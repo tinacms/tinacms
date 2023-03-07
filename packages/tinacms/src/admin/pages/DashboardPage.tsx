@@ -3,7 +3,7 @@
 */
 
 import React from 'react'
-import type { TinaCMS } from '@tinacms/toolkit'
+import type { TinaCMS } from '../../toolkit/src'
 
 import GetCMS from '../components/GetCMS'
 import { PageWrapper, PageHeader, PageBodyNarrow } from '../components/Page'

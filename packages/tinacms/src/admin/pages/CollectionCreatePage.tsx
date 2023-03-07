@@ -9,7 +9,7 @@ import {
   FormBuilder,
   FormStatus,
   wrapFieldsWithMeta,
-} from '@tinacms/toolkit'
+} from '../../toolkit/src'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
@@ -18,10 +18,10 @@ import type { Template } from '@tinacms/schema-tools'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import { HiChevronRight } from 'react-icons/hi'
-import { LocalWarning } from '@tinacms/toolkit'
+import { LocalWarning } from '../../toolkit/src'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
-import type { TinaCMS } from '@tinacms/toolkit'
+import type { TinaCMS } from '../../toolkit/src'
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 import { useWindowWidth } from '@react-hook/window-size'
 import { FaLock, FaUnlock } from 'react-icons/fa'

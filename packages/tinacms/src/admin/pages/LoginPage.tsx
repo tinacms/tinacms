@@ -7,7 +7,7 @@ import { BiLogIn } from 'react-icons/bi'
 import { MdOutlineArrowBack } from 'react-icons/md'
 import { useEditState } from '@tinacms/sharedctx'
 import AuthTemplate from '../components/AuthTemplate'
-import { Button } from '@tinacms/toolkit'
+import { Button } from '../../toolkit/src'
 
 const LoginPage = () => {
   const { setEdit } = useEditState()

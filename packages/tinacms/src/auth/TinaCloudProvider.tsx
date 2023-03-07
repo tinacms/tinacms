@@ -14,7 +14,7 @@ import {
   useLocalStorage,
   DummyMediaStore,
   TinaMediaStore,
-} from '@tinacms/toolkit'
+} from '../toolkit/src'
 
 import { Client, TinaIOConfig } from '../internalClient'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
@@ -177,13 +177,13 @@ export const TinaCloudProvider = (
   const setupMedia = async () => {
     const hasTinaMedia = Boolean(props.schema.config?.media?.tina)
 
-    /* 
+    /*
      Has tina media (set up in the schema)
     */
     if (hasTinaMedia) {
       cms.media.store = new TinaMediaStore(cms)
     } else if (
-      /* 
+      /*
      Has tina custom media (set up in the schema or define schema)
       */
       props.schema.config?.media?.loadCustomStore ||

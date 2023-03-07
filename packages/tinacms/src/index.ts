@@ -7,18 +7,18 @@ export * from './auth'
 export * from './utils'
 export * from './tina-cms'
 export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
-export * from '@tinacms/toolkit'
+export * from './toolkit/src'
 export { TinaAdmin } from './admin'
 export { RouteMappingPlugin } from './admin/plugins/route-mapping'
 export { TinaAdminApi } from './admin/api'
 
-export { MdxFieldPluginExtendible } from '@tinacms/toolkit'
+export { MdxFieldPluginExtendible } from './toolkit/src'
 
 import { TinaCMSProvider2, DocumentCreatorCallback } from './tina-cms'
 import type { TinaCMSProviderDefaultProps } from './types/cms'
 export type { TinaCMSProviderDefaultProps }
 export default TinaCMSProvider2
-import { MediaStore, TinaCMS } from '@tinacms/toolkit'
+import { MediaStore, TinaCMS } from './toolkit/src'
 import { formifyCallback } from './hooks/use-graphql-forms'
 
 import { validateSchema } from '@tinacms/schema-tools'

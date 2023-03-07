@@ -4,8 +4,8 @@
 
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import { BillingWarning, LocalWarning } from '@tinacms/toolkit'
-import type { TinaCMS, ScreenPlugin } from '@tinacms/toolkit'
+import { BillingWarning, LocalWarning } from '../../toolkit/src'
+import type { TinaCMS, ScreenPlugin } from '../../toolkit/src'
 
 import GetCMS from '../components/GetCMS'
 import { slugify } from '../components/Sidebar'

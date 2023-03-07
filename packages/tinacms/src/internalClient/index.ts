@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { AUTH_TOKEN_KEY, TokenObject, authenticate } from '../auth/authenticate'
 //@ts-ignore can't locate BranchChangeEvent
-import { BranchChangeEvent, BranchData, EventBus } from '@tinacms/toolkit'
+import { BranchChangeEvent, BranchData, EventBus } from '../toolkit/src'
 import {
   DocumentNode,
   GraphQLSchema,

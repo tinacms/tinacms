@@ -6,7 +6,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
-import { TinaCMS, useCMS } from '@tinacms/toolkit'
+import { TinaCMS, useCMS } from '../toolkit/src'
 
 import Layout from './components/Layout'
 import Sidebar from './components/Sidebar'

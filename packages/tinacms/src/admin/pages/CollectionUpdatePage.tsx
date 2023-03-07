@@ -2,7 +2,12 @@
 
 */
 
-import { BillingWarning, Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
+import {
+  BillingWarning,
+  Form,
+  FormBuilder,
+  FormStatus,
+} from '../../toolkit/src'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import GetDocument from '../components/GetDocument'
@@ -10,10 +15,10 @@ import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
 import { Link, useParams } from 'react-router-dom'
 import { HiChevronRight } from 'react-icons/hi'
-import { LocalWarning } from '@tinacms/toolkit'
+import { LocalWarning } from '../../toolkit/src'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
-import type { TinaCMS } from '@tinacms/toolkit'
+import type { TinaCMS } from '../../toolkit/src'
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 import { useWindowWidth } from '@react-hook/window-size'
 

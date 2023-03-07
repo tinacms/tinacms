@@ -2,7 +2,7 @@
 
 */
 
-import type { TinaCMS } from '@tinacms/toolkit'
+import type { TinaCMS } from '../toolkit/src'
 import type { Schema, Config } from '@tinacms/schema-tools'
 import type { TinaCloudMediaStoreClass } from '../auth'
 import type { useDocumentCreatorPlugin } from '../hooks/use-content-creator'

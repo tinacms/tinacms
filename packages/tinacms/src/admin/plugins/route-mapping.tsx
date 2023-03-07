@@ -2,7 +2,7 @@
 
 */
 
-import { Plugin } from '@tinacms/toolkit'
+import { Plugin } from '../../toolkit/src'
 import type { CollectionResponse, DocumentSys } from '../types'
 export class RouteMappingPlugin implements Plugin {
   __type: string = 'tina-admin'

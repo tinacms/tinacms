@@ -3,7 +3,7 @@
 */
 
 import React, { useEffect, useState } from 'react'
-import type { TinaCMS } from '@tinacms/toolkit'
+import type { TinaCMS } from '../../toolkit/src'
 import type { TinaSchema } from '@tinacms/schema-tools'
 import { FilterArgs, TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'

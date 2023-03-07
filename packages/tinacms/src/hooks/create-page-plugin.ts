@@ -2,7 +2,7 @@
 
 */
 
-import { AddContentPlugin, TinaCMS } from '@tinacms/toolkit'
+import { AddContentPlugin, TinaCMS } from '../toolkit/src'
 
 type CollectionShape = {
   label: string

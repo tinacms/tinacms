@@ -5,7 +5,7 @@
 import React from 'react'
 
 import { TinaAdminApi } from '../api'
-import type { TinaCMS } from '@tinacms/toolkit'
+import type { TinaCMS } from '../../toolkit/src'
 
 export const useGetCollections = (cms: TinaCMS) => {
   const api = new TinaAdminApi(cms)

@@ -34,7 +34,7 @@ import {
   ReactDateTimeWithStyles,
   Toggle,
   textFieldClasses,
-} from '@tinacms/toolkit'
+} from '../../toolkit/src'
 import type {
   CollectionResponse,
   TemplateResponse,
@@ -46,7 +46,7 @@ import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageWrapper, PageHeader, PageBody } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import { useState } from 'react'
-import { CursorPaginator } from '@tinacms/toolkit'
+import { CursorPaginator } from '../../toolkit/src'
 import { useEffect } from 'react'
 import type { Collection } from '@tinacms/schema-tools'
 

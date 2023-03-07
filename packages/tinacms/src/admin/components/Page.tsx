@@ -8,7 +8,7 @@ import {
   BillingWarning,
   BranchBanner,
   useCMS,
-} from '@tinacms/toolkit'
+} from '../../toolkit/src'
 
 export const PageWrapper = ({
   children,

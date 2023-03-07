@@ -8,7 +8,7 @@ import { BiLogOut } from 'react-icons/bi'
 import { MdOutlineArrowBack } from 'react-icons/md'
 import { useEditState, setEditing } from '@tinacms/sharedctx'
 import AuthTemplate from '../components/AuthTemplate'
-import { Button, useCMS } from '@tinacms/toolkit'
+import { Button, useCMS } from '../../toolkit/src'
 
 export const LogoutRedirect = () => {
   const cms = useCMS()

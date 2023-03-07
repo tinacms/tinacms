@@ -389,7 +389,6 @@ importers:
       '@heroicons/react': 1.0.6
       '@monaco-editor/react': 4.4.5
       '@tinacms/mdx': workspace:*
-      '@tinacms/toolkit': workspace:*
       '@types/react': 17.0.47
       '@types/react-dom': 17.0.2
       '@xstate/react': 3.0.0
@@ -413,7 +412,6 @@ importers:
       '@heroicons/react': 1.0.6_react@17.0.2
       '@monaco-editor/react': 4.4.5_ilaxvrtg3zfidjpyrhsbytq244
       '@tinacms/mdx': link:../mdx
-      '@tinacms/toolkit': link:../toolkit
       '@xstate/react': 3.0.0_qoz6orvt26se6gmwe4ax5kvcum
       final-form: 4.20.7
       graphiql: 2.4.0_ltqzrpympbddkywnmhjcbgtday
@@ -1118,131 +1116,6 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       typescript: 4.3.5
 
-  packages/@tinacms/toolkit:
-    specifiers:
-      '@floating-ui/dom': ^0.1.7
-      '@floating-ui/react-dom': ^0.3.3
-      '@headlessui/react': ^1.5.0
-      '@heroicons/react': ^1.0.5
-      '@monaco-editor/react': 4.4.5
-      '@react-aria/i18n': ^3.3.4
-      '@react-aria/listbox': 3.3.0
-      '@react-hook/window-size': ^3.0.7
-      '@react-types/combobox': ^3.2.0
-      '@react-types/shared': ^3.10.0
-      '@sambego/storybook-styles': ^1.0.0
-      '@testing-library/jest-dom': ^5.11.9
-      '@testing-library/react': ^12.0.0
-      '@testing-library/user-event': ^12.7.0
-      '@tinacms/scripts': workspace:*
-      '@tinacms/sharedctx': workspace:*
-      '@types/atob': ^2.1.2
-      '@types/codemirror': ^0.0.71
-      '@types/color-string': ^1.5.0
-      '@types/jest': ^27.0.1
-      '@types/lodash.debounce': ^4.0.6
-      '@types/lodash.get': ^4.4.5
-      '@types/prop-types': ^15.7.4
-      '@types/react': 17.0.47
-      '@types/react-beautiful-dnd': ^11.0.3
-      '@types/react-color': ^3.0.1
-      '@types/react-dom': ^17.0.9
-      '@types/react-select': ^2.0.11
-      '@types/storybook__react': ^4.0.2
-      '@udecode/plate-headless': ^14.0.2
-      atob: 2.1.2
-      color-string: ^1.5.3
-      final-form: ^4.20.2
-      final-form-arrays: ^3.0.1
-      final-form-set-field-data: ^1.0.2
-      is-hotkey: ^0.2.0
-      jest: ^27.0.6
-      lodash.get: ^4.4.2
-      moment: 2.29.4
-      monaco-editor: 0.31.0
-      prism-react-renderer: ^1.3.5
-      prismjs: ^1.28.0
-      prop-types: 15.7.2
-      react: 17.0.2
-      react-beautiful-dnd: ^13.1.0
-      react-color: ^2.17.3
-      react-datetime: ^2.16.3
-      react-dom: 17.0.2
-      react-dropzone: 14.2.3
-      react-final-form: ^6.3.0
-      react-icons: ^4.3.1
-      react-is: ^17.0.2
-      react-onclickoutside: ^6.12.2
-      slate: ^0.81.1
-      slate-history: ^0.66.0
-      slate-hyperscript: ^0.77.0
-      slate-react: ^0.81.0
-      tslib: ^2.3.0
-      typescript: 4.3.5
-      webfontloader: 1.6.28
-    dependencies:
-      '@floating-ui/dom': 0.1.10
-      '@floating-ui/react-dom': 0.3.4_nn45z5sr7igu7sfun6tiae5hx4
-      '@headlessui/react': 1.6.5_sfoxds7t5ydpegc3knd667wn6m
-      '@heroicons/react': 1.0.6_react@17.0.2
-      '@monaco-editor/react': 4.4.5_ilaxvrtg3zfidjpyrhsbytq244
-      '@react-aria/i18n': 3.4.1_react@17.0.2
-      '@react-aria/listbox': 3.3.0_react@17.0.2
-      '@react-hook/window-size': 3.0.7_react@17.0.2
-      '@react-types/combobox': 3.5.1_react@17.0.2
-      '@react-types/shared': 3.13.1_react@17.0.2
-      '@sambego/storybook-styles': 1.0.0
-      '@tinacms/sharedctx': link:../sharedctx
-      '@udecode/plate-headless': 14.4.3_bhjjt5imxaxhlt7sylcuqcqbdm
-      atob: 2.1.2
-      color-string: 1.9.1
-      final-form: 4.20.7
-      final-form-arrays: 3.0.2_final-form@4.20.7
-      final-form-set-field-data: 1.0.2_final-form@4.20.7
-      is-hotkey: 0.2.0
-      lodash.get: 4.4.2
-      moment: 2.29.4
-      monaco-editor: 0.31.0
-      prism-react-renderer: 1.3.5_react@17.0.2
-      prismjs: 1.28.0
-      prop-types: 15.7.2
-      react-beautiful-dnd: 13.1.0_sfoxds7t5ydpegc3knd667wn6m
-      react-color: 2.19.3_react@17.0.2
-      react-datetime: 2.16.3_tonpzznxmdkdqlpcs7osdmovtq
-      react-dropzone: 14.2.3_react@17.0.2
-      react-final-form: 6.5.9_s44h3cxpdxv6cks4bnqewerqda
-      react-icons: 4.4.0_react@17.0.2
-      react-onclickoutside: 6.12.2_sfoxds7t5ydpegc3knd667wn6m
-      slate: 0.81.1
-      slate-history: 0.66.0_slate@0.81.1
-      slate-hyperscript: 0.77.0_slate@0.81.1
-      slate-react: 0.81.0_ve2o5usd253mp6cjwaeru2n3py
-      webfontloader: 1.6.28
-    devDependencies:
-      '@testing-library/jest-dom': 5.16.4
-      '@testing-library/react': 12.1.5_sfoxds7t5ydpegc3knd667wn6m
-      '@testing-library/user-event': 12.8.3
-      '@tinacms/scripts': link:../scripts
-      '@types/atob': 2.1.2
-      '@types/codemirror': 0.0.71
-      '@types/color-string': 1.5.2
-      '@types/jest': 27.5.2
-      '@types/lodash.debounce': 4.0.7
-      '@types/lodash.get': 4.4.7
-      '@types/prop-types': 15.7.5
-      '@types/react': 17.0.47
-      '@types/react-beautiful-dnd': 11.0.7
-      '@types/react-color': 3.0.6
-      '@types/react-dom': 17.0.17
-      '@types/react-select': 2.0.19
-      '@types/storybook__react': 4.0.2
-      jest: 27.5.1
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-is: 17.0.2
-      tslib: 2.4.0
-      typescript: 4.3.5
-
   packages/@tinacms/webpack-helpers:
     specifiers: {}
 
@@ -1284,7 +1157,6 @@ importers:
   packages/next-tinacms-cloudinary:
     specifiers:
       '@tinacms/scripts': workspace:*
-      '@tinacms/toolkit': workspace:*
       '@types/crypto-js': ^3.1.47
       '@types/js-cookie': ^2.2.6
       '@types/node': ^13.13.1
@@ -1298,7 +1170,6 @@ importers:
       multer: 1.4.5-lts.1
     devDependencies:
       '@tinacms/scripts': link:../@tinacms/scripts
-      '@tinacms/toolkit': link:../@tinacms/toolkit
       '@types/crypto-js': 3.1.47
       '@types/js-cookie': 2.2.7
       '@types/node': 13.13.52
@@ -1310,7 +1181,6 @@ importers:
     specifiers:
       '@aws-sdk/client-s3': 3.150.0
       '@tinacms/scripts': workspace:*
-      '@tinacms/toolkit': workspace:*
       '@types/crypto-js': ^3.1.47
       '@types/js-cookie': ^2.2.6
       '@types/node': ^13.13.1
@@ -1323,7 +1193,6 @@ importers:
       multer: 1.4.5-lts.1
     devDependencies:
       '@tinacms/scripts': link:../@tinacms/scripts
-      '@tinacms/toolkit': link:../@tinacms/toolkit
       '@types/crypto-js': 3.1.47
       '@types/js-cookie': 2.2.7
       '@types/node': 13.13.52
@@ -1336,7 +1205,6 @@ importers:
       '@aws-sdk/client-s3': 3.150.0
       '@aws-sdk/signature-v4-crt': 3.163.0
       '@tinacms/scripts': workspace:*
-      '@tinacms/toolkit': workspace:*
       '@types/crypto-js': ^3.1.47
       '@types/js-cookie': ^2.2.6
       '@types/node': ^13.13.1
@@ -1351,7 +1219,6 @@ importers:
       multer: 1.4.5-lts.1
     devDependencies:
       '@tinacms/scripts': link:../@tinacms/scripts
-      '@tinacms/toolkit': link:../@tinacms/toolkit
       '@types/crypto-js': 3.1.47
       '@types/js-cookie': 2.2.7
       '@types/node': 13.13.52
@@ -1362,12 +1229,20 @@ importers:
 
   packages/tinacms:
     specifiers:
+      '@floating-ui/dom': ^0.1.7
+      '@floating-ui/react-dom': ^0.3.3
       '@graphql-inspector/core': ^4.0.0
       '@graphql-tools/relay-operation-optimizer': ^6.4.1
       '@graphql-tools/utils': ^8.6.1
       '@headlessui/react': ^1.5.0
       '@heroicons/react': ^1.0.4
+      '@monaco-editor/react': 4.4.5
+      '@react-aria/i18n': ^3.3.4
+      '@react-aria/listbox': 3.3.0
       '@react-hook/window-size': ^3.0.7
+      '@react-types/combobox': ^3.2.0
+      '@react-types/shared': ^3.10.0
+      '@sambego/storybook-styles': ^1.0.0
       '@testing-library/jest-dom': ^5.11.9
       '@testing-library/react': ^12.0.0
       '@testing-library/react-hooks': ^7.0.2
@@ -1375,52 +1250,114 @@ importers:
       '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
       '@tinacms/sharedctx': workspace:*
-      '@tinacms/toolkit': workspace:*
+      '@types/atob': ^2.1.2
+      '@types/codemirror': ^0.0.71
+      '@types/color-string': ^1.5.0
       '@types/jest': ^27.0.1
       '@types/lodash': ^4.14.169
+      '@types/lodash.debounce': ^4.0.6
+      '@types/lodash.get': ^4.4.5
       '@types/node': ^14.0.13
+      '@types/prop-types': ^15.7.4
       '@types/react': 17.0.47
+      '@types/react-beautiful-dnd': ^11.0.3
+      '@types/react-color': ^3.0.1
+      '@types/react-dom': ^17.0.9
+      '@types/react-select': ^2.0.11
+      '@types/storybook__react': ^4.0.2
       '@types/yup': ^0.29.10
+      '@udecode/plate-headless': ^14.0.2
+      atob: 2.1.2
+      color-string: ^1.5.3
       crypto-js: ^4.0.0
       encoding: 0.1.13
       fetch-ponyfill: ^7.1.0
       final-form: 4.20.1
+      final-form-arrays: ^3.0.1
+      final-form-set-field-data: ^1.0.2
       graphql: 15.8.0
       graphql-tag: ^2.11.0
       identity-obj-proxy: ^3.0.0
+      is-hotkey: ^0.2.0
       isomorphic-fetch: ^3.0.0
       jest: ^27.0.6
       jest-file-snapshot: ^0.5.0
+      lodash.get: ^4.4.2
       lodash.set: ^4.3.2
+      moment: 2.29.4
+      monaco-editor: 0.31.0
       next: 12.2.4
       prism-react-renderer: ^1.3.5
+      prismjs: ^1.28.0
+      prop-types: 15.7.2
       react: 17.0.2
+      react-beautiful-dnd: ^13.1.0
+      react-color: ^2.17.3
+      react-datetime: ^2.16.3
       react-dom: 17.0.2
+      react-dropzone: 14.2.3
+      react-final-form: ^6.3.0
       react-icons: ^4.3.1
       react-is: ^17.0.2
+      react-onclickoutside: ^6.12.2
       react-router-dom: '6'
+      slate: ^0.81.1
+      slate-history: ^0.66.0
+      slate-hyperscript: ^0.77.0
+      slate-react: ^0.81.0
+      tslib: ^2.3.0
       typescript: 4.3.5
+      webfontloader: 1.6.28
       yup: ^0.32.0
       zod: ^3.14.3
     dependencies:
+      '@floating-ui/dom': 0.1.10
+      '@floating-ui/react-dom': 0.3.4_nn45z5sr7igu7sfun6tiae5hx4
       '@graphql-inspector/core': 4.0.0_graphql@15.8.0
       '@graphql-tools/relay-operation-optimizer': 6.5.0_qyboaezk4cm6zsf5jfobzggyaa
       '@headlessui/react': 1.7.5_sfoxds7t5ydpegc3knd667wn6m
       '@heroicons/react': 1.0.6_react@17.0.2
+      '@monaco-editor/react': 4.4.5_ilaxvrtg3zfidjpyrhsbytq244
+      '@react-aria/i18n': 3.4.1_react@17.0.2
+      '@react-aria/listbox': 3.3.0_react@17.0.2
       '@react-hook/window-size': 3.0.7_react@17.0.2
+      '@react-types/combobox': 3.5.1_react@17.0.2
+      '@react-types/shared': 3.13.1_react@17.0.2
+      '@sambego/storybook-styles': 1.0.0
       '@tinacms/schema-tools': link:../@tinacms/schema-tools
       '@tinacms/sharedctx': link:../@tinacms/sharedctx
-      '@tinacms/toolkit': link:../@tinacms/toolkit
+      '@udecode/plate-headless': 14.4.3_bhjjt5imxaxhlt7sylcuqcqbdm
+      atob: 2.1.2
+      color-string: 1.9.1
       crypto-js: 4.1.1
       encoding: 0.1.13
       fetch-ponyfill: 7.1.0_encoding@0.1.13
       final-form: 4.20.1
+      final-form-arrays: 3.0.2_final-form@4.20.1
+      final-form-set-field-data: 1.0.2_final-form@4.20.1
       graphql: 15.8.0
       graphql-tag: 2.12.6_graphql@15.8.0
+      is-hotkey: 0.2.0
+      lodash.get: 4.4.2
       lodash.set: 4.3.2
+      moment: 2.29.4
+      monaco-editor: 0.31.0
       prism-react-renderer: 1.3.5_react@17.0.2
+      prismjs: 1.28.0
+      prop-types: 15.7.2
+      react-beautiful-dnd: 13.1.0_sfoxds7t5ydpegc3knd667wn6m
+      react-color: 2.19.3_react@17.0.2
+      react-datetime: 2.16.3_tonpzznxmdkdqlpcs7osdmovtq
+      react-dropzone: 14.2.3_react@17.0.2
+      react-final-form: 6.5.9_uwmlhjeisyueizxonpmaggth2e
       react-icons: 4.4.0_react@17.0.2
+      react-onclickoutside: 6.12.2_sfoxds7t5ydpegc3knd667wn6m
       react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
+      slate: 0.81.1
+      slate-history: 0.66.0_slate@0.81.1
+      slate-hyperscript: 0.77.0_slate@0.81.1
+      slate-react: 0.81.0_ve2o5usd253mp6cjwaeru2n3py
+      webfontloader: 1.6.28
       yup: 0.32.11
       zod: 3.17.3
     devDependencies:
@@ -1430,10 +1367,21 @@ importers:
       '@testing-library/react-hooks': 7.0.2_sfoxds7t5ydpegc3knd667wn6m
       '@testing-library/user-event': 12.8.3
       '@tinacms/scripts': link:../@tinacms/scripts
+      '@types/atob': 2.1.2
+      '@types/codemirror': 0.0.71
+      '@types/color-string': 1.5.2
       '@types/jest': 27.5.2
       '@types/lodash': 4.14.182
+      '@types/lodash.debounce': 4.0.7
+      '@types/lodash.get': 4.4.7
       '@types/node': 14.18.21
+      '@types/prop-types': 15.7.5
       '@types/react': 17.0.47
+      '@types/react-beautiful-dnd': 11.0.7
+      '@types/react-color': 3.0.6
+      '@types/react-dom': 17.0.17
+      '@types/react-select': 2.0.19
+      '@types/storybook__react': 4.0.2
       '@types/yup': 0.29.14
       identity-obj-proxy: 3.0.0
       isomorphic-fetch: 3.0.0_encoding@0.1.13
@@ -1443,6 +1391,7 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
+      tslib: 2.5.0
       typescript: 4.3.5
 
 packages:
@@ -6313,7 +6262,7 @@ packages:
       }
     engines: { node: '>=6.9.0' }
     dependencies:
-      regenerator-runtime: 0.13.9
+      regenerator-runtime: 0.13.11
     dev: false
 
   /@babel/runtime/7.21.0:
@@ -7677,7 +7626,7 @@ packages:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
       graphql: 15.8.0
-      tslib: 2.4.0
+      tslib: 2.5.0
 
   /@graphql-tools/utils/9.1.3_graphql@15.8.0:
     resolution:
@@ -9557,7 +9506,7 @@ packages:
       '@react-aria/interactions': 3.9.1_react@17.0.2
       '@react-aria/utils': 3.13.1_react@17.0.2
       '@react-types/shared': 3.13.1_react@17.0.2
-      clsx: 1.1.1
+      clsx: 1.2.1
       react: 17.0.2
     dev: false
 
@@ -9569,7 +9518,7 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.21.0
       '@internationalized/date': 3.0.0
       '@internationalized/message': 3.0.8
       '@internationalized/number': 3.1.1
@@ -9616,7 +9565,7 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1
     dependencies:
-      '@babel/runtime': 7.19.0
+      '@babel/runtime': 7.21.0
       '@react-aria/focus': 3.6.1_react@17.0.2
       '@react-aria/interactions': 3.9.1_react@17.0.2
       '@react-aria/label': 3.3.1_react@17.0.2
@@ -9672,7 +9621,7 @@ packages:
       '@react-aria/ssr': 3.2.0_react@17.0.2
       '@react-stately/utils': 3.5.0_react@17.0.2
       '@react-types/shared': 3.13.1_react@17.0.2
-      clsx: 1.1.1
+      clsx: 1.2.1
       react: 17.0.2
     dev: false
 
@@ -10381,7 +10330,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
-      tailwindcss: 2.2.19_3vnygek3yzhyjlvmmgk3sqgzme
+      tailwindcss: 2.2.19_ugi4xkrfysqkt4c4y6hkyfj344
     dev: false
 
   /@tailwindcss/typography/0.5.2_tailwindcss@3.1.4:
@@ -11449,7 +11398,7 @@ packages:
       }
     dependencies:
       '@types/react': 17.0.47
-      '@types/react-dom': 17.0.17
+      '@types/react-dom': 18.0.5
       '@types/react-transition-group': 4.4.5
     dev: true
 
@@ -12318,7 +12267,7 @@ packages:
     dependencies:
       '@radix-ui/react-slot': 0.1.2_react@17.0.2
       '@udecode/zustood': 1.1.1_bufjuvbfmumf3fm6mt4owofr5e
-      clsx: 1.1.1
+      clsx: 1.2.1
       jotai: 1.7.5_react@17.0.2
       lodash: 4.17.21
       react: 17.0.2
@@ -14159,7 +14108,6 @@ packages:
       picocolors: 1.0.0
       postcss: 8.4.14
       postcss-value-parser: 4.2.0
-    dev: true
 
   /autoprefixer/10.4.7_postcss@8.4.16:
     resolution:
@@ -14178,6 +14126,7 @@ packages:
       picocolors: 1.0.0
       postcss: 8.4.16
       postcss-value-parser: 4.2.0
+    dev: true
 
   /autoprefixer/10.4.7_postcss@8.4.18:
     resolution:
@@ -15646,14 +15595,6 @@ packages:
       proxy-agent: 5.0.0
     transitivePeerDependencies:
       - supports-color
-    dev: false
-
-  /clsx/1.1.1:
-    resolution:
-      {
-        integrity: sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==,
-      }
-    engines: { node: '>=6' }
     dev: false
 
   /clsx/1.2.1:
@@ -19791,7 +19732,7 @@ packages:
     engines: { node: '>=0.10.0' }
     dev: false
 
-  /final-form-arrays/3.0.2_final-form@4.20.7:
+  /final-form-arrays/3.0.2_final-form@4.20.1:
     resolution:
       {
         integrity: sha512-TfO8aZNz3RrsZCDx8GHMQcyztDNpGxSSi9w4wpSNKlmv2PfFWVVM8P7Yj5tj4n0OWax+x5YwTLhT5BnqSlCi+w==,
@@ -19799,10 +19740,10 @@ packages:
     peerDependencies:
       final-form: ^4.18.2
     dependencies:
-      final-form: 4.20.7
+      final-form: 4.20.1
     dev: false
 
-  /final-form-set-field-data/1.0.2_final-form@4.20.7:
+  /final-form-set-field-data/1.0.2_final-form@4.20.1:
     resolution:
       {
         integrity: sha512-gAnENimyQ5GW3OEGca5pbwm4lYshW2orzfBlPUYqzcm7ZxkQrVO8FqCAgEcCM+Rq9U1OU0q+D+UkqETvvDY6jw==,
@@ -19810,7 +19751,7 @@ packages:
     peerDependencies:
       final-form: '>=1.2.0'
     dependencies:
-      final-form: 4.20.7
+      final-form: 4.20.1
     dev: false
 
   /final-form/4.20.1:
@@ -27834,6 +27775,7 @@ packages:
       lilconfig: 2.0.6
       postcss: 8.4.16
       yaml: 1.10.2
+    dev: true
 
   /postcss-load-config/3.1.4_postcss@8.4.18:
     resolution:
@@ -27908,6 +27850,7 @@ packages:
     dependencies:
       postcss: 8.4.16
       postcss-selector-parser: 6.0.10
+    dev: true
 
   /postcss-nested/5.0.6_postcss@8.4.18:
     resolution:
@@ -28655,7 +28598,7 @@ packages:
       react: ^16.8.5 || ^17.0.0
       react-dom: ^16.8.5 || ^17.0.0
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.21.0
       css-box-model: 1.2.1
       memoize-one: 5.2.1
       raf-schd: 4.0.3
@@ -28711,7 +28654,7 @@ packages:
       create-react-class: 15.7.0
       moment: 2.29.4
       object-assign: 3.0.0
-      prop-types: 15.7.2
+      prop-types: 15.8.1
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-onclickoutside: 6.12.2_sfoxds7t5ydpegc3knd667wn6m
@@ -28770,7 +28713,7 @@ packages:
       react: 17.0.2
     dev: true
 
-  /react-final-form/6.5.9_s44h3cxpdxv6cks4bnqewerqda:
+  /react-final-form/6.5.9_uwmlhjeisyueizxonpmaggth2e:
     resolution:
       {
         integrity: sha512-x3XYvozolECp3nIjly+4QqxdjSSWfcnpGEL5K8OBT6xmGrq5kBqbA6+/tOqoom9NwqIPPbxPNsOViFlbKgowbA==,
@@ -28780,7 +28723,7 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       '@babel/runtime': 7.19.0
-      final-form: 4.20.7
+      final-form: 4.20.1
       react: 17.0.2
     dev: false
 
@@ -31518,6 +31461,7 @@ packages:
       tmp: 0.2.1
     transitivePeerDependencies:
       - ts-node
+    dev: true
 
   /tailwindcss/2.2.19_ugi4xkrfysqkt4c4y6hkyfj344:
     resolution:
@@ -31566,7 +31510,6 @@ packages:
       tmp: 0.2.1
     transitivePeerDependencies:
       - ts-node
-    dev: true
 
   /tailwindcss/3.1.4_postcss@8.4.14:
     resolution:
@@ -32296,6 +32239,7 @@ packages:
       {
         integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==,
       }
+    dev: false
 
   /tslib/2.5.0:
     resolution:

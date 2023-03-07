@@ -3,7 +3,7 @@
 */
 
 import React from 'react'
-import { useCMS } from '@tinacms/toolkit'
+import { useCMS } from '../toolkit/src'
 import { ContentCreatorPlugin, OnNewDocument } from './create-page-plugin'
 
 export type FilterCollections = (

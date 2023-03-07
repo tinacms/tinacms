@@ -8,8 +8,8 @@ import type {
   MediaListOptions,
   MediaStore,
   MediaUploadOptions,
-} from '@tinacms/toolkit'
-import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@tinacms/toolkit'
+} from 'tinacms'
+import { DEFAULT_MEDIA_UPLOAD_TYPES } from 'tinacms'
 
 import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors'
 

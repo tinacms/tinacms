@@ -8,8 +8,8 @@ import {
   ModalHeader,
   ModalBody,
   ModalActions,
-} from '@tinacms/toolkit'
-import { LoadingDots, Button } from '@tinacms/toolkit'
+} from '../toolkit/src'
+import { LoadingDots, Button } from '../toolkit/src'
 import React, { useCallback, useState } from 'react'
 
 interface ModalBuilderProps {

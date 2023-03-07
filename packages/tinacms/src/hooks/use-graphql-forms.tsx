@@ -2,8 +2,8 @@
 
 */
 
-import { Form, GlobalFormPlugin } from '@tinacms/toolkit'
-import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
+import { Form, GlobalFormPlugin } from '../toolkit/src'
+import type { FormOptions, TinaCMS } from '../toolkit/src'
 import { assertShape } from '../utils'
 
 export const transformDocumentIntoMutationRequestPayload = (

@@ -1,4 +1,4 @@
-import type { TinaCMS } from '@tinacms/toolkit'
+import type { TinaCMS } from '../toolkit/src'
 import { print, buildSchema } from 'graphql'
 
 import { diff } from '@graphql-inspector/core'

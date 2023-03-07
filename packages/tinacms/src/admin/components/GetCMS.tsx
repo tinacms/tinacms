@@ -3,7 +3,7 @@
 */
 
 import React from 'react'
-import { useCMS } from '@tinacms/toolkit'
+import { useCMS } from '../../toolkit/src'
 
 const GetCMS = ({ children }: { children: any }) => {
   try {

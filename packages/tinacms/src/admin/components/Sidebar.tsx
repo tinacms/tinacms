@@ -7,15 +7,15 @@ import { NavLink } from 'react-router-dom'
 import { ImFilesEmpty } from 'react-icons/im'
 import type { IconType } from 'react-icons/lib'
 
-import { Button, Nav } from '@tinacms/toolkit'
-import type { TinaCMS, ScreenPlugin } from '@tinacms/toolkit'
+import { Button, Nav } from '../../toolkit/src'
+import type { TinaCMS, ScreenPlugin } from '../../toolkit/src'
 import { Transition } from '@headlessui/react'
 import { useWindowWidth } from '@react-hook/window-size'
 
 import { useGetCollections } from './GetCollections'
 import { IoMdClose } from 'react-icons/io'
 import { BiMenu } from 'react-icons/bi'
-import { CloudConfigPlugin } from '@tinacms/toolkit/dist/packages/react-cloud-config'
+import { CloudConfigPlugin } from '../../toolkit/src/packages/react-cloud-config'
 
 export const slugify = (text) => {
   return text
