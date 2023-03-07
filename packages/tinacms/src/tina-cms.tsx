@@ -181,12 +181,6 @@ export const TinaCMSProvider2 = ({
   schema,
   ...props
 }: TinaCMSProviderDefaultProps) => {
-  React.useEffect(() => {
-    console.warn(`
-    * Tina no longer requires wrapping your site in the TinaProvider
-    * See https://tina.io/blog/upgrading-to-iframe/ for full migration details
-    `)
-  }, [])
   if (props?.apiURL) {
     console.warn(
       'The apiURL prop is deprecated. Please see https://tina.io/blog/tina-v-0.68.14 for information on how to upgrade to the new API'
