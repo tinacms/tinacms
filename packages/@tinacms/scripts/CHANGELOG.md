@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.0.3
+
+### Patch Changes
+
+- be3eac32f: Adds grid view to media manager
+- f831dcf4f: security: update some deps
+
 ## 1.0.2
 
 ### Patch Changes

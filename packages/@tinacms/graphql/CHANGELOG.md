@@ -1,5 +1,20 @@
 # tina-graphql
 
+## 1.3.3
+
+### Patch Changes
+
+- 0a5297800: feat: Allow adding aliases in field configs, to export special characters like names with dashes, or fields named "id"
+- 5427d03c6: Fix issue where getTemplatesForCollectable was being called with a nullable value
+- Updated dependencies [3e97d978c]
+- Updated dependencies [0a5297800]
+- Updated dependencies [7a3e86ba1]
+- Updated dependencies [f831dcf4f]
+- Updated dependencies [353899de1]
+- Updated dependencies [01b858e41]
+  - @tinacms/mdx@1.3.2
+  - @tinacms/schema-tools@1.3.3
+
 ## 1.3.2
 
 ### Patch Changes
