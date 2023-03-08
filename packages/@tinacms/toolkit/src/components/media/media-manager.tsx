@@ -438,12 +438,12 @@ export function MediaPicker({
           <div className="flex w-full flex-col h-full">
             <ul
               {...rootProps}
-              className={`h-full grow bg-white overflow-y-auto transition duration-150 ease-out ${
+              className={`h-full grow overflow-y-auto transition duration-150 ease-out ${
                 viewMode === 'list' &&
-                'w-full flex flex-1 flex-col divide-y divide-gray-100'
+                'bg-gray-50 w-full flex flex-1 flex-col justify-start'
               } ${
                 viewMode === 'grid' &&
-                'w-full grid grid-cols-[repeat(auto-fit,_minmax(min(100%,_max(220px,_100%/8)),_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4 content-start'
+                'bg-white w-full grid grid-cols-[repeat(auto-fit,_minmax(min(100%,_max(220px,_100%/8)),_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4 content-start'
               } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
             >
               <input {...getInputProps()} />
