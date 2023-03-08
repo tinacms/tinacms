@@ -200,8 +200,8 @@ export const baseCmds: Command[] = [
           buildSetupCmdBuild,
           buildCmdBuild,
           checkClientInfo,
-          checkGraphqlSchema,
           waitForDB,
+          checkGraphqlSchema,
           indexIntoSelfHostedDatabase,
         ],
         options
