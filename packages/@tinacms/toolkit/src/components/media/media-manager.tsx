@@ -534,10 +534,7 @@ const ActiveItemPreview = ({
             <h3 className="text-lg text-gray-600 w-full max-w-full break-words block truncate">
               {activeItem.filename}
             </h3>
-            <CopyField
-              value={absoluteImgURL(activeItem.src)}
-              label="Absolute URL"
-            />
+            <CopyField value={absoluteImgURL(activeItem.src)} label="URL" />
           </div>
           <div className="shrink-0 w-full flex flex-col justify-end items-start">
             <div className="flex w-full gap-3">
