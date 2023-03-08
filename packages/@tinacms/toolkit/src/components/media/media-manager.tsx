@@ -673,7 +673,7 @@ interface CopyFieldProps {
 }
 
 const CopyField = ({ label, description, value }: CopyFieldProps) => {
-  const [clientIdCopied, setClientIdCopied] = React.useState(false)
+  const [copied, setCopied] = React.useState(false)
   const [fadeOut, setFadeOut] = React.useState(false)
 
   return (
@@ -685,25 +685,25 @@ const CopyField = ({ label, description, value }: CopyFieldProps) => {
       )}
       <span
         onClick={() => {
-          if (clientIdCopied === true) return
-          setClientIdCopied(true)
+          if (copied === true) return
+          setCopied(true)
           setTimeout(() => {
             setFadeOut(true)
           }, 2500)
           setTimeout(() => {
-            setClientIdCopied(false)
+            setCopied(false)
             setFadeOut(false)
           }, 3000)
 
           navigator.clipboard.writeText(value)
         }}
         className={`shadow-inner text-base leading-5 whitespace-normal break-all px-3 py-2 text-gray-600 w-full bg-gray-50 border border-gray-200 transition-all ease-out duration-150 rounded-md relative overflow-hidden appearance-none flex items-center w-full cursor-pointer hover:bg-white hover:text-blue-500  ${
-          clientIdCopied ? `pointer-events-none` : ``
+          copied ? `pointer-events-none` : ``
         }`}
       >
         <BiCopyAlt className="relative text-blue-500 shrink-0 w-5 h-auto mr-1.5 -ml-0.5 z-20" />{' '}
         {value}{' '}
-        {clientIdCopied && (
+        {copied && (
           <span
             className={`${
               fadeOut ? `opacity-0` : `opacity-100`
