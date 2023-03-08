@@ -672,7 +672,7 @@ interface CopyFieldProps {
   value: any
 }
 
-export const CopyField = ({ label, description, value }: CopyFieldProps) => {
+const CopyField = ({ label, description, value }: CopyFieldProps) => {
   const [clientIdCopied, setClientIdCopied] = React.useState(false)
   const [fadeOut, setFadeOut] = React.useState(false)
 
