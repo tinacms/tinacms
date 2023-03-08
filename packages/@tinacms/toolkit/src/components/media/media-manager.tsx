@@ -530,8 +530,8 @@ const ActiveItemPreview = ({
               <BiFile className="w-14 h-auto fill-gray-300" />
             </span>
           )}
-          <div className="grow h-full shrink flex flex-col gap-3 items-start justify-start">
-            <h3 className="text-lg text-gray-600 w-full break-words truncate">
+          <div className="grow h-full w-full shrink flex flex-col gap-3 items-start justify-start">
+            <h3 className="text-lg text-gray-600 w-full max-w-full break-words block truncate">
               {activeItem.filename}
             </h3>
             <CopyField
