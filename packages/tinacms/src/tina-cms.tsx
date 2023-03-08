@@ -238,6 +238,7 @@ export const TinaCMSProvider2 = ({
         // Not ideal but we need this for backwards compatibility for now. We can clean this up when we require a config.{js,ts} file
         // @ts-ignore
         schema={{ ...schema, config: { ...schema.config, ...props } }}
+        tinaGraphQLVersion={props.tinaGraphQLVersion}
       >
         <style>{styles}</style>
         <ErrorBoundary>{props.children}</ErrorBoundary>

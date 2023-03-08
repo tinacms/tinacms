@@ -64,4 +64,6 @@ type QueryProviderProps =
 export type TinaCMSProviderDefaultProps = QueryProviderProps &
   APIProviderProps &
   BaseProviderProps &
-  Config
+  Config & {
+    tinaGraphQLVersion: string
+  }
