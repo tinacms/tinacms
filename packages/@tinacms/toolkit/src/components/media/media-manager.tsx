@@ -513,7 +513,7 @@ const ActiveItemPreview = ({
     <div
       className={`shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto bg-white border-l border-gray-100 bg-white shadow-md transition ease-out duration-150 ${
         activeItem
-          ? `p-4 opacity-100 w-[40%] max-w-[460px] min-w-[240px]`
+          ? `p-4 opacity-100 w-[35%] max-w-[560px] min-w-[240px]`
           : `translate-x-8 opacity-0 w-[0px]`
       }`}
     >
@@ -697,19 +697,19 @@ export const CopyField = ({ label, description, value }: CopyFieldProps) => {
 
           navigator.clipboard.writeText(value)
         }}
-        className={`relative overflow-hidden appearance-none flex items-center w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md transition duration-150 ease-in-out text-sm leading-4 cursor-pointer hover:bg-white hover:text-blue-500 ${
+        className={`shadow-inner text-base leading-5 whitespace-normal break-all px-3 py-2 text-gray-600 w-full bg-gray-50 border border-gray-200 transition-all ease-out duration-150 rounded-md relative overflow-hidden appearance-none flex items-center w-full cursor-pointer hover:bg-white hover:text-blue-500  ${
           clientIdCopied ? `pointer-events-none` : ``
         }`}
       >
-        <BiCopyAlt className="relative text-blue-500 w-5 h-auto mr-1.5 -ml-0.5 z-20" />{' '}
+        <BiCopyAlt className="relative text-blue-500 shrink-0 w-5 h-auto mr-1.5 -ml-0.5 z-20" />{' '}
         {value}{' '}
         {clientIdCopied && (
           <span
             className={`${
               fadeOut ? `opacity-0` : `opacity-100`
-            } text-blue-600 transition-opacity	duration-500 absolute right-0 w-full h-full px-3 py-2 bg-white bg-opacity-90 text-center tracking-wide font-bold z-10`}
+            } text-blue-500 transition-opacity	duration-500 absolute right-0 w-full h-full px-3 py-2 bg-white bg-opacity-90 flex items-center justify-center text-center tracking-wide font-medium z-10`}
           >
-            Copied to clipboard!
+            <span>Copied to clipboard!</span>
           </span>
         )}
       </span>
