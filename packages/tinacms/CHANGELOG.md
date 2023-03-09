@@ -1,5 +1,30 @@
 # tinacms
 
+## 1.3.0
+
+### Minor Changes
+
+- 4cd5cd4f7: Refactor: Remove previewSrc from imageAPI
+
+### Patch Changes
+
+- 964a6985b: Remove warning about TinaProvider
+- 9c277e179: fix: make rich text errors scrollable
+- 8d5c923c7: fix: When current branch doesn't exist, handle error more gracefully
+- Updated dependencies [be3eac32f]
+- Updated dependencies [4cd5cd4f7]
+- Updated dependencies [9cf869d40]
+- Updated dependencies [0a5297800]
+- Updated dependencies [9c277e179]
+- Updated dependencies [7a3e86ba1]
+- Updated dependencies [8d5c923c7]
+- Updated dependencies [353899de1]
+- Updated dependencies [01b858e41]
+- Updated dependencies [0b7687424]
+  - @tinacms/toolkit@1.4.0
+  - @tinacms/schema-tools@1.3.3
+  - @tinacms/sharedctx@1.0.1
+
 ## 1.2.2
 
 ### Patch Changes

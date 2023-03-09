@@ -700,7 +700,7 @@ importers:
       dataloader: ^2.0.0
       date-fns: ^2.21.1
       encoding-down: ^7.1.0
-      esbuild: ^0.12.25
+      esbuild: ^0.15.5
       esbuild-jest: ^0.5.0
       estree-walker: ^3.0.0
       fast-glob: ^3.2.5
@@ -758,8 +758,8 @@ importers:
       dataloader: 2.1.0
       date-fns: 2.28.0
       encoding-down: 7.1.0
-      esbuild: 0.12.29
-      esbuild-jest: 0.5.0_esbuild@0.12.29
+      esbuild: 0.15.12
+      esbuild-jest: 0.5.0_esbuild@0.15.12
       estree-walker: 3.0.1
       fast-glob: 3.2.11
       flat: 5.0.2
@@ -1053,7 +1053,7 @@ importers:
       chalk: ^4.1.1
       chokidar: ^3.5.2
       commander: ^7.2.0
-      esbuild: ^0.12.9
+      esbuild: ^0.15.5
       esbuild-jest: ^0.5.0
       execa: ^5.1.1
       express: ^4.17.1
@@ -1082,8 +1082,8 @@ importers:
       chalk: 4.1.2
       chokidar: 3.5.3
       commander: 7.2.0
-      esbuild: 0.12.29
-      esbuild-jest: 0.5.0_esbuild@0.12.29
+      esbuild: 0.15.12
+      esbuild-jest: 0.5.0_esbuild@0.15.12
       execa: 5.1.1
       express: 4.18.1
       fs-extra: 9.1.0
@@ -2068,7 +2068,7 @@ packages:
       '@aws-sdk/util-utf8-node': 3.109.0
       entities: 2.2.0
       fast-xml-parser: 3.19.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     transitivePeerDependencies:
       - aws-crt
     dev: false
@@ -2132,7 +2132,7 @@ packages:
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-config-provider': 3.109.0
       '@aws-sdk/util-middleware': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/config-resolver/3.272.0:
@@ -2276,7 +2276,7 @@ packages:
       '@aws-sdk/property-provider': 3.127.0
       '@aws-sdk/shared-ini-file-loader': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     transitivePeerDependencies:
       - aws-crt
     dev: false
@@ -2411,7 +2411,7 @@ packages:
       '@aws-sdk/property-provider': 3.272.0
       '@aws-sdk/shared-ini-file-loader': 3.272.0
       '@aws-sdk/types': 3.272.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     transitivePeerDependencies:
       - aws-crt
     dev: false
@@ -2438,7 +2438,7 @@ packages:
     dependencies:
       '@aws-sdk/eventstream-serde-universal': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/eventstream-serde-config-resolver/3.127.0:
@@ -2449,7 +2449,7 @@ packages:
     engines: { node: '>= 12.0.0' }
     dependencies:
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/eventstream-serde-node/3.127.0:
@@ -2461,7 +2461,7 @@ packages:
     dependencies:
       '@aws-sdk/eventstream-serde-universal': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/eventstream-serde-universal/3.127.0:
@@ -2486,7 +2486,7 @@ packages:
       '@aws-sdk/querystring-builder': 3.127.0
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-base64-browser': 3.109.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/fetch-http-handler/3.272.0:
@@ -2512,7 +2512,7 @@ packages:
       '@aws-sdk/chunked-blob-reader': 3.55.0
       '@aws-sdk/chunked-blob-reader-native': 3.109.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/hash-node/3.127.0:
@@ -2524,7 +2524,7 @@ packages:
     dependencies:
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-buffer-from': 3.55.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/hash-node/3.272.0:
@@ -2549,7 +2549,7 @@ packages:
     engines: { node: '>= 12.0.0' }
     dependencies:
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/invalid-dependency/3.127.0:
@@ -2559,7 +2559,7 @@ packages:
       }
     dependencies:
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/invalid-dependency/3.272.0:
@@ -2603,7 +2603,7 @@ packages:
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-utf8-browser': 3.109.0
       '@aws-sdk/util-utf8-node': 3.109.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-bucket-endpoint/3.127.0:
@@ -2617,7 +2617,7 @@ packages:
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-arn-parser': 3.55.0
       '@aws-sdk/util-config-provider': 3.109.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-content-length/3.127.0:
@@ -2629,7 +2629,7 @@ packages:
     dependencies:
       '@aws-sdk/protocol-http': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-content-length/3.272.0:
@@ -2672,7 +2672,7 @@ packages:
     dependencies:
       '@aws-sdk/protocol-http': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-flexible-checksums/3.127.0:
@@ -2687,7 +2687,7 @@ packages:
       '@aws-sdk/is-array-buffer': 3.55.0
       '@aws-sdk/protocol-http': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-host-header/3.127.0:
@@ -2699,7 +2699,7 @@ packages:
     dependencies:
       '@aws-sdk/protocol-http': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-host-header/3.272.0:
@@ -2723,7 +2723,7 @@ packages:
     engines: { node: '>= 12.0.0' }
     dependencies:
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-logger/3.127.0:
@@ -2734,7 +2734,7 @@ packages:
     engines: { node: '>= 12.0.0' }
     dependencies:
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-logger/3.272.0:
@@ -2758,7 +2758,7 @@ packages:
     dependencies:
       '@aws-sdk/protocol-http': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-recursion-detection/3.272.0:
@@ -2785,7 +2785,7 @@ packages:
       '@aws-sdk/service-error-classification': 3.127.0
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-middleware': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
       uuid: 8.3.2
     dev: false
 
@@ -2817,7 +2817,7 @@ packages:
       '@aws-sdk/protocol-http': 3.127.0
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-arn-parser': 3.55.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-sdk-sts/3.130.0:
@@ -2859,7 +2859,7 @@ packages:
     engines: { node: '>= 12.0.0' }
     dependencies:
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-serde/3.272.0:
@@ -2885,7 +2885,7 @@ packages:
       '@aws-sdk/protocol-http': 3.127.0
       '@aws-sdk/signature-v4': 3.130.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-signing/3.272.0:
@@ -2912,7 +2912,7 @@ packages:
     engines: { node: '>= 12.0.0' }
     dependencies:
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-stack/3.127.0:
@@ -2922,7 +2922,7 @@ packages:
       }
     engines: { node: '>= 12.0.0' }
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-stack/3.272.0:
@@ -2945,7 +2945,7 @@ packages:
     dependencies:
       '@aws-sdk/protocol-http': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/middleware-user-agent/3.272.0:
@@ -2971,7 +2971,7 @@ packages:
       '@aws-sdk/property-provider': 3.127.0
       '@aws-sdk/shared-ini-file-loader': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/node-config-provider/3.272.0:
@@ -2999,7 +2999,7 @@ packages:
       '@aws-sdk/protocol-http': 3.127.0
       '@aws-sdk/querystring-builder': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/node-http-handler/3.272.0:
@@ -3048,7 +3048,7 @@ packages:
     engines: { node: '>= 12.0.0' }
     dependencies:
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/protocol-http/3.272.0:
@@ -3207,7 +3207,7 @@ packages:
       '@aws-sdk/signature-v4-crt': 3.163.0
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-arn-parser': 3.55.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/signature-v4-multi-region/3.130.0_ram2e4zire67hyrfjkiq4bdxbu:
@@ -3227,7 +3227,7 @@ packages:
       '@aws-sdk/signature-v4-crt': 3.163.0
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-arn-parser': 3.55.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/signature-v4/3.130.0:
@@ -3286,7 +3286,7 @@ packages:
     dependencies:
       '@aws-sdk/middleware-stack': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/smithy-client/3.272.0:
@@ -3353,7 +3353,7 @@ packages:
     dependencies:
       '@aws-sdk/querystring-parser': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/url-parser/3.272.0:
@@ -3384,7 +3384,7 @@ packages:
         integrity: sha512-lAZ6fyDGiRLaIsKT9qh7P9FGuNyZ4gAbr1YOSQk/5mHtaTuUvxlPptZuInNM/0MPQm6lpcot00D8IWTucn4PbA==,
       }
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-base64-node/3.55.0:
@@ -3395,7 +3395,7 @@ packages:
     engines: { node: '>= 12.0.0' }
     dependencies:
       '@aws-sdk/util-buffer-from': 3.55.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-base64/3.208.0:
@@ -3426,7 +3426,7 @@ packages:
         integrity: sha512-Ei2OCzXQw5N6ZkTMZbamUzc1z+z1R1Ja5tMEagz5BxuX4vWdBObT+uGlSzL8yvTbjoPjnxWA2aXyEqaUP3JS8Q==,
       }
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-body-length-node/3.208.0:
@@ -3447,7 +3447,7 @@ packages:
       }
     engines: { node: '>= 12.0.0' }
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-buffer-from/3.208.0:
@@ -3504,7 +3504,7 @@ packages:
       '@aws-sdk/property-provider': 3.127.0
       '@aws-sdk/types': 3.127.0
       bowser: 2.11.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-defaults-mode-browser/3.272.0:
@@ -3533,7 +3533,7 @@ packages:
       '@aws-sdk/node-config-provider': 3.127.0
       '@aws-sdk/property-provider': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-defaults-mode-node/3.272.0:
@@ -3649,7 +3649,7 @@ packages:
       '@aws-sdk/util-base64-browser': 3.109.0
       '@aws-sdk/util-hex-encoding': 3.109.0
       '@aws-sdk/util-utf8-browser': 3.109.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-stream-node/3.129.0:
@@ -3662,7 +3662,7 @@ packages:
       '@aws-sdk/node-http-handler': 3.127.0
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-buffer-from': 3.55.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-uri-escape/3.201.0:
@@ -3694,7 +3694,7 @@ packages:
     dependencies:
       '@aws-sdk/types': 3.127.0
       bowser: 2.11.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-user-agent-browser/3.272.0:
@@ -3723,7 +3723,7 @@ packages:
     dependencies:
       '@aws-sdk/node-config-provider': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-user-agent-node/3.272.0:
@@ -3750,7 +3750,7 @@ packages:
         integrity: sha512-FmcGSz0v7Bqpl1SE8G1Gc0CtDpug+rvqNCG/szn86JApD/f5x8oByjbEiAyTU2ZH2VevUntx6EW68ulHyH+x+w==,
       }
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.5.0
 
   /@aws-sdk/util-utf8-node/3.109.0:
     resolution:
@@ -3760,7 +3760,7 @@ packages:
     engines: { node: '>= 12.0.0' }
     dependencies:
       '@aws-sdk/util-buffer-from': 3.55.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/util-utf8/3.254.0:
@@ -3784,7 +3784,7 @@ packages:
     dependencies:
       '@aws-sdk/abort-controller': 3.127.0
       '@aws-sdk/types': 3.127.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@aws-sdk/xml-builder/3.142.0:
@@ -3794,7 +3794,7 @@ packages:
       }
     engines: { node: '>= 12.0.0' }
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@babel/code-frame/7.12.11:
@@ -9689,7 +9689,7 @@ packages:
         integrity: sha512-rEUrBSGIoSFuYxwBYtlUFMlE2CwGhmW+w9355/5oduSw8e5h2+Tj4UrAGNNgP9915++wj5vkQo0UuOBqOAq4nw==,
       }
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@swc/helpers/0.4.3:
@@ -9698,7 +9698,7 @@ packages:
         integrity: sha512-6JrF+fdUK2zbGpJIlN7G3v966PQjyx/dPt1T9km2wj+EUBqgrxCk3uX4Kct16MIm9gGxfKRcfax2hVf5jvlTzA==,
       }
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.5.0
 
   /@swc/jest/0.2.21_@swc+core@1.2.215:
     resolution:
@@ -9754,7 +9754,7 @@ packages:
       tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
     dependencies:
       mini-svg-data-uri: 1.4.4
-      tailwindcss: 3.2.7_ts-node@10.9.1
+      tailwindcss: 3.2.7_aesdjsunmf4wiehhujt67my7tu
     dev: true
 
   /@tailwindcss/line-clamp/0.3.1_tailwindcss@3.2.7:
@@ -10732,7 +10732,6 @@ packages:
       {
         integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==,
       }
-    dev: true
 
   /@types/prettier/2.6.3:
     resolution:
@@ -15449,7 +15448,6 @@ packages:
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
-    dev: true
 
   /crc-32/1.2.2:
     resolution:
@@ -17089,7 +17087,7 @@ packages:
     requiresBuild: true
     optional: true
 
-  /esbuild-jest/0.5.0_esbuild@0.12.29:
+  /esbuild-jest/0.5.0_esbuild@0.15.12:
     resolution:
       {
         integrity: sha512-AMZZCdEpXfNVOIDvURlqYyHwC8qC1/BFjgsrOiSL1eyiIArVtHL8YAC83Shhn16cYYoAWEW17yZn0W/RJKJKHQ==,
@@ -17100,7 +17098,7 @@ packages:
       '@babel/core': 7.18.6
       '@babel/plugin-transform-modules-commonjs': 7.18.6_@babel+core@7.18.6
       babel-jest: 26.6.3_@babel+core@7.18.6
-      esbuild: 0.12.29
+      esbuild: 0.15.12
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -17764,6 +17762,7 @@ packages:
       {
         integrity: sha512-w/XuoBCSwepyiZtIRsKsetiLDUVGPVw1E/R3VTFSecIy8UR7Cq3SOtwKHJMFoVqqVG36aGkzh4e8BvpO1Fdc7g==,
       }
+    hasBin: true
     requiresBuild: true
     dev: false
 
@@ -25890,10 +25889,10 @@ packages:
       '@swc/helpers': 0.4.3
       caniuse-lite: 1.0.30001359
       postcss: 8.4.14
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      styled-jsx: 5.0.2_react@18.2.0
-      use-sync-external-store: 1.2.0_react@18.2.0
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+      styled-jsx: 5.0.2_react@17.0.2
+      use-sync-external-store: 1.2.0_react@17.0.2
     optionalDependencies:
       '@next/swc-android-arm-eabi': 12.2.4
       '@next/swc-android-arm64': 12.2.4
@@ -25911,7 +25910,6 @@ packages:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
-    dev: false
 
   /next/12.2.4_sfoxds7t5ydpegc3knd667wn6m:
     resolution:
@@ -27059,7 +27057,6 @@ packages:
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.1
-    dev: true
 
   /postcss-import/14.1.0_postcss@8.4.16:
     resolution:
@@ -27089,7 +27086,6 @@ packages:
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.1
-    dev: true
 
   /postcss-import/14.1.0_postcss@8.4.21:
     resolution:
@@ -27104,6 +27100,7 @@ packages:
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.1
+    dev: true
 
   /postcss-js/4.0.0_postcss@8.4.21:
     resolution:
@@ -27116,6 +27113,7 @@ packages:
     dependencies:
       camelcase-css: 2.0.1
       postcss: 8.4.21
+    dev: true
 
   /postcss-load-config/3.1.4_aesdjsunmf4wiehhujt67my7tu:
     resolution:
@@ -27136,6 +27134,7 @@ packages:
       postcss: 8.4.21
       ts-node: 10.9.1_3ts5pezbn3c3azuqsq74yqdemu
       yaml: 1.10.2
+    dev: true
 
   /postcss-load-config/3.1.4_postcss@8.4.14:
     resolution:
@@ -27157,7 +27156,7 @@ packages:
       yaml: 1.10.2
     dev: false
 
-  /postcss-load-config/3.1.4_postcss@8.4.21:
+  /postcss-load-config/3.1.4_postcss@8.4.16:
     resolution:
       {
         integrity: sha512-6DiM4E7v4coTE4uzA8U//WhtPwyhiim3eyjEMFCnUpzbrkK9wJHgKDT2mR+HbtSrd/NubVaYTOpSpjUl8NQeRg==,
@@ -27173,8 +27172,9 @@ packages:
         optional: true
     dependencies:
       lilconfig: 2.0.6
-      postcss: 8.4.21
+      postcss: 8.4.16
       yaml: 1.10.2
+    dev: true
 
   /postcss-nested/5.0.6_postcss@8.4.14:
     resolution:
@@ -27189,6 +27189,19 @@ packages:
       postcss-selector-parser: 6.0.10
     dev: false
 
+  /postcss-nested/6.0.0_postcss@8.4.18:
+    resolution:
+      {
+        integrity: sha512-0DkamqrPcmkBDsLn+vQDIrtkSbNkv5AD/M322ySo9kqFkCIYklym2xEmWkwo+Y3/qZo34tzEPNUw4y7yMCdv5w==,
+      }
+    engines: { node: '>=12.0' }
+    peerDependencies:
+      postcss: ^8.2.14
+    dependencies:
+      postcss: 8.4.18
+      postcss-selector-parser: 6.0.11
+    dev: false
+
   /postcss-nested/6.0.0_postcss@8.4.21:
     resolution:
       {
@@ -27200,6 +27213,7 @@ packages:
     dependencies:
       postcss: 8.4.21
       postcss-selector-parser: 6.0.11
+    dev: true
 
   /postcss-nesting/10.1.9_postcss@8.4.14:
     resolution:
@@ -27290,7 +27304,6 @@ packages:
       nanoid: 3.3.4
       picocolors: 1.0.0
       source-map-js: 1.0.2
-    dev: true
 
   /postcss/8.4.18:
     resolution:
@@ -27313,6 +27326,7 @@ packages:
       nanoid: 3.3.4
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
 
   /preferred-pm/3.0.3:
     resolution:
@@ -29056,7 +29070,7 @@ packages:
         integrity: sha512-dnyv2/YsXhnm461G+R/Pe5bWP41Nm6LBXEYWI6eiFP4fiwx6WRI/CD0zbdVAudd9xwLEF2IDcKXLHit0FYjUzw==,
       }
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.5.0
 
   /sade/1.8.1:
     resolution:
@@ -30525,6 +30539,8 @@ packages:
       }
     engines: { node: '>=12.13.0' }
     hasBin: true
+    peerDependencies:
+      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3
@@ -30552,13 +30568,15 @@ packages:
     transitivePeerDependencies:
       - ts-node
 
-  /tailwindcss/3.2.7_ts-node@10.9.1:
+  /tailwindcss/3.2.7_aesdjsunmf4wiehhujt67my7tu:
     resolution:
       {
         integrity: sha512-B6DLqJzc21x7wntlH/GsZwEXTBttVSl1FtCzC8WP4oBc/NKef7kaax5jeihkkCEWc831/5NDJ9gRNDK6NEioQQ==,
       }
     engines: { node: '>=12.13.0' }
     hasBin: true
+    peerDependencies:
+      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3
@@ -30801,7 +30819,6 @@ packages:
     engines: { node: '>=8.17.0' }
     dependencies:
       rimraf: 3.0.2
-    dev: true
 
   /tmpl/1.0.5:
     resolution:
