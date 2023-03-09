@@ -12,6 +12,7 @@ import {
   BiCloudUpload,
   BiGridAlt,
   BiListUl,
+  BiX,
 } from 'react-icons/bi'
 import { Modal, ModalBody, FullscreenModal } from '../../packages/react-modals'
 import { BiFile } from 'react-icons/bi'
@@ -21,7 +22,7 @@ import {
   MediaListOffset,
   MediaListError,
 } from '../../packages/core'
-import { Button } from '../../packages/styles'
+import { Button, IconButton } from '../../packages/styles'
 import { useDropzone } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
@@ -176,6 +177,7 @@ export function MediaPicker({
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeItem, setActiveItem] = useState<Media | false>(false)
+  const closePreview = () => setActiveItem(false)
 
   /**
    * current offset is last element in offsetHistory[]
@@ -440,18 +442,18 @@ export function MediaPicker({
           <UploadButton onClick={onClick} uploading={uploading} />
         </div>
 
-        <div className="flex h-full overflow-hidden">
+        <div className="flex h-full overflow-hidden bg-white">
           <div className="flex w-full flex-col h-full @container">
             <ul
               {...rootProps}
-              className={`h-full grow overflow-y-auto transition duration-150 ease-out ${
+              className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
                 list.items.length === 0 ||
                 (viewMode === 'list' &&
-                  'bg-gray-50 w-full flex flex-1 flex-col justify-start')
+                  'w-full flex flex-1 flex-col justify-start -mb-px')
               } ${
                 list.items.length > 0 &&
                 viewMode === 'grid' &&
-                'bg-white w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-8 auto-rows-auto content-start justify-start'
+                'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-8 auto-rows-auto content-start justify-start'
               } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
             >
               <input {...getInputProps()} />
@@ -481,7 +483,7 @@ export function MediaPicker({
                 ))}
             </ul>
 
-            <div className="bg-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
+            <div className="bg-gradient-to-r to-gray-50/50 from-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
               <CursorPaginator
                 hasNext={hasNext}
                 navigateNext={navigateNext}
@@ -493,6 +495,7 @@ export function MediaPicker({
 
           <ActiveItemPreview
             activeItem={activeItem}
+            close={closePreview}
             selectMediaItem={selectMediaItem}
             allowDelete={allowDelete}
             deleteMediaItem={() => {
@@ -517,6 +520,7 @@ export function MediaPicker({
 
 const ActiveItemPreview = ({
   activeItem,
+  close,
   selectMediaItem,
   deleteMediaItem,
   allowDelete,
@@ -531,6 +535,20 @@ const ActiveItemPreview = ({
     >
       {activeItem && (
         <>
+          <div className="flex grow-0 shrink-0 gap-2 w-full items-center justify-between">
+            <h3 className="text-lg text-gray-600 w-full max-w-full break-words block truncate flex-1">
+              {activeItem.filename}
+            </h3>
+            <IconButton
+              variant="ghost"
+              className="group grow-0 shrink-0"
+              onClick={close}
+            >
+              <BiX
+                className={`w-7 h-auto text-gray-500 opacity-50 group-hover:opacity-100 transition duration-150 ease-out`}
+              />
+            </IconButton>
+          </div>
           {isImage(activeItem.thumbnail) ? (
             <div className="w-full max-h-[75%]">
               <img
@@ -545,9 +563,6 @@ const ActiveItemPreview = ({
             </span>
           )}
           <div className="grow h-full w-full shrink flex flex-col gap-3 items-start justify-start">
-            <h3 className="text-lg text-gray-600 w-full max-w-full break-words block truncate">
-              {activeItem.filename}
-            </h3>
             <CopyField value={absoluteImgURL(activeItem.src)} label="URL" />
           </div>
           <div className="shrink-0 w-full flex flex-col justify-end items-start">
