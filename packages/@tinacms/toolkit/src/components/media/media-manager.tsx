@@ -221,7 +221,16 @@ export function MediaPicker({
   function loadMedia() {
     setListState('loading')
     cms.media
-      .list({ offset, limit: cms.media.pageSize, directory })
+      .list({
+        offset,
+        limit: cms.media.pageSize,
+        directory,
+        thumbnailSizes: [
+          { w: 75, h: 75 },
+          { w: 400, h: 400 },
+          { w: 1000, h: 1000 },
+        ],
+      })
       .then((list) => {
         setList(list)
         setListState('loaded')
@@ -509,6 +518,7 @@ const ActiveItemPreview = ({
   selectMediaItem,
   deleteMediaItem,
 }) => {
+  const thumbnail = activeItem?.thumbnails['1000x1000']
   return (
     <div
       className={`shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto bg-white border-l border-gray-100 bg-white shadow-md transition ease-out duration-150 ${
@@ -519,10 +529,10 @@ const ActiveItemPreview = ({
     >
       {activeItem && (
         <>
-          {isImage(activeItem.thumbnail) ? (
+          {isImage(thumbnail) ? (
             <img
               className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
-              src={activeItem.thumbnail}
+              src={thumbnail}
               alt={activeItem.filename}
             />
           ) : (

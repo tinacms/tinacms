@@ -121,12 +121,17 @@ export class TinaMediaStore implements MediaStore {
           }
         }
         const src = `https://assets.tina.io/${this.api.clientId}/${path}`
+
         newFiles.push({
           directory: item.directory,
           filename: item.file.name,
           id: item.file.name,
           type: 'file',
-          thumbnail: src,
+          thumbnails: {
+            '75x75': src,
+            '400x400': src,
+            '1000x1000': src,
+          },
           src,
         })
       }
@@ -208,8 +213,10 @@ export class TinaMediaStore implements MediaStore {
     }
   }
 
-  private genThumbnail(src: string) {
-    return !this.isLocal ? `${src}?fit=crop&max-w=56&max-h=56` : src
+  private genThumbnail(src: string, dimensions: { w: number; h: number }) {
+    return !this.isLocal
+      ? `${src}?fit=crop&max-w=${dimensions.w}&max-h=${dimensions.h}`
+      : src
   }
 
   async list(options?: MediaListOptions): Promise<MediaList> {
@@ -262,7 +269,9 @@ export class TinaMediaStore implements MediaStore {
         id: file.filename,
         filename: file.filename,
         src: file.src,
-        thumbnail: this.genThumbnail(file.src),
+        thumbnails: options.thumbnailSizes.reduce((acc, { w, h }) => {
+          return (acc[`${w}x${h}`] = this.genThumbnail(file.src, { w, h }))
+        }, {}),
       })
     }
 
