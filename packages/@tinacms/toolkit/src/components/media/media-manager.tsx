@@ -167,6 +167,7 @@ export function MediaPicker({
     return 'not-configured'
   })
 
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
   const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
@@ -266,9 +267,7 @@ export function MediaPicker({
   let deleteMediaItem: (_item: Media) => void
   if (allowDelete) {
     deleteMediaItem = (item: Media) => {
-      if (confirm('Are you sure you want to delete this file?')) {
-        cms.media.delete(item)
-      }
+      cms.media.delete(item)
     }
   }
 
@@ -386,6 +385,19 @@ export function MediaPicker({
 
   return (
     <>
+      {deleteModalOpen && (
+        <DeleteModal
+          filename={activeItem ? activeItem.filename : ''}
+          deleteFunc={() => {
+            if (activeItem) {
+              deleteMediaItem(activeItem)
+              setActiveItem(false)
+            }
+          }}
+          close={() => setDeleteModalOpen(false)}
+        />
+      )}
+
       <MediaPickerWrap>
         <div className="flex items-center bg-gray-50 border-b border-gray-150 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
           {/* viewMode toggle */}
@@ -486,7 +498,10 @@ export function MediaPicker({
           <ActiveItemPreview
             activeItem={activeItem}
             selectMediaItem={selectMediaItem}
-            deleteMediaItem={deleteMediaItem}
+            allowDelete={allowDelete}
+            deleteMediaItem={() => {
+              setDeleteModalOpen(true)
+            }}
           />
         </div>
       </MediaPickerWrap>
@@ -508,6 +523,7 @@ const ActiveItemPreview = ({
   activeItem,
   selectMediaItem,
   deleteMediaItem,
+  allowDelete,
 }) => {
   return (
     <div
@@ -549,15 +565,17 @@ const ActiveItemPreview = ({
                   <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-white opacity-70" />
                 </Button>
               )}
-              <Button
-                variant="white"
-                size="medium"
-                className="grow max-w-[40%]"
-                onClick={() => deleteMediaItem(activeItem)}
-              >
-                Delete
-                <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
-              </Button>
+              {allowDelete && (
+                <Button
+                  variant="white"
+                  size="medium"
+                  className="grow max-w-[40%]"
+                  onClick={deleteMediaItem}
+                >
+                  Delete
+                  <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
+                </Button>
+              )}
             </div>
           </div>
         </>
@@ -714,5 +732,41 @@ const CopyField = ({ label, description, value }: CopyFieldProps) => {
         <p className="mt-2 text-sm text-gray-500">{description}</p>
       )}
     </div>
+  )
+}
+
+interface DeleteModalProps {
+  close(): void
+  deleteFunc(): void
+  filename: string
+}
+
+const DeleteModal = ({ close, deleteFunc, filename }: DeleteModalProps) => {
+  return (
+    <Modal>
+      <PopupModal>
+        <ModalHeader close={close}>Delete {filename}</ModalHeader>
+        <ModalBody padded={true}>
+          <p>
+            Are you sure you want to delete <strong>{filename}</strong>?
+          </p>
+        </ModalBody>
+        <ModalActions>
+          <Button style={{ flexGrow: 2 }} onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            style={{ flexGrow: 3 }}
+            variant="danger"
+            onClick={() => {
+              deleteFunc()
+              close()
+            }}
+          >
+            Delete
+          </Button>
+        </ModalActions>
+      </PopupModal>
+    </Modal>
   )
 }
