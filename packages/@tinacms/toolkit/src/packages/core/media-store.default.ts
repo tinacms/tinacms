@@ -270,7 +270,8 @@ export class TinaMediaStore implements MediaStore {
         filename: file.filename,
         src: file.src,
         thumbnails: options.thumbnailSizes.reduce((acc, { w, h }) => {
-          return (acc[`${w}x${h}`] = this.genThumbnail(file.src, { w, h }))
+          acc[`${w}x${h}`] = this.genThumbnail(file.src, { w, h })
+          return acc
         }, {}),
       })
     }
