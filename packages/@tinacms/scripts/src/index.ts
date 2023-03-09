@@ -433,6 +433,7 @@ const config = (cwd = '') => {
     },
     content: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
     plugins: [
+      require('@tailwindcss/container-queries'),
       require('@tailwindcss/typography')({
         className: 'tina-prose',
       }),

@@ -441,7 +441,7 @@ export function MediaPicker({
         </div>
 
         <div className="flex h-full overflow-hidden">
-          <div className="flex w-full flex-col h-full">
+          <div className="flex w-full flex-col h-full @container">
             <ul
               {...rootProps}
               className={`h-full grow overflow-y-auto transition duration-150 ease-out ${
@@ -449,7 +449,7 @@ export function MediaPicker({
                 'bg-gray-50 w-full flex flex-1 flex-col justify-start'
               } ${
                 viewMode === 'grid' &&
-                'bg-white w-full grid grid-cols-[repeat(auto-fit,_minmax(min(100%,_max(220px,_100%/8)),_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4 content-start'
+                'bg-white w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-8 auto-rows-auto content-start justify-start'
               } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
             >
               <input {...getInputProps()} />
@@ -530,11 +530,13 @@ const ActiveItemPreview = ({
       {activeItem && (
         <>
           {isImage(activeItem.thumbnail) ? (
-            <img
-              className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
-              src={activeItem.thumbnail}
-              alt={activeItem.filename}
-            />
+            <div className="w-full max-h-[75%]">
+              <img
+                className="block border border-gray-100 rounded-md overflow-hidden max-w-full max-h-full object-fit h-auto shadow"
+                src={activeItem.thumbnail}
+                alt={activeItem.filename}
+              />
+            </div>
           ) : (
             <span className="p-3 border border-gray-100 rounded-md overflow-hidden bg-gray-50 shadow">
               <BiFile className="w-14 h-auto fill-gray-300" />
