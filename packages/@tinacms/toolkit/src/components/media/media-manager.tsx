@@ -13,15 +13,8 @@ import {
   BiGridAlt,
   BiListUl,
 } from 'react-icons/bi'
-import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  FullscreenModal,
-  PopupModal,
-  ModalActions,
-} from '../../packages/react-modals'
-import { BiFolder, BiFile } from 'react-icons/bi'
+import { Modal, ModalBody, FullscreenModal } from '../../packages/react-modals'
+import { BiFile } from 'react-icons/bi'
 import {
   MediaList,
   Media,
@@ -42,7 +35,8 @@ import {
   dropzoneAcceptFromString,
   isImage,
 } from './utils'
-import { BiCopyAlt } from 'react-icons/bi'
+import { DeleteModal, SyncModal } from './modal'
+import { CopyField } from './copy-field'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -648,125 +642,5 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
         Learn More
       </a>
     </div>
-  )
-}
-
-const SyncModal = ({ close, syncFunc, folder, branch }) => {
-  return (
-    <Modal>
-      <PopupModal>
-        <ModalHeader close={close}>Sync Media</ModalHeader>
-        <ModalBody padded={true}>
-          <p>
-            {`This will copy media assets from the \`${folder}\` folder on branch \`${branch}\` in your git repository to Tina Cloud's asset service. This will allow you to use these assets in your site with Tina Cloud`}
-          </p>
-        </ModalBody>
-        <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
-            Cancel
-          </Button>
-          <Button
-            style={{ flexGrow: 3 }}
-            variant="primary"
-            onClick={async () => {
-              await syncFunc()
-              close()
-            }}
-          >
-            Sync Media
-          </Button>
-        </ModalActions>
-      </PopupModal>
-    </Modal>
-  )
-}
-
-interface CopyFieldProps {
-  label?: string
-  description?: string
-  value: any
-}
-
-const CopyField = ({ label, description, value }: CopyFieldProps) => {
-  const [copied, setCopied] = React.useState(false)
-  const [fadeOut, setFadeOut] = React.useState(false)
-
-  return (
-    <div className="w-full">
-      {label && (
-        <label className="w-full mb-1 block flex-1  text-sm font-bold leading-5 text-gray-700">
-          {label}
-        </label>
-      )}
-      <span
-        onClick={() => {
-          if (copied === true) return
-          setCopied(true)
-          setTimeout(() => {
-            setFadeOut(true)
-          }, 2500)
-          setTimeout(() => {
-            setCopied(false)
-            setFadeOut(false)
-          }, 3000)
-
-          navigator.clipboard.writeText(value)
-        }}
-        className={`shadow-inner text-base leading-5 whitespace-normal break-all px-3 py-2 text-gray-600 w-full bg-gray-50 border border-gray-200 transition-all ease-out duration-150 rounded-md relative overflow-hidden appearance-none flex items-center w-full cursor-pointer hover:bg-white hover:text-blue-500  ${
-          copied ? `pointer-events-none` : ``
-        }`}
-      >
-        <BiCopyAlt className="relative text-blue-500 shrink-0 w-5 h-auto mr-1.5 -ml-0.5 z-20" />{' '}
-        {value}{' '}
-        {copied && (
-          <span
-            className={`${
-              fadeOut ? `opacity-0` : `opacity-100`
-            } text-blue-500 transition-opacity	duration-500 absolute right-0 w-full h-full px-3 py-2 bg-white bg-opacity-90 flex items-center justify-center text-center tracking-wide font-medium z-10`}
-          >
-            <span>Copied to clipboard!</span>
-          </span>
-        )}
-      </span>
-      {description && (
-        <p className="mt-2 text-sm text-gray-500">{description}</p>
-      )}
-    </div>
-  )
-}
-
-interface DeleteModalProps {
-  close(): void
-  deleteFunc(): void
-  filename: string
-}
-
-const DeleteModal = ({ close, deleteFunc, filename }: DeleteModalProps) => {
-  return (
-    <Modal>
-      <PopupModal>
-        <ModalHeader close={close}>Delete {filename}</ModalHeader>
-        <ModalBody padded={true}>
-          <p>
-            Are you sure you want to delete <strong>{filename}</strong>?
-          </p>
-        </ModalBody>
-        <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
-            Cancel
-          </Button>
-          <Button
-            style={{ flexGrow: 3 }}
-            variant="danger"
-            onClick={() => {
-              deleteFunc()
-              close()
-            }}
-          >
-            Delete
-          </Button>
-        </ModalActions>
-      </PopupModal>
-    </Modal>
   )
 }
