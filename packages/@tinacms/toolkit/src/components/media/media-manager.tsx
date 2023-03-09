@@ -445,9 +445,11 @@ export function MediaPicker({
             <ul
               {...rootProps}
               className={`h-full grow overflow-y-auto transition duration-150 ease-out ${
-                viewMode === 'list' &&
-                'bg-gray-50 w-full flex flex-1 flex-col justify-start'
+                list.items.length === 0 ||
+                (viewMode === 'list' &&
+                  'bg-gray-50 w-full flex flex-1 flex-col justify-start')
               } ${
+                list.items.length > 0 &&
                 viewMode === 'grid' &&
                 'bg-white w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-8 auto-rows-auto content-start justify-start'
               } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
@@ -622,10 +624,10 @@ const MediaPickerWrap = ({ children }) => {
 
 const EmptyMediaList = (props) => {
   return (
-    <div className={`text-2xl opacity-50 p-12 text-center`} {...props}>
-      Drag and Drop assets here
+    <div className={`p-12 text-xl opacity-50 text-center`} {...props}>
+      Drag and drop assets here
       {props.hasTinaMedia &&
-        " or click 'Sync' to sync your media to Tina Cloud"}
+        " or click 'Sync' to sync your media to Tina Cloud."}
     </div>
   )
 }

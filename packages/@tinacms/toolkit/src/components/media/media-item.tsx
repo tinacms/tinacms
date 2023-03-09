@@ -18,7 +18,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
   return (
     <li
-      className={`flex shrink-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer ${
+      className={`flex shrink-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
         active
           ? 'bg-gray-50/50 text-blue-500 hover:bg-gray-50'
           : 'bg-white hover:bg-gray-50/50'
@@ -53,7 +53,7 @@ export function GridMediaItem({ item, active, onClick }) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
   return (
     <li
-      className={`relative pb-[100%] h-0 block shadow border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out ${
+      className={`relative pb-[100%] h-0 block border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out ${
         active
           ? 'shadow-outline'
           : 'shadow hover:shadow-md hover:scale-103 hover:border-gray-150'
