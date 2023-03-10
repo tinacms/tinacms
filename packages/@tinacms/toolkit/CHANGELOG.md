@@ -1,5 +1,20 @@
 # Change Log
 
+## 1.4.0
+
+### Minor Changes
+
+- 4cd5cd4f7: Refactor: Remove previewSrc from imageAPI
+
+### Patch Changes
+
+- be3eac32f: Adds grid view to media manager
+- 9cf869d40: fix: previous directory link in Tina MediaManager
+- 9c277e179: fix: make rich text errors scrollable
+- 8d5c923c7: fix: When current branch doesn't exist, handle error more gracefully
+- 0b7687424: support pdf uploads
+  - @tinacms/sharedctx@1.0.1
+
 ## 1.3.4
 
 ### Patch Changes

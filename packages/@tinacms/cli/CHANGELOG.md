@@ -1,5 +1,33 @@
 # tinacms-cli
 
+## 1.3.1
+
+### Patch Changes
+
+- 591c6e95c: Wait for DB before checking schema.
+
+## 1.3.0
+
+### Minor Changes
+
+- d9962edc2: rm previewSrc from images
+
+### Patch Changes
+
+- 2df7b56e4: feat: import invalid forestry field names
+- Updated dependencies [0a5297800]
+- Updated dependencies [9c277e179]
+- Updated dependencies [7a3e86ba1]
+- Updated dependencies [f831dcf4f]
+- Updated dependencies [5427d03c6]
+- Updated dependencies [353899de1]
+- Updated dependencies [01b858e41]
+  - @tinacms/graphql@1.3.3
+  - @tinacms/schema-tools@1.3.3
+  - @tinacms/app@1.1.2
+  - @tinacms/datalayer@1.1.4
+  - @tinacms/metrics@1.0.2
+
 ## 1.2.2
 
 ### Patch Changes

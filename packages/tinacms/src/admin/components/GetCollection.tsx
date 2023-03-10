@@ -8,6 +8,7 @@ import type { TinaSchema } from '@tinacms/schema-tools'
 import { FilterArgs, TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
 import type { CollectionResponse } from '../types'
+import { FullscreenError } from './FullscreenError'
 
 export const useGetCollection = (
   cms: TinaCMS,
@@ -97,7 +98,7 @@ const GetCollection = ({
     ) || {}
 
   if (error) {
-    return null
+    return <FullscreenError />
   }
 
   if (loading) {

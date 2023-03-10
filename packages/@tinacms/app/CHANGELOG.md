@@ -1,5 +1,11 @@
 # @tinacms/app
 
+## 1.1.2
+
+### Patch Changes
+
+- 9c277e179: fix: make rich text errors scrollable
+
 ## 1.1.1
 
 ### Patch Changes

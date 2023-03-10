@@ -19,9 +19,9 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   const thumbnail = item.thumbnails['75x75']
   return (
     <li
-      className={`flex shrink-0 grow-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-100 ${
+      className={`flex shrink-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
         active
-          ? 'bg-gray-50/50 text-blue-500 hover:bg-gray-50'
+          ? 'bg-gradient-to-r from-white to-gray-50/50 text-blue-500 hover:bg-gray-50'
           : 'bg-white hover:bg-gray-50/50'
       }`}
       onClick={() => {
@@ -55,14 +55,14 @@ export function GridMediaItem({ item, active, onClick }) {
   const thumbnail = item.thumbnails['400x400']
   return (
     <li
-      className={`relative pb-[100%] h-0 block shadow border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 transition duration-150 ease-out ${
+      className={`relative pb-[100%] h-0 block border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out ${
         active
           ? 'shadow-outline'
           : 'shadow hover:shadow-md hover:scale-103 hover:border-gray-150'
       } ${item.type === 'dir' ? 'cursor-pointer' : ''}`}
     >
       <button
-        className="absolute w-full h-full flex items-center justify-center bg-gray-50"
+        className="absolute w-full h-full flex items-center justify-center bg-white"
         onClick={() => {
           if (!active) {
             onClick(item)

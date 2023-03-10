@@ -207,76 +207,77 @@ const CollectionListPage = () => {
     <GetCMS>
       {(cms: TinaCMS) => {
         return (
-          <GetCollection
-            cms={cms}
-            collectionName={collectionName}
-            includeDocuments
-            startCursor={endCursor}
-            sortKey={sortKey}
-            filterArgs={
-              // only pass filter args if the collection is the same as the current route
-              // We need this hear because this runs before the useEffect above
-              collectionName === vars.collection
-                ? vars
-                : {
-                    collection: collectionName,
-                    relativePath: '',
-                    newRelativePath: '',
-                    filterField: '',
-                    startsWith: '',
-                    endsWith: '',
-                    before: '',
-                    after: '',
-                    booleanEquals: null,
-                  }
-            }
-          >
-            {(
-              collection: CollectionResponse,
-              _loading,
-              reFetchCollection,
-              collectionExtra: Collection<true>
-            ) => {
-              const totalCount = collection.documents.totalCount
-              const documents = collection.documents.edges
-              const admin: TinaAdminApi = cms.api.admin
-              const pageInfo = collection.documents.pageInfo
-              const fields = collectionExtra.fields?.filter((x) =>
-                // only allow sortable fields
-                ['string', 'number', 'datetime', 'boolean'].includes(x.type)
-              )
-
-              const filterFields = collectionExtra.fields?.filter((x) => {
-                // only allow fileable fields. Currently only string, datetime, and boolean of non-list type
-                return (
-                  ['string', 'datetime', 'boolean'].includes(x.type) && !x.list
+          <PageWrapper>
+            <GetCollection
+              cms={cms}
+              collectionName={collectionName}
+              includeDocuments
+              startCursor={endCursor}
+              sortKey={sortKey}
+              filterArgs={
+                // only pass filter args if the collection is the same as the current route
+                // We need this hear because this runs before the useEffect above
+                collectionName === vars.collection
+                  ? vars
+                  : {
+                      collection: collectionName,
+                      relativePath: '',
+                      newRelativePath: '',
+                      filterField: '',
+                      startsWith: '',
+                      endsWith: '',
+                      before: '',
+                      after: '',
+                      booleanEquals: null,
+                    }
+              }
+            >
+              {(
+                collection: CollectionResponse,
+                _loading,
+                reFetchCollection,
+                collectionExtra: Collection<true>
+              ) => {
+                const totalCount = collection.documents.totalCount
+                const documents = collection.documents.edges
+                const admin: TinaAdminApi = cms.api.admin
+                const pageInfo = collection.documents.pageInfo
+                const fields = collectionExtra.fields?.filter((x) =>
+                  // only allow sortable fields
+                  ['string', 'number', 'datetime', 'boolean'].includes(x.type)
                 )
-              })
 
-              const filterField = filterFields?.find(
-                (x) => x.name === vars.filterField
-              )
-              const showStartsWith =
-                filterField?.type === 'string' && !filterField.list
-              const showDateFilter = filterField?.type === 'datetime'
+                const filterFields = collectionExtra.fields?.filter((x) => {
+                  // only allow fileable fields. Currently only string, datetime, and boolean of non-list type
+                  return (
+                    ['string', 'datetime', 'boolean'].includes(x.type) &&
+                    !x.list
+                  )
+                })
 
-              const showBooleanToggle =
-                filterField?.type === 'boolean' && !filterField.list
+                const filterField = filterFields?.find(
+                  (x) => x.name === vars.filterField
+                )
+                const showStartsWith =
+                  filterField?.type === 'string' && !filterField.list
+                const showDateFilter = filterField?.type === 'datetime'
 
-              // TODO: add other fields
-              // const showNumberFilter = sortField?.type === 'number' && !sortField.list
+                const showBooleanToggle =
+                  filterField?.type === 'boolean' && !filterField.list
 
-              const collectionDefinition = cms.api.tina.schema.getCollection(
-                collection.name
-              )
+                // TODO: add other fields
+                // const showNumberFilter = sortField?.type === 'number' && !sortField.list
 
-              const allowCreate =
-                collectionDefinition?.ui?.allowedActions?.create ?? true
-              const allowDelete =
-                collectionDefinition?.ui?.allowedActions?.delete ?? true
+                const collectionDefinition = cms.api.tina.schema.getCollection(
+                  collection.name
+                )
 
-              return (
-                <PageWrapper>
+                const allowCreate =
+                  collectionDefinition?.ui?.allowedActions?.create ?? true
+                const allowDelete =
+                  collectionDefinition?.ui?.allowedActions?.delete ?? true
+
+                return (
                   <>
                     {deleteModalOpen && (
                       <DeleteModal
@@ -807,10 +808,10 @@ const CollectionListPage = () => {
                       </div>
                     </PageBody>
                   </>
-                </PageWrapper>
-              )
-            }}
-          </GetCollection>
+                )
+              }}
+            </GetCollection>
+          </PageWrapper>
         )
       }}
     </GetCMS>
