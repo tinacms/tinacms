@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 1.3.0
+
+### Minor Changes
+
+- 817b10b8a: deliver multiple size thumbnails
+
 ## 1.2.0
 
 ### Minor Changes

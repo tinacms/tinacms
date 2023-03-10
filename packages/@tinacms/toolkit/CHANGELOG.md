@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.5.0
+
+### Minor Changes
+
+- 817b10b8a: deliver multiple size thumbnails
+
+### Patch Changes
+
+- ee4543ea5: feat: add absolute img urls to media library
+- 743246851: Update isFile funtion to match src from TinaCloud
+  - @tinacms/sharedctx@1.0.1
+
 ## 1.4.0
 
 ### Minor Changes
