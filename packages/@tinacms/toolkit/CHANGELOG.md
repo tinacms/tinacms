@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.5.1
+
+### Patch Changes
+
+- f07d8f165: fix: nested thumbails
+
 ## 1.5.0
 
 ### Minor Changes
