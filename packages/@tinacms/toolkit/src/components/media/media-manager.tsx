@@ -12,23 +12,17 @@ import {
   BiCloudUpload,
   BiGridAlt,
   BiListUl,
+  BiX,
 } from 'react-icons/bi'
-import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  FullscreenModal,
-  PopupModal,
-  ModalActions,
-} from '../../packages/react-modals'
-import { BiFolder, BiFile } from 'react-icons/bi'
+import { Modal, ModalBody, FullscreenModal } from '../../packages/react-modals'
+import { BiFile } from 'react-icons/bi'
 import {
   MediaList,
   Media,
   MediaListOffset,
   MediaListError,
 } from '../../packages/core'
-import { Button } from '../../packages/styles'
+import { Button, IconButton } from '../../packages/styles'
 import { useDropzone } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
@@ -37,10 +31,13 @@ import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
 import { CloseIcon, TrashIcon } from '../../packages/icons'
 import {
+  absoluteImgURL,
   DEFAULT_MEDIA_UPLOAD_TYPES,
   dropzoneAcceptFromString,
   isImage,
 } from './utils'
+import { DeleteModal, SyncModal } from './modal'
+import { CopyField } from './copy-field'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -165,6 +162,7 @@ export function MediaPicker({
     return 'not-configured'
   })
 
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
   const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
@@ -179,6 +177,7 @@ export function MediaPicker({
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeItem, setActiveItem] = useState<Media | false>(false)
+  const closePreview = () => setActiveItem(false)
 
   /**
    * current offset is last element in offsetHistory[]
@@ -246,18 +245,6 @@ export function MediaPicker({
   }, [offset, directory, cms.media.isConfigured])
 
   const onClickMediaItem = (item: Media) => {
-    if (item.type === 'dir') {
-      // Only join when there is a directory to join to
-      setDirectory(
-        item.directory === '.' || item.directory === ''
-          ? item.filename
-          : join(item.directory, item.filename)
-      )
-      resetOffset()
-    }
-  }
-
-  const onClickGridMediaItem = (item: Media) => {
     if (!item) {
       setActiveItem(false)
     } else if (item.type === 'dir') {
@@ -276,9 +263,7 @@ export function MediaPicker({
   let deleteMediaItem: (_item: Media) => void
   if (allowDelete) {
     deleteMediaItem = (item: Media) => {
-      if (confirm('Are you sure you want to delete this file?')) {
-        cms.media.delete(item)
-      }
+      cms.media.delete(item)
     }
   }
 
@@ -396,6 +381,19 @@ export function MediaPicker({
 
   return (
     <>
+      {deleteModalOpen && (
+        <DeleteModal
+          filename={activeItem ? activeItem.filename : ''}
+          deleteFunc={() => {
+            if (activeItem) {
+              deleteMediaItem(activeItem)
+              setActiveItem(false)
+            }
+          }}
+          close={() => setDeleteModalOpen(false)}
+        />
+      )}
+
       <MediaPickerWrap>
         <div className="flex items-center bg-gray-50 border-b border-gray-150 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
           {/* viewMode toggle */}
@@ -444,60 +442,65 @@ export function MediaPicker({
           <UploadButton onClick={onClick} uploading={uploading} />
         </div>
 
-        <div className="flex h-full overflow-hidden">
-          <ul
-            {...rootProps}
-            className={`h-full bg-white overflow-y-auto transition duration-150 ease-out ${
-              viewMode === 'list' &&
-              'flex flex-1 flex-col divide-y divide-gray-100'
-            } ${
-              viewMode === 'grid' &&
-              'w-full grid grid-cols-[repeat(auto-fit,_minmax(min(100%,_max(220px,_100%/8)),_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4 content-start'
-            } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
-          >
-            <input {...getInputProps()} />
+        <div className="flex h-full overflow-hidden bg-white">
+          <div className="flex w-full flex-col h-full @container">
+            <ul
+              {...rootProps}
+              className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
+                list.items.length === 0 ||
+                (viewMode === 'list' &&
+                  'w-full flex flex-1 flex-col justify-start -mb-px')
+              } ${
+                list.items.length > 0 &&
+                viewMode === 'grid' &&
+                'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-8 auto-rows-auto content-start justify-start'
+              } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
+            >
+              <input {...getInputProps()} />
 
-            {listState === 'loaded' && list.items.length === 0 && (
-              <EmptyMediaList hasTinaMedia={hasTinaMedia} />
-            )}
+              {listState === 'loaded' && list.items.length === 0 && (
+                <EmptyMediaList hasTinaMedia={hasTinaMedia} />
+              )}
 
-            {viewMode === 'list' &&
-              list.items.map((item: Media) => (
-                <ListMediaItem
-                  key={item.id}
-                  item={item}
-                  onClick={onClickMediaItem}
-                  onSelect={selectMediaItem}
-                  onDelete={deleteMediaItem}
-                />
-              ))}
+              {viewMode === 'list' &&
+                list.items.map((item: Media) => (
+                  <ListMediaItem
+                    key={item.id}
+                    item={item}
+                    onClick={onClickMediaItem}
+                    active={activeItem && activeItem.id === item.id}
+                  />
+                ))}
 
-            {viewMode === 'grid' &&
-              list.items.map((item: Media) => (
-                <GridMediaItem
-                  key={item.id}
-                  item={item}
-                  onClick={onClickGridMediaItem}
-                  active={activeItem && activeItem.id === item.id}
-                />
-              ))}
-          </ul>
+              {viewMode === 'grid' &&
+                list.items.map((item: Media) => (
+                  <GridMediaItem
+                    key={item.id}
+                    item={item}
+                    onClick={onClickMediaItem}
+                    active={activeItem && activeItem.id === item.id}
+                  />
+                ))}
+            </ul>
 
-          {viewMode === 'grid' && activeItem && (
-            <ActiveItemPreview
-              activeItem={activeItem}
-              selectMediaItem={selectMediaItem}
-              deleteMediaItem={deleteMediaItem}
-            />
-          )}
-        </div>
+            <div className="bg-gradient-to-r to-gray-50/50 from-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
+              <CursorPaginator
+                hasNext={hasNext}
+                navigateNext={navigateNext}
+                hasPrev={hasPrev}
+                navigatePrev={navigatePrev}
+              />
+            </div>
+          </div>
 
-        <div className="bg-gray-50 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
-          <CursorPaginator
-            hasNext={hasNext}
-            navigateNext={navigateNext}
-            hasPrev={hasPrev}
-            navigatePrev={navigatePrev}
+          <ActiveItemPreview
+            activeItem={activeItem}
+            close={closePreview}
+            selectMediaItem={selectMediaItem}
+            allowDelete={allowDelete}
+            deleteMediaItem={() => {
+              setDeleteModalOpen(true)
+            }}
           />
         </div>
       </MediaPickerWrap>
@@ -517,49 +520,79 @@ export function MediaPicker({
 
 const ActiveItemPreview = ({
   activeItem,
+  close,
   selectMediaItem,
   deleteMediaItem,
+  allowDelete,
 }) => {
   return (
-    <div className="p-4 shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto w-[40%] max-w-[460px] min-w-[240px] bg-white border-l border-gray-100 bg-white shadow-md animate-slide-in-left">
-      {isImage(activeItem.thumbnail) ? (
-        <img
-          className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
-          src={activeItem.thumbnail}
-          alt={activeItem.filename}
-        />
-      ) : (
-        <span className="p-3 border border-gray-100 rounded-md overflow-hidden bg-gray-50 shadow">
-          <BiFile className="w-14 h-auto fill-gray-300" />
-        </span>
-      )}
-      <h3 className="text-lg text-gray-600 flex-grow w-full break-words truncate">
-        {activeItem.filename}
-      </h3>
-      <div className="grow w-full flex flex-col justify-end items-start">
-        <div className="flex w-full gap-3">
-          {selectMediaItem && (
-            <Button
-              size="medium"
-              variant="primary"
-              className="grow"
-              onClick={() => selectMediaItem(activeItem)}
+    <div
+      className={`shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto bg-white border-l border-gray-100 bg-white shadow-md transition ease-out duration-150 ${
+        activeItem
+          ? `p-4 opacity-100 w-[35%] max-w-[560px] min-w-[240px]`
+          : `translate-x-8 opacity-0 w-[0px]`
+      }`}
+    >
+      {activeItem && (
+        <>
+          <div className="flex grow-0 shrink-0 gap-2 w-full items-center justify-between">
+            <h3 className="text-lg text-gray-600 w-full max-w-full break-words block truncate flex-1">
+              {activeItem.filename}
+            </h3>
+            <IconButton
+              variant="ghost"
+              className="group grow-0 shrink-0"
+              onClick={close}
             >
-              Insert
-              <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-white opacity-70" />
-            </Button>
+              <BiX
+                className={`w-7 h-auto text-gray-500 opacity-50 group-hover:opacity-100 transition duration-150 ease-out`}
+              />
+            </IconButton>
+          </div>
+          {isImage(activeItem.thumbnail) ? (
+            <div className="w-full max-h-[75%]">
+              <img
+                className="block border border-gray-100 rounded-md overflow-hidden max-w-full max-h-full object-fit h-auto shadow"
+                src={activeItem.thumbnail}
+                alt={activeItem.filename}
+              />
+            </div>
+          ) : (
+            <span className="p-3 border border-gray-100 rounded-md overflow-hidden bg-gray-50 shadow">
+              <BiFile className="w-14 h-auto fill-gray-300" />
+            </span>
           )}
-          <Button
-            variant="white"
-            size="medium"
-            className="grow max-w-[40%]"
-            onClick={() => deleteMediaItem(activeItem)}
-          >
-            Delete
-            <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
-          </Button>
-        </div>
-      </div>
+          <div className="grow h-full w-full shrink flex flex-col gap-3 items-start justify-start">
+            <CopyField value={absoluteImgURL(activeItem.src)} label="URL" />
+          </div>
+          <div className="shrink-0 w-full flex flex-col justify-end items-start">
+            <div className="flex w-full gap-3">
+              {selectMediaItem && (
+                <Button
+                  size="medium"
+                  variant="primary"
+                  className="grow"
+                  onClick={() => selectMediaItem(activeItem)}
+                >
+                  Insert
+                  <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-white opacity-70" />
+                </Button>
+              )}
+              {allowDelete && (
+                <Button
+                  variant="white"
+                  size="medium"
+                  className="grow max-w-[40%]"
+                  onClick={deleteMediaItem}
+                >
+                  Delete
+                  <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
+                </Button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -606,10 +639,10 @@ const MediaPickerWrap = ({ children }) => {
 
 const EmptyMediaList = (props) => {
   return (
-    <div className={`text-2xl opacity-50 p-12 text-center`} {...props}>
-      Drag and Drop assets here
+    <div className={`p-12 text-xl opacity-50 text-center`} {...props}>
+      Drag and drop assets here
       {props.hasTinaMedia &&
-        " or click 'Sync' to sync your media to Tina Cloud"}
+        " or click 'Sync' to sync your media to Tina Cloud."}
     </div>
   )
 }
@@ -628,35 +661,5 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
         Learn More
       </a>
     </div>
-  )
-}
-
-const SyncModal = ({ close, syncFunc, folder, branch }) => {
-  return (
-    <Modal>
-      <PopupModal>
-        <ModalHeader close={close}>Sync Media</ModalHeader>
-        <ModalBody padded={true}>
-          <p>
-            {`This will copy media assets from the \`${folder}\` folder on branch \`${branch}\` in your git repository to Tina Cloud's asset service. This will allow you to use these assets in your site with Tina Cloud`}
-          </p>
-        </ModalBody>
-        <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
-            Cancel
-          </Button>
-          <Button
-            style={{ flexGrow: 3 }}
-            variant="primary"
-            onClick={async () => {
-              await syncFunc()
-              close()
-            }}
-          >
-            Sync Media
-          </Button>
-        </ModalActions>
-      </PopupModal>
-    </Modal>
   )
 }
