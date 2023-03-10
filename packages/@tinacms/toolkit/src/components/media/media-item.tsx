@@ -16,6 +16,7 @@ interface MediaItemProps {
 
 export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
+  const thumbnail = item.thumbnails['75x75']
   return (
     <li
       className={`flex shrink-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
@@ -32,10 +33,10 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
       }}
     >
       <div className="w-20 h-20 bg-gray-50 shadow border border-gray-100 rounded overflow-hidden flex justify-center flex-shrink-0">
-        {isImage(item.thumbnail) ? (
+        {isImage(thumbnail) ? (
           <img
             className="object-cover w-full h-full object-center"
-            src={item.thumbnail}
+            src={thumbnail}
             alt={item.filename}
           />
         ) : (
@@ -51,6 +52,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
 
 export function GridMediaItem({ item, active, onClick }) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
+  const thumbnail = item.thumbnails['400x400']
   return (
     <li
       className={`relative pb-[100%] h-0 block border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out ${
@@ -69,10 +71,10 @@ export function GridMediaItem({ item, active, onClick }) {
           }
         }}
       >
-        {isImage(item.thumbnail) ? (
+        {isImage(thumbnail) ? (
           <img
             className="object-cover w-full h-full object-center"
-            src={item.thumbnail}
+            src={thumbnail}
             alt={item.filename}
           />
         ) : (

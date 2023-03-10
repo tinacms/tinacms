@@ -37,7 +37,7 @@ export interface Media {
   /**
    * A url that provides a smaller image of the media file
    */
-  thumbnail?: string
+  thumbnails?: { [name: string]: string }
 }
 
 export interface MediaUploadOptions {
@@ -87,6 +87,7 @@ export interface MediaListOptions {
   directory?: string
   limit?: number
   offset?: MediaListOffset
+  thumbnailSizes?: { w: number; h: number }[]
 }
 
 /**
