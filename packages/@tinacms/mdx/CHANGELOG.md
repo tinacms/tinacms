@@ -1,5 +1,12 @@
 # @tinacms/mdx
 
+## 1.3.3
+
+### Patch Changes
+
+- 290520682: Update handling of top-level images during stringify
+  - @tinacms/schema-tools@1.3.3
+
 ## 1.3.2
 
 ### Patch Changes

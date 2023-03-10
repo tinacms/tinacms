@@ -1,5 +1,14 @@
 # tina-graphql
 
+## 1.3.4
+
+### Patch Changes
+
+- b095d06a9: Bump esbuild versions in graphql/scripts
+- Updated dependencies [290520682]
+  - @tinacms/mdx@1.3.3
+  - @tinacms/schema-tools@1.3.3
+
 ## 1.3.3
 
 ### Patch Changes

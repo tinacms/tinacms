@@ -1,5 +1,11 @@
 # e2e-next
 
+## 0.1.20
+
+### Patch Changes
+
+- tinacms@1.3.1
+
 ## 0.1.19
 
 ### Patch Changes
