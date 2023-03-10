@@ -534,7 +534,7 @@ const ActiveItemPreview = ({
   deleteMediaItem,
   allowDelete,
 }) => {
-  const thumbnail = activeItem ? activeItem.thumbnails['1000x1000'] : ''
+  const thumbnail = activeItem ? (activeItem.thumbnails || {})['1000x1000'] : ''
   return (
     <div
       className={`shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto bg-white border-l border-gray-100 bg-white shadow-md transition ease-out duration-150 ${
