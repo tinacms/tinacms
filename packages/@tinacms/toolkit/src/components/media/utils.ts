@@ -21,7 +21,8 @@ export const dropzoneAcceptFromString = (str: string) => {
 
 export const isImage = (filename: string): boolean => {
   // http://stackoverflow.com/questions/10473185/regex-javascript-image-file-extension
-  return /\.(gif|jpg|jpeg|tiff|png|svg|webp)$/i.test(filename)
+  // (\?.*)? is to match query strings (like from tina cloud)
+  return /\.(gif|jpg|jpeg|tiff|png|svg|webp)(\?.*)?$/i.test(filename)
 }
 
 export const absoluteImgURL = (str: string) => {
