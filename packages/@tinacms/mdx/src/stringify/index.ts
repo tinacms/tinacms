@@ -268,10 +268,17 @@ export const blockElement = (
     }
     case 'img':
       return {
-        type: 'image',
-        url: imageCallback(content.url),
-        alt: content.alt,
-        title: content.caption,
+        // Slate editor treats `img` as a block-level element, wrap
+        // it in an empty paragraph
+        type: 'paragraph',
+        children: [
+          {
+            type: 'image',
+            url: imageCallback(content.url),
+            alt: content.alt,
+            title: content.caption,
+          },
+        ],
       }
     default:
       throw new Error(`BlockElement: ${content.type} is not yet supported`)
