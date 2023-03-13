@@ -114,6 +114,10 @@ export class DevCommand extends Command {
       })
       const apiURL = await codegen.execute()
 
+      if (!this.noWatch) {
+        this.watchQueries(configManager, async () => await codegen.execute())
+      }
+
       await database.indexContent({ tinaSchema, graphQLSchema })
       return { apiURL, database }
     }
@@ -135,6 +139,12 @@ export class DevCommand extends Command {
 
     server.watcher.on('change', async (changedPath) => {
       if (changedPath.includes('__generated__')) {
+        return
+      }
+      if (changedPath.includes('@tinacms/app')) {
+        return
+      }
+      if (changedPath.includes('tinacms/dist')) {
         return
       }
       try {
@@ -273,6 +283,30 @@ export class DevCommand extends Command {
       .on('unlink', async (removedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(removedFile)
         database.deleteContentByPaths([pathFromRoot])
+      })
+  }
+  watchQueries(configManager: ConfigManager, callback: () => Promise<string>) {
+    let ready = false
+    /**
+     * This has no way of knowing whether the change to the file came from someone manually
+     * editing in their IDE or Tina pushing the update via the Filesystem bridge. It's a simple
+     * enough update that it's fine that when Tina pushes a change, we go and push that same
+     * thing back through the database, and Tina Cloud does the same thing when it receives
+     * a push from Github.
+     */
+    chokidar
+      .watch(configManager.userQueriesAndFragmentsGlob)
+      .on('ready', () => {
+        ready = true
+      })
+      .on('add', async (addedFile) => {
+        await callback()
+      })
+      .on('change', async (changedFile) => {
+        await callback()
+      })
+      .on('unlink', async (removedFile) => {
+        await callback()
       })
   }
 }
