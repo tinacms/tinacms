@@ -59,7 +59,7 @@ export const parseURL = (
 
   if (!branch || !clientId) {
     throw new Error(
-      `Invalid URL format provided. Expected: https://content.tinajs.io/<Verion>/content/<ClientID>/github/<Branch> but but received ${url}`
+      `Invalid URL format provided. Expected: https://content.tinajs.io/<Version>/content/<ClientID>/github/<Branch> but but received ${url}`
     )
   }
 
