@@ -5,14 +5,21 @@ import { tinaTailwind } from './tailwind'
 import { ConfigManager } from '../config-manager'
 import normalizePath from 'normalize-path'
 
-export const createConfig = async (
-  configManager: ConfigManager,
-  database: Database,
-  apiURL: string,
-  plugins: Plugin[],
-  noSDK: boolean,
+export const createConfig = async ({
+  configManager,
+  database,
+  apiURL,
+  plugins,
+  noSDK,
+  noWatch,
+}: {
+  configManager: ConfigManager
+  database: Database
+  apiURL: string
+  noSDK: boolean
   noWatch: boolean
-) => {
+  plugins?: Plugin[]
+}) => {
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {}
   Object.keys(process.env).forEach((key) => {

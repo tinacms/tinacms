@@ -26,5 +26,6 @@ stack: ${code.stack || 'No stack was provided'}`)
       logger.info(`child process exited with code ${code}`)
       process.exit(code)
     })
+    return ps
   }
 }

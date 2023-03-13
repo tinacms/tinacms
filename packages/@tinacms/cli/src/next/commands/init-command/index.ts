@@ -17,6 +17,7 @@ export class InitCommand extends Command {
 
   async catch(error: any): Promise<void> {
     logger.error('Error occured during tinacms init')
+    console.error(error)
     process.exit(1)
   }
 

@@ -11,6 +11,7 @@ import { Codegen } from '../../codegen'
 import chalk from 'chalk'
 import { startSubprocess2 } from '../../../utils/start-subprocess'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
+import type { ChildProcess } from 'child_process'
 
 export class DevCommand extends Command {
   static paths = [['dev'], ['server:start']]
@@ -52,9 +53,7 @@ export class DevCommand extends Command {
 
   async catch(error: any): Promise<void> {
     logger.error('Error occured during tinacms dev')
-    if (this.verbose) {
-      console.error(error)
-    }
+    console.error(error)
     process.exit(1)
   }
 
@@ -165,12 +164,12 @@ export class DevCommand extends Command {
             value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}`,
           },
           {
-            key: 'API url',
-            value: apiURL,
-          },
-          {
             key: 'API playground',
             value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}#/graphql`,
+          },
+          {
+            key: 'API url',
+            value: apiURL,
           },
           ...subItems,
         ],
@@ -214,10 +213,26 @@ export class DevCommand extends Command {
         // },
       ],
     })
+    let subProc: ChildProcess | undefined
     if (this.subCommand) {
-      logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
-      await startSubprocess2({ command: this.subCommand })
+      subProc = await startSubprocess2({ command: this.subCommand })
     }
+    logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
+    function exitHandler(options, exitCode) {
+      if (subProc) {
+        subProc.kill()
+      }
+      process.exit()
+    }
+    //do something when app is closing
+    process.on('exit', exitHandler)
+    //catches ctrl+c event
+    process.on('SIGINT', exitHandler)
+    // catches "kill pid" (for example: nodemon restart)
+    process.on('SIGUSR1', exitHandler)
+    process.on('SIGUSR2', exitHandler)
+    //catches uncaught exceptions
+    process.on('uncaughtException', exitHandler)
   }
 
   watchContentFiles(configManager: ConfigManager, database: Database) {

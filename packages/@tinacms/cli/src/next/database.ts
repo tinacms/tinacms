@@ -19,15 +19,19 @@ export const createDBServer = () => {
       valueEncoding: 'json',
     })
   )
-  const dbserver = createServer(function (socket) {
+  const dbServer = createServer(function (socket) {
     // Pipe socket into host stream and vice versa
     return pipeline(socket, levelHost.createRpcStream(), socket, () => {
       // Disconnected
     })
   })
-  dbserver.listen(9000)
-
-  return dbserver
+  dbServer.once('error', (err) => {
+    // @ts-ignore err.code undefined
+    if (err?.code === 'EADDRINUSE') {
+      throw new Error(`Tina Dev server is already in use`)
+    }
+  })
+  dbServer.listen(9000)
 }
 
 export async function createAndInitializeDatabase(

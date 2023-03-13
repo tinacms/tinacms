@@ -91,6 +91,13 @@ export const createDevServer = async (
     },
   ]
   return createViteServer(
-    await createConfig(configManager, database, apiURL, plugins, noSDK, noWatch)
+    await createConfig({
+      configManager,
+      database,
+      apiURL,
+      plugins,
+      noSDK,
+      noWatch,
+    })
   )
 }

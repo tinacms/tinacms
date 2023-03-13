@@ -35,13 +35,12 @@ export const buildProductionSpa = async (
       }
     }
   })
-  const config = await createConfig(
+  const config = await createConfig({
     configManager,
     database,
     apiURL,
-    [],
     noSDK,
-    true
-  )
+    noWatch: true,
+  })
   return build(config)
 }

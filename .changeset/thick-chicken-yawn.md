@@ -1,8 +1,8 @@
 ---
-'@tinacms/datalayer': patch
-'@tinacms/graphql': patch
-'@tinacms/app': patch
-'@tinacms/cli': patch
+'@tinacms/datalayer': minor
+'@tinacms/graphql': minor
+'@tinacms/app': minor
+'@tinacms/cli': minor
 'tinacms': patch
 ---
 

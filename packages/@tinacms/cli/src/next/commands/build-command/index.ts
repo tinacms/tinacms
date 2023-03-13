@@ -39,9 +39,7 @@ export class BuildCommand extends Command {
   })
 
   async catch(error: any): Promise<void> {
-    if (this.verbose) {
-      console.error(error)
-    }
+    console.error(error)
     process.exit(1)
   }
 
