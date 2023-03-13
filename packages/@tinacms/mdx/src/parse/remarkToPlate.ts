@@ -464,6 +464,10 @@ export const remarkToSlate = (
             type: 'html',
           }
         }
+        if (children[0].type === 'img') {
+          // @ts-ignore, Slate editor allows img as a top-level block
+          return children[0]
+        }
       }
     }
     return {
