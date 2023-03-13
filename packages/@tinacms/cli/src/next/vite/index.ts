@@ -89,6 +89,7 @@ export const createConfig = async ({
       'process.env': `new Object(${JSON.stringify(publicEnv)})`,
       __API_URL__: `"${apiURL}"`,
       __TOKEN__: `"${configManager.config.token}"`,
+      __TINA_GRAPHQL_VERSION__: `"${configManager.getTinaGraphQLVersion()}"`,
     },
     server: {
       watch: noWatch

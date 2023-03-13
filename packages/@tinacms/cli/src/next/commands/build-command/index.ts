@@ -32,6 +32,10 @@ export class BuildCommand extends Command {
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
   })
+  tinaGraphQLVersion = Option.String('--tina-graphql-version', {
+    description:
+      'Specify the root directory to run the CLI from (defaults to current working directory)',
+  })
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -44,7 +48,10 @@ export class BuildCommand extends Command {
   }
 
   async execute(): Promise<number | void> {
-    const configManager = new ConfigManager(this.rootPath)
+    const configManager = new ConfigManager(
+      this.rootPath,
+      this.tinaGraphQLVersion
+    )
     logger.info('Starting Tina build')
 
     try {

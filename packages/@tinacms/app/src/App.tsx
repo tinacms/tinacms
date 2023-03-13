@@ -43,7 +43,13 @@ export const TinaAdminWrapper = () => {
   const schema = { ...config?.schema, config }
   return (
     // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
-    <TinaCMS {...config} schema={schema} client={{ apiUrl: __API_URL__ }}>
+    <TinaCMS
+      {...config}
+      schema={schema}
+      client={{ apiUrl: __API_URL__ }}
+      // THis will be replaced by the version of the graphql package or --garphql-version flag. It is replaced by vite at compile time
+      tinaGraphQLVersion={__TINA_GRAPHQL_VERSION__}
+    >
       <SetPreview outputFolder={config.build.outputFolder} />
       <TinaAdmin
         preview={Preview}

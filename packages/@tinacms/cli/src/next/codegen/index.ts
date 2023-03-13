@@ -105,6 +105,7 @@ export class Codegen {
     const branch = this.configManager.config?.branch
     const clientId = this.configManager.config?.clientId
     const token = this.configManager.config?.token
+    const version = this.configManager.getTinaGraphQLVersion()
     const baseUrl =
       this.configManager.config.tinaioConfig?.contentApiUrlOverride ||
       `https://${TINA_HOST}`
@@ -128,7 +129,7 @@ export class Codegen {
 
     let apiURL = this.port
       ? `http://localhost:${this.port}/graphql`
-      : `${baseUrl}/content/${clientId}/github/${branch}`
+      : `${baseUrl}/${version}/content/${clientId}/github/${branch}`
 
     if (this.configManager.config.contentApiUrlOverride) {
       apiURL = this.configManager.config.contentApiUrlOverride

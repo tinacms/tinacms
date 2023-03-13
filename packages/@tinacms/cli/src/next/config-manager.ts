@@ -46,9 +46,11 @@ export class ConfigManager {
   selfHostedDatabaseFilePath?: string
   spaRootPath: string
   spaHTMLPath: string
+  tinaGraphQLVersionFromCLI?: string
 
-  constructor(rootPath: string = process.cwd()) {
+  constructor(rootPath: string = process.cwd(), tinaGraphQLVersion?: string) {
     this.rootPath = normalizePath(rootPath)
+    this.tinaGraphQLVersionFromCLI = tinaGraphQLVersion
   }
 
   isUsingTs() {
@@ -188,6 +190,24 @@ export class ConfigManager {
     throw new Error(
       `Unable to find Tina folder, if you're working in folder outside of the Tina config be sure to specify --rootPath`
     )
+  }
+
+  getTinaGraphQLVersion() {
+    if (this.tinaGraphQLVersionFromCLI) {
+      return this.tinaGraphQLVersionFromCLI
+    }
+    const generatedSchema = fs.readJSONSync(this.generatedSchemaJSONPath)
+    if (
+      !generatedSchema ||
+      !(typeof generatedSchema?.version !== 'undefined') ||
+      !(typeof generatedSchema?.version?.major === 'string') ||
+      !(typeof generatedSchema?.version?.minor === 'string')
+    ) {
+      throw new Error(
+        `Can not find Tina GraphQL version in ${this.generatedSchemaJSONPath}`
+      )
+    }
+    return `${generatedSchema.version.major}.${generatedSchema.version.minor}`
   }
 
   printGeneratedClientFilePath() {
