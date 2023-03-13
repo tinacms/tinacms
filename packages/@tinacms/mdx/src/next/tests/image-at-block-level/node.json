@@ -1,0 +1,34 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Image callback should persist"
+        }
+      ]
+    },
+    {
+      "type": "img",
+      "url": "http://some-url/my-pic.jpg",
+      "caption": null,
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+      ]
+    }
+  ]
+}
