@@ -9,7 +9,7 @@ export const createConfig = async ({
   configManager,
   database,
   apiURL,
-  plugins,
+  plugins = [],
   noSDK,
   noWatch,
 }: {

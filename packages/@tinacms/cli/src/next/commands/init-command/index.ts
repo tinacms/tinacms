@@ -23,7 +23,7 @@ export class InitCommand extends Command {
 
   async execute(): Promise<number | void> {
     await initStaticTina({
-      rootPath: this.rootPath,
+      rootPath: this.rootPath || process.cwd(),
       noTelemetry: this.noTelemetry,
     })
     process.exit()
