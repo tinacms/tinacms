@@ -1161,7 +1161,10 @@ const _indexContent = async (
   }
 
   const tinaSchema = await database.getSchema()
-  const templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
+  let templateInfo: CollectionTemplateable | null = null
+  if (collection) {
+    templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
+  }
 
   await sequential(documentPaths, async (filepath) => {
     try {
@@ -1177,10 +1180,12 @@ const _indexContent = async (
       )
       const normalizedPath = normalizePath(filepath)
 
-      const aliasedData = replaceNameOverrides(
-        getTemplateForFile(templateInfo, data as any),
-        data
-      )
+      const aliasedData = templateInfo
+        ? replaceNameOverrides(
+            getTemplateForFile(templateInfo, data as any),
+            data
+          )
+        : data
 
       await enqueueOps([
         ...makeIndexOpsForDocument<Record<string, any>>(

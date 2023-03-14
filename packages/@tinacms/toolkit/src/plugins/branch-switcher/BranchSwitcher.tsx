@@ -206,6 +206,32 @@ export const BranchSwitcher = ({
   )
 }
 
+export const getFilteredBranchList = (
+  branchList: Branch[],
+  filter: string,
+  currentBranchName: string
+) => {
+  const filteredBranchList = branchList.filter(
+    (branch) =>
+      !filter ||
+      branch.name.includes(filter) ||
+      branch.name === currentBranchName
+  )
+  const currentBranchItem = branchList.find(
+    (branch) => branch.name === currentBranchName
+  )
+
+  // return list with current branch at top
+  return [
+    currentBranchItem ||
+      ({
+        name: currentBranchName,
+        indexStatus: { status: 'failed' },
+      } as Branch),
+    ...filteredBranchList.filter((branch) => branch.name !== currentBranchName),
+  ]
+}
+
 const BranchSelector = ({
   branchList,
   currentBranch,
@@ -219,18 +245,11 @@ const BranchSelector = ({
 }) => {
   const [newBranchName, setNewBranchName] = React.useState('')
   const [filter, setFilter] = React.useState('')
-  const filteredBranchList = branchList.filter(
-    (branch) =>
-      !filter || branch.name.includes(filter) || branch.name === currentBranch
+  const filteredBranchList = getFilteredBranchList(
+    branchList,
+    filter,
+    currentBranch
   )
-  const currentBranchItem = branchList.find(
-    (branch) => branch.name === currentBranch
-  )
-  const currentIndex = filteredBranchList.findIndex(
-    (branch) => branch.name === currentBranch
-  )
-  filteredBranchList.splice(currentIndex, 1)
-  filteredBranchList.unshift(currentBranchItem)
 
   return (
     <div className="flex flex-col gap-3">

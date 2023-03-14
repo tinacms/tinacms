@@ -57,7 +57,11 @@ export class CloudinaryMediaStore implements MediaStore {
         id: fileRes.public_id,
         filename: fileRes.original_filename,
         directory: '/',
-        thumbnail: fileRes.url,
+        thumbnails: {
+          '75x75': fileRes.url,
+          '400x400': fileRes.url,
+          '1000x1000': fileRes.url,
+        },
         src: fileRes.url,
       }
 

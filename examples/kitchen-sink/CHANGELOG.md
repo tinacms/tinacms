@@ -1,5 +1,28 @@
 # e2e-next
 
+## 0.1.21
+
+### Patch Changes
+
+- tinacms@1.3.2
+
+## 0.1.20
+
+### Patch Changes
+
+- tinacms@1.3.1
+
+## 0.1.19
+
+### Patch Changes
+
+- f831dcf4f: security: update some deps
+- Updated dependencies [964a6985b]
+- Updated dependencies [4cd5cd4f7]
+- Updated dependencies [9c277e179]
+- Updated dependencies [8d5c923c7]
+  - tinacms@1.3.0
+
 ## 0.1.18
 
 ### Patch Changes

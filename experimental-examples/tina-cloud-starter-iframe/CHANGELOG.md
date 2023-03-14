@@ -1,5 +1,35 @@
 # @tinacms/starter-iframe
 
+## 0.1.23
+
+### Patch Changes
+
+- next-tinacms-cloudinary@4.3.0
+- tinacms@1.3.2
+
+## 0.1.22
+
+### Patch Changes
+
+- Updated dependencies [817b10b8a]
+  - next-tinacms-cloudinary@4.3.0
+  - tinacms@1.3.1
+  - @tinacms/auth@1.0.3
+
+## 0.1.21
+
+### Patch Changes
+
+- Updated dependencies [964a6985b]
+- Updated dependencies [4cd5cd4f7]
+- Updated dependencies [9c277e179]
+- Updated dependencies [f831dcf4f]
+- Updated dependencies [8d5c923c7]
+- Updated dependencies [0b7687424]
+  - tinacms@1.3.0
+  - next-tinacms-cloudinary@4.2.0
+  - @tinacms/auth@1.0.3
+
 ## 0.1.20
 
 ### Patch Changes

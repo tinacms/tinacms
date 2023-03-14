@@ -117,7 +117,11 @@ async function uploadMedia(
         id: prefix + filename,
         filename,
         directory: prefix,
-        thumbnail: src,
+        thumbnails: {
+          '75x75': src,
+          '400x400': src,
+          '1000x1000': src,
+        },
         src,
       })
     } catch (e) {
@@ -235,7 +239,11 @@ function getS3ToTinaFunc(cdnUrl) {
       filename,
       directory,
       src: src,
-      thumbnail: src,
+      thumbnails: {
+        '75x75': src,
+        '400x400': src,
+        '1000x1000': src,
+      },
       type: 'file',
     }
   }

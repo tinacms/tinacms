@@ -7,7 +7,7 @@ import type { TinaCMS } from '@tinacms/toolkit'
 import { TinaAdminApi } from '../api'
 import type { DocumentForm } from '../types'
 import LoadingPage from './LoadingPage'
-
+import { FullscreenError } from './FullscreenError'
 export const useGetDocument = (
   cms: TinaCMS,
   collectionName: string,
@@ -62,7 +62,7 @@ const GetDocument = ({
   )
 
   if (error) {
-    return null
+    return <FullscreenError />
   }
 
   if (loading) {
