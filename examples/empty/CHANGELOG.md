@@ -4,6 +4,13 @@
 
 ### Patch Changes
 
+- tinacms@1.3.3
+- @tinacms/cli@1.3.3
+
+## null
+
+### Patch Changes
+
 - tinacms@1.3.2
 
 ## null
