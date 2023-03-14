@@ -217,6 +217,14 @@ export const transformForestryFieldsToTinaFields = ({
           label: forestryField.label,
         }
         break
+      case 'image_gallery':
+        field = {
+          type: 'image',
+          ...getTinaFieldsFromName(forestryField.name),
+          label: forestryField.label,
+          list: true,
+        }
+        break
       case 'select':
         if (forestryField.config?.options) {
           field = {
@@ -327,7 +335,6 @@ export const transformForestryFieldsToTinaFields = ({
         break
 
       // Unsupported types
-      case 'image_gallery':
       case 'include':
         logger.info(
           warnText(
