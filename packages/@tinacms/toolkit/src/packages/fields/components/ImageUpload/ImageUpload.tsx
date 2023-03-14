@@ -11,6 +11,7 @@ import { useCMS } from '../../../../react-tinacms/use-cms'
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
   dropzoneAcceptFromString,
+  isImage,
 } from '../../../../components/media/utils'
 import { BiFileBlank } from 'react-icons/bi'
 
@@ -21,10 +22,6 @@ interface ImageUploadProps {
   value?: string
   src?: string
   loading?: boolean
-}
-
-const isStringImage = (src: string) => {
-  return src && src.match(/\.(bmp|gif|jpe?g|jfif|jp2|jxr|png|webp)$/) != null
 }
 
 const StyledImage = ({ src }) => (
@@ -56,7 +53,6 @@ export const ImageUpload = ({
   loading,
 }: ImageUploadProps) => {
   const cms = useCMS()
-  const isImage = isStringImage(src)
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: dropzoneAcceptFromString(
@@ -74,14 +70,18 @@ export const ImageUpload = ({
         ) : (
           <div
             className={`relative w-full max-w-full flex justify-between gap-3 ${
-              isImage ? `items-start` : `items-center`
+              isImage(src) ? `items-start` : `items-center`
             }`}
           >
             <button
               className="outline-none overflow-visible flex-1 w-[0px] cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
               onClick={onClick}
             >
-              {isImage ? <StyledImage src={src} /> : <StyledFile src={src} />}
+              {isImage(src) ? (
+                <StyledImage src={src} />
+              ) : (
+                <StyledFile src={src} />
+              )}
             </button>
             {onClear && (
               <DeleteImageButton
