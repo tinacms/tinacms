@@ -24,7 +24,7 @@ interface ListFieldDefinititon extends Field {
   component: 'list'
   defaultItem?: DefaultItem
   field: {
-    component: 'text' | 'textarea' | 'number' | 'select'
+    component: 'text' | 'textarea' | 'number' | 'select' | 'image'
   }
 
   type?: string

@@ -205,6 +205,7 @@ export default defineConfig({
                         name: 'title',
                         ui: { component: 'textarea' },
                       },
+                      { type: 'image', name: 'imageList', list: true },
                       {
                         type: 'string',
                         name: 'hidden',
