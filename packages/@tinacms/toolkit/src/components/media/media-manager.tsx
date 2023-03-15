@@ -405,35 +405,7 @@ export function MediaPicker({
 
       <MediaPickerWrap>
         <div className="flex items-center bg-gray-50 border-b border-gray-150 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
-          {/* viewMode toggle */}
-          <div
-            className={`grow-0 flex shadow-inner bg-white border border-gray-100 justify-between rounded-md`}
-          >
-            <button
-              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2.5 py-1 transition-all ease-out duration-150 border rounded-l-md ${
-                viewMode === 'grid'
-                  ? 'text-blue-500 border-transparent'
-                  : 'bg-gray-50 border-gray-100 text-gray-400 shadow'
-              }`}
-              onClick={() => {
-                setViewMode('grid')
-              }}
-            >
-              <BiGridAlt className="w-6 h-full opacity-70" />
-            </button>
-            <button
-              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2 py-1 transition-all ease-out duration-150 border rounded-r-md ${
-                viewMode === 'list'
-                  ? 'text-blue-500 border-transparent'
-                  : 'bg-gray-50 border-gray-100 text-gray-400 shadow'
-              }`}
-              onClick={() => {
-                setViewMode('list')
-              }}
-            >
-              <BiListUl className="w-8 h-full opacity-70" />
-            </button>
-          </div>
+          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
 
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
           {!isLocal && hasTinaMedia && (
@@ -670,6 +642,39 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
       >
         Learn More
       </a>
+    </div>
+  )
+}
+
+const ViewModeToggle = ({ viewMode, setViewMode }) => {
+  const toggleClasses = {
+    base: 'relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base py-1 transition-all ease-out duration-150 border border-gray-100',
+    active: 'bg-white text-blue-500 shadow-inner',
+    inactive: 'bg-gray-50 text-gray-400 shadow',
+  }
+
+  return (
+    <div className={`grow-0 flex justify-between`}>
+      <button
+        className={`${toggleClasses.base} px-2.5 rounded-l-md ${
+          viewMode === 'grid' ? toggleClasses.active : toggleClasses.inactive
+        }`}
+        onClick={() => {
+          setViewMode('grid')
+        }}
+      >
+        <BiGridAlt className="w-6 h-full opacity-70" />
+      </button>
+      <button
+        className={`${toggleClasses.base} px-2 rounded-r-md ${
+          viewMode === 'list' ? toggleClasses.active : toggleClasses.inactive
+        }`}
+        onClick={() => {
+          setViewMode('list')
+        }}
+      >
+        <BiListUl className="w-8 h-full opacity-70" />
+      </button>
     </div>
   )
 }
