@@ -302,6 +302,11 @@ export function MediaPicker({
             }
           })
         )
+
+        // Upload Failed
+        if (files.length === 0) {
+          cms.alerts.error('Upload failed: File not supported.')
+        }
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
       }

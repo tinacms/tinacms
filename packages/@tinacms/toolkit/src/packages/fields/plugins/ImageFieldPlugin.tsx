@@ -65,6 +65,8 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
             }
           } catch (error) {
             console.error('Error uploading media asset: ', error)
+            // @ts-ignore
+            cms.alerts.error('Upload failed: File not supported.')
           } finally {
             setIsImgUploading(false)
           }
