@@ -219,36 +219,20 @@ const forestryMigrate = async ({
   forestryPath: string
   rootPath: string
 }): Promise<string> => {
-  logger.info(
-    `It looks like you have a ${focusText(
-      '.forestry/settings.yml'
-    )} file in your project.`
-  )
+  logger.info(`Forestry.io configuration found.`)
 
-  logger.info(
-    `This migration will update some of your content to match tina.  Please ${focusText(
-      'save a backup of your content'
-    )} before doing this migration. (This can be done with git)`
+  const disclaimer = logText(
+    `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
   )
-
   const option = await prompts({
     name: 'selection',
     type: 'confirm',
     initial: true,
-    message: `Please note that this is a beta version and may contain some issues\nWould you like to migrate your Forestry templates?\n${logText(
-      'Note: This migration will not be perfect, but it will get you started.'
-    )}`,
+    message: `Would you like to migrate your Forestry templates?\n${disclaimer}`,
   })
   if (!option['selection']) {
     return null
   }
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-  await spin({
-    waitFor: async () => {
-      await delay(2000)
-    },
-    text: '',
-  })
   const collections = await generateCollections({
     forestryPath,
     rootPath,
