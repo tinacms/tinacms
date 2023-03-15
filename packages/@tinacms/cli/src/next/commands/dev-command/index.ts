@@ -124,6 +124,11 @@ export class DevCommand extends Command {
     const { apiURL, database } = await setup()
 
     await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port))
+    // Add the gitignore so the index.html and assets are committed to git
+    await fs.outputFile(
+      configManager.outputGitignorePath,
+      'index.html\nassets/'
+    )
     const server = await createDevServer(
       configManager,
       database,

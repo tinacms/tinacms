@@ -85,7 +85,7 @@ export class BuildCommand extends Command {
 
     await buildProductionSpa(configManager, database, apiURL, this.noSDK)
 
-    // When the build completes, add the gitignore
+    // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
       configManager.outputGitignorePath,
       'index.html\nassets/'
