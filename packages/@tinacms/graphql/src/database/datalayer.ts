@@ -580,11 +580,9 @@ export const makeStringEscaper = (
       ) as T
     } else {
       if (typeof input === 'string') {
-        const s = (input as string).replace(regex, replacement) as T
-        console.log({ s })
-        return s
+        return (input as string).replace(regex, replacement) as T
       } else {
-        return input
+        return input as T
       }
     }
   }
