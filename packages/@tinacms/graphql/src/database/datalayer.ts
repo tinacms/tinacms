@@ -579,7 +579,13 @@ export const makeStringEscaper = (
         val.replace(regex, replacement)
       ) as T
     } else {
-      return (input as string).replace(regex, replacement) as T
+      if (typeof input === 'string') {
+        const s = (input as string).replace(regex, replacement) as T
+        console.log({ s })
+        return s
+      } else {
+        return input
+      }
     }
   }
 }
