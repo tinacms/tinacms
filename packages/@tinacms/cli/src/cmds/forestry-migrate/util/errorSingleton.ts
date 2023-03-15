@@ -47,13 +47,11 @@ export class ErrorSingleton {
   public printCollectionNameErrors() {
     if (this.collectionNameErrors?.length) {
       logger.error(
-        dangerText('ERROR: TinaCMS only supports alphanumeric field names')
+        dangerText('ERROR: TinaCMS only supports alphanumeric template names')
       )
       logger.error('The following templates have been renamed:')
       this.collectionNameErrors.forEach((error) => {
-        logger.error(
-          `- Content that uses ${error.template}.yaml: ${error.name} -> ${error.newName}`
-        )
+        logger.error(`- ${error.template}.yaml -> ${error.newName}`)
       })
       logger.error(
         `If you wish to edit any of the following templates, you will have to update your content and code to use the new name. See ${linkText(
