@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser'
+import path from 'path'
 import cors from 'cors'
 import { createServer as createViteServer } from 'vite'
 import { resolve as gqlResolve, Database } from '@tinacms/graphql'
@@ -26,9 +27,12 @@ export const createDevServer = async (
         // .tsx but seems to work ok for now.
         // TODO: other loaders needed (eg svg)?
         if (id.startsWith(configManager.rootPath)) {
-          const result = await esbuildTransform(code, { loader: 'tsx' })
-          return {
-            code: result.code,
+          const extName = path.extname(id)
+          if (extName.startsWith('.tsx') || extName.startsWith('.ts')) {
+            const result = await esbuildTransform(code, { loader: 'tsx' })
+            return {
+              code: result.code,
+            }
           }
         }
       },
@@ -98,6 +102,17 @@ export const createDevServer = async (
       plugins,
       noSDK,
       noWatch,
+      /**
+       * Ensure Vite's import scan uses the spaMainPath as the input
+       * so it properly finds everything. This is for dev only, and when
+       * running the server outside of this monorepo vite fails to find
+       * and optimize the imports, so you get errors about it not being
+       * able to find an export from a module, and it's always a CJS
+       * module that Vite would usually transform to an ES module.
+       */
+      rollupOptions: {
+        input: configManager.spaMainPath,
+      },
     })
   )
 }

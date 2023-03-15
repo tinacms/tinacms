@@ -226,8 +226,8 @@ export class DevCommand extends Command {
     let subProc: ChildProcess | undefined
     if (this.subCommand) {
       subProc = await startSubprocess2({ command: this.subCommand })
+      logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
     }
-    logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
     function exitHandler(options, exitCode) {
       if (subProc) {
         subProc.kill()

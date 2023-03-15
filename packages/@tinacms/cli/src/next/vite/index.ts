@@ -1,5 +1,10 @@
 import path from 'path'
-import { InlineConfig, Plugin, splitVendorChunkPlugin } from 'vite'
+import {
+  BuildOptions,
+  InlineConfig,
+  Plugin,
+  splitVendorChunkPlugin,
+} from 'vite'
 import { Database } from '@tinacms/graphql'
 import { tinaTailwind } from './tailwind'
 import { ConfigManager } from '../config-manager'
@@ -12,6 +17,7 @@ export const createConfig = async ({
   plugins = [],
   noSDK,
   noWatch,
+  rollupOptions,
 }: {
   configManager: ConfigManager
   database: Database
@@ -19,6 +25,7 @@ export const createConfig = async ({
   noSDK: boolean
   noWatch: boolean
   plugins?: Plugin[]
+  rollupOptions?: BuildOptions['rollupOptions']
 }) => {
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {}
@@ -91,6 +98,12 @@ export const createConfig = async ({
       __TOKEN__: `"${configManager.config.token}"`,
       __TINA_GRAPHQL_VERSION__: `"${configManager.getTinaGraphQLVersion()}"`,
     },
+    optimizeDeps: {
+      force: true,
+      // Not 100% sure why this isn't being picked up automatically, this works from within the monorepo
+      // but breaks externally
+      include: ['react/jsx-runtime'],
+    },
     server: {
       watch: noWatch
         ? {
@@ -105,6 +118,7 @@ export const createConfig = async ({
       sourcemap: true,
       outDir: configManager.outputFolderPath,
       emptyOutDir: true,
+      rollupOptions: rollupOptions,
     },
     plugins: [
       /**

@@ -45,6 +45,7 @@ export class ConfigManager {
   outputGitignorePath: string
   selfHostedDatabaseFilePath?: string
   spaRootPath: string
+  spaMainPath: string
   spaHTMLPath: string
   tinaGraphQLVersionFromCLI?: string
 
@@ -172,6 +173,7 @@ export class ConfigManager {
       require.resolve('@tinacms/app')
     ).pathname
     this.spaRootPath = this.spaHTMLPath.replace('/index.html', '')
+    this.spaMainPath = path.join(this.spaRootPath, 'src', 'main.tsx')
   }
 
   async getTinaFolderPath(rootPath) {
