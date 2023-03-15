@@ -42,10 +42,6 @@ export const handleServerErrors = (e: Error) => {
   } else if (e instanceof TinaFetchError) {
     handleFetchErrorError(e, true)
   } else {
-    logger.info(
-      dangerText(
-        'Compilation failed with errors. Server has not been restarted.'
-      ) + ` see error below \n ${e.message}`
-    )
+    logger.info(dangerText(`Compilation failed with errors:\n${e.message}`))
   }
 }
