@@ -6,7 +6,7 @@ import { parseFile, stringifyFile } from '@tinacms/graphql'
 import type { Collection, TinaField, UITemplate } from '@tinacms/schema-tools'
 import { getFieldsFromTemplates, parseSections } from './util'
 import { logger } from '../../logger'
-import { warnText } from '../../utils/theme'
+import { dangerText, warnText } from '../../utils/theme'
 
 const BODY_FIELD = {
   // This is the body field
@@ -179,7 +179,9 @@ export const generateCollections = async ({
                   stringifyFile(newContent, extname, true)
                 )
               } catch (error) {
-                console.log('Error updating file', page)
+                console.log(
+                  dangerText('Error updating template -> _template in ', page)
+                )
               }
             })
           } catch (e) {
