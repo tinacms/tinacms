@@ -69,6 +69,8 @@ export class DevCommand extends Command {
     // Initialize the host TCP server
     createDBServer()
 
+    let database: Database = null
+
     const setup = async ({ firstTime }: { firstTime: boolean }) => {
       try {
         await configManager.processConfig()
@@ -84,8 +86,10 @@ export class DevCommand extends Command {
           process.exit(1)
         }
       }
+      if (firstTime) {
+        database = await createAndInitializeDatabase(configManager)
+      }
 
-      const database = await createAndInitializeDatabase(configManager)
       const { tinaSchema, graphQLSchema, queryDoc, fragDoc } =
         await buildSchema(database, configManager.config)
       if (!configManager.isUsingLegacyFolder) {
@@ -119,11 +123,12 @@ export class DevCommand extends Command {
       if (!this.noWatch) {
         this.watchQueries(configManager, async () => await codegen.execute())
       }
-
+      // console.dir(configManager.config, { depth: null })
+      // console.log('indexing content')
       await database.indexContent({ tinaSchema, graphQLSchema })
       return { apiURL, database }
     }
-    const { apiURL, database } = await setup({ firstTime: true })
+    const { apiURL } = await setup({ firstTime: true })
 
     await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port))
     // Add the gitignore so the index.html and assets are committed to git
@@ -157,6 +162,8 @@ export class DevCommand extends Command {
       try {
         // await server.reloadModule
         logger.info('Tina config updated')
+        // We may want to remove this. Not sure if its needed
+        database.clearCache()
         await setup({ firstTime: false })
         // await server.restart()
       } catch (e) {
