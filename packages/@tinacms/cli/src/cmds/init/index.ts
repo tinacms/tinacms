@@ -22,6 +22,7 @@ import { hasForestryConfig } from '../forestry-migrate/util'
 import { generateCollections } from '../forestry-migrate'
 import { spin } from '../../utils/spinner'
 import { ErrorSingleton } from '../forestry-migrate/util/errorSingleton'
+import type { Collection, TinaField } from '@tinacms/schema-tools'
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other'
@@ -241,7 +242,36 @@ const forestryMigrate = async ({
   // print errors
   ErrorSingleton.getInstance().printCollectionNameErrors()
 
-  return JSON.stringify(collections, null, 2)
+  return stingifyCollections(collections)
+}
+
+const stingifyField = (field: TinaField<false>) => {
+  const fieldJson = JSON.stringify(field, null, 2)
+  if (field.type === 'object' && field.templates?.length) {
+    return (
+      `/*\n// For help migrating your blocks...\n` +
+      `// see this doc: https://tina.io/docs/forestry/common-errors/#migrating-blocks\n${fieldJson}\n*/`
+    )
+  } else {
+    return fieldJson
+  }
+}
+
+const stingifyCollections = (collections: Collection<false>[]) => {
+  const commentedCollections: string[] = []
+
+  for (const collection of collections) {
+    const fields = collection.fields.map((field) => {
+      return stingifyField(field)
+    })
+
+    const commentedFieldsString = fields.join(',\n')
+    const collectionString = `{\n  fields: [\n${commentedFieldsString}\n  ]\n}`
+
+    commentedCollections.push(collectionString)
+  }
+
+  return commentedCollections.join(',\n')
 }
 
 const reportTelemetry = async ({
