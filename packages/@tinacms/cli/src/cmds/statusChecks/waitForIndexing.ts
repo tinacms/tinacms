@@ -51,7 +51,8 @@ export const waitForDB = async (
     1
   )
 
-  const pollForStatus = async () => {
+  const pollForStatus = async (args?: { unknownCount?: number }) => {
+    const count = args?.unknownCount || 0
     try {
       if (options.verbose) {
         logger.info(logText('Polling for status...'))
@@ -97,9 +98,32 @@ export const waitForDB = async (
 
         // Index Unknown
       } else {
-        throw new IndexFailedError(
-          `Attempting to index but responded with status 'unknown', To retry the indexing process, click “Reset Repository Cache” in tina cloud advance settings.  ${error}`
-        )
+        if (count > 5) {
+          throw new IndexFailedError(
+            `Attempting to index but responded with status 'unknown'. This means that Tina Cloud does not know about branch '${branch}'. Please make sure that branch '${branch}' exists in your repository and that you have pushed your changes to the remote. View all all branches and there current status here: https://app.tina.io/projects/${clientId}/configuration  \n\nAdditional Info: ${JSON.stringify(
+              {
+                branch,
+                clientId,
+                token,
+              },
+              null,
+              2
+            )}`
+          )
+        } else {
+          if (options.verbose) {
+            logger.info(
+              logText(
+                `${statusMessage}, trying again in 5 seconds (attempt ${
+                  count + 1
+                })`
+              )
+            )
+          }
+          setTimeout(pollForStatus, POLLING_INTERVAL, {
+            unknownCount: count + 1,
+          })
+        }
       }
     } catch (e) {
       if (e instanceof IndexFailedError) {
