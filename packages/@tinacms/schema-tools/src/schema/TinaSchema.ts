@@ -326,7 +326,7 @@ export class TinaSchema {
     collection: Collectable
   ): CollectionTemplateable => {
     let extraFields: TinaField<true>[] = []
-    if (collection.fields) {
+    if (collection?.fields) {
       const template = collection
 
       if (
@@ -345,7 +345,7 @@ export class TinaSchema {
         },
       }
     } else {
-      if (collection.templates) {
+      if (collection?.templates) {
         return {
           namespace: collection.namespace,
           type: 'union',

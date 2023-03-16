@@ -48,8 +48,10 @@ export const parseURL = (
     }
   }
 
-  const pattern = new UrlPattern('/content/:clientId/github/*', {
+  const pattern = new UrlPattern('/:v/content/:clientId/github/*', {
     escapeChar: ' ',
+    // extend to allow `.` in version
+    segmentValueCharset: 'a-zA-Z0-9-_~ %.',
   })
   const result = pattern.match(params.pathname)
   const branch = result?._
@@ -57,7 +59,7 @@ export const parseURL = (
 
   if (!branch || !clientId) {
     throw new Error(
-      `Invalid URL format provided. Expected: https://content.tinajs.io/content/<ClientID>/github/<Branch> but but received ${url}`
+      `Invalid URL format provided. Expected: https://content.tinajs.io/<Version>/content/<ClientID>/github/<Branch> but but received ${url}`
     )
   }
 

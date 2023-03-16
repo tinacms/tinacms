@@ -131,11 +131,13 @@ const CheckSchema = ({
 
 export const TinaAdmin = ({
   preview,
+  Playground,
   config,
   schemaJson,
 }: {
   schemaJson?: any
   preview?: (props: object) => JSX.Element
+  Playground?: (props: object) => JSX.Element
   config: object
 }) => {
   const isSSR = typeof window === 'undefined'
@@ -178,6 +180,14 @@ export const TinaAdmin = ({
                       }
                     />
                   )}
+                  <Route
+                    path="graphql"
+                    element={
+                      <PlainLayout>
+                        <Playground />
+                      </PlainLayout>
+                    }
+                  />
                   <Route
                     path="collections/:collectionName/new"
                     element={
@@ -271,5 +281,28 @@ const DefaultWrapper = ({
         <div className="flex-1 relative">{children}</div>
       </div>
     </Layout>
+  )
+}
+
+/**
+ * FIXME: This still hides modal popups most of the time
+ */
+const PlainLayout = ({ children }: { children: any }) => {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'auto',
+        background: '#F6F6F9',
+        fontFamily: "'Inter', sans-serif",
+        zIndex: 9999,
+      }}
+    >
+      {children}
+    </div>
   )
 }
