@@ -773,6 +773,26 @@ export default defineConfig({
                 ],
               },
               {
+                name: 'center',
+                label: 'Centered HTML',
+                match: {
+                  start: '{{<',
+                  name: 'center',
+                  end: '>}}',
+                },
+                fields: [
+                  {
+                    name: 'children',
+                    label: 'Children',
+                    type: 'rich-text',
+                    parser: {
+                      type: 'markdown',
+                      skipEscaping: 'html',
+                    },
+                  },
+                ],
+              },
+              {
                 name: 'pullQuote',
                 label: 'Pull Quote',
                 match: {
