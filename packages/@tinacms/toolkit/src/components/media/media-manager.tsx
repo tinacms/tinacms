@@ -23,7 +23,7 @@ import {
   MediaListError,
 } from '../../packages/core'
 import { Button, IconButton } from '../../packages/styles'
-import { useDropzone } from 'react-dropzone'
+import { FileError, useDropzone } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
@@ -291,7 +291,7 @@ export function MediaPicker({
       cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
     ),
     multiple: true,
-    onDrop: async (files) => {
+    onDrop: async (files, fileRejections) => {
       try {
         setUploading(true)
         await cms.media.persist(
@@ -303,9 +303,34 @@ export function MediaPicker({
           })
         )
 
+        // Codes here https://github.com/react-dropzone/react-dropzone/blob/c36ab5bd8b8fd74e2074290d80e3ecb93d26b014/typings/react-dropzone.d.ts#LL13-L18C2
+        const errorCodes = {
+          'file-invalid-type': 'Invalid file type',
+          'file-too-large': 'File too large',
+          'file-too-small': 'File too small',
+          'too-many-files': 'Too many files',
+        }
+
+        const printError = (error: FileError) => {
+          const message = errorCodes[error.code]
+          if (message) {
+            return message
+          }
+          console.error(error)
+          return 'Unknown error'
+        }
+
         // Upload Failed
         if (files.length === 0) {
-          cms.alerts.error('Upload failed: File not supported.')
+          const messages = []
+          fileRejections.map((fileRejection) => {
+            messages.push(
+              `${fileRejection.file.name}: ${fileRejection.errors
+                .map((error) => printError(error))
+                .join(', ')}`
+            )
+          })
+          cms.alerts.error(`Upload failed\n\n${messages.join('. ')}`)
         }
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
