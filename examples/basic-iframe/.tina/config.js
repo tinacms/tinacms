@@ -69,7 +69,7 @@ export default defineConfig({
     collections: [
       {
         name: 'test',
-        path: 'content/test',
+        path: 'content/test/foo',
         label: 'Test',
         templates: [
           {
@@ -142,6 +142,19 @@ export default defineConfig({
                 ],
               },
             ],
+          },
+        ],
+      },
+      {
+        label: 'Blog 2',
+        name: 'post2',
+        path: 'content/new-folder',
+        format: 'md',
+        fields: [
+          {
+            type: 'string',
+            label: 'Title',
+            name: 'title',
           },
         ],
       },
