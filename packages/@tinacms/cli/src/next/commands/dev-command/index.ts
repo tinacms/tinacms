@@ -88,6 +88,8 @@ export class DevCommand extends Command {
       }
       if (firstTime) {
         database = await createAndInitializeDatabase(configManager)
+      } else {
+        database.clearCache()
       }
 
       const { tinaSchema, graphQLSchema, queryDoc, fragDoc } =
@@ -162,8 +164,6 @@ export class DevCommand extends Command {
       try {
         // await server.reloadModule
         logger.info('Tina config updated')
-        // We may want to remove this. Not sure if its needed
-        database.clearCache()
         await setup({ firstTime: false })
         // await server.restart()
       } catch (e) {
