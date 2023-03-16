@@ -1,5 +1,64 @@
 # @tinacms/mdx
 
+## 1.3.4
+
+### Patch Changes
+
+- 973e83f1f: Some fixes around image handling in the rich-text editor
+
+  - Stop treating images as block-level
+  - Fix issue where images inside links were being stripped out
+  - Fix display of .avif images in the media manager
+
+- Updated dependencies [d1cf65999]
+  - @tinacms/schema-tools@1.3.4
+
+## 1.3.3
+
+### Patch Changes
+
+- 290520682: Update handling of top-level images during stringify
+  - @tinacms/schema-tools@1.3.3
+
+## 1.3.2
+
+### Patch Changes
+
+- 3e97d978c: Add support for experimental markdown parser. To enable:
+
+  ```js
+  {
+    name: "body",
+    type: "rich-text",
+    parser: {
+      type: "markdown"
+    }
+  }
+  ```
+
+  For users who want to control the escape behavior, you can specify
+
+  ```js
+  {
+    name: "body",
+    type: "rich-text",
+    parser: {
+      type: "markdown"
+      skipEscaping: "all" // options are "all" | "html"
+    }
+  }
+  ```
+
+  This is helpful for sites rendered by other systems such as Hugo, where escape characters may interfere with
+  shortcodes that aren't registered with Tina.
+
+- f831dcf4f: security: update some deps
+- Updated dependencies [0a5297800]
+- Updated dependencies [7a3e86ba1]
+- Updated dependencies [353899de1]
+- Updated dependencies [01b858e41]
+  - @tinacms/schema-tools@1.3.3
+
 ## 1.3.1
 
 ### Patch Changes

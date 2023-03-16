@@ -433,6 +433,7 @@ const config = (cwd = '') => {
     },
     content: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
     plugins: [
+      require('@tailwindcss/container-queries'),
       require('@tailwindcss/typography')({
         className: 'tina-prose',
       }),
@@ -470,6 +471,11 @@ export const buildIt = async (entryPoint, packageJSON) => {
   }
 
   const outInfo = out(entry)
+
+  if (['@tinacms/app'].includes(packageJSON.name)) {
+    console.log('skipping @tinacms/app')
+    return
+  }
 
   external.forEach((ext) => (globals[ext] = 'NOOP'))
   if (target === 'node') {
@@ -526,24 +532,24 @@ export const buildIt = async (entryPoint, packageJSON) => {
        * to do that with the latest version of @tinacms/mdx, it's easiest to inline the dependency
        * directly. Especially because this package bundles its dependencies
        */
-      const appMDXPath = path.join(
-        process.cwd(),
-        '..',
-        'app',
-        'appFiles',
-        'src',
-        'fields',
-        'rich-text',
-        'monaco',
-        'mdx.js'
-      )
-      await esbuild({
-        entryPoints: [path.join(process.cwd(), entry)],
-        bundle: true,
-        format: 'esm',
-        outfile: appMDXPath,
-        external: Object.keys({ ...peerDeps }),
-      })
+      // const appMDXPath = path.join(
+      //   process.cwd(),
+      //   '..',
+      //   'app',
+      //   'appFiles',
+      //   'src',
+      //   'fields',
+      //   'rich-text',
+      //   'monaco',
+      //   'mdx.js'
+      // )
+      // await esbuild({
+      //   entryPoints: [path.join(process.cwd(), entry)],
+      //   bundle: true,
+      //   format: 'esm',
+      //   outfile: appMDXPath,
+      //   external: Object.keys({ ...peerDeps }),
+      // })
     } else {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],

@@ -1,5 +1,60 @@
 # @tinacms/schema-tools
 
+## 1.3.4
+
+### Patch Changes
+
+- d1cf65999: Adds list support to image field, improved field UI
+
+## 1.3.3
+
+### Patch Changes
+
+- 0a5297800: feat: Allow adding aliases in field configs, to export special characters like names with dashes, or fields named "id"
+- 7a3e86ba1: fix: templates regression
+- 353899de1: Deprecate and reconfigure internal types. Most user-facing types should remain unchanged aside from a couple of bug fixes:
+
+  - Fix missing `indexed` and `indexes` properties on `collection` and `field` configs.
+
+  Deprecations
+
+  ```
+  CollectionFieldsWithNamespace
+  CollectionTemplates
+  CollectionTemplatesWithNamespace
+  GlobalTemplate
+  ObjectType
+  ReferenceType
+  ReferenceTypeInner
+  ReferenceTypeWithNamespace
+  RichTextType
+  RichTypeWithNamespace
+  TinaCloudCollection
+  TinaCloudCollectionBase
+  TinaCloudCollectionEnriched
+  TinaCloudSchema
+  TinaCloudSchemaBase
+  TinaCloudSchemaConfig
+  TinaCloudSchemaEnriched
+  TinaCloudSchemaWithNamespace
+  TinaCloudTemplateBase
+  TinaCloudTemplateEnriched
+  TinaFieldBase
+  TinaFieldEnriched
+  TinaFieldInner
+  TinaTemplate
+  ```
+
+  Removals
+
+  ```
+  Templatable
+  TinaIndex
+  ResolveFormArgs
+  ```
+
+- 01b858e41: Better error message on the name field
+
 ## 1.3.2
 
 ### Patch Changes

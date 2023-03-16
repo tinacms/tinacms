@@ -1,5 +1,22 @@
 # next-tinacms-cloudinary
 
+## 4.3.0
+
+### Minor Changes
+
+- 817b10b8a: deliver multiple size thumbnails
+
+## 4.2.0
+
+### Minor Changes
+
+- 4cd5cd4f7: Refactor: Remove previewSrc from imageAPI
+
+### Patch Changes
+
+- f831dcf4f: security: update some deps
+- 0b7687424: support pdf uploads
+
 ## 4.1.2
 
 ### Patch Changes
