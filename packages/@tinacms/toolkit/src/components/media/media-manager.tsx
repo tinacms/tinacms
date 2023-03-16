@@ -653,13 +653,16 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
 
 const ViewModeToggle = ({ viewMode, setViewMode }) => {
   const toggleClasses = {
-    base: 'relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base py-1 transition-all ease-out duration-150 border border-gray-100',
-    active: 'bg-white text-blue-500 shadow-inner',
-    inactive: 'bg-gray-50 text-gray-400 shadow',
+    base: 'relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base py-1 transition-all ease-out duration-150 border',
+    active:
+      'bg-white text-blue-500 shadow-inner border-gray-50 border-t-gray-100',
+    inactive: 'bg-gray-50 text-gray-400 shadow border-gray-100 border-t-white',
   }
 
   return (
-    <div className={`grow-0 flex justify-between`}>
+    <div
+      className={`grow-0 flex justify-between rounded-md border border-gray-100`}
+    >
       <button
         className={`${toggleClasses.base} px-2.5 rounded-l-md ${
           viewMode === 'grid' ? toggleClasses.active : toggleClasses.inactive
