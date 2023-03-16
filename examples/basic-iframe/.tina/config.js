@@ -69,7 +69,7 @@ export default defineConfig({
     collections: [
       {
         name: 'test',
-        path: 'content/test/foo',
+        path: 'content/test',
         label: 'Test',
         templates: [
           {
