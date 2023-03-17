@@ -27,6 +27,7 @@ interface ServerOptions {
   schema?: Schema
   clientId: string
   branch: string
+  tinaGraphQLVersion: string
   customContentApiUrl?: string
   getTokenFn?: () => Promise<TokenObject>
   tinaioConfig?: TinaIOConfig
@@ -178,6 +179,7 @@ export class Client {
   clientId: string
   contentApiBase: string
   query: string
+  tinaGraphQLVersion: string
   setToken: (_token: TokenObject) => void
   private getToken: () => Promise<TokenObject>
   private token: string // used with memory storage
@@ -186,6 +188,7 @@ export class Client {
   events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
+    this.tinaGraphQLVersion = options.tinaGraphQLVersion
     this.onLogin = options.schema?.config?.admin?.auth?.onLogin
     this.onLogout = options.schema?.config?.admin?.auth?.onLogout
     if (options.schema?.config?.admin?.auth?.logout) {
@@ -289,7 +292,7 @@ export class Client {
       `https://content.tinajs.io`
     this.contentApiUrl =
       this.options.customContentApiUrl ||
-      `${this.contentApiBase}/content/${this.options.clientId}/github/${encodedBranch}`
+      `${this.contentApiBase}/${this.tinaGraphQLVersion}/content/${this.options.clientId}/github/${encodedBranch}`
   }
 
   addPendingContent = async (props) => {
@@ -716,12 +719,13 @@ export class LocalClient extends Client {
     props?: {
       customContentApiUrl?: string
       schema?: Schema
-    } & Omit<ServerOptions, 'clientId' | 'branch'>
+    } & Omit<ServerOptions, 'clientId' | 'branch' | 'tinaGraphQLVersion'>
   ) {
     const clientProps = {
       ...props,
       clientId: '',
       branch: '',
+      tinaGraphQLVersion: '',
       customContentApiUrl:
         props && props.customContentApiUrl
           ? props.customContentApiUrl

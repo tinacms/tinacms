@@ -16,6 +16,7 @@ export interface CreateClientProps {
   branch?: string
   schema?: Schema
   apiUrl?: string
+  tinaGraphQLVersion: string
 }
 export const createClient = ({
   clientId,
@@ -24,6 +25,7 @@ export const createClient = ({
   tinaioConfig,
   schema,
   apiUrl,
+  tinaGraphQLVersion,
 }: CreateClientProps) => {
   return isLocalClient
     ? new LocalClient({ customContentApiUrl: apiUrl, schema })
@@ -33,6 +35,7 @@ export const createClient = ({
         tokenStorage: 'LOCAL_STORAGE',
         tinaioConfig,
         schema,
+        tinaGraphQLVersion,
       })
 }
 

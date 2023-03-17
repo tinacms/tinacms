@@ -7,5 +7,7 @@ if (major < 14 || (major == 14 && minor < 18)) {
     'ERROR: Node.js version lower than 14.18 is not supported in tinacms, please update to the latest LTS version. See https://nodejs.org/en/download/ for more details'
   )
 } else {
-  require('../dist/index.js').init(process.argv)
+  const cli = require('../dist/index.js')
+  const [node, app, ...args] = process.argv
+  cli.default.runExit(args)
 }

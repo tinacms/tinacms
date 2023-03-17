@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.5.2
+
+### Patch Changes
+
+- 973e83f1f: Some fixes around image handling in the rich-text editor
+
+  - Stop treating images as block-level
+  - Fix issue where images inside links were being stripped out
+  - Fix display of .avif images in the media manager
+
+- d1cf65999: Adds list support to image field, improved field UI
+
 ## 1.5.1
 
 ### Patch Changes

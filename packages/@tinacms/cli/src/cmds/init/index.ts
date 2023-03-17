@@ -28,8 +28,14 @@ export interface Framework {
   reactive: boolean
 }
 
-export async function initStaticTina(ctx: any, next: () => void, options) {
-  const baseDir = ctx.rootPath
+export async function initStaticTina({
+  rootPath,
+  noTelemetry,
+}: {
+  rootPath: string
+  noTelemetry: boolean
+}) {
+  const baseDir = rootPath
   logger.level = 'info'
 
   // Choose your ClientID
@@ -54,7 +60,7 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   const publicFolder: string = await choosePublicFolder({ framework })
 
   // Detect forestry config
-  const forestryPath = await hasForestryConfig({ rootPath: ctx.rootPath })
+  const forestryPath = await hasForestryConfig({ rootPath: rootPath })
 
   let collections: string | null | undefined
 
@@ -62,7 +68,7 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   if (forestryPath.exists) {
     collections = await forestryMigrate({
       forestryPath: forestryPath.path,
-      rootPath: ctx.rootPath,
+      rootPath: rootPath,
     })
   }
 
@@ -70,7 +76,7 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   await reportTelemetry({
     usingTypescript,
     hasForestryConfig: forestryPath.exists,
-    noTelemetry: options.noTelemetry,
+    noTelemetry: noTelemetry,
   })
 
   // Check for package.json

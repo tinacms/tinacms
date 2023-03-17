@@ -1,0 +1,28 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "a",
+          "url": "https://example.com/niceurl",
+          "title": null,
+          "children": [
+            {
+              "type": "img",
+              "url": "http://some-url/uploads/llama-2.avif",
+              "caption": null,
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
