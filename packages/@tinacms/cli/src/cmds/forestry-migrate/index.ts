@@ -49,7 +49,7 @@ function checkExt(ext: string): Ext | false {
   }
 }
 
-export const generateAllCollections = async ({
+export const generateAllTemplates = async ({
   rootPath,
 }: {
   rootPath: string
@@ -80,6 +80,255 @@ export const generateAllCollections = async ({
   return templateMap
 }
 
+const generateCollectionFromForestrySection = (
+  section: {
+    templates?: string[]
+    label?: string
+    path?: string
+    match?: string
+    type?:
+      | 'directory'
+      | 'document'
+      | 'heading'
+      | 'jekyll-pages'
+      | 'jekyll-posts'
+    exclude?: string
+    create?: 'all' | 'documents' | 'none'
+    new_doc_ext?: string
+    read_only?: boolean
+  },
+  templateMap: Map<
+    string,
+    {
+      fields: TinaField[]
+      templateObj: any
+    }
+  >,
+  rootPath: string
+) => {
+  if (section.read_only) return
+
+  {
+    // TODO: What should we do with read only sections?
+    if (section.read_only) return
+
+    const baseCollection: Omit<Collection, 'fields' | 'templates'> = {
+      label: section.label,
+      name: stringifyLabel(section.label),
+      path: section.path,
+    }
+    // Add include and exclude if they exist
+    if (section.match) {
+      baseCollection.match = {
+        ...(baseCollection?.match || {}),
+        include: transformForestryMatchToTinaMatch(section.match),
+      }
+    }
+    if (section.exclude) {
+      baseCollection.match = {
+        ...(baseCollection?.match || {}),
+        exclude: transformForestryMatchToTinaMatch(section.exclude),
+      }
+    }
+    if (section.type === 'directory') {
+      const forestryTemplates = section?.templates || []
+
+      // If the section has no templates and has `create: all`
+      if (forestryTemplates.length === 0 && section.create === 'all') {
+        // For all template
+        for (let templateKey of templateMap.keys()) {
+          // get the shape of the template
+          const { templateObj } = templateMap.get(templateKey)
+          const pages: undefined | string[] = templateObj?.pages
+          // if has pages see if there is I page that matches the current section
+          if (pages) {
+            if (
+              pages.some((page) =>
+                minimatch(page, section.path + '/' + section.match)
+              )
+            ) {
+              forestryTemplates.push(templateKey)
+            }
+          }
+        }
+      }
+      if ((forestryTemplates?.length || 0) > 1) {
+        // deal with templates
+        const templates: {
+          label: string
+          name: string
+          ui?: UITemplate
+          fields: TinaField[]
+        }[] = []
+        forestryTemplates.forEach((tem) => {
+          try {
+            // Add the template to the collection with its fields and the body field
+            const { fields, templateObj } = templateMap.get(tem)
+            templates.push({
+              fields: [BODY_FIELD, ...fields],
+              label: tem,
+              name: stringifyLabel(tem),
+            })
+
+            // Go through all the pages in the template and update  the content to contain _template: ${templateName}
+            templateObj?.pages?.forEach((page) => {
+              // update the data in page to have _template: tem
+              try {
+                const filePath = path.join(rootPath, page)
+                const extname = path.extname(filePath)
+                const fileContent = fs.readFileSync(filePath).toString()
+                const content = parseFile(fileContent, extname, (yup) =>
+                  yup.object({})
+                )
+                const newContent = {
+                  _template: stringifyLabel(tem),
+                  ...content,
+                }
+                fs.writeFileSync(
+                  filePath,
+                  stringifyFile(newContent, extname, true)
+                )
+              } catch (error) {
+                console.log(
+                  dangerText('Error updating template -> _template in ', page)
+                )
+              }
+            })
+          } catch (e) {
+            console.log('Error parsing template ', tem)
+            console.error(e)
+          }
+        })
+        // Add the collection to the list of collections with its templates
+        const c: Collection = {
+          ...baseCollection,
+          templates,
+        }
+        if (section?.create === 'none') {
+          c.ui = {
+            ...c.ui,
+            allowedActions: {
+              create: false,
+            },
+          }
+        }
+        return c
+      } else {
+        const fields: TinaField[] = [BODY_FIELD]
+
+        // This is a collection with fields
+        forestryTemplates?.forEach((tem) => {
+          try {
+            const { fields: additionalFields, templateObj } =
+              templateMap.get(tem)
+            fields.push(...additionalFields)
+            // Go through all the pages in the template and update  the content to contain _template: ${templateName}
+            templateObj?.pages?.forEach((page) => {
+              // update the data in page to have _template: tem
+              try {
+                const filePath = path.join(rootPath, page)
+                const extname = path.extname(filePath)
+                const fileContent = fs.readFileSync(filePath).toString()
+                const content = parseFile(fileContent, extname, (yup) =>
+                  yup.object({})
+                )
+                const newContent = {
+                  _template: stringifyLabel(tem),
+                  ...content,
+                }
+                fs.writeFileSync(
+                  filePath,
+                  stringifyFile(newContent, extname, true)
+                )
+              } catch (error) {
+                logger.log('Error updating file', page)
+              }
+            })
+          } catch (e) {
+            logger.log('Error parsing template ', tem)
+            console.error(e)
+          }
+        })
+        const c: Collection = {
+          ...baseCollection,
+          fields,
+        }
+        if (section?.create === 'none') {
+          c.ui = {
+            ...c.ui,
+            allowedActions: {
+              create: false,
+            },
+          }
+        }
+        return c
+      }
+    } else if (section.type === 'document') {
+      const filePath = section.path
+      const extname = path.extname(filePath)
+      const fileName = path.basename(filePath, extname)
+      const dir = path.dirname(filePath)
+      const ext = checkExt(extname)
+      if (ext) {
+        const fields: TinaField[] = []
+        if (ext === 'md' || ext === 'mdx') {
+          fields.push(BODY_FIELD)
+        }
+        // Go though all templates
+        for (let currentTemplateName of templateMap.keys()) {
+          const { templateObj, fields: additionalFields } =
+            templateMap.get(currentTemplateName)
+          const pages: string[] = templateObj?.pages || []
+
+          // find the template that has the current "path" in its pages
+          if (pages.includes(section.path)) {
+            fields.push(...additionalFields)
+            break
+          }
+        }
+
+        // if we don't find any fields, add a dummy field
+        if (fields.length === 0) {
+          fields.push({
+            name: 'dummy',
+            label: 'Dummy field',
+            type: 'string',
+            description:
+              'This is a dummy field, please replace it with the fields you want to edit. See https://tina.io/docs/schema/ for more info',
+          })
+          logger.warn(
+            warnText(
+              `No fields found for ${section.path}. Please add the fields you want to edit to the ${section.label} collection in the config file.`
+            )
+          )
+        }
+
+        return {
+          ...baseCollection,
+          path: dir,
+          format: ext,
+          ui: {
+            allowedActions: {
+              create: false,
+              delete: false,
+            },
+          },
+          match: {
+            include: fileName,
+          },
+          fields,
+        }
+      } else {
+        logger.log(
+          warnText(
+            `Error: document section has an unsupported file extension: ${extname} in ${section.path}`
+          )
+        )
+      }
+    }
+  }
+}
+
 export const generateCollections = async ({
   forestryPath,
   rootPath,
@@ -87,229 +336,14 @@ export const generateCollections = async ({
   forestryPath: string
   rootPath: string
 }) => {
-  const templateMap = await generateAllCollections({ rootPath })
+  const templateMap = await generateAllTemplates({ rootPath })
 
   const forestryConfig = await fs.readFile(forestryPath)
 
   return parseSections({ val: yaml.load(forestryConfig.toString()) })
-    .sections.map((section): Collection => {
-      // TODO: What should we do with read only sections?
-      if (section.read_only) return
-
-      const baseCollection: Omit<Collection, 'fields' | 'templates'> = {
-        label: section.label,
-        name: stringifyLabel(section.label),
-        path: section.path,
-      }
-      // Add include and exclude if they exist
-      if (section.match) {
-        baseCollection.match = {
-          ...(baseCollection?.match || {}),
-          include: transformForestryMatchToTinaMatch(section.match),
-        }
-      }
-      if (section.exclude) {
-        baseCollection.match = {
-          ...(baseCollection?.match || {}),
-          exclude: transformForestryMatchToTinaMatch(section.exclude),
-        }
-      }
-      if (section.type === 'directory') {
-        const forestryTemplates = section?.templates || []
-
-        // If the section has no templates and has `create: all`
-        if (forestryTemplates.length === 0 && section.create === 'all') {
-          // For all template
-          for (let templateKey of templateMap.keys()) {
-            // get the shape of the template
-            const { templateObj } = templateMap.get(templateKey)
-            const pages: undefined | string[] = templateObj?.pages
-            // if has pages see if there is I page that matches the current section
-            if (pages) {
-              if (
-                pages.some((page) =>
-                  minimatch(page, section.path + '/' + section.match)
-                )
-              ) {
-                forestryTemplates.push(templateKey)
-              }
-            }
-          }
-        }
-        if ((forestryTemplates?.length || 0) > 1) {
-          // deal with templates
-          const templates: {
-            label: string
-            name: string
-            ui?: UITemplate
-            fields: TinaField[]
-          }[] = []
-          forestryTemplates.forEach((tem) => {
-            try {
-              // Add the template to the collection with its fields and the body field
-              const { fields, templateObj } = templateMap.get(tem)
-              templates.push({
-                fields: [BODY_FIELD, ...fields],
-                label: tem,
-                name: stringifyLabel(tem),
-              })
-
-              // Go through all the pages in the template and update  the content to contain _template: ${templateName}
-              templateObj?.pages?.forEach((page) => {
-                // update the data in page to have _template: tem
-                try {
-                  const filePath = path.join(rootPath, page)
-                  const extname = path.extname(filePath)
-                  const fileContent = fs.readFileSync(filePath).toString()
-                  const content = parseFile(fileContent, extname, (yup) =>
-                    yup.object({})
-                  )
-                  const newContent = {
-                    _template: stringifyLabel(tem),
-                    ...content,
-                  }
-                  fs.writeFileSync(
-                    filePath,
-                    stringifyFile(newContent, extname, true)
-                  )
-                } catch (error) {
-                  console.log(
-                    dangerText('Error updating template -> _template in ', page)
-                  )
-                }
-              })
-            } catch (e) {
-              console.log('Error parsing template ', tem)
-              console.error(e)
-            }
-          })
-          // Add the collection to the list of collections with its templates
-          const c: Collection = {
-            ...baseCollection,
-            templates,
-          }
-          if (section?.create === 'none') {
-            c.ui = {
-              ...c.ui,
-              allowedActions: {
-                create: false,
-              },
-            }
-          }
-          return c
-        } else {
-          const fields: TinaField[] = [BODY_FIELD]
-
-          // This is a collection with fields
-          forestryTemplates?.forEach((tem) => {
-            try {
-              const { fields: additionalFields, templateObj } =
-                templateMap.get(tem)
-              fields.push(...additionalFields)
-              // Go through all the pages in the template and update  the content to contain _template: ${templateName}
-              templateObj?.pages?.forEach((page) => {
-                // update the data in page to have _template: tem
-                try {
-                  const filePath = path.join(rootPath, page)
-                  const extname = path.extname(filePath)
-                  const fileContent = fs.readFileSync(filePath).toString()
-                  const content = parseFile(fileContent, extname, (yup) =>
-                    yup.object({})
-                  )
-                  const newContent = {
-                    _template: stringifyLabel(tem),
-                    ...content,
-                  }
-                  fs.writeFileSync(
-                    filePath,
-                    stringifyFile(newContent, extname, true)
-                  )
-                } catch (error) {
-                  logger.log('Error updating file', page)
-                }
-              })
-            } catch (e) {
-              logger.log('Error parsing template ', tem)
-              console.error(e)
-            }
-          })
-          const c: Collection = {
-            ...baseCollection,
-            fields,
-          }
-          if (section?.create === 'none') {
-            c.ui = {
-              ...c.ui,
-              allowedActions: {
-                create: false,
-              },
-            }
-          }
-          return c
-        }
-      } else if (section.type === 'document') {
-        const filePath = section.path
-        const extname = path.extname(filePath)
-        const fileName = path.basename(filePath, extname)
-        const dir = path.dirname(filePath)
-        const ext = checkExt(extname)
-        if (ext) {
-          const fields: TinaField[] = []
-          if (ext === 'md' || ext === 'mdx') {
-            fields.push(BODY_FIELD)
-          }
-          // Go though all templates
-          for (let currentTemplateName of templateMap.keys()) {
-            const { templateObj, fields: additionalFields } =
-              templateMap.get(currentTemplateName)
-            const pages: string[] = templateObj?.pages || []
-
-            // find the template that has the current "path" in its pages
-            if (pages.includes(section.path)) {
-              fields.push(...additionalFields)
-              break
-            }
-          }
-
-          // if we don't find any fields, add a dummy field
-          if (fields.length === 0) {
-            fields.push({
-              name: 'dummy',
-              label: 'Dummy field',
-              type: 'string',
-              description:
-                'This is a dummy field, please replace it with the fields you want to edit. See https://tina.io/docs/schema/ for more info',
-            })
-            logger.warn(
-              warnText(
-                `No fields found for ${section.path}. Please add the fields you want to edit to the ${section.label} collection in the config file.`
-              )
-            )
-          }
-
-          return {
-            ...baseCollection,
-            path: dir,
-            format: ext,
-            ui: {
-              allowedActions: {
-                create: false,
-                delete: false,
-              },
-            },
-            match: {
-              include: fileName,
-            },
-            fields,
-          }
-        } else {
-          logger.log(
-            warnText(
-              `Error: document section has an unsupported file extension: ${extname} in ${section.path}`
-            )
-          )
-        }
-      }
-    })
+    .sections.map(
+      (section): Collection =>
+        generateCollectionFromForestrySection(section, templateMap, rootPath)
+    )
     .filter((c) => c !== undefined)
 }
