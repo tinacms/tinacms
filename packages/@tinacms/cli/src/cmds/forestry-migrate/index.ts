@@ -80,6 +80,98 @@ export const generateAllTemplates = async ({
   return templateMap
 }
 
+const updateFoo = (
+  c: Collection,
+  templateMap: Map<
+    string,
+    {
+      fields: TinaField[]
+      templateObj: any
+    }
+  >,
+  rootPath: string
+) => {
+  const forestryTemplateNames = c.templates.map((c) => c.name) || []
+
+  if (forestryTemplateNames.length > 1) {
+    // deal with templates
+    const templates: {
+      label: string
+      name: string
+      ui?: UITemplate
+      fields: TinaField[]
+    }[] = []
+    forestryTemplateNames.forEach((tem) => {
+      try {
+        // Add the template to the collection with its fields and the body field
+        const { fields, templateObj } = templateMap.get(tem)
+        templates.push({
+          fields: [BODY_FIELD, ...fields],
+          label: tem,
+          name: stringifyLabel(tem),
+        })
+
+        // Go through all the pages in the template and update  the content to contain _template: ${templateName}
+        templateObj?.pages?.forEach((page) => {
+          // update the data in page to have _template: tem
+          try {
+            const filePath = path.join(rootPath, page)
+            const extname = path.extname(filePath)
+            const fileContent = fs.readFileSync(filePath).toString()
+            const content = parseFile(fileContent, extname, (yup) =>
+              yup.object({})
+            )
+            const newContent = {
+              _template: stringifyLabel(tem),
+              ...content,
+            }
+            fs.writeFileSync(filePath, stringifyFile(newContent, extname, true))
+          } catch (error) {
+            console.log(
+              dangerText('Error updating template -> _template in ', page)
+            )
+          }
+        })
+      } catch (e) {
+        console.log('Error parsing template ', tem)
+        console.error(e)
+      }
+    })
+  } else {
+    const fields: TinaField[] = [BODY_FIELD]
+
+    // This is a collection with fields
+    forestryTemplateNames?.forEach((tem) => {
+      try {
+        const { fields: additionalFields, templateObj } = templateMap.get(tem)
+        fields.push(...additionalFields)
+        // Go through all the pages in the template and update  the content to contain _template: ${templateName}
+        templateObj?.pages?.forEach((page) => {
+          // update the data in page to have _template: tem
+          try {
+            const filePath = path.join(rootPath, page)
+            const extname = path.extname(filePath)
+            const fileContent = fs.readFileSync(filePath).toString()
+            const content = parseFile(fileContent, extname, (yup) =>
+              yup.object({})
+            )
+            const newContent = {
+              _template: stringifyLabel(tem),
+              ...content,
+            }
+            fs.writeFileSync(filePath, stringifyFile(newContent, extname, true))
+          } catch (error) {
+            logger.log('Error updating file', page)
+          }
+        })
+      } catch (e) {
+        logger.log('Error parsing template ', tem)
+        console.error(e)
+      }
+    })
+  }
+}
+
 const generateCollectionFromForestrySection = (
   section: {
     templates?: string[]
@@ -103,8 +195,7 @@ const generateCollectionFromForestrySection = (
       fields: TinaField[]
       templateObj: any
     }
-  >,
-  rootPath: string
+  >
 ) => {
   if (section.read_only) return
 
@@ -152,117 +243,45 @@ const generateCollectionFromForestrySection = (
           }
         }
       }
-      if ((forestryTemplates?.length || 0) > 1) {
-        // deal with templates
-        const templates: {
-          label: string
-          name: string
-          ui?: UITemplate
-          fields: TinaField[]
-        }[] = []
-        forestryTemplates.forEach((tem) => {
-          try {
-            // Add the template to the collection with its fields and the body field
-            const { fields, templateObj } = templateMap.get(tem)
-            templates.push({
-              fields: [BODY_FIELD, ...fields],
-              label: tem,
-              name: stringifyLabel(tem),
-            })
 
-            // Go through all the pages in the template and update  the content to contain _template: ${templateName}
-            templateObj?.pages?.forEach((page) => {
-              // update the data in page to have _template: tem
-              try {
-                const filePath = path.join(rootPath, page)
-                const extname = path.extname(filePath)
-                const fileContent = fs.readFileSync(filePath).toString()
-                const content = parseFile(fileContent, extname, (yup) =>
-                  yup.object({})
-                )
-                const newContent = {
-                  _template: stringifyLabel(tem),
-                  ...content,
+      const c: Collection =
+        (forestryTemplates?.length || 0) > 1
+          ? {
+              ...baseCollection,
+              templates: forestryTemplates.map((tem) => {
+                const { fields } = templateMap.get(tem)
+                return {
+                  fields: [BODY_FIELD, ...fields],
+                  label: tem,
+                  name: stringifyLabel(tem),
                 }
-                fs.writeFileSync(
-                  filePath,
-                  stringifyFile(newContent, extname, true)
-                )
-              } catch (error) {
-                console.log(
-                  dangerText('Error updating template -> _template in ', page)
-                )
-              }
-            })
-          } catch (e) {
-            console.log('Error parsing template ', tem)
-            console.error(e)
-          }
-        })
-        // Add the collection to the list of collections with its templates
-        const c: Collection = {
-          ...baseCollection,
-          templates,
-        }
-        if (section?.create === 'none') {
-          c.ui = {
-            ...c.ui,
-            allowedActions: {
-              create: false,
-            },
-          }
-        }
-        return c
-      } else {
-        const fields: TinaField[] = [BODY_FIELD]
+              }),
+            }
+          : {
+              ...baseCollection,
+              fields: [
+                BODY_FIELD,
+                ...(forestryTemplates || []).flatMap((tem) => {
+                  try {
+                    const { fields: additionalFields } = templateMap.get(tem)
+                    return additionalFields
+                  } catch (e) {
+                    logger.log('Error parsing template ', tem)
+                    return []
+                  }
+                }),
+              ],
+            }
 
-        // This is a collection with fields
-        forestryTemplates?.forEach((tem) => {
-          try {
-            const { fields: additionalFields, templateObj } =
-              templateMap.get(tem)
-            fields.push(...additionalFields)
-            // Go through all the pages in the template and update  the content to contain _template: ${templateName}
-            templateObj?.pages?.forEach((page) => {
-              // update the data in page to have _template: tem
-              try {
-                const filePath = path.join(rootPath, page)
-                const extname = path.extname(filePath)
-                const fileContent = fs.readFileSync(filePath).toString()
-                const content = parseFile(fileContent, extname, (yup) =>
-                  yup.object({})
-                )
-                const newContent = {
-                  _template: stringifyLabel(tem),
-                  ...content,
-                }
-                fs.writeFileSync(
-                  filePath,
-                  stringifyFile(newContent, extname, true)
-                )
-              } catch (error) {
-                logger.log('Error updating file', page)
-              }
-            })
-          } catch (e) {
-            logger.log('Error parsing template ', tem)
-            console.error(e)
-          }
-        })
-        const c: Collection = {
-          ...baseCollection,
-          fields,
+      if (section?.create === 'none') {
+        c.ui = {
+          ...c.ui,
+          allowedActions: {
+            create: false,
+          },
         }
-        if (section?.create === 'none') {
-          c.ui = {
-            ...c.ui,
-            allowedActions: {
-              create: false,
-            },
-          }
-        }
-        return c
       }
+      return c
     } else if (section.type === 'document') {
       const filePath = section.path
       const extname = path.extname(filePath)
@@ -340,10 +359,47 @@ export const generateCollections = async ({
 
   const forestryConfig = await fs.readFile(forestryPath)
 
+  rewriteTemplateKeysInDocs(templateMap, rootPath)
   return parseSections({ val: yaml.load(forestryConfig.toString()) })
     .sections.map(
       (section): Collection =>
-        generateCollectionFromForestrySection(section, templateMap, rootPath)
+        generateCollectionFromForestrySection(section, templateMap)
     )
     .filter((c) => c !== undefined)
+}
+
+const rewriteTemplateKeysInDocs = (
+  templateMap: Map<
+    string,
+    {
+      fields: TinaField[]
+      templateObj: any
+    }
+  >,
+  rootPath: string
+) => {
+  // Go through all the pages in the template and update  the content to contain _template: ${templateName}
+
+  for (const templateKey of templateMap.keys()) {
+    const { templateObj } = templateMap.get(templateKey)
+
+    templateObj?.pages?.forEach((page) => {
+      // update the data in page to have _template: tem
+      try {
+        const filePath = path.join(rootPath, page)
+        const extname = path.extname(filePath)
+        const fileContent = fs.readFileSync(filePath).toString()
+        const content = parseFile(fileContent, extname, (yup) => yup.object({}))
+        const newContent = {
+          _template: stringifyLabel(templateKey),
+          ...content,
+        }
+        fs.writeFileSync(filePath, stringifyFile(newContent, extname, true))
+      } catch (error) {
+        console.log(
+          dangerText('Error updating template -> _template in ', page)
+        )
+      }
+    })
+  }
 }

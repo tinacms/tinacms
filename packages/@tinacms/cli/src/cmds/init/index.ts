@@ -20,7 +20,6 @@ import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
 import { hasForestryConfig } from '../forestry-migrate/util'
 import { generateCollections } from '../forestry-migrate'
-import { spin } from '../../utils/spinner'
 import { ErrorSingleton } from '../forestry-migrate/util/errorSingleton'
 
 export interface Framework {
