@@ -4,6 +4,14 @@
 
 ### Patch Changes
 
+- tinacms@1.3.3
+- @tinacms/graphql@1.3.5
+- @tinacms/datalayer@1.1.6
+
+## null
+
+### Patch Changes
+
 - tinacms@1.3.2
 
 ## null

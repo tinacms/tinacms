@@ -5,6 +5,7 @@ export type {
   CreateDatabase,
   OnPutCallback,
   OnDeleteCallback,
+  Database,
 } from '@tinacms/graphql'
 export {
   FilesystemBridge,
@@ -12,7 +13,6 @@ export {
   IsomorphicBridge,
   // Users facing
   createDatabase,
-  Database,
   TinaLevelClient,
   resolve,
 } from '@tinacms/graphql'

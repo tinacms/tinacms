@@ -18,6 +18,7 @@ export type Options = {
   acornOptions?: AcornOptions
   patterns?: Pattern[]
   addResult?: boolean
+  skipHTML?: boolean
 }
 
 export function mdxJsx(options: Options = {}): Extension {
@@ -70,8 +71,13 @@ export function mdxJsx(options: Options = {}): Extension {
     }
   })
 
+  let disabledTokens: string[] = []
+  if (options.skipHTML) {
+    disabledTokens = ['htmlFlow', 'htmlText']
+  }
   return {
     flow: flowRules,
     text: textRules,
+    disable: { null: disabledTokens },
   }
 }

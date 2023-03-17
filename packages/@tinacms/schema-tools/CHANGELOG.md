@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.3.4
+
+### Patch Changes
+
+- d1cf65999: Adds list support to image field, improved field UI
+
 ## 1.3.3
 
 ### Patch Changes
