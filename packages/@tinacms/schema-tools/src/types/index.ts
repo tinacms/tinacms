@@ -626,7 +626,10 @@ interface BaseCollection {
    * The delimiters used to parse the frontmatter.
    */
   frontmatterDelimiters?: [string, string] | string
-  match?: string
+  match?: {
+    include?: string
+    exclude?: string
+  }
 }
 
 type TemplateCollection<WithNamespace extends boolean = false> = {

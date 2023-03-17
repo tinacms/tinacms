@@ -1,3 +1,4 @@
+import micromatch from 'micromatch'
 import {
   Schema,
   Collection,
@@ -7,6 +8,7 @@ import {
   TinaField,
 } from '../types/index'
 import { lastItem, assertShape } from '../util'
+import { normalizePath } from '../util/normalizePath'
 
 type Version = {
   fullVersion: string
@@ -44,12 +46,6 @@ export class TinaSchema {
       collectionNames.includes(collection.name)
     )
   }
-  public getAllCollectionPaths = () => {
-    const paths = this.getCollections().map(
-      (collection) => `${collection.path}${collection.match || ''}`
-    )
-    return paths
-  }
   public getCollection = (collectionName: string): Collection<true> => {
     const collection = this.schema.collections.find(
       (collection) => collection.name === collectionName
@@ -83,7 +79,21 @@ export class TinaSchema {
     )
   }
   public getCollectionByFullPath = (filepath: string) => {
+    const fileExtension = filepath.split('.').pop()
+
     const possibleCollections = this.getCollections().filter((collection) => {
+      // filter out file extensions that don't match the collection format
+      if (fileExtension !== (collection.format || 'md')) {
+        return false
+      }
+      if (collection?.match?.include || collection?.match?.exclude) {
+        // if the collection has a match or exclude, we need to check if the file matches
+        const matches = this.getMatches({ collection })
+        const match = micromatch([filepath], matches).length > 0
+        if (!match) {
+          return false
+        }
+      }
       return filepath
         .replace(/\\/g, '/')
         .startsWith(collection.path.replace(/\/?$/, '/'))
@@ -365,5 +375,46 @@ export class TinaSchema {
         )
       }
     }
+  }
+
+  /**
+   * This function returns an array of glob matches for a given collection.
+   *
+   * @param collection The collection to get the matches for. Can be a string or a collection object.
+   * @returns An array of glob matches.
+   */
+  public getMatches({
+    collection: collectionOrString,
+  }: {
+    collection: string | Collection
+  }) {
+    const collection =
+      typeof collectionOrString === 'string'
+        ? this.getCollection(collectionOrString)
+        : collectionOrString
+    const normalPath = normalizePath(collection.path)
+    const format = collection.format || 'md'
+    const matches: string[] = []
+    if (collection?.match?.include) {
+      const match = `${normalPath}/${collection.match.include}.${format}`
+      matches.push(match)
+    }
+    if (collection?.match?.exclude) {
+      const exclude = `!(${normalPath}/${collection.match.exclude}.${format})`
+      matches.push(exclude)
+    }
+    return matches
+  }
+
+  public matchFiles({
+    collection,
+    files,
+  }: {
+    collection: string | Collection
+    files: string[]
+  }) {
+    const matches = this.getMatches({ collection })
+    const matchedFiles = micromatch(files, matches)
+    return matchedFiles
   }
 }

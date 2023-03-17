@@ -2,6 +2,7 @@ import bodyParser from 'body-parser'
 import path from 'path'
 import cors from 'cors'
 import { createServer as createViteServer } from 'vite'
+import type { Plugin } from 'vite'
 import { resolve as gqlResolve, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../../config-manager'
 import { parseMediaFolder, createMediaRouter } from './media'
@@ -15,7 +16,7 @@ export const createDevServer = async (
   noSDK: boolean,
   noWatch: boolean
 ) => {
-  const plugins = [
+  const plugins: Plugin[] = [
     {
       name: 'transform-tsx',
       async transform(code, id) {
