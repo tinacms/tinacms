@@ -52,7 +52,6 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
           })
         }}
         onDrop={async ([file]: File[], fileRejections) => {
-          console.log(fileRejections)
           setIsImgUploading(true)
           try {
             if (file) {
