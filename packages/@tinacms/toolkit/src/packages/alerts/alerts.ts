@@ -46,7 +46,11 @@ export class Alerts {
     }
   }
 
-  add(level: AlertLevel, message: string, timeout: number = 3000): () => void {
+  add(
+    level: AlertLevel,
+    message: string | (() => void),
+    timeout: number = 3000
+  ): () => void {
     const alert = {
       level,
       message,
@@ -85,16 +89,16 @@ export class Alerts {
     return Array.from(this.alerts.values())
   }
 
-  info(message: string, timeout?: number) {
+  info(message: string | (() => void), timeout?: number) {
     return this.add('info', message, timeout)
   }
-  success(message: string, timeout?: number) {
+  success(message: string | (() => void), timeout?: number) {
     return this.add('success', message, timeout)
   }
-  warn(message: string, timeout?: number) {
+  warn(message: string | (() => void), timeout?: number) {
     return this.add('warn', message, timeout)
   }
-  error(message: string, timeout?: number) {
+  error(message: string | (() => void), timeout?: number) {
     return this.add('error', message, timeout)
   }
 }
@@ -104,6 +108,6 @@ export type AlertLevel = 'info' | 'success' | 'warn' | 'error'
 export interface Alert {
   id: string
   level: AlertLevel
-  message: string
+  message: string | (() => void)
   timeout: number
 }

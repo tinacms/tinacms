@@ -321,7 +321,7 @@ export function MediaPicker({
         }
 
         // Upload Failed
-        if (files.length === 0) {
+        if (fileRejections.length > 0) {
           const messages = []
           fileRejections.map((fileRejection) => {
             messages.push(
@@ -330,7 +330,14 @@ export function MediaPicker({
                 .join(', ')}`
             )
           })
-          cms.alerts.error(`Upload failed\n\n${messages.join('. ')}`)
+          cms.alerts.error(() => {
+            return (
+              <>
+                Upload Failed. <br />
+                {messages.join('. ')}.
+              </>
+            )
+          })
         }
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
