@@ -5,6 +5,8 @@ import { logger } from '../../../logger'
 import { audit } from './audit'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { AuditFileSystemBridge } from '@tinacms/graphql'
+import { spin } from '../../../utils/spinner'
+import { warnText } from '../../../utils/theme'
 
 export class AuditCommand extends Command {
   static paths = [['audit']]
@@ -61,7 +63,23 @@ export class AuditCommand extends Command {
       configManager.config
     )
 
-    await database.indexContent({ tinaSchema, graphQLSchema })
+    const warnings: string[] = []
+    await spin({
+      waitFor: async () => {
+        const res = await database.indexContent({
+          graphQLSchema,
+          tinaSchema,
+        })
+        warnings.push(...res.warnings)
+      },
+      text: 'Indexing local files',
+    })
+    if (warnings.length > 0) {
+      logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
+      warnings.forEach((warning) => {
+        logger.warn(warnText(`${warning}`))
+      })
+    }
 
     await audit({
       database,

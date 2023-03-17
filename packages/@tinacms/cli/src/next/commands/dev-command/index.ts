@@ -12,6 +12,8 @@ import chalk from 'chalk'
 import { startSubprocess2 } from '../../../utils/start-subprocess'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import type { ChildProcess } from 'child_process'
+import { spin } from '../../../utils/spinner'
+import { warnText } from '../../../utils/theme'
 
 export class DevCommand extends Command {
   static paths = [['dev'], ['server:start']]
@@ -118,7 +120,23 @@ export class DevCommand extends Command {
         this.watchQueries(configManager, async () => await codegen.execute())
       }
 
-      await database.indexContent({ tinaSchema, graphQLSchema })
+      const warnings: string[] = []
+      await spin({
+        waitFor: async () => {
+          const res = await database.indexContent({
+            graphQLSchema,
+            tinaSchema,
+          })
+          warnings.push(...res.warnings)
+        },
+        text: 'Indexing local files',
+      })
+      if (warnings.length > 0) {
+        logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
+        warnings.forEach((warning) => {
+          logger.warn(warnText(`${warning}`))
+        })
+      }
       return { apiURL, database }
     }
     const { apiURL, database } = await setup()
