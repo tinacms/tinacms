@@ -623,9 +623,9 @@ export const mdxJsxToMarkdown = function (
     }
 
     if (!selfClosing) {
-      value += tracker.move(
+      const closingTag =
         pattern.start + ' /' + (patternName || ' ') + ' ' + pattern.end
-      )
+      value += tracker.move(closingTag)
     }
 
     exit()

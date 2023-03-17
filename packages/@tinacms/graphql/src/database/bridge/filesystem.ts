@@ -12,12 +12,9 @@ import type { Bridge } from './index'
 export class FilesystemBridge implements Bridge {
   public rootPath: string
   public outputPath?: string
-  constructor(rootPath: string) {
+  constructor(rootPath: string, outputPath?: string) {
     this.rootPath = rootPath || ''
-    this.outputPath = rootPath || ''
-  }
-  public addOutputPath(outputPath: string) {
-    this.outputPath = outputPath
+    this.outputPath = outputPath || rootPath
   }
   public async glob(pattern: string, extension: string) {
     const basePath = path.join(this.outputPath, ...pattern.split('/'))

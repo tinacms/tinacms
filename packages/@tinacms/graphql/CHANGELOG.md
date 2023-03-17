@@ -1,5 +1,14 @@
 # tina-graphql
 
+## 1.3.5
+
+### Patch Changes
+
+- Updated dependencies [973e83f1f]
+- Updated dependencies [d1cf65999]
+  - @tinacms/mdx@1.3.4
+  - @tinacms/schema-tools@1.3.4
+
 ## 1.3.4
 
 ### Patch Changes

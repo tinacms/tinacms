@@ -20,7 +20,7 @@ export const ELEMENT_IMG = 'img'
 export const createImgPlugin = createPluginFactory({
   key: ELEMENT_IMG,
   isVoid: true,
-  isInline: false,
+  isInline: true,
   isElement: true,
   component: (props) => {
     const handleChange = (values) => {
@@ -33,7 +33,7 @@ export const createImgPlugin = createPluginFactory({
 
 export const insertImg = (editor: PlateEditor, media: Media) => {
   if (isImage(media.src)) {
-    insertBlockElement(editor, {
+    insertInlineElement(editor, {
       type: ELEMENT_IMG,
       children: [{ text: '' }],
       url: media.src,

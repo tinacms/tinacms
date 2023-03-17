@@ -1,10 +1,11 @@
 import { factorySpace } from 'micromark-factory-space'
-import { markdownLineEnding } from 'micromark-util-character'
+import { markdownLineEndingOrSpace } from 'micromark-util-character'
 import { codes } from 'micromark-util-symbol/codes.js'
 import { types } from 'micromark-util-symbol/types.js'
 import { factoryTag } from './factory-tag'
 import type { Construct, Tokenizer, State } from 'micromark-util-types'
 import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression'
+import { findCode } from './util'
 
 export const jsxFlow: (
   acorn: Acorn | undefined,
@@ -56,14 +57,23 @@ export const jsxFlow: (
     }
 
     const after: State = function (code) {
-      return code === codes.lessThan
-        ? start(code)
-        : code === codes.eof || markdownLineEnding(code)
-        ? ok(code)
-        : nok(code)
+      const character = findCode(pattern.start[0])
+      if (code === character) {
+        return start(code)
+      }
+      if (code === codes.eof) {
+        return ok(code)
+      }
+      if (markdownLineEndingOrSpace(code)) {
+        return ok(code)
+      }
+      return nok(code)
     }
 
     return start
   }
-  return { tokenize: tokenizeJsxFlow, concrete: true }
+  return {
+    tokenize: tokenizeJsxFlow,
+    concrete: true,
+  }
 }

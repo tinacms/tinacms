@@ -1,5 +1,18 @@
 # @tinacms/mdx
 
+## 1.3.4
+
+### Patch Changes
+
+- 973e83f1f: Some fixes around image handling in the rich-text editor
+
+  - Stop treating images as block-level
+  - Fix issue where images inside links were being stripped out
+  - Fix display of .avif images in the media manager
+
+- Updated dependencies [d1cf65999]
+  - @tinacms/schema-tools@1.3.4
+
 ## 1.3.3
 
 ### Patch Changes

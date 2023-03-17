@@ -94,7 +94,9 @@ const validationCollectionsPathAndMatch = (collections: Collection<true>[]) => {
     })
     .map(
       (x) =>
-        `${x.path}|${x.match.include}|${x.match.exclude}|${x.format || 'md'}`
+        `${x.path}|${x?.match?.exclude || ''}|${x?.match?.include || ''}|${
+          x.format || 'md'
+        }`
     )
 
   if (hasMatchAndPath.length !== new Set(hasMatchAndPath).size) {
@@ -133,7 +135,9 @@ const validationCollectionsPathAndMatch = (collections: Collection<true>[]) => {
       )
     }
 
-    const matches = collectionsArr.map((x) => x.match || '')
+    const matches = collectionsArr.map((x) =>
+      typeof x?.match === 'object' ? JSON.stringify(x.match) : ''
+    )
     if (matches.length === new Set(matches).size) {
       return
     }

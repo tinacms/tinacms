@@ -15,7 +15,7 @@ import { codes } from 'micromark-util-symbol/codes.js'
 import { constants } from 'micromark-util-symbol/constants.js'
 import { types } from 'micromark-util-symbol/types.js'
 import { VFileMessage } from 'vfile-message'
-import { findCode, printCode } from './util'
+import { findCode } from './util'
 import type {
   Tokenizer,
   TokenizeContext,
