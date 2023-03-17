@@ -16,7 +16,7 @@ import {
 import { BiFileBlank } from 'react-icons/bi'
 
 interface ImageUploadProps {
-  onDrop: (_acceptedFiles: any[]) => void
+  onDrop: (files: any, fileRejections: any) => Promise<void>
   onClear?: () => void
   onClick?: () => void
   value?: string
