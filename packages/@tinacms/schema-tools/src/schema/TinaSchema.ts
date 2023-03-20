@@ -6,6 +6,7 @@ import {
   Collectable,
   CollectionTemplateable,
   TinaField,
+  ObjectField,
 } from '../types/index'
 import { lastItem, assertShape } from '../util'
 import { normalizePath } from '../util/normalizePath'
@@ -34,6 +35,30 @@ export class TinaSchema {
   constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
     this.schema = config
+    this.walkFields(({ field, collection, path }) => {
+      if (field.type === 'rich-text') {
+        if (field.parser) {
+          return
+        }
+        if (collection.format === 'mdx') {
+          field.parser = { type: 'mdx' }
+        } else {
+          field.templates?.forEach((template) => {
+            if (!template.match) {
+              console.warn(
+                `WARNING: Found rich-text template at ${
+                  collection.name
+                }.${path.join(
+                  '.'
+                )} with no matches property.\nVisit https://tina.io/docs/reference/types/rich-text/#custom-shortcode-syntax to learn more
+                `
+              )
+            }
+          })
+          field.parser = { type: 'markdown' }
+        }
+      }
+    })
   }
   public getIsTitleFieldName = (collection: string) => {
     const col = this.getCollection(collection)
@@ -375,6 +400,40 @@ export class TinaSchema {
         )
       }
     }
+  }
+  public walkFields = (
+    cb: (args: {
+      field: TinaField
+      collection: Collection
+      path: string[]
+    }) => void
+  ) => {
+    const walk = (
+      collectionOrObject: {
+        templates?: Template[]
+        fields?: TinaField[]
+      },
+      collection: Collection,
+      path: string[]
+    ) => {
+      if (collectionOrObject.templates) {
+        collectionOrObject.templates.forEach((template) => {
+          template.fields.forEach((field) => {
+            cb({ field, collection, path: [...path, template.name] })
+          })
+        })
+      }
+      if (collectionOrObject.fields) {
+        collectionOrObject.fields.forEach((field) => {
+          cb({ field, collection, path: [...path, field.name] })
+          if (field.type === 'rich-text' || field.type === 'object') {
+            walk(field, collection, [...path, field.name])
+          }
+        })
+      }
+    }
+    const collections = this.getCollections()
+    collections.forEach((collection) => walk(collection, collection, []))
   }
 
   /**
