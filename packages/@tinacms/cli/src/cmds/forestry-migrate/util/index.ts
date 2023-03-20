@@ -366,7 +366,9 @@ export const transformForestryFieldsToTinaFields = ({
   if (blockFields.length > 0) {
     logger.info(
       warnText(
-        `Skipping blocks field${blockFields.length > 1 && 's'}: ${blockFields
+        `Skipping blocks field${
+          blockFields.length > 1 ? 's' : ''
+        }: ${blockFields
           .map((b) => `"${b}"`)
           .join(
             ', '
