@@ -8,7 +8,7 @@ import yaml from 'js-yaml'
 import z from 'zod'
 import type { TinaField, TinaTemplate } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
-import { warnText } from '../../../utils/theme'
+import { linkText, warnText } from '../../../utils/theme'
 import { ErrorSingleton } from './errorSingleton'
 
 const errorSingletonInstance = ErrorSingleton.getInstance()
@@ -150,6 +150,7 @@ export const transformForestryFieldsToTinaFields = ({
 }) => {
   const tinaFields: TinaField[] = []
 
+  const blockFields: string[] = []
   fields?.forEach((forestryField) => {
     if (forestryField.name === 'menu') {
       logger.info(
@@ -308,7 +309,10 @@ export const transformForestryFieldsToTinaFields = ({
         break
 
       case 'blocks':
-        if (skipBlocks) break
+        if (skipBlocks) {
+          blockFields.push(forestryField.name)
+          break
+        }
 
         const templates: TinaTemplate[] = []
         forestryField?.template_types.forEach((tem) => {
@@ -358,6 +362,20 @@ export const transformForestryFieldsToTinaFields = ({
       tinaFields.push(field)
     }
   })
+
+  if (blockFields.length > 0) {
+    logger.info(
+      warnText(
+        `Skipping blocks field${blockFields.length > 1 && 's'}: ${blockFields
+          .map((b) => `"${b}"`)
+          .join(
+            ', '
+          )}" in ${template}.yaml. Blocks fields need to be manually imported: ${linkText(
+          'https://tina.io/docs/forestry/common-errors/#migrating-blocks'
+        )}`
+      )
+    )
+  }
   return tinaFields
 }
 
