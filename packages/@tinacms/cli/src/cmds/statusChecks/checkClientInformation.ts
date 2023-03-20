@@ -12,6 +12,7 @@ import type { Database } from '@tinacms/graphql'
 import type { Schema } from '@tinacms/schema-tools'
 import { parseURL } from '@tinacms/schema-tools'
 import { ConfigBuilder } from '../../buildTina'
+import { linkText } from '../../utils/theme'
 
 //  This was taken from packages/tinacms/src/unifiedClient/index.ts
 // TODO: maybe move this to a shared util package?
@@ -87,10 +88,14 @@ export const checkClientInfo = async (
   const bar = new Progress('Checking clientId, token and branch. :prog', 1)
 
   try {
-    await request({
+    const resp = await request({
       token,
       url,
     })
+
+    if (resp.status == 'unknown') {
+      throw new Error(`Unknown status.`)
+    }
     bar.tick({
       prog: '✅',
     })
@@ -107,7 +112,9 @@ export const checkClientInfo = async (
         },
         null,
         2
-      )}\n\n Please check you have the correct "clientId", "branch" and "token" configured. For more information see https://tina.io/docs/tina-cloud/connecting-site/`
+      )}\n\n Please check you have the correct "clientId", "branch" and "token" configured. For more information see ${linkText(
+        'https://tina.io/docs/tina-cloud/connecting-site/'
+      )}`
     )
 
     throw e
