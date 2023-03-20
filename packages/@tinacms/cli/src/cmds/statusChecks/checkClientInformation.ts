@@ -94,7 +94,7 @@ export const checkClientInfo = async (
     })
 
     if (resp.status == 'unknown') {
-      throw new Error(`Unknown status.`)
+      throw new Error(`Branch not indexed by Tina Cloud.`)
     }
     bar.tick({
       prog: '✅',
