@@ -439,7 +439,7 @@ const frameworkDevCmds: {
 }
 
 const config = (args: AddConfigArgs) => {
-  return format(configExamples[args.framework.name](args))
+  return format(configExamples[args.framework.name](args), { parser: 'babel' })
 }
 
 const content = `---
