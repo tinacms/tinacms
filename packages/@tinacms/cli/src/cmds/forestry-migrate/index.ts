@@ -307,7 +307,6 @@ const rewriteTemplateKeysInDocs = (
         console.log(
           dangerText('Error updating template -> _template in ', page)
         )
-        throw error
       }
     })
   }
