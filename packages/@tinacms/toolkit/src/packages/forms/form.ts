@@ -1,15 +1,11 @@
-/**
-
-
-
-*/
-
 import arrayMutators from 'final-form-arrays'
 import setFieldData from 'final-form-set-field-data'
 import { FormApi, createForm, Config, FormState, FORM_ERROR } from 'final-form'
 import type { FormSubscription } from 'final-form'
-import { Plugin } from '../core'
+import type { Plugin } from '../core'
 import { Field, AnyField } from './field'
+
+export type { FormApi }
 
 type GlobalOptions = {
   global: true
@@ -32,6 +28,7 @@ export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   loadInitialValues?: () => Promise<S>
   onChange?(values: FormState<S>): void
   extraSubscribeValues?: FormSubscription
+  queries?: string[]
 }
 
 export class Form<S = any, F extends Field = AnyField> implements Plugin {
@@ -47,6 +44,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     save: string
     reset: string
   }
+  queries: string[]
   global: GlobalOptions | null = null
   loading: boolean = false
 
@@ -60,6 +58,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     reset,
     loadInitialValues,
     onChange,
+    queries,
     ...options
   }: FormOptions<S, F>) {
     const initialValues = options.initialValues || ({} as S)
@@ -69,6 +68,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.global = global
     this.fields = fields || []
     this.onSubmit = options.onSubmit
+    this.queries = queries || []
     this.finalForm = createForm<S>({
       ...options,
       initialValues,
@@ -218,6 +218,16 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
 
   get mutators() {
     return this.finalForm.mutators
+  }
+
+  addQuery(queryId: string) {
+    this.queries = [...this.queries.filter((id) => id !== queryId), queryId]
+  }
+  removeQuery(queryId: string) {
+    this.queries = this.queries.filter((id) => id !== queryId)
+    if (this.queries.length === 0) {
+      console.log(`I should be removed. ${this.id}`)
+    }
   }
 
   /**
