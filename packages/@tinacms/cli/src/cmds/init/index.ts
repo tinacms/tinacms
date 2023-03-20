@@ -34,7 +34,7 @@ export async function initStaticTina({
   rootPath: string
   noTelemetry: boolean
 }) {
-  const baseDir = '' //rootPath
+  const baseDir = rootPath
   logger.level = 'info'
 
   // Choose your ClientID
@@ -89,13 +89,13 @@ export async function initStaticTina({
   const hasGitignore = await fs.pathExistsSync('.gitignore')
   // if no .gitignore, create one
   if (!hasGitignore) {
-    await createGitignore({ baseDir })
+    await createGitignore({ baseDir: '' })
   } else {
     const hasNodeModulesIgnored = await checkGitignoreForNodeModules({
-      baseDir,
+      baseDir: '',
     })
     if (!hasNodeModulesIgnored) {
-      await addNodeModulesToGitignore({ baseDir })
+      await addNodeModulesToGitignore({ baseDir: '' })
     }
   }
 
