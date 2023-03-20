@@ -34,7 +34,7 @@ export async function initStaticTina({
   rootPath: string
   noTelemetry: boolean
 }) {
-  const baseDir = rootPath
+  const baseDir = '' //rootPath
   logger.level = 'info'
 
   // Choose your ClientID
