@@ -373,7 +373,7 @@ export const getFieldsFromTemplates: (_args: {
     hide_body?: boolean
     fields?: ForestryFieldType[]
   }
-} = ({ tem, rootPath, skipBlocks = false }) => {
+} = ({ tem, rootPath, skipBlocks = true }) => {
   const templatePath = path.join(
     rootPath,
     '.forestry',
