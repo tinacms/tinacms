@@ -1,6 +1,6 @@
 mutation {
   updateDocument(
-    relativePath: "star-wars.md"
+    relativePath: "star-wars.mdx"
     # Changes the genre to action
     params: {
       movie: {
