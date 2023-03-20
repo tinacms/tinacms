@@ -1,0 +1,40 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Cta",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "h2",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Click "
+                },
+                {
+                  "type": "text",
+                  "text": "here",
+                  "bold": true
+                },
+                {
+                  "type": "text",
+                  "text": "!"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

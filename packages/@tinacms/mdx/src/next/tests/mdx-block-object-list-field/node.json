@@ -1,0 +1,24 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Playground",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "code": "Some sample code",
+        "config": [
+          {
+            "key": "width",
+            "value": "100%"
+          }
+        ]
+      }
+    }
+  ]
+}

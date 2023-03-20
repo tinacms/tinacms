@@ -1,0 +1,25 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "html",
+      "value": "<SomeUnregisteredComponen hello=\"world\" />",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "type": "html",
+      "value": "<SomeUnregisteredComponen>\n  # Some markdown in the child\n</SomeUnregisteredComponen>",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}
