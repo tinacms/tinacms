@@ -5,7 +5,11 @@ import {
   TinaLevelClient,
   Bridge,
 } from '@tinacms/graphql'
-import { ConfigManager } from './config-manager'
+import {
+  ConfigManager,
+  LEGACY_TINA_FOLDER,
+  TINA_FOLDER,
+} from './config-manager'
 import { logger } from '../logger'
 import { pipeline } from 'readable-stream'
 import { createServer } from 'net'
@@ -64,6 +68,9 @@ export async function createAndInitializeDatabase(
     database = createDatabase({
       bridge,
       level,
+      tinaDirectory: configManager.isUsingLegacyFolder
+        ? LEGACY_TINA_FOLDER
+        : TINA_FOLDER,
     })
   }
 
