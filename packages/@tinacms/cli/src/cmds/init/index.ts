@@ -445,7 +445,7 @@ const addReactiveFile = {
   }) => {
     const usingSrc = !fs.pathExistsSync(path.join(baseDir, 'pages'))
     const pagesPath = path.join(baseDir, usingSrc ? 'src' : '', 'pages')
-    const packageJSONPath = path.join(baseDir, 'package.json')
+    const packageJSONPath = 'package.json'
 
     const tinaBlogPagePath = path.join(pagesPath, 'demo', 'blog')
     const tinaBlogPagePathFile = path.join(

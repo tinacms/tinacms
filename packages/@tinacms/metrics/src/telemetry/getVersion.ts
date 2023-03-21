@@ -21,9 +21,7 @@ function _executeCommand(cmd: string) {
 const _getPack = (rootDir: string) => {
   let pack: any = {}
   try {
-    const rawJSON: string = readFileSync(
-      join(rootDir, 'package.json')
-    ).toString()
+    const rawJSON: string = readFileSync('package.json').toString()
     pack = JSON.parse(rawJSON)
   } catch (_e) {}
   return pack
