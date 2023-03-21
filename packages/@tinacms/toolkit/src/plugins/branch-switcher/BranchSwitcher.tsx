@@ -122,6 +122,7 @@ export const BranchSwitcher = ({
   // Keep branch list up to date
   React.useEffect(() => {
     if (listState === 'ready') {
+      const cancelFuncs = []
       // update all branches that have indexing status of 'inprogress' or 'unknown'
       branchList
         .filter(
@@ -130,16 +131,30 @@ export const BranchSwitcher = ({
             x?.indexStatus?.status === 'unknown'
         )
         .forEach(async (x) => {
-          const indexStatus = await cms.api.tina.waitForIndexStatus({
+          const [prom, cancel] = cms.api.tina.waitForIndexStatus({
             ref: x.name,
           })
-          setBranchList((prev) => {
-            const newList = Array.from(prev)
-            const index = newList.findIndex((y) => y.name === x.name)
-            newList[index].indexStatus = indexStatus
-            return newList
-          })
+          cancelFuncs.push(cancel)
+          prom
+            .then((indexStatus) => {
+              setBranchList((prev) => {
+                const newList = Array.from(prev)
+                const index = newList.findIndex((y) => y.name === x.name)
+                newList[index].indexStatus = indexStatus
+                return newList
+              })
+            })
+            .catch((e) => {
+              if (e.message === 'AsyncPoller: cancelled') return
+              console.error(e)
+            })
         })
+      return () => {
+        cancelFuncs.forEach((x) => {
+          console.log({ x })
+          x()
+        })
+      }
     }
   }, [listState, branchList.length])
 
