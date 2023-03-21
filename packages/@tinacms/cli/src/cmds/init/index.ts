@@ -59,7 +59,7 @@ export async function initStaticTina({
   const publicFolder: string = await choosePublicFolder({ framework })
 
   // Detect forestry config
-  const forestryPath = await hasForestryConfig({ rootPath: rootPath })
+  const forestryPath = await hasForestryConfig({ rootPath })
 
   let collections: string | null | undefined
 
@@ -67,7 +67,7 @@ export async function initStaticTina({
   if (forestryPath.exists) {
     collections = await forestryMigrate({
       forestryPath: forestryPath.path,
-      rootPath: rootPath,
+      rootPath,
     })
   }
 
@@ -104,7 +104,7 @@ export async function initStaticTina({
   // add .tina/config.{js,ts}]
   await addConfigFile({
     publicFolder,
-    baseDir,
+    baseDir: '',
     usingTypescript,
     framework,
     collections,
