@@ -156,7 +156,6 @@ export function asyncPoll<T>(
     Promise.resolve(fn())
       .then((result) => {
         const now = new Date().getTime()
-        console.log('polling', { stop }, { result }, { now }, { endTime })
         if (stop) {
           reject(new Error('AsyncPoller: cancelled'))
         } else if (result.done) {
