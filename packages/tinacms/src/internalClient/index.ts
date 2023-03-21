@@ -43,8 +43,6 @@ const parseRefForBranchName = (ref: string) => {
 const ListBranchResponse = z
   .object({
     name: z.string(),
-    protected: z.boolean(),
-    commit: z.object({ sha: z.string(), url: z.string() }),
   })
   .array()
 
@@ -188,7 +186,7 @@ export class Client {
   events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
-    this.tinaGraphQLVersion = options.tinaGraphQLVersion
+    this.tinaGraphQLVersion = 'beta' || options.tinaGraphQLVersion
     this.onLogin = options.schema?.config?.admin?.auth?.onLogin
     this.onLogout = options.schema?.config?.admin?.auth?.onLogout
     if (options.schema?.config?.admin?.auth?.logout) {

@@ -100,7 +100,17 @@ export const BranchSwitcher = ({
     }).then(async (createdBranchName) => {
       // @ts-ignore
       cms.alerts.success('Branch created.')
-      await refreshBranchList()
+      // add the newly created branch to the list
+      setBranchList((oldBranchList) => {
+        return [
+          ...oldBranchList,
+          {
+            indexStatus: { status: 'unknown' },
+            name: createdBranchName,
+          },
+        ]
+      })
+      setListState('ready')
     })
   }, [])
 
