@@ -517,6 +517,18 @@ export const buildIt = async (entryPoint, packageJSON) => {
         outfile: path.join(process.cwd(), 'dist', 'index.js'),
         external: Object.keys({ ...peerDeps }),
       })
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'node',
+        target: 'es2020',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        // Bundle dependencies, the remark ecosystem only publishes ES modules
+        // and includes "development" export maps which actually throw errors during
+        // development, which we don't want to expose our users to.
+        external: Object.keys({ ...peerDeps }),
+      })
       // The ES version is targeting the browser, this is used by the rich-text's raw mode
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],
@@ -524,7 +536,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         platform: 'browser',
         target: 'es2020',
         format: 'esm',
-        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        outfile: path.join(process.cwd(), 'dist', 'index.browser.es.js'),
         // Bundle dependencies, the remark ecosystem only publishes ES modules
         // and includes "development" export maps which actually throw errors during
         // development, which we don't want to expose our users to.
