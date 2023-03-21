@@ -1343,7 +1343,6 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
     switch (field.type) {
       case 'boolean':
       case 'datetime':
-      case 'image':
       case 'number':
         if (field.list) {
           console.warn(listWarningMsg)
