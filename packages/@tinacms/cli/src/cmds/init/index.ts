@@ -86,16 +86,16 @@ export async function initStaticTina({
   }
 
   // Check if .gitignore exists
-  const hasGitignore = await fs.pathExistsSync('.gitignore')
+  const hasGitignore = await fs.pathExistsSync(path.join(baseDir, '.gitignore'))
   // if no .gitignore, create one
   if (!hasGitignore) {
-    await createGitignore({ baseDir: '' })
+    await createGitignore({ baseDir })
   } else {
     const hasNodeModulesIgnored = await checkGitignoreForNodeModules({
-      baseDir: '',
+      baseDir,
     })
     if (!hasNodeModulesIgnored) {
-      await addNodeModulesToGitignore({ baseDir: '' })
+      await addNodeModulesToGitignore({ baseDir })
     }
   }
 
@@ -445,8 +445,7 @@ const addReactiveFile = {
   }) => {
     const usingSrc = !fs.pathExistsSync(path.join(baseDir, 'pages'))
     const pagesPath = path.join(baseDir, usingSrc ? 'src' : '', 'pages')
-    const packageJSONPath = 'package.json'
-
+    const packageJSONPath = path.join(baseDir, 'package.json')
     const tinaBlogPagePath = path.join(pagesPath, 'demo', 'blog')
     const tinaBlogPagePathFile = path.join(
       tinaBlogPagePath,
