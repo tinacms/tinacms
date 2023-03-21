@@ -34,7 +34,6 @@ export async function initStaticTina({
   rootPath: string
   noTelemetry: boolean
 }) {
-  const baseDir = rootPath
   logger.level = 'info'
 
   // Choose your ClientID
@@ -86,16 +85,16 @@ export async function initStaticTina({
   }
 
   // Check if .gitignore exists
-  const hasGitignore = await fs.pathExistsSync(path.join(baseDir, '.gitignore'))
+  const hasGitignore = await fs.pathExistsSync('.gitignore')
   // if no .gitignore, create one
   if (!hasGitignore) {
-    await createGitignore({ baseDir })
+    await createGitignore({ baseDir: '' })
   } else {
     const hasNodeModulesIgnored = await checkGitignoreForNodeModules({
-      baseDir,
+      baseDir: '',
     })
     if (!hasNodeModulesIgnored) {
-      await addNodeModulesToGitignore({ baseDir })
+      await addNodeModulesToGitignore({ baseDir: '' })
     }
   }
 
@@ -114,12 +113,12 @@ export async function initStaticTina({
 
   if (!forestryPath.exists) {
     // add /content/posts/hello-world.md
-    await addContentFile({ baseDir })
+    await addContentFile({ baseDir: '' })
   }
 
   if (framework.reactive) {
     await addReactiveFile[framework.name]({
-      baseDir,
+      baseDir: '',
       framework,
       usingTypescript,
     })
