@@ -151,7 +151,6 @@ export const BranchSwitcher = ({
         })
       return () => {
         cancelFuncs.forEach((x) => {
-          console.log({ x })
           x()
         })
       }
