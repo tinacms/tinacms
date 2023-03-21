@@ -27,9 +27,17 @@ export class DevCommand extends Command {
     description:
       'Specify the root directory to run the CLI from (defaults to current working directory)',
   })
+  // NOTE: camelCase commands for string options don't work if there's an `=` used https://github.com/arcanis/clipanion/issues/141
   watchFolders = Option.String('-w,--watchFolders', {
     description:
-      'a list of folders (relative to where this is being run) that the cli will watch for changes',
+      'DEPRECATED - a list of folders (relative to where this is being run) that the cli will watch for changes',
+  })
+  isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
+    description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
+  })
+  experimentalDataLayer = Option.Boolean('--experimentalData', {
+    description:
+      'DEPRECATED - Build the server with additional data querying capabilities',
   })
   verbose = Option.Boolean('-v,--verbose', false, {
     description: 'increase verbosity of logged output',
@@ -62,7 +70,15 @@ export class DevCommand extends Command {
   async execute(): Promise<number | void> {
     if (this.watchFolders) {
       logger.warn(
-        '--watchFolders has been deprecated, if you still need it please open a ticket at https://github.com/tinacms/tinacms/issues'
+        '--watchFolders has been deprecated, imports from your Tina config file will be watched automatically. If you still need it please open a ticket at https://github.com/tinacms/tinacms/issues'
+      )
+    }
+    if (this.isomorphicGitBridge) {
+      logger.warn('--isomorphicGitBridge has been deprecated')
+    }
+    if (this.experimentalDataLayer) {
+      logger.warn(
+        '--experimentalDataLayer has been deprecated, the data layer is now built-in automatically'
       )
     }
     const configManager = new ConfigManager(this.rootPath)
