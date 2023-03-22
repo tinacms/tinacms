@@ -1,6 +1,6 @@
 import React from 'react'
 import * as G from 'graphql'
-import { z } from 'zod'
+import { z, ZodError } from 'zod'
 // @ts-expect-error
 import schemaJson from 'SCHEMA_IMPORT'
 import { expandQuery, isNodeType } from './expand-query'
@@ -54,13 +54,11 @@ type SystemInfo = {
 }
 
 type Document = {
-  id: string
-  values: Record<string, unknown>
-  sys: SystemInfo
+  _values: Record<string, unknown>
+  _sys: SystemInfo
 }
 
 const documentSchema = z.object({
-  id: z.string(),
   _internalValues: z.record(z.unknown()),
   _internalSys: z.object({
     breadcrumbs: z.array(z.string()),
@@ -69,7 +67,7 @@ const documentSchema = z.object({
     path: z.string(),
     extension: z.string(),
     relativePath: z.string(),
-    title: z.string(),
+    // title: z.string().optional(), // Optional isn't working
     template: z.string(),
     // __typename: z.string(), // This isn't being populated for some reason
     collection: z.object({
@@ -83,9 +81,8 @@ const documentSchema = z.object({
 })
 
 type ResolvedDocument = {
-  id: string
-  values: Record<string, unknown>
-  sys: SystemInfo
+  _values: Record<string, unknown>
+  _sys: SystemInfo
   _internalValues: Record<string, unknown>
   _internalSys: SystemInfo
 }
@@ -153,41 +150,40 @@ export const useGraphQLReducer = (
           if (typeof value === 'string') {
             const response = await getDocument(value, cms.api.tina)
             doc = {
-              id: value,
-              sys: response._sys,
-              values: response._values,
+              _sys: response._sys,
+              _values: response._values,
             }
           } else {
             const { _internalSys, _internalValues } =
               documentSchema.parse(value)
-            const sys = _internalSys as SystemInfo
-            const values = _internalValues as Record<string, unknown>
-            const id = _internalSys.path as string
+            const _sys = _internalSys as SystemInfo
+            const _values = _internalValues as Record<string, unknown>
             doc = {
-              id,
-              values,
-              sys,
+              _values,
+              _sys,
             }
           }
-          const collection = tinaSchema.getCollectionByFullPath(doc.id)
+          const collection = tinaSchema.getCollectionByFullPath(doc._sys.path)
           if (!collection) {
-            throw new Error(`Unable to determine collection for path ${doc.id}`)
+            throw new Error(
+              `Unable to determine collection for path ${doc._sys.path}`
+            )
           }
           const template = tinaSchema.getTemplateForData({
-            data: doc.values,
+            data: doc._values,
             collection,
           })
           let form: Form
-          const existingForm = cms.forms.find(doc.id)
+          const existingForm = cms.forms.find(doc._sys.path)
           if (!existingForm) {
             form = new Form({
-              id: doc.id,
-              initialValues: doc.values,
+              id: doc._sys.path,
+              initialValues: doc._values,
               fields: template.fields.map((field) =>
                 resolveField(field, tinaSchema)
               ),
               onSubmit: (payload) =>
-                onSubmit(collection, doc.sys.relativePath, payload, cms),
+                onSubmit(collection, doc._sys.relativePath, payload, cms),
               label: collection.label || collection.name,
               queries: [payload.id],
             })
@@ -207,7 +203,13 @@ export const useGraphQLReducer = (
       },
     })
     if (result.errors) {
-      console.log(result)
+      result.errors.forEach((error) => {
+        if (error instanceof ZodError) {
+          console.log(error.format())
+        } else {
+          console.log(error)
+        }
+      })
     } else {
       iframe.current?.contentWindow?.postMessage({
         type: 'updateData',
@@ -309,11 +311,10 @@ const resolveDocument = (
   })
   return {
     ...formValues,
-    id: doc.id,
-    sys: doc.sys,
+    sys: doc._sys,
     values: form.values,
-    _internalSys: doc.sys,
-    _internalValues: doc.values,
+    _internalSys: doc._sys,
+    _internalValues: doc._values,
     __typename: NAMER.dataTypeName(template.namespace),
   }
 }
