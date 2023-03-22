@@ -32,7 +32,11 @@ export const buildDotTinaFiles = async ({
   if (flags.indexOf('experimentalData') === -1) {
     flags.push('experimentalData')
   }
-  const tinaSchema = await createSchema({ schema: config.schema, flags })
+  const { schema } = config
+  const tinaSchema = await createSchema({
+    schema: { ...schema, config },
+    flags,
+  })
   const builder = await createBuilder({
     database,
     tinaSchema,
