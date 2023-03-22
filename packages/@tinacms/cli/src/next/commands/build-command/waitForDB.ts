@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import Progress from 'progress'
 import { Config, parseURL } from '@tinacms/schema-tools'
 import fetch, { Headers } from 'node-fetch'
@@ -9,6 +5,7 @@ import fetch, { Headers } from 'node-fetch'
 import { logger } from '../../../logger'
 import { spin } from '../../../utils/spinner'
 import { logText } from '../../../utils/theme'
+import { sleepAndCallFunc } from '../../../utils/sleep'
 
 const POLLING_INTERVAL = 5000
 
@@ -16,7 +13,7 @@ const STATUS_INPROGRESS = 'inprogress'
 const STATUS_COMPLETE = 'complete'
 const STATUS_FAILED = 'failed'
 
-interface IndexStatusResponse {
+export interface IndexStatusResponse {
   status: 'inprogress' | 'complete' | 'failed' | 'unknown'
   timestamp: number
   error?: string
@@ -36,6 +33,14 @@ export const waitForDB = async (
 ) => {
   const token = config.token
   const { clientId, branch, isLocalClient, host } = parseURL(apiUrl)
+
+  // Can't check status if we're not using Tina Cloud
+  if (isLocalClient || !host || !clientId || !branch) {
+    if (verbose) {
+      logger.info(logText('Not using Tina Cloud, skipping DB check'))
+    }
+    return
+  }
 
   const bar = new Progress(
     'Checking indexing process in Tina Cloud... :prog',
@@ -77,7 +82,7 @@ export const waitForDB = async (
         if (verbose) {
           logger.info(logText(`${statusMessage}, trying again in 5 seconds`))
         }
-        setTimeout(pollForStatus, POLLING_INTERVAL)
+        await sleepAndCallFunc({ fn: pollForStatus, ms: POLLING_INTERVAL })
 
         // Index Failed
       } else if (status === STATUS_FAILED) {
