@@ -11,10 +11,12 @@ export function useTina<T extends object>(props: {
   query: string
   variables: object
   data: T
-}): { data: T } {
+}): { data: T; isClient: boolean } {
   const [data, setData] = React.useState(props.data)
+  const [isClient, setIsClient] = React.useState(false)
   const id = JSON.stringify({ query: props.query, variables: props.variables })
   React.useEffect(() => {
+    setIsClient(true)
     setData(props.data)
   }, [id])
   React.useEffect(() => {
@@ -28,7 +30,7 @@ export function useTina<T extends object>(props: {
     return () =>
       parent.postMessage({ type: 'close', id }, window.location.origin)
   }, [id])
-  return { data } as any
+  return { data, isClient } as any
 }
 
 export function useEditState(): { edit: boolean } {
