@@ -1,0 +1,137 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Test",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "leftColumn": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "foo bar baz left"
+                }
+              ]
+            }
+          ]
+        },
+        "rightColumn": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "foo bar baz right"
+                }
+              ]
+            },
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "Highlight",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "props": {
+                "content": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Foo bar baz"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Test",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "leftColumn": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "foo bar baz left"
+                }
+              ]
+            }
+          ]
+        },
+        "rightColumn": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "foo bar baz right"
+                }
+              ]
+            },
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "Highlight",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "props": {
+                "content": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Foo bar baz"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

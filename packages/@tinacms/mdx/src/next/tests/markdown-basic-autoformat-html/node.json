@@ -1,0 +1,14 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "<ul>\n<li>\nSome Item 1\n</li>\n<li>\nSome Item 2\n</li>\n</ul>"
+        }
+      ]
+    }
+  ]
+}

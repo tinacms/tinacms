@@ -1,0 +1,22 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Blockquote",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "author": "Pedro",
+        "children": {
+          "type": "root",
+          "children": []
+        }
+      }
+    }
+  ]
+}

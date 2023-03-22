@@ -1,0 +1,14 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "blockquote",
+      "children": [
+        {
+          "type": "text",
+          "text": "Hello, World!"
+        }
+      ]
+    }
+  ]
+}

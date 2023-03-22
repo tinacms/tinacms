@@ -1,0 +1,40 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "123 Abc Street"
+        },
+        {
+          "type": "break",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "Town Central, CA"
+        },
+        {
+          "type": "break",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "90210"
+        }
+      ]
+    }
+  ]
+}

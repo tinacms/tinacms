@@ -65,6 +65,10 @@ export function mdxJsxElement(
     )
     if (childField) {
       if (childField.type === 'rich-text') {
+        if (node.type === 'mdxJsxTextElement') {
+          // @ts-ignore FIXME: frontend rich-text needs top-level elements to be wrapped in `paragraph`
+          node.children = [{ type: 'paragraph', children: node.children }]
+        }
         props.children = remarkToSlate(node, childField, imageCallback)
       }
     }

@@ -524,32 +524,24 @@ export const buildIt = async (entryPoint, packageJSON) => {
         target: 'es2020',
         format: 'esm',
         outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
-        external,
+        // Bundle dependencies, the remark ecosystem only publishes ES modules
+        // and includes "development" export maps which actually throw errors during
+        // development, which we don't want to expose our users to.
+        external: Object.keys({ ...peerDeps }),
       })
-      /**
-       * For MDX, we need to use it in the frontend with rich-text's raw mode. And we use
-       * a package.json to install most modules at dev time for the user. But in order
-       * to do that with the latest version of @tinacms/mdx, it's easiest to inline the dependency
-       * directly. Especially because this package bundles its dependencies
-       */
-      // const appMDXPath = path.join(
-      //   process.cwd(),
-      //   '..',
-      //   'app',
-      //   'appFiles',
-      //   'src',
-      //   'fields',
-      //   'rich-text',
-      //   'monaco',
-      //   'mdx.js'
-      // )
-      // await esbuild({
-      //   entryPoints: [path.join(process.cwd(), entry)],
-      //   bundle: true,
-      //   format: 'esm',
-      //   outfile: appMDXPath,
-      //   external: Object.keys({ ...peerDeps }),
-      // })
+      // The ES version is targeting the browser, this is used by the rich-text's raw mode
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'browser',
+        target: 'es2020',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'index.browser.es.js'),
+        // Bundle dependencies, the remark ecosystem only publishes ES modules
+        // and includes "development" export maps which actually throw errors during
+        // development, which we don't want to expose our users to.
+        external: Object.keys({ ...peerDeps }),
+      })
     } else {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],

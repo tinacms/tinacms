@@ -1,1 +1,0 @@
-<Tags items={["one", "two"]} />
