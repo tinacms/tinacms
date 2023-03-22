@@ -191,6 +191,12 @@ export const useGraphQLReducer = (
               label: collection.label || collection.name,
               queries: [payload.id],
             })
+            form.subscribe(
+              () => {
+                setOperationIndex((index) => index + 1)
+              },
+              { values: true }
+            )
             cms.forms.add(form)
           } else {
             form = existingForm
@@ -211,52 +217,49 @@ export const useGraphQLReducer = (
     }
   }, [payload?.id, operationIndex])
 
-  React.useEffect(() => {
-    const unsubscribeFieldChange = cms.events.subscribe(
-      `forms:fields:onChange`,
-      () => {
-        setOperationIndex((index) => index + 1)
+  const notifyEditMode = React.useCallback(
+    (event: MessageEvent<PostMessage>) => {
+      if (event?.data?.type === 'isEditMode') {
+        iframe?.current?.contentWindow?.postMessage({
+          type: 'tina:editMode',
+        })
       }
-    )
-    const unsubscribeReset = cms.events.subscribe(`forms:reset`, () => {
-      setOperationIndex((index) => index + 1)
-    })
-
-    return () => {
-      unsubscribeFieldChange()
-      unsubscribeReset()
-    }
-  }, [])
+    },
+    [setPayload]
+  )
+  const handleOpenClose = React.useCallback(
+    (event: MessageEvent<PostMessage>) => {
+      if (event.data.type === 'close') {
+        const payloadSchema = z.object({ id: z.string() })
+        const { id } = payloadSchema.parse(event.data)
+        cms.forms.all().map((form) => {
+          form.removeQuery(id)
+        })
+        cms.removeOrphanedForms()
+      }
+      if (event.data.type === 'open') {
+        const payloadSchema = z.object({
+          id: z.string(),
+          query: z.string(),
+          variables: z.record(z.unknown()),
+          data: z.record(z.unknown()),
+        })
+        setPayload(payloadSchema.parse(event.data))
+      }
+    },
+    [setPayload, cms]
+  )
 
   React.useEffect(() => {
     if (iframe) {
-      window.addEventListener('message', (event: MessageEvent<PostMessage>) => {
-        if (event.data.type === 'close') {
-          console.log('closeevent')
-          const payloadSchema = z.object({ id: z.string() })
-          const { id } = payloadSchema.parse(event.data)
-          cms.forms.all().map((form) => {
-            form.removeQuery(id)
-          })
-          cms.removeOrphanedForms()
-        }
-        if (event.data.type === 'open') {
-          const payloadSchema = z.object({
-            id: z.string(),
-            query: z.string(),
-            variables: z.record(z.unknown()),
-            data: z.record(z.unknown()),
-          })
-          setPayload(payloadSchema.parse(event.data))
-        }
-      })
-      window.addEventListener('message', (event: MessageEvent<PostMessage>) => {
-        if (event?.data?.type === 'isEditMode') {
-          iframe?.current?.contentWindow?.postMessage({
-            type: 'tina:editMode',
-          })
-        }
-      })
+      window.addEventListener('message', handleOpenClose)
+      window.addEventListener('message', notifyEditMode)
+    }
+
+    return () => {
+      window.removeEventListener('message', handleOpenClose)
+      window.removeEventListener('message', notifyEditMode)
+      cms.removeAllForms()
     }
   }, [iframe.current])
 

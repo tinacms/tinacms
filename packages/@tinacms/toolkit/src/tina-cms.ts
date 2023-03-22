@@ -176,6 +176,11 @@ export class TinaCMS extends CMS {
   get screens(): PluginType<ScreenPlugin> {
     return this.plugins.findOrCreateMap('screen')
   }
+  removeAllForms() {
+    this.forms.all().forEach((form) => {
+      this.forms.remove(form)
+    })
+  }
 
   removeOrphanedForms() {
     const orphanedForms = this.forms
