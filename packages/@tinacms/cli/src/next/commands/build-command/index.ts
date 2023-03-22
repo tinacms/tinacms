@@ -29,6 +29,16 @@ export class BuildCommand extends Command {
   noSDK = Option.Boolean('--noSDK', false, {
     description: "Don't generate the generated client SDK",
   })
+  isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
+    description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
+  })
+  localOption = Option.Boolean('--local', {
+    description: 'DEPRECATED: Uses the local file system graphql server',
+  })
+  experimentalDataLayer = Option.Boolean('--experimentalData', {
+    description:
+      'DEPRECATED - Build the server with additional data querying capabilities',
+  })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
   })
@@ -53,6 +63,17 @@ export class BuildCommand extends Command {
       this.tinaGraphQLVersion
     )
     logger.info('Starting Tina build')
+    if (this.isomorphicGitBridge) {
+      logger.warn('--isomorphicGitBridge has been deprecated')
+    }
+    if (this.experimentalDataLayer) {
+      logger.warn(
+        '--experimentalDataLayer has been deprecated, the data layer is now built-in automatically'
+      )
+    }
+    if (this.localOption) {
+      logger.warn('--local has been deprecated')
+    }
 
     try {
       await configManager.processConfig()
