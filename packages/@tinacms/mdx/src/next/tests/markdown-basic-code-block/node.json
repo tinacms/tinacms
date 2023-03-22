@@ -1,0 +1,26 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "code_block",
+      "lang": "javascript",
+      "value": "const test = 123",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "type": "code_block",
+      "value": "some random code",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}

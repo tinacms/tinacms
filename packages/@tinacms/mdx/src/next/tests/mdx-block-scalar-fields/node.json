@@ -1,0 +1,99 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Count",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "number": 1
+      }
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "MaybeShow",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "toggle": true
+      }
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "mdxJsxTextElement",
+          "name": "Greeting",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ],
+          "props": {
+            "message": "Hello"
+          }
+        },
+        {
+          "type": "text",
+          "text": " world!"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Date",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "here": "2022-12-12"
+      }
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Ratings",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "value": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Tags",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "items": [
+          "one",
+          "two"
+        ]
+      }
+    }
+  ]
+}
