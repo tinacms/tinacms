@@ -34,7 +34,7 @@ export class BuildCommand extends Command {
   })
   tinaGraphQLVersion = Option.String('--tina-graphql-version', {
     description:
-      'Specify the root directory to run the CLI from (defaults to current working directory)',
+      'Specify the version of @tinacms/graphql to use (defaults to latest)',
   })
 
   static usage = Command.Usage({
