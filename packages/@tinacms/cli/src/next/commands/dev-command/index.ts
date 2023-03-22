@@ -195,12 +195,10 @@ export class DevCommand extends Command {
         return
       }
       try {
-        // await server.reloadModule
         logger.info('Tina config updated')
         await setup({ firstTime: false })
-        // await server.restart()
       } catch (e) {
-        logger.error(e.message)
+        this.catch(e)
       }
     })
 
