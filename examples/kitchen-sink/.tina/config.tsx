@@ -683,19 +683,11 @@ export default defineConfig({
           {
             type: 'rich-text',
             name: 'body',
-            parser: {
-              type: 'markdown',
-              skipEscaping: 'html',
-            },
             isBody: true,
             templates: [
               {
                 name: 'rimg',
                 label: 'rimg',
-                match: {
-                  start: '{{<',
-                  end: '>}}',
-                },
                 fields: [
                   {
                     name: 'src',

@@ -1,7 +1,7 @@
 {
   "data": {
     "document": {
-      "id": "content/movies/star-wars.md",
+      "id": "content/movies/star-wars.mdx",
       "title": "Star Wars",
       "genre": "scifi",
       "director": {

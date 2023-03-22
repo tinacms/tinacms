@@ -1,7 +1,7 @@
 {
   "data": {
     "updateDocument": {
-      "id": "content/movies/star-wars.md",
+      "id": "content/movies/star-wars.mdx",
       "data": {
         "releaseDate": "2021-02-02T07:00:00.000Z",
         "archived": true,

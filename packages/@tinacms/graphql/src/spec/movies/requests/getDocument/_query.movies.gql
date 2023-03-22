@@ -1,5 +1,5 @@
 query {
-  document(collection: "movie", relativePath: "star-wars.md") {
+  document(collection: "movie", relativePath: "star-wars.mdx") {
     ... on Movie {
       id
       title
