@@ -1347,6 +1347,7 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
         if (field.list) {
           console.warn(listWarningMsg)
         }
+      case 'image':
       case 'string':
         return astBuilder.FieldDefinition({
           name: field.name,
