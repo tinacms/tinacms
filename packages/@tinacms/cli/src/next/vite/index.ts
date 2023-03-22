@@ -94,6 +94,8 @@ export const createConfig = async ({
        * but node does. This was a surprise, but using `new Object()` seems to do the trick.
        */
       'process.env': `new Object(${JSON.stringify(publicEnv)})`,
+      // Used by picomatch https://github.com/micromatch/picomatch/blob/master/lib/utils.js#L4
+      'process.platform': `"${process.platform}"`,
       __API_URL__: `"${apiURL}"`,
       __TOKEN__: `"${configManager.config.token}"`,
       __TINA_GRAPHQL_VERSION__: `"${configManager.getTinaGraphQLVersion()}"`,
@@ -102,7 +104,7 @@ export const createConfig = async ({
       force: true,
       // Not 100% sure why this isn't being picked up automatically, this works from within the monorepo
       // but breaks externally
-      include: ['react/jsx-runtime'],
+      include: ['react/jsx-runtime', 'react/jsx-dev-runtime'],
     },
     server: {
       watch: noWatch

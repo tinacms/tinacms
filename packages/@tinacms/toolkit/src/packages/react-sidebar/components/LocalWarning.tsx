@@ -12,7 +12,7 @@ import { useCMS } from '../../react-core'
 export const LocalWarning = () => {
   return (
     <a
-      className="flex-grow-0 flex w-full text-xs items-center py-1 px-4 text-yellow-600 bg-gradient-to-r from-yellow-50 to-yellow-100 border-b border-yellow-200"
+      className="flex-grow-0 flex w-full text-xs items-center py-1 px-4 text-yellow-600 bg-gradient-to-r from-yellow-50 to-yellow-100 border-b border-gray-150 shadow-sm"
       href="https://tina.io/docs/tina-cloud/"
       target="_blank"
     >

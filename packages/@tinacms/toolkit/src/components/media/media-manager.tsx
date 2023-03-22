@@ -23,7 +23,7 @@ import {
   MediaListError,
 } from '../../packages/core'
 import { Button, IconButton } from '../../packages/styles'
-import { useDropzone } from 'react-dropzone'
+import { FileError, useDropzone } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
@@ -291,7 +291,7 @@ export function MediaPicker({
       cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
     ),
     multiple: true,
-    onDrop: async (files) => {
+    onDrop: async (files, fileRejections) => {
       try {
         setUploading(true)
         await cms.media.persist(
@@ -302,6 +302,43 @@ export function MediaPicker({
             }
           })
         )
+
+        // Codes here https://github.com/react-dropzone/react-dropzone/blob/c36ab5bd8b8fd74e2074290d80e3ecb93d26b014/typings/react-dropzone.d.ts#LL13-L18C2
+        const errorCodes = {
+          'file-invalid-type': 'Invalid file type',
+          'file-too-large': 'File too large',
+          'file-too-small': 'File too small',
+          'too-many-files': 'Too many files',
+        }
+
+        const printError = (error: FileError) => {
+          const message = errorCodes[error.code]
+          if (message) {
+            return message
+          }
+          console.error(error)
+          return 'Unknown error'
+        }
+
+        // Upload Failed
+        if (fileRejections.length > 0) {
+          const messages = []
+          fileRejections.map((fileRejection) => {
+            messages.push(
+              `${fileRejection.file.name}: ${fileRejection.errors
+                .map((error) => printError(error))
+                .join(', ')}`
+            )
+          })
+          cms.alerts.error(() => {
+            return (
+              <>
+                Upload Failed. <br />
+                {messages.join('. ')}.
+              </>
+            )
+          })
+        }
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
       }
@@ -405,35 +442,7 @@ export function MediaPicker({
 
       <MediaPickerWrap>
         <div className="flex items-center bg-gray-50 border-b border-gray-150 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
-          {/* viewMode toggle */}
-          <div
-            className={`grow-0 flex divide-x divide-gray-150 shadow-inner bg-gray-50 border border-gray-150 justify-between rounded-md`}
-          >
-            <button
-              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2.5 py-1 transition-all ease-out duration-150 rounded-l-md ${
-                viewMode === 'grid'
-                  ? 'bg-white text-blue-500 shadow'
-                  : 'text-gray-400'
-              }`}
-              onClick={() => {
-                setViewMode('grid')
-              }}
-            >
-              <BiGridAlt className="w-6 h-full opacity-70" />
-            </button>
-            <button
-              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2 py-1 transition-all ease-out duration-150 rounded-r-md ${
-                viewMode === 'list'
-                  ? 'bg-white text-blue-500 shadow'
-                  : 'text-gray-400'
-              }`}
-              onClick={() => {
-                setViewMode('list')
-              }}
-            >
-              <BiListUl className="w-8 h-full opacity-70" />
-            </button>
-          </div>
+          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
 
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
           {!isLocal && hasTinaMedia && (
@@ -670,6 +679,42 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
       >
         Learn More
       </a>
+    </div>
+  )
+}
+
+const ViewModeToggle = ({ viewMode, setViewMode }) => {
+  const toggleClasses = {
+    base: 'relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base py-1 transition-all ease-out duration-150 border',
+    active:
+      'bg-white text-blue-500 shadow-inner border-gray-50 border-t-gray-100',
+    inactive: 'bg-gray-50 text-gray-400 shadow border-gray-100 border-t-white',
+  }
+
+  return (
+    <div
+      className={`grow-0 flex justify-between rounded-md border border-gray-100`}
+    >
+      <button
+        className={`${toggleClasses.base} px-2.5 rounded-l-md ${
+          viewMode === 'grid' ? toggleClasses.active : toggleClasses.inactive
+        }`}
+        onClick={() => {
+          setViewMode('grid')
+        }}
+      >
+        <BiGridAlt className="w-6 h-full opacity-70" />
+      </button>
+      <button
+        className={`${toggleClasses.base} px-2 rounded-r-md ${
+          viewMode === 'list' ? toggleClasses.active : toggleClasses.inactive
+        }`}
+        onClick={() => {
+          setViewMode('list')
+        }}
+      >
+        <BiListUl className="w-8 h-full opacity-70" />
+      </button>
     </div>
   )
 }

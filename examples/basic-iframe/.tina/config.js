@@ -146,6 +146,19 @@ export default defineConfig({
         ],
       },
       {
+        label: 'Blog 2',
+        name: 'post2',
+        path: 'content/new-folder-2',
+        format: 'md',
+        fields: [
+          {
+            type: 'string',
+            label: 'Title',
+            name: 'title',
+          },
+        ],
+      },
+      {
         label: 'Blog Posts',
         name: 'post',
         path: 'content/post',

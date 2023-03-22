@@ -71,21 +71,29 @@ export class DevCommand extends Command {
     // Initialize the host TCP server
     createDBServer()
 
-    const setup = async () => {
+    let database: Database = null
+
+    const setup = async ({ firstTime }: { firstTime: boolean }) => {
       try {
         await configManager.processConfig()
       } catch (e) {
-        logger.error(
-          'Unable to start dev server, please fix your Tina config and try again'
-        )
         logger.error(e.message)
         if (this.verbose) {
           console.error(e)
         }
-        process.exit(1)
+        if (firstTime) {
+          logger.error(
+            'Unable to start dev server, please fix your Tina config and try again'
+          )
+          process.exit(1)
+        }
+      }
+      if (firstTime) {
+        database = await createAndInitializeDatabase(configManager)
+      } else {
+        database.clearCache()
       }
 
-      const database = await createAndInitializeDatabase(configManager)
       const { tinaSchema, graphQLSchema, queryDoc, fragDoc } =
         await buildSchema(database, configManager.config)
       if (!configManager.isUsingLegacyFolder) {
@@ -139,7 +147,7 @@ export class DevCommand extends Command {
       }
       return { apiURL, database }
     }
-    const { apiURL, database } = await setup()
+    const { apiURL } = await setup({ firstTime: true })
 
     await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port))
     // Add the gitignore so the index.html and assets are committed to git
@@ -171,8 +179,10 @@ export class DevCommand extends Command {
         return
       }
       try {
-        await setup()
+        // await server.reloadModule
         logger.info('Tina config updated')
+        await setup({ firstTime: false })
+        // await server.restart()
       } catch (e) {
         logger.error(e.message)
       }
