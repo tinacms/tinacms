@@ -295,6 +295,10 @@ const rewriteTemplateKeysInDocs = (
       // update the data in page to have _template: tem
       try {
         const filePath = path.join(page)
+        if (fs.lstatSync(filePath).isDirectory()) {
+          // For some reason some templates have directories in the `pages` property
+          return
+        }
         const extname = path.extname(filePath)
         const fileContent = fs.readFileSync(filePath).toString()
         const content = parseFile(fileContent, extname, (yup) => yup.object({}))
