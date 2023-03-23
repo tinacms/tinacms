@@ -131,17 +131,23 @@ export const BranchSwitcher = ({
             x?.indexStatus?.status === 'unknown'
         )
         .forEach(async (x) => {
-          const [prom, cancel] = cms.api.tina.waitForIndexStatus({
+          const [
+            // When this promise resolves, we know the index status is no longer 'inprogress' or 'unknown'
+            waitForIndexStatusPromise,
+            // Calling this function will cancel the polling
+            cancelWaitForIndexFunc,
+          ] = cms.api.tina.waitForIndexStatus({
             ref: x.name,
           })
-          cancelFuncs.push(cancel)
-          prom
+          cancelFuncs.push(cancelWaitForIndexFunc)
+          waitForIndexStatusPromise
             .then((indexStatus) => {
-              setBranchList((prev) => {
-                const newList = Array.from(prev)
-                const index = newList.findIndex((y) => y.name === x.name)
-                newList[index].indexStatus = indexStatus
-                return newList
+              setBranchList((previousBranchList) => {
+                // update the index status of the branch
+                const newBranchList = Array.from(previousBranchList)
+                const index = newBranchList.findIndex((y) => y.name === x.name)
+                newBranchList[index].indexStatus = indexStatus
+                return newBranchList
               })
             })
             .catch((e) => {
