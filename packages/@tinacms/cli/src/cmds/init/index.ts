@@ -18,7 +18,6 @@ import { Telemetry } from '@tinacms/metrics'
 import { nextPostPage } from './setup-files'
 import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
-import { hasForestryConfig } from '../forestry-migrate/util'
 import { generateCollections } from '../forestry-migrate'
 import { ErrorSingleton } from '../forestry-migrate/util/errorSingleton'
 
@@ -28,10 +27,10 @@ export interface Framework {
 }
 
 export async function initStaticTina({
-  rootPath,
+  pathToForestryConfig,
   noTelemetry,
 }: {
-  rootPath: string
+  pathToForestryConfig: string
   noTelemetry: boolean
 }) {
   logger.level = 'info'
@@ -58,22 +57,24 @@ export async function initStaticTina({
   const publicFolder: string = await choosePublicFolder({ framework })
 
   // Detect forestry config
-  const forestryPath = await hasForestryConfig({ rootPath })
 
   let collections: string | null | undefined
 
   // If there is a forestry config, ask user to migrate it to tina collections
-  if (forestryPath.exists) {
+  const hasForestryConfig = await fs.pathExists(
+    path.join(pathToForestryConfig, '.forestry', 'settings.yml')
+  )
+
+  if (hasForestryConfig) {
     collections = await forestryMigrate({
-      forestryPath: forestryPath.path,
-      rootPath,
+      pathToForestryConfig,
     })
   }
 
   // Report telemetry
   await reportTelemetry({
     usingTypescript,
-    hasForestryConfig: forestryPath.exists,
+    hasForestryConfig,
     noTelemetry: noTelemetry,
   })
 
@@ -111,7 +112,7 @@ export async function initStaticTina({
     clientId,
   })
 
-  if (!forestryPath.exists) {
+  if (!hasForestryConfig) {
     // add /content/posts/hello-world.md
     await addContentFile({ baseDir: '' })
   }
@@ -217,11 +218,9 @@ const chooseFramework = async () => {
 }
 
 const forestryMigrate = async ({
-  forestryPath,
-  rootPath,
+  pathToForestryConfig,
 }: {
-  forestryPath: string
-  rootPath: string
+  pathToForestryConfig: string
 }): Promise<string> => {
   logger.info(`Forestry.io configuration found.`)
 
@@ -238,8 +237,7 @@ const forestryMigrate = async ({
     return null
   }
   const collections = await generateCollections({
-    forestryPath,
-    rootPath,
+    pathToForestryConfig,
   })
 
   // print errors

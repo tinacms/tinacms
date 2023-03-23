@@ -4,7 +4,7 @@ import { initStaticTina } from '../../../cmds/init'
 
 export class InitCommand extends Command {
   static paths = [['init']]
-  rootPath = Option.String('--forestryPath', {
+  pathToForestryConfig = Option.String('--forestryPath', {
     description:
       'Specify the relative path to the .forestry directory, if importing an existing forestry site.',
   })
@@ -24,7 +24,7 @@ export class InitCommand extends Command {
 
   async execute(): Promise<number | void> {
     await initStaticTina({
-      rootPath: this.rootPath || process.cwd(),
+      pathToForestryConfig: this.pathToForestryConfig || process.cwd(),
       noTelemetry: this.noTelemetry,
     })
     process.exit()

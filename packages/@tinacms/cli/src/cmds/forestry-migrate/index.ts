@@ -50,13 +50,13 @@ function checkExt(ext: string): Ext | false {
 }
 
 export const generateAllTemplates = async ({
-  rootPath,
+  pathToForestryConfig,
 }: {
-  rootPath: string
+  pathToForestryConfig: string
 }) => {
   const allTemplates = (
     await fs.readdir(
-      path.join(rootPath, '.forestry', 'front_matter', 'templates')
+      path.join(pathToForestryConfig, '.forestry', 'front_matter', 'templates')
     )
   ).map((tem) => path.basename(tem, '.yml'))
   const templateMap = new Map<
@@ -67,7 +67,7 @@ export const generateAllTemplates = async ({
     try {
       const { fields, templateObj } = getFieldsFromTemplates({
         tem,
-        rootPath,
+        pathToForestryConfig,
       })
       templateMap.set(tem, { fields, templateObj })
     } catch (e) {
@@ -257,17 +257,17 @@ const generateCollectionFromForestrySection = (
 }
 
 export const generateCollections = async ({
-  forestryPath,
-  rootPath,
+  pathToForestryConfig,
 }: {
-  forestryPath: string
-  rootPath: string
+  pathToForestryConfig: string
 }) => {
-  const templateMap = await generateAllTemplates({ rootPath })
+  const templateMap = await generateAllTemplates({ pathToForestryConfig })
 
-  const forestryConfig = await fs.readFile(forestryPath)
+  const forestryConfig = await fs.readFile(
+    path.join(pathToForestryConfig, '.forestry', 'settings.yml')
+  )
 
-  rewriteTemplateKeysInDocs(templateMap, rootPath)
+  rewriteTemplateKeysInDocs(templateMap, pathToForestryConfig)
   return parseSections({ val: yaml.load(forestryConfig.toString()) })
     .sections.map(
       (section): Collection =>
