@@ -6,8 +6,7 @@ import { createConfig } from '../../vite'
 export const buildProductionSpa = async (
   configManager: ConfigManager,
   database: Database,
-  apiURL: string,
-  noSDK: boolean
+  apiURL: string
 ) => {
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {}
@@ -39,7 +38,6 @@ export const buildProductionSpa = async (
     configManager,
     database,
     apiURL,
-    noSDK,
     noWatch: true,
   })
   return build(config)

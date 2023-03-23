@@ -48,10 +48,20 @@ export class ConfigManager {
   spaMainPath: string
   spaHTMLPath: string
   tinaGraphQLVersionFromCLI?: string
+  legacyNoSDK?: boolean
 
-  constructor(rootPath: string = process.cwd(), tinaGraphQLVersion?: string) {
+  constructor({
+    rootPath = process.cwd(),
+    tinaGraphQLVersion,
+    legacyNoSDK,
+  }: {
+    rootPath: string
+    tinaGraphQLVersion?: string
+    legacyNoSDK?: boolean
+  }) {
     this.rootPath = normalizePath(rootPath)
     this.tinaGraphQLVersionFromCLI = tinaGraphQLVersion
+    this.legacyNoSDK = legacyNoSDK
   }
 
   isUsingTs() {
@@ -64,6 +74,13 @@ export class ConfigManager {
 
   hasSeparateContentRoot() {
     return this.rootPath !== this.contentRootPath
+  }
+
+  shouldSkipSDK() {
+    if (this.legacyNoSDK) {
+      return this.legacyNoSDK
+    }
+    return this.config.client?.skip || false
   }
 
   async processConfig() {

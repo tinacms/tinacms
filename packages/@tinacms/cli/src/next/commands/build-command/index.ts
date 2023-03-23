@@ -29,7 +29,7 @@ export class BuildCommand extends Command {
     description: 'increase verbosity of logged output',
   })
   noSDK = Option.Boolean('--noSDK', false, {
-    description: "Don't generate the generated client SDK",
+    description: "DEPRECATED - Don't generate the generated client SDK",
   })
   isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
     description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
@@ -60,10 +60,11 @@ export class BuildCommand extends Command {
   }
 
   async execute(): Promise<number | void> {
-    const configManager = new ConfigManager(
-      this.rootPath,
-      this.tinaGraphQLVersion
-    )
+    const configManager = new ConfigManager({
+      rootPath: this.rootPath,
+      tinaGraphQLVersion: this.tinaGraphQLVersion,
+      legacyNoSDK: this.noSDK,
+    })
     logger.info('Starting Tina build')
     if (this.isomorphicGitBridge) {
       logger.warn('--isomorphicGitBridge has been deprecated')
@@ -75,6 +76,11 @@ export class BuildCommand extends Command {
     }
     if (this.localOption) {
       logger.warn('--local has been deprecated')
+    }
+    if (this.noSDK) {
+      logger.warn(
+        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at config.skip = true'
+      )
     }
 
     try {
@@ -96,7 +102,6 @@ export class BuildCommand extends Command {
     const codegen = new Codegen({
       schema: await getASTSchema(database),
       configManager: configManager,
-      noSDK: this.noSDK,
       queryDoc,
       fragDoc,
     })
@@ -106,7 +111,7 @@ export class BuildCommand extends Command {
     await waitForDB(configManager.config, apiURL, false)
     await this.checkGraphqlSchema(configManager, database, apiURL)
 
-    await buildProductionSpa(configManager, database, apiURL, this.noSDK)
+    await buildProductionSpa(configManager, database, apiURL)
 
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
@@ -115,7 +120,7 @@ export class BuildCommand extends Command {
     )
 
     const summaryItems = []
-    if (!this.noSDK) {
+    if (!configManager.shouldSkipSDK()) {
       summaryItems.push({
         emoji: '🤖',
         heading: 'Auto-generated files',
