@@ -92,7 +92,7 @@ export const useGraphQLReducer = (
 ) => {
   const cms = useCMS()
   const tinaSchema = cms.api.tina.schema as TinaSchema
-  const [payloads, setPayloads] = React.useState<Payload[] | []>([])
+  const [payloads, setPayloads] = React.useState<Payload[]>([])
   const [operationIndex, setOperationIndex] = React.useState(0)
 
   const handlePayload = React.useCallback(async (payload) => {
@@ -203,21 +203,21 @@ export const useGraphQLReducer = (
         return value
       },
     })
-    // if (result.errors) {
-    //   result.errors.forEach((error) => {
-    //     if (error instanceof ZodError) {
-    //       console.log(error.format())
-    //     } else {
-    //       console.log(error)
-    //     }
-    //   })
-    // } else {
-    //   iframe.current?.contentWindow?.postMessage({
-    //     type: 'updateData',
-    //     id: payload.id,
-    //     data: result.data,
-    //   })
-    // }
+    if (result.errors) {
+      result.errors.forEach((error) => {
+        if (error instanceof ZodError) {
+          console.log(error.format())
+        } else {
+          console.log(error)
+        }
+      })
+    } else {
+      iframe.current?.contentWindow?.postMessage({
+        type: 'updateData',
+        id: payload.id,
+        data: result.data,
+      })
+    }
   }, [])
 
   React.useEffect(() => {
@@ -323,6 +323,7 @@ const resolveDocument = (
   })
   return {
     ...formValues,
+    id: doc._sys.path,
     sys: doc._sys,
     values: form.values,
     _internalSys: doc._sys,
