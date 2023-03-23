@@ -8,6 +8,10 @@ export class InitCommand extends Command {
     description:
       'Specify the relative path to the .forestry directory, if importing an existing forestry site.',
   })
+  rootPath = Option.String('--rootPath', {
+    description:
+      'Specify the root directory to run the CLI from (defaults to current working directory)',
+  })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
   })
@@ -23,8 +27,10 @@ export class InitCommand extends Command {
   }
 
   async execute(): Promise<number | void> {
+    const rootPath = this.rootPath || process.cwd()
     await initStaticTina({
-      pathToForestryConfig: this.pathToForestryConfig || process.cwd(),
+      rootPath: rootPath,
+      pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,
     })
     process.exit()
