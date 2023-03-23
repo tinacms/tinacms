@@ -8,10 +8,10 @@
     "packages/[^@]*"
   ],
   "scripts": {
-    "watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
+    "watch": "FORCE_COLOR=1 pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
     "build": "turbo run build --filter=\"./packages/**\"",
-    "test": "turbo run test --filter=\"./packages/**\" -- --silent",
-    "types": "turbo run types --filter=\"./packages/**\"",
+    "test": "FORCE_COLOR=1 turbo run test --filter=\"./packages/**\" -- --silent",
+    "types": "FORCE_COLOR=1 turbo run types --filter=\"./packages/**\"",
     "build:e2e": "pnpm run build && pnpm --filter=kitchen-sink-starter run build",
     "start:e2e": "pnpm --filter=kitchen-sink-starter run start ",
     "start:e2e:dev": "pnpm --filter=kitchen-sink-starter run dev",
@@ -47,7 +47,7 @@
     "@types/jest": "^27.5.2",
     "cypress": "9.5.3",
     "husky": "^7.0.4",
-    "turbo": "^1.8.3"
+    "turbo": "^1.8.5"
   },
   "pnpm": {
     "overrides": {
