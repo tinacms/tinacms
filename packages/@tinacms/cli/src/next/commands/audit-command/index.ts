@@ -39,7 +39,7 @@ export class AuditCommand extends Command {
   }
 
   async execute(): Promise<number | void> {
-    const configManager = new ConfigManager(this.rootPath)
+    const configManager = new ConfigManager({ rootPath: this.rootPath })
     logger.info('Starting Tina Audit')
 
     try {
