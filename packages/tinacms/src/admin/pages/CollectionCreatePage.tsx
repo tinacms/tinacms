@@ -17,7 +17,6 @@ import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
-import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 import { useWindowWidth } from '@react-hook/window-size'
 import { FaLock, FaUnlock } from 'react-icons/fa'
 
@@ -30,20 +29,13 @@ const createDocument = async (
 ) => {
   const api = new TinaAdminApi(cms)
   const { filename, ...leftover } = values
-  const { includeCollection, includeTemplate } = mutationInfo
 
   const relativePath = `${filename}.${collection.format}`
-  const params = transformDocumentIntoMutationRequestPayload(
-    {
-      _collection: collection.name,
-      ...(template && { _template: template.name }),
-      ...leftover,
-    },
-    {
-      includeCollection,
-      includeTemplate,
-    }
-  )
+  const params = api.schema.transformPayload(collection.name, {
+    _collection: collection.name,
+    ...(template && { _template: template.name }),
+    ...leftover,
+  })
 
   if (await api.isAuthenticated()) {
     await api.createDocument(collection.name, relativePath, params)
