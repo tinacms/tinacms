@@ -1,5 +1,22 @@
 # @tinacms/mdx
 
+## 1.3.5
+
+### Patch Changes
+
+- 9e86312d6: Skip html tokenization when skipEscaping is enabled.
+- 5d1e0e406: Support mdx block elements when children are on the same line. Eg.
+
+  ```
+  <Cta>Hello, world</Cta>
+  ```
+
+- cbc1fb919: Provide browser-specific version of @tinacms/mdx
+- Updated dependencies [76c984bcc]
+- Updated dependencies [5809796cf]
+- Updated dependencies [54aac9017]
+  - @tinacms/schema-tools@1.4.0
+
 ## 1.3.4
 
 ### Patch Changes

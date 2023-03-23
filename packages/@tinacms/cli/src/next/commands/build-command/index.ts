@@ -14,8 +14,10 @@ import {
   getIntrospectionQuery,
 } from 'graphql'
 import { diff } from '@graphql-inspector/core'
-import { waitForDB } from './waitForDB'
+import { IndexStatusResponse, waitForDB } from './waitForDB'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
+import { sleepAndCallFunc } from '../../../utils/sleep'
+import { dangerText, linkText } from '../../../utils/theme'
 
 export class BuildCommand extends Command {
   static paths = [['build']]
@@ -29,12 +31,22 @@ export class BuildCommand extends Command {
   noSDK = Option.Boolean('--noSDK', false, {
     description: "Don't generate the generated client SDK",
   })
+  isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
+    description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
+  })
+  localOption = Option.Boolean('--local', {
+    description: 'DEPRECATED: Uses the local file system graphql server',
+  })
+  experimentalDataLayer = Option.Boolean('--experimentalData', {
+    description:
+      'DEPRECATED - Build the server with additional data querying capabilities',
+  })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
   })
   tinaGraphQLVersion = Option.String('--tina-graphql-version', {
     description:
-      'Specify the root directory to run the CLI from (defaults to current working directory)',
+      'Specify the version of @tinacms/graphql to use (defaults to latest)',
   })
 
   static usage = Command.Usage({
@@ -53,6 +65,17 @@ export class BuildCommand extends Command {
       this.tinaGraphQLVersion
     )
     logger.info('Starting Tina build')
+    if (this.isomorphicGitBridge) {
+      logger.warn('--isomorphicGitBridge has been deprecated')
+    }
+    if (this.experimentalDataLayer) {
+      logger.warn(
+        '--experimentalDataLayer has been deprecated, the data layer is now built-in automatically'
+      )
+    }
+    if (this.localOption) {
+      logger.warn('--local has been deprecated')
+    }
 
     try {
       await configManager.processConfig()
@@ -147,16 +170,21 @@ export class BuildCommand extends Command {
     const token = config.token
     const { clientId, branch, host } = parseURL(apiURL)
     const url = `https://${host}/db/${clientId}/status/${branch}`
-    const bar = new Progress('Checking clientId, token and branch. :prog', 1)
+    const bar = new Progress('Checking clientId and token. :prog', 1)
 
+    // Check the client information
+    let branchKnown = false
     try {
-      await request({
+      const res = await request({
         token,
         url,
       })
       bar.tick({
         prog: '✅',
       })
+      if (!(res.status === 'unknown')) {
+        branchKnown = true
+      }
     } catch (e) {
       summary({
         heading: 'Error when checking client information',
@@ -165,10 +193,6 @@ export class BuildCommand extends Command {
             emoji: '❌',
             heading: 'You provided',
             subItems: [
-              {
-                key: 'branch',
-                value: config.branch,
-              },
               {
                 key: 'clientId',
                 value: config.clientId,
@@ -183,6 +207,75 @@ export class BuildCommand extends Command {
       })
       throw e
     }
+
+    const branchBar = new Progress('Checking branch is on Tina Cloud. :prog', 1)
+
+    // We know the branch is known (could be status: 'failed', 'inprogress' or 'success')
+    if (branchKnown) {
+      branchBar.tick({
+        prog: '✅',
+      })
+      return
+    }
+
+    // We know the branch is status: 'unknown'
+
+    // Check for a max of 6 times
+    for (let i = 0; i <= 5; i++) {
+      await sleepAndCallFunc({
+        fn: async () => {
+          const res = await request({
+            token,
+            url,
+          })
+          if (this.verbose) {
+            logger.info(
+              `Branch status: ${res.status}. Attempt: ${
+                i + 1
+              }. Trying again in 5 seconds.`
+            )
+          }
+          if (!(res.status === 'unknown')) {
+            branchBar.tick({
+              prog: '✅',
+            })
+            return
+          }
+        },
+        ms: 5000,
+      })
+    }
+
+    branchBar.tick({
+      prog: '❌',
+    })
+
+    // I wanted to use the summary function here but I was getting the following error:
+    // RangeError: Invalid count value
+    // at String.repeat (<anonymous>)
+    // summary({
+    //   heading: `ERROR: Branch '${branch}' is not on Tina Cloud. Please make sure that branch '${branch}' exists in your repository and that you have pushed your all changes to the remote. View all all branches and there current status here: https://app.tina.io/projects/${clientId}/configuration`,
+    //   items: [
+    //     {
+    //       emoji: '❌',
+    //       heading: 'You provided',
+    //       subItems: [
+    //         {
+    //           key: 'branch',
+    //           value: config.branch,
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // })
+    logger.error(
+      `${dangerText(
+        `ERROR: Branch '${branch}' is not on Tina Cloud.`
+      )} Please make sure that branch '${branch}' exists in your repository and that you have pushed your all changes to the remote. View all all branches and there current status here: ${linkText(
+        `https://app.tina.io/projects/${clientId}/configuration`
+      )}`
+    )
+    throw new Error('Branch is not on Tina Cloud')
   }
 
   async checkGraphqlSchema(
@@ -272,7 +365,7 @@ async function request(args: {
   return {
     status: json?.status,
     timestamp: json?.timestamp,
-  }
+  } as { status: IndexStatusResponse['status']; timestamp: number }
 }
 
 export const fetchRemoteGraphqlSchema = async ({

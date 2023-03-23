@@ -1,7 +1,7 @@
 mutation {
   addPendingDocument(
     collection: "movie"
-    relativePath: "empire-strikes-back.md"
+    relativePath: "empire-strikes-back.mdx"
   ) {
     ... on MovieDocument {
       id

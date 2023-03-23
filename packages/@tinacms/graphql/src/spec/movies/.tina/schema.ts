@@ -2,7 +2,7 @@
 
 */
 
-import { Schema } from '../../../types'
+import { Schema } from '@tinacms/schema-tools'
 import { richBody } from './body'
 
 const tinaSchema: Schema = {
@@ -11,6 +11,7 @@ const tinaSchema: Schema = {
       label: 'Movie',
       name: 'movie',
       path: 'content/movies',
+      format: 'mdx',
       fields: [
         {
           name: 'title',
