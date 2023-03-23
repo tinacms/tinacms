@@ -92,10 +92,10 @@ export const useGraphQLReducer = (
 ) => {
   const cms = useCMS()
   const tinaSchema = cms.api.tina.schema as TinaSchema
-  const [payload, setPayload] = React.useState<Payload | null>(null)
+  const [payloads, setPayloads] = React.useState<Payload[] | []>([])
   const [operationIndex, setOperationIndex] = React.useState(0)
 
-  React.useMemo(async () => {
+  const handlePayload = React.useCallback(async (payload) => {
     if (!payload?.query) {
       return
     }
@@ -196,28 +196,35 @@ export const useGraphQLReducer = (
             cms.forms.add(form)
           } else {
             form = existingForm
+            form.addQuery(payload.id)
           }
           return resolveDocument(doc, template, form)
         }
         return value
       },
     })
-    if (result.errors) {
-      result.errors.forEach((error) => {
-        if (error instanceof ZodError) {
-          console.log(error.format())
-        } else {
-          console.log(error)
-        }
-      })
-    } else {
-      iframe.current?.contentWindow?.postMessage({
-        type: 'updateData',
-        id: payload.id,
-        data: result.data,
-      })
-    }
-  }, [payload?.id, operationIndex])
+    // if (result.errors) {
+    //   result.errors.forEach((error) => {
+    //     if (error instanceof ZodError) {
+    //       console.log(error.format())
+    //     } else {
+    //       console.log(error)
+    //     }
+    //   })
+    // } else {
+    //   iframe.current?.contentWindow?.postMessage({
+    //     type: 'updateData',
+    //     id: payload.id,
+    //     data: result.data,
+    //   })
+    // }
+  }, [])
+
+  React.useEffect(() => {
+    payloads.forEach((payload) => {
+      handlePayload(payload)
+    })
+  }, [payloads.map(({ id }) => id).join('.'), operationIndex])
 
   const notifyEditMode = React.useCallback(
     (event: MessageEvent<PostMessage>) => {
@@ -227,7 +234,7 @@ export const useGraphQLReducer = (
         })
       }
     },
-    [setPayload]
+    []
   )
   const handleOpenClose = React.useCallback(
     (event: MessageEvent<PostMessage>) => {
@@ -246,10 +253,15 @@ export const useGraphQLReducer = (
           variables: z.record(z.unknown()),
           data: z.record(z.unknown()),
         })
-        setPayload(payloadSchema.parse(event.data))
+        const payload = payloadSchema.parse(event.data)
+        setPayloads((payloads) => [
+          ...payloads.filter(({ id }) => id !== payload.id),
+          payload,
+        ])
+        setOperationIndex((index) => index + 1)
       }
     },
-    [setPayload, cms]
+    [, cms]
   )
 
   React.useEffect(() => {

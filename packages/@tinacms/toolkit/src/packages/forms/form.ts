@@ -225,9 +225,6 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   }
   removeQuery(queryId: string) {
     this.queries = this.queries.filter((id) => id !== queryId)
-    if (this.queries.length === 0) {
-      console.log(`I should be removed. ${this.id}`)
-    }
   }
 
   /**
