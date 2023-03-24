@@ -103,7 +103,11 @@ export async function initStaticTina({
 
   // add .tina/config.{js,ts}]
   await addConfigFile({
-    publicFolder,
+    // remove process fom pathToForestryConfig and add publicFolder
+    publicFolder: path.join(
+      path.relative(process.cwd(), pathToForestryConfig),
+      publicFolder
+    ),
     baseDir: '',
     usingTypescript,
     framework,
