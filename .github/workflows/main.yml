@@ -64,6 +64,21 @@ jobs:
       - name: Build Types
         run: pnpm types
 
+      - name: Set NPMRC
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Publish tagged PR
+        if: contains(github.event.pull_request.labels.*.name, 'tagged')
+        allow-failure: true
+        run: |
+          echo running on branch ${GITHUB_REF##*/}
+          pnpm version:snapshot
+          pnpm publish -r --tag ${GITHUB_REF##*/} --no-git-checks --access public
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Test
         run: pnpm test
 
