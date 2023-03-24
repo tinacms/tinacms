@@ -20,6 +20,7 @@ importers:
       eslint-plugin-react-hooks: ^2.5.1
       husky: ^7.0.4
       mime-types: ^2.1.35
+      nodemon: 2.0.22
       prettier: ^2.8.4
       pretty-quick: ^3.1.3
       turbo: ^1.8.5
@@ -36,6 +37,7 @@ importers:
       eslint-plugin-react: 7.32.2_eslint@6.8.0
       eslint-plugin-react-hooks: 2.5.1_eslint@6.8.0
       mime-types: 2.1.35
+      nodemon: 2.0.22
       prettier: 2.8.4
       pretty-quick: 3.1.3_prettier@2.8.4
       typescript: 4.3.5
@@ -11961,7 +11963,7 @@ packages:
       debug: 4.3.4
       globby: 11.1.0
       is-glob: 4.0.3
-      semver: 7.3.7
+      semver: 7.3.8
       tsutils: 3.21.0_typescript@4.3.5
       typescript: 4.3.5
     transitivePeerDependencies:
@@ -11985,7 +11987,7 @@ packages:
       debug: 4.3.4
       globby: 11.1.0
       is-glob: 4.0.3
-      semver: 7.3.7
+      semver: 7.3.8
       tsutils: 3.21.0
     transitivePeerDependencies:
       - supports-color
@@ -12008,7 +12010,7 @@ packages:
       debug: 4.3.4
       globby: 11.1.0
       is-glob: 4.0.3
-      semver: 7.3.7
+      semver: 7.3.8
       tsutils: 3.21.0_typescript@4.8.4
       typescript: 4.8.4
     transitivePeerDependencies:
@@ -12032,7 +12034,7 @@ packages:
       eslint: 8.24.0
       eslint-scope: 5.1.1
       eslint-utils: 3.0.0_eslint@8.24.0
-      semver: 7.3.7
+      semver: 7.3.8
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -13375,7 +13377,7 @@ packages:
       p-limit: 2.3.0
       pluralize: 7.0.0
       pretty-bytes: 5.6.0
-      semver: 7.3.7
+      semver: 7.3.8
       stream-to-promise: 2.2.0
       tar-stream: 2.2.0
       treeify: 1.1.0
@@ -13496,7 +13498,6 @@ packages:
       {
         integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==,
       }
-    dev: true
 
   /abort-controller/3.0.0:
     resolution:
@@ -15926,10 +15927,7 @@ packages:
     dev: false
 
   /concat-map/0.0.1:
-    resolution:
-      {
-        integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==,
-      }
+    resolution: { integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s= }
 
   /concat-md/0.5.1:
     resolution:
@@ -16634,7 +16632,6 @@ packages:
     dependencies:
       ms: 2.1.3
       supports-color: 5.5.0
-    dev: true
 
   /debug/3.2.7_supports-color@8.1.1:
     resolution:
@@ -21502,7 +21499,6 @@ packages:
       {
         integrity: sha512-Ius2VYcGNk7T90CppJqcIkS5ooHUZyIQK+ClZfMfMNFEF9VSE73Fq+906u/CWu92x4gzZMWOwfFYckPObzdEbA==,
       }
-    dev: true
 
   /ignore/4.0.6:
     resolution:
@@ -26952,6 +26948,26 @@ packages:
       undefsafe: 2.0.5
     dev: true
 
+  /nodemon/2.0.22:
+    resolution:
+      {
+        integrity: sha512-B8YqaKMmyuCO7BowF1Z1/mkPqLk6cs/l63Ojtd6otKjMx47Dq1utxfRxcavH1I7VSaL8n5BUaoutadnsX3AAVQ==,
+      }
+    engines: { node: '>=8.10.0' }
+    hasBin: true
+    dependencies:
+      chokidar: 3.5.3
+      debug: 3.2.7_supports-color@5.5.0
+      ignore-by-default: 1.0.1
+      minimatch: 3.1.2
+      pstree.remy: 1.1.8
+      semver: 5.7.1
+      simple-update-notifier: 1.0.7
+      supports-color: 5.5.0
+      touch: 3.1.0
+      undefsafe: 2.0.5
+    dev: false
+
   /nopt/1.0.10:
     resolution:
       {
@@ -26960,7 +26976,6 @@ packages:
     hasBin: true
     dependencies:
       abbrev: 1.1.1
-    dev: true
 
   /normalize-package-data/2.5.0:
     resolution:
@@ -28656,7 +28671,6 @@ packages:
       {
         integrity: sha512-77DZwxQmxKnu3aR542U+X8FypNzbfJ+C5XQDk3uWjWxn6151aIMGthWYRXTqT1E5oJvg+ljaa2OJi+VfvCOQ8w==,
       }
-    dev: true
 
   /pump/3.0.0:
     resolution:
@@ -30336,7 +30350,6 @@ packages:
         integrity: sha512-+GB6zVA9LWh6zovYQLALHwv5rb2PHGlJi3lfiqIHxR0uuwCgefcOJc59v9fv1w8GbStwxuuqqAjI9NMAOOgq1A==,
       }
     hasBin: true
-    dev: true
 
   /semver/7.3.7:
     resolution:
@@ -30347,6 +30360,7 @@ packages:
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
+    dev: true
 
   /semver/7.3.8:
     resolution:
@@ -30592,7 +30606,6 @@ packages:
     engines: { node: '>=8.10.0' }
     dependencies:
       semver: 7.0.0
-    dev: true
 
   /sisteransi/1.0.5:
     resolution:
@@ -32173,7 +32186,6 @@ packages:
     hasBin: true
     dependencies:
       nopt: 1.0.10
-    dev: true
 
   /tough-cookie/2.5.0:
     resolution:
@@ -32816,7 +32828,6 @@ packages:
       {
         integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==,
       }
-    dev: true
 
   /underscore/1.13.6:
     resolution:
