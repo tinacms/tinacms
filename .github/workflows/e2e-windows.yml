@@ -7,10 +7,11 @@ jobs:
     # container: cypress/browsers:node14.17.6-chrome100-ff98
     # container: cypress/browsers:node14.17.0-chrome88-ff89
     container: cypress/browsers:node16.5.0-chrome94-ff93
-    name: E2E on Tests
+    name: E2E on Tests Windows
     strategy:
       matrix:
-        browser: 'chrome'
+        browser:
+          - 'chrome'
     steps:
       - uses: actions/checkout@v2
       - uses: pnpm/action-setup@v2.2.2
