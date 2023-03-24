@@ -71,7 +71,7 @@ jobs:
 
       - name: Publish tagged PR
         if: contains(github.event.pull_request.labels.*.name, 'tagged')
-        allow-failure: true
+        continue-on-error: true
         run: |
           echo running on branch ${GITHUB_REF##*/}
           pnpm version:snapshot
