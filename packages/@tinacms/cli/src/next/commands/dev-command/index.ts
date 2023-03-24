@@ -46,7 +46,7 @@ export class DevCommand extends Command {
     description: "Don't regenerate config on file changes",
   })
   noSDK = Option.Boolean('--noSDK', false, {
-    description: "DEPRECATED - Don't generate the generated client SDK",
+    description: "DEPRECATED - This should now be set in the config at config.skip = true'. Don't generate the generated client SDK",
   })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
