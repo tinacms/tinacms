@@ -8,10 +8,10 @@
     "packages/[^@]*"
   ],
   "scripts": {
-    "watch": "FORCE_COLOR=1 pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
+    "watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
     "build": "turbo run build --filter=\"./packages/**\"",
-    "test": "FORCE_COLOR=1 turbo run test --filter=\"./packages/**\" -- --silent",
-    "types": "FORCE_COLOR=1 turbo run types --filter=\"./packages/**\"",
+    "test": "turbo run test --filter=\"./packages/**\" -- --silent",
+    "types": "turbo run types --filter=\"./packages/**\"",
     "build:e2e": "pnpm run build && pnpm --filter=kitchen-sink-starter run build",
     "start:e2e": "pnpm --filter=kitchen-sink-starter run start ",
     "start:e2e:dev": "pnpm --filter=kitchen-sink-starter run dev",
