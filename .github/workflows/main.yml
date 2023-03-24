@@ -33,7 +33,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16
-          cache: 'pnpm'
 
       - uses: pnpm/action-setup@v2.2.2
         name: Install pnpm
