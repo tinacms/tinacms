@@ -24,6 +24,7 @@ cli.register(DevCommand)
 cli.register(BuildCommand)
 cli.register(AuditCommand)
 cli.register(InitCommand)
+// Small tweak to test cache
 // Uncomment when cloud supports /tina & tina-lock.json
 // cli.register(CodemodCommand)
 cli.register(Builtins.DefinitionsCommand)
