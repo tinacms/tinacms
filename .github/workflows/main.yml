@@ -14,7 +14,7 @@ jobs:
         os:
           - ubuntu-latest
           - macOS-latest
-        #  - windows-latest
+          - windows-latest
         node-version: [14.x]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
