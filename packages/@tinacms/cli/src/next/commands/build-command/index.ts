@@ -29,7 +29,8 @@ export class BuildCommand extends Command {
     description: 'increase verbosity of logged output',
   })
   noSDK = Option.Boolean('--noSDK', false, {
-    description: "DEPRECATED - This should now be set in the config at config.skip = true'. Don't generate the generated client SDK",
+    description:
+      "DEPRECATED - This should now be set in the config at client.skip = true'. Don't generate the generated client SDK",
   })
   isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
     description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
@@ -79,7 +80,7 @@ export class BuildCommand extends Command {
     }
     if (this.noSDK) {
       logger.warn(
-        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at config.skip = true'
+        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
       )
     }
 

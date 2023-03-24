@@ -46,7 +46,8 @@ export class DevCommand extends Command {
     description: "Don't regenerate config on file changes",
   })
   noSDK = Option.Boolean('--noSDK', false, {
-    description: "DEPRECATED - This should now be set in the config at config.skip = true'. Don't generate the generated client SDK",
+    description:
+      "DEPRECATED - This should now be set in the config at client.skip = true'. Don't generate the generated client SDK",
   })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
@@ -83,7 +84,7 @@ export class DevCommand extends Command {
     }
     if (this.noSDK) {
       logger.warn(
-        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at config.skip = true'
+        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
       )
     }
     const configManager = new ConfigManager({
