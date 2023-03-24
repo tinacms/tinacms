@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.6.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+
+### Patch Changes
+
+- 084a39d2c: Dont trigger hover events for ListFieldMeta when wrapping objects
+- 785748400: Add error modal for failed media uploads
+  - @tinacms/sharedctx@1.0.1
+
 ## 1.5.2
 
 ### Patch Changes

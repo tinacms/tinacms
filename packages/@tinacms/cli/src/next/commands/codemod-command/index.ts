@@ -3,7 +3,6 @@ import { logger } from '../../../logger'
 import { ConfigManager } from '../../config-manager'
 import fs from 'fs-extra'
 import path from 'path'
-import { execShellCommand } from '../../../cmds/init'
 
 export class CodemodCommand extends Command {
   static paths = [['codemod'], ['codemod', 'move-tina-folder']]

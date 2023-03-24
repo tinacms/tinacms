@@ -14,7 +14,6 @@ import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
-import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 import { useWindowWidth } from '@react-hook/window-size'
 
 const updateDocument = async (
@@ -25,11 +24,7 @@ const updateDocument = async (
   values: any
 ) => {
   const api = new TinaAdminApi(cms)
-  const { includeCollection, includeTemplate } = mutationInfo
-  const params = transformDocumentIntoMutationRequestPayload(values, {
-    includeCollection,
-    includeTemplate,
-  })
+  const params = api.schema.transformPayload(collection.name, values)
   if (await api.isAuthenticated()) {
     await api.updateDocument(collection.name, relativePath, params)
   } else {

@@ -20,6 +20,10 @@ export class DevCommand extends Command {
   port = Option.String('-p,--port', '4001', {
     description: 'Specify a port to run the server on. (default 4001)',
   })
+  datalayerPort = Option.String('--datalayer-port', '9000', {
+    description:
+      'Specify a port to run the datalayer server on. (default 4001)',
+  })
   subCommand = Option.String('-c,--command', {
     description: 'The sub-command to run',
   })
@@ -93,7 +97,7 @@ export class DevCommand extends Command {
     logger.info('Starting Tina Dev Server')
 
     // Initialize the host TCP server
-    createDBServer()
+    createDBServer(Number(this.datalayerPort))
 
     let database: Database = null
 

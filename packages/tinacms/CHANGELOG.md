@@ -1,5 +1,23 @@
 # tinacms
 
+## 1.4.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+
+### Patch Changes
+
+- 202cd714d: Internal updates to the CLI
+- Updated dependencies [084a39d2c]
+- Updated dependencies [76c984bcc]
+- Updated dependencies [5809796cf]
+- Updated dependencies [785748400]
+- Updated dependencies [54aac9017]
+  - @tinacms/toolkit@1.6.0
+  - @tinacms/schema-tools@1.4.0
+  - @tinacms/sharedctx@1.0.1
+
 ## 1.3.3
 
 ### Patch Changes

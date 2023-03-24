@@ -31,6 +31,10 @@ export class BuildCommand extends Command {
   noSDK = Option.Boolean('--noSDK', false, {
     description: "DEPRECATED - Don't generate the generated client SDK",
   })
+  datalayerPort = Option.String('--datalayer-port', '9000', {
+    description:
+      'Specify a port to run the datalayer server on. (default 4001)',
+  })
   isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
     description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
   })
@@ -92,7 +96,7 @@ export class BuildCommand extends Command {
     }
 
     // Initialize the host TCP server
-    createDBServer()
+    createDBServer(Number(this.datalayerPort))
     const database = await createAndInitializeDatabase(configManager)
     const { queryDoc, fragDoc } = await buildSchema(
       database,
