@@ -29,7 +29,7 @@ export class BuildCommand extends Command {
     description: 'increase verbosity of logged output',
   })
   noSDK = Option.Boolean('--noSDK', false, {
-    description: "DEPRECATED - This should now be set in the config at config.skip = true'". Don't generate the generated client SDK",
+    description: "DEPRECATED - This should now be set in the config at config.skip = true'. Don't generate the generated client SDK",
   })
   isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
     description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
