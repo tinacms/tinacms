@@ -33,39 +33,31 @@ export class ErrorSingleton {
   public static getInstance(): ErrorSingleton {
     if (!ErrorSingleton.instance) {
       ErrorSingleton.instance = new ErrorSingleton()
-      ErrorSingleton.instance.allErrorNames = []
+      ErrorSingleton.instance.collectionNameErrors = []
     }
 
     return ErrorSingleton.instance
   }
 
-  private allErrorNames: NameError[]
+  private collectionNameErrors: NameError[]
 
   public addErrorName(error: NameError) {
-    this.allErrorNames.push(error)
+    this.collectionNameErrors.push(error)
   }
-  public printNameErrors() {
-    logger.error(
-      dangerText('ERROR: TinaCMS only supports alphanumeric field names')
-    )
-    logger.error(
-      `If you wish to edit any of the following fields or template names you will have to update your content and code to use the new name. See ${linkText(
-        'https://tina.io/docs/forestry/common-errors/#migrating-fields-with-non-alphanumeric-characters'
-      )} for more information.`
-    )
-    logger.error('The following template and field names have been renamed:`')
-    this.allErrorNames.forEach((error) => {
+  public printCollectionNameErrors() {
+    if (this.collectionNameErrors?.length) {
       logger.error(
-        `- Content that uses ${error.template}.yaml: ${error.name} -> ${error.newName}`
+        dangerText('ERROR: TinaCMS only supports alphanumeric template names')
       )
-    })
-
-    // logger.error(
-    //   `${dangerText(
-    //     `Name, "${name}" used in Frontmatter template "${template}.yaml" must be alphanumeric and can only contain underscores.`
-    //   )}\n "${name}" will be updated to ${newName} in  TinaCMS if you wish to edit attribute ${name} you will have to update your content and code to use ${newName} instead. See ${linkText(
-    //     'https://tina.io/docs/forestry/common-errors/#migrating-fields-with-non-alphanumeric-characters'
-    //   )} for more information.`
-    // )
+      logger.error('The following templates have been renamed:')
+      this.collectionNameErrors.forEach((error) => {
+        logger.error(`- ${error.template}.yaml -> ${error.newName}`)
+      })
+      logger.error(
+        `If you wish to edit any of the following templates, you will have to update your content and code to use the new name. See ${linkText(
+          'https://tina.io/docs/forestry/common-errors/#migrating-fields-with-non-alphanumeric-characters'
+        )} for more information.`
+      )
+    }
   }
 }
