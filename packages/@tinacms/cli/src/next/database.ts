@@ -16,7 +16,7 @@ import { createServer } from 'net'
 import { ManyLevelHost } from 'many-level'
 import { MemoryLevel } from 'memory-level'
 
-export const createDBServer = () => {
+export const createDBServer = (port: number) => {
   const levelHost = new ManyLevelHost(
     // @ts-ignore
     new MemoryLevel<string, Record<string, any>>({
@@ -32,10 +32,12 @@ export const createDBServer = () => {
   dbServer.once('error', (err) => {
     // @ts-ignore err.code undefined
     if (err?.code === 'EADDRINUSE') {
-      throw new Error(`Tina Dev server is already in use`)
+      throw new Error(
+        `Tina Dev server is already in use. Datalayer server is busy on port ${port}`
+      )
     }
   })
-  dbServer.listen(9000)
+  dbServer.listen(port)
 }
 
 export async function createAndInitializeDatabase(
