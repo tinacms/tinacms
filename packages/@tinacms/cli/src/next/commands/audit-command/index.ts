@@ -25,6 +25,10 @@ export class AuditCommand extends Command {
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
   })
+  datalayerPort = Option.String('--datalayer-port', '9000', {
+    description:
+      'Specify a port to run the datalayer server on. (default 4001)',
+  })
   static usage = Command.Usage({
     category: `Commands`,
     description: `Audit config and content files`,
@@ -53,7 +57,7 @@ export class AuditCommand extends Command {
     }
 
     // Initialize the host TCP server
-    createDBServer()
+    createDBServer(Number(this.datalayerPort))
     const database = await createAndInitializeDatabase(
       configManager,
       this.clean ? undefined : new AuditFileSystemBridge(configManager.rootPath)

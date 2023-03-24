@@ -1264,9 +1264,19 @@ const getTemplateForFile = (
   }
   if (templateInfo.type === 'union') {
     if (hasOwnProperty(data, '_template')) {
-      return templateInfo.templates.find(
+      const template = templateInfo.templates.find(
         (t) => lastItem(t.namespace) === data._template
       )
+      if (!template) {
+        throw new Error(
+          `Unable to find template "${
+            data._template
+          }". Possible templates are: ${templateInfo.templates
+            .map((template) => `"${template.name}"`)
+            .join(', ')}.`
+        )
+      }
+      return template
     } else {
       throw new Error(
         `Expected _template to be provided for document in an ambiguous collection`
