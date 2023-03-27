@@ -22,7 +22,7 @@ export class DevCommand extends Command {
   })
   datalayerPort = Option.String('--datalayer-port', '9000', {
     description:
-      'Specify a port to run the datalayer server on. (default 4001)',
+      'Specify a port to run the datalayer server on. (default 9000)',
   })
   subCommand = Option.String('-c,--command', {
     description: 'The sub-command to run',
@@ -109,7 +109,10 @@ export class DevCommand extends Command {
         }
       }
       if (firstTime) {
-        database = await createAndInitializeDatabase(configManager)
+        database = await createAndInitializeDatabase(
+          configManager,
+          Number(this.datalayerPort)
+        )
       } else {
         database.clearCache()
       }

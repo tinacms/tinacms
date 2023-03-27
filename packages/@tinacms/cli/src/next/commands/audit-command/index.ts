@@ -27,7 +27,7 @@ export class AuditCommand extends Command {
   })
   datalayerPort = Option.String('--datalayer-port', '9000', {
     description:
-      'Specify a port to run the datalayer server on. (default 4001)',
+      'Specify a port to run the datalayer server on. (default 9000)',
   })
   static usage = Command.Usage({
     category: `Commands`,
@@ -60,6 +60,7 @@ export class AuditCommand extends Command {
     createDBServer(Number(this.datalayerPort))
     const database = await createAndInitializeDatabase(
       configManager,
+      Number(this.datalayerPort),
       this.clean ? undefined : new AuditFileSystemBridge(configManager.rootPath)
     )
     const { tinaSchema, graphQLSchema } = await buildSchema(
