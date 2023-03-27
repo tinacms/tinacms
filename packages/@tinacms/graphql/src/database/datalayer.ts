@@ -3,12 +3,16 @@
 */
 
 import { JSONPath } from 'jsonpath-plus'
+import sha from 'js-sha1'
 import {
   BatchOp,
+  CONTENT_ROOT_PREFIX,
   INDEX_KEY_FIELD_SEPARATOR,
   Level,
   SUBLEVEL_OPTIONS,
 } from './level'
+import { Collection } from '@tinacms/schema-tools'
+import path from 'path'
 
 export enum OP {
   EQ = 'eq',
@@ -529,6 +533,131 @@ export const makeFilterSuffixes = (
   } else {
     return {}
   }
+}
+
+const FOLDER_ROOT = '~'
+type FolderTree = Record<string, Set<string>>
+
+const stripCollectionFromPath = (collectionPath: string, path: string) => {
+  const collectionPathParts = collectionPath.split('/')
+  const pathParts = path.split('/')
+  const strippedPathParts = pathParts.slice(collectionPathParts.length)
+  return strippedPathParts.join('/')
+}
+
+export class FolderTreeBuilder {
+  _tree: FolderTree
+
+  constructor() {
+    this._tree = {
+      [FOLDER_ROOT]: new Set<string>(),
+    }
+  }
+
+  get tree() {
+    return this._tree
+  }
+
+  update(documentPath: string, collectionPath: string) {
+    let folderPath = path.dirname(documentPath)
+    if (collectionPath) {
+      folderPath = stripCollectionFromPath(collectionPath, folderPath)
+    }
+    // split folder path into parts
+    // for each part, add to folder paths establishing parent / child relationships
+    const parent = [FOLDER_ROOT]
+    folderPath
+      .split('/')
+      .filter((part) => part.length)
+      .forEach((part) => {
+        const current = parent.join('/')
+        this._tree[current].add(path.join(current, part))
+        parent.push(part)
+      })
+    const current = parent.join('/')
+    if (!this._tree[current]) {
+      this._tree[current] = new Set<string>()
+    }
+
+    return current === FOLDER_ROOT ? FOLDER_ROOT : sha.hex(current)
+  }
+}
+
+// TODO
+// Need to handle document deletes
+
+export const makeFolderOpsForCollection = <T extends object>(
+  folderTree: FolderTree,
+  collection: Collection<true>,
+  indexDefinitions: IndexDefinition[],
+  opType: 'put' | 'del',
+  level: Level,
+  escapeStr: StringEscaper = stringEscaper
+): BatchOp[] => {
+  const result: BatchOp[] = []
+
+  const data: any = {}
+  const indexedValues: Record<string, string | null> = {}
+  for (const [sort, indexDefinition] of Object.entries(indexDefinitions)) {
+    for (const field of indexDefinition.fields) {
+      data[field.name] = '\x1C'
+    }
+    indexedValues[sort] = makeKeyForField<T>(indexDefinition, data, escapeStr)
+  }
+  const baseCharacter = 'a'.charCodeAt(0)
+
+  for (const [folderName, folder] of Object.entries(folderTree)) {
+    const parentFolderKey =
+      folderName === FOLDER_ROOT ? FOLDER_ROOT : sha.hex(folderName)
+    const folderCollectionSublevel = level.sublevel(
+      `${collection.name}_${parentFolderKey}`,
+      SUBLEVEL_OPTIONS
+    )
+    let folderSortingIdx = 0
+    for (const path of Array.from(folder).sort()) {
+      for (const [sort] of Object.entries(indexDefinitions)) {
+        const indexSublevel = folderCollectionSublevel.sublevel(
+          sort,
+          SUBLEVEL_OPTIONS
+        )
+        const subFolderKey = sha.hex(path)
+        if (sort === DEFAULT_COLLECTION_SORT_KEY) {
+          result.push({
+            type: opType,
+            key: `${collection.path}/${subFolderKey}.${collection.format}`, // replace the root with the collection path
+            sublevel: indexSublevel,
+            value: {} as T,
+          })
+        } else {
+          // generate index value with sort by folderIdx regardless of the index
+          const indexValue = `\x1C${String.fromCharCode(
+            baseCharacter + folderSortingIdx
+          )}${indexedValues[sort].substring(1)}`
+          result.push({
+            type: opType,
+            key: `${indexValue}${INDEX_KEY_FIELD_SEPARATOR}${collection.path}/${subFolderKey}.${collection.format}`,
+            sublevel: indexSublevel,
+            value: {} as T,
+          })
+        }
+      }
+      folderSortingIdx++
+    }
+
+    if (folderName !== FOLDER_ROOT) {
+      result.push({
+        type: 'put',
+        key: `${collection.path}/${parentFolderKey}.${collection.format}`,
+        value: { __folder: path.basename(folderName) },
+        sublevel: level.sublevel<string, Record<string, any>>(
+          CONTENT_ROOT_PREFIX,
+          SUBLEVEL_OPTIONS
+        ),
+      })
+    }
+  }
+
+  return result
 }
 
 export const makeIndexOpsForDocument = <T extends object>(

@@ -730,6 +730,7 @@ importers:
       jest-diff: 27.0.6
       jest-file-snapshot: ^0.5.0
       jest-matcher-utils: 27.0.6
+      js-sha1: ^0.6.0
       js-yaml: ^3.14.1
       jsonpath-plus: ^6.0.1
       leveldown: ^6.1.0
@@ -785,6 +786,7 @@ importers:
       graphql-type-json: 0.3.2_graphql@15.8.0
       gray-matter: 4.0.3
       isomorphic-git: 1.21.0
+      js-sha1: 0.6.0
       js-yaml: 3.14.1
       jsonpath-plus: 6.0.1
       leveldown: 6.1.1
@@ -23851,6 +23853,13 @@ packages:
         integrity: sha512-08bOAKweV2NUC1wqTtf3qZlnpOX/R2DU9ikpjOHs0H+ibQv3zpncVQg6um4uYtRtrwIX8M4Nh3ytK4HGlYAq7Q==,
       }
     dev: true
+
+  /js-sha1/0.6.0:
+    resolution:
+      {
+        integrity: sha512-01gwBFreYydzmU9BmZxpVk6svJJHrVxEN3IOiGl6VO93bVKYETJ0sIth6DASI6mIFdt7NmfX9UiByRzsYHGU9w==,
+      }
+    dev: false
 
   /js-tokens/4.0.0:
     resolution:

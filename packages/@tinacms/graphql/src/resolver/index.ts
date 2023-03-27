@@ -131,18 +131,23 @@ export class Resolver {
         }
       })
       const titleFieldName = titleField?.name
+      const folder: string | undefined = rawData['__folder']
+      if (folder) {
+        data[titleFieldName] = folder
+      }
       const title = data[titleFieldName || ' '] || null
 
       return {
         __typename: collection.fields
           ? NAMER.documentTypeName(collection.namespace)
           : NAMER.documentTypeName(template.namespace),
-        id: fullPath,
+        id: folder ? filename : fullPath,
         ...data,
         _sys: {
-          title,
+          title: title || folder || '',
           basename,
           filename,
+          folder: !!folder,
           extension,
           path: fullPath,
           relativePath,
@@ -646,6 +651,7 @@ export class Resolver {
       last: args.last as number,
       before: args.before as string,
       after: args.after as string,
+      folder: args.folder as string,
     }
 
     const result = await this.database.query(
