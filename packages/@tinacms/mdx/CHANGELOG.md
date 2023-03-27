@@ -1,5 +1,16 @@
 # @tinacms/mdx
 
+## 1.3.6
+
+### Patch Changes
+
+- 5fcef561d: - Pin vite version
+  - Adds react plugin so that we no longer get a 404 on react /@react-refresh
+  - Adds transform ts and tsx files in build as well as dev
+- Updated dependencies [9a8074889]
+- Updated dependencies [c48326846]
+  - @tinacms/schema-tools@1.4.1
+
 ## 1.3.5
 
 ### Patch Changes
