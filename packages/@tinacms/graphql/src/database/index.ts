@@ -1122,13 +1122,18 @@ const _indexContent = async (
           frontmatterFormat: collection?.frontmatterFormat,
         }
       )
+      const template = getTemplateForFile(templateInfo, data as any)
+      if (!template) {
+        console.warn(
+          `Document: ${filepath} has an ambiguous template, skipping from indexing`
+        )
+        return
+      }
+
       const normalizedPath = normalizePath(filepath)
 
       const aliasedData = templateInfo
-        ? replaceNameOverrides(
-            getTemplateForFile(templateInfo, data as any),
-            data
-          )
+        ? replaceNameOverrides(template, data)
         : data
 
       await enqueueOps([
@@ -1212,9 +1217,7 @@ const getTemplateForFile = (
         (t) => lastItem(t.namespace) === data._template
       )
     } else {
-      throw new Error(
-        `Expected _template to be provided for document in an ambiguous collection`
-      )
+      return undefined
     }
   }
   throw new Error(`Unable to determine template`)
