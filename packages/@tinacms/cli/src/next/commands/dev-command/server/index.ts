@@ -13,7 +13,6 @@ export const createDevServer = async (
   configManager: ConfigManager,
   database: Database,
   apiURL: string,
-  noSDK: boolean,
   noWatch: boolean
 ) => {
   const plugins: Plugin[] = [
@@ -101,7 +100,6 @@ export const createDevServer = async (
       database,
       apiURL,
       plugins,
-      noSDK,
       noWatch,
       /**
        * Ensure Vite's import scan uses the spaMainPath as the input

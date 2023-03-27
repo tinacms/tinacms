@@ -15,14 +15,12 @@ export const createConfig = async ({
   database,
   apiURL,
   plugins = [],
-  noSDK,
   noWatch,
   rollupOptions,
 }: {
   configManager: ConfigManager
   database: Database
   apiURL: string
-  noSDK: boolean
   noWatch: boolean
   plugins?: Plugin[]
   rollupOptions?: BuildOptions['rollupOptions']
@@ -58,7 +56,7 @@ export const createConfig = async ({
     TINA_IMPORT: configManager.tinaConfigFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
   }
-  if (noSDK) {
+  if (configManager.shouldSkipSDK()) {
     alias['CLIENT_IMPORT'] = path.join(
       configManager.spaRootPath,
       'src',
