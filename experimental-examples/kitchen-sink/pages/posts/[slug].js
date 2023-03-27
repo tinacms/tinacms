@@ -1,7 +1,7 @@
 import { staticRequest } from 'tinacms'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Layout } from '../../components/Layout'
-import { ExperimentalGetTinaClient } from '../../.tina/__generated__/types.ts'
+import { ExperimentalGetTinaClient } from '../../tina/__generated__/types.ts'
 
 export default function Home(props) {
   return (
