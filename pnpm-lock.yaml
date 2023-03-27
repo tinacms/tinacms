@@ -136,7 +136,7 @@ importers:
       '@tailwindcss/typography': ^0.5.7
       '@tinacms/app': workspace:*
       '@tinacms/cli': workspace:*
-      '@tinacms/datalayer': workspace:^1.2.0
+      '@tinacms/datalayer': workspace:^1.2.1
       autoprefixer: ^10.4.0
       cypress: ^10.10.0
       eslint: 8.24.0
@@ -1523,11 +1523,11 @@ packages:
       graphql: '*'
     dependencies:
       '@babel/core': 7.21.0
-      '@babel/generator': 7.18.13
-      '@babel/parser': 7.18.13
+      '@babel/generator': 7.21.1
+      '@babel/parser': 7.21.2
       '@babel/runtime': 7.21.0
-      '@babel/traverse': 7.18.13
-      '@babel/types': 7.18.13
+      '@babel/traverse': 7.21.2
+      '@babel/types': 7.21.2
       babel-preset-fbjs: 3.4.0_@babel+core@7.21.0
       chalk: 4.1.2
       fb-watchman: 2.0.1
@@ -4133,6 +4133,7 @@ packages:
         integrity: sha512-8n6gSfn2baOY+qlp+VSzsosjCVGFqWKmDF0cCWOybh52Dw3SEyoWR1KrhMJASjLwIEkkAufZ0xvr+SxLHSpy2Q==,
       }
     engines: { node: '>=6.9.0' }
+    dev: false
 
   /@babel/helper-environment-visitor/7.18.9:
     resolution:
@@ -4215,6 +4216,7 @@ packages:
       '@babel/types': 7.18.6
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /@babel/helper-module-transforms/7.18.9:
     resolution:
@@ -4261,13 +4263,6 @@ packages:
     engines: { node: '>=6.9.0' }
     dependencies:
       '@babel/types': 7.21.2
-
-  /@babel/helper-plugin-utils/7.18.6:
-    resolution:
-      {
-        integrity: sha512-gvZnm1YAAxh13eJdkb9EWHBnF3eAub3XTLCZEehHT2kWxiKVRL64+ae5Y6Ivne0mVHmMYKT+xWgZO+gQhuLUBg==,
-      }
-    engines: { node: '>=6.9.0' }
 
   /@babel/helper-plugin-utils/7.18.9:
     resolution:
@@ -4317,6 +4312,7 @@ packages:
     engines: { node: '>=6.9.0' }
     dependencies:
       '@babel/types': 7.18.13
+    dev: false
 
   /@babel/helper-simple-access/7.20.2:
     resolution:
@@ -4358,6 +4354,7 @@ packages:
         integrity: sha512-MmetCkz9ej86nJQV+sFCxoGGrUbU3q02kgLciwkrt9QqEB7cP39oKEY0PakknEO0Gu20SskMRi+AYZ3b1TpN9g==,
       }
     engines: { node: '>=6.9.0' }
+    dev: false
 
   /@babel/helper-validator-identifier/7.19.1:
     resolution:
@@ -4804,7 +4801,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.18.6
-      '@babel/helper-plugin-utils': 7.18.6
+      '@babel/helper-plugin-utils': 7.18.9
     dev: false
 
   /@babel/plugin-syntax-bigint/7.8.3_@babel+core@7.21.0:
@@ -4925,7 +4922,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.18.6
-      '@babel/helper-plugin-utils': 7.18.6
+      '@babel/helper-plugin-utils': 7.18.9
     dev: false
 
   /@babel/plugin-syntax-import-meta/7.10.4_@babel+core@7.21.0:
@@ -5666,9 +5663,9 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.18.13
-      '@babel/helper-module-transforms': 7.18.6
-      '@babel/helper-plugin-utils': 7.18.6
-      '@babel/helper-simple-access': 7.18.6
+      '@babel/helper-module-transforms': 7.21.2
+      '@babel/helper-plugin-utils': 7.18.9
+      '@babel/helper-simple-access': 7.20.2
       babel-plugin-dynamic-import-node: 2.3.3
     transitivePeerDependencies:
       - supports-color
@@ -5684,9 +5681,9 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.18.6
-      '@babel/helper-module-transforms': 7.18.6
-      '@babel/helper-plugin-utils': 7.18.6
-      '@babel/helper-simple-access': 7.18.6
+      '@babel/helper-module-transforms': 7.21.2
+      '@babel/helper-plugin-utils': 7.18.9
+      '@babel/helper-simple-access': 7.20.2
       babel-plugin-dynamic-import-node: 2.3.3
     transitivePeerDependencies:
       - supports-color
@@ -5958,7 +5955,7 @@ packages:
       '@babel/helper-module-imports': 7.18.6
       '@babel/helper-plugin-utils': 7.18.9
       '@babel/plugin-syntax-jsx': 7.18.6_@babel+core@7.18.13
-      '@babel/types': 7.18.13
+      '@babel/types': 7.21.2
     dev: true
 
   /@babel/plugin-transform-react-jsx/7.18.10_@babel+core@7.21.0:
@@ -6369,6 +6366,7 @@ packages:
       '@babel/code-frame': 7.18.6
       '@babel/parser': 7.21.2
       '@babel/types': 7.21.2
+    dev: false
 
   /@babel/template/7.20.7:
     resolution:
@@ -6400,6 +6398,7 @@ packages:
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
+    dev: true
 
   /@babel/traverse/7.18.13_supports-color@5.5.0:
     resolution:
@@ -6441,6 +6440,7 @@ packages:
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /@babel/traverse/7.21.2:
     resolution:
@@ -6482,6 +6482,7 @@ packages:
     dependencies:
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
+    dev: false
 
   /@babel/types/7.21.2:
     resolution:
@@ -10385,7 +10386,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
-      tailwindcss: 3.2.7_postcss@8.4.14
+      tailwindcss: 3.2.7_postcss@8.4.16
     dev: false
 
   /@tailwindcss/typography/0.5.2_tailwindcss@3.2.7:
@@ -10429,7 +10430,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
-      tailwindcss: 3.2.7
+      tailwindcss: 3.2.7_postcss@8.4.18
 
   /@testing-library/dom/8.14.0:
     resolution:
@@ -27899,6 +27900,20 @@ packages:
     engines: { node: '>=0.10.0' }
     dev: false
 
+  /postcss-import/14.1.0:
+    resolution:
+      {
+        integrity: sha512-flwI+Vgm4SElObFVPpTIT7SU7R3qk2L7PyduMcokiaVKuWv9d/U+Gm/QAd8NDLuykTWTkcrjOeD2Pp1rMeBTGw==,
+      }
+    engines: { node: '>=10.0.0' }
+    peerDependencies:
+      postcss: ^8.0.0
+    dependencies:
+      postcss-value-parser: 4.2.0
+      read-cache: 1.0.0
+      resolve: 1.22.1
+    dev: false
+
   /postcss-import/14.1.0_postcss@8.4.14:
     resolution:
       {
@@ -27926,7 +27941,6 @@ packages:
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.1
-    dev: true
 
   /postcss-import/14.1.0_postcss@8.4.18:
     resolution:
@@ -27955,6 +27969,19 @@ packages:
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.1
+    dev: true
+
+  /postcss-js/4.0.0:
+    resolution:
+      {
+        integrity: sha512-77QESFBwgX4irogGVPgQ5s07vLvFqWr228qZY+w6lW599cRlK/HmnlivnnVUxkjHnCu4J16PDMHcH+e+2HbvTQ==,
+      }
+    engines: { node: ^12 || ^14 || >= 16 }
+    peerDependencies:
+      postcss: ^8.3.3
+    dependencies:
+      camelcase-css: 2.0.1
+    dev: false
 
   /postcss-js/4.0.0_postcss@8.4.14:
     resolution:
@@ -27979,7 +28006,6 @@ packages:
     dependencies:
       camelcase-css: 2.0.1
       postcss: 8.4.16
-    dev: true
 
   /postcss-js/4.0.0_postcss@8.4.18:
     resolution:
@@ -28004,6 +28030,26 @@ packages:
     dependencies:
       camelcase-css: 2.0.1
       postcss: 8.4.21
+    dev: true
+
+  /postcss-load-config/3.1.4:
+    resolution:
+      {
+        integrity: sha512-6DiM4E7v4coTE4uzA8U//WhtPwyhiim3eyjEMFCnUpzbrkK9wJHgKDT2mR+HbtSrd/NubVaYTOpSpjUl8NQeRg==,
+      }
+    engines: { node: '>= 10' }
+    peerDependencies:
+      postcss: '>=8.0.9'
+      ts-node: '>=9.0.0'
+    peerDependenciesMeta:
+      postcss:
+        optional: true
+      ts-node:
+        optional: true
+    dependencies:
+      lilconfig: 2.0.6
+      yaml: 1.10.2
+    dev: false
 
   /postcss-load-config/3.1.4_aesdjsunmf4wiehhujt67my7tu:
     resolution:
@@ -28063,7 +28109,6 @@ packages:
       lilconfig: 2.0.6
       postcss: 8.4.16
       yaml: 1.10.2
-    dev: true
 
   /postcss-load-config/3.1.4_postcss@8.4.18:
     resolution:
@@ -28082,25 +28127,6 @@ packages:
     dependencies:
       lilconfig: 2.0.6
       postcss: 8.4.18
-      yaml: 1.10.2
-
-  /postcss-load-config/3.1.4_postcss@8.4.21:
-    resolution:
-      {
-        integrity: sha512-6DiM4E7v4coTE4uzA8U//WhtPwyhiim3eyjEMFCnUpzbrkK9wJHgKDT2mR+HbtSrd/NubVaYTOpSpjUl8NQeRg==,
-      }
-    engines: { node: '>= 10' }
-    peerDependencies:
-      postcss: '>=8.0.9'
-      ts-node: '>=9.0.0'
-    peerDependenciesMeta:
-      postcss:
-        optional: true
-      ts-node:
-        optional: true
-    dependencies:
-      lilconfig: 2.0.6
-      postcss: 8.4.21
       yaml: 1.10.2
 
   /postcss-nested/5.0.6:
@@ -28128,6 +28154,18 @@ packages:
       postcss-selector-parser: 6.0.11
     dev: false
 
+  /postcss-nested/6.0.0:
+    resolution:
+      {
+        integrity: sha512-0DkamqrPcmkBDsLn+vQDIrtkSbNkv5AD/M322ySo9kqFkCIYklym2xEmWkwo+Y3/qZo34tzEPNUw4y7yMCdv5w==,
+      }
+    engines: { node: '>=12.0' }
+    peerDependencies:
+      postcss: ^8.2.14
+    dependencies:
+      postcss-selector-parser: 6.0.11
+    dev: false
+
   /postcss-nested/6.0.0_postcss@8.4.14:
     resolution:
       {
@@ -28151,7 +28189,6 @@ packages:
     dependencies:
       postcss: 8.4.16
       postcss-selector-parser: 6.0.11
-    dev: true
 
   /postcss-nested/6.0.0_postcss@8.4.18:
     resolution:
@@ -28176,6 +28213,7 @@ packages:
     dependencies:
       postcss: 8.4.21
       postcss-selector-parser: 6.0.11
+    dev: true
 
   /postcss-nesting/10.1.9_postcss@8.4.14:
     resolution:
@@ -28266,7 +28304,6 @@ packages:
       nanoid: 3.3.4
       picocolors: 1.0.0
       source-map-js: 1.0.2
-    dev: true
 
   /postcss/8.4.18:
     resolution:
@@ -31662,6 +31699,8 @@ packages:
       }
     engines: { node: '>=12.13.0' }
     hasBin: true
+    peerDependencies:
+      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3
@@ -31678,16 +31717,17 @@ packages:
       object-hash: 3.0.0
       picocolors: 1.0.0
       postcss: 8.4.21
-      postcss-import: 14.1.0_postcss@8.4.21
-      postcss-js: 4.0.0_postcss@8.4.21
-      postcss-load-config: 3.1.4_postcss@8.4.21
-      postcss-nested: 6.0.0_postcss@8.4.21
+      postcss-import: 14.1.0
+      postcss-js: 4.0.0
+      postcss-load-config: 3.1.4
+      postcss-nested: 6.0.0
       postcss-selector-parser: 6.0.11
       postcss-value-parser: 4.2.0
       quick-lru: 5.1.1
       resolve: 1.22.1
     transitivePeerDependencies:
       - ts-node
+    dev: false
 
   /tailwindcss/3.2.7_aesdjsunmf4wiehhujt67my7tu:
     resolution:
@@ -31797,7 +31837,6 @@ packages:
       resolve: 1.22.1
     transitivePeerDependencies:
       - ts-node
-    dev: true
 
   /tailwindcss/3.2.7_postcss@8.4.18:
     resolution:
