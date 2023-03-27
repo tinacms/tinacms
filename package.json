@@ -8,6 +8,7 @@
     "packages/[^@]*"
   ],
   "scripts": {
+    "dev": "pnpm watch",
     "watch": "FORCE_COLOR=1 pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
     "build": "turbo run build --filter=\"./packages/**\"",
     "test": "FORCE_COLOR=1 turbo run test --filter=\"./packages/**\" -- --silent",
