@@ -583,9 +583,6 @@ export class FolderTreeBuilder {
   }
 }
 
-// TODO
-// Need to handle document deletes
-
 export const makeFolderOpsForCollection = <T extends object>(
   folderTree: FolderTree,
   collection: Collection<true>,
