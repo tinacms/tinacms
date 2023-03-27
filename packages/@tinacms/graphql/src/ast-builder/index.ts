@@ -527,6 +527,7 @@ export const astBuilder = {
     },
     MultiCollectionDocument: 'DocumentNode',
     CollectionDocumentUnion: 'DocumentUnion',
+    Folder: 'Folder',
     String: 'String',
     Reference: 'Reference',
     Collection: 'Collection',

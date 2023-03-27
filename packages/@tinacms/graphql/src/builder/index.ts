@@ -900,13 +900,12 @@ export class Builder {
       }
     })
     if (includeFolderType) {
-      types.push('Folder')
+      types.push(astBuilder.TYPES.Folder)
     }
     const type = astBuilder.UnionTypeDefinition({
       name: fieldName,
       types,
     })
-    console.log(type)
 
     await this.database.addToLookupMap({
       type: type.name.value,

@@ -147,7 +147,7 @@ const scalarDefinitions = [
     ],
   }),
   astBuilder.ObjectTypeDefinition({
-    name: 'Folder',
+    name: astBuilder.TYPES.Folder,
     fields: [
       astBuilder.FieldDefinition({
         name: 'name',
