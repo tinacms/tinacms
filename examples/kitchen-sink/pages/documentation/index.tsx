@@ -1,7 +1,7 @@
 import { InferGetStaticPropsType } from 'next'
 import { Json } from '../../components/json'
 import { useTina } from 'tinacms/dist/react'
-import client from '../../.tina/__generated__/client'
+import client from '../../tina/__generated__/client'
 
 export default function Home(
   props: InferGetStaticPropsType<typeof getStaticProps>

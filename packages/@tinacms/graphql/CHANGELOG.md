@@ -1,5 +1,18 @@
 # tina-graphql
 
+## 1.4.1
+
+### Patch Changes
+
+- e9514656c: Don't log warning for image list
+- 9a8074889: Consolidate payload transform logic
+- 13b809ff5: Improve error message when a \_template property isn't one of the templates in the collection
+- Updated dependencies [5fcef561d]
+- Updated dependencies [9a8074889]
+- Updated dependencies [c48326846]
+  - @tinacms/mdx@1.3.6
+  - @tinacms/schema-tools@1.4.1
+
 ## 1.4.0
 
 ### Minor Changes

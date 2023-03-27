@@ -1,5 +1,12 @@
 # @tinacms/schema-tools
 
+## 1.4.1
+
+### Patch Changes
+
+- 9a8074889: Consolidate payload transform logic
+- c48326846: Move --skipSDK into config property: `client.skip = true`
+
 ## 1.4.0
 
 ### Minor Changes

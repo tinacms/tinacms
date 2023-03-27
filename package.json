@@ -8,7 +8,8 @@
     "packages/[^@]*"
   ],
   "scripts": {
-    "watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
+    "dev": "pnpm watch",
+    "watch": "FORCE_COLOR=1 pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
     "build": "turbo run build --filter=\"./packages/**\"",
     "test": "turbo run test --filter=\"./packages/**\" -- --silent",
     "types": "turbo run types --filter=\"./packages/**\"",

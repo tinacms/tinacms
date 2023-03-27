@@ -1,6 +1,6 @@
 {
   "name": "e2e-next",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "private": true,
   "scripts": {
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
@@ -18,7 +18,7 @@
     "@headlessui/react": "^1.7.3",
     "@heroicons/react": "^2.0.12",
     "@tailwindcss/typography": "^0.5.7",
-    "@tinacms/datalayer": "workspace:^1.2.0",
+    "@tinacms/datalayer": "workspace:^1.2.1",
     "graphql": "^15.1.0",
     "jest-file-snapshot": "^0.5.0",
     "mongodb-level": "^0.0.2",
