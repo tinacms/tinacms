@@ -1,16 +1,16 @@
 {
   "data": {
     "movie": {
-      "id": "content/movies/star-wars.md",
+      "id": "content/movies/star-wars.mdx",
       "_sys": {
         "filename": "star-wars",
-        "basename": "star-wars.md",
+        "basename": "star-wars.mdx",
         "breadcrumbs": [
           "star-wars"
         ],
-        "path": "content/movies/star-wars.md",
-        "relativePath": "star-wars.md",
-        "extension": ".md",
+        "path": "content/movies/star-wars.mdx",
+        "relativePath": "star-wars.mdx",
+        "extension": ".mdx",
         "template": "movie",
         "collection": {
           "name": "movie"

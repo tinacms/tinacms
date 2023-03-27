@@ -1,0 +1,24 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "ul",
+      "children": [
+        {
+          "type": "li",
+          "children": [
+            {
+              "type": "lic",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "this is a blockquote in a list item"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

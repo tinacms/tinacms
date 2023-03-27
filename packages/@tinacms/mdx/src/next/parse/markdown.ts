@@ -9,8 +9,16 @@ import type { Options } from '../shortcodes'
 export const fromMarkdown = (value: string, field: RichTextField) => {
   const patterns = getFieldPatterns(field)
   const acornDefault = acorn as unknown as Options['acorn']
+  let skipHTML = false
+  if (field.parser?.type === 'markdown') {
+    if (['all', 'html'].includes(field.parser?.skipEscaping || '')) {
+      skipHTML = true
+    }
+  }
   const tree = mdastFromMarkdown(value, {
-    extensions: [mdxJsx({ acorn: acornDefault, patterns, addResult: true })],
+    extensions: [
+      mdxJsx({ acorn: acornDefault, patterns, addResult: true, skipHTML }),
+    ],
     mdastExtensions: [mdxJsxFromMarkdown({ patterns })],
   })
 

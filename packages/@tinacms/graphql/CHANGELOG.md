@@ -1,5 +1,35 @@
 # tina-graphql
 
+## 1.4.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+- 202cd714d: Internal updates to the CLI
+
+### Patch Changes
+
+- 5809796cf: Adds match property to collection
+- e3b58c03e: Fix error "input.replace is not a function"
+- 0553035f5: Fix regression from Tina client not having referenceDepth provided
+- Updated dependencies [9e86312d6]
+- Updated dependencies [76c984bcc]
+- Updated dependencies [5809796cf]
+- Updated dependencies [54aac9017]
+- Updated dependencies [5d1e0e406]
+- Updated dependencies [cbc1fb919]
+  - @tinacms/mdx@1.3.5
+  - @tinacms/schema-tools@1.4.0
+
+## 1.3.5
+
+### Patch Changes
+
+- Updated dependencies [973e83f1f]
+- Updated dependencies [d1cf65999]
+  - @tinacms/mdx@1.3.4
+  - @tinacms/schema-tools@1.3.4
+
 ## 1.3.4
 
 ### Patch Changes

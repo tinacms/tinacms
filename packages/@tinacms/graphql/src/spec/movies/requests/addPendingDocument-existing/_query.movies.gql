@@ -1,5 +1,5 @@
 mutation {
-  addPendingDocument(collection: "movie", relativePath: "star-wars.md") {
+  addPendingDocument(collection: "movie", relativePath: "star-wars.mdx") {
     ... on MovieDocument {
       id
     }

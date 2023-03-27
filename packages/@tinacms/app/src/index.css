@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tailwind reset clobbers some playground styles */
+.graphiql-execute-button {
+  @apply bg-blue-600 !important;
+}

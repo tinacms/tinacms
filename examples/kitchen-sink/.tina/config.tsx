@@ -2,6 +2,8 @@ import { defineConfig } from 'tinacms'
 import React from 'react'
 import { BiBall, BiBasketball, BiBaseball, BiFootball } from 'react-icons/bi'
 
+const TINA_TOKEN_KEY = 'tina_token_key'
+
 const slugify = (values) => {
   return `${(values?.name || values?.title || `document-${Date.now()}`)
     .toLowerCase()
@@ -12,6 +14,27 @@ const router = ({ document, collection }) => {
   return `/${collection.name}/${document._sys.filename}`
 }
 export default defineConfig({
+  // contentApiUrlOverride: '/api/gql',
+  admin: {
+    auth: {
+      useLocalAuth: true,
+      // If you wanted to use custom auth
+      customAuth: true,
+      getToken: async () => {
+        return { id_token: 'some-token' }
+      },
+      logout: async () => {
+        localStorage.removeItem(TINA_TOKEN_KEY)
+      },
+      authenticate: async () => {
+        localStorage.setItem(TINA_TOKEN_KEY, 'some-token')
+        return true
+      },
+      getUser: async () => {
+        return localStorage.getItem(TINA_TOKEN_KEY)
+      },
+    },
+  },
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',
@@ -182,6 +205,7 @@ export default defineConfig({
                         name: 'title',
                         ui: { component: 'textarea' },
                       },
+                      { type: 'image', name: 'imageList', list: true },
                       {
                         type: 'string',
                         name: 'hidden',
@@ -659,19 +683,11 @@ export default defineConfig({
           {
             type: 'rich-text',
             name: 'body',
-            parser: {
-              type: 'markdown',
-              skipEscaping: 'html',
-            },
             isBody: true,
             templates: [
               {
                 name: 'rimg',
                 label: 'rimg',
-                match: {
-                  start: '{{<',
-                  end: '>}}',
-                },
                 fields: [
                   {
                     name: 'src',
@@ -745,6 +761,26 @@ export default defineConfig({
                     isTitle: true,
                     label: 'Value',
                     type: 'string',
+                  },
+                ],
+              },
+              {
+                name: 'center',
+                label: 'Centered HTML',
+                match: {
+                  start: '{{<',
+                  name: 'center',
+                  end: '>}}',
+                },
+                fields: [
+                  {
+                    name: 'children',
+                    label: 'Children',
+                    type: 'rich-text',
+                    parser: {
+                      type: 'markdown',
+                      skipEscaping: 'html',
+                    },
                   },
                 ],
               },

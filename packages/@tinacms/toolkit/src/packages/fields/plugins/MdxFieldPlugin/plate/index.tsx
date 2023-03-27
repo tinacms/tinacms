@@ -66,7 +66,9 @@ export const RichEditor = (props: RichTextType) => {
             children: value,
           })
         }}
-        normalizeInitialValue={true}
+        // Some nodes aren't ready when this runs
+        // Fixed in a later release https://github.com/udecode/plate/pull/1689/files
+        // normalizeInitialValue={true}
         firstChildren={
           <>
             {withToolbar ? (

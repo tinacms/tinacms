@@ -1,5 +1,45 @@
 # tinacms-cli
 
+## 1.4.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+- 202cd714d: Internal updates to the CLI
+
+### Patch Changes
+
+- 74742cb1c: Add warnings for deprecated CLI commands
+- 81a2d3125: Ensure tina directory is specified on Database with new Tina config folder
+- 48011a9ab: Fix issue where process.platform wasn't defined for external package. Fix issue where jsx-dev-runtime wasn't provided as an ES module from Vite in dev mode
+- 5809796cf: Adds match property to collection
+- 54dd7aabb: Move branch check to a seperate check.
+- a18474c3b: Fix console warning about prettier parser not being provided
+- 3a1edd50d: Bundle the MDX package with its dependencies so we can avoid awkward import issues related to the remark ecosystem modules
+- a37648c5c: Only stop dev process when config is invalid at the start of the command
+- Updated dependencies [76c984bcc]
+- Updated dependencies [5809796cf]
+- Updated dependencies [e3b58c03e]
+- Updated dependencies [54aac9017]
+- Updated dependencies [0553035f5]
+- Updated dependencies [202cd714d]
+- Updated dependencies [3a1edd50d]
+  - @tinacms/schema-tools@1.4.0
+  - @tinacms/datalayer@1.2.0
+  - @tinacms/graphql@1.4.0
+  - @tinacms/app@1.2.0
+  - @tinacms/metrics@1.0.2
+
+## 1.3.3
+
+### Patch Changes
+
+- Updated dependencies [d1cf65999]
+  - @tinacms/schema-tools@1.3.4
+  - @tinacms/app@1.1.2
+  - @tinacms/graphql@1.3.5
+  - @tinacms/datalayer@1.1.6
+
 ## 1.3.2
 
 ### Patch Changes

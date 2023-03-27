@@ -2,9 +2,9 @@
 
 */
 
-import { TinaTemplate, TinaField } from '../../..'
+import { Template, TinaField } from '@tinacms/schema-tools'
 
-const cta: TinaTemplate = {
+const cta: Template = {
   name: 'Cta',
   label: 'CTA',
   fields: [

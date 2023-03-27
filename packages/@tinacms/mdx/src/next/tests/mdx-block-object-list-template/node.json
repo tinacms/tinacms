@@ -1,0 +1,48 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Action",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "action": {
+          "_template": "popup",
+          "title": "Say hello",
+          "description": "This is a description"
+        }
+      }
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "And another template"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Action",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "action": {
+          "_template": "link",
+          "title": "Say hello",
+          "url": "http://example.com"
+        }
+      }
+    }
+  ]
+}

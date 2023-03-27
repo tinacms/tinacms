@@ -1,10 +1,8 @@
-/**
-
-*/
-
 import path from 'path'
 import type { DocumentNode } from 'graphql'
 import { GraphQLError } from 'graphql'
+import micromatch from 'micromatch'
+
 import { createSchema } from '../schema/createSchema'
 import { atob, btoa, lastItem, sequential } from '../util'
 import { normalizePath, parseFile, stringifyFile } from './util'
@@ -309,6 +307,7 @@ export class Database {
     collectionName?: string
   ) => {
     await this.initLevel()
+
     try {
       if (SYSTEM_FILES.includes(filepath)) {
         throw new Error(`Unexpected put for config file ${filepath}`)
@@ -322,6 +321,26 @@ export class Database {
         const normalizedPath = normalizePath(filepath)
         const dataFields = await this.formatBodyOnPayload(filepath, data)
         const collection = await this.collectionForPath(filepath)
+
+        // If a collection match is specified, make sure the file matches the glob.
+        // TODO: Maybe we should service this error better in the frontend?
+        if (collection.match?.exclude || collection.match?.include) {
+          const matches = this.tinaSchema.getMatches({ collection })
+
+          const match = micromatch.isMatch(filepath, matches)
+
+          if (!match) {
+            throw new GraphQLError(
+              `File ${filepath} does not match collection ${
+                collection.name
+              } glob ${matches.join(
+                ','
+              )}. Please change the filename or update matches for ${
+                collection.name
+              } in your config file.`
+            )
+          }
+        }
 
         const stringifiedFile = await this.stringifyFile(
           filepath,
@@ -815,11 +834,14 @@ export class Database {
     }
   }
 
-  private async indexStatusCallbackWrapper(fn: () => Promise<void>) {
+  private async indexStatusCallbackWrapper<T>(
+    fn: () => Promise<T>
+  ): Promise<T> {
     await this.indexStatusCallback({ status: 'inprogress' })
     try {
-      await fn()
+      const result = await fn()
       await this.indexStatusCallback({ status: 'complete' })
+      return result
     } catch (error) {
       await this.indexStatusCallback({ status: 'failed', error })
       throw error
@@ -839,7 +861,7 @@ export class Database {
       throw new Error('No bridge configured')
     }
     await this.initLevel()
-    await this.indexStatusCallbackWrapper(async () => {
+    const result = await this.indexStatusCallbackWrapper(async () => {
       const lookup =
         lookupFromLockFile ||
         JSON.parse(
@@ -875,7 +897,7 @@ export class Database {
         normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json')),
         lookup
       )
-      await this._indexAllContent(nextLevel)
+      const result = await this._indexAllContent(nextLevel)
 
       if (this.config.version) {
         await this.updateDatabaseVersion(nextVersion)
@@ -884,7 +906,9 @@ export class Database {
         }
         this.level = nextLevel
       }
+      return result
     })
+    return result
   }
 
   public deleteContentByPaths = async (documentPaths: string[]) => {
@@ -990,6 +1014,7 @@ export class Database {
   }
 
   public _indexAllContent = async (level: Level) => {
+    const warnings: string[] = []
     const tinaSchema = await this.getSchema(level)
     const operations: PutOp[] = []
     const enqueueOps = async (ops: PutOp[]): Promise<void> => {
@@ -1000,16 +1025,47 @@ export class Database {
         await level.batch(batchOps)
       }
     }
+    // This map is used to map files to there collections
+    const filesSeen = new Map<string, string[]>()
+    // This is used to track which files have duplicate collections so we do not have to loop over all files at the end
+    const duplicateFiles = new Set<string>()
     await sequential(tinaSchema.getCollections(), async (collection) => {
-      const documentPaths = await this.bridge.glob(
-        normalizePath(collection.path),
-        collection.format || 'md'
-      )
-      await _indexContent(this, level, documentPaths, enqueueOps, collection)
+      const normalPath = normalizePath(collection.path)
+      const format = collection.format || 'md'
+      // Get all possible paths for this collection
+      const documentPaths = await this.bridge.glob(normalPath, format)
+
+      // filter paths based on match and exclude
+      const matches = this.tinaSchema.getMatches({ collection })
+      const filteredPaths =
+        matches.length > 0 ? micromatch(documentPaths, matches) : documentPaths
+
+      filteredPaths.forEach((path) => {
+        if (filesSeen.has(path)) {
+          filesSeen.get(path).push(collection.name)
+          duplicateFiles.add(path)
+        } else {
+          filesSeen.set(path, [collection.name])
+        }
+      })
+      duplicateFiles.forEach((path) => {
+        warnings.push(
+          // TODO: link to docs
+          `"${path}" Found in multiple collections: ${filesSeen
+            .get(path)
+            .map((collection) => `"${collection}"`)
+            .join(
+              ', '
+            )}. This can cause unexpected behavior. We recommend updating the \`match\` property of those collections so that each file is in only one collection.\nThis will be an error in the future.\n`
+        )
+      })
+
+      await _indexContent(this, level, filteredPaths, enqueueOps, collection)
     })
     while (operations.length) {
       await level.batch(operations.splice(0, 25))
     }
+    return { warnings }
   }
 
   public addToLookupMap = async (lookup: LookupMapType) => {
@@ -1208,9 +1264,19 @@ const getTemplateForFile = (
   }
   if (templateInfo.type === 'union') {
     if (hasOwnProperty(data, '_template')) {
-      return templateInfo.templates.find(
+      const template = templateInfo.templates.find(
         (t) => lastItem(t.namespace) === data._template
       )
+      if (!template) {
+        throw new Error(
+          `Unable to find template "${
+            data._template
+          }". Possible templates are: ${templateInfo.templates
+            .map((template) => `"${template.name}"`)
+            .join(', ')}.`
+        )
+      }
+      return template
     } else {
       throw new Error(
         `Expected _template to be provided for document in an ambiguous collection`

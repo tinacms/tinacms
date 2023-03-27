@@ -19,6 +19,7 @@ interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   error?: string
   margin?: boolean
   index?: number
+  triggerHoverEvents?: boolean
   tinaForm: Form
 }
 
@@ -32,15 +33,22 @@ export const ListFieldMeta = ({
   actions,
   index,
   tinaForm,
+  triggerHoverEvents,
   ...props
 }: FieldMetaProps) => {
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
+  const hoverEvents = {}
+  if (triggerHoverEvents) {
+    hoverEvents['onMouseOver'] = () =>
+      setHoveredField({ id: tinaForm.id, fieldName: name })
+    hoverEvents['onMouseOut'] = () =>
+      setHoveredField({ id: null, fieldName: null })
+  }
   return (
     <FieldWrapper
       margin={margin}
-      onMouseOver={() => setHoveredField({ id: tinaForm.id, fieldName: name })}
-      onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
+      {...hoverEvents}
       onClick={() => setFocusedField({ id: tinaForm.id, fieldName: name })}
       style={{ zIndex: index ? 1000 - index : undefined }}
       {...props}

@@ -103,6 +103,7 @@ const Blocks = ({
       label={field.label}
       description={field.description}
       error={meta.error}
+      triggerHoverEvents={false}
       index={index}
       tinaForm={tinaForm}
       actions={

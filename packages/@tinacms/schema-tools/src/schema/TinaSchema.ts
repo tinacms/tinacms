@@ -1,3 +1,4 @@
+import micromatch from 'micromatch'
 import {
   Schema,
   Collection,
@@ -5,8 +6,10 @@ import {
   Collectable,
   CollectionTemplateable,
   TinaField,
+  ObjectField,
 } from '../types/index'
 import { lastItem, assertShape } from '../util'
+import { normalizePath } from '../util/normalizePath'
 
 type Version = {
   fullVersion: string
@@ -32,6 +35,30 @@ export class TinaSchema {
   constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
     this.schema = config
+    this.walkFields(({ field, collection, path }) => {
+      if (field.type === 'rich-text') {
+        if (field.parser) {
+          return
+        }
+        if (collection.format === 'mdx') {
+          field.parser = { type: 'mdx' }
+        } else {
+          field.templates?.forEach((template) => {
+            if (!template.match) {
+              console.warn(
+                `WARNING: Found rich-text template at ${
+                  collection.name
+                }.${path.join(
+                  '.'
+                )} with no matches property.\nVisit https://tina.io/docs/reference/types/rich-text/#custom-shortcode-syntax to learn more
+                `
+              )
+            }
+          })
+          field.parser = { type: 'markdown' }
+        }
+      }
+    })
   }
   public getIsTitleFieldName = (collection: string) => {
     const col = this.getCollection(collection)
@@ -43,12 +70,6 @@ export class TinaSchema {
     return this.schema.collections.filter((collection) =>
       collectionNames.includes(collection.name)
     )
-  }
-  public getAllCollectionPaths = () => {
-    const paths = this.getCollections().map(
-      (collection) => `${collection.path}${collection.match || ''}`
-    )
-    return paths
   }
   public getCollection = (collectionName: string): Collection<true> => {
     const collection = this.schema.collections.find(
@@ -83,7 +104,21 @@ export class TinaSchema {
     )
   }
   public getCollectionByFullPath = (filepath: string) => {
+    const fileExtension = filepath.split('.').pop()
+
     const possibleCollections = this.getCollections().filter((collection) => {
+      // filter out file extensions that don't match the collection format
+      if (fileExtension !== (collection.format || 'md')) {
+        return false
+      }
+      if (collection?.match?.include || collection?.match?.exclude) {
+        // if the collection has a match or exclude, we need to check if the file matches
+        const matches = this.getMatches({ collection })
+        const match = micromatch([filepath], matches).length > 0
+        if (!match) {
+          return false
+        }
+      }
       return filepath
         .replace(/\\/g, '/')
         .startsWith(collection.path.replace(/\/?$/, '/'))
@@ -326,7 +361,7 @@ export class TinaSchema {
     collection: Collectable
   ): CollectionTemplateable => {
     let extraFields: TinaField<true>[] = []
-    if (collection.fields) {
+    if (collection?.fields) {
       const template = collection
 
       if (
@@ -345,7 +380,7 @@ export class TinaSchema {
         },
       }
     } else {
-      if (collection.templates) {
+      if (collection?.templates) {
         return {
           namespace: collection.namespace,
           type: 'union',
@@ -365,5 +400,80 @@ export class TinaSchema {
         )
       }
     }
+  }
+  public walkFields = (
+    cb: (args: {
+      field: TinaField
+      collection: Collection
+      path: string[]
+    }) => void
+  ) => {
+    const walk = (
+      collectionOrObject: {
+        templates?: Template[]
+        fields?: TinaField[]
+      },
+      collection: Collection,
+      path: string[]
+    ) => {
+      if (collectionOrObject.templates) {
+        collectionOrObject.templates.forEach((template) => {
+          template.fields.forEach((field) => {
+            cb({ field, collection, path: [...path, template.name] })
+          })
+        })
+      }
+      if (collectionOrObject.fields) {
+        collectionOrObject.fields.forEach((field) => {
+          cb({ field, collection, path: [...path, field.name] })
+          if (field.type === 'rich-text' || field.type === 'object') {
+            walk(field, collection, [...path, field.name])
+          }
+        })
+      }
+    }
+    const collections = this.getCollections()
+    collections.forEach((collection) => walk(collection, collection, []))
+  }
+
+  /**
+   * This function returns an array of glob matches for a given collection.
+   *
+   * @param collection The collection to get the matches for. Can be a string or a collection object.
+   * @returns An array of glob matches.
+   */
+  public getMatches({
+    collection: collectionOrString,
+  }: {
+    collection: string | Collection
+  }) {
+    const collection =
+      typeof collectionOrString === 'string'
+        ? this.getCollection(collectionOrString)
+        : collectionOrString
+    const normalPath = normalizePath(collection.path)
+    const format = collection.format || 'md'
+    const matches: string[] = []
+    if (collection?.match?.include) {
+      const match = `${normalPath}/${collection.match.include}.${format}`
+      matches.push(match)
+    }
+    if (collection?.match?.exclude) {
+      const exclude = `!(${normalPath}/${collection.match.exclude}.${format})`
+      matches.push(exclude)
+    }
+    return matches
+  }
+
+  public matchFiles({
+    collection,
+    files,
+  }: {
+    collection: string | Collection
+    files: string[]
+  }) {
+    const matches = this.getMatches({ collection })
+    const matchedFiles = micromatch(files, matches)
+    return matchedFiles
   }
 }

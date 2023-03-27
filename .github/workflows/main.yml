@@ -29,15 +29,31 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 2
 
-      - uses: pnpm/action-setup@v2.2.2
-        with:
-          version: 7.4.0
-
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
           node-version: 16
-          cache: 'pnpm'
+
+      - uses: pnpm/action-setup@v2.2.2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install
@@ -47,6 +63,21 @@ jobs:
 
       - name: Build Types
         run: pnpm types
+
+      - name: Set NPMRC
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Publish tagged PR
+        if: contains(github.event.pull_request.labels.*.name, 'tagged')
+        continue-on-error: true
+        run: |
+          echo running on branch ${GITHUB_REF##*/}
+          pnpm version:snapshot
+          pnpm publish -r --tag ${GITHUB_REF##*/} --no-git-checks --access public
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test
         run: pnpm test

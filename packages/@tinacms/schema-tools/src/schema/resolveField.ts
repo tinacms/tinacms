@@ -39,6 +39,16 @@ export const resolveField = (
         ...extraFields,
       }
     case 'image':
+      if (field.list) {
+        return {
+          component: 'list',
+          field: {
+            component: 'image',
+          },
+          ...field,
+          ...extraFields,
+        }
+      }
       return {
         component: 'image',
         clearable: true,
