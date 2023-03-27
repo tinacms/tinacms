@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/cli",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -69,6 +69,7 @@
     "@tinacms/graphql": "workspace:*",
     "@tinacms/metrics": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
+    "@vitejs/plugin-react": "^2.1.0",
     "ajv": "^6.12.3",
     "altair-express-middleware": "4.0.6",
     "auto-bind": "^4.0.0",
@@ -107,7 +108,7 @@
     "rollup-plugin-visualizer": "^5.9.0",
     "tailwindcss": "^3.2.7",
     "url-pattern": "^1.0.3",
-    "vite": "^4.1.4",
+    "vite": "4.1.4",
     "yarn": "^1.22.17",
     "yup": "^0.32.9",
     "zod": "^3.14.3"

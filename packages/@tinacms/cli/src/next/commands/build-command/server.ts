@@ -2,12 +2,12 @@ import { build } from 'vite'
 import { Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { createConfig } from '../../vite'
+import { transformTsxPlugin } from '../../vite/plugins'
 
 export const buildProductionSpa = async (
   configManager: ConfigManager,
   database: Database,
-  apiURL: string,
-  noSDK: boolean
+  apiURL: string
 ) => {
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {}
@@ -36,10 +36,10 @@ export const buildProductionSpa = async (
     }
   })
   const config = await createConfig({
+    plugins: [transformTsxPlugin({ configManager })],
     configManager,
     database,
     apiURL,
-    noSDK,
     noWatch: true,
   })
   return build(config)

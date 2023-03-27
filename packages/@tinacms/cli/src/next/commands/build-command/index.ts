@@ -29,7 +29,12 @@ export class BuildCommand extends Command {
     description: 'increase verbosity of logged output',
   })
   noSDK = Option.Boolean('--noSDK', false, {
-    description: "Don't generate the generated client SDK",
+    description:
+      "DEPRECATED - This should now be set in the config at client.skip = true'. Don't generate the generated client SDK",
+  })
+  datalayerPort = Option.String('--datalayer-port', '9000', {
+    description:
+      'Specify a port to run the datalayer server on. (default 9000)',
   })
   isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
     description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
@@ -60,10 +65,11 @@ export class BuildCommand extends Command {
   }
 
   async execute(): Promise<number | void> {
-    const configManager = new ConfigManager(
-      this.rootPath,
-      this.tinaGraphQLVersion
-    )
+    const configManager = new ConfigManager({
+      rootPath: this.rootPath,
+      tinaGraphQLVersion: this.tinaGraphQLVersion,
+      legacyNoSDK: this.noSDK,
+    })
     logger.info('Starting Tina build')
     if (this.isomorphicGitBridge) {
       logger.warn('--isomorphicGitBridge has been deprecated')
@@ -76,6 +82,11 @@ export class BuildCommand extends Command {
     if (this.localOption) {
       logger.warn('--local has been deprecated')
     }
+    if (this.noSDK) {
+      logger.warn(
+        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
+      )
+    }
 
     try {
       await configManager.processConfig()
@@ -86,8 +97,11 @@ export class BuildCommand extends Command {
     }
 
     // Initialize the host TCP server
-    createDBServer()
-    const database = await createAndInitializeDatabase(configManager)
+    createDBServer(Number(this.datalayerPort))
+    const database = await createAndInitializeDatabase(
+      configManager,
+      Number(this.datalayerPort)
+    )
     const { queryDoc, fragDoc } = await buildSchema(
       database,
       configManager.config
@@ -96,7 +110,6 @@ export class BuildCommand extends Command {
     const codegen = new Codegen({
       schema: await getASTSchema(database),
       configManager: configManager,
-      noSDK: this.noSDK,
       queryDoc,
       fragDoc,
     })
@@ -106,7 +119,7 @@ export class BuildCommand extends Command {
     await waitForDB(configManager.config, apiURL, false)
     await this.checkGraphqlSchema(configManager, database, apiURL)
 
-    await buildProductionSpa(configManager, database, apiURL, this.noSDK)
+    await buildProductionSpa(configManager, database, apiURL)
 
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
@@ -115,7 +128,7 @@ export class BuildCommand extends Command {
     )
 
     const summaryItems = []
-    if (!this.noSDK) {
+    if (!configManager.shouldSkipSDK()) {
       summaryItems.push({
         emoji: '🤖',
         heading: 'Auto-generated files',

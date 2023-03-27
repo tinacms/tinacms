@@ -3,7 +3,6 @@ import { logger } from '../../../logger'
 import { ConfigManager } from '../../config-manager'
 import fs from 'fs-extra'
 import path from 'path'
-import { execShellCommand } from '../../../cmds/init'
 
 export class CodemodCommand extends Command {
   static paths = [['codemod'], ['codemod', 'move-tina-folder']]
@@ -42,7 +41,7 @@ export class CodemodCommand extends Command {
   }
 }
 const moveTinaFolder = async (rootPath: string = process.cwd()) => {
-  const configManager = new ConfigManager(rootPath)
+  const configManager = new ConfigManager({ rootPath })
   try {
     await configManager.processConfig()
   } catch (e) {

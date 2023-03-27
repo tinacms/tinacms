@@ -48,10 +48,20 @@ export class ConfigManager {
   spaMainPath: string
   spaHTMLPath: string
   tinaGraphQLVersionFromCLI?: string
+  legacyNoSDK?: boolean
 
-  constructor(rootPath: string = process.cwd(), tinaGraphQLVersion?: string) {
+  constructor({
+    rootPath = process.cwd(),
+    tinaGraphQLVersion,
+    legacyNoSDK,
+  }: {
+    rootPath: string
+    tinaGraphQLVersion?: string
+    legacyNoSDK?: boolean
+  }) {
     this.rootPath = normalizePath(rootPath)
     this.tinaGraphQLVersionFromCLI = tinaGraphQLVersion
+    this.legacyNoSDK = legacyNoSDK
   }
 
   isUsingTs() {
@@ -64,6 +74,13 @@ export class ConfigManager {
 
   hasSeparateContentRoot() {
     return this.rootPath !== this.contentRootPath
+  }
+
+  shouldSkipSDK() {
+    if (this.legacyNoSDK) {
+      return this.legacyNoSDK
+    }
+    return this.config.client?.skip || false
   }
 
   async processConfig() {
@@ -168,12 +185,8 @@ export class ConfigManager {
     this.outputHTMLFilePath = path.join(this.outputFolderPath, 'index.html')
     this.outputGitignorePath = path.join(this.outputFolderPath, '.gitignore')
 
-    // This package lists `index.html` as it's main field export
-    this.spaHTMLPath = url.pathToFileURL(
-      require.resolve('@tinacms/app')
-    ).pathname
-    this.spaRootPath = this.spaHTMLPath.replace('/index.html', '')
-    this.spaMainPath = path.join(this.spaRootPath, 'src', 'main.tsx')
+    this.spaMainPath = require.resolve('@tinacms/app')
+    this.spaRootPath = path.join(this.spaMainPath, '..', '..')
   }
 
   async getTinaFolderPath(rootPath) {

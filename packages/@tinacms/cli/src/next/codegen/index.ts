@@ -11,27 +11,23 @@ export class Codegen {
   schema: GraphQLSchema
   queryDoc: string
   fragDoc: string
-  noSDK: boolean
 
   constructor({
     configManager,
     port,
     schema,
-    noSDK,
     queryDoc,
     fragDoc,
   }: {
     configManager: ConfigManager
     port?: number
     schema: GraphQLSchema
-    noSDK: boolean
     queryDoc: string
     fragDoc: string
   }) {
     this.configManager = configManager
     this.port = port
     this.schema = schema
-    this.noSDK = noSDK
     this.queryDoc = queryDoc
     this.fragDoc = fragDoc
   }
@@ -48,7 +44,7 @@ export class Codegen {
 
   async execute() {
     const apiURL = this.getApiURL()
-    if (this.noSDK) {
+    if (this.configManager.shouldSkipSDK()) {
       await this.removeGeneratedFilesIfExists()
       return apiURL
     }

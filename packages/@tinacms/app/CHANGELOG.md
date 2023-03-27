@@ -1,5 +1,21 @@
 # @tinacms/app
 
+## 1.2.1
+
+### Patch Changes
+
+- 5fcef561d: - Pin vite version
+  - Adds react plugin so that we no longer get a 404 on react /@react-refresh
+  - Adds transform ts and tsx files in build as well as dev
+- 8fc99059f: Fix main export field for @tinacms/app
+- c48326846: Move --skipSDK into config property: `client.skip = true`
+- Updated dependencies [5fcef561d]
+- Updated dependencies [9a8074889]
+- Updated dependencies [d0c4801b7]
+  - @tinacms/mdx@1.3.6
+  - tinacms@1.4.1
+  - @tinacms/toolkit@1.6.1
+
 ## 1.2.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.6.1
+
+### Patch Changes
+
+- d0c4801b7: cancel index polling when component is unmounted
+
 ## 1.6.0
 
 ### Minor Changes

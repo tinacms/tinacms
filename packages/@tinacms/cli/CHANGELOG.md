@@ -1,5 +1,34 @@
 # tinacms-cli
 
+## 1.5.0
+
+### Minor Changes
+
+- bbae12b95: Changes Tailwind config to also search for class names within user's config and related custom components
+
+### Patch Changes
+
+- 5f0139437: Add option for specifying datalayer port
+- 5fcef561d: - Pin vite version
+  - Adds react plugin so that we no longer get a 404 on react /@react-refresh
+  - Adds transform ts and tsx files in build as well as dev
+- 8fc99059f: Fix main export field for @tinacms/app
+- 9a8074889: Consolidate payload transform logic
+- e37f64b7f: feat: Skip blocks import, since it has some issues
+  feat: Handle image gallery import
+  feat: Handle a nested forestry directory through --forestryPath arg
+- c48326846: Move --skipSDK into config property: `client.skip = true`
+- Updated dependencies [e9514656c]
+- Updated dependencies [5fcef561d]
+- Updated dependencies [8fc99059f]
+- Updated dependencies [9a8074889]
+- Updated dependencies [c48326846]
+- Updated dependencies [13b809ff5]
+  - @tinacms/graphql@1.4.1
+  - @tinacms/app@1.2.1
+  - @tinacms/schema-tools@1.4.1
+  - @tinacms/datalayer@1.2.1
+
 ## 1.4.0
 
 ### Minor Changes

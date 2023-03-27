@@ -20,6 +20,10 @@ export class DevCommand extends Command {
   port = Option.String('-p,--port', '4001', {
     description: 'Specify a port to run the server on. (default 4001)',
   })
+  datalayerPort = Option.String('--datalayer-port', '9000', {
+    description:
+      'Specify a port to run the datalayer server on. (default 9000)',
+  })
   subCommand = Option.String('-c,--command', {
     description: 'The sub-command to run',
   })
@@ -46,7 +50,8 @@ export class DevCommand extends Command {
     description: "Don't regenerate config on file changes",
   })
   noSDK = Option.Boolean('--noSDK', false, {
-    description: "Don't generate the generated client SDK",
+    description:
+      "DEPRECATED - This should now be set in the config at client.skip = true'. Don't generate the generated client SDK",
   })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
@@ -81,11 +86,19 @@ export class DevCommand extends Command {
         '--experimentalDataLayer has been deprecated, the data layer is now built-in automatically'
       )
     }
-    const configManager = new ConfigManager(this.rootPath)
+    if (this.noSDK) {
+      logger.warn(
+        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
+      )
+    }
+    const configManager = new ConfigManager({
+      rootPath: this.rootPath,
+      legacyNoSDK: this.noSDK,
+    })
     logger.info('Starting Tina Dev Server')
 
     // Initialize the host TCP server
-    createDBServer()
+    createDBServer(Number(this.datalayerPort))
 
     let database: Database = null
 
@@ -105,7 +118,10 @@ export class DevCommand extends Command {
         }
       }
       if (firstTime) {
-        database = await createAndInitializeDatabase(configManager)
+        database = await createAndInitializeDatabase(
+          configManager,
+          Number(this.datalayerPort)
+        )
       } else {
         database.clearCache()
       }
@@ -134,7 +150,6 @@ export class DevCommand extends Command {
         schema: await getASTSchema(database),
         configManager: configManager,
         port: Number(this.port),
-        noSDK: this.noSDK,
         queryDoc,
         fragDoc,
       })
@@ -175,7 +190,6 @@ export class DevCommand extends Command {
       configManager,
       database,
       apiURL,
-      this.noSDK,
       this.noWatch
     )
     await server.listen(Number(this.port))
@@ -235,7 +249,7 @@ export class DevCommand extends Command {
       },
     ]
 
-    if (!this.noSDK) {
+    if (!configManager.shouldSkipSDK()) {
       summaryItems.push({
         emoji: '🤖',
         heading: 'Auto-generated files',

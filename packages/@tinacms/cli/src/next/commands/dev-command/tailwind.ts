@@ -16,7 +16,7 @@ export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
       const plugins: Plugin[] = []
       const content = [
         path.join(spaPath, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
-        path.join(configFilePath),
+        path.join(configFilePath, '../**/*.{vue,js,ts,jsx,tsx,svelte}'),
       ]
 
       const tw = tailwind({

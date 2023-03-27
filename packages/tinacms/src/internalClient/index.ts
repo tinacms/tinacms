@@ -118,7 +118,7 @@ export interface AsyncFunction<T> extends Function {
       15000,  // timeout
   );
 */
-export async function asyncPoll<T>(
+export function asyncPoll<T>(
   /**
    * Function to call periodically until it resolves or rejects.
    *
@@ -146,13 +146,19 @@ export async function asyncPoll<T>(
    * Default 30 seconds.
    */
   pollTimeout: number = 30 * 1000
-): Promise<T> {
+) {
   const endTime = new Date().getTime() + pollTimeout
+  let stop = false
+  const cancel = () => {
+    stop = true
+  }
   const checkCondition = (resolve: Function, reject: Function): void => {
     Promise.resolve(fn())
       .then((result) => {
         const now = new Date().getTime()
-        if (result.done) {
+        if (stop) {
+          reject(new Error('AsyncPoller: cancelled'))
+        } else if (result.done) {
           resolve(result.data)
         } else if (now < endTime) {
           setTimeout(checkCondition, pollInterval, resolve, reject)
@@ -164,7 +170,7 @@ export async function asyncPoll<T>(
         reject(err)
       })
   }
-  return new Promise(checkCondition)
+  return [new Promise(checkCondition) as Promise<T>, cancel]
 }
 
 export class Client {
@@ -399,6 +405,11 @@ mutation addPendingDocumentMutation(
       if (resBody.message) {
         errorMessage = `${errorMessage}, Response: ${resBody.message}`
       }
+      errorMessage = `${errorMessage}, Please check that the following information is correct: \n\tclientId: ${this.options.clientId}\n\tbranch: ${this.branch}.`
+      if (this.branch !== 'main') {
+        errorMessage = `${errorMessage}\n\tNote: This error can occur if the branch does not exist on GitHub or on Tina Cloud`
+      }
+
       throw new Error(errorMessage)
     }
 
@@ -618,9 +629,9 @@ mutation addPendingDocumentMutation(
     }
   }
 
-  async waitForIndexStatus({ ref }: { ref: string }) {
+  waitForIndexStatus({ ref }: { ref: string }) {
     try {
-      const result = await asyncPoll(
+      const [prom, cancel] = asyncPoll(
         async (): Promise<AsyncData<any>> => {
           try {
             const result = await this.getIndexStatus({ ref })
@@ -645,7 +656,7 @@ mutation addPendingDocumentMutation(
         //  timeout is 15 min
         900000 // timeout
       )
-      return result
+      return [prom, cancel]
     } catch (error) {
       if (error.message === 'AsyncPoller: reached timeout') {
         console.warn(error)
