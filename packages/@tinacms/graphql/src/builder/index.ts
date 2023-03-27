@@ -91,6 +91,7 @@ export class Builder {
         nodeType: astBuilder.TYPES.MultiCollectionDocument,
         collections,
         connectionNamespace: ['document'],
+        includeFolderFilter: true,
       })
 
     const type = astBuilder.ObjectTypeDefinition({
@@ -236,6 +237,7 @@ export class Builder {
     const type = await this._buildMultiCollectionDocumentDefinition({
       fieldName: astBuilder.TYPES.MultiCollectionDocument,
       collections,
+      includeFolderType: true,
     })
 
     return astBuilder.FieldDefinition({
@@ -878,9 +880,11 @@ export class Builder {
   private _buildMultiCollectionDocumentDefinition = async ({
     fieldName,
     collections,
+    includeFolderType,
   }: {
     fieldName: string
     collections: Collection<true>[]
+    includeFolderType?: boolean
   }) => {
     const types: string[] = []
     collections.forEach((collection) => {
@@ -890,18 +894,19 @@ export class Builder {
       }
       if (collection.templates) {
         collection.templates.forEach((template) => {
-          if (typeof template === 'string') {
-            throw new Error('Global templates not yet supported')
-          }
           const typeName = NAMER.documentTypeName(template.namespace)
           types.push(typeName)
         })
       }
     })
+    if (includeFolderType) {
+      types.push('Folder')
+    }
     const type = astBuilder.UnionTypeDefinition({
       name: fieldName,
       types,
     })
+    console.log(type)
 
     await this.database.addToLookupMap({
       type: type.name.value,
@@ -918,12 +923,14 @@ export class Builder {
     nodeType,
     collections,
     connectionNamespace,
+    includeFolderFilter,
   }: {
     fieldName: string
     namespace: string[]
     nodeType: string | TypeDefinitionNode
     collections: Collection<true>[]
     connectionNamespace: string[]
+    includeFolderFilter?: boolean
   }) => {
     const connectionName = NAMER.referenceConnectionType(namespace)
     await this.database.addToLookupMap({
@@ -938,6 +945,7 @@ export class Builder {
       connectionName,
       nodeType: nodeType,
       collections,
+      includeFolderFilter,
     })
   }
 
@@ -1277,6 +1285,7 @@ export class Builder {
     nodeType,
     collection,
     collections,
+    includeFolderFilter,
   }: {
     fieldName: string
     namespace: string[]
@@ -1284,6 +1293,7 @@ export class Builder {
     nodeType: string | TypeDefinitionNode
     collection?: Collectable
     collections?: Collectable[]
+    includeFolderFilter?: boolean
   }) => {
     const extra = [
       await this._connectionFilterBuilder({
@@ -1293,6 +1303,14 @@ export class Builder {
         collections,
       }),
     ]
+    if (includeFolderFilter) {
+      extra.push(
+        astBuilder.InputValueDefinition({
+          name: 'folder',
+          type: astBuilder.TYPES.String,
+        })
+      )
+    }
     return astBuilder.FieldDefinition({
       name: fieldName,
       required: true,

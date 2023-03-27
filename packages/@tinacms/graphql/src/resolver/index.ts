@@ -77,15 +77,47 @@ export class Resolver {
       ...extraFields,
     }
   }
+  public getRaw = async (fullPath: unknown) => {
+    if (typeof fullPath !== 'string') {
+      throw new Error(`fullPath must be of type string for getDocument request`)
+    }
+
+    return this.database.get<{
+      _collection: string
+      _template: string
+    }>(fullPath)
+  }
+  public getDocumentOrDirectory = async (fullPath: unknown) => {
+    if (typeof fullPath !== 'string') {
+      throw new Error(
+        `fullPath must be of type string for getDocumentOrDirectory request`
+      )
+    }
+    const rawData = await this.getRaw(fullPath)
+    if (rawData['__folder']) {
+      const { name: filename } = path.parse(fullPath)
+      return {
+        __typename: 'Folder',
+        name: rawData['__folder'],
+        sha: filename,
+      }
+    } else {
+      return this.transformDocumentIntoPayload(fullPath, rawData)
+    }
+  }
   public getDocument = async (fullPath: unknown) => {
     if (typeof fullPath !== 'string') {
       throw new Error(`fullPath must be of type string for getDocument request`)
     }
 
-    const rawData = await this.database.get<{
-      _collection: string
-      _template: string
-    }>(fullPath)
+    const rawData = await this.getRaw(fullPath)
+    return this.transformDocumentIntoPayload(fullPath, rawData)
+  }
+
+  private transformDocumentIntoPayload = async (
+    fullPath: string,
+    rawData: { _collection; _template }
+  ) => {
     const collection = this.tinaSchema.getCollection(rawData._collection)
     try {
       const template = await this.tinaSchema.getTemplateForData({
@@ -131,23 +163,18 @@ export class Resolver {
         }
       })
       const titleFieldName = titleField?.name
-      const folder: string | undefined = rawData['__folder']
-      if (folder) {
-        data[titleFieldName] = folder
-      }
       const title = data[titleFieldName || ' '] || null
 
       return {
         __typename: collection.fields
           ? NAMER.documentTypeName(collection.namespace)
           : NAMER.documentTypeName(template.namespace),
-        id: folder ? filename : fullPath,
+        id: fullPath,
         ...data,
         _sys: {
-          title: title || folder || '',
+          title: title || '',
           basename,
           filename,
-          folder: !!folder,
           extension,
           path: fullPath,
           relativePath,
@@ -656,7 +683,7 @@ export class Resolver {
 
     const result = await this.database.query(
       queryOptions,
-      hydrator ? hydrator : this.getDocument
+      hydrator ? hydrator : this.getDocumentOrDirectory
     )
     const edges = result.edges
     const pageInfo = result.pageInfo
