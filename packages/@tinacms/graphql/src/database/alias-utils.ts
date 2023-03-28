@@ -33,17 +33,7 @@ const _replaceNameOverrides = (fields: TinaFieldEnriched[], obj: any) => {
 }
 
 const getTemplateKey = (field) => {
-  //return "_template"
-  // Do some extra work to allow custom _template keys
-
-  const DEFAULT_TEMPLATE_KEY = '_template'
-  if (field.templates?.length) {
-    const templateField = field.templates[0]?.fields?.find(
-      (field) => field.name === DEFAULT_TEMPLATE_KEY
-    )
-    return templateField?.alias || DEFAULT_TEMPLATE_KEY
-  }
-  return DEFAULT_TEMPLATE_KEY
+  return field?.templateKey || '_template'
 }
 
 const getTemplateForData = (field: any, data: any) => {
@@ -51,9 +41,14 @@ const getTemplateForData = (field: any, data: any) => {
     const templateKey = getTemplateKey(field)
 
     if (data[templateKey]) {
-      return field.templates.find(
-        (template) => template.name === data[templateKey]
+      const result = field.templates.find(
+        (template) =>
+          template.nameOverride === data[templateKey] ||
+          template.name === data[templateKey]
       )
+      if (result) {
+        return result
+      }
     }
   } else {
     return field
