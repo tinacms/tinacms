@@ -186,7 +186,7 @@ export class Client {
   events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
-    this.tinaGraphQLVersion = 'beta' || options.tinaGraphQLVersion
+    this.tinaGraphQLVersion = options.tinaGraphQLVersion
     this.onLogin = options.schema?.config?.admin?.auth?.onLogin
     this.onLogout = options.schema?.config?.admin?.auth?.onLogout
     if (options.schema?.config?.admin?.auth?.logout) {
