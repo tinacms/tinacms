@@ -52,7 +52,7 @@ const moveTinaFolder = async (rootPath: string = process.cwd()) => {
   const tinaDestination = path.join(configManager.rootPath, 'tina')
   if (await fs.existsSync(tinaDestination)) {
     logger.info(
-      `Folder already exists at ${tinaDestination}. Either delete this folder to complete the codemod, or ensure you have properly copied you config from the ".tina" folder.`
+      `Folder already exists at ${tinaDestination}. Either delete this folder to complete the codemod, or ensure you have properly copied your config from the ".tina" folder.`
     )
   } else {
     await fs.moveSync(configManager.tinaFolderPath, tinaDestination)
