@@ -22,7 +22,7 @@ export class DevCommand extends Command {
   })
   datalayerPort = Option.String('--datalayer-port', '9000', {
     description:
-      'Specify a port to run the datalayer server on. (default 4001)',
+      'Specify a port to run the datalayer server on. (default 9000)',
   })
   subCommand = Option.String('-c,--command', {
     description: 'The sub-command to run',
@@ -50,7 +50,8 @@ export class DevCommand extends Command {
     description: "Don't regenerate config on file changes",
   })
   noSDK = Option.Boolean('--noSDK', false, {
-    description: "DEPRECATED - Don't generate the generated client SDK",
+    description:
+      "DEPRECATED - This should now be set in the config at client.skip = true'. Don't generate the generated client SDK",
   })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
@@ -87,7 +88,7 @@ export class DevCommand extends Command {
     }
     if (this.noSDK) {
       logger.warn(
-        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at config.skip = true'
+        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
       )
     }
     const configManager = new ConfigManager({
@@ -117,7 +118,10 @@ export class DevCommand extends Command {
         }
       }
       if (firstTime) {
-        database = await createAndInitializeDatabase(configManager)
+        database = await createAndInitializeDatabase(
+          configManager,
+          Number(this.datalayerPort)
+        )
       } else {
         database.clearCache()
       }

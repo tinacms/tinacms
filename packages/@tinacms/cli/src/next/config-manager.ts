@@ -185,12 +185,8 @@ export class ConfigManager {
     this.outputHTMLFilePath = path.join(this.outputFolderPath, 'index.html')
     this.outputGitignorePath = path.join(this.outputFolderPath, '.gitignore')
 
-    // This package lists `index.html` as it's main field export
-    this.spaHTMLPath = url.pathToFileURL(
-      require.resolve('@tinacms/app')
-    ).pathname
-    this.spaRootPath = this.spaHTMLPath.replace('/index.html', '')
-    this.spaMainPath = path.join(this.spaRootPath, 'src', 'main.tsx')
+    this.spaMainPath = require.resolve('@tinacms/app')
+    this.spaRootPath = path.join(this.spaMainPath, '..', '..')
   }
 
   async getTinaFolderPath(rootPath) {

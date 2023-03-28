@@ -5,6 +5,7 @@ import {
   Plugin,
   splitVendorChunkPlugin,
 } from 'vite'
+import react from '@vitejs/plugin-react'
 import { Database } from '@tinacms/graphql'
 import { tinaTailwind } from './tailwind'
 import { ConfigManager } from '../config-manager'
@@ -115,7 +116,7 @@ export const createConfig = async ({
       },
     },
     build: {
-      sourcemap: true,
+      sourcemap: false,
       outDir: configManager.outputFolderPath,
       emptyOutDir: true,
       rollupOptions: rollupOptions,
@@ -125,6 +126,7 @@ export const createConfig = async ({
        * `splitVendorChunkPlugin` is needed because `tinacms` and `@tinacms/toolkit` are quite large,
        * Vite's chunking strategy chokes on memory issues for smaller machines (ie. on CI).
        */
+      react(),
       splitVendorChunkPlugin(),
       tinaTailwind(configManager.spaRootPath, configManager.tinaConfigFilePath),
       ...plugins,

@@ -1,5 +1,17 @@
 # tinacms
 
+## 1.4.1
+
+### Patch Changes
+
+- 9a8074889: Consolidate payload transform logic
+- d0c4801b7: cancel index polling when component is unmounted
+- Updated dependencies [9a8074889]
+- Updated dependencies [d0c4801b7]
+- Updated dependencies [c48326846]
+  - @tinacms/schema-tools@1.4.1
+  - @tinacms/toolkit@1.6.1
+
 ## 1.4.0
 
 ### Minor Changes

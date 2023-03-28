@@ -20,6 +20,7 @@ import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
 import { generateCollections } from '../forestry-migrate'
 import { ErrorSingleton } from '../forestry-migrate/util/errorSingleton'
+import { writeGitignore } from '../../next/commands/codemod-command'
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other'
@@ -109,7 +110,7 @@ export async function initStaticTina({
 
   await addDependencies(packageManager)
 
-  // add .tina/config.{js,ts}]
+  // add tina/config.{js,ts}]
   await addConfigFile({
     // remove process fom pathToForestryConfig and add publicFolder
     publicFolder: path.join(
@@ -339,7 +340,7 @@ export interface AddConfigArgs {
 const addConfigFile = async (args: AddConfigArgs) => {
   const { baseDir, usingTypescript } = args
   const configPath = path.join(
-    '.tina',
+    'tina',
     `config.${usingTypescript ? 'ts' : 'js'}`
   )
   const fullConfigPath = path.join(baseDir, configPath)
@@ -358,10 +359,11 @@ const addConfigFile = async (args: AddConfigArgs) => {
   } else {
     logger.info(
       logText(
-        `Adding config file at .tina/config.${usingTypescript ? 'ts' : 'js'}`
+        `Adding config file at tina/config.${usingTypescript ? 'ts' : 'js'}`
       )
     )
     await fs.outputFileSync(fullConfigPath, config(args))
+    await writeGitignore(baseDir)
   }
 }
 

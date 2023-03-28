@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
+    "dev": "pnpm watch",
     "build": "turbo run build --filter=\"./packages/**\"",
     "test": "turbo run test --filter=\"./packages/**\" -- --silent",
     "types": "turbo run types --filter=\"./packages/**\"",

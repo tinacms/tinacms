@@ -29,11 +29,12 @@ export class BuildCommand extends Command {
     description: 'increase verbosity of logged output',
   })
   noSDK = Option.Boolean('--noSDK', false, {
-    description: "DEPRECATED - Don't generate the generated client SDK",
+    description:
+      "DEPRECATED - This should now be set in the config at client.skip = true'. Don't generate the generated client SDK",
   })
   datalayerPort = Option.String('--datalayer-port', '9000', {
     description:
-      'Specify a port to run the datalayer server on. (default 4001)',
+      'Specify a port to run the datalayer server on. (default 9000)',
   })
   isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
     description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
@@ -83,7 +84,7 @@ export class BuildCommand extends Command {
     }
     if (this.noSDK) {
       logger.warn(
-        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at config.skip = true'
+        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
       )
     }
 
@@ -97,7 +98,10 @@ export class BuildCommand extends Command {
 
     // Initialize the host TCP server
     createDBServer(Number(this.datalayerPort))
-    const database = await createAndInitializeDatabase(configManager)
+    const database = await createAndInitializeDatabase(
+      configManager,
+      Number(this.datalayerPort)
+    )
     const { queryDoc, fragDoc } = await buildSchema(
       database,
       configManager.config
