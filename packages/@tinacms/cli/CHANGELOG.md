@@ -1,5 +1,20 @@
 # tinacms-cli
 
+## 1.5.1
+
+### Patch Changes
+
+- 691d2eb3f: Add support for the `tinacms codemod move-tina-folder` command. This command moves the Tina folder from `.tina` to `tina`, and creates a lock file, which allows the entire `tina/__generated__` folder to be gitignored.
+- bb9f0047f: Add `skip.client = true` to the Tina config for Forestry migrations by default.
+- a70204500: feat: Configurable template key on blocks
+- Updated dependencies [af5c32eae]
+- Updated dependencies [1f9f83718]
+- Updated dependencies [a70204500]
+  - @tinacms/graphql@1.4.2
+  - @tinacms/schema-tools@1.4.2
+  - @tinacms/app@1.2.2
+  - @tinacms/datalayer@1.2.2
+
 ## 1.5.0
 
 ### Minor Changes
