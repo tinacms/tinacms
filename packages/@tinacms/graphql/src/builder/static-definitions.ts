@@ -155,7 +155,7 @@ const scalarDefinitions = [
         type: astBuilder.TYPES.String,
       }),
       astBuilder.FieldDefinition({
-        name: 'sha',
+        name: 'path',
         required: true,
         type: astBuilder.TYPES.String,
       }),

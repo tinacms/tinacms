@@ -535,7 +535,7 @@ export const makeFilterSuffixes = (
   }
 }
 
-const FOLDER_ROOT = '~'
+export const FOLDER_ROOT = '~'
 type FolderTree = Record<string, Set<string>>
 
 const stripCollectionFromPath = (collectionPath: string, path: string) => {
@@ -645,7 +645,10 @@ export const makeFolderOpsForCollection = <T extends object>(
       result.push({
         type: 'put',
         key: `${collection.path}/${parentFolderKey}.${collection.format}`,
-        value: { __folder: path.basename(folderName) },
+        value: {
+          __folderBasename: path.basename(folderName),
+          __folderPath: folderName,
+        },
         sublevel: level.sublevel<string, Record<string, any>>(
           CONTENT_ROOT_PREFIX,
           SUBLEVEL_OPTIONS

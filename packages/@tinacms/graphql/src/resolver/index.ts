@@ -94,12 +94,11 @@ export class Resolver {
       )
     }
     const rawData = await this.getRaw(fullPath)
-    if (rawData['__folder']) {
-      const { name: filename } = path.parse(fullPath)
+    if (rawData['__folderBasename']) {
       return {
         __typename: 'Folder',
-        name: rawData['__folder'],
-        sha: filename,
+        name: rawData['__folderBasename'],
+        path: rawData['__folderPath'],
       }
     } else {
       return this.transformDocumentIntoPayload(fullPath, rawData)

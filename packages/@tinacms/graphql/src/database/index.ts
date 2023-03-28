@@ -22,6 +22,7 @@ import {
   coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
+  FOLDER_ROOT,
   FolderTreeBuilder,
   IndexDefinition,
   makeFilter,
@@ -41,6 +42,7 @@ import {
   LevelProxy,
 } from './level'
 import { replaceNameOverrides, applyNameOverrides } from './alias-utils'
+import sha from 'js-sha1'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -770,7 +772,11 @@ export class Database {
     const sublevel = indexDefinition
       ? this.level
           .sublevel(
-            `${collection}${folder ? `_${folder}` : ''}`,
+            `${collection}${
+              folder
+                ? `_${folder === FOLDER_ROOT ? folder : sha.hex(folder)}`
+                : ''
+            }`,
             SUBLEVEL_OPTIONS
           )
           .sublevel(sort, SUBLEVEL_OPTIONS)
