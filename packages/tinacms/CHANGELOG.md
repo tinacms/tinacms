@@ -1,5 +1,25 @@
 # tinacms
 
+## 1.4.2
+
+### Patch Changes
+
+- 0626ba381: If you have a collection with
+
+  ```ts
+  ui: {
+    allowedActions: {
+      create: false,
+      delete: false,
+    }
+  },
+  ```
+
+  and it only contains one document. Instead of navigating to the collection list page it will navigate to the document edit page.
+
+- Updated dependencies [a70204500]
+  - @tinacms/schema-tools@1.4.2
+
 ## 1.4.1
 
 ### Patch Changes

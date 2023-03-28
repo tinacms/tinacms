@@ -1,5 +1,16 @@
 # tina-graphql
 
+## 1.4.2
+
+### Patch Changes
+
+- af5c32eae: Fix issue where datalayer-port option wasn't being used
+- 1f9f83718: Handle ambiguous templates from indexing
+- a70204500: feat: Configurable template key on blocks
+- Updated dependencies [a70204500]
+  - @tinacms/schema-tools@1.4.2
+  - @tinacms/mdx@1.3.7
+
 ## 1.4.1
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # e2e-next
 
+## 0.1.25
+
+### Patch Changes
+
+- Updated dependencies [0626ba381]
+  - tinacms@1.4.2
+  - @tinacms/datalayer@1.2.2
+
 ## 0.1.24
 
 ### Patch Changes
