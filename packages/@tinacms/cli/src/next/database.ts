@@ -42,6 +42,7 @@ export const createDBServer = (port: number) => {
 
 export async function createAndInitializeDatabase(
   configManager: ConfigManager,
+  datalayerPort: number,
   bridgeOverride?: Bridge
 ) {
   let database: Database
@@ -65,7 +66,7 @@ export async function createAndInitializeDatabase(
         )} but there was no "contentApiUrlOverride" set. Falling back to built-in datalayer`
       )
     }
-    const level = new TinaLevelClient()
+    const level = new TinaLevelClient(datalayerPort)
     level.openConnection()
     database = createDatabase({
       bridge,
