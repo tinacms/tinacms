@@ -360,6 +360,7 @@ export type ObjectField<WithNamespace extends boolean = false> =
             type: 'object'
             fields?: undefined
             templates: Template<WithNamespace>[]
+            templateKey?: string
           }
       )
 

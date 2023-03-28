@@ -8,7 +8,7 @@ import yaml from 'js-yaml'
 import z from 'zod'
 import type { TinaField, TinaTemplate } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
-import { linkText, warnText } from '../../../utils/theme'
+import { warnText } from '../../../utils/theme'
 import { ErrorSingleton } from './errorSingleton'
 
 const errorSingletonInstance = ErrorSingleton.getInstance()
@@ -150,7 +150,6 @@ export const transformForestryFieldsToTinaFields = ({
 }) => {
   const tinaFields: TinaField[] = []
 
-  const blockFields: string[] = []
   fields?.forEach((forestryField) => {
     if (forestryField.name === 'menu') {
       logger.info(
@@ -310,7 +309,6 @@ export const transformForestryFieldsToTinaFields = ({
 
       case 'blocks':
         if (skipBlocks) {
-          blockFields.push(forestryField.name)
           break
         }
 
@@ -332,6 +330,7 @@ export const transformForestryFieldsToTinaFields = ({
         field = {
           type: 'object',
           list: true,
+          templateKey: 'template',
           label: forestryField.label,
           ...getTinaFieldsFromName(forestryField.name),
           templates,
@@ -363,21 +362,6 @@ export const transformForestryFieldsToTinaFields = ({
     }
   })
 
-  if (blockFields.length > 0) {
-    logger.info(
-      warnText(
-        `Skipping blocks field${
-          blockFields.length > 1 ? 's' : ''
-        }: ${blockFields
-          .map((b) => `"${b}"`)
-          .join(
-            ', '
-          )}" in ${template}.yaml. Blocks fields need to be manually imported: ${linkText(
-          'https://tina.io/docs/forestry/common-errors/#migrating-blocks'
-        )}`
-      )
-    )
-  }
   return tinaFields
 }
 
@@ -393,7 +377,7 @@ export const getFieldsFromTemplates: (_args: {
     hide_body?: boolean
     fields?: ForestryFieldType[]
   }
-} = ({ tem, pathToForestryConfig, skipBlocks = true }) => {
+} = ({ tem, pathToForestryConfig, skipBlocks = false }) => {
   const templatePath = path.join(
     pathToForestryConfig,
     '.forestry',
