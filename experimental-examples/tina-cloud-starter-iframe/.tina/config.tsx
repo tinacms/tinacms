@@ -164,6 +164,10 @@ const config = defineStaticConfig({
         path: "content/global",
         format: "json",
         ui: {
+          allowedActions: {
+            create: false,
+            delete: false,
+          },
           global: true,
         },
         fields: [

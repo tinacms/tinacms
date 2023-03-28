@@ -98,7 +98,7 @@ const TemplateMenu = ({ templates }: { templates: TemplateResponse[] }) => {
   )
 }
 
-const handleNavigate = (
+export const handleNavigate = (
   navigate: NavigateFunction,
   cms: TinaCMS,
   // FIXME: `Collection` is deceiving because it's just the value we get back from the API request
