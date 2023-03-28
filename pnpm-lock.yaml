@@ -330,6 +330,7 @@ importers:
       '@types/fs-extra': ^9.0.1
       '@types/react': 17.0.2
       '@types/react-dom': 17.0.2
+      '@vercel/stega': 0.0.2
       '@vitejs/plugin-react': ^2.1.0
       '@xstate/react': 3.0.0
       autoprefixer: ^10.4.0
@@ -358,6 +359,7 @@ importers:
       '@tailwindcss/aspect-ratio': 0.4.0_tailwindcss@3.1.8
       '@tailwindcss/line-clamp': 0.3.1_tailwindcss@3.1.8
       '@tailwindcss/typography': 0.5.4_tailwindcss@3.1.8
+      '@vercel/stega': 0.0.2
       '@vitejs/plugin-react': 2.1.0_vite@3.1.8
       '@xstate/react': 3.0.0_cgmtdnh7hbcv55nluxt3gdbquy
       autoprefixer: 10.4.7_postcss@8.4.14
@@ -496,7 +498,7 @@ importers:
       yup: ^0.32.9
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 3.1.1_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 4.0.0_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -5624,15 +5626,15 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@graphql-codegen/plugin-helpers/3.1.1_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/4.0.0_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-+V1WK4DUhejVSbkZrAsyv9gA4oQABVrtEUkT7vWq7gSf7Ln6OEM59lDUDsjp5wpLPTBIDJANbAe3qEd+iCB3Ow==,
+        integrity: sha512-vgNGTanT36hC4RAC/LAThMEjDvnu3WCyx6MtKZcPUtfCWFxbUAr88+OarGl1LAEiOef0agIREC7tIBXCqjKkJA==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-tools/utils': 8.8.0_graphql@15.8.0
+      '@graphql-tools/utils': 9.2.1_graphql@15.8.0
       change-case-all: 1.0.15
       common-tags: 1.8.2
       graphql: 15.8.0
@@ -5865,6 +5867,30 @@ packages:
     dependencies:
       graphql: 15.8.0
       tslib: 2.4.0
+
+  /@graphql-tools/utils/9.2.1_graphql@15.8.0:
+    resolution:
+      {
+        integrity: sha512-WUw506Ql6xzmOORlriNrD6Ugx+HjVgYxt9KCXD9mHAak+eaXSwuGGPyE60hy9xaDEoXKBsG7SkG69ybitaVl6A==,
+      }
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0_graphql@15.8.0
+      graphql: 15.8.0
+      tslib: 2.4.0
+    dev: false
+
+  /@graphql-typed-document-node/core/3.2.0_graphql@15.8.0:
+    resolution:
+      {
+        integrity: sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==,
+      }
+    peerDependencies:
+      graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+    dependencies:
+      graphql: 15.8.0
+    dev: false
 
   /@headlessui/react/1.6.5_sfoxds7t5ydpegc3knd667wn6m:
     resolution:
@@ -10832,6 +10858,13 @@ packages:
       - react-dom
       - react-native
       - scheduler
+    dev: false
+
+  /@vercel/stega/0.0.2:
+    resolution:
+      {
+        integrity: sha512-sTtQCACrBlHlINySA/UpInPFhmLSGTS0HgyGfKndBBDBtY8J0ILg0lD3LcCRIv3AVR1rZ87dXHtYdTPnNdTXAg==,
+      }
     dev: false
 
   /@vitejs/plugin-react/2.1.0_vite@3.1.8:

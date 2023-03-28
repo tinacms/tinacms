@@ -26,6 +26,14 @@ import { formify } from '../formify'
 import { Data, documentMachine } from './document-machine'
 import type { ActorRefFrom } from 'xstate'
 import { getIn } from 'final-form'
+import { vercelStegaEncode } from '@vercel/stega'
+
+function encodeEditInfo(text: string, href: string): string {
+  return `${vercelStegaEncode({
+    origin: 'tina.io',
+    href,
+  })}${text}`
+}
 
 export type DataType = Record<string, unknown>
 type DocumentInfo = {
@@ -373,6 +381,7 @@ export const queryMachine =
                     fields: form.fields,
                     values: values,
                     tinaSchema,
+                    path: [path],
                   })
                   const template = tinaSchema.getTemplateForData({
                     data: form.values,
@@ -629,10 +638,12 @@ const resolveFormValue = <T extends Record<string, unknown>>({
   fields,
   values,
   tinaSchema,
+  path,
 }: {
   fields: TinaFieldEnriched[]
   values: T
   tinaSchema: TinaSchema
+  path: (string | number)[]
 }): T & { __typename?: string } => {
   const accum: Record<string, unknown> = {}
   fields.forEach((field) => {
@@ -647,6 +658,7 @@ const resolveFormValue = <T extends Record<string, unknown>>({
       field,
       value: v,
       tinaSchema,
+      path,
     })
   })
   return accum as T & { __typename?: string }
@@ -655,17 +667,25 @@ const resolveFieldValue = ({
   field,
   value,
   tinaSchema,
+  path,
 }: {
   field: TinaFieldEnriched
   value: unknown
   tinaSchema: TinaSchema
+  path: (string | number)[]
 }) => {
   switch (field.type) {
+    case 'string': {
+      const [formId, ...rest] = [...path, field.name]
+      const lookup = `${formId}#${rest.join('.')}`
+      return encodeEditInfo(value, lookup)
+      return `${lookup}--${value}`
+    }
     case 'object': {
       if (field.templates) {
         if (field.list) {
           if (Array.isArray(value)) {
-            return value.map((item) => {
+            return value.map((item, index) => {
               const template = field.templates[item._template]
               if (typeof template === 'string') {
                 throw new Error('Global templates not supported')
@@ -676,6 +696,7 @@ const resolveFieldValue = ({
                   fields: template.fields,
                   values: item,
                   tinaSchema,
+                  path: [...path, field.name, index],
                 }),
               }
             })
@@ -694,13 +715,14 @@ const resolveFieldValue = ({
       }
       if (field.list) {
         if (Array.isArray(value)) {
-          return value.map((item) => {
+          return value.map((item, index) => {
             return {
               __typename: NAMER.dataTypeName(field.namespace),
               ...resolveFormValue({
                 fields: templateFields,
                 values: item,
                 tinaSchema,
+                path: [...path, field.name, index],
               }),
             }
           })
@@ -712,6 +734,7 @@ const resolveFieldValue = ({
             fields: templateFields,
             values: value as any,
             tinaSchema,
+            path: [...path, field.name],
           }),
         }
       }
