@@ -4,6 +4,13 @@
 
 import type { AddConfigArgs, Framework } from '..'
 
+const clientConfig = (isForestryMigration?: boolean) => {
+  if (isForestryMigration) {
+    return 'client: {skip: true},'
+  }
+  return ''
+}
+
 const other = (args: AddConfigArgs) => {
   return `
 import { defineConfig } from "tinacms";
@@ -17,6 +24,7 @@ export default defineConfig({
     args.clientId ? `'${args.clientId}'` : 'null'
   }, // Get this from tina.io
   token:  ${args.token ? `'${args.token}'` : 'null'}, // Get this from tina.io
+  ${clientConfig(args.isForestryMigration)}
   build: {
     outputFolder: "admin",
     publicFolder: "${args.publicFolder}",
@@ -66,13 +74,14 @@ export const configExamples: {
 
   // Your hosting provider likely exposes this as an environment variable
   const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || 'main'
-  
+
   export default defineConfig({
     branch,
     clientId: ${
       args.clientId ? `'${args.clientId}'` : 'null'
     }, // Get this from tina.io
     token:  ${args.token ? `'${args.token}'` : 'null'}, // Get this from tina.io
+    ${clientConfig(args.isForestryMigration)}
     build: {
       outputFolder: "admin",
       publicFolder: "${args.publicFolder}",

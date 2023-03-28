@@ -14,7 +14,7 @@ jobs:
         os:
           - ubuntu-latest
           - macOS-latest
-        #  - windows-latest
+          - windows-latest
         node-version: [14.x]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
@@ -70,14 +70,18 @@ jobs:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Publish tagged PR
-        if: contains(github.event.pull_request.labels.*.name, 'tagged')
+        if: >
+          matrix.os == 'ubuntu-latest' &&
+          github.event_name == 'pull_request' &&
+          contains(github.event.pull_request.labels.*.name, 'tagged')
         continue-on-error: true
         run: |
-          echo running on branch ${GITHUB_REF##*/}
+          echo running on branch ${BRANCH_NAME}
           pnpm version:snapshot
-          pnpm publish -r --tag ${GITHUB_REF##*/} --no-git-checks --access public
+          pnpm publish -r --tag ${BRANCH_NAME} --no-git-checks --access public
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
       - name: Test
         run: pnpm test

@@ -28,13 +28,17 @@ export interface Framework {
 }
 
 export async function initStaticTina({
+  rootPath,
   pathToForestryConfig,
   noTelemetry,
 }: {
+  rootPath: string
   pathToForestryConfig: string
   noTelemetry: boolean
 }) {
   logger.level = 'info'
+
+  process.chdir(rootPath)
 
   // Choose your ClientID
   const clientId = await chooseClientId()
@@ -66,10 +70,14 @@ export async function initStaticTina({
     path.join(pathToForestryConfig, '.forestry', 'settings.yml')
   )
 
+  let isForestryMigration = false
   if (hasForestryConfig) {
     collections = await forestryMigrate({
       pathToForestryConfig,
     })
+    if (collections) {
+      isForestryMigration = true
+    }
   }
 
   // Report telemetry
@@ -115,6 +123,7 @@ export async function initStaticTina({
     collections,
     token,
     clientId,
+    isForestryMigration,
   })
 
   if (!hasForestryConfig) {
@@ -326,6 +335,7 @@ export interface AddConfigArgs {
   collections?: string
   token?: string
   clientId?: string
+  isForestryMigration?: boolean
 }
 const addConfigFile = async (args: AddConfigArgs) => {
   const { baseDir, usingTypescript } = args
