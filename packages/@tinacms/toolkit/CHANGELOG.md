@@ -1,5 +1,41 @@
 # Change Log
 
+## 1.6.1
+
+### Patch Changes
+
+- d0c4801b7: cancel index polling when component is unmounted
+
+## 1.6.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+
+### Patch Changes
+
+- 084a39d2c: Dont trigger hover events for ListFieldMeta when wrapping objects
+- 785748400: Add error modal for failed media uploads
+  - @tinacms/sharedctx@1.0.1
+
+## 1.5.2
+
+### Patch Changes
+
+- 973e83f1f: Some fixes around image handling in the rich-text editor
+
+  - Stop treating images as block-level
+  - Fix issue where images inside links were being stripped out
+  - Fix display of .avif images in the media manager
+
+- d1cf65999: Adds list support to image field, improved field UI
+
+## 1.5.1
+
+### Patch Changes
+
+- f07d8f165: fix: nested thumbails
+
 ## 1.5.0
 
 ### Minor Changes

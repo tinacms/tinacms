@@ -1,5 +1,45 @@
 # tina-graphql
 
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [af5c32eae]
+- Updated dependencies [1f9f83718]
+- Updated dependencies [a70204500]
+  - @tinacms/graphql@1.4.2
+
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [e9514656c]
+- Updated dependencies [9a8074889]
+- Updated dependencies [13b809ff5]
+  - @tinacms/graphql@1.4.1
+
+## 1.2.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+- 202cd714d: Internal updates to the CLI
+
+### Patch Changes
+
+- Updated dependencies [76c984bcc]
+- Updated dependencies [5809796cf]
+- Updated dependencies [e3b58c03e]
+- Updated dependencies [0553035f5]
+- Updated dependencies [202cd714d]
+  - @tinacms/graphql@1.4.0
+
+## 1.1.6
+
+### Patch Changes
+
+- @tinacms/graphql@1.3.5
+
 ## 1.1.5
 
 ### Patch Changes

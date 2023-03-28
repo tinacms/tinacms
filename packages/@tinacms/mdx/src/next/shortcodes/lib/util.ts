@@ -35,5 +35,9 @@ export const printCode = (num: number) => {
   console.log(lookupValue)
 }
 export const logSelf = (item: any) => {
-  console.log(item.events.map((e: any) => `${e[0]} - ${e[1].type}`))
+  console.log(
+    item.events.map((e: any) => {
+      return `${e[0]} - ${e[1].type} | ${item.sliceSerialize(e[1])}`
+    })
+  )
 }

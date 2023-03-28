@@ -1,0 +1,166 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "ul",
+      "children": [
+        {
+          "type": "li",
+          "children": [
+            {
+              "type": "lic",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "This is an item"
+                }
+              ]
+            },
+            {
+              "type": "ul",
+              "children": [
+                {
+                  "type": "li",
+                  "children": [
+                    {
+                      "type": "lic",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "this is a sub-item"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "li",
+          "children": [
+            {
+              "type": "lic",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "this is another item"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hr",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "type": "ul",
+      "children": [
+        {
+          "type": "li",
+          "children": [
+            {
+              "type": "lic",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "this is an "
+                },
+                {
+                  "type": "text",
+                  "text": "item",
+                  "bold": true
+                },
+                {
+                  "type": "text",
+                  "text": " and a "
+                },
+                {
+                  "type": "a",
+                  "url": "http://example.com",
+                  "title": null,
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "link"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hr",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "type": "ul",
+      "children": [
+        {
+          "type": "li",
+          "children": [
+            {
+              "type": "lic",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "list item 1"
+                }
+              ]
+            },
+            {
+              "type": "ol",
+              "children": [
+                {
+                  "type": "li",
+                  "children": [
+                    {
+                      "type": "lic",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "sub list item 1A"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "li",
+          "children": [
+            {
+              "type": "lic",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "list item 2"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

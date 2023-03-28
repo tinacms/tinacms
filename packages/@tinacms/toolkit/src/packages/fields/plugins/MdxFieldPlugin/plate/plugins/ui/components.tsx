@@ -121,7 +121,8 @@ export const components = () => {
       element,
       ...props
     }) => (
-      <p
+      // Descendants in the rich-text editor can be `<div>` elements, so we get a console error for divs in paragraphs
+      <div
         className={classNames(
           blockClasses,
           className,

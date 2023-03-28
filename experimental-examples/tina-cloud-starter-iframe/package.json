@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/starter-iframe",
-  "version": "0.1.22",
+  "version": "0.1.27",
   "private": true,
   "scripts": {
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.5.0",
-    "@tailwindcss/typography": "^0.4.1",
+    "@tailwindcss/typography": "0.5.9",
     "@tinacms/auth": "workspace:*",
     "date-fns": "^2.23.0",
     "next": "12.2.4",

@@ -1,5 +1,50 @@
 # @tinacms/app
 
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [0626ba381]
+  - tinacms@1.4.2
+  - @tinacms/mdx@1.3.7
+
+## 1.2.1
+
+### Patch Changes
+
+- 5fcef561d: - Pin vite version
+  - Adds react plugin so that we no longer get a 404 on react /@react-refresh
+  - Adds transform ts and tsx files in build as well as dev
+- 8fc99059f: Fix main export field for @tinacms/app
+- c48326846: Move --skipSDK into config property: `client.skip = true`
+- Updated dependencies [5fcef561d]
+- Updated dependencies [9a8074889]
+- Updated dependencies [d0c4801b7]
+  - @tinacms/mdx@1.3.6
+  - tinacms@1.4.1
+  - @tinacms/toolkit@1.6.1
+
+## 1.2.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+- 202cd714d: Internal updates to the CLI
+
+### Patch Changes
+
+- 3a1edd50d: Bundle the MDX package with its dependencies so we can avoid awkward import issues related to the remark ecosystem modules
+- Updated dependencies [9e86312d6]
+- Updated dependencies [084a39d2c]
+- Updated dependencies [76c984bcc]
+- Updated dependencies [785748400]
+- Updated dependencies [5d1e0e406]
+- Updated dependencies [202cd714d]
+- Updated dependencies [cbc1fb919]
+  - @tinacms/mdx@1.3.5
+  - @tinacms/toolkit@1.6.0
+  - tinacms@1.4.0
+
 ## 1.1.2
 
 ### Patch Changes

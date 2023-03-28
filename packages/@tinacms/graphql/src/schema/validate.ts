@@ -68,10 +68,13 @@ const validationCollectionsPathAndMatch = (collections: Collection<true>[]) => {
     .filter((x) => {
       return typeof x?.match === 'undefined'
     })
-    .map((x) => x.path)
+    .map((x) => `${x.path}${x.format || 'md'}`)
 
   if (noMatchCollections.length !== new Set(noMatchCollections).size) {
-    throw new Error('path must be unique')
+    throw new Error(
+      // TODO: add a link to the docs
+      'Two collections without match can not have the same `path`. Please make the `path` unique or add a matches property to the collection.'
+    )
   }
 
   // Make sure both path and match are not the same
@@ -89,39 +92,58 @@ const validationCollectionsPathAndMatch = (collections: Collection<true>[]) => {
     .filter((x) => {
       return typeof x.path !== 'undefined' && typeof x.match !== 'undefined'
     })
-    .map((x) => `${x.path}|${x.match}`)
+    .map(
+      (x) =>
+        `${x.path}|${x?.match?.exclude || ''}|${x?.match?.include || ''}|${
+          x.format || 'md'
+        }`
+    )
 
   if (hasMatchAndPath.length !== new Set(hasMatchAndPath).size) {
-    throw new Error('Both `match` and `path` can not be the same')
+    throw new Error(
+      'Can not have two or more collections with the same path and match. Please update either the path or the match to be unique.'
+    )
   }
 
   // Check to make sure that when two paths are the same they all have different matches
-  // checks this type of invalid state
-  //  {
-  //   path: 'content/posts',
-  //   matches: '**/*.en.md'
-  // },
-  // {
-  //   path: 'content/posts'
-  // }
   const groupbyPath = collections.reduce((r, a) => {
-    r[a.path] = r[a.path] || []
-    r[a.path].push(a)
+    const key = `${a.path}|${a.format || 'md'}`
+    r[key] = r[key] || []
+    r[key].push(a)
     return r
   }, Object.create(null))
-
   Object.keys(groupbyPath).forEach((key) => {
     const collectionsArr: Collection<true>[] = groupbyPath[key]
+
+    // if there is only one collection with this path
     if (collectionsArr.length === 1) {
       return
     }
-    // check if one or more does not have the "matches key" it is invalid
-    const matches = collectionsArr.filter((x) => {
-      return typeof x.match !== 'undefined'
-    })
-    if (matches.length !== collections.length) {
-      throw new Error('path must be unique when no `match` is provided')
+
+    // check to make sure each collection has a match
+    // checks this type of invalid state
+    //  {
+    //   path: 'content/posts',
+    //   matches: '**/*.en.md'
+    // },
+    // {
+    //   path: 'content/posts'
+    // }
+    if (collectionsArr.some((x) => typeof x.match === 'undefined')) {
+      throw new Error(
+        "Can not have two or more collections with the same path and format if one doesn't have a match property"
+      )
     }
+
+    const matches = collectionsArr.map((x) =>
+      typeof x?.match === 'object' ? JSON.stringify(x.match) : ''
+    )
+    if (matches.length === new Set(matches).size) {
+      return
+    }
+    throw new Error(
+      'Can not have two or more collections with the same path format and match. Please update either the path or the match to be unique.'
+    )
   })
 }
 

@@ -1,0 +1,53 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Click "
+        },
+        {
+          "type": "a",
+          "url": "https://example.com",
+          "title": "Tester",
+          "children": [
+            {
+              "type": "text",
+              "text": "here"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " to join now"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Click "
+        },
+        {
+          "type": "a",
+          "url": "https://example.com",
+          "title": null,
+          "children": [
+            {
+              "type": "text",
+              "text": "here"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " to join now"
+        }
+      ]
+    }
+  ]
+}

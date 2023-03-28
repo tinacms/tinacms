@@ -6,7 +6,11 @@ import * as yup from 'yup'
 import toml from '@iarna/toml'
 import yaml from 'js-yaml'
 import matter from 'gray-matter'
+import { normalizePath } from '@tinacms/schema-tools'
+
 import { assertShape } from '../util'
+
+export { normalizePath }
 
 const matterEngines = {
   toml: {
@@ -118,8 +122,6 @@ export const parseFile = <T extends object>(
 }
 
 export type FormatType = 'json' | 'md' | 'mdx' | 'markdown'
-
-export const normalizePath = (filepath: string) => filepath.replace(/\\/g, '/')
 
 export const atob = (b64Encoded: string) => {
   return Buffer.from(b64Encoded, 'base64').toString()

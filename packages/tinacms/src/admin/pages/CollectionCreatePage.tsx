@@ -1,9 +1,4 @@
-/**
-
-*/
-
 import {
-  BaseTextField,
   BillingWarning,
   Form,
   FormBuilder,
@@ -12,7 +7,7 @@ import {
 } from '@tinacms/toolkit'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
+import { TinaSchema, resolveForm, normalizePath } from '@tinacms/schema-tools'
 import type { Template } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
@@ -22,7 +17,6 @@ import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
-import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 import { useWindowWidth } from '@react-hook/window-size'
 import { FaLock, FaUnlock } from 'react-icons/fa'
 
@@ -35,20 +29,13 @@ const createDocument = async (
 ) => {
   const api = new TinaAdminApi(cms)
   const { filename, ...leftover } = values
-  const { includeCollection, includeTemplate } = mutationInfo
 
   const relativePath = `${filename}.${collection.format}`
-  const params = transformDocumentIntoMutationRequestPayload(
-    {
-      _collection: collection.name,
-      ...(template && { _template: template.name }),
-      ...leftover,
-    },
-    {
-      includeCollection,
-      includeTemplate,
-    }
-  )
+  const params = api.schema.transformPayload(collection.name, {
+    _collection: collection.name,
+    ...(template && { _template: template.name }),
+    ...leftover,
+  })
 
   if (await api.isAuthenticated()) {
     await api.createDocument(collection.name, relativePath, params)
@@ -221,6 +208,22 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
             const isValid = /^[_a-zA-Z0-9][\.\-_\/a-zA-Z0-9]*$/.test(value)
             if (value && !isValid) {
               return 'Must begin with a-z, A-Z, 0-9, or _ and contain only a-z, A-Z, 0-9, -, _, ., or /.'
+            }
+            // check if the filename is allowed by the collection.
+            if (
+              schemaCollection.match?.exclude ||
+              schemaCollection.match?.include
+            ) {
+              const filePath = `${normalizePath(
+                schemaCollection.path
+              )}/${value}.${schemaCollection.format || 'md'}`
+              const match = schema.matchFiles({
+                files: [filePath],
+                collection: schemaCollection,
+              })
+              if (match.length === 0) {
+                return `The filename "${value}" is not allowed for this collection.`
+              }
             }
           },
         },

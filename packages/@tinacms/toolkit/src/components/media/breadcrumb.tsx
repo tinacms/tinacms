@@ -10,7 +10,7 @@ import { IconButton } from '../../packages/styles'
 
 // Fixed issue where dirname was being used in the frontend
 function dirname(path): string | undefined {
-  const pattern = new RegExp('(?<prevDir>.*)\/')
+  const pattern = new RegExp('(?<prevDir>.*)/')
   return path.match(pattern)?.groups?.prevDir
 }
 

@@ -16,7 +16,7 @@ interface MediaItemProps {
 
 export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
-  const thumbnail = item.thumbnails['75x75']
+  const thumbnail = (item.thumbnails || {})['75x75']
   return (
     <li
       className={`flex shrink-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
@@ -52,7 +52,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
 
 export function GridMediaItem({ item, active, onClick }) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
-  const thumbnail = item.thumbnails['400x400']
+  const thumbnail = (item.thumbnails || {})['400x400']
   return (
     <li
       className={`relative pb-[100%] h-0 block border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out ${

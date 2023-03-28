@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/schema-tools",
-  "version": "1.3.3",
+  "version": "1.4.2",
   "main": "dist/index.js",
   "module": "./dist/index.es.js",
   "exports": {
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
+    "@types/micromatch": "^4.0.2",
     "@types/yup": "^0.29.10",
     "jest": "^27.0.6",
     "react": "17.0.2",
@@ -49,6 +50,7 @@
     "directory": "packages/@tinacms/cli"
   },
   "dependencies": {
+    "micromatch": "4.0.5",
     "url-pattern": "^1.0.3",
     "zod": "^3.14.3"
   }

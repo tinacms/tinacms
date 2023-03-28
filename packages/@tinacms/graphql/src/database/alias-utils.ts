@@ -1,8 +1,12 @@
-import { Template, TinaFieldEnriched } from '@tinacms/schema-tools/src'
-
+import { Template, TinaField } from '@tinacms/schema-tools/src'
 export const replaceNameOverrides = (template: Template, obj: any) => {
   if ((template as any).list) {
     return (obj as any[]).map((item) => {
+      if (isBlockField(template) && (template as any).templateKey) {
+        item._template = item[(template as any).templateKey]
+        delete item[(template as any).templateKey]
+      }
+
       return _replaceNameOverrides(
         getTemplateForData(template, item).fields,
         item
@@ -13,7 +17,11 @@ export const replaceNameOverrides = (template: Template, obj: any) => {
   }
 }
 
-const _replaceNameOverrides = (fields: TinaFieldEnriched[], obj: any) => {
+function isBlockField(field: any): field is Object {
+  return field && field.type === 'object' && field.templates?.length > 0
+}
+
+const _replaceNameOverrides = (fields: TinaField[], obj: any) => {
   const output: object = {}
 
   Object.keys(obj).forEach((key) => {
@@ -32,13 +40,9 @@ const _replaceNameOverrides = (fields: TinaFieldEnriched[], obj: any) => {
   return output
 }
 
-const getTemplateKey = (field) => {
-  return field?.templateKey || '_template'
-}
-
 const getTemplateForData = (field: any, data: any) => {
   if (field.templates?.length) {
-    const templateKey = getTemplateKey(field)
+    const templateKey = '_template'
 
     if (data[templateKey]) {
       const result = field.templates.find(
@@ -50,27 +54,34 @@ const getTemplateForData = (field: any, data: any) => {
         return result
       }
     }
+
+    throw new Error(
+      `Missing required key "${templateKey}" on field ${field.name}`
+    )
   } else {
     return field
   }
-
-  throw new Error('No template found for field ' + field.name)
 }
 
 export const applyNameOverrides = (template: Template, obj: any): object => {
   if ((template as any).list) {
     return (obj as any[]).map((item) => {
-      return _applyNameOverrides(
+      const result = _applyNameOverrides(
         getTemplateForData(template, item).fields,
         item
       )
+      if (isBlockField(template) && (template as any).templateKey) {
+        result[(template as any).templateKey] = (result as any)._template
+        delete (result as any)._template
+      }
+      return result
     })
   } else {
     return _applyNameOverrides(getTemplateForData(template, obj).fields, obj)
   }
 }
 
-const _applyNameOverrides = (fields: TinaFieldEnriched[], obj: any): object => {
+const _applyNameOverrides = (fields: TinaField[], obj: any): object => {
   const output: object = {}
   Object.keys(obj).forEach((key) => {
     const field = fields.find((field) => field.name === key)

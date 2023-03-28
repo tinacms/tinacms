@@ -1,0 +1,54 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "img",
+          "url": "https://some-image.jpg",
+          "alt": "alt description",
+          "caption": "Some Title",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "img",
+          "url": "https://some-image.jpg",
+          "caption": "Some title",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "img",
+          "url": "https://some-image.jpg",
+          "caption": null,
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

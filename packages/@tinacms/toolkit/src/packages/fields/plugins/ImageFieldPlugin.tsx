@@ -5,6 +5,7 @@ import { Media, MediaStore } from '../../core'
 import { useCMS } from '../../react-core'
 import { parse } from './textFormat'
 import { useState, useEffect } from 'react'
+import { FileError } from 'react-dropzone'
 
 interface ImageProps {
   path: string
@@ -50,18 +51,58 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
             onSelect: onChange,
           })
         }}
-        onDrop={async ([file]: File[]) => {
+        onDrop={async ([file]: File[], fileRejections) => {
           setIsImgUploading(true)
           try {
-            const directory = uploadDir(props.form.getState().values)
-            const [media] = await cms.media.persist([
-              {
-                directory: directory,
-                file,
-              },
-            ])
-            if (media) {
-              await onChange(media)
+            if (file) {
+              const directory = uploadDir(props.form.getState().values)
+              const [media] = await cms.media.persist([
+                {
+                  directory: directory,
+                  file,
+                },
+              ])
+              if (media) {
+                await onChange(media)
+              }
+            }
+
+            // Codes here https://github.com/react-dropzone/react-dropzone/blob/c36ab5bd8b8fd74e2074290d80e3ecb93d26b014/typings/react-dropzone.d.ts#LL13-L18C2
+            const errorCodes = {
+              'file-invalid-type': 'Invalid file type',
+              'file-too-large': 'File too large',
+              'file-too-small': 'File too small',
+              'too-many-files': 'Too many files',
+            }
+
+            const printError = (error: FileError) => {
+              const message = errorCodes[error.code]
+              if (message) {
+                return message
+              }
+              console.error(error)
+              return 'Unknown error'
+            }
+
+            // Upload Failed
+            if (fileRejections.length > 0) {
+              const messages = []
+              fileRejections.map((fileRejection) => {
+                messages.push(
+                  `${fileRejection.file.name}: ${fileRejection.errors
+                    .map((error) => printError(error))
+                    .join(', ')}`
+                )
+              })
+              // @ts-ignore
+              cms.alerts.error(() => {
+                return (
+                  <>
+                    Upload Failed. <br />
+                    {messages.join('. ')}.
+                  </>
+                )
+              })
             }
           } catch (error) {
             console.error('Error uploading media asset: ', error)

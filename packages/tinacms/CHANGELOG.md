@@ -1,5 +1,71 @@
 # tinacms
 
+## 1.4.2
+
+### Patch Changes
+
+- 0626ba381: If you have a collection with
+
+  ```ts
+  ui: {
+    allowedActions: {
+      create: false,
+      delete: false,
+    }
+  },
+  ```
+
+  and it only contains one document. Instead of navigating to the collection list page it will navigate to the document edit page.
+
+- Updated dependencies [a70204500]
+  - @tinacms/schema-tools@1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- 9a8074889: Consolidate payload transform logic
+- d0c4801b7: cancel index polling when component is unmounted
+- Updated dependencies [9a8074889]
+- Updated dependencies [d0c4801b7]
+- Updated dependencies [c48326846]
+  - @tinacms/schema-tools@1.4.1
+  - @tinacms/toolkit@1.6.1
+
+## 1.4.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+
+### Patch Changes
+
+- 202cd714d: Internal updates to the CLI
+- Updated dependencies [084a39d2c]
+- Updated dependencies [76c984bcc]
+- Updated dependencies [5809796cf]
+- Updated dependencies [785748400]
+- Updated dependencies [54aac9017]
+  - @tinacms/toolkit@1.6.0
+  - @tinacms/schema-tools@1.4.0
+  - @tinacms/sharedctx@1.0.1
+
+## 1.3.3
+
+### Patch Changes
+
+- Updated dependencies [973e83f1f]
+- Updated dependencies [d1cf65999]
+  - @tinacms/toolkit@1.5.2
+  - @tinacms/schema-tools@1.3.4
+
+## 1.3.2
+
+### Patch Changes
+
+- Updated dependencies [f07d8f165]
+  - @tinacms/toolkit@1.5.1
+
 ## 1.3.1
 
 ### Patch Changes

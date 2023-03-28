@@ -18,19 +18,27 @@ import { Telemetry } from '@tinacms/metrics'
 import { nextPostPage } from './setup-files'
 import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
-import { hasForestryConfig } from '../forestry-migrate/util'
 import { generateCollections } from '../forestry-migrate'
-import { spin } from '../../utils/spinner'
 import { ErrorSingleton } from '../forestry-migrate/util/errorSingleton'
+import { writeGitignore } from '../../next/commands/codemod-command'
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other'
   reactive: boolean
 }
 
-export async function initStaticTina(ctx: any, next: () => void, options) {
-  const baseDir = ctx.rootPath
+export async function initStaticTina({
+  rootPath,
+  pathToForestryConfig,
+  noTelemetry,
+}: {
+  rootPath: string
+  pathToForestryConfig: string
+  noTelemetry: boolean
+}) {
   logger.level = 'info'
+
+  process.chdir(rootPath)
 
   // Choose your ClientID
   const clientId = await chooseClientId()
@@ -54,23 +62,29 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   const publicFolder: string = await choosePublicFolder({ framework })
 
   // Detect forestry config
-  const forestryPath = await hasForestryConfig({ rootPath: ctx.rootPath })
 
   let collections: string | null | undefined
 
   // If there is a forestry config, ask user to migrate it to tina collections
-  if (forestryPath.exists) {
+  const hasForestryConfig = await fs.pathExists(
+    path.join(pathToForestryConfig, '.forestry', 'settings.yml')
+  )
+
+  let isForestryMigration = false
+  if (hasForestryConfig) {
     collections = await forestryMigrate({
-      forestryPath: forestryPath.path,
-      rootPath: ctx.rootPath,
+      pathToForestryConfig,
     })
+    if (collections) {
+      isForestryMigration = true
+    }
   }
 
   // Report telemetry
   await reportTelemetry({
     usingTypescript,
-    hasForestryConfig: forestryPath.exists,
-    noTelemetry: options.noTelemetry,
+    hasForestryConfig,
+    noTelemetry: noTelemetry,
   })
 
   // Check for package.json
@@ -84,37 +98,42 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   const hasGitignore = await fs.pathExistsSync('.gitignore')
   // if no .gitignore, create one
   if (!hasGitignore) {
-    await createGitignore({ baseDir })
+    await createGitignore({ baseDir: '' })
   } else {
     const hasNodeModulesIgnored = await checkGitignoreForNodeModules({
-      baseDir,
+      baseDir: '',
     })
     if (!hasNodeModulesIgnored) {
-      await addNodeModulesToGitignore({ baseDir })
+      await addNodeModulesToGitignore({ baseDir: '' })
     }
   }
 
   await addDependencies(packageManager)
 
-  // add .tina/config.{js,ts}]
+  // add tina/config.{js,ts}]
   await addConfigFile({
-    publicFolder,
-    baseDir,
+    // remove process fom pathToForestryConfig and add publicFolder
+    publicFolder: path.join(
+      path.relative(process.cwd(), pathToForestryConfig),
+      publicFolder
+    ),
+    baseDir: '',
     usingTypescript,
     framework,
     collections,
     token,
     clientId,
+    isForestryMigration,
   })
 
-  if (!forestryPath.exists) {
+  if (!hasForestryConfig) {
     // add /content/posts/hello-world.md
-    await addContentFile({ baseDir })
+    await addContentFile({ baseDir: '' })
   }
 
   if (framework.reactive) {
     await addReactiveFile[framework.name]({
-      baseDir,
+      baseDir: '',
       framework,
       usingTypescript,
     })
@@ -213,49 +232,30 @@ const chooseFramework = async () => {
 }
 
 const forestryMigrate = async ({
-  forestryPath,
-  rootPath,
+  pathToForestryConfig,
 }: {
-  forestryPath: string
-  rootPath: string
+  pathToForestryConfig: string
 }): Promise<string> => {
-  logger.info(
-    `It looks like you have a ${focusText(
-      '.forestry/settings.yml'
-    )} file in your project.`
-  )
+  logger.info(`Forestry.io configuration found.`)
 
-  logger.info(
-    `This migration will update some of your content to match tina.  Please ${focusText(
-      'save a backup of your content'
-    )} before doing this migration. (This can be done with git)`
+  const disclaimer = logText(
+    `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
   )
-
   const option = await prompts({
     name: 'selection',
     type: 'confirm',
     initial: true,
-    message: `Please note that this is a beta version and may contain some issues\nWould you like to migrate your Forestry templates?\n${logText(
-      'Note: This migration will not be perfect, but it will get you started.'
-    )}`,
+    message: `Would you like to migrate your Forestry templates?\n${disclaimer}`,
   })
   if (!option['selection']) {
     return null
   }
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-  await spin({
-    waitFor: async () => {
-      await delay(2000)
-    },
-    text: '',
-  })
   const collections = await generateCollections({
-    forestryPath,
-    rootPath,
+    pathToForestryConfig,
   })
 
   // print errors
-  ErrorSingleton.getInstance().printNameErrors()
+  ErrorSingleton.getInstance().printCollectionNameErrors()
 
   return JSON.stringify(collections, null, 2)
 }
@@ -335,11 +335,12 @@ export interface AddConfigArgs {
   collections?: string
   token?: string
   clientId?: string
+  isForestryMigration?: boolean
 }
 const addConfigFile = async (args: AddConfigArgs) => {
   const { baseDir, usingTypescript } = args
   const configPath = path.join(
-    '.tina',
+    'tina',
     `config.${usingTypescript ? 'ts' : 'js'}`
   )
   const fullConfigPath = path.join(baseDir, configPath)
@@ -358,10 +359,11 @@ const addConfigFile = async (args: AddConfigArgs) => {
   } else {
     logger.info(
       logText(
-        `Adding config file at .tina/config.${usingTypescript ? 'ts' : 'js'}`
+        `Adding config file at tina/config.${usingTypescript ? 'ts' : 'js'}`
       )
     )
     await fs.outputFileSync(fullConfigPath, config(args))
+    await writeGitignore(baseDir)
   }
 }
 
@@ -433,7 +435,7 @@ const frameworkDevCmds: {
 }
 
 const config = (args: AddConfigArgs) => {
-  return format(configExamples[args.framework.name](args))
+  return format(configExamples[args.framework.name](args), { parser: 'babel' })
 }
 
 const content = `---
@@ -457,7 +459,6 @@ const addReactiveFile = {
     const usingSrc = !fs.pathExistsSync(path.join(baseDir, 'pages'))
     const pagesPath = path.join(baseDir, usingSrc ? 'src' : '', 'pages')
     const packageJSONPath = path.join(baseDir, 'package.json')
-
     const tinaBlogPagePath = path.join(pagesPath, 'demo', 'blog')
     const tinaBlogPagePathFile = path.join(
       tinaBlogPagePath,

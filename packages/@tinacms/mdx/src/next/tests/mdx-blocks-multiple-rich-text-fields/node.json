@@ -1,0 +1,65 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Cta",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Read our privacy policy "
+                },
+                {
+                  "type": "a",
+                  "url": "http://example.com",
+                  "title": null,
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "here"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Click "
+                },
+                {
+                  "type": "text",
+                  "text": "here",
+                  "bold": true
+                },
+                {
+                  "type": "text",
+                  "text": "!"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

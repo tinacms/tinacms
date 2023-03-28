@@ -43,7 +43,8 @@ export const setup = async (
   })
   const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
     database: setupDatabase,
-    config: schema,
+    // @ts-ignore
+    config: { schema },
   })
   await setupDatabase.indexContent({ graphQLSchema, tinaSchema })
 
