@@ -43,8 +43,6 @@ const parseRefForBranchName = (ref: string) => {
 const ListBranchResponse = z
   .object({
     name: z.string(),
-    protected: z.boolean(),
-    commit: z.object({ sha: z.string(), url: z.string() }),
   })
   .array()
 
