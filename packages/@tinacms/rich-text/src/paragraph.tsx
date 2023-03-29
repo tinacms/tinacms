@@ -1,5 +1,4 @@
 import {
-  ElementNode,
   LexicalNode,
   ParagraphNode,
   RangeSelection,
