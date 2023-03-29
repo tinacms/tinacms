@@ -6,7 +6,7 @@ import { parseFile, stringifyFile } from '@tinacms/graphql'
 import type { Collection, TinaField, UITemplate } from '@tinacms/schema-tools'
 import { getFieldsFromTemplates, parseSections } from './util'
 import { logger } from '../../logger'
-import { dangerText, warnText } from '../../utils/theme'
+import { dangerText, linkText, warnText } from '../../utils/theme'
 
 const BODY_FIELD = {
   // This is the body field
@@ -32,8 +32,11 @@ const transformForestryMatchToTinaMatch = (match: string) => {
     ?.replace('{}', '')
 
   if (match !== newMatch) {
-    // TODO: add link to docs
-    logger.warn(`Warning: Match ${match} was transformed to ${newMatch}`)
+    logger.info(
+      `Info: Match ${match} was transformed to ${newMatch}. See ${linkText(
+        'https://tina.io/docs/forestry/common-errors/#info-match-match-was-transformed-to-newmatch'
+      )}`
+    )
   }
 
   return newMatch
