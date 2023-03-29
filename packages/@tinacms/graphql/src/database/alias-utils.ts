@@ -1,14 +1,23 @@
 import { Template, TinaField } from '@tinacms/schema-tools/src'
+
+const replaceBlockAliases = (template: Template, item: any) => {
+  const output = { ...item }
+  if ((template as any).templateKey) {
+    const templateName = output[(template as any).templateKey]
+
+    output._template = (template as any).templates.find(
+      (t) => t.nameOverride == templateName || t.name == templateName
+    ).name
+    delete output[(template as any).templateKey]
+  }
+  return output
+}
+
 export const replaceNameOverrides = (template: Template, obj: any) => {
   if ((template as any).list) {
     return (obj as any[]).map((item) => {
-      if (isBlockField(template) && (template as any).templateKey) {
-        const templateName = item[(template as any).templateKey]
-
-        item._template = (template as any).templates.find(
-          (t) => t.nameOverride == templateName || t.name == templateName
-        ).name
-        delete item[(template as any).templateKey]
+      if (isBlockField(template)) {
+        item = replaceBlockAliases(template, item)
       }
 
       return _replaceNameOverrides(
@@ -70,22 +79,30 @@ const getTemplateForData = (field: any, data: any) => {
   }
 }
 
+const applyBlockAliases = (template: Template, item: any) => {
+  const output = { ...item }
+  if ((template as any).templateKey) {
+    const templateName = (output as any)._template
+
+    const matchingTemplate = (template as any).templates.find(
+      (t) => t.nameOverride == templateName || t.name == templateName
+    )
+    output[(template as any).templateKey] =
+      matchingTemplate.nameOverride || matchingTemplate.name
+    delete (output as any)._template
+  }
+  return output
+}
+
 export const applyNameOverrides = (template: Template, obj: any): object => {
   if ((template as any).list) {
     return (obj as any[]).map((item) => {
-      const result = _applyNameOverrides(
+      let result = _applyNameOverrides(
         getTemplateForData(template, item).fields,
         item
       )
       if (isBlockField(template) && (template as any).templateKey) {
-        const templateName = (result as any)._template
-
-        const matchingTemplate = (template as any).templates.find(
-          (t) => t.nameOverride == templateName || t.name == templateName
-        )
-        result[(template as any).templateKey] =
-          matchingTemplate.nameOverride || matchingTemplate.name
-        delete (result as any)._template
+        result = applyBlockAliases(template, result)
       }
       return result
     })
