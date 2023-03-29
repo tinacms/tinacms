@@ -4,7 +4,7 @@ import { ListNode, $isListNode } from '@lexical/list'
 export function invariant(
   cond?: boolean,
   message?: string,
-  ...args: string[]
+  ..._args: string[]
 ): asserts cond {
   if (cond) {
     return
@@ -92,12 +92,14 @@ export function $getAllListItems(node: ListNode): Array<TinaListItemNode> {
 
   for (let i = 0; i < listChildren.length; i++) {
     const listItemNode = listChildren[i]
-    const firstChild = listItemNode.getFirstChild()
+    const firstChild = listItemNode?.getFirstChild()
 
     if ($isListNode(firstChild)) {
       listItemNodes = listItemNodes.concat($getAllListItems(firstChild))
     } else {
-      listItemNodes.push(listItemNode)
+      if (listItemNode) {
+        listItemNodes.push(listItemNode)
+      }
     }
   }
 
