@@ -11,26 +11,28 @@ import { $applyNodeReplacement } from 'lexical'
 import { ListItemNode } from '@lexical/list'
 
 export class TinaListItemNode extends ListItemNode {
-  static getType(): string {
+  static override getType(): string {
     return 'tina-listitem'
   }
 
-  static clone(node: TinaListItemNode): TinaListItemNode {
+  static override clone(node: TinaListItemNode): TinaListItemNode {
     return new TinaListItemNode(node.__value, node.__checked, node.__key)
   }
 
   constructor(value?: number, checked?: boolean, key?: NodeKey) {
     super(value, checked, key)
     this.__value = value === undefined ? 1 : value
-    this.__checked = checked
+    if (checked === true || checked === false) {
+      this.__checked = checked
+    }
   }
 
-  static importDOM(): DOMConversionMap | null {
+  static override importDOM(): DOMConversionMap | null {
     return ListItemNode.importDOM()
   }
 
   // SerializedListItemNode is not exported
-  static importJSON(serializedNode: any) {
+  static override importJSON(serializedNode: any) {
     const node = new TinaListItemNode(
       serializedNode.value,
       serializedNode.checked
@@ -42,23 +44,34 @@ export class TinaListItemNode extends ListItemNode {
   }
 
   /**
+   *
+   * The built-in ListItemNode allows content to be merged with
+   * paragraph nodes and content can be merged during an .append to the node. If we
+   * call this.append([...some nodes]) and there's a paragraph node
+   * it will try to merge the paragraph's children with these children
+   */
+  override canMergeWith(node: LexicalNode) {
+    return $isListItemNode(node)
+  }
+
+  /**
    * This allows markdown transforms to work within this node
    *
    * NOT SURE WHAT ELSE IT DOES
    */
-  isShadowRoot(): boolean {
+  override isShadowRoot(): boolean {
     return true
   }
 
-  exportJSON() {
+  override exportJSON() {
     return {
       ...super.exportJSON(),
-      type: 'tina-listitem',
+      type: 'tina-listitem' as const,
       version: 1,
     }
   }
 
-  splice(
+  override splice(
     start: number,
     deleteCount: number,
     nodesToInsert: LexicalNode[]

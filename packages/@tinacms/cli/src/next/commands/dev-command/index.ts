@@ -202,7 +202,7 @@ export class DevCommand extends Command {
       if (changedPath.includes('__generated__')) {
         return
       }
-      if (changedPath.includes('@tinacms/app')) {
+      if (changedPath.includes('@tinacms/')) {
         return
       }
       if (changedPath.includes('tinacms/dist')) {

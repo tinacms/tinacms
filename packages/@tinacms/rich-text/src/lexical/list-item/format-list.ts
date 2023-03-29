@@ -22,7 +22,7 @@ import {
   ListItemNode,
   ListNode,
 } from '@lexical/list'
-import { ListType } from '@lexical/list'
+import type { ListType } from '@lexical/list'
 import {
   $getAllListItems,
   $getTopListNode,

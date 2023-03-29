@@ -11,7 +11,12 @@ import {
   ParagraphNode,
   RootNode,
 } from 'lexical'
-import { CodeHighlightNode, CodeNode } from '@lexical/code'
+import {
+  $createCodeHighlightNode,
+  $createCodeNode,
+  CodeHighlightNode,
+  CodeNode,
+} from '@lexical/code'
 import {
   $createTableCellNode,
   $createTableNode,
@@ -22,10 +27,20 @@ import {
 } from '@lexical/table'
 import { $createLinkNode, AutoLinkNode, LinkNode } from '@lexical/link'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { HeadingNode, QuoteNode } from '@lexical/rich-text'
-import { ListItemNode, ListNode } from '@lexical/list'
+import {
+  $createHeadingNode,
+  $createQuoteNode,
+  HeadingNode,
+  QuoteNode,
+} from '@lexical/rich-text'
+import {
+  $createListItemNode,
+  $createListNode,
+  ListItemNode,
+  ListNode,
+} from '@lexical/list'
 import { TinaParagraphNode } from './paragraph'
-import { TinaListItemNode } from './list-item'
+import { $createTinaListItemNode, TinaListItemNode } from './list-item'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { TRANSFORMERS } from './transformers'
@@ -38,6 +53,8 @@ import React from 'react'
 import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical'
 import { addClassNamesToElement } from '@lexical/utils'
 import type {
+  BlockContent,
+  DefinitionContent,
   PhrasingContent,
   SlateRootType,
   StaticPhrasingContent,
@@ -174,42 +191,105 @@ const populatePhrasingContent = (value: PhrasingContent, node: ElementNode) => {
   }
 }
 
+const populateBlockOrDefinitionContent = (
+  value: BlockContent | DefinitionContent,
+  node: ElementNode
+) => {
+  switch (value.type) {
+    case 'table': {
+      const tableNode = $createTableNode()
+      value.children.forEach((row) => {
+        const rowNode = $createTableRowNode()
+        row.children.forEach((cell, columnIndex) => {
+          const cellNode = $createTableCellNode(0) // All cells are the same, no <th>
+          const alignment = value.align ? value.align[columnIndex] : 'center'
+          const alignmentClasses = {
+            left: 'text-left',
+            center: 'text-center',
+            right: 'text-right',
+          }
+          cell.children.forEach((cellChild) => {
+            populatePhrasingContent(cellChild, cellNode)
+          })
+          rowNode.append(cellNode)
+        })
+        tableNode.append(rowNode)
+      })
+      node.append(tableNode)
+      break
+    }
+    case 'list': {
+      const listNode = $createListNode(value.ordered ? 'number' : 'bullet')
+      value.children.forEach((subChild) => {
+        const listItemNode = $createTinaListItemNode()
+        subChild.children.forEach((listItemChild) => {
+          if (
+            listItemChild.type === 'definition' ||
+            listItemChild.type === 'footnoteDefinition'
+          ) {
+            // not sure
+          } else {
+            populateBlockOrDefinitionContent(listItemChild, listItemNode)
+          }
+        })
+        listNode.append(listItemNode)
+      })
+      node.append(listNode)
+      break
+    }
+    case 'thematicBreak': {
+      node.append($createHorizontalRuleNode())
+      break
+    }
+    case 'blockquote': {
+      const blockQuoteNode = $createQuoteNode()
+      value.children.forEach((child) =>
+        populateBlockOrDefinitionContent(child, blockQuoteNode)
+      )
+      node.append(blockQuoteNode)
+      break
+    }
+    case 'code': {
+      const codeNode = $createCodeNode(value.lang)
+      const codeHighlightNode = $createCodeHighlightNode(value.value)
+      codeNode.append(codeHighlightNode)
+      node.append(codeNode)
+      break
+    }
+    case 'heading': {
+      const headingNode = $createHeadingNode(`h${value.depth}`)
+      value.children.forEach((subChild) => {
+        populatePhrasingContent(subChild, headingNode)
+      })
+      node.append(headingNode)
+      break
+    }
+    case 'paragraph': {
+      const paragraph = $createParagraphNode()
+      value.children.forEach((subChild) => {
+        populatePhrasingContent(subChild, paragraph)
+      })
+      node.append(paragraph)
+    }
+  }
+}
+
 const populateTopLevelContent = (value: SlateRootType, root: RootNode) => {
   value.children.forEach((child) => {
     switch (child.type) {
-      case 'table': {
-        const tableNode = $createTableNode()
-        child.children.forEach((row) => {
-          const rowNode = $createTableRowNode()
-          row.children.forEach((cell, columnIndex) => {
-            const cellNode = $createTableCellNode(0) // All cells are the same, no <th>
-            const alignment = child.align ? child.align[columnIndex] : 'center'
-            const alignmentClasses = {
-              left: 'text-left',
-              center: 'text-center',
-              right: 'text-right',
-            }
-            cell.children.forEach((cellChild) => {
-              populatePhrasingContent(cellChild, cellNode)
-            })
-            rowNode.append(cellNode)
-          })
-          tableNode.append(rowNode)
-        })
-        root.append(tableNode)
-        break
-      }
-      case 'thematicBreak': {
-        root.append($createHorizontalRuleNode())
-        break
-      }
+      case 'table':
+      case 'list':
+      case 'thematicBreak':
+      case 'blockquote':
+      case 'code':
+      case 'heading':
+      case 'html':
       case 'paragraph': {
-        const paragraph = $createParagraphNode()
-        child.children.forEach((subChild) => {
-          populatePhrasingContent(subChild, paragraph)
-        })
-        root.append(paragraph)
+        populateBlockOrDefinitionContent(child, root)
+        break
       }
+      default:
+        console.warn(`No builder for ${child.type}`)
     }
   })
 }
@@ -218,8 +298,17 @@ const buildInitialContent = (value: SlateRootType) => {
   const root = $getRoot()
   console.log(value)
   populateTopLevelContent(value, root)
+  // const listNode = $createListNode("bullet")
+  // const listItemNode = $createTinaListItemNode()
+  // const paragraphNode = $createParagraphNode()
+  // const textNode = $createTextNode("hi there")
+  // // paragraphNode.append(textNode)
+  // listItemNode.append(paragraphNode)
+  // listNode.append(listItemNode)
 
-  root.append($createParagraphNode().append($createTextNode('Testing')))
+  // root.append(listNode)
+
+  // root.append($createParagraphNode().append($createTextNode('Testing')))
 }
 
 export const LexicalEditor = (props: {
@@ -326,8 +415,8 @@ export const LexicalEditor = (props: {
             <ListPlugin />
             <OnChangePlugin
               onChange={(editorState: EditorState) => {
-                // const json = editorState.toJSON();
-                // console.log(json)
+                const json = editorState.toJSON()
+                console.log(json)
               }}
             />
           </div>
