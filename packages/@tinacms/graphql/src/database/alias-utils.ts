@@ -5,9 +5,15 @@ const replaceBlockAliases = (template: Template, item: any) => {
   if ((template as any).templateKey) {
     const templateName = output[(template as any).templateKey]
 
-    output._template = (template as any).templates.find(
+    const matchingTemplate = (template as any).templates.find(
       (t) => t.nameOverride == templateName || t.name == templateName
-    ).name
+    )
+    if (!matchingTemplate) {
+      throw new Error(
+        `Block template "${templateName}" is not defined for field "${template.name}"`
+      )
+    }
+    output._template = matchingTemplate.name
     delete output[(template as any).templateKey]
   }
   return output
@@ -87,6 +93,11 @@ const applyBlockAliases = (template: Template, item: any) => {
     const matchingTemplate = (template as any).templates.find(
       (t) => t.nameOverride == templateName || t.name == templateName
     )
+    if (!matchingTemplate) {
+      throw new Error(
+        `Block template "${templateName}" is not defined for field "${template.name}"`
+      )
+    }
     output[(template as any).templateKey] =
       matchingTemplate.nameOverride || matchingTemplate.name
     delete (output as any)._template
