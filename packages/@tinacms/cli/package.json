@@ -62,6 +62,7 @@
     "@graphql-tools/graphql-file-loader": "^7.2.0",
     "@graphql-tools/load": "^7.3.2",
     "@rollup/pluginutils": "^5.0.2",
+    "@svgr/core": "^7.0.0",
     "@tailwindcss/aspect-ratio": "^0.4.0",
     "@tailwindcss/line-clamp": "^0.3.1",
     "@tailwindcss/typography": "^0.5.9",
