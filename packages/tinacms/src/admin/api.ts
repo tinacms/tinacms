@@ -76,6 +76,7 @@ export class TinaAdminApi {
   async fetchCollection(
     collectionName: string,
     includeDocuments: boolean,
+    folder: string = '',
     after?: string,
     sortKey?: string,
     order?: 'asc' | 'desc',
@@ -127,13 +128,13 @@ export class TinaAdminApi {
         order === 'asc'
           ? await this.api.request(
               `#graphql
-      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String, $filter: DocumentFilter){
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String, $filter: DocumentFilter, $folder: String){
         collection(collection: $collection){
           name
           label
           format
           templates
-          documents(sort: $sort, after: $after, first: $limit, filter: $filter) @include(if: $includeDocuments) {
+          documents(sort: $sort, after: $after, first: $limit, filter: $filter, folder: $folder) @include(if: $includeDocuments) {
             totalCount
             pageInfo {
               hasPreviousPage
@@ -143,6 +144,11 @@ export class TinaAdminApi {
             }
             edges {
               node {
+                __typename
+                ... on Folder {
+                    name
+                    path
+                }
                 ... on Document {
                   _sys {
                     title
@@ -164,6 +170,7 @@ export class TinaAdminApi {
                 variables: {
                   collection: collectionName,
                   includeDocuments,
+                  folder,
                   sort,
                   limit: 50,
                   after,
@@ -173,13 +180,13 @@ export class TinaAdminApi {
             )
           : await this.api.request(
               `#graphql
-      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String, $filter: DocumentFilter){
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String, $filter: DocumentFilter, $folder: String) {
         collection(collection: $collection){
           name
           label
           format
           templates
-          documents(sort: $sort, before: $after, last: $limit, filter: $filter) @include(if: $includeDocuments) {
+          documents(sort: $sort, before: $after, last: $limit, filter: $filter, folder: $folder) @include(if: $includeDocuments) {
             totalCount
             pageInfo {
               hasPreviousPage
@@ -189,6 +196,11 @@ export class TinaAdminApi {
             }
             edges {
               node {
+                __typename
+                ... on Folder {
+                    name
+                    path
+                }
                 ... on Document {
                   _sys {
                     title
@@ -210,6 +222,7 @@ export class TinaAdminApi {
                 variables: {
                   collection: collectionName,
                   includeDocuments,
+                  folder,
                   sort,
                   limit: 50,
                   after,

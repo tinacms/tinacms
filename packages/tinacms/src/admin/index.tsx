@@ -189,7 +189,7 @@ export const TinaAdmin = ({
                     }
                   />
                   <Route
-                    path="collections/:collectionName/new"
+                    path="collections/new/:collectionName"
                     element={
                       <DefaultWrapper cms={cms}>
                         <CollectionCreatePage />
@@ -197,7 +197,7 @@ export const TinaAdmin = ({
                     }
                   />
                   <Route
-                    path="collections/:collectionName/:templateName/new"
+                    path="collections/new/:collectionName/:templateName"
                     element={
                       <DefaultWrapper cms={cms}>
                         <CollectionCreatePage />
@@ -205,7 +205,23 @@ export const TinaAdmin = ({
                     }
                   />
                   <Route
-                    path="collections/:collectionName/*"
+                    path="collections/new/:collectionName/:templateName/~/*"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionCreatePage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="collections/new/:collectionName/~/*"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionCreatePage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="collections/edit/:collectionName/*"
                     element={
                       <DefaultWrapper cms={cms}>
                         <CollectionUpdatePage />
@@ -213,7 +229,7 @@ export const TinaAdmin = ({
                     }
                   />
                   <Route
-                    path="collections/:collectionName"
+                    path="collections/:collectionName/*"
                     element={
                       <DefaultWrapper cms={cms}>
                         <CollectionListPage />

@@ -2,53 +2,55 @@
 
 */
 
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import {
+  BiArrowBack,
   BiEdit,
+  BiFolder,
+  BiListUl,
   BiPlus,
-  BiTrash,
   BiRename,
   BiSearch,
+  BiTrash,
   BiX,
 } from 'react-icons/bi'
 import {
-  useParams,
   Link,
-  useNavigate,
   NavigateFunction,
   useLocation,
+  useNavigate,
+  useParams,
 } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 import {
+  BaseTextField,
   Button,
+  CursorPaginator,
+  Input,
   Modal,
   ModalActions,
   ModalBody,
   ModalHeader,
-  PopupModal,
-  TinaCMS,
   OverflowMenu,
-  Select,
-  BaseTextField,
-  Input,
+  PopupModal,
   ReactDateTimeWithStyles,
-  Toggle,
+  Select,
   textFieldClasses,
+  TinaCMS,
+  Toggle,
 } from '@tinacms/toolkit'
 import type {
   CollectionResponse,
-  TemplateResponse,
   DocumentSys,
+  TemplateResponse,
 } from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
-import { PageWrapper, PageHeader, PageBody } from '../components/Page'
+import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
-import { useState } from 'react'
-import { CursorPaginator } from '@tinacms/toolkit'
-import { useEffect } from 'react'
 import type { Collection } from '@tinacms/schema-tools'
+import { useCollectionFolder } from './utils'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
 const isSSR = typeof window === 'undefined'
@@ -173,6 +175,7 @@ const CollectionListPage = () => {
   )
   const [sortOrder, setSortOrder] = useState('asc' as 'asc' | 'desc')
   const loc = useLocation()
+  const folder = useCollectionFolder()
   useEffect(() => {
     // set sort key to cached value on route change
     setSortKey(
@@ -202,6 +205,12 @@ const CollectionListPage = () => {
       booleanEquals: null,
     }))
   }, [collectionName])
+  const toggleClasses = {
+    base: 'relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base py-1 transition-all ease-out duration-150 border',
+    active:
+      'bg-white text-blue-500 shadow-inner border-gray-50 border-t-gray-100',
+    inactive: 'bg-gray-50 text-gray-400 shadow border-gray-100 border-t-white',
+  }
 
   return (
     <GetCMS>
@@ -214,6 +223,7 @@ const CollectionListPage = () => {
               includeDocuments
               startCursor={endCursor}
               sortKey={sortKey}
+              folder={folder}
               filterArgs={
                 // only pass filter args if the collection is the same as the current route
                 // We need this hear because this runs before the useEffect above
@@ -607,10 +617,66 @@ const CollectionListPage = () => {
                             </div>
                           )}
                         </div>
+                        <div className="flex flex-col gap-4">
+                          <div
+                            className={`grow-0 flex justify-between rounded-md border border-gray-100`}
+                          >
+                            <button
+                              className={`${
+                                toggleClasses.base
+                              } px-2.5 rounded-l-md ${
+                                folder.fullyQualifiedName === ''
+                                  ? toggleClasses.active
+                                  : toggleClasses.inactive
+                              }`}
+                              onClick={() => {
+                                navigate(
+                                  `/${['collections', collectionName, ''].join(
+                                    '/'
+                                  )}`,
+                                  { replace: true }
+                                )
+                              }}
+                            >
+                              <BiListUl className="w-8 h-full opacity-70" />
+                            </button>
+                            <button
+                              className={`${
+                                toggleClasses.base
+                              } px-2 rounded-r-md ${
+                                folder.fullyQualifiedName !== ''
+                                  ? toggleClasses.active
+                                  : toggleClasses.inactive
+                              }`}
+                              onClick={() => {
+                                navigate(
+                                  `/${['collections', collectionName, '~'].join(
+                                    '/'
+                                  )}`,
+                                  { replace: true }
+                                )
+                              }}
+                            >
+                              <BiFolder className="w-6 h-full opacity-70" />
+                            </button>
+                          </div>
+                        </div>
                         <div className="flex self-end	justify-self-end">
                           {!collection.templates && allowCreate && (
                             <Link
-                              to={`new`}
+                              to={`/${
+                                folder.fullyQualifiedName
+                                  ? [
+                                      'collections',
+                                      'new',
+                                      collectionName,
+                                      '~',
+                                      folder.name,
+                                    ].join('/')
+                                  : ['collections', 'new', collectionName].join(
+                                      '/'
+                                    )
+                              }`}
                               className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
                             >
                               Create New{' '}
@@ -625,10 +691,66 @@ const CollectionListPage = () => {
                     </PageHeader>
                     <PageBody>
                       <div className="w-full mx-auto max-w-screen-xl">
+                        {folder.name && (
+                          <div>
+                            <button
+                              onClick={() => {
+                                const folders =
+                                  folder.fullyQualifiedName.split('/')
+                                navigate(
+                                  `/${[
+                                    'collections',
+                                    collectionName,
+                                    ...folders.slice(0, folders.length - 1),
+                                  ].join('/')}`,
+                                  { replace: true }
+                                )
+                              }}
+                            >
+                              <BiArrowBack className="w-6 h-full opacity-70" />
+                            </button>
+                          </div>
+                        )}
                         {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
+                                if (document.node.__typename === 'Folder') {
+                                  return (
+                                    <tr
+                                      key={`folder-${document.node.path}`}
+                                      className=""
+                                    >
+                                      <td className="pl-5 pr-3 py-2 truncate max-w-0">
+                                        <a
+                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate"
+                                          onClick={() => {
+                                            navigate(
+                                              `/${[
+                                                'collections',
+                                                collectionName,
+                                                document.node.path,
+                                              ].join('/')}`,
+                                              { replace: true }
+                                            )
+                                          }}
+                                        >
+                                          <BiFolder className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
+                                          <span className="truncate block">
+                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                              {document.node.path}
+                                            </span>
+                                            <span className="block text-sm font-medium">
+                                              {document.node.name}
+                                            </span>
+                                          </span>
+                                        </a>
+                                      </td>
+                                      <td className="pr-5 py-2 text-right whitespace-nowrap text-sm text-gray-500"></td>
+                                    </tr>
+                                  )
+                                }
+
                                 const hasTitle = Boolean(
                                   document.node._sys.title
                                 )
@@ -716,10 +838,18 @@ const CollectionListPage = () => {
                                             label: 'Edit in Admin',
                                             Icon: <BiEdit size="1.3rem" />,
                                             onMouseDown: () => {
+                                              const pathToDoc =
+                                                document.node._sys.breadcrumbs
+                                              if (folder.fullyQualifiedName) {
+                                                pathToDoc.unshift('~')
+                                              }
                                               navigate(
-                                                `${document.node._sys.breadcrumbs.join(
-                                                  '/'
-                                                )}`,
+                                                `/${[
+                                                  'collections',
+                                                  'edit',
+                                                  collectionName,
+                                                  ...pathToDoc,
+                                                ].join('/')}`,
                                                 { replace: true }
                                               )
                                             },
