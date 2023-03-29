@@ -2,7 +2,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import os from 'os'
 import * as esbuild from 'esbuild'
-import * as url from 'url'
+import type { Loader } from 'esbuild'
 import { Config } from '@tinacms/schema-tools'
 import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
@@ -284,6 +284,7 @@ export class ConfigManager {
       bundle: true,
       platform: 'node',
       outfile: outfile,
+      loader: loaders,
     })
     const result = require(outfile)
     await fs.removeSync(outfile)
@@ -305,16 +306,44 @@ export class ConfigManager {
       target: ['es2020'],
       platform: 'node',
       outfile,
+      loader: loaders,
     })
     await esbuild.build({
       entryPoints: [outfile],
       bundle: true,
       platform: 'node',
       outfile: outfile2,
+      loader: loaders,
     })
     const result = require(outfile2)
     await fs.removeSync(outfile)
     await fs.removeSync(outfile2)
     return result.default
   }
+}
+
+export const loaders: { [ext: string]: Loader } = {
+  '.aac': 'file',
+  '.css': 'file',
+  '.eot': 'file',
+  '.flac': 'file',
+  '.gif': 'file',
+  '.jpeg': 'file',
+  '.jpg': 'file',
+  '.json': 'json',
+  '.mp3': 'file',
+  '.mp4': 'file',
+  '.ogg': 'file',
+  '.otf': 'file',
+  '.png': 'file',
+  '.svg': 'file',
+  '.ttf': 'file',
+  '.wav': 'file',
+  '.webm': 'file',
+  '.webp': 'file',
+  '.woff': 'file',
+  '.woff2': 'file',
+  '.js': 'jsx',
+  '.jsx': 'jsx',
+  '.tsx': 'tsx',
 }

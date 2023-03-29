@@ -1,11 +1,12 @@
 import { createServer as createViteServer } from 'vite'
 import type { Plugin } from 'vite'
-import { resolve as gqlResolve, Database } from '@tinacms/graphql'
+import type { Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../../config-manager'
 import { createConfig } from '../../../vite'
 import {
   devServerEndPointsPlugin,
   transformTsxPlugin,
+  viteTransformExtension,
 } from '../../../vite/plugins'
 
 export const createDevServer = async (
@@ -17,6 +18,7 @@ export const createDevServer = async (
   const plugins: Plugin[] = [
     transformTsxPlugin({ configManager }),
     devServerEndPointsPlugin({ apiURL, configManager, database }),
+    viteTransformExtension(),
   ]
   return createViteServer(
     await createConfig({
