@@ -1,5 +1,4 @@
 import {
-  $getRoot,
   $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_EDITOR,
@@ -18,8 +17,6 @@ export function TabIndentationPlugin() {
       KEY_TAB_COMMAND,
       (event: KeyboardEvent) => {
         const selection = $getSelection()
-        const a = $getRoot()
-
         if (!$isRangeSelection(selection)) {
           return false
         }
