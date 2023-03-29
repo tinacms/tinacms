@@ -14,14 +14,14 @@ import {
 } from '@lexical/rich-text'
 
 export class TinaHeadingNode extends HeadingNode {
-  static getType(): string {
+  static override getType(): string {
     return 'tina-heading'
   }
-  static clone(node: TinaHeadingNode) {
+  static override clone(node: TinaHeadingNode) {
     return new TinaHeadingNode(node.__tag, node.__key)
   }
 
-  collapseAtStart() {
+  override collapseAtStart() {
     const parent = this.getParent()
     if ($isTinaListItemNode(parent)) {
       parent.replace(this)
@@ -41,11 +41,11 @@ export class TinaHeadingNode extends HeadingNode {
     return super.collapseAtStart()
   }
 
-  static importJSON(serializedNode: SerializedHeadingNode) {
+  static override importJSON(serializedNode: SerializedHeadingNode) {
     return HeadingNode.importJSON(serializedNode)
   }
 
-  exportJSON() {
+  override exportJSON() {
     return {
       ...super.exportJSON(),
       type: 'tina-heading',

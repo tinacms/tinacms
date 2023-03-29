@@ -33,12 +33,7 @@ import {
   HeadingNode,
   QuoteNode,
 } from '@lexical/rich-text'
-import {
-  $createListItemNode,
-  $createListNode,
-  ListItemNode,
-  ListNode,
-} from '@lexical/list'
+import { $createListNode, ListItemNode, ListNode } from '@lexical/list'
 import { TinaParagraphNode } from './paragraph'
 import { $createTinaListItemNode, TinaListItemNode } from './list-item'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
@@ -51,7 +46,6 @@ import { TinaQuoteNode } from './quote'
 import { TinaHeadingNode } from './header'
 import React from 'react'
 import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical'
-import { addClassNamesToElement } from '@lexical/utils'
 import type {
   BlockContent,
   DefinitionContent,
@@ -67,70 +61,6 @@ import TableActionMenuPlugin from './plugins/tableActionMenuPlugin'
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
-}
-
-function prepopulatedRichText() {
-  const root = $getRoot()
-  if (root.getFirstChild() === null) {
-    // ast.children.forEach(child => {
-    //   const childNodes = []
-    //   if(child.type === 'heading') {
-    //     childNodes.push($createHeadingNode(`h${child.depth}`))
-    //   }
-    // })
-    // Trying to recreate the bug that happens on weird copy/paste
-    // root.append($createListNode('bullet').append($createListItemNode().append($createParagraphNode().append($createTextNode('First line')), ($createParagraphNode().append($createTextNode('Testing')))), $createListItemNode().append($createParagraphNode().append($createTextNode('First line')), ($createParagraphNode().append($createTextNode('again'))))))
-    // root.append($createCodeNode().append($createCodeHighlightNode("const meh = 'ok'")))
-    root.append($createParagraphNode().append($createTextNode('Testing')))
-    // root.append(
-    //   ...ast.children.map((child) => {
-    //     if (child.type === "heading") {
-    //       return $createTinaHeadingNode(`h${child.depth}`).append(
-    //         ...child.children.map((child) => {
-    //           if (child.type === "text") {
-    //             return $createTextNode(child.value);
-    //           }
-    //           return $createTextNode();
-    //         })
-    //       );
-    //     }
-    //     if (child.type === "paragraph") {
-    //       return $createTinaParagraphNode().append(
-    //         ...child.children.map((child) => {
-    //           if (child.type === "text") {
-    //             return $createTextNode(child.value);
-    //           }
-    //           return $createTextNode();
-    //         })
-    //       );
-    //     }
-    //     return $createParagraphNode();
-    //   })
-    // );
-    // const paragraph = $createParagraphNode();
-    // // const heading = $createHeadingNode("h1");
-    // // paragraph.insertNewAfter();
-    // const paragraph2 = $createParagraphNode();
-    // paragraph.append($createTextNode(`Check out the code on our `));
-    // paragraph2.append($createTextNode(`leggo`));
-    // const list = $createListNode("bullet").append(
-    // $createListItemNode().append($createParagraphNode())
-    // $createListItemNode()
-    // );
-    // $createTinaListItemNode()
-    // $createTinaListItemNode().append(
-    //   $createParagraphNode().append($createTextNode("okok"))
-    // )
-    // $createTinaListItemNode().append(
-    //   $createParagraphNode().append($createTextNode("again"))
-    // ),
-    // $createTinaListItemNode().append(
-    //   $createParagraphNode().append($createTextNode("and again"))
-    // )
-    // const p = $createParagraphNode().append($createTextNode("and again"));
-    // root.append(list);
-    // root.append(paragraph);
-  }
 }
 
 const populateStaticPhrasingContent = (

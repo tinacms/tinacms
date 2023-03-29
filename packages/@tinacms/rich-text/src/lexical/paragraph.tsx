@@ -1,5 +1,4 @@
 import {
-  $createParagraphNode,
   ElementNode,
   LexicalNode,
   ParagraphNode,
@@ -11,14 +10,14 @@ import { $createTinaListItemNode, $isTinaListItemNode } from './list-item'
 import { $isTinaQuoteNode } from './quote'
 
 export class TinaParagraphNode extends ParagraphNode {
-  static getType(): string {
+  static override getType(): string {
     return 'tina-paragraph'
   }
-  static clone(node: LexicalNode) {
+  static override clone(node: LexicalNode) {
     return new TinaParagraphNode(node.__key)
   }
 
-  collapseAtStart(): boolean {
+  override collapseAtStart(): boolean {
     const parent = this.getParent()
     if ($isTinaListItemNode(parent)) {
       parent.replace(this)
@@ -37,17 +36,17 @@ export class TinaParagraphNode extends ParagraphNode {
    * if it's not a list item, we fall back to paragraph's default
    * functionality (eg. no tabbing support)
    */
-  canIndent(): boolean {
+  override canIndent(): boolean {
     return true
   }
-  getIndent(): number {
+  override getIndent(): number {
     const parent = this.getParent()
     if ($isListItemNode(parent)) {
       return parent.getIndent()
     }
     return this.__indent
   }
-  setIndent(indentLevel: number): this {
+  override setIndent(indentLevel: number): this {
     const parent = this.getParent()
     if ($isListItemNode(parent)) {
       parent.setIndent(indentLevel)
@@ -55,7 +54,7 @@ export class TinaParagraphNode extends ParagraphNode {
     return this
   }
 
-  insertNewAfter(
+  override insertNewAfter(
     selection: RangeSelection,
     restoreSelection: boolean | undefined = true
   ): ElementNode {
@@ -92,7 +91,7 @@ export class TinaParagraphNode extends ParagraphNode {
     return super.insertNewAfter(selection, restoreSelection)
   }
 
-  splice(
+  override splice(
     start: number,
     deleteCount: number,
     nodesToInsert: LexicalNode[]
@@ -115,11 +114,11 @@ export class TinaParagraphNode extends ParagraphNode {
     return this
   }
 
-  static importJSON(serializedNode: SerializedParagraphNode) {
+  static override importJSON(serializedNode: SerializedParagraphNode) {
     return ParagraphNode.importJSON(serializedNode)
   }
 
-  exportJSON() {
+  override exportJSON() {
     return {
       ...super.exportJSON(),
       type: 'tina-paragraph',
