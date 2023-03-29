@@ -1,6 +1,6 @@
 import { $createParagraphNode, $isRootNode, LexicalNode } from 'lexical'
-import { $isTinaListItemNode } from './list-item'
-import { $isTinaQuoteNode } from './quote'
+import { $isTinaListItemNode } from '../list-item'
+import { $isTinaQuoteNode } from '../quote'
 import {
   HeadingNode,
   HeadingTagType,

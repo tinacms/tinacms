@@ -9,8 +9,8 @@ import {
   $createTinaListItemNode,
   $isTinaListItemNode,
   TinaListItemNode,
-} from './list-item'
-import { $isTinaQuoteNode } from './quote'
+} from '../list-item'
+import { $isTinaQuoteNode } from '../quote'
 
 export class TinaParagraphNode extends ParagraphNode {
   static override getType(): string {
