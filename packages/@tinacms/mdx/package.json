@@ -30,6 +30,8 @@
   },
   "dependencies": {
     "@tinacms/schema-tools": "workspace:*",
+    "@types/mdast": "^3.0.10",
+    "@types/unist": "^2.0.6",
     "acorn": "8.8.2",
     "ccount": "2.0.1",
     "concat-md": "0.5.1",
@@ -51,8 +53,6 @@
     "micromark-extension-directive": "2.1.2",
     "micromark-extension-frontmatter": "1.0.0",
     "micromark-extension-gfm": "2.0.1",
-    "@types/mdast": "^3.0.10",
-    "@types/unist": "^2.0.6",
     "micromark-extension-mdx": "1.0.0",
     "micromark-extension-mdx-jsx": "1.0.3",
     "micromark-extension-mdxjs": "1.0.0",
@@ -77,7 +77,8 @@
     "unist-util-visit-parents": "5.1.3",
     "uvu": "0.5.6",
     "vfile": "5.3.7",
-    "vfile-message": "3.1.4"
+    "vfile-message": "3.1.4",
+    "zod": "^3.21.4"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
@@ -92,23 +93,24 @@
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.9",
     "@tinacms/scripts": "workspace:*",
+    "@types/cors": "^2.8.7",
     "@types/estree": "1.0.0",
     "@types/estree-jsx": "1.0.0",
-    "@types/mdast": "3.0.10",
-    "@types/unist": "2.0.6",
-    "@types/cors": "^2.8.7",
     "@types/fs-extra": "^9.0.2",
     "@types/jest": "^26.0.4",
     "@types/js-yaml": "^3.12.5",
     "@types/lodash-es": "4.17.6",
+    "@types/mdast": "3.0.10",
     "@types/node": "^14.18.21",
     "@types/normalize-path": "^3.0.0",
     "@types/prettier": "^2.6.3",
     "@types/react": "^18.0.27",
+    "@types/unist": "2.0.6",
     "@types/ws": "^7.2.6",
     "@types/yup": "^0.29.7",
     "@vitejs/plugin-react": "^2.1.0",
     "c8": "^7.11.3",
+    "concat-md": "^0.5.1",
     "estree-jsx": "^0.0.1",
     "jest": "^28.1.2",
     "jest-diff": "^28.1.1",
@@ -125,7 +127,6 @@
     "typedoc-plugin-markdown": "^3.13.6",
     "typescript": "^4.7.4",
     "vite": "4.1.4",
-    "vitest": "^0.18.0",
-    "concat-md": "^0.5.1"
+    "vitest": "^0.18.0"
   }
 }

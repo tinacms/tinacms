@@ -9,6 +9,7 @@ import { InputProps } from 'react-select/lib/components/Input'
 import { InputFieldType, wrapFieldsWithMeta } from '../wrapFieldWithMeta'
 import { RichEditor } from './plate'
 import { EditorContext } from './plate/editor-context'
+import { RichEditor as RichEditorNext } from '@tinacms/rich-text'
 import type { MdxTemplate } from './plate/types'
 
 // TODO: there's an issue where void node values don't get updated if the editor hasn't been focused from another node first.
@@ -55,7 +56,7 @@ export const MdxFieldPlugin = {
             }
           >
             {/* {rawMode ? <RawEditor {...props} /> : <RichEditor {...props} />} */}
-            <RichEditor {...props} />
+            <RichEditorNext {...props} />
           </div>
         </EditorContext.Provider>
       )
@@ -109,7 +110,7 @@ export const MdxFieldPluginExtendible = {
               'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md px-3 py-2'
             }
           >
-            {props.rawMode ? props.rawEditor : <RichEditor {...props} />}
+            {props.rawMode ? props.rawEditor : <RichEditorNext {...props} />}
           </div>
         </EditorContext.Provider>
       )
