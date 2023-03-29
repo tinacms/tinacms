@@ -1,6 +1,6 @@
 import { stringifyMDX } from './stringify'
 
-export * from './parse/plate'
+// export * from './parse/plate'
 
 // export { parseMDX }
 export { stringifyMDX }
@@ -27,3 +27,4 @@ export const parseMDX = (value: string) => {
 }
 
 export type { SlateRootType, SlateElementType }
+export * from './parser/types'

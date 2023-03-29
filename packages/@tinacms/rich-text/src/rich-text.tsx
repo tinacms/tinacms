@@ -20,7 +20,7 @@ export const RichEditor = (props: {
   return (
     <>
       <style>{styles}</style>
-      <LexicalEditor />
+      <LexicalEditor {...props} />
     </>
   )
 

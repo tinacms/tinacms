@@ -1,13 +1,16 @@
+import type { EditorThemeClasses } from 'lexical'
+
 const classNames = (...strings: string[]) => strings.join(' ')
 const blockClasses = 'my-0'
 /** prose sets a bold font, making bold marks impossible to see */
 const headerClasses = 'font-normal'
 
-export const exampleTheme = {
+export const exampleTheme: EditorThemeClasses = {
   ltr: 'ltr',
   rtl: 'rtl',
   placeholder: 'editor-placeholder',
   highlight: 'bg-blue-400',
+  link: 'text-blue-500',
   // using prose for now
   heading: {
     h1: classNames(
@@ -82,9 +85,9 @@ export const exampleTheme = {
   },
   text: {
     bold: 'font-bold',
-    code: 'font-mono',
+    code: 'font-mono bg-gray-100',
     italic: 'italic',
-    // strikethrough: 'PlaygroundEditorTheme__textStrikethrough',
+    strikethrough: 'line-through',
     // subscript: 'PlaygroundEditorTheme__textSubscript',
     // superscript: 'PlaygroundEditorTheme__textSuperscript',
     // underline: 'PlaygroundEditorTheme__textUnderline',

@@ -4,10 +4,16 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import TreeViewPlugin from './plugins/treeView'
 import CodeHighlightPlugin from './plugins/codeHighlight'
-import { EditorState, ParagraphNode } from 'lexical'
+import {
+  $createLineBreakNode,
+  EditorState,
+  ElementNode,
+  ParagraphNode,
+  RootNode,
+} from 'lexical'
 import { CodeHighlightNode, CodeNode } from '@lexical/code'
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table'
-import { AutoLinkNode, LinkNode } from '@lexical/link'
+import { $createLinkNode, AutoLinkNode, LinkNode } from '@lexical/link'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { ListItemNode, ListNode } from '@lexical/list'
@@ -23,6 +29,11 @@ import { TinaQuoteNode } from './quote'
 import { TinaHeadingNode } from './header'
 import React from 'react'
 import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical'
+import type {
+  PhrasingContent,
+  SlateRootType,
+  StaticPhrasingContent,
+} from '@tinacms/mdx'
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -92,13 +103,87 @@ function prepopulatedRichText() {
   }
 }
 
-export const LexicalEditor = () => {
+const populateStaticPhrasingContent = (
+  value: StaticPhrasingContent,
+  node: ElementNode
+) => {
+  switch (value.type) {
+    case 'break': {
+      node.append($createLineBreakNode())
+      break
+    }
+    case 'html': {
+      // TODO: this should probably be a custom node of some sort.
+      const textNode = $createTextNode(value.value)
+      node.append(textNode)
+      break
+    }
+    case 'text': {
+      const textNode = $createTextNode(value.text)
+      if (value.code) {
+        textNode.setFormat('code')
+      }
+      if (value.delete) {
+        textNode.setFormat('strikethrough')
+      }
+      if (value.emphasis) {
+        textNode.setFormat('italic')
+      }
+      if (value.strong) {
+        textNode.setFormat('bold')
+      }
+      node.append(textNode)
+      break
+    }
+  }
+}
+
+const populatePhrasingContent = (value: PhrasingContent, node: ElementNode) => {
+  switch (value.type) {
+    case 'link': {
+      const linkNode = $createLinkNode(value.url)
+      value.children.forEach((child) =>
+        populateStaticPhrasingContent(child, linkNode)
+      )
+      node.append(linkNode)
+      break
+    }
+    default:
+      populateStaticPhrasingContent(value, node)
+  }
+}
+
+const populateTopLevelContent = (value: SlateRootType, root: RootNode) => {
+  value.children.forEach((child) => {
+    switch (child.type) {
+      case 'paragraph': {
+        const paragraph = $createParagraphNode()
+        child.children.forEach((subChild) => {
+          populatePhrasingContent(subChild, paragraph)
+        })
+        root.append(paragraph)
+      }
+    }
+  })
+}
+
+const buildInitialContent = (value: SlateRootType) => {
+  const root = $getRoot()
+  console.log(value)
+  populateTopLevelContent(value, root)
+
+  root.append($createParagraphNode().append($createTextNode('Testing')))
+}
+
+export const LexicalEditor = (props: {
+  input: { value: SlateRootType; onChange: (value: unknown) => void }
+}) => {
   return (
     <div className="lexical-editor">
       <LexicalComposer
         initialConfig={{
           namespace: 'MyEditor',
-          editorState: prepopulatedRichText,
+          editorState: () => buildInitialContent(props.input.value),
           onError: (e: Error) => {
             throw e
           },
