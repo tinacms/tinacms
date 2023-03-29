@@ -5,6 +5,7 @@ import './types'
 import styles from './styles.css'
 
 import { Slate, Editable, withReact } from 'slate-react'
+import { LexicalEditor } from './lexical'
 import type { SlateRootType } from '@tinacms/mdx'
 
 export const RichEditor = (props: {
@@ -15,6 +16,13 @@ export const RichEditor = (props: {
   editor.children.map((child) => {
     child
   })
+
+  return (
+    <>
+      <style>{styles}</style>
+      <LexicalEditor />
+    </>
+  )
 
   return (
     <Slate

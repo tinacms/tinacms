@@ -41,3 +41,43 @@
 .with-toolbar [data-slate-editor='true'] {
   min-height: 72px;
 }
+
+.tina-prose ul {
+  list-style: disc;
+}
+.tina-prose ul ul {
+  list-style: circle;
+}
+.tina-prose ul ul ul {
+  list-style: square;
+}
+
+/* prose adds backticks, which look like they should be editable */
+.tina-prose code::before {
+  content: '';
+}
+.tina-prose code::after {
+  content: '';
+}
+
+/* TODO: update lexical as support for this was just merged */
+p {
+  --lexical-indent-base-value: 10px;
+}
+
+.tina-prose :where(p):not(:where([class~='not-prose'] *)) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tina-prose :where(blockquote):not(:where([class~='not-prose'] *)) {
+  font-weight: normal;
+  font-style: normal;
+  color: var(--tw-prose-quotes);
+  border-left-width: 0.25rem;
+  border-left-color: var(--tw-prose-quote-borders);
+  quotes: none;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 1em;
+}
