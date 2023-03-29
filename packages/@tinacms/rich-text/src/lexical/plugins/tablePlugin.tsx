@@ -1,13 +1,4 @@
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { INSERT_TABLE_COMMAND } from '@lexical/table'
 import {
   $createNodeSelection,
   $createParagraphNode,
@@ -25,14 +16,10 @@ import {
 } from 'lexical'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import * as React from 'react'
-// import invariant from 'shared/invariant';
-// invariant(condition, message) will refine types based on "condition", and
-// if "condition" is false will throw an error. This function is special-cased
-// in flow itself, so we can't name it anything else.
+
 export default function invariant(
   cond?: boolean,
-  message?: string,
-  ...args: string[]
+  message?: string
 ): asserts cond {
   if (cond) {
     return

@@ -1,18 +1,5 @@
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
-import type {
-  ElementTransformer,
-  TextMatchTransformer,
-  Transformer,
-} from '@lexical/markdown'
+import type { ElementTransformer, Transformer } from '@lexical/markdown'
 import type { ElementNode, LexicalNode } from 'lexical'
-
 import {
   CHECK_LIST,
   ELEMENT_TRANSFORMERS,
@@ -169,7 +156,11 @@ export const TABLE: ElementTransformer = {
   },
   regExp: TABLE_ROW_REG_EXP,
   replace: (parentNode, _1, match) => {
-    const matchCells = mapToTableCells(match[0])
+    const matchedCell = match[0]
+    if (!matchedCell) {
+      return
+    }
+    const matchCells = mapToTableCells(matchedCell)
 
     if (matchCells == null) {
       return
@@ -214,7 +205,8 @@ export const TABLE: ElementTransformer = {
       table.append(tableRow)
 
       for (let i = 0; i < maxCells; i++) {
-        tableRow.append(i < cells.length ? cells[i] : createTableCell(null))
+        const rowNode = i < cells.length ? cells[i] : undefined
+        tableRow.append(rowNode || createTableCell(null))
       }
     }
 

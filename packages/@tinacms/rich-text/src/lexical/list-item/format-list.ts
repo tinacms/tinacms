@@ -14,14 +14,7 @@ import {
   NodeKey,
   ParagraphNode,
 } from 'lexical'
-import {
-  $createListItemNode,
-  $createListNode,
-  $isListItemNode,
-  $isListNode,
-  ListItemNode,
-  ListNode,
-} from '@lexical/list'
+import { $createListNode, $isListNode, ListNode } from '@lexical/list'
 import type { ListType } from '@lexical/list'
 import {
   $getAllListItems,
@@ -32,13 +25,18 @@ import {
   isNestedListNode,
   invariant,
 } from './utils'
+import {
+  $createTinaListItemNode,
+  $isTinaListItemNode,
+  TinaListItemNode,
+} from '.'
 
 function $isSelectingEmptyListItem(
-  anchorNode: ListItemNode | LexicalNode,
+  anchorNode: TinaListItemNode | LexicalNode,
   nodes: Array<LexicalNode>
 ): boolean {
   return (
-    $isListItemNode(anchorNode) &&
+    $isTinaListItemNode(anchorNode) &&
     (nodes.length === 0 ||
       (nodes.length === 1 &&
         anchorNode.is(nodes[0]) &&
@@ -46,7 +44,7 @@ function $isSelectingEmptyListItem(
   )
 }
 
-function $getListItemValue(listItem: ListItemNode): number {
+function $getListItemValue(listItem: TinaListItemNode): number {
   const list = listItem.getParent()
 
   let value = 1
@@ -66,7 +64,7 @@ function $getListItemValue(listItem: ListItemNode): number {
   for (let i = 0; i < siblings.length; i++) {
     const sibling = siblings[i]
 
-    if ($isListItemNode(sibling) && !$isListNode(sibling.getFirstChild())) {
+    if ($isTinaListItemNode(sibling) && !$isListNode(sibling.getFirstChild())) {
       value++
     }
   }
@@ -92,13 +90,13 @@ export function insertList(editor: LexicalEditor, listType: ListType): void {
 
         if ($isRootOrShadowRoot(anchorNodeParent)) {
           anchorNode.replace(list)
-          const listItem = $createListItemNode()
+          const listItem = $createTinaListItemNode()
           if ($isElementNode(anchorNode)) {
             listItem.setFormat(anchorNode.getFormatType())
             listItem.setIndent(anchorNode.getIndent())
           }
           list.append(listItem)
-        } else if ($isListItemNode(anchorNode)) {
+        } else if ($isTinaListItemNode(anchorNode)) {
           const parent = anchorNode.getParentOrThrow()
           append(list, parent.getChildren())
           parent.replace(list)
@@ -167,7 +165,7 @@ function createListOrMerge(node: ElementNode, listType: ListType): ListNode {
 
   const previousSibling = node.getPreviousSibling()
   const nextSibling = node.getNextSibling()
-  const listItem = $createListItemNode()
+  const listItem = $createTinaListItemNode()
   listItem.setFormat(node.getFormatType())
   listItem.setIndent(node.getIndent())
   append(listItem, node.getChildren())
@@ -217,7 +215,7 @@ export function removeList(editor: LexicalEditor): void {
           const node = nodes[i]
 
           if ($isLeafNode(node)) {
-            const listItemNode = $getNearestNodeOfType(node, ListItemNode)
+            const listItemNode = $getNearestNodeOfType(node, TinaListItemNode)
 
             if (listItemNode != null) {
               listNodes.add($getTopListNode(listItemNode))
@@ -268,7 +266,7 @@ export function updateChildrenListItemValue(
   if (childrenOrExisting !== undefined) {
     for (let i = 0; i < childrenOrExisting.length; i++) {
       const child = childrenOrExisting[i]
-      if ($isListItemNode(child)) {
+      if (child && $isTinaListItemNode(child)) {
         const prevValue = child.getValue()
         const nextValue = $getListItemValue(child)
 
@@ -280,11 +278,11 @@ export function updateChildrenListItemValue(
   }
 }
 
-export function $handleIndent(listItemNodes: Array<ListItemNode>): void {
+export function $handleIndent(listItemNodes: Array<TinaListItemNode>): void {
   // go through each node and decide where to move it.
   const removed = new Set<NodeKey>()
 
-  listItemNodes.forEach((listItemNode: ListItemNode) => {
+  listItemNodes.forEach((listItemNode: TinaListItemNode) => {
     if (isNestedListNode(listItemNode) || removed.has(listItemNode.getKey())) {
       return
     }
@@ -293,9 +291,9 @@ export function $handleIndent(listItemNodes: Array<ListItemNode>): void {
 
     // We can cast both of the below `isNestedListNode` only returns a boolean type instead of a user-defined type guards
     const nextSibling =
-      listItemNode.getNextSibling<ListItemNode>() as ListItemNode
+      listItemNode.getNextSibling<TinaListItemNode>() as TinaListItemNode
     const previousSibling =
-      listItemNode.getPreviousSibling<ListItemNode>() as ListItemNode
+      listItemNode.getPreviousSibling<TinaListItemNode>() as TinaListItemNode
     // if there are nested lists on either side, merge them all together.
 
     if (isNestedListNode(nextSibling) && isNestedListNode(previousSibling)) {
@@ -314,7 +312,7 @@ export function $handleIndent(listItemNodes: Array<ListItemNode>): void {
         updateChildrenListItemValue(innerList)
       }
     } else if (isNestedListNode(nextSibling)) {
-      // if the ListItemNode is next to a nested ListNode, merge them
+      // if the TinaListItemNode is next to a nested ListNode, merge them
       const innerList = nextSibling.getFirstChild()
 
       if ($isListNode(innerList)) {
@@ -336,7 +334,7 @@ export function $handleIndent(listItemNodes: Array<ListItemNode>): void {
       // otherwise, we need to create a new nested ListNode
 
       if ($isListNode(parent)) {
-        const newListItem = $createListItemNode()
+        const newListItem = $createTinaListItemNode()
         const newList = $createListNode(parent.getListType())
         newListItem.append(newList)
         newList.append(listItemNode)
@@ -357,7 +355,7 @@ export function $handleIndent(listItemNodes: Array<ListItemNode>): void {
   })
 }
 
-export function $handleOutdent(listItemNodes: Array<ListItemNode>): void {
+export function $handleOutdent(listItemNodes: Array<TinaListItemNode>): void {
   // go through each node and decide where to move it.
 
   listItemNodes.forEach((listItemNode) => {
@@ -373,7 +371,7 @@ export function $handleOutdent(listItemNodes: Array<ListItemNode>): void {
 
     if (
       $isListNode(greatGrandparentList) &&
-      $isListItemNode(grandparentListItem) &&
+      $isTinaListItemNode(grandparentListItem) &&
       $isListNode(parentList)
     ) {
       // if it's the first child in it's parent list, insert it into the
@@ -398,13 +396,13 @@ export function $handleOutdent(listItemNodes: Array<ListItemNode>): void {
       } else {
         // otherwise, we need to split the siblings into two new nested lists
         const listType = parentList.getListType()
-        const previousSiblingsListItem = $createListItemNode()
+        const previousSiblingsListItem = $createTinaListItemNode()
         const previousSiblingsList = $createListNode(listType)
         previousSiblingsListItem.append(previousSiblingsList)
         listItemNode
           .getPreviousSiblings()
           .forEach((sibling) => previousSiblingsList.append(sibling))
-        const nextSiblingsListItem = $createListItemNode()
+        const nextSiblingsListItem = $createTinaListItemNode()
         const nextSiblingsList = $createListNode(listType)
         nextSiblingsListItem.append(nextSiblingsList)
         append(nextSiblingsList, listItemNode.getNextSiblings())
@@ -427,7 +425,7 @@ function maybeIndentOrOutdent(direction: 'indent' | 'outdent'): void {
     return
   }
   const selectedNodes = selection.getNodes()
-  let listItemNodes: Array<ListItemNode> = []
+  let listItemNodes: Array<TinaListItemNode | TinaListItemNode> = []
 
   if (selectedNodes.length === 0) {
     selectedNodes.push(selection.anchor.getNode())
@@ -435,11 +433,14 @@ function maybeIndentOrOutdent(direction: 'indent' | 'outdent'): void {
 
   if (selectedNodes.length === 1) {
     // Only 1 node selected. Selection may not contain the ListNodeItem so we traverse the tree to
-    // find whether this is part of a ListItemNode
-    const nearestListItemNode = findNearestListItemNode(selectedNodes[0])
+    // find whether this is part of a TinaListItemNode
+    const firstNode = selectedNodes[0]
+    if (firstNode) {
+      const nearestListItemNode = findNearestListItemNode(firstNode)
 
-    if (nearestListItemNode !== null) {
-      listItemNodes = [nearestListItemNode]
+      if (nearestListItemNode !== null) {
+        listItemNodes = [nearestListItemNode]
+      }
     }
   } else {
     listItemNodes = getUniqueListItemNodes(selectedNodes)
@@ -471,7 +472,7 @@ export function $handleListInsertParagraph(): boolean {
   // Only run this code on empty list items
   const anchor = selection.anchor.getNode()
 
-  if (!$isListItemNode(anchor) || anchor.getTextContent() !== '') {
+  if (!$isTinaListItemNode(anchor) || anchor.getTextContent() !== '') {
     return false
   }
   const topListNode = $getTopListNode(anchor)
@@ -479,7 +480,7 @@ export function $handleListInsertParagraph(): boolean {
 
   invariant(
     $isListNode(parent),
-    'A ListItemNode must have a ListNode for a parent.'
+    'A TinaListItemNode must have a ListNode for a parent.'
   )
 
   const grandparent = parent.getParent()
@@ -489,8 +490,8 @@ export function $handleListInsertParagraph(): boolean {
   if ($isRootOrShadowRoot(grandparent)) {
     replacementNode = $createParagraphNode()
     topListNode.insertAfter(replacementNode)
-  } else if ($isListItemNode(grandparent)) {
-    replacementNode = $createListItemNode()
+  } else if ($isTinaListItemNode(grandparent)) {
+    replacementNode = $createTinaListItemNode()
     grandparent.insertAfter(replacementNode)
   } else {
     return false
@@ -505,7 +506,7 @@ export function $handleListInsertParagraph(): boolean {
     if ($isParagraphNode(replacementNode)) {
       replacementNode.insertAfter(newList)
     } else {
-      const newListItem = $createListItemNode()
+      const newListItem = $createTinaListItemNode()
       newListItem.append(newList)
       replacementNode.insertAfter(newListItem)
     }
