@@ -111,11 +111,6 @@ export const exampleTheme: EditorThemeClasses = {
     ul: 'mb-2 pl-5',
     listitem: 'mb-2',
   },
-  //   table:
-  //   "min-w-[100px] divide-y divide-gray-300 border-gray-200 border rounded-md block overflow-scroll",
-  // tableRow: "divide-x divide-gray-200",
-  // tableCell: "px-2 min-w-[200px] prose-p:m-2",
-  // tableCellHeader: "bg-gray-100",
   table:
     'min-w-[100px] mb-2 divide-y divide-gray-200 border-gray-200 border rounded-md block overflow-scroll',
   tableRow: 'divide-x divide-gray-200',

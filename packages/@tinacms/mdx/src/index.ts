@@ -21,7 +21,7 @@ export const parseMDX = (value: string) => {
   if (!result.success) {
     console.dir(result.error.format().children, { depth: 8 })
   } else {
-    console.dir(result, { depth: null })
+    // console.dir(result, { depth: null })
     return result.data
   }
 }

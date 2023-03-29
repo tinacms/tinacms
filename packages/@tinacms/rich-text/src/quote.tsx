@@ -1,22 +1,13 @@
-import {
-  $createParagraphNode,
-  DOMConversionMap,
-  ElementNode,
-  LexicalNode,
-  NodeKey,
-} from 'lexical'
-
 import { $applyNodeReplacement } from 'lexical'
-
-import { HeadingNode, QuoteNode, $createHeadingNode } from '@lexical/rich-text'
-import { ListItemNode } from '@lexical/list'
+import { QuoteNode } from '@lexical/rich-text'
+import type { LexicalNode, DOMConversionMap, NodeKey } from 'lexical'
 
 export class TinaQuoteNode extends QuoteNode {
-  static getType(): string {
+  static override getType(): string {
     return 'tina-quotenode'
   }
 
-  static clone(node: TinaQuoteNode): TinaQuoteNode {
+  static override clone(node: TinaQuoteNode): TinaQuoteNode {
     return new TinaQuoteNode(node.__key)
   }
 
@@ -24,12 +15,12 @@ export class TinaQuoteNode extends QuoteNode {
     super(key)
   }
 
-  static importDOM(): DOMConversionMap | null {
+  static override importDOM(): DOMConversionMap | null {
     return QuoteNode.importDOM()
   }
 
   // SerializedListItemNode is not exported
-  static importJSON(serializedNode: any) {
+  static override importJSON(serializedNode: any) {
     return QuoteNode.importJSON(serializedNode)
   }
 
@@ -38,11 +29,11 @@ export class TinaQuoteNode extends QuoteNode {
    *
    * NOT SURE WHAT ELSE IT DOES
    */
-  isShadowRoot(): boolean {
+  override isShadowRoot(): boolean {
     return true
   }
 
-  exportJSON() {
+  override exportJSON() {
     return {
       ...super.exportJSON(),
       type: 'tina-quotenode',
@@ -50,7 +41,7 @@ export class TinaQuoteNode extends QuoteNode {
     }
   }
 
-  append(...nodes: LexicalNode[]): this {
+  override append(...nodes: LexicalNode[]): this {
     return this.splice(this.getChildrenSize(), 0, nodes)
   }
 }

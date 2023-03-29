@@ -17,7 +17,7 @@ export function invariant(
   )
 }
 
-import { $createListItemNode, $isListItemNode, TinaListItemNode } from './'
+import { $createListItemNode, $isListItemNode, TinaListItemNode } from '.'
 
 export function $getListDepth(listNode: ListNode): number {
   let depth = 1
