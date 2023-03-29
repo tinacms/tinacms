@@ -102,7 +102,7 @@ describe('replaceNameOverrides', () => {
           expect(replaceNameOverrides(template, obj)).toEqual({
             blockField: [
               {
-                _template: 'template-aliased',
+                _template: 'template_aliased',
                 name: 'value',
               },
             ],
@@ -308,7 +308,7 @@ describe('applyNameOverrides', () => {
           const obj = {
             blockField: [
               {
-                _template: 'template-aliased',
+                _template: 'template_aliased',
                 name: 'value',
               },
             ],

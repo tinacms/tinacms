@@ -3,7 +3,11 @@ export const replaceNameOverrides = (template: Template, obj: any) => {
   if ((template as any).list) {
     return (obj as any[]).map((item) => {
       if (isBlockField(template) && (template as any).templateKey) {
-        item._template = item[(template as any).templateKey]
+        const templateName = item[(template as any).templateKey]
+
+        item._template = (template as any).templates.find(
+          (t) => t.nameOverride == templateName || t.name == templateName
+        ).name
         delete item[(template as any).templateKey]
       }
 
@@ -74,7 +78,13 @@ export const applyNameOverrides = (template: Template, obj: any): object => {
         item
       )
       if (isBlockField(template) && (template as any).templateKey) {
-        result[(template as any).templateKey] = (result as any)._template
+        const templateName = (result as any)._template
+
+        const matchingTemplate = (template as any).templates.find(
+          (t) => t.nameOverride == templateName || t.name == templateName
+        )
+        result[(template as any).templateKey] =
+          matchingTemplate.nameOverride || matchingTemplate.name
         delete (result as any)._template
       }
       return result
