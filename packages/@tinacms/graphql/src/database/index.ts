@@ -999,7 +999,9 @@ export class Database {
         )
       }
 
-      await _deleteIndexContent(this, nonCollectionPaths, enqueueOps, null)
+      if (nonCollectionPaths.length) {
+        await _deleteIndexContent(this, nonCollectionPaths, enqueueOps, null)
+      }
     })
     while (operations.length) {
       await this.level.batch(operations.splice(0, 25))
@@ -1335,6 +1337,10 @@ const _deleteIndexContent = async (
   enqueueOps: (ops: BatchOp[]) => Promise<void>,
   collection?: Collection<true>
 ) => {
+  if (!documentPaths.length) {
+    return
+  }
+
   let collectionIndexDefinitions
   if (collection) {
     const indexDefinitions = await database.getIndexDefinitions(database.level)
@@ -1392,16 +1398,17 @@ const _deleteIndexContent = async (
       ])
     }
   })
-
-  await enqueueOps(
-    makeFolderOpsForCollection(
-      folderTreeBuilder.tree,
-      collection,
-      collectionIndexDefinitions,
-      'del',
-      database.level
+  if (collectionIndexDefinitions) {
+    await enqueueOps(
+      makeFolderOpsForCollection(
+        folderTreeBuilder.tree,
+        collection,
+        collectionIndexDefinitions,
+        'del',
+        database.level
+      )
     )
-  )
+  }
 }
 
 const getTemplateForFile = (
