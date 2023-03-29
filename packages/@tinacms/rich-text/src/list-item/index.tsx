@@ -63,6 +63,7 @@ export class TinaListItemNode extends ListItemNode {
     return true
   }
 
+  // @ts-ignore FIXME override return type.
   override exportJSON() {
     return {
       ...super.exportJSON(),

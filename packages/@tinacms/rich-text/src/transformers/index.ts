@@ -12,7 +12,6 @@ import type { HeadingTagType } from '@lexical/rich-text'
 import { $createCodeNode, $isCodeNode, CodeNode } from '@lexical/code'
 import { $createLinkNode, $isLinkNode, LinkNode } from '@lexical/link'
 import {
-  $createListItemNode,
   $createListNode,
   $isListItemNode,
   $isListNode,
@@ -21,7 +20,6 @@ import {
 } from '@lexical/list'
 import {
   $createHeadingNode,
-  $createQuoteNode,
   $isHeadingNode,
   $isQuoteNode,
   HeadingNode,
@@ -29,7 +27,6 @@ import {
 } from '@lexical/rich-text'
 import {
   $createLineBreakNode,
-  $createParagraphNode,
   $createTextNode,
   $isTextNode,
   ElementNode,
@@ -129,9 +126,12 @@ const listReplace = (listType: ListType): ElementTransformer['replace'] => {
     }
     listItem.append(parentNode)
     listItem.select(0, 0)
-    const indent = Math.floor(match[1].length / LIST_INDENT_SIZE)
-    if (indent) {
-      listItem.setIndent(indent)
+    const secondMatch = match[1]
+    if (secondMatch) {
+      const indent = Math.floor(secondMatch.length / LIST_INDENT_SIZE)
+      if (indent) {
+        listItem.setIndent(indent)
+      }
     }
   }
 }
@@ -180,7 +180,8 @@ export const HEADING: ElementTransformer = {
   },
   regExp: /^(#{1,6})\s/,
   replace: createBlockNode((match) => {
-    const tag = ('h' + match[1].length) as HeadingTagType
+    const secondMatch = match[1] || [1] // Default to h1
+    const tag = ('h' + secondMatch.length) as HeadingTagType
     return $createHeadingNode(tag)
   }),
   type: 'element',
@@ -357,11 +358,13 @@ export const LINK: TextMatchTransformer = {
   regExp: /(?:\[([^[]+)\])(?:\(([^()]+)\))$/,
   replace: (textNode, match) => {
     const [, linkText, linkUrl] = match
-    const linkNode = $createLinkNode(linkUrl)
-    const linkTextNode = $createTextNode(linkText)
-    linkTextNode.setFormat(textNode.getFormat())
-    linkNode.append(linkTextNode)
-    textNode.replace(linkNode)
+    if (linkUrl) {
+      const linkNode = $createLinkNode(linkUrl)
+      const linkTextNode = $createTextNode(linkText)
+      linkTextNode.setFormat(textNode.getFormat())
+      linkNode.append(linkTextNode)
+      textNode.replace(linkNode)
+    }
   },
   trigger: ')',
   type: 'text-match',

@@ -1,10 +1,4 @@
-import {
-  $createParagraphNode,
-  $isRootNode,
-  $isRootOrShadowRoot,
-  LexicalNode,
-  SerializedElementNode,
-} from 'lexical'
+import { $createParagraphNode, $isRootNode, LexicalNode } from 'lexical'
 import { $isTinaListItemNode } from './list-item'
 import { $isTinaQuoteNode } from './quote'
 import {
@@ -45,6 +39,7 @@ export class TinaHeadingNode extends HeadingNode {
     return HeadingNode.importJSON(serializedNode)
   }
 
+  // @ts-ignore FIXME override return type
   override exportJSON() {
     return {
       ...super.exportJSON(),

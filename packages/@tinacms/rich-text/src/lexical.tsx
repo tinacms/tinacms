@@ -130,14 +130,14 @@ const populateBlockOrDefinitionContent = (
       const tableNode = $createTableNode()
       value.children.forEach((row) => {
         const rowNode = $createTableRowNode()
-        row.children.forEach((cell, columnIndex) => {
+        row.children.forEach((cell) => {
           const cellNode = $createTableCellNode(0) // All cells are the same, no <th>
-          const alignment = value.align ? value.align[columnIndex] : 'center'
-          const alignmentClasses = {
-            left: 'text-left',
-            center: 'text-center',
-            right: 'text-right',
-          }
+          // const alignment = value.align ? value.align[columnIndex] : 'center'
+          // const alignmentClasses = {
+          //   left: 'text-left',
+          //   center: 'text-center',
+          //   right: 'text-right',
+          // }
           cell.children.forEach((cellChild) => {
             populatePhrasingContent(cellChild, cellNode)
           })

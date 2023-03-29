@@ -6,7 +6,11 @@ import {
   SerializedParagraphNode,
 } from 'lexical'
 import { $isListItemNode, $isListNode } from '@lexical/list'
-import { $createTinaListItemNode, $isTinaListItemNode } from './list-item'
+import {
+  $createTinaListItemNode,
+  $isTinaListItemNode,
+  TinaListItemNode,
+} from './list-item'
 import { $isTinaQuoteNode } from './quote'
 
 export class TinaParagraphNode extends ParagraphNode {
@@ -54,10 +58,11 @@ export class TinaParagraphNode extends ParagraphNode {
     return this
   }
 
+  // @ts-ignore FIXME override return type. Type 'TinaParagraphNode | TinaListItemNode' is not assignable to type 'ParagraphNode'
   override insertNewAfter(
     selection: RangeSelection,
     restoreSelection: boolean | undefined = true
-  ): ElementNode {
+  ): TinaParagraphNode | TinaListItemNode {
     const isLastChild = !this.getNextSibling()
     const hasNoChildren = this.getChildren().length === 0
     if (isLastChild && hasNoChildren) {
