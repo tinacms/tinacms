@@ -571,6 +571,9 @@ export class FolderTreeBuilder {
       .filter((part) => part.length)
       .forEach((part) => {
         const current = parent.join('/')
+        if (!this._tree[current]) {
+          this._tree[current] = new Set<string>()
+        }
         this._tree[current].add(path.join(current, part))
         parent.push(part)
       })
