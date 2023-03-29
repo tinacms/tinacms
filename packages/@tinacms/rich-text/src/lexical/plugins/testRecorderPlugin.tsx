@@ -448,7 +448,7 @@ ${steps.map(formatStep).join(`\n`)}
       <pre
         id="test-recorder"
         ref={preRef}
-        className="mt-4 bg-gray-800 text-white rounded-md p-2 text-xs"
+        className="mt-4 bg-gray-800 text-white rounded-md p-2 text-xs overflow-scroll"
       >
         {templatedTest}
       </pre>

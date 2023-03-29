@@ -14,7 +14,7 @@ export default function TreeViewPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext()
   return (
     <TreeView
-      viewClassName="mt-4 bg-gray-800 text-white rounded-md p-2 text-xs"
+      viewClassName="mt-4 bg-gray-800 text-white rounded-md p-2 text-xs overflow-scroll"
       timeTravelPanelClassName="hidden"
       timeTravelButtonClassName="hidden"
       timeTravelPanelSliderClassName="debug-timetravel-panel-slider"

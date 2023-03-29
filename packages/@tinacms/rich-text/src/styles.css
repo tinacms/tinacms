@@ -60,6 +60,10 @@
   content: '';
 }
 
+.lexical-editor hr {
+  margin: 8px 0 !important;
+  @apply bg-gray-200;
+}
 /* TODO: update lexical as support for this was just merged */
 p {
   --lexical-indent-base-value: 10px;

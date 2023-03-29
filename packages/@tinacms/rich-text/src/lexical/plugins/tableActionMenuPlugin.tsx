@@ -336,7 +336,7 @@ function TableActionMenu({
   return createPortal(
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
-      className="absolute min-w-[200px] height-[100px] mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+      className="z-[10000] absolute min-w-[200px] height-[100px] mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
       ref={dropDownRef}
       onClick={(e) => {
         e.stopPropagation()
@@ -524,7 +524,7 @@ function TableCellActionMenuContainer({
   }, [prevTableCellDOM, tableCellNode])
 
   return (
-    <div className="absolute top-0 left-0" ref={menuButtonRef}>
+    <div className="absolute top-0 left-0 z-[10000]" ref={menuButtonRef}>
       {tableCellNode != null && (
         <>
           <button

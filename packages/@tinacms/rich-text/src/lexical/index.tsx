@@ -12,7 +12,14 @@ import {
   RootNode,
 } from 'lexical'
 import { CodeHighlightNode, CodeNode } from '@lexical/code'
-import { TableCellNode, TableNode, TableRowNode } from '@lexical/table'
+import {
+  $createTableCellNode,
+  $createTableNode,
+  $createTableRowNode,
+  TableCellNode,
+  TableNode,
+  TableRowNode,
+} from '@lexical/table'
 import { $createLinkNode, AutoLinkNode, LinkNode } from '@lexical/link'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
@@ -29,11 +36,17 @@ import { TinaQuoteNode } from './quote'
 import { TinaHeadingNode } from './header'
 import React from 'react'
 import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical'
+import { addClassNamesToElement } from '@lexical/utils'
 import type {
   PhrasingContent,
   SlateRootType,
   StaticPhrasingContent,
 } from '@tinacms/mdx'
+import {
+  $createHorizontalRuleNode,
+  HorizontalRuleNode,
+} from '@lexical/react/LexicalHorizontalRuleNode'
+import TableActionMenuPlugin from './plugins/tableActionMenuPlugin'
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -148,6 +161,14 @@ const populatePhrasingContent = (value: PhrasingContent, node: ElementNode) => {
       node.append(linkNode)
       break
     }
+    case 'linkReference': {
+      const linkNode = $createLinkNode(`url from ${value.identifier}`)
+      value.children.forEach((child) =>
+        populateStaticPhrasingContent(child, linkNode)
+      )
+      node.append(linkNode)
+      break
+    }
     default:
       populateStaticPhrasingContent(value, node)
   }
@@ -156,6 +177,32 @@ const populatePhrasingContent = (value: PhrasingContent, node: ElementNode) => {
 const populateTopLevelContent = (value: SlateRootType, root: RootNode) => {
   value.children.forEach((child) => {
     switch (child.type) {
+      case 'table': {
+        const tableNode = $createTableNode()
+        child.children.forEach((row) => {
+          const rowNode = $createTableRowNode()
+          row.children.forEach((cell, columnIndex) => {
+            const cellNode = $createTableCellNode(0) // All cells are the same, no <th>
+            const alignment = child.align ? child.align[columnIndex] : 'center'
+            const alignmentClasses = {
+              left: 'text-left',
+              center: 'text-center',
+              right: 'text-right',
+            }
+            cell.children.forEach((cellChild) => {
+              populatePhrasingContent(cellChild, cellNode)
+            })
+            rowNode.append(cellNode)
+          })
+          tableNode.append(rowNode)
+        })
+        root.append(tableNode)
+        break
+      }
+      case 'thematicBreak': {
+        root.append($createHorizontalRuleNode())
+        break
+      }
       case 'paragraph': {
         const paragraph = $createParagraphNode()
         child.children.forEach((subChild) => {
@@ -218,6 +265,7 @@ export const LexicalEditor = (props: {
             },
             TinaQuoteNode,
             CodeNode,
+            HorizontalRuleNode,
             CodeHighlightNode,
             TableNode,
             TableCellNode,
@@ -286,6 +334,7 @@ export const LexicalEditor = (props: {
         </div>
         <TabIndentationPlugin />
         <CodeHighlightPlugin />
+        <TableActionMenuPlugin />
         <TreeViewPlugin />
       </LexicalComposer>
     </div>
