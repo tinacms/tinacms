@@ -53,10 +53,13 @@ const getTemplateForData = (field: any, data: any) => {
       if (result) {
         return result
       }
+      throw new Error(
+        `Template "${data[templateKey]}" is not defined for field "${field.name}"`
+      )
     }
 
     throw new Error(
-      `Missing required key "${templateKey}" on field ${field.name}`
+      `Missing required key "${templateKey}" on field "${field.name}"`
     )
   } else {
     return field
