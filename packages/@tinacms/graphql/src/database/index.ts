@@ -1050,13 +1050,12 @@ export class Database {
       })
       duplicateFiles.forEach((path) => {
         warnings.push(
-          // TODO: link to docs
           `"${path}" Found in multiple collections: ${filesSeen
             .get(path)
             .map((collection) => `"${collection}"`)
             .join(
               ', '
-            )}. This can cause unexpected behavior. We recommend updating the \`match\` property of those collections so that each file is in only one collection.\nThis will be an error in the future.\n`
+            )}. This can cause unexpected behavior. We recommend updating the \`match\` property of those collections so that each file is in only one collection.\nThis will be an error in the future. See https://tina.io/docs/errors/file-in-mutpliple-collections/\n`
         )
       })
 
