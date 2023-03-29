@@ -94,7 +94,7 @@ function prepopulatedRichText() {
 
 export const LexicalEditor = () => {
   return (
-    <div className="">
+    <div className="lexical-editor">
       <LexicalComposer
         initialConfig={{
           namespace: 'MyEditor',

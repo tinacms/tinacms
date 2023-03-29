@@ -42,21 +42,21 @@
   min-height: 72px;
 }
 
-.tina-prose ul {
-  list-style: disc;
+.lexical-editor ul {
+  list-style: disc !important;
 }
-.tina-prose ul ul {
-  list-style: circle;
+.lexical-editor ul ul {
+  list-style: circle !important;
 }
-.tina-prose ul ul ul {
-  list-style: square;
+.lexical-editor ul ul ul {
+  list-style: square !important;
 }
 
 /* prose adds backticks, which look like they should be editable */
-.tina-prose code::before {
+.lexical-editor code::before {
   content: '';
 }
-.tina-prose code::after {
+.lexical-editor code::after {
   content: '';
 }
 
@@ -65,12 +65,12 @@ p {
   --lexical-indent-base-value: 10px;
 }
 
-.tina-prose :where(p):not(:where([class~='not-prose'] *)) {
+.lexical-editor :where(p):not(:where([class~='not-prose'] *)) {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.tina-prose :where(blockquote):not(:where([class~='not-prose'] *)) {
+.lexical-editor :where(blockquote):not(:where([class~='not-prose'] *)) {
   font-weight: normal;
   font-style: normal;
   color: var(--tw-prose-quotes);
