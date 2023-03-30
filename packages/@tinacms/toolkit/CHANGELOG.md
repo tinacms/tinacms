@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.6.2
+
+### Patch Changes
+
+- 1370ebae6: Update branching refresh logic to not refresh when a new branch is created. Instead it will be added to the list of branches in memory
+
 ## 1.6.1
 
 ### Patch Changes
