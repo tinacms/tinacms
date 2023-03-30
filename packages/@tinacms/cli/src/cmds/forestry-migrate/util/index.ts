@@ -324,6 +324,9 @@ export const transformForestryFieldsToTinaFields = ({
             label: template.label,
             name: stringifyTemplateName(tem, tem),
           }
+          if (t.name != tem) {
+            ;(t as any).nameOverride = tem
+          }
           templates.push(t)
         })
 
