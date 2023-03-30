@@ -113,7 +113,7 @@ importers:
       '@tailwindcss/typography': ^0.5.7
       '@tinacms/app': workspace:*
       '@tinacms/cli': workspace:*
-      '@tinacms/datalayer': workspace:^1.2.3
+      '@tinacms/datalayer': workspace:^1.2.4
       autoprefixer: ^10.4.0
       cypress: ^10.10.0
       eslint: 8.24.0
