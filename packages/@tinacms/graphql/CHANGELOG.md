@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 1.4.3
+
+### Patch Changes
+
+- 40d908a79: Update error messages in Forestry migration
+- 02a555c39: Handle block aliases on forestry migration
+
 ## 1.4.2
 
 ### Patch Changes

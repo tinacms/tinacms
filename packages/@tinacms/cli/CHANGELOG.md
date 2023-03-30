@@ -1,5 +1,18 @@
 # tinacms-cli
 
+## 1.5.2
+
+### Patch Changes
+
+- 40d908a79: Update error messages in Forestry migration
+- 02a555c39: Handle block aliases on forestry migration
+- 9216a5bda: Allow svg imports
+- Updated dependencies [40d908a79]
+- Updated dependencies [02a555c39]
+  - @tinacms/graphql@1.4.3
+  - @tinacms/app@1.2.3
+  - @tinacms/datalayer@1.2.3
+
 ## 1.5.1
 
 ### Patch Changes
