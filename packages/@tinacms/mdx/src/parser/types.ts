@@ -275,7 +275,7 @@ export interface FootnoteDefinition extends Parent, Association {
 
 export interface Text {
   type: 'text'
-  text: string
+  value: string
   strong?: boolean
   emphasis?: boolean
   code?: boolean

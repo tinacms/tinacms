@@ -1,3 +1,6 @@
+import { toMarkdown } from 'mdast-util-to-markdown'
+import { gfm } from 'micromark-extension-gfm'
+import { gfmToMarkdown } from 'mdast-util-gfm'
 import { z } from 'zod'
 import type * as M from 'mdast'
 import type {
@@ -18,7 +21,7 @@ import type {
   Table,
   TableRow,
   TableCell,
-} from './types'
+} from '../types'
 
 const InlineCodeSchema: z.ZodType<M.InlineCode> = z.object({
   type: z.literal('inlineCode'),
@@ -100,9 +103,9 @@ const UntransformedPhrasingContentSchema: z.ZodType<M.PhrasingContent[]> =
   )
 
 const PhrasingContentSchema: z.ZodType<
-  PhrasingContent[],
+  M.PhrasingContent[],
   z.ZodTypeDef,
-  M.PhrasingContent[]
+  PhrasingContent[]
 > = z
   .array(
     z.lazy(() =>
@@ -110,6 +113,14 @@ const PhrasingContentSchema: z.ZodType<
     )
   )
   .transform((items) => {
+    console.log(items)
+
+    return items.map((item) => {
+      if (item.type === 'text') {
+        return { type: 'text', value: item.value }
+      }
+    })
+
     const flattenMdStaticPhrasingContent = (
       items: M.StaticPhrasingContent[],
       accumulator: StaticPhrasingContent[] = [],
@@ -143,7 +154,7 @@ const PhrasingContentSchema: z.ZodType<
             })
             break
           case 'inlineCode':
-            accumulator.push({ type: 'text', value: item.value, code: true })
+            accumulator.push({ type: 'text', text: item.value, code: true })
             break
           case 'break':
             accumulator.push({ type: 'break' })
@@ -185,7 +196,7 @@ const PhrasingContentSchema: z.ZodType<
             })
             break
           case 'text':
-            accumulator.push({ type: 'text', value: item.value, ...marks })
+            accumulator.push({ type: 'text', text: item.value, ...marks })
             break
           case 'strong':
             flattenMdPhrasingContent(item.children, accumulator, {
@@ -202,7 +213,7 @@ const PhrasingContentSchema: z.ZodType<
     return accumulator
   })
 
-const HeadingSchema: z.ZodType<Heading, z.ZodTypeDef, M.Heading> = z.object({
+const HeadingSchema: z.ZodType<M.Heading, z.ZodTypeDef, Heading> = z.object({
   type: z.literal('heading'),
   depth: z.union([
     z.literal(1),
@@ -223,7 +234,7 @@ const BlockQuoteSchema = z.object({
   type: z.literal('blockquote'),
   children: z.lazy(() => BlockContentSchema),
 })
-const DefinitionSchema: z.ZodType<Definition, z.ZodTypeDef, M.Definition> =
+const DefinitionSchema: z.ZodType<M.Definition, z.ZodTypeDef, Definition> =
   z.object({
     type: z.literal('definition'),
     identifier: z.string(),
@@ -231,17 +242,17 @@ const DefinitionSchema: z.ZodType<Definition, z.ZodTypeDef, M.Definition> =
   })
 
 const ThematicBreakSchema: z.ZodType<
-  ThematicBreak,
+  M.ThematicBreak,
   z.ZodTypeDef,
-  M.ThematicBreak
+  ThematicBreak
 > = z.object({
   type: z.literal('thematicBreak'),
 })
 
 const FootnoteDefinitionSchema: z.ZodType<
-  FootnoteDefinition,
+  M.FootnoteDefinition,
   z.ZodTypeDef,
-  M.FootnoteDefinition
+  FootnoteDefinition
 > = z.object({
   type: z.literal('footnoteDefinition'),
   identifier: z.string(),
@@ -249,7 +260,7 @@ const FootnoteDefinitionSchema: z.ZodType<
   children: z.lazy(() => BlockContentSchema),
 })
 
-const ListItemSchema: z.ZodType<ListItem, z.ZodTypeDef, M.ListItem> = z.object({
+const ListItemSchema: z.ZodType<M.ListItem, z.ZodTypeDef, ListItem> = z.object({
   type: z.literal('listItem'),
   checked: z.boolean().optional().nullable(),
   spreak: z.boolean().optional().nullable(),
@@ -258,14 +269,14 @@ const ListItemSchema: z.ZodType<ListItem, z.ZodTypeDef, M.ListItem> = z.object({
   ),
 })
 
-const CodeSchema: z.ZodType<Code, z.ZodTypeDef, M.Code> = z.object({
+const CodeSchema: z.ZodType<M.Code, z.ZodTypeDef, Code> = z.object({
   type: z.literal('code'),
   lang: z.string().optional().nullable(),
   meta: z.string().optional().nullable(),
   value: z.string(),
 })
 
-const ListSchema: z.ZodType<List, z.ZodTypeDef, M.List> = z.object({
+const ListSchema: z.ZodType<M.List, z.ZodTypeDef, List> = z.object({
   type: z.literal('list'),
   ordered: z.boolean().optional().nullable(),
   start: z.number().optional().nullable(),
@@ -274,23 +285,23 @@ const ListSchema: z.ZodType<List, z.ZodTypeDef, M.List> = z.object({
 })
 
 export const DefinitionContentSchema: z.ZodType<
-  DefinitionContent[],
+  M.DefinitionContent[],
   z.ZodTypeDef,
-  M.DefinitionContent[]
+  DefinitionContent[]
 > = z.array(z.lazy(() => z.union([DefinitionSchema, FootnoteDefinitionSchema])))
 
-export const TableCellSchema: z.ZodType<TableCell, z.ZodTypeDef, M.TableCell> =
+export const TableCellSchema: z.ZodType<M.TableCell, z.ZodTypeDef, TableCell> =
   z.object({
     type: z.literal('tableCell'),
     children: PhrasingContentSchema,
   })
-export const TableRowSchema: z.ZodType<TableRow, z.ZodTypeDef, M.TableRow> =
+export const TableRowSchema: z.ZodType<M.TableRow, z.ZodTypeDef, TableRow> =
   z.object({
     type: z.literal('tableRow'),
     children: z.array(TableCellSchema),
   })
 
-export const TableSchema: z.ZodType<Table, z.ZodTypeDef, M.Table> = z.object({
+export const TableSchema: z.ZodType<M.Table, z.ZodTypeDef, Table> = z.object({
   type: z.literal('table'),
   align: z
     .array(z.enum(['left', 'right', 'center']))
@@ -300,9 +311,9 @@ export const TableSchema: z.ZodType<Table, z.ZodTypeDef, M.Table> = z.object({
 })
 
 export const BlockContentSchema: z.ZodType<
-  BlockContent[],
+  M.BlockContent[],
   z.ZodTypeDef,
-  M.BlockContent[]
+  BlockContent[]
 > = z.array(
   z.lazy(() =>
     z.union([
@@ -319,9 +330,9 @@ export const BlockContentSchema: z.ZodType<
 )
 
 export const TopLevelContentSchema: z.ZodType<
-  TopLevelContent[],
+  M.TopLevelContent[],
   z.ZodTypeDef,
-  M.TopLevelContent[]
+  TopLevelContent[]
 > = z.array(
   z.lazy(() =>
     z.union([
@@ -339,13 +350,23 @@ export const TopLevelContentSchema: z.ZodType<
   )
 )
 
-export const SlateRoot = z.object({
+export const LexicalRoot = z.object({
   type: z.literal('root'),
   children: TopLevelContentSchema,
 })
 
-export type SlateRootType = ReturnType<typeof SlateRoot.parse>
+export const stringifyMDX = (ast: {
+  type: 'root'
+  children: TopLevelContent[]
+}) => {
+  const mdast = LexicalRoot.safeParse(ast)
 
-export type SlateElementType = ReturnType<
-  typeof SlateRoot.parse
->['children'][number]
+  if (mdast.success) {
+    const string = toMarkdown(mdast.data, {
+      extensions: [gfmToMarkdown()],
+    })
+    return string
+  } else {
+    console.dir(mdast.error.format(), { depth: null })
+  }
+}

@@ -11,6 +11,6 @@ it('matches input', () => {
   if (tree) {
     expect(util.print(tree)).toMatchFile(util.nodePath(__dirname))
   }
-  // const string = stringifyMDX(tree)
-  // expect(string).toMatchFile(util.mdPath(__dirname))
+  const string = stringifyMDX(tree)
+  expect(string).toMatchFile(util.mdPath(__dirname))
 })

@@ -35,7 +35,7 @@ const populateStaticPhrasingContent = (
       break
     }
     case 'text': {
-      const textNode = $createTextNode(value.text)
+      const textNode = $createTextNode(value.value)
       if (value.code) {
         textNode.setFormat('code')
       }

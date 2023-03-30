@@ -6,16 +6,16 @@
       "children": [
         {
           "type": "text",
-          "text": "Testing "
+          "value": "Testing "
         },
         {
           "type": "text",
-          "text": "things",
+          "value": "things",
           "strong": true
         },
         {
           "type": "text",
-          "text": " are working? "
+          "value": " are working? "
         },
         {
           "type": "link",
@@ -24,19 +24,19 @@
           "children": [
             {
               "type": "text",
-              "text": "Here's ",
+              "value": "Here's ",
               "emphasis": true
             },
             {
               "type": "text",
-              "text": "the forecast",
+              "value": "the forecast",
               "emphasis": true
             }
           ]
         },
         {
           "type": "text",
-          "text": "\nfor tomorrow's weather"
+          "value": "\nfor tomorrow's weather"
         }
       ]
     },
@@ -55,11 +55,11 @@
               "children": [
                 {
                   "type": "text",
-                  "text": "List item. With "
+                  "value": "List item. With "
                 },
                 {
                   "type": "text",
-                  "text": "emphasis",
+                  "value": "emphasis",
                   "emphasis": true
                 }
               ]
@@ -70,7 +70,7 @@
               "children": [
                 {
                   "type": "text",
-                  "text": "Heading That's part of the List"
+                  "value": "Heading That's part of the List"
                 }
               ]
             },
@@ -85,7 +85,7 @@
               "children": [
                 {
                   "type": "text",
-                  "text": "You can put block content in here as much as you want. Here's a table:"
+                  "value": "You can put block content in here as much as you want. Here's a table:"
                 }
               ]
             },
@@ -104,7 +104,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "text": "foo"
+                          "value": "foo"
                         }
                       ]
                     },
@@ -113,7 +113,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "text": "bar"
+                          "value": "bar"
                         }
                       ]
                     }
@@ -127,7 +127,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "text": "baz"
+                          "value": "baz"
                         }
                       ]
                     },
@@ -136,16 +136,16 @@
                       "children": [
                         {
                           "type": "text",
-                          "text": "qux "
+                          "value": "qux "
                         },
                         {
                           "type": "text",
-                          "text": "with some emphasis",
+                          "value": "with some emphasis",
                           "emphasis": true
                         },
                         {
                           "type": "text",
-                          "text": " and "
+                          "value": " and "
                         },
                         {
                           "type": "linkReference",
@@ -155,7 +155,7 @@
                           "children": [
                             {
                               "type": "text",
-                              "text": "link"
+                              "value": "link"
                             }
                           ]
                         }
@@ -177,7 +177,7 @@
           "children": [
             {
               "type": "text",
-              "text": "This is my blockquote"
+              "value": "This is my blockquote"
             }
           ]
         },
@@ -187,7 +187,7 @@
           "children": [
             {
               "type": "text",
-              "text": "Here's a header"
+              "value": "Here's a header"
             }
           ]
         },
@@ -205,7 +205,7 @@
       "children": [
         {
           "type": "text",
-          "text": "Testing again!"
+          "value": "Testing again!"
         }
       ]
     },
@@ -220,14 +220,14 @@
       "children": [
         {
           "type": "text",
-          "text": "123 Street"
+          "value": "123 Street"
         },
         {
           "type": "break"
         },
         {
           "type": "text",
-          "text": "Abc, London"
+          "value": "Abc, London"
         }
       ]
     },
@@ -246,7 +246,7 @@
               "children": [
                 {
                   "type": "text",
-                  "text": "foo"
+                  "value": "foo"
                 }
               ]
             },
@@ -255,7 +255,7 @@
               "children": [
                 {
                   "type": "text",
-                  "text": "bar"
+                  "value": "bar"
                 }
               ]
             }
@@ -269,7 +269,7 @@
               "children": [
                 {
                   "type": "text",
-                  "text": "baz"
+                  "value": "baz"
                 }
               ]
             },
@@ -278,16 +278,16 @@
               "children": [
                 {
                   "type": "text",
-                  "text": "qux "
+                  "value": "qux "
                 },
                 {
                   "type": "text",
-                  "text": "with some emphasis",
+                  "value": "with some emphasis",
                   "emphasis": true
                 },
                 {
                   "type": "text",
-                  "text": " and "
+                  "value": " and "
                 },
                 {
                   "type": "linkReference",
@@ -297,7 +297,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "text": "link"
+                      "value": "link"
                     }
                   ]
                 }
@@ -312,30 +312,30 @@
       "children": [
         {
           "type": "text",
-          "text": "some "
+          "value": "some "
         },
         {
           "type": "text",
-          "text": "inline code",
+          "value": "inline code",
           "code": true
         },
         {
           "type": "text",
-          "text": " goes here. "
+          "value": " goes here. "
         },
         {
           "type": "text",
-          "text": "bold ",
+          "value": "bold ",
           "emphasis": true
         },
         {
           "type": "text",
-          "text": "marks are ignored",
+          "value": "marks are ignored",
           "code": true
         },
         {
           "type": "text",
-          "text": " for inline code."
+          "value": " for inline code."
         }
       ]
     },
@@ -344,31 +344,31 @@
       "children": [
         {
           "type": "text",
-          "text": "You can "
+          "value": "You can "
         },
         {
           "type": "text",
-          "text": "delete this code",
+          "value": "delete this code",
           "delete": true
         },
         {
           "type": "text",
-          "text": ". And "
+          "value": ". And "
         },
         {
           "type": "text",
-          "text": "emphasize the ",
+          "value": "emphasize the ",
           "strong": true
         },
         {
           "type": "text",
-          "text": "deletion",
+          "value": "deletion",
           "strong": true,
           "delete": true
         },
         {
           "type": "text",
-          "text": " if you'd like"
+          "value": " if you'd like"
         }
       ]
     },
@@ -377,7 +377,7 @@
       "children": [
         {
           "type": "text",
-          "text": "Here's a "
+          "value": "Here's a "
         },
         {
           "type": "html",
@@ -385,7 +385,7 @@
         },
         {
           "type": "text",
-          "text": "Link to the docs"
+          "value": "Link to the docs"
         },
         {
           "type": "html",
@@ -398,7 +398,7 @@
       "children": [
         {
           "type": "text",
-          "text": "I'm making a reference to the "
+          "value": "I'm making a reference to the "
         },
         {
           "type": "footnoteReference",
@@ -407,7 +407,7 @@
         },
         {
           "type": "text",
-          "text": " footnote"
+          "value": " footnote"
         }
       ]
     },
@@ -422,7 +422,7 @@
           "children": [
             {
               "type": "text",
-              "text": "alpha"
+              "value": "alpha"
             }
           ]
         }
@@ -454,7 +454,7 @@
           "children": [
             {
               "type": "text",
-              "text": "This is a footnote definition"
+              "value": "This is a footnote definition"
             }
           ]
         }
@@ -465,7 +465,7 @@
       "children": [
         {
           "type": "text",
-          "text": "I am part of the footnote still!"
+          "value": "I am part of the footnote still!"
         }
       ]
     },
@@ -479,7 +479,7 @@
       "children": [
         {
           "type": "text",
-          "text": "Here's an "
+          "value": "Here's an "
         },
         {
           "type": "image",
