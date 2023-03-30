@@ -2,20 +2,23 @@ import { Template, TinaField } from '@tinacms/schema-tools/src'
 
 const replaceBlockAliases = (template: Template, item: any) => {
   const output = { ...item }
-  if ((template as any).templateKey) {
-    const templateName = output[(template as any).templateKey]
+  const templateKey = (template as any).templateKey || '_template'
 
-    const matchingTemplate = (template as any).templates.find(
-      (t) => t.nameOverride == templateName || t.name == templateName
+  const templateName = output[templateKey]
+
+  const matchingTemplate = (template as any).templates.find(
+    (t) => t.nameOverride == templateName || t.name == templateName
+  )
+  if (!matchingTemplate) {
+    throw new Error(
+      `Block template "${templateName}" is not defined for field "${template.name}"`
     )
-    if (!matchingTemplate) {
-      throw new Error(
-        `Block template "${templateName}" is not defined for field "${template.name}"`
-      )
-    }
-    output._template = matchingTemplate.name
-    delete output[(template as any).templateKey]
   }
+  output._template = matchingTemplate.name
+  if (templateKey != '_template') {
+    delete output[templateKey]
+  }
+
   return output
 }
 
@@ -87,19 +90,19 @@ const getTemplateForData = (field: any, data: any) => {
 
 const applyBlockAliases = (template: Template, item: any) => {
   const output = { ...item }
-  if ((template as any).templateKey) {
-    const templateName = (output as any)._template
+  const templateKey = (template as any).templateKey || '_template'
+  const templateName = (output as any)._template
 
-    const matchingTemplate = (template as any).templates.find(
-      (t) => t.nameOverride == templateName || t.name == templateName
+  const matchingTemplate = (template as any).templates.find(
+    (t) => t.nameOverride == templateName || t.name == templateName
+  )
+  if (!matchingTemplate) {
+    throw new Error(
+      `Block template "${templateName}" is not defined for field "${template.name}"`
     )
-    if (!matchingTemplate) {
-      throw new Error(
-        `Block template "${templateName}" is not defined for field "${template.name}"`
-      )
-    }
-    output[(template as any).templateKey] =
-      matchingTemplate.nameOverride || matchingTemplate.name
+  }
+  output[templateKey] = matchingTemplate.nameOverride || matchingTemplate.name
+  if (templateKey != '_template') {
     delete (output as any)._template
   }
   return output
@@ -112,7 +115,7 @@ export const applyNameOverrides = (template: Template, obj: any): object => {
         getTemplateForData(template, item).fields,
         item
       )
-      if (isBlockField(template) && (template as any).templateKey) {
+      if (isBlockField(template)) {
         result = applyBlockAliases(template, result)
       }
       return result
