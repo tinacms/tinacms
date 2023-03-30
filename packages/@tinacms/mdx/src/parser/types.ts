@@ -250,11 +250,11 @@ export interface TableCell extends Parent {
   children: PhrasingContent[]
 }
 
-export interface HTML extends Literal, Void {
+export interface HTML extends Literal {
   type: 'html'
 }
 
-export interface Code extends Literal, Void {
+export interface Code extends Literal {
   type: 'code'
   lang?: string | null | undefined
   meta?: string | null | undefined
@@ -264,7 +264,7 @@ export interface YAML extends Literal {
   type: 'yaml'
 }
 
-export interface Definition extends Node, Association, Resource, Void {
+export interface Definition extends Node, Association, Resource {
   type: 'definition'
 }
 
@@ -282,7 +282,7 @@ export interface Text {
   delete?: boolean
 }
 
-export interface Break extends Node, Void {
+export interface Break extends Node {
   type: 'break'
 }
 
@@ -291,7 +291,7 @@ export interface Link extends Parent, Resource {
   children: StaticPhrasingContent[]
 }
 
-export interface Image extends Node, Resource, Alternative, Void {
+export interface Image extends Node, Resource, Alternative {
   type: 'image'
 }
 
@@ -300,7 +300,7 @@ export interface LinkReference extends Parent, Reference {
   children: StaticPhrasingContent[]
 }
 
-export interface ImageReference extends Node, Reference, Alternative, Void {
+export interface ImageReference extends Node, Reference, Alternative {
   type: 'imageReference'
 }
 
@@ -309,7 +309,7 @@ export interface Footnote extends Parent {
   children: PhrasingContent[]
 }
 
-export interface FootnoteReference extends Node, Association, Void {
+export interface FootnoteReference extends Node, Association {
   type: 'footnoteReference'
 }
 
@@ -330,11 +330,4 @@ export interface Reference extends Association {
 
 export interface Alternative {
   alt?: string | null | undefined
-}
-
-/**
- * All slate leafs must have at least one child text node
- */
-export interface Void {
-  children: [Text]
 }

@@ -6,8 +6,6 @@ import type {
   StaticPhrasingContent,
   Heading,
   Text,
-  Link,
-  Void,
   Definition,
   FootnoteDefinition,
   TopLevelContent,
@@ -101,8 +99,6 @@ const UntransformedPhrasingContentSchema: z.ZodType<M.PhrasingContent[]> =
     )
   )
 
-const voidNode: Void = { children: [{ type: 'text', text: '' }] }
-
 const PhrasingContentSchema: z.ZodType<
   PhrasingContent[],
   z.ZodTypeDef,
@@ -150,7 +146,7 @@ const PhrasingContentSchema: z.ZodType<
             accumulator.push({ type: 'text', text: item.value, code: true })
             break
           case 'break':
-            accumulator.push({ type: 'break', ...voidNode })
+            accumulator.push({ type: 'break' })
             break
           case 'emphasis':
             flattenMdPhrasingContent(item.children, accumulator, {
@@ -159,16 +155,16 @@ const PhrasingContentSchema: z.ZodType<
             })
             break
           case 'footnoteReference':
-            accumulator.push({ ...item, ...voidNode })
+            accumulator.push(item)
             break
           case 'html':
-            accumulator.push({ type: 'html', value: item.value, ...voidNode })
+            accumulator.push({ type: 'html', value: item.value })
             break
           case 'image':
-            accumulator.push({ ...item, ...voidNode })
+            accumulator.push(item)
             break
           case 'imageReference':
-            accumulator.push({ ...item, ...voidNode })
+            accumulator.push(item)
             break
           case 'linkReference':
             {
@@ -227,43 +223,21 @@ const BlockQuoteSchema = z.object({
   type: z.literal('blockquote'),
   children: z.lazy(() => BlockContentSchema),
 })
-const DefinitionSchema: z.ZodType<Definition, z.ZodTypeDef, M.Definition> = z
-  .object({
+const DefinitionSchema: z.ZodType<Definition, z.ZodTypeDef, M.Definition> =
+  z.object({
     type: z.literal('definition'),
     identifier: z.string(),
     url: z.string(),
   })
-  .transform((item) => {
-    return {
-      ...item,
-      ...voidNode,
-    }
-  })
+
 const ThematicBreakSchema: z.ZodType<
   ThematicBreak,
   z.ZodTypeDef,
   M.ThematicBreak
-> = z
-  .object({
-    type: z.literal('thematicBreak'),
-  })
-  .transform((item) => {
-    return {
-      ...item,
-      ...voidNode,
-    }
-  })
-const TransformedHTMLSchema: z.ZodType<HTML, z.ZodTypeDef, M.HTML> = z
-  .object({
-    type: z.literal('html'),
-    value: z.string(),
-  })
-  .transform((item) => {
-    return {
-      ...item,
-      ...voidNode,
-    }
-  })
+> = z.object({
+  type: z.literal('thematicBreak'),
+})
+
 const FootnoteDefinitionSchema: z.ZodType<
   FootnoteDefinition,
   z.ZodTypeDef,
@@ -284,19 +258,12 @@ const ListItemSchema: z.ZodType<ListItem, z.ZodTypeDef, M.ListItem> = z.object({
   ),
 })
 
-const CodeSchema: z.ZodType<Code, z.ZodTypeDef, M.Code> = z
-  .object({
-    type: z.literal('code'),
-    lang: z.string().optional().nullable(),
-    meta: z.string().optional().nullable(),
-    value: z.string(),
-  })
-  .transform((item) => {
-    return {
-      ...item,
-      ...voidNode,
-    }
-  })
+const CodeSchema: z.ZodType<Code, z.ZodTypeDef, M.Code> = z.object({
+  type: z.literal('code'),
+  lang: z.string().optional().nullable(),
+  meta: z.string().optional().nullable(),
+  value: z.string(),
+})
 
 const ListSchema: z.ZodType<List, z.ZodTypeDef, M.List> = z.object({
   type: z.literal('list'),
@@ -345,7 +312,7 @@ export const BlockContentSchema: z.ZodType<
       ParagraphSchema,
       TableSchema,
       ListSchema,
-      TransformedHTMLSchema,
+      HTMLSchema,
       ThematicBreakSchema,
     ])
   )
@@ -364,7 +331,7 @@ export const TopLevelContentSchema: z.ZodType<
       ParagraphSchema,
       ListSchema,
       TableSchema,
-      TransformedHTMLSchema,
+      HTMLSchema,
       ThematicBreakSchema,
       DefinitionSchema,
       FootnoteDefinitionSchema,

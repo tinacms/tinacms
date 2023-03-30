@@ -1,0 +1,493 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "Testing "
+        },
+        {
+          "type": "text",
+          "text": "things",
+          "strong": true
+        },
+        {
+          "type": "text",
+          "text": " are working? "
+        },
+        {
+          "type": "link",
+          "url": "http://example.com",
+          "title": null,
+          "children": [
+            {
+              "type": "text",
+              "text": "Here's ",
+              "emphasis": true
+            },
+            {
+              "type": "text",
+              "text": "the forecast",
+              "emphasis": true
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "\nfor tomorrow's weather"
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "start": null,
+      "spread": false,
+      "children": [
+        {
+          "type": "listItem",
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "List item. With "
+                },
+                {
+                  "type": "text",
+                  "text": "emphasis",
+                  "emphasis": true
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "depth": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Heading That's part of the List"
+                }
+              ]
+            },
+            {
+              "type": "code",
+              "lang": "typescript",
+              "meta": null,
+              "value": "// And a code block, too!\nconst meh: Node = {}"
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "You can put block content in here as much as you want. Here's a table:"
+                }
+              ]
+            },
+            {
+              "type": "table",
+              "align": [
+                "left",
+                "center"
+              ],
+              "children": [
+                {
+                  "type": "tableRow",
+                  "children": [
+                    {
+                      "type": "tableCell",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "foo"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "tableCell",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "bar"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "tableRow",
+                  "children": [
+                    {
+                      "type": "tableCell",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "baz"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "tableCell",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "qux "
+                        },
+                        {
+                          "type": "text",
+                          "text": "with some emphasis",
+                          "emphasis": true
+                        },
+                        {
+                          "type": "text",
+                          "text": " and "
+                        },
+                        {
+                          "type": "linkReference",
+                          "referenceType": "full",
+                          "identifier": "bravo",
+                          "label": "bravo",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "link"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "blockquote",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "This is my blockquote"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "depth": 1,
+          "children": [
+            {
+              "type": "text",
+              "text": "Here's a header"
+            }
+          ]
+        },
+        {
+          "type": "code",
+          "lang": "js",
+          "meta": null,
+          "value": "and a code block"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "depth": 2,
+      "children": [
+        {
+          "type": "text",
+          "text": "Testing again!"
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "lang": "javascript",
+      "meta": null,
+      "value": "const hello = \"world\""
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "123 Street"
+        },
+        {
+          "type": "break"
+        },
+        {
+          "type": "text",
+          "text": "Abc, London"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "align": [
+        "left",
+        "center"
+      ],
+      "children": [
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "foo"
+                }
+              ]
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "bar"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "baz"
+                }
+              ]
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "qux "
+                },
+                {
+                  "type": "text",
+                  "text": "with some emphasis",
+                  "emphasis": true
+                },
+                {
+                  "type": "text",
+                  "text": " and "
+                },
+                {
+                  "type": "linkReference",
+                  "referenceType": "full",
+                  "identifier": "bravo",
+                  "label": "bravo",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "link"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "some "
+        },
+        {
+          "type": "text",
+          "text": "inline code",
+          "code": true
+        },
+        {
+          "type": "text",
+          "text": " goes here. "
+        },
+        {
+          "type": "text",
+          "text": "bold ",
+          "emphasis": true
+        },
+        {
+          "type": "text",
+          "text": "marks are ignored",
+          "code": true
+        },
+        {
+          "type": "text",
+          "text": " for inline code."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "You can "
+        },
+        {
+          "type": "text",
+          "text": "delete this code",
+          "delete": true
+        },
+        {
+          "type": "text",
+          "text": ". And "
+        },
+        {
+          "type": "text",
+          "text": "emphasize the ",
+          "strong": true
+        },
+        {
+          "type": "text",
+          "text": "deletion",
+          "strong": true,
+          "delete": true
+        },
+        {
+          "type": "text",
+          "text": " if you'd like"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "Here's a "
+        },
+        {
+          "type": "html",
+          "value": "<a href=\"some-link\" data-link=\"true\" disabled>"
+        },
+        {
+          "type": "text",
+          "text": "Link to the docs"
+        },
+        {
+          "type": "html",
+          "value": "</a>"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "I'm making a reference to the "
+        },
+        {
+          "type": "footnoteReference",
+          "identifier": "some definition",
+          "label": "some definition"
+        },
+        {
+          "type": "text",
+          "text": " footnote"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "linkReference",
+          "referenceType": "full",
+          "identifier": "bravo",
+          "label": "bravo",
+          "children": [
+            {
+              "type": "text",
+              "text": "alpha"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "thematicBreak"
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "imageReference",
+          "alt": "alpha",
+          "referenceType": "full",
+          "identifier": "bravo",
+          "label": "bravo"
+        }
+      ]
+    },
+    {
+      "type": "footnoteDefinition",
+      "identifier": "some definition",
+      "label": "some definition",
+      "children": [
+        {
+          "type": "heading",
+          "depth": 2,
+          "children": [
+            {
+              "type": "text",
+              "text": "This is a footnote definition"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "I am part of the footnote still!"
+        }
+      ]
+    },
+    {
+      "type": "definition",
+      "identifier": "bravo",
+      "url": "http://exapmle.com/referenceimage.jpg"
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "Here's an "
+        },
+        {
+          "type": "image",
+          "url": "http://example.com/my-img.jpg",
+          "title": null,
+          "alt": "image you'll love"
+        }
+      ]
+    }
+  ]
+}
