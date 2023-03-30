@@ -92,6 +92,8 @@ export class ConfigManager {
     )
     dotenv.config({ path: this.envFilePath })
 
+    // Setup file paths that don't depend on the config file
+    // =================
     this.tinaConfigFilePath = await this.getPathWithExtension(
       path.join(this.tinaFolderPath, 'config')
     )
@@ -104,10 +106,7 @@ export class ConfigManager {
       path.join(this.tinaFolderPath, 'database')
     )
     this.generatedFolderPath = path.join(this.tinaFolderPath, GENERATED_FOLDER)
-    this.config = await this.loadConfigFile(
-      this.generatedFolderPath,
-      this.tinaConfigFilePath
-    )
+
     this.generatedGraphQLGQLPath = path.join(
       this.generatedFolderPath,
       GRAPHQL_GQL_FILE
@@ -132,19 +131,7 @@ export class ConfigManager {
       this.generatedFolderPath,
       'frags.gql'
     )
-    const fullLocalContentPath = path.join(
-      this.tinaFolderPath,
-      this.config.localContentPath || ''
-    )
-    if (
-      this.config.localContentPath &&
-      (await fs.existsSync(fullLocalContentPath))
-    ) {
-      logger.info(`Using separate content repo at ${fullLocalContentPath}`)
-      this.contentRootPath = fullLocalContentPath
-    } else {
-      this.contentRootPath = this.rootPath
-    }
+
     this.generatedTypesTSFilePath = path.join(
       this.generatedFolderPath,
       'types.ts'
@@ -174,6 +161,29 @@ export class ConfigManager {
       this.generatedFolderPath,
       'client.js'
     )
+    // =================
+    // End of file paths that don't depend on the config file
+
+    // Setup Config files and paths that depend on the config file
+    // =================
+
+    // Create a Dummy client file if it doesn't exist
+    if (!(await fs.pathExists(this.generatedClientJSFilePath))) {
+      // This handles the case if they import the client from the config file (normally indirectly and its not actually used)
+      const file = 'export default ()=>({})\nexport const client = ()=>({})'
+      if (this.isUsingTs()) {
+        await fs.writeFile(this.generatedClientTSFilePath, file)
+      } else {
+        await fs.writeFile(this.generatedClientJSFilePath, file)
+      }
+    }
+
+    // Load the config file with ES build
+    this.config = await this.loadConfigFile(
+      this.generatedFolderPath,
+      this.tinaConfigFilePath
+    )
+
     this.publicFolderPath = path.join(
       this.rootPath,
       this.config.build.publicFolder
@@ -185,8 +195,25 @@ export class ConfigManager {
     this.outputHTMLFilePath = path.join(this.outputFolderPath, 'index.html')
     this.outputGitignorePath = path.join(this.outputFolderPath, '.gitignore')
 
+    const fullLocalContentPath = path.join(
+      this.tinaFolderPath,
+      this.config.localContentPath || ''
+    )
+
+    if (
+      this.config.localContentPath &&
+      (await fs.existsSync(fullLocalContentPath))
+    ) {
+      logger.info(`Using separate content repo at ${fullLocalContentPath}`)
+      this.contentRootPath = fullLocalContentPath
+    } else {
+      this.contentRootPath = this.rootPath
+    }
+
     this.spaMainPath = require.resolve('@tinacms/app')
     this.spaRootPath = path.join(this.spaMainPath, '..', '..')
+    // =================
+    // End of paths that depend on the config file
   }
 
   async getTinaFolderPath(rootPath) {
