@@ -168,13 +168,17 @@ export class ConfigManager {
     // =================
 
     // Create a Dummy client file if it doesn't exist
-    if (!(await fs.pathExists(this.generatedClientJSFilePath))) {
+    const clientExists = this.isUsingTs()
+      ? await fs.pathExists(this.generatedClientTSFilePath)
+      : await fs.pathExists(this.generatedClientJSFilePath)
+
+    if (!clientExists) {
       // This handles the case if they import the client from the config file (normally indirectly and its not actually used)
       const file = 'export default ()=>({})\nexport const client = ()=>({})'
       if (this.isUsingTs()) {
-        await fs.writeFile(this.generatedClientTSFilePath, file)
+        await fs.outputFile(this.generatedClientTSFilePath, file)
       } else {
-        await fs.writeFile(this.generatedClientJSFilePath, file)
+        await fs.outputFile(this.generatedClientJSFilePath, file)
       }
     }
 
