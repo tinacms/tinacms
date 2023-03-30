@@ -43,6 +43,7 @@ const template: Template<true> = {
       namespace: [],
       type: 'object',
       list: true,
+      nameOverride: 'block-field',
       templateKey: 'template',
       templates: [
         {
@@ -92,7 +93,7 @@ describe('replaceNameOverrides', () => {
       describe('with alias on block', () => {
         it('should replace _templateKey', () => {
           const obj = {
-            blockField: [
+            'block-field': [
               {
                 template: 'template1',
                 name: 'value',
@@ -134,7 +135,7 @@ describe('replaceNameOverrides', () => {
       describe('with nested template w/ alias', () => {
         it('should replace _templateKey', () => {
           const obj = {
-            blockField: [
+            'block-field': [
               {
                 template: 'template-aliased',
                 name: 'value',
@@ -337,7 +338,7 @@ describe('applyNameOverrides', () => {
             ],
           }
           expect(applyNameOverrides(template, obj)).toEqual({
-            blockField: [
+            'block-field': [
               {
                 template: 'template1',
                 name: 'value',
@@ -378,7 +379,7 @@ describe('applyNameOverrides', () => {
             ],
           }
           expect(applyNameOverrides(template, obj)).toEqual({
-            blockField: [
+            'block-field': [
               {
                 template: 'template-aliased',
                 name: 'value',
