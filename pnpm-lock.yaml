@@ -1040,6 +1040,7 @@ importers:
       tslib: ^2.3.0
       typescript: 4.3.5
       unist: ^8.0.11
+      unist-util-visit: ^4.1.2
       vitest: ^0.18.0
       webfontloader: 1.6.28
       zod: ^3.21.4
@@ -1098,6 +1099,7 @@ importers:
       slate-hyperscript: 0.77.0_slate@0.91.4
       slate-react: 0.91.10_t4ihqhozpslrsdude4aebhjgxy
       unist: 8.0.11
+      unist-util-visit: 4.1.2
       vitest: 0.18.1
       webfontloader: 1.6.28
       zod: 3.21.4

@@ -27,6 +27,7 @@ import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import TableActionMenuPlugin from './plugins/tableActionMenuPlugin'
 import { buildInitialContent } from './builder'
 import { LexicalRoot } from './schema'
+import { exportToMarkdownAst } from './exporter'
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -137,19 +138,20 @@ export const LexicalEditor = (props: {
             <OnChangePlugin
               onChange={(editorState: EditorState) => {
                 const json = editorState.toJSON()
+                exportToMarkdownAst(json)
                 /**
                  * calling this on every change seems heavy-handed, but the value
                  * we get from the out-of-the-box exportJSON values from all of our nodes
                  * doesn't match the type we need. This is probably not an issue for a lot
                  * of editors because they don't need to support live preview...
                  */
-                const result = LexicalRoot.safeParse(json.root)
-                console.log(json)
-                if (result.success) {
-                  console.log(result.data)
-                } else {
-                  console.log(result.error.format())
-                }
+                // const result = LexicalRoot.safeParse(json.root)
+                // console.log(json)
+                // if (result.success) {
+                //   console.log(result.data)
+                // } else {
+                //   console.log(result.error.format())
+                // }
               }}
             />
           </div>
