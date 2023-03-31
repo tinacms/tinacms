@@ -7,15 +7,15 @@ import { createSchema } from '../schema/createSchema'
 import { atob, btoa, lastItem, sequential } from '../util'
 import { normalizePath, parseFile, stringifyFile } from './util'
 import type {
-  CollectionTemplateable,
-  TinaCloudCollection,
   Collection,
+  CollectionTemplateable,
   Schema,
+  Template,
+  TinaCloudCollection,
   TinaField,
   TinaSchema,
-  Template,
 } from '@tinacms/schema-tools'
-import type { Bridge } from '../database/bridge'
+import type { Bridge } from './bridge'
 import { TinaFetchError, TinaQueryError } from '../resolver/error'
 import {
   BinaryFilter,
@@ -30,15 +30,15 @@ import {
 } from './datalayer'
 import {
   BatchOp,
+  CONTENT_ROOT_PREFIX,
   DelOp,
   INDEX_KEY_FIELD_SEPARATOR,
   Level,
-  PutOp,
-  CONTENT_ROOT_PREFIX,
-  SUBLEVEL_OPTIONS,
   LevelProxy,
+  PutOp,
+  SUBLEVEL_OPTIONS,
 } from './level'
-import { replaceNameOverrides, applyNameOverrides } from './alias-utils'
+import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -835,12 +835,16 @@ export class Database {
   }
 
   private async indexStatusCallbackWrapper<T>(
-    fn: () => Promise<T>
+    fn: () => Promise<T>,
+    post?: () => Promise<void>
   ): Promise<T> {
     await this.indexStatusCallback({ status: 'inprogress' })
     try {
       const result = await fn()
       await this.indexStatusCallback({ status: 'complete' })
+      if (post) {
+        await post()
+      }
       return result
     } catch (error) {
       await this.indexStatusCallback({ status: 'failed', error })
@@ -861,54 +865,60 @@ export class Database {
       throw new Error('No bridge configured')
     }
     await this.initLevel()
-    const result = await this.indexStatusCallbackWrapper(async () => {
-      const lookup =
-        lookupFromLockFile ||
-        JSON.parse(
-          await this.bridge.get(
-            normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json'))
+    let nextLevel: Level | undefined
+    return await this.indexStatusCallbackWrapper(
+      async () => {
+        const lookup =
+          lookupFromLockFile ||
+          JSON.parse(
+            await this.bridge.get(
+              normalizePath(
+                path.join(this.getGeneratedFolder(), '_lookup.json')
+              )
+            )
           )
-        )
 
-      let nextLevel: Level | undefined
-      let nextVersion: string | undefined
-      if (!this.config.version) {
-        await this.level.clear()
-        nextLevel = this.level
-      } else {
-        const version = await this.getDatabaseVersion()
-        nextVersion = version ? `${parseInt(version) + 1}` : '0'
-        nextLevel = this.rootLevel.sublevel(nextVersion, SUBLEVEL_OPTIONS)
-      }
-
-      const contentRootLevel = nextLevel.sublevel<string, Record<string, any>>(
-        CONTENT_ROOT_PREFIX,
-        SUBLEVEL_OPTIONS
-      )
-      await contentRootLevel.put(
-        normalizePath(path.join(this.getGeneratedFolder(), '_graphql.json')),
-        graphQLSchema as any
-      )
-      await contentRootLevel.put(
-        normalizePath(path.join(this.getGeneratedFolder(), '_schema.json')),
-        tinaSchema.schema as any
-      )
-      await contentRootLevel.put(
-        normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json')),
-        lookup
-      )
-      const result = await this._indexAllContent(nextLevel)
-
-      if (this.config.version) {
-        await this.updateDatabaseVersion(nextVersion)
-        if (this.level) {
+        let nextVersion: string | undefined
+        if (!this.config.version) {
           await this.level.clear()
+          nextLevel = this.level
+        } else {
+          const version = await this.getDatabaseVersion()
+          nextVersion = version ? `${parseInt(version) + 1}` : '0'
+          nextLevel = this.rootLevel.sublevel(nextVersion, SUBLEVEL_OPTIONS)
         }
-        this.level = nextLevel
+
+        const contentRootLevel = nextLevel.sublevel<
+          string,
+          Record<string, any>
+        >(CONTENT_ROOT_PREFIX, SUBLEVEL_OPTIONS)
+        await contentRootLevel.put(
+          normalizePath(path.join(this.getGeneratedFolder(), '_graphql.json')),
+          graphQLSchema as any
+        )
+        await contentRootLevel.put(
+          normalizePath(path.join(this.getGeneratedFolder(), '_schema.json')),
+          tinaSchema.schema as any
+        )
+        await contentRootLevel.put(
+          normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json')),
+          lookup
+        )
+        const result = await this._indexAllContent(nextLevel)
+        if (this.config.version) {
+          await this.updateDatabaseVersion(nextVersion)
+        }
+        return result
+      },
+      async () => {
+        if (this.config.version) {
+          if (this.level) {
+            await this.level.clear()
+          }
+          this.level = nextLevel
+        }
       }
-      return result
-    })
-    return result
+    )
   }
 
   public deleteContentByPaths = async (documentPaths: string[]) => {
