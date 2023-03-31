@@ -4,6 +4,7 @@ import {
   LexicalRootSchema,
   LexicalRootSchemaType,
   LexicalStaticPhrasingContentSchemaType,
+  LexicalTextSchemaType,
   LexicalTopLevelContentSchemaType,
 } from './validator'
 import type * as M from 'mdast'
@@ -23,6 +24,76 @@ export const exportToMarkdownAst = (
     console.log(result.error)
   }
 }
+
+const textNode = (node: LexicalTextSchemaType): M.Text => {
+  return { type: 'text', value: node.text }
+}
+/**
+ * FIXME: this is a pretty rough first attempt at serializing these,
+ * probably a few ways to tackle this, but this doesn't do well
+ * when formatting cross over link elements
+ */
+const wrapText = (node: LexicalTextSchemaType): M.StaticPhrasingContent => {
+  // 0 default
+  // 1 strong
+  // 2 emphasis
+  // 3 strong + emphasis
+  // 4 strikethrough
+  // 5 strikethrough + strong
+  // 6 strikethrough + emphasis
+  // 7 strikethrough + strong + emphasis
+  switch (node.format) {
+    case 0: {
+      return textNode(node)
+    }
+    case 1: {
+      return { type: 'strong', children: [textNode(node)] }
+    }
+    case 2: {
+      return {
+        type: 'emphasis',
+        children: [textNode(node)],
+      }
+    }
+    case 3: {
+      return {
+        type: 'strong',
+        children: [{ type: 'emphasis', children: [textNode(node)] }],
+      }
+    }
+    case 4: {
+      return {
+        type: 'delete',
+        children: [textNode(node)],
+      }
+    }
+    case 5: {
+      return {
+        type: 'delete',
+        children: [{ type: 'strong', children: [textNode(node)] }],
+      }
+    }
+    case 6: {
+      return {
+        type: 'delete',
+        children: [{ type: 'emphasis', children: [textNode(node)] }],
+      }
+    }
+    case 7: {
+      return {
+        type: 'delete',
+        children: [
+          {
+            type: 'strong',
+            children: [{ type: 'emphasis', children: [textNode(node)] }],
+          },
+        ],
+      }
+    }
+  }
+  return textNode(node)
+}
+
 const staticPhrasingContent = (
   node: LexicalStaticPhrasingContentSchemaType
 ): M.StaticPhrasingContent => {
@@ -31,7 +102,7 @@ const staticPhrasingContent = (
       return { type: 'break' }
     }
     case 'text': {
-      return { type: 'text', value: node.text }
+      return wrapText(node)
     }
   }
 }
@@ -40,12 +111,6 @@ const phrasingContent = (
   node: LexicalPhrasingContentSchemaType
 ): M.PhrasingContent => {
   switch (node.type) {
-    case 'text': {
-      return { type: 'text', value: node.text }
-    }
-    case 'linebreak': {
-      return { type: 'break' }
-    }
     case 'link': {
       const link: M.Link = {
         type: 'link',
@@ -55,9 +120,7 @@ const phrasingContent = (
       return link
     }
     default: {
-      // @ts-expect-error
-      console.warn(`Nothing for ${node.type}`)
-      return { type: 'text', value: '' }
+      return staticPhrasingContent(node)
     }
   }
 }

@@ -60,17 +60,13 @@ const populatePhrasingContent = (value: PhrasingContent, node: ElementNode) => {
   switch (value.type) {
     case 'link': {
       const linkNode = $createLinkNode(value.url)
-      value.children.forEach((child) =>
-        populateStaticPhrasingContent(child, linkNode)
-      )
+      flattenMdPhrasingContentArray(value.children, linkNode)
       node.append(linkNode)
       break
     }
     case 'linkReference': {
       const linkNode = $createLinkNode(`url from ${value.identifier}`)
-      value.children.forEach((child) =>
-        populateStaticPhrasingContent(child, linkNode)
-      )
+      flattenMdPhrasingContentArray(value.children, linkNode)
       node.append(linkNode)
       break
     }
