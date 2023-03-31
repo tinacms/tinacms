@@ -15,9 +15,11 @@ import type {
   BlockContent,
   DefinitionContent,
   PhrasingContent,
-  SlateRootType,
   StaticPhrasingContent,
+  Root,
+  Text,
 } from '@tinacms/mdx'
+import type * as M from 'mdast'
 
 const populateStaticPhrasingContent = (
   value: StaticPhrasingContent,
@@ -77,6 +79,104 @@ const populatePhrasingContent = (value: PhrasingContent, node: ElementNode) => {
   }
 }
 
+const flattenMdPhrasingContentArray = (
+  items: PhrasingContent[],
+  node: ElementNode
+) => {
+  const flattenMdStaticPhrasingContent = (
+    items: M.StaticPhrasingContent[],
+    accumulator: StaticPhrasingContent[] = [],
+    parentMarks: Partial<Text>
+  ): void => {
+    return flattenMdPhrasingContent(items, accumulator, parentMarks)
+  }
+  const flattenMdPhrasingContent = (
+    items: M.PhrasingContent[],
+    accumulator: PhrasingContent[] = [],
+    parentMarks: Partial<Text>
+  ): void => {
+    const marks: Partial<Text> = parentMarks
+    items.forEach((item) => {
+      switch (item.type) {
+        case 'footnote':
+          /**
+           * It doesn't actually seem like this is supported. But
+           * the spec says that this is a footnote:
+           *
+           * ^[alpha bravo]
+           *
+           * And it's picked up as as paragraph element so not sure
+           */
+          console.warn(`Not implemented ${item.type}`)
+          break
+        case 'delete':
+          flattenMdPhrasingContent(item.children, accumulator, {
+            ...marks,
+            delete: true,
+          })
+          break
+        case 'inlineCode':
+          accumulator.push({ type: 'text', value: item.value, code: true })
+          break
+        case 'break':
+          accumulator.push({ type: 'break' })
+          break
+        case 'emphasis':
+          flattenMdPhrasingContent(item.children, accumulator, {
+            ...marks,
+            emphasis: true,
+          })
+          break
+        case 'footnoteReference':
+          accumulator.push(item)
+          break
+        case 'html':
+          accumulator.push({ type: 'html', value: item.value })
+          break
+        case 'image':
+          accumulator.push(item)
+          break
+        case 'imageReference':
+          accumulator.push(item)
+          break
+        case 'linkReference':
+          {
+            const linkChildren: Text[] = []
+            flattenMdStaticPhrasingContent(item.children, linkChildren, marks)
+            accumulator.push({
+              ...item,
+              children: linkChildren,
+            })
+          }
+          break
+        case 'link':
+          const linkChildren: Text[] = []
+          flattenMdStaticPhrasingContent(item.children, linkChildren, marks)
+          accumulator.push({
+            ...item,
+            children: linkChildren,
+          })
+          break
+        case 'text':
+          accumulator.push({ type: 'text', value: item.value, ...marks })
+          break
+        case 'strong':
+          flattenMdPhrasingContent(item.children, accumulator, {
+            ...marks,
+            strong: true,
+          })
+          break
+      }
+    })
+  }
+
+  const accumulator: PhrasingContent[] = []
+  flattenMdPhrasingContent(items, accumulator, {})
+  return accumulator.forEach((item) => {
+    populatePhrasingContent(item, node)
+  })
+}
+
 const populateBlockOrDefinitionContent = (
   value: BlockContent | DefinitionContent,
   node: ElementNode
@@ -94,9 +194,7 @@ const populateBlockOrDefinitionContent = (
           //   center: 'text-center',
           //   right: 'text-right',
           // }
-          cell.children.forEach((cellChild) => {
-            populatePhrasingContent(cellChild, cellNode)
-          })
+          flattenMdPhrasingContentArray(cell.children, cellNode)
           rowNode.append(cellNode)
         })
         tableNode.append(rowNode)
@@ -144,23 +242,19 @@ const populateBlockOrDefinitionContent = (
     }
     case 'heading': {
       const headingNode = $createHeadingNode(`h${value.depth}`)
-      value.children.forEach((subChild) => {
-        populatePhrasingContent(subChild, headingNode)
-      })
+      flattenMdPhrasingContentArray(value.children, headingNode)
       node.append(headingNode)
       break
     }
     case 'paragraph': {
       const paragraph = $createParagraphNode()
-      value.children.forEach((subChild) => {
-        populatePhrasingContent(subChild, paragraph)
-      })
+      flattenMdPhrasingContentArray(value.children, paragraph)
       node.append(paragraph)
     }
   }
 }
 
-const populateTopLevelContent = (value: SlateRootType, root: RootNode) => {
+const populateTopLevelContent = (value: Root, root: RootNode) => {
   value.children.forEach((child) => {
     switch (child.type) {
       case 'table':
@@ -180,7 +274,7 @@ const populateTopLevelContent = (value: SlateRootType, root: RootNode) => {
   })
 }
 
-export const buildInitialContent = (value: SlateRootType) => {
+export const buildInitialContent = (value: Root) => {
   const root = $getRoot()
   populateTopLevelContent(value, root)
 }
