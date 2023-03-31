@@ -1,4 +1,5 @@
 import type { SerializedEditorState, SerializedLexicalNode } from 'lexical'
+import type { PhrasingContent, Root } from 'mdast'
 import { z } from 'zod'
 import type {
   LexicalHorizontalruleNode,
@@ -30,6 +31,11 @@ export const exportToMarkdownAst = (
   const result = LexicalRootSchema.safeParse(json.root)
   if (result.success) {
     console.log(result)
+    // const root: Root = {type: 'root', children: []}
+    // result.data.children.forEach(child => {
+    //   child.
+    //   root.children.push()
+    // })
     // const string = stringifyMDX(result.data)
     // console.log(string)
   } else {
@@ -74,14 +80,43 @@ const PhrasingContentSchema: z.ZodType<LexicalPhrasingContentNode> =
     { errorMap }
   )
 
+const PhrasingContentArraySchema: z.ZodType<
+  PhrasingContent[],
+  z.ZodTypeDef,
+  LexicalPhrasingContentNode[]
+> = z
+  .array(
+    z.discriminatedUnion(
+      'type',
+      [LexicalTextSchema, LexicalLinebreakSchema, LexicalLinkSchema],
+      { errorMap }
+    )
+  )
+  .transform((items) => {
+    return [{ type: 'text' as const, value: '' }]
+  })
+
 const LexicalHeadingSchema = z.object({
   type: z.literal('tina-heading'),
   children: z.array(PhrasingContentSchema),
+  // children: PhrasingContentArraySchema,
 })
 
 const LexicalParagraphSchema = z.object({
   type: z.literal('tina-paragraph'),
-  children: z.array(PhrasingContentSchema),
+  // children: z.array(PhrasingContentSchema),
+  children: z.array(PhrasingContentSchema).transform((items) => {
+    console.log(items)
+    return items.map((item) => {
+      // if (item.type === 'text') {
+      //   return {
+      //     type: 'text',
+      //     value: item.text,
+      //   }
+      // }
+      return item
+    })
+  }),
 })
 
 const LexicalListItemSchema = z.object({
