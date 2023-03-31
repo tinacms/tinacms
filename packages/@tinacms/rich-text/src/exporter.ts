@@ -6,6 +6,7 @@ import type {
   LexicalStaticPhrasingContentNode,
   LexicalTopLevelContent,
 } from './types'
+// import { stringifyMDX } from '@tinacms/mdx'
 
 const errorMap: z.ZodErrorMap = (issue, ctx): { message: string } => {
   // Add a better error message for invalid_union_discriminator
@@ -29,12 +30,11 @@ export const exportToMarkdownAst = (
   const result = LexicalRootSchema.safeParse(json.root)
   if (result.success) {
     console.log(result)
+    // const string = stringifyMDX(result.data)
+    // console.log(string)
   } else {
     console.log(result.error)
   }
-  // json.root.children.forEach((child) => {
-  //   child.type === ''
-  // })
 }
 
 // Text node formatting
