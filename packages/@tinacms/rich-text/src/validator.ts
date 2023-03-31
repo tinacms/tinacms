@@ -40,32 +40,42 @@ const LexicalLinebreakSchema = z.object({
   type: z.literal('linebreak'),
 })
 
-const StaticPhrasingContentSchema: z.ZodType<LexicalStaticPhrasingContentNode> =
+const LexicalStaticPhrasingContentSchema: z.ZodType<LexicalStaticPhrasingContentNode> =
   z.discriminatedUnion('type', [LexicalTextSchema, LexicalLinebreakSchema], {
     errorMap,
   })
+export type LexicalStaticPhrasingContentSchemaType = z.infer<
+  typeof LexicalStaticPhrasingContentSchema
+>
 
 const LexicalLinkSchema = z.object({
   type: z.literal('link'),
-  children: z.array(StaticPhrasingContentSchema),
+  url: z.string(),
+  target: z.string().optional().nullable(),
+  rel: z.string().optional().nullable(),
+  children: z.array(LexicalStaticPhrasingContentSchema),
 })
 
-const PhrasingContentSchema: z.ZodType<LexicalPhrasingContentNode> =
+const LexicalPhrasingContentSchema: z.ZodType<LexicalPhrasingContentNode> =
   z.discriminatedUnion(
     'type',
     [LexicalTextSchema, LexicalLinebreakSchema, LexicalLinkSchema],
     { errorMap }
   )
+export type LexicalPhrasingContentSchemaType = z.infer<
+  typeof LexicalPhrasingContentSchema
+>
 
 const LexicalHeadingSchema = z.object({
   type: z.literal('tina-heading'),
-  children: z.array(PhrasingContentSchema),
+  tag: z.enum(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']),
+  children: z.array(LexicalPhrasingContentSchema),
   // children: PhrasingContentArraySchema,
 })
 
 const LexicalParagraphSchema = z.object({
   type: z.literal('tina-paragraph'),
-  children: z.array(PhrasingContentSchema),
+  children: z.array(LexicalPhrasingContentSchema),
 })
 
 const LexicalListItemSchema = z.object({
@@ -106,7 +116,7 @@ const LexicalHorizontalruleNode = z.object({
 
 const LexicalTableCellSchema = z.object({
   type: z.literal('tablecell'),
-  children: z.array(PhrasingContentSchema),
+  children: z.array(LexicalPhrasingContentSchema),
 })
 
 const LexicalTableRowSchema = z.object({
@@ -133,8 +143,12 @@ const LexicalTopLevelContentSchema: z.ZodType<LexicalTopLevelContent> =
     ],
     { errorMap }
   )
+export type LexicalTopLevelContentSchemaType = z.infer<
+  typeof LexicalTopLevelContentSchema
+>
 
 export const LexicalRootSchema = z.object({
   type: z.literal('root'),
   children: z.array(LexicalTopLevelContentSchema),
 })
+export type LexicalRootSchemaType = z.infer<typeof LexicalRootSchema>

@@ -14,6 +14,9 @@ export type LexicalStaticPhrasingContentNode =
 
 export interface LexicalLinkNode {
   type: 'link'
+  url: string
+  target?: string | null | undefined
+  rel?: string | null | undefined
   children: LexicalStaticPhrasingContentNode[]
 }
 
@@ -34,6 +37,7 @@ export interface LexicalParagraphNode {
 
 export interface LexicalHeadingNode {
   type: 'tina-heading'
+  tag: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   children: LexicalPhrasingContentNode[]
 }
 
