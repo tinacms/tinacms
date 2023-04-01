@@ -26,8 +26,8 @@ import type { SlateRootType } from '@tinacms/mdx'
 import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import TableActionMenuPlugin from './plugins/tableActionMenuPlugin'
 import { buildInitialContent } from './builder'
-import { LexicalRoot } from './schema'
 import { exportToMarkdownAst } from './exporter'
+import type { Root } from 'mdast'
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -36,6 +36,13 @@ export function classNames(...classes: string[]) {
 export const LexicalEditor = (props: {
   input: { value: SlateRootType; onChange: (value: unknown) => void }
 }) => {
+  const [value, setValue] = React.useState<Root | undefined | null>(null)
+  const debouncedValue = useDebounce(value, 50)
+
+  React.useEffect(() => {
+    props.input.onChange(debouncedValue)
+  }, [debouncedValue])
+
   return (
     <div className="lexical-editor">
       <LexicalComposer
@@ -138,7 +145,8 @@ export const LexicalEditor = (props: {
             <OnChangePlugin
               onChange={(editorState: EditorState) => {
                 const json = editorState.toJSON()
-                exportToMarkdownAst(json)
+                const tree = exportToMarkdownAst(json)
+                setValue(tree)
                 /**
                  * calling this on every change seems heavy-handed, but the value
                  * we get from the out-of-the-box exportJSON values from all of our nodes
@@ -172,4 +180,26 @@ function Placeholder() {
       Type something...
     </div>
   )
+}
+
+// Hook
+function useDebounce(value: unknown, delay: number) {
+  // State and setters for debounced value
+  const [debouncedValue, setDebouncedValue] = React.useState(value)
+  React.useEffect(
+    () => {
+      // Update debounced value after delay
+      const handler = setTimeout(() => {
+        setDebouncedValue(value)
+      }, delay)
+      // Cancel the timeout if value changes (also on delay change or unmount)
+      // This is how we prevent debounced value from updating if value is changed ...
+      // .. within the delay period. Timeout gets cleared and restarted.
+      return () => {
+        clearTimeout(handler)
+      }
+    },
+    [value, delay] // Only re-call effect if value or delay changes
+  )
+  return debouncedValue
 }

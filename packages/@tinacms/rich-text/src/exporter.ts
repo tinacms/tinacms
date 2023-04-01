@@ -8,20 +8,17 @@ import {
   LexicalTopLevelContentSchemaType,
 } from './validator'
 import type * as M from 'mdast'
-import { stringifyMDX } from '@tinacms/mdx'
 
 export const exportToMarkdownAst = (
   json: SerializedEditorState<SerializedLexicalNode>
-) => {
-  console.log(json.root)
+): M.Root | undefined => {
   const result = LexicalRootSchema.safeParse(json.root)
   if (result.success) {
-    console.log(result)
     const tree = root(result.data)
-    const string = stringifyMDX(tree)
-    console.log(string)
+    return tree
   } else {
     console.log(result.error)
+    return undefined
   }
 }
 

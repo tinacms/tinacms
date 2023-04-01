@@ -22,6 +22,7 @@ export const parseMDX = (value: string) => {
 export const stringifyMDX = (tree: Root) => {
   return toMarkdown(tree, {
     extensions: [gfmToMarkdown()],
+    fences: true,
   })
 }
 
