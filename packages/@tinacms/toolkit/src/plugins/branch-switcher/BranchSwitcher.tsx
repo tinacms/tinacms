@@ -19,57 +19,10 @@ import { useCMS } from '../../packages/react-core'
 
 type ListState = 'loading' | 'ready' | 'error'
 
-export const BranchCreator = ({ callback, createBranch, chooseBranch }) => {
-  const [newBranchName, setNewBranchName] = React.useState('')
-  const branchName = newBranchName.toLowerCase().replaceAll(' ', '-')
-  const [isCreating, setIsCreating] = React.useState(false)
-  const { currentBranch } = useBranchData()
-
-  const handleCreateBranch = React.useCallback((value) => {
-    setIsCreating(true)
-    createBranch({
-      branchName: value,
-      baseBranch: currentBranch,
-    }).then(async (createdBranchName) => {
-      chooseBranch(createdBranchName)
-      callback(createdBranchName)
-    })
-  }, [])
-
-  return (
-    <div className="w-full flex flex-col items-stretch w-full gap-4">
-      <BaseTextField
-        placeholder="Name"
-        value={newBranchName}
-        disabled={isCreating}
-        onChange={(e) => setNewBranchName(e.target.value)}
-      />
-      <BaseTextField
-        placeholder="Branch Name"
-        value={branchName}
-        disabled={true}
-        readOnly
-      />
-      <Button
-        className="flex-grow flex items-center gap-2 whitespace-nowrap"
-        size="medium"
-        variant="primary"
-        disabled={isCreating}
-        onClick={() => handleCreateBranch(branchName)}
-      >
-        {isCreating ? (
-          <>
-            <FaSpinner className="w-5 h-auto opacity-70 animate-spin" /> Create
-            Branch
-          </>
-        ) : (
-          <>
-            <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
-          </>
-        )}
-      </Button>
-    </div>
-  )
+export function formatBranchName(str: string): string {
+  const pattern = /[^/\w-]+/g // regular expression pattern to match invalid special characters
+  const formattedStr = str.replace(pattern, '') // remove special characters
+  return formattedStr.toLowerCase()
 }
 
 export const BranchSwitcher = ({
@@ -95,7 +48,7 @@ export const BranchSwitcher = ({
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading')
     createBranch({
-      branchName: value,
+      branchName: formatBranchName(value),
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
       // @ts-ignore
@@ -381,7 +334,7 @@ const BranchSelector = ({
             size="medium"
             variant="white"
             disabled={newBranchName === ''}
-            onClick={() => onCreateBranch(stringToBranchName(newBranchName))}
+            onClick={() => onCreateBranch(newBranchName)}
           >
             <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
           </Button>
@@ -389,15 +342,4 @@ const BranchSelector = ({
       </div>
     </div>
   )
-}
-
-const stringToBranchName = (string) => {
-  return string
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '')
 }
