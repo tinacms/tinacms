@@ -2,14 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .icon-parent {
-    svg {
-      fill: currentColor;
-    }
-  }
-}
-
 .tina-tailwind {
   @apply font-sans text-gray-600 text-base;
 }

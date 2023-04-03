@@ -4,7 +4,8 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import TreeViewPlugin from './plugins/treeView'
 import CodeHighlightPlugin from './plugins/codeHighlight'
-import { EditorState, ParagraphNode } from 'lexical'
+import { ParagraphNode } from 'lexical'
+import type { EditorState } from 'lexical'
 import { CodeHighlightNode, CodeNode } from '@lexical/code'
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table'
 import { AutoLinkNode, LinkNode } from '@lexical/link'
@@ -28,6 +29,7 @@ import TableActionMenuPlugin from './plugins/tableActionMenuPlugin'
 import { buildInitialContent } from './builder'
 import { exportToMarkdownAst } from './exporter'
 import type { Root } from 'mdast'
+import { ImageNode } from './image'
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -82,6 +84,7 @@ export const LexicalEditor = (props: {
               },
             },
             TinaQuoteNode,
+            ImageNode,
             CodeNode,
             HorizontalRuleNode,
             CodeHighlightNode,
@@ -167,7 +170,7 @@ export const LexicalEditor = (props: {
         <TabIndentationPlugin />
         <CodeHighlightPlugin />
         <TableActionMenuPlugin />
-        <TreeViewPlugin />
+        {/* <TreeViewPlugin /> */}
       </LexicalComposer>
     </div>
   )

@@ -1,7 +1,7 @@
 import React from 'react'
 import './types'
 // @ts-ignore
-import styles from './styles.css'
+import styles from './styles.css?inline'
 
 import { LexicalEditor } from './lexical'
 import type { SlateRootType } from '@tinacms/mdx'

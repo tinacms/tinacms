@@ -20,6 +20,7 @@ import type {
   Text,
 } from '@tinacms/mdx'
 import type * as M from 'mdast'
+import { $createImageNode } from './image'
 
 const populateStaticPhrasingContent = (
   value: StaticPhrasingContent,
@@ -34,6 +35,10 @@ const populateStaticPhrasingContent = (
       // TODO: this should probably be a custom node of some sort.
       const textNode = $createTextNode(value.value)
       node.append(textNode)
+      break
+    }
+    case 'image': {
+      node.append($createImageNode({ src: value.url, altText: '' }))
       break
     }
     case 'text': {
