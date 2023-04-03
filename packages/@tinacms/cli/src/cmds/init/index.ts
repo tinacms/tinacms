@@ -18,6 +18,7 @@ import { configExamples } from './setup-files/config'
 import { generateCollections } from '../forestry-migrate'
 import { ErrorSingleton } from '../forestry-migrate/util/errorSingleton'
 import { writeGitignore } from '../../next/commands/codemod-command'
+import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer'
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other'
@@ -61,6 +62,7 @@ export async function initStaticTina({
   // Detect forestry config
 
   let collections: string | null | undefined
+  let extraText: string | null | undefined
 
   // If there is a forestry config, ask user to migrate it to tina collections
   const hasForestryConfig = await fs.pathExists(
@@ -69,10 +71,13 @@ export async function initStaticTina({
 
   let isForestryMigration = false
   if (hasForestryConfig) {
-    collections = await forestryMigrate({
+    const { collectionString, importStatements } = await forestryMigrate({
+      rootPath,
       pathToForestryConfig,
     })
-    if (collections) {
+    if (collectionString) {
+      collections = collectionString
+      extraText = importStatements
       isForestryMigration = true
     }
   }
@@ -121,6 +126,7 @@ export async function initStaticTina({
     token,
     clientId,
     isForestryMigration,
+    extraText,
   })
 
   if (!hasForestryConfig) {
@@ -231,9 +237,11 @@ const chooseFramework = async () => {
 
 const forestryMigrate = async ({
   pathToForestryConfig,
+  rootPath,
 }: {
   pathToForestryConfig: string
-}): Promise<string> => {
+  rootPath: string
+}) => {
   logger.info(`Forestry.io configuration found.`)
 
   const disclaimer = logText(
@@ -248,14 +256,18 @@ const forestryMigrate = async ({
   if (!option['selection']) {
     return null
   }
-  const collections = await generateCollections({
+  const { collections, importStatements } = await generateCollections({
     pathToForestryConfig,
+    rootPath,
   })
 
   // print errors
   ErrorSingleton.getInstance().printCollectionNameErrors()
+  const JSONString = JSON.stringify(collections, null, 2)
 
-  return JSON.stringify(collections, null, 2)
+  const { code } = addVariablesToCode(JSONString)
+
+  return { collectionString: code, importStatements }
 }
 
 const reportTelemetry = async ({
@@ -326,6 +338,7 @@ const addDependencies = async (packageManager) => {
 }
 
 export interface AddConfigArgs {
+  extraText?: string
   publicFolder: string
   baseDir: string
   usingTypescript: boolean

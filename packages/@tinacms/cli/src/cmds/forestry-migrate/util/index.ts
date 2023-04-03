@@ -6,10 +6,11 @@ import fs from 'fs-extra'
 import path from 'path'
 import yaml from 'js-yaml'
 import z from 'zod'
-import type { TinaField, TinaTemplate } from '@tinacms/schema-tools'
+import type { TinaField, Template } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
 import { warnText } from '../../../utils/theme'
 import { ErrorSingleton } from './errorSingleton'
+import { stringifyLabelWithField } from '..'
 
 const errorSingletonInstance = ErrorSingleton.getInstance()
 
@@ -312,15 +313,17 @@ export const transformForestryFieldsToTinaFields = ({
           break
         }
 
-        const templates: TinaTemplate[] = []
+        const templates: Template[] = []
         forestryField?.template_types.forEach((tem) => {
-          const { fields, template } = getFieldsFromTemplates({
+          const { template } = getFieldsFromTemplates({
             tem,
             skipBlocks: true,
             pathToForestryConfig,
           })
-          const t: TinaTemplate = {
-            fields,
+          const fieldsString = stringifyLabelWithField(template.label)
+          const t: Template = {
+            // @ts-ignore
+            fields: `__TINA_INTERNAL__:::${fieldsString}:::`,
             label: template.label,
             name: stringifyTemplateName(tem, tem),
           }
@@ -355,6 +358,7 @@ export const transformForestryFieldsToTinaFields = ({
           )
         )
     }
+
     if (field) {
       if (forestryField.config?.required) {
         // @ts-ignore
