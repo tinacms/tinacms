@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.4.4
+
+### Patch Changes
+
+- ae3abe927: handle image array in Tina Cloud media transformation
+
 ## 1.4.3
 
 ### Patch Changes

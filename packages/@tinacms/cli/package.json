@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/cli",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -71,7 +71,7 @@
     "@tinacms/graphql": "workspace:*",
     "@tinacms/metrics": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
-    "@vitejs/plugin-react": "^2.1.0",
+    "@vitejs/plugin-react": "3.1.0",
     "ajv": "^6.12.3",
     "altair-express-middleware": "4.0.6",
     "auto-bind": "^4.0.0",
