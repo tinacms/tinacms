@@ -108,8 +108,6 @@ const generateCollectionFromForestrySection = (
     }
   >
 ) => {
-  if (section.read_only) return
-
   // TODO: What should we do with read only sections?
   if (section.read_only) return
 
@@ -132,6 +130,25 @@ const generateCollectionFromForestrySection = (
     }
   }
   if (section.type === 'directory') {
+    if (
+      !section?.path ||
+      section.path === '/' ||
+      section.path === './' ||
+      section.path === '.'
+    ) {
+      console.log({ path: section.path })
+      console.log({ section })
+      logger.log(
+        warnText(
+          `Warning: Section ${
+            section.label
+          } is using a Root Path. Currently, Tina Does not support Root paths see ${linkText(
+            'https://github.com/tinacms/tinacms/issues/3768'
+          )} for more updates on this issue.`
+        )
+      )
+      return
+    }
     const forestryTemplates = section?.templates || []
 
     // If the section has no templates and has `create: all`
