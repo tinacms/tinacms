@@ -90,6 +90,7 @@ const forestryFieldWithoutField = z.object({
   name: z.string(),
   label: z.string(),
   default: z.any().optional(),
+  template: z.string().optional(),
   config: z
     .object({
       // min and max are used for lists
@@ -308,12 +309,13 @@ export const transformForestryFieldsToTinaFields = ({
         }
         break
 
-      case 'blocks':
+      case 'blocks': {
         if (skipBlocks) {
           break
         }
 
         const templates: Template[] = []
+
         forestryField?.template_types.forEach((tem) => {
           const { template } = getFieldsFromTemplates({
             tem,
@@ -343,14 +345,23 @@ export const transformForestryFieldsToTinaFields = ({
         }
         break
 
-      // Unsupported types
-      case 'include':
-        logger.info(
-          warnText(
-            `Unsupported field type: ${forestryField.type}, in forestry ${template}. This will not be added to the schema.`
-          )
+        // Unsupported types
+      }
+      case 'include': {
+        const tem = forestryField.template
+
+        const { template } = getFieldsFromTemplates({
+          tem,
+          skipBlocks: true,
+          pathToForestryConfig,
+        })
+        const fieldsString = stringifyLabelWithField(template.label)
+        tinaFields.push(
+          // @ts-ignore
+          `__TINA_INTERNAL__:::...${fieldsString}:::`
         )
         break
+      }
       default:
         logger.info(
           warnText(
