@@ -197,7 +197,7 @@ const chooseTypescript = async () => {
     type: 'confirm',
     initial: true,
     message:
-      'Would you like to use Typescript for your Tina Configuration (Recommend)?',
+      'Would you like to use Typescript for your Tina Configuration (Recommended)?',
   })
   return option['selection'] as boolean
 }
