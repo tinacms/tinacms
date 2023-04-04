@@ -170,7 +170,7 @@ export const LexicalEditor = (props: {
         <TabIndentationPlugin />
         <CodeHighlightPlugin />
         <TableActionMenuPlugin />
-        {/* <TreeViewPlugin /> */}
+        <TreeViewPlugin />
       </LexicalComposer>
     </div>
   )

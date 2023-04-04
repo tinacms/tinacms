@@ -27,13 +27,13 @@ function App() {
   return (
     <div className="grid grid-cols-12 h-screen w-screen">
       <div className="col-span-3">
-        NAV
         <ul>
           {Object.keys(modules).map((modKey) => {
             return (
               <li>
                 <button
                   onClick={() => {
+                    setJson(null)
                     setActiveMd(modKey)
                   }}
                   type="button"
@@ -48,10 +48,15 @@ function App() {
         </ul>
       </div>
       <div className="col-span-9 w-full grid grid-cols-2 gap-4 px-4 grid-rows-2">
-        <Textarea value={raw ? raw : ''} onChange={(value) => setRaw(value)} />
+        <Textarea
+          value={raw ? raw : ''}
+          onChange={(value) => {
+            setRaw(value)
+          }}
+        />
         <div className="h-full overflow-scroll px-2">
           <RichEditor
-            key={raw}
+            // key={raw}
             input={{
               value: raw
                 ? parseMDX(raw)
@@ -72,8 +77,11 @@ function App() {
             }}
           />
         </div>
-        <Textarea value={json ? stringifyMDX(json) : ''} />
-        <Textarea value={JSON.stringify(json, null, 2)} />
+        <Textarea
+          key={`${json ? JSON.stringify(json) : ''}-out`}
+          value={json ? stringifyMDX(json) : ''}
+        />
+        {/* <Textarea key={`${json ? JSON.stringify(json) : ''}-json`} value={JSON.stringify(json, null, 2)} /> */}
       </div>
     </div>
   )
@@ -87,7 +95,7 @@ const Textarea = ({
   onChange?: (value: string) => void
 }) => {
   return (
-    <div className="bg-gray-300 font-mono relative h-full max-h-full overflow-scroll">
+    <div className="row-span-1 bg-gray-300 font-mono relative h-full max-h-full overflow-scroll">
       <textarea
         className="absolute inset-0"
         value={value}

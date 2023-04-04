@@ -12,7 +12,6 @@ import type * as M from 'mdast'
 export const exportToMarkdownAst = (
   json: SerializedEditorState<SerializedLexicalNode>
 ): M.Root | undefined => {
-  console.log(json)
   const result = LexicalRootSchema.safeParse(json.root)
   if (result.success) {
     const tree = root(result.data)
@@ -24,7 +23,7 @@ export const exportToMarkdownAst = (
 }
 
 const textNode = (node: LexicalTextSchemaType): M.Text => {
-  return { type: 'text', value: node.text }
+  return { type: 'text', value: node.text.trimEnd() }
 }
 /**
  * FIXME: this is a pretty rough first attempt at serializing these,

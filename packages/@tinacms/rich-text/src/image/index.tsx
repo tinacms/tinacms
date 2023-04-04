@@ -21,7 +21,10 @@ import type {
 import { $applyNodeReplacement, DecoratorNode } from 'lexical'
 import * as React from 'react'
 import { Suspense } from 'react'
-import ImageComponent from './component'
+const ImageComponent = React.lazy(
+  // @ts-ignore
+  () => import('./component')
+)
 
 export interface ImagePayload {
   altText?: string | null | undefined
