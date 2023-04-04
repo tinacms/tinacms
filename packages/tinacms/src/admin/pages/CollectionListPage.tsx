@@ -979,7 +979,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
   const folderArray = folder.name.split('/')
 
   return (
-    <div className="w-full bg-gray-50/30 flex items-center">
+    <div className="w-full bg-gray-50/30 flex items-stretch">
       <button
         onClick={() => {
           const folders = folder.fullyQualifiedName.split('/')
@@ -996,7 +996,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
       >
         <BiArrowBack className="w-6 h-full opacity-70" />
       </button>
-      <span className="px-3 text-gray-600 flex items-center justify-start gap-1">
+      <span className="px-3 py-2 text-gray-600 flex flex-wrap items-center justify-start gap-1">
         {folderArray.length > 0 && (
           <button
             onClick={() => {
@@ -1004,7 +1004,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
                 replace: true,
               })
             }}
-            className="bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100"
+            className="shrink-0 bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100"
           >
             <RiHome2Line className="w-5 h-auto" />
           </button>
@@ -1012,10 +1012,10 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
         {folderArray.map((node, index) => {
           return (
             <>
-              <span className="text-gray-200">/</span>
+              <span className="text-gray-200 shrink-0">/</span>
               {index < folderArray.length - 1 ? (
                 <button
-                  className="bg-transparent p-0 border-0 text-blue-500 hover:text-blue-600 transition-all ease-out duration-100 underline underline-offset-2 decoration-1	decoration-blue-200 hover:decoration-blue-400"
+                  className="bg-transparent whitespace-nowrap truncate p-0 border-0 text-blue-500 hover:text-blue-600 transition-all ease-out duration-100 underline underline-offset-2 decoration-1	decoration-blue-200 hover:decoration-blue-400"
                   onClick={() => {
                     const folders = folder.fullyQualifiedName.split('/')
                     navigate(
@@ -1034,7 +1034,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
                   {node}
                 </button>
               ) : (
-                <span className="">{node}</span>
+                <span className="whitespace-nowrap truncate">{node}</span>
               )}
             </>
           )
