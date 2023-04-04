@@ -53,9 +53,9 @@ export const makeFieldsWithInternalCode = ({
   }
 }
 
+// Makes the template file text and the import statements for the config file
 export const makeTemplateFile = async ({
   templateMap,
-  rootPath,
   usingTypescript,
 }: {
   templateMap: Map<
@@ -65,10 +65,8 @@ export const makeTemplateFile = async ({
       templateObj: any
     }
   >
-  rootPath: string
   usingTypescript: boolean
 }) => {
-  const templateFilePath = path.join(rootPath, 'tina', 'templates.ts')
   const importStatements: string[] = []
   const templateCodeText: string[] = []
 
@@ -99,7 +97,5 @@ ${templateCodeText.join('\n')}
     plugins: [TsParser],
   })
 
-  await fs.writeFile(templateFilePath, formattedCode)
-
-  return { importStatements }
+  return { importStatements, templateCodeText: formattedCode }
 }

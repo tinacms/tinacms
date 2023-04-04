@@ -62,6 +62,7 @@ export async function initStaticTina({
   // Detect forestry config
 
   let collections: string | null | undefined
+  let templateCode: string | null | undefined
   let extraText: string | null | undefined
 
   // If there is a forestry config, ask user to migrate it to tina collections
@@ -71,11 +72,16 @@ export async function initStaticTina({
 
   let isForestryMigration = false
   if (hasForestryConfig) {
-    const { collectionString, importStatements } = await forestryMigrate({
-      rootPath,
-      pathToForestryConfig,
-    })
+    // CollectionsString is the string that will be added to the tina config
+    // importStatements are the import statements that will be added to the tina config
+    // templateCodeString is the string that will be added to the template.{ts,js} file
+    const { collectionString, importStatements, templateCodeString } =
+      await forestryMigrate({
+        usingTypescript,
+        pathToForestryConfig,
+      })
     if (collectionString) {
+      templateCode = templateCodeString
       collections = collectionString
       extraText = importStatements
       isForestryMigration = true
@@ -111,6 +117,10 @@ export async function initStaticTina({
   }
 
   await addDependencies(packageManager)
+
+  if (hasForestryConfig) {
+    await addTemplateFile({ baseDir: '', usingTypescript, templateCode })
+  }
 
   // add tina/config.{js,ts}]
   await addConfigFile({
@@ -189,7 +199,7 @@ const chooseTypescript = async () => {
     message:
       'Would you like to use Typescript for your Tina Configuration (Recommend)?',
   })
-  return option['selection']
+  return option['selection'] as boolean
 }
 
 const choosePublicFolder = async ({ framework }: { framework: Framework }) => {
@@ -237,10 +247,10 @@ const chooseFramework = async () => {
 
 const forestryMigrate = async ({
   pathToForestryConfig,
-  rootPath,
+  usingTypescript,
 }: {
+  usingTypescript: boolean
   pathToForestryConfig: string
-  rootPath: string
 }) => {
   logger.info(`Forestry.io configuration found.`)
 
@@ -256,10 +266,11 @@ const forestryMigrate = async ({
   if (!option['selection']) {
     return null
   }
-  const { collections, importStatements } = await generateCollections({
-    pathToForestryConfig,
-    rootPath,
-  })
+  const { collections, importStatements, templateCode } =
+    await generateCollections({
+      pathToForestryConfig,
+      usingTypescript,
+    })
 
   // print errors
   ErrorSingleton.getInstance().printCollectionNameErrors()
@@ -267,7 +278,11 @@ const forestryMigrate = async ({
 
   const { code } = addVariablesToCode(JSONString)
 
-  return { collectionString: code, importStatements }
+  return {
+    collectionString: code,
+    importStatements,
+    templateCodeString: templateCode,
+  }
 }
 
 const reportTelemetry = async ({
@@ -375,6 +390,37 @@ const addConfigFile = async (args: AddConfigArgs) => {
     )
     await fs.outputFileSync(fullConfigPath, config(args))
     await writeGitignore(baseDir)
+  }
+}
+
+// Adds tina/template.{ts,js} file
+export const addTemplateFile = async (args: {
+  templateCode: string
+  baseDir: string
+  usingTypescript: boolean
+}) => {
+  const { baseDir, usingTypescript, templateCode } = args
+  const templatesPath = path.join(
+    'tina',
+    `templates.${usingTypescript ? 'ts' : 'js'}`
+  )
+  const fullTemplatesPath = path.join(baseDir, templatesPath)
+
+  if (fs.pathExistsSync(fullTemplatesPath)) {
+    const override = await prompts({
+      name: 'selection',
+      type: 'confirm',
+      message: `Found existing file at ${templatesPath}. Would you like to override?`,
+    })
+    if (override['selection']) {
+      logger.info(logText(`Overriding file at ${templatesPath}.`))
+      await fs.outputFileSync(fullTemplatesPath, templateCode)
+    } else {
+      logger.info(logText(`Not overriding file at ${templatesPath}.`))
+    }
+  } else {
+    logger.info(logText(`Adding template file at ${templatesPath}`))
+    await fs.outputFileSync(fullTemplatesPath, templateCode)
   }
 }
 

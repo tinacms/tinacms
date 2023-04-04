@@ -334,16 +334,16 @@ const generateCollectionFromForestrySection = (
 
 export const generateCollections = async ({
   pathToForestryConfig,
-  rootPath,
+  usingTypescript,
 }: {
   pathToForestryConfig: string
-  rootPath: string
+  usingTypescript: boolean
 }) => {
   const templateMap = await generateAllTemplates({ pathToForestryConfig })
-  const { importStatements } = await makeTemplateFile({
-    rootPath,
+
+  const { importStatements, templateCodeText } = await makeTemplateFile({
     templateMap,
-    usingTypescript: true,
+    usingTypescript,
   })
 
   const forestryConfig = await fs.readFile(
@@ -359,7 +359,11 @@ export const generateCollections = async ({
         generateCollectionFromForestrySection(section, templateMap)
     )
     .filter((c) => c !== undefined)
-  return { collections, importStatements: importStatements.join('\n') }
+  return {
+    collections,
+    importStatements: importStatements.join('\n'),
+    templateCode: templateCodeText,
+  }
 }
 
 const rewriteTemplateKeysInDocs = (
