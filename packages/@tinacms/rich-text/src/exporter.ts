@@ -1,17 +1,18 @@
 import type { SerializedEditorState, SerializedLexicalNode } from 'lexical'
-import {
+import type {
   LexicalPhrasingContentSchemaType,
-  LexicalRootSchema,
   LexicalRootSchemaType,
   LexicalStaticPhrasingContentSchemaType,
   LexicalTextSchemaType,
   LexicalTopLevelContentSchemaType,
 } from './validator'
+import { LexicalRootSchema } from './validator'
 import type * as M from 'mdast'
 
 export const exportToMarkdownAst = (
   json: SerializedEditorState<SerializedLexicalNode>
 ): M.Root | undefined => {
+  console.log(json)
   const result = LexicalRootSchema.safeParse(json.root)
   if (result.success) {
     const tree = root(result.data)
@@ -97,6 +98,9 @@ const staticPhrasingContent = (
   switch (node.type) {
     case 'linebreak': {
       return { type: 'break' }
+    }
+    case 'image': {
+      return { type: 'image', url: node.src, alt: node.altText }
     }
     case 'text': {
       return wrapText(node)

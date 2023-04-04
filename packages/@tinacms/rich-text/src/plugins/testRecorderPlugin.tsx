@@ -424,26 +424,32 @@ ${steps.map(formatStep).join(`\n`)}
     </button>
   )
   const output = isRecording ? (
-    <div className="py-2">
+    <div className="py-2 bg-gray-100">
       <div className="flex">
         <button
           className="test-recorder-button"
           id="test-recorder-button-snapshot"
           title="Insert snapshot"
           onClick={onSnapshotClick}
-        />
+        >
+          Snapshot
+        </button>
         <button
           className="test-recorder-button"
           id="test-recorder-button-copy"
           title="Copy to clipboard"
           onClick={onCopyClick}
-        />
+        >
+          Copy
+        </button>
         <button
           className="test-recorder-button"
           id="test-recorder-button-download"
           title="Download as a file"
           onClick={onDownloadClick}
-        />
+        >
+          Download
+        </button>
       </div>
       <pre
         id="test-recorder"

@@ -11,6 +11,7 @@ export interface LexicalLinebreakNode {
 export type LexicalStaticPhrasingContentNode =
   | LexicalTextNode
   | LexicalLinebreakNode
+  | LexicalImageNode
 
 export interface LexicalLinkNode {
   type: 'link'
@@ -20,10 +21,19 @@ export interface LexicalLinkNode {
   children: LexicalStaticPhrasingContentNode[]
 }
 
+export interface LexicalImageNode {
+  type: 'image'
+  src: string
+  altText?: string | null | undefined
+  // target?: string | null | undefined
+  // rel?: string | null | undefined
+}
+
 export type LexicalPhrasingContentNode =
   | LexicalTextNode
   | LexicalLinkNode
   | LexicalLinebreakNode
+  | LexicalImageNode
 
 export interface LexicalQuoteNode {
   type: 'tina-quotenode'

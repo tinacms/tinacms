@@ -31,10 +31,20 @@ const LexicalLinebreakSchema = z.object({
   type: z.literal('linebreak'),
 })
 
+const LexicalImageSchema = z.object({
+  type: z.literal('image'),
+  src: z.string(),
+  altText: z.string().optional().nullable(),
+})
+
 const LexicalStaticPhrasingContentSchema: z.ZodType<LexicalStaticPhrasingContentNode> =
-  z.discriminatedUnion('type', [LexicalTextSchema, LexicalLinebreakSchema], {
-    errorMap,
-  })
+  z.discriminatedUnion(
+    'type',
+    [LexicalTextSchema, LexicalLinebreakSchema, LexicalImageSchema],
+    {
+      errorMap,
+    }
+  )
 export type LexicalStaticPhrasingContentSchemaType = z.infer<
   typeof LexicalStaticPhrasingContentSchema
 >
@@ -50,7 +60,12 @@ const LexicalLinkSchema = z.object({
 const LexicalPhrasingContentSchema: z.ZodType<LexicalPhrasingContentNode> =
   z.discriminatedUnion(
     'type',
-    [LexicalTextSchema, LexicalLinebreakSchema, LexicalLinkSchema],
+    [
+      LexicalTextSchema,
+      LexicalLinebreakSchema,
+      LexicalLinkSchema,
+      LexicalImageSchema,
+    ],
     { errorMap }
   )
 export type LexicalPhrasingContentSchemaType = z.infer<

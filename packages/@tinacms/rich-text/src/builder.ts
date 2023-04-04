@@ -38,7 +38,7 @@ const populateStaticPhrasingContent = (
       break
     }
     case 'image': {
-      node.append($createImageNode({ src: value.url, altText: '' }))
+      node.append($createImageNode({ src: value.url, altText: value.alt }))
       break
     }
     case 'text': {
