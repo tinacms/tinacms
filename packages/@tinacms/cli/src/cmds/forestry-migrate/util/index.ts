@@ -348,8 +348,6 @@ export const transformForestryFieldsToTinaFields = ({
           templates,
         }
         break
-
-        // Unsupported types
       }
       case 'include': {
         const tem = forestryField.template
