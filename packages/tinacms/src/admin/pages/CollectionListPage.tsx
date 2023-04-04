@@ -15,6 +15,7 @@ import {
   BiTrash,
   BiX,
 } from 'react-icons/bi'
+import { RiHome2Line } from 'react-icons/ri'
 import {
   Link,
   NavigateFunction,
@@ -995,21 +996,36 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
       >
         <BiArrowBack className="w-6 h-full opacity-70" />
       </button>
-      <span className="px-3 text-gray-600">
+      <span className="px-3 text-gray-600 flex items-center justify-start gap-1">
+        {folderArray.length > 0 && (
+          <button
+            onClick={() => {
+              navigate(`/collections/${collectionName}/~`, {
+                replace: true,
+              })
+            }}
+            className="bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100"
+          >
+            <RiHome2Line className="w-5 h-auto" />
+          </button>
+        )}
         {folderArray.map((node, index) => {
           return (
-            <span key={node}>
-              {index > 0 && <span className="text-gray-300 pr-0.5">/</span>}
+            <>
+              <span className="text-gray-200">/</span>
               {index < folderArray.length - 1 ? (
                 <button
-                  className="pr-0.5 bg-transparent p-0 border-0 text-blue-600 hover:text-blue-500 transition-all ease-out duration-100 underline underline-offset-2 decoration-blue-200 hover:decoration-blue-500"
+                  className="bg-transparent p-0 border-0 text-blue-500 hover:text-blue-600 transition-all ease-out duration-100 underline underline-offset-2 decoration-1	decoration-blue-200 hover:decoration-blue-400"
                   onClick={() => {
                     const folders = folder.fullyQualifiedName.split('/')
                     navigate(
                       `/${[
                         'collections',
                         collectionName,
-                        ...folders.slice(0, folders.length - 1),
+                        ...folders.slice(
+                          0,
+                          folders.length - (folders.length - (index + 2))
+                        ),
                       ].join('/')}`,
                       { replace: true }
                     )
@@ -1018,9 +1034,9 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
                   {node}
                 </button>
               ) : (
-                <span className="pr-0.5">{node}</span>
+                <span className="">{node}</span>
               )}
-            </span>
+            </>
           )
         })}
       </span>
