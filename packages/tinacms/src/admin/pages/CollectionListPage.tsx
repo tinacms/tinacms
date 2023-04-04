@@ -288,6 +288,8 @@ const CollectionListPage = () => {
                 const allowDelete =
                   collectionDefinition?.ui?.allowedActions?.delete ?? true
 
+                const folderView = folder.fullyQualifiedName !== ''
+
                 return (
                   <>
                     {deleteModalOpen && (
@@ -359,7 +361,7 @@ const CollectionListPage = () => {
                                 className={`${
                                   toggleClasses.base
                                 } px-2.5 rounded-l-md ${
-                                  folder.fullyQualifiedName !== ''
+                                  folderView
                                     ? toggleClasses.active
                                     : toggleClasses.inactive
                                 }`}
@@ -380,7 +382,7 @@ const CollectionListPage = () => {
                                 className={`${
                                   toggleClasses.base
                                 } px-2.5 rounded-r-md ${
-                                  folder.fullyQualifiedName === ''
+                                  !folderView
                                     ? toggleClasses.active
                                     : toggleClasses.inactive
                                 }`}
@@ -704,31 +706,11 @@ const CollectionListPage = () => {
                               {folder.name && (
                                 <tr>
                                   <td colSpan={5}>
-                                    <div className="w-full bg-gray-50/30 flex items-center">
-                                      <button
-                                        onClick={() => {
-                                          const folders =
-                                            folder.fullyQualifiedName.split('/')
-                                          navigate(
-                                            `/${[
-                                              'collections',
-                                              collectionName,
-                                              ...folders.slice(
-                                                0,
-                                                folders.length - 1
-                                              ),
-                                            ].join('/')}`,
-                                            { replace: true }
-                                          )
-                                        }}
-                                        className="px-3 py-2 bg-white hover:bg-gray-50/50 transition ease-out duration-100 border-r border-gray-100 text-blue-500 hover:text-blue-600"
-                                      >
-                                        <BiArrowBack className="w-6 h-full opacity-70" />
-                                      </button>
-                                      <span className="px-3 text-gray-500">
-                                        {folder.name}
-                                      </span>
-                                    </div>
+                                    <Breadcrumb
+                                      folder={folder}
+                                      navigate={navigate}
+                                      collectionName={collectionName}
+                                    />
                                   </td>
                                 </tr>
                               )}
@@ -768,8 +750,22 @@ const CollectionListPage = () => {
                                         <span className="block text-xs text-gray-400 mb-1 uppercase">
                                           Path
                                         </span>
-                                        <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
-                                          <span>{document.node.path}</span>
+                                        <span className="leading-5 block text-sm font-medium text-gray-900 truncate">
+                                          {document.node.path
+                                            .substring(2)
+                                            .split('/')
+                                            .map((node) => {
+                                              return (
+                                                <span key={node}>
+                                                  <span className="text-gray-300 pr-0.5">
+                                                    /
+                                                  </span>
+                                                  <span className="pr-0.5">
+                                                    {node}
+                                                  </span>
+                                                </span>
+                                              )
+                                            })}
                                         </span>
                                       </td>
                                     </tr>
@@ -811,11 +807,13 @@ const CollectionListPage = () => {
                                             {hasTitle ? 'Title' : 'Filename'}
                                           </span>
                                           <span className="h-5 leading-5 block truncate">
-                                            {!hasTitle && subfolders && (
-                                              <span className="text-xs text-gray-400">
-                                                {`${subfolders}/`}
-                                              </span>
-                                            )}
+                                            {!folderView &&
+                                              !hasTitle &&
+                                              subfolders && (
+                                                <span className="text-xs text-gray-400">
+                                                  {`${subfolders}/`}
+                                                </span>
+                                              )}
                                             <span>
                                               {hasTitle
                                                 ? document.node._sys?.title
@@ -831,7 +829,7 @@ const CollectionListPage = () => {
                                           Filename
                                         </span>
                                         <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
-                                          {subfolders && (
+                                          {!folderView && subfolders && (
                                             <span className="text-xs text-gray-400">
                                               {`${subfolders}/`}
                                             </span>
@@ -975,6 +973,61 @@ const CollectionListPage = () => {
     </GetCMS>
   )
 }
+
+const Breadcrumb = ({ folder, navigate, collectionName }) => {
+  const folderArray = folder.name.split('/')
+
+  return (
+    <div className="w-full bg-gray-50/30 flex items-center">
+      <button
+        onClick={() => {
+          const folders = folder.fullyQualifiedName.split('/')
+          navigate(
+            `/${[
+              'collections',
+              collectionName,
+              ...folders.slice(0, folders.length - 1),
+            ].join('/')}`,
+            { replace: true }
+          )
+        }}
+        className="px-3 py-2 bg-white hover:bg-gray-50/50 transition ease-out duration-100 border-r border-gray-100 text-blue-500 hover:text-blue-600"
+      >
+        <BiArrowBack className="w-6 h-full opacity-70" />
+      </button>
+      <span className="px-3 text-gray-600">
+        {folderArray.map((node, index) => {
+          return (
+            <span key={node}>
+              {index > 0 && <span className="text-gray-300 pr-0.5">/</span>}
+              {index < folderArray.length - 1 ? (
+                <button
+                  className="pr-0.5 bg-transparent p-0 border-0 text-blue-600 hover:text-blue-500 transition-all ease-out duration-100 underline underline-offset-2 decoration-blue-200 hover:decoration-blue-500"
+                  onClick={() => {
+                    const folders = folder.fullyQualifiedName.split('/')
+                    navigate(
+                      `/${[
+                        'collections',
+                        collectionName,
+                        ...folders.slice(0, folders.length - 1),
+                      ].join('/')}`,
+                      { replace: true }
+                    )
+                  }}
+                >
+                  {node}
+                </button>
+              ) : (
+                <span className="pr-0.5">{node}</span>
+              )}
+            </span>
+          )
+        })}
+      </span>
+    </div>
+  )
+}
+
 interface ResetModalProps {
   close(): void
   deleteFunc(): void
