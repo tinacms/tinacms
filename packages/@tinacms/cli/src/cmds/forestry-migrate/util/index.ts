@@ -11,6 +11,7 @@ import { logger } from '../../../logger'
 import { warnText } from '../../../utils/theme'
 import { ErrorSingleton } from './errorSingleton'
 import { stringifyLabelWithField } from '..'
+import { makeFieldsWithInternalCode } from './codeTransformer'
 
 const errorSingletonInstance = ErrorSingleton.getInstance()
 
@@ -325,7 +326,10 @@ export const transformForestryFieldsToTinaFields = ({
           const fieldsString = stringifyLabelWithField(template.label)
           const t: Template = {
             // @ts-ignore
-            fields: `__TINA_INTERNAL__:::${fieldsString}:::`,
+            fields: makeFieldsWithInternalCode({
+              hasBody: false,
+              field: fieldsString,
+            }),
             label: template.label,
             name: stringifyTemplateName(tem, tem),
           }
@@ -356,9 +360,14 @@ export const transformForestryFieldsToTinaFields = ({
           pathToForestryConfig,
         })
         const fieldsString = stringifyLabelWithField(template.label)
+        const field = makeFieldsWithInternalCode({
+          field: fieldsString,
+          hasBody: false,
+          spread: true,
+        })
         tinaFields.push(
           // @ts-ignore
-          `__TINA_INTERNAL__:::...${fieldsString}:::`
+          field
         )
         break
       }
