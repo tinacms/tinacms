@@ -1,5 +1,14 @@
 # tinacms
 
+## 1.4.4
+
+### Patch Changes
+
+- 7c750e370: Fix the initialization of sort order in collection list when previous desc sort order in local storage
+- Updated dependencies [2a32a0b99]
+- Updated dependencies [6f491f38c]
+  - @tinacms/toolkit@1.6.3
+
 ## 1.4.3
 
 ### Patch Changes
