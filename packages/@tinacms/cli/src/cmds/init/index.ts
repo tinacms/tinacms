@@ -1,6 +1,3 @@
-/**
-
-*/
 import path from 'path'
 import { format } from 'prettier'
 import {
@@ -183,7 +180,8 @@ const chooseTypescript = async () => {
     name: 'selection',
     type: 'confirm',
     initial: true,
-    message: 'Would you like to use Typescript?',
+    message:
+      'Would you like to use Typescript for your Tina Configuration (Recommended)?',
   })
   return option['selection']
 }
