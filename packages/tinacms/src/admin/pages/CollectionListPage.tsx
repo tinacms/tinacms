@@ -171,7 +171,8 @@ const CollectionListPage = () => {
             name: '',
           })
   )
-  const [sortOrder, setSortOrder] = useState('asc' as 'asc' | 'desc')
+  const { order = 'asc' } = JSON.parse(sortKey || '{}')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order)
   const loc = useLocation()
   useEffect(() => {
     // set sort key to cached value on route change
