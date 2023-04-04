@@ -14,6 +14,7 @@ const clientConfig = (isForestryMigration?: boolean) => {
 const other = (args: AddConfigArgs) => {
   return `
 import { defineConfig } from "tinacms";
+${args.extraText || ''}
 
 // Your hosting provider likely exposes this as an environment variable
 const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || "main";
