@@ -2,17 +2,8 @@
   "type": "root",
   "children": [
     {
-      "type": "p",
-      "children": [
-        {
-          "type": "text",
-          "text": "A regular line of text"
-        }
-      ]
-    },
-    {
       "type": "mdxJsxFlowElement",
-      "name": "center",
+      "name": "center_a",
       "children": [
         {
           "type": "text",
@@ -28,7 +19,33 @@
               "children": [
                 {
                   "type": "text",
-                  "text": "<Some>"
+                  "text": "Some text"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "center_a",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Some text"
                 }
               ]
             }
