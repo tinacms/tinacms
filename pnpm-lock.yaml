@@ -113,7 +113,7 @@ importers:
       '@tailwindcss/typography': ^0.5.7
       '@tinacms/app': workspace:*
       '@tinacms/cli': workspace:*
-      '@tinacms/datalayer': workspace:^1.2.4
+      '@tinacms/datalayer': workspace:^1.2.5
       autoprefixer: ^10.4.0
       cypress: ^10.10.0
       eslint: 8.24.0
@@ -489,7 +489,7 @@ importers:
       zod: ^3.14.3
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 4.0.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 4.2.0_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -7284,10 +7284,10 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@graphql-codegen/plugin-helpers/4.0.0_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/4.2.0_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-vgNGTanT36hC4RAC/LAThMEjDvnu3WCyx6MtKZcPUtfCWFxbUAr88+OarGl1LAEiOef0agIREC7tIBXCqjKkJA==,
+        integrity: sha512-THFTCfg+46PXlXobYJ/OoCX6pzjI+9woQqCjdyKtgoI0tn3Xq2HUUCiidndxUpEYVrXb5pRiRXb7b/ZbMQqD0A==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
@@ -7298,7 +7298,7 @@ packages:
       graphql: 15.8.0
       import-from: 4.0.0
       lodash: 4.17.21
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /@graphql-codegen/schema-ast/2.4.1_graphql@15.8.0:
