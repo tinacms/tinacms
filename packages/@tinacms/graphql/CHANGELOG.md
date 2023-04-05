@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.4.5
+
+### Patch Changes
+
+- 67c7a48b8: Improve full reindexing to update status to complete as soon as the new version of the index is ready
+
 ## 1.4.4
 
 ### Patch Changes
