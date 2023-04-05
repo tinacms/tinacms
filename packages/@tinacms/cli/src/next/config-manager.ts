@@ -99,7 +99,7 @@ export class ConfigManager {
     )
     if (!this.tinaConfigFilePath) {
       throw new Error(
-        `Unable to find confg file in ${this.tinaFolderPath}. Looking for a file named "config.{ts,tsx,js,jsx}"`
+        `Unable to find config file in ${this.tinaFolderPath}. Looking for a file named "config.{ts,tsx,js,jsx}"`
       )
     }
     this.selfHostedDatabaseFilePath = await this.getPathWithExtension(
