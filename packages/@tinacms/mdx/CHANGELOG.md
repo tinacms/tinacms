@@ -1,5 +1,11 @@
 # @tinacms/mdx
 
+## 1.3.8
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+
 ## 1.3.7
 
 ### Patch Changes

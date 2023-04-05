@@ -1,5 +1,11 @@
 # tinacms
 
+## 1.4.5
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+
 ## 1.4.4
 
 ### Patch Changes
