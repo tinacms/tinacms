@@ -5,6 +5,7 @@
 __generated__
 
 packages/**/*.md
+**/*/admin/**/*.js
 .yarn
 .pnp.js
 .yarnrc.yml
