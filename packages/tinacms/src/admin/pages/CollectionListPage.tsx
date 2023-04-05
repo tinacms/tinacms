@@ -998,18 +998,16 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
         <BiArrowBack className="w-6 h-full opacity-70" />
       </button>
       <span className="px-3 py-2 text-gray-600 flex flex-wrap items-center justify-start gap-1">
-        {folderArray.length > 0 && (
-          <button
-            onClick={() => {
-              navigate(`/collections/${collectionName}/~`, {
-                replace: true,
-              })
-            }}
-            className="shrink-0 bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100"
-          >
-            <RiHome2Line className="w-5 h-auto" />
-          </button>
-        )}
+        <button
+          onClick={() => {
+            navigate(`/collections/${collectionName}/~`, {
+              replace: true,
+            })
+          }}
+          className="shrink-0 bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100"
+        >
+          <RiHome2Line className="w-5 h-auto" />
+        </button>
         {folderArray.map((node, index) => {
           return (
             <>
