@@ -1,5 +1,13 @@
 # tina-graphql
 
+## 1.4.6
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+- Updated dependencies [75d5ed359]
+  - @tinacms/mdx@1.3.8
+
 ## 1.4.5
 
 ### Patch Changes

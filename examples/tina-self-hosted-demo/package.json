@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/self-hosted-starter",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "private": true,
   "scripts": {
     "dev": "tinacms dev --watchFolders='components/util/icon.tsx' -c \"next dev\"",
