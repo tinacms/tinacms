@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Page } from '../.tina/__generated__/types'
+import type { Page } from '../tina/__generated__/types'
 import { Content } from './blocks/content'
 import { Features } from './blocks/features'
 import { Hero } from './blocks/hero'

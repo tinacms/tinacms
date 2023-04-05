@@ -6,10 +6,12 @@ import fs from 'fs-extra'
 import path from 'path'
 import yaml from 'js-yaml'
 import z from 'zod'
-import type { TinaField, TinaTemplate } from '@tinacms/schema-tools'
+import type { TinaField, Template } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
-import { linkText, warnText } from '../../../utils/theme'
+import { warnText } from '../../../utils/theme'
 import { ErrorSingleton } from './errorSingleton'
+import { stringifyLabelWithField } from '..'
+import { makeFieldsWithInternalCode } from './codeTransformer'
 
 const errorSingletonInstance = ErrorSingleton.getInstance()
 
@@ -89,6 +91,7 @@ const forestryFieldWithoutField = z.object({
   name: z.string(),
   label: z.string(),
   default: z.any().optional(),
+  template: z.string().optional(),
   config: z
     .object({
       // min and max are used for lists
@@ -150,7 +153,6 @@ export const transformForestryFieldsToTinaFields = ({
 }) => {
   const tinaFields: TinaField[] = []
 
-  const blockFields: string[] = []
   fields?.forEach((forestryField) => {
     if (forestryField.name === 'menu') {
       logger.info(
@@ -308,23 +310,31 @@ export const transformForestryFieldsToTinaFields = ({
         }
         break
 
-      case 'blocks':
+      case 'blocks': {
         if (skipBlocks) {
-          blockFields.push(forestryField.name)
           break
         }
 
-        const templates: TinaTemplate[] = []
+        const templates: Template[] = []
+
         forestryField?.template_types.forEach((tem) => {
-          const { fields, template } = getFieldsFromTemplates({
+          const { template } = getFieldsFromTemplates({
             tem,
             skipBlocks: true,
             pathToForestryConfig,
           })
-          const t: TinaTemplate = {
-            fields,
+          const fieldsString = stringifyLabelWithField(template.label)
+          const t: Template = {
+            // @ts-ignore
+            fields: makeFieldsWithInternalCode({
+              hasBody: false,
+              field: fieldsString,
+            }),
             label: template.label,
             name: stringifyTemplateName(tem, tem),
+          }
+          if (t.name != tem) {
+            ;(t as any).nameOverride = tem
           }
           templates.push(t)
         })
@@ -332,20 +342,33 @@ export const transformForestryFieldsToTinaFields = ({
         field = {
           type: 'object',
           list: true,
+          templateKey: 'template',
           label: forestryField.label,
           ...getTinaFieldsFromName(forestryField.name),
           templates,
         }
         break
+      }
+      case 'include': {
+        const tem = forestryField.template
 
-      // Unsupported types
-      case 'include':
-        logger.info(
-          warnText(
-            `Unsupported field type: ${forestryField.type}, in forestry ${template}. This will not be added to the schema.`
-          )
+        const { template } = getFieldsFromTemplates({
+          tem,
+          skipBlocks: true,
+          pathToForestryConfig,
+        })
+        const fieldsString = stringifyLabelWithField(template.label)
+        const field = makeFieldsWithInternalCode({
+          field: fieldsString,
+          hasBody: false,
+          spread: true,
+        })
+        tinaFields.push(
+          // @ts-ignore
+          field
         )
         break
+      }
       default:
         logger.info(
           warnText(
@@ -353,6 +376,7 @@ export const transformForestryFieldsToTinaFields = ({
           )
         )
     }
+
     if (field) {
       if (forestryField.config?.required) {
         // @ts-ignore
@@ -363,21 +387,6 @@ export const transformForestryFieldsToTinaFields = ({
     }
   })
 
-  if (blockFields.length > 0) {
-    logger.info(
-      warnText(
-        `Skipping blocks field${
-          blockFields.length > 1 ? 's' : ''
-        }: ${blockFields
-          .map((b) => `"${b}"`)
-          .join(
-            ', '
-          )}" in ${template}.yaml. Blocks fields need to be manually imported: ${linkText(
-          'https://tina.io/docs/forestry/common-errors/#migrating-blocks'
-        )}`
-      )
-    )
-  }
   return tinaFields
 }
 
@@ -393,7 +402,7 @@ export const getFieldsFromTemplates: (_args: {
     hide_body?: boolean
     fields?: ForestryFieldType[]
   }
-} = ({ tem, pathToForestryConfig, skipBlocks = true }) => {
+} = ({ tem, pathToForestryConfig, skipBlocks = false }) => {
   const templatePath = path.join(
     pathToForestryConfig,
     '.forestry',

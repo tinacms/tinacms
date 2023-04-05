@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.4.2
+
+### Patch Changes
+
+- a70204500: feat: Configurable template key on blocks
+
 ## 1.4.1
 
 ### Patch Changes

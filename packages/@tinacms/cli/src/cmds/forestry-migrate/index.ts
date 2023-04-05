@@ -6,7 +6,11 @@ import { parseFile, stringifyFile } from '@tinacms/graphql'
 import type { Collection, TinaField, UITemplate } from '@tinacms/schema-tools'
 import { getFieldsFromTemplates, parseSections } from './util'
 import { logger } from '../../logger'
-import { dangerText, warnText } from '../../utils/theme'
+import { dangerText, linkText, warnText } from '../../utils/theme'
+import {
+  makeTemplateFile,
+  makeFieldsWithInternalCode,
+} from './util/codeTransformer'
 
 const BODY_FIELD = {
   // This is the body field
@@ -17,8 +21,12 @@ const BODY_FIELD = {
   isBody: true,
 }
 
-const stringifyLabel = (label: string) => {
+export const stringifyLabel = (label: string) => {
   return label.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()
+}
+export const stringifyLabelWithField = (label: string) => {
+  const labelString = stringifyLabel(label)
+  return `${labelString}Fields`
 }
 const transformForestryMatchToTinaMatch = (match: string) => {
   const newMatch = match
@@ -32,8 +40,11 @@ const transformForestryMatchToTinaMatch = (match: string) => {
     ?.replace('{}', '')
 
   if (match !== newMatch) {
-    // TODO: add link to docs
-    logger.warn(`Warning: Match ${match} was transformed to ${newMatch}`)
+    logger.info(
+      `Info: Match ${match} was transformed to ${newMatch}. See ${linkText(
+        'https://tina.io/docs/forestry/common-errors/#info-match-match-was-transformed-to-newmatch'
+      )}`
+    )
   }
 
   return newMatch
@@ -105,175 +116,254 @@ const generateCollectionFromForestrySection = (
     }
   >
 ) => {
+  // TODO: What should we do with read only sections?
   if (section.read_only) return
 
-  {
-    // TODO: What should we do with read only sections?
-    if (section.read_only) return
+  // find the document format
+  let format: Ext = 'md'
+  if (section.new_doc_ext) {
+    const ext = checkExt(section.new_doc_ext)
+    if (ext) {
+      format = ext
+    }
+  }
 
-    const baseCollection: Omit<Collection, 'fields' | 'templates'> = {
-      label: section.label,
-      name: stringifyLabel(section.label),
-      path: section.path,
+  const baseCollection: Omit<Collection, 'fields' | 'templates'> = {
+    format: format,
+    label: section.label,
+    name: stringifyLabel(section.label),
+    path: section.path || '/',
+  }
+  // Add include and exclude if they exist
+  if (section.match) {
+    baseCollection.match = {
+      ...(baseCollection?.match || {}),
+      include: transformForestryMatchToTinaMatch(section.match),
     }
-    // Add include and exclude if they exist
-    if (section.match) {
-      baseCollection.match = {
-        ...(baseCollection?.match || {}),
-        include: transformForestryMatchToTinaMatch(section.match),
-      }
+  }
+  if (section.exclude) {
+    baseCollection.match = {
+      ...(baseCollection?.match || {}),
+      exclude: transformForestryMatchToTinaMatch(section.exclude),
     }
-    if (section.exclude) {
-      baseCollection.match = {
-        ...(baseCollection?.match || {}),
-        exclude: transformForestryMatchToTinaMatch(section.exclude),
-      }
+  }
+  if (section.type === 'directory') {
+    if (
+      !section?.path ||
+      section.path === '/' ||
+      section.path === './' ||
+      section.path === '.'
+    ) {
+      logger.log(
+        warnText(
+          `Warning: Section ${
+            section.label
+          } is using a Root Path. Currently, Tina Does not support Root paths see ${linkText(
+            'https://github.com/tinacms/tinacms/issues/3768'
+          )} for more updates on this issue.`
+        )
+      )
+      return
     }
-    if (section.type === 'directory') {
-      const forestryTemplates = section?.templates || []
+    const forestryTemplates = section?.templates || []
 
-      // If the section has no templates and has `create: all`
-      if (forestryTemplates.length === 0 && section.create === 'all') {
-        // For all template
-        for (let templateKey of templateMap.keys()) {
-          // get the shape of the template
-          const { templateObj } = templateMap.get(templateKey)
-          const pages: undefined | string[] = templateObj?.pages
-          // if has pages see if there is I page that matches the current section
-          if (pages) {
-            if (
-              pages.some((page) =>
-                minimatch(page, section.path + '/' + section.match)
-              )
-            ) {
-              forestryTemplates.push(templateKey)
-            }
+    // If the section has no templates and has `create: all`
+    if (forestryTemplates.length === 0 && section.create === 'all') {
+      // For all template
+      for (let templateKey of templateMap.keys()) {
+        // get the shape of the template
+        const { templateObj } = templateMap.get(templateKey)
+        const pages: undefined | string[] = templateObj?.pages
+        // if has pages see if there is I page that matches the current section
+        if (pages) {
+          // Glob used for matching
+          let glob = section.match
+
+          // We don't want to match the root if the path is empty or /
+          // This is because /*.md will not match on foo.md
+          const skipPath =
+            section.path === '' || section.path === '/' || !section.path
+          if (!skipPath) {
+            glob = section.path + '/' + section.match
+          }
+          // If we find any pages that match the glob add the forestry template to the section
+          if (
+            pages.some((page) => {
+              return minimatch(page, glob)
+            })
+          ) {
+            forestryTemplates.push(templateKey)
           }
         }
       }
+    }
 
-      const c: Collection =
-        (forestryTemplates?.length || 0) > 1
-          ? {
-              ...baseCollection,
-              templates: forestryTemplates.map((tem) => {
-                const { fields } = templateMap.get(tem)
-                return {
-                  fields: [BODY_FIELD, ...fields],
-                  label: tem,
-                  name: stringifyLabel(tem),
-                }
-              }),
-            }
-          : {
-              ...baseCollection,
-              fields: [
-                BODY_FIELD,
-                ...(forestryTemplates || []).flatMap((tem) => {
-                  try {
-                    const { fields: additionalFields } = templateMap.get(tem)
-                    return additionalFields
-                  } catch (e) {
-                    logger.log('Error parsing template ', tem)
-                    return []
-                  }
-                }),
-              ],
-            }
+    const hasBody = ['md', 'mdx', 'markdown'].includes(format)
 
-      if (section?.create === 'none') {
-        c.ui = {
-          ...c.ui,
-          allowedActions: {
-            create: false,
-          },
-        }
-      }
-      return c
-    } else if (section.type === 'document') {
-      const filePath = section.path
-      const extname = path.extname(filePath)
-      const fileName = path.basename(filePath, extname)
-      const dir = path.dirname(filePath)
-      const ext = checkExt(extname)
-      if (ext) {
-        const fields: TinaField[] = []
-        if (ext === 'md' || ext === 'mdx') {
-          fields.push(BODY_FIELD)
-        }
-        // Go though all templates
-        for (let currentTemplateName of templateMap.keys()) {
-          const { templateObj, fields: additionalFields } =
-            templateMap.get(currentTemplateName)
-          const pages: string[] = templateObj?.pages || []
+    let c: Collection
 
-          // find the template that has the current "path" in its pages
-          if (pages.includes(section.path)) {
-            fields.push(...additionalFields)
-            break
-          }
-        }
-
-        // if we don't find any fields, add a dummy field
-        if (fields.length === 0) {
-          fields.push({
-            name: 'dummy',
-            label: 'Dummy field',
-            type: 'string',
-            description:
-              'This is a dummy field, please replace it with the fields you want to edit. See https://tina.io/docs/schema/ for more info',
-          })
-          logger.warn(
-            warnText(
-              `No fields found for ${section.path}. Please add the fields you want to edit to the ${section.label} collection in the config file.`
-            )
+    if ((forestryTemplates?.length || 0) > 1) {
+      c = {
+        ...baseCollection,
+        // @ts-expect-error
+        templates: forestryTemplates.map((tem) => {
+          const currentTemplate = templateMap.get(tem)
+          const fieldsString = stringifyLabelWithField(
+            currentTemplate.templateObj.label
           )
-        }
+          return {
+            // fields: [BODY_FIELD],
+            fields: makeFieldsWithInternalCode({
+              hasBody,
+              field: fieldsString,
+              bodyField: BODY_FIELD,
+            }),
+            label: tem,
+            name: stringifyLabel(tem),
+          }
+        }),
+      }
+    }
 
-        return {
-          ...baseCollection,
-          path: dir,
-          format: ext,
-          ui: {
-            allowedActions: {
-              create: false,
-              delete: false,
-            },
-          },
-          match: {
-            include: fileName,
-          },
-          fields,
+    if (forestryTemplates?.length === 1) {
+      const tem = forestryTemplates[0]
+      const template = templateMap.get(tem)
+      const fieldsString = stringifyLabelWithField(template.templateObj.label)
+      c = {
+        ...baseCollection,
+        // fields: [BODY_FIELD],
+        // @ts-expect-error
+        fields: makeFieldsWithInternalCode({
+          field: fieldsString,
+          hasBody,
+          bodyField: BODY_FIELD,
+        }),
+      }
+    }
+
+    // We did not find any fields
+    if (forestryTemplates?.length === 0) {
+      logger.warn(
+        warnText(
+          `No templates found for section ${
+            section.label
+          }. Please see ${linkText(
+            'https://tina.io/docs/forestry/content-modelling/'
+          )} for more information`
+        )
+      )
+      c = {
+        ...baseCollection,
+        fields: [BODY_FIELD],
+      }
+    }
+
+    if (section?.create === 'none') {
+      c.ui = {
+        ...c.ui,
+        allowedActions: {
+          create: false,
+        },
+      }
+    }
+    return c
+  } else if (section.type === 'document') {
+    const filePath = section.path
+    const extname = path.extname(filePath)
+    const fileName = path.basename(filePath, extname)
+    const dir = path.dirname(filePath)
+    const ext = checkExt(extname)
+    if (ext) {
+      const fields: TinaField[] = []
+      if (ext === 'md' || ext === 'mdx') {
+        fields.push(BODY_FIELD)
+      }
+      // Go though all templates
+      for (let currentTemplateName of templateMap.keys()) {
+        const { templateObj, fields: additionalFields } =
+          templateMap.get(currentTemplateName)
+        const pages: string[] = templateObj?.pages || []
+
+        // find the template that has the current "path" in its pages
+        if (pages.includes(section.path)) {
+          fields.push(...additionalFields)
+          break
         }
-      } else {
-        logger.log(
+      }
+
+      // if we don't find any fields, add a dummy field
+      if (fields.length === 0) {
+        fields.push({
+          name: 'dummy',
+          label: 'Dummy field',
+          type: 'string',
+          description:
+            'This is a dummy field, please replace it with the fields you want to edit. See https://tina.io/docs/schema/ for more info',
+        })
+        logger.warn(
           warnText(
-            `Error: document section has an unsupported file extension: ${extname} in ${section.path}`
+            `No fields found for ${section.path}. Please add the fields you want to edit to the ${section.label} collection in the config file.`
           )
         )
       }
+
+      return {
+        ...baseCollection,
+        path: dir,
+        format: ext,
+        ui: {
+          allowedActions: {
+            create: false,
+            delete: false,
+          },
+        },
+        match: {
+          include: fileName,
+        },
+        fields,
+      }
+    } else {
+      logger.log(
+        warnText(
+          `Error: document section has an unsupported file extension: ${extname} in ${section.path}`
+        )
+      )
     }
   }
 }
 
 export const generateCollections = async ({
   pathToForestryConfig,
+  usingTypescript,
 }: {
   pathToForestryConfig: string
+  usingTypescript: boolean
 }) => {
   const templateMap = await generateAllTemplates({ pathToForestryConfig })
+
+  const { importStatements, templateCodeText } = await makeTemplateFile({
+    templateMap,
+    usingTypescript,
+  })
 
   const forestryConfig = await fs.readFile(
     path.join(pathToForestryConfig, '.forestry', 'settings.yml')
   )
 
   rewriteTemplateKeysInDocs(templateMap, pathToForestryConfig)
-  return parseSections({ val: yaml.load(forestryConfig.toString()) })
+  const collections = parseSections({
+    val: yaml.load(forestryConfig.toString()),
+  })
     .sections.map(
       (section): Collection =>
         generateCollectionFromForestrySection(section, templateMap)
     )
     .filter((c) => c !== undefined)
+  return {
+    collections,
+    importStatements: importStatements.join('\n'),
+    templateCode: templateCodeText,
+  }
 }
 
 const rewriteTemplateKeysInDocs = (
@@ -295,6 +385,10 @@ const rewriteTemplateKeysInDocs = (
       // update the data in page to have _template: tem
       try {
         const filePath = path.join(page)
+        if (fs.lstatSync(filePath).isDirectory()) {
+          // For some reason some templates have directories in the `pages` property
+          return
+        }
         const extname = path.extname(filePath)
         const fileContent = fs.readFileSync(filePath).toString()
         const content = parseFile(fileContent, extname, (yup) => yup.object({}))

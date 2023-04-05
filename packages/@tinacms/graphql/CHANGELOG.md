@@ -1,5 +1,29 @@
 # tina-graphql
 
+## 1.4.4
+
+### Patch Changes
+
+- ae3abe927: handle image array in Tina Cloud media transformation
+
+## 1.4.3
+
+### Patch Changes
+
+- 40d908a79: Update error messages in Forestry migration
+- 02a555c39: Handle block aliases on forestry migration
+
+## 1.4.2
+
+### Patch Changes
+
+- af5c32eae: Fix issue where datalayer-port option wasn't being used
+- 1f9f83718: Handle ambiguous templates from indexing
+- a70204500: feat: Configurable template key on blocks
+- Updated dependencies [a70204500]
+  - @tinacms/schema-tools@1.4.2
+  - @tinacms/mdx@1.3.7
+
 ## 1.4.1
 
 ### Patch Changes

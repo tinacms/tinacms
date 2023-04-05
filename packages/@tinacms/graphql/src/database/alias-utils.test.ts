@@ -1,7 +1,7 @@
-import { Templateable } from '@tinacms/schema-tools/src'
+import { Template } from '@tinacms/schema-tools/src'
 import { replaceNameOverrides, applyNameOverrides } from './alias-utils'
 
-const template: Templateable = {
+const template: Template<true> = {
   name: 'template',
   namespace: [],
   fields: [
@@ -38,6 +38,46 @@ const template: Templateable = {
       ],
     },
     { name: 'normalField', namespace: [], type: 'string' },
+    {
+      name: 'blockField',
+      namespace: [],
+      type: 'object',
+      list: true,
+      nameOverride: 'block-field',
+      templateKey: 'template',
+      templates: [
+        {
+          name: 'template_aliased',
+          nameOverride: 'template-aliased',
+          namespace: [],
+          fields: [{ name: 'name', namespace: [], type: 'string' }],
+        },
+        {
+          name: 'template1',
+          namespace: [],
+          fields: [{ name: 'name', namespace: [], type: 'string' }],
+        },
+      ],
+    },
+    {
+      name: 'unaliasedBlockField',
+      namespace: [],
+      type: 'object',
+      list: true,
+      templates: [
+        {
+          name: 'template_aliased',
+          nameOverride: 'template-aliased',
+          namespace: [],
+          fields: [{ name: 'name', namespace: [], type: 'string' }],
+        },
+        {
+          name: 'template1',
+          namespace: [],
+          fields: [{ name: 'name', namespace: [], type: 'string' }],
+        },
+      ],
+    },
   ],
 }
 
@@ -49,6 +89,71 @@ describe('replaceNameOverrides', () => {
     })
   })
   describe('with payload', () => {
+    describe('with templateKey defined on block field', () => {
+      describe('with alias on block', () => {
+        it('should replace _templateKey', () => {
+          const obj = {
+            'block-field': [
+              {
+                template: 'template1',
+                name: 'value',
+              },
+            ],
+          }
+          expect(replaceNameOverrides(template, obj)).toEqual({
+            blockField: [
+              {
+                _template: 'template1',
+                name: 'value',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('without alias on block', () => {
+        it('should replace _templateKey', () => {
+          const obj = {
+            unaliasedBlockField: [
+              {
+                _template: 'template1',
+                name: 'value',
+              },
+            ],
+          }
+          expect(replaceNameOverrides(template, obj)).toEqual({
+            unaliasedBlockField: [
+              {
+                _template: 'template1',
+                name: 'value',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with nested template w/ alias', () => {
+        it('should replace _templateKey', () => {
+          const obj = {
+            'block-field': [
+              {
+                template: 'template-aliased',
+                name: 'value',
+              },
+            ],
+          }
+          expect(replaceNameOverrides(template, obj)).toEqual({
+            blockField: [
+              {
+                _template: 'template_aliased',
+                name: 'value',
+              },
+            ],
+          })
+        })
+      })
+    })
+
     describe('with nested alias', () => {
       it('should return an object with field names replaced with their nameOverrides', () => {
         const obj = {
@@ -218,6 +323,70 @@ describe('applyNameOverrides', () => {
         }
 
         expect(applyNameOverrides(template, obj)).toEqual(expected)
+      })
+    })
+
+    describe('with templateKey defined on block field', () => {
+      describe('with alias on block', () => {
+        it('should replace Template with _template', () => {
+          const obj = {
+            blockField: [
+              {
+                _template: 'template1',
+                name: 'value',
+              },
+            ],
+          }
+          expect(applyNameOverrides(template, obj)).toEqual({
+            'block-field': [
+              {
+                template: 'template1',
+                name: 'value',
+              },
+            ],
+          })
+        })
+      })
+      describe('without alias on block', () => {
+        it('should replace Template with _template', () => {
+          const obj = {
+            unaliasedBlockField: [
+              {
+                _template: 'template1',
+                name: 'value',
+              },
+            ],
+          }
+          expect(applyNameOverrides(template, obj)).toEqual({
+            unaliasedBlockField: [
+              {
+                _template: 'template1',
+                name: 'value',
+              },
+            ],
+          })
+        })
+      })
+
+      describe('with nested template w/ alias', () => {
+        it('should replace Template with _template', () => {
+          const obj = {
+            blockField: [
+              {
+                _template: 'template_aliased',
+                name: 'value',
+              },
+            ],
+          }
+          expect(applyNameOverrides(template, obj)).toEqual({
+            'block-field': [
+              {
+                template: 'template-aliased',
+                name: 'value',
+              },
+            ],
+          })
+        })
       })
     })
   })

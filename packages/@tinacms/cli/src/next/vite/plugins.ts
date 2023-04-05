@@ -1,4 +1,8 @@
 import type { Plugin } from 'vite'
+import { createFilter, FilterPattern } from '@rollup/pluginutils'
+import type { Config } from '@svgr/core'
+import fs from 'fs'
+import { transformWithEsbuild } from 'vite'
 import { transform as esbuildTransform } from 'esbuild'
 import path from 'path'
 import bodyParser from 'body-parser'
@@ -106,4 +110,58 @@ export const devServerEndPointsPlugin = ({
     },
   }
   return plug
+}
+
+// Copied from https://github.com/pd4d10/vite-plugin-svgr/blob/main/src/index.ts and modified to suite our needs
+export interface ViteSvgrOptions {
+  /**
+   * Export React component as default. Notice that it will overrides
+   * the default behavior of Vite, which exports the URL as default
+   *
+   * @default false
+   */
+  exportAsDefault?: boolean
+  svgrOptions?: Config
+  esbuildOptions?: Parameters<typeof transformWithEsbuild>[2]
+  exclude?: FilterPattern
+  include?: FilterPattern
+}
+
+export function viteTransformExtension({
+  exportAsDefault = true,
+  svgrOptions,
+  esbuildOptions,
+  include = '**/*.svg',
+  exclude,
+}: ViteSvgrOptions = {}): Plugin {
+  const filter = createFilter(include, exclude)
+  return {
+    name: 'vite-plugin-svgr',
+    async transform(code, id) {
+      if (filter(id)) {
+        const { transform } = await import('@svgr/core')
+        const svgCode = await fs.promises.readFile(
+          id.replace(/\?.*$/, ''),
+          'utf8'
+        )
+
+        const componentCode = await transform(svgCode, svgrOptions, {
+          filePath: id,
+          caller: {
+            previousExport: exportAsDefault ? null : code,
+          },
+        })
+
+        const res = await transformWithEsbuild(componentCode, id, {
+          loader: 'jsx',
+          ...esbuildOptions,
+        })
+
+        return {
+          code: res.code,
+          map: null, // TODO:
+        }
+      }
+    },
+  }
 }

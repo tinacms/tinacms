@@ -1,5 +1,41 @@
 # tinacms-cli
 
+## 1.5.3
+
+### Patch Changes
+
+- Updated dependencies [ae3abe927]
+  - @tinacms/graphql@1.4.4
+  - @tinacms/datalayer@1.2.4
+
+## 1.5.2
+
+### Patch Changes
+
+- 40d908a79: Update error messages in Forestry migration
+- 02a555c39: Handle block aliases on forestry migration
+- 9216a5bda: Allow svg imports
+- Updated dependencies [40d908a79]
+- Updated dependencies [02a555c39]
+  - @tinacms/graphql@1.4.3
+  - @tinacms/app@1.2.3
+  - @tinacms/datalayer@1.2.3
+
+## 1.5.1
+
+### Patch Changes
+
+- 691d2eb3f: Add support for the `tinacms codemod move-tina-folder` command. This command moves the Tina folder from `.tina` to `tina`, and creates a lock file, which allows the entire `tina/__generated__` folder to be gitignored.
+- bb9f0047f: Add `skip.client = true` to the Tina config for Forestry migrations by default.
+- a70204500: feat: Configurable template key on blocks
+- Updated dependencies [af5c32eae]
+- Updated dependencies [1f9f83718]
+- Updated dependencies [a70204500]
+  - @tinacms/graphql@1.4.2
+  - @tinacms/schema-tools@1.4.2
+  - @tinacms/app@1.2.2
+  - @tinacms/datalayer@1.2.2
+
 ## 1.5.0
 
 ### Minor Changes

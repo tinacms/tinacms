@@ -360,6 +360,7 @@ export type ObjectField<WithNamespace extends boolean = false> =
             type: 'object'
             fields?: undefined
             templates: Template<WithNamespace>[]
+            templateKey?: string
           }
       )
 
@@ -384,6 +385,7 @@ type MaybeNamespace<WithNamespace extends boolean = false> =
 export type Template<WithNamespace extends boolean = false> = {
   label?: string | boolean
   name: string
+  nameOverride?: string
   ui?: {
     /**
      * Override the properties passed to the field
