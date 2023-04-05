@@ -1,4 +1,4 @@
-import { getFilteredBranchList } from './BranchSwitcher'
+import { formatBranchName, getFilteredBranchList } from './BranchSwitcher'
 import { Branch } from './types'
 
 const branches: Branch[] = [
@@ -68,5 +68,22 @@ describe('getFilteredBranchList', () => {
         'feature/branch-3',
       ])
     })
+  })
+})
+
+describe('formatBranchName', () => {
+  it('replaces invalid special characters', () => {
+    const result = formatBranchName('foo bar@@--')
+    expect(result).toEqual('foobar--')
+  })
+
+  it('preserves valid special character(s)', () => {
+    const result = formatBranchName('my/company-branch')
+    expect(result).toEqual('my/company-branch')
+  })
+
+  it('returns as lowerCase', () => {
+    const result = formatBranchName('mYbRaNcH')
+    expect(result).toEqual('mybranch')
   })
 })
