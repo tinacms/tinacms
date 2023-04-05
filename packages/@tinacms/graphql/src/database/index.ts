@@ -1092,10 +1092,12 @@ export class Database {
       ...lookupMap,
       [lookup.type]: lookup,
     }
-    await this.bridge.putConfig(
-      normalizePath(lookupPath),
-      JSON.stringify(updatedLookup)
-    )
+    if (this.bridge.supportsBuilding()) {
+      await this.bridge.putConfig(
+        normalizePath(lookupPath),
+        JSON.stringify(updatedLookup)
+      )
+    }
     //await this.onPut(normalizePath(lookupPath), JSON.stringify(updatedLookup))
   }
 }

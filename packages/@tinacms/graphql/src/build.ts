@@ -46,6 +46,8 @@ export const buildDotTinaFiles = async ({
     graphQLSchema = await _buildSchema(builder, tinaSchema)
     await database.putConfigFiles({ graphQLSchema, tinaSchema })
   } else {
+    // TODO: Does this need to be updated to support the recent
+    // change from the `.tina` folder to the new `tina` folder?
     graphQLSchema = JSON.parse(
       await database.bridge.get('.tina/__generated__/_graphql.json')
     )

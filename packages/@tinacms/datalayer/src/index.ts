@@ -10,6 +10,7 @@ export type {
 export {
   FilesystemBridge,
   AuditFileSystemBridge,
+  GithubBridge,
   IsomorphicBridge,
   // Users facing
   createDatabase,

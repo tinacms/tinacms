@@ -53,5 +53,6 @@ export {
   FilesystemBridge,
   AuditFileSystemBridge,
 } from './database/bridge/filesystem'
+export { GithubBridge } from './database/bridge/github'
 export { IsomorphicBridge } from './database/bridge/isomorphic'
 export type { Bridge } from './database/bridge'

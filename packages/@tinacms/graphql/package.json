@@ -33,6 +33,7 @@
   "dependencies": {
     "@graphql-tools/relay-operation-optimizer": "^6.4.1",
     "@iarna/toml": "^2.2.5",
+    "@octokit/rest": "^19.0.7",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
     "abstract-level": "^1.0.3",
