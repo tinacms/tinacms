@@ -209,10 +209,9 @@ const CollectionListPage = () => {
     }))
   }, [collectionName])
   const toggleClasses = {
-    base: 'relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base py-1 transition-all ease-out duration-150 border',
-    active:
-      'bg-white text-blue-500 shadow-inner border-gray-50 border-t-gray-100',
-    inactive: 'bg-gray-50 text-gray-400 shadow border-gray-100 border-t-white',
+    base: 'relative whitespace-nowrap flex gap-1.5 items-center justify-center flex-1 block font-medium text-base py-2 transition-all ease-out duration-150 ',
+    active: 'bg-white text-blue-500 shadow-inner',
+    inactive: 'bg-gray-50 text-gray-400 shadow',
   }
 
   return (
@@ -356,52 +355,6 @@ const CollectionListPage = () => {
                           </h3>
 
                           <div className="flex gap-4 items-end flex-wrap">
-                            <div
-                              className={`grow-0 flex justify-between rounded-md border border-gray-150`}
-                            >
-                              <button
-                                className={`${
-                                  toggleClasses.base
-                                } px-2.5 rounded-l-md ${
-                                  folderView
-                                    ? toggleClasses.active
-                                    : toggleClasses.inactive
-                                }`}
-                                onClick={() => {
-                                  navigate(
-                                    `/${[
-                                      'collections',
-                                      collectionName,
-                                      '~',
-                                    ].join('/')}`,
-                                    { replace: true }
-                                  )
-                                }}
-                              >
-                                <BiFolder className="w-6 h-full opacity-70" />
-                              </button>
-                              <button
-                                className={`${
-                                  toggleClasses.base
-                                } px-2.5 rounded-r-md ${
-                                  !folderView
-                                    ? toggleClasses.active
-                                    : toggleClasses.inactive
-                                }`}
-                                onClick={() => {
-                                  navigate(
-                                    `/${[
-                                      'collections',
-                                      collectionName,
-                                      '',
-                                    ].join('/')}`,
-                                    { replace: true }
-                                  )
-                                }}
-                              >
-                                <BiListUl className="w-8 h-full opacity-70" />
-                              </button>
-                            </div>
                             {fields?.length > 0 && (
                               <>
                                 <div className="flex flex-col gap-2 items-start">
@@ -670,6 +623,60 @@ const CollectionListPage = () => {
                                 </form>
                               </>
                             )}
+
+                            <div className="flex flex-col gap-2 items-start">
+                              <label className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal">
+                                Search In
+                              </label>
+                              <div
+                                className={`grow-0 flex justify-between rounded-md divide-x divide-gray-150	border border-gray-150`}
+                              >
+                                <button
+                                  className={`${
+                                    toggleClasses.base
+                                  } px-2.5 rounded-l-md ${
+                                    folderView
+                                      ? toggleClasses.active
+                                      : toggleClasses.inactive
+                                  }`}
+                                  onClick={() => {
+                                    navigate(
+                                      `/${[
+                                        'collections',
+                                        collectionName,
+                                        '~',
+                                      ].join('/')}`,
+                                      { replace: true }
+                                    )
+                                  }}
+                                >
+                                  <BiFolder className="w-5 h-full opacity-70" />{' '}
+                                  Folder
+                                </button>
+                                <button
+                                  className={`${
+                                    toggleClasses.base
+                                  } px-2.5 rounded-r-md ${
+                                    !folderView
+                                      ? toggleClasses.active
+                                      : toggleClasses.inactive
+                                  }`}
+                                  onClick={() => {
+                                    navigate(
+                                      `/${[
+                                        'collections',
+                                        collectionName,
+                                        '',
+                                      ].join('/')}`,
+                                      { replace: true }
+                                    )
+                                  }}
+                                >
+                                  <BiListUl className="w-6 h-full opacity-70" />{' '}
+                                  All
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </div>
                         <div className="flex self-end	justify-self-end">
