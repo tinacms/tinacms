@@ -24,11 +24,12 @@
           "type": "root",
           "children": [
             {
-              "type": "p",
+              "type": "html",
+              "value": "<Some>\n{{< /center >}}",
               "children": [
                 {
                   "type": "text",
-                  "text": "<Some>"
+                  "text": ""
                 }
               ]
             }
