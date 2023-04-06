@@ -71,7 +71,7 @@ p {
   font-style: normal;
   color: var(--tw-prose-quotes);
   border-left-width: 0.25rem;
-  border-left-color: var(--tw-prose-quote-borders);
+  /* border-left-color: var(--tw-prose-quote-borders); */
   quotes: none;
   margin-top: 0;
   margin-bottom: 0;
