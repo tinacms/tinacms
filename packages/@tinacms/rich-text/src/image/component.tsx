@@ -67,6 +67,8 @@ export default function ImageComponent({
   const classNames =
     $isNodeSelection(selection) && isFocused ? 'bg-blue-400' : 'bg-gray-100'
 
+  // console.log(nodeKey, isSelected)
+
   return (
     <Suspense fallback={null}>
       <span className={`${classNames} inline-block p-1 rounded-md`}>

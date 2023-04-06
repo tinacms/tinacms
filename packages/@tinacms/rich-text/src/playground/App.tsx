@@ -47,41 +47,49 @@ function App() {
           })}
         </ul>
       </div>
-      <div className="col-span-9 w-full grid grid-cols-2 gap-4 px-4 grid-rows-2">
-        <Textarea
-          value={raw ? raw : ''}
-          onChange={(value) => {
-            setRaw(value)
-          }}
-        />
-        <div className="h-full overflow-scroll px-2">
-          <RichEditor
-            key={raw}
-            input={{
-              value: raw
-                ? parseMDX(raw)
-                : {
-                    type: 'root',
-                    children: [
-                      {
-                        type: 'paragraph',
-                        children: [{ type: 'text', value: '' }],
-                      },
-                    ],
-                  },
-              onChange: (value) => {
-                if (value) {
-                  setJson(value)
-                }
-              },
-            }}
-          />
+      <div className="col-span-9 w-full grid">
+        <div className="grid grid-cols-2 h-screen w-full">
+          <div className="h-full overflow-scroll px-2">
+            <RichEditor
+              key={raw}
+              input={{
+                value: raw
+                  ? parseMDX(raw)
+                  : {
+                      type: 'root',
+                      children: [
+                        {
+                          type: 'paragraph',
+                          children: [{ type: 'text', value: '' }],
+                        },
+                      ],
+                    },
+                onChange: (value) => {
+                  if (value) {
+                    setJson(value)
+                  }
+                },
+              }}
+            />
+          </div>
+          {/* <Textarea key={`${json ? JSON.stringify(json) : ''}-json`} value={JSON.stringify(json, null, 2)} /> */}
+          <div className="h-full">
+            <div className="h-1/2">
+              <Textarea
+                value={raw ? raw : ''}
+                onChange={(value) => {
+                  setRaw(value)
+                }}
+              />
+            </div>
+            <div className="h-1/2">
+              <Textarea
+                key={`${json ? JSON.stringify(json) : ''}-out`}
+                value={json ? stringifyMDX(json) : ''}
+              />
+            </div>
+          </div>
         </div>
-        <Textarea
-          key={`${json ? JSON.stringify(json) : ''}-out`}
-          value={json ? stringifyMDX(json) : ''}
-        />
-        {/* <Textarea key={`${json ? JSON.stringify(json) : ''}-json`} value={JSON.stringify(json, null, 2)} /> */}
       </div>
     </div>
   )
@@ -95,7 +103,7 @@ const Textarea = ({
   onChange?: (value: string) => void
 }) => {
   return (
-    <div className="row-span-1 bg-gray-300 font-mono relative h-full max-h-full overflow-scroll">
+    <div className="bg-gray-300 font-mono relative h-full max-h-full overflow-scroll">
       <textarea
         className="absolute inset-0"
         value={value}
