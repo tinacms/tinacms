@@ -58,9 +58,9 @@ export const stringifyFile = (
         typeof $_body === 'undefined' ? '' : `\n${$_body}`,
         strippedContent,
         {
-          language: markdownParseConfig?.frontmatterFormat || 'yaml',
+          language: markdownParseConfig?.frontmatterFormat ?? 'yaml',
           engines: matterEngines,
-          delimiters: markdownParseConfig?.frontmatterDelimiters || '---',
+          delimiters: markdownParseConfig?.frontmatterDelimiters ?? '---',
         }
       )
       return ok
@@ -90,8 +90,8 @@ export const parseFile = <T extends object>(
     case '.mdx':
     case '.md':
       const contentJSON = matter(content || '', {
-        language: markdownParseConfig?.frontmatterFormat || 'yaml',
-        delimiters: markdownParseConfig?.frontmatterDelimiters || '---',
+        language: markdownParseConfig?.frontmatterFormat ?? 'yaml',
+        delimiters: markdownParseConfig?.frontmatterDelimiters ?? '---',
         engines: matterEngines,
       })
       const markdownData = {
