@@ -30,9 +30,9 @@ import {
   $createTextNode,
   $isTextNode,
   ElementNode,
-  Klass,
-  LexicalNode,
-  TextFormatType,
+  type Klass,
+  type LexicalNode,
+  type TextFormatType,
   TextNode,
 } from 'lexical'
 import { $createTinaListItemNode } from '../list-item'
