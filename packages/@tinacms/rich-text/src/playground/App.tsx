@@ -56,7 +56,7 @@ function App() {
         />
         <div className="h-full overflow-scroll px-2">
           <RichEditor
-            // key={raw}
+            key={raw}
             input={{
               value: raw
                 ? parseMDX(raw)
