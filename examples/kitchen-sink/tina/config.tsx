@@ -505,6 +505,51 @@ export default defineConfig({
         },
         fields: [
           {
+            label: 'Academic Partners',
+            name: 'academic',
+            type: 'object',
+            list: true,
+            ui: {
+              itemProps: (item) => {
+                return { label: `${item?.label}` }
+              },
+            },
+            fields: [
+              {
+                label: 'North America',
+                name: 'north_america',
+                type: 'object',
+                list: true,
+                ui: {
+                  itemProps: (item) => {
+                    return {
+                      label: `${item?.organization}`,
+                    }
+                  },
+                },
+                fields: [
+                  {
+                    label: 'Organization Name',
+                    name: 'organization',
+                    type: 'string',
+                  },
+                  {
+                    label: 'Logo',
+                    name: 'logo',
+                    type: 'image',
+                  },
+
+                  {
+                    label: 'URL',
+                    name: 'url',
+                    type: 'string',
+                  },
+                ],
+              },
+              // end of north america academic partners
+            ],
+          },
+          {
             type: 'string',
             name: 'title',
             required: true,

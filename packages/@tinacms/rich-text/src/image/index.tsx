@@ -6,16 +6,17 @@
  *
  */
 
-import type {
-  DOMConversionMap,
-  DOMConversionOutput,
-  DOMExportOutput,
-  EditorConfig,
-  LexicalEditor,
-  LexicalNode,
-  NodeKey,
-  SerializedLexicalNode,
-  Spread,
+import {
+  $getSelection,
+  type DOMConversionMap,
+  type DOMConversionOutput,
+  type DOMExportOutput,
+  type EditorConfig,
+  type LexicalEditor,
+  type LexicalNode,
+  type NodeKey,
+  type SerializedLexicalNode,
+  type Spread,
 } from 'lexical'
 
 import { $applyNodeReplacement, DecoratorNode } from 'lexical'
@@ -82,8 +83,6 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     const element = document.createElement('img')
     element.setAttribute('src', this.__src)
     element.setAttribute('alt', this.__altText)
-    element.setAttribute('width', this.__width.toString())
-    element.setAttribute('height', this.__height.toString())
     return { element }
   }
 
@@ -111,18 +110,8 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     }
   }
 
-  setWidthAndHeight(
-    width: 'inherit' | number,
-    height: 'inherit' | number
-  ): void {
-    const writable = this.getWritable()
-    writable.__width = width
-    writable.__height = height
-  }
-
-  setShowCaption(showCaption: boolean): void {
-    const writable = this.getWritable()
-    writable.__showCaption = showCaption
+  override isInline(): boolean {
+    return true
   }
 
   // View

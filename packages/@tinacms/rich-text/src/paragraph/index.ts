@@ -1,8 +1,8 @@
 import {
-  LexicalNode,
   ParagraphNode,
-  RangeSelection,
-  SerializedParagraphNode,
+  type LexicalNode,
+  type RangeSelection,
+  type SerializedParagraphNode,
 } from 'lexical'
 import { $isListItemNode, $isListNode } from '@lexical/list'
 import {
