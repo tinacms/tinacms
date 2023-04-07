@@ -110,7 +110,7 @@ export const LexicalEditor = (props: {
           <div
             className={classNames(
               // checked ? 'border-transparent' : 'border-gray-300',
-              true ? 'border-indigo-500 ring-2 ring-indigo-500' : '',
+              true ? 'border-blue-500 ring-2 ring-blue-500' : '',
               'relative block rounded-lg border bg-white shadow-sm'
             )}
           >

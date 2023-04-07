@@ -34,7 +34,7 @@ import {
 import * as React from 'react'
 import { ReactPortal, useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { classNames } from '../toolbar'
+import { classNames } from '../toolbar/component'
 
 type TableCellActionMenuProps = Readonly<{
   contextRef: { current: null | HTMLElement }
