@@ -21,7 +21,7 @@ import {
   $isTableRowNode,
   $removeTableRowAtIndex,
   getTableSelectionFromTableElement,
-  HTMLTableElementWithWithTableSelectionState,
+  type HTMLTableElementWithWithTableSelectionState,
   TableCellHeaderStates,
   TableCellNode,
 } from '@lexical/table'
@@ -32,7 +32,13 @@ import {
   DEPRECATED_$isGridSelection,
 } from 'lexical'
 import * as React from 'react'
-import { ReactPortal, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  type ReactPortal,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { createPortal } from 'react-dom'
 import { classNames } from '../toolbar/component'
 
@@ -132,7 +138,7 @@ function TableActionMenu({
         }
 
         const tableSelection = getTableSelectionFromTableElement(tableElement)
-        if (tableSelection !== null) {
+        if (tableSelection) {
           tableSelection.clearHighlight()
         }
 
@@ -210,7 +216,8 @@ function TableActionMenu({
           grid
         )
 
-        clearTableSelection()
+        // This causes us to refocus at the top of the editor, not sure how necessary it is...
+        // clearTableSelection()
 
         onClose()
       })
@@ -500,9 +507,16 @@ function TableCellActionMenuContainer({
         const tableCellRect = tableCellNodeDOM.getBoundingClientRect()
         const menuRect = menuButtonDOM.getBoundingClientRect()
         const anchorRect = anchorElem.getBoundingClientRect()
+        // console.log('anchor', anchorRect)
+        // console.log('table', tableCellRect)
+        let rightPoint: number = tableCellRect.right
+        if (tableCellRect.right > anchorRect.right) {
+          rightPoint = anchorRect.right
+          // console.log('iti issss', rightPoint)
+        }
 
-        const top = tableCellRect.top - anchorRect.top + 4
-        const left = tableCellRect.right - menuRect.width - 10 - anchorRect.left
+        const top = tableCellRect.top - anchorRect.top - 2
+        const left = rightPoint - menuRect.width - 10 - anchorRect.left
 
         menuButtonDOM.style.opacity = '1'
         menuButtonDOM.style.transform = `translate(${left}px, ${top}px)`

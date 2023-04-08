@@ -115,7 +115,7 @@ export const exampleTheme: EditorThemeClasses = {
   table:
     'min-w-[100px] mb-2 divide-y divide-gray-200 border-gray-200 border rounded-md block overflow-scroll',
   tableRow: 'divide-x divide-gray-200',
-  tableCell: 'whitespace-nowrap p-3 w-full',
+  tableCell: 'whitespace-nowrap p-3 flex-1 w-full min-w-[200px]',
   tableAddColumns: 'PlaygroundEditorTheme__tableAddColumns',
   tableAddRows: 'PlaygroundEditorTheme__tableAddRows',
   tableCellActionButton: 'PlaygroundEditorTheme__tableCellActionButton',
