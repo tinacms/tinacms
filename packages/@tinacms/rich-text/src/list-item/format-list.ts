@@ -9,9 +9,9 @@ import {
   $isRootOrShadowRoot,
   DEPRECATED_$isGridSelection,
   ElementNode,
-  LexicalEditor,
-  LexicalNode,
-  NodeKey,
+  type LexicalEditor,
+  type LexicalNode,
+  type NodeKey,
   ParagraphNode,
 } from 'lexical'
 import { $createListNode, $isListNode, ListNode } from '@lexical/list'

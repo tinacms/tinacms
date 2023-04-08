@@ -1,9 +1,9 @@
 import {
   $createParagraphNode,
   $isTextNode,
-  DOMConversionMap,
-  LexicalNode,
-  NodeKey,
+  type DOMConversionMap,
+  type LexicalNode,
+  type NodeKey,
 } from 'lexical'
 
 import { $applyNodeReplacement } from 'lexical'
