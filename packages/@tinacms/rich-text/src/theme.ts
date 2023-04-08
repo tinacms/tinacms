@@ -26,22 +26,22 @@ export const exampleTheme: EditorThemeClasses = {
     h3: classNames(
       blockClasses,
       headerClasses,
-      'text-2xl font-semibold mb-4 last:mb-0 mt-6 first:mt-0'
+      'text-2xl font-medium mb-4 last:mb-0 mt-6 first:mt-0'
     ),
     h4: classNames(
       blockClasses,
       headerClasses,
-      'text-xl font-bold mb-4 last:mb-0 mt-6 first:mt-0'
+      'text-xl font-medium mb-4 last:mb-0 mt-6 first:mt-0'
     ),
     h5: classNames(
       blockClasses,
       headerClasses,
-      'text-lg font-bold mb-4 last:mb-0 mt-6 first:mt-0'
+      'text-lg font-medium mb-4 last:mb-0 mt-6 first:mt-0'
     ),
     h6: classNames(
       blockClasses,
       headerClasses,
-      'text-base font-bold mb-4 last:mb-0 mt-6 first:mt-0'
+      'text-base font-medium mb-4 last:mb-0 mt-6 first:mt-0'
     ),
   },
   paragraph: 'text-base font-normal mb-2 last:mb-0',

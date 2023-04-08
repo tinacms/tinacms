@@ -2,6 +2,7 @@ import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 import TreeViewPlugin from './plugins/treeView'
 import CodeHighlightPlugin from './plugins/codeHighlight'
 import { ParagraphNode } from 'lexical'
@@ -30,6 +31,7 @@ import { buildInitialContent } from './builder'
 import { exportToMarkdownAst } from './exporter'
 import type { Root } from 'mdast'
 import { ImageNode } from './image'
+import { FloatingLinkEditorPlugin } from './link/floating-link-editor'
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -44,6 +46,15 @@ export const LexicalEditor = (props: {
   React.useEffect(() => {
     props.input.onChange(debouncedValue)
   }, [debouncedValue])
+
+  const [floatingAnchorElem, setFloatingAnchorElem] =
+    React.useState<HTMLDivElement | null>(null)
+
+  const onRef = (_floatingAnchorElem: HTMLDivElement) => {
+    if (_floatingAnchorElem !== null) {
+      setFloatingAnchorElem(_floatingAnchorElem)
+    }
+  }
 
   return (
     <div className="lexical-editor">
@@ -126,7 +137,7 @@ export const LexicalEditor = (props: {
               <div className="relative px-2 md:px-3 pb-2">
                 <RichTextPlugin
                   contentEditable={
-                    <div className="editor relative">
+                    <div className="editor relative" ref={onRef}>
                       <ContentEditable
                         className={classNames(
                           'editor-root relative outline-none py-2'
@@ -144,6 +155,9 @@ export const LexicalEditor = (props: {
             </div>
             <HistoryPlugin />
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+            {floatingAnchorElem && (
+              <FloatingLinkEditorPlugin anchorElem={floatingAnchorElem} />
+            )}
             <ListPlugin />
             <OnChangePlugin
               onChange={(editorState: EditorState) => {
@@ -168,6 +182,7 @@ export const LexicalEditor = (props: {
           </div>
         </div>
         <TabIndentationPlugin />
+        <LinkPlugin />
         <CodeHighlightPlugin />
         <TableActionMenuPlugin />
         <TreeViewPlugin />

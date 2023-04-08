@@ -37,6 +37,11 @@ import {
 } from 'lexical'
 import { $createTinaListItemNode } from '../list-item'
 import { $createTinaQuoteNode } from '../quote'
+import {
+  $createHorizontalRuleNode,
+  $isHorizontalRuleNode,
+  HorizontalRuleNode,
+} from '@lexical/react/LexicalHorizontalRuleNode'
 
 export type Transformer =
   | ElementTransformer
@@ -369,6 +374,27 @@ export const LINK: TextMatchTransformer = {
   type: 'text-match',
 }
 
+export const HR: ElementTransformer = {
+  dependencies: [HorizontalRuleNode],
+  export: (node: LexicalNode) => {
+    return $isHorizontalRuleNode(node) ? '***' : null
+  },
+  regExp: /^(---|\*\*\*|___)\s?$/,
+  replace: (parentNode, _1, _2, isImport) => {
+    const line = $createHorizontalRuleNode()
+
+    // TODO: Get rid of isImport flag
+    if (isImport || parentNode.getNextSibling() != null) {
+      parentNode.replace(line)
+    } else {
+      parentNode.insertBefore(line)
+    }
+
+    line.selectNext()
+  },
+  type: 'element',
+}
+
 export const TRANSFORMERS = [
   HEADING,
   QUOTE,
@@ -377,6 +403,7 @@ export const TRANSFORMERS = [
   CHECK_LIST,
   ORDERED_LIST,
   INLINE_CODE,
+  HR,
   BOLD_ITALIC_STAR,
   BOLD_ITALIC_UNDERSCORE,
   BOLD_STAR,
