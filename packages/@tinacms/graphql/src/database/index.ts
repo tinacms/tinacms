@@ -571,12 +571,20 @@ export class Database {
       .get(schemaPath)) as unknown as Schema
   }
 
-  public getSchema = async (level?: Level) => {
+  public getSchema = async (level?: Level, existingSchema?: Schema) => {
     if (this.tinaSchema) {
       return this.tinaSchema
     }
     await this.initLevel()
-    const schema = await this.getTinaSchema(level || this.level)
+    const schema =
+      existingSchema || (await this.getTinaSchema(level || this.level))
+    if (!schema) {
+      throw new Error(
+        `Unable to get schema from level db: ${normalizePath(
+          path.join(this.getGeneratedFolder(), `_schema.json`)
+        )}`
+      )
+    }
     this.tinaSchema = await createSchema({ schema })
     return this.tinaSchema
   }
@@ -904,7 +912,10 @@ export class Database {
           normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json')),
           lookup
         )
-        const result = await this._indexAllContent(nextLevel)
+        const result = await this._indexAllContent(
+          nextLevel,
+          tinaSchema.schema as any
+        )
         if (this.config.version) {
           await this.updateDatabaseVersion(nextVersion)
         }
@@ -1023,9 +1034,9 @@ export class Database {
     await this.onDelete(normalizePath(filepath))
   }
 
-  public _indexAllContent = async (level: Level) => {
+  public _indexAllContent = async (level: Level, schema?: Schema) => {
     const warnings: string[] = []
-    const tinaSchema = await this.getSchema(level)
+    const tinaSchema = await this.getSchema(level, schema)
     const operations: PutOp[] = []
     const enqueueOps = async (ops: PutOp[]): Promise<void> => {
       operations.push(...ops)

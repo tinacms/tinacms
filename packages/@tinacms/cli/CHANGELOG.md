@@ -1,5 +1,26 @@
 # tinacms-cli
 
+## 1.5.5
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+- Updated dependencies [75d5ed359]
+  - @tinacms/graphql@1.4.6
+  - @tinacms/app@1.2.5
+  - @tinacms/datalayer@1.2.6
+
+## 1.5.4
+
+### Patch Changes
+
+- 9f9cc4799: better forestry template migration
+- 8f3767410: better matching on forestry pages
+- Updated dependencies [67c7a48b8]
+  - @tinacms/graphql@1.4.5
+  - @tinacms/app@1.2.4
+  - @tinacms/datalayer@1.2.5
+
 ## 1.5.3
 
 ### Patch Changes

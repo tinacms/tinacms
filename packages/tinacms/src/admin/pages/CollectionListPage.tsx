@@ -73,15 +73,17 @@ const TemplateMenu = ({ templates }: { templates: TemplateResponse[] }) => {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="origin-top-right absolute right-0 mt-2 z-menu w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
                 {templates.map((template) => (
                   <Menu.Item key={`${template.label}-${template.name}`}>
                     {({ active }) => (
                       <Link
                         to={`${template.name}/new`}
-                        className={`w-full text-md px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
-                          active && 'text-gray-800 opacity-100'
+                        className={`w-full text-md px-4 py-2 tracking-wide flex items-center transition ease-out duration-100 ${
+                          active
+                            ? 'text-blue-600 opacity-100 bg-gray-50'
+                            : 'opacity-80 text-gray-600'
                         }`}
                       >
                         {template.label}
