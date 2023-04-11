@@ -69,9 +69,11 @@ export class TinaListItemNode extends ListItemNode {
           const nestedList = $createListNode(parent.getListType())
           const nestedListItem = $createTinaListItemNode()
           const children = this.getChildren()
+          // reparenting the children in the list item which
+          // will be appended. NOTE: this effectively "removes"
+          // these children from the _current_ list item
           nestedListItem.append(...children)
           nestedList.append(nestedListItem)
-          // TODO: what about when there are more than one child?
           this.append(nestedList)
         } else {
           throw new Error(
@@ -80,7 +82,6 @@ export class TinaListItemNode extends ListItemNode {
         }
         currentIndent++
       } else {
-        // $handleOutdent(this)
         currentIndent--
       }
     }

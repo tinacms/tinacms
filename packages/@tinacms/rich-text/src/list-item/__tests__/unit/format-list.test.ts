@@ -139,11 +139,71 @@ describe('LexicalListItemNode tests', () => {
 
             root.append(listNode)
             listNode.append(listItemNode1, listItemNode2)
-            // listItemNode1.append(new TextNode('one'))
-            // listItemNode2.append(new TextNode('two'))
           })
         })
-        it('indents list items properly', async () => {
+        it('indents list items properly with multiple nodes', async () => {
+          const { editor } = testEnv
+          if (!editor) {
+            throw new Error(`No editor found`)
+          }
+
+          await editor.update(() => {
+            listItemNode1.append(
+              $createParagraphNode().append($createTextNode('one sibling'))
+            )
+          })
+
+          expectHtmlToBeEqual(
+            editor.getRootElement()?.innerHTML || '',
+            html`
+              <ul class="ul">
+                <li value="1" class="listitem">
+                  <p class="paragraph ltr" dir="ltr">
+                    <span data-lexical-text="true">one</span>
+                  </p>
+                  <p class="paragraph ltr" dir="ltr">
+                    <span data-lexical-text="true">one sibling</span>
+                  </p>
+                </li>
+                <li value="2" class="listitem">
+                  <p class="paragraph ltr" dir="ltr">
+                    <span data-lexical-text="true">two</span>
+                  </p>
+                </li>
+              </ul>
+            `
+          )
+
+          await editor.update(() => {
+            listItemNode1Paragraph.setIndent(1)
+          })
+
+          expectHtmlToBeEqual(
+            editor.getRootElement()?.innerHTML || '',
+            html`
+              <ul class="ul">
+                <li value="1" class="listitem nested-listitem">
+                  <ul class="ul">
+                    <li value="1" class="listitem">
+                      <p class="paragraph ltr" dir="ltr">
+                        <span data-lexical-text="true">one</span>
+                      </p>
+                      <p class="paragraph ltr" dir="ltr">
+                        <span data-lexical-text="true">one sibling</span>
+                      </p>
+                    </li>
+                  </ul>
+                </li>
+                <li value="2" class="listitem">
+                  <p class="paragraph ltr" dir="ltr">
+                    <span data-lexical-text="true">two</span>
+                  </p>
+                </li>
+              </ul>
+            `
+          )
+        })
+        it('indents list items properly 2', async () => {
           const { editor } = testEnv
           if (!editor) {
             throw new Error(`No editor found`)
