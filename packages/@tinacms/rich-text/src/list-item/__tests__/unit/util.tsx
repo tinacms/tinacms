@@ -1,0 +1,508 @@
+import { beforeEach, afterEach } from 'vitest'
+import type {
+  EditorState,
+  EditorThemeClasses,
+  Klass,
+  LexicalEditor,
+  LexicalNode,
+  RangeSelection,
+} from 'lexical'
+
+import { CodeHighlightNode, CodeNode } from '@lexical/code'
+import { AutoLinkNode, LinkNode } from '@lexical/link'
+import { ListItemNode, ListNode } from '@lexical/list'
+import {
+  LexicalComposer,
+  type InitialConfigType,
+} from '@lexical/react/LexicalComposer'
+import { HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table'
+import { $isRangeSelection, createEditor } from 'lexical'
+import * as React from 'react'
+import { createRef } from 'react'
+import { createRoot } from 'react-dom/client'
+import * as ReactTestUtils from 'react-dom/test-utils'
+import { buildInitialContent } from '../../../builder'
+import { createEditorConfig } from '../../../lexical'
+import { testTheme } from '../../../theme'
+
+// import { resetRandomKey } from 'lexical/LexicalUtils';
+let keyCounter = 1
+
+export function resetRandomKey(): void {
+  keyCounter = 1
+}
+
+type TestEnv = {
+  container: HTMLDivElement | null
+  editor: LexicalEditor | null
+  outerHTML: string
+}
+
+export function initializeUnitTest(
+  runTests: (testEnv: TestEnv) => void,
+  editorConfig: InitialConfigType
+) {
+  const testEnv: TestEnv = {
+    container: null,
+    editor: null,
+
+    get outerHTML() {
+      const html = this.container?.innerHTML
+      if (html) {
+        return html
+      }
+      throw new Error('No html found for unit test env')
+    },
+  }
+
+  beforeEach(async () => {
+    resetRandomKey()
+
+    testEnv.container = document.createElement('div')
+    document.body.appendChild(testEnv.container)
+    const ref = createRef<HTMLDivElement>()
+
+    const useLexicalEditor = (
+      rootElementRef: React.RefObject<HTMLDivElement>
+    ) => {
+      const lexicalEditor = React.useMemo(() => {
+        // // const lexical = createTestEditor({
+        // //   namespace: '', onError: e => {
+        // //     console.error(e)
+        // //   }
+        // // });
+        // const config = createEditorConfig()
+        // console.log(editorConfig)
+        const lexical = createEditor({
+          ...editorConfig,
+          editorState: undefined,
+          namespace: '',
+          theme: testTheme,
+          onError: (e) => {
+            throw e
+          },
+        })
+        // const lexical = createEditor({ ...editorConfig, editorState: () => buildInitialContent({ type: 'root', children: [] }) })
+        return lexical
+      }, [])
+
+      React.useEffect(() => {
+        const rootElement = rootElementRef.current
+        lexicalEditor.setRootElement(rootElement)
+      }, [rootElementRef, lexicalEditor])
+      return lexicalEditor
+    }
+
+    const Editor = () => {
+      testEnv.editor = useLexicalEditor(ref)
+      return <div ref={ref} contentEditable={true} />
+    }
+
+    ReactTestUtils.act(() => {
+      if (testEnv.container) {
+        createRoot(testEnv.container).render(<Editor />)
+      } else {
+        throw new Error(`testEnv.container not found`)
+      }
+    })
+  })
+
+  afterEach(() => {
+    if (testEnv.container) {
+      document.body.removeChild(testEnv.container)
+    } else {
+      throw new Error(`testEnv.container not found`)
+    }
+    testEnv.container = null
+  })
+
+  runTests(testEnv)
+}
+
+// export function initializeClipboard() {
+//   Object.defineProperty(window, 'DragEvent', {
+//     value: class DragEvent { },
+//   });
+//   Object.defineProperty(window, 'ClipboardEvent', {
+//     value: class ClipboardEvent { },
+//   });
+// }
+
+// export type SerializedTestElementNode = SerializedElementNode;
+
+// export class TestElementNode extends ElementNode {
+//   static getType(): string {
+//     return 'test_block';
+//   }
+
+//   static clone(node: TestElementNode) {
+//     return new TestElementNode(node.__key);
+//   }
+
+//   static importJSON(
+//     serializedNode: SerializedTestElementNode,
+//   ): TestInlineElementNode {
+//     const node = $createTestInlineElementNode();
+//     node.setFormat(serializedNode.format);
+//     node.setIndent(serializedNode.indent);
+//     node.setDirection(serializedNode.direction);
+//     return node;
+//   }
+
+//   exportJSON(): SerializedTestElementNode {
+//     return {
+//       ...super.exportJSON(),
+//       type: 'test_block',
+//       version: 1,
+//     };
+//   }
+
+//   createDOM() {
+//     return document.createElement('div');
+//   }
+
+//   updateDOM() {
+//     return false;
+//   }
+// }
+
+// export function $createTestElementNode(): TestElementNode {
+//   return new TestElementNode();
+// }
+
+// type SerializedTestTextNode = SerializedTextNode;
+
+// export class TestTextNode extends TextNode {
+//   static getType() {
+//     return 'test_text';
+//   }
+
+//   static clone(node: TestTextNode): TestTextNode {
+//     // @ts-ignore
+//     return new TestTextNode(node.__text, node.__key);
+//   }
+
+//   static importJSON(serializedNode: SerializedTestTextNode): TestTextNode {
+//     // @ts-ignore
+//     return new TestTextNode(serializedNode.__text);
+//   }
+
+//   exportJSON(): SerializedTestTextNode {
+//     return {
+//       ...super.exportJSON(),
+//       type: 'test_text',
+//       version: 1,
+//     };
+//   }
+// }
+
+// export type SerializedTestInlineElementNode = SerializedElementNode;
+
+// export class TestInlineElementNode extends ElementNode {
+//   static getType(): string {
+//     return 'test_inline_block';
+//   }
+
+//   static clone(node: TestInlineElementNode) {
+//     return new TestInlineElementNode(node.__key);
+//   }
+
+//   static importJSON(
+//     serializedNode: SerializedTestInlineElementNode,
+//   ): TestInlineElementNode {
+//     const node = $createTestInlineElementNode();
+//     node.setFormat(serializedNode.format);
+//     node.setIndent(serializedNode.indent);
+//     node.setDirection(serializedNode.direction);
+//     return node;
+//   }
+
+//   exportJSON(): SerializedTestInlineElementNode {
+//     return {
+//       ...super.exportJSON(),
+//       type: 'test_inline_block',
+//       version: 1,
+//     };
+//   }
+
+//   createDOM() {
+//     return document.createElement('a');
+//   }
+
+//   updateDOM() {
+//     return false;
+//   }
+
+//   isInline() {
+//     return true;
+//   }
+// }
+
+// export function $createTestInlineElementNode(): TestInlineElementNode {
+//   return new TestInlineElementNode();
+// }
+
+// export type SerializedTestShadowRootNode = SerializedElementNode;
+
+// export class TestShadowRootNode extends ElementNode {
+//   static getType(): string {
+//     return 'test_shadow_root';
+//   }
+
+//   static clone(node: TestShadowRootNode) {
+//     return new TestElementNode(node.__key);
+//   }
+
+//   static importJSON(
+//     serializedNode: SerializedTestShadowRootNode,
+//   ): TestShadowRootNode {
+//     const node = $createTestShadowRootNode();
+//     node.setFormat(serializedNode.format);
+//     node.setIndent(serializedNode.indent);
+//     node.setDirection(serializedNode.direction);
+//     return node;
+//   }
+
+//   exportJSON(): SerializedTestShadowRootNode {
+//     return {
+//       ...super.exportJSON(),
+//       type: 'test_block',
+//       version: 1,
+//     };
+//   }
+
+//   createDOM() {
+//     return document.createElement('div');
+//   }
+
+//   updateDOM() {
+//     return false;
+//   }
+
+//   isShadowRoot() {
+//     return true;
+//   }
+// }
+
+// export function $createTestShadowRootNode(): TestShadowRootNode {
+//   return new TestShadowRootNode();
+// }
+
+// export type SerializedTestSegmentedNode = SerializedTextNode;
+
+// export class TestSegmentedNode extends TextNode {
+//   static getType(): string {
+//     return 'test_segmented';
+//   }
+
+//   static clone(node: TestSegmentedNode): TestSegmentedNode {
+//     return new TestSegmentedNode(node.__text, node.__key);
+//   }
+
+//   static importJSON(
+//     serializedNode: SerializedTestSegmentedNode,
+//   ): TestSegmentedNode {
+//     const node = $createTestSegmentedNode(serializedNode.text);
+//     node.setFormat(serializedNode.format);
+//     node.setDetail(serializedNode.detail);
+//     node.setMode(serializedNode.mode);
+//     node.setStyle(serializedNode.style);
+//     return node;
+//   }
+
+//   exportJSON(): SerializedTestSegmentedNode {
+//     return {
+//       ...super.exportJSON(),
+//       type: 'test_segmented',
+//       version: 1,
+//     };
+//   }
+// }
+
+// export function $createTestSegmentedNode(text): TestSegmentedNode {
+//   return new TestSegmentedNode(text).setMode('segmented');
+// }
+
+// export type SerializedTestExcludeFromCopyElementNode = SerializedElementNode;
+
+// export class TestExcludeFromCopyElementNode extends ElementNode {
+//   static getType(): string {
+//     return 'test_exclude_from_copy_block';
+//   }
+
+//   static clone(node: TestExcludeFromCopyElementNode) {
+//     return new TestExcludeFromCopyElementNode(node.__key);
+//   }
+
+//   static importJSON(
+//     serializedNode: SerializedTestExcludeFromCopyElementNode,
+//   ): TestExcludeFromCopyElementNode {
+//     const node = $createTestExcludeFromCopyElementNode();
+//     node.setFormat(serializedNode.format);
+//     node.setIndent(serializedNode.indent);
+//     node.setDirection(serializedNode.direction);
+//     return node;
+//   }
+
+//   exportJSON(): SerializedTestExcludeFromCopyElementNode {
+//     return {
+//       ...super.exportJSON(),
+//       type: 'test_exclude_from_copy_block',
+//       version: 1,
+//     };
+//   }
+
+//   createDOM() {
+//     return document.createElement('div');
+//   }
+
+//   updateDOM() {
+//     return false;
+//   }
+
+//   excludeFromCopy() {
+//     return true;
+//   }
+// }
+
+// export function $createTestExcludeFromCopyElementNode(): TestExcludeFromCopyElementNode {
+//   return new TestExcludeFromCopyElementNode();
+// }
+
+// export type SerializedTestDecoratorNode = SerializedLexicalNode;
+
+// export class TestDecoratorNode extends DecoratorNode<JSX.Element> {
+//   static getType(): string {
+//     return 'test_decorator';
+//   }
+
+//   static clone(node: TestDecoratorNode) {
+//     return new TestDecoratorNode(node.__key);
+//   }
+
+//   static importJSON(
+//     serializedNode: SerializedTestDecoratorNode,
+//   ): TestDecoratorNode {
+//     return $createTestDecoratorNode();
+//   }
+
+//   exportJSON(): SerializedTestDecoratorNode {
+//     return {
+//       ...super.exportJSON(),
+//       type: 'test_decorator',
+//       version: 1,
+//     };
+//   }
+
+//   static importDOM() {
+//     return {
+//       'test-decorator': (domNode: HTMLElement) => {
+//         return {
+//           conversion: () => ({ node: $createTestDecoratorNode() }),
+//         };
+//       },
+//     };
+//   }
+
+//   exportDOM() {
+//     return {
+//       element: document.createElement('test-decorator'),
+//     };
+//   }
+
+//   getTextContent() {
+//     return 'Hello world';
+//   }
+
+//   createDOM() {
+//     return document.createElement('span');
+//   }
+
+//   updateDOM() {
+//     return false;
+//   }
+
+//   decorate() {
+//     return <Decorator text={'Hello world'} />;
+//   }
+// }
+
+// function Decorator({ text }): JSX.Element {
+//   return <span>{text}</span>;
+// }
+
+// export function $createTestDecoratorNode(): TestDecoratorNode {
+//   return new TestDecoratorNode();
+// }
+
+const DEFAULT_NODES = [
+  HeadingNode,
+  ListNode,
+  ListItemNode,
+  QuoteNode,
+  CodeNode,
+  TableNode,
+  TableCellNode,
+  TableRowNode,
+  // HashtagNode,
+  CodeHighlightNode,
+  AutoLinkNode,
+  LinkNode,
+  // OverflowNode,
+  // TestElementNode,
+  // TestSegmentedNode,
+  // TestExcludeFromCopyElementNode,
+  // TestDecoratorNode,
+  // TestInlineElementNode,
+  // TestShadowRootNode,
+  // TestTextNode,
+]
+
+export function TestComposer({
+  config = {
+    nodes: [],
+    theme: {},
+  },
+  children,
+}: {
+  config: any
+  children: React.ReactElement
+}) {
+  const customNodes = config.nodes
+  return (
+    <LexicalComposer
+      initialConfig={{
+        onError: (e) => {
+          throw e
+        },
+        ...config,
+        namespace: '',
+        nodes: DEFAULT_NODES.concat(customNodes),
+      }}
+    >
+      {children}
+    </LexicalComposer>
+  )
+}
+
+export function createTestEditor(config: InitialConfigType): LexicalEditor {
+  // const customNodes = config.nodes || [];
+  const editor = createEditor({
+    ...config,
+    namespace: config.namespace || '',
+    onError: (e) => {
+      throw e
+    },
+    // @ts-ignore
+    // nodes: DEFAULT_NODES.concat(customNodes),
+  })
+  return editor
+}
+
+export function $assertRangeSelection(selection: unknown): RangeSelection {
+  if (!$isRangeSelection(selection)) {
+    throw new Error(`Expected RangeSelection, got ${selection}`)
+  }
+  return selection
+}

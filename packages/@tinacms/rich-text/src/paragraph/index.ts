@@ -16,6 +16,7 @@ export class TinaParagraphNode extends ParagraphNode {
   static override getType(): string {
     return 'tina-paragraph'
   }
+
   static override clone(node: LexicalNode) {
     return new TinaParagraphNode(node.__key)
   }

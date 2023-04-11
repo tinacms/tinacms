@@ -23,6 +23,7 @@ export const stringifyMDX = (tree: Root) => {
   return toMarkdown(tree, {
     extensions: [gfmToMarkdown()],
     fences: true,
+    listItemIndent: 'one',
   })
 }
 

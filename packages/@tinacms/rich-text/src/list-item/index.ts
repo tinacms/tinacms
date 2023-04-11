@@ -2,13 +2,14 @@ import {
   $createParagraphNode,
   $isTextNode,
   type DOMConversionMap,
+  type EditorConfig,
   type LexicalNode,
   type NodeKey,
 } from 'lexical'
 
 import { $applyNodeReplacement } from 'lexical'
 
-import { ListItemNode } from '@lexical/list'
+import { $createListNode, $isListNode, ListItemNode } from '@lexical/list'
 
 export class TinaListItemNode extends ListItemNode {
   static override getType(): string {
@@ -25,6 +26,66 @@ export class TinaListItemNode extends ListItemNode {
     if (checked === true || checked === false) {
       this.__checked = checked
     }
+  }
+
+  // override createDOM(config: EditorConfig): HTMLElement {
+  //   const el = super.createDOM(config)
+  //   console.log('created', el.outerHTML)
+  //   return el
+  // }
+
+  // override  createDOM2(config) {
+  // }
+
+  static override transform() {
+    return (node: TinaListItemNode) => {
+      const parent = node.getParent()
+
+      if ($isListNode(parent)) {
+        // The parent listitem logic runs this, which improperly
+        // sets the `value` to 1 for sibilings when items are nested in the previous
+        // list item
+        // updateChildrenListItemValue(parent);
+
+        if (parent.getListType() !== 'check' && node.getChecked() != null) {
+          node.setChecked(undefined)
+        }
+      }
+    }
+  }
+
+  override setIndent(indent: number): this {
+    // return super.setIndent(indent)
+    if (!(typeof indent === 'number' && indent > -1)) {
+      throw Error(`Invalid indent value.`)
+    }
+
+    let currentIndent = this.getIndent()
+
+    while (currentIndent !== indent) {
+      if (currentIndent < indent) {
+        const parent = this.getParent()
+        if ($isListNode(parent)) {
+          const nestedList = $createListNode(parent.getListType())
+          const nestedListItem = $createTinaListItemNode()
+          const children = this.getChildren()
+          nestedListItem.append(...children)
+          nestedList.append(nestedListItem)
+          // TODO: what about when there are more than one child?
+          this.append(nestedList)
+        } else {
+          throw new Error(
+            `Unexpected node for list item of type ${parent?.__type} (key: ${parent?.__key})`
+          )
+        }
+        currentIndent++
+      } else {
+        // $handleOutdent(this)
+        currentIndent--
+      }
+    }
+
+    return this
   }
 
   static override importDOM(): DOMConversionMap | null {

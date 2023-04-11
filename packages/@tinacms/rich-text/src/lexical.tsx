@@ -1,4 +1,8 @@
-import { LexicalComposer } from '@lexical/react/LexicalComposer'
+import {
+  LexicalComposer,
+  type InitialConfigType,
+  type InitialEditorStateType,
+} from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
@@ -37,6 +41,67 @@ export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
+export const createEditorConfig = (editorState: InitialEditorStateType) => {
+  const config: InitialConfigType = {
+    namespace: 'MyEditor',
+    editorState,
+    onError: (e: Error) => {
+      throw e
+    },
+    theme: exampleTheme,
+    nodes: [
+      TinaHeadingNode,
+      HeadingNode,
+      {
+        replace: HeadingNode,
+        with: (node: HeadingNode) => {
+          return new TinaHeadingNode(node.__tag)
+        },
+      },
+      ListNode,
+      // This causes errors, and may not be necessary. The main reason
+      // for it was to ensure that when children are added we keep
+      // the paragraph element between list items and text
+      // TinaListNode,
+      // {
+      //   replace: ListNode,
+      //   with: (node: ListNode) => {
+      //     return new TinaListNode(node.__listType, node.__start);
+      //   },
+      // },
+      ListItemNode,
+      QuoteNode,
+      {
+        replace: QuoteNode,
+        with: () => {
+          return new TinaQuoteNode()
+        },
+      },
+      TinaQuoteNode,
+      ImageNode,
+      CodeNode,
+      HorizontalRuleNode,
+      CodeHighlightNode,
+      TableNode,
+      TableCellNode,
+      TableRowNode,
+      AutoLinkNode,
+      LinkNode,
+      TinaListItemNode,
+      {
+        replace: ListItemNode,
+        with: () => new TinaListItemNode(),
+      },
+      TinaParagraphNode,
+      {
+        replace: ParagraphNode,
+        with: () => new TinaParagraphNode(),
+      },
+    ],
+  }
+  return config
+}
+
 export const LexicalEditor = (props: {
   input: { value: SlateRootType; onChange: (value: unknown) => void }
 }) => {
@@ -59,63 +124,9 @@ export const LexicalEditor = (props: {
   return (
     <div className="lexical-editor">
       <LexicalComposer
-        initialConfig={{
-          namespace: 'MyEditor',
-          editorState: () => buildInitialContent(props.input.value),
-          onError: (e: Error) => {
-            throw e
-          },
-          theme: exampleTheme,
-          nodes: [
-            TinaHeadingNode,
-            HeadingNode,
-            {
-              replace: HeadingNode,
-              with: (node: HeadingNode) => {
-                return new TinaHeadingNode(node.__tag)
-              },
-            },
-            ListNode,
-            // This causes errors, and may not be necessary. The main reason
-            // for it was to ensure that when children are added we keep
-            // the paragraph element between list items and text
-            // TinaListNode,
-            // {
-            //   replace: ListNode,
-            //   with: (node: ListNode) => {
-            //     return new TinaListNode(node.__listType, node.__start);
-            //   },
-            // },
-            ListItemNode,
-            QuoteNode,
-            {
-              replace: QuoteNode,
-              with: () => {
-                return new TinaQuoteNode()
-              },
-            },
-            TinaQuoteNode,
-            ImageNode,
-            CodeNode,
-            HorizontalRuleNode,
-            CodeHighlightNode,
-            TableNode,
-            TableCellNode,
-            TableRowNode,
-            AutoLinkNode,
-            LinkNode,
-            TinaListItemNode,
-            {
-              replace: ListItemNode,
-              with: () => new TinaListItemNode(),
-            },
-            TinaParagraphNode,
-            {
-              replace: ParagraphNode,
-              with: () => new TinaParagraphNode(),
-            },
-          ],
-        }}
+        initialConfig={createEditorConfig(() =>
+          buildInitialContent(props.input.value)
+        )}
       >
         <div className="relative mt-8">
           <div
@@ -163,6 +174,7 @@ export const LexicalEditor = (props: {
               onChange={(editorState: EditorState) => {
                 const json = editorState.toJSON()
                 const tree = exportToMarkdownAst(json)
+                // console.log(tree)
                 setValue(tree)
                 /**
                  * calling this on every change seems heavy-handed, but the value

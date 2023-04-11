@@ -278,7 +278,17 @@ export function updateChildrenListItemValue(
   }
 }
 
-export function $handleIndent(listItemNodes: Array<TinaListItemNode>): void {
+export function $handleIndent(listItemNode: TinaListItemNode): void {
+  const parent = listItemNode.getParent()
+  if ($isListNode(parent)) {
+    const replacementList = $createListNode(parent.getListType())
+    console.log(replacementList)
+    replacementList.append(listItemNode)
+    // parent.
+    // listItemNode.replace(replacementList)
+  }
+}
+export function $handleIndent2(listItemNodes: Array<TinaListItemNode>): void {
   // go through each node and decide where to move it.
   const removed = new Set<NodeKey>()
 

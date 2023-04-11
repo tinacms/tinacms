@@ -175,9 +175,12 @@ const blockContent = (
     case 'list': {
       return {
         type: 'list',
+        ordered: node.listType === 'bullet' ? false : true,
+        spread: false,
         children: node.children.map((child) => {
           return {
             type: 'listItem',
+            spread: false,
             children: child.children.map((child) => blockContent(child)),
           }
         }),
