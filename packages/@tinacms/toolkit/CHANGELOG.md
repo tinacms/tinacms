@@ -1,5 +1,36 @@
 # Change Log
 
+## 1.6.3
+
+### Patch Changes
+
+- 2a32a0b99: Truncate long branch names in sidebar UI
+- 6f491f38c: allow slashes in branch names
+
+## 1.6.2
+
+### Patch Changes
+
+- 1370ebae6: Update branching refresh logic to not refresh when a new branch is created. Instead it will be added to the list of branches in memory
+
+## 1.6.1
+
+### Patch Changes
+
+- d0c4801b7: cancel index polling when component is unmounted
+
+## 1.6.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+
+### Patch Changes
+
+- 084a39d2c: Dont trigger hover events for ListFieldMeta when wrapping objects
+- 785748400: Add error modal for failed media uploads
+  - @tinacms/sharedctx@1.0.1
+
 ## 1.5.2
 
 ### Patch Changes

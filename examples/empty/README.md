@@ -1,7 +1,7 @@
 This is a vanilla Next.js project can be used to test the `tinacms init` command.
 
-To test, run the command with [`yarn exec`](https://yarnpkg.com/cli/exec):
+To test, run the command with `pnpm exec`
 
 ```sh
-yarn exec ../../packages/@tinacms/cli/bin/tinacms init
+pnpm exec ../../packages/@tinacms/cli/bin/tinacms init
 ```

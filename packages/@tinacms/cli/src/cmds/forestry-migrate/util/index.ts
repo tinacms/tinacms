@@ -6,10 +6,12 @@ import fs from 'fs-extra'
 import path from 'path'
 import yaml from 'js-yaml'
 import z from 'zod'
-import type { TinaField, TinaTemplate } from '@tinacms/schema-tools'
+import type { TinaField, Template } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
 import { warnText } from '../../../utils/theme'
 import { ErrorSingleton } from './errorSingleton'
+import { stringifyLabelWithField } from '..'
+import { makeFieldsWithInternalCode } from './codeTransformer'
 
 const errorSingletonInstance = ErrorSingleton.getInstance()
 
@@ -89,6 +91,7 @@ const forestryFieldWithoutField = z.object({
   name: z.string(),
   label: z.string(),
   default: z.any().optional(),
+  template: z.string().optional(),
   config: z
     .object({
       // min and max are used for lists
@@ -139,12 +142,12 @@ const FrontmatterTemplateSchema = z.object({
 // Takes a field from forestry and converts it to a Tina field
 export const transformForestryFieldsToTinaFields = ({
   fields,
-  rootPath,
+  pathToForestryConfig,
   template,
   skipBlocks = false,
 }: {
   fields: z.infer<typeof FrontmatterTemplateSchema>['fields']
-  rootPath: string
+  pathToForestryConfig: string
   template: string
   skipBlocks?: boolean
 }) => {
@@ -217,6 +220,14 @@ export const transformForestryFieldsToTinaFields = ({
           label: forestryField.label,
         }
         break
+      case 'image_gallery':
+        field = {
+          type: 'image',
+          ...getTinaFieldsFromName(forestryField.name),
+          label: forestryField.label,
+          list: true,
+        }
+        break
       case 'select':
         if (forestryField.config?.options) {
           field = {
@@ -278,7 +289,7 @@ export const transformForestryFieldsToTinaFields = ({
           label: forestryField.label,
           fields: transformForestryFieldsToTinaFields({
             fields: forestryField.fields,
-            rootPath,
+            pathToForestryConfig,
             template,
             skipBlocks,
           }),
@@ -293,26 +304,37 @@ export const transformForestryFieldsToTinaFields = ({
           fields: transformForestryFieldsToTinaFields({
             fields: forestryField.fields,
             template,
-            rootPath,
+            pathToForestryConfig,
             skipBlocks,
           }),
         }
         break
 
-      case 'blocks':
-        if (skipBlocks) break
+      case 'blocks': {
+        if (skipBlocks) {
+          break
+        }
 
-        const templates: TinaTemplate[] = []
+        const templates: Template[] = []
+
         forestryField?.template_types.forEach((tem) => {
-          const { fields, template } = getFieldsFromTemplates({
+          const { template } = getFieldsFromTemplates({
             tem,
             skipBlocks: true,
-            rootPath: process.cwd(),
+            pathToForestryConfig,
           })
-          const t: TinaTemplate = {
-            fields,
+          const fieldsString = stringifyLabelWithField(template.label)
+          const t: Template = {
+            // @ts-ignore
+            fields: makeFieldsWithInternalCode({
+              hasBody: false,
+              field: fieldsString,
+            }),
             label: template.label,
             name: stringifyTemplateName(tem, tem),
+          }
+          if (t.name != tem) {
+            ;(t as any).nameOverride = tem
           }
           templates.push(t)
         })
@@ -320,21 +342,33 @@ export const transformForestryFieldsToTinaFields = ({
         field = {
           type: 'object',
           list: true,
+          templateKey: 'template',
           label: forestryField.label,
           ...getTinaFieldsFromName(forestryField.name),
           templates,
         }
         break
+      }
+      case 'include': {
+        const tem = forestryField.template
 
-      // Unsupported types
-      case 'image_gallery':
-      case 'include':
-        logger.info(
-          warnText(
-            `Unsupported field type: ${forestryField.type}, in forestry ${template}. This will not be added to the schema.`
-          )
+        const { template } = getFieldsFromTemplates({
+          tem,
+          skipBlocks: true,
+          pathToForestryConfig,
+        })
+        const fieldsString = stringifyLabelWithField(template.label)
+        const field = makeFieldsWithInternalCode({
+          field: fieldsString,
+          hasBody: false,
+          spread: true,
+        })
+        tinaFields.push(
+          // @ts-ignore
+          field
         )
         break
+      }
       default:
         logger.info(
           warnText(
@@ -342,6 +376,7 @@ export const transformForestryFieldsToTinaFields = ({
           )
         )
     }
+
     if (field) {
       if (forestryField.config?.required) {
         // @ts-ignore
@@ -351,12 +386,13 @@ export const transformForestryFieldsToTinaFields = ({
       tinaFields.push(field)
     }
   })
+
   return tinaFields
 }
 
 export const getFieldsFromTemplates: (_args: {
   tem: string
-  rootPath: string
+  pathToForestryConfig: string
   skipBlocks?: boolean
 }) => {
   fields: TinaField[]
@@ -366,9 +402,9 @@ export const getFieldsFromTemplates: (_args: {
     hide_body?: boolean
     fields?: ForestryFieldType[]
   }
-} = ({ tem, rootPath, skipBlocks = false }) => {
+} = ({ tem, pathToForestryConfig, skipBlocks = false }) => {
   const templatePath = path.join(
-    rootPath,
+    pathToForestryConfig,
     '.forestry',
     'front_matter',
     'templates',
@@ -387,7 +423,7 @@ export const getFieldsFromTemplates: (_args: {
   const template = parseTemplates({ val: templateObj })
   const fields = transformForestryFieldsToTinaFields({
     fields: template.fields,
-    rootPath,
+    pathToForestryConfig,
     template: tem,
     skipBlocks,
   })
@@ -399,13 +435,18 @@ export const parseTemplates = ({ val }: { val: unknown }) => {
   return template
 }
 
-export const hasForestryConfig = async ({ rootPath }: { rootPath: string }) => {
-  const forestryPath = path.join(rootPath, '.forestry', 'settings.yml')
-  const exists = await fs.pathExists(forestryPath)
-  return {
-    path: forestryPath,
-    exists: exists,
-  }
+export const checkForestrySettingsPath = async ({
+  forestryPath,
+}: {
+  forestryPath: string
+}): Promise<string | undefined> => {
+  const forestrySettingsPath = path.join(
+    forestryPath,
+    '.forestry',
+    'settings.yml'
+  )
+  const exists = await fs.pathExists(forestrySettingsPath)
+  return exists ? forestrySettingsPath : undefined
 }
 
 export const parseSections = ({ val }: { val: unknown }) => {

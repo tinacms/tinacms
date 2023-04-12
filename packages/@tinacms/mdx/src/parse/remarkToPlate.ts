@@ -112,17 +112,22 @@ export const remarkToSlate = (
 
   // Treating HTML as paragraphs so they remain editable
   // This is only really used for non-MDX contexts
-  const html = (content: Md.HTML): Plate.ParagraphElement => {
+  const html = (content: Md.HTML): Plate.HTMLElement => {
     return {
-      type: 'p',
-      children: [{ type: 'text', text: content.value }],
+      type: 'html',
+      value: content.value,
+      children: [{ type: 'text', text: '' }],
     }
   }
 
   // Treating HTML as text nodes so they remain editable
   // This is only really used for non-MDX contexts
-  const html_inline = (content: Md.HTML): Plate.TextElement => {
-    return { type: 'text', text: content.value }
+  const html_inline = (content: Md.HTML): Plate.HTMLInlineElement => {
+    return {
+      type: 'html_inline',
+      value: content.value,
+      children: [{ type: 'text', text: '' }],
+    }
   }
 
   const list = (content: Md.List): Plate.List => {
@@ -395,7 +400,6 @@ export const remarkToSlate = (
         accum.push({ type: 'a', url: node.url, title: node.title, children })
         break
       }
-      case 'html':
       case 'text':
         const markProps: { [key: string]: boolean } = {}
         marks.forEach((mark) => (markProps[mark] = true))
@@ -405,7 +409,7 @@ export const remarkToSlate = (
        * Eg. this is a line break
        *                 vv
        * _Some italicized
-       * Vitaly, co-founder of SmashingMag_
+       * text on 2 lines_
        */
       case 'break':
         accum.push(breakContent())

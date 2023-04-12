@@ -1,5 +1,61 @@
 # @tinacms/self-hosted-starter
 
+## 0.1.11
+
+### Patch Changes
+
+- Updated dependencies [75d5ed359]
+  - tinacms@1.4.5
+  - @tinacms/datalayer@1.2.6
+
+## 0.1.10
+
+### Patch Changes
+
+- Updated dependencies [7c750e370]
+  - tinacms@1.4.4
+  - @tinacms/datalayer@1.2.5
+
+## 0.1.9
+
+### Patch Changes
+
+- @tinacms/datalayer@1.2.4
+
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [1370ebae6]
+  - tinacms@1.4.3
+  - @tinacms/datalayer@1.2.3
+
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [0626ba381]
+  - tinacms@1.4.2
+  - @tinacms/datalayer@1.2.2
+
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [9a8074889]
+- Updated dependencies [d0c4801b7]
+  - tinacms@1.4.1
+  - @tinacms/datalayer@1.2.1
+
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [76c984bcc]
+- Updated dependencies [202cd714d]
+  - @tinacms/datalayer@1.2.0
+  - tinacms@1.4.0
+
 ## 0.1.4
 
 ### Patch Changes

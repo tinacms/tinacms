@@ -1,5 +1,121 @@
 # tinacms-cli
 
+## 1.5.5
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+- Updated dependencies [75d5ed359]
+  - @tinacms/graphql@1.4.6
+  - @tinacms/app@1.2.5
+  - @tinacms/datalayer@1.2.6
+
+## 1.5.4
+
+### Patch Changes
+
+- 9f9cc4799: better forestry template migration
+- 8f3767410: better matching on forestry pages
+- Updated dependencies [67c7a48b8]
+  - @tinacms/graphql@1.4.5
+  - @tinacms/app@1.2.4
+  - @tinacms/datalayer@1.2.5
+
+## 1.5.3
+
+### Patch Changes
+
+- Updated dependencies [ae3abe927]
+  - @tinacms/graphql@1.4.4
+  - @tinacms/datalayer@1.2.4
+
+## 1.5.2
+
+### Patch Changes
+
+- 40d908a79: Update error messages in Forestry migration
+- 02a555c39: Handle block aliases on forestry migration
+- 9216a5bda: Allow svg imports
+- Updated dependencies [40d908a79]
+- Updated dependencies [02a555c39]
+  - @tinacms/graphql@1.4.3
+  - @tinacms/app@1.2.3
+  - @tinacms/datalayer@1.2.3
+
+## 1.5.1
+
+### Patch Changes
+
+- 691d2eb3f: Add support for the `tinacms codemod move-tina-folder` command. This command moves the Tina folder from `.tina` to `tina`, and creates a lock file, which allows the entire `tina/__generated__` folder to be gitignored.
+- bb9f0047f: Add `skip.client = true` to the Tina config for Forestry migrations by default.
+- a70204500: feat: Configurable template key on blocks
+- Updated dependencies [af5c32eae]
+- Updated dependencies [1f9f83718]
+- Updated dependencies [a70204500]
+  - @tinacms/graphql@1.4.2
+  - @tinacms/schema-tools@1.4.2
+  - @tinacms/app@1.2.2
+  - @tinacms/datalayer@1.2.2
+
+## 1.5.0
+
+### Minor Changes
+
+- bbae12b95: Changes Tailwind config to also search for class names within user's config and related custom components
+
+### Patch Changes
+
+- 5f0139437: Add option for specifying datalayer port
+- 5fcef561d: - Pin vite version
+  - Adds react plugin so that we no longer get a 404 on react /@react-refresh
+  - Adds transform ts and tsx files in build as well as dev
+- 8fc99059f: Fix main export field for @tinacms/app
+- 9a8074889: Consolidate payload transform logic
+- e37f64b7f: feat: Skip blocks import, since it has some issues
+  feat: Handle image gallery import
+  feat: Handle a nested forestry directory through --forestryPath arg
+- c48326846: Move --skipSDK into config property: `client.skip = true`
+- Updated dependencies [e9514656c]
+- Updated dependencies [5fcef561d]
+- Updated dependencies [8fc99059f]
+- Updated dependencies [9a8074889]
+- Updated dependencies [c48326846]
+- Updated dependencies [13b809ff5]
+  - @tinacms/graphql@1.4.1
+  - @tinacms/app@1.2.1
+  - @tinacms/schema-tools@1.4.1
+  - @tinacms/datalayer@1.2.1
+
+## 1.4.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+- 202cd714d: Internal updates to the CLI
+
+### Patch Changes
+
+- 74742cb1c: Add warnings for deprecated CLI commands
+- 81a2d3125: Ensure tina directory is specified on Database with new Tina config folder
+- 48011a9ab: Fix issue where process.platform wasn't defined for external package. Fix issue where jsx-dev-runtime wasn't provided as an ES module from Vite in dev mode
+- 5809796cf: Adds match property to collection
+- 54dd7aabb: Move branch check to a seperate check.
+- a18474c3b: Fix console warning about prettier parser not being provided
+- 3a1edd50d: Bundle the MDX package with its dependencies so we can avoid awkward import issues related to the remark ecosystem modules
+- a37648c5c: Only stop dev process when config is invalid at the start of the command
+- Updated dependencies [76c984bcc]
+- Updated dependencies [5809796cf]
+- Updated dependencies [e3b58c03e]
+- Updated dependencies [54aac9017]
+- Updated dependencies [0553035f5]
+- Updated dependencies [202cd714d]
+- Updated dependencies [3a1edd50d]
+  - @tinacms/schema-tools@1.4.0
+  - @tinacms/datalayer@1.2.0
+  - @tinacms/graphql@1.4.0
+  - @tinacms/app@1.2.0
+  - @tinacms/metrics@1.0.2
+
 ## 1.3.3
 
 ### Patch Changes

@@ -2,7 +2,7 @@ import { InferGetStaticPropsType } from 'next'
 import { Json } from '../../components/json'
 import { useTina } from 'tinacms/dist/react'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
-import client from '../../.tina/__generated__/client'
+import client from '../../tina/__generated__/client'
 import ReactDOM from 'react-dom'
 
 export default function Home(

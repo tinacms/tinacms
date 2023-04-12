@@ -1,5 +1,46 @@
 # @tinacms/mdx
 
+## 1.3.8
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+
+## 1.3.7
+
+### Patch Changes
+
+- Updated dependencies [a70204500]
+  - @tinacms/schema-tools@1.4.2
+
+## 1.3.6
+
+### Patch Changes
+
+- 5fcef561d: - Pin vite version
+  - Adds react plugin so that we no longer get a 404 on react /@react-refresh
+  - Adds transform ts and tsx files in build as well as dev
+- Updated dependencies [9a8074889]
+- Updated dependencies [c48326846]
+  - @tinacms/schema-tools@1.4.1
+
+## 1.3.5
+
+### Patch Changes
+
+- 9e86312d6: Skip html tokenization when skipEscaping is enabled.
+- 5d1e0e406: Support mdx block elements when children are on the same line. Eg.
+
+  ```
+  <Cta>Hello, world</Cta>
+  ```
+
+- cbc1fb919: Provide browser-specific version of @tinacms/mdx
+- Updated dependencies [76c984bcc]
+- Updated dependencies [5809796cf]
+- Updated dependencies [54aac9017]
+  - @tinacms/schema-tools@1.4.0
+
 ## 1.3.4
 
 ### Patch Changes

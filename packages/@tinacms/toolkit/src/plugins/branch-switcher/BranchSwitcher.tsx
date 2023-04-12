@@ -19,57 +19,10 @@ import { useCMS } from '../../packages/react-core'
 
 type ListState = 'loading' | 'ready' | 'error'
 
-export const BranchCreator = ({ callback, createBranch, chooseBranch }) => {
-  const [newBranchName, setNewBranchName] = React.useState('')
-  const branchName = newBranchName.toLowerCase().replaceAll(' ', '-')
-  const [isCreating, setIsCreating] = React.useState(false)
-  const { currentBranch } = useBranchData()
-
-  const handleCreateBranch = React.useCallback((value) => {
-    setIsCreating(true)
-    createBranch({
-      branchName: value,
-      baseBranch: currentBranch,
-    }).then(async (createdBranchName) => {
-      chooseBranch(createdBranchName)
-      callback(createdBranchName)
-    })
-  }, [])
-
-  return (
-    <div className="w-full flex flex-col items-stretch w-full gap-4">
-      <BaseTextField
-        placeholder="Name"
-        value={newBranchName}
-        disabled={isCreating}
-        onChange={(e) => setNewBranchName(e.target.value)}
-      />
-      <BaseTextField
-        placeholder="Branch Name"
-        value={branchName}
-        disabled={true}
-        readOnly
-      />
-      <Button
-        className="flex-grow flex items-center gap-2 whitespace-nowrap"
-        size="medium"
-        variant="primary"
-        disabled={isCreating}
-        onClick={() => handleCreateBranch(branchName)}
-      >
-        {isCreating ? (
-          <>
-            <FaSpinner className="w-5 h-auto opacity-70 animate-spin" /> Create
-            Branch
-          </>
-        ) : (
-          <>
-            <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
-          </>
-        )}
-      </Button>
-    </div>
-  )
+export function formatBranchName(str: string): string {
+  const pattern = /[^/\w-]+/g // regular expression pattern to match invalid special characters
+  const formattedStr = str.replace(pattern, '') // remove special characters
+  return formattedStr.toLowerCase()
 }
 
 export const BranchSwitcher = ({
@@ -95,12 +48,22 @@ export const BranchSwitcher = ({
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading')
     createBranch({
-      branchName: value,
+      branchName: formatBranchName(value),
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
       // @ts-ignore
       cms.alerts.success('Branch created.')
-      await refreshBranchList()
+      // add the newly created branch to the list
+      setBranchList((oldBranchList) => {
+        return [
+          ...oldBranchList,
+          {
+            indexStatus: { status: 'unknown' },
+            name: createdBranchName,
+          },
+        ]
+      })
+      setListState('ready')
     })
   }, [])
 
@@ -122,6 +85,7 @@ export const BranchSwitcher = ({
   // Keep branch list up to date
   React.useEffect(() => {
     if (listState === 'ready') {
+      const cancelFuncs = []
       // update all branches that have indexing status of 'inprogress' or 'unknown'
       branchList
         .filter(
@@ -130,16 +94,35 @@ export const BranchSwitcher = ({
             x?.indexStatus?.status === 'unknown'
         )
         .forEach(async (x) => {
-          const indexStatus = await cms.api.tina.waitForIndexStatus({
+          const [
+            // When this promise resolves, we know the index status is no longer 'inprogress' or 'unknown'
+            waitForIndexStatusPromise,
+            // Calling this function will cancel the polling
+            cancelWaitForIndexFunc,
+          ] = cms.api.tina.waitForIndexStatus({
             ref: x.name,
           })
-          setBranchList((prev) => {
-            const newList = Array.from(prev)
-            const index = newList.findIndex((y) => y.name === x.name)
-            newList[index].indexStatus = indexStatus
-            return newList
-          })
+          cancelFuncs.push(cancelWaitForIndexFunc)
+          waitForIndexStatusPromise
+            .then((indexStatus) => {
+              setBranchList((previousBranchList) => {
+                // update the index status of the branch
+                const newBranchList = Array.from(previousBranchList)
+                const index = newBranchList.findIndex((y) => y.name === x.name)
+                newBranchList[index].indexStatus = indexStatus
+                return newBranchList
+              })
+            })
+            .catch((e) => {
+              if (e.message === 'AsyncPoller: cancelled') return
+              console.error(e)
+            })
         })
+      return () => {
+        cancelFuncs.forEach((x) => {
+          x()
+        })
+      }
     }
   }, [listState, branchList.length])
 
@@ -351,7 +334,7 @@ const BranchSelector = ({
             size="medium"
             variant="white"
             disabled={newBranchName === ''}
-            onClick={() => onCreateBranch(stringToBranchName(newBranchName))}
+            onClick={() => onCreateBranch(newBranchName)}
           >
             <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
           </Button>
@@ -359,15 +342,4 @@ const BranchSelector = ({
       </div>
     </div>
   )
-}
-
-const stringToBranchName = (string) => {
-  return string
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '')
 }

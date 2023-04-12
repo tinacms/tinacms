@@ -1,5 +1,31 @@
 # @tinacms/schema-tools
 
+## 1.4.2
+
+### Patch Changes
+
+- a70204500: feat: Configurable template key on blocks
+
+## 1.4.1
+
+### Patch Changes
+
+- 9a8074889: Consolidate payload transform logic
+- c48326846: Move --skipSDK into config property: `client.skip = true`
+
+## 1.4.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+
+### Patch Changes
+
+- 5809796cf: Adds match property to collection
+- 54aac9017: Support more forgiving markdown parser for non-MDX collections. Previously, this feature was only available by opting in
+  with the `parser: {type: "markdown"}` configuration on a rich-text field. Now, all `rich-text` fields will adhere to the
+  appropriate parser based on their collection format, but can continue to be overridden manually.
+
 ## 1.3.4
 
 ### Patch Changes

@@ -14,7 +14,6 @@ jobs:
         os:
           - ubuntu-latest
           - macOS-latest
-        #  - windows-latest
         node-version: [14.x]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
@@ -29,15 +28,31 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 2
 
-      - uses: pnpm/action-setup@v2.2.2
-        with:
-          version: 7.4.0
-
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
           node-version: 16
-          cache: 'pnpm'
+
+      - uses: pnpm/action-setup@v2.2.2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install
@@ -47,6 +62,25 @@ jobs:
 
       - name: Build Types
         run: pnpm types
+
+      - name: Set NPMRC
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Publish tagged PR
+        if: >
+          matrix.os == 'ubuntu-latest' &&
+          github.event_name == 'pull_request' &&
+          contains(github.event.pull_request.labels.*.name, 'tagged')
+        continue-on-error: true
+        run: |
+          echo running on branch ${BRANCH_NAME}
+          pnpm version:snapshot
+          pnpm publish -r --tag ${BRANCH_NAME} --no-git-checks --access public
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
       - name: Test
         run: pnpm test

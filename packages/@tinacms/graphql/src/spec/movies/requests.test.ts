@@ -50,7 +50,7 @@ const mutationFixtures: Fixture[] = [
     name: 'updateDocument',
     description: 'Updating a document works',
     assert: 'file',
-    filename: 'content/movies/star-wars.md',
+    filename: 'content/movies/star-wars.mdx',
   },
 ]
 

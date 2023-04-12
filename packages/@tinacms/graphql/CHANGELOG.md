@@ -1,5 +1,77 @@
 # tina-graphql
 
+## 1.4.6
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+- Updated dependencies [75d5ed359]
+  - @tinacms/mdx@1.3.8
+
+## 1.4.5
+
+### Patch Changes
+
+- 67c7a48b8: Improve full reindexing to update status to complete as soon as the new version of the index is ready
+
+## 1.4.4
+
+### Patch Changes
+
+- ae3abe927: handle image array in Tina Cloud media transformation
+
+## 1.4.3
+
+### Patch Changes
+
+- 40d908a79: Update error messages in Forestry migration
+- 02a555c39: Handle block aliases on forestry migration
+
+## 1.4.2
+
+### Patch Changes
+
+- af5c32eae: Fix issue where datalayer-port option wasn't being used
+- 1f9f83718: Handle ambiguous templates from indexing
+- a70204500: feat: Configurable template key on blocks
+- Updated dependencies [a70204500]
+  - @tinacms/schema-tools@1.4.2
+  - @tinacms/mdx@1.3.7
+
+## 1.4.1
+
+### Patch Changes
+
+- e9514656c: Don't log warning for image list
+- 9a8074889: Consolidate payload transform logic
+- 13b809ff5: Improve error message when a \_template property isn't one of the templates in the collection
+- Updated dependencies [5fcef561d]
+- Updated dependencies [9a8074889]
+- Updated dependencies [c48326846]
+  - @tinacms/mdx@1.3.6
+  - @tinacms/schema-tools@1.4.1
+
+## 1.4.0
+
+### Minor Changes
+
+- 76c984bcc: Use new API endpoint in content api reqests
+- 202cd714d: Internal updates to the CLI
+
+### Patch Changes
+
+- 5809796cf: Adds match property to collection
+- e3b58c03e: Fix error "input.replace is not a function"
+- 0553035f5: Fix regression from Tina client not having referenceDepth provided
+- Updated dependencies [9e86312d6]
+- Updated dependencies [76c984bcc]
+- Updated dependencies [5809796cf]
+- Updated dependencies [54aac9017]
+- Updated dependencies [5d1e0e406]
+- Updated dependencies [cbc1fb919]
+  - @tinacms/mdx@1.3.5
+  - @tinacms/schema-tools@1.4.0
+
 ## 1.3.5
 
 ### Patch Changes
