@@ -385,12 +385,16 @@ mutation addPendingDocumentMutation(
     query: ((gqlTag: typeof gql) => DocumentNode) | string,
     { variables }: { variables: object }
   ): Promise<ReturnType> {
+    const token = await this.getToken()
+    const headers = {
+      'Content-Type': 'application/json',
+    }
+    if (token?.id_token) {
+      headers['Authorization'] = 'Bearer ' + token.id_token
+    }
     const res = await fetch(this.contentApiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + (await this.getToken()).id_token,
-      },
+      headers,
       body: JSON.stringify({
         query: typeof query === 'function' ? print(query(gql)) : query,
         variables,
@@ -565,10 +569,13 @@ mutation addPendingDocumentMutation(
     init?: RequestInit
   ): Promise<Response> {
     const headers = init?.headers || {}
+    const token = await this.getToken()
+    if (token?.id_token) {
+      headers['Authorization'] = 'Bearer ' + token.id_token
+    }
     return await fetch(input, {
       ...init,
       headers: new Headers({
-        Authorization: 'Bearer ' + (await this.getToken()).id_token,
         ...headers,
       }),
     })
