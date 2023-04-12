@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
 import { $getNearestNodeOfType } from '@lexical/utils'
 import {
   $createParagraphNode,
@@ -14,29 +22,36 @@ import {
   type NodeKey,
   ParagraphNode,
 } from 'lexical'
-import { $createListNode, $isListNode, ListNode } from '@lexical/list'
-import type { ListType } from '@lexical/list'
+import { invariant } from './utils'
+
+import {
+  $createListNode,
+  $isListNode,
+  ListNode,
+  type ListType,
+} from '@lexical/list'
+import {
+  $createListItemNode,
+  // $createListNode,
+  $isListItemNode,
+  // $isListNode,
+  TinaListItemNode as ListItemNode,
+  // ListNode,
+} from './'
+// import {ListType} from './LexicalListNode';
 import {
   $getAllListItems,
   $getTopListNode,
   $removeHighestEmptyListParent,
-  findNearestListItemNode,
-  getUniqueListItemNodes,
   isNestedListNode,
-  invariant,
 } from './utils'
-import {
-  $createTinaListItemNode,
-  $isTinaListItemNode,
-  TinaListItemNode,
-} from '.'
 
 function $isSelectingEmptyListItem(
-  anchorNode: TinaListItemNode | LexicalNode,
+  anchorNode: ListItemNode | LexicalNode,
   nodes: Array<LexicalNode>
 ): boolean {
   return (
-    $isTinaListItemNode(anchorNode) &&
+    $isListItemNode(anchorNode) &&
     (nodes.length === 0 ||
       (nodes.length === 1 &&
         anchorNode.is(nodes[0]) &&
@@ -44,7 +59,7 @@ function $isSelectingEmptyListItem(
   )
 }
 
-function $getListItemValue(listItem: TinaListItemNode): number {
+function $getListItemValue(listItem: ListItemNode): number {
   const list = listItem.getParent()
 
   let value = 1
@@ -63,14 +78,32 @@ function $getListItemValue(listItem: TinaListItemNode): number {
   const siblings = listItem.getPreviousSiblings()
   for (let i = 0; i < siblings.length; i++) {
     const sibling = siblings[i]
+    // console.log(
+    //   $isListItemNode(sibling) && !$isListNode(sibling.getFirstChild())
+    // )
 
-    if ($isTinaListItemNode(sibling) && !$isListNode(sibling.getFirstChild())) {
+    if ($isListItemNode(sibling)) {
       value++
     }
+    // Original: not sure what the second check means,
+    // I think there's some logic for merging elsewhere so
+    // if ($isListItemNode(sibling) && !$isListNode(sibling.getFirstChild())) {
+    //   value++
+    // }
   }
   return value
 }
 
+/**
+ * Inserts a new ListNode. If the selection's anchor node is an empty ListItemNode and is a child of
+ * the root/shadow root, it will replace the ListItemNode with a ListNode and the old ListItemNode.
+ * Otherwise it will replace its parent with a new ListNode and re-insert the ListItemNode and any previous children.
+ * If the selection's anchor node is not an empty ListItemNode, it will add a new ListNode or merge an existing ListNode,
+ * unless the the node is a leaf node, in which case it will attempt to find a ListNode up the branch and replace it with
+ * a new ListNode, or create a new ListNode at the nearest root/shadow root.
+ * @param editor - The lexical editor.
+ * @param listType - The type of list, "number" | "bullet" | "check".
+ */
 export function insertList(editor: LexicalEditor, listType: ListType): void {
   editor.update(() => {
     const selection = $getSelection()
@@ -84,19 +117,18 @@ export function insertList(editor: LexicalEditor, listType: ListType): void {
       const anchorNode = anchor.getNode()
       const anchorNodeParent = anchorNode.getParent()
 
-      console.log('insertme!')
       if ($isSelectingEmptyListItem(anchorNode, nodes)) {
         const list = $createListNode(listType)
 
         if ($isRootOrShadowRoot(anchorNodeParent)) {
           anchorNode.replace(list)
-          const listItem = $createTinaListItemNode()
+          const listItem = $createListItemNode()
           if ($isElementNode(anchorNode)) {
             listItem.setFormat(anchorNode.getFormatType())
             listItem.setIndent(anchorNode.getIndent())
           }
           list.append(listItem)
-        } else if ($isTinaListItemNode(anchorNode)) {
+        } else if ($isListItemNode(anchorNode)) {
           const parent = anchorNode.getParentOrThrow()
           append(list, parent.getChildren())
           parent.replace(list)
@@ -165,7 +197,7 @@ function createListOrMerge(node: ElementNode, listType: ListType): ListNode {
 
   const previousSibling = node.getPreviousSibling()
   const nextSibling = node.getNextSibling()
-  const listItem = $createTinaListItemNode()
+  const listItem = $createListItemNode()
   listItem.setFormat(node.getFormatType())
   listItem.setIndent(node.getIndent())
   append(listItem, node.getChildren())
@@ -199,6 +231,42 @@ function createListOrMerge(node: ElementNode, listType: ListType): ListNode {
   }
 }
 
+/**
+ * A recursive function that goes through each list and their children, including nested lists,
+ * appending list2 children after list1 children and updating ListItemNode values.
+ * @param list1 - The first list to be merged.
+ * @param list2 - The second list to be merged.
+ */
+export function mergeLists(list1: ListNode, list2: ListNode): void {
+  const listItem1 = list1.getLastChild()
+  const listItem2 = list2.getFirstChild()
+
+  if (
+    listItem1 &&
+    listItem2 &&
+    isNestedListNode(listItem1) &&
+    isNestedListNode(listItem2)
+  ) {
+    mergeLists(listItem1.getFirstChild(), listItem2.getFirstChild())
+    listItem2.remove()
+  }
+
+  const toMerge = list2.getChildren()
+  if (toMerge.length > 0) {
+    list1.append(...toMerge)
+    updateChildrenListItemValue(list1)
+  }
+
+  list2.remove()
+}
+
+/**
+ * Searches for the nearest ancestral ListNode and removes it. If selection is an empty ListItemNode
+ * it will remove the whole list, including the ListItemNode. For each ListItemNode in the ListNode,
+ * removeList will also generate new ParagraphNodes in the removed ListNode's place. Any child node
+ * inside a ListItemNode will be appended to the new ParagraphNodes.
+ * @param editor - The lexical editor.
+ */
 export function removeList(editor: LexicalEditor): void {
   editor.update(() => {
     const selection = $getSelection()
@@ -215,7 +283,7 @@ export function removeList(editor: LexicalEditor): void {
           const node = nodes[i]
 
           if ($isLeafNode(node)) {
-            const listItemNode = $getNearestNodeOfType(node, TinaListItemNode)
+            const listItemNode = $getNearestNodeOfType(node, ListItemNode)
 
             if (listItemNode != null) {
               listNodes.add($getTopListNode(listItemNode))
@@ -258,15 +326,23 @@ export function removeList(editor: LexicalEditor): void {
   })
 }
 
+/**
+ * Takes the value of a child ListItemNode and makes it the value the ListItemNode
+ * should be if it isn't already. If only certain children should be updated, they
+ * can be passed optionally in an array.
+ * @param list - The list whose children are updated.
+ * @param children - An array of the children to be updated.
+ */
 export function updateChildrenListItemValue(
   list: ListNode,
   children?: Array<LexicalNode>
 ): void {
   const childrenOrExisting = children || list.getChildren()
+  // console.log(childrenOrExisting)
   if (childrenOrExisting !== undefined) {
     for (let i = 0; i < childrenOrExisting.length; i++) {
       const child = childrenOrExisting[i]
-      if (child && $isTinaListItemNode(child)) {
+      if ($isListItemNode(child)) {
         const prevValue = child.getValue()
         const nextValue = $getListItemValue(child)
 
@@ -278,201 +354,165 @@ export function updateChildrenListItemValue(
   }
 }
 
-export function $handleIndent(listItemNode: TinaListItemNode): void {
-  const parent = listItemNode.getParent()
-  if ($isListNode(parent)) {
-    const replacementList = $createListNode(parent.getListType())
-    console.log(replacementList)
-    replacementList.append(listItemNode)
-    // parent.
-    // listItemNode.replace(replacementList)
-  }
-}
-export function $handleIndent2(listItemNodes: Array<TinaListItemNode>): void {
+/**
+ * Adds an empty ListNode/ListItemNode chain at listItemNode, so as to
+ * create an indent effect. Won't indent ListItemNodes that have a ListNode as
+ * a child, but does merge sibling ListItemNodes if one has a nested ListNode.
+ * @param listItemNode - The ListItemNode to be indented.
+ */
+export function $handleIndent(listItemNode: ListItemNode): void {
   // go through each node and decide where to move it.
   const removed = new Set<NodeKey>()
 
-  listItemNodes.forEach((listItemNode: TinaListItemNode) => {
-    if (isNestedListNode(listItemNode) || removed.has(listItemNode.getKey())) {
-      return
-    }
-
-    const parent = listItemNode.getParent()
-
-    // We can cast both of the below `isNestedListNode` only returns a boolean type instead of a user-defined type guards
-    const nextSibling =
-      listItemNode.getNextSibling<TinaListItemNode>() as TinaListItemNode
-    const previousSibling =
-      listItemNode.getPreviousSibling<TinaListItemNode>() as TinaListItemNode
-    // if there are nested lists on either side, merge them all together.
-
-    if (isNestedListNode(nextSibling) && isNestedListNode(previousSibling)) {
-      const innerList = previousSibling.getFirstChild()
-
-      if ($isListNode(innerList)) {
-        innerList.append(listItemNode)
-        const nextInnerList = nextSibling.getFirstChild()
-
-        if ($isListNode(nextInnerList)) {
-          const children = nextInnerList.getChildren()
-          append(innerList, children)
-          nextSibling.remove()
-          removed.add(nextSibling.getKey())
-        }
-        updateChildrenListItemValue(innerList)
-      }
-    } else if (isNestedListNode(nextSibling)) {
-      // if the TinaListItemNode is next to a nested ListNode, merge them
-      const innerList = nextSibling.getFirstChild()
-
-      if ($isListNode(innerList)) {
-        const firstChild = innerList.getFirstChild()
-
-        if (firstChild !== null) {
-          firstChild.insertBefore(listItemNode)
-        }
-        updateChildrenListItemValue(innerList)
-      }
-    } else if (isNestedListNode(previousSibling)) {
-      const innerList = previousSibling.getFirstChild()
-
-      if ($isListNode(innerList)) {
-        innerList.append(listItemNode)
-        updateChildrenListItemValue(innerList)
-      }
-    } else {
-      // otherwise, we need to create a new nested ListNode
-
-      if ($isListNode(parent)) {
-        const newListItem = $createTinaListItemNode()
-        const newList = $createListNode(parent.getListType())
-        newListItem.append(newList)
-        newList.append(listItemNode)
-
-        if (previousSibling) {
-          previousSibling.insertAfter(newListItem)
-        } else if (nextSibling) {
-          nextSibling.insertBefore(newListItem)
-        } else {
-          parent.append(newListItem)
-        }
-      }
-    }
-
-    if ($isListNode(parent)) {
-      updateChildrenListItemValue(parent)
-    }
-  })
-}
-
-export function $handleOutdent(listItemNodes: Array<TinaListItemNode>): void {
-  // go through each node and decide where to move it.
-
-  listItemNodes.forEach((listItemNode) => {
-    if (isNestedListNode(listItemNode)) {
-      return
-    }
-    const parentList = listItemNode.getParent()
-    const grandparentListItem = parentList ? parentList.getParent() : undefined
-    const greatGrandparentList = grandparentListItem
-      ? grandparentListItem.getParent()
-      : undefined
-    // If it doesn't have these ancestors, it's not indented.
-
-    if (
-      $isListNode(greatGrandparentList) &&
-      $isTinaListItemNode(grandparentListItem) &&
-      $isListNode(parentList)
-    ) {
-      // if it's the first child in it's parent list, insert it into the
-      // great grandparent list before the grandparent
-      const firstChild = parentList ? parentList.getFirstChild() : undefined
-      const lastChild = parentList ? parentList.getLastChild() : undefined
-
-      if (listItemNode.is(firstChild)) {
-        grandparentListItem.insertBefore(listItemNode)
-
-        if (parentList.isEmpty()) {
-          grandparentListItem.remove()
-        }
-        // if it's the last child in it's parent list, insert it into the
-        // great grandparent list after the grandparent.
-      } else if (listItemNode.is(lastChild)) {
-        grandparentListItem.insertAfter(listItemNode)
-
-        if (parentList.isEmpty()) {
-          grandparentListItem.remove()
-        }
-      } else {
-        // otherwise, we need to split the siblings into two new nested lists
-        const listType = parentList.getListType()
-        const previousSiblingsListItem = $createTinaListItemNode()
-        const previousSiblingsList = $createListNode(listType)
-        previousSiblingsListItem.append(previousSiblingsList)
-        listItemNode
-          .getPreviousSiblings()
-          .forEach((sibling) => previousSiblingsList.append(sibling))
-        const nextSiblingsListItem = $createTinaListItemNode()
-        const nextSiblingsList = $createListNode(listType)
-        nextSiblingsListItem.append(nextSiblingsList)
-        append(nextSiblingsList, listItemNode.getNextSiblings())
-        // put the sibling nested lists on either side of the grandparent list item in the great grandparent.
-        grandparentListItem.insertBefore(previousSiblingsListItem)
-        grandparentListItem.insertAfter(nextSiblingsListItem)
-        // replace the grandparent list item (now between the siblings) with the outdented list item.
-        grandparentListItem.replace(listItemNode)
-      }
-      updateChildrenListItemValue(parentList)
-      updateChildrenListItemValue(greatGrandparentList)
-    }
-  })
-}
-
-function maybeIndentOrOutdent(direction: 'indent' | 'outdent'): void {
-  const selection = $getSelection()
-
-  if (!$isRangeSelection(selection)) {
+  if (isNestedListNode(listItemNode) || removed.has(listItemNode.getKey())) {
     return
   }
-  const selectedNodes = selection.getNodes()
-  let listItemNodes: Array<TinaListItemNode | TinaListItemNode> = []
 
-  if (selectedNodes.length === 0) {
-    selectedNodes.push(selection.anchor.getNode())
-  }
+  const parent = listItemNode.getParent()
 
-  if (selectedNodes.length === 1) {
-    // Only 1 node selected. Selection may not contain the ListNodeItem so we traverse the tree to
-    // find whether this is part of a TinaListItemNode
-    const firstNode = selectedNodes[0]
-    if (firstNode) {
-      const nearestListItemNode = findNearestListItemNode(firstNode)
+  // We can cast both of the below `isNestedListNode` only returns a boolean type instead of a user-defined type guards
+  const nextSibling =
+    listItemNode.getNextSibling<ListItemNode>() as ListItemNode
+  const previousSibling =
+    listItemNode.getPreviousSibling<ListItemNode>() as ListItemNode
+  // if there are nested lists on either side, merge them all together.
 
-      if (nearestListItemNode !== null) {
-        listItemNodes = [nearestListItemNode]
+  if (isNestedListNode(nextSibling) && isNestedListNode(previousSibling)) {
+    const innerList = previousSibling.getFirstChild()
+
+    if ($isListNode(innerList)) {
+      innerList.append(listItemNode)
+      const nextInnerList = nextSibling.getFirstChild()
+
+      if ($isListNode(nextInnerList)) {
+        const children = nextInnerList.getChildren()
+        append(innerList, children)
+        nextSibling.remove()
+        removed.add(nextSibling.getKey())
       }
+      updateChildrenListItemValue(innerList)
+    }
+  } else if (isNestedListNode(nextSibling)) {
+    // if the ListItemNode is next to a nested ListNode, merge them
+    const innerList = nextSibling.getFirstChild()
+
+    if ($isListNode(innerList)) {
+      const firstChild = innerList.getFirstChild()
+
+      if (firstChild !== null) {
+        firstChild.insertBefore(listItemNode)
+      }
+      updateChildrenListItemValue(innerList)
+    }
+  } else if (isNestedListNode(previousSibling)) {
+    const innerList = previousSibling.getFirstChild()
+
+    if ($isListNode(innerList)) {
+      innerList.append(listItemNode)
+      updateChildrenListItemValue(innerList)
     }
   } else {
-    listItemNodes = getUniqueListItemNodes(selectedNodes)
-  }
+    // otherwise, we need to create a new nested ListNode
 
-  if (listItemNodes.length > 0) {
-    if (direction === 'indent') {
-      $handleIndent(listItemNodes)
-    } else {
-      $handleOutdent(listItemNodes)
+    if ($isListNode(parent)) {
+      const newListItem = $createListItemNode()
+      const newList = $createListNode(parent.getListType())
+      newListItem.append(newList)
+      newList.append(listItemNode)
+
+      if (previousSibling) {
+        previousSibling.insertAfter(newListItem)
+      } else if (nextSibling) {
+        nextSibling.insertBefore(newListItem)
+      } else {
+        parent.append(newListItem)
+      }
+      // updateChildrenListItemValue(newList)
     }
   }
+
+  if ($isListNode(parent)) {
+    updateChildrenListItemValue(parent)
+  }
 }
 
-export function indentList(): void {
-  maybeIndentOrOutdent('indent')
+/**
+ * Removes an indent by removing an empty ListNode/ListItemNode chain. An indented ListItemNode
+ * has a great grandparent node of type ListNode, which is where the ListItemNode will reside
+ * within as a child.
+ * @param listItemNode - The ListItemNode to remove the indent (outdent).
+ */
+export function $handleOutdent(listItemNode: ListItemNode): void {
+  // go through each node and decide where to move it.
+
+  if (isNestedListNode(listItemNode)) {
+    return
+  }
+  const parentList = listItemNode.getParent()
+  const grandparentListItem = parentList ? parentList.getParent() : undefined
+  const greatGrandparentList = grandparentListItem
+    ? grandparentListItem.getParent()
+    : undefined
+  // If it doesn't have these ancestors, it's not indented.
+
+  if (
+    $isListNode(greatGrandparentList) &&
+    $isListItemNode(grandparentListItem) &&
+    $isListNode(parentList)
+  ) {
+    // if it's the first child in it's parent list, insert it into the
+    // great grandparent list before the grandparent
+    const firstChild = parentList ? parentList.getFirstChild() : undefined
+    const lastChild = parentList ? parentList.getLastChild() : undefined
+
+    if (listItemNode.is(firstChild)) {
+      console.log('yesss')
+      grandparentListItem.insertBefore(listItemNode)
+
+      if (parentList.isEmpty()) {
+        grandparentListItem.remove()
+      }
+      // if it's the last child in it's parent list, insert it into the
+      // great grandparent list after the grandparent.
+    } else if (listItemNode.is(lastChild)) {
+      grandparentListItem.insertAfter(listItemNode)
+
+      if (parentList.isEmpty()) {
+        grandparentListItem.remove()
+      }
+    } else {
+      // otherwise, we need to split the siblings into two new nested lists
+      const listType = parentList.getListType()
+      const previousSiblingsListItem = $createListItemNode()
+      const previousSiblingsList = $createListNode(listType)
+      previousSiblingsListItem.append(previousSiblingsList)
+      listItemNode
+        .getPreviousSiblings()
+        .forEach((sibling) => previousSiblingsList.append(sibling))
+      const nextSiblingsListItem = $createListItemNode()
+      const nextSiblingsList = $createListNode(listType)
+      nextSiblingsListItem.append(nextSiblingsList)
+      append(nextSiblingsList, listItemNode.getNextSiblings())
+      // put the sibling nested lists on either side of the grandparent list item in the great grandparent.
+      grandparentListItem.insertBefore(previousSiblingsListItem)
+      grandparentListItem.insertAfter(nextSiblingsListItem)
+      // replace the grandparent list item (now between the siblings) with the outdented list item.
+      grandparentListItem.replace(listItemNode)
+    }
+    updateChildrenListItemValue(parentList)
+    updateChildrenListItemValue(greatGrandparentList)
+  }
 }
 
-export function outdentList(): void {
-  maybeIndentOrOutdent('outdent')
-}
-
+/**
+ * Attempts to insert a ParagraphNode at selection and selects the new node. The selection must contain a ListItemNode
+ * or a node that does not already contain text. If its grandparent is the root/shadow root, it will get the ListNode
+ * (which should be the parent node) and insert the ParagraphNode as a sibling to the ListNode. If the ListNode is
+ * nested in a ListItemNode instead, it will add the ParagraphNode after the grandparent ListItemNode.
+ * Throws an invariant if the selection is not a child of a ListNode.
+ * @returns true if a ParagraphNode was inserted succesfully, false if there is no selection
+ * or the selection does not contain a ListItemNode or the node already holds text.
+ */
 export function $handleListInsertParagraph(): boolean {
   const selection = $getSelection()
 
@@ -482,7 +522,7 @@ export function $handleListInsertParagraph(): boolean {
   // Only run this code on empty list items
   const anchor = selection.anchor.getNode()
 
-  if (!$isTinaListItemNode(anchor) || anchor.getTextContent() !== '') {
+  if (!$isListItemNode(anchor) || anchor.getTextContent() !== '') {
     return false
   }
   const topListNode = $getTopListNode(anchor)
@@ -490,7 +530,7 @@ export function $handleListInsertParagraph(): boolean {
 
   invariant(
     $isListNode(parent),
-    'A TinaListItemNode must have a ListNode for a parent.'
+    'A ListItemNode must have a ListNode for a parent.'
   )
 
   const grandparent = parent.getParent()
@@ -500,8 +540,8 @@ export function $handleListInsertParagraph(): boolean {
   if ($isRootOrShadowRoot(grandparent)) {
     replacementNode = $createParagraphNode()
     topListNode.insertAfter(replacementNode)
-  } else if ($isTinaListItemNode(grandparent)) {
-    replacementNode = $createTinaListItemNode()
+  } else if ($isListItemNode(grandparent)) {
+    replacementNode = $createListItemNode()
     grandparent.insertAfter(replacementNode)
   } else {
     return false
@@ -516,7 +556,7 @@ export function $handleListInsertParagraph(): boolean {
     if ($isParagraphNode(replacementNode)) {
       replacementNode.insertAfter(newList)
     } else {
-      const newListItem = $createTinaListItemNode()
+      const newListItem = $createListItemNode()
       newListItem.append(newList)
       replacementNode.insertAfter(newListItem)
     }

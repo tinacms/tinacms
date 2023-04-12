@@ -17,7 +17,7 @@ import { initializeUnitTest } from './util'
 
 import { ListItemNode, ListNode } from '@lexical/list/LexicalList.dev'
 import { $createListItemNode, $isListItemNode, TinaListItemNode } from '../..'
-import { expectHtmlToBeEqual, html } from './utils'
+import { expectHtmlToBeEqual, html, prettifyHtml } from './utils'
 import { createEditorConfig } from '../../../lexical'
 import { buildInitialContent } from '../../../builder'
 import { $createListNode } from '@lexical/list'
@@ -110,7 +110,7 @@ describe('LexicalListItemNode tests', () => {
         })
       })
 
-      describe('listItem.setIndent', () => {
+      describe('listItem.setIndent for indenting', () => {
         let listNode: ListNode
         let listItemNode1: TinaListItemNode
         let listItemNode2: TinaListItemNode
@@ -153,105 +153,132 @@ describe('LexicalListItemNode tests', () => {
             )
           })
 
-          expectHtmlToBeEqual(
-            editor.getRootElement()?.innerHTML || '',
-            html`
-              <ul class="ul">
-                <li value="1" class="listitem">
-                  <p class="paragraph ltr" dir="ltr">
-                    <span data-lexical-text="true">one</span>
-                  </p>
-                  <p class="paragraph ltr" dir="ltr">
-                    <span data-lexical-text="true">one sibling</span>
-                  </p>
-                </li>
-                <li value="2" class="listitem">
-                  <p class="paragraph ltr" dir="ltr">
-                    <span data-lexical-text="true">two</span>
-                  </p>
-                </li>
-              </ul>
-            `
-          )
+          expect(
+            prettifyHtml(editor.getRootElement()?.innerHTML || '')
+          ).toMatchFileSnapshot('./snaps/indent2/in.html')
 
           await editor.update(() => {
             listItemNode1Paragraph.setIndent(1)
           })
 
-          expectHtmlToBeEqual(
-            editor.getRootElement()?.innerHTML || '',
-            html`
-              <ul class="ul">
-                <li value="1" class="listitem nested-listitem">
-                  <ul class="ul">
-                    <li value="1" class="listitem">
-                      <p class="paragraph ltr" dir="ltr">
-                        <span data-lexical-text="true">one</span>
-                      </p>
-                      <p class="paragraph ltr" dir="ltr">
-                        <span data-lexical-text="true">one sibling</span>
-                      </p>
-                    </li>
-                  </ul>
-                </li>
-                <li value="2" class="listitem">
-                  <p class="paragraph ltr" dir="ltr">
-                    <span data-lexical-text="true">two</span>
-                  </p>
-                </li>
-              </ul>
-            `
-          )
+          expect(
+            prettifyHtml(editor.getRootElement()?.innerHTML || '')
+          ).toMatchFileSnapshot('./snaps/indent2/out.html')
         })
-        it('indents list items properly 2', async () => {
+        it('indents list items properly', async () => {
           const { editor } = testEnv
           if (!editor) {
             throw new Error(`No editor found`)
           }
 
-          expectHtmlToBeEqual(
-            editor.getRootElement()?.innerHTML || '',
-            html`
-              <ul class="ul">
-                <li value="1" class="listitem">
-                  <p class="paragraph ltr" dir="ltr">
-                    <span data-lexical-text="true">one</span>
-                  </p>
-                </li>
-                <li value="2" class="listitem">
-                  <p class="paragraph ltr" dir="ltr">
-                    <span data-lexical-text="true">two</span>
-                  </p>
-                </li>
-              </ul>
-            `
-          )
+          expect(
+            prettifyHtml(editor.getRootElement()?.innerHTML || '')
+          ).toMatchFileSnapshot('./snaps/indent1/in.html')
 
           await editor.update(() => {
             listItemNode1Paragraph.setIndent(1)
           })
 
-          expectHtmlToBeEqual(
-            editor.getRootElement()?.innerHTML || '',
-            html`
-              <ul class="ul">
-                <li value="1" class="listitem nested-listitem">
-                  <ul class="ul">
-                    <li value="1" class="listitem">
-                      <p class="paragraph ltr" dir="ltr">
-                        <span data-lexical-text="true">one</span>
-                      </p>
-                    </li>
-                  </ul>
-                </li>
-                <li value="2" class="listitem">
-                  <p class="paragraph ltr" dir="ltr">
-                    <span data-lexical-text="true">two</span>
-                  </p>
-                </li>
-              </ul>
-            `
-          )
+          expect(
+            prettifyHtml(editor.getRootElement()?.innerHTML || '')
+          ).toMatchFileSnapshot('./snaps/indent1/out.html')
+        })
+      })
+
+      describe('listItem.setIndent for outdenting', () => {
+        let listNode: ListNode
+        let listItemNode1: TinaListItemNode
+        let nestedListItemParagraph: TinaParagraphNode
+
+        beforeEach(async () => {
+          const { editor } = testEnv
+
+          if (!editor) {
+            throw new Error(`No editor found`)
+          }
+
+          await editor.update(() => {
+            const root = $getRoot()
+            listNode = $createListNode('bullet')
+            root.append(listNode)
+            listItemNode1 = $createListItemNode()
+            listNode.append(listItemNode1)
+            const nestedList = $createListNode('bullet')
+            listItemNode1.append(nestedList)
+            const nestedListItem = $createListItemNode()
+            nestedList.append(nestedListItem)
+            nestedListItemParagraph = $createParagraphNode()
+            nestedListItem.append(nestedListItemParagraph)
+            nestedListItemParagraph.append($createTextNode('nested one'))
+          })
+        })
+        it('outdent list items properly', async () => {
+          const { editor } = testEnv
+          if (!editor) {
+            throw new Error(`No editor found`)
+          }
+
+          expect(
+            prettifyHtml(editor.getRootElement()?.innerHTML || '')
+          ).toMatchFileSnapshot('./snaps/outdent/in.html')
+
+          await editor.update(() => {
+            nestedListItemParagraph.setIndent(0)
+          })
+
+          expect(
+            prettifyHtml(editor.getRootElement()?.innerHTML || '')
+          ).toMatchFileSnapshot('./snaps/outdent/out.html')
+        })
+      })
+
+      describe('listItem.setIndent for outdenting 2', () => {
+        let listNode: ListNode
+        let listItemNode1: TinaListItemNode
+        let nestedListItemParagraph: TinaParagraphNode
+
+        beforeEach(async () => {
+          const { editor } = testEnv
+
+          if (!editor) {
+            throw new Error(`No editor found`)
+          }
+
+          await editor.update(() => {
+            const root = $getRoot()
+            listNode = $createListNode('bullet')
+            root.append(listNode)
+            listItemNode1 = $createListItemNode()
+            listNode.append(listItemNode1)
+            const nestedList = $createListNode('bullet')
+            listItemNode1.append(
+              $createParagraphNode().append($createTextNode('previous sibling'))
+            )
+            listItemNode1.append(nestedList)
+            const nestedListItem = $createListItemNode()
+            nestedList.append(nestedListItem)
+            nestedListItemParagraph = $createParagraphNode()
+            nestedListItem.append(nestedListItemParagraph)
+            nestedListItemParagraph.append($createTextNode('nested one'))
+          })
+        })
+        it.only('outdent list items properly', async () => {
+          const { editor } = testEnv
+          if (!editor) {
+            throw new Error(`No editor found`)
+          }
+
+          expect(
+            prettifyHtml(editor.getRootElement()?.innerHTML || '')
+          ).toMatchFileSnapshot('./snaps/outdent2/in.html')
+
+          await editor.update(() => {
+            nestedListItemParagraph.setIndent(0)
+          })
+
+          expect(
+            prettifyHtml(editor.getRootElement()?.innerHTML || '')
+          ).toMatchFileSnapshot('./snaps/outdent2/out.html')
         })
       })
     },

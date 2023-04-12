@@ -2,7 +2,6 @@ import {
   $createParagraphNode,
   $isTextNode,
   type DOMConversionMap,
-  type EditorConfig,
   type LexicalNode,
   type NodeKey,
 } from 'lexical'
@@ -10,6 +9,7 @@ import {
 import { $applyNodeReplacement } from 'lexical'
 
 import { $createListNode, $isListNode, ListItemNode } from '@lexical/list'
+import { $handleIndent, $handleOutdent } from './format-list'
 
 export class TinaListItemNode extends ListItemNode {
   static override getType(): string {
@@ -64,24 +64,10 @@ export class TinaListItemNode extends ListItemNode {
 
     while (currentIndent !== indent) {
       if (currentIndent < indent) {
-        const parent = this.getParent()
-        if ($isListNode(parent)) {
-          const nestedList = $createListNode(parent.getListType())
-          const nestedListItem = $createTinaListItemNode()
-          const children = this.getChildren()
-          // reparenting the children in the list item which
-          // will be appended. NOTE: this effectively "removes"
-          // these children from the _current_ list item
-          nestedListItem.append(...children)
-          nestedList.append(nestedListItem)
-          this.append(nestedList)
-        } else {
-          throw new Error(
-            `Unexpected node for list item of type ${parent?.__type} (key: ${parent?.__key})`
-          )
-        }
+        $handleIndent(this)
         currentIndent++
       } else {
+        $handleOutdent(this)
         currentIndent--
       }
     }
