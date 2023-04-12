@@ -79,6 +79,8 @@ export async function initStaticTina({
       await forestryMigrate({
         usingTypescript,
         pathToForestryConfig,
+        rootPath,
+        framework,
       })
     if (collectionString) {
       templateCode = templateCodeString
@@ -248,7 +250,11 @@ const chooseFramework = async () => {
 const forestryMigrate = async ({
   pathToForestryConfig,
   usingTypescript,
+  rootPath,
+  framework,
 }: {
+  framework: Framework
+  rootPath: string
   usingTypescript: boolean
   pathToForestryConfig: string
 }) => {
@@ -266,14 +272,21 @@ const forestryMigrate = async ({
   if (!option['selection']) {
     return null
   }
+  let frontMatterFormat = null
+
+  if (framework.name === 'hugo') {
+    frontMatterFormat = await getFrontmatterFormat(rootPath)
+  }
   const { collections, importStatements, templateCode } =
     await generateCollections({
       pathToForestryConfig,
       usingTypescript,
+      frontMatterFormat,
     })
 
   // print errors
-  ErrorSingleton.getInstance().printCollectionNameErrors()
+  // This error is handled now so we do not need to print it
+  // ErrorSingleton.getInstance().printCollectionNameErrors()
   const JSONString = JSON.stringify(collections, null, 2)
 
   const { code } = addVariablesToCode(JSONString)
@@ -283,6 +296,33 @@ const forestryMigrate = async ({
     importStatements,
     templateCodeString: templateCode,
   }
+}
+
+const getFrontmatterFormat = async (rootPath: string) => {
+  try {
+    const hugoConfigPath = path.join(rootPath, 'config.toml')
+    const hugoConfig = await fs.readFile(hugoConfigPath, 'utf8')
+    const frontMatterFormat = hugoConfig.match(/metaDataFormat = "(.*)"/)
+    console.log({ frontMatterFormat })
+    if (frontMatterFormat && frontMatterFormat[1]) {
+      return frontMatterFormat[1] as 'yaml' | 'toml' | 'json'
+    }
+  } catch (e) {}
+
+  const option = await prompts({
+    name: 'selection',
+    type: 'select',
+    choices: [
+      { title: 'yaml', value: 'yaml' },
+      { title: 'toml', value: 'toml' },
+      { title: 'json', value: 'json' },
+    ],
+    message: `What format are you using in your frontmatter?`,
+  })
+  if (!option['selection']) {
+    return null
+  }
+  return option['selection'] as 'yaml' | 'toml' | 'json'
 }
 
 const reportTelemetry = async ({

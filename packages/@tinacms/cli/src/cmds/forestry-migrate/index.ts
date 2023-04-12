@@ -91,7 +91,8 @@ export const generateAllTemplates = async ({
   return templateMap
 }
 
-const generateCollectionFromForestrySection = (
+const generateCollectionFromForestrySection = (args: {
+  frontMatterFormat?: 'yaml' | 'toml' | 'json'
   section: {
     templates?: string[]
     label?: string
@@ -107,7 +108,7 @@ const generateCollectionFromForestrySection = (
     create?: 'all' | 'documents' | 'none'
     new_doc_ext?: string
     read_only?: boolean
-  },
+  }
   templateMap: Map<
     string,
     {
@@ -115,7 +116,8 @@ const generateCollectionFromForestrySection = (
       templateObj: any
     }
   >
-) => {
+}) => {
+  const { section, templateMap } = args
   // TODO: What should we do with read only sections?
   if (section.read_only) return
 
@@ -133,6 +135,12 @@ const generateCollectionFromForestrySection = (
     label: section.label,
     name: stringifyLabel(section.label),
     path: section.path || '/',
+  }
+  if (args.frontMatterFormat) {
+    baseCollection.frontmatterFormat = args.frontMatterFormat
+    if (args.frontMatterFormat === 'toml') {
+      baseCollection.frontmatterDelimiters = '+++'
+    }
   }
   // Add include and exclude if they exist
   if (section.match) {
@@ -335,7 +343,9 @@ const generateCollectionFromForestrySection = (
 export const generateCollections = async ({
   pathToForestryConfig,
   usingTypescript,
+  frontMatterFormat,
 }: {
+  frontMatterFormat?: 'toml' | 'yaml' | 'json'
   pathToForestryConfig: string
   usingTypescript: boolean
 }) => {
@@ -350,13 +360,23 @@ export const generateCollections = async ({
     path.join(pathToForestryConfig, '.forestry', 'settings.yml')
   )
 
-  rewriteTemplateKeysInDocs(templateMap, pathToForestryConfig)
+  rewriteTemplateKeysInDocs({
+    templateMap,
+    markdownParseConfig: {
+      frontmatterFormat: frontMatterFormat,
+      frontmatterDelimiters: frontMatterFormat === 'toml' ? '+++' : undefined,
+    },
+  })
   const collections = parseSections({
     val: yaml.load(forestryConfig.toString()),
   })
     .sections.map(
       (section): Collection =>
-        generateCollectionFromForestrySection(section, templateMap)
+        generateCollectionFromForestrySection({
+          section,
+          templateMap,
+          frontMatterFormat,
+        })
     )
     .filter((c) => c !== undefined)
   return {
@@ -366,16 +386,20 @@ export const generateCollections = async ({
   }
 }
 
-const rewriteTemplateKeysInDocs = (
+const rewriteTemplateKeysInDocs = (args: {
   templateMap: Map<
     string,
     {
       fields: TinaField[]
       templateObj: any
     }
-  >,
-  rootPath: string
-) => {
+  >
+  markdownParseConfig?: {
+    frontmatterFormat?: 'toml' | 'yaml' | 'json'
+    frontmatterDelimiters?: [string, string] | string
+  }
+}) => {
+  const { templateMap, markdownParseConfig } = args
   // Go through all the pages in the template and update  the content to contain _template: ${templateName}
 
   for (const templateKey of templateMap.keys()) {
@@ -391,12 +415,20 @@ const rewriteTemplateKeysInDocs = (
         }
         const extname = path.extname(filePath)
         const fileContent = fs.readFileSync(filePath).toString()
-        const content = parseFile(fileContent, extname, (yup) => yup.object({}))
+        const content = parseFile(
+          fileContent,
+          extname,
+          (yup) => yup.object({}),
+          markdownParseConfig
+        )
         const newContent = {
           _template: stringifyLabel(templateKey),
           ...content,
         }
-        fs.writeFileSync(filePath, stringifyFile(newContent, extname, true))
+        fs.writeFileSync(
+          filePath,
+          stringifyFile(newContent, extname, true, markdownParseConfig)
+        )
       } catch (error) {
         console.log(
           dangerText('Error updating template -> _template in ', page)
