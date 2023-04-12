@@ -67,12 +67,36 @@ const addTypenameToDocument = (doc: G.DocumentNode) => {
   })
 }
 
+const METADATA_FIELD: G.FieldNode = {
+  kind: G.Kind.FIELD,
+  name: {
+    kind: G.Kind.NAME,
+    value: '_metadata',
+  },
+}
+
 const TYPENAME_FIELD: G.FieldNode = {
   kind: G.Kind.FIELD,
   name: {
     kind: G.Kind.NAME,
     value: '__typename',
   },
+}
+
+const addMetadataField = (
+  node: G.FieldNode | G.InlineFragmentNode | G.FragmentDefinitionNode
+): G.ASTNode => {
+  return {
+    ...node,
+    selectionSet: {
+      ...(node.selectionSet || {
+        kind: 'SelectionSet',
+        selections: [],
+      }),
+      selections:
+        [...(node.selectionSet?.selections || []), METADATA_FIELD] || [],
+    },
+  }
 }
 
 const addMetaFieldsToQuery = (
@@ -96,12 +120,51 @@ const addMetaFieldsToQuery = (
   }
 
   const formifyVisitor: G.Visitor<G.ASTKindToNode, G.ASTNode> = {
+    FragmentDefinition: {
+      enter: (node, key, parent, path, ancestors) => {
+        typeInfo.enter(node)
+        const type = typeInfo.getType()
+        if (type) {
+          const namedType = G.getNamedType(type)
+          if (G.isObjectType(namedType)) {
+            if (namedType.getFields()['_metadata']) {
+              return addMetadataField(node)
+            }
+          }
+          return node
+        }
+      },
+    },
+    InlineFragment: {
+      enter: (node, key, parent, path, ancestors) => {
+        typeInfo.enter(node)
+        const type = typeInfo.getType()
+        if (type) {
+          const namedType = G.getNamedType(type)
+          if (G.isObjectType(namedType)) {
+            if (namedType.getFields()['_metadata']) {
+              return addMetadataField(node)
+            }
+          }
+          return node
+        }
+      },
+    },
     Field: {
       enter: (node, key, parent, path, ancestors) => {
         typeInfo.enter(node)
         const type = typeInfo.getType()
-        if (type && isNodeType(type)) {
-          return addMetaFields(node, key, parent, path, ancestors)
+        if (type) {
+          if (isNodeType(type)) {
+            return addMetaFields(node, key, parent, path, ancestors)
+          }
+          const namedType = G.getNamedType(type)
+          if (G.isObjectType(namedType)) {
+            if (namedType.getFields()['_metadata']) {
+              return addMetadataField(node)
+            }
+            return node
+          }
         }
         return node
       },

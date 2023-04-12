@@ -18,47 +18,13 @@ import {
   FormOptions,
 } from 'tinacms'
 import { createForm, createGlobalForm, FormifyCallback } from './build-form'
-
-export type PostMessage = {
-  type: 'open' | 'close' | 'isEditMode'
-  id: string
-  data: object
-}
-
-export type Payload = {
-  id: string
-  query: string
-  variables: object
-  data: object
-}
-
-type SystemInfo = {
-  breadcrumbs: string[]
-  basename: string
-  filename: string
-  path: string
-  extension: string
-  relativePath: string
-  title?: string
-  template: string
-  __typename: string
-  collection: {
-    name: string
-    slug: string
-    label: string
-    path: string
-    format: string
-    matches?: string
-    templates?: object
-    fields?: object
-    __typename: string
-  }
-}
-
-type Document = {
-  _values: Record<string, unknown>
-  _sys: SystemInfo
-}
+import type {
+  PostMessage,
+  Payload,
+  SystemInfo,
+  Document,
+  ResolvedDocument,
+} from './types'
 
 const documentSchema = z.object({
   _internalValues: z.record(z.unknown()),
@@ -69,7 +35,7 @@ const documentSchema = z.object({
     path: z.string(),
     extension: z.string(),
     relativePath: z.string(),
-    // title: z.string().optional(), // Optional isn't working
+    title: z.string().optional().nullable(),
     template: z.string(),
     // __typename: z.string(), // This isn't being populated for some reason
     collection: z.object({
@@ -82,12 +48,41 @@ const documentSchema = z.object({
   }),
 })
 
-type ResolvedDocument = {
-  _values: Record<string, unknown>
-  _sys: SystemInfo
-  _internalValues: Record<string, unknown>
-  _internalSys: SystemInfo
+const astNode = schemaJson as G.DocumentNode
+const astNodeWithMeta: G.DocumentNode = {
+  ...astNode,
+  definitions: astNode.definitions.map((def) => {
+    if (def.kind === 'ObjectTypeDefinition') {
+      return {
+        ...def,
+        fields: [
+          ...(def.fields || []),
+          {
+            kind: 'FieldDefinition',
+            name: {
+              kind: 'Name',
+              value: '_metadata',
+            },
+            arguments: [],
+            type: {
+              kind: 'NonNullType',
+              type: {
+                kind: 'NamedType',
+                name: {
+                  kind: 'Name',
+                  value: 'JSON',
+                },
+              },
+            },
+          },
+        ],
+      }
+    }
+    return def
+  }),
 }
+const schema = G.buildASTSchema(astNode)
+const schemaForResolver = G.buildASTSchema(astNodeWithMeta)
 
 export const useGraphQLReducer = (
   iframe: React.MutableRefObject<HTMLIFrameElement>
@@ -102,8 +97,12 @@ export const useGraphQLReducer = (
       return
     }
     const { query, variables } = payload
-    const astNode = schemaJson as G.DocumentNode
-    const schema = G.buildASTSchema(astNode)
+
+    /**
+     * First we grab the query from the payload and expand it so it includes
+     * information we'll need. Specifically the _sys and _value info used
+     * for building forms
+     */
     const documentNode = G.parse(query)
     const expandedDocumentNode = expandQuery({ schema, documentNode })
     const expandedQuery = G.print(expandedDocumentNode)
@@ -111,9 +110,14 @@ export const useGraphQLReducer = (
       variables,
     })
 
+    const expandedDocumentNodeForResolver = expandQuery({
+      schema: schemaForResolver,
+      documentNode,
+    })
+    const expandedQueryForResolver = G.print(expandedDocumentNodeForResolver)
     const result = await G.graphql({
-      schema,
-      source: expandedQuery,
+      schema: schemaForResolver,
+      source: expandedQueryForResolver,
       variableValues: variables,
       rootValue: expandedData,
       fieldResolver: async function (source, args, context, info) {
@@ -146,6 +150,17 @@ export const useGraphQLReducer = (
         }
         if (fieldName === '_values') {
           return source._internalValues
+        }
+        if (info.fieldName === '_metadata') {
+          if (value) {
+            return value
+          }
+          // TODO: ensure all fields that have _metadata
+          // actually need it
+          return {
+            id: null,
+            fields: [],
+          }
         }
         if (isNodeType(info.returnType)) {
           let doc: Document
@@ -346,6 +361,8 @@ const onSubmit = async (
   }
 }
 
+type Path = (string | number)[]
+
 const resolveDocument = (
   doc: Document,
   template: Template<true>,
@@ -353,15 +370,27 @@ const resolveDocument = (
 ): ResolvedDocument => {
   // @ts-ignore AnyField and TinaField don't mix
   const fields = form.fields as TinaField<true>[]
+  const path: Path = []
   const formValues = resolveFormValue({
     fields: fields,
     values: form.values,
+    path,
+    id: doc._sys.path,
   })
+  const metadataFields: Record<string, string> = {}
+  Object.keys(formValues).forEach((key) => {
+    metadataFields[key] = [...path, key].join('.')
+  })
+
   return {
     ...formValues,
     id: doc._sys.path,
     sys: doc._sys,
     values: form.values,
+    _metadata: {
+      id: doc._sys.path,
+      fields: metadataFields,
+    },
     _internalSys: doc._sys,
     _internalValues: doc._values,
     __typename: NAMER.dataTypeName(template.namespace),
@@ -371,10 +400,14 @@ const resolveDocument = (
 const resolveFormValue = <T extends Record<string, unknown>>({
   fields,
   values,
+  path,
+  id,
 }: // tinaSchema,
 {
   fields: TinaField<true>[]
   values: T
+  path: Path
+  id: string
   // tinaSchema: TinaSchema
 }): T & { __typename?: string } => {
   const accum: Record<string, unknown> = {}
@@ -389,7 +422,8 @@ const resolveFormValue = <T extends Record<string, unknown>>({
     accum[field.name] = resolveFieldValue({
       field,
       value: v,
-      // tinaSchema,
+      path,
+      id,
     })
   })
   return accum as T & { __typename?: string }
@@ -397,25 +431,40 @@ const resolveFormValue = <T extends Record<string, unknown>>({
 const resolveFieldValue = ({
   field,
   value,
+  path,
+  id,
 }: {
   field: TinaField<true>
   value: unknown
+  path: Path
+  id: string
 }) => {
   switch (field.type) {
     case 'object': {
       if (field.templates) {
         if (field.list) {
           if (Array.isArray(value)) {
-            return value.map((item) => {
+            return value.map((item, index) => {
               const template = field.templates[item._template]
               if (typeof template === 'string') {
                 throw new Error('Global templates not supported')
               }
+              const nextPath = [...path, field.name, index]
+              const metadataFields: Record<string, string> = {}
+              template.fields.forEach((field) => {
+                metadataFields[field.name] = [...nextPath, field.name].join('.')
+              })
               return {
                 __typename: NAMER.dataTypeName(template.namespace),
+                _metadata: {
+                  id,
+                  fields: metadataFields,
+                },
                 ...resolveFormValue({
                   fields: template.fields,
                   values: item,
+                  path: nextPath,
+                  id,
                 }),
               }
             })
@@ -434,22 +483,44 @@ const resolveFieldValue = ({
       }
       if (field.list) {
         if (Array.isArray(value)) {
-          return value.map((item) => {
+          return value.map((item, index) => {
+            const nextPath = [...path, field.name, index]
+            const metadataFields: Record<string, string> = {}
+            templateFields.forEach((field) => {
+              metadataFields[field.name] = [...nextPath, field.name].join('.')
+            })
             return {
               __typename: NAMER.dataTypeName(field.namespace),
+              _metadata: {
+                id,
+                fields: metadataFields,
+              },
               ...resolveFormValue({
                 fields: templateFields,
                 values: item,
+                path,
+                id,
               }),
             }
           })
         }
       } else {
+        const nextPath = [...path, field.name]
+        const metadataFields: Record<string, string> = {}
+        templateFields.forEach((field) => {
+          metadataFields[field.name] = [...nextPath, field.name].join('.')
+        })
         return {
           __typename: NAMER.dataTypeName(field.namespace),
+          _metadata: {
+            id,
+            fields: metadataFields,
+          },
           ...resolveFormValue({
             fields: templateFields,
             values: value as any,
+            path,
+            id,
           }),
         }
       }

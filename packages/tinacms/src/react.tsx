@@ -55,18 +55,18 @@ export function useEditState(): { edit: boolean } {
  */
 export const tinaField = <
   T extends object & {
-    __meta__?: { id: string; name?: string; fields: Record<string, string> }
+    _metadata?: { id: string; name?: string; fields: Record<string, string> }
   }
 >(
   obj: T,
   field?: keyof Omit<T, '__typename' | '_sys'>
 ) => {
   if (!field) {
-    return `${obj.__meta__?.id}#${obj.__meta__?.name}`
+    return `${obj._metadata?.id}#${obj._metadata?.name}`
   }
-  if (obj?.__meta__) {
+  if (obj?._metadata) {
     if (typeof field === 'string') {
-      return `${obj.__meta__?.id}#${obj.__meta__.fields[field]}`
+      return `${obj._metadata?.id}#${obj._metadata.fields[field]}`
     }
   }
   return ''
