@@ -15,7 +15,9 @@ import {
   Template,
   TinaField,
   Client,
+  FormOptions,
 } from 'tinacms'
+import { createForm, createGlobalForm, FormifyCallback } from './build-form'
 
 export type PostMessage = {
   type: 'open' | 'close' | 'isEditMode'
@@ -173,10 +175,11 @@ export const useGraphQLReducer = (
             data: doc._values,
             collection,
           })
-          let form: Form
           const existingForm = cms.forms.find(doc._sys.path)
+          let form: Form | undefined
+          let shouldRegisterForm = true
           if (!existingForm) {
-            form = new Form({
+            const formConfig: FormOptions<any> = {
               id: doc._sys.path,
               initialValues: doc._values,
               fields: template.fields.map((field) =>
@@ -186,17 +189,46 @@ export const useGraphQLReducer = (
                 onSubmit(collection, doc._sys.relativePath, payload, cms),
               label: collection.label || collection.name,
               queries: [payload.id],
-            })
-            form.subscribe(
-              () => {
-                setOperationIndex((index) => index + 1)
-              },
-              { values: true }
-            )
-            cms.forms.add(form)
+            }
+            if (tinaSchema.config.config?.formifyCallback) {
+              const callback = tinaSchema.config.config
+                ?.formifyCallback as FormifyCallback
+              form =
+                callback(
+                  {
+                    createForm: createForm,
+                    createGlobalForm: createGlobalForm,
+                    skip: () => {},
+                    formConfig,
+                  },
+                  cms
+                ) || undefined
+              if (!form) {
+                // If the form isn't created from formify, we still
+                // need it, just don't show it to the user.
+                shouldRegisterForm = false
+                form = new Form(formConfig)
+              }
+            } else {
+              form = new Form(formConfig)
+            }
+            if (form) {
+              if (shouldRegisterForm) {
+                form.subscribe(
+                  () => {
+                    setOperationIndex((index) => index + 1)
+                  },
+                  { values: true }
+                )
+                cms.forms.add(form)
+              }
+            }
           } else {
             form = existingForm
             form.addQuery(payload.id)
+          }
+          if (!form) {
+            throw new Error(`No form registered for ${doc._sys.path}.`)
           }
           return resolveDocument(doc, template, form)
         }
@@ -204,11 +236,12 @@ export const useGraphQLReducer = (
       },
     })
     if (result.errors) {
+      cms.alerts.error('There was a problem building forms for your query')
       result.errors.forEach((error) => {
         if (error instanceof ZodError) {
           console.log(error.format())
         } else {
-          console.log(error)
+          console.error(error)
         }
       })
     } else {
@@ -241,6 +274,9 @@ export const useGraphQLReducer = (
       if (event.data.type === 'close') {
         const payloadSchema = z.object({ id: z.string() })
         const { id } = payloadSchema.parse(event.data)
+        setPayloads((previous) =>
+          previous.filter((payload) => payload.id !== id)
+        )
         cms.forms.all().map((form) => {
           form.removeQuery(id)
         })

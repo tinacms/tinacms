@@ -182,6 +182,10 @@ export class TinaCMS extends CMS {
     })
   }
 
+  /**
+   * When a form is associated with any queries
+   * it's considered orphaned.
+   */
   removeOrphanedForms() {
     const orphanedForms = this.forms
       .all()
