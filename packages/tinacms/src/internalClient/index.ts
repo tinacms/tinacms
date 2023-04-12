@@ -226,7 +226,7 @@ export class Client {
       }
     )
     this.clientId = options.clientId
-
+    console.log({ tokenStorage })
     switch (tokenStorage) {
       case 'LOCAL_STORAGE':
         this.getToken = async function () {
@@ -385,7 +385,9 @@ mutation addPendingDocumentMutation(
     query: ((gqlTag: typeof gql) => DocumentNode) | string,
     { variables }: { variables: object }
   ): Promise<ReturnType> {
+    console.log('request')
     const token = await this.getToken()
+    console.log({ token })
     const headers = {
       'Content-Type': 'application/json',
     }
@@ -570,6 +572,8 @@ mutation addPendingDocumentMutation(
   ): Promise<Response> {
     const headers = init?.headers || {}
     const token = await this.getToken()
+    console.log('fetchWithToken')
+    console.log({ token })
     if (token?.id_token) {
       headers['Authorization'] = 'Bearer ' + token.id_token
     }
