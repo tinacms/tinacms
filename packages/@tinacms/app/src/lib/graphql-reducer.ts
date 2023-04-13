@@ -64,7 +64,7 @@ const astNodeWithMeta: G.DocumentNode = {
             kind: 'FieldDefinition',
             name: {
               kind: 'Name',
-              value: '_metadata',
+              value: '_tina_metadata',
             },
             arguments: [],
             type: {
@@ -188,11 +188,11 @@ export const useGraphQLReducer = (
           if (fieldName === '_values') {
             return source._internalValues
           }
-          if (info.fieldName === '_metadata') {
+          if (info.fieldName === '_tina_metadata') {
             if (value) {
               return value
             }
-            // TODO: ensure all fields that have _metadata
+            // TODO: ensure all fields that have _tina_metadata
             // actually need it
             return {
               id: null,
@@ -412,7 +412,7 @@ const resolveDocument = (
     id,
     sys: doc._internalSys,
     values: form.values,
-    _metadata: {
+    _tina_metadata: {
       id: doc._internalSys.path,
       fields: metadataFields,
     },
@@ -481,7 +481,7 @@ const resolveFieldValue = ({
               })
               return {
                 __typename: NAMER.dataTypeName(template.namespace),
-                _metadata: {
+                _tina_metadata: {
                   id,
                   fields: metadataFields,
                 },
@@ -516,7 +516,7 @@ const resolveFieldValue = ({
             })
             return {
               __typename: NAMER.dataTypeName(field.namespace),
-              _metadata: {
+              _tina_metadata: {
                 id,
                 fields: metadataFields,
               },
@@ -537,7 +537,7 @@ const resolveFieldValue = ({
         })
         return {
           __typename: NAMER.dataTypeName(field.namespace),
-          _metadata: {
+          _tina_metadata: {
             id,
             fields: metadataFields,
           },

@@ -71,7 +71,7 @@ const METADATA_FIELD: G.FieldNode = {
   kind: G.Kind.FIELD,
   name: {
     kind: G.Kind.NAME,
-    value: '_metadata',
+    value: '_tina_metadata',
   },
 }
 
@@ -127,7 +127,7 @@ const addMetaFieldsToQuery = (
         if (type) {
           const namedType = G.getNamedType(type)
           if (G.isObjectType(namedType)) {
-            if (namedType.getFields()['_metadata']) {
+            if (namedType.getFields()['_tina_metadata']) {
               return addMetadataField(node)
             }
           }
@@ -142,7 +142,7 @@ const addMetaFieldsToQuery = (
         if (type) {
           const namedType = G.getNamedType(type)
           if (G.isObjectType(namedType)) {
-            if (namedType.getFields()['_metadata']) {
+            if (namedType.getFields()['_tina_metadata']) {
               return addMetadataField(node)
             }
           }
@@ -160,7 +160,7 @@ const addMetaFieldsToQuery = (
           }
           const namedType = G.getNamedType(type)
           if (G.isObjectType(namedType)) {
-            if (namedType.getFields()['_metadata']) {
+            if (namedType.getFields()['_tina_metadata']) {
               return addMetadataField(node)
             }
             return node
