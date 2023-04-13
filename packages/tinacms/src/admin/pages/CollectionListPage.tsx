@@ -623,60 +623,6 @@ const CollectionListPage = () => {
                                 </form>
                               </>
                             )}
-
-                            <div className="flex flex-col gap-2 items-start">
-                              <label className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal">
-                                Search In
-                              </label>
-                              <div
-                                className={`grow-0 flex justify-between rounded-md divide-x divide-gray-150	border border-gray-150`}
-                              >
-                                <button
-                                  className={`${
-                                    toggleClasses.base
-                                  } px-2.5 rounded-l-md ${
-                                    folderView
-                                      ? toggleClasses.active
-                                      : toggleClasses.inactive
-                                  }`}
-                                  onClick={() => {
-                                    navigate(
-                                      `/${[
-                                        'collections',
-                                        collectionName,
-                                        '~',
-                                      ].join('/')}`,
-                                      { replace: true }
-                                    )
-                                  }}
-                                >
-                                  <BiFolder className="w-5 h-full opacity-70" />{' '}
-                                  Folder
-                                </button>
-                                <button
-                                  className={`${
-                                    toggleClasses.base
-                                  } px-2.5 rounded-r-md ${
-                                    !folderView
-                                      ? toggleClasses.active
-                                      : toggleClasses.inactive
-                                  }`}
-                                  onClick={() => {
-                                    navigate(
-                                      `/${[
-                                        'collections',
-                                        collectionName,
-                                        '',
-                                      ].join('/')}`,
-                                      { replace: true }
-                                    )
-                                  }}
-                                >
-                                  <BiListUl className="w-6 h-full opacity-70" />{' '}
-                                  All
-                                </button>
-                              </div>
-                            </div>
                           </div>
                         </div>
                         <div className="flex self-end	justify-self-end">
@@ -744,7 +690,7 @@ const CollectionListPage = () => {
                                           <BiFolder className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
                                           <span className="truncate block">
                                             <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                              Folder Name
+                                              Name
                                             </span>
                                             <span className="h-5 leading-5 block truncate">
                                               <span>{document.node.name}</span>
