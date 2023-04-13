@@ -390,6 +390,8 @@ mutation addPendingDocumentMutation(
     }
     if (token?.id_token) {
       headers['Authorization'] = 'Bearer ' + token.id_token
+    } else {
+      throw new Error('Authentication required')
     }
     const res = await fetch(this.contentApiUrl, {
       method: 'POST',
@@ -571,6 +573,8 @@ mutation addPendingDocumentMutation(
     const token = await this.getToken()
     if (token?.id_token) {
       headers['Authorization'] = 'Bearer ' + token.id_token
+    } else {
+      throw new Error('Authentication required')
     }
     return await fetch(input, {
       ...init,
