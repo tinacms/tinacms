@@ -226,6 +226,7 @@ export class Client {
       }
     )
     this.clientId = options.clientId
+
     switch (tokenStorage) {
       case 'LOCAL_STORAGE':
         this.getToken = async function () {
@@ -385,17 +386,15 @@ mutation addPendingDocumentMutation(
     { variables }: { variables: object }
   ): Promise<ReturnType> {
     const token = await this.getToken()
-    const headers = {
-      'Content-Type': 'application/json',
-    }
-    if (token?.id_token) {
-      headers['Authorization'] = 'Bearer ' + token.id_token
-    } else {
+    if (!token?.id_token) {
       throw new Error('Authentication required')
     }
     const res = await fetch(this.contentApiUrl, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token?.id_token,
+      },
       body: JSON.stringify({
         query: typeof query === 'function' ? print(query(gql)) : query,
         variables,
@@ -571,14 +570,13 @@ mutation addPendingDocumentMutation(
   ): Promise<Response> {
     const headers = init?.headers || {}
     const token = await this.getToken()
-    if (token?.id_token) {
-      headers['Authorization'] = 'Bearer ' + token.id_token
-    } else {
+    if (!token?.id_token) {
       throw new Error('Authentication required')
     }
     return await fetch(input, {
       ...init,
       headers: new Headers({
+        Authorization: 'Bearer ' + token?.id_token,
         ...headers,
       }),
     })
