@@ -1,5 +1,18 @@
 # tinacms-cli
 
+## 1.5.6
+
+### Patch Changes
+
+- 65d53d5b9: Handle frontmatter format in forestry migration
+- e7e11c624: Fix issue with windows paths not getting converted in config-manager
+- Updated dependencies [65d53d5b9]
+- Updated dependencies [40d15644f]
+- Updated dependencies [a6786cc73]
+  - @tinacms/graphql@1.4.7
+  - @tinacms/datalayer@1.2.7
+  - @tinacms/app@1.2.6
+
 ## 1.5.5
 
 ### Patch Changes
