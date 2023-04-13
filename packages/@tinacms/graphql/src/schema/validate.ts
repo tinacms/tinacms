@@ -162,12 +162,9 @@ const validateCollection = async (
           `Collection's "name" must match ${obj.regex} at ${messageName}`,
       })
       .required(),
-    path: yup
-      .string()
-      .required()
-      .transform((value) => {
-        return value.replace(/^\/|\/$/g, '')
-      }),
+    path: yup.string().transform((value) => {
+      return value.replace(/^\/|\/$/g, '')
+    }),
   })
   await collectionSchema.validate(collection)
   const validCollection = (await collectionSchema.cast(

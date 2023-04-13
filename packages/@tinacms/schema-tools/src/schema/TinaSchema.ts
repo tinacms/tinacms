@@ -119,9 +119,9 @@ export class TinaSchema {
           return false
         }
       }
-      return filepath
-        .replace(/\\/g, '/')
-        .startsWith(collection.path.replace(/\/?$/, '/'))
+      // add / to the end of the path if it is not "''"
+      const path = collection.path ? collection.path.replace(/\/?$/, '/') : ''
+      return filepath.replace(/\\/g, '/').startsWith(path)
     })
 
     // No matches
@@ -452,14 +452,15 @@ export class TinaSchema {
         ? this.getCollection(collectionOrString)
         : collectionOrString
     const normalPath = normalizePath(collection.path)
+    const slash = normalPath ? '/' : ''
     const format = collection.format || 'md'
     const matches: string[] = []
     if (collection?.match?.include) {
-      const match = `${normalPath}/${collection.match.include}.${format}`
+      const match = `${normalPath}${slash}${collection.match.include}.${format}`
       matches.push(match)
     }
     if (collection?.match?.exclude) {
-      const exclude = `!(${normalPath}/${collection.match.exclude}.${format})`
+      const exclude = `!(${normalPath}${slash}${collection.match.exclude}.${format})`
       matches.push(exclude)
     }
     return matches
