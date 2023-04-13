@@ -271,13 +271,15 @@ export class ConfigManager {
   }
   printRelativePath(filename: string) {
     if (filename) {
-      return filename.replace(`${this.rootPath}/`, '')
+      return filename.replace(/\\/g, '/').replace(`${this.rootPath}/`, '')
     }
     throw `No path provided to print`
   }
   printContentRelativePath(filename: string) {
     if (filename) {
-      return filename.replace(`${this.contentRootPath}/`, '')
+      return filename
+        .replace(/\\/g, '/')
+        .replace(`${this.contentRootPath}/`, '')
     }
     throw `No path provided to print`
   }

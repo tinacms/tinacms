@@ -104,17 +104,12 @@ export class TinaSchema {
     )
   }
   public getCollectionByFullPath = (filepath: string) => {
-    console.log('getCollectionByFullPath', filepath)
     const fileExtension = filepath.split('.').pop()
-    console.log({ fileExtension })
 
     const collections = this.getCollections()
-    console.log('found', collections.length, 'collections')
     const possibleCollections = collections.filter((collection) => {
-      console.log(collection.path, collection.format)
       // filter out file extensions that don't match the collection format
       if (fileExtension !== (collection.format || 'md')) {
-        console.log('extension mismatch')
         return false
       }
       if (collection?.match?.include || collection?.match?.exclude) {
@@ -122,7 +117,6 @@ export class TinaSchema {
         const matches = this.getMatches({ collection })
         const match = micromatch([filepath], matches).length > 0
         if (!match) {
-          console.log('match mismatch')
           return false
         }
       }
@@ -130,7 +124,6 @@ export class TinaSchema {
         .replace(/\\/g, '/')
         .startsWith(collection.path.replace(/\/?$/, '/'))
     })
-    console.log({ possibleCollections })
 
     // No matches
     if (possibleCollections.length === 0) {
