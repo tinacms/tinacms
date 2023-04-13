@@ -162,9 +162,17 @@ const validateCollection = async (
           `Collection's "name" must match ${obj.regex} at ${messageName}`,
       })
       .required(),
-    path: yup.string().transform((value) => {
-      return value.replace(/^\/|\/$/g, '')
-    }),
+    path: yup
+      .string()
+      .test('is-required', 'This field is required', (value) => {
+        if (value === '') {
+          return true
+        }
+        return yup.string().required().isValidSync(value)
+      })
+      .transform((value) => {
+        return value.replace(/^\/|\/$/g, '')
+      }),
   })
   await collectionSchema.validate(collection)
   const validCollection = (await collectionSchema.cast(
