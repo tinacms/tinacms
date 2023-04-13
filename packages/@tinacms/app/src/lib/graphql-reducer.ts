@@ -199,10 +199,10 @@ export const useGraphQLReducer = (
               fields: [],
             }
           }
-          if (!value) {
-            return
-          }
           if (isNodeType(info.returnType)) {
+            if (!value) {
+              return
+            }
             let resolvedDocument: ResolvedDocument
             // This is a reference from another form
             if (typeof value === 'string') {
@@ -276,9 +276,9 @@ export const useGraphQLReducer = (
             ])
           } else {
             console.log(error)
-            cms.alerts.error(
-              `Error processing value change, please contact support`
-            )
+            // throw new Error(
+            //   `Error processing value change, please contact support`
+            // )
           }
         })
       } else {
@@ -287,6 +287,24 @@ export const useGraphQLReducer = (
           id: payload.id,
           data: result.data,
         })
+
+        // This can be improved, for now we just need something to test with
+        const elements =
+          iframe.current?.contentWindow?.document.querySelectorAll<HTMLElement>(
+            `[data-tinafield]`
+          )
+        if (elements) {
+          for (let i = 0; i < elements.length; i++) {
+            const el = elements[i]
+            el.onclick = () => {
+              const tinafield = el.getAttribute('data-tinafield')
+              cms.events.dispatch({
+                type: 'field:selected',
+                value: tinafield,
+              })
+            }
+          }
+        }
       }
     },
     [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
