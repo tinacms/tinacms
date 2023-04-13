@@ -208,11 +208,6 @@ const CollectionListPage = () => {
       booleanEquals: null,
     }))
   }, [collectionName])
-  const toggleClasses = {
-    base: 'relative whitespace-nowrap flex gap-1.5 items-center justify-center flex-1 block font-medium text-base py-2 transition-all ease-out duration-150 ',
-    active: 'bg-white text-blue-500 shadow-inner',
-    inactive: 'bg-gray-50 text-gray-400 shadow',
-  }
 
   return (
     <GetCMS>
@@ -658,17 +653,21 @@ const CollectionListPage = () => {
                         {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
-                              {folder.name && (
-                                <tr>
-                                  <td colSpan={5}>
-                                    <Breadcrumb
-                                      folder={folder}
-                                      navigate={navigate}
-                                      collectionName={collectionName}
-                                    />
-                                  </td>
-                                </tr>
-                              )}
+                              {(vars.startsWith ||
+                                vars.after ||
+                                vars.before ||
+                                vars.booleanEquals) &&
+                                folder.name && (
+                                  <tr>
+                                    <td colSpan={5}>
+                                      <Breadcrumb
+                                        folder={folder}
+                                        navigate={navigate}
+                                        collectionName={collectionName}
+                                      />
+                                    </td>
+                                  </tr>
+                                )}
                               {documents.map((document) => {
                                 if (document.node.__typename === 'Folder') {
                                   return (
