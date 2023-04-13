@@ -386,15 +386,15 @@ mutation addPendingDocumentMutation(
     { variables }: { variables: object }
   ): Promise<ReturnType> {
     const token = await this.getToken()
-    if (!token?.id_token) {
-      throw new Error('Authentication required')
+    const headers = {
+      'Content-Type': 'application/json',
+    }
+    if (token?.id_token) {
+      headers['Authorization'] = 'Bearer ' + token?.id_token
     }
     const res = await fetch(this.contentApiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token?.id_token,
-      },
+      headers,
       body: JSON.stringify({
         query: typeof query === 'function' ? print(query(gql)) : query,
         variables,
