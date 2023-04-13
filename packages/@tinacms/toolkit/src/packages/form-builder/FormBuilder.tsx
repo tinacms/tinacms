@@ -425,11 +425,6 @@ const getFieldGroup = ({
   fieldName,
   values,
   prefix,
-}: {
-  form: Form
-  fieldName?: string
-  values: object
-  prefix: string[]
 }): { fieldGroup: Field[]; path: string[] } | undefined => {
   if (!fieldName) {
     return { fieldGroup: form.fields, path: prefix }
