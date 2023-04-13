@@ -49,7 +49,7 @@ export const PageHeader = ({
       {isLocalMode && <LocalWarning />}
       {!isLocalMode && <BillingWarning />}
 
-      <div className="pt-12 px-12">
+      <div className="pt-12 px-4 lg:px-8 xl:px-12">
         <div className="w-full mx-auto max-w-screen-xl">
           <div className="w-full flex justify-between items-end">
             {children}
@@ -64,14 +64,14 @@ export const PageBody = ({
   children,
 }: {
   children: React.ReactChild | React.ReactChildren
-}) => <div className="py-8 px-12">{children}</div>
+}) => <div className="py-8 px-4 lg:px-8 xl:px-12">{children}</div>
 
 export const PageBodyNarrow = ({
   children,
 }: {
   children: React.ReactChild | React.ReactChildren
 }) => (
-  <div className="py-10 px-12">
+  <div className="py-10 px-4 lg:px-8 xl:px-12">
     <div className="w-full mx-auto max-w-screen-xl">{children}</div>
   </div>
 )

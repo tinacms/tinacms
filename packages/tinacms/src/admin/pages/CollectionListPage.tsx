@@ -627,7 +627,7 @@ const CollectionListPage = () => {
                       </div>
                     </PageHeader>
                     <PageBody>
-                      <div className="w-full mx-auto max-w-screen-xl">
+                      <div className="@container w-full mx-auto max-w-screen-xl">
                         {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
@@ -643,9 +643,13 @@ const CollectionListPage = () => {
                                 return (
                                   <tr
                                     key={`document-${document.node._sys.relativePath}`}
-                                    className=""
+                                    className={`grid grid-rows-2 ${
+                                      hasTitle
+                                        ? 'grid-cols-4 grid-cols-[repeat(3,_1fr)_32px]'
+                                        : 'grid-cols-3 grid-cols-[repeat(2,_1fr)_32px]'
+                                    } justify-items-stretch p-2 @xl:p-0 @xl:table-row`}
                                   >
-                                    <td className="pl-5 pr-3 py-2 truncate max-w-0">
+                                    <td className="col-span-4 px-1 @xl:px-3 @xl:pl-5 @xl:pr-3 py-1 @xl:py-3 truncate @xl:max-w-0">
                                       <a
                                         className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate"
                                         onClick={() => {
@@ -679,8 +683,8 @@ const CollectionListPage = () => {
                                       </a>
                                     </td>
                                     {hasTitle && (
-                                      <td className="px-3 py-4 truncate max-w-0 ">
-                                        <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                      <td className="px-1 @xl:px-3 py-1 @xl:py-3 truncate @xl:max-w-0 ">
+                                        <span className="block text-xs text-gray-400 mb-1 uppercase truncate">
                                           Filename
                                         </span>
                                         <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
@@ -695,23 +699,23 @@ const CollectionListPage = () => {
                                         </span>
                                       </td>
                                     )}
-                                    <td className="px-3 py-4 truncate w-[15%]">
-                                      <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                    <td className="px-1 @xl:px-3 py-1 @xl:py-3 truncate @xl:w-[15%]">
+                                      <span className="block text-xs text-gray-400 mb-1 uppercase truncate">
                                         Extension
                                       </span>
-                                      <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                      <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
                                         {document.node._sys.extension}
                                       </span>
                                     </td>
-                                    <td className="px-3 py-4 truncate w-[15%]">
-                                      <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                    <td className="px-1 @xl:px-3 py-1 @xl:py-3 truncate @xl:w-[15%]">
+                                      <span className="block text-xs text-gray-400 mb-1 uppercase truncate">
                                         Template
                                       </span>
-                                      <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                      <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
                                         {document.node._sys.template}
                                       </span>
                                     </td>
-                                    <td className="w-0">
+                                    <td className="@xl:w-0 grow-0 shrink-0">
                                       <OverflowMenu
                                         toolbarItems={[
                                           {
