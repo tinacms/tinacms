@@ -288,23 +288,24 @@ export const useGraphQLReducer = (
           data: result.data,
         })
 
+        // WIP for testing reverse active field
         // This can be improved, for now we just need something to test with
-        const elements =
-          iframe.current?.contentWindow?.document.querySelectorAll<HTMLElement>(
-            `[data-tinafield]`
-          )
-        if (elements) {
-          for (let i = 0; i < elements.length; i++) {
-            const el = elements[i]
-            el.onclick = () => {
-              const tinafield = el.getAttribute('data-tinafield')
-              cms.events.dispatch({
-                type: 'field:selected',
-                value: tinafield,
-              })
-            }
-          }
-        }
+        // const elements =
+        //   iframe.current?.contentWindow?.document.querySelectorAll<HTMLElement>(
+        //     `[data-tinafield]`
+        //   )
+        // if (elements) {
+        //   for (let i = 0; i < elements.length; i++) {
+        //     const el = elements[i]
+        //     el.onclick = () => {
+        //       const tinafield = el.getAttribute('data-tinafield')
+        //       cms.events.dispatch({
+        //         type: 'field:selected',
+        //         value: tinafield,
+        //       })
+        //     }
+        //   }
+        // }
       }
     },
     [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
