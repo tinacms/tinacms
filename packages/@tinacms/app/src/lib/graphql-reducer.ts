@@ -199,6 +199,9 @@ export const useGraphQLReducer = (
               fields: [],
             }
           }
+          if (!value) {
+            return
+          }
           if (isNodeType(info.returnType)) {
             let resolvedDocument: ResolvedDocument
             // This is a reference from another form
@@ -272,7 +275,10 @@ export const useGraphQLReducer = (
               id,
             ])
           } else {
-            cms.alerts.error(error.message)
+            console.log(error)
+            cms.alerts.error(
+              `Error processing value change, please contact support`
+            )
           }
         })
       } else {
