@@ -4,7 +4,7 @@
 
 import * as React from 'react'
 import { FC, useEffect } from 'react'
-import { Form } from '../forms'
+import { Field, Form } from '../forms'
 import { Form as FinalForm } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
@@ -22,6 +22,7 @@ export interface FormBuilderProps {
   form: Form
   hideFooter?: boolean
   label?: string
+  setActiveFormId?: (id: string) => void
   onPristineChange?: (_pristine: boolean) => unknown
 }
 
@@ -84,8 +85,12 @@ const FormKeyBindings: FC<FormKeyBindingsProps> = ({ onSubmit }) => {
 export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
   onPristineChange,
+  setActiveFormId,
   ...rest
 }) => {
+  const [activeFieldName, setActiveFieldName] = React.useState<string | null>(
+    null
+  )
   const hideFooter = !!rest.hideFooter
   /**
    * > Why is a `key` being set when this isn't an array?
@@ -103,6 +108,21 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   React.useEffect(() => {
     setI((i) => i + 1)
   }, [tinaForm])
+
+  const cms = useCMS()
+  // This subscribes multiple times since the event bus doesn't know how to
+  // only subscribe once
+  React.useMemo(() => {
+    if (setActiveFormId) {
+      cms.events.subscribe('field:selected', (e) => {
+        if (e.value.includes('#')) {
+          const [formId, fieldName] = e.value.split('#')
+          setActiveFormId(formId)
+          setActiveFieldName(fieldName)
+        }
+      })
+    }
+  }, [setActiveFormId])
 
   const finalForm = tinaForm.finalForm
 
@@ -148,11 +168,13 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     }
   }, [finalForm])
 
-  // This will be needed when we add rename and delete functionality to this page
-  // const cms = useCMS()
-  // const id: string = tinaForm.id
-  // const schema = cms.api.tina.schema
-  // const collection = schema.getCollectionByFullPath(id)
+  const result = getFieldGroup({
+    form: tinaForm,
+    fieldName: activeFieldName,
+    values: tinaForm.finalForm.getState().values,
+    prefix: [],
+  })
+  const fields = result ? result.fieldGroup : tinaForm.fields
 
   return (
     <FinalForm
@@ -187,8 +209,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
               <FormPortalProvider>
                 <FormWrapper id={tinaForm.id}>
-                  {tinaForm && tinaForm.fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
+                  {tinaForm && fields.length ? (
+                    <FieldsBuilder form={tinaForm} fields={fields} />
                   ) : (
                     <NoFieldsPlaceholder />
                   )}
@@ -391,3 +413,117 @@ const Emoji = ({ className = '', ...props }) => (
     {...props}
   />
 )
+
+/**
+ * Given a fieldName like blocks.0
+ * This will return the array of fields at blocks.0
+ * But it will also return the array of fields at blocks.0
+ * if blocks.0.title is provided
+ */
+const getFieldGroup = ({
+  form,
+  fieldName,
+  values,
+  prefix,
+}: {
+  form: Form
+  fieldName?: string
+  values: object
+  prefix: string[]
+}): { fieldGroup: Field[]; path: string[] } | undefined => {
+  if (!fieldName) {
+    return { fieldGroup: form.fields, path: prefix }
+  }
+  const [name, ...rest] = fieldName.split('.')
+  const field = form.fields.find((field) => field.name === name)
+  const value = values[name]
+  // When a new form is selected, the fieldName may still
+  // be from a previous render
+  if (!field) {
+    return { fieldGroup: form.fields, path: prefix }
+  }
+  if (field.type === 'object') {
+    if (field.templates) {
+      if (field.list) {
+        const [index, ...rest2] = rest
+        if (index) {
+          const value2 = value[index]
+          const template = field.templates[value2._template]
+          if (rest2.length) {
+            const result = getFieldGroup({
+              form: template,
+              fieldName: rest2.join('.'),
+              values: value2,
+              prefix: [...prefix, name, index],
+            })
+            if (result) {
+              return result
+            }
+          }
+          return {
+            path: [...prefix, name, index],
+            fieldGroup: template.fields.map((field) => {
+              return {
+                ...field,
+                name: `${[...prefix, name, index].join('.')}.${field.name}`,
+              }
+            }),
+          }
+        } else {
+          return
+        }
+      } else {
+      }
+    }
+    if (field.fields) {
+      if (field.list) {
+        const [index, ...rest2] = rest
+        if (index) {
+          const value2 = value[index]
+          if (rest2.length) {
+            const result = getFieldGroup({
+              form: field,
+              fieldName: rest2.join('.'),
+              values: value2,
+              prefix: [...prefix, name, index],
+            })
+            if (result) {
+              return result
+            }
+          }
+          return {
+            path: [...prefix, name, index],
+            fieldGroup: field.fields.map((field) => {
+              return {
+                ...field,
+                name: `${[...prefix, name, index].join('.')}.${field.name}`,
+              }
+            }),
+          }
+        } else {
+          return
+        }
+      } else {
+        if (rest.length) {
+          // @ts-ignore PR FOR DEMO ONLY
+          const result = getFieldGroup(field, rest.join('.'), value, [
+            ...prefix,
+            name,
+          ])
+          if (result) {
+            return result
+          }
+        }
+        return {
+          path: [...prefix, name],
+          fieldGroup: field.fields.map((field) => {
+            return {
+              ...field,
+              name: `${[...prefix, name].join('.')}.${field.name}`,
+            }
+          }),
+        }
+      }
+    }
+  }
+}

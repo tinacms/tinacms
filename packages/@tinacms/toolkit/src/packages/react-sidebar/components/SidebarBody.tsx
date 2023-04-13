@@ -124,6 +124,7 @@ export const FormsView = ({
             ))}
           <FormBuilder
             form={activeForm as any}
+            setActiveFormId={setActiveFormId}
             onPristineChange={setFormIsPristine}
           />
         </FormWrapper>
