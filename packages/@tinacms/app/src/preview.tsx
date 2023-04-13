@@ -13,7 +13,7 @@ export const Preview = (
     iframeRef: React.MutableRefObject<HTMLIFrameElement>
   }
 ) => {
-  useGraphQLReducer(props.iframeRef)
+  useGraphQLReducer(props.iframeRef, props.url)
 
   return (
     <div className="tina-tailwind">

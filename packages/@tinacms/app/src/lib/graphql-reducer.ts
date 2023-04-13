@@ -1,5 +1,6 @@
 import React from 'react'
 import * as G from 'graphql'
+import { getIn } from 'final-form'
 import { z, ZodError } from 'zod'
 // @ts-expect-error
 import schemaJson from 'SCHEMA_IMPORT'
@@ -26,26 +27,28 @@ import type {
   ResolvedDocument,
 } from './types'
 
-const documentSchema = z.object({
-  _internalValues: z.record(z.unknown()),
-  _internalSys: z.object({
-    breadcrumbs: z.array(z.string()),
-    basename: z.string(),
-    filename: z.string(),
+const sysSchema = z.object({
+  breadcrumbs: z.array(z.string()),
+  basename: z.string(),
+  filename: z.string(),
+  path: z.string(),
+  extension: z.string(),
+  relativePath: z.string(),
+  title: z.string().optional().nullable(),
+  template: z.string(),
+  collection: z.object({
+    name: z.string(),
+    slug: z.string(),
+    label: z.string(),
     path: z.string(),
-    extension: z.string(),
-    relativePath: z.string(),
-    title: z.string().optional().nullable(),
-    template: z.string(),
-    // __typename: z.string(), // This isn't being populated for some reason
-    collection: z.object({
-      name: z.string(),
-      slug: z.string(),
-      label: z.string(),
-      path: z.string(),
-      format: z.string(),
-    }),
+    format: z.string().optional().nullable(),
+    matches: z.string().optional().nullable(),
   }),
+})
+
+const documentSchema: z.ZodType<ResolvedDocument> = z.object({
+  _internalValues: z.record(z.unknown()),
+  _internalSys: sysSchema,
 })
 
 const astNode = schemaJson as G.DocumentNode
@@ -85,194 +88,203 @@ const schema = G.buildASTSchema(astNode)
 const schemaForResolver = G.buildASTSchema(astNodeWithMeta)
 
 export const useGraphQLReducer = (
-  iframe: React.MutableRefObject<HTMLIFrameElement>
+  iframe: React.MutableRefObject<HTMLIFrameElement>,
+  url: string
 ) => {
   const cms = useCMS()
   const tinaSchema = cms.api.tina.schema as TinaSchema
   const [payloads, setPayloads] = React.useState<Payload[]>([])
+  const [documentsToResolve, setDocumentsToResolve] = React.useState<string[]>(
+    []
+  )
+  const [resolvedDocuments, setResolvedDocuments] = React.useState<
+    ResolvedDocument[]
+  >([])
   const [operationIndex, setOperationIndex] = React.useState(0)
 
-  const handlePayload = React.useCallback(async (payload) => {
-    if (!payload?.query) {
-      return
+  React.useEffect(() => {
+    const run = async () => {
+      return Promise.all(
+        documentsToResolve.map(async (documentId) => {
+          return await getDocument(documentId, cms.api.tina)
+        })
+      )
     }
-    const { query, variables } = payload
+    if (documentsToResolve.length) {
+      run().then((docs) => {
+        setResolvedDocuments((resolvedDocs) => [...resolvedDocs, ...docs])
+        setDocumentsToResolve([])
+        setOperationIndex((i) => i + 1)
+      })
+    }
+  }, [documentsToResolve.join('.')])
 
-    /**
-     * First we grab the query from the payload and expand it so it includes
-     * information we'll need. Specifically the _sys and _value info used
-     * for building forms
-     */
-    const documentNode = G.parse(query)
-    const expandedDocumentNode = expandQuery({ schema, documentNode })
-    const expandedQuery = G.print(expandedDocumentNode)
-    const expandedData = await cms.api.tina.request(expandedQuery, {
-      variables,
-    })
-
-    const expandedDocumentNodeForResolver = expandQuery({
-      schema: schemaForResolver,
-      documentNode,
-    })
-    const expandedQueryForResolver = G.print(expandedDocumentNodeForResolver)
-    const result = await G.graphql({
-      schema: schemaForResolver,
-      source: expandedQueryForResolver,
-      variableValues: variables,
-      rootValue: expandedData,
-      fieldResolver: async function (source, args, context, info) {
-        const fieldName = info.fieldName
-        /**
-         * Since the `source` for this resolver is the query that
-         * ran before passing it into `useTina`, we need to take aliases
-         * into consideration, so if an alias is provided we try to
-         * see if that has the value we're looking for. This isn't a perfect
-         * solution as the `value` gets overwritten depending on the alias
-         * query.
-         */
-        const aliases: string[] = []
-        info.fieldNodes.forEach((fieldNode) => {
-          if (fieldNode.alias) {
-            aliases.push(fieldNode.alias.value)
+  /**
+   * Note: since React runs effects twice in development this will run twice for a given query
+   * which results in duplicate network requests in quick succession
+   */
+  React.useEffect(() => {
+    const run = async () => {
+      return Promise.all(
+        payloads.map(async (payload) => {
+          // This payload has already been expanded, skip it.
+          if (payload.expandedQuery) {
+            return payload
+          } else {
+            const expandedPayload = await expandPayload(payload, cms)
+            processPayload(expandedPayload)
+            return expandedPayload
           }
         })
-        let value = source[fieldName] as unknown
-        if (!value) {
-          aliases.forEach((alias) => {
-            const aliasValue = source[alias]
-            if (aliasValue) {
-              value = aliasValue
-            }
-          })
-        }
-        if (fieldName === '_sys') {
-          return source._internalSys
-        }
-        if (fieldName === '_values') {
-          return source._internalValues
-        }
-        if (info.fieldName === '_metadata') {
-          if (value) {
-            return value
-          }
-          // TODO: ensure all fields that have _metadata
-          // actually need it
-          return {
-            id: null,
-            fields: [],
-          }
-        }
-        if (isNodeType(info.returnType)) {
-          let doc: Document
-          if (typeof value === 'string') {
-            const response = await getDocument(value, cms.api.tina)
-            doc = {
-              _sys: response._sys,
-              _values: response._values,
-            }
-          } else {
-            const { _internalSys, _internalValues } =
-              documentSchema.parse(value)
-            const _sys = _internalSys as SystemInfo
-            const _values = _internalValues as Record<string, unknown>
-            doc = {
-              _values,
-              _sys,
-            }
-          }
-          const collection = tinaSchema.getCollectionByFullPath(doc._sys.path)
-          if (!collection) {
-            throw new Error(
-              `Unable to determine collection for path ${doc._sys.path}`
-            )
-          }
-          const template = tinaSchema.getTemplateForData({
-            data: doc._values,
-            collection,
-          })
-          const existingForm = cms.forms.find(doc._sys.path)
-          let form: Form | undefined
-          let shouldRegisterForm = true
-          if (!existingForm) {
-            const formConfig: FormOptions<any> = {
-              id: doc._sys.path,
-              initialValues: doc._values,
-              fields: template.fields.map((field) =>
-                resolveField(field, tinaSchema)
-              ),
-              onSubmit: (payload) =>
-                onSubmit(collection, doc._sys.relativePath, payload, cms),
-              label: collection.label || collection.name,
-              queries: [payload.id],
-            }
-            if (tinaSchema.config.config?.formifyCallback) {
-              const callback = tinaSchema.config.config
-                ?.formifyCallback as FormifyCallback
-              form =
-                callback(
-                  {
-                    createForm: createForm,
-                    createGlobalForm: createGlobalForm,
-                    skip: () => {},
-                    formConfig,
-                  },
-                  cms
-                ) || undefined
-              if (!form) {
-                // If the form isn't created from formify, we still
-                // need it, just don't show it to the user.
-                shouldRegisterForm = false
-                form = new Form(formConfig)
-              }
-            } else {
-              form = new Form(formConfig)
-            }
-            if (form) {
-              if (shouldRegisterForm) {
-                form.subscribe(
-                  () => {
-                    setOperationIndex((index) => index + 1)
-                  },
-                  { values: true }
-                )
-                cms.forms.add(form)
-              }
-            }
-          } else {
-            form = existingForm
-            form.addQuery(payload.id)
-          }
-          if (!form) {
-            throw new Error(`No form registered for ${doc._sys.path}.`)
-          }
-          return resolveDocument(doc, template, form)
-        }
-        return value
-      },
-    })
-    if (result.errors) {
-      cms.alerts.error('There was a problem building forms for your query')
-      result.errors.forEach((error) => {
-        if (error instanceof ZodError) {
-          console.log(error.format())
-        } else {
-          console.error(error)
-        }
-      })
-    } else {
-      iframe.current?.contentWindow?.postMessage({
-        type: 'updateData',
-        id: payload.id,
-        data: result.data,
+      )
+    }
+    if (payloads.length) {
+      run().then((updatedPayloads) => {
+        setPayloads(updatedPayloads)
       })
     }
-  }, [])
+  }, [payloads.map(({ id }) => id).join('.'), cms])
 
-  React.useEffect(() => {
-    payloads.forEach((payload) => {
-      handlePayload(payload)
-    })
-  }, [payloads.map(({ id }) => id).join('.'), operationIndex])
+  const processPayload = React.useCallback(
+    (payload: Payload) => {
+      const { expandedQueryForResolver, variables, expandedData } = payload
+      if (!expandedQueryForResolver || !expandedData) {
+        throw new Error(`Unable to process payload which has not been expanded`)
+      }
+
+      const result = G.graphqlSync({
+        schema: schemaForResolver,
+        source: expandedQueryForResolver,
+        variableValues: variables,
+        rootValue: expandedData,
+        fieldResolver: (source, args, context, info) => {
+          const fieldName = info.fieldName
+          /**
+           * Since the `source` for this resolver is the query that
+           * ran before passing it into `useTina`, we need to take aliases
+           * into consideration, so if an alias is provided we try to
+           * see if that has the value we're looking for. This isn't a perfect
+           * solution as the `value` gets overwritten depending on the alias
+           * query.
+           */
+          const aliases: string[] = []
+          info.fieldNodes.forEach((fieldNode) => {
+            if (fieldNode.alias) {
+              aliases.push(fieldNode.alias.value)
+            }
+          })
+          let value = source[fieldName] as unknown
+          if (!value) {
+            aliases.forEach((alias) => {
+              const aliasValue = source[alias]
+              if (aliasValue) {
+                value = aliasValue
+              }
+            })
+          }
+          if (fieldName === '_sys') {
+            return source._internalSys
+          }
+          if (fieldName === '_values') {
+            return source._internalValues
+          }
+          if (info.fieldName === '_metadata') {
+            if (value) {
+              return value
+            }
+            // TODO: ensure all fields that have _metadata
+            // actually need it
+            return {
+              id: null,
+              fields: [],
+            }
+          }
+          if (isNodeType(info.returnType)) {
+            let resolvedDocument: ResolvedDocument
+            // This is a reference from another form
+            if (typeof value === 'string') {
+              const valueFromSetup = getIn(
+                expandedData,
+                G.responsePathAsArray(info.path).join('.')
+              )
+              const maybeResolvedDocument = resolvedDocuments.find(
+                (doc) => doc._internalSys.path === value
+              )
+              // If we already have this document, use it.
+              if (maybeResolvedDocument) {
+                resolvedDocument = maybeResolvedDocument
+              } else if (valueFromSetup) {
+                // Else, even though in this context the value is a string because it's
+                // resolved from a parent form, if the reference hasn't changed
+                // from when we ran the setup query, we can avoid a data fetch
+                // here and just grab it from the response
+                const maybeResolvedDocument =
+                  documentSchema.parse(valueFromSetup)
+                if (maybeResolvedDocument._internalSys.path === value) {
+                  resolvedDocument = maybeResolvedDocument
+                } else {
+                  throw new NoFormError(`No form found`, value)
+                }
+              } else {
+                throw new NoFormError(`No form found`, value)
+              }
+            } else {
+              resolvedDocument = documentSchema.parse(value)
+            }
+            const id = resolvedDocument._internalSys.path
+            const existingForm = cms.forms.find(id)
+            if (!existingForm) {
+              const { form, template } = buildForm({
+                resolvedDocument,
+                tinaSchema,
+                payloadId: payload.id,
+                cms,
+              })
+              form.subscribe(
+                () => {
+                  setOperationIndex((i) => i + 1)
+                },
+                { values: true }
+              )
+              return resolveDocument(resolvedDocument, template, form)
+            } else {
+              existingForm.addQuery(payload.id)
+              const { template } = getTemplateForDocument(
+                resolvedDocument,
+                tinaSchema
+              )
+              existingForm.addQuery(payload.id)
+              return resolveDocument(resolvedDocument, template, existingForm)
+            }
+          }
+          return value
+        },
+      })
+      if (result.errors) {
+        result.errors.forEach((error) => {
+          if (
+            error instanceof G.GraphQLError &&
+            error.originalError instanceof NoFormError
+          ) {
+            const id = error.originalError.id
+            setDocumentsToResolve((docs) => [
+              ...docs.filter((doc) => doc !== id),
+              id,
+            ])
+          } else {
+            cms.alerts.error(error.message)
+          }
+        })
+      } else {
+        iframe.current?.contentWindow?.postMessage({
+          type: 'updateData',
+          id: payload.id,
+          data: result.data,
+        })
+      }
+    },
+    [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
+  )
 
   const notifyEditMode = React.useCallback(
     (event: MessageEvent<PostMessage>) => {
@@ -309,11 +321,25 @@ export const useGraphQLReducer = (
           ...payloads.filter(({ id }) => id !== payload.id),
           payload,
         ])
-        setOperationIndex((index) => index + 1)
       }
     },
-    [, cms]
+    [cms]
   )
+
+  React.useEffect(() => {
+    payloads.forEach((payload) => {
+      if (payload.expandedData) {
+        processPayload(payload)
+      }
+    })
+  }, [operationIndex])
+
+  React.useEffect(() => {
+    return () => {
+      setPayloads([])
+      cms.removeAllForms()
+    }
+  }, [url])
 
   React.useEffect(() => {
     if (iframe) {
@@ -327,8 +353,6 @@ export const useGraphQLReducer = (
       cms.removeAllForms()
     }
   }, [iframe.current])
-
-  return { state: {} }
 }
 
 const onSubmit = async (
@@ -364,18 +388,19 @@ const onSubmit = async (
 type Path = (string | number)[]
 
 const resolveDocument = (
-  doc: Document,
+  doc: ResolvedDocument,
   template: Template<true>,
   form: Form
 ): ResolvedDocument => {
   // @ts-ignore AnyField and TinaField don't mix
   const fields = form.fields as TinaField<true>[]
+  const id = doc._internalSys.path
   const path: Path = []
   const formValues = resolveFormValue({
     fields: fields,
     values: form.values,
     path,
-    id: doc._sys.path,
+    id,
   })
   const metadataFields: Record<string, string> = {}
   Object.keys(formValues).forEach((key) => {
@@ -384,15 +409,15 @@ const resolveDocument = (
 
   return {
     ...formValues,
-    id: doc._sys.path,
-    sys: doc._sys,
+    id,
+    sys: doc._internalSys,
     values: form.values,
     _metadata: {
-      id: doc._sys.path,
+      id: doc._internalSys.path,
       fields: metadataFields,
     },
-    _internalSys: doc._sys,
-    _internalValues: doc._values,
+    _internalSys: doc._internalSys,
+    _internalValues: doc._internalValues,
     __typename: NAMER.dataTypeName(template.namespace),
   }
 }
@@ -533,13 +558,13 @@ const resolveFieldValue = ({
 
 const getDocument = async (id: string, tina: Client) => {
   const response = await tina.request<{
-    node: { _sys: SystemInfo; _values: Record<string, unknown> }
+    node: { _internalSys: SystemInfo; _internalValues: Record<string, unknown> }
   }>(
     `query GetNode($id: String!) {
 node(id: $id) {
 ...on Document {
-_values
-_sys {
+  _internalValues: _values
+_internalSys: _sys {
   breadcrumbs
   basename
   filename
@@ -567,4 +592,118 @@ _sys {
     { variables: { id: id } }
   )
   return response.node
+}
+
+const expandPayload = async (payload: Payload, cms: TinaCMS) => {
+  const { query, variables } = payload
+  const documentNode = G.parse(query)
+  const expandedDocumentNode = expandQuery({ schema, documentNode })
+  const expandedQuery = G.print(expandedDocumentNode)
+  const expandedData = await cms.api.tina.request(expandedQuery, {
+    variables,
+  })
+
+  const expandedDocumentNodeForResolver = expandQuery({
+    schema: schemaForResolver,
+    documentNode,
+  })
+  const expandedQueryForResolver = G.print(expandedDocumentNodeForResolver)
+  return { ...payload, expandQuery, expandedData, expandedQueryForResolver }
+}
+
+/**
+ * When we resolve the graphql data we check for these errors,
+ * if we find one we enqueue the document to be generated, and then
+ * process it once we have that document
+ */
+class NoFormError extends Error {
+  id: string
+  constructor(msg: string, id: string) {
+    super(msg)
+    this.id = id
+    Object.setPrototypeOf(this, NoFormError.prototype)
+  }
+}
+
+const getTemplateForDocument = (
+  resolvedDocument: ResolvedDocument,
+  tinaSchema: TinaSchema
+) => {
+  const id = resolvedDocument._internalSys.path
+  const collection = tinaSchema.getCollectionByFullPath(id)
+  if (!collection) {
+    throw new Error(`Unable to determine collection for path ${id}`)
+  }
+
+  const template = tinaSchema.getTemplateForData({
+    data: resolvedDocument._internalValues,
+    collection,
+  })
+  return { template, collection }
+}
+
+const buildForm = ({
+  resolvedDocument,
+  tinaSchema,
+  payloadId,
+  cms,
+}: {
+  resolvedDocument: ResolvedDocument
+  tinaSchema: TinaSchema
+  payloadId: string
+  cms: TinaCMS
+}) => {
+  const { template, collection } = getTemplateForDocument(
+    resolvedDocument,
+    tinaSchema
+  )
+  const id = resolvedDocument._internalSys.path
+  let form: Form | undefined
+  let shouldRegisterForm = true
+  const formConfig: FormOptions<any> = {
+    id,
+    initialValues: resolvedDocument._internalValues,
+    fields: template.fields.map((field) => resolveField(field, tinaSchema)),
+    onSubmit: (payload) =>
+      onSubmit(
+        collection,
+        resolvedDocument._internalSys.relativePath,
+        payload,
+        cms
+      ),
+    label: collection.label || collection.name,
+    queries: [payloadId],
+  }
+  if (tinaSchema.config.config?.formifyCallback) {
+    const callback = tinaSchema.config.config
+      ?.formifyCallback as FormifyCallback
+    form =
+      callback(
+        {
+          createForm: createForm,
+          createGlobalForm: createGlobalForm,
+          skip: () => {},
+          formConfig,
+        },
+        cms
+      ) || undefined
+    if (!form) {
+      // If the form isn't created from formify, we still
+      // need it, just don't show it to the user.
+      shouldRegisterForm = false
+      form = new Form(formConfig)
+    }
+  } else {
+    form = new Form(formConfig)
+  }
+  if (form) {
+    if (shouldRegisterForm) {
+      form.subscribe(() => {}, { values: true })
+      cms.forms.add(form)
+    }
+  }
+  if (!form) {
+    throw new Error(`No form registered for ${id}.`)
+  }
+  return { template, form }
 }

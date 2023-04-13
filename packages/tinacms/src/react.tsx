@@ -27,8 +27,9 @@ export function useTina<T extends object>(props: {
       }
     })
 
-    return () =>
+    return () => {
       parent.postMessage({ type: 'close', id }, window.location.origin)
+    }
   }, [id])
   return { data, isClient } as any
 }

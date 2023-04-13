@@ -6,9 +6,12 @@ export type PostMessage = {
 
 export type Payload = {
   id: string
-  query: string
   variables: object
+  query: string
   data: object
+  expandedQuery?: string
+  expandedData?: object
+  expandedQueryForResolver?: string
 }
 
 export type SystemInfo = {
@@ -18,19 +21,19 @@ export type SystemInfo = {
   path: string
   extension: string
   relativePath: string
-  title?: string
+  title?: string | null | undefined
   template: string
-  __typename: string
+  // __typename: string
   collection: {
     name: string
     slug: string
     label: string
     path: string
-    format: string
-    matches?: string
-    templates?: object
-    fields?: object
-    __typename: string
+    format?: string | null | undefined
+    matches?: string | null | undefined
+    // templates?: object
+    // fields?: object
+    // __typename: string
   }
 }
 
@@ -40,8 +43,6 @@ export type Document = {
 }
 
 export type ResolvedDocument = {
-  _values: Record<string, unknown>
-  _sys: SystemInfo
   _internalValues: Record<string, unknown>
   _internalSys: SystemInfo
 }
