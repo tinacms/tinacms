@@ -163,6 +163,7 @@ const CollectionListPage = () => {
     after: '',
     booleanEquals: null,
   })
+  const [activeSearch, setActiveSearch] = React.useState(false)
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
   const [sortKey, setSortKey] = useState(
@@ -580,6 +581,7 @@ const CollectionListPage = () => {
                                     <div className="flex gap-3">
                                       <Button
                                         onClick={() => {
+                                          setActiveSearch(true)
                                           setEndCursor('')
                                           setPrevCursors([])
                                           reFetchCollection()
@@ -596,8 +598,10 @@ const CollectionListPage = () => {
                                         vars.booleanEquals) && (
                                         <Button
                                           onClick={() => {
+                                            setActiveSearch(false)
                                             setVars((old) => ({
                                               ...old,
+                                              filterField: '',
                                               startsWith: '',
                                               after: '',
                                               before: '',
@@ -653,21 +657,17 @@ const CollectionListPage = () => {
                         {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
-                              {(vars.startsWith ||
-                                vars.after ||
-                                vars.before ||
-                                vars.booleanEquals) &&
-                                folder.name && (
-                                  <tr>
-                                    <td colSpan={5}>
-                                      <Breadcrumb
-                                        folder={folder}
-                                        navigate={navigate}
-                                        collectionName={collectionName}
-                                      />
-                                    </td>
-                                  </tr>
-                                )}
+                              {!activeSearch && folder.name && (
+                                <tr>
+                                  <td colSpan={5}>
+                                    <Breadcrumb
+                                      folder={folder}
+                                      navigate={navigate}
+                                      collectionName={collectionName}
+                                    />
+                                  </td>
+                                </tr>
+                              )}
                               {documents.map((document) => {
                                 if (document.node.__typename === 'Folder') {
                                   return (
