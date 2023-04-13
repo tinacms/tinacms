@@ -106,8 +106,7 @@ export class TinaSchema {
   public getCollectionByFullPath = (filepath: string) => {
     const fileExtension = filepath.split('.').pop()
 
-    const collections = this.getCollections()
-    const possibleCollections = collections.filter((collection) => {
+    const possibleCollections = this.getCollections().filter((collection) => {
       // filter out file extensions that don't match the collection format
       if (fileExtension !== (collection.format || 'md')) {
         return false
@@ -127,7 +126,6 @@ export class TinaSchema {
 
     // No matches
     if (possibleCollections.length === 0) {
-      console.log('throwing error')
       throw new Error(`Unable to find collection for file at ${filepath}`)
     }
     // One match
