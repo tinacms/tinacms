@@ -17,6 +17,7 @@ import LogoutPage, { LogoutRedirect } from './pages/LogoutPage'
 import DashboardPage from './pages/DashboardPage'
 import CollectionListPage from './pages/CollectionListPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
+import CollectionDuplicatePage from './pages/CollectionDuplicatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 import ScreenPage from './pages/ScreenPage'
 
@@ -193,6 +194,14 @@ export const TinaAdmin = ({
                     element={
                       <DefaultWrapper cms={cms}>
                         <CollectionCreatePage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="collections/:collectionName/duplicate/*"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionDuplicatePage />
                       </DefaultWrapper>
                     }
                   />

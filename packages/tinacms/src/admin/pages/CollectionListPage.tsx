@@ -6,6 +6,7 @@ import React, { Fragment } from 'react'
 import {
   BiEdit,
   BiPlus,
+  BiCopy,
   BiTrash,
   BiRename,
   BiSearch,
@@ -718,6 +719,20 @@ const CollectionListPage = () => {
                                             onMouseDown: () => {
                                               navigate(
                                                 `${document.node._sys.breadcrumbs.join(
+                                                  '/'
+                                                )}`,
+                                                { replace: true }
+                                              )
+                                            },
+                                          },
+                                          {
+                                            name: 'duplicate',
+                                            label: 'Duplicate',
+                                            Icon: <BiCopy size="1.3rem" />,
+                                            onMouseDown: () => {
+                                              console.log('document', document)
+                                              navigate(
+                                                `/collections/${collectionName}/duplicate/${document.node._sys.breadcrumbs.join(
                                                   '/'
                                                 )}`,
                                                 { replace: true }
