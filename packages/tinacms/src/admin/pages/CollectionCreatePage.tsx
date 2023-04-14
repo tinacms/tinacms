@@ -160,6 +160,7 @@ export const RenderForm = ({
     customDefaults ||
     // @ts-ignore internal types aren't up to date
     template.ui?.defaultItem ||
+    // @ts-ignore
     template?.defaultItem
 
   const form = useMemo(() => {

@@ -33,15 +33,17 @@ const CollectionDuplicatePage = () => {
                 collectionName={collection.name}
                 relativePath={relativePath}
               >
-                {(document) => (
-                  <RenderForm
-                    cms={cms}
-                    collection={collection}
-                    templateName={document._template}
-                    mutationInfo={mutationInfo}
-                    customDefaults={document._values}
-                  />
-                )}
+                {(document) => {
+                  return (
+                    <RenderForm
+                      cms={cms}
+                      collection={collection}
+                      templateName={document._values?._template}
+                      mutationInfo={mutationInfo}
+                      customDefaults={document._values}
+                    />
+                  )
+                }}
               </GetDocument>
             )
           }}
