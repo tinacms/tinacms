@@ -44,7 +44,7 @@ export const useGetCollection = (
           const collection = await api.fetchCollection(
             collectionName,
             includeDocuments,
-            filterArgs.filterField ? '' : folder.fullyQualifiedName,
+            filterArgs?.filterField ? '' : folder.fullyQualifiedName,
             after,
             validSortKey,
             order,
