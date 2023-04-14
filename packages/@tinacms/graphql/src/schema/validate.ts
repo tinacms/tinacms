@@ -164,7 +164,7 @@ const validateCollection = async (
       .required(),
     path: yup
       .string()
-      .test('is-required', 'This field is required', (value) => {
+      .test('is-required', 'path is a required field', (value) => {
         if (value === '') {
           return true
         }
