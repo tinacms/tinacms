@@ -76,7 +76,7 @@ const UnknownRenderer = ({
         // 'id',
         '_sys',
         '__typename',
-        '__meta__',
+        // '_tina_metadata',
         '_internalValues',
         '_internalSys',
       ].includes(keyName)

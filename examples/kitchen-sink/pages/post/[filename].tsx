@@ -6,7 +6,7 @@ import client from '../../tina/__generated__/client'
 export default function Home(
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) {
-  const { data } = useTina(props)
+  const { data } = useTina(props, { outputFolder: 'admin' })
 
   return <Json src={data} />
 }

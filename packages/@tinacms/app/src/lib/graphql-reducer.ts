@@ -1,7 +1,7 @@
 import React from 'react'
 import * as G from 'graphql'
 import { getIn } from 'final-form'
-import { z, ZodError } from 'zod'
+import { z } from 'zod'
 // @ts-expect-error
 import schemaJson from 'SCHEMA_IMPORT'
 import { expandQuery, isNodeType } from './expand-query'
@@ -23,7 +23,6 @@ import type {
   PostMessage,
   Payload,
   SystemInfo,
-  Document,
   ResolvedDocument,
 } from './types'
 
@@ -46,7 +45,7 @@ const sysSchema = z.object({
   }),
 })
 
-const documentSchema: z.ZodType<ResolvedDocument> = z.object({
+export const documentSchema = z.object({
   _internalValues: z.record(z.unknown()),
   _internalSys: sysSchema,
 })
@@ -84,14 +83,15 @@ const astNodeWithMeta: G.DocumentNode = {
     return def
   }),
 }
-const schema = G.buildASTSchema(astNode)
-const schemaForResolver = G.buildASTSchema(astNodeWithMeta)
+export const schema = G.buildASTSchema(astNode)
+export const schemaForResolver = G.buildASTSchema(astNodeWithMeta)
 
 export const useGraphQLReducer = (
   iframe: React.MutableRefObject<HTMLIFrameElement>,
   url: string
 ) => {
   const cms = useCMS()
+  const [status, setStatus] = React.useState<'idle' | 'ready'>('idle')
   const tinaSchema = cms.api.tina.schema as TinaSchema
   const [payloads, setPayloads] = React.useState<Payload[]>([])
   const [documentsToResolve, setDocumentsToResolve] = React.useState<string[]>(
@@ -282,6 +282,7 @@ export const useGraphQLReducer = (
           }
         })
       } else {
+        setStatus('ready')
         iframe.current?.contentWindow?.postMessage({
           type: 'updateData',
           id: payload.id,
@@ -317,6 +318,14 @@ export const useGraphQLReducer = (
         iframe?.current?.contentWindow?.postMessage({
           type: 'tina:editMode',
         })
+      }
+    },
+    []
+  )
+  const handleActiveField = React.useCallback(
+    (event: MessageEvent<PostMessage>) => {
+      if (event?.data?.type === 'field:selected') {
+        cms.events.dispatch({ type: 'field:selected', value: event.data.value })
       }
     },
     []
@@ -370,14 +379,18 @@ export const useGraphQLReducer = (
     if (iframe) {
       window.addEventListener('message', handleOpenClose)
       window.addEventListener('message', notifyEditMode)
+      window.addEventListener('message', handleActiveField)
     }
 
     return () => {
       window.removeEventListener('message', handleOpenClose)
       window.removeEventListener('message', notifyEditMode)
+      window.removeEventListener('message', handleActiveField)
       cms.removeAllForms()
     }
   }, [iframe.current])
+
+  return { status }
 }
 
 const onSubmit = async (

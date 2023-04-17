@@ -2,8 +2,9 @@
 
 */
 import React from 'react'
-import { defineConfig } from 'tinacms'
+import { defineConfig, useCMS } from 'tinacms'
 import { useGraphQLReducer } from './lib/graphql-reducer'
+import { useParams, useSearchParams } from 'react-router-dom'
 
 type Config = Parameters<typeof defineConfig>[0]
 
@@ -13,7 +14,26 @@ export const Preview = (
     iframeRef: React.MutableRefObject<HTMLIFrameElement>
   }
 ) => {
-  useGraphQLReducer(props.iframeRef, props.url)
+  const { status } = useGraphQLReducer(props.iframeRef, props.url)
+  const cms = useCMS()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const activeField = searchParams.get('activeField')
+
+  React.useEffect(() => {
+    if (status === 'ready') {
+      if (activeField) {
+        setSearchParams({})
+        const [formID, fieldName] = activeField.split('__')
+        if (formID && fieldName) {
+          cms.events.dispatch({
+            type: 'field:selected',
+            value: `${formID}#${fieldName}`,
+          })
+        }
+      }
+    }
+  }, [status])
 
   return (
     <div className="tina-tailwind">

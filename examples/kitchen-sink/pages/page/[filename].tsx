@@ -3,16 +3,63 @@ import { InferGetStaticPropsType } from 'next'
 import { Json } from '../../components/json'
 import { useTina } from 'tinacms/dist/react'
 import client from '../../tina/__generated__/client'
+import { expandWithMetadata } from '@tinacms/preview-helpers'
+import {
+  previewField,
+  useEditOpen,
+  useEditDemo,
+} from '@tinacms/preview-helpers/dist/react'
+
+// export default function Home(
+//   props: InferGetStaticPropsType<typeof getStaticProps>
+// ) {
+//   const { data } = useTina(props)
+//   useEditOpen("/admin")
+//   useEditDemo()
+//   return <div className='mx-auto max-w-4xl p-4 shadow-lg rounded-md'>
+//     <h1 data-vercel-edit-info={previewField(data.documentation, 'title')}>{data.documentation.title}</h1>
+//   </div>
+//   // return <Json src={data} />
+// }
+
+// export const getStaticProps = async ({ params }) => {
+//   const variables = { relativePath: `${params.filename}.md` }
+//   let props = await client.queries.documentation(variables)
+
+//   // if (process.env.VERCEL_ENV === 'preview') {
+//   props = await expandWithMetadata(props, client)
+//   // }
+//   return {
+//     props: { ...props, variables },
+//   }
+// }
 
 export default function Home(
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) {
   const { data } = useTina(props)
 
+  useEditOpen('/admin')
+  useEditDemo()
+
   return (
     <div>
-      <ClientLoadExample />
-      <Json src={data} />
+      {/* <ClientLoadExample /> */}
+      {data.page.__typename === 'PageBlockPage'
+        ? data.page.blocks.map((block) => {
+            if (block.__typename === 'PageBlockPageBlocksHero') {
+              return (
+                <div>
+                  <h3 data-vercel-edit-info={previewField(block, 'headline')}>
+                    {block.headline}
+                  </h3>
+                </div>
+              )
+            }
+            return <div></div>
+          })
+        : null}
+      {/* <Json src={data} /> */}
     </div>
   )
 }
@@ -30,7 +77,9 @@ const ClientLoadExample = () => {
     return (
       <button
         type="button"
-        onClick={() => setShowAuthor((showAuthor) => !showAuthor)}
+        onClick={() => {
+          setShowAuthor((showAuthor) => !showAuthor)
+        }}
       >
         Toggle Author
       </button>
@@ -57,7 +106,8 @@ const ClientLoadAuthor = (props) => {
 
 export const getStaticProps = async ({ params }) => {
   const variables = { relativePath: `${params.filename}.md` }
-  const props = await client.queries.page(variables)
+  let props = await client.queries.page(variables)
+  props = await expandWithMetadata(props, client)
   return {
     props: { ...props, variables },
   }

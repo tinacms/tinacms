@@ -1,9 +1,8 @@
-export * from './unifiedClient'
 import * as G from 'graphql'
 import { z } from 'zod'
-import { TinaClient } from './unifiedClient'
-import { vercelStegaEncode, vercelStegaDecode } from '@vercel/stega'
-import { tinaField } from './react'
+import { vercelStegaEncode } from '@vercel/stega'
+import { tinaField } from 'tinacms/dist/react'
+import type { TinaClient } from 'tinacms/dist/client'
 
 function encodeEditInfo(text: string, href: string): string {
   return `${vercelStegaEncode({
@@ -12,7 +11,7 @@ function encodeEditInfo(text: string, href: string): string {
   })}${text}`
 }
 
-export type Payload = {
+type Payload = {
   id: string
   variables: object
   query: string
@@ -143,10 +142,14 @@ export const expandWithMetadata = async <
     },
   })
 
-  return { ...result, query: props.query, variables: props.variables }
+  return { ...result, query: props.query, variables: props.variables } as {
+    data: D
+    variables: V
+    query: Q
+  }
 }
 
-export const expandQuery = ({
+const expandQuery = ({
   schema,
   documentNode,
 }: {
@@ -376,7 +379,7 @@ export const isNodeType = (type: G.GraphQLOutputType) => {
   }
 }
 
-export type SystemInfo = {
+type SystemInfo = {
   breadcrumbs: string[]
   basename: string
   filename: string
@@ -399,12 +402,12 @@ export type SystemInfo = {
   }
 }
 
-export type Document = {
+type Document = {
   _values: Record<string, unknown>
   _sys: SystemInfo
 }
 
-export type ResolvedDocument = {
+type ResolvedDocument = {
   _internalValues: Record<string, unknown>
   _internalSys: SystemInfo
 }
@@ -475,7 +478,7 @@ const sysSchema = z.object({
   }),
 })
 
-export const documentSchema = z.object({
+const documentSchema = z.object({
   _internalValues: z.record(z.unknown()),
   _internalSys: sysSchema,
 })

@@ -1,0 +1,57 @@
+{
+  "name": "@tinacms/preview-helpers",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "module": "./dist/index.es.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.js"
+    },
+    "./dist/react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.es.js",
+      "require": "./dist/react.js"
+    }
+  },
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      "src/index.ts",
+      "src/react.tsx"
+    ]
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "jest": "^27.0.6",
+    "react": "17.0.2",
+    "@types/react": "17.0.2",
+    "tinacms": "workspace:*",
+    "typescript": "4.3.5"
+  },
+  "peerDependencies": {
+    "react": ">=16.14.0",
+    "tinacms": "workspace:*"
+  },
+  "dependencies": {
+    "@vercel/stega": "^0.0.2",
+    "graphql": "15.8.0",
+    "zod": "^3.14.3"
+  },
+  "scripts": {
+    "build": "tinacms-scripts build",
+    "types": "pnpm tsc"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/preview-helpers"
+  }
+}
