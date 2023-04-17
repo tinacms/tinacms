@@ -76,12 +76,16 @@ export const defineLegacyConfig = (
   return config
 }
 
+interface MediaStoreClass {
+  new (...args: any[]): MediaStore
+}
+
 export const defineStaticConfig = (
   config: Config<
     (cms: TinaCMS) => TinaCMS,
     formifyCallback,
     DocumentCreatorCallback,
-    MediaStore
+    MediaStoreClass
   >
 ) => {
   if (!config.schema) {
