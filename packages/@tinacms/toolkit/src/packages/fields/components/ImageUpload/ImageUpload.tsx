@@ -14,11 +14,13 @@ import {
   isImage,
 } from '../../../../components/media/utils'
 import { BiFileBlank } from 'react-icons/bi'
+import { useActiveFieldCallback } from '../../use-active-field'
 
 interface ImageUploadProps {
   onDrop: (files: any, fileRejections: any) => Promise<void>
   onClear?: () => void
   onClick?: () => void
+  name?: string
   value?: string
   src?: string
   loading?: boolean
@@ -48,6 +50,7 @@ export const ImageUpload = ({
   onDrop,
   onClear,
   onClick,
+  name,
   value,
   src,
   loading,
@@ -61,8 +64,16 @@ export const ImageUpload = ({
     onDrop,
     noClick: !!onClick,
   })
+  const ref = React.useRef<HTMLDivElement>(null)
+  useActiveFieldCallback(name, () => {
+    if (ref.current) {
+      const el = ref.current
+      console.log(el)
+      el.focus()
+    }
+  })
   return (
-    <div className="w-full max-w-full" {...getRootProps()}>
+    <div className="w-full max-w-full" {...getRootProps()} ref={ref}>
       <input {...getInputProps()} />
       {value ? (
         loading ? (

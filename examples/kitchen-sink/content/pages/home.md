@@ -11,6 +11,8 @@ blocks:
         variant: primary
     _template: hero
   - title: Features
+    imageList:
+      - /uploads/llama-4.avif
     items:
       - Query Your Content
       - Build on Top of Your Components
@@ -25,4 +27,5 @@ blocks:
     _template: cta
 _template: blockPage
 ---
+
 

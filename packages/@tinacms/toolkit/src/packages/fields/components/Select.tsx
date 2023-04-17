@@ -6,6 +6,7 @@
 
 import * as React from 'react'
 import { MdKeyboardArrowDown } from 'react-icons/md'
+import { useActiveFieldCallback } from '../use-active-field'
 
 type Option = {
   value: string
@@ -32,9 +33,18 @@ export const selectFieldClasses =
 
 export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
   const selectOptions = options || field.options
+  const ref = React.useRef<HTMLSelectElement>(null)
+  useActiveFieldCallback(input.name, () => {
+    if (ref.current) {
+      const el = ref.current
+      el.focus()
+    }
+  })
+
   return (
     <div className="relative group">
       <select
+        ref={ref}
         id={input.name}
         value={input.value}
         onChange={input.onChange}

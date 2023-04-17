@@ -452,6 +452,7 @@ const resolveDocument = (
     values: form.values,
     _tina_metadata: {
       id: doc._internalSys.path,
+      name: path.join('.'),
       fields: metadataFields,
     },
     _internalSys: doc._internalSys,
@@ -521,6 +522,7 @@ const resolveFieldValue = ({
                 __typename: NAMER.dataTypeName(template.namespace),
                 _tina_metadata: {
                   id,
+                  name: nextPath.join('.'),
                   fields: metadataFields,
                 },
                 ...resolveFormValue({
@@ -556,6 +558,7 @@ const resolveFieldValue = ({
               __typename: NAMER.dataTypeName(field.namespace),
               _tina_metadata: {
                 id,
+                name: nextPath.join('.'),
                 fields: metadataFields,
               },
               ...resolveFormValue({

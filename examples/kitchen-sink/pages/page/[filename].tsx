@@ -47,19 +47,52 @@ export default function Home(
       {/* <ClientLoadExample /> */}
       {data.page.__typename === 'PageBlockPage'
         ? data.page.blocks.map((block) => {
-            if (block.__typename === 'PageBlockPageBlocksHero') {
+            if (block.__typename === 'PageBlockPageBlocksFeatures') {
               return (
-                <div>
+                <div className="mx-auto max-w-5xl p-8 rounded-lg shadow-md">
+                  {block.imageList?.map((item, index) => {
+                    return (
+                      <img
+                        data-vercel-edit-info={previewField(
+                          block,
+                          'imageList',
+                          index
+                        )}
+                        src={item}
+                      />
+                    )
+                  })}
+                </div>
+              )
+            } else if (block.__typename === 'PageBlockPageBlocksHero') {
+              return (
+                <div className="mx-auto max-w-5xl p-8 rounded-lg shadow-md">
                   <h3 data-vercel-edit-info={previewField(block, 'headline')}>
                     {block.headline}
                   </h3>
+                  <p data-vercel-edit-info={previewField(block, 'description')}>
+                    {block.description}
+                  </p>
+                  <div className="flex gap-2">
+                    {block.actions.map((action) => {
+                      if (
+                        action.__typename === 'PageBlockPageBlocksHeroActions'
+                      ) {
+                        return (
+                          <button data-vercel-edit-info={previewField(action)}>
+                            {action.label}
+                          </button>
+                        )
+                      }
+                    })}
+                  </div>
                 </div>
               )
             }
             return <div></div>
           })
         : null}
-      {/* <Json src={data} /> */}
+      <Json src={data} />
     </div>
   )
 }

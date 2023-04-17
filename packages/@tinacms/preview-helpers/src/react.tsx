@@ -11,9 +11,10 @@ export const previewField = <
   }
 >(
   obj: T,
-  field?: keyof Omit<T, '__typename' | '_sys'>
+  field?: keyof Omit<T, '__typename' | '_sys'>,
+  index?: number
 ) => {
-  const href = tinaField(obj, field)
+  const href = tinaField(obj, field, index)
   return JSON.stringify({ origin: 'tinacms', href })
 }
 

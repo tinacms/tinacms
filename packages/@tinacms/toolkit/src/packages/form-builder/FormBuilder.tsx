@@ -17,6 +17,7 @@ import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
 import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
+import { ActiveFieldContextProvider } from '../fields/use-active-field'
 
 export interface FormBuilderProps {
   form: Form
@@ -177,84 +178,86 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const fields = result ? result.fieldGroup : tinaForm.fields
 
   return (
-    <FinalForm
-      form={finalForm}
-      key={`${i}: ${tinaForm.id}`}
-      onSubmit={tinaForm.onSubmit}
-    >
-      {({
-        handleSubmit,
-        pristine,
-        invalid,
-        submitting,
-        dirtySinceLastSubmit,
-        hasValidationErrors,
-      }) => {
-        const canSubmit =
-          !pristine &&
-          !submitting &&
-          !hasValidationErrors &&
-          !(invalid && !dirtySinceLastSubmit)
+    <ActiveFieldContextProvider value={{ activeFieldName, setActiveFieldName }}>
+      <FinalForm
+        form={finalForm}
+        key={`${i}: ${tinaForm.id}`}
+        onSubmit={tinaForm.onSubmit}
+      >
+        {({
+          handleSubmit,
+          pristine,
+          invalid,
+          submitting,
+          dirtySinceLastSubmit,
+          hasValidationErrors,
+        }) => {
+          const canSubmit =
+            !pristine &&
+            !submitting &&
+            !hasValidationErrors &&
+            !(invalid && !dirtySinceLastSubmit)
 
-        const safeHandleSubmit = () => {
-          if (canSubmit) {
-            handleSubmit()
+          const safeHandleSubmit = () => {
+            if (canSubmit) {
+              handleSubmit()
+            }
           }
-        }
 
-        return (
-          <>
-            <DragDropContext onDragEnd={moveArrayItem}>
-              <FormKeyBindings onSubmit={safeHandleSubmit} />
+          return (
+            <>
+              <DragDropContext onDragEnd={moveArrayItem}>
+                <FormKeyBindings onSubmit={safeHandleSubmit} />
 
-              <FormPortalProvider>
-                <FormWrapper id={tinaForm.id}>
-                  {tinaForm && fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={fields} />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  )}
-                </FormWrapper>
-              </FormPortalProvider>
-              {!hideFooter && (
-                <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
-                  <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
-                    {tinaForm.reset && (
-                      <ResetForm
-                        pristine={pristine}
-                        reset={async () => {
-                          finalForm.reset()
-                          await tinaForm.reset!()
-                        }}
-                        style={{ flexGrow: 1 }}
+                <FormPortalProvider>
+                  <FormWrapper id={tinaForm.id}>
+                    {tinaForm && fields.length ? (
+                      <FieldsBuilder form={tinaForm} fields={fields} />
+                    ) : (
+                      <NoFieldsPlaceholder />
+                    )}
+                  </FormWrapper>
+                </FormPortalProvider>
+                {!hideFooter && (
+                  <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
+                    <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
+                      {tinaForm.reset && (
+                        <ResetForm
+                          pristine={pristine}
+                          reset={async () => {
+                            finalForm.reset()
+                            await tinaForm.reset!()
+                          }}
+                          style={{ flexGrow: 1 }}
+                        >
+                          {tinaForm.buttons.reset}
+                        </ResetForm>
+                      )}
+                      <Button
+                        onClick={safeHandleSubmit}
+                        disabled={!canSubmit}
+                        busy={submitting}
+                        variant="primary"
+                        style={{ flexGrow: 3 }}
                       >
-                        {tinaForm.buttons.reset}
-                      </ResetForm>
-                    )}
-                    <Button
-                      onClick={safeHandleSubmit}
-                      disabled={!canSubmit}
-                      busy={submitting}
-                      variant="primary"
-                      style={{ flexGrow: 3 }}
-                    >
-                      {submitting && <LoadingDots />}
-                      {!submitting && tinaForm.buttons.save}
-                    </Button>
-                    {tinaForm.actions.length > 0 && (
-                      <FormActionMenu
-                        form={tinaForm as any}
-                        actions={tinaForm.actions}
-                      />
-                    )}
+                        {submitting && <LoadingDots />}
+                        {!submitting && tinaForm.buttons.save}
+                      </Button>
+                      {tinaForm.actions.length > 0 && (
+                        <FormActionMenu
+                          form={tinaForm as any}
+                          actions={tinaForm.actions}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
-            </DragDropContext>
-          </>
-        )
-      }}
-    </FinalForm>
+                )}
+              </DragDropContext>
+            </>
+          )
+        }}
+      </FinalForm>
+    </ActiveFieldContextProvider>
   )
 }
 

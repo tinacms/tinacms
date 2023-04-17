@@ -43,6 +43,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
         value={value}
         src={src}
         loading={isImgUploading}
+        name={props.input.name}
         onClick={() => {
           const directory = uploadDir(props.form.getState().values)
           cms.media.open({

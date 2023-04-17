@@ -57,14 +57,20 @@ export const tinaField = <
   }
 >(
   obj: T,
-  field?: keyof Omit<T, '__typename' | '_sys'>
+  field?: keyof Omit<T, '__typename' | '_sys'>,
+  index?: number
 ) => {
   if (!field) {
     return `${obj._tina_metadata?.id}#${obj._tina_metadata?.name}`
   }
   if (obj?._tina_metadata) {
     if (typeof field === 'string') {
-      return `${obj._tina_metadata?.id}#${obj._tina_metadata.fields[field]}`
+      const value = `${obj._tina_metadata?.id}#${obj._tina_metadata.fields[field]}`
+      if (typeof index === 'number') {
+        return `${value}.${index}`
+      } else {
+        return value
+      }
     }
   }
   return ''
