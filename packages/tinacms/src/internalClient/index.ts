@@ -570,15 +570,12 @@ mutation addPendingDocumentMutation(
   ): Promise<Response> {
     const headers = init?.headers || {}
     const token = await this.getToken()
-    if (!token?.id_token) {
-      throw new Error('Authentication required')
+    if (token?.id_token) {
+      headers['Authorization'] = 'Bearer ' + token?.id_token
     }
     return await fetch(input, {
       ...init,
-      headers: new Headers({
-        Authorization: 'Bearer ' + token?.id_token,
-        ...headers,
-      }),
+      headers: new Headers(headers),
     })
   }
 
