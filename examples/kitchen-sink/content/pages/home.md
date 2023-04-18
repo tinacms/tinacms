@@ -13,6 +13,12 @@ blocks:
   - title: Features
     imageList:
       - /uploads/llama-4.avif
+    checkbox:
+      - movies
+      - new
+    categoriesOther:
+      - world!
+      - Hello
     items:
       - Query Your Content
       - Build on Top of Your Components
@@ -27,5 +33,6 @@ blocks:
     _template: cta
 _template: blockPage
 ---
+
 
 

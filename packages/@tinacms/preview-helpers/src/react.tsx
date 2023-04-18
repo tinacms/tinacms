@@ -54,7 +54,6 @@ export const useEditDemo = () => {
     if (e.target instanceof Element) {
       const vercelEditInfo = e.target.getAttribute('data-vercel-edit-info')
       if (vercelEditInfo) {
-        // e.stopPropagation()
         const event = new CustomEvent('edit:open', {
           bubbles: true,
           detail: JSON.parse(vercelEditInfo),

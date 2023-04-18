@@ -24,6 +24,8 @@ export const BaseTextField = ({ className = '', ...props }) => {
   useActiveFieldCallback(props.name, () => {
     if (ref.current) {
       ref.current.focus()
+      // Smooth scrolling doesn't seem to work when block is set
+      ref.current.scrollIntoView({ behavior: 'smooth' })
     }
   })
 

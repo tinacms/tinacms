@@ -53,6 +53,7 @@ export default function Home(
                   {block.imageList?.map((item, index) => {
                     return (
                       <img
+                        className="max-w-lg"
                         data-vercel-edit-info={previewField(
                           block,
                           'imageList',
@@ -62,6 +63,40 @@ export default function Home(
                       />
                     )
                   })}
+                  <ul data-vercel-edit-info={previewField(block, 'checkbox')}>
+                    {block.checkbox?.map((item, index) => {
+                      return <li>{item}</li>
+                    })}
+                  </ul>
+                  <ul>
+                    {block.categoriesOther?.map((item, index) => {
+                      return (
+                        <li
+                          data-vercel-edit-info={previewField(
+                            block,
+                            'categoriesOther'
+                          )}
+                        >
+                          {item}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                  <ul>
+                    {block.items?.map((item, index) => {
+                      return (
+                        <li
+                          data-vercel-edit-info={previewField(
+                            block,
+                            'categoriesOther',
+                            index
+                          )}
+                        >
+                          {item}
+                        </li>
+                      )
+                    })}
+                  </ul>
                 </div>
               )
             } else if (block.__typename === 'PageBlockPageBlocksHero') {

@@ -6,6 +6,7 @@
 
 import * as React from 'react'
 import { BiCheck } from 'react-icons/bi'
+import { useActiveFieldCallback } from '../use-active-field'
 
 type Option = {
   value: string
@@ -41,6 +42,14 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
     if (typeof option === 'object') return option
     return { value: option, label: option }
   }
+
+  const ref = React.useRef<HTMLDivElement>(null)
+  useActiveFieldCallback(input.name, () => {
+    if (ref.current) {
+      const el = ref.current
+      el.focus()
+    }
+  })
 
   const toComponent = (option: Option) => {
     const optionId = `field-${field.name}-option-${option.value}`
@@ -117,6 +126,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
 
   return (
     <div
+      ref={ref}
       className={`flex w-full ${
         field.direction === 'horizontal'
           ? 'flex-wrap gap-y-1 gap-x-3'

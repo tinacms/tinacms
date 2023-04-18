@@ -36,6 +36,7 @@ export const TagsField = wrapFieldsWithMeta<
       <div className="flex items-center gap-3">
         <BaseTextField
           value={value}
+          name={input.name}
           onChange={(event) => setValue(event.target.value)}
           placeholder={field.placeholder ? field.placeholder : 'Add a tag'}
           onKeyPress={(event) => {
