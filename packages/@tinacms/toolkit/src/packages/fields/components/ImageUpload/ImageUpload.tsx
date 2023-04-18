@@ -69,12 +69,12 @@ export const ImageUpload = ({
           <ImageLoadingIndicator />
         ) : (
           <div
-            className={`relative w-full max-w-full flex justify-between gap-3 ${
+            className={`relative w-full max-w-full flex justify-start gap-3 ${
               isImage(src) ? `items-start` : `items-center`
             }`}
           >
             <button
-              className="outline-none overflow-visible flex-1 w-[0px] cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
+              className="outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
               onClick={onClick}
             >
               {isImage(src) ? (

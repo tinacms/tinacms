@@ -940,10 +940,7 @@ const resolveDateInput = (value: string) => {
     throw 'Invalid Date'
   }
 
-  /**
-   * toISOString() converts to UTC
-   */
-  return date.toISOString()
+  return date
 }
 
 type FieldParams = {

@@ -1,5 +1,18 @@
 # Change Log
 
+## 1.6.4
+
+### Patch Changes
+
+- 709b6f2ec: Fix template menu UI, image delete button
+
+## 1.6.3
+
+### Patch Changes
+
+- 2a32a0b99: Truncate long branch names in sidebar UI
+- 6f491f38c: allow slashes in branch names
+
 ## 1.6.2
 
 ### Patch Changes

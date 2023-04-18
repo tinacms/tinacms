@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/app",
-  "version": "1.2.3",
+  "version": "1.2.6",
   "main": "src/main.tsx",
   "license": "Apache-2.0",
   "devDependencies": {

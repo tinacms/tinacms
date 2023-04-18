@@ -1,5 +1,28 @@
 # tinacms
 
+## 1.4.6
+
+### Patch Changes
+
+- 709b6f2ec: Fix template menu UI, image delete button
+- Updated dependencies [709b6f2ec]
+  - @tinacms/toolkit@1.6.4
+
+## 1.4.5
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+
+## 1.4.4
+
+### Patch Changes
+
+- 7c750e370: Fix the initialization of sort order in collection list when previous desc sort order in local storage
+- Updated dependencies [2a32a0b99]
+- Updated dependencies [6f491f38c]
+  - @tinacms/toolkit@1.6.3
+
 ## 1.4.3
 
 ### Patch Changes

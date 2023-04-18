@@ -124,13 +124,14 @@ const FilenameInput = (props) => {
   )
 }
 
-const RenderForm = ({
+export const RenderForm = ({
   cms,
   collection,
+  folder,
   templateName,
   mutationInfo,
-  folder,
-}) => {
+  customDefaults,
+}: any) => {
   const navigate = useNavigate()
   const [formIsPristine, setFormIsPristine] = useState(true)
   const schema: TinaSchema | undefined = cms.api.tina.schema
@@ -164,8 +165,11 @@ const RenderForm = ({
   }
 
   const defaultItem =
+    customDefaults ||
     // @ts-ignore internal types aren't up to date
-    template.ui?.defaultItem || template?.defaultItem
+    template.ui?.defaultItem ||
+    // @ts-ignore
+    template?.defaultItem
 
   const form = useMemo(() => {
     return new Form({

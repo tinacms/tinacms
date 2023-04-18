@@ -99,7 +99,7 @@ export class ConfigManager {
     )
     if (!this.tinaConfigFilePath) {
       throw new Error(
-        `Unable to find confg file in ${this.tinaFolderPath}. Looking for a file named "config.{ts,tsx,js,jsx}"`
+        `Unable to find config file in ${this.tinaFolderPath}. Looking for a file named "config.{ts,tsx,js,jsx}"`
       )
     }
     this.selfHostedDatabaseFilePath = await this.getPathWithExtension(
@@ -271,13 +271,15 @@ export class ConfigManager {
   }
   printRelativePath(filename: string) {
     if (filename) {
-      return filename.replace(`${this.rootPath}/`, '')
+      return filename.replace(/\\/g, '/').replace(`${this.rootPath}/`, '')
     }
     throw `No path provided to print`
   }
   printContentRelativePath(filename: string) {
     if (filename) {
-      return filename.replace(`${this.contentRootPath}/`, '')
+      return filename
+        .replace(/\\/g, '/')
+        .replace(`${this.contentRootPath}/`, '')
     }
     throw `No path provided to print`
   }
