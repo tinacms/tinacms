@@ -452,15 +452,17 @@ export class TinaSchema {
         ? this.getCollection(collectionOrString)
         : collectionOrString
     const normalPath = normalizePath(collection.path)
-    const slash = normalPath ? '/' : ''
+
+    // if normalPath is empty, we don't want to add a trailing slash
+    const pathSuffix = normalPath ? '/' : ''
     const format = collection.format || 'md'
     const matches: string[] = []
     if (collection?.match?.include) {
-      const match = `${normalPath}${slash}${collection.match.include}.${format}`
+      const match = `${normalPath}${pathSuffix}${collection.match.include}.${format}`
       matches.push(match)
     }
     if (collection?.match?.exclude) {
-      const exclude = `!(${normalPath}${slash}${collection.match.exclude}.${format})`
+      const exclude = `!(${normalPath}${pathSuffix}${collection.match.exclude}.${format})`
       matches.push(exclude)
     }
     return matches
