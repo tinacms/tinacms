@@ -198,7 +198,15 @@ export const TinaAdmin = ({
                     }
                   />
                   <Route
-                    path="collections/:collectionName/duplicate/*"
+                    path="collections/duplicate/:collectionName/~/*"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionDuplicatePage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="collections/duplicate/:collectionName/*"
                     element={
                       <DefaultWrapper cms={cms}>
                         <CollectionDuplicatePage />

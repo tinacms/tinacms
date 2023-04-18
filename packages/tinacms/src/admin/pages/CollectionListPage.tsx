@@ -841,10 +841,18 @@ const CollectionListPage = () => {
                                             label: 'Duplicate',
                                             Icon: <BiCopy size="1.3rem" />,
                                             onMouseDown: () => {
+                                              const pathToDoc =
+                                                document.node._sys.breadcrumbs
+                                              if (folder.fullyQualifiedName) {
+                                                pathToDoc.unshift('~')
+                                              }
                                               navigate(
-                                                `/collections/${collectionName}/duplicate/${document.node._sys.breadcrumbs.join(
-                                                  '/'
-                                                )}`,
+                                                `/${[
+                                                  'collections',
+                                                  'duplicate',
+                                                  collectionName,
+                                                  ...pathToDoc,
+                                                ].join('/')}`,
                                                 { replace: true }
                                               )
                                             },

@@ -8,6 +8,18 @@ export type CollectionFolder = {
   fullyQualifiedName: string
   parentName: string
 }
+
+export const parentFolder = (folder: CollectionFolder) => {
+  return {
+    ...folder,
+    name: folder.name.split('/').slice(0, -1).join('/'),
+    fullyQualifiedName: folder.fullyQualifiedName
+      .split('/')
+      .slice(0, -1)
+      .join('/'),
+    parentName: folder.parentName.split('/').slice(0, -1).join('/'),
+  }
+}
 export const useCollectionFolder = () => {
   const [folder, setFolder] = useState<CollectionFolder>({
     loading: true,

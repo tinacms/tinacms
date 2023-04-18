@@ -6,8 +6,10 @@ import GetCollection from '../components/GetCollection'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { RenderForm } from './CollectionCreatePage'
 import GetDocument from '../components/GetDocument'
+import { parentFolder, useCollectionFolder } from './utils'
 
 const CollectionDuplicatePage = () => {
+  const folder = useCollectionFolder()
   const { collectionName, ...rest } = useParams()
   const { '*': filename } = rest
 
@@ -17,10 +19,13 @@ const CollectionDuplicatePage = () => {
         <GetCollection
           cms={cms}
           collectionName={collectionName}
+          folder={folder}
           includeDocuments={false}
         >
           {(collection) => {
-            const relativePath = `${filename}.${collection.format}`
+            const relativePath = `${
+              filename.startsWith('~/') ? filename.substring(2) : filename
+            }.${collection.format}`
 
             const mutationInfo = {
               includeCollection: true,
@@ -39,6 +44,7 @@ const CollectionDuplicatePage = () => {
                       cms={cms}
                       collection={collection}
                       templateName={document._values?._template}
+                      folder={parentFolder(folder)}
                       mutationInfo={mutationInfo}
                       customDefaults={document._values}
                     />
