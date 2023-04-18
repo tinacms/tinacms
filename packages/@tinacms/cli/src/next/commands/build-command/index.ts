@@ -115,9 +115,11 @@ export class BuildCommand extends Command {
     })
     const apiURL = await codegen.execute()
 
-    await this.checkClientInfo(configManager, apiURL)
-    await waitForDB(configManager.config, apiURL, false)
-    await this.checkGraphqlSchema(configManager, database, apiURL)
+    if (!configManager.hasSelfHostedConfig()) {
+      await this.checkClientInfo(configManager, apiURL)
+      await waitForDB(configManager.config, apiURL, false)
+      await this.checkGraphqlSchema(configManager, database, apiURL)
+    }
 
     await buildProductionSpa(configManager, database, apiURL)
 
