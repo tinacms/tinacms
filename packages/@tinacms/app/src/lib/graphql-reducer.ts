@@ -17,6 +17,7 @@ import {
   TinaField,
   Client,
   FormOptions,
+  GlobalFormPlugin,
 } from 'tinacms'
 import { createForm, createGlobalForm, FormifyCallback } from './build-form'
 import type {
@@ -723,7 +724,11 @@ const buildForm = ({
   if (form) {
     if (shouldRegisterForm) {
       form.subscribe(() => {}, { values: true })
-      cms.forms.add(form)
+      if (collection.ui?.global) {
+        cms.plugins.add(new GlobalFormPlugin(form))
+      } else {
+        cms.forms.add(form)
+      }
     }
   }
   if (!form) {
