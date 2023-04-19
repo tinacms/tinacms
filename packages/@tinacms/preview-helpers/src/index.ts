@@ -4,10 +4,11 @@ import { vercelStegaEncode } from '@vercel/stega'
 import { tinaField } from 'tinacms/dist/react'
 import type { TinaClient } from 'tinacms/dist/client'
 
-function encodeEditInfo(text: string, href: string): string {
+function encodeEditInfo(text: string, fieldName: string): string {
   return `${vercelStegaEncode({
     origin: 'tinacms',
-    href,
+    // href, // omit for now?
+    data: { fieldName },
   })}${text}`
 }
 

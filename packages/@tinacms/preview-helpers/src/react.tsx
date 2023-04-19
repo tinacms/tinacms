@@ -26,7 +26,7 @@ export const useEditOpen = (redirectPath: string) => {
       if (edit) {
         console.log('edit:open in edit mode')
         parent.postMessage(
-          { type: 'field:selected', value: event.detail.href },
+          { type: 'field:selected', value: event.detail?.data?.fieldName },
           window.location.origin
         )
       } else {
