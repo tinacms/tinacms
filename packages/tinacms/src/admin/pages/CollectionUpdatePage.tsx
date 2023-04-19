@@ -139,7 +139,7 @@ const RenderForm = ({
 
   return (
     <>
-      {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
+      {!cms?.api?.tina?.isLocalMode && <BillingWarning />}
       <div
         className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
       >

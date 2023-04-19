@@ -437,7 +437,6 @@ const SidebarHeader = ({
 
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
-      {isLocalMode && <LocalWarning />}
       {!isLocalMode && <BillingWarning />}
       {branchingEnabled && !isLocalMode && <BranchBanner />}
 

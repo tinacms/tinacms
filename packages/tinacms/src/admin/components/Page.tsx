@@ -46,7 +46,6 @@ export const PageHeader = ({
 }) => {
   return (
     <>
-      {isLocalMode && <LocalWarning />}
       {!isLocalMode && <BillingWarning />}
 
       <div className="pt-12 px-12">

@@ -17,6 +17,7 @@ import { LoadingDots } from '../../form-builder'
 import { SyncStatus, SyncErrorWidget, SyncStatusModal } from './SyncStatus'
 import { useCMS } from '../../react-core'
 import { CloudConfigPlugin } from '../../react-cloud-config'
+import { LocalWarning } from './LocalWarning'
 
 interface NavProps {
   isLocalMode: boolean
@@ -204,6 +205,12 @@ export const Nav = ({
           </>
         )}
       </div>
+
+      {isLocalMode && (
+        <div className="border-t border-gray-150">
+          <LocalWarning />
+        </div>
+      )}
     </div>
   )
 }
