@@ -33,7 +33,7 @@ export declare type DefaultSidebarState = 'open' | 'closed'
 export class SidebarState {
   private _isOpen: boolean = false
   placeholder: React.FC
-
+  listItems: ListItem[]
   position: SidebarPosition = 'displace'
   renderNav: boolean = true
   buttons: SidebarButtons = {
@@ -46,6 +46,7 @@ export class SidebarState {
     this.position = options.position || 'displace'
     this.renderNav = options.renderNav || true
     this.placeholder = options.placeholder || NoFormsPlaceholder
+    this.listItems = []
 
     if (options.buttons?.save) {
       this.buttons.save = options.buttons.save
@@ -73,9 +74,30 @@ export class SidebarState {
     }
   }
 
+  setListItems(listItems: ListItem[]) {
+    this.listItems = listItems
+  }
+
   subscribe(callback: Callback): () => void {
     const unsub = this.events.subscribe('sidebar', callback)
 
     return () => unsub()
   }
 }
+
+export type ListItemItem = {
+  type: 'item'
+  path: (string | number)[]
+  form: {
+    id: string
+    label: string
+  }
+  subItems: ListItemItem[]
+}
+export type ListItemList = {
+  type: 'list'
+  label: string
+  items: ListItemItem[]
+}
+
+export type ListItem = ListItemItem | ListItemList

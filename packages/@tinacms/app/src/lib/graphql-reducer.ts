@@ -86,6 +86,19 @@ const astNodeWithMeta: G.DocumentNode = {
 export const schema = G.buildASTSchema(astNode)
 export const schemaForResolver = G.buildASTSchema(astNodeWithMeta)
 
+type ListItemItem = {
+  type: 'item'
+  path: (string | number)[]
+  form: {
+    id: string
+    label: string
+  }
+  subItems: ListItemItem[]
+}
+type ListItemList = { type: 'list'; label: string; items: ListItemItem[] }
+
+export type ListItem = ListItemItem | ListItemList
+
 export const useGraphQLReducer = (
   iframe: React.MutableRefObject<HTMLIFrameElement>,
   url: string
@@ -132,7 +145,8 @@ export const useGraphQLReducer = (
             return payload
           } else {
             const expandedPayload = await expandPayload(payload, cms)
-            processPayload(expandedPayload)
+            const listItems = processPayload(expandedPayload)
+            cms.sidebar?.setListItems(listItems)
             return expandedPayload
           }
         })
@@ -146,11 +160,12 @@ export const useGraphQLReducer = (
   }, [payloads.map(({ id }) => id).join('.'), cms])
 
   const processPayload = React.useCallback(
-    (payload: Payload) => {
+    (payload: Payload): ListItem[] => {
       const { expandedQueryForResolver, variables, expandedData } = payload
       if (!expandedQueryForResolver || !expandedData) {
         throw new Error(`Unable to process payload which has not been expanded`)
       }
+      const listItems: ListItem[] = []
 
       const result = G.graphqlSync({
         schema: schemaForResolver,
@@ -200,12 +215,19 @@ export const useGraphQLReducer = (
             }
           }
           if (isNodeType(info.returnType)) {
+            const connectionType = traversePath(
+              info.path,
+              (typename: string | undefined) =>
+                typename?.endsWith('Connection') || false
+            )
+            let isFromReference = false
             if (!value) {
               return
             }
             let resolvedDocument: ResolvedDocument
             // This is a reference from another form
             if (typeof value === 'string') {
+              isFromReference = true
               const valueFromSetup = getIn(
                 expandedData,
                 G.responsePathAsArray(info.path).join('.')
@@ -249,14 +271,27 @@ export const useGraphQLReducer = (
                 },
                 { values: true }
               )
+              appendToListItems({
+                listItems,
+                connectionType,
+                path: info.path,
+                form,
+                isFromReference,
+              })
+              form.addQuery(payload.id)
               return resolveDocument(resolvedDocument, template, form)
             } else {
-              existingForm.addQuery(payload.id)
               const { template } = getTemplateForDocument(
                 resolvedDocument,
                 tinaSchema
               )
-              existingForm.addQuery(payload.id)
+              appendToListItems({
+                listItems,
+                connectionType,
+                path: info.path,
+                form: existingForm,
+                isFromReference,
+              })
               return resolveDocument(resolvedDocument, template, existingForm)
             }
           }
@@ -288,26 +323,8 @@ export const useGraphQLReducer = (
           id: payload.id,
           data: result.data,
         })
-
-        // WIP for testing reverse active field
-        // This can be improved, for now we just need something to test with
-        // const elements =
-        //   iframe.current?.contentWindow?.document.querySelectorAll<HTMLElement>(
-        //     `[data-tinafield]`
-        //   )
-        // if (elements) {
-        //   for (let i = 0; i < elements.length; i++) {
-        //     const el = elements[i]
-        //     el.onclick = () => {
-        //       const tinafield = el.getAttribute('data-tinafield')
-        //       cms.events.dispatch({
-        //         type: 'field:selected',
-        //         value: tinafield,
-        //       })
-        //     }
-        //   }
-        // }
       }
+      return listItems
     },
     [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
   )
@@ -363,7 +380,8 @@ export const useGraphQLReducer = (
   React.useEffect(() => {
     payloads.forEach((payload) => {
       if (payload.expandedData) {
-        processPayload(payload)
+        const listItems = processPayload(payload)
+        cms.sidebar?.setListItems(listItems)
       }
     })
   }, [operationIndex])
@@ -713,7 +731,6 @@ const buildForm = ({
         cms
       ),
     label: collection.label || collection.name,
-    queries: [payloadId],
   }
   if (tinaSchema.config.config?.formifyCallback) {
     const callback = tinaSchema.config.config
@@ -747,4 +764,117 @@ const buildForm = ({
     throw new Error(`No form registered for ${id}.`)
   }
   return { template, form }
+}
+
+const appendToListItems = ({
+  listItems,
+  connectionType,
+  isFromReference,
+  path,
+  form,
+}: {
+  listItems: ListItem[]
+  connectionType: G.ResponsePath | undefined
+  isFromReference: boolean
+  path: G.ResponsePath
+  form: Form
+}) => {
+  const pathArray = G.responsePathAsArray(path)
+  const listLabel =
+    connectionType?.typename &&
+    connectionType?.typename.replace('Connection', ' List')
+  if (connectionType) {
+    const existing = listItems.find(
+      (item) => item.type === 'list' && item.label === listLabel
+    )
+    if (existing) {
+      if (existing.type === 'list') {
+        appendItemToListItems({
+          listItems: existing.items,
+          isFromReference,
+          form,
+          path,
+        })
+      } else {
+        throw new Error(
+          `Expected ListItem for connection ${connectionType.typename}`
+        )
+      }
+    } else {
+      listItems.push({
+        type: 'list',
+        label: listLabel || '',
+        items: [
+          {
+            type: 'item',
+            path: pathArray,
+            form: { id: form.id, label: form.label },
+            subItems: [],
+          },
+        ],
+      })
+    }
+  } else {
+    appendItemToListItems({ listItems, isFromReference, form, path })
+  }
+}
+
+const appendItemToListItems = ({
+  listItems,
+  isFromReference,
+  path,
+  form,
+}: {
+  listItems: ListItem[]
+  isFromReference: boolean
+  path: G.ResponsePath
+  form: Form
+}) => {
+  const pathArray = G.responsePathAsArray(path)
+  if (isFromReference) {
+    let parent!: ListItemItem
+    let longestParentPath = 0
+    listItems
+      .filter(
+        (item) =>
+          item.type === 'item' &&
+          G.responsePathAsArray(path).join('.').startsWith(item.path.join('.'))
+      )
+      .forEach((item) => {
+        if (item.type === 'item') {
+          if (item.path.length > longestParentPath) {
+            parent = item
+            longestParentPath = item.path.length
+          }
+        }
+      })
+    if (parent) {
+      parent.subItems.push({
+        type: 'item',
+        path: pathArray,
+        subItems: [],
+        form: { id: form.id, label: form.label },
+      })
+    }
+  } else {
+    listItems.push({
+      type: 'item',
+      path: pathArray,
+      subItems: [],
+      form: { id: form.id, label: form.label },
+    })
+  }
+}
+
+const traversePath = (
+  p: G.ResponsePath,
+  callback: (typename: string | undefined) => boolean
+): G.ResponsePath | undefined => {
+  if (callback(p.typename)) {
+    return p
+  }
+  if (p.prev) {
+    return traversePath(p.prev, callback)
+  }
+  return undefined
 }
