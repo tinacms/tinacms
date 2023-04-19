@@ -14,15 +14,17 @@ export const previewField = <
   field?: keyof Omit<T, '__typename' | '_sys'>,
   index?: number
 ) => {
-  const href = tinaField(obj, field, index)
-  return JSON.stringify({ origin: 'tinacms', href })
+  const fieldName = tinaField(obj, field, index)
+  return JSON.stringify({ origin: 'tinacms', data: { fieldName } })
 }
 
 export const useEditOpen = (redirectPath: string) => {
   const { edit } = useEditState()
   const handleOpenEvent = useCallback(
     (event: CustomEventInit) => {
+      console.log('edit:open started', event)
       if (edit) {
+        console.log('edit:open in edit mode')
         parent.postMessage(
           { type: 'field:selected', value: event.detail.href },
           window.location.origin
@@ -33,7 +35,8 @@ export const useEditOpen = (redirectPath: string) => {
           : `/${redirectPath}`
         const tinaAdminPath = `${tinaAdminBasePath}/index.html#/~${
           window.location.pathname
-        }?activeField=${event.detail.href.replace('#', '__')}`
+        }?activeField=${event.detail.data.fieldName.replace('#', '__')}`
+        console.log('edit:open not in edit mode, redirecting', tinaAdminPath)
         window.location.assign(tinaAdminPath)
       }
     },
@@ -72,3 +75,14 @@ export const useEditDemo = () => {
     }
   }, [])
 }
+
+// const redirectPath = '/admin'
+// const handleOpenEvent =  (event) => {
+//       const tinaAdminBasePath = redirectPath.startsWith('/')
+//         ? redirectPath
+//         : `/${redirectPath}`
+//       const tinaAdminPath = `${tinaAdminBasePath}/index.html#/~${
+//         window.location.pathname
+//       }?activeField=${event.detail.href.replace('#', '__')}`
+//       window.location.assign(tinaAdminPath)
+//     }
