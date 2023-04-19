@@ -220,11 +220,15 @@ const BlockListItem = ({
                   return
                 }
 
-                setExpanded(true)
-                setFocusedField({
-                  id: tinaForm.id,
-                  fieldName: `${field.name}.${index}`,
+                cms.events.dispatch({
+                  type: 'field:selected',
+                  value: `${tinaForm.id}#${field.name}.${index}`,
                 })
+                // setExpanded(true)
+                // setFocusedField({
+                //   id: tinaForm.id,
+                //   fieldName: `${field.name}.${index}`,
+                // })
               }}
               onMouseOver={() =>
                 setHoveredField({
@@ -241,7 +245,7 @@ const BlockListItem = ({
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />
             )}
           </ItemHeader>
-          <FormPortal>
+          {/* <FormPortal>
             {({ zIndexShift }) => (
               <Panel
                 zIndexShift={zIndexShift}
@@ -255,7 +259,7 @@ const BlockListItem = ({
                 template={template}
               />
             )}
-          </FormPortal>
+          </FormPortal> */}
         </>
       )}
     </Draggable>

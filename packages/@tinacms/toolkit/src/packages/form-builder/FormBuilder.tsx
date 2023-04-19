@@ -18,6 +18,7 @@ import { FormActionMenu } from './FormActions'
 import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
 import { ActiveFieldContextProvider } from '../fields/use-active-field'
+import { IoMdClose } from 'react-icons/io'
 
 export interface FormBuilderProps {
   form: Form
@@ -114,15 +115,15 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   // This subscribes multiple times since the event bus doesn't know how to
   // only subscribe once
   React.useMemo(() => {
-    if (setActiveFormId) {
-      cms.events.subscribe('field:selected', (e) => {
-        if (e.value.includes('#')) {
-          const [formId, fieldName] = e.value.split('#')
+    cms.events.subscribe('field:selected', (e) => {
+      if (e.value.includes('#')) {
+        const [formId, fieldName] = e.value.split('#')
+        if (setActiveFormId) {
           setActiveFormId(formId)
-          setActiveFieldName(fieldName)
         }
-      })
-    }
+        setActiveFieldName(fieldName)
+      }
+    })
   }, [setActiveFormId])
 
   const finalForm = tinaForm.finalForm
@@ -208,7 +209,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
             <>
               <DragDropContext onDragEnd={moveArrayItem}>
                 <FormKeyBindings onSubmit={safeHandleSubmit} />
-
+                <PanelHeader
+                  path={result?.path}
+                  setActiveFieldName={setActiveFieldName}
+                />
                 <FormPortalProvider>
                   <FormWrapper id={tinaForm.id}>
                     {tinaForm && fields.length ? (
@@ -524,4 +528,45 @@ const getFieldGroup = ({
       }
     }
   }
+}
+
+const isNumber = (item: string) => {
+  return !isNaN(Number(item))
+}
+
+const PanelHeader = ({
+  path,
+  setActiveFieldName,
+}: {
+  path?: string[]
+  setActiveFieldName: (value: string) => void
+}) => {
+  if (!path || path.length === 0) {
+    return null
+  }
+  let lastItem
+  let lastItemIndex
+  path.forEach((item, index) => {
+    if (!isNumber(item)) {
+      lastItemIndex = index
+      lastItem = item
+    }
+  })
+  const returnPath = path.slice(0, lastItemIndex)
+
+  return (
+    <button
+      className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
+   border-gray-100 px-6 -mt-px`}
+      onClick={() => {
+        setActiveFieldName(returnPath.length > 0 ? returnPath.join('.') : null)
+      }}
+      tabIndex={-1}
+    >
+      <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
+        {lastItem}
+        <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+      </div>
+    </button>
+  )
 }

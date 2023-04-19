@@ -63,7 +63,7 @@ export const tinaField = <
   if (!field) {
     return `${obj._tina_metadata?.id}#${obj._tina_metadata?.name}`
   }
-  if (obj?._tina_metadata) {
+  if (obj?._tina_metadata && obj._tina_metadata?.fields) {
     if (typeof field === 'string') {
       const value = `${obj._tina_metadata?.id}#${obj._tina_metadata.fields[field]}`
       if (typeof index === 'number') {

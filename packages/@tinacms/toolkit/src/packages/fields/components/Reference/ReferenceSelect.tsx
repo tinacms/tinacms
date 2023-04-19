@@ -10,6 +10,7 @@ import type { ReferenceFieldProps } from './index'
 import { selectFieldClasses } from '../Select'
 import { LoadingDots } from '../../../form-builder'
 import { MdKeyboardArrowDown } from 'react-icons/md'
+import { useActiveFieldCallback } from '../../use-active-field'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
@@ -107,6 +108,14 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
 }) => {
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
 
+  const ref = React.useRef<HTMLSelectElement>(null)
+  useActiveFieldCallback(input.name, () => {
+    if (ref.current) {
+      const el = ref.current
+      el.focus()
+    }
+  })
+
   if (loading === true) {
     return <LoadingDots color="var(--tina-color-primary)" />
   }
@@ -114,6 +123,7 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
   return (
     <>
       <select
+        ref={ref}
         id={input.name}
         value={input.value}
         onChange={input.onChange}
