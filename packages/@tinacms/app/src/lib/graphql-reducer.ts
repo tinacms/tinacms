@@ -17,6 +17,7 @@ import {
   TinaField,
   Client,
   FormOptions,
+  GlobalFormPlugin,
 } from 'tinacms'
 import { createForm, createGlobalForm, FormifyCallback } from './build-form'
 import type {
@@ -323,6 +324,24 @@ export const useGraphQLReducer = (
           id: payload.id,
           data: result.data,
         })
+
+        // This can be improved, for now we just need something to test with
+        const elements =
+          iframe.current?.contentWindow?.document.querySelectorAll<HTMLElement>(
+            `[data-tinafield]`
+          )
+        if (elements) {
+          for (let i = 0; i < elements.length; i++) {
+            const el = elements[i]
+            el.onclick = () => {
+              const tinafield = el.getAttribute('data-tinafield')
+              cms.events.dispatch({
+                type: 'field:selected',
+                value: tinafield,
+              })
+            }
+          }
+        }
       }
       return listItems
     },
@@ -757,7 +776,11 @@ const buildForm = ({
   if (form) {
     if (shouldRegisterForm) {
       form.subscribe(() => {}, { values: true })
-      cms.forms.add(form)
+      if (collection.ui?.global) {
+        cms.plugins.add(new GlobalFormPlugin(form))
+      } else {
+        cms.forms.add(form)
+      }
     }
   }
   if (!form) {
