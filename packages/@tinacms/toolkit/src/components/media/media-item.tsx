@@ -19,7 +19,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   const thumbnail = (item.thumbnails || {})['75x75']
   return (
     <li
-      className={`flex shrink-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
+      className={`flex shrink-0 gap-3 items-center py-0 pl-0 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
         active
           ? 'bg-gradient-to-r from-white to-gray-50/50 text-blue-500 hover:bg-gray-50'
           : 'bg-white hover:bg-gray-50/50'
@@ -32,7 +32,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
         }
       }}
     >
-      <div className="w-20 h-20 bg-gray-50 shadow border border-gray-100 rounded overflow-hidden flex justify-center flex-shrink-0">
+      <div className="w-16 h-16 border-r border-gray-100 bg-gray-50 flex justify-center flex-shrink-0">
         {isImage(thumbnail) ? (
           <img
             className="object-cover w-full h-full object-center"
@@ -40,7 +40,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
             alt={item.filename}
           />
         ) : (
-          <FileIcon className="w-3/5 h-full fill-gray-300" />
+          <FileIcon className="w-1/2 h-full fill-gray-300" />
         )}
       </div>
       <span className={'text-base flex-grow w-full break-words truncate'}>
