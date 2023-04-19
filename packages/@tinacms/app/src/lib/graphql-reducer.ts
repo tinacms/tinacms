@@ -221,6 +221,7 @@ export const useGraphQLReducer = (
                 typename?.endsWith('Connection') || false
             )
             let isFromReference = false
+
             if (!value) {
               return
             }
@@ -323,6 +324,24 @@ export const useGraphQLReducer = (
           id: payload.id,
           data: result.data,
         })
+
+        // This can be improved, for now we just need something to test with
+        const elements =
+          iframe.current?.contentWindow?.document.querySelectorAll<HTMLElement>(
+            `[data-tinafield]`
+          )
+        if (elements) {
+          for (let i = 0; i < elements.length; i++) {
+            const el = elements[i]
+            el.onclick = () => {
+              const tinafield = el.getAttribute('data-tinafield')
+              cms.events.dispatch({
+                type: 'field:selected',
+                value: tinafield,
+              })
+            }
+          }
+        }
       }
       return listItems
     },
