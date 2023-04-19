@@ -7,7 +7,6 @@ import type { TinaClient } from 'tinacms/dist/client'
 function encodeEditInfo(text: string, fieldName: string): string {
   return `${vercelStegaEncode({
     origin: 'tinacms',
-    // href, // omit for now?
     data: { fieldName },
   })}${text}`
 }
@@ -137,7 +136,12 @@ export const expandWithMetadata = async <
         return documentWithMetadata(documentSchema.passthrough().parse(value))
       }
       if (typeof value === 'string' && source?._tina_metadata) {
-        return encodeEditInfo(value, tinaField(source, info.fieldName))
+        // FIXME: hack to prevent breaking images
+        if (isValidHttpUrl(value)) {
+          return value
+        } else {
+          return encodeEditInfo(value, tinaField(source, info.fieldName))
+        }
       }
       return value
     },
@@ -147,6 +151,15 @@ export const expandWithMetadata = async <
     data: D
     variables: V
     query: Q
+  }
+}
+
+function isValidHttpUrl(string: string) {
+  try {
+    new URL(string)
+    return true
+  } catch (_) {
+    return false
   }
 }
 
