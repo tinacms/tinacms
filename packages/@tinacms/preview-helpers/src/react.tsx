@@ -23,7 +23,10 @@ export const useEditOpen = (redirectPath: string) => {
   const handleOpenEvent = useCallback(
     (event: CustomEventInit) => {
       if (edit) {
-        parent.postMessage({ type: 'field:selected', value: event.detail.href })
+        parent.postMessage(
+          { type: 'field:selected', value: event.detail.href },
+          window.location.origin
+        )
       } else {
         const tinaAdminBasePath = redirectPath.startsWith('/')
           ? redirectPath
