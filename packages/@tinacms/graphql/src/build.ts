@@ -3,8 +3,7 @@
 */
 
 import _ from 'lodash'
-import fs from 'fs-extra'
-import { print, OperationDefinitionNode, DocumentNode } from 'graphql'
+import { print, OperationDefinitionNode } from 'graphql'
 import { TinaSchema, Config } from '@tinacms/schema-tools'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 
@@ -13,7 +12,6 @@ import { sequential } from './util'
 import { createBuilder } from './builder'
 import { createSchema } from './schema/createSchema'
 import { extractInlineTypes } from './ast-builder'
-import path from 'path'
 
 import type { Builder } from './builder'
 import { Database } from './database'
@@ -41,15 +39,7 @@ export const buildDotTinaFiles = async ({
     database,
     tinaSchema,
   })
-  let graphQLSchema: DocumentNode
-  if (database.bridge.supportsBuilding()) {
-    graphQLSchema = await _buildSchema(builder, tinaSchema)
-    await database.putConfigFiles({ graphQLSchema, tinaSchema })
-  } else {
-    graphQLSchema = JSON.parse(
-      await database.bridge.get('.tina/__generated__/_graphql.json')
-    )
-  }
+  const graphQLSchema = await _buildSchema(builder, tinaSchema)
   let fragDoc = ''
   let queryDoc = ''
   if (buildSDK) {

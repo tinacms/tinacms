@@ -10,7 +10,7 @@ import { logger } from '../logger'
 
 export const TINA_FOLDER = 'tina'
 export const LEGACY_TINA_FOLDER = '.tina'
-const GENERATED_FOLDER = '__generated__'
+export const GENERATED_FOLDER = '__generated__'
 const GRAPHQL_JSON_FILE = '_graphql.json'
 const GRAPHQL_GQL_FILE = 'schema.gql'
 const SCHEMA_JSON_FILE = '_schema.json'

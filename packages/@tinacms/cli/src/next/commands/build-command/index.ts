@@ -2,7 +2,7 @@ import fetch, { Headers } from 'node-fetch'
 import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
-import { buildSchema, getASTSchema, Database } from '@tinacms/graphql'
+import { buildSchema, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
 import { buildProductionSpa } from './server'
@@ -102,16 +102,17 @@ export class BuildCommand extends Command {
       configManager,
       Number(this.datalayerPort)
     )
-    const { queryDoc, fragDoc } = await buildSchema(
+    const { queryDoc, fragDoc, graphQLSchema, tinaSchema } = await buildSchema(
       database,
       configManager.config
     )
 
     const codegen = new Codegen({
-      schema: await getASTSchema(database),
       configManager: configManager,
       queryDoc,
       fragDoc,
+      graphqlSchemaDoc: graphQLSchema,
+      tinaSchema,
     })
     const apiURL = await codegen.execute()
 

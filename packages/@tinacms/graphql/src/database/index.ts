@@ -1,4 +1,5 @@
 import path from 'path'
+import fs from 'fs-extra'
 import type { DocumentNode } from 'graphql'
 import { GraphQLError } from 'graphql'
 import micromatch from 'micromatch'
@@ -56,10 +57,24 @@ export type CreateDatabase = {
   tinaDirectory?: string
   indexStatusCallback?: IndexStatusCallback
   version?: boolean
+  updateConfig?: (relativePath: string, data: string) => Promise<void>
 }
 
 export const createDatabase = (config: CreateDatabase) => {
   return new Database({
+    //TODO: This is the same logic as in the codegen class - we should consolidate
+    updateConfig: async (relativePath, data) => {
+      const fullPath = path.join(config.bridge.rootPath, relativePath)
+      await fs.ensureFile(fullPath)
+      await fs.outputFile(fullPath, data)
+
+      // This means that we have a separate content repo
+      if (config.bridge.rootPath !== config.bridge.outputPath) {
+        const fullPath = path.join(config.bridge.outputPath, relativePath)
+        await fs.ensureFile(fullPath)
+        await fs.outputFile(fullPath, data)
+      }
+    },
     ...config,
     bridge: config.bridge,
     level: config.level,
@@ -99,11 +114,15 @@ export class Database {
   private onPut: OnPutCallback
   private onDelete: OnDeleteCallback
   private tinaSchema: TinaSchema | undefined
+  private updateConfig?: (relativePath: string, data: string) => Promise<void>
+
   private collectionIndexDefinitions:
     | Record<string, Record<string, IndexDefinition>>
     | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
+
   constructor(public config: CreateDatabase) {
+    this.updateConfig = config.updateConfig
     this.tinaDirectory = config.tinaDirectory || '.tina'
     this.bridge = config.bridge
     this.rootLevel =
@@ -822,26 +841,6 @@ export class Database {
       },
     }
   }
-
-  public putConfigFiles = async ({
-    graphQLSchema,
-    tinaSchema,
-  }: {
-    graphQLSchema: DocumentNode
-    tinaSchema: TinaSchema
-  }) => {
-    if (this.bridge && this.bridge.supportsBuilding()) {
-      await this.bridge.putConfig(
-        normalizePath(path.join(this.getGeneratedFolder(), `_graphql.json`)),
-        JSON.stringify(graphQLSchema)
-      )
-      await this.bridge.putConfig(
-        normalizePath(path.join(this.getGeneratedFolder(), `_schema.json`)),
-        JSON.stringify(tinaSchema.schema)
-      )
-    }
-  }
-
   private async indexStatusCallbackWrapper<T>(
     fn: () => Promise<T>,
     post?: () => Promise<void>
@@ -1103,10 +1102,16 @@ export class Database {
       ...lookupMap,
       [lookup.type]: lookup,
     }
-    await this.bridge.putConfig(
-      normalizePath(lookupPath),
-      JSON.stringify(updatedLookup)
-    )
+    if (this.updateConfig) {
+      await this.updateConfig(
+        normalizePath(lookupPath),
+        JSON.stringify(updatedLookup)
+      )
+    }
+    // await this.bridge.putConfig(
+    //   normalizePath(lookupPath),
+    //   JSON.stringify(updatedLookup)
+    // )
     //await this.onPut(normalizePath(lookupPath), JSON.stringify(updatedLookup))
   }
 }

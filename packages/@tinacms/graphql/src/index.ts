@@ -28,6 +28,7 @@ export { buildDotTinaFiles }
 
 export type DummyType = unknown
 
+// TODO: Can we just remove this or rename buildDotFiles. Having a wrapper function is confusing.
 export const buildSchema = async (
   database: Database,
   config: Config,
@@ -35,14 +36,9 @@ export const buildSchema = async (
 ) => {
   return buildDotTinaFiles({
     database,
-    config: config,
+    config,
     flags,
   })
-}
-
-export const getASTSchema = async (database: Database) => {
-  const gqlAst = await database.getGraphQLSchemaFromBridge()
-  return buildASTSchema(gqlAst)
 }
 
 export type TinaSchema = Schema

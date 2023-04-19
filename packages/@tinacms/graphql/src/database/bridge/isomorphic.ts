@@ -392,10 +392,6 @@ export class IsomorphicBridge implements Bridge {
       .filter((path) => path.endsWith(extension))
   }
 
-  public supportsBuilding() {
-    return true
-  }
-
   public async delete(filepath: string) {
     const ref = await this.getRef()
     const { pathParts, pathEntries } = await this.resolvePathEntries(
@@ -498,10 +494,6 @@ export class IsomorphicBridge implements Bridge {
     })
 
     return Buffer.from(blob).toString('utf8')
-  }
-
-  public async putConfig(filepath: string, data: string) {
-    await this.put(filepath, data)
   }
 
   public async put(filepath: string, data: string) {
