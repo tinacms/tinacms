@@ -4,7 +4,7 @@
 
 import * as React from 'react'
 import { FC, useEffect } from 'react'
-import { Field, Form } from '../forms'
+import { AnyField, Field, Form } from '../forms'
 import { Form as FinalForm } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
@@ -90,9 +90,36 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   setActiveFormId,
   ...rest
 }) => {
-  const [activeFieldName, setActiveFieldName] = React.useState<string | null>(
-    null
-  )
+  const [activeFieldName, setActiveFieldNameInner] = React.useState<
+    string | null
+  >(null)
+  const [animatedActiveFieldName, setAnimatedActiveFieldName] = React.useState<
+    string | null
+  >(null)
+  const [showAnimatedFields, setShowAnimatedFields] = React.useState<boolean>()
+
+  // const setActiveFieldName = (name: string | null) => {
+  //   setAnimatedActiveFieldName(activeFieldName)
+  //   setShowAnimatedFields(true)
+  //   setTimeout(() => {
+  //     setActiveFieldNameInner(name)
+  //   }, 500)
+  //   setTimeout(() => {
+  //     setShowAnimatedFields(false)
+  //   }, 1000)
+  // }
+
+  const setActiveFieldName = (name: string | null) => {
+    setAnimatedActiveFieldName(name)
+    setShowAnimatedFields(true)
+    setTimeout(() => {
+      setActiveFieldNameInner(name)
+    }, 500)
+    setTimeout(() => {
+      setShowAnimatedFields(false)
+    }, 1000)
+  }
+
   const hideFooter = !!rest.hideFooter
   /**
    * > Why is a `key` being set when this isn't an array?
@@ -170,6 +197,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     }
   }, [finalForm])
 
+  // TODO: memoize
   const result = getFieldGroup({
     form: tinaForm,
     fieldName: activeFieldName,
@@ -177,6 +205,17 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     prefix: [],
   })
   const fields = result ? result.fieldGroup : tinaForm.fields
+
+  // TODO: memoize
+  const animatedResult = getFieldGroup({
+    form: tinaForm,
+    fieldName: animatedActiveFieldName,
+    values: tinaForm.finalForm.getState().values,
+    prefix: [],
+  })
+  const animatedFields = animatedResult
+    ? animatedResult.fieldGroup
+    : tinaForm.fields
 
   return (
     <ActiveFieldContextProvider value={{ activeFieldName, setActiveFieldName }}>
@@ -209,19 +248,24 @@ export const FormBuilder: FC<FormBuilderProps> = ({
             <>
               <DragDropContext onDragEnd={moveArrayItem}>
                 <FormKeyBindings onSubmit={safeHandleSubmit} />
-                <PanelHeader
-                  path={result?.path}
-                  setActiveFieldName={setActiveFieldName}
-                />
-                <FormPortalProvider>
-                  <FormWrapper id={tinaForm.id}>
-                    {tinaForm && fields.length ? (
-                      <FieldsBuilder form={tinaForm} fields={fields} />
-                    ) : (
-                      <NoFieldsPlaceholder />
-                    )}
-                  </FormWrapper>
-                </FormPortalProvider>
+                <div className="relative h-full flex flex-col">
+                  <FormFields
+                    path={result.path}
+                    setActiveFieldName={setActiveFieldName}
+                    fields={fields}
+                    tinaForm={tinaForm}
+                  />
+                  {showAnimatedFields && (
+                    <GroupPanel isExpanded={true}>
+                      <FormFields
+                        path={animatedResult.path}
+                        setActiveFieldName={setActiveFieldName}
+                        fields={animatedFields}
+                        tinaForm={tinaForm}
+                      />
+                    </GroupPanel>
+                  )}
+                </div>
                 {!hideFooter && (
                   <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
                     <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
@@ -375,6 +419,31 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
         }}
       </FinalForm>
     </ModalProvider>
+  )
+}
+
+const FormFields = ({
+  path,
+  setActiveFieldName,
+  fields,
+  tinaForm,
+}: {
+  path?: string[]
+  setActiveFieldName: (fieldName: string) => void
+  fields: AnyField[]
+  tinaForm: Form
+}) => {
+  return (
+    <FormPortalProvider>
+      <PanelHeader path={path} setActiveFieldName={setActiveFieldName} />
+      <FormWrapper id={tinaForm.id}>
+        {tinaForm && fields.length ? (
+          <FieldsBuilder form={tinaForm} fields={fields} />
+        ) : (
+          <NoFieldsPlaceholder />
+        )}
+      </FormWrapper>
+    </FormPortalProvider>
   )
 }
 
@@ -571,3 +640,63 @@ const PanelHeader = ({
     </button>
   )
 }
+
+export const GroupPanel = ({
+  isExpanded,
+  className = '',
+  style = {},
+  ...props
+}) => (
+  <div
+    className={`absolute w-full top-0 bottom-0 left-0 flex flex-col justify-between overflow-hidden ${className}`}
+    style={{
+      zIndex: 1000, // testing
+      pointerEvents: isExpanded ? 'all' : 'none',
+      ...(isExpanded
+        ? {
+            animationName: 'fly-in-left',
+            animationDuration: '150ms',
+            animationDelay: '0',
+            animationIterationCount: 1,
+            animationTimingFunction: 'ease-out',
+            animationFillMode: 'backwards',
+          }
+        : {
+            transition: 'transform 150ms ease-out',
+            transform: 'translate3d(100%, 0, 0)',
+          }),
+      ...style,
+    }}
+    {...props}
+  />
+)
+
+export const GroupPanel2 = ({
+  isExpanded,
+  className = '',
+  style = {},
+  ...props
+}) => (
+  <div
+    className={`absolute w-full top-0 bottom-0 left-0 flex flex-col justify-between overflow-hidden ${className}`}
+    style={{
+      zIndex: 1000, // testing
+      pointerEvents: isExpanded ? 'all' : 'none',
+      ...(isExpanded
+        ? {
+            animationName: 'fly-out-right',
+            animationDuration: '300ms',
+            animationDelay: '0',
+            animationIterationCount: 1,
+            animationTimingFunction: 'ease-out',
+            animationFillMode: 'forwards',
+          }
+        : {
+            transition: 'transform 150ms ease-out',
+            transform: 'translate3d(100%, 0, 0)',
+          }),
+      ...style,
+    }}
+    {...props}
+  />
+)
