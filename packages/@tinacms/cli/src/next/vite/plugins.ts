@@ -57,7 +57,7 @@ export const devServerEndPointsPlugin = ({
     name: 'graphql-endpoints',
     configureServer(server) {
       server.middlewares.use(cors())
-      server.middlewares.use(bodyParser.json())
+      server.middlewares.use(bodyParser.json({ limit: '5mb' }))
       server.middlewares.use(async (req, res, next: Function) => {
         const mediaPaths = configManager.config.media?.tina
         const mediaRouter = createMediaRouter({
