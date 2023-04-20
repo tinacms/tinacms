@@ -318,6 +318,7 @@ importers:
       '@tinacms/toolkit': workspace:*
       '@types/react': 17.0.47
       '@types/react-dom': 17.0.2
+      '@vercel/stega': ^0.0.2
       '@xstate/react': 3.0.0
       final-form: 4.20.7
       graphiql: ^2.4.0
@@ -342,6 +343,7 @@ importers:
       '@monaco-editor/react': 4.4.5_ilaxvrtg3zfidjpyrhsbytq244
       '@tinacms/mdx': link:../mdx
       '@tinacms/toolkit': link:../toolkit
+      '@vercel/stega': 0.0.2
       '@xstate/react': 3.0.0_sudpmbbyhqtxq6t4xf6jlicdem
       final-form: 4.20.7
       graphiql: 2.4.0_ltqzrpympbddkywnmhjcbgtday

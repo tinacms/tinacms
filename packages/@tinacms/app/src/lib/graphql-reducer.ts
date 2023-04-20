@@ -4,6 +4,8 @@ import { getIn } from 'final-form'
 import { z } from 'zod'
 // @ts-expect-error
 import schemaJson from 'SCHEMA_IMPORT'
+import { vercelStegaEncode } from '@vercel/stega'
+import { tinaField } from 'tinacms/dist/react'
 import { expandQuery, isNodeType } from './expand-query'
 import {
   Form,
@@ -26,6 +28,13 @@ import type {
   SystemInfo,
   ResolvedDocument,
 } from './types'
+
+function encodeEditInfo(text: string, fieldName: string): string {
+  return `${vercelStegaEncode({
+    origin: 'tinacms',
+    data: { fieldName },
+  })}${text}`
+}
 
 const sysSchema = z.object({
   breadcrumbs: z.array(z.string()),
@@ -308,6 +317,14 @@ export const useGraphQLReducer = (
               return resolveDocument(resolvedDocument, template, existingForm)
             }
           }
+          if (typeof value === 'string' && source?._tina_metadata) {
+            // FIXME: hack to prevent breaking images
+            if (isValidHttpUrl(value)) {
+              return value
+            } else {
+              return encodeEditInfo(value, tinaField(source, info.fieldName))
+            }
+          }
           return value
         },
       })
@@ -469,6 +486,15 @@ const onSubmit = async (
   } catch (e) {
     cms.alerts.error('There was a problem saving your document')
     console.error(e)
+  }
+}
+
+function isValidHttpUrl(string: string) {
+  try {
+    new URL(string)
+    return true
+  } catch (_) {
+    return false
   }
 }
 
