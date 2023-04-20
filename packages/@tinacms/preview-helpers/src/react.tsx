@@ -33,7 +33,7 @@ export const useEditOpen = (redirectPath: string) => {
         const tinaAdminBasePath = redirectPath.startsWith('/')
           ? redirectPath
           : `/${redirectPath}`
-        const tinaAdminPath = `${tinaAdminBasePath}/index.html#/~${
+        const tinaAdminPath = `${tinaAdminBasePath}/index.html?enableToolbarInIframe#/~${
           window.location.pathname
         }?activeField=${event.detail.data.fieldName.replace('#', '__')}`
         console.log('edit:open not in edit mode, redirecting', tinaAdminPath)
