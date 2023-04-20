@@ -236,7 +236,19 @@ export const useGraphQLReducer = (
               resolvedDocument = documentSchema.parse(value)
             }
             const id = resolvedDocument._internalSys.path
-            const existingForm = cms.forms.find(id)
+            let existingForm = cms.forms.find(id)
+            if (!existingForm) {
+              cms.plugins
+                .getType('screen')
+                .all()
+                .forEach((plugin) => {
+                  // @ts-ignore
+                  if (plugin?.form && plugin.form?.id === id) {
+                    // @ts-ignore
+                    existingForm = plugin.form
+                  }
+                })
+            }
             if (!existingForm) {
               const { form, template } = buildForm({
                 resolvedDocument,
@@ -697,7 +709,6 @@ const buildForm = ({
         cms
       ),
     label: collection.label || collection.name,
-    queries: [payloadId],
   }
   if (tinaSchema.config.config?.formifyCallback) {
     const callback = tinaSchema.config.config
@@ -719,7 +730,11 @@ const buildForm = ({
       form = new Form(formConfig)
     }
   } else {
-    form = new Form(formConfig)
+    if (collection.ui?.global) {
+      form = createGlobalForm(formConfig)
+    } else {
+      form = createForm(formConfig)
+    }
   }
   if (form) {
     if (shouldRegisterForm) {
