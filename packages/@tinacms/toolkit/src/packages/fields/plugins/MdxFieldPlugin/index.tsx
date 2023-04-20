@@ -66,6 +66,10 @@ export const MdxFieldPlugin = {
 export const MdxFieldPluginExtendible = {
   name: 'rich-text',
   validate(value: any) {
+    if (typeof value === 'string') {
+      return 'Received string value for rich-text, strings must be parsed before being used in the rich-text editor.'
+    }
+
     if (
       typeof value !== 'undefined' &&
       value !== null &&

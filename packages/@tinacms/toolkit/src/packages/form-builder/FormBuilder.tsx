@@ -507,11 +507,12 @@ const getFieldGroup = ({
         }
       } else {
         if (rest.length) {
-          // @ts-ignore PR FOR DEMO ONLY
-          const result = getFieldGroup(field, rest.join('.'), value, [
-            ...prefix,
-            name,
-          ])
+          const result = getFieldGroup({
+            form: field,
+            fieldName: rest.join('.'),
+            values: value,
+            prefix: [...prefix, name],
+          })
           if (result) {
             return result
           }
