@@ -174,7 +174,7 @@ const CollectionListPage = () => {
             name: '',
           })
   )
-  const { order = 'asc' } = JSON.parse(sortKey || '{}')
+  const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order)
   const loc = useLocation()
   useEffect(() => {
@@ -249,6 +249,9 @@ const CollectionListPage = () => {
                 const fields = collectionExtra.fields?.filter((x) =>
                   // only allow sortable fields
                   ['string', 'number', 'datetime', 'boolean'].includes(x.type)
+                )
+                const sortField = fields.find(
+                  (field) => field.name === sortName
                 )
 
                 const filterFields = collectionExtra.fields?.filter((x) => {
@@ -629,6 +632,15 @@ const CollectionListPage = () => {
                     </PageHeader>
                     <PageBody>
                       <div className="w-full mx-auto max-w-screen-xl">
+                        {sortField && !sortField.required && (
+                          <p className="mb-4 text-gray-500">
+                            <em>
+                              Sorting on a non-required field. Some documents
+                              may be excluded (if they don't have a value for{' '}
+                              {sortName})
+                            </em>
+                          </p>
+                        )}
                         {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
