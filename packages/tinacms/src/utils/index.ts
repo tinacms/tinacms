@@ -16,6 +16,7 @@ export interface CreateClientProps {
   branch?: string
   schema?: Schema
   apiUrl?: string
+  cms
   tinaGraphQLVersion: string
 }
 export const createClient = ({
@@ -25,10 +26,11 @@ export const createClient = ({
   tinaioConfig,
   schema,
   apiUrl,
+  cms,
   tinaGraphQLVersion,
 }: CreateClientProps) => {
   return isLocalClient
-    ? new LocalClient({ customContentApiUrl: apiUrl, schema })
+    ? new LocalClient({ customContentApiUrl: apiUrl, schema, cms })
     : new Client({
         clientId: clientId || '',
         branch: branch || 'main',
@@ -36,6 +38,7 @@ export const createClient = ({
         tinaioConfig,
         schema,
         tinaGraphQLVersion,
+        cms,
       })
 }
 

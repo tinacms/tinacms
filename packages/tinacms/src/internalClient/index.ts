@@ -14,6 +14,7 @@ import {
 
 import gql from 'graphql-tag'
 import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
+import type { TinaCMS } from '..'
 
 export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
 
@@ -25,6 +26,7 @@ export type TinaIOConfig = {
 }
 interface ServerOptions {
   schema?: Schema
+  cms: TinaCMS
   clientId: string
   branch: string
   tinaGraphQLVersion: string
@@ -189,9 +191,10 @@ export class Client {
   private token: string // used with memory storage
   private branch: string
   private options: ServerOptions
-  events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
+  events: EventBus
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
+    this.events = options.cms.events
     this.tinaGraphQLVersion = options.tinaGraphQLVersion
     this.onLogin = options.schema?.config?.admin?.auth?.onLogin
     this.onLogout = options.schema?.config?.admin?.auth?.onLogout

@@ -173,19 +173,6 @@ export class CMS {
     if (this.unsubscribeHooks[name]) {
       this.unsubscribeHooks[name]()
     }
-    if (api.events instanceof EventBus) {
-      const unsubscribeHost = (api.events as EventBus).subscribe(
-        '*',
-        this.events.dispatch
-      )
-      const unsubscribeGuest = this.events.subscribe('*', (e) =>
-        api.events.dispatch(e)
-      )
-      this.unsubscribeHooks[name] = () => {
-        unsubscribeHost()
-        unsubscribeGuest()
-      }
-    }
     this.api[name] = api
   }
 
