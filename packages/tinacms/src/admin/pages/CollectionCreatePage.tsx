@@ -257,11 +257,13 @@ export const RenderForm = ({
             values
           )
           cms.alerts.success('Document created!')
-          navigate(
-            `/collections/${collection.name}${
-              folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
-            }`
-          )
+          setTimeout(() => {
+            navigate(
+              `/collections/${collection.name}${
+                folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
+              }`
+            )
+          }, 10)
         } catch (error) {
           console.error(error)
           const defaultErrorText = 'There was a problem saving your document.'
