@@ -97,28 +97,36 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     string | null
   >(null)
   const [showAnimatedFields, setShowAnimatedFields] = React.useState<boolean>()
+  const [isForward, setIsForward] = React.useState<boolean>(true)
 
-  // const setActiveFieldName = (name: string | null) => {
-  //   setAnimatedActiveFieldName(activeFieldName)
-  //   setShowAnimatedFields(true)
-  //   setTimeout(() => {
-  //     setActiveFieldNameInner(name)
-  //   }, 500)
-  //   setTimeout(() => {
-  //     setShowAnimatedFields(false)
-  //   }, 1000)
-  // }
-
-  const setActiveFieldName = (name: string | null) => {
-    setAnimatedActiveFieldName(name)
-    setShowAnimatedFields(true)
-    setTimeout(() => {
-      setActiveFieldNameInner(name)
-    }, 500)
-    setTimeout(() => {
-      setShowAnimatedFields(false)
-    }, 1000)
-  }
+  const setActiveFieldName = React.useCallback(
+    (name: string | null) => {
+      const isForward = name
+        ? name.split('.').length >
+          (activeFieldName ? activeFieldName.split('.').length : 0)
+        : false
+      if (isForward) {
+        setIsForward(true)
+        setAnimatedActiveFieldName(name)
+        setShowAnimatedFields(true)
+        setTimeout(() => {
+          setActiveFieldNameInner(name)
+        }, 250)
+        setTimeout(() => {
+          setShowAnimatedFields(false)
+        }, 300)
+      } else {
+        setIsForward(false)
+        setAnimatedActiveFieldName(name)
+        setShowAnimatedFields(true)
+        setActiveFieldNameInner(name)
+        setTimeout(() => {
+          setShowAnimatedFields(false)
+        }, 300)
+      }
+    },
+    [activeFieldName]
+  )
 
   const hideFooter = !!rest.hideFooter
   /**
@@ -139,10 +147,9 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   }, [tinaForm])
 
   const cms = useCMS()
-  // This subscribes multiple times since the event bus doesn't know how to
-  // only subscribe once
-  React.useMemo(() => {
-    cms.events.subscribe('field:selected', (e) => {
+
+  React.useEffect(() => {
+    const handleSelection = (e) => {
       if (e.value.includes('#')) {
         const [formId, fieldName] = e.value.split('#')
         if (setActiveFormId) {
@@ -150,8 +157,13 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         }
         setActiveFieldName(fieldName)
       }
-    })
-  }, [setActiveFormId])
+    }
+
+    const unsubscribe = cms.events.subscribe('field:selected', handleSelection)
+    return () => {
+      unsubscribe()
+    }
+  }, [setActiveFormId, setActiveFieldName, cms.events])
 
   const finalForm = tinaForm.finalForm
 
@@ -165,7 +177,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         result.destination.index
       )
     },
-    [tinaForm]
+    [finalForm]
   )
 
   /**
@@ -255,7 +267,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     fields={fields}
                     tinaForm={tinaForm}
                   />
-                  {showAnimatedFields && (
+                  {showAnimatedFields && isForward && (
                     <GroupPanel isExpanded={true}>
                       <FormFields
                         path={animatedResult.path}
@@ -264,6 +276,16 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                         tinaForm={tinaForm}
                       />
                     </GroupPanel>
+                  )}
+                  {showAnimatedFields && !isForward && (
+                    <GroupPanel2 isExpanded={true}>
+                      <FormFields
+                        path={animatedResult.path}
+                        setActiveFieldName={setActiveFieldName}
+                        fields={animatedFields}
+                        tinaForm={tinaForm}
+                      />
+                    </GroupPanel2>
                   )}
                 </div>
                 {!hideFooter && (
@@ -651,7 +673,7 @@ export const GroupPanel = ({
     className={`absolute w-full top-0 bottom-0 left-0 flex flex-col justify-between overflow-hidden ${className}`}
     style={{
       zIndex: 1000, // testing
-      pointerEvents: isExpanded ? 'all' : 'none',
+      pointerEvents: 'none',
       ...(isExpanded
         ? {
             animationName: 'fly-in-left',
