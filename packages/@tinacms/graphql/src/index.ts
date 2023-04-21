@@ -29,13 +29,8 @@ export { buildDotTinaFiles }
 export type DummyType = unknown
 
 // TODO: Can we just remove this or rename buildDotFiles. Having a wrapper function is confusing.
-export const buildSchema = async (
-  database: Database,
-  config: Config,
-  flags?: string[]
-) => {
+export const buildSchema = async (config: Config, flags?: string[]) => {
   return buildDotTinaFiles({
-    database,
     config,
     flags,
   })

@@ -19,6 +19,7 @@ export class Codegen {
     definitions: TypeDefinitionNode[]
   }
   tinaSchema: TinaSchema
+  lookup: any
 
   constructor({
     configManager,
@@ -27,6 +28,7 @@ export class Codegen {
     fragDoc,
     graphqlSchemaDoc,
     tinaSchema,
+    lookup,
   }: {
     configManager: ConfigManager
     port?: number
@@ -37,6 +39,7 @@ export class Codegen {
       definitions: TypeDefinitionNode[]
     }
     tinaSchema: TinaSchema
+    lookup: any
   }) {
     this.graphqlSchemaDoc = graphqlSchemaDoc
     this.configManager = configManager
@@ -45,6 +48,7 @@ export class Codegen {
     this.tinaSchema = tinaSchema
     this.queryDoc = queryDoc
     this.fragDoc = fragDoc
+    this.lookup = lookup
   }
 
   async writeConfigFile(fileName: string, data: string) {
@@ -92,6 +96,8 @@ export class Codegen {
       '_schema.json',
       JSON.stringify(this.tinaSchema.schema)
     )
+    // update _lookup.json
+    await this.writeConfigFile('_lookup.json', JSON.stringify(this.lookup))
 
     const apiURL = this.getApiURL()
     if (this.configManager.shouldSkipSDK()) {
