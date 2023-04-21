@@ -1,5 +1,5 @@
-import { defineConfig } from 'tinacms'
 import React from 'react'
+import { defineConfig } from 'tinacms'
 import { BiBall, BiBasketball, BiBaseball, BiFootball } from 'react-icons/bi'
 
 const TINA_TOKEN_KEY = 'tina_token_key'
@@ -497,7 +497,9 @@ export default defineConfig({
         path: 'content/post',
         format: 'mdx',
         ui: {
-          router,
+          router: ({ document, collection }) => {
+            return `/${collection.name}/${document._sys.breadcrumbs.join('/')}`
+          },
           filename: {
             slugify,
             readonly: true,
