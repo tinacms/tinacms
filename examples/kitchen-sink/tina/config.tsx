@@ -13,6 +13,9 @@ const slugify = (values) => {
 const router = ({ document, collection }) => {
   return `/${collection.name}/${document._sys.filename}`
 }
+const extendedRouter = ({ document, collection }) => {
+  return `/${collection.name}/${document._sys.breadcrumbs.join('/')}`
+}
 export default defineConfig({
   // contentApiUrlOverride: '/api/gql',
   admin: {
@@ -497,9 +500,7 @@ export default defineConfig({
         path: 'content/post',
         format: 'mdx',
         ui: {
-          router: ({ document, collection }) => {
-            return `/${collection.name}/${document._sys.breadcrumbs.join('/')}`
-          },
+          router: extendedRouter,
           filename: {
             slugify,
             readonly: true,
@@ -864,7 +865,7 @@ export default defineConfig({
         label: 'Documentation',
         path: 'content/documentation',
         ui: {
-          router,
+          router: extendedRouter,
           filename: {
             slugify,
           },
