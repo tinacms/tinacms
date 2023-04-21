@@ -1,7 +1,3 @@
-/**
-
-*/
-
 export * from './schema'
 export * from './types/index'
 export * from './validate'

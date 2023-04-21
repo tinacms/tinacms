@@ -46,7 +46,17 @@ export const CollectionBaseSchema = z.object({
       })
     }
   }),
-  path: z.string().transform((val) => val.replace(/^\/|\/$/g, '')),
+  path: z
+    .string()
+    .transform((val) => val.replace(/^\/|\/$/g, ''))
+    .superRefine((val, ctx) => {
+      if (val === '.') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `path cannot be '.'. Please use '/' or '' instead. `,
+        })
+      }
+    }),
   format: z.enum(FORMATS).optional(),
 })
 

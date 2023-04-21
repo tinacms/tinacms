@@ -795,7 +795,9 @@ export class Database {
     }
 
     if (!query.lt && !query.lte) {
-      query.lte = filterSuffixes?.right ? `${filterSuffixes.right}\xFF` : '\xFF'
+      query.lte = filterSuffixes?.right
+        ? `${filterSuffixes.right}\uFFFF`
+        : '\uFFFF'
     }
 
     let edges: { cursor: string; path: string }[] = []
