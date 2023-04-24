@@ -15,7 +15,6 @@ import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
 import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
-import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
 import { ActiveFieldContextProvider } from '../fields/use-active-field'
 import { IoMdClose } from 'react-icons/io'
@@ -117,7 +116,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         }, 300)
       } else {
         setIsForward(false)
-        setAnimatedActiveFieldName(name)
         setShowAnimatedFields(true)
         setActiveFieldNameInner(name)
         setTimeout(() => {
@@ -260,7 +258,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
             <>
               <DragDropContext onDragEnd={moveArrayItem}>
                 <FormKeyBindings onSubmit={safeHandleSubmit} />
-                <div className="relative h-full flex flex-col">
+                <div className="relative flex flex-col h-full overflow-scroll">
                   <FormFields
                     path={result.path}
                     setActiveFieldName={setActiveFieldName}
@@ -268,7 +266,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     tinaForm={tinaForm}
                   />
                   {showAnimatedFields && isForward && (
-                    <GroupPanel isExpanded={true}>
+                    <GroupPanel>
                       <FormFields
                         path={animatedResult.path}
                         setActiveFieldName={setActiveFieldName}
@@ -278,7 +276,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     </GroupPanel>
                   )}
                   {showAnimatedFields && !isForward && (
-                    <GroupPanel2 isExpanded={true}>
+                    <GroupPanel2>
                       <FormFields
                         path={animatedResult.path}
                         setActiveFieldName={setActiveFieldName}
@@ -455,16 +453,24 @@ const FormFields = ({
   fields: AnyField[]
   tinaForm: Form
 }) => {
+  if (!fields) {
+    console.log({ path, tinaForm })
+    throw new Error('No fields supplied to FormFields')
+  }
   return (
-    <FormPortalProvider>
-      <PanelHeader path={path} setActiveFieldName={setActiveFieldName} />
-      <FormWrapper id={tinaForm.id}>
+    <FormPortalProvider
+      header={
+        <PanelHeader path={path} setActiveFieldName={setActiveFieldName} />
+      }
+      id={tinaForm.id}
+    >
+      <div className="w-full flex-1 max-w-form">
         {tinaForm && fields.length ? (
           <FieldsBuilder form={tinaForm} fields={fields} />
         ) : (
           <NoFieldsPlaceholder />
         )}
-      </FormWrapper>
+      </div>
     </FormPortalProvider>
   )
 }
@@ -534,6 +540,11 @@ const getFieldGroup = ({
   // be from a previous render
   if (!field) {
     return { fieldGroup: form.fields, path: prefix }
+  }
+  if (field.type === 'rich-text') {
+    // handle nested forms
+    console.log('its irch-text', fieldName, field)
+    return { fieldGroup: field.templates.BlockQuote, path: [...prefix, name] }
   }
   if (field.type === 'object') {
     if (field.templates) {
@@ -663,60 +674,36 @@ const PanelHeader = ({
   )
 }
 
-export const GroupPanel = ({
-  isExpanded,
-  className = '',
-  style = {},
-  ...props
-}) => (
+export const GroupPanel = ({ className = '', style = {}, ...props }) => (
   <div
     className={`absolute w-full top-0 bottom-0 left-0 flex flex-col justify-between overflow-hidden ${className}`}
     style={{
       zIndex: 1000, // testing
       pointerEvents: 'none',
-      ...(isExpanded
-        ? {
-            animationName: 'fly-in-left',
-            animationDuration: '150ms',
-            animationDelay: '0',
-            animationIterationCount: 1,
-            animationTimingFunction: 'ease-out',
-            animationFillMode: 'backwards',
-          }
-        : {
-            transition: 'transform 150ms ease-out',
-            transform: 'translate3d(100%, 0, 0)',
-          }),
+      animationName: 'fly-in-left',
+      animationDuration: '150ms',
+      animationDelay: '0',
+      animationIterationCount: 1,
+      animationTimingFunction: 'ease-out',
+      // animationFillMode: 'backwards',
       ...style,
     }}
     {...props}
   />
 )
 
-export const GroupPanel2 = ({
-  isExpanded,
-  className = '',
-  style = {},
-  ...props
-}) => (
+export const GroupPanel2 = ({ className = '', style = {}, ...props }) => (
   <div
     className={`absolute w-full top-0 bottom-0 left-0 flex flex-col justify-between overflow-hidden ${className}`}
     style={{
       zIndex: 1000, // testing
-      pointerEvents: isExpanded ? 'all' : 'none',
-      ...(isExpanded
-        ? {
-            animationName: 'fly-out-right',
-            animationDuration: '300ms',
-            animationDelay: '0',
-            animationIterationCount: 1,
-            animationTimingFunction: 'ease-out',
-            animationFillMode: 'forwards',
-          }
-        : {
-            transition: 'transform 150ms ease-out',
-            transform: 'translate3d(100%, 0, 0)',
-          }),
+      pointerEvents: 'none',
+      animationName: 'fly-out-right',
+      animationDuration: '300ms',
+      animationDelay: '0',
+      animationIterationCount: 1,
+      animationTimingFunction: 'ease-out',
+      // animationFillMode: 'backwards',
       ...style,
     }}
     {...props}

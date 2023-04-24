@@ -16,6 +16,7 @@ import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
 import { EmptyList, ListFieldMeta, ListPanel } from './ListFieldMeta'
+import { useActiveFieldContext } from '../use-active-field'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -157,6 +158,7 @@ const Item = ({
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
   const title = label || (field.label || field.name) + ' Item'
+  const { setActiveFieldName } = useActiveFieldContext()
 
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
@@ -190,15 +192,7 @@ const Item = ({
                   return
                 }
 
-                cms.events.dispatch({
-                  type: 'field:selected',
-                  value: `${tinaForm.id}#${field.name}.${index}`,
-                })
-                // setExpanded(true)
-                // setFocusedField({
-                //   id: tinaForm.id,
-                //   fieldName: `${field.name}.${index}`,
-                // })
+                setActiveFieldName(`${field.name}.${index}`)
               }}
             >
               <GroupLabel>{title}</GroupLabel>
@@ -208,19 +202,6 @@ const Item = ({
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />
             )}
           </ItemHeader>
-          {/* <FormPortal>
-            {({ zIndexShift }) => (
-              <Panel
-                isExpanded={isExpanded}
-                setExpanded={setExpanded}
-                field={field}
-                index={index}
-                tinaForm={tinaForm}
-                itemTitle={title}
-                zIndexShift={zIndexShift}
-              />
-            )}
-          </FormPortal> */}
         </>
       )}
     </Draggable>

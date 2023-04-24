@@ -6,9 +6,8 @@
 
 import * as React from 'react'
 import { Field, Form } from '../../../forms'
-import { FieldsBuilder, useFormPortal } from '../../../form-builder'
+import { useFormPortal } from '../../../form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { GroupPanel, PanelHeader, PanelBody } from '../GroupFieldPlugin'
 import {
   GroupLabel,
   ItemDeleteButton,
@@ -23,6 +22,7 @@ import { BlockSelector } from './BlockSelector'
 import { BlockSelectorBig } from './BlockSelectorBig'
 import { BiPencil } from 'react-icons/bi'
 import { EmptyList, ListFieldMeta, ListPanel } from '../ListFieldMeta'
+import { useActiveFieldContext } from '../../use-active-field'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -200,6 +200,8 @@ const BlockListItem = ({
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
 
+  const { setActiveFieldName } = useActiveFieldContext()
+
   return (
     <Draggable
       key={index}
@@ -220,15 +222,12 @@ const BlockListItem = ({
                   return
                 }
 
-                cms.events.dispatch({
-                  type: 'field:selected',
-                  value: `${tinaForm.id}#${field.name}.${index}`,
-                })
+                setActiveFieldName(`${field.name}.${index}`)
                 // setExpanded(true)
-                // setFocusedField({
-                //   id: tinaForm.id,
-                //   fieldName: `${field.name}.${index}`,
-                // })
+                setFocusedField({
+                  id: tinaForm.id,
+                  fieldName: `${field.name}.${index}`,
+                })
               }}
               onMouseOver={() =>
                 setHoveredField({
@@ -245,21 +244,6 @@ const BlockListItem = ({
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />
             )}
           </ItemHeader>
-          {/* <FormPortal>
-            {({ zIndexShift }) => (
-              <Panel
-                zIndexShift={zIndexShift}
-                isExpanded={isExpanded}
-                setExpanded={setExpanded}
-                field={field}
-                item={block}
-                index={index}
-                tinaForm={tinaForm}
-                label={label || template.label}
-                template={template}
-              />
-            )}
-          </FormPortal> */}
         </>
       )}
     </Draggable>
@@ -296,63 +280,6 @@ const InvalidBlockListItem = ({
         </ItemHeader>
       )}
     </Draggable>
-  )
-}
-
-interface PanelProps {
-  setExpanded(next: boolean): void
-  isExpanded: boolean
-  tinaForm: Form
-  index: number
-  field: BlocksFieldDefinititon
-  item: any
-  label: string
-  template: BlockTemplate
-  zIndexShift: number
-}
-
-const Panel = function Panel({
-  setExpanded,
-  isExpanded,
-  tinaForm,
-  field,
-  index,
-  label,
-  template,
-  zIndexShift,
-}: PanelProps) {
-  const cms = useCMS()
-
-  const fields: any[] = React.useMemo(() => {
-    if (!template.fields) return []
-
-    return template.fields.map((subField: any) => ({
-      ...subField,
-      name: `${field.name}.${index}.${subField.name}`,
-    }))
-  }, [field.name, index, template.fields])
-
-  return (
-    <GroupPanel isExpanded={isExpanded} style={{ zIndex: zIndexShift + 1000 }}>
-      <PanelHeader
-        onClick={() => {
-          const state = tinaForm.finalForm.getState()
-          if (state.invalid === true) {
-            // @ts-ignore
-            cms.alerts.error('Cannot navigate away from an invalid form.')
-            return
-          }
-
-          setExpanded(false)
-        }}
-      >
-        {label}
-      </PanelHeader>
-      <PanelBody id={tinaForm.id}>
-        {/* RENDER OPTIMIZATION: Only render fields of expanded fields.  */}
-        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
-      </PanelBody>
-    </GroupPanel>
   )
 }
 

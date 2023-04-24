@@ -20,7 +20,7 @@ export function useFormPortal() {
   return useContext(FormPortalContext)
 }
 
-export const FormPortalProvider: React.FC = ({ children }) => {
+export const FormPortalProvider: React.FC = ({ header, children }) => {
   const wrapperRef = React.useRef<HTMLDivElement | null>(null)
   const zIndexRef = React.useRef<number>(0)
 
@@ -38,14 +38,10 @@ export const FormPortalProvider: React.FC = ({ children }) => {
 
   return (
     <FormPortalContext.Provider value={FormPortal}>
+      {header || null}
       <div
         ref={wrapperRef}
-        style={{
-          position: 'relative',
-          width: '100%',
-          flex: '1 1 0%',
-          overflow: 'hidden',
-        }}
+        className="flex-1 bg-gray-50 py-5 px-6 flex justify-center relative"
       >
         {children}
       </div>
