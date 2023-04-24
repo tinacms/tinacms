@@ -330,8 +330,6 @@ importers:
       tailwindcss: ^3.2.7
       tinacms: workspace:*
       typescript: ^4.6.4
-      vite: 3.1.8
-      webfontloader: 1.6.28
       zod: ^3.14.3
     dependencies:
       '@graphiql/toolkit': 0.8.2_graphql@15.8.0
@@ -354,8 +352,6 @@ importers:
       tailwindcss: 3.2.7_postcss@8.4.14
       tinacms: link:../../tinacms
       typescript: 4.7.4
-      vite: 3.1.8
-      webfontloader: 1.6.28
       zod: 3.17.3
     devDependencies:
       '@types/react': 17.0.47
@@ -33536,36 +33532,6 @@ packages:
       rollup: 2.78.1
     optionalDependencies:
       fsevents: 2.3.2
-
-  /vite/3.1.8:
-    resolution:
-      {
-        integrity: sha512-m7jJe3nufUbuOfotkntGFupinL/fmuTNuQmiVE7cH2IZMuf4UbfbGYMUT3jVWgGYuRVLY9j8NnrRqgw5rr5QTg==,
-      }
-    engines: { node: ^14.18.0 || >=16.0.0 }
-    hasBin: true
-    peerDependencies:
-      less: '*'
-      sass: '*'
-      stylus: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: 0.15.12
-      postcss: 8.4.21
-      resolve: 1.22.1
-      rollup: 2.78.1
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: false
 
   /vite/4.1.4:
     resolution:

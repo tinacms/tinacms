@@ -29,8 +29,6 @@
     "tailwindcss": "^3.2.7",
     "tinacms": "workspace:*",
     "typescript": "^4.6.4",
-    "vite": "3.1.8",
-    "webfontloader": "1.6.28",
     "zod": "^3.14.3"
   }
 }
