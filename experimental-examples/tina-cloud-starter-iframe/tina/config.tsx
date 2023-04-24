@@ -35,7 +35,7 @@ const config = defineStaticConfig({
      * Enables experimental branch switcher
      */
     cms.flags.set("branch-switcher", true);
-    cms.plugins.add(createPreviewHelper());
+    // cms.plugins.add(createPreviewHelper());
 
     return cms;
   },

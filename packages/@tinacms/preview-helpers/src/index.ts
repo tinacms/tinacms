@@ -28,7 +28,9 @@ export const expandWithMetadata = async <
   Q extends string
 >(
   props: { data: D; variables: V; query: Q },
-  client: TinaClient<any>
+  client: TinaClient<any>,
+  // Opt-out of encoding strings with metadata
+  skipStringEncoding?: boolean
 ): Promise<{ data: D; variables: V; query: Q }> => {
   const instrospectionResult = await client.request({
     query: G.getIntrospectionQuery(),
@@ -141,7 +143,9 @@ export const expandWithMetadata = async <
         if (isValidHttpUrl(value)) {
           return value
         } else {
-          return encodeEditInfo(value, tinaField(source, info.fieldName))
+          if (!skipStringEncoding) {
+            return encodeEditInfo(value, tinaField(source, info.fieldName))
+          }
         }
       }
       return value

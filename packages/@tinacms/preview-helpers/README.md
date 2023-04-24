@@ -76,3 +76,8 @@ const config = defineConfig({
   ... // rest of config
 })
 ```
+
+## Opting out of string encoding
+
+`expandWithMetadata` includes a 3rd optional parameter to allow you to opt-out of string encoded metadata.
+If you do this, you'll also want to avoid creating the CMS helper plugin in the Tina config.

@@ -35,7 +35,7 @@ export const getStaticProps = async ({ params }) => {
   let tinaProps = await client.queries.blogPostQuery({
     relativePath: `${params.filename}.mdx`,
   });
-  tinaProps = await expandWithMetadata(tinaProps, client);
+  tinaProps = await expandWithMetadata(tinaProps, client, true);
   console.log(tinaProps.data);
   return {
     props: {
