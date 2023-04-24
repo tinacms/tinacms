@@ -126,8 +126,8 @@ export class DevCommand extends Command {
         database.clearCache()
       }
 
-      const { tinaSchema, graphQLSchema, queryDoc, fragDoc } =
-        await buildSchema(database, configManager.config)
+      const { tinaSchema, graphQLSchema, lookup, queryDoc, fragDoc } =
+        await buildSchema(configManager.config)
 
       const codegen = new Codegen({
         configManager: configManager,
@@ -136,6 +136,7 @@ export class DevCommand extends Command {
         fragDoc,
         graphqlSchemaDoc: graphQLSchema,
         tinaSchema,
+        lookup,
       })
       const apiURL = await codegen.execute()
 
@@ -167,6 +168,7 @@ export class DevCommand extends Command {
           const res = await database.indexContent({
             graphQLSchema,
             tinaSchema,
+            lookup,
           })
           warnings.push(...res.warnings)
         },

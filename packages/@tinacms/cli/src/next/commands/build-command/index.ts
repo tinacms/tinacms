@@ -102,10 +102,8 @@ export class BuildCommand extends Command {
       configManager,
       Number(this.datalayerPort)
     )
-    const { queryDoc, fragDoc, graphQLSchema, tinaSchema } = await buildSchema(
-      database,
-      configManager.config
-    )
+    const { queryDoc, fragDoc, graphQLSchema, tinaSchema, lookup } =
+      await buildSchema(configManager.config)
 
     const codegen = new Codegen({
       configManager: configManager,
@@ -113,6 +111,7 @@ export class BuildCommand extends Command {
       fragDoc,
       graphqlSchemaDoc: graphQLSchema,
       tinaSchema,
+      lookup,
     })
     const apiURL = await codegen.execute()
 
