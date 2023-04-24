@@ -30,7 +30,7 @@ export const Posts = ({ data }) => {
         return (
           <Link
             key={post._sys.filename}
-            href={`/posts/` + post._sys.filename}
+            href={`/posts/` + post._sys.breadcrumbs.join("/")}
             passHref
           >
             <a

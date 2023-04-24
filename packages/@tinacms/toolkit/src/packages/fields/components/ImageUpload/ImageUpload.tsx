@@ -26,12 +26,18 @@ interface ImageUploadProps {
   loading?: boolean
 }
 
-const StyledImage = ({ src }) => (
-  <img
-    src={src}
-    className="block max-w-full rounded shadow overflow-hidden max-h-48 h-auto object-contain transition-opacity duration-100 ease-out m-0 bg-gray-200 bg-auto bg-center bg-no-repeat"
-  />
-)
+const StyledImage = ({ src }) => {
+  const isSvg = /\.svg$/.test(src)
+
+  return (
+    <img
+      src={src}
+      className={`"block max-w-full rounded shadow overflow-hidden max-h-48 h-auto object-contain transition-opacity duration-100 ease-out m-0 bg-gray-200 bg-auto bg-center bg-no-repeat ${
+        isSvg ? 'min-w-[12rem]' : ''
+      }`}
+    />
+  )
+}
 
 const StyledFile = ({ src }) => {
   return (

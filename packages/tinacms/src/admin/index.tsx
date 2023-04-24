@@ -17,6 +17,7 @@ import LogoutPage, { LogoutRedirect } from './pages/LogoutPage'
 import DashboardPage from './pages/DashboardPage'
 import CollectionListPage from './pages/CollectionListPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
+import CollectionDuplicatePage from './pages/CollectionDuplicatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 import ScreenPage from './pages/ScreenPage'
 
@@ -189,7 +190,7 @@ export const TinaAdmin = ({
                     }
                   />
                   <Route
-                    path="collections/:collectionName/new"
+                    path="collections/new/:collectionName"
                     element={
                       <DefaultWrapper cms={cms}>
                         <CollectionCreatePage />
@@ -197,7 +198,23 @@ export const TinaAdmin = ({
                     }
                   />
                   <Route
-                    path="collections/:collectionName/:templateName/new"
+                    path="collections/duplicate/:collectionName/~/*"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionDuplicatePage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="collections/duplicate/:collectionName/*"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionDuplicatePage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="collections/new/:collectionName/:templateName"
                     element={
                       <DefaultWrapper cms={cms}>
                         <CollectionCreatePage />
@@ -205,7 +222,23 @@ export const TinaAdmin = ({
                     }
                   />
                   <Route
-                    path="collections/:collectionName/*"
+                    path="collections/new/:collectionName/:templateName/~/*"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionCreatePage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="collections/new/:collectionName/~/*"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionCreatePage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="collections/edit/:collectionName/*"
                     element={
                       <DefaultWrapper cms={cms}>
                         <CollectionUpdatePage />
@@ -213,7 +246,7 @@ export const TinaAdmin = ({
                     }
                   />
                   <Route
-                    path="collections/:collectionName"
+                    path="collections/:collectionName/*"
                     element={
                       <DefaultWrapper cms={cms}>
                         <CollectionListPage />

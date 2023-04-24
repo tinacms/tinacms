@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest'
-import { getStaticProps } from './[filename]'
+import { getStaticProps } from './[...filename]'
 import { printState, printBlueprints } from '@tinacms/app/dist/test-utils'
 import schema from '../../tina/__generated__/_graphql.json'
 import client from '../../tina/__generated__/client'
@@ -10,7 +10,7 @@ import path from 'path'
 
 test('the query is formified for a documentation document', async () => {
   const result = await getStaticProps({
-    params: { filename: 'tinacms-v0.69.7' },
+    params: { filename: ['tinacms-v0.69.7'] },
   })
   const res = await printBlueprints({
     schema: schema as DocumentNode,

@@ -1,5 +1,5 @@
-import { defineConfig } from 'tinacms'
 import React from 'react'
+import { defineConfig } from 'tinacms'
 import { BiBall, BiBasketball, BiBaseball, BiFootball } from 'react-icons/bi'
 import { createPreviewHelper } from '@tinacms/preview-helpers'
 
@@ -13,6 +13,9 @@ const slugify = (values) => {
 }
 const router = ({ document, collection }) => {
   return `/${collection.name}/${document._sys.filename}`
+}
+const extendedRouter = ({ document, collection }) => {
+  return `/${collection.name}/${document._sys.breadcrumbs.join('/')}`
 }
 export default defineConfig({
   // contentApiUrlOverride: '/api/gql',
@@ -512,7 +515,7 @@ export default defineConfig({
         path: 'content/post',
         format: 'mdx',
         ui: {
-          router,
+          router: extendedRouter,
           filename: {
             slugify,
             readonly: true,
@@ -877,7 +880,7 @@ export default defineConfig({
         label: 'Documentation',
         path: 'content/documentation',
         ui: {
-          router,
+          router: extendedRouter,
           filename: {
             slugify,
           },

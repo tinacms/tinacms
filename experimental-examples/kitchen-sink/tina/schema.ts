@@ -57,6 +57,13 @@ export default defineSchema({
           type: 'string',
           label: 'Title',
           name: 'title',
+          required: true,
+        },
+        {
+          type: 'string',
+          label: 'Excerpt',
+          name: 'excerpt',
+          required: false,
         },
         {
           type: 'rich-text',

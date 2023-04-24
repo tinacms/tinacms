@@ -164,7 +164,12 @@ const validateCollection = async (
       .required(),
     path: yup
       .string()
-      .required()
+      .test('is-required', 'path is a required field', (value) => {
+        if (value === '') {
+          return true
+        }
+        return yup.string().required().isValidSync(value)
+      })
       .transform((value) => {
         return value.replace(/^\/|\/$/g, '')
       }),

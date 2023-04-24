@@ -33,7 +33,7 @@ export default function BlogPostPage(
 
 export const getStaticProps = async ({ params }) => {
   let tinaProps = await client.queries.blogPostQuery({
-    relativePath: `${params.filename}.mdx`,
+    relativePath: `${params.filename.join("/")}.mdx`,
   });
   tinaProps = await expandWithMetadata(tinaProps, client, true);
   console.log(tinaProps.data);
@@ -54,9 +54,13 @@ export const getStaticProps = async ({ params }) => {
 export const getStaticPaths = async () => {
   const postsListData = await client.queries.postConnection();
   return {
-    paths: postsListData.data.postConnection.edges.map((post) => ({
-      params: { filename: post.node._sys.filename },
-    })),
+    paths: postsListData.data.postConnection.edges.map((post) => {
+      return {
+        params: {
+          filename: post.node._sys.breadcrumbs,
+        },
+      };
+    }),
     fallback: "blocking",
   };
 };
