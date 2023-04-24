@@ -10,7 +10,6 @@ import { FilterArgs, TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
 import type { CollectionResponse } from '../types'
 import { FullscreenError } from './FullscreenError'
-import { handleNavigate } from '../pages/CollectionListPage'
 
 export const useGetCollection = (
   cms: TinaCMS,
@@ -32,8 +31,10 @@ export const useGetCollection = (
   const [resetState, setResetSate] = useState(0)
 
   useEffect(() => {
+    let cancelled = false
+
     const fetchCollection = async () => {
-      if ((await api.isAuthenticated()) && !folder.loading) {
+      if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         const { name, order } = JSON.parse(sortKey || '{}')
         const validSortKey = collectionExtra.fields
           ?.map((x) => x.name)
@@ -64,9 +65,14 @@ export const useGetCollection = (
       }
     }
 
+    if (cancelled) return
+
     setLoading(true)
     fetchCollection()
     // TODO: useDebounce
+    return () => {
+      cancelled = true
+    }
   }, [
     cms,
     collectionName,
@@ -131,7 +137,14 @@ const GetCollection = ({
       collection.documents?.edges?.length === 1
     ) {
       const doc = collection.documents.edges[0].node
-      handleNavigate(navigate, cms, collection, collectionDefinition, doc)
+      const pathToDoc = doc._sys.breadcrumbs
+      if (folder.fullyQualifiedName) {
+        pathToDoc.unshift('~')
+      }
+      navigate(
+        `/${['collections', 'edit', collectionName, ...pathToDoc].join('/')}`,
+        { replace: true }
+      )
     }
   }, [collection?.name || '', loading])
 
