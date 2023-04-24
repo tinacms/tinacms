@@ -17,7 +17,7 @@ import { diff } from '@graphql-inspector/core'
 import { IndexStatusResponse, waitForDB } from './waitForDB'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { sleepAndCallFunc } from '../../../utils/sleep'
-import { dangerText, linkText } from '../../../utils/theme'
+import { dangerText, linkText, warnText } from '../../../utils/theme'
 
 export class BuildCommand extends Command {
   static paths = [['build']]
@@ -316,21 +316,37 @@ export class BuildCommand extends Command {
     // This will always be the filesystem bridge.
     const localSchemaDocument = await database.getGraphQLSchemaFromBridge()
     const localGraphqlSchema = buildASTSchema(localSchemaDocument)
-    const diffResult = await diff(localGraphqlSchema, remoteGqlSchema)
+    try {
+      const diffResult = await diff(localGraphqlSchema, remoteGqlSchema)
 
-    if (diffResult.length === 0) {
-      bar.tick({
-        prog: '✅',
-      })
-    } else {
-      bar.tick({
-        prog: '❌',
-      })
-      let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to Github to update your remote GraphQL schema.`
-      if (config?.branch) {
-        errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
+      if (diffResult.length === 0) {
+        bar.tick({
+          prog: '✅',
+        })
+      } else {
+        bar.tick({
+          prog: '❌',
+        })
+        let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to Github to update your remote GraphQL schema.`
+        if (config?.branch) {
+          errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
+        }
+        throw new Error(errorMessage)
       }
-      throw new Error(errorMessage)
+    } catch (e) {
+      // In some cases, a GraphQL version mismatch prevents us from being able to do this check.
+      // Note that a check will still be run from the Tina admin since it's deduped in the Vite build
+      // Unfortunately there's no specific error class to compare with, so a string check here should still
+      // allow other errors to throw properly
+      if (e.message.startsWith('Cannot use')) {
+        logger.warn(
+          `${warnText(
+            'Skipping schema check due to conflicting GraphQL versions'
+          )}`
+        )
+      } else {
+        throw e
+      }
     }
   }
 }
