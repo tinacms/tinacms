@@ -1,6 +1,7 @@
 import { defineConfig } from 'tinacms'
 import React from 'react'
 import { BiBall, BiBasketball, BiBaseball, BiFootball } from 'react-icons/bi'
+import { createPreviewHelper } from '@tinacms/preview-helpers'
 
 const TINA_TOKEN_KEY = 'tina_token_key'
 
@@ -926,5 +927,9 @@ export default defineConfig({
         ],
       },
     ],
+  },
+  cmsCallback(cms) {
+    cms.plugins.add(createPreviewHelper())
+    return cms
   },
 })

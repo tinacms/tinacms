@@ -1,4 +1,5 @@
 import { defineStaticConfig } from "tinacms";
+import { createPreviewHelper } from "@tinacms/preview-helpers";
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockSchema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
@@ -34,6 +35,7 @@ const config = defineStaticConfig({
      * Enables experimental branch switcher
      */
     cms.flags.set("branch-switcher", true);
+    cms.plugins.add(createPreviewHelper());
 
     return cms;
   },

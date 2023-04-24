@@ -125,6 +125,11 @@ export const useGraphQLReducer = (
   >([])
   const [operationIndex, setOperationIndex] = React.useState(0)
 
+  const helper = React.useMemo(() => {
+    const previewPlugins = cms.plugins.getType('preview-helper')
+    return previewPlugins.find('preview-helper')
+  }, [cms])
+
   React.useEffect(() => {
     const run = async () => {
       return Promise.all(
@@ -322,7 +327,14 @@ export const useGraphQLReducer = (
             if (isValidHttpUrl(value)) {
               return value
             } else {
-              return encodeEditInfo(value, tinaField(source, info.fieldName))
+              if (helper) {
+                // @ts-ignore external plugin types aren't available
+                return helper.encodeEditInfo(
+                  value,
+                  tinaField(source, info.fieldName)
+                )
+              }
+              return value
             }
           }
           return value

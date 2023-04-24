@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { vercelStegaEncode } from '@vercel/stega'
 import { tinaField } from 'tinacms/dist/react'
 import type { TinaClient } from 'tinacms/dist/client'
+import type { Plugin } from 'tinacms'
 
 function encodeEditInfo(text: string, fieldName: string): string {
   return `${vercelStegaEncode({
@@ -533,5 +534,17 @@ const documentWithMetadata = (doc: ResolvedDocument) => {
       id,
       fields: metaFields,
     },
+  }
+}
+
+export interface PreviewHelperPlugin extends Plugin {
+  __type: 'preview-helper'
+  encodeEditInfo: typeof encodeEditInfo
+}
+export function createPreviewHelper(): PreviewHelperPlugin {
+  return {
+    __type: 'preview-helper',
+    name: 'preview-helper',
+    encodeEditInfo,
   }
 }
