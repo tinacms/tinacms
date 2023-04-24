@@ -10,6 +10,9 @@ export interface TemplateResponse {
 
 export interface DocumentNode {
   node: {
+    __typename: string
+    name?: string
+    path?: string
     _sys: {
       template: string
       breadcrumbs: string[]

@@ -14,7 +14,7 @@ export default function Home(
 }
 
 export const getStaticProps = async ({ params }) => {
-  const variables = { relativePath: `${params.filename}.md` }
+  const variables = { relativePath: `${params.filename.join('/')}.md` }
   const props = await client.queries.documentation(variables)
   return {
     props: { ...props, variables },
@@ -25,7 +25,7 @@ export const getStaticPaths = async () => {
   const connection = await client.queries.documentationConnection()
   return {
     paths: connection.data.documentationConnection.edges.map((post) => ({
-      params: { filename: post.node._sys.filename },
+      params: { filename: post.node._sys.breadcrumbs },
     })),
     fallback: 'blocking',
   }

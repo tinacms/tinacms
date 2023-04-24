@@ -22,9 +22,12 @@ import {
   coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
+  FOLDER_ROOT,
+  FolderTreeBuilder,
   IndexDefinition,
   makeFilter,
   makeFilterSuffixes,
+  makeFolderOpsForCollection,
   makeIndexOpsForDocument,
   TernaryFilter,
 } from './datalayer'
@@ -38,7 +41,8 @@ import {
   PutOp,
   SUBLEVEL_OPTIONS,
 } from './level'
-import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
+import { replaceNameOverrides, applyNameOverrides } from './alias-utils'
+import sha from 'js-sha1'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -84,6 +88,8 @@ export type QueryOptions = {
   after?: string
   /* specify cursor to end results at */
   before?: string
+  /* folder to query */
+  folder?: string
 }
 
 const defaultStatusCallback: IndexStatusCallback = () => Promise.resolve()
@@ -256,15 +262,28 @@ export class Database {
       await this.bridge.put(normalizedPath, stringifiedFile)
     }
     await this.onPut(normalizedPath, stringifiedFile)
+    const folderTreeBuilder = new FolderTreeBuilder()
+    const folderKey = folderTreeBuilder.update(filepath, collection.path || '')
 
-    const putOps = makeIndexOpsForDocument(
-      normalizedPath,
-      collection?.name,
-      collectionIndexDefinitions,
-      dataFields,
-      'put',
-      this.level
-    )
+    const putOps = [
+      ...makeIndexOpsForDocument(
+        normalizedPath,
+        collection?.name,
+        collectionIndexDefinitions,
+        dataFields,
+        'put',
+        this.level
+      ),
+      // folder indices
+      ...makeIndexOpsForDocument(
+        normalizedPath,
+        `${collection?.name}_${folderKey}`,
+        collectionIndexDefinitions,
+        dataFields,
+        'put',
+        this.level
+      ),
+    ]
 
     const existingItem = await this.level
       .sublevel<string, Record<string, any>>(
@@ -274,14 +293,25 @@ export class Database {
       .get(normalizedPath)
 
     const delOps = existingItem
-      ? makeIndexOpsForDocument(
-          normalizedPath,
-          collection?.name,
-          collectionIndexDefinitions,
-          existingItem,
-          'del',
-          this.level
-        )
+      ? [
+          ...makeIndexOpsForDocument(
+            normalizedPath,
+            collection?.name,
+            collectionIndexDefinitions,
+            existingItem,
+            'del',
+            this.level
+          ),
+          // folder indices
+          ...makeIndexOpsForDocument(
+            normalizedPath,
+            `${collection?.name}_${folderKey}`,
+            collectionIndexDefinitions,
+            existingItem,
+            'del',
+            this.level
+          ),
+        ]
       : []
 
     const ops: BatchOp[] = [
@@ -352,14 +382,30 @@ export class Database {
           await this.bridge.put(normalizedPath, stringifiedFile)
         }
         await this.onPut(normalizedPath, stringifiedFile)
-        const putOps = makeIndexOpsForDocument(
-          normalizedPath,
-          collectionName,
-          collectionIndexDefinitions,
-          dataFields,
-          'put',
-          this.level
+        const folderTreeBuilder = new FolderTreeBuilder()
+        const folderKey = folderTreeBuilder.update(
+          filepath,
+          collection.path || ''
         )
+        const putOps = [
+          ...makeIndexOpsForDocument(
+            normalizedPath,
+            collectionName,
+            collectionIndexDefinitions,
+            dataFields,
+            'put',
+            this.level
+          ),
+          // folder indices
+          ...makeIndexOpsForDocument(
+            normalizedPath,
+            `${collection?.name}_${folderKey}`,
+            collectionIndexDefinitions,
+            dataFields,
+            'put',
+            this.level
+          ),
+        ]
 
         const existingItem = await this.level
           .sublevel<string, Record<string, any>>(
@@ -369,14 +415,25 @@ export class Database {
           .get(normalizedPath)
 
         const delOps = existingItem
-          ? makeIndexOpsForDocument(
-              normalizedPath,
-              collectionName,
-              collectionIndexDefinitions,
-              existingItem,
-              'del',
-              this.level
-            )
+          ? [
+              ...makeIndexOpsForDocument(
+                normalizedPath,
+                collectionName,
+                collectionIndexDefinitions,
+                existingItem,
+                'del',
+                this.level
+              ),
+              // folder indices
+              ...makeIndexOpsForDocument(
+                normalizedPath,
+                `${collection?.name}_${folderKey}`,
+                collectionIndexDefinitions,
+                existingItem,
+                'del',
+                this.level
+              ),
+            ]
           : []
 
         const ops: BatchOp[] = [
@@ -676,6 +733,7 @@ export class Database {
       sort = DEFAULT_COLLECTION_SORT_KEY,
       collection,
       filterChain: rawFilterChain,
+      folder,
     } = queryOptions
     let limit = 50
     if (first) {
@@ -721,7 +779,14 @@ export class Database {
     )
     const sublevel = indexDefinition
       ? this.level
-          .sublevel(collection, SUBLEVEL_OPTIONS)
+          .sublevel(
+            `${collection}${
+              folder
+                ? `_${folder === FOLDER_ROOT ? folder : sha.hex(folder)}`
+                : ''
+            }`,
+            SUBLEVEL_OPTIONS
+          )
           .sublevel(sort, SUBLEVEL_OPTIONS)
       : rootLevel
 
@@ -957,7 +1022,9 @@ export class Database {
         )
       }
 
-      await _deleteIndexContent(this, nonCollectionPaths, enqueueOps, null)
+      if (nonCollectionPaths.length) {
+        await _deleteIndexContent(this, nonCollectionPaths, enqueueOps, null)
+      }
     })
     while (operations.length) {
       await this.level.batch(operations.splice(0, 25))
@@ -1013,10 +1080,24 @@ export class Database {
     )
     const item = await rootSublevel.get(itemKey)
     if (item) {
+      const folderTreeBuilder = new FolderTreeBuilder()
+      const folderKey = folderTreeBuilder.update(
+        filepath,
+        collection.path || ''
+      )
       await this.level.batch([
         ...makeIndexOpsForDocument<Record<string, any>>(
           filepath,
           collection.name,
+          collectionIndexDefinitions,
+          item,
+          'del',
+          this.level
+        ),
+        // folder indices
+        ...makeIndexOpsForDocument(
+          filepath,
+          `${collection.name}_${folderKey}`,
           collectionIndexDefinitions,
           item,
           'del',
@@ -1048,7 +1129,7 @@ export class Database {
         await level.batch(batchOps)
       }
     }
-    // This map is used to map files to there collections
+    // This map is used to map files to their collections
     const filesSeen = new Map<string, string[]>()
     // This is used to track which files have duplicate collections so we do not have to loop over all files at the end
     const duplicateFiles = new Set<string>()
@@ -1123,6 +1204,7 @@ function hasOwnProperty<X extends {}, Y extends PropertyKey>(
 export type LookupMapType =
   | GlobalDocumentLookup
   | CollectionDocumentLookup
+  | CollectionFolderLookup
   | MultiCollectionDocumentLookup
   | MultiCollectionDocumentListLookup
   | CollectionDocumentListLookup
@@ -1141,6 +1223,11 @@ type GlobalDocumentLookup = {
 type CollectionDocumentLookup = {
   type: string
   resolveType: 'collectionDocument'
+  collection: string
+}
+type CollectionFolderLookup = {
+  type: string
+  resolveType: 'collectionFolder'
   collection: string
 }
 type MultiCollectionDocumentLookup = {
@@ -1174,12 +1261,14 @@ const _indexContent = async (
   collection?: Collection<true>
 ) => {
   let collectionIndexDefinitions
+  let collectionPath: string | undefined
   if (collection) {
     const indexDefinitions = await database.getIndexDefinitions(level)
     collectionIndexDefinitions = indexDefinitions?.[collection.name]
     if (!collectionIndexDefinitions) {
       throw new Error(`No indexDefinitions for collection ${collection.name}`)
     }
+    collectionPath = collection.path
   }
 
   const tinaSchema = await database.getSchema()
@@ -1188,6 +1277,7 @@ const _indexContent = async (
     templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
   }
 
+  const folderTreeBuilder = new FolderTreeBuilder()
   await sequential(documentPaths, async (filepath) => {
     try {
       const dataString = await database.bridge.get(normalizePath(filepath))
@@ -1209,7 +1299,10 @@ const _indexContent = async (
       }
 
       const normalizedPath = normalizePath(filepath)
-
+      const folderKey = folderTreeBuilder.update(
+        normalizedPath,
+        collectionPath || ''
+      )
       const aliasedData = templateInfo
         ? replaceNameOverrides(template, data)
         : data
@@ -1218,6 +1311,15 @@ const _indexContent = async (
         ...makeIndexOpsForDocument<Record<string, any>>(
           normalizedPath,
           collection?.name,
+          collectionIndexDefinitions,
+          aliasedData,
+          'put',
+          level
+        ),
+        // folder indexes
+        ...makeIndexOpsForDocument<Record<string, any>>(
+          normalizedPath,
+          `${collection?.name}_${folderKey}`,
           collectionIndexDefinitions,
           aliasedData,
           'put',
@@ -1242,14 +1344,30 @@ const _indexContent = async (
       })
     }
   })
+
+  if (collection) {
+    await enqueueOps(
+      makeFolderOpsForCollection(
+        folderTreeBuilder.tree,
+        collection,
+        collectionIndexDefinitions,
+        'put',
+        level
+      )
+    )
+  }
 }
 
 const _deleteIndexContent = async (
   database: Database,
   documentPaths: string[],
-  enequeueOps: (ops: BatchOp[]) => Promise<void>,
+  enqueueOps: (ops: BatchOp[]) => Promise<void>,
   collection?: Collection<true>
 ) => {
+  if (!documentPaths.length) {
+    return
+  }
+
   let collectionIndexDefinitions
   if (collection) {
     const indexDefinitions = await database.getIndexDefinitions(database.level)
@@ -1259,20 +1377,47 @@ const _deleteIndexContent = async (
     }
   }
 
+  const tinaSchema = await database.getSchema()
+  let templateInfo: CollectionTemplateable | null = null
+  if (collection) {
+    templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
+  }
+
   const rootLevel = database.level.sublevel<string, Record<string, any>>(
     CONTENT_ROOT_PREFIX,
     SUBLEVEL_OPTIONS
   )
+
+  const folderTreeBuilder = new FolderTreeBuilder()
   await sequential(documentPaths, async (filepath) => {
     const itemKey = normalizePath(filepath)
     const item = await rootLevel.get(itemKey)
     if (item) {
-      await enequeueOps([
+      const folderKey = folderTreeBuilder.update(
+        itemKey,
+        collection?.path || ''
+      )
+      const aliasedData = templateInfo
+        ? replaceNameOverrides(
+            getTemplateForFile(templateInfo, item as any),
+            item
+          )
+        : item
+      await enqueueOps([
         ...makeIndexOpsForDocument(
           itemKey,
           collection.name,
           collectionIndexDefinitions,
-          item,
+          aliasedData,
+          'del',
+          database.level
+        ),
+        // folder indexes
+        ...makeIndexOpsForDocument<Record<string, any>>(
+          itemKey,
+          `${collection?.name}_${folderKey}`,
+          collectionIndexDefinitions,
+          aliasedData,
           'del',
           database.level
         ),
@@ -1280,6 +1425,17 @@ const _deleteIndexContent = async (
       ])
     }
   })
+  if (collectionIndexDefinitions) {
+    await enqueueOps(
+      makeFolderOpsForCollection(
+        folderTreeBuilder.tree,
+        collection,
+        collectionIndexDefinitions,
+        'del',
+        database.level
+      )
+    )
+  }
 }
 
 const getTemplateForFile = (

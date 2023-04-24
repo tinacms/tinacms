@@ -147,6 +147,21 @@ const scalarDefinitions = [
     ],
   }),
   astBuilder.ObjectTypeDefinition({
+    name: astBuilder.TYPES.Folder,
+    fields: [
+      astBuilder.FieldDefinition({
+        name: 'name',
+        required: true,
+        type: astBuilder.TYPES.String,
+      }),
+      astBuilder.FieldDefinition({
+        name: 'path',
+        required: true,
+        type: astBuilder.TYPES.String,
+      }),
+    ],
+  }),
+  astBuilder.ObjectTypeDefinition({
     name: 'PageInfo',
     fields: [
       astBuilder.FieldDefinition({
