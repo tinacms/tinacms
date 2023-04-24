@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.6.4
+
+### Patch Changes
+
+- 709b6f2ec: Fix template menu UI, image delete button
+
 ## 1.6.3
 
 ### Patch Changes

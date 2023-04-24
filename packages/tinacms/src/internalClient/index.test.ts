@@ -25,6 +25,7 @@ describe('Tina Client', () => {
         branch: 'main',
         tokenStorage: 'LOCAL_STORAGE',
         customContentApiUrl: 'http://tina.io/fakeURL',
+        tinaGraphQLVersion: '1.1',
       })
     })
     it('sets isLocalMode to false', () => {

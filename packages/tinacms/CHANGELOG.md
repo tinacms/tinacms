@@ -1,5 +1,13 @@
 # tinacms
 
+## 1.4.6
+
+### Patch Changes
+
+- 709b6f2ec: Fix template menu UI, image delete button
+- Updated dependencies [709b6f2ec]
+  - @tinacms/toolkit@1.6.4
+
 ## 1.4.5
 
 ### Patch Changes

@@ -19,18 +19,22 @@ import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { useWindowWidth } from '@react-hook/window-size'
 import { FaLock, FaUnlock } from 'react-icons/fa'
+import { useCollectionFolder } from './utils'
 
 const createDocument = async (
   cms: TinaCMS,
   collection: { name: string; format: string },
   template: { name: string },
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
+  folder: string,
   values: any
 ) => {
   const api = new TinaAdminApi(cms)
   const { filename, ...leftover } = values
 
-  const relativePath = `${filename}.${collection.format}`
+  const relativePath = `${folder ? `${folder}/` : ''}${filename}.${
+    collection.format
+  }`
   const params = api.schema.transformPayload(collection.name, {
     _collection: collection.name,
     ...(template && { _template: template.name }),
@@ -48,6 +52,7 @@ const createDocument = async (
 }
 
 const CollectionCreatePage = () => {
+  const folder = useCollectionFolder()
   const { collectionName, templateName } = useParams()
 
   return (
@@ -56,6 +61,7 @@ const CollectionCreatePage = () => {
         <GetCollection
           cms={cms}
           collectionName={collectionName}
+          folder={folder}
           includeDocuments={false}
         >
           {(collection) => {
@@ -70,6 +76,7 @@ const CollectionCreatePage = () => {
                 collection={collection}
                 templateName={templateName}
                 mutationInfo={mutationInfo}
+                folder={folder}
               />
             )
           }}
@@ -117,7 +124,14 @@ const FilenameInput = (props) => {
   )
 }
 
-const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
+export const RenderForm = ({
+  cms,
+  collection,
+  folder,
+  templateName,
+  mutationInfo,
+  customDefaults,
+}: any) => {
   const navigate = useNavigate()
   const [formIsPristine, setFormIsPristine] = useState(true)
   const schema: TinaSchema | undefined = cms.api.tina.schema
@@ -151,8 +165,11 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
   }
 
   const defaultItem =
+    customDefaults ||
     // @ts-ignore internal types aren't up to date
-    template.ui?.defaultItem || template?.defaultItem
+    template.ui?.defaultItem ||
+    // @ts-ignore
+    template?.defaultItem
 
   const form = useMemo(() => {
     return new Form({
@@ -230,9 +247,23 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
       ],
       onSubmit: async (values) => {
         try {
-          await createDocument(cms, collection, template, mutationInfo, values)
+          const folderName = folder.fullyQualifiedName ? folder.name : ''
+          await createDocument(
+            cms,
+            collection,
+            template,
+            mutationInfo,
+            folderName,
+            values
+          )
           cms.alerts.success('Document created!')
-          navigate(`/collections/${collection.name}`)
+          setTimeout(() => {
+            navigate(
+              `/collections/${collection.name}${
+                folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
+              }`
+            )
+          }, 10)
         } catch (error) {
           console.error(error)
           const defaultErrorText = 'There was a problem saving your document.'
@@ -267,7 +298,11 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
             <div className="mb-2">
               <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
                 <Link
-                  to={`/collections/${collection.name}`}
+                  to={`/collections/${collection.name}${
+                    folder.fullyQualifiedName
+                      ? `/${folder.fullyQualifiedName}`
+                      : ''
+                  }`}
                   className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
                 >
                   {collection.label ? collection.label : collection.name}

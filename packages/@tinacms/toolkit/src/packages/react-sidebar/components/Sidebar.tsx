@@ -545,7 +545,7 @@ const SidebarCollectionLink = ({
       onClick={onClick}
       href={`${
         tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
-      }/collections/${collection.name}`}
+      }/collections/${collection.name}/~`}
       className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
     >
       <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}

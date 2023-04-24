@@ -1,5 +1,13 @@
 # tina-graphql
 
+## 1.4.7
+
+### Patch Changes
+
+- 65d53d5b9: Handle frontmatter format in forestry migration
+- 40d15644f: Update indexAllContent to use the passed in schema instead of fetching it from level after writing
+- a6786cc73: Export dates as date format in md/mdx
+
 ## 1.4.6
 
 ### Patch Changes
