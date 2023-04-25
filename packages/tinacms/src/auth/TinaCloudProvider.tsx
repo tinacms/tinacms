@@ -145,7 +145,7 @@ export const AuthWallInner = ({
  */
 export const TinaCloudProvider = (
   props: TinaCloudAuthWallProps &
-    CreateClientProps & { cmsCallback?: (cms: TinaCMS) => TinaCMS }
+    Omit<CreateClientProps, 'cms'> & { cmsCallback?: (cms: TinaCMS) => TinaCMS }
 ) => {
   const baseBranch = props.branch || 'main'
   const [currentBranch, setCurrentBranch] = useLocalStorage(

@@ -20,7 +20,13 @@ export function useFormPortal() {
   return useContext(FormPortalContext)
 }
 
-export const FormPortalProvider: React.FC = ({ header, children }) => {
+export const FormPortalProvider: React.FC = ({
+  header,
+  children,
+}: {
+  header: any
+  children: any
+}) => {
   const wrapperRef = React.useRef<HTMLDivElement | null>(null)
   const zIndexRef = React.useRef<number>(0)
 

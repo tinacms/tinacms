@@ -459,6 +459,7 @@ const FormFields = ({
   }
   return (
     <FormPortalProvider
+      // @ts-ignore
       header={
         <PanelHeader path={path} setActiveFieldName={setActiveFieldName} />
       }
@@ -674,7 +675,7 @@ const PanelHeader = ({
   )
 }
 
-export const GroupPanel = ({ className = '', style = {}, ...props }) => (
+const GroupPanel = ({ className = '', style = {}, ...props }) => (
   <div
     className={`absolute w-full top-0 bottom-0 left-0 flex flex-col justify-between overflow-hidden ${className}`}
     style={{
