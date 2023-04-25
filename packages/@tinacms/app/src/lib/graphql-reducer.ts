@@ -4,7 +4,6 @@ import { getIn } from 'final-form'
 import { z } from 'zod'
 // @ts-expect-error
 import schemaJson from 'SCHEMA_IMPORT'
-import { vercelStegaEncode } from '@vercel/stega'
 import { tinaField } from 'tinacms/dist/react'
 import { expandQuery, isNodeType } from './expand-query'
 import {
@@ -28,13 +27,6 @@ import type {
   SystemInfo,
   ResolvedDocument,
 } from './types'
-
-function encodeEditInfo(text: string, fieldName: string): string {
-  return `${vercelStegaEncode({
-    origin: 'tinacms',
-    data: { fieldName },
-  })}${text}`
-}
 
 const sysSchema = z.object({
   breadcrumbs: z.array(z.string()),
