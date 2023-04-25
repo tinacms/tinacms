@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import { BillingWarning, Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
@@ -73,7 +69,6 @@ const CollectionUpdatePage = () => {
                       relativePath={relativePath}
                       collection={collection}
                       mutationInfo={mutationInfo}
-                      folder={folder}
                     />
                   )}
                 </GetDocument>
@@ -93,10 +88,10 @@ const RenderForm = ({
   relativePath,
   collection,
   mutationInfo,
-  folder,
 }) => {
   const [formIsPristine, setFormIsPristine] = useState(true)
   const schema: TinaSchema | undefined = cms.api.tina.schema
+  const parentFolder = relativePath.split('/').slice(0, -1).join('/')
 
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name)
@@ -153,7 +148,7 @@ const RenderForm = ({
           <div className="mb-2">
             <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
               <Link
-                to={`/collections/${collection.name}${folder.parentName}`}
+                to={`/collections/${collection.name}/~${parentFolder}`}
                 className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
               >
                 {collection.label ? collection.label : collection.name}
