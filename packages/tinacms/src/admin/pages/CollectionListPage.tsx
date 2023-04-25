@@ -145,7 +145,11 @@ export const handleNavigate = (
       : (window.location.href = routeOverride)
     return null
   } else {
-    navigate(document._sys.breadcrumbs.join('/'))
+    const pathToDoc = document._sys.breadcrumbs
+    navigate(
+      `/${['collections', 'edit', collection.name, ...pathToDoc].join('/')}`,
+      { replace: true }
+    )
   }
 }
 
