@@ -2,4 +2,7 @@
 'tinacms': patch
 ---
 
-Fix bug in auto-edit of single document collections
+Fix routing issues with the folder update. 
+- Back button goes back to the folder you were in
+- Admin navigation works as expected
+
