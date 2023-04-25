@@ -1,5 +1,13 @@
 The purpose of this package is to add metadata to Tina's query result which helps to make your live site easily editable.
 
+## Installation
+
+Note this is not on the `main` version of Tina yet. To install:
+
+```
+yarn add @tinacms/cli@remove-form-nesting tinacms@remove-form-nesting @tinacms/preview-helpers@remove-form-nesting
+```
+
 ## Usage
 
 You'll need to add a few things to your Tina-enabled page:
