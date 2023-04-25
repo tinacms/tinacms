@@ -1,5 +1,12 @@
 # @tinacms/schema-tools
 
+## 1.4.3
+
+### Patch Changes
+
+- f14f59a96: Handle `path: "/"` in a collection
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+
 ## 1.4.2
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # tina-graphql
 
+## 1.4.8
+
+### Patch Changes
+
+- f14f59a96: Handle `path: "/"` in a collection
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+- 7d4be0e51: Fix cyrillic characters in indexes were being incorrectly filtered out
+- Updated dependencies [f14f59a96]
+- Updated dependencies [eeedcfd30]
+  - @tinacms/schema-tools@1.4.3
+  - @tinacms/mdx@1.3.9
+
 ## 1.4.7
 
 ### Patch Changes
