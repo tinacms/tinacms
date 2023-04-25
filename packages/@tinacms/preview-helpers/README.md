@@ -10,7 +10,7 @@ yarn add @tinacms/cli@remove-form-nesting tinacms@remove-form-nesting @tinacms/p
 
 ## Usage
 
-You'll need to add a few things to your Tina-enabled page:
+You'll need to add a few things to your Tina-enabled page. `expandWithMetadata`, `useEditOpen`, and optionally, the `previewField` helper.
 
 ```ts
 import client from '../../tina/__generated__/client'
