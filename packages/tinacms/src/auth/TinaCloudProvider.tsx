@@ -15,18 +15,31 @@ import {
   DummyMediaStore,
   TinaMediaStore,
 } from '@tinacms/toolkit'
+import type { Config as SchemaConfig } from '@tinacms/schema-tools'
 
 import { Client, TinaIOConfig } from '../internalClient'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
 import { setEditing } from '@tinacms/sharedctx'
 import { TinaAdminApi } from '../admin/api'
+import { formifyCallback } from '../hooks/use-graphql-forms'
+import { DocumentCreatorCallback } from '../tina-cms'
 
 type ModalNames = null | 'authenticate'
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+interface MediaStoreClass {
+  new (...args: any[]): MediaStore
+}
+type Config = SchemaConfig<
+  (cms: TinaCMS) => TinaCMS,
+  formifyCallback,
+  DocumentCreatorCallback,
+  MediaStoreClass
+>
 
 export interface TinaCloudMediaStoreClass {
   new (client: Client): MediaStore
@@ -144,8 +157,7 @@ export const AuthWallInner = ({
  * Note: this will not restrict access for local filesystem clients
  */
 export const TinaCloudProvider = (
-  props: TinaCloudAuthWallProps &
-    CreateClientProps & { cmsCallback?: (cms: TinaCMS) => TinaCMS }
+  props: TinaCloudAuthWallProps & CreateClientProps & Config
 ) => {
   const baseBranch = props.branch || 'main'
   const [currentBranch, setCurrentBranch] = useLocalStorage(
@@ -254,9 +266,12 @@ export const TinaCloudProvider = (
   }, [branchingEnabled, props.branch])
 
   React.useEffect(() => {
-    if (props.cmsCallback) {
+    if (props?.cmsCallback) {
       props.cmsCallback(cms)
     }
+    props?.plugins?.forEach((tinaPlugin) => {
+      if (tinaPlugin?.cmsCallback) tinaPlugin.cmsCallback(cms)
+    })
   }, [])
 
   return (

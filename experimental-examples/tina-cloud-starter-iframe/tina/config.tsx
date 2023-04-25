@@ -1,12 +1,30 @@
 import { defineStaticConfig } from "tinacms";
+import { colorFieldPlugin } from "tinacms-plugin-color-picker";
+
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockSchema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
 import { testimonialBlockSchema } from "../components/blocks/testimonial";
-import { ColorPickerInput } from "../components/fields/color";
 import { iconSchema } from "../components/util/icon";
 
 const config = defineStaticConfig({
+  plugins: [
+    // example of an external plugin
+    colorFieldPlugin(),
+    // example of a local plugin
+    // {
+    //   vite: {
+    //     define: {
+    //       __TESTING_DEFINE_FOO: `"bar"`,
+    //     },
+    //   },
+    //   tailwind: {
+    //     content: [
+    //       "/Users/logananderson-forestry-mac/dev/tinacms/tinacms/packages/tinacms-plugin-color-picker/src/**/*.{vue,js,ts,jsx,tsx,svelte}",
+    //     ],
+    //   },
+    // },
+  ],
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
   branch:
     process.env.NEXT_PUBLIC_TINA_BRANCH! || // custom branch env override
@@ -274,7 +292,7 @@ const config = defineStaticConfig({
                 label: "Primary Color",
                 name: "color",
                 ui: {
-                  component: ColorPickerInput,
+                  component: "color-picker",
                 },
               },
               {

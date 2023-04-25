@@ -1,5 +1,7 @@
 import tailwind from 'tailwindcss'
-import { Plugin } from 'vite'
+import type { Config as TailwindConfig } from 'tailwindcss'
+import defaultPreset from 'tailwindcss/defaultConfig'
+import { Plugin, mergeConfig } from 'vite'
 import postcssNested from 'postcss-nested/index.js'
 import tailwindNesting from 'tailwindcss/nesting/index.js'
 import defaultTheme from 'tailwindcss/defaultTheme.js'
@@ -7,19 +9,43 @@ import twTypography from '@tailwindcss/typography'
 import lineClamp from '@tailwindcss/line-clamp'
 import aspectRatio from '@tailwindcss/aspect-ratio'
 import path from 'path'
+import { ConfigManager } from '../config-manager'
 
-export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
+export const tinaTailwind = (
+  spaPath: string,
+  configFilePath,
+  configManager: ConfigManager
+): Plugin => {
   return {
     name: 'vite-plugin-tina',
     // @ts-ignore
     config: (viteConfig) => {
       const plugins: Plugin[] = []
-      const content = [
+      const content: TailwindConfig['content'] = [
         path.join(spaPath, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
         path.join(configFilePath, '../**/*.{vue,js,ts,jsx,tsx,svelte}'),
       ]
-
+      const tailwindPresets = []
+      // add default tailwind config
+      tailwindPresets.push(defaultPreset)
+      configManager.config?.plugins?.forEach((tinaPlugin) => {
+        if (tinaPlugin.tailwind) {
+          // Add content from plugins to the content array
+          if (tinaPlugin.tailwind?.content) {
+            if (Array.isArray(tinaPlugin.tailwind.content)) {
+              content.push(...tinaPlugin.tailwind.content)
+            } else {
+              console.warn(
+                'TinaCMS only support content as an array. Please submit a Github issue if you need support for an object.'
+              )
+            }
+          }
+          // Add the plugin to the list of presets
+          tailwindPresets.push(tinaPlugin.tailwind)
+        }
+      })
       const tw = tailwind({
+        presets: tailwindPresets,
         important: '.tina-tailwind',
         theme: {
           columns: {

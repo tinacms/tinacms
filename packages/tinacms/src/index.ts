@@ -31,10 +31,11 @@ import {
   Schema,
   Collection,
   Template,
+  TinaPlugin as InternalTinaPlugin,
 } from '@tinacms/schema-tools'
 
 export type { Config, Schema, Collection, Template, TinaField, TinaSchema }
-
+export type TinaPlugin = InternalTinaPlugin<(cms: TinaCMS) => TinaCMS>
 /**
  * @deprecated use `TinaField` instead
  */

@@ -277,6 +277,7 @@ importers:
       styled-jsx: ^5.1.2
       tailwindcss: ^3.2.7
       tinacms: workspace:*
+      tinacms-plugin-color-picker: workspace:*
       typescript: 4.3.5
     dependencies:
       '@headlessui/react': 1.7.5_sfoxds7t5ydpegc3knd667wn6m
@@ -292,6 +293,7 @@ importers:
       styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
       styled-jsx: 5.1.2_react@17.0.2
       tinacms: link:../../packages/tinacms
+      tinacms-plugin-color-picker: link:../../packages/tinacms-plugin-color-picker
       typescript: 4.3.5
     devDependencies:
       '@svgr/webpack': 6.3.1
@@ -973,8 +975,10 @@ importers:
       jest: ^27.0.6
       micromatch: 4.0.5
       react: 17.0.2
+      tailwindcss: ^3.2.7
       typescript: 4.3.5
       url-pattern: ^1.0.3
+      vite: 4.1.4
       yup: ^0.32.0
       zod: ^3.14.3
     dependencies:
@@ -987,7 +991,9 @@ importers:
       '@types/yup': 0.29.14
       jest: 27.5.1
       react: 17.0.2
+      tailwindcss: 3.2.7
       typescript: 4.3.5
+      vite: 4.1.4
       yup: 0.32.11
 
   packages/@tinacms/scripts:
@@ -1387,6 +1393,34 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
+      typescript: 4.3.5
+
+  packages/tinacms-plugin-color-picker:
+    specifiers:
+      '@tinacms/scripts': workspace:*
+      '@types/node': ^13.13.1
+      '@types/react': 17.0.47
+      tinacms: workspace:*
+      typescript: 4.3.5
+    devDependencies:
+      '@tinacms/scripts': link:../@tinacms/scripts
+      '@types/node': 13.13.52
+      '@types/react': 17.0.47
+      tinacms: link:../tinacms
+      typescript: 4.3.5
+
+  packages/tinacms-plugin-react-icon-picker:
+    specifiers:
+      '@tinacms/scripts': workspace:*
+      '@types/node': ^13.13.1
+      '@types/react': 17.0.47
+      tinacms: workspace:*
+      typescript: 4.3.5
+    devDependencies:
+      '@tinacms/scripts': link:../@tinacms/scripts
+      '@types/node': 13.13.52
+      '@types/react': 17.0.47
+      tinacms: link:../tinacms
       typescript: 4.3.5
 
 packages:
@@ -6668,6 +6702,7 @@ packages:
     engines: { node: '>=12' }
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
+    dev: true
 
   /@csstools/selector-specificity/2.0.1_dvkg4kkb622mvceygg47xxdz3a:
     resolution:
@@ -8417,6 +8452,7 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
+    dev: true
 
   /@manypkg/find-root/1.1.0:
     resolution:
@@ -10022,6 +10058,7 @@ packages:
     cpu: [arm]
     os: [android]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-android-arm64/1.2.216:
@@ -10033,6 +10070,7 @@ packages:
     cpu: [arm64]
     os: [android]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-darwin-arm64/1.2.216:
@@ -10044,6 +10082,7 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-darwin-x64/1.2.216:
@@ -10055,6 +10094,7 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-freebsd-x64/1.2.216:
@@ -10066,6 +10106,7 @@ packages:
     cpu: [x64]
     os: [freebsd]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-linux-arm-gnueabihf/1.2.216:
@@ -10077,6 +10118,7 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-linux-arm64-gnu/1.2.216:
@@ -10088,6 +10130,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-linux-arm64-musl/1.2.216:
@@ -10099,6 +10142,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-linux-x64-gnu/1.2.216:
@@ -10110,6 +10154,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-linux-x64-musl/1.2.216:
@@ -10121,6 +10166,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-win32-arm64-msvc/1.2.216:
@@ -10132,6 +10178,7 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-win32-ia32-msvc/1.2.216:
@@ -10143,6 +10190,7 @@ packages:
     cpu: [ia32]
     os: [win32]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core-win32-x64-msvc/1.2.216:
@@ -10154,6 +10202,7 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
+    dev: true
     optional: true
 
   /@swc/core/1.2.215:
@@ -10176,6 +10225,7 @@ packages:
       '@swc/core-win32-arm64-msvc': 1.2.216
       '@swc/core-win32-ia32-msvc': 1.2.216
       '@swc/core-win32-x64-msvc': 1.2.216
+    dev: true
 
   /@swc/helpers/0.4.11:
     resolution:
@@ -10303,7 +10353,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
-      tailwindcss: 3.2.7_ts-node@10.9.1
+      tailwindcss: 3.2.7
 
   /@testing-library/dom/8.14.0:
     resolution:
@@ -10460,24 +10510,28 @@ packages:
       {
         integrity: sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA==,
       }
+    dev: true
 
   /@tsconfig/node12/1.0.11:
     resolution:
       {
         integrity: sha512-cqefuRsh12pWyGsIoBKJA9luFu3mRxCA+ORZvA4ktLSzIuCUtWVxGIuXigEwO5/ywWFMZ2QEGKWvkZG1zDMTag==,
       }
+    dev: true
 
   /@tsconfig/node14/1.0.3:
     resolution:
       {
         integrity: sha512-ysT8mhdixWK6Hw3i1V2AeRqZ5WfXg1G43mqoYlM2nc6388Fq5jcXyr5mRsqViLx/GJYdoL0bfXD8nmF+Zn/Iow==,
       }
+    dev: true
 
   /@tsconfig/node16/1.0.3:
     resolution:
       {
         integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==,
       }
+    dev: true
 
   /@types/abstract-leveldown/7.2.0:
     resolution:
@@ -11160,6 +11214,7 @@ packages:
       {
         integrity: sha512-x5W9s+8P4XteaxT/jKF0PSb7XEvo5VmqEWgsMlyeY4ZlLK8I6aH6g5TPPyDlLAep+GYf4kefb7HFyc7PAO3m+Q==,
       }
+    dev: true
 
   /@types/node/14.18.29:
     resolution:
@@ -13716,6 +13771,7 @@ packages:
       {
         integrity: sha512-58S9QDqG0Xx27YwPSt9fJxivjYl432YCwfDMfZ+71RAqUrZef7LrKQZ3LHLOwCS4FLNBplP533Zx895SeOCHvA==,
       }
+    dev: true
 
   /arg/5.0.2:
     resolution:
@@ -15990,6 +16046,7 @@ packages:
       {
         integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==,
       }
+    dev: true
 
   /cross-fetch/3.1.5:
     resolution:
@@ -22320,6 +22377,7 @@ packages:
       whatwg-fetch: 3.6.2
     transitivePeerDependencies:
       - encoding
+    dev: false
 
   /isomorphic-fetch/3.0.0_encoding@0.1.13:
     resolution:
@@ -24643,6 +24701,7 @@ packages:
       {
         integrity: sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==,
       }
+    dev: true
 
   /makeerror/1.0.12:
     resolution:
@@ -27844,6 +27903,7 @@ packages:
       postcss: 8.4.21
       ts-node: 10.9.1_3ts5pezbn3c3azuqsq74yqdemu
       yaml: 1.10.2
+    dev: true
 
   /postcss-load-config/3.1.4_postcss@8.4.14:
     resolution:
@@ -31451,6 +31511,7 @@ packages:
       resolve: 1.22.1
     transitivePeerDependencies:
       - ts-node
+    dev: true
 
   /tapable/2.2.1:
     resolution:
@@ -31935,6 +31996,7 @@ packages:
       typescript: 4.7.4
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+    dev: true
 
   /tsconfig-paths/3.14.1:
     resolution:
@@ -33062,6 +33124,7 @@ packages:
       {
         integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==,
       }
+    dev: true
 
   /v8-compile-cache/2.3.0:
     resolution:
@@ -33320,7 +33383,6 @@ packages:
       rollup: 3.19.1
     optionalDependencies:
       fsevents: 2.3.2
-    dev: false
 
   /vite/4.1.4_@types+node@14.18.21:
     resolution:
@@ -34006,6 +34068,7 @@ packages:
         integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==,
       }
     engines: { node: '>=6' }
+    dev: true
 
   /yocto-queue/0.1.0:
     resolution:

@@ -222,6 +222,7 @@ export const TinaCMSProvider2 = ({
   return (
     <>
       <TinaCloudProvider
+        {...props}
         branch={branch}
         clientId={clientId || schema?.config?.clientId}
         tinaioConfig={props.tinaioConfig}

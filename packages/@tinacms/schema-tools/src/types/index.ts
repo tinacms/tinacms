@@ -1,5 +1,7 @@
 import type { FC } from 'react'
 import type React from 'react'
+import type { Config as TailwindConfig } from 'tailwindcss'
+import type { UserConfig } from 'vite'
 
 type Meta = {
   active?: boolean
@@ -422,7 +424,11 @@ type TokenObject = {
   access_token?: string
   refresh_token?: string
 }
-
+export interface TinaPlugin<CMSCallback = undefined> {
+  tailwind?: TailwindConfig
+  vite?: UserConfig
+  cmsCallback?: CMSCallback
+}
 export interface Config<
   CMSCallback = undefined,
   FormifyCallback = undefined,
@@ -587,6 +593,13 @@ export interface Config<
   }
   cmsCallback?: CMSCallback
   formifyCallback?: FormifyCallback
+  /**
+   * Tina Plugin array
+   */
+  plugins?: TinaPlugin<CMSCallback>[]
+  /**
+   * @deprecated This is no longer used internally
+   */
   documentCreatorCallback?: DocumentCreatorCallback
 }
 export type TinaCMSConfig<

@@ -4,6 +4,7 @@ import {
   InlineConfig,
   Plugin,
   splitVendorChunkPlugin,
+  mergeConfig,
 } from 'vite'
 import react from '@vitejs/plugin-react'
 import { Database } from '@tinacms/graphql'
@@ -128,7 +129,25 @@ export const createConfig = async ({
        */
       react(),
       splitVendorChunkPlugin(),
-      tinaTailwind(configManager.spaRootPath, configManager.tinaConfigFilePath),
+      tinaTailwind(
+        configManager.spaRootPath,
+        configManager.tinaConfigFilePath,
+        configManager
+      ),
+      // I have not fully tested this but it seems to work
+      {
+        name: 'merge-user-vite-config',
+        config: () => {
+          const userViteConfig = configManager.config?.plugins
+            .map((plugin) => plugin.vite)
+            .filter(Boolean)
+          const userConfig = userViteConfig?.reduce((acc, config) => {
+            return mergeConfig(acc, config)
+          }, {})
+          console.log('userConfig', userConfig)
+          return userConfig
+        },
+      },
       ...plugins,
     ],
   }
