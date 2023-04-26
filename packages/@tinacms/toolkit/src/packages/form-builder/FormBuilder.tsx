@@ -561,11 +561,6 @@ const getFieldGroup = ({
   if (!field) {
     return { fieldGroup: form.fields, path: prefix }
   }
-  if (field.type === 'rich-text') {
-    // handle nested forms
-    console.log('its irch-text', fieldName, field)
-    return { fieldGroup: field.templates.BlockQuote, path: [...prefix, name] }
-  }
   if (field.type === 'object') {
     if (field.templates) {
       if (field.list) {

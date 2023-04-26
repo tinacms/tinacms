@@ -1,0 +1,32 @@
+name: Update TinaCMS Dependencies
+on:
+  push:
+    branches:
+      - dependabot/npm_and_yarn/**
+
+jobs:
+  update-tinacms:
+    runs-on: ubuntu-latest
+    steps:
+      # Clone repo
+      - name: Check out repo to update
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      # Install deps, update Tina packages, update schema
+      - name: Install dependencies
+        run: yarn install
+      - name: Update Tina packages
+        run: yarn upgrade tinacms@latest @tinacms/cli@latest
+      - name: Update Schema
+        run: yarn tinacms audit
+      # Commit changes
+      - name: Commit changes back to branch
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Update TinaCMS generated files"
+          branch: ${{ github.ref }}
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
