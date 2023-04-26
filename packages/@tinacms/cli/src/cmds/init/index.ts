@@ -117,7 +117,7 @@ export async function initStaticTina({
     }
   }
 
-  // await addDependencies(packageManager)
+  await addDependencies(packageManager)
 
   if (isForestryMigration) {
     await addTemplateFile({ baseDir: '', usingTypescript, templateCode })
