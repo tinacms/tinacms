@@ -74,7 +74,6 @@ export const ImageUpload = ({
   useActiveFieldCallback(name, () => {
     if (ref.current) {
       const el = ref.current
-      console.log(el)
       el.focus()
     }
   })

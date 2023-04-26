@@ -81,8 +81,9 @@ export const FormsView = ({
    */
 
   function setSingleActiveForm() {
-    if (formPlugins.all().length === 1) {
-      setActiveFormId(formPlugins.all()[0].id)
+    const formToActivate = formPlugins.all().find((plugin) => !plugin.global)
+    if (formToActivate) {
+      setActiveFormId(formToActivate.id)
     }
   }
 

@@ -4,8 +4,10 @@ import { useRouter } from "next/router";
 import { Container } from "../util/container";
 import { useTheme } from ".";
 import { Icon } from "../util/icon";
+import { tinaField } from "tinacms/dist/react";
+import { GlobalHeader } from "../../tina/__generated__/types";
 
-export const Header = ({ data }) => {
+export const Header = ({ data }: { data: GlobalHeader }) => {
   const router = useRouter();
   const theme = useTheme();
 
@@ -71,6 +73,7 @@ export const Header = ({ data }) => {
               className="flex gap-1 items-center whitespace-nowrap tracking-[.002em]"
             >
               <Icon
+                tinaField={tinaField(data, "icon")}
                 parentColor={data.color}
                 data={{
                   name: data.icon.name,
@@ -78,7 +81,7 @@ export const Header = ({ data }) => {
                   style: data.icon.style,
                 }}
               />
-              {data.name}
+              <span data-tinafield={tinaField(data, "name")}>{data.name}</span>
             </Link>
           </h4>
           <ul className="flex gap-6 sm:gap-8 lg:gap-10 tracking-[.002em] -mx-4">
@@ -96,6 +99,7 @@ export const Header = ({ data }) => {
                     }`}
                   >
                     <Link
+                      data-tinafield={tinaField(item)}
                       href={`/${item.href}`}
                       className={`relative select-none	text-base inline-block tracking-wide transition duration-150 ease-out hover:opacity-100 py-8 px-4 ${
                         activeItem ? `` : `opacity-70`
