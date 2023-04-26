@@ -25,6 +25,9 @@ export const FormsView = ({
   children?: React.ReactChild | React.ReactChild[]
 }) => {
   const [activeFormId, setActiveFormId] = useState<string>('')
+  const [activeFieldName, setActiveFieldName] = React.useState<string | null>(
+    null
+  )
   const cms = useCMS()
   const renderNav =
     // @ts-ignore
@@ -48,6 +51,26 @@ export const FormsView = ({
       }),
     []
   )
+
+  React.useEffect(() => {
+    const handleSelection = (e) => {
+      if (e.value.includes('#')) {
+        const [formId, fieldName] = e.value.split('#')
+        // "undefined can occur when the helpers for data-tinafield are given an invalid object"
+        if (setActiveFormId && formId !== 'undefined') {
+          setActiveFormId(formId)
+        }
+        if (fieldName !== 'undefined') {
+          setActiveFieldName(fieldName)
+        }
+      }
+    }
+
+    const unsubscribe = cms.events.subscribe('field:selected', handleSelection)
+    return () => {
+      unsubscribe()
+    }
+  }, [setActiveFormId, setActiveFieldName, cms.events])
 
   /**
    * If there's only one form, make it the active form.
@@ -127,6 +150,8 @@ export const FormsView = ({
             form={activeForm as any}
             setActiveFormId={setActiveFormId}
             onPristineChange={setFormIsPristine}
+            activeFieldName={activeFieldName}
+            setActiveFieldName={setActiveFieldName}
           />
         </FormWrapper>
       )}

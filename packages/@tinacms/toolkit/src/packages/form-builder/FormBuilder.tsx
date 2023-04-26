@@ -15,7 +15,6 @@ import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
 import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
-import { useCMS } from '../react-core'
 import { ActiveFieldContextProvider } from '../fields/use-active-field'
 import { IoMdClose } from 'react-icons/io'
 
@@ -25,6 +24,8 @@ export interface FormBuilderProps {
   label?: string
   setActiveFormId?: (id: string) => void
   onPristineChange?: (_pristine: boolean) => unknown
+  setActiveFieldName?: (id: string) => void
+  activeFieldName?: string
 }
 
 interface FormKeyBindingsProps {
@@ -87,11 +88,13 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
   onPristineChange,
   setActiveFormId,
+  activeFieldName,
+  setActiveFieldName: setActiveFieldNameInner,
   ...rest
 }) => {
-  const [activeFieldName, setActiveFieldNameInner] = React.useState<
-    string | null
-  >(null)
+  // const [activeFieldName, setActiveFieldNameInner] = React.useState<
+  //   string | null
+  // >(null)
   const [animatedActiveFieldName, setAnimatedActiveFieldName] = React.useState<
     string | null
   >(null)
@@ -159,28 +162,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   React.useEffect(() => {
     setI((i) => i + 1)
   }, [tinaForm])
-
-  const cms = useCMS()
-
-  React.useEffect(() => {
-    const handleSelection = (e) => {
-      if (e.value.includes('#')) {
-        const [formId, fieldName] = e.value.split('#')
-        // "undefined can occur when the helpers for data-tinafield are given an invalid object"
-        if (setActiveFormId && formId !== 'undefined') {
-          setActiveFormId(formId)
-        }
-        if (fieldName !== 'undefined') {
-          setActiveFieldName(fieldName)
-        }
-      }
-    }
-
-    const unsubscribe = cms.events.subscribe('field:selected', handleSelection)
-    return () => {
-      unsubscribe()
-    }
-  }, [setActiveFormId, setActiveFieldName, cms.events])
 
   const finalForm = tinaForm.finalForm
 
