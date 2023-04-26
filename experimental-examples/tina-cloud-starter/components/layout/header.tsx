@@ -61,6 +61,7 @@ export const Header = ({ data }: { data: GlobalHeader }) => {
     setIsClient(true);
   }, []);
 
+  console.log(data);
   return (
     <div
       className={`relative overflow-hidden bg-gradient-to-b ${headerColorCss}`}

@@ -376,7 +376,16 @@ export const useGraphQLReducer = (
         //   }
         // }
       }
-      return listItems
+      const orderedListItems: ListItem[] = []
+      const globalItems: ListItem[] = []
+      listItems.forEach((item) => {
+        if (item.type === 'list' && item.label === 'Global') {
+          globalItems.push(item)
+        } else {
+          orderedListItems.push(item)
+        }
+      })
+      return [...orderedListItems, ...globalItems]
     },
     [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
   )
@@ -643,7 +652,7 @@ const resolveFieldValue = ({
               ...resolveFormValue({
                 fields: templateFields,
                 values: item,
-                path,
+                path: nextPath,
                 id,
               }),
             }
@@ -664,7 +673,7 @@ const resolveFieldValue = ({
           ...resolveFormValue({
             fields: templateFields,
             values: value as any,
-            path,
+            path: nextPath,
             id,
           }),
         }
@@ -927,12 +936,27 @@ const appendItemToListItems = ({
       })
     }
   } else {
-    listItems.push({
-      type: 'item',
-      path: pathArray,
-      subItems: [],
-      form: { id: form.id, label: form.label },
-    })
+    if (form.global) {
+      listItems.push({
+        type: 'list',
+        label: 'Global',
+        items: [
+          {
+            type: 'item',
+            path: pathArray,
+            form: { id: form.id, label: form.label },
+            subItems: [],
+          },
+        ],
+      })
+    } else {
+      listItems.push({
+        type: 'item',
+        path: pathArray,
+        subItems: [],
+        form: { id: form.id, label: form.label },
+      })
+    }
   }
 }
 
