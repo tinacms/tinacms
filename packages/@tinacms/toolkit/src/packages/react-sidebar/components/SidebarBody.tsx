@@ -17,6 +17,7 @@ import { BiChevronLeft } from 'react-icons/bi'
 import { useWindowWidth } from '@react-hook/window-size'
 import { EditContext } from '@tinacms/sharedctx'
 import { PendingFormsPlaceholder } from './NoFormsPlaceHolder'
+import { VisualEditingContext } from '../../form-builder/use-visual-editing'
 
 export const FormsView = ({
   children,
@@ -140,25 +141,27 @@ interface FormWrapperProps {
 
 const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
   return (
-    <div
-      className="flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white"
-      style={
-        isEditing
-          ? {
-              transform: 'none',
-              animationName: 'fly-in-left',
-              animationDuration: '150ms',
-              animationDelay: '0',
-              animationIterationCount: 1,
-              animationTimingFunction: 'ease-out',
-            }
-          : {
-              transform: 'translate3d(100%, 0, 0)',
-            }
-      }
-    >
-      {children}
-    </div>
+    <VisualEditingContext.Provider value={{ visualEditing: true }}>
+      <div
+        className="flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white"
+        style={
+          isEditing
+            ? {
+                transform: 'none',
+                animationName: 'fly-in-left',
+                animationDuration: '150ms',
+                animationDelay: '0',
+                animationIterationCount: 1,
+                animationTimingFunction: 'ease-out',
+              }
+            : {
+                transform: 'translate3d(100%, 0, 0)',
+              }
+        }
+      >
+        {children}
+      </div>
+    </VisualEditingContext.Provider>
   )
 }
 

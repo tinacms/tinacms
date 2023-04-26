@@ -7,6 +7,7 @@
 import * as React from 'react'
 import type { TinaCMS } from '../../../../tina-cms'
 import { BiEdit } from 'react-icons/bi'
+import { useVisualEditingContext } from '../../../form-builder/use-visual-editing'
 
 interface ReferenceLinkProps {
   cms: TinaCMS
@@ -18,6 +19,7 @@ type Document = {
     collection: {
       name: string
     }
+    path: string
     breadcrumbs: string[]
   }
 }
@@ -42,6 +44,7 @@ const useGetNode = (cms: TinaCMS, id: string) => {
                 collection {
                   name
                 }
+                path
                 breadcrumbs
               }
             }
@@ -73,6 +76,7 @@ const GetReference = ({ cms, id, children }) => {
 const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
   const hasTinaAdmin = cms.flags.get('tina-admin') === false ? false : true
   const tinaPreview = cms.flags.get('tina-preview') || false
+  const { visualEditing } = useVisualEditingContext()
 
   if (!hasTinaAdmin) {
     return null
@@ -80,19 +84,36 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
 
   return (
     <GetReference cms={cms} id={input.value}>
-      {(document: Document) => (
-        <a
-          href={`${
-            tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
-          }/collections/${
-            document._sys.collection.name
-          }/${document._sys.breadcrumbs.join('/')}`}
-          className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"
-        >
-          <BiEdit className="h-5 w-auto opacity-80 mr-2" />
-          Edit in CMS
-        </a>
-      )}
+      {(document: Document) =>
+        visualEditing ? (
+          <button
+            type="button"
+            // TODO: use context to determine if this is in the visual editor
+            onClick={() => {
+              cms.events.dispatch({
+                type: 'field:selected',
+                value: `${document._sys.path}#name`,
+              })
+            }}
+            className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"
+          >
+            <BiEdit className="h-5 w-auto opacity-80 mr-2" />
+            Edit
+          </button>
+        ) : (
+          <a
+            href={`${
+              tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+            }/collections/${
+              document._sys.collection.name
+            }/${document._sys.breadcrumbs.join('/')}`}
+            className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"
+          >
+            <BiEdit className="h-5 w-auto opacity-80 mr-2" />
+            Edit in CMS
+          </a>
+        )
+      }
     </GetReference>
   )
 }

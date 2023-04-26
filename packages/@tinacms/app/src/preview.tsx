@@ -2,10 +2,9 @@
 
 */
 import React from 'react'
-import { createPortal } from 'react-dom'
-import { defineConfig, useCMS } from 'tinacms'
+import { defineConfig, useCMS, useCMSEvent } from 'tinacms'
 import { useGraphQLReducer } from './lib/graphql-reducer'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 
 type Config = Parameters<typeof defineConfig>[0]
 
@@ -108,16 +107,39 @@ const FieldSelector = ({
   fieldList: Item[]
   style: React.CSSProperties
 }) => {
+  const [focusedField, setFocusedField] = React.useState<string | null>(null)
+  const [hoveredField, setHoveredField] = React.useState<string | null>(null)
+  useCMSEvent(
+    'field:focus',
+    (event) => {
+      setFocusedField(`${event.id}#${event.fieldName}`)
+    },
+    []
+  )
+  useCMSEvent(
+    'field:hover',
+    (event) => {
+      setHoveredField(`${event.id}#${event.fieldName}`)
+    },
+    []
+  )
+
   if (fieldList.length) {
     return (
       <div
         style={style}
-        className={`absolute top-0 left-0 right-0 min-h-screen pointer-events-none ${
-          hotkey ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`absolute top-0 left-0 right-0 min-h-screen pointer-events-none`}
       >
         {fieldList.map((fieldItem, i) => {
-          return <FieldListItem hotkey={hotkey} key={i} fieldItem={fieldItem} />
+          return (
+            <FieldListItem
+              focused={focusedField === fieldItem.fieldName}
+              hovered={hoveredField === fieldItem.fieldName}
+              hotkey={hotkey}
+              key={i}
+              fieldItem={fieldItem}
+            />
+          )
         })}
       </div>
     )
@@ -128,16 +150,19 @@ const FieldSelector = ({
 type Item = { fieldName: string; rect: DOMRect }
 
 const FieldListItem = ({
+  focused,
+  hovered,
   hotkey,
   fieldItem,
 }: {
+  focused: boolean
+  hovered: boolean
   hotkey: boolean
   fieldItem: Item
 }) => {
   const cms = useCMS()
   const rect = fieldItem.rect
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-    console.log(fieldItem.fieldName)
     cms.events.dispatch({
       type: 'field:selected',
       value: fieldItem.fieldName,
@@ -154,9 +179,9 @@ const FieldListItem = ({
         left: rect.left,
         height: rect.height,
       }}
-      className={`${
-        hotkey ? 'pointer-events-auto' : 'pointer-events-none'
-      } opacity-20 hover:opacity-100 absolute border-2 border-dashed border-blue-300 rounded-sm hover:border-blue-500 transition`}
+      className={`${hotkey ? 'pointer-events-auto' : 'pointer-events-none'} ${
+        focused || hovered ? 'opacity-100' : hotkey ? 'opacity-20' : 'opacity-0'
+      } hover:opacity-100 absolute border-2 border-dashed border-blue-300 rounded-sm hover:border-blue-500 transition`}
     >
       <span className="absolute inset-0 bg-blue-200 opacity-0 hover:opacity-10 transition" />
     </button>
@@ -172,7 +197,7 @@ function useKeyPress() {
 
   // If pressed key is our target key then set to true
   const downHandler = React.useCallback(
-    function downHandler({ key }) {
+    function downHandler({ key }: { key: string }) {
       if (key === targetKey) {
         setKeyPressed(true)
       }
@@ -183,7 +208,7 @@ function useKeyPress() {
     [metaPressed]
   )
   // If released key is our target key then set to false
-  const upHandler = ({ key }) => {
+  const upHandler = ({ key }: { key: string }) => {
     if (key === targetKey) {
       setKeyPressed(false)
     }

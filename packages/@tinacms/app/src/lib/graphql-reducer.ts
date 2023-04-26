@@ -824,6 +824,7 @@ const buildForm = ({
       form.subscribe(() => {}, { values: true })
       if (collection.ui?.global) {
         cms.plugins.add(new GlobalFormPlugin(form))
+        cms.forms.add(form)
       } else {
         cms.forms.add(form)
       }
@@ -848,9 +849,6 @@ const appendToListItems = ({
   path: G.ResponsePath
   form: Form
 }) => {
-  if (form.global) {
-    return
-  }
   const pathArray = G.responsePathAsArray(path)
   const listLabel =
     connectionType?.typename &&
