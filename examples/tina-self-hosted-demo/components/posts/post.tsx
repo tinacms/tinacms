@@ -95,9 +95,9 @@ const components: Components<{
     )
   },
   img: (props) => (
-    <div className="flex items-center justify-center">
+    <span className="flex items-center justify-center">
       <img src={props.url} alt={props.alt} />
-    </div>
+    </span>
   ),
 }
 
