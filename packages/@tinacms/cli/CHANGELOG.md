@@ -1,5 +1,21 @@
 # tinacms-cli
 
+## 1.5.7
+
+### Patch Changes
+
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+- 1de2c09ff: skip some checks durring build if the user is using self hosted
+- f11408108: Skip schema diff check when we have conflicting version of GraphQL
+- 0b0255a50: Increase body parser limit
+- Updated dependencies [f14f59a96]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [7d4be0e51]
+  - @tinacms/schema-tools@1.4.3
+  - @tinacms/graphql@1.4.8
+  - @tinacms/app@1.2.7
+  - @tinacms/datalayer@1.2.8
+
 ## 1.5.6
 
 ### Patch Changes

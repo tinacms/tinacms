@@ -1,5 +1,19 @@
 # e2e-next
 
+## 0.1.30
+
+### Patch Changes
+
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+- Updated dependencies [675c4cfde]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [40dd5b7ef]
+- Updated dependencies [0f90e9520]
+- Updated dependencies [d9d773a24]
+- Updated dependencies [63454fa1e]
+  - tinacms@1.5.0
+  - @tinacms/datalayer@1.2.8
+
 ## 0.1.29
 
 ### Patch Changes
