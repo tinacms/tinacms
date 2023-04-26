@@ -73,7 +73,7 @@ const UnknownRenderer = ({
   if (!showMetaFields) {
     if (
       [
-        'id',
+        // 'id',
         '_sys',
         '__typename',
         '__meta__',

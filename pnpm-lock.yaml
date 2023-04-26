@@ -328,8 +328,7 @@ importers:
       tailwindcss: ^3.2.7
       tinacms: workspace:*
       typescript: ^4.6.4
-      webfontloader: 1.6.28
-      xstate: 4.32.1
+      zod: ^3.14.3
     dependencies:
       '@graphiql/toolkit': 0.8.2_graphql@15.8.0
       '@headlessui/react': 1.6.6_sfoxds7t5ydpegc3knd667wn6m
@@ -337,7 +336,7 @@ importers:
       '@monaco-editor/react': 4.4.5_ilaxvrtg3zfidjpyrhsbytq244
       '@tinacms/mdx': link:../mdx
       '@tinacms/toolkit': link:../toolkit
-      '@xstate/react': 3.0.0_qoz6orvt26se6gmwe4ax5kvcum
+      '@xstate/react': 3.0.0_sudpmbbyhqtxq6t4xf6jlicdem
       final-form: 4.20.7
       graphiql: 2.4.0_ltqzrpympbddkywnmhjcbgtday
       graphql: 15.8.0
@@ -351,8 +350,7 @@ importers:
       tailwindcss: 3.2.7_postcss@8.4.14
       tinacms: link:../../tinacms
       typescript: 4.7.4
-      webfontloader: 1.6.28
-      xstate: 4.32.1
+      zod: 3.17.3
     devDependencies:
       '@types/react': 17.0.47
       '@types/react-dom': 17.0.2
@@ -10399,7 +10397,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': 4.0.1
       '@types/keyv': 3.1.4
-      '@types/node': 18.7.18
+      '@types/node': 18.15.5
       '@types/responselike': 1.0.0
     dev: false
 
@@ -10789,7 +10787,7 @@ packages:
         integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==,
       }
     dependencies:
-      '@types/node': 18.7.18
+      '@types/node': 18.15.5
     dev: false
 
   /@types/level-codec/9.0.1:
@@ -11017,6 +11015,12 @@ packages:
         integrity: sha512-cHlGmko4gWLVI27cGJntjs/Sj8th9aYwplmZFwmmgYQQvL5NUsgVJG7OddLvNfLqYS31KFN0s3qlaD9qCaxACA==,
       }
 
+  /@types/node/18.15.5:
+    resolution:
+      {
+        integrity: sha512-Ark2WDjjZO7GmvsyFFf81MXuGTA/d6oP38anyxWOL6EREyBKAxKoFHwBhaZxCfLRLpO8JgVXwqOwSwa7jRcjew==,
+      }
+
   /@types/node/18.7.18:
     resolution:
       {
@@ -11199,7 +11203,7 @@ packages:
         integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==,
       }
     dependencies:
-      '@types/node': 18.7.18
+      '@types/node': 18.15.5
     dev: false
 
   /@types/scheduler/0.16.2:
@@ -11391,7 +11395,7 @@ packages:
       }
     requiresBuild: true
     dependencies:
-      '@types/node': 18.7.18
+      '@types/node': 18.15.5
     optional: true
 
   /@types/yup/0.29.14:
@@ -13024,7 +13028,7 @@ packages:
       }
     dev: false
 
-  /@xstate/react/3.0.0_qoz6orvt26se6gmwe4ax5kvcum:
+  /@xstate/react/3.0.0_sudpmbbyhqtxq6t4xf6jlicdem:
     resolution:
       {
         integrity: sha512-KHSCfwtb8gZ7QH2luihvmKYI+0lcdHQOmGNRUxUEs4zVgaJCyd8csCEmwPsudpliLdUmyxX2pzUBojFkINpotw==,
@@ -13042,7 +13046,6 @@ packages:
       react: 17.0.2
       use-isomorphic-layout-effect: 1.1.2_sudpmbbyhqtxq6t4xf6jlicdem
       use-sync-external-store: 1.2.0_react@17.0.2
-      xstate: 4.32.1
     transitivePeerDependencies:
       - '@types/react'
     dev: false
@@ -33522,13 +33525,6 @@ packages:
     resolution: { integrity: sha1-UqY+VsoLhKfzpfPWGHLxJq16WUM= }
     dev: false
     optional: true
-
-  /xstate/4.32.1:
-    resolution:
-      {
-        integrity: sha512-QYUd+3GkXZ8i6qdixnOn28bL3EvA++LONYL/EMWwKlFSh/hiLndJ8YTnz77FDs+JUXcwU7NZJg7qoezoRHc4GQ==,
-      }
-    dev: false
 
   /xtend/4.0.2:
     resolution:

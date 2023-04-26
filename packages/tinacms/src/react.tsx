@@ -11,10 +11,12 @@ export function useTina<T extends object>(props: {
   query: string
   variables: object
   data: T
-}): { data: T } {
+}): { data: T; isClient: boolean } {
   const [data, setData] = React.useState(props.data)
+  const [isClient, setIsClient] = React.useState(false)
   const id = JSON.stringify({ query: props.query, variables: props.variables })
   React.useEffect(() => {
+    setIsClient(true)
     setData(props.data)
   }, [id])
   React.useEffect(() => {
@@ -25,10 +27,11 @@ export function useTina<T extends object>(props: {
       }
     })
 
-    return () =>
+    return () => {
       parent.postMessage({ type: 'close', id }, window.location.origin)
+    }
   }, [id])
-  return { data } as any
+  return { data, isClient } as any
 }
 
 export function useEditState(): { edit: boolean } {
@@ -53,18 +56,22 @@ export function useEditState(): { edit: boolean } {
  */
 export const tinaField = <
   T extends object & {
-    __meta__?: { id: string; name?: string; fields: Record<string, string> }
+    _tina_metadata?: {
+      id: string
+      name?: string
+      fields: Record<string, string>
+    }
   }
 >(
   obj: T,
   field?: keyof Omit<T, '__typename' | '_sys'>
 ) => {
   if (!field) {
-    return `${obj.__meta__?.id}#${obj.__meta__?.name}`
+    return `${obj._tina_metadata?.id}#${obj._tina_metadata?.name}`
   }
-  if (obj?.__meta__) {
+  if (obj?._tina_metadata) {
     if (typeof field === 'string') {
-      return `${obj.__meta__?.id}#${obj.__meta__.fields[field]}`
+      return `${obj._tina_metadata?.id}#${obj._tina_metadata.fields[field]}`
     }
   }
   return ''
