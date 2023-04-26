@@ -137,7 +137,7 @@ const FieldListItem = ({
   const cms = useCMS()
   const rect = fieldItem.rect
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-    // const tinafield = fieldItem.getAttribute('data-tinafield')
+    console.log(fieldItem.fieldName)
     cms.events.dispatch({
       type: 'field:selected',
       value: fieldItem.fieldName,

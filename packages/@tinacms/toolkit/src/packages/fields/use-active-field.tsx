@@ -17,7 +17,9 @@ export const useActiveFieldCallback = (name: string, callback: () => void) => {
   const context = useContext(ActiveFieldContext)
   React.useEffect(() => {
     if (context.activeFieldName === name) {
-      callback()
+      setTimeout(() => {
+        callback()
+      }, 150)
     }
   }, [context.activeFieldName, name])
 }

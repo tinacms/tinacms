@@ -100,10 +100,20 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
   const setActiveFieldName = React.useCallback(
     (name: string | null) => {
-      const nameLength = name.split('.').length
-      const activeFieldNameLength = activeFieldName
-        ? activeFieldName.split('.').length
-        : 0
+      const result1 = getFieldGroup({
+        form: tinaForm,
+        fieldName: name,
+        values: tinaForm.finalForm.getState().values,
+        prefix: [],
+      })
+      const result2 = getFieldGroup({
+        form: tinaForm,
+        fieldName: activeFieldName,
+        values: tinaForm.finalForm.getState().values,
+        prefix: [],
+      })
+      const nameLength = result1?.path?.length || 0
+      const activeFieldNameLength = result2?.path?.length || 0
       if (nameLength === activeFieldNameLength) {
         setActiveFieldNameInner(name)
         return
@@ -156,10 +166,13 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     const handleSelection = (e) => {
       if (e.value.includes('#')) {
         const [formId, fieldName] = e.value.split('#')
-        if (setActiveFormId) {
+        // "undefined can occur when the helpers for data-tinafield are given an invalid object"
+        if (setActiveFormId && formId !== 'undefined') {
           setActiveFormId(formId)
         }
-        setActiveFieldName(fieldName)
+        if (fieldName !== 'undefined') {
+          setActiveFieldName(fieldName)
+        }
       }
     }
 

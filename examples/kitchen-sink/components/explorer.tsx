@@ -1,5 +1,6 @@
 import React from 'react'
 import type { TinaMarkdownContent } from 'tinacms/dist/rich-text'
+import { tinaField } from 'tinacms/dist/react'
 
 type RenderValue = (args: {
   value: unknown
@@ -95,7 +96,7 @@ const UnknownRenderer = ({
           {!expanded && `...]`}
         </button>
         {expanded && (
-          <div className="pl-4" data-tinafield="">
+          <div className="pl-4">
             {value.map((item, index) => (
               <UnknownRenderer
                 key={String(index)}
@@ -218,7 +219,7 @@ const ObjectRenderer = ({
           )}
         </div>
         {expanded && (
-          <div className="pl-4">
+          <div className="pl-4" data-tinafield={tinaField(v)}>
             <ObjectValueRenderer
               value={v}
               parentValue={parentValue}

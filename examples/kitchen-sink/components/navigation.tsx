@@ -109,10 +109,11 @@ export default function Example(props: { items: Items }) {
                     <Disclosure.Panel className="space-y-1">
                       {item.children.map((subItem) => (
                         <Disclosure.Button key={subItem.name} as={Fragment}>
-                          <Link href={subItem.href}>
-                            <a className="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
-                              {subItem.name}
-                            </a>
+                          <Link
+                            href={subItem.href}
+                            className="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                          >
+                            {subItem.name}
                           </Link>
                         </Disclosure.Button>
                       ))}
