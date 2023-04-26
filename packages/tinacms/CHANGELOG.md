@@ -1,5 +1,26 @@
 # tinacms
 
+## 1.5.0
+
+### Minor Changes
+
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+
+### Patch Changes
+
+- 675c4cfde: Fixes [this type issue](https://github.com/tinacms/tinacms/issues/3799)
+- 40dd5b7ef: Show a simple message to editors to alert them to the fact that sorting by a non-required field can exclude some documents. The message will only appear when an editor actually runs a sort using a non-required field. The original issue issue is visible in this video: https://www.loom.com/share/244853da315e4f959ebf371d662192dd
+- 0f90e9520: Fix routing issues with the folder update.
+  - Back button goes back to the folder you were in
+  - Admin navigation works as expected
+- d9d773a24: feat: Add ability to duplicate documents
+- 63454fa1e: Fix: do not set Authorization header if token not present
+- Updated dependencies [f14f59a96]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [804639965]
+  - @tinacms/schema-tools@1.4.3
+  - @tinacms/toolkit@1.7.0
+
 ## 1.4.6
 
 ### Patch Changes

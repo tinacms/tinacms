@@ -1,5 +1,19 @@
 # @tinacms/starter-iframe
 
+## 0.1.32
+
+### Patch Changes
+
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+- Updated dependencies [675c4cfde]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [40dd5b7ef]
+- Updated dependencies [0f90e9520]
+- Updated dependencies [d9d773a24]
+- Updated dependencies [63454fa1e]
+  - tinacms@1.5.0
+  - next-tinacms-cloudinary@4.3.0
+
 ## 0.1.31
 
 ### Patch Changes

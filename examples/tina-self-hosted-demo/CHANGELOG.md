@@ -1,5 +1,19 @@
 # @tinacms/self-hosted-starter
 
+## 0.1.13
+
+### Patch Changes
+
+- 40dd5b7ef: Show a simple message to editors to alert them to the fact that sorting by a non-required field can exclude some documents. The message will only appear when an editor actually runs a sort using a non-required field. The original issue issue is visible in this video: https://www.loom.com/share/244853da315e4f959ebf371d662192dd
+- Updated dependencies [675c4cfde]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [40dd5b7ef]
+- Updated dependencies [0f90e9520]
+- Updated dependencies [d9d773a24]
+- Updated dependencies [63454fa1e]
+  - tinacms@1.5.0
+  - @tinacms/datalayer@1.2.8
+
 ## 0.1.12
 
 ### Patch Changes

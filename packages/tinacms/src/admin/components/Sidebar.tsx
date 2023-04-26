@@ -62,7 +62,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
           RenderNavCollection={({ collection }) => (
             <SidebarLink
               label={collection.label ? collection.label : collection.name}
-              to={`/collections/${collection.name}`}
+              to={`/collections/${collection.name}/~`}
               Icon={ImFilesEmpty}
             />
           )}
@@ -107,7 +107,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                     label={
                       collection.label ? collection.label : collection.name
                     }
-                    to={`/collections/${collection.name}`}
+                    to={`/collections/${collection.name}/~`}
                     Icon={ImFilesEmpty}
                     onClick={() => {
                       setMenuIsOpen(false)

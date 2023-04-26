@@ -46,7 +46,7 @@ const config = defineStaticConfig({
         format: "mdx",
         ui: {
           router: ({ document }) => {
-            return `/posts/${document._sys.filename}`;
+            return `/posts/${document._sys.breadcrumbs.join("/")}`;
           },
         },
         fields: [

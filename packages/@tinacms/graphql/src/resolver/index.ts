@@ -77,15 +77,46 @@ export class Resolver {
       ...extraFields,
     }
   }
+  public getRaw = async (fullPath: unknown) => {
+    if (typeof fullPath !== 'string') {
+      throw new Error(`fullPath must be of type string for getDocument request`)
+    }
+
+    return this.database.get<{
+      _collection: string
+      _template: string
+    }>(fullPath)
+  }
+  public getDocumentOrDirectory = async (fullPath: unknown) => {
+    if (typeof fullPath !== 'string') {
+      throw new Error(
+        `fullPath must be of type string for getDocumentOrDirectory request`
+      )
+    }
+    const rawData = await this.getRaw(fullPath)
+    if (rawData['__folderBasename']) {
+      return {
+        __typename: 'Folder',
+        name: rawData['__folderBasename'],
+        path: rawData['__folderPath'],
+      }
+    } else {
+      return this.transformDocumentIntoPayload(fullPath, rawData)
+    }
+  }
   public getDocument = async (fullPath: unknown) => {
     if (typeof fullPath !== 'string') {
       throw new Error(`fullPath must be of type string for getDocument request`)
     }
 
-    const rawData = await this.database.get<{
-      _collection: string
-      _template: string
-    }>(fullPath)
+    const rawData = await this.getRaw(fullPath)
+    return this.transformDocumentIntoPayload(fullPath, rawData)
+  }
+
+  private transformDocumentIntoPayload = async (
+    fullPath: string,
+    rawData: { _collection; _template }
+  ) => {
     const collection = this.tinaSchema.getCollection(rawData._collection)
     try {
       const template = await this.tinaSchema.getTemplateForData({
@@ -140,7 +171,7 @@ export class Resolver {
         id: fullPath,
         ...data,
         _sys: {
-          title,
+          title: title || '',
           basename,
           filename,
           extension,
@@ -646,11 +677,12 @@ export class Resolver {
       last: args.last as number,
       before: args.before as string,
       after: args.after as string,
+      folder: args.folder as string,
     }
 
     const result = await this.database.query(
       queryOptions,
-      hydrator ? hydrator : this.getDocument
+      hydrator ? hydrator : this.getDocumentOrDirectory
     )
     const edges = result.edges
     const pageInfo = result.pageInfo
