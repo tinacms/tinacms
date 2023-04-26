@@ -95,7 +95,7 @@ const UnknownRenderer = ({
           {!expanded && `...]`}
         </button>
         {expanded && (
-          <div className="pl-4">
+          <div className="pl-4" data-tinafield="">
             {value.map((item, index) => (
               <UnknownRenderer
                 key={String(index)}

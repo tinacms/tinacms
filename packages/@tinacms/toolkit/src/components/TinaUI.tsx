@@ -45,7 +45,7 @@ export const TinaUI: React.FC<TinaUIProps> = ({ children, position }) => {
               sidebar={cms.sidebar}
             />
           )}
-          <ActiveFieldIndicator />
+          {/* <ActiveFieldIndicator /> */}
         </div>
         {/* Dragging across the iframe causes mouse events to stop propagating so there's a laggy feeling without this */}
         <div className={`${resizingSidebar ? 'pointer-events-none' : ''}`}>

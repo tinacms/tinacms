@@ -99,7 +99,7 @@ const PreviewInner = ({ preview, config }) => {
     }, 100)
   }, [ref.current])
   const Preview = preview
-  return <Preview url={url} iframeRef={ref} {...config} />
+  return <Preview url={url} ref={ref} {...config} />
 }
 
 const CheckSchema = ({

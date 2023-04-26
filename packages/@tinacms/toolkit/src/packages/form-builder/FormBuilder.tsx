@@ -100,10 +100,16 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
   const setActiveFieldName = React.useCallback(
     (name: string | null) => {
-      const isForward = name
-        ? name.split('.').length >
-          (activeFieldName ? activeFieldName.split('.').length : 0)
-        : false
+      const nameLength = name.split('.').length
+      const activeFieldNameLength = activeFieldName
+        ? activeFieldName.split('.').length
+        : 0
+      if (nameLength === activeFieldNameLength) {
+        setActiveFieldNameInner(name)
+        return
+      }
+
+      const isForward = name ? nameLength > activeFieldNameLength : false
       if (isForward) {
         setIsForward(true)
         setAnimatedActiveFieldName(name)
@@ -260,7 +266,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 <FormKeyBindings onSubmit={safeHandleSubmit} />
                 <div className="relative flex flex-col h-full overflow-scroll">
                   <FormFields
-                    path={result.path}
+                    path={result?.path || []}
                     setActiveFieldName={setActiveFieldName}
                     fields={fields}
                     tinaForm={tinaForm}
@@ -268,7 +274,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                   {showAnimatedFields && isForward && (
                     <GroupPanel>
                       <FormFields
-                        path={animatedResult.path}
+                        path={animatedResult?.path || []}
                         setActiveFieldName={setActiveFieldName}
                         fields={animatedFields}
                         tinaForm={tinaForm}
@@ -278,7 +284,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                   {showAnimatedFields && !isForward && (
                     <GroupPanel2>
                       <FormFields
-                        path={animatedResult.path}
+                        path={animatedResult?.path || []}
                         setActiveFieldName={setActiveFieldName}
                         fields={animatedFields}
                         tinaForm={tinaForm}
