@@ -1,24 +1,25 @@
 {
   "header": {
-    "name": "Tina Starter",
     "icon": {
+      "name": "Tina",
       "color": "orange",
-      "style": "float",
-      "name": "Tina"
+      "style": "float"
     },
+    "name": "Tina Starter",
     "color": "default",
     "nav": [
       {
-        "href": "",
-        "label": "Home"
+        "reference": "content/pages/home.md",
+        "_template": "page"
       },
       {
-        "href": "about",
-        "label": "About"
+        "reference": "content/pages/about.md",
+        "_template": "page"
       },
       {
         "href": "posts",
-        "label": "Blog"
+        "label": "Blog",
+        "_template": "basic"
       }
     ]
   },

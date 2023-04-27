@@ -73,6 +73,10 @@ export const Preview = React.forwardRef<
       }
     }
   }
+  React.useEffect(() => {
+    // Reset
+    setIframeBodyHeight(null)
+  }, [props.url])
 
   React.useEffect(() => {
     if (iframeRef.current) {

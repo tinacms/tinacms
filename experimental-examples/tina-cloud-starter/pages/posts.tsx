@@ -4,14 +4,16 @@ import { Posts } from "../components/posts";
 import { client } from "../tina/__generated__/client";
 import { Layout } from "../components/layout";
 import { InferGetStaticPropsType } from "next";
+import { useTina } from "tinacms/dist/react";
 
 export default function HomePage(
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) {
-  const posts = props.data.postConnection.edges;
+  const { data } = useTina(props);
+  const posts = data.postConnection.edges;
 
   return (
-    <Layout>
+    <Layout rawData={data} data={data.global as any}>
       <Section className="flex-1">
         <Container size="large" width="small">
           <Posts data={posts} />

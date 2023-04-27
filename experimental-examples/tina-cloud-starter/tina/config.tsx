@@ -188,16 +188,36 @@ const config = defineConfig({
                     label: "Home",
                   },
                 },
-                fields: [
+                templates: [
                   {
-                    type: "string",
-                    label: "Link",
-                    name: "href",
+                    name: "page",
+                    label: "Page",
+                    type: "object",
+                    fields: [
+                      {
+                        type: "reference",
+                        label: "Page",
+                        name: "reference",
+                        collections: ["page"],
+                      },
+                    ],
                   },
                   {
-                    type: "string",
-                    label: "Label",
-                    name: "label",
+                    name: "basic",
+                    label: "Basic",
+                    type: "object",
+                    fields: [
+                      {
+                        type: "string",
+                        label: "Link",
+                        name: "href",
+                      },
+                      {
+                        type: "string",
+                        label: "Label",
+                        name: "label",
+                      },
+                    ],
                   },
                 ],
               },
