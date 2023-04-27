@@ -1279,8 +1279,10 @@ importers:
       '@tinacms/toolkit': workspace:*
       '@types/crypto-js': ^3.1.47
       '@types/js-cookie': ^2.2.6
+      '@types/mime-types': ^2.1.1
       '@types/node': ^13.13.1
       '@types/react': 17.0.47
+      mime-types: ^2.1.35
       multer: 1.4.5-lts.1
       next: 12.2.4
       tinacms: workspace:*
@@ -1288,12 +1290,14 @@ importers:
     dependencies:
       '@aws-sdk/client-s3': 3.150.0_ram2e4zire67hyrfjkiq4bdxbu
       '@aws-sdk/signature-v4-crt': 3.163.0
+      mime-types: 2.1.35
       multer: 1.4.5-lts.1
     devDependencies:
       '@tinacms/scripts': link:../@tinacms/scripts
       '@tinacms/toolkit': link:../@tinacms/toolkit
       '@types/crypto-js': 3.1.47
       '@types/js-cookie': 2.2.7
+      '@types/mime-types': 2.1.1
       '@types/node': 13.13.52
       '@types/react': 17.0.47
       next: 12.2.4
@@ -10922,6 +10926,13 @@ packages:
       '@types/braces': 3.0.1
     dev: true
 
+  /@types/mime-types/2.1.1:
+    resolution:
+      {
+        integrity: sha512-vXOTGVSLR2jMw440moWTC7H19iUyLtP3Z1YTj7cSsubOICinjMxFeb/V57v9QdyyPGbbWolUFSSmSiRSn94tFw==,
+      }
+    dev: true
+
   /@types/mime/1.3.2:
     resolution:
       {
@@ -15670,7 +15681,10 @@ packages:
       safe-buffer: 5.1.2
 
   /cookie-signature/1.0.6:
-    resolution: { integrity: sha1-4wOogrNCzD7oylE6eZmXNNqzriw= }
+    resolution:
+      {
+        integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==,
+      }
     dev: false
 
   /cookie/0.5.0:
@@ -19931,7 +19945,10 @@ packages:
     dev: false
 
   /fresh/0.5.2:
-    resolution: { integrity: sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac= }
+    resolution:
+      {
+        integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==,
+      }
     engines: { node: '>= 0.6' }
     dev: false
 
@@ -24922,7 +24939,10 @@ packages:
     dev: false
 
   /merge-descriptors/1.0.1:
-    resolution: { integrity: sha1-sAqqVW3YtEVoFQ7J0blT8/kMu2E= }
+    resolution:
+      {
+        integrity: sha512-cCi6g3/Zr1iqQi6ySbseM1Xvooa98N0w31jzUYrXPX2xqObmFGHJ0tQ5u74H3mVh7wLouTseZyYIq39g8cNp1w==,
+      }
     dev: false
 
   /merge-stream/2.0.0:
@@ -25617,6 +25637,7 @@ packages:
         integrity: sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==,
       }
     engines: { node: '>=4' }
+    hasBin: true
     dev: false
 
   /mimic-fn/2.1.0:
@@ -27159,7 +27180,10 @@ packages:
     dev: false
 
   /path-to-regexp/0.1.7:
-    resolution: { integrity: sha1-32BBeABfUi8V60SQ5yR6G/qmf4w= }
+    resolution:
+      {
+        integrity: sha512-5DFkuoqlv1uYQKxy8omFBeJPQcdoE07Kv2sferDCrAq1ohOU+MSDswDIbnx3YAM60qIOnYa53wBhXW0EbMonrQ==,
+      }
     dev: false
 
   /path-type/4.0.0:
@@ -27985,18 +28009,11 @@ packages:
       }
     dev: false
 
-  /psl/1.8.0:
-    resolution:
-      {
-        integrity: sha512-RIdOzyoavK+hA18OGGWDqUTsCLhtA7IcZ/6NCs4fFJaHBDab+pDDmDIByWFRQJq2Cd7r1OoQxBGKOaztq+hjIQ==,
-      }
-
   /psl/1.9.0:
     resolution:
       {
         integrity: sha512-E/ZsdU4HLs/68gYzgGTkMicWTLPdAftJLfJFlLUAAKZGkStNU72sZjT66SnMDVOfOWY/YAoiD7Jxa9iHvngcag==,
       }
-    dev: true
 
   /pstree.remy/1.1.8:
     resolution:
@@ -31480,7 +31497,7 @@ packages:
       }
     engines: { node: '>=6' }
     dependencies:
-      psl: 1.8.0
+      psl: 1.9.0
       punycode: 2.1.1
       universalify: 0.1.2
 
@@ -32720,7 +32737,10 @@ packages:
       }
 
   /utils-merge/1.0.1:
-    resolution: { integrity: sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM= }
+    resolution:
+      {
+        integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==,
+      }
     engines: { node: '>= 0.4.0' }
     dev: false
 
@@ -32843,7 +32863,10 @@ packages:
     dev: false
 
   /verror/1.10.0:
-    resolution: { integrity: sha1-OhBcoXBTr1XW4nDB+CiGguGNpAA= }
+    resolution:
+      {
+        integrity: sha512-ZZKSmDAEFOijERBLkmYfJ+vmk3w+7hOLYDNkRCuRuMJGEmqYNCNLyBBFwWKVMhfwaEF3WOd0Zlw86U/WC/+nYw==,
+      }
     engines: { '0': node >=0.6.0 }
     dependencies:
       assert-plus: 1.0.0

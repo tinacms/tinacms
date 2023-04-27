@@ -17,6 +17,7 @@ import { Media, MediaListOptions } from '@tinacms/toolkit'
 import path from 'path'
 import fs from 'fs'
 import { NextApiRequest, NextApiResponse } from 'next'
+import mimetypes from 'mime-types'
 import multer from 'multer'
 import { promisify } from 'util'
 
@@ -107,6 +108,7 @@ async function uploadMedia(
       Key: prefix + filename,
       Body: blob,
       ACL: 'public-read',
+      ContentType: mimetypes.lookup(filename) || 'application/octet-stream',
     }
     const command = new PutObjectCommand(params)
     try {
