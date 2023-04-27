@@ -3,7 +3,7 @@
 */
 
 import { Database } from '../database'
-import { astBuilder, NAMER } from '../ast-builder'
+import { astBuilder, NAMER, SysFieldDefinition } from '../ast-builder'
 import { sequential } from '../util'
 import { staticDefinitions } from './static-definitions'
 
@@ -607,6 +607,7 @@ export class Builder {
                     arguments: [],
                     directives: [],
                   },
+                  SysFieldDefinition,
                 ],
               },
             },
