@@ -94,7 +94,8 @@ export const Preview = React.forwardRef<
       <FieldSelector style={style} hotkey={isEdit} fieldList={fieldList} />
       <iframe
         ref={iframeRef}
-        style={style}
+        // style={style}
+        style={{ height: 3000 }}
         className="w-full min-h-screen block"
         src={props.url}
       />

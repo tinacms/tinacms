@@ -7,6 +7,7 @@ export function useTina<T extends object>(props: {
 }): { data: T; isClient: boolean } {
   const [data, setData] = React.useState(props.data)
   const [isClient, setIsClient] = React.useState(false)
+  const [operationIndex, setOperationIndex] = React.useState(0)
   const id = JSON.stringify({ query: props.query, variables: props.variables })
   React.useEffect(() => {
     setIsClient(true)
@@ -21,46 +22,44 @@ export function useTina<T extends object>(props: {
     )
   }, [isEdit])
 
+  const updateElementList = () => {
+    const nodeList = document.querySelectorAll('[data-tinafield]')
+    const elementList: { fieldName: string; rect: DOMRect }[] = []
+    for (const node of nodeList) {
+      elementList.push({
+        fieldName: node.getAttribute('data-tinafield'),
+        rect: node.getBoundingClientRect(),
+      })
+    }
+    parent.postMessage(
+      { type: 'tinafields', elementList },
+      window.location.origin
+    )
+  }
+
+  React.useEffect(() => {
+    updateElementList()
+  }, [operationIndex])
+
   React.useEffect(() => {
     parent.postMessage({ type: 'open', ...props, id }, window.location.origin)
     window.addEventListener('message', (event) => {
       if (event.data.id === id && event.data.type === 'updateData') {
         setData(event.data.data)
+        setOperationIndex((i) => i + 1)
       }
     })
 
-    const mutationCallback = () => {
-      const nodeList = document.querySelectorAll('[data-tinafield]')
-      const elementList: { fieldName: string; rect: DOMRect }[] = []
-      for (const node of nodeList) {
-        elementList.push({
-          fieldName: node.getAttribute('data-tinafield'),
-          rect: node.getBoundingClientRect(),
-        })
-      }
-      parent.postMessage(
-        { type: 'tinafields', elementList },
-        window.location.origin
-      )
-    }
-
-    const mutationObserver = new MutationObserver(mutationCallback)
-
     const observer = new ResizeObserver(() => {
       const htmlElement = document.querySelector('html')
+      console.log(htmlElement.scrollHeight, document.body.scrollHeight)
       parent.postMessage(
         { type: 'window-size', height: htmlElement.scrollHeight },
         window.location.origin
       )
-      mutationCallback()
+      updateElementList()
     })
     observer.observe(document.body)
-    mutationObserver.observe(document.body, {
-      attributes: true,
-      characterData: true,
-      childList: true,
-      subtree: true,
-    })
 
     return () => {
       parent.postMessage({ type: 'close', id }, window.location.origin)
