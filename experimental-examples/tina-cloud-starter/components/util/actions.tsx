@@ -7,12 +7,10 @@ import { tinaField } from "tinacms/dist/react";
 
 export const Actions = ({
   parentColor = "default",
-  parentField = "",
   className = "",
   actions,
 }: {
   parentColor: string;
-  parentField: string;
   className: string;
   actions: PageBlocksHeroActions[];
 }) => {
