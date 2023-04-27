@@ -1,5 +1,15 @@
 # @tinacms/app
 
+## 1.2.8
+
+### Patch Changes
+
+- eba7e5e5e: Simplify formify logic
+- Updated dependencies [790b1e1ae]
+- Updated dependencies [eba7e5e5e]
+  - tinacms@1.5.1
+  - @tinacms/toolkit@1.7.1
+
 ## 1.2.7
 
 ### Patch Changes
