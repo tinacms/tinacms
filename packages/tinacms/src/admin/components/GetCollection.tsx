@@ -10,6 +10,7 @@ import { FilterArgs, TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
 import type { CollectionResponse } from '../types'
 import { FullscreenError } from './FullscreenError'
+import { handleNavigate } from '../pages/CollectionListPage'
 
 export const useGetCollection = (
   cms: TinaCMS,
@@ -137,14 +138,7 @@ const GetCollection = ({
       collection.documents?.edges?.length === 1
     ) {
       const doc = collection.documents.edges[0].node
-      const pathToDoc = doc._sys.breadcrumbs
-      if (folder.fullyQualifiedName) {
-        pathToDoc.unshift('~')
-      }
-      navigate(
-        `/${['collections', 'edit', collectionName, ...pathToDoc].join('/')}`,
-        { replace: true }
-      )
+      handleNavigate(navigate, cms, collection, collectionDefinition, doc)
     }
   }, [collection?.name || '', loading])
 
