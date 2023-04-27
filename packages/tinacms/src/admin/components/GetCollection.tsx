@@ -129,15 +129,50 @@ const GetCollection = ({
     // check if the collection allows create or delete
     const allowCreate = collectionDefinition?.ui?.allowedActions?.create ?? true
     const allowDelete = collectionDefinition?.ui?.allowedActions?.delete ?? true
+    const hasRouter = collectionDefinition?.ui?.router ?? false
 
     if (
       !allowCreate &&
       !allowDelete &&
       // Check there is only one document
-      collection.documents?.edges?.length === 1
+      collection.documents?.edges?.length === 1 &&
+      // Check they do not have a router
+      !hasRouter
     ) {
       const doc = collection.documents.edges[0].node
       const pathToDoc = doc._sys.breadcrumbs
+
+      /**
+       *  I was going to add this code but I don't think we are ready for it yet
+       *  This code does the following:
+       *    - if they have a router clicking on the collection will navigate them to the route returned
+       *    - if they don't have a router clicking on the collection will navigate them to document
+       *
+       *  The reason I want to pull back on it is it emelentates the ability for the user to choose if they want to navigate contextually or click the dropdown and "Edit in admin"
+       */
+
+      // if (hasRouter) {
+      //   // if there is a router, navigate to the first document
+
+      //   const tinaPreview = cms.flags.get('tina-preview')
+      //   let routeOverride = collectionDefinition.ui?.router({
+      //     document: doc,
+      //     collection: collectionDefinition,
+      //   })
+      //   // was a route override returned?
+      //   if (routeOverride) {
+      //     // remove leading /
+      //     if (routeOverride.startsWith('/')) {
+      //       routeOverride = routeOverride.slice(1)
+      //     }
+      //     tinaPreview
+      //       ? // navigate to preview route in admin
+      //         navigate(`/~/${routeOverride}`)
+      //       : // Navigate to real page
+      //         (window.location.href = routeOverride)
+      //     return
+      //   }
+      // }
       if (folder.fullyQualifiedName) {
         pathToDoc.unshift('~')
       }
