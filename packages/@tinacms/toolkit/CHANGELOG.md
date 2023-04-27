@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.7.1
+
+### Patch Changes
+
+- eba7e5e5e: Simplify formify logic
+
 ## 1.7.0
 
 ### Minor Changes
