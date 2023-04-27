@@ -106,6 +106,7 @@ export const createConfig = async ({
       include: ['react/jsx-runtime', 'react/jsx-dev-runtime'],
     },
     server: {
+      host: configManager.config?.build?.host ?? false,
       watch: noWatch
         ? {
             ignored: ['**/*'],
