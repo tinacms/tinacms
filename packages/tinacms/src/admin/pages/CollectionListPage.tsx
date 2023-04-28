@@ -260,7 +260,7 @@ const CollectionListPage = () => {
                   // only allow sortable fields
                   ['string', 'number', 'datetime', 'boolean'].includes(x.type)
                 )
-                const sortField = fields.find(
+                const sortField = fields?.find(
                   (field) => field.name === sortName
                 )
 
