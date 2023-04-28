@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 1.4.9
+
+### Patch Changes
+
+- 89dcad9d9: Fix Database.get on folders within collections that have templates
+- a0eb72ce0: Fix issue where collection lookup fails with folder having match property
+
 ## 1.4.8
 
 ### Patch Changes
