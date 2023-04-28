@@ -206,10 +206,12 @@ export class Database {
           : undefined
       const { collection, template } = hasOwnProperty(
         contentObject,
-        '__folderBasename'
+        '__collection'
       )
         ? {
-            collection: await this.collectionForPath(filepath),
+            collection: tinaSchema.getCollection(
+              contentObject['__collection'] as string
+            ),
             template: undefined,
           } // folders have no templates
         : tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
@@ -873,6 +875,7 @@ export class Database {
             cursor: btoa(edge.cursor),
           }
         } catch (error) {
+          console.log(error)
           if (
             error instanceof Error &&
             (!edge.path.includes('.tina/__generated__/_graphql.json') ||

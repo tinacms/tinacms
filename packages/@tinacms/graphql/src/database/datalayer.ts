@@ -649,6 +649,7 @@ export const makeFolderOpsForCollection = <T extends object>(
         type: 'put',
         key: `${collection.path}/${parentFolderKey}.${collection.format}`,
         value: {
+          __collection: collection.name,
           __folderBasename: path.basename(folderName),
           __folderPath: folderName,
         },
