@@ -204,10 +204,17 @@ export class Database {
         typeof contentObject._template === 'string'
           ? contentObject._template
           : undefined
-      const { collection, template } =
-        tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
+      const { collection, template } = hasOwnProperty(
+        contentObject,
+        '__folderBasename'
+      )
+        ? {
+            collection: await this.collectionForPath(filepath),
+            template: undefined,
+          } // folders have no templates
+        : tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
 
-      const field = template.fields.find((field) => {
+      const field = template?.fields.find((field) => {
         if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
             return true
@@ -228,7 +235,9 @@ export class Database {
         ...data,
         _collection: collection.name,
         _keepTemplateKey: !!collection.templates,
-        _template: lastItem(template.namespace),
+        _template: template?.namespace
+          ? lastItem(template?.namespace)
+          : undefined,
         _relativePath: filepath
           .replace(collection.path, '')
           .replace(/^\/|\/$/g, ''),
