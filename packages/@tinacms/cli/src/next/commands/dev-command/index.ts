@@ -150,6 +150,7 @@ export class DevCommand extends Command {
         schema: await getASTSchema(database),
         configManager: configManager,
         port: Number(this.port),
+        isLocal: true,
         queryDoc,
         fragDoc,
       })

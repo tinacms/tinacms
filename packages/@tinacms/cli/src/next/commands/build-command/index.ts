@@ -2,6 +2,9 @@ import fetch, { Headers } from 'node-fetch'
 import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
+import chalk from 'chalk'
+import type { ViteDevServer } from 'vite'
+import type { ChildProcess } from 'child_process'
 import { buildSchema, getASTSchema, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
@@ -18,6 +21,9 @@ import { IndexStatusResponse, waitForDB } from './waitForDB'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { sleepAndCallFunc } from '../../../utils/sleep'
 import { dangerText, linkText, warnText } from '../../../utils/theme'
+import { createDevServer } from '../dev-command/server'
+import { startSubprocess2 } from '../../../utils/start-subprocess'
+import { spin } from '../../../utils/spinner'
 
 export class BuildCommand extends Command {
   static paths = [['build']]
@@ -40,7 +46,15 @@ export class BuildCommand extends Command {
     description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
   })
   localOption = Option.Boolean('--local', {
-    description: 'DEPRECATED: Uses the local file system graphql server',
+    description:
+      'Starts local Graphql server and builds the local client instead of production client',
+  })
+  port = Option.String('-p,--port', '4001', {
+    description:
+      'Specify a port to run the server on. This is only applicable with the --local option (default 4001)',
+  })
+  subCommand = Option.String('-c,--command', {
+    description: 'The sub-command to run',
   })
   experimentalDataLayer = Option.Boolean('--experimentalData', {
     description:
@@ -65,11 +79,6 @@ export class BuildCommand extends Command {
   }
 
   async execute(): Promise<number | void> {
-    const configManager = new ConfigManager({
-      rootPath: this.rootPath,
-      tinaGraphQLVersion: this.tinaGraphQLVersion,
-      legacyNoSDK: this.noSDK,
-    })
     logger.info('Starting Tina build')
     if (this.isomorphicGitBridge) {
       logger.warn('--isomorphicGitBridge has been deprecated')
@@ -79,14 +88,17 @@ export class BuildCommand extends Command {
         '--experimentalDataLayer has been deprecated, the data layer is now built-in automatically'
       )
     }
-    if (this.localOption) {
-      logger.warn('--local has been deprecated')
-    }
+
     if (this.noSDK) {
       logger.warn(
         '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
       )
     }
+    const configManager = new ConfigManager({
+      rootPath: this.rootPath,
+      tinaGraphQLVersion: this.tinaGraphQLVersion,
+      legacyNoSDK: this.noSDK,
+    })
 
     try {
       await configManager.processConfig()
@@ -95,14 +107,14 @@ export class BuildCommand extends Command {
       logger.error('Unable to build, please fix your Tina config and try again')
       process.exit(1)
     }
-
+    let server: ViteDevServer | undefined
     // Initialize the host TCP server
     createDBServer(Number(this.datalayerPort))
     const database = await createAndInitializeDatabase(
       configManager,
       Number(this.datalayerPort)
     )
-    const { queryDoc, fragDoc } = await buildSchema(
+    const { tinaSchema, graphQLSchema, queryDoc, fragDoc } = await buildSchema(
       database,
       configManager.config
     )
@@ -110,18 +122,47 @@ export class BuildCommand extends Command {
     const codegen = new Codegen({
       schema: await getASTSchema(database),
       configManager: configManager,
+      port: this.localOption ? Number(this.port) : undefined,
+      isLocal: this.localOption,
       queryDoc,
       fragDoc,
     })
     const apiURL = await codegen.execute()
 
-    if (!configManager.hasSelfHostedConfig()) {
-      await this.checkClientInfo(configManager, apiURL)
-      await waitForDB(configManager.config, apiURL, false)
-      await this.checkGraphqlSchema(configManager, database, apiURL)
+    if (this.localOption) {
+      const warnings: string[] = []
+      await spin({
+        waitFor: async () => {
+          const res = await database.indexContent({
+            graphQLSchema,
+            tinaSchema,
+          })
+          warnings.push(...res.warnings)
+        },
+        text: 'Indexing local files',
+      })
+      if (warnings.length > 0) {
+        logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
+        warnings.forEach((warning) => {
+          logger.warn(warnText(`${warning}`))
+        })
+      }
+      server = await createDevServer(configManager, database, apiURL, true)
+      await server.listen(Number(this.port))
+      console.log('server listening on port', this.port)
     }
 
-    await buildProductionSpa(configManager, database, apiURL)
+    if (!configManager.hasSelfHostedConfig()) {
+      await this.checkClientInfo(configManager, codegen.productionUrl)
+      await waitForDB(configManager.config, codegen.productionUrl, false)
+      await this.checkGraphqlSchema(
+        configManager,
+        database,
+        codegen.productionUrl
+      )
+    }
+
+    await buildProductionSpa(configManager, database, codegen.productionUrl)
 
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
@@ -177,13 +218,36 @@ export class BuildCommand extends Command {
         // },
       ],
     })
-    process.exit()
+    if (this.subCommand) {
+      let subProc: ChildProcess | undefined
+      if (this.subCommand) {
+        subProc = await startSubprocess2({ command: this.subCommand })
+        logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
+      }
+      function exitHandler(options, exitCode) {
+        if (subProc) {
+          subProc.kill()
+        }
+        process.exit()
+      }
+      //do something when app is closing
+      process.on('exit', exitHandler)
+      //catches ctrl+c event
+      process.on('SIGINT', exitHandler)
+      // catches "kill pid" (for example: nodemon restart)
+      process.on('SIGUSR1', exitHandler)
+      process.on('SIGUSR2', exitHandler)
+      //catches uncaught exceptions
+      process.on('uncaughtException', exitHandler)
+    }
+    // process.exit()
   }
 
   async checkClientInfo(configManager: ConfigManager, apiURL: string) {
     const { config } = configManager
     const token = config.token
     const { clientId, branch, host } = parseURL(apiURL)
+
     const url = `https://${host}/db/${clientId}/status/${branch}`
     const bar = new Progress('Checking clientId and token. :prog', 1)
 
