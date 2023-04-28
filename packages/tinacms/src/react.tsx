@@ -77,10 +77,13 @@ export function useTina<T extends object>(props: {
       })
       const button = document.createElement('button')
       button.addEventListener('mousedown', () => {
-        parent.postMessage({
-          type: 'field:selected',
-          fieldName: node.getAttribute('data-tinafield'),
-        })
+        parent.postMessage(
+          {
+            type: 'field:selected',
+            fieldName: node.getAttribute('data-tinafield'),
+          },
+          window.location.origin
+        )
       })
       button.style.position = 'absolute'
       button.style.top = `${rect.top + window.scrollY}px`
