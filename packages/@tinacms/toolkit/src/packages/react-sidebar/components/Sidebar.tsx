@@ -6,7 +6,7 @@
 
 import * as React from 'react'
 
-import { BiMenu, BiPencil } from 'react-icons/bi'
+import { BiMenu, BiPencil, BiTargetLock } from 'react-icons/bi'
 import { BsArrowsAngleContract, BsArrowsAngleExpand } from 'react-icons/bs'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
@@ -261,6 +261,7 @@ const Sidebar = ({
       <>
         <SidebarWrapper>
           <EditButton />
+          <ClickEditButton />
           {displayNav && (
             <Nav
               isLocalMode={cms.api?.tina?.isLocalMode}
@@ -551,6 +552,39 @@ const SidebarCollectionLink = ({
       <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
       {collection.label ? collection.label : collection.name}
     </a>
+  )
+}
+
+const ClickEditButton = ({}) => {
+  const { setDisplayState } = React.useContext(SidebarContext)
+  const [clickEditingEnabled, setClickEditingEnabled] = React.useState(false)
+
+  React.useEffect(() => {
+    const iframe = document.querySelector('#tina-iframe')
+    if (iframe) {
+      // @ts-ignore
+      iframe.contentWindow?.postMessage({
+        type: 'isEdit',
+        value: clickEditingEnabled,
+      })
+    }
+  }, [clickEditingEnabled])
+
+  return (
+    <Button
+      rounded="right"
+      variant={clickEditingEnabled ? 'primary' : 'secondary'}
+      onClick={() => {
+        setDisplayState('open')
+        setClickEditingEnabled((enabled) => !enabled)
+      }}
+      className={` absolute top-24 right-0 transition-all duration-150 ease-out ${
+        false ? 'opacity-0' : 'translate-x-full pointer-events-auto'
+      }`}
+      aria-label="toggle click editing"
+    >
+      <BiTargetLock className="h-6 w-auto" />
+    </Button>
   )
 }
 

@@ -13,23 +13,82 @@ export function useTina<T extends object>(props: {
     setIsClient(true)
     setData(props.data)
   }, [id])
-  const isEdit = useKeyPress()
+  const [isEdit, setIsEdit] = React.useState(false)
+  const [isEditable, setIsEditable] = React.useState(false)
 
   React.useEffect(() => {
-    parent.postMessage(
-      { type: 'hotkey', value: isEdit },
-      window.location.origin
-    )
-  }, [isEdit])
+    if (!isEditable) {
+      clearElementContainer()
+      return
+    }
+    if (isEdit) {
+      addElementContainer()
+      updateElementList()
+    } else {
+      clearElementContainer()
+    }
+  }, [isEdit, isEditable])
+
+  React.useEffect(() => {
+    const style = document.createElement('style')
+    style.type = 'text/css'
+    style.textContent = `
+.tina-click-edit-button {
+  background-color: rgb(169 212 251);
+  opacity: 0.2;
+  border: 2px dashed rgb(117 142 164);
+}
+.tina-click-edit-button:hover { opacity: 0.4;}
+    `
+    document.head.appendChild(style)
+  }, [])
+
+  const clearElementContainer = () => {
+    const prevContainer = document.querySelector('#tina-click-edit-container')
+    prevContainer?.remove()
+  }
+  const addElementContainer = () => {
+    const prevContainer = document.querySelector('#tina-click-edit-container')
+    prevContainer?.remove()
+    const container = document.createElement('div')
+    container.id = 'tina-click-edit-container'
+    container.style['z-index'] = `20000`
+    container.style.position = `absolute`
+    container.style.top = `0`
+    container.style.left = `0`
+    container.style.right = `0`
+    container.style.bottom = `0`
+    document.body.append(container)
+  }
 
   const updateElementList = () => {
+    const container = document.querySelector('#tina-click-edit-container')
+    if (!container) {
+      return
+    }
+    container.innerHTML = ''
     const nodeList = document.querySelectorAll('[data-tinafield]')
     const elementList: { fieldName: string; rect: DOMRect }[] = []
     for (const node of nodeList) {
+      const rect = node.getBoundingClientRect()
       elementList.push({
         fieldName: node.getAttribute('data-tinafield'),
-        rect: node.getBoundingClientRect(),
+        rect,
       })
+      const button = document.createElement('button')
+      button.addEventListener('mousedown', () => {
+        parent.postMessage({
+          type: 'field:selected',
+          fieldName: node.getAttribute('data-tinafield'),
+        })
+      })
+      button.style.position = 'absolute'
+      button.style.top = `${rect.top + window.scrollY}px`
+      button.style.left = `${rect.left + window.scrollX}px`
+      button.style.width = `${rect.width}px`
+      button.style.height = `${rect.height}px`
+      button.className = 'tina-click-edit-button'
+      container.append(button)
     }
     parent.postMessage(
       { type: 'tinafields', elementList },
@@ -44,18 +103,17 @@ export function useTina<T extends object>(props: {
   React.useEffect(() => {
     parent.postMessage({ type: 'open', ...props, id }, window.location.origin)
     window.addEventListener('message', (event) => {
+      if (event.data.type === 'isEdit') {
+        setIsEdit(event.data.value)
+      }
       if (event.data.id === id && event.data.type === 'updateData') {
         setData(event.data.data)
         setOperationIndex((i) => i + 1)
+        setIsEditable(true)
       }
     })
 
     const observer = new ResizeObserver(() => {
-      const htmlElement = document.querySelector('html')
-      parent.postMessage(
-        { type: 'window-size', height: htmlElement.scrollHeight },
-        window.location.origin
-      )
       updateElementList()
     })
     observer.observe(document.body)
@@ -63,7 +121,7 @@ export function useTina<T extends object>(props: {
     return () => {
       parent.postMessage({ type: 'close', id }, window.location.origin)
     }
-  }, [id])
+  }, [id, setIsEdit])
 
   return { data, isClient } as any
 }
@@ -115,52 +173,4 @@ export const tinaField = <
     }
   }
   return ''
-}
-
-function useKeyPress() {
-  const targetKey = 'e'
-  const metaKey = 'Meta'
-  // State for keeping track of whether key is pressed
-  const [keyPressed, setKeyPressed] = React.useState<boolean>(false)
-  const [metaPressed, setMetaPressed] = React.useState<boolean>(false)
-  const [isEdit, setIsEdit] = React.useState(false)
-
-  const hotkey = keyPressed && metaPressed
-  // React.useEffect(() => {
-  //   if (hotkey) {
-  //     setIsEdit((edit) => !edit)
-  //   }
-  // }, [hotkey])
-  // If pressed key is our target key then set to true
-  const downHandler = React.useCallback(
-    function downHandler({ key }) {
-      if (key === targetKey) {
-        setKeyPressed(true)
-      }
-      if (key === metaKey) {
-        setMetaPressed(true)
-      }
-    },
-    [metaPressed]
-  )
-  // If released key is our target key then set to false
-  const upHandler = ({ key }) => {
-    if (key === targetKey) {
-      setKeyPressed(false)
-    }
-    if (key === metaKey) {
-      setMetaPressed(false)
-    }
-  }
-  // Add event listeners
-  React.useEffect(() => {
-    window.addEventListener('keydown', downHandler)
-    window.addEventListener('keyup', upHandler)
-    // Remove event listeners on cleanup
-    return () => {
-      window.removeEventListener('keydown', downHandler)
-      window.removeEventListener('keyup', upHandler)
-    }
-  }, []) // Empty array ensures that effect is only run on mount and unmount
-  return hotkey
 }

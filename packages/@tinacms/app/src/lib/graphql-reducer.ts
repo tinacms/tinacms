@@ -1069,7 +1069,6 @@ const appendItemToListItems = ({
             }
           }
         })
-      console.log('ohno', form, parent)
     }
   } else {
     if (form.global) {
