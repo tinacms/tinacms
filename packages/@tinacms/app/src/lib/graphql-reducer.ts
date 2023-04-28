@@ -5,7 +5,7 @@ import { z } from 'zod'
 // @ts-expect-error
 import schemaJson from 'SCHEMA_IMPORT'
 import { tinaField } from 'tinacms/dist/react'
-import { expandQuery, isNodeType } from './expand-query'
+import { expandQuery, isConnectionType, isNodeType } from './expand-query'
 import {
   Form,
   TinaCMS,
@@ -27,6 +27,8 @@ import type {
   SystemInfo,
   ResolvedDocument,
 } from './types'
+import { useFormList } from 'tinacms'
+import type { FormListItem } from 'tinacms'
 
 const sysSchema = z.object({
   breadcrumbs: z.array(z.string()),
@@ -56,6 +58,32 @@ const astNode = schemaJson as G.DocumentNode
 const astNodeWithMeta: G.DocumentNode = {
   ...astNode,
   definitions: astNode.definitions.map((def) => {
+    if (def.kind === 'InterfaceTypeDefinition') {
+      return {
+        ...def,
+        fields: [
+          ...(def.fields || []),
+          {
+            kind: 'FieldDefinition',
+            name: {
+              kind: 'Name',
+              value: '_tina_metadata',
+            },
+            arguments: [],
+            type: {
+              kind: 'NonNullType',
+              type: {
+                kind: 'NamedType',
+                name: {
+                  kind: 'Name',
+                  value: 'JSON',
+                },
+              },
+            },
+          },
+        ],
+      }
+    }
     if (def.kind === 'ObjectTypeDefinition') {
       return {
         ...def,
@@ -112,6 +140,7 @@ export const useGraphQLReducer = (
   const [documentsToResolve, setDocumentsToResolve] = React.useState<string[]>(
     []
   )
+  const { setFormList } = useFormList()
   const [resolvedDocuments, setResolvedDocuments] = React.useState<
     ResolvedDocument[]
   >([])
@@ -167,19 +196,26 @@ export const useGraphQLReducer = (
   }, [payloads.map(({ id }) => id).join('.'), cms])
 
   const processPayload = React.useCallback(
-    (payload: Payload): ListItem[] => {
+    (payload: Payload) => {
       const { expandedQueryForResolver, variables, expandedData } = payload
       if (!expandedQueryForResolver || !expandedData) {
         throw new Error(`Unable to process payload which has not been expanded`)
       }
       const listItems: ListItem[] = []
+      const formList2: FormListItem[] = []
+
+      let queryName = ''
 
       const result = G.graphqlSync({
         schema: schemaForResolver,
         source: expandedQueryForResolver,
         variableValues: variables,
         rootValue: expandedData,
+        contextValue: {},
         fieldResolver: (source, args, context, info) => {
+          if (!queryName) {
+            queryName = info.operation.name?.value || 'Unknown Query'
+          }
           const fieldName = info.fieldName
           /**
            * Since the `source` for this resolver is the query that
@@ -219,6 +255,25 @@ export const useGraphQLReducer = (
             return {
               id: null,
               fields: [],
+            }
+          }
+          if (isConnectionType(info.returnType)) {
+            // const collection = tinaSchema.getCollection()
+            const name = G.getNamedType(info.returnType).name
+            let connectionCollection: Collection
+            tinaSchema.getCollections().forEach((collection) => {
+              const collectionName = NAMER.referenceConnectionType(
+                collection.namespace
+              )
+              if (collectionName === name) {
+                connectionCollection = collection
+              }
+            })
+            if (connectionCollection) {
+              formList2.push({
+                type: 'list',
+                label: connectionCollection.label,
+              })
             }
           }
           if (isNodeType(info.returnType)) {
@@ -298,6 +353,31 @@ export const useGraphQLReducer = (
                 isFromReference,
               })
               form.addQuery(payload.id)
+              const pathArray = G.responsePathAsArray(info.path)
+              const pathString = pathArray.join('.')
+              const ancestors = formList2.filter((item) => {
+                if (item.type === 'document') {
+                  return pathString.startsWith(item.path)
+                }
+              })
+              let parent = ancestors[ancestors.length - 1]
+              if (parent) {
+                if (parent.type === 'document') {
+                  parent.subItems.push({
+                    type: 'document',
+                    path: pathString,
+                    form,
+                    subItems: [],
+                  })
+                }
+              } else {
+                formList2.push({
+                  type: 'document',
+                  path: pathString,
+                  form,
+                  subItems: [],
+                })
+              }
               return resolveDocument(resolvedDocument, template, form)
             } else {
               const { template } = getTemplateForDocument(
@@ -311,6 +391,31 @@ export const useGraphQLReducer = (
                 form: existingForm,
                 isFromReference,
               })
+              const pathArray = G.responsePathAsArray(info.path)
+              const pathString = pathArray.join('.')
+              const ancestors = formList2.filter((item) => {
+                if (item.type === 'document') {
+                  return pathString.startsWith(item.path)
+                }
+              })
+              let parent = ancestors[ancestors.length - 1]
+              if (parent) {
+                if (parent.type === 'document') {
+                  parent.subItems.push({
+                    type: 'document',
+                    path: pathString,
+                    form: existingForm,
+                    subItems: [],
+                  })
+                }
+              } else {
+                formList2.push({
+                  type: 'document',
+                  path: pathString,
+                  form: existingForm,
+                  subItems: [],
+                })
+              }
               return resolveDocument(resolvedDocument, template, existingForm)
             }
           }
@@ -376,16 +481,26 @@ export const useGraphQLReducer = (
         //   }
         // }
       }
-      const orderedListItems: ListItem[] = []
-      const globalItems: ListItem[] = []
-      listItems.forEach((item) => {
-        if (item.type === 'list' && item.label === 'Global') {
+      const orderedListItems: FormListItem[] = []
+      const globalItems: FormListItem[] = []
+      // Always put global forms at the end
+      formList2.forEach((item) => {
+        if (item.type === 'document' && item.form.global) {
           globalItems.push(item)
         } else {
           orderedListItems.push(item)
         }
       })
-      return [...orderedListItems, ...globalItems]
+      const topItems: FormListItem[] = []
+      if (orderedListItems[0]?.type === 'document') {
+        topItems.push({ type: 'list', label: 'Documents' })
+      }
+      setFormList([
+        ...topItems,
+        ...orderedListItems,
+        { type: 'list', label: 'Global Documents' },
+        ...globalItems,
+      ])
     },
     [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
   )
@@ -735,6 +850,7 @@ const expandPayload = async (payload: Payload, cms: TinaCMS) => {
   const expandedDocumentNodeForResolver = expandQuery({
     schema: schemaForResolver,
     documentNode,
+    includeTinaMetadataField: true,
   })
   const expandedQueryForResolver = G.print(expandedDocumentNodeForResolver)
   return { ...payload, expandQuery, expandedData, expandedQueryForResolver }
@@ -934,6 +1050,26 @@ const appendItemToListItems = ({
         subItems: [],
         form: { id: form.id, label: form.label },
       })
+    } else {
+      let parent!: ListItemItem
+      let longestParentPath = 0
+      listItems
+        .filter(
+          (item) =>
+            item.type === 'item' &&
+            G.responsePathAsArray(path)
+              .join('.')
+              .startsWith(item.path.join('.'))
+        )
+        .forEach((item) => {
+          if (item.type === 'item') {
+            if (item.path.length > longestParentPath) {
+              parent = item
+              longestParentPath = item.path.length
+            }
+          }
+        })
+      console.log('ohno', form, parent)
     }
   } else {
     if (form.global) {

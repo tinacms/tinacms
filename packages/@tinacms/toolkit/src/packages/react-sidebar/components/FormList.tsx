@@ -3,14 +3,14 @@ import { Form } from '../../forms'
 import { BiChevronRight } from 'react-icons/bi'
 import { Transition } from '@headlessui/react'
 import { useCMS } from '../../../react-tinacms'
-import type { ListItemItem } from '../sidebar'
+import { FormListItem, useFormList } from '../../../components/FormListProvider'
 
 const Item = ({
   item,
   depth,
   setActiveFormId,
 }: {
-  item: ListItemItem
+  item: Extract<FormListItem, { type: 'document' }>
   depth: number
   setActiveFormId: (id: string) => void
 }) => {
@@ -37,7 +37,7 @@ const Item = ({
   )
 }
 export interface FormsListProps {
-  forms: Form[]
+  formList: FormListItem[]
   setActiveFormId(id: string): void
   isEditing: Boolean
   hidden?: boolean
@@ -48,7 +48,7 @@ const FormListItem = ({
   depth,
   setActiveFormId,
 }: {
-  item: ListItemItem
+  item: Extract<FormListItem, { type: 'document' }>
   depth: number
   setActiveFormId: (id: string) => void
 }) => {
@@ -58,15 +58,17 @@ const FormListItem = ({
       {item.subItems && (
         <ul className="divide-y divide-gray-200">
           {item.subItems?.map((subItem) => {
-            return (
-              <li key={subItem.form.id}>
-                <Item
-                  setActiveFormId={setActiveFormId}
-                  depth={depth + 1}
-                  item={subItem}
-                />
-              </li>
-            )
+            if (subItem.type === 'document') {
+              return (
+                <li key={subItem.form.id}>
+                  <Item
+                    setActiveFormId={setActiveFormId}
+                    depth={depth + 1}
+                    item={subItem}
+                  />
+                </li>
+              )
+            }
           })}
         </ul>
       )}
@@ -76,10 +78,9 @@ const FormListItem = ({
 
 export const FormList = ({
   hidden = false,
-  forms,
+  formList,
   setActiveFormId,
 }: FormsListProps) => {
-  const cms = useCMS()
   return (
     <Transition
       appear={true}
@@ -92,11 +93,12 @@ export const FormList = ({
       leaveTo="opacity-0 -translate-x-1/2"
     >
       <ul className="pt-16">
-        {cms.sidebar.listItems.map((item, index) => {
-          if (item.type === 'list') {
-            return (
-              <li key={item.label} className={`divide-y divide-gray-200`}>
+        <li className={`divide-y divide-gray-200`}>
+          {formList.map((item, index) => {
+            if (item.type === 'list') {
+              return (
                 <div
+                  key={item.label}
                   className={`relative group text-left w-full bg-white py-2 border-t shadow-sm
    border-gray-100 px-6 -mt-px`}
                 >
@@ -108,26 +110,18 @@ export const FormList = ({
                     {item.label}
                   </span>
                 </div>
-                {item.items.map((item) => (
-                  <FormListItem
-                    setActiveFormId={setActiveFormId}
-                    key={item.form.id}
-                    item={item}
-                    depth={0}
-                  />
-                ))}
-              </li>
+              )
+            }
+            return (
+              <FormListItem
+                setActiveFormId={setActiveFormId}
+                key={item.form.id}
+                item={item}
+                depth={0}
+              />
             )
-          }
-          return (
-            <FormListItem
-              setActiveFormId={setActiveFormId}
-              key={item.form.id}
-              item={item}
-              depth={0}
-            />
-          )
-        })}
+          })}
+        </li>
       </ul>
     </Transition>
   )

@@ -3,12 +3,18 @@ import * as G from 'graphql'
 export const expandQuery = ({
   schema,
   documentNode,
+  includeTinaMetadataField,
 }: {
   schema: G.GraphQLSchema
   documentNode: G.DocumentNode
+  includeTinaMetadataField?: boolean
 }): G.DocumentNode => {
   const documentNodeWithTypenames = addTypenameToDocument(documentNode)
-  return addMetaFieldsToQuery(documentNodeWithTypenames, new G.TypeInfo(schema))
+  return addMetaFieldsToQuery(
+    documentNodeWithTypenames,
+    new G.TypeInfo(schema),
+    includeTinaMetadataField
+  )
 }
 
 const addTypenameToDocument = (doc: G.DocumentNode) => {
@@ -101,11 +107,16 @@ const addMetadataField = (
 
 const addMetaFieldsToQuery = (
   documentNode: G.DocumentNode,
-  typeInfo: G.TypeInfo
+  typeInfo: G.TypeInfo,
+  includeTinaMetadataField?: boolean
 ) => {
   const addMetaFields: G.VisitFn<G.ASTNode, G.FieldNode> = (
     node: G.FieldNode
   ): G.ASTNode => {
+    let extra: G.SelectionNode[] = []
+    if (includeTinaMetadataField) {
+      extra = tinaMetadaFields
+    }
     return {
       ...node,
       selectionSet: {
@@ -114,7 +125,8 @@ const addMetaFieldsToQuery = (
           selections: [],
         }),
         selections:
-          [...(node.selectionSet?.selections || []), ...metaFields] || [],
+          [...(node.selectionSet?.selections || []), ...metaFields, ...extra] ||
+          [],
       },
     }
   }
@@ -155,10 +167,10 @@ const addMetaFieldsToQuery = (
         typeInfo.enter(node)
         const type = typeInfo.getType()
         if (type) {
+          const namedType = G.getNamedType(type)
           if (isNodeType(type)) {
             return addMetaFields(node, key, parent, path, ancestors)
           }
-          const namedType = G.getNamedType(type)
           if (G.isObjectType(namedType)) {
             if (namedType.getFields()['_tina_metadata']) {
               return addMetadataField(node)
@@ -172,6 +184,16 @@ const addMetaFieldsToQuery = (
   }
   return G.visit(documentNode, G.visitWithTypeInfo(typeInfo, formifyVisitor))
 }
+const dummy = G.parse(`
+ query Sample {
+  ...on Document {
+    _tina_metadata
+  }
+ }`)
+const tinaMetadaFields: G.SelectionNode[] =
+  // @ts-ignore
+  dummy.definitions[0].selectionSet.selections
+
 /**
  * This is a dummy query which we pull apart and spread
  * back into the the selectionSet for all "Node" fields
@@ -225,6 +247,32 @@ export const isNodeType = (type: G.GraphQLOutputType) => {
   }
   if (G.isObjectType(namedType)) {
     if (namedType.getInterfaces().some((intfc) => intfc.name === 'Node')) {
+      return true
+    }
+  }
+}
+
+export const isConnectionType = (type: G.GraphQLOutputType) => {
+  const namedType = G.getNamedType(type)
+  if (G.isInterfaceType(namedType)) {
+    if (namedType.name === 'Connection') {
+      return true
+    }
+  }
+  if (G.isUnionType(namedType)) {
+    const types = namedType.getTypes()
+    if (
+      types.every((type) => {
+        return type.getInterfaces().some((intfc) => intfc.name === 'Connection')
+      })
+    ) {
+      return true
+    }
+  }
+  if (G.isObjectType(namedType)) {
+    if (
+      namedType.getInterfaces().some((intfc) => intfc.name === 'Connection')
+    ) {
       return true
     }
   }

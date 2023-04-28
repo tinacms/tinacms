@@ -52,7 +52,6 @@ export function useTina<T extends object>(props: {
 
     const observer = new ResizeObserver(() => {
       const htmlElement = document.querySelector('html')
-      console.log(htmlElement.scrollHeight, document.body.scrollHeight)
       parent.postMessage(
         { type: 'window-size', height: htmlElement.scrollHeight },
         window.location.origin

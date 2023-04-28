@@ -7,6 +7,7 @@
 import * as React from 'react'
 import { TinaCMSProvider, TinaCMSProviderProps } from './TinaCMSProvider'
 import { TinaUI, TinaUIProps } from './TinaUI'
+import { FormListProvider } from './FormListProvider'
 
 export interface TinaProviderProps extends TinaCMSProviderProps, TinaUIProps {}
 
@@ -18,9 +19,11 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
 }) => {
   return (
     <TinaCMSProvider cms={cms}>
-      <TinaUI position={position} styled={styled}>
-        {children}
-      </TinaUI>
+      <FormListProvider>
+        <TinaUI position={position} styled={styled}>
+          {children}
+        </TinaUI>
+      </FormListProvider>
     </TinaCMSProvider>
   )
 }

@@ -55,6 +55,8 @@ export {
   // Deprecated aliases to the previous exports
   Tina,
 } from './components/TinaProvider'
+export { FormListProvider, useFormList } from './components/FormListProvider'
+export type { FormListItem } from './components/FormListProvider'
 export type { TinaProviderProps, TinaProps } from './components/TinaProvider'
 export { TinaCMSProvider } from './components/TinaCMSProvider'
 export type { TinaCMSProviderProps } from './components/TinaCMSProvider'

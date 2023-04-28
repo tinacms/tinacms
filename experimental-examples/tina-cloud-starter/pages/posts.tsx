@@ -11,6 +11,7 @@ export default function HomePage(
 ) {
   const { data } = useTina(props);
   const posts = data.postConnection.edges;
+  console.log(posts);
 
   return (
     <Layout rawData={data} data={data.global as any}>

@@ -9,7 +9,8 @@ import * as React from 'react'
 import { Form } from '../../forms'
 import { useState } from 'react'
 import { FormList } from './FormList'
-import { useCMS, useSubscribable } from '../../react-core'
+import { useSubscribable } from '../../react-core'
+import { useCMS } from '../../../react-tinacms'
 import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
@@ -18,6 +19,7 @@ import { useWindowWidth } from '@react-hook/window-size'
 import { EditContext } from '@tinacms/sharedctx'
 import { PendingFormsPlaceholder } from './NoFormsPlaceHolder'
 import { VisualEditingContext } from '../../form-builder/use-visual-editing'
+import { FormListItem, useFormList } from '../../../components/FormListProvider'
 
 export const FormsView = ({
   children,
@@ -36,6 +38,7 @@ export const FormsView = ({
         cms.sidebar.renderNav
       : true
   const formPlugins = cms.plugins.getType<Form>('form')
+  const { formList } = useFormList()
   const { setFormIsPristine } = React.useContext(SidebarContext)
   const { formsRegistering, setFormsRegistering } =
     React.useContext(EditContext)
@@ -79,9 +82,15 @@ export const FormsView = ({
    * by one, so the 'active form' always gets set as if there
    * were only one form, even when there are multiple
    */
+  // console.log(formList)
 
   function setSingleActiveForm() {
     const formToActivate = formPlugins.all().find((plugin) => !plugin.global)
+    // let foundItem
+    // cms.sidebar.listItems.forEach(item => {
+    //   if(item.type === 'item') {
+    //   }
+    // })
     if (formToActivate) {
       setActiveFormId(formToActivate.id)
     }
@@ -91,16 +100,30 @@ export const FormsView = ({
    ** Subscribes the forms to the CMS,
    ** passing a callback to set active form
    */
-  useSubscribable(formPlugins, () => {
-    setSingleActiveForm()
-  })
+  // useSubscribable(formPlugins, () => {
+  //   setSingleActiveForm()
+  // })
 
   /*
    ** Sets single active form on componentDidMount
    */
   React.useEffect(() => {
-    setSingleActiveForm()
-  }, [])
+    if (activeFormId) {
+      return
+    }
+    let itemFound = false
+    // Global items are at the end of the list, so just activate
+    // the first item we find
+    formList.forEach((item) => {
+      if (itemFound) {
+        return
+      }
+      if (item.type === 'document') {
+        setActiveFormId(item.form.id)
+        itemFound = true
+      }
+    })
+  }, [formList])
 
   const forms = formPlugins.all()
   const isMultiform = forms.length > 1
@@ -119,7 +142,7 @@ export const FormsView = ({
     return (
       <FormList
         isEditing={isEditing}
-        forms={forms}
+        formList={formList}
         setActiveFormId={setActiveFormId}
       />
     )
