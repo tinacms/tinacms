@@ -3,11 +3,13 @@ import chalk from 'chalk'
 
 import type { ChildProcess } from 'child_process'
 import type { DocumentNode } from 'graphql'
+
+import type { Database } from '@tinacms/graphql'
+import type { TinaSchema } from '@tinacms/schema-tools'
+
 import { startSubprocess2 } from '../../utils/start-subprocess'
 import { logger } from '../../logger'
 import { spin } from '../../utils/spinner'
-import { Database } from '../../../../graphql/src'
-import { TinaSchema } from '../../../../schema-tools/src'
 import { warnText } from '../../utils/theme'
 
 /**
