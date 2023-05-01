@@ -202,20 +202,6 @@ export class BuildCommand extends Command {
           ],
         },
         ...summaryItems,
-        // {
-        //   emoji: '📚',
-        //   heading: 'Useful links',
-        //   subItems: [
-        //     {
-        //       key: 'Custom queries',
-        //       value: 'https://tina.io/querying',
-        //     },
-        //     {
-        //       key: 'Visual editing',
-        //       value: 'https://tina.io/visual-editing',
-        //     },
-        //   ],
-        // },
       ],
     })
     if (this.subCommand) {
@@ -239,8 +225,9 @@ export class BuildCommand extends Command {
       process.on('SIGUSR2', exitHandler)
       //catches uncaught exceptions
       process.on('uncaughtException', exitHandler)
+    } else {
+      process.exit()
     }
-    // process.exit()
   }
 
   async checkClientInfo(configManager: ConfigManager, apiURL: string) {
