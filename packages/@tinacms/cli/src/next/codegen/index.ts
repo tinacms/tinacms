@@ -150,42 +150,9 @@ export class Codegen {
   }
 
   getApiURL() {
+    if (!this.apiURL)
+      throw new Error('apiURL not set. Please run execute() first')
     return this.apiURL
-    // const branch = this.configManager.config?.branch
-    // const clientId = this.configManager.config?.clientId
-    // const token = this.configManager.config?.token
-    // const version = this.configManager.getTinaGraphQLVersion()
-    // const baseUrl =
-    //   this.configManager.config.tinaioConfig?.contentApiUrlOverride ||
-    //   `https://${TINA_HOST}`
-
-    // if (
-    //   (!branch || !clientId || !token) &&
-    //   !this.port &&
-    //   !this.configManager.config.contentApiUrlOverride
-    // ) {
-    //   const missing = []
-    //   if (!branch) missing.push('branch')
-    //   if (!clientId) missing.push('clientId')
-    //   if (!token) missing.push('token')
-
-    //   throw new Error(
-    //     `Client not configured properly. Missing ${missing.join(
-    //       ', '
-    //     )}. Please visit https://tina.io/docs/tina-cloud/connecting-site/ for more information`
-    //   )
-    // }
-    // let localUrl = `http://localhost:${this.port}/graphql`
-    // let tinaCloudUrl = `${baseUrl}/${version}/content/${clientId}/github/${branch}`
-
-    // let apiURL = this.isLocal
-    //   ? `http://localhost:${this.port}/graphql`
-    //   : `${baseUrl}/${version}/content/${clientId}/github/${branch}`
-
-    // if (this.configManager.config.contentApiUrlOverride) {
-    //   apiURL = this.configManager.config.contentApiUrlOverride
-    // }
-    // return apiURL
   }
 
   async genClient() {

@@ -24,44 +24,13 @@ import { dangerText, linkText, warnText } from '../../../utils/theme'
 import { createDevServer } from '../dev-command/server'
 import { startSubprocess2 } from '../../../utils/start-subprocess'
 import { spin } from '../../../utils/spinner'
+import { BaseCommand } from '../baseCommands'
 
-export class BuildCommand extends Command {
+export class BuildCommand extends BaseCommand {
   static paths = [['build']]
-  rootPath = Option.String('--rootPath', {
-    description:
-      'Specify the root directory to run the CLI from (defaults to current working directory)',
-  })
-  verbose = Option.Boolean('-v,--verbose', false, {
-    description: 'increase verbosity of logged output',
-  })
-  noSDK = Option.Boolean('--noSDK', false, {
-    description:
-      "DEPRECATED - This should now be set in the config at client.skip = true'. Don't generate the generated client SDK",
-  })
-  datalayerPort = Option.String('--datalayer-port', '9000', {
-    description:
-      'Specify a port to run the datalayer server on. (default 9000)',
-  })
-  isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
-    description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
-  })
   localOption = Option.Boolean('--local', {
     description:
       'Starts local Graphql server and builds the local client instead of production client',
-  })
-  port = Option.String('-p,--port', '4001', {
-    description:
-      'Specify a port to run the server on. This is only applicable with the --local option (default 4001)',
-  })
-  subCommand = Option.String('-c,--command', {
-    description: 'The sub-command to run',
-  })
-  experimentalDataLayer = Option.Boolean('--experimentalData', {
-    description:
-      'DEPRECATED - Build the server with additional data querying capabilities',
-  })
-  noTelemetry = Option.Boolean('--noTelemetry', false, {
-    description: 'Disable anonymous telemetry that is collected',
   })
   tinaGraphQLVersion = Option.String('--tina-graphql-version', {
     description:

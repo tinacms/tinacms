@@ -14,47 +14,17 @@ import { createAndInitializeDatabase, createDBServer } from '../../database'
 import type { ChildProcess } from 'child_process'
 import { spin } from '../../../utils/spinner'
 import { warnText } from '../../../utils/theme'
+import { BaseCommand } from '../baseCommands'
 
-export class DevCommand extends Command {
+export class DevCommand extends BaseCommand {
   static paths = [['dev'], ['server:start']]
-  port = Option.String('-p,--port', '4001', {
-    description: 'Specify a port to run the server on. (default 4001)',
-  })
-  datalayerPort = Option.String('--datalayer-port', '9000', {
-    description:
-      'Specify a port to run the datalayer server on. (default 9000)',
-  })
-  subCommand = Option.String('-c,--command', {
-    description: 'The sub-command to run',
-  })
-  rootPath = Option.String('--rootPath', {
-    description:
-      'Specify the root directory to run the CLI from (defaults to current working directory)',
-  })
   // NOTE: camelCase commands for string options don't work if there's an `=` used https://github.com/arcanis/clipanion/issues/141
   watchFolders = Option.String('-w,--watchFolders', {
     description:
       'DEPRECATED - a list of folders (relative to where this is being run) that the cli will watch for changes',
   })
-  isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
-    description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
-  })
-  experimentalDataLayer = Option.Boolean('--experimentalData', {
-    description:
-      'DEPRECATED - Build the server with additional data querying capabilities',
-  })
-  verbose = Option.Boolean('-v,--verbose', false, {
-    description: 'increase verbosity of logged output',
-  })
   noWatch = Option.Boolean('--noWatch', false, {
     description: "Don't regenerate config on file changes",
-  })
-  noSDK = Option.Boolean('--noSDK', false, {
-    description:
-      "DEPRECATED - This should now be set in the config at client.skip = true'. Don't generate the generated client SDK",
-  })
-  noTelemetry = Option.Boolean('--noTelemetry', false, {
-    description: 'Disable anonymous telemetry that is collected',
   })
 
   static usage = Command.Usage({
