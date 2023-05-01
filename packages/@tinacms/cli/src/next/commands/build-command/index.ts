@@ -32,6 +32,12 @@ export class BuildCommand extends BaseCommand {
     description:
       'Specify the version of @tinacms/graphql to use (defaults to latest)',
   })
+  /**
+   * This option allows the user to skip the tina cloud checks if they want to. This could be useful for mismatched GraphQL versions or if they want to build only using the local client and never connect to Tina Cloud
+   */
+  skipCloudChecks = Option.Boolean('--skip-cloud-checks', false, {
+    description: 'Skips checking the provided cloud config.',
+  })
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -82,6 +88,7 @@ export class BuildCommand extends BaseCommand {
     const apiURL = await codegen.execute()
 
     if (this.localOption) {
+      // start the dev server if we are building locally
       await this.indexContentWithSpinner({
         database,
         graphQLSchema,
@@ -92,7 +99,10 @@ export class BuildCommand extends BaseCommand {
       console.log('server listening on port', this.port)
     }
 
-    if (!configManager.hasSelfHostedConfig()) {
+    const skipCloudChecks =
+      this.skipCloudChecks || configManager.hasSelfHostedConfig()
+
+    if (!skipCloudChecks) {
       await this.checkClientInfo(configManager, codegen.productionUrl)
       await waitForDB(configManager.config, codegen.productionUrl, false)
       await this.checkGraphqlSchema(
