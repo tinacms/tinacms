@@ -204,10 +204,19 @@ export class Database {
         typeof contentObject._template === 'string'
           ? contentObject._template
           : undefined
-      const { collection, template } =
-        tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
+      const { collection, template } = hasOwnProperty(
+        contentObject,
+        '__collection'
+      )
+        ? {
+            collection: tinaSchema.getCollection(
+              contentObject['__collection'] as string
+            ),
+            template: undefined,
+          } // folders have no templates
+        : tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
 
-      const field = template.fields.find((field) => {
+      const field = template?.fields.find((field) => {
         if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
             return true
@@ -228,7 +237,9 @@ export class Database {
         ...data,
         _collection: collection.name,
         _keepTemplateKey: !!collection.templates,
-        _template: lastItem(template.namespace),
+        _template: template?.namespace
+          ? lastItem(template?.namespace)
+          : undefined,
         _relativePath: filepath
           .replace(collection.path, '')
           .replace(/^\/|\/$/g, ''),
@@ -864,6 +875,7 @@ export class Database {
             cursor: btoa(edge.cursor),
           }
         } catch (error) {
+          console.log(error)
           if (
             error instanceof Error &&
             (!edge.path.includes('.tina/__generated__/_graphql.json') ||

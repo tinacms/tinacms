@@ -1,5 +1,24 @@
 # tinacms-cli
 
+## 1.5.9
+
+### Patch Changes
+
+- Updated dependencies [89dcad9d9]
+- Updated dependencies [a0eb72ce0]
+  - @tinacms/graphql@1.4.9
+  - @tinacms/app@1.2.9
+  - @tinacms/datalayer@1.2.9
+
+## 1.5.8
+
+### Patch Changes
+
+- 5cb73050e: fix issue where migration would error if a user selected no to migrating templates
+- 012ed53bf: Fix regression where `build.host` was not passed correctly
+- Updated dependencies [eba7e5e5e]
+  - @tinacms/app@1.2.8
+
 ## 1.5.7
 
 ### Patch Changes

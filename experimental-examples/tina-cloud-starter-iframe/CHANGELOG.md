@@ -1,5 +1,23 @@
 # @tinacms/starter-iframe
 
+## 0.1.34
+
+### Patch Changes
+
+- Updated dependencies [e7f4c0a96]
+- Updated dependencies [ff8673515]
+  - tinacms@1.5.2
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.33
+
+### Patch Changes
+
+- Updated dependencies [790b1e1ae]
+- Updated dependencies [eba7e5e5e]
+  - tinacms@1.5.1
+  - next-tinacms-cloudinary@4.3.0
+
 ## 0.1.32
 
 ### Patch Changes

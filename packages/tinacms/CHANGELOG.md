@@ -1,5 +1,21 @@
 # tinacms
 
+## 1.5.2
+
+### Patch Changes
+
+- e7f4c0a96: Fix issue where sortFields are undefined
+- ff8673515: Trim whitespace from readonly token to ignore any accidental whitespace from cut and paste
+
+## 1.5.1
+
+### Patch Changes
+
+- 790b1e1ae: Fix issue where contextual editing was not working for singleton collection
+- eba7e5e5e: Simplify formify logic
+- Updated dependencies [eba7e5e5e]
+  - @tinacms/toolkit@1.7.1
+
 ## 1.5.0
 
 ### Minor Changes
