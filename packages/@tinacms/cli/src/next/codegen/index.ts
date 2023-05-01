@@ -52,22 +52,16 @@ export class Codegen {
   }
 
   async writeConfigFile(fileName: string, data: string) {
-    const tinaFolderPath = await this.configManager.getTinaFolderPath(
-      this.configManager.rootPath
-    )
-    const filePath = path.join(tinaFolderPath, GENERATED_FOLDER, fileName)
+    const filePath = path.join(this.configManager.generatedFolderPath, fileName)
     await fs.ensureFile(filePath)
     await fs.outputFile(filePath, data)
     if (this.configManager.hasSeparateContentRoot()) {
-      const tinaFolderContentRepoPath =
-        await this.configManager.getTinaFolderPath(
-          this.configManager.contentRootPath
-        )
-      await fs.ensureFile(filePath)
-      await fs.outputFile(
-        path.join(tinaFolderContentRepoPath, GENERATED_FOLDER, fileName),
-        data
+      const filePath = path.join(
+        this.configManager.generatedFolderPathContentRepo,
+        fileName
       )
+      await fs.ensureFile(filePath)
+      await fs.outputFile(filePath, data)
     }
   }
 
