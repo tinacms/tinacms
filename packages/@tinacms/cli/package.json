@@ -82,7 +82,6 @@
     "chokidar": "^3.5.1",
     "cli-spinner": "^0.2.10",
     "clipanion": "^3.2.0",
-    "commander": "^9.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "esbuild": "^0.15.5",
