@@ -2,6 +2,7 @@ import React from 'react'
 import * as G from 'graphql'
 import { getIn } from 'final-form'
 import { z } from 'zod'
+import type { TinaState } from 'tinacms'
 // @ts-expect-error
 import schemaJson from 'SCHEMA_IMPORT'
 import { tinaField } from 'tinacms/dist/react'
@@ -116,19 +117,6 @@ const astNodeWithMeta: G.DocumentNode = {
 export const schema = G.buildASTSchema(astNode)
 export const schemaForResolver = G.buildASTSchema(astNodeWithMeta)
 
-type ListItemItem = {
-  type: 'item'
-  path: (string | number)[]
-  form: {
-    id: string
-    label: string
-  }
-  subItems: ListItemItem[]
-}
-type ListItemList = { type: 'list'; label: string; items: ListItemItem[] }
-
-export type ListItem = ListItemItem | ListItemList
-
 export const useGraphQLReducer = (
   iframe: React.ForwardedRef<HTMLIFrameElement>,
   url: string
@@ -181,8 +169,7 @@ export const useGraphQLReducer = (
             return payload
           } else {
             const expandedPayload = await expandPayload(payload, cms)
-            const listItems = processPayload(expandedPayload)
-            cms.sidebar?.setListItems(listItems)
+            processPayload(expandedPayload)
             return expandedPayload
           }
         })
@@ -201,8 +188,8 @@ export const useGraphQLReducer = (
       if (!expandedQueryForResolver || !expandedData) {
         throw new Error(`Unable to process payload which has not been expanded`)
       }
-      const listItems: ListItem[] = []
-      const formList2: FormListItem[] = []
+      const listItems: TinaState['formList'] = []
+      const formList2: TinaState['formList'] = []
 
       let queryName = ''
 
@@ -272,7 +259,7 @@ export const useGraphQLReducer = (
             if (connectionCollection) {
               formList2.push({
                 type: 'list',
-                label: connectionCollection.label,
+                label: connectionCollection.label || connectionCollection.name,
               })
             }
           }
@@ -366,7 +353,7 @@ export const useGraphQLReducer = (
                   parent.subItems.push({
                     type: 'document',
                     path: pathString,
-                    form,
+                    formId: form.id,
                     subItems: [],
                   })
                 }
@@ -374,7 +361,7 @@ export const useGraphQLReducer = (
                 formList2.push({
                   type: 'document',
                   path: pathString,
-                  form,
+                  formId: form.id,
                   subItems: [],
                 })
               }
@@ -404,7 +391,7 @@ export const useGraphQLReducer = (
                   parent.subItems.push({
                     type: 'document',
                     path: pathString,
-                    form: existingForm,
+                    formId: existingForm.id,
                     subItems: [],
                   })
                 }
@@ -412,7 +399,7 @@ export const useGraphQLReducer = (
                 formList2.push({
                   type: 'document',
                   path: pathString,
-                  form: existingForm,
+                  formId: existingForm.id,
                   subItems: [],
                 })
               }
@@ -462,45 +449,11 @@ export const useGraphQLReducer = (
           id: payload.id,
           data: result.data,
         })
-
-        // This can be improved, for now we just need something to test with
-        // const elements =
-        //   iframe.current?.contentWindow?.document.querySelectorAll<HTMLElement>(
-        //     `[data-tinafield]`
-        //   )
-        // if (elements) {
-        //   for (let i = 0; i < elements.length; i++) {
-        //     const el = elements[i]
-        //     el.onclick = () => {
-        //       const tinafield = el.getAttribute('data-tinafield')
-        //       cms.events.dispatch({
-        //         type: 'field:selected',
-        //         value: tinafield,
-        //       })
-        //     }
-        //   }
-        // }
       }
-      const orderedListItems: FormListItem[] = []
-      const globalItems: FormListItem[] = []
-      // Always put global forms at the end
-      formList2.forEach((item) => {
-        if (item.type === 'document' && item.form.global) {
-          globalItems.push(item)
-        } else {
-          orderedListItems.push(item)
-        }
+      cms.dispatch({
+        type: 'form-lists:add',
+        value: { id: payload.id, label: 'Main query', items: formList2 },
       })
-      const topItems: FormListItem[] = []
-      if (orderedListItems[0]?.type === 'document') {
-        topItems.push({ type: 'list', label: 'Documents' })
-      }
-      setFormList([
-        ...topItems,
-        ...orderedListItems,
-        { type: 'list', label: 'Global Documents' },
-        ...globalItems,
-      ])
     },
     [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
   )
@@ -534,6 +487,7 @@ export const useGraphQLReducer = (
         cms.forms.all().map((form) => {
           form.removeQuery(id)
         })
+        cms.dispatch({ type: 'form-lists:remove', value: id })
         cms.removeOrphanedForms()
       }
       if (event.data.type === 'open') {
@@ -565,6 +519,7 @@ export const useGraphQLReducer = (
   React.useEffect(() => {
     return () => {
       setPayloads([])
+      console.log('clear')
       cms.removeAllForms()
     }
   }, [url])
@@ -950,8 +905,10 @@ const buildForm = ({
       if (collection.ui?.global) {
         cms.plugins.add(new GlobalFormPlugin(form))
         cms.forms.add(form)
+        cms.dispatch({ type: 'forms:add', value: form })
       } else {
         cms.forms.add(form)
+        cms.dispatch({ type: 'forms:add', value: form })
       }
     }
   }

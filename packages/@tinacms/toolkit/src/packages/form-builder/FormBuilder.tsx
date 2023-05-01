@@ -17,15 +17,16 @@ import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
 import { ActiveFieldContextProvider } from '../fields/use-active-field'
 import { IoMdClose } from 'react-icons/io'
+import { useCMS } from '../../react-tinacms'
 
 export interface FormBuilderProps {
   form: Form
   hideFooter?: boolean
   label?: string
-  setActiveFormId?: (id: string) => void
-  onPristineChange?: (_pristine: boolean) => unknown
-  setActiveFieldName?: (id: string) => void
-  activeFieldName?: string
+  // setActiveFormId?: (id: string) => void
+  // onPristineChange?: (_pristine: boolean) => unknown
+  // setActiveFieldName?: (id: string) => void
+  // activeFieldName?: string
 }
 
 interface FormKeyBindingsProps {
@@ -86,64 +87,70 @@ const FormKeyBindings: FC<FormKeyBindingsProps> = ({ onSubmit }) => {
 
 export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
-  onPristineChange,
-  setActiveFormId,
-  activeFieldName,
-  setActiveFieldName: setActiveFieldNameInner,
+  cms,
+  // onPristineChange,
+  // setActiveFormId,
+  // activeFieldName,
+  // setActiveFieldName: setActiveFieldNameInner,
   ...rest
 }) => {
   // const [activeFieldName, setActiveFieldNameInner] = React.useState<
   //   string | null
   // >(null)
+  // const cms = useCMS()
   const [animatedActiveFieldName, setAnimatedActiveFieldName] = React.useState<
     string | null
   >(null)
   const [showAnimatedFields, setShowAnimatedFields] = React.useState<boolean>()
   const [isForward, setIsForward] = React.useState<boolean>(true)
 
-  const setActiveFieldName = React.useCallback(
-    (name: string | null) => {
-      const result1 = getFieldGroup({
-        form: tinaForm,
-        fieldName: name,
-        values: tinaForm.finalForm.getState().values,
-        prefix: [],
-      })
-      const result2 = getFieldGroup({
-        form: tinaForm,
-        fieldName: activeFieldName,
-        values: tinaForm.finalForm.getState().values,
-        prefix: [],
-      })
-      const nameLength = result1?.path?.length || 0
-      const activeFieldNameLength = result2?.path?.length || 0
-      if (nameLength === activeFieldNameLength) {
-        setActiveFieldNameInner(name)
-        return
-      }
+  const setActiveFieldName = (name: string) => {}
+  const setActiveFormId = (name: string) => {}
+  const activeFieldName = null
 
-      const isForward = name ? nameLength > activeFieldNameLength : false
-      if (isForward) {
-        setIsForward(true)
-        setAnimatedActiveFieldName(name)
-        setShowAnimatedFields(true)
-        setTimeout(() => {
-          setActiveFieldNameInner(name)
-        }, 250)
-        setTimeout(() => {
-          setShowAnimatedFields(false)
-        }, 300)
-      } else {
-        setIsForward(false)
-        setShowAnimatedFields(true)
-        setActiveFieldNameInner(name)
-        setTimeout(() => {
-          setShowAnimatedFields(false)
-        }, 300)
-      }
-    },
-    [activeFieldName]
-  )
+  // const setActiveFieldName = React.useCallback(
+  //   (name: string | null) => {
+  //     const result1 = getFieldGroup({
+  //       form: tinaForm,
+  //       fieldName: name,
+  //       values: tinaForm.finalForm.getState().values,
+  //       prefix: [],
+  //     })
+  //     const result2 = getFieldGroup({
+  //       form: tinaForm,
+  //       fieldName: activeFieldName,
+  //       values: tinaForm.finalForm.getState().values,
+  //       prefix: [],
+  //     })
+  //     const nameLength = result1?.path?.length || 0
+  //     const activeFieldNameLength = result2?.path?.length || 0
+  //     if (nameLength === activeFieldNameLength) {
+  //       setActiveFieldNameInner(name)
+  //       return
+  //     }
+
+  //     const isForward = name ? nameLength > activeFieldNameLength : false
+  //     if (isForward) {
+  //       setIsForward(true)
+  //       setAnimatedActiveFieldName(name)
+  //       setShowAnimatedFields(true)
+  //       setTimeout(() => {
+  //         setActiveFieldNameInner(name)
+  //       }, 250)
+  //       setTimeout(() => {
+  //         setShowAnimatedFields(false)
+  //       }, 300)
+  //     } else {
+  //       setIsForward(false)
+  //       setShowAnimatedFields(true)
+  //       setActiveFieldNameInner(name)
+  //       setTimeout(() => {
+  //         setShowAnimatedFields(false)
+  //       }, 300)
+  //     }
+  //   },
+  //   [activeFieldName]
+  // )
 
   const hideFooter = !!rest.hideFooter
   /**
@@ -189,10 +196,9 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
     const unsubscribe = finalForm.subscribe(
       ({ pristine }) => {
-        if (onPristineChange) {
-          onPristineChange(pristine)
-        }
-
+        // if (onPristineChange) {
+        //   onPristineChange(pristine)
+        // }
         // if (!pristine) {
         //   window.addEventListener('beforeunload', onBeforeUnload)
         // } else {
@@ -210,7 +216,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   // TODO: memoize
   const result = getFieldGroup({
     form: tinaForm,
-    fieldName: activeFieldName,
+    // fieldName: activeFieldName,
+    fieldName: null,
     values: tinaForm.finalForm.getState().values,
     prefix: [],
   })

@@ -7,29 +7,21 @@
 import * as React from 'react'
 
 import { Form } from '../../forms'
-import { useState } from 'react'
-import { FormList } from './FormList'
-import { useSubscribable } from '../../react-core'
+import { FormList, FormLists } from './FormList'
 import { useCMS } from '../../../react-tinacms'
 import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
 import { BiChevronLeft } from 'react-icons/bi'
 import { useWindowWidth } from '@react-hook/window-size'
-import { EditContext } from '@tinacms/sharedctx'
 import { PendingFormsPlaceholder } from './NoFormsPlaceHolder'
 import { VisualEditingContext } from '../../form-builder/use-visual-editing'
-import { FormListItem, useFormList } from '../../../components/FormListProvider'
 
 export const FormsView = ({
   children,
 }: {
   children?: React.ReactChild | React.ReactChild[]
 }) => {
-  const [activeFormId, setActiveFormId] = useState<string>('')
-  const [activeFieldName, setActiveFieldName] = React.useState<string | null>(
-    null
-  )
   const cms = useCMS()
   const renderNav =
     // @ts-ignore
@@ -37,115 +29,29 @@ export const FormsView = ({
       ? // @ts-ignore
         cms.sidebar.renderNav
       : true
-  const formPlugins = cms.plugins.getType<Form>('form')
-  const { formList } = useFormList()
-  const { setFormIsPristine } = React.useContext(SidebarContext)
-  const { formsRegistering, setFormsRegistering } =
-    React.useContext(EditContext)
 
-  React.useMemo(
-    () =>
-      cms.events.subscribe('forms:register', (event) => {
-        if (event.value === 'start') {
-          setFormsRegistering(true)
-        } else {
-          setFormsRegistering(false)
-        }
-      }),
-    []
-  )
-
-  React.useEffect(() => {
-    const handleSelection = (e) => {
-      if (e.value.includes('#')) {
-        const [formId, fieldName] = e.value.split('#')
-        // "undefined can occur when the helpers for data-tinafield are given an invalid object"
-        if (setActiveFormId && formId !== 'undefined') {
-          setActiveFormId(formId)
-        }
-        if (fieldName !== 'undefined') {
-          setActiveFieldName(fieldName)
-        }
-      }
-    }
-
-    const unsubscribe = cms.events.subscribe('field:selected', handleSelection)
-    return () => {
-      unsubscribe()
-    }
-  }, [setActiveFormId, setActiveFieldName, cms.events])
-
-  /**
-   * If there's only one form, make it the active form.
-   *
-   * TODO: There's an issue where the forms register one
-   * by one, so the 'active form' always gets set as if there
-   * were only one form, even when there are multiple
-   */
-  // console.log(formList)
-
-  function setSingleActiveForm() {
-    const formToActivate = formPlugins.all().find((plugin) => !plugin.global)
-    // let foundItem
-    // cms.sidebar.listItems.forEach(item => {
-    //   if(item.type === 'item') {
-    //   }
-    // })
-    if (formToActivate) {
-      setActiveFormId(formToActivate.id)
-    }
-  }
-
-  /*
-   ** Subscribes the forms to the CMS,
-   ** passing a callback to set active form
-   */
-  // useSubscribable(formPlugins, () => {
-  //   setSingleActiveForm()
-  // })
-
-  /*
-   ** Sets single active form on componentDidMount
-   */
-  React.useEffect(() => {
-    if (activeFormId) {
-      return
-    }
-    let itemFound = false
-    // Global items are at the end of the list, so just activate
-    // the first item we find
-    formList.forEach((item) => {
-      if (itemFound) {
-        return
-      }
-      if (item.type === 'document') {
-        setActiveFormId(item.form.id)
-        itemFound = true
-      }
-    })
-  }, [formList])
-
-  const forms = formPlugins.all()
+  const forms = cms.state.forms
   const isMultiform = forms.length > 1
-  const activeForm: Form | undefined = formPlugins.find(activeFormId)
+  const activeForm: Form | undefined = forms.find(
+    ({ id }) => id === cms.state.activeFormId
+  )
+  const setActiveFormId = (id: string) =>
+    cms.dispatch({
+      type: 'forms:set-active-form-id',
+      value: id,
+    })
   const isEditing = !!activeForm
 
   /**
    * No Forms
    */
-  if (!forms.length) {
-    if (formsRegistering) return <PendingFormsPlaceholder />
+  if (!cms.state.formLists.length) {
+    // if (formsRegistering) return <PendingFormsPlaceholder />
     return <> {children} </>
   }
 
-  if (isMultiform && !activeForm) {
-    return (
-      <FormList
-        isEditing={isEditing}
-        formList={formList}
-        setActiveFormId={setActiveFormId}
-      />
-    )
+  if (!activeForm) {
+    return <FormLists isEditing={isEditing} setActiveFormId={setActiveFormId} />
   }
 
   const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta')
@@ -171,11 +77,12 @@ export const FormsView = ({
               </React.Fragment>
             ))}
           <FormBuilder
+            cms={cms}
             form={activeForm as any}
-            setActiveFormId={setActiveFormId}
-            onPristineChange={setFormIsPristine}
-            activeFieldName={activeFieldName}
-            setActiveFieldName={setActiveFieldName}
+            // setActiveFormId={setActiveFormId}
+            // // onPristineChange={setFormIsPristine}
+            // activeFieldName={activeFieldName}
+            // setActiveFieldName={setActiveFieldName}
           />
         </FormWrapper>
       )}

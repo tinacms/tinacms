@@ -5,20 +5,30 @@
 */
 
 import * as React from 'react'
-import { CMS } from '../core'
+// import { CMS } from '../core'
+import { TinaAction, TinaState } from '../../tina-state'
+import { TinaCMS } from '../../tina-cms'
 
 export const ERROR_MISSING_CMS = `useCMS could not find an instance of CMS`
 
-export const CMSContext = React.createContext<CMS | null>(null)
+export const CMSContext = React.createContext<{
+  cms: TinaCMS
+  dispatch: React.Dispatch<TinaAction>
+  state: TinaState
+} | null>(null)
 
-export function useCMS(): CMS {
-  const cms = React.useContext(CMSContext)
+export function useCMS(): TinaCMS {
+  const { cms, dispatch, state } = React.useContext(CMSContext)
 
   if (!cms) {
     throw new Error(ERROR_MISSING_CMS)
   }
 
   const [, setEnabled] = React.useState(cms.enabled)
+
+  // Attach these so they can be reached via `const cms = useCMS()` -> `cms.state`
+  cms.dispatch = dispatch
+  cms.state = state
 
   React.useEffect(() => {
     return cms.events.subscribe('cms', () => {

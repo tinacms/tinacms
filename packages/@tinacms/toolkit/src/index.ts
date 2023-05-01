@@ -34,6 +34,7 @@ export type { ContentCreatorPlugin } from './packages/forms'
 export * from './packages/forms'
 export * from './packages/icons'
 export * from './packages/react-dismissible'
+export type { TinaState } from './tina-state'
 export {
   Nav,
   LocalWarning,

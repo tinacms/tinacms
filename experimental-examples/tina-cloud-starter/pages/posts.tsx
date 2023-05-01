@@ -9,7 +9,8 @@ import { useTina } from "tinacms/dist/react";
 export default function HomePage(
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) {
-  const { data } = useTina(props);
+  // const { data } = useTina(props);
+  const { data } = props;
   const posts = data.postConnection.edges;
 
   return (
