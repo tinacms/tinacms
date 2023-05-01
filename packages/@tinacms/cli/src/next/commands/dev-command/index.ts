@@ -9,8 +9,6 @@ import { logger, summary } from '../../../logger'
 import { createDevServer } from './server'
 import { Codegen } from '../../codegen'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
-import { spin } from '../../../utils/spinner'
-import { warnText } from '../../../utils/theme'
 import { BaseCommand } from '../baseCommands'
 
 export class DevCommand extends BaseCommand {
@@ -118,24 +116,11 @@ export class DevCommand extends BaseCommand {
       if (!this.noWatch) {
         this.watchQueries(configManager, async () => await codegen.execute())
       }
-
-      const warnings: string[] = []
-      await spin({
-        waitFor: async () => {
-          const res = await database.indexContent({
-            graphQLSchema,
-            tinaSchema,
-          })
-          warnings.push(...res.warnings)
-        },
-        text: 'Indexing local files',
+      await this.indexContentWithSpinner({
+        database,
+        graphQLSchema,
+        tinaSchema,
       })
-      if (warnings.length > 0) {
-        logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
-        warnings.forEach((warning) => {
-          logger.warn(warnText(`${warning}`))
-        })
-      }
       return { apiURL, database }
     }
     const { apiURL } = await setup({ firstTime: true })

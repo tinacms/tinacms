@@ -2,9 +2,7 @@ import fetch, { Headers } from 'node-fetch'
 import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
-import chalk from 'chalk'
 import type { ViteDevServer } from 'vite'
-import type { ChildProcess } from 'child_process'
 import { buildSchema, getASTSchema, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
@@ -22,8 +20,6 @@ import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { sleepAndCallFunc } from '../../../utils/sleep'
 import { dangerText, linkText, warnText } from '../../../utils/theme'
 import { createDevServer } from '../dev-command/server'
-import { startSubprocess2 } from '../../../utils/start-subprocess'
-import { spin } from '../../../utils/spinner'
 import { BaseCommand } from '../baseCommands'
 
 export class BuildCommand extends BaseCommand {
@@ -86,23 +82,11 @@ export class BuildCommand extends BaseCommand {
     const apiURL = await codegen.execute()
 
     if (this.localOption) {
-      const warnings: string[] = []
-      await spin({
-        waitFor: async () => {
-          const res = await database.indexContent({
-            graphQLSchema,
-            tinaSchema,
-          })
-          warnings.push(...res.warnings)
-        },
-        text: 'Indexing local files',
+      await this.indexContentWithSpinner({
+        database,
+        graphQLSchema,
+        tinaSchema,
       })
-      if (warnings.length > 0) {
-        logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
-        warnings.forEach((warning) => {
-          logger.warn(warnText(`${warning}`))
-        })
-      }
       server = await createDevServer(configManager, database, apiURL, true)
       await server.listen(Number(this.port))
       console.log('server listening on port', this.port)

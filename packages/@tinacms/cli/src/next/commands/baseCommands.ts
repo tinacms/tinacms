@@ -2,8 +2,13 @@ import { Command, Option } from 'clipanion'
 import chalk from 'chalk'
 
 import type { ChildProcess } from 'child_process'
+import type { DocumentNode } from 'graphql'
 import { startSubprocess2 } from '../../utils/start-subprocess'
 import { logger } from '../../logger'
+import { spin } from '../../utils/spinner'
+import { Database } from '../../../../graphql/src'
+import { TinaSchema } from '../../../../schema-tools/src'
+import { warnText } from '../../utils/theme'
 
 /**
  * Base Command for Dev and build
@@ -79,6 +84,33 @@ export abstract class BaseCommand extends Command {
       logger.warn(
         '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
       )
+    }
+  }
+  async indexContentWithSpinner({
+    database,
+    graphQLSchema,
+    tinaSchema,
+  }: {
+    database: Database
+    graphQLSchema: DocumentNode
+    tinaSchema: TinaSchema
+  }) {
+    const warnings: string[] = []
+    await spin({
+      waitFor: async () => {
+        const res = await database.indexContent({
+          graphQLSchema,
+          tinaSchema,
+        })
+        warnings.push(...res.warnings)
+      },
+      text: 'Indexing local files',
+    })
+    if (warnings.length > 0) {
+      logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
+      warnings.forEach((warning) => {
+        logger.warn(warnText(`${warning}`))
+      })
     }
   }
 }
