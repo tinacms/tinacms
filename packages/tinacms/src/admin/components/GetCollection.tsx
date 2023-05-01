@@ -135,7 +135,8 @@ const GetCollection = ({
       !allowCreate &&
       !allowDelete &&
       // Check there is only one document
-      collection.documents?.edges?.length === 1
+      collection.documents?.edges?.length === 1 &&
+      collection.documents?.edges[0]?.node.__typename === 'Document'
     ) {
       const doc = collection.documents.edges[0].node
       handleNavigate(navigate, cms, collection, collectionDefinition, doc)
