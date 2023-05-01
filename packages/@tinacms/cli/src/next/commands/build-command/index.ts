@@ -49,20 +49,7 @@ export class BuildCommand extends BaseCommand {
 
   async execute(): Promise<number | void> {
     logger.info('Starting Tina build')
-    if (this.isomorphicGitBridge) {
-      logger.warn('--isomorphicGitBridge has been deprecated')
-    }
-    if (this.experimentalDataLayer) {
-      logger.warn(
-        '--experimentalDataLayer has been deprecated, the data layer is now built-in automatically'
-      )
-    }
-
-    if (this.noSDK) {
-      logger.warn(
-        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
-      )
-    }
+    this.logDeprecationWarnings()
     const configManager = new ConfigManager({
       rootPath: this.rootPath,
       tinaGraphQLVersion: this.tinaGraphQLVersion,
@@ -174,26 +161,7 @@ export class BuildCommand extends BaseCommand {
       ],
     })
     if (this.subCommand) {
-      let subProc: ChildProcess | undefined
-      if (this.subCommand) {
-        subProc = await startSubprocess2({ command: this.subCommand })
-        logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
-      }
-      function exitHandler(options, exitCode) {
-        if (subProc) {
-          subProc.kill()
-        }
-        process.exit()
-      }
-      //do something when app is closing
-      process.on('exit', exitHandler)
-      //catches ctrl+c event
-      process.on('SIGINT', exitHandler)
-      // catches "kill pid" (for example: nodemon restart)
-      process.on('SIGUSR1', exitHandler)
-      process.on('SIGUSR2', exitHandler)
-      //catches uncaught exceptions
-      process.on('uncaughtException', exitHandler)
+      await this.startSubCommand()
     } else {
       process.exit()
     }

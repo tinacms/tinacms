@@ -8,10 +8,7 @@ import { devHTML } from './html'
 import { logger, summary } from '../../../logger'
 import { createDevServer } from './server'
 import { Codegen } from '../../codegen'
-import chalk from 'chalk'
-import { startSubprocess2 } from '../../../utils/start-subprocess'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
-import type { ChildProcess } from 'child_process'
 import { spin } from '../../../utils/spinner'
 import { warnText } from '../../../utils/theme'
 import { BaseCommand } from '../baseCommands'
@@ -42,30 +39,22 @@ export class DevCommand extends BaseCommand {
     process.exit(1)
   }
 
-  async execute(): Promise<number | void> {
+  logDeprecationWarnings() {
+    super.logDeprecationWarnings()
     if (this.watchFolders) {
       logger.warn(
         '--watchFolders has been deprecated, imports from your Tina config file will be watched automatically. If you still need it please open a ticket at https://github.com/tinacms/tinacms/issues'
       )
     }
-    if (this.isomorphicGitBridge) {
-      logger.warn('--isomorphicGitBridge has been deprecated')
-    }
-    if (this.experimentalDataLayer) {
-      logger.warn(
-        '--experimentalDataLayer has been deprecated, the data layer is now built-in automatically'
-      )
-    }
-    if (this.noSDK) {
-      logger.warn(
-        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
-      )
-    }
+  }
+
+  async execute(): Promise<number | void> {
     const configManager = new ConfigManager({
       rootPath: this.rootPath,
       legacyNoSDK: this.noSDK,
     })
     logger.info('Starting Tina Dev Server')
+    this.logDeprecationWarnings()
 
     // Initialize the host TCP server
     createDBServer(Number(this.datalayerPort))
@@ -257,26 +246,7 @@ export class DevCommand extends BaseCommand {
         // },
       ],
     })
-    let subProc: ChildProcess | undefined
-    if (this.subCommand) {
-      subProc = await startSubprocess2({ command: this.subCommand })
-      logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
-    }
-    function exitHandler(options, exitCode) {
-      if (subProc) {
-        subProc.kill()
-      }
-      process.exit()
-    }
-    //do something when app is closing
-    process.on('exit', exitHandler)
-    //catches ctrl+c event
-    process.on('SIGINT', exitHandler)
-    // catches "kill pid" (for example: nodemon restart)
-    process.on('SIGUSR1', exitHandler)
-    process.on('SIGUSR2', exitHandler)
-    //catches uncaught exceptions
-    process.on('uncaughtException', exitHandler)
+    await this.startSubCommand()
   }
 
   watchContentFiles(configManager: ConfigManager, database: Database) {
