@@ -22,6 +22,7 @@ export class FilesystemBridge implements Bridge {
       path.join(basePath, '**', `/*${extension}`).replace(/\\/g, '/'),
       {
         dot: true,
+        ignore: ['**/node_modules/**'],
       }
     )
     const posixRootPath = normalize(this.outputPath)
