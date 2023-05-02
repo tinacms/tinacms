@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.4.10
+
+### Patch Changes
+
+- a402c8010: Fix root level collection issues including a folder related bug
+
 ## 1.4.9
 
 ### Patch Changes
