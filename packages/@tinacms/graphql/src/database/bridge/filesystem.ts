@@ -19,9 +19,10 @@ export class FilesystemBridge implements Bridge {
   public async glob(pattern: string, extension: string) {
     const basePath = path.join(this.outputPath, ...pattern.split('/'))
     const items = await fg(
-      path.join(basePath, '**', `/*${extension}`).replace(/\\/g, '/'),
+      path.join(basePath, '**', `/*\.${extension}`).replace(/\\/g, '/'),
       {
         dot: true,
+        ignore: ['**/node_modules/**'],
       }
     )
     const posixRootPath = normalize(this.outputPath)
