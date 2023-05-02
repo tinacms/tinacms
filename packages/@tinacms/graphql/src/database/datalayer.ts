@@ -560,6 +560,9 @@ export class FolderTreeBuilder {
 
   update(documentPath: string, collectionPath: string) {
     let folderPath = path.dirname(documentPath)
+    if (folderPath === '.') {
+      folderPath = ''
+    }
     if (collectionPath) {
       folderPath = stripCollectionFromPath(collectionPath, folderPath)
     }
