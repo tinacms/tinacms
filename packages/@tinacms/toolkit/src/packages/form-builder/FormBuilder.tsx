@@ -15,16 +15,16 @@ import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
 import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
-import { ActiveFieldContextProvider } from '../fields/use-active-field'
 import { IoMdClose } from 'react-icons/io'
-import { useCMS } from '../../react-tinacms'
+import { useCMS } from '../react-core'
 
 export interface FormBuilderProps {
   form: Form
   hideFooter?: boolean
   label?: string
+  // cms: TinaCMS
   // setActiveFormId?: (id: string) => void
-  // onPristineChange?: (_pristine: boolean) => unknown
+  onPristineChange?: (_pristine: boolean) => unknown
   // setActiveFieldName?: (id: string) => void
   // activeFieldName?: string
 }
@@ -87,88 +87,26 @@ const FormKeyBindings: FC<FormKeyBindingsProps> = ({ onSubmit }) => {
 
 export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
-  cms,
-  // onPristineChange,
+  // cms,
+  onPristineChange,
   // setActiveFormId,
   // activeFieldName,
   // setActiveFieldName: setActiveFieldNameInner,
   ...rest
 }) => {
-  // const [activeFieldName, setActiveFieldNameInner] = React.useState<
-  //   string | null
-  // >(null)
-  // const cms = useCMS()
-  const [animatedActiveFieldName, setAnimatedActiveFieldName] = React.useState<
-    string | null
-  >(null)
-  const [showAnimatedFields, setShowAnimatedFields] = React.useState<boolean>()
-  const [isForward, setIsForward] = React.useState<boolean>(true)
+  const cms = useCMS()
 
-  const setActiveFieldName = (name: string) => {}
-  const setActiveFormId = (name: string) => {}
-  const activeFieldName = null
+  const { fields, activePath } = tinaForm.getFieldGroup({
+    form: tinaForm,
+    fieldName: cms.state.activeFieldName,
+    values: tinaForm.finalForm.getState().values,
+    prefix: [],
+  })
 
-  // const setActiveFieldName = React.useCallback(
-  //   (name: string | null) => {
-  //     const result1 = getFieldGroup({
-  //       form: tinaForm,
-  //       fieldName: name,
-  //       values: tinaForm.finalForm.getState().values,
-  //       prefix: [],
-  //     })
-  //     const result2 = getFieldGroup({
-  //       form: tinaForm,
-  //       fieldName: activeFieldName,
-  //       values: tinaForm.finalForm.getState().values,
-  //       prefix: [],
-  //     })
-  //     const nameLength = result1?.path?.length || 0
-  //     const activeFieldNameLength = result2?.path?.length || 0
-  //     if (nameLength === activeFieldNameLength) {
-  //       setActiveFieldNameInner(name)
-  //       return
-  //     }
-
-  //     const isForward = name ? nameLength > activeFieldNameLength : false
-  //     if (isForward) {
-  //       setIsForward(true)
-  //       setAnimatedActiveFieldName(name)
-  //       setShowAnimatedFields(true)
-  //       setTimeout(() => {
-  //         setActiveFieldNameInner(name)
-  //       }, 250)
-  //       setTimeout(() => {
-  //         setShowAnimatedFields(false)
-  //       }, 300)
-  //     } else {
-  //       setIsForward(false)
-  //       setShowAnimatedFields(true)
-  //       setActiveFieldNameInner(name)
-  //       setTimeout(() => {
-  //         setShowAnimatedFields(false)
-  //       }, 300)
-  //     }
-  //   },
-  //   [activeFieldName]
-  // )
+  const setActiveFieldName = (name: string) =>
+    cms.dispatch({ type: 'forms:set-active-field-name', value: name })
 
   const hideFooter = !!rest.hideFooter
-  /**
-   * > Why is a `key` being set when this isn't an array?
-   *
-   * `FinalForm` does not update when given a new `form` prop.
-   *
-   * We can force `FinalForm` to update by setting the `key` to
-   * the name of the form. When the name changes React will
-   * treat it as a new instance of `FinalForm`, destroying the
-   * old `FinalForm` componentt and create a new one.
-   *
-   * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
-   */
-  const [i, setI] = React.useState(0)
-  React.useEffect(() => {
-    setI((i) => i + 1)
-  }, [tinaForm])
 
   const finalForm = tinaForm.finalForm
 
@@ -196,9 +134,9 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
     const unsubscribe = finalForm.subscribe(
       ({ pristine }) => {
-        // if (onPristineChange) {
-        //   onPristineChange(pristine)
-        // }
+        if (onPristineChange) {
+          onPristineChange(pristine)
+        }
         // if (!pristine) {
         //   window.addEventListener('beforeunload', onBeforeUnload)
         // } else {
@@ -213,126 +151,79 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     }
   }, [finalForm])
 
-  // TODO: memoize
-  const result = getFieldGroup({
-    form: tinaForm,
-    // fieldName: activeFieldName,
-    fieldName: null,
-    values: tinaForm.finalForm.getState().values,
-    prefix: [],
-  })
-  const fields = result ? result.fieldGroup : tinaForm.fields
-
-  // TODO: memoize
-  const animatedResult = getFieldGroup({
-    form: tinaForm,
-    fieldName: animatedActiveFieldName,
-    values: tinaForm.finalForm.getState().values,
-    prefix: [],
-  })
-  const animatedFields = animatedResult
-    ? animatedResult.fieldGroup
-    : tinaForm.fields
-
   return (
-    <ActiveFieldContextProvider value={{ activeFieldName, setActiveFieldName }}>
-      <FinalForm
-        form={finalForm}
-        key={`${i}: ${tinaForm.id}`}
-        onSubmit={tinaForm.onSubmit}
-      >
-        {({
-          handleSubmit,
-          pristine,
-          invalid,
-          submitting,
-          dirtySinceLastSubmit,
-          hasValidationErrors,
-        }) => {
-          const canSubmit =
-            !pristine &&
-            !submitting &&
-            !hasValidationErrors &&
-            !(invalid && !dirtySinceLastSubmit)
+    <FinalForm form={finalForm} onSubmit={tinaForm.onSubmit}>
+      {({
+        handleSubmit,
+        pristine,
+        invalid,
+        submitting,
+        dirtySinceLastSubmit,
+        hasValidationErrors,
+      }) => {
+        const canSubmit =
+          !pristine &&
+          !submitting &&
+          !hasValidationErrors &&
+          !(invalid && !dirtySinceLastSubmit)
 
-          const safeHandleSubmit = () => {
-            if (canSubmit) {
-              handleSubmit()
-            }
+        const safeHandleSubmit = () => {
+          if (canSubmit) {
+            handleSubmit()
           }
+        }
 
-          return (
-            <>
-              <DragDropContext onDragEnd={moveArrayItem}>
-                <FormKeyBindings onSubmit={safeHandleSubmit} />
-                <div className="relative flex flex-col h-full overflow-scroll">
-                  <FormFields
-                    path={result?.path || []}
-                    setActiveFieldName={setActiveFieldName}
-                    fields={fields}
-                    tinaForm={tinaForm}
-                  />
-                  {showAnimatedFields && isForward && (
-                    <GroupPanel>
-                      <FormFields
-                        path={animatedResult?.path || []}
-                        setActiveFieldName={setActiveFieldName}
-                        fields={animatedFields}
-                        tinaForm={tinaForm}
-                      />
-                    </GroupPanel>
-                  )}
-                  {showAnimatedFields && !isForward && (
-                    <GroupPanel2>
-                      <FormFields
-                        path={animatedResult?.path || []}
-                        setActiveFieldName={setActiveFieldName}
-                        fields={animatedFields}
-                        tinaForm={tinaForm}
-                      />
-                    </GroupPanel2>
-                  )}
-                </div>
-                {!hideFooter && (
-                  <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
-                    <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
-                      {tinaForm.reset && (
-                        <ResetForm
-                          pristine={pristine}
-                          reset={async () => {
-                            finalForm.reset()
-                            await tinaForm.reset!()
-                          }}
-                          style={{ flexGrow: 1 }}
-                        >
-                          {tinaForm.buttons.reset}
-                        </ResetForm>
-                      )}
-                      <Button
-                        onClick={safeHandleSubmit}
-                        disabled={!canSubmit}
-                        busy={submitting}
-                        variant="primary"
-                        style={{ flexGrow: 3 }}
+        return (
+          <>
+            <DragDropContext onDragEnd={moveArrayItem}>
+              <FormKeyBindings onSubmit={safeHandleSubmit} />
+              <div className="relative flex flex-col h-full overflow-scroll">
+                <FormFields
+                  path={activePath || []}
+                  setActiveFieldName={setActiveFieldName}
+                  fields={fields}
+                  tinaForm={tinaForm}
+                />
+              </div>
+              {!hideFooter && (
+                <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
+                  <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
+                    {tinaForm.reset && (
+                      <ResetForm
+                        pristine={pristine}
+                        reset={async () => {
+                          finalForm.reset()
+                          await tinaForm.reset!()
+                        }}
+                        style={{ flexGrow: 1 }}
                       >
-                        {submitting && <LoadingDots />}
-                        {!submitting && tinaForm.buttons.save}
-                      </Button>
-                      {tinaForm.actions.length > 0 && (
-                        <FormActionMenu
-                          form={tinaForm as any}
-                          actions={tinaForm.actions}
-                        />
-                      )}
-                    </div>
+                        {tinaForm.buttons.reset}
+                      </ResetForm>
+                    )}
+                    <Button
+                      onClick={safeHandleSubmit}
+                      disabled={!canSubmit}
+                      busy={submitting}
+                      variant="primary"
+                      style={{ flexGrow: 3 }}
+                    >
+                      {submitting && <LoadingDots />}
+                      {!submitting && tinaForm.buttons.save}
+                    </Button>
+                    {tinaForm.actions.length > 0 && (
+                      <FormActionMenu
+                        form={tinaForm as any}
+                        actions={tinaForm.actions}
+                      />
+                    )}
                   </div>
-                )}
-              </DragDropContext>
-            </>
-          )
-        }}
-      </FinalForm>
-    </ActiveFieldContextProvider>
+                </div>
+              )}
+            </DragDropContext>
+          </>
+        )
+      }}
+    </FinalForm>
   )
 }
 
@@ -681,7 +572,7 @@ const GroupPanel = ({ className = '', style = {}, ...props }) => (
   <div
     className={`absolute w-full top-0 bottom-0 left-0 flex flex-col justify-between overflow-hidden ${className}`}
     style={{
-      zIndex: 1000, // testing
+      // zIndex: 1000, // testing
       pointerEvents: 'none',
       animationName: 'fly-in-left',
       animationDuration: '150ms',

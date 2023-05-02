@@ -16,7 +16,6 @@ import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
 import { EmptyList, ListFieldMeta, ListPanel } from './ListFieldMeta'
-import { useActiveFieldContext } from '../use-active-field'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -152,13 +151,10 @@ const Item = ({
   ...p
 }: ItemProps) => {
   const cms = useCMS()
-  const FormPortal = useFormPortal()
-  const [isExpanded, setExpanded] = React.useState<boolean>(false)
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
   const title = label || (field.label || field.name) + ' Item'
-  const { setActiveFieldName } = useActiveFieldContext()
 
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
@@ -192,7 +188,10 @@ const Item = ({
                   return
                 }
 
-                setActiveFieldName(`${field.name}.${index}`)
+                cms.dispatch({
+                  type: 'forms:set-active-field-name',
+                  value: `${field.name}.${index}`,
+                })
               }}
             >
               <GroupLabel>{title}</GroupLabel>

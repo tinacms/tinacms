@@ -6,7 +6,6 @@
 
 import * as React from 'react'
 import { Field, Form } from '../../../forms'
-import { useFormPortal } from '../../../form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import {
   GroupLabel,
@@ -22,7 +21,6 @@ import { BlockSelector } from './BlockSelector'
 import { BlockSelectorBig } from './BlockSelectorBig'
 import { BiPencil } from 'react-icons/bi'
 import { EmptyList, ListFieldMeta, ListPanel } from '../ListFieldMeta'
-import { useActiveFieldContext } from '../../use-active-field'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -190,8 +188,6 @@ const BlockListItem = ({
   fixedLength,
 }: BlockListItemProps) => {
   const cms = useCMS()
-  const FormPortal = useFormPortal()
-  const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
@@ -199,8 +195,6 @@ const BlockListItem = ({
 
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
-
-  const { setActiveFieldName } = useActiveFieldContext()
 
   return (
     <Draggable
@@ -222,7 +216,10 @@ const BlockListItem = ({
                   return
                 }
 
-                setActiveFieldName(`${field.name}.${index}`)
+                cms.dispatch({
+                  type: 'forms:set-active-field-name',
+                  value: `${field.name}.${index}`,
+                })
                 // setExpanded(true)
                 setFocusedField({
                   id: tinaForm.id,

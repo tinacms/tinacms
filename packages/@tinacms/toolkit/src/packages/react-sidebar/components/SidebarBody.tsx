@@ -7,15 +7,14 @@
 import * as React from 'react'
 
 import { Form } from '../../forms'
-import { FormList, FormLists } from './FormList'
-import { useCMS } from '../../../react-tinacms'
+import { FormLists } from './FormList'
+import { useCMS } from '../../react-core'
 import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
 import { BiChevronLeft } from 'react-icons/bi'
 import { useWindowWidth } from '@react-hook/window-size'
 import { PendingFormsPlaceholder } from './NoFormsPlaceHolder'
-import { VisualEditingContext } from '../../form-builder/use-visual-editing'
 
 export const FormsView = ({
   children,
@@ -29,6 +28,11 @@ export const FormsView = ({
       ? // @ts-ignore
         cms.sidebar.renderNav
       : true
+
+  React.useEffect(() => {
+    cms.dispatch({ type: 'set-edit-mode', value: 'visual' })
+    return () => cms.dispatch({ type: 'set-edit-mode', value: 'basic' })
+  }, [])
 
   const forms = cms.state.forms
   const isMultiform = forms.length > 1
@@ -64,7 +68,6 @@ export const FormsView = ({
             <MultiformFormHeader
               renderNav={renderNav}
               activeForm={activeForm}
-              setActiveFormId={setActiveFormId}
             />
           )}
           {!isMultiform && (
@@ -76,14 +79,7 @@ export const FormsView = ({
                 <meta.Component />
               </React.Fragment>
             ))}
-          <FormBuilder
-            cms={cms}
-            form={activeForm as any}
-            // setActiveFormId={setActiveFormId}
-            // // onPristineChange={setFormIsPristine}
-            // activeFieldName={activeFieldName}
-            // setActiveFieldName={setActiveFieldName}
-          />
+          <FormBuilder form={activeForm as any} />
         </FormWrapper>
       )}
     </>
@@ -97,39 +93,35 @@ interface FormWrapperProps {
 
 const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
   return (
-    <VisualEditingContext.Provider value={{ visualEditing: true }}>
-      <div
-        className="flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white"
-        style={
-          isEditing
-            ? {
-                transform: 'none',
-                animationName: 'fly-in-left',
-                animationDuration: '150ms',
-                animationDelay: '0',
-                animationIterationCount: 1,
-                animationTimingFunction: 'ease-out',
-              }
-            : {
-                transform: 'translate3d(100%, 0, 0)',
-              }
-        }
-      >
-        {children}
-      </div>
-    </VisualEditingContext.Provider>
+    <div
+      className="flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white"
+      style={
+        isEditing
+          ? {
+              transform: 'none',
+              animationName: 'fly-in-left',
+              animationDuration: '150ms',
+              animationDelay: '0',
+              animationIterationCount: 1,
+              animationTimingFunction: 'ease-out',
+            }
+          : {
+              transform: 'translate3d(100%, 0, 0)',
+            }
+      }
+    >
+      {children}
+    </div>
   )
 }
 
 export interface MultiformFormHeaderProps {
   activeForm: Form
-  setActiveFormId(_id: string): void
   renderNav?: boolean
 }
 
 export const MultiformFormHeader = ({
   activeForm,
-  setActiveFormId,
   renderNav,
 }: MultiformFormHeaderProps) => {
   const cms = useCMS()
@@ -154,7 +146,10 @@ export const MultiformFormHeader = ({
               // @ts-ignore
               cms.alerts.error('Cannot navigate away from an invalid form.')
             } else {
-              setActiveFormId('')
+              cms.dispatch({
+                type: 'forms:set-active-form-id',
+                value: null,
+              })
             }
           }}
         >

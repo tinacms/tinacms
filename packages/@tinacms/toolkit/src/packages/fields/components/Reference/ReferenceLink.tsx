@@ -7,7 +7,6 @@
 import * as React from 'react'
 import type { TinaCMS } from '../../../../tina-cms'
 import { BiEdit } from 'react-icons/bi'
-import { useVisualEditingContext } from '../../../form-builder/use-visual-editing'
 
 interface ReferenceLinkProps {
   cms: TinaCMS
@@ -76,7 +75,7 @@ const GetReference = ({ cms, id, children }) => {
 const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
   const hasTinaAdmin = cms.flags.get('tina-admin') === false ? false : true
   const tinaPreview = cms.flags.get('tina-preview') || false
-  const { visualEditing } = useVisualEditingContext()
+  const visualEditing = cms.state.editingMode === 'visual'
 
   if (!hasTinaAdmin) {
     return null
@@ -90,9 +89,9 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
             type="button"
             // TODO: use context to determine if this is in the visual editor
             onClick={() => {
-              cms.events.dispatch({
-                type: 'field:selected',
-                value: `${document._sys.path}#name`,
+              cms.dispatch({
+                type: 'forms:set-active-form-id',
+                value: input.value,
               })
             }}
             className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"

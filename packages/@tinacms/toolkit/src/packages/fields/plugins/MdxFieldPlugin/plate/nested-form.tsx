@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 import React from 'react'
 import { useFormPortal, FormBuilder } from '../../../../form-builder'
 import { PanelHeader, GroupPanel } from '../../GroupFieldPlugin'
@@ -19,7 +13,6 @@ export const NestedForm = (props: {
   onChange: (values: object) => void
 }) => {
   const FormPortal = useFormPortal()
-  // const id = [editorContext.formId, props.id].join('.')
   const id = React.useMemo(() => uuid(), [props.id])
   const form = React.useMemo(() => {
     return new Form({

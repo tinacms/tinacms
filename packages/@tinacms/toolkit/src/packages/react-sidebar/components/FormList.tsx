@@ -104,7 +104,7 @@ export const FormLists = (props: {
         leaveTo="opacity-0 -translate-x-1/2"
       >
         {cms.state.formLists.map((formList) => (
-          <div className="pt-16">
+          <div key={formList.id} className="pt-16">
             {/* TODO: add labels for each list */}
             <FormList
               isEditing={props.isEditing}

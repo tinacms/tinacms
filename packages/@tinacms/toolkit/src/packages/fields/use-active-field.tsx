@@ -1,25 +1,13 @@
-import React, { useContext } from 'react'
-
-const ActiveFieldContext = React.createContext({
-  activeFieldName: null,
-  setActiveFieldName: (value: string) => {},
-})
-
-export const ActiveFieldContextProvider = ActiveFieldContext.Provider
-
-export const useActiveFieldContext = () => {
-  const context = useContext(ActiveFieldContext)
-
-  return context
-}
+import React from 'react'
+import { useCMS } from '../react-core'
 
 export const useActiveFieldCallback = (name: string, callback: () => void) => {
-  const context = useContext(ActiveFieldContext)
+  const cms = useCMS()
   React.useEffect(() => {
-    if (context.activeFieldName === name) {
+    if (cms.state.activeFieldName === name) {
       setTimeout(() => {
         callback()
       }, 150)
     }
-  }, [context.activeFieldName, name])
+  }, [cms.state.activeFieldName, name])
 }

@@ -31,33 +31,28 @@ export const Preview = React.forwardRef<
     if (status === 'ready') {
       if (activeField) {
         setSearchParams({})
-        const [formID, fieldName] = activeField.split('__')
-        if (formID && fieldName) {
-          cms.events.dispatch({
-            type: 'field:selected',
-            value: `${formID}#${fieldName}`,
+        const [formId, fieldName] = activeField.split('__')
+        if (formId && fieldName) {
+          cms.dispatch({ type: 'forms:set-active-form-id', value: formId })
+          cms.dispatch({
+            type: 'forms:set-active-field-name',
+            value: fieldName,
           })
         }
       }
     }
   }, [status])
 
-  const pressed = useKeyPress()
-
-  // React.useEffect(() => {
-  //   if (pressed) {
-  //     iframeRef.current?.contentWindow?.postMessage({
-  //       type: 'isEdit',
-  //     })
-  //   }
-  // }, [pressed])
-
   const handleMessage = (e: MessageEvent) => {
     if (e.data.type === 'field:selected') {
-      cms.events.dispatch({
-        type: 'field:selected',
-        value: e.data.fieldName,
-      })
+      const [formId, fieldName] = e.data.fieldName.split('#')
+      if (formId && fieldName) {
+        cms.dispatch({ type: 'forms:set-active-form-id', value: formId })
+        cms.dispatch({
+          type: 'forms:set-active-field-name',
+          value: fieldName,
+        })
+      }
     }
   }
 
@@ -83,44 +78,3 @@ export const Preview = React.forwardRef<
     </div>
   )
 })
-
-function useKeyPress() {
-  const targetKey = 'e'
-  const metaKey = 'Meta'
-  // State for keeping track of whether key is pressed
-  const [keyPressed, setKeyPressed] = React.useState<boolean>(false)
-  const [metaPressed, setMetaPressed] = React.useState<boolean>(false)
-
-  // If pressed key is our target key then set to true
-  const downHandler = React.useCallback(
-    function downHandler({ key }: { key: string }) {
-      if (key === targetKey) {
-        setKeyPressed(true)
-      }
-      if (key === metaKey) {
-        setMetaPressed(true)
-      }
-    },
-    [metaPressed]
-  )
-  // If released key is our target key then set to false
-  const upHandler = ({ key }: { key: string }) => {
-    if (key === targetKey) {
-      setKeyPressed(false)
-    }
-    if (key === metaKey) {
-      setMetaPressed(false)
-    }
-  }
-  // Add event listeners
-  React.useEffect(() => {
-    window.addEventListener('keydown', downHandler)
-    window.addEventListener('keyup', upHandler)
-    // Remove event listeners on cleanup
-    return () => {
-      window.removeEventListener('keydown', downHandler)
-      window.removeEventListener('keyup', upHandler)
-    }
-  }, []) // Empty array ensures that effect is only run on mount and unmount
-  return keyPressed && metaPressed
-}

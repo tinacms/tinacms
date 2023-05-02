@@ -270,6 +270,112 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       }
     })
   }
+
+  getFieldGroup({ form, fieldName, values, prefix }): {
+    fields: Field[]
+    activePath: string[]
+  } {
+    const previous = { activePath: prefix, fields: form.fields }
+    if (!fieldName) {
+      return previous
+    }
+    const [name, ...rest] = fieldName.split('.')
+    const field = form.fields.find((field) => field.name === name)
+    const value = values[name]
+    // When a new form is selected, the fieldName may still
+    // be from a previous render
+    if (!field) {
+      return { fields: form.fields, activePath: prefix }
+    }
+    if (field.type === 'object') {
+      if (field.templates) {
+        if (field.list) {
+          const [index, ...rest2] = rest
+          if (index) {
+            const value2 = value[index]
+            const template = field.templates[value2._template]
+            if (rest2.length) {
+              const result = this.getFieldGroup({
+                form: template,
+                fieldName: rest2.join('.'),
+                values: value2,
+                prefix: [...prefix, name, index],
+              })
+              if (result) {
+                return result
+              }
+            }
+            return {
+              activePath: [...prefix, name, index],
+              fields: template.fields.map((field) => {
+                return {
+                  ...field,
+                  name: `${[...prefix, name, index].join('.')}.${field.name}`,
+                }
+              }),
+            }
+          } else {
+            return previous
+          }
+        } else {
+          return previous
+        }
+      }
+      if (field.fields) {
+        if (field.list) {
+          const [index, ...rest2] = rest
+          if (index) {
+            const value2 = value[index]
+            if (rest2.length) {
+              const result = this.getFieldGroup({
+                form: field,
+                fieldName: rest2.join('.'),
+                values: value2,
+                prefix: [...prefix, name, index],
+              })
+              if (result) {
+                return result
+              }
+            }
+            return {
+              activePath: [...prefix, name, index],
+              fields: field.fields.map((field) => {
+                return {
+                  ...field,
+                  name: `${[...prefix, name, index].join('.')}.${field.name}`,
+                }
+              }),
+            }
+          } else {
+            return previous
+          }
+        } else {
+          if (rest.length) {
+            const result = this.getFieldGroup({
+              form: field,
+              fieldName: rest.join('.'),
+              values: value,
+              prefix: [...prefix, name],
+            })
+            if (result) {
+              return result
+            }
+          }
+          return {
+            activePath: [...prefix, name],
+            fields: field.fields.map((field) => {
+              return {
+                ...field,
+                name: `${[...prefix, name].join('.')}.${field.name}`,
+              }
+            }),
+          }
+        }
+      }
+    } else {
+      return previous
+    }
+  }
 }
 
 function updateEverything<S>(form: FormApi<any>, values: S) {

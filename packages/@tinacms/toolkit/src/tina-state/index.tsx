@@ -32,30 +32,38 @@ export type TinaAction =
       value: string
     }
   | {
-      type: 'forms:set-active-field-path'
-      value: (string | number)[]
+      type: 'forms:set-active-field-name'
+      value: string
     }
   | {
       type: 'form-list:clear'
     }
+  | {
+      type: 'set-edit-mode'
+      value: 'visual' | 'basic'
+    }
 
 export interface TinaState {
   activeFormId: string | null
-  activeFieldPath: (string | number)[]
+  activeFieldName: string | null
   forms: Form[]
   formLists: FormList[]
+  editingMode: 'visual' | 'basic'
 }
 
 export const initialState = {
   activeFormId: null,
-  activeFieldPath: null,
+  activeFieldName: null,
   forms: [],
   formLists: [],
+  editingMode: 'basic',
 }
 
 // Our reducer function that uses a switch statement to handle our actions
 export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
   switch (action.type) {
+    case 'set-edit-mode':
+      return { ...state, editingMode: action.value }
     case 'forms:add':
       if (state.forms.find((f) => f.id === action.value.id)) {
         return state
@@ -92,13 +100,21 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         // when `useTina` hooks are mounting client-side as a result of the app itself
         // rather than route navigation
         activeFormId: null,
+        activeFieldName: null,
         formLists: nextFormLists,
       }
     }
     case 'forms:set-active-form-id':
-      return { ...state, activeFormId: action.value, activeFieldPath: [] }
-    case 'forms:set-active-field-path':
-      return { ...state, activeFieldPath: action.value }
+      if (action.value !== state.activeFormId) {
+        return {
+          ...state,
+          activeFormId: action.value,
+          activeFieldName: null,
+        }
+      }
+      return state
+    case 'forms:set-active-field-name':
+      return { ...state, activeFieldName: action.value }
     default:
       throw new Error(`Unhandled action ${action.type}`)
       return state

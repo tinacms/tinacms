@@ -5,7 +5,6 @@ import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
 import { IoMdClose } from 'react-icons/io'
 import { wrapFieldWithError } from './wrapFieldWithMeta'
-import { useActiveFieldContext } from '../use-active-field'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -22,7 +21,6 @@ export interface GroupProps {
 
 export const Group = wrapFieldWithError(({ tinaForm, field }: GroupProps) => {
   const cms = useCMS()
-  const { setActiveFieldName } = useActiveFieldContext()
   return (
     <>
       <Header
@@ -34,7 +32,10 @@ export const Group = wrapFieldWithError(({ tinaForm, field }: GroupProps) => {
             return
           }
 
-          setActiveFieldName(field.name)
+          cms.dispatch({
+            type: 'forms:set-active-field-name',
+            value: field.name,
+          })
         }}
       >
         {field.label || field.name}
