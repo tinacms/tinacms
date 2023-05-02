@@ -1149,7 +1149,7 @@ export class Database {
       const normalPath = normalizePath(collection.path)
       const format = collection.format || 'md'
       // Get all possible paths for this collection
-      const documentPaths = await this.bridge.glob(normalPath, format)
+      const documentPaths = await this.bridge.glob(normalPath, `\.${format}`)
 
       // filter paths based on match and exclude
       const matches = this.tinaSchema.getMatches({ collection })
