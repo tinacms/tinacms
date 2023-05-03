@@ -198,7 +198,7 @@ const config = defineStaticConfig({
                       /* @ts-ignore */
                       <Select
                         {...props}
-                        // show the font name in the given font
+                        // show the color in front of the label
                         prefixComponent={({ option, active }) => {
                           let color = "bg-gray-900";
                           if (option.value === "primary") {
