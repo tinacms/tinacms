@@ -131,7 +131,14 @@ export const RenderForm = ({
   templateName,
   mutationInfo,
   customDefaults,
-}: any) => {
+}: {
+  cms: TinaCMS
+  collection
+  folder
+  templateName
+  mutationInfo
+  customDefaults
+}) => {
   const navigate = useNavigate()
   const [formIsPristine, setFormIsPristine] = useState(true)
   const schema: TinaSchema | undefined = cms.api.tina.schema
@@ -287,6 +294,20 @@ export const RenderForm = ({
   const renderNavToggle = windowWidth < navBreakpoint + 1
   const headerPadding = renderNavToggle ? 'px-20' : 'px-6'
 
+  React.useEffect(() => {
+    cms.dispatch({ type: 'forms:add', value: form })
+    cms.dispatch({ type: 'forms:set-active-form-id', value: form.id })
+    return () => {
+      cms.dispatch({ type: 'forms:remove', value: form.id })
+    }
+  }, [JSON.stringify(formInfo.fields)])
+  if (!cms.state.activeFormId) {
+    return null
+  }
+  const activeForm = cms.state.forms.find(
+    ({ tinaForm }) => tinaForm.id === form.id
+  )
+
   return (
     <PageWrapper>
       <>
@@ -316,7 +337,9 @@ export const RenderForm = ({
             <FormStatus pristine={formIsPristine} />
           </div>
         </div>
-        <FormBuilder form={form} onPristineChange={setFormIsPristine} />
+        {activeForm && (
+          <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
+        )}
       </>
     </PageWrapper>
   )

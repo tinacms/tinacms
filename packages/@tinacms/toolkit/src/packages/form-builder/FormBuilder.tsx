@@ -9,13 +9,11 @@ import { Form as FinalForm } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { Button } from '../styles'
-import { ModalProvider } from '../react-modals'
 import { LoadingDots } from './LoadingDots'
 import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
 import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
-import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
 import { IoMdClose } from 'react-icons/io'
 import { Transition } from '@headlessui/react'
@@ -248,119 +246,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         )
       }}
     </FinalForm>
-  )
-}
-
-export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
-  form: tinaForm,
-  label,
-}) => {
-  /**
-   * > Why is a `key` being set when this isn't an array?
-   *
-   * `FinalForm` does not update when given a new `form` prop.
-   *
-   * We can force `FinalForm` to update by setting the `key` to
-   * the name of the form. When the name changes React will
-   * treat it as a new instance of `FinalForm`, destroying the
-   * old `FinalForm` componentt and create a new one.
-   *
-   * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
-   */
-  const [i, setI] = React.useState(0)
-  React.useEffect(() => {
-    setI((i) => i + 1)
-  }, [tinaForm])
-
-  const finalForm = tinaForm.finalForm
-
-  const moveArrayItem = React.useCallback(
-    (result: DropResult) => {
-      if (!result.destination || !finalForm) return
-      const name = result.type
-      finalForm.mutators.move(
-        name,
-        result.source.index,
-        result.destination.index
-      )
-    },
-    [tinaForm]
-  )
-
-  return (
-    <ModalProvider>
-      <FinalForm
-        form={finalForm}
-        key={`${i}: ${tinaForm.id}`}
-        onSubmit={tinaForm.onSubmit}
-      >
-        {({ handleSubmit, pristine, invalid, submitting }) => {
-          const canSubmit = !pristine && !submitting && !invalid
-
-          const safeHandleSubmit = () => {
-            if (canSubmit) {
-              handleSubmit()
-            }
-          }
-
-          return (
-            <DragDropContext onDragEnd={moveArrayItem}>
-              <FormKeyBindings onSubmit={safeHandleSubmit} />
-
-              <div className="w-full h-screen flex flex-col items-center">
-                <div className="px-6 py-4 w-full bg-white border-b border-gray-150 shadow-sm sticky flex flex-wrap gap-x-6 gap-y-3 justify-between items-center">
-                  {label && (
-                    <h4 className="font-bold font-sans text-lg opacity-80">
-                      {label}
-                    </h4>
-                  )}
-                  <div className="flex flex-1 gap-4 items-center justify-end">
-                    <FormStatus pristine={pristine} />
-                    {tinaForm.reset && (
-                      <ResetForm
-                        pristine={pristine}
-                        reset={async () => {
-                          finalForm.reset()
-                          await tinaForm.reset!()
-                        }}
-                        style={{ flexBasis: '7rem' }}
-                      >
-                        {tinaForm.buttons.reset}
-                      </ResetForm>
-                    )}
-                    <Button
-                      onClick={safeHandleSubmit}
-                      disabled={!canSubmit}
-                      busy={submitting}
-                      variant="primary"
-                      style={{ flexBasis: '10rem' }}
-                    >
-                      {submitting && <LoadingDots />}
-                      {!submitting && tinaForm.buttons.save}
-                    </Button>
-                    {tinaForm.actions.length > 0 && (
-                      <FormActionMenu
-                        form={tinaForm as any}
-                        actions={tinaForm.actions}
-                      />
-                    )}
-                  </div>
-                </div>
-                <FormPortalProvider>
-                  <FormWrapper id={tinaForm.id}>
-                    {tinaForm && tinaForm.fields.length ? (
-                      <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
-                    ) : (
-                      <NoFieldsPlaceholder />
-                    )}
-                  </FormWrapper>
-                </FormPortalProvider>
-              </div>
-            </DragDropContext>
-          )
-        }}
-      </FinalForm>
-    </ModalProvider>
   )
 }
 

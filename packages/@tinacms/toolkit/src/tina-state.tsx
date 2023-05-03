@@ -17,6 +17,10 @@ export type TinaAction =
       value: Form
     }
   | {
+      type: 'forms:remove'
+      value: string
+    }
+  | {
       type: 'forms:clear'
     }
   | {
@@ -73,6 +77,11 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         return state
       }
       return { ...state, forms: [...state.forms, { tinaForm: action.value }] }
+    case 'forms:remove':
+      return {
+        ...state,
+        forms: state.forms.filter((form) => form.tinaForm.id !== action.value),
+      }
     case 'form-lists:add': {
       if (state.formLists.find((f) => f.id === action.value.id)) {
         return state
