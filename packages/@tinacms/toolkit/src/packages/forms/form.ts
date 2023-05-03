@@ -117,10 +117,10 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   /**
    * A unique identifier for Forms.
    *
-   * @alias id
+   * @deprecated use id instead
    */
   get name() {
-    return this.id
+    return undefined
   }
 
   /**

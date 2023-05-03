@@ -162,7 +162,7 @@ export const MultiformFormHeader = ({
           Return to Form List
         </button>
         <span className="block w-full text-xl mb-[6px] text-gray-700 font-medium leading-tight">
-          {activeForm.tinaForm.label || activeForm.tinaForm.name}
+          {activeForm.tinaForm.label || activeForm.tinaForm.id}
         </span>
         <FormStatus pristine={formIsPristine} />
       </div>

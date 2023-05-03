@@ -18,6 +18,7 @@ import { FormActionMenu } from './FormActions'
 import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
 import { IoMdClose } from 'react-icons/io'
+import { Transition } from '@headlessui/react'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -82,6 +83,18 @@ const FormKeyBindings: FC<FormKeyBindingsProps> = ({ onSubmit }) => {
   return null
 }
 
+function usePrevious(value) {
+  // The ref object is a generic container whose current property is mutable ...
+  // ... and can hold any value, similar to an instance property on a class
+  const ref = React.useRef(null)
+  // Store current value in ref
+  useEffect(() => {
+    ref.current = value
+  }, [value]) // Only re-run if value changes
+  // Return previous value (happens before update in useEffect above)
+  return ref.current
+}
+
 export const FormBuilder: FC<FormBuilderProps> = ({
   form,
   onPristineChange,
@@ -136,6 +149,18 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   }, [finalForm])
 
   const fieldGroup = tinaForm.getActiveField(form.activeFieldName)
+  const previousName = usePrevious(fieldGroup.name)
+  const animateStatus =
+    fieldGroup.name === previousName
+      ? 'none'
+      : fieldGroup.name
+      ? previousName
+        ? previousName.length < fieldGroup.name.length
+          ? 'forwards'
+          : 'backwards'
+        : 'forwards'
+      : 'backwards'
+  const animationProps = getAnimationProps(animateStatus)
 
   return (
     <FinalForm form={tinaForm.finalForm} onSubmit={tinaForm.onSubmit}>
@@ -163,16 +188,26 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           <>
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormKeyBindings onSubmit={safeHandleSubmit} />
-
               <FormPortalProvider>
-                <PanelHeader {...fieldGroup} id={tinaForm.id} />
-                <FormWrapper id={tinaForm.id}>
-                  {tinaForm && tinaForm.fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={fieldGroup.fields} />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  )}
-                </FormWrapper>
+                <Transition
+                  className="h-full bg-gray-50"
+                  appear={true}
+                  show={true}
+                  key={fieldGroup.name}
+                  {...animationProps}
+                >
+                  <PanelHeader {...fieldGroup} id={tinaForm.id} />
+                  <FormWrapper id={tinaForm.id}>
+                    {tinaForm && tinaForm.fields.length ? (
+                      <FieldsBuilder
+                        form={tinaForm}
+                        fields={fieldGroup.fields}
+                      />
+                    ) : (
+                      <NoFieldsPlaceholder />
+                    )}
+                  </FormWrapper>
+                </Transition>
               </FormPortalProvider>
               {!hideFooter && (
                 <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
@@ -412,4 +447,29 @@ const PanelHeader = (props: { label?: string; name?: string; id: string }) => {
       </div>
     </button>
   )
+}
+
+const getAnimationProps = (animateStatus) => {
+  const forwardsAnimation = {
+    enter: 'transform transition ease-in-out duration-500 sm:duration-700',
+    enterFrom: 'translate-x-8',
+    enterTo: 'translate-x-0',
+    leave: 'transform transition ease-in-out duration-500 sm:duration-700',
+    leaveFrom: 'translate-x-0',
+    leaveTo: 'translate-x-8',
+  }
+  const backwardsAnimation = {
+    enter: 'transform transition ease-in-out duration-500 sm:duration-700',
+    enterFrom: '-translate-x-8',
+    enterTo: 'translate-x-0',
+    leave: 'transform transition ease-in-out duration-500 sm:duration-700',
+    leaveFrom: 'translate-x-0',
+    leaveTo: '-translate-x-8',
+  }
+
+  return animateStatus === 'backwards'
+    ? backwardsAnimation
+    : animateStatus === 'forwards'
+    ? forwardsAnimation
+    : {}
 }
