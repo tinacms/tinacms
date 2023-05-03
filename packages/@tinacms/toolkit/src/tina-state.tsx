@@ -53,7 +53,10 @@ export interface TinaState {
    * Forms are wrapped here because we need `activeFieldName` to be reactive, so adding it as a propery
    * on the Form class won't work, unfortunately. So "form" at this level means tinaForm + activeFieldName
    *
-   * TODO: maybe rename this so that it's more clear???
+   * The activeFieldName should probably not be in global state, and having it here means that forms
+   * only work if they're registered as part of this top-level state. At the risk of touching too much code
+   * all at once, putting state this high up at least allows us to not have to touch the Form class too much.
+   * Longer term, replaceing Form with something stateful seems like the right approach
    */
   forms: { activeFieldName?: string | null; tinaForm: Form }[]
   formLists: FormList[]

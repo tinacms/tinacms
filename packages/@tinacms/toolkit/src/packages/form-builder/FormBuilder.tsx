@@ -157,7 +157,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           ? 'forwards'
           : 'backwards'
         : 'forwards'
-      : 'backwards'
+      : 'none'
   const animationProps = getAnimationProps(animateStatus)
 
   return (
@@ -194,8 +194,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                   key={fieldGroup.name}
                   {...animationProps}
                 >
-                  <PanelHeader {...fieldGroup} id={tinaForm.id} />
-                  <FormWrapper id={tinaForm.id}>
+                  <FormWrapper
+                    header={<PanelHeader {...fieldGroup} id={tinaForm.id} />}
+                    id={tinaForm.id}
+                  >
                     {tinaForm && tinaForm.fields.length ? (
                       <FieldsBuilder
                         form={tinaForm}
@@ -272,14 +274,17 @@ export const FormStatus = ({ pristine }) => {
   )
 }
 
-export const FormWrapper = ({ children, id }) => {
+export const FormWrapper = ({ header, children, id }) => {
   return (
     <div
       data-test={`form:${id?.replace(/\\/g, '/')}`}
-      className="h-full overflow-y-auto max-h-full bg-gray-50 py-5 px-6"
+      className="h-full overflow-y-auto max-h-full bg-gray-50"
     >
-      <div className="w-full flex justify-center">
-        <div className="w-full max-w-form">{children}</div>
+      {header}
+      <div className="py-5 px-6">
+        <div className="w-full flex justify-center">
+          <div className="w-full max-w-form">{children}</div>
+        </div>
       </div>
     </div>
   )
