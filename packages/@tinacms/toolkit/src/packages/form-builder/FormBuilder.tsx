@@ -17,9 +17,10 @@ import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
 import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
+import { IoMdClose } from 'react-icons/io'
 
 export interface FormBuilderProps {
-  form: Form
+  form: { tinaForm: Form; activeFieldName?: string }
   hideFooter?: boolean
   label?: string
   onPristineChange?: (_pristine: boolean) => unknown
@@ -82,29 +83,15 @@ const FormKeyBindings: FC<FormKeyBindingsProps> = ({ onSubmit }) => {
 }
 
 export const FormBuilder: FC<FormBuilderProps> = ({
-  form: tinaForm,
+  form,
   onPristineChange,
   ...rest
 }) => {
+  const cms = useCMS()
   const hideFooter = !!rest.hideFooter
-  /**
-   * > Why is a `key` being set when this isn't an array?
-   *
-   * `FinalForm` does not update when given a new `form` prop.
-   *
-   * We can force `FinalForm` to update by setting the `key` to
-   * the name of the form. When the name changes React will
-   * treat it as a new instance of `FinalForm`, destroying the
-   * old `FinalForm` componentt and create a new one.
-   *
-   * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
-   */
-  const [i, setI] = React.useState(0)
-  React.useEffect(() => {
-    setI((i) => i + 1)
-  }, [tinaForm])
 
-  const finalForm = tinaForm.finalForm
+  const tinaForm = form.tinaForm
+  const finalForm = form.tinaForm.finalForm
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
@@ -148,18 +135,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     }
   }, [finalForm])
 
-  // This will be needed when we add rename and delete functionality to this page
-  // const cms = useCMS()
-  // const id: string = tinaForm.id
-  // const schema = cms.api.tina.schema
-  // const collection = schema.getCollectionByFullPath(id)
+  const fieldGroup = tinaForm.getActiveField(form.activeFieldName)
 
   return (
-    <FinalForm
-      form={finalForm}
-      key={`${i}: ${tinaForm.id}`}
-      onSubmit={tinaForm.onSubmit}
-    >
+    <FinalForm form={tinaForm.finalForm} onSubmit={tinaForm.onSubmit}>
       {({
         handleSubmit,
         pristine,
@@ -186,9 +165,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
               <FormKeyBindings onSubmit={safeHandleSubmit} />
 
               <FormPortalProvider>
+                <PanelHeader {...fieldGroup} id={tinaForm.id} />
                 <FormWrapper id={tinaForm.id}>
                   {tinaForm && tinaForm.fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
+                    <FieldsBuilder form={tinaForm} fields={fieldGroup.fields} />
                   ) : (
                     <NoFieldsPlaceholder />
                   )}
@@ -391,3 +371,45 @@ const Emoji = ({ className = '', ...props }) => (
     {...props}
   />
 )
+
+const isNumber = (item: string) => {
+  return !isNaN(Number(item))
+}
+
+const PanelHeader = (props: { label?: string; name?: string; id: string }) => {
+  const cms = useCMS()
+  const activePath = props.name?.split('.') || []
+  if (!activePath || activePath.length === 0) {
+    return null
+  }
+
+  let lastItemIndex
+  activePath.forEach((item, index) => {
+    if (!isNumber(item)) {
+      lastItemIndex = index
+    }
+  })
+  const returnPath = activePath.slice(0, lastItemIndex)
+
+  return (
+    <button
+      className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
+   border-gray-100 px-6 -mt-px`}
+      onClick={() => {
+        cms.dispatch({
+          type: 'forms:set-active-field-name',
+          value: {
+            formId: props.id,
+            fieldName: returnPath.length > 0 ? returnPath.join('.') : null,
+          },
+        })
+      }}
+      tabIndex={-1}
+    >
+      <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
+        {props.label || props.name || 'Back'}
+        <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+      </div>
+    </button>
+  )
+}

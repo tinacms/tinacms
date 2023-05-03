@@ -30,12 +30,14 @@ const Editor = (props) => {
 
 const SetPreview = ({ outputFolder }: { outputFolder: string }) => {
   const cms = useCMS()
-  cms.flags.set('tina-preview', outputFolder)
-  // Override original 'rich-text' field with one that has raw mode support
-  cms.fields.add({
-    ...MdxFieldPluginExtendible,
-    Component: Editor,
-  })
+  React.useEffect(() => {
+    cms.flags.set('tina-preview', outputFolder)
+    // Override original 'rich-text' field with one that has raw mode support
+    cms.fields.add({
+      ...MdxFieldPluginExtendible,
+      Component: Editor,
+    })
+  }, [])
   return null
 }
 

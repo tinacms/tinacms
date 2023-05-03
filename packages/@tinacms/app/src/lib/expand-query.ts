@@ -229,3 +229,29 @@ export const isNodeType = (type: G.GraphQLOutputType) => {
     }
   }
 }
+
+export const isConnectionType = (type: G.GraphQLOutputType) => {
+  const namedType = G.getNamedType(type)
+  if (G.isInterfaceType(namedType)) {
+    if (namedType.name === 'Connection') {
+      return true
+    }
+  }
+  if (G.isUnionType(namedType)) {
+    const types = namedType.getTypes()
+    if (
+      types.every((type) => {
+        return type.getInterfaces().some((intfc) => intfc.name === 'Connection')
+      })
+    ) {
+      return true
+    }
+  }
+  if (G.isObjectType(namedType)) {
+    if (
+      namedType.getInterfaces().some((intfc) => intfc.name === 'Connection')
+    ) {
+      return true
+    }
+  }
+}
