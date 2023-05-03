@@ -356,6 +356,33 @@ describe('collectConditionsForField', () => {
       filterPath: fieldName,
       filterExpression: {
         _type: field.type,
+        _list: false,
+        ...filterExpression,
+      },
+    }
+    collectConditionsForField(fieldName, field, filterNode, '', collector)
+    expect(conditions).toHaveLength(1)
+    expect(conditions[0]).toEqual(expectedCondition)
+  })
+
+  it('collects conditions for simple filter on list field', () => {
+    const conditions: FilterCondition[] = []
+    const collector = (condition: FilterCondition) => conditions.push(condition)
+    const fieldName = 'age'
+    const field: TinaField = {
+      type: 'number',
+      list: true,
+      name: fieldName,
+    }
+    const filterExpression: Record<string, any> = {
+      gte: 18,
+    }
+    const filterNode = filterExpression
+    const expectedCondition: FilterCondition = {
+      filterPath: fieldName,
+      filterExpression: {
+        _type: field.type,
+        _list: true,
         ...filterExpression,
       },
     }
@@ -390,6 +417,7 @@ describe('collectConditionsForField', () => {
       filterPath: `${parentFieldName}[*].${childFieldName}`,
       filterExpression: {
         _type: (field.fields[0] as TinaField).type,
+        _list: false,
         ...filterExpression,
       },
     }
@@ -424,6 +452,7 @@ describe('collectConditionsForField', () => {
       filterPath: `${parentFieldName}.${childFieldName}`,
       filterExpression: {
         _type: (field.fields[0] as TinaField).type,
+        _list: false,
         ...filterExpression,
       },
     }
@@ -468,6 +497,7 @@ describe('collectConditionsForField', () => {
       filterPath: `${parentFieldName}.${childFieldName}.${grandchildFieldName}`,
       filterExpression: {
         _type: type,
+        _list: false,
         ...filterExpression,
       },
     }
@@ -548,6 +578,7 @@ describe('collectConditionsForField', () => {
       filterPath: `${parentFieldName}[?(@._template=="${templateName}")].${childFieldName}`,
       filterExpression: {
         _type: childType,
+        _list: false,
         ...filterExpression,
       },
     }
@@ -601,6 +632,7 @@ describe('collectConditionsForField', () => {
       filterPath: `${rootFieldName}.${parentFieldName}[?(@._template=="${templateName}")].${childFieldName}`,
       filterExpression: {
         _type: childType,
+        _list: false,
         ...filterExpression,
       },
     }
