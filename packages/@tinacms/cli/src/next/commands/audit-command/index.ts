@@ -63,8 +63,7 @@ export class AuditCommand extends Command {
       Number(this.datalayerPort),
       this.clean ? undefined : new AuditFileSystemBridge(configManager.rootPath)
     )
-    const { tinaSchema, graphQLSchema } = await buildSchema(
-      database,
+    const { tinaSchema, graphQLSchema, lookup } = await buildSchema(
       configManager.config
     )
 
@@ -74,6 +73,7 @@ export class AuditCommand extends Command {
         const res = await database.indexContent({
           graphQLSchema,
           tinaSchema,
+          lookup,
         })
         warnings.push(...res.warnings)
       },

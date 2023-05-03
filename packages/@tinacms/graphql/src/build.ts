@@ -3,8 +3,7 @@
 */
 
 import _ from 'lodash'
-import fs from 'fs-extra'
-import { print, OperationDefinitionNode, DocumentNode } from 'graphql'
+import { print, OperationDefinitionNode } from 'graphql'
 import { TinaSchema, Config } from '@tinacms/schema-tools'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 
@@ -13,18 +12,15 @@ import { sequential } from './util'
 import { createBuilder } from './builder'
 import { createSchema } from './schema/createSchema'
 import { extractInlineTypes } from './ast-builder'
-import path from 'path'
 
 import type { Builder } from './builder'
-import { Database } from './database'
+import { LookupMapType } from './database'
 
 export const buildDotTinaFiles = async ({
-  database,
   config,
   flags = [],
   buildSDK = true,
 }: {
-  database: Database
   config: Config
   flags?: string[]
   buildSDK?: boolean
@@ -38,40 +34,25 @@ export const buildDotTinaFiles = async ({
     flags,
   })
   const builder = await createBuilder({
-    database,
     tinaSchema,
   })
-  let graphQLSchema: DocumentNode
-  if (database.bridge.supportsBuilding()) {
-    graphQLSchema = await _buildSchema(builder, tinaSchema)
-    await database.putConfigFiles({ graphQLSchema, tinaSchema })
-  } else {
-    graphQLSchema = JSON.parse(
-      await database.bridge.get('.tina/__generated__/_graphql.json')
-    )
-  }
+  const graphQLSchema = await _buildSchema(builder, tinaSchema)
   let fragDoc = ''
   let queryDoc = ''
   if (buildSDK) {
-    fragDoc = await _buildFragments(
-      builder,
-      tinaSchema,
-      database.bridge.rootPath
-    )
-    queryDoc = await _buildQueries(
-      builder,
-      tinaSchema,
-      database.bridge.rootPath
-    )
+    fragDoc = await _buildFragments(builder, tinaSchema)
+    queryDoc = await _buildQueries(builder, tinaSchema)
   }
-  return { graphQLSchema, tinaSchema, fragDoc, queryDoc }
+  return {
+    graphQLSchema,
+    tinaSchema,
+    lookup: builder.lookupMap,
+    fragDoc,
+    queryDoc,
+  }
 }
 
-const _buildFragments = async (
-  builder: Builder,
-  tinaSchema: TinaSchema,
-  rootPath: string
-) => {
+const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
   const fragmentDefinitionsFields: FragmentDefinitionNode[] = []
   const collections = tinaSchema.getCollections()
 
@@ -95,11 +76,7 @@ const _buildFragments = async (
   return print(fragDoc)
 }
 
-const _buildQueries = async (
-  builder: Builder,
-  tinaSchema: TinaSchema,
-  rootPath: string
-) => {
+const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
   const operationsDefinitions: OperationDefinitionNode[] = []
 
   const collections = tinaSchema.getCollections()
@@ -146,7 +123,7 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
    * Definitions for the GraphQL AST
    */
   const definitions = []
-  definitions.push(await builder.buildStaticDefinitions())
+  definitions.push(builder.buildStaticDefinitions())
   const queryTypeDefinitionFields: FieldDefinitionNode[] = []
   const mutationTypeDefinitionFields: FieldDefinitionNode[] = []
 
@@ -224,7 +201,7 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     })
   )
 
-  const doc = {
+  return {
     kind: 'Document' as const,
     definitions: _.uniqBy(
       // @ts-ignore
@@ -232,6 +209,4 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       (node) => node.name.value
     ),
   }
-
-  return doc
 }
