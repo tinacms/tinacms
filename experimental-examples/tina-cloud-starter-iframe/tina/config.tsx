@@ -1,10 +1,11 @@
-import { defineStaticConfig } from "tinacms";
+import { Select, defineStaticConfig, wrapFieldsWithMeta } from "tinacms";
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockSchema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
 import { testimonialBlockSchema } from "../components/blocks/testimonial";
 import { ColorPickerInput } from "../components/fields/color";
 import { iconSchema } from "../components/util/icon";
+import { BsReplyAllFill } from "react-icons/bs";
 
 const config = defineStaticConfig({
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
@@ -175,6 +176,7 @@ const config = defineStaticConfig({
             type: "object",
             label: "Header",
             name: "header",
+            // @ts-ignore
             fields: [
               iconSchema,
               {
@@ -190,6 +192,35 @@ const config = defineStaticConfig({
                   { label: "Default", value: "default" },
                   { label: "Primary", value: "primary" },
                 ],
+                ui: {
+                  component: wrapFieldsWithMeta((props) => {
+                    return (
+                      /* @ts-ignore */
+                      <Select
+                        {...props}
+                        // show the font name in the given font
+                        prefixComponent={({ option, active }) => {
+                          let color = "bg-yellow-500";
+                          if (option.value === "primary") {
+                            color = "bg-blue-500";
+                          }
+                          return (
+                            <div
+                              className={`rounded-full w-5 h-5 border mr-2 shrink-0 ${color} ${
+                                active
+                                  ? "border-white/80"
+                                  : "border-gray-800/80"
+                              }`}
+                              style={{
+                                backgroundColor: color,
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    );
+                  }),
+                },
               },
               {
                 type: "object",
@@ -294,7 +325,68 @@ const config = defineStaticConfig({
                     label: "Lato",
                     value: "lato",
                   },
+                  {
+                    label: "Inter",
+                    value: "inter",
+                  },
                 ],
+                ui: {
+                  component: wrapFieldsWithMeta((props) => {
+                    // load fonts dynamically to show in select
+                    import("webfontloader").then((WebFont) => {
+                      return WebFont.load({
+                        google: {
+                          families: [
+                            "Nunito:400,500,700",
+                            "Lato:400,500,700",
+                            "Inter:400,500,700",
+                          ],
+                        },
+                      });
+                    });
+
+                    const getStyles = (option: {
+                      value: any;
+                      label?: string;
+                    }) => ({
+                      fontFamily:
+                        option.value === "sans"
+                          ? 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"'
+                          : option.value,
+                    });
+
+                    return (
+                      /* @ts-ignore */
+                      <Select
+                        {...props}
+                        // show the font name in the given font
+                        labelComponent={({ option }) => {
+                          return (
+                            <span
+                              className="font-medium"
+                              style={getStyles(option)}
+                            >
+                              {option.label}
+                            </span>
+                          );
+                        }}
+                        // show a sample phrase in the given font
+                        subLabelComponent={({ option }) => {
+                          return (
+                            <span
+                              style={{
+                                fontFamily:
+                                  option.value === "sans" ? "" : option.value,
+                              }}
+                            >
+                              A brown fox jumps over the lazy dog
+                            </span>
+                          );
+                        }}
+                      />
+                    );
+                  }),
+                },
               },
               {
                 type: "string",
