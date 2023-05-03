@@ -2,4 +2,4 @@
 '@tinacms/graphql': patch
 ---
 
-Feat update database query to support filtering on list fields
+Feat: Update database query to support filtering on list fields
