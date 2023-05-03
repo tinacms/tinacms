@@ -3,7 +3,7 @@ import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
 import type { ViteDevServer } from 'vite'
-import { buildSchema, getASTSchema, Database } from '@tinacms/graphql'
+import { buildSchema, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
 import { buildProductionSpa } from './server'
@@ -72,18 +72,19 @@ export class BuildCommand extends BaseCommand {
       configManager,
       Number(this.datalayerPort)
     )
-    const { tinaSchema, graphQLSchema, queryDoc, fragDoc } = await buildSchema(
-      database,
-      configManager.config
-    )
+
+    const { queryDoc, fragDoc, graphQLSchema, tinaSchema, lookup } =
+      await buildSchema(configManager.config)
 
     const codegen = new Codegen({
-      schema: await getASTSchema(database),
       configManager: configManager,
       port: this.localOption ? Number(this.port) : undefined,
       isLocal: this.localOption,
       queryDoc,
       fragDoc,
+      graphqlSchemaDoc: graphQLSchema,
+      tinaSchema,
+      lookup,
     })
     const apiURL = await codegen.execute()
 

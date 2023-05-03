@@ -2,7 +2,7 @@ import { Command, Option } from 'clipanion'
 import fs from 'fs-extra'
 import path from 'path'
 import chokidar from 'chokidar'
-import { buildSchema, getASTSchema, Database } from '@tinacms/graphql'
+import { buildSchema, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { devHTML } from './html'
 import { logger, summary } from '../../../logger'
@@ -83,8 +83,21 @@ export class DevCommand extends BaseCommand {
         database.clearCache()
       }
 
-      const { tinaSchema, graphQLSchema, queryDoc, fragDoc } =
-        await buildSchema(database, configManager.config)
+      const { tinaSchema, graphQLSchema, lookup, queryDoc, fragDoc } =
+        await buildSchema(configManager.config)
+
+      const codegen = new Codegen({
+        isLocal: true,
+        configManager: configManager,
+        port: Number(this.port),
+        queryDoc,
+        fragDoc,
+        graphqlSchemaDoc: graphQLSchema,
+        tinaSchema,
+        lookup,
+      })
+      const apiURL = await codegen.execute()
+
       if (!configManager.isUsingLegacyFolder) {
         delete require.cache[configManager.generatedSchemaJSONPath]
         delete require.cache[configManager.generatedLookupJSONPath]
@@ -103,19 +116,10 @@ export class DevCommand extends BaseCommand {
         )
       }
 
-      const codegen = new Codegen({
-        schema: await getASTSchema(database),
-        configManager: configManager,
-        port: Number(this.port),
-        isLocal: true,
-        queryDoc,
-        fragDoc,
-      })
-      const apiURL = await codegen.execute()
-
       if (!this.noWatch) {
         this.watchQueries(configManager, async () => await codegen.execute())
       }
+
       await this.indexContentWithSpinner({
         database,
         graphQLSchema,

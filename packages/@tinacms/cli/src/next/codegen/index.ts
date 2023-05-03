@@ -1,8 +1,11 @@
 import fs from 'fs-extra'
-import { GraphQLSchema, printSchema } from 'graphql'
+import path from 'path'
+import { buildASTSchema, printSchema } from 'graphql'
+import type { TypeDefinitionNode, GraphQLSchema } from 'graphql'
 import { generateTypes } from './codegen'
 import { transform } from 'esbuild'
 import { ConfigManager } from '../config-manager'
+import type { TinaSchema } from '@tinacms/schema-tools'
 export const TINA_HOST = 'content.tinajs.io'
 
 export class Codegen {
@@ -18,28 +21,58 @@ export class Codegen {
   localUrl: string
   // production url
   productionUrl: string
+  graphqlSchemaDoc: {
+    kind: 'Document'
+    definitions: TypeDefinitionNode[]
+  }
+  tinaSchema: TinaSchema
+  lookup: any
 
   constructor({
     configManager,
     port,
-    schema,
     queryDoc,
     fragDoc,
     isLocal,
+    graphqlSchemaDoc,
+    tinaSchema,
+    lookup,
   }: {
     configManager: ConfigManager
     port?: number
-    schema: GraphQLSchema
     queryDoc: string
     fragDoc: string
     isLocal: boolean
+    graphqlSchemaDoc: {
+      kind: 'Document'
+      definitions: TypeDefinitionNode[]
+    }
+    tinaSchema: TinaSchema
+    lookup: any
   }) {
     this.isLocal = isLocal
+    this.graphqlSchemaDoc = graphqlSchemaDoc
     this.configManager = configManager
     this.port = port
-    this.schema = schema
+    this.schema = buildASTSchema(graphqlSchemaDoc)
+    this.tinaSchema = tinaSchema
     this.queryDoc = queryDoc
     this.fragDoc = fragDoc
+    this.lookup = lookup
+  }
+
+  async writeConfigFile(fileName: string, data: string) {
+    const filePath = path.join(this.configManager.generatedFolderPath, fileName)
+    await fs.ensureFile(filePath)
+    await fs.outputFile(filePath, data)
+    if (this.configManager.hasSeparateContentRoot()) {
+      const filePath = path.join(
+        this.configManager.generatedFolderPathContentRepo,
+        fileName
+      )
+      await fs.ensureFile(filePath)
+      await fs.outputFile(filePath, data)
+    }
   }
 
   async removeGeneratedFilesIfExists() {
@@ -57,6 +90,23 @@ export class Codegen {
     this.apiURL = apiURL
     this.localUrl = localUrl
     this.productionUrl = tinaCloudUrl
+    console.log('Generating Tina Files')
+
+    // Update Config Files
+
+    // update _graphql.json
+    await this.writeConfigFile(
+      '_graphql.json',
+      JSON.stringify(this.graphqlSchemaDoc)
+    )
+    // update _schema.json
+    await this.writeConfigFile(
+      '_schema.json',
+      JSON.stringify(this.tinaSchema.schema)
+    )
+    // update _lookup.json
+    await this.writeConfigFile('_lookup.json', JSON.stringify(this.lookup))
+
     if (this.configManager.shouldSkipSDK()) {
       await this.removeGeneratedFilesIfExists()
       return apiURL
