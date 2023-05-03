@@ -9,6 +9,7 @@ import { useMemo } from 'react'
 import { Form } from '../forms'
 import { useCMS } from '../react-core'
 
+// Pretty sure this isn't used anymore
 export const FormModal = ({ plugin, close }: any) => {
   const cms = useCMS()
   const form: Form = useMemo(
@@ -36,7 +37,7 @@ export const FormModal = ({ plugin, close }: any) => {
       <PopupModal>
         <ModalHeader close={close}>{plugin.name}</ModalHeader>
         <ModalBody>
-          <FormBuilder form={form} />
+          <FormBuilder form={{ tinaForm: form }} />
         </ModalBody>
       </PopupModal>
     </Modal>
