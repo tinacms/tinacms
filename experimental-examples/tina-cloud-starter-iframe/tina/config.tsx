@@ -200,7 +200,7 @@ const config = defineStaticConfig({
                         {...props}
                         // show the font name in the given font
                         prefixComponent={({ option, active }) => {
-                          let color = "bg-yellow-500";
+                          let color = "bg-gray-900";
                           if (option.value === "primary") {
                             color = "bg-blue-500";
                           }
