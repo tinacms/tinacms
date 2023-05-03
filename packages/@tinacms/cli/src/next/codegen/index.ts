@@ -86,12 +86,6 @@ export class Codegen {
   }
 
   async execute() {
-    const { apiURL, localUrl, tinaCloudUrl } = this._createApiUrl()
-    this.apiURL = apiURL
-    this.localUrl = localUrl
-    this.productionUrl = tinaCloudUrl
-    console.log('Generating Tina Files')
-
     // Update Config Files
 
     // update _graphql.json
@@ -106,6 +100,11 @@ export class Codegen {
     )
     // update _lookup.json
     await this.writeConfigFile('_lookup.json', JSON.stringify(this.lookup))
+
+    const { apiURL, localUrl, tinaCloudUrl } = this._createApiUrl()
+    this.apiURL = apiURL
+    this.localUrl = localUrl
+    this.productionUrl = tinaCloudUrl
 
     if (this.configManager.shouldSkipSDK()) {
       await this.removeGeneratedFilesIfExists()
