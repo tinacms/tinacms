@@ -162,6 +162,7 @@ export const collectConditionsForField = (
       filterPath: pathExpression ? `${pathExpression}.${fieldName}` : fieldName,
       filterExpression: {
         _type: field.type,
+        _list: !!field.list,
         ...filterNode,
       },
     })

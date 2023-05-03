@@ -5,6 +5,7 @@
 import { JSONPath } from 'jsonpath-plus'
 import sha from 'js-sha1'
 import {
+  ARRAY_ITEM_VALUE_SEPARATOR,
   BatchOp,
   CONTENT_ROOT_PREFIX,
   INDEX_KEY_FIELD_SEPARATOR,
@@ -30,6 +31,7 @@ export type BinaryFilter = {
   operator: OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.STARTS_WITH | OP.IN
   type: string
   pad?: PadDefinition
+  list: boolean
 }
 export type TernaryFilter = {
   pathExpression: string
@@ -39,12 +41,14 @@ export type TernaryFilter = {
   rightOperator: OP.LT | OP.LTE
   type: string
   pad?: PadDefinition
+  list: boolean
 }
 export type IndexDefinition = {
   fields: {
     name: string
     type?: string
     pad?: PadDefinition
+    list: boolean
   }[]
 }
 
@@ -132,14 +136,26 @@ const makeKeyForField = <T extends object>(
     ) {
       // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
       const rawValue = data[field.name]
-      const resolvedValue = String(
-        field.type === 'datetime'
-          ? new Date(rawValue).getTime()
-          : field.type === 'string'
-          ? stringEscaper(rawValue as string | string[])
-          : rawValue
-      ).substring(0, maxStringLength)
-      valueParts.push(applyPadding(resolvedValue, field.pad))
+      let resolvedValue: string
+      if (field.type === 'datetime') {
+        resolvedValue = String(new Date(rawValue).getTime())
+      } else {
+        if (field.type === 'string') {
+          const escapedString = stringEscaper(rawValue as string | string[])
+          if (Array.isArray(escapedString)) {
+            resolvedValue = escapedString
+              .sort()
+              .join(ARRAY_ITEM_VALUE_SEPARATOR)
+          } else {
+            resolvedValue = escapedString
+          }
+        } else {
+          resolvedValue = String(rawValue)
+        }
+      }
+      valueParts.push(
+        applyPadding(resolvedValue.substring(0, maxStringLength), field.pad)
+      )
     } else {
       return null // tell caller that one of the fields is missing and we can't index
     }
@@ -214,6 +230,105 @@ export const coerceFilterChainOperands = (
   return result
 }
 
+function operatorMatchesBinaryFilter(
+  operator: OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.STARTS_WITH | OP.IN,
+  operands: FilterOperand[],
+  filter: BinaryFilter | TernaryFilter
+) {
+  let matches = false
+  switch (operator) {
+    case OP.EQ:
+      if (
+        operands.findIndex((operand) => operand === filter.rightOperand) >= 0
+      ) {
+        matches = true
+      }
+      break
+    case OP.GT:
+      for (const operand of operands) {
+        if (operand > filter.rightOperand) {
+          matches = true
+          break
+        }
+      }
+      break
+    case OP.LT:
+      for (const operand of operands) {
+        if (operand < filter.rightOperand) {
+          matches = true
+          break
+        }
+      }
+      break
+    case OP.GTE:
+      for (const operand of operands) {
+        if (operand >= filter.rightOperand) {
+          matches = true
+          break
+        }
+      }
+      break
+    case OP.LTE:
+      for (const operand of operands) {
+        if (operand <= filter.rightOperand) {
+          matches = true
+          break
+        }
+      }
+      break
+    case OP.IN:
+      for (const operand of operands) {
+        if ((filter.rightOperand as any[]).indexOf(operand) >= 0) {
+          matches = true
+          break
+        }
+      }
+      break
+    case OP.STARTS_WITH:
+      for (const operand of operands) {
+        if ((operand as string).startsWith(filter.rightOperand as string)) {
+          matches = true
+          break
+        }
+      }
+      break
+    default:
+      throw new Error(`unexpected operator ${operator}`)
+  }
+  return matches
+}
+
+function operatorMatchesTernaryFilter(
+  operands: FilterOperand[],
+  rightOperator: OP.LT | OP.LTE,
+  rightOperand: string | number | boolean | string[] | number[],
+  leftOperator: OP.GTE | OP.GT,
+  leftOperand: string | number | boolean | string[] | number[]
+) {
+  let matches = false
+  for (const operand of operands) {
+    let rightMatches = false
+    let leftMatches = false
+    if (rightOperator === OP.LTE && operand <= rightOperand) {
+      rightMatches = true
+    } else if (rightOperator === OP.LT && operand < rightOperand) {
+      rightMatches = true
+    }
+
+    if (leftOperator === OP.GTE && operand >= leftOperand) {
+      leftMatches = true
+    } else if (leftOperator === OP.GT && operand > leftOperand) {
+      leftMatches = true
+    }
+
+    if (rightMatches && leftMatches) {
+      matches = true
+      break
+    }
+  }
+  return matches
+}
+
 export const makeFilter = ({
   filterChain,
 }: {
@@ -222,6 +337,7 @@ export const makeFilter = ({
   return (values: Record<string, object>) => {
     for (const filter of filterChain) {
       const dataType = filter.type
+      const isList = filter.list
       const resolvedValues = JSONPath({
         path: filter.pathExpression,
         json: values,
@@ -234,19 +350,40 @@ export const makeFilter = ({
       if (dataType === 'string' || dataType === 'reference') {
         operands = resolvedValues
       } else if (dataType === 'number') {
-        operands = resolvedValues.map((resolvedValue) => Number(resolvedValue))
+        operands = resolvedValues.map((resolvedValue) => {
+          if (isList) {
+            return resolvedValue.map((listValue) => Number(listValue))
+          }
+          return Number(resolvedValue)
+        })
       } else if (dataType === 'datetime') {
         operands = resolvedValues.map((resolvedValue) => {
+          if (isList) {
+            return resolvedValue.map((listValue) => {
+              const coerced = new Date(listValue).getTime()
+              return isNaN(coerced) ? Number(listValue) : coerced
+            })
+          }
           const coerced = new Date(resolvedValue).getTime()
           return isNaN(coerced) ? Number(resolvedValue) : coerced
         })
       } else if (dataType === 'boolean') {
-        operands = resolvedValues.map(
-          (resolvedValue) =>
+        operands = resolvedValues.map((resolvedValue) => {
+          if (isList) {
+            return resolvedValue.map((listValue) => {
+              return (
+                (typeof listValue === 'boolean' && listValue) ||
+                listValue === 'true' ||
+                listValue === '1'
+              )
+            })
+          }
+          return (
             (typeof resolvedValue === 'boolean' && resolvedValue) ||
             resolvedValue === 'true' ||
             resolvedValue === '1'
-        )
+          )
+        })
       } else {
         throw new Error(`Unexpected datatype ${dataType}`)
       }
@@ -254,90 +391,47 @@ export const makeFilter = ({
       const { operator } = filter as BinaryFilter
       let matches = false
       if (operator) {
-        switch (operator) {
-          case OP.EQ:
-            if (
-              operands.findIndex(
-                (operand) => operand === filter.rightOperand
-              ) >= 0
-            ) {
+        if (isList) {
+          for (const operand of operands as any[]) {
+            if (operatorMatchesBinaryFilter(operator, operand, filter)) {
               matches = true
+              break
             }
-            break
-          case OP.GT:
-            for (const operand of operands) {
-              if (operand > filter.rightOperand) {
-                matches = true
-                break
-              }
-            }
-            break
-          case OP.LT:
-            for (const operand of operands) {
-              if (operand < filter.rightOperand) {
-                matches = true
-                break
-              }
-            }
-            break
-          case OP.GTE:
-            for (const operand of operands) {
-              if (operand >= filter.rightOperand) {
-                matches = true
-                break
-              }
-            }
-            break
-          case OP.LTE:
-            for (const operand of operands) {
-              if (operand <= filter.rightOperand) {
-                matches = true
-                break
-              }
-            }
-            break
-          case OP.IN:
-            for (const operand of operands) {
-              if ((filter.rightOperand as any[]).indexOf(operand) >= 0) {
-                matches = true
-                break
-              }
-            }
-            break
-          case OP.STARTS_WITH:
-            for (const operand of operands) {
-              if (
-                (operand as string).startsWith(filter.rightOperand as string)
-              ) {
-                matches = true
-                break
-              }
-            }
-            break
-          default:
-            throw new Error(`unexpected operator ${operator}`)
+          }
+        } else {
+          if (operatorMatchesBinaryFilter(operator, operands, filter)) {
+            matches = true
+          }
         }
       } else {
         const { rightOperator, leftOperator, rightOperand, leftOperand } =
           filter as TernaryFilter
-        for (const operand of operands) {
-          let rightMatches = false
-          let leftMatches = false
-          if (rightOperator === OP.LTE && operand <= rightOperand) {
-            rightMatches = true
-          } else if (rightOperator === OP.LT && operand < rightOperand) {
-            rightMatches = true
+        if (isList) {
+          for (const operand of operands as any[]) {
+            if (
+              operatorMatchesTernaryFilter(
+                operand,
+                rightOperator,
+                rightOperand,
+                leftOperator,
+                leftOperand
+              )
+            ) {
+              matches = true
+              break
+            }
           }
-
-          if (leftOperator === OP.GTE && operand >= leftOperand) {
-            leftMatches = true
-          } else if (leftOperator === OP.GT && operand > leftOperand) {
-            leftMatches = true
-          }
-
-          if (rightMatches && leftMatches) {
+        } else {
+          if (
+            operatorMatchesTernaryFilter(
+              operands,
+              rightOperator,
+              rightOperand,
+              leftOperator,
+              leftOperand
+            )
+          ) {
             matches = true
-            break
           }
         }
       }
@@ -362,7 +456,7 @@ export const makeFilterChain = ({
 
   for (const condition of conditions) {
     const { filterPath, filterExpression } = condition
-    const { _type, ...keys } = filterExpression
+    const { _type, _list, ...keys } = filterExpression
     const [key1, key2, ...extraKeys] = Object.keys(keys)
     if (extraKeys.length) {
       throw new Error(
@@ -372,6 +466,7 @@ export const makeFilterChain = ({
 
     if (key1 && !key2) {
       filterChain.push({
+        list: _list as boolean,
         pathExpression: filterPath,
         rightOperand: filterExpression[key1],
         operator: inferOperatorFromFilter(key1),
@@ -406,6 +501,7 @@ export const makeFilterChain = ({
         }
 
         filterChain.push({
+          list: _list as boolean,
           pathExpression: filterPath,
           rightOperand,
           leftOperand,
