@@ -137,7 +137,7 @@ export const RenderForm = ({
   folder
   templateName
   mutationInfo
-  customDefaults
+  customDefaults?: any
 }) => {
   const navigate = useNavigate()
   const [formIsPristine, setFormIsPristine] = useState(true)

@@ -274,7 +274,15 @@ export const FormStatus = ({ pristine }) => {
   )
 }
 
-export const FormWrapper = ({ header, children, id }) => {
+export const FormWrapper = ({
+  header,
+  children,
+  id,
+}: {
+  header?: React.ReactNode
+  children: React.ReactNode
+  id: string
+}) => {
   return (
     <div
       data-test={`form:${id?.replace(/\\/g, '/')}`}
