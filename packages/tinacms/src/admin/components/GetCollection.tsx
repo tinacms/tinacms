@@ -136,6 +136,7 @@ const GetCollection = ({
       !allowDelete &&
       // Check there is only one document
       collection.documents?.edges?.length === 1 &&
+      // Check to make sure the file is not a folder
       collection.documents?.edges[0]?.node?.__typename !== 'Folder'
     ) {
       const doc = collection.documents.edges[0].node
