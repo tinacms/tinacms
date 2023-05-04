@@ -534,12 +534,15 @@ export interface Config<
      */
     outputFolder: string
     /**
-     *
-     *  the host option for the vite config. This is useful when trying to run tinacms dev in a docker container.
+     *  The host option for the vite config. This is useful when trying to run tinacms dev in a docker container.
      *
      * See https://vitejs.dev/config/server-options.html#server-host for more details
      */
     host?: string | boolean
+    /**
+     * If your site will be served at a sub-path like `my-domain.com/my-site`, provide `"my-site"`
+     */
+    subPath?: string
   }
   media?:
     | {
