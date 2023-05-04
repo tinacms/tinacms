@@ -5,7 +5,6 @@ import { heroBlockSchema } from "../components/blocks/hero";
 import { testimonialBlockSchema } from "../components/blocks/testimonial";
 import { ColorPickerInput } from "../components/fields/color";
 import { iconSchema } from "../components/util/icon";
-import { BsReplyAllFill } from "react-icons/bs";
 
 const config = defineStaticConfig({
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
@@ -199,23 +198,25 @@ const config = defineStaticConfig({
                       <Select
                         {...props}
                         // show the color in front of the label
-                        prefixComponent={({ option, active }) => {
-                          let color = "bg-gray-900";
-                          if (option.value === "primary") {
-                            color = "bg-blue-500";
-                          }
-                          return (
-                            <div
-                              className={`rounded-full w-5 h-5 border mr-1 shrink-0 ${color} ${
-                                active
-                                  ? "border-white/80"
-                                  : "border-gray-800/80"
-                              }`}
-                              style={{
-                                backgroundColor: color,
-                              }}
-                            />
-                          );
+                        componentOverrides={{
+                          prefix: ({ option, active }) => {
+                            let color = "bg-gray-900";
+                            if (option.value === "primary") {
+                              color = "bg-blue-500";
+                            }
+                            return (
+                              <div
+                                className={`rounded-full w-5 h-5 border mr-1 shrink-0 ${color} ${
+                                  active
+                                    ? "border-white/80"
+                                    : "border-gray-800/80"
+                                }`}
+                                style={{
+                                  backgroundColor: color,
+                                }}
+                              />
+                            );
+                          },
                         }}
                       />
                     );
@@ -332,7 +333,7 @@ const config = defineStaticConfig({
                 ],
                 ui: {
                   component: wrapFieldsWithMeta((props) => {
-                    // load fonts dynamically to show in select
+                    // load fonts dynamically to show in select for use case demo purposes
                     import("webfontloader").then((WebFont) => {
                       return WebFont.load({
                         google: {
@@ -360,29 +361,31 @@ const config = defineStaticConfig({
                       <Select
                         {...props}
                         // show the font name in the given font
-                        labelComponent={({ option }) => {
-                          return (
-                            <span
-                              className="font-medium"
-                              style={getStyles(option)}
-                            >
-                              {option.label}
-                            </span>
-                          );
+                        componentOverrides={{
+                          label: ({ option }) => {
+                            return (
+                              <span
+                                className="font-medium"
+                                style={getStyles(option)}
+                              >
+                                {option.label}
+                              </span>
+                            );
+                          },
+                          subLabel: ({ option }) => {
+                            return (
+                              <span
+                                style={{
+                                  fontFamily:
+                                    option.value === "sans" ? "" : option.value,
+                                }}
+                              >
+                                A brown fox jumps over the lazy dog
+                              </span>
+                            );
+                          },
                         }}
                         // show a sample phrase in the given font
-                        subLabelComponent={({ option }) => {
-                          return (
-                            <span
-                              style={{
-                                fontFamily:
-                                  option.value === "sans" ? "" : option.value,
-                              }}
-                            >
-                              A brown fox jumps over the lazy dog
-                            </span>
-                          );
-                        }}
                       />
                     );
                   }),

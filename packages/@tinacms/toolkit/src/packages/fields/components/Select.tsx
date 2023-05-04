@@ -20,16 +20,20 @@ interface SelectFieldProps {
   options: (Option | string)[]
 }
 
+interface SelectComponentOverrides {
+  prefix?: React.FC<SelectSlotProps>
+  label?: React.FC<SelectSlotProps>
+  subLabel?: React.FC<SelectSlotProps>
+  suffix?: React.FC<SelectSlotProps>
+}
+
 export interface SelectProps {
   name: string
   input: React.SelectHTMLAttributes<HTMLSelectElement>
   field?: SelectFieldProps
   disabled?: boolean
   options?: (Option | string)[]
-  prefixComponent?: React.FC<SelectSlotProps>
-  suffixComponent?: React.FC<SelectSlotProps>
-  labelComponent?: React.FC<SelectSlotProps>
-  subLabelComponent?: React.FC<SelectSlotProps>
+  componentOverrides?: SelectComponentOverrides
 }
 
 function classNames(...classes) {
@@ -52,10 +56,7 @@ export const Select: React.FC<SelectProps> = ({
   input,
   field,
   options,
-  labelComponent,
-  prefixComponent,
-  suffixComponent,
-  subLabelComponent,
+  componentOverrides,
 }) => {
   const selectOptions = options || field.options
   const [selected, setSelected] = React.useState(
@@ -92,8 +93,8 @@ export const Select: React.FC<SelectProps> = ({
                   selectFieldClasses
                 )}
               >
-                {prefixComponent &&
-                  prefixComponent({
+                {componentOverrides?.prefix &&
+                  componentOverrides.prefix({
                     option: selected as any,
                     active: false,
                     selected: false,
@@ -141,8 +142,8 @@ export const Select: React.FC<SelectProps> = ({
                         const isEmpty = option.value?.length < 1
                         return (
                           <div className="flex items-center space-x-1">
-                            {prefixComponent &&
-                              prefixComponent({
+                            {componentOverrides?.prefix &&
+                              componentOverrides.prefix({
                                 option: option,
                                 active: active,
                                 selected: selected,
@@ -158,8 +159,8 @@ export const Select: React.FC<SelectProps> = ({
                                   'text-gray-400'
                               )}
                             >
-                              {labelComponent ? (
-                                labelComponent({
+                              {componentOverrides?.label ? (
+                                componentOverrides.label({
                                   option: option,
                                   active: active,
                                   selected: selected,
@@ -171,14 +172,14 @@ export const Select: React.FC<SelectProps> = ({
                                   selected={selected}
                                 />
                               )}
-                              {subLabelComponent && (
+                              {componentOverrides?.subLabel && (
                                 <div
                                   className={classNames(
                                     'text-xs font-normal truncate',
                                     !selected && !active && 'text-gray-400'
                                   )}
                                 >
-                                  {subLabelComponent({
+                                  {componentOverrides.subLabel({
                                     option: option,
                                     active: active,
                                     selected: selected,
@@ -186,14 +187,14 @@ export const Select: React.FC<SelectProps> = ({
                                 </div>
                               )}
                             </div>
-                            {suffixComponent ? (
+                            {componentOverrides?.suffix ? (
                               <div
                                 className={classNames(
                                   active ? 'text-white' : 'text-blue-500',
                                   'flex items-center'
                                 )}
                               >
-                                {suffixComponent({
+                                {componentOverrides.suffix({
                                   option: option,
                                   active: active,
                                   selected: selected,
@@ -221,7 +222,7 @@ export const Select: React.FC<SelectProps> = ({
   )
 }
 
-type SelectSlotProps = {
+interface SelectSlotProps {
   option: Option
   active: boolean
   selected: boolean
