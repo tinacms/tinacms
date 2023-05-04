@@ -154,6 +154,7 @@ export const useGraphQLReducer = (
         throw new Error(`Unable to process payload which has not been expanded`)
       }
       const formListItems: TinaState['formLists'][number]['items'] = []
+      const formIds: string[] = []
 
       const result = G.graphqlSync({
         schema: schemaForResolver,
@@ -258,19 +259,10 @@ export const useGraphQLReducer = (
               resolvedDocument = documentSchema.parse(value)
             }
             const id = resolvedDocument._internalSys.path
-            let existingForm = cms.state.forms.find((f) => f.tinaForm.id === id)
-            if (!existingForm) {
-              cms.plugins
-                .getType('screen')
-                .all()
-                .forEach((plugin) => {
-                  // @ts-ignore
-                  if (plugin?.form && plugin.form?.id === id) {
-                    // @ts-ignore
-                    existingForm = plugin.form
-                  }
-                })
-            }
+            formIds.push(id)
+            const existingForm = cms.state.forms.find(
+              (f) => f.tinaForm.id === id
+            )
 
             const pathArray = G.responsePathAsArray(info.path)
             const pathString = pathArray.join('.')
@@ -282,6 +274,10 @@ export const useGraphQLReducer = (
             let parent = ancestors[ancestors.length - 1]
             if (parent) {
               if (parent.type === 'document') {
+                // console.log(
+                //   'its a parent',
+                //   JSON.stringify({ id, value, pathString, parent }, null, 2)
+                // )
                 parent.subItems.push({
                   type: 'document',
                   path: pathString,
@@ -353,31 +349,14 @@ export const useGraphQLReducer = (
           id: payload.id,
           data: result.data,
         })
-
-        // This can be improved, for now we just need something to test with
-        const elements =
-          iframe.current?.contentWindow?.document.querySelectorAll<HTMLElement>(
-            `[data-tinafield]`
-          )
-        if (elements) {
-          for (let i = 0; i < elements.length; i++) {
-            const el = elements[i]
-            el.onclick = () => {
-              const tinafield = el.getAttribute('data-tinafield')
-              cms.events.dispatch({
-                type: 'field:selected',
-                value: tinafield,
-              })
-            }
-          }
-        }
       }
       cms.dispatch({
         type: 'form-lists:add',
         value: {
           id: payload.id,
-          label: 'Anonymous Query',
+          label: 'Anonymous Query', // TODO: grab the name of the query if it exists
           items: formListItems,
+          formIds,
         },
       })
     },
@@ -437,6 +416,7 @@ export const useGraphQLReducer = (
     return () => {
       setPayloads([])
       cms.removeAllForms()
+      cms.dispatch({ type: 'form-lists:clear' })
     }
   }, [url])
 
@@ -800,7 +780,6 @@ const buildForm = ({
   }
   if (form) {
     if (shouldRegisterForm) {
-      form.subscribe(() => {}, { values: true })
       if (collection.ui?.global) {
         cms.plugins.add(new GlobalFormPlugin(form))
       }

@@ -55,7 +55,7 @@ export const FormsView = ({
   /**
    * No Forms
    */
-  if (!cms.state.forms.length) {
+  if (!cms.state.formLists.length) {
     if (formsRegistering) return <PendingFormsPlaceholder />
     return <> {children} </>
   }

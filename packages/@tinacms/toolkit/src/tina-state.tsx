@@ -9,7 +9,14 @@ type FormListItem =
     }
   | { type: 'list'; label: string }
 
-type FormList = { label: string; id: string; items: FormListItem[] }
+type FormList = {
+  label: string
+  id: string
+  items: FormListItem[]
+  // This value is somewhat duplicated from whats inside the items array, but it makes cleaning
+  // Up orphaned forms easier.
+  formIds: string[]
+}
 
 export type TinaAction =
   | {
@@ -40,11 +47,14 @@ export type TinaAction =
       value: { formId: string; fieldName: string }
     }
   | {
-      type: 'form-list:clear'
+      type: 'form-lists:clear'
     }
   | {
       type: 'set-edit-mode'
       value: 'visual' | 'basic'
+    }
+  | {
+      type: 'increment-operation-index'
     }
 
 export interface TinaState {
@@ -85,14 +95,17 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         ...state,
         forms: state.forms.filter((form) => form.tinaForm.id !== action.value),
       }
+    case 'form-lists:clear': {
+      return { ...state, formLists: [], forms: [] }
+    }
     case 'form-lists:add': {
-      if (state.formLists.find((f) => f.id === action.value.id)) {
-        return state
-      }
-      const nextFormLists = [...state.formLists, action.value]
+      const nextFormLists = [
+        ...state.formLists.filter(({ id }) => id !== action.value.id),
+        action.value,
+      ]
 
-      let activeFormId = null
-      if ((state.activeFormId, state.formLists.length === 0)) {
+      let activeFormId = state.activeFormId
+      if (!activeFormId && state.formLists.length === 0) {
         action.value.items.forEach((item) => {
           if (item.type === 'document') {
             const form = state.forms.find(
@@ -111,6 +124,17 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       const nextFormLists = state.formLists.filter(
         ({ id }) => id !== action.value
       )
+      const allFormIdsListed: string[] = []
+      nextFormLists.forEach((formList) => {
+        formList.formIds.forEach((id) => {
+          allFormIdsListed.push(id)
+        })
+      })
+
+      // Only keep forms that are associated with remaing form lists
+      const nextForms = state.forms.filter(({ tinaForm }) =>
+        allFormIdsListed.includes(tinaForm.id)
+      )
 
       return {
         ...state,
@@ -118,6 +142,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         // when `useTina` hooks are mounting client-side as a result of the app itself
         // rather than route navigation
         activeFormId: null,
+        forms: nextForms,
         formLists: nextFormLists,
       }
     }
