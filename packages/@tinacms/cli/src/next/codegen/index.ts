@@ -4,7 +4,7 @@ import { buildASTSchema, printSchema } from 'graphql'
 import type { TypeDefinitionNode, GraphQLSchema } from 'graphql'
 import { generateTypes } from './codegen'
 import { transform } from 'esbuild'
-import { ConfigManager, GENERATED_FOLDER } from '../config-manager'
+import { ConfigManager } from '../config-manager'
 import type { TinaSchema } from '@tinacms/schema-tools'
 export const TINA_HOST = 'content.tinajs.io'
 
@@ -14,6 +14,13 @@ export class Codegen {
   schema: GraphQLSchema
   queryDoc: string
   fragDoc: string
+  isLocal: boolean
+  // The API url used in the client
+  apiURL: string
+  // This is always the local URL.
+  localUrl: string
+  // production url
+  productionUrl: string
   graphqlSchemaDoc: {
     kind: 'Document'
     definitions: TypeDefinitionNode[]
@@ -26,6 +33,7 @@ export class Codegen {
     port,
     queryDoc,
     fragDoc,
+    isLocal,
     graphqlSchemaDoc,
     tinaSchema,
     lookup,
@@ -34,6 +42,7 @@ export class Codegen {
     port?: number
     queryDoc: string
     fragDoc: string
+    isLocal: boolean
     graphqlSchemaDoc: {
       kind: 'Document'
       definitions: TypeDefinitionNode[]
@@ -41,6 +50,7 @@ export class Codegen {
     tinaSchema: TinaSchema
     lookup: any
   }) {
+    this.isLocal = isLocal
     this.graphqlSchemaDoc = graphqlSchemaDoc
     this.configManager = configManager
     this.port = port
@@ -76,8 +86,6 @@ export class Codegen {
   }
 
   async execute() {
-    console.log('Generating Tina Files')
-
     // Update Config Files
 
     // update _graphql.json
@@ -93,7 +101,11 @@ export class Codegen {
     // update _lookup.json
     await this.writeConfigFile('_lookup.json', JSON.stringify(this.lookup))
 
-    const apiURL = this.getApiURL()
+    const { apiURL, localUrl, tinaCloudUrl } = this._createApiUrl()
+    this.apiURL = apiURL
+    this.localUrl = localUrl
+    this.productionUrl = tinaCloudUrl
+
     if (this.configManager.shouldSkipSDK()) {
       await this.removeGeneratedFilesIfExists()
       return apiURL
@@ -146,8 +158,7 @@ export class Codegen {
     }
     return apiURL
   }
-
-  getApiURL() {
+  private _createApiUrl() {
     const branch = this.configManager.config?.branch
     const clientId = this.configManager.config?.clientId
     const token = this.configManager.config?.token
@@ -172,15 +183,25 @@ export class Codegen {
         )}. Please visit https://tina.io/docs/tina-cloud/connecting-site/ for more information`
       )
     }
+    let localUrl = `http://localhost:${this.port}/graphql`
+    let tinaCloudUrl = `${baseUrl}/${version}/content/${clientId}/github/${branch}`
 
-    let apiURL = this.port
+    let apiURL = this.isLocal
       ? `http://localhost:${this.port}/graphql`
       : `${baseUrl}/${version}/content/${clientId}/github/${branch}`
 
     if (this.configManager.config.contentApiUrlOverride) {
       apiURL = this.configManager.config.contentApiUrlOverride
+      localUrl = apiURL
+      tinaCloudUrl = apiURL
     }
-    return apiURL
+    return { apiURL, localUrl, tinaCloudUrl }
+  }
+
+  getApiURL() {
+    if (!this.apiURL)
+      throw new Error('apiURL not set. Please run execute() first')
+    return this.apiURL
   }
 
   async genClient() {

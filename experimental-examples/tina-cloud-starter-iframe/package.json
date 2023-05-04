@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
-    "build": "tinacms build --noTelemetry && next build",
+    "build": "tinacms build --local --skip-cloud-checks --noTelemetry -c \"next build\"",
     "start": "tinacms build --noTelemetry && next start",
     "dev:audit": "tinacms audit",
     "build:prod": "tinacms build && next build"

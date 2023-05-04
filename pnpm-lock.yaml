@@ -449,7 +449,6 @@ importers:
       chokidar: ^3.5.1
       cli-spinner: ^0.2.10
       clipanion: ^3.2.0
-      commander: ^9.0.0
       cors: ^2.8.5
       dotenv: ^16.0.1
       esbuild: ^0.15.5
@@ -514,7 +513,6 @@ importers:
       chokidar: 3.5.3
       cli-spinner: 0.2.10
       clipanion: 3.2.0
-      commander: 9.3.0
       cors: 2.8.5
       dotenv: 16.0.1
       esbuild: 0.15.5
@@ -15529,14 +15527,6 @@ packages:
         integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==,
       }
     engines: { node: '>= 12' }
-    dev: false
-
-  /commander/9.3.0:
-    resolution:
-      {
-        integrity: sha512-hv95iU5uXPbK83mjrJKuZyFM/LBAoCV/XhVGkS5Je6tl7sxr6A0ITMw5WoRV46/UaJ46Nllm3Xt7IaJhXTIkzw==,
-      }
-    engines: { node: ^12.20.0 || >=14 }
     dev: false
 
   /comment-json/2.4.2:
