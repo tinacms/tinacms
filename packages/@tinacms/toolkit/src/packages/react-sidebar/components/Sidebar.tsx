@@ -6,7 +6,7 @@
 
 import * as React from 'react'
 
-import { BiMenu, BiPencil } from 'react-icons/bi'
+import { BiMenu, BiPencil, BiTargetLock } from 'react-icons/bi'
 import { BsArrowsAngleContract, BsArrowsAngleExpand } from 'react-icons/bs'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
@@ -261,6 +261,7 @@ const Sidebar = ({
       <>
         <SidebarWrapper>
           <EditButton />
+          <QuickEditButton />
           {displayNav && (
             <Nav
               isLocalMode={cms.api?.tina?.isLocalMode}
@@ -570,6 +571,43 @@ const EditButton = ({}) => {
       aria-label="opens cms sidebar"
     >
       <BiPencil className="h-6 w-auto" />
+    </Button>
+  )
+}
+
+const QuickEditButton = () => {
+  const cms = useCMS()
+
+  const shouldDisplay = true
+  // If/when we put this in the sidebar somewhere, this should hide like the EditButton does
+  // const { displayState: sidebarDisplayState } = React.useContext(SidebarContext)
+  // const shouldDisplay =
+  //   sidebarDisplayState === 'closed'
+  //     ? cms.state.quickEditSupported
+  //       ? true
+  //       : false
+  //     : false
+  if (!cms.state.quickEditSupported) {
+    return null
+  }
+  return (
+    <Button
+      rounded="right"
+      // variant={variant}
+      variant="secondary"
+      onClick={() => {
+        cms.dispatch({ type: 'toggle-quick-editing-enabled' })
+      }}
+      className={` absolute top-20 right-0 transition-all duration-150 ease-out ${
+        shouldDisplay ? 'translate-x-full pointer-events-auto' : 'opacity-0'
+      }`}
+      aria-label="opens cms sidebar"
+    >
+      <BiTargetLock
+        className={`h-6 w-auto ${
+          cms.state.quickEditEnabled ? 'text-blue-600' : ''
+        }`}
+      />
     </Button>
   )
 }

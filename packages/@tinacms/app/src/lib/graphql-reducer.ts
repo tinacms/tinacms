@@ -363,18 +363,26 @@ export const useGraphQLReducer = (
     [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
   )
 
-  const notifyEditMode = React.useCallback(
+  const handleMessage = React.useCallback(
     (event: MessageEvent<PostMessage>) => {
+      if (event?.data?.type === 'quick-edit') {
+        cms.dispatch({
+          type: 'set-quick-editing-supported',
+          value: event.data.value,
+        })
+      }
       if (event?.data?.type === 'isEditMode') {
         iframe?.current?.contentWindow?.postMessage({
           type: 'tina:editMode',
         })
       }
-    },
-    []
-  )
-  const handleOpenClose = React.useCallback(
-    (event: MessageEvent<PostMessage>) => {
+      if (event.data.type === 'field:selected') {
+        const [formId, fieldName] = event.data.fieldName?.split('#')
+        cms.dispatch({
+          type: 'forms:set-active-field-name',
+          value: { formId, fieldName },
+        })
+      }
       if (event.data.type === 'close') {
         const payloadSchema = z.object({ id: z.string() })
         const { id } = payloadSchema.parse(event.data)
@@ -421,14 +429,19 @@ export const useGraphQLReducer = (
   }, [url])
 
   React.useEffect(() => {
+    iframe.current?.contentWindow?.postMessage({
+      type: 'quickEditEnabled',
+      value: cms.state.quickEditEnabled,
+    })
+  }, [cms.state.quickEditEnabled])
+
+  React.useEffect(() => {
     if (iframe) {
-      window.addEventListener('message', handleOpenClose)
-      window.addEventListener('message', notifyEditMode)
+      window.addEventListener('message', handleMessage)
     }
 
     return () => {
-      window.removeEventListener('message', handleOpenClose)
-      window.removeEventListener('message', notifyEditMode)
+      window.removeEventListener('message', handleMessage)
       cms.removeAllForms()
     }
   }, [iframe.current])

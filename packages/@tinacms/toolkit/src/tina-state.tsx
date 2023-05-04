@@ -56,6 +56,17 @@ export type TinaAction =
   | {
       type: 'increment-operation-index'
     }
+  | {
+      type: 'set-quick-editing-supported'
+      value: boolean
+    }
+  | {
+      type: 'set-quick-editing-enabled'
+      value?: boolean
+    }
+  | {
+      type: 'toggle-quick-editing-enabled'
+    }
 
 export interface TinaState {
   activeFormId: string | null
@@ -71,6 +82,8 @@ export interface TinaState {
   forms: { activeFieldName?: string | null; tinaForm: Form }[]
   formLists: FormList[]
   editingMode: 'visual' | 'basic'
+  quickEditSupported: boolean
+  quickEditEnabled: boolean
 }
 
 export const initialState: TinaState = {
@@ -78,11 +91,19 @@ export const initialState: TinaState = {
   forms: [],
   formLists: [],
   editingMode: 'basic',
+  quickEditSupported: false,
+  quickEditEnabled: false,
 }
 
 // Our reducer function that uses a switch statement to handle our actions
 export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
   switch (action.type) {
+    case 'set-quick-editing-supported':
+      return { ...state, quickEditSupported: action.value }
+    case 'set-quick-editing-enabled':
+      return { ...state, quickEditEnabled: action.value }
+    case 'toggle-quick-editing-enabled':
+      return { ...state, quickEditEnabled: !state.quickEditEnabled }
     case 'set-edit-mode':
       return { ...state, editingMode: action.value }
     case 'forms:add':

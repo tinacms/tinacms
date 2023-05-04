@@ -1,8 +1,11 @@
-export type PostMessage = {
-  type: 'open' | 'close' | 'isEditMode'
-  id: string
-  data: object
-}
+export type PostMessage =
+  | {
+      type: 'open' | 'close' | 'isEditMode'
+      id: string
+      data: object
+    }
+  | { type: 'field:selected'; fieldName: string }
+  | { type: 'quick-edit'; value: boolean }
 
 export type Payload = {
   id: string
