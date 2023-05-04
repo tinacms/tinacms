@@ -1,5 +1,16 @@
 # tinacms-cli
 
+## 1.5.11
+
+### Patch Changes
+
+- 83b19fb8d: Update the bridge interface to remove properties that are no longer needed.
+- Updated dependencies [83b19fb8d]
+- Updated dependencies [1c7998b7e]
+  - @tinacms/graphql@1.4.11
+  - @tinacms/app@1.2.11
+  - @tinacms/datalayer@1.2.11
+
 ## 1.5.10
 
 ### Patch Changes
