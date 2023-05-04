@@ -1,5 +1,18 @@
 # tinacms
 
+## 1.5.4
+
+### Patch Changes
+
+- f6e2ec5e9: fix issue with single document naviation
+
+## 1.5.3
+
+### Patch Changes
+
+- 3532d07f3: fix issue where a user was unable to create a document with templates
+- 6d1465fd8: Fix auto navigate logic in GetCollection to only be active for Documents and not Folders
+
 ## 1.5.2
 
 ### Patch Changes

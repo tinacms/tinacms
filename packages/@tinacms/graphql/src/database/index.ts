@@ -1,4 +1,5 @@
 import path from 'path'
+import fs from 'fs-extra'
 import type { DocumentNode } from 'graphql'
 import { GraphQLError } from 'graphql'
 import micromatch from 'micromatch'
@@ -105,10 +106,12 @@ export class Database {
   private onPut: OnPutCallback
   private onDelete: OnDeleteCallback
   private tinaSchema: TinaSchema | undefined
+
   private collectionIndexDefinitions:
     | Record<string, Record<string, IndexDefinition>>
     | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
+
   constructor(public config: CreateDatabase) {
     this.tinaDirectory = config.tinaDirectory || '.tina'
     this.bridge = config.bridge
@@ -901,26 +904,6 @@ export class Database {
       },
     }
   }
-
-  public putConfigFiles = async ({
-    graphQLSchema,
-    tinaSchema,
-  }: {
-    graphQLSchema: DocumentNode
-    tinaSchema: TinaSchema
-  }) => {
-    if (this.bridge && this.bridge.supportsBuilding()) {
-      await this.bridge.putConfig(
-        normalizePath(path.join(this.getGeneratedFolder(), `_graphql.json`)),
-        JSON.stringify(graphQLSchema)
-      )
-      await this.bridge.putConfig(
-        normalizePath(path.join(this.getGeneratedFolder(), `_schema.json`)),
-        JSON.stringify(tinaSchema.schema)
-      )
-    }
-  }
-
   private async indexStatusCallbackWrapper<T>(
     fn: () => Promise<T>,
     post?: () => Promise<void>
@@ -1181,28 +1164,6 @@ export class Database {
       await level.batch(operations.splice(0, 25))
     }
     return { warnings }
-  }
-
-  public addToLookupMap = async (lookup: LookupMapType) => {
-    if (!this.bridge) {
-      throw new Error('No bridge configured')
-    }
-    const lookupPath = path.join(this.getGeneratedFolder(), `_lookup.json`)
-    let lookupMap
-    try {
-      lookupMap = JSON.parse(await this.bridge.get(normalizePath(lookupPath)))
-    } catch (e) {
-      lookupMap = {}
-    }
-    const updatedLookup = {
-      ...lookupMap,
-      [lookup.type]: lookup,
-    }
-    await this.bridge.putConfig(
-      normalizePath(lookupPath),
-      JSON.stringify(updatedLookup)
-    )
-    //await this.onPut(normalizePath(lookupPath), JSON.stringify(updatedLookup))
   }
 }
 

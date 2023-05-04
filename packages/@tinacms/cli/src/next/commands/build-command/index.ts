@@ -2,7 +2,8 @@ import fetch, { Headers } from 'node-fetch'
 import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
-import { buildSchema, getASTSchema, Database } from '@tinacms/graphql'
+import type { ViteDevServer } from 'vite'
+import { buildSchema, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
 import { buildProductionSpa } from './server'
@@ -18,40 +19,24 @@ import { IndexStatusResponse, waitForDB } from './waitForDB'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { sleepAndCallFunc } from '../../../utils/sleep'
 import { dangerText, linkText, warnText } from '../../../utils/theme'
+import { createDevServer } from '../dev-command/server'
+import { BaseCommand } from '../baseCommands'
 
-export class BuildCommand extends Command {
+export class BuildCommand extends BaseCommand {
   static paths = [['build']]
-  rootPath = Option.String('--rootPath', {
-    description:
-      'Specify the root directory to run the CLI from (defaults to current working directory)',
-  })
-  verbose = Option.Boolean('-v,--verbose', false, {
-    description: 'increase verbosity of logged output',
-  })
-  noSDK = Option.Boolean('--noSDK', false, {
-    description:
-      "DEPRECATED - This should now be set in the config at client.skip = true'. Don't generate the generated client SDK",
-  })
-  datalayerPort = Option.String('--datalayer-port', '9000', {
-    description:
-      'Specify a port to run the datalayer server on. (default 9000)',
-  })
-  isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
-    description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
-  })
   localOption = Option.Boolean('--local', {
-    description: 'DEPRECATED: Uses the local file system graphql server',
-  })
-  experimentalDataLayer = Option.Boolean('--experimentalData', {
     description:
-      'DEPRECATED - Build the server with additional data querying capabilities',
-  })
-  noTelemetry = Option.Boolean('--noTelemetry', false, {
-    description: 'Disable anonymous telemetry that is collected',
+      'Starts local Graphql server and builds the local client instead of production client',
   })
   tinaGraphQLVersion = Option.String('--tina-graphql-version', {
     description:
       'Specify the version of @tinacms/graphql to use (defaults to latest)',
+  })
+  /**
+   * This option allows the user to skip the tina cloud checks if they want to. This could be useful for mismatched GraphQL versions or if they want to build only using the local client and never connect to Tina Cloud
+   */
+  skipCloudChecks = Option.Boolean('--skip-cloud-checks', false, {
+    description: 'Skips checking the provided cloud config.',
   })
 
   static usage = Command.Usage({
@@ -65,28 +50,13 @@ export class BuildCommand extends Command {
   }
 
   async execute(): Promise<number | void> {
+    logger.info('Starting Tina build')
+    this.logDeprecationWarnings()
     const configManager = new ConfigManager({
       rootPath: this.rootPath,
       tinaGraphQLVersion: this.tinaGraphQLVersion,
       legacyNoSDK: this.noSDK,
     })
-    logger.info('Starting Tina build')
-    if (this.isomorphicGitBridge) {
-      logger.warn('--isomorphicGitBridge has been deprecated')
-    }
-    if (this.experimentalDataLayer) {
-      logger.warn(
-        '--experimentalDataLayer has been deprecated, the data layer is now built-in automatically'
-      )
-    }
-    if (this.localOption) {
-      logger.warn('--local has been deprecated')
-    }
-    if (this.noSDK) {
-      logger.warn(
-        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
-      )
-    }
 
     try {
       await configManager.processConfig()
@@ -95,33 +65,55 @@ export class BuildCommand extends Command {
       logger.error('Unable to build, please fix your Tina config and try again')
       process.exit(1)
     }
-
+    let server: ViteDevServer | undefined
     // Initialize the host TCP server
     createDBServer(Number(this.datalayerPort))
     const database = await createAndInitializeDatabase(
       configManager,
       Number(this.datalayerPort)
     )
-    const { queryDoc, fragDoc } = await buildSchema(
-      database,
-      configManager.config
-    )
+
+    const { queryDoc, fragDoc, graphQLSchema, tinaSchema, lookup } =
+      await buildSchema(configManager.config)
 
     const codegen = new Codegen({
-      schema: await getASTSchema(database),
       configManager: configManager,
+      port: this.localOption ? Number(this.port) : undefined,
+      isLocal: this.localOption,
       queryDoc,
       fragDoc,
+      graphqlSchemaDoc: graphQLSchema,
+      tinaSchema,
+      lookup,
     })
     const apiURL = await codegen.execute()
 
-    if (!configManager.hasSelfHostedConfig()) {
-      await this.checkClientInfo(configManager, apiURL)
-      await waitForDB(configManager.config, apiURL, false)
-      await this.checkGraphqlSchema(configManager, database, apiURL)
+    if (this.localOption) {
+      // start the dev server if we are building locally
+      await this.indexContentWithSpinner({
+        database,
+        graphQLSchema,
+        tinaSchema,
+      })
+      server = await createDevServer(configManager, database, apiURL, true)
+      await server.listen(Number(this.port))
+      console.log('server listening on port', this.port)
     }
 
-    await buildProductionSpa(configManager, database, apiURL)
+    const skipCloudChecks =
+      this.skipCloudChecks || configManager.hasSelfHostedConfig()
+
+    if (!skipCloudChecks) {
+      await this.checkClientInfo(configManager, codegen.productionUrl)
+      await waitForDB(configManager.config, codegen.productionUrl, false)
+      await this.checkGraphqlSchema(
+        configManager,
+        database,
+        codegen.productionUrl
+      )
+    }
+
+    await buildProductionSpa(configManager, database, codegen.productionUrl)
 
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
@@ -161,29 +153,20 @@ export class BuildCommand extends Command {
           ],
         },
         ...summaryItems,
-        // {
-        //   emoji: '📚',
-        //   heading: 'Useful links',
-        //   subItems: [
-        //     {
-        //       key: 'Custom queries',
-        //       value: 'https://tina.io/querying',
-        //     },
-        //     {
-        //       key: 'Visual editing',
-        //       value: 'https://tina.io/visual-editing',
-        //     },
-        //   ],
-        // },
       ],
     })
-    process.exit()
+    if (this.subCommand) {
+      await this.startSubCommand()
+    } else {
+      process.exit()
+    }
   }
 
   async checkClientInfo(configManager: ConfigManager, apiURL: string) {
     const { config } = configManager
     const token = config.token
     const { clientId, branch, host } = parseURL(apiURL)
+
     const url = `https://${host}/db/${clientId}/status/${branch}`
     const bar = new Progress('Checking clientId and token. :prog', 1)
 
