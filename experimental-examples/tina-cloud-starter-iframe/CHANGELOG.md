@@ -1,5 +1,23 @@
 # @tinacms/starter-iframe
 
+## 0.1.36
+
+### Patch Changes
+
+- f6e2ec5e9: fix issue with single document naviation
+- Updated dependencies [f6e2ec5e9]
+  - tinacms@1.5.4
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.35
+
+### Patch Changes
+
+- Updated dependencies [3532d07f3]
+- Updated dependencies [6d1465fd8]
+  - tinacms@1.5.3
+  - next-tinacms-cloudinary@4.3.0
+
 ## 0.1.34
 
 ### Patch Changes
