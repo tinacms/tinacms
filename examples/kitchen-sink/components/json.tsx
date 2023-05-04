@@ -41,8 +41,15 @@ export function Json(props: { src: object }) {
                 } else {
                   fieldName = tinaField(parentValue, keyName)
                 }
+                // const dataAttributeName = tinaField(fieldName)
+                const extraProps = {}
+                if (fieldName !== 'undefined#undefined') {
+                  if (fieldName) {
+                    extraProps['data-tinafield'] = fieldName
+                  }
+                }
                 return (
-                  <span className="text-orange-600" data-tinafield={fieldName}>
+                  <span className="text-orange-600" {...extraProps}>
                     {value}
                   </span>
                 )

@@ -57,6 +57,32 @@ const astNode = schemaJson as G.DocumentNode
 const astNodeWithMeta: G.DocumentNode = {
   ...astNode,
   definitions: astNode.definitions.map((def) => {
+    if (def.kind === 'InterfaceTypeDefinition') {
+      return {
+        ...def,
+        fields: [
+          ...(def.fields || []),
+          {
+            kind: 'FieldDefinition',
+            name: {
+              kind: 'Name',
+              value: '_tina_metadata',
+            },
+            arguments: [],
+            type: {
+              kind: 'NonNullType',
+              type: {
+                kind: 'NamedType',
+                name: {
+                  kind: 'Name',
+                  value: 'JSON',
+                },
+              },
+            },
+          },
+        ],
+      }
+    }
     if (def.kind === 'ObjectTypeDefinition') {
       return {
         ...def,
@@ -575,6 +601,7 @@ const resolveFieldValue = ({
                 __typename: NAMER.dataTypeName(template.namespace),
                 _tina_metadata: {
                   id,
+                  name: nextPath.join('.'),
                   fields: metadataFields,
                 },
                 ...resolveFormValue({
@@ -610,6 +637,7 @@ const resolveFieldValue = ({
               __typename: NAMER.dataTypeName(field.namespace),
               _tina_metadata: {
                 id,
+                name: nextPath.join('.'),
                 fields: metadataFields,
               },
               ...resolveFormValue({
