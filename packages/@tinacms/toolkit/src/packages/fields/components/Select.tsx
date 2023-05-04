@@ -87,7 +87,10 @@ export const Select: React.FC<SelectProps> = ({
           <>
             <div className="relative mt-2">
               <Listbox.Button
-                className={classNames('flex items-center', selectFieldClasses)}
+                className={classNames(
+                  'flex items-center space-x-1',
+                  selectFieldClasses
+                )}
               >
                 {prefixComponent &&
                   prefixComponent({
@@ -137,7 +140,7 @@ export const Select: React.FC<SelectProps> = ({
                       {({ selected, active }) => {
                         const isEmpty = option.value?.length < 1
                         return (
-                          <div className="flex items-center">
+                          <div className="flex items-center space-x-1">
                             {prefixComponent &&
                               prefixComponent({
                                 option: option,

@@ -206,7 +206,7 @@ const config = defineStaticConfig({
                           }
                           return (
                             <div
-                              className={`rounded-full w-5 h-5 border mr-2 shrink-0 ${color} ${
+                              className={`rounded-full w-5 h-5 border mr-1 shrink-0 ${color} ${
                                 active
                                   ? "border-white/80"
                                   : "border-gray-800/80"
