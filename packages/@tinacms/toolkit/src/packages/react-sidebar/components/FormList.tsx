@@ -106,7 +106,6 @@ export const FormLists = (props: { isEditing: boolean }) => {
             <FormList
               isEditing={props.isEditing}
               setActiveFormId={(id) => {
-                console.log('setit', id)
                 cms.dispatch({ type: 'forms:set-active-form-id', value: id })
               }}
               formList={formList}

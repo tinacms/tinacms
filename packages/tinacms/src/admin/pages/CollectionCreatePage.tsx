@@ -299,6 +299,7 @@ export const RenderForm = ({
     cms.dispatch({ type: 'forms:set-active-form-id', value: form.id })
     return () => {
       cms.dispatch({ type: 'forms:remove', value: form.id })
+      cms.dispatch({ type: 'forms:set-active-form-id', value: null })
     }
   }, [JSON.stringify(formInfo.fields)])
   if (!cms.state.activeFormId) {
