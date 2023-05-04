@@ -1,5 +1,11 @@
 # tinacms
 
+## 1.5.4
+
+### Patch Changes
+
+- f6e2ec5e9: fix issue with single document naviation
+
 ## 1.5.3
 
 ### Patch Changes
