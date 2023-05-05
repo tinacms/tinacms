@@ -126,7 +126,10 @@ const UnknownRenderer = ({
             {keyName}: {!expanded && '{...}'}
           </button>
           {/* @ts-ignore */}
-          <div>{expanded && renderRichText({ value })}</div>
+          <div>
+            {expanded &&
+              renderRichText({ value, keyName, parentValue, parentKeyName })}
+          </div>
         </div>
       )
     }
