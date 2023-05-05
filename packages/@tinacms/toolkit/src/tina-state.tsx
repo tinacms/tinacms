@@ -185,7 +185,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         }
         return form
       })
-      return { ...state, forms }
+      return { ...state, forms, activeFormId: action.value.formId }
     default:
       throw new Error(`Unhandled action ${action.type}`)
       return state
