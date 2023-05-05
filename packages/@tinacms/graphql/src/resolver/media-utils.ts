@@ -100,12 +100,14 @@ const cleanUpSlashes = (path: string): string => {
 }
 
 const hasTinaMediaConfig = (schema: Schema<true>): boolean => {
-  if (
-    schema.config?.media?.tina?.publicFolder &&
-    schema.config?.media?.tina?.mediaRoot
-  ) {
-    return true
-  }
+  if (!schema.config?.media?.tina) return false
 
-  return false
+  // If they don't have both publicFolder and mediaRoot, they don't have a Tina Media config
+  if (
+    typeof schema.config?.media?.tina?.publicFolder !== 'string' &&
+    typeof schema.config?.media?.tina?.mediaRoot !== 'string'
+  )
+    return false
+
+  return true
 }

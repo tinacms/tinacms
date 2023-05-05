@@ -1,10 +1,10 @@
 {
   "name": "@tinacms/starter-iframe",
-  "version": "0.1.34",
+  "version": "0.1.36",
   "private": true,
   "scripts": {
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
-    "build": "tinacms build --noTelemetry && next build",
+    "build": "tinacms build --local --skip-cloud-checks --noTelemetry -c \"next build\"",
     "start": "tinacms build --noTelemetry && next start",
     "dev:audit": "tinacms audit",
     "build:prod": "tinacms build && next build"
