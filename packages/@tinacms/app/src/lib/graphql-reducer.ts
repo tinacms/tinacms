@@ -643,7 +643,7 @@ const resolveFieldValue = ({
               ...resolveFormValue({
                 fields: templateFields,
                 values: item,
-                path,
+                path: nextPath,
                 id,
               }),
             }
@@ -664,7 +664,7 @@ const resolveFieldValue = ({
           ...resolveFormValue({
             fields: templateFields,
             values: value as any,
-            path,
+            path: nextPath,
             id,
           }),
         }
