@@ -53,7 +53,6 @@ export function SidebarProvider({
   resizingSidebar,
   setResizingSidebar,
   defaultWidth = defaultSidebarWidth,
-  defaultState = defaultSidebarState,
   sidebar,
 }: SidebarProviderProps) {
   useSubscribable(sidebar)
@@ -66,8 +65,6 @@ export function SidebarProvider({
       position={cms?.sidebar?.position || position}
       // @ts-ignore
       defaultWidth={cms?.sidebar?.defaultWidth || defaultWidth}
-      // @ts-ignore
-      defaultState={cms?.sidebar?.defaultState || defaultState}
       resizingSidebar={resizingSidebar}
       setResizingSidebar={setResizingSidebar}
       renderNav={
@@ -92,8 +89,6 @@ interface SidebarProps {
   renderNav?: boolean
 }
 
-type displayStates = 'closed' | 'open' | 'fullscreen'
-
 const useFetchCollections = (cms) => {
   return { collections: cms.api.admin.fetchCollections(), loading: false }
 }
@@ -101,7 +96,7 @@ const useFetchCollections = (cms) => {
 const Sidebar = ({
   sidebar,
   defaultWidth,
-  defaultState,
+  // defaultState,
   position,
   renderNav,
   resizingSidebar,
@@ -131,10 +126,12 @@ const Sidebar = ({
 
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
-  const [displayState, setDisplayState] =
-    React.useState<displayStates>(defaultState)
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
+
+  const setDisplayState = (value: 'closed' | 'fullscreen' | 'open') =>
+    cms.dispatch({ type: 'sidebar:set-display-state', value: value })
+  const displayState = cms.state.sidebarDisplayState
 
   /* Set sidebar open state and width to local values if available */
   React.useEffect(() => {
@@ -158,10 +155,10 @@ const Sidebar = ({
       const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY)
 
       if (localSidebarState === null) {
-        setDisplayState(defaultState)
+        setDisplayState(defaultSidebarState)
       }
     }
-  }, [defaultState])
+  }, [defaultSidebarState])
 
   /* Update the local value of the sidebar state any time it updates, if the CMS is loaded */
   React.useEffect(() => {

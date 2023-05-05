@@ -1,4 +1,5 @@
 import { Form } from './react-tinacms'
+import { TinaCMS } from './tina-cms'
 
 type FormListItem =
   | {
@@ -67,6 +68,10 @@ export type TinaAction =
   | {
       type: 'toggle-quick-editing-enabled'
     }
+  | {
+      type: 'sidebar:set-display-state'
+      value: TinaState['sidebarDisplayState'] | 'openOrFull'
+    }
 
 export interface TinaState {
   activeFormId: string | null
@@ -84,15 +89,19 @@ export interface TinaState {
   editingMode: 'visual' | 'basic'
   quickEditSupported: boolean
   quickEditEnabled: boolean
+  sidebarDisplayState: 'closed' | 'open' | 'fullscreen'
 }
 
-export const initialState: TinaState = {
-  activeFormId: null,
-  forms: [],
-  formLists: [],
-  editingMode: 'basic',
-  quickEditSupported: false,
-  quickEditEnabled: false,
+export const initialState = (cms: TinaCMS): TinaState => {
+  return {
+    activeFormId: null,
+    forms: [],
+    formLists: [],
+    editingMode: 'basic',
+    quickEditSupported: false,
+    quickEditEnabled: false,
+    sidebarDisplayState: cms.sidebar.defaultState || 'open',
+  }
 }
 
 // Our reducer function that uses a switch statement to handle our actions
@@ -186,6 +195,17 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         return form
       })
       return { ...state, forms, activeFormId: action.value.formId }
+    case 'sidebar:set-display-state': {
+      // In some cases, you may only care that the sidebar is open, regardless
+      // whether it's "open" or "full"
+      if (action.value === 'openOrFull') {
+        if (state.sidebarDisplayState === 'closed') {
+          return { ...state, sidebarDisplayState: 'open' }
+        }
+        return state
+      }
+      return { ...state, sidebarDisplayState: action.value }
+    }
     default:
       throw new Error(`Unhandled action ${action.type}`)
       return state

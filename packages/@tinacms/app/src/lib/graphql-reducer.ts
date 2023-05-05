@@ -408,6 +408,10 @@ export const useGraphQLReducer = (
           type: 'forms:set-active-field-name',
           value: { formId, fieldName },
         })
+        cms.dispatch({
+          type: 'sidebar:set-display-state',
+          value: 'openOrFull',
+        })
       }
       if (event.data.type === 'close') {
         const payloadSchema = z.object({ id: z.string() })
