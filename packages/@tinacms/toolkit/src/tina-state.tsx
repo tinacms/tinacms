@@ -100,7 +100,7 @@ export const initialState = (cms: TinaCMS): TinaState => {
     editingMode: 'basic',
     quickEditSupported: false,
     quickEditEnabled: false,
-    sidebarDisplayState: cms.sidebar.defaultState || 'open',
+    sidebarDisplayState: cms?.sidebar?.defaultState || 'open',
   }
 }
 
