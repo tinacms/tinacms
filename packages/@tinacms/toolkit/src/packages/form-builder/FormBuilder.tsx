@@ -205,6 +205,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     {tinaForm && tinaForm.fields.length ? (
                       <FieldsBuilder
                         form={tinaForm}
+                        activeFieldName={form.activeFieldName}
                         fields={fieldGroup.fields}
                       />
                     ) : (

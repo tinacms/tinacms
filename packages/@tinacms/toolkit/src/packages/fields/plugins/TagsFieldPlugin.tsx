@@ -31,10 +31,18 @@ export const TagsField = wrapFieldsWithMeta<
     [form, field.name]
   )
   const items = input.value || []
+  const ref = React.useRef(null)
+  React.useEffect(() => {
+    if (ref.current && field.experimental_focusIntent) {
+      ref.current.focus()
+    }
+  }, [field.experimental_focusIntent, ref])
+
   return (
     <>
       <div className="flex items-center gap-3">
         <BaseTextField
+          ref={ref}
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder={field.placeholder ? field.placeholder : 'Add a tag'}

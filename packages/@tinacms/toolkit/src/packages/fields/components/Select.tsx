@@ -6,6 +6,7 @@
 
 import * as React from 'react'
 import { MdKeyboardArrowDown } from 'react-icons/md'
+import type { Field } from '../../forms'
 
 type Option = {
   value: string
@@ -22,7 +23,7 @@ interface SelectFieldProps {
 export interface SelectProps {
   name: string
   input: React.SelectHTMLAttributes<HTMLSelectElement>
-  field?: SelectFieldProps
+  field?: SelectFieldProps & Field
   disabled?: boolean
   options?: (Option | string)[]
 }
@@ -32,10 +33,18 @@ export const selectFieldClasses =
 
 export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
   const selectOptions = options || field.options
+  const ref = React.useRef(null)
+  React.useEffect(() => {
+    if (ref.current && field.experimental_focusIntent) {
+      ref.current.focus()
+    }
+  }, [field.experimental_focusIntent, ref])
+
   return (
     <div className="relative group">
       <select
         id={input.name}
+        ref={ref}
         value={input.value}
         onChange={input.onChange}
         className={`${selectFieldClasses} ${
