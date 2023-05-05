@@ -71,8 +71,18 @@ export const createConfig = async ({
 
   let subPath
   if (configManager.config.build.subPath) {
+    console.log('subpath found: ', configManager.config.build.subPath)
     subPath = configManager.config.build.subPath
+  } else {
+    console.log('no subpath found: ')
   }
+
+  console.log(
+    'Config base: ',
+    `/${subPath ? `${normalizePath(subPath)}/` : ''}${normalizePath(
+      configManager.config.build.outputFolder
+    )}/`
+  )
 
   const config: InlineConfig = {
     root: configManager.spaRootPath,
