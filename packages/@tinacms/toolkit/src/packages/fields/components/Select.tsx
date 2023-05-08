@@ -35,10 +35,10 @@ export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
   const selectOptions = options || field.options
   const ref = React.useRef(null)
   React.useEffect(() => {
-    if (ref.current && field.experimental_focusIntent) {
+    if (ref.current && field?.experimental_focusIntent) {
       ref.current.focus()
     }
-  }, [field.experimental_focusIntent, ref])
+  }, [field?.experimental_focusIntent, ref])
 
   return (
     <div className="relative group">
