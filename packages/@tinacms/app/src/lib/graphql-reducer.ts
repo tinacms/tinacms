@@ -466,6 +466,7 @@ export const useGraphQLReducer = (
   }, [cms.state.quickEditEnabled])
 
   React.useEffect(() => {
+    cms.dispatch({ type: 'set-edit-mode', value: 'visual' })
     if (iframe) {
       window.addEventListener('message', handleMessage)
     }
@@ -473,6 +474,7 @@ export const useGraphQLReducer = (
     return () => {
       window.removeEventListener('message', handleMessage)
       cms.removeAllForms()
+      cms.dispatch({ type: 'set-edit-mode', value: 'basic' })
     }
   }, [iframe.current])
 }

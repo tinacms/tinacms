@@ -11,6 +11,7 @@ import {
   FieldFocusEvent,
 } from '../packages/fields/field-events'
 import { useFieldReference } from '../hooks/use-field-reference'
+import { useCMS } from '../react-tinacms'
 
 const IndicatorWrap = ({ style = {}, position, ...props }) => (
   <div
@@ -110,6 +111,7 @@ const useScrollToFocusedField = () => {
 }
 
 export const ActiveFieldIndicator = () => {
+  const cms = useCMS()
   const [activeFieldName, setActiveFieldName] = React.useState<string | null>(
     null
   )
@@ -164,6 +166,10 @@ export const ActiveFieldIndicator = () => {
   const eleBottomY = position.top + position.height + window.scrollY
   const viewportTopY = window.scrollY
   const viewportBottomY = window.innerHeight + window.scrollY
+
+  if (cms.state.quickEditEnabled) {
+    return null
+  }
 
   if (eleTopY > viewportBottomY) {
     // element is below the viewport
