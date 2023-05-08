@@ -10,7 +10,7 @@ Add support for sites deployed to sub-paths. To enabled, provide the sub-path at
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',
-    subPath: 'my-site', // site is served at my-domain.com/my-site
+    basePath: 'my-site', // site is served at my-domain.com/my-site
   },
   ...
 ```

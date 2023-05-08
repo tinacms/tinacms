@@ -542,7 +542,7 @@ export interface Config<
     /**
      * If your site will be served at a sub-path like `my-domain.com/my-site`, provide `"my-site"`
      */
-    subPath?: string
+    basePath?: string
   }
   media?:
     | {
