@@ -129,10 +129,18 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       return { ...state, formLists: [], forms: [] }
     }
     case 'form-lists:add': {
-      const nextFormLists = [
-        ...state.formLists.filter(({ id }) => id !== action.value.id),
-        action.value,
-      ]
+      let formListItemExists = false
+      const nextFormLists = state.formLists.map((formList) => {
+        if (formList.id === action.value.id) {
+          formListItemExists = true
+          return action.value
+        }
+        return formList
+      })
+
+      if (!formListItemExists) {
+        nextFormLists.push(action.value)
+      }
 
       let activeFormId = state.activeFormId
       if (!activeFormId && state.formLists.length === 0) {

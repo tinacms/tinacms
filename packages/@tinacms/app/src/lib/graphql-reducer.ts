@@ -171,7 +171,7 @@ export const useGraphQLReducer = (
         setPayloads(updatedPayloads)
       })
     }
-  }, [payloads.map(({ id }) => id).join('.'), cms])
+  }, [JSON.stringify(payloads), cms])
 
   const processPayload = React.useCallback(
     (payload: Payload) => {
@@ -734,7 +734,7 @@ const expandPayload = async (payload: Payload, cms: TinaCMS) => {
     documentNode,
   })
   const expandedQueryForResolver = G.print(expandedDocumentNodeForResolver)
-  return { ...payload, expandQuery, expandedData, expandedQueryForResolver }
+  return { ...payload, expandedQuery, expandedData, expandedQueryForResolver }
 }
 
 /**

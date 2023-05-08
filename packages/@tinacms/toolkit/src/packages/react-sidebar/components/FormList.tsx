@@ -147,12 +147,11 @@ export const FormList = (props: {
       if (orderedListItems[0]?.type === 'document') {
         topItems.push({ type: 'list', label: 'Documents' })
       }
-      return [
-        ...topItems,
-        ...orderedListItems,
-        { type: 'list', label: 'Global Documents' },
-        ...globalItems,
-      ]
+      let extra = []
+      if (globalItems.length) {
+        extra = [{ type: 'list', label: 'Global Documents' }, ...globalItems]
+      }
+      return [...topItems, ...orderedListItems, ...extra]
     }, [JSON.stringify(props.formList.items)])
 
   return (
