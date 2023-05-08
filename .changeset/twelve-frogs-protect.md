@@ -3,7 +3,7 @@
 '@tinacms/cli': patch
 ---
 
-Add support for sites deployed to sub-paths. To enabled, provide the sub-path at config.build.subPath:
+Add support for sites deployed to sub-paths. To enabled, provide the sub-path at config.build.basePath:
 
 ```ts
   ...
