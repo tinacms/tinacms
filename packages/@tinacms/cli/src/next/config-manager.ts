@@ -6,11 +6,13 @@ import type { Loader } from 'esbuild'
 import { Config } from '@tinacms/schema-tools'
 import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
+import chalk from 'chalk'
+
 import { logger } from '../logger'
 
 export const TINA_FOLDER = 'tina'
 export const LEGACY_TINA_FOLDER = '.tina'
-const GENERATED_FOLDER = '__generated__'
+export const GENERATED_FOLDER = '__generated__'
 const GRAPHQL_JSON_FILE = '_graphql.json'
 const GRAPHQL_GQL_FILE = 'schema.gql'
 const SCHEMA_JSON_FILE = '_schema.json'
@@ -26,6 +28,7 @@ export class ConfigManager {
   contentRootPath?: string
   envFilePath: string
   generatedFolderPath: string
+  generatedFolderPathContentRepo: string
   generatedGraphQLGQLPath: string
   generatedGraphQLJSONPath: string
   generatedSchemaJSONPath: string
@@ -204,16 +207,32 @@ export class ConfigManager {
       this.config.localContentPath || ''
     )
 
-    if (
-      this.config.localContentPath &&
-      (await fs.existsSync(fullLocalContentPath))
-    ) {
-      logger.info(`Using separate content repo at ${fullLocalContentPath}`)
-      this.contentRootPath = fullLocalContentPath
-    } else {
+    if (this.config.localContentPath) {
+      // Check if the localContentPath exists
+      const localContentPathExists = await fs.pathExists(fullLocalContentPath)
+      if (localContentPathExists) {
+        logger.info(`Using separate content repo at ${fullLocalContentPath}`)
+        this.contentRootPath = fullLocalContentPath
+      } else {
+        // Warn the user if they provided a localContentPath that doesn't exist
+        logger.warn(
+          `${chalk.yellow('Warning:')} The localContentPath ${chalk.cyan(
+            fullLocalContentPath
+          )} does not exist. Please create it or remove the localContentPath from your config file at ${chalk.cyan(
+            this.tinaConfigFilePath
+          )}`
+        )
+      }
+    }
+
+    if (!this.contentRootPath) {
       this.contentRootPath = this.rootPath
     }
 
+    this.generatedFolderPathContentRepo = path.join(
+      await this.getTinaFolderPath(this.contentRootPath),
+      GENERATED_FOLDER
+    )
     this.spaMainPath = require.resolve('@tinacms/app')
     this.spaRootPath = path.join(this.spaMainPath, '..', '..')
     // =================

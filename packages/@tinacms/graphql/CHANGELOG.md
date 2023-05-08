@@ -1,5 +1,18 @@
 # tina-graphql
 
+## 1.4.11
+
+### Patch Changes
+
+- 83b19fb8d: Update the bridge interface to remove properties that are no longer needed.
+- 1c7998b7e: fix hasTinaMediaConfig function
+
+## 1.4.10
+
+### Patch Changes
+
+- a402c8010: Fix root level collection issues including a folder related bug
+
 ## 1.4.9
 
 ### Patch Changes

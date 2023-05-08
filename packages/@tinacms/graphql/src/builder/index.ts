@@ -2,7 +2,7 @@
 
 */
 
-import { Database } from '../database'
+import { LookupMapType } from '../database'
 import { astBuilder, NAMER } from '../ast-builder'
 import { sequential } from '../util'
 import { staticDefinitions } from './static-definitions'
@@ -29,13 +29,11 @@ import type {
 import { TinaSchema } from '@tinacms/schema-tools'
 
 export const createBuilder = async ({
-  database,
   tinaSchema,
 }: {
-  database: Database
   tinaSchema: TinaSchema
 }) => {
-  return new Builder({ database, tinaSchema: tinaSchema })
+  return new Builder({ tinaSchema: tinaSchema })
 }
 
 /**
@@ -46,10 +44,9 @@ export const createBuilder = async ({
 export class Builder {
   private maxDepth: number
   public tinaSchema: TinaSchema
-  public database: Database
+  public lookupMap: Record<string, LookupMapType>
   constructor(
     public config: {
-      database: Database
       tinaSchema: TinaSchema
     }
   ) {
@@ -57,8 +54,13 @@ export class Builder {
       // @ts-ignore
       config?.tinaSchema.schema?.config?.client?.referenceDepth ?? 2
     this.tinaSchema = config.tinaSchema
-    this.database = config.database
+    this.lookupMap = {}
   }
+
+  private addToLookupMap = (lookup: LookupMapType) => {
+    this.lookupMap[lookup.type] = lookup
+  }
+
   /**
    * ```graphql
    * # ex.
@@ -194,7 +196,8 @@ export class Builder {
         type: astBuilder.TYPES.String,
       }),
     ]
-    await this.database.addToLookupMap({
+
+    await this.addToLookupMap({
       type: astBuilder.TYPES.Node,
       resolveType: 'nodeDocument',
     })
@@ -428,7 +431,7 @@ export class Builder {
         type: astBuilder.TYPES.String,
       }),
     ]
-    await this.database.addToLookupMap({
+    await this.addToLookupMap({
       type: type.name.value,
       resolveType: 'collectionDocument',
       collection: collection.name,
@@ -722,7 +725,7 @@ export class Builder {
   public collectionDocumentList = async (collection: Collection<true>) => {
     const connectionName = NAMER.referenceConnectionType(collection.namespace)
 
-    await this.database.addToLookupMap({
+    this.addToLookupMap({
       type: connectionName,
       resolveType: 'collectionDocumentList' as const,
       collection: collection.name,
@@ -907,7 +910,7 @@ export class Builder {
       types,
     })
 
-    await this.database.addToLookupMap({
+    this.addToLookupMap({
       type: type.name.value,
       resolveType: 'multiCollectionDocument',
       createDocument: 'create',
@@ -932,7 +935,7 @@ export class Builder {
     includeFolderFilter?: boolean
   }) => {
     const connectionName = NAMER.referenceConnectionType(namespace)
-    await this.database.addToLookupMap({
+    this.addToLookupMap({
       type: connectionName,
       resolveType: 'multiCollectionDocumentList' as const,
       collections: collections.map((collection) => collection.name),
@@ -1225,7 +1228,7 @@ export class Builder {
         }
       )
 
-      await this.database.addToLookupMap({
+      this.addToLookupMap({
         type: name,
         resolveType: 'unionData',
         collection: collection?.name,
