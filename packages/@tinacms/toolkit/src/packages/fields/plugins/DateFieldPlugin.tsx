@@ -29,7 +29,9 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   }
 )
 
-export const ReactDateTimeWithStyles = (props: DatetimepickerProps & Field) => {
+export const ReactDateTimeWithStyles = (
+  props: DatetimepickerProps & Partial<Field>
+) => {
   const [isOpen, setIsOpen] = useState(false)
   const area = useRef<HTMLDivElement>(null!)
 
