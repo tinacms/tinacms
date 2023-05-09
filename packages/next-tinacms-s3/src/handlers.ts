@@ -125,9 +125,13 @@ async function uploadMedia(
         src,
       })
     } catch (e) {
+      console.error('Error uploading media to s3')
+      console.error(e)
       res.status(500).send(findErrorMessage(e))
     }
   } catch (e) {
+    console.error('Error uploading media')
+    console.error(e)
     res.status(500)
     const message = findErrorMessage(e)
     res.json({ e: message })
@@ -185,6 +189,9 @@ async function listMedia(
       offset: response.NextMarker,
     })
   } catch (e) {
+    // Show the error to the user
+    console.error('Error listing media')
+    console.error(e)
     res.status(500)
     const message = findErrorMessage(e)
     res.json({ e: message })
@@ -222,6 +229,8 @@ async function deleteAsset(
     const data = await client.send(command)
     res.json(data)
   } catch (e) {
+    console.error('Error deleting media')
+    console.error(e)
     res.status(500)
     const message = findErrorMessage(e)
     res.json({ e: message })
