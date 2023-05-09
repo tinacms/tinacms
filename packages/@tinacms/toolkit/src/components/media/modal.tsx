@@ -1,4 +1,5 @@
 import React from 'react'
+import { Input } from '../../packages/fields'
 import {
   Modal,
   ModalHeader,
@@ -12,6 +13,10 @@ interface DeleteModalProps {
   close(): void
   deleteFunc(): void
   filename: string
+}
+interface NewFolderModalProps {
+  onSubmit(filename: string): void
+  close(): void
 }
 
 export const DeleteModal = ({
@@ -41,6 +46,42 @@ export const DeleteModal = ({
             }}
           >
             Delete
+          </Button>
+        </ModalActions>
+      </PopupModal>
+    </Modal>
+  )
+}
+
+// TODO: Scott B can you style this?
+// It might not need styling but feel free to take a look
+export const NewFolderModal = ({ onSubmit, close }: NewFolderModalProps) => {
+  const [folderName, setFolderName] = React.useState('')
+  return (
+    <Modal>
+      <PopupModal>
+        <ModalHeader close={close}>New Folder</ModalHeader>
+        <ModalBody padded={true}>
+          <Input
+            value={folderName}
+            onChange={(e) => setFolderName(e.target.value)}
+          />
+        </ModalBody>
+        <ModalActions>
+          <Button style={{ flexGrow: 2 }} onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!folderName}
+            style={{ flexGrow: 3 }}
+            variant="primary"
+            onClick={() => {
+              if (!folderName) return
+              onSubmit(folderName)
+              close()
+            }}
+          >
+            Add new folder
           </Button>
         </ModalActions>
       </PopupModal>

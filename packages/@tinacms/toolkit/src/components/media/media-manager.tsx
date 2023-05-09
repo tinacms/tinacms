@@ -28,7 +28,7 @@ import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
-import { IoMdSync, IoMdRefresh } from 'react-icons/io'
+import { IoMdSync, IoMdRefresh, IoMdFolder } from 'react-icons/io'
 import { CloseIcon, TrashIcon } from '../../packages/icons'
 import {
   absoluteImgURL,
@@ -36,7 +36,7 @@ import {
   dropzoneAcceptFromString,
   isImage,
 } from './utils'
-import { DeleteModal, SyncModal } from './modal'
+import { DeleteModal, NewFolderModal, SyncModal } from './modal'
 import { CopyField } from './copy-field'
 
 // taken from https://davidwalsh.name/javascript-polling
@@ -163,6 +163,7 @@ export function MediaPicker({
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
+  const [newFolderModalOpen, setNewFolderModalOpen] = React.useState(false)
   const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
@@ -453,12 +454,41 @@ export function MediaPicker({
           close={() => setDeleteModalOpen(false)}
         />
       )}
+      {newFolderModalOpen && (
+        <NewFolderModal
+          onSubmit={(name) => {
+            setDirectory((oldDir) => {
+              if (oldDir) {
+                return join(oldDir, name)
+              } else {
+                return name
+              }
+            })
+            resetOffset()
+          }}
+          close={() => setNewFolderModalOpen(false)}
+        />
+      )}
 
       <MediaPickerWrap>
         <div className="flex items-center bg-gray-50 border-b border-gray-150 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
           <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
 
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
+
+          {/* TODO: Scott B can you style this? */}
+          {/* I added two buttons; refresh list and new folder */}
+          <Button
+            busy={false}
+            variant="secondary"
+            onClick={() => {
+              setNewFolderModalOpen(true)
+            }}
+            className="whitespace-nowrap"
+          >
+            New Folder
+            <IoMdFolder className="w-6 h-full ml-2 opacity-70" />
+          </Button>
           <Button
             busy={false}
             variant="secondary"
