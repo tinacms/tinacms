@@ -10,6 +10,7 @@
     <div id="root"></div>
     <script>
       function handleLoadError() {
+        console.error('Failed to load assets')
         // Assets have failed to load
         document.getElementById('root').innerHTML =
           '<style type="text/css">\
@@ -54,11 +55,15 @@
           </p>\
         </div>'
       }
+
+      // Check if #root has childen after 2 seconds
+      // If not, we assume that the assets have failed to load
+      setTimeout(() => {
+        if (!document.getElementById('root').children.length) {
+          handleLoadError()
+        }
+      }, 2000)
     </script>
-    <script
-      type="module"
-      src="/src/main.tsx"
-      onerror="handleLoadError()"
-    ></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
