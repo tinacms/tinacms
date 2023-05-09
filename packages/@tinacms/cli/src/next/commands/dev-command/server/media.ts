@@ -38,8 +38,9 @@ export const createMediaRouter = (config: PathConfig) => {
   ) {
     const bb = busboy({ headers: req.headers })
 
-    bb.on('file', (name, file, info) => {
-      const saveTo = path.join(mediaFolder, info.filename)
+    bb.on('file', (_name, file, _info) => {
+      const fullPath = req.url?.slice('/media/upload/'.length)
+      const saveTo = path.join(mediaFolder, ...fullPath.split('/'))
       file.pipe(fs.createWriteStream(saveTo))
     })
     bb.on('error', (error) => {
