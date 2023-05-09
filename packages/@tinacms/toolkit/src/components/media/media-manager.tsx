@@ -28,7 +28,7 @@ import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
-import { IoMdSync } from 'react-icons/io'
+import { IoMdSync, IoMdRefresh } from 'react-icons/io'
 import { CloseIcon, TrashIcon } from '../../packages/icons'
 import {
   absoluteImgURL,
@@ -248,7 +248,7 @@ export function MediaPicker({
     loadMedia()
 
     return cms.events.subscribe(
-      ['media:upload:success', 'media:delete:success', 'media:pageSize'],
+      ['media:delete:success', 'media:pageSize'],
       loadMedia
     )
   }, [offset, directory, cms.media.isConfigured])
@@ -294,7 +294,7 @@ export function MediaPicker({
     onDrop: async (files, fileRejections) => {
       try {
         setUploading(true)
-        await cms.media.persist(
+        const mediaItems = await cms.media.persist(
           files.map((file) => {
             return {
               directory: directory || '/',
@@ -337,6 +337,20 @@ export function MediaPicker({
                 {messages.join('. ')}.
               </>
             )
+          })
+        }
+        // if there are media items, set the first one as active and prepend all the items to the list
+        if (mediaItems.length !== 0) {
+          setActiveItem(mediaItems[0])
+          setList((mediaList) => {
+            return {
+              items: [
+                // all of the newly added items are new
+                ...mediaItems.map((x) => ({ ...x, new: true })),
+                ...mediaList.items,
+              ],
+              nextOffset: mediaList.nextOffset,
+            }
           })
         }
       } catch {
@@ -445,6 +459,15 @@ export function MediaPicker({
           <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
 
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
+          <Button
+            busy={false}
+            variant="secondary"
+            onClick={loadMedia}
+            className="whitespace-nowrap"
+          >
+            Refresh List
+            <IoMdRefresh className="w-6 h-full ml-2 opacity-70" />
+          </Button>
           {!isLocal && hasTinaMedia && (
             <Button
               // this button is only displayed when the data is not loading

@@ -9,7 +9,7 @@ import { BiFolder, BiFile } from 'react-icons/bi'
 import { isImage } from './utils'
 
 interface MediaItemProps {
-  item: Media
+  item: Media & { new?: boolean }
   onClick(_item: Media | false): void
   active: boolean
 }
@@ -50,7 +50,43 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   )
 }
 
-export function GridMediaItem({ item, active, onClick }) {
+// We may need this later
+// const EnsureLoaded: React.FC<{ url: string; bypass: boolean }> = ({
+//   children,
+//   bypass,
+//   url,
+// }) => {
+//   const [loaded, setLoaded] = React.useState(false)
+
+//   React.useEffect(() => {
+//     let cancel = false
+//     const fetchLoaded = async () => {
+//       for (let i = 0; i < 10; i++) {
+//         if (!cancel && !loaded) {
+//           const res = await fetch(url, { method: 'HEAD' })
+//           // console.log(res)
+//           if (res.ok) {
+//             setLoaded(true)
+//           } else {
+//             await new Promise((resolve) => setTimeout(resolve, 1000))
+//           }
+//         }
+//       }
+//     }
+//     if (!loaded && !cancel && url && !bypass) fetchLoaded()
+
+//     return () => {
+//       cancel = true
+//     }
+//   }, [])
+//   if (bypass || loaded) {
+//     return children
+//   } else {
+//     return <div>loading...</div>
+//   }
+// }
+
+export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
   const thumbnail = (item.thumbnails || {})['400x400']
   return (
@@ -61,6 +97,12 @@ export function GridMediaItem({ item, active, onClick }) {
           : 'shadow hover:shadow-md hover:scale-103 hover:border-gray-150'
       } ${item.type === 'dir' ? 'cursor-pointer' : ''}`}
     >
+      {/* TODO: Scott B can you style this? */}
+      {item.new && (
+        <span className="absolute top-1 left-1 rounded-md bg-green-50  text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 z-10">
+          New
+        </span>
+      )}
       <button
         className="absolute w-full h-full flex items-center justify-center bg-white"
         onClick={() => {
