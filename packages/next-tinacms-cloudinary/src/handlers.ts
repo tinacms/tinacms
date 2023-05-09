@@ -115,28 +115,44 @@ async function listMedia(
         return cloudinary.api.sub_folders(directory)
       }
     }
+    let folders: string[] = []
+    let folderRes = null
 
-    // @ts-ignore
-    let { folders } = await cloudinary.api.folders(directory)
-
-    folders = folders.map(function (folder: {
-      name: string
-      path: string
-    }): Media {
-      'empty-repo/004'
-      return {
-        id: folder.path,
-        type: 'dir',
-        filename: path.basename(folder.path),
-        directory: path.dirname(folder.path),
+    try {
+      // @ts-ignore
+      folderRes = await cloudinary.api.folders(directory)
+    } catch (e) {
+      // If the folder doesn't exist, just return an empty array
+      if (e.error?.message.startsWith("Can't find folder with path")) {
+        // ignore
+      } else {
+        console.error('Error getting folders')
+        console.error(e)
+        throw e
       }
-    })
+    }
+
+    if (folderRes?.folders) {
+      folders = folderRes.folders.map(function (folder: {
+        name: string
+        path: string
+      }): Media {
+        'empty-repo/004'
+        return {
+          id: folder.path,
+          type: 'dir',
+          filename: path.basename(folder.path),
+          directory: path.dirname(folder.path),
+        }
+      })
+    }
 
     res.json({
       items: [...folders, ...files],
       offset: response.next_cursor,
     })
   } catch (e) {
+    console.log(e)
     res.status(500)
     const message = findErrorMessage(e)
     res.json({ e: message })
