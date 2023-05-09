@@ -15,59 +15,58 @@ export function useTina<T extends object>(props: {
   const [quickEditEnabled, setQuickEditEnabled] = React.useState(false)
   const [editingReady, setEditingReady] = React.useState(false)
 
-  React.useEffect(() => {
-    if (!editingReady) {
-      clearElementContainer()
-      return
-    }
-    if (quickEditEnabled) {
-      addElementContainer()
-      updateElementList()
-    } else {
-      clearElementContainer()
-    }
-  }, [quickEditEnabled, editingReady])
+  // React.useEffect(() => {
+  //   if (quickEditEnabled) {
+  //     addElementContainer()
+  //     updateElementList()
+  //   } else {
+  //     clearElementContainer()
+  //   }
+  // }, [quickEditEnabled, editingReady])
 
   React.useEffect(() => {
+    if (!quickEditEnabled) {
+      return
+    }
     const style = document.createElement('style')
+    const onMouseDown = (event: MouseEvent) => {
+      // @ts-ignore
+      const dataset = event.target.dataset as DOMStringMap
+      if (dataset['tinafield']) {
+        console.log(event)
+        event.preventDefault()
+        event.stopPropagation()
+        parent.postMessage(
+          {
+            type: 'field:selected',
+            fieldName: dataset['tinafield'],
+          },
+          window.location.origin
+        )
+      }
+    }
+    document.addEventListener('mousedown', onMouseDown)
     style.type = 'text/css'
     style.textContent = `
-.tina-click-edit-button {
-  border: 2px dashed rgb(107 182 248);
-  border-radius: 3px;
-  transition: background-color 0.5s ease;
-  pointer-events: auto;
+[data-tinafield] {
+  box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.1);
+  outline: 2px solid rgba(110, 163, 216, 0.2);
+  cursor: pointer;
+  transition: ease-in-out 200ms;
 }
-.tina-click-edit-button:hover {
-  background-color: rgb(197 221 239 / 40%);
-  border: 2px dashed rgb(22 110 188);
+[data-tinafield]:not(:has([data-tinafield]:hover)):hover {
+  box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.4);
+  outline: 2px solid rgba(110, 163, 216, 0.9);
+  cursor: pointer;
 }
     `
     document.head.appendChild(style)
 
     return () => {
+      document.removeEventListener('mousedown', onMouseDown)
       style.remove()
     }
-  }, [])
-
-  const clearElementContainer = () => {
-    const prevContainer = document.querySelector('#tina-click-edit-container')
-    prevContainer?.remove()
-  }
-  const addElementContainer = () => {
-    const prevContainer = document.querySelector('#tina-click-edit-container')
-    prevContainer?.remove()
-    const container = document.createElement('div')
-    container.id = 'tina-click-edit-container'
-    container.style['z-index'] = `20000`
-    container.style.position = `absolute`
-    container.style.pointerEvents = `none`
-    container.style.top = `0`
-    container.style.left = `0`
-    container.style.right = `0`
-    container.style.bottom = `0`
-    document.body.append(container)
-  }
+  }, [quickEditEnabled])
 
   const updateElementList = () => {
     const container = document.querySelector('#tina-click-edit-container')
@@ -96,23 +95,6 @@ export function useTina<T extends object>(props: {
         fieldName,
         rect,
       })
-      const button = document.createElement('button')
-      button.addEventListener('mousedown', () => {
-        parent.postMessage(
-          {
-            type: 'field:selected',
-            fieldName,
-          },
-          window.location.origin
-        )
-      })
-      button.style.position = 'absolute'
-      button.style.top = `${rect.top + window.scrollY}px`
-      button.style.left = `${rect.left + window.scrollX}px`
-      button.style.width = `${rect.width}px`
-      button.style.height = `${rect.height}px`
-      button.className = 'tina-click-edit-button'
-      container.append(button)
     }
   }
 
@@ -128,11 +110,6 @@ export function useTina<T extends object>(props: {
         setEditingReady(true)
       }
     })
-
-    const observer = new ResizeObserver(() => {
-      updateElementList()
-    })
-    observer.observe(document.body)
 
     return () => {
       parent.postMessage({ type: 'close', id }, window.location.origin)
