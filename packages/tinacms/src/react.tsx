@@ -7,96 +7,64 @@ export function useTina<T extends object>(props: {
 }): { data: T; isClient: boolean } {
   const [data, setData] = React.useState(props.data)
   const [isClient, setIsClient] = React.useState(false)
+  const [quickEditEnabled, setQuickEditEnabled] = React.useState(false)
+
   const id = JSON.stringify({ query: props.query, variables: props.variables })
   React.useEffect(() => {
     setIsClient(true)
     setData(props.data)
   }, [id])
-  const [quickEditEnabled, setQuickEditEnabled] = React.useState(false)
-  const [editingReady, setEditingReady] = React.useState(false)
-
-  // React.useEffect(() => {
-  //   if (quickEditEnabled) {
-  //     addElementContainer()
-  //     updateElementList()
-  //   } else {
-  //     clearElementContainer()
-  //   }
-  // }, [quickEditEnabled, editingReady])
 
   React.useEffect(() => {
     if (!quickEditEnabled) {
       return
     }
     const style = document.createElement('style')
-    const onMouseDown = (event: MouseEvent) => {
-      // @ts-ignore
-      const dataset = event.target.dataset as DOMStringMap
-      if (dataset['tinafield']) {
-        console.log(event)
-        event.preventDefault()
-        event.stopPropagation()
-        parent.postMessage(
-          {
-            type: 'field:selected',
-            fieldName: dataset['tinafield'],
-          },
-          window.location.origin
-        )
-      }
-    }
-    document.addEventListener('mousedown', onMouseDown)
     style.type = 'text/css'
     style.textContent = `
-[data-tinafield] {
-  box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.1);
-  outline: 2px solid rgba(110, 163, 216, 0.2);
-  cursor: pointer;
-  transition: ease-in-out 200ms;
-}
-[data-tinafield]:not(:has([data-tinafield]:hover)):hover {
-  box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.4);
-  outline: 2px solid rgba(110, 163, 216, 0.9);
-  cursor: pointer;
-}
+    [data-tinafield] {
+      box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.1);
+      outline: 2px solid rgba(110, 163, 216, 0.2);
+      cursor: pointer;
+      transition: ease-in-out 200ms;
+    }
+    [data-tinafield]:not(:has([data-tinafield]:hover)):hover {
+      box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.4);
+      outline: 2px solid rgba(110, 163, 216, 0.9);
+      cursor: pointer;
+    }
     `
     document.head.appendChild(style)
 
+    function mouseDownHandler(e) {
+      const fieldName = e.target?.dataset['tinafield']
+      if (e.target?.dataset && fieldName) {
+        e.preventDefault()
+        e.stopPropagation()
+        parent.postMessage(
+          { type: 'field:selected', fieldName },
+          window.location.origin
+        )
+      } else {
+        const ancestor = e.target.closest('[data-tinafield]')
+        if (ancestor) {
+          const fieldName = ancestor.dataset['tinafield']
+          e.preventDefault()
+          e.stopPropagation()
+          parent.postMessage(
+            { type: 'field:selected', fieldName },
+            window.location.origin
+          )
+        }
+      }
+    }
+    document.addEventListener('mousedown', mouseDownHandler, true)
+
     return () => {
-      document.removeEventListener('mousedown', onMouseDown)
+      document.removeEventListener('mousedown', mouseDownHandler)
       style.remove()
     }
   }, [quickEditEnabled])
-
-  const updateElementList = () => {
-    const container = document.querySelector('#tina-click-edit-container')
-    const nodeList = document.querySelectorAll('[data-tinafield]')
-    if (nodeList.length > 0) {
-      parent.postMessage(
-        { type: 'quick-edit', value: true },
-        window.location.origin
-      )
-    } else {
-      parent.postMessage(
-        { type: 'quick-edit', value: false },
-        window.location.origin
-      )
-    }
-    if (!container) {
-      return
-    }
-    container.innerHTML = ''
-    const elementList: { fieldName: string; rect: DOMRect }[] = []
-    for (const node of nodeList) {
-      const fieldName = node.getAttribute('data-tinafield')
-
-      const rect = node.getBoundingClientRect()
-      elementList.push({
-        fieldName,
-        rect,
-      })
-    }
-  }
 
   React.useEffect(() => {
     parent.postMessage({ type: 'open', ...props, id }, window.location.origin)
@@ -106,8 +74,19 @@ export function useTina<T extends object>(props: {
       }
       if (event.data.id === id && event.data.type === 'updateData') {
         setData(event.data.data)
-        updateElementList()
-        setEditingReady(true)
+        // Ensure we still have a tinafield on the page
+        const anyTinaField = document.querySelector('[data-tinafield]')
+        if (anyTinaField) {
+          parent.postMessage(
+            { type: 'quick-edit', value: true },
+            window.location.origin
+          )
+        } else {
+          parent.postMessage(
+            { type: 'quick-edit', value: false },
+            window.location.origin
+          )
+        }
       }
     })
 
@@ -115,7 +94,6 @@ export function useTina<T extends object>(props: {
       parent.postMessage({ type: 'close', id }, window.location.origin)
     }
   }, [id, setQuickEditEnabled])
-
   return { data, isClient } as any
 }
 
