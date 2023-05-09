@@ -1,10 +1,6 @@
 import React from 'react'
 
-export function useTina<T extends object>(props: {
-  query: string
-  variables: object
-  data: T
-}): { data: T; isClient: boolean } {
+export function useTina(props) {
   const [data, setData] = React.useState(props.data)
   const [isClient, setIsClient] = React.useState(false)
   const [quickEditEnabled, setQuickEditEnabled] = React.useState(false)
@@ -16,12 +12,10 @@ export function useTina<T extends object>(props: {
   }, [id])
 
   React.useEffect(() => {
-    if (!quickEditEnabled) {
-      return
-    }
-    const style = document.createElement('style')
-    style.type = 'text/css'
-    style.textContent = `
+    if (quickEditEnabled) {
+      const style = document.createElement('style')
+      style.type = 'text/css'
+      style.textContent = `
     [data-tinafield] {
       box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.1);
       outline: 2px solid rgba(110, 163, 216, 0.2);
@@ -34,35 +28,38 @@ export function useTina<T extends object>(props: {
       cursor: pointer;
     }
     `
-    document.head.appendChild(style)
+      document.head.appendChild(style)
 
-    function mouseDownHandler(e) {
-      const fieldName = e.target?.dataset['tinafield']
-      if (e.target?.dataset && fieldName) {
+      function mouseDownHandler(e) {
+        const fieldName = e.target?.dataset['tinafield']
         e.preventDefault()
         e.stopPropagation()
-        parent.postMessage(
-          { type: 'field:selected', fieldName },
-          window.location.origin
-        )
-      } else {
-        const ancestor = e.target.closest('[data-tinafield]')
-        if (ancestor) {
-          const fieldName = ancestor.dataset['tinafield']
+        if (e.target?.dataset && fieldName) {
           e.preventDefault()
           e.stopPropagation()
           parent.postMessage(
             { type: 'field:selected', fieldName },
             window.location.origin
           )
+        } else {
+          const ancestor = e.target.closest('[data-tinafield]')
+          if (ancestor) {
+            const fieldName = ancestor.dataset['tinafield']
+            e.preventDefault()
+            e.stopPropagation()
+            parent.postMessage(
+              { type: 'field:selected', fieldName },
+              window.location.origin
+            )
+          }
         }
       }
-    }
-    document.addEventListener('mousedown', mouseDownHandler, true)
+      document.addEventListener('click', mouseDownHandler, true)
 
-    return () => {
-      document.removeEventListener('mousedown', mouseDownHandler)
-      style.remove()
+      return () => {
+        document.removeEventListener('click', mouseDownHandler, true)
+        style.remove()
+      }
     }
   }, [quickEditEnabled])
 
@@ -94,7 +91,7 @@ export function useTina<T extends object>(props: {
       parent.postMessage({ type: 'close', id }, window.location.origin)
     }
   }, [id, setQuickEditEnabled])
-  return { data, isClient } as any
+  return { data, isClient }
 }
 
 export function useEditState(): { edit: boolean } {
