@@ -30,13 +30,13 @@ const errorHTML = `<style type="text/css">
 }
 </style>
 <div id="no-assets-placeholder">
-<h1>Oops!</h1>
+<h1>Failed loading TinaCMS assets</h1>
 <p>
   Your TinaCMS configuration may be misconfigured, and we could not load
   the assets for this page.
 </p>
 <p>
-  Please visit <a href="https://tina.io">https://tina.io</a> for help.
+  Please visit <a href="https://tina.io/docs/tina-cloud/faq/#how-do-i-resolve-failed-loading-tinacms-assets-error">this doc</a> for help.
 </p>
 </div>
 </div>`
