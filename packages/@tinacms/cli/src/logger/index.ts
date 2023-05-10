@@ -40,12 +40,13 @@ export const note = (message = '', title = '') => {
         )}${chalk.gray(bar)}`
     )
     .join('\n')
+  const underscoreLen = len - title.length - 1 > 0 ? len - title.length - 1 : 0
   process.stdout.write(
     `${chalk.gray(bar)}\n${chalk.green('○')}  ${chalk.reset(
       title
-    )} ${chalk.gray(
-      '─'.repeat(len - title.length - 1) + '╮'
-    )}\n${msg}\n${chalk.gray('├' + '─'.repeat(len + 2) + '╯')}\n`
+    )} ${chalk.gray('─'.repeat(underscoreLen) + '╮')}\n${msg}\n${chalk.gray(
+      '├' + '─'.repeat(len + 2) + '╯'
+    )}\n`
   )
 }
 

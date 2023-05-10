@@ -1,5 +1,23 @@
 # e2e-next
 
+## 0.1.34
+
+### Patch Changes
+
+- 69145cf93: Fix dep issue
+- Updated dependencies [f6e2ec5e9]
+  - tinacms@1.5.4
+  - @tinacms/datalayer@1.2.11
+
+## 0.1.33
+
+### Patch Changes
+
+- Updated dependencies [3532d07f3]
+- Updated dependencies [6d1465fd8]
+  - tinacms@1.5.3
+  - @tinacms/datalayer@1.2.10
+
 ## 0.1.32
 
 ### Patch Changes
