@@ -1,5 +1,12 @@
 # tinacms
 
+## 1.5.5
+
+### Patch Changes
+
+- Updated dependencies [beb179279]
+  - @tinacms/schema-tools@1.4.4
+
 ## 1.5.4
 
 ### Patch Changes

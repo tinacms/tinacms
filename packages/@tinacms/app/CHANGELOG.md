@@ -1,5 +1,13 @@
 # @tinacms/app
 
+## 1.2.12
+
+### Patch Changes
+
+- 31c160cdf: Placeholder view for when assets fail to load
+  - @tinacms/mdx@1.3.10
+  - tinacms@1.5.5
+
 ## 1.2.11
 
 ### Patch Changes
