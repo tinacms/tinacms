@@ -69,9 +69,16 @@ export const createConfig = async ({
       : configManager.generatedTypesJSFilePath
   }
 
+  let basePath
+  if (configManager.config.build.basePath) {
+    basePath = configManager.config.build.basePath
+  }
+
   const config: InlineConfig = {
     root: configManager.spaRootPath,
-    base: `/${normalizePath(configManager.config.build.outputFolder)}/`,
+    base: `/${basePath ? `${normalizePath(basePath)}/` : ''}${normalizePath(
+      configManager.config.build.outputFolder
+    )}/`,
     appType: 'spa',
     resolve: {
       alias,
