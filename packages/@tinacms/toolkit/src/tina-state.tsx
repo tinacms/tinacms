@@ -126,7 +126,13 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         forms: state.forms.filter((form) => form.tinaForm.id !== action.value),
       }
     case 'form-lists:clear': {
-      return { ...state, formLists: [], forms: [] }
+      return {
+        ...state,
+        quickEditEnabled: false,
+        quickEditSupported: false,
+        formLists: [],
+        forms: [],
+      }
     }
     case 'form-lists:add': {
       let formListItemExists = false

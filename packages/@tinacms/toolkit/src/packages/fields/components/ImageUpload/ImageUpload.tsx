@@ -63,10 +63,7 @@ export const ImageUpload = React.forwardRef<
     noClick: !!onClick,
   })
   return (
-    <div
-      className="w-full max-w-full shadow-inner focus-within:shadow-outline focus-within:border-blue-500"
-      {...getRootProps()}
-    >
+    <div className="w-full max-w-full" {...getRootProps()}>
       <input {...getInputProps()} />
       {value ? (
         loading ? (
@@ -78,7 +75,7 @@ export const ImageUpload = React.forwardRef<
             }`}
           >
             <button
-              className="outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
+              className="shadow-inner focus-within:shadow-outline focus-within:border-blue-500 outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
               onClick={onClick}
               ref={ref}
             >
