@@ -191,28 +191,20 @@ export const FormBuilder: FC<FormBuilderProps> = ({
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormKeyBindings onSubmit={safeHandleSubmit} />
               <FormPortalProvider>
-                <Transition
-                  className="h-full bg-gray-50"
-                  appear={true}
-                  show={true}
-                  key={fieldGroup.name}
-                  {...animationProps}
+                <FormWrapper
+                  header={<PanelHeader {...fieldGroup} id={tinaForm.id} />}
+                  id={tinaForm.id}
                 >
-                  <FormWrapper
-                    header={<PanelHeader {...fieldGroup} id={tinaForm.id} />}
-                    id={tinaForm.id}
-                  >
-                    {tinaForm && tinaForm.fields.length ? (
-                      <FieldsBuilder
-                        form={tinaForm}
-                        activeFieldName={form.activeFieldName}
-                        fields={fieldGroup.fields}
-                      />
-                    ) : (
-                      <NoFieldsPlaceholder />
-                    )}
-                  </FormWrapper>
-                </Transition>
+                  {tinaForm && tinaForm.fields.length ? (
+                    <FieldsBuilder
+                      form={tinaForm}
+                      activeFieldName={form.activeFieldName}
+                      fields={fieldGroup.fields}
+                    />
+                  ) : (
+                    <NoFieldsPlaceholder />
+                  )}
+                </FormWrapper>
               </FormPortalProvider>
               {!hideFooter && (
                 <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
