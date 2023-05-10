@@ -227,7 +227,7 @@ export class TinaMediaStore implements MediaStore {
       if (await this.isAuthenticated()) {
         res = await this.api.fetchWithToken(
           `${this.url}/list/${options.directory || ''}?limit=${
-            options.limit | 20
+            options.limit || 20
           }${options.offset ? `&cursor=${options.offset}` : ''}`
         )
 
@@ -244,7 +244,7 @@ export class TinaMediaStore implements MediaStore {
     } else {
       res = await this.fetchFunction(
         `${this.url}/list/${options.directory || ''}?limit=${
-          options.limit | 20
+          options.limit || 20
         }${options.offset ? `&cursor=${options.offset}` : ''}`
       )
 
