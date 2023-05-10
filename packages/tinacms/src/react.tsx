@@ -36,6 +36,7 @@ export function useTina(props) {
           content: '';
           position: absolute;
           inset: 0;
+          z-index: 20;
           background-color: rgba(110, 163, 216, 0.2);
         }
         [data-tinafield-overlay]:hover::after {
