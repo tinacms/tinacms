@@ -16,41 +16,73 @@ export function useTina(props) {
       const style = document.createElement('style')
       style.type = 'text/css'
       style.textContent = `
-    [data-tinafield] {
-      box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.1);
-      outline: 2px solid rgba(110, 163, 216, 0.2);
-      cursor: pointer;
-      transition: ease-in-out 200ms;
-    }
-    [data-tinafield]:not(:has([data-tinafield]:hover)):hover {
-      box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.4);
-      outline: 2px solid rgba(110, 163, 216, 0.9);
-      cursor: pointer;
-    }
-    `
+        [data-tinafield] {
+          box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.1);
+          outline: 2px solid rgba(110, 163, 216);
+          cursor: pointer;
+          transition: ease-in-out 200ms;
+        }
+        [data-tinafield]:hover {
+          box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.4);
+          outline: 3px solid rgba(110, 163, 216);
+        }
+        [data-tinafield-overlay] {
+          outline: 2px solid rgba(110, 163, 216);
+          cursor: pointer;
+          transition: ease-in-out 200ms;
+          position: relative;
+        }
+        [data-tinafield-overlay]::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-color: rgba(110, 163, 216, 0.2);
+        }
+        [data-tinafield-overlay]:hover::after {
+          background-color: rgba(110, 163, 216, 0.4);
+        }
+      `
       document.head.appendChild(style)
+      document.body.classList.add('__tina-quick-editing-enabled')
 
       function mouseDownHandler(e) {
-        const fieldName = e.target?.dataset['tinafield']
-        e.preventDefault()
-        e.stopPropagation()
-        if (e.target?.dataset && fieldName) {
+        const attributeNames = e.target.getAttributeNames()
+        // If multiple attributes start with data-tinafield, only the first is used
+        const tinaAttribute = attributeNames.find((name) =>
+          name.startsWith('data-tinafield')
+        )
+        if (tinaAttribute) {
           e.preventDefault()
           e.stopPropagation()
+          const fieldName = e.target.getAttribute(tinaAttribute)
           parent.postMessage(
             { type: 'field:selected', fieldName },
             window.location.origin
           )
         } else {
-          const ancestor = e.target.closest('[data-tinafield]')
+          const ancestor = e.target.closest(
+            '[data-tinafield], [data-tinafield-overlay]'
+          )
           if (ancestor) {
-            const fieldName = ancestor.dataset['tinafield']
-            e.preventDefault()
-            e.stopPropagation()
-            parent.postMessage(
-              { type: 'field:selected', fieldName },
-              window.location.origin
+            const attributeNames = ancestor.getAttributeNames()
+            const tinaAttribute = attributeNames.find((name) =>
+              name.startsWith('data-tinafield')
             )
+            if (tinaAttribute) {
+              e.preventDefault()
+              e.stopPropagation()
+              const fieldName = ancestor.getAttribute(tinaAttribute)
+              console.log({
+                ancestor,
+                attributeNames,
+                tinaAttribute,
+                fieldName,
+              })
+              parent.postMessage(
+                { type: 'field:selected', fieldName },
+                window.location.origin
+              )
+            }
           }
         }
       }
@@ -58,6 +90,7 @@ export function useTina(props) {
 
       return () => {
         document.removeEventListener('click', mouseDownHandler, true)
+        document.body.classList.remove('__tina-quick-editing-enabled')
         style.remove()
       }
     }
