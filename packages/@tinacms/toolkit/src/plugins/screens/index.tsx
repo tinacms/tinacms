@@ -9,6 +9,7 @@ import { MdOutlineSettings } from 'react-icons/md'
 import { Form } from '../../packages/forms'
 import { ScreenPlugin } from '../../packages/react-screens'
 import { FormBuilder } from '../../packages/form-builder'
+import { useCMS } from '../../react-tinacms'
 
 export class GlobalFormPlugin implements ScreenPlugin {
   __type: ScreenPlugin['__type'] = 'screen'
@@ -26,7 +27,12 @@ export class GlobalFormPlugin implements ScreenPlugin {
     this.Icon = icon || MdOutlineSettings
     this.layout = layout || 'popup'
     this.Component = () => {
-      return <FormBuilder form={form as any} />
+      const cms = useCMS()
+
+      const cmsForm = cms.state.forms.find(
+        ({ tinaForm }) => tinaForm.id === form.id
+      )
+      return <FormBuilder form={cmsForm} />
     }
   }
 }

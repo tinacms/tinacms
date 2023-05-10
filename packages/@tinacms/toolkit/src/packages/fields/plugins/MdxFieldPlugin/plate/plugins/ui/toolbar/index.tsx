@@ -191,9 +191,8 @@ export function Toolbar({
   })
 
   return (
-    // Note: -top-4 is because there's padding on the form wrapper that pushes this too far down
     <div
-      className="sticky -top-4 inline-flex shadow rounded-md mb-2 z-50 max-w-full"
+      className="sticky top-1 inline-flex shadow rounded-md mb-2 z-50 max-w-full"
       style={{
         width: `${
           toolbarItems.length * ICON_WIDTH + (showEmbed ? EMBED_ICON_WIDTH : 0)

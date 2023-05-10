@@ -4,7 +4,7 @@ import { getIn } from 'final-form'
 import { z, ZodError } from 'zod'
 // @ts-expect-error
 import schemaJson from 'SCHEMA_IMPORT'
-import { expandQuery, isNodeType } from './expand-query'
+import { expandQuery, isConnectionType, isNodeType } from './expand-query'
 import {
   Form,
   TinaCMS,
@@ -18,6 +18,7 @@ import {
   Client,
   FormOptions,
   GlobalFormPlugin,
+  TinaState,
 } from 'tinacms'
 import { createForm, createGlobalForm, FormifyCallback } from './build-form'
 import type {
@@ -152,6 +153,8 @@ export const useGraphQLReducer = (
       if (!expandedQueryForResolver || !expandedData) {
         throw new Error(`Unable to process payload which has not been expanded`)
       }
+      const formListItems: TinaState['formLists'][number]['items'] = []
+      const formIds: string[] = []
 
       const result = G.graphqlSync({
         schema: schemaForResolver,
@@ -200,6 +203,26 @@ export const useGraphQLReducer = (
               fields: [],
             }
           }
+          if (isConnectionType(info.returnType)) {
+            const name = G.getNamedType(info.returnType).name
+            const connectionCollection = tinaSchema
+              .getCollections()
+              .find((collection) => {
+                const collectionName = NAMER.referenceConnectionType(
+                  collection.namespace
+                )
+                if (collectionName === name) {
+                  return true
+                }
+                return false
+              })
+            if (connectionCollection) {
+              formListItems.push({
+                type: 'list',
+                label: connectionCollection.label || connectionCollection.name,
+              })
+            }
+          }
           if (isNodeType(info.returnType)) {
             if (!value) {
               return
@@ -236,19 +259,41 @@ export const useGraphQLReducer = (
               resolvedDocument = documentSchema.parse(value)
             }
             const id = resolvedDocument._internalSys.path
-            let existingForm = cms.forms.find(id)
-            if (!existingForm) {
-              cms.plugins
-                .getType('screen')
-                .all()
-                .forEach((plugin) => {
-                  // @ts-ignore
-                  if (plugin?.form && plugin.form?.id === id) {
-                    // @ts-ignore
-                    existingForm = plugin.form
-                  }
+            formIds.push(id)
+            const existingForm = cms.state.forms.find(
+              (f) => f.tinaForm.id === id
+            )
+
+            const pathArray = G.responsePathAsArray(info.path)
+            const pathString = pathArray.join('.')
+            const ancestors = formListItems.filter((item) => {
+              if (item.type === 'document') {
+                return pathString.startsWith(item.path)
+              }
+            })
+            let parent = ancestors[ancestors.length - 1]
+            if (parent) {
+              if (parent.type === 'document') {
+                // console.log(
+                //   'its a parent',
+                //   JSON.stringify({ id, value, pathString, parent }, null, 2)
+                // )
+                parent.subItems.push({
+                  type: 'document',
+                  path: pathString,
+                  formId: id,
+                  subItems: [],
                 })
+              }
+            } else {
+              formListItems.push({
+                type: 'document',
+                path: pathString,
+                formId: id,
+                subItems: [],
+              })
             }
+
             if (!existingForm) {
               const { form, template } = buildForm({
                 resolvedDocument,
@@ -264,13 +309,17 @@ export const useGraphQLReducer = (
               )
               return resolveDocument(resolvedDocument, template, form)
             } else {
-              existingForm.addQuery(payload.id)
+              existingForm.tinaForm.addQuery(payload.id)
               const { template } = getTemplateForDocument(
                 resolvedDocument,
                 tinaSchema
               )
-              existingForm.addQuery(payload.id)
-              return resolveDocument(resolvedDocument, template, existingForm)
+              existingForm.tinaForm.addQuery(payload.id)
+              return resolveDocument(
+                resolvedDocument,
+                template,
+                existingForm.tinaForm
+              )
             }
           }
           return value
@@ -300,25 +349,16 @@ export const useGraphQLReducer = (
           id: payload.id,
           data: result.data,
         })
-
-        // This can be improved, for now we just need something to test with
-        const elements =
-          iframe.current?.contentWindow?.document.querySelectorAll<HTMLElement>(
-            `[data-tinafield]`
-          )
-        if (elements) {
-          for (let i = 0; i < elements.length; i++) {
-            const el = elements[i]
-            el.onclick = () => {
-              const tinafield = el.getAttribute('data-tinafield')
-              cms.events.dispatch({
-                type: 'field:selected',
-                value: tinafield,
-              })
-            }
-          }
-        }
       }
+      cms.dispatch({
+        type: 'form-lists:add',
+        value: {
+          id: payload.id,
+          label: 'Anonymous Query', // TODO: grab the name of the query if it exists
+          items: formListItems,
+          formIds,
+        },
+      })
     },
     [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
   )
@@ -345,6 +385,7 @@ export const useGraphQLReducer = (
           form.removeQuery(id)
         })
         cms.removeOrphanedForms()
+        cms.dispatch({ type: 'form-lists:remove', value: id })
       }
       if (event.data.type === 'open') {
         const payloadSchema = z.object({
@@ -375,6 +416,7 @@ export const useGraphQLReducer = (
     return () => {
       setPayloads([])
       cms.removeAllForms()
+      cms.dispatch({ type: 'form-lists:clear' })
     }
   }, [url])
 
@@ -738,12 +780,10 @@ const buildForm = ({
   }
   if (form) {
     if (shouldRegisterForm) {
-      form.subscribe(() => {}, { values: true })
       if (collection.ui?.global) {
         cms.plugins.add(new GlobalFormPlugin(form))
-      } else {
-        cms.forms.add(form)
       }
+      cms.dispatch({ type: 'forms:add', value: form })
     }
   }
   if (!form) {

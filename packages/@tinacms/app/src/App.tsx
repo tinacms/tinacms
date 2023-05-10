@@ -47,11 +47,6 @@ const SetPreview = () => {
         ''
       )}`
     )
-    // Override original 'rich-text' field with one that has raw mode support
-    cms.fields.add({
-      ...MdxFieldPluginExtendible,
-      Component: Editor,
-    })
   }, [])
   return null
 }

@@ -117,10 +117,10 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   /**
    * A unique identifier for Forms.
    *
-   * @alias id
+   * @deprecated use id instead
    */
   get name() {
-    return this.id
+    return undefined
   }
 
   /**
@@ -269,6 +269,156 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
         updateSelectively<S>(this.finalForm, values)
       }
     })
+  }
+
+  /**
+   * Based on field's name this function will
+   * return an array of fields for the give form along
+   * with the path that it was found at top nearest
+   * object-like group
+   *
+   * So if you have a field named blocks.3.title
+   * It will return the fields from the 3rd "block"
+   * along with the path it was found at
+   * fields: [{type: 'string', name: 'title'}, ... other fields]
+   * activePath: ['blocks', '3']
+   */
+  getActiveField(fieldName: string | null): {
+    label?: string
+    name?: string
+    fields: Field[]
+  } {
+    if (!fieldName) {
+      return this
+    }
+    return this.getFieldGroup({
+      formOrObjectField: this,
+      values: this.finalForm.getState().values,
+      namePathIndex: 0,
+      namePath: fieldName.split('.'),
+    })
+  }
+
+  private getFieldGroup({
+    formOrObjectField,
+    values,
+    namePathIndex,
+    namePath,
+  }: {
+    formOrObjectField: any // Awkwardness due to differences in TinaField and Field types
+    values: FormState<any, any>['values']
+    namePathIndex: number
+    namePath: string[]
+  }) {
+    const name = namePath[namePathIndex]
+    const field = formOrObjectField.fields.find((field) => field.name === name)
+    const value = values[name]
+    const isLastItem = namePathIndex === namePath.length - 1
+    if (!field) {
+      return formOrObjectField
+    } else {
+      if (field.type === 'object') {
+        if (field.templates) {
+          if (field.list) {
+            if (isLastItem) {
+              console.log('isLast')
+              return formOrObjectField
+            } else {
+              const namePathIndexForListItem = namePathIndex + 1
+              const index = namePath[namePathIndexForListItem]
+              const listItemValue = value[index]
+              const template = field.templates[listItemValue._template]
+              const templateName = [
+                ...namePath.slice(0, namePathIndexForListItem),
+                index,
+              ].join('.')
+              const isLastItem =
+                namePathIndexForListItem === namePath.length - 1
+              if (!isLastItem) {
+                return this.getFieldGroup({
+                  formOrObjectField: template,
+                  values: listItemValue,
+                  namePath,
+                  namePathIndex: namePathIndex + 2,
+                })
+              }
+              if (!template) {
+                console.error({ field, value })
+                throw new Error(
+                  `Expected template value for field ${field.name}`
+                )
+              }
+              return {
+                ...template,
+                name: templateName,
+                fields: template.fields.map((field) => {
+                  return {
+                    ...field,
+                    name: [templateName, field.name].join('.'),
+                  }
+                }),
+              }
+            }
+          } else {
+            // TODO
+          }
+        } else {
+          if (field.list) {
+            const namePathIndexForListItem = namePathIndex + 1
+            const index = namePath[namePathIndexForListItem]
+            const listItemValue = value[index]
+            const fieldName = [
+              ...namePath.slice(0, namePathIndexForListItem),
+              index,
+            ].join('.')
+            const isLastItem = namePathIndexForListItem === namePath.length - 1
+            if (!isLastItem) {
+              if (field.fields) {
+                return this.getFieldGroup({
+                  formOrObjectField: field,
+                  values: listItemValue,
+                  namePath,
+                  namePathIndex: namePathIndex + 2,
+                })
+              }
+            }
+            return {
+              ...field,
+              name: fieldName,
+              fields: field.fields.map((field) => {
+                return {
+                  ...field,
+                  name: [fieldName, field.name].join('.'),
+                }
+              }),
+            }
+          } else {
+            const fieldName = [...namePath.slice(0, namePathIndex + 1)].join(
+              '.'
+            )
+            const isLastItem = namePathIndex === namePath.length - 1
+            if (!isLastItem) {
+              return this.getFieldGroup({
+                formOrObjectField: field,
+                values: value,
+                namePath,
+                namePathIndex: namePathIndex + 1,
+              })
+            }
+            return {
+              ...field,
+              name: fieldName,
+              fields: field.fields.map((field) => {
+                return {
+                  ...field,
+                  name: [fieldName, field.name].join('.'),
+                }
+              }),
+            }
+          }
+        }
+      }
+    }
   }
 }
 

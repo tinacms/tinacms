@@ -36,7 +36,7 @@ export const NestedForm = (props: {
       {({ zIndexShift }) => (
         <GroupPanel isExpanded={true} style={{ zIndex: zIndexShift + 1000 }}>
           <PanelHeader onClick={props.onClose}>{props.label}</PanelHeader>
-          <FormBuilder form={form} hideFooter={true} />
+          <FormBuilder form={{ tinaForm: form }} hideFooter={true} />
         </GroupPanel>
       )}
     </FormPortal>

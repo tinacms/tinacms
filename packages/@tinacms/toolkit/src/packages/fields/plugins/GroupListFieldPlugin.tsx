@@ -190,7 +190,14 @@ const Item = ({
                   return
                 }
 
-                setExpanded(true)
+                // setExpanded(true)
+                cms.dispatch({
+                  type: 'forms:set-active-field-name',
+                  value: {
+                    formId: tinaForm.id,
+                    fieldName: `${field.name}.${index}`,
+                  },
+                })
                 setFocusedField({
                   id: tinaForm.id,
                   fieldName: `${field.name}.${index}`,
@@ -204,7 +211,7 @@ const Item = ({
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />
             )}
           </ItemHeader>
-          <FormPortal>
+          {/* <FormPortal>
             {({ zIndexShift }) => (
               <Panel
                 isExpanded={isExpanded}
@@ -216,7 +223,7 @@ const Item = ({
                 zIndexShift={zIndexShift}
               />
             )}
-          </FormPortal>
+          </FormPortal> */}
         </>
       )}
     </Draggable>

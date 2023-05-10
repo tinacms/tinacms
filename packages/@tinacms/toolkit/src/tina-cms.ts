@@ -41,6 +41,7 @@ import {
 } from './plugins/fields/markdown'
 import { MediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
 import { createCloudConfig } from './packages/react-cloud-config'
+import { TinaAction, TinaState } from './tina-state'
 
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
@@ -76,6 +77,8 @@ export interface TinaCMSConfig extends CMSConfig {
 export class TinaCMS extends CMS {
   sidebar?: SidebarState
   _alerts?: Alerts
+  state: TinaState
+  dispatch: React.Dispatch<TinaAction>
 
   constructor({
     sidebar,
