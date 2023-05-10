@@ -1,5 +1,13 @@
 # @tinacms/starter-iframe
 
+## 0.1.37
+
+### Patch Changes
+
+- b2a38b56f: Add back local build option that allows the user to build their site with the filesystem.
+  - tinacms@1.5.5
+  - next-tinacms-cloudinary@4.3.0
+
 ## 0.1.36
 
 ### Patch Changes
