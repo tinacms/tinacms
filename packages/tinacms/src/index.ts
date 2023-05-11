@@ -22,7 +22,7 @@ import { MediaStore, TinaCMS } from '@tinacms/toolkit'
 import { formifyCallback } from './hooks/use-graphql-forms'
 
 import { validateSchema } from '@tinacms/schema-tools'
-export { NAMER, resolveForm } from '@tinacms/schema-tools'
+export { NAMER, resolveField } from '@tinacms/schema-tools'
 
 import {
   TinaSchema,
@@ -76,12 +76,16 @@ export const defineLegacyConfig = (
   return config
 }
 
+interface MediaStoreClass {
+  new (...args: any[]): MediaStore
+}
+
 export const defineStaticConfig = (
   config: Config<
     (cms: TinaCMS) => TinaCMS,
     formifyCallback,
     DocumentCreatorCallback,
-    MediaStore
+    MediaStoreClass
   >
 ) => {
   if (!config.schema) {

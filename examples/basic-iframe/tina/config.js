@@ -175,6 +175,11 @@ export default defineConfig({
             name: 'title',
           },
           {
+            type: 'image',
+            list: true,
+            name: 'images',
+          },
+          {
             type: 'object',
             label: 'Related Posts',
             name: 'posts',

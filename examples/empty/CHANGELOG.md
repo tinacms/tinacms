@@ -4,6 +4,115 @@
 
 ### Patch Changes
 
+- Updated dependencies [31c160cdf]
+- Updated dependencies [b2a38b56f]
+- Updated dependencies [beb179279]
+  - @tinacms/cli@1.5.12
+  - tinacms@1.5.5
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [f6e2ec5e9]
+- Updated dependencies [83b19fb8d]
+  - tinacms@1.5.4
+  - @tinacms/cli@1.5.11
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [3532d07f3]
+- Updated dependencies [6d1465fd8]
+  - tinacms@1.5.3
+  - @tinacms/cli@1.5.10
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [e7f4c0a96]
+- Updated dependencies [ff8673515]
+  - tinacms@1.5.2
+  - @tinacms/cli@1.5.9
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [790b1e1ae]
+- Updated dependencies [eba7e5e5e]
+- Updated dependencies [5cb73050e]
+- Updated dependencies [012ed53bf]
+  - tinacms@1.5.1
+  - @tinacms/cli@1.5.8
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [675c4cfde]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [40dd5b7ef]
+- Updated dependencies [1de2c09ff]
+- Updated dependencies [0f90e9520]
+- Updated dependencies [f11408108]
+- Updated dependencies [d9d773a24]
+- Updated dependencies [0b0255a50]
+- Updated dependencies [63454fa1e]
+  - tinacms@1.5.0
+  - @tinacms/cli@1.5.7
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [65d53d5b9]
+- Updated dependencies [709b6f2ec]
+- Updated dependencies [e7e11c624]
+  - @tinacms/cli@1.5.6
+  - tinacms@1.4.6
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [75d5ed359]
+  - @tinacms/cli@1.5.5
+  - tinacms@1.4.5
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [7c750e370]
+- Updated dependencies [9f9cc4799]
+- Updated dependencies [8f3767410]
+  - tinacms@1.4.4
+  - @tinacms/cli@1.5.4
+
+## null
+
+### Patch Changes
+
+- @tinacms/cli@1.5.3
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [1370ebae6]
+- Updated dependencies [40d908a79]
+- Updated dependencies [02a555c39]
+- Updated dependencies [9216a5bda]
+  - tinacms@1.4.3
+  - @tinacms/cli@1.5.2
+
+## null
+
+### Patch Changes
+
 - Updated dependencies [691d2eb3f]
 - Updated dependencies [0626ba381]
 - Updated dependencies [bb9f0047f]

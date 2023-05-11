@@ -1,0 +1,269 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "To fetch our pets from the server, we need to write queries that request the "
+        },
+        {
+          "type": "text",
+          "text": "exact fields",
+          "bold": true
+        },
+        {
+          "type": "text",
+          "text": " that we want. Head over to "
+        },
+        {
+          "type": "text",
+          "text": "client/src/pages/Pets.js",
+          "code": true
+        },
+        {
+          "type": "text",
+          "text": ", and copy and paste the following code into it:"
+        }
+      ]
+    },
+    {
+      "type": "html",
+      "value": "<div class=\"break-out\">\n<pre><code class=\"language-javascript\">import React, {useState} from 'react'\nimport gql from 'graphql-tag'\nimport { useQuery, useMutation } from '@apollo/react-hooks'\nimport PetsList from '../components/PetsList'\nimport NewPetModal from '../components/NewPetModal'\nimport Loader from '../components/Loader'</code>",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "html_inline",
+          "value": "<code class=\"language-javascript\" style=\"background-color: #fffbd7\">",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "const GET_PETS = gql"
+        },
+        {
+          "type": "text",
+          "text": "  query getPets {\n    pets {\n      id\n      name\n      type\n      img\n    }\n  }",
+          "code": true
+        },
+        {
+          "type": "text",
+          "text": ";"
+        },
+        {
+          "type": "html_inline",
+          "value": "</code>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "html_inline",
+          "value": "<code class=\"language-javascript\">",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "export default function Pets () {\nconst [modal, setModal] = useState(false)"
+        },
+        {
+          "type": "html_inline",
+          "value": "</code>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "\n"
+        },
+        {
+          "type": "html_inline",
+          "value": "<code class=\"language-javascript\" style=\"background-color: #fffbd7\">",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " const { loading, error, data } = useQuery(GET_PETS);"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "if (loading) return <Loader />;"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "if (error) return <p>An error occured!</p>;"
+        },
+        {
+          "type": "html_inline",
+          "value": "</code>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "html_inline",
+          "value": "<code class=\"language-javascript\">",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " const onSubmit = input => {\nsetModal(false)\n}"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "if (modal) {\nreturn <NewPetModal onSubmit={onSubmit} onCancel={() => setModal(false)} />\n}\nreturn (\n<div className=\"page pets-page\">\n<section>\n<div className=\"row betwee-xs middle-xs\">\n<div className=\"col-xs-10\">\n<h1>Pets</h1>\n</div>\n<div className=\"col-xs-2\">\n<button onClick={() => setModal(true)}>new pet</button>\n</div>\n</div>\n</section>\n<section>"
+        },
+        {
+          "type": "html_inline",
+          "value": "</code>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "\n"
+        },
+        {
+          "type": "html_inline",
+          "value": "<code class=\"language-javascript\" style=\"background-color: #fffbd7\">",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " <PetsList pets={data.pets}/>"
+        },
+        {
+          "type": "html_inline",
+          "value": "</code>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "\n"
+        },
+        {
+          "type": "html_inline",
+          "value": "<code class=\"language-javascript\">",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " </section>\n</div>\n)\n}\n"
+        },
+        {
+          "type": "html_inline",
+          "value": "</code>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "html_inline",
+          "value": "</pre>",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "html",
+      "value": "</div>",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}

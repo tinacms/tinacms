@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/graphql",
-  "version": "1.4.2",
+  "version": "1.4.12",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "typings": "dist/index.d.ts",
@@ -52,6 +52,7 @@
     "graphql-type-json": "^0.3.2",
     "gray-matter": "^4.0.2",
     "isomorphic-git": "^1.21.0",
+    "js-sha1": "^0.6.0",
     "js-yaml": "^3.14.1",
     "jsonpath-plus": "^6.0.1",
     "leveldown": "^6.1.0",

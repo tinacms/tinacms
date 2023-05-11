@@ -1,5 +1,95 @@
 # @tinacms/app
 
+## 1.2.12
+
+### Patch Changes
+
+- 31c160cdf: Placeholder view for when assets fail to load
+  - @tinacms/mdx@1.3.10
+  - tinacms@1.5.5
+
+## 1.2.11
+
+### Patch Changes
+
+- Updated dependencies [f6e2ec5e9]
+  - tinacms@1.5.4
+
+## 1.2.10
+
+### Patch Changes
+
+- Updated dependencies [3532d07f3]
+- Updated dependencies [6d1465fd8]
+  - tinacms@1.5.3
+
+## 1.2.9
+
+### Patch Changes
+
+- Updated dependencies [e7f4c0a96]
+- Updated dependencies [ff8673515]
+  - tinacms@1.5.2
+
+## 1.2.8
+
+### Patch Changes
+
+- eba7e5e5e: Simplify formify logic
+- Updated dependencies [790b1e1ae]
+- Updated dependencies [eba7e5e5e]
+  - tinacms@1.5.1
+  - @tinacms/toolkit@1.7.1
+
+## 1.2.7
+
+### Patch Changes
+
+- Updated dependencies [675c4cfde]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [40dd5b7ef]
+- Updated dependencies [0f90e9520]
+- Updated dependencies [d9d773a24]
+- Updated dependencies [63454fa1e]
+- Updated dependencies [804639965]
+  - tinacms@1.5.0
+  - @tinacms/toolkit@1.7.0
+  - @tinacms/mdx@1.3.9
+
+## 1.2.6
+
+### Patch Changes
+
+- Updated dependencies [709b6f2ec]
+  - @tinacms/toolkit@1.6.4
+  - tinacms@1.4.6
+
+## 1.2.5
+
+### Patch Changes
+
+- Updated dependencies [75d5ed359]
+  - @tinacms/mdx@1.3.8
+  - tinacms@1.4.5
+
+## 1.2.4
+
+### Patch Changes
+
+- Updated dependencies [7c750e370]
+- Updated dependencies [2a32a0b99]
+- Updated dependencies [6f491f38c]
+  - tinacms@1.4.4
+  - @tinacms/toolkit@1.6.3
+
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies [1370ebae6]
+  - @tinacms/toolkit@1.6.2
+  - tinacms@1.4.3
+
 ## 1.2.2
 
 ### Patch Changes

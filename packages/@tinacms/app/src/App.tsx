@@ -28,14 +28,26 @@ const Editor = (props) => {
   )
 }
 
-const SetPreview = ({ outputFolder }: { outputFolder: string }) => {
+const SetPreview = () => {
   const cms = useCMS()
-  cms.flags.set('tina-preview', outputFolder)
-  // Override original 'rich-text' field with one that has raw mode support
-  cms.fields.add({
-    ...MdxFieldPluginExtendible,
-    Component: Editor,
-  })
+  React.useEffect(() => {
+    // Override original 'rich-text' field with one that has raw mode support
+    cms.fields.add({
+      ...MdxFieldPluginExtendible,
+      Component: Editor,
+    })
+    let basePath
+    if (config.build.basePath) {
+      basePath = config.build.basePath.replace(/^\/|\/$/g, '')
+    }
+    cms.flags.set(
+      'tina-preview',
+      `${basePath ? `${basePath}/` : ''}${config.build.outputFolder.replace(
+        /^\/|\/$/g,
+        ''
+      )}`
+    )
+  }, [])
   return null
 }
 
@@ -50,7 +62,7 @@ export const TinaAdminWrapper = () => {
       // THis will be replaced by the version of the graphql package or --garphql-version flag. It is replaced by vite at compile time
       tinaGraphQLVersion={__TINA_GRAPHQL_VERSION__}
     >
-      <SetPreview outputFolder={config.build.outputFolder} />
+      <SetPreview />
       <TinaAdmin
         preview={Preview}
         Playground={Playground}

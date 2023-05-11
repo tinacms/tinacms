@@ -2,15 +2,17 @@ import fs from 'fs-extra'
 import path from 'path'
 import os from 'os'
 import * as esbuild from 'esbuild'
-import * as url from 'url'
+import type { Loader } from 'esbuild'
 import { Config } from '@tinacms/schema-tools'
 import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
+import chalk from 'chalk'
+
 import { logger } from '../logger'
 
 export const TINA_FOLDER = 'tina'
 export const LEGACY_TINA_FOLDER = '.tina'
-const GENERATED_FOLDER = '__generated__'
+export const GENERATED_FOLDER = '__generated__'
 const GRAPHQL_JSON_FILE = '_graphql.json'
 const GRAPHQL_GQL_FILE = 'schema.gql'
 const SCHEMA_JSON_FILE = '_schema.json'
@@ -26,6 +28,7 @@ export class ConfigManager {
   contentRootPath?: string
   envFilePath: string
   generatedFolderPath: string
+  generatedFolderPathContentRepo: string
   generatedGraphQLGQLPath: string
   generatedGraphQLJSONPath: string
   generatedSchemaJSONPath: string
@@ -92,22 +95,21 @@ export class ConfigManager {
     )
     dotenv.config({ path: this.envFilePath })
 
+    // Setup file paths that don't depend on the config file
+    // =================
     this.tinaConfigFilePath = await this.getPathWithExtension(
       path.join(this.tinaFolderPath, 'config')
     )
     if (!this.tinaConfigFilePath) {
       throw new Error(
-        `Unable to find confg file in ${this.tinaFolderPath}. Looking for a file named "config.{ts,tsx,js,jsx}"`
+        `Unable to find config file in ${this.tinaFolderPath}. Looking for a file named "config.{ts,tsx,js,jsx}"`
       )
     }
     this.selfHostedDatabaseFilePath = await this.getPathWithExtension(
       path.join(this.tinaFolderPath, 'database')
     )
     this.generatedFolderPath = path.join(this.tinaFolderPath, GENERATED_FOLDER)
-    this.config = await this.loadConfigFile(
-      this.generatedFolderPath,
-      this.tinaConfigFilePath
-    )
+
     this.generatedGraphQLGQLPath = path.join(
       this.generatedFolderPath,
       GRAPHQL_GQL_FILE
@@ -132,19 +134,7 @@ export class ConfigManager {
       this.generatedFolderPath,
       'frags.gql'
     )
-    const fullLocalContentPath = path.join(
-      this.tinaFolderPath,
-      this.config.localContentPath || ''
-    )
-    if (
-      this.config.localContentPath &&
-      (await fs.existsSync(fullLocalContentPath))
-    ) {
-      logger.info(`Using separate content repo at ${fullLocalContentPath}`)
-      this.contentRootPath = fullLocalContentPath
-    } else {
-      this.contentRootPath = this.rootPath
-    }
+
     this.generatedTypesTSFilePath = path.join(
       this.generatedFolderPath,
       'types.ts'
@@ -174,6 +164,33 @@ export class ConfigManager {
       this.generatedFolderPath,
       'client.js'
     )
+    // =================
+    // End of file paths that don't depend on the config file
+
+    // Setup Config files and paths that depend on the config file
+    // =================
+
+    // Create a Dummy client file if it doesn't exist
+    const clientExists = this.isUsingTs()
+      ? await fs.pathExists(this.generatedClientTSFilePath)
+      : await fs.pathExists(this.generatedClientJSFilePath)
+
+    if (!clientExists) {
+      // This handles the case if they import the client from the config file (normally indirectly and its not actually used)
+      const file = 'export default ()=>({})\nexport const client = ()=>({})'
+      if (this.isUsingTs()) {
+        await fs.outputFile(this.generatedClientTSFilePath, file)
+      } else {
+        await fs.outputFile(this.generatedClientJSFilePath, file)
+      }
+    }
+
+    // Load the config file with ES build
+    this.config = await this.loadConfigFile(
+      this.generatedFolderPath,
+      this.tinaConfigFilePath
+    )
+
     this.publicFolderPath = path.join(
       this.rootPath,
       this.config.build.publicFolder
@@ -185,8 +202,41 @@ export class ConfigManager {
     this.outputHTMLFilePath = path.join(this.outputFolderPath, 'index.html')
     this.outputGitignorePath = path.join(this.outputFolderPath, '.gitignore')
 
+    const fullLocalContentPath = path.join(
+      this.tinaFolderPath,
+      this.config.localContentPath || ''
+    )
+
+    if (this.config.localContentPath) {
+      // Check if the localContentPath exists
+      const localContentPathExists = await fs.pathExists(fullLocalContentPath)
+      if (localContentPathExists) {
+        logger.info(`Using separate content repo at ${fullLocalContentPath}`)
+        this.contentRootPath = fullLocalContentPath
+      } else {
+        // Warn the user if they provided a localContentPath that doesn't exist
+        logger.warn(
+          `${chalk.yellow('Warning:')} The localContentPath ${chalk.cyan(
+            fullLocalContentPath
+          )} does not exist. Please create it or remove the localContentPath from your config file at ${chalk.cyan(
+            this.tinaConfigFilePath
+          )}`
+        )
+      }
+    }
+
+    if (!this.contentRootPath) {
+      this.contentRootPath = this.rootPath
+    }
+
+    this.generatedFolderPathContentRepo = path.join(
+      await this.getTinaFolderPath(this.contentRootPath),
+      GENERATED_FOLDER
+    )
     this.spaMainPath = require.resolve('@tinacms/app')
     this.spaRootPath = path.join(this.spaMainPath, '..', '..')
+    // =================
+    // End of paths that depend on the config file
   }
 
   async getTinaFolderPath(rootPath) {
@@ -240,13 +290,15 @@ export class ConfigManager {
   }
   printRelativePath(filename: string) {
     if (filename) {
-      return filename.replace(`${this.rootPath}/`, '')
+      return filename.replace(/\\/g, '/').replace(`${this.rootPath}/`, '')
     }
     throw `No path provided to print`
   }
   printContentRelativePath(filename: string) {
     if (filename) {
-      return filename.replace(`${this.contentRootPath}/`, '')
+      return filename
+        .replace(/\\/g, '/')
+        .replace(`${this.contentRootPath}/`, '')
     }
     throw `No path provided to print`
   }
@@ -284,6 +336,7 @@ export class ConfigManager {
       bundle: true,
       platform: 'node',
       outfile: outfile,
+      loader: loaders,
     })
     const result = require(outfile)
     await fs.removeSync(outfile)
@@ -305,16 +358,44 @@ export class ConfigManager {
       target: ['es2020'],
       platform: 'node',
       outfile,
+      loader: loaders,
     })
     await esbuild.build({
       entryPoints: [outfile],
       bundle: true,
       platform: 'node',
       outfile: outfile2,
+      loader: loaders,
     })
     const result = require(outfile2)
     await fs.removeSync(outfile)
     await fs.removeSync(outfile2)
     return result.default
   }
+}
+
+export const loaders: { [ext: string]: Loader } = {
+  '.aac': 'file',
+  '.css': 'file',
+  '.eot': 'file',
+  '.flac': 'file',
+  '.gif': 'file',
+  '.jpeg': 'file',
+  '.jpg': 'file',
+  '.json': 'json',
+  '.mp3': 'file',
+  '.mp4': 'file',
+  '.ogg': 'file',
+  '.otf': 'file',
+  '.png': 'file',
+  '.svg': 'file',
+  '.ttf': 'file',
+  '.wav': 'file',
+  '.webm': 'file',
+  '.webp': 'file',
+  '.woff': 'file',
+  '.woff2': 'file',
+  '.js': 'jsx',
+  '.jsx': 'jsx',
+  '.tsx': 'tsx',
 }

@@ -1,5 +1,5 @@
 import { Post } from "../../components/posts/post";
-import { client } from "../../.tina/__generated__/client";
+import { client } from "../../tina/__generated__/client";
 import { useTina } from "tinacms/dist/react";
 import { Layout } from "../../components/layout";
 
@@ -28,7 +28,7 @@ export default function BlogPostPage(
 
 export const getStaticProps = async ({ params }) => {
   const tinaProps = await client.queries.blogPostQuery({
-    relativePath: `${params.filename}.mdx`,
+    relativePath: `${params.filename.join("/")}.mdx`,
   });
   return {
     props: {
@@ -47,9 +47,13 @@ export const getStaticProps = async ({ params }) => {
 export const getStaticPaths = async () => {
   const postsListData = await client.queries.postConnection();
   return {
-    paths: postsListData.data.postConnection.edges.map((post) => ({
-      params: { filename: post.node._sys.filename },
-    })),
+    paths: postsListData.data.postConnection.edges.map((post) => {
+      return {
+        params: {
+          filename: post.node._sys.breadcrumbs,
+        },
+      };
+    }),
     fallback: "blocking",
   };
 };

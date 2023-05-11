@@ -1,5 +1,80 @@
 # tina-graphql
 
+## 1.4.12
+
+### Patch Changes
+
+- Updated dependencies [beb179279]
+  - @tinacms/schema-tools@1.4.4
+  - @tinacms/mdx@1.3.10
+
+## 1.4.11
+
+### Patch Changes
+
+- 83b19fb8d: Update the bridge interface to remove properties that are no longer needed.
+- 1c7998b7e: fix hasTinaMediaConfig function
+
+## 1.4.10
+
+### Patch Changes
+
+- a402c8010: Fix root level collection issues including a folder related bug
+
+## 1.4.9
+
+### Patch Changes
+
+- 89dcad9d9: Fix Database.get on folders within collections that have templates
+- a0eb72ce0: Fix issue where collection lookup fails with folder having match property
+
+## 1.4.8
+
+### Patch Changes
+
+- f14f59a96: Handle `path: "/"` in a collection
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+- 7d4be0e51: Fix cyrillic characters in indexes were being incorrectly filtered out
+- Updated dependencies [f14f59a96]
+- Updated dependencies [eeedcfd30]
+  - @tinacms/schema-tools@1.4.3
+  - @tinacms/mdx@1.3.9
+
+## 1.4.7
+
+### Patch Changes
+
+- 65d53d5b9: Handle frontmatter format in forestry migration
+- 40d15644f: Update indexAllContent to use the passed in schema instead of fetching it from level after writing
+- a6786cc73: Export dates as date format in md/mdx
+
+## 1.4.6
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+- Updated dependencies [75d5ed359]
+  - @tinacms/mdx@1.3.8
+
+## 1.4.5
+
+### Patch Changes
+
+- 67c7a48b8: Improve full reindexing to update status to complete as soon as the new version of the index is ready
+
+## 1.4.4
+
+### Patch Changes
+
+- ae3abe927: handle image array in Tina Cloud media transformation
+
+## 1.4.3
+
+### Patch Changes
+
+- 40d908a79: Update error messages in Forestry migration
+- 02a555c39: Handle block aliases on forestry migration
+
 ## 1.4.2
 
 ### Patch Changes

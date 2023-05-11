@@ -2,59 +2,24 @@ import { Command, Option } from 'clipanion'
 import fs from 'fs-extra'
 import path from 'path'
 import chokidar from 'chokidar'
-import { buildSchema, getASTSchema, Database } from '@tinacms/graphql'
+import { buildSchema, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { devHTML } from './html'
 import { logger, summary } from '../../../logger'
 import { createDevServer } from './server'
 import { Codegen } from '../../codegen'
-import chalk from 'chalk'
-import { startSubprocess2 } from '../../../utils/start-subprocess'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
-import type { ChildProcess } from 'child_process'
-import { spin } from '../../../utils/spinner'
-import { warnText } from '../../../utils/theme'
+import { BaseCommand } from '../baseCommands'
 
-export class DevCommand extends Command {
+export class DevCommand extends BaseCommand {
   static paths = [['dev'], ['server:start']]
-  port = Option.String('-p,--port', '4001', {
-    description: 'Specify a port to run the server on. (default 4001)',
-  })
-  datalayerPort = Option.String('--datalayer-port', '9000', {
-    description:
-      'Specify a port to run the datalayer server on. (default 9000)',
-  })
-  subCommand = Option.String('-c,--command', {
-    description: 'The sub-command to run',
-  })
-  rootPath = Option.String('--rootPath', {
-    description:
-      'Specify the root directory to run the CLI from (defaults to current working directory)',
-  })
   // NOTE: camelCase commands for string options don't work if there's an `=` used https://github.com/arcanis/clipanion/issues/141
   watchFolders = Option.String('-w,--watchFolders', {
     description:
       'DEPRECATED - a list of folders (relative to where this is being run) that the cli will watch for changes',
   })
-  isomorphicGitBridge = Option.Boolean('--isomorphicGitBridge', {
-    description: 'DEPRECATED - Enable Isomorphic Git Bridge Implementation',
-  })
-  experimentalDataLayer = Option.Boolean('--experimentalData', {
-    description:
-      'DEPRECATED - Build the server with additional data querying capabilities',
-  })
-  verbose = Option.Boolean('-v,--verbose', false, {
-    description: 'increase verbosity of logged output',
-  })
   noWatch = Option.Boolean('--noWatch', false, {
     description: "Don't regenerate config on file changes",
-  })
-  noSDK = Option.Boolean('--noSDK', false, {
-    description:
-      "DEPRECATED - This should now be set in the config at client.skip = true'. Don't generate the generated client SDK",
-  })
-  noTelemetry = Option.Boolean('--noTelemetry', false, {
-    description: 'Disable anonymous telemetry that is collected',
   })
 
   static usage = Command.Usage({
@@ -72,30 +37,22 @@ export class DevCommand extends Command {
     process.exit(1)
   }
 
-  async execute(): Promise<number | void> {
+  logDeprecationWarnings() {
+    super.logDeprecationWarnings()
     if (this.watchFolders) {
       logger.warn(
         '--watchFolders has been deprecated, imports from your Tina config file will be watched automatically. If you still need it please open a ticket at https://github.com/tinacms/tinacms/issues'
       )
     }
-    if (this.isomorphicGitBridge) {
-      logger.warn('--isomorphicGitBridge has been deprecated')
-    }
-    if (this.experimentalDataLayer) {
-      logger.warn(
-        '--experimentalDataLayer has been deprecated, the data layer is now built-in automatically'
-      )
-    }
-    if (this.noSDK) {
-      logger.warn(
-        '--noSDK has been deprecated, and will be unsupported in a future release. This should be set in the config at client.skip = true'
-      )
-    }
+  }
+
+  async execute(): Promise<number | void> {
     const configManager = new ConfigManager({
       rootPath: this.rootPath,
       legacyNoSDK: this.noSDK,
     })
     logger.info('Starting Tina Dev Server')
+    this.logDeprecationWarnings()
 
     // Initialize the host TCP server
     createDBServer(Number(this.datalayerPort))
@@ -126,8 +83,21 @@ export class DevCommand extends Command {
         database.clearCache()
       }
 
-      const { tinaSchema, graphQLSchema, queryDoc, fragDoc } =
-        await buildSchema(database, configManager.config)
+      const { tinaSchema, graphQLSchema, lookup, queryDoc, fragDoc } =
+        await buildSchema(configManager.config)
+
+      const codegen = new Codegen({
+        isLocal: true,
+        configManager: configManager,
+        port: Number(this.port),
+        queryDoc,
+        fragDoc,
+        graphqlSchemaDoc: graphQLSchema,
+        tinaSchema,
+        lookup,
+      })
+      const apiURL = await codegen.execute()
+
       if (!configManager.isUsingLegacyFolder) {
         delete require.cache[configManager.generatedSchemaJSONPath]
         delete require.cache[configManager.generatedLookupJSONPath]
@@ -146,36 +116,15 @@ export class DevCommand extends Command {
         )
       }
 
-      const codegen = new Codegen({
-        schema: await getASTSchema(database),
-        configManager: configManager,
-        port: Number(this.port),
-        queryDoc,
-        fragDoc,
-      })
-      const apiURL = await codegen.execute()
-
       if (!this.noWatch) {
         this.watchQueries(configManager, async () => await codegen.execute())
       }
 
-      const warnings: string[] = []
-      await spin({
-        waitFor: async () => {
-          const res = await database.indexContent({
-            graphQLSchema,
-            tinaSchema,
-          })
-          warnings.push(...res.warnings)
-        },
-        text: 'Indexing local files',
+      await this.indexContentWithSpinner({
+        database,
+        graphQLSchema,
+        tinaSchema,
       })
-      if (warnings.length > 0) {
-        logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
-        warnings.forEach((warning) => {
-          logger.warn(warnText(`${warning}`))
-        })
-      }
       return { apiURL, database }
     }
     const { apiURL } = await setup({ firstTime: true })
@@ -286,26 +235,7 @@ export class DevCommand extends Command {
         // },
       ],
     })
-    let subProc: ChildProcess | undefined
-    if (this.subCommand) {
-      subProc = await startSubprocess2({ command: this.subCommand })
-      logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
-    }
-    function exitHandler(options, exitCode) {
-      if (subProc) {
-        subProc.kill()
-      }
-      process.exit()
-    }
-    //do something when app is closing
-    process.on('exit', exitHandler)
-    //catches ctrl+c event
-    process.on('SIGINT', exitHandler)
-    // catches "kill pid" (for example: nodemon restart)
-    process.on('SIGUSR1', exitHandler)
-    process.on('SIGUSR2', exitHandler)
-    //catches uncaught exceptions
-    process.on('uncaughtException', exitHandler)
+    await this.startSubCommand()
   }
 
   watchContentFiles(configManager: ConfigManager, database: Database) {

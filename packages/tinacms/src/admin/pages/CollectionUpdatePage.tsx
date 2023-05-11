@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import { BillingWarning, Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
@@ -15,6 +11,7 @@ import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { useWindowWidth } from '@react-hook/window-size'
+import { useCollectionFolder } from './utils'
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -37,18 +34,21 @@ const updateDocument = async (
 
 const CollectionUpdatePage = () => {
   const { collectionName, ...rest } = useParams()
-  const { '*': filename } = rest
+  const folder = useCollectionFolder()
+  const { '*': filename } = rest // TODO can just use the folder.name instead
 
+  const resolvedFile = folder.fullyQualifiedName ? folder.name : filename
   return (
     <GetCMS>
       {(cms: TinaCMS) => (
         <GetCollection
           cms={cms}
           collectionName={collectionName}
+          folder={folder}
           includeDocuments={false}
         >
           {(collection) => {
-            const relativePath = `${filename}.${collection.format}`
+            const relativePath = `${resolvedFile}.${collection.format}`
             const mutationInfo = {
               includeCollection: true,
               includeTemplate: !!collection.templates,
@@ -65,7 +65,7 @@ const CollectionUpdatePage = () => {
                     <RenderForm
                       cms={cms}
                       document={document}
-                      filename={filename}
+                      filename={resolvedFile}
                       relativePath={relativePath}
                       collection={collection}
                       mutationInfo={mutationInfo}
@@ -88,9 +88,17 @@ const RenderForm = ({
   relativePath,
   collection,
   mutationInfo,
+}: {
+  cms: TinaCMS
+  document
+  filename
+  relativePath
+  collection
+  mutationInfo
 }) => {
   const [formIsPristine, setFormIsPristine] = useState(true)
   const schema: TinaSchema | undefined = cms.api.tina.schema
+  const parentFolder = relativePath.split('/').slice(0, -1).join('/')
 
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name)
@@ -137,6 +145,21 @@ const RenderForm = ({
   const renderNavToggle = windowWidth < navBreakpoint + 1
   const headerPadding = renderNavToggle ? 'px-20' : 'px-6'
 
+  React.useEffect(() => {
+    cms.dispatch({ type: 'forms:add', value: form })
+    cms.dispatch({ type: 'forms:set-active-form-id', value: form.id })
+    return () => {
+      cms.dispatch({ type: 'forms:remove', value: form.id })
+      cms.dispatch({ type: 'forms:set-active-form-id', value: null })
+    }
+  }, [JSON.stringify(document._values)])
+  if (!cms.state.activeFormId) {
+    return null
+  }
+  const activeForm = cms.state.forms.find(
+    ({ tinaForm }) => tinaForm.id === form.id
+  )
+
   return (
     <>
       {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
@@ -147,7 +170,7 @@ const RenderForm = ({
           <div className="mb-2">
             <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
               <Link
-                to={`/collections/${collection.name}`}
+                to={`/collections/${collection.name}/~${parentFolder}`}
                 className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
               >
                 {collection.label ? collection.label : collection.name}
@@ -161,7 +184,9 @@ const RenderForm = ({
           <FormStatus pristine={formIsPristine} />
         </div>
       </div>
-      <FormBuilder form={form} onPristineChange={setFormIsPristine} />
+      {activeForm && (
+        <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
+      )}
     </>
   )
 }

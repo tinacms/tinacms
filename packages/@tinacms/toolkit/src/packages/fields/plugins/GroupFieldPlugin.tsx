@@ -39,17 +39,21 @@ export const Group = wrapFieldWithError(({ tinaForm, field }: GroupProps) => {
             return
           }
 
-          setExpanded((p) => !p)
+          // setExpanded((p) => !p)
+          cms.dispatch({
+            type: 'forms:set-active-field-name',
+            value: { formId: tinaForm.id, fieldName: field.name },
+          })
         }}
       >
         {field.label || field.name}
       </Header>
-      <Panel
+      {/* <Panel
         isExpanded={isExpanded}
         setExpanded={setExpanded}
         field={field}
         tinaForm={tinaForm}
-      />
+      /> */}
     </>
   )
 })

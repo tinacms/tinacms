@@ -1,5 +1,93 @@
 # tinacms
 
+## 1.5.5
+
+### Patch Changes
+
+- Updated dependencies [beb179279]
+  - @tinacms/schema-tools@1.4.4
+
+## 1.5.4
+
+### Patch Changes
+
+- f6e2ec5e9: fix issue with single document naviation
+
+## 1.5.3
+
+### Patch Changes
+
+- 3532d07f3: fix issue where a user was unable to create a document with templates
+- 6d1465fd8: Fix auto navigate logic in GetCollection to only be active for Documents and not Folders
+
+## 1.5.2
+
+### Patch Changes
+
+- e7f4c0a96: Fix issue where sortFields are undefined
+- ff8673515: Trim whitespace from readonly token to ignore any accidental whitespace from cut and paste
+
+## 1.5.1
+
+### Patch Changes
+
+- 790b1e1ae: Fix issue where contextual editing was not working for singleton collection
+- eba7e5e5e: Simplify formify logic
+- Updated dependencies [eba7e5e5e]
+  - @tinacms/toolkit@1.7.1
+
+## 1.5.0
+
+### Minor Changes
+
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+
+### Patch Changes
+
+- 675c4cfde: Fixes [this type issue](https://github.com/tinacms/tinacms/issues/3799)
+- 40dd5b7ef: Show a simple message to editors to alert them to the fact that sorting by a non-required field can exclude some documents. The message will only appear when an editor actually runs a sort using a non-required field. The original issue issue is visible in this video: https://www.loom.com/share/244853da315e4f959ebf371d662192dd
+- 0f90e9520: Fix routing issues with the folder update.
+  - Back button goes back to the folder you were in
+  - Admin navigation works as expected
+- d9d773a24: feat: Add ability to duplicate documents
+- 63454fa1e: Fix: do not set Authorization header if token not present
+- Updated dependencies [f14f59a96]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [804639965]
+  - @tinacms/schema-tools@1.4.3
+  - @tinacms/toolkit@1.7.0
+
+## 1.4.6
+
+### Patch Changes
+
+- 709b6f2ec: Fix template menu UI, image delete button
+- Updated dependencies [709b6f2ec]
+  - @tinacms/toolkit@1.6.4
+
+## 1.4.5
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+
+## 1.4.4
+
+### Patch Changes
+
+- 7c750e370: Fix the initialization of sort order in collection list when previous desc sort order in local storage
+- Updated dependencies [2a32a0b99]
+- Updated dependencies [6f491f38c]
+  - @tinacms/toolkit@1.6.3
+
+## 1.4.3
+
+### Patch Changes
+
+- 1370ebae6: Update branching refresh logic to not refresh when a new branch is created. Instead it will be added to the list of branches in memory
+- Updated dependencies [1370ebae6]
+  - @tinacms/toolkit@1.6.2
+
 ## 1.4.2
 
 ### Patch Changes

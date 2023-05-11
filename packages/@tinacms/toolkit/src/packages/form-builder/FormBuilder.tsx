@@ -9,17 +9,17 @@ import { Form as FinalForm } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { Button } from '../styles'
-import { ModalProvider } from '../react-modals'
 import { LoadingDots } from './LoadingDots'
 import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
 import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
-import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
+import { IoMdClose } from 'react-icons/io'
+import { Transition } from '@headlessui/react'
 
 export interface FormBuilderProps {
-  form: Form
+  form: { tinaForm: Form; activeFieldName?: string }
   hideFooter?: boolean
   label?: string
   onPristineChange?: (_pristine: boolean) => unknown
@@ -81,30 +81,28 @@ const FormKeyBindings: FC<FormKeyBindingsProps> = ({ onSubmit }) => {
   return null
 }
 
+function usePrevious(value) {
+  // The ref object is a generic container whose current property is mutable ...
+  // ... and can hold any value, similar to an instance property on a class
+  const ref = React.useRef(null)
+  // Store current value in ref
+  useEffect(() => {
+    ref.current = value
+  }, [value]) // Only re-run if value changes
+  // Return previous value (happens before update in useEffect above)
+  return ref.current
+}
+
 export const FormBuilder: FC<FormBuilderProps> = ({
-  form: tinaForm,
+  form,
   onPristineChange,
   ...rest
 }) => {
+  const cms = useCMS()
   const hideFooter = !!rest.hideFooter
-  /**
-   * > Why is a `key` being set when this isn't an array?
-   *
-   * `FinalForm` does not update when given a new `form` prop.
-   *
-   * We can force `FinalForm` to update by setting the `key` to
-   * the name of the form. When the name changes React will
-   * treat it as a new instance of `FinalForm`, destroying the
-   * old `FinalForm` componentt and create a new one.
-   *
-   * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
-   */
-  const [i, setI] = React.useState(0)
-  React.useEffect(() => {
-    setI((i) => i + 1)
-  }, [tinaForm])
 
-  const finalForm = tinaForm.finalForm
+  const tinaForm = form.tinaForm
+  const finalForm = form.tinaForm.finalForm
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
@@ -148,20 +146,22 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     }
   }, [finalForm])
 
-  useOnChangeEventDispatch({ finalForm, tinaForm })
-
-  // This will be needed when we add rename and delete functionality to this page
-  // const cms = useCMS()
-  // const id: string = tinaForm.id
-  // const schema = cms.api.tina.schema
-  // const collection = schema.getCollectionByFullPath(id)
+  const fieldGroup = tinaForm.getActiveField(form.activeFieldName)
+  const previousName = usePrevious(fieldGroup.name)
+  const animateStatus =
+    fieldGroup.name === previousName
+      ? 'none'
+      : fieldGroup.name
+      ? previousName
+        ? previousName.length < fieldGroup.name.length
+          ? 'forwards'
+          : 'backwards'
+        : 'forwards'
+      : 'none'
+  const animationProps = getAnimationProps(animateStatus)
 
   return (
-    <FinalForm
-      form={finalForm}
-      key={`${i}: ${tinaForm.id}`}
-      onSubmit={tinaForm.onSubmit}
-    >
+    <FinalForm form={tinaForm.finalForm} onSubmit={tinaForm.onSubmit}>
       {({
         handleSubmit,
         pristine,
@@ -186,11 +186,13 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           <>
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormKeyBindings onSubmit={safeHandleSubmit} />
-
               <FormPortalProvider>
-                <FormWrapper id={tinaForm.id}>
+                <FormWrapper
+                  header={<PanelHeader {...fieldGroup} id={tinaForm.id} />}
+                  id={tinaForm.id}
+                >
                   {tinaForm && tinaForm.fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
+                    <FieldsBuilder form={tinaForm} fields={fieldGroup.fields} />
                   ) : (
                     <NoFieldsPlaceholder />
                   )}
@@ -238,119 +240,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   )
 }
 
-export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
-  form: tinaForm,
-  label,
-}) => {
-  /**
-   * > Why is a `key` being set when this isn't an array?
-   *
-   * `FinalForm` does not update when given a new `form` prop.
-   *
-   * We can force `FinalForm` to update by setting the `key` to
-   * the name of the form. When the name changes React will
-   * treat it as a new instance of `FinalForm`, destroying the
-   * old `FinalForm` componentt and create a new one.
-   *
-   * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
-   */
-  const [i, setI] = React.useState(0)
-  React.useEffect(() => {
-    setI((i) => i + 1)
-  }, [tinaForm])
-
-  const finalForm = tinaForm.finalForm
-
-  const moveArrayItem = React.useCallback(
-    (result: DropResult) => {
-      if (!result.destination || !finalForm) return
-      const name = result.type
-      finalForm.mutators.move(
-        name,
-        result.source.index,
-        result.destination.index
-      )
-    },
-    [tinaForm]
-  )
-
-  return (
-    <ModalProvider>
-      <FinalForm
-        form={finalForm}
-        key={`${i}: ${tinaForm.id}`}
-        onSubmit={tinaForm.onSubmit}
-      >
-        {({ handleSubmit, pristine, invalid, submitting }) => {
-          const canSubmit = !pristine && !submitting && !invalid
-
-          const safeHandleSubmit = () => {
-            if (canSubmit) {
-              handleSubmit()
-            }
-          }
-
-          return (
-            <DragDropContext onDragEnd={moveArrayItem}>
-              <FormKeyBindings onSubmit={safeHandleSubmit} />
-
-              <div className="w-full h-screen flex flex-col items-center">
-                <div className="px-6 py-4 w-full bg-white border-b border-gray-150 shadow-sm sticky flex flex-wrap gap-x-6 gap-y-3 justify-between items-center">
-                  {label && (
-                    <h4 className="font-bold font-sans text-lg opacity-80">
-                      {label}
-                    </h4>
-                  )}
-                  <div className="flex flex-1 gap-4 items-center justify-end">
-                    <FormStatus pristine={pristine} />
-                    {tinaForm.reset && (
-                      <ResetForm
-                        pristine={pristine}
-                        reset={async () => {
-                          finalForm.reset()
-                          await tinaForm.reset!()
-                        }}
-                        style={{ flexBasis: '7rem' }}
-                      >
-                        {tinaForm.buttons.reset}
-                      </ResetForm>
-                    )}
-                    <Button
-                      onClick={safeHandleSubmit}
-                      disabled={!canSubmit}
-                      busy={submitting}
-                      variant="primary"
-                      style={{ flexBasis: '10rem' }}
-                    >
-                      {submitting && <LoadingDots />}
-                      {!submitting && tinaForm.buttons.save}
-                    </Button>
-                    {tinaForm.actions.length > 0 && (
-                      <FormActionMenu
-                        form={tinaForm as any}
-                        actions={tinaForm.actions}
-                      />
-                    )}
-                  </div>
-                </div>
-                <FormPortalProvider>
-                  <FormWrapper id={tinaForm.id}>
-                    {tinaForm && tinaForm.fields.length ? (
-                      <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
-                    ) : (
-                      <NoFieldsPlaceholder />
-                    )}
-                  </FormWrapper>
-                </FormPortalProvider>
-              </div>
-            </DragDropContext>
-          )
-        }}
-      </FinalForm>
-    </ModalProvider>
-  )
-}
-
 export const FormStatus = ({ pristine }) => {
   return (
     <div className="flex flex-0 items-center">
@@ -374,120 +263,28 @@ export const FormStatus = ({ pristine }) => {
   )
 }
 
-export const FormWrapper = ({ children, id }) => {
+export const FormWrapper = ({
+  header,
+  children,
+  id,
+}: {
+  header?: React.ReactNode
+  children: React.ReactNode
+  id: string
+}) => {
   return (
     <div
       data-test={`form:${id?.replace(/\\/g, '/')}`}
-      className="h-full overflow-y-auto max-h-full bg-gray-50 py-5 px-6"
+      className="h-full overflow-y-auto max-h-full bg-gray-50"
     >
-      <div className="w-full flex justify-center">
-        <div className="w-full max-w-form">{children}</div>
+      {header}
+      <div className="py-5 px-6">
+        <div className="w-full flex justify-center">
+          <div className="w-full max-w-form">{children}</div>
+        </div>
       </div>
     </div>
   )
-}
-
-/**
- *
- * Subscribes to final form value changes and dispatches an event
- * with information specific to which field changed.
- */
-const useOnChangeEventDispatch = ({
-  finalForm,
-  tinaForm,
-}: {
-  finalForm: FormApi<any, Partial<any>>
-  tinaForm: Form
-}) => {
-  const [formValues, setFormValues] = React.useState({})
-  const [newUpdate, setNewUpdate] = React.useState(null)
-
-  const { subscribe } = finalForm
-
-  React.useEffect(() => {
-    subscribe(
-      ({ values }) => {
-        setFormValues(values)
-      },
-      { values: true }
-    )
-  }, [subscribe, setFormValues])
-  const cms = useCMS()
-
-  React.useEffect(() => {
-    if (newUpdate?.name === 'reset') {
-      cms.events.dispatch({
-        type: `forms:reset`,
-        value: null,
-        mutationType: newUpdate.mutationType,
-        formId: tinaForm.id,
-      })
-      setNewUpdate(null)
-    } else if (newUpdate?.name) {
-      // it seems that on the first update newUpdate?field was undefined (only mattered if calling `onChange` on your own)
-      const previousValue = newUpdate?.field?.value
-      const newValue = getIn(formValues, newUpdate?.name)
-      cms.events.dispatch({
-        type: `forms:fields:onChange`,
-        value: newValue,
-        previousValue,
-        mutationType: newUpdate.mutationType,
-        formId: tinaForm.id,
-        field: newUpdate.field,
-      })
-      setNewUpdate(null)
-    }
-  }, [JSON.stringify(formValues), cms])
-
-  const { change, reset } = finalForm
-  const { insert, move, remove, ...moreMutators } = finalForm.mutators
-
-  const prepareNewUpdate = (
-    name: string,
-    mutationType:
-      | { type: 'change' }
-      | { type: 'insert'; at: string }
-      | { type: 'move'; from: string; to: string }
-      | { type: 'remove'; at: string }
-      | { type: 'reset' }
-  ) => {
-    setNewUpdate({
-      name,
-      field: finalForm.getFieldState(name),
-      mutationType,
-    })
-  }
-
-  React.useMemo(() => {
-    finalForm.reset = (initialValues) => {
-      prepareNewUpdate('reset', { type: 'reset' })
-      return reset(initialValues)
-    }
-    finalForm.change = (name, value) => {
-      prepareNewUpdate(name.toString(), { type: 'change' })
-      return change(name, value)
-    }
-
-    finalForm.mutators = {
-      insert: (...args) => {
-        prepareNewUpdate(args[0], { type: 'insert', at: args[1] })
-        insert(...args)
-      },
-      move: (...args) => {
-        prepareNewUpdate(args[0], {
-          type: 'move',
-          from: args[1],
-          to: args[2],
-        })
-        move(...args)
-      },
-      remove: (...args) => {
-        prepareNewUpdate(args[0], { type: 'remove', at: args[1] })
-        remove(...args)
-      },
-      ...moreMutators,
-    }
-  }, [JSON.stringify(formValues)])
 }
 
 const Emoji = ({ className = '', ...props }) => (
@@ -496,3 +293,70 @@ const Emoji = ({ className = '', ...props }) => (
     {...props}
   />
 )
+
+const isNumber = (item: string) => {
+  return !isNaN(Number(item))
+}
+
+const PanelHeader = (props: { label?: string; name?: string; id: string }) => {
+  const cms = useCMS()
+  const activePath = props.name?.split('.') || []
+  if (!activePath || activePath.length === 0) {
+    return null
+  }
+
+  let lastItemIndex
+  activePath.forEach((item, index) => {
+    if (!isNumber(item)) {
+      lastItemIndex = index
+    }
+  })
+  const returnPath = activePath.slice(0, lastItemIndex)
+
+  return (
+    <button
+      className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
+   border-gray-100 px-6 -mt-px`}
+      onClick={() => {
+        cms.dispatch({
+          type: 'forms:set-active-field-name',
+          value: {
+            formId: props.id,
+            fieldName: returnPath.length > 0 ? returnPath.join('.') : null,
+          },
+        })
+      }}
+      tabIndex={-1}
+    >
+      <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
+        {props.label || props.name || 'Back'}
+        <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+      </div>
+    </button>
+  )
+}
+
+const getAnimationProps = (animateStatus) => {
+  const forwardsAnimation = {
+    enter: 'transform transition ease-in-out duration-500 sm:duration-700',
+    enterFrom: 'translate-x-8',
+    enterTo: 'translate-x-0',
+    leave: 'transform transition ease-in-out duration-500 sm:duration-700',
+    leaveFrom: 'translate-x-0',
+    leaveTo: 'translate-x-8',
+  }
+  const backwardsAnimation = {
+    enter: 'transform transition ease-in-out duration-500 sm:duration-700',
+    enterFrom: '-translate-x-8',
+    enterTo: 'translate-x-0',
+    leave: 'transform transition ease-in-out duration-500 sm:duration-700',
+    leaveFrom: 'translate-x-0',
+    leaveTo: '-translate-x-8',
+  }
+
+  return animateStatus === 'backwards'
+    ? backwardsAnimation
+    : animateStatus === 'forwards'
+    ? forwardsAnimation
+    : {}
+}

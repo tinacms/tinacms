@@ -1,5 +1,26 @@
 # @tinacms/mdx
 
+## 1.3.10
+
+### Patch Changes
+
+- Updated dependencies [beb179279]
+  - @tinacms/schema-tools@1.4.4
+
+## 1.3.9
+
+### Patch Changes
+
+- Updated dependencies [f14f59a96]
+- Updated dependencies [eeedcfd30]
+  - @tinacms/schema-tools@1.4.3
+
+## 1.3.8
+
+### Patch Changes
+
+- 75d5ed359: Add html tag back into rich-text response
+
 ## 1.3.7
 
 ### Patch Changes

@@ -2,7 +2,7 @@
 
 */
 
-import { Database } from '../database'
+import { LookupMapType } from '../database'
 import { astBuilder, NAMER } from '../ast-builder'
 import { sequential } from '../util'
 import { staticDefinitions } from './static-definitions'
@@ -29,13 +29,11 @@ import type {
 import { TinaSchema } from '@tinacms/schema-tools'
 
 export const createBuilder = async ({
-  database,
   tinaSchema,
 }: {
-  database: Database
   tinaSchema: TinaSchema
 }) => {
-  return new Builder({ database, tinaSchema: tinaSchema })
+  return new Builder({ tinaSchema: tinaSchema })
 }
 
 /**
@@ -46,10 +44,9 @@ export const createBuilder = async ({
 export class Builder {
   private maxDepth: number
   public tinaSchema: TinaSchema
-  public database: Database
+  public lookupMap: Record<string, LookupMapType>
   constructor(
     public config: {
-      database: Database
       tinaSchema: TinaSchema
     }
   ) {
@@ -57,8 +54,13 @@ export class Builder {
       // @ts-ignore
       config?.tinaSchema.schema?.config?.client?.referenceDepth ?? 2
     this.tinaSchema = config.tinaSchema
-    this.database = config.database
+    this.lookupMap = {}
   }
+
+  private addToLookupMap = (lookup: LookupMapType) => {
+    this.lookupMap[lookup.type] = lookup
+  }
+
   /**
    * ```graphql
    * # ex.
@@ -91,6 +93,7 @@ export class Builder {
         nodeType: astBuilder.TYPES.MultiCollectionDocument,
         collections,
         connectionNamespace: ['document'],
+        includeFolderFilter: true,
       })
 
     const type = astBuilder.ObjectTypeDefinition({
@@ -193,7 +196,8 @@ export class Builder {
         type: astBuilder.TYPES.String,
       }),
     ]
-    await this.database.addToLookupMap({
+
+    await this.addToLookupMap({
       type: astBuilder.TYPES.Node,
       resolveType: 'nodeDocument',
     })
@@ -236,6 +240,7 @@ export class Builder {
     const type = await this._buildMultiCollectionDocumentDefinition({
       fieldName: astBuilder.TYPES.MultiCollectionDocument,
       collections,
+      includeFolderType: true,
     })
 
     return astBuilder.FieldDefinition({
@@ -426,7 +431,7 @@ export class Builder {
         type: astBuilder.TYPES.String,
       }),
     ]
-    await this.database.addToLookupMap({
+    await this.addToLookupMap({
       type: type.name.value,
       resolveType: 'collectionDocument',
       collection: collection.name,
@@ -720,7 +725,7 @@ export class Builder {
   public collectionDocumentList = async (collection: Collection<true>) => {
     const connectionName = NAMER.referenceConnectionType(collection.namespace)
 
-    await this.database.addToLookupMap({
+    this.addToLookupMap({
       type: connectionName,
       resolveType: 'collectionDocumentList' as const,
       collection: collection.name,
@@ -878,9 +883,11 @@ export class Builder {
   private _buildMultiCollectionDocumentDefinition = async ({
     fieldName,
     collections,
+    includeFolderType,
   }: {
     fieldName: string
     collections: Collection<true>[]
+    includeFolderType?: boolean
   }) => {
     const types: string[] = []
     collections.forEach((collection) => {
@@ -890,20 +897,20 @@ export class Builder {
       }
       if (collection.templates) {
         collection.templates.forEach((template) => {
-          if (typeof template === 'string') {
-            throw new Error('Global templates not yet supported')
-          }
           const typeName = NAMER.documentTypeName(template.namespace)
           types.push(typeName)
         })
       }
     })
+    if (includeFolderType) {
+      types.push(astBuilder.TYPES.Folder)
+    }
     const type = astBuilder.UnionTypeDefinition({
       name: fieldName,
       types,
     })
 
-    await this.database.addToLookupMap({
+    this.addToLookupMap({
       type: type.name.value,
       resolveType: 'multiCollectionDocument',
       createDocument: 'create',
@@ -918,15 +925,17 @@ export class Builder {
     nodeType,
     collections,
     connectionNamespace,
+    includeFolderFilter,
   }: {
     fieldName: string
     namespace: string[]
     nodeType: string | TypeDefinitionNode
     collections: Collection<true>[]
     connectionNamespace: string[]
+    includeFolderFilter?: boolean
   }) => {
     const connectionName = NAMER.referenceConnectionType(namespace)
-    await this.database.addToLookupMap({
+    this.addToLookupMap({
       type: connectionName,
       resolveType: 'multiCollectionDocumentList' as const,
       collections: collections.map((collection) => collection.name),
@@ -938,6 +947,7 @@ export class Builder {
       connectionName,
       nodeType: nodeType,
       collections,
+      includeFolderFilter,
     })
   }
 
@@ -1218,7 +1228,7 @@ export class Builder {
         }
       )
 
-      await this.database.addToLookupMap({
+      this.addToLookupMap({
         type: name,
         resolveType: 'unionData',
         collection: collection?.name,
@@ -1277,6 +1287,7 @@ export class Builder {
     nodeType,
     collection,
     collections,
+    includeFolderFilter,
   }: {
     fieldName: string
     namespace: string[]
@@ -1284,6 +1295,7 @@ export class Builder {
     nodeType: string | TypeDefinitionNode
     collection?: Collectable
     collections?: Collectable[]
+    includeFolderFilter?: boolean
   }) => {
     const extra = [
       await this._connectionFilterBuilder({
@@ -1293,6 +1305,14 @@ export class Builder {
         collections,
       }),
     ]
+    if (includeFolderFilter) {
+      extra.push(
+        astBuilder.InputValueDefinition({
+          name: 'folder',
+          type: astBuilder.TYPES.String,
+        })
+      )
+    }
     return astBuilder.FieldDefinition({
       name: fieldName,
       required: true,

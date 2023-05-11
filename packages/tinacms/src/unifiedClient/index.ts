@@ -32,7 +32,7 @@ export class TinaClient<GenQueries> {
   public queries: GenQueries
   constructor({ token, url, queries }: TinaClientArgs<GenQueries>) {
     this.apiUrl = url
-    this.readonlyToken = token
+    this.readonlyToken = token?.trim()
     this.queries = queries(this)
   }
 

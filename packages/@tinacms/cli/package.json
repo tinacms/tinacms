@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/cli",
-  "version": "1.5.1",
+  "version": "1.5.12",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -61,6 +61,8 @@
     "@graphql-inspector/core": "^4.0.0",
     "@graphql-tools/graphql-file-loader": "^7.2.0",
     "@graphql-tools/load": "^7.3.2",
+    "@rollup/pluginutils": "^5.0.2",
+    "@svgr/core": "6.3.1",
     "@tailwindcss/aspect-ratio": "^0.4.0",
     "@tailwindcss/line-clamp": "^0.3.1",
     "@tailwindcss/typography": "^0.5.9",
@@ -69,7 +71,7 @@
     "@tinacms/graphql": "workspace:*",
     "@tinacms/metrics": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
-    "@vitejs/plugin-react": "^2.1.0",
+    "@vitejs/plugin-react": "3.1.0",
     "ajv": "^6.12.3",
     "altair-express-middleware": "4.0.6",
     "auto-bind": "^4.0.0",
@@ -80,7 +82,6 @@
     "chokidar": "^3.5.1",
     "cli-spinner": "^0.2.10",
     "clipanion": "^3.2.0",
-    "commander": "^9.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "esbuild": "^0.15.5",

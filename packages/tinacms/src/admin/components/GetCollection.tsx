@@ -16,6 +16,7 @@ export const useGetCollection = (
   cms: TinaCMS,
   collectionName: string,
   includeDocuments: boolean = true,
+  folder: { loading: boolean; fullyQualifiedName: string },
   after: string = '',
   sortKey?: string,
   filterArgs?: FilterArgs
@@ -31,8 +32,10 @@ export const useGetCollection = (
   const [resetState, setResetSate] = useState(0)
 
   useEffect(() => {
+    let cancelled = false
+
     const fetchCollection = async () => {
-      if (await api.isAuthenticated()) {
+      if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         const { name, order } = JSON.parse(sortKey || '{}')
         const validSortKey = collectionExtra.fields
           ?.map((x) => x.name)
@@ -43,6 +46,7 @@ export const useGetCollection = (
           const collection = await api.fetchCollection(
             collectionName,
             includeDocuments,
+            filterArgs?.filterField ? '' : folder.fullyQualifiedName,
             after,
             validSortKey,
             order,
@@ -62,10 +66,23 @@ export const useGetCollection = (
       }
     }
 
+    if (cancelled) return
+
     setLoading(true)
     fetchCollection()
     // TODO: useDebounce
-  }, [cms, collectionName, resetState, after, sortKey])
+    return () => {
+      cancelled = true
+    }
+  }, [
+    cms,
+    collectionName,
+    folder.loading,
+    folder.fullyQualifiedName,
+    resetState,
+    after,
+    sortKey,
+  ])
 
   const reFetchCollection = () => setResetSate((x) => x + 1)
 
@@ -75,6 +92,7 @@ export const useGetCollection = (
 const GetCollection = ({
   cms,
   collectionName,
+  folder,
   includeDocuments = true,
   startCursor,
   sortKey,
@@ -83,6 +101,7 @@ const GetCollection = ({
 }: {
   cms: TinaCMS
   collectionName: string
+  folder: { loading: boolean; fullyQualifiedName: string }
   includeDocuments?: boolean
   startCursor?: string
   sortKey?: string
@@ -95,6 +114,7 @@ const GetCollection = ({
       cms,
       collectionName,
       includeDocuments,
+      folder,
       startCursor || '',
       sortKey,
       filterArgs
@@ -115,7 +135,9 @@ const GetCollection = ({
       !allowCreate &&
       !allowDelete &&
       // Check there is only one document
-      collection.documents?.edges?.length === 1
+      collection.documents?.edges?.length === 1 &&
+      // Check to make sure the file is not a folder
+      collection.documents?.edges[0]?.node?.__typename !== 'Folder'
     ) {
       const doc = collection.documents.edges[0].node
       handleNavigate(navigate, cms, collection, collectionDefinition, doc)

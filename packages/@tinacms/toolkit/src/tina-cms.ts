@@ -41,6 +41,7 @@ import {
 } from './plugins/fields/markdown'
 import { MediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
 import { createCloudConfig } from './packages/react-cloud-config'
+import { TinaAction, TinaState } from './tina-state'
 
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
@@ -76,6 +77,8 @@ export interface TinaCMSConfig extends CMSConfig {
 export class TinaCMS extends CMS {
   sidebar?: SidebarState
   _alerts?: Alerts
+  state: TinaState
+  dispatch: React.Dispatch<TinaAction>
 
   constructor({
     sidebar,
@@ -175,5 +178,23 @@ export class TinaCMS extends CMS {
 
   get screens(): PluginType<ScreenPlugin> {
     return this.plugins.findOrCreateMap('screen')
+  }
+  removeAllForms() {
+    this.forms.all().forEach((form) => {
+      this.forms.remove(form)
+    })
+  }
+
+  /**
+   * When a form is associated with any queries
+   * it's considered orphaned.
+   */
+  removeOrphanedForms() {
+    const orphanedForms = this.forms
+      .all()
+      .filter((form) => form.queries.length === 0)
+    orphanedForms.forEach((form) => {
+      this.forms.remove(form)
+    })
   }
 }

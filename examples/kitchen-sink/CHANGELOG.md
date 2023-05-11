@@ -1,5 +1,93 @@
 # e2e-next
 
+## 0.1.35
+
+### Patch Changes
+
+- tinacms@1.5.5
+- @tinacms/datalayer@1.2.12
+
+## 0.1.34
+
+### Patch Changes
+
+- 69145cf93: Fix dep issue
+- Updated dependencies [f6e2ec5e9]
+  - tinacms@1.5.4
+  - @tinacms/datalayer@1.2.11
+
+## 0.1.33
+
+### Patch Changes
+
+- Updated dependencies [3532d07f3]
+- Updated dependencies [6d1465fd8]
+  - tinacms@1.5.3
+  - @tinacms/datalayer@1.2.10
+
+## 0.1.32
+
+### Patch Changes
+
+- Updated dependencies [e7f4c0a96]
+- Updated dependencies [ff8673515]
+  - tinacms@1.5.2
+  - @tinacms/datalayer@1.2.9
+
+## 0.1.31
+
+### Patch Changes
+
+- Updated dependencies [790b1e1ae]
+- Updated dependencies [eba7e5e5e]
+  - tinacms@1.5.1
+
+## 0.1.30
+
+### Patch Changes
+
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+- Updated dependencies [675c4cfde]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [40dd5b7ef]
+- Updated dependencies [0f90e9520]
+- Updated dependencies [d9d773a24]
+- Updated dependencies [63454fa1e]
+  - tinacms@1.5.0
+  - @tinacms/datalayer@1.2.8
+
+## 0.1.29
+
+### Patch Changes
+
+- Updated dependencies [709b6f2ec]
+  - tinacms@1.4.6
+  - @tinacms/datalayer@1.2.7
+
+## 0.1.28
+
+### Patch Changes
+
+- Updated dependencies [75d5ed359]
+  - tinacms@1.4.5
+  - @tinacms/datalayer@1.2.6
+
+## 0.1.27
+
+### Patch Changes
+
+- Updated dependencies [7c750e370]
+  - tinacms@1.4.4
+  - @tinacms/datalayer@1.2.5
+
+## 0.1.26
+
+### Patch Changes
+
+- Updated dependencies [1370ebae6]
+  - tinacms@1.4.3
+  - @tinacms/datalayer@1.2.3
+
 ## 0.1.25
 
 ### Patch Changes

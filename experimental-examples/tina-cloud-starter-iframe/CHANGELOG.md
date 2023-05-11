@@ -1,5 +1,95 @@
 # @tinacms/starter-iframe
 
+## 0.1.37
+
+### Patch Changes
+
+- b2a38b56f: Add back local build option that allows the user to build their site with the filesystem.
+  - tinacms@1.5.5
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.36
+
+### Patch Changes
+
+- f6e2ec5e9: fix issue with single document naviation
+- Updated dependencies [f6e2ec5e9]
+  - tinacms@1.5.4
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.35
+
+### Patch Changes
+
+- Updated dependencies [3532d07f3]
+- Updated dependencies [6d1465fd8]
+  - tinacms@1.5.3
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.34
+
+### Patch Changes
+
+- Updated dependencies [e7f4c0a96]
+- Updated dependencies [ff8673515]
+  - tinacms@1.5.2
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.33
+
+### Patch Changes
+
+- Updated dependencies [790b1e1ae]
+- Updated dependencies [eba7e5e5e]
+  - tinacms@1.5.1
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.32
+
+### Patch Changes
+
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+- Updated dependencies [675c4cfde]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [40dd5b7ef]
+- Updated dependencies [0f90e9520]
+- Updated dependencies [d9d773a24]
+- Updated dependencies [63454fa1e]
+  - tinacms@1.5.0
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.31
+
+### Patch Changes
+
+- Updated dependencies [709b6f2ec]
+  - tinacms@1.4.6
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.30
+
+### Patch Changes
+
+- Updated dependencies [75d5ed359]
+  - tinacms@1.4.5
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.29
+
+### Patch Changes
+
+- Updated dependencies [7c750e370]
+  - tinacms@1.4.4
+  - next-tinacms-cloudinary@4.3.0
+
+## 0.1.28
+
+### Patch Changes
+
+- Updated dependencies [1370ebae6]
+  - tinacms@1.4.3
+  - next-tinacms-cloudinary@4.3.0
+
 ## 0.1.27
 
 ### Patch Changes

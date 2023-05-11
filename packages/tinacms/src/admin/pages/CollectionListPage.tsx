@@ -1,59 +1,67 @@
-/**
-
-*/
-
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import {
+  BiArrowBack,
+  BiCopy,
   BiEdit,
+  BiFile,
+  BiFolder,
   BiPlus,
   BiTrash,
   BiRename,
   BiSearch,
   BiX,
 } from 'react-icons/bi'
+import { RiHome2Line } from 'react-icons/ri'
 import {
-  useParams,
   Link,
-  useNavigate,
   NavigateFunction,
   useLocation,
+  useNavigate,
+  useParams,
 } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 import {
+  BaseTextField,
   Button,
+  CursorPaginator,
+  Input,
   Modal,
   ModalActions,
   ModalBody,
   ModalHeader,
-  PopupModal,
-  TinaCMS,
   OverflowMenu,
-  Select,
-  BaseTextField,
-  Input,
+  PopupModal,
   ReactDateTimeWithStyles,
-  Toggle,
+  Select,
   textFieldClasses,
+  TinaCMS,
+  Toggle,
 } from '@tinacms/toolkit'
 import type {
   CollectionResponse,
-  TemplateResponse,
   DocumentSys,
+  TemplateResponse,
 } from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
-import { PageWrapper, PageHeader, PageBody } from '../components/Page'
+import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
-import { useState } from 'react'
-import { CursorPaginator } from '@tinacms/toolkit'
-import { useEffect } from 'react'
 import type { Collection } from '@tinacms/schema-tools'
+import { CollectionFolder, useCollectionFolder } from './utils'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
 const isSSR = typeof window === 'undefined'
 
-const TemplateMenu = ({ templates }: { templates: TemplateResponse[] }) => {
+const TemplateMenu = ({
+  templates,
+  folder,
+  collectionName,
+}: {
+  collectionName: string
+  templates: TemplateResponse[]
+  folder: CollectionFolder
+}) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
       {() => (
@@ -73,15 +81,34 @@ const TemplateMenu = ({ templates }: { templates: TemplateResponse[] }) => {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="origin-top-right absolute right-0 mt-2 z-menu w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
                 {templates.map((template) => (
                   <Menu.Item key={`${template.label}-${template.name}`}>
                     {({ active }) => (
                       <Link
-                        to={`${template.name}/new`}
-                        className={`w-full text-md px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
-                          active && 'text-gray-800 opacity-100'
+                        to={`/${
+                          folder.fullyQualifiedName
+                            ? [
+                                'collections',
+                                'new',
+                                collectionName,
+                                template.name,
+                                '~',
+                                folder.name,
+                              ].join('/')
+                            : [
+                                'collections',
+                                'new',
+                                collectionName,
+                                template.name,
+                              ].join('/')
+                        }`}
+                        // to={`${template.name}/new`}
+                        className={`w-full text-md px-4 py-2 tracking-wide flex items-center transition ease-out duration-100 ${
+                          active
+                            ? 'text-blue-600 opacity-100 bg-gray-50'
+                            : 'opacity-80 text-gray-600'
                         }`}
                       >
                         {template.label}
@@ -139,7 +166,11 @@ export const handleNavigate = (
       : (window.location.href = routeOverride)
     return null
   } else {
-    navigate(document._sys.breadcrumbs.join('/'))
+    const pathToDoc = document._sys.breadcrumbs
+    navigate(
+      `/${['collections', 'edit', collection.name, ...pathToDoc].join('/')}`,
+      { replace: true }
+    )
   }
 }
 
@@ -159,6 +190,7 @@ const CollectionListPage = () => {
     after: '',
     booleanEquals: null,
   })
+  const [activeSearch, setActiveSearch] = React.useState(false)
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
   const [sortKey, setSortKey] = useState(
@@ -171,8 +203,10 @@ const CollectionListPage = () => {
             name: '',
           })
   )
-  const [sortOrder, setSortOrder] = useState('asc' as 'asc' | 'desc')
+  const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order)
   const loc = useLocation()
+  const folder = useCollectionFolder()
   useEffect(() => {
     // set sort key to cached value on route change
     setSortKey(
@@ -214,6 +248,7 @@ const CollectionListPage = () => {
               includeDocuments
               startCursor={endCursor}
               sortKey={sortKey}
+              folder={folder}
               filterArgs={
                 // only pass filter args if the collection is the same as the current route
                 // We need this hear because this runs before the useEffect above
@@ -246,6 +281,9 @@ const CollectionListPage = () => {
                   // only allow sortable fields
                   ['string', 'number', 'datetime', 'boolean'].includes(x.type)
                 )
+                const sortField = fields?.find(
+                  (field) => field.name === sortName
+                )
 
                 const filterFields = collectionExtra.fields?.filter((x) => {
                   // only allow fileable fields. Currently only string, datetime, and boolean of non-list type
@@ -276,6 +314,8 @@ const CollectionListPage = () => {
                   collectionDefinition?.ui?.allowedActions?.create ?? true
                 const allowDelete =
                   collectionDefinition?.ui?.allowedActions?.delete ?? true
+
+                const folderView = folder.fullyQualifiedName !== ''
 
                 return (
                   <>
@@ -340,277 +380,296 @@ const CollectionListPage = () => {
                               : collection.name}
                           </h3>
 
-                          {fields?.length > 0 && (
-                            <div className="flex gap-4 items-end flex-wrap">
-                              <div className="flex flex-col gap-2 items-start">
-                                <label
-                                  htmlFor="sort"
-                                  className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                >
-                                  Sort by
-                                </label>
-                                <Select
-                                  name="sort"
-                                  options={[
-                                    {
-                                      label: 'Default',
-                                      value: JSON.stringify({
-                                        order: 'asc',
-                                        name: '',
-                                      }),
-                                    },
-                                    ...fields
-                                      .map((x) => [
-                                        {
-                                          label:
-                                            (x.label || x.name) +
-                                            (x.type === 'datetime'
-                                              ? ' (Oldest First)'
-                                              : ' (Ascending)'),
-                                          value: JSON.stringify({
-                                            name: x.name,
-                                            order: 'asc',
-                                          }),
-                                        },
-                                        {
-                                          label:
-                                            (x.label || x.name) +
-                                            (x.type === 'datetime'
-                                              ? ' (Newest First)'
-                                              : ' (Descending)'),
-                                          value: JSON.stringify({
-                                            name: x.name,
-                                            order: 'desc',
-                                          }),
-                                        },
-                                      ])
-                                      .flat(),
-                                  ]}
-                                  input={{
-                                    id: 'sort',
-                                    name: 'sort',
-                                    value: sortKey,
-                                    onChange: (e) => {
-                                      const val = JSON.parse(e.target.value)
-                                      setEndCursor('')
-                                      setPrevCursors([])
-                                      window?.localStorage.setItem(
-                                        `${LOCAL_STORAGE_KEY}.${collectionName}`,
-                                        e.target.value
-                                      )
-                                      setSortKey(e.target.value)
-                                      setSortOrder(val.order)
-                                    },
-                                  }}
-                                />
-                              </div>
-                              <form className="flex flex-wrap gap-4 items-end">
-                                <div className="flex flex-shrink-0 flex-col gap-2 items-start">
+                          <div className="flex gap-4 items-end flex-wrap">
+                            {fields?.length > 0 && (
+                              <>
+                                <div className="flex flex-col gap-2 items-start">
                                   <label
-                                    htmlFor="filter"
+                                    htmlFor="sort"
                                     className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
                                   >
-                                    Filter by
+                                    Sort by
                                   </label>
                                   <Select
-                                    name="filter"
+                                    name="sort"
                                     options={[
                                       {
-                                        label: 'None',
-                                        value: '',
+                                        label: 'Default',
+                                        value: JSON.stringify({
+                                          order: 'asc',
+                                          name: '',
+                                        }),
                                       },
-                                      ...filterFields.map((x) => ({
-                                        label:
-                                          (typeof x.label === 'string' &&
-                                            x.label) ||
-                                          x.name,
-                                        value: x.name,
-                                      })),
+                                      ...fields
+                                        .map((x) => [
+                                          {
+                                            label:
+                                              (x.label || x.name) +
+                                              (x.type === 'datetime'
+                                                ? ' (Oldest First)'
+                                                : ' (Ascending)'),
+                                            value: JSON.stringify({
+                                              name: x.name,
+                                              order: 'asc',
+                                            }),
+                                          },
+                                          {
+                                            label:
+                                              (x.label || x.name) +
+                                              (x.type === 'datetime'
+                                                ? ' (Newest First)'
+                                                : ' (Descending)'),
+                                            value: JSON.stringify({
+                                              name: x.name,
+                                              order: 'desc',
+                                            }),
+                                          },
+                                        ])
+                                        .flat(),
                                     ]}
                                     input={{
-                                      id: 'filter',
-                                      name: 'filter',
-                                      value: vars.filterField,
+                                      id: 'sort',
+                                      name: 'sort',
+                                      value: sortKey,
                                       onChange: (e) => {
-                                        const val = e.target.value
+                                        const val = JSON.parse(e.target.value)
                                         setEndCursor('')
                                         setPrevCursors([])
-                                        setVars((old) => ({
-                                          ...old,
-                                          filterField: val,
-                                        }))
-                                        // if we clear the filter, we need to re-fetch the collection
-                                        if (!val) {
-                                          reFetchCollection()
-                                        }
+                                        window?.localStorage.setItem(
+                                          `${LOCAL_STORAGE_KEY}.${collectionName}`,
+                                          e.target.value
+                                        )
+                                        setSortKey(e.target.value)
+                                        setSortOrder(val.order)
                                       },
                                     }}
                                   />
                                 </div>
-                                {showStartsWith && (
-                                  <>
-                                    <div className="flex flex-shrink-0 flex-col gap-2 items-start">
-                                      <label
-                                        htmlFor="startsWith"
-                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                      >
-                                        Starts with
-                                      </label>
-                                      <Input
-                                        name="startsWith"
-                                        id="startsWith"
-                                        value={vars.startsWith}
-                                        onChange={(e) => {
+                                <form className="flex flex-wrap gap-4 items-end">
+                                  <div className="flex flex-shrink-0 flex-col gap-2 items-start">
+                                    <label
+                                      htmlFor="filter"
+                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                    >
+                                      Filter by
+                                    </label>
+                                    <Select
+                                      name="filter"
+                                      options={[
+                                        {
+                                          label: 'None',
+                                          value: '',
+                                        },
+                                        ...filterFields.map((x) => ({
+                                          label:
+                                            (typeof x.label === 'string' &&
+                                              x.label) ||
+                                            x.name,
+                                          value: x.name,
+                                        })),
+                                      ]}
+                                      input={{
+                                        id: 'filter',
+                                        name: 'filter',
+                                        value: vars.filterField,
+                                        onChange: (e) => {
                                           const val = e.target.value
+                                          setEndCursor('')
+                                          setPrevCursors([])
                                           setVars((old) => ({
                                             ...old,
-                                            startsWith: val,
-                                            after: '',
-                                            before: '',
-                                            booleanEquals: null,
+                                            filterField: val,
                                           }))
-                                        }}
-                                      />
-                                    </div>
-                                  </>
-                                )}
-                                {showDateFilter && (
-                                  <div className="flex flex-shrink-0 gap-4">
-                                    <div className="flex flex-col gap-2 items-start">
-                                      <label
-                                        htmlFor="dateAfter"
-                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                      >
-                                        After
-                                      </label>
-                                      <ReactDateTimeWithStyles
-                                        inputProps={{
-                                          className: textFieldClasses,
-                                        }}
-                                        value={vars.after}
-                                        onChange={(e) => {
-                                          setVars((old) => ({
-                                            ...old,
-                                            after:
-                                              // @ts-ignore
-                                              typeof e.format === 'function'
-                                                ? // @ts-ignore
-                                                  e.format()
-                                                : '',
-                                            booleanEquals: null,
-                                            startsWith: '',
-                                          }))
-                                        }}
-                                      />
-                                    </div>
-                                    <div className="flex flex-col gap-2 items-start">
-                                      <label
-                                        htmlFor="dateBefore"
-                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                      >
-                                        Before
-                                      </label>
-                                      <ReactDateTimeWithStyles
-                                        inputProps={{
-                                          className: textFieldClasses,
-                                        }}
-                                        value={vars.before}
-                                        onChange={(e) => {
-                                          setVars((old) => ({
-                                            ...old,
-                                            before:
-                                              // @ts-ignore
-                                              typeof e.format === 'function'
-                                                ? // @ts-ignore
-                                                  e.format()
-                                                : '',
-                                            booleanEquals: null,
-                                            startsWith: '',
-                                          }))
-                                        }}
-                                      />
-                                    </div>
+                                          // if we clear the filter, we need to re-fetch the collection
+                                          if (!val) {
+                                            reFetchCollection()
+                                          }
+                                        },
+                                      }}
+                                    />
                                   </div>
-                                )}
-                                {showBooleanToggle && (
-                                  <>
-                                    <div className="flex flex-col gap-2 items-start">
-                                      <label
-                                        htmlFor="toggle"
-                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                      >
-                                        {filterField.label || filterField.name}
-                                      </label>
-                                      <Toggle
-                                        // @ts-ignore
-                                        field={filterField}
-                                        input={{
-                                          name: 'toggle',
-                                          value: vars.booleanEquals ?? false,
-                                          onChange: () => {
+                                  {showStartsWith && (
+                                    <>
+                                      <div className="flex flex-shrink-0 flex-col gap-2 items-start">
+                                        <label
+                                          htmlFor="startsWith"
+                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                        >
+                                          Starts with
+                                        </label>
+                                        <Input
+                                          name="startsWith"
+                                          id="startsWith"
+                                          value={vars.startsWith}
+                                          onChange={(e) => {
+                                            const val = e.target.value
                                             setVars((old) => ({
                                               ...old,
-                                              booleanEquals: !old.booleanEquals,
+                                              startsWith: val,
                                               after: '',
                                               before: '',
+                                              booleanEquals: null,
+                                            }))
+                                          }}
+                                        />
+                                      </div>
+                                    </>
+                                  )}
+                                  {showDateFilter && (
+                                    <div className="flex flex-shrink-0 gap-4">
+                                      <div className="flex flex-col gap-2 items-start">
+                                        <label
+                                          htmlFor="dateAfter"
+                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                        >
+                                          After
+                                        </label>
+                                        <ReactDateTimeWithStyles
+                                          inputProps={{
+                                            className: textFieldClasses,
+                                          }}
+                                          value={vars.after}
+                                          onChange={(e) => {
+                                            setVars((old) => ({
+                                              ...old,
+                                              after:
+                                                // @ts-ignore
+                                                typeof e.format === 'function'
+                                                  ? // @ts-ignore
+                                                    e.format()
+                                                  : '',
+                                              booleanEquals: null,
                                               startsWith: '',
                                             }))
-                                          },
-                                        }}
-                                        name="toggle"
-                                      />
+                                          }}
+                                        />
+                                      </div>
+                                      <div className="flex flex-col gap-2 items-start">
+                                        <label
+                                          htmlFor="dateBefore"
+                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                        >
+                                          Before
+                                        </label>
+                                        <ReactDateTimeWithStyles
+                                          inputProps={{
+                                            className: textFieldClasses,
+                                          }}
+                                          value={vars.before}
+                                          onChange={(e) => {
+                                            setVars((old) => ({
+                                              ...old,
+                                              before:
+                                                // @ts-ignore
+                                                typeof e.format === 'function'
+                                                  ? // @ts-ignore
+                                                    e.format()
+                                                  : '',
+                                              booleanEquals: null,
+                                              startsWith: '',
+                                            }))
+                                          }}
+                                        />
+                                      </div>
                                     </div>
-                                  </>
-                                )}
-                                {(showStartsWith ||
-                                  showDateFilter ||
-                                  showBooleanToggle) && (
-                                  <div className="flex gap-3">
-                                    <Button
-                                      onClick={() => {
-                                        setEndCursor('')
-                                        setPrevCursors([])
-                                        reFetchCollection()
-                                      }}
-                                      variant="primary"
-                                      type="submit"
-                                    >
-                                      Search{' '}
-                                      <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
-                                    </Button>
-                                    {(vars.startsWith ||
-                                      vars.after ||
-                                      vars.before ||
-                                      vars.booleanEquals) && (
+                                  )}
+                                  {showBooleanToggle && (
+                                    <>
+                                      <div className="flex flex-col gap-2 items-start">
+                                        <label
+                                          htmlFor="toggle"
+                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                        >
+                                          {filterField.label ||
+                                            filterField.name}
+                                        </label>
+                                        <Toggle
+                                          // @ts-ignore
+                                          field={filterField}
+                                          input={{
+                                            name: 'toggle',
+                                            value: vars.booleanEquals ?? false,
+                                            onChange: () => {
+                                              setVars((old) => ({
+                                                ...old,
+                                                booleanEquals:
+                                                  !old.booleanEquals,
+                                                after: '',
+                                                before: '',
+                                                startsWith: '',
+                                              }))
+                                            },
+                                          }}
+                                          name="toggle"
+                                        />
+                                      </div>
+                                    </>
+                                  )}
+                                  {(showStartsWith ||
+                                    showDateFilter ||
+                                    showBooleanToggle) && (
+                                    <div className="flex gap-3">
                                       <Button
                                         onClick={() => {
-                                          setVars((old) => ({
-                                            ...old,
-                                            startsWith: '',
-                                            after: '',
-                                            before: '',
-                                            booleanEquals: null,
-                                          }))
+                                          setActiveSearch(true)
                                           setEndCursor('')
                                           setPrevCursors([])
                                           reFetchCollection()
                                         }}
-                                        variant="white"
+                                        variant="primary"
+                                        type="submit"
                                       >
-                                        Clear{' '}
-                                        <BiX className="w-5 h-full ml-1 opacity-70" />
+                                        Search{' '}
+                                        <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
                                       </Button>
-                                    )}
-                                  </div>
-                                )}
-                              </form>
-                            </div>
-                          )}
+                                      {(vars.startsWith ||
+                                        vars.after ||
+                                        vars.before ||
+                                        vars.booleanEquals) && (
+                                        <Button
+                                          onClick={() => {
+                                            setActiveSearch(false)
+                                            setVars((old) => ({
+                                              ...old,
+                                              filterField: '',
+                                              startsWith: '',
+                                              after: '',
+                                              before: '',
+                                              booleanEquals: null,
+                                            }))
+                                            setEndCursor('')
+                                            setPrevCursors([])
+                                            reFetchCollection()
+                                          }}
+                                          variant="white"
+                                        >
+                                          Clear{' '}
+                                          <BiX className="w-5 h-full ml-1 opacity-70" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  )}
+                                </form>
+                              </>
+                            )}
+                          </div>
                         </div>
                         <div className="flex self-end	justify-self-end">
                           {!collection.templates && allowCreate && (
                             <Link
-                              to={`new`}
+                              to={`/${
+                                folder.fullyQualifiedName
+                                  ? [
+                                      'collections',
+                                      'new',
+                                      collectionName,
+                                      '~',
+                                      folder.name,
+                                    ].join('/')
+                                  : ['collections', 'new', collectionName].join(
+                                      '/'
+                                    )
+                              }`}
                               className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
                             >
                               Create New{' '}
@@ -618,17 +677,98 @@ const CollectionListPage = () => {
                             </Link>
                           )}
                           {collection.templates && allowCreate && (
-                            <TemplateMenu templates={collection.templates} />
+                            <TemplateMenu
+                              collectionName={collectionName}
+                              templates={collection.templates}
+                              folder={folder}
+                            />
                           )}
                         </div>
                       </div>
                     </PageHeader>
                     <PageBody>
                       <div className="w-full mx-auto max-w-screen-xl">
+                        {sortField && !sortField.required && (
+                          <p className="mb-4 text-gray-500">
+                            <em>
+                              Sorting on a non-required field. Some documents
+                              may be excluded (if they don't have a value for{' '}
+                              {sortName})
+                            </em>
+                          </p>
+                        )}
                         {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
+                              {!activeSearch && folder.name && (
+                                <tr>
+                                  <td colSpan={5}>
+                                    <Breadcrumb
+                                      folder={folder}
+                                      navigate={navigate}
+                                      collectionName={collectionName}
+                                    />
+                                  </td>
+                                </tr>
+                              )}
                               {documents.map((document) => {
+                                if (document.node.__typename === 'Folder') {
+                                  return (
+                                    <tr key={`folder-${document.node.path}`}>
+                                      <td className="pl-5 pr-3 py-3 truncate max-w-0">
+                                        <a
+                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate"
+                                          onClick={() => {
+                                            navigate(
+                                              `/${[
+                                                'collections',
+                                                collectionName,
+                                                document.node.path,
+                                              ].join('/')}`,
+                                              { replace: true }
+                                            )
+                                          }}
+                                        >
+                                          <BiFolder className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
+                                          <span className="truncate block">
+                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                              Name
+                                            </span>
+                                            <span className="h-5 leading-5 block truncate">
+                                              <span>{document.node.name}</span>
+                                            </span>
+                                          </span>
+                                        </a>
+                                      </td>
+                                      <td
+                                        className="px-3 py-3 truncate max-w-0"
+                                        colSpan={4}
+                                      >
+                                        <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                          Path
+                                        </span>
+                                        <span className="leading-5 block text-sm font-medium text-gray-900 truncate">
+                                          {document.node.path
+                                            .substring(2)
+                                            .split('/')
+                                            .map((node) => {
+                                              return (
+                                                <span key={node}>
+                                                  <span className="text-gray-300 pr-0.5">
+                                                    /
+                                                  </span>
+                                                  <span className="pr-0.5">
+                                                    {node}
+                                                  </span>
+                                                </span>
+                                              )
+                                            })}
+                                        </span>
+                                      </td>
+                                    </tr>
+                                  )
+                                }
+
                                 const hasTitle = Boolean(
                                   document.node._sys.title
                                 )
@@ -642,7 +782,10 @@ const CollectionListPage = () => {
                                     key={`document-${document.node._sys.relativePath}`}
                                     className=""
                                   >
-                                    <td className="pl-5 pr-3 py-2 truncate max-w-0">
+                                    <td
+                                      className="pl-5 pr-3 py-3 truncate max-w-0"
+                                      colSpan={hasTitle ? 1 : 2}
+                                    >
                                       <a
                                         className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate"
                                         onClick={() => {
@@ -655,17 +798,19 @@ const CollectionListPage = () => {
                                           )
                                         }}
                                       >
-                                        <BiEdit className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
+                                        <BiFile className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
                                         <span className="truncate block">
                                           <span className="block text-xs text-gray-400 mb-1 uppercase">
                                             {hasTitle ? 'Title' : 'Filename'}
                                           </span>
                                           <span className="h-5 leading-5 block truncate">
-                                            {!hasTitle && subfolders && (
-                                              <span className="text-xs text-gray-400">
-                                                {`${subfolders}/`}
-                                              </span>
-                                            )}
+                                            {!folderView &&
+                                              !hasTitle &&
+                                              subfolders && (
+                                                <span className="text-xs text-gray-400">
+                                                  {`${subfolders}/`}
+                                                </span>
+                                              )}
                                             <span>
                                               {hasTitle
                                                 ? document.node._sys?.title
@@ -676,12 +821,12 @@ const CollectionListPage = () => {
                                       </a>
                                     </td>
                                     {hasTitle && (
-                                      <td className="px-3 py-4 truncate max-w-0 ">
+                                      <td className="px-3 py-3 truncate max-w-0">
                                         <span className="block text-xs text-gray-400 mb-1 uppercase">
                                           Filename
                                         </span>
                                         <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
-                                          {subfolders && (
+                                          {!folderView && subfolders && (
                                             <span className="text-xs text-gray-400">
                                               {`${subfolders}/`}
                                             </span>
@@ -692,7 +837,7 @@ const CollectionListPage = () => {
                                         </span>
                                       </td>
                                     )}
-                                    <td className="px-3 py-4 truncate w-[15%]">
+                                    <td className="px-3 py-3 truncate w-[15%]">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
                                         Extension
                                       </span>
@@ -700,7 +845,7 @@ const CollectionListPage = () => {
                                         {document.node._sys.extension}
                                       </span>
                                     </td>
-                                    <td className="px-3 py-4 truncate w-[15%]">
+                                    <td className="px-3 py-3 truncate w-[15%]">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
                                         Template
                                       </span>
@@ -716,10 +861,39 @@ const CollectionListPage = () => {
                                             label: 'Edit in Admin',
                                             Icon: <BiEdit size="1.3rem" />,
                                             onMouseDown: () => {
+                                              const pathToDoc =
+                                                document.node._sys.breadcrumbs
+                                              if (folder.fullyQualifiedName) {
+                                                pathToDoc.unshift('~')
+                                              }
                                               navigate(
-                                                `${document.node._sys.breadcrumbs.join(
-                                                  '/'
-                                                )}`,
+                                                `/${[
+                                                  'collections',
+                                                  'edit',
+                                                  collectionName,
+                                                  ...pathToDoc,
+                                                ].join('/')}`,
+                                                { replace: true }
+                                              )
+                                            },
+                                          },
+                                          allowCreate && {
+                                            name: 'duplicate',
+                                            label: 'Duplicate',
+                                            Icon: <BiCopy size="1.3rem" />,
+                                            onMouseDown: () => {
+                                              const pathToDoc =
+                                                document.node._sys.breadcrumbs
+                                              if (folder.fullyQualifiedName) {
+                                                pathToDoc.unshift('~')
+                                              }
+                                              navigate(
+                                                `/${[
+                                                  'collections',
+                                                  'duplicate',
+                                                  collectionName,
+                                                  ...pathToDoc,
+                                                ].join('/')}`,
                                                 { replace: true }
                                               )
                                             },
@@ -817,6 +991,74 @@ const CollectionListPage = () => {
     </GetCMS>
   )
 }
+
+const Breadcrumb = ({ folder, navigate, collectionName }) => {
+  const folderArray = folder.name.split('/')
+
+  return (
+    <div className="w-full bg-gray-50/30 flex items-stretch">
+      <button
+        onClick={() => {
+          const folders = folder.fullyQualifiedName.split('/')
+          navigate(
+            `/${[
+              'collections',
+              collectionName,
+              ...folders.slice(0, folders.length - 1),
+            ].join('/')}`,
+            { replace: true }
+          )
+        }}
+        className="px-3 py-2 bg-white hover:bg-gray-50/50 transition ease-out duration-100 border-r border-gray-100 text-blue-500 hover:text-blue-600"
+      >
+        <BiArrowBack className="w-6 h-full opacity-70" />
+      </button>
+      <span className="px-3 py-2 text-gray-600 flex flex-wrap items-center justify-start gap-1">
+        <button
+          onClick={() => {
+            navigate(`/collections/${collectionName}/~`, {
+              replace: true,
+            })
+          }}
+          className="shrink-0 bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100"
+        >
+          <RiHome2Line className="w-5 h-auto" />
+        </button>
+        {folderArray.map((node, index) => {
+          return (
+            <>
+              <span className="text-gray-200 shrink-0">/</span>
+              {index < folderArray.length - 1 ? (
+                <button
+                  className="bg-transparent whitespace-nowrap truncate p-0 border-0 text-blue-500 hover:text-blue-600 transition-all ease-out duration-100 underline underline-offset-2 decoration-1	decoration-blue-200 hover:decoration-blue-400"
+                  onClick={() => {
+                    const folders = folder.fullyQualifiedName.split('/')
+                    navigate(
+                      `/${[
+                        'collections',
+                        collectionName,
+                        ...folders.slice(
+                          0,
+                          folders.length - (folders.length - (index + 2))
+                        ),
+                      ].join('/')}`,
+                      { replace: true }
+                    )
+                  }}
+                >
+                  {node}
+                </button>
+              ) : (
+                <span className="whitespace-nowrap truncate">{node}</span>
+              )}
+            </>
+          )
+        })}
+      </span>
+    </div>
+  )
+}
+
 interface ResetModalProps {
   close(): void
   deleteFunc(): void

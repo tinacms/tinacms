@@ -24,12 +24,18 @@ interface ImageUploadProps {
   loading?: boolean
 }
 
-const StyledImage = ({ src }) => (
-  <img
-    src={src}
-    className="block max-w-full rounded shadow overflow-hidden max-h-48 h-auto object-contain transition-opacity duration-100 ease-out m-0 bg-gray-200 bg-auto bg-center bg-no-repeat"
-  />
-)
+const StyledImage = ({ src }) => {
+  const isSvg = /\.svg$/.test(src)
+
+  return (
+    <img
+      src={src}
+      className={`"block max-w-full rounded shadow overflow-hidden max-h-48 h-auto object-contain transition-opacity duration-100 ease-out m-0 bg-gray-200 bg-auto bg-center bg-no-repeat ${
+        isSvg ? 'min-w-[12rem]' : ''
+      }`}
+    />
+  )
+}
 
 const StyledFile = ({ src }) => {
   return (
@@ -69,12 +75,12 @@ export const ImageUpload = ({
           <ImageLoadingIndicator />
         ) : (
           <div
-            className={`relative w-full max-w-full flex justify-between gap-3 ${
+            className={`relative w-full max-w-full flex justify-start gap-3 ${
               isImage(src) ? `items-start` : `items-center`
             }`}
           >
             <button
-              className="outline-none overflow-visible flex-1 w-[0px] cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
+              className="outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
               onClick={onClick}
             >
               {isImage(src) ? (
