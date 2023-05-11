@@ -128,7 +128,7 @@ export const LexicalEditor = (props: {
           buildInitialContent(props.input.value)
         )}
       >
-        <div className="relative mt-8">
+        <div className="relative">
           <div
             className={classNames(
               // checked ? 'border-transparent' : 'border-gray-300',

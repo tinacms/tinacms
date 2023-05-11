@@ -1,4 +1,6 @@
-import React from 'react'
+import * as React from 'react'
+import { BrowserRouter } from 'react-router-dom'
+import { Routes, Route, Outlet, Link, useParams } from 'react-router-dom'
 import { RichEditor } from '../rich-text'
 import { parseMDX, stringifyMDX } from '@tinacms/mdx'
 
@@ -6,97 +8,114 @@ const modules = import.meta.glob('../../../mdx/src/next/tests/**/in.md', {
   as: 'raw',
 })
 
-function App() {
-  // const [activeMd, setActiveMd] = React.useState<string | null>(null)
-  const [activeMd, setActiveMd] = useLocalStorage('active-md', null)
-  const [raw, setRaw] = React.useState<string | null>(null)
-  const [json, setJson] = React.useState<object | null>(null)
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path=":mod" element={<Editor />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
+}
 
-  React.useEffect(() => {
-    if (activeMd) {
-      const moduleToImport = modules[activeMd]
-      if (moduleToImport) {
-        moduleToImport().then((value) => {
-          setRaw(value)
-        })
-      } else {
-        setRaw(null)
-      }
-    }
-  }, [activeMd])
-
+function Layout() {
   return (
     <div className="grid grid-cols-12 h-screen w-screen">
-      <div className="col-span-3">
+      {/* A "layout route" is a good place to put markup you want to
+          share across all the pages on your site, like navigation. */}
+      <nav className="col-span-3 bg-gray-800 text-gray-50 h-screen overflow-scroll pt-4 px-2">
         <ul>
           {Object.keys(modules).map((modKey) => {
+            const display = modKey
+              .replace('../../../mdx/src/next/tests/', '')
+              .replace('/in.md', '')
             return (
               <li key={modKey}>
-                <button
-                  onClick={() => {
-                    setJson(null)
-                    setActiveMd(modKey)
-                  }}
+                <Link
+                  to={display}
+                  className="w-full overflow-hidden p-1 hover:bg-gray-700 block rounded-sm truncate"
                   type="button"
                 >
-                  {modKey
-                    .replace('../../../mdx/src/next/tests/', '')
-                    .replace('/in.md', '')}
-                </button>
+                  <span className="whitespace-pre text-sm max-w-full capitalize">
+                    {display.split('-').join(' ')}
+                  </span>
+                </Link>
               </li>
             )
           })}
         </ul>
-      </div>
+      </nav>
+
       <div className="col-span-9 w-full grid">
-        <div className="grid grid-cols-2 h-screen w-full">
-          <div className="h-full overflow-scroll px-2">
-            <RichEditor
-              key={raw}
-              input={{
-                value: raw
-                  ? parseMDX(raw)
-                  : {
-                      type: 'root',
-                      children: [
-                        {
-                          type: 'paragraph',
-                          children: [{ type: 'text', value: '' }],
-                        },
-                      ],
-                    },
-                onChange: (value) => {
-                  if (value) {
-                    setJson(value)
-                  }
-                },
-              }}
-            />
-          </div>
-          {/* <Textarea key={`${json ? JSON.stringify(json) : ''}-json`} value={JSON.stringify(json, null, 2)} /> */}
-          <div className="h-full">
-            <div className="h-1/2">
-              <Textarea
-                value={raw ? raw : ''}
-                onChange={(value) => {
-                  setRaw(value)
-                }}
-              />
-            </div>
-            <div className="h-1/2">
-              <Textarea
-                key={`${json ? JSON.stringify(json) : ''}-out`}
-                value={json ? stringifyMDX(json) : ''}
-              />
-            </div>
-          </div>
+        <Outlet />
+      </div>
+    </div>
+  )
+}
+
+function Editor() {
+  const { mod } = useParams()
+  const [raw, setRaw] = React.useState<string | null>(null)
+  const [json, setJson] = React.useState<object | null>(null)
+
+  React.useEffect(() => {
+    const moduleToImport = modules[`../../../mdx/src/next/tests/${mod}/in.md`]
+    if (moduleToImport) {
+      moduleToImport().then((value) => {
+        setRaw(value)
+      })
+    } else {
+      setRaw(null)
+    }
+  }, [mod])
+
+  return (
+    <div className="col-span-9 w-full grid">
+      <div className="grid grid-cols-2 h-screen w-full">
+        <div className="h-full overflow-scroll p-2">
+          <RichEditor
+            key={raw}
+            input={{
+              value: raw
+                ? parseMDX(raw)
+                : {
+                    type: 'root',
+                    children: [
+                      {
+                        type: 'paragraph',
+                        children: [{ type: 'text', value: '' }],
+                      },
+                    ],
+                  },
+              onChange: (value) => {
+                if (value) {
+                  setJson(value)
+                }
+              },
+            }}
+          />
+        </div>
+        {/* <Textarea key={`${json ? JSON.stringify(json) : ''}-json`} value={JSON.stringify(json, null, 2)} /> */}
+        <div className="h-full flex flex-col gap-2 py-2">
+          <Textarea
+            value={raw ? raw : ''}
+            onChange={(value) => {
+              setRaw(value)
+            }}
+          />
+          <Textarea
+            key={`${json ? JSON.stringify(json) : ''}-out`}
+            value={json ? stringifyMDX(json) : ''}
+          />
         </div>
       </div>
     </div>
   )
 }
 
-const Textarea = ({
+export const Textarea = ({
   value,
   onChange,
 }: {
@@ -104,9 +123,9 @@ const Textarea = ({
   onChange?: (value: string) => void
 }) => {
   return (
-    <div className="bg-gray-300 font-mono relative h-full max-h-full overflow-scroll">
+    <div className="bg-gray-300 w-full border border-gray-800 rounded-lg font-mono relative h-full max-h-full overflow-scroll">
       <textarea
-        className="absolute inset-0 h-full w-full"
+        className="absolute inset-0 h-full w-full text-sm"
         value={value}
         onChange={(e) => {
           if (onChange) {
@@ -116,46 +135,4 @@ const Textarea = ({
       />
     </div>
   )
-}
-
-export default App
-
-// Hook
-function useLocalStorage(key: string, initialValue: unknown) {
-  // State to store our value
-  // Pass initial state function to useState so logic is only executed once
-  const [storedValue, setStoredValue] = React.useState(() => {
-    if (typeof window === 'undefined') {
-      return initialValue
-    }
-    try {
-      // Get from local storage by key
-      const item = window.localStorage.getItem(key)
-      // Parse stored json or if none return initialValue
-      return item ? JSON.parse(item) : initialValue
-    } catch (error) {
-      // If error also return initialValue
-      console.log(error)
-      return initialValue
-    }
-  })
-  // Return a wrapped version of useState's setter function that ...
-  // ... persists the new value to localStorage.
-  const setValue = (value: unknown) => {
-    try {
-      // Allow value to be a function so we have same API as useState
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value
-      // Save state
-      setStoredValue(valueToStore)
-      // Save to local storage
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore))
-      }
-    } catch (error) {
-      // A more advanced implementation would handle the error case
-      console.log(error)
-    }
-  }
-  return [storedValue, setValue]
 }
