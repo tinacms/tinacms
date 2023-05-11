@@ -82,6 +82,14 @@ export class TinaListItemNode extends ListItemNode {
         }
         currentIndent++
       } else {
+        const parent = this.getParent()
+        if ($isListNode(parent)) {
+          // parent.setIndent(currentIndent)
+        } else {
+          throw new Error(
+            `Unexpected node for list item of type ${parent?.__type} (key: ${parent?.__key})`
+          )
+        }
         currentIndent--
       }
     }

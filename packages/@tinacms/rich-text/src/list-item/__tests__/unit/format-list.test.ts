@@ -253,6 +253,62 @@ describe('LexicalListItemNode tests', () => {
             `
           )
         })
+        it('dedents', async () => {
+          const { editor } = testEnv
+          if (!editor) {
+            throw new Error(`No editor found`)
+          }
+
+          await editor.update(() => {
+            listItemNode1.append(
+              $createParagraphNode().append($createTextNode('one sibling'))
+            )
+          })
+
+          expectHtmlToBeEqual(
+            editor.getRootElement()?.innerHTML || '',
+            html`
+              <ul class="ul">
+                <li value="1" class="listitem">
+                  <p class="paragraph ltr" dir="ltr">
+                    <span data-lexical-text="true">one</span>
+                  </p>
+                  <p class="paragraph ltr" dir="ltr">
+                    <span data-lexical-text="true">one sibling</span>
+                  </p>
+                </li>
+                <li value="2" class="listitem">
+                  <p class="paragraph ltr" dir="ltr">
+                    <span data-lexical-text="true">two</span>
+                  </p>
+                </li>
+              </ul>
+            `
+          )
+
+          await editor.update(() => {
+            listItemNode1Paragraph.collapseAtStart()
+          })
+
+          expectHtmlToBeEqual(
+            editor.getRootElement()?.innerHTML || '',
+            html`
+              <p class="paragraph ltr" dir="ltr">
+                <span data-lexical-text="true">one</span>
+              </p>
+              <p class="paragraph ltr" dir="ltr">
+                <span data-lexical-text="true">one sibling</span>
+              </p>
+              <ul class="ul">
+                <li value="1" class="listitem">
+                  <p class="paragraph ltr" dir="ltr">
+                    <span data-lexical-text="true">two</span>
+                  </p>
+                </li>
+              </ul>
+            `
+          )
+        })
       })
     },
     createEditorConfig(() => {})

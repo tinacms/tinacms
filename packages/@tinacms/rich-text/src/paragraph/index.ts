@@ -23,13 +23,23 @@ export class TinaParagraphNode extends ParagraphNode {
 
   override collapseAtStart(): boolean {
     const parent = this.getParent()
-    if ($isTinaListItemNode(parent)) {
+    if ($isTinaListItemNode(parent) || $isTinaQuoteNode(parent)) {
+      // collapseAtStart is only called for the first child
+      // so when we need to move all of the items up one level
+      // we can move the next siblings to their correct spots
+      // first, then just replace the parent node with the current
+      // one (which is the first element)
+      this.getNextSiblings().forEach((sibling) => {
+        parent.insertAfter(sibling)
+      })
+      // NOTE: this works because when a list node is
+      // given a non list-item child, it moves it up to it's parent
+      // https://github.com/facebook/lexical/blob/c782ce5d7e3faee492f5b6ed2ea233ec09c9ed47/packages/lexical-list/src/LexicalListNode.ts#L176-L177
       parent.replace(this)
+      return true
+    } else {
+      return super.collapseAtStart()
     }
-    if ($isTinaQuoteNode(parent)) {
-      parent.replace(this)
-    }
-    return super.collapseAtStart()
   }
 
   /**
@@ -45,6 +55,7 @@ export class TinaParagraphNode extends ParagraphNode {
   }
   override getIndent(): number {
     const parent = this.getParent()
+    // Might be able to remove this now that we're handling indent/outdent in-house
     if ($isListItemNode(parent)) {
       return parent.getIndent()
     }
