@@ -34,6 +34,6 @@ export function TabIndentationPlugin() {
       },
       COMMAND_PRIORITY_EDITOR
     )
-  })
+  }, [editor])
   return null
 }
