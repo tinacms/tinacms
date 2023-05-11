@@ -53,8 +53,6 @@ export const DeleteModal = ({
   )
 }
 
-// TODO: Scott B can you style this?
-// It might not need styling but feel free to take a look
 export const NewFolderModal = ({ onSubmit, close }: NewFolderModalProps) => {
   const [folderName, setFolderName] = React.useState('')
   return (

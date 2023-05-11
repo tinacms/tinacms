@@ -66,7 +66,6 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
           : 'shadow hover:shadow-md hover:scale-103 hover:border-gray-150'
       } ${item.type === 'dir' ? 'cursor-pointer' : ''}`}
     >
-      {/* TODO: Scott B can you style this? */}
       {item.new && (
         <span className="absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10">
           NEW
