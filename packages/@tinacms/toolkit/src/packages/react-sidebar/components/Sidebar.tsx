@@ -559,7 +559,7 @@ const EditButton = ({}) => {
   return (
     <Button
       rounded="right"
-      variant={cms.state.quickEditSupported ? 'white' : 'primary'}
+      variant={'white'}
       size="custom"
       onClick={toggleSidebarOpen}
       className={` absolute top-8 right-0 text-sm h-10 px-3 transition-all duration-150 ease-out ${
@@ -569,11 +569,7 @@ const EditButton = ({}) => {
       }`}
       aria-label="opens cms sidebar"
     >
-      {cms.state.quickEditSupported ? (
-        <MdOutlineArrowForwardIos className={`h-6 w-auto text-blue-500`} />
-      ) : (
-        <BiPencil className={`h-6 w-auto text-white`} />
-      )}
+      <MdOutlineArrowForwardIos className={`h-6 w-auto text-blue-500`} />
     </Button>
   )
 }
