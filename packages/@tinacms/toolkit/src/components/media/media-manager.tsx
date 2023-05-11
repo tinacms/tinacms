@@ -10,6 +10,7 @@ import { useCMS } from '../../react-tinacms/use-cms'
 import {
   BiArrowToBottom,
   BiCloudUpload,
+  BiFolder,
   BiGridAlt,
   BiListUl,
   BiX,
@@ -471,46 +472,47 @@ export function MediaPicker({
       )}
 
       <MediaPickerWrap>
-        <div className="flex items-center bg-gray-50 border-b border-gray-150 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
-          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+        <div className="flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0">
+          <div className="flex flex-1 items-center gap-4">
+            <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+            <Breadcrumb directory={directory} setDirectory={setDirectory} />
+          </div>
 
-          <Breadcrumb directory={directory} setDirectory={setDirectory} />
-
-          {/* TODO: Scott B can you style this? */}
-          {/* I added two buttons; refresh list and new folder */}
-          <Button
-            busy={false}
-            variant="secondary"
-            onClick={() => {
-              setNewFolderModalOpen(true)
-            }}
-            className="whitespace-nowrap"
-          >
-            New Folder
-            <IoMdFolder className="w-6 h-full ml-2 opacity-70" />
-          </Button>
-          <Button
-            busy={false}
-            variant="secondary"
-            onClick={loadMedia}
-            className="whitespace-nowrap"
-          >
-            Refresh List
-            <IoMdRefresh className="w-6 h-full ml-2 opacity-70" />
-          </Button>
-          {!isLocal && hasTinaMedia && (
+          <div className="flex items-center gap-4">
             <Button
-              // this button is only displayed when the data is not loading
+              busy={false}
+              variant="white"
+              onClick={loadMedia}
+              className="whitespace-nowrap"
+            >
+              Refresh
+              <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+            </Button>
+            <Button
               busy={false}
               variant="white"
               onClick={() => {
-                setShowSync(true)
+                setNewFolderModalOpen(true)
               }}
+              className="whitespace-nowrap"
             >
-              Sync <IoMdSync className="w-6 h-full ml-2 opacity-70" />
+              New Folder
+              <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
             </Button>
-          )}
-          <UploadButton onClick={onClick} uploading={uploading} />
+            {!isLocal && hasTinaMedia && (
+              <Button
+                // this button is only displayed when the data is not loading
+                busy={false}
+                variant="white"
+                onClick={() => {
+                  setShowSync(true)
+                }}
+              >
+                Sync <IoMdSync className="w-6 h-full ml-2 opacity-70" />
+              </Button>
+            )}
+            <UploadButton onClick={onClick} uploading={uploading} />
+          </div>
         </div>
 
         <div className="flex h-full overflow-hidden bg-white">

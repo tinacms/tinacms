@@ -64,6 +64,8 @@ export const NewFolderModal = ({ onSubmit, close }: NewFolderModalProps) => {
         <ModalBody padded={true}>
           <Input
             value={folderName}
+            placeholder="Folder Name"
+            required
             onChange={(e) => setFolderName(e.target.value)}
           />
         </ModalBody>
@@ -81,7 +83,7 @@ export const NewFolderModal = ({ onSubmit, close }: NewFolderModalProps) => {
               close()
             }}
           >
-            Add new folder
+            Create New Folder
           </Button>
         </ModalActions>
       </PopupModal>

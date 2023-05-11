@@ -32,10 +32,9 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
         }
       }}
     >
-      {/* TODO: Scott B can you style this? */}
       {item.new && (
-        <span className="absolute top-1 left-1 rounded-md bg-green-50  text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 z-10">
-          New
+        <span className="absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10">
+          NEW
         </span>
       )}
       <div className="w-20 h-20 bg-gray-50 shadow border border-gray-100 rounded overflow-hidden flex justify-center flex-shrink-0">
@@ -69,8 +68,8 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
     >
       {/* TODO: Scott B can you style this? */}
       {item.new && (
-        <span className="absolute top-1 left-1 rounded-md bg-green-50  text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 z-10">
-          New
+        <span className="absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10">
+          NEW
         </span>
       )}
       <button
