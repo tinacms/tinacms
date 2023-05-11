@@ -182,6 +182,8 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
 
       return {
         ...state,
+        quickEditEnabled: false,
+        quickEditSupported: false,
         // Always set it to null for now, this will become more annoying for users
         // when `useTina` hooks are mounting client-side as a result of the app itself
         // rather than route navigation
