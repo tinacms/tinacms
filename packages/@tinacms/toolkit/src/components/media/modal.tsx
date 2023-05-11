@@ -62,6 +62,13 @@ export const NewFolderModal = ({ onSubmit, close }: NewFolderModalProps) => {
       <PopupModal>
         <ModalHeader close={close}>New Folder</ModalHeader>
         <ModalBody padded={true}>
+          <p className="text-base text-gray-700 mb-2">
+            Please provide a name for your folder.
+          </p>
+          <p className="text-sm text-gray-500 mb-4 italic">
+            <span className="font-bold">Note</span> &ndash; If you navigate away
+            before uploading a media item, the folder will disappear.
+          </p>
           <Input
             value={folderName}
             placeholder="Folder Name"
