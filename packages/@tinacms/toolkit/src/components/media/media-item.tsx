@@ -19,7 +19,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   const thumbnail = (item.thumbnails || {})['75x75']
   return (
     <li
-      className={`flex shrink-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
+      className={`relative flex shrink-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
         active
           ? 'bg-gradient-to-r from-white to-gray-50/50 text-blue-500 hover:bg-gray-50'
           : 'bg-white hover:bg-gray-50/50'
@@ -32,6 +32,12 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
         }
       }}
     >
+      {/* TODO: Scott B can you style this? */}
+      {item.new && (
+        <span className="absolute top-1 left-1 rounded-md bg-green-50  text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 z-10">
+          New
+        </span>
+      )}
       <div className="w-20 h-20 bg-gray-50 shadow border border-gray-100 rounded overflow-hidden flex justify-center flex-shrink-0">
         {isImage(thumbnail) ? (
           <img
@@ -49,42 +55,6 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
     </li>
   )
 }
-
-// We may need this later
-// const EnsureLoaded: React.FC<{ url: string; bypass: boolean }> = ({
-//   children,
-//   bypass,
-//   url,
-// }) => {
-//   const [loaded, setLoaded] = React.useState(false)
-
-//   React.useEffect(() => {
-//     let cancel = false
-//     const fetchLoaded = async () => {
-//       for (let i = 0; i < 10; i++) {
-//         if (!cancel && !loaded) {
-//           const res = await fetch(url, { method: 'HEAD' })
-//           // console.log(res)
-//           if (res.ok) {
-//             setLoaded(true)
-//           } else {
-//             await new Promise((resolve) => setTimeout(resolve, 1000))
-//           }
-//         }
-//       }
-//     }
-//     if (!loaded && !cancel && url && !bypass) fetchLoaded()
-
-//     return () => {
-//       cancel = true
-//     }
-//   }, [])
-//   if (bypass || loaded) {
-//     return children
-//   } else {
-//     return <div>loading...</div>
-//   }
-// }
 
 export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
