@@ -33,6 +33,7 @@ import {
   TernaryFilter,
 } from './datalayer'
 import {
+  ARRAY_ITEM_VALUE_SEPARATOR,
   BatchOp,
   CONTENT_ROOT_PREFIX,
   DelOp,
@@ -689,6 +690,7 @@ export class Database {
                     {
                       name: field.name,
                       type: field.type,
+                      list: !!field.list,
                       pad:
                         field.type === 'number'
                           ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
@@ -703,12 +705,16 @@ export class Database {
               // build IndexDefinitions for each index in the collection schema
               for (const index of collection.indexes) {
                 indexDefinitions[index.name] = {
-                  fields: index.fields.map((indexField) => ({
-                    name: indexField.name,
-                    type: (collection.fields as TinaField<true>[]).find(
+                  fields: index.fields.map((indexField) => {
+                    const field = (collection.fields as TinaField<true>[]).find(
                       (field) => indexField.name === field.name
-                    )?.type,
-                  })),
+                    )
+                    return {
+                      name: indexField.name,
+                      type: field?.type,
+                      list: !!field?.list,
+                    }
+                  }),
                 }
               }
             }
@@ -842,16 +848,29 @@ export class Database {
       ) {
         continue
       }
-      const filepath = matcher.groups['_filepath_']
-      if (
-        !itemFilter(
-          filterSuffixes
-            ? matcher.groups
-            : indexDefinition
-            ? await rootLevel.get(filepath)
-            : (value as Record<string, any>)
-        )
-      ) {
+
+      let filepath = matcher.groups['_filepath_']
+      let itemRecord: Record<string, any>
+      if (filterSuffixes) {
+        itemRecord = matcher.groups
+        // for index match fields, convert the array value from comma-separated string to array
+        for (const field of indexDefinition.fields) {
+          if (itemRecord[field.name]) {
+            if (field.list) {
+              itemRecord[field.name] = itemRecord[field.name].split(
+                ARRAY_ITEM_VALUE_SEPARATOR
+              )
+            }
+          }
+        }
+      } else {
+        if (indexDefinition) {
+          itemRecord = await rootLevel.get(filepath)
+        } else {
+          itemRecord = value
+        }
+      }
+      if (!itemFilter(itemRecord)) {
         continue
       }
 
