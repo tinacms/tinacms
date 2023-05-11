@@ -17,19 +17,20 @@ export function useTina(props) {
       style.type = 'text/css'
       style.textContent = `
         [data-tinafield] {
-          box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.1);
-          outline: 2px solid rgba(110, 163, 216);
-          cursor: pointer;
-          transition: ease-in-out 200ms;
+          outline: 2px dashed rgba(34,150,254,0.5);
+          transition: box-shadow ease-out 150ms;
         }
         [data-tinafield]:hover {
-          box-shadow: inset 100vi 100vh rgba(110, 163, 216, 0.4);
-          outline: 3px solid rgba(110, 163, 216);
+          box-shadow: inset 100vi 100vh rgba(34,150,254,0.3);
+          outline: 2px solid rgba(34,150,254,1);
+          cursor: pointer;
         }
         [data-tinafield-overlay] {
-          outline: 2px solid rgba(110, 163, 216);
+          outline: 2px dashed rgba(34,150,254,0.5);
+        }
+        [data-tinafield-overlay]:hover {
           cursor: pointer;
-          transition: ease-in-out 200ms;
+          outline: 2px solid rgba(34,150,254,1);
           position: relative;
         }
         [data-tinafield-overlay]::after {
@@ -37,10 +38,12 @@ export function useTina(props) {
           position: absolute;
           inset: 0;
           z-index: 20;
-          background-color: rgba(110, 163, 216, 0.2);
+          transition: opacity ease-out 150ms;
+          background-color: rgba(34,150,254,0.3);
+          opacity: 0;
         }
         [data-tinafield-overlay]:hover::after {
-          background-color: rgba(110, 163, 216, 0.4);
+          opacity: 1;
         }
       `
       document.head.appendChild(style)

@@ -6,7 +6,7 @@
 
 import * as React from 'react'
 
-import { BiMenu, BiPencil, BiTargetLock } from 'react-icons/bi'
+import { BiMenu, BiPencil } from 'react-icons/bi'
 import { BsArrowsAngleContract, BsArrowsAngleExpand } from 'react-icons/bs'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
@@ -18,7 +18,7 @@ import { FormsView } from './SidebarBody'
 import { ImFilesEmpty } from 'react-icons/im'
 import { IoMdClose } from 'react-icons/io'
 import { BillingWarning, LocalWarning } from './LocalWarning'
-import { MdOutlineArrowBackIos } from 'react-icons/md'
+import { MdOutlineArrowBackIos, MdOutlineArrowForwardIos } from 'react-icons/md'
 import { Nav } from './Nav'
 import { ResizeHandle } from './ResizeHandle'
 import { Transition } from '@headlessui/react'
@@ -553,27 +553,34 @@ const SidebarCollectionLink = ({
 }
 
 const EditButton = ({}) => {
+  const cms = useCMS()
   const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext)
 
   return (
     <Button
       rounded="right"
-      variant="primary"
+      variant={cms.state.quickEditSupported ? 'white' : 'primary'}
+      size="custom"
       onClick={toggleSidebarOpen}
-      className={` absolute top-8 right-0 transition-all duration-150 ease-out ${
+      className={` absolute top-8 right-0 text-sm h-10 px-3 transition-all duration-150 ease-out ${
         displayState !== 'closed'
           ? 'opacity-0'
           : 'translate-x-full pointer-events-auto'
       }`}
       aria-label="opens cms sidebar"
     >
-      <BiPencil className="h-6 w-auto" />
+      {cms.state.quickEditSupported ? (
+        <MdOutlineArrowForwardIos className={`h-6 w-auto text-blue-500`} />
+      ) : (
+        <BiPencil className={`h-6 w-auto text-white`} />
+      )}
     </Button>
   )
 }
 
 const QuickEditButton = () => {
   const cms = useCMS()
+  const { displayState } = React.useContext(SidebarContext)
 
   const shouldDisplay = true
   // If/when we put this in the sidebar somewhere, this should hide like the EditButton does
@@ -589,20 +596,21 @@ const QuickEditButton = () => {
   }
   return (
     <Button
-      rounded="right"
+      rounded="full"
       // variant={variant}
-      variant="secondary"
+      size="custom"
+      variant={cms.state.quickEditEnabled ? 'secondary' : 'primary'}
       onClick={() => {
         cms.dispatch({ type: 'toggle-quick-editing-enabled' })
       }}
-      className={` absolute top-20 right-0 transition-all duration-150 ease-out ${
+      className={` absolute w-[44px] h-[44px] mt-[-2px] top-8 transition-all duration-150 ease-out ${
         shouldDisplay ? 'translate-x-full pointer-events-auto' : 'opacity-0'
-      }`}
+      } ${displayState === 'closed' ? '-right-14' : '-right-2'}`}
       aria-label="opens cms sidebar"
     >
-      <BiTargetLock
-        className={`h-6 w-auto ${
-          cms.state.quickEditEnabled ? 'text-blue-600' : ''
+      <BiPencil
+        className={`h-6 w-auto shrink-0 ${
+          cms.state.quickEditEnabled ? 'text-gray-400' : 'text-white'
         }`}
       />
     </Button>
