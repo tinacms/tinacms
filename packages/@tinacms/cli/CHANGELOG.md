@@ -1,5 +1,30 @@
 # tinacms-cli
 
+## 1.5.12
+
+### Patch Changes
+
+- 31c160cdf: Placeholder view for when assets fail to load
+- b2a38b56f: Add back local build option that allows the user to build their site with the filesystem.
+- beb179279: Add support for sites deployed to sub-paths. To enabled, provide the sub-path at config.build.basePath:
+
+  ```ts
+    ...
+    build: {
+      outputFolder: 'admin',
+      publicFolder: 'public',
+      basePath: 'my-site', // site is served at my-domain.com/my-site
+    },
+    ...
+  ```
+
+- Updated dependencies [31c160cdf]
+- Updated dependencies [beb179279]
+  - @tinacms/app@1.2.12
+  - @tinacms/schema-tools@1.4.4
+  - @tinacms/graphql@1.4.12
+  - @tinacms/datalayer@1.2.12
+
 ## 1.5.11
 
 ### Patch Changes

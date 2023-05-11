@@ -1,5 +1,21 @@
 # @tinacms/schema-tools
 
+## 1.4.4
+
+### Patch Changes
+
+- beb179279: Add support for sites deployed to sub-paths. To enabled, provide the sub-path at config.build.basePath:
+
+  ```ts
+    ...
+    build: {
+      outputFolder: 'admin',
+      publicFolder: 'public',
+      basePath: 'my-site', // site is served at my-domain.com/my-site
+    },
+    ...
+  ```
+
 ## 1.4.3
 
 ### Patch Changes

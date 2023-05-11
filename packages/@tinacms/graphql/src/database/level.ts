@@ -39,6 +39,7 @@ export type DelOp = {
 
 export type BatchOp = PutOp | DelOp
 
+export const ARRAY_ITEM_VALUE_SEPARATOR = ','
 export const INDEX_KEY_FIELD_SEPARATOR = '\x1D'
 export const CONTENT_ROOT_PREFIX = '~'
 export const SUBLEVEL_OPTIONS: AbstractSublevelOptions<
