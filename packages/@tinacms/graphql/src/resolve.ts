@@ -203,7 +203,7 @@ export const resolve = async ({
               )
               return resolver.getDocument(args.id)
             case 'multiCollectionDocument':
-              if (typeof value === 'string') {
+              if (typeof value === 'string' && value !== '') {
                 /**
                  * This is a reference value (`director: /path/to/george.md`)
                  */
