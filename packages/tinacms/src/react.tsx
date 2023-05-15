@@ -1,11 +1,32 @@
 import React from 'react'
 
-export function useTina(props) {
-  const [data, setData] = React.useState(props.data)
+export function useTina<T extends object>(
+  props: {
+    query: string
+    variables: object
+    data: T
+  },
+  preview?: { redirect: string; quickEditEnabled?: boolean }
+): { data: T; isClient: boolean } {
+  const stringifiedQuery = JSON.stringify({
+    query: props.query,
+    variables: props.variables,
+  })
+  const id = React.useMemo(
+    () => hashFromQuery(stringifiedQuery),
+    [stringifiedQuery]
+  )
+  const [data, setData] = React.useState(
+    preview?.quickEditEnabled ? addMetadata(id, props.data, []) : props.data
+  )
   const [isClient, setIsClient] = React.useState(false)
   const [quickEditEnabled, setQuickEditEnabled] = React.useState(false)
+  const [isInTinaIframe, setIsInTinaIframe] = React.useState(false)
 
-  const id = JSON.stringify({ query: props.query, variables: props.variables })
+  React.useEffect(() => {
+    setQuickEditEnabled(preview?.quickEditEnabled)
+  }, [preview?.quickEditEnabled])
+
   React.useEffect(() => {
     setIsClient(true)
     setData(props.data)
@@ -16,24 +37,24 @@ export function useTina(props) {
       const style = document.createElement('style')
       style.type = 'text/css'
       style.textContent = `
-        [data-tinafield] {
+        [data-tina-field] {
           outline: 2px dashed rgba(34,150,254,0.5);
           transition: box-shadow ease-out 150ms;
         }
-        [data-tinafield]:hover {
+        [data-tina-field]:hover {
           box-shadow: inset 100vi 100vh rgba(34,150,254,0.3);
           outline: 2px solid rgba(34,150,254,1);
           cursor: pointer;
         }
-        [data-tinafield-overlay] {
+        [data-tina-field-overlay] {
           outline: 2px dashed rgba(34,150,254,0.5);
-        }
-        [data-tinafield-overlay]:hover {
-          cursor: pointer;
-          outline: 2px solid rgba(34,150,254,1);
           position: relative;
         }
-        [data-tinafield-overlay]::after {
+        [data-tina-field-overlay]:hover {
+          cursor: pointer;
+          outline: 2px solid rgba(34,150,254,1);
+        }
+        [data-tina-field-overlay]::after {
           content: '';
           position: absolute;
           inset: 0;
@@ -42,7 +63,7 @@ export function useTina(props) {
           background-color: rgba(34,150,254,0.3);
           opacity: 0;
         }
-        [data-tinafield-overlay]:hover::after {
+        [data-tina-field-overlay]:hover::after {
           opacity: 1;
         }
       `
@@ -51,41 +72,44 @@ export function useTina(props) {
 
       function mouseDownHandler(e) {
         const attributeNames = e.target.getAttributeNames()
-        // If multiple attributes start with data-tinafield, only the first is used
+        // If multiple attributes start with data-tina-field, only the first is used
         const tinaAttribute = attributeNames.find((name) =>
-          name.startsWith('data-tinafield')
+          name.startsWith('data-tina-field')
         )
+        let fieldName
         if (tinaAttribute) {
           e.preventDefault()
           e.stopPropagation()
-          const fieldName = e.target.getAttribute(tinaAttribute)
-          parent.postMessage(
-            { type: 'field:selected', fieldName },
-            window.location.origin
-          )
+          fieldName = e.target.getAttribute(tinaAttribute)
         } else {
           const ancestor = e.target.closest(
-            '[data-tinafield], [data-tinafield-overlay]'
+            '[data-tina-field], [data-tina-field-overlay]'
           )
           if (ancestor) {
             const attributeNames = ancestor.getAttributeNames()
             const tinaAttribute = attributeNames.find((name) =>
-              name.startsWith('data-tinafield')
+              name.startsWith('data-tina-field')
             )
             if (tinaAttribute) {
               e.preventDefault()
               e.stopPropagation()
-              const fieldName = ancestor.getAttribute(tinaAttribute)
-              console.log({
-                ancestor,
-                attributeNames,
-                tinaAttribute,
-                fieldName,
-              })
-              parent.postMessage(
-                { type: 'field:selected', fieldName },
-                window.location.origin
-              )
+              fieldName = ancestor.getAttribute(tinaAttribute)
+            }
+          }
+        }
+        if (fieldName) {
+          if (isInTinaIframe) {
+            parent.postMessage(
+              { type: 'field:selected', fieldName: fieldName },
+              window.location.origin
+            )
+          } else {
+            if (preview?.redirect) {
+              const tinaAdminBasePath = preview.redirect.startsWith('/')
+                ? preview.redirect
+                : `/${preview.redirect}`
+              const tinaAdminPath = `${tinaAdminBasePath}/index.html#/~${window.location.pathname}?active-field=${fieldName}`
+              window.location.assign(tinaAdminPath)
             }
           }
         }
@@ -98,7 +122,7 @@ export function useTina(props) {
         style.remove()
       }
     }
-  }, [quickEditEnabled])
+  }, [quickEditEnabled, isInTinaIframe])
 
   React.useEffect(() => {
     parent.postMessage({ type: 'open', ...props, id }, window.location.origin)
@@ -108,8 +132,9 @@ export function useTina(props) {
       }
       if (event.data.id === id && event.data.type === 'updateData') {
         setData(event.data.data)
-        // Ensure we still have a tinafield on the page
-        const anyTinaField = document.querySelector('[data-tinafield]')
+        setIsInTinaIframe(true)
+        // Ensure we still have a tina-field on the page
+        const anyTinaField = document.querySelector('[data-tina-field]')
         if (anyTinaField) {
           parent.postMessage(
             { type: 'quick-edit', value: true },
@@ -128,6 +153,11 @@ export function useTina(props) {
       parent.postMessage({ type: 'close', id }, window.location.origin)
     }
   }, [id, setQuickEditEnabled])
+
+  // Probably don't want to always do this on every data update,
+  // Just needs to be done once when in non-edit mode
+  // addMetadata(id, data, [])
+
   return { data, isClient }
 }
 
@@ -153,10 +183,9 @@ export function useEditState(): { edit: boolean } {
  */
 export const tinaField = <
   T extends object & {
-    _tina_metadata?: {
-      id: string
-      name?: string
-      fields: Record<string, string>
+    _content_source?: {
+      queryId: string
+      path: (number | string)[]
     }
   }
 >(
@@ -164,18 +193,91 @@ export const tinaField = <
   field?: keyof Omit<T, '__typename' | '_sys'>,
   index?: number
 ) => {
-  if (!field) {
-    return `${obj._tina_metadata?.id}#${obj._tina_metadata?.name}`
-  }
-  if (obj?._tina_metadata && obj._tina_metadata?.fields) {
-    if (typeof field === 'string') {
-      const value = `${obj._tina_metadata?.id}#${obj._tina_metadata.fields[field]}`
-      if (typeof index === 'number') {
-        return `${value}.${index}`
-      } else {
-        return value
-      }
+  if (obj._content_source) {
+    if (!field) {
+      return [
+        obj._content_source?.queryId,
+        obj._content_source.path.join('.'),
+      ].join('---')
     }
+    if (typeof index === 'number') {
+      return [
+        obj._content_source?.queryId,
+        [...obj._content_source.path, field, index].join('.'),
+      ].join('---')
+    }
+    return [
+      obj._content_source?.queryId,
+      [...obj._content_source.path, field].join('.'),
+    ].join('---')
   }
   return ''
+}
+
+export const addMetadata = <T extends object>(
+  id: string,
+  object: T & { type?: string; _content_source?: unknown },
+  path: (string | number)[]
+): T => {
+  Object.entries(object).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => {
+        if (isScalarOrUndefined(item)) {
+          return
+        }
+        if (Array.isArray(item)) {
+          return // we don't expect arrays of arrays
+        }
+        const itemObject = item as object
+        addMetadata(id, itemObject, [...path, key, index])
+      })
+    } else {
+      if (isScalarOrUndefined(value)) {
+        return
+      }
+      const itemObject = value as object
+      addMetadata(id, itemObject, [...path, key])
+    }
+  })
+  // This is a rich-text field object
+  if (object?.type === 'root') {
+    return
+  }
+
+  object._content_source = {
+    queryId: id,
+    path,
+  }
+  return object
+}
+function isScalarOrUndefined(value: unknown) {
+  const type = typeof value
+  if (type === 'string') return true
+  if (type === 'number') return true
+  if (type === 'boolean') return true
+  if (type === 'undefined') return true
+
+  if (value == null) return true
+  if (value instanceof String) return true
+  if (value instanceof Number) return true
+  if (value instanceof Boolean) return true
+
+  return false
+}
+
+/**
+ * This is a pretty rudimentary approach to hashing the query and variables to
+ * ensure we treat multiple queries on the page uniquely. It's possible
+ * that we would have collisions, and I'm not sure of the likeliness but seems
+ * like it'd be rare.
+ */
+export const hashFromQuery = (input: string) => {
+  let hash = 0
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charCodeAt(i)
+    hash = ((hash << 5) - hash + char) & 0xffffffff // Apply bitwise AND to ensure non-negative value
+  }
+  const nonNegativeHash = Math.abs(hash)
+  const alphanumericHash = nonNegativeHash.toString(36)
+  return alphanumericHash
 }
