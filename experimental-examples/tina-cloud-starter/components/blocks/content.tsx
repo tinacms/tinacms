@@ -13,7 +13,7 @@ export const Content = ({ data }: { data: PageBlocksContent }) => {
         className={`prose prose-lg ${
           data.color === 'primary' ? `prose-primary` : `dark:prose-dark`
         }`}
-        data-tinafield={tinaField(data, 'body')}
+        data-tina-field={tinaField(data, 'body')}
         size="large"
         width="medium"
       >

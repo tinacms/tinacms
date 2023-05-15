@@ -17,7 +17,7 @@ export const Feature = ({
 }) => {
   return (
     <div
-      data-tinafield={tinaField(data)}
+      data-tina-field={tinaField(data)}
       className="flex-1 flex flex-col gap-6 text-center items-center lg:items-start lg:text-left max-w-xl mx-auto"
       style={{ flexBasis: '16rem' }}
     >
@@ -30,7 +30,7 @@ export const Feature = ({
       )}
       {data.title && (
         <h3
-          data-tinafield={tinaField(data, 'title')}
+          data-tina-field={tinaField(data, 'title')}
           className="text-2xl font-semibold title-font"
         >
           {data.title}
@@ -38,7 +38,7 @@ export const Feature = ({
       )}
       {data.text && (
         <p
-          data-tinafield={tinaField(data, 'text')}
+          data-tina-field={tinaField(data, 'text')}
           className="text-base opacity-80 leading-relaxed"
         >
           {data.text}

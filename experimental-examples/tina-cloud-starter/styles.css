@@ -8,21 +8,21 @@
 }
 
 /* Here are a few examples of overriding the built-in css */
-/* .__tina-quick-editing-enabled [data-tinafield] {
+/* .__tina-quick-editing-enabled [data-tina-field] {
   outline: 2px solid rgba(215, 137, 41, 0.25);
   box-shadow: inset 100vi 100vh rgba(216, 189, 110, 0.2);
   cursor: pointer;
   transition: ease-in-out 200ms;
 }
-.__tina-quick-editing-enabled [data-tinafield]:hover {
+.__tina-quick-editing-enabled [data-tina-field]:hover {
   box-shadow: inset 100vi 100vh rgba(216, 189, 110, 0.5);
 }
-.__tina-quick-editing-enabled [data-tinafield-overlay] {
+.__tina-quick-editing-enabled [data-tina-field-overlay] {
   cursor: pointer;
   transition: ease-in-out 200ms;
   position: relative;
 }
-.__tina-quick-editing-enabled [data-tinafield-overlay]::after {
+.__tina-quick-editing-enabled [data-tina-field-overlay]::after {
   content: '';
   position: absolute;
   display: block;
@@ -32,6 +32,6 @@
   pointer-events: none;
   z-index: 100;
 }
-.__tina-quick-editing-enabled [data-tinafield-overlay]:hover::after {
+.__tina-quick-editing-enabled [data-tina-field-overlay]:hover::after {
   background-color: rgba(215, 137, 41, 0.5);
 } */

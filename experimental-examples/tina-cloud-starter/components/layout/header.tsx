@@ -81,7 +81,7 @@ export const Header = ({ data }: { data: GlobalHeader }) => {
                   style: data.icon.style,
                 }}
               />
-              <span data-tinafield={tinaField(data, 'name')}>{data.name}</span>
+              <span data-tina-field={tinaField(data, 'name')}>{data.name}</span>
             </Link>
           </h4>
           <ul className="flex gap-6 sm:gap-8 lg:gap-10 tracking-[.002em] -mx-4">
@@ -99,7 +99,7 @@ export const Header = ({ data }: { data: GlobalHeader }) => {
                     }`}
                   >
                     <Link
-                      data-tinafield={tinaField(item, 'label')}
+                      data-tina-field={tinaField(item, 'label')}
                       href={`/${item.href}`}
                       className={`relative select-none	text-base inline-block tracking-wide transition duration-150 ease-out hover:opacity-100 py-8 px-4 ${
                         activeItem ? `` : `opacity-70`

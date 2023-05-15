@@ -3,17 +3,25 @@ import { Blocks } from '../components/blocks-renderer'
 import { useTina } from 'tinacms/dist/react'
 import { Layout } from '../components/layout'
 import { client } from '../.tina/__generated__/client'
+import React from 'react'
 
 export default function HomePage(
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) {
-  const { data } = useTina({
-    query: props.query,
-    variables: props.variables,
-    data: props.data,
+  const [enabledPreview, setPreviewEnabled] = React.useState(false)
+  const { data } = useTina(props, {
+    redirect: '/admin',
+    quickEditEnabled: enabledPreview,
   })
+  // const dataWithEncodedMetadata = useEncodeMetadata(data)
   return (
     <Layout rawData={data} data={data.global as any}>
+      <button
+        className="absolute bottom-2 right-2 p-4 rounded-sm bg-blue-500 text-white z-40"
+        onClick={() => setPreviewEnabled((preview) => !preview)}
+      >
+        Toggle Preview
+      </button>
       <Blocks {...data.page} />
     </Layout>
   )
@@ -24,13 +32,11 @@ export const getStaticProps = async ({ params }) => {
     relativePath: `${params.filename}.md`,
   })
   return {
-    props: JSON.parse(
-      JSON.stringify({
-        data: tinaProps.data,
-        query: tinaProps.query,
-        variables: tinaProps.variables,
-      })
-    ),
+    props: {
+      data: tinaProps.data,
+      query: tinaProps.query,
+      variables: tinaProps.variables,
+    },
   }
 }
 

@@ -106,7 +106,7 @@ export const Icon = ({
   if (style == 'circle') {
     return (
       <div
-        data-tinafield={tinaField}
+        data-tina-field={tinaField}
         className={`relative z-10 inline-flex items-center justify-center flex-shrink-0 ${iconSizeClasses} rounded-full ${iconColorClass[iconColor].circle} ${className}`}
       >
         <IconSVG className="w-2/3 h-2/3" />
@@ -122,7 +122,7 @@ export const Icon = ({
       ].regular
     return (
       <IconSVG
-        data-tinafield={tinaField}
+        data-tina-field={tinaField}
         className={`${iconSizeClasses} ${iconColorClasses} ${className}`}
       />
     )
