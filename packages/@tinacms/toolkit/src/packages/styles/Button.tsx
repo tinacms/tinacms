@@ -13,7 +13,7 @@ export interface ButtonProps
   target?: string
   size?: 'small' | 'medium' | 'custom'
   busy?: boolean
-  rounded?: 'full' | 'left' | 'right'
+  rounded?: 'full' | 'left' | 'right' | 'custom'
   disabled?: boolean
   className?: string
   children?: React.ReactNode
@@ -49,6 +49,7 @@ export const Button = ({
     full: `rounded-full`,
     left: `rounded-l-full`,
     right: `rounded-r-full`,
+    custom: '',
   }
   const sizeClasses = {
     small: `text-xs h-8 px-3`,
