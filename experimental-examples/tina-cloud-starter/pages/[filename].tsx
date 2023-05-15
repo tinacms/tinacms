@@ -4,11 +4,14 @@ import { useTina } from 'tinacms/dist/react'
 import { Layout } from '../components/layout'
 import { client } from '../.tina/__generated__/client'
 import React from 'react'
+import { withSourceMap, withSourceMaps } from '@tinacms/vercel-previews'
+import { encodeAtPath } from '../.tina/config'
 
 export default function HomePage(
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) {
   const [enabledPreview, setPreviewEnabled] = React.useState(false)
+  // const { data } = props
   const { data } = useTina(props, {
     redirect: '/admin',
     quickEditEnabled: enabledPreview,
@@ -32,11 +35,14 @@ export const getStaticProps = async ({ params }) => {
     relativePath: `${params.filename}.md`,
   })
   return {
-    props: {
-      data: tinaProps.data,
-      query: tinaProps.query,
-      variables: tinaProps.variables,
-    },
+    props: withSourceMaps(
+      {
+        data: tinaProps.data,
+        query: tinaProps.query,
+        variables: tinaProps.variables,
+      },
+      { encodeStrings: true, encodeAtPath }
+    ),
   }
 }
 

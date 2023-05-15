@@ -5,6 +5,17 @@ import { heroBlockSchema } from '../components/blocks/hero'
 import { testimonialBlockSchema } from '../components/blocks/testimonial'
 import { ColorPickerInput } from '../components/fields/color'
 import { iconSchema } from '../components/util/icon'
+import { createSourceMapEncoder } from '@tinacms/vercel-previews'
+
+export const encodeAtPath = (path, value) => {
+  if (path === 'page.blocks.0.headline') {
+    console.log(path)
+    return true
+  }
+  return false
+}
+
+export const shouldEncode = (path: string, value: string) => {}
 
 const config = defineConfig({
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
@@ -17,6 +28,11 @@ const config = defineConfig({
     auth: {
       useLocalAuth: true,
     },
+  },
+  cmsCallback: (cms) => {
+    cms.plugins.add(createSourceMapEncoder(encodeAtPath))
+
+    return cms
   },
   media: {
     // If you wanted cloudinary do this

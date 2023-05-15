@@ -179,6 +179,11 @@ export const useGraphQLReducer = (
   >([])
   const [operationIndex, setOperationIndex] = React.useState(0)
 
+  const helper = React.useMemo(() => {
+    const previewPlugins = cms.plugins.getType('preview-helper')
+    return previewPlugins.find('preview-helper')
+  }, [cms])
+
   React.useEffect(() => {
     const run = async () => {
       return Promise.all(
@@ -405,6 +410,14 @@ export const useGraphQLReducer = (
                 existingForm.tinaForm,
                 pathString
               )
+            }
+          }
+          if (typeof value === 'string' && source?._tina_metadata) {
+            // FIXME: hack to prevent breaking images
+            if (helper) {
+              const pathArray = G.responsePathAsArray(info.path)
+
+              return helper.encode(pathArray.join('.'), value, payload.id)
             }
           }
           return value
