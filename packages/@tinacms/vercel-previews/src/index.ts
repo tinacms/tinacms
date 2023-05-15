@@ -49,28 +49,30 @@ export const withSourceMaps = <
   }
 >(
   payload: T,
-  options: {
+  options?: {
     encodeStrings?: boolean
     encodeAtPath?: (path: string, value: any) => boolean
   }
 ) => {
-  if (!options.encodeStrings) {
-    return payload
-  }
   const stringifiedQuery = JSON.stringify({
     query: payload.query,
     variables: payload.variables,
   })
   const id = hashFromQuery(stringifiedQuery)
-  const callback = options.encodeAtPath || (() => true)
-  const dataWithMetadata = transformObject(payload.data, (value, path) => {
-    const pathString = path.join('.')
-    if (callback(pathString, value)) {
-      return encodeEditInfo(pathString, value, id)
-    }
-    return value
-  })
-  return { ...payload, data: dataWithMetadata }
+  if (options?.encodeStrings) {
+    const callback = options?.encodeAtPath || (() => true)
+    const dataWithMetadata = transformString(payload.data, (value, path) => {
+      const pathString = path.join('.')
+      if (callback(pathString, value)) {
+        return encodeEditInfo(pathString, value, id)
+      }
+      return value
+    })
+    return { ...payload, data: dataWithMetadata }
+  } else {
+    const dataWithMetadata = appendMetadata(payload.data, [], id)
+    return { ...payload, data: dataWithMetadata }
+  }
 }
 
 type ObjectPath = (string | number)[]
@@ -84,7 +86,7 @@ function isValidHttpUrl(string: string) {
   }
 }
 
-function transformObject<T>(
+function transformString<T>(
   obj: T,
   callback: (value: string, path: ObjectPath) => string,
   path: ObjectPath = []
@@ -95,7 +97,7 @@ function transformObject<T>(
 
   if (Array.isArray(obj)) {
     return obj.map((item, index) =>
-      transformObject(item, callback, [...path, index])
+      transformString(item, callback, [...path, index])
     ) as unknown as T // Handle arrays recursively
   }
 
@@ -110,9 +112,30 @@ function transformObject<T>(
         transformedObj[key] = callback(value, currentPath) // Apply the callback to transform string values
       }
     } else {
-      transformedObj[key] = transformObject(value, callback, currentPath) // Recursively transform nested objects
+      transformedObj[key] = transformString(value, callback, currentPath) // Recursively transform nested objects
     }
   }
 
   return transformedObj
+}
+
+function appendMetadata<T>(obj: T, path: ObjectPath = [], id: string): T {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj // Return non-object values as is
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map((item, index) =>
+      appendMetadata(item, [...path, index], id)
+    ) as unknown as T // Handle arrays recursively
+  }
+
+  const transformedObj = {} as T
+  for (const [key, value] of Object.entries(obj)) {
+    const currentPath = [...path, key]
+
+    transformedObj[key] = appendMetadata(value, currentPath, id)
+  }
+
+  return { ...transformedObj, _content_source: { queryId: id, path } }
 }

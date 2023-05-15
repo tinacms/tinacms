@@ -18,7 +18,7 @@
       "import": "./dist/index.es.js",
       "require": "./dist/index.js"
     },
-    "./react": {
+    "./dist/react": {
       "types": "./dist/react.d.ts",
       "import": "./dist/react.es.js",
       "require": "./dist/react.js"
