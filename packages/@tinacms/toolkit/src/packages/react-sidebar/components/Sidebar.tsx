@@ -6,8 +6,7 @@
 
 import * as React from 'react'
 
-import { BiMenu, BiPencil } from 'react-icons/bi'
-import { BsArrowsAngleContract, BsArrowsAngleExpand } from 'react-icons/bs'
+import { BiExpandAlt, BiMenu, BiPencil } from 'react-icons/bi'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
 import { useCMS, useSubscribable } from '../../react-core'
@@ -18,7 +17,7 @@ import { FormsView } from './SidebarBody'
 import { ImFilesEmpty } from 'react-icons/im'
 import { IoMdClose } from 'react-icons/io'
 import { BillingWarning, LocalWarning } from './LocalWarning'
-import { MdOutlineArrowBackIos, MdOutlineArrowForwardIos } from 'react-icons/md'
+import { MdOutlineArrowBackIos } from 'react-icons/md'
 import { Nav } from './Nav'
 import { ResizeHandle } from './ResizeHandle'
 import { Transition } from '@headlessui/react'
@@ -258,7 +257,6 @@ const Sidebar = ({
       <>
         <SidebarWrapper>
           <EditButton />
-          <QuickEditButton />
           {displayNav && (
             <Nav
               isLocalMode={cms.api?.tina?.isLocalMode}
@@ -360,7 +358,7 @@ const Sidebar = ({
                       }}
                       className={`transition-opacity duration-150 ease-out`}
                     >
-                      <IoMdClose className="h-6 w-auto" />
+                      <IoMdClose className="h-5 w-auto text-blue-500" />
                     </Button>
                   </div>
                 </Nav>
@@ -449,33 +447,41 @@ const SidebarHeader = ({
             }}
             className="pointer-events-auto -ml-px"
           >
-            <BiMenu className="h-7 w-auto" />
+            <BiMenu className="h-6 w-auto text-blue-500" />
           </Button>
         )}
         <div className="flex-1"></div>
         <div
-          className={`flex items-center gap-2 pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
+          className={`flex items-center pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
         >
-          <Button
-            rounded="full"
-            variant="ghost"
-            onClick={toggleFullscreen}
-            className="pointer-events-auto opacity-50 hover:opacity-100 focus:opacity-80"
-          >
-            {displayState === 'fullscreen' ? (
-              <BsArrowsAngleContract className="h-5 w-auto -mx-1" />
-            ) : (
-              <BsArrowsAngleExpand className="h-5 w-auto -mx-1" />
-            )}
-          </Button>
           <Button
             rounded="left"
             variant="secondary"
             onClick={toggleSidebarOpen}
             aria-label="closes cms sidebar"
-            className={``}
           >
-            <MdOutlineArrowBackIos className="h-6 w-auto" />
+            <MdOutlineArrowBackIos className="h-[18px] w-auto -mr-1 text-blue-500" />
+          </Button>
+          <Button
+            rounded="custom"
+            variant="secondary"
+            onClick={toggleFullscreen}
+          >
+            {displayState === 'fullscreen' ? (
+              // BiCollapseAlt
+              <svg
+                className="h-5 w-auto -mx-1 text-blue-500"
+                stroke="currentColor"
+                fill="currentColor"
+                stroke-width="0"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M2 15h7v7h2v-9H2v2zM15 2h-2v9h9V9h-7V2z"></path>
+              </svg>
+            ) : (
+              <BiExpandAlt className="h-5 -mx-1 w-auto text-blue-500" />
+            )}
           </Button>
         </div>
       </div>
@@ -556,59 +562,27 @@ const EditButton = ({}) => {
   const cms = useCMS()
   const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext)
 
+  const buttonAction = () => {
+    toggleSidebarOpen()
+    if (cms.state.quickEditSupported) {
+      cms.dispatch({ type: 'toggle-quick-editing-enabled' })
+    }
+  }
+
   return (
     <Button
       rounded="right"
-      variant={'white'}
+      variant="primary"
       size="custom"
-      onClick={toggleSidebarOpen}
-      className={` absolute top-8 right-0 text-sm h-10 px-3 transition-all duration-150 ease-out ${
+      onClick={buttonAction}
+      className={`z-chrome absolute top-6 right-0 text-sm h-10 pl-3 pr-4 transition-all duration-150 ease-out ${
         displayState !== 'closed'
           ? 'opacity-0'
           : 'translate-x-full pointer-events-auto'
       }`}
       aria-label="opens cms sidebar"
     >
-      <MdOutlineArrowForwardIos className={`h-6 w-auto text-blue-500`} />
-    </Button>
-  )
-}
-
-const QuickEditButton = () => {
-  const cms = useCMS()
-  const { displayState } = React.useContext(SidebarContext)
-
-  const shouldDisplay = true
-  // If/when we put this in the sidebar somewhere, this should hide like the EditButton does
-  // const { displayState: sidebarDisplayState } = React.useContext(SidebarContext)
-  // const shouldDisplay =
-  //   sidebarDisplayState === 'closed'
-  //     ? cms.state.quickEditSupported
-  //       ? true
-  //       : false
-  //     : false
-  if (!cms.state.quickEditSupported) {
-    return null
-  }
-  return (
-    <Button
-      rounded="full"
-      // variant={variant}
-      size="custom"
-      variant={cms.state.quickEditEnabled ? 'secondary' : 'primary'}
-      onClick={() => {
-        cms.dispatch({ type: 'toggle-quick-editing-enabled' })
-      }}
-      className={` absolute w-[44px] h-[44px] mt-[-2px] top-8 transition-all duration-150 ease-out ${
-        shouldDisplay ? 'translate-x-full pointer-events-auto' : 'opacity-0'
-      } ${displayState === 'closed' ? '-right-14' : '-right-2'}`}
-      aria-label="opens cms sidebar"
-    >
-      <BiPencil
-        className={`h-6 w-auto shrink-0 ${
-          cms.state.quickEditEnabled ? 'text-gray-400' : 'text-white'
-        }`}
-      />
+      <BiPencil className="h-6 w-auto" />
     </Button>
   )
 }
