@@ -17,17 +17,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
       "require": "./dist/index.js"
-    },
-    "./dist/react": {
-      "types": "./dist/react.d.ts",
-      "import": "./dist/react.es.js",
-      "require": "./dist/react.js"
     }
   },
   "buildConfig": {
     "entryPoints": [
-      "src/index.ts",
-      "src/react.tsx"
+      "src/index.ts"
     ]
   },
   "bugs": {
@@ -42,8 +36,7 @@
   "scripts": {
     "types": "pnpm tsc",
     "build": "tinacms-scripts build",
-    "test": "jest --env=jsdom --passWithNoTests",
-    "test-watch": "jest --watch --env=jsdom --passWithNoTests"
+    "test": "echo 'no tests for vercel previews'"
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",

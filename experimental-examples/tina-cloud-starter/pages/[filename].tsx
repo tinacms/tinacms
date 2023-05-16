@@ -4,19 +4,34 @@ import { useTina } from 'tinacms/dist/react'
 import { Layout } from '../components/layout'
 import { client } from '../.tina/__generated__/client'
 import React from 'react'
-import { withSourceMap, withSourceMaps } from '@tinacms/vercel-previews'
+import { useVisualEditing } from '@tinacms/vercel-previews'
 import { encodeAtPath } from '../.tina/config'
 
 export default function HomePage(
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) {
   const [enabledPreview, setPreviewEnabled] = React.useState(false)
-  // const { data } = props
-  const { data } = useTina(props, {
+  const { data: tinaData } = useTina(props, {
     redirect: '/admin',
     quickEditEnabled: enabledPreview,
   })
-  // const dataWithEncodedMetadata = useEncodeMetadata(data)
+  const data = useVisualEditing({
+    data: tinaData,
+    query: props.query,
+    variables: props.variables,
+    redirect: '/admin',
+    // stringEncoding: true
+    stringEncoding: {
+      skipPaths: (path) => {
+        if ('page.blocks.0.headline' === path) {
+          return false
+        }
+
+        return true
+      },
+    },
+  })
+
   return (
     <Layout rawData={data} data={data.global as any}>
       <button
@@ -35,14 +50,11 @@ export const getStaticProps = async ({ params }) => {
     relativePath: `${params.filename}.md`,
   })
   return {
-    props: withSourceMaps(
-      {
-        data: tinaProps.data,
-        query: tinaProps.query,
-        variables: tinaProps.variables,
-      },
-      { encodeStrings: true, encodeAtPath }
-    ),
+    props: {
+      data: tinaProps.data,
+      query: tinaProps.query,
+      variables: tinaProps.variables,
+    },
   }
 }
 

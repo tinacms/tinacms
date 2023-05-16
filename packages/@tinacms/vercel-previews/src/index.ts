@@ -1,33 +1,131 @@
 import { vercelStegaEncode } from '@vercel/stega'
-import type { Plugin } from 'tinacms'
+import React from 'react'
+import { tinaField, useEditState } from 'tinacms/dist/react'
+import { useCallback, useEffect } from 'react'
 
-function encodeEditInfo(path: string, value: string, id: string): string {
+export const vercelEditInfo = <
+  T extends object & {
+    _content_source?: {
+      queryId: string
+      path: (number | string)[]
+    }
+  }
+>(
+  obj: T,
+  field?: keyof Omit<T, '__typename' | '_sys'>,
+  index?: number
+) => {
+  const fieldName = tinaField(obj, field, index)
+  return JSON.stringify({ origin: 'tinacms', data: { fieldName } })
+}
+
+export const useVisualEditing = <T extends object>({
+  data,
+  query,
+  variables,
+  redirect,
+  stringEncoding,
+}: {
+  data: T
+  query: string
+  variables: object
+  redirect: string
+  stringEncoding:
+    | boolean
+    | { skipPaths: (path: string, value: string) => boolean }
+}): T => {
+  const stringifiedQuery = JSON.stringify({
+    query: query,
+    variables: variables,
+  })
+  const id = React.useMemo(
+    () => hashFromQuery(stringifiedQuery),
+    [stringifiedQuery]
+  )
+  const { edit } = useEditState()
+  const handleOpenEvent = useCallback(
+    (event: CustomEventInit) => {
+      if (edit) {
+        parent.postMessage(
+          { type: 'field:selected', fieldName: event.detail?.data?.fieldName },
+          window.location.origin
+        )
+      } else {
+        const tinaAdminBasePath = redirect.startsWith('/')
+          ? redirect
+          : `/${redirect}`
+        const tinaAdminPath = `${tinaAdminBasePath}/index.html#/~${window.location.pathname}?active-field=${event.detail.data.fieldName}`
+        window.location.assign(tinaAdminPath)
+      }
+    },
+    [edit]
+  )
+
+  useEffect(() => {
+    window.addEventListener('edit:open', handleOpenEvent)
+    return () => {
+      window.removeEventListener('edit:open', handleOpenEvent)
+    }
+  }, [redirect, edit])
+
+  function appendMetadata<T>(
+    obj: T,
+    path: (string | number)[] = [],
+    id: string
+  ): T {
+    if (typeof obj !== 'object' || obj === null) {
+      if (typeof obj === 'string' && stringEncoding) {
+        if (typeof stringEncoding === 'boolean') {
+          if (stringEncoding) {
+            return encodeEditInfo(path, obj, id) as any
+          }
+        } else if (stringEncoding.skipPaths) {
+          if (!stringEncoding.skipPaths(path.join('.'), obj)) {
+            return encodeEditInfo(path, obj, id) as any
+          }
+        }
+      }
+      return obj
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map((item, index) =>
+        appendMetadata(item, [...path, index], id)
+      ) as unknown as T // Handle arrays recursively
+    }
+
+    const transformedObj = {} as T
+    for (const [key, value] of Object.entries(obj)) {
+      const currentPath = [...path, key]
+      if (
+        [
+          '__typename',
+          '_sys',
+          '_internalSys',
+          '_values',
+          '_internalValues',
+          '_content_source',
+          '_tina_metadata',
+        ].includes(key)
+      ) {
+        transformedObj[key] = value
+      } else {
+        transformedObj[key] = appendMetadata(value, currentPath, id)
+      }
+    }
+
+    return { ...transformedObj, _content_source: { queryId: id, path } }
+  }
+  return appendMetadata(data, [], id)
+}
+
+function encodeEditInfo(path: (string | number)[], value: string, id: string) {
   const res = `${vercelStegaEncode({
     origin: 'tinacms',
-    data: { fieldName: `${id}---${path}` },
+    data: { fieldName: `${id}---${path.join('.')}` },
   })}${value}`
 
   return res
-}
-
-export interface PreviewHelperPlugin extends Plugin {
-  __type: 'preview-helper'
-  encode: typeof encodeEditInfo
-}
-
-export function createSourceMapEncoder(
-  encodeAtPath?: (path: string, value: any) => boolean
-): PreviewHelperPlugin {
-  return {
-    __type: 'preview-helper',
-    name: 'preview-helper',
-    encode: (path, value, id): string => {
-      if (encodeAtPath(path, value)) {
-        return encodeEditInfo(path, value, id)
-      }
-      return value
-    },
-  }
 }
 
 export const hashFromQuery = (input: string) => {
@@ -39,103 +137,4 @@ export const hashFromQuery = (input: string) => {
   const nonNegativeHash = Math.abs(hash)
   const alphanumericHash = nonNegativeHash.toString(36)
   return alphanumericHash
-}
-
-export const withSourceMaps = <
-  T extends {
-    query: string
-    variables: object
-    data: object
-  }
->(
-  payload: T,
-  options?: {
-    encodeStrings?: boolean
-    encodeAtPath?: (path: string, value: any) => boolean
-  }
-) => {
-  const stringifiedQuery = JSON.stringify({
-    query: payload.query,
-    variables: payload.variables,
-  })
-  const id = hashFromQuery(stringifiedQuery)
-  if (options?.encodeStrings) {
-    const callback = options?.encodeAtPath || (() => true)
-    const dataWithMetadata = transformString(payload.data, (value, path) => {
-      const pathString = path.join('.')
-      if (callback(pathString, value)) {
-        return encodeEditInfo(pathString, value, id)
-      }
-      return value
-    })
-    return { ...payload, data: dataWithMetadata }
-  } else {
-    const dataWithMetadata = appendMetadata(payload.data, [], id)
-    return { ...payload, data: dataWithMetadata }
-  }
-}
-
-type ObjectPath = (string | number)[]
-
-function isValidHttpUrl(string: string) {
-  try {
-    new URL(string)
-    return true
-  } catch (_) {
-    return false
-  }
-}
-
-function transformString<T>(
-  obj: T,
-  callback: (value: string, path: ObjectPath) => string,
-  path: ObjectPath = []
-): T {
-  if (typeof obj !== 'object' || obj === null) {
-    return obj // Return non-object values as is
-  }
-
-  if (Array.isArray(obj)) {
-    return obj.map((item, index) =>
-      transformString(item, callback, [...path, index])
-    ) as unknown as T // Handle arrays recursively
-  }
-
-  const transformedObj = {} as T
-  for (const [key, value] of Object.entries(obj)) {
-    const currentPath = [...path, key]
-
-    if (typeof value === 'string') {
-      if (['__typename'].includes(key) || isValidHttpUrl(value)) {
-        transformedObj[key] = value
-      } else {
-        transformedObj[key] = callback(value, currentPath) // Apply the callback to transform string values
-      }
-    } else {
-      transformedObj[key] = transformString(value, callback, currentPath) // Recursively transform nested objects
-    }
-  }
-
-  return transformedObj
-}
-
-function appendMetadata<T>(obj: T, path: ObjectPath = [], id: string): T {
-  if (typeof obj !== 'object' || obj === null) {
-    return obj // Return non-object values as is
-  }
-
-  if (Array.isArray(obj)) {
-    return obj.map((item, index) =>
-      appendMetadata(item, [...path, index], id)
-    ) as unknown as T // Handle arrays recursively
-  }
-
-  const transformedObj = {} as T
-  for (const [key, value] of Object.entries(obj)) {
-    const currentPath = [...path, key]
-
-    transformedObj[key] = appendMetadata(value, currentPath, id)
-  }
-
-  return { ...transformedObj, _content_source: { queryId: id, path } }
 }
