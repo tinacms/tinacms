@@ -158,7 +158,7 @@ export const MultiformFormHeader = ({
             }
           }}
         >
-          <BiChevronLeft className="h-auto w-5 inline-block opacity-70 -ml-1 -mr-0.5" />
+          <BiChevronLeft className="h-auto w-5 inline-block opacity-70 -ml-1 -mr-0.5 -mt-px" />
           Form List
         </button>
         <span className="block w-full text-lg mb-2 text-gray-700 font-medium leading-tight truncate">

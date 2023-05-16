@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BiChevronRight } from 'react-icons/bi'
+import { BiEdit } from 'react-icons/bi'
 import { Transition } from '@headlessui/react'
 import { TinaState } from '../../../tina-state'
 import { useCMS } from '../../../react-tinacms'
@@ -28,18 +28,16 @@ const Item = ({
       onClick={() => setActiveFormId(item.formId)}
       className={`${
         depths[depth] || 'pl-12'
-      } pr-6 py-2 w-full h-full bg-transparent border-none text-lg text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center justify-between gap-2`}
+      } pr-6 py-3 w-full h-full bg-transparent border-none text-lg text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center justify-between gap-2`}
     >
-      <div className="flex flex-col gap-1 items-start">
-        <div className="group-hover:text-blue-500 text-sm text-gray-500 font-bold">
+      <BiEdit className="opacity-70 w-5 h-auto text-blue-500 flex-none" />
+      <div className="flex-1 flex flex-col gap-0.5 items-start">
+        <div className="group-hover:text-blue-500 font-sans text-xs font-semibold text-gray-700 whitespace-normal">
           {form.tinaForm.label}
         </div>
-        <div className="group-hover:text-blue-500 text-xs text-gray-500 flex gap-2">
+        <div className="group-hover:text-blue-500 text-base truncate leading-tight text-gray-600">
           {form.tinaForm.id}
         </div>
-      </div>
-      <div className="flex gap-2">
-        <BiChevronRight className="opacity-70 w-5 h-auto fill-current" />
       </div>
     </button>
   )
@@ -158,16 +156,21 @@ export const FormList = (props: {
     <ul>
       <li className={`divide-y divide-gray-200`}>
         {listItems.map((item, index) => {
+          console.log(item)
           if (item.type === 'list') {
             return (
               <div
                 key={item.label}
-                className={`relative group text-left w-full bg-white py-2 border-t shadow-sm
-   border-gray-100 px-6 -mt-px`}
+                className={`relative group text-left w-full bg-white shadow-sm
+   border-gray-100 px-6 -mt-px pb-3 ${
+     index > 0
+       ? 'pt-6 bg-gradient-to-b from-gray-50 via-white to-white'
+       : 'pt-3'
+   }`}
               >
                 <span
                   className={
-                    'text-xs tracking-wide font-medium text-gray-700 uppercase'
+                    'text-sm tracking-wide font-bold text-gray-700 uppercase'
                   }
                 >
                   {item.label}
