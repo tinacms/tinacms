@@ -162,11 +162,11 @@ export const FormList = (props: {
               <div
                 key={item.label}
                 className={`relative group text-left w-full bg-white shadow-sm
-   border-gray-100 px-6 -mt-px pt-4 pb-2`}
+   border-gray-100 px-6 -mt-px pt-6 pb-3`}
               >
                 <span
                   className={
-                    'text-xs tracking-wide font-bold text-gray-600 uppercase'
+                    'text-sm tracking-wide font-bold text-gray-700 uppercase'
                   }
                 >
                   {item.label}
