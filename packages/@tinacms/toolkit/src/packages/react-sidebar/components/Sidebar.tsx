@@ -192,11 +192,7 @@ const Sidebar = ({
   }
 
   const toggleSidebarOpen = () => {
-    if (displayState === 'closed') {
-      setDisplayState('open')
-    } else {
-      setDisplayState('closed')
-    }
+    cms.dispatch({ type: 'toggle-edit-state' })
   }
 
   const toggleMenu = () => {
@@ -559,22 +555,14 @@ const SidebarCollectionLink = ({
 }
 
 const EditButton = ({}) => {
-  const cms = useCMS()
   const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext)
-
-  const buttonAction = () => {
-    toggleSidebarOpen()
-    if (cms.state.quickEditSupported) {
-      cms.dispatch({ type: 'toggle-quick-editing-enabled' })
-    }
-  }
 
   return (
     <Button
       rounded="right"
       variant="primary"
       size="custom"
-      onClick={buttonAction}
+      onClick={toggleSidebarOpen}
       className={`z-chrome absolute top-6 right-0 text-sm h-10 pl-3 pr-4 transition-all duration-150 ease-out ${
         displayState !== 'closed'
           ? 'opacity-0'
