@@ -2,18 +2,15 @@
 
 ## Setting up your data for visual editing
 
-There are two ways to indicate that field is editable.
+There are two ways to indicate that a field is editable.
 
 ### Data Attributes
 
-If an element has a `[data-vercel-edit-info]` attribute on it, it will be considered editable. In this scenario, the attribute should be set to the stringified JSON of the schema for the field.
+If an element has a `[data-vercel-edit-info]` attribute on it, it will be considered editable. To make it easier to manage, Tina provides a helper function:
 
 #### The `vercelEditInfo` helper
 
-When using the `withMetadata` helper, Tina populates the result's data with embedded
-metadata. This metadata is opaque and isn't something you should worry about knowing.
-To added it to the `[data-vercel-edit-info]` attribute, use the `vercelEditInfo`
-utility function:
+> NOTE: this should be used in conjuction with the `withSourceMaps` function described below
 
 ```tsx
 // pages/[slug].tsx
@@ -47,7 +44,8 @@ export const NewsletterBlock = (props) => {
         {props.actions.map((action) => {
           return (
             <button
-              data-vercel-edit-info={vercelEditInfo(props, 'message')}
+              // notice here that the first value is the action object
+              data-vercel-edit-info={vercelEditInfo(action, 'message')}
               {...action}
             />
           )
