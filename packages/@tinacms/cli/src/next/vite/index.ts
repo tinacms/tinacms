@@ -106,6 +106,7 @@ export const createConfig = async ({
       __TOKEN__: `"${configManager.config.token}"`,
       __TINA_GRAPHQL_VERSION__: `"${configManager.getTinaGraphQLVersion()}"`,
     },
+    logLevel: 'error', // Vite import warnings are noisy
     optimizeDeps: {
       force: true,
       // Not 100% sure why this isn't being picked up automatically, this works from within the monorepo

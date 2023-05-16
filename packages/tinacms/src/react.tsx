@@ -187,26 +187,26 @@ export const tinaField = <
     }
   }
 >(
-  obj: T,
-  field?: keyof Omit<T, '__typename' | '_sys'>,
+  object: T,
+  property?: keyof Omit<T, '__typename' | '_sys'>,
   index?: number
 ) => {
-  if (obj._content_source) {
-    if (!field) {
+  if (object._content_source) {
+    if (!property) {
       return [
-        obj._content_source?.queryId,
-        obj._content_source.path.join('.'),
+        object._content_source?.queryId,
+        object._content_source.path.join('.'),
       ].join('---')
     }
     if (typeof index === 'number') {
       return [
-        obj._content_source?.queryId,
-        [...obj._content_source.path, field, index].join('.'),
+        object._content_source?.queryId,
+        [...object._content_source.path, property, index].join('.'),
       ].join('---')
     }
     return [
-      obj._content_source?.queryId,
-      [...obj._content_source.path, field].join('.'),
+      object._content_source?.queryId,
+      [...object._content_source.path, property].join('.'),
     ].join('---')
   }
   return ''

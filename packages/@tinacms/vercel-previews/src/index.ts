@@ -126,7 +126,7 @@ export const useVisualEditing = <T extends object>({
 
 function encodeEditInfo(path: (string | number)[], value: string, id: string) {
   const res = `${vercelStegaEncode({
-    origin: 'tinacms',
+    origin: 'tina.io',
     data: { fieldName: `${id}---${path.join('.')}` },
   })}${value}`
 
