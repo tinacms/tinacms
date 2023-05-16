@@ -64,7 +64,6 @@ export const RichEditor = (props: RichTextType) => {
           '[role="textbox"]'
         ) as HTMLElement
         if (props.field.experimental_focusIntent && plateElement) {
-          console.log(plateElement)
           if (plateElement) plateElement.focus()
         }
         // Slate takes a second to mount
