@@ -142,8 +142,8 @@ export const MultiformFormHeader = ({
         sidebarWidth > navBreakpoint && renderNav
           ? `px-6`
           : renderNav
-          ? `pl-20 pr-28`
-          : `pl-6 pr-28`
+          ? `pl-18 pr-24`
+          : `pl-6 pr-24`
       }`}
     >
       <div className="max-w-form mx-auto flex flex-col items-start justify-center min-h-[2.5rem]">
@@ -159,9 +159,9 @@ export const MultiformFormHeader = ({
           }}
         >
           <BiChevronLeft className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
-          Return to Form List
+          Form List
         </button>
-        <span className="block w-full text-xl mb-[6px] text-gray-700 font-medium leading-tight">
+        <span className="block w-full text-lg mb-[6px] text-gray-700 font-medium leading-tight truncate">
           {activeForm.tinaForm.label || activeForm.tinaForm.id}
         </span>
         <FormStatus pristine={formIsPristine} />
@@ -181,8 +181,8 @@ export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
 
   const headerPadding = {
     navOpen: 'px-6',
-    navClosed: 'pl-20 pr-28',
-    noNav: 'pl-6 pr-28',
+    navClosed: 'pl-18 pr-24',
+    noNav: 'pl-6 pr-24',
   }
 
   const windowWidth = useWindowWidth()
@@ -203,7 +203,7 @@ export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
     >
       <div className="max-w-form mx-auto  flex flex-col items-start justify-center min-h-[2.5rem]">
         {shortFormLabel && (
-          <span className="block w-full text-lg mb-[6px] text-gray-700 font-medium leading-tight text-ellipsis overflow-hidden whitespace-nowrap">
+          <span className="block w-full text-lg mb-[6px] text-gray-700 font-medium leading-tight truncate">
             {shortFormLabel}
           </span>
         )}
