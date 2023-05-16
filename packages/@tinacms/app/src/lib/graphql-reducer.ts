@@ -431,7 +431,7 @@ export const useGraphQLReducer = (
       } else {
         if (result.data) {
           setResults((results) => [
-            ...results,
+            ...results.filter((result) => result.id !== payload.id),
             { id: payload.id, data: result.data },
           ])
         }
@@ -494,6 +494,7 @@ export const useGraphQLReducer = (
       if (event.data.type === 'field:selected') {
         const [queryId, eventFieldName] = event.data.fieldName.split('---')
         const result = results.find((res) => res.id === queryId)
+        console.log(results)
         if (result?.data) {
           cms.dispatch({
             type: 'forms:set-active-field-name',

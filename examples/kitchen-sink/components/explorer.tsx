@@ -202,7 +202,7 @@ const ObjectRenderer = ({
     const fieldName = tinaField(v)
     const extraProps = {}
     if (fieldName !== 'undefined#undefined') {
-      extraProps['data-tinafield'] = fieldName
+      extraProps['data-tina-field'] = fieldName
     }
     return (
       <div>

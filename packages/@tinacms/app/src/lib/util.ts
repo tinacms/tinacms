@@ -113,7 +113,12 @@ export const getFormAndFieldNameFromMetadata = (
         ? fieldName.slice(value?.name?.length + 1)
         : fieldName
       if (localFieldName) {
-        n = value.fields[localFieldName]
+        // If localFieldName is tags.2, just use `tags`
+        if (!isNaN(Number(localFieldName.split('.')[1]))) {
+          n = value.fields[localFieldName.split('.')[0]]
+        } else {
+          n = value.fields[localFieldName]
+        }
       } else {
         n = value.name
       }

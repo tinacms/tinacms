@@ -42,7 +42,7 @@ export function Json(props: { src: object }) {
                 const extraProps = {}
                 if (fieldName !== 'undefined#undefined') {
                   if (fieldName) {
-                    extraProps['data-tinafield'] = fieldName
+                    extraProps['data-tina-field'] = fieldName
                   }
                 }
                 return (
@@ -68,7 +68,7 @@ export function Json(props: { src: object }) {
                 const extraProps = {}
                 if (fieldName !== 'undefined#undefined') {
                   if (fieldName) {
-                    extraProps['data-tinafield'] = fieldName
+                    extraProps['data-tina-field'] = fieldName
                   }
                 }
                 return (
