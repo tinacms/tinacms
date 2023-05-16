@@ -148,7 +148,7 @@ export const MultiformFormHeader = ({
     >
       <div className="max-w-form mx-auto flex flex-col items-start justify-center min-h-[2.5rem]">
         <button
-          className="pointer-events-auto text-xs mb-1 text-gray-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150 font-medium flex items-center justify-start gap-0.5"
+          className="pointer-events-auto text-xs -mt-1 mb-1.5 text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150 font-medium flex items-center justify-start gap-0.5"
           onClick={() => {
             const state = activeForm.tinaForm.finalForm.getState()
             if (state.invalid === true) {
@@ -158,10 +158,10 @@ export const MultiformFormHeader = ({
             }
           }}
         >
-          <BiChevronLeft className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+          <BiChevronLeft className="h-auto w-5 inline-block opacity-70 -ml-1 -mr-0.5" />
           Form List
         </button>
-        <span className="block w-full text-lg mb-[6px] text-gray-700 font-medium leading-tight truncate">
+        <span className="block w-full text-lg mb-2 text-gray-700 font-medium leading-tight truncate">
           {activeForm.tinaForm.label || activeForm.tinaForm.id}
         </span>
         <FormStatus pristine={formIsPristine} />
