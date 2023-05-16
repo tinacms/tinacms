@@ -494,7 +494,6 @@ export const useGraphQLReducer = (
       if (event.data.type === 'field:selected') {
         const [queryId, eventFieldName] = event.data.fieldName.split('---')
         const result = results.find((res) => res.id === queryId)
-        console.log(results)
         if (result?.data) {
           cms.dispatch({
             type: 'forms:set-active-field-name',
