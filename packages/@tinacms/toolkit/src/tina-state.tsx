@@ -69,6 +69,9 @@ export type TinaAction =
       type: 'toggle-quick-editing-enabled'
     }
   | {
+      type: 'toggle-edit-state'
+    }
+  | {
       type: 'sidebar:set-display-state'
       value: TinaState['sidebarDisplayState'] | 'openOrFull'
     }
@@ -211,6 +214,15 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         return form
       })
       return { ...state, forms, activeFormId: action.value.formId }
+    case 'toggle-edit-state': {
+      return state.sidebarDisplayState === 'closed'
+        ? { ...state, quickEditEnabled: true, sidebarDisplayState: 'open' }
+        : {
+            ...state,
+            quickEditEnabled: false,
+            sidebarDisplayState: 'closed',
+          }
+    }
     case 'sidebar:set-display-state': {
       // In some cases, you may only care that the sidebar is open, regardless
       // whether it's "open" or "full"
