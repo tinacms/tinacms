@@ -114,7 +114,7 @@ export class Database {
   private _lookup: { [returnType: string]: LookupMapType } | undefined
 
   constructor(public config: CreateDatabase) {
-    this.tinaDirectory = config.tinaDirectory || '.tina'
+    this.tinaDirectory = config.tinaDirectory || 'tina'
     this.bridge = config.bridge
     this.rootLevel =
       config.level && (new LevelProxy(config.level) as unknown as Level)
@@ -957,15 +957,26 @@ export class Database {
     let nextLevel: Level | undefined
     return await this.indexStatusCallbackWrapper(
       async () => {
-        const lookup =
-          lookupFromLockFile ||
-          JSON.parse(
-            await this.bridge.get(
-              normalizePath(
-                path.join(this.getGeneratedFolder(), '_lookup.json')
+        let lookup
+        try {
+          lookup =
+            lookupFromLockFile ||
+            JSON.parse(
+              await this.bridge.get(
+                normalizePath(
+                  path.join(this.getGeneratedFolder(), '_lookup.json')
+                )
               )
             )
-          )
+        } catch (error) {
+          console.error('Error: Unable to find generated lookup file')
+          if (this.tinaDirectory === 'tina') {
+            console.error(
+              'If you are using the .tina folder. Please set {tinaDirectory: ".tina"} in your createDatabase options or migrate to the new tina folder: https://tina.io/blog/tina-config-rearrangements/'
+            )
+          }
+          throw error
+        }
 
         let nextVersion: string | undefined
         if (!this.config.version) {
