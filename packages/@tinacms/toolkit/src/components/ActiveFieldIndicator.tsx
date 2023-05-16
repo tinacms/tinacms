@@ -167,10 +167,6 @@ export const ActiveFieldIndicator = () => {
   const viewportTopY = window.scrollY
   const viewportBottomY = window.innerHeight + window.scrollY
 
-  if (cms.state.quickEditEnabled) {
-    return null
-  }
-
   if (eleTopY > viewportBottomY) {
     // element is below the viewport
     return <BelowViewportIndicator />
