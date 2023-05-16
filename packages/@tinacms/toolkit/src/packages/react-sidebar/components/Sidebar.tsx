@@ -394,12 +394,14 @@ export const updateBodyDisplacement = ({
   const windowWidth = window.innerWidth
 
   if (position === 'displace') {
-    // Transition displacement when not dragging sidebar (opening/closing sidebar)
-    if (!resizingSidebar) {
-      body.style.transition = 'all 200ms ease-out'
-    } else {
-      body.style.transition = ''
-    }
+    // Padding can't be animated smoothly, so we're using a delay to time the size change
+    body.style.transition = resizingSidebar
+      ? ''
+      : displayState === 'fullscreen'
+      ? 'padding 0ms 150ms'
+      : displayState === 'closed'
+      ? 'padding 0ms 0ms'
+      : 'padding 0ms 300ms'
 
     if (displayState === 'open') {
       const bodyDisplacement = Math.min(
@@ -563,10 +565,10 @@ const EditButton = ({}) => {
       variant="primary"
       size="custom"
       onClick={toggleSidebarOpen}
-      className={`z-chrome absolute top-6 right-0 text-sm h-10 pl-3 pr-4 transition-all duration-150 ease-out ${
+      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${
         displayState !== 'closed'
-          ? 'opacity-0'
-          : 'translate-x-full pointer-events-auto'
+          ? 'opacity-0 ease-in pointer-events-none'
+          : 'ease-out pointer-events-auto'
       }`}
       aria-label="opens cms sidebar"
     >
@@ -591,6 +593,8 @@ const SidebarWrapper = ({ children }) => {
         } ${
           resizingSidebar
             ? `transition-none`
+            : displayState === 'closed'
+            ? `transition-all duration-300 ease-in`
             : displayState === 'fullscreen'
             ? `transition-all duration-150 ease-out`
             : `transition-all duration-300 ease-out`
@@ -609,13 +613,9 @@ const SidebarWrapper = ({ children }) => {
 }
 
 const SidebarBody = ({ children }) => {
-  const { displayState } = React.useContext(SidebarContext)
-
   return (
     <div
-      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white border-r border-gray-200 overflow-hidden transition-opacity duration-300 ease-out ${
-        displayState !== 'closed' ? 'opacity-100' : 'opacity-0'
-      } ${displayState === 'fullscreen' ? '' : ''}`}
+      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white border-r border-gray-200 overflow-hidden`}
     >
       {children}
     </div>
