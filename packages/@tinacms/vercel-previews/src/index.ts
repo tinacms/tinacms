@@ -23,12 +23,14 @@ export const useVisualEditing = <T extends object>({
   data,
   query,
   variables,
+  enabled,
   redirect,
   stringEncoding,
 }: {
   data: T
   query: string
   variables: object
+  enabled: boolean
   redirect: string
   stringEncoding:
     | boolean
@@ -116,7 +118,10 @@ export const useVisualEditing = <T extends object>({
 
     return { ...transformedObj, _content_source: { queryId: id, path } }
   }
-  return appendMetadata(data, [], id)
+  if (enabled) {
+    return appendMetadata(data, [], id)
+  }
+  return data
 }
 
 function encodeEditInfo(path: (string | number)[], value: string, id: string) {

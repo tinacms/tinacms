@@ -20,7 +20,8 @@ export default function HomePage(
     query: props.query,
     variables: props.variables,
     redirect: '/admin',
-    // stringEncoding: true
+    enabled: false,
+    // stringEncoding: true,
     stringEncoding: {
       skipPaths: (path) => {
         if ('page.blocks.0.headline' === path) {
