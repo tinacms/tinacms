@@ -91,7 +91,6 @@ export interface TinaState {
   formLists: FormList[]
   editingMode: 'visual' | 'basic'
   quickEditSupported: boolean
-  quickEditEnabled: boolean
   sidebarDisplayState: 'closed' | 'open' | 'fullscreen'
 }
 
@@ -102,7 +101,6 @@ export const initialState = (cms: TinaCMS): TinaState => {
     formLists: [],
     editingMode: 'basic',
     quickEditSupported: false,
-    quickEditEnabled: false,
     sidebarDisplayState: cms?.sidebar?.defaultState || 'open',
   }
 }
@@ -111,11 +109,10 @@ export const initialState = (cms: TinaCMS): TinaState => {
 export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
   switch (action.type) {
     case 'set-quick-editing-supported':
-      return { ...state, quickEditSupported: action.value }
-    case 'set-quick-editing-enabled':
-      return { ...state, quickEditEnabled: action.value }
-    case 'toggle-quick-editing-enabled':
-      return { ...state, quickEditEnabled: !state.quickEditEnabled }
+      return {
+        ...state,
+        quickEditSupported: action.value,
+      }
     case 'set-edit-mode':
       return { ...state, editingMode: action.value }
     case 'forms:add':
@@ -131,7 +128,6 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
     case 'form-lists:clear': {
       return {
         ...state,
-        quickEditEnabled: false,
         quickEditSupported: false,
         formLists: [],
         forms: [],
@@ -185,7 +181,6 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
 
       return {
         ...state,
-        quickEditEnabled: false,
         quickEditSupported: false,
         // Always set it to null for now, this will become more annoying for users
         // when `useTina` hooks are mounting client-side as a result of the app itself
@@ -216,10 +211,9 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       return { ...state, forms, activeFormId: action.value.formId }
     case 'toggle-edit-state': {
       return state.sidebarDisplayState === 'closed'
-        ? { ...state, quickEditEnabled: true, sidebarDisplayState: 'open' }
+        ? { ...state, sidebarDisplayState: 'open' }
         : {
             ...state,
-            quickEditEnabled: false,
             sidebarDisplayState: 'closed',
           }
     }
@@ -228,9 +222,18 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       // whether it's "open" or "full"
       if (action.value === 'openOrFull') {
         if (state.sidebarDisplayState === 'closed') {
-          return { ...state, sidebarDisplayState: 'open' }
+          return {
+            ...state,
+            sidebarDisplayState: 'open',
+          }
         }
         return state
+      }
+      if (action.value === 'open') {
+        return {
+          ...state,
+          sidebarDisplayState: action.value,
+        }
       }
       return { ...state, sidebarDisplayState: action.value }
     }

@@ -10,15 +10,35 @@ If an element has a `[data-vercel-edit-info]` attribute on it, it will be consid
 
 #### The `vercelEditInfo` helper
 
-> NOTE: this should be used in conjuction with the `withSourceMaps` function described below
-
 ```tsx
 // pages/[slug].tsx
 import { useTina } from 'tinacms/dist/react'
 import { vercelEditInfo } from '@tinacms/vercel-previews/dist/react'
 
 export const Post = (props) => {
-  const { data } = useTina(props)
+  const { data: tinaData } = useTina(props)
+  const data = useVisualEditing({
+    data: tinaData,
+    // metadata is derived from the query and variables
+    query: props.query,
+    variables: props.variables,
+    // When clicking on an editable element for the first time, redirect to the TinaCMS app
+    redirect: '/admin',
+    // Only enable visual editing on preview deploys
+    enabled: props.visualEditingEnabled
+    // stringEncoding automatically adds metadata to strings
+    stringEncoding: true,
+    // Alternatively, you can skip some strings from being encoded
+    stringEncoding: {
+      skipPaths: (path) => {
+        if ('page.blocks.0.image' === path) {
+          return true
+        }
+
+        return false
+      }
+    }
+  })
 
   return (
     <div>

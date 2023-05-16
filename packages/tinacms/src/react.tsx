@@ -1,13 +1,10 @@
 import React from 'react'
 
-export function useTina<T extends object>(
-  props: {
-    query: string
-    variables: object
-    data: T
-  },
-  preview?: { redirect: string; quickEditEnabled?: boolean }
-): { data: T; isClient: boolean } {
+export function useTina<T extends object>(props: {
+  query: string
+  variables: object
+  data: T
+}): { data: T; isClient: boolean } {
   const stringifiedQuery = JSON.stringify({
     query: props.query,
     variables: props.variables,
@@ -16,16 +13,17 @@ export function useTina<T extends object>(
     () => hashFromQuery(stringifiedQuery),
     [stringifiedQuery]
   )
-  const [data, setData] = React.useState(
-    preview?.quickEditEnabled ? addMetadata(id, props.data, []) : props.data
-  )
+  const [data, setData] = React.useState(props.data)
+  // const [data, setData] = React.useState(
+  //   preview?.quickEditEnabled ? addMetadata(id, props.data, []) : props.data
+  // )
   const [isClient, setIsClient] = React.useState(false)
   const [quickEditEnabled, setQuickEditEnabled] = React.useState(false)
   const [isInTinaIframe, setIsInTinaIframe] = React.useState(false)
 
-  React.useEffect(() => {
-    setQuickEditEnabled(preview?.quickEditEnabled)
-  }, [preview?.quickEditEnabled])
+  // React.useEffect(() => {
+  //   setQuickEditEnabled(preview?.quickEditEnabled)
+  // }, [preview?.quickEditEnabled])
 
   React.useEffect(() => {
     setIsClient(true)
@@ -104,13 +102,13 @@ export function useTina<T extends object>(
               window.location.origin
             )
           } else {
-            if (preview?.redirect) {
-              const tinaAdminBasePath = preview.redirect.startsWith('/')
-                ? preview.redirect
-                : `/${preview.redirect}`
-              const tinaAdminPath = `${tinaAdminBasePath}/index.html#/~${window.location.pathname}?active-field=${fieldName}`
-              window.location.assign(tinaAdminPath)
-            }
+            // if (preview?.redirect) {
+            //   const tinaAdminBasePath = preview.redirect.startsWith('/')
+            //     ? preview.redirect
+            //     : `/${preview.redirect}`
+            //   const tinaAdminPath = `${tinaAdminBasePath}/index.html#/~${window.location.pathname}?active-field=${fieldName}`
+            //   window.location.assign(tinaAdminPath)
+            // }
           }
         }
       }

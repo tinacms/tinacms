@@ -179,11 +179,6 @@ export const useGraphQLReducer = (
   >([])
   const [operationIndex, setOperationIndex] = React.useState(0)
 
-  const helper = React.useMemo(() => {
-    const previewPlugins = cms.plugins.getType('preview-helper')
-    return previewPlugins.find('preview-helper')
-  }, [cms])
-
   React.useEffect(() => {
     const run = async () => {
       return Promise.all(
@@ -412,14 +407,6 @@ export const useGraphQLReducer = (
               )
             }
           }
-          if (typeof value === 'string' && source?._tina_metadata) {
-            // FIXME: hack to prevent breaking images
-            if (helper) {
-              const pathArray = G.responsePathAsArray(info.path)
-
-              return helper.encode(pathArray.join('.'), value, payload.id)
-            }
-          }
           return value
         },
       })
@@ -494,6 +481,10 @@ export const useGraphQLReducer = (
           type: 'set-quick-editing-supported',
           value: event.data.value,
         })
+        iframe.current?.contentWindow?.postMessage({
+          type: 'quickEditEnabled',
+          value: cms.state.sidebarDisplayState === 'open',
+        })
       }
       if (event?.data?.type === 'isEditMode') {
         iframe?.current?.contentWindow?.postMessage({
@@ -564,9 +555,9 @@ export const useGraphQLReducer = (
   React.useEffect(() => {
     iframe.current?.contentWindow?.postMessage({
       type: 'quickEditEnabled',
-      value: cms.state.quickEditEnabled,
+      value: cms.state.sidebarDisplayState === 'open',
     })
-  }, [cms.state.quickEditEnabled])
+  }, [cms.state.sidebarDisplayState])
 
   React.useEffect(() => {
     cms.dispatch({ type: 'set-edit-mode', value: 'visual' })
