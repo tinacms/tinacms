@@ -15,6 +15,7 @@ interface ImageProps {
 
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
   (props) => {
+    const ref = React.useRef(null)
     const cms = useCMS()
     const { value } = props.input
     const src = value
@@ -23,6 +24,12 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
     if (props.field.clearable) {
       onClear = () => props.input.onChange('')
     }
+
+    React.useEffect(() => {
+      if (ref.current && props.field.experimental_focusIntent) {
+        ref.current.focus()
+      }
+    }, [props.field.experimental_focusIntent, ref])
 
     async function onChange(media?: Media | Media[]) {
       if (media) {
@@ -40,6 +47,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
 
     return (
       <ImageUpload
+        ref={ref}
         value={value}
         src={src}
         loading={isImgUploading}

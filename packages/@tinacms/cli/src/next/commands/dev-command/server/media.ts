@@ -38,8 +38,11 @@ export const createMediaRouter = (config: PathConfig) => {
   ) {
     const bb = busboy({ headers: req.headers })
 
-    bb.on('file', (name, file, info) => {
-      const saveTo = path.join(mediaFolder, info.filename)
+    bb.on('file', async (_name, file, _info) => {
+      const fullPath = req.url?.slice('/media/upload/'.length)
+      const saveTo = path.join(mediaFolder, ...fullPath.split('/'))
+      // make sure the directory exists before writing the file. This is needed for creating new folders
+      await fs.ensureDir(path.dirname(saveTo))
       file.pipe(fs.createWriteStream(saveTo))
     })
     bb.on('error', (error) => {
@@ -120,6 +123,13 @@ export class MediaModel {
         args.searchPath
       )
       const searchPath = parseMediaFolder(args.searchPath)
+      // if the path does not exist, return an empty array
+      if (!(await fs.pathExists(folderPath))) {
+        return {
+          files: [],
+          directories: [],
+        }
+      }
       const filesStr = await fs.readdir(folderPath)
       const filesProm: Promise<FileRes>[] = filesStr.map(async (file) => {
         const filePath = join(folderPath, file)

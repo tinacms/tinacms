@@ -22,7 +22,7 @@ import { MediaStore, TinaCMS } from '@tinacms/toolkit'
 import { formifyCallback } from './hooks/use-graphql-forms'
 
 import { validateSchema } from '@tinacms/schema-tools'
-export { NAMER, resolveForm } from '@tinacms/schema-tools'
+export { NAMER, resolveField } from '@tinacms/schema-tools'
 
 import {
   TinaSchema,

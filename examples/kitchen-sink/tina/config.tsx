@@ -38,9 +38,24 @@ export default defineConfig({
       },
     },
   },
+  // formifyCallback: (args, cms) => {
+  //   if (args.formConfig.id === 'content/authors/napolean.md') {
+  //     return args.skip()
+  //   }
+  //   if (args.formConfig.id === 'content/authors/pedro.md') {
+  //     return args.skip()
+  //   }
+  //   return args.createForm({
+  //     ...args.formConfig, onSubmit: (values) => {
+  //       console.log('submiteede!', values)
+  //       cms.alerts.info("Go for it!")
+  //     }
+  //   })
+  // },
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',
+    basePath: 'my-site',
   },
   media: {
     tina: {

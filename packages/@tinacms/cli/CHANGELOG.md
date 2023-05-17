@@ -1,5 +1,85 @@
 # tinacms-cli
 
+## 1.5.12
+
+### Patch Changes
+
+- 31c160cdf: Placeholder view for when assets fail to load
+- b2a38b56f: Add back local build option that allows the user to build their site with the filesystem.
+- beb179279: Add support for sites deployed to sub-paths. To enabled, provide the sub-path at config.build.basePath:
+
+  ```ts
+    ...
+    build: {
+      outputFolder: 'admin',
+      publicFolder: 'public',
+      basePath: 'my-site', // site is served at my-domain.com/my-site
+    },
+    ...
+  ```
+
+- Updated dependencies [31c160cdf]
+- Updated dependencies [beb179279]
+  - @tinacms/app@1.2.12
+  - @tinacms/schema-tools@1.4.4
+  - @tinacms/graphql@1.4.12
+  - @tinacms/datalayer@1.2.12
+
+## 1.5.11
+
+### Patch Changes
+
+- 83b19fb8d: Update the bridge interface to remove properties that are no longer needed.
+- Updated dependencies [83b19fb8d]
+- Updated dependencies [1c7998b7e]
+  - @tinacms/graphql@1.4.11
+  - @tinacms/app@1.2.11
+  - @tinacms/datalayer@1.2.11
+
+## 1.5.10
+
+### Patch Changes
+
+- Updated dependencies [a402c8010]
+  - @tinacms/graphql@1.4.10
+  - @tinacms/datalayer@1.2.10
+  - @tinacms/app@1.2.10
+
+## 1.5.9
+
+### Patch Changes
+
+- Updated dependencies [89dcad9d9]
+- Updated dependencies [a0eb72ce0]
+  - @tinacms/graphql@1.4.9
+  - @tinacms/app@1.2.9
+  - @tinacms/datalayer@1.2.9
+
+## 1.5.8
+
+### Patch Changes
+
+- 5cb73050e: fix issue where migration would error if a user selected no to migrating templates
+- 012ed53bf: Fix regression where `build.host` was not passed correctly
+- Updated dependencies [eba7e5e5e]
+  - @tinacms/app@1.2.8
+
+## 1.5.7
+
+### Patch Changes
+
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+- 1de2c09ff: skip some checks durring build if the user is using self hosted
+- f11408108: Skip schema diff check when we have conflicting version of GraphQL
+- 0b0255a50: Increase body parser limit
+- Updated dependencies [f14f59a96]
+- Updated dependencies [eeedcfd30]
+- Updated dependencies [7d4be0e51]
+  - @tinacms/schema-tools@1.4.3
+  - @tinacms/graphql@1.4.8
+  - @tinacms/app@1.2.7
+  - @tinacms/datalayer@1.2.8
+
 ## 1.5.6
 
 ### Patch Changes

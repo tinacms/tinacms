@@ -75,17 +75,16 @@ export async function initStaticTina({
     // CollectionsString is the string that will be added to the tina config
     // importStatements are the import statements that will be added to the tina config
     // templateCodeString is the string that will be added to the template.{ts,js} file
-    const { collectionString, importStatements, templateCodeString } =
-      await forestryMigrate({
-        usingTypescript,
-        pathToForestryConfig,
-        rootPath,
-        framework,
-      })
-    if (collectionString) {
-      templateCode = templateCodeString
-      collections = collectionString
-      extraText = importStatements
+    const res = await forestryMigrate({
+      usingTypescript,
+      pathToForestryConfig,
+      rootPath,
+      framework,
+    })
+    if (res) {
+      templateCode = res.templateCodeString
+      collections = res.collectionString
+      extraText = res.importStatements
       isForestryMigration = true
     }
   }
@@ -120,7 +119,7 @@ export async function initStaticTina({
 
   await addDependencies(packageManager)
 
-  if (hasForestryConfig) {
+  if (isForestryMigration) {
     await addTemplateFile({ baseDir: '', usingTypescript, templateCode })
   }
 

@@ -8,7 +8,7 @@ import * as React from 'react'
 
 import { Form } from '../../forms'
 import { useState } from 'react'
-import { FormList } from './FormList'
+import { FormLists } from './FormList'
 import { useCMS, useSubscribable } from '../../react-core'
 import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
@@ -23,7 +23,6 @@ export const FormsView = ({
 }: {
   children?: React.ReactChild | React.ReactChild[]
 }) => {
-  const [activeFormId, setActiveFormId] = useState<string>('')
   const cms = useCMS()
   const renderNav =
     // @ts-ignore
@@ -31,7 +30,6 @@ export const FormsView = ({
       ? // @ts-ignore
         cms.sidebar.renderNav
       : true
-  const formPlugins = cms.plugins.getType<Form>('form')
   const { setFormIsPristine } = React.useContext(SidebarContext)
   const { formsRegistering, setFormsRegistering } =
     React.useContext(EditContext)
@@ -48,56 +46,22 @@ export const FormsView = ({
     []
   )
 
-  /**
-   * If there's only one form, make it the active form.
-   *
-   * TODO: There's an issue where the forms register one
-   * by one, so the 'active form' always gets set as if there
-   * were only one form, even when there are multiple
-   */
-
-  function setSingleActiveForm() {
-    if (formPlugins.all().length === 1) {
-      setActiveFormId(formPlugins.all()[0].id)
-    }
-  }
-
-  /*
-   ** Subscribes the forms to the CMS,
-   ** passing a callback to set active form
-   */
-  useSubscribable(formPlugins, () => {
-    setSingleActiveForm()
-  })
-
-  /*
-   ** Sets single active form on componentDidMount
-   */
-  React.useEffect(() => {
-    setSingleActiveForm()
-  }, [])
-
-  const forms = formPlugins.all()
-  const isMultiform = forms.length > 1
-  const activeForm: Form | undefined = formPlugins.find(activeFormId)
+  const isMultiform = cms.state.forms.length > 1
+  const activeForm = cms.state.forms.find(
+    ({ tinaForm }) => tinaForm.id === cms.state.activeFormId
+  )
   const isEditing = !!activeForm
 
   /**
    * No Forms
    */
-  if (!forms.length) {
+  if (!cms.state.formLists.length) {
     if (formsRegistering) return <PendingFormsPlaceholder />
     return <> {children} </>
   }
 
   if (isMultiform && !activeForm) {
-    return (
-      <FormList
-        isEditing={isEditing}
-        forms={forms}
-        setActiveFormId={setActiveFormId}
-      />
-    )
+    return <FormLists isEditing={isEditing} />
   }
 
   const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta')
@@ -110,7 +74,6 @@ export const FormsView = ({
             <MultiformFormHeader
               renderNav={renderNav}
               activeForm={activeForm}
-              setActiveFormId={setActiveFormId}
             />
           )}
           {!isMultiform && (
@@ -162,14 +125,12 @@ const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
 }
 
 export interface MultiformFormHeaderProps {
-  activeForm: Form
-  setActiveFormId(_id: string): void
+  activeForm: { activeFieldName?: string; tinaForm: Form }
   renderNav?: boolean
 }
 
 export const MultiformFormHeader = ({
   activeForm,
-  setActiveFormId,
   renderNav,
 }: MultiformFormHeaderProps) => {
   const cms = useCMS()
@@ -181,28 +142,27 @@ export const MultiformFormHeader = ({
         sidebarWidth > navBreakpoint && renderNav
           ? `px-6`
           : renderNav
-          ? `pl-20 pr-28`
-          : `pl-6 pr-28`
+          ? `pl-18 pr-24`
+          : `pl-6 pr-24`
       }`}
     >
       <div className="max-w-form mx-auto flex flex-col items-start justify-center min-h-[2.5rem]">
         <button
-          className="pointer-events-auto text-xs mb-1 text-gray-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150 font-medium flex items-center justify-start gap-0.5"
+          className="pointer-events-auto text-xs -mt-1 mb-1.5 text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150 font-medium flex items-center justify-start gap-0.5"
           onClick={() => {
-            const state = activeForm.finalForm.getState()
+            const state = activeForm.tinaForm.finalForm.getState()
             if (state.invalid === true) {
-              // @ts-ignore
               cms.alerts.error('Cannot navigate away from an invalid form.')
             } else {
-              setActiveFormId('')
+              cms.dispatch({ type: 'forms:set-active-form-id', value: null })
             }
           }}
         >
-          <BiChevronLeft className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
-          Return to Form List
+          <BiChevronLeft className="h-auto w-5 inline-block opacity-70 -ml-1 -mr-0.5 -mt-px" />
+          Form List
         </button>
-        <span className="block w-full text-xl mb-[6px] text-gray-700 font-medium leading-tight">
-          {activeForm.label || activeForm.name}
+        <span className="block w-full text-lg mb-2 text-gray-700 font-medium leading-tight truncate">
+          {activeForm.tinaForm.label || activeForm.tinaForm.id}
         </span>
         <FormStatus pristine={formIsPristine} />
       </div>
@@ -211,7 +171,7 @@ export const MultiformFormHeader = ({
 }
 
 export interface FormHeaderProps {
-  activeForm: Form
+  activeForm: { activeFieldName?: string; tinaForm: Form }
   renderNav?: boolean
 }
 
@@ -221,8 +181,8 @@ export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
 
   const headerPadding = {
     navOpen: 'px-6',
-    navClosed: 'pl-20 pr-28',
-    noNav: 'pl-6 pr-28',
+    navClosed: 'pl-18 pr-24',
+    noNav: 'pl-6 pr-24',
   }
 
   const windowWidth = useWindowWidth()
@@ -233,8 +193,8 @@ export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
     ? 'navOpen'
     : 'navClosed'
 
-  const shortFormLabel = activeForm.label
-    ? activeForm.label.replace(/^.*[\\\/]/, '')
+  const shortFormLabel = activeForm.tinaForm.label
+    ? activeForm.tinaForm.label.replace(/^.*[\\\/]/, '')
     : false
 
   return (
@@ -243,7 +203,7 @@ export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
     >
       <div className="max-w-form mx-auto  flex flex-col items-start justify-center min-h-[2.5rem]">
         {shortFormLabel && (
-          <span className="block w-full text-lg mb-[6px] text-gray-700 font-medium leading-tight text-ellipsis overflow-hidden whitespace-nowrap">
+          <span className="block w-full text-lg mb-[6px] text-gray-700 font-medium leading-tight truncate">
             {shortFormLabel}
           </span>
         )}

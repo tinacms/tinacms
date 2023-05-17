@@ -69,6 +69,7 @@ export const MdxFieldPluginExtendible = {
     if (
       typeof value !== 'undefined' &&
       value !== null &&
+      Array.isArray(value.children) &&
       value.children[0] &&
       value.children[0].type === 'invalid_markdown'
     ) {

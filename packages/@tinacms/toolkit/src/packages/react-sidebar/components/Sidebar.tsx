@@ -6,8 +6,7 @@
 
 import * as React from 'react'
 
-import { BiMenu, BiPencil } from 'react-icons/bi'
-import { BsArrowsAngleContract, BsArrowsAngleExpand } from 'react-icons/bs'
+import { BiExpandAlt, BiMenu, BiPencil } from 'react-icons/bi'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
 import { useCMS, useSubscribable } from '../../react-core'
@@ -53,7 +52,6 @@ export function SidebarProvider({
   resizingSidebar,
   setResizingSidebar,
   defaultWidth = defaultSidebarWidth,
-  defaultState = defaultSidebarState,
   sidebar,
 }: SidebarProviderProps) {
   useSubscribable(sidebar)
@@ -66,8 +64,6 @@ export function SidebarProvider({
       position={cms?.sidebar?.position || position}
       // @ts-ignore
       defaultWidth={cms?.sidebar?.defaultWidth || defaultWidth}
-      // @ts-ignore
-      defaultState={cms?.sidebar?.defaultState || defaultState}
       resizingSidebar={resizingSidebar}
       setResizingSidebar={setResizingSidebar}
       renderNav={
@@ -92,8 +88,6 @@ interface SidebarProps {
   renderNav?: boolean
 }
 
-type displayStates = 'closed' | 'open' | 'fullscreen'
-
 const useFetchCollections = (cms) => {
   return { collections: cms.api.admin.fetchCollections(), loading: false }
 }
@@ -101,7 +95,7 @@ const useFetchCollections = (cms) => {
 const Sidebar = ({
   sidebar,
   defaultWidth,
-  defaultState,
+  // defaultState,
   position,
   renderNav,
   resizingSidebar,
@@ -131,10 +125,12 @@ const Sidebar = ({
 
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
-  const [displayState, setDisplayState] =
-    React.useState<displayStates>(defaultState)
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
+
+  const setDisplayState = (value: 'closed' | 'fullscreen' | 'open') =>
+    cms.dispatch({ type: 'sidebar:set-display-state', value: value })
+  const displayState = cms.state.sidebarDisplayState
 
   /* Set sidebar open state and width to local values if available */
   React.useEffect(() => {
@@ -158,10 +154,10 @@ const Sidebar = ({
       const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY)
 
       if (localSidebarState === null) {
-        setDisplayState(defaultState)
+        setDisplayState(defaultSidebarState)
       }
     }
-  }, [defaultState])
+  }, [defaultSidebarState])
 
   /* Update the local value of the sidebar state any time it updates, if the CMS is loaded */
   React.useEffect(() => {
@@ -196,11 +192,7 @@ const Sidebar = ({
   }
 
   const toggleSidebarOpen = () => {
-    if (displayState === 'closed') {
-      setDisplayState('open')
-    } else {
-      setDisplayState('closed')
-    }
+    cms.dispatch({ type: 'toggle-edit-state' })
   }
 
   const toggleMenu = () => {
@@ -362,7 +354,7 @@ const Sidebar = ({
                       }}
                       className={`transition-opacity duration-150 ease-out`}
                     >
-                      <IoMdClose className="h-6 w-auto" />
+                      <IoMdClose className="h-5 w-auto text-blue-500" />
                     </Button>
                   </div>
                 </Nav>
@@ -402,12 +394,14 @@ export const updateBodyDisplacement = ({
   const windowWidth = window.innerWidth
 
   if (position === 'displace') {
-    // Transition displacement when not dragging sidebar (opening/closing sidebar)
-    if (!resizingSidebar) {
-      body.style.transition = 'all 200ms ease-out'
-    } else {
-      body.style.transition = ''
-    }
+    // Padding can't be animated smoothly, so we're using a delay to time the size change
+    body.style.transition = resizingSidebar
+      ? ''
+      : displayState === 'fullscreen'
+      ? 'padding 0ms 150ms'
+      : displayState === 'closed'
+      ? 'padding 0ms 0ms'
+      : 'padding 0ms 300ms'
 
     if (displayState === 'open') {
       const bodyDisplacement = Math.min(
@@ -451,33 +445,41 @@ const SidebarHeader = ({
             }}
             className="pointer-events-auto -ml-px"
           >
-            <BiMenu className="h-7 w-auto" />
+            <BiMenu className="h-6 w-auto text-blue-500" />
           </Button>
         )}
         <div className="flex-1"></div>
         <div
-          className={`flex items-center gap-2 pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
+          className={`flex items-center pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
         >
-          <Button
-            rounded="full"
-            variant="ghost"
-            onClick={toggleFullscreen}
-            className="pointer-events-auto opacity-50 hover:opacity-100 focus:opacity-80"
-          >
-            {displayState === 'fullscreen' ? (
-              <BsArrowsAngleContract className="h-5 w-auto -mx-1" />
-            ) : (
-              <BsArrowsAngleExpand className="h-5 w-auto -mx-1" />
-            )}
-          </Button>
           <Button
             rounded="left"
             variant="secondary"
             onClick={toggleSidebarOpen}
             aria-label="closes cms sidebar"
-            className={``}
           >
-            <MdOutlineArrowBackIos className="h-6 w-auto" />
+            <MdOutlineArrowBackIos className="h-[18px] w-auto -mr-1 text-blue-500" />
+          </Button>
+          <Button
+            rounded="custom"
+            variant="secondary"
+            onClick={toggleFullscreen}
+          >
+            {displayState === 'fullscreen' ? (
+              // BiCollapseAlt
+              <svg
+                className="h-5 w-auto -mx-1 text-blue-500"
+                stroke="currentColor"
+                fill="currentColor"
+                stroke-width="0"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M2 15h7v7h2v-9H2v2zM15 2h-2v9h9V9h-7V2z"></path>
+              </svg>
+            ) : (
+              <BiExpandAlt className="h-5 -mx-1 w-auto text-blue-500" />
+            )}
           </Button>
         </div>
       </div>
@@ -561,11 +563,12 @@ const EditButton = ({}) => {
     <Button
       rounded="right"
       variant="primary"
+      size="custom"
       onClick={toggleSidebarOpen}
-      className={` absolute top-8 right-0 transition-all duration-150 ease-out ${
+      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${
         displayState !== 'closed'
-          ? 'opacity-0'
-          : 'translate-x-full pointer-events-auto'
+          ? 'opacity-0 ease-in pointer-events-none'
+          : 'ease-out pointer-events-auto'
       }`}
       aria-label="opens cms sidebar"
     >
@@ -590,6 +593,8 @@ const SidebarWrapper = ({ children }) => {
         } ${
           resizingSidebar
             ? `transition-none`
+            : displayState === 'closed'
+            ? `transition-all duration-300 ease-in`
             : displayState === 'fullscreen'
             ? `transition-all duration-150 ease-out`
             : `transition-all duration-300 ease-out`
@@ -608,13 +613,9 @@ const SidebarWrapper = ({ children }) => {
 }
 
 const SidebarBody = ({ children }) => {
-  const { displayState } = React.useContext(SidebarContext)
-
   return (
     <div
-      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white border-r border-gray-200 overflow-hidden transition-opacity duration-300 ease-out ${
-        displayState !== 'closed' ? 'opacity-100' : 'opacity-0'
-      } ${displayState === 'fullscreen' ? '' : ''}`}
+      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white border-r border-gray-200 overflow-hidden`}
     >
       {children}
     </div>

@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import React, { Fragment, useEffect, useState } from 'react'
 import {
   BiArrowBack,
@@ -52,12 +48,20 @@ import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { Collection } from '@tinacms/schema-tools'
-import { useCollectionFolder } from './utils'
+import { CollectionFolder, useCollectionFolder } from './utils'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
 const isSSR = typeof window === 'undefined'
 
-const TemplateMenu = ({ templates }: { templates: TemplateResponse[] }) => {
+const TemplateMenu = ({
+  templates,
+  folder,
+  collectionName,
+}: {
+  collectionName: string
+  templates: TemplateResponse[]
+  folder: CollectionFolder
+}) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
       {() => (
@@ -83,7 +87,24 @@ const TemplateMenu = ({ templates }: { templates: TemplateResponse[] }) => {
                   <Menu.Item key={`${template.label}-${template.name}`}>
                     {({ active }) => (
                       <Link
-                        to={`${template.name}/new`}
+                        to={`/${
+                          folder.fullyQualifiedName
+                            ? [
+                                'collections',
+                                'new',
+                                collectionName,
+                                template.name,
+                                '~',
+                                folder.name,
+                              ].join('/')
+                            : [
+                                'collections',
+                                'new',
+                                collectionName,
+                                template.name,
+                              ].join('/')
+                        }`}
+                        // to={`${template.name}/new`}
                         className={`w-full text-md px-4 py-2 tracking-wide flex items-center transition ease-out duration-100 ${
                           active
                             ? 'text-blue-600 opacity-100 bg-gray-50'
@@ -145,7 +166,11 @@ export const handleNavigate = (
       : (window.location.href = routeOverride)
     return null
   } else {
-    navigate(document._sys.breadcrumbs.join('/'))
+    const pathToDoc = document._sys.breadcrumbs
+    navigate(
+      `/${['collections', 'edit', collection.name, ...pathToDoc].join('/')}`,
+      { replace: true }
+    )
   }
 }
 
@@ -256,7 +281,7 @@ const CollectionListPage = () => {
                   // only allow sortable fields
                   ['string', 'number', 'datetime', 'boolean'].includes(x.type)
                 )
-                const sortField = fields.find(
+                const sortField = fields?.find(
                   (field) => field.name === sortName
                 )
 
@@ -652,7 +677,11 @@ const CollectionListPage = () => {
                             </Link>
                           )}
                           {collection.templates && allowCreate && (
-                            <TemplateMenu templates={collection.templates} />
+                            <TemplateMenu
+                              collectionName={collectionName}
+                              templates={collection.templates}
+                              folder={folder}
+                            />
                           )}
                         </div>
                       </div>

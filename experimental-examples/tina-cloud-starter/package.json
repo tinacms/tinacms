@@ -1,0 +1,43 @@
+{
+  "name": "@tinacms/starter",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tinacms dev -c \"next dev\"",
+    "build": "tinacms build && next build",
+    "start": "tinacms build && next start",
+    "export": "npm run build && next export",
+    "lint": "eslint . --ext .ts,.tsx"
+  },
+  "devDependencies": {
+    "@svgr/webpack": "^6.3.1",
+    "@tinacms/cli": "workspace:*",
+    "@types/js-cookie": "^3.0.0",
+    "@types/node": "^16.11.7",
+    "@types/react": "^17.0.35",
+    "@types/styled-components": "^5.1.15",
+    "@typescript-eslint/eslint-plugin": "^5.20.0",
+    "@typescript-eslint/parser": "^5.20.0",
+    "autoprefixer": "^10.4.7",
+    "eslint": "^8.13.0",
+    "postcss": "^8.4.21",
+    "postcss-import": "^14.0.2",
+    "postcss-nesting": "^10.1.0",
+    "tailwindcss": "^3.3.2"
+  },
+  "dependencies": {
+    "@headlessui/react": "1.7.5",
+    "@tailwindcss/typography": "^0.5.8",
+    "@tinacms/vercel-previews": "workspace:*",
+    "date-fns": "^2.23.0",
+    "graphql": "15.8.0",
+    "mongodb-level": "^0.0.2",
+    "next": "^13.3.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.2.0",
+    "styled-jsx": "^3.2.5",
+    "tinacms": "workspace:*",
+    "typescript": "^4.5.2"
+  }
+}

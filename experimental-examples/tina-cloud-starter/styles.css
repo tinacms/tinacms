@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.bg-clip-text {
+  /* Tailwind isn't adding this for some reason */
+  -webkit-background-clip: text;
+}
+
+/* Here are a few examples of overriding the built-in css */
+/* .__tina-quick-editing-enabled [data-tina-field] {
+  outline: 2px solid rgba(215, 137, 41, 0.25);
+  box-shadow: inset 100vi 100vh rgba(216, 189, 110, 0.2);
+  cursor: pointer;
+  transition: ease-in-out 200ms;
+}
+.__tina-quick-editing-enabled [data-tina-field]:hover {
+  box-shadow: inset 100vi 100vh rgba(216, 189, 110, 0.5);
+}
+.__tina-quick-editing-enabled [data-tina-field-overlay] {
+  cursor: pointer;
+  transition: ease-in-out 200ms;
+  position: relative;
+}
+.__tina-quick-editing-enabled [data-tina-field-overlay]::after {
+  content: '';
+  position: absolute;
+  display: block;
+  top: 0; right: 0; left: 0; bottom: 0;
+  box-shadow: inset 0 0 0 2px rgba(215, 137, 41, 0.5);
+  background-color: rgba(215, 137, 41, 0.2);
+  pointer-events: none;
+  z-index: 100;
+}
+.__tina-quick-editing-enabled [data-tina-field-overlay]:hover::after {
+  background-color: rgba(215, 137, 41, 0.5);
+} */

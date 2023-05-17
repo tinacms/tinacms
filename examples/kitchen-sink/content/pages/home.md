@@ -8,9 +8,12 @@ blocks:
     actions:
       - label: Get Started
         url: 'https://tina.io'
-        variant: primary
+        variant: secondary
     _template: hero
   - title: Features
+    categoriesOther:
+      - IT's ok!
+      - Hey there
     items:
       - Query Your Content
       - Build on Top of Your Components
@@ -25,4 +28,3 @@ blocks:
     _template: cta
 _template: blockPage
 ---
-

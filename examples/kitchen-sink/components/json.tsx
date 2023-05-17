@@ -24,13 +24,36 @@ export function Json(props: { src: object }) {
           <div className="h-full overflow-scroll">
             <Explorer2
               value={props.src}
-              // renderRichText={({ value }) => {
-              //   return (
-              //     <div className="font-sans px-2 border-l-2 bg-gray-50 w-full prose">
-              //       <TinaMarkdown content={value} />
-              //     </div>
-              //   )
-              // }}
+              renderRichText={({
+                value,
+                keyName,
+                parentValue,
+                parentKeyName,
+              }) => {
+                let fieldName = ''
+                if (!isNaN(Number(keyName))) {
+                  fieldName = `${tinaField(
+                    parentValue,
+                    parentKeyName
+                  )}.${keyName}`
+                } else {
+                  fieldName = tinaField(parentValue, keyName)
+                }
+                const extraProps = {}
+                if (fieldName !== 'undefined#undefined') {
+                  if (fieldName) {
+                    extraProps['data-tina-field'] = fieldName
+                  }
+                }
+                return (
+                  <div
+                    className="font-sans px-2 border-l-2 bg-gray-50 w-full prose"
+                    {...extraProps}
+                  >
+                    <TinaMarkdown content={value} />
+                  </div>
+                )
+              }}
               renderValue={({ value, keyName, parentValue, parentKeyName }) => {
                 let fieldName = ''
                 if (!isNaN(Number(keyName))) {
@@ -41,8 +64,15 @@ export function Json(props: { src: object }) {
                 } else {
                   fieldName = tinaField(parentValue, keyName)
                 }
+                // const dataAttributeName = tinaField(fieldName)
+                const extraProps = {}
+                if (fieldName !== 'undefined#undefined') {
+                  if (fieldName) {
+                    extraProps['data-tina-field'] = fieldName
+                  }
+                }
                 return (
-                  <span className="text-orange-600" data-tinafield={fieldName}>
+                  <span className="text-orange-600" {...extraProps}>
                     {value}
                   </span>
                 )

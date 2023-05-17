@@ -1,9 +1,9 @@
 {
   "name": "@tinacms/self-hosted-starter",
-  "version": "0.1.12",
+  "version": "0.1.18",
   "private": true,
   "scripts": {
-    "dev": "tinacms dev --watchFolders='components/util/icon.tsx' -c \"next dev\"",
+    "dev": "tinacms dev -c \"next dev\"",
     "build": "tinacms build && next build",
     "start": "tinacms build && next start",
     "export": "npm run build && next export",
@@ -32,7 +32,7 @@
     "date-fns": "^2.23.0",
     "js-base64": "^3.7.4",
     "mongodb-level": "^0.0.2",
-    "next": "^12.3.1",
+    "next": "12.2.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-icons": "^4.3.1",

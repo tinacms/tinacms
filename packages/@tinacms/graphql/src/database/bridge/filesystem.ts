@@ -19,9 +19,10 @@ export class FilesystemBridge implements Bridge {
   public async glob(pattern: string, extension: string) {
     const basePath = path.join(this.outputPath, ...pattern.split('/'))
     const items = await fg(
-      path.join(basePath, '**', `/*${extension}`).replace(/\\/g, '/'),
+      path.join(basePath, '**', `/*\.${extension}`).replace(/\\/g, '/'),
       {
         dot: true,
+        ignore: ['**/node_modules/**'],
       }
     )
     const posixRootPath = normalize(this.outputPath)
@@ -29,26 +30,11 @@ export class FilesystemBridge implements Bridge {
       return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '')
     })
   }
-  public supportsBuilding() {
-    return true
-  }
   public async delete(filepath: string) {
     await fs.remove(path.join(this.outputPath, filepath))
   }
   public async get(filepath: string) {
     return fs.readFileSync(path.join(this.outputPath, filepath)).toString()
-  }
-  public async putConfig(filepath: string, data: string) {
-    /**
-     * If the root path and output path are different (for separate content repos)
-     * push config file changes to both.
-     */
-    if (this.rootPath !== this.outputPath) {
-      await this.put(filepath, data)
-      await this.put(filepath, data, this.rootPath)
-    } else {
-      await this.put(filepath, data)
-    }
   }
   public async put(filepath: string, data: string, basePathOverride?: string) {
     const basePath = basePathOverride || this.outputPath
@@ -66,6 +52,9 @@ export class AuditFileSystemBridge extends FilesystemBridge {
         '.tina/__generated__/_lookup.json',
         '.tina/__generated__/_schema.json',
         '.tina/__generated__/_graphql.json',
+        'tina/__generated__/_lookup.json',
+        'tina/__generated__/_schema.json',
+        'tina/__generated__/_graphql.json',
       ].includes(filepath)
     ) {
       return super.put(filepath, data)

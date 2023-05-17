@@ -10,11 +10,12 @@ import type { ReferenceFieldProps } from './index'
 import { selectFieldClasses } from '../Select'
 import { LoadingDots } from '../../../form-builder'
 import { MdKeyboardArrowDown } from 'react-icons/md'
+import { Field } from '../../../forms'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
-  field: ReferenceFieldProps
+  field: ReferenceFieldProps & Field
 }
 
 interface Node {
@@ -106,6 +107,12 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
   field,
 }) => {
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
+  const ref = React.useRef(null)
+  React.useEffect(() => {
+    if (ref.current && field.experimental_focusIntent) {
+      ref.current.focus()
+    }
+  }, [field.experimental_focusIntent, ref])
 
   if (loading === true) {
     return <LoadingDots color="var(--tina-color-primary)" />
@@ -114,6 +121,7 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
   return (
     <>
       <select
+        ref={ref}
         id={input.name}
         value={input.value}
         onChange={input.onChange}

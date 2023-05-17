@@ -10,6 +10,7 @@ import { useCMS } from '../../react-tinacms/use-cms'
 import {
   BiArrowToBottom,
   BiCloudUpload,
+  BiFolder,
   BiGridAlt,
   BiListUl,
   BiX,
@@ -28,7 +29,7 @@ import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
-import { IoMdSync } from 'react-icons/io'
+import { IoMdRefresh } from 'react-icons/io'
 import { CloseIcon, TrashIcon } from '../../packages/icons'
 import {
   absoluteImgURL,
@@ -36,7 +37,7 @@ import {
   dropzoneAcceptFromString,
   isImage,
 } from './utils'
-import { DeleteModal } from './modal'
+import { DeleteModal, NewFolderModal } from './modal'
 import { CopyField } from './copy-field'
 
 // Can not use path.join on the frontend
@@ -132,6 +133,7 @@ export function MediaPicker({
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
+  const [newFolderModalOpen, setNewFolderModalOpen] = React.useState(false)
   const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
@@ -198,7 +200,7 @@ export function MediaPicker({
     loadMedia()
 
     return cms.events.subscribe(
-      ['media:upload:success', 'media:delete:success', 'media:pageSize'],
+      ['media:delete:success', 'media:pageSize'],
       loadMedia
     )
   }, [offset, directory, cms.media.isConfigured])
@@ -244,7 +246,7 @@ export function MediaPicker({
     onDrop: async (files, fileRejections) => {
       try {
         setUploading(true)
-        await cms.media.persist(
+        const mediaItems = await cms.media.persist(
           files.map((file) => {
             return {
               directory: directory || '/',
@@ -287,6 +289,20 @@ export function MediaPicker({
                 {messages.join('. ')}.
               </>
             )
+          })
+        }
+        // if there are media items, set the first one as active and prepend all the items to the list
+        if (mediaItems.length !== 0) {
+          setActiveItem(mediaItems[0])
+          setList((mediaList) => {
+            return {
+              items: [
+                // all of the newly added items are new
+                ...mediaItems.map((x) => ({ ...x, new: true })),
+                ...mediaList.items,
+              ],
+              nextOffset: mediaList.nextOffset,
+            }
           })
         }
       } catch {
@@ -342,13 +358,52 @@ export function MediaPicker({
           close={() => setDeleteModalOpen(false)}
         />
       )}
+      {newFolderModalOpen && (
+        <NewFolderModal
+          onSubmit={(name) => {
+            setDirectory((oldDir) => {
+              if (oldDir) {
+                return join(oldDir, name)
+              } else {
+                return name
+              }
+            })
+            resetOffset()
+          }}
+          close={() => setNewFolderModalOpen(false)}
+        />
+      )}
 
       <MediaPickerWrap>
-        <div className="flex items-center bg-gray-50 border-b border-gray-150 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
-          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+        <div className="flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0">
+          <div className="flex flex-1 items-center gap-4">
+            <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+            <Breadcrumb directory={directory} setDirectory={setDirectory} />
+          </div>
 
-          <Breadcrumb directory={directory} setDirectory={setDirectory} />
-          <UploadButton onClick={onClick} uploading={uploading} />
+          <div className="flex items-center gap-4">
+            <Button
+              busy={false}
+              variant="white"
+              onClick={loadMedia}
+              className="whitespace-nowrap"
+            >
+              Refresh
+              <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+            </Button>
+            <Button
+              busy={false}
+              variant="white"
+              onClick={() => {
+                setNewFolderModalOpen(true)
+              }}
+              className="whitespace-nowrap"
+            >
+              New Folder
+              <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+            </Button>
+            <UploadButton onClick={onClick} uploading={uploading} />
+          </div>
         </div>
 
         <div className="flex h-full overflow-hidden bg-white">

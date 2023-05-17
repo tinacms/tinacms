@@ -1,4 +1,5 @@
 import path from 'path'
+import fs from 'fs-extra'
 import type { DocumentNode } from 'graphql'
 import { GraphQLError } from 'graphql'
 import micromatch from 'micromatch'
@@ -32,6 +33,7 @@ import {
   TernaryFilter,
 } from './datalayer'
 import {
+  ARRAY_ITEM_VALUE_SEPARATOR,
   BatchOp,
   CONTENT_ROOT_PREFIX,
   DelOp,
@@ -105,12 +107,14 @@ export class Database {
   private onPut: OnPutCallback
   private onDelete: OnDeleteCallback
   private tinaSchema: TinaSchema | undefined
+
   private collectionIndexDefinitions:
     | Record<string, Record<string, IndexDefinition>>
     | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
+
   constructor(public config: CreateDatabase) {
-    this.tinaDirectory = config.tinaDirectory || '.tina'
+    this.tinaDirectory = config.tinaDirectory || 'tina'
     this.bridge = config.bridge
     this.rootLevel =
       config.level && (new LevelProxy(config.level) as unknown as Level)
@@ -204,10 +208,19 @@ export class Database {
         typeof contentObject._template === 'string'
           ? contentObject._template
           : undefined
-      const { collection, template } =
-        tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
+      const { collection, template } = hasOwnProperty(
+        contentObject,
+        '__collection'
+      )
+        ? {
+            collection: tinaSchema.getCollection(
+              contentObject['__collection'] as string
+            ),
+            template: undefined,
+          } // folders have no templates
+        : tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
 
-      const field = template.fields.find((field) => {
+      const field = template?.fields.find((field) => {
         if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
             return true
@@ -228,7 +241,9 @@ export class Database {
         ...data,
         _collection: collection.name,
         _keepTemplateKey: !!collection.templates,
-        _template: lastItem(template.namespace),
+        _template: template?.namespace
+          ? lastItem(template?.namespace)
+          : undefined,
         _relativePath: filepath
           .replace(collection.path, '')
           .replace(/^\/|\/$/g, ''),
@@ -675,6 +690,7 @@ export class Database {
                     {
                       name: field.name,
                       type: field.type,
+                      list: !!field.list,
                       pad:
                         field.type === 'number'
                           ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
@@ -689,12 +705,16 @@ export class Database {
               // build IndexDefinitions for each index in the collection schema
               for (const index of collection.indexes) {
                 indexDefinitions[index.name] = {
-                  fields: index.fields.map((indexField) => ({
-                    name: indexField.name,
-                    type: (collection.fields as TinaField<true>[]).find(
+                  fields: index.fields.map((indexField) => {
+                    const field = (collection.fields as TinaField<true>[]).find(
                       (field) => indexField.name === field.name
-                    )?.type,
-                  })),
+                    )
+                    return {
+                      name: indexField.name,
+                      type: field?.type,
+                      list: !!field?.list,
+                    }
+                  }),
                 }
               }
             }
@@ -828,16 +848,29 @@ export class Database {
       ) {
         continue
       }
-      const filepath = matcher.groups['_filepath_']
-      if (
-        !itemFilter(
-          filterSuffixes
-            ? matcher.groups
-            : indexDefinition
-            ? await rootLevel.get(filepath)
-            : (value as Record<string, any>)
-        )
-      ) {
+
+      let filepath = matcher.groups['_filepath_']
+      let itemRecord: Record<string, any>
+      if (filterSuffixes) {
+        itemRecord = matcher.groups
+        // for index match fields, convert the array value from comma-separated string to array
+        for (const field of indexDefinition.fields) {
+          if (itemRecord[field.name]) {
+            if (field.list) {
+              itemRecord[field.name] = itemRecord[field.name].split(
+                ARRAY_ITEM_VALUE_SEPARATOR
+              )
+            }
+          }
+        }
+      } else {
+        if (indexDefinition) {
+          itemRecord = await rootLevel.get(filepath)
+        } else {
+          itemRecord = value
+        }
+      }
+      if (!itemFilter(itemRecord)) {
         continue
       }
 
@@ -864,6 +897,7 @@ export class Database {
             cursor: btoa(edge.cursor),
           }
         } catch (error) {
+          console.log(error)
           if (
             error instanceof Error &&
             (!edge.path.includes('.tina/__generated__/_graphql.json') ||
@@ -889,26 +923,6 @@ export class Database {
       },
     }
   }
-
-  public putConfigFiles = async ({
-    graphQLSchema,
-    tinaSchema,
-  }: {
-    graphQLSchema: DocumentNode
-    tinaSchema: TinaSchema
-  }) => {
-    if (this.bridge && this.bridge.supportsBuilding()) {
-      await this.bridge.putConfig(
-        normalizePath(path.join(this.getGeneratedFolder(), `_graphql.json`)),
-        JSON.stringify(graphQLSchema)
-      )
-      await this.bridge.putConfig(
-        normalizePath(path.join(this.getGeneratedFolder(), `_schema.json`)),
-        JSON.stringify(tinaSchema.schema)
-      )
-    }
-  }
-
   private async indexStatusCallbackWrapper<T>(
     fn: () => Promise<T>,
     post?: () => Promise<void>
@@ -943,15 +957,26 @@ export class Database {
     let nextLevel: Level | undefined
     return await this.indexStatusCallbackWrapper(
       async () => {
-        const lookup =
-          lookupFromLockFile ||
-          JSON.parse(
-            await this.bridge.get(
-              normalizePath(
-                path.join(this.getGeneratedFolder(), '_lookup.json')
+        let lookup
+        try {
+          lookup =
+            lookupFromLockFile ||
+            JSON.parse(
+              await this.bridge.get(
+                normalizePath(
+                  path.join(this.getGeneratedFolder(), '_lookup.json')
+                )
               )
             )
-          )
+        } catch (error) {
+          console.error('Error: Unable to find generated lookup file')
+          if (this.tinaDirectory === 'tina') {
+            console.error(
+              'If you are using the .tina folder. Please set {tinaDirectory: ".tina"} in your createDatabase options or migrate to the new tina folder: https://tina.io/blog/tina-config-rearrangements/'
+            )
+          }
+          throw error
+        }
 
         let nextVersion: string | undefined
         if (!this.config.version) {
@@ -1169,28 +1194,6 @@ export class Database {
       await level.batch(operations.splice(0, 25))
     }
     return { warnings }
-  }
-
-  public addToLookupMap = async (lookup: LookupMapType) => {
-    if (!this.bridge) {
-      throw new Error('No bridge configured')
-    }
-    const lookupPath = path.join(this.getGeneratedFolder(), `_lookup.json`)
-    let lookupMap
-    try {
-      lookupMap = JSON.parse(await this.bridge.get(normalizePath(lookupPath)))
-    } catch (e) {
-      lookupMap = {}
-    }
-    const updatedLookup = {
-      ...lookupMap,
-      [lookup.type]: lookup,
-    }
-    await this.bridge.putConfig(
-      normalizePath(lookupPath),
-      JSON.stringify(updatedLookup)
-    )
-    //await this.onPut(normalizePath(lookupPath), JSON.stringify(updatedLookup))
   }
 }
 

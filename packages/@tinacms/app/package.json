@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/app",
-  "version": "1.2.6",
+  "version": "1.2.12",
   "main": "src/main.tsx",
   "license": "Apache-2.0",
   "devDependencies": {
@@ -12,24 +12,23 @@
     "@graphiql/toolkit": "^0.8.2",
     "@headlessui/react": "1.6.6",
     "@heroicons/react": "1.0.6",
+    "@monaco-editor/react": "4.4.5",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/toolkit": "workspace:*",
     "@xstate/react": "3.0.0",
     "final-form": "4.20.7",
     "graphiql": "^2.4.0",
     "graphql": "15.8.0",
+    "monaco-editor": "0.31.0",
     "postcss": "^8.4.14",
     "postcss-nested": "^5.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-is": "17.0.2",
     "react-router-dom": "6.3.0",
-    "tinacms": "workspace:*",
-    "xstate": "4.32.1",
     "tailwindcss": "^3.2.7",
+    "tinacms": "workspace:*",
     "typescript": "^4.6.4",
-    "@monaco-editor/react": "4.4.5",
-    "monaco-editor": "0.31.0",
-    "webfontloader": "1.6.28"
+    "zod": "^3.14.3"
   }
 }

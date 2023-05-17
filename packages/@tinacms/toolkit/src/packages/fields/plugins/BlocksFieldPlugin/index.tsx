@@ -220,7 +220,13 @@ const BlockListItem = ({
                   return
                 }
 
-                setExpanded(true)
+                cms.dispatch({
+                  type: 'forms:set-active-field-name',
+                  value: {
+                    formId: tinaForm.id,
+                    fieldName: `${field.name}.${index}`,
+                  },
+                })
                 setFocusedField({
                   id: tinaForm.id,
                   fieldName: `${field.name}.${index}`,
@@ -241,7 +247,7 @@ const BlockListItem = ({
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />
             )}
           </ItemHeader>
-          <FormPortal>
+          {/* <FormPortal>
             {({ zIndexShift }) => (
               <Panel
                 zIndexShift={zIndexShift}
@@ -255,7 +261,7 @@ const BlockListItem = ({
                 template={template}
               />
             )}
-          </FormPortal>
+          </FormPortal> */}
         </>
       )}
     </Draggable>

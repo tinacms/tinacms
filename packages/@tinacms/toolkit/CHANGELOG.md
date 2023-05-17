@@ -1,5 +1,21 @@
 # Change Log
 
+## 1.7.1
+
+### Patch Changes
+
+- eba7e5e5e: Simplify formify logic
+
+## 1.7.0
+
+### Minor Changes
+
+- eeedcfd30: Adds folder support in the admin. See [this PR](https://github.com/tinacms/tinacms/pull/3750) for more info and a demo.
+
+### Patch Changes
+
+- 804639965: Sets minimum width for SVG images
+
 ## 1.6.4
 
 ### Patch Changes
