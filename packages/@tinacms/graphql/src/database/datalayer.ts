@@ -14,7 +14,7 @@ import {
 } from './level'
 import { Collection } from '@tinacms/schema-tools'
 import path from 'path'
-import { normalizePath } from './utils'
+import { normalizePath } from './util'
 
 export enum OP {
   EQ = 'eq',
