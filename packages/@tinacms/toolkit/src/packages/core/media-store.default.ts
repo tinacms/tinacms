@@ -150,6 +150,7 @@ export class TinaMediaStore implements MediaStore {
         this.cms.api.tina.schema.schema?.config?.media?.tina || {}
       ).includes('publicFolder')
 
+    // Folder always has leading and trailing slashes
     let folder: string = hasTinaMedia
       ? this.cms.api.tina.schema.schema?.config?.media?.tina.mediaRoot
       : '/'
@@ -164,16 +165,31 @@ export class TinaMediaStore implements MediaStore {
 
     for (const item of media) {
       const { file, directory } = item
+      // Stripped directory does not have leading or trailing slashes
+      let strippedDirectory = directory
+      if (strippedDirectory.startsWith('/')) {
+        strippedDirectory = strippedDirectory.substr(1) || ''
+      }
+      if (strippedDirectory.endsWith('/')) {
+        strippedDirectory =
+          strippedDirectory.substr(0, strippedDirectory.length - 1) || ''
+      }
+
       const formData = new FormData()
       formData.append('file', file)
       formData.append('directory', directory)
       formData.append('filename', file.name)
 
-      const uploadPath = `${
-        directory ? `${directory}/${file.name}` : file.name
+      let uploadPath = `${
+        strippedDirectory ? `${strippedDirectory}/${file.name}` : file.name
       }`
+      if (uploadPath.startsWith('/')) {
+        uploadPath = uploadPath.substr(1)
+      }
       const filePath = `${
-        directory ? `${directory}${folder}${file.name}` : folder + file.name
+        strippedDirectory
+          ? `${folder}${strippedDirectory}/${file.name}`
+          : folder + file.name
       }`
       const res = await this.fetchFunction(`${this.url}/upload/${uploadPath}`, {
         method: 'POST',
@@ -193,6 +209,11 @@ export class TinaMediaStore implements MediaStore {
           filename: file.name,
           directory,
           src: filePath,
+          thumbnails: {
+            '75x75': filePath,
+            '400x400': filePath,
+            '1000x1000': filePath,
+          },
         }
 
         newFiles.push(parsedRes)

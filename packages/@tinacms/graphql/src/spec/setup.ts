@@ -40,6 +40,7 @@ export const setup = async (
   const setupDatabase = await createDatabase({
     bridge: setupBridge,
     level,
+    tinaDirectory: '.tina',
   })
   const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
     database: setupDatabase,
@@ -53,6 +54,7 @@ export const setup = async (
     // @ts-ignore
     bridge,
     level,
+    tinaDirectory: '.tina',
   })
   const schemaString = await database.getGraphQLSchemaFromBridge()
   // @ts-ignore

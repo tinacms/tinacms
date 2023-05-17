@@ -141,6 +141,8 @@ async function uploadMedia(
           : prefix + filename),
     })
   } catch (e) {
+    console.error('Error uploading media')
+    console.error(e)
     res.status(500).send(findErrorMessage(e))
   }
 }
@@ -218,6 +220,9 @@ async function listMedia(
       offset: response.NextMarker,
     })
   } catch (e) {
+    // Show the error to the user
+    console.error('Error listing media')
+    console.error(e)
     res.status(500)
     const message = findErrorMessage(e)
     res.json({ e: message })
@@ -254,6 +259,8 @@ async function deleteAsset(
     const data = await client.send(new DeleteObjectCommand(params))
     res.json(data)
   } catch (err) {
+    console.error('Error deleting media')
+    console.error(err)
     res.status(500).json({
       message: err.message || 'Something went wrong',
     })

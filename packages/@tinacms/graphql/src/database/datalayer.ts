@@ -14,6 +14,7 @@ import {
 } from './level'
 import { Collection } from '@tinacms/schema-tools'
 import path from 'path'
+import { normalizePath } from './util'
 
 export enum OP {
   EQ = 'eq',
@@ -655,7 +656,7 @@ export class FolderTreeBuilder {
   }
 
   update(documentPath: string, collectionPath: string) {
-    let folderPath = path.dirname(documentPath)
+    let folderPath = path.dirname(normalizePath(documentPath))
     if (folderPath === '.') {
       folderPath = ''
     }
@@ -673,7 +674,7 @@ export class FolderTreeBuilder {
         if (!this._tree[current]) {
           this._tree[current] = new Set<string>()
         }
-        this._tree[current].add(path.join(current, part))
+        this._tree[current].add(normalizePath(path.join(current, part)))
         parent.push(part)
       })
     const current = parent.join('/')

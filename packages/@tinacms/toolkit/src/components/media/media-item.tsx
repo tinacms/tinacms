@@ -9,7 +9,7 @@ import { BiFolder, BiFile } from 'react-icons/bi'
 import { isImage } from './utils'
 
 interface MediaItemProps {
-  item: Media
+  item: Media & { new?: boolean }
   onClick(_item: Media | false): void
   active: boolean
 }
@@ -19,7 +19,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   const thumbnail = (item.thumbnails || {})['75x75']
   return (
     <li
-      className={`flex shrink-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
+      className={`relative flex shrink-0 gap-3 items-center py-2 pl-2 pr-3 transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
         active
           ? 'bg-gradient-to-r from-white to-gray-50/50 text-blue-500 hover:bg-gray-50'
           : 'bg-white hover:bg-gray-50/50'
@@ -32,6 +32,11 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
         }
       }}
     >
+      {item.new && (
+        <span className="absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10">
+          NEW
+        </span>
+      )}
       <div className="w-20 h-20 bg-gray-50 shadow border border-gray-100 rounded overflow-hidden flex justify-center flex-shrink-0">
         {isImage(thumbnail) ? (
           <img
@@ -50,7 +55,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   )
 }
 
-export function GridMediaItem({ item, active, onClick }) {
+export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
   const thumbnail = (item.thumbnails || {})['400x400']
   return (
@@ -61,6 +66,11 @@ export function GridMediaItem({ item, active, onClick }) {
           : 'shadow hover:shadow-md hover:scale-103 hover:border-gray-150'
       } ${item.type === 'dir' ? 'cursor-pointer' : ''}`}
     >
+      {item.new && (
+        <span className="absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10">
+          NEW
+        </span>
+      )}
       <button
         className="absolute w-full h-full flex items-center justify-center bg-white"
         onClick={() => {
