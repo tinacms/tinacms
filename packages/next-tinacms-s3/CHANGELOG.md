@@ -1,5 +1,16 @@
 # next-tinacms-s3
 
+## 1.3.1
+
+### Patch Changes
+
+- 63dd98904: - Adds newly added images to the top of the list and selects them
+  - Adds a refresh button to the image list
+  - Fixes a bug where you could not upload images in a directory (Locally)
+  - Adds a new folder button to the media manager
+  - Logs error messages from the handlers so the user is aware of them (previously they were just swallowed and returned in the response message but this is harder to find)
+- 400a7fdeb: Add the `mediaRoot` option to the s3 media store
+
 ## 1.3.0
 
 ### Minor Changes
