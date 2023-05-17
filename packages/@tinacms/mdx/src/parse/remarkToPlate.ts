@@ -1,10 +1,4 @@
-/**
-
-
-
-*/
-
-import { flatten } from 'lodash-es'
+import flatten from 'lodash.flatten'
 import { directiveElement, mdxJsxElement as mdxJsxElementDefault } from './mdx'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'

@@ -1,12 +1,6 @@
 {
   "name": "root",
   "private": true,
-  "workspaces": [
-    "packages/@tinacms/*",
-    "examples/*",
-    "experimental-examples/*",
-    "packages/[^@]*"
-  ],
   "scripts": {
     "dev": "pnpm watch",
     "watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
@@ -30,8 +24,6 @@
   },
   "dependencies": {
     "@changesets/cli": "^2.26.0",
-    "@typescript-eslint/eslint-plugin": "^2.34.0",
-    "@typescript-eslint/parser": "5.15.0",
     "@yarnpkg/pnpify": "^2.4.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.15.0",

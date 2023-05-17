@@ -11,13 +11,12 @@
     "next": "12.2.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-is": "^17.0.2",
     "tinacms": "workspace:*"
   },
   "devDependencies": {
     "@tinacms/cli": "workspace:*",
     "eslint": "7",
-    "eslint-config-next": "13.2.1"
-  },
-  "version": null
+    "eslint-config-next": "13.2.1",
+    "typescript": "^4.8.3"
+  }
 }

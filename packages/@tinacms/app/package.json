@@ -15,7 +15,7 @@
     "@monaco-editor/react": "4.4.5",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/toolkit": "workspace:*",
-    "@xstate/react": "3.0.0",
+    "@codemirror/language": "6.0.0",
     "final-form": "4.20.7",
     "graphiql": "^2.4.0",
     "graphql": "15.8.0",

@@ -38,7 +38,6 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^12.0.0",
-    "@testing-library/user-event": "^12.7.0",
     "@tinacms/scripts": "workspace:*",
     "@types/atob": "^2.1.2",
     "@types/codemirror": "^0.0.71",
@@ -56,7 +55,6 @@
     "jest": "^27.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-is": "^17.0.2",
     "tslib": "^2.3.0",
     "typescript": "4.3.5"
   },
@@ -93,6 +91,7 @@
     "react-final-form": "^6.3.0",
     "react-icons": "^4.3.1",
     "react-onclickoutside": "^6.12.2",
+    "scheduler": "^0.23.0",
     "slate": "^0.81.1",
     "slate-history": "^0.66.0",
     "slate-hyperscript": "^0.77.0",
@@ -101,8 +100,7 @@
   },
   "peerDependencies": {
     "react": ">=16.14",
-    "react-dom": ">=16.14",
-    "react-is": ">=16.14.0"
+    "react-dom": ">=16.14"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }

@@ -4,9 +4,6 @@ import { Prism } from 'tinacms/dist/rich-text/prism'
 import { tinaField } from 'tinacms/dist/react'
 import { Explorer2 } from './explorer'
 
-// react-json-view assumes global.document exists
-const ReactJson = React.lazy(() => import('react-json-view'))
-
 export function Json(props: { src: object }) {
   const [isClient, setIsClient] = useState(false)
 
