@@ -161,7 +161,11 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const animationProps = getAnimationProps(animateStatus)
 
   return (
-    <FinalForm form={tinaForm.finalForm} onSubmit={tinaForm.onSubmit}>
+    <FinalForm
+      key={tinaForm.id}
+      form={tinaForm.finalForm}
+      onSubmit={tinaForm.onSubmit}
+    >
       {({
         handleSubmit,
         pristine,
@@ -192,7 +196,11 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                   id={tinaForm.id}
                 >
                   {tinaForm && tinaForm.fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={fieldGroup.fields} />
+                    <FieldsBuilder
+                      form={tinaForm}
+                      activeFieldName={form.activeFieldName}
+                      fields={fieldGroup.fields}
+                    />
                   ) : (
                     <NoFieldsPlaceholder />
                   )}

@@ -1,10 +1,7 @@
-**/*.mdx
-**/*.md
 **/*.gql
 **/*.json
 __generated__
 
-packages/**/*.md
 **/*/admin/**/*.js
 .yarn
 .pnp.js

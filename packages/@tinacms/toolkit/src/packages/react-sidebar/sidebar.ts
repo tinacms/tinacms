@@ -33,6 +33,7 @@ export declare type DefaultSidebarState = 'open' | 'closed'
 export class SidebarState {
   private _isOpen: boolean = false
   placeholder: React.FC
+  defaultState: DefaultSidebarState
 
   position: SidebarPosition = 'displace'
   renderNav: boolean = true

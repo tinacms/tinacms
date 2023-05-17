@@ -1,7 +1,7 @@
 import React from 'react'
 import * as G from 'graphql'
 import { getIn } from 'final-form'
-import { z, ZodError } from 'zod'
+import { z } from 'zod'
 // @ts-expect-error
 import schemaJson from 'SCHEMA_IMPORT'
 import { expandQuery, isConnectionType, isNodeType } from './expand-query'
@@ -25,9 +25,10 @@ import type {
   PostMessage,
   Payload,
   SystemInfo,
-  Document,
   ResolvedDocument,
 } from './types'
+import { getFormAndFieldNameFromMetadata } from './util'
+import { useSearchParams } from 'react-router-dom'
 
 const sysSchema = z.object({
   breadcrumbs: z.array(z.string()),
@@ -57,6 +58,50 @@ const astNode = schemaJson as G.DocumentNode
 const astNodeWithMeta: G.DocumentNode = {
   ...astNode,
   definitions: astNode.definitions.map((def) => {
+    if (def.kind === 'InterfaceTypeDefinition') {
+      return {
+        ...def,
+        fields: [
+          ...(def.fields || []),
+          {
+            kind: 'FieldDefinition',
+            name: {
+              kind: 'Name',
+              value: '_tina_metadata',
+            },
+            arguments: [],
+            type: {
+              kind: 'NonNullType',
+              type: {
+                kind: 'NamedType',
+                name: {
+                  kind: 'Name',
+                  value: 'JSON',
+                },
+              },
+            },
+          },
+          {
+            kind: 'FieldDefinition',
+            name: {
+              kind: 'Name',
+              value: '_content_source',
+            },
+            arguments: [],
+            type: {
+              kind: 'NonNullType',
+              type: {
+                kind: 'NamedType',
+                name: {
+                  kind: 'Name',
+                  value: 'JSON',
+                },
+              },
+            },
+          },
+        ],
+      }
+    }
     if (def.kind === 'ObjectTypeDefinition') {
       return {
         ...def,
@@ -67,6 +112,24 @@ const astNodeWithMeta: G.DocumentNode = {
             name: {
               kind: 'Name',
               value: '_tina_metadata',
+            },
+            arguments: [],
+            type: {
+              kind: 'NonNullType',
+              type: {
+                kind: 'NamedType',
+                name: {
+                  kind: 'Name',
+                  value: 'JSON',
+                },
+              },
+            },
+          },
+          {
+            kind: 'FieldDefinition',
+            name: {
+              kind: 'Name',
+              value: '_content_source',
             },
             arguments: [],
             type: {
@@ -96,6 +159,18 @@ export const useGraphQLReducer = (
   const cms = useCMS()
   const tinaSchema = cms.api.tina.schema as TinaSchema
   const [payloads, setPayloads] = React.useState<Payload[]>([])
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [results, setResults] = React.useState<
+    {
+      id: string
+      data:
+        | {
+            [key: string]: any
+          }
+        | null
+        | undefined
+    }[]
+  >([])
   const [documentsToResolve, setDocumentsToResolve] = React.useState<string[]>(
     []
   )
@@ -145,7 +220,7 @@ export const useGraphQLReducer = (
         setPayloads(updatedPayloads)
       })
     }
-  }, [payloads.map(({ id }) => id).join('.'), cms])
+  }, [JSON.stringify(payloads), cms])
 
   const processPayload = React.useCallback(
     (payload: Payload) => {
@@ -192,6 +267,13 @@ export const useGraphQLReducer = (
           if (fieldName === '_values') {
             return source._internalValues
           }
+          if (info.fieldName === '_content_source') {
+            const pathArray = G.responsePathAsArray(info.path)
+            return {
+              queryId: payload.id,
+              path: pathArray.slice(0, pathArray.length - 1),
+            }
+          }
           if (info.fieldName === '_tina_metadata') {
             if (value) {
               return value
@@ -201,6 +283,7 @@ export const useGraphQLReducer = (
             return {
               id: null,
               fields: [],
+              prefix: '',
             }
           }
           if (isConnectionType(info.returnType)) {
@@ -271,13 +354,9 @@ export const useGraphQLReducer = (
                 return pathString.startsWith(item.path)
               }
             })
-            let parent = ancestors[ancestors.length - 1]
+            const parent = ancestors[ancestors.length - 1]
             if (parent) {
               if (parent.type === 'document') {
-                // console.log(
-                //   'its a parent',
-                //   JSON.stringify({ id, value, pathString, parent }, null, 2)
-                // )
                 parent.subItems.push({
                   type: 'document',
                   path: pathString,
@@ -307,7 +386,12 @@ export const useGraphQLReducer = (
                 },
                 { values: true }
               )
-              return resolveDocument(resolvedDocument, template, form)
+              return resolveDocument(
+                resolvedDocument,
+                template,
+                form,
+                pathString
+              )
             } else {
               existingForm.tinaForm.addQuery(payload.id)
               const { template } = getTemplateForDocument(
@@ -318,7 +402,8 @@ export const useGraphQLReducer = (
               return resolveDocument(
                 resolvedDocument,
                 template,
-                existingForm.tinaForm
+                existingForm.tinaForm,
+                pathString
               )
             }
           }
@@ -344,6 +429,32 @@ export const useGraphQLReducer = (
           }
         })
       } else {
+        if (result.data) {
+          setResults((results) => [
+            ...results.filter((result) => result.id !== payload.id),
+            { id: payload.id, data: result.data },
+          ])
+        }
+        const activeField = searchParams.get('active-field')
+        if (activeField) {
+          setSearchParams({})
+          const [queryId, eventFieldName] = activeField.split('---')
+          if (queryId === payload.id) {
+            if (result?.data) {
+              cms.dispatch({
+                type: 'forms:set-active-field-name',
+                value: getFormAndFieldNameFromMetadata(
+                  result.data,
+                  eventFieldName
+                ),
+              })
+            }
+            cms.dispatch({
+              type: 'sidebar:set-display-state',
+              value: 'openOrFull',
+            })
+          }
+        }
         iframe.current?.contentWindow?.postMessage({
           type: 'updateData',
           id: payload.id,
@@ -363,24 +474,44 @@ export const useGraphQLReducer = (
     [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
   )
 
-  const notifyEditMode = React.useCallback(
+  const handleMessage = React.useCallback(
     (event: MessageEvent<PostMessage>) => {
+      if (event?.data?.type === 'quick-edit') {
+        cms.dispatch({
+          type: 'set-quick-editing-supported',
+          value: event.data.value,
+        })
+        iframe.current?.contentWindow?.postMessage({
+          type: 'quickEditEnabled',
+          value: cms.state.sidebarDisplayState === 'open',
+        })
+      }
       if (event?.data?.type === 'isEditMode') {
         iframe?.current?.contentWindow?.postMessage({
           type: 'tina:editMode',
         })
       }
-    },
-    []
-  )
-  const handleOpenClose = React.useCallback(
-    (event: MessageEvent<PostMessage>) => {
+      if (event.data.type === 'field:selected') {
+        const [queryId, eventFieldName] = event.data.fieldName.split('---')
+        const result = results.find((res) => res.id === queryId)
+        if (result?.data) {
+          cms.dispatch({
+            type: 'forms:set-active-field-name',
+            value: getFormAndFieldNameFromMetadata(result.data, eventFieldName),
+          })
+        }
+        cms.dispatch({
+          type: 'sidebar:set-display-state',
+          value: 'openOrFull',
+        })
+      }
       if (event.data.type === 'close') {
         const payloadSchema = z.object({ id: z.string() })
         const { id } = payloadSchema.parse(event.data)
         setPayloads((previous) =>
           previous.filter((payload) => payload.id !== id)
         )
+        setResults((previous) => previous.filter((result) => result.id !== id))
         cms.forms.all().map((form) => {
           form.removeQuery(id)
         })
@@ -401,7 +532,7 @@ export const useGraphQLReducer = (
         ])
       }
     },
-    [cms]
+    [cms, JSON.stringify(results)]
   )
 
   React.useEffect(() => {
@@ -415,23 +546,31 @@ export const useGraphQLReducer = (
   React.useEffect(() => {
     return () => {
       setPayloads([])
+      setResults([])
       cms.removeAllForms()
       cms.dispatch({ type: 'form-lists:clear' })
     }
   }, [url])
 
   React.useEffect(() => {
+    iframe.current?.contentWindow?.postMessage({
+      type: 'quickEditEnabled',
+      value: cms.state.sidebarDisplayState === 'open',
+    })
+  }, [cms.state.sidebarDisplayState])
+
+  React.useEffect(() => {
+    cms.dispatch({ type: 'set-edit-mode', value: 'visual' })
     if (iframe) {
-      window.addEventListener('message', handleOpenClose)
-      window.addEventListener('message', notifyEditMode)
+      window.addEventListener('message', handleMessage)
     }
 
     return () => {
-      window.removeEventListener('message', handleOpenClose)
-      window.removeEventListener('message', notifyEditMode)
+      window.removeEventListener('message', handleMessage)
       cms.removeAllForms()
+      cms.dispatch({ type: 'set-edit-mode', value: 'basic' })
     }
-  }, [iframe.current])
+  }, [iframe.current, JSON.stringify(results)])
 }
 
 const onSubmit = async (
@@ -469,7 +608,8 @@ type Path = (string | number)[]
 const resolveDocument = (
   doc: ResolvedDocument,
   template: Template<true>,
-  form: Form
+  form: Form,
+  pathToDocument: string
 ): ResolvedDocument => {
   // @ts-ignore AnyField and TinaField don't mix
   const fields = form.fields as TinaField<true>[]
@@ -480,6 +620,7 @@ const resolveDocument = (
     values: form.values,
     path,
     id,
+    pathToDocument,
   })
   const metadataFields: Record<string, string> = {}
   Object.keys(formValues).forEach((key) => {
@@ -492,7 +633,9 @@ const resolveDocument = (
     sys: doc._internalSys,
     values: form.values,
     _tina_metadata: {
+      prefix: pathToDocument,
       id: doc._internalSys.path,
+      name: '',
       fields: metadataFields,
     },
     _internalSys: doc._internalSys,
@@ -506,12 +649,14 @@ const resolveFormValue = <T extends Record<string, unknown>>({
   values,
   path,
   id,
+  pathToDocument,
 }: // tinaSchema,
 {
   fields: TinaField<true>[]
   values: T
   path: Path
   id: string
+  pathToDocument: string
   // tinaSchema: TinaSchema
 }): T & { __typename?: string } => {
   const accum: Record<string, unknown> = {}
@@ -528,6 +673,7 @@ const resolveFormValue = <T extends Record<string, unknown>>({
       value: v,
       path,
       id,
+      pathToDocument,
     })
   })
   return accum as T & { __typename?: string }
@@ -537,11 +683,13 @@ const resolveFieldValue = ({
   value,
   path,
   id,
+  pathToDocument,
 }: {
   field: TinaField<true>
   value: unknown
   path: Path
   id: string
+  pathToDocument: string
 }) => {
   switch (field.type) {
     case 'object': {
@@ -562,13 +710,16 @@ const resolveFieldValue = ({
                 __typename: NAMER.dataTypeName(template.namespace),
                 _tina_metadata: {
                   id,
+                  name: nextPath.join('.'),
                   fields: metadataFields,
+                  prefix: pathToDocument,
                 },
                 ...resolveFormValue({
                   fields: template.fields,
                   values: item,
                   path: nextPath,
                   id,
+                  pathToDocument,
                 }),
               }
             })
@@ -597,13 +748,16 @@ const resolveFieldValue = ({
               __typename: NAMER.dataTypeName(field.namespace),
               _tina_metadata: {
                 id,
+                name: nextPath.join('.'),
                 fields: metadataFields,
+                prefix: pathToDocument,
               },
               ...resolveFormValue({
                 fields: templateFields,
                 values: item,
-                path,
+                path: nextPath,
                 id,
+                pathToDocument,
               }),
             }
           })
@@ -618,13 +772,16 @@ const resolveFieldValue = ({
           __typename: NAMER.dataTypeName(field.namespace),
           _tina_metadata: {
             id,
+            name: nextPath.join('.'),
             fields: metadataFields,
+            prefix: pathToDocument,
           },
           ...resolveFormValue({
             fields: templateFields,
             values: value as any,
-            path,
+            path: nextPath,
             id,
+            pathToDocument,
           }),
         }
       }
@@ -687,7 +844,7 @@ const expandPayload = async (payload: Payload, cms: TinaCMS) => {
     documentNode,
   })
   const expandedQueryForResolver = G.print(expandedDocumentNodeForResolver)
-  return { ...payload, expandQuery, expandedData, expandedQueryForResolver }
+  return { ...payload, expandedQuery, expandedData, expandedQueryForResolver }
 }
 
 /**

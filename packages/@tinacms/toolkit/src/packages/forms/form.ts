@@ -417,6 +417,21 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             }
           }
         }
+      } else {
+        const fieldName = [...namePath.slice(0, namePathIndex)].join('.')
+        if (!fieldName) {
+          return formOrObjectField
+        }
+        return {
+          ...formOrObjectField,
+          name: fieldName,
+          fields: formOrObjectField.fields.map((field) => {
+            return {
+              ...field,
+              name: [fieldName, field.name].join('.'),
+            }
+          }),
+        }
       }
     }
   }

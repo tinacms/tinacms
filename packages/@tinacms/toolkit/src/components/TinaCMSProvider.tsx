@@ -21,7 +21,7 @@ export const TinaCMSProvider: React.FC<TinaCMSProviderProps> = ({
   cms,
   children,
 }) => {
-  const [state, dispatch] = React.useReducer(tinaReducer, initialState)
+  const [state, dispatch] = React.useReducer(tinaReducer, cms, initialState)
   if (!(cms instanceof TinaCMS)) {
     throw new Error(INVALID_CMS_ERROR)
   }

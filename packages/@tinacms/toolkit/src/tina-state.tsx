@@ -1,4 +1,5 @@
 import { Form } from './react-tinacms'
+import { TinaCMS } from './tina-cms'
 
 type FormListItem =
   | {
@@ -56,6 +57,24 @@ export type TinaAction =
   | {
       type: 'increment-operation-index'
     }
+  | {
+      type: 'set-quick-editing-supported'
+      value: boolean
+    }
+  | {
+      type: 'set-quick-editing-enabled'
+      value?: boolean
+    }
+  | {
+      type: 'toggle-quick-editing-enabled'
+    }
+  | {
+      type: 'toggle-edit-state'
+    }
+  | {
+      type: 'sidebar:set-display-state'
+      value: TinaState['sidebarDisplayState'] | 'openOrFull'
+    }
 
 export interface TinaState {
   activeFormId: string | null
@@ -71,18 +90,29 @@ export interface TinaState {
   forms: { activeFieldName?: string | null; tinaForm: Form }[]
   formLists: FormList[]
   editingMode: 'visual' | 'basic'
+  quickEditSupported: boolean
+  sidebarDisplayState: 'closed' | 'open' | 'fullscreen'
 }
 
-export const initialState: TinaState = {
-  activeFormId: null,
-  forms: [],
-  formLists: [],
-  editingMode: 'basic',
+export const initialState = (cms: TinaCMS): TinaState => {
+  return {
+    activeFormId: null,
+    forms: [],
+    formLists: [],
+    editingMode: 'basic',
+    quickEditSupported: false,
+    sidebarDisplayState: cms?.sidebar?.defaultState || 'open',
+  }
 }
 
 // Our reducer function that uses a switch statement to handle our actions
 export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
   switch (action.type) {
+    case 'set-quick-editing-supported':
+      return {
+        ...state,
+        quickEditSupported: action.value,
+      }
     case 'set-edit-mode':
       return { ...state, editingMode: action.value }
     case 'forms:add':
@@ -96,13 +126,26 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         forms: state.forms.filter((form) => form.tinaForm.id !== action.value),
       }
     case 'form-lists:clear': {
-      return { ...state, formLists: [], forms: [] }
+      return {
+        ...state,
+        quickEditSupported: false,
+        formLists: [],
+        forms: [],
+      }
     }
     case 'form-lists:add': {
-      const nextFormLists = [
-        ...state.formLists.filter(({ id }) => id !== action.value.id),
-        action.value,
-      ]
+      let formListItemExists = false
+      const nextFormLists = state.formLists.map((formList) => {
+        if (formList.id === action.value.id) {
+          formListItemExists = true
+          return action.value
+        }
+        return formList
+      })
+
+      if (!formListItemExists) {
+        nextFormLists.push(action.value)
+      }
 
       let activeFormId = state.activeFormId
       if (!activeFormId && state.formLists.length === 0) {
@@ -138,6 +181,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
 
       return {
         ...state,
+        quickEditSupported: false,
         // Always set it to null for now, this will become more annoying for users
         // when `useTina` hooks are mounting client-side as a result of the app itself
         // rather than route navigation
@@ -164,7 +208,35 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         }
         return form
       })
-      return { ...state, forms }
+      return { ...state, forms, activeFormId: action.value.formId }
+    case 'toggle-edit-state': {
+      return state.sidebarDisplayState === 'closed'
+        ? { ...state, sidebarDisplayState: 'open' }
+        : {
+            ...state,
+            sidebarDisplayState: 'closed',
+          }
+    }
+    case 'sidebar:set-display-state': {
+      // In some cases, you may only care that the sidebar is open, regardless
+      // whether it's "open" or "full"
+      if (action.value === 'openOrFull') {
+        if (state.sidebarDisplayState === 'closed') {
+          return {
+            ...state,
+            sidebarDisplayState: 'open',
+          }
+        }
+        return state
+      }
+      if (action.value === 'open') {
+        return {
+          ...state,
+          sidebarDisplayState: action.value,
+        }
+      }
+      return { ...state, sidebarDisplayState: action.value }
+    }
     default:
       throw new Error(`Unhandled action ${action.type}`)
       return state

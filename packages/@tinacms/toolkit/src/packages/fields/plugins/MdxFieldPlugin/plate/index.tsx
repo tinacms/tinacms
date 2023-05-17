@@ -53,9 +53,26 @@ export const RichEditor = (props: RichTextType) => {
   const withToolbar = true
   const tempId = [props.tinaForm.id, props.input.name].join('.')
   const id = React.useMemo(() => uuid() + tempId, [tempId])
+  const ref = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    if (ref.current) {
+      setTimeout(() => {
+        // Slate/Plate doesn't expose it's underlying element
+        // as a ref, so we need to query for it ourselves
+        const plateElement = ref.current.querySelector(
+          '[role="textbox"]'
+        ) as HTMLElement
+        if (props.field.experimental_focusIntent && plateElement) {
+          if (plateElement) plateElement.focus()
+        }
+        // Slate takes a second to mount
+      }, 100)
+    }
+  }, [props.field.experimental_focusIntent, ref])
 
   return (
-    <div className={withToolbar ? 'with-toolbar' : ''}>
+    <div ref={ref} className={withToolbar ? 'with-toolbar' : ''}>
       <Plate
         id={id}
         initialValue={initialValue}
