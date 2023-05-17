@@ -427,13 +427,8 @@ mutation addPendingDocumentMutation(
     return json.data as ReturnType
   }
 
-  async syncTinaMedia(): Promise<{ assetsSyncing: string[] }> {
-    const res = await this.fetchWithToken(
-      `${this.contentApiBase}/assets/${this.clientId}/sync/${this.branch}`,
-      { method: 'POST' }
-    )
-    const jsonRes = await res.json()
-    return jsonRes
+  get appDashboardLink() {
+    return `${this.frontendUrl}/projects/${this.clientId}`
   }
 
   async checkSyncStatus({
@@ -496,6 +491,16 @@ mutation addPendingDocumentMutation(
         .join('')
     )
     return JSON.parse(jsonPayload)
+  }
+
+  async getProject() {
+    const res = await this.fetchWithToken(
+      `${this.contentApiBase}/projects/${this.clientId}`,
+      {
+        method: 'GET',
+      }
+    )
+    return res.json()
   }
 
   async getRefreshedToken(tokens: string): Promise<TokenObject> {

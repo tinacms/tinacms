@@ -36,41 +36,8 @@ import {
   dropzoneAcceptFromString,
   isImage,
 } from './utils'
-import { DeleteModal, SyncModal } from './modal'
+import { DeleteModal } from './modal'
 import { CopyField } from './copy-field'
-
-// taken from https://davidwalsh.name/javascript-polling
-async function poll(
-  fn: () => Promise<{
-    complete: boolean
-    status: {
-      [key: string]: boolean
-    }
-  }>,
-  timeout,
-  interval
-) {
-  const endTime = Number(new Date()) + (timeout || 2000)
-  interval = interval || 100
-
-  const checkCondition = async function (resolve, reject) {
-    // If the condition is met, we're done!
-    const result = await fn()
-    if (result.complete) {
-      resolve(result)
-    }
-    // If the condition isn't met but the timeout hasn't elapsed, go again
-    else if (Number(new Date()) < endTime) {
-      setTimeout(checkCondition, interval, resolve, reject)
-    }
-    // Didn't match and too much time, reject!
-    else {
-      reject(new Error('Time out error'))
-    }
-  }
-
-  return new Promise(checkCondition)
-}
 
 // Can not use path.join on the frontend
 const join = function (...parts) {
@@ -109,6 +76,8 @@ export function MediaManager() {
   const cms = useCMS()
 
   const [request, setRequest] = useState<MediaRequest | undefined>()
+
+  const [needsTinaSync, setNeedsTinaSync] = useState<boolean>()
 
   useEffect(() => {
     return cms.events.subscribe('media:open', ({ type, ...request }) => {
@@ -173,8 +142,6 @@ export function MediaPicker({
     nextOffset: undefined,
   })
 
-  const [showSync, setShowSync] = useState(false)
-
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeItem, setActiveItem] = useState<Media | false>(false)
   const closePreview = () => setActiveItem(false)
@@ -197,23 +164,6 @@ export function MediaPicker({
   }
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
-
-  const isLocal = cms.api.tina.isLocalMode
-
-  const hasTinaMedia =
-    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
-      'mediaRoot'
-    ) &&
-    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
-      'publicFolder'
-    )
-  const folder = hasTinaMedia
-    ? join(
-        cms.api.tina.schema.schema?.config?.media?.tina.publicFolder,
-        cms.api.tina.schema.schema?.config?.media?.tina.mediaRoot
-      )
-    : ''
-  const branch = cms.api.tina?.branch
 
   function loadMedia() {
     setListState('loading')
@@ -346,53 +296,6 @@ export function MediaPicker({
     },
   })
 
-  const syncMedia = async () => {
-    if (hasTinaMedia) {
-      const res = await cms.api.tina.syncTinaMedia()
-      if (res?.assetsSyncing) {
-        // it was successful
-        try {
-          setListState('loading')
-          // poll every 3 seconds until it is done
-          await poll(
-            async () => {
-              const status = await cms.api.tina.checkSyncStatus({
-                assetsSyncing: res.assetsSyncing,
-              })
-              const totalDone = Object.values(status.status).filter(
-                Boolean
-              )?.length
-              const total = Object.keys(status.status)?.length
-              setLoadingText(`${totalDone}/${total} Media items loaded`)
-              return status
-            },
-            // Will time out after 60 seconds
-            60000,
-            3000
-          )
-          setLoadingText('')
-          // refresh the media
-          loadMedia()
-        } catch (e) {
-          cms.alerts.error(
-            'Error in syncing media, check console for more details'
-          )
-          console.error("'Error in syncing media, check below for more details")
-          console.error(e)
-        }
-      } else {
-        // it was not
-        cms.alerts.warn(
-          'Whoops, Looks media is not set up correctly in Tina Cloud. Check console for more details'
-        )
-        console.warn(
-          'Whoops, Looks media is not set up correctly. Check below for more details'
-        )
-        console.warn(res)
-      }
-    }
-  }
-
   const { onClick, ...rootProps } = getRootProps()
 
   function disableScrollBody() {
@@ -445,18 +348,6 @@ export function MediaPicker({
           <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
 
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
-          {!isLocal && hasTinaMedia && (
-            <Button
-              // this button is only displayed when the data is not loading
-              busy={false}
-              variant="white"
-              onClick={() => {
-                setShowSync(true)
-              }}
-            >
-              Sync <IoMdSync className="w-6 h-full ml-2 opacity-70" />
-            </Button>
-          )}
           <UploadButton onClick={onClick} uploading={uploading} />
         </div>
 
@@ -477,7 +368,7 @@ export function MediaPicker({
               <input {...getInputProps()} />
 
               {listState === 'loaded' && list.items.length === 0 && (
-                <EmptyMediaList hasTinaMedia={hasTinaMedia} />
+                <EmptyMediaList />
               )}
 
               {viewMode === 'list' &&
@@ -522,16 +413,6 @@ export function MediaPicker({
           />
         </div>
       </MediaPickerWrap>
-      {showSync && (
-        <SyncModal
-          folder={folder}
-          branch={branch}
-          syncFunc={syncMedia}
-          close={() => {
-            setShowSync(false)
-          }}
-        />
-      )}
     </>
   )
 }
@@ -656,12 +537,46 @@ const MediaPickerWrap = ({ children }) => {
   )
 }
 
-const EmptyMediaList = (props) => {
+const EmptyMediaList = () => {
+  const cms = useCMS()
+  const isLocal = cms.api.tina.isLocalMode
+
+  const hasTinaMedia =
+    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
+      'mediaRoot'
+    ) &&
+    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
+      'publicFolder'
+    )
+
+  const [syncStatus, setSyncStatus] = useState<
+    'loading' | 'synced' | 'needs-sync'
+  >(hasTinaMedia && !isLocal ? 'loading' : 'synced')
+
+  useEffect(() => {
+    const checkSyncStatus = async () => {
+      const project = await cms.api.tina.getProject({})
+      setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
+    }
+    if (!isLocal && hasTinaMedia) {
+      checkSyncStatus()
+    }
+  }, [])
+
   return (
-    <div className={`p-12 text-xl opacity-50 text-center`} {...props}>
-      Drag and drop assets here
-      {props.hasTinaMedia &&
-        " or click 'Sync' to sync your media to Tina Cloud."}
+    <div className={`p-12 text-xl opacity-50 text-center`}>
+      {syncStatus === 'loading' && 'Loading...'}
+      {syncStatus === 'needs-sync' && (
+        <>
+          <span>
+            Media needs to be turned on for this project. Sync your media in{' '}
+            <a target="_blank" href={`${cms.api.tina.appDashboardLink}/media`}>
+              Tina Cloud.
+            </a>
+          </span>
+        </>
+      )}
+      {syncStatus === 'synced' && 'Drag and drop assets here'}
     </div>
   )
 }
