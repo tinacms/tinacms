@@ -9,6 +9,7 @@ import type { DatetimepickerProps } from 'react-datetime'
 import { format, parse, DEFAULT_DATE_DISPLAY_FORMAT } from './dateFormat'
 // @ts-ignore importing css is not recognized
 import DateFieldPluginCSS from './DateFieldPlugin.css'
+import { Field } from '../../forms'
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field: { dateFormat, timeFormat, ...rest } }) => {
@@ -28,7 +29,9 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   }
 )
 
-export const ReactDateTimeWithStyles = (props: DatetimepickerProps) => {
+export const ReactDateTimeWithStyles = (
+  props: DatetimepickerProps & Partial<Field>
+) => {
   const [isOpen, setIsOpen] = useState(false)
   const area = useRef<HTMLDivElement>(null!)
 
@@ -48,6 +51,22 @@ export const ReactDateTimeWithStyles = (props: DatetimepickerProps) => {
       document.removeEventListener('mouseup', handleClick, false)
     }
   }, [document])
+
+  React.useEffect(() => {
+    if (area.current) {
+      setTimeout(() => {
+        // ReactDateTime doesn't expose it's underlying element
+        // as a ref, so we need to query for it ourselves
+        const plateElement = area.current.querySelector(
+          'input[type="text"]'
+        ) as HTMLElement
+        if (props.experimental_focusIntent && plateElement) {
+          if (plateElement) plateElement.focus()
+        }
+        // ReactDateTime takes a second to mount
+      }, 100)
+    }
+  }, [props.experimental_focusIntent, area])
 
   return (
     <>

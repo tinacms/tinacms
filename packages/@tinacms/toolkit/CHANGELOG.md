@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.7.2
+
+### Patch Changes
+
+- 63dd98904: - Adds newly added images to the top of the list and selects them
+  - Adds a refresh button to the image list
+  - Fixes a bug where you could not upload images in a directory (Locally)
+  - Adds a new folder button to the media manager
+  - Logs error messages from the handlers so the user is aware of them (previously they were just swallowed and returned in the response message but this is harder to find)
+- b3d98d159: Add array check for value.children
+- 7f95c1ce5: Reorganize the way fields are presented on the form to allow for deep-linking
+
 ## 1.7.1
 
 ### Patch Changes

@@ -13,12 +13,20 @@ interface ExtraProps {
   disabled?: boolean
 }
 export const TextField = wrapFieldsWithMeta<{}, InputProps & ExtraProps>(
-  ({ input, field }) => {
+  (props) => {
+    const ref = React.useRef(null)
+    React.useEffect(() => {
+      if (ref.current && props.field.experimental_focusIntent) {
+        ref.current.focus()
+      }
+    }, [props.field.experimental_focusIntent, ref])
+
     return (
       <BaseTextField
-        {...input}
-        disabled={field?.disabled ?? false}
-        placeholder={field.placeholder}
+        {...props.input}
+        ref={ref}
+        disabled={props.field?.disabled ?? false}
+        placeholder={props.field.placeholder}
       />
     )
   }

@@ -15,12 +15,16 @@ export interface TextAreaProps extends a {
   ref?: any
 }
 
-export const TextArea = ({ ...props }) => {
+export const TextArea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.ComponentProps<'textarea'>
+>(({ ...props }, ref) => {
   return (
     <textarea
-      className="shadow-inner text-base px-3 py-2 text-gray-600 resize-y focus:shadow-outline focus:border-blue-500 block w-full border border-gray-200 focus:text-gray-900 rounded-md"
       {...props}
+      className="shadow-inner text-base px-3 py-2 text-gray-600 resize-y focus:shadow-outline focus:border-blue-500 block w-full border border-gray-200 focus:text-gray-900 rounded-md"
+      ref={ref}
       style={{ minHeight: '160px' }}
     />
   )
-}
+})

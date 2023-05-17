@@ -1,5 +1,6 @@
 import React from 'react'
 import type { TinaMarkdownContent } from 'tinacms/dist/rich-text'
+import { tinaField } from 'tinacms/dist/react'
 
 type RenderValue = (args: {
   value: unknown
@@ -76,7 +77,7 @@ const UnknownRenderer = ({
         // 'id',
         '_sys',
         '__typename',
-        '__meta__',
+        // '_tina_metadata',
         '_internalValues',
         '_internalSys',
       ].includes(keyName)
@@ -125,7 +126,10 @@ const UnknownRenderer = ({
             {keyName}: {!expanded && '{...}'}
           </button>
           {/* @ts-ignore */}
-          <div>{expanded && renderRichText({ value })}</div>
+          <div>
+            {expanded &&
+              renderRichText({ value, keyName, parentValue, parentKeyName })}
+          </div>
         </div>
       )
     }
@@ -195,6 +199,11 @@ const ObjectRenderer = ({
       </div>
     )
   } else {
+    const fieldName = tinaField(v)
+    const extraProps = {}
+    if (fieldName !== 'undefined#undefined') {
+      extraProps['data-tina-field'] = fieldName
+    }
     return (
       <div>
         <div className="flex justify-between">
@@ -218,7 +227,7 @@ const ObjectRenderer = ({
           )}
         </div>
         {expanded && (
-          <div className="pl-4">
+          <div className="pl-4" {...extraProps}>
             <ObjectValueRenderer
               value={v}
               parentValue={parentValue}

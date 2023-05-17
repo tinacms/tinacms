@@ -50,16 +50,11 @@ const StyledFile = ({ src }) => {
   )
 }
 
-export const ImageUpload = ({
-  onDrop,
-  onClear,
-  onClick,
-  value,
-  src,
-  loading,
-}: ImageUploadProps) => {
+export const ImageUpload = React.forwardRef<
+  HTMLButtonElement,
+  ImageUploadProps
+>(({ onDrop, onClear, onClick, value, src, loading }, ref) => {
   const cms = useCMS()
-
   const { getRootProps, getInputProps } = useDropzone({
     accept: dropzoneAcceptFromString(
       cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
@@ -80,8 +75,9 @@ export const ImageUpload = ({
             }`}
           >
             <button
-              className="outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
+              className="shadow-inner focus-within:shadow-outline focus-within:border-blue-500 outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
               onClick={onClick}
+              ref={ref}
             >
               {isImage(src) ? (
                 <StyledImage src={src} />
@@ -117,7 +113,7 @@ export const ImageUpload = ({
       )}
     </div>
   )
-}
+})
 
 export const DeleteImageButton = ({
   onClick,

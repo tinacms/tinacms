@@ -67,6 +67,13 @@ const addTypenameToDocument = (doc: G.DocumentNode) => {
   })
 }
 
+const CONTENT_SOURCE_FIELD: G.FieldNode = {
+  kind: G.Kind.FIELD,
+  name: {
+    kind: G.Kind.NAME,
+    value: '_content_source',
+  },
+}
 const METADATA_FIELD: G.FieldNode = {
   kind: G.Kind.FIELD,
   name: {
@@ -94,7 +101,11 @@ const addMetadataField = (
         selections: [],
       }),
       selections:
-        [...(node.selectionSet?.selections || []), METADATA_FIELD] || [],
+        [
+          ...(node.selectionSet?.selections || []),
+          METADATA_FIELD,
+          CONTENT_SOURCE_FIELD,
+        ] || [],
     },
   }
 }
