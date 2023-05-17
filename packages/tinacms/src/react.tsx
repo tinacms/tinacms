@@ -14,16 +14,9 @@ export function useTina<T extends object>(props: {
     [stringifiedQuery]
   )
   const [data, setData] = React.useState(props.data)
-  // const [data, setData] = React.useState(
-  //   preview?.quickEditEnabled ? addMetadata(id, props.data, []) : props.data
-  // )
   const [isClient, setIsClient] = React.useState(false)
   const [quickEditEnabled, setQuickEditEnabled] = React.useState(false)
   const [isInTinaIframe, setIsInTinaIframe] = React.useState(false)
-
-  // React.useEffect(() => {
-  //   setQuickEditEnabled(preview?.quickEditEnabled)
-  // }, [preview?.quickEditEnabled])
 
   React.useEffect(() => {
     setIsClient(true)

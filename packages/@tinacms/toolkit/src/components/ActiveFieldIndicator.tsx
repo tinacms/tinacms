@@ -11,7 +11,6 @@ import {
   FieldFocusEvent,
 } from '../packages/fields/field-events'
 import { useFieldReference } from '../hooks/use-field-reference'
-import { useCMS } from '../react-tinacms'
 
 const IndicatorWrap = ({ style = {}, position, ...props }) => (
   <div
@@ -111,7 +110,6 @@ const useScrollToFocusedField = () => {
 }
 
 export const ActiveFieldIndicator = () => {
-  const cms = useCMS()
   const [activeFieldName, setActiveFieldName] = React.useState<string | null>(
     null
   )
