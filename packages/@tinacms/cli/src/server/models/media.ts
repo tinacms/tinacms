@@ -55,7 +55,15 @@ export class MediaModel {
         args.searchPath
       )
       const searchPath = parseMediaFolder(args.searchPath)
-      const filesStr = await fs.readdir(folderPath)
+      let filesStr: string[] = []
+      try {
+        filesStr = await fs.readdir(folderPath)
+      } catch (error) {
+        return {
+          files: [],
+          directories: [],
+        }
+      }
       const filesProm: Promise<FileRes>[] = filesStr.map(async (file) => {
         const filePath = join(folderPath, file)
         const stat = await fs.stat(filePath)
