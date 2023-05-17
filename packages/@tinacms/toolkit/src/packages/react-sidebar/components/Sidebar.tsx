@@ -487,7 +487,7 @@ const SidebarHeader = ({
   )
 }
 
-const SidebarSiteLink = ({
+export const SidebarSiteLink = ({
   view,
   onClick,
 }: {

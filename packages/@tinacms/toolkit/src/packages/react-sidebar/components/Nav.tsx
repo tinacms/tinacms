@@ -6,10 +6,15 @@
 
 import * as React from 'react'
 import { BiExit } from 'react-icons/bi'
+import { MdOutlineSettings } from 'react-icons/md'
 import { FiMoreVertical, FiInfo } from 'react-icons/fi'
 import { VscNewFile } from 'react-icons/vsc'
 import { Menu, Transition } from '@headlessui/react'
-import { updateBodyDisplacement } from './Sidebar'
+import {
+  SidebarContext,
+  SidebarSiteLink,
+  updateBodyDisplacement,
+} from './Sidebar'
 import { FormModal } from '../../react-forms'
 import { useEditState } from '@tinacms/sharedctx'
 import type { ScreenPlugin } from '../../react-screens'
@@ -56,6 +61,7 @@ export const Nav = ({
   const cms = useCMS()
   const { setEdit } = useEditState()
   const [eventsOpen, setEventsOpen] = React.useState(false)
+  const { setMenuIsOpen } = React.useContext(SidebarContext)
 
   function closeEventsModal() {
     setEventsOpen(false)
@@ -178,7 +184,31 @@ export const Nav = ({
                   </li>
                 )
               })}
-
+              {cms.state.forms
+                .filter((f) => !!f.tinaForm.global)
+                .map((f) => {
+                  return (
+                    <li key={`nav-site-${f.tinaForm.label}`}>
+                      <SidebarSiteLink
+                        onClick={() => {
+                          setMenuIsOpen(false)
+                          cms.dispatch({
+                            type: 'forms:set-active-form-id',
+                            value: f.tinaForm.id,
+                          })
+                        }}
+                        view={{
+                          __type: 'screen',
+                          Icon: MdOutlineSettings,
+                          name: f.tinaForm.label,
+                          // These are just to satisfy the type constraints
+                          Component: () => null,
+                          layout: 'popup',
+                        }}
+                      />
+                    </li>
+                  )
+                })}
               {contentCreators.map((plugin, idx) => {
                 return (
                   <CreateContentNavItem key={`plugin-${idx}`} plugin={plugin} />
