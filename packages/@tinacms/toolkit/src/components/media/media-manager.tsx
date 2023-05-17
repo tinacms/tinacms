@@ -610,7 +610,7 @@ const EmptyMediaList = () => {
 
   useEffect(() => {
     const checkSyncStatus = async () => {
-      const project = await cms.api.tina.getProject({})
+      const project = await cms.api.tina.getProject()
       setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
     }
     if (!isLocal && hasTinaMedia) {

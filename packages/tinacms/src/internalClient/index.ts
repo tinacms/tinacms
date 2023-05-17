@@ -495,7 +495,7 @@ mutation addPendingDocumentMutation(
 
   async getProject() {
     const res = await this.fetchWithToken(
-      `${this.contentApiBase}/projects/${this.clientId}`,
+      `${this.identityApiUrl}/apps/${this.clientId}`,
       {
         method: 'GET',
       }
