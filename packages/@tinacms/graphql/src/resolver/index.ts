@@ -789,7 +789,9 @@ export class Resolver {
       case 'boolean':
       case 'number':
       case 'reference':
-        accumulator[field.name] = value
+        if (value) {
+          accumulator[field.name] = value
+        }
         break
       case 'image':
         accumulator[field.name] = resolveMediaRelativeToCloud(
