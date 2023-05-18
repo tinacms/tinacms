@@ -785,9 +785,9 @@ export class Resolver {
           accumulator[field.name] = value
         }
         break
+      case 'string':
       case 'boolean':
       case 'number':
-      case 'string':
         accumulator[field.name] = value
         break
       case 'reference':
