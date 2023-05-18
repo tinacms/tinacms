@@ -14,6 +14,11 @@ import {
 
 import gql from 'graphql-tag'
 import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
+import {
+  optionsToSearchIndexOptions,
+  parseSearchIndexResponse,
+  SearchClient,
+} from '@tinacms/search'
 
 export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
 
@@ -182,7 +187,6 @@ export class Client {
   schema?: TinaSchema
   clientId: string
   contentApiBase: string
-  query: string
   tinaGraphQLVersion: string
   setToken: (_token: TokenObject) => void
   private getToken: () => Promise<TokenObject>
@@ -297,6 +301,10 @@ export class Client {
     this.contentApiUrl =
       this.options.customContentApiUrl ||
       `${this.contentApiBase}/${this.tinaGraphQLVersion}/content/${this.options.clientId}/github/${encodedBranch}`
+  }
+
+  getBranch() {
+    return this.branch
   }
 
   addPendingContent = async (props) => {
@@ -769,5 +777,77 @@ export class LocalClient extends Client {
 
   async getUser(): Promise<boolean> {
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
+  }
+}
+
+export class TinaCMSSearchClient extends Client implements SearchClient {
+  async query(
+    query: string,
+    options?: {
+      limit?: number
+      cursor?: string
+    }
+  ): Promise<{
+    results: any[]
+    nextCursor: string | null
+    total: number
+    prevCursor: string | null
+  }> {
+    const opt = optionsToSearchIndexOptions(options)
+    const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
+    const res = await super.fetchWithToken(
+      `${this.contentApiBase}/searchIndex/${
+        this.clientId
+      }/${this.getBranch()}?q=${query}${optionsParam}`
+    )
+    return parseSearchIndexResponse(await res.json(), options)
+  }
+
+  del(ids: string[]): Promise<any> {
+    return Promise.resolve(undefined)
+  }
+
+  put(docs: any[]): Promise<any> {
+    return Promise.resolve(undefined)
+  }
+
+  // TODO implement
+  supportsClientSideIndexing(): boolean {
+    return false
+  }
+}
+
+export class LocalSearchClient extends LocalClient implements SearchClient {
+  async query(
+    query: string,
+    options?: {
+      limit?: number
+      cursor?: string
+    }
+  ): Promise<{
+    results: any[]
+    nextCursor: string | null
+    total: number
+    prevCursor: string | null
+  }> {
+    const opt = optionsToSearchIndexOptions(options)
+    const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
+    const res = await super.fetchWithToken(
+      `http://localhost:4001/searchIndex?q=${query}${optionsParam}`
+    )
+    return parseSearchIndexResponse(await res.json(), options)
+  }
+
+  del(ids: string[]): Promise<any> {
+    return Promise.resolve(undefined)
+  }
+
+  put(docs: any[]): Promise<any> {
+    return Promise.resolve(undefined)
+  }
+
+  // TODO implement
+  supportsClientSideIndexing(): boolean {
+    return false
   }
 }

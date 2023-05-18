@@ -427,7 +427,8 @@ export interface Config<
   CMSCallback = undefined,
   FormifyCallback = undefined,
   DocumentCreatorCallback = undefined,
-  Store = undefined
+  Store = undefined,
+  SearchClient = undefined
 > {
   contentApiUrlOverride?: string
   admin?: {
@@ -576,6 +577,30 @@ export interface Config<
           mediaRoot: string
         }
         loadCustomStore?: never
+      }
+  search?:
+    | {
+        /**
+         * An instance of a search client like Algolia
+         */
+        searchClient: SearchClient
+        tina?: never
+      }
+    | {
+        searchClient?: never
+        /**
+         * Use the Tina Cloud search index
+         */
+        tina: {
+          /**
+           * Search index token with permissions to write to search index. Only used by CLI.
+           */
+          indexerToken?: string
+          /**
+           * stopword languages to use (default: eng)
+           */
+          stopwordLanguages?: string[]
+        }
       }
   /**
    * Used to override the default Tina Cloud API URL
