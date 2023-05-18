@@ -16,7 +16,12 @@ import {
   TinaMediaStore,
 } from '@tinacms/toolkit'
 
-import { Client, TinaIOConfig } from '../internalClient'
+import {
+  Client,
+  LocalSearchClient,
+  TinaCMSSearchClient,
+  TinaIOConfig,
+} from '../internalClient'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
 import { setEditing } from '@tinacms/sharedctx'
@@ -208,6 +213,25 @@ export const TinaCloudProvider = (
     }
   }
 
+  const setupSearch = async (props: CreateClientProps) => {
+    // if local and search is configured then we always use the local client
+    // if not local, then determine if search is enabled and use the client from the config
+    if (props.isLocalClient) {
+      cms.searchClient = new LocalSearchClient()
+    } else {
+      const hasTinaSearch = Boolean(props.schema.config?.search?.tina)
+      if (hasTinaSearch) {
+        cms.searchClient = new TinaCMSSearchClient({
+          ...props,
+          branch: props.branch || 'main',
+          clientId: props.clientId || '',
+        })
+      } else {
+        cms.searchClient = props.schema.config?.search?.searchClient
+      }
+    }
+  }
+
   const handleListBranches = async (): Promise<Branch[]> => {
     const { owner, repo } = props
     const branches = await cms.api.tina.listBranches({ owner, repo })
@@ -224,6 +248,7 @@ export const TinaCloudProvider = (
   }
 
   setupMedia()
+  setupSearch(props)
 
   const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
     cms.flags.get('branch-switcher')

@@ -247,18 +247,44 @@ export class TinaAdminApi {
     }
   }
 
-  async fetchDocument(collectionName: string, relativePath: string) {
-    const response: { document: DocumentForm } = await this.api.request(
-      `#graphql
-      query($collection: String!, $relativePath: String!) {
-        document(collection:$collection, relativePath:$relativePath) {
-          ... on Document {
-            _values
+  async fetchDocument(
+    collectionName: string,
+    relativePath: string,
+    valuesOnly: boolean = true
+  ) {
+    let query
+    if (valuesOnly) {
+      query = `#graphql
+        query($collection: String!, $relativePath: String!) {
+          document(collection:$collection, relativePath:$relativePath) {
+            ... on Document {
+              _values
+            }
           }
-        }
-      }`,
-      { variables: { collection: collectionName, relativePath } }
-    )
+        }`
+    } else {
+      query = `#graphql
+        query($collection: String!, $relativePath: String!) {
+          document(collection:$collection, relativePath:$relativePath) {
+            __typename
+            ... on Document {
+              _sys {
+                title
+                template
+                breadcrumbs
+                path
+                basename
+                relativePath
+                filename
+                extension
+              }
+            }
+          }
+        }`
+    }
+    const response: { document: DocumentForm } = await this.api.request(query, {
+      variables: { collection: collectionName, relativePath },
+    })
 
     return response
   }

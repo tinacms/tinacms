@@ -3,7 +3,7 @@ import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
 import type { ViteDevServer } from 'vite'
-import { buildSchema, Database } from '@tinacms/graphql'
+import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
 import { buildProductionSpa } from './server'
@@ -19,6 +19,12 @@ import { IndexStatusResponse, waitForDB } from './waitForDB'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { sleepAndCallFunc } from '../../../utils/sleep'
 import { dangerText, linkText, warnText } from '../../../utils/theme'
+import {
+  SearchClient,
+  SearchIndexer,
+  TinaCMSSearchIndexClient,
+} from '@tinacms/search'
+import { spin } from '../../../utils/spinner'
 import { createDevServer } from '../dev-command/server'
 import { BaseCommand } from '../baseCommands'
 
@@ -41,6 +47,9 @@ export class BuildCommand extends BaseCommand {
    */
   skipCloudChecks = Option.Boolean('--skip-cloud-checks', false, {
     description: 'Skips checking the provided cloud config.',
+  })
+  skipSearchIndex = Option.Boolean('--skip-search-index', false, {
+    description: 'Skip indexing the site for search',
   })
 
   static usage = Command.Usage({
@@ -136,6 +145,36 @@ export class BuildCommand extends BaseCommand {
       configManager.outputGitignorePath,
       'index.html\nassets/'
     )
+
+    if (configManager.config.search && !this.skipSearchIndex) {
+      let client: SearchClient
+      if (Boolean(configManager.config?.search?.tina)) {
+        client = new TinaCMSSearchIndexClient({
+          apiUrl:
+            configManager.config.tinaioConfig?.contentApiUrlOverride ||
+            'https://content.tinajs.io',
+          indexerToken: configManager.config?.search?.tina?.indexerToken,
+        })
+      } else {
+        client = configManager.config?.search?.searchClient
+      }
+
+      const searchIndexer = new SearchIndexer({
+        batchSize: 100,
+        bridge: new FilesystemBridge(
+          configManager.rootPath,
+          configManager.contentRootPath
+        ),
+        schema: tinaSchema,
+        client,
+      })
+      await spin({
+        waitFor: async () => {
+          await searchIndexer.indexAllContent()
+        },
+        text: 'Building search index',
+      })
+    }
 
     const summaryItems = []
     if (!configManager.shouldSkipSDK()) {

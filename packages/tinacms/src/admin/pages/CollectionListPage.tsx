@@ -49,6 +49,7 @@ import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { Collection } from '@tinacms/schema-tools'
 import { CollectionFolder, useCollectionFolder } from './utils'
+import { useDebounce } from '../../hooks/use-debounce'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
 const isSSR = typeof window === 'undefined'
@@ -203,6 +204,8 @@ const CollectionListPage = () => {
             name: '',
           })
   )
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
   const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order)
   const loc = useLocation()
@@ -266,6 +269,7 @@ const CollectionListPage = () => {
                       booleanEquals: null,
                     }
               }
+              search={debouncedSearch}
             >
               {(
                 collection: CollectionResponse,
@@ -293,6 +297,8 @@ const CollectionListPage = () => {
                   )
                 })
 
+                const searchEnabled =
+                  !!cms.api.tina.schema?.config?.config?.search
                 const filterField = filterFields?.find(
                   (x) => x.name === vars.filterField
                 )
@@ -384,6 +390,21 @@ const CollectionListPage = () => {
                             {fields?.length > 0 && (
                               <>
                                 <div className="flex flex-col gap-2 items-start">
+                                  {searchEnabled && (
+                                    <>
+                                      <label htmlFor="search">Search</label>
+                                      <input
+                                        type="text"
+                                        name="search"
+                                        placeholder="Search"
+                                        className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm text-gray-700"
+                                        value={search}
+                                        onChange={(e) => {
+                                          setSearch(e.target.value)
+                                        }}
+                                      />
+                                    </>
+                                  )}
                                   <label
                                     htmlFor="sort"
                                     className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"

@@ -19,7 +19,8 @@ export const useGetCollection = (
   folder: { loading: boolean; fullyQualifiedName: string },
   after: string = '',
   sortKey?: string,
-  filterArgs?: FilterArgs
+  filterArgs?: FilterArgs,
+  search?: string
 ) => {
   const api = new TinaAdminApi(cms)
   const schema = cms.api.tina.schema as TinaSchema
@@ -66,10 +67,62 @@ export const useGetCollection = (
       }
     }
 
+    const searchCollection = async () => {
+      if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
+        try {
+          const response = await cms.searchClient.query(
+            `${search} AND _collection:${collectionName}`,
+            {
+              limit: 15,
+              cursor: after,
+            }
+          )
+          const docs = await Promise.allSettled(
+            response.results.map((result) => {
+              const [collection, relativePath] = result._id.split(':')
+              return api.fetchDocument(collection, relativePath, false)
+            })
+          )
+          setCollection({
+            // TODO populate these?
+            format: '',
+            label: '',
+            name: collectionName,
+            slug: '',
+            templates: [],
+            documents: {
+              pageInfo: {
+                hasNextPage: !!response.nextCursor,
+                hasPreviousPage: !!response.prevCursor,
+                startCursor: '',
+                endCursor: response.nextCursor || '',
+              },
+              edges: docs
+                .filter((p) => p.status === 'fulfilled')
+                .map((result) => ({ node: (result as any).value?.document })),
+            },
+          })
+        } catch (error) {
+          cms.alerts.error(
+            `[${error.name}] GetCollection failed: ${error.message}`
+          )
+          console.error(error)
+          setCollection(undefined)
+          setError(error)
+        }
+
+        setLoading(false)
+      }
+    }
+
     if (cancelled) return
 
     setLoading(true)
-    fetchCollection()
+    if (search) {
+      searchCollection()
+    } else {
+      fetchCollection()
+    }
     // TODO: useDebounce
     return () => {
       cancelled = true
@@ -81,6 +134,7 @@ export const useGetCollection = (
     folder.fullyQualifiedName,
     resetState,
     after,
+    search,
     sortKey,
   ])
 
@@ -98,6 +152,7 @@ const GetCollection = ({
   sortKey,
   children,
   filterArgs,
+  search,
 }: {
   cms: TinaCMS
   collectionName: string
@@ -107,6 +162,7 @@ const GetCollection = ({
   sortKey?: string
   children: any
   filterArgs?: FilterArgs
+  search?: string
 }) => {
   const navigate = useNavigate()
   const { collection, loading, error, reFetchCollection, collectionExtra } =
@@ -117,7 +173,8 @@ const GetCollection = ({
       folder,
       startCursor || '',
       sortKey,
-      filterArgs
+      filterArgs,
+      search
     ) || {}
   useEffect(() => {
     if (loading) return

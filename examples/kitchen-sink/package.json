@@ -11,7 +11,8 @@
     "build": "next build",
     "replay": "replay ./recording.json",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "searchindex": "tinacms search-index --apiUrl https://pr1832-content.tinajs.dev/searchIndex/8aaaff40-c2ae-4430-80f4-cd3536364d51/main --writeToken 535062364dd105dadd3623dd5432c876529bedd4"
   },
   "dependencies": {
     "@cypress/chrome-recorder": "^2.2.0",

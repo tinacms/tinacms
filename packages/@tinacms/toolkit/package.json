@@ -72,6 +72,7 @@
     "@react-types/combobox": "^3.2.0",
     "@react-types/shared": "^3.10.0",
     "@sambego/storybook-styles": "^1.0.0",
+    "@tinacms/search": "workspace:*",
     "@tinacms/sharedctx": "workspace:*",
     "@udecode/plate-headless": "^14.0.2",
     "atob": "2.1.2",
