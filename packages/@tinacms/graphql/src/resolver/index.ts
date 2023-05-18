@@ -788,6 +788,8 @@ export class Resolver {
       case 'string':
       case 'boolean':
       case 'number':
+        accumulator[field.name] = value
+        break
       case 'reference':
         if (value) {
           accumulator[field.name] = value
