@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BranchSwitcherProps, Branch } from './types'
 import { useBranchData } from './BranchData'
-import { BaseTextField } from '../../packages/fields'
+import { BaseTextField, Input } from '../../packages/fields'
 import { Button } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
 import {
@@ -16,6 +16,7 @@ import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
 import { AiFillWarning } from 'react-icons/ai'
 import { FaSpinner } from 'react-icons/fa'
 import { useCMS } from '../../packages/react-core'
+import { Modal, PopupModal, ModalHeader, ModalBody, ModalActions } from '../..'
 
 type ListState = 'loading' | 'ready' | 'error'
 
@@ -318,28 +319,80 @@ const BranchSelector = ({
           })}
         </div>
       )}
-      <div className="border-t border-gray-150 pt-4 mt-3 flex flex-col gap-3">
-        <div className="text-sm">
-          Create a new branch from <b>{currentBranch}</b>. Once created you will
-          need to wait for indexing to complete before you can switch branches.
-        </div>
-        <div className="flex justify-between items-center w-full gap-3">
-          <BaseTextField
-            placeholder="Branch Name"
-            value={newBranchName}
-            onChange={(e) => setNewBranchName(e.target.value)}
-          />
-          <Button
-            className="flex-0 flex items-center gap-2 whitespace-nowrap"
-            size="medium"
-            variant="white"
-            disabled={newBranchName === ''}
-            onClick={() => onCreateBranch(newBranchName)}
-          >
-            <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
-          </Button>
-        </div>
+      <CreateBranch
+        {...{ onCreateBranch, currentBranch, newBranchName, setNewBranchName }}
+      />
+    </div>
+  )
+}
+
+export const CreateBranch: React.FC<{
+  setNewBranchName: (value: any) => void
+  onCreateBranch: (value: string) => void
+  currentBranch: string
+  newBranchName: string
+}> = ({ currentBranch, newBranchName, onCreateBranch, setNewBranchName }) => {
+  return (
+    <div className="border-t border-gray-150 pt-4 mt-3 flex flex-col gap-3">
+      <div className="text-sm">
+        Create a new branch from <b>{currentBranch}</b>. Once created you will
+        need to wait for indexing to complete before you can switch branches.
+      </div>
+      <div className="flex justify-between items-center w-full gap-3">
+        <BaseTextField
+          placeholder="Branch Name"
+          value={newBranchName}
+          onChange={(e) => setNewBranchName(e.target.value)}
+        />
+        <Button
+          className="flex-0 flex items-center gap-2 whitespace-nowrap"
+          size="medium"
+          variant="white"
+          disabled={newBranchName === ''}
+          onClick={() => onCreateBranch(newBranchName)}
+        >
+          <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
+        </Button>
       </div>
     </div>
+  )
+}
+
+export const CreateBranchModel = ({ onSubmit, close }: any) => {
+  return (
+    <Modal>
+      <PopupModal>
+        <ModalHeader close={close}>New Folder</ModalHeader>
+        <ModalBody padded={true}>
+          <p className="text-base text-gray-700 mb-2">
+            <strong>Your working on a protected branch.</strong> To save your
+            work Tina will create a new branch
+          </p>
+          <CreateBranch
+            currentBranch="main"
+            newBranchName=""
+            onCreateBranch={() => {}}
+            setNewBranchName={() => {}}
+          />
+        </ModalBody>
+        <ModalActions>
+          <Button style={{ flexGrow: 2 }} onClick={close}>
+            Cancel
+          </Button>
+          {/* <Button
+            disabled={!folderName}
+            style={{ flexGrow: 3 }}
+            variant="primary"
+            onClick={() => {
+              if (!folderName) return
+              onSubmit(folderName)
+              close()
+            }}
+          >
+            Create New Folder
+          </Button> */}
+        </ModalActions>
+      </PopupModal>
+    </Modal>
   )
 }

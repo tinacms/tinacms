@@ -17,6 +17,14 @@ import { FormActionMenu } from './FormActions'
 import { useCMS } from '../react-core'
 import { IoMdClose } from 'react-icons/io'
 import { Transition } from '@headlessui/react'
+import { Input } from '../fields'
+import {
+  Modal,
+  PopupModal,
+  ModalHeader,
+  ModalBody,
+  ModalActions,
+} from '../react-modals'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -100,6 +108,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 }) => {
   const cms = useCMS()
   const hideFooter = !!rest.hideFooter
+  const [createBranchModalOpen, setCreateBranchModalOpen] =
+    React.useState(false)
 
   const tinaForm = form.tinaForm
   const finalForm = form.tinaForm.finalForm
@@ -174,6 +184,13 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         dirtySinceLastSubmit,
         hasValidationErrors,
       }) => {
+        const usingDefaultBranch =
+          cms.api.tina.branch === 'main' || cms.api.tina.branch === 'master'
+        const usingBranching = cms.flags.get('branch-switcher')
+
+        const usingBranchingAndOnDefualtBranch =
+          usingDefaultBranch && usingBranching
+
         const canSubmit =
           !pristine &&
           !submitting &&
@@ -181,13 +198,22 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           !(invalid && !dirtySinceLastSubmit)
 
         const safeHandleSubmit = () => {
-          if (canSubmit) {
-            handleSubmit()
+          if (usingBranchingAndOnDefualtBranch) {
+            setCreateBranchModalOpen(true)
+          } else {
+            if (canSubmit) {
+              handleSubmit()
+            }
           }
         }
 
         return (
           <>
+            {createBranchModalOpen && (
+              <CreateBranchModel
+                close={() => setCreateBranchModalOpen(false)}
+              />
+            )}
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormKeyBindings onSubmit={safeHandleSubmit} />
               <FormPortalProvider>
@@ -367,4 +393,46 @@ const getAnimationProps = (animateStatus) => {
     : animateStatus === 'forwards'
     ? forwardsAnimation
     : {}
+}
+
+export const CreateBranchModel = ({ onSubmit, close }: any) => {
+  const [folderName, setFolderName] = React.useState('')
+  return (
+    <Modal>
+      <PopupModal>
+        <ModalHeader close={close}>Save Changes</ModalHeader>
+        <ModalBody padded={true}>
+          <p className="text-base text-gray-700 mb-2">
+            <strong className="text-strong">
+              Your working from a protected branch
+            </strong>
+            To save your work Tina will create a new branch
+          </p>
+          <Input
+            value={folderName}
+            placeholder="Folder Name"
+            required
+            onChange={(e) => setFolderName(e.target.value)}
+          />
+        </ModalBody>
+        <ModalActions>
+          <Button style={{ flexGrow: 2 }} onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!folderName}
+            style={{ flexGrow: 3 }}
+            variant="primary"
+            onClick={() => {
+              if (!folderName) return
+              onSubmit(folderName)
+              close()
+            }}
+          >
+            Create New Folder
+          </Button>
+        </ModalActions>
+      </PopupModal>
+    </Modal>
+  )
 }
