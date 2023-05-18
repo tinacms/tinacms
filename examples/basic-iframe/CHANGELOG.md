@@ -4,6 +4,14 @@
 
 ### Patch Changes
 
+- Updated dependencies [e731ab0c5]
+  - @tinacms/graphql@1.4.14
+  - @tinacms/datalayer@1.2.14
+
+## null
+
+### Patch Changes
+
 - Updated dependencies [ca74add40]
 - Updated dependencies [5a6018916]
 - Updated dependencies [0f5557d23]

@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.4.14
+
+### Patch Changes
+
+- e731ab0c5: Fix error "Cannot return null for non-nullable field" on boolean required fields
+
 ## 1.4.13
 
 ### Patch Changes
