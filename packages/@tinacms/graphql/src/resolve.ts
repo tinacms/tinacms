@@ -40,18 +40,14 @@ export const resolve = async ({
   isAudit?: boolean
 }) => {
   try {
-    console.log('resolve1')
     const verboseValue = verbose ?? true
     const graphQLSchemaAst = await database.getGraphQLSchema()
     if (!graphQLSchemaAst) {
       throw new GraphQLError(`GraphQL schema not found`)
     }
-    console.log('resolve2')
     const graphQLSchema = buildASTSchema(graphQLSchemaAst)
-    console.log('resolve3')
 
     const tinaConfig = await database.getTinaSchema()
-    console.log('resolve4')
     const tinaSchema = (await createSchema({
       // TODO: please update all the types to import from @tinacms/schema-tools
       // @ts-ignore
@@ -59,14 +55,12 @@ export const resolve = async ({
       // @ts-ignore
       flags: tinaConfig?.meta?.flags,
     })) as unknown as TinaSchema
-    console.log('resolve5')
     const resolver = await createResolver({
       config,
       database,
       tinaSchema,
       isAudit: isAudit || false,
     })
-    console.log('resolve6')
 
     const res = await graphql({
       schema: graphQLSchema,

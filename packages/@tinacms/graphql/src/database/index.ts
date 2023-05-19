@@ -114,7 +114,6 @@ export class Database {
   private _lookup: { [returnType: string]: LookupMapType } | undefined
 
   constructor(public config: CreateDatabase) {
-    console.log('db.ctor')
     this.tinaDirectory = config.tinaDirectory || 'tina'
     this.bridge = config.bridge
     this.rootLevel =
@@ -354,7 +353,6 @@ export class Database {
     data: { [key: string]: unknown },
     collectionName?: string
   ) => {
-    console.log('db.put', filepath)
     await this.initLevel()
 
     try {
@@ -611,12 +609,10 @@ export class Database {
     return this._lookup[returnType]
   }
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
-    console.log('Database.getGraphQLSchema')
     await this.initLevel()
     const graphqlPath = normalizePath(
       path.join(this.getGeneratedFolder(), `_graphql.json`)
     )
-    console.log('graphqlPath', graphqlPath)
     return (await this.level
       .sublevel<string, Record<string, any>>(
         CONTENT_ROOT_PREFIX,
@@ -956,7 +952,6 @@ export class Database {
     tinaSchema: TinaSchema
     lookup?: object
   }) => {
-    console.log('indexContent called')
     if (!this.bridge) {
       throw new Error('No bridge configured')
     }

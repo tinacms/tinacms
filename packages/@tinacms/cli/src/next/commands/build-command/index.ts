@@ -405,7 +405,6 @@ export const fetchRemoteGraphqlSchema = async ({
     headers.append('X-API-KEY', token)
   }
   const body = JSON.stringify({ query: getIntrospectionQuery(), variables: {} })
-  console.log({ body })
 
   headers.append('Content-Type', 'application/json')
 
