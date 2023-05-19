@@ -43,6 +43,9 @@ export const resolve = async ({
     console.log('resolve1')
     const verboseValue = verbose ?? true
     const graphQLSchemaAst = await database.getGraphQLSchema()
+    if (!graphQLSchemaAst) {
+      throw new GraphQLError(`GraphQL schema not found`)
+    }
     console.log('resolve2')
     const graphQLSchema = buildASTSchema(graphQLSchemaAst)
     console.log('resolve3')
