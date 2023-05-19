@@ -31,6 +31,7 @@ interface ListMediaRes {
   error?: string
 }
 export interface PathConfig {
+  basePath: string
   rootPath: string
   publicFolder: string
   mediaRoot: string
@@ -38,10 +39,12 @@ export interface PathConfig {
 
 type SuccessRecord = { ok: true } | { ok: false; message: string }
 export class MediaModel {
+  public readonly basePath: string
   public readonly rootPath: string
   public readonly publicFolder: string
   public readonly mediaRoot: string
-  constructor({ rootPath, publicFolder, mediaRoot }: PathConfig) {
+  constructor({ basePath, rootPath, publicFolder, mediaRoot }: PathConfig) {
+    this.basePath = basePath
     this.rootPath = rootPath
     this.mediaRoot = mediaRoot
     this.publicFolder = publicFolder
@@ -67,6 +70,7 @@ export class MediaModel {
       const filesProm: Promise<FileRes>[] = filesStr.map(async (file) => {
         const filePath = join(folderPath, file)
         const stat = await fs.stat(filePath)
+        const basePathPrefix = this.basePath ? `/${this.basePath}` : ''
 
         let src = `/${file}`
 
@@ -92,7 +96,7 @@ export class MediaModel {
         return {
           isFile,
           size: stat.size,
-          src: src,
+          src: `${basePathPrefix}${src}`,
           filename: file,
         }
       })

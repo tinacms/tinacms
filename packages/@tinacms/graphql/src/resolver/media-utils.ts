@@ -25,22 +25,18 @@ export const resolveMediaCloudToRelative = (
 
     if (hasTinaMediaConfig(schema) === true) {
       const assetsURL = `https://${config.assetsHost}/${config.clientId}`
+      const cleanMediaRoot = cleanUpSlashes(schema.config.media.tina.mediaRoot)
+      const cleanBasePath = cleanUpSlashes(schema.config.build.basePath)
 
       if (typeof value === 'string' && value.includes(assetsURL)) {
-        const cleanMediaRoot = cleanUpSlashes(
-          schema.config.media.tina.mediaRoot
-        )
         const strippedURL = value.replace(assetsURL, '')
-        return `${cleanMediaRoot}${strippedURL}`
+        return `${cleanBasePath}${cleanMediaRoot}${strippedURL}`
       }
       if (Array.isArray(value)) {
         return value.map((v) => {
           if (!v || typeof v !== 'string') return v
-          const cleanMediaRoot = cleanUpSlashes(
-            schema.config.media.tina.mediaRoot
-          )
           const strippedURL = v.replace(assetsURL, '')
-          return `${cleanMediaRoot}${strippedURL}`
+          return `${cleanBasePath}${cleanMediaRoot}${strippedURL}`
         })
       }
 
@@ -73,14 +69,17 @@ export const resolveMediaRelativeToCloud = (
 
     if (hasTinaMediaConfig(schema) === true) {
       const cleanMediaRoot = cleanUpSlashes(schema.config.media.tina.mediaRoot)
+      const cleanBasePath = cleanUpSlashes(schema.config.build.basePath)
+      const relativePath = `${cleanBasePath}${cleanMediaRoot}`
+
       if (typeof value === 'string') {
-        const strippedValue = value.replace(cleanMediaRoot, '')
+        const strippedValue = value.replace(relativePath, '')
         return `https://${config.assetsHost}/${config.clientId}${strippedValue}`
       }
       if (Array.isArray(value)) {
         return value.map((v) => {
           if (!v || typeof v !== 'string') return v
-          const strippedValue = v.replace(cleanMediaRoot, '')
+          const strippedValue = v.replace(relativePath, '')
           return `https://${config.assetsHost}/${config.clientId}${strippedValue}`
         })
       }

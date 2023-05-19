@@ -60,7 +60,9 @@ export const devServerEndPointsPlugin = ({
       server.middlewares.use(bodyParser.json({ limit: '5mb' }))
       server.middlewares.use(async (req, res, next: Function) => {
         const mediaPaths = configManager.config.media?.tina
+        const basePath = configManager.config.build?.basePath
         const mediaRouter = createMediaRouter({
+          basePath: parseMediaFolder(basePath || ''),
           rootPath: configManager.rootPath,
           apiURL,
           publicFolder: parseMediaFolder(mediaPaths?.publicFolder || ''),

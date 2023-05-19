@@ -62,10 +62,12 @@ export const gqlServer = async (database, verbose: boolean) => {
   const db: Database = database
   const schema = await db.getSchema()
   const mediaPaths = schema?.schema?.config?.media?.tina
+  const basePath = schema?.schema?.config?.build?.basePath
 
   app.use(
     '/media',
     createMediaRouter({
+      basePath: parseMediaFolder(basePath || ''),
       rootPath: db.bridge.rootPath,
       publicFolder: parseMediaFolder(mediaPaths?.publicFolder || ''),
       mediaRoot: parseMediaFolder(mediaPaths?.mediaRoot || ''),
