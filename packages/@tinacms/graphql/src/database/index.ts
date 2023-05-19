@@ -176,7 +176,9 @@ export class Database {
       let version = await this.getDatabaseVersion()
       if (!version) {
         version = ''
-        await this.updateDatabaseVersion(version)
+        try {
+          await this.updateDatabaseVersion(version)
+        } catch (e) {} // this might fail on queries that don't have a version
       }
       this.level = this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
     }
@@ -609,10 +611,12 @@ export class Database {
     return this._lookup[returnType]
   }
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
+    console.log('Database.getGraphQLSchema')
     await this.initLevel()
     const graphqlPath = normalizePath(
       path.join(this.getGeneratedFolder(), `_graphql.json`)
     )
+    console.log('graphqlPath', graphqlPath)
     return (await this.level
       .sublevel<string, Record<string, any>>(
         CONTENT_ROOT_PREFIX,
