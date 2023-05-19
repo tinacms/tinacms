@@ -32,9 +32,10 @@ export const useCollectionFolder = () => {
   useEffect(() => {
     // set folder using the pathname
     const match = loc.pathname.match(folderRegex)
+    const folderName = match ? decodeURIComponent(match[1]) : ''
     const update = {
-      name: match ? match[1] : '',
-      fullyQualifiedName: match ? (match[1] ? `~/${match[1]}` : '~') : '',
+      name: folderName,
+      fullyQualifiedName: match ? (folderName ? `~/${folderName}` : '~') : '',
       loading: false,
       parentName: '',
     }
