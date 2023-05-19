@@ -114,6 +114,7 @@ export class Database {
   private _lookup: { [returnType: string]: LookupMapType } | undefined
 
   constructor(public config: CreateDatabase) {
+    console.log('db.ctor')
     this.tinaDirectory = config.tinaDirectory || 'tina'
     this.bridge = config.bridge
     this.rootLevel =
@@ -351,6 +352,7 @@ export class Database {
     data: { [key: string]: unknown },
     collectionName?: string
   ) => {
+    console.log('db.put', filepath)
     await this.initLevel()
 
     try {
