@@ -950,6 +950,7 @@ export class Database {
     tinaSchema: TinaSchema
     lookup?: object
   }) => {
+    console.log('indexContent called')
     if (!this.bridge) {
       throw new Error('No bridge configured')
     }
