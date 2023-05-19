@@ -16,7 +16,6 @@ import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
 import { AiFillWarning } from 'react-icons/ai'
 import { FaSpinner } from 'react-icons/fa'
 import { useCMS } from '../../packages/react-core'
-import { Modal, PopupModal, ModalHeader, ModalBody, ModalActions } from '../..'
 
 type ListState = 'loading' | 'ready' | 'error'
 
@@ -355,44 +354,5 @@ export const CreateBranch: React.FC<{
         </Button>
       </div>
     </div>
-  )
-}
-
-export const CreateBranchModel = ({ onSubmit, close }: any) => {
-  return (
-    <Modal>
-      <PopupModal>
-        <ModalHeader close={close}>New Folder</ModalHeader>
-        <ModalBody padded={true}>
-          <p className="text-base text-gray-700 mb-2">
-            <strong>Your working on a protected branch.</strong> To save your
-            work Tina will create a new branch
-          </p>
-          <CreateBranch
-            currentBranch="main"
-            newBranchName=""
-            onCreateBranch={() => {}}
-            setNewBranchName={() => {}}
-          />
-        </ModalBody>
-        <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
-            Cancel
-          </Button>
-          {/* <Button
-            disabled={!folderName}
-            style={{ flexGrow: 3 }}
-            variant="primary"
-            onClick={() => {
-              if (!folderName) return
-              onSubmit(folderName)
-              close()
-            }}
-          >
-            Create New Folder
-          </Button> */}
-        </ModalActions>
-      </PopupModal>
-    </Modal>
   )
 }

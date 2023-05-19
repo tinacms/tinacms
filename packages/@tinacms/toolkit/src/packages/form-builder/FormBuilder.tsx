@@ -16,8 +16,6 @@ import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
 import { useCMS } from '../react-core'
 import { IoMdClose } from 'react-icons/io'
-import { Transition } from '@headlessui/react'
-import { Input } from '../fields'
 import {
   Modal,
   PopupModal,
@@ -25,6 +23,11 @@ import {
   ModalBody,
   ModalActions,
 } from '../react-modals'
+import {
+  CreateBranch,
+  formatBranchName,
+} from '../../plugins/branch-switcher/BranchSwitcher'
+import { useBranchData } from '../../plugins/branch-switcher/BranchData'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -197,13 +200,17 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           !hasValidationErrors &&
           !(invalid && !dirtySinceLastSubmit)
 
-        const safeHandleSubmit = () => {
+        const safeSubmit = async () => {
+          if (canSubmit) {
+            await handleSubmit()
+          }
+        }
+
+        const safeHandleSubmit = async () => {
           if (usingBranchingAndOnDefualtBranch) {
             setCreateBranchModalOpen(true)
           } else {
-            if (canSubmit) {
-              handleSubmit()
-            }
+            safeSubmit()
           }
         }
 
@@ -211,6 +218,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           <>
             {createBranchModalOpen && (
               <CreateBranchModel
+                onSubmit={safeSubmit}
                 close={() => setCreateBranchModalOpen(false)}
               />
             )}
@@ -395,41 +403,80 @@ const getAnimationProps = (animateStatus) => {
     : {}
 }
 
-export const CreateBranchModel = ({ onSubmit, close }: any) => {
-  const [folderName, setFolderName] = React.useState('')
+export const CreateBranchModel = ({
+  close,
+  onSubmit,
+}: {
+  close: () => void
+  onSubmit: (branch: string) => Promise<void>
+}) => {
+  const cms = useCMS()
+  const tinaApi = cms.api.tina
+  const currentBranch = tinaApi.branch
+  const { setCurrentBranch } = useBranchData()
+  const [loading, setLoading] = React.useState<'loading' | 'indexing' | 'done'>(
+    'done'
+  )
+
+  const [newBranchName, setNewBranchName] = React.useState('')
+  const handleCreateBranch = React.useCallback((value) => {
+    setLoading('loading')
+    tinaApi
+      .createBranch({
+        branchName: formatBranchName(value),
+        baseBranch: currentBranch,
+      })
+      .then(async (createdBranchName) => {
+        setLoading('indexing')
+        // @ts-ignore
+        cms.alerts.success('Branch created.')
+        const [
+          // When this promise resolves, we know the index status is no longer 'inprogress' or 'unknown'
+          waitForIndexStatusPromise,
+          // Calling this function will cancel the polling
+          _cancelWaitForIndexFunc,
+        ] = cms.api.tina.waitForIndexStatus({
+          ref: createdBranchName,
+        })
+        await waitForIndexStatusPromise
+        setCurrentBranch(createdBranchName)
+        await onSubmit(createdBranchName)
+        setLoading('done')
+        close()
+      })
+  }, [])
   return (
     <Modal>
       <PopupModal>
-        <ModalHeader close={close}>Save Changes</ModalHeader>
+        <ModalHeader close={close}>New Folder</ModalHeader>
         <ModalBody padded={true}>
-          <p className="text-base text-gray-700 mb-2">
-            <strong className="text-strong">
-              Your working from a protected branch
-            </strong>
-            To save your work Tina will create a new branch
-          </p>
-          <Input
-            value={folderName}
-            placeholder="Folder Name"
-            required
-            onChange={(e) => setFolderName(e.target.value)}
-          />
+          <div className="text-base text-gray-700 mb-2">
+            <p>
+              <strong>Your working on a protected branch.</strong>
+            </p>
+            <p>To save your work Tina will create a new branch</p>
+          </div>
+          {loading === 'loading' && <div>Creating branch</div>}
+          {loading === 'indexing' && <div>Indexing Content</div>}
+          {(loading === 'indexing' || loading === 'loading') && (
+            <LoadingDots color="black" />
+          )}
+          {loading === 'done' && (
+            <CreateBranch
+              currentBranch={currentBranch}
+              newBranchName={newBranchName}
+              onCreateBranch={handleCreateBranch}
+              setNewBranchName={setNewBranchName}
+            />
+          )}
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
-            Cancel
-          </Button>
           <Button
-            disabled={!folderName}
-            style={{ flexGrow: 3 }}
-            variant="primary"
-            onClick={() => {
-              if (!folderName) return
-              onSubmit(folderName)
-              close()
-            }}
+            style={{ flexGrow: 2 }}
+            onClick={close}
+            disabled={loading == 'indexing' || loading === 'loading'}
           >
-            Create New Folder
+            Cancel
           </Button>
         </ModalActions>
       </PopupModal>
