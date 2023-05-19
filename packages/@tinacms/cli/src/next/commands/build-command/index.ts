@@ -294,6 +294,17 @@ export class BuildCommand extends BaseCommand {
       token,
     })
 
+    if (!remoteSchema) {
+      bar.tick({
+        prog: '❌',
+      })
+      let errorMessage = `The remote GraphQL schema does not exist. Check indexing for this branch.`
+      if (config?.branch) {
+        errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
+      }
+      throw new Error(errorMessage)
+    }
+
     const remoteGqlSchema = buildClientSchema(remoteSchema)
 
     // This will always be the filesystem bridge.
