@@ -212,8 +212,7 @@ export class SqliteLevel<
   private readOnly: boolean = false
 
   constructor(options: SqliteLevelOptions<KDefault, VDefault>) {
-    const encodings = { utf8: true }
-    super({ encodings }, options)
+    super({ encodings: { utf8: true } }, options)
     this.db = new Database(options.filename)
     this.db.pragma('journal_mode = WAL')
     if (options.readOnly !== undefined) {
