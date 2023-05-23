@@ -15,12 +15,8 @@ import {
 import gql from 'graphql-tag'
 import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
 // TODO wtf
-/* @ts-ignore */
-import {
-  optionsToSearchIndexOptions,
-  parseSearchIndexResponse,
-  SearchClient,
-} from '@tinacms/search'
+/* @ts-ignore */ // prettier-ignore
+import { optionsToSearchIndexOptions, parseSearchIndexResponse, SearchClient } from '@tinacms/search'
 
 export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
 
