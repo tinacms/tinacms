@@ -28,6 +28,10 @@ export class BuildCommand extends BaseCommand {
     description:
       'Starts local Graphql server and builds the local client instead of production client',
   })
+  skipIndexing = Option.Boolean('--skip-indexing', false, {
+    description:
+      'Skips indexing the content. This can be used for building the site without indexing the content  (defaults to false)',
+  })
   tinaGraphQLVersion = Option.String('--tina-graphql-version', {
     description:
       'Specify the version of @tinacms/graphql to use (defaults to latest)',
@@ -88,13 +92,20 @@ export class BuildCommand extends BaseCommand {
     })
     const apiURL = await codegen.execute()
 
-    if (this.localOption) {
-      // start the dev server if we are building locally
+    // Always index the content if we are building locally (and not skipping indexing)
+    if (
+      (configManager.hasSelfHostedConfig() || this.localOption) &&
+      !this.skipIndexing
+    ) {
       await this.indexContentWithSpinner({
         database,
         graphQLSchema,
         tinaSchema,
       })
+    }
+
+    if (this.localOption) {
+      // start the dev server if we are building locally
       server = await createDevServer(configManager, database, apiURL, true)
       await server.listen(Number(this.port))
       console.log('server listening on port', this.port)
