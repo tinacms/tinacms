@@ -53,9 +53,11 @@ export class SearchIndexCommand extends Command {
     const hasTinaSearch = Boolean(configManager.config?.search?.tina)
     if (hasTinaSearch) {
       client = new TinaCMSSearchIndexClient({
-        apiUrl:
+        apiUrl: `${
           configManager.config.tinaioConfig?.contentApiUrlOverride ||
-          'https://content.tinajs.io',
+          'https://content.tinajs.io'
+        }/searchIndex/${configManager.config?.clientId}`,
+        branch: configManager.config?.branch,
         indexerToken: configManager.config?.search?.tina?.indexerToken,
         stopwordLanguages:
           configManager.config?.search?.tina?.stopwordLanguages,
