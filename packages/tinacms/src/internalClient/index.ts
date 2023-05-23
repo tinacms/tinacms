@@ -798,17 +798,27 @@ export class TinaCMSSearchClient extends Client implements SearchClient {
     return parseSearchIndexResponse(await res.json(), options)
   }
 
+  // TODO implement
   del(ids: string[]): Promise<any> {
     return Promise.resolve(undefined)
   }
 
-  put(docs: any[]): Promise<any> {
-    return Promise.resolve(undefined)
+  async put(docs: any[]): Promise<any> {
+    // TODO should only be called if search is enabled and supportsClientSideIndexing is true
+    const res = await super.fetchWithToken(
+      `${this.contentApiBase}/searchIndex/${this.clientId}/${this.getBranch()}`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ docs }),
+      }
+    )
+    if (res.status !== 200) {
+      throw new Error('Failed to update search index')
+    }
   }
 
-  // TODO implement
   supportsClientSideIndexing(): boolean {
-    return false
+    return true
   }
 }
 
@@ -841,8 +851,8 @@ export class LocalSearchClient extends LocalClient implements SearchClient {
     return Promise.resolve(undefined)
   }
 
-  // TODO implement
   supportsClientSideIndexing(): boolean {
+    // chokidar will keep index updated
     return false
   }
 }
