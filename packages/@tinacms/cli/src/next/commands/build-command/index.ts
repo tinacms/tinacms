@@ -120,7 +120,7 @@ export class BuildCommand extends BaseCommand {
 
     if (this.localOption) {
       // start the dev server if we are building locally
-      server = await createDevServer(configManager, database, apiURL, true)
+      server = await createDevServer(configManager, database, null, apiURL, true)
       await server.listen(Number(this.port))
       console.log('server listening on port', this.port)
     }
