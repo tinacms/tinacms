@@ -798,9 +798,18 @@ export class TinaCMSSearchClient extends Client implements SearchClient {
     return parseSearchIndexResponse(await res.json(), options)
   }
 
-  // TODO implement
-  del(ids: string[]): Promise<any> {
-    return Promise.resolve(undefined)
+  async del(ids: string[]): Promise<any> {
+    const res = await super.fetchWithToken(
+      `${this.contentApiBase}/searchIndex/${
+        this.clientId
+      }/${this.getBranch()}?ids=${ids.join(',')}`,
+      {
+        method: 'DELETE',
+      }
+    )
+    if (res.status !== 200) {
+      throw new Error('Failed to update search index')
+    }
   }
 
   async put(docs: any[]): Promise<any> {

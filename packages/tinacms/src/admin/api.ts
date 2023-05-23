@@ -6,6 +6,7 @@ import { diff } from '@graphql-inspector/core'
 import type { TinaSchema } from '@tinacms/schema-tools'
 import type { Client } from '../internalClient'
 import type { CollectionResponse, DocumentForm } from './types'
+import { SearchClient } from '@tinacms/search'
 
 export interface FilterArgs {
   filterField: string
@@ -19,9 +20,13 @@ export class TinaAdminApi {
   api: Client
   useDataLayer: boolean
   schema: TinaSchema
+  searchClient?: SearchClient
   constructor(cms: TinaCMS) {
     this.api = cms.api.tina
     this.schema = cms.api.tina.schema
+    if (cms.searchClient && cms.searchClient?.supportsClientSideIndexing()) {
+      this.searchClient = cms.searchClient
+    }
   }
 
   async isAuthenticated() {
@@ -54,6 +59,18 @@ export class TinaAdminApi {
             `,
       { variables: { collection, relativePath, newRelativePath } }
     )
+
+    if (this.searchClient) {
+      const doc = await this.fetchDocument(
+        collection.name,
+        newRelativePath,
+        false
+      )
+      doc['_relativePath'] = newRelativePath
+      doc['_id'] = `${collection.name}:${newRelativePath}`
+      await this.searchClient.put([doc])
+      await this.searchClient.del([`${collection.name}:${relativePath}`])
+    }
   }
 
   async deleteDocument({
@@ -72,6 +89,7 @@ export class TinaAdminApi {
 }`,
       { variables: { collection, relativePath } }
     )
+    await this.searchClient?.del([`${collection}:${relativePath}`])
   }
   async fetchCollection(
     collectionName: string,
@@ -312,6 +330,13 @@ export class TinaAdminApi {
       }
     )
 
+    if (this.searchClient) {
+      const doc = await this.fetchDocument(collectionName, relativePath, false)
+      doc['_relativePath'] = relativePath
+      doc['_id'] = `${collectionName}:${relativePath}`
+      await this.searchClient.put([doc])
+    }
+
     return response
   }
 
@@ -337,6 +362,13 @@ export class TinaAdminApi {
         },
       }
     )
+
+    if (this.searchClient) {
+      const doc = await this.fetchDocument(collectionName, relativePath, false)
+      doc['_relativePath'] = relativePath
+      doc['_id'] = `${collectionName}:${relativePath}`
+      await this.searchClient.put([doc])
+    }
 
     return response
   }
