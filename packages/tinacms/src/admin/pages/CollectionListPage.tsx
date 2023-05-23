@@ -191,7 +191,7 @@ const CollectionListPage = () => {
     after: '',
     booleanEquals: null,
   })
-  const [activeSearch, setActiveSearch] = React.useState(false)
+  const [activeFilter, setActiveFilter] = React.useState(false)
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
   const [sortKey, setSortKey] = useState(
@@ -632,7 +632,7 @@ const CollectionListPage = () => {
                                     <div className="flex gap-3">
                                       <Button
                                         onClick={() => {
-                                          setActiveSearch(true)
+                                          setActiveFilter(true)
                                           setEndCursor('')
                                           setPrevCursors([])
                                           reFetchCollection()
@@ -640,7 +640,7 @@ const CollectionListPage = () => {
                                         variant="primary"
                                         type="submit"
                                       >
-                                        Search{' '}
+                                        Filter{' '}
                                         <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
                                       </Button>
                                       {(vars.startsWith ||
@@ -649,7 +649,7 @@ const CollectionListPage = () => {
                                         vars.booleanEquals) && (
                                         <Button
                                           onClick={() => {
-                                            setActiveSearch(false)
+                                            setActiveFilter(false)
                                             setVars((old) => ({
                                               ...old,
                                               filterField: '',
@@ -721,7 +721,7 @@ const CollectionListPage = () => {
                         {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
-                              {!activeSearch && folder.name && (
+                              {!activeFilter && folder.name && (
                                 <tr>
                                   <td colSpan={5}>
                                     <Breadcrumb
