@@ -98,7 +98,9 @@ export class BuildCommand extends BaseCommand {
       !this.skipIndexing
     ) {
       // if we are building locally use the default spinner text
-      const text = this.localOption ? undefined : 'Indexing self-hosted content'
+      const text = this.localOption
+        ? undefined
+        : 'Indexing to self-hosted data layer'
       await this.indexContentWithSpinner({
         text,
         database,
