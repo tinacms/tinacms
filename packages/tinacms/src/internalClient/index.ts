@@ -16,7 +16,7 @@ import gql from 'graphql-tag'
 import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
 // TODO wtf
 /* @ts-ignore */ // prettier-ignore
-import { optionsToSearchIndexOptions, parseSearchIndexResponse, SearchClient } from '@tinacms/search'
+import { optionsToSearchIndexOptions, parseSearchIndexResponse, queryToSearchIndexQuery, SearchClient } from '@tinacms/search'
 
 export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
 
@@ -792,12 +792,13 @@ export class TinaCMSSearchClient implements SearchClient {
     total: number
     prevCursor: string | null
   }> {
+    const q = queryToSearchIndexQuery(query)
     const opt = optionsToSearchIndexOptions(options)
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
     const res = await this.client.fetchWithToken(
       `${this.client.contentApiBase}/searchIndex/${
         this.client.clientId
-      }/${this.client.getBranch()}?q=${query}${optionsParam}`
+      }/${this.client.getBranch()}?q=${JSON.stringify(q)}${optionsParam}`
     )
     return parseSearchIndexResponse(await res.json(), options)
   }
@@ -851,10 +852,11 @@ export class LocalSearchClient implements SearchClient {
     total: number
     prevCursor: string | null
   }> {
+    const q = queryToSearchIndexQuery(query)
     const opt = optionsToSearchIndexOptions(options)
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
     const res = await this.client.fetchWithToken(
-      `http://localhost:4001/searchIndex?q=${query}${optionsParam}`
+      `http://localhost:4001/searchIndex?q=${JSON.stringify(q)}${optionsParam}`
     )
     return parseSearchIndexResponse(await res.json(), options)
   }

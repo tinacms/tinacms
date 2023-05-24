@@ -1,5 +1,17 @@
 export type { SearchClient } from './types'
 
+export const queryToSearchIndexQuery = (query: string) => {
+  let q
+  const parts = query.split(' ')
+  if (parts.length === 1) {
+    q = { AND: [parts[0]] }
+  } else {
+    // TODO only allow AND for now - need parser
+    q = { AND: parts.filter((part) => part.toLowerCase() !== 'and') }
+  }
+  return q
+}
+
 export const optionsToSearchIndexOptions = (options?: {
   limit?: number
   cursor?: string
