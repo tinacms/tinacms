@@ -778,7 +778,8 @@ export class LocalClient extends Client {
   }
 }
 
-export class TinaCMSSearchClient extends Client implements SearchClient {
+export class TinaCMSSearchClient implements SearchClient {
+  constructor(private client: Client) {}
   async query(
     query: string,
     options?: {
@@ -793,19 +794,19 @@ export class TinaCMSSearchClient extends Client implements SearchClient {
   }> {
     const opt = optionsToSearchIndexOptions(options)
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
-    const res = await super.fetchWithToken(
-      `${this.contentApiBase}/searchIndex/${
-        this.clientId
-      }/${this.getBranch()}?q=${query}${optionsParam}`
+    const res = await this.client.fetchWithToken(
+      `${this.client.contentApiBase}/searchIndex/${
+        this.client.clientId
+      }/${this.client.getBranch()}?q=${query}${optionsParam}`
     )
     return parseSearchIndexResponse(await res.json(), options)
   }
 
   async del(ids: string[]): Promise<any> {
-    const res = await super.fetchWithToken(
-      `${this.contentApiBase}/searchIndex/${
-        this.clientId
-      }/${this.getBranch()}?ids=${ids.join(',')}`,
+    const res = await this.client.fetchWithToken(
+      `${this.client.contentApiBase}/searchIndex/${
+        this.client.clientId
+      }/${this.client.getBranch()}?ids=${ids.join(',')}`,
       {
         method: 'DELETE',
       }
@@ -817,8 +818,10 @@ export class TinaCMSSearchClient extends Client implements SearchClient {
 
   async put(docs: any[]): Promise<any> {
     // TODO should only be called if search is enabled and supportsClientSideIndexing is true
-    const res = await super.fetchWithToken(
-      `${this.contentApiBase}/searchIndex/${this.clientId}/${this.getBranch()}`,
+    const res = await this.client.fetchWithToken(
+      `${this.client.contentApiBase}/searchIndex/${
+        this.client.clientId
+      }/${this.client.getBranch()}`,
       {
         method: 'POST',
         body: JSON.stringify({ docs }),
@@ -834,7 +837,8 @@ export class TinaCMSSearchClient extends Client implements SearchClient {
   }
 }
 
-export class LocalSearchClient extends LocalClient implements SearchClient {
+export class LocalSearchClient implements SearchClient {
+  constructor(private client: Client) {}
   async query(
     query: string,
     options?: {
@@ -849,7 +853,7 @@ export class LocalSearchClient extends LocalClient implements SearchClient {
   }> {
     const opt = optionsToSearchIndexOptions(options)
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
-    const res = await super.fetchWithToken(
+    const res = await this.client.fetchWithToken(
       `http://localhost:4001/searchIndex?q=${query}${optionsParam}`
     )
     return parseSearchIndexResponse(await res.json(), options)
