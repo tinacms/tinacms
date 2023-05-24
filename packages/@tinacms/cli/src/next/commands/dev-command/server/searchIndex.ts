@@ -30,17 +30,7 @@ export const createSearchIndexRouter = ({
       }
     }
     if (query) {
-      // TODO this should be handled in the client
-      let q
-      const parts = query.split(' ')
-      if (parts.length === 1) {
-        q = { AND: [parts[0]] }
-      } else {
-        // TODO only allow AND for now - need parser
-        q = { AND: parts.filter((part) => part.toLowerCase() !== 'and') }
-      }
-
-      const result = await searchIndex.QUERY(q, options)
+      const result = await searchIndex.QUERY(JSON.parse(query), options)
       res.end(JSON.stringify(result))
     } else {
       // TODO do we need this anymore?
