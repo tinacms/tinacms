@@ -24,15 +24,6 @@ const updateDocument = async (
   const params = api.schema.transformPayload(collection.name, values)
   if (await api.isAuthenticated()) {
     await api.updateDocument(collection.name, relativePath, params)
-    if (
-      !!cms.api.tina.schema?.config?.config?.search &&
-      cms?.searchClient?.supportsClientSideIndexing()
-    ) {
-      const doc = await api.fetchDocument(collection.name, relativePath, false)
-      doc['_relativePath'] = relativePath
-      doc['_id'] = `${collection.name}:${relativePath}`
-      await cms.searchClient.put([doc])
-    }
   } else {
     const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`
     cms.alerts.error(authMessage)
