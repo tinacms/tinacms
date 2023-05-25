@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { useNavigate } from 'react-router-dom'
-import type { TinaSchema } from '@tinacms/schema-tools'
+import type { Collection, TinaSchema } from '@tinacms/schema-tools'
 import { FilterArgs, TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
 import type { CollectionResponse } from '../types'
@@ -25,9 +25,9 @@ export const useGetCollection = (
   const api = new TinaAdminApi(cms)
   const schema = cms.api.tina.schema as TinaSchema
   const collectionExtra = schema.getCollection(collectionName)
-  const [collection, setCollection] = useState<CollectionResponse | undefined>(
-    undefined
-  )
+  const [collection, setCollection] = useState<
+    CollectionResponse | Collection | undefined
+  >(undefined)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | undefined>(undefined)
   const [resetState, setResetSate] = useState(0)
@@ -188,16 +188,23 @@ const GetCollection = ({
     const allowCreate = collectionDefinition?.ui?.allowedActions?.create ?? true
     const allowDelete = collectionDefinition?.ui?.allowedActions?.delete ?? true
 
+    const collectionResponse = collection as CollectionResponse
     if (
       !allowCreate &&
       !allowDelete &&
       // Check there is only one document
-      collection.documents?.edges?.length === 1 &&
+      collectionResponse.documents?.edges?.length === 1 &&
       // Check to make sure the file is not a folder
-      collection.documents?.edges[0]?.node?.__typename !== 'Folder'
+      collectionResponse.documents?.edges[0]?.node?.__typename !== 'Folder'
     ) {
-      const doc = collection.documents.edges[0].node
-      handleNavigate(navigate, cms, collection, collectionDefinition, doc)
+      const doc = collectionResponse.documents.edges[0].node
+      handleNavigate(
+        navigate,
+        cms,
+        collectionResponse,
+        collectionDefinition,
+        doc
+      )
     }
   }, [collection?.name || '', loading])
 
