@@ -84,6 +84,7 @@ export class TinaAdminApi {
     collection: string
     relativePath: string
   }) {
+    console.log('in delete', collection, relativePath)
     await this.api.request(
       `#graphql
       mutation DeleteDocument($collection: String!, $relativePath: String!  ){
@@ -93,6 +94,7 @@ export class TinaAdminApi {
 }`,
       { variables: { collection, relativePath } }
     )
+    console.log(this.searchClient)
     await this.searchClient?.del([`${collection}:${relativePath}`])
   }
   async fetchCollection(
