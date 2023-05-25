@@ -175,6 +175,22 @@ export const TinaCloudProvider = (
     cms.api.tina.setBranch(currentBranch)
   }
 
+  const setupSearch = async (props: CreateClientProps) => {
+    // if local and search is configured then we always use the local client
+    // if not local, then determine if search is enabled and use the client from the config
+    if (props.isLocalClient) {
+      cms.searchClient = new LocalSearchClient(cms.api.tina)
+    } else {
+      const hasTinaSearch = Boolean(props.schema.config?.search?.tina)
+      if (hasTinaSearch) {
+        cms.searchClient = new TinaCMSSearchClient(cms.api.tina)
+      } else {
+        cms.searchClient = props.schema.config?.search?.searchClient
+      }
+    }
+  }
+  setupSearch(props)
+
   if (!cms.api.admin) {
     cms.registerApi('admin', new TinaAdminApi(cms))
   }
@@ -213,21 +229,6 @@ export const TinaCloudProvider = (
     }
   }
 
-  const setupSearch = async (props: CreateClientProps) => {
-    // if local and search is configured then we always use the local client
-    // if not local, then determine if search is enabled and use the client from the config
-    if (props.isLocalClient) {
-      cms.searchClient = new LocalSearchClient(cms.api.tina)
-    } else {
-      const hasTinaSearch = Boolean(props.schema.config?.search?.tina)
-      if (hasTinaSearch) {
-        cms.searchClient = new TinaCMSSearchClient(cms.api.tina)
-      } else {
-        cms.searchClient = props.schema.config?.search?.searchClient
-      }
-    }
-  }
-
   const handleListBranches = async (): Promise<Branch[]> => {
     const { owner, repo } = props
     const branches = await cms.api.tina.listBranches({ owner, repo })
@@ -244,7 +245,6 @@ export const TinaCloudProvider = (
   }
 
   setupMedia()
-  setupSearch(props)
 
   const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
     cms.flags.get('branch-switcher')

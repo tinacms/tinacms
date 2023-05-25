@@ -23,6 +23,11 @@ export class TinaAdminApi {
   schema: TinaSchema
   searchClient?: SearchClient
   constructor(cms: TinaCMS) {
+    console.log(
+      'in TinaAdminApi constructor',
+      cms.searchClient,
+      cms.searchClient?.supportsClientSideIndexing()
+    )
     this.api = cms.api.tina
     this.schema = cms.api.tina.schema
     if (cms.searchClient && cms.searchClient?.supportsClientSideIndexing()) {
@@ -94,7 +99,6 @@ export class TinaAdminApi {
 }`,
       { variables: { collection, relativePath } }
     )
-    console.log(this.searchClient)
     await this.searchClient?.del([`${collection}:${relativePath}`])
   }
   async fetchCollection(

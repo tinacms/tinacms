@@ -807,7 +807,6 @@ export class TinaCMSSearchClient implements SearchClient {
         method: 'DELETE',
       }
     )
-    console.log(res.status)
     if (res.status !== 200) {
       throw new Error('Failed to update search index')
     }
