@@ -3,7 +3,7 @@ import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import GetDocument from '../components/GetDocument'
 import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
+import { TinaSchema, resolveForm, Collection } from '@tinacms/schema-tools'
 import { Link, useParams } from 'react-router-dom'
 import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
@@ -16,14 +16,14 @@ import { useCollectionFolder } from './utils'
 const updateDocument = async (
   cms: TinaCMS,
   relativePath: string,
-  collection: { name: string },
+  collection: Collection,
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
   const api = new TinaAdminApi(cms)
   const params = api.schema.transformPayload(collection.name, values)
   if (await api.isAuthenticated()) {
-    await api.updateDocument(collection.name, relativePath, params)
+    await api.updateDocument(collection, relativePath, params)
   } else {
     const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`
     cms.alerts.error(authMessage)

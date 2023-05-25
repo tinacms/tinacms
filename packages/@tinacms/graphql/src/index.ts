@@ -8,6 +8,7 @@ import type {
 
 import { buildDotTinaFiles } from './build'
 export { resolve } from './resolve'
+export { transformDocumentIntoPayload } from './resolver'
 export * from './resolver/error'
 export { createDatabase } from './database'
 export { TinaLevelClient } from './level/tinaLevel'
