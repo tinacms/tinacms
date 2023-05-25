@@ -821,6 +821,9 @@ export class TinaCMSSearchClient implements SearchClient {
       {
         method: 'POST',
         body: JSON.stringify({ docs }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
     )
     if (res.status !== 200) {
