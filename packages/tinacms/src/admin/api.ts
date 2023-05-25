@@ -23,11 +23,6 @@ export class TinaAdminApi {
   schema: TinaSchema
   searchClient?: SearchClient
   constructor(cms: TinaCMS) {
-    console.log(
-      'in TinaAdminApi constructor',
-      cms.searchClient,
-      cms.searchClient?.supportsClientSideIndexing()
-    )
     this.api = cms.api.tina
     this.schema = cms.api.tina.schema
     if (cms.searchClient && cms.searchClient?.supportsClientSideIndexing()) {
@@ -89,7 +84,6 @@ export class TinaAdminApi {
     collection: string
     relativePath: string
   }) {
-    console.log('in delete', collection, relativePath)
     await this.api.request(
       `#graphql
       mutation DeleteDocument($collection: String!, $relativePath: String!  ){
