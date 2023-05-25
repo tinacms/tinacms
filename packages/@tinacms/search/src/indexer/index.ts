@@ -1,4 +1,4 @@
-import { Collection, ObjectField, TinaSchema } from '@tinacms/schema-tools'
+import { Collection, TinaSchema } from '@tinacms/schema-tools'
 import {
   Bridge,
   loadAndParseWithAliases,
@@ -6,8 +6,10 @@ import {
   scanAllContent,
   scanContentByPaths,
   transformDocument,
+  transformDocumentIntoPayload,
 } from '@tinacms/graphql'
 import { SearchClient } from '../types'
+import { processDocumentForIndexing } from './utils'
 
 type SearchIndexOptions = {
   batchSize?: number
@@ -31,74 +33,52 @@ export class SearchIndexer {
     this.textIndexLength = options.textIndexLength || 500
   }
 
-  private relativePath(path: string, collection: Collection<true>) {
-    return path
-      .replace(/\\/g, '/')
-      .replace(collection.path, '')
-      .replace(/^\/|\/$/g, '')
-  }
-
-  private processDocumentForIndexing(
-    data: any,
-    path: string,
-    collection: Collection<true>,
-    field?: ObjectField<true>
-  ) {
-    if (!field) {
-      data['_id'] = `${collection.name}:${this.relativePath(path, collection)}`
-    }
-    for (const f of collection.fields || field?.fields || []) {
-      const isList = f.list
-      if (data[f.name]) {
-        if (f.type === 'object') {
-          if (isList) {
-            data[f.name] = data[f.name].map((obj: any) =>
-              this.processDocumentForIndexing(obj, path, collection, f)
-            )
-          } else {
-            data[f.name] = this.processDocumentForIndexing(
-              data[f.name],
+  private makeIndexerCallback(itemCallback: (item: any) => Promise<void>) {
+    return async (collection: Collection<true>, contentPaths: string[]) => {
+      const templateInfo = await this.schema.getTemplatesForCollectable(
+        collection
+      )
+      await sequential(contentPaths as string[], async (path) => {
+        const data = await transformDocumentIntoPayload(
+          `${collection.path}/${path}`,
+          transformDocument(
+            path,
+            await loadAndParseWithAliases(
+              this.bridge,
               path,
               collection,
-              f
-            )
-          }
-        } else if (f.type === 'image') {
-          delete data[f.name]
-        } else if (f.type === 'string' || f.type === 'rich-text') {
-          if (isList) {
-            data[f.name] = data[f.name].map((value: string) =>
-              value.substring(0, this.textIndexLength)
-            )
-          } else {
-            data[f.name] = data[f.name].substring(0, this.textIndexLength)
-          }
-        }
-      }
+              templateInfo
+            ),
+            this.schema
+          ),
+          this.schema
+        )
+        await itemCallback(
+          processDocumentForIndexing(
+            data['_values'],
+            path,
+            collection,
+            this.textIndexLength
+          )
+        )
+      })
     }
-    return data
   }
 
   public async indexContentByPaths(documentPaths: string[]) {
     let batch = []
+    const itemCallback = async (item: any) => {
+      batch.push(item)
+      if (batch.length > this.batchSize) {
+        await this.client.put(batch)
+        batch = []
+      }
+    }
     await this.client.onStartIndexing?.()
     await scanContentByPaths(
       this.schema,
       documentPaths,
-      async (collection, contentPaths) => {
-        await sequential(contentPaths as string[], async (path) => {
-          const data = transformDocument(
-            path,
-            JSON.parse(await this.bridge.get(path)),
-            this.schema
-          )
-          batch.push(this.processDocumentForIndexing(data, path, collection))
-          if (batch.length > this.batchSize) {
-            await this.client.put(batch)
-            batch = []
-          }
-        })
-      }
+      this.makeIndexerCallback(itemCallback)
     )
     if (batch.length > 0) {
       await this.client.put(batch)
@@ -110,31 +90,17 @@ export class SearchIndexer {
     await this.client.onStartIndexing?.()
 
     let batch = []
+    const itemCallback = async (item: any) => {
+      batch.push(item)
+      if (batch.length > this.batchSize) {
+        await this.client.put(batch)
+        batch = []
+      }
+    }
     const warnings = await scanAllContent(
       this.schema,
       this.bridge,
-      async (collection, contentPaths) => {
-        const templateInfo = await this.schema.getTemplatesForCollectable(
-          collection
-        )
-        await sequential(contentPaths as string[], async (path) => {
-          const data = transformDocument(
-            path,
-            await loadAndParseWithAliases(
-              this.bridge,
-              path,
-              collection,
-              templateInfo
-            ),
-            this.schema
-          )
-          batch.push(this.processDocumentForIndexing(data, path, collection))
-          if (batch.length > this.batchSize) {
-            await this.client.put(batch)
-            batch = []
-          }
-        })
-      }
+      this.makeIndexerCallback(itemCallback)
     )
     if (batch.length > 0) {
       await this.client.put(batch)

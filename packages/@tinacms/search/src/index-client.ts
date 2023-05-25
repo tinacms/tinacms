@@ -1,4 +1,5 @@
 export type { SearchClient } from './types'
+export { processDocumentForIndexing } from './indexer/utils'
 
 export const queryToSearchIndexQuery = (query: string) => {
   let q
