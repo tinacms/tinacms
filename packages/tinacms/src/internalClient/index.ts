@@ -584,7 +584,6 @@ mutation addPendingDocumentMutation(
     if (token?.id_token) {
       headers['Authorization'] = 'Bearer ' + token?.id_token
     }
-    console.log({ headers })
     return await fetch(input, {
       ...init,
       headers: new Headers(headers),
@@ -813,6 +812,7 @@ export class TinaCMSSearchClient implements SearchClient {
         method: 'DELETE',
       }
     )
+    console.log(res.status)
     if (res.status !== 200) {
       throw new Error('Failed to update search index')
     }
