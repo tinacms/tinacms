@@ -631,7 +631,11 @@ const SyncStatusContainer = ({ children }) => {
   return syncStatus == 'needs-sync' ? (
     <div className="items-center bg-gray-50 m-auto">
       Media needs to be turned on for this project. Sync your media in{' '}
-      <a target="_blank" href={`${cms.api.tina.appDashboardLink}/media`}>
+      <a
+        className="transition-all duration-150 ease-out text-blue-600 hover:text-blue-400 hover:underline no-underline"
+        target="_blank"
+        href={`${cms.api.tina.appDashboardLink}/media`}
+      >
         Tina Cloud.
       </a>
     </div>
