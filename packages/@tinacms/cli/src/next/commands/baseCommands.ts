@@ -92,11 +92,14 @@ export abstract class BaseCommand extends Command {
     database,
     graphQLSchema,
     tinaSchema,
+    text,
   }: {
     database: Database
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
+    text?: string
   }) {
+    const textToUse = text || 'Indexing local files'
     const warnings: string[] = []
     await spin({
       waitFor: async () => {
@@ -106,7 +109,7 @@ export abstract class BaseCommand extends Command {
         })
         warnings.push(...res.warnings)
       },
-      text: 'Indexing local files',
+      text: textToUse,
     })
     if (warnings.length > 0) {
       logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
