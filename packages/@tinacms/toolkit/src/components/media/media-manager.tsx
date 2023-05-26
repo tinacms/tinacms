@@ -39,7 +39,7 @@ import {
 } from './utils'
 import { DeleteModal, NewFolderModal } from './modal'
 import { CopyField } from './copy-field'
-
+import { createContext, useContext } from 'react'
 // Can not use path.join on the frontend
 const join = function (...parts) {
   // From: https://stackoverflow.com/questions/29855098/is-there-a-built-in-javascript-function-similar-to-os-path-join
@@ -375,98 +375,100 @@ export function MediaPicker({
       )}
 
       <MediaPickerWrap>
-        <div className="flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0">
-          <div className="flex flex-1 items-center gap-4">
-            <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
-            <Breadcrumb directory={directory} setDirectory={setDirectory} />
-          </div>
+        <SyncStatusContainer>
+          <div className="flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0">
+            <div className="flex flex-1 items-center gap-4">
+              <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+              <Breadcrumb directory={directory} setDirectory={setDirectory} />
+            </div>
 
-          <div className="flex items-center gap-4">
-            <Button
-              busy={false}
-              variant="white"
-              onClick={loadMedia}
-              className="whitespace-nowrap"
-            >
-              Refresh
-              <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
-            </Button>
-            <Button
-              busy={false}
-              variant="white"
-              onClick={() => {
-                setNewFolderModalOpen(true)
-              }}
-              className="whitespace-nowrap"
-            >
-              New Folder
-              <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
-            </Button>
-            <UploadButton onClick={onClick} uploading={uploading} />
-          </div>
-        </div>
-
-        <div className="flex h-full overflow-hidden bg-white">
-          <div className="flex w-full flex-col h-full @container">
-            <ul
-              {...rootProps}
-              className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
-                list.items.length === 0 ||
-                (viewMode === 'list' &&
-                  'w-full flex flex-1 flex-col justify-start -mb-px')
-              } ${
-                list.items.length > 0 &&
-                viewMode === 'grid' &&
-                'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-8 auto-rows-auto content-start justify-start'
-              } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
-            >
-              <input {...getInputProps()} />
-
-              {listState === 'loaded' && list.items.length === 0 && (
-                <EmptyMediaList />
-              )}
-
-              {viewMode === 'list' &&
-                list.items.map((item: Media) => (
-                  <ListMediaItem
-                    key={item.id}
-                    item={item}
-                    onClick={onClickMediaItem}
-                    active={activeItem && activeItem.id === item.id}
-                  />
-                ))}
-
-              {viewMode === 'grid' &&
-                list.items.map((item: Media) => (
-                  <GridMediaItem
-                    key={item.id}
-                    item={item}
-                    onClick={onClickMediaItem}
-                    active={activeItem && activeItem.id === item.id}
-                  />
-                ))}
-            </ul>
-
-            <div className="bg-gradient-to-r to-gray-50/50 from-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
-              <CursorPaginator
-                hasNext={hasNext}
-                navigateNext={navigateNext}
-                hasPrev={hasPrev}
-                navigatePrev={navigatePrev}
-              />
+            <div className="flex items-center gap-4">
+              <Button
+                busy={false}
+                variant="white"
+                onClick={loadMedia}
+                className="whitespace-nowrap"
+              >
+                Refresh
+                <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+              </Button>
+              <Button
+                busy={false}
+                variant="white"
+                onClick={() => {
+                  setNewFolderModalOpen(true)
+                }}
+                className="whitespace-nowrap"
+              >
+                New Folder
+                <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+              </Button>
+              <UploadButton onClick={onClick} uploading={uploading} />
             </div>
           </div>
 
-          <ActiveItemPreview
-            activeItem={activeItem}
-            close={closePreview}
-            selectMediaItem={selectMediaItem}
-            allowDelete={allowDelete}
-            deleteMediaItem={() => {
-              setDeleteModalOpen(true)
-            }}
-          />
-        </div>
+          <div className="flex h-full overflow-hidden bg-white">
+            <div className="flex w-full flex-col h-full @container">
+              <ul
+                {...rootProps}
+                className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
+                  list.items.length === 0 ||
+                  (viewMode === 'list' &&
+                    'w-full flex flex-1 flex-col justify-start -mb-px')
+                } ${
+                  list.items.length > 0 &&
+                  viewMode === 'grid' &&
+                  'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-8 auto-rows-auto content-start justify-start'
+                } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
+              >
+                <input {...getInputProps()} />
+
+                {listState === 'loaded' && list.items.length === 0 && (
+                  <EmptyMediaList />
+                )}
+
+                {viewMode === 'list' &&
+                  list.items.map((item: Media) => (
+                    <ListMediaItem
+                      key={item.id}
+                      item={item}
+                      onClick={onClickMediaItem}
+                      active={activeItem && activeItem.id === item.id}
+                    />
+                  ))}
+
+                {viewMode === 'grid' &&
+                  list.items.map((item: Media) => (
+                    <GridMediaItem
+                      key={item.id}
+                      item={item}
+                      onClick={onClickMediaItem}
+                      active={activeItem && activeItem.id === item.id}
+                    />
+                  ))}
+              </ul>
+
+              <div className="bg-gradient-to-r to-gray-50/50 from-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
+                <CursorPaginator
+                  hasNext={hasNext}
+                  navigateNext={navigateNext}
+                  hasPrev={hasPrev}
+                  navigatePrev={navigatePrev}
+                />
+              </div>
+            </div>
+
+            <ActiveItemPreview
+              activeItem={activeItem}
+              close={closePreview}
+              selectMediaItem={selectMediaItem}
+              allowDelete={allowDelete}
+              deleteMediaItem={() => {
+                setDeleteModalOpen(true)
+              }}
+            />
+          </div>
+        </SyncStatusContainer>
       </MediaPickerWrap>
     </>
   )
@@ -592,7 +594,15 @@ const MediaPickerWrap = ({ children }) => {
   )
 }
 
-const EmptyMediaList = () => {
+interface SyncStatusContextProps {
+  syncStatus: 'loading' | 'synced' | 'needs-sync'
+}
+
+const SyncStatusContext = createContext<SyncStatusContextProps | undefined>(
+  undefined
+)
+
+const SyncStatusContainer = ({ children }) => {
   const cms = useCMS()
   const isLocal = cms.api.tina.isLocalMode
 
@@ -611,27 +621,44 @@ const EmptyMediaList = () => {
   useEffect(() => {
     const checkSyncStatus = async () => {
       const project = await cms.api.tina.getProject()
+
       setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
     }
-    if (!isLocal && hasTinaMedia) {
+    //TODO REMOVE THIS LINE:
+    setSyncStatus('needs-sync')
+
+    if (!isLocal) {
       checkSyncStatus()
     }
   }, [])
 
+  return syncStatus == 'needs-sync' ? (
+    <div className="items-center bg-gray-50 m-auto">
+      Media needs to be turned on for this project. Sync your media in{' '}
+      <a target="_blank" href={`${cms.api.tina.appDashboardLink}/media`}>
+        Tina Cloud.
+      </a>
+    </div>
+  ) : (
+    <SyncStatusContext.Provider value={{ syncStatus }}>
+      {children}
+    </SyncStatusContext.Provider>
+  )
+}
+
+const useSyncStatus = () => {
+  const context = useContext(SyncStatusContext)
+  if (!context) {
+    throw new Error('useSyncStatus must be used within a SyncStatusProvider')
+  }
+  return context
+}
+
+const EmptyMediaList = () => {
+  const { syncStatus } = useSyncStatus()
   return (
     <div className={`p-12 text-xl opacity-50 text-center`}>
-      {syncStatus === 'loading' && 'Loading...'}
-      {syncStatus === 'needs-sync' && (
-        <>
-          <span>
-            Media needs to be turned on for this project. Sync your media in{' '}
-            <a target="_blank" href={`${cms.api.tina.appDashboardLink}/media`}>
-              Tina Cloud.
-            </a>
-          </span>
-        </>
-      )}
-      {syncStatus === 'synced' && 'Drag and drop assets here'}
+      {syncStatus == 'synced' ? 'Drag and drop assets here' : 'Loading...'}
     </div>
   )
 }
