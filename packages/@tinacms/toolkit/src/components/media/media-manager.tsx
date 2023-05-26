@@ -78,8 +78,6 @@ export function MediaManager() {
 
   const [request, setRequest] = useState<MediaRequest | undefined>()
 
-  const [needsTinaSync, setNeedsTinaSync] = useState<boolean>()
-
   useEffect(() => {
     return cms.events.subscribe('media:open', ({ type, ...request }) => {
       setRequest(request)
@@ -624,8 +622,6 @@ const SyncStatusContainer = ({ children }) => {
 
       setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
     }
-    //TODO REMOVE THIS LINE:
-    setSyncStatus('needs-sync')
 
     if (!isLocal) {
       checkSyncStatus()
