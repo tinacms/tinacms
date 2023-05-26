@@ -45,7 +45,7 @@ const extractText = (
       }
     }
 
-    data.children?.forEach((child: any) =>
+    data.children?.forEach?.((child: any) =>
       extractText(child, acc, indexableNodeTypes)
     )
   }
