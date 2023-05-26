@@ -42,6 +42,9 @@ export const resolve = async ({
   try {
     const verboseValue = verbose ?? true
     const graphQLSchemaAst = await database.getGraphQLSchema()
+    if (!graphQLSchemaAst) {
+      throw new GraphQLError(`GraphQL schema not found`)
+    }
     const graphQLSchema = buildASTSchema(graphQLSchemaAst)
 
     const tinaConfig = await database.getTinaSchema()

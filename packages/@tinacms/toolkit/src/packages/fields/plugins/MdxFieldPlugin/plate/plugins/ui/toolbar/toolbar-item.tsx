@@ -232,20 +232,26 @@ export const EmbedButton = ({
           >
             <Popover.Panel>
               {({ close }) => (
-                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1 max-h-[10rem] overflow-y-auto">
-                  {templates.map((template) => (
-                    <span
-                      key={template.name}
-                      onMouseDown={(e) => {
-                        e.preventDefault()
-                        close()
-                        insertMDX(editor, template)
-                      }}
-                      className={`hover:bg-gray-50 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center`}
-                    >
-                      {template.label || template.name}
-                    </span>
-                  ))}
+                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none max-h-[13rem] overflow-y-auto">
+                  <div className="sticky z-10 top-0 w-full h-8 -mb-8 opacity-10 bg-gradient-to-b from-blue-600 to-transparent"></div>
+                  <div className="relative py-1 z-20">
+                    {templates.map((template) => (
+                      <span
+                        key={template.name}
+                        onMouseDown={(e) => {
+                          e.preventDefault()
+                          close()
+                          insertMDX(editor, template)
+                        }}
+                        className={`relative z-30 hover:bg-gray-400/10 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center`}
+                      >
+                        {template.label || template.name}
+                      </span>
+                    ))}
+                    <div className="absolute top-0 w-full h-8 bg-gradient-to-b from-white to-transparent"></div>
+                    <div className="absolute bottom-0 w-full h-8 bg-gradient-to-t from-white to-transparent"></div>
+                  </div>
+                  <div className="sticky z-10 bottom-0 w-full h-8 -mt-8 opacity-10 bg-gradient-to-t from-blue-600 to-transparent"></div>
                 </div>
               )}
             </Popover.Panel>

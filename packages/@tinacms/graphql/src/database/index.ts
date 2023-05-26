@@ -175,7 +175,9 @@ export class Database {
       let version = await this.getDatabaseVersion()
       if (!version) {
         version = ''
-        await this.updateDatabaseVersion(version)
+        try {
+          await this.updateDatabaseVersion(version)
+        } catch (e) {} // this might fail on queries that don't have a version
       }
       this.level = this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
     }
