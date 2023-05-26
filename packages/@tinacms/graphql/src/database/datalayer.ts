@@ -802,20 +802,33 @@ export const makeIndexOpsForDocument = <T extends object>(
   return result
 }
 
+const ensureString = (input: unknown): string => {
+  if (typeof input === 'object' || typeof input === 'function') {
+    throw new Error(
+      `Expected string, got ${typeof input}. Value: ${JSON.stringify(input)}`
+    )
+  }
+  return String(input)
+}
+
 export const makeStringEscaper = (
   regex: RegExp,
   replacement: string
 ): StringEscaper => {
   return <T extends string | string[]>(input: T): T => {
     if (Array.isArray(input)) {
-      return (input as string[]).map((val) =>
-        val.replace(regex, replacement)
-      ) as T
+      return (input as string[]).map((val) => {
+        if (typeof val === 'string') {
+          return val.replace(regex, replacement)
+        } else {
+          return ensureString(val)
+        }
+      }) as T
     } else {
       if (typeof input === 'string') {
-        return (input as string).replace(regex, replacement) as T
+        return input.replace(regex, replacement) as T
       } else {
-        return input as T
+        return ensureString(input) as T
       }
     }
   }
