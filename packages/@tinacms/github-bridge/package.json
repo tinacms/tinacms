@@ -1,0 +1,53 @@
+{
+  "name": "@tinacms/github-bridge",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "module": "./dist/index.es.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "@types/jest": "^27.0.1",
+    "@types/lodash-es": "4.17.7",
+    "jest": "^27.0.6",
+    "typescript": "4.3.5"
+  },
+  "peerDependencies": {},
+  "scripts": {
+    "build": "tinacms-scripts build",
+    "test": "jest --passWithNoTests",
+    "types": "pnpm tsc",
+    "test-watch": "jest  --passWithNoTests --watch",
+    "generate:schema": "yarn node scripts/generateSchema.js"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/github-bridge"
+  },
+  "dependencies": {
+    "@octokit/rest": "^19.0.11",
+    "@tinacms/graphql": "workspace:*",
+    "graphql": "15.8.0",
+    "lodash-es": "4.17.21"
+  }
+}
