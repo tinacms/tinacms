@@ -1,5 +1,20 @@
 # tina-graphql
 
+## 1.4.14
+
+### Patch Changes
+
+- e731ab0c5: Fix error "Cannot return null for non-nullable field" on boolean required fields
+
+## 1.4.13
+
+### Patch Changes
+
+- ca74add40: Fix issue where an empty reference would cause an error in a list query
+- 0f5557d23: Fix windows bug in folder support
+- ff4c1e0f4: tina folder is default in createDatabase function. If the .tina folder is still being used then `tinaDirectory: '.tina'`, must be added to the createDatabase function.
+- 6fefa56b0: Feat: Update database query to support filtering on list fields
+
 ## 1.4.12
 
 ### Patch Changes

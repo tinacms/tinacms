@@ -1,5 +1,38 @@
 # tinacms-cli
 
+## 1.5.14
+
+### Patch Changes
+
+- Updated dependencies [e731ab0c5]
+  - @tinacms/graphql@1.4.14
+  - @tinacms/datalayer@1.2.14
+
+## 1.5.13
+
+### Patch Changes
+
+- 5a6018916: Add support for "quick editing". By adding the `[data-tina-field]` attribute to your elements, editors can click to see the
+  correct form and field focused in the sidebar.
+
+  This work closely resembles the ["Active Feild Indicator"](https://tina-io-git-quick-edit-tinacms.vercel.app/docs/editing/active-field-indicator/) feature.
+  Which will be phased in out place of this in the future. Note that the attribute name is different, `[data-tinafield]` is the value
+  for the "Active Field Indicator" while `[data-tina-field]` is the new attribute.
+
+  The `tinaField` helper function should now only be used with the `[data-tina-field]` attibute.
+
+  Adds experimental support for Vercel previews, the `useVisualEditing` hook from `@tinacms/vercel-previews` can be used
+  to activate edit mode and listen for Vercel edit events.
+
+- Updated dependencies [ca74add40]
+- Updated dependencies [0f5557d23]
+- Updated dependencies [ff4c1e0f4]
+- Updated dependencies [6fefa56b0]
+- Updated dependencies [7f95c1ce5]
+  - @tinacms/graphql@1.4.13
+  - @tinacms/app@1.2.13
+  - @tinacms/datalayer@1.2.13
+
 ## 1.5.12
 
 ### Patch Changes
