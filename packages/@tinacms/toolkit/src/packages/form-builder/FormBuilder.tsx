@@ -187,12 +187,11 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         dirtySinceLastSubmit,
         hasValidationErrors,
       }) => {
-        const usingDefaultBranch =
-          cms.api.tina.branch === 'main' || cms.api.tina.branch === 'master'
+        const usingProtectedBranch = cms.api.tina.usingProtectedBranch()
         const usingBranching = cms.flags.get('branch-switcher')
 
-        const usingBranchingAndOnDefualtBranch =
-          usingDefaultBranch && usingBranching
+        const usingBranchingAndOnDefaultBranch =
+          usingProtectedBranch && usingBranching
 
         const canSubmit =
           !pristine &&
@@ -207,7 +206,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         }
 
         const safeHandleSubmit = async () => {
-          if (usingBranchingAndOnDefualtBranch) {
+          if (usingBranchingAndOnDefaultBranch) {
             setCreateBranchModalOpen(true)
           } else {
             safeSubmit()
@@ -443,6 +442,10 @@ export const CreateBranchModel = ({
         await onSubmit(createdBranchName)
         setLoading('done')
         close()
+      })
+      .catch((err) => {
+        console.error(err)
+        cms.alerts.error('Error creating branch. ' + err.message)
       })
   }, [])
   return (

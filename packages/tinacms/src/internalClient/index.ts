@@ -43,6 +43,7 @@ const parseRefForBranchName = (ref: string) => {
 const ListBranchResponse = z
   .object({
     name: z.string(),
+    protected: z.boolean().optional().default(false),
   })
   .array()
 
@@ -189,7 +190,8 @@ export class Client {
   private token: string // used with memory storage
   private branch: string
   private options: ServerOptions
-  events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
+  events = new EventBus() // automatically hooked into global event bus when attached via cms.
+  protectedBranches: string[] = []
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.tinaGraphQLVersion = options.tinaGraphQLVersion
@@ -694,6 +696,9 @@ mutation addPendingDocumentMutation(
           indexStatus,
         }
       })
+      this.protectedBranches = parsedBranches
+        .filter((x) => x.protected)
+        .map((x) => x.name)
       const indexStatus = await Promise.all(indexStatusPromises)
 
       return indexStatus
@@ -701,6 +706,9 @@ mutation addPendingDocumentMutation(
       console.error('There was an error listing branches.', error)
       throw error
     }
+  }
+  usingProtectedBranch() {
+    return this.protectedBranches.includes(this.branch)
   }
   async createBranch({ baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`
