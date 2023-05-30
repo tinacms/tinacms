@@ -61,7 +61,7 @@ export const Nav = ({
   const cms = useCMS()
   const { setEdit } = useEditState()
   const [eventsOpen, setEventsOpen] = React.useState(false)
-  const { setMenuIsOpen } = React.useContext(SidebarContext)
+  const sidebarContext = React.useContext(SidebarContext)
 
   function closeEventsModal() {
     setEventsOpen(false)
@@ -191,7 +191,7 @@ export const Nav = ({
                     <li key={`nav-site-${f.tinaForm.label}`}>
                       <SidebarSiteLink
                         onClick={() => {
-                          setMenuIsOpen(false)
+                          sidebarContext?.setMenuIsOpen(false)
                           cms.dispatch({
                             type: 'forms:set-active-form-id',
                             value: f.tinaForm.id,
