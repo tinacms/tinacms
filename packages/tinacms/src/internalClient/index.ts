@@ -466,7 +466,6 @@ mutation addPendingDocumentMutation(
       }
     )
     const val = await res.json()
-    console.log({ getProject: val })
     return val as TinaCloudProject
   }
 

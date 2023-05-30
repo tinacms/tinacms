@@ -269,8 +269,7 @@ export const TinaCloudProvider = (
       client.getProject().then((project) => {
         if (project?.branchingEnabled) {
           cms.flags.set('branch-switcher', true)
-          // TODO: we dont need to call this if the branch list is returned from the getProject call
-          client.listBranches()
+          client.protectedBranches = project.protectedBranches
         }
       })
     }
