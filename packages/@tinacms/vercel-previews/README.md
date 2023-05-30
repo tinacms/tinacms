@@ -1,10 +1,18 @@
 ## Getting started
 
-## Setting up your data for visual editing
+> For a quick start, use [the starter](https://github.com/tinacms/vercel-edit-demo)
 
-There are two ways to indicate that a field is editable.
+To use Vercel's visual editing features with Tina your site should already be configured to work with Tina's `useTina` hook. Refer to this guide to get started with [Tina's visual edting](https://tina.io/docs/contextual-editing/overview/).
 
-### String encoding
+Vercel's visual editing mode works by adding metadata to your page about where the content comes from. To get started, add the preview package:
+
+```
+npm install @tinacms/vercel-previews
+```
+
+There are two ways to indicate that a field is editable, **automatically** by enabling string-encoding and **manually** by adding data attributes to editable elements on your page.
+
+### Enabling string-encoding
 
 ```tsx
 // pages/[slug].tsx
@@ -46,13 +54,13 @@ export const Post = (props) => {
 }
 ```
 
-### Data Attributes
+### Manually adding data attributes
 
-String encoding can break things like links or images. If you decide to turn string encoding off you can still enable
+String-encoding can break things like links or images. If you decide to turn string-encoding off you can still enable
 visual editing with the `[data-vercel-edit-info]` attribute.
 
 If an element has a `[data-vercel-edit-info]` attribute on it, it will be considered editable.
-This is obviously more work than the string encoding, but to make it easier to manage, Tina provides a helper function:
+Tina provides a helper function to add the necessary metadata to your element:
 
 #### The `vercelEditInfo` helper
 
