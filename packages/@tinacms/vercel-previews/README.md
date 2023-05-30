@@ -1,8 +1,10 @@
 ## Getting started
 
+⚠️ You must be a Vercel Enterprise customer for Visual Editing ⚠️
+
 > For a quick start, use [the starter](https://github.com/tinacms/vercel-edit-demo)
 
-To use Vercel's visual editing features with Tina your site should already be configured to work with Tina's `useTina` hook. Refer to this guide to get started with [Tina's visual edting](https://tina.io/docs/contextual-editing/overview/).
+To use Vercel's [visual editing](https://vercel.com/blog/visual-editing) features with Tina your site should already be configured to work with Tina's `useTina` hook. Refer to this guide to get started with [Tina's visual edting](https://tina.io/docs/contextual-editing/overview/).
 
 Vercel's visual editing mode works by adding metadata to your page about where the content comes from. To get started, add the preview package:
 
