@@ -14,6 +14,7 @@ import {
 
 import gql from 'graphql-tag'
 import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
+import { TinaCloudProject } from './types'
 
 export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
 
@@ -455,6 +456,18 @@ mutation addPendingDocumentMutation(
     )
     const jsonRes = await res.json()
     return jsonRes
+  }
+
+  async getProject() {
+    const res = await this.fetchWithToken(
+      `${this.identityApiUrl}/v2/apps/${this.clientId}`,
+      {
+        method: 'GET',
+      }
+    )
+    const val = await res.json()
+    console.log({ getProject: val })
+    return val as TinaCloudProject
   }
 
   async fetchEvents(

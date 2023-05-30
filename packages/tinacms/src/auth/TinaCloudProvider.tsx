@@ -207,6 +207,11 @@ export const TinaCloudProvider = (
       cms.media.store = new DummyMediaStore()
     }
   }
+  const client: Client = cms.api.tina
+  // Weather or not we are using Tina Cloud for auth
+  const isTinaCloud =
+    !client.isLocalMode &&
+    !client.schema?.config?.config?.admin?.auth?.customAuth
 
   const handleListBranches = async (): Promise<Branch[]> => {
     const { owner, repo } = props
@@ -256,6 +261,18 @@ export const TinaCloudProvider = (
   React.useEffect(() => {
     if (props.cmsCallback) {
       props.cmsCallback(cms)
+    }
+  }, [])
+
+  React.useEffect(() => {
+    if (isTinaCloud) {
+      client.getProject().then((project) => {
+        if (project?.branchingEnabled) {
+          cms.flags.set('branch-switcher', true)
+          // TODO: we dont need to call this if the branch list is returned from the getProject call
+          client.listBranches()
+        }
+      })
     }
   }, [])
 
