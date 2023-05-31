@@ -84,31 +84,44 @@ export class TinaCMSSearchIndexClient implements SearchClient {
     const headers = new Headers()
     headers.append('x-api-key', this.indexerToken || 'bogus')
     headers.append('Content-Type', 'application/json')
-    const res = await fetch(`${this.apiUrl}/upload/${this.branch}`, {
+    let res = await fetch(`${this.apiUrl}/upload/${this.branch}`, {
       method: 'GET',
       headers,
     })
+    if (res.status !== 200) {
+      let json
+      try {
+        json = await res.json()
+      } catch (e) {
+        console.error('Failed to parse error response', e)
+      }
+
+      throw new Error(
+        `Failed to get upload url. Status: ${res.status}${
+          json?.message ? ` - ${json.message}` : ``
+        }`
+      )
+    }
     const { signedUrl } = await res.json()
-    console.log('onFinishIndexing')
-    // TODO this should use the token and apiUrl to upload the index
     const sqliteLevel = new SqliteLevel({ filename: ':memory:' })
-    console.log('dumping to sqlite')
     const iterator = this.memoryLevel.iterator()
-    // should batch these writes?
     for await (const [key, value] of iterator) {
       await sqliteLevel.put(key, value)
     }
     const buffer = sqliteLevel.db.serialize()
-    console.log(buffer.byteLength)
     await sqliteLevel.close()
-    // TODO this should use the token and apiUrl to upload the index
     // upload the buffer to the apiUrl
-    await fetch(signedUrl, {
+    res = await fetch(signedUrl, {
       method: 'PUT',
       body: zlib.gzipSync(buffer),
     })
-    // TODO check for errors and output
-    console.log('done onFinishIndexing')
+    if (res.status !== 200) {
+      throw new Error(
+        `Failed to upload search index. Status: ${
+          res.status
+        }\n${await res.text()}`
+      )
+    }
   }
 
   public getSearchIndex() {

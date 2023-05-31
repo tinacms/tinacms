@@ -14,7 +14,6 @@ const tinaConfigKey = z
   .optional()
 const tinaSearchKey = z
   .object({
-    apiUrl: z.string().optional(),
     indexerToken: z.string().optional(),
   })
   .strict()
