@@ -1,19 +1,25 @@
 ## Getting started
 
-## Setting up your data for visual editing
+⚠️ You must be a Vercel Enterprise customer for Visual Editing ⚠️
 
-There are two ways to indicate that a field is editable.
+> For a quick start, use [the starter](https://github.com/tinacms/vercel-edit-demo)
 
-### Data Attributes
+To use Vercel's [visual editing](https://vercel.com/blog/visual-editing) features with Tina your site should already be configured to work with Tina's `useTina` hook. Refer to this guide to get started with [Tina's visual edting](https://tina.io/docs/contextual-editing/overview/).
 
-If an element has a `[data-vercel-edit-info]` attribute on it, it will be considered editable. To make it easier to manage, Tina provides a helper function:
+Vercel's visual editing mode works by adding metadata to your page about where the content comes from. To get started, add the preview package:
 
-#### The `vercelEditInfo` helper
+```
+npm install @tinacms/vercel-previews
+```
+
+There are two ways to indicate that a field is editable, **automatically** by enabling string-encoding and **manually** by adding data attributes to editable elements on your page.
+
+### Enabling string-encoding
 
 ```tsx
 // pages/[slug].tsx
 import { useTina } from 'tinacms/dist/react'
-import { vercelEditInfo } from '@tinacms/vercel-previews/dist/react'
+import { useVisualEditing } from '@tinacms/vercel-previews'
 
 export const Post = (props) => {
   const { data: tinaData } = useTina(props)
@@ -38,6 +44,46 @@ export const Post = (props) => {
         return false
       }
     }
+  })
+
+  return (
+    <div>
+      <h1>
+        {data.title}
+      </h1>
+    </div>
+  )
+}
+```
+
+### Manually adding data attributes
+
+String-encoding can break things like links or images. If you decide to turn string-encoding off you can still enable
+visual editing with the `[data-vercel-edit-info]` attribute.
+
+If an element has a `[data-vercel-edit-info]` attribute on it, it will be considered editable.
+Tina provides a helper function to add the necessary metadata to your element:
+
+#### The `vercelEditInfo` helper
+
+```tsx
+// pages/[slug].tsx
+import { useTina } from 'tinacms/dist/react'
+import { vercelEditInfo, useVisualEditing } from '@tinacms/vercel-previews'
+
+export const Post = (props) => {
+  const { data: tinaData } = useTina(props)
+  const data = useVisualEditing({
+    data: tinaData,
+    // metadata is derived from the query and variables
+    query: props.query,
+    variables: props.variables,
+    // When clicking on an editable element for the first time, redirect to the TinaCMS app
+    redirect: '/admin',
+    // Only enable visual editing on preview deploys
+    enabled: props.visualEditingEnabled
+    // stringEncoding automatically adds metadata to strings
+    stringEncoding: false
   })
 
   return (
@@ -73,75 +119,5 @@ export const NewsletterBlock = (props) => {
       </div>
     </div>
   )
-}
-```
-
-### Encoded Strings
-
-If an element’s `textContent` contains an encoded string, it will be considered editable.
-This feature is not enabled by default, to enable:
-
-> NOTE: Most likely, you won't want all of your fields to be encoded, the encoding process
-> only applies to string values, but it alters them in a way that makes them unusable for
-> anything other than rendering. Take note of the `encodeAtPath` callback function, which
-> controls whether a value at the given path recieves the encoding info.
-
-#### Add the plugin to the TinaCMS config:
-
-```js
-// tina/config.ts
-export default defineConfig({
-  cmsCallback: (cms) => {
-    cms.plugins.add(createSourceMapEncoder(encodeAtPath))
-
-    return cms
-  },
-})
-
-// Export this so it can be re-used in the next section
-export const encodeAtPath = (path, value) => {
-  if (path === 'page.blocks.0.headline') {
-    console.log(path)
-    return true
-  }
-  return false
-}
-```
-
-### Use the `withSourceMaps` helper
-
-```js
-// pages/[slug].tsx
-import { encodeAtPath } from '../tina/config'
-
-export const getStaticProps = async ({ params }) => {
-  const tinaProps = await client.queries.contentQuery({
-    relativePath: `${params.filename}.md`,
-  })
-  return {
-    props: withSourceMaps(tinaProps, { encodeStrings: true, encodeAtPath }),
-  }
-}
-```
-
-## Listen for clicks on a visual element
-
-When a user clicks to edit a visual element, Tina will redirect to the same URL
-within an iframe, and will select the appropriate form and field for editing. After
-the first redirect, subsequent clicks will no longer redirect, but will activate
-the selected field.
-
-To set this up, register the hook, provide the redirect URL you set up
-in your `tina/config.ts` file:
-
-```jsx
-// pages/[slug].tsx
-import { useEditOpen } from '@tinacms/vercel-previews/dist/react'
-
-export default function Page(props) {
-  const { data } = useTina(props)
-  useEditOpen('/admin')
-
-  return <MyPage {...data} />
 }
 ```
