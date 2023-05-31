@@ -265,17 +265,20 @@ export class DevCommand extends BaseCommand {
           return
         }
         const pathFromRoot = configManager.printContentRelativePath(addedFile)
-        database.indexContentByPaths([pathFromRoot])
+        console.log('added', pathFromRoot)
+        database.indexContentByPaths([pathFromRoot]).catch(logger.error)
       })
       .on('change', async (changedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(changedFile)
         // Optionally we can reload the page when this happens
         // server.ws.send({ type: 'full-reload', path: '*' })
-        database.indexContentByPaths([pathFromRoot])
+        console.log('changed', pathFromRoot)
+        database.indexContentByPaths([pathFromRoot]).catch(logger.error)
       })
       .on('unlink', async (removedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(removedFile)
-        database.deleteContentByPaths([pathFromRoot])
+        console.log('removed', pathFromRoot)
+        database.deleteContentByPaths([pathFromRoot]).catch(logger.error)
       })
   }
   watchQueries(configManager: ConfigManager, callback: () => Promise<string>) {
