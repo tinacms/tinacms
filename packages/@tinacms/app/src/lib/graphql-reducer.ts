@@ -179,6 +179,8 @@ export const useGraphQLReducer = (
   >([])
   const [operationIndex, setOperationIndex] = React.useState(0)
 
+  const activeField = searchParams.get('active-field')
+
   React.useEffect(() => {
     const run = async () => {
       return Promise.all(
@@ -435,10 +437,10 @@ export const useGraphQLReducer = (
             { id: payload.id, data: result.data },
           ])
         }
-        const activeField = searchParams.get('active-field')
         if (activeField) {
           setSearchParams({})
           const [queryId, eventFieldName] = activeField.split('---')
+          console.log('calling set active field name', eventFieldName)
           if (queryId === payload.id) {
             if (result?.data) {
               cms.dispatch({
@@ -471,7 +473,10 @@ export const useGraphQLReducer = (
         },
       })
     },
-    [resolvedDocuments.map((doc) => doc._internalSys.path).join('.')]
+    [
+      resolvedDocuments.map((doc) => doc._internalSys.path).join('.'),
+      activeField,
+    ]
   )
 
   const handleMessage = React.useCallback(
