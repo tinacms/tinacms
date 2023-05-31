@@ -1351,7 +1351,7 @@ const _indexContent = async (
       throw new TinaFetchError(`Unable to seed ${filepath}`, {
         originalError: error,
         file: filepath,
-        collection: collection.name,
+        collection: collection?.name,
         stack: error.stack,
       })
     }
