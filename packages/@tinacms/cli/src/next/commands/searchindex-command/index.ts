@@ -8,6 +8,7 @@ import {
   TinaCMSSearchIndexClient,
 } from '@tinacms/search'
 import { spin } from '../../../utils/spinner'
+import { dangerText } from '../../../utils/theme'
 
 export class SearchIndexCommand extends Command {
   static paths = [['search-index']]
@@ -52,6 +53,28 @@ export class SearchIndexCommand extends Command {
     let client: SearchClient
     const hasTinaSearch = Boolean(configManager.config?.search?.tina)
     if (hasTinaSearch) {
+      if (!configManager.config?.branch) {
+        logger.error(
+          `${dangerText(
+            `ERROR: Branch not configured in tina search configuration.`
+          )}`
+        )
+        throw new Error('Branch not configured in tina search configuration.')
+      }
+      if (!configManager.config?.clientId) {
+        logger.error(`${dangerText(`ERROR: clientId not configured.`)}`)
+        throw new Error('clientId not configured.')
+      }
+      if (!configManager.config?.search?.tina?.indexerToken) {
+        logger.error(
+          `${dangerText(
+            `ERROR: indexerToken not configured in tina search configuration.`
+          )}`
+        )
+        throw new Error(
+          'indexerToken not configured in tina search configuration.'
+        )
+      }
       client = new TinaCMSSearchIndexClient({
         apiUrl: `${
           configManager.config.tinaioConfig?.contentApiUrlOverride ||
@@ -76,12 +99,21 @@ export class SearchIndexCommand extends Command {
       textIndexLength: 500,
       client,
     })
+    let err: Error | undefined
     await spin({
       waitFor: async () => {
-        await searchIndexer.indexAllContent()
+        try {
+          await searchIndexer.indexAllContent()
+        } catch (e) {
+          err = e
+        }
       },
       text: 'Building search index',
     })
-    process.exit()
+    if (err) {
+      logger.error(`${dangerText(`ERROR: ${err.message}`)}`)
+      process.exit(1)
+    }
+    process.exit(0)
   }
 }
