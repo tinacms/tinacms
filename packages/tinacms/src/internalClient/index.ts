@@ -189,7 +189,7 @@ export class Client {
   setToken: (_token: TokenObject) => void
   private getToken: () => Promise<TokenObject>
   private token: string // used with memory storage
-  private branch: string
+  branch: string
   private options: ServerOptions
   events = new EventBus() // automatically hooked into global event bus when attached via cms.
   protectedBranches: string[] = []
@@ -736,7 +736,11 @@ mutation addPendingDocumentMutation(
           'Content-Type': 'application/json',
         },
       })
-      return await res.json().then((r) => parseRefForBranchName(r.data.ref))
+      const values = await res.json()
+      console.log('values', values)
+      const returnValue = parseRefForBranchName(values.data.ref)
+      console.log('returnValue', returnValue)
+      return returnValue
     } catch (error) {
       console.error('There was an error creating a new branch.', error)
       return null

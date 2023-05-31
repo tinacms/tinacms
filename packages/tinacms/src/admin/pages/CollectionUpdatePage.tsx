@@ -116,7 +116,8 @@ const RenderForm = ({
 
   const form = useMemo(() => {
     return new Form({
-      id: 'update-form',
+      // id is the full document path
+      id: `${schemaCollection.path}/${relativePath}`,
       label: 'form',
       fields: formInfo.fields as any,
       initialValues: document._values,

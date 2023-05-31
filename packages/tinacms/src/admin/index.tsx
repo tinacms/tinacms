@@ -24,6 +24,7 @@ import ScreenPage from './pages/ScreenPage'
 import { useEditState } from '@tinacms/sharedctx'
 import { Client } from '../internalClient'
 import { TinaAdminApi } from './api'
+import { IndexingPage } from './pages/indexingPage'
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -187,6 +188,14 @@ export const TinaAdmin = ({
                       <PlainLayout>
                         <Playground />
                       </PlainLayout>
+                    }
+                  />
+                  <Route
+                    path="branch/new"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <IndexingPage />
+                      </DefaultWrapper>
                     }
                   />
                   <Route

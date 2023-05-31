@@ -29,8 +29,6 @@ export interface BranchChangeEvent {
 }
 
 export interface BranchData {
-  owner: string
-  repo: string
   baseBranch?: string
   branchName?: string
 }

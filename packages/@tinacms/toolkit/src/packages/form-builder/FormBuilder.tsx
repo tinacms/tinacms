@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import * as React from 'react'
 import { FC, useEffect } from 'react'
 import { Form } from '../forms'
@@ -217,7 +213,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           <>
             {createBranchModalOpen && (
               <CreateBranchModel
-                onSubmit={safeSubmit}
+                tinaForm={tinaForm}
                 close={() => setCreateBranchModalOpen(false)}
               />
             )}
@@ -404,50 +400,16 @@ const getAnimationProps = (animateStatus) => {
 
 export const CreateBranchModel = ({
   close,
-  onSubmit,
+  tinaForm,
 }: {
   close: () => void
-  onSubmit: (branch: string) => Promise<void>
+  tinaForm: Form<any, any>
 }) => {
   const cms = useCMS()
   const tinaApi = cms.api.tina
   const currentBranch = tinaApi.branch
-  const { setCurrentBranch } = useBranchData()
-  const [loading, setLoading] = React.useState<'loading' | 'indexing' | 'done'>(
-    'done'
-  )
 
   const [newBranchName, setNewBranchName] = React.useState('')
-  const handleCreateBranch = React.useCallback((value) => {
-    setLoading('loading')
-    tinaApi
-      .createBranch({
-        branchName: formatBranchName(value),
-        baseBranch: currentBranch,
-      })
-      .then(async (createdBranchName) => {
-        setLoading('indexing')
-        // @ts-ignore
-        cms.alerts.success('Branch created.')
-        const [
-          // When this promise resolves, we know the index status is no longer 'inprogress' or 'unknown'
-          waitForIndexStatusPromise,
-          // Calling this function will cancel the polling
-          _cancelWaitForIndexFunc,
-        ] = cms.api.tina.waitForIndexStatus({
-          ref: createdBranchName,
-        })
-        await waitForIndexStatusPromise
-        setCurrentBranch(createdBranchName)
-        await onSubmit(createdBranchName)
-        setLoading('done')
-        close()
-      })
-      .catch((err) => {
-        console.error(err)
-        cms.alerts.error('Error creating branch. ' + err.message)
-      })
-  }, [])
   return (
     <Modal>
       <PopupModal>
@@ -459,26 +421,33 @@ export const CreateBranchModel = ({
             </p>
             <p>To save your work Tina will create a new branch</p>
           </div>
-          {loading === 'loading' && <div>Creating branch</div>}
-          {loading === 'indexing' && <div>Indexing Content</div>}
-          {(loading === 'indexing' || loading === 'loading') && (
-            <LoadingDots color="black" />
-          )}
-          {loading === 'done' && (
-            <CreateBranch
-              currentBranch={currentBranch}
-              newBranchName={newBranchName}
-              onCreateBranch={handleCreateBranch}
-              setNewBranchName={setNewBranchName}
-            />
-          )}
+
+          <CreateBranch
+            currentBranch={currentBranch}
+            newBranchName={newBranchName}
+            onCreateBranch={() => {
+              const fullPath = tinaForm.id
+              const values = tinaForm.values
+              localStorage.setItem('tina.createBranchState', 'starting')
+              localStorage.setItem('tina.createBranchState.fullPath', fullPath)
+              localStorage.setItem(
+                'tina.createBranchState.values',
+                JSON.stringify(values)
+              )
+              localStorage.setItem(
+                'tina.createBranchState.back',
+                window.location.href
+              )
+              const hash = window.location.hash
+              const newHash = `#/branch/new?branch=${newBranchName}`
+              const newUrl = window.location.href.replace(hash, newHash)
+              window.location.href = newUrl
+            }}
+            setNewBranchName={setNewBranchName}
+          />
         </ModalBody>
         <ModalActions>
-          <Button
-            style={{ flexGrow: 2 }}
-            onClick={close}
-            disabled={loading == 'indexing' || loading === 'loading'}
-          >
+          <Button style={{ flexGrow: 2 }} onClick={close}>
             Cancel
           </Button>
         </ModalActions>
