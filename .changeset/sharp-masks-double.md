@@ -3,4 +3,4 @@
 '@tinacms/app': patch
 ---
 
-Prevent unhandled promise when not able to determine collection for file
+Prevent unhandled promise rejection when not able to determine collection for file
