@@ -128,7 +128,9 @@ export class Database {
     filepath: string
   ): Promise<Collection<true> | undefined> => {
     const tinaSchema = await this.getSchema(this.level)
-    return tinaSchema.getCollectionByFullPath(filepath)
+    try {
+      return tinaSchema.getCollectionByFullPath(filepath)
+    } catch (e) {}
   }
 
   private getGeneratedFolder = () =>
@@ -481,7 +483,7 @@ export class Database {
   }
 
   public async getTemplateDetailsForFile(
-    collection: TinaCloudCollection<true>,
+    collection: Collection<true>,
     data: { [key: string]: unknown }
   ) {
     const tinaSchema = await this.getSchema()
@@ -516,8 +518,10 @@ export class Database {
     filepath: string,
     data: { [key: string]: unknown }
   ) => {
-    const tinaSchema = await this.getSchema(this.level)
-    const collection = tinaSchema.getCollectionByFullPath(filepath)
+    const collection = await this.collectionForPath(filepath)
+    if (!collection) {
+      throw new Error(`Unable to find collection for path ${filepath}`)
+    }
 
     const { template } = await this.getTemplateDetailsForFile(collection, data)
     const bodyField = template.fields.find((field) => {

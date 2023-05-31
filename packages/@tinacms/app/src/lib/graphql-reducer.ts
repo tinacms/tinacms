@@ -870,7 +870,11 @@ const getTemplateForDocument = (
   tinaSchema: TinaSchema
 ) => {
   const id = resolvedDocument._internalSys.path
-  const collection = tinaSchema.getCollectionByFullPath(id)
+  let collection: Collection<true> | undefined
+  try {
+    collection = tinaSchema.getCollectionByFullPath(id)
+  } catch (e) {}
+
   if (!collection) {
     throw new Error(`Unable to determine collection for path ${id}`)
   }
