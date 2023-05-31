@@ -440,7 +440,6 @@ export const useGraphQLReducer = (
         if (activeField) {
           setSearchParams({})
           const [queryId, eventFieldName] = activeField.split('---')
-          console.log('calling set active field name', eventFieldName)
           if (queryId === payload.id) {
             if (result?.data) {
               cms.dispatch({
