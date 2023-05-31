@@ -12,7 +12,6 @@ import type {
   CollectionTemplateable,
   Schema,
   Template,
-  TinaCloudCollection,
   TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools'
@@ -124,9 +123,7 @@ export class Database {
     this.onDelete = config.onDelete || defaultOnDelete
   }
 
-  private collectionForPath = async (
-    filepath: string
-  ): Promise<Collection<true> | undefined> => {
+  private collectionForPath = async (filepath: string) => {
     const tinaSchema = await this.getSchema(this.level)
     try {
       return tinaSchema.getCollectionByFullPath(filepath)
@@ -264,6 +261,9 @@ export class Database {
     const dataFields = await this.formatBodyOnPayload(filepath, data)
 
     const collection = await this.collectionForPath(filepath)
+    if (!collection) {
+      throw new GraphQLError(`Unable to find collection for ${filepath}`)
+    }
 
     const stringifiedFile = await this.stringifyFile(
       filepath,
@@ -271,11 +271,8 @@ export class Database {
       collection
     )
 
-    let collectionIndexDefinitions
-    if (collection) {
-      const indexDefinitions = await this.getIndexDefinitions(this.level)
-      collectionIndexDefinitions = indexDefinitions?.[collection.name]
-    }
+    const indexDefinitions = await this.getIndexDefinitions(this.level)
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
     const normalizedPath = normalizePath(filepath)
     if (this.bridge) {
       await this.bridge.put(normalizedPath, stringifiedFile)
@@ -370,6 +367,9 @@ export class Database {
         const normalizedPath = normalizePath(filepath)
         const dataFields = await this.formatBodyOnPayload(filepath, data)
         const collection = await this.collectionForPath(filepath)
+        if (!collection) {
+          throw new GraphQLError(`Unable to find collection for ${filepath}.`)
+        }
 
         // If a collection match is specified, make sure the file matches the glob.
         // TODO: Maybe we should service this error better in the frontend?
@@ -550,7 +550,7 @@ export class Database {
   public stringifyFile = async (
     filepath: string,
     payload: { [key: string]: unknown },
-    collection: TinaCloudCollection<true>
+    collection: Collection<true>
   ) => {
     const templateDetails = await this.getTemplateDetailsForFile(
       collection,
@@ -586,6 +586,9 @@ export class Database {
 
     const dataFields = await this.formatBodyOnPayload(filepath, data)
     const collection = await this.collectionForPath(filepath)
+    if (!collection) {
+      throw new Error(`Unable to find collection for path ${filepath}`)
+    }
     const stringifiedFile = await this.stringifyFile(
       filepath,
       dataFields,
@@ -1095,11 +1098,11 @@ export class Database {
   public delete = async (filepath: string) => {
     await this.initLevel()
     const collection = await this.collectionForPath(filepath)
-    let collectionIndexDefinitions
-    if (collection) {
-      const indexDefinitions = await this.getIndexDefinitions(this.level)
-      collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    if (!collection) {
+      throw new Error(`No collection found for path: ${filepath}`)
     }
+    const indexDefinitions = await this.getIndexDefinitions(this.level)
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
     this.level.sublevel<string, Record<string, any>>(
       CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
