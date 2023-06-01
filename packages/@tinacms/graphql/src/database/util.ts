@@ -289,10 +289,10 @@ export const getTemplateForFile = (
   templateInfo: CollectionTemplateable,
   data: { [key: string]: unknown }
 ) => {
-  if (templateInfo.type === 'object') {
+  if (templateInfo?.type === 'object') {
     return templateInfo.template
   }
-  if (templateInfo.type === 'union') {
+  if (templateInfo?.type === 'union') {
     if (hasOwnProperty(data, '_template')) {
       const template = templateInfo.templates.find(
         (t) => lastItem(t.namespace) === data._template
