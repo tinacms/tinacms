@@ -10,8 +10,10 @@ import { useCMS } from '../../react-tinacms/use-cms'
 import {
   BiArrowToBottom,
   BiCloudUpload,
+  BiError,
   BiFolder,
   BiGridAlt,
+  BiLinkExternal,
   BiListUl,
   BiX,
 } from 'react-icons/bi'
@@ -620,7 +622,7 @@ const SyncStatusContainer = ({ children }) => {
     const checkSyncStatus = async () => {
       const project = await cms.api.tina.getProject()
 
-      setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
+      setSyncStatus('needs-sync')
     }
 
     if (!isLocal) {
@@ -629,15 +631,27 @@ const SyncStatusContainer = ({ children }) => {
   }, [])
 
   return syncStatus == 'needs-sync' ? (
-    <div className="items-center bg-gray-50 m-auto">
-      Media needs to be turned on for this project. Sync your media in{' '}
-      <a
-        className="transition-all duration-150 ease-out text-blue-600 hover:text-blue-400 hover:underline no-underline"
-        target="_blank"
-        href={`${cms.api.tina.appDashboardLink}/media`}
-      >
-        Tina Cloud.
-      </a>
+    <div className="h-full flex items-center justify-center p-6 bg-gradient-to-t from-gray-200 to-transparent">
+      <div className="rounded-lg border shadow-sm px-4 lg:px-6 py-3 lg:py-4 bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 mx-auto mb-12">
+        <div className="flex items-start sm:items-center gap-2">
+          <BiError
+            className={`w-7 h-auto flex-shrink-0 text-yellow-400 -mt-px`}
+          />
+          <div
+            className={`flex-1 flex flex-col items-start gap-0.5 text-base text-yellow-700`}
+          >
+            Media needs to be turned on for this project.
+            <a
+              className="transition-all duration-150 ease-out text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 font-medium flex items-center justify-start gap-1"
+              target="_blank"
+              href={`${cms.api.tina.appDashboardLink}/media`}
+            >
+              Sync Your Media In Tina Cloud.
+              <BiLinkExternal className={`w-5 h-auto flex-shrink-0`} />
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   ) : (
     <SyncStatusContext.Provider value={{ syncStatus }}>
