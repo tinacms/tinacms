@@ -622,7 +622,7 @@ const SyncStatusContainer = ({ children }) => {
     const checkSyncStatus = async () => {
       const project = await cms.api.tina.getProject()
 
-      setSyncStatus('needs-sync')
+      setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
     }
 
     if (!isLocal) {
