@@ -204,6 +204,7 @@ const CollectionListPage = () => {
           })
   )
   const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const debouncedSearch = useDebounce(search, 500)
 
   const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}')
@@ -438,6 +439,8 @@ const CollectionListPage = () => {
                                     loading={_loading}
                                     search={search}
                                     setSearch={setSearch}
+                                    searchInput={searchInput}
+                                    setSearchInput={setSearchInput}
                                   />
                                 )}
                               </>
@@ -782,8 +785,13 @@ const CollectionListPage = () => {
   )
 }
 
-const SearchInput = ({ loading, search, setSearch }) => {
-  const [searchInput, setSearchInput] = useState('')
+const SearchInput = ({
+  loading,
+  search,
+  setSearch,
+  searchInput,
+  setSearchInput,
+}) => {
   const [searchLoaded, setSearchLoaded] = useState(false)
   useEffect(() => {
     if (loading) {
@@ -794,7 +802,7 @@ const SearchInput = ({ loading, search, setSearch }) => {
   }, [loading])
 
   return (
-    <div className="flex flex-1 flex-col gap-2 items-start w-full">
+    <form className="flex flex-1 flex-col gap-2 items-start w-full">
       <label
         htmlFor="search"
         className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
@@ -837,7 +845,7 @@ const SearchInput = ({ loading, search, setSearch }) => {
           )}
         </div>
       </div>
-    </div>
+    </form>
   )
 }
 
