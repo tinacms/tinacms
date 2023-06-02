@@ -611,6 +611,10 @@ export interface Config<
       }
   ) & {
     /**
+     * The number of documents to index per PUT request
+     */
+    indexBatchSize?: number
+    /**
      * The maximum length of a string field that will be indexed for search
      */
     maxSearchIndexFieldLength?: number

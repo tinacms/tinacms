@@ -165,7 +165,7 @@ export class DevCommand extends BaseCommand {
     )
     await server.listen(Number(this.port))
     const searchIndexer = new SearchIndexer({
-      batchSize: 100,
+      batchSize: configManager.config.search?.indexBatchSize || 100,
       bridge: new FilesystemBridge(
         configManager.rootPath,
         configManager.contentRootPath

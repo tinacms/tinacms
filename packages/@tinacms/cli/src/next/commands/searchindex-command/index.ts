@@ -90,7 +90,7 @@ export class SearchIndexCommand extends Command {
     }
 
     const searchIndexer = new SearchIndexer({
-      batchSize: 100, // TODO make configurable
+      batchSize: configManager.config.search?.indexBatchSize || 100,
       bridge: new FilesystemBridge(
         configManager.rootPath,
         configManager.contentRootPath
