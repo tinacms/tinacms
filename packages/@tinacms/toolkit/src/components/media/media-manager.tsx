@@ -10,8 +10,10 @@ import { useCMS } from '../../react-tinacms/use-cms'
 import {
   BiArrowToBottom,
   BiCloudUpload,
+  BiError,
   BiFolder,
   BiGridAlt,
+  BiLinkExternal,
   BiListUl,
   BiX,
 } from 'react-icons/bi'
@@ -29,7 +31,7 @@ import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
-import { IoMdSync, IoMdRefresh, IoMdFolder } from 'react-icons/io'
+import { IoMdRefresh } from 'react-icons/io'
 import { CloseIcon, TrashIcon } from '../../packages/icons'
 import {
   absoluteImgURL,
@@ -37,42 +39,9 @@ import {
   dropzoneAcceptFromString,
   isImage,
 } from './utils'
-import { DeleteModal, NewFolderModal, SyncModal } from './modal'
+import { DeleteModal, NewFolderModal } from './modal'
 import { CopyField } from './copy-field'
-
-// taken from https://davidwalsh.name/javascript-polling
-async function poll(
-  fn: () => Promise<{
-    complete: boolean
-    status: {
-      [key: string]: boolean
-    }
-  }>,
-  timeout,
-  interval
-) {
-  const endTime = Number(new Date()) + (timeout || 2000)
-  interval = interval || 100
-
-  const checkCondition = async function (resolve, reject) {
-    // If the condition is met, we're done!
-    const result = await fn()
-    if (result.complete) {
-      resolve(result)
-    }
-    // If the condition isn't met but the timeout hasn't elapsed, go again
-    else if (Number(new Date()) < endTime) {
-      setTimeout(checkCondition, interval, resolve, reject)
-    }
-    // Didn't match and too much time, reject!
-    else {
-      reject(new Error('Time out error'))
-    }
-  }
-
-  return new Promise(checkCondition)
-}
-
+import { createContext, useContext } from 'react'
 // Can not use path.join on the frontend
 const join = function (...parts) {
   // From: https://stackoverflow.com/questions/29855098/is-there-a-built-in-javascript-function-similar-to-os-path-join
@@ -175,8 +144,6 @@ export function MediaPicker({
     nextOffset: undefined,
   })
 
-  const [showSync, setShowSync] = useState(false)
-
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeItem, setActiveItem] = useState<Media | false>(false)
   const closePreview = () => setActiveItem(false)
@@ -199,23 +166,6 @@ export function MediaPicker({
   }
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
-
-  const isLocal = cms.api.tina.isLocalMode
-
-  const hasTinaMedia =
-    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
-      'mediaRoot'
-    ) &&
-    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
-      'publicFolder'
-    )
-  const folder = hasTinaMedia
-    ? join(
-        cms.api.tina.schema.schema?.config?.media?.tina.publicFolder,
-        cms.api.tina.schema.schema?.config?.media?.tina.mediaRoot
-      )
-    : ''
-  const branch = cms.api.tina?.branch
 
   function loadMedia() {
     setListState('loading')
@@ -362,53 +312,6 @@ export function MediaPicker({
     },
   })
 
-  const syncMedia = async () => {
-    if (hasTinaMedia) {
-      const res = await cms.api.tina.syncTinaMedia()
-      if (res?.assetsSyncing) {
-        // it was successful
-        try {
-          setListState('loading')
-          // poll every 3 seconds until it is done
-          await poll(
-            async () => {
-              const status = await cms.api.tina.checkSyncStatus({
-                assetsSyncing: res.assetsSyncing,
-              })
-              const totalDone = Object.values(status.status).filter(
-                Boolean
-              )?.length
-              const total = Object.keys(status.status)?.length
-              setLoadingText(`${totalDone}/${total} Media items loaded`)
-              return status
-            },
-            // Will time out after 60 seconds
-            60000,
-            3000
-          )
-          setLoadingText('')
-          // refresh the media
-          loadMedia()
-        } catch (e) {
-          cms.alerts.error(
-            'Error in syncing media, check console for more details'
-          )
-          console.error("'Error in syncing media, check below for more details")
-          console.error(e)
-        }
-      } else {
-        // it was not
-        cms.alerts.warn(
-          'Whoops, Looks media is not set up correctly in Tina Cloud. Check console for more details'
-        )
-        console.warn(
-          'Whoops, Looks media is not set up correctly. Check below for more details'
-        )
-        console.warn(res)
-      }
-    }
-  }
-
   const { onClick, ...rootProps } = getRootProps()
 
   function disableScrollBody() {
@@ -472,121 +375,101 @@ export function MediaPicker({
       )}
 
       <MediaPickerWrap>
-        <div className="flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0">
-          <div className="flex flex-1 items-center gap-4">
-            <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
-            <Breadcrumb directory={directory} setDirectory={setDirectory} />
-          </div>
+        <SyncStatusContainer>
+          <div className="flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0">
+            <div className="flex flex-1 items-center gap-4">
+              <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+              <Breadcrumb directory={directory} setDirectory={setDirectory} />
+            </div>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <Button
-              busy={false}
-              variant="white"
-              onClick={loadMedia}
-              className="whitespace-nowrap"
-            >
-              Refresh
-              <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
-            </Button>
-            <Button
-              busy={false}
-              variant="white"
-              onClick={() => {
-                setNewFolderModalOpen(true)
-              }}
-              className="whitespace-nowrap"
-            >
-              New Folder
-              <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
-            </Button>
-            {!isLocal && hasTinaMedia && (
+            <div className="flex flex-wrap items-center gap-4">
               <Button
-                // this button is only displayed when the data is not loading
+                busy={false}
+                variant="white"
+                onClick={loadMedia}
+                className="whitespace-nowrap"
+              >
+                Refresh
+                <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+              </Button>
+              <Button
                 busy={false}
                 variant="white"
                 onClick={() => {
-                  setShowSync(true)
+                  setNewFolderModalOpen(true)
                 }}
+                className="whitespace-nowrap"
               >
-                Sync <IoMdSync className="w-6 h-full ml-2 opacity-70" />
+                New Folder
+                <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
               </Button>
-            )}
-            <UploadButton onClick={onClick} uploading={uploading} />
-          </div>
-        </div>
-
-        <div className="flex h-full overflow-hidden bg-white">
-          <div className="flex w-full flex-col h-full @container">
-            <ul
-              {...rootProps}
-              className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
-                list.items.length === 0 ||
-                (viewMode === 'list' &&
-                  'w-full flex flex-1 flex-col justify-start -mb-px')
-              } ${
-                list.items.length > 0 &&
-                viewMode === 'grid' &&
-                'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-8 auto-rows-auto content-start justify-start'
-              } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
-            >
-              <input {...getInputProps()} />
-
-              {listState === 'loaded' && list.items.length === 0 && (
-                <EmptyMediaList hasTinaMedia={hasTinaMedia} />
-              )}
-
-              {viewMode === 'list' &&
-                list.items.map((item: Media) => (
-                  <ListMediaItem
-                    key={item.id}
-                    item={item}
-                    onClick={onClickMediaItem}
-                    active={activeItem && activeItem.id === item.id}
-                  />
-                ))}
-
-              {viewMode === 'grid' &&
-                list.items.map((item: Media) => (
-                  <GridMediaItem
-                    key={item.id}
-                    item={item}
-                    onClick={onClickMediaItem}
-                    active={activeItem && activeItem.id === item.id}
-                  />
-                ))}
-            </ul>
-
-            <div className="bg-gradient-to-r to-gray-50/50 from-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
-              <CursorPaginator
-                hasNext={hasNext}
-                navigateNext={navigateNext}
-                hasPrev={hasPrev}
-                navigatePrev={navigatePrev}
-              />
+              <UploadButton onClick={onClick} uploading={uploading} />
             </div>
           </div>
 
-          <ActiveItemPreview
-            activeItem={activeItem}
-            close={closePreview}
-            selectMediaItem={selectMediaItem}
-            allowDelete={allowDelete}
-            deleteMediaItem={() => {
-              setDeleteModalOpen(true)
-            }}
-          />
-        </div>
+          <div className="flex h-full overflow-hidden bg-white">
+            <div className="flex w-full flex-col h-full @container">
+              <ul
+                {...rootProps}
+                className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
+                  list.items.length === 0 ||
+                  (viewMode === 'list' &&
+                    'w-full flex flex-1 flex-col justify-start -mb-px')
+                } ${
+                  list.items.length > 0 &&
+                  viewMode === 'grid' &&
+                  'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-8 auto-rows-auto content-start justify-start'
+                } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
+              >
+                <input {...getInputProps()} />
+
+                {listState === 'loaded' && list.items.length === 0 && (
+                  <EmptyMediaList />
+                )}
+
+                {viewMode === 'list' &&
+                  list.items.map((item: Media) => (
+                    <ListMediaItem
+                      key={item.id}
+                      item={item}
+                      onClick={onClickMediaItem}
+                      active={activeItem && activeItem.id === item.id}
+                    />
+                  ))}
+
+                {viewMode === 'grid' &&
+                  list.items.map((item: Media) => (
+                    <GridMediaItem
+                      key={item.id}
+                      item={item}
+                      onClick={onClickMediaItem}
+                      active={activeItem && activeItem.id === item.id}
+                    />
+                  ))}
+              </ul>
+
+              <div className="bg-gradient-to-r to-gray-50/50 from-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
+                <CursorPaginator
+                  hasNext={hasNext}
+                  navigateNext={navigateNext}
+                  hasPrev={hasPrev}
+                  navigatePrev={navigatePrev}
+                />
+              </div>
+            </div>
+
+            <ActiveItemPreview
+              activeItem={activeItem}
+              close={closePreview}
+              selectMediaItem={selectMediaItem}
+              allowDelete={allowDelete}
+              deleteMediaItem={() => {
+                setDeleteModalOpen(true)
+              }}
+            />
+          </div>
+        </SyncStatusContainer>
       </MediaPickerWrap>
-      {showSync && (
-        <SyncModal
-          folder={folder}
-          branch={branch}
-          syncFunc={syncMedia}
-          close={() => {
-            setShowSync(false)
-          }}
-        />
-      )}
     </>
   )
 }
@@ -711,12 +594,85 @@ const MediaPickerWrap = ({ children }) => {
   )
 }
 
-const EmptyMediaList = (props) => {
+interface SyncStatusContextProps {
+  syncStatus: 'loading' | 'synced' | 'needs-sync'
+}
+
+const SyncStatusContext = createContext<SyncStatusContextProps | undefined>(
+  undefined
+)
+
+const SyncStatusContainer = ({ children }) => {
+  const cms = useCMS()
+  const isLocal = cms.api.tina.isLocalMode
+
+  const hasTinaMedia =
+    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
+      'mediaRoot'
+    ) &&
+    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
+      'publicFolder'
+    )
+
+  const [syncStatus, setSyncStatus] = useState<
+    'loading' | 'synced' | 'needs-sync'
+  >(hasTinaMedia && !isLocal ? 'loading' : 'synced')
+
+  useEffect(() => {
+    const checkSyncStatus = async () => {
+      const project = await cms.api.tina.getProject()
+
+      setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
+    }
+
+    if (!isLocal) {
+      checkSyncStatus()
+    }
+  }, [])
+
+  return syncStatus == 'needs-sync' ? (
+    <div className="h-full flex items-center justify-center p-6 bg-gradient-to-t from-gray-200 to-transparent">
+      <div className="rounded-lg border shadow-sm px-4 lg:px-6 py-3 lg:py-4 bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 mx-auto mb-12">
+        <div className="flex items-start sm:items-center gap-2">
+          <BiError
+            className={`w-7 h-auto flex-shrink-0 text-yellow-400 -mt-px`}
+          />
+          <div
+            className={`flex-1 flex flex-col items-start gap-0.5 text-base text-yellow-700`}
+          >
+            Media needs to be turned on for this project.
+            <a
+              className="transition-all duration-150 ease-out text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 font-medium flex items-center justify-start gap-1"
+              target="_blank"
+              href={`${cms.api.tina.appDashboardLink}/media`}
+            >
+              Sync Your Media In Tina Cloud.
+              <BiLinkExternal className={`w-5 h-auto flex-shrink-0`} />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <SyncStatusContext.Provider value={{ syncStatus }}>
+      {children}
+    </SyncStatusContext.Provider>
+  )
+}
+
+const useSyncStatus = () => {
+  const context = useContext(SyncStatusContext)
+  if (!context) {
+    throw new Error('useSyncStatus must be used within a SyncStatusProvider')
+  }
+  return context
+}
+
+const EmptyMediaList = () => {
+  const { syncStatus } = useSyncStatus()
   return (
-    <div className={`p-12 text-xl opacity-50 text-center`} {...props}>
-      Drag and drop assets here
-      {props.hasTinaMedia &&
-        " or click 'Sync' to sync your media to Tina Cloud."}
+    <div className={`p-12 text-xl opacity-50 text-center`}>
+      {syncStatus == 'synced' ? 'Drag and drop assets here' : 'Loading...'}
     </div>
   )
 }
