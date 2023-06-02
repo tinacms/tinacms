@@ -24,7 +24,7 @@ import ScreenPage from './pages/ScreenPage'
 import { useEditState } from '@tinacms/sharedctx'
 import { Client } from '../internalClient'
 import { TinaAdminApi } from './api'
-import { IndexingPage } from './pages/indexingPage'
+import { IndexingPage } from './pages/IndexingPage'
 
 const Redirect = () => {
   React.useEffect(() => {
