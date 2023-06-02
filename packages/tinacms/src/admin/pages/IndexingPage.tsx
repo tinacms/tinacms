@@ -20,6 +20,7 @@ type IndexingState =
 export const IndexingPage: FC = () => {
   const cms = useCMS()
   const tinaApi: Client = cms.api.tina
+  // @ts-ignore
   const currentBranch = tinaApi.branch
   const { setCurrentBranch } = useBranchData()
   const [state, setState] = React.useState(
