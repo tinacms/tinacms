@@ -607,7 +607,7 @@ const SyncStatusContainer = ({ children }) => {
   const isLocal = cms.api.tina.isLocalMode
 
   const tinaMedia = cms.api.tina.schema.schema?.config?.media?.tina || {}
-  const hasTinaMedia = tinaMedia.mediaRoot || tinaMedia.publicFolder
+  const hasTinaMedia = !!(tinaMedia.mediaRoot || tinaMedia.publicFolder)
 
   const checkForSyncStatus = hasTinaMedia && !isLocal
   const [syncStatus, setSyncStatus] = useState<
