@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.3
+
+### Patch Changes
+
+- tinacms@1.5.8
+
 ## 0.0.2
 
 ### Patch Changes
