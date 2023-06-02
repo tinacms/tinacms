@@ -36,6 +36,14 @@ export class TinaSchema {
     // @ts-ignore
     this.schema = config
     this.walkFields(({ field, collection, path }) => {
+      // set defaults for field searchability
+      if (!('searchable' in field)) {
+        if (field.type === 'image') {
+          field.searchable = false
+        } else {
+          field.searchable = true
+        }
+      }
       if (field.type === 'rich-text') {
         if (field.parser) {
           return

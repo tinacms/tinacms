@@ -172,7 +172,8 @@ export class DevCommand extends BaseCommand {
       ),
       schema: tinaSchema,
       client: searchIndexClient,
-      textIndexLength: configManager.config.search?.maxStringFieldLength || 100,
+      textIndexLength:
+        configManager.config.search?.maxSearchIndexFieldLength || 100,
     })
 
     await spin({

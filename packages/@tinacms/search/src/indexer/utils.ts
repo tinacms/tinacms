@@ -11,15 +11,13 @@ class StringBuilder {
 
   public append(str: string) {
     if (this.length + str.length > this.limit) {
-      const remaining = this.limit - this.length
-      if (remaining > 0) {
-        this.buffer.push(str.substring(0, remaining))
-        this.length += remaining
-      }
       return true
     } else {
       this.buffer.push(str)
       this.length += str.length
+      if (this.length > this.limit) {
+        return true
+      }
       return false
     }
   }
@@ -40,8 +38,11 @@ const extractText = (
       indexableNodeTypes.indexOf(data.type) !== -1 &&
       (data.text || data.value)
     ) {
-      if (acc.append(data.text || data.value)) {
-        return
+      const tokens = tokenizeString(data.text || data.value)
+      for (const token of tokens) {
+        if (acc.append(token)) {
+          return
+        }
       }
     }
 
@@ -58,6 +59,24 @@ const relativePath = (path: string, collection: Collection<true>) => {
     .replace(/^\/|\/$/g, '')
 }
 
+const tokenizeString = (str: string) => {
+  return str
+    .split(/[\s\.,]+/)
+    .map((s) => s.toLowerCase())
+    .filter((s) => s)
+}
+
+const processTextFieldValue = (value: string, maxLen: number) => {
+  const tokens = tokenizeString(value)
+  const builder = new StringBuilder(maxLen)
+  for (const part of tokens) {
+    if (builder.append(part)) {
+      break
+    }
+  }
+  return builder.toString()
+}
+
 export const processDocumentForIndexing = (
   data: any,
   path: string,
@@ -71,6 +90,10 @@ export const processDocumentForIndexing = (
     data['_relativePath'] = relPath
   }
   for (const f of collection.fields || field?.fields || []) {
+    if (!f.searchable) {
+      delete data[f.name]
+      continue
+    }
     const isList = f.list
     if (data[f.name]) {
       if (f.type === 'object') {
@@ -93,25 +116,30 @@ export const processDocumentForIndexing = (
             f
           )
         }
-      } else if (f.type === 'image') {
-        delete data[f.name]
       } else if (f.type === 'string') {
+        const fieldTextIndexLength =
+          f.maxSearchIndexFieldLength || textIndexLength
         if (isList) {
           data[f.name] = data[f.name].map((value: string) =>
-            value.substring(0, textIndexLength)
+            processTextFieldValue(value, fieldTextIndexLength)
           )
         } else {
-          data[f.name] = data[f.name].substring(0, textIndexLength)
+          data[f.name] = processTextFieldValue(
+            data[f.name],
+            fieldTextIndexLength
+          )
         }
       } else if (f.type === 'rich-text') {
+        const fieldTextIndexLength =
+          f.maxSearchIndexFieldLength || textIndexLength
         if (isList) {
           data[f.name] = data[f.name].map((value: any) => {
-            const acc = new StringBuilder(textIndexLength)
+            const acc = new StringBuilder(fieldTextIndexLength)
             extractText(value, acc, ['text', 'code_block', 'html'])
             return acc.toString()
           })
         } else {
-          const acc = new StringBuilder(textIndexLength)
+          const acc = new StringBuilder(fieldTextIndexLength)
           extractText(data[f.name], acc, ['text', 'code_block', 'html'])
           data[f.name] = acc.toString()
         }

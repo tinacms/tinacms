@@ -139,6 +139,10 @@ type FieldGeneric<
       ui?: UIField<Type, false> & ExtraFieldUIProps
     }
 
+type SearchableTextField = {
+  maxSearchIndexFieldLength?: number
+}
+
 export interface BaseField {
   label?: string | boolean
   required?: boolean
@@ -146,6 +150,7 @@ export interface BaseField {
   name: string
   nameOverride?: string
   description?: string
+  searchable?: boolean
 }
 
 export type StringField = (
@@ -153,7 +158,8 @@ export type StringField = (
   | FieldGeneric<string, true>
   | FieldGeneric<string, false>
 ) &
-  BaseField & {
+  BaseField &
+  SearchableTextField & {
     type: 'string'
     isTitle?: boolean
     isBody?: boolean
@@ -230,7 +236,8 @@ export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
   | FieldGeneric<RichTextAst, false>
 ) &
-  BaseField & {
+  BaseField &
+  SearchableTextField & {
     type: 'rich-text'
     /**
      * When using Markdown or MDX formats, this field's value
@@ -606,7 +613,7 @@ export interface Config<
     /**
      * The maximum length of a string field that will be indexed for search
      */
-    maxStringFieldLength?: number
+    maxSearchIndexFieldLength?: number
   }
   /**
    * Used to override the default Tina Cloud API URL

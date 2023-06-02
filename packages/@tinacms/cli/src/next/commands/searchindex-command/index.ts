@@ -96,7 +96,8 @@ export class SearchIndexCommand extends Command {
         configManager.contentRootPath
       ),
       schema: tinaSchema,
-      textIndexLength: configManager.config.search?.maxStringFieldLength || 100,
+      textIndexLength:
+        configManager.config.search?.maxSearchIndexFieldLength || 100,
       client,
     })
     let err: Error | undefined
