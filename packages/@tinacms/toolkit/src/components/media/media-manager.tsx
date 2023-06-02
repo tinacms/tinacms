@@ -606,13 +606,8 @@ const SyncStatusContainer = ({ children }) => {
   const cms = useCMS()
   const isLocal = cms.api.tina.isLocalMode
 
-  const hasTinaMedia =
-    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
-      'mediaRoot'
-    ) &&
-    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
-      'publicFolder'
-    )
+  const tinaMedia = cms.api.tina.schema.schema?.config?.media?.tina || {}
+  const hasTinaMedia = tinaMedia.mediaRoot || tinaMedia.publicFolder
 
   const checkForSyncStatus = hasTinaMedia && !isLocal
   const [syncStatus, setSyncStatus] = useState<
