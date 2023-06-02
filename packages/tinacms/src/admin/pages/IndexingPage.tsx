@@ -13,6 +13,7 @@ type IndexingState =
   | 'starting'
   | 'indexing'
   | 'creatingBranch'
+  | 'creatingPR'
   | 'done'
   | 'submitting'
 
@@ -23,6 +24,9 @@ export const IndexingPage: FC = () => {
   const { setCurrentBranch } = useBranchData()
   const [state, setState] = React.useState(
     localStorage?.getItem('tina.createBranchState') as IndexingState
+  )
+  const [baseBranch, setBaseBranch] = React.useState(
+    localStorage?.getItem('tina.createBranchState.baseBranch') as string
   )
   const [searchParams] = useSearchParams()
 
@@ -65,6 +69,11 @@ export const IndexingPage: FC = () => {
         setState('submitting')
       }
       if (state === 'submitting') {
+        setBaseBranch(tinaApi.branch)
+        localStorage.setItem(
+          'tina.createBranchState.baseBranch',
+          tinaApi.branch
+        )
         setCurrentBranch(branch)
         const collection = tinaApi.schema.getCollectionByFullPath(fullPath)
 
@@ -80,8 +89,19 @@ export const IndexingPage: FC = () => {
           console.error(authMessage)
           return false
         }
-        localStorage.setItem('tina.createBranchState', 'done')
+        localStorage.setItem('tina.createBranchState', 'creatingPR')
         cms.alerts.success('Content saved.')
+        setState('creatingPR')
+      }
+      if (state === 'creatingPR') {
+        const foo = await tinaApi.createPullRequest({
+          baseBranch,
+          branch: branch,
+          title: 'PR from TinaCMS',
+        })
+        console.log('PR created', foo)
+        cms.alerts.success('Creating PR')
+        localStorage.setItem('tina.createBranchState', 'done')
         setState('done')
       }
       if (state === 'done') {
@@ -102,6 +122,7 @@ export const IndexingPage: FC = () => {
       )}
       {state === 'indexing' && <div>Indexing Content</div>}
       {state === 'submitting' && <div>Saving content</div>}
+      {state === 'creatingPR' && <div>Creating Pull Request</div>}
       {state !== 'done' && <LoadingDots color="black" />}
     </div>
   )

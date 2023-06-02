@@ -469,6 +469,37 @@ mutation addPendingDocumentMutation(
     return val as TinaCloudProject
   }
 
+  async createPullRequest({
+    baseBranch,
+    branch,
+    title,
+  }: {
+    baseBranch: string
+    branch: string
+    title: string
+  }) {
+    const url = `${this.contentApiBase}/github/${this.clientId}/create_pull_request`
+
+    try {
+      const res = await this.fetchWithToken(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          baseBranch,
+          branch,
+          title,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const values = await res.json()
+      return values
+    } catch (error) {
+      console.error('There was an error creating a new branch.', error)
+      return null
+    }
+  }
+
   async fetchEvents(
     limit?: number,
     cursor?: string
@@ -737,10 +768,7 @@ mutation addPendingDocumentMutation(
         },
       })
       const values = await res.json()
-      console.log('values', values)
-      const returnValue = parseRefForBranchName(values.data.ref)
-      console.log('returnValue', returnValue)
-      return returnValue
+      return parseRefForBranchName(values.data.ref)
     } catch (error) {
       console.error('There was an error creating a new branch.', error)
       return null
