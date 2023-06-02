@@ -15,9 +15,9 @@ export interface TinaCloudProject {
   accessDisabled?: boolean
   indexVersion?: string
   mediaBranch?: string
-  branchingEnabled?: boolean
   role: string
   protectedBranches: string[]
+  features?: string[]
 }
 
 export interface Token {
