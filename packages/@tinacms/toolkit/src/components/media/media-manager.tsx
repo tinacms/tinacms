@@ -613,7 +613,7 @@ const SyncStatusContainer = ({ children }) => {
   const [syncStatus, setSyncStatus] = useState<
     'loading' | 'synced' | 'needs-sync'
   >(checkForSyncStatus ? 'loading' : 'synced')
-
+  //
   useEffect(() => {
     const checkSyncStatus = async () => {
       const project = await cms.api.tina.getProject()
