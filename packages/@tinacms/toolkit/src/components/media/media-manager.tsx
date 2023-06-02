@@ -609,21 +609,22 @@ const SyncStatusContainer = ({ children }) => {
   const tinaMedia = cms.api.tina.schema.schema?.config?.media?.tina || {}
   const hasTinaMedia = !!(tinaMedia.mediaRoot || tinaMedia.publicFolder)
 
-  const checkForSyncStatus = hasTinaMedia && !isLocal
+  const doCheckSyncStatus = hasTinaMedia && !isLocal
   const [syncStatus, setSyncStatus] = useState<
     'loading' | 'synced' | 'needs-sync'
-  >(checkForSyncStatus ? 'loading' : 'synced')
+  >(doCheckSyncStatus ? 'loading' : 'synced')
+  //
 
   useEffect(() => {
     const checkSyncStatus = async () => {
-      const project = await cms.api.tina.getProject()
+      if (doCheckSyncStatus) {
+        const project = await cms.api.tina.getProject()
 
-      setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
+        setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
+      }
     }
 
-    if (checkForSyncStatus) {
-      checkSyncStatus()
-    }
+    checkSyncStatus()
   }, [])
 
   return syncStatus == 'needs-sync' ? (
