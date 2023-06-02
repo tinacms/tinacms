@@ -33,14 +33,7 @@ export const createSearchIndexRouter = ({
       const result = await searchIndex.QUERY(JSON.parse(query), options)
       res.end(JSON.stringify(result))
     } else {
-      // TODO do we need this anymore?
-      const docId = requestURL.pathname
-        .split('/')
-        .filter(Boolean)
-        .slice(1)
-        .join('/')
-      const result = await searchIndex.DOCUMENTS(docId)
-      res.end(JSON.stringify(result))
+      res.end(JSON.stringify({ RESULT: [] }))
     }
   }
 
