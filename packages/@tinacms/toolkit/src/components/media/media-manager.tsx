@@ -614,9 +614,10 @@ const SyncStatusContainer = ({ children }) => {
       'publicFolder'
     )
 
+  const checkForSyncStatus = hasTinaMedia && !isLocal
   const [syncStatus, setSyncStatus] = useState<
     'loading' | 'synced' | 'needs-sync'
-  >(hasTinaMedia && !isLocal ? 'loading' : 'synced')
+  >(checkForSyncStatus ? 'loading' : 'synced')
 
   useEffect(() => {
     const checkSyncStatus = async () => {
@@ -625,7 +626,7 @@ const SyncStatusContainer = ({ children }) => {
       setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
     }
 
-    if (!isLocal) {
+    if (checkForSyncStatus) {
       checkSyncStatus()
     }
   }, [])
