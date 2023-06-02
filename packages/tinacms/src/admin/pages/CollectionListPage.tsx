@@ -191,7 +191,6 @@ const CollectionListPage = () => {
     after: '',
     booleanEquals: null,
   })
-  const [activeFilter, setActiveFilter] = React.useState(false)
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
   const [sortKey, setSortKey] = useState(
@@ -205,6 +204,7 @@ const CollectionListPage = () => {
           })
   )
   const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const debouncedSearch = useDebounce(search, 500)
   const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order)
@@ -289,28 +289,8 @@ const CollectionListPage = () => {
                   (field) => field.name === sortName
                 )
 
-                const filterFields = collectionExtra.fields?.filter((x) => {
-                  // only allow fileable fields. Currently only string, datetime, and boolean of non-list type
-                  return (
-                    ['string', 'datetime', 'boolean'].includes(x.type) &&
-                    !x.list
-                  )
-                })
-
                 const searchEnabled =
                   !!cms.api.tina.schema?.config?.config?.search
-                const filterField = filterFields?.find(
-                  (x) => x.name === vars.filterField
-                )
-                const showStartsWith =
-                  filterField?.type === 'string' && !filterField.list
-                const showDateFilter = filterField?.type === 'datetime'
-
-                const showBooleanToggle =
-                  filterField?.type === 'boolean' && !filterField.list
-
-                // TODO: add other fields
-                // const showNumberFilter = sortField?.type === 'number' && !sortField.list
 
                 const collectionDefinition = cms.api.tina.schema.getCollection(
                   collection.name
@@ -386,291 +366,146 @@ const CollectionListPage = () => {
                               : collection.name}
                           </h3>
 
-                          <div className="flex gap-4 items-end flex-wrap">
+                          <div className="flex gap-4 items-start flex-wrap">
                             {fields?.length > 0 && (
                               <>
-                                <div className="flex flex-col gap-2 items-start">
-                                  {searchEnabled && (
-                                    <>
-                                      <label htmlFor="search">Search</label>
-                                      <input
-                                        type="text"
-                                        name="search"
-                                        placeholder="Search"
-                                        className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm text-gray-700"
-                                        value={search}
-                                        onChange={(e) => {
-                                          setSearch(e.target.value)
-                                        }}
-                                      />
-                                    </>
-                                  )}
-                                  <label
-                                    htmlFor="sort"
-                                    className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                  >
-                                    Sort by
-                                  </label>
-                                  <Select
-                                    name="sort"
-                                    options={[
-                                      {
-                                        label: 'Default',
-                                        value: JSON.stringify({
-                                          order: 'asc',
-                                          name: '',
-                                        }),
-                                      },
-                                      ...fields
-                                        .map((x) => [
-                                          {
-                                            label:
-                                              (x.label || x.name) +
-                                              (x.type === 'datetime'
-                                                ? ' (Oldest First)'
-                                                : ' (Ascending)'),
-                                            value: JSON.stringify({
-                                              name: x.name,
-                                              order: 'asc',
-                                            }),
-                                          },
-                                          {
-                                            label:
-                                              (x.label || x.name) +
-                                              (x.type === 'datetime'
-                                                ? ' (Newest First)'
-                                                : ' (Descending)'),
-                                            value: JSON.stringify({
-                                              name: x.name,
-                                              order: 'desc',
-                                            }),
-                                          },
-                                        ])
-                                        .flat(),
-                                    ]}
-                                    input={{
-                                      id: 'sort',
-                                      name: 'sort',
-                                      value: sortKey,
-                                      onChange: (e) => {
-                                        const val = JSON.parse(e.target.value)
-                                        setEndCursor('')
-                                        setPrevCursors([])
-                                        window?.localStorage.setItem(
-                                          `${LOCAL_STORAGE_KEY}.${collectionName}`,
-                                          e.target.value
-                                        )
-                                        setSortKey(e.target.value)
-                                        setSortOrder(val.order)
-                                      },
-                                    }}
-                                  />
-                                </div>
-                                <form className="flex flex-wrap gap-4 items-end">
-                                  <div className="flex flex-shrink-0 flex-col gap-2 items-start">
+                                {!search ? (
+                                  <div className="flex flex-col gap-2 items-start">
                                     <label
-                                      htmlFor="filter"
+                                      htmlFor="sort"
                                       className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
                                     >
-                                      Filter by
+                                      Sort by
                                     </label>
                                     <Select
-                                      name="filter"
+                                      name="sort"
                                       options={[
                                         {
-                                          label: 'None',
-                                          value: '',
+                                          label: 'Default',
+                                          value: JSON.stringify({
+                                            order: 'asc',
+                                            name: '',
+                                          }),
                                         },
-                                        ...filterFields.map((x) => ({
-                                          label:
-                                            (typeof x.label === 'string' &&
-                                              x.label) ||
-                                            x.name,
-                                          value: x.name,
-                                        })),
+                                        ...fields
+                                          .map((x) => [
+                                            {
+                                              label:
+                                                (x.label || x.name) +
+                                                (x.type === 'datetime'
+                                                  ? ' (Oldest First)'
+                                                  : ' (Ascending)'),
+                                              value: JSON.stringify({
+                                                name: x.name,
+                                                order: 'asc',
+                                              }),
+                                            },
+                                            {
+                                              label:
+                                                (x.label || x.name) +
+                                                (x.type === 'datetime'
+                                                  ? ' (Newest First)'
+                                                  : ' (Descending)'),
+                                              value: JSON.stringify({
+                                                name: x.name,
+                                                order: 'desc',
+                                              }),
+                                            },
+                                          ])
+                                          .flat(),
                                       ]}
                                       input={{
-                                        id: 'filter',
-                                        name: 'filter',
-                                        value: vars.filterField,
+                                        id: 'sort',
+                                        name: 'sort',
+                                        value: sortKey,
                                         onChange: (e) => {
-                                          const val = e.target.value
+                                          const val = JSON.parse(e.target.value)
                                           setEndCursor('')
                                           setPrevCursors([])
-                                          setVars((old) => ({
-                                            ...old,
-                                            filterField: val,
-                                          }))
-                                          // if we clear the filter, we need to re-fetch the collection
-                                          if (!val) {
-                                            reFetchCollection()
-                                          }
+                                          window?.localStorage.setItem(
+                                            `${LOCAL_STORAGE_KEY}.${collectionName}`,
+                                            e.target.value
+                                          )
+                                          setSortKey(e.target.value)
+                                          setSortOrder(val.order)
                                         },
                                       }}
                                     />
                                   </div>
-                                  {showStartsWith && (
-                                    <>
-                                      <div className="flex flex-shrink-0 flex-col gap-2 items-start">
-                                        <label
-                                          htmlFor="startsWith"
-                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                        >
-                                          Starts with
-                                        </label>
+                                ) : (
+                                  <div className="flex flex-col gap-2 items-start">
+                                    <label
+                                      htmlFor="sort"
+                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                    >
+                                      Sort by
+                                    </label>
+                                    <Select
+                                      name="sort"
+                                      options={[
+                                        {
+                                          label: 'Relevance',
+                                          value: 'Relevance',
+                                        },
+                                      ]}
+                                      input={{
+                                        id: 'sort',
+                                        name: 'sort',
+                                        value: 'Relevance',
+                                        onChange: (e) => {},
+                                        disabled: true,
+                                      }}
+                                      className="pointer-events-none w-[150px]"
+                                    />
+                                  </div>
+                                )}
+                                {searchEnabled && (
+                                  <div className="flex flex-1 flex-col gap-2 items-start w-full">
+                                    <label
+                                      htmlFor="search"
+                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                    >
+                                      Search
+                                    </label>
+                                    <div className="flex flex-wrap items-center gap-3">
+                                      <div className="flex-1 min-w-[200px]">
                                         <Input
-                                          name="startsWith"
-                                          id="startsWith"
-                                          value={vars.startsWith}
+                                          type="text"
+                                          name="search"
+                                          placeholder="Search"
+                                          value={searchInput}
                                           onChange={(e) => {
-                                            const val = e.target.value
-                                            setVars((old) => ({
-                                              ...old,
-                                              startsWith: val,
-                                              after: '',
-                                              before: '',
-                                              booleanEquals: null,
-                                            }))
+                                            setSearchInput(e.target.value)
                                           }}
                                         />
                                       </div>
-                                    </>
-                                  )}
-                                  {showDateFilter && (
-                                    <div className="flex flex-shrink-0 gap-4">
-                                      <div className="flex flex-col gap-2 items-start">
-                                        <label
-                                          htmlFor="dateAfter"
-                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                        >
-                                          After
-                                        </label>
-                                        <ReactDateTimeWithStyles
-                                          inputProps={{
-                                            className: textFieldClasses,
-                                          }}
-                                          value={vars.after}
-                                          onChange={(e) => {
-                                            setVars((old) => ({
-                                              ...old,
-                                              after:
-                                                // @ts-ignore
-                                                typeof e.format === 'function'
-                                                  ? // @ts-ignore
-                                                    e.format()
-                                                  : '',
-                                              booleanEquals: null,
-                                              startsWith: '',
-                                            }))
-                                          }}
-                                        />
-                                      </div>
-                                      <div className="flex flex-col gap-2 items-start">
-                                        <label
-                                          htmlFor="dateBefore"
-                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                        >
-                                          Before
-                                        </label>
-                                        <ReactDateTimeWithStyles
-                                          inputProps={{
-                                            className: textFieldClasses,
-                                          }}
-                                          value={vars.before}
-                                          onChange={(e) => {
-                                            setVars((old) => ({
-                                              ...old,
-                                              before:
-                                                // @ts-ignore
-                                                typeof e.format === 'function'
-                                                  ? // @ts-ignore
-                                                    e.format()
-                                                  : '',
-                                              booleanEquals: null,
-                                              startsWith: '',
-                                            }))
-                                          }}
-                                        />
-                                      </div>
-                                    </div>
-                                  )}
-                                  {showBooleanToggle && (
-                                    <>
-                                      <div className="flex flex-col gap-2 items-start">
-                                        <label
-                                          htmlFor="toggle"
-                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                        >
-                                          {filterField.label ||
-                                            filterField.name}
-                                        </label>
-                                        <Toggle
-                                          // @ts-ignore
-                                          field={filterField}
-                                          input={{
-                                            name: 'toggle',
-                                            value: vars.booleanEquals ?? false,
-                                            onChange: () => {
-                                              setVars((old) => ({
-                                                ...old,
-                                                booleanEquals:
-                                                  !old.booleanEquals,
-                                                after: '',
-                                                before: '',
-                                                startsWith: '',
-                                              }))
-                                            },
-                                          }}
-                                          name="toggle"
-                                        />
-                                      </div>
-                                    </>
-                                  )}
-                                  {(showStartsWith ||
-                                    showDateFilter ||
-                                    showBooleanToggle) && (
-                                    <div className="flex gap-3">
-                                      <Button
-                                        onClick={() => {
-                                          setActiveFilter(true)
-                                          setEndCursor('')
-                                          setPrevCursors([])
-                                          reFetchCollection()
-                                        }}
-                                        variant="primary"
-                                        type="submit"
-                                      >
-                                        Filter{' '}
-                                        <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
-                                      </Button>
-                                      {(vars.startsWith ||
-                                        vars.after ||
-                                        vars.before ||
-                                        vars.booleanEquals) && (
+                                      <div className="flex gap-3">
                                         <Button
                                           onClick={() => {
-                                            setActiveFilter(false)
-                                            setVars((old) => ({
-                                              ...old,
-                                              filterField: '',
-                                              startsWith: '',
-                                              after: '',
-                                              before: '',
-                                              booleanEquals: null,
-                                            }))
-                                            setEndCursor('')
-                                            setPrevCursors([])
-                                            reFetchCollection()
+                                            setSearch(searchInput)
                                           }}
-                                          variant="white"
+                                          variant="primary"
+                                          type="submit"
                                         >
-                                          Clear{' '}
-                                          <BiX className="w-5 h-full ml-1 opacity-70" />
+                                          Search{' '}
+                                          <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
                                         </Button>
-                                      )}
+                                        {search && (
+                                          <Button
+                                            onClick={() => {
+                                              setSearch('')
+                                              setSearchInput('')
+                                            }}
+                                            variant="white"
+                                          >
+                                            Clear{' '}
+                                            <BiX className="w-5 h-full ml-1 opacity-70" />
+                                          </Button>
+                                        )}
+                                      </div>
                                     </div>
-                                  )}
-                                </form>
+                                  </div>
+                                )}
                               </>
                             )}
                           </div>
@@ -721,7 +556,7 @@ const CollectionListPage = () => {
                         {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
-                              {!activeFilter && folder.name && (
+                              {folder.name && (
                                 <tr>
                                   <td colSpan={5}>
                                     <Breadcrumb
