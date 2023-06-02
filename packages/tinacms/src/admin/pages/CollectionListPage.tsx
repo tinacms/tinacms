@@ -204,8 +204,8 @@ const CollectionListPage = () => {
           })
   )
   const [search, setSearch] = useState('')
-  const [searchInput, setSearchInput] = useState('')
   const debouncedSearch = useDebounce(search, 500)
+
   const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order)
   const loc = useLocation()
@@ -369,7 +369,7 @@ const CollectionListPage = () => {
                           <div className="flex gap-4 items-start flex-wrap">
                             {fields?.length > 0 && (
                               <>
-                                {!search ? (
+                                {!search && (
                                   <div className="flex flex-col gap-2 items-start">
                                     <label
                                       htmlFor="sort"
@@ -432,79 +432,13 @@ const CollectionListPage = () => {
                                       }}
                                     />
                                   </div>
-                                ) : (
-                                  <div className="flex flex-col gap-2 items-start">
-                                    <label
-                                      htmlFor="sort"
-                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                    >
-                                      Sort by
-                                    </label>
-                                    <Select
-                                      name="sort"
-                                      options={[
-                                        {
-                                          label: 'Relevance',
-                                          value: 'Relevance',
-                                        },
-                                      ]}
-                                      input={{
-                                        id: 'sort',
-                                        name: 'sort',
-                                        value: 'Relevance',
-                                        onChange: (e) => {},
-                                        disabled: true,
-                                      }}
-                                      className="pointer-events-none w-[150px]"
-                                    />
-                                  </div>
                                 )}
                                 {searchEnabled && (
-                                  <div className="flex flex-1 flex-col gap-2 items-start w-full">
-                                    <label
-                                      htmlFor="search"
-                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                    >
-                                      Search
-                                    </label>
-                                    <div className="flex flex-wrap items-center gap-3">
-                                      <div className="flex-1 min-w-[200px]">
-                                        <Input
-                                          type="text"
-                                          name="search"
-                                          placeholder="Search"
-                                          value={searchInput}
-                                          onChange={(e) => {
-                                            setSearchInput(e.target.value)
-                                          }}
-                                        />
-                                      </div>
-                                      <div className="flex gap-3">
-                                        <Button
-                                          onClick={() => {
-                                            setSearch(searchInput)
-                                          }}
-                                          variant="primary"
-                                          type="submit"
-                                        >
-                                          Search{' '}
-                                          <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
-                                        </Button>
-                                        {search && (
-                                          <Button
-                                            onClick={() => {
-                                              setSearch('')
-                                              setSearchInput('')
-                                            }}
-                                            variant="white"
-                                          >
-                                            Clear{' '}
-                                            <BiX className="w-5 h-full ml-1 opacity-70" />
-                                          </Button>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
+                                  <SearchInput
+                                    loading={_loading}
+                                    search={search}
+                                    setSearch={setSearch}
+                                  />
                                 )}
                               </>
                             )}
@@ -845,6 +779,65 @@ const CollectionListPage = () => {
         )
       }}
     </GetCMS>
+  )
+}
+
+const SearchInput = ({ loading, search, setSearch }) => {
+  const [searchInput, setSearchInput] = useState('')
+  const [searchLoaded, setSearchLoaded] = useState(false)
+  useEffect(() => {
+    if (loading) {
+      setSearchLoaded(false)
+    } else {
+      setSearchLoaded(true)
+    }
+  }, [loading])
+
+  return (
+    <div className="flex flex-1 flex-col gap-2 items-start w-full">
+      <label
+        htmlFor="search"
+        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+      >
+        Search
+      </label>
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex-1 min-w-[200px]">
+          <Input
+            type="text"
+            name="search"
+            placeholder="Search"
+            value={searchInput}
+            onChange={(e) => {
+              setSearchInput(e.target.value)
+            }}
+          />
+        </div>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => {
+              setSearch(searchInput)
+              setSearchLoaded(false)
+            }}
+            variant="primary"
+            type="submit"
+          >
+            Search <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
+          </Button>
+          {search && searchLoaded && (
+            <Button
+              onClick={() => {
+                setSearch('')
+                setSearchInput('')
+              }}
+              variant="white"
+            >
+              Clear <BiX className="w-5 h-full ml-1 opacity-70" />
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
 
