@@ -606,28 +606,25 @@ const SyncStatusContainer = ({ children }) => {
   const cms = useCMS()
   const isLocal = cms.api.tina.isLocalMode
 
-  const hasTinaMedia =
-    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
-      'mediaRoot'
-    ) &&
-    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
-      'publicFolder'
-    )
+  const tinaMedia = cms.api.tina.schema.schema?.config?.media?.tina || {}
+  const hasTinaMedia = !!(tinaMedia.mediaRoot || tinaMedia.publicFolder)
 
+  const doCheckSyncStatus = hasTinaMedia && !isLocal
   const [syncStatus, setSyncStatus] = useState<
     'loading' | 'synced' | 'needs-sync'
-  >(hasTinaMedia && !isLocal ? 'loading' : 'synced')
+  >(doCheckSyncStatus ? 'loading' : 'synced')
+  //
 
   useEffect(() => {
     const checkSyncStatus = async () => {
-      const project = await cms.api.tina.getProject()
+      if (doCheckSyncStatus) {
+        const project = await cms.api.tina.getProject()
 
-      setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
+        setSyncStatus(project.mediaBranch ? 'synced' : 'needs-sync')
+      }
     }
 
-    if (!isLocal) {
-      checkSyncStatus()
-    }
+    checkSyncStatus()
   }, [])
 
   return syncStatus == 'needs-sync' ? (
