@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.7.4
+
+### Patch Changes
+
+- cc621f665: fix: Skip media status check on external media
+
 ## 1.7.3
 
 ### Patch Changes
