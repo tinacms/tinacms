@@ -578,7 +578,7 @@ export interface Config<
         }
         loadCustomStore?: never
       }
-  search?:
+  search?: (
     | {
         /**
          * An instance of a search client like Algolia
@@ -602,6 +602,12 @@ export interface Config<
           stopwordLanguages?: string[]
         }
       }
+  ) & {
+    /**
+     * The maximum length of a string field that will be indexed for search
+     */
+    maxStringFieldLength?: number
+  }
   /**
    * Used to override the default Tina Cloud API URL
    *

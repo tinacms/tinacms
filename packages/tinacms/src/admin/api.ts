@@ -22,11 +22,14 @@ export class TinaAdminApi {
   useDataLayer: boolean
   schema: TinaSchema
   searchClient?: SearchClient
+  maxStringFieldLength: number = 100
   constructor(cms: TinaCMS) {
     this.api = cms.api.tina
     this.schema = cms.api.tina.schema
     if (cms.searchClient && cms.searchClient?.supportsClientSideIndexing()) {
       this.searchClient = cms.searchClient
+      this.maxStringFieldLength =
+        this.schema.config?.config?.search?.maxStringFieldLength || 100
     }
   }
 
@@ -70,7 +73,7 @@ export class TinaAdminApi {
         doc['_values'],
         `${collection.path}/${newRelativePath}`,
         collection,
-        /*TODO configuration*/ 500
+        this.maxStringFieldLength
       )
       await this.searchClient.put([processed])
       await this.searchClient.del([`${collection.name}:${relativePath}`])
@@ -343,7 +346,7 @@ export class TinaAdminApi {
         doc['_values'],
         `${collection.path}/${relativePath}`,
         collection,
-        /*TODO configuration*/ 500
+        this.maxStringFieldLength
       )
       await this.searchClient.put([processed])
     }
@@ -383,7 +386,7 @@ export class TinaAdminApi {
         doc['_values'],
         `${collection.path}/${relativePath}`,
         collection,
-        /*TODO configuration*/ 500
+        this.maxStringFieldLength
       )
       await this.searchClient.put([processed])
     }

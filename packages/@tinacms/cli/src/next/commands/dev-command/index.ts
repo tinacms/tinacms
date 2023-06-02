@@ -172,7 +172,7 @@ export class DevCommand extends BaseCommand {
       ),
       schema: tinaSchema,
       client: searchIndexClient,
-      textIndexLength: 500,
+      textIndexLength: configManager.config.search?.maxStringFieldLength || 100,
     })
 
     await spin({
@@ -326,7 +326,9 @@ export class DevCommand extends BaseCommand {
         const pathFromRoot = configManager.printContentRelativePath(addedFile)
         await database.indexContentByPaths([pathFromRoot]).catch(console.error)
         if (searchClient) {
-          await searchClient.put([await database.get(pathFromRoot)]).catch(console.error)
+          await searchClient
+            .put([await database.get(pathFromRoot)])
+            .catch(console.error)
         }
       })
       .on('change', async (changedFile) => {
@@ -335,7 +337,9 @@ export class DevCommand extends BaseCommand {
         // server.ws.send({ type: 'full-reload', path: '*' })
         await database.indexContentByPaths([pathFromRoot]).catch(console.error)
         if (searchClient) {
-          await searchClient.put([await database.get(pathFromRoot)]).catch(console.error)
+          await searchClient
+            .put([await database.get(pathFromRoot)])
+            .catch(console.error)
         }
       })
       .on('unlink', async (removedFile) => {
