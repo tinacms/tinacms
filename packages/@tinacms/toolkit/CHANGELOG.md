@@ -1,5 +1,19 @@
 # Change Log
 
+## 1.7.4
+
+### Patch Changes
+
+- cc621f665: fix: Skip media status check on external media
+
+## 1.7.3
+
+### Patch Changes
+
+- 70c74bb55: Embed dropdown UI, media list view styles
+- 385c8a865: Update Media Manager to sync media from Cloud dashboard
+- 1aea2c6a4: Fix an issue which result in an infinite loop for required fields in some cases
+
 ## 1.7.2
 
 ### Patch Changes

@@ -767,7 +767,7 @@ export const makeFolderOpsForCollection = <T extends object>(
 export const makeIndexOpsForDocument = <T extends object>(
   filepath: string,
   collection: string | undefined,
-  indexDefinitions: IndexDefinition[],
+  indexDefinitions: Record<string, IndexDefinition>,
   data: T,
   opType: 'put' | 'del',
   level: Level,

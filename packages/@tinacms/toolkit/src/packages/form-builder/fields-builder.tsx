@@ -37,30 +37,11 @@ export function FieldsBuilder({
   return (
     <FieldsGroup padding={padding}>
       {fields.map((field: Field, index) => {
-        let isActiveField = field.name === activeFieldName
-        // TODO: this handles focusing on the tag element when one
-        // of it's items is the activeField (categories.2) but not
-        // for when the items are displayed with the ListFieldPlugin
-        // It also doesn't handle radio/checkbox focus
-        // @ts-ignore field types don't know about list and type
-        if (field.list && field.type === 'string') {
-          if (activeFieldName) {
-            const activeFieldNameArray = activeFieldName.split('.')
-            const activeFieldNameWithoutIndex = activeFieldNameArray
-              .slice(0, activeFieldNameArray.length - 1)
-              .join('.')
-            if (field.name === activeFieldNameWithoutIndex) {
-              isActiveField = true
-            }
-          }
-        }
         return (
           <InnerField
             key={field.name}
-            field={{
-              ...field,
-              experimental_focusIntent: isActiveField,
-            }}
+            field={field}
+            activeFieldName={activeFieldName}
             form={form}
             fieldPlugins={fieldPlugins}
             index={index}
@@ -71,7 +52,7 @@ export function FieldsBuilder({
   )
 }
 
-const InnerField = ({ field, form, fieldPlugins, index }) => {
+const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
   /**
    * We double-render form builders for some reason which reults in useMemo not working here
    */
@@ -99,6 +80,24 @@ const InnerField = ({ field, form, fieldPlugins, index }) => {
 
   if (!format && plugin && plugin.format) {
     format = plugin.format
+  }
+
+  let isActiveField = field.name === activeFieldName
+  // TODO: this handles focusing on the tag element when one
+  // of it's items is the activeField (categories.2) but not
+  // for when the items are displayed with the ListFieldPlugin
+  // It also doesn't handle radio/checkbox focus
+  // @ts-ignore field types don't know about list and type
+  if (field.list && field.type === 'string') {
+    if (activeFieldName) {
+      const activeFieldNameArray = activeFieldName.split('.')
+      const activeFieldNameWithoutIndex = activeFieldNameArray
+        .slice(0, activeFieldNameArray.length - 1)
+        .join('.')
+      if (field.name === activeFieldNameWithoutIndex) {
+        isActiveField = true
+      }
+    }
   }
 
   return (
@@ -131,7 +130,7 @@ const InnerField = ({ field, form, fieldPlugins, index }) => {
               {...fieldProps}
               form={form.finalForm}
               tinaForm={form}
-              field={field}
+              field={{ ...field, experimental_focusIntent: isActiveField }}
             />
           )
         }
@@ -140,9 +139,10 @@ const InnerField = ({ field, form, fieldPlugins, index }) => {
           return (
             <plugin.Component
               {...fieldProps}
+              experimental_focusIntent={isActiveField}
               form={form.finalForm}
               tinaForm={form}
-              field={field}
+              field={{ ...field, experimental_focusIntent: isActiveField }}
               index={index}
             />
           )

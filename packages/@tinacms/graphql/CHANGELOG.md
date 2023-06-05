@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 1.4.15
+
+### Patch Changes
+
+- a94bf721b: Catch condition where remote schema does not exist to avoid "Invalid or incomplete introspection error" being thrown during build checks
+- 52b1762e2: Prevent unhandled promise rejection when not able to determine collection for file
+
 ## 1.4.14
 
 ### Patch Changes
