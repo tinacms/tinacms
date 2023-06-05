@@ -115,7 +115,6 @@
     "prompts": "^2.4.1",
     "readable-stream": "^4.3.0",
     "rollup-plugin-visualizer": "^5.9.0",
-    "@kldavis4/search-index": "4.4.1",
     "tailwindcss": "^3.2.7",
     "url-pattern": "^1.0.3",
     "vite": "4.1.4",

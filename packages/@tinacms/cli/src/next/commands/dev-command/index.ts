@@ -11,10 +11,10 @@ import { Codegen } from '../../codegen'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { BaseCommand } from '../baseCommands'
 import { spin } from '../../../utils/spinner'
-import si from '@kldavis4/search-index'
 import { MemoryLevel } from 'memory-level'
 import {
   SearchIndexer,
+  si,
   LocalSearchIndexClient,
   lookupStopwords,
 } from '@tinacms/search'

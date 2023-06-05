@@ -1,8 +1,10 @@
 import * as sw from 'stopword'
+import si from '@kldavis4/search-index'
 export { SearchIndexer } from './indexer'
 export { LocalSearchIndexClient, TinaCMSSearchIndexClient } from './client'
 export type { SearchClient } from './types'
 export { default as sw } from 'stopword'
+export { si }
 
 export const lookupStopwords = (
   keys?: string[],
