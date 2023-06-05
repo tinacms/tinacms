@@ -83,13 +83,26 @@ export const useGetCollection = (
               return api.fetchDocument(collection, relativePath, false)
             })
           )
+          const { name, order } = JSON.parse(sortKey || '{}')
+          const validSortKey = collectionExtra.fields
+            ?.map((x) => x.name)
+            .includes(name)
+            ? name
+            : undefined
+          const c = await api.fetchCollection(
+            collectionName,
+            false,
+            filterArgs?.filterField ? '' : folder.fullyQualifiedName,
+            after,
+            validSortKey,
+            order,
+            filterArgs
+          )
           setCollection({
-            // TODO populate these?
-            format: '',
-            label: '',
+            format: collection.format,
+            label: collection.label,
             name: collectionName,
-            slug: '',
-            templates: [],
+            templates: collection.templates,
             documents: {
               pageInfo: {
                 hasNextPage: !!response.nextCursor,
