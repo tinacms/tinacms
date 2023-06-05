@@ -1,5 +1,26 @@
 # @tinacms/app
 
+## 1.2.15
+
+### Patch Changes
+
+- Updated dependencies [cc621f665]
+  - @tinacms/toolkit@1.7.4
+  - tinacms@1.5.8
+
+## 1.2.14
+
+### Patch Changes
+
+- 52b1762e2: Prevent unhandled promise rejection when not able to determine collection for file
+- 16b0c8073: Fix issue where activeField search param would be called twice, resulting in the incorrect form being focused.
+- Updated dependencies [70c74bb55]
+- Updated dependencies [385c8a865]
+- Updated dependencies [ccd928bc3]
+- Updated dependencies [1aea2c6a4]
+  - @tinacms/toolkit@1.7.3
+  - tinacms@1.5.7
+
 ## 1.2.13
 
 ### Patch Changes

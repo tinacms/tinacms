@@ -1,5 +1,23 @@
 # tinacms
 
+## 1.5.8
+
+### Patch Changes
+
+- Updated dependencies [cc621f665]
+  - @tinacms/toolkit@1.7.4
+
+## 1.5.7
+
+### Patch Changes
+
+- 385c8a865: Update Media Manager to sync media from Cloud dashboard
+- ccd928bc3: Fix to decode the folder name from the url
+- Updated dependencies [70c74bb55]
+- Updated dependencies [385c8a865]
+- Updated dependencies [1aea2c6a4]
+  - @tinacms/toolkit@1.7.3
+
 ## 1.5.6
 
 ### Patch Changes

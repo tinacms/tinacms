@@ -488,7 +488,7 @@ importers:
       zod: ^3.14.3
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 4.2.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 5.0.0_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -1189,12 +1189,12 @@ importers:
     specifiers:
       '@tinacms/scripts': workspace:*
       '@types/react': 17.0.47
-      '@vercel/stega': ^0.0.4
+      '@vercel/stega': ^0.0.5
       react: 17.0.2
       tinacms: workspace:*
       typescript: 4.3.5
     dependencies:
-      '@vercel/stega': 0.0.4
+      '@vercel/stega': 0.0.5
       tinacms: link:../../tinacms
     devDependencies:
       '@tinacms/scripts': link:../scripts
@@ -7332,15 +7332,15 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@graphql-codegen/plugin-helpers/4.2.0_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/5.0.0_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-THFTCfg+46PXlXobYJ/OoCX6pzjI+9woQqCjdyKtgoI0tn3Xq2HUUCiidndxUpEYVrXb5pRiRXb7b/ZbMQqD0A==,
+        integrity: sha512-suL2ZMkBAU2a4YbBHaZvUPsV1z0q3cW6S96Z/eYYfkRIsJoe2vN+wNZ9Xdzmqx0JLmeeFCBSoBGC0imFyXlkDQ==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-tools/utils': 9.1.3_graphql@15.8.0
+      '@graphql-tools/utils': 10.0.0_graphql@15.8.0
       change-case-all: 1.0.15
       common-tags: 1.8.2
       graphql: 15.8.0
@@ -7577,6 +7577,20 @@ packages:
       value-or-promise: 1.0.11
     dev: false
 
+  /@graphql-tools/utils/10.0.0_graphql@15.8.0:
+    resolution:
+      {
+        integrity: sha512-ndBPc6zgR+eGU/jHLpuojrs61kYN3Z89JyMLwK3GCRkPv4EQn9EOr1UWqF1JO0iM+/jAVHY0mvfUxyrFFN9DUQ==,
+      }
+    engines: { node: '>=16.0.0' }
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0_graphql@15.8.0
+      graphql: 15.8.0
+      tslib: 2.5.0
+    dev: false
+
   /@graphql-tools/utils/8.8.0_graphql@15.8.0:
     resolution:
       {
@@ -7588,16 +7602,15 @@ packages:
       graphql: 15.8.0
       tslib: 2.5.0
 
-  /@graphql-tools/utils/9.1.3_graphql@15.8.0:
+  /@graphql-typed-document-node/core/3.2.0_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-bbJyKhs6awp1/OmP+WKA1GOyu9UbgZGkhIj5srmiMGLHohEOKMjW784Sk0BZil1w2x95UPu0WHw6/d/HVCACCg==,
+        integrity: sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==,
       }
     peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+      graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
       graphql: 15.8.0
-      tslib: 2.5.0
     dev: false
 
   /@headlessui/react/1.6.5_sfoxds7t5ydpegc3knd667wn6m:
@@ -12966,10 +12979,10 @@ packages:
       - scheduler
     dev: false
 
-  /@vercel/stega/0.0.4:
+  /@vercel/stega/0.0.5:
     resolution:
       {
-        integrity: sha512-4c9AibBOJ9oGvvev0f5QFbdcDPmOjkxdlrKb5Y70DnAc0ThtFujod8DRGA/RLFQ5lAvgRTdpvoczl8GhHuxFJQ==,
+        integrity: sha512-vvuUYW0rBp4Ea9xv0LilqFyDHAW9tvy4GL70G1ayGisQwpOYIPChmiw/56jqZvpxjE9gjQIApLfglOcdZe3PcA==,
       }
     dev: false
 

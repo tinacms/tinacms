@@ -1,5 +1,24 @@
 # tinacms-cli
 
+## 1.5.16
+
+### Patch Changes
+
+- @tinacms/app@1.2.15
+
+## 1.5.15
+
+### Patch Changes
+
+- 9f4136c10: Index the content before a build when self hosting.
+- a94bf721b: Catch condition where remote schema does not exist to avoid "Invalid or incomplete introspection error" being thrown during build checks
+- Updated dependencies [a94bf721b]
+- Updated dependencies [52b1762e2]
+- Updated dependencies [16b0c8073]
+  - @tinacms/graphql@1.4.15
+  - @tinacms/app@1.2.14
+  - @tinacms/datalayer@1.2.15
+
 ## 1.5.14
 
 ### Patch Changes

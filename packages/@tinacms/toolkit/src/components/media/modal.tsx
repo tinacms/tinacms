@@ -95,33 +95,3 @@ export const NewFolderModal = ({ onSubmit, close }: NewFolderModalProps) => {
     </Modal>
   )
 }
-
-export const SyncModal = ({ close, syncFunc, folder, branch }) => {
-  return (
-    <Modal>
-      <PopupModal>
-        <ModalHeader close={close}>Sync Media</ModalHeader>
-        <ModalBody padded={true}>
-          <p>
-            {`This will copy media assets from the \`${folder}\` folder on branch \`${branch}\` in your git repository to Tina Cloud's asset service. This will allow you to use these assets in your site with Tina Cloud`}
-          </p>
-        </ModalBody>
-        <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
-            Cancel
-          </Button>
-          <Button
-            style={{ flexGrow: 3 }}
-            variant="primary"
-            onClick={async () => {
-              await syncFunc()
-              close()
-            }}
-          >
-            Sync Media
-          </Button>
-        </ModalActions>
-      </PopupModal>
-    </Modal>
-  )
-}
