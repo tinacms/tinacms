@@ -70,7 +70,7 @@ export const useGetCollection = (
     const searchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         try {
-          const response = await cms.searchClient.query(
+          const response = await cms.api.search.query(
             `${search} AND _collection:${collectionName}`,
             {
               limit: 15,

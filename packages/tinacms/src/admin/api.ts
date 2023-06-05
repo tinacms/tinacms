@@ -26,8 +26,8 @@ export class TinaAdminApi {
   constructor(cms: TinaCMS) {
     this.api = cms.api.tina
     this.schema = cms.api.tina.schema
-    if (cms.searchClient && cms.searchClient?.supportsClientSideIndexing()) {
-      this.searchClient = cms.searchClient
+    if (cms.api.search && cms.api.search?.supportsClientSideIndexing()) {
+      this.searchClient = cms.api.searchClient
       this.maxSearchIndexFieldLength =
         this.schema.config?.config?.search?.maxSearchIndexFieldLength || 100
     }
