@@ -1,5 +1,5 @@
 import type { SearchClient } from '../types'
-import { SqliteLevel } from '../sqlite-level'
+import { SqliteLevel } from 'sqlite-level'
 import * as zlib from 'zlib'
 import si from '@kldavis4/search-index'
 import { MemoryLevel } from 'memory-level'

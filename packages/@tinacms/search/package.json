@@ -34,13 +34,13 @@
     "@tinacms/graphql": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
     "abstract-level": "^1.0.3",
-    "better-sqlite3": "^7.4.2",
     "classic-level": "^1.3.0",
     "memory-level": "^1.0.0",
     "module-error": "^1.0.2",
     "node-fetch": "2",
     "@kldavis4/search-index": "4.4.2",
-    "stopword": "^2.0.8"
+    "stopword": "^2.0.8",
+    "sqlite-level": "^1.0.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
