@@ -413,7 +413,6 @@ importers:
       '@graphql-inspector/core': ^4.0.0
       '@graphql-tools/graphql-file-loader': ^7.2.0
       '@graphql-tools/load': ^7.3.2
-      '@kldavis4/search-index': 4.4.1
       '@rollup/pluginutils': ^5.0.2
       '@svgr/core': 6.3.1
       '@tailwindcss/aspect-ratio': ^0.4.0
@@ -497,7 +496,7 @@ importers:
       zod: ^3.14.3
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 4.2.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 5.0.0_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -505,7 +504,6 @@ importers:
       '@graphql-inspector/core': 4.0.0_graphql@15.8.0
       '@graphql-tools/graphql-file-loader': 7.4.0_graphql@15.8.0
       '@graphql-tools/load': 7.7.0_graphql@15.8.0
-      '@kldavis4/search-index': 4.4.1_abstract-level@1.0.3
       '@rollup/pluginutils': 5.0.2
       '@svgr/core': 6.3.1
       '@tailwindcss/aspect-ratio': 0.4.0_tailwindcss@3.2.7
@@ -1068,7 +1066,7 @@ importers:
 
   packages/@tinacms/search:
     specifiers:
-      '@kldavis4/search-index': 4.4.1
+      '@kldavis4/search-index': 4.4.2
       '@tinacms/graphql': workspace:*
       '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
@@ -1088,7 +1086,7 @@ importers:
       stopword: ^2.0.8
       typescript: 4.3.5
     dependencies:
-      '@kldavis4/search-index': 4.4.1_abstract-level@1.0.3
+      '@kldavis4/search-index': 4.4.2_abstract-level@1.0.3
       '@tinacms/graphql': link:../graphql
       '@tinacms/schema-tools': link:../schema-tools
       abstract-level: 1.0.3
@@ -6834,15 +6832,15 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@graphql-codegen/plugin-helpers/4.2.0_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/5.0.0_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-THFTCfg+46PXlXobYJ/OoCX6pzjI+9woQqCjdyKtgoI0tn3Xq2HUUCiidndxUpEYVrXb5pRiRXb7b/ZbMQqD0A==,
+        integrity: sha512-suL2ZMkBAU2a4YbBHaZvUPsV1z0q3cW6S96Z/eYYfkRIsJoe2vN+wNZ9Xdzmqx0JLmeeFCBSoBGC0imFyXlkDQ==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-tools/utils': 9.1.3_graphql@15.8.0
+      '@graphql-tools/utils': 10.0.0_graphql@15.8.0
       change-case-all: 1.0.15
       common-tags: 1.8.2
       graphql: 15.8.0
@@ -7079,6 +7077,20 @@ packages:
       value-or-promise: 1.0.11
     dev: false
 
+  /@graphql-tools/utils/10.0.0_graphql@15.8.0:
+    resolution:
+      {
+        integrity: sha512-ndBPc6zgR+eGU/jHLpuojrs61kYN3Z89JyMLwK3GCRkPv4EQn9EOr1UWqF1JO0iM+/jAVHY0mvfUxyrFFN9DUQ==,
+      }
+    engines: { node: '>=16.0.0' }
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0_graphql@15.8.0
+      graphql: 15.8.0
+      tslib: 2.5.0
+    dev: false
+
   /@graphql-tools/utils/8.8.0_graphql@15.8.0:
     resolution:
       {
@@ -7090,16 +7102,15 @@ packages:
       graphql: 15.8.0
       tslib: 2.5.0
 
-  /@graphql-tools/utils/9.1.3_graphql@15.8.0:
+  /@graphql-typed-document-node/core/3.2.0_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-bbJyKhs6awp1/OmP+WKA1GOyu9UbgZGkhIj5srmiMGLHohEOKMjW784Sk0BZil1w2x95UPu0WHw6/d/HVCACCg==,
+        integrity: sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==,
       }
     peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+      graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
       graphql: 15.8.0
-      tslib: 2.5.0
     dev: false
 
   /@headlessui/react/1.6.5_sfoxds7t5ydpegc3knd667wn6m:
@@ -7922,29 +7933,29 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@kldavis4/fergies-inverted-index/12.0.1_abstract-level@1.0.3:
+  /@kldavis4/fergies-inverted-index/12.0.2_abstract-level@1.0.3:
     resolution:
       {
-        integrity: sha512-Ei9m9Yg35aDp81Sgw++/jpNKILSDZQEyXzxVuFWpgKTlAx0Qxr//V3mCcH02tVjTW+Yx3Lf5H0cq1t0snG3TXA==,
+        integrity: sha512-dLTkiMtpcGVU04OIUboceQHvgZ4EWYsaK0lhBmPbV30fArsbAefU0eWRSxJ9RLn8mtNii8GD/rIWNLMqV3CU9g==,
       }
     dependencies:
       browser-level: 1.0.1
       charwise: 3.0.1
-      classic-level: 1.3.0
       level-read-stream: 1.1.0_abstract-level@1.0.3
+      memory-level: 1.0.0
       traverse: 0.6.7
     transitivePeerDependencies:
       - abstract-level
     dev: false
 
-  /@kldavis4/search-index/4.4.1_abstract-level@1.0.3:
+  /@kldavis4/search-index/4.4.2_abstract-level@1.0.3:
     resolution:
       {
-        integrity: sha512-NQ+ofTRQIKlzDDcgtLZw/puoeScHDcqmOYUIf5pnqP/0aG06uzJxJYmxZLA69KmKeRe2dzkhLJqhoKAAcCvm7w==,
+        integrity: sha512-0uqNF/flp7vEtkkRNIvpoyw94i/kERShHKTzluwY3STYS5I0iUILc8KA112zii7rnPWWJAcD9ftCdBYkjorpVA==,
       }
     engines: { node: '>=12' }
     dependencies:
-      '@kldavis4/fergies-inverted-index': 12.0.1_abstract-level@1.0.3
+      '@kldavis4/fergies-inverted-index': 12.0.2_abstract-level@1.0.3
       browser-level: 1.0.1
       charwise: 3.0.1
       level-read-stream: 1.1.0_abstract-level@1.0.3
