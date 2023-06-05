@@ -45,7 +45,7 @@
     "typescript": "4.3.5"
   },
   "dependencies": {
-    "@vercel/stega": "^0.0.4",
+    "@vercel/stega": "^0.0.5",
     "tinacms": "workspace:*"
   },
   "peerDependencies": {
