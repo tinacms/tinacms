@@ -48,10 +48,6 @@ class ErrorBoundary extends React.Component {
    * again in the new, hopefully valid, state.
    */
   render() {
-    const branchData =
-      window.localStorage &&
-      window.localStorage.getItem('tinacms-current-branch')
-    const hasBranchData = branchData && branchData.length > 0
     // @ts-ignore
     if (this.state.hasError && !this.state.pageRefresh) {
       return (
@@ -123,39 +119,6 @@ class ErrorBoundary extends React.Component {
             >
               Refresh
             </button>
-            {hasBranchData && (
-              <>
-                <p>
-                  If you're using the branch switcher, you may currently be on a
-                  "stale" branch that has been deleted or whose content is not
-                  compatible with the latest version of the site's layout. Click
-                  the button below to switch back to the default branch for this
-                  deployment.
-                </p>
-                <p>
-                  See our{' '}
-                  <a
-                    className="text-gray-600"
-                    style={{ textDecoration: 'underline' }}
-                    href="https://tina.io/docs/errors/faq/"
-                    target="_blank"
-                  >
-                    {' '}
-                    Error FAQ{' '}
-                  </a>{' '}
-                  for more information.
-                </p>
-                <button
-                  style={errorButtonStyles as any}
-                  onClick={() => {
-                    window.localStorage.removeItem('tinacms-current-branch')
-                    window.location.reload()
-                  }}
-                >
-                  Switch to default branch
-                </button>
-              </>
-            )}
           </div>
         </div>
       )
