@@ -9,6 +9,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Client } from '../../internalClient'
 import { TinaAdminApi } from '../api'
 
+// TODO: Scott B styles
 type IndexingState =
   | 'starting'
   | 'indexing'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BranchSwitcherProps, Branch } from './types'
 import { useBranchData } from './BranchData'
-import { BaseTextField } from '../../packages/fields'
+import { BaseTextField, Input } from '../../packages/fields'
 import { Button } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
 import {
@@ -16,7 +16,6 @@ import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
 import { AiFillWarning } from 'react-icons/ai'
 import { FaSpinner } from 'react-icons/fa'
 import { useCMS } from '../../packages/react-core'
-import { BranchSwitcherLegacy } from './BranchSwitcherLegecy'
 
 type ListState = 'loading' | 'ready' | 'error'
 
@@ -26,17 +25,7 @@ export function formatBranchName(str: string): string {
   return formattedStr.toLowerCase()
 }
 
-export const BranchSwitcher = (props: BranchSwitcherProps) => {
-  const cms = useCMS()
-  const usingProtectedBranch = cms.api.tina.usingProtectedBranch
-  if (usingProtectedBranch) {
-    return <EditoralBranchSwitcher {...props} />
-  } else {
-    return <BranchSwitcherLegacy {...props} />
-  }
-}
-
-export const EditoralBranchSwitcher = ({
+export const BranchSwitcherLegacy = ({
   listBranches,
   createBranch,
   chooseBranch,
@@ -136,8 +125,6 @@ export const EditoralBranchSwitcher = ({
       }
     }
   }, [listState, branchList.length])
-
-  console.log('List', branchList)
 
   return (
     <div className="w-full flex justify-center p-5">
@@ -298,9 +285,7 @@ const BranchSelector = ({
                 {isCurrentBranch && (
                   <BiGitBranch className="w-5 h-auto text-blue-500/70" />
                 )}
-                {branch.name} | {branch.githubPullRequestUrl} |{' '}
-                {branch.protected ? 'Protected' : 'Not Protected'} |{' '}
-                {new Date(branch.indexStatus.timestamp).toLocaleString()}
+                {branch.name}
                 {indexingStatus === 'unknown' && (
                   <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
                     <span className="opacity-50 italic">{`Unknown`}</span>
