@@ -49,7 +49,6 @@ import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { Collection } from '@tinacms/schema-tools'
 import { CollectionFolder, useCollectionFolder } from './utils'
-import { useDebounce } from '../../hooks/use-debounce'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
 const isSSR = typeof window === 'undefined'
@@ -205,7 +204,6 @@ const CollectionListPage = () => {
   )
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
-  const debouncedSearch = useDebounce(search, 500)
 
   const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order)
@@ -270,7 +268,7 @@ const CollectionListPage = () => {
                       booleanEquals: null,
                     }
               }
-              search={debouncedSearch}
+              search={search}
             >
               {(
                 collection: CollectionResponse,
