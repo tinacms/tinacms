@@ -1,5 +1,5 @@
 import * as sw from 'stopword'
-import si from '@kldavis4/search-index'
+import si from '@tinacms/search-index'
 export { SearchIndexer } from './indexer'
 export { LocalSearchIndexClient, TinaCMSSearchIndexClient } from './client'
 export type { SearchClient } from './types'

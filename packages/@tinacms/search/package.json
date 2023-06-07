@@ -38,7 +38,7 @@
     "memory-level": "^1.0.0",
     "module-error": "^1.0.2",
     "node-fetch": "2",
-    "@kldavis4/search-index": "4.4.2",
+    "@tinacms/search-index": "^3.5.2",
     "stopword": "^2.0.8",
     "sqlite-level": "^1.0.0"
   },
