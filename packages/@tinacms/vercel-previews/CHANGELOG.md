@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.4
+
+### Patch Changes
+
+- 66b2a15a3: Update vercel stega function for encoding
+
 ## 0.0.3
 
 ### Patch Changes
