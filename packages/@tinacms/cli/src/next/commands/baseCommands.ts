@@ -70,7 +70,10 @@ export abstract class BaseCommand extends Command {
     process.on('SIGUSR1', exitHandler)
     process.on('SIGUSR2', exitHandler)
     //catches uncaught exceptions
-    process.on('uncaughtException', exitHandler)
+    process.on('uncaughtException', (error) => {
+      logger.error(`Uncaught exception ${error.name}`)
+      console.error(error)
+    })
   }
 
   logDeprecationWarnings() {

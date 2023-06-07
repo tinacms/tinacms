@@ -39,7 +39,7 @@ export const createMediaRouter = (config: PathConfig) => {
     const bb = busboy({ headers: req.headers })
 
     bb.on('file', async (_name, file, _info) => {
-      const fullPath = req.url?.slice('/media/upload/'.length)
+      const fullPath = decodeURI(req.url?.slice('/media/upload/'.length))
       const saveTo = path.join(mediaFolder, ...fullPath.split('/'))
       // make sure the directory exists before writing the file. This is needed for creating new folders
       await fs.ensureDir(path.dirname(saveTo))
