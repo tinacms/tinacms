@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Collection, TinaSchema } from '@tinacms/schema-tools'
 import { FilterArgs, TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
-import type { CollectionResponse } from '../types'
+import type { CollectionResponse, DocumentForm } from '../types'
 import { FullscreenError } from './FullscreenError'
 import { handleNavigate } from '../pages/CollectionListPage'
 
@@ -70,19 +70,31 @@ export const useGetCollection = (
     const searchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         try {
-          const response = await cms.api.search.query(
+          const response = (await cms.api.search.query(
             `${search} AND _collection:${collectionName}`,
             {
               limit: 15,
               cursor: after,
             }
-          )
-          const docs = await Promise.allSettled(
+          )) as {
+            results: { _id: string }[]
+            nextCursor: string
+            prevCursor: string
+          }
+          const docs = (await Promise.allSettled<
+            Promise<{ document: DocumentForm }>
+          >(
             response.results.map((result) => {
               const [collection, relativePath] = result._id.split(':')
               return api.fetchDocument(collection, relativePath, false)
             })
-          )
+          )) as {
+            status: 'fulfilled' | 'rejected'
+            value: { document: DocumentForm }
+          }[]
+          const edges = docs
+            .filter((p) => p.status === 'fulfilled' && !!p.value?.document)
+            .map((result) => ({ node: result.value.document })) as any[]
           const { name, order } = JSON.parse(sortKey || '{}')
           const validSortKey = collectionExtra.fields
             ?.map((x) => x.name)
@@ -110,9 +122,7 @@ export const useGetCollection = (
                 startCursor: '',
                 endCursor: response.nextCursor || '',
               },
-              edges: docs
-                .filter((p) => p.status === 'fulfilled')
-                .map((result) => ({ node: (result as any).value?.document })),
+              edges,
             },
           })
         } catch (error) {
