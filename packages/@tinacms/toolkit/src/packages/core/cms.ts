@@ -16,7 +16,6 @@ import { EventBus } from './event'
 import { MediaManager, MediaStore } from './media'
 import { DummyMediaStore } from './media-store.default'
 import { Flags } from './flags'
-import type { SearchClient } from '@tinacms/search/dist/index-client'
 
 /**
  * A [[CMS]] is the core object of any content management system.
@@ -117,8 +116,6 @@ export class CMS {
   events = new EventBus()
 
   media = new MediaManager(new DummyMediaStore(), this.events)
-
-  searchClient: SearchClient
 
   flags: Flags
 
