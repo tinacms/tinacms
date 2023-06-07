@@ -52,7 +52,7 @@ const extractText = (
   }
 }
 
-const relativePath = (path: string, collection: Collection<true>) => {
+const relativePath = (path: string, collection: Collection) => {
   return path
     .replace(/\\/g, '/')
     .replace(collection.path, '')
@@ -80,9 +80,9 @@ const processTextFieldValue = (value: string, maxLen: number) => {
 export const processDocumentForIndexing = (
   data: any,
   path: string,
-  collection: Collection<true>,
+  collection: Collection,
   textIndexLength: number,
-  field?: ObjectField<true>
+  field?: ObjectField
 ) => {
   if (!field) {
     const relPath = relativePath(path, collection)

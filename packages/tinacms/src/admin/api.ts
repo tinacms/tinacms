@@ -6,7 +6,7 @@ import { diff } from '@graphql-inspector/core'
 import type { Collection, TinaSchema } from '@tinacms/schema-tools'
 import type { Client } from '../internalClient'
 import type { CollectionResponse, DocumentForm } from './types'
-// @ts-ignore
+
 import {
   SearchClient,
   processDocumentForIndexing,
