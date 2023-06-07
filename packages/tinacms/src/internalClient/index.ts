@@ -194,6 +194,7 @@ export class Client {
   private options: ServerOptions
   events = new EventBus() // automatically hooked into global event bus when attached via cms.
   protectedBranches: string[] = []
+  usingEditorialWorkflow: boolean = false
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.tinaGraphQLVersion = options.tinaGraphQLVersion
@@ -747,7 +748,10 @@ mutation addPendingDocumentMutation(
     }
   }
   usingProtectedBranch() {
-    return this.protectedBranches.includes(this.branch)
+    return (
+      this.usingEditorialWorkflow &&
+      this.protectedBranches?.includes(this.branch)
+    )
   }
   async createBranch({ baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`

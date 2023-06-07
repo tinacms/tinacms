@@ -28,8 +28,8 @@ export function formatBranchName(str: string): string {
 
 export const BranchSwitcher = (props: BranchSwitcherProps) => {
   const cms = useCMS()
-  const usingProtectedBranch = cms.api.tina.usingProtectedBranch
-  if (usingProtectedBranch) {
+  const usingEditorialWorkflow = cms.api.tina.usingEditorialWorkflow
+  if (usingEditorialWorkflow) {
     return <EditoralBranchSwitcher {...props} />
   } else {
     return <BranchSwitcherLegacy {...props} />

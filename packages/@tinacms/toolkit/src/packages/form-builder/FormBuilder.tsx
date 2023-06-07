@@ -19,11 +19,7 @@ import {
   ModalBody,
   ModalActions,
 } from '../react-modals'
-import {
-  CreateBranch,
-  formatBranchName,
-} from '../../plugins/branch-switcher/BranchSwitcher'
-import { useBranchData } from '../../plugins/branch-switcher/BranchData'
+import { CreateBranch } from '../../plugins/branch-switcher/BranchSwitcher'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -184,10 +180,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         hasValidationErrors,
       }) => {
         const usingProtectedBranch = cms.api.tina.usingProtectedBranch()
-        const usingBranching = cms.flags.get('branch-switcher')
-
-        const usingBranchingAndOnDefaultBranch =
-          usingProtectedBranch && usingBranching
 
         const canSubmit =
           !pristine &&
@@ -202,7 +194,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         }
 
         const safeHandleSubmit = async () => {
-          if (usingBranchingAndOnDefaultBranch) {
+          if (usingProtectedBranch) {
             setCreateBranchModalOpen(true)
           } else {
             safeSubmit()

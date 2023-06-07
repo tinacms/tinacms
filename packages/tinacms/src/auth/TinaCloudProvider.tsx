@@ -267,8 +267,9 @@ export const TinaCloudProvider = (
   React.useEffect(() => {
     if (isTinaCloud) {
       client.getProject().then((project) => {
-        if (project?.features.includes('editorial-workflow')) {
+        if (project?.features?.includes('editorial-workflow')) {
           cms.flags.set('branch-switcher', true)
+          client.usingEditorialWorkflow = true
           client.protectedBranches = project.protectedBranches
         }
       })
