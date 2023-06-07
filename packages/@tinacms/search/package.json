@@ -9,8 +9,14 @@
     "dist"
   ],
   "exports": {
-    "import": "./dist/index-client.es.js",
-    "require": "./dist/index.js"
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.js"
+    },
+    "./dist/index-client": {
+      "import": "./dist/index-client.es.js",
+      "require": "./dist/index-client.js"
+    }
   },
   "license": "SEE LICENSE IN LICENSE",
   "buildConfig": {
