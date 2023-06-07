@@ -205,6 +205,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           <>
             {createBranchModalOpen && (
               <CreateBranchModel
+                safeSubmit={safeSubmit}
                 tinaForm={tinaForm}
                 close={() => setCreateBranchModalOpen(false)}
               />
@@ -393,7 +394,9 @@ const getAnimationProps = (animateStatus) => {
 export const CreateBranchModel = ({
   close,
   tinaForm,
+  safeSubmit,
 }: {
+  safeSubmit: () => Promise<void>
   close: () => void
   tinaForm: Form<any, any>
 }) => {
@@ -441,6 +444,15 @@ export const CreateBranchModel = ({
         <ModalActions>
           <Button style={{ flexGrow: 2 }} onClick={close}>
             Cancel
+          </Button>
+          <Button
+            style={{ flexGrow: 2 }}
+            onClick={() => {
+              close()
+              safeSubmit()
+            }}
+          >
+            Save to protected branch
           </Button>
         </ModalActions>
       </PopupModal>
