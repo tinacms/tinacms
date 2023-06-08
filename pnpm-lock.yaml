@@ -58,9 +58,9 @@ importers:
       eslint-config-next: 13.2.1
       js-base64: ^3.7.4
       next: 12.2.4
-      react: 17.0.2
-      react-dom: 17.0.2
-      react-is: ^17.0.2
+      react: 18.2.0
+      react-dom: 18.2.0
+      react-is: ^18.2.0
       tinacms: workspace:*
     dependencies:
       '@octokit/rest': 19.0.7
@@ -68,10 +68,10 @@ importers:
       '@tinacms/graphql': link:../../packages/@tinacms/graphql
       dotenv: 16.0.3
       js-base64: 3.7.5
-      next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-is: 17.0.2
+      next: 12.2.4_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      react-is: 18.2.0
       tinacms: link:../../packages/tinacms
     devDependencies:
       '@tinacms/cli': link:../../packages/@tinacms/cli
@@ -28211,7 +28211,6 @@ packages:
       {
         integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==,
       }
-    dev: true
 
   /react-json-view/1.21.3_biqbaboplfbrettd7655fr4n2y:
     resolution:
