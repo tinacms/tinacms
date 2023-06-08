@@ -19,8 +19,7 @@ export const useGetCollection = (
   folder: { loading: boolean; fullyQualifiedName: string },
   after: string = '',
   sortKey?: string,
-  filterArgs?: FilterArgs,
-  search?: string
+  filterArgs?: FilterArgs
 ) => {
   const api = new TinaAdminApi(cms)
   const schema = cms.api.tina.schema as TinaSchema
@@ -67,6 +66,51 @@ export const useGetCollection = (
       }
     }
 
+    if (cancelled) return
+
+    setLoading(true)
+    fetchCollection()
+
+    // TODO: useDebounce
+    return () => {
+      cancelled = true
+    }
+  }, [
+    cms,
+    collectionName,
+    folder.loading,
+    folder.fullyQualifiedName,
+    resetState,
+    after,
+    sortKey,
+  ])
+
+  const reFetchCollection = () => setResetSate((x) => x + 1)
+
+  return { collection, loading, error, reFetchCollection, collectionExtra }
+}
+
+export const useSearchCollection = (
+  cms: TinaCMS,
+  collectionName: string,
+  includeDocuments: boolean = true,
+  folder: { loading: boolean; fullyQualifiedName: string },
+  after: string = '',
+  search?: string
+) => {
+  const api = new TinaAdminApi(cms)
+  const schema = cms.api.tina.schema as TinaSchema
+  const collectionExtra = schema.getCollection(collectionName)
+  const [collection, setCollection] = useState<
+    CollectionResponse | Collection | undefined
+  >(undefined)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<Error | undefined>(undefined)
+  const [resetState, setResetSate] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+
     const searchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         try {
@@ -95,21 +139,7 @@ export const useGetCollection = (
           const edges = docs
             .filter((p) => p.status === 'fulfilled' && !!p.value?.document)
             .map((result) => ({ node: result.value.document })) as any[]
-          const { name, order } = JSON.parse(sortKey || '{}')
-          const validSortKey = collectionExtra.fields
-            ?.map((x) => x.name)
-            .includes(name)
-            ? name
-            : undefined
-          const c = await api.fetchCollection(
-            collectionName,
-            false,
-            filterArgs?.filterField ? '' : folder.fullyQualifiedName,
-            after,
-            validSortKey,
-            order,
-            filterArgs
-          )
+          const c = await api.fetchCollection(collectionName, false, '')
           setCollection({
             format: collection.format,
             label: collection.label,
@@ -141,11 +171,8 @@ export const useGetCollection = (
     if (cancelled) return
 
     setLoading(true)
-    if (search) {
-      searchCollection()
-    } else {
-      fetchCollection()
-    }
+    searchCollection()
+
     // TODO: useDebounce
     return () => {
       cancelled = true
@@ -158,7 +185,6 @@ export const useGetCollection = (
     resetState,
     after,
     search,
-    sortKey,
   ])
 
   const reFetchCollection = () => setResetSate((x) => x + 1)
@@ -189,16 +215,24 @@ const GetCollection = ({
 }) => {
   const navigate = useNavigate()
   const { collection, loading, error, reFetchCollection, collectionExtra } =
-    useGetCollection(
-      cms,
-      collectionName,
-      includeDocuments,
-      folder,
-      startCursor || '',
-      sortKey,
-      filterArgs,
-      search
-    ) || {}
+    search
+      ? useSearchCollection(
+          cms,
+          collectionName,
+          includeDocuments,
+          folder,
+          startCursor || '',
+          search
+        )
+      : useGetCollection(
+          cms,
+          collectionName,
+          includeDocuments,
+          folder,
+          startCursor || '',
+          sortKey,
+          filterArgs
+        ) || {}
   useEffect(() => {
     if (loading) return
 
