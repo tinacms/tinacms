@@ -274,7 +274,8 @@ export const TinaCloudProvider = (
         }
       })
     }
-  }, [])
+    // refresh if the user logs in
+  }, [isTinaCloud, client.token])
 
   return (
     <BranchDataProvider

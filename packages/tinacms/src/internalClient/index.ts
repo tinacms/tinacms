@@ -189,7 +189,7 @@ export class Client {
   tinaGraphQLVersion: string
   setToken: (_token: TokenObject) => void
   private getToken: () => Promise<TokenObject>
-  private token: string // used with memory storage
+  token: string // used with memory storage
   branch: string
   private options: ServerOptions
   events = new EventBus() // automatically hooked into global event bus when attached via cms.
@@ -489,11 +489,16 @@ mutation addPendingDocumentMutation(
           'Content-Type': 'application/json',
         },
       })
+      if (!res.ok) {
+        throw new Error(
+          `There was an error creating a new branch. ${res.statusText}`
+        )
+      }
       const values = await res.json()
       return values
     } catch (error) {
       console.error('There was an error creating a new branch.', error)
-      return null
+      throw error
     }
   }
 
@@ -675,6 +680,7 @@ mutation addPendingDocumentMutation(
   }
 
   waitForIndexStatus({ ref }: { ref: string }) {
+    let unknownCount = 0
     try {
       const [prom, cancel] = asyncPoll(
         async (): Promise<AsyncData<any>> => {
@@ -688,6 +694,14 @@ mutation addPendingDocumentMutation(
                 data: result,
               })
             } else {
+              if (result.status === 'unknown') {
+                unknownCount++
+                if (unknownCount > 5) {
+                  throw new Error(
+                    'AsyncPoller: status unknown for too long, please check indexing progress the Tina Cloud dashboard'
+                  )
+                }
+              }
               return Promise.resolve({
                 done: false,
               })
@@ -705,9 +719,7 @@ mutation addPendingDocumentMutation(
     } catch (error) {
       if (error.message === 'AsyncPoller: reached timeout') {
         console.warn(error)
-        return {
-          status: 'timeout',
-        }
+        return [Promise.resolve({ status: 'timeout' }), () => {}]
       }
       throw error
     }
@@ -767,11 +779,16 @@ mutation addPendingDocumentMutation(
           'Content-Type': 'application/json',
         },
       })
+      if (!res.ok) {
+        console.error('There was an error creating a new branch.')
+        const error = await res.json()
+        throw new Error(error?.message)
+      }
       const values = await res.json()
       return parseRefForBranchName(values.data.ref)
     } catch (error) {
       console.error('There was an error creating a new branch.', error)
-      return null
+      throw error
     }
   }
 }

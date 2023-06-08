@@ -13,10 +13,11 @@ import { TinaAdminApi } from '../api'
 type IndexingState =
   | 'starting'
   | 'indexing'
-  | 'creatingBranch'
-  | 'creatingPR'
-  | 'done'
   | 'submitting'
+  | 'creatingPR'
+  | 'creatingBranch'
+  | 'done'
+  | 'error'
 
 export const IndexingPage: FC = () => {
   const cms = useCMS()
@@ -27,12 +28,12 @@ export const IndexingPage: FC = () => {
   const [state, setState] = React.useState(
     localStorage?.getItem('tina.createBranchState') as IndexingState
   )
+  const [errorMessage, setErrorMessage] = React.useState('')
+
   const [baseBranch, setBaseBranch] = React.useState(
     localStorage?.getItem('tina.createBranchState.baseBranch') as string
   )
   const [searchParams] = useSearchParams()
-
-  //   const back = searchParams.get('back') as string
 
   const back = localStorage?.getItem('tina.createBranchState.back')
   const fullPath = localStorage?.getItem('tina.createBranchState.fullPath')
@@ -47,53 +48,82 @@ export const IndexingPage: FC = () => {
   useEffect(() => {
     const run = async () => {
       if (state === 'starting') {
-        const name = await tinaApi.createBranch({
-          branchName: formatBranchName(branch),
-          baseBranch: currentBranch,
-        })
-        setBranch(name)
-        localStorage.setItem('tina.createBranchState', 'indexing')
-        cms.alerts.success('Branch created.')
-        setState('indexing')
+        try {
+          const name = await tinaApi.createBranch({
+            branchName: formatBranchName(branch),
+            baseBranch: currentBranch,
+          })
+          if (!name) {
+            throw new Error('Branch creation failed.')
+          }
+          setBranch(name)
+          localStorage.setItem('tina.createBranchState', 'indexing')
+          cms.alerts.success('Branch created.')
+          setState('indexing')
+        } catch (e) {
+          console.error(e)
+          cms.alerts.error('Branch creation failed.')
+          setErrorMessage(
+            'Branch creation failed, please try again. By refreshing the page.'
+          )
+          setState('error')
+        }
       }
       if (state === 'indexing') {
-        const [
-          // When this promise resolves, we know the index status is no longer 'inprogress' or 'unknown'
-          waitForIndexStatusPromise,
-          // Calling this function will cancel the polling
-          _cancelWaitForIndexFunc,
-        ] = cms.api.tina.waitForIndexStatus({
-          ref: branch,
-        })
-        await waitForIndexStatusPromise
-        cms.alerts.success('Branch indexed.')
-        localStorage.setItem('tina.createBranchState', 'submitting')
-        setState('submitting')
+        try {
+          const [
+            // When this promise resolves, we know the index status is no longer 'inprogress' or 'unknown'
+            waitForIndexStatusPromise,
+            // Calling this function will cancel the polling
+            _cancelWaitForIndexFunc,
+          ] = tinaApi.waitForIndexStatus({
+            ref: branch,
+          })
+          await waitForIndexStatusPromise
+          cms.alerts.success('Branch indexed.')
+          localStorage.setItem('tina.createBranchState', 'submitting')
+          setState('submitting')
+        } catch {
+          cms.alerts.error('Branch indexing failed.')
+          setErrorMessage(
+            'Branch indexing failed, please check the Tina Cloud dashboard for more information. To try again chick "re-index" on the branch in the dashboard.'
+          )
+          setState('error')
+        }
       }
       if (state === 'submitting') {
-        setBaseBranch(tinaApi.branch)
-        localStorage.setItem(
-          'tina.createBranchState.baseBranch',
-          tinaApi.branch
-        )
-        setCurrentBranch(branch)
-        const collection = tinaApi.schema.getCollectionByFullPath(fullPath)
+        try {
+          setBaseBranch(tinaApi.branch)
+          localStorage.setItem(
+            'tina.createBranchState.baseBranch',
+            tinaApi.branch
+          )
+          setCurrentBranch(branch)
+          const collection = tinaApi.schema.getCollectionByFullPath(fullPath)
 
-        const api = new TinaAdminApi(cms)
-        const params = api.schema.transformPayload(collection.name, values)
-        const relativePath = fullPath.replace(`${collection.path}/`, '')
+          const api = new TinaAdminApi(cms)
+          const params = api.schema.transformPayload(collection.name, values)
+          const relativePath = fullPath.replace(`${collection.path}/`, '')
 
-        if (await api.isAuthenticated()) {
-          await api.updateDocument(collection.name, relativePath, params)
-        } else {
-          const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`
-          cms.alerts.error(authMessage)
-          console.error(authMessage)
-          return false
+          if (await api.isAuthenticated()) {
+            await api.updateDocument(collection.name, relativePath, params)
+          } else {
+            const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`
+            cms.alerts.error(authMessage)
+            console.error(authMessage)
+            return false
+          }
+          localStorage.setItem('tina.createBranchState', 'creatingPR')
+          cms.alerts.success('Content saved.')
+          setState('creatingPR')
+        } catch (e) {
+          console.error(e)
+          cms.alerts.error('Content save failed.')
+          setErrorMessage(
+            'Content save failed, please try again. If the problem persists please contact support.'
+          )
+          setState('error')
         }
-        localStorage.setItem('tina.createBranchState', 'creatingPR')
-        cms.alerts.success('Content saved.')
-        setState('creatingPR')
       }
       if (state === 'creatingPR') {
         const foo = await tinaApi.createPullRequest({
@@ -125,7 +155,8 @@ export const IndexingPage: FC = () => {
       {state === 'indexing' && <div>Indexing Content</div>}
       {state === 'submitting' && <div>Saving content</div>}
       {state === 'creatingPR' && <div>Creating Pull Request</div>}
-      {state !== 'done' && <LoadingDots color="black" />}
+      {state === 'error' && <div>ERROR: {errorMessage} </div>}
+      {state !== 'done' && state !== 'error' && <LoadingDots color="black" />}
     </div>
   )
 }
