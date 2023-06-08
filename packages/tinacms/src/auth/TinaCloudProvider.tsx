@@ -3,7 +3,7 @@
 */
 
 import { ModalBuilder } from './AuthModal'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   TinaCMS,
   TinaProvider,
@@ -175,10 +175,7 @@ export const TinaCloudProvider = (
     cms.api.tina.setBranch(currentBranch)
   }
 
-  const setupSearch = async (props: CreateClientProps) => {
-    if (cms.api.search) {
-      return
-    }
+  useEffect(() => {
     let searchClient
     // if local and search is configured then we always use the local client
     // if not local, then determine if search is enabled and use the client from the config
@@ -196,8 +193,7 @@ export const TinaCloudProvider = (
     if (searchClient) {
       cms.registerApi('search', searchClient)
     }
-  }
-  setupSearch(props)
+  }, [props])
 
   if (!cms.api.admin) {
     cms.registerApi('admin', new TinaAdminApi(cms))
