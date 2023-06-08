@@ -3,7 +3,7 @@ import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
 import type { ViteDevServer } from 'vite'
-import { buildSchema, Database } from '@tinacms/graphql'
+import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
 import { buildProductionSpa } from './server'
@@ -19,6 +19,12 @@ import { IndexStatusResponse, waitForDB } from './waitForDB'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { sleepAndCallFunc } from '../../../utils/sleep'
 import { dangerText, linkText, warnText } from '../../../utils/theme'
+import {
+  SearchClient,
+  SearchIndexer,
+  TinaCMSSearchIndexClient,
+} from '@tinacms/search'
+import { spin } from '../../../utils/spinner'
 import { createDevServer } from '../dev-command/server'
 import { BaseCommand } from '../baseCommands'
 
@@ -41,6 +47,9 @@ export class BuildCommand extends BaseCommand {
    */
   skipCloudChecks = Option.Boolean('--skip-cloud-checks', false, {
     description: 'Skips checking the provided cloud config.',
+  })
+  skipSearchIndex = Option.Boolean('--skip-search-index', false, {
+    description: 'Skip indexing the site for search',
   })
 
   static usage = Command.Usage({
@@ -111,7 +120,13 @@ export class BuildCommand extends BaseCommand {
 
     if (this.localOption) {
       // start the dev server if we are building locally
-      server = await createDevServer(configManager, database, apiURL, true)
+      server = await createDevServer(
+        configManager,
+        database,
+        null,
+        apiURL,
+        true
+      )
       await server.listen(Number(this.port))
       console.log('server listening on port', this.port)
     }
@@ -136,6 +151,76 @@ export class BuildCommand extends BaseCommand {
       configManager.outputGitignorePath,
       'index.html\nassets/'
     )
+
+    if (
+      configManager.config.search &&
+      !this.skipSearchIndex &&
+      !this.localOption
+    ) {
+      let client: SearchClient
+      const hasTinaSearch = Boolean(configManager.config?.search?.tina)
+      if (hasTinaSearch) {
+        if (!configManager.config?.branch) {
+          logger.error(
+            `${dangerText(
+              `ERROR: Branch not configured in tina search configuration.`
+            )}`
+          )
+          throw new Error('Branch not configured in tina search configuration.')
+        }
+        if (!configManager.config?.clientId) {
+          logger.error(`${dangerText(`ERROR: clientId not configured.`)}`)
+          throw new Error('clientId not configured.')
+        }
+        if (!configManager.config?.search?.tina?.indexerToken) {
+          logger.error(
+            `${dangerText(
+              `ERROR: indexerToken not configured in tina search configuration.`
+            )}`
+          )
+          throw new Error(
+            'indexerToken not configured in tina search configuration.'
+          )
+        }
+        client = new TinaCMSSearchIndexClient({
+          apiUrl: `${
+            configManager.config.tinaioConfig?.contentApiUrlOverride ||
+            'https://content.tinajs.io'
+          }/searchIndex/${configManager.config?.clientId}`,
+          branch: configManager.config?.branch,
+          indexerToken: configManager.config?.search?.tina?.indexerToken,
+          stopwordLanguages:
+            configManager.config?.search?.tina?.stopwordLanguages,
+        })
+      } else {
+        client = configManager.config?.search?.searchClient
+      }
+
+      const searchIndexer = new SearchIndexer({
+        batchSize: configManager.config.search?.indexBatchSize || 100,
+        bridge: new FilesystemBridge(
+          configManager.rootPath,
+          configManager.contentRootPath
+        ),
+        schema: tinaSchema,
+        client,
+      })
+      let err: Error | undefined
+      await spin({
+        waitFor: async () => {
+          try {
+            await searchIndexer.indexAllContent()
+          } catch (e) {
+            err = e
+          }
+        },
+        text: 'Building search index',
+      })
+      if (err) {
+        logger.error(`${dangerText(`ERROR: ${err.message}`)}`)
+        process.exit(1)
+      }
+    }
 
     const summaryItems = []
     if (!configManager.shouldSkipSDK()) {

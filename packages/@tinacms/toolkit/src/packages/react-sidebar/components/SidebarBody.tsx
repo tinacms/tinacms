@@ -7,9 +7,8 @@
 import * as React from 'react'
 
 import { Form } from '../../forms'
-import { useState } from 'react'
 import { FormLists } from './FormList'
-import { useCMS, useSubscribable } from '../../react-core'
+import { useCMS } from '../../react-core'
 import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
@@ -31,8 +30,10 @@ export const FormsView = ({
         cms.sidebar.renderNav
       : true
   const { setFormIsPristine } = React.useContext(SidebarContext)
-  const { formsRegistering, setFormsRegistering } =
-    React.useContext(EditContext)
+  const { formsRegistering, setFormsRegistering } = React.useContext<{
+    formsRegistering: boolean
+    setFormsRegistering: (_value: boolean) => void
+  }>(EditContext)
 
   React.useMemo(
     () =>

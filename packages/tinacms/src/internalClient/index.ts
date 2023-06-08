@@ -14,6 +14,12 @@ import {
 
 import gql from 'graphql-tag'
 import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
+import {
+  optionsToSearchIndexOptions,
+  parseSearchIndexResponse,
+  queryToSearchIndexQuery,
+  SearchClient,
+} from '@tinacms/search/dist/index-client'
 
 export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
 
@@ -182,7 +188,6 @@ export class Client {
   schema?: TinaSchema
   clientId: string
   contentApiBase: string
-  query: string
   tinaGraphQLVersion: string
   setToken: (_token: TokenObject) => void
   private getToken: () => Promise<TokenObject>
@@ -297,6 +302,10 @@ export class Client {
     this.contentApiUrl =
       this.options.customContentApiUrl ||
       `${this.contentApiBase}/${this.tinaGraphQLVersion}/content/${this.options.clientId}/github/${encodedBranch}`
+  }
+
+  getBranch() {
+    return this.branch
   }
 
   addPendingContent = async (props) => {
@@ -769,5 +778,105 @@ export class LocalClient extends Client {
 
   async getUser(): Promise<boolean> {
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
+  }
+}
+
+export class TinaCMSSearchClient implements SearchClient {
+  constructor(private client: Client) {}
+  async query(
+    query: string,
+    options?: {
+      limit?: number
+      cursor?: string
+    }
+  ): Promise<{
+    results: any[]
+    nextCursor: string | null
+    total: number
+    prevCursor: string | null
+  }> {
+    const q = queryToSearchIndexQuery(query)
+    const opt = optionsToSearchIndexOptions(options)
+    const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
+    const res = await this.client.fetchWithToken(
+      `${this.client.contentApiBase}/searchIndex/${
+        this.client.clientId
+      }/${this.client.getBranch()}?q=${JSON.stringify(q)}${optionsParam}`
+    )
+    return parseSearchIndexResponse(await res.json(), options)
+  }
+
+  async del(ids: string[]): Promise<any> {
+    const res = await this.client.fetchWithToken(
+      `${this.client.contentApiBase}/searchIndex/${
+        this.client.clientId
+      }/${this.client.getBranch()}?ids=${ids.join(',')}`,
+      {
+        method: 'DELETE',
+      }
+    )
+    if (res.status !== 200) {
+      throw new Error('Failed to update search index')
+    }
+  }
+
+  async put(docs: any[]): Promise<any> {
+    // TODO should only be called if search is enabled and supportsClientSideIndexing is true
+    const res = await this.client.fetchWithToken(
+      `${this.client.contentApiBase}/searchIndex/${
+        this.client.clientId
+      }/${this.client.getBranch()}`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ docs }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    if (res.status !== 200) {
+      throw new Error('Failed to update search index')
+    }
+  }
+
+  supportsClientSideIndexing(): boolean {
+    return true
+  }
+}
+
+export class LocalSearchClient implements SearchClient {
+  constructor(private client: Client) {}
+  async query(
+    query: string,
+    options?: {
+      limit?: number
+      cursor?: string
+    }
+  ): Promise<{
+    results: any[]
+    nextCursor: string | null
+    total: number
+    prevCursor: string | null
+  }> {
+    const q = queryToSearchIndexQuery(query)
+    const opt = optionsToSearchIndexOptions(options)
+    const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
+    const res = await this.client.fetchWithToken(
+      `http://localhost:4001/searchIndex?q=${JSON.stringify(q)}${optionsParam}`
+    )
+    return parseSearchIndexResponse(await res.json(), options)
+  }
+
+  del(ids: string[]): Promise<any> {
+    return Promise.resolve(undefined)
+  }
+
+  put(docs: any[]): Promise<any> {
+    return Promise.resolve(undefined)
+  }
+
+  supportsClientSideIndexing(): boolean {
+    // chokidar will keep index updated
+    return false
   }
 }

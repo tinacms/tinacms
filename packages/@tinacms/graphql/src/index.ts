@@ -8,6 +8,7 @@ import type {
 
 import { buildDotTinaFiles } from './build'
 export { resolve } from './resolve'
+export { transformDocumentIntoPayload } from './resolver'
 export * from './resolver/error'
 export { createDatabase } from './database'
 export { TinaLevelClient } from './level/tinaLevel'
@@ -22,7 +23,14 @@ import type { Database } from './database'
 import type { Config } from '@tinacms/schema-tools'
 
 export { sequential, assertShape } from './util'
-export { stringifyFile, parseFile } from './database/util'
+export {
+  loadAndParseWithAliases,
+  stringifyFile,
+  parseFile,
+  scanAllContent,
+  scanContentByPaths,
+  transformDocument,
+} from './database/util'
 export { createSchema } from './schema/createSchema'
 export { buildDotTinaFiles }
 

@@ -7,7 +7,12 @@ import {
 } from '@tinacms/toolkit'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm, normalizePath } from '@tinacms/schema-tools'
+import {
+  TinaSchema,
+  resolveForm,
+  normalizePath,
+  Collection,
+} from '@tinacms/schema-tools'
 import type { Template } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
@@ -23,7 +28,7 @@ import { useCollectionFolder } from './utils'
 
 const createDocument = async (
   cms: TinaCMS,
-  collection: { name: string; format: string },
+  collection: Collection,
   template: { name: string },
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   folder: string,
@@ -42,7 +47,7 @@ const createDocument = async (
   })
 
   if (await api.isAuthenticated()) {
-    await api.createDocument(collection.name, relativePath, params)
+    await api.createDocument(collection, relativePath, params)
   } else {
     const authMessage = `CreateDocument failed: User is no longer authenticated; please login and try again.`
     cms.alerts.error(authMessage)

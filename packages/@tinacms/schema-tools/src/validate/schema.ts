@@ -136,4 +136,15 @@ export const TinaCloudSchemaZod = z
         path: ['config', 'media'],
       })
     }
+
+    const search = val?.config?.search
+    if (search && search.tina && search.searchClient) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'can not have both searchClient and tina. Must use one or the other',
+        fatal: true,
+        path: ['config', 'search'],
+      })
+    }
   })

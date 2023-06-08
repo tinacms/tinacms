@@ -4,7 +4,7 @@
 
 export interface TemplateResponse {
   name: string
-  label: string
+  label?: string | boolean
   fields: any[]
 }
 
@@ -45,7 +45,7 @@ export interface DocumentSys {
 export interface CollectionResponse {
   label: string
   name: string
-  slug: string
+  slug?: string
   format?: string
   templates?: TemplateResponse[]
   documents?: {

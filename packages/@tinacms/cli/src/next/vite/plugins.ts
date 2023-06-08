@@ -14,6 +14,7 @@ import {
   createMediaRouter,
 } from '../commands/dev-command/server/media'
 import type { ConfigManager } from '../config-manager'
+import { createSearchIndexRouter } from '../commands/dev-command/server/searchIndex'
 
 export const transformTsxPlugin = ({
   configManager: _configManager,
@@ -48,10 +49,12 @@ export const devServerEndPointsPlugin = ({
   configManager,
   apiURL,
   database,
+  searchIndex,
 }: {
   apiURL: string
   database: Database
   configManager: ConfigManager
+  searchIndex: any
 }) => {
   const plug: Plugin = {
     name: 'graphql-endpoints',
@@ -66,6 +69,11 @@ export const devServerEndPointsPlugin = ({
           publicFolder: parseMediaFolder(mediaPaths?.publicFolder || ''),
           mediaRoot: parseMediaFolder(mediaPaths?.mediaRoot || ''),
         })
+        const searchIndexRouter = createSearchIndexRouter({
+          config: { apiURL, searchPath: 'searchIndex' },
+          searchIndex,
+        })
+
         if (req.url.startsWith('/media/upload')) {
           await mediaRouter.handlePost(req, res)
           return
@@ -102,6 +110,17 @@ export const devServerEndPointsPlugin = ({
             verbose: false,
           })
           res.end(JSON.stringify(result))
+          return
+        }
+
+        if (req.url.startsWith('/searchIndex')) {
+          if (req.method === 'POST') {
+            await searchIndexRouter.put(req, res)
+          } else if (req.method === 'GET') {
+            await searchIndexRouter.get(req, res)
+          } else if (req.method === 'DELETE') {
+            await searchIndexRouter.del(req, res)
+          }
           return
         }
 
