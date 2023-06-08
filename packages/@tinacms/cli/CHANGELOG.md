@@ -1,5 +1,18 @@
 # tinacms-cli
 
+## 1.5.17
+
+### Patch Changes
+
+- e2e8bd01d: Fix issue where images with spaces in their names wouldn't upload properly
+- e2e8bd01d: Show uncaught errors from the CLI
+
+## 1.5.16
+
+### Patch Changes
+
+- @tinacms/app@1.2.15
+
 ## 1.5.15
 
 ### Patch Changes

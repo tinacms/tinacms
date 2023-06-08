@@ -1,4 +1,4 @@
-import { vercelStegaEncode } from '@vercel/stega'
+import { vercelStegaCombine } from '@vercel/stega'
 import React from 'react'
 import { tinaField, useEditState } from 'tinacms/dist/react'
 import { useCallback, useEffect } from 'react'
@@ -125,12 +125,10 @@ export const useVisualEditing = <T extends object>({
 }
 
 function encodeEditInfo(path: (string | number)[], value: string, id: string) {
-  const res = `${vercelStegaEncode({
+  return vercelStegaCombine(value, {
     origin: 'tina.io',
     data: { fieldName: `${id}---${path.join('.')}` },
-  })}${value}`
-
-  return res
+  })
 }
 
 export const hashFromQuery = (input: string) => {

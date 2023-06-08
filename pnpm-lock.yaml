@@ -1236,12 +1236,12 @@ importers:
     specifiers:
       '@tinacms/scripts': workspace:*
       '@types/react': 17.0.47
-      '@vercel/stega': ^0.0.4
+      '@vercel/stega': ^0.0.5
       react: 17.0.2
       tinacms: workspace:*
       typescript: 4.3.5
     dependencies:
-      '@vercel/stega': 0.0.4
+      '@vercel/stega': 0.0.5
       tinacms: link:../../tinacms
     devDependencies:
       '@tinacms/scripts': link:../scripts
@@ -12553,10 +12553,10 @@ packages:
       - scheduler
     dev: false
 
-  /@vercel/stega/0.0.4:
+  /@vercel/stega/0.0.5:
     resolution:
       {
-        integrity: sha512-4c9AibBOJ9oGvvev0f5QFbdcDPmOjkxdlrKb5Y70DnAc0ThtFujod8DRGA/RLFQ5lAvgRTdpvoczl8GhHuxFJQ==,
+        integrity: sha512-vvuUYW0rBp4Ea9xv0LilqFyDHAW9tvy4GL70G1ayGisQwpOYIPChmiw/56jqZvpxjE9gjQIApLfglOcdZe3PcA==,
       }
     dev: false
 
