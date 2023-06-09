@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BranchSwitcherProps, Branch } from './types'
 import { useBranchData } from './BranchData'
-import { BaseTextField } from '../../packages/fields'
+import { BaseTextField, Select } from '../../packages/fields'
 import { Button, OverflowMenu } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
 import {
@@ -254,41 +254,90 @@ const BranchSelector = ({
     <div className="flex flex-col gap-3">
       <div className="flex space-x-4">
         <div>
-          <Dropdown
-            label="Sort By"
-            items={[
-              { key: 'updated', onClick: () => {}, render: 'Last Udated' },
+          <label
+            htmlFor="sort"
+            className="text-xs mb-1 flex flex-col font-bold"
+          >
+            Sort By
+          </label>
+          <Select
+            name="sort"
+            input={{
+              id: 'sort',
+              name: 'sort',
+              value: 'default',
+              onChange: (e) => {},
+            }}
+            options={[
+              {
+                label: 'Default',
+                value: 'default',
+              },
+              {
+                label: 'Last Updated',
+                value: 'updated',
+              },
+              {
+                label: 'Branch Name',
+                value: 'name',
+              },
             ]}
           />
         </div>
         <div>
-          <Dropdown
-            label="Branch Type"
-            items={[
-              { key: 'content', onClick: () => {}, render: 'Content' },
-              { key: 'all', onClick: () => {}, render: 'All Branches' },
+          <label
+            htmlFor="branch-type"
+            className="text-xs mb-1 flex flex-col font-bold"
+          >
+            Branch Type
+          </label>
+          <Select
+            name="branch-type"
+            input={{
+              id: 'branch-type',
+              name: 'branch-type',
+              value: 'content',
+              onChange: (e) => {},
+            }}
+            options={[
+              {
+                label: 'Content',
+                value: 'content',
+              },
+              {
+                label: 'All',
+                value: 'All',
+              },
             ]}
           />
         </div>
         <div className="flex-1" />
-        <div className="block relative group">
-          <BaseTextField
-            placeholder="Search"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          />
-          {filter === '' ? (
-            <BiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150" />
-          ) : (
-            <button
-              onClick={() => {
-                setFilter('')
-              }}
-              className="outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150"
-            >
-              <MdOutlineClear className="w-5 h-auto text-gray-600" />
-            </button>
-          )}
+        <div>
+          <label
+            htmlFor="search"
+            className="text-xs mb-1 flex flex-col font-bold"
+          >
+            Search / Create
+          </label>
+          <div className="block relative group h-fit mb-auto">
+            <BaseTextField
+              placeholder="Search"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            {filter === '' ? (
+              <BiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150" />
+            ) : (
+              <button
+                onClick={() => {
+                  setFilter('')
+                }}
+                className="outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150"
+              >
+                <MdOutlineClear className="w-5 h-auto text-gray-600" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
       {filteredBranchList.length === 0 && (
