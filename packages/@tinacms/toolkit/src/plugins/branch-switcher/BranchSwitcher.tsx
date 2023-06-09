@@ -283,7 +283,7 @@ const BranchSelector = ({
             const indexingStatus = branch?.indexStatus?.status
             return (
               <div
-                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
+                className={`relative text-base py-1.5 px-3 flex justify-between items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
                   indexingStatus !== 'complete'
                     ? 'bg-gray-50 text-gray-400 pointer-events-none'
                     : isCurrentBranch
@@ -314,7 +314,7 @@ const BranchSelector = ({
                     addSuffix: true,
                   })}
                 </div>
-                <div>{branch.githubPullRequestUrl} </div>
+                <div>...{branch.githubPullRequestUrl} </div>
               </div>
             )
           })}
