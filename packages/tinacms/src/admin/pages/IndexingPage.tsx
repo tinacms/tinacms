@@ -1,13 +1,9 @@
 import React, { FC, useEffect } from 'react'
-import {
-  LoadingDots,
-  useCMS,
-  useBranchData,
-  formatBranchName,
-} from '@tinacms/toolkit'
+import { useCMS, useBranchData, formatBranchName } from '@tinacms/toolkit'
 import { useSearchParams } from 'react-router-dom'
 import { Client } from '../../internalClient'
 import { TinaAdminApi } from '../api'
+import { BiError, BiLoaderAlt } from 'react-icons/bi'
 
 // TODO: Scott B styles
 type IndexingState =
@@ -145,18 +141,37 @@ export const IndexingPage: FC = () => {
     }
   }, [state])
   if (!back || !fullPath || !values || !branch) {
-    return <div>Missing params please try again</div>
+    return (
+      <Wrapper>
+        <p>Missing params please try again.</p>
+      </Wrapper>
+    )
   }
   return (
-    <div>
-      {(state === 'starting' || state === 'creatingBranch') && (
-        <div>Creating branch</div>
+    <Wrapper>
+      {state !== 'done' && state !== 'error' && (
+        <BiLoaderAlt
+          className={`opacity-70 text-blue-400 animate-spin w-10 h-auto`}
+        />
       )}
-      {state === 'indexing' && <div>Indexing Content</div>}
-      {state === 'submitting' && <div>Saving content</div>}
-      {state === 'creatingPR' && <div>Creating Pull Request</div>}
-      {state === 'error' && <div>ERROR: {errorMessage} </div>}
-      {state !== 'done' && state !== 'error' && <LoadingDots color="black" />}
-    </div>
+      {(state === 'starting' || state === 'creatingBranch') && (
+        <p>Creating branch&hellip;</p>
+      )}
+      {state === 'indexing' && <p>Indexing Content&hellip;</p>}
+      {state === 'submitting' && <p>Saving content&hellip;</p>}
+      {state === 'creatingPR' && <p>Creating Pull Request&hellip;</p>}
+      {state === 'error' && (
+        <p className="flex items-center gap-1 text-red-700">
+          <BiError className="w-7 h-auto text-red-400 flex-shrink-0" />{' '}
+          <b>Error:</b> {errorMessage}{' '}
+        </p>
+      )}
+    </Wrapper>
   )
 }
+
+const Wrapper = ({ children }: any) => (
+  <div className="w-full h-full flex flex-col justify-center items-center gap-4 p-6 text-xl text-gray-700">
+    {children}
+  </div>
+)
