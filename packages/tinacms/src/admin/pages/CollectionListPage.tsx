@@ -49,6 +49,7 @@ import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { Collection } from '@tinacms/schema-tools'
 import { CollectionFolder, useCollectionFolder } from './utils'
+import { MdOutlineInfo } from 'react-icons/md'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
 const isSSR = typeof window === 'undefined'
@@ -432,15 +433,34 @@ const CollectionListPage = () => {
                                     />
                                   </div>
                                 )}
-                                {searchEnabled && (
-                                  <SearchInput
-                                    loading={_loading}
-                                    search={search}
-                                    setSearch={setSearch}
-                                    searchInput={searchInput}
-                                    setSearchInput={setSearchInput}
-                                  />
-                                )}
+                                <div className="flex flex-1 flex-col gap-2 items-start w-full">
+                                  {searchEnabled ? (
+                                    <SearchInput
+                                      loading={_loading}
+                                      search={search}
+                                      setSearch={setSearch}
+                                      searchInput={searchInput}
+                                      setSearchInput={setSearchInput}
+                                    />
+                                  ) : (
+                                    <>
+                                      <label
+                                        htmlFor="search"
+                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                      >
+                                        Search
+                                      </label>
+                                      <a
+                                        target="_blank"
+                                        href="https://tina.io/docs/reference/search/overview"
+                                        className="inline-flex text-xs"
+                                      >
+                                        <p>Search not configured.</p>
+                                        <MdOutlineInfo className="w-4 h-auto ml-1.5 opacity-80" />
+                                      </a>
+                                    </>
+                                  )}
+                                </div>
                               </>
                             )}
                           </div>
