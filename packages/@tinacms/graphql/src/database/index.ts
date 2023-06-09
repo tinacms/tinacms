@@ -6,7 +6,17 @@ import micromatch from 'micromatch'
 
 import { createSchema } from '../schema/createSchema'
 import { atob, btoa, lastItem, sequential } from '../util'
-import { normalizePath, parseFile, stringifyFile } from './util'
+import {
+  getTemplateForFile,
+  hasOwnProperty,
+  loadAndParseWithAliases,
+  normalizePath,
+  partitionPathsByCollection,
+  scanAllContent,
+  scanContentByPaths,
+  stringifyFile,
+  transformDocument,
+} from './util'
 import type {
   Collection,
   CollectionTemplateable,
@@ -42,7 +52,7 @@ import {
   PutOp,
   SUBLEVEL_OPTIONS,
 } from './level'
-import { replaceNameOverrides, applyNameOverrides } from './alias-utils'
+import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
 import sha from 'js-sha1'
 
 type IndexStatusEvent = {
@@ -133,25 +143,6 @@ export class Database {
   private getGeneratedFolder = () =>
     path.join(this.tinaDirectory, '__generated__')
 
-  private async partitionPathsByCollection(documentPaths: string[]) {
-    const pathsByCollection: Record<string, string[]> = {}
-    const nonCollectionPaths: string[] = []
-    const collections: Record<string, Collection<true>> = {}
-    for (const documentPath of documentPaths) {
-      const collection = await this.collectionForPath(documentPath)
-      if (collection) {
-        if (!pathsByCollection[collection.name]) {
-          pathsByCollection[collection.name] = []
-        }
-        collections[collection.name] = collection
-        pathsByCollection[collection.name].push(documentPath)
-      } else {
-        nonCollectionPaths.push(documentPath)
-      }
-    }
-    return { pathsByCollection, nonCollectionPaths, collections }
-  }
-
   private async updateDatabaseVersion(version: string) {
     const metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
     await metadataLevel.put('metadata', { version })
@@ -192,8 +183,6 @@ export class Database {
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected get for config file ${filepath}`)
     } else {
-      const tinaSchema = await this.getSchema(this.level)
-      const extension = path.extname(filepath)
       const contentObject = await this.level
         .sublevel<string, Record<string, any>>(
           CONTENT_ROOT_PREFIX,
@@ -204,52 +193,11 @@ export class Database {
       if (!contentObject) {
         throw new GraphQLError(`Unable to find record ${filepath}`)
       }
-      const templateName =
-        hasOwnProperty(contentObject, '_template') &&
-        typeof contentObject._template === 'string'
-          ? contentObject._template
-          : undefined
-      const { collection, template } = hasOwnProperty(
+      return transformDocument(
+        filepath,
         contentObject,
-        '__collection'
+        await this.getSchema(this.level)
       )
-        ? {
-            collection: tinaSchema.getCollection(
-              contentObject['__collection'] as string
-            ),
-            template: undefined,
-          } // folders have no templates
-        : tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
-
-      const field = template?.fields.find((field) => {
-        if (field.type === 'string' || field.type === 'rich-text') {
-          if (field.isBody) {
-            return true
-          }
-        }
-        return false
-      })
-
-      let data = contentObject
-      if ((extension === '.md' || extension === '.mdx') && field) {
-        if (hasOwnProperty(contentObject, '$_body')) {
-          const { $_body, ...rest } = contentObject
-          data = rest
-          data[field.name] = $_body as object
-        }
-      }
-      return {
-        ...data,
-        _collection: collection.name,
-        _keepTemplateKey: !!collection.templates,
-        _template: template?.namespace
-          ? lastItem(template?.namespace)
-          : undefined,
-        _relativePath: filepath
-          .replace(collection.path, '')
-          .replace(/^\/|\/$/g, ''),
-        _id: filepath,
-      } as T
     }
   }
 
@@ -1043,9 +991,10 @@ export class Database {
         await this.level.batch(operations.splice(0, 25))
       }
     }
+    const tinaSchema = await this.getSchema(this.level)
     await this.indexStatusCallbackWrapper(async () => {
       const { pathsByCollection, nonCollectionPaths, collections } =
-        await this.partitionPathsByCollection(documentPaths)
+        await partitionPathsByCollection(tinaSchema, documentPaths)
 
       for (const collection of Object.keys(pathsByCollection)) {
         await _deleteIndexContent(
@@ -1075,20 +1024,25 @@ export class Database {
         await this.level.batch(operations.splice(0, 25))
       }
     }
+    const tinaSchema = await this.getSchema(this.level)
     await this.indexStatusCallbackWrapper(async () => {
-      const { pathsByCollection, nonCollectionPaths, collections } =
-        await this.partitionPathsByCollection(documentPaths)
-
-      for (const collection of Object.keys(pathsByCollection)) {
-        await _indexContent(
-          this,
-          this.level,
-          pathsByCollection[collection],
-          enqueueOps,
-          collections[collection]
-        )
-      }
-      await _indexContent(this, this.level, nonCollectionPaths, enqueueOps)
+      await scanContentByPaths(
+        tinaSchema,
+        documentPaths,
+        async (collection, documentPaths) => {
+          if (collection) {
+            await _indexContent(
+              this,
+              this.level,
+              documentPaths,
+              enqueueOps,
+              collection
+            )
+          } else {
+            await _indexContent(this, this.level, documentPaths, enqueueOps)
+          }
+        }
+      )
     })
     while (operations.length) {
       await this.level.batch(operations.splice(0, 25))
@@ -1152,7 +1106,6 @@ export class Database {
   }
 
   public _indexAllContent = async (level: Level, schema?: Schema) => {
-    const warnings: string[] = []
     const tinaSchema = await this.getSchema(level, schema)
     const operations: PutOp[] = []
     const enqueueOps = async (ops: PutOp[]): Promise<void> => {
@@ -1163,54 +1116,19 @@ export class Database {
         await level.batch(batchOps)
       }
     }
-    // This map is used to map files to their collections
-    const filesSeen = new Map<string, string[]>()
-    // This is used to track which files have duplicate collections so we do not have to loop over all files at the end
-    const duplicateFiles = new Set<string>()
-    await sequential(tinaSchema.getCollections(), async (collection) => {
-      const normalPath = normalizePath(collection.path)
-      const format = collection.format || 'md'
-      // Get all possible paths for this collection
-      const documentPaths = await this.bridge.glob(normalPath, format)
+    const warnings = await scanAllContent(
+      tinaSchema,
+      this.bridge,
+      async (collection, contentPaths) => {
+        await _indexContent(this, level, contentPaths, enqueueOps, collection)
+      }
+    )
 
-      // filter paths based on match and exclude
-      const matches = this.tinaSchema.getMatches({ collection })
-      const filteredPaths =
-        matches.length > 0 ? micromatch(documentPaths, matches) : documentPaths
-
-      filteredPaths.forEach((path) => {
-        if (filesSeen.has(path)) {
-          filesSeen.get(path).push(collection.name)
-          duplicateFiles.add(path)
-        } else {
-          filesSeen.set(path, [collection.name])
-        }
-      })
-      duplicateFiles.forEach((path) => {
-        warnings.push(
-          `"${path}" Found in multiple collections: ${filesSeen
-            .get(path)
-            .map((collection) => `"${collection}"`)
-            .join(
-              ', '
-            )}. This can cause unexpected behavior. We recommend updating the \`match\` property of those collections so that each file is in only one collection.\nThis will be an error in the future. See https://tina.io/docs/errors/file-in-mutpliple-collections/\n`
-        )
-      })
-
-      await _indexContent(this, level, filteredPaths, enqueueOps, collection)
-    })
     while (operations.length) {
       await level.batch(operations.splice(0, 25))
     }
     return { warnings }
   }
-}
-
-function hasOwnProperty<X extends {}, Y extends PropertyKey>(
-  obj: X,
-  prop: Y
-): obj is X & Record<Y, unknown> {
-  return obj.hasOwnProperty(prop)
 }
 
 export type LookupMapType =
@@ -1292,32 +1210,17 @@ const _indexContent = async (
   const folderTreeBuilder = new FolderTreeBuilder()
   await sequential(documentPaths, async (filepath) => {
     try {
-      const dataString = await database.bridge.get(normalizePath(filepath))
-      const data = parseFile(
-        dataString,
-        path.extname(filepath),
-        (yup) => yup.object({}),
-        {
-          frontmatterDelimiters: collection?.frontmatterDelimiters,
-          frontmatterFormat: collection?.frontmatterFormat,
-        }
+      const aliasedData = await loadAndParseWithAliases(
+        database.bridge,
+        filepath,
+        collection,
+        templateInfo
       )
-      const template = getTemplateForFile(templateInfo, data as any)
-      if (!template) {
-        console.warn(
-          `Document: ${filepath} has an ambiguous template, skipping from indexing`
-        )
-        return
-      }
-
       const normalizedPath = normalizePath(filepath)
       const folderKey = folderTreeBuilder.update(
         normalizedPath,
         collectionPath || ''
       )
-      const aliasedData = templateInfo
-        ? replaceNameOverrides(template, data)
-        : data
 
       await enqueueOps([
         ...makeIndexOpsForDocument<Record<string, any>>(
@@ -1448,33 +1351,4 @@ const _deleteIndexContent = async (
       )
     )
   }
-}
-
-const getTemplateForFile = (
-  templateInfo: CollectionTemplateable,
-  data: { [key: string]: unknown }
-) => {
-  if (templateInfo?.type === 'object') {
-    return templateInfo.template
-  }
-  if (templateInfo?.type === 'union') {
-    if (hasOwnProperty(data, '_template')) {
-      const template = templateInfo.templates.find(
-        (t) => lastItem(t.namespace) === data._template
-      )
-      if (!template) {
-        throw new Error(
-          `Unable to find template "${
-            data._template
-          }". Possible templates are: ${templateInfo.templates
-            .map((template) => `"${template.name}"`)
-            .join(', ')}.`
-        )
-      }
-      return template
-    } else {
-      return undefined
-    }
-  }
-  throw new Error(`Unable to determine template`)
 }

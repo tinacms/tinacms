@@ -3,9 +3,14 @@ import { print, buildSchema } from 'graphql'
 
 import { diff } from '@graphql-inspector/core'
 
-import type { TinaSchema } from '@tinacms/schema-tools'
+import type { Collection, TinaSchema } from '@tinacms/schema-tools'
 import type { Client } from '../internalClient'
 import type { CollectionResponse, DocumentForm } from './types'
+
+import {
+  SearchClient,
+  processDocumentForIndexing,
+} from '@tinacms/search/dist/index-client'
 
 export interface FilterArgs {
   filterField: string
@@ -19,9 +24,16 @@ export class TinaAdminApi {
   api: Client
   useDataLayer: boolean
   schema: TinaSchema
+  searchClient?: SearchClient
+  maxSearchIndexFieldLength: number = 100
   constructor(cms: TinaCMS) {
     this.api = cms.api.tina
     this.schema = cms.api.tina.schema
+    if (cms.api.search && cms.api.search?.supportsClientSideIndexing()) {
+      this.searchClient = cms.api.searchClient
+      this.maxSearchIndexFieldLength =
+        this.schema.config?.config?.search?.maxSearchIndexFieldLength || 100
+    }
   }
 
   async isAuthenticated() {
@@ -54,6 +66,21 @@ export class TinaAdminApi {
             `,
       { variables: { collection, relativePath, newRelativePath } }
     )
+
+    if (this.searchClient) {
+      const { document: doc } = await this.fetchDocument(
+        collection.name,
+        newRelativePath
+      )
+      const processed = processDocumentForIndexing(
+        doc['_values'],
+        `${collection.path}/${newRelativePath}`,
+        collection,
+        this.maxSearchIndexFieldLength
+      )
+      await this.searchClient.put([processed])
+      await this.searchClient.del([`${collection.name}:${relativePath}`])
+    }
   }
 
   async deleteDocument({
@@ -72,6 +99,7 @@ export class TinaAdminApi {
 }`,
       { variables: { collection, relativePath } }
     )
+    await this.searchClient?.del([`${collection}:${relativePath}`])
   }
   async fetchCollection(
     collectionName: string,
@@ -247,24 +275,50 @@ export class TinaAdminApi {
     }
   }
 
-  async fetchDocument(collectionName: string, relativePath: string) {
-    const response: { document: DocumentForm } = await this.api.request(
-      `#graphql
-      query($collection: String!, $relativePath: String!) {
-        document(collection:$collection, relativePath:$relativePath) {
-          ... on Document {
-            _values
+  async fetchDocument(
+    collectionName: string,
+    relativePath: string,
+    values: boolean = true
+  ) {
+    let query
+    if (values) {
+      query = `#graphql
+        query($collection: String!, $relativePath: String!) {
+          document(collection:$collection, relativePath:$relativePath) {
+            ... on Document {
+              _values
+            }
           }
-        }
-      }`,
-      { variables: { collection: collectionName, relativePath } }
-    )
+        }`
+    } else {
+      query = `#graphql
+        query($collection: String!, $relativePath: String!) {
+          document(collection:$collection, relativePath:$relativePath) {
+            __typename
+            ... on Document {
+              _sys {
+                title
+                template
+                breadcrumbs
+                path
+                basename
+                relativePath
+                filename
+                extension
+              }
+            }
+          }
+        }`
+    }
+    const response: { document: DocumentForm } = await this.api.request(query, {
+      variables: { collection: collectionName, relativePath },
+    })
 
     return response
   }
 
   async createDocument(
-    collectionName: string,
+    collection: Collection,
     relativePath: string,
     params: Object
   ) {
@@ -279,18 +333,32 @@ export class TinaAdminApi {
       }`,
       {
         variables: {
-          collection: collectionName,
+          collection: collection.name,
           relativePath,
           params,
         },
       }
     )
 
+    if (this.searchClient) {
+      const { document: doc } = await this.fetchDocument(
+        collection.name,
+        relativePath
+      )
+      const processed = processDocumentForIndexing(
+        doc['_values'],
+        `${collection.path}/${relativePath}`,
+        collection,
+        this.maxSearchIndexFieldLength
+      )
+      await this.searchClient.put([processed])
+    }
+
     return response
   }
 
   async updateDocument(
-    collectionName: string,
+    collection: Collection,
     relativePath: string,
     params: Object
   ) {
@@ -305,12 +373,26 @@ export class TinaAdminApi {
       }`,
       {
         variables: {
-          collection: collectionName,
+          collection: collection.name,
           relativePath,
           params,
         },
       }
     )
+
+    if (this.searchClient) {
+      const { document: doc } = await this.fetchDocument(
+        collection.name,
+        relativePath
+      )
+      const processed = processDocumentForIndexing(
+        doc['_values'],
+        `${collection.path}/${relativePath}`,
+        collection,
+        this.maxSearchIndexFieldLength
+      )
+      await this.searchClient.put([processed])
+    }
 
     return response
   }

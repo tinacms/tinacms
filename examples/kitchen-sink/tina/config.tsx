@@ -57,6 +57,11 @@ export default defineConfig({
     publicFolder: 'public',
     basePath: 'my-site',
   },
+  search: {
+    tina: {
+      indexerToken: '',
+    },
+  },
   media: {
     tina: {
       mediaRoot: 'uploads',
