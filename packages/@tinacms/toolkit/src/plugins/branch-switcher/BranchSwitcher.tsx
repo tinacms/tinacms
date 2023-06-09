@@ -10,6 +10,7 @@ import {
   BiPlus,
   BiRefresh,
   BiSearch,
+  BiLock,
 } from 'react-icons/bi'
 import { GrCircleQuestion } from 'react-icons/gr'
 import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
@@ -17,6 +18,7 @@ import { AiFillWarning } from 'react-icons/ai'
 import { FaSpinner } from 'react-icons/fa'
 import { useCMS } from '../../packages/react-core'
 import { BranchSwitcherLegacy } from './BranchSwitcherLegecy'
+import { formatDistanceToNow } from 'date-fns'
 
 type ListState = 'loading' | 'ready' | 'error'
 
@@ -296,13 +298,21 @@ const BranchSelector = ({
                 }}
               >
                 <div>
-                  {branch.protected ? 'Protected' : 'Not Protected'}{' '}
-                  {branch.name}
-                  <IndexStatus indexingStatus={branch.indexStatus.status} />
+                  <div className="flex space-x-1 justify-items-start">
+                    <div className="m-auto">
+                      {!branch.protected && <BiLock />}
+                    </div>
+                    <div>{branch.name}</div>
+                  </div>
+                  <div className="flex flex-wrap items-center">
+                    <IndexStatus indexingStatus={branch.indexStatus.status} />
+                  </div>
                 </div>
                 <div>
                   {' '}
-                  {new Date(branch.indexStatus.timestamp).toLocaleString()}
+                  {formatDistanceToNow(new Date(branch.indexStatus.timestamp), {
+                    addSuffix: true,
+                  })}
                 </div>
                 <div>{branch.githubPullRequestUrl} </div>
               </div>
