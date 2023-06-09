@@ -2,7 +2,7 @@ import * as React from 'react'
 import { BranchSwitcherProps, Branch } from './types'
 import { useBranchData } from './BranchData'
 import { BaseTextField } from '../../packages/fields'
-import { Button } from '../../packages/styles'
+import { Button, OverflowMenu } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
 import {
   BiError,
@@ -314,7 +314,19 @@ const BranchSelector = ({
                     addSuffix: true,
                   })}
                 </div>
-                <div>...{branch.githubPullRequestUrl} </div>
+                <div>
+                  <OverflowMenu
+                    toolbarItems={[
+                      {
+                        name: 'preview',
+                        label: 'Preview',
+                        onMouseDown: () => {
+                          window.open(branch.githubPullRequestUrl, '_blank')
+                        },
+                      },
+                    ]}
+                  />
+                </div>
               </div>
             )
           })}
