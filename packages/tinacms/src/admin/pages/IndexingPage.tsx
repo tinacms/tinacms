@@ -106,7 +106,7 @@ export const IndexingPage: FC = () => {
           const relativePath = fullPath.replace(`${collection.path}/`, '')
 
           if (await api.isAuthenticated()) {
-            await api.updateDocument(collection.name, relativePath, params)
+            await api.updateDocument(collection, relativePath, params)
           } else {
             const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`
             cms.alerts.error(authMessage)
