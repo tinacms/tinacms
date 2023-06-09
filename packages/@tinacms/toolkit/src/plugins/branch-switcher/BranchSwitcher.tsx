@@ -283,7 +283,7 @@ const BranchSelector = ({
             const indexingStatus = branch?.indexStatus?.status
             return (
               <div
-                className={`relative text-base py-1.5 px-3 flex justify-between items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
+                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
                   indexingStatus !== 'complete'
                     ? 'bg-gray-50 text-gray-400 pointer-events-none'
                     : isCurrentBranch
@@ -297,24 +297,24 @@ const BranchSelector = ({
                   }
                 }}
               >
-                <div>
+                <div className="w-1/2">
                   <div className="flex space-x-1 justify-items-start">
-                    <div className="m-auto">
+                    <div className="my-auto">
                       {!branch.protected && <BiLock />}
                     </div>
-                    <div>{branch.name}</div>
+                    <div className="truncate">{branch.name}</div>
                   </div>
                   <div className="flex flex-wrap items-center">
                     <IndexStatus indexingStatus={branch.indexStatus.status} />
                   </div>
                 </div>
-                <div>
+                <div className="flex-1">
                   {' '}
                   {formatDistanceToNow(new Date(branch.indexStatus.timestamp), {
                     addSuffix: true,
                   })}
                 </div>
-                <div>
+                <div className="">
                   <OverflowMenu
                     toolbarItems={[
                       {

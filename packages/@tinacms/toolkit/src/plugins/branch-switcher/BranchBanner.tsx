@@ -60,7 +60,7 @@ const BranchModal = ({ close }: SubmitModalProps) => {
 
   return (
     <Modal>
-      <PopupModal>
+      <PopupModal className=" w-[800px]">
         <ModalHeader close={close}>Select Branch</ModalHeader>
         <ModalBody padded={false}>
           <BranchSwitcher
