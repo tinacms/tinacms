@@ -50,7 +50,6 @@ import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { Collection } from '@tinacms/schema-tools'
 import { CollectionFolder, useCollectionFolder } from './utils'
-import { MdOutlineInfo } from 'react-icons/md'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
 const isSSR = typeof window === 'undefined'
