@@ -25,6 +25,7 @@ import {
   Button,
   CursorPaginator,
   Input,
+  Message,
   Modal,
   ModalActions,
   ModalBody,
@@ -447,14 +448,14 @@ const CollectionListPage = () => {
                                       <label className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal">
                                         Search
                                       </label>
-                                      <a
-                                        target="_blank"
-                                        href="https://tina.io/docs/reference/search/overview"
-                                        className="inline-flex text-xs"
+                                      <Message
+                                        link="https://tina.io/docs/reference/search/overview"
+                                        linkLabel="Read The Docs"
+                                        type="info"
+                                        size="small"
                                       >
-                                        <p>Search not configured.</p>
-                                        <MdOutlineInfo className="w-4 h-auto ml-1.5 opacity-80" />
-                                      </a>
+                                        Search not configured.
+                                      </Message>
                                     </>
                                   )}
                                 </div>
