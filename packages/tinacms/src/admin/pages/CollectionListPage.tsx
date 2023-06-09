@@ -444,10 +444,7 @@ const CollectionListPage = () => {
                                     />
                                   ) : (
                                     <>
-                                      <label
-                                        htmlFor="search"
-                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                      >
+                                      <label className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal">
                                         Search
                                       </label>
                                       <a
