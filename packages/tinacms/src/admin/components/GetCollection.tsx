@@ -5,10 +5,10 @@
 import React, { useEffect, useState } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { useNavigate } from 'react-router-dom'
-import type { TinaSchema } from '@tinacms/schema-tools'
+import type { Collection, TinaSchema } from '@tinacms/schema-tools'
 import { FilterArgs, TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
-import type { CollectionResponse } from '../types'
+import type { CollectionResponse, DocumentForm } from '../types'
 import { FullscreenError } from './FullscreenError'
 import { handleNavigate } from '../pages/CollectionListPage'
 
@@ -24,9 +24,9 @@ export const useGetCollection = (
   const api = new TinaAdminApi(cms)
   const schema = cms.api.tina.schema as TinaSchema
   const collectionExtra = schema.getCollection(collectionName)
-  const [collection, setCollection] = useState<CollectionResponse | undefined>(
-    undefined
-  )
+  const [collection, setCollection] = useState<
+    CollectionResponse | Collection | undefined
+  >(undefined)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | undefined>(undefined)
   const [resetState, setResetSate] = useState(0)
@@ -70,6 +70,7 @@ export const useGetCollection = (
 
     setLoading(true)
     fetchCollection()
+
     // TODO: useDebounce
     return () => {
       cancelled = true
@@ -89,6 +90,108 @@ export const useGetCollection = (
   return { collection, loading, error, reFetchCollection, collectionExtra }
 }
 
+export const useSearchCollection = (
+  cms: TinaCMS,
+  collectionName: string,
+  includeDocuments: boolean = true,
+  folder: { loading: boolean; fullyQualifiedName: string },
+  after: string = '',
+  search?: string
+) => {
+  const api = new TinaAdminApi(cms)
+  const schema = cms.api.tina.schema as TinaSchema
+  const collectionExtra = schema.getCollection(collectionName)
+  const [collection, setCollection] = useState<
+    CollectionResponse | Collection | undefined
+  >(undefined)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<Error | undefined>(undefined)
+  const [resetState, setResetSate] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const searchCollection = async () => {
+      if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
+        try {
+          const response = (await cms.api.search.query(
+            `${search} AND _collection:${collectionName}`,
+            {
+              limit: 15,
+              cursor: after,
+            }
+          )) as {
+            results: { _id: string }[]
+            nextCursor: string
+            prevCursor: string
+          }
+          const docs = (await Promise.allSettled<
+            Promise<{ document: DocumentForm }>
+          >(
+            response.results.map((result) => {
+              const [collection, relativePath] = result._id.split(':')
+              return api.fetchDocument(collection, relativePath, false)
+            })
+          )) as {
+            status: 'fulfilled' | 'rejected'
+            value: { document: DocumentForm }
+          }[]
+          const edges = docs
+            .filter((p) => p.status === 'fulfilled' && !!p.value?.document)
+            .map((result) => ({ node: result.value.document })) as any[]
+          const c = await api.fetchCollection(collectionName, false, '')
+          setCollection({
+            format: collection.format,
+            label: collection.label,
+            name: collectionName,
+            templates: collection.templates,
+            documents: {
+              pageInfo: {
+                hasNextPage: !!response.nextCursor,
+                hasPreviousPage: !!response.prevCursor,
+                startCursor: '',
+                endCursor: response.nextCursor || '',
+              },
+              edges,
+            },
+          })
+        } catch (error) {
+          cms.alerts.error(
+            `[${error.name}] GetCollection failed: ${error.message}`
+          )
+          console.error(error)
+          setCollection(undefined)
+          setError(error)
+        }
+
+        setLoading(false)
+      }
+    }
+
+    if (cancelled) return
+
+    setLoading(true)
+    searchCollection()
+
+    // TODO: useDebounce
+    return () => {
+      cancelled = true
+    }
+  }, [
+    cms,
+    collectionName,
+    folder.loading,
+    folder.fullyQualifiedName,
+    resetState,
+    after,
+    search,
+  ])
+
+  const reFetchCollection = () => setResetSate((x) => x + 1)
+
+  return { collection, loading, error, reFetchCollection, collectionExtra }
+}
+
 const GetCollection = ({
   cms,
   collectionName,
@@ -98,6 +201,7 @@ const GetCollection = ({
   sortKey,
   children,
   filterArgs,
+  search,
 }: {
   cms: TinaCMS
   collectionName: string
@@ -107,18 +211,28 @@ const GetCollection = ({
   sortKey?: string
   children: any
   filterArgs?: FilterArgs
+  search?: string
 }) => {
   const navigate = useNavigate()
   const { collection, loading, error, reFetchCollection, collectionExtra } =
-    useGetCollection(
-      cms,
-      collectionName,
-      includeDocuments,
-      folder,
-      startCursor || '',
-      sortKey,
-      filterArgs
-    ) || {}
+    search
+      ? useSearchCollection(
+          cms,
+          collectionName,
+          includeDocuments,
+          folder,
+          startCursor || '',
+          search
+        )
+      : useGetCollection(
+          cms,
+          collectionName,
+          includeDocuments,
+          folder,
+          startCursor || '',
+          sortKey,
+          filterArgs
+        ) || {}
   useEffect(() => {
     if (loading) return
 
@@ -131,16 +245,23 @@ const GetCollection = ({
     const allowCreate = collectionDefinition?.ui?.allowedActions?.create ?? true
     const allowDelete = collectionDefinition?.ui?.allowedActions?.delete ?? true
 
+    const collectionResponse = collection as CollectionResponse
     if (
       !allowCreate &&
       !allowDelete &&
       // Check there is only one document
-      collection.documents?.edges?.length === 1 &&
+      collectionResponse.documents?.edges?.length === 1 &&
       // Check to make sure the file is not a folder
-      collection.documents?.edges[0]?.node?.__typename !== 'Folder'
+      collectionResponse.documents?.edges[0]?.node?.__typename !== 'Folder'
     ) {
-      const doc = collection.documents.edges[0].node
-      handleNavigate(navigate, cms, collection, collectionDefinition, doc)
+      const doc = collectionResponse.documents.edges[0].node
+      handleNavigate(
+        navigate,
+        cms,
+        collectionResponse,
+        collectionDefinition,
+        doc
+      )
     }
   }, [collection?.name || '', loading])
 

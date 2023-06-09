@@ -3,7 +3,7 @@
 */
 
 import { ModalBuilder } from './AuthModal'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   TinaCMS,
   TinaProvider,
@@ -16,7 +16,12 @@ import {
   TinaMediaStore,
 } from '@tinacms/toolkit'
 
-import { Client, TinaIOConfig } from '../internalClient'
+import {
+  Client,
+  LocalSearchClient,
+  TinaCMSSearchClient,
+  TinaIOConfig,
+} from '../internalClient'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
 import { setEditing } from '@tinacms/sharedctx'
@@ -169,6 +174,26 @@ export const TinaCloudProvider = (
   } else {
     cms.api.tina.setBranch(currentBranch)
   }
+
+  useEffect(() => {
+    let searchClient
+    // if local and search is configured then we always use the local client
+    // if not local, then determine if search is enabled and use the client from the config
+    if (props.isLocalClient) {
+      searchClient = new LocalSearchClient(cms.api.tina)
+    } else {
+      const hasTinaSearch = Boolean(props.schema.config?.search?.tina)
+      if (hasTinaSearch) {
+        searchClient = new TinaCMSSearchClient(cms.api.tina)
+      } else {
+        searchClient = props.schema.config?.search?.searchClient
+      }
+    }
+
+    if (searchClient) {
+      cms.registerApi('search', searchClient)
+    }
+  }, [props])
 
   if (!cms.api.admin) {
     cms.registerApi('admin', new TinaAdminApi(cms))

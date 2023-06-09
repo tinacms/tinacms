@@ -1,10 +1,11 @@
 {
   "name": "@tinacms/starter",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "scripts": {
     "dev": "tinacms dev -c \"next dev\"",
     "build": "tinacms build && next build",
+    "build:local": "tinacms build --local --skip-cloud-checks -c \"next build\"",
     "start": "tinacms build && next start",
     "export": "npm run build && next export",
     "lint": "eslint . --ext .ts,.tsx"

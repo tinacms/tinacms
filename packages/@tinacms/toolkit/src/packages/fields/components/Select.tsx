@@ -26,12 +26,18 @@ export interface SelectProps {
   field?: SelectFieldProps & Field
   disabled?: boolean
   options?: (Option | string)[]
+  className?: string
 }
 
 export const selectFieldClasses =
   'shadow appearance-none bg-white block pl-3 pr-8 py-2 truncate w-full text-base cursor-pointer border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md'
 
-export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
+export const Select: React.FC<SelectProps> = ({
+  input,
+  field,
+  options,
+  className = '',
+}) => {
   const selectOptions = options || field.options
   const ref = React.useRef(null)
   React.useEffect(() => {
@@ -49,7 +55,7 @@ export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
         onChange={input.onChange}
         className={`${selectFieldClasses} ${
           input.value ? 'text-gray-700' : 'text-gray-300'
-        } }`}
+        } } ${className}`}
         {...input}
       >
         {selectOptions ? (

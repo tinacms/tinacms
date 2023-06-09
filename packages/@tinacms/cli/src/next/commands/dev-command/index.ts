@@ -2,7 +2,7 @@ import { Command, Option } from 'clipanion'
 import fs from 'fs-extra'
 import path from 'path'
 import chokidar from 'chokidar'
-import { buildSchema, Database } from '@tinacms/graphql'
+import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { devHTML } from './html'
 import { logger, summary } from '../../../logger'
@@ -10,6 +10,15 @@ import { createDevServer } from './server'
 import { Codegen } from '../../codegen'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { BaseCommand } from '../baseCommands'
+import { spin } from '../../../utils/spinner'
+import { MemoryLevel } from 'memory-level'
+import {
+  SearchIndexer,
+  si,
+  LocalSearchIndexClient,
+  lookupStopwords,
+} from '@tinacms/search'
+import type { SearchClient } from '@tinacms/search'
 
 export class DevCommand extends BaseCommand {
   static paths = [['dev'], ['server:start']]
@@ -125,9 +134,11 @@ export class DevCommand extends BaseCommand {
         graphQLSchema,
         tinaSchema,
       })
-      return { apiURL, database }
+      return { apiURL, database, graphQLSchema, tinaSchema }
     }
-    const { apiURL } = await setup({ firstTime: true })
+    const { apiURL, graphQLSchema, tinaSchema } = await setup({
+      firstTime: true,
+    })
 
     await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port))
     // Add the gitignore so the index.html and assets are committed to git
@@ -135,16 +146,61 @@ export class DevCommand extends BaseCommand {
       configManager.outputGitignorePath,
       'index.html\nassets/'
     )
+
+    // @ts-ignore
+    const searchIndex = await si({
+      db: new MemoryLevel(),
+      stopwords: lookupStopwords(
+        configManager.config.search?.tina?.stopwordLanguages
+      ),
+    })
+    const searchIndexClient = new LocalSearchIndexClient(searchIndex)
+
     const server = await createDevServer(
       configManager,
       database,
+      searchIndex,
       apiURL,
       this.noWatch
     )
     await server.listen(Number(this.port))
+    const searchIndexer = new SearchIndexer({
+      batchSize: configManager.config.search?.indexBatchSize || 100,
+      bridge: new FilesystemBridge(
+        configManager.rootPath,
+        configManager.contentRootPath
+      ),
+      schema: tinaSchema,
+      client: searchIndexClient,
+      textIndexLength:
+        configManager.config.search?.maxSearchIndexFieldLength || 100,
+    })
+
+    await spin({
+      waitFor: async () => {
+        const res = await database.indexContent({
+          graphQLSchema,
+          tinaSchema,
+        })
+      },
+      text: 'Indexing local files',
+    })
+
+    if (configManager.config.search) {
+      await spin({
+        waitFor: async () => {
+          await searchIndexer.indexAllContent()
+        },
+        text: 'Building search index',
+      })
+    }
 
     if (!this.noWatch) {
-      this.watchContentFiles(configManager, database)
+      this.watchContentFiles(
+        configManager,
+        database,
+        configManager.config.search && searchIndexClient
+      )
     }
 
     server.watcher.on('change', async (changedPath) => {
@@ -238,7 +294,11 @@ export class DevCommand extends BaseCommand {
     await this.startSubCommand()
   }
 
-  watchContentFiles(configManager: ConfigManager, database: Database) {
+  watchContentFiles(
+    configManager: ConfigManager,
+    database: Database,
+    searchClient?: SearchClient
+  ) {
     const collectionContentFiles = []
     configManager.config.schema.collections.forEach((collection) => {
       const collectionGlob = `${path.join(
@@ -265,17 +325,30 @@ export class DevCommand extends BaseCommand {
           return
         }
         const pathFromRoot = configManager.printContentRelativePath(addedFile)
-        database.indexContentByPaths([pathFromRoot]).catch(console.error)
+        await database.indexContentByPaths([pathFromRoot]).catch(console.error)
+        if (searchClient) {
+          await searchClient
+            .put([await database.get(pathFromRoot)])
+            .catch(console.error)
+        }
       })
       .on('change', async (changedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(changedFile)
         // Optionally we can reload the page when this happens
         // server.ws.send({ type: 'full-reload', path: '*' })
-        database.indexContentByPaths([pathFromRoot]).catch(console.error)
+        await database.indexContentByPaths([pathFromRoot]).catch(console.error)
+        if (searchClient) {
+          await searchClient
+            .put([await database.get(pathFromRoot)])
+            .catch(console.error)
+        }
       })
       .on('unlink', async (removedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(removedFile)
-        database.deleteContentByPaths([pathFromRoot]).catch(console.error)
+        await database.deleteContentByPaths([pathFromRoot]).catch(console.error)
+        if (searchClient) {
+          await searchClient.del([pathFromRoot]).catch(console.error)
+        }
       })
   }
   watchQueries(configManager: ConfigManager, callback: () => Promise<string>) {
