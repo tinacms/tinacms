@@ -19,6 +19,7 @@ import { FaSpinner } from 'react-icons/fa'
 import { useCMS } from '../../packages/react-core'
 import { BranchSwitcherLegacy } from './BranchSwitcherLegecy'
 import { formatDistanceToNow } from 'date-fns'
+import { Dropdown } from '../../packages/fields/plugins/MdxFieldPlugin/plate/plugins/ui/dropdown'
 
 type ListState = 'loading' | 'ready' | 'error'
 
@@ -251,24 +252,44 @@ const BranchSelector = ({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="block relative group">
-        <BaseTextField
-          placeholder="Search"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-        {filter === '' ? (
-          <BiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150" />
-        ) : (
-          <button
-            onClick={() => {
-              setFilter('')
-            }}
-            className="outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150"
-          >
-            <MdOutlineClear className="w-5 h-auto text-gray-600" />
-          </button>
-        )}
+      <div className="flex space-x-4">
+        <div>
+          <Dropdown
+            label="Sort By"
+            items={[
+              { key: 'updated', onClick: () => {}, render: 'Last Udated' },
+            ]}
+          />
+        </div>
+        <div>
+          <Dropdown
+            label="Branch Type"
+            items={[
+              { key: 'content', onClick: () => {}, render: 'Content' },
+              { key: 'all', onClick: () => {}, render: 'All Branches' },
+            ]}
+          />
+        </div>
+        <div className="flex-1" />
+        <div className="block relative group">
+          <BaseTextField
+            placeholder="Search"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
+          {filter === '' ? (
+            <BiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150" />
+          ) : (
+            <button
+              onClick={() => {
+                setFilter('')
+              }}
+              className="outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150"
+            >
+              <MdOutlineClear className="w-5 h-auto text-gray-600" />
+            </button>
+          )}
+        </div>
       </div>
       {filteredBranchList.length === 0 && (
         <div className="block relative text-gray-300 italic py-1">
@@ -300,7 +321,7 @@ const BranchSelector = ({
                 <div className="w-1/2">
                   <div className="flex space-x-1 justify-items-start">
                     <div className="my-auto">
-                      {!branch.protected && <BiLock />}
+                      {branch.protected && <BiLock />}
                     </div>
                     <div className="truncate">{branch.name}</div>
                   </div>
@@ -332,9 +353,6 @@ const BranchSelector = ({
           })}
         </div>
       )}
-      <CreateBranch
-        {...{ onCreateBranch, currentBranch, newBranchName, setNewBranchName }}
-      />
     </div>
   )
 }
