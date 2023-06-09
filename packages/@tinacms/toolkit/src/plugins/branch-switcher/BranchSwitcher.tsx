@@ -281,12 +281,12 @@ const BranchSelector = ({
             const indexingStatus = branch?.indexStatus?.status
             return (
               <div
-                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
+                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
                   indexingStatus !== 'complete'
                     ? 'bg-gray-50 text-gray-400 pointer-events-none'
                     : isCurrentBranch
-                    ? 'cursor-pointer bg-blue-50 text-blue-800 pointer-events-none hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
-                    : 'cursor-pointer hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
+                    ? 'border-teal-500 border-b-0 border-l-4 cursor-pointer bg-blue-50 text-blue-800 pointer-events-none hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
+                    : 'cursor-pointer hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 '
                 }`}
                 key={branch.name}
                 onClick={() => {
@@ -295,39 +295,16 @@ const BranchSelector = ({
                   }
                 }}
               >
-                {isCurrentBranch && (
-                  <BiGitBranch className="w-5 h-auto text-blue-500/70" />
-                )}
-                {branch.name} | {branch.githubPullRequestUrl} |{' '}
-                {branch.protected ? 'Protected' : 'Not Protected'} |{' '}
-                {new Date(branch.indexStatus.timestamp).toLocaleString()}
-                {indexingStatus === 'unknown' && (
-                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
-                    <span className="opacity-50 italic">{`Unknown`}</span>
-                    <GrCircleQuestion className="w-5 h-auto opacity-70" />
-                  </span>
-                )}
-                {indexingStatus === 'inprogress' && (
-                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
-                    <span className="opacity-50 italic">{`Indexing`}</span>
-                    <FaSpinner className="w-5 h-auto opacity-70 animate-spin" />
-                  </span>
-                )}
-                {indexingStatus === 'failed' && (
-                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-red-500">
-                    <span className="opacity-50 italic">{`Indexing failed`}</span>
-                    <BiError className="w-5 h-auto opacity-70" />
-                  </span>
-                )}
-                {indexingStatus === 'timeout' && (
-                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-red-500">
-                    <span className="opacity-50 italic">{`Indexing timed out`}</span>
-                    <BiError className="w-5 h-auto opacity-70" />
-                  </span>
-                )}
-                {isCurrentBranch && (
-                  <span className="opacity-70 italic">{` (current)`}</span>
-                )}
+                <div>
+                  {branch.protected ? 'Protected' : 'Not Protected'}{' '}
+                  {branch.name}
+                  <IndexStatus indexingStatus={branch.indexStatus.status} />
+                </div>
+                <div>
+                  {' '}
+                  {new Date(branch.indexStatus.timestamp).toLocaleString()}
+                </div>
+                <div>{branch.githubPullRequestUrl} </div>
               </div>
             )
           })}
@@ -337,6 +314,41 @@ const BranchSelector = ({
         {...{ onCreateBranch, currentBranch, newBranchName, setNewBranchName }}
       />
     </div>
+  )
+}
+
+const IndexStatus = ({
+  indexingStatus,
+}: {
+  indexingStatus: 'failed' | 'unknown' | 'complete' | 'inprogress' | 'timeout'
+}) => {
+  return (
+    <>
+      {indexingStatus === 'unknown' && (
+        <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
+          <span className="opacity-50 italic">{`Unknown`}</span>
+          <GrCircleQuestion className="w-5 h-auto opacity-70" />
+        </span>
+      )}
+      {indexingStatus === 'inprogress' && (
+        <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
+          <span className="opacity-50 italic">{`Indexing`}</span>
+          <FaSpinner className="w-5 h-auto opacity-70 animate-spin" />
+        </span>
+      )}
+      {indexingStatus === 'failed' && (
+        <span className="flex-1 w-full flex justify-end items-center gap-2 text-red-500">
+          <span className="opacity-50 italic">{`Indexing failed`}</span>
+          <BiError className="w-5 h-auto opacity-70" />
+        </span>
+      )}
+      {indexingStatus === 'timeout' && (
+        <span className="flex-1 w-full flex justify-end items-center gap-2 text-red-500">
+          <span className="opacity-50 italic">{`Indexing timed out`}</span>
+          <BiError className="w-5 h-auto opacity-70" />
+        </span>
+      )}
+    </>
   )
 }
 
