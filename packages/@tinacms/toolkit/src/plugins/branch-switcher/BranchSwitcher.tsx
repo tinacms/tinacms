@@ -207,15 +207,23 @@ export const EditoralBranchSwitcher = ({
 
 export const getFilteredBranchList = (
   branchList: Branch[],
-  filter: string,
-  currentBranchName: string
+  search: string,
+  currentBranchName: string,
+  filter: 'content' | 'all' = 'all'
 ) => {
-  const filteredBranchList = branchList.filter(
-    (branch) =>
-      !filter ||
-      branch.name.includes(filter) ||
-      branch.name === currentBranchName
-  )
+  const filteredBranchList = branchList
+    .filter(
+      (branch) =>
+        !search ||
+        branch.name.includes(search) ||
+        branch.name === currentBranchName
+    )
+    .filter((branch) => {
+      if (filter === 'all') return true
+      if (filter === 'content') {
+        return branch.name.startsWith('tina/')
+      }
+    })
   const currentBranchItem = branchList.find(
     (branch) => branch.name === currentBranchName
   )
@@ -231,6 +239,22 @@ export const getFilteredBranchList = (
   ]
 }
 
+const sortBranchListFn = (sortValue: 'default' | 'updated' | 'name') => {
+  return (a: Branch, b: Branch) => {
+    if (sortValue === 'default') {
+      // Default sorting logic
+      // Implement your own logic here if needed
+      return 0
+    } else if (sortValue === 'updated') {
+      // Sort by last updated logic
+      return b.indexStatus.timestamp - a.indexStatus.timestamp
+    } else if (sortValue === 'name') {
+      // Sort by branch name logic
+      return a.name.localeCompare(b.name)
+    }
+  }
+}
+
 const BranchSelector = ({
   branchList,
   currentBranch,
@@ -242,13 +266,18 @@ const BranchSelector = ({
   onCreateBranch: (branchName: string) => void
   onChange: (branchName: string) => void
 }) => {
-  const [newBranchName, setNewBranchName] = React.useState('')
-  const [filter, setFilter] = React.useState('')
+  const [search, setSearch] = React.useState('')
+  const [filter, setFilter] = React.useState<'content' | 'all'>('content')
+  const [sortValue, setSortValue] = React.useState<
+    'default' | 'updated' | 'name'
+  >('default')
+
   const filteredBranchList = getFilteredBranchList(
     branchList,
-    filter,
-    currentBranch
-  )
+    search,
+    currentBranch,
+    filter
+  ).sort(sortBranchListFn(sortValue))
 
   return (
     <div className="flex flex-col gap-3">
@@ -265,8 +294,8 @@ const BranchSelector = ({
             input={{
               id: 'sort',
               name: 'sort',
-              value: 'default',
-              onChange: (e) => {},
+              value: sortValue,
+              onChange: (e: any) => setSortValue(e.target.value),
             }}
             options={[
               {
@@ -296,8 +325,8 @@ const BranchSelector = ({
             input={{
               id: 'branch-type',
               name: 'branch-type',
-              value: 'content',
-              onChange: (e) => {},
+              value: filter,
+              onChange: (e: any) => setFilter(e.target.value),
             }}
             options={[
               {
@@ -306,7 +335,7 @@ const BranchSelector = ({
               },
               {
                 label: 'All',
-                value: 'All',
+                value: 'all',
               },
             ]}
           />
@@ -322,15 +351,15 @@ const BranchSelector = ({
           <div className="block relative group h-fit mb-auto">
             <BaseTextField
               placeholder="Search"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
-            {filter === '' ? (
+            {search === '' ? (
               <BiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150" />
             ) : (
               <button
                 onClick={() => {
-                  setFilter('')
+                  setSearch('')
                 }}
                 className="outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150"
               >
