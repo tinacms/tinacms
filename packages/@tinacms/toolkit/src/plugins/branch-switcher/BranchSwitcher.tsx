@@ -346,7 +346,7 @@ const BranchSelector = ({
             htmlFor="search"
             className="text-xs mb-1 flex flex-col font-bold"
           >
-            Search / Create
+            Search
           </label>
           <div className="block relative group h-fit mb-auto">
             <BaseTextField
