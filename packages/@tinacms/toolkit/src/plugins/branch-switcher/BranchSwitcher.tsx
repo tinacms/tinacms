@@ -384,17 +384,12 @@ const BranchSelector = ({
               <div
                 className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
                   indexingStatus !== 'complete'
-                    ? 'bg-gray-50 text-gray-400 pointer-events-none'
+                    ? 'bg-gray-50 text-gray-400'
                     : isCurrentBranch
-                    ? 'border-teal-500 border-b-0 border-l-4 cursor-pointer bg-blue-50 text-blue-800 pointer-events-none hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
-                    : 'cursor-pointer hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 '
+                    ? 'border-teal-500 border-b-0 border-l-4 bg-blue-50 text-blue-800 hover:text-blue-500'
+                    : ''
                 }`}
                 key={branch.name}
-                onClick={() => {
-                  if (indexingStatus === 'complete') {
-                    onChange(branch.name)
-                  }
-                }}
               >
                 <div className="w-1/2">
                   <div className="flex space-x-1 justify-items-start">
@@ -413,18 +408,30 @@ const BranchSelector = ({
                     addSuffix: true,
                   })}
                 </div>
-                <div className="">
-                  <OverflowMenu
-                    toolbarItems={[
-                      {
-                        name: 'preview',
-                        label: 'Preview',
-                        onMouseDown: () => {
-                          window.open(branch.githubPullRequestUrl, '_blank')
+                <div className="flex items-center">
+                  {indexingStatus === 'complete' && !isCurrentBranch && (
+                    <Button
+                      onClick={() => {
+                        onChange(branch.name)
+                      }}
+                      className="mr-auto cursor-pointer"
+                    >
+                      Edit
+                    </Button>
+                  )}
+                  <div className="ml-auto">
+                    <OverflowMenu
+                      toolbarItems={[
+                        {
+                          name: 'preview',
+                          label: 'Preview',
+                          onMouseDown: () => {
+                            window.open(branch.githubPullRequestUrl, '_blank')
+                          },
                         },
-                      },
-                    ]}
-                  />
+                      ]}
+                    />
+                  </div>
                 </div>
               </div>
             )
