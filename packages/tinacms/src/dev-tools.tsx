@@ -1,6 +1,6 @@
 import { TinaMarkdown } from './rich-text'
 import { tinaField } from './react'
-import React, { Suspense, useEffect, useState } from 'react'
+import React, { Suspense, useContext, useEffect, useState } from 'react'
 import type { TinaMarkdownContent } from './rich-text'
 
 type RenderValue = (args: {
@@ -187,6 +187,7 @@ const ObjectRenderer = ({
   renderValue,
   renderRichText,
 }) => {
+  const { withDataTinaFieldState } = useContext(JsonContext)
   const [showMetaFields, setShowMetaFields] = React.useState(false)
   const [expanded, setExpanded] = React.useState(true)
   const v = value as object
@@ -203,7 +204,7 @@ const ObjectRenderer = ({
   } else {
     const fieldName = tinaField(v)
     const extraProps = {}
-    if (fieldName !== 'undefined#undefined') {
+    if (fieldName !== 'undefined#undefined' && withDataTinaFieldState) {
       extraProps['data-tina-field'] = fieldName
     }
     return (
@@ -246,7 +247,15 @@ const ObjectRenderer = ({
   }
 }
 
-export function Json(props: { src: object }) {
+const JsonContext = React.createContext({ withDataTinaFieldState: true })
+
+export function Json({
+  src,
+  withDataTinaFieldState = true,
+}: {
+  src: object
+  withDataTinaFieldState?: boolean
+}) {
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -258,73 +267,85 @@ export function Json(props: { src: object }) {
 
   return (
     <Suspense fallback={<div className="">Loading...</div>}>
-      <div className="px-4">
-        <div className="mx-auto my-8 border rounded-lg p-8 shadow-lg max-w-5xl mx-auto shadow-lg">
-          <div className="h-full overflow-scroll">
-            <Explorer
-              value={props.src}
-              renderRichText={({
-                value,
-                // @ts-ignore
-                keyName,
-                // @ts-ignore
-                parentValue,
-                // @ts-ignore
-                parentKeyName,
-              }) => {
-                let fieldName = ''
-                if (!isNaN(Number(keyName))) {
-                  fieldName = `${tinaField(
-                    parentValue,
-                    parentKeyName
-                  )}.${keyName}`
-                } else {
-                  fieldName = tinaField(parentValue, keyName)
-                }
-                const extraProps = {}
-                if (fieldName !== 'undefined#undefined') {
-                  if (fieldName) {
-                    extraProps['data-tina-field'] = fieldName
-                  }
-                }
-                return (
-                  <div
-                    className="font-sans px-2 border-l-2 bg-gray-50 w-full prose"
-                    {...extraProps}
-                  >
-                    <TinaMarkdown content={value} />
-                  </div>
-                )
-              }}
-              renderValue={({ value, keyName, parentValue, parentKeyName }) => {
-                let fieldName = ''
-                if (!isNaN(Number(keyName))) {
-                  fieldName = `${tinaField(
-                    parentValue,
-                    // @ts-ignore
-                    parentKeyName
-                  )}.${keyName}`
-                } else {
+      <JsonContext.Provider
+        value={{
+          withDataTinaFieldState:
+            withDataTinaFieldState === false ? false : true,
+        }}
+      >
+        <div className="px-4">
+          <div className="mx-auto my-8 border rounded-lg p-8 shadow-lg max-w-5xl mx-auto shadow-lg">
+            <div className="h-full overflow-scroll">
+              <Explorer
+                value={src}
+                renderRichText={({
+                  value,
                   // @ts-ignore
-                  fieldName = tinaField(parentValue, keyName)
-                }
-                // const dataAttributeName = tinaField(fieldName)
-                const extraProps = {}
-                if (fieldName !== 'undefined#undefined') {
-                  if (fieldName) {
-                    extraProps['data-tina-field'] = fieldName
+                  keyName,
+                  // @ts-ignore
+                  parentValue,
+                  // @ts-ignore
+                  parentKeyName,
+                }) => {
+                  let fieldName = ''
+                  if (!isNaN(Number(keyName))) {
+                    fieldName = `${tinaField(
+                      parentValue,
+                      parentKeyName
+                    )}.${keyName}`
+                  } else {
+                    fieldName = tinaField(parentValue, keyName)
                   }
-                }
-                return (
-                  <span className="text-orange-600" {...extraProps}>
-                    {value}
-                  </span>
-                )
-              }}
-            />
+                  const extraProps = {}
+                  if (fieldName !== 'undefined#undefined') {
+                    if (fieldName && withDataTinaFieldState) {
+                      extraProps['data-tina-field'] = fieldName
+                    }
+                  }
+                  return (
+                    <div
+                      className="font-sans px-2 border-l-2 bg-gray-50 w-full prose"
+                      {...extraProps}
+                    >
+                      <TinaMarkdown content={value} />
+                    </div>
+                  )
+                }}
+                renderValue={({
+                  value,
+                  keyName,
+                  parentValue,
+                  parentKeyName,
+                }) => {
+                  let fieldName = ''
+                  if (!isNaN(Number(keyName))) {
+                    fieldName = `${tinaField(
+                      parentValue,
+                      // @ts-ignore
+                      parentKeyName
+                    )}.${keyName}`
+                  } else {
+                    // @ts-ignore
+                    fieldName = tinaField(parentValue, keyName)
+                  }
+                  // const dataAttributeName = tinaField(fieldName)
+                  const extraProps = {}
+                  if (fieldName !== 'undefined#undefined') {
+                    if (fieldName && withDataTinaFieldState) {
+                      extraProps['data-tina-field'] = fieldName
+                    }
+                  }
+                  return (
+                    <span className="text-orange-600" {...extraProps}>
+                      {value}
+                    </span>
+                  )
+                }}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </JsonContext.Provider>
     </Suspense>
   )
 }
