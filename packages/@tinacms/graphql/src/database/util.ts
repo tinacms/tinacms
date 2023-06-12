@@ -202,7 +202,9 @@ export const scanContentByPaths = async (
   for (const collection of Object.keys(pathsByCollection)) {
     await callback(collections[collection], pathsByCollection[collection])
   }
-  await callback(undefined, nonCollectionPaths)
+  if (nonCollectionPaths.length) {
+    await callback(undefined, nonCollectionPaths)
+  }
 }
 
 export const partitionPathsByCollection = async (
