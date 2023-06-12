@@ -386,21 +386,25 @@ const BranchSelector = ({
                   indexingStatus !== 'complete'
                     ? 'bg-gray-50 text-gray-400'
                     : isCurrentBranch
-                    ? 'border-teal-500 border-l-4 bg-blue-50 text-blue-800 hover:text-blue-500 border-b-0'
+                    ? 'border-teal-500 border-l-4 bg-blue-50 text-blue-800 border-b-0'
                     : 'border-b-2'
                 }`}
                 key={branch.name}
               >
                 <div className="w-1/2">
-                  <div className="flex space-x-1 justify-items-start">
+                  <div className="w-fit max-w-full">
                     <div className="my-auto">
                       {branch.protected && <BiLock />}
                     </div>
-                    <div className="truncate">{branch.name}</div>
+                    <div className="truncate w-fit max-w-full">
+                      {branch.name}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap items-center">
-                    <IndexStatus indexingStatus={branch.indexStatus.status} />
-                  </div>
+                  {indexingStatus !== 'complete' && (
+                    <div className="w-fit">
+                      <IndexStatus indexingStatus={branch.indexStatus.status} />
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1">
                   <div className="text-xs font-bold mb-1">Last Updated</div>
@@ -442,38 +446,62 @@ const BranchSelector = ({
   )
 }
 
-const IndexStatus = ({
-  indexingStatus,
-}: {
-  indexingStatus: 'failed' | 'unknown' | 'complete' | 'inprogress' | 'timeout'
-}) => {
+type Status = 'failed' | 'unknown' | 'complete' | 'inprogress' | 'timeout'
+
+const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
+  const styles: {
+    [key in Status]: {
+      classes: string
+      content: () => JSX.Element
+    }
+  } = {
+    complete: {
+      classes: '',
+      content: () => <></>,
+    },
+    unknown: {
+      classes: 'text-blue-500 border-blue-500',
+      content: () => (
+        <>
+          <GrCircleQuestion className="w-3 h-auto" />
+          <span className="">{`Unknown`}</span>
+        </>
+      ),
+    },
+    inprogress: {
+      classes: 'text-blue-500 border-blue-500',
+      content: () => (
+        <>
+          <FaSpinner className="w-3 h-auto animate-spin" />
+          <span className="">{`Indexing`}</span>
+        </>
+      ),
+    },
+    failed: {
+      classes: 'text-red-500 border-red-500',
+      content: () => (
+        <>
+          <BiError className="w-3 h-auto" />
+          <span className="">{`Indexing failed`}</span>
+        </>
+      ),
+    },
+    timeout: {
+      classes: 'text-red-500 border-red-500',
+      content: () => (
+        <>
+          <BiError className="w-3 h-auto" />
+          <span className="">{`Indexing timed out`}</span>
+        </>
+      ),
+    },
+  }
   return (
-    <>
-      {indexingStatus === 'unknown' && (
-        <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
-          <span className="opacity-50 italic">{`Unknown`}</span>
-          <GrCircleQuestion className="w-5 h-auto opacity-70" />
-        </span>
-      )}
-      {indexingStatus === 'inprogress' && (
-        <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
-          <span className="opacity-50 italic">{`Indexing`}</span>
-          <FaSpinner className="w-5 h-auto opacity-70 animate-spin" />
-        </span>
-      )}
-      {indexingStatus === 'failed' && (
-        <span className="flex-1 w-full flex justify-end items-center gap-2 text-red-500">
-          <span className="opacity-50 italic">{`Indexing failed`}</span>
-          <BiError className="w-5 h-auto opacity-70" />
-        </span>
-      )}
-      {indexingStatus === 'timeout' && (
-        <span className="flex-1 w-full flex justify-end items-center gap-2 text-red-500">
-          <span className="opacity-50 italic">{`Indexing timed out`}</span>
-          <BiError className="w-5 h-auto opacity-70" />
-        </span>
-      )}
-    </>
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium border space-x-1 ${styles[indexingStatus].classes}`}
+    >
+      {styles[indexingStatus].content()}
+    </span>
   )
 }
 
