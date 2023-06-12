@@ -272,6 +272,8 @@ const BranchSelector = ({
     'default' | 'updated' | 'name'
   >('default')
 
+  const cms = useCMS()
+
   const filteredBranchList = getFilteredBranchList(
     branchList,
     search,
@@ -427,12 +429,28 @@ const BranchSelector = ({
                     <OverflowMenu
                       toolbarItems={[
                         {
-                          name: 'preview',
-                          label: 'Preview',
+                          name: 'github-pr',
+                          label: 'View in Github',
                           onMouseDown: () => {
                             window.open(branch.githubPullRequestUrl, '_blank')
                           },
                         },
+                        ...(cms.api.tina.schema?.config?.config?.ui?.previewUrl
+                          ? [
+                              {
+                                name: 'preview',
+                                label: 'Preview',
+                                onMouseDown: () => {
+                                  window.open(
+                                    cms.api.tina.schema?.config?.config?.ui?.previewUrl(
+                                      { branch: branch.name }
+                                    ),
+                                    '_blank'
+                                  )
+                                },
+                              },
+                            ]
+                          : []),
                       ]}
                     />
                   </div>
