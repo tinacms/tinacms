@@ -386,8 +386,8 @@ const BranchSelector = ({
                   indexingStatus !== 'complete'
                     ? 'bg-gray-50 text-gray-400'
                     : isCurrentBranch
-                    ? 'border-teal-500 border-b-0 border-l-4 bg-blue-50 text-blue-800 hover:text-blue-500'
-                    : ''
+                    ? 'border-teal-500 border-l-4 bg-blue-50 text-blue-800 hover:text-blue-500 border-b-0'
+                    : 'border-b-2'
                 }`}
                 key={branch.name}
               >
@@ -403,7 +403,7 @@ const BranchSelector = ({
                   </div>
                 </div>
                 <div className="flex-1">
-                  {' '}
+                  <div className="text-xs font-bold mb-1">Last Updated</div>
                   {formatDistanceToNow(new Date(branch.indexStatus.timestamp), {
                     addSuffix: true,
                   })}
