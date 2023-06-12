@@ -13,9 +13,9 @@ export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-export const OverflowMenu = ({ toolbarItems }) => {
+export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
   return (
-    <Popover as="div" className="relative block w-full">
+    <Popover as="div" className={`relative block ${className}`}>
       {({ open }) => (
         <>
           <Popover.Button
