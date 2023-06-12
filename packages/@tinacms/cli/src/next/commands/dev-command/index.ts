@@ -18,7 +18,6 @@ import {
   LocalSearchIndexClient,
   lookupStopwords,
 } from '@tinacms/search'
-import type { SearchClient } from '@tinacms/search'
 
 export class DevCommand extends BaseCommand {
   static paths = [['dev'], ['server:start']]
@@ -199,7 +198,7 @@ export class DevCommand extends BaseCommand {
       this.watchContentFiles(
         configManager,
         database,
-        configManager.config.search && searchIndexClient
+        configManager.config.search && searchIndexer
       )
     }
 
@@ -297,7 +296,7 @@ export class DevCommand extends BaseCommand {
   watchContentFiles(
     configManager: ConfigManager,
     database: Database,
-    searchClient?: SearchClient
+    searchIndexer?: SearchIndexer
   ) {
     const collectionContentFiles = []
     configManager.config.schema.collections.forEach((collection) => {
@@ -326,9 +325,9 @@ export class DevCommand extends BaseCommand {
         }
         const pathFromRoot = configManager.printContentRelativePath(addedFile)
         await database.indexContentByPaths([pathFromRoot]).catch(console.error)
-        if (searchClient) {
-          await searchClient
-            .put([await database.get(pathFromRoot)])
+        if (searchIndexer) {
+          await searchIndexer
+            .indexContentByPaths([pathFromRoot])
             .catch(console.error)
         }
       })
@@ -337,17 +336,19 @@ export class DevCommand extends BaseCommand {
         // Optionally we can reload the page when this happens
         // server.ws.send({ type: 'full-reload', path: '*' })
         await database.indexContentByPaths([pathFromRoot]).catch(console.error)
-        if (searchClient) {
-          await searchClient
-            .put([await database.get(pathFromRoot)])
+        if (searchIndexer) {
+          await searchIndexer
+            .indexContentByPaths([pathFromRoot])
             .catch(console.error)
         }
       })
       .on('unlink', async (removedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(removedFile)
         await database.deleteContentByPaths([pathFromRoot]).catch(console.error)
-        if (searchClient) {
-          await searchClient.del([pathFromRoot]).catch(console.error)
+        if (searchIndexer) {
+          await searchIndexer
+            .deleteIndexContent([pathFromRoot])
+            .catch(console.error)
         }
       })
   }
