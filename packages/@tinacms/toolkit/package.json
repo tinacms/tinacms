@@ -98,7 +98,8 @@
     "slate-history": "^0.66.0",
     "slate-hyperscript": "^0.77.0",
     "slate-react": "^0.81.0",
-    "webfontloader": "1.6.28"
+    "webfontloader": "1.6.28",
+    "date-fns": "2.30.0"
   },
   "peerDependencies": {
     "react": ">=16.14",
