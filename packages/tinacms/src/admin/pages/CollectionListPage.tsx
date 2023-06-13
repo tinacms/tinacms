@@ -36,6 +36,7 @@ import {
   textFieldClasses,
   TinaCMS,
   Toggle,
+  CreateBranchModel,
 } from '@tinacms/toolkit'
 import type {
   CollectionResponse,
@@ -304,10 +305,39 @@ const CollectionListPage = () => {
 
                 return (
                   <>
-                    {deleteModalOpen && (
-                      <DeleteModal
-                        filename={vars.relativePath}
-                        deleteFunc={async () => {
+                    {/* Normal Flow */}
+                    {deleteModalOpen &&
+                      !cms.api.tina.usingProtectedBranch() && (
+                        <DeleteModal
+                          filename={vars.relativePath}
+                          deleteFunc={async () => {
+                            try {
+                              await admin.deleteDocument(vars)
+                              cms.alerts.info(
+                                'Document was successfully deleted'
+                              )
+                              reFetchCollection()
+                            } catch (error) {
+                              cms.alerts.warn(
+                                'Document was not deleted, ask a developer for help or check the console for an error message'
+                              )
+                              console.error(error)
+                              throw error
+                            }
+                          }}
+                          close={() => setDeleteModalOpen(false)}
+                        />
+                      )}
+                    {/* Editorial workflow  */}
+                    {deleteModalOpen && cms.api.tina.usingProtectedBranch() && (
+                      <CreateBranchModel
+                        crudType="delete"
+                        relativePath={
+                          collectionExtra.path + '/' + vars.relativePath
+                        }
+                        values={vars}
+                        close={() => setDeleteModalOpen(false)}
+                        safeSubmit={async () => {
                           try {
                             await admin.deleteDocument(vars)
                             cms.alerts.info('Document was successfully deleted')
@@ -320,7 +350,6 @@ const CollectionListPage = () => {
                             throw error
                           }
                         }}
-                        close={() => setDeleteModalOpen(false)}
                       />
                     )}
 
