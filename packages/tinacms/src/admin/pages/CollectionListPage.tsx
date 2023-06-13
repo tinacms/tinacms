@@ -307,7 +307,7 @@ const CollectionListPage = () => {
                   <>
                     {/* Normal Flow */}
                     {deleteModalOpen &&
-                      !cms.api.tina.usingEditorialWorkflow && (
+                      !cms.api.tina.usingProtectedBranch() && (
                         <DeleteModal
                           filename={vars.relativePath}
                           deleteFunc={async () => {
@@ -329,7 +329,7 @@ const CollectionListPage = () => {
                         />
                       )}
                     {/* Editorial workflow  */}
-                    {deleteModalOpen && cms.api.tina.usingEditorialWorkflow && (
+                    {deleteModalOpen && cms.api.tina.usingProtectedBranch() && (
                       <CreateBranchModel
                         crudType="delete"
                         relativePath={
