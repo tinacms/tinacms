@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 1.4.16
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+- 1c78bafc2: Fix scanContentByPaths to not invoke callback when there are no nonCollectionPaths
+- Updated dependencies [c385b5615]
+  - @tinacms/schema-tools@1.4.5
+  - @tinacms/mdx@1.3.11
+
 ## 1.4.15
 
 ### Patch Changes
