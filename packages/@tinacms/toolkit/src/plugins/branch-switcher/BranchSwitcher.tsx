@@ -282,7 +282,7 @@ const BranchSelector = ({
   ).sort(sortBranchListFn(sortValue))
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       <div className="flex space-x-4">
         <div>
           <label
@@ -409,10 +409,15 @@ const BranchSelector = ({
                   )}
                 </div>
                 <div className="flex-1">
-                  <div className="text-xs font-bold mb-1">Last Updated</div>
-                  {formatDistanceToNow(new Date(branch.indexStatus.timestamp), {
-                    addSuffix: true,
-                  })}
+                  <div className="text-xs font-bold">Last Updated</div>
+                  <span className="text-base leading-tight">
+                    {formatDistanceToNow(
+                      new Date(branch.indexStatus.timestamp),
+                      {
+                        addSuffix: true,
+                      }
+                    )}
+                  </span>
                 </div>
                 <div className="flex items-center">
                   {indexingStatus === 'complete' && !isCurrentBranch && (

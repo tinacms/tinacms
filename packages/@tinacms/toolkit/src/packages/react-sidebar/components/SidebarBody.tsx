@@ -23,12 +23,6 @@ export const FormsView = ({
   children?: React.ReactChild | React.ReactChild[]
 }) => {
   const cms = useCMS()
-  const renderNav =
-    // @ts-ignore
-    typeof cms?.sidebar?.renderNav !== 'undefined'
-      ? // @ts-ignore
-        cms.sidebar.renderNav
-      : true
   const { setFormIsPristine } = React.useContext(SidebarContext)
   const { formsRegistering, setFormsRegistering } = React.useContext<{
     formsRegistering: boolean
@@ -71,15 +65,8 @@ export const FormsView = ({
     <>
       {activeForm && (
         <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-          {isMultiform && (
-            <MultiformFormHeader
-              renderNav={renderNav}
-              activeForm={activeForm}
-            />
-          )}
-          {!isMultiform && (
-            <FormHeader renderNav={renderNav} activeForm={activeForm} />
-          )}
+          {isMultiform && <MultiformFormHeader activeForm={activeForm} />}
+          {!isMultiform && <FormHeader activeForm={activeForm} />}
           {formMetas &&
             formMetas.map((meta) => (
               <React.Fragment key={meta.name}>
@@ -127,12 +114,10 @@ const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
 
 export interface MultiformFormHeaderProps {
   activeForm: { activeFieldName?: string; tinaForm: Form }
-  renderNav?: boolean
 }
 
 export const MultiformFormHeader = ({
   activeForm,
-  renderNav,
 }: MultiformFormHeaderProps) => {
   const cms = useCMS()
   const { formIsPristine } = React.useContext(SidebarContext)
@@ -169,26 +154,10 @@ export const MultiformFormHeader = ({
 
 export interface FormHeaderProps {
   activeForm: { activeFieldName?: string; tinaForm: Form }
-  renderNav?: boolean
 }
 
-export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
-  const { sidebarWidth, formIsPristine, displayState } =
-    React.useContext(SidebarContext)
-
-  const headerPadding = {
-    navOpen: 'px-6',
-    navClosed: 'pl-18 pr-24',
-    noNav: 'pl-6 pr-24',
-  }
-
-  const windowWidth = useWindowWidth()
-  const navState = !renderNav
-    ? 'noNav'
-    : (sidebarWidth > navBreakpoint && windowWidth > navBreakpoint) ||
-      (displayState === 'fullscreen' && windowWidth > navBreakpoint)
-    ? 'navOpen'
-    : 'navClosed'
+export const FormHeader = ({ activeForm }: FormHeaderProps) => {
+  const { formIsPristine } = React.useContext(SidebarContext)
 
   const shortFormLabel = activeForm.tinaForm.label
     ? activeForm.tinaForm.label.replace(/^.*[\\\/]/, '')
@@ -196,11 +165,11 @@ export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
 
   return (
     <div
-      className={`py-4 border-b border-gray-200 bg-white ${headerPadding[navState]}`}
+      className={`pt-18 pb-4 px-6 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50`}
     >
-      <div className="max-w-form mx-auto  flex flex-col items-start justify-center min-h-[2.5rem]">
+      <div className="max-w-form mx-auto flex gap-2 justify-between items-center">
         {shortFormLabel && (
-          <span className="block w-full text-lg mb-[6px] text-gray-700 font-medium leading-tight truncate">
+          <span className="block w-full text-sm leading-tight whitespace-nowrap truncate">
             {shortFormLabel}
           </span>
         )}

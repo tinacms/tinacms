@@ -20,7 +20,7 @@ export const BranchModal = ({ close }: SubmitModalProps) => {
   return (
     <Modal>
       <PopupModal className=" w-[800px]">
-        <ModalHeader close={close}>Select Branch</ModalHeader>
+        <ModalHeader close={close}>Branch List</ModalHeader>
         <ModalBody padded={false}>
           <BranchSwitcher
             listBranches={tinaApi.listBranches.bind(tinaApi)}
