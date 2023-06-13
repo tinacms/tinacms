@@ -82,6 +82,7 @@ export const AuthWallInner = ({
     if (await client.isAuthenticated()) {
       setShowChildren(true)
       setActiveModal(null)
+      cms.events.dispatch({ type: 'cms:login' })
     } else {
       throw new Error('No access to repo') // TODO - display modal here
     }
@@ -290,7 +291,7 @@ export const TinaCloudProvider = (
   }, [])
 
   React.useEffect(() => {
-    if (isTinaCloud) {
+    const setupEditorialWorkflow = () => {
       client.getProject().then((project) => {
         if (project?.features?.includes('editorial-workflow')) {
           cms.flags.set('branch-switcher', true)
@@ -299,8 +300,17 @@ export const TinaCloudProvider = (
         }
       })
     }
-    // refresh if the user logs in
-  }, [isTinaCloud, client.token])
+    if (isTinaCloud) {
+      setupEditorialWorkflow()
+    }
+    // If the user logs in after the cms is initialized
+    const unsubscribe = cms.events.subscribe('cms:login', () => {
+      if (isTinaCloud) {
+        setupEditorialWorkflow()
+      }
+    })
+    return unsubscribe
+  }, [isTinaCloud, cms])
 
   return (
     <BranchDataProvider
