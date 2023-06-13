@@ -38,13 +38,14 @@ export const IndexingPage: FC = () => {
   )
 
   const [branch, setBranch] = React.useState(
-    searchParams.get('branch') as string
+    ('tina/' + searchParams.get('branch')) as string
   )
 
   useEffect(() => {
     const run = async () => {
       if (state === 'starting') {
         try {
+          console.log('starting', branch, formatBranchName(branch))
           const name = await tinaApi.createBranch({
             branchName: formatBranchName(branch),
             baseBranch: currentBranch,
