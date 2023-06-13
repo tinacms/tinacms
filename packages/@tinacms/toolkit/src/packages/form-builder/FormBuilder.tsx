@@ -409,13 +409,17 @@ export const CreateBranchModel = ({
   const [newBranchName, setNewBranchName] = React.useState('')
 
   const onCreateBranch = (newBranchName) => {
-    const fullPath = tinaForm.id
+    const fullPath = tinaForm.relativePath
     const values = tinaForm.values
     localStorage.setItem('tina.createBranchState', 'starting')
     localStorage.setItem('tina.createBranchState.fullPath', fullPath)
     localStorage.setItem(
       'tina.createBranchState.values',
       JSON.stringify(values)
+    )
+    localStorage.setItem(
+      'tina.createBranchState.kind',
+      tinaForm.crudType || 'update'
     )
     localStorage.setItem('tina.createBranchState.back', window.location.href)
     const hash = window.location.hash

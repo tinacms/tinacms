@@ -184,11 +184,20 @@ export const RenderForm = ({
     template?.defaultItem
 
   const form = useMemo(() => {
+    const folderName = folder.fullyQualifiedName ? folder.name : ''
     return new Form({
+      crudType: 'create',
       initialValues:
         typeof defaultItem === 'function' ? defaultItem() : defaultItem,
       extraSubscribeValues: { active: true, submitting: true, touched: true },
       onChange: (values) => {
+        if (!values?.submitting) {
+          // keeps the forms relative path in sync with the filename
+          form.relativePath =
+            schemaCollection.path +
+            folderName +
+            `/${values?.values?.filename}.${schemaCollection.format || 'md'}`
+        }
         if (
           slugFunction &&
           values?.active !== 'filename' &&
@@ -199,7 +208,10 @@ export const RenderForm = ({
           form.finalForm.change('filename', value)
         }
       },
-      id: 'create-form',
+      id:
+        schemaCollection.path +
+        folderName +
+        `/new-post.${schemaCollection.format || 'md'}`,
       label: 'form',
       fields: [
         ...(formInfo.fields as any),

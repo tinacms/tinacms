@@ -20,6 +20,10 @@ export const IndexingPage: FC = () => {
   const tinaApi: Client = cms.api.tina
   // @ts-ignore
   const currentBranch = tinaApi.branch
+  const kind = localStorage?.getItem('tina.createBranchState.kind') as
+    | 'create'
+    | 'update'
+    | 'delete'
   const { setCurrentBranch } = useBranchData()
   const [state, setState] = React.useState(
     localStorage?.getItem('tina.createBranchState') as IndexingState
@@ -103,7 +107,16 @@ export const IndexingPage: FC = () => {
           const relativePath = fullPath.replace(`${collection.path}/`, '')
 
           if (await api.isAuthenticated()) {
-            await api.updateDocument(collection, relativePath, params)
+            if (kind === 'delete') {
+              await api.deleteDocument({
+                collection: collection.name,
+                relativePath,
+              })
+            } else if (kind === 'create') {
+              await api.createDocument(collection, relativePath, params)
+            } else {
+              await api.updateDocument(collection, relativePath, params)
+            }
           } else {
             const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`
             cms.alerts.error(authMessage)
