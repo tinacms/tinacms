@@ -108,10 +108,7 @@ export const IndexingPage: FC = () => {
 
           if (await api.isAuthenticated()) {
             if (kind === 'delete') {
-              await api.deleteDocument({
-                collection: collection.name,
-                relativePath,
-              })
+              await api.deleteDocument(values)
             } else if (kind === 'create') {
               await api.createDocument(collection, relativePath, params)
             } else {
