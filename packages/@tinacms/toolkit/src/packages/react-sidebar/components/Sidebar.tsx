@@ -23,7 +23,7 @@ import { ResizeHandle } from './ResizeHandle'
 import { Transition } from '@headlessui/react'
 import { useWindowWidth } from '@react-hook/window-size'
 import { CloudConfigPlugin } from '../../react-cloud-config'
-import { BranchBanner } from '../../../plugins/branch-switcher'
+import { BranchButton } from '../../../plugins/branch-switcher'
 
 export const SidebarContext = React.createContext<any>(null)
 
@@ -433,13 +433,12 @@ const SidebarHeader = ({
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
       {!isLocalMode && <BillingWarning />}
-      {branchingEnabled && !isLocalMode && <BranchBanner />}
 
       <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
         {displayMenuButton && (
           <Button
             rounded="right"
-            variant="secondary"
+            variant="white"
             onClick={() => {
               setMenuIsOpen(true)
             }}
@@ -448,23 +447,25 @@ const SidebarHeader = ({
             <BiMenu className="h-6 w-auto text-blue-500" />
           </Button>
         )}
+        {branchingEnabled && !isLocalMode && (
+          <div className="ml-3">
+            <BranchButton />
+          </div>
+        )}
         <div className="flex-1"></div>
         <div
           className={`flex items-center pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
         >
           <Button
             rounded="left"
-            variant="secondary"
+            variant="white"
             onClick={toggleSidebarOpen}
             aria-label="closes cms sidebar"
+            className="-mr-px"
           >
             <MdOutlineArrowBackIos className="h-[18px] w-auto -mr-1 text-blue-500" />
           </Button>
-          <Button
-            rounded="custom"
-            variant="secondary"
-            onClick={toggleFullscreen}
-          >
+          <Button rounded="custom" variant="white" onClick={toggleFullscreen}>
             {displayState === 'fullscreen' ? (
               // BiCollapseAlt
               <svg

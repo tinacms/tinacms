@@ -388,7 +388,7 @@ const BranchSelector = ({
                   indexingStatus !== 'complete'
                     ? 'bg-gray-50 text-gray-400'
                     : isCurrentBranch
-                    ? 'border-teal-500 border-l-4 bg-blue-50 text-blue-800 border-b-0'
+                    ? 'border-blue-500 border-l-5 bg-blue-50 text-blue-800 border-b-0'
                     : 'border-b-2'
                 }`}
                 key={branch.name}

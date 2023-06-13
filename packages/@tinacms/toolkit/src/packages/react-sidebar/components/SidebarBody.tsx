@@ -12,7 +12,7 @@ import { useCMS } from '../../react-core'
 import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
-import { BiChevronLeft } from 'react-icons/bi'
+import { BiChevronLeft, BiHomeAlt } from 'react-icons/bi'
 import { useWindowWidth } from '@react-hook/window-size'
 import { EditContext } from '@tinacms/sharedctx'
 import { PendingFormsPlaceholder } from './NoFormsPlaceHolder'
@@ -135,21 +135,15 @@ export const MultiformFormHeader = ({
   renderNav,
 }: MultiformFormHeaderProps) => {
   const cms = useCMS()
-  const { sidebarWidth, formIsPristine } = React.useContext(SidebarContext)
+  const { formIsPristine } = React.useContext(SidebarContext)
 
   return (
     <div
-      className={`py-4 border-b border-gray-200 bg-white ${
-        sidebarWidth > navBreakpoint && renderNav
-          ? `px-6`
-          : renderNav
-          ? `pl-18 pr-24`
-          : `pl-6 pr-24`
-      }`}
+      className={`pt-18 pb-4 px-6 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50`}
     >
-      <div className="max-w-form mx-auto flex flex-col items-start justify-center min-h-[2.5rem]">
+      <div className="max-w-form mx-auto flex gap-2 justify-between items-center">
         <button
-          className="pointer-events-auto text-xs -mt-1 mb-1.5 text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150 font-medium flex items-center justify-start gap-0.5"
+          className="pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150"
           onClick={() => {
             const state = activeForm.tinaForm.finalForm.getState()
             if (state.invalid === true) {
@@ -159,10 +153,12 @@ export const MultiformFormHeader = ({
             }
           }}
         >
-          <BiChevronLeft className="h-auto w-5 inline-block opacity-70 -ml-1 -mr-0.5 -mt-px" />
-          Form List
+          <BiHomeAlt className="h-auto w-5 inline-block opacity-70" />
         </button>
-        <span className="block w-full text-lg mb-2 text-gray-700 font-medium leading-tight truncate">
+        <span className="opacity-30 text-sm leading-tight whitespace-nowrap flex-0">
+          /
+        </span>
+        <span className="block w-full text-sm leading-tight whitespace-nowrap truncate">
           {activeForm.tinaForm.label || activeForm.tinaForm.id}
         </span>
         <FormStatus pristine={formIsPristine} />
