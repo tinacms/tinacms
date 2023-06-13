@@ -4,7 +4,7 @@ import { Form } from '../forms'
 import { Form as FinalForm } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { Button } from '../styles'
+import { Button, OverflowMenu } from '../styles'
 import { LoadingDots } from './LoadingDots'
 import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
@@ -19,7 +19,9 @@ import {
   ModalBody,
   ModalActions,
 } from '../react-modals'
-import { CreateBranch } from '../../plugins/branch-switcher/BranchSwitcher'
+import { BaseTextField } from '../fields'
+import { BiGitBranch } from 'react-icons/bi'
+import { MdOutlineSaveAlt } from 'react-icons/md'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -405,55 +407,71 @@ export const CreateBranchModel = ({
   const currentBranch = tinaApi.branch
 
   const [newBranchName, setNewBranchName] = React.useState('')
+
+  const onCreateBranch = (newBranchName) => {
+    const fullPath = tinaForm.id
+    const values = tinaForm.values
+    localStorage.setItem('tina.createBranchState', 'starting')
+    localStorage.setItem('tina.createBranchState.fullPath', fullPath)
+    localStorage.setItem(
+      'tina.createBranchState.values',
+      JSON.stringify(values)
+    )
+    localStorage.setItem('tina.createBranchState.back', window.location.href)
+    const hash = window.location.hash
+    const newHash = `#/branch/new?branch=${newBranchName}`
+    const newUrl = window.location.href.replace(hash, newHash)
+    window.location.href = newUrl
+  }
+
   return (
     <Modal>
       <PopupModal>
-        <ModalHeader close={close}>New Folder</ModalHeader>
+        <ModalHeader close={close}>
+          <BiGitBranch className="w-6 h-auto mr-1 text-blue-500 opacity-70" />{' '}
+          Protected Branch
+        </ModalHeader>
         <ModalBody padded={true}>
-          <div className="text-base text-gray-700 mb-2">
-            <p>
-              <strong>Your working on a protected branch.</strong>
-            </p>
-            <p>To save your work Tina will create a new branch</p>
-          </div>
-
-          <CreateBranch
-            currentBranch={currentBranch}
-            newBranchName={newBranchName}
-            onCreateBranch={() => {
-              const fullPath = tinaForm.id
-              const values = tinaForm.values
-              localStorage.setItem('tina.createBranchState', 'starting')
-              localStorage.setItem('tina.createBranchState.fullPath', fullPath)
-              localStorage.setItem(
-                'tina.createBranchState.values',
-                JSON.stringify(values)
-              )
-              localStorage.setItem(
-                'tina.createBranchState.back',
-                window.location.href
-              )
-              const hash = window.location.hash
-              const newHash = `#/branch/new?branch=${newBranchName}`
-              const newUrl = window.location.href.replace(hash, newHash)
-              window.location.href = newUrl
-            }}
-            setNewBranchName={setNewBranchName}
+          <p className="text-base text-gray-700 mb-2">
+            <strong>You are working on a protected branch.</strong> To save your
+            work Tina will create a new branch from <b>{currentBranch}</b>.
+          </p>
+          <p className="text-sm text-gray-500 mb-4">
+            Once created you will need to wait for indexing to complete before
+            you can switch branches.
+          </p>
+          <BaseTextField
+            placeholder="Branch Name"
+            value={newBranchName}
+            onChange={(e) => setNewBranchName(e.target.value)}
           />
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
+          <Button style={{ flexGrow: 1 }} onClick={close}>
             Cancel
           </Button>
           <Button
+            variant="primary"
             style={{ flexGrow: 2 }}
-            onClick={() => {
-              close()
-              safeSubmit()
-            }}
+            disabled={newBranchName === ''}
+            onClick={() => onCreateBranch(newBranchName)}
           >
-            Save to protected branch
+            Create Branch and Save
           </Button>
+          <OverflowMenu
+            className="-ml-2"
+            toolbarItems={[
+              {
+                name: 'override',
+                label: 'Save to Protected Branch',
+                Icon: <MdOutlineSaveAlt size="1rem" />,
+                onMouseDown: () => {
+                  close()
+                  safeSubmit()
+                },
+              },
+            ]}
+          />
         </ModalActions>
       </PopupModal>
     </Modal>

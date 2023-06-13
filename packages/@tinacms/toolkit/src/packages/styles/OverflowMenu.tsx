@@ -5,13 +5,13 @@ export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-export const OverflowMenu = ({ toolbarItems }) => {
+export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
   return (
     <DialogTrigger>
       <Button
-        className={`cursor-pointer relative w-full justify-center inline-flex border items-center p-3 text-sm font-medium focus:outline-1 focus:outline-blue-200 pointer-events-auto ${
+        className={`cursor-pointer relative justify-center inline-flex border items-center p-3 text-sm font-medium focus:outline-1 focus:outline-blue-200 pointer-events-auto ${
           open ? `text-blue-400` : `text-gray-300 hover:text-blue-500`
-        }`}
+        } ${className}}`}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
