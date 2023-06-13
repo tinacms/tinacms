@@ -6,6 +6,7 @@ import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { devHTML } from './html'
 import { logger, summary } from '../../../logger'
+import { dangerText, warnText } from '../../../utils/theme'
 import { createDevServer } from './server'
 import { Codegen } from '../../codegen'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
@@ -70,70 +71,77 @@ export class DevCommand extends BaseCommand {
     const setup = async ({ firstTime }: { firstTime: boolean }) => {
       try {
         await configManager.processConfig()
+        if (firstTime) {
+          database = await createAndInitializeDatabase(
+            configManager,
+            Number(this.datalayerPort)
+          )
+        } else {
+          database.clearCache()
+        }
+
+        const { tinaSchema, graphQLSchema, lookup, queryDoc, fragDoc } =
+          await buildSchema(configManager.config)
+
+        const codegen = new Codegen({
+          isLocal: true,
+          configManager: configManager,
+          port: Number(this.port),
+          queryDoc,
+          fragDoc,
+          graphqlSchemaDoc: graphQLSchema,
+          tinaSchema,
+          lookup,
+        })
+        const apiURL = await codegen.execute()
+
+        if (!configManager.isUsingLegacyFolder) {
+          delete require.cache[configManager.generatedSchemaJSONPath]
+          delete require.cache[configManager.generatedLookupJSONPath]
+          delete require.cache[configManager.generatedGraphQLJSONPath]
+
+          const schemaObject = require(configManager.generatedSchemaJSONPath)
+          const lookupObject = require(configManager.generatedLookupJSONPath)
+          const graphqlSchemaObject = require(configManager.generatedGraphQLJSONPath)
+          await fs.writeFileSync(
+            path.join(configManager.tinaFolderPath, 'tina-lock.json'),
+            JSON.stringify({
+              schema: schemaObject,
+              lookup: lookupObject,
+              graphql: graphqlSchemaObject,
+            })
+          )
+        }
+
+        if (!this.noWatch) {
+          this.watchQueries(configManager, async () => await codegen.execute())
+        }
+
+        await this.indexContentWithSpinner({
+          database,
+          graphQLSchema,
+          tinaSchema,
+        })
+        if (!firstTime) {
+          logger.error('Re-index complete')
+        }
+        return { apiURL, database, graphQLSchema, tinaSchema }
       } catch (e) {
-        logger.error(e.message)
+        logger.error(dangerText(e.message))
         if (this.verbose) {
           console.error(e)
         }
         if (firstTime) {
           logger.error(
-            'Unable to start dev server, please fix your Tina config and try again'
+            warnText(
+              'Unable to start dev server, please fix your Tina config and try again'
+            )
           )
           process.exit(1)
+        } else {
+          logger.error(warnText('Dev server has not been restarted'))
         }
       }
-      if (firstTime) {
-        database = await createAndInitializeDatabase(
-          configManager,
-          Number(this.datalayerPort)
-        )
-      } else {
-        database.clearCache()
-      }
-
-      const { tinaSchema, graphQLSchema, lookup, queryDoc, fragDoc } =
-        await buildSchema(configManager.config)
-
-      const codegen = new Codegen({
-        isLocal: true,
-        configManager: configManager,
-        port: Number(this.port),
-        queryDoc,
-        fragDoc,
-        graphqlSchemaDoc: graphQLSchema,
-        tinaSchema,
-        lookup,
-      })
-      const apiURL = await codegen.execute()
-
-      if (!configManager.isUsingLegacyFolder) {
-        delete require.cache[configManager.generatedSchemaJSONPath]
-        delete require.cache[configManager.generatedLookupJSONPath]
-        delete require.cache[configManager.generatedGraphQLJSONPath]
-
-        const schemaObject = require(configManager.generatedSchemaJSONPath)
-        const lookupObject = require(configManager.generatedLookupJSONPath)
-        const graphqlSchemaObject = require(configManager.generatedGraphQLJSONPath)
-        await fs.writeFileSync(
-          path.join(configManager.tinaFolderPath, 'tina-lock.json'),
-          JSON.stringify({
-            schema: schemaObject,
-            lookup: lookupObject,
-            graphql: graphqlSchemaObject,
-          })
-        )
-      }
-
-      if (!this.noWatch) {
-        this.watchQueries(configManager, async () => await codegen.execute())
-      }
-
-      await this.indexContentWithSpinner({
-        database,
-        graphQLSchema,
-        tinaSchema,
-      })
-      return { apiURL, database, graphQLSchema, tinaSchema }
     }
     const { apiURL, graphQLSchema, tinaSchema } = await setup({
       firstTime: true,
@@ -175,16 +183,6 @@ export class DevCommand extends BaseCommand {
         configManager.config.search?.maxSearchIndexFieldLength || 100,
     })
 
-    await spin({
-      waitFor: async () => {
-        const res = await database.indexContent({
-          graphQLSchema,
-          tinaSchema,
-        })
-      },
-      text: 'Indexing local files',
-    })
-
     if (configManager.config.search) {
       await spin({
         waitFor: async () => {
@@ -200,27 +198,15 @@ export class DevCommand extends BaseCommand {
         database,
         configManager.config.search && searchIndexer
       )
-    }
-
-    server.watcher.on('change', async (changedPath) => {
-      if (changedPath.includes('__generated__')) {
-        return
-      }
-      if (changedPath.includes('@tinacms/app')) {
-        return
-      }
-      if (changedPath.includes('tinacms/dist')) {
-        return
-      }
-      try {
-        // await server.reloadModule
-        logger.info('Tina config updated')
+      chokidar.watch(configManager.watchList).on('change', async () => {
+        logger.info(`Tina config change detected, rebuilding`)
         await setup({ firstTime: false })
-        // await server.restart()
-      } catch (e) {
-        logger.error(e.message)
-      }
-    })
+        // The setup process results in an update to the prebuild file
+        // But Vite doesn't reload when it's changed for some reason
+        // So we're triggering the reload ourselves
+        server.ws.send({ type: 'full-reload', path: '*' })
+      })
+    }
 
     const subItems = []
 

@@ -8,7 +8,10 @@ import lineClamp from '@tailwindcss/line-clamp'
 import aspectRatio from '@tailwindcss/aspect-ratio'
 import path from 'path'
 
-export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
+export const tinaTailwind = (
+  spaPath: string,
+  prebuildFilePath: string
+): Plugin => {
   return {
     name: 'vite-plugin-tina',
     // @ts-ignore
@@ -16,7 +19,7 @@ export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
       const plugins: Plugin[] = []
       const content = [
         path.join(spaPath, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
-        path.join(configFilePath, '../**/*.{vue,js,ts,jsx,tsx,svelte}'),
+        prebuildFilePath,
       ]
 
       const tw = tailwind({

@@ -54,7 +54,7 @@ export const createConfig = async ({
   })
 
   const alias = {
-    TINA_IMPORT: configManager.tinaConfigFilePath,
+    TINA_IMPORT: configManager.prebuildFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
   }
   if (configManager.shouldSkipSDK()) {
@@ -119,7 +119,13 @@ export const createConfig = async ({
         ? {
             ignored: ['**/*'],
           }
-        : undefined,
+        : {
+            // Since we prebuild the file, the prebuild is the only file the Vite server should
+            // know/care about
+            ignored: [
+              `${configManager.tinaFolderPath}/**/!(config.prebuild.jsx)`,
+            ],
+          },
       fs: {
         strict: false,
       },
@@ -135,9 +141,14 @@ export const createConfig = async ({
        * `splitVendorChunkPlugin` is needed because `tinacms` and `@tinacms/toolkit` are quite large,
        * Vite's chunking strategy chokes on memory issues for smaller machines (ie. on CI).
        */
-      react(),
+      react({
+        babel: {
+          // Supresses the warning [NOTE] babel The code generator has deoptimised the styling of
+          compact: true,
+        },
+      }),
       splitVendorChunkPlugin(),
-      tinaTailwind(configManager.spaRootPath, configManager.tinaConfigFilePath),
+      tinaTailwind(configManager.spaRootPath, configManager.prebuildFilePath),
       ...plugins,
     ],
   }
