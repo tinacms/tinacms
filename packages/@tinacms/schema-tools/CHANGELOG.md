@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.4.5
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+
 ## 1.4.4
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # tinacms
 
+## 1.5.9
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+- d2ddfa5a6: Remove type: module from TinaCMS package
+- 9489d5d47: Add `{type: "module"}` to tinacms package
+- Updated dependencies [c385b5615]
+  - @tinacms/schema-tools@1.4.5
+  - @tinacms/toolkit@1.7.5
+  - @tinacms/search@1.0.1
+
 ## 1.5.8
 
 ### Patch Changes
