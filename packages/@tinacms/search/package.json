@@ -46,7 +46,7 @@
     "node-fetch": "2",
     "@tinacms/search-index": "^3.5.2",
     "stopword": "^2.0.8",
-    "sqlite-level": "^1.0.0"
+    "sqlite-level": "^1.0.1"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

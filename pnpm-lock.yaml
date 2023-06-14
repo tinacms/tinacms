@@ -1068,7 +1068,7 @@ importers:
       memory-level: ^1.0.0
       module-error: ^1.0.2
       node-fetch: '2'
-      sqlite-level: ^1.0.0
+      sqlite-level: ^1.0.1
       stopword: ^2.0.8
       typescript: 4.3.5
     dependencies:
@@ -1080,7 +1080,7 @@ importers:
       memory-level: 1.0.0
       module-error: 1.0.2
       node-fetch: 2.6.7
-      sqlite-level: 1.0.0
+      sqlite-level: 1.0.1
       stopword: 2.0.8
     devDependencies:
       '@tinacms/scripts': link:../scripts
@@ -13983,10 +13983,10 @@ packages:
       is-windows: 1.0.2
     dev: false
 
-  /better-sqlite3/7.6.2:
+  /better-sqlite3/8.4.0:
     resolution:
       {
-        integrity: sha512-S5zIU1Hink2AH4xPsN0W43T1/AJ5jrPh7Oy07ocuW/AKYYY02GWzz9NH0nbSMn/gw6fDZ5jZ1QsHt1BXAwJ6Lg==,
+        integrity: sha512-NmsNW1CQvqMszu/CFAJ3pLct6NEFlNfuGM6vw72KHkjOD1UDnL96XNN1BMQc1hiHo8vE2GbOWQYIpZ+YM5wrZw==,
       }
     requiresBuild: true
     dependencies:
@@ -30129,14 +30129,14 @@ packages:
         integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==,
       }
 
-  /sqlite-level/1.0.0:
+  /sqlite-level/1.0.1:
     resolution:
       {
-        integrity: sha512-B3h5PR3wpCJKrpk4hyJF/fs/qDyqZ6iRULKE4kzzeIXsL6XxNFehOIz9mCHolR/qqUMScHglNOwDKY5JW4Dskw==,
+        integrity: sha512-uPo21L96VADz/PPkkZoPNMH9fURTQLDrSVe8XJUwPjqvTi3xigDvCfoektZdvoEgRAiaHchOgksW7YBoyVyEnw==,
       }
     dependencies:
       abstract-level: 1.0.3
-      better-sqlite3: 7.6.2
+      better-sqlite3: 8.4.0
       module-error: 1.0.2
     dev: false
 
