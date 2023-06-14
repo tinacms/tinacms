@@ -139,7 +139,7 @@ export const IndexingPage: FC = () => {
           title: 'PR from TinaCMS',
         })
         console.log('PR created', foo)
-        cms.alerts.success('Creating PR')
+        cms.alerts.success('Pull request created.')
         localStorage.setItem('tina.createBranchState', 'done')
         setState('done')
       }
