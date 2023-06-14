@@ -74,6 +74,7 @@
     "@sambego/storybook-styles": "^1.0.0",
     "@tinacms/search": "workspace:*",
     "@tinacms/sharedctx": "workspace:*",
+    "@tinacms/schema-tools": "workspace:*",
     "@udecode/plate-headless": "^14.0.2",
     "atob": "2.1.2",
     "color-string": "^1.5.3",

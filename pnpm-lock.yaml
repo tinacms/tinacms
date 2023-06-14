@@ -1121,6 +1121,7 @@ importers:
       '@testing-library/jest-dom': ^5.11.9
       '@testing-library/react': ^12.0.0
       '@testing-library/user-event': ^12.7.0
+      '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
       '@tinacms/search': workspace:*
       '@tinacms/sharedctx': workspace:*
@@ -1182,6 +1183,7 @@ importers:
       '@react-types/combobox': 3.5.1_react@17.0.2
       '@react-types/shared': 3.13.1_react@17.0.2
       '@sambego/storybook-styles': 1.0.0
+      '@tinacms/schema-tools': link:../schema-tools
       '@tinacms/search': link:../search
       '@tinacms/sharedctx': link:../sharedctx
       '@udecode/plate-headless': 14.4.3_bhjjt5imxaxhlt7sylcuqcqbdm
@@ -23246,7 +23248,6 @@ packages:
       whatwg-fetch: 3.6.2
     transitivePeerDependencies:
       - encoding
-    dev: false
 
   /isomorphic-fetch/3.0.0_encoding@0.1.13:
     resolution:

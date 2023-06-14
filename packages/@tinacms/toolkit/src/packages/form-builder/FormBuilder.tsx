@@ -2,8 +2,9 @@ import * as React from 'react'
 import { FC, useEffect } from 'react'
 import { Form } from '../forms'
 import { Form as FinalForm } from 'react-final-form'
-
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
+import type { TinaSchema } from '@tinacms/schema-tools'
+
 import { Button, OverflowMenu } from '../styles'
 import { LoadingDots } from './LoadingDots'
 import { FormPortalProvider } from './FormPortal'
@@ -171,7 +172,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     <FinalForm
       key={tinaForm.id}
       form={tinaForm.finalForm}
-      onSubmit={tinaForm.onSubmit}
+      onSubmit={async (values, form, cb) => {
+        const schema: TinaSchema = cms.api.tina.schema
+        const collection = schema.getCollectionByFullPath(tinaForm.relativePath)
+        const valOverride = collection?.onSubmit
+          ? await collection.onSubmit({ cms, form, values })
+          : false
+        return tinaForm.onSubmit(valOverride || values, form, cb)
+      }}
     >
       {({
         handleSubmit,
