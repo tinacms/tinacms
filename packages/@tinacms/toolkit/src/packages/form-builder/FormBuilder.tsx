@@ -445,11 +445,18 @@ export const CreateBranchModel = ({
             Once created you will need to wait for indexing to complete before
             you can switch branches.
           </p>
-          <BaseTextField
-            placeholder="Branch Name"
-            value={newBranchName}
-            onChange={(e) => setNewBranchName(e.target.value)}
-          />
+          <div className="border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded-md shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150">
+            <span className="pl-3 pr-2 py-2 font-medium text-base text-gray-500 opacity-70">
+              tina/
+            </span>
+            <input
+              type="text"
+              className="shadow-inner focus:outline-none block text-base placeholder:text-gray-300 px-3 py-2 text-gray-600 flex-1 bg-white focus:text-gray-900"
+              placeholder="Branch Name"
+              value={newBranchName}
+              onChange={(e) => setNewBranchName(e.target.value)}
+            />
+          </div>
         </ModalBody>
         <ModalActions>
           <Button style={{ flexGrow: 1 }} onClick={close}>
