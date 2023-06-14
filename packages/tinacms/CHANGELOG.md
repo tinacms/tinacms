@@ -1,5 +1,15 @@
 # tinacms
 
+## 1.5.10
+
+### Patch Changes
+
+- Updated dependencies [ee9acb5e5]
+- Updated dependencies [a94e123b6]
+  - @tinacms/search@1.0.2
+  - @tinacms/schema-tools@1.4.6
+  - @tinacms/toolkit@1.7.6
+
 ## 1.5.9
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # tinacms-cli
 
+## 1.5.19
+
+### Patch Changes
+
+- 1751f2fd3: Update tailwind.ts
+- Updated dependencies [ee9acb5e5]
+- Updated dependencies [a94e123b6]
+  - @tinacms/search@1.0.2
+  - @tinacms/schema-tools@1.4.6
+  - @tinacms/graphql@1.4.17
+  - @tinacms/app@1.2.17
+  - @tinacms/datalayer@1.2.17
+
 ## 1.5.18
 
 ### Patch Changes
