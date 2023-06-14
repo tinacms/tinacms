@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.7.6
+
+### Patch Changes
+
+- Updated dependencies [ee9acb5e5]
+  - @tinacms/search@1.0.2
+
 ## 1.7.5
 
 ### Patch Changes

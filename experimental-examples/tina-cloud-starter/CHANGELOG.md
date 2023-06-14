@@ -1,5 +1,12 @@
 # @tinacms/starter
 
+## 0.1.6
+
+### Patch Changes
+
+- tinacms@1.5.10
+- @tinacms/vercel-previews@0.0.6
+
 ## 0.1.5
 
 ### Patch Changes
