@@ -1,7 +1,7 @@
 import type { SearchClient } from '../types'
 import { SqliteLevel } from 'sqlite-level'
 import * as zlib from 'zlib'
-import si from '@tinacms/search-index'
+import si from 'search-index'
 import { MemoryLevel } from 'memory-level'
 import { lookupStopwords } from '../index'
 import fetch, { Headers } from 'node-fetch'
