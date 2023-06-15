@@ -23,6 +23,7 @@ export interface BranchSwitcherProps {
     baseBranch: string
     branchName: string
   }) => Promise<string>
+  setModalTitle?: any
 }
 
 export interface BranchChangeEvent {

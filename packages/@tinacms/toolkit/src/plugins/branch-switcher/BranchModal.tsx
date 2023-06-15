@@ -16,11 +16,12 @@ interface SubmitModalProps {
 export const BranchModal = ({ close }: SubmitModalProps) => {
   const tinaApi = useCMS().api.tina
   const { setCurrentBranch } = useBranchData()
+  const [modalTitle, setModalTitle] = React.useState<string>('Branch List')
 
   return (
     <Modal>
       <PopupModal className=" w-[800px]">
-        <ModalHeader close={close}>Branch List</ModalHeader>
+        <ModalHeader close={close}>{modalTitle}</ModalHeader>
         <ModalBody padded={false}>
           <BranchSwitcher
             listBranches={tinaApi.listBranches.bind(tinaApi)}
@@ -28,6 +29,7 @@ export const BranchModal = ({ close }: SubmitModalProps) => {
               return await tinaApi.createBranch(data)
             }}
             chooseBranch={setCurrentBranch}
+            setModalTitle={setModalTitle}
           />
         </ModalBody>
       </PopupModal>

@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { BranchSwitcherProps, Branch } from './types'
 import { useBranchData } from './BranchData'
-import { BaseTextField, Select } from '../../packages/fields'
+import { BaseTextField, FieldLabel, Select } from '../../packages/fields'
 import { Button, OverflowMenu } from '../../packages/styles'
-import { LoadingDots } from '../../packages/form-builder'
+import { LoadingDots, PrefixedTextField } from '../../packages/form-builder'
 import {
   BiError,
   BiGitBranch,
@@ -11,6 +11,8 @@ import {
   BiRefresh,
   BiSearch,
   BiLock,
+  BiPencil,
+  BiLinkExternal,
 } from 'react-icons/bi'
 import { GrCircleQuestion } from 'react-icons/gr'
 import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
@@ -43,9 +45,11 @@ export const EditoralBranchSwitcher = ({
   listBranches,
   createBranch,
   chooseBranch,
+  setModalTitle,
 }: BranchSwitcherProps) => {
   const cms = useCMS()
   const isLocalMode = cms.api?.tina?.isLocalMode
+  const [viewState, setViewState] = React.useState<'list' | 'create'>('list')
   const [listState, setListState] = React.useState<ListState>('loading')
   const [branchList, setBranchList] = React.useState([] as Branch[])
   const { currentBranch } = useBranchData()
@@ -58,6 +62,15 @@ export const EditoralBranchSwitcher = ({
       }
     }
   }, [currentBranch])
+
+  React.useEffect(() => {
+    if (!setModalTitle) return
+    if (viewState === 'create') {
+      setModalTitle('Create Branch')
+    } else {
+      setModalTitle('Branch List')
+    }
+  }, [viewState, setModalTitle])
 
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading')
@@ -140,8 +153,6 @@ export const EditoralBranchSwitcher = ({
     }
   }, [listState, branchList.length])
 
-  console.log('List', branchList)
-
   return (
     <div className="w-full flex justify-center p-5">
       <div className="w-full max-w-form">
@@ -171,6 +182,12 @@ export const EditoralBranchSwitcher = ({
               </Button>
             </p>
           </div>
+        ) : viewState === 'create' ? (
+          <BranchCreator
+            currentBranch={currentBranch}
+            setViewState={setViewState}
+            handleCreateBranch={handleCreateBranch}
+          />
         ) : listState === 'loading' ? (
           <div style={{ margin: '32px auto', textAlign: 'center' }}>
             <LoadingDots color={'var(--tina-color-primary)'} />
@@ -181,8 +198,8 @@ export const EditoralBranchSwitcher = ({
               <BranchSelector
                 currentBranch={currentBranch}
                 branchList={branchList}
-                onCreateBranch={(newBranch) => {
-                  handleCreateBranch(newBranch)
+                createBranch={() => {
+                  setViewState('create')
                 }}
                 onChange={(branchName) => {
                   chooseBranch(branchName)
@@ -255,16 +272,70 @@ const sortBranchListFn = (sortValue: 'default' | 'updated' | 'name') => {
   }
 }
 
+const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
+  const [branchName, setBranchName] = React.useState('')
+
+  return (
+    <form>
+      <div className="">
+        <p className="text-base text-gray-700 mb-4">
+          Createa new branch from <strong>{currentBranch}</strong>.
+        </p>
+        <div className="mb-3">
+          <FieldLabel name="current-branch-name">
+            Current Branch Name
+          </FieldLabel>
+          <BaseTextField
+            name="current-branch-name"
+            value={currentBranch}
+            disabled
+          />
+        </div>
+        <div className="mb-6">
+          <FieldLabel name="branch-name">New Branch Name</FieldLabel>
+          <PrefixedTextField
+            placeholder=""
+            name="branch-name"
+            value={branchName}
+            onChange={(e) => setBranchName(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="w-full flex justify-between gap-4 items-center">
+        <Button
+          style={{ flexGrow: 1 }}
+          onClick={() => {
+            setViewState('list')
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          type="submit"
+          style={{ flexGrow: 2 }}
+          disabled={branchName === ''}
+          onClick={() => {
+            handleCreateBranch(branchName)
+          }}
+        >
+          Create Branch <BiGitBranch className="w-5 h-full ml-1 opacity-70" />
+        </Button>
+      </div>
+    </form>
+  )
+}
+
 const BranchSelector = ({
   branchList,
   currentBranch,
-  onCreateBranch,
   onChange,
+  createBranch,
 }: {
   branchList: Branch[]
   currentBranch: string
-  onCreateBranch: (branchName: string) => void
   onChange: (branchName: string) => void
+  createBranch: () => void
 }) => {
   const [search, setSearch] = React.useState('')
   const [filter, setFilter] = React.useState<'content' | 'all'>('content')
@@ -283,37 +354,33 @@ const BranchSelector = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex space-x-4">
+      <div className="flex items-end space-x-4">
         <div>
           <label
-            htmlFor="sort"
+            htmlFor="search"
             className="text-xs mb-1 flex flex-col font-bold"
           >
-            Sort By
+            Search
           </label>
-          <Select
-            name="sort"
-            input={{
-              id: 'sort',
-              name: 'sort',
-              value: sortValue,
-              onChange: (e: any) => setSortValue(e.target.value),
-            }}
-            options={[
-              {
-                label: 'Default',
-                value: 'default',
-              },
-              {
-                label: 'Last Updated',
-                value: 'updated',
-              },
-              {
-                label: 'Branch Name',
-                value: 'name',
-              },
-            ]}
-          />
+          <div className="block relative group h-fit mb-auto">
+            <BaseTextField
+              placeholder="Search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {search === '' ? (
+              <BiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150" />
+            ) : (
+              <button
+                onClick={() => {
+                  setSearch('')
+                }}
+                className="outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150"
+              >
+                <MdOutlineClear className="w-5 h-auto text-gray-600" />
+              </button>
+            )}
+          </div>
         </div>
         <div>
           <label
@@ -344,31 +411,9 @@ const BranchSelector = ({
         </div>
         <div className="flex-1" />
         <div>
-          <label
-            htmlFor="search"
-            className="text-xs mb-1 flex flex-col font-bold"
-          >
-            Search
-          </label>
-          <div className="block relative group h-fit mb-auto">
-            <BaseTextField
-              placeholder="Search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            {search === '' ? (
-              <BiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150" />
-            ) : (
-              <button
-                onClick={() => {
-                  setSearch('')
-                }}
-                className="outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150"
-              >
-                <MdOutlineClear className="w-5 h-auto text-gray-600" />
-              </button>
-            )}
-          </div>
+          <Button variant="primary" onClick={createBranch}>
+            Create Branch <BiPlus className="w-5 h-full ml-1 opacity-70" />
+          </Button>
         </div>
       </div>
       {filteredBranchList.length === 0 && (
@@ -394,13 +439,13 @@ const BranchSelector = ({
                 key={branch.name}
               >
                 <div className="w-1/2">
-                  <div className="w-fit max-w-full">
-                    <div className="my-auto">
-                      {branch.protected && <BiLock />}
+                  <div className="flex items-center gap-1">
+                    <div className="flex-0">
+                      {branch.protected && (
+                        <BiLock className="w-5 h-auto opacity-70 text-blue-500" />
+                      )}
                     </div>
-                    <div className="truncate w-fit max-w-full">
-                      {branch.name}
-                    </div>
+                    <div className="truncate flex-1">{branch.name}</div>
                   </div>
                   {indexingStatus !== 'complete' && (
                     <div className="w-fit">
@@ -410,7 +455,7 @@ const BranchSelector = ({
                 </div>
                 <div className="flex-1">
                   <div className="text-xs font-bold">Last Updated</div>
-                  <span className="text-base leading-tight">
+                  <span className="text-sm leading-tight">
                     {formatDistanceToNow(
                       new Date(branch.indexStatus.timestamp),
                       {
@@ -422,11 +467,14 @@ const BranchSelector = ({
                 <div className="flex items-center">
                   {indexingStatus === 'complete' && !isCurrentBranch && (
                     <Button
+                      variant="white"
+                      size="custom"
                       onClick={() => {
                         onChange(branch.name)
                       }}
-                      className="mr-auto cursor-pointer"
+                      className="mr-auto cursor-pointer text-sm h-9 px-4 flex items-center gap-1"
                     >
+                      <BiPencil className="h-4 w-auto text-blue-500 opacity-70 -mt-px" />{' '}
                       Edit
                     </Button>
                   )}
@@ -436,6 +484,9 @@ const BranchSelector = ({
                         {
                           name: 'github-pr',
                           label: 'View in Github',
+                          Icon: (
+                            <BiLinkExternal className="w-5 h-auto text-blue-500 opacity-70" />
+                          ),
                           onMouseDown: () => {
                             window.open(branch.githubPullRequestUrl, '_blank')
                           },
