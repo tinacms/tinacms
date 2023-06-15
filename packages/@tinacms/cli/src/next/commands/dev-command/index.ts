@@ -11,13 +11,7 @@ import { Codegen } from '../../codegen'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { BaseCommand } from '../baseCommands'
 import { spin } from '../../../utils/spinner'
-import { MemoryLevel } from 'memory-level'
-import {
-  SearchIndexer,
-  si,
-  LocalSearchIndexClient,
-  lookupStopwords,
-} from '@tinacms/search'
+import { SearchIndexer, LocalSearchIndexClient } from '@tinacms/search'
 
 export class DevCommand extends BaseCommand {
   static paths = [['dev'], ['server:start']]
@@ -28,6 +22,9 @@ export class DevCommand extends BaseCommand {
   })
   noWatch = Option.Boolean('--noWatch', false, {
     description: "Don't regenerate config on file changes",
+  })
+  outputSearchIndexPath = Option.String('--outputSearchIndexPath', {
+    description: 'Path to write the search index to',
   })
 
   static usage = Command.Usage({
@@ -145,20 +142,16 @@ export class DevCommand extends BaseCommand {
       configManager.outputGitignorePath,
       'index.html\nassets/'
     )
-
-    // @ts-ignore
-    const searchIndex = await si({
-      db: new MemoryLevel(),
-      stopwords: lookupStopwords(
-        configManager.config.search?.tina?.stopwordLanguages
-      ),
+    const searchIndexClient = new LocalSearchIndexClient({
+      stopwordLanguages: configManager.config.search?.tina?.stopwordLanguages,
+      tokenSplitRegex: configManager.config.search?.tina?.tokenSplitRegex,
     })
-    const searchIndexClient = new LocalSearchIndexClient(searchIndex)
+    await searchIndexClient.onStartIndexing()
 
     const server = await createDevServer(
       configManager,
       database,
-      searchIndex,
+      searchIndexClient.searchIndex,
       apiURL,
       this.noWatch
     )
@@ -192,6 +185,10 @@ export class DevCommand extends BaseCommand {
         },
         text: 'Building search index',
       })
+
+      if (this.outputSearchIndexPath) {
+        await searchIndexClient.export(this.outputSearchIndexPath)
+      }
     }
 
     if (!this.noWatch) {

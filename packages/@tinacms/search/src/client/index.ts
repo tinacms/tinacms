@@ -6,17 +6,50 @@ import { MemoryLevel } from 'memory-level'
 import { lookupStopwords } from '../index'
 import fetch, { Headers } from 'node-fetch'
 
+const DEFAULT_TOKEN_SPLIT_REGEX = /[\p{L}\d_]+/gu
+
+type TinaSearchIndexerClientOptions = {
+  stopwordLanguages?: string[]
+  tokenSplitRegex?: string
+}
+
+type TinaCloudSearchIndexerClientOptions = {
+  apiUrl: string
+  branch: string
+  indexerToken: string
+} & TinaSearchIndexerClientOptions
+
 export class LocalSearchIndexClient implements SearchClient {
-  protected searchIndex: any
-  constructor(searchIndex: any) {
-    this.searchIndex = searchIndex
+  public searchIndex: any
+  protected readonly memoryLevel: MemoryLevel
+  private readonly stopwords: string[]
+  private readonly tokenSplitRegex: RegExp
+  constructor(options: TinaSearchIndexerClientOptions) {
+    this.memoryLevel = new MemoryLevel()
+    this.stopwords = lookupStopwords(options.stopwordLanguages)
+    this.tokenSplitRegex = options.tokenSplitRegex
+      ? new RegExp(options.tokenSplitRegex, 'gu')
+      : DEFAULT_TOKEN_SPLIT_REGEX
+  }
+  async onStartIndexing() {
+    this.searchIndex = await si({
+      db: this.memoryLevel,
+      stopwords: this.stopwords,
+      tokenSplitRegex: this.tokenSplitRegex,
+    })
   }
 
   async put(docs: any[]) {
+    if (!this.searchIndex) {
+      throw new Error('onStartIndexing must be called first')
+    }
     return this.searchIndex.PUT(docs)
   }
 
   async del(ids: string[]) {
+    if (!this.searchIndex) {
+      throw new Error('onStartIndexing must be called first')
+    }
     return this.searchIndex.DELETE(ids)
   }
 
@@ -36,48 +69,27 @@ export class LocalSearchIndexClient implements SearchClient {
       total: 0,
     })
   }
+
+  async export(filename: string) {
+    const sqliteLevel = new SqliteLevel({ filename })
+    const iterator = this.memoryLevel.iterator()
+    for await (const [key, value] of iterator) {
+      await sqliteLevel.put(key, value)
+    }
+    await sqliteLevel.close()
+  }
 }
 
-type TinaCloudSearchIndexerClientOptions = {
-  apiUrl: string
-  branch: string
-  indexerToken: string
-  stopwordLanguages?: string[]
-}
-
-export class TinaCMSSearchIndexClient implements SearchClient {
-  private memoryLevel: MemoryLevel
-  private searchIndex: any
+export class TinaCMSSearchIndexClient extends LocalSearchIndexClient {
   private readonly apiUrl: string
   private readonly branch: string
   private readonly indexerToken: string
-  private readonly stopwordLanguages: string[] | undefined
   constructor(options: TinaCloudSearchIndexerClientOptions) {
+    super(options)
+
     this.apiUrl = options.apiUrl
     this.branch = options.branch
     this.indexerToken = options.indexerToken
-    this.stopwordLanguages = options.stopwordLanguages
-  }
-
-  async put(docs: any[]) {
-    if (this.searchIndex) {
-      await this.searchIndex.PUT(docs)
-    }
-  }
-
-  async del(ids: string[]) {
-    if (this.searchIndex) {
-      await this.searchIndex.DELETE(ids)
-    }
-  }
-
-  async onStartIndexing() {
-    this.memoryLevel = new MemoryLevel()
-    // @ts-ignore
-    this.searchIndex = await si({
-      db: this.memoryLevel,
-      stopwords: lookupStopwords(this.stopwordLanguages),
-    })
   }
 
   async onFinishIndexing() {
@@ -122,26 +134,5 @@ export class TinaCMSSearchIndexClient implements SearchClient {
         }\n${await res.text()}`
       )
     }
-  }
-
-  public getSearchIndex() {
-    return this.searchIndex
-  }
-
-  query(
-    query: string,
-    options: { cursor?: string; limit?: number } | undefined
-  ): Promise<{
-    results: any[]
-    total: number
-    nextCursor: string | null
-    prevCursor: string | null
-  }> {
-    return Promise.resolve({
-      nextCursor: undefined,
-      prevCursor: undefined,
-      results: [],
-      total: 0,
-    })
   }
 }

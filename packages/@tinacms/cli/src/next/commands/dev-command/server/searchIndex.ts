@@ -13,6 +13,7 @@ export const createSearchIndexRouter = ({
   const put = async (req, res) => {
     const { docs } = req.body as { docs: Record<string, any>[] }
     const result = await searchIndex.PUT(docs)
+    res.writeHead(200, { 'Content-Type': 'application/json' })
     res.end(JSON.stringify({ result }))
   }
 
@@ -29,6 +30,7 @@ export const createSearchIndexRouter = ({
         ...JSON.parse(optionsParam),
       }
     }
+    res.writeHead(200, { 'Content-Type': 'application/json' })
     if (query) {
       const result = await searchIndex.QUERY(JSON.parse(query), options)
       res.end(JSON.stringify(result))
@@ -45,6 +47,7 @@ export const createSearchIndexRouter = ({
       .slice(1)
       .join('/')
     const result = await searchIndex.DELETE(docId)
+    res.writeHead(200, { 'Content-Type': 'application/json' })
     res.end(JSON.stringify({ result }))
   }
 

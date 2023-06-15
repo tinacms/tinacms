@@ -607,6 +607,10 @@ export interface Config<
            * stopword languages to use (default: eng)
            */
           stopwordLanguages?: string[]
+          /**
+           * regex used for splitting tokens (default: /[\p{L}\d_]+/)
+           */
+          tokenSplitRegex?: string
         }
       }
   ) & {
