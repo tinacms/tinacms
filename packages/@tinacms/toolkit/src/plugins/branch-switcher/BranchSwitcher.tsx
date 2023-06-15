@@ -279,7 +279,7 @@ const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
     <form>
       <div className="">
         <p className="text-base text-gray-700 mb-4">
-          Createa new branch from <strong>{currentBranch}</strong>.
+          Create a new branch from <strong>{currentBranch}</strong>.
         </p>
         <div className="mb-3">
           <FieldLabel name="current-branch-name">
