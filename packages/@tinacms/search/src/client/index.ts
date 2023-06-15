@@ -33,6 +33,7 @@ export class LocalSearchIndexClient implements SearchClient {
   }
   async onStartIndexing() {
     this.searchIndex = await si({
+      // @ts-ignore
       db: this.memoryLevel,
       stopwords: this.stopwords,
       tokenSplitRegex: this.tokenSplitRegex,
