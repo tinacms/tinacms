@@ -16,6 +16,7 @@ const tinaSearchKey = z
   .object({
     indexerToken: z.string().optional(),
     stopwordLanguages: z.array(z.string()).nonempty().optional(),
+    tokenSplitRegex: z.string().optional(),
   })
   .strict()
   .optional()
