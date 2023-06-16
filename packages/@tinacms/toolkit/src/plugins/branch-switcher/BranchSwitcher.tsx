@@ -354,7 +354,6 @@ const BranchSelector = ({
   ).sort(sortBranchListFn(sortValue))
 
   const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
-  const previewUrl = previewFunction ? previewFunction()?.url : undefined
 
   return (
     <div className="flex flex-col gap-4">
@@ -495,13 +494,17 @@ const BranchSelector = ({
                             window.open(branch.githubPullRequestUrl, '_blank')
                           },
                         },
-                        previewUrl && {
-                          name: 'preview',
-                          label: 'Preview',
-                          onMouseDown: () => {
-                            window.open(previewUrl, '_blank')
+                        typeof previewFunction === 'function' &&
+                          previewFunction({ branch: branch.name }) && {
+                            name: 'preview',
+                            label: 'Preview',
+                            onMouseDown: () => {
+                              const previewUrl = previewFunction({
+                                branch: branch.name,
+                              })
+                              window.open(previewUrl, '_blank')
+                            },
                           },
-                        },
                       ].filter(Boolean)}
                     />
                   </div>

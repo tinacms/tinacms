@@ -21,8 +21,8 @@ export const BranchBanner = () => {
   const windowWidth = useWindowWidth()
   const renderNavToggle = windowWidth < navBreakpoint + 1
   const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
-  const previewUrl = previewFunction ? previewFunction()?.url : null
   const branch = cms.api.tina.branch
+  const previewUrl = previewFunction ? previewFunction({ branch })?.url : null
 
   return (
     <>
@@ -46,12 +46,7 @@ export const BranchBanner = () => {
             variant="white"
             size="small"
             onClick={() => {
-              window.open(
-                cms.api.tina.schema?.config?.config?.ui?.previewUrl({
-                  branch: branch,
-                })?.url,
-                '_blank'
-              )
+              window.open(previewUrl, '_blank')
             }}
           >
             <BiLinkExternal className="flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1" />
