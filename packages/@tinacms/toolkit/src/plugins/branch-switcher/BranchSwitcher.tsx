@@ -21,7 +21,6 @@ import { FaSpinner } from 'react-icons/fa'
 import { useCMS } from '../../packages/react-core'
 import { BranchSwitcherLegacy } from './BranchSwitcherLegecy'
 import { formatDistanceToNow } from 'date-fns'
-import { Dropdown } from '../../packages/fields/plugins/MdxFieldPlugin/plate/plugins/ui/dropdown'
 
 type ListState = 'loading' | 'ready' | 'error'
 
@@ -236,6 +235,8 @@ export const getFilteredBranchList = (
         branch.name === currentBranchName
     )
     .filter((branch) => {
+      // always show protected branches (e.g. main)
+      if (branch.protected) return true
       if (filter === 'all') return true
       if (filter === 'content') {
         return branch.name.startsWith('tina/')
@@ -500,7 +501,7 @@ const BranchSelector = ({
                                   window.open(
                                     cms.api.tina.schema?.config?.config?.ui?.previewUrl(
                                       { branch: branch.name }
-                                    ),
+                                    )?.url,
                                     '_blank'
                                   )
                                 },

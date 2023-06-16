@@ -4,6 +4,7 @@ import { useBranchData } from './BranchData'
 import { BranchModal } from './BranchModal'
 import { Button } from '../../packages/styles'
 import { useWindowWidth } from '@react-hook/window-size'
+import { useCMS } from '../../react-tinacms/use-cms'
 
 // trim 'tina/' prefix from branch name
 const trimPrefix = (branchName: string) => {
@@ -11,6 +12,7 @@ const trimPrefix = (branchName: string) => {
 }
 
 export const BranchBanner = () => {
+  const cms = useCMS()
   const [open, setOpen] = React.useState(false)
   const openModal = () => setOpen(true)
   const { currentBranch } = useBranchData()
@@ -18,6 +20,9 @@ export const BranchBanner = () => {
   const navBreakpoint = 1000
   const windowWidth = useWindowWidth()
   const renderNavToggle = windowWidth < navBreakpoint + 1
+  const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
+  const previewUrl = previewFunction ? previewFunction()?.url : null
+  const branch = cms.api.tina.branch
 
   return (
     <>
@@ -36,10 +41,23 @@ export const BranchBanner = () => {
             aria-hidden="true"
           />
         </Button>
-        <Button variant="white" size="small" onClick={() => {}}>
-          <BiLinkExternal className="flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1" />
-          Preview
-        </Button>
+        {previewUrl && (
+          <Button
+            variant="white"
+            size="small"
+            onClick={() => {
+              window.open(
+                cms.api.tina.schema?.config?.config?.ui?.previewUrl({
+                  branch: branch,
+                })?.url,
+                '_blank'
+              )
+            }}
+          >
+            <BiLinkExternal className="flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1" />
+            Preview
+          </Button>
+        )}
       </div>
       {open && (
         <BranchModal
