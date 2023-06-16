@@ -1,5 +1,20 @@
 # Change Log
 
+## 1.7.6
+
+### Patch Changes
+
+- Updated dependencies [ee9acb5e5]
+  - @tinacms/search@1.0.2
+
+## 1.7.5
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+- Updated dependencies [c385b5615]
+  - @tinacms/search@1.0.1
+
 ## 1.7.4
 
 ### Patch Changes

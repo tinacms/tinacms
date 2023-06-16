@@ -4,7 +4,6 @@ import postcssNested from 'postcss-nested/index.js'
 import tailwindNesting from 'tailwindcss/nesting/index.js'
 import defaultTheme from 'tailwindcss/defaultTheme.js'
 import twTypography from '@tailwindcss/typography'
-import lineClamp from '@tailwindcss/line-clamp'
 import aspectRatio from '@tailwindcss/aspect-ratio'
 import path from 'path'
 
@@ -236,7 +235,6 @@ export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
         content,
         plugins: [
           twTypography({ className: 'tina-prose' }),
-          lineClamp,
           aspectRatio,
         ],
       }) as unknown as Plugin
