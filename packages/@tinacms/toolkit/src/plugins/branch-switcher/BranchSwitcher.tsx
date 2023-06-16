@@ -481,33 +481,36 @@ const BranchSelector = ({
                       Edit
                     </Button>
                   )}
-                  <div className="ml-auto">
-                    <OverflowMenu
-                      toolbarItems={[
-                        branch.githubPullRequestUrl && {
-                          name: 'github-pr',
-                          label: 'View in Github',
-                          Icon: (
-                            <BiLinkExternal className="w-5 h-auto text-blue-500 opacity-70" />
-                          ),
-                          onMouseDown: () => {
-                            window.open(branch.githubPullRequestUrl, '_blank')
-                          },
-                        },
-                        typeof previewFunction === 'function' &&
-                          previewFunction({ branch: branch.name }) && {
-                            name: 'preview',
-                            label: 'Preview',
+                  {(branch.githubPullRequestUrl ||
+                    typeof previewFunction === 'function') && (
+                    <div className="ml-auto">
+                      <OverflowMenu
+                        toolbarItems={[
+                          branch.githubPullRequestUrl && {
+                            name: 'github-pr',
+                            label: 'View in Github',
+                            Icon: (
+                              <BiLinkExternal className="w-5 h-auto text-blue-500 opacity-70" />
+                            ),
                             onMouseDown: () => {
-                              const previewUrl = previewFunction({
-                                branch: branch.name,
-                              })
-                              window.open(previewUrl, '_blank')
+                              window.open(branch.githubPullRequestUrl, '_blank')
                             },
                           },
-                      ].filter(Boolean)}
-                    />
-                  </div>
+                          typeof previewFunction === 'function' &&
+                            previewFunction({ branch: branch.name }) && {
+                              name: 'preview',
+                              label: 'Preview',
+                              onMouseDown: () => {
+                                const previewUrl = previewFunction({
+                                  branch: branch.name,
+                                })
+                                window.open(previewUrl, '_blank')
+                              },
+                            },
+                        ].filter(Boolean)}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             )
