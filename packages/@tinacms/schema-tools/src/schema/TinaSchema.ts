@@ -51,18 +51,6 @@ export class TinaSchema {
         if (collection.format === 'mdx') {
           field.parser = { type: 'mdx' }
         } else {
-          field.templates?.forEach((template) => {
-            if (!template.match) {
-              console.warn(
-                `WARNING: Found rich-text template at ${
-                  collection.name
-                }.${path.join(
-                  '.'
-                )} with no matches property.\nVisit https://tina.io/docs/reference/types/rich-text/#custom-shortcode-syntax to learn more
-                `
-              )
-            }
-          })
           field.parser = { type: 'markdown' }
         }
       }
