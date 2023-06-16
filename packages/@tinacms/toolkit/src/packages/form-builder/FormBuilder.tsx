@@ -175,8 +175,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
       onSubmit={async (values, form, cb) => {
         const schema: TinaSchema = cms.api.tina.schema
         const collection = schema.getCollectionByFullPath(tinaForm.relativePath)
-        const valOverride = collection?.onSubmit
-          ? await collection.onSubmit({ cms, form, values })
+        const valOverride = collection?.ui?.onSubmit
+          ? await collection?.ui?.onSubmit({ cms, form, values, tinaForm })
           : false
         return tinaForm.onSubmit(valOverride || values, form, cb)
       }}

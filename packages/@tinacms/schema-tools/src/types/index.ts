@@ -699,14 +699,6 @@ interface BaseCollection {
     include?: string
     exclude?: string
   }
-  /**
-   * This callback function is called when a form is saved.
-   */
-  onSubmit?: (arg: {
-    values: Record<string, unknown>
-    cms: unknown
-    form: unknown
-  }) => Promise<void | Record<string, unknown>>
 }
 
 type TemplateCollection<WithNamespace extends boolean = false> = {
@@ -789,6 +781,16 @@ export interface UICollection {
     document: Document
     collection: Collection<true>
   }) => string | undefined
+
+  /**
+   * This callback function is called when a form is saved.
+   */
+  onSubmit?: (arg: {
+    values: Record<string, unknown>
+    cms: any
+    form: any
+    tinaForm: any
+  }) => Promise<void | Record<string, unknown>>
 }
 
 export type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
