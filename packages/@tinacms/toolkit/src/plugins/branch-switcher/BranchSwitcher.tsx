@@ -353,6 +353,9 @@ const BranchSelector = ({
     filter
   ).sort(sortBranchListFn(sortValue))
 
+  const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
+  const previewUrl = previewFunction ? previewFunction()?.url : undefined
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-end space-x-4">
@@ -482,7 +485,7 @@ const BranchSelector = ({
                   <div className="ml-auto">
                     <OverflowMenu
                       toolbarItems={[
-                        {
+                        branch.githubPullRequestUrl && {
                           name: 'github-pr',
                           label: 'View in Github',
                           Icon: (
@@ -492,23 +495,14 @@ const BranchSelector = ({
                             window.open(branch.githubPullRequestUrl, '_blank')
                           },
                         },
-                        ...(cms.api.tina.schema?.config?.config?.ui?.previewUrl
-                          ? [
-                              {
-                                name: 'preview',
-                                label: 'Preview',
-                                onMouseDown: () => {
-                                  window.open(
-                                    cms.api.tina.schema?.config?.config?.ui?.previewUrl(
-                                      { branch: branch.name }
-                                    )?.url,
-                                    '_blank'
-                                  )
-                                },
-                              },
-                            ]
-                          : []),
-                      ]}
+                        previewUrl && {
+                          name: 'preview',
+                          label: 'Preview',
+                          onMouseDown: () => {
+                            window.open(previewUrl, '_blank')
+                          },
+                        },
+                      ].filter(Boolean)}
                     />
                   </div>
                 </div>
