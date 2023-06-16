@@ -1066,7 +1066,7 @@ importers:
       memory-level: ^1.0.0
       module-error: ^1.0.2
       node-fetch: '2'
-      search-index: 4.0.0-rc1
+      search-index: 4.0.0
       sqlite-level: ^1.0.1
       stopword: ^2.0.8
       typescript: 4.3.5
@@ -1077,7 +1077,7 @@ importers:
       memory-level: 1.0.0
       module-error: 1.0.2
       node-fetch: 2.6.7
-      search-index: 4.0.0-rc1_abstract-level@1.0.3
+      search-index: 4.0.0_abstract-level@1.0.3
       sqlite-level: 1.0.1
       stopword: 2.0.8
     devDependencies:
@@ -19101,10 +19101,10 @@ packages:
     dependencies:
       pend: 1.2.0
 
-  /fergies-inverted-index/12.0.0-rc1_abstract-level@1.0.3:
+  /fergies-inverted-index/12.0.0_abstract-level@1.0.3:
     resolution:
       {
-        integrity: sha512-jpCKZIvSHYZhoi9+m+gxBzteHWLUNFkS0c+GNh1j8kbFJJmWTP52cdTaMm+0z+05Bs3vCis6f2ke/OE/LP6Nrw==,
+        integrity: sha512-lAkyiDSdQog0aqWhyO8/8gnwbh6k27bd18IWJw7IOl2EUWEh22O4C9ebnw8Li3E+HK3Plxgv6ql1Ty/C3gndvg==,
       }
     dependencies:
       browser-level: 1.0.1
@@ -23760,6 +23760,14 @@ packages:
     engines: { node: '>=8' }
     dev: false
 
+  /lru-cache/10.0.0:
+    resolution:
+      {
+        integrity: sha512-svTf/fzsKHffP42sujkO/Rjs37BCIsQVRCeNYIm9WN8rgT7ffoUnRtZCqU+6BqcSBdv8gwJeTz8knJpgACeQMw==,
+      }
+    engines: { node: 14 || >=16.14 }
+    dev: false
+
   /lru-cache/4.1.5:
     resolution:
       {
@@ -23786,14 +23794,6 @@ packages:
     engines: { node: '>=10' }
     dependencies:
       yallist: 4.0.0
-
-  /lru-cache/7.18.3:
-    resolution:
-      {
-        integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==,
-      }
-    engines: { node: '>=12' }
-    dev: false
 
   /lunr/2.3.9:
     resolution:
@@ -29341,18 +29341,18 @@ packages:
       compute-scroll-into-view: 1.0.17
     dev: false
 
-  /search-index/4.0.0-rc1_abstract-level@1.0.3:
+  /search-index/4.0.0_abstract-level@1.0.3:
     resolution:
       {
-        integrity: sha512-bRiBLuF7fV1drTWQZX1zgDKuzMrYKhujQQu2TLDCc3wgpDSNcIbE6c4/laiM189cGSPb9sK/SRn9oaIBJ63JbQ==,
+        integrity: sha512-D3MRIWXO5yF5c33B1DLh8yqWvJu4gaH9gaKUNeWIZMkwb/+j2y/wOe1OB1dyoFvBw3aUCxYZQJJDZK02HOGrDQ==,
       }
     engines: { node: '>=12' }
     dependencies:
       browser-level: 1.0.1
       charwise: 3.0.1
-      fergies-inverted-index: 12.0.0-rc1_abstract-level@1.0.3
+      fergies-inverted-index: 12.0.0_abstract-level@1.0.3
       level-read-stream: 1.1.0_abstract-level@1.0.3
-      lru-cache: 7.18.3
+      lru-cache: 10.0.0
       memory-level: 1.0.0
       ngraminator: 3.0.2
       p-queue: 7.3.4
