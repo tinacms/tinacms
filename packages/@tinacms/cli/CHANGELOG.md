@@ -1,5 +1,32 @@
 # tinacms-cli
 
+## 1.5.19
+
+### Patch Changes
+
+- 1751f2fd3: Update tailwind.ts
+- Updated dependencies [ee9acb5e5]
+- Updated dependencies [a94e123b6]
+  - @tinacms/search@1.0.2
+  - @tinacms/schema-tools@1.4.6
+  - @tinacms/graphql@1.4.17
+  - @tinacms/app@1.2.17
+  - @tinacms/datalayer@1.2.17
+
+## 1.5.18
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+- 1c78bafc2: Fix local search indexing to properly update the index on filesystem changes
+- Updated dependencies [c385b5615]
+- Updated dependencies [1c78bafc2]
+  - @tinacms/schema-tools@1.4.5
+  - @tinacms/graphql@1.4.16
+  - @tinacms/search@1.0.1
+  - @tinacms/datalayer@1.2.16
+  - @tinacms/app@1.2.16
+
 ## 1.5.17
 
 ### Patch Changes

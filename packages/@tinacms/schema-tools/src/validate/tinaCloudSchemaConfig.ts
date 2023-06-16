@@ -15,6 +15,7 @@ const tinaConfigKey = z
 const tinaSearchKey = z
   .object({
     indexerToken: z.string().optional(),
+    stopwordLanguages: z.array(z.string()).nonempty().optional(),
   })
   .strict()
   .optional()
@@ -30,6 +31,8 @@ export const tinaConfigZod = z.object({
     .object({
       tina: tinaSearchKey,
       searchClient: z.any().optional(),
+      indexBatchSize: z.number().gte(1).optional(),
+      maxSearchIndexFieldLength: z.number().gte(1).optional(),
     })
     .optional(),
 })

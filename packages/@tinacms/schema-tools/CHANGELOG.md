@@ -1,5 +1,17 @@
 # @tinacms/schema-tools
 
+## 1.4.6
+
+### Patch Changes
+
+- a94e123b6: Fix optional config validation for search
+
+## 1.4.5
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+
 ## 1.4.4
 
 ### Patch Changes
