@@ -497,13 +497,13 @@ const BranchSelector = ({
                             },
                           },
                           typeof previewFunction === 'function' &&
-                            previewFunction({ branch: branch.name }) && {
+                            previewFunction({ branch: branch.name })?.url && {
                               name: 'preview',
                               label: 'Preview',
                               onMouseDown: () => {
                                 const previewUrl = previewFunction({
                                   branch: branch.name,
-                                })
+                                })?.url
                                 window.open(previewUrl, '_blank')
                               },
                             },
