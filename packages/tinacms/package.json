@@ -29,6 +29,11 @@
       "import": "./dist/rich-text/index.es.js",
       "require": "./dist/rich-text/index.js"
     },
+    "./dist/dev-tools": {
+      "types": "./dist/dev-tools.d.ts",
+      "import": "./dist/dev-tools.es.js",
+      "require": "./dist/dev-tools.js"
+    },
     "./dist/rich-text/prism": {
       "types": "./dist/rich-text/prism.d.ts",
       "import": "./dist/rich-text/prism.es.js",
@@ -45,7 +50,8 @@
       "src/rich-text/index.tsx",
       "src/rich-text/prism.tsx",
       "src/react.tsx",
-      "src/client.ts"
+      "src/client.ts",
+      "src/dev-tools.tsx"
     ]
   },
   "typings": "dist/index.d.ts",
