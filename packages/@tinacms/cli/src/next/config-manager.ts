@@ -362,7 +362,6 @@ export class ConfigManager {
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
-    const external = ['react', 'react-dom', 'next']
     await fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
@@ -371,7 +370,7 @@ export class ConfigManager {
       platform: 'browser',
       format: 'esm',
       logLevel: 'silent',
-      external: ['tinacms', ...external],
+      external: ['tinacms', 'react', 'react-dom', 'next'],
       ignoreAnnotations: true,
       outfile: prebuild,
       loader: loaders,
@@ -388,7 +387,6 @@ export class ConfigManager {
       entryPoints: [configFilePath],
       bundle: true,
       target: ['es2020'],
-      external,
       logLevel: 'silent',
       platform: 'node',
       outfile,
@@ -400,7 +398,6 @@ export class ConfigManager {
       // Suppress warning about comparison with -0 from client module
       logLevel: 'silent',
       platform: 'node',
-      external,
       outfile: outfile2,
       loader: loaders,
     })
