@@ -93,7 +93,12 @@ export const getDeepestMetadata = (state: Object, complexKey: string): any => {
     }
     const value = current[key]
     if (value?._tina_metadata) {
-      metadata = value._tina_metadata
+      // We're at a reference field, we don't want to select the
+      // reference form, just the reference select field
+      if (complexKey === value._tina_metadata?.prefix && metadata) {
+      } else {
+        metadata = value._tina_metadata
+      }
     }
     current = value
   }

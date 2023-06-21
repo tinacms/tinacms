@@ -180,10 +180,13 @@ export const tinaField = <
     }
   }
 >(
-  object: T,
+  object: T | undefined | null,
   property?: keyof Omit<T, '__typename' | '_sys'>,
   index?: number
 ) => {
+  if (!object) {
+    return ''
+  }
   if (object._content_source) {
     if (!property) {
       return [
