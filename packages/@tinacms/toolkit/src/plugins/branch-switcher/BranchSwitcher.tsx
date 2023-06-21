@@ -317,7 +317,7 @@ const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
           style={{ flexGrow: 2 }}
           disabled={branchName === ''}
           onClick={() => {
-            handleCreateBranch(branchName)
+            handleCreateBranch('tina/' + branchName)
           }}
         >
           Create Branch <BiGitBranch className="w-5 h-full ml-1 opacity-70" />
