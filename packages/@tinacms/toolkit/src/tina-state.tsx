@@ -129,6 +129,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       return {
         ...state,
         quickEditSupported: false,
+        activeFormId: null,
         formLists: [],
         forms: [],
       }
@@ -150,12 +151,14 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       let activeFormId = state.activeFormId
       if (!activeFormId && state.formLists.length === 0) {
         action.value.items.forEach((item) => {
-          if (item.type === 'document') {
-            const form = state.forms.find(
-              ({ tinaForm }) => item.formId === tinaForm.id
-            )
-            if (!form.tinaForm.global) {
-              activeFormId = item.formId
+          if (!activeFormId) {
+            if (item.type === 'document') {
+              const form = state.forms.find(
+                ({ tinaForm }) => item.formId === tinaForm.id
+              )
+              if (!form.tinaForm.global) {
+                activeFormId = item.formId
+              }
             }
           }
         })

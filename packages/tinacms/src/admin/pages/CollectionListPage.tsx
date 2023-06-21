@@ -223,6 +223,8 @@ const CollectionListPage = () => {
     // reset state when the route is changed
     setEndCursor('')
     setPrevCursors([])
+    setSearch('')
+    setSearchInput('')
   }, [loc])
 
   useEffect(() => {
