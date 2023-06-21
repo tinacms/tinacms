@@ -66,6 +66,7 @@
     "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.5",
     "@monaco-editor/react": "4.4.5",
+    "@radix-ui/react-popover": "^1.0.6",
     "@react-aria/i18n": "^3.3.4",
     "@react-aria/listbox": "3.3.0",
     "@react-hook/window-size": "^3.0.7",
