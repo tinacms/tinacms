@@ -270,7 +270,7 @@ export const remarkToSlate = (
   const link = (content: Md.Link): Plate.LinkElement => {
     return {
       type: 'a',
-      url: content.url,
+      url: sanitizeUrl(content.url),
       title: content.title,
       children: flatten(
         content.children.map((child) => staticPhrasingContent(child))
@@ -397,7 +397,12 @@ export const remarkToSlate = (
         const children = flatten(
           node.children.map((child) => phrashingMark(child, marks))
         )
-        accum.push({ type: 'a', url: node.url, title: node.title, children })
+        accum.push({
+          type: 'a',
+          url: sanitizeUrl(node.url),
+          title: node.title,
+          children,
+        })
         break
       }
       case 'text':
@@ -500,4 +505,26 @@ export class RichTextParseError extends Error {
     // Custom debugging information
     this.position = position
   }
+}
+
+// Prevent javascript scheme (eg. `javascript:alert(document.domain)`)
+const sanitizeUrl = (url: string | undefined) => {
+  const allowedSchemes = ['http', 'https', 'mailto', 'tel']
+  if (!url) return ''
+
+  let parsedUrl: URL | null = null
+
+  try {
+    parsedUrl = new URL(url)
+  } catch (error) {
+    return url
+  }
+
+  const scheme = parsedUrl.protocol.slice(0, -1)
+  if (allowedSchemes && !allowedSchemes.includes(scheme)) {
+    console.warn(`Invalid URL scheme detected ${scheme}`)
+    return ''
+  }
+
+  return parsedUrl.href
 }
