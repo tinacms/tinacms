@@ -16,7 +16,6 @@
     "searchindex": "tinacms search-index"
   },
   "dependencies": {
-    "@cypress/chrome-recorder": "^2.2.0",
     "@headlessui/react": "^1.7.3",
     "@heroicons/react": "^2.0.12",
     "@tailwindcss/typography": "^0.5.7",

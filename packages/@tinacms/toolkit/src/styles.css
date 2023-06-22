@@ -19,6 +19,8 @@
 /* if the last block has margin-bottom it makes the text box larger but some of it isn't clickable */
 .tina-prose [data-slate-editor='true'] {
   padding-bottom: 0.5em;
+  /* Outline is placed on the parent element for styling consistency with other elements */
+  outline: none;
 }
 /* prose adds backticks, which look like they should be editable */
 .tina-prose [data-slate-editor='true'] .slate-code::before {

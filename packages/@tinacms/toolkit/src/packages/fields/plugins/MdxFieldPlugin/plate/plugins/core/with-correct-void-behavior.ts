@@ -4,6 +4,7 @@
 
 */
 
+import { isElement } from '@udecode/plate-headless'
 import { Editor, Node, Path, Range, Transforms } from 'slate'
 
 /**
@@ -24,13 +25,15 @@ export const withCorrectVoidBehavior = (editor) => {
 
     const selectedNodePath = Path.parent(editor.selection.anchor.path)
     const selectedNode = Node.get(editor, selectedNodePath)
-    if (Editor.isVoid(editor, selectedNode)) {
-      Editor.insertNode(editor, {
-        // @ts-ignore bad type from slate
-        type: 'p',
-        children: [{ text: '' }],
-      })
-      return
+    if (isElement(selectedNode)) {
+      if (Editor.isVoid(editor, selectedNode)) {
+        Editor.insertNode(editor, {
+          // @ts-ignore bad type from slate
+          type: 'p',
+          children: [{ text: '' }],
+        })
+        return
+      }
     }
 
     insertBreak()
@@ -53,14 +56,16 @@ export const withCorrectVoidBehavior = (editor) => {
     if (parentIsEmpty && Path.hasPrevious(parentPath)) {
       const prevNodePath = Path.previous(parentPath)
       const prevNode = Node.get(editor, prevNodePath)
-      if (Editor.isVoid(editor, prevNode)) {
-        Transforms.removeNodes(editor)
-        // Deleting a top-level void node results in an empty array for the value
-        // Normalizing kicks in some of the other normalization logic which
-        // prevents this from happening. I'm not sure when/why normalize runs
-        // but for whatever reason it doesn't happen unless we force it
-        Editor.normalize(editor, { force: true })
-        return
+      if (isElement(prevNode)) {
+        if (Editor.isVoid(editor, prevNode)) {
+          Transforms.removeNodes(editor)
+          // Deleting a top-level void node results in an empty array for the value
+          // Normalizing kicks in some of the other normalization logic which
+          // prevents this from happening. I'm not sure when/why normalize runs
+          // but for whatever reason it doesn't happen unless we force it
+          Editor.normalize(editor, { force: true })
+          return
+        }
       }
     }
 
