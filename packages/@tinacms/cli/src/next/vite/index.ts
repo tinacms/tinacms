@@ -120,10 +120,9 @@ export const createConfig = async ({
             ignored: ['**/*'],
           }
         : {
-            // Since we prebuild the file, the prebuild is the only file the Vite server should
-            // know/care about
+            // Ignore everything except for the alias fields we specified above
             ignored: [
-              `${configManager.tinaFolderPath}/**/!(config.prebuild.jsx)`,
+              `${configManager.tinaFolderPath}/**/!(config.prebuild.jsx|_graphql.json)`,
             ],
           },
       fs: {

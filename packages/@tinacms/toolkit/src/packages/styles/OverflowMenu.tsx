@@ -1,14 +1,15 @@
 import React from 'react'
-import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components'
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
+import * as Popover from '@radix-ui/react-popover'
+
 export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
   return (
-    <DialogTrigger>
-      <Button
+    <Popover.Root>
+      <Popover.Trigger
         className={`cursor-pointer relative justify-center inline-flex border items-center p-3 text-sm font-medium focus:outline-1 focus:outline-blue-200 pointer-events-auto ${
           open ? `text-blue-400` : `text-gray-300 hover:text-blue-500`
         } ${className}}`}
@@ -27,9 +28,9 @@ export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
             d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
           />
         </svg>
-      </Button>
-      <Popover placement="bottom right">
-        <Dialog className="focus:outline-none">
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content style={{ zIndex: 20000 }} align="end">
           <div className="mt-0 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1">
             {toolbarItems.map((toolbarItem) => {
               return (
@@ -38,7 +39,6 @@ export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
                   key={toolbarItem.name}
                   onMouseDown={(event) => {
                     event.preventDefault()
-                    // close()
                     toolbarItem.onMouseDown(event)
                   }}
                   className={classNames(
@@ -54,8 +54,8 @@ export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
               )
             })}
           </div>
-        </Dialog>
-      </Popover>
-    </DialogTrigger>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   )
 }
