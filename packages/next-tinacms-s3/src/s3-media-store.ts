@@ -20,7 +20,7 @@ export class S3MediaStore implements MediaStore {
   accept = DEFAULT_MEDIA_UPLOAD_TYPES
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
-    let newFiles: Media[] = []
+    const newFiles: Media[] = []
 
     for (const item of media) {
       const { file, directory } = item

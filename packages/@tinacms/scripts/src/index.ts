@@ -573,7 +573,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
       {
         name: 'vite-plugin-tina',
         config: (_, env) => {
-          let plugins = []
+          const plugins = []
 
           const tw = tailwind(config(process.cwd()))
           plugins.push(tailwindNesting)

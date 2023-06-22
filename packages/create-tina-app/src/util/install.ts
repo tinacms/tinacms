@@ -43,7 +43,7 @@ export function install(
    */
   return new Promise((resolve, reject) => {
     let args: string[]
-    let command: string = useYarn ? 'yarnpkg' : 'npm'
+    const command: string = useYarn ? 'yarnpkg' : 'npm'
 
     if (dependencies && dependencies.length) {
       /**
