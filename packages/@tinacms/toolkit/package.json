@@ -3,7 +3,7 @@
   "version": "1.7.6",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.mjs",
   "keywords": [
     "tinacms",
     "cms",
@@ -16,7 +16,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     }
   },

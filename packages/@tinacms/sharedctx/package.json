@@ -2,11 +2,11 @@
   "name": "@tinacms/sharedctx",
   "version": "1.0.1",
   "main": "dist/index.js",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.mjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     }
   },
