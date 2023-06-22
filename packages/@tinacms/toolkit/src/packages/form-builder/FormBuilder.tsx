@@ -422,7 +422,16 @@ export const CreateBranchModel = ({
       JSON.stringify(values)
     )
     localStorage.setItem('tina.createBranchState.kind', crudType)
-    localStorage.setItem('tina.createBranchState.back', window.location.href)
+
+    if (crudType === 'create') {
+      localStorage.setItem(
+        'tina.createBranchState.back',
+        // go back to the list view
+        window.location.href.replace('/new', '')
+      )
+    } else {
+      localStorage.setItem('tina.createBranchState.back', window.location.href)
+    }
     const hash = window.location.hash
     const newHash = `#/branch/new?branch=${newBranchName}`
     const newUrl = window.location.href.replace(hash, newHash)
