@@ -1,5 +1,18 @@
 # @tinacms/app
 
+## 1.2.18
+
+### Patch Changes
+
+- 1176d569a: Ensure tinaField links to references land on the select field instead of the referenced form
+- Updated dependencies [c7fa6ddc0]
+- Updated dependencies [8710dec4b]
+- Updated dependencies [6e192cc38]
+- Updated dependencies [5aaae9902]
+  - tinacms@1.5.11
+  - @tinacms/toolkit@1.7.7
+  - @tinacms/mdx@1.3.13
+
 ## 1.2.17
 
 ### Patch Changes
