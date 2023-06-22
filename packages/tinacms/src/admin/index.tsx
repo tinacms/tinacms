@@ -123,7 +123,7 @@ const CheckSchema = ({
   const api = new TinaAdminApi(cms)
   const url = api.api.contentApiUrl
   const [schemaMissingError, setSchemaMissingError] = React.useState(false)
-  const currentBranch = cms.api.tina.branch
+  const currentBranch = decodeURIComponent(cms.api.tina.branch)
 
   useEffect(() => {
     if (schemaJson && cms) {
