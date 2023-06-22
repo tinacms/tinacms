@@ -27,7 +27,6 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.7.1",
-    "react-json-view": "^1.21.3",
     "remove": "^0.1.5",
     "tinacms": "workspace:*",
     "vite": "^3.1.3",

@@ -37,7 +37,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.2.0",
-    "styled-jsx": "^3.2.5",
     "tinacms": "workspace:*",
     "typescript": "^4.5.2"
   }
