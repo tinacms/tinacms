@@ -9,7 +9,7 @@ import DaysView from './views/DaysView'
 import MonthsView from './views/MonthsView'
 import YearsView from './views/YearsView'
 import TimeView from './views/TimeView'
-import onClickOutside from 'react-onclickoutside'
+import onClickOutside from 'react-onclickoutside/dist/react-onclickoutside.es'
 
 const viewModes = {
   YEARS: 'years',
