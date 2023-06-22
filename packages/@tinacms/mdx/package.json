@@ -78,8 +78,8 @@
     "typedoc": "^0.23.21",
     "typedoc-plugin-markdown": "^3.13.6",
     "typescript": "^4.7.4",
-    "vite": "4.1.4",
-    "vitest": "^0.18.0",
+    "vite": "^4.3.9",
+    "vitest": "^0.32.2",
     "concat-md": "^0.5.1"
   }
 }

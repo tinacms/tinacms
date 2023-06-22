@@ -32,7 +32,6 @@
     "@changesets/cli": "^2.26.0",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "5.15.0",
-    "@yarnpkg/pnpify": "^2.4.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-react": "^7.32.2",
@@ -45,14 +44,18 @@
   },
   "devDependencies": {
     "@types/jest": "^27.5.2",
-    "cypress": "9.5.3",
+    "cypress": "9.7.0",
     "husky": "^7.0.4",
     "turbo": "^1.8.5"
   },
   "pnpm": {
     "overrides": {
       "@types/react": "17.0.47",
-      "vm2@<3.9.11": ">=3.9.11"
+      "vm2": "3.9.19",
+      "json5": "1.0.2",
+      "ua-parser-js": "0.7.33",
+      "fast-xml-parser": "4.2.5",
+      "semver": "7.5.2"
     }
   }
 }
