@@ -410,12 +410,13 @@ const BranchSelector = ({
             ]}
           />
         </div>
-        <div className="flex-1" />
+        {/* TODO: Add this back when we implement on backend */}
+        {/* <div className="flex-1" />
         <div>
           <Button variant="primary" onClick={createBranch}>
             Create Branch <BiPlus className="w-5 h-full ml-1 opacity-70" />
           </Button>
-        </div>
+        </div> */}
       </div>
       {filteredBranchList.length === 0 && (
         <div className="block relative text-gray-300 italic py-1">
