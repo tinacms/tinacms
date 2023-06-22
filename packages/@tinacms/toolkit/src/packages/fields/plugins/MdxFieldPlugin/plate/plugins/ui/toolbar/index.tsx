@@ -7,7 +7,6 @@
 import * as React from 'react'
 import {
   useEditorState,
-  getPreventDefaultHandler,
   toggleMark,
   toggleNodeType,
   toggleList,
@@ -100,9 +99,11 @@ export function Toolbar({
       options: headers.map((item) => (
         <span
           key={item.name}
-          onMouseDown={getPreventDefaultHandler(toggleNodeType, editor, {
-            activeType: item.name,
-          })}
+          onMouseDown={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            toggleNodeType(editor, { activeType: item.name })
+          }}
           className={classNames(
             'hover:bg-gray-100 hover:text-gray-900 cursor-pointer block px-4 py-2 text-sm w-full text-left'
           )}
@@ -125,55 +126,71 @@ export function Toolbar({
       name: 'quote',
       label: 'Quote',
       active: blockQuoteActive,
-      onMouseDown: getPreventDefaultHandler(toggleNodeType, editor, {
-        activeType: ELEMENT_BLOCKQUOTE,
-      }),
+      onMouseDown: (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        toggleNodeType(editor, { activeType: ELEMENT_BLOCKQUOTE })
+      },
     },
     {
       name: 'ul',
       label: 'Bullet List',
       active: ulActive,
-      onMouseDown: getPreventDefaultHandler(toggleList, editor, {
-        type: ELEMENT_UL,
-      }),
+      onMouseDown: (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        toggleList(editor, { type: ELEMENT_UL })
+      },
     },
     {
       name: 'ol',
       label: 'List',
       active: olActive,
-      onMouseDown: getPreventDefaultHandler(toggleList, editor, {
-        type: ELEMENT_OL,
-      }),
+      onMouseDown: (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        toggleList(editor, { type: ELEMENT_OL })
+      },
     },
     {
       name: 'code',
       label: 'Code',
       active: isCodeActive,
-      onMouseDown: getPreventDefaultHandler(toggleMark, editor, {
-        key: MARK_CODE,
-      }),
+      onMouseDown: (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        toggleMark(editor, { key: MARK_CODE })
+      },
     },
     {
       name: 'codeBlock',
       label: 'Code Block',
       active: codeBlockActive,
-      onMouseDown: getPreventDefaultHandler(insertEmptyCodeBlock, editor),
+      onMouseDown: (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        insertEmptyCodeBlock(editor)
+      },
     },
     {
       name: 'bold',
       label: 'Bold',
       active: isBoldActive,
-      onMouseDown: getPreventDefaultHandler(toggleMark, editor, {
-        key: MARK_BOLD,
-      }),
+      onMouseDown: (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        toggleMark(editor, { key: MARK_BOLD })
+      },
     },
     {
       name: 'italic',
       label: 'Italic',
       active: isItalicActive,
-      onMouseDown: getPreventDefaultHandler(toggleMark, editor, {
-        key: MARK_ITALIC,
-      }),
+      onMouseDown: (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        toggleMark(editor, { key: MARK_ITALIC })
+      },
     },
     {
       name: 'raw',
