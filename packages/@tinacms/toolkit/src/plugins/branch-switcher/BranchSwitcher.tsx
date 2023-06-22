@@ -55,10 +55,8 @@ export const EditoralBranchSwitcher = ({
   const initialBranch = React.useMemo(() => currentBranch, [])
   // when modal closes, refresh page is currentBranch has changed
   React.useEffect(() => {
-    return () => {
-      if (initialBranch != currentBranch) {
-        window.location.reload()
-      }
+    if (initialBranch != currentBranch) {
+      window.location.reload()
     }
   }, [currentBranch])
 
@@ -478,7 +476,7 @@ const BranchSelector = ({
                       className="mr-auto cursor-pointer text-sm h-9 px-4 flex items-center gap-1"
                     >
                       <BiPencil className="h-4 w-auto text-blue-500 opacity-70 -mt-px" />{' '}
-                      Edit
+                      Select
                     </Button>
                   )}
                   {(branch.githubPullRequestUrl ||
