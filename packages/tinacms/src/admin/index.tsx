@@ -150,7 +150,7 @@ const CheckSchema = ({
   }, [cms, JSON.stringify(schemaJson || {}), url])
   return (
     <>
-      {schemaMissingError && (
+      {schemaMissingError ? (
         <Modal>
           <PopupModal>
             <ModalHeader>Branch Not Found</ModalHeader>
@@ -177,8 +177,9 @@ const CheckSchema = ({
             </ModalActions>
           </PopupModal>
         </Modal>
+      ) : (
+        children
       )}
-      {children}
     </>
   )
 }
