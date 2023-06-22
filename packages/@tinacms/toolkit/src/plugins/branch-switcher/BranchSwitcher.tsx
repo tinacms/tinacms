@@ -500,7 +500,7 @@ const BranchSelector = ({
                               label: 'Preview',
                               onMouseDown: () => {
                                 const previewUrl = previewFunction({
-                                  branch: encodeURIComponent(branch.name),
+                                  branch: branch.name,
                                 })?.url
                                 window.open(previewUrl, '_blank')
                               },

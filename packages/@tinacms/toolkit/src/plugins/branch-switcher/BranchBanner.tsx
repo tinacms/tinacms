@@ -21,7 +21,7 @@ export const BranchBanner = () => {
   const windowWidth = useWindowWidth()
   const renderNavToggle = windowWidth < navBreakpoint + 1
   const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
-  const branch = cms.api.tina.branch
+  const branch = decodeURIComponent(cms.api.tina.branch)
   const previewUrl = previewFunction ? previewFunction({ branch })?.url : null
 
   return (
