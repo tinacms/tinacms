@@ -441,7 +441,7 @@ importers:
       '@types/progress': ^2.0.3
       '@types/prompts': ^2.0.13
       '@types/yup': ^0.29.11
-      '@vitejs/plugin-react': ^4.0.1
+      '@vitejs/plugin-react': 3.1.0
       ajv: ^6.12.3
       altair-express-middleware: 4.0.6
       auto-bind: ^4.0.0
@@ -508,7 +508,7 @@ importers:
       '@tinacms/metrics': link:../metrics
       '@tinacms/schema-tools': link:../schema-tools
       '@tinacms/search': link:../search
-      '@vitejs/plugin-react': 4.0.1_vite@4.3.9
+      '@vitejs/plugin-react': 3.1.0_vite@4.3.9
       ajv: 6.12.6
       altair-express-middleware: 4.0.6
       auto-bind: 4.0.0
@@ -13787,18 +13787,19 @@ packages:
       }
     dev: false
 
-  /@vitejs/plugin-react/4.0.1_vite@4.3.9:
+  /@vitejs/plugin-react/3.1.0_vite@4.3.9:
     resolution:
       {
-        integrity: sha512-g25lL98essfeSj43HJ0o4DMp0325XK0ITkxpgChzJU/CyemgyChtlxfnRbjfwxDGCTRxTiXtQAsdebQXKMRSOA==,
+        integrity: sha512-AfgcRL8ZBhAlc3BFdigClmTUMISmmzHn7sB2h9U1odvc5U/MjWXsAaz18b/WoppUTDBzxOJwo2VdClfUcItu9g==,
       }
     engines: { node: ^14.18.0 || >=16.0.0 }
     peerDependencies:
-      vite: ^4.2.0
+      vite: ^4.1.0-beta.0
     dependencies:
       '@babel/core': 7.22.5
       '@babel/plugin-transform-react-jsx-self': 7.22.5_@babel+core@7.22.5
       '@babel/plugin-transform-react-jsx-source': 7.22.5_@babel+core@7.22.5
+      magic-string: 0.27.0
       react-refresh: 0.14.0
       vite: 4.3.9
     transitivePeerDependencies:
@@ -22912,6 +22913,16 @@ packages:
       }
     hasBin: true
     dev: true
+
+  /magic-string/0.27.0:
+    resolution:
+      {
+        integrity: sha512-8UnnX2PeRAPZuN12svgR9j7M1uWMovg/CEnIwIG0LFkXSJJe4PdfUGiTGl8V9bsBHFUtfVINcSyYxd7q+kx9fA==,
+      }
+    engines: { node: '>=12' }
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.4.14
+    dev: false
 
   /magic-string/0.30.0:
     resolution:
