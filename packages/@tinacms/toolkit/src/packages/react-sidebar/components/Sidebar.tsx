@@ -430,8 +430,8 @@ const SidebarHeader = ({
   const displayMenuButton = renderNav && !displayNav
 
   const cms = useCMS()
-  const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
-  const branch = cms.api.tina.branch
+  const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl
+  const branch = cms.api?.tina?.branch
   const previewUrl =
     typeof previewFunction === 'function'
       ? previewFunction({ branch })?.url
