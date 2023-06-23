@@ -224,7 +224,7 @@ export const SyncStatus = ({ cms, setEventsOpen }) => {
     setEventsOpen(true)
   }
 
-  if (cms.api?.tina?.isLocalMode) {
+  if (cms.api?.tina?.isCustomContentApi) {
     return null
   }
 

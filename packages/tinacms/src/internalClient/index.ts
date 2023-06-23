@@ -285,6 +285,10 @@ export class Client {
     return false
   }
 
+  public get isCustomContentApi() {
+    return !!this.options.customContentApiUrl
+  }
+
   setBranch(branchName: string) {
     const encodedBranch = encodeURIComponent(branchName)
     this.branch = encodedBranch
