@@ -6,7 +6,7 @@
 
 import * as React from 'react'
 
-import { BiExpandAlt, BiMenu, BiPencil } from 'react-icons/bi'
+import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
 import { useCMS, useSubscribable } from '../../react-core'
@@ -429,6 +429,14 @@ const SidebarHeader = ({
 
   const displayMenuButton = renderNav && !displayNav
 
+  const cms = useCMS()
+  const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
+  const branch = cms.api.tina.branch
+  const previewUrl =
+    typeof previewFunction === 'function'
+      ? previewFunction({ branch })?.url
+      : null
+
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
@@ -450,6 +458,19 @@ const SidebarHeader = ({
         {branchingEnabled && !isLocalMode && (
           <div className="ml-3">
             <BranchButton />
+          </div>
+        )}
+        {branchingEnabled && !isLocalMode && previewUrl && (
+          <div className="ml-3">
+            <button
+              className="pointer-events-auto flex min-w-0	shrink gap-1 items-center justify-between form-select text-sm h-10 px-4 shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100 transition-color duration-150 ease-out rounded-full focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight min-w-[5rem]"
+              onClick={() => {
+                window.open(previewUrl, '_blank')
+              }}
+            >
+              <BiLinkExternal className="flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1" />
+              Preview
+            </button>
           </div>
         )}
         <div className="flex-1"></div>
