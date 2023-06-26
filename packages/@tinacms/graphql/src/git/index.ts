@@ -58,33 +58,33 @@ export const getChangedFiles = async ({
     // gitdir,
     trees: [git.TREE({ ref: from }), git.TREE({ ref: to })],
     map: async function (filename, [A, B]) {
-      let found = false
+      let matches = false
       for (const [key, value] of Object.entries(pathFilter)) {
         if (filename.startsWith(key)) {
-          found = true
+          matches = true
           break
         }
       }
-      if (!found) {
-        console.log('not found', filename)
-        return
+      if (matches) {
+        let oidA = await A.oid()
+        let oidB = await B.oid()
+        console.log({ filename, oidA, oidB })
+        if (oidA !== oidB) {
+          if (oidA === undefined) {
+            results.added.push(filename)
+          } else if (oidB === undefined) {
+            results.deleted.push(filename)
+          } else {
+            results.modified.push(filename)
+          }
+        }
+      } else {
+        console.log('no match', filename)
       }
-      console.log({ filename })
+      // console.log({ filename })
       // if ((await A.type()) === 'tree') {
       //   return
       // }
-      let oidA = await A.oid()
-      let oidB = await B.oid()
-      console.log({ oidA, oidB })
-      if (oidA !== oidB) {
-        if (oidA === undefined) {
-          results.added.push(filename)
-        } else if (oidB === undefined) {
-          results.deleted.push(filename)
-        } else {
-          results.modified.push(filename)
-        }
-      }
     },
   })
   console.log({ results })
