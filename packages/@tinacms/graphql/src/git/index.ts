@@ -66,8 +66,8 @@ export const getChangedFiles = async ({
         }
       }
       if (matches) {
-        let oidA = await A.oid()
-        let oidB = await B.oid()
+        let oidA = await A?.oid()
+        let oidB = await B?.oid()
         console.log({ filename, oidA, oidB })
         if (oidA !== oidB) {
           if (oidA === undefined) {
