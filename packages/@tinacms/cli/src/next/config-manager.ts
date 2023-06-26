@@ -370,7 +370,7 @@ export class ConfigManager {
       platform: 'browser',
       format: 'esm',
       logLevel: 'silent',
-      external: ['tinacms', 'react', 'react-dom', 'next'],
+      external: ['tinacms', 'next'],
       ignoreAnnotations: true,
       outfile: prebuild,
       loader: loaders,
