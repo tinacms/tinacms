@@ -116,7 +116,7 @@ export abstract class BaseCommand extends Command {
       waitFor: async () => {
         // TODO should this happen in local mode?
         const sha = await getSha({ fs, dir: rootPath }) // TODO should be contentRootPath?
-        const lastSha = await database.getMetadata<string>('lastSha')
+        const lastSha = await database.getMetadata('lastSha')
         // const lastSha = '41ae4536fcc27c003c0b99b9248ad076a1e9950a'
         let res
         console.log('rootPath', rootPath)
@@ -132,7 +132,7 @@ export abstract class BaseCommand extends Command {
           const { added, modified, deleted } = await getChangedFiles({
             fs,
             dir: rootPath,
-            from: lastSha,
+            from: lastSha.value,
             to: sha,
             pathFilter,
           })
