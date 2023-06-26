@@ -180,7 +180,7 @@ export class Database {
 
   public getMetadata = async (key: string) => {
     await this.initLevel()
-    return this.level.get(`_metadata_${key}`)
+    return this.level.get(`_metadata_${key}`) as unknown as string
   }
 
   public setMetadata = async (key: string, value: string) => {
