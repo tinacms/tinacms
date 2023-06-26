@@ -180,12 +180,13 @@ export class Database {
 
   public getMetadata = async (key: string) => {
     await this.initLevel()
-    return this.level.get(`_metadata_${key}`) as unknown as string
+    const record = await this.level.get(`_metadata_${key}`)
+    return record?.value
   }
 
   public setMetadata = async (key: string, value: string) => {
     await this.initLevel()
-    return this.level.put(`_metadata_${key}`, JSON.stringify(value) as any)
+    return this.level.put(`_metadata_${key}`, { value })
   }
 
   public get = async <T extends object>(filepath: string): Promise<T> => {

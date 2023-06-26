@@ -65,6 +65,10 @@ export const getChangedFiles = async ({
           break
         }
       }
+      if ((await B?.type()) === 'tree') {
+        // skip directory matches
+        return
+      }
       if (matches) {
         let oidA = await A?.oid()
         let oidB = await B?.oid()
