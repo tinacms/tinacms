@@ -178,6 +178,16 @@ export class Database {
     }
   }
 
+  public getMetadata = async <T>(key: string) => {
+    await this.initLevel()
+    return this.level.get(`_metadata_${key}`) as T
+  }
+
+  public setMetadata = async (key: string, value: any) => {
+    await this.initLevel()
+    return this.level.put(`_metadata_${key}`, value)
+  }
+
   public get = async <T extends object>(filepath: string): Promise<T> => {
     await this.initLevel()
     if (SYSTEM_FILES.includes(filepath)) {

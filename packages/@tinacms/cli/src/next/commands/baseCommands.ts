@@ -11,6 +11,8 @@ import { startSubprocess2 } from '../../utils/start-subprocess'
 import { logger } from '../../logger'
 import { spin } from '../../utils/spinner'
 import { warnText } from '../../utils/theme'
+import { getChangedFiles, getSha } from '@tinacms/graphql'
+import fs from 'fs-extra'
 
 /**
  * Base Command for Dev and build
@@ -95,22 +97,72 @@ export abstract class BaseCommand extends Command {
     database,
     graphQLSchema,
     tinaSchema,
+    rootPath,
+    generatedPath,
+    partialReindex,
     text,
   }: {
     database: Database
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
+    rootPath: string
+    generatedPath: string
+    partialReindex?: boolean
     text?: string
   }) {
     const textToUse = text || 'Indexing local files'
     const warnings: string[] = []
     await spin({
       waitFor: async () => {
-        const res = await database.indexContent({
-          graphQLSchema,
-          tinaSchema,
-        })
-        warnings.push(...res.warnings)
+        // TODO should this happen in local mode?
+        const sha = await getSha({ fs, dir: rootPath }) // TODO should be contentRootPath?
+        const lastSha = await database.getMetadata<string>('lastSha')
+        // const lastSha = '41ae4536fcc27c003c0b99b9248ad076a1e9950a'
+        let res
+        console.log('rootPath', rootPath)
+        console.log('sha', sha)
+        console.log('lastSha', lastSha)
+        if (partialReindex && lastSha) {
+          const pathFilter: Record<string, boolean> = { [generatedPath]: true }
+          for (const collection of tinaSchema.getCollections()) {
+            pathFilter[`${rootPath}/${collection.path}`] = true
+          }
+
+          // TODO filter by where the file is (tina schema or content)
+          const { added, modified, deleted } = await getChangedFiles({
+            fs,
+            dir: rootPath,
+            from: lastSha,
+            to: sha,
+            pathFilter,
+          })
+          console.log({ added, modified, deleted })
+          const generatedPathUpdates = modified.filter((path) =>
+            path.startsWith(generatedPath)
+          )
+          if (generatedPathUpdates.length > 0) {
+            res = await database.indexContent({
+              graphQLSchema,
+              tinaSchema,
+            })
+          } else {
+            if (added.length > 0 || modified.length > 0) {
+              await database.indexContentByPaths([...added, ...modified])
+            }
+            if (deleted.length > 0) {
+              await database.deleteContentByPaths(deleted)
+            }
+          }
+        } else {
+          res = await database.indexContent({
+            graphQLSchema,
+            tinaSchema,
+          })
+        }
+        await database.setMetadata('lastSha', sha)
+        if (res?.warnings) {
+          warnings.push(...res.warnings)
+        }
       },
       text: textToUse,
     })
