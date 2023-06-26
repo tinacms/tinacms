@@ -70,11 +70,12 @@ export const getChangedFiles = async ({
         return
       }
       console.log({ filename })
-      if ((await A.type()) === 'tree') {
-        return
-      }
+      // if ((await A.type()) === 'tree') {
+      //   return
+      // }
       let oidA = await A.oid()
       let oidB = await B.oid()
+      console.log({ oidA, oidB })
       if (oidA !== oidB) {
         if (oidA === undefined) {
           results.added.push(filename)
