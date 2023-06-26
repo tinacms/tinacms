@@ -139,7 +139,7 @@ export abstract class BaseCommand extends Command {
           const { added, modified, deleted } = await getChangedFiles({
             fs,
             dir: rootPath,
-            from: lastSha.value,
+            from: lastSha,
             to: sha,
             pathFilter,
           })
