@@ -118,8 +118,7 @@ export class DevCommand extends BaseCommand {
           database,
           graphQLSchema,
           tinaSchema,
-          rootPath: configManager.rootPath,
-          generatedPath: configManager.generatedFolderPath,
+          configManager,
         })
         if (!firstTime) {
           logger.error('Re-index complete')

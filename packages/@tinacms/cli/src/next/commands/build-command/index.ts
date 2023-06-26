@@ -119,8 +119,7 @@ export class BuildCommand extends BaseCommand {
         database,
         graphQLSchema,
         tinaSchema,
-        rootPath: configManager.rootPath,
-        generatedPath: configManager.generatedFolderPath,
+        configManager,
         partialReindex: this.partialReindex,
       })
     }

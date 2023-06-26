@@ -13,6 +13,7 @@ import { spin } from '../../utils/spinner'
 import { warnText } from '../../utils/theme'
 import { getChangedFiles, getSha } from '@tinacms/graphql'
 import fs from 'fs-extra'
+import { ConfigManager } from '../config-manager'
 
 /**
  * Base Command for Dev and build
@@ -97,16 +98,18 @@ export abstract class BaseCommand extends Command {
     database,
     graphQLSchema,
     tinaSchema,
-    rootPath,
-    generatedPath,
+    configManager,
+    // rootPath,
+    // generatedPath,
     partialReindex,
     text,
   }: {
     database: Database
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
-    rootPath: string
-    generatedPath: string
+    configManager: ConfigManager
+    // rootPath: string
+    // generatedPath: string
     partialReindex?: boolean
     text?: string
   }) {
@@ -115,6 +118,7 @@ export abstract class BaseCommand extends Command {
     await spin({
       waitFor: async () => {
         // TODO should this happen in local mode?
+        const rootPath = configManager.rootPath
         const sha = await getSha({ fs, dir: rootPath }) // TODO should be contentRootPath?
         const lastSha = await database.getMetadata('lastSha')
         // const lastSha = '41ae4536fcc27c003c0b99b9248ad076a1e9950a'
@@ -123,9 +127,12 @@ export abstract class BaseCommand extends Command {
         console.log('sha', sha)
         console.log('lastSha', lastSha)
         if (partialReindex && lastSha) {
-          const pathFilter: Record<string, boolean> = { [generatedPath]: true }
+          const pathFilter: Record<string, boolean> = {
+            [configManager.tinaFolderPath]: true,
+          }
           for (const collection of tinaSchema.getCollections()) {
-            pathFilter[`${rootPath}/${collection.path}`] = true
+            // TODO this needs to handle offset between root folder and git root
+            pathFilter[collection.path] = true
           }
 
           // TODO filter by where the file is (tina schema or content)
@@ -137,15 +144,20 @@ export abstract class BaseCommand extends Command {
             pathFilter,
           })
           console.log({ added, modified, deleted })
-          const generatedPathUpdates = modified.filter((path) =>
-            path.startsWith(generatedPath)
+          const tinaPathUpdates = modified.filter(
+            (path) =>
+              path.startsWith(configManager.tinaConfigFilePath) ||
+              path.startsWith(configManager.generatedFolderPath)
           )
-          if (generatedPathUpdates.length > 0) {
+          console.log({ tinaPathUpdates })
+          if (tinaPathUpdates.length > 0) {
+            console.log('doing full reindex')
             res = await database.indexContent({
               graphQLSchema,
               tinaSchema,
             })
           } else {
+            console.log('doing partial reindex')
             if (added.length > 0 || modified.length > 0) {
               await database.indexContentByPaths([...added, ...modified])
             }
