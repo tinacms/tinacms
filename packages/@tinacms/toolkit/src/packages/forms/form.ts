@@ -1,6 +1,13 @@
 import arrayMutators from 'final-form-arrays'
 import setFieldData from 'final-form-set-field-data'
-import { FormApi, createForm, Config, FormState, FORM_ERROR } from 'final-form'
+import {
+  FormApi,
+  createForm,
+  Config,
+  FormState,
+  FORM_ERROR,
+  getIn,
+} from 'final-form'
 import type { FormSubscription } from 'final-form'
 import type { Plugin } from '../core'
 import { Field, AnyField } from './field'
@@ -298,7 +305,6 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       namePath: fieldName.split('.'),
     })
   }
-
   private getFieldGroup({
     formOrObjectField,
     values,
@@ -315,13 +321,20 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     const value = values[name]
     const isLastItem = namePathIndex === namePath.length - 1
     if (!field) {
-      return formOrObjectField
+      return {
+        ...formOrObjectField,
+        fields: formOrObjectField.fields.map((field) => {
+          return {
+            ...field,
+            name: [...namePath, field.name].join('.'),
+          }
+        }),
+      }
     } else {
       if (field.type === 'object') {
         if (field.templates) {
           if (field.list) {
             if (isLastItem) {
-              console.log('isLast')
               return formOrObjectField
             } else {
               const namePathIndexForListItem = namePathIndex + 1
@@ -415,6 +428,48 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                 }
               }),
             }
+          }
+        }
+      } else if (field.type === 'rich-text') {
+        if (isLastItem) {
+          return formOrObjectField
+        } else {
+          const childrenIndex = namePathIndex + 1
+          const propsIndex = namePath.findIndex((value) => value === 'props')
+          const itemName = namePath.slice(childrenIndex, propsIndex).join('.')
+          const item = getIn(value, itemName)
+          const props = item.props
+          const templateString = item.name
+          const currentPathIndex = namePathIndex + 3
+          const isLastItem = currentPathIndex + 1 === namePath.length
+          const template = field.templates.find(
+            (t) => t.name === templateString
+          )
+          if (!isLastItem) {
+            if (currentPathIndex === namePath.length) {
+              return formOrObjectField
+            }
+
+            return this.getFieldGroup({
+              formOrObjectField: template,
+              values: props,
+              namePath,
+              namePathIndex: namePathIndex + 4,
+            })
+          }
+          if (!template) {
+            throw new Error(`Expected template value for field ${item.name}`)
+          }
+          const templateName = namePath.slice(0, currentPathIndex + 2).join('.')
+          return {
+            ...template,
+            name: templateName,
+            fields: template.fields.map((field) => {
+              return {
+                ...field,
+                name: [templateName, field.name].join('.'),
+              }
+            }),
           }
         }
       } else {
