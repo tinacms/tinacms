@@ -114,10 +114,20 @@ export abstract class BaseCommand extends Command {
     await spin({
       waitFor: async () => {
         const rootPath = configManager.rootPath
-        const sha = await getSha({ fs, dir: rootPath })
+        let sha
+        try {
+          sha = await getSha({ fs, dir: rootPath })
+        } catch (e) {
+          if (partialReindex) {
+            console.error(
+              'Failed to get sha. NOTE: `--partial-reindex` only supported for git repositories'
+            )
+            throw e
+          }
+        }
         const lastSha = await database.getMetadata('lastSha')
         let res
-        if (partialReindex && lastSha) {
+        if (partialReindex && lastSha && sha) {
           const pathFilter: Record<string, { matches?: string[] }> = {}
           if (configManager.isUsingLegacyFolder) {
             pathFilter['.tina/__generated__/_schema.json'] = {}
@@ -164,7 +174,9 @@ export abstract class BaseCommand extends Command {
             tinaSchema,
           })
         }
-        await database.setMetadata('lastSha', sha)
+        if (sha) {
+          await database.setMetadata('lastSha', sha)
+        }
         if (res?.warnings) {
           warnings.push(...res.warnings)
         }
