@@ -29,6 +29,8 @@ export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   onChange?(values: FormState<S>): void
   extraSubscribeValues?: FormSubscription
   queries?: string[]
+  crudType?: 'create' | 'update'
+  relativePath?: string
 }
 
 export class Form<S = any, F extends Field = AnyField> implements Plugin {
@@ -47,6 +49,8 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   queries: string[]
   global: GlobalOptions | null = null
   loading: boolean = false
+  relativePath: string
+  crudType?: 'create' | 'update'
 
   constructor({
     id,
@@ -69,6 +73,8 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.fields = fields || []
     this.onSubmit = options.onSubmit
     this.queries = queries || []
+    this.crudType = options.crudType || 'update'
+    this.relativePath = options.relativePath || id
     this.finalForm = createForm<S>({
       ...options,
       initialValues,

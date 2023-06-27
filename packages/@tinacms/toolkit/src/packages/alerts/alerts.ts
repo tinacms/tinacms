@@ -50,7 +50,7 @@ export class Alerts {
   add(
     level: AlertLevel,
     message: string | React.FunctionComponent,
-    timeout: number = 3000
+    timeout: number = 4000
   ): () => void {
     const alert = {
       level,

@@ -82,6 +82,7 @@ export const AuthWallInner = ({
     if (await client.isAuthenticated()) {
       setShowChildren(true)
       setActiveModal(null)
+      cms.events.dispatch({ type: 'cms:login' })
     } else {
       throw new Error('No access to repo') // TODO - display modal here
     }
@@ -232,6 +233,11 @@ export const TinaCloudProvider = (
       cms.media.store = new DummyMediaStore()
     }
   }
+  const client: Client = cms.api.tina
+  // Weather or not we are using Tina Cloud for auth
+  const isTinaCloud =
+    !client.isLocalMode &&
+    !client.schema?.config?.config?.admin?.auth?.customAuth
 
   const handleListBranches = async (): Promise<Branch[]> => {
     const { owner, repo } = props
@@ -283,6 +289,28 @@ export const TinaCloudProvider = (
       props.cmsCallback(cms)
     }
   }, [])
+
+  React.useEffect(() => {
+    const setupEditorialWorkflow = () => {
+      client.getProject().then((project) => {
+        if (project?.features?.includes('editorial-workflow')) {
+          cms.flags.set('branch-switcher', true)
+          client.usingEditorialWorkflow = true
+          client.protectedBranches = project.protectedBranches
+        }
+      })
+    }
+    if (isTinaCloud) {
+      setupEditorialWorkflow()
+    }
+    // If the user logs in after the cms is initialized
+    const unsubscribe = cms.events.subscribe('cms:login', () => {
+      if (isTinaCloud) {
+        setupEditorialWorkflow()
+      }
+    })
+    return unsubscribe
+  }, [isTinaCloud, cms])
 
   return (
     <BranchDataProvider

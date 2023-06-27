@@ -4,13 +4,6 @@
 
 import React from 'react'
 import { Alerts as AlertsCollection, AlertLevel } from '../alerts'
-import {
-  AlertIcon,
-  InfoIcon,
-  WarningIcon,
-  ErrorIcon,
-  CloseIcon,
-} from '../icons'
 import { useSubscribable } from '../react-core'
 import {
   Modal,
@@ -20,6 +13,7 @@ import {
   PopupModal,
 } from '../react-modals'
 import { Button } from '../styles'
+import { BiCheckCircle, BiError, BiInfoCircle, BiX } from 'react-icons/bi'
 
 export interface AlertsProps {
   alerts: AlertsCollection
@@ -43,13 +37,13 @@ export function Alerts({ alerts }: AlertsProps) {
             return (
               <Alert key={alert.id} level={alert.level}>
                 {alert.level === 'info' && (
-                  <InfoIcon className="w-5 h-5 mr-2" />
+                  <BiInfoCircle className="w-5 h-auto opacity-70" />
                 )}
                 {alert.level === 'success' && (
-                  <AlertIcon className="w-5 h-5 mr-2" />
+                  <BiCheckCircle className="w-5 h-auto opacity-70" />
                 )}
                 {alert.level === 'warn' && (
-                  <WarningIcon className="w-5 h-5 mr-2" />
+                  <BiError className="w-5 h-auto opacity-70" />
                 )}
                 <p className="m-0 flex-1 max-w-[680px] text-left">
                   {alert.message}
@@ -87,7 +81,7 @@ export function Alerts({ alerts }: AlertsProps) {
                     alerts.dismiss(alert)
                   }}
                 >
-                  <ErrorIcon className="mr-1 w-6 h-auto fill-current inline-block text-red-600" />{' '}
+                  <BiError className="mr-1 w-6 h-auto fill-current inline-block text-red-600" />{' '}
                   Error
                 </ModalHeader>
                 <ModalBody padded={true}>
@@ -115,42 +109,44 @@ export function Alerts({ alerts }: AlertsProps) {
 }
 
 const Alert: React.FC<{ level: AlertLevel }> = ({ level, ...props }) => {
-  const fillColor = {
-    info: 'var(--tina-color-primary)',
-    success: 'var(--tina-color-success)',
-    warn: 'var(--tina-color-dark)',
-    error: 'var(--tina-color-error)',
+  const colorClasses = {
+    info: 'bg-blue-100 border-blue-500 text-blue-600 fill-blue-500',
+    success: 'bg-green-100 border-green-500 text-green-600 fill-green-500',
+    warn: 'bg-yellow-100 border-yellow-500 text-yellow-600 fill-yellow-500',
+    error: 'bg-red-100 border-red-500 text-red-600 fill-red-500',
   }
-  const borderColor = {
-    info: 'var(--tina-color-primary)',
-    success: 'var(--tina-color-success)',
-    warn: 'var(--tina-color-warning)',
-    error: 'var(--tina-color-error)',
+
+  const borderClasses = {
+    info: 'border-blue-200',
+    success: 'border-green-200',
+    warn: 'border-yellow-200',
+    error: 'border-red-200',
   }
 
   return (
     <div
-      className={`text-center rounded-[5px] bg-gray-50 border border-solid border-gray-100 text-gray-800 fill-blue-500 font-normal cursor-pointer text-[15px] py-2 pr-1 pl-3 transition-all duration-100 ease-out mb-4 flex items-center min-w-[350px] max-w-full `}
+      className={`rounded shadow-lg border-l-[6px] font-normal cursor-pointer pointer-events-all text-sm transition-all duration-100 ease-out mb-4 max-w-full ${colorClasses[level]}}`}
       style={{
-        pointerEvents: 'all',
         animationName: 'fly-in-up, fade-in',
         animationTimingFunction: 'ease-out',
         animationIterationCount: 1,
         animationFillMode: 'both',
         animationDuration: '150ms',
-        fill: fillColor[level],
-        borderLeft: `6px solid ${borderColor[level]}`,
       }}
-      {...props}
-    />
+    >
+      <div
+        className={`flex items-center gap-1.5 min-w-[350px] rounded-r border p-2 ${borderClasses[level]}`}
+        {...props}
+      />
+    </div>
   )
 }
 
 const CloseAlert = ({ ...styleProps }) => (
   <button
-    className="border-none bg-transparent p-0 ml-[14px] outline-none fill-gray-400 flex items-center"
+    className="border-none bg-transparent p-0 outline-none flex items-center"
     {...styleProps}
   >
-    <CloseIcon className="w-5 h-5 flex-grow-0 flex-shrink-0 basis-[auto] mr-2" />
+    <BiX className="w-5 auto flex-grow-0 flex-shrink-0 opacity-50" />
   </button>
 )

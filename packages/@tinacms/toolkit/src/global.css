@@ -118,3 +118,12 @@
     opacity: 1;
   }
 }
+
+/* Used by OverflowMenu */
+.react-aria-Popover[data-entering] {
+  animation: slideIn 300ms;
+}
+
+.react-aria-Popover[data-exiting] {
+  animation: slideIn 600ms reverse;
+}

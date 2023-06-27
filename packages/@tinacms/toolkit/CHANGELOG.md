@@ -1,5 +1,20 @@
 # Change Log
 
+## 1.7.8
+
+### Patch Changes
+
+- f6efd498e: Added branch creation model
+
+## 1.7.7
+
+### Patch Changes
+
+- 8710dec4b: Fix issue where navigating in and out of visual editing mode would not pick up the correct active form
+- Updated dependencies [fe13b4ed9]
+- Updated dependencies [812df6ace]
+  - @tinacms/search@1.0.3
+
 ## 1.7.6
 
 ### Patch Changes
