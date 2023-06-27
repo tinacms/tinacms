@@ -1,14 +1,10 @@
-/**
-
-*/
-
 import * as React from 'react'
 import { FC, useEffect } from 'react'
 import { Form } from '../forms'
 import { Form as FinalForm } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { Button } from '../styles'
+import { Button, OverflowMenu } from '../styles'
 import { LoadingDots } from './LoadingDots'
 import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
@@ -16,7 +12,16 @@ import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
 import { useCMS } from '../react-core'
 import { IoMdClose } from 'react-icons/io'
-import { Transition } from '@headlessui/react'
+import {
+  Modal,
+  PopupModal,
+  ModalHeader,
+  ModalBody,
+  ModalActions,
+} from '../react-modals'
+import { BaseTextField } from '../fields'
+import { BiGitBranch } from 'react-icons/bi'
+import { MdOutlineSaveAlt } from 'react-icons/md'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -100,6 +105,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 }) => {
   const cms = useCMS()
   const hideFooter = !!rest.hideFooter
+  const [createBranchModalOpen, setCreateBranchModalOpen] =
+    React.useState(false)
 
   const tinaForm = form.tinaForm
   const finalForm = form.tinaForm.finalForm
@@ -174,20 +181,39 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         dirtySinceLastSubmit,
         hasValidationErrors,
       }) => {
+        const usingProtectedBranch = cms.api.tina.usingProtectedBranch()
+
         const canSubmit =
           !pristine &&
           !submitting &&
           !hasValidationErrors &&
           !(invalid && !dirtySinceLastSubmit)
 
-        const safeHandleSubmit = () => {
+        const safeSubmit = async () => {
           if (canSubmit) {
-            handleSubmit()
+            await handleSubmit()
+          }
+        }
+
+        const safeHandleSubmit = async () => {
+          if (usingProtectedBranch) {
+            setCreateBranchModalOpen(true)
+          } else {
+            safeSubmit()
           }
         }
 
         return (
           <>
+            {createBranchModalOpen && (
+              <CreateBranchModel
+                safeSubmit={safeSubmit}
+                crudType={tinaForm.crudType}
+                relativePath={tinaForm.relativePath}
+                values={tinaForm.values}
+                close={() => setCreateBranchModalOpen(false)}
+              />
+            )}
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormKeyBindings onSubmit={safeHandleSubmit} />
               <FormPortalProvider>
@@ -253,8 +279,8 @@ export const FormStatus = ({ pristine }) => {
     <div className="flex flex-0 items-center">
       {!pristine && (
         <>
-          <span className="w-3 h-3 flex-0 rounded-full bg-yellow-400 border border-yellow-500 mr-2"></span>{' '}
-          <p className="text-gray-700 text-sm leading-tight whitespace-nowrap">
+          <span className="w-3 h-3 flex-0 rounded-full bg-yellow-300 border border-yellow-400 mr-2"></span>{' '}
+          <p className="text-gray-500 text-xs leading-tight whitespace-nowrap">
             Unsaved Changes
           </p>
         </>
@@ -262,7 +288,7 @@ export const FormStatus = ({ pristine }) => {
       {pristine && (
         <>
           <span className="w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400 mr-2"></span>{' '}
-          <p className="text-gray-500 text-sm leading-tight whitespace-nowrap">
+          <p className="text-gray-500 text-xs leading-tight whitespace-nowrap">
             No Changes
           </p>
         </>
@@ -367,4 +393,143 @@ const getAnimationProps = (animateStatus) => {
     : animateStatus === 'forwards'
     ? forwardsAnimation
     : {}
+}
+
+export const CreateBranchModel = ({
+  close,
+  safeSubmit,
+  relativePath,
+  values,
+  crudType,
+}: {
+  safeSubmit: () => Promise<void>
+  close: () => void
+  relativePath: string
+  values: Record<string, unknown>
+  crudType: string
+}) => {
+  const cms = useCMS()
+  const tinaApi = cms.api.tina
+  const currentBranch = tinaApi.branch
+  const [disabled, setDisabled] = React.useState(false)
+  const [newBranchName, setNewBranchName] = React.useState('')
+  const [error, setError] = React.useState('')
+
+  const onCreateBranch = (newBranchName) => {
+    localStorage.setItem('tina.createBranchState', 'starting')
+    localStorage.setItem('tina.createBranchState.fullPath', relativePath)
+    localStorage.setItem(
+      'tina.createBranchState.values',
+      JSON.stringify(values)
+    )
+    localStorage.setItem('tina.createBranchState.kind', crudType)
+
+    if (crudType === 'create') {
+      localStorage.setItem(
+        'tina.createBranchState.back',
+        // go back to the list view
+        window.location.href.replace('/new', '')
+      )
+    } else {
+      localStorage.setItem('tina.createBranchState.back', window.location.href)
+    }
+    const hash = window.location.hash
+    const newHash = `#/branch/new?branch=${newBranchName}`
+    const newUrl = window.location.href.replace(hash, newHash)
+    window.location.href = newUrl
+  }
+
+  return (
+    <Modal>
+      <PopupModal>
+        <ModalHeader close={close}>
+          <BiGitBranch className="w-6 h-auto mr-1 text-blue-500 opacity-70" />{' '}
+          Protected Branch
+        </ModalHeader>
+        <ModalBody padded={true}>
+          <p className="text-base text-gray-700 mb-2">
+            <strong>You are working on a protected branch.</strong> To save your
+            work Tina will create a new branch from <b>{currentBranch}</b>.
+          </p>
+          <p className="text-sm text-gray-500 mb-4">
+            Once created you will need to wait for indexing to complete before
+            you can switch branches.
+          </p>
+          <PrefixedTextField
+            placeholder="Branch Name"
+            value={newBranchName}
+            onChange={(e) => {
+              // reset error state on change
+              setError('')
+              setNewBranchName(e.target.value)
+            }}
+          />
+          {error && <div className="mt-2 text-sm text-red-700">{error}</div>}
+        </ModalBody>
+        <ModalActions>
+          <Button style={{ flexGrow: 1 }} onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            style={{ flexGrow: 2 }}
+            disabled={newBranchName === '' || Boolean(error) || disabled}
+            onClick={async () => {
+              setDisabled(true)
+              // get the list of branches form tina
+              const branchList: { name: string }[] = await tinaApi.listBranches(
+                {
+                  includeIndexStatus: false,
+                }
+              )
+              // filter out the branches that are not content branches
+              const contentBranches = branchList
+                .filter((x) => x?.name?.startsWith('tina/'))
+                .map((x) => x.name.replace('tina/', ''))
+
+              // check if the branch already exists
+              if (contentBranches.includes(newBranchName)) {
+                setError('Branch already exists')
+                setDisabled(false)
+                return
+              }
+
+              if (!error) onCreateBranch(newBranchName)
+            }}
+          >
+            Create Branch and Save
+          </Button>
+          <OverflowMenu
+            className="-ml-2"
+            toolbarItems={[
+              {
+                name: 'override',
+                label: 'Save to Protected Branch',
+                Icon: <MdOutlineSaveAlt size="1rem" />,
+                onMouseDown: () => {
+                  close()
+                  safeSubmit()
+                },
+              },
+            ]}
+          />
+        </ModalActions>
+      </PopupModal>
+    </Modal>
+  )
+}
+
+export const PrefixedTextField = ({ prefix = 'tina/', ...props }) => {
+  return (
+    <div className="border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded-md shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150">
+      <span className="pl-3 pr-2 py-2 font-medium text-base text-gray-700 opacity-50">
+        {prefix}
+      </span>
+      <input
+        type="text"
+        className="shadow-inner focus:outline-none block text-base placeholder:text-gray-300 px-3 py-2 text-gray-600 flex-1 bg-white focus:text-gray-900"
+        {...props}
+      />
+    </div>
+  )
 }
