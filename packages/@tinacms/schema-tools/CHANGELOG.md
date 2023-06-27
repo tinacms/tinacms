@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.4.7
+
+### Patch Changes
+
+- fe13b4ed9: Fix search index tokenizer regex to not treat underscores as token separators
+
 ## 1.4.6
 
 ### Patch Changes
