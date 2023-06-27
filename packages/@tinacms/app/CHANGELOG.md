@@ -1,5 +1,13 @@
 # @tinacms/app
 
+## 1.2.19
+
+### Patch Changes
+
+- Updated dependencies [f6efd498e]
+  - @tinacms/toolkit@1.7.8
+  - tinacms@1.5.12
+
 ## 1.2.18
 
 ### Patch Changes
