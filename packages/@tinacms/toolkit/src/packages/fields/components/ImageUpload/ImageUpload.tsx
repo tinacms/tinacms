@@ -24,20 +24,20 @@ interface ImageUploadProps {
   loading?: boolean
 }
 
-const StyledImage = ({ src }) => {
+export const StyledImage = ({ src }) => {
   const isSvg = /\.svg$/.test(src)
 
   return (
     <img
       src={src}
-      className={`"block max-w-full rounded shadow overflow-hidden max-h-48 h-auto object-contain transition-opacity duration-100 ease-out m-0 bg-gray-200 bg-auto bg-center bg-no-repeat ${
+      className={`block max-w-full rounded shadow overflow-hidden max-h-48 lg:max-h-64 h-auto object-contain transition-opacity duration-100 ease-out m-0 bg-gray-200 bg-auto bg-center bg-no-repeat ${
         isSvg ? 'min-w-[12rem]' : ''
       }`}
     />
   )
 }
 
-const StyledFile = ({ src }) => {
+export const StyledFile = ({ src }) => {
   return (
     <div className="max-w-full w-full flex-1 flex justify-start items-center gap-3">
       <div className="w-12 h-12 bg-white shadow border border-gray-100 rounded flex justify-center flex-none">
@@ -75,7 +75,7 @@ export const ImageUpload = React.forwardRef<
             }`}
           >
             <button
-              className="flex-shrink min-w-0 focus-within:shadow-outline focus-within:border-blue-500 outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
+              className="flex-shrink min-w-0 focus-within:shadow-outline focus-within:border-blue-500 rounded outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
               onClick={onClick}
               ref={ref}
             >
