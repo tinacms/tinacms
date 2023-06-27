@@ -99,8 +99,6 @@ export abstract class BaseCommand extends Command {
     graphQLSchema,
     tinaSchema,
     configManager,
-    // rootPath,
-    // generatedPath,
     partialReindex,
     text,
   }: {
@@ -108,8 +106,6 @@ export abstract class BaseCommand extends Command {
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
     configManager: ConfigManager
-    // rootPath: string
-    // generatedPath: string
     partialReindex?: boolean
     text?: string
   }) {
@@ -117,15 +113,10 @@ export abstract class BaseCommand extends Command {
     const warnings: string[] = []
     await spin({
       waitFor: async () => {
-        // TODO should this happen in local mode?
         const rootPath = configManager.rootPath
-        const sha = await getSha({ fs, dir: rootPath }) // TODO should be contentRootPath?
+        const sha = await getSha({ fs, dir: rootPath })
         const lastSha = await database.getMetadata('lastSha')
-        // const lastSha = '41ae4536fcc27c003c0b99b9248ad076a1e9950a'
         let res
-        console.log('rootPath', rootPath)
-        console.log('sha', sha)
-        console.log('lastSha', lastSha)
         if (partialReindex && lastSha) {
           const pathFilter: Record<string, { matches?: string[] }> = {}
           if (configManager.isUsingLegacyFolder) {
@@ -142,7 +133,6 @@ export abstract class BaseCommand extends Command {
             }
           }
 
-          // TODO filter by where the file is (tina schema or content)
           const { added, modified, deleted } = await getChangedFiles({
             fs,
             dir: rootPath,
@@ -150,21 +140,17 @@ export abstract class BaseCommand extends Command {
             to: sha,
             pathFilter,
           })
-          console.log({ added, modified, deleted })
           const tinaPathUpdates = modified.filter(
             (path) =>
-              path.startsWith(configManager.tinaConfigFilePath) ||
-              path.startsWith(configManager.generatedFolderPath)
+              path.startsWith('.tina/__generated__/_schema.json') ||
+              path.startsWith('tina/tina-lock.json')
           )
-          console.log({ tinaPathUpdates })
           if (tinaPathUpdates.length > 0) {
-            console.log('doing full reindex')
             res = await database.indexContent({
               graphQLSchema,
               tinaSchema,
             })
           } else {
-            console.log('doing partial reindex')
             if (added.length > 0 || modified.length > 0) {
               await database.indexContentByPaths([...added, ...modified])
             }
@@ -178,7 +164,6 @@ export abstract class BaseCommand extends Command {
             tinaSchema,
           })
         }
-        console.log('calling setMetadata', sha)
         await database.setMetadata('lastSha', sha)
         if (res?.warnings) {
           warnings.push(...res.warnings)

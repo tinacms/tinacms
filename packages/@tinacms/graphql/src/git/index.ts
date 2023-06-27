@@ -43,7 +43,6 @@ export const getChangedFiles = async ({
   to: string
   pathFilter: Record<string, { matches?: string[] }>
 }) => {
-  console.log({ pathFilter })
   const results = {
     added: [],
     modified: [],
@@ -55,10 +54,6 @@ export const getChangedFiles = async ({
   if (rootDir !== dir) {
     pathPrefix = normalizePath(dir.substring(rootDir.length + 1))
   }
-  // const gitdir = path.join(await findGitRoot(dir), '.git')
-  // console.log({gitdir, dir})
-  // console.log(path)
-  // TODO should we employ match patterns here?
   await git.walk({
     fs,
     dir: rootDir,
@@ -85,7 +80,6 @@ export const getChangedFiles = async ({
       if (matches) {
         let oidA = await A?.oid()
         let oidB = await B?.oid()
-        console.log({ filename, relativePath, oidA, oidB })
         if (oidA !== oidB) {
           if (oidA === undefined) {
             results.added.push(relativePath)
@@ -95,55 +89,8 @@ export const getChangedFiles = async ({
             results.modified.push(relativePath)
           }
         }
-      } else {
-        console.log('no match', filename, relativePath)
       }
-      // console.log({ filename })
-      // if ((await A.type()) === 'tree') {
-      //   return
-      // }
     },
   })
-  console.log({ results })
-  // Locally modified files
-  // await git.walk({
-  //   fs,
-  //   dir,
-  //   gitdir,
-  //   trees: [git.TREE({ref: to}), git.WORKDIR()],
-  //   map: async function (filename, [A, B]) {
-  //     // console.log(A,B)
-  //     if (!A || !B) {
-  //       // console.log('no A or B', filename)
-  //       return
-  //     }
-  //     if (await A.type() === 'tree') {
-  //       return
-  //     }
-  //     let oidA = await A.oid()
-  //     let oidB = await B.oid()
-  //     if (oidA !== oidB) {
-  //       if (oidA === undefined) {
-  //         results.added.push(filename)
-  //       } else if (oidB === undefined) {
-  //         results.deleted.push(filename)
-  //       } else {
-  //         results.modified.push(filename)
-  //       }
-  //     }
-  //   }
-  // })
-  // console.log({entries})
-  // for (const entry of entries) {
-  //   if (entry.type === 'blob') {
-  //     if (entry.mode === '100644') {
-  //       results.added.push(entry.path)
-  //     } else if (entry.mode === '100755') {
-  //       results.modified.push(entry.path)
-  //     }
-  //   } else if (entry.type === 'tree') {
-  //     results.added.push(entry.path)
-  //   }
-  // }
   return results
 }
