@@ -497,7 +497,7 @@ export interface Config<
    * Your read only token from app.tina.io
    */
   token: string | null
-  ui: {
+  ui?: {
     /**
      * When using Tina Cloud's branching feature, provide the URL for your given branch
      *
