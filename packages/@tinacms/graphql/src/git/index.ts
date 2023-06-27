@@ -64,9 +64,7 @@ export const getChangedFiles = async ({
     dir: rootDir,
     trees: [git.TREE({ ref: from }), git.TREE({ ref: to })],
     map: async function (filename, [A, B]) {
-      const relativePath = normalizePath(filename).substring(
-        pathPrefix.length + 1
-      )
+      const relativePath = normalizePath(filename).substring(pathPrefix.length)
       let matches = false
       for (const [key, matcher] of Object.entries(pathFilter)) {
         if (relativePath.startsWith(key)) {
