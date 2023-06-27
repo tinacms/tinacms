@@ -8,6 +8,7 @@ import { insertNodes, ELEMENT_PARAGRAPH } from '@udecode/plate-headless'
 import { NestedForm } from '../../nested-form'
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks'
 import { DeleteImageButton } from '../../../../../components'
+import { useTemplates } from '../../editor-context'
 
 export const ImgEmbed = ({
   attributes,
@@ -17,8 +18,9 @@ export const ImgEmbed = ({
   onChange,
 }) => {
   const selected = useSelected()
+  const { fieldName } = useTemplates()
   const { handleClose, handleRemove, handleSelect, isExpanded } =
-    useEmbedHandles(editor, element)
+    useEmbedHandles(editor, element, fieldName)
 
   useHotkey('enter', () => {
     insertNodes(editor, [{ type: ELEMENT_PARAGRAPH, children: [{ text: '' }] }])

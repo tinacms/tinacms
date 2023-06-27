@@ -298,12 +298,13 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     if (!fieldName) {
       return this
     }
-    return this.getFieldGroup({
+    const result = this.getFieldGroup({
       formOrObjectField: this,
       values: this.finalForm.getState().values,
       namePathIndex: 0,
       namePath: fieldName.split('.'),
     })
+    return result
   }
   private getFieldGroup({
     formOrObjectField,
@@ -432,7 +433,17 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
         }
       } else if (field.type === 'rich-text') {
         if (isLastItem) {
-          return formOrObjectField
+          return {
+            ...formOrObjectField,
+            fields: formOrObjectField.fields.map((field) => {
+              return {
+                ...field,
+                name: [...namePath.slice(0, namePathIndex), field.name].join(
+                  '.'
+                ),
+              }
+            }),
+          }
         } else {
           const childrenIndex = namePathIndex + 1
           const propsIndex = namePath.findIndex((value) => value === 'props')
@@ -445,6 +456,36 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
           const template = field.templates.find(
             (t) => t.name === templateString
           )
+          const templateName = namePath.slice(0, currentPathIndex + 2).join('.')
+          if (item?.type === 'img') {
+            const imageName = namePath.slice(0, currentPathIndex + 2).join('.')
+            console.log(imageName)
+            return {
+              ...formOrObjectField,
+              // name: [formOrObjectField.name, 'img'].join('.'),
+              name: [imageName].join('.'),
+              fields: [
+                {
+                  type: 'image',
+                  // label: 'URL',
+                  name: [templateName, 'url'].join('.'),
+                  component: 'image',
+                },
+                {
+                  type: 'string',
+                  label: 'Alt',
+                  name: [templateName, 'alt'].join('.'),
+                  component: 'text',
+                },
+                {
+                  type: 'string',
+                  label: 'Caption',
+                  name: [templateName, 'caption'].join('.'),
+                  component: 'text',
+                },
+              ],
+            }
+          }
           if (!isLastItem) {
             if (currentPathIndex === namePath.length) {
               return formOrObjectField
@@ -460,7 +501,6 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
           if (!template) {
             throw new Error(`Expected template value for field ${item.name}`)
           }
-          const templateName = namePath.slice(0, currentPathIndex + 2).join('.')
           return {
             ...template,
             name: templateName,
