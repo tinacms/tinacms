@@ -1,6 +1,7 @@
 import git, { CallbackFsClient, PromiseFsClient } from 'isomorphic-git'
 import fs from 'fs-extra'
 import path from 'path'
+import micromatch from 'micromatch'
 
 const findGitRoot = async (dir: string): Promise<string> => {
   if (await fs.pathExists(path.join(dir, '.git'))) {
@@ -39,7 +40,7 @@ export const getChangedFiles = async ({
   dir: string
   from: string
   to: string
-  pathFilter: Record<string, boolean>
+  pathFilter: Record<string, { matches?: string[] }>
 }) => {
   console.log({ pathFilter })
   const results = {
@@ -47,22 +48,33 @@ export const getChangedFiles = async ({
     modified: [],
     deleted: [],
   }
-  dir = await findGitRoot(dir)
+
+  const rootDir = await findGitRoot(dir)
+  let pathPrefix = ''
+  if (rootDir !== dir) {
+    pathPrefix = dir.substring(rootDir.length + 1)
+  }
   // const gitdir = path.join(await findGitRoot(dir), '.git')
   // console.log({gitdir, dir})
   // console.log(path)
   // TODO should we employ match patterns here?
   await git.walk({
     fs,
-    dir,
-    // gitdir,
+    dir: rootDir,
     trees: [git.TREE({ ref: from }), git.TREE({ ref: to })],
     map: async function (filename, [A, B]) {
+      const relativePath = filename.substring(pathPrefix.length + 1)
       let matches = false
-      for (const [key, value] of Object.entries(pathFilter)) {
-        if (filename.startsWith(key)) {
-          matches = true
-          break
+      for (const [key, matcher] of Object.entries(pathFilter)) {
+        if (relativePath.startsWith(key)) {
+          if (!matcher.matches) {
+            matches = true
+          } else {
+            if (micromatch.isMatch(relativePath, matcher.matches)) {
+              matches = true
+              break
+            }
+          }
         }
       }
       if ((await B?.type()) === 'tree') {
@@ -72,18 +84,18 @@ export const getChangedFiles = async ({
       if (matches) {
         let oidA = await A?.oid()
         let oidB = await B?.oid()
-        console.log({ filename, oidA, oidB })
+        console.log({ filename, relativePath, oidA, oidB })
         if (oidA !== oidB) {
           if (oidA === undefined) {
-            results.added.push(filename)
+            results.added.push(relativePath)
           } else if (oidB === undefined) {
-            results.deleted.push(filename)
+            results.deleted.push(relativePath)
           } else {
-            results.modified.push(filename)
+            results.modified.push(relativePath)
           }
         }
       } else {
-        console.log('no match', filename)
+        console.log('no match', filename, relativePath)
       }
       // console.log({ filename })
       // if ((await A.type()) === 'tree') {
