@@ -127,12 +127,19 @@ export abstract class BaseCommand extends Command {
         console.log('sha', sha)
         console.log('lastSha', lastSha)
         if (partialReindex && lastSha) {
-          const pathFilter: Record<string, boolean> = {
-            [configManager.tinaFolderPath]: true,
+          const pathFilter: Record<string, { matches?: string[] }> = {}
+          if (configManager.isUsingLegacyFolder) {
+            pathFilter['.tina/__generated__/_schema.json'] = {}
+          } else {
+            pathFilter['tina/tina-lock.json'] = {}
           }
           for (const collection of tinaSchema.getCollections()) {
-            // TODO this needs to handle offset between root folder and git root
-            pathFilter[collection.path] = true
+            pathFilter[collection.path] = {
+              matches:
+                collection.match?.exclude || collection.match?.include
+                  ? tinaSchema.getMatches({ collection })
+                  : undefined,
+            }
           }
 
           // TODO filter by where the file is (tina schema or content)
@@ -171,6 +178,7 @@ export abstract class BaseCommand extends Command {
             tinaSchema,
           })
         }
+        console.log('calling setMetadata', sha)
         await database.setMetadata('lastSha', sha)
         if (res?.warnings) {
           warnings.push(...res.warnings)
