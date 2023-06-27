@@ -6,8 +6,7 @@
   },
   "extends": [
     "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "prettier/@typescript-eslint"
+    "prettier"
   ],
   "plugins": ["@typescript-eslint", "react-hooks", "react"],
   "rules": {
@@ -32,7 +31,8 @@
     "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/ban-ts-ignore": "warn",
+    "@typescript-eslint/ban-ts-comment": "warn",
+    "@typescript-eslint/prefer-as-const": "warn",
     "cript-eslint/no-empty-function": "off",
     "@typescript-eslint/prefer-interface": "off",
     "prefer-const": "warn",
