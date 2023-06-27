@@ -742,7 +742,7 @@ mutation addPendingDocumentMutation(
     return parsedResult
   }
 
-  async listBranches() {
+  async listBranches(args?: { includeIndexStatus?: boolean }) {
     try {
       const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
       const res = await this.fetchWithToken(url, {
@@ -750,6 +750,9 @@ mutation addPendingDocumentMutation(
       })
       const branches = await res.json()
       const parsedBranches = ListBranchResponse.parse(branches)
+      if (args?.includeIndexStatus === false) {
+        return parsedBranches
+      }
       const indexStatusPromises = parsedBranches.map(async (branch) => {
         const indexStatus = await this.getIndexStatus({ ref: branch.name })
         return {

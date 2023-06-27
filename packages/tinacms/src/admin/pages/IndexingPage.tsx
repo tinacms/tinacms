@@ -63,7 +63,7 @@ export const IndexingPage: FC = () => {
           setState('indexing')
         } catch (e) {
           console.error(e)
-          cms.alerts.error('Branch creation failed.')
+          cms.alerts.error('Branch creation failed: ' + e.message)
           setErrorMessage(
             'Branch creation failed, please try again. By refreshing the page.'
           )

@@ -411,8 +411,9 @@ export const CreateBranchModel = ({
   const cms = useCMS()
   const tinaApi = cms.api.tina
   const currentBranch = tinaApi.branch
-
+  const [disabled, setDisabled] = React.useState(false)
   const [newBranchName, setNewBranchName] = React.useState('')
+  const [error, setError] = React.useState('')
 
   const onCreateBranch = (newBranchName) => {
     localStorage.setItem('tina.createBranchState', 'starting')
@@ -457,8 +458,13 @@ export const CreateBranchModel = ({
           <PrefixedTextField
             placeholder="Branch Name"
             value={newBranchName}
-            onChange={(e) => setNewBranchName(e.target.value)}
+            onChange={(e) => {
+              // reset error state on change
+              setError('')
+              setNewBranchName(e.target.value)
+            }}
           />
+          {error && <div className="mt-2 text-sm text-red-700">{error}</div>}
         </ModalBody>
         <ModalActions>
           <Button style={{ flexGrow: 1 }} onClick={close}>
@@ -467,8 +473,29 @@ export const CreateBranchModel = ({
           <Button
             variant="primary"
             style={{ flexGrow: 2 }}
-            disabled={newBranchName === ''}
-            onClick={() => onCreateBranch(newBranchName)}
+            disabled={newBranchName === '' || Boolean(error) || disabled}
+            onClick={async () => {
+              setDisabled(true)
+              // get the list of branches form tina
+              const branchList: { name: string }[] = await tinaApi.listBranches(
+                {
+                  includeIndexStatus: false,
+                }
+              )
+              // filter out the branches that are not content branches
+              const contentBranches = branchList
+                .filter((x) => x?.name?.startsWith('tina/'))
+                .map((x) => x.name.replace('tina/', ''))
+
+              // check if the branch already exists
+              if (contentBranches.includes(newBranchName)) {
+                setError('Branch already exists')
+                setDisabled(false)
+                return
+              }
+
+              if (!error) onCreateBranch(newBranchName)
+            }}
           >
             Create Branch and Save
           </Button>
