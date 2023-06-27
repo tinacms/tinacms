@@ -2,6 +2,7 @@ import git, { CallbackFsClient, PromiseFsClient } from 'isomorphic-git'
 import fs from 'fs-extra'
 import path from 'path'
 import micromatch from 'micromatch'
+import { normalizePath } from '../database/util'
 
 const findGitRoot = async (dir: string): Promise<string> => {
   if (await fs.pathExists(path.join(dir, '.git'))) {
@@ -52,7 +53,7 @@ export const getChangedFiles = async ({
   const rootDir = await findGitRoot(dir)
   let pathPrefix = ''
   if (rootDir !== dir) {
-    pathPrefix = dir.substring(rootDir.length + 1)
+    pathPrefix = normalizePath(dir.substring(rootDir.length + 1))
   }
   // const gitdir = path.join(await findGitRoot(dir), '.git')
   // console.log({gitdir, dir})
@@ -63,7 +64,9 @@ export const getChangedFiles = async ({
     dir: rootDir,
     trees: [git.TREE({ ref: from }), git.TREE({ ref: to })],
     map: async function (filename, [A, B]) {
-      const relativePath = filename.substring(pathPrefix.length + 1)
+      const relativePath = normalizePath(filename).substring(
+        pathPrefix.length + 1
+      )
       let matches = false
       for (const [key, matcher] of Object.entries(pathFilter)) {
         if (relativePath.startsWith(key)) {
