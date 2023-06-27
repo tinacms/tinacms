@@ -39,8 +39,8 @@ const StyledImage = ({ src }) => {
 
 const StyledFile = ({ src }) => {
   return (
-    <div className="max-w-full w-full overflow-hidden flex-1 flex justify-start items-center gap-3">
-      <div className="w-14 h-14 bg-gray-50 shadow border border-gray-100 rounded flex justify-center flex-none">
+    <div className="max-w-full w-full flex-1 flex justify-start items-center gap-3">
+      <div className="w-12 h-12 bg-white shadow border border-gray-100 rounded flex justify-center flex-none">
         <BiFileBlank className="w-3/5 h-full fill-gray-300" />
       </div>
       <span className="text-base text-left flex-1 text-gray-500 w-full break-words truncate">
@@ -70,12 +70,12 @@ export const ImageUpload = React.forwardRef<
           <ImageLoadingIndicator />
         ) : (
           <div
-            className={`relative w-full max-w-full flex justify-start gap-3 ${
-              isImage(src) ? `items-start` : `items-center`
+            className={`relative w-full max-w-full flex justify-start ${
+              isImage(src) ? `items-start gap-3` : `items-center gap-2`
             }`}
           >
             <button
-              className="shadow-inner focus-within:shadow-outline focus-within:border-blue-500 outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
+              className="flex-shrink min-w-0 focus-within:shadow-outline focus-within:border-blue-500 outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100"
               onClick={onClick}
               ref={ref}
             >
