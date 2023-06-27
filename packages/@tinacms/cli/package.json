@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/cli",
-  "version": "1.5.20",
+  "version": "1.5.21",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -85,7 +85,7 @@
     "clipanion": "^3.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
-    "esbuild": "^0.15.5",
+    "esbuild": "^0.18.10",
     "express": "^4.17.1",
     "fast-glob": "^3.2.4",
     "fs-extra": "^9.0.1",

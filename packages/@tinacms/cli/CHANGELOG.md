@@ -1,5 +1,12 @@
 # tinacms-cli
 
+## 1.5.21
+
+### Patch Changes
+
+- ca1298975: Fix issue where external React depenedencies we're being dynamically required
+  - @tinacms/app@1.2.19
+
 ## 1.5.20
 
 ### Patch Changes

@@ -236,10 +236,7 @@ export const tinaTailwind = (
           },
         },
         content,
-        plugins: [
-          twTypography({ className: 'tina-prose' }),
-          aspectRatio,
-        ],
+        plugins: [twTypography({ className: 'tina-prose' }), aspectRatio],
       }) as unknown as Plugin
       plugins.push(tailwindNesting)
       // @ts-ignore

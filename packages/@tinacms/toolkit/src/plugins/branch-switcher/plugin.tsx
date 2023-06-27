@@ -1,6 +1,3 @@
-/**
-
-*/
 import * as React from 'react'
 import { BiGitRepoForked } from 'react-icons/bi'
 import { ScreenPlugin } from '../../packages/react-screens'
