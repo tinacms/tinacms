@@ -1,5 +1,26 @@
 # tinacms
 
+## 1.5.12
+
+### Patch Changes
+
+- Updated dependencies [f6efd498e]
+  - @tinacms/toolkit@1.7.8
+
+## 1.5.11
+
+### Patch Changes
+
+- c7fa6ddc0: Add dev-tools export to make it easy to see Tina data when building a page
+- 6e192cc38: Improve type signature for tinaField so potentially null fields don't show a Typescript error
+- 5aaae9902: Clear the search state when switching between collections
+- Updated dependencies [fe13b4ed9]
+- Updated dependencies [812df6ace]
+- Updated dependencies [8710dec4b]
+  - @tinacms/schema-tools@1.4.7
+  - @tinacms/search@1.0.3
+  - @tinacms/toolkit@1.7.7
+
 ## 1.5.10
 
 ### Patch Changes

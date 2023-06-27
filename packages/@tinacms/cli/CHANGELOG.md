@@ -1,5 +1,31 @@
 # tinacms-cli
 
+## 1.5.21
+
+### Patch Changes
+
+- ca1298975: Fix issue where external React depenedencies we're being dynamically required
+  - @tinacms/app@1.2.19
+
+## 1.5.20
+
+### Patch Changes
+
+- 62e4ce3f1: Fix the indexing status error message to suggest Reindex instead of Reset Repository cache
+- fe13b4ed9: Fix search index tokenizer regex to not treat underscores as token separators
+- 4d2c913f8: Ensure schema changes are picked up by the Vite dev server so we don't get schema mismatch errors during local dev
+- 0bf700512: Change the way the Tina config file is built, so dependencies with Tailwind classes are picked up automatically
+- cc9d065b8: Fix issue where react and react-dom werent provided by the CLI
+- Updated dependencies [fe13b4ed9]
+- Updated dependencies [e5e29ed58]
+- Updated dependencies [812df6ace]
+- Updated dependencies [1176d569a]
+  - @tinacms/schema-tools@1.4.7
+  - @tinacms/search@1.0.3
+  - @tinacms/graphql@1.4.18
+  - @tinacms/app@1.2.18
+  - @tinacms/datalayer@1.2.18
+
 ## 1.5.19
 
 ### Patch Changes
