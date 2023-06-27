@@ -819,7 +819,7 @@ export class Database {
         continue
       }
 
-      let filepath = matcher.groups['_filepath_']
+      const filepath = matcher.groups['_filepath_']
       let itemRecord: Record<string, any>
       if (filterSuffixes) {
         itemRecord = matcher.groups

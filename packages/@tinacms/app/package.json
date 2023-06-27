@@ -9,6 +9,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
+    "@codemirror/language": "6.0.0",
     "@graphiql/toolkit": "^0.8.2",
     "@headlessui/react": "1.6.6",
     "@heroicons/react": "1.0.6",

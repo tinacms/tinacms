@@ -44,7 +44,7 @@ export const sequential = async <A, B>(
   return accum
 }
 
-export function assertShape<T extends unknown>(
+export function assertShape<T>(
   value: unknown,
   yupSchema: (args: typeof yup) => yup.AnySchema,
   errorMessage?: string

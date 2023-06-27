@@ -5,7 +5,7 @@
 import * as yup from 'yup'
 import type { AnySchema } from 'yup'
 
-export function assertShape<T extends unknown>(
+export function assertShape<T>(
   value: unknown,
   yupSchema: (args: typeof yup) => AnySchema,
   errorMessage?: string

@@ -178,7 +178,7 @@ const generateCollectionFromForestrySection = (args: {
     // If the section has no templates and has `create: all`
     if (forestryTemplates.length === 0 && section.create === 'all') {
       // For all template
-      for (let templateKey of templateMap.keys()) {
+      for (const templateKey of templateMap.keys()) {
         // get the shape of the template
         const { templateObj } = templateMap.get(templateKey)
         const pages: undefined | string[] = templateObj?.pages
@@ -287,7 +287,7 @@ const generateCollectionFromForestrySection = (args: {
         fields.push(BODY_FIELD)
       }
       // Go though all templates
-      for (let currentTemplateName of templateMap.keys()) {
+      for (const currentTemplateName of templateMap.keys()) {
         const { templateObj, fields: additionalFields } =
           templateMap.get(currentTemplateName)
         const pages: string[] = templateObj?.pages || []
