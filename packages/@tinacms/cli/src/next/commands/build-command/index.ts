@@ -40,7 +40,7 @@ export class BuildCommand extends BaseCommand {
   })
   partialReindex = Option.Boolean('--partial-reindex', false, {
     description:
-      'Reindexes only the content that has changed since the last build (defaults to false)',
+      'Re-indexes only the content that has changed since the last build (defaults to false). Not currently supported for separate content repos.',
   })
   tinaGraphQLVersion = Option.String('--tina-graphql-version', {
     description:
