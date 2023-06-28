@@ -49,7 +49,7 @@ export const BranchBanner = () => {
               className={`flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1`}
             />
           )}
-          <span className="truncate max-w-full -mr-1">
+          <span className="truncate max-w-full">
             {trimPrefix(currentBranch)}
           </span>
           <BiChevronDown
