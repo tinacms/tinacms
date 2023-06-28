@@ -34,7 +34,9 @@ export const BranchButton = () => {
             className={`flex-shrink-0 w-4.5 h-auto opacity-70 text-blue-500`}
           />
         )}
-        <span className="truncate max-w-full">{trimPrefix(currentBranch)}</span>
+        <span className="truncate max-w-full -mr-1">
+          {trimPrefix(currentBranch)}
+        </span>
         <BiChevronDown
           className="-mr-1 h-4 w-4 opacity-70 shrink-0"
           aria-hidden="true"

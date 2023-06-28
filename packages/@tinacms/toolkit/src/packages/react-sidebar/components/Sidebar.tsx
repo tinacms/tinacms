@@ -442,7 +442,7 @@ const SidebarHeader = ({
       {isLocalMode && <LocalWarning />}
       {!isLocalMode && <BillingWarning />}
 
-      <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
+      <div className="mt-4 -mb-14 w-full flex gap-3 items-center justify-between pointer-events-none">
         {displayMenuButton && (
           <Button
             rounded="right"
@@ -455,13 +455,9 @@ const SidebarHeader = ({
             <BiMenu className="h-6 w-auto text-blue-500" />
           </Button>
         )}
-        {branchingEnabled && !isLocalMode && (
-          <div className="ml-3">
-            <BranchButton />
-          </div>
-        )}
-        {branchingEnabled && !isLocalMode && previewUrl && (
-          <div className="ml-3">
+        <div className="flex-1 flex gap-3 items-center shrink min-w-0">
+          {branchingEnabled && !isLocalMode && <BranchButton />}
+          {branchingEnabled && !isLocalMode && previewUrl && (
             <button
               className="pointer-events-auto flex min-w-0	shrink gap-1 items-center justify-between form-select text-sm h-10 px-4 shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100 transition-color duration-150 ease-out rounded-full focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight min-w-[5rem]"
               onClick={() => {
@@ -469,11 +465,12 @@ const SidebarHeader = ({
               }}
             >
               <BiLinkExternal className="flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1" />
-              Preview
+              <span className="truncate max-w-full min-w-0 shrink">
+                Preview
+              </span>
             </button>
-          </div>
-        )}
-        <div className="flex-1"></div>
+          )}
+        </div>
         <div
           className={`flex items-center pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
         >

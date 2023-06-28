@@ -1281,7 +1281,7 @@ importers:
       jest-file-snapshot: ^0.5.0
       lodash.set: ^4.3.2
       next: 12.2.4
-      prism-react-renderer: ^1.3.5
+      prism-react-renderer: ^2.0.6
       react: 17.0.2
       react-dom: 17.0.2
       react-icons: ^4.3.1
@@ -1306,7 +1306,7 @@ importers:
       graphql: 15.8.0
       graphql-tag: 2.12.6_graphql@15.8.0
       lodash.set: 4.3.2
-      prism-react-renderer: 1.3.5_react@17.0.2
+      prism-react-renderer: 2.0.6_react@17.0.2
       react-icons: 4.4.0_react@17.0.2
       react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
       yup: 0.32.11
@@ -13335,6 +13335,13 @@ packages:
       {
         integrity: sha512-ymZk3LEC/fsut+/Q5qejp6R9O1rMxz3XaRHDV6kX8MrGAhOSPqVARbDi+EZvInBpw+BnCX3TD240byVkOfQsHg==,
       }
+
+  /@types/prismjs/1.26.0:
+    resolution:
+      {
+        integrity: sha512-ZTaqn/qSqUuAq1YwvOFQfVW1AR/oQJlLSZVustdjwI+GZ8kr0MSHBj0tsXPW1EqHubx50gtBEjbPGsdZwQwCjQ==,
+      }
+    dev: false
 
   /@types/progress/2.0.5:
     resolution:
@@ -27508,6 +27515,19 @@ packages:
     peerDependencies:
       react: '>=0.14.9'
     dependencies:
+      react: 17.0.2
+    dev: false
+
+  /prism-react-renderer/2.0.6_react@17.0.2:
+    resolution:
+      {
+        integrity: sha512-ERzmAI5UvrcTw5ivfEG20/dYClAsC84eSED5p9X3oKpm0xPV4A5clFK1mp7lPIdKmbLnQYsPTGiOI7WS6gWigw==,
+      }
+    peerDependencies:
+      react: '>=16.0.0'
+    dependencies:
+      '@types/prismjs': 1.26.0
+      clsx: 1.2.1
       react: 17.0.2
     dev: false
 
