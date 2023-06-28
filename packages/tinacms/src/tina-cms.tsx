@@ -150,9 +150,9 @@ export const TinaCMSProvider2 = ({
     )
   }
   const apiURL = props?.client?.apiUrl || props?.apiURL
-
+  console.log('auth', schema?.config?.admin?.auth)
   const isLocalOverride = schema?.config?.admin?.auth?.useLocalAuth
-
+  console.log(typeof isLocalOverride)
   const { branch, clientId, isLocalClient } = apiURL
     ? parseURL(apiURL)
     : {
