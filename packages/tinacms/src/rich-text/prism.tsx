@@ -3,17 +3,18 @@
 */
 
 import React from 'react'
-import Highlight, { defaultProps } from 'prism-react-renderer'
-import theme from 'prism-react-renderer/themes/github'
+import { Highlight, themes } from 'prism-react-renderer'
 
-export const Prism = (props: { value: string; lang?: string }) => {
+export const Prism = (props: {
+  value: string
+  lang?: string
+  theme?: keyof typeof themes
+}) => {
   return (
     <Highlight
-      {...defaultProps}
-      theme={theme}
+      theme={themes[props.theme || 'github']}
       code={props.value}
-      // @ts-ignore prism will ignore syntax for languages it doesn't have
-      language={props.lang}
+      language={props.lang || ''}
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
         <pre className={className} style={style}>
