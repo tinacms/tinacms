@@ -14,7 +14,7 @@ export const Prism = (props: {
     <Highlight
       theme={themes[props.theme || 'github']}
       code={props.value}
-      language={props.lang}
+      language={props.lang || ''}
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
         <pre className={className} style={style}>
