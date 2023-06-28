@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { BiChevronDown, BiGitBranch, BiLinkExternal } from 'react-icons/bi'
+import {
+  BiChevronDown,
+  BiGitBranch,
+  BiLinkExternal,
+  BiLockAlt,
+} from 'react-icons/bi'
 import { useBranchData } from './BranchData'
 import { BranchModal } from './BranchModal'
 import { Button } from '../../packages/styles'
@@ -16,6 +21,7 @@ export const BranchBanner = () => {
   const [open, setOpen] = React.useState(false)
   const openModal = () => setOpen(true)
   const { currentBranch } = useBranchData()
+  const isProtected = cms.api.tina.usingProtectedBranch()
 
   const navBreakpoint = 1000
   const windowWidth = useWindowWidth()
@@ -31,9 +37,19 @@ export const BranchBanner = () => {
           renderNavToggle ? 'pl-20' : 'pl-4'
         }`}
       >
-        <Button variant="white" size="small" onClick={openModal}>
-          <BiGitBranch className="flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1" />
-          <span className="truncate max-w-full">
+        <Button
+          variant={isProtected ? 'primary' : 'white'}
+          size="small"
+          onClick={openModal}
+        >
+          {isProtected ? (
+            <BiLockAlt className="flex-shrink-0 w-4 h-auto text-white opacity-70 mr-1" />
+          ) : (
+            <BiGitBranch
+              className={`flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1`}
+            />
+          )}
+          <span className="truncate max-w-full -mr-1">
             {trimPrefix(currentBranch)}
           </span>
           <BiChevronDown
