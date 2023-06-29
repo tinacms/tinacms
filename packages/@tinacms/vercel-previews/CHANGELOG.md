@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.0.9
+
+### Patch Changes
+
+- Updated dependencies [495108725]
+- Updated dependencies [b0eba5d49]
+  - tinacms@1.5.13
+
 ## 0.0.8
 
 ### Patch Changes

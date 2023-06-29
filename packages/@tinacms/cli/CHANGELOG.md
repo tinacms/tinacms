@@ -1,5 +1,16 @@
 # tinacms-cli
 
+## 1.5.22
+
+### Patch Changes
+
+- 495108725: Add optional partialReindex flag to build command
+- Updated dependencies [495108725]
+  - @tinacms/graphql@1.4.19
+  - @tinacms/app@1.2.20
+  - @tinacms/datalayer@1.2.19
+  - @tinacms/search@1.0.4
+
 ## 1.5.21
 
 ### Patch Changes

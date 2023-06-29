@@ -1,5 +1,19 @@
 # tinacms
 
+## 1.5.13
+
+### Patch Changes
+
+- 495108725: Disable tina cloud specific calls when using custom content api
+- b0eba5d49: Upgrade prism react renderer, allow for theming
+- Updated dependencies [d73d03f8f]
+- Updated dependencies [745e30708]
+- Updated dependencies [495108725]
+- Updated dependencies [7d6e6ff3d]
+- Updated dependencies [808d5cc6c]
+  - @tinacms/toolkit@1.7.9
+  - @tinacms/search@1.0.4
+
 ## 1.5.12
 
 ### Patch Changes
