@@ -11,6 +11,9 @@ import { startSubprocess2 } from '../../utils/start-subprocess'
 import { logger } from '../../logger'
 import { spin } from '../../utils/spinner'
 import { warnText } from '../../utils/theme'
+import { getChangedFiles, getSha } from '@tinacms/graphql'
+import fs from 'fs-extra'
+import { ConfigManager } from '../config-manager'
 
 /**
  * Base Command for Dev and build
@@ -95,22 +98,88 @@ export abstract class BaseCommand extends Command {
     database,
     graphQLSchema,
     tinaSchema,
+    configManager,
+    partialReindex,
     text,
   }: {
     database: Database
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
+    configManager: ConfigManager
+    partialReindex?: boolean
     text?: string
   }) {
     const textToUse = text || 'Indexing local files'
     const warnings: string[] = []
     await spin({
       waitFor: async () => {
-        const res = await database.indexContent({
-          graphQLSchema,
-          tinaSchema,
-        })
-        warnings.push(...res.warnings)
+        const rootPath = configManager.rootPath
+        let sha
+        try {
+          sha = await getSha({ fs, dir: rootPath })
+        } catch (e) {
+          if (partialReindex) {
+            console.error(
+              'Failed to get sha. NOTE: `--partial-reindex` only supported for git repositories'
+            )
+            throw e
+          }
+        }
+        const lastSha = await database.getMetadata('lastSha')
+        let res
+        if (partialReindex && lastSha && sha) {
+          const pathFilter: Record<string, { matches?: string[] }> = {}
+          if (configManager.isUsingLegacyFolder) {
+            pathFilter['.tina/__generated__/_schema.json'] = {}
+          } else {
+            pathFilter['tina/tina-lock.json'] = {}
+          }
+          for (const collection of tinaSchema.getCollections()) {
+            pathFilter[collection.path] = {
+              matches:
+                collection.match?.exclude || collection.match?.include
+                  ? tinaSchema.getMatches({ collection })
+                  : undefined,
+            }
+          }
+
+          const { added, modified, deleted } = await getChangedFiles({
+            fs,
+            dir: rootPath,
+            from: lastSha,
+            to: sha,
+            pathFilter,
+          })
+          const tinaPathUpdates = modified.filter(
+            (path) =>
+              path.startsWith('.tina/__generated__/_schema.json') ||
+              path.startsWith('tina/tina-lock.json')
+          )
+          if (tinaPathUpdates.length > 0) {
+            res = await database.indexContent({
+              graphQLSchema,
+              tinaSchema,
+            })
+          } else {
+            if (added.length > 0 || modified.length > 0) {
+              await database.indexContentByPaths([...added, ...modified])
+            }
+            if (deleted.length > 0) {
+              await database.deleteContentByPaths(deleted)
+            }
+          }
+        } else {
+          res = await database.indexContent({
+            graphQLSchema,
+            tinaSchema,
+          })
+        }
+        if (sha) {
+          await database.setMetadata('lastSha', sha)
+        }
+        if (res?.warnings) {
+          warnings.push(...res.warnings)
+        }
       },
       text: textToUse,
     })
