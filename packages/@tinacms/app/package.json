@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@codemirror/language": "6.0.0",
-    "@graphiql/toolkit": "^0.8.2",
+    "@graphiql/toolkit": "0.8.4",
     "@headlessui/react": "1.6.6",
     "@heroicons/react": "1.0.6",
     "@monaco-editor/react": "4.4.5",
@@ -18,7 +18,7 @@
     "@tinacms/toolkit": "workspace:*",
     "@xstate/react": "3.0.0",
     "final-form": "4.20.7",
-    "graphiql": "^2.4.0",
+    "graphiql": "3.0.0-alpha.1",
     "graphql": "15.8.0",
     "monaco-editor": "0.31.0",
     "postcss": "^8.4.14",
