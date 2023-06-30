@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.4.19
+
+### Patch Changes
+
+- 495108725: Add optional partialReindex flag to build command
+
 ## 1.4.18
 
 ### Patch Changes

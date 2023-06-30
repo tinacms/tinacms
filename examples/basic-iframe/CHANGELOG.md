@@ -4,6 +4,17 @@
 
 ### Patch Changes
 
+- Updated dependencies [495108725]
+- Updated dependencies [b0eba5d49]
+- Updated dependencies [495108725]
+  - tinacms@1.5.13
+  - @tinacms/graphql@1.4.19
+  - @tinacms/datalayer@1.2.19
+
+## null
+
+### Patch Changes
+
 - tinacms@1.5.12
 
 ## null
