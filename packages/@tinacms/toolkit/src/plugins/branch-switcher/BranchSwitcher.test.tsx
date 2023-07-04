@@ -72,9 +72,9 @@ describe('getFilteredBranchList', () => {
 })
 
 describe('formatBranchName', () => {
-  it('replaces invalid special characters', () => {
+  it('replaces invalid special characters with -', () => {
     const result = formatBranchName('foo bar@@--')
-    expect(result).toEqual('foobar--')
+    expect(result).toEqual('foo-bar---')
   })
 
   it('preserves valid special character(s)', () => {
