@@ -19,9 +19,9 @@ import {
   ModalBody,
   ModalActions,
 } from '../react-modals'
-import { BaseTextField } from '../fields'
 import { BiGitBranch } from 'react-icons/bi'
 import { MdOutlineSaveAlt } from 'react-icons/md'
+import { formatBranchName } from '../../plugins/branch-switcher/BranchSwitcher'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -461,7 +461,7 @@ export const CreateBranchModel = ({
             onChange={(e) => {
               // reset error state on change
               setError('')
-              setNewBranchName(e.target.value)
+              setNewBranchName(formatBranchName(e.target.value))
             }}
           />
           {error && <div className="mt-2 text-sm text-red-700">{error}</div>}
