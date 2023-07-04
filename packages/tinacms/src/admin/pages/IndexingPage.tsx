@@ -136,7 +136,9 @@ export const IndexingPage: FC = () => {
         const foo = await tinaApi.createPullRequest({
           baseBranch,
           branch: branch,
-          title: 'PR from TinaCMS',
+          title: `${branch
+            .replace('tina/', '')
+            .replace('-', ' ')} (PR from TinaCMS)`,
         })
         console.log('PR created', foo)
         cms.alerts.success('Pull request created.')
