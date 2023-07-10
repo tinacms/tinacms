@@ -58,7 +58,7 @@ export const RichEditor = (props: RichTextType) => {
       setTimeout(() => {
         // Slate/Plate doesn't expose it's underlying element
         // as a ref, so we need to query for it ourselves
-        const plateElement = ref.current.querySelector(
+        const plateElement = ref.current?.querySelector(
           '[role="textbox"]'
         ) as HTMLElement
         if (props.field.experimental_focusIntent && plateElement) {

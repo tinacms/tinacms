@@ -465,7 +465,6 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
           const templateName = namePath.slice(0, currentPathIndex + 2).join('.')
           if (item?.type === 'img') {
             const imageName = namePath.slice(0, currentPathIndex + 2).join('.')
-            console.log(imageName)
             return {
               ...formOrObjectField,
               // name: [formOrObjectField.name, 'img'].join('.'),
@@ -494,7 +493,19 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
           }
           if (!isLastItem) {
             if (currentPathIndex === namePath.length) {
-              return formOrObjectField
+              return {
+                ...formOrObjectField,
+                name: namePath.slice(0, namePathIndex).join('.'),
+                fields: formOrObjectField.fields.map((field) => {
+                  return {
+                    ...field,
+                    name: [
+                      ...namePath.slice(0, namePathIndex),
+                      field.name,
+                    ].join('.'),
+                  }
+                }),
+              }
             }
 
             return this.getFieldGroup({
