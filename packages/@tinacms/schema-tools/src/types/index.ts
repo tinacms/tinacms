@@ -486,17 +486,23 @@ export interface Config<
    */
   schema: Schema
   /**
-   * The base branch to pull content from. Note that this is ignored for local development
+   * The base branch to pull content from.
+   *
+   * Note: This is ignored and not needed for local development or when self-hosting
    */
-  branch: string | null
+  branch?: string | null
   /**
    * Your clientId from  app.tina.io
+   *
+   * Note: This is ignored and not needed for local development or when self-hosting
    */
-  clientId: string | null
+  clientId?: string | null
   /**
    * Your read only token from app.tina.io
+   *
+   *  Note: This is ignored and not needed for local development or when self-hosting
    */
-  token: string | null
+  token?: string | null
   ui?: {
     /**
      * When using Tina Cloud's branching feature, provide the URL for your given branch
