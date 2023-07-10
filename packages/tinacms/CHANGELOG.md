@@ -1,5 +1,17 @@
 # tinacms
 
+## 1.5.14
+
+### Patch Changes
+
+- f1e8828c8: fix: resort prop overrides to allow for style & className merging of list items
+- 304e23318: - Update pull request title to include the branch name
+  - Slugify brach name when typing in the title
+- Updated dependencies [f1e8828c8]
+- Updated dependencies [304e23318]
+- Updated dependencies [a5d986477]
+  - @tinacms/toolkit@1.7.10
+
 ## 1.5.13
 
 ### Patch Changes
