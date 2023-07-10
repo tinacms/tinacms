@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
 /**
 
 
@@ -11,6 +10,7 @@ import { Dismissible } from '../../../react-dismissible'
 import { SketchPicker, BlockPicker } from 'react-color'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
 import { useFormPortal } from '../../../form-builder'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore importing css is not recognized
 import keyframes from './index.css'
 

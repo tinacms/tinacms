@@ -14,6 +14,7 @@ import {
 
 import gql from 'graphql-tag'
 import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
+import { TinaCloudProject } from './types'
 import {
   optionsToSearchIndexOptions,
   parseSearchIndexResponse,
@@ -49,6 +50,8 @@ const parseRefForBranchName = (ref: string) => {
 const ListBranchResponse = z
   .object({
     name: z.string(),
+    protected: z.boolean().optional().default(false),
+    githubPullRequestUrl: z.string().optional(),
   })
   .array()
 
@@ -191,10 +194,12 @@ export class Client {
   tinaGraphQLVersion: string
   setToken: (_token: TokenObject) => void
   private getToken: () => Promise<TokenObject>
-  private token: string // used with memory storage
-  private branch: string
+  token: string // used with memory storage
+  branch: string
   private options: ServerOptions
-  events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
+  events = new EventBus() // automatically hooked into global event bus when attached via cms.
+  protectedBranches: string[] = []
+  usingEditorialWorkflow: boolean = false
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.tinaGraphQLVersion = options.tinaGraphQLVersion
@@ -283,6 +288,10 @@ export class Client {
 
   public get isLocalMode() {
     return false
+  }
+
+  public get isCustomContentApi() {
+    return !!this.options.customContentApiUrl
   }
 
   setBranch(branchName: string) {
@@ -459,6 +468,53 @@ mutation addPendingDocumentMutation(
     return jsonRes
   }
 
+  async getProject() {
+    const res = await this.fetchWithToken(
+      `${this.identityApiUrl}/v2/apps/${this.clientId}`,
+      {
+        method: 'GET',
+      }
+    )
+    const val = await res.json()
+    return val as TinaCloudProject
+  }
+
+  async createPullRequest({
+    baseBranch,
+    branch,
+    title,
+  }: {
+    baseBranch: string
+    branch: string
+    title: string
+  }) {
+    const url = `${this.contentApiBase}/github/${this.clientId}/create_pull_request`
+
+    try {
+      const res = await this.fetchWithToken(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          baseBranch,
+          branch,
+          title,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!res.ok) {
+        throw new Error(
+          `There was an error creating a new branch. ${res.statusText}`
+        )
+      }
+      const values = await res.json()
+      return values
+    } catch (error) {
+      console.error('There was an error creating a new branch.', error)
+      throw error
+    }
+  }
+
   async fetchEvents(
     limit?: number,
     cursor?: string
@@ -500,16 +556,6 @@ mutation addPendingDocumentMutation(
         .join('')
     )
     return JSON.parse(jsonPayload)
-  }
-
-  async getProject() {
-    const res = await this.fetchWithToken(
-      `${this.identityApiUrl}/v2/apps/${this.clientId}`,
-      {
-        method: 'GET',
-      }
-    )
-    return res.json()
   }
 
   async getRefreshedToken(tokens: string): Promise<TokenObject> {
@@ -647,6 +693,7 @@ mutation addPendingDocumentMutation(
   }
 
   waitForIndexStatus({ ref }: { ref: string }) {
+    let unknownCount = 0
     try {
       const [prom, cancel] = asyncPoll(
         async (): Promise<AsyncData<any>> => {
@@ -660,6 +707,14 @@ mutation addPendingDocumentMutation(
                 data: result,
               })
             } else {
+              if (result.status === 'unknown') {
+                unknownCount++
+                if (unknownCount > 5) {
+                  throw new Error(
+                    'AsyncPoller: status unknown for too long, please check indexing progress the Tina Cloud dashboard'
+                  )
+                }
+              }
               return Promise.resolve({
                 done: false,
               })
@@ -677,9 +732,7 @@ mutation addPendingDocumentMutation(
     } catch (error) {
       if (error.message === 'AsyncPoller: reached timeout') {
         console.warn(error)
-        return {
-          status: 'timeout',
-        }
+        return [Promise.resolve({ status: 'timeout' }), () => {}]
       }
       throw error
     }
@@ -693,7 +746,7 @@ mutation addPendingDocumentMutation(
     return parsedResult
   }
 
-  async listBranches() {
+  async listBranches(args?: { includeIndexStatus?: boolean }) {
     try {
       const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
       const res = await this.fetchWithToken(url, {
@@ -701,6 +754,9 @@ mutation addPendingDocumentMutation(
       })
       const branches = await res.json()
       const parsedBranches = ListBranchResponse.parse(branches)
+      if (args?.includeIndexStatus === false) {
+        return parsedBranches
+      }
       const indexStatusPromises = parsedBranches.map(async (branch) => {
         const indexStatus = await this.getIndexStatus({ ref: branch.name })
         return {
@@ -708,6 +764,9 @@ mutation addPendingDocumentMutation(
           indexStatus,
         }
       })
+      this.protectedBranches = parsedBranches
+        .filter((x) => x.protected)
+        .map((x) => x.name)
       const indexStatus = await Promise.all(indexStatusPromises)
 
       return indexStatus
@@ -715,6 +774,12 @@ mutation addPendingDocumentMutation(
       console.error('There was an error listing branches.', error)
       throw error
     }
+  }
+  usingProtectedBranch() {
+    return (
+      this.usingEditorialWorkflow &&
+      this.protectedBranches?.includes(this.branch)
+    )
   }
   async createBranch({ baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`
@@ -730,10 +795,16 @@ mutation addPendingDocumentMutation(
           'Content-Type': 'application/json',
         },
       })
-      return await res.json().then((r) => parseRefForBranchName(r.data.ref))
+      if (!res.ok) {
+        console.error('There was an error creating a new branch.')
+        const error = await res.json()
+        throw new Error(error?.message)
+      }
+      const values = await res.json()
+      return parseRefForBranchName(values.data.ref)
     } catch (error) {
       console.error('There was an error creating a new branch.', error)
-      return null
+      throw error
     }
   }
 }

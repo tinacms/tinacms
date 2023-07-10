@@ -28,7 +28,7 @@ const walkThrough = function* (obj: object) {
   // @ts-ignore
   const walk = function* (x: object & { position?: object }, previous = []) {
     if (x) {
-      for (let key of Object.keys(x)) {
+      for (const key of Object.keys(x)) {
         if (key === 'position') {
           delete x.position
         }

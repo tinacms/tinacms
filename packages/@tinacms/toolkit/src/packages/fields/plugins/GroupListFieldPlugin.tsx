@@ -268,18 +268,23 @@ export const ItemHeader = ({
   isDragging: boolean
   children: any | any[]
   provider: any
-}) => {
+} & any) => {
   return (
     <div
-      className={`relative group cursor-pointer flex justify-between items-stretch bg-white border border-gray-100 -mb-px overflow-visible p-0 text-sm font-normal ${
-        isDragging
-          ? `rounded shadow text-blue-600`
-          : `text-gray-600 first:rounded-t last:rounded-b`
-      }`}
       ref={provider.innerRef}
       {...provider.draggableProps}
       {...provider.dragHandleProps}
       {...props}
+      className={`relative group cursor-pointer flex justify-between items-stretch bg-white border border-gray-100 -mb-px overflow-visible p-0 text-sm font-normal ${
+        isDragging
+          ? `rounded shadow text-blue-600`
+          : `text-gray-600 first:rounded-t last:rounded-b`
+      } ${props.className ?? ''}`}
+      style={{
+        ...(provider.draggableProps.style ?? {}),
+        ...(provider.dragHandleProps.style ?? {}),
+        ...(props.style ?? {}),
+      }}
     >
       {children}
     </div>

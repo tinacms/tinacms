@@ -6,7 +6,16 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
-import { TinaCMS, useCMS } from '@tinacms/toolkit'
+import {
+  Button,
+  Modal,
+  ModalActions,
+  ModalBody,
+  ModalHeader,
+  PopupModal,
+  TinaCMS,
+  useCMS,
+} from '@tinacms/toolkit'
 
 import Layout from './components/Layout'
 import Sidebar from './components/Sidebar'
@@ -24,6 +33,7 @@ import ScreenPage from './pages/ScreenPage'
 import { useEditState } from '@tinacms/sharedctx'
 import { Client } from '../internalClient'
 import { TinaAdminApi } from './api'
+import { IndexingPage } from './pages/IndexingPage'
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -112,6 +122,9 @@ const CheckSchema = ({
   const cms = useCMS()
   const api = new TinaAdminApi(cms)
   const url = api.api.contentApiUrl
+  const [schemaMissingError, setSchemaMissingError] = React.useState(false)
+  const currentBranch = decodeURIComponent(cms.api.tina.branch)
+
   useEffect(() => {
     if (schemaJson && cms) {
       api
@@ -125,9 +138,50 @@ const CheckSchema = ({
             )
           }
         })
+        .catch((e) => {
+          // TODO: HACK- Check on an error id, rather than message string
+          if (e.message.includes('has not been indexed by Tina Cloud')) {
+            setSchemaMissingError(true)
+          } else {
+            throw e
+          }
+        })
     }
   }, [cms, JSON.stringify(schemaJson || {}), url])
-  return children
+  return (
+    <>
+      {schemaMissingError ? (
+        <Modal>
+          <PopupModal>
+            <ModalHeader>Branch Not Found</ModalHeader>
+            <ModalBody padded={true}>
+              <div className="tina-prose">
+                The current branch (
+                <span className="font-bold">{currentBranch}</span>) has either
+                been merged or deleted.
+              </div>
+            </ModalBody>
+            <ModalActions>
+              <div className="flex-1"></div>
+              <Button
+                style={{ flexGrow: 1 }}
+                className="w-full"
+                variant="primary"
+                onClick={() => {
+                  window.localStorage.removeItem('tinacms-current-branch')
+                  window.location.reload()
+                }}
+              >
+                Switch back to default branch
+              </Button>
+            </ModalActions>
+          </PopupModal>
+        </Modal>
+      ) : (
+        children
+      )}
+    </>
+  )
 }
 
 export const TinaAdmin = ({
@@ -168,120 +222,132 @@ export const TinaAdmin = ({
             })
           const hasRouter = Boolean(collectionWithRouter)
           return (
-            <CheckSchema schemaJson={schemaJson}>
-              <Router>
-                {/* @ts-ignore */}
-                <SetPreviewFlag preview={preview} cms={cms} />
-                <Routes>
-                  {preview && (
+            <>
+              <CheckSchema schemaJson={schemaJson}>
+                <Router>
+                  {/* @ts-ignore */}
+                  <SetPreviewFlag preview={preview} cms={cms} />
+                  <Routes>
+                    {preview && (
+                      <Route
+                        path="/~/*"
+                        element={
+                          <PreviewInner config={config} preview={preview} />
+                        }
+                      />
+                    )}
                     <Route
-                      path="/~/*"
+                      path="graphql"
                       element={
-                        <PreviewInner config={config} preview={preview} />
+                        <PlainLayout>
+                          <Playground />
+                        </PlainLayout>
                       }
                     />
-                  )}
-                  <Route
-                    path="graphql"
-                    element={
-                      <PlainLayout>
-                        <Playground />
-                      </PlainLayout>
-                    }
-                  />
-                  <Route
-                    path="collections/new/:collectionName"
-                    element={
-                      <DefaultWrapper cms={cms}>
-                        <CollectionCreatePage />
-                      </DefaultWrapper>
-                    }
-                  />
-                  <Route
-                    path="collections/duplicate/:collectionName/~/*"
-                    element={
-                      <DefaultWrapper cms={cms}>
-                        <CollectionDuplicatePage />
-                      </DefaultWrapper>
-                    }
-                  />
-                  <Route
-                    path="collections/duplicate/:collectionName/*"
-                    element={
-                      <DefaultWrapper cms={cms}>
-                        <CollectionDuplicatePage />
-                      </DefaultWrapper>
-                    }
-                  />
-                  <Route
-                    path="collections/new/:collectionName/:templateName"
-                    element={
-                      <DefaultWrapper cms={cms}>
-                        <CollectionCreatePage />
-                      </DefaultWrapper>
-                    }
-                  />
-                  <Route
-                    path="collections/new/:collectionName/:templateName/~/*"
-                    element={
-                      <DefaultWrapper cms={cms}>
-                        <CollectionCreatePage />
-                      </DefaultWrapper>
-                    }
-                  />
-                  <Route
-                    path="collections/new/:collectionName/~/*"
-                    element={
-                      <DefaultWrapper cms={cms}>
-                        <CollectionCreatePage />
-                      </DefaultWrapper>
-                    }
-                  />
-                  <Route
-                    path="collections/edit/:collectionName/*"
-                    element={
-                      <DefaultWrapper cms={cms}>
-                        <CollectionUpdatePage />
-                      </DefaultWrapper>
-                    }
-                  />
-                  <Route
-                    path="collections/:collectionName/*"
-                    element={
-                      <DefaultWrapper cms={cms}>
-                        <CollectionListPage />
-                      </DefaultWrapper>
-                    }
-                  />
-                  <Route
-                    path="screens/:screenName"
-                    element={
-                      <DefaultWrapper cms={cms}>
-                        <ScreenPage />
-                      </DefaultWrapper>
-                    }
-                  />
-                  <Route
-                    path="logout"
-                    element={
-                      <DefaultWrapper cms={cms}>
-                        <LogoutRedirect />
-                      </DefaultWrapper>
-                    }
-                  />
-                  <Route
-                    path="/"
-                    element={
-                      <MaybeRedirectToPreview redirect={!!preview && hasRouter}>
+                    <Route
+                      path="branch/new"
+                      element={
                         <DefaultWrapper cms={cms}>
-                          <DashboardPage />
+                          <IndexingPage />
                         </DefaultWrapper>
-                      </MaybeRedirectToPreview>
-                    }
-                  />
-                </Routes>
-              </Router>
-            </CheckSchema>
+                      }
+                    />
+                    <Route
+                      path="collections/new/:collectionName"
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <CollectionCreatePage />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path="collections/duplicate/:collectionName/~/*"
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <CollectionDuplicatePage />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path="collections/duplicate/:collectionName/*"
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <CollectionDuplicatePage />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path="collections/new/:collectionName/:templateName"
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <CollectionCreatePage />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path="collections/new/:collectionName/:templateName/~/*"
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <CollectionCreatePage />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path="collections/new/:collectionName/~/*"
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <CollectionCreatePage />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path="collections/edit/:collectionName/*"
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <CollectionUpdatePage />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path="collections/:collectionName/*"
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <CollectionListPage />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path="screens/:screenName"
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <ScreenPage />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path="logout"
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <LogoutRedirect />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path="/"
+                      element={
+                        <MaybeRedirectToPreview
+                          redirect={!!preview && hasRouter}
+                        >
+                          <DefaultWrapper cms={cms}>
+                            <DashboardPage />
+                          </DefaultWrapper>
+                        </MaybeRedirectToPreview>
+                      }
+                    />
+                  </Routes>
+                </Router>
+              </CheckSchema>
+            </>
           )
         } else {
           return (

@@ -293,7 +293,7 @@ function stringifyObj(obj: unknown, flatten: boolean) {
   }
 }
 
-export function assertShape<T extends unknown>(
+export function assertShape<T>(
   value: unknown,
   callback: (item: any) => boolean,
   errorMessage?: string

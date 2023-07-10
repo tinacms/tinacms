@@ -1,3 +1,4 @@
+// TODO: Consolidate these types with the ones from the internal client
 export interface Branch {
   indexStatus: {
     status?: 'unknown' | 'complete' | 'failed' | 'inprogress' | 'timeout'
@@ -9,6 +10,7 @@ export interface Branch {
     sha?: string
     url?: string
   }
+  githubPullRequestUrl?: string
 }
 
 export interface BranchSwitcherProps {
@@ -21,6 +23,7 @@ export interface BranchSwitcherProps {
     baseBranch: string
     branchName: string
   }) => Promise<string>
+  setModalTitle?: any
 }
 
 export interface BranchChangeEvent {
@@ -29,8 +32,6 @@ export interface BranchChangeEvent {
 }
 
 export interface BranchData {
-  owner: string
-  repo: string
   baseBranch?: string
   branchName?: string
 }

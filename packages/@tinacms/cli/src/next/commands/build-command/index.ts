@@ -38,6 +38,10 @@ export class BuildCommand extends BaseCommand {
     description:
       'Skips indexing the content. This can be used for building the site without indexing the content  (defaults to false)',
   })
+  partialReindex = Option.Boolean('--partial-reindex', false, {
+    description:
+      'Re-indexes only the content that has changed since the last build (defaults to false). Not currently supported for separate content repos.',
+  })
   tinaGraphQLVersion = Option.String('--tina-graphql-version', {
     description:
       'Specify the version of @tinacms/graphql to use (defaults to latest)',
@@ -115,6 +119,8 @@ export class BuildCommand extends BaseCommand {
         database,
         graphQLSchema,
         tinaSchema,
+        configManager,
+        partialReindex: this.partialReindex,
       })
     }
 

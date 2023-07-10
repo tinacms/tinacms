@@ -1,28 +1,74 @@
 import * as React from 'react'
-import { BiChevronDown, BiGitBranch } from 'react-icons/bi'
 import {
-  Modal,
-  ModalBody,
-  ModalHeader,
-  PopupModal,
-} from '../../packages/react-modals'
-import { useCMS } from '../../react-tinacms'
+  BiChevronDown,
+  BiGitBranch,
+  BiLinkExternal,
+  BiLockAlt,
+} from 'react-icons/bi'
 import { useBranchData } from './BranchData'
-import { BranchSwitcher } from './BranchSwitcher'
+import { BranchModal } from './BranchModal'
+import { Button } from '../../packages/styles'
+import { useWindowWidth } from '@react-hook/window-size'
+import { useCMS } from '../../react-tinacms/use-cms'
+
+// trim 'tina/' prefix from branch name
+const trimPrefix = (branchName: string) => {
+  return branchName.replace(/^tina\//, '')
+}
 
 export const BranchBanner = () => {
+  const cms = useCMS()
   const [open, setOpen] = React.useState(false)
   const openModal = () => setOpen(true)
   const { currentBranch } = useBranchData()
+  const isProtected = cms.api.tina.usingProtectedBranch()
+
+  const navBreakpoint = 1000
+  const windowWidth = useWindowWidth()
+  const renderNavToggle = windowWidth < navBreakpoint + 1
+  const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
+  const branch = decodeURIComponent(cms.api.tina.branch)
+  const previewUrl = previewFunction ? previewFunction({ branch })?.url : null
 
   return (
     <>
-      <div className="flex-grow-0 flex justify-between items-center gap-2 w-full max-w-full text-xs items-center py-2 px-4 text-gray-500 bg-gradient-to-r from-white to-gray-50 border-b border-gray-150 gap-2">
-        <BiGitBranch className="shrink-0 w-5 h-auto text-blue-500/70" />{' '}
-        <span className="shrink-">Branch</span>
-        <div className="flex-1 min-w-0 flex items-center justify-start">
-          <BranchButton currentBranch={currentBranch} openModal={openModal} />
-        </div>
+      <div
+        className={`w-full bg-white flex items-center gap-2 -mb-px border-b border-gray-100 py-3 pr-4 ${
+          renderNavToggle ? 'pl-20' : 'pl-4'
+        }`}
+      >
+        <Button
+          variant={isProtected ? 'primary' : 'white'}
+          size="small"
+          onClick={openModal}
+        >
+          {isProtected ? (
+            <BiLockAlt className="flex-shrink-0 w-4 h-auto text-white opacity-70 mr-1" />
+          ) : (
+            <BiGitBranch
+              className={`flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1`}
+            />
+          )}
+          <span className="truncate max-w-full">
+            {trimPrefix(currentBranch)}
+          </span>
+          <BiChevronDown
+            className="-mr-1 h-4 w-4 opacity-70 shrink-0"
+            aria-hidden="true"
+          />
+        </Button>
+        {previewUrl && (
+          <Button
+            variant="white"
+            size="small"
+            onClick={() => {
+              window.open(previewUrl, '_blank')
+            }}
+          >
+            <BiLinkExternal className="flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1" />
+            Preview
+          </Button>
+        )}
       </div>
       {open && (
         <BranchModal
@@ -32,46 +78,5 @@ export const BranchBanner = () => {
         />
       )}
     </>
-  )
-}
-
-interface SubmitModalProps {
-  close(): void
-}
-
-const BranchButton = ({ currentBranch = 'main', openModal }) => {
-  return (
-    <button
-      className="flex min-w-0	shrink gap-1.5 items-center justify-between form-select h-7 px-2.5 border border-gray-200 bg-white text-gray-700 hover:text-blue-500 transition-color duration-150 ease-out rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight capitalize min-w-[5rem]"
-      onClick={openModal}
-    >
-      <span className="truncate max-w-full">{currentBranch}</span>
-      <BiChevronDown
-        className="-mr-1 -ml-1 h-4 w-4 opacity-70 shrink-0"
-        aria-hidden="true"
-      />
-    </button>
-  )
-}
-
-const BranchModal = ({ close }: SubmitModalProps) => {
-  const tinaApi = useCMS().api.tina
-  const { setCurrentBranch } = useBranchData()
-
-  return (
-    <Modal>
-      <PopupModal>
-        <ModalHeader close={close}>Select Branch</ModalHeader>
-        <ModalBody padded={false}>
-          <BranchSwitcher
-            listBranches={tinaApi.listBranches.bind(tinaApi)}
-            createBranch={async (data) => {
-              return await tinaApi.createBranch(data)
-            }}
-            chooseBranch={setCurrentBranch}
-          />
-        </ModalBody>
-      </PopupModal>
-    </Modal>
   )
 }

@@ -178,6 +178,19 @@ export class Database {
     }
   }
 
+  public getMetadata = async (key: string) => {
+    await this.initLevel()
+    const metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    const metadata = await metadataLevel.get(`metadata_${key}`)
+    return metadata?.value
+  }
+
+  public setMetadata = async (key: string, value: string) => {
+    await this.initLevel()
+    const metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    return metadataLevel.put(`metadata_${key}`, { value })
+  }
+
   public get = async <T extends object>(filepath: string): Promise<T> => {
     await this.initLevel()
     if (SYSTEM_FILES.includes(filepath)) {
@@ -806,7 +819,7 @@ export class Database {
         continue
       }
 
-      let filepath = matcher.groups['_filepath_']
+      const filepath = matcher.groups['_filepath_']
       let itemRecord: Record<string, any>
       if (filterSuffixes) {
         itemRecord = matcher.groups

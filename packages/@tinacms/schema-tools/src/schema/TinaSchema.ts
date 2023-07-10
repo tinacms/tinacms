@@ -356,7 +356,7 @@ export class TinaSchema {
   public getTemplatesForCollectable = (
     collection: Collectable
   ): CollectionTemplateable => {
-    let extraFields: TinaField<true>[] = []
+    const extraFields: TinaField<true>[] = []
     if (collection?.fields) {
       const template = collection
 

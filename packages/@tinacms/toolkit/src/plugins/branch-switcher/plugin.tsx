@@ -1,6 +1,3 @@
-/**
-
-*/
 import * as React from 'react'
 import { BiGitRepoForked } from 'react-icons/bi'
 import { ScreenPlugin } from '../../packages/react-screens'
@@ -8,10 +5,10 @@ import { BranchSwitcher } from './BranchSwitcher'
 import { BranchSwitcherProps } from './types'
 
 export class BranchSwitcherPlugin implements ScreenPlugin {
-  __type = 'screen' as 'screen'
+  __type = 'screen' as const
   Icon = BiGitRepoForked
   name = 'Select Branch'
-  layout = 'popup' as 'popup'
+  layout = 'popup' as const
 
   listBranches: BranchSwitcherProps['listBranches']
   createBranch: BranchSwitcherProps['createBranch']

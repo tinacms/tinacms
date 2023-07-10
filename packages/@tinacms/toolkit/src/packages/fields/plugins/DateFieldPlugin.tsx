@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import * as React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { InputProps, textFieldClasses } from '../components'
@@ -7,6 +6,7 @@ import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import ReactDatetime from '../../react-datetime/DateTime'
 import type { DatetimepickerProps } from 'react-datetime'
 import { format, parse, DEFAULT_DATE_DISPLAY_FORMAT } from './dateFormat'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore importing css is not recognized
 import DateFieldPluginCSS from './DateFieldPlugin.css'
 import { Field } from '../../forms'

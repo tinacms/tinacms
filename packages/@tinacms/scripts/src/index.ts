@@ -232,6 +232,7 @@ const config = (cwd = '') => {
         3: '12px',
         3.5: '14px',
         4: '16px',
+        4.5: '18px',
         5: '20px',
         6: '24px',
         7: '28px',
@@ -573,7 +574,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
       {
         name: 'vite-plugin-tina',
         config: (_, env) => {
-          let plugins = []
+          const plugins = []
 
           const tw = tailwind(config(process.cwd()))
           plugins.push(tailwindNesting)

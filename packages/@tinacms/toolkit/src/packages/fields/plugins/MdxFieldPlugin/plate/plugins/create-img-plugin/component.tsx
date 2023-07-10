@@ -7,8 +7,13 @@ import { useSelected } from 'slate-react'
 import { insertNodes, ELEMENT_PARAGRAPH } from '@udecode/plate-headless'
 import { NestedForm } from '../../nested-form'
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks'
-import { DeleteImageButton } from '../../../../../components'
 import { useTemplates } from '../../editor-context'
+import {
+  DeleteImageButton,
+  StyledFile,
+  StyledImage,
+} from '../../../../../components'
+import { isImage } from '../../../../../../../components/media/utils'
 
 export const ImgEmbed = ({
   attributes,
@@ -29,46 +34,49 @@ export const ImgEmbed = ({
   return (
     <span {...attributes} className="">
       {children}
-      <span className="relative">
-        <span className="relative inline-flex shadow-sm rounded-md">
-          {selected && (
-            <span className="z-10 absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-md pointer-events-none" />
-          )}
-          <div className="z-10">
-            <DeleteImageButton
-              onClick={(e) => {
-                e.stopPropagation()
-                handleRemove()
-              }}
-            />
-          </div>
-          <span
-            onMouseDown={handleSelect}
-            className="min-w-[200px] max-w-[400px] cursor-pointer rounded-md relative bg-gray-100 overflow-hidden relative"
+      {element.url ? (
+        <div
+          className={`relative w-full max-w-full flex justify-start ${
+            isImage(element.url) ? `items-start gap-3` : `items-center gap-2`
+          }`}
+        >
+          <button
+            className={`flex-shrink min-w-0 focus-within:shadow-outline focus-within:border-blue-500 rounded outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100 ${
+              selected ? 'shadow-outline border-blue-500' : ''
+            }`}
+            onClick={handleSelect}
           >
-            {element.url ? (
-              <img
-                src={element.url}
-                title={element.caption}
-                alt={element.alt}
-                className="my-0 min-h-[100px]"
-              />
+            {isImage(element.url) ? (
+              <StyledImage src={element.url} />
             ) : (
-              <span className="min-h-[100px] min-w-[200px] flex items-center justify-center text-gray-300">
-                <span>Click to add an image</span>
-              </span>
+              <StyledFile src={element.url} />
             )}
-          </span>
-        </span>
-        {isExpanded && (
-          <ImageForm
-            onChange={onChange}
-            initialValues={element}
-            onClose={handleClose}
-            element={element}
+          </button>
+          <DeleteImageButton
+            onClick={(e) => {
+              e.stopPropagation()
+              handleRemove()
+            }}
           />
-        )}
-      </span>
+        </div>
+      ) : (
+        <button
+          className="outline-none relative hover:opacity-60 w-full"
+          onClick={handleSelect}
+        >
+          <div className="text-center rounded-[5px] bg-gray-100 text-gray-300 leading-[1.35] py-3 text-[15px] font-normal transition-all ease-out duration-100 hover:opacity-60">
+            Click to select an image
+          </div>
+        </button>
+      )}
+      {isExpanded && (
+        <ImageForm
+          onChange={onChange}
+          initialValues={element}
+          onClose={handleClose}
+          element={element}
+        />
+      )}
     </span>
   )
 }
