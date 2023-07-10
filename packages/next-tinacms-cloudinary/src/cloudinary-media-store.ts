@@ -58,11 +58,11 @@ export class CloudinaryMediaStore implements MediaStore {
         filename: fileRes.original_filename,
         directory: '/',
         thumbnails: {
-          '75x75': fileRes.url,
-          '400x400': fileRes.url,
-          '1000x1000': fileRes.url,
+          '75x75': fileRes.secure_url,
+          '400x400': fileRes.secure_url,
+          '1000x1000': fileRes.secure_url,
         },
-        src: fileRes.url,
+        src: fileRes.secure_url,
       }
 
       newFiles.push(parsedRes)
