@@ -1,5 +1,13 @@
 # @tinacms/app
 
+## 1.2.22
+
+### Patch Changes
+
+- @tinacms/mdx@1.3.14
+- tinacms@1.5.15
+- @tinacms/toolkit@1.7.11
+
 ## 1.2.21
 
 ### Patch Changes
