@@ -14,7 +14,6 @@ import {
 } from './plugins/create-mdx-plugins'
 import { createImgPlugin } from './plugins/create-img-plugin'
 import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin'
-// import { createSlashPlugin } from './plugins/create-slash-plugin'
 import { createLinkPlugin } from './plugins/create-link-plugin'
 import { uuid } from './plugins/ui/helpers'
 import { RichTextType } from '..'
@@ -40,7 +39,6 @@ export const RichEditor = (props: RichTextType) => {
           createInvalidMarkdownPlugin(),
           createLinkPlugin(),
           // This is a bit buggy
-          // createSlashPlugin(),
         ],
         {
           components: components(),
