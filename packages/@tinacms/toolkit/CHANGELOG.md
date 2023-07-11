@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.7.11
+
+### Patch Changes
+
+- @tinacms/search@1.0.5
+
 ## 1.7.10
 
 ### Patch Changes
