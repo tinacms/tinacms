@@ -49,11 +49,16 @@ export async function createAndInitializeDatabase(
   const bridge =
     bridgeOverride ||
     new FilesystemBridge(configManager.rootPath, configManager.contentRootPath)
+  console.log('createAndInitializeDatabase')
   if (
     configManager.hasSelfHostedConfig() &&
     configManager.config.contentApiUrlOverride
   ) {
+    console.log('createAndInitializeDatabase: hasSelfHostedConfig')
+
     database = (await configManager.loadDatabaseFile()) as Database
+    console.log('createdDB', !!database)
+
     database.bridge = bridge
   } else {
     if (

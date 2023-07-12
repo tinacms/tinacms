@@ -67,8 +67,11 @@ export class DevCommand extends BaseCommand {
 
     const setup = async ({ firstTime }: { firstTime: boolean }) => {
       try {
+        console.log('Setting up db')
         await configManager.processConfig()
         if (firstTime) {
+          console.log('Will createAndInitializeDatabase')
+
           database = await createAndInitializeDatabase(
             configManager,
             Number(this.datalayerPort)
