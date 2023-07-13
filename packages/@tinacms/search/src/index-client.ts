@@ -1,14 +1,25 @@
 export type { SearchClient } from './types'
 export { processDocumentForIndexing } from './indexer/utils'
+import { lookupStopwords } from './indexer/utils'
 
-export const queryToSearchIndexQuery = (query: string) => {
+export const queryToSearchIndexQuery = (
+  query: string,
+  stopwordLanguages?: string[]
+) => {
   let q
   const parts = query.split(' ')
+  const stopwords = lookupStopwords(stopwordLanguages)
   if (parts.length === 1) {
     q = { AND: [parts[0]] }
   } else {
     // TODO only allow AND for now - need parser
-    q = { AND: parts.filter((part) => part.toLowerCase() !== 'and') }
+    q = {
+      AND: parts.filter(
+        (part) =>
+          part.toLowerCase() !== 'and' &&
+          stopwords.indexOf(part.toLowerCase()) === -1
+      ),
+    }
   }
   return q
 }

@@ -3,7 +3,7 @@ import { SqliteLevel } from 'sqlite-level'
 import * as zlib from 'zlib'
 import si from 'search-index'
 import { MemoryLevel } from 'memory-level'
-import { lookupStopwords } from '../index'
+import { lookupStopwords } from '../indexer/utils'
 import fetch, { Headers } from 'node-fetch'
 
 const DEFAULT_TOKEN_SPLIT_REGEX = /[\p{L}\d_]+/gu
