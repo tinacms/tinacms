@@ -849,7 +849,10 @@ export class LocalClient extends Client {
 }
 
 export class TinaCMSSearchClient implements SearchClient {
-  constructor(private client: Client) {}
+  constructor(
+    private client: Client,
+    private tinaSearchConfig?: { stopwordLanguages?: string[] }
+  ) {}
   async query(
     query: string,
     options?: {
@@ -862,7 +865,10 @@ export class TinaCMSSearchClient implements SearchClient {
     total: number
     prevCursor: string | null
   }> {
-    const q = queryToSearchIndexQuery(query)
+    const q = queryToSearchIndexQuery(
+      query,
+      this.tinaSearchConfig?.stopwordLanguages
+    )
     const opt = optionsToSearchIndexOptions(options)
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
     const res = await this.client.fetchWithToken(
