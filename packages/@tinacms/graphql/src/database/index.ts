@@ -1229,6 +1229,12 @@ const _indexContent = async (
         collection,
         templateInfo
       )
+
+      // if we aren't able to load the data, we can't index it
+      if (!aliasedData) {
+        return
+      }
+
       const normalizedPath = normalizePath(filepath)
       const folderKey = folderTreeBuilder.update(
         normalizedPath,
