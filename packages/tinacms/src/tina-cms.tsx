@@ -187,6 +187,7 @@ export const TinaCMSProvider2 = ({
         clientId={clientId || schema?.config?.clientId}
         tinaioConfig={props.tinaioConfig}
         isLocalClient={isLocalOverride || isLocalClient}
+        isSelfHosted={!!schema?.config?.contentApiUrlOverride}
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}
         apiUrl={apiURL}

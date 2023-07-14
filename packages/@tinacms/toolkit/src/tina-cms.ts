@@ -71,6 +71,7 @@ export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions | boolean
   alerts?: EventsToAlerts
   isLocalClient?: boolean
+  isSelfHosted?: boolean
   clientId?: string
 }
 
@@ -84,6 +85,7 @@ export class TinaCMS extends CMS {
     sidebar,
     alerts = {},
     isLocalClient,
+    isSelfHosted,
     clientId,
     ...config
   }: TinaCMSConfig = {}) {
@@ -139,7 +141,7 @@ export class TinaCMS extends CMS {
             },
           })
         )
-      } else {
+      } else if (!isSelfHosted) {
         this.plugins.add(
           createCloudConfig({
             name: 'Setup Cloud',

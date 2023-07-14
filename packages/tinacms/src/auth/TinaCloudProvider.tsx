@@ -166,6 +166,7 @@ export const TinaCloudProvider = (
         enabled: true,
         sidebar: true,
         isLocalClient: props.isLocalClient,
+        isSelfHosted: !!props.contentApiUrlOverride,
         clientId: props.clientId,
       }),
     [props.cms]

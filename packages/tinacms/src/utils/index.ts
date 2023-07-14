@@ -10,6 +10,7 @@ import { Schema } from '@tinacms/schema-tools'
 export interface CreateClientProps {
   clientId?: string
   isLocalClient?: boolean
+  isSelfHosted?: boolean
   tinaioConfig?: TinaIOConfig
   owner?: string
   repo?: string
