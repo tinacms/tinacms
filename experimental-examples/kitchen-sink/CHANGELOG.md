@@ -4,6 +4,13 @@
 
 ### Patch Changes
 
+- Updated dependencies [1889422b0]
+  - tinacms@1.5.16
+
+## null
+
+### Patch Changes
+
 - tinacms@1.5.15
 
 ## null

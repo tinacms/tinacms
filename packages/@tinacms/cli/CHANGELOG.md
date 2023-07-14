@@ -1,5 +1,17 @@
 # tinacms-cli
 
+## 1.5.25
+
+### Patch Changes
+
+- 94f353822: Fix to log errors in spinner
+- Updated dependencies [ad6a166a6]
+- Updated dependencies [94f353822]
+  - @tinacms/search@1.0.6
+  - @tinacms/graphql@1.4.21
+  - @tinacms/app@1.2.23
+  - @tinacms/datalayer@1.2.21
+
 ## 1.5.24
 
 ### Patch Changes
