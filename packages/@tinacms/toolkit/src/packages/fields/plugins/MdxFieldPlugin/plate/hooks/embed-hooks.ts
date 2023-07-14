@@ -6,6 +6,8 @@ import React from 'react'
 import { Transforms } from 'slate'
 import { useSelected, ReactEditor } from 'slate-react'
 import isHotkey from 'is-hotkey'
+import { useCMS, useEvent } from '../../../../../react-core'
+import { FieldFocusEvent } from '../../../../field-events'
 
 const handleCloseBase = (editor, element) => {
   const path = ReactEditor.findPath(editor, element)
@@ -54,7 +56,9 @@ export const useHotkey = (key, callback) => {
   }, [selected])
 }
 
-export const useEmbedHandles = (editor, element) => {
+export const useEmbedHandles = (editor, element, baseFieldName: string) => {
+  const cms = useCMS()
+  const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
   const [isExpanded, setIsExpanded] = React.useState(false)
 
   const handleClose = () => {
@@ -62,9 +66,20 @@ export const useEmbedHandles = (editor, element) => {
     handleCloseBase(editor, element)
   }
 
-  const handleSelect = (e) => {
-    e.preventDefault()
-    setIsExpanded(true)
+  const path = ReactEditor.findPath(editor, element)
+  const fieldName = `${baseFieldName}.children.${path.join('.children.')}.props`
+  const handleSelect = () => {
+    cms.dispatch({
+      type: 'forms:set-active-field-name',
+      value: {
+        formId: cms.state.activeFormId,
+        fieldName,
+      },
+    })
+    setFocusedField({
+      id: cms.state.activeFormId,
+      fieldName,
+    })
   }
 
   const handleRemove = () => {

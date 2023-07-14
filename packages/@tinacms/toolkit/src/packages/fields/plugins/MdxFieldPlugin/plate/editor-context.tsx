@@ -6,10 +6,12 @@ import React from 'react'
 import type { MdxTemplate } from './types'
 
 export const EditorContext = React.createContext<{
+  fieldName: string
   templates: MdxTemplate[]
   rawMode: boolean
   setRawMode: (mode: boolean) => void
 }>({
+  fieldName: '',
   rawMode: false,
   setRawMode: () => {},
   templates: [],
@@ -19,7 +21,5 @@ export const useEditorContext = () => {
 }
 
 export const useTemplates = () => {
-  const { templates } = React.useContext(EditorContext)
-
-  return templates
+  return React.useContext(EditorContext)
 }

@@ -154,18 +154,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   }, [finalForm])
 
   const fieldGroup = tinaForm.getActiveField(form.activeFieldName)
-  const previousName = usePrevious(fieldGroup.name)
-  const animateStatus =
-    fieldGroup.name === previousName
-      ? 'none'
-      : fieldGroup.name
-      ? previousName
-        ? previousName.length < fieldGroup.name.length
-          ? 'forwards'
-          : 'backwards'
-        : 'forwards'
-      : 'none'
-  const animationProps = getAnimationProps(animateStatus)
 
   return (
     <FinalForm
