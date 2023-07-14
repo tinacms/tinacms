@@ -185,7 +185,10 @@ export const TinaCloudProvider = (
     } else {
       const hasTinaSearch = Boolean(props.schema.config?.search?.tina)
       if (hasTinaSearch) {
-        searchClient = new TinaCMSSearchClient(cms.api.tina)
+        searchClient = new TinaCMSSearchClient(
+          cms.api.tina,
+          props.schema.config?.search?.tina
+        )
       } else {
         searchClient = props.schema.config?.search?.searchClient
       }

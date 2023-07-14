@@ -1,4 +1,5 @@
 import { Collection, ObjectField } from '@tinacms/schema-tools'
+import * as sw from 'stopword'
 
 class StringBuilder {
   private readonly buffer: string[]
@@ -147,4 +148,23 @@ export const processDocumentForIndexing = (
     }
   }
   return data
+}
+
+const memo: Record<string, string[]> = {}
+export const lookupStopwords = (
+  keys?: string[],
+  defaultStopWords: string[] = sw.eng
+) => {
+  let stopwords = defaultStopWords
+  if (keys) {
+    if (memo[keys.join(',')]) {
+      return memo[keys.join(',')]
+    }
+    stopwords = []
+    for (const key of keys) {
+      stopwords.push(...sw[key])
+    }
+    memo[keys.join(',')] = stopwords
+  }
+  return stopwords
 }
