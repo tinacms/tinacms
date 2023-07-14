@@ -1,5 +1,15 @@
 # tinacms
 
+## 1.5.16
+
+### Patch Changes
+
+- 1889422b0: Fix issue where deeply nested rich-text fields weren't selectable
+- Updated dependencies [1889422b0]
+- Updated dependencies [ad6a166a6]
+  - @tinacms/toolkit@1.7.12
+  - @tinacms/search@1.0.6
+
 ## 1.5.15
 
 ### Patch Changes

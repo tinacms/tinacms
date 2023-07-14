@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.7.12
+
+### Patch Changes
+
+- 1889422b0: Fix issue where deeply nested rich-text fields weren't selectable
+- Updated dependencies [ad6a166a6]
+  - @tinacms/search@1.0.6
+
 ## 1.7.11
 
 ### Patch Changes

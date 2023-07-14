@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.4.21
+
+### Patch Changes
+
+- 94f353822: Fix to not index content where we are unable to load it due to template issues
+
 ## 1.4.20
 
 ### Patch Changes
