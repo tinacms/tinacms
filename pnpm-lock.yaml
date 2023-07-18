@@ -322,7 +322,6 @@ importers:
       postcss-nested: ^5.0.6
       react: 17.0.2
       react-dom: 17.0.2
-      react-is: 17.0.2
       react-router-dom: 6.3.0
       tailwindcss: ^3.2.7
       tinacms: workspace:*
@@ -345,7 +344,6 @@ importers:
       postcss-nested: 5.0.6_postcss@8.4.14
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
-      react-is: 17.0.2
       react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
       tailwindcss: 3.2.7
       tinacms: link:../../tinacms
@@ -1020,7 +1018,6 @@ importers:
       react-dropzone: 14.2.3
       react-final-form: ^6.3.0
       react-icons: ^4.3.1
-      react-is: ^17.0.2
       react-onclickoutside: ^6.13.0
       scheduler: 0.19.0
       slate: ^0.94.1
@@ -1094,7 +1091,6 @@ importers:
       jest-environment-jsdom: 29.5.0
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
-      react-is: 17.0.2
       tslib: 2.4.0
       typescript: 4.3.5
 
@@ -1283,7 +1279,6 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2
       react-icons: ^4.3.1
-      react-is: ^17.0.2
       react-router-dom: 6.3.0
       typescript: 4.3.5
       yup: ^0.32.0
@@ -1330,7 +1325,6 @@ importers:
       next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
-      react-is: 17.0.2
       typescript: 4.3.5
 
 packages:

@@ -756,10 +756,13 @@ export interface UICollection {
      *
      * eg:
      * ```ts
-     * slugify: (values) => values.title.toLowerCase().split(" ").join("-")
+     * slugify: (values, options) => values.title.toLowerCase().split(" ").join("-")
      * ```
      */
-    slugify?: (values: Record<string, any>) => string
+    slugify?: (
+      values: Record<string, any>,
+      options: { collection: Collection; template: Template }
+    ) => string
     /**
      * When set to `true`, editors won't be able to modify the filename
      */

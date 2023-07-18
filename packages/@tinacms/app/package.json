@@ -25,7 +25,6 @@
     "postcss-nested": "^5.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-is": "17.0.2",
     "react-router-dom": "6.3.0",
     "tailwindcss": "^3.2.7",
     "tinacms": "workspace:*",
