@@ -4,6 +4,7 @@
   "main": "dist/cli.js",
   "module": "dist/index.es.js",
   "files": [
+    "bin/*",
     "dist"
   ],
   "typings": "dist/index.d.ts",
