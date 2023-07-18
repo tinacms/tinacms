@@ -28,7 +28,7 @@
     "test": "jest --passWithNoTests"
   },
   "dependencies": {
-    "@octokit/rest": "^20.0.1",
+    "@octokit/rest": "^19.0.7",
     "@tinacms/graphql": "workspace:*",
     "js-base64": "^3.7.4"
   },
