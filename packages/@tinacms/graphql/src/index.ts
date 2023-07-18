@@ -16,7 +16,7 @@ export type {
   OnPutCallback,
   DatabaseArgs,
 } from './database'
-export { Database } from './database'
+export { Database, createDatabaseInternal } from './database'
 import type { Config } from '@tinacms/schema-tools'
 export { getChangedFiles, getSha } from './git'
 
