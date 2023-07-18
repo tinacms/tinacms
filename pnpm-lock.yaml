@@ -1154,7 +1154,6 @@ importers:
   packages/next-auth-tinacms:
     specifiers:
       '@tinacms/scripts': workspace:*
-      '@types/node': ^13.13.1
       '@upstash/redis': ^1.22.0
       bcryptjs: ^2.4.3
       chalk: ^5.2.0
@@ -1173,7 +1172,6 @@ importers:
       inquirer: 9.2.8
     devDependencies:
       '@tinacms/scripts': link:../@tinacms/scripts
-      '@types/node': 13.13.52
       next: 12.3.4_biqbaboplfbrettd7655fr4n2y
       next-auth: 4.22.1_bhgafntz2ozm43l35i5qtimxry
       react: 18.2.0
@@ -22107,7 +22105,7 @@ packages:
       '@jest/fake-timers': 29.5.0
       '@jest/types': 29.5.0
       '@types/jsdom': 20.0.1
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
       jest-mock: 29.5.0
       jest-util: 29.5.0
       jsdom: 20.0.3
