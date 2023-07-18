@@ -20,7 +20,8 @@
       },
       {
         "name": "src/cli.ts",
-        "target": "node"
+        "target": "node",
+        "bundleDeps": true
       }
     ]
   },
@@ -31,9 +32,10 @@
   "dependencies": {
     "@upstash/redis": "^1.22.0",
     "bcryptjs": "^2.4.3",
-    "chalk": "^5.2.0",
+    "chalk": "^2.4.2",
+    "clipanion": "^3.2.0",
     "dotenv": "^16.3.1",
-    "inquirer": "^9.2.7"
+    "inquirer": "^8.2.5"
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",

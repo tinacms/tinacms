@@ -1,11 +1,20 @@
-import { RedisUserStore } from './redis-user-store'
+//@ts-ignore
+import { version, name } from '../package.json'
 
+import { Cli, Builtins, Command } from 'clipanion'
 import chalk from 'chalk'
 import dotenv from 'dotenv'
 import fs from 'fs'
 import inquirer from 'inquirer'
+
+import { RedisUserStore } from './redis-user-store'
 import { UserStore } from './types'
 
+const cli = new Cli({
+  binaryName: `tinacms-next-auth`,
+  binaryLabel: `TinaCMS NextAuth`,
+  binaryVersion: version,
+})
 const CHOICES = {
   ADD: 'Add a user',
   UPDATE: "Update a user's password",
@@ -96,107 +105,128 @@ export const deleteUser = async (name: string, userStore: UserStore) => {
     console.log(chalk.red(`Error deleting user ${name}!`))
   }
 }
-;(async () => {
-  await fs.promises.stat('.env').catch((_) => {
-    fs.copyFileSync('.env.example', '.env')
-  })
-  dotenv.config()
 
-  console.log(chalk.green('Welcome to TinaCMS!'))
-
-  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-    await promptUserForToken()
-  }
-
-  let done = false
-  const userStore = new RedisUserStore(process.env.NEXTAUTH_CREDENTIALS_KEY, {
-    url: process.env.KV_REST_API_URL,
-    token: process.env.KV_REST_API_TOKEN,
+class SetupCommand extends Command {
+  static usage = Command.Usage({
+    category: `Commands`,
+    description: `Configure TinaCMS Users`,
+    examples: [[`A basic example`, `$0 setup`]],
   })
 
-  // Loop until user exits
-  while (!done) {
-    const users = await userStore.getUsers()
-    if (!users?.length) {
-      console.log(chalk.red('No users found! Please add a user.'))
-    } else {
-      console.log(chalk.green('Users:'))
-      console.table(
-        users.map((user) => {
-          return {
-            name: user.name,
-          }
+  async execute(): Promise<number | void> {
+    await fs.promises.stat('.env').catch(async (_) => {
+      await fs.promises
+        .stat('.env.example')
+        .then(async (_) => {
+          fs.copyFileSync('.env.example', '.env')
         })
-      )
+        .catch(async (_) => {
+          console.log(chalk.red('No .env file found!'))
+          process.exit(1)
+        })
+    })
+    dotenv.config()
+
+    console.log(chalk.green('Welcome to TinaCMS!'))
+
+    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+      await promptUserForToken()
     }
 
-    const answers = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'choice',
-        message: `What would you like to do?`,
-        choices: [CHOICES.ADD, CHOICES.UPDATE, CHOICES.DELETE, CHOICES.EXIT],
-      },
-      {
-        type: 'input',
-        name: 'name',
-        message: `Enter a username:`,
-        when: (answers) =>
-          answers.choice === CHOICES.ADD ||
-          answers.choice === CHOICES.UPDATE ||
-          answers.choice === CHOICES.DELETE,
-      },
-      {
-        type: 'password',
-        name: 'password',
-        message: `Enter a user password:`,
-        when: (answers) =>
-          answers.choice === CHOICES.ADD || answers.choice === CHOICES.UPDATE,
-      },
-      {
-        type: 'password',
-        name: 'passwordConfirm',
-        message: `Confirm the user password:`,
-        when: (answers) =>
-          answers.choice === CHOICES.ADD || answers.choice === CHOICES.UPDATE,
-      },
-    ])
+    let done = false
+    const userStore = new RedisUserStore(process.env.NEXTAUTH_CREDENTIALS_KEY, {
+      url: process.env.KV_REST_API_URL,
+      token: process.env.KV_REST_API_TOKEN,
+    })
 
-    if (answers.choice === CHOICES.ADD) {
-      const { name, password, passwordConfirm } = answers
-      try {
-        await addUser(name, password, passwordConfirm, userStore)
-      } catch (e) {
-        console.log(
-          chalk.red(
-            `An unexpected error occurred while adding a user. ${e.message}}`
-          )
+    // Loop until user exits
+    while (!done) {
+      const users = await userStore.getUsers()
+      if (!users?.length) {
+        console.log(chalk.red('No users found! Please add a user.'))
+      } else {
+        console.log(chalk.green('Users:'))
+        console.table(
+          users.map((user) => {
+            return {
+              name: user.name,
+            }
+          })
         )
       }
-    } else if (answers.choice === CHOICES.UPDATE) {
-      const { name, password, passwordConfirm } = answers
-      try {
-        await updatePassword(name, password, passwordConfirm, userStore)
-      } catch (e) {
-        console.log(
-          chalk.red(
-            `An unexpected error occurred while adding a updating the password for ${name}. ${e.message}}`
+
+      const answers = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'choice',
+          message: `What would you like to do?`,
+          choices: [CHOICES.ADD, CHOICES.UPDATE, CHOICES.DELETE, CHOICES.EXIT],
+        },
+        {
+          type: 'input',
+          name: 'name',
+          message: `Enter a username:`,
+          when: (answers) =>
+            answers.choice === CHOICES.ADD ||
+            answers.choice === CHOICES.UPDATE ||
+            answers.choice === CHOICES.DELETE,
+        },
+        {
+          type: 'password',
+          name: 'password',
+          message: `Enter a user password:`,
+          when: (answers) =>
+            answers.choice === CHOICES.ADD || answers.choice === CHOICES.UPDATE,
+        },
+        {
+          type: 'password',
+          name: 'passwordConfirm',
+          message: `Confirm the user password:`,
+          when: (answers) =>
+            answers.choice === CHOICES.ADD || answers.choice === CHOICES.UPDATE,
+        },
+      ])
+
+      if (answers.choice === CHOICES.ADD) {
+        const { name, password, passwordConfirm } = answers
+        try {
+          await addUser(name, password, passwordConfirm, userStore)
+        } catch (e) {
+          console.log(
+            chalk.red(
+              `An unexpected error occurred while adding a user. ${e.message}}`
+            )
           )
-        )
-      }
-    } else if (answers.choice === CHOICES.DELETE) {
-      const { name } = answers
-      try {
-        await deleteUser(name, userStore)
-      } catch (e) {
-        console.log(
-          chalk.red(
-            `An unexpected error occurred while deleting the user ${name}. ${e.message}}`
+        }
+      } else if (answers.choice === CHOICES.UPDATE) {
+        const { name, password, passwordConfirm } = answers
+        try {
+          await updatePassword(name, password, passwordConfirm, userStore)
+        } catch (e) {
+          console.log(
+            chalk.red(
+              `An unexpected error occurred while adding a updating the password for ${name}. ${e.message}}`
+            )
           )
-        )
+        }
+      } else if (answers.choice === CHOICES.DELETE) {
+        const { name } = answers
+        try {
+          await deleteUser(name, userStore)
+        } catch (e) {
+          console.log(
+            chalk.red(
+              `An unexpected error occurred while deleting the user ${name}. ${e.message}}`
+            )
+          )
+        }
+      } else if (answers.choice === CHOICES.EXIT) {
+        done = true
       }
-    } else if (answers.choice === CHOICES.EXIT) {
-      done = true
     }
   }
-})()
+}
+
+cli.register(SetupCommand)
+
+export default cli
