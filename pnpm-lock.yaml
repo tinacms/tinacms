@@ -1160,8 +1160,8 @@ importers:
       chalk: ^5.2.0
       dotenv: ^16.3.1
       inquirer: ^9.2.7
-      next: ^12.3.4
-      next-auth: ^4.22.1
+      next: 12.3.4
+      next-auth: 4.22.1
       react: ^18
       react-dom: ^18
       typescript: 4.3.5
@@ -1175,7 +1175,7 @@ importers:
       '@tinacms/scripts': link:../@tinacms/scripts
       '@types/node': 13.13.52
       next: 12.3.4_biqbaboplfbrettd7655fr4n2y
-      next-auth: 4.22.2_bhgafntz2ozm43l35i5qtimxry
+      next-auth: 4.22.1_bhgafntz2ozm43l35i5qtimxry
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       typescript: 4.3.5
@@ -24829,10 +24829,10 @@ packages:
     dev: false
     optional: true
 
-  /next-auth/4.22.2_bhgafntz2ozm43l35i5qtimxry:
+  /next-auth/4.22.1_bhgafntz2ozm43l35i5qtimxry:
     resolution:
       {
-        integrity: sha512-5JO3onTI0gogG+FkTelBpmZi3inXtfSZvQ4VzS1mxx6LswA42/NPC9qFahjy455AEUCY0hdU4yM5Znf6o3wZPQ==,
+        integrity: sha512-NTR3f6W7/AWXKw8GSsgSyQcDW6jkslZLH8AiZa5PQ09w1kR8uHtR9rez/E9gAq/o17+p0JYHE8QjF3RoniiObA==,
       }
     peerDependencies:
       next: ^12.2.5 || ^13

@@ -34,8 +34,8 @@
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
     "@types/node": "^13.13.1",
-    "next": "^12.3.4",
-    "next-auth": "^4.22.1",
+    "next": "12.3.4",
+    "next-auth": "4.22.1",
     "react": "^18",
     "react-dom": "^18",
     "typescript": "4.3.5"
