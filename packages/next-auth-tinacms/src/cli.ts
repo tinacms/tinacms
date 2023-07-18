@@ -1,3 +1,5 @@
+import 'isomorphic-fetch'
+
 //@ts-ignore
 import { version, name } from '../package.json'
 
@@ -107,6 +109,7 @@ export const deleteUser = async (name: string, userStore: UserStore) => {
 }
 
 class SetupCommand extends Command {
+  static paths = [['setup']]
   static usage = Command.Usage({
     category: `Commands`,
     description: `Configure TinaCMS Users`,
@@ -228,5 +231,8 @@ class SetupCommand extends Command {
 }
 
 cli.register(SetupCommand)
+cli.register(Builtins.DefinitionsCommand)
+cli.register(Builtins.HelpCommand)
+cli.register(Builtins.VersionCommand)
 
 export default cli

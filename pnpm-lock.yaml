@@ -1160,6 +1160,7 @@ importers:
       clipanion: ^3.2.0
       dotenv: ^16.3.1
       inquirer: ^8.2.5
+      isomorphic-fetch: ^3.0.0
       next: 12.3.4
       next-auth: 4.22.1
       react: ^18
@@ -1172,6 +1173,7 @@ importers:
       clipanion: 3.2.0
       dotenv: 16.3.1
       inquirer: 8.2.5
+      isomorphic-fetch: 3.0.0
     devDependencies:
       '@tinacms/scripts': link:../@tinacms/scripts
       next: 12.3.4_biqbaboplfbrettd7655fr4n2y
@@ -18624,10 +18626,10 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.60.0_ypn2ylkkyfa5i233caldtndbqa
+      '@typescript-eslint/parser': 5.60.0_3rubbgt5ekhqrcgx4uwls3neim
       debug: 3.2.7
       eslint-import-resolver-node: 0.3.6
-      eslint-import-resolver-typescript: 3.5.3_dg2pe6kqkrddxbf2funb723kue
+      eslint-import-resolver-typescript: 3.5.3_hpmu7kn6tcn2vnxpfzvv33bxmy
       find-up: 2.1.0
     transitivePeerDependencies:
       - supports-color

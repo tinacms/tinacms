@@ -35,7 +35,8 @@
     "chalk": "^2.4.2",
     "clipanion": "^3.2.0",
     "dotenv": "^16.3.1",
-    "inquirer": "^8.2.5"
+    "inquirer": "^8.2.5",
+    "isomorphic-fetch": "^3.0.0"
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
