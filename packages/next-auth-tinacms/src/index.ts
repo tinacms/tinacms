@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth/next'
 import { RedisUserStore } from './redis-user-store'
 import { checkPassword } from './utils'
 import { UserStore } from './types'
+import { getSession, signIn, signOut } from 'next-auth/react'
 
 const withNextAuthApiRoute = (
   handler: NextApiHandler,
@@ -64,6 +65,44 @@ const TinaCredentialsProvider = (opts: {
     },
   })
 
-export { RedisUserStore, TinaCredentialsProvider, withNextAuthApiRoute }
+const createTinaNextAuthHandler = (opts: {
+  isLocalDevelopment: boolean
+  name?: string
+  callbackUrl?: string
+}) => {
+  const name = opts.name || 'Credentials'
+  const callbackUrl = opts.callbackUrl || '/admin/index.html'
+  return {
+    authenticate: async () => {
+      if (opts.isLocalDevelopment) {
+        return true
+      }
+      return signIn(name, { callbackUrl })
+    },
+    getToken: async () => {
+      return { id_token: '' }
+    },
+    getUser: async () => {
+      if (opts.isLocalDevelopment) {
+        return true
+      }
+      const session = await getSession()
+      return !!session
+    },
+    logout: async () => {
+      if (opts.isLocalDevelopment) {
+        return
+      }
+      return signOut({ callbackUrl })
+    },
+  }
+}
+
+export {
+  createTinaNextAuthHandler,
+  RedisUserStore,
+  TinaCredentialsProvider,
+  withNextAuthApiRoute,
+}
 
 export type { UserStore }

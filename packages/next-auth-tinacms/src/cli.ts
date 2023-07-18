@@ -12,11 +12,6 @@ import inquirer from 'inquirer'
 import { RedisUserStore } from './redis-user-store'
 import { UserStore } from './types'
 
-const cli = new Cli({
-  binaryName: `tinacms-next-auth`,
-  binaryLabel: `TinaCMS NextAuth`,
-  binaryVersion: version,
-})
 const CHOICES = {
   ADD: 'Add a user',
   UPDATE: "Update a user's password",
@@ -229,6 +224,12 @@ class SetupCommand extends Command {
     }
   }
 }
+
+const cli = new Cli({
+  binaryName: `tinacms-next-auth`,
+  binaryLabel: `TinaCMS NextAuth`,
+  binaryVersion: version,
+})
 
 cli.register(SetupCommand)
 cli.register(Builtins.DefinitionsCommand)
