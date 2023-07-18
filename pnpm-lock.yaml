@@ -1153,6 +1153,7 @@ importers:
 
   packages/next-auth-tinacms:
     specifiers:
+      '@tinacms/scripts': workspace:*
       '@types/node': ^13.13.1
       '@upstash/redis': ^1.22.0
       bcryptjs: ^2.4.3
@@ -1171,6 +1172,7 @@ importers:
       dotenv: 16.3.1
       inquirer: 9.2.8
     devDependencies:
+      '@tinacms/scripts': link:../@tinacms/scripts
       '@types/node': 13.13.52
       next: 13.3.0_biqbaboplfbrettd7655fr4n2y
       next-auth: 4.22.1_yucv4tfv7v7nrkw2uguegj6e7e

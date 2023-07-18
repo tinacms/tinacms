@@ -29,11 +29,12 @@
     "inquirer": "^9.2.7"
   },
   "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "@types/node": "^13.13.1",
     "next": "13.3.0",
     "next-auth": "^4.22.1",
     "react": "^18",
     "react-dom": "^18",
-    "@types/node": "^13.13.1",
     "typescript": "4.3.5"
   },
   "peerDependencies": {
