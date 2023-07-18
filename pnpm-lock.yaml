@@ -1175,7 +1175,7 @@ importers:
       '@tinacms/scripts': link:../@tinacms/scripts
       '@types/node': 13.13.52
       next: 12.3.4_biqbaboplfbrettd7655fr4n2y
-      next-auth: 4.22.1_bhgafntz2ozm43l35i5qtimxry
+      next-auth: 4.22.2_bhgafntz2ozm43l35i5qtimxry
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       typescript: 4.3.5
@@ -11473,7 +11473,7 @@ packages:
         integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==,
       }
     dependencies:
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
     dev: true
 
   /@types/cors/2.8.12:
@@ -18640,10 +18640,10 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.60.0_3rubbgt5ekhqrcgx4uwls3neim
+      '@typescript-eslint/parser': 5.60.0_ypn2ylkkyfa5i233caldtndbqa
       debug: 3.2.7
       eslint-import-resolver-node: 0.3.6
-      eslint-import-resolver-typescript: 3.5.3_hpmu7kn6tcn2vnxpfzvv33bxmy
+      eslint-import-resolver-typescript: 3.5.3_dg2pe6kqkrddxbf2funb723kue
       find-up: 2.1.0
     transitivePeerDependencies:
       - supports-color
@@ -24829,10 +24829,10 @@ packages:
     dev: false
     optional: true
 
-  /next-auth/4.22.1_bhgafntz2ozm43l35i5qtimxry:
+  /next-auth/4.22.2_bhgafntz2ozm43l35i5qtimxry:
     resolution:
       {
-        integrity: sha512-NTR3f6W7/AWXKw8GSsgSyQcDW6jkslZLH8AiZa5PQ09w1kR8uHtR9rez/E9gAq/o17+p0JYHE8QjF3RoniiObA==,
+        integrity: sha512-5JO3onTI0gogG+FkTelBpmZi3inXtfSZvQ4VzS1mxx6LswA42/NPC9qFahjy455AEUCY0hdU4yM5Znf6o3wZPQ==,
       }
     peerDependencies:
       next: ^12.2.5 || ^13
