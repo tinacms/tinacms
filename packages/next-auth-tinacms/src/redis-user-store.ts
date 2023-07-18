@@ -18,7 +18,7 @@ export class RedisUserStore implements UserStore {
     const user = {
       name: username,
       username,
-      password: hashPassword(password),
+      password: await hashPassword(password),
     }
     if (!(await this.isInitialized())) {
       await this.redis.json.set(this.authCollectionName, '$', {})
