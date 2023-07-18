@@ -14,10 +14,7 @@
   },
   "buildConfig": {
     "entryPoints": [
-      {
-        "name": "src/index.ts",
-        "target": "node"
-      },
+      "src/index.ts",
       {
         "name": "src/cli.ts",
         "target": "node",
