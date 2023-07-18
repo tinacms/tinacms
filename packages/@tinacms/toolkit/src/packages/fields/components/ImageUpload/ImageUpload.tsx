@@ -3,7 +3,7 @@
 */
 
 import * as React from 'react'
-import { useDropzone } from 'react-dropzone'
+import * as dropzone from 'react-dropzone'
 import { IconButton } from '../../../styles'
 import { TrashIcon } from '../../../icons'
 import { LoadingDots } from '../../../form-builder'
@@ -14,6 +14,8 @@ import {
   isImage,
 } from '../../../../components/media/utils'
 import { BiFileBlank } from 'react-icons/bi'
+
+const { useDropzone } = dropzone
 
 interface ImageUploadProps {
   onDrop: (files: any, fileRejections: any) => Promise<void>
