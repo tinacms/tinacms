@@ -481,6 +481,7 @@ importers:
       readable-stream: ^4.3.0
       rollup-plugin-visualizer: ^5.9.0
       tailwindcss: ^3.2.7
+      typanion: 3.13.0
       typescript: 4.3.5
       url-pattern: ^1.0.3
       vite: ^4.3.9
@@ -547,6 +548,7 @@ importers:
       readable-stream: 4.3.0
       rollup-plugin-visualizer: 5.9.0
       tailwindcss: 3.2.7
+      typanion: 3.13.0
       url-pattern: 1.0.3
       vite: 4.3.9
       yarn: 1.22.19
@@ -16041,7 +16043,7 @@ packages:
         integrity: sha512-XaPQiJQZKbyaaDbv5yR/cAt/ORfZfENkr4wGQj+Go/Uf/65ofTQBCPirgWFeJctZW24V3mxrFiEnEmqBflrJYA==,
       }
     dependencies:
-      typanion: 3.12.1
+      typanion: 3.13.0
     dev: false
 
   /cliui/3.2.0:
@@ -29241,10 +29243,10 @@ packages:
       }
     dev: true
 
-  /typanion/3.12.1:
+  /typanion/3.13.0:
     resolution:
       {
-        integrity: sha512-3SJF/czpzqq6G3lprGFLa6ps12yb1uQ1EmitNnep2fDMNh1aO/Zbq9sWY+3lem0zYb2oHJnQWyabTGUZ+L1ScQ==,
+        integrity: sha512-AkZMjMIW8MGeQwBxu1bixzu/2Zk7rH6ILrI/9zBoW0sAiVaWwHjXSnmPBomfY2t7tSG6m5bIE+OYYyyuGnFVHA==,
       }
     dev: false
 
