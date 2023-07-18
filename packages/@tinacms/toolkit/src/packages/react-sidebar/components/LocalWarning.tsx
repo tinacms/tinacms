@@ -26,7 +26,7 @@ export const LocalWarning = () => {
 export const BillingWarning = () => {
   const cms = useCMS()
   const api = cms?.api?.tina
-  const isLocalMode: boolean = api?.isLocalMode || false
+  const isCustomContentApi: boolean = api?.isCustomContentApi || false
 
   const [billingState, setBillingState] = React.useState(
     null as {
@@ -41,10 +41,14 @@ export const BillingWarning = () => {
       const billingRes = await api?.getBillingState()
       setBillingState(billingRes)
     }
-    if (!isLocalMode) fetchBillingState()
+    if (!isCustomContentApi) fetchBillingState()
   }, [])
 
-  if (isLocalMode || !billingState || billingState.billingState === 'current') {
+  if (
+    isCustomContentApi ||
+    !billingState ||
+    billingState.billingState === 'current'
+  ) {
     return <></>
   }
 

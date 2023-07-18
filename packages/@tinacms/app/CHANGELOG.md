@@ -1,5 +1,44 @@
 # @tinacms/app
 
+## 1.2.23
+
+### Patch Changes
+
+- Updated dependencies [1889422b0]
+  - @tinacms/toolkit@1.7.12
+  - tinacms@1.5.16
+
+## 1.2.22
+
+### Patch Changes
+
+- @tinacms/mdx@1.3.14
+- tinacms@1.5.15
+- @tinacms/toolkit@1.7.11
+
+## 1.2.21
+
+### Patch Changes
+
+- Updated dependencies [f1e8828c8]
+- Updated dependencies [304e23318]
+- Updated dependencies [a5d986477]
+  - @tinacms/toolkit@1.7.10
+  - tinacms@1.5.14
+
+## 1.2.20
+
+### Patch Changes
+
+- Updated dependencies [d73d03f8f]
+- Updated dependencies [745e30708]
+- Updated dependencies [495108725]
+- Updated dependencies [b0eba5d49]
+- Updated dependencies [7d6e6ff3d]
+- Updated dependencies [808d5cc6c]
+  - @tinacms/toolkit@1.7.9
+  - tinacms@1.5.13
+
 ## 1.2.19
 
 ### Patch Changes

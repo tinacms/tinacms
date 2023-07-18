@@ -21,6 +21,7 @@ export type {
 } from './database'
 import type { Database } from './database'
 import type { Config } from '@tinacms/schema-tools'
+export { getChangedFiles, getSha } from './git'
 
 export { sequential, assertShape } from './util'
 export {

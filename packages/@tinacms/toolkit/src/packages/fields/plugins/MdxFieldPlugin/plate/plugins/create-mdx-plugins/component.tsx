@@ -35,8 +35,9 @@ export const InlineEmbed = ({
   editor,
 }) => {
   const selected = useSelected()
+  const { templates, fieldName } = useTemplates()
   const { handleClose, handleRemove, handleSelect, isExpanded } =
-    useEmbedHandles(editor, element)
+    useEmbedHandles(editor, element, fieldName)
   useHotkey('enter', () => {
     insertNodes(editor, [{ type: ELEMENT_PARAGRAPH, children: [{ text: '' }] }])
   })
@@ -50,8 +51,6 @@ export const InlineEmbed = ({
       select: true,
     })
   })
-
-  const templates = useTemplates()
 
   const activeTemplate = templates.find(
     (template) => template.name === element.name
@@ -106,14 +105,13 @@ export const BlockEmbed = ({
   onChange,
 }) => {
   const selected = useSelected()
+  const { templates, fieldName } = useTemplates()
   const { handleClose, handleRemove, handleSelect, isExpanded } =
-    useEmbedHandles(editor, element)
+    useEmbedHandles(editor, element, fieldName)
 
   useHotkey('enter', () => {
     insertNodes(editor, [{ type: ELEMENT_PARAGRAPH, children: [{ text: '' }] }])
   })
-
-  const templates = useTemplates()
 
   const activeTemplate = templates.find(
     (template) => template.name === element.name

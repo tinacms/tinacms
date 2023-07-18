@@ -1,5 +1,45 @@
 # tinacms-cli
 
+## 1.5.25
+
+### Patch Changes
+
+- 94f353822: Fix to log errors in spinner
+- Updated dependencies [ad6a166a6]
+- Updated dependencies [94f353822]
+  - @tinacms/search@1.0.6
+  - @tinacms/graphql@1.4.21
+  - @tinacms/app@1.2.23
+  - @tinacms/datalayer@1.2.21
+
+## 1.5.24
+
+### Patch Changes
+
+- Updated dependencies [019920a35]
+  - @tinacms/schema-tools@1.4.8
+  - @tinacms/graphql@1.4.20
+  - @tinacms/search@1.0.5
+  - @tinacms/datalayer@1.2.20
+  - @tinacms/app@1.2.22
+
+## 1.5.23
+
+### Patch Changes
+
+- @tinacms/app@1.2.21
+
+## 1.5.22
+
+### Patch Changes
+
+- 495108725: Add optional partialReindex flag to build command
+- Updated dependencies [495108725]
+  - @tinacms/graphql@1.4.19
+  - @tinacms/app@1.2.20
+  - @tinacms/datalayer@1.2.19
+  - @tinacms/search@1.0.4
+
 ## 1.5.21
 
 ### Patch Changes

@@ -1,5 +1,50 @@
 # tinacms
 
+## 1.5.16
+
+### Patch Changes
+
+- 1889422b0: Fix issue where deeply nested rich-text fields weren't selectable
+- Updated dependencies [1889422b0]
+- Updated dependencies [ad6a166a6]
+  - @tinacms/toolkit@1.7.12
+  - @tinacms/search@1.0.6
+
+## 1.5.15
+
+### Patch Changes
+
+- Updated dependencies [019920a35]
+  - @tinacms/schema-tools@1.4.8
+  - @tinacms/search@1.0.5
+  - @tinacms/toolkit@1.7.11
+
+## 1.5.14
+
+### Patch Changes
+
+- f1e8828c8: fix: resort prop overrides to allow for style & className merging of list items
+- 304e23318: - Update pull request title to include the branch name
+  - Slugify brach name when typing in the title
+- Updated dependencies [f1e8828c8]
+- Updated dependencies [304e23318]
+- Updated dependencies [a5d986477]
+  - @tinacms/toolkit@1.7.10
+
+## 1.5.13
+
+### Patch Changes
+
+- 495108725: Disable tina cloud specific calls when using custom content api
+- b0eba5d49: Upgrade prism react renderer, allow for theming
+- Updated dependencies [d73d03f8f]
+- Updated dependencies [745e30708]
+- Updated dependencies [495108725]
+- Updated dependencies [7d6e6ff3d]
+- Updated dependencies [808d5cc6c]
+  - @tinacms/toolkit@1.7.9
+  - @tinacms/search@1.0.4
+
 ## 1.5.12
 
 ### Patch Changes

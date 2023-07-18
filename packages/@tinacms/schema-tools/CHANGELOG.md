@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.4.8
+
+### Patch Changes
+
+- 019920a35: Make clientId, branch and token optional in the config.
+
 ## 1.4.7
 
 ### Patch Changes

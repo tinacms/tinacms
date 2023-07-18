@@ -26,7 +26,7 @@ type ListState = 'loading' | 'ready' | 'error'
 
 export function formatBranchName(str: string): string {
   const pattern = /[^/\w-]+/g // regular expression pattern to match invalid special characters
-  const formattedStr = str.replace(pattern, '') // remove special characters
+  const formattedStr = str.replace(pattern, '-') // remove special characters
   return formattedStr.toLowerCase()
 }
 

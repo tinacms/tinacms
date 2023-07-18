@@ -1,5 +1,25 @@
 # tina-graphql
 
+## 1.4.21
+
+### Patch Changes
+
+- 94f353822: Fix to not index content where we are unable to load it due to template issues
+
+## 1.4.20
+
+### Patch Changes
+
+- Updated dependencies [019920a35]
+  - @tinacms/schema-tools@1.4.8
+  - @tinacms/mdx@1.3.14
+
+## 1.4.19
+
+### Patch Changes
+
+- 495108725: Add optional partialReindex flag to build command
+
 ## 1.4.18
 
 ### Patch Changes

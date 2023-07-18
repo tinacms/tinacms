@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/toolkit",
-  "version": "1.7.8",
+  "version": "1.7.12",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "./dist/index.mjs",
@@ -63,8 +63,8 @@
     "typescript": "4.3.5"
   },
   "dependencies": {
-    "@floating-ui/dom": "^0.1.7",
-    "@floating-ui/react-dom": "^0.3.3",
+    "@floating-ui/dom": "^1.4.4",
+    "@floating-ui/react-dom": "^2.0.1",
     "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.5",
     "@monaco-editor/react": "4.4.5",

@@ -1,5 +1,28 @@
 # @tinacms/search
 
+## 1.0.6
+
+### Patch Changes
+
+- ad6a166a6: Fixes issue where copying the full text of a title into a search query would result in no results because of the stopwords used in the query not existing in the search index
+- Updated dependencies [94f353822]
+  - @tinacms/graphql@1.4.21
+
+## 1.0.5
+
+### Patch Changes
+
+- Updated dependencies [019920a35]
+  - @tinacms/schema-tools@1.4.8
+  - @tinacms/graphql@1.4.20
+
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies [495108725]
+  - @tinacms/graphql@1.4.19
+
 ## 1.0.3
 
 ### Patch Changes

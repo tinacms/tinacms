@@ -19,9 +19,9 @@ import {
   ModalBody,
   ModalActions,
 } from '../react-modals'
-import { BaseTextField } from '../fields'
 import { BiGitBranch } from 'react-icons/bi'
 import { MdOutlineSaveAlt } from 'react-icons/md'
+import { formatBranchName } from '../../plugins/branch-switcher/BranchSwitcher'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -154,18 +154,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   }, [finalForm])
 
   const fieldGroup = tinaForm.getActiveField(form.activeFieldName)
-  const previousName = usePrevious(fieldGroup.name)
-  const animateStatus =
-    fieldGroup.name === previousName
-      ? 'none'
-      : fieldGroup.name
-      ? previousName
-        ? previousName.length < fieldGroup.name.length
-          ? 'forwards'
-          : 'backwards'
-        : 'forwards'
-      : 'none'
-  const animationProps = getAnimationProps(animateStatus)
 
   return (
     <FinalForm
@@ -444,16 +432,12 @@ export const CreateBranchModel = ({
       <PopupModal>
         <ModalHeader close={close}>
           <BiGitBranch className="w-6 h-auto mr-1 text-blue-500 opacity-70" />{' '}
-          Protected Branch
+          Create Branch
         </ModalHeader>
         <ModalBody padded={true}>
           <p className="text-base text-gray-700 mb-2">
-            <strong>You are working on a protected branch.</strong> To save your
-            work Tina will create a new branch from <b>{currentBranch}</b>.
-          </p>
-          <p className="text-sm text-gray-500 mb-4">
-            Once created you will need to wait for indexing to complete before
-            you can switch branches.
+            This branch is <strong>protected</strong>. Create a new branch to
+            save your changes.
           </p>
           <PrefixedTextField
             placeholder="Branch Name"
@@ -461,7 +445,7 @@ export const CreateBranchModel = ({
             onChange={(e) => {
               // reset error state on change
               setError('')
-              setNewBranchName(e.target.value)
+              setNewBranchName(formatBranchName(e.target.value))
             }}
           />
           {error && <div className="mt-2 text-sm text-red-700">{error}</div>}

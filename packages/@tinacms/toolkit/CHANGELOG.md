@@ -1,5 +1,39 @@
 # Change Log
 
+## 1.7.12
+
+### Patch Changes
+
+- 1889422b0: Fix issue where deeply nested rich-text fields weren't selectable
+- Updated dependencies [ad6a166a6]
+  - @tinacms/search@1.0.6
+
+## 1.7.11
+
+### Patch Changes
+
+- @tinacms/search@1.0.5
+
+## 1.7.10
+
+### Patch Changes
+
+- f1e8828c8: fix: resort prop overrides to allow for style & className merging of list items
+- 304e23318: - Update pull request title to include the branch name
+  - Slugify brach name when typing in the title
+- a5d986477: update branch modal text
+
+## 1.7.9
+
+### Patch Changes
+
+- d73d03f8f: Improves image field UI
+- 745e30708: Fix text truncation in branch button
+- 495108725: Disable tina cloud specific calls when using custom content api
+- 7d6e6ff3d: Update plate
+- 808d5cc6c: Update branch banner button to reflect protected status
+  - @tinacms/search@1.0.4
+
 ## 1.7.8
 
 ### Patch Changes
