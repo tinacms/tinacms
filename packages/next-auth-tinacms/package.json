@@ -22,7 +22,8 @@
         "name": "src/cli.ts",
         "target": "node",
         "bundleDeps": true
-      }
+      },
+      "src/tinacms.ts"
     ]
   },
   "scripts": {
