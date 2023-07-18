@@ -63,7 +63,7 @@ type IndexStatusCallback = (event: IndexStatusEvent) => Promise<void>
 export type OnPutCallback = (key: string, value: any) => Promise<void>
 export type OnDeleteCallback = (key: string) => Promise<void>
 
-export type CreateDatabase = {
+export interface DatabaseArgs {
   bridge?: Bridge
   level: Level
   onPut?: (key: string, value: any) => Promise<void>
@@ -73,7 +73,7 @@ export type CreateDatabase = {
   version?: boolean
 }
 
-export const createDatabase = (config: CreateDatabase) => {
+export const createDatabaseInternal = (config: DatabaseArgs) => {
   return new Database({
     ...config,
     bridge: config.bridge,
@@ -122,7 +122,7 @@ export class Database {
     | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
 
-  constructor(public config: CreateDatabase) {
+  constructor(public config: DatabaseArgs) {
     this.tinaDirectory = config.tinaDirectory || 'tina'
     this.bridge = config.bridge
     this.rootLevel =

@@ -1,5 +1,3 @@
-import { buildASTSchema } from 'graphql'
-
 import type {
   Schema,
   Collection,
@@ -10,16 +8,15 @@ import { buildDotTinaFiles } from './build'
 export { resolve } from './resolve'
 export { transformDocumentIntoPayload } from './resolver'
 export * from './resolver/error'
-export { createDatabase } from './database'
 export { TinaLevelClient } from './level/tinaLevel'
+export type { Level } from './database/level'
 export type {
   QueryOptions,
-  Database,
   OnDeleteCallback,
   OnPutCallback,
-  CreateDatabase,
+  DatabaseArgs,
 } from './database'
-import type { Database } from './database'
+export { Database } from './database'
 import type { Config } from '@tinacms/schema-tools'
 export { getChangedFiles, getSha } from './git'
 

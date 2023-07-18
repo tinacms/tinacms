@@ -11,7 +11,7 @@ import { FilesystemBridge } from '../database/bridge/filesystem'
 import type { Schema } from '@tinacms/schema-tools'
 
 import { resolve } from '../resolve'
-import { createDatabase } from '../database'
+import { createDatabaseInternal } from '../database'
 import { Database } from '../database'
 import { sequential } from '../util'
 import { buildDotTinaFiles } from '../build'
@@ -37,7 +37,7 @@ export const setup = async (
   database: Database
 }> => {
   const setupBridge = new FilesystemBridge(rootPath)
-  const setupDatabase = await createDatabase({
+  const setupDatabase = await createDatabaseInternal({
     bridge: setupBridge,
     level,
     tinaDirectory: '.tina',
@@ -50,7 +50,7 @@ export const setup = async (
   await setupDatabase.indexContent({ graphQLSchema, tinaSchema })
 
   const bridge = new MockFilesystemBridge(rootPath)
-  const database = await createDatabase({
+  const database = await createDatabaseInternal({
     // @ts-ignore
     bridge,
     level,
