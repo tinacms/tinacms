@@ -501,7 +501,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         platform: 'node',
         target: 'es2020',
         format: 'esm',
-        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        outfile: path.join(process.cwd(), 'dist', 'index.mjs'),
         external,
       })
     } else if (['@tinacms/mdx'].includes(packageJSON.name)) {
@@ -524,7 +524,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         platform: 'node',
         target: 'es2020',
         format: 'esm',
-        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        outfile: path.join(process.cwd(), 'dist', 'index.mjs'),
         // Bundle dependencies, the remark ecosystem only publishes ES modules
         // and includes "development" export maps which actually throw errors during
         // development, which we don't want to expose our users to.
@@ -537,7 +537,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         platform: 'browser',
         target: 'es2020',
         format: 'esm',
-        outfile: path.join(process.cwd(), 'dist', 'index.browser.es.js'),
+        outfile: path.join(process.cwd(), 'dist', 'index.browser.mjs'),
         // Bundle dependencies, the remark ecosystem only publishes ES modules
         // and includes "development" export maps which actually throw errors during
         // development, which we don't want to expose our users to.
@@ -600,7 +600,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         fileName: (format) => {
           return format === 'umd'
             ? `${outInfo.outfile}.js`
-            : `${outInfo.outfile}.es.js`
+            : `${outInfo.outfile}.mjs`
         },
       },
       outDir: outInfo.outdir,
