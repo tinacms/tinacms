@@ -4,7 +4,7 @@ import type {
   OnDeleteCallback,
   OnPutCallback,
 } from '@tinacms/graphql'
-import { TinaLevelClient, Database } from '@tinacms/graphql'
+import { TinaLevelClient, Database, FilesystemBridge } from '@tinacms/graphql'
 
 import type { GitProvider } from './gitProviders'
 
@@ -31,11 +31,14 @@ export type CreateDatabase = Omit<
 
 export type CreateLocalDatabaseArgs = Omit<DatabaseArgs, 'level'> & {
   port?: number
+  rootPath?: string
 }
 export const createLocalDatabase = (config?: CreateLocalDatabaseArgs) => {
   const level = new TinaLevelClient(config?.port)
   level.openConnection()
+  const fsBridge = new FilesystemBridge(config?.rootPath || process.cwd())
   return new Database({
+    bridge: fsBridge,
     ...(config || {}),
     level,
   })
