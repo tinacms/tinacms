@@ -756,7 +756,7 @@ export interface UICollection {
      *
      * eg:
      * ```ts
-     * slugify: (values, options) => values.title.toLowerCase().split(" ").join("-")
+     * slugify: (values) => values.title.toLowerCase().split(" ").join("-")
      * ```
      */
     slugify?: (values: Record<string, any>) => string
