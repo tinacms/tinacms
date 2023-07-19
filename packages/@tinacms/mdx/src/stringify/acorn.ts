@@ -3,7 +3,8 @@
 
 
 */
-import { format } from 'prettier'
+// @ts-ignore TODO: Fix this
+import prettier from 'prettier/esm/standalone.mjs'
 import type { RichTextType, RichTextTemplate } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
@@ -282,11 +283,12 @@ export function stringifyProps(
 function stringifyObj(obj: unknown, flatten: boolean) {
   if (typeof obj === 'object' && obj !== null) {
     const dummyFunc = `const dummyFunc = `
-    const res = format(`${dummyFunc}${JSON.stringify(obj)}`, {
-      parser: 'acorn',
-      trailingComma: 'none',
-      semi: false,
-    })
+    const res = prettier
+      .format(`${dummyFunc}${JSON.stringify(obj)}`, {
+        parser: 'acorn',
+        trailingComma: 'none',
+        semi: false,
+      })
       .trim()
       .replace(dummyFunc, '')
     return flatten ? res.replaceAll('\n', '').replaceAll('  ', ' ') : res
