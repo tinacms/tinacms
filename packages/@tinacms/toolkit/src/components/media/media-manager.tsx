@@ -26,7 +26,8 @@ import {
   MediaListError,
 } from '../../packages/core'
 import { Button, IconButton } from '../../packages/styles'
-import { FileError, useDropzone } from 'react-dropzone'
+import * as dropzone from 'react-dropzone'
+import type { FileError } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
@@ -42,6 +43,7 @@ import {
 import { DeleteModal, NewFolderModal } from './modal'
 import { CopyField } from './copy-field'
 import { createContext, useContext } from 'react'
+const { useDropzone } = dropzone
 // Can not use path.join on the frontend
 const join = function (...parts) {
   // From: https://stackoverflow.com/questions/29855098/is-there-a-built-in-javascript-function-similar-to-os-path-join

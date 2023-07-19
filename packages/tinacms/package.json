@@ -2,41 +2,41 @@
   "name": "tinacms",
   "version": "1.5.16",
   "main": "dist/index.js",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.mjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
     "./dist/client": {
       "types": "./dist/client.d.ts",
-      "import": "./dist/client.es.js",
+      "import": "./dist/client.mjs",
       "require": "./dist/client.js"
     },
     "./dist/edit-state": {
       "types": "./dist/edit-state.d.ts",
-      "import": "./dist/edit-state.es.js",
+      "import": "./dist/edit-state.mjs",
       "require": "./dist/edit-state.js"
     },
     "./dist/react": {
       "types": "./dist/react.d.ts",
-      "import": "./dist/react.es.js",
+      "import": "./dist/react.mjs",
       "require": "./dist/react.js"
     },
     "./dist/rich-text": {
       "types": "./dist/rich-text/index.d.ts",
-      "import": "./dist/rich-text/index.es.js",
+      "import": "./dist/rich-text/index.mjs",
       "require": "./dist/rich-text/index.js"
     },
     "./dist/dev-tools": {
       "types": "./dist/dev-tools.d.ts",
-      "import": "./dist/dev-tools.es.js",
+      "import": "./dist/dev-tools.mjs",
       "require": "./dist/dev-tools.js"
     },
     "./dist/rich-text/prism": {
       "types": "./dist/rich-text/prism.d.ts",
-      "import": "./dist/rich-text/prism.es.js",
+      "import": "./dist/rich-text/prism.mjs",
       "require": "./dist/rich-text/prism.js"
     }
   },
@@ -105,13 +105,11 @@
     "next": "12.2.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-is": "^17.0.2",
     "typescript": "4.3.5"
   },
   "peerDependencies": {
     "react": ">=16.14.0",
-    "react-dom": ">=16.14.0",
-    "react-is": "^16.13.1 || <18.0.0"
+    "react-dom": ">=16.14.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

@@ -7,7 +7,8 @@
 import * as React from 'react'
 import { useState } from 'react'
 import { Dismissible } from '../../../react-dismissible'
-import { SketchPicker, BlockPicker } from 'react-color'
+import * as pkg from 'react-color'
+const { SketchPicker, BlockPicker } = pkg
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
 import { useFormPortal } from '../../../form-builder'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

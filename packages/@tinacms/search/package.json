@@ -2,7 +2,7 @@
   "name": "@tinacms/search",
   "version": "1.0.6",
   "main": "dist/index.js",
-  "module": "dist/index-client.es.js",
+  "module": "dist/index-client.mjs",
   "typings": "dist/index.d.ts",
   "files": [
     "package.json",
@@ -10,11 +10,11 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.es.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
     "./dist/index-client": {
-      "import": "./dist/index-client.es.js",
+      "import": "./dist/index-client.mjs",
       "require": "./dist/index-client.js"
     }
   },

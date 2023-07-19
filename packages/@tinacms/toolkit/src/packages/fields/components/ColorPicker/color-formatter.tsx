@@ -4,7 +4,8 @@
 
 */
 
-import { get as getColor, to as toColor } from 'color-string'
+import * as pkg from 'color-string'
+const { get: getColor, to: toColor } = pkg
 
 export interface ColorRGBA {
   r: number
