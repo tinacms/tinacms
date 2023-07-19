@@ -38,6 +38,8 @@ export class ConfigManager {
   generatedTypesDFilePath: string
   generatedClientTSFilePath: string
   generatedClientJSFilePath: string
+  generatedDatabaseClientJSFilePath: string
+  generatedDatabaseClientTSFilePath: string
   generatedQueriesFilePath: string
   generatedFragmentsFilePath: string
   generatedQueriesAndFragmentsGlob: string
@@ -165,6 +167,14 @@ export class ConfigManager {
     this.generatedClientJSFilePath = path.join(
       this.generatedFolderPath,
       'client.js'
+    )
+    this.generatedDatabaseClientTSFilePath = path.join(
+      this.generatedFolderPath,
+      'backendClient.ts'
+    )
+    this.generatedDatabaseClientJSFilePath = path.join(
+      this.generatedFolderPath,
+      'backendClient.js'
     )
     // =================
     // End of file paths that don't depend on the config file
