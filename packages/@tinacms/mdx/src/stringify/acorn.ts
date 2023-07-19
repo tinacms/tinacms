@@ -3,8 +3,10 @@
 
 
 */
-// @ts-ignore TODO: Fix this
+// @ts-ignore Fix this by updating prettier
 import prettier from 'prettier/esm/standalone.mjs'
+// @ts-ignore Fix this by updating prettier
+import parser from 'prettier/esm/parser-espree.mjs'
 import type { RichTextType, RichTextTemplate } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
@@ -288,6 +290,7 @@ function stringifyObj(obj: unknown, flatten: boolean) {
         parser: 'acorn',
         trailingComma: 'none',
         semi: false,
+        plugins: [parser],
       })
       .trim()
       .replace(dummyFunc, '')
