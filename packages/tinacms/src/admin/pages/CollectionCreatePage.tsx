@@ -197,11 +197,6 @@ export const RenderForm = ({
             schemaCollection.path +
             folderName +
             `/${values?.values?.filename}.${schemaCollection.format || 'md'}`
-          console.log({
-            schemapath: schemaCollection.path,
-            folderName,
-            filename: values?.values?.filename,
-          })
         }
         if (
           slugFunction &&
@@ -209,10 +204,7 @@ export const RenderForm = ({
           !values?.submitting &&
           !values.touched?.filename
         ) {
-          const value = slugFunction(values?.values, {
-            collection: schemaCollection,
-            template,
-          })
+          const value = slugFunction(values?.values)
           form.finalForm.change('filename', value)
         }
       },
