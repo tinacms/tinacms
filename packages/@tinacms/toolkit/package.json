@@ -76,6 +76,7 @@
     "@tinacms/search": "workspace:*",
     "@tinacms/sharedctx": "workspace:*",
     "@udecode/plate-headless": "^21.4.0",
+    "react-textarea-autosize": "8.5.2",
     "atob": "2.1.2",
     "color-string": "^1.5.3",
     "date-fns": "2.30.0",

@@ -1021,6 +1021,7 @@ importers:
       react-final-form: ^6.3.0
       react-icons: ^4.3.1
       react-onclickoutside: ^6.13.0
+      react-textarea-autosize: 8.5.2
       scheduler: 0.19.0
       slate: ^0.94.1
       slate-history: ^0.93.0
@@ -1064,6 +1065,7 @@ importers:
       react-final-form: 6.5.9_s44h3cxpdxv6cks4bnqewerqda
       react-icons: 4.4.0_react@17.0.2
       react-onclickoutside: 6.13.0_sfoxds7t5ydpegc3knd667wn6m
+      react-textarea-autosize: 8.5.2_sudpmbbyhqtxq6t4xf6jlicdem
       scheduler: 0.19.0
       slate: 0.94.1
       slate-history: 0.93.0_slate@0.94.1
@@ -13503,7 +13505,7 @@ packages:
       js-video-url-parser: 0.5.1
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
-      react-textarea-autosize: 8.3.4_sudpmbbyhqtxq6t4xf6jlicdem
+      react-textarea-autosize: 8.5.2_sudpmbbyhqtxq6t4xf6jlicdem
       scriptjs: 2.5.9
       slate: 0.94.1
       slate-history: 0.93.0_slate@0.94.1
@@ -26595,10 +26597,10 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /react-textarea-autosize/8.3.4_sudpmbbyhqtxq6t4xf6jlicdem:
+  /react-textarea-autosize/8.5.2_sudpmbbyhqtxq6t4xf6jlicdem:
     resolution:
       {
-        integrity: sha512-CdtmP8Dc19xL8/R6sWvtknD/eCXkQr30dtvC4VmGInhRsfF8X/ihXCq6+9l9qbxmKRiq407/7z5fxE7cVWQNgQ==,
+        integrity: sha512-uOkyjkEl0ByEK21eCJMHDGBAAd/BoFQBawYK5XItjAmCTeSbjxghd8qnt7nzsLYzidjnoObu6M26xts0YGKsGg==,
       }
     engines: { node: '>=10' }
     peerDependencies:
