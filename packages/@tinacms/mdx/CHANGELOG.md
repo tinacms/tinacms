@@ -1,5 +1,13 @@
 # @tinacms/mdx
 
+## 1.3.15
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [bc812441b]
+  - @tinacms/schema-tools@1.4.9
+
 ## 1.3.14
 
 ### Patch Changes

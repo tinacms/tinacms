@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.7.13
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [bc812441b]
+  - @tinacms/sharedctx@1.0.2
+  - @tinacms/search@1.0.7
+
 ## 1.7.12
 
 ### Patch Changes

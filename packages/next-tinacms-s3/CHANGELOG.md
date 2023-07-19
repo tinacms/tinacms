@@ -1,5 +1,11 @@
 # next-tinacms-s3
 
+## 1.3.2
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+
 ## 1.3.1
 
 ### Patch Changes

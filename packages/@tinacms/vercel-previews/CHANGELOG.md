@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.0.13
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [bc812441b]
+  - tinacms@1.5.17
+
 ## 0.0.12
 
 ### Patch Changes

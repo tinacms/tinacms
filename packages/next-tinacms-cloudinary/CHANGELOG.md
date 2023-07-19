@@ -1,5 +1,12 @@
 # next-tinacms-cloudinary
 
+## 4.3.2
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- a3e92bcfd: save https value on cloudinary upload
+
 ## 4.3.1
 
 ### Patch Changes
