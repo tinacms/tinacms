@@ -11,14 +11,15 @@ import {
 import { logger } from '../../logger'
 import fs from 'fs-extra'
 import { Telemetry } from '@tinacms/metrics'
-import { nextPostPage } from './setup-files'
+import { nextPostPage } from './templates/next'
 import { extendNextScripts } from '../../utils/script-helpers'
-import { configExamples } from './setup-files/config'
+import { configExamples, ConfigTemplateVariables } from './templates/config'
 import { generateCollections } from '../forestry-migrate'
 import { writeGitignore } from '../../next/commands/codemod-command'
 import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer'
 import detectEnvironment from './environment'
 import promptForInitConfiguration, { Framework } from './config'
+import { helloWorldPost } from './templates/content'
 
 export async function initStaticTina({
   rootPath,
@@ -35,7 +36,10 @@ export async function initStaticTina({
 
   process.chdir(rootPath)
 
+  const baseDir = ''
+
   const env = await detectEnvironment({
+    baseDir,
     pathToForestryConfig,
     rootPath,
   })
@@ -77,14 +81,14 @@ export async function initStaticTina({
 
   // if no .gitignore, create one
   if (!env.gitIgnoreExists) {
-    await createGitignore({ baseDir: '' })
+    await createGitignore({ baseDir })
   } else {
     if (!env.gitIgoreNodeModulesExists) {
-      await addNodeModulesToGitignore({ baseDir: '' })
+      await addNodeModulesToGitignore({ baseDir })
     }
   }
 
-  await addDependencies(config.packageManager)
+  await addDependencies(config.packageManager, config.nextAuth)
 
   if (isForestryMigration) {
     await addTemplateFile({
@@ -103,16 +107,18 @@ export async function initStaticTina({
 
   // add tina/config.{js,ts}]
   await addConfigFile({
-    // remove process fom pathToForestryConfig and add publicFolder
-    publicFolder: path.join(
-      path.relative(process.cwd(), pathToForestryConfig),
-      config.publicFolder
-    ),
-    baseDir: '',
-    framework: config.framework,
-    collections,
-    isForestryMigration,
-    extraText,
+    templateVariables: {
+      // remove process fom pathToForestryConfig and add publicFolder
+      publicFolder: path.join(
+        path.relative(process.cwd(), pathToForestryConfig),
+        config.publicFolder
+      ),
+      framework: config.framework,
+      collections,
+      isForestryMigration,
+      extraText,
+    },
+    baseDir,
     hasConfig: config.typescript
       ? env.typescriptConfigExists
       : env.javascriptConfigExists,
@@ -135,7 +141,7 @@ export async function initStaticTina({
 
   if (config.framework.reactive) {
     await addReactiveFile[config.framework.name]({
-      baseDir: '',
+      baseDir,
       framework: config.framework,
       usingTypescript: config.typescript,
     })
@@ -211,18 +217,24 @@ const createGitignore = async ({ baseDir }: { baseDir: string }) => {
 
 const addNodeModulesToGitignore = async ({ baseDir }: { baseDir: string }) => {
   logger.info(logText('Adding node_modules to .gitignore'))
-  const gitignoreContent = await fs
+  const gitignoreContent = fs
     .readFileSync(path.join(baseDir, '.gitignore'))
     .toString()
   const newGitignoreContent = [
     ...gitignoreContent.split('\n'),
     'node_modules',
   ].join('\n')
-  await fs.writeFileSync(path.join(baseDir, '.gitignore'), newGitignoreContent)
+  await fs.writeFile(path.join(baseDir, '.gitignore'), newGitignoreContent)
 }
-const addDependencies = async (packageManager) => {
+const addDependencies = async (
+  packageManager: 'pnpm' | 'yarn' | 'npm',
+  nextAuth: boolean
+) => {
   logger.info(logText('Adding dependencies, this might take a moment...'))
   const deps = ['tinacms', '@tinacms/cli']
+  if (nextAuth) {
+    deps.push('next-auth-tinacms')
+  }
   const packageManagers = {
     pnpm: process.env.USE_WORKSPACE
       ? `pnpm add ${deps.join(' ')} --workspace`
@@ -234,32 +246,29 @@ const addDependencies = async (packageManager) => {
   await execShellCommand(packageManagers[packageManager])
 }
 
-export interface AddConfigArgs {
-  extraText?: string
-  publicFolder: string
+const addConfigFile = async ({
+  baseDir,
+  hasConfig,
+  overwriteConfig,
+  configPath,
+  templateVariables,
+}: {
   baseDir: string
-  framework: Framework
-  collections?: string
-  isForestryMigration?: boolean
-  token?: string
-  clientId?: string
   hasConfig: boolean
   overwriteConfig: boolean
   configPath: string
-}
-
-const addConfigFile = async (args: AddConfigArgs) => {
-  const { baseDir, hasConfig, overwriteConfig, configPath } = args
+  templateVariables: ConfigTemplateVariables
+}) => {
   if (hasConfig) {
     if (overwriteConfig) {
       logger.info(logText(`Overriding file at ${configPath}.`))
-      await fs.outputFileSync(configPath, config(args))
+      await fs.outputFileSync(configPath, config(templateVariables))
     } else {
       logger.info(logText(`Not overriding file at ${configPath}.`))
     }
   } else {
     logger.info(logText(`Adding config file at ${configPath}`))
-    await fs.outputFileSync(configPath, config(args))
+    await fs.outputFileSync(configPath, config(templateVariables))
     await writeGitignore(baseDir)
   }
 }
@@ -301,13 +310,13 @@ const addContentFile = async ({
   if (hasSampleContent) {
     if (overwriteSampleContent) {
       logger.info(logText(`Overriding file at ${sampleContentPath}.`))
-      await fs.outputFileSync(sampleContentPath, content)
+      await fs.outputFileSync(sampleContentPath, helloWorldPost)
     } else {
       logger.info(logText(`Not overriding file at ${sampleContentPath}.`))
     }
   } else {
     logger.info(logText(`Adding content file at ${sampleContentPath}`))
-    await fs.outputFileSync(sampleContentPath, content)
+    await fs.outputFileSync(sampleContentPath, helloWorldPost)
   }
 }
 
@@ -357,20 +366,10 @@ const frameworkDevCmds: {
   },
 }
 
-const config = (args: AddConfigArgs) => {
+const config = (args: ConfigTemplateVariables) => {
   return format(configExamples[args.framework.name](args), { parser: 'babel' })
 }
 
-const content = `---
-title: Hello, World!
----
-
-## Hello World!
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut non lorem diam. Quisque vulputate nibh sodales eros pretium tincidunt. Aenean porttitor efficitur convallis. Nulla sagittis finibus convallis. Phasellus in fermentum quam, eu egestas tortor. Maecenas ac mollis leo. Integer maximus eu nisl vel sagittis.
-
-Suspendisse facilisis, mi ac scelerisque interdum, ligula ex imperdiet felis, a posuere eros justo nec sem. Nullam laoreet accumsan metus, sit amet tincidunt orci egestas nec. Pellentesque ut aliquet ante, at tristique nunc. Donec non massa nibh. Ut posuere lacus non aliquam laoreet. Fusce pharetra ligula a felis porttitor, at mollis ipsum maximus. Donec quam tortor, vehicula a magna sit amet, tincidunt dictum enim. In hac habitasse platea dictumst. Mauris sit amet ornare ligula, blandit consequat risus. Duis malesuada pellentesque lectus, non feugiat turpis eleifend a. Nullam tempus ante et diam pretium, ac faucibus ligula interdum.
-`
 const addReactiveFile = {
   next: ({
     baseDir,

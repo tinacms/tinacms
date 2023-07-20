@@ -177,6 +177,15 @@ async function promptForInitConfiguration(
         ],
       },
       {
+        name: 'nextAuthCredentialsProviderName',
+        type: (_, answers) =>
+          answers.nextAuthProvider === 'vercel-kv-credentials-provider'
+            ? 'text'
+            : null,
+        message: `Enter a name for the Vercel KV Credentials Provider (Defaults to "VercelKVCredentialsProvider")`,
+        initial: 'VercelKVCredentialsProvider',
+      },
+      {
         name: 'overwriteConfigJS',
         type: (_, answers) =>
           !answers.typescript

@@ -2,8 +2,17 @@
 
 */
 
-import type { AddConfigArgs } from '..'
 import type { Framework } from '../config'
+
+export type ConfigTemplateVariables = {
+  extraText?: string
+  publicFolder: string
+  framework: Framework
+  collections?: string
+  isForestryMigration?: boolean
+  token?: string
+  clientId?: string
+}
 
 const clientConfig = (isForestryMigration?: boolean) => {
   if (isForestryMigration) {
@@ -12,7 +21,7 @@ const clientConfig = (isForestryMigration?: boolean) => {
   return ''
 }
 
-const other = (args: AddConfigArgs) => {
+const other = (args: ConfigTemplateVariables) => {
   return `
 import { defineConfig } from "tinacms";
 ${args.extraText || ''}
@@ -70,7 +79,7 @@ export default defineConfig({
 type Keys = Framework['name']
 
 export const configExamples: {
-  [key in Keys]: (args?: AddConfigArgs) => string
+  [key in Keys]: (args?: ConfigTemplateVariables) => string
 } = {
   next: (args) => `import { defineConfig } from 'tinacms'
 
