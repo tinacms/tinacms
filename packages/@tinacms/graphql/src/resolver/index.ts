@@ -6,7 +6,7 @@ import path from 'path'
 import { Database } from '../database'
 import { assertShape, lastItem, sequential } from '../util'
 import { NAMER } from '../ast-builder'
-import isValid from 'date-fns/isValid'
+import isValid from 'date-fns/isValid/index.js'
 import { parseMDX, stringifyMDX } from '../mdx'
 
 import type {
