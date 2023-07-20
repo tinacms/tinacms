@@ -1,6 +1,21 @@
 import fs from 'fs-extra'
 import path from 'path'
 
+export type InitEnvironment = {
+  frontMatterFormat: 'yaml' | 'toml' | 'json'
+  hasForestryConfig: boolean
+  hasJavascriptConfig: boolean
+  hasJavascriptTemplates: boolean
+  hasSampleContent: boolean
+  hasTypescriptConfig: boolean
+  hasTypescriptTemplates: boolean
+  jsConfigPath: string
+  jsTemplatesPath: string
+  sampleContentPath: string
+  tsConfigPath: string
+  tsTemplatesPath: string
+}
+
 const detectEnvironment = async ({
   baseDir = '',
   pathToForestryConfig,
@@ -23,16 +38,16 @@ const detectEnvironment = async ({
   const jsTemplatesPath = path.join(baseDir, 'tina', 'templates.js')
   const tsTemplatesPath = path.join(baseDir, 'tina', 'templates.ts')
   const hasSampleContent = await fs.pathExists(sampleContentPath)
-  const hasTypescriptTemplates = fs.pathExistsSync(tsTemplatesPath)
-  const hasJavascriptTemplates = fs.pathExistsSync(jsTemplatesPath)
+  const hasTypescriptTemplates = await fs.pathExists(tsTemplatesPath)
+  const hasJavascriptTemplates = await fs.pathExists(jsTemplatesPath)
   const tsConfigPath = path.join(baseDir, 'tina', `config.ts`)
   const jsConfigPath = path.join(baseDir, 'tina', `config.js`)
-  const hasTypescriptConfig = fs.pathExistsSync(tsConfigPath)
-  const hasJavascriptConfig = fs.pathExistsSync(jsConfigPath)
+  const hasTypescriptConfig = await fs.pathExists(tsConfigPath)
+  const hasJavascriptConfig = await fs.pathExists(jsConfigPath)
   let frontMatterFormat
   if (hasForestryConfig) {
     const hugoConfigPath = path.join(rootPath, 'config.toml')
-    if (fs.pathExistsSync(hugoConfigPath)) {
+    if (await fs.pathExists(hugoConfigPath)) {
       const hugoConfig = await fs.readFile(hugoConfigPath, 'utf8')
       frontMatterFormat = hugoConfig.match(/metaDataFormat = "(.*)"/)
     }
@@ -53,18 +68,3 @@ const detectEnvironment = async ({
   }
 }
 export default detectEnvironment
-
-export type InitEnvironment = {
-  frontMatterFormat: 'yaml' | 'toml' | 'json'
-  hasForestryConfig: boolean
-  hasJavascriptConfig: boolean
-  hasJavascriptTemplates: boolean
-  hasSampleContent: boolean
-  hasTypescriptConfig: boolean
-  hasTypescriptTemplates: boolean
-  jsConfigPath: string
-  jsTemplatesPath: string
-  sampleContentPath: string
-  tsConfigPath: string
-  tsTemplatesPath: string
-}
