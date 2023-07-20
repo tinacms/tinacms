@@ -51,7 +51,7 @@ We are deprecating onPut and onDelete. You can now use the `gitProvider` to do t
 
 We also provide a `GitHubProvider` that you can use (If you are using Github). 
 
-instead of defining `onPut` and `onDelete` you can now do this. 
+Instead of defining `onPut` and `onDelete` you can now do this:
 
 ```ts
 // We now provide a GitHubProvider that you can use.
