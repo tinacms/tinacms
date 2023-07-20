@@ -18,6 +18,10 @@ import {
   ConfigTemplateOptions,
   ConfigTemplateVariables,
 } from './templates/config'
+import {
+  Variables as AuthTemplateVariables,
+  templates as AuthTemplates,
+} from './templates/auth'
 import { generateCollections } from '../forestry-migrate'
 import { writeGitignore } from '../../next/commands/codemod-command'
 import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer'
@@ -117,7 +121,6 @@ export async function initStaticTina({
         path.relative(process.cwd(), pathToForestryConfig),
         config.publicFolder
       ),
-      framework: config.framework,
       collections,
       extraText,
       isLocalEnvVarName: config.isLocalEnvVarName,
@@ -129,6 +132,7 @@ export async function initStaticTina({
       selfHosted: config.selfHosted,
     },
     baseDir,
+    framework: config.framework,
     hasConfig: config.typescript
       ? env.typescriptConfigExists
       : env.javascriptConfigExists,
@@ -139,6 +143,24 @@ export async function initStaticTina({
       ? env.typescriptConfigPath
       : env.javascriptConfigPath,
   })
+
+  if (config.nextAuthProvider) {
+    await addAuthFile({
+      templateVariables: {
+        nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
+      },
+      authPath: config.typescript
+        ? env.typescriptAuthPath
+        : env.javascriptAuthPath,
+      hasAuth: config.typescript
+        ? env.typescriptAuthExists
+        : env.javascriptAuthExists,
+      nextAuthProvider: config.nextAuthProvider,
+      overwriteAuth: config.typescript
+        ? config.overwriteAuthTS
+        : config.overwriteAuthJS,
+    })
+  }
 
   if (!env.forestryConfigExists) {
     // add /content/posts/hello-world.md
@@ -258,6 +280,7 @@ const addDependencies = async (
 
 const addConfigFile = async ({
   baseDir,
+  framework,
   hasConfig,
   overwriteConfig,
   configPath,
@@ -265,6 +288,7 @@ const addConfigFile = async ({
   templateVariables,
 }: {
   baseDir: string
+  framework: Framework
   hasConfig: boolean
   overwriteConfig: boolean
   configPath: string
@@ -276,7 +300,7 @@ const addConfigFile = async ({
       logger.info(logText(`Overriding file at ${configPath}.`))
       await fs.outputFileSync(
         configPath,
-        config(templateVariables, templateOptions)
+        config(framework, templateVariables, templateOptions)
       )
     } else {
       logger.info(logText(`Not overriding file at ${configPath}.`))
@@ -285,9 +309,38 @@ const addConfigFile = async ({
     logger.info(logText(`Adding config file at ${configPath}`))
     await fs.outputFileSync(
       configPath,
-      config(templateVariables, templateOptions)
+      config(framework, templateVariables, templateOptions)
     )
     await writeGitignore(baseDir)
+  }
+}
+
+const addAuthFile = async ({
+  templateVariables,
+  authPath,
+  hasAuth,
+  nextAuthProvider,
+  overwriteAuth,
+}: {
+  templateVariables: AuthTemplateVariables
+  authPath: string
+  hasAuth: boolean
+  nextAuthProvider: string
+  overwriteAuth: boolean
+}) => {
+  if (hasAuth) {
+    if (overwriteAuth) {
+      logger.info(logText(`Overriding file at ${authPath}.`))
+      await fs.outputFileSync(
+        authPath,
+        auth(nextAuthProvider, templateVariables)
+      )
+    } else {
+      logger.info(logText(`Not overriding file at ${authPath}.`))
+    }
+  } else {
+    logger.info(logText(`Adding config file at ${authPath}`))
+    await fs.outputFileSync(authPath, auth(nextAuthProvider, templateVariables))
   }
 }
 
@@ -383,8 +436,18 @@ const frameworkDevCmds: {
   },
 }
 
-const config = (vars: ConfigTemplateVariables, opts: ConfigTemplateOptions) => {
-  return format(configExamples[vars.framework.name](vars, opts), {
+const config = (
+  framework: Framework,
+  vars: ConfigTemplateVariables,
+  opts: ConfigTemplateOptions
+) => {
+  return format(configExamples[framework.name](vars, opts), {
+    parser: 'babel',
+  })
+}
+
+const auth = (authType: string, vars: AuthTemplateVariables) => {
+  return format(AuthTemplates[authType](vars), {
     parser: 'babel',
   })
 }

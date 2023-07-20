@@ -7,7 +7,6 @@ import type { Framework } from '../config'
 export type ConfigTemplateVariables = {
   extraText?: string
   publicFolder: string
-  framework: Framework
   collections?: string
   token?: string
   clientId?: string

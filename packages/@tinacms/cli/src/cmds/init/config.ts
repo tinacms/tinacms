@@ -186,6 +186,26 @@ async function promptForInitConfiguration(
         initial: 'VercelKVCredentialsProvider',
       },
       {
+        name: 'overwriteAuthJS',
+        type: (_, answers) =>
+          answers.nextAuthProvider &&
+          !answers.typescript &&
+          env.javascriptAuthExists
+            ? 'confirm'
+            : null,
+        message: `Found existing file at ${env.javascriptAuthPath}. Would you like to override?`,
+      },
+      {
+        name: 'overwriteAuthTS',
+        type: (_, answers) =>
+          answers.nextAuthProvider &&
+          answers.typescript &&
+          env.typescriptAuthExists
+            ? 'confirm'
+            : null,
+        message: `Found existing file at ${env.typescriptAuthPath}. Would you like to override?`,
+      },
+      {
         name: 'isLocalEnvVarName',
         type: (_, answers) =>
           answers.nextAuth || answers.dataLayer ? 'text' : null,

@@ -6,6 +6,8 @@ export type InitEnvironment = {
   frontMatterFormat: 'yaml' | 'toml' | 'json'
   gitIgnoreExists: boolean
   gitIgoreNodeModulesExists: boolean
+  javascriptAuthPath: string
+  javascriptAuthExists: boolean
   javascriptConfigExists: boolean
   javascriptConfigPath: string
   javascriptTemplatesExists: boolean
@@ -13,6 +15,8 @@ export type InitEnvironment = {
   packageJSONExists: boolean
   sampleContentExists: boolean
   sampleContentPath: string
+  typescriptAuthPath: string
+  typescriptAuthExists: boolean
   typescriptConfigExists: boolean
   typescriptConfigPath: string
   typescriptTemplatesExists: boolean
@@ -49,15 +53,19 @@ const detectEnvironment = async ({
     'posts',
     'hello-world.md'
   )
-  const jsTemplatesPath = path.join(baseDir, 'tina', 'templates.js')
-  const tsTemplatesPath = path.join(baseDir, 'tina', 'templates.ts')
+  const javascriptAuthPath = path.join(baseDir, 'tina', 'auth.js')
+  const hasJavascriptAuth = await fs.pathExists(javascriptAuthPath)
+  const typescriptAuthPath = path.join(baseDir, 'tina', 'auth.ts')
+  const hasTypescriptAuth = await fs.pathExists(typescriptAuthPath)
+  const javascriptTemplatesPath = path.join(baseDir, 'tina', 'templates.js')
+  const typescriptTemplatesPath = path.join(baseDir, 'tina', 'templates.ts')
   const hasSampleContent = await fs.pathExists(sampleContentPath)
-  const hasTypescriptTemplates = await fs.pathExists(tsTemplatesPath)
-  const hasJavascriptTemplates = await fs.pathExists(jsTemplatesPath)
-  const tsConfigPath = path.join(baseDir, 'tina', `config.ts`)
-  const jsConfigPath = path.join(baseDir, 'tina', `config.js`)
-  const hasTypescriptConfig = await fs.pathExists(tsConfigPath)
-  const hasJavascriptConfig = await fs.pathExists(jsConfigPath)
+  const hasTypescriptTemplates = await fs.pathExists(typescriptTemplatesPath)
+  const hasJavascriptTemplates = await fs.pathExists(javascriptTemplatesPath)
+  const typescriptConfigPath = path.join(baseDir, 'tina', `config.ts`)
+  const javascriptConfigPath = path.join(baseDir, 'tina', `config.js`)
+  const hasTypescriptConfig = await fs.pathExists(typescriptConfigPath)
+  const hasJavascriptConfig = await fs.pathExists(javascriptConfigPath)
   const hasPackageJSON = await fs.pathExists('package.json')
   const hasGitIgnore = await fs.pathExists(path.join('.gitignore'))
   const hasGitIgnoreNodeModules =
@@ -75,17 +83,21 @@ const detectEnvironment = async ({
     frontMatterFormat,
     gitIgnoreExists: hasGitIgnore,
     gitIgoreNodeModulesExists: hasGitIgnoreNodeModules,
+    javascriptAuthExists: hasJavascriptAuth,
+    javascriptAuthPath,
     javascriptConfigExists: hasJavascriptConfig,
-    javascriptConfigPath: jsConfigPath,
+    javascriptConfigPath,
     javascriptTemplatesExists: hasJavascriptTemplates,
-    javascriptTemplatesPath: jsTemplatesPath,
+    javascriptTemplatesPath: javascriptTemplatesPath,
     packageJSONExists: hasPackageJSON,
     sampleContentExists: hasSampleContent,
     sampleContentPath,
+    typescriptAuthExists: hasTypescriptAuth,
+    typescriptAuthPath,
     typescriptConfigExists: hasTypescriptConfig,
-    typescriptConfigPath: tsConfigPath,
+    typescriptConfigPath,
     typescriptTemplatesExists: hasTypescriptTemplates,
-    typescriptTemplatesPath: tsTemplatesPath,
+    typescriptTemplatesPath,
   }
 }
 export default detectEnvironment
