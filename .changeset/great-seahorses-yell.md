@@ -99,7 +99,7 @@ createDatabase({
 
 ### createLocalDatabase
 
-We now provide a `createLocalDatabase` function that you can use to create a local database. Previously you would have to implement this yourself and pass the correct handlers to `createDatabase`.
+We now provide a `createLocalDatabase` function that you can use to create a local database. Previously you would have to implement this yourself and pass the correct handlers to `createDatabase`:
 ```ts
 import { createLocalDatabase } from '@tinacms/datalayer'
 createLocalDatabase(port)
