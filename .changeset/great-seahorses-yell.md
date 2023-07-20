@@ -63,7 +63,7 @@ const gitProvider new GitHubProvider({
 })
 ```
 
-If you are using a different git provider you can implement the `GitProvider` interface. 
+If you are using a different git provider you can implement the `GitProvider` interface:
 
 ```ts
 class CustomGitProvider implements GitProvider {
