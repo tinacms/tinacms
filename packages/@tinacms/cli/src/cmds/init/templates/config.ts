@@ -114,7 +114,12 @@ export const configExamples: {
       args.token ? `'${args.token}'` : 'null'
     }, // Get this from tina.io`
     return `import { defineConfig } from 'tinacms'
-
+  ${
+    opts.selfHosted
+      ? `import { createTinaNextAuthHandler } from 'next-auth-tinacms/dist/tinacms'
+  `
+      : ''
+  }
   // Your hosting provider likely exposes this as an environment variable
   const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || 'main'
   ${
