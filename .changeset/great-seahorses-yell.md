@@ -79,7 +79,7 @@ const gitProvider = new CustomGitProvider()
 
 ### Renaming `level` to `databaseAdapter`
 
-We found that introducing the concept of levelDB was a but confusing for folks getting started with Self Hosted Tina. We are changes the prop `level` to `databaseAdapter`.  In most cases you can use a provided implementation. 
+In order to clarify the purpose of the `level` property, we are renaming it to `databaseAdapter`.  In most cases you can use a provided implementation:
 
 
 ```diff 
