@@ -79,7 +79,9 @@ export class GitHubProvider implements GitProvider {
         sha,
       })
     } else {
-      throw new Error(`Could not find file ${key} in repo ${owner}/${repo}`)
+      throw new Error(
+        `Could not find file ${key} in repo ${this.owner}/${this.repo}`
+      )
     }
   }
 }
