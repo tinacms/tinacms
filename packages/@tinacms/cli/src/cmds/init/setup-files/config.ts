@@ -2,7 +2,8 @@
 
 */
 
-import type { AddConfigArgs, Framework } from '..'
+import type { AddConfigArgs } from '..'
+import type { Framework } from '../config'
 
 const clientConfig = (isForestryMigration?: boolean) => {
   if (isForestryMigration) {

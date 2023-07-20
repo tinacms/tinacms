@@ -10,76 +10,50 @@ import {
 } from '../../utils/theme'
 import { logger } from '../../logger'
 import fs from 'fs-extra'
-import prompts from 'prompts'
 import { Telemetry } from '@tinacms/metrics'
 import { nextPostPage } from './setup-files'
 import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
 import { generateCollections } from '../forestry-migrate'
-import { ErrorSingleton } from '../forestry-migrate/util/errorSingleton'
 import { writeGitignore } from '../../next/commands/codemod-command'
 import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer'
-
-export interface Framework {
-  name: 'next' | 'hugo' | 'jekyll' | 'other'
-  reactive: boolean
-}
+import detectEnvironment from './environment'
+import promptForInitConfiguration, { Framework } from './config'
 
 export async function initStaticTina({
   rootPath,
   pathToForestryConfig,
   noTelemetry,
+  showSelfHosted = false,
 }: {
   rootPath: string
   pathToForestryConfig: string
   noTelemetry: boolean
+  showSelfHosted?: boolean
 }) {
   logger.level = 'info'
 
   process.chdir(rootPath)
 
-  // Choose your ClientID
-  const clientId = await chooseClientId()
-
-  let token: string | null = null
-  // Choose your Read Only token
-  if (clientId) {
-    token = await chooseToken({ clientId })
-  }
-
-  // Choose package manager
-  const packageManager = await choosePackageManager()
-
-  // Choose framework
-  const framework: Framework = await chooseFramework()
-
-  // Choose typescript
-  const usingTypescript = await chooseTypescript()
-
-  // Choose public folder
-  const publicFolder: string = await choosePublicFolder({ framework })
-
-  // Detect forestry config
+  const env = await detectEnvironment({
+    pathToForestryConfig,
+    rootPath,
+  })
+  const config = await promptForInitConfiguration(env, { showSelfHosted })
 
   let collections: string | null | undefined
   let templateCode: string | null | undefined
   let extraText: string | null | undefined
 
-  // If there is a forestry config, ask user to migrate it to tina collections
-  const hasForestryConfig = await fs.pathExists(
-    path.join(pathToForestryConfig, '.forestry', 'settings.yml')
-  )
-
   let isForestryMigration = false
-  if (hasForestryConfig) {
+  if (env.hasForestryConfig) {
     // CollectionsString is the string that will be added to the tina config
     // importStatements are the import statements that will be added to the tina config
     // templateCodeString is the string that will be added to the template.{ts,js} file
     const res = await forestryMigrate({
-      usingTypescript,
+      frontMatterFormat: env.frontMatterFormat || config.frontMatterFormat,
       pathToForestryConfig,
-      rootPath,
-      framework,
+      usingTypescript: config.typescript,
     })
     if (res) {
       templateCode = res.templateCodeString
@@ -91,8 +65,8 @@ export async function initStaticTina({
 
   // Report telemetry
   await reportTelemetry({
-    usingTypescript,
-    hasForestryConfig,
+    usingTypescript: config.typescript,
+    hasForestryConfig: env.hasForestryConfig,
     noTelemetry: noTelemetry,
   })
 
@@ -117,10 +91,21 @@ export async function initStaticTina({
     }
   }
 
-  await addDependencies(packageManager)
+  await addDependencies(config.packageManager)
 
   if (isForestryMigration) {
-    await addTemplateFile({ baseDir: '', usingTypescript, templateCode })
+    await addTemplateFile({
+      templatesPath: config.typescript
+        ? env.tsTemplatesPath
+        : env.jsTemplatesPath,
+      overwriteTemplates: config.typescript
+        ? config.overwriteTemplatesTS
+        : config.overwriteTemplatesJS,
+      hasTemplates: config.typescript
+        ? env.hasTypescriptTemplates
+        : env.hasJavascriptTemplates,
+      templateCode,
+    })
   }
 
   // add tina/config.{js,ts}]
@@ -128,154 +113,54 @@ export async function initStaticTina({
     // remove process fom pathToForestryConfig and add publicFolder
     publicFolder: path.join(
       path.relative(process.cwd(), pathToForestryConfig),
-      publicFolder
+      config.publicFolder
     ),
     baseDir: '',
-    usingTypescript,
-    framework,
+    framework: config.framework,
     collections,
-    token,
-    clientId,
     isForestryMigration,
     extraText,
+    hasConfig: config.typescript
+      ? env.hasTypescriptConfig
+      : env.hasJavascriptConfig,
+    overwriteConfig: config.typescript
+      ? config.overwriteConfigTS
+      : config.overwriteConfigJS,
+    configPath: config.typescript ? env.tsConfigPath : env.jsConfigPath,
   })
 
-  if (!hasForestryConfig) {
+  if (!env.hasForestryConfig) {
     // add /content/posts/hello-world.md
-    await addContentFile({ baseDir: '' })
-  }
-
-  if (framework.reactive) {
-    await addReactiveFile[framework.name]({
-      baseDir: '',
-      framework,
-      usingTypescript,
+    await addContentFile({
+      hasSampleContent: env.hasSampleContent,
+      overwriteSampleContent: config.overwriteSampleContent,
+      sampleContentPath: env.sampleContentPath,
     })
   }
 
-  logNextSteps({ packageManager, framework })
-}
-
-const chooseClientId = async () => {
-  const option = await prompts({
-    name: 'clientId',
-    type: 'text',
-    message: `What is your Tina Cloud Client ID? (Hit enter to skip and set up yourself later)\n${logText(
-      "Don't have a Client ID? Create one here: "
-    )}${linkText('https://app.tina.io/projects/new')}`,
-  })
-  return option['clientId'] as string
-}
-
-const chooseToken = async ({ clientId }: { clientId: string }) => {
-  const option = await prompts({
-    name: 'token',
-    type: 'text',
-    message: `What is your Tina Cloud Read Only Token?\n${logText(
-      "Don't have a Read Only Token? Create one here: "
-    )}${linkText(`https://app.tina.io/projects/${clientId}/tokens`)}`,
-  })
-  return option['token'] as string
-}
-
-const choosePackageManager = async () => {
-  const option = await prompts({
-    name: 'selection',
-    type: 'select',
-    message: 'Choose your package manager',
-    choices: [
-      { title: 'PNPM', value: 'pnpm' },
-      { title: 'Yarn', value: 'yarn' },
-      { title: 'NPM', value: 'npm' },
-    ],
-  })
-  return option['selection']
-}
-
-const chooseTypescript = async () => {
-  const option = await prompts({
-    name: 'selection',
-    type: 'confirm',
-    initial: true,
-    message:
-      'Would you like to use Typescript for your Tina Configuration (Recommended)?',
-  })
-  return option['selection'] as boolean
-}
-
-const choosePublicFolder = async ({ framework }: { framework: Framework }) => {
-  let suggestion = 'public'
-  switch (framework.name) {
-    case 'next':
-      return 'public'
-    case 'hugo':
-      return 'static'
-    case 'jekyll':
-      suggestion = 'public'
-      break
+  if (config.framework.reactive) {
+    await addReactiveFile[config.framework.name]({
+      baseDir: '',
+      framework: config.framework,
+      usingTypescript: config.typescript,
+    })
   }
-  const option = await prompts({
-    name: 'selection',
-    type: 'text',
-    message:
-      `Where are public assets stored? (default: "${suggestion}")\n` +
-      logText(
-        `Not sure what value to use? Refer to our "Frameworks" doc: ${linkText(
-          'https://tina.io/docs/integration/frameworks/#configuring-tina-with-each-framework'
-        )}`
-      ),
-  })
-  return option['selection'] || suggestion
-}
 
-const chooseFramework = async () => {
-  const option = await prompts({
-    name: 'selection',
-    type: 'select',
-    message: 'What framework are you using?',
-    choices: [
-      { title: 'Next.js', value: { name: 'next', reactive: true } },
-      { title: 'Hugo', value: { name: 'hugo', reactive: false } },
-      { title: 'Jekyll', value: { name: 'jekyll', reactive: false } },
-      {
-        title: 'Other (SSG frameworks like gatsby, etc.)',
-        value: { name: 'other', reactive: false },
-      },
-    ] as { title: string; value: Framework }[],
+  logNextSteps({
+    packageManager: config.packageManager,
+    framework: config.framework,
   })
-  return option['selection'] as Framework
 }
 
 const forestryMigrate = async ({
   pathToForestryConfig,
   usingTypescript,
-  rootPath,
-  framework,
+  frontMatterFormat,
 }: {
-  framework: Framework
-  rootPath: string
   usingTypescript: boolean
   pathToForestryConfig: string
+  frontMatterFormat: 'yaml' | 'toml' | 'json'
 }) => {
-  logger.info(`Forestry.io configuration found.`)
-
-  const disclaimer = logText(
-    `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
-  )
-  const option = await prompts({
-    name: 'selection',
-    type: 'confirm',
-    initial: true,
-    message: `Would you like to migrate your Forestry templates?\n${disclaimer}`,
-  })
-  if (!option['selection']) {
-    return null
-  }
-  let frontMatterFormat = null
-
-  if (framework.name === 'hugo') {
-    frontMatterFormat = await getFrontmatterFormat(rootPath)
-  }
   const { collections, importStatements, templateCode } =
     await generateCollections({
       pathToForestryConfig,
@@ -295,33 +180,6 @@ const forestryMigrate = async ({
     importStatements,
     templateCodeString: templateCode,
   }
-}
-
-const getFrontmatterFormat = async (rootPath: string) => {
-  try {
-    const hugoConfigPath = path.join(rootPath, 'config.toml')
-    const hugoConfig = await fs.readFile(hugoConfigPath, 'utf8')
-    const frontMatterFormat = hugoConfig.match(/metaDataFormat = "(.*)"/)
-    console.log({ frontMatterFormat })
-    if (frontMatterFormat && frontMatterFormat[1]) {
-      return frontMatterFormat[1] as 'yaml' | 'toml' | 'json'
-    }
-  } catch (e) {}
-
-  const option = await prompts({
-    name: 'selection',
-    type: 'select',
-    choices: [
-      { title: 'yaml', value: 'yaml' },
-      { title: 'toml', value: 'toml' },
-      { title: 'json', value: 'json' },
-    ],
-    message: `What format are you using in your frontmatter?`,
-  })
-  if (!option['selection']) {
-    return null
-  }
-  return option['selection'] as 'yaml' | 'toml' | 'json'
 }
 
 const reportTelemetry = async ({
@@ -395,92 +253,76 @@ export interface AddConfigArgs {
   extraText?: string
   publicFolder: string
   baseDir: string
-  usingTypescript: boolean
   framework: Framework
   collections?: string
+  isForestryMigration?: boolean
   token?: string
   clientId?: string
-  isForestryMigration?: boolean
+  hasConfig: boolean
+  overwriteConfig: boolean
+  configPath: string
 }
+
 const addConfigFile = async (args: AddConfigArgs) => {
-  const { baseDir, usingTypescript } = args
-  const configPath = path.join(
-    'tina',
-    `config.${usingTypescript ? 'ts' : 'js'}`
-  )
-  const fullConfigPath = path.join(baseDir, configPath)
-  if (fs.pathExistsSync(fullConfigPath)) {
-    const override = await prompts({
-      name: 'selection',
-      type: 'confirm',
-      message: `Found existing file at ${configPath}. Would you like to override?`,
-    })
-    if (override['selection']) {
+  const { baseDir, hasConfig, overwriteConfig, configPath } = args
+  if (hasConfig) {
+    if (overwriteConfig) {
       logger.info(logText(`Overriding file at ${configPath}.`))
-      await fs.outputFileSync(fullConfigPath, config(args))
+      await fs.outputFileSync(configPath, config(args))
     } else {
       logger.info(logText(`Not overriding file at ${configPath}.`))
     }
   } else {
-    logger.info(
-      logText(
-        `Adding config file at tina/config.${usingTypescript ? 'ts' : 'js'}`
-      )
-    )
-    await fs.outputFileSync(fullConfigPath, config(args))
+    logger.info(logText(`Adding config file at ${configPath}`))
+    await fs.outputFileSync(configPath, config(args))
     await writeGitignore(baseDir)
   }
 }
 
 // Adds tina/template.{ts,js} file
-export const addTemplateFile = async (args: {
+export const addTemplateFile = async ({
+  hasTemplates,
+  templatesPath,
+  overwriteTemplates,
+  templateCode,
+}: {
+  hasTemplates: boolean
+  templatesPath: string
+  overwriteTemplates: boolean
   templateCode: string
-  baseDir: string
-  usingTypescript: boolean
 }) => {
-  const { baseDir, usingTypescript, templateCode } = args
-  const templatesPath = path.join(
-    'tina',
-    `templates.${usingTypescript ? 'ts' : 'js'}`
-  )
-  const fullTemplatesPath = path.join(baseDir, templatesPath)
-
-  if (fs.pathExistsSync(fullTemplatesPath)) {
-    const override = await prompts({
-      name: 'selection',
-      type: 'confirm',
-      message: `Found existing file at ${templatesPath}. Would you like to override?`,
-    })
-    if (override['selection']) {
-      logger.info(logText(`Overriding file at ${templatesPath}.`))
-      await fs.outputFileSync(fullTemplatesPath, templateCode)
+  if (hasTemplates) {
+    if (overwriteTemplates) {
+      logger.info(logText(`Overwriting file at ${templatesPath}.`))
+      await fs.outputFileSync(templatesPath, templateCode)
     } else {
-      logger.info(logText(`Not overriding file at ${templatesPath}.`))
+      logger.info(logText(`Not overwriting file at ${templatesPath}.`))
     }
   } else {
     logger.info(logText(`Adding template file at ${templatesPath}`))
-    await fs.outputFileSync(fullTemplatesPath, templateCode)
+    await fs.outputFileSync(templatesPath, templateCode)
   }
 }
 
-const addContentFile = async ({ baseDir }: { baseDir: string }) => {
-  const contentPath = path.join('content', 'posts', 'hello-world.md')
-  const fullContentPath = path.join(baseDir, contentPath)
-  if (fs.pathExistsSync(fullContentPath)) {
-    const override = await prompts({
-      name: 'selection',
-      type: 'confirm',
-      message: `Found existing file at ${contentPath}. Would you like to override?`,
-    })
-    if (override['selection']) {
-      logger.info(logText(`Overriding file at ${contentPath}.`))
-      await fs.outputFileSync(fullContentPath, content)
+const addContentFile = async ({
+  hasSampleContent,
+  overwriteSampleContent,
+  sampleContentPath,
+}: {
+  hasSampleContent: boolean
+  overwriteSampleContent: boolean
+  sampleContentPath: string
+}) => {
+  if (hasSampleContent) {
+    if (overwriteSampleContent) {
+      logger.info(logText(`Overriding file at ${sampleContentPath}.`))
+      await fs.outputFileSync(sampleContentPath, content)
     } else {
-      logger.info(logText(`Not overriding file at ${contentPath}.`))
+      logger.info(logText(`Not overriding file at ${sampleContentPath}.`))
     }
   } else {
-    logger.info(logText(`Adding content file at ${contentPath}`))
-    await fs.outputFileSync(fullContentPath, content)
+    logger.info(logText(`Adding content file at ${sampleContentPath}`))
+    await fs.outputFileSync(sampleContentPath, content)
   }
 }
 
