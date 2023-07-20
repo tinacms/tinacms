@@ -13,7 +13,11 @@ import fs from 'fs-extra'
 import { Telemetry } from '@tinacms/metrics'
 import { nextPostPage } from './templates/next'
 import { extendNextScripts } from '../../utils/script-helpers'
-import { configExamples, ConfigTemplateVariables } from './templates/config'
+import {
+  configExamples,
+  ConfigTemplateOptions,
+  ConfigTemplateVariables,
+} from './templates/config'
 import { generateCollections } from '../forestry-migrate'
 import { writeGitignore } from '../../next/commands/codemod-command'
 import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer'
@@ -115,8 +119,14 @@ export async function initStaticTina({
       ),
       framework: config.framework,
       collections,
-      isForestryMigration,
       extraText,
+      isLocalEnvVarName: config.isLocalEnvVarName,
+      nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
+    },
+    templateOptions: {
+      nextAuth: config.nextAuth,
+      isForestryMigration,
+      selfHosted: config.selfHosted,
     },
     baseDir,
     hasConfig: config.typescript
@@ -251,24 +261,32 @@ const addConfigFile = async ({
   hasConfig,
   overwriteConfig,
   configPath,
+  templateOptions,
   templateVariables,
 }: {
   baseDir: string
   hasConfig: boolean
   overwriteConfig: boolean
   configPath: string
+  templateOptions: ConfigTemplateOptions
   templateVariables: ConfigTemplateVariables
 }) => {
   if (hasConfig) {
     if (overwriteConfig) {
       logger.info(logText(`Overriding file at ${configPath}.`))
-      await fs.outputFileSync(configPath, config(templateVariables))
+      await fs.outputFileSync(
+        configPath,
+        config(templateVariables, templateOptions)
+      )
     } else {
       logger.info(logText(`Not overriding file at ${configPath}.`))
     }
   } else {
     logger.info(logText(`Adding config file at ${configPath}`))
-    await fs.outputFileSync(configPath, config(templateVariables))
+    await fs.outputFileSync(
+      configPath,
+      config(templateVariables, templateOptions)
+    )
     await writeGitignore(baseDir)
   }
 }
@@ -345,8 +363,7 @@ const other = ({ packageManager }: { packageManager: string }) => {
     npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
     yarn: `yarn`,
   }
-  const installText = `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`
-  return installText
+  return `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`
 }
 
 const frameworkDevCmds: {
@@ -366,8 +383,10 @@ const frameworkDevCmds: {
   },
 }
 
-const config = (args: ConfigTemplateVariables) => {
-  return format(configExamples[args.framework.name](args), { parser: 'babel' })
+const config = (vars: ConfigTemplateVariables, opts: ConfigTemplateOptions) => {
+  return format(configExamples[vars.framework.name](vars, opts), {
+    parser: 'babel',
+  })
 }
 
 const addReactiveFile = {

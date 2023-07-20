@@ -186,6 +186,13 @@ async function promptForInitConfiguration(
         initial: 'VercelKVCredentialsProvider',
       },
       {
+        name: 'isLocalEnvVarName',
+        type: (_, answers) =>
+          answers.nextAuth || answers.dataLayer ? 'text' : null,
+        message: `Enter a name for the environment variable that will be used to determine if the app is running locally (Defaults to "TINA_PUBLIC_IS_LOCAL")`,
+        initial: 'TINA_PUBLIC_IS_LOCAL',
+      },
+      {
         name: 'overwriteConfigJS',
         type: (_, answers) =>
           !answers.typescript
