@@ -1,7 +1,7 @@
 import { Post } from '../../components/posts/post'
 import { useTina } from 'tinacms/dist/react'
 import { Layout } from '../../components/layout'
-import databaseClient from '../../tina/__generated__/backendClient'
+import databaseClient from '../../tina/__generated__/databaseClient'
 
 // Use the props returned by get static props
 export default function BlogPostPage(

@@ -1,7 +1,7 @@
 import { Blocks } from '../components/blocks-renderer'
 import { useTina } from 'tinacms/dist/react'
 import { Layout } from '../components/layout'
-import databaseClient from '../tina/__generated__/backendClient'
+import databaseClient from '../tina/__generated__/databaseClient'
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>['props']

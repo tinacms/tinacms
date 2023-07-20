@@ -38,12 +38,12 @@ export class GitHubProvider implements GitProvider {
         owner: this.owner,
         repo: this.repo,
         path: key,
-        branch: this.branch,
+        ref: this.branch,
       })
       sha = existingSha
     } catch (e) {}
 
-    const { data } = await this.octokit.repos.createOrUpdateFileContents({
+    await this.octokit.repos.createOrUpdateFileContents({
       owner: this.owner,
       repo: this.repo,
       path: key,
@@ -64,14 +64,13 @@ export class GitHubProvider implements GitProvider {
         owner: this.owner,
         repo: this.repo,
         path: key,
-        branch: this.branch,
+        ref: this.branch,
       })
       sha = existingSha
-    } catch (e) {
-      console.log(e)
-    }
+    } catch (e) {}
+
     if (sha) {
-      const { data } = await this.octokit.repos.deleteFile({
+      await this.octokit.repos.deleteFile({
         owner: this.owner,
         repo: this.repo,
         path: key,
@@ -79,6 +78,8 @@ export class GitHubProvider implements GitProvider {
         branch: this.branch,
         sha,
       })
+    } else {
+      throw new Error(`Could not find file ${key} in repo ${owner}/${repo}`)
     }
   }
 }

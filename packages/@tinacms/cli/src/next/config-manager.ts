@@ -170,11 +170,11 @@ export class ConfigManager {
     )
     this.generatedDatabaseClientTSFilePath = path.join(
       this.generatedFolderPath,
-      'backendClient.ts'
+      'databaseClient.ts'
     )
     this.generatedDatabaseClientJSFilePath = path.join(
       this.generatedFolderPath,
-      'backendClient.js'
+      'databaseClient.js'
     )
     // =================
     // End of file paths that don't depend on the config file

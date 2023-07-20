@@ -2,7 +2,7 @@ import { Container } from '../components/util/container'
 import { Section } from '../components/util/section'
 import { Posts } from '../components/posts'
 import { Layout } from '../components/layout'
-import databaseClient from '../tina/__generated__/backendClient'
+import databaseClient from '../tina/__generated__/databaseClient'
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>['props']

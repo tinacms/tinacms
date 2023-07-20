@@ -1,4 +1,4 @@
-import { databaseClient } from '../../tina/__generated__/backendClient'
+import { databaseClient } from '../../tina/__generated__/databaseClient'
 
 export default async function handler(req, res) {
   const { query, variables } = req.body
