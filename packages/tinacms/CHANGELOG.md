@@ -1,5 +1,16 @@
 # tinacms
 
+## 1.5.17
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [bc812441b]
+  - @tinacms/schema-tools@1.4.9
+  - @tinacms/sharedctx@1.0.2
+  - @tinacms/toolkit@1.7.13
+  - @tinacms/search@1.0.7
+
 ## 1.5.16
 
 ### Patch Changes

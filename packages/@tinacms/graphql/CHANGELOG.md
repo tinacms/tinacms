@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 1.4.22
+
+### Patch Changes
+
+- 0d8a19632: import isValid from 'date-fns/isValid/index.js' instead of date-fns/isValid
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [bc812441b]
+  - @tinacms/schema-tools@1.4.9
+  - @tinacms/mdx@1.3.15
+
 ## 1.4.21
 
 ### Patch Changes

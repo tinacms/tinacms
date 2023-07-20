@@ -1,5 +1,15 @@
 # @tinacms/search
 
+## 1.0.7
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [0d8a19632]
+- Updated dependencies [bc812441b]
+  - @tinacms/graphql@1.4.22
+  - @tinacms/schema-tools@1.4.9
+
 ## 1.0.6
 
 ### Patch Changes

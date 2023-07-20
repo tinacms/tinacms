@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.1
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+
 ## 1.1.0
 
 ### Minor Changes

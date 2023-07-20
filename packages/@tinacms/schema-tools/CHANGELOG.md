@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.4.9
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+
 ## 1.4.8
 
 ### Patch Changes
