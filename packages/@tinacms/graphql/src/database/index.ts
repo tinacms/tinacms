@@ -54,6 +54,7 @@ import {
 } from './level'
 import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
 import sha from 'js-sha1'
+import { FilesystemBridge, TinaLevelClient } from '..'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -71,6 +72,92 @@ export interface DatabaseArgs {
   tinaDirectory?: string
   indexStatusCallback?: IndexStatusCallback
   version?: boolean
+}
+
+export interface GitProvider {
+  onPut: (key: string, value: string) => Promise<void>
+  onDelete: (key: string) => Promise<void>
+}
+
+export type CreateDatabase = Omit<
+  DatabaseArgs,
+  'level' | 'onPut' | 'onDelete'
+> & {
+  databaseAdapter: Level
+  gitProvider: GitProvider
+
+  /**
+   * @deprecated Use databaseAdapter instead
+   */
+  level?: Level
+  /**
+   * @deprecated Use gitProvider instead
+   */
+  onPut?: OnPutCallback
+  /**
+   * @deprecated Use gitProvider instead
+   */
+  onDelete?: OnDeleteCallback
+}
+
+export type CreateLocalDatabaseArgs = Omit<DatabaseArgs, 'level'> & {
+  port?: number
+  rootPath?: string
+}
+
+export const createLocalDatabase = (config?: CreateLocalDatabaseArgs) => {
+  const level = new TinaLevelClient(config?.port)
+  level.openConnection()
+  const fsBridge = new FilesystemBridge(config?.rootPath || process.cwd())
+  return new Database({
+    bridge: fsBridge,
+    ...(config || {}),
+    level,
+  })
+}
+
+export const createDatabase = (config: CreateDatabase) => {
+  if (config.onPut && config.onDelete) {
+    console.warn(
+      'onPut and onDelete are deprecated. Please use gitProvider.onPut and gitProvider.onDelete instead.'
+    )
+  }
+  if (config.level) {
+    console.warn('level is deprecated. Please use databaseAdapter instead.')
+  }
+  if (
+    config.onPut &&
+    config.onDelete &&
+    config.level &&
+    !config.databaseAdapter &&
+    !config.gitProvider
+  ) {
+    // This is required for backwards compatibility
+    return new Database({
+      ...config,
+      level: config.level,
+    })
+  }
+
+  if (!config.gitProvider) {
+    throw new Error(
+      'createDatabase requires a gitProvider. Please provide a gitProvider.'
+    )
+  }
+
+  if (!config.databaseAdapter) {
+    throw new Error(
+      'createDatabase requires a databaseAdapter. Please provide a databaseAdapter.'
+    )
+  }
+
+  return new Database({
+    ...config,
+    bridge: config.bridge,
+    level: config.databaseAdapter,
+    onPut: config.gitProvider.onPut.bind(config.gitProvider),
+    onDelete: config.gitProvider.onDelete.bind(config.gitProvider),
+  })
 }
 
 export const createDatabaseInternal = (config: DatabaseArgs) => {

@@ -13,8 +13,8 @@ export {
   // Users facing
   TinaLevelClient,
   resolve,
+  createDatabase,
+  createLocalDatabase,
 } from '@tinacms/graphql'
 
-export * from './database'
-
-export * from './gitProviders'
+export * from './providers/github'

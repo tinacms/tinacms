@@ -15,8 +15,15 @@ export type {
   OnDeleteCallback,
   OnPutCallback,
   DatabaseArgs,
+  GitProvider,
+  CreateDatabase,
 } from './database'
-export { Database, createDatabaseInternal } from './database'
+export {
+  Database,
+  createDatabaseInternal,
+  createDatabase,
+  createLocalDatabase,
+} from './database'
 import type { Config } from '@tinacms/schema-tools'
 export { getChangedFiles, getSha } from './git'
 
