@@ -79,7 +79,7 @@ async function promptForInitConfiguration(
       },
       {
         name: 'forestryMigrate',
-        type: (_) => (env.hasForestryConfig ? 'confirm' : null),
+        type: (_) => (env.forestryConfigExists ? 'confirm' : null),
         initial: true,
         message: `Would you like to migrate your Forestry templates?\n${forestryDisclaimer}`,
       },
@@ -104,21 +104,21 @@ async function promptForInitConfiguration(
         name: 'overwriteTemplatesJS',
         type: (_, answers) =>
           !answers.typescript
-            ? env.hasJavascriptTemplates
+            ? env.javascriptTemplatesExists
               ? 'confirm'
               : null
             : null,
-        message: `Found existing file at ${env.jsTemplatesPath}. Would you like to override?`,
+        message: `Found existing file at ${env.javascriptTemplatesPath}. Would you like to override?`,
       },
       {
         name: 'overwriteTemplatesTS',
         type: (_, answers) =>
           answers.typescript
-            ? env.hasTypescriptTemplates
+            ? env.typescriptTemplatesExists
               ? 'confirm'
               : null
             : null,
-        message: `Found existing file at ${env.tsTemplatesPath}. Would you like to override?`,
+        message: `Found existing file at ${env.typescriptTemplatesPath}. Would you like to override?`,
       },
       {
         name: 'dataLayer',
@@ -180,25 +180,25 @@ async function promptForInitConfiguration(
         name: 'overwriteConfigJS',
         type: (_, answers) =>
           !answers.typescript
-            ? env.hasJavascriptConfig
+            ? env.javascriptConfigExists
               ? 'confirm'
               : null
             : null,
-        message: `Found existing file at ${env.hasJavascriptConfig}. Would you like to override?`,
+        message: `Found existing file at ${env.javascriptConfigExists}. Would you like to override?`,
       },
       {
         name: 'overwriteConfigTS',
         type: (_, answers) =>
           answers.typescript
-            ? env.hasTypescriptConfig
+            ? env.typescriptConfigExists
               ? 'confirm'
               : null
             : null,
-        message: `Found existing file at ${env.hasTypescriptConfig}. Would you like to override?`,
+        message: `Found existing file at ${env.typescriptConfigExists}. Would you like to override?`,
       },
       {
         name: 'overwriteSampleContent',
-        type: (_, answers) => (env.hasSampleContent ? 'confirm' : null),
+        type: (_, answers) => (env.sampleContentExists ? 'confirm' : null),
         message: `Found existing file at ${env.sampleContentPath}. Would you like to override?`,
       },
     ],

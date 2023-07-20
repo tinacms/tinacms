@@ -46,7 +46,7 @@ export async function initStaticTina({
   let extraText: string | null | undefined
 
   let isForestryMigration = false
-  if (env.hasForestryConfig) {
+  if (env.forestryConfigExists) {
     // CollectionsString is the string that will be added to the tina config
     // importStatements are the import statements that will be added to the tina config
     // templateCodeString is the string that will be added to the template.{ts,js} file
@@ -66,27 +66,20 @@ export async function initStaticTina({
   // Report telemetry
   await reportTelemetry({
     usingTypescript: config.typescript,
-    hasForestryConfig: env.hasForestryConfig,
+    hasForestryConfig: env.forestryConfigExists,
     noTelemetry: noTelemetry,
   })
 
-  // Check for package.json
-  const hasPackageJSON = await fs.pathExistsSync('package.json')
   // if no package.json, init
-  if (!hasPackageJSON) {
+  if (!env.packageJSONExists) {
     await createPackageJSON()
   }
 
-  // Check if .gitignore exists
-  const hasGitignore = await fs.pathExistsSync('.gitignore')
   // if no .gitignore, create one
-  if (!hasGitignore) {
+  if (!env.gitIgnoreExists) {
     await createGitignore({ baseDir: '' })
   } else {
-    const hasNodeModulesIgnored = await checkGitignoreForNodeModules({
-      baseDir: '',
-    })
-    if (!hasNodeModulesIgnored) {
+    if (!env.gitIgoreNodeModulesExists) {
       await addNodeModulesToGitignore({ baseDir: '' })
     }
   }
@@ -96,14 +89,14 @@ export async function initStaticTina({
   if (isForestryMigration) {
     await addTemplateFile({
       templatesPath: config.typescript
-        ? env.tsTemplatesPath
-        : env.jsTemplatesPath,
+        ? env.typescriptTemplatesPath
+        : env.javascriptTemplatesPath,
       overwriteTemplates: config.typescript
         ? config.overwriteTemplatesTS
         : config.overwriteTemplatesJS,
       hasTemplates: config.typescript
-        ? env.hasTypescriptTemplates
-        : env.hasJavascriptTemplates,
+        ? env.typescriptTemplatesExists
+        : env.javascriptTemplatesExists,
       templateCode,
     })
   }
@@ -121,18 +114,20 @@ export async function initStaticTina({
     isForestryMigration,
     extraText,
     hasConfig: config.typescript
-      ? env.hasTypescriptConfig
-      : env.hasJavascriptConfig,
+      ? env.typescriptConfigExists
+      : env.javascriptConfigExists,
     overwriteConfig: config.typescript
       ? config.overwriteConfigTS
       : config.overwriteConfigJS,
-    configPath: config.typescript ? env.tsConfigPath : env.jsConfigPath,
+    configPath: config.typescript
+      ? env.typescriptConfigPath
+      : env.javascriptConfigPath,
   })
 
-  if (!env.hasForestryConfig) {
+  if (!env.forestryConfigExists) {
     // add /content/posts/hello-world.md
     await addContentFile({
-      hasSampleContent: env.hasSampleContent,
+      hasSampleContent: env.sampleContentExists,
       overwriteSampleContent: config.overwriteSampleContent,
       sampleContentPath: env.sampleContentPath,
     })
@@ -214,16 +209,6 @@ const createGitignore = async ({ baseDir }: { baseDir: string }) => {
   await fs.outputFileSync(path.join(baseDir, '.gitignore'), 'node_modules')
 }
 
-const checkGitignoreForNodeModules = async ({
-  baseDir,
-}: {
-  baseDir: string
-}) => {
-  const gitignoreContent = await fs
-    .readFileSync(path.join(baseDir, '.gitignore'))
-    .toString()
-  return gitignoreContent.split('\n').some((item) => item === 'node_modules')
-}
 const addNodeModulesToGitignore = async ({ baseDir }: { baseDir: string }) => {
   logger.info(logText('Adding node_modules to .gitignore'))
   const gitignoreContent = await fs

@@ -2,18 +2,32 @@ import fs from 'fs-extra'
 import path from 'path'
 
 export type InitEnvironment = {
+  forestryConfigExists: boolean
   frontMatterFormat: 'yaml' | 'toml' | 'json'
-  hasForestryConfig: boolean
-  hasJavascriptConfig: boolean
-  hasJavascriptTemplates: boolean
-  hasSampleContent: boolean
-  hasTypescriptConfig: boolean
-  hasTypescriptTemplates: boolean
-  jsConfigPath: string
-  jsTemplatesPath: string
+  gitIgnoreExists: boolean
+  gitIgoreNodeModulesExists: boolean
+  javascriptConfigExists: boolean
+  javascriptConfigPath: string
+  javascriptTemplatesExists: boolean
+  javascriptTemplatesPath: string
+  packageJSONExists: boolean
+  sampleContentExists: boolean
   sampleContentPath: string
-  tsConfigPath: string
-  tsTemplatesPath: string
+  typescriptConfigExists: boolean
+  typescriptConfigPath: string
+  typescriptTemplatesExists: boolean
+  typescriptTemplatesPath: string
+}
+
+const checkGitignoreForNodeModules = async ({
+  baseDir,
+}: {
+  baseDir: string
+}) => {
+  const gitignoreContent = await fs
+    .readFileSync(path.join(baseDir, '.gitignore'))
+    .toString()
+  return gitignoreContent.split('\n').some((item) => item === 'node_modules')
 }
 
 const detectEnvironment = async ({
@@ -44,6 +58,10 @@ const detectEnvironment = async ({
   const jsConfigPath = path.join(baseDir, 'tina', `config.js`)
   const hasTypescriptConfig = await fs.pathExists(tsConfigPath)
   const hasJavascriptConfig = await fs.pathExists(jsConfigPath)
+  const hasPackageJSON = await fs.pathExists('package.json')
+  const hasGitIgnore = await fs.pathExists(path.join('.gitignore'))
+  const hasGitIgnoreNodeModules =
+    hasGitIgnore && (await checkGitignoreForNodeModules({ baseDir }))
   let frontMatterFormat
   if (hasForestryConfig) {
     const hugoConfigPath = path.join(rootPath, 'config.toml')
@@ -53,18 +71,21 @@ const detectEnvironment = async ({
     }
   }
   return {
+    forestryConfigExists: hasForestryConfig,
     frontMatterFormat,
-    hasForestryConfig,
-    hasJavascriptConfig,
-    hasJavascriptTemplates,
-    hasSampleContent,
-    hasTypescriptConfig,
-    hasTypescriptTemplates,
-    jsConfigPath,
-    jsTemplatesPath,
+    gitIgnoreExists: hasGitIgnore,
+    gitIgoreNodeModulesExists: hasGitIgnoreNodeModules,
+    javascriptConfigExists: hasJavascriptConfig,
+    javascriptConfigPath: jsConfigPath,
+    javascriptTemplatesExists: hasJavascriptTemplates,
+    javascriptTemplatesPath: jsTemplatesPath,
+    packageJSONExists: hasPackageJSON,
+    sampleContentExists: hasSampleContent,
     sampleContentPath,
-    tsConfigPath,
-    tsTemplatesPath,
+    typescriptConfigExists: hasTypescriptConfig,
+    typescriptConfigPath: tsConfigPath,
+    typescriptTemplatesExists: hasTypescriptTemplates,
+    typescriptTemplatesPath: tsTemplatesPath,
   }
 }
 export default detectEnvironment
