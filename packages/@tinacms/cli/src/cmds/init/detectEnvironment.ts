@@ -69,11 +69,12 @@ const detectEnvironment = async ({
     'hello-world.md'
   )
   const usingSrc = !fs.pathExistsSync(path.join(baseDir, 'pages'))
-  const parentPath = path.join(baseDir, 'tina')
+  const tinaFolder = path.join(baseDir, 'tina')
   const generatedFiles = {
-    auth: await makeGeneratedFile('auth', parentPath),
-    config: await makeGeneratedFile('config', parentPath),
-    templates: await makeGeneratedFile('templates', parentPath),
+    auth: await makeGeneratedFile('auth', tinaFolder),
+    config: await makeGeneratedFile('config', tinaFolder),
+    database: await makeGeneratedFile('database', tinaFolder),
+    templates: await makeGeneratedFile('templates', tinaFolder),
     ['vercel-kv-credentials-provider-signin']: await makeGeneratedFile(
       'signin',
       path.join(baseDir, usingSrc ? 'src' : 'pages', 'auth'),

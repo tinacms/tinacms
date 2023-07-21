@@ -22,6 +22,7 @@ import {
   templates as AuthTemplates,
   Variables as AuthTemplateVariables,
 } from './templates/auth'
+import { templates as DatabaseTemplates } from './templates/database'
 import { helloWorldPost } from './templates/content'
 import { format } from 'prettier'
 import {
@@ -126,6 +127,13 @@ async function apply({
     generatedFile: env.generatedFiles['config'],
     config,
   })
+
+  if (config.dataLayer) {
+    await addDatabaseFile({
+      config,
+      generatedFile: env.generatedFiles['database'],
+    })
+  }
 
   if (config.nextAuthProvider) {
     await addAuthFile({
@@ -339,6 +347,24 @@ const addAuthFile = async ({
       ? config.overwriteAuthTS
       : config.overwriteAuthJS,
     content: authContent(nextAuthProvider, templateVariables),
+    typescript: config.typescript,
+  })
+}
+
+const addDatabaseFile = async ({
+  config,
+  generatedFile,
+}: {
+  config: Record<any, any>
+  generatedFile: GeneratedFile
+}) => {
+  const { isLocalEnvVarName } = config
+  await writeGeneratedFile({
+    generatedFile,
+    overwrite: config.typescript
+      ? config.overwriteDatabaseTS
+      : config.overwriteDatabaseJS,
+    content: DatabaseTemplates[config.dataLayerAdapter]({ isLocalEnvVarName }),
     typescript: config.typescript,
   })
 }

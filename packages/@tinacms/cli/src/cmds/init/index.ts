@@ -12,6 +12,7 @@ export interface Framework {
 type GeneratedFileType =
   | 'auth'
   | 'config'
+  | 'database'
   | 'templates'
   | 'vercel-kv-credentials-provider-signin'
   | 'vercel-kv-credentials-provider-register'

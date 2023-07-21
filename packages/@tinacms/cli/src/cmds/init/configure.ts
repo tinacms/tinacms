@@ -210,6 +210,12 @@ async function configure(
         message: `Enter a name for the Vercel KV Credentials Provider (Defaults to "VercelKVCredentialsProvider")`,
         initial: 'VercelKVCredentialsProvider',
       },
+      // tina/database.ts
+      ...generatedFileOverwritePrompt({
+        condition: (answers) => !!answers.dataLayer,
+        configName: 'Database',
+        generatedFile: env.generatedFiles['database'],
+      }),
       // tina/auth.ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!answers.nextAuthProvider,
