@@ -484,6 +484,7 @@ const ActiveItemPreview = ({
   deleteMediaItem,
   allowDelete,
 }) => {
+  console.log({ activeItem })
   const thumbnail = activeItem ? (activeItem.thumbnails || {})['1000x1000'] : ''
   return (
     <div
