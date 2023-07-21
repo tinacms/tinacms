@@ -35,7 +35,7 @@ export class GitHubProvider implements GitProvider {
 
   async onPut(key: string, value: string) {
     let sha
-    const keyWithPath = this.rootPath ? `${this.rootPath}/${key}` : key
+    const path = this.rootPath ? `${this.rootPath}/${key}` : key
     try {
       const {
         // @ts-ignore
@@ -43,7 +43,7 @@ export class GitHubProvider implements GitProvider {
       } = await this.octokit.repos.getContent({
         owner: this.owner,
         repo: this.repo,
-        path: keyWithPath,
+        path: path,
         ref: this.branch,
       })
       sha = existingSha
@@ -52,7 +52,7 @@ export class GitHubProvider implements GitProvider {
     await this.octokit.repos.createOrUpdateFileContents({
       owner: this.owner,
       repo: this.repo,
-      path: keyWithPath,
+      path: path,
       message: this.commitMessage || 'Edited with TinaCMS',
       content: Base64.encode(value),
       branch: this.branch,
@@ -62,7 +62,7 @@ export class GitHubProvider implements GitProvider {
 
   async onDelete(key: string) {
     let sha
-    const keyWithPath = this.rootPath ? `${this.rootPath}/${key}` : key
+    const path = this.rootPath ? `${this.rootPath}/${key}` : key
     try {
       const {
         // @ts-ignore
@@ -70,7 +70,7 @@ export class GitHubProvider implements GitProvider {
       } = await this.octokit.repos.getContent({
         owner: this.owner,
         repo: this.repo,
-        path: keyWithPath,
+        path: path,
         ref: this.branch,
       })
       sha = existingSha
@@ -80,14 +80,14 @@ export class GitHubProvider implements GitProvider {
       await this.octokit.repos.deleteFile({
         owner: this.owner,
         repo: this.repo,
-        path: keyWithPath,
+        path: path,
         message: this.commitMessage || 'Edited with TinaCMS',
         branch: this.branch,
         sha,
       })
     } else {
       throw new Error(
-        `Could not find file ${keyWithPath} in repo ${this.owner}/${this.repo}`
+        `Could not find file ${path} in repo ${this.owner}/${this.repo}`
       )
     }
   }
