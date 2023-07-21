@@ -7,6 +7,9 @@ export interface GitHubProviderOptions {
   repo: string
   token: string
   branch: string
+  commitMessage?: string
+  rootPath?: string
+  octokitOptions?: Omit<ConstructorParameters<typeof Octokit>[0], 'auth'>
 }
 
 export class GitHubProvider implements GitProvider {
@@ -14,18 +17,24 @@ export class GitHubProvider implements GitProvider {
   owner: string
   repo: string
   branch: string
+  rootPath?: string
+  commitMessage?: string
 
   constructor(args: GitHubProviderOptions) {
     this.owner = args.owner
     this.repo = args.repo
     this.branch = args.branch
+    this.commitMessage = args.commitMessage
+    this.rootPath = args.rootPath
     this.octokit = new Octokit({
       auth: args.token,
+      ...(args.octokitOptions || {}),
     })
   }
 
   async onPut(key: string, value: string) {
     let sha
+    const keyWithPath = this.rootPath ? `${this.rootPath}/${key}` : key
     try {
       const {
         // @ts-ignore
@@ -33,7 +42,7 @@ export class GitHubProvider implements GitProvider {
       } = await this.octokit.repos.getContent({
         owner: this.owner,
         repo: this.repo,
-        path: key,
+        path: keyWithPath,
         ref: this.branch,
       })
       sha = existingSha
@@ -42,8 +51,8 @@ export class GitHubProvider implements GitProvider {
     await this.octokit.repos.createOrUpdateFileContents({
       owner: this.owner,
       repo: this.repo,
-      path: key,
-      message: 'commit from self-hosted tina',
+      path: keyWithPath,
+      message: this.commitMessage || 'commit from self-hosted tina',
       content: Base64.encode(value),
       branch: this.branch,
       sha,
@@ -52,6 +61,7 @@ export class GitHubProvider implements GitProvider {
 
   async onDelete(key: string) {
     let sha
+    const keyWithPath = this.rootPath ? `${this.rootPath}/${key}` : key
     try {
       const {
         // @ts-ignore
@@ -59,7 +69,7 @@ export class GitHubProvider implements GitProvider {
       } = await this.octokit.repos.getContent({
         owner: this.owner,
         repo: this.repo,
-        path: key,
+        path: keyWithPath,
         ref: this.branch,
       })
       sha = existingSha
@@ -69,14 +79,14 @@ export class GitHubProvider implements GitProvider {
       await this.octokit.repos.deleteFile({
         owner: this.owner,
         repo: this.repo,
-        path: key,
-        message: 'commit from self-hosted tina',
+        path: keyWithPath,
+        message: this.commitMessage || 'commit from self-hosted tina',
         branch: this.branch,
         sha,
       })
     } else {
       throw new Error(
-        `Could not find file ${key} in repo ${this.owner}/${this.repo}`
+        `Could not find file ${keyWithPath} in repo ${this.owner}/${this.repo}`
       )
     }
   }
