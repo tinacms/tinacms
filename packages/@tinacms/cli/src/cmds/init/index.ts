@@ -15,6 +15,7 @@ type GeneratedFileType =
   | 'templates'
   | 'vercel-kv-credentials-provider-signin'
   | 'vercel-kv-credentials-provider-register'
+  | 'vercel-kv-credentials-provider-register-api-handler'
   | 'next-auth-api-handler'
 
 export type GeneratedFile = {

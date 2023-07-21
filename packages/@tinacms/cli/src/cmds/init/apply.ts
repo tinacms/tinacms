@@ -25,6 +25,7 @@ import {
 import { helloWorldPost } from './templates/content'
 import { format } from 'prettier'
 import {
+  authRegisterApiHandler,
   authRegisterPage,
   authSigninPage,
   nextAuthApiHandler,
@@ -144,6 +145,10 @@ async function apply({
           env.generatedFiles['vercel-kv-credentials-provider-signin'],
         generatedRegister:
           env.generatedFiles['vercel-kv-credentials-provider-register'],
+        generatedRegisterApiHandler:
+          env.generatedFiles[
+            'vercel-kv-credentials-provider-register-api-handler'
+          ],
         config,
       })
     }
@@ -505,10 +510,12 @@ async function addNextAuthApiHandler({
 const addVercelKVCredentialsProviderFiles = async ({
   generatedSignin,
   generatedRegister,
+  generatedRegisterApiHandler,
   config,
 }: {
   generatedSignin: GeneratedFile
   generatedRegister: GeneratedFile
+  generatedRegisterApiHandler: GeneratedFile
   config: Record<any, any>
 }) => {
   await writeGeneratedFile({
@@ -527,6 +534,14 @@ const addVercelKVCredentialsProviderFiles = async ({
     content: authRegisterPage({
       nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
     }),
+    typescript: config.typescript,
+  })
+  await writeGeneratedFile({
+    generatedFile: generatedRegisterApiHandler,
+    overwrite: config.typescript
+      ? config.overwriteVercelKVCredentialsProviderRegisterApiHandlerTS
+      : config.overwriteVercelKVCredentialsProviderRegisterApiHandlerJS,
+    content: authRegisterApiHandler(),
     typescript: config.typescript,
   })
 }

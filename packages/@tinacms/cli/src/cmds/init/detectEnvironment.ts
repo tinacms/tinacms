@@ -90,6 +90,11 @@ const detectEnvironment = async ({
       '[...nextauth]',
       path.join(baseDir, usingSrc ? 'src' : 'pages', 'api', 'auth')
     ),
+    ['vercel-kv-credentials-provider-register-api-handler']:
+      await makeGeneratedFile(
+        'register',
+        path.join(baseDir, usingSrc ? 'src' : 'pages', 'api', 'credentials')
+      ),
   }
   const hasSampleContent = await fs.pathExists(sampleContentPath)
   const hasPackageJSON = await fs.pathExists('package.json')

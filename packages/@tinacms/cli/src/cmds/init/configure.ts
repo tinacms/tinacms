@@ -238,6 +238,16 @@ async function configure(
         generatedFile:
           env.generatedFiles['vercel-kv-credentials-provider-register'],
       }),
+      // pages/api/credentials/register.ts
+      ...generatedFileOverwritePrompt({
+        condition: (answers) =>
+          answers.nextAuthProvider === 'vercel-kv-credentials-provider',
+        configName: 'VercelKVCredentialsProviderRegisterApiHandler',
+        generatedFile:
+          env.generatedFiles[
+            'vercel-kv-credentials-provider-register-api-handler'
+          ],
+      }),
       {
         name: 'isLocalEnvVarName',
         type: (_, answers) =>

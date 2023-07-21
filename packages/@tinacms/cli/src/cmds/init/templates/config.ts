@@ -2,7 +2,7 @@
 
 */
 
-import type { Framework } from '../config'
+import type { Framework } from '..'
 
 export type ConfigTemplateVariables = {
   extraText?: string
