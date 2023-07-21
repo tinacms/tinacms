@@ -7,11 +7,11 @@
 
 ## Changes
 - deprecate onPut, onDelete and the level args to `createDatabase`
-- `createDatabase` code moves from `@tinacms/graphql`t `@tinacms/datalayer`
 - adds `databaseAdapter` instead of `level`
 - adds `gitProvider` instead of onPut and onDelete. 
-- adds `createLocalDatabase` to  `@tinacms/datalayer`
 - adds `GitHubProvider` to  `@tinacms/datalayer`
+- adds `gitProvider` to interface to `@tinacms/graphql`
+- adds the generated database client
 
 
 The database.ts file can now look like this.
