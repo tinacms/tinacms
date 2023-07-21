@@ -83,12 +83,17 @@ async function apply({
   if (!env.gitIgnoreExists) {
     await createGitignore({ baseDir })
   } else {
+    let itemsToAdd = []
     if (!env.gitIgoreNodeModulesExists) {
-      await addNodeModulesToGitignore({ baseDir })
+      itemsToAdd.push('node_modules')
+    }
+    if (!env.gitIgnoreTinaEnvExists) {
+      itemsToAdd.push('.env.tina')
+    }
+    if (itemsToAdd.length > 0) {
+      await updateGitIgnore({ baseDir, items: itemsToAdd })
     }
   }
-
-  await addDependencies(config)
 
   if (isForestryMigration) {
     await addTemplateFile({
@@ -170,6 +175,8 @@ async function apply({
     })
   }
 
+  await addDependencies(config)
+
   logNextSteps({
     packageManager: config.packageManager,
     framework: config.framework,
@@ -235,18 +242,26 @@ const createPackageJSON = async () => {
 }
 const createGitignore = async ({ baseDir }: { baseDir: string }) => {
   logger.info(logText('No .gitignore found, creating one'))
-  await fs.outputFileSync(path.join(baseDir, '.gitignore'), 'node_modules')
+  await fs.outputFileSync(
+    path.join(baseDir, '.gitignore'),
+    'node_modules\n.env.tina'
+  )
 }
 
-const addNodeModulesToGitignore = async ({ baseDir }: { baseDir: string }) => {
-  logger.info(logText('Adding node_modules to .gitignore'))
+const updateGitIgnore = async ({
+  baseDir,
+  items,
+}: {
+  baseDir: string
+  items: string[]
+}) => {
+  logger.info(logText(`Adding ${items.join(',')} to .gitignore`))
   const gitignoreContent = fs
     .readFileSync(path.join(baseDir, '.gitignore'))
     .toString()
-  const newGitignoreContent = [
-    ...gitignoreContent.split('\n'),
-    'node_modules',
-  ].join('\n')
+  const newGitignoreContent = [...gitignoreContent.split('\n'), ...items].join(
+    '\n'
+  )
   await fs.writeFile(path.join(baseDir, '.gitignore'), newGitignoreContent)
 }
 const addDependencies = async (config: Record<any, any>) => {

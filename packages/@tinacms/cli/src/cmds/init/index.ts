@@ -34,6 +34,7 @@ export type InitEnvironment = {
   frontMatterFormat: 'yaml' | 'toml' | 'json'
   gitIgnoreExists: boolean
   gitIgoreNodeModulesExists: boolean
+  gitIgnoreTinaEnvExists: boolean
   packageJSONExists: boolean
   sampleContentExists: boolean
   sampleContentPath: string

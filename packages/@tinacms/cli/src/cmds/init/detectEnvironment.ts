@@ -1,16 +1,19 @@
 import fs from 'fs-extra'
 import path from 'path'
 import { InitEnvironment } from './index'
+import dotenv from 'dotenv'
 
-const checkGitignoreForNodeModules = async ({
+const checkGitignoreForItem = async ({
   baseDir,
+  line,
 }: {
   baseDir: string
+  line: string
 }) => {
   const gitignoreContent = fs
     .readFileSync(path.join(baseDir, '.gitignore'))
     .toString()
-  return gitignoreContent.split('\n').some((item) => item === 'node_modules')
+  return gitignoreContent.split('\n').some((item) => item === line)
 }
 
 const makeGeneratedFile = async (
@@ -61,6 +64,10 @@ const detectEnvironment = async ({
   pathToForestryConfig: string
   rootPath: string
 }): Promise<InitEnvironment> => {
+  if (fs.pathExistsSync('.env.tina')) {
+    dotenv.config({ path: '.env.tina' })
+  }
+
   // If there is a forestry config, ask user to migrate it to tina collections
   const hasForestryConfig = await fs.pathExists(
     path.join(pathToForestryConfig, '.forestry', 'settings.yml')
@@ -106,7 +113,11 @@ const detectEnvironment = async ({
   const hasPackageJSON = await fs.pathExists('package.json')
   const hasGitIgnore = await fs.pathExists(path.join('.gitignore'))
   const hasGitIgnoreNodeModules =
-    hasGitIgnore && (await checkGitignoreForNodeModules({ baseDir }))
+    hasGitIgnore &&
+    (await checkGitignoreForItem({ baseDir, line: 'node_modules' }))
+  const hasEnvTina =
+    hasGitIgnore &&
+    (await checkGitignoreForItem({ baseDir, line: '.env.tina' }))
   let frontMatterFormat
   if (hasForestryConfig) {
     const hugoConfigPath = path.join(rootPath, 'config.toml')
@@ -120,6 +131,7 @@ const detectEnvironment = async ({
     frontMatterFormat,
     gitIgnoreExists: hasGitIgnore,
     gitIgoreNodeModulesExists: hasGitIgnoreNodeModules,
+    gitIgnoreTinaEnvExists: hasEnvTina,
     packageJSONExists: hasPackageJSON,
     sampleContentExists: hasSampleContent,
     sampleContentPath,
