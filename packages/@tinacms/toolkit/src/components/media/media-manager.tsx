@@ -256,7 +256,6 @@ export function MediaPicker({
             }
           })
         )
-        console.log({ mediaItems })
 
         // Codes here https://github.com/react-dropzone/react-dropzone/blob/c36ab5bd8b8fd74e2074290d80e3ecb93d26b014/typings/react-dropzone.d.ts#LL13-L18C2
         const errorCodes = {
@@ -484,7 +483,6 @@ const ActiveItemPreview = ({
   deleteMediaItem,
   allowDelete,
 }) => {
-  console.log({ activeItem })
   const thumbnail = activeItem ? (activeItem.thumbnails || {})['1000x1000'] : ''
   return (
     <div

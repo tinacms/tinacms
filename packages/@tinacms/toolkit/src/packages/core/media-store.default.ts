@@ -95,7 +95,6 @@ export class TinaMediaStore implements MediaStore {
             ? `${directory}/${item.file.name}`
             : item.file.name
         }`
-        console.log({ item, directory, path })
         const res = await this.api.fetchWithToken(
           `${this.url}/upload_url/${path}`,
           { method: 'GET' }
@@ -127,7 +126,6 @@ export class TinaMediaStore implements MediaStore {
         }
         const src = `https://assets.tina.io/${this.api.clientId}/${path}`
 
-        console.log({ src })
         newFiles.push({
           directory: item.directory,
           filename: item.file.name,
