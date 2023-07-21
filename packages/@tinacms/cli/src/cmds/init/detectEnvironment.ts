@@ -16,15 +16,29 @@ const checkGitignoreForNodeModules = async ({
 const makeGeneratedFile = async (
   name: string,
   parentPath: string,
-  typescriptSuffix?: string
+  opts?: {
+    typescriptSuffix?: string
+  }
 ) => {
   const result = {
-    fullPathJS: path.join(parentPath, name, typescriptSuffix || 'ts'),
+    fullPathJS: path.join(parentPath, name, opts?.typescriptSuffix || 'ts'),
     fullPathTS: path.join(parentPath, name, 'js'),
     name,
     parentPath,
     typescriptExists: false,
     javascriptExists: false,
+    get resolve() {
+      return (typescript) =>
+        typescript
+          ? {
+              exists: this.typescriptExists,
+              path: this.fullPathTS,
+            }
+          : {
+              exists: this.javascriptExists,
+              path: this.fullPathJS,
+            }
+    },
   }
 
   result.typescriptExists = await fs.pathExists(result.fullPathTS)
@@ -61,12 +75,20 @@ const detectEnvironment = async ({
     ['vercel-kv-credentials-provider-signin']: await makeGeneratedFile(
       'signin',
       path.join(baseDir, usingSrc ? 'src' : 'pages', 'auth'),
-      'tsx'
+      {
+        typescriptSuffix: 'tsx',
+      }
     ),
     ['vercel-kv-credentials-provider-register']: await makeGeneratedFile(
       'register',
       path.join(baseDir, usingSrc ? 'src' : 'pages', 'auth'),
-      'tsx'
+      {
+        typescriptSuffix: 'tsx',
+      }
+    ),
+    ['next-auth-api-handler']: await makeGeneratedFile(
+      '[...nextauth]',
+      path.join(baseDir, usingSrc ? 'src' : 'pages', 'api', 'auth')
     ),
   }
   const hasSampleContent = await fs.pathExists(sampleContentPath)

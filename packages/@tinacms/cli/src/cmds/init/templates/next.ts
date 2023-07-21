@@ -225,7 +225,8 @@ export const nextPostPage = ({
     )
   }`
 
-const authSigninPage = () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
+export const authSigninPage =
+  () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
 import { getCsrfToken } from 'next-auth/react'
 
 export default function SignIn({ csrfToken, error, userSetupRequired }) {
@@ -412,3 +413,11 @@ export async function getServerSideProps(context) {
     },
   }
 }`
+
+export const nextAuthApiHandler =
+  () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
+import NextAuth from 'next-auth'
+import { authOptions } from "../../../tina/auth";
+
+export default NextAuth(authOptions)
+`

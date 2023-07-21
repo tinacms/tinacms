@@ -15,6 +15,7 @@ type GeneratedFileType =
   | 'templates'
   | 'vercel-kv-credentials-provider-signin'
   | 'vercel-kv-credentials-provider-register'
+  | 'next-auth-api-handler'
 
 export type GeneratedFile = {
   fullPathJS: string
@@ -23,6 +24,7 @@ export type GeneratedFile = {
   parentPath: string
   typescriptExists: boolean
   javascriptExists: boolean
+  resolve: (boolean) => { exists: boolean; path: string }
 }
 
 export type InitEnvironment = {

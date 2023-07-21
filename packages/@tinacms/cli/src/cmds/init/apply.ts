@@ -24,7 +24,12 @@ import {
 } from './templates/auth'
 import { helloWorldPost } from './templates/content'
 import { format } from 'prettier'
-import { nextPostPage } from './templates/next'
+import {
+  authRegisterPage,
+  authSigninPage,
+  nextAuthApiHandler,
+  nextPostPage,
+} from './templates/next'
 import { extendNextScripts } from '../../utils/script-helpers'
 import { Framework, GeneratedFile, InitEnvironment, InitParams } from './index'
 
@@ -84,15 +89,10 @@ async function apply({
   await addDependencies(config.packageManager, config.nextAuth)
 
   if (isForestryMigration) {
-    const { fullPathTS, fullPathJS, javascriptExists, typescriptExists } =
-      env.generatedFiles['templates']
     await addTemplateFile({
-      templatesPath: config.typescript ? fullPathTS : fullPathJS,
-      overwriteTemplates: config.typescript
-        ? config.overwriteTemplatesTS
-        : config.overwriteTemplatesJS,
-      hasTemplates: config.typescript ? typescriptExists : javascriptExists,
+      generatedFile: env.generatedFiles['templates'],
       content: templateCode,
+      config,
     })
   }
 
@@ -122,38 +122,36 @@ async function apply({
     },
     baseDir,
     framework: config.framework,
-    hasConfig: config.typescript
-      ? typescriptConfigExists
-      : javascriptConfigExists,
-    overwriteConfig: config.typescript
-      ? config.overwriteConfigTS
-      : config.overwriteConfigJS,
-    configPath: config.typescript ? typescriptConfigPath : javascriptConfigPath,
+    generatedFile: env.generatedFiles['config'],
+    config,
   })
 
   if (config.nextAuthProvider) {
-    const { fullPathTS, fullPathJS, javascriptExists, typescriptExists } =
-      env.generatedFiles['auth']
     await addAuthFile({
-      templateVariables: {
-        nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
-      },
-      authPath: config.typescript ? fullPathJS : fullPathTS,
-      hasAuth: config.typescript ? typescriptExists : javascriptExists,
-      nextAuthProvider: config.nextAuthProvider,
-      overwriteAuth: config.typescript
-        ? config.overwriteAuthTS
-        : config.overwriteAuthJS,
+      config,
+      generatedFile: env.generatedFiles['auth'],
     })
+
+    await addNextAuthApiHandler({
+      config,
+      generatedFile: env.generatedFiles['next-auth-api-handler'],
+      content: nextAuthApiHandler(),
+    })
+
+    if (config.nextAuthProvider === 'vercel-kv-credentials-provider') {
+      await addVercelKVCredentialsProviderFiles({
+        generatedSignin:
+          env.generatedFiles['vercel-kv-credentials-provider-signin'],
+        generatedRegister:
+          env.generatedFiles['vercel-kv-credentials-provider-register'],
+        config,
+      })
+    }
   }
 
   if (!env.forestryConfigExists) {
     // add /content/posts/hello-world.md
-    await addContentFile({
-      hasSampleContent: env.sampleContentExists,
-      overwriteSampleContent: config.overwriteSampleContent,
-      sampleContentPath: env.sampleContentPath,
-    })
+    await addContentFile({ config, env })
   }
 
   if (config.framework.reactive) {
@@ -265,16 +263,17 @@ const addDependencies = async (
 }
 
 const writeGeneratedFile = async ({
-  exists,
+  generatedFile,
   overwrite,
-  path,
   content,
+  typescript,
 }: {
-  exists: boolean
+  generatedFile: GeneratedFile
   overwrite: boolean
-  path: string
   content: string
+  typescript: boolean
 }) => {
+  const { exists, path } = generatedFile.resolve(typescript)
   if (exists) {
     if (overwrite) {
       logger.info(logText(`Overwriting file at ${path}.`))
@@ -291,86 +290,98 @@ const writeGeneratedFile = async ({
 const addConfigFile = async ({
   baseDir,
   framework,
-  hasConfig,
-  overwriteConfig,
-  configPath,
   templateOptions,
   templateVariables,
+  generatedFile,
+  config,
 }: {
   baseDir: string
   framework: Framework
-  hasConfig: boolean
-  overwriteConfig: boolean
-  configPath: string
   templateOptions: ConfigTemplateOptions
   templateVariables: ConfigTemplateVariables
+  generatedFile: GeneratedFile
+  config: Record<any, any>
 }) => {
   await writeGeneratedFile({
-    exists: hasConfig,
-    overwrite: overwriteConfig,
-    path: configPath,
-    content: config(framework, templateVariables, templateOptions),
+    overwrite: config.typescript
+      ? config.overwriteConfigTS
+      : config.overwriteConfigJS,
+    generatedFile,
+    content: configContent(framework, templateVariables, templateOptions),
+    typescript: config.typescript,
   })
-  if (!hasConfig) {
+  const { exists } = generatedFile.resolve(config.typescript)
+  if (!exists) {
     await writeGitignore(baseDir)
   }
 }
 
 const addAuthFile = async ({
-  templateVariables,
-  authPath,
-  hasAuth,
-  nextAuthProvider,
-  overwriteAuth,
+  config,
+  generatedFile,
 }: {
-  templateVariables: AuthTemplateVariables
-  authPath: string
-  hasAuth: boolean
-  nextAuthProvider: string
-  overwriteAuth: boolean
+  config: Record<any, any>
+  generatedFile: GeneratedFile
 }) => {
+  const { nextAuthProvider, nextAuthCredentialsProviderName } = config
+  const templateVariables = {
+    nextAuthCredentialsProviderName,
+  }
   await writeGeneratedFile({
-    exists: hasAuth,
-    overwrite: overwriteAuth,
-    path: authPath,
-    content: auth(nextAuthProvider, templateVariables),
+    generatedFile,
+    overwrite: config.typescript
+      ? config.overwriteAuthTS
+      : config.overwriteAuthJS,
+    content: authContent(nextAuthProvider, templateVariables),
+    typescript: config.typescript,
   })
 }
 
 // Adds tina/template.{ts,js} file
 export const addTemplateFile = async ({
-  hasTemplates,
-  templatesPath,
-  overwriteTemplates,
   content,
+  generatedFile,
+  config,
 }: {
-  hasTemplates: boolean
-  templatesPath: string
-  overwriteTemplates: boolean
   content: string
+  generatedFile: GeneratedFile
+  config: Record<any, any>
 }) => {
   await writeGeneratedFile({
-    exists: hasTemplates,
-    overwrite: overwriteTemplates,
-    path: templatesPath,
+    generatedFile,
+    overwrite: config.typescript
+      ? config.overwriteTemplatesTS
+      : config.overwriteTemplatesJS,
     content,
+    typescript: config.typescript,
   })
 }
 
 const addContentFile = async ({
-  hasSampleContent,
-  overwriteSampleContent,
-  sampleContentPath,
+  config,
+  env,
 }: {
-  hasSampleContent: boolean
-  overwriteSampleContent: boolean
-  sampleContentPath: string
+  config: Record<any, any>
+  env: InitEnvironment
 }) => {
   await writeGeneratedFile({
-    exists: hasSampleContent,
-    overwrite: overwriteSampleContent,
-    path: sampleContentPath,
+    generatedFile: {
+      javascriptExists: false,
+      typescriptExists: false,
+      fullPathJS: '',
+      fullPathTS: '',
+      name: '',
+      parentPath: '',
+      get resolve() {
+        return () => ({
+          exists: env.sampleContentExists,
+          path: env.sampleContentPath,
+        })
+      },
+    },
+    overwrite: config.overwriteSampleContent,
     content: helloWorldPost,
+    typescript: false,
   })
 }
 
@@ -418,7 +429,7 @@ const frameworkDevCmds: {
   },
 }
 
-const config = (
+const configContent = (
   framework: Framework,
   vars: ConfigTemplateVariables,
   opts: ConfigTemplateOptions
@@ -428,7 +439,7 @@ const config = (
   })
 }
 
-const auth = (authType: string, vars: AuthTemplateVariables) => {
+const authContent = (authType: string, vars: AuthTemplateVariables) => {
   return format(AuthTemplates[authType](vars), {
     parser: 'babel',
   })
@@ -472,20 +483,52 @@ const addReactiveFile = {
   },
 }
 
+async function addNextAuthApiHandler({
+  generatedFile,
+  config,
+  content,
+}: {
+  generatedFile: GeneratedFile
+  config: Record<any, any>
+  content: string
+}) {
+  await writeGeneratedFile({
+    generatedFile,
+    typescript: config.typescript,
+    overwrite: config.typescript
+      ? config.overwriteNextAuthApiHandlerTS
+      : config.overwriteNextAuthApiHandlerTS,
+    content,
+  })
+}
+
 const addVercelKVCredentialsProviderFiles = async ({
-  usingTypescript,
   generatedSignin,
   generatedRegister,
+  config,
 }: {
-  usingTypescript: boolean
   generatedSignin: GeneratedFile
   generatedRegister: GeneratedFile
+  config: Record<any, any>
 }) => {
-  // TODO write generated files using writeGeneratedFile function
-  // TODO consider protecting pages/api/gql.ts
-  // TODO generate database.ts
-  // TODO add api for register.ts
-  // TODO add next auth endpoint
+  await writeGeneratedFile({
+    generatedFile: generatedSignin,
+    overwrite: config.typescript
+      ? config.overwriteVercelKVCredentialsProviderSigninJS
+      : config.overwriteVercelKVCredentialsProviderSigninJS,
+    content: authSigninPage(),
+    typescript: config.typescript,
+  })
+  await writeGeneratedFile({
+    generatedFile: generatedRegister,
+    overwrite: config.typescript
+      ? config.overwriteVercelKVCredentialsProviderRegisterJS
+      : config.overwriteVercelKVCredentialsProviderRegisterJS,
+    content: authRegisterPage({
+      nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
+    }),
+    typescript: config.typescript,
+  })
 }
 
 /**

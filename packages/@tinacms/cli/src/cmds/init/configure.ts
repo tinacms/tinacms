@@ -216,6 +216,12 @@ async function configure(
         configName: 'Auth',
         generatedFile: env.generatedFiles['auth'],
       }),
+      // pages/api/auth/[...nextauth].ts
+      ...generatedFileOverwritePrompt({
+        condition: (answers) => !!answers.nextAuthProvider,
+        configName: 'NextAuthApiHandler',
+        generatedFile: env.generatedFiles['next-auth-api-handler'],
+      }),
       // pages/auth/signin.tsx
       ...generatedFileOverwritePrompt({
         condition: (answers) =>
@@ -247,7 +253,7 @@ async function configure(
       }),
       {
         name: 'overwriteSampleContent',
-        type: (_, answers) => (env.sampleContentExists ? 'confirm' : null),
+        type: (_) => (env.sampleContentExists ? 'confirm' : null),
         message: `Found existing file at ${env.sampleContentPath}. Would you like to override?`,
       },
     ],
