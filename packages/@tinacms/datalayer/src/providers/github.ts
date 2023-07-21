@@ -2,6 +2,7 @@ import { Octokit } from '@octokit/rest'
 import { Base64 } from 'js-base64'
 import type { GitProvider } from '@tinacms/graphql'
 
+type OctokitOptions = ConstructorParameters<typeof Octokit>[0]
 export interface GitHubProviderOptions {
   owner: string
   repo: string
@@ -9,7 +10,7 @@ export interface GitHubProviderOptions {
   branch: string
   commitMessage?: string
   rootPath?: string
-  octokitOptions?: Omit<ConstructorParameters<typeof Octokit>[0], 'auth'>
+  octokitOptions?: OctokitOptions
 }
 
 export class GitHubProvider implements GitProvider {
@@ -52,7 +53,7 @@ export class GitHubProvider implements GitProvider {
       owner: this.owner,
       repo: this.repo,
       path: keyWithPath,
-      message: this.commitMessage || 'commit from self-hosted tina',
+      message: this.commitMessage || 'Edited with TinaCMS',
       content: Base64.encode(value),
       branch: this.branch,
       sha,
@@ -80,7 +81,7 @@ export class GitHubProvider implements GitProvider {
         owner: this.owner,
         repo: this.repo,
         path: keyWithPath,
-        message: this.commitMessage || 'commit from self-hosted tina',
+        message: this.commitMessage || 'Edited with TinaCMS',
         branch: this.branch,
         sha,
       })
