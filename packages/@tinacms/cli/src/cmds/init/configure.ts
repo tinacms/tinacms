@@ -153,14 +153,14 @@ async function configure(
       },
       {
         name: 'clientId',
-        type: (_, answers) => (answers.dataLayer ? 'text' : null),
+        type: (_, answers) => (!answers.dataLayer ? 'text' : null),
         message: `What is your Tina Cloud Client ID? (Hit enter to skip and set up yourself later)\n${logText(
           "Don't have a Client ID? Create one here: "
         )}${linkText('https://app.tina.io/projects/new')}`,
       },
       {
         name: 'token',
-        type: (_, answers) => (answers.dataLayer ? 'text' : null),
+        type: (_, answers) => (!answers.dataLayer ? 'text' : null),
         message: (prev) =>
           `What is your Tina Cloud Read Only Token?\n${logText(
             "Don't have a Read Only Token? Create one here: "
