@@ -21,8 +21,11 @@ const makeGeneratedFile = async (
   }
 ) => {
   const result = {
-    fullPathJS: path.join(parentPath, name, opts?.typescriptSuffix || 'ts'),
-    fullPathTS: path.join(parentPath, name, 'js'),
+    fullPathTS: path.join(
+      parentPath,
+      `${name}.${opts?.typescriptSuffix || 'ts'}`
+    ),
+    fullPathJS: path.join(parentPath, `${name}.js`),
     name,
     parentPath,
     typescriptExists: false,

@@ -88,7 +88,7 @@ async function apply({
     }
   }
 
-  await addDependencies(config.packageManager, config.nextAuth)
+  await addDependencies(config)
 
   if (isForestryMigration) {
     await addTemplateFile({
@@ -114,7 +114,7 @@ async function apply({
     templateOptions: {
       nextAuth: config.nextAuth,
       isForestryMigration,
-      selfHosted: config.selfHosted,
+      selfHosted: config.dataLayer,
     },
     baseDir,
     framework: config.framework,
@@ -249,14 +249,21 @@ const addNodeModulesToGitignore = async ({ baseDir }: { baseDir: string }) => {
   ].join('\n')
   await fs.writeFile(path.join(baseDir, '.gitignore'), newGitignoreContent)
 }
-const addDependencies = async (
-  packageManager: 'pnpm' | 'yarn' | 'npm',
-  nextAuth: boolean
-) => {
+const addDependencies = async (config: Record<any, any>) => {
+  const { dataLayer, dataLayerAdapter, nextAuth, packageManager } = config
   logger.info(logText('Adding dependencies, this might take a moment...'))
   const deps = ['tinacms', '@tinacms/cli']
   if (nextAuth) {
     deps.push('next-auth-tinacms', 'next-auth')
+  }
+  if (dataLayer) {
+    deps.push('@tinacms/datalayer')
+    deps.push('@octokit/rest')
+    deps.push('js-base64')
+  }
+  if (dataLayerAdapter === 'upstash-redis') {
+    deps.push('upstash-redis-level')
+    deps.push('@upstash/redis')
   }
   const packageManagers = {
     pnpm: process.env.USE_WORKSPACE
@@ -543,7 +550,7 @@ const addVercelKVCredentialsProviderFiles = async ({
   await writeGeneratedFile({
     generatedFile: generatedSignin,
     overwrite: config.typescript
-      ? config.overwriteVercelKVCredentialsProviderSigninJS
+      ? config.overwriteVercelKVCredentialsProviderSigninTS
       : config.overwriteVercelKVCredentialsProviderSigninJS,
     content: authSigninPage(),
     typescript: config.typescript,
@@ -551,7 +558,7 @@ const addVercelKVCredentialsProviderFiles = async ({
   await writeGeneratedFile({
     generatedFile: generatedRegister,
     overwrite: config.typescript
-      ? config.overwriteVercelKVCredentialsProviderRegisterJS
+      ? config.overwriteVercelKVCredentialsProviderRegisterTS
       : config.overwriteVercelKVCredentialsProviderRegisterJS,
     content: authRegisterPage({
       nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,

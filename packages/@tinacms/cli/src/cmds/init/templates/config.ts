@@ -97,15 +97,17 @@ export const configExamples: {
   ) => string
 } = {
   next: (args, opts) => {
-    const authConfig = opts.selfHosted
-      ? `auth: {
-        useLocalAuth: isLocal,
-        customAuth: !isLocal,
-        ...createTinaNextAuthHandler({
-          callbackUrl: '/admin/index.html',
-          isLocalDevelopment: isLocal,
-          name: '${args.nextAuthCredentialsProviderName}',
-        })
+    const authConfig = opts.nextAuth
+      ? `admin: {
+        auth: {
+          useLocalAuth: isLocal,
+          customAuth: !isLocal,
+          ...createTinaNextAuthHandler({
+            callbackUrl: '/admin/index.html',
+            isLocalDevelopment: isLocal,
+            name: '${args.nextAuthCredentialsProviderName}',
+          })
+      }
       },`
       : `clientId: ${
           args.clientId ? `'${args.clientId}'` : 'null'
@@ -115,7 +117,7 @@ export const configExamples: {
     }, // Get this from tina.io`
     return `import { defineConfig } from 'tinacms'
   ${
-    opts.selfHosted
+    opts.nextAuth
       ? `import { createTinaNextAuthHandler } from 'next-auth-tinacms/dist/tinacms'
   `
       : ''

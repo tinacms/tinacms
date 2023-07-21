@@ -1,6 +1,7 @@
 import { Framework, GeneratedFile, InitEnvironment } from '.'
 import prompts, { PromptType } from 'prompts'
 import { linkText, logText } from '../../utils/theme'
+import crypto from 'crypto-js'
 
 async function configure(
   env: InitEnvironment,
@@ -15,8 +16,6 @@ async function configure(
     answers.nextAuth ? promptType : null
   const dataLayerEnabled = (promptType: PromptType) => (_, answers) =>
     answers.dataLayer ? promptType : null
-  const kvRestApiUrlEnabled = (promptType: PromptType) => (_, answers) =>
-    answers.kvRestApiUrl ? promptType : null
   const selfHostedEnabled = (promptType: PromptType) => (_) =>
     opts.showSelfHosted ? promptType : null
 
@@ -36,7 +35,7 @@ async function configure(
         name: `overwrite${configName}JS`,
         type: (_, answers) =>
           !answers.typescript && condition(answers) ? 'confirm' : null,
-        message: `Found existing file at ${env.generatedFiles['auth'].fullPathJS}. Would you like to override?`,
+        message: `Found existing file at ${generatedFile.fullPathJS}. Would you like to override?`,
       })
     }
     if (generatedFile.typescriptExists) {
@@ -44,7 +43,7 @@ async function configure(
         name: `overwrite${configName}TS`,
         type: (_, answers) =>
           answers.typescript && condition(answers) ? 'confirm' : null,
-        message: `Found existing file at ${env.generatedFiles['auth'].fullPathTS}. Would you like to override?`,
+        message: `Found existing file at ${generatedFile.fullPathTS}. Would you like to override?`,
       })
     }
     return results
@@ -152,23 +151,6 @@ async function configure(
         message: 'Enable Self-Hosted Data Layer?',
       },
       {
-        name: 'clientId',
-        type: (_, answers) => (!answers.dataLayer ? 'text' : null),
-        message: `What is your Tina Cloud Client ID? (Hit enter to skip and set up yourself later)\n${logText(
-          "Don't have a Client ID? Create one here: "
-        )}${linkText('https://app.tina.io/projects/new')}`,
-      },
-      {
-        name: 'token',
-        type: (_, answers) => (!answers.dataLayer ? 'text' : null),
-        message: (prev) =>
-          `What is your Tina Cloud Read Only Token?\n${logText(
-            "Don't have a Read Only Token? Create one here: "
-          )}${linkText(
-            `https://app.tina.io/projects/${prev || '[XXX]'}/tokens`
-          )}`,
-      },
-      {
         name: 'dataLayerAdapter',
         message: 'Select a self-hosted data layer adapter',
         type: dataLayerEnabled('select'),
@@ -184,11 +166,51 @@ async function configure(
         },
       },
       {
+        name: 'kvRestApiUrl',
+        type: (_, answers) =>
+          answers.dataLayerAdapter === 'upstash-redis' ? 'text' : null,
+        message: `What is the KV (Redis) Rest API URL? (Hit enter to skip and set up yourself later)`,
+      },
+      {
+        name: 'kvRestApiToken',
+        type: (prev) => (prev !== undefined ? 'text' : null),
+        message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
+      },
+      {
         name: 'nextAuth',
         type:
           selfHostedEnabled('confirm') && isNext('confirm') ? 'confirm' : null,
         initial: 'true',
         message: 'Enable NextAuth.js integration?',
+      },
+      {
+        name: 'nextAuthSecret',
+        type: (_, answers) => (answers.nextAuth ? 'text' : null),
+        message: `What is the NextAuth.js Secret? (Hit enter to use a randomly generated secret)`,
+        initial: crypto.lib.WordArray.random(16).toString(),
+      },
+      {
+        name: 'clientId',
+        type: (_, answers) =>
+          !answers.dataLayer || (answers.dataLayer && !answers.nextAuth)
+            ? 'text'
+            : null,
+        message: `What is your Tina Cloud Client ID? (Hit enter to skip and set up yourself later)\n${logText(
+          "Don't have a Client ID? Create one here: "
+        )}${linkText('https://app.tina.io/projects/new')}`,
+      },
+      {
+        name: 'token',
+        type: (_, answers) =>
+          !answers.dataLayer || (answers.dataLayer && !answers.nextAuth)
+            ? 'text'
+            : null,
+        message: (prev) =>
+          `What is your Tina Cloud Read Only Token?\n${logText(
+            "Don't have a Read Only Token? Create one here: "
+          )}${linkText(
+            `https://app.tina.io/projects/${prev || '[XXX]'}/tokens`
+          )}`,
       },
       {
         name: 'nextAuthProvider',
@@ -202,6 +224,34 @@ async function configure(
         ],
       },
       {
+        name: 'kvRestApiUrl',
+        type: (_, answers) =>
+          answers.nextAuthProvider === 'vercel-kv-credentials-provider' &&
+          answers.kvRestApiUrl === undefined
+            ? 'text'
+            : null,
+        message: `What is the KV (Redis) Rest API URL? (Hit enter to skip and set up yourself later)`,
+      },
+      {
+        name: 'kvRestApiToken',
+        type: (_, answers) =>
+          answers.nextAuthProvider === 'vercel-kv-credentials-provider' &&
+          answers.kvRestApiUrl !== undefined &&
+          answers.kvRestApiToken === undefined
+            ? 'text'
+            : null,
+        message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
+      },
+      {
+        name: 'vercelKVNextAuthCredentialsKey',
+        type: (_, answers) =>
+          answers.nextAuthProvider === 'vercel-kv-credentials-provider'
+            ? 'text'
+            : null,
+        message: `Enter a name for the Vercel KV Credentials Provider Auth Collection (Defaults to "tinacms_users")`,
+        initial: 'tinacms_users',
+      },
+      {
         name: 'nextAuthCredentialsProviderName',
         type: (_, answers) =>
           answers.nextAuthProvider === 'vercel-kv-credentials-provider'
@@ -210,6 +260,19 @@ async function configure(
         message: `Enter a name for the Vercel KV Credentials Provider (Defaults to "VercelKVCredentialsProvider")`,
         initial: 'VercelKVCredentialsProvider',
       },
+      {
+        name: 'isLocalEnvVarName',
+        type: (_, answers) =>
+          answers.nextAuth || answers.dataLayer ? 'text' : null,
+        message: `Enter a name for the environment variable that will be used to determine if the app is running locally (Defaults to "TINA_PUBLIC_IS_LOCAL")`,
+        initial: 'TINA_PUBLIC_IS_LOCAL',
+      },
+      // tina/config.ts
+      ...generatedFileOverwritePrompt({
+        condition: (_) => true,
+        configName: 'Config',
+        generatedFile: env.generatedFiles['config'],
+      }),
       // tina/database.ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!answers.dataLayer,
@@ -255,19 +318,6 @@ async function configure(
           ],
       }),
       {
-        name: 'isLocalEnvVarName',
-        type: (_, answers) =>
-          answers.nextAuth || answers.dataLayer ? 'text' : null,
-        message: `Enter a name for the environment variable that will be used to determine if the app is running locally (Defaults to "TINA_PUBLIC_IS_LOCAL")`,
-        initial: 'TINA_PUBLIC_IS_LOCAL',
-      },
-      // tina/config.ts
-      ...generatedFileOverwritePrompt({
-        condition: (answers) => true,
-        configName: 'Config',
-        generatedFile: env.generatedFiles['config'],
-      }),
-      {
         name: 'overwriteSampleContent',
         type: (_) => (env.sampleContentExists ? 'confirm' : null),
         message: `Found existing file at ${env.sampleContentPath}. Would you like to override?`,
@@ -275,62 +325,6 @@ async function configure(
     ],
     promptOptions
   )
-
-  if (config.dataLayerAdapter === 'upstash-redis') {
-    config = {
-      ...config,
-      ...(await prompts([
-        {
-          name: 'kvRestApiUrl',
-          type: 'text',
-          message: `What is the KV (Redis) Rest API URL? (Hit enter to skip and set up yourself later)`,
-        },
-        {
-          name: 'kvRestApiToken',
-          type: kvRestApiUrlEnabled('text'),
-          message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
-        },
-      ])),
-    }
-  }
-
-  if (config.nextAuth) {
-    config = {
-      ...config,
-      ...(await prompts([
-        {
-          name: 'nextAuthSecret',
-          type: 'text',
-          message: `What is the NextAuth.js Secret? (Hit enter to use a randomly generated secret)`,
-        },
-      ])),
-    }
-  }
-
-  if (config.nextAuthProvider === 'vercel-kv-credentials-provider') {
-    config = {
-      ...config,
-      ...(await prompts([
-        {
-          name: 'kvRestApiUrl',
-          type: kvRestApiUrlEnabled('text'),
-          message: `What is the Vercel KV Rest API URL? (Hit enter to skip and set up yourself later)\n${logText(
-            "Don't have a Vercel KV Store? Create one here: "
-          )}${linkText('https://vercel.com/dashboard/stores')}`,
-        },
-        {
-          name: 'kvRestApiToken',
-          type: kvRestApiUrlEnabled('text'),
-          message: `What is the Vercel KV Rest API Token? (Hit enter to skip and set up yourself later)`,
-        },
-        {
-          name: 'vercelKVNextAuthCredentialsKey',
-          type: 'text',
-          message: `Enter a name for the Vercel KV Credentials Provider Auth Collection`,
-        },
-      ])),
-    }
-  }
 
   if (config.framework.name === 'next') {
     config.publicFolder = 'public'
