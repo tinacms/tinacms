@@ -99,12 +99,6 @@ async function apply({
   }
 
   // add tina/config.{js,ts}]
-  const {
-    fullPathTS: typescriptConfigPath,
-    fullPathJS: javascriptConfigPath,
-    javascriptExists: javascriptConfigExists,
-    typescriptExists: typescriptConfigExists,
-  } = env.generatedFiles['config']
   await addConfigFile({
     templateVariables: {
       // remove process fom pathToForestryConfig and add publicFolder
