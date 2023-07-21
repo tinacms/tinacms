@@ -278,7 +278,7 @@ const writeGeneratedFile = async ({
   content: string
   typescript: boolean
 }) => {
-  const { exists, path } = generatedFile.resolve(typescript)
+  const { exists, path, parentPath } = generatedFile.resolve(typescript)
   if (exists) {
     if (overwrite) {
       logger.info(logText(`Overwriting file at ${path}.`))
@@ -288,6 +288,7 @@ const writeGeneratedFile = async ({
     }
   } else {
     logger.info(logText(`Adding file at ${path}`))
+    await fs.ensureDir(parentPath)
     await fs.outputFileSync(path, content)
   }
 }
@@ -381,6 +382,7 @@ const addContentFile = async ({
         return () => ({
           exists: env.sampleContentExists,
           path: env.sampleContentPath,
+          parentPath: path.dirname(env.sampleContentPath),
         })
       },
     },

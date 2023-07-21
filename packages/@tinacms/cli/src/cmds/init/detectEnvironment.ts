@@ -33,10 +33,12 @@ const makeGeneratedFile = async (
           ? {
               exists: this.typescriptExists,
               path: this.fullPathTS,
+              parentPath: this.parentPath,
             }
           : {
               exists: this.javascriptExists,
               path: this.fullPathJS,
+              parentPath: this.parentPath,
             }
     },
   }

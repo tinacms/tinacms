@@ -25,7 +25,7 @@ export type GeneratedFile = {
   parentPath: string
   typescriptExists: boolean
   javascriptExists: boolean
-  resolve: (boolean) => { exists: boolean; path: string }
+  resolve: (boolean) => { exists: boolean; path: string; parentPath: string }
 }
 
 export type InitEnvironment = {
