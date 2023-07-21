@@ -1,13 +1,8 @@
-import { GeneratedFile, InitEnvironment } from '.'
+import { Framework, GeneratedFile, InitEnvironment } from '.'
 import prompts, { PromptType } from 'prompts'
 import { linkText, logText } from '../../utils/theme'
 
-export interface Framework {
-  name: 'next' | 'hugo' | 'jekyll' | 'other'
-  reactive: boolean
-}
-
-async function promptForInitConfiguration(
+async function configure(
   env: InitEnvironment,
   opts: { showSelfHosted?: boolean }
 ) {
@@ -324,4 +319,4 @@ async function promptForInitConfiguration(
   return config
 }
 
-export default promptForInitConfiguration
+export default configure
