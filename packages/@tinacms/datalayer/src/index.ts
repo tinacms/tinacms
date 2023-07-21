@@ -5,6 +5,7 @@ export type {
   OnPutCallback,
   OnDeleteCallback,
   Database,
+  GitProvider,
 } from '@tinacms/graphql'
 export {
   FilesystemBridge,
