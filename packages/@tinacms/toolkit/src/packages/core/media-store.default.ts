@@ -86,9 +86,13 @@ export class TinaMediaStore implements MediaStore {
 
     if (await this.isAuthenticated()) {
       for (const item of media) {
+        let directory = item.directory
+        if (directory?.endsWith('/')) {
+          directory = directory.substr(0, directory.length - 1)
+        }
         const path = `${
-          item.directory && item.directory !== '/'
-            ? `${item.directory}/${item.file.name}`
+          directory && directory !== '/'
+            ? `${directory}/${item.file.name}`
             : item.file.name
         }`
         const res = await this.api.fetchWithToken(
