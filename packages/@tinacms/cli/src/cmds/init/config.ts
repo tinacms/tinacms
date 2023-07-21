@@ -1,4 +1,4 @@
-import { InitEnvironment } from './environment'
+import { GeneratedFile, InitEnvironment } from '.'
 import prompts, { PromptType } from 'prompts'
 import { linkText, logText } from '../../utils/theme'
 
@@ -24,6 +24,36 @@ async function promptForInitConfiguration(
     answers.kvRestApiUrl ? promptType : null
   const selfHostedEnabled = (promptType: PromptType) => (_) =>
     opts.showSelfHosted ? promptType : null
+
+  // conditionally generate overwrite prompts for generated ts/js
+  const generatedFileOverwritePrompt = ({
+    condition,
+    configName,
+    generatedFile,
+  }: {
+    configName: string
+    condition: (answers: any) => boolean
+    generatedFile: GeneratedFile
+  }) => {
+    const results = []
+    if (generatedFile.javascriptExists) {
+      results.push({
+        name: `overwrite${configName}JS`,
+        type: (_, answers) =>
+          !answers.typescript && condition(answers) ? 'confirm' : null,
+        message: `Found existing file at ${env.generatedFiles['auth'].fullPathJS}. Would you like to override?`,
+      })
+    }
+    if (generatedFile.typescriptExists) {
+      results.push({
+        name: `overwrite${configName}TS`,
+        type: (_, answers) =>
+          answers.typescript && condition(answers) ? 'confirm' : null,
+        message: `Found existing file at ${env.generatedFiles['auth'].fullPathTS}. Would you like to override?`,
+      })
+    }
+    return results
+  }
 
   const forestryDisclaimer = logText(
     `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
@@ -104,21 +134,21 @@ async function promptForInitConfiguration(
         name: 'overwriteTemplatesJS',
         type: (_, answers) =>
           !answers.typescript
-            ? env.javascriptTemplatesExists
+            ? env.generatedFiles['templates'].javascriptExists
               ? 'confirm'
               : null
             : null,
-        message: `Found existing file at ${env.javascriptTemplatesPath}. Would you like to override?`,
+        message: `Found existing file at ${env.generatedFiles['templates'].javascriptExists}. Would you like to override?`,
       },
       {
         name: 'overwriteTemplatesTS',
         type: (_, answers) =>
           answers.typescript
-            ? env.typescriptTemplatesExists
+            ? env.generatedFiles['templates'].typescriptExists
               ? 'confirm'
               : null
             : null,
-        message: `Found existing file at ${env.typescriptTemplatesPath}. Would you like to override?`,
+        message: `Found existing file at ${env.generatedFiles['templates'].fullPathTS}. Would you like to override?`,
       },
       {
         name: 'dataLayer',
@@ -185,26 +215,28 @@ async function promptForInitConfiguration(
         message: `Enter a name for the Vercel KV Credentials Provider (Defaults to "VercelKVCredentialsProvider")`,
         initial: 'VercelKVCredentialsProvider',
       },
-      {
-        name: 'overwriteAuthJS',
-        type: (_, answers) =>
-          answers.nextAuthProvider &&
-          !answers.typescript &&
-          env.javascriptAuthExists
-            ? 'confirm'
-            : null,
-        message: `Found existing file at ${env.javascriptAuthPath}. Would you like to override?`,
-      },
-      {
-        name: 'overwriteAuthTS',
-        type: (_, answers) =>
-          answers.nextAuthProvider &&
-          answers.typescript &&
-          env.typescriptAuthExists
-            ? 'confirm'
-            : null,
-        message: `Found existing file at ${env.typescriptAuthPath}. Would you like to override?`,
-      },
+      // tina/auth.ts
+      ...generatedFileOverwritePrompt({
+        condition: (answers) => !!answers.nextAuthProvider,
+        configName: 'Auth',
+        generatedFile: env.generatedFiles['auth'],
+      }),
+      // pages/auth/signin.tsx
+      ...generatedFileOverwritePrompt({
+        condition: (answers) =>
+          answers.nextAuthProvider === 'vercel-kv-credentials-provider',
+        configName: 'VercelKVCredentialsProviderSignin',
+        generatedFile:
+          env.generatedFiles['vercel-kv-credentials-provider-signin'],
+      }),
+      // pages/auth/register.tsx
+      ...generatedFileOverwritePrompt({
+        condition: (answers) =>
+          answers.nextAuthProvider === 'vercel-kv-credentials-provider',
+        configName: 'VercelKVCredentialsProviderRegister',
+        generatedFile:
+          env.generatedFiles['vercel-kv-credentials-provider-register'],
+      }),
       {
         name: 'isLocalEnvVarName',
         type: (_, answers) =>
@@ -212,26 +244,12 @@ async function promptForInitConfiguration(
         message: `Enter a name for the environment variable that will be used to determine if the app is running locally (Defaults to "TINA_PUBLIC_IS_LOCAL")`,
         initial: 'TINA_PUBLIC_IS_LOCAL',
       },
-      {
-        name: 'overwriteConfigJS',
-        type: (_, answers) =>
-          !answers.typescript
-            ? env.javascriptConfigExists
-              ? 'confirm'
-              : null
-            : null,
-        message: `Found existing file at ${env.javascriptConfigExists}. Would you like to override?`,
-      },
-      {
-        name: 'overwriteConfigTS',
-        type: (_, answers) =>
-          answers.typescript
-            ? env.typescriptConfigExists
-              ? 'confirm'
-              : null
-            : null,
-        message: `Found existing file at ${env.typescriptConfigExists}. Would you like to override?`,
-      },
+      // tina/config.ts
+      ...generatedFileOverwritePrompt({
+        condition: (answers) => true,
+        configName: 'Config',
+        generatedFile: env.generatedFiles['config'],
+      }),
       {
         name: 'overwriteSampleContent',
         type: (_, answers) => (env.sampleContentExists ? 'confirm' : null),

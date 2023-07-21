@@ -1,37 +1,36 @@
 import fs from 'fs-extra'
 import path from 'path'
-
-export type InitEnvironment = {
-  forestryConfigExists: boolean
-  frontMatterFormat: 'yaml' | 'toml' | 'json'
-  gitIgnoreExists: boolean
-  gitIgoreNodeModulesExists: boolean
-  javascriptAuthPath: string
-  javascriptAuthExists: boolean
-  javascriptConfigExists: boolean
-  javascriptConfigPath: string
-  javascriptTemplatesExists: boolean
-  javascriptTemplatesPath: string
-  packageJSONExists: boolean
-  sampleContentExists: boolean
-  sampleContentPath: string
-  typescriptAuthPath: string
-  typescriptAuthExists: boolean
-  typescriptConfigExists: boolean
-  typescriptConfigPath: string
-  typescriptTemplatesExists: boolean
-  typescriptTemplatesPath: string
-}
+import { InitEnvironment } from './index'
 
 const checkGitignoreForNodeModules = async ({
   baseDir,
 }: {
   baseDir: string
 }) => {
-  const gitignoreContent = await fs
+  const gitignoreContent = fs
     .readFileSync(path.join(baseDir, '.gitignore'))
     .toString()
   return gitignoreContent.split('\n').some((item) => item === 'node_modules')
+}
+
+const makeGeneratedFile = async (
+  name: string,
+  parentPath: string,
+  typescriptSuffix?: string
+) => {
+  const result = {
+    fullPathJS: path.join(parentPath, name, typescriptSuffix || 'ts'),
+    fullPathTS: path.join(parentPath, name, 'js'),
+    name,
+    parentPath,
+    typescriptExists: false,
+    javascriptExists: false,
+  }
+
+  result.typescriptExists = await fs.pathExists(result.fullPathTS)
+  result.javascriptExists = await fs.pathExists(result.fullPathJS)
+
+  return result
 }
 
 const detectEnvironment = async ({
@@ -53,19 +52,24 @@ const detectEnvironment = async ({
     'posts',
     'hello-world.md'
   )
-  const javascriptAuthPath = path.join(baseDir, 'tina', 'auth.js')
-  const hasJavascriptAuth = await fs.pathExists(javascriptAuthPath)
-  const typescriptAuthPath = path.join(baseDir, 'tina', 'auth.ts')
-  const hasTypescriptAuth = await fs.pathExists(typescriptAuthPath)
-  const javascriptTemplatesPath = path.join(baseDir, 'tina', 'templates.js')
-  const typescriptTemplatesPath = path.join(baseDir, 'tina', 'templates.ts')
+  const usingSrc = !fs.pathExistsSync(path.join(baseDir, 'pages'))
+  const parentPath = path.join(baseDir, 'tina')
+  const generatedFiles = {
+    auth: await makeGeneratedFile('auth', parentPath),
+    config: await makeGeneratedFile('config', parentPath),
+    templates: await makeGeneratedFile('templates', parentPath),
+    ['vercel-kv-credentials-provider-signin']: await makeGeneratedFile(
+      'signin',
+      path.join(baseDir, usingSrc ? 'src' : 'pages', 'auth'),
+      'tsx'
+    ),
+    ['vercel-kv-credentials-provider-register']: await makeGeneratedFile(
+      'register',
+      path.join(baseDir, usingSrc ? 'src' : 'pages', 'auth'),
+      'tsx'
+    ),
+  }
   const hasSampleContent = await fs.pathExists(sampleContentPath)
-  const hasTypescriptTemplates = await fs.pathExists(typescriptTemplatesPath)
-  const hasJavascriptTemplates = await fs.pathExists(javascriptTemplatesPath)
-  const typescriptConfigPath = path.join(baseDir, 'tina', `config.ts`)
-  const javascriptConfigPath = path.join(baseDir, 'tina', `config.js`)
-  const hasTypescriptConfig = await fs.pathExists(typescriptConfigPath)
-  const hasJavascriptConfig = await fs.pathExists(javascriptConfigPath)
   const hasPackageJSON = await fs.pathExists('package.json')
   const hasGitIgnore = await fs.pathExists(path.join('.gitignore'))
   const hasGitIgnoreNodeModules =
@@ -83,21 +87,11 @@ const detectEnvironment = async ({
     frontMatterFormat,
     gitIgnoreExists: hasGitIgnore,
     gitIgoreNodeModulesExists: hasGitIgnoreNodeModules,
-    javascriptAuthExists: hasJavascriptAuth,
-    javascriptAuthPath,
-    javascriptConfigExists: hasJavascriptConfig,
-    javascriptConfigPath,
-    javascriptTemplatesExists: hasJavascriptTemplates,
-    javascriptTemplatesPath: javascriptTemplatesPath,
     packageJSONExists: hasPackageJSON,
     sampleContentExists: hasSampleContent,
     sampleContentPath,
-    typescriptAuthExists: hasTypescriptAuth,
-    typescriptAuthPath,
-    typescriptConfigExists: hasTypescriptConfig,
-    typescriptConfigPath,
-    typescriptTemplatesExists: hasTypescriptTemplates,
-    typescriptTemplatesPath,
+    generatedFiles,
+    usingSrc,
   }
 }
 export default detectEnvironment

@@ -19,8 +19,8 @@ import {
   ConfigTemplateVariables,
 } from './templates/config'
 import {
-  Variables as AuthTemplateVariables,
   templates as AuthTemplates,
+  Variables as AuthTemplateVariables,
 } from './templates/auth'
 import { generateCollections } from '../forestry-migrate'
 import { writeGitignore } from '../../next/commands/codemod-command'
@@ -28,31 +28,91 @@ import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer'
 import detectEnvironment from './environment'
 import promptForInitConfiguration, { Framework } from './config'
 import { helloWorldPost } from './templates/content'
+import { CLICommand } from '../index'
 
-export async function initStaticTina({
-  rootPath,
-  pathToForestryConfig,
-  noTelemetry,
-  showSelfHosted = false,
-}: {
+type GeneratedFileType =
+  | 'auth'
+  | 'config'
+  | 'templates'
+  | 'vercel-kv-credentials-provider-signin'
+  | 'vercel-kv-credentials-provider-register'
+
+export type GeneratedFile = {
+  fullPathJS: string
+  fullPathTS: string
+  name: string
+  parentPath: string
+  typescriptExists: boolean
+  javascriptExists: boolean
+}
+
+export type InitEnvironment = {
+  forestryConfigExists: boolean
+  frontMatterFormat: 'yaml' | 'toml' | 'json'
+  gitIgnoreExists: boolean
+  gitIgoreNodeModulesExists: boolean
+  packageJSONExists: boolean
+  sampleContentExists: boolean
+  sampleContentPath: string
+  generatedFiles?: {
+    [key in GeneratedFileType]: GeneratedFile
+  }
+  usingSrc: boolean
+}
+
+type InitParams = {
   rootPath: string
   pathToForestryConfig: string
   noTelemetry: boolean
   showSelfHosted?: boolean
-}) {
-  logger.level = 'info'
+  baseDir?: string
+}
 
-  process.chdir(rootPath)
-
-  const baseDir = ''
-
-  const env = await detectEnvironment({
-    baseDir,
-    pathToForestryConfig,
+export const command = new CLICommand<InitEnvironment, InitParams>({
+  async setup(params: InitParams): Promise<void> {
+    logger.level = 'info'
+    process.chdir(params.rootPath)
+  },
+  detectEnvironment({
     rootPath,
-  })
-  const config = await promptForInitConfiguration(env, { showSelfHosted })
+    pathToForestryConfig,
+    baseDir = '',
+  }: InitParams): Promise<InitEnvironment> {
+    return detectEnvironment({
+      baseDir,
+      pathToForestryConfig,
+      rootPath,
+    })
+  },
+  configure(
+    env: InitEnvironment,
+    { showSelfHosted = false }: InitParams
+  ): Promise<Record<any, any>> {
+    return promptForInitConfiguration(env, { showSelfHosted })
+  },
+  apply(
+    config: Record<any, any>,
+    env: InitEnvironment,
+    params: InitParams
+  ): Promise<void> {
+    return initStaticTina({
+      env,
+      params,
+      config,
+    })
+  },
+})
 
+async function initStaticTina({
+  env,
+  params,
+  config,
+}: {
+  env: InitEnvironment
+  params: InitParams
+  config: Record<any, any>
+}) {
+  const { pathToForestryConfig, noTelemetry, baseDir = '' } = params
   let collections: string | null | undefined
   let templateCode: string | null | undefined
   let extraText: string | null | undefined
@@ -99,21 +159,25 @@ export async function initStaticTina({
   await addDependencies(config.packageManager, config.nextAuth)
 
   if (isForestryMigration) {
+    const { fullPathTS, fullPathJS, javascriptExists, typescriptExists } =
+      env.generatedFiles['templates']
     await addTemplateFile({
-      templatesPath: config.typescript
-        ? env.typescriptTemplatesPath
-        : env.javascriptTemplatesPath,
+      templatesPath: config.typescript ? fullPathTS : fullPathJS,
       overwriteTemplates: config.typescript
         ? config.overwriteTemplatesTS
         : config.overwriteTemplatesJS,
-      hasTemplates: config.typescript
-        ? env.typescriptTemplatesExists
-        : env.javascriptTemplatesExists,
-      templateCode,
+      hasTemplates: config.typescript ? typescriptExists : javascriptExists,
+      content: templateCode,
     })
   }
 
   // add tina/config.{js,ts}]
+  const {
+    fullPathTS: typescriptConfigPath,
+    fullPathJS: javascriptConfigPath,
+    javascriptExists: javascriptConfigExists,
+    typescriptExists: typescriptConfigExists,
+  } = env.generatedFiles['config']
   await addConfigFile({
     templateVariables: {
       // remove process fom pathToForestryConfig and add publicFolder
@@ -134,27 +198,23 @@ export async function initStaticTina({
     baseDir,
     framework: config.framework,
     hasConfig: config.typescript
-      ? env.typescriptConfigExists
-      : env.javascriptConfigExists,
+      ? typescriptConfigExists
+      : javascriptConfigExists,
     overwriteConfig: config.typescript
       ? config.overwriteConfigTS
       : config.overwriteConfigJS,
-    configPath: config.typescript
-      ? env.typescriptConfigPath
-      : env.javascriptConfigPath,
+    configPath: config.typescript ? typescriptConfigPath : javascriptConfigPath,
   })
 
   if (config.nextAuthProvider) {
+    const { fullPathTS, fullPathJS, javascriptExists, typescriptExists } =
+      env.generatedFiles['auth']
     await addAuthFile({
       templateVariables: {
         nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
       },
-      authPath: config.typescript
-        ? env.typescriptAuthPath
-        : env.javascriptAuthPath,
-      hasAuth: config.typescript
-        ? env.typescriptAuthExists
-        : env.javascriptAuthExists,
+      authPath: config.typescript ? fullPathJS : fullPathTS,
+      hasAuth: config.typescript ? typescriptExists : javascriptExists,
       nextAuthProvider: config.nextAuthProvider,
       overwriteAuth: config.typescript
         ? config.overwriteAuthTS
@@ -175,6 +235,7 @@ export async function initStaticTina({
     await addReactiveFile[config.framework.name]({
       baseDir,
       framework: config.framework,
+      usingSrc: env.usingSrc,
       usingTypescript: config.typescript,
     })
   }
@@ -265,7 +326,7 @@ const addDependencies = async (
   logger.info(logText('Adding dependencies, this might take a moment...'))
   const deps = ['tinacms', '@tinacms/cli']
   if (nextAuth) {
-    deps.push('next-auth-tinacms')
+    deps.push('next-auth-tinacms', 'next-auth')
   }
   const packageManagers = {
     pnpm: process.env.USE_WORKSPACE
@@ -276,6 +337,30 @@ const addDependencies = async (
   }
   logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`))
   await execShellCommand(packageManagers[packageManager])
+}
+
+const writeGeneratedFile = async ({
+  exists,
+  overwrite,
+  path,
+  content,
+}: {
+  exists: boolean
+  overwrite: boolean
+  path: string
+  content: string
+}) => {
+  if (exists) {
+    if (overwrite) {
+      logger.info(logText(`Overwriting file at ${path}.`))
+      await fs.outputFileSync(path, content)
+    } else {
+      logger.info(logText(`Not overwriting file at ${path}.`))
+    }
+  } else {
+    logger.info(logText(`Adding file at ${path}`))
+    await fs.outputFileSync(path, content)
+  }
 }
 
 const addConfigFile = async ({
@@ -295,22 +380,13 @@ const addConfigFile = async ({
   templateOptions: ConfigTemplateOptions
   templateVariables: ConfigTemplateVariables
 }) => {
-  if (hasConfig) {
-    if (overwriteConfig) {
-      logger.info(logText(`Overriding file at ${configPath}.`))
-      await fs.outputFileSync(
-        configPath,
-        config(framework, templateVariables, templateOptions)
-      )
-    } else {
-      logger.info(logText(`Not overriding file at ${configPath}.`))
-    }
-  } else {
-    logger.info(logText(`Adding config file at ${configPath}`))
-    await fs.outputFileSync(
-      configPath,
-      config(framework, templateVariables, templateOptions)
-    )
+  await writeGeneratedFile({
+    exists: hasConfig,
+    overwrite: overwriteConfig,
+    path: configPath,
+    content: config(framework, templateVariables, templateOptions),
+  })
+  if (!hasConfig) {
     await writeGitignore(baseDir)
   }
 }
@@ -328,20 +404,12 @@ const addAuthFile = async ({
   nextAuthProvider: string
   overwriteAuth: boolean
 }) => {
-  if (hasAuth) {
-    if (overwriteAuth) {
-      logger.info(logText(`Overriding file at ${authPath}.`))
-      await fs.outputFileSync(
-        authPath,
-        auth(nextAuthProvider, templateVariables)
-      )
-    } else {
-      logger.info(logText(`Not overriding file at ${authPath}.`))
-    }
-  } else {
-    logger.info(logText(`Adding config file at ${authPath}`))
-    await fs.outputFileSync(authPath, auth(nextAuthProvider, templateVariables))
-  }
+  await writeGeneratedFile({
+    exists: hasAuth,
+    overwrite: overwriteAuth,
+    path: authPath,
+    content: auth(nextAuthProvider, templateVariables),
+  })
 }
 
 // Adds tina/template.{ts,js} file
@@ -349,24 +417,19 @@ export const addTemplateFile = async ({
   hasTemplates,
   templatesPath,
   overwriteTemplates,
-  templateCode,
+  content,
 }: {
   hasTemplates: boolean
   templatesPath: string
   overwriteTemplates: boolean
-  templateCode: string
+  content: string
 }) => {
-  if (hasTemplates) {
-    if (overwriteTemplates) {
-      logger.info(logText(`Overwriting file at ${templatesPath}.`))
-      await fs.outputFileSync(templatesPath, templateCode)
-    } else {
-      logger.info(logText(`Not overwriting file at ${templatesPath}.`))
-    }
-  } else {
-    logger.info(logText(`Adding template file at ${templatesPath}`))
-    await fs.outputFileSync(templatesPath, templateCode)
-  }
+  await writeGeneratedFile({
+    exists: hasTemplates,
+    overwrite: overwriteTemplates,
+    path: templatesPath,
+    content,
+  })
 }
 
 const addContentFile = async ({
@@ -378,17 +441,12 @@ const addContentFile = async ({
   overwriteSampleContent: boolean
   sampleContentPath: string
 }) => {
-  if (hasSampleContent) {
-    if (overwriteSampleContent) {
-      logger.info(logText(`Overriding file at ${sampleContentPath}.`))
-      await fs.outputFileSync(sampleContentPath, helloWorldPost)
-    } else {
-      logger.info(logText(`Not overriding file at ${sampleContentPath}.`))
-    }
-  } else {
-    logger.info(logText(`Adding content file at ${sampleContentPath}`))
-    await fs.outputFileSync(sampleContentPath, helloWorldPost)
-  }
+  await writeGeneratedFile({
+    exists: hasSampleContent,
+    overwrite: overwriteSampleContent,
+    path: sampleContentPath,
+    content: helloWorldPost,
+  })
 }
 
 const logNextSteps = ({
@@ -431,8 +489,7 @@ const frameworkDevCmds: {
       npm: `npm run`, // npx is the way to run executables that aren't in your "scripts"
       yarn: `yarn`,
     }
-    const installText = `${packageManagers[packageManager]} dev`
-    return installText
+    return `${packageManagers[packageManager]} dev`
   },
 }
 
@@ -455,12 +512,13 @@ const auth = (authType: string, vars: AuthTemplateVariables) => {
 const addReactiveFile = {
   next: ({
     baseDir,
+    usingSrc,
     usingTypescript,
   }: {
     baseDir: string
+    usingSrc: boolean
     usingTypescript: boolean
   }) => {
-    const usingSrc = !fs.pathExistsSync(path.join(baseDir, 'pages'))
     const pagesPath = path.join(baseDir, usingSrc ? 'src' : '', 'pages')
     const packageJSONPath = path.join(baseDir, 'package.json')
     const tinaBlogPagePath = path.join(pagesPath, 'demo', 'blog')
@@ -487,6 +545,22 @@ const addReactiveFile = {
     )
     fs.writeFileSync(packageJSONPath, newPack)
   },
+}
+
+const addVercelKVCredentialsProviderFiles = async ({
+  usingTypescript,
+  generatedSignin,
+  generatedRegister,
+}: {
+  usingTypescript: boolean
+  generatedSignin: GeneratedFile
+  generatedRegister: GeneratedFile
+}) => {
+  // TODO write generated files using writeGeneratedFile function
+  // TODO consider protecting pages/api/gql.ts
+  // TODO generate database.ts
+  // TODO add api for register.ts
+  // TODO add next auth endpoint
 }
 
 /**

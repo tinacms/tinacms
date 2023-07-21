@@ -1,6 +1,6 @@
 import { Command, Option } from 'clipanion'
 import { logger } from '../../../logger'
-import { initStaticTina } from '../../../cmds/init'
+import { command } from '../../../cmds/init'
 
 export class InitCommand extends Command {
   static paths = [['init']]
@@ -28,7 +28,7 @@ export class InitCommand extends Command {
 
   async execute(): Promise<number | void> {
     const rootPath = this.rootPath || process.cwd()
-    await initStaticTina({
+    await command.execute({
       rootPath: rootPath,
       pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,
