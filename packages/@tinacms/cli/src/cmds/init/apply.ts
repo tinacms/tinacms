@@ -187,6 +187,7 @@ async function apply({
       framework: config.framework,
       usingSrc: env.usingSrc,
       usingTypescript: config.typescript,
+      isLocalEnvVarName: config.isLocalEnvVarName,
     })
   }
 
@@ -560,10 +561,12 @@ const authContent = (authType: string, vars: AuthTemplateVariables) => {
 const addReactiveFile = {
   next: ({
     baseDir,
+    isLocalEnvVarName,
     usingSrc,
     usingTypescript,
   }: {
     baseDir: string
+    isLocalEnvVarName: string
     usingSrc: boolean
     usingTypescript: boolean
   }) => {
@@ -586,7 +589,7 @@ const addReactiveFile = {
     const newPack = JSON.stringify(
       {
         ...pack,
-        scripts: extendNextScripts(oldScripts),
+        scripts: extendNextScripts(oldScripts, { isLocalEnvVarName }),
       },
       null,
       2
