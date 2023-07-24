@@ -1,7 +1,9 @@
 [![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/main/LICENSE)
 [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms)
 [![Build, Test, Lint for Main](https://github.com/tinacms/tinacms/actions/workflows/main.yml/badge.svg?branch=main&event=push)](https://github.com/tinacms/tinacms/actions/workflows/main.yml)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/github/all-contributors/tinacms/tinacms?color=ec4815)](#contributors)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tina.io)
 
