@@ -7,37 +7,37 @@ import { Cli, Builtins, Command } from 'clipanion'
 import chalk from 'chalk'
 import dotenv from 'dotenv'
 import fs from 'fs'
-import inquirer from 'inquirer'
+import prompts from 'prompts'
 
 import { RedisUserStore } from './redis-user-store'
 import { UserStore } from './types'
 
 const CHOICES = {
-  ADD: 'Add a user',
-  UPDATE: "Update a user's password",
-  DELETE: 'Delete a user',
-  EXIT: 'Exit',
+  ADD: { title: 'Add a user', value: 'ADD' },
+  UPDATE: { title: "Update a user's password", value: 'UPDATE' },
+  DELETE: { title: 'Delete a user', value: 'DELETE' },
+  EXIT: { title: 'Exit', value: 'EXIT' },
 }
 
 const promptUserForToken = async () => {
   console.log('Did not find KV store url and token in .env file.')
   // Prompt user for KV store url and token
-  const answers = await inquirer.prompt([
+  const answers = await prompts([
     {
-      type: 'input',
+      type: 'text',
       name: 'url',
       message: `Enter your Vercel KV Database URL (see https://vercel.com/dashboard/stores):`,
     },
     {
-      type: 'input',
+      type: 'text',
       name: 'token',
       message: `Enter your Vercel KV Database token:`,
     },
     {
-      type: 'input',
+      type: 'text',
       name: 'credentials_key',
       message: `Enter your Credentials key (default: 'tinacms_users'):`,
-      default: 'tinacms_users',
+      initial: 'tinacms_users',
     },
   ])
 
@@ -153,39 +153,42 @@ class SetupCommand extends Command {
         )
       }
 
-      const answers = await inquirer.prompt([
+      const answers = await prompts([
         {
-          type: 'list',
+          type: 'select',
           name: 'choice',
           message: `What would you like to do?`,
           choices: [CHOICES.ADD, CHOICES.UPDATE, CHOICES.DELETE, CHOICES.EXIT],
         },
         {
-          type: 'input',
+          type: (_, answers) =>
+            answers.choice.name === 'ADD' ||
+            answers.choice.name === 'UPDATE' ||
+            answers.choice.name === 'DELETE'
+              ? 'text'
+              : null,
           name: 'name',
           message: `Enter a username:`,
-          when: (answers) =>
-            answers.choice === CHOICES.ADD ||
-            answers.choice === CHOICES.UPDATE ||
-            answers.choice === CHOICES.DELETE,
         },
         {
-          type: 'password',
+          type: (_, answers) =>
+            answers.choice.name === 'ADD' || answers.choice.name === 'UPDATE'
+              ? 'password'
+              : null,
           name: 'password',
           message: `Enter a user password:`,
-          when: (answers) =>
-            answers.choice === CHOICES.ADD || answers.choice === CHOICES.UPDATE,
         },
         {
-          type: 'password',
+          type: (_, answers) =>
+            answers.choice.name === 'ADD' || answers.choice.name === 'UPDATE'
+              ? 'password'
+              : null,
           name: 'passwordConfirm',
           message: `Confirm the user password:`,
-          when: (answers) =>
-            answers.choice === CHOICES.ADD || answers.choice === CHOICES.UPDATE,
         },
       ])
 
-      if (answers.choice === CHOICES.ADD) {
+      if (answers.choice.value === 'ADD') {
         const { name, password, passwordConfirm } = answers
         try {
           await addUser(name, password, passwordConfirm, userStore)
@@ -196,7 +199,7 @@ class SetupCommand extends Command {
             )
           )
         }
-      } else if (answers.choice === CHOICES.UPDATE) {
+      } else if (answers.choice.value === 'UPDATE') {
         const { name, password, passwordConfirm } = answers
         try {
           await updatePassword(name, password, passwordConfirm, userStore)
@@ -207,7 +210,7 @@ class SetupCommand extends Command {
             )
           )
         }
-      } else if (answers.choice === CHOICES.DELETE) {
+      } else if (answers.choice.value === 'DELETE') {
         const { name } = answers
         try {
           await deleteUser(name, userStore)
@@ -218,7 +221,7 @@ class SetupCommand extends Command {
             )
           )
         }
-      } else if (answers.choice === CHOICES.EXIT) {
+      } else if (answers.choice.value === 'EXIT') {
         done = true
       }
     }
