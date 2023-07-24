@@ -21,6 +21,9 @@ async function writeTinaEnv(config: Record<any, any>) {
   if (config.clientId !== undefined && config.framework.name === 'next') {
     envFile += `NEXT_PUBLIC_TINA_CLIENT_ID=${config.clientId}\n`
   }
+  if (config.githubToken !== undefined) {
+    envFile += `GITHUB_PERSONAL_ACCESS_TOKEN=${config.githubToken}\n`
+  }
   if (config.token !== undefined) {
     envFile += `TINA_TOKEN=${config.token}\n`
   }
@@ -173,6 +176,14 @@ async function configure(
         type: selfHostedEnabled('confirm'),
         initial: true,
         message: 'Enable Self-Hosted Data Layer?',
+      },
+      {
+        name: 'githubToken',
+        type: (_, answers) => (answers.dataLayer ? 'text' : null),
+        message: `What is your GitHub Personal Access Token? (Hit enter to skip and set up later)\n${logText(
+          'Create one here: '
+        )}${linkText('https://github.com/settings/tokens?type=beta')}`,
+        initial: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
       },
       {
         name: 'dataLayerAdapter',
