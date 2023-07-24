@@ -57,7 +57,7 @@ import databaseClient from '../../tina/__generated__/databaseClient'
 const nextApiHandler: NextApiHandler = async (req, res) => {
    const isAuthorized = process.env.${vars.isLocalEnvVarName} === 'true' || await isUserAuthorized({
        token: req.headers.authorization,
-       clientID: process.env.PUBLIC_TINA_CLOUD_CLIENT_ID,
+       clientID: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
   })
 
   if (isAuthorized) {
