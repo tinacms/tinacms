@@ -1,5 +1,5 @@
 ---
-'next-auth-tinacms': major
+'tinacms-next-auth': major
 ---
 
 Initial release
