@@ -128,9 +128,9 @@ export const createConfig = async ({
     configManager.generatedFolderPath,
     'static-media.json'
   )
-  if (configManager.config.media.tina.static) {
+  if (configManager.config.media?.tina?.static) {
     const staticMedia = await listFilesRecursively({
-      directoryPath: configManager.config.media.tina.mediaRoot || '',
+      directoryPath: configManager.config.media.tina?.mediaRoot || '',
       config: configManager.config.media.tina,
       roothPath: configManager.rootPath,
     })
