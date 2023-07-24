@@ -132,7 +132,7 @@ export const configExamples: {
   }
 
   export default defineConfig({
-    ${opts.dataLayer ? `contentApiUrlOverride: "/api/gql"` : ''}
+    ${opts.dataLayer ? `contentApiUrlOverride: "/api/gql",` : ''}
     branch,
     ${authConfig}
     ${clientConfig(opts.isForestryMigration)}
