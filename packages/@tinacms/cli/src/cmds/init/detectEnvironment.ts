@@ -103,10 +103,12 @@ const detectEnvironment = async ({
   baseDir = '',
   pathToForestryConfig,
   rootPath,
+  debug = false,
 }: {
   baseDir?: string
   pathToForestryConfig: string
   rootPath: string
+  debug?: boolean
 }): Promise<InitEnvironment> => {
   if (fs.pathExistsSync('.env.tina')) {
     dotenv.config({ path: '.env.tina' })
@@ -201,7 +203,7 @@ const detectEnvironment = async ({
       frontMatterFormat = hugoConfig.match(/metaDataFormat = "(.*)"/)
     }
   }
-  return {
+  const env = {
     forestryConfigExists: hasForestryConfig,
     frontMatterFormat,
     gitIgnoreExists: hasGitIgnore,
@@ -216,5 +218,10 @@ const detectEnvironment = async ({
     generatedFiles,
     usingSrc,
   }
+  if (debug) {
+    console.log('Environment:')
+    console.log(JSON.stringify(env, null, 2))
+  }
+  return env
 }
 export default detectEnvironment

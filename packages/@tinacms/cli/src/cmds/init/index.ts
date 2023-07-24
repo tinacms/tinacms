@@ -57,6 +57,7 @@ export type InitParams = {
   noTelemetry: boolean
   showSelfHosted?: boolean
   baseDir?: string
+  debug?: boolean
 }
 
 export const command = new CLICommand<InitEnvironment, InitParams>({
@@ -68,18 +69,20 @@ export const command = new CLICommand<InitEnvironment, InitParams>({
     rootPath,
     pathToForestryConfig,
     baseDir = '',
+    debug = false,
   }: InitParams): Promise<InitEnvironment> {
     return detectEnvironment({
       baseDir,
       pathToForestryConfig,
       rootPath,
+      debug,
     })
   },
   configure(
     env: InitEnvironment,
-    { showSelfHosted = false }: InitParams
+    { debug = false, showSelfHosted = false }: InitParams
   ): Promise<Record<any, any>> {
-    return configure(env, { showSelfHosted })
+    return configure(env, { debug, showSelfHosted })
   },
   apply(
     config: Record<any, any>,

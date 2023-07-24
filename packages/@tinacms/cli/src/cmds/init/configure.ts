@@ -32,7 +32,7 @@ async function writeTinaEnv(config: Record<any, any>) {
 
 async function configure(
   env: InitEnvironment,
-  opts: { showSelfHosted?: boolean }
+  opts: { debug?: boolean; showSelfHosted?: boolean }
 ) {
   const promptOptions = { onCancel: () => process.exit(0) } // allow ctrl + c to exit
 
@@ -409,6 +409,11 @@ async function configure(
   }
 
   await writeTinaEnv(config)
+
+  if (opts.debug) {
+    console.log('Configuration:')
+    console.log(JSON.stringify(config, null, 2))
+  }
 
   return config
 }

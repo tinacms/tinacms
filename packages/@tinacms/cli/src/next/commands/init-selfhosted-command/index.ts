@@ -15,6 +15,9 @@ export class InitSelfHostedCommand extends Command {
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
   })
+  debug = Option.Boolean('--debug', false, {
+    description: 'Enable debug logging',
+  })
   static usage = Command.Usage({
     category: `Commands`,
     description: `Add Tina to an existing project`,
@@ -33,6 +36,7 @@ export class InitSelfHostedCommand extends Command {
       pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,
       showSelfHosted: true,
+      debug: this.debug,
     })
     process.exit()
   }

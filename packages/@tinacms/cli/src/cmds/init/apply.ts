@@ -28,6 +28,7 @@ import {
 } from './templates/gql'
 import { templates as DatabaseTemplates } from './templates/database'
 import { templates as TailwindTemplates } from './templates/tailwind'
+import { templates as AssetsTemplates } from './templates/assets'
 import { helloWorldPost } from './templates/content'
 import { format } from 'prettier'
 import {
@@ -680,7 +681,7 @@ const addVercelKVCredentialsProviderFiles = async ({
     await writeGeneratedFile({
       generatedFile: generatedTinaSVG,
       overwrite: true,
-      content: TailwindTemplates['tina-svg'](),
+      content: AssetsTemplates['tina.svg'](),
       typescript: config.typescript,
     })
     if (!env.globalStylesHasTailwind) {

@@ -12,6 +12,9 @@ export class InitCommand extends Command {
     description:
       'Specify the root directory to run the CLI from (defaults to current working directory)',
   })
+  debug = Option.Boolean('--debug', false, {
+    description: 'Enable debug logging',
+  })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
   })
@@ -32,6 +35,7 @@ export class InitCommand extends Command {
       rootPath: rootPath,
       pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,
+      debug: this.debug,
     })
     process.exit()
   }
