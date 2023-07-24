@@ -82,8 +82,19 @@ async function detectNextGlobalStyles(baseDir: string, usingSrc: boolean) {
       }
     }
     if (stylesPath) {
+      if (stylesPath.startsWith('@')) {
+        // scoped modules
+        stylesPath = path.join(
+          path.dirname(pathToApp),
+          stylesPath.replace('@', '')
+        )
+        stylesPath = stylesPath.replace('@', baseDir)
+      } else {
+        stylesPath = path.join(path.dirname(pathToApp), stylesPath)
+      }
+      pathToGlobalStyles = stylesPath
+
       // compute path to styles file
-      pathToGlobalStyles = path.join(path.dirname(pathToApp), stylesPath)
       if (fs.pathExistsSync(stylesPath)) {
         // check if styles file imports tailwind
         const globalStylesContent = await fs.readFile(
