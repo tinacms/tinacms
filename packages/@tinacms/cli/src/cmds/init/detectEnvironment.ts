@@ -108,6 +108,10 @@ const detectEnvironment = async ({
         'register',
         path.join(baseDir, usingSrc ? 'src' : 'pages', 'api', 'credentials')
       ),
+    ['gql-api-handler']: await makeGeneratedFile(
+      'gql',
+      path.join(baseDir, usingSrc ? 'src' : 'pages', 'api')
+    ),
   }
   const hasSampleContent = await fs.pathExists(sampleContentPath)
   const hasPackageJSON = await fs.pathExists('package.json')

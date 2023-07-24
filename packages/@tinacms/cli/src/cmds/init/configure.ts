@@ -320,6 +320,12 @@ async function configure(
         configName: 'Auth',
         generatedFile: env.generatedFiles['auth'],
       }),
+      // pages/api/gql.ts
+      ...generatedFileOverwritePrompt({
+        condition: (answers) => !!answers.dataLayer,
+        configName: 'GqlApiHandler',
+        generatedFile: env.generatedFiles['gql-api-handler'],
+      }),
       // pages/api/auth/[...nextauth].ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!answers.nextAuthProvider,

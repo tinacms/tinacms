@@ -1,0 +1,74 @@
+export type Variables = {
+  isLocalEnvVarName: string
+}
+export type GQLEndpointTypes = 'custom' | 'tinacms-next-auth' | 'tina-cloud'
+
+export const templates: {
+  [key in GQLEndpointTypes]: (vars: Variables) => string
+} = {
+  ['custom']: (
+    vars: Variables
+  ) => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
+import { NextApiHandler } from 'next'
+import databaseClient from '../../tina/__generated__/databaseClient'
+
+const nextApiHandler: NextApiHandler = async (req, res) => {
+  const isAuthorized =
+    process.env.${vars.isLocalEnvVarName} === 'true' ||
+    // add your own authorization logic here
+    false
+
+  if (isAuthorized) {
+    const { query, variables } = req.body
+    const result = await databaseClient({ query, variables })
+    return res.json(result)
+  } else {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+}
+
+export default nextApiHandler;
+`,
+  ['tinacms-next-auth']: (
+    vars: Variables
+  ) => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
+import { NextApiHandler } from 'next'
+import databaseClient from '../../tina/__generated__/databaseClient'
+import { withNextAuthApiRoute } from 'next-auth-tinacms/dist/index'
+import { authOptions } from '../../tina/nextauth'
+
+const nextApiHandler: NextApiHandler = async (req, res) => {
+  const { query, variables } = req.body
+  const result = await databaseClient({ query, variables })
+  return res.json(result)
+}
+
+export default withNextAuthApiRoute(
+  nextApiHandler, { authOptions, isLocalDevelopment: process.env.${vars.isLocalEnvVarName} === 'true' }
+)
+`,
+  ['tina-cloud']: (
+    vars: Variables
+  ) => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
+import { isUserAuthorized } from '@tinacms/auth'
+import { NextApiHandler } from 'next'
+import databaseClient from '../../tina/__generated__/databaseClient'
+
+const nextApiHandler: NextApiHandler = async (req, res) => {
+   const isAuthorized = process.env.${vars.isLocalEnvVarName} === 'true' || await isUserAuthorized({
+       token: req.headers.authorization,
+       clientID: process.env.PUBLIC_TINA_CLOUD_CLIENT_ID,
+  })
+
+  if (isAuthorized) {
+    const { query, variables } = req.body
+    const result = await databaseClient({ query, variables })
+    return res.json(result)
+  } else {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+}
+
+export default nextApiHandler
+`,
+}

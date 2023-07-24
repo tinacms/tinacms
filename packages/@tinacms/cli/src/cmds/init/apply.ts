@@ -22,6 +22,10 @@ import {
   templates as AuthTemplates,
   Variables as AuthTemplateVariables,
 } from './templates/auth'
+import {
+  templates as GQLTemplates,
+  Variables as GQLTemplateVariables,
+} from './templates/gql'
 import { templates as DatabaseTemplates } from './templates/database'
 import { helloWorldPost } from './templates/content'
 import { format } from 'prettier'
@@ -131,6 +135,10 @@ async function apply({
     await addDatabaseFile({
       config,
       generatedFile: env.generatedFiles['database'],
+    })
+    await addGqlApiHandler({
+      config,
+      generatedFile: env.generatedFiles['gql-api-handler'],
     })
   }
 
@@ -381,6 +389,26 @@ const addDatabaseFile = async ({
       ? config.overwriteDatabaseTS
       : config.overwriteDatabaseJS,
     content: DatabaseTemplates[config.dataLayerAdapter]({ isLocalEnvVarName }),
+    typescript: config.typescript,
+  })
+}
+
+const addGqlApiHandler = async ({ config, generatedFile }) => {
+  let vars: GQLTemplateVariables = {
+    isLocalEnvVarName: config.isLocalEnvVarName,
+  }
+  let content = GQLTemplates['custom'](vars)
+  if (config.nextAuth) {
+    content = GQLTemplates['tinacms-next-auth'](vars)
+  } else if (config.clientId || config.token) {
+    content = GQLTemplates['tina-cloud'](vars)
+  }
+  await writeGeneratedFile({
+    generatedFile,
+    overwrite: config.typescript
+      ? config.overwriteGqlApiHandlerTS
+      : config.overwriteGqlApiHandlerJS,
+    content,
     typescript: config.typescript,
   })
 }

@@ -18,6 +18,7 @@ type GeneratedFileType =
   | 'vercel-kv-credentials-provider-register'
   | 'vercel-kv-credentials-provider-register-api-handler'
   | 'next-auth-api-handler'
+  | 'gql-api-handler'
 
 export type GeneratedFile = {
   fullPathJS: string
