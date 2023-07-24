@@ -269,7 +269,7 @@ const addDependencies = async (config: Record<any, any>) => {
   logger.info(logText('Adding dependencies, this might take a moment...'))
   const deps = ['tinacms', '@tinacms/cli']
   if (nextAuth) {
-    deps.push('next-auth-tinacms', 'next-auth')
+    deps.push('tinacms-next-auth', 'next-auth')
   }
   if (dataLayer) {
     deps.push('@tinacms/datalayer')
