@@ -168,7 +168,6 @@ async function apply({
           ],
         generatedTailwindConfig: env.generatedFiles['tailwind-config'],
         generatedPostcssConfig: env.generatedFiles['postcss-config'],
-        generatedGlobalsCSS: env.generatedFiles['globals.css'],
         generatedTinaSVG: env.generatedFiles['tina.svg'],
         config,
         env,
@@ -620,7 +619,6 @@ const addVercelKVCredentialsProviderFiles = async ({
   generatedRegisterApiHandler,
   generatedTailwindConfig,
   generatedPostcssConfig,
-  generatedGlobalsCSS,
   generatedTinaSVG,
   config,
   env,
@@ -630,7 +628,6 @@ const addVercelKVCredentialsProviderFiles = async ({
   generatedRegisterApiHandler: GeneratedFile
   generatedTailwindConfig: GeneratedFile
   generatedPostcssConfig: GeneratedFile
-  generatedGlobalsCSS: GeneratedFile
   generatedTinaSVG: GeneratedFile
   config: Record<any, any>
   env: InitEnvironment
@@ -678,14 +675,6 @@ const addVercelKVCredentialsProviderFiles = async ({
         ? config.overwritePostcssConfigTS
         : config.overwritePostcssConfigJS,
       content: TailwindTemplates['postcss-default'](),
-      typescript: config.typescript,
-    })
-    await writeGeneratedFile({
-      generatedFile: generatedGlobalsCSS,
-      overwrite: config.typescript
-        ? config.overwriteGlobalsCSS
-        : config.overwriteGlobalsCSS,
-      content: TailwindTemplates['globals-css'](),
       typescript: config.typescript,
     })
     await writeGeneratedFile({
