@@ -43,7 +43,6 @@ async function listFilesRecursively({
   const fullDirectoryPath = path.join(
     roothPath,
     config.publicFolder,
-    // config.mediaRoot,
     directoryPath
   )
   const items = await fs.promises.readdir(fullDirectoryPath)
