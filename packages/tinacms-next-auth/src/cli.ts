@@ -162,9 +162,9 @@ class SetupCommand extends Command {
         },
         {
           type: (_, answers) =>
-            answers.choice.name === 'ADD' ||
-            answers.choice.name === 'UPDATE' ||
-            answers.choice.name === 'DELETE'
+            answers.choice === 'ADD' ||
+            answers.choice === 'UPDATE' ||
+            answers.choice === 'DELETE'
               ? 'text'
               : null,
           name: 'name',
@@ -172,7 +172,7 @@ class SetupCommand extends Command {
         },
         {
           type: (_, answers) =>
-            answers.choice.name === 'ADD' || answers.choice.name === 'UPDATE'
+            answers.choice === 'ADD' || answers.choice === 'UPDATE'
               ? 'password'
               : null,
           name: 'password',
@@ -180,7 +180,7 @@ class SetupCommand extends Command {
         },
         {
           type: (_, answers) =>
-            answers.choice.name === 'ADD' || answers.choice.name === 'UPDATE'
+            answers.choice === 'ADD' || answers.choice === 'UPDATE'
               ? 'password'
               : null,
           name: 'passwordConfirm',
@@ -188,7 +188,7 @@ class SetupCommand extends Command {
         },
       ])
 
-      if (answers.choice.value === 'ADD') {
+      if (answers.choice === 'ADD') {
         const { name, password, passwordConfirm } = answers
         try {
           await addUser(name, password, passwordConfirm, userStore)
@@ -199,7 +199,7 @@ class SetupCommand extends Command {
             )
           )
         }
-      } else if (answers.choice.value === 'UPDATE') {
+      } else if (answers.choice === 'UPDATE') {
         const { name, password, passwordConfirm } = answers
         try {
           await updatePassword(name, password, passwordConfirm, userStore)
@@ -210,7 +210,7 @@ class SetupCommand extends Command {
             )
           )
         }
-      } else if (answers.choice.value === 'DELETE') {
+      } else if (answers.choice === 'DELETE') {
         const { name } = answers
         try {
           await deleteUser(name, userStore)
@@ -221,7 +221,7 @@ class SetupCommand extends Command {
             )
           )
         }
-      } else if (answers.choice.value === 'EXIT') {
+      } else if (answers.choice === 'EXIT') {
         done = true
       }
     }
