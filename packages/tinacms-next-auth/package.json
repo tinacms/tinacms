@@ -1,5 +1,5 @@
 {
-  "name": "next-auth-tinacms",
+  "name": "tinacms-next-auth",
   "version": "1.0.0",
   "main": "dist/cli.js",
   "module": "dist/index.es.js",
