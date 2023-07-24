@@ -40,6 +40,10 @@ export class DummyMediaStore implements MediaStore {
   }
 }
 
+export type StaticMediaItem = Media & {
+  children?: StaticMediaItem[]
+}
+
 export class TinaMediaStore implements MediaStore {
   fetchFunction = (input: RequestInfo, init?: RequestInit) => {
     return fetch(input, init)
@@ -49,8 +53,15 @@ export class TinaMediaStore implements MediaStore {
   private cms: CMS
   private isLocal: boolean
   private url: string
-  constructor(cms: CMS) {
+  private staticMedia: StaticMediaItem[]
+  isStatic?: boolean
+
+  constructor(cms: CMS, staticMedia?: StaticMediaItem[]) {
     this.cms = cms
+    if (staticMedia && staticMedia.length) {
+      this.isStatic = true
+      this.staticMedia = staticMedia || []
+    }
   }
 
   setup() {
@@ -310,6 +321,25 @@ export class TinaMediaStore implements MediaStore {
       })
     }
 
+    if (this.staticMedia) {
+      if (options.directory) {
+        let depth = 0
+        const pathToDirectory = options.directory.split('/')
+        let currentFolder = this.staticMedia
+        while (depth < pathToDirectory.length) {
+          const nextFolder = currentFolder.find(
+            (item) =>
+              item.type === 'dir' && item.filename === pathToDirectory[depth]
+          )
+          if (nextFolder) {
+            currentFolder = nextFolder.children
+          }
+          depth++
+        }
+        return { items: currentFolder, nextOffset: 0 }
+      }
+      return { items: this.staticMedia, nextOffset: 0 }
+    }
     return {
       items,
       nextOffset: cursor || 0,

@@ -2,7 +2,7 @@
 
 */
 
-import type { TinaCMS } from '@tinacms/toolkit'
+import type { StaticMediaItem, TinaCMS } from '@tinacms/toolkit'
 import type { Schema, Config } from '@tinacms/schema-tools'
 import type { TinaCloudMediaStoreClass } from '../auth'
 import type { useDocumentCreatorPlugin } from '../hooks/use-content-creator'
@@ -34,6 +34,7 @@ interface BaseProviderProps {
   mediaStore?:
     | TinaCloudMediaStoreClass
     | (() => Promise<TinaCloudMediaStoreClass>)
+  staticMedia?: StaticMediaItem[]
   tinaioConfig?: TinaIOConfig
   schema?: Schema
 }

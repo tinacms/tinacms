@@ -30,6 +30,7 @@ const config = defineConfig({
     tina: {
       publicFolder: 'public',
       mediaRoot: 'uploads',
+      static: true,
     },
   },
   build: {

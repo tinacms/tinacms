@@ -9,6 +9,7 @@ const tinaConfigKey = z
   .object({
     publicFolder: z.string(),
     mediaRoot: z.string(),
+    static: z.boolean().nullish(),
   })
   .strict()
   .optional()
