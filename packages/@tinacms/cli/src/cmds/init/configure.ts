@@ -258,7 +258,7 @@ async function configure(
       },
       {
         name: 'nextAuthProvider',
-        message: 'Select a self-hosted data layer adapter',
+        message: 'Select a NextAuth Credentials Provider',
         type: isNextAuth('select'),
         choices: [
           {
