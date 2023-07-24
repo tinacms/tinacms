@@ -21,14 +21,18 @@ const makeGeneratedFile = async (
   parentPath: string,
   opts?: {
     typescriptSuffix?: string
+    extensionOverride?: string
   }
 ) => {
   const result = {
     fullPathTS: path.join(
       parentPath,
-      `${name}.${opts?.typescriptSuffix || 'ts'}`
+      `${name}.${opts?.typescriptSuffix || opts?.extensionOverride || 'ts'}`
     ),
-    fullPathJS: path.join(parentPath, `${name}.js`),
+    fullPathJS: path.join(
+      parentPath,
+      `${name}.${opts?.extensionOverride || 'js'}`
+    ),
     name,
     parentPath,
     typescriptExists: false,
@@ -55,6 +59,46 @@ const makeGeneratedFile = async (
   return result
 }
 
+async function detectNextGlobalStyles(baseDir: string, usingSrc: boolean) {
+  let pathToGlobalStyles = ''
+  let globalStylesHasTailwind = false
+  let pathToApp = path.join(baseDir, usingSrc ? 'src' : 'pages', '_app')
+  if (fs.pathExistsSync(`${pathToApp}.js`)) {
+    pathToApp = `${pathToApp}.js`
+  } else if (fs.pathExistsSync(`${pathToApp}.tsx`)) {
+    pathToApp = `${pathToApp}.tsx`
+  } else {
+    pathToApp = ''
+  }
+  if (pathToApp) {
+    // read lines from file into array of strings
+    const lines = (await fs.readFile(pathToApp, 'utf8')).split('\n')
+    let stylesPath = ''
+    for (const line of lines) {
+      const match = line.match(/^import\s+["'](.*\.css)["'];?$/)
+      if (match) {
+        stylesPath = match[1]
+        break
+      }
+    }
+    if (stylesPath) {
+      // compute path to styles file
+      pathToGlobalStyles = path.join(path.dirname(pathToApp), stylesPath)
+      if (fs.pathExistsSync(stylesPath)) {
+        // check if styles file imports tailwind
+        const globalStylesContent = await fs.readFile(
+          pathToGlobalStyles,
+          'utf8'
+        )
+        if (globalStylesContent.indexOf('@tailwind') !== -1) {
+          globalStylesHasTailwind = true
+        }
+      }
+    }
+  }
+  return { pathToGlobalStyles, globalStylesHasTailwind }
+}
+
 const detectEnvironment = async ({
   baseDir = '',
   pathToForestryConfig,
@@ -72,6 +116,9 @@ const detectEnvironment = async ({
   const hasForestryConfig = await fs.pathExists(
     path.join(pathToForestryConfig, '.forestry', 'settings.yml')
   )
+  const hasTailwindConfig = await fs.pathExists(
+    path.join(baseDir, 'tailwind.config.js')
+  )
   const sampleContentPath = path.join(
     baseDir,
     'content',
@@ -79,6 +126,9 @@ const detectEnvironment = async ({
     'hello-world.md'
   )
   const usingSrc = !fs.pathExistsSync(path.join(baseDir, 'pages'))
+  const { pathToGlobalStyles, globalStylesHasTailwind } =
+    await detectNextGlobalStyles(baseDir, usingSrc)
+
   const tinaFolder = path.join(baseDir, 'tina')
   const generatedFiles = {
     auth: await makeGeneratedFile('auth', tinaFolder),
@@ -112,6 +162,27 @@ const detectEnvironment = async ({
       'gql',
       path.join(baseDir, usingSrc ? 'src' : 'pages', 'api')
     ),
+    ['tailwind-config']: await makeGeneratedFile(
+      'tailwind.config',
+      path.join(baseDir),
+      {
+        typescriptSuffix: 'js',
+      }
+    ),
+    ['postcss-config']: await makeGeneratedFile(
+      'postcss.config',
+      path.join(baseDir),
+      {
+        typescriptSuffix: 'js',
+      }
+    ),
+    ['tina.svg']: await makeGeneratedFile(
+      'tina',
+      path.join(baseDir, 'public'),
+      {
+        extensionOverride: 'svg',
+      }
+    ),
   }
   const hasSampleContent = await fs.pathExists(sampleContentPath)
   const hasPackageJSON = await fs.pathExists('package.json')
@@ -136,6 +207,9 @@ const detectEnvironment = async ({
     gitIgnoreExists: hasGitIgnore,
     gitIgoreNodeModulesExists: hasGitIgnoreNodeModules,
     gitIgnoreTinaEnvExists: hasEnvTina,
+    globalStylesHasTailwind,
+    globalStylesPath: pathToGlobalStyles,
+    tailwindConfigExists: hasTailwindConfig,
     packageJSONExists: hasPackageJSON,
     sampleContentExists: hasSampleContent,
     sampleContentPath,

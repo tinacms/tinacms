@@ -18,6 +18,7 @@ export type ConfigTemplateOptions = {
   isForestryMigration?: boolean
   nextAuth?: boolean
   selfHosted?: boolean
+  dataLayer?: boolean
 }
 
 const clientConfig = (isForestryMigration?: boolean) => {
@@ -131,6 +132,7 @@ export const configExamples: {
   }
 
   export default defineConfig({
+    ${opts.dataLayer ? `contentApiUrlOverride: "/api/gql"` : ''}
     branch,
     ${authConfig}
     ${clientConfig(opts.isForestryMigration)}

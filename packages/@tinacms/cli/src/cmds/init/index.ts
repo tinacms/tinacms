@@ -19,6 +19,9 @@ type GeneratedFileType =
   | 'vercel-kv-credentials-provider-register-api-handler'
   | 'next-auth-api-handler'
   | 'gql-api-handler'
+  | 'tailwind-config'
+  | 'postcss-config'
+  | 'tina.svg'
 
 export type GeneratedFile = {
   fullPathJS: string
@@ -42,6 +45,9 @@ export type InitEnvironment = {
   generatedFiles?: {
     [key in GeneratedFileType]: GeneratedFile
   }
+  tailwindConfigExists: boolean
+  globalStylesHasTailwind: boolean
+  globalStylesPath: string
   usingSrc: boolean
 }
 
