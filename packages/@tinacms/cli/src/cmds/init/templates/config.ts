@@ -118,7 +118,7 @@ export const configExamples: {
     return `import { defineConfig } from 'tinacms'
   ${
     opts.nextAuth
-      ? `import { createTinaNextAuthHandler } from 'next-auth-tinacms/dist/tinacms'
+      ? `import { createTinaNextAuthHandler } from 'tinacms-next-auth/dist/tinacms'
   `
       : ''
   }

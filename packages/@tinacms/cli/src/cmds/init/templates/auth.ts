@@ -8,7 +8,7 @@ export const templates: {
   [key in Keys]: (vars?: Variables) => string
 } = {
   ['vercel-kv-credentials-provider']: (vars) => {
-    return `import { RedisUserStore, TinaCredentialsProvider } from "next-auth-tinacms/dist/index";
+    return `import { RedisUserStore, TinaCredentialsProvider } from "tinacms-next-auth/dist/index";
 
 const {
   NEXTAUTH_CREDENTIALS_KEY: authCollectionName,

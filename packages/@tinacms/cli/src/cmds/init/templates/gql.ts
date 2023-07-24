@@ -34,7 +34,7 @@ export default nextApiHandler;
   ) => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
 import { NextApiHandler } from 'next'
 import databaseClient from '../../tina/__generated__/databaseClient'
-import { withNextAuthApiRoute } from 'next-auth-tinacms/dist/index'
+import { withNextAuthApiRoute } from 'tinacms-next-auth/dist/index'
 import { authOptions } from '../../tina/nextauth'
 
 const nextApiHandler: NextApiHandler = async (req, res) => {
