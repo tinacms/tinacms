@@ -295,7 +295,7 @@ const addDependencies = async (
   const deps = ['tinacms', '@tinacms/cli']
   const devDeps = []
   if (nextAuth) {
-    deps.push('tinacms-next-auth', 'next-auth', ...tailwindDeps)
+    deps.push('tinacms-next-auth', 'next-auth')
     if (config.installTailwindCSS && !env.tailwindConfigExists) {
       devDeps.push(...tailwindDeps)
     }
