@@ -490,7 +490,7 @@ importers:
       zod: ^3.14.3
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 5.0.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 5.0.1_graphql@15.8.0
       '@graphql-codegen/typescript': 4.0.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 3.1.0_3jt5ibhtazvod5hvf7xqhzsx4q
       '@graphql-codegen/typescript-operations': 4.0.1_graphql@15.8.0
@@ -1003,9 +1003,8 @@ importers:
       final-form: ^4.20.2
       final-form-arrays: ^3.0.1
       final-form-set-field-data: ^1.0.2
+      happy-dom: ^10.5.2
       is-hotkey: ^0.2.0
-      jest: ^29.5.0
-      jest-environment-jsdom: ^29.5.0
       lodash.get: ^4.4.2
       moment: 2.29.4
       monaco-editor: 0.31.0
@@ -1027,8 +1026,11 @@ importers:
       slate-history: ^0.93.0
       slate-hyperscript: ^0.77.0
       slate-react: ^0.97.1
+      tsc-alias: ^1.8.7
       tslib: ^2.3.0
       typescript: 4.3.5
+      vite: ^4.3.9
+      vitest: ^0.32.2
       webfontloader: 1.6.28
     dependencies:
       '@floating-ui/dom': 1.4.4
@@ -1071,6 +1073,8 @@ importers:
       slate-history: 0.93.0_slate@0.94.1
       slate-hyperscript: 0.77.0_slate@0.94.1
       slate-react: 0.97.1_ceyajmovvfljjbz2h2ik5qmoja
+      tsc-alias: 1.8.7
+      vite: 4.3.9
       webfontloader: 1.6.28
     devDependencies:
       '@testing-library/dom': 7.31.2
@@ -1091,12 +1095,12 @@ importers:
       '@types/react-dom': 17.0.17
       '@types/react-select': 2.0.19
       '@types/storybook__react': 4.0.2
-      jest: 29.5.0
-      jest-environment-jsdom: 29.5.0
+      happy-dom: 10.5.2
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       tslib: 2.4.0
       typescript: 4.3.5
+      vitest: 0.32.2_happy-dom@10.5.2
 
   packages/@tinacms/vercel-previews:
     specifiers:
@@ -7650,10 +7654,10 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@graphql-codegen/plugin-helpers/5.0.0_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/5.0.1_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-suL2ZMkBAU2a4YbBHaZvUPsV1z0q3cW6S96Z/eYYfkRIsJoe2vN+wNZ9Xdzmqx0JLmeeFCBSoBGC0imFyXlkDQ==,
+        integrity: sha512-6L5sb9D8wptZhnhLLBcheSPU7Tg//DGWgc5tQBWX46KYTOTQHGqDpv50FxAJJOyFVJrveN9otWk9UT9/yfY4ww==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
@@ -7675,7 +7679,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 5.0.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 5.0.1_graphql@15.8.0
       '@graphql-tools/utils': 10.0.0_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.5.0
@@ -7709,7 +7713,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 5.0.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 5.0.1_graphql@15.8.0
       '@graphql-codegen/typescript': 4.0.1_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 4.0.1_graphql@15.8.0
       auto-bind: 4.0.0
@@ -7728,7 +7732,7 @@ packages:
     peerDependencies:
       graphql: ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 5.0.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 5.0.1_graphql@15.8.0
       '@graphql-codegen/schema-ast': 4.0.0_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 4.0.1_graphql@15.8.0
       auto-bind: 4.0.0
@@ -7771,7 +7775,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 5.0.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 5.0.1_graphql@15.8.0
       '@graphql-tools/optimize': 2.0.0_graphql@15.8.0
       '@graphql-tools/relay-operation-optimizer': 7.0.0_graphql@15.8.0
       '@graphql-tools/utils': 10.0.0_graphql@15.8.0
@@ -11390,7 +11394,7 @@ packages:
         integrity: sha512-anKkLmZZ+xm4p8JWBf4hElkM4XR+EZeA2M9BAkkTldmcyDY4mbdIJnRghDJH3Ov5ooY7/UAoENtmdMSkaAd7Cw==,
       }
     dependencies:
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
 
   /@types/hast/2.3.4:
     resolution:
@@ -15741,7 +15745,7 @@ packages:
       check-error: 1.0.2
       deep-eql: 4.1.3
       get-func-name: 2.0.0
-      loupe: 2.3.4
+      loupe: 2.3.6
       pathval: 1.1.1
       type-detect: 4.0.8
     dev: true
@@ -16289,6 +16293,14 @@ packages:
         integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==,
       }
     engines: { node: '>= 12' }
+    dev: false
+
+  /commander/9.5.0:
+    resolution:
+      {
+        integrity: sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==,
+      }
+    engines: { node: ^12.20.0 || >=14 }
     dev: false
 
   /commist/1.1.0:
@@ -20289,6 +20301,20 @@ packages:
       uglify-js: 3.17.4
     dev: true
 
+  /happy-dom/10.5.2:
+    resolution:
+      {
+        integrity: sha512-dTA1cDcLOPIkAdykLd9Wo1k8Ly36Hh2OdKGkWEHWuAHb89KcVVRLSj1OFev7ir90xhRLSGCGrEdDvS6u9l13kg==,
+      }
+    dependencies:
+      css.escape: 1.5.1
+      entities: 4.5.0
+      iconv-lite: 0.6.3
+      webidl-conversions: 7.0.0
+      whatwg-encoding: 2.0.0
+      whatwg-mimetype: 3.0.0
+    dev: true
+
   /hard-rejection/2.1.0:
     resolution:
       {
@@ -21492,7 +21518,7 @@ packages:
       '@jest/expect': 29.5.0
       '@jest/test-result': 29.5.0
       '@jest/types': 29.5.0
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
       chalk: 4.1.2
       co: 4.6.0
       dedent: 0.7.0
@@ -21803,7 +21829,7 @@ packages:
       '@jest/environment': 29.5.0
       '@jest/fake-timers': 29.5.0
       '@jest/types': 29.5.0
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
       jest-mock: 29.5.0
       jest-util: 29.5.0
 
@@ -21994,7 +22020,7 @@ packages:
       '@jest/test-result': 29.5.0
       '@jest/transform': 29.5.0
       '@jest/types': 29.5.0
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
       chalk: 4.1.2
       emittery: 0.13.1
       graceful-fs: 4.2.10
@@ -22129,7 +22155,7 @@ packages:
       }
     engines: { node: ^14.15.0 || ^16.10.0 || >=18.0.0 }
     dependencies:
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
       jest-util: 29.5.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -22906,15 +22932,6 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
-
-  /loupe/2.3.4:
-    resolution:
-      {
-        integrity: sha512-OvKfgCC2Ndby6aSTREl5aCCPTNIzlDfQZvZxNUrBrihDhL3xcrYegTblhmEiCrg2kKQz4XsFIaemE5BF4ybSaQ==,
-      }
-    dependencies:
-      get-func-name: 2.0.0
-    dev: true
 
   /loupe/2.3.6:
     resolution:
@@ -24417,6 +24434,14 @@ packages:
       minimatch: 3.1.2
     dev: false
 
+  /mylas/2.1.13:
+    resolution:
+      {
+        integrity: sha512-+MrqnJRtxdF+xngFfUUkIMQrUUL0KsxbADUkn23Z/4ibGg192Q+z+CQyiYwvWTsYjJygmMR8+w3ZDa98Zh6ESg==,
+      }
+    engines: { node: '>=12.0.0' }
+    dev: false
+
   /mz/2.7.0:
     resolution:
       {
@@ -25478,6 +25503,15 @@ packages:
       pathe: 1.1.1
     dev: true
 
+  /plimit-lit/1.5.0:
+    resolution:
+      {
+        integrity: sha512-Eb/MqCb1Iv/ok4m1FqIXqvUKPISufcjZ605hl3KM/n8GaX8zfhtgdLwZU3vKjuHGh2O9Rjog/bHTq8ofIShdng==,
+      }
+    dependencies:
+      queue-lit: 1.5.0
+    dev: false
+
   /popmotion/11.0.3:
     resolution:
       {
@@ -26211,6 +26245,13 @@ packages:
         integrity: sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==,
       }
     dev: true
+
+  /queue-lit/1.5.0:
+    resolution:
+      {
+        integrity: sha512-IslToJ4eiCEE9xwMzq3viOO5nH8sUWUCwoElrhNMozzr9IIt2qqvB4I+uHu/zJTQVqc9R5DFwok4ijNK1pU3fA==,
+      }
+    dev: false
 
   /queue-microtask/1.2.3:
     resolution:
@@ -28264,7 +28305,7 @@ packages:
         integrity: sha512-QZTsipNpa2Ppr6v1AmJHESqJ3Uz247MUS0OjrnnZjFAvEoWqxuyFuXn2xLgMtRnijJShAa1HL0gtJyUs7u7n3Q==,
       }
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
     dev: true
 
   /strip-outer/1.0.1:
@@ -29035,6 +29076,21 @@ packages:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
     dev: true
+
+  /tsc-alias/1.8.7:
+    resolution:
+      {
+        integrity: sha512-59Q/zUQa3miTf99mLbSqaW0hi1jt4WoG8Uhe5hSZJHQpSoFW9eEwvW7jlKMHXWvT+zrzy3SN9PE/YBhQ+WVydA==,
+      }
+    hasBin: true
+    dependencies:
+      chokidar: 3.5.3
+      commander: 9.5.0
+      globby: 11.1.0
+      mylas: 2.1.13
+      normalize-path: 3.0.0
+      plimit-lit: 1.5.0
+    dev: false
 
   /tsconfig-paths/3.14.1:
     resolution:
@@ -30110,7 +30166,7 @@ packages:
       vfile-message: 3.1.4
     dev: false
 
-  /vite-node/0.32.2_@types+node@14.18.29:
+  /vite-node/0.32.2_@types+node@18.7.18:
     resolution:
       {
         integrity: sha512-dTQ1DCLwl2aEseov7cfQ+kDMNJpM1ebpyMMMwWzBvLbis8Nla/6c9WQcqpPssTwS6Rp/+U6KwlIj8Eapw4bLdA==,
@@ -30123,7 +30179,7 @@ packages:
       mlly: 1.4.0
       pathe: 1.1.1
       picocolors: 1.0.0
-      vite: 4.3.9_@types+node@14.18.29
+      vite: 4.3.9_@types+node@18.7.18
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -30204,7 +30260,7 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vite/4.3.9_@types+node@14.18.29:
+  /vite/4.3.9_@types+node@18.7.18:
     resolution:
       {
         integrity: sha512-qsTNZjO9NoJNW7KnOrgYwczm0WctJ8m/yqYAMAK9Lxt4SoySUfS5S8ia9K7JHpa3KEeMfyF8LoJ3c5NeBJy6pg==,
@@ -30232,7 +30288,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
       esbuild: 0.17.19
       postcss: 8.4.23
       rollup: 3.25.1
@@ -30276,13 +30332,13 @@ packages:
     dependencies:
       '@types/chai': 4.3.5
       '@types/chai-subset': 1.3.3
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
       '@vitest/expect': 0.32.2
       '@vitest/runner': 0.32.2
       '@vitest/snapshot': 0.32.2
       '@vitest/spy': 0.32.2
       '@vitest/utils': 0.32.2
-      acorn: 8.8.2
+      acorn: 8.9.0
       acorn-walk: 8.2.0
       cac: 6.7.14
       chai: 4.3.7
@@ -30296,8 +30352,77 @@ packages:
       strip-literal: 1.0.1
       tinybench: 2.5.0
       tinypool: 0.5.0
-      vite: 4.3.9_@types+node@14.18.29
-      vite-node: 0.32.2_@types+node@14.18.29
+      vite: 4.3.9_@types+node@18.7.18
+      vite-node: 0.32.2_@types+node@18.7.18
+      why-is-node-running: 2.2.2
+    transitivePeerDependencies:
+      - less
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+    dev: true
+
+  /vitest/0.32.2_happy-dom@10.5.2:
+    resolution:
+      {
+        integrity: sha512-hU8GNNuQfwuQmqTLfiKcqEhZY72Zxb7nnN07koCUNmntNxbKQnVbeIS6sqUgR3eXSlbOpit8+/gr1KpqoMgWCQ==,
+      }
+    engines: { node: '>=v14.18.0' }
+    hasBin: true
+    peerDependencies:
+      '@edge-runtime/vm': '*'
+      '@vitest/browser': '*'
+      '@vitest/ui': '*'
+      happy-dom: '*'
+      jsdom: '*'
+      playwright: '*'
+      safaridriver: '*'
+      webdriverio: '*'
+    peerDependenciesMeta:
+      '@edge-runtime/vm':
+        optional: true
+      '@vitest/browser':
+        optional: true
+      '@vitest/ui':
+        optional: true
+      happy-dom:
+        optional: true
+      jsdom:
+        optional: true
+      playwright:
+        optional: true
+      safaridriver:
+        optional: true
+      webdriverio:
+        optional: true
+    dependencies:
+      '@types/chai': 4.3.5
+      '@types/chai-subset': 1.3.3
+      '@types/node': 18.7.18
+      '@vitest/expect': 0.32.2
+      '@vitest/runner': 0.32.2
+      '@vitest/snapshot': 0.32.2
+      '@vitest/spy': 0.32.2
+      '@vitest/utils': 0.32.2
+      acorn: 8.9.0
+      acorn-walk: 8.2.0
+      cac: 6.7.14
+      chai: 4.3.7
+      concordance: 5.0.4
+      debug: 4.3.4
+      happy-dom: 10.5.2
+      local-pkg: 0.4.3
+      magic-string: 0.30.0
+      pathe: 1.1.1
+      picocolors: 1.0.0
+      std-env: 3.3.3
+      strip-literal: 1.0.1
+      tinybench: 2.5.0
+      tinypool: 0.5.0
+      vite: 4.3.9_@types+node@18.7.18
+      vite-node: 0.32.2_@types+node@18.7.18
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less

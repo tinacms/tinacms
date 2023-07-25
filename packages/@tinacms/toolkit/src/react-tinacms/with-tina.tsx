@@ -1,12 +1,6 @@
-/**
-
-
-
-*/
-
 import * as React from 'react'
-import { TinaProvider } from '../components/TinaProvider'
-import { TinaCMS, TinaCMSConfig } from '../tina-cms'
+import { TinaProvider } from '../components/tina-provider'
+import { TinaCMS, TinaCMSConfig } from '@/tina-cms'
 
 export function withTina(Component: any, config?: TinaCMSConfig) {
   return (props: any) => {

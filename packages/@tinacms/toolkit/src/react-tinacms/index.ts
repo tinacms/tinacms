@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 export * from './use-cms'
 export * from './use-form'
 export * from './use-plugin'
@@ -11,7 +5,7 @@ export * from './use-subscribable'
 export * from './use-watch-form-values'
 export * from './with-plugin'
 export * from './with-tina'
-export { useCMSEvent } from '../packages/react-core'
+export { useCMSEvent } from '@/react-core'
 
-export type { Plugin } from '../packages/core'
-export type { Form, FormOptions, Field } from '../packages/forms'
+export type { Plugin } from '@/core'
+export type { Form, FormOptions, Field } from '@/forms'

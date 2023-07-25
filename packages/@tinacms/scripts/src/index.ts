@@ -591,6 +591,11 @@ export const buildIt = async (entryPoint, packageJSON) => {
         },
       },
     ],
+    resolve: {
+      alias: {
+        '@': path.resolve(process.cwd(), 'src'),
+      },
+    },
     build: {
       minify: false,
       assetsInlineLimit: 0,

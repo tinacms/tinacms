@@ -1,21 +1,9 @@
-import { FormOptions, Form } from '../packages/forms'
-import { GlobalFormPlugin } from '../plugins/screens'
+import { FormOptions, Form } from '@/forms'
+import { GlobalFormPlugin } from '@/plugin-screens'
 import { useMemo } from 'react'
-import { useForm, WatchableFormValue, usePlugins } from '../packages/react-core'
-
-/**
-
-
-
-*/
-
-/**
-
-
-
-*/
-export { useLocalForm, useForm } from '../packages/react-core'
-export type { WatchableFormValue } from '../packages/react-core'
+import { useForm, WatchableFormValue, usePlugins } from '@/react-core'
+export { useLocalForm, useForm } from '@/react-core'
+export type { WatchableFormValue } from '@/react-core'
 
 /**
  * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md

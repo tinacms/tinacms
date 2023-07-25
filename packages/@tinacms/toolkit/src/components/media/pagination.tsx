@@ -1,11 +1,5 @@
-/**
-
-
-
-*/
-
 import React from 'react'
-import { Button } from '../../packages/styles'
+import { Button } from '@/styles'
 import { BiLeftArrowAlt, BiRightArrowAlt } from 'react-icons/bi'
 
 export interface MediaPaginatorProps {

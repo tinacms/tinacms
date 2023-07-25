@@ -8,16 +8,15 @@ import {
   CMSEvent,
   MediaUploadOptions,
   PluginType,
-} from './packages/core'
-import { FieldPlugin } from './packages/form-builder'
-import { ScreenPlugin } from './packages/react-screens'
+} from '@/core'
+import { FieldPlugin } from '@/form-builder'
+import { ScreenPlugin } from '@/react-screens'
 import {
   TextFieldPlugin,
   TextareaFieldPlugin,
   ImageFieldPlugin,
   ColorFieldPlugin,
   NumberFieldPlugin,
-  MdxFieldPlugin,
   ToggleFieldPlugin,
   SelectFieldPlugin,
   RadioGroupFieldPlugin,
@@ -31,16 +30,16 @@ import {
   ReferenceFieldPlugin,
   ButtonToggleFieldPlugin,
   HiddenFieldPlugin,
-} from './packages/fields'
-import { Form } from './packages/forms'
-import { Alerts, EventsToAlerts } from './packages/alerts'
-import { SidebarState, SidebarStateOptions } from './packages/react-sidebar'
+} from '@/fields'
+import { Form } from '@/forms'
+import { Alerts, EventsToAlerts } from '@/alerts'
+import { SidebarState, SidebarStateOptions } from '@/react-sidebar'
 import {
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
-} from './plugins/fields/markdown'
-import { MediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
-import { createCloudConfig } from './packages/react-cloud-config'
+} from '@/plugin-fields/markdown'
+import { MediaManagerScreenPlugin } from '@/plugin-screens/media-manager-screen'
+import { createCloudConfig } from '@/react-cloud-config'
 import { TinaAction, TinaState } from './tina-state'
 
 const DEFAULT_FIELDS = [
@@ -51,7 +50,6 @@ const DEFAULT_FIELDS = [
   NumberFieldPlugin,
   ToggleFieldPlugin,
   SelectFieldPlugin,
-  MdxFieldPlugin,
   RadioGroupFieldPlugin,
   GroupFieldPlugin,
   GroupListFieldPlugin,

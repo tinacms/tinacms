@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import * as React from 'react'
 
 export function useLocalStorage(key, initialValue) {

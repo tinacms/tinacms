@@ -1,13 +1,13 @@
 import React from 'react'
-import { Input } from '../../packages/fields'
+import { Input } from '@/fields'
 import {
   Modal,
   ModalHeader,
   ModalBody,
   PopupModal,
   ModalActions,
-} from '../../packages/react-modals'
-import { Button } from '../../packages/styles'
+} from '@/react-modals'
+import { Button } from '@/styles'
 
 interface DeleteModalProps {
   close(): void

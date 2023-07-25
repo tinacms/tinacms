@@ -1,11 +1,5 @@
-/**
-
-
-
-*/
-
 import * as React from 'react'
-import { MutationSignalContext } from '../components/MutationSignal'
+import { MutationSignalContext } from '@/components/mutation-signal'
 
 /**
  * If the DOM wrapped by Tina contains an element with a

@@ -1,7 +1,1 @@
-/**
-
-
-
-*/
-
-export { withPlugins, withPlugin } from '../packages/react-core'
+export { withPlugins, withPlugin } from '@/react-core'

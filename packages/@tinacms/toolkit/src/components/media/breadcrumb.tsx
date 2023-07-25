@@ -1,12 +1,6 @@
-/**
-
-
-
-*/
-
 import React from 'react'
-import { LeftArrowIcon } from '../../packages/icons'
-import { IconButton } from '../../packages/styles'
+import { LeftArrowIcon } from '@/icons'
+import { IconButton } from '@/styles'
 
 // Fixed issue where dirname was being used in the frontend
 function dirname(path): string | undefined {

@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 import React from 'react'
 import { useEffect, useState } from 'react'
 import { useCMS } from '../../react-tinacms/use-cms'
@@ -17,23 +11,18 @@ import {
   BiListUl,
   BiX,
 } from 'react-icons/bi'
-import { Modal, ModalBody, FullscreenModal } from '../../packages/react-modals'
+import { Modal, ModalBody, FullscreenModal } from '@/react-modals'
 import { BiFile } from 'react-icons/bi'
-import {
-  MediaList,
-  Media,
-  MediaListOffset,
-  MediaListError,
-} from '../../packages/core'
-import { Button, IconButton } from '../../packages/styles'
+import { MediaList, Media, MediaListOffset, MediaListError } from '@/core'
+import { Button, IconButton } from '@/styles'
 import * as dropzone from 'react-dropzone'
 import type { FileError } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
-import { LoadingDots } from '../../packages/form-builder'
+import { LoadingDots } from '@/form-builder'
 import { IoMdRefresh } from 'react-icons/io'
-import { CloseIcon, TrashIcon } from '../../packages/icons'
+import { CloseIcon, TrashIcon } from '@/icons'
 import {
   absoluteImgURL,
   DEFAULT_MEDIA_UPLOAD_TYPES,

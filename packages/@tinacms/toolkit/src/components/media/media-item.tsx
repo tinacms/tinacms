@@ -1,10 +1,5 @@
-/**
-
-
-
-*/
 import React from 'react'
-import { Media } from '../../packages/core'
+import { Media } from '@/core'
 import { BiFolder, BiFile } from 'react-icons/bi'
 import { isImage } from './utils'
 

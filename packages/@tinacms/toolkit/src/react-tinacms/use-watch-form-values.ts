@@ -1,7 +1,1 @@
-/**
-
-
-
-*/
-
-export { useWatchFormValues } from '../packages/react-core'
+export { useWatchFormValues } from '@/react-core'

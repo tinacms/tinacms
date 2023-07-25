@@ -1,7 +1,1 @@
-/**
-
-
-
-*/
-
-export { usePlugins, usePlugin } from '../packages/react-core'
+export { usePlugins, usePlugin } from '@/react-core'

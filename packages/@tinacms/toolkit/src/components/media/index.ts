@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 export * from './media-manager'
 export { ListMediaItem, GridMediaItem } from './media-item'
 export { Breadcrumb } from './breadcrumb'

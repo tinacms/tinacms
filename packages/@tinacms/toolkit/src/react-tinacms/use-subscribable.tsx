@@ -1,7 +1,1 @@
-/**
-
-
-
-*/
-
-export { useSubscribable } from '../packages/react-core'
+export { useSubscribable } from '@/react-core'
