@@ -48,7 +48,11 @@ async function listFilesRecursively({
     config.publicFolder,
     directoryPath
   )
-  const items = await fs.promises.readdir(fullDirectoryPath)
+  const exists = await fs.pathExists(fullDirectoryPath)
+  if (!exists) {
+    return { '0': [] }
+  }
+  const items = await fs.readdir(fullDirectoryPath)
 
   const staticMediaItems: StaticMediaItem[] = []
 

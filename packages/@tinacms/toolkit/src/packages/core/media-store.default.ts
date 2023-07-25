@@ -71,8 +71,7 @@ export class TinaMediaStore implements MediaStore {
 
   constructor(cms: CMS, staticMedia?: StaticMedia) {
     this.cms = cms
-    // if (staticMedia && staticMedia.length) {
-    if (staticMedia) {
+    if (staticMedia && Object.keys(staticMedia).length > 0) {
       this.isStatic = true
       this.staticMedia = staticMedia
     }
