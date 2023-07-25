@@ -35,7 +35,7 @@ export default nextApiHandler;
 import { NextApiHandler } from 'next'
 import databaseClient from '../../tina/__generated__/databaseClient'
 import { withNextAuthApiRoute } from 'tinacms-next-auth/dist/index'
-import { authOptions } from '../../tina/nextauth'
+import { authOptions } from '../../tina/auth'
 
 const nextApiHandler: NextApiHandler = async (req, res) => {
   const { query, variables } = req.body
