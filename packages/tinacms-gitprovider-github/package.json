@@ -1,5 +1,5 @@
 {
-  "name": "tinacms-provider-github",
+  "name": "tinacms-gitprovider-github",
   "version": "0.0.1",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

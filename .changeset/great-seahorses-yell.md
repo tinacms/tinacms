@@ -3,13 +3,14 @@
 '@tinacms/self-hosted-starter': patch
 '@tinacms/graphql': patch
 '@tinacms/cli': patch
+'tinacms-gitprovider-github': patch
 ---
 
 ## Changes
 - deprecate onPut, onDelete and the level args to `createDatabase`
 - adds `databaseAdapter` instead of `level`
 - adds `gitProvider` instead of onPut and onDelete. 
-- adds `GitHubProvider` to  `@tinacms/datalayer`
+- creates a packages called `tinacms-gitprovider-github` that exports the `GitHubProvider` class
 - adds `gitProvider` to interface to `@tinacms/graphql`
 - adds the generated database client
 

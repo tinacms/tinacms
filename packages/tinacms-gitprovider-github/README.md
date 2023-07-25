@@ -3,7 +3,7 @@ he Github Git Provider handles saving and deleting content to github. It can be 
 ## Adding the Github Git Provider
 
 ```ts
-import { GithubProvider } from 'tinacms-provider-github'
+import { GithubProvider } from 'tinacms-gitprovider-github'
 // database.{ts,js}
 //...
 
