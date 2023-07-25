@@ -21,8 +21,17 @@ export function extendNextScripts(
 ) {
   return {
     ...scripts,
-    dev: generateGqlScript(scripts?.dev || 'next dev', opts),
-    build: `tinacms build && ${scripts?.build || 'next build'}`,
-    start: `tinacms build && ${scripts?.start || 'next start'}`,
+    dev:
+      !scripts?.dev || scripts?.dev?.indexOf('tinacms dev -c') === -1
+        ? generateGqlScript(scripts?.dev || 'next dev', opts)
+        : scripts?.dev,
+    build:
+      !scripts?.build || !scripts?.build?.startsWith('tinacms build &&')
+        ? `tinacms build && ${scripts?.build || 'next build'}`
+        : scripts?.build,
+    start:
+      !scripts?.start || !scripts?.start?.startsWith('tinacms build &&')
+        ? `tinacms build && ${scripts?.start || 'next start'}`
+        : scripts?.start,
   }
 }
