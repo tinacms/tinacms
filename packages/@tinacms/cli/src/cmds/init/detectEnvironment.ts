@@ -84,7 +84,7 @@ async function detectNextGlobalStyles(baseDir: string, usingSrc: boolean) {
     }
     if (stylesPath) {
       if (stylesPath.startsWith('@')) {
-        stylesPath = stylesPath.replace('@', baseDir)
+        stylesPath = path.join(baseDir, stylesPath.replace('@/', ''))
       } else {
         stylesPath = path.join(path.dirname(pathToApp), stylesPath)
       }
