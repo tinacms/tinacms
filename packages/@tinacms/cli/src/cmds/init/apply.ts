@@ -349,13 +349,13 @@ const writeGeneratedFile = async ({
   const { exists, path, parentPath } = generatedFile.resolve(typescript)
   if (exists) {
     if (overwrite) {
-      logger.info(logText(`Overwriting file at ${path}.`))
+      logger.info(`Overwriting file at ${path}... ✅`)
       await fs.outputFileSync(path, content)
     } else {
       logger.info(logText(`Not overwriting file at ${path}.`))
     }
   } else {
-    logger.info(logText(`Adding file at ${path}`))
+    logger.info('Adding file at ${path}... ✅')
     await fs.ensureDir(parentPath)
     await fs.outputFileSync(path, content)
   }
