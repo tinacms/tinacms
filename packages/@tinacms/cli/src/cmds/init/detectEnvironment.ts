@@ -71,6 +71,7 @@ async function detectNextGlobalStyles(baseDir: string, usingSrc: boolean) {
     pathToApp = ''
   }
   if (pathToApp) {
+    console.log('pathToApp', pathToApp)
     // read lines from file into array of strings
     const lines = (await fs.readFile(pathToApp, 'utf8')).split('\n')
     let stylesPath = ''
@@ -83,15 +84,11 @@ async function detectNextGlobalStyles(baseDir: string, usingSrc: boolean) {
     }
     if (stylesPath) {
       if (stylesPath.startsWith('@')) {
-        // scoped modules
-        stylesPath = path.join(
-          path.dirname(pathToApp),
-          stylesPath.replace('@', '')
-        )
         stylesPath = stylesPath.replace('@', baseDir)
       } else {
         stylesPath = path.join(path.dirname(pathToApp), stylesPath)
       }
+      console.log('stylesPath', stylesPath)
       pathToGlobalStyles = stylesPath
 
       // compute path to styles file
