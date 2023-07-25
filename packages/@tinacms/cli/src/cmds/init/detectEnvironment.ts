@@ -201,6 +201,8 @@ const detectEnvironment = async ({
   const hasEnvTina =
     hasGitIgnore &&
     (await checkGitignoreForItem({ baseDir, line: '.env.tina' }))
+  const hasGitIgnoreEnv =
+    hasGitIgnore && (await checkGitignoreForItem({ baseDir, line: '.env' }))
   let frontMatterFormat
   if (hasForestryConfig) {
     const hugoConfigPath = path.join(rootPath, 'config.toml')
@@ -214,6 +216,7 @@ const detectEnvironment = async ({
     frontMatterFormat,
     gitIgnoreExists: hasGitIgnore,
     gitIgoreNodeModulesExists: hasGitIgnoreNodeModules,
+    gitIgnoreEnvExists: hasGitIgnoreEnv,
     gitIgnoreTinaEnvExists: hasEnvTina,
     globalStylesHasTailwind,
     globalStylesPath: pathToGlobalStyles,

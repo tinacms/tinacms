@@ -96,6 +96,9 @@ async function apply({
     if (!env.gitIgnoreTinaEnvExists) {
       itemsToAdd.push('.env.tina')
     }
+    if (!env.gitIgnoreEnvExists) {
+      itemsToAdd.push('.env')
+    }
     if (itemsToAdd.length > 0) {
       await updateGitIgnore({ baseDir, items: itemsToAdd })
     }

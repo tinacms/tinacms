@@ -39,6 +39,7 @@ export type InitEnvironment = {
   gitIgnoreExists: boolean
   gitIgoreNodeModulesExists: boolean
   gitIgnoreTinaEnvExists: boolean
+  gitIgnoreEnvExists: boolean
   packageJSONExists: boolean
   sampleContentExists: boolean
   sampleContentPath: string
