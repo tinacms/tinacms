@@ -40,8 +40,21 @@ export class DummyMediaStore implements MediaStore {
   }
 }
 
-export type StaticMediaItem = Media & {
-  children?: StaticMediaItem[]
+interface StaticMediaItem {
+  id: string
+  filename: string
+  src: string
+  directory: string
+  thumbnails: {
+    '75x75': string
+    '400x400': string
+    '1000x1000': string
+  }
+  type: 'file' | 'dir'
+  children?: StaticMedia
+}
+export interface StaticMedia {
+  [offset: string]: StaticMediaItem[]
 }
 
 export class TinaMediaStore implements MediaStore {
@@ -53,14 +66,15 @@ export class TinaMediaStore implements MediaStore {
   private cms: CMS
   private isLocal: boolean
   private url: string
-  private staticMedia: StaticMediaItem[]
+  private staticMedia: StaticMedia
   isStatic?: boolean
 
-  constructor(cms: CMS, staticMedia?: StaticMediaItem[]) {
+  constructor(cms: CMS, staticMedia?: StaticMedia) {
     this.cms = cms
-    if (staticMedia && staticMedia.length) {
+    // if (staticMedia && staticMedia.length) {
+    if (staticMedia) {
       this.isStatic = true
-      this.staticMedia = staticMedia || []
+      this.staticMedia = staticMedia
     }
   }
 
@@ -322,23 +336,37 @@ export class TinaMediaStore implements MediaStore {
     }
 
     if (this.staticMedia) {
+      const offset = options.offset || 0
+      const media = this.staticMedia[String(offset)]
+      let hasMore = false
+      if (this.staticMedia[String(Number(offset) + 20)]) {
+        hasMore = true
+      }
       if (options.directory) {
         let depth = 0
         const pathToDirectory = options.directory.split('/')
-        let currentFolder = this.staticMedia
+        let currentFolder = media
+        let hasMore = false
         while (depth < pathToDirectory.length) {
           const nextFolder = currentFolder.find(
             (item) =>
               item.type === 'dir' && item.filename === pathToDirectory[depth]
           )
           if (nextFolder) {
-            currentFolder = nextFolder.children
+            const offset = options.offset || 0
+            currentFolder = nextFolder.children[String(offset)]
+            if (nextFolder.children[String(Number(offset) + 20)]) {
+              hasMore = true
+            }
           }
           depth++
         }
-        return { items: currentFolder, nextOffset: 0 }
+        return {
+          items: currentFolder,
+          nextOffset: hasMore ? Number(offset) + 20 : null,
+        }
       }
-      return { items: this.staticMedia, nextOffset: 0 }
+      return { items: media, nextOffset: hasMore ? Number(offset) + 20 : null }
     }
     return {
       items,

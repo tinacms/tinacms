@@ -14,7 +14,7 @@ export type {
   MediaStore,
   MediaListOptions,
   MediaList,
-  StaticMediaItem,
+  StaticMedia,
 } from './packages/core'
 export { MdxFieldPluginExtendible } from './packages/fields/plugins/MdxFieldPlugin'
 export {

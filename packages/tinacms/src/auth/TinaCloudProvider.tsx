@@ -14,7 +14,7 @@ import {
   useLocalStorage,
   DummyMediaStore,
   TinaMediaStore,
-  StaticMediaItem,
+  StaticMedia,
 } from '@tinacms/toolkit'
 
 import {
@@ -154,7 +154,7 @@ export const TinaCloudProvider = (
   props: TinaCloudAuthWallProps &
     CreateClientProps & {
       cmsCallback?: (cms: TinaCMS) => TinaCMS
-      staticMedia: StaticMediaItem[]
+      staticMedia: StaticMedia
     }
 ) => {
   const baseBranch = props.branch || 'main'
@@ -208,7 +208,7 @@ export const TinaCloudProvider = (
     cms.registerApi('admin', new TinaAdminApi(cms))
   }
 
-  const setupMedia = async (staticMedia: StaticMediaItem[]) => {
+  const setupMedia = async (staticMedia: StaticMedia) => {
     const hasTinaMedia = Boolean(props.schema.config?.media?.tina)
 
     /*

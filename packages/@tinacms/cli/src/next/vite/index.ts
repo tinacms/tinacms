@@ -28,7 +28,10 @@ interface StaticMediaItem {
     '1000x1000': string
   }
   type: 'file' | 'dir'
-  children?: StaticMediaItem[]
+  children?: StaticMedia
+}
+export interface StaticMedia {
+  [offset: string]: StaticMediaItem[]
 }
 
 async function listFilesRecursively({
@@ -39,7 +42,7 @@ async function listFilesRecursively({
   directoryPath: string
   config: { publicFolder: string; mediaRoot: string }
   roothPath: string
-}): Promise<StaticMediaItem[]> {
+}): Promise<StaticMedia> {
   const fullDirectoryPath = path.join(
     roothPath,
     config.publicFolder,
@@ -47,14 +50,13 @@ async function listFilesRecursively({
   )
   const items = await fs.promises.readdir(fullDirectoryPath)
 
-  const fileInfos: StaticMediaItem[] = []
-  const fileInfos2: StaticMediaItem[] = []
+  const staticMediaItems: StaticMediaItem[] = []
 
   for (const item of items) {
     const itemPath = path.join(fullDirectoryPath, item)
     const stats = await fs.promises.lstat(itemPath)
 
-    const fileInfo: StaticMediaItem = {
+    const staticMediaItem: StaticMediaItem = {
       id: item,
       filename: item,
       type: stats.isDirectory() ? 'dir' : 'file',
@@ -68,18 +70,28 @@ async function listFilesRecursively({
     }
 
     if (stats.isDirectory()) {
-      fileInfo.children = await listFilesRecursively({
+      staticMediaItem.children = await listFilesRecursively({
         directoryPath: path.join(directoryPath, item),
         config,
         roothPath,
       })
-      fileInfos2.push(fileInfo)
-    } else {
-      fileInfos.push(fileInfo)
     }
+    staticMediaItems.push(staticMediaItem)
   }
+  function chunkArrayIntoObject<T>(
+    array: T[],
+    chunkSize: number
+  ): { [key: string]: T[] } {
+    const result: { [key: string]: T[] } = {}
 
-  return [...fileInfos, ...fileInfos2]
+    for (let i = 0; i < array.length; i += chunkSize) {
+      const chunkKey = `${(i / chunkSize) * 20}`
+      result[chunkKey] = array.slice(i, i + chunkSize)
+    }
+
+    return result
+  }
+  return chunkArrayIntoObject(staticMediaItems, 20)
 }
 
 export const createConfig = async ({
