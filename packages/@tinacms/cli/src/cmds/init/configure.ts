@@ -62,7 +62,7 @@ async function configure(
         name: `overwrite${configName}JS`,
         type: (_, answers) =>
           !answers.typescript && condition(answers) ? 'confirm' : null,
-        message: `Found existing file at ${generatedFile.fullPathJS}. Would you like to override?`,
+        message: `Found existing file at ${generatedFile.fullPathJS}. Would you like to overwrite?`,
       })
     }
     if (generatedFile.typescriptExists) {
@@ -70,7 +70,7 @@ async function configure(
         name: `overwrite${configName}TS`,
         type: (_, answers) =>
           answers.typescript && condition(answers) ? 'confirm' : null,
-        message: `Found existing file at ${generatedFile.fullPathTS}. Would you like to override?`,
+        message: `Found existing file at ${generatedFile.fullPathTS}. Would you like to overwrite?`,
       })
     }
     return results
@@ -159,7 +159,7 @@ async function configure(
               ? 'confirm'
               : null
             : null,
-        message: `Found existing file at ${env.generatedFiles['templates'].javascriptExists}. Would you like to override?`,
+        message: `Found existing file at ${env.generatedFiles['templates'].javascriptExists}. Would you like to overwrite?`,
       },
       {
         name: 'overwriteTemplatesTS',
@@ -169,7 +169,7 @@ async function configure(
               ? 'confirm'
               : null
             : null,
-        message: `Found existing file at ${env.generatedFiles['templates'].fullPathTS}. Would you like to override?`,
+        message: `Found existing file at ${env.generatedFiles['templates'].fullPathTS}. Would you like to overwrite?`,
       },
       {
         name: 'dataLayer',
@@ -396,7 +396,7 @@ async function configure(
       {
         name: 'overwriteSampleContent',
         type: (_) => (env.sampleContentExists ? 'confirm' : null),
-        message: `Found existing file at ${env.sampleContentPath}. Would you like to override?`,
+        message: `Found existing file at ${env.sampleContentPath}. Would you like to overwrite?`,
       },
     ],
     promptOptions
