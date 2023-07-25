@@ -1,6 +1,6 @@
 he Github Git Provider handles saving and deleting content to github. It can be used as a prop to the `createDatabase` function.
 
-## Adding the Github Git Provider
+## Adding the GitHub Git Provider
 
 ```ts
 import { GithubProvider } from 'tinacms-gitprovider-github'
