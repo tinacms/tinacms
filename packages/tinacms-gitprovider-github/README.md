@@ -1,4 +1,4 @@
-he Github Git Provider handles saving and deleting content to github. It can be used as a prop to the `createDatabase` function.
+The Github Git Provider handles saving and deleting content to GitHub. It can be used as a prop to the `createDatabase` function.
 
 ## Adding the GitHub Git Provider
 
