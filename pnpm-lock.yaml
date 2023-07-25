@@ -1073,8 +1073,6 @@ importers:
       slate-history: 0.93.0_slate@0.94.1
       slate-hyperscript: 0.77.0_slate@0.94.1
       slate-react: 0.97.1_ceyajmovvfljjbz2h2ik5qmoja
-      tsc-alias: 1.8.7
-      vite: 4.3.9
       webfontloader: 1.6.28
     devDependencies:
       '@testing-library/dom': 7.31.2
@@ -1098,8 +1096,10 @@ importers:
       happy-dom: 10.5.2
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
+      tsc-alias: 1.8.7
       tslib: 2.4.0
       typescript: 4.3.5
+      vite: 4.3.9
       vitest: 0.32.2_happy-dom@10.5.2
 
   packages/@tinacms/vercel-previews:
@@ -16301,7 +16301,7 @@ packages:
         integrity: sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==,
       }
     engines: { node: ^12.20.0 || >=14 }
-    dev: false
+    dev: true
 
   /commist/1.1.0:
     resolution:
@@ -24440,7 +24440,7 @@ packages:
         integrity: sha512-+MrqnJRtxdF+xngFfUUkIMQrUUL0KsxbADUkn23Z/4ibGg192Q+z+CQyiYwvWTsYjJygmMR8+w3ZDa98Zh6ESg==,
       }
     engines: { node: '>=12.0.0' }
-    dev: false
+    dev: true
 
   /mz/2.7.0:
     resolution:
@@ -25510,7 +25510,7 @@ packages:
       }
     dependencies:
       queue-lit: 1.5.0
-    dev: false
+    dev: true
 
   /popmotion/11.0.3:
     resolution:
@@ -26251,7 +26251,7 @@ packages:
       {
         integrity: sha512-IslToJ4eiCEE9xwMzq3viOO5nH8sUWUCwoElrhNMozzr9IIt2qqvB4I+uHu/zJTQVqc9R5DFwok4ijNK1pU3fA==,
       }
-    dev: false
+    dev: true
 
   /queue-microtask/1.2.3:
     resolution:
@@ -29090,7 +29090,7 @@ packages:
       mylas: 2.1.13
       normalize-path: 3.0.0
       plimit-lit: 1.5.0
-    dev: false
+    dev: true
 
   /tsconfig-paths/3.14.1:
     resolution:
