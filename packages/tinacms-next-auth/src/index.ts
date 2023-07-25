@@ -12,23 +12,28 @@ const withNextAuthApiRoute = (
 ) => {
   return async (req, res) => {
     if (opts?.isLocalDevelopment) {
-      Object.defineProperty(req, 'session', {
-        value: {
-          user: {
-            name: 'local',
+      if (!req.session?.user?.name) {
+        Object.defineProperty(req, 'session', {
+          value: {
+            user: {
+              name: 'local',
+            },
           },
-        },
-        writable: false,
-      })
-    }
-    const session = await getServerSession(req, res, opts?.authOptions)
-    Object.defineProperty(req, 'session', {
-      value: session,
-      writable: false,
-    })
+          writable: false,
+        })
+      }
+    } else {
+      const session = await getServerSession(req, res, opts?.authOptions)
+      if (!req.session) {
+        Object.defineProperty(req, 'session', {
+          value: session,
+          writable: false,
+        })
+      }
 
-    if (!session?.user?.name) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      if (!session?.user?.name) {
+        return res.status(401).json({ error: 'Unauthorized' })
+      }
     }
 
     return handler(req, res)
