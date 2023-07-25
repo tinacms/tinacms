@@ -15,7 +15,7 @@ import { useWindowWidth } from '@react-hook/window-size'
 import { useGetCollections } from './GetCollections'
 import { IoMdClose } from 'react-icons/io'
 import { BiMenu } from 'react-icons/bi'
-import { CloudConfigPlugin } from '@tinacms/toolkit/dist/react-cloud-config'
+import { CloudConfigPlugin } from '@tinacms/toolkit'
 
 export const slugify = (text) => {
   return text

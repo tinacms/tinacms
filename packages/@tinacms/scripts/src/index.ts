@@ -593,7 +593,8 @@ export const buildIt = async (entryPoint, packageJSON) => {
     ],
     resolve: {
       alias: {
-        '@': path.resolve(process.cwd(), 'src'),
+        '@toolkit': path.resolve(process.cwd(), 'src/toolkit'),
+        '@tinacms/toolkit': path.resolve(process.cwd(), 'src/toolkit/index.ts'),
       },
     },
     build: {
