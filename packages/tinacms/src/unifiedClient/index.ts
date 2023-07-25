@@ -39,7 +39,6 @@ export class TinaClient<GenQueries> {
   public async request<DataType extends Record<string, any> = any>(
     args: TinaClientRequestArgs
   ): Promise<{ data: DataType; query: string }> {
-    const data: DataType = {} as DataType
     const headers = new Headers()
     if (this.readonlyToken) {
       headers.append('X-API-KEY', this.readonlyToken)

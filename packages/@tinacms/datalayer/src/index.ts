@@ -2,17 +2,18 @@
 export type {
   Bridge,
   // User facing
-  CreateDatabase,
   OnPutCallback,
   OnDeleteCallback,
   Database,
+  GitProvider,
 } from '@tinacms/graphql'
 export {
   FilesystemBridge,
   AuditFileSystemBridge,
   IsomorphicBridge,
   // Users facing
-  createDatabase,
   TinaLevelClient,
   resolve,
+  createDatabase,
+  createLocalDatabase,
 } from '@tinacms/graphql'

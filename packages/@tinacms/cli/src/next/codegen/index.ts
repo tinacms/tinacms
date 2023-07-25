@@ -121,6 +121,9 @@ export class Codegen {
     await maybeWarnFragmentSize(this.configManager.generatedFragmentsFilePath)
 
     const { clientString } = await this.genClient()
+    const databaseClientString = this.configManager.hasSelfHostedConfig
+      ? await this.genDatabaseClient()
+      : ''
     const { codeString, schemaString } = await this.genTypes()
 
     await fs.outputFile(
@@ -136,6 +139,12 @@ export class Codegen {
         this.configManager.generatedClientTSFilePath,
         clientString
       )
+      if (this.configManager.hasSelfHostedConfig) {
+        await fs.outputFile(
+          this.configManager.generatedDatabaseClientTSFilePath,
+          databaseClientString
+        )
+      }
       await unlinkIfExists(this.configManager.generatedClientJSFilePath)
       await unlinkIfExists(this.configManager.generatedTypesDFilePath)
       await unlinkIfExists(this.configManager.generatedTypesJSFilePath)
@@ -153,6 +162,12 @@ export class Codegen {
         this.configManager.generatedClientJSFilePath,
         clientString
       )
+      if (this.configManager.hasSelfHostedConfig) {
+        await fs.outputFile(
+          this.configManager.generatedClientJSFilePath,
+          databaseClientString
+        )
+      }
       await unlinkIfExists(this.configManager.generatedTypesTSFilePath)
       await unlinkIfExists(this.configManager.generatedClientTSFilePath)
     }
@@ -202,6 +217,50 @@ export class Codegen {
     if (!this.apiURL)
       throw new Error('apiURL not set. Please run execute() first')
     return this.apiURL
+  }
+
+  async genDatabaseClient() {
+    return ` import { resolve } from "@tinacms/datalayer";
+import type { TinaClient } from "tinacms/dist/client";
+
+import { queries } from "./types";
+import database from "../database";
+
+export async function databaseRequest({ query, variables }) {
+  const result = await resolve({
+    config: {
+      useRelativeMedia: true,
+    },
+    database,
+    query,
+    variables,
+    verbose: true,
+  });
+
+  return result;
+}
+
+function createDatabaseClient<GenQueries = Record<string, unknown>>({
+  queries,
+}: {
+  queries: (client: {
+    request: TinaClient<GenQueries>["request"];
+  }) => GenQueries;
+}) {
+  const request = async ({ query, variables }) => {
+    const data = await databaseRequest({ query, variables });
+    return { data: data.data as any, query, variables, errors: data.errors };
+  };
+  const q = queries({
+    request,
+  });
+  return { queries: q, request };
+}
+
+export const databaseClient = createDatabaseClient({ queries });
+
+export default databaseClient;
+`
   }
 
   async genClient() {

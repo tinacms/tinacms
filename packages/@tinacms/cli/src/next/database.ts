@@ -1,5 +1,5 @@
 import {
-  createDatabase,
+  createDatabaseInternal,
   FilesystemBridge,
   Database,
   TinaLevelClient,
@@ -68,7 +68,7 @@ export async function createAndInitializeDatabase(
     }
     const level = new TinaLevelClient(datalayerPort)
     level.openConnection()
-    database = createDatabase({
+    database = createDatabaseInternal({
       bridge,
       level,
       tinaDirectory: configManager.isUsingLegacyFolder

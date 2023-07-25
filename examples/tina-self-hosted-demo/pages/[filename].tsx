@@ -1,7 +1,7 @@
 import { Blocks } from '../components/blocks-renderer'
 import { useTina } from 'tinacms/dist/react'
 import { Layout } from '../components/layout'
-import { dbConnection } from '../lib/databaseConnection'
+import databaseClient from '../tina/__generated__/databaseClient'
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>['props']
@@ -19,7 +19,7 @@ export default function HomePage(
 }
 
 export const getStaticProps = async ({ params }) => {
-  const tinaProps = await dbConnection.queries.contentQuery({
+  const tinaProps = await databaseClient.queries.contentQuery({
     relativePath: `${params.filename}.md`,
   })
   return {
@@ -32,7 +32,7 @@ export const getStaticProps = async ({ params }) => {
 }
 
 export const getStaticPaths = async () => {
-  const pagesListData = await dbConnection.queries.pageConnection()
+  const pagesListData = await databaseClient.queries.pageConnection()
   return {
     paths: pagesListData.data.pageConnection.edges.map((page) => ({
       params: { filename: page.node._sys.filename },
