@@ -28,9 +28,7 @@
     "test": "jest --passWithNoTests"
   },
   "dependencies": {
-    "@octokit/rest": "^19.0.7",
-    "@tinacms/graphql": "workspace:*",
-    "js-base64": "^3.7.4"
+    "@tinacms/graphql": "workspace:*"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
