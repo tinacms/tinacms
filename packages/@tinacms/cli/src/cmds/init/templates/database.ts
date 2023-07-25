@@ -37,9 +37,9 @@ export default isLocal
   ? createLocalDatabase()
   : createDatabase({
       gitProvider: new GitHubProvider({
-        repo: process.env.GITHUB_REPO || process.env.VERCEL_GIT_REPO_SLUG,
-        owner: process.env.GITHUB_OWNER || process.env.VERCEL_GIT_REPO_OWNER,
-        token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+        repo: process.env.GITHUB_REPO || process.env.VERCEL_GIT_REPO_SLUG || 'missing-repo',
+        owner: process.env.GITHUB_OWNER || process.env.VERCEL_GIT_REPO_OWNER || 'missing-owner',
+        token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN || 'missing-token',
         branch,
       }),
       databaseAdapter: new RedisLevel<string, Record<string, any>>({

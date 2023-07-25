@@ -127,7 +127,7 @@ export const configExamples: {
   const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || 'main'
   ${
     (args.isLocalEnvVarName &&
-      `const isLocal = process.env.${args.isLocalEnvVarName}`) ||
+      `const isLocal = process.env.${args.isLocalEnvVarName} === 'true' || false`) ||
     ''
   }
 
