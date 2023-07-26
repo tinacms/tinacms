@@ -141,6 +141,8 @@ const detectEnvironment = async ({
       }
     ),
   }
+
+  const cliVersion = version
   const tagVersion = version?.startsWith('0.0.0') ? version : ''
   const hasSampleContent = await fs.pathExists(sampleContentPath)
   const hasPackageJSON = await fs.pathExists('package.json')
@@ -162,6 +164,7 @@ const detectEnvironment = async ({
     }
   }
   const env = {
+    cliVersion,
     forestryConfigExists: hasForestryConfig,
     frontMatterFormat,
     gitIgnoreExists: hasGitIgnore,

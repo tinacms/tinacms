@@ -33,6 +33,7 @@ export type GeneratedFile = {
 }
 
 export type InitEnvironment = {
+  cliVersion: string
   forestryConfigExists: boolean
   frontMatterFormat: 'yaml' | 'toml' | 'json'
   gitIgnoreExists: boolean
