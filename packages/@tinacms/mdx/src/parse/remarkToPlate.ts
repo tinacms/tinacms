@@ -526,5 +526,22 @@ const sanitizeUrl = (url: string | undefined) => {
     return ''
   }
 
-  return parsedUrl.href
+  /**
+   * Trailing slash is added from new URL(...) for urls with no pathname,
+   * if the passed in url had one, keep it there, else just use the origin
+   * eg:
+   *
+   * http://example.com/ -> http://example.com/
+   * http://example.com -> http://example.com
+   * http://example.com/a/b -> http://example.com/a/b
+   * http://example.com/a/b/ -> http://example.com/a/b/
+   */
+  if (parsedUrl.pathname === '/') {
+    if (url.endsWith('/')) {
+      return parsedUrl.href
+    }
+    return parsedUrl.origin
+  } else {
+    return parsedUrl.href
+  }
 }
