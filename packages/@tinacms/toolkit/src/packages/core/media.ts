@@ -113,7 +113,7 @@ export interface MediaList {
  * ```
  */
 export class MediaManager implements MediaStore {
-  private _pageSize: number = 20
+  private _pageSize: number = 36
 
   constructor(public store: MediaStore, private events: EventBus) {}
 
