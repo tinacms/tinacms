@@ -287,10 +287,11 @@ const addDependencies = async (
   config: Record<any, any>,
   env: InitEnvironment
 ) => {
+  const tagVersion = env.tagVersion ? `@${env.tagVersion}` : ''
   const { dataLayer, dataLayerAdapter, nextAuth, packageManager } = config
   logger.info(logText('Adding dependencies, this might take a moment...'))
-  const deps = ['tinacms', '@tinacms/cli']
-  const devDeps = []
+  let deps = [`tinacms`, '@tinacms/cli']
+  let devDeps = []
   if (nextAuth) {
     deps.push('tinacms-next-auth', 'next-auth')
   }
@@ -301,6 +302,16 @@ const addDependencies = async (
   if (dataLayerAdapter === 'upstash-redis') {
     deps.push('upstash-redis-level')
     deps.push('@upstash/redis')
+  }
+
+  // add tag version if this is a pr tagged version
+  if (tagVersion) {
+    deps = deps.map((dep) =>
+      dep.indexOf('tina') >= 0 ? `${dep}${tagVersion}` : dep
+    )
+    devDeps = devDeps.map((dep) =>
+      dep.indexOf('tina') >= 0 ? `${dep}${tagVersion}` : dep
+    )
   }
 
   // dependencies

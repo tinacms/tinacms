@@ -46,6 +46,7 @@ export type InitEnvironment = {
   generatedFiles?: {
     [key in GeneratedFileType]: GeneratedFile
   }
+  tagVersion?: string
   usingSrc: boolean
 }
 
