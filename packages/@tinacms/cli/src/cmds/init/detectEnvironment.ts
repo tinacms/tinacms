@@ -64,15 +64,13 @@ const detectEnvironment = async ({
   pathToForestryConfig,
   rootPath,
   debug = false,
-  args,
 }: {
   baseDir?: string
   pathToForestryConfig: string
   rootPath: string
   debug?: boolean
-  args?: string[]
+  tinaVersion?: string
 }): Promise<InitEnvironment> => {
-  console.log(args)
   if (fs.pathExistsSync('.env.tina')) {
     dotenv.config({ path: '.env.tina' })
   }
@@ -144,20 +142,6 @@ const detectEnvironment = async ({
     ),
   }
 
-  let cliVersion
-  let tagVersion
-  for (const arg of args || []) {
-    console.log({ arg })
-    if (arg.startsWith('@tinacms/cli@')) {
-      cliVersion = arg.split('@')[2]
-      console.log({ cliVersion })
-      if (cliVersion.startsWith('0.0.0')) {
-        tagVersion = cliVersion
-      }
-      break
-    }
-  }
-
   const hasSampleContent = await fs.pathExists(sampleContentPath)
   const hasPackageJSON = await fs.pathExists('package.json')
   const hasGitIgnore = await fs.pathExists(path.join('.gitignore'))
@@ -178,7 +162,6 @@ const detectEnvironment = async ({
     }
   }
   const env = {
-    cliVersion,
     forestryConfigExists: hasForestryConfig,
     frontMatterFormat,
     gitIgnoreExists: hasGitIgnore,
@@ -190,7 +173,6 @@ const detectEnvironment = async ({
     sampleContentExists: hasSampleContent,
     sampleContentPath,
     generatedFiles,
-    tagVersion,
     usingSrc,
   }
   if (debug) {

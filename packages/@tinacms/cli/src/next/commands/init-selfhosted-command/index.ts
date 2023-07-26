@@ -18,6 +18,9 @@ export class InitSelfHostedCommand extends Command {
   debug = Option.Boolean('--debug', false, {
     description: 'Enable debug logging',
   })
+  tinaVersion = Option.String('--tinaVersion', {
+    description: 'Specify a version for tina dependencies',
+  })
   static usage = Command.Usage({
     category: `Commands`,
     description: `Add Tina to an existing project`,
@@ -37,7 +40,7 @@ export class InitSelfHostedCommand extends Command {
       noTelemetry: this.noTelemetry,
       showSelfHosted: true,
       debug: this.debug,
-      args: process.argv,
+      tinaVersion: this.tinaVersion,
     })
     process.exit()
   }

@@ -194,7 +194,7 @@ async function apply({
     })
   }
 
-  await addDependencies(config, env)
+  await addDependencies(config, env, params)
 
   logNextSteps({
     packageManager: config.packageManager,
@@ -285,9 +285,10 @@ const updateGitIgnore = async ({
 }
 const addDependencies = async (
   config: Record<any, any>,
-  env: InitEnvironment
+  env: InitEnvironment,
+  params: InitParams
 ) => {
-  const tagVersion = env.tagVersion ? `@${env.tagVersion}` : ''
+  const tagVersion = params.tinaVersion ? `@${params.tinaVersion}` : ''
   const { dataLayer, dataLayerAdapter, nextAuth, packageManager } = config
   logger.info(logText('Adding dependencies, this might take a moment...'))
   let deps = [`tinacms`, '@tinacms/cli']

@@ -18,6 +18,9 @@ export class InitCommand extends Command {
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
   })
+  tinaVersion = Option.String('--tinaVersion', {
+    description: 'Specify a version for tina dependencies',
+  })
   static usage = Command.Usage({
     category: `Commands`,
     description: `Add Tina to an existing project`,
@@ -36,7 +39,7 @@ export class InitCommand extends Command {
       pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,
       debug: this.debug,
-      args: process.argv,
+      tinaVersion: this.tinaVersion,
     })
     process.exit()
   }

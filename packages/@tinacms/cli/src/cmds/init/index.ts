@@ -33,7 +33,6 @@ export type GeneratedFile = {
 }
 
 export type InitEnvironment = {
-  cliVersion: string
   forestryConfigExists: boolean
   frontMatterFormat: 'yaml' | 'toml' | 'json'
   gitIgnoreExists: boolean
@@ -47,7 +46,6 @@ export type InitEnvironment = {
   generatedFiles?: {
     [key in GeneratedFileType]: GeneratedFile
   }
-  tagVersion?: string
   usingSrc: boolean
 }
 
@@ -58,7 +56,7 @@ export type InitParams = {
   showSelfHosted?: boolean
   baseDir?: string
   debug?: boolean
-  args?: string[]
+  tinaVersion?: string
 }
 
 export const command = new CLICommand<InitEnvironment, InitParams>({
@@ -71,14 +69,14 @@ export const command = new CLICommand<InitEnvironment, InitParams>({
     pathToForestryConfig,
     baseDir = '',
     debug = false,
-    args,
+    tinaVersion,
   }: InitParams): Promise<InitEnvironment> {
     return detectEnvironment({
       baseDir,
       pathToForestryConfig,
       rootPath,
       debug,
-      args,
+      tinaVersion,
     })
   },
   configure(
