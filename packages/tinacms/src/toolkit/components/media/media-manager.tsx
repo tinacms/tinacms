@@ -571,12 +571,13 @@ const UploadButton = ({ onClick, uploading }: any) => {
 }
 
 const LoadingMediaList = (props) => {
+  const { extraText, ...rest } = props
   return (
     <div
       className="w-full h-full flex flex-col items-center justify-center"
-      {...props}
+      {...rest}
     >
-      {props.extraText && <p>{props.extraText}</p>}
+      {extraText && <p>{props}</p>}
       <LoadingDots color={'var(--tina-color-primary)'} />
     </div>
   )

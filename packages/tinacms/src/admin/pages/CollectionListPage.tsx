@@ -539,7 +539,7 @@ const CollectionListPage = () => {
                         {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
-                              {folder.name && !search && (
+                              {folder.name && !search ? (
                                 <tr>
                                   <td colSpan={5}>
                                     <Breadcrumb
@@ -549,7 +549,7 @@ const CollectionListPage = () => {
                                     />
                                   </td>
                                 </tr>
-                              )}
+                              ) : null}
                               {documents.map((document) => {
                                 if (document.node.__typename === 'Folder') {
                                   return (
