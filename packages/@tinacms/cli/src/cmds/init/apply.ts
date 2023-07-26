@@ -49,6 +49,13 @@ async function apply({
   let templateCode: string | null | undefined
   let extraText: string | null | undefined
 
+  if (env.nextAppDir && config.framework.name === 'next') {
+    console.log(
+      `❌Error: the init command does not currently support the app dir. You will have to setup Tina manually`
+    )
+    process.exit(1)
+  }
+
   let isForestryMigration = false
   if (env.forestryConfigExists) {
     // CollectionsString is the string that will be added to the tina config

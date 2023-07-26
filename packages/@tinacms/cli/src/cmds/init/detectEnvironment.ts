@@ -137,6 +137,9 @@ const detectEnvironment = async ({
     fs.pathExistsSync(path.join(baseDir, 'src')) &&
     (fs.pathExistsSync(path.join(baseDir, 'src', 'app')) ||
       fs.pathExistsSync(path.join(baseDir, 'src', 'pages')))
+  const hasAppDir = usingSrc
+    ? fs.pathExistsSync(path.join(baseDir, 'src', 'app'))
+    : fs.pathExistsSync(path.join(baseDir, 'app'))
   const { pathToGlobalStyles, globalStylesHasTailwind } =
     await detectNextGlobalStyles(baseDir, usingSrc)
 
@@ -223,6 +226,7 @@ const detectEnvironment = async ({
     gitIgnoreTinaEnvExists: hasEnvTina,
     globalStylesHasTailwind,
     globalStylesPath: pathToGlobalStyles,
+    nextAppDir: hasAppDir,
     tailwindConfigExists: hasTailwindConfig,
     packageJSONExists: hasPackageJSON,
     sampleContentExists: hasSampleContent,
