@@ -354,7 +354,7 @@ const writeGeneratedFile = async ({
       logger.info(logText(`Not overwriting file at ${path}.`))
     }
   } else {
-    logger.info('Adding file at ${path}... ✅')
+    logger.info(`Adding file at ${path}... ✅`)
     await fs.ensureDir(parentPath)
     await fs.outputFileSync(path, content)
   }
