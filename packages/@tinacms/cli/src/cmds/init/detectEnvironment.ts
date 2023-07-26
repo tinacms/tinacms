@@ -114,7 +114,7 @@ const detectEnvironment = async ({
       }
     ),
     ['vercel-kv-credentials-provider-tailwindcss']: await makeGeneratedFile(
-      'tw.modules',
+      'tw.module',
       path.join(baseDir, usingSrc ? 'src' : 'pages', 'auth'),
       {
         extensionOverride: 'css',
