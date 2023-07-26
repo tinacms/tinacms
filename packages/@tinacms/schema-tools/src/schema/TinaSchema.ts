@@ -1,4 +1,7 @@
-import micromatch from 'micromatch'
+// micromatch/picomatch are not compatible in the browser
+// https://github.com/micromatch/picomatch/pull/73#issuecomment-992497433
+import picomatch from 'picomatch-browser'
+
 import {
   Schema,
   Collection,
@@ -110,7 +113,7 @@ export class TinaSchema {
       if (collection?.match?.include || collection?.match?.exclude) {
         // if the collection has a match or exclude, we need to check if the file matches
         const matches = this.getMatches({ collection })
-        const match = micromatch([filepath], matches).length > 0
+        const match = picomatch([filepath], matches).length > 0
         if (!match) {
           return false
         }
@@ -472,7 +475,7 @@ export class TinaSchema {
     files: string[]
   }) {
     const matches = this.getMatches({ collection })
-    const matchedFiles = micromatch(files, matches)
+    const matchedFiles = picomatch(files, matches)
     return matchedFiles
   }
 }
