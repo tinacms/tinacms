@@ -191,6 +191,7 @@ async function apply({
       usingTypescript: config.typescript,
       isLocalEnvVarName: config.isLocalEnvVarName,
       dataLayer: config.dataLayer,
+      nextAuthProvider: config.nextAuthProvider,
     })
   }
 
@@ -570,12 +571,14 @@ const addReactiveFile = {
     usingSrc,
     usingTypescript,
     dataLayer,
+    nextAuthProvider,
   }: {
     baseDir: string
     isLocalEnvVarName: string
     usingSrc: boolean
     usingTypescript: boolean
     dataLayer: boolean
+    nextAuthProvider: string
   }) => {
     const pagesPath = path.join(baseDir, usingSrc ? 'src' : '', 'pages')
     const packageJSONPath = path.join(baseDir, 'package.json')
@@ -599,7 +602,10 @@ const addReactiveFile = {
     const newPack = JSON.stringify(
       {
         ...pack,
-        scripts: extendNextScripts(oldScripts, { isLocalEnvVarName }),
+        scripts: extendNextScripts(oldScripts, {
+          isLocalEnvVarName,
+          addSetupUsers: nextAuthProvider === 'vercel-kv-credentials-provider',
+        }),
       },
       null,
       2

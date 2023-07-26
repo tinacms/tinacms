@@ -17,9 +17,9 @@ export function generateGqlScript(
 
 export function extendNextScripts(
   scripts,
-  opts?: { isLocalEnvVarName?: string }
+  opts?: { isLocalEnvVarName?: string; addSetupUsers?: boolean }
 ) {
-  return {
+  const result = {
     ...scripts,
     dev:
       !scripts?.dev || scripts?.dev?.indexOf('tinacms dev -c') === -1
@@ -34,4 +34,10 @@ export function extendNextScripts(
         ? `tinacms build && ${scripts?.start || 'next start'}`
         : scripts?.start,
   }
+
+  if (opts?.addSetupUsers && !scripts['setup:users']) {
+    result['setup:users'] = 'tinacms tinacms-next-auth setup'
+  }
+
+  return result
 }
