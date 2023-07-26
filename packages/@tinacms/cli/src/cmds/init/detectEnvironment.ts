@@ -2,7 +2,6 @@ import fs from 'fs-extra'
 import path from 'path'
 import { InitEnvironment } from './index'
 import dotenv from 'dotenv'
-import { version } from '../../../package.json'
 
 const checkGitignoreForItem = async ({
   baseDir,
@@ -141,9 +140,14 @@ const detectEnvironment = async ({
       }
     ),
   }
+  let cliVersion
+  let tagVersion
+  try {
+    const { version = '' } = require('../package.json') || {}
+    cliVersion = version
+    tagVersion = version?.startsWith('0.0.0') ? version : ''
+  } catch (e) {}
 
-  const cliVersion = version
-  const tagVersion = version?.startsWith('0.0.0') ? version : ''
   const hasSampleContent = await fs.pathExists(sampleContentPath)
   const hasPackageJSON = await fs.pathExists('package.json')
   const hasGitIgnore = await fs.pathExists(path.join('.gitignore'))
