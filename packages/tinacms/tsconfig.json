@@ -9,6 +9,12 @@
       "@toolkit/*": ["./src/toolkit/*"]
     },
   },
-  "exclude": ["src/**/*.test.tsx", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.spec.tsx"],
+  "exclude": [
+    "src/**/*.test.tsx",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx",
+    "dist"
+  ],
   "include": ["src"]
 }
