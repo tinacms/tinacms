@@ -133,7 +133,10 @@ const detectEnvironment = async ({
     'posts',
     'hello-world.md'
   )
-  const usingSrc = !fs.pathExistsSync(path.join(baseDir, 'pages'))
+  const usingSrc =
+    fs.pathExistsSync(path.join(baseDir, 'src')) &&
+    (fs.pathExistsSync(path.join(baseDir, 'src', 'app')) ||
+      fs.pathExistsSync(path.join(baseDir, 'src', 'pages')))
   const { pathToGlobalStyles, globalStylesHasTailwind } =
     await detectNextGlobalStyles(baseDir, usingSrc)
 
