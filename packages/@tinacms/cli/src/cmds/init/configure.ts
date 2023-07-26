@@ -307,16 +307,6 @@ async function configure(
         initial: 'VercelKVCredentialsProvider',
       },
       {
-        name: 'installTailwindCSS',
-        type: (_, answers) =>
-          answers.nextAuthProvider === 'vercel-kv-credentials-provider' &&
-          !env.tailwindConfigExists
-            ? 'confirm'
-            : null,
-        message: `Install TailwindCSS? (Required for Vercel KV Credentials Provider Signin & Registration Pages)`,
-        initial: true,
-      },
-      {
         name: 'isLocalEnvVarName',
         type: (_, answers) =>
           answers.nextAuth || answers.dataLayer ? 'text' : null,
@@ -369,6 +359,14 @@ async function configure(
         generatedFile:
           env.generatedFiles['vercel-kv-credentials-provider-register'],
       }),
+      // pages/auth/tw.module.css
+      ...generatedFileOverwritePrompt({
+        condition: (answers) =>
+          answers.nextAuthProvider === 'vercel-kv-credentials-provider',
+        configName: 'VercelKVCredentialsProviderTailwindCSS',
+        generatedFile:
+          env.generatedFiles['vercel-kv-credentials-provider-tailwindcss'],
+      }),
       // pages/api/credentials/register.ts
       ...generatedFileOverwritePrompt({
         condition: (answers) =>
@@ -378,20 +376,6 @@ async function configure(
           env.generatedFiles[
             'vercel-kv-credentials-provider-register-api-handler'
           ],
-      }),
-      // tailwind.config.js
-      ...generatedFileOverwritePrompt({
-        condition: (answers) =>
-          answers.nextAuthProvider === 'vercel-kv-credentials-provider',
-        configName: 'TailwindConfig',
-        generatedFile: env.generatedFiles['tailwind-config'],
-      }),
-      // postcss.config.js
-      ...generatedFileOverwritePrompt({
-        condition: (answers) =>
-          answers.nextAuthProvider === 'vercel-kv-credentials-provider',
-        configName: 'PostcssConfig',
-        generatedFile: env.generatedFiles['postcss-config'],
       }),
       {
         name: 'overwriteSampleContent',

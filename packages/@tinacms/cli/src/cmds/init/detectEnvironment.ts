@@ -59,52 +59,6 @@ const makeGeneratedFile = async (
   return result
 }
 
-async function detectNextGlobalStyles(baseDir: string, usingSrc: boolean) {
-  let pathToGlobalStyles = ''
-  let globalStylesHasTailwind = false
-  let pathToApp = path.join(baseDir, usingSrc ? 'src' : 'pages', '_app')
-  if (fs.pathExistsSync(`${pathToApp}.js`)) {
-    pathToApp = `${pathToApp}.js`
-  } else if (fs.pathExistsSync(`${pathToApp}.tsx`)) {
-    pathToApp = `${pathToApp}.tsx`
-  } else {
-    pathToApp = ''
-  }
-  if (pathToApp) {
-    // read lines from file into array of strings
-    const lines = (await fs.readFile(pathToApp, 'utf8')).split('\n')
-    let stylesPath = ''
-    for (const line of lines) {
-      const match = line.match(/^import\s+["'](.*\.css)["'];?$/)
-      if (match) {
-        stylesPath = match[1]
-        break
-      }
-    }
-    if (stylesPath) {
-      if (stylesPath.startsWith('@')) {
-        stylesPath = path.join(baseDir, stylesPath.replace('@/', ''))
-      } else {
-        stylesPath = path.join(path.dirname(pathToApp), stylesPath)
-      }
-      pathToGlobalStyles = stylesPath
-
-      // compute path to styles file
-      if (fs.pathExistsSync(stylesPath)) {
-        // check if styles file imports tailwind
-        const globalStylesContent = await fs.readFile(
-          pathToGlobalStyles,
-          'utf8'
-        )
-        if (globalStylesContent.indexOf('@tailwind') !== -1) {
-          globalStylesHasTailwind = true
-        }
-      }
-    }
-  }
-  return { pathToGlobalStyles, globalStylesHasTailwind }
-}
-
 const detectEnvironment = async ({
   baseDir = '',
   pathToForestryConfig,
@@ -124,9 +78,6 @@ const detectEnvironment = async ({
   const hasForestryConfig = await fs.pathExists(
     path.join(pathToForestryConfig, '.forestry', 'settings.yml')
   )
-  const hasTailwindConfig = await fs.pathExists(
-    path.join(baseDir, 'tailwind.config.js')
-  )
   const sampleContentPath = path.join(
     baseDir,
     'content',
@@ -140,8 +91,6 @@ const detectEnvironment = async ({
   const hasAppDir = usingSrc
     ? fs.pathExistsSync(path.join(baseDir, 'src', 'app'))
     : fs.pathExistsSync(path.join(baseDir, 'app'))
-  const { pathToGlobalStyles, globalStylesHasTailwind } =
-    await detectNextGlobalStyles(baseDir, usingSrc)
 
   const tinaFolder = path.join(baseDir, 'tina')
   const generatedFiles = {
@@ -163,6 +112,13 @@ const detectEnvironment = async ({
         typescriptSuffix: 'tsx',
       }
     ),
+    ['vercel-kv-credentials-provider-tailwindcss']: await makeGeneratedFile(
+      'tw.modules',
+      path.join(baseDir, usingSrc ? 'src' : 'pages', 'auth'),
+      {
+        extensionOverride: 'css',
+      }
+    ),
     ['next-auth-api-handler']: await makeGeneratedFile(
       '[...nextauth]',
       path.join(baseDir, usingSrc ? 'src' : 'pages', 'api', 'auth')
@@ -175,20 +131,6 @@ const detectEnvironment = async ({
     ['gql-api-handler']: await makeGeneratedFile(
       'gql',
       path.join(baseDir, usingSrc ? 'src' : 'pages', 'api')
-    ),
-    ['tailwind-config']: await makeGeneratedFile(
-      'tailwind.config',
-      path.join(baseDir),
-      {
-        typescriptSuffix: 'js',
-      }
-    ),
-    ['postcss-config']: await makeGeneratedFile(
-      'postcss.config',
-      path.join(baseDir),
-      {
-        typescriptSuffix: 'js',
-      }
     ),
     ['tina.svg']: await makeGeneratedFile(
       'tina',
@@ -224,10 +166,7 @@ const detectEnvironment = async ({
     gitIgoreNodeModulesExists: hasGitIgnoreNodeModules,
     gitIgnoreEnvExists: hasGitIgnoreEnv,
     gitIgnoreTinaEnvExists: hasEnvTina,
-    globalStylesHasTailwind,
-    globalStylesPath: pathToGlobalStyles,
     nextAppDir: hasAppDir,
-    tailwindConfigExists: hasTailwindConfig,
     packageJSONExists: hasPackageJSON,
     sampleContentExists: hasSampleContent,
     sampleContentPath,

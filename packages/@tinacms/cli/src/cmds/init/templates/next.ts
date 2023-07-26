@@ -2,6 +2,7 @@ export type NextTemplateTypes =
   | 'vercel-kv-credentials-provider-register-api-handler'
   | 'vercel-kv-credentials-provider-signin'
   | 'vercel-kv-credentials-provider-register'
+  | 'vercel-kv-credentials-provider-tailwindcss'
   | 'next-auth-api-handler'
   | 'demo-post-page'
 
@@ -244,7 +245,7 @@ const ContentSection = ({ content }) => {
   ['vercel-kv-credentials-provider-register-api-handler']:
     () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
 // @ts-nocheck
-import { userStore } from "../../../tina/auth";
+import { userStore } from '../../../tina/auth'
 
 export default async function handler(req, res) {
   const { username, password } = req.body
@@ -271,7 +272,7 @@ export default async function handler(req, res) {
   ['next-auth-api-handler']:
     () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
 import NextAuth from 'next-auth'
-import { authOptions } from "../../../tina/auth";
+import { authOptions } from '../../../tina/auth'
 
 export default NextAuth(authOptions)
 `,
@@ -283,6 +284,8 @@ export default NextAuth(authOptions)
 // @ts-nocheck
 import { useEffect, useState } from 'react'
 import { signIn } from 'next-auth/react'
+
+import styles from './tw.module.css'
 
 export default function Register({ userSetupRequired }) {
   const [username, setUsername] = useState('')
@@ -327,55 +330,71 @@ export default function Register({ userSetupRequired }) {
   if (message && status !== 'initial' && status !== 'error') {
     return (
       <div
-        className={'grid h-screen w-screen place-items-center bg-slate-800 px-4 text-sm font-medium'}
+        className={\`\${styles.grid} \${styles['h-screen']} \${styles['w-screen']} \${styles['place-items-center']}  \${styles['px-4']}\${styles['text-sm']}\${styles['font-medium']} \`}
       >
         {message}
       </div>
     )
   }
 
-  const disabled = !username || !password || !confirmPassword || !userSetupRequired
-  const buttonStyle = 
-   'flex items-center justify-center gap-x-2 rounded-md border border-slate-600 bg-slate-700 py-3 px-4 text-slate-300 transition hover:text-purple-400 '
-   + (disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-purple-400') 
+  const disabled =
+    !username || !password || !confirmPassword || !userSetupRequired
 
   return (
     <div
-      className='grid h-screen w-screen place-items-center bg-slate-800 px-4 text-sm font-medium'
+      className={\`\${styles.grid} \${styles['h-screen']} \${styles['w-screen']} \${styles['place-items-center']} \${styles['px-4']} \${styles['text-sm']} \${styles['font-medium']}\`}
     >
-      <div className='w-full max-w-sm rounded-lg bg-slate-700/30 shadow'>
-        <div className='flex flex-col items-center justify-center gap-4'>
-          <img src='../tina.svg' alt='TinaCMS Logo' height={100} width={72}/>
+      <div
+        className={\`\${styles['w-full']} \${styles['max-w-sm']} \${styles['rounded-lg']} \${styles['shadow']}\`}
+      >
+        <div
+          className={\`\${styles.flex} \${styles['flex-col']}  \${styles['items-center']} \${styles['justify-center']} \${styles['gap-4']}\`}
+        >
+          <img src='../tina.svg' alt='TinaCMS Logo' height={100} width={72} />
           {message && (
-            <div className='bg-red-500 text-white rounded-md p-3'>
+            <div
+              className={\`\${styles['bg-red-500']} \${styles['text-white']} \${styles['rounded-md']} \${styles['p-3']}\`}
+            >
               Error: {message}
             </div>
           )}
         </div>
-        <div className='p-4 md:p-5 lg:p-6'>
+        <div className={\`\${styles['p-6']}\`}>
           <div className='grid gap-y-3'>
             <input
-              className='focus:border-purple-400 rounded-md border border-slate-600 bg-slate-700 py-3 px-4 text-slate-200 outline-none transition placeholder:text-slate-400'
+              className={\`\${styles['focus:border-purple-400']} \${styles['rounded-md']} \${styles['border']} \${styles['py-3']} \${styles['px-4']} \${styles['outline-none']} \${styles['transition']}}\`}
               placeholder='Enter username'
               value={username}
-              onChange={e => setUsername(e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
             />
             <input
-              className='focus:border-purple-400 rounded-md border border-slate-600 bg-slate-700 py-3 px-4 text-slate-200 outline-none transition placeholder:text-slate-400'
+              className={\`\${styles['focus:border-purple-400']} \${styles['rounded-md']} \${styles['border']} \${styles['py-3']} \${styles['px-4']} \${styles['outline-none']} \${styles['transition']}}\`}
               placeholder='Enter password'
               type='password'
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <input
-              className='focus:border-purple-400 rounded-md border border-slate-600 bg-slate-700 py-3 px-4 text-slate-200 outline-none transition placeholder:text-slate-400'
               placeholder='Confirm password'
+              className={\`\${styles['focus:border-purple-400']} \${styles['rounded-md']} \${styles['border']} \${styles['py-3']} \${styles['px-4']} \${styles['outline-none']} \${styles['transition']}}\`}
               type='password'
               value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
             <button
-              className={buttonStyle}
+              className={\`\${styles['flex']} \${styles['items-center']} \${
+    styles['justify-center']
+  } \${styles['gap-x-2']} \${styles['rounded-md']} \${
+    styles['border']
+  } \${styles['border-gray-300']} \${styles['bg-white']} \${
+    styles['py-3']
+  } \${styles['px-4']} \${styles['text-gray-700']} \${
+    styles['transition']
+  } \${styles['hover:text-purple-400']} \${
+    disabled ? 
+    \`\${styles['opacity-50']} \${styles['cursor-not-allowed']}\` : 
+    \`\${styles['hover:border-purple-400']}\`
+  }}\`}
               disabled={disabled}
               onClick={handleSubmit}
             >
@@ -395,61 +414,81 @@ export async function getServerSideProps(context) {
       userSetupRequired: !(await userStore.isInitialized())
     },
   }
-}`,
+}
+`,
   ['vercel-kv-credentials-provider-signin']:
     () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
 // @ts-nocheck
 import { getCsrfToken } from 'next-auth/react'
 
+import styles from './tw.module.css'
+
 export default function SignIn({ csrfToken, error, userSetupRequired }) {
   if (userSetupRequired) {
     return (
       <div
-        className='grid h-screen w-screen place-items-center bg-slate-800 px-4 text-sm font-medium'>
-        <div className='w-full max-w-sm rounded-lg bg-slate-700/30 shadow'>
-          <div className='flex flex-col items-center justify-center gap-4 p-10'>
-            <img src='../tina.svg' alt='TinaCMS Logo' height={100} width={72}/>
-            <div>User setup required. Click <a href={'/auth/register'} className={'text-blue-700'}>here</a> to add your first user.</div>
+        className={\`\${styles.grid} \${styles['h-screen']} \${styles['w-screen']} \${styles['place-items-center']} \${styles['px-4']} \${styles['text-sm']} \${styles['font-medium']}\`}
+      >
+        <div
+          className={\`\${styles['w-full']} \${styles['max-w-sm']} \${styles['rounded-lg']} \${styles['bg-gray-200']} \${styles['shadow']} \${styles['p-10']}\`}
+        >
+          <img src='../tina.svg' alt='TinaCMS Logo' height={100} width={72} />
+          <div className={styles['text-gray-600']}>
+            User setup required. Click{' '}
+            <a href={'/auth/register'} className={styles['text-blue-700']}>
+              here
+            </a>{' '}
+            to add your first user.
           </div>
         </div>
       </div>
     )
   }
   return (
+    <div
+      className={\`\${styles.grid} \${styles['h-screen']} \${styles['w-screen']} \${styles['place-items-center']} \${styles['px-4']} \${styles['text-sm']} \${styles['font-medium']}\`}
+    >
       <div
-        className='grid h-screen w-screen place-items-center bg-slate-800 px-4 text-sm font-medium'
+        className={\`\${styles['w-full']} \${styles['max-w-sm']} \${styles['rounded-lg']} \${styles['shadow']}\`}
       >
-        <div className='w-full max-w-sm rounded-lg bg-slate-700/30 shadow'>
-          <div className='flex flex-col items-center justify-center gap-4'>
-            <img src='../tina.svg' alt='TinaCMS Logo' height={100} width={72}/>
-            {error && (
-              <div className='bg-red-500 text-white rounded-md p-3'>
-                Sign In Failed [{error}]
-              </div>
-            )}
-          </div>
-          <form className='p-4 md:p-5 lg:p-6' method='post' action='/api/auth/callback/credentials'>
-            <input name='csrfToken' type='hidden' defaultValue={csrfToken} />
-            <div className='grid gap-y-3'>
-              <input
-                name='username'
-                className='focus:border-purple-400 rounded-md border border-slate-600 bg-slate-700 py-3 px-4 text-slate-200 outline-none transition placeholder:text-slate-400'
-                placeholder='jsmith'
-              />
-              <input
-                name='password'
-                className='focus:border-purple-400 rounded-md border border-slate-600 bg-slate-700 py-3 px-4 text-slate-200 outline-none transition placeholder:text-slate-400'
-                type='password'
-              />
-              <button
-                className='flex items-center justify-center gap-x-2 rounded-md border border-slate-600 bg-slate-700 py-3 px-4 text-slate-300 transition hover:text-purple-400'
-              >
-                Sign in
-              </button>
+        <div
+          className={\`\${styles.flex} \${styles['flex-col']}  \${styles['items-center']} \${styles['justify-center']} \${styles['gap-4']}\`}
+        >
+          <img src='../tina.svg' alt='TinaCMS Logo' height={100} width={72} />
+          {error && (
+            <div
+              className={\`\${styles['bg-red-500']} \${styles['text-white']} \${styles['rounded-md']} \${styles['p-3']}\`}
+            >
+              Sign In Failed [{error}]
             </div>
-          </form>
+          )}
         </div>
+        <form
+          className={\`\${styles['p-6']}\`}
+          method='post'
+          action='/api/auth/callback/credentials'
+        >
+          <input name='csrfToken' type='hidden' defaultValue={csrfToken} />
+          <div className={\`\${styles['grid']} \${styles['gap-y-3']}\`}>
+            <input
+              name='username'
+              className={\`\${styles['focus:border-purple-400']} \${styles['rounded-md']} \${styles['border']} \${styles['py-3']} \${styles['px-4']} \${styles['outline-none']} \${styles['transition']}}\`}
+              placeholder='jsmith'
+            />
+            <input
+              name='password'
+              className={\`\${styles['focus:border-purple-400']} \${styles['rounded-md']} \${styles['border']} \${styles['py-3']} \${styles['px-4']} \${styles['outline-none']} \${styles['transition']}\`}
+              type='password'
+            />
+            <button
+              className={\`\${styles['flex']} \${styles['items-center']} \${styles['justify-center']} \${styles['gap-x-2']} \${styles['rounded-md']} \${styles['border']} \${styles['border-gray-300']} \${styles['bg-white']} \${styles['py-3']} \${styles['px-4']} \${styles['text-gray-700']} \${styles['transition']} \${styles['hover:text-purple-400']}\`}
+            >
+              Sign in
+            </button>
+          </div>
+        </form>
       </div>
+    </div>
   )
 }
 
@@ -464,4 +503,242 @@ export async function getServerSideProps(context) {
   }
 }
 `,
+  ['vercel-kv-credentials-provider-tailwindcss']:
+    () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
+/* Base Styles */
+  
+  .grid {
+    display: grid
+  }
+  
+  .place-items-center {
+    place-items: center
+  }
+  
+  .h-screen {
+    height: 100vh
+  }
+  
+  .w-screen {
+    width: 100vw
+  }
+  .w-full {
+    width: 100%
+  }
+  
+  /* Colors */
+  .bg-slate-800 {
+    background-color: #1e293b
+  }
+  .bg-gray-200 {
+   background-color: #E1DDEC 
+  }
+  .bg-slate-700\\/30 {
+    background-color: rgba(30, 41, 59, 0.3)
+  }
+  
+  .bg-red-500 {
+    --tw-bg-opacity: 1
+    background-color: rgb(244 63 94 / var(--tw-bg-opacity))
+  }
+  .opacity-50 {
+    opacity: 0.5
+  }
+  .cursor-not-allowed {
+    cursor: not-allowed
+  }
+  /* .hover:border-purple-400 {
+    --tw-border-opacity: 1
+    border-color: rgba(139, 92, 246, var(--tw-border-opacity))
+  } */
+  @media (hover) {
+    .hover:border-purple-400 {
+        --tw-border-opacity: 1
+        border-color: rgba(139, 92, 246, var(--tw-border-opacity))
+    }
+  }
+  
+  .text-white {
+    color: #ffffff
+  }
+  
+  .text-purple-400 {
+    color: #8b5cf6
+  }
+  
+  .text-blue-700 {
+    color: #3b82f6
+  }
+  
+  .text-slate-200 {
+    color: #a0aec0
+  }
+  
+  /* Spacing */
+  .px-4 {
+    padding-left: 1rem
+    padding-right: 1rem
+  }
+  
+  .p-10 {
+    padding: 2.5rem
+  }
+  
+  .p-3 {
+    padding: 0.75rem
+  }
+  
+  .md\\:p-5 {
+    padding: 1.25rem
+  }
+  
+  .lg\\:p-6 {
+    padding: 1.5rem
+  }
+  
+  .py-3 {
+    padding-top: 0.75rem
+    padding-bottom: 0.75rem
+  }
+  
+  /* Layout */
+  .rounded-lg {
+    border-radius: 0.5rem
+  }
+  
+  .rounded-md {
+    border-radius: 0.375rem
+  }
+  .max-w-sm {
+    max-width: 24rem
+  }
+  
+  /* Flexbox */
+  .flex {
+    display: flex
+  }
+  
+  .flex-col {
+    flex-direction: column
+  }
+  
+  .items-center {
+    align-items: center
+  }
+  
+  .justify-center {
+    justify-content: center
+  }
+
+  .p-6 {
+    padding: 1.5rem
+  }
+  
+  .py-3 {
+    padding-top: 0.75rem
+    padding-bottom: 0.75rem
+  }
+  .px-4 {
+    padding-left: 1rem
+    padding-right: 1rem
+  }
+
+  .gap-4 {
+    gap: 1rem
+  }
+  
+  .gap-2 {
+    gap: 0.5rem
+  }
+  
+  .gap-y-3 {
+    row-gap: 0.75rem
+  }
+  
+  .gap-x-2 {
+    column-gap: 0.5rem
+  }
+  .full {
+    width: 100%
+  }
+  .max-w-sm {
+    max-width: 24rem
+}
+  
+  /* Forms */
+  .form {
+    display: block
+  }
+  
+  /* Inputs */
+  .custom-input {
+    display: block
+    width: 100%
+    line-height: 1.5
+    padding-top: 0.75rem
+    padding-bottom: 0.75rem
+    padding-left: 1rem
+    padding-right: 1rem
+    border-radius: 0.375rem
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out
+  }
+  .shadow {
+    --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)
+    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color)
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+  }
+  .outline-none {
+    outline: 0
+  }
+  
+  /* Borders */
+  .border {
+    border-width: 3px
+  }
+  
+  .border-slate-600 {
+    border-color: #4a5568
+  }
+  
+  /* Button */
+  .custom-button {
+    display: inline-block
+    text-align: center
+    line-height: 1.5
+    padding-top: 0.75rem
+    padding-bottom: 0.75rem
+    padding-left: 1rem
+    padding-right: 1rem
+    border-width: 1px
+    border-radius: 0.375rem
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out
+    cursor: pointer
+    user-select: none
+  }
+  
+  /* Hover */
+  .hover\\:text-purple-400:hover {
+    color: #8b5cf6
+  }
+  
+  /* Focus */
+  .focus\\:border-purple-400:focus {
+    border-color: #8b5cf6
+  }
+  
+  /* Placeholder Text */
+  .placeholder-text-slate-400::placeholder {
+    color: #cbd5e0
+  }
+  
+  /* Image */
+  .custom-img {
+    display: inline-block
+    vertical-align: middle
+  }
+  
+  /* Gap */
+  .gap-3 {
+    gap: 0.75rem
+  }`,
 }

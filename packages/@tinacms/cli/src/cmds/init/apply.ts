@@ -29,7 +29,6 @@ import {
   Variables as GQLTemplateVariables,
 } from './templates/gql'
 import { templates as NextTemplates } from './templates/next'
-import { templates as TailwindTemplates } from './templates/tailwind'
 import { helloWorldPost } from './templates/content'
 import { format } from 'prettier'
 import { extendNextScripts } from '../../utils/script-helpers'
@@ -167,15 +166,14 @@ async function apply({
           env.generatedFiles['vercel-kv-credentials-provider-signin'],
         generatedRegister:
           env.generatedFiles['vercel-kv-credentials-provider-register'],
+        generatedTailwindCSS:
+          env.generatedFiles['vercel-kv-credentials-provider-tailwindcss'],
         generatedRegisterApiHandler:
           env.generatedFiles[
             'vercel-kv-credentials-provider-register-api-handler'
           ],
-        generatedTailwindConfig: env.generatedFiles['tailwind-config'],
-        generatedPostcssConfig: env.generatedFiles['postcss-config'],
         generatedTinaSVG: env.generatedFiles['tina.svg'],
         config,
-        env,
       })
     }
   }
@@ -291,19 +289,10 @@ const addDependencies = async (
 ) => {
   const { dataLayer, dataLayerAdapter, nextAuth, packageManager } = config
   logger.info(logText('Adding dependencies, this might take a moment...'))
-  const tailwindDeps = [
-    '@tailwindcss/typography',
-    'tailwindcss',
-    'postcss',
-    'autoprefixer',
-  ]
   const deps = ['tinacms', '@tinacms/cli']
   const devDeps = []
   if (nextAuth) {
     deps.push('tinacms-next-auth', 'next-auth')
-    if (config.installTailwindCSS && !env.tailwindConfigExists) {
-      devDeps.push(...tailwindDeps)
-    }
   }
   if (dataLayer) {
     deps.push('@tinacms/datalayer')
@@ -629,21 +618,17 @@ async function addNextAuthApiHandler({
 const addVercelKVCredentialsProviderFiles = async ({
   generatedSignin,
   generatedRegister,
+  generatedTailwindCSS,
   generatedRegisterApiHandler,
-  generatedTailwindConfig,
-  generatedPostcssConfig,
   generatedTinaSVG,
   config,
-  env,
 }: {
   generatedSignin: GeneratedFile
   generatedRegister: GeneratedFile
+  generatedTailwindCSS: GeneratedFile
   generatedRegisterApiHandler: GeneratedFile
-  generatedTailwindConfig: GeneratedFile
-  generatedPostcssConfig: GeneratedFile
   generatedTinaSVG: GeneratedFile
   config: Record<any, any>
-  env: InitEnvironment
 }) => {
   await writeGeneratedFile({
     generatedFile: generatedSignin,
@@ -664,6 +649,14 @@ const addVercelKVCredentialsProviderFiles = async ({
     typescript: config.typescript,
   })
   await writeGeneratedFile({
+    generatedFile: generatedTailwindCSS,
+    overwrite: config.typescript
+      ? config.overwriteVercelKVCredentialsProviderTailwindCSSTS
+      : config.overwriteVercelKVCredentialsProviderTailwindCSSJS,
+    content: NextTemplates['vercel-kv-credentials-provider-tailwindcss'](),
+    typescript: config.typescript,
+  })
+  await writeGeneratedFile({
     generatedFile: generatedRegisterApiHandler,
     overwrite: config.typescript
       ? config.overwriteVercelKVCredentialsProviderRegisterApiHandlerTS
@@ -672,39 +665,12 @@ const addVercelKVCredentialsProviderFiles = async ({
       NextTemplates['vercel-kv-credentials-provider-register-api-handler'](),
     typescript: config.typescript,
   })
-  if (config.installTailwindCSS && !env.tailwindConfigExists) {
-    await writeGeneratedFile({
-      generatedFile: generatedTailwindConfig,
-      overwrite: config.typescript
-        ? config.overwriteTailwindConfigTS
-        : config.overwriteTailwindConfigJS,
-      content: TailwindTemplates['tailwind-default']({
-        usingSrc: env.usingSrc,
-      }),
-      typescript: config.typescript,
-    })
-    await writeGeneratedFile({
-      generatedFile: generatedPostcssConfig,
-      overwrite: config.typescript
-        ? config.overwritePostcssConfigTS
-        : config.overwritePostcssConfigJS,
-      content: TailwindTemplates['postcss-default'](),
-      typescript: config.typescript,
-    })
-    await writeGeneratedFile({
-      generatedFile: generatedTinaSVG,
-      overwrite: true,
-      content: AssetsTemplates['tina.svg'](),
-      typescript: config.typescript,
-    })
-    if (!env.globalStylesHasTailwind) {
-      // append global styles to existing styles
-      const globalStyles = fs.readFileSync(env.globalStylesPath).toString()
-      const newGlobalStyles =
-        globalStyles + '\n' + TailwindTemplates['globals-css']()
-      fs.writeFileSync(env.globalStylesPath, newGlobalStyles)
-    }
-  }
+  await writeGeneratedFile({
+    generatedFile: generatedTinaSVG,
+    overwrite: true,
+    content: AssetsTemplates['tina.svg'](),
+    typescript: config.typescript,
+  })
 }
 
 /**

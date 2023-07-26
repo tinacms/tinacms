@@ -16,11 +16,10 @@ type GeneratedFileType =
   | 'templates'
   | 'vercel-kv-credentials-provider-signin'
   | 'vercel-kv-credentials-provider-register'
+  | 'vercel-kv-credentials-provider-tailwindcss'
   | 'vercel-kv-credentials-provider-register-api-handler'
   | 'next-auth-api-handler'
   | 'gql-api-handler'
-  | 'tailwind-config'
-  | 'postcss-config'
   | 'tina.svg'
 
 export type GeneratedFile = {
@@ -47,9 +46,6 @@ export type InitEnvironment = {
   generatedFiles?: {
     [key in GeneratedFileType]: GeneratedFile
   }
-  tailwindConfigExists: boolean
-  globalStylesHasTailwind: boolean
-  globalStylesPath: string
   usingSrc: boolean
 }
 
