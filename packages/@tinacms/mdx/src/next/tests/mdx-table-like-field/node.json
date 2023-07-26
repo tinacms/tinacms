@@ -1,0 +1,72 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Welcome to the barebones starter for TinaCMS!"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "TestComponent",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "rows": [
+          {
+            "celss": [
+              "Three",
+              "Two",
+              "One"
+            ],
+            "isHeader": true
+          },
+          {
+            "celss": [
+              "C",
+              "B",
+              "A"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "TestComponent",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "rows": [
+          {
+            "celss": [
+              1,
+              2,
+              3
+            ],
+            "isHeader": true
+          },
+          {
+            "celss": [
+              4,
+              5,
+              6
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
