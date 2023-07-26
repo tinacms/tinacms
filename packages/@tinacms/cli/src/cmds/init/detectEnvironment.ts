@@ -72,6 +72,7 @@ const detectEnvironment = async ({
   debug?: boolean
   args?: string[]
 }): Promise<InitEnvironment> => {
+  console.log(args)
   if (fs.pathExistsSync('.env.tina')) {
     dotenv.config({ path: '.env.tina' })
   }
@@ -146,8 +147,10 @@ const detectEnvironment = async ({
   let cliVersion
   let tagVersion
   for (const arg of args || []) {
+    console.log({ arg })
     if (arg.startsWith('@tinacms/cli@')) {
       cliVersion = arg.split('@')[2]
+      console.log({ cliVersion })
       if (cliVersion.startsWith('0.0.0')) {
         tagVersion = cliVersion
       }
