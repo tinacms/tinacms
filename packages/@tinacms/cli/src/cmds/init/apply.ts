@@ -300,8 +300,6 @@ const addDependencies = async (
   }
   if (dataLayer) {
     deps.push('@tinacms/datalayer')
-    deps.push('@octokit/rest')
-    deps.push('js-base64')
     deps.push('tinacms-gitprovider-github')
   }
   if (dataLayerAdapter === 'upstash-redis') {
