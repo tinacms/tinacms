@@ -58,6 +58,7 @@ export type InitParams = {
   showSelfHosted?: boolean
   baseDir?: string
   debug?: boolean
+  args?: string[]
 }
 
 export const command = new CLICommand<InitEnvironment, InitParams>({
@@ -70,12 +71,14 @@ export const command = new CLICommand<InitEnvironment, InitParams>({
     pathToForestryConfig,
     baseDir = '',
     debug = false,
+    args,
   }: InitParams): Promise<InitEnvironment> {
     return detectEnvironment({
       baseDir,
       pathToForestryConfig,
       rootPath,
       debug,
+      args,
     })
   },
   configure(

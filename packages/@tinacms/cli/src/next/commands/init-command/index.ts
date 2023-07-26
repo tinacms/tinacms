@@ -36,6 +36,7 @@ export class InitCommand extends Command {
       pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,
       debug: this.debug,
+      args: process.argv,
     })
     process.exit()
   }

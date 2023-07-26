@@ -37,6 +37,7 @@ export class InitSelfHostedCommand extends Command {
       noTelemetry: this.noTelemetry,
       showSelfHosted: true,
       debug: this.debug,
+      args: process.argv,
     })
     process.exit()
   }
