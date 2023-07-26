@@ -25,6 +25,9 @@
     "@aws-sdk/client-s3": "^3.357.0",
     "multer": "1.4.5-lts.1"
   },
+  "peerDependencies": {
+    "tinacms": "workspace:*"
+  },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
     "@types/crypto-js": "^3.1.47",
