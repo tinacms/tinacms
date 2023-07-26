@@ -12,32 +12,26 @@ import {
 } from '../../utils/theme'
 import { Telemetry } from '@tinacms/metrics'
 import fs from 'fs-extra'
-import {
-  configExamples,
-  ConfigTemplateOptions,
-  ConfigTemplateVariables,
-} from './templates/config'
 import { writeGitignore } from '../../next/commands/codemod-command'
+import { templates as AssetsTemplates } from './templates/assets'
 import {
   templates as AuthTemplates,
   Variables as AuthTemplateVariables,
 } from './templates/auth'
 import {
+  configExamples,
+  ConfigTemplateOptions,
+  ConfigTemplateVariables,
+} from './templates/config'
+import { templates as DatabaseTemplates } from './templates/database'
+import {
   templates as GQLTemplates,
   Variables as GQLTemplateVariables,
 } from './templates/gql'
-import { templates as DatabaseTemplates } from './templates/database'
+import { templates as NextTemplates } from './templates/next'
 import { templates as TailwindTemplates } from './templates/tailwind'
-import { templates as AssetsTemplates } from './templates/assets'
 import { helloWorldPost } from './templates/content'
 import { format } from 'prettier'
-import {
-  authRegisterApiHandler,
-  authRegisterPage,
-  authSigninPage,
-  nextAuthApiHandler,
-  nextPostPage,
-} from './templates/next'
 import { extendNextScripts } from '../../utils/script-helpers'
 import { Framework, GeneratedFile, InitEnvironment, InitParams } from './index'
 
@@ -157,7 +151,7 @@ async function apply({
     await addNextAuthApiHandler({
       config,
       generatedFile: env.generatedFiles['next-auth-api-handler'],
-      content: nextAuthApiHandler(),
+      content: NextTemplates['next-auth-api-handler'](),
     })
 
     if (config.nextAuthProvider === 'vercel-kv-credentials-provider') {
@@ -191,6 +185,7 @@ async function apply({
       usingSrc: env.usingSrc,
       usingTypescript: config.typescript,
       isLocalEnvVarName: config.isLocalEnvVarName,
+      dataLayer: config.dataLayer,
     })
   }
 
@@ -568,11 +563,13 @@ const addReactiveFile = {
     isLocalEnvVarName,
     usingSrc,
     usingTypescript,
+    dataLayer,
   }: {
     baseDir: string
     isLocalEnvVarName: string
     usingSrc: boolean
     usingTypescript: boolean
+    dataLayer: boolean
   }) => {
     const pagesPath = path.join(baseDir, usingSrc ? 'src' : '', 'pages')
     const packageJSONPath = path.join(baseDir, 'package.json')
@@ -583,7 +580,10 @@ const addReactiveFile = {
     )
     if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
       fs.mkdirpSync(tinaBlogPagePath)
-      fs.writeFileSync(tinaBlogPagePathFile, nextPostPage({ usingSrc }))
+      fs.writeFileSync(
+        tinaBlogPagePathFile,
+        NextTemplates['demo-post-page']({ usingSrc, dataLayer })
+      )
     }
     logger.info('Adding a nextjs example... ✅')
 
@@ -645,7 +645,7 @@ const addVercelKVCredentialsProviderFiles = async ({
     overwrite: config.typescript
       ? config.overwriteVercelKVCredentialsProviderSigninTS
       : config.overwriteVercelKVCredentialsProviderSigninJS,
-    content: authSigninPage(),
+    content: NextTemplates['vercel-kv-credentials-provider-signin'](),
     typescript: config.typescript,
   })
   await writeGeneratedFile({
@@ -653,7 +653,7 @@ const addVercelKVCredentialsProviderFiles = async ({
     overwrite: config.typescript
       ? config.overwriteVercelKVCredentialsProviderRegisterTS
       : config.overwriteVercelKVCredentialsProviderRegisterJS,
-    content: authRegisterPage({
+    content: NextTemplates['vercel-kv-credentials-provider-register']({
       nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
     }),
     typescript: config.typescript,
@@ -663,7 +663,8 @@ const addVercelKVCredentialsProviderFiles = async ({
     overwrite: config.typescript
       ? config.overwriteVercelKVCredentialsProviderRegisterApiHandlerTS
       : config.overwriteVercelKVCredentialsProviderRegisterApiHandlerJS,
-    content: authRegisterApiHandler(),
+    content:
+      NextTemplates['vercel-kv-credentials-provider-register-api-handler'](),
     typescript: config.typescript,
   })
   if (config.installTailwindCSS && !env.tailwindConfigExists) {
