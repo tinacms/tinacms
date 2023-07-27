@@ -43,7 +43,7 @@ async function configure(
     answers.nextAuth ? promptType : null
   const dataLayerEnabled = (promptType: PromptType) => (_, answers) =>
     answers.dataLayer ? promptType : null
-  const selfHostedEnabled = (promptType: PromptType) => (_) =>
+  const selfHostedEnabled = (promptType: PromptType) =>
     opts.showSelfHosted ? promptType : null
 
   // conditionally generate overwrite prompts for generated ts/js
@@ -209,7 +209,7 @@ async function configure(
       },
       {
         name: 'kvRestApiToken',
-        type: (prev) => (prev !== undefined ? 'text' : null),
+        type: (prev) => (prev !== undefined ? selfHostedEnabled('text') : null),
         message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
         initial: process.env.KV_REST_API_TOKEN,
       },
@@ -288,31 +288,6 @@ async function configure(
         message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
         initial: process.env.KV_REST_API_TOKEN,
       },
-      {
-        name: 'vercelKVNextAuthCredentialsKey',
-        type: (_, answers) =>
-          answers.nextAuthProvider === 'vercel-kv-credentials-provider'
-            ? 'text'
-            : null,
-        message: `Enter a name for the Vercel KV Credentials Provider Auth Collection (Defaults to "tinacms_users")`,
-        initial: process.env.NEXTAUTH_CREDENTIALS_KEY || 'tinacms_users',
-      },
-      {
-        name: 'nextAuthCredentialsProviderName',
-        type: (_, answers) =>
-          answers.nextAuthProvider === 'vercel-kv-credentials-provider'
-            ? 'text'
-            : null,
-        message: `Enter a name for the Vercel KV Credentials Provider (Defaults to "VercelKVCredentialsProvider")`,
-        initial: 'VercelKVCredentialsProvider',
-      },
-      {
-        name: 'isLocalEnvVarName',
-        type: (_, answers) =>
-          answers.nextAuth || answers.dataLayer ? 'text' : null,
-        message: `Enter a name for the environment variable that will be used to determine if the app is running locally (Defaults to "TINA_PUBLIC_IS_LOCAL")`,
-        initial: 'TINA_PUBLIC_IS_LOCAL',
-      },
       // tina/config.ts
       ...generatedFileOverwritePrompt({
         condition: (_) => true,
@@ -385,6 +360,12 @@ async function configure(
     ],
     promptOptions
   )
+
+  config.vercelKVNextAuthCredentialsKey =
+    process.env.NEXTAUTH_CREDENTIALS_KEY || 'tinacms_users'
+
+  config.nextAuthCredentialsProviderName = 'VercelKVCredentialsProvider'
+  config.isLocalEnvVarName = 'TINA_PUBLIC_IS_LOCAL'
 
   if (config.framework.name === 'next') {
     config.publicFolder = 'public'
