@@ -15,7 +15,6 @@
     "@heroicons/react": "1.0.6",
     "@monaco-editor/react": "4.4.5",
     "@tinacms/mdx": "workspace:*",
-    "@tinacms/toolkit": "workspace:*",
     "@xstate/react": "3.0.0",
     "final-form": "4.20.7",
     "graphiql": "3.0.0-alpha.1",

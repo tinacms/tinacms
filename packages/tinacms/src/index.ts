@@ -7,11 +7,11 @@ export * from './auth'
 export * from './utils'
 export * from './tina-cms'
 export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
-export * from '@tinacms/toolkit'
 export { TinaAdmin } from './admin'
 export { RouteMappingPlugin } from './admin/plugins/route-mapping'
 export { TinaAdminApi } from './admin/api'
 
+export * from './toolkit'
 export { MdxFieldPluginExtendible } from '@tinacms/toolkit'
 
 import { TinaCMSProvider2, DocumentCreatorCallback } from './tina-cms'

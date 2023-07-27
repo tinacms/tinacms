@@ -591,6 +591,12 @@ export const buildIt = async (entryPoint, packageJSON) => {
         },
       },
     ],
+    resolve: {
+      alias: {
+        '@toolkit': path.resolve(process.cwd(), 'src/toolkit'),
+        '@tinacms/toolkit': path.resolve(process.cwd(), 'src/toolkit/index.ts'),
+      },
+    },
     build: {
       minify: false,
       assetsInlineLimit: 0,
