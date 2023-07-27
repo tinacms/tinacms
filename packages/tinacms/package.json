@@ -77,7 +77,8 @@
   "scripts": {
     "types": "pnpm tsc && pnpm tsc-alias",
     "build": "tinacms-scripts build",
-    "test": "vitest"
+    "test": "vitest run",
+    "test-watch": "vitest"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.4.4",
