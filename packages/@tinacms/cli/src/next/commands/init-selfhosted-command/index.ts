@@ -2,8 +2,8 @@ import { Command, Option } from 'clipanion'
 import { logger } from '../../../logger'
 import { command } from '../../../cmds/init'
 
-export class InitCommand extends Command {
-  static paths = [['init']]
+export class InitSelfHostedCommand extends Command {
+  static paths = [['init-self-hosted']]
   pathToForestryConfig = Option.String('--forestryPath', {
     description:
       'Specify the relative path to the .forestry directory, if importing an existing forestry site.',
@@ -12,11 +12,11 @@ export class InitCommand extends Command {
     description:
       'Specify the root directory to run the CLI from (defaults to current working directory)',
   })
-  debug = Option.Boolean('--debug', false, {
-    description: 'Enable debug logging',
-  })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
+  })
+  debug = Option.Boolean('--debug', false, {
+    description: 'Enable debug logging',
   })
   tinaVersion = Option.String('--tinaVersion', {
     description: 'Specify a version for tina dependencies',
@@ -38,6 +38,7 @@ export class InitCommand extends Command {
       rootPath: rootPath,
       pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,
+      showSelfHosted: true,
       debug: this.debug,
       tinaVersion: this.tinaVersion,
     })

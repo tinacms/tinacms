@@ -1,16 +1,17 @@
 {
   "name": "@tinacms/datalayer",
   "version": "1.2.22",
-  "main": "dist/index.js",
+  "main": "dist/index",
   "module": "dist/index.mjs",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/index",
   "files": [
     "package.json",
     "dist"
   ],
   "exports": {
     "import": "./dist/index.mjs",
-    "require": "./dist/index.js"
+    "require": "./dist/index.js",
+    "types": "./dist/index.d.ts"
   },
   "license": "SEE LICENSE IN LICENSE",
   "buildConfig": {

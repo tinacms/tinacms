@@ -220,7 +220,8 @@ export class Codegen {
   }
 
   async genDatabaseClient() {
-    return ` import { resolve } from "@tinacms/datalayer";
+    return `// @ts-nocheck
+import { resolve } from "@tinacms/datalayer";
 import type { TinaClient } from "tinacms/dist/client";
 
 import { queries } from "./types";
