@@ -1,7 +1,7 @@
 import path from 'path'
 import { generateCollections } from '../forestry-migrate'
 import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer'
-import { logger } from '../../logger'
+import { log, logger } from '../../logger'
 import {
   cmdText,
   focusText,
@@ -198,6 +198,7 @@ async function apply({
   await addDependencies(config, env, params)
 
   logNextSteps({
+    dataLayer: config.dataLayer,
     packageManager: config.packageManager,
     framework: config.framework,
   })
@@ -505,17 +506,26 @@ const addContentFile = async ({
 }
 
 const logNextSteps = ({
+  dataLayer,
   framework,
   packageManager,
 }: {
+  dataLayer: boolean
   packageManager: string
   framework: Framework
 }) => {
   logger.info(focusText(`\n${titleText(' TinaCMS ')} has been initialized!`))
+  if (dataLayer) {
+    logger.info('Copy .env.tina to .env')
+    logger.info(
+      'If you are deploying to vercel make sure to add the environment variables to your project.'
+    )
+  }
   logger.info(
     'To get started run: ' +
       cmdText(frameworkDevCmds[framework.name]({ packageManager }))
   )
+  logger.info('Make sure  to push tina-lock.json to your GitHub repo')
   logger.info(
     `\nOnce your site is running, access the CMS at ${linkText(
       '<YourDevURL>/admin/index.html'
