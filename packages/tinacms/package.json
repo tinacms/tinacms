@@ -19,20 +19,10 @@
       "import": "./dist/edit-state.mjs",
       "require": "./dist/edit-state.js"
     },
-    "./react": {
-      "types": "./dist/react.d.ts",
-      "import": "./dist/react.mjs",
-      "require": "./dist/react.js"
-    },
     "./dist/react": {
       "types": "./dist/react.d.ts",
       "import": "./dist/react.mjs",
       "require": "./dist/react.js"
-    },
-    "./rich-text": {
-      "types": "./dist/rich-text/index.d.ts",
-      "import": "./dist/rich-text/index.mjs",
-      "require": "./dist/rich-text/index.js"
     },
     "./dist/rich-text": {
       "types": "./dist/rich-text/index.d.ts",
@@ -43,11 +33,6 @@
       "types": "./dist/dev-tools.d.ts",
       "import": "./dist/dev-tools.mjs",
       "require": "./dist/dev-tools.js"
-    },
-    "./rich-text/prism": {
-      "types": "./dist/rich-text/prism.d.ts",
-      "import": "./dist/rich-text/prism.mjs",
-      "require": "./dist/rich-text/prism.js"
     },
     "./dist/rich-text/prism": {
       "types": "./dist/rich-text/prism.d.ts",
