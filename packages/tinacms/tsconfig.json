@@ -16,5 +16,12 @@
     "src/**/*.spec.tsx",
     "dist"
   ],
+  "tsc-alias": {
+    "replacers": {
+      "base-url": {
+        "enabled": false
+      }
+    }
+  },
   "include": ["src"]
 }
