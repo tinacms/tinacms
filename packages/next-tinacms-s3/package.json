@@ -27,7 +27,6 @@
     "multer": "1.4.5-lts.1"
   },
   "devDependencies": {
-    "@tinacms/toolkit": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/crypto-js": "^3.1.47",
     "@types/js-cookie": "^2.2.6",
@@ -39,7 +38,9 @@
     "tinacms": "workspace:*",
     "typescript": "4.3.5"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "tinacms": "workspace:*"
+  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },

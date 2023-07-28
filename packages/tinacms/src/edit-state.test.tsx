@@ -1,11 +1,6 @@
-/**
-
-
-
-*/
-
 import { render, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
+import { describe, it, expect, vi } from 'vitest'
 
 import React from 'react'
 import { useTina } from './edit-state'
@@ -15,7 +10,7 @@ const query = `{}`
 const variables = { filename: 'neat.md' }
 
 const CreateDummyEditProvider = (isLoading, payload) => {
-  const setRequest = jest.fn()
+  const setRequest = vi.fn()
 
   return {
     setRequest,

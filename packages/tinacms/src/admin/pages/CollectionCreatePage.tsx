@@ -222,7 +222,7 @@ export const RenderForm = ({
             ? wrapFieldsWithMeta(({ field, input, meta }) => {
                 return (
                   <FilenameInput
-                    readonly={schemaCollection?.ui?.filename?.readonly}
+                    readOnly={schemaCollection?.ui?.filename?.readonly}
                     {...input}
                   />
                 )

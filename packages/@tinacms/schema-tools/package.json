@@ -50,7 +50,7 @@
     "directory": "packages/@tinacms/cli"
   },
   "dependencies": {
-    "micromatch": "4.0.5",
+    "picomatch-browser": "2.2.6",
     "url-pattern": "^1.0.3",
     "zod": "^3.14.3"
   }

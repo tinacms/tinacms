@@ -16,11 +16,13 @@ import { Container } from '../util/container'
 import { Section } from '../util/section'
 import { useTheme } from '../layout'
 import format from 'date-fns/format'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { TinaMarkdown } from 'tinacms/rich-text'
 import { Prism } from 'tinacms/dist/rich-text/prism'
 import type { TinaMarkdownContent, Components } from 'tinacms/dist/rich-text'
 import { PostType } from '../../pages/posts/[filename]'
-import { tinaField } from 'tinacms/dist/react'
+import { tinaField } from 'tinacms/react'
+
+console.log('hihih', TinaMarkdown)
 
 const components: Components<{
   BlockQuote: {
