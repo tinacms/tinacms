@@ -41,10 +41,7 @@
     }
   },
   "files": [
-    "dist",
-    "rich-text.d.ts",
-    "react.d.ts",
-    "rich-text/prism.d.ts"
+    "dist"
   ],
   "buildConfig": {
     "entryPoints": [
