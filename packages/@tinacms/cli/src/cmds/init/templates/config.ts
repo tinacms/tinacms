@@ -43,7 +43,10 @@ import { defineConfig } from "tinacms";
 ${vars.extraText || ''}
 
 // Your hosting provider likely exposes this as an environment variable
-const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || "main";
+const branch = process.env.GITHUB_BRANCH ||
+  process.env.VERCEL_GIT_COMMIT_REF ||
+  process.env.HEAD ||
+  "main"
 
 export default defineConfig({
   branch,
@@ -124,7 +127,10 @@ export const configExamples: {
       : ''
   }
   // Your hosting provider likely exposes this as an environment variable
-  const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || 'main'
+  const branch = process.env.GITHUB_BRANCH ||
+  process.env.VERCEL_GIT_COMMIT_REF ||
+  process.env.HEAD ||
+  "main"
   ${
     (args.isLocalEnvVarName &&
       `const isLocal = process.env.${args.isLocalEnvVarName} === 'true' || false`) ||

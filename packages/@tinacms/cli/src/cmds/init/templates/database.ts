@@ -25,6 +25,7 @@ const isLocal = process.env.${vars.isLocalEnvVarName} === "true";
 
 const branch = (process.env.GITHUB_BRANCH ||
   process.env.VERCEL_GIT_COMMIT_REF ||
+  process.env.HEAD ||
   "main") as string;
 
 if (!branch) {
