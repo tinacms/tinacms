@@ -378,29 +378,31 @@ export function MediaPicker({
               <Breadcrumb directory={directory} setDirectory={setDirectory} />
             </div>
 
-            <div className="flex flex-wrap items-center gap-4">
-              <Button
-                busy={false}
-                variant="white"
-                onClick={loadMedia}
-                className="whitespace-nowrap"
-              >
-                Refresh
-                <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
-              </Button>
-              <Button
-                busy={false}
-                variant="white"
-                onClick={() => {
-                  setNewFolderModalOpen(true)
-                }}
-                className="whitespace-nowrap"
-              >
-                New Folder
-                <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
-              </Button>
-              <UploadButton onClick={onClick} uploading={uploading} />
-            </div>
+            {cms.media.store.isStatic ? null : (
+              <div className="flex flex-wrap items-center gap-4">
+                <Button
+                  busy={false}
+                  variant="white"
+                  onClick={loadMedia}
+                  className="whitespace-nowrap"
+                >
+                  Refresh
+                  <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+                </Button>
+                <Button
+                  busy={false}
+                  variant="white"
+                  onClick={() => {
+                    setNewFolderModalOpen(true)
+                  }}
+                  className="whitespace-nowrap"
+                >
+                  New Folder
+                  <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+                </Button>
+                <UploadButton onClick={onClick} uploading={uploading} />
+              </div>
+            )}
           </div>
 
           <div className="flex h-full overflow-hidden bg-white">
@@ -458,7 +460,7 @@ export function MediaPicker({
               activeItem={activeItem}
               close={closePreview}
               selectMediaItem={selectMediaItem}
-              allowDelete={allowDelete}
+              allowDelete={cms.media.store.isStatic ? false : allowDelete}
               deleteMediaItem={() => {
                 setDeleteModalOpen(true)
               }}

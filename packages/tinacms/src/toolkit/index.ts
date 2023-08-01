@@ -8,6 +8,7 @@ export type {
   MediaStore,
   MediaListOptions,
   MediaList,
+  StaticMedia,
 } from '@toolkit/core'
 export { MdxFieldPluginExtendible } from '@toolkit/fields/plugins/mdx-field-plugin'
 export type { CloudConfigPlugin } from '@toolkit/react-cloud-config'

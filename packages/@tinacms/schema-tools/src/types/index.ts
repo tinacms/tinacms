@@ -606,6 +606,10 @@ export interface Config<
            * would store content in `"<my-public-folder>/uploads"`
            */
           mediaRoot: string
+          /**
+           * Indicates that media files cannot be uploaded or removed by editors
+           */
+          static?: boolean
         }
         loadCustomStore?: never
       }

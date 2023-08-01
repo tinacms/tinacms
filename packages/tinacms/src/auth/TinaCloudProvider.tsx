@@ -14,6 +14,7 @@ import {
   useLocalStorage,
   DummyMediaStore,
   TinaMediaStore,
+  StaticMedia,
 } from '@tinacms/toolkit'
 
 import {
@@ -151,7 +152,10 @@ export const AuthWallInner = ({
  */
 export const TinaCloudProvider = (
   props: TinaCloudAuthWallProps &
-    CreateClientProps & { cmsCallback?: (cms: TinaCMS) => TinaCMS }
+    CreateClientProps & {
+      cmsCallback?: (cms: TinaCMS) => TinaCMS
+      staticMedia: StaticMedia
+    }
 ) => {
   const baseBranch = props.branch || 'main'
   const [currentBranch, setCurrentBranch] = useLocalStorage(
@@ -204,14 +208,14 @@ export const TinaCloudProvider = (
     cms.registerApi('admin', new TinaAdminApi(cms))
   }
 
-  const setupMedia = async () => {
+  const setupMedia = async (staticMedia: StaticMedia) => {
     const hasTinaMedia = Boolean(props.schema.config?.media?.tina)
 
     /*
      Has tina media (set up in the schema)
     */
     if (hasTinaMedia) {
-      cms.media.store = new TinaMediaStore(cms)
+      cms.media.store = new TinaMediaStore(cms, staticMedia)
     } else if (
       /*
      Has tina custom media (set up in the schema or define schema)
@@ -258,7 +262,7 @@ export const TinaCloudProvider = (
     return newBranch
   }
 
-  setupMedia()
+  setupMedia(props.staticMedia)
 
   const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
     cms.flags.get('branch-switcher')

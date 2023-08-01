@@ -1,4 +1,5 @@
 import path from 'path'
+import fs from 'fs-extra'
 import {
   BuildOptions,
   InlineConfig,
@@ -10,6 +11,92 @@ import { Database } from '@tinacms/graphql'
 import { tinaTailwind } from './tailwind'
 import { ConfigManager } from '../config-manager'
 import normalizePath from 'normalize-path'
+
+/**
+ * This type is duplicated in he `TinaMediaStore`
+ * It represents the files that are available at build time
+ * and can be referenced in the media manager
+ */
+interface StaticMediaItem {
+  id: string
+  filename: string
+  src: string
+  directory: string
+  thumbnails: {
+    '75x75': string
+    '400x400': string
+    '1000x1000': string
+  }
+  type: 'file' | 'dir'
+  children?: StaticMedia
+}
+export interface StaticMedia {
+  [offset: string]: StaticMediaItem[]
+}
+
+async function listFilesRecursively({
+  directoryPath,
+  config,
+  roothPath,
+}: {
+  directoryPath: string
+  config: { publicFolder: string; mediaRoot: string }
+  roothPath: string
+}): Promise<StaticMedia> {
+  const fullDirectoryPath = path.join(
+    roothPath,
+    config.publicFolder,
+    directoryPath
+  )
+  const exists = await fs.pathExists(fullDirectoryPath)
+  if (!exists) {
+    return { '0': [] }
+  }
+  const items = await fs.readdir(fullDirectoryPath)
+
+  const staticMediaItems: StaticMediaItem[] = []
+
+  for (const item of items) {
+    const itemPath = path.join(fullDirectoryPath, item)
+    const stats = await fs.promises.lstat(itemPath)
+
+    const staticMediaItem: StaticMediaItem = {
+      id: item,
+      filename: item,
+      type: stats.isDirectory() ? 'dir' : 'file',
+      directory: `${directoryPath.replace(config.mediaRoot, '')}`,
+      src: `/${path.join(directoryPath, item)}`,
+      thumbnails: {
+        '75x75': `/${path.join(directoryPath, item)}`,
+        '400x400': `/${path.join(directoryPath, item)}`,
+        '1000x1000': `/${path.join(directoryPath, item)}`,
+      },
+    }
+
+    if (stats.isDirectory()) {
+      staticMediaItem.children = await listFilesRecursively({
+        directoryPath: path.join(directoryPath, item),
+        config,
+        roothPath,
+      })
+    }
+    staticMediaItems.push(staticMediaItem)
+  }
+  function chunkArrayIntoObject<T>(
+    array: T[],
+    chunkSize: number
+  ): { [key: string]: T[] } {
+    const result: { [key: string]: T[] } = {}
+
+    for (let i = 0; i < array.length; i += chunkSize) {
+      const chunkKey = `${(i / chunkSize) * 20}`
+      result[chunkKey] = array.slice(i, i + chunkSize)
+    }
+
+    return result
+  }
+  return chunkArrayIntoObject(staticMediaItems, 20)
+}
 
 export const createConfig = async ({
   configManager,
@@ -53,9 +140,25 @@ export const createConfig = async ({
     }
   })
 
+  const staticMediaPath: string = path.join(
+    configManager.generatedFolderPath,
+    'static-media.json'
+  )
+  if (configManager.config.media?.tina?.static) {
+    const staticMedia = await listFilesRecursively({
+      directoryPath: configManager.config.media.tina?.mediaRoot || '',
+      config: configManager.config.media.tina,
+      roothPath: configManager.rootPath,
+    })
+    await fs.outputFile(staticMediaPath, JSON.stringify(staticMedia, null, 2))
+  } else {
+    await fs.outputFile(staticMediaPath, `[]`)
+  }
+
   const alias = {
     TINA_IMPORT: configManager.prebuildFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
+    STATIC_MEDIA_IMPORT: staticMediaPath,
   }
   if (configManager.shouldSkipSDK()) {
     alias['CLIENT_IMPORT'] = path.join(
