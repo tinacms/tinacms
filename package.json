@@ -28,7 +28,7 @@
     "format": "prettier --write .",
     "postinstall": "husky install"
   },
-  "dependencies": {
+  "devDependencies": {
     "@changesets/cli": "^2.26.0",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
@@ -40,9 +40,7 @@
     "prettier": "^2.8.4",
     "pretty-quick": "^3.1.3",
     "typescript": "4.3.5",
-    "workspace": "^0.0.1-preview.1"
-  },
-  "devDependencies": {
+    "workspace": "^0.0.1-preview.1",
     "@types/jest": "^27.5.2",
     "cypress": "9.7.0",
     "husky": "^7.0.4",

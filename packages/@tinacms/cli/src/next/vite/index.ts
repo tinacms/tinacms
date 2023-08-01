@@ -185,7 +185,7 @@ export const createConfig = async ({
     appType: 'spa',
     resolve: {
       alias,
-      dedupe: ['graphql', 'tinacms', '@tinacms/toolkit', 'react', 'react-dom'],
+      dedupe: ['graphql', 'tinacms', 'react', 'react-dom'],
     },
     define: {
       /**
@@ -240,7 +240,7 @@ export const createConfig = async ({
     },
     plugins: [
       /**
-       * `splitVendorChunkPlugin` is needed because `tinacms` and `@tinacms/toolkit` are quite large,
+       * `splitVendorChunkPlugin` is needed because `tinacms` is quite large,
        * Vite's chunking strategy chokes on memory issues for smaller machines (ie. on CI).
        */
       react({

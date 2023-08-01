@@ -186,6 +186,14 @@ const extractKeyValue = (
       const value = extractObjectExpression(property.value, field)
       return { key, value }
     }
+  } else if (field?.list) {
+    assertType(property.value, 'ArrayExpression')
+    const value = property.value.elements.map((element) => {
+      assertHasType(element)
+      assertType(element, 'Literal')
+      return element.value
+    })
+    return { key, value }
   } else {
     assertType(property.value, 'Literal')
     return { key, value: property.value.value }
