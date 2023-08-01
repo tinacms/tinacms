@@ -36,7 +36,7 @@ export function extendNextScripts(
   }
 
   if (opts?.addSetupUsers && !scripts['setup:users']) {
-    result['setup:users'] = 'tinacms tinacms-next-auth setup'
+    result['setup:users'] = 'tinacms-next-auth setup'
   }
 
   return result
