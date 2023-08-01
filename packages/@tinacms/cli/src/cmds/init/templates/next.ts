@@ -504,7 +504,7 @@ export async function getServerSideProps(context) {
 }
 `,
   ['vercel-kv-credentials-provider-tailwindcss']:
-    () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
+    () => `/* THIS FILE HAS BEEN GENERATED WITH THE TINA CLI. */
 /* Base Styles */
  .grid {
      display: grid;
