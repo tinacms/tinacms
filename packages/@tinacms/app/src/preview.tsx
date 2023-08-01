@@ -16,14 +16,12 @@ export const Preview = (
   useGraphQLReducer(props.iframeRef, props.url)
 
   return (
-    <div className="tina-tailwind">
-      <iframe
-        data-test="tina-iframe"
-        id="tina-iframe"
-        ref={props.iframeRef}
-        className="h-screen w-full bg-white"
-        src={props.url}
-      />
-    </div>
+    <iframe
+      data-test="tina-iframe"
+      id="tina-iframe"
+      ref={props.iframeRef}
+      className="h-screen w-full bg-white"
+      src={props.url}
+    />
   )
 }

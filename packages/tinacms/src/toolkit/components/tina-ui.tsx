@@ -12,8 +12,6 @@ import { Alerts } from '@toolkit/react-alerts'
 import { MediaManager } from './media'
 import { ActiveFieldIndicator } from './active-field-indicator'
 import { MutationSignalProvider } from './mutation-signal'
-// @ts-ignore importing css is not recognized
-import styles from '../styles.css'
 
 export interface TinaUIProps {
   position?: SidebarPosition
@@ -27,26 +25,18 @@ export const TinaUI: React.FC<TinaUIProps> = ({ children, position }) => {
 
   return (
     <MutationSignalProvider>
-      {/* <style>{styles}</style>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Inter:400,600"
-        media="all"
-      ></link> */}
       <ModalProvider>
-        <div className="tina-tailwind">
-          <Alerts alerts={cms.alerts} />
-          <MediaManager />
-          {cms.sidebar && (
-            <SidebarProvider
-              resizingSidebar={resizingSidebar}
-              setResizingSidebar={setResizingSidebar}
-              position={position}
-              sidebar={cms.sidebar}
-            />
-          )}
-          <ActiveFieldIndicator />
-        </div>
+        <Alerts alerts={cms.alerts} />
+        <MediaManager />
+        {cms.sidebar && (
+          <SidebarProvider
+            resizingSidebar={resizingSidebar}
+            setResizingSidebar={setResizingSidebar}
+            position={position}
+            sidebar={cms.sidebar}
+          />
+        )}
+        <ActiveFieldIndicator />
         {/* Dragging across the iframe causes mouse events to stop propagating so there's a laggy feeling without this */}
         <div className={`${resizingSidebar ? 'pointer-events-none' : ''}`}>
           {children}

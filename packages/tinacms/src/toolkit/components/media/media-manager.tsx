@@ -416,7 +416,7 @@ export function MediaPicker({
                 } ${
                   list.items.length > 0 &&
                   viewMode === 'grid' &&
-                  'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-9 auto-rows-auto content-start justify-start'
+                  'w-full p-4 gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 4xl:grid-cols-6 6xl:grid-cols-9 auto-rows-auto content-start justify-start'
                 } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
               >
                 <input {...getInputProps()} />

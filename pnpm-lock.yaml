@@ -317,7 +317,6 @@ importers:
       graphql: 15.8.0
       monaco-editor: 0.31.0
       postcss: ^8.4.14
-      postcss-nested: ^5.0.6
       react: 17.0.2
       react-dom: 17.0.2
       react-router-dom: 6.3.0
@@ -338,7 +337,6 @@ importers:
       graphql: 15.8.0
       monaco-editor: 0.31.0
       postcss: 8.4.14
-      postcss-nested: 5.0.6_postcss@8.4.14
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
@@ -471,13 +469,13 @@ importers:
       node-fetch: '2'
       normalize-path: ^3.0.0
       postcss: ^8.3.3
-      postcss-nested: ^5.0.6
       prettier: ^2.2.1
       progress: ^2.0.3
       prompts: ^2.4.1
       readable-stream: ^4.3.0
       rollup-plugin-visualizer: ^5.9.0
       tailwindcss: ^3.2.7
+      tinacms: workspace:*
       typanion: 3.13.0
       typescript: 4.3.5
       url-pattern: ^1.0.3
@@ -538,13 +536,13 @@ importers:
       node-fetch: 2.6.7
       normalize-path: 3.0.0
       postcss: 8.4.23
-      postcss-nested: 5.0.6_postcss@8.4.23
       prettier: 2.7.1
       progress: 2.0.3
       prompts: 2.4.2
       readable-stream: 4.3.0
       rollup-plugin-visualizer: 5.9.0
       tailwindcss: 3.2.7
+      tinacms: link:../../tinacms
       typanion: 3.13.0
       url-pattern: 1.0.3
       vite: 4.3.9
@@ -873,7 +871,6 @@ importers:
       meow: ^10.0.1
       normalize-path: ^3.0.0
       postcss: ^8.4.5
-      postcss-nested: ^5.0.6
       tailwindcss: ^3.2.7
       tsup: ^4.12.5
       typescript: ^4.2.2
@@ -900,7 +897,6 @@ importers:
       meow: 10.1.3
       normalize-path: 3.0.0
       postcss: 8.4.14
-      postcss-nested: 5.0.6_postcss@8.4.14
       tailwindcss: 3.2.7
       tsup: 4.14.0_m3gf5jmpd2aiwepqhoxxcqgnwi
       typescript: 4.7.4
@@ -25424,32 +25420,6 @@ packages:
       lilconfig: 2.1.0
       postcss: 8.4.23
       yaml: 2.2.2
-
-  /postcss-nested/5.0.6_postcss@8.4.14:
-    resolution:
-      {
-        integrity: sha512-rKqm2Fk0KbA8Vt3AdGN0FB9OBOMDVajMG6ZCf/GoHgdxUJ4sBFp0A/uMIRm+MJUdo33YXEtjqIz8u7DAp8B7DA==,
-      }
-    engines: { node: '>=12.0' }
-    peerDependencies:
-      postcss: ^8.2.14
-    dependencies:
-      postcss: 8.4.14
-      postcss-selector-parser: 6.0.11
-    dev: false
-
-  /postcss-nested/5.0.6_postcss@8.4.23:
-    resolution:
-      {
-        integrity: sha512-rKqm2Fk0KbA8Vt3AdGN0FB9OBOMDVajMG6ZCf/GoHgdxUJ4sBFp0A/uMIRm+MJUdo33YXEtjqIz8u7DAp8B7DA==,
-      }
-    engines: { node: '>=12.0' }
-    peerDependencies:
-      postcss: ^8.2.14
-    dependencies:
-      postcss: 8.4.23
-      postcss-selector-parser: 6.0.11
-    dev: false
 
   /postcss-nested/6.0.0_postcss@8.4.23:
     resolution:
