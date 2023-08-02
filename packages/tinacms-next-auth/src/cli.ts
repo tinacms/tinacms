@@ -1,7 +1,7 @@
 import 'isomorphic-fetch'
 
 //@ts-ignore
-import { version, name } from '../package.json'
+import { version } from '../package.json'
 
 import { Cli, Builtins, Command } from 'clipanion'
 import chalk from 'chalk'
@@ -19,39 +19,47 @@ const CHOICES = {
   EXIT: { title: 'Exit', value: 'EXIT' },
 }
 
+const isValidUrl = (urlString) => {
+  try {
+    return Boolean(new URL(urlString))
+  } catch (e) {
+    return false
+  }
+}
+
 const promptUserForToken = async () => {
   console.log('Did not find KV store url and token in .env file.')
   // Prompt user for KV store url and token
   const answers = await prompts([
     {
-      type: 'text',
+      type: () => (process.env.KV_REST_API_URL ? null : 'text'),
       name: 'url',
       message: `Enter your Vercel KV Database URL (see https://vercel.com/dashboard/stores):`,
     },
     {
-      type: 'text',
       name: 'token',
       message: `Enter your Vercel KV Database token:`,
+      type: () => (process.env.KV_REST_API_TOKEN ? null : 'text'),
     },
     {
-      type: 'text',
+      type: () => (process.env.NEXTAUTH_CREDENTIALS_KEY ? null : 'text'),
       name: 'credentials_key',
       message: `Enter your Credentials key (default: 'tinacms_users'):`,
       initial: 'tinacms_users',
     },
   ])
 
-  if (!process.env.KV_REST_API_URL) {
+  if (answers.url && !process.env.KV_REST_API_URL) {
     fs.writeFileSync('.env', `KV_REST_API_URL=${answers.url}\n`, { flag: 'a' })
     process.env.KV_REST_API_URL = answers.url
   }
-  if (!process.env.KV_REST_API_TOKEN) {
+  if (answers.token && !process.env.KV_REST_API_TOKEN) {
     fs.writeFileSync('.env', `KV_REST_API_TOKEN=${answers.token}\n`, {
       flag: 'a',
     })
     process.env.KV_REST_API_TOKEN = answers.token
   }
-  if (!process.env.NEXTAUTH_CREDENTIALS_KEY) {
+  if (answers.credentials_key && !process.env.NEXTAUTH_CREDENTIALS_KEY) {
     fs.writeFileSync(
       '.env',
       `NEXTAUTH_CREDENTIALS_KEY=${answers.credentials_key}\n`,
@@ -127,19 +135,64 @@ class SetupCommand extends Command {
 
     console.log(chalk.green('Welcome to TinaCMS!'))
 
-    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-      await promptUserForToken()
+    if (
+      !process.env.KV_REST_API_URL ||
+      !process.env.KV_REST_API_TOKEN ||
+      !process.env.NEXTAUTH_CREDENTIALS_KEY
+    ) {
+      try {
+        await promptUserForToken()
+        if (
+          !process.env.KV_REST_API_URL ||
+          !process.env.KV_REST_API_TOKEN ||
+          !process.env.NEXTAUTH_CREDENTIALS_KEY
+        ) {
+          throw new Error('Missing KV store url or token!')
+        }
+        // Check to make sure they have to correct format
+        if (!isValidUrl(process.env.KV_REST_API_URL)) {
+          throw new Error('Invalid KV store url!')
+        }
+        if (typeof process.env.NEXTAUTH_CREDENTIALS_KEY !== 'string') {
+          throw new Error('Invalid NEXTAUTH_CREDENTIALS_KEY! Must be a string.')
+        }
+        if (typeof process.env.KV_REST_API_TOKEN !== 'string') {
+          throw new Error('Invalid KV_REST_API_TOKEN! Must be a string.')
+        }
+      } catch (e) {
+        console.log(
+          chalk.red(
+            'Error: Could not setup process.env.KV_REST_API_URL or process.env.KV_REST_API_TOKEN or process.env.NEXTAUTH_CREDENTIALS_KEY'
+          )
+        )
+        console.log(e.message)
+        process.exit(1)
+      }
     }
 
     let done = false
-    const userStore = new RedisUserStore(process.env.NEXTAUTH_CREDENTIALS_KEY, {
-      url: process.env.KV_REST_API_URL,
-      token: process.env.KV_REST_API_TOKEN,
-    })
+    let userStore: RedisUserStore
+    try {
+      userStore = new RedisUserStore(process.env.NEXTAUTH_CREDENTIALS_KEY, {
+        url: process.env.KV_REST_API_URL,
+        token: process.env.KV_REST_API_TOKEN,
+      })
+      await userStore.isInitialized()
+    } catch (e) {
+      console.error(
+        chalk.red(
+          'Error: Could not connect to KV store! Please check credentials in your .env file.\nEx:\n\nKV_REST_API_URL="https://<Something>.kv.vercel-storage.com"\nKV_REST_API_TOKEN=***\nNEXTAUTH_CREDENTIALS_KEY=tinacms_users'
+        )
+      )
+      console.error(e)
+      process.exit(1)
+    }
+    console.log(chalk.green('Connected to KV store!'))
 
     // Loop until user exits
     while (!done) {
       const users = await userStore.getUsers()
+
       if (!users?.length) {
         console.log(chalk.red('No users found! Please add a user.'))
       } else {
@@ -153,40 +206,61 @@ class SetupCommand extends Command {
         )
       }
 
-      const answers = await prompts([
+      const answers = await prompts(
+        [
+          {
+            type: 'select',
+            name: 'choice',
+            message: `What would you like to do?`,
+            choices: [
+              CHOICES.ADD,
+              CHOICES.UPDATE,
+              CHOICES.DELETE,
+              CHOICES.EXIT,
+            ],
+          },
+          {
+            type: (_, answers) =>
+              answers.choice === 'ADD' ||
+              answers.choice === 'UPDATE' ||
+              answers.choice === 'DELETE'
+                ? 'text'
+                : null,
+            name: 'name',
+            validate: (value) => {
+              // username must only contain alphanumeric characters
+              if (!/^[a-z0-9]+$/i.test(value)) {
+                return 'Username must only contain alphanumeric characters'
+              }
+              return true
+            },
+            message: `Enter a username:`,
+          },
+          {
+            type: (_, answers) =>
+              answers.choice === 'ADD' || answers.choice === 'UPDATE'
+                ? 'password'
+                : null,
+            name: 'password',
+            message: `Enter a user password:`,
+          },
+          {
+            type: (_, answers) =>
+              answers.choice === 'ADD' || answers.choice === 'UPDATE'
+                ? 'password'
+                : null,
+            name: 'passwordConfirm',
+            message: `Confirm the user password:`,
+          },
+        ],
         {
-          type: 'select',
-          name: 'choice',
-          message: `What would you like to do?`,
-          choices: [CHOICES.ADD, CHOICES.UPDATE, CHOICES.DELETE, CHOICES.EXIT],
-        },
-        {
-          type: (_, answers) =>
-            answers.choice === 'ADD' ||
-            answers.choice === 'UPDATE' ||
-            answers.choice === 'DELETE'
-              ? 'text'
-              : null,
-          name: 'name',
-          message: `Enter a username:`,
-        },
-        {
-          type: (_, answers) =>
-            answers.choice === 'ADD' || answers.choice === 'UPDATE'
-              ? 'password'
-              : null,
-          name: 'password',
-          message: `Enter a user password:`,
-        },
-        {
-          type: (_, answers) =>
-            answers.choice === 'ADD' || answers.choice === 'UPDATE'
-              ? 'password'
-              : null,
-          name: 'passwordConfirm',
-          message: `Confirm the user password:`,
-        },
-      ])
+          onCancel: async () => {
+            // If the click Control C, exit the process
+            console.log(chalk.green('Goodbye!'))
+            process.exit(0)
+          },
+        }
+      )
 
       if (answers.choice === 'ADD') {
         const { name, password, passwordConfirm } = answers
@@ -232,6 +306,16 @@ const cli = new Cli({
   binaryName: `tinacms-next-auth`,
   binaryLabel: `TinaCMS NextAuth`,
   binaryVersion: version,
+})
+cli.error((err) => {
+  // check to see if user clicked CTRL+C
+  if (err.message === 'SIGINT') {
+    console.log(chalk.red('Exiting...'))
+    process.exit(1)
+  }
+  console.log(chalk.red(err.message))
+  console.log(err)
+  process.exit(1)
 })
 
 cli.register(SetupCommand)

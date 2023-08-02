@@ -28,7 +28,8 @@
   },
   "scripts": {
     "types": "pnpm tsc",
-    "build": "tinacms-scripts build"
+    "build": "tinacms-scripts build",
+    "run-self-script": "node bin/tinacms-next-auth setup"
   },
   "dependencies": {
     "@upstash/redis": "^1.22.0",
