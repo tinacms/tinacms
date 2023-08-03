@@ -1,12 +1,12 @@
 {
   "name": "@tinacms/sharedctx",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "dist/index.js",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.mjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     }
   },
@@ -35,7 +35,6 @@
   },
   "peerDependencies": {
     "react": ">=16.14",
-    "react-dom": ">=16.14",
-    "react-is": ">=16.14.0"
+    "react-dom": ">=16.14"
   }
 }

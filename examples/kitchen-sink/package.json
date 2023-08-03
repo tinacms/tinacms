@@ -1,6 +1,6 @@
 {
   "name": "e2e-next",
-  "version": "0.1.39",
+  "version": "0.1.48",
   "private": true,
   "scripts": {
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
@@ -16,7 +16,6 @@
     "searchindex": "tinacms search-index"
   },
   "dependencies": {
-    "@cypress/chrome-recorder": "^2.2.0",
     "@headlessui/react": "^1.7.3",
     "@heroicons/react": "^2.0.12",
     "@tailwindcss/typography": "^0.5.7",
@@ -28,11 +27,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.7.1",
-    "react-json-view": "^1.21.3",
     "remove": "^0.1.5",
-    "tinacms": "workspace:*",
-    "vite": "^3.1.3",
-    "vitest": "^0.18.0"
+    "tinacms": "workspace:*"
   },
   "devDependencies": {
     "@puppeteer/replay": "^1.3.0",
@@ -41,10 +37,12 @@
     "autoprefixer": "^10.4.0",
     "cypress": "^10.10.0",
     "eslint": "8.24.0",
-    "eslint-config-next": "13.2.1",
+    "eslint-config-next": "^13.4.7",
     "postcss": "^8.4.18",
     "puppeteer": "^18.0.5",
     "tailwindcss": "^3.2.7",
-    "typescript": "^4.8.3"
+    "typescript": "^4.8.3",
+    "vite": "^4.3.9",
+    "vitest": "^0.32.2"
   }
 }

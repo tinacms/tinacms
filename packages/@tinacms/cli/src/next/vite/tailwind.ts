@@ -4,11 +4,13 @@ import postcssNested from 'postcss-nested/index.js'
 import tailwindNesting from 'tailwindcss/nesting/index.js'
 import defaultTheme from 'tailwindcss/defaultTheme.js'
 import twTypography from '@tailwindcss/typography'
-import lineClamp from '@tailwindcss/line-clamp'
 import aspectRatio from '@tailwindcss/aspect-ratio'
 import path from 'path'
 
-export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
+export const tinaTailwind = (
+  spaPath: string,
+  prebuildFilePath: string
+): Plugin => {
   return {
     name: 'vite-plugin-tina',
     // @ts-ignore
@@ -16,7 +18,7 @@ export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
       const plugins: Plugin[] = []
       const content = [
         path.join(spaPath, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
-        path.join(configFilePath, '../**/*.{vue,js,ts,jsx,tsx,svelte}'),
+        prebuildFilePath,
       ]
 
       const tw = tailwind({
@@ -234,11 +236,7 @@ export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
           },
         },
         content,
-        plugins: [
-          twTypography({ className: 'tina-prose' }),
-          lineClamp,
-          aspectRatio,
-        ],
+        plugins: [twTypography({ className: 'tina-prose' }), aspectRatio],
       }) as unknown as Plugin
       plugins.push(tailwindNesting)
       // @ts-ignore

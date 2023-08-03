@@ -98,7 +98,7 @@ const ReferenceField = FieldWithList.extend({
   }),
 })
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore --- Not sure why this is giving a type error here
 export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
   // needs to be redefined here to avoid circle deps

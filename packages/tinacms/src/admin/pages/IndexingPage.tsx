@@ -63,7 +63,7 @@ export const IndexingPage: FC = () => {
           setState('indexing')
         } catch (e) {
           console.error(e)
-          cms.alerts.error('Branch creation failed.')
+          cms.alerts.error('Branch creation failed: ' + e.message)
           setErrorMessage(
             'Branch creation failed, please try again. By refreshing the page.'
           )
@@ -136,10 +136,12 @@ export const IndexingPage: FC = () => {
         const foo = await tinaApi.createPullRequest({
           baseBranch,
           branch: branch,
-          title: 'PR from TinaCMS',
+          title: `${branch
+            .replace('tina/', '')
+            .replace('-', ' ')} (PR from TinaCMS)`,
         })
         console.log('PR created', foo)
-        cms.alerts.success('Creating PR')
+        cms.alerts.success('Pull request created.')
         localStorage.setItem('tina.createBranchState', 'done')
         setState('done')
       }

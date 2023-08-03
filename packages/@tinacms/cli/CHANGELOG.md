@@ -1,5 +1,111 @@
 # tinacms-cli
 
+## 1.5.26
+
+### Patch Changes
+
+- Updated dependencies [0d8a19632]
+- Updated dependencies [bc812441b]
+  - @tinacms/graphql@1.4.22
+  - @tinacms/schema-tools@1.4.9
+  - @tinacms/datalayer@1.2.22
+  - @tinacms/search@1.0.7
+  - @tinacms/app@1.2.24
+  - @tinacms/metrics@1.0.2
+
+## 1.5.25
+
+### Patch Changes
+
+- 94f353822: Fix to log errors in spinner
+- Updated dependencies [ad6a166a6]
+- Updated dependencies [94f353822]
+  - @tinacms/search@1.0.6
+  - @tinacms/graphql@1.4.21
+  - @tinacms/app@1.2.23
+  - @tinacms/datalayer@1.2.21
+
+## 1.5.24
+
+### Patch Changes
+
+- Updated dependencies [019920a35]
+  - @tinacms/schema-tools@1.4.8
+  - @tinacms/graphql@1.4.20
+  - @tinacms/search@1.0.5
+  - @tinacms/datalayer@1.2.20
+  - @tinacms/app@1.2.22
+
+## 1.5.23
+
+### Patch Changes
+
+- @tinacms/app@1.2.21
+
+## 1.5.22
+
+### Patch Changes
+
+- 495108725: Add optional partialReindex flag to build command
+- Updated dependencies [495108725]
+  - @tinacms/graphql@1.4.19
+  - @tinacms/app@1.2.20
+  - @tinacms/datalayer@1.2.19
+  - @tinacms/search@1.0.4
+
+## 1.5.21
+
+### Patch Changes
+
+- ca1298975: Fix issue where external React depenedencies we're being dynamically required
+  - @tinacms/app@1.2.19
+
+## 1.5.20
+
+### Patch Changes
+
+- 62e4ce3f1: Fix the indexing status error message to suggest Reindex instead of Reset Repository cache
+- fe13b4ed9: Fix search index tokenizer regex to not treat underscores as token separators
+- 4d2c913f8: Ensure schema changes are picked up by the Vite dev server so we don't get schema mismatch errors during local dev
+- 0bf700512: Change the way the Tina config file is built, so dependencies with Tailwind classes are picked up automatically
+- cc9d065b8: Fix issue where react and react-dom werent provided by the CLI
+- Updated dependencies [fe13b4ed9]
+- Updated dependencies [e5e29ed58]
+- Updated dependencies [812df6ace]
+- Updated dependencies [1176d569a]
+  - @tinacms/schema-tools@1.4.7
+  - @tinacms/search@1.0.3
+  - @tinacms/graphql@1.4.18
+  - @tinacms/app@1.2.18
+  - @tinacms/datalayer@1.2.18
+
+## 1.5.19
+
+### Patch Changes
+
+- 1751f2fd3: Update tailwind.ts
+- Updated dependencies [ee9acb5e5]
+- Updated dependencies [a94e123b6]
+  - @tinacms/search@1.0.2
+  - @tinacms/schema-tools@1.4.6
+  - @tinacms/graphql@1.4.17
+  - @tinacms/app@1.2.17
+  - @tinacms/datalayer@1.2.17
+
+## 1.5.18
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+- 1c78bafc2: Fix local search indexing to properly update the index on filesystem changes
+- Updated dependencies [c385b5615]
+- Updated dependencies [1c78bafc2]
+  - @tinacms/schema-tools@1.4.5
+  - @tinacms/graphql@1.4.16
+  - @tinacms/search@1.0.1
+  - @tinacms/datalayer@1.2.16
+  - @tinacms/app@1.2.16
+
 ## 1.5.17
 
 ### Patch Changes

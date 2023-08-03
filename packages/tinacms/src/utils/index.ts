@@ -10,6 +10,7 @@ import { Schema } from '@tinacms/schema-tools'
 export interface CreateClientProps {
   clientId?: string
   isLocalClient?: boolean
+  isSelfHosted?: boolean
   tinaioConfig?: TinaIOConfig
   owner?: string
   repo?: string
@@ -39,7 +40,7 @@ export const createClient = ({
       })
 }
 
-export function assertShape<T extends unknown>(
+export function assertShape<T>(
   value: unknown,
   yupSchema: (args: typeof yup) => yup.AnySchema,
   errorMessage?: string
@@ -53,7 +54,7 @@ export function assertShape<T extends unknown>(
   }
 }
 
-export function safeAssertShape<T extends unknown>(
+export function safeAssertShape<T>(
   value: unknown,
   yupSchema: (args: typeof yup) => yup.AnySchema
 ): boolean {

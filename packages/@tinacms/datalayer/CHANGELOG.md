@@ -1,5 +1,55 @@
 # tina-graphql
 
+## 1.2.22
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [0d8a19632]
+- Updated dependencies [bc812441b]
+  - @tinacms/graphql@1.4.22
+
+## 1.2.21
+
+### Patch Changes
+
+- Updated dependencies [94f353822]
+  - @tinacms/graphql@1.4.21
+
+## 1.2.20
+
+### Patch Changes
+
+- @tinacms/graphql@1.4.20
+
+## 1.2.19
+
+### Patch Changes
+
+- Updated dependencies [495108725]
+  - @tinacms/graphql@1.4.19
+
+## 1.2.18
+
+### Patch Changes
+
+- Updated dependencies [e5e29ed58]
+  - @tinacms/graphql@1.4.18
+
+## 1.2.17
+
+### Patch Changes
+
+- @tinacms/graphql@1.4.17
+
+## 1.2.16
+
+### Patch Changes
+
+- Updated dependencies [c385b5615]
+- Updated dependencies [1c78bafc2]
+  - @tinacms/graphql@1.4.16
+
 ## 1.2.15
 
 ### Patch Changes

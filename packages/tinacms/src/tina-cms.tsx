@@ -150,9 +150,7 @@ export const TinaCMSProvider2 = ({
     )
   }
   const apiURL = props?.client?.apiUrl || props?.apiURL
-
   const isLocalOverride = schema?.config?.admin?.auth?.useLocalAuth
-
   const { branch, clientId, isLocalClient } = apiURL
     ? parseURL(apiURL)
     : {
@@ -189,9 +187,11 @@ export const TinaCMSProvider2 = ({
         clientId={clientId || schema?.config?.clientId}
         tinaioConfig={props.tinaioConfig}
         isLocalClient={isLocalOverride || isLocalClient}
+        isSelfHosted={!!schema?.config?.contentApiUrlOverride}
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}
         apiUrl={apiURL}
+        staticMedia={props.staticMedia}
         // Not ideal but we need this for backwards compatibility for now. We can clean this up when we require a config.{js,ts} file
         // @ts-ignore
         schema={{ ...schema, config: { ...schema.config, ...props } }}

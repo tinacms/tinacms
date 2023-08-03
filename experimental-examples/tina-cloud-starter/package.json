@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/starter",
-  "version": "0.1.4",
+  "version": "0.1.13",
   "private": true,
   "scripts": {
     "dev": "tinacms dev -c \"next dev\"",
@@ -11,13 +11,13 @@
     "lint": "eslint . --ext .ts,.tsx"
   },
   "devDependencies": {
-    "@svgr/webpack": "^6.3.1",
+    "@svgr/webpack": "^8.0.1",
     "@tinacms/cli": "workspace:*",
     "@types/js-cookie": "^3.0.0",
     "@types/node": "^16.11.7",
     "@types/react": "^17.0.35",
     "@types/styled-components": "^5.1.15",
-    "@typescript-eslint/eslint-plugin": "^5.20.0",
+    "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.20.0",
     "autoprefixer": "^10.4.7",
     "eslint": "^8.13.0",
@@ -37,7 +37,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.2.0",
-    "styled-jsx": "^3.2.5",
     "tinacms": "workspace:*",
     "typescript": "^4.5.2"
   }

@@ -1,5 +1,11 @@
 # @tinacms/sharedctx
 
+## 1.0.2
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+
 ## 1.0.1
 
 ### Patch Changes

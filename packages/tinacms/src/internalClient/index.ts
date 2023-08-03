@@ -290,6 +290,10 @@ export class Client {
     return false
   }
 
+  public get isCustomContentApi() {
+    return !!this.options.customContentApiUrl
+  }
+
   setBranch(branchName: string) {
     const encodedBranch = encodeURIComponent(branchName)
     this.branch = encodedBranch
@@ -742,7 +746,7 @@ mutation addPendingDocumentMutation(
     return parsedResult
   }
 
-  async listBranches() {
+  async listBranches(args?: { includeIndexStatus?: boolean }) {
     try {
       const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
       const res = await this.fetchWithToken(url, {
@@ -750,6 +754,9 @@ mutation addPendingDocumentMutation(
       })
       const branches = await res.json()
       const parsedBranches = ListBranchResponse.parse(branches)
+      if (args?.includeIndexStatus === false) {
+        return parsedBranches
+      }
       const indexStatusPromises = parsedBranches.map(async (branch) => {
         const indexStatus = await this.getIndexStatus({ ref: branch.name })
         return {
@@ -846,7 +853,10 @@ export class LocalClient extends Client {
 }
 
 export class TinaCMSSearchClient implements SearchClient {
-  constructor(private client: Client) {}
+  constructor(
+    private client: Client,
+    private tinaSearchConfig?: { stopwordLanguages?: string[] }
+  ) {}
   async query(
     query: string,
     options?: {
@@ -859,7 +869,10 @@ export class TinaCMSSearchClient implements SearchClient {
     total: number
     prevCursor: string | null
   }> {
-    const q = queryToSearchIndexQuery(query)
+    const q = queryToSearchIndexQuery(
+      query,
+      this.tinaSearchConfig?.stopwordLanguages
+    )
     const opt = optionsToSearchIndexOptions(options)
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
     const res = await this.client.fetchWithToken(

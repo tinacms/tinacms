@@ -173,17 +173,23 @@ export function useEditState(): { edit: boolean } {
  * is working with.
  */
 export const tinaField = <
-  T extends object & {
-    _content_source?: {
-      queryId: string
-      path: (number | string)[]
-    }
-  }
+  T extends
+    | (object & {
+        _content_source?: {
+          queryId: string
+          path: (number | string)[]
+        }
+      })
+    | undefined
+    | null
 >(
   object: T,
-  property?: keyof Omit<T, '__typename' | '_sys'>,
+  property?: keyof Omit<NonNullable<T>, '__typename' | '_sys'>,
   index?: number
 ) => {
+  if (!object) {
+    return ''
+  }
   if (object._content_source) {
     if (!property) {
       return [

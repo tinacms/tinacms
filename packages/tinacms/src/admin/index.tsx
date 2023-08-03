@@ -123,7 +123,7 @@ const CheckSchema = ({
   const api = new TinaAdminApi(cms)
   const url = api.api.contentApiUrl
   const [schemaMissingError, setSchemaMissingError] = React.useState(false)
-  const currentBranch = cms.api.tina.branch
+  const currentBranch = decodeURIComponent(cms.api.tina.branch)
 
   useEffect(() => {
     if (schemaJson && cms) {
@@ -150,7 +150,7 @@ const CheckSchema = ({
   }, [cms, JSON.stringify(schemaJson || {}), url])
   return (
     <>
-      {schemaMissingError && (
+      {schemaMissingError ? (
         <Modal>
           <PopupModal>
             <ModalHeader>Branch Not Found</ModalHeader>
@@ -177,8 +177,9 @@ const CheckSchema = ({
             </ModalActions>
           </PopupModal>
         </Modal>
+      ) : (
+        children
       )}
-      {children}
     </>
   )
 }

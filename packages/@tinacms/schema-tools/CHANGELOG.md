@@ -1,5 +1,35 @@
 # @tinacms/schema-tools
 
+## 1.4.9
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+
+## 1.4.8
+
+### Patch Changes
+
+- 019920a35: Make clientId, branch and token optional in the config.
+
+## 1.4.7
+
+### Patch Changes
+
+- fe13b4ed9: Fix search index tokenizer regex to not treat underscores as token separators
+
+## 1.4.6
+
+### Patch Changes
+
+- a94e123b6: Fix optional config validation for search
+
+## 1.4.5
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+
 ## 1.4.4
 
 ### Patch Changes

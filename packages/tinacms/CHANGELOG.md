@@ -1,5 +1,104 @@
 # tinacms
 
+## 1.5.17
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [bc812441b]
+  - @tinacms/schema-tools@1.4.9
+  - @tinacms/sharedctx@1.0.2
+  - @tinacms/toolkit@1.7.13
+  - @tinacms/search@1.0.7
+
+## 1.5.16
+
+### Patch Changes
+
+- 1889422b0: Fix issue where deeply nested rich-text fields weren't selectable
+- Updated dependencies [1889422b0]
+- Updated dependencies [ad6a166a6]
+  - @tinacms/toolkit@1.7.12
+  - @tinacms/search@1.0.6
+
+## 1.5.15
+
+### Patch Changes
+
+- Updated dependencies [019920a35]
+  - @tinacms/schema-tools@1.4.8
+  - @tinacms/search@1.0.5
+  - @tinacms/toolkit@1.7.11
+
+## 1.5.14
+
+### Patch Changes
+
+- f1e8828c8: fix: resort prop overrides to allow for style & className merging of list items
+- 304e23318: - Update pull request title to include the branch name
+  - Slugify brach name when typing in the title
+- Updated dependencies [f1e8828c8]
+- Updated dependencies [304e23318]
+- Updated dependencies [a5d986477]
+  - @tinacms/toolkit@1.7.10
+
+## 1.5.13
+
+### Patch Changes
+
+- 495108725: Disable tina cloud specific calls when using custom content api
+- b0eba5d49: Upgrade prism react renderer, allow for theming
+- Updated dependencies [d73d03f8f]
+- Updated dependencies [745e30708]
+- Updated dependencies [495108725]
+- Updated dependencies [7d6e6ff3d]
+- Updated dependencies [808d5cc6c]
+  - @tinacms/toolkit@1.7.9
+  - @tinacms/search@1.0.4
+
+## 1.5.12
+
+### Patch Changes
+
+- Updated dependencies [f6efd498e]
+  - @tinacms/toolkit@1.7.8
+
+## 1.5.11
+
+### Patch Changes
+
+- c7fa6ddc0: Add dev-tools export to make it easy to see Tina data when building a page
+- 6e192cc38: Improve type signature for tinaField so potentially null fields don't show a Typescript error
+- 5aaae9902: Clear the search state when switching between collections
+- Updated dependencies [fe13b4ed9]
+- Updated dependencies [812df6ace]
+- Updated dependencies [8710dec4b]
+  - @tinacms/schema-tools@1.4.7
+  - @tinacms/search@1.0.3
+  - @tinacms/toolkit@1.7.7
+
+## 1.5.10
+
+### Patch Changes
+
+- Updated dependencies [ee9acb5e5]
+- Updated dependencies [a94e123b6]
+  - @tinacms/search@1.0.2
+  - @tinacms/schema-tools@1.4.6
+  - @tinacms/toolkit@1.7.6
+
+## 1.5.9
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+- d2ddfa5a6: Remove type: module from TinaCMS package
+- 9489d5d47: Add `{type: "module"}` to tinacms package
+- Updated dependencies [c385b5615]
+  - @tinacms/schema-tools@1.4.5
+  - @tinacms/toolkit@1.7.5
+  - @tinacms/search@1.0.1
+
 ## 1.5.8
 
 ### Patch Changes

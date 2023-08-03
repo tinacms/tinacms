@@ -1,5 +1,94 @@
 # @tinacms/app
 
+## 1.2.24
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [bc812441b]
+  - @tinacms/toolkit@1.7.13
+  - @tinacms/mdx@1.3.15
+  - tinacms@1.5.17
+
+## 1.2.23
+
+### Patch Changes
+
+- Updated dependencies [1889422b0]
+  - @tinacms/toolkit@1.7.12
+  - tinacms@1.5.16
+
+## 1.2.22
+
+### Patch Changes
+
+- @tinacms/mdx@1.3.14
+- tinacms@1.5.15
+- @tinacms/toolkit@1.7.11
+
+## 1.2.21
+
+### Patch Changes
+
+- Updated dependencies [f1e8828c8]
+- Updated dependencies [304e23318]
+- Updated dependencies [a5d986477]
+  - @tinacms/toolkit@1.7.10
+  - tinacms@1.5.14
+
+## 1.2.20
+
+### Patch Changes
+
+- Updated dependencies [d73d03f8f]
+- Updated dependencies [745e30708]
+- Updated dependencies [495108725]
+- Updated dependencies [b0eba5d49]
+- Updated dependencies [7d6e6ff3d]
+- Updated dependencies [808d5cc6c]
+  - @tinacms/toolkit@1.7.9
+  - tinacms@1.5.13
+
+## 1.2.19
+
+### Patch Changes
+
+- Updated dependencies [f6efd498e]
+  - @tinacms/toolkit@1.7.8
+  - tinacms@1.5.12
+
+## 1.2.18
+
+### Patch Changes
+
+- 1176d569a: Ensure tinaField links to references land on the select field instead of the referenced form
+- Updated dependencies [c7fa6ddc0]
+- Updated dependencies [8710dec4b]
+- Updated dependencies [6e192cc38]
+- Updated dependencies [5aaae9902]
+  - tinacms@1.5.11
+  - @tinacms/toolkit@1.7.7
+  - @tinacms/mdx@1.3.13
+
+## 1.2.17
+
+### Patch Changes
+
+- @tinacms/toolkit@1.7.6
+- tinacms@1.5.10
+- @tinacms/mdx@1.3.12
+
+## 1.2.16
+
+### Patch Changes
+
+- Updated dependencies [c385b5615]
+- Updated dependencies [d2ddfa5a6]
+- Updated dependencies [9489d5d47]
+  - @tinacms/toolkit@1.7.5
+  - tinacms@1.5.9
+  - @tinacms/mdx@1.3.11
+
 ## 1.2.15
 
 ### Patch Changes

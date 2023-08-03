@@ -9,12 +9,15 @@ const tinaConfigKey = z
   .object({
     publicFolder: z.string(),
     mediaRoot: z.string(),
+    static: z.boolean().nullish(),
   })
   .strict()
   .optional()
 const tinaSearchKey = z
   .object({
     indexerToken: z.string().optional(),
+    stopwordLanguages: z.array(z.string()).nonempty().optional(),
+    tokenSplitRegex: z.string().optional(),
   })
   .strict()
   .optional()
@@ -30,6 +33,8 @@ export const tinaConfigZod = z.object({
     .object({
       tina: tinaSearchKey,
       searchClient: z.any().optional(),
+      indexBatchSize: z.number().gte(1).optional(),
+      maxSearchIndexFieldLength: z.number().gte(1).optional(),
     })
     .optional(),
 })

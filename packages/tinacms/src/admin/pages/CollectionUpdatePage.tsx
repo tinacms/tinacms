@@ -165,23 +165,21 @@ const RenderForm = ({
     <>
       {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
       <div
-        className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
+        className={`pt-3 pb-4 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center ${headerPadding}`}
       >
-        <div className="max-w-form mx-auto">
-          <div className="mb-2">
-            <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
-              <Link
-                to={`/collections/${collection.name}/~${parentFolder}`}
-                className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
-              >
-                {collection.label ? collection.label : collection.name}
-              </Link>
-              <HiChevronRight className="inline-block -mt-0.5 opacity-50" />
-            </span>
-            <span className="text-xl text-gray-700 font-medium leading-tight">
-              Edit {`${filename}.${collection.format}`}
-            </span>
-          </div>
+        <div className="w-full max-w-form flex gap-1.5 justify-between items-center">
+          <Link
+            to={`/collections/${collection.name}/~${parentFolder}`}
+            className="flex-0 text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 text-sm leading-tight whitespace-nowrap truncate transition-all duration-150 ease-out"
+          >
+            {collection.label ? collection.label : collection.name}
+          </Link>
+          <span className="opacity-30 text-sm leading-tight whitespace-nowrap flex-0">
+            /
+          </span>
+          <span className="flex-1 w-full text-sm leading-tight whitespace-nowrap truncate">
+            {`${filename}.${collection.format}`}
+          </span>
           <FormStatus pristine={formIsPristine} />
         </div>
       </div>

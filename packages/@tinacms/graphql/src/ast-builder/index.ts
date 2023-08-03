@@ -27,7 +27,7 @@ import {
 import _ from 'lodash'
 import { lastItem } from '../util'
 
-const SysFieldDefinition = {
+export const SysFieldDefinition = {
   kind: 'Field' as const,
   name: {
     kind: 'Name' as const,
