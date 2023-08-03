@@ -128,7 +128,7 @@ const components = {
 
 const ContentSection = ({ content }) => {
   return (
-    <div className='relative py-16 bg-white overflow-hidden'>
+    <div className='relative py-16 bg-white overflow-hidden text-black'>
       <div className='hidden lg:block lg:absolute lg:inset-y-0 lg:h-full lg:w-full'>
         <div
           className='relative h-full text-lg max-w-prose mx-auto'

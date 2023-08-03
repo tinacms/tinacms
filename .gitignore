@@ -40,3 +40,7 @@ cypress/videos/kitchen-sink/sidebar.spec.js.mp4
 build/**
 dist/**
 .next/**
+
+
+# Ignore all .env files
+**/**/.env
