@@ -1,4 +1,4 @@
-import { defineConfig } from 'tinacms'
+import { TinaCMS, defineConfig } from 'tinacms'
 
 export default defineConfig({
   // Example of how you can override the frontend url
@@ -93,7 +93,8 @@ export default defineConfig({
         frontmatterDelimiters: ['+++', '+++'],
         ui: {
           // Example of beforeSubmit
-          beforeSubmit: async ({ values }) => {
+          /** @type {(args: {cms: TinaCMS, values: Record<string, any>, form: any, tinaForm: any})=>Promise<Record<any,any>>} */
+          beforeSubmit: async ({ values, cms, form, tinaForm }) => {
             return {
               ...values,
               lastUpdated: new Date().toISOString(),
