@@ -797,7 +797,21 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   }) => string | undefined
 
   /**
-   * The
+   * This function is called before a document is created or updated. It can be used to modify the values that are saved to the CMS. It can also be used to perform side effects such as sending a notification or triggering a build.
+   *
+   * @example
+   *
+   *
+   *```js
+   * beforeSubmit: async ({ values }) => {
+   *   return {
+   *     ...values,
+   *     lastUpdated: new Date().toISOString(),
+   *   };
+   * },
+   *```
+   *
+   *
    *
    */
   beforeSubmit?: (arg: {
