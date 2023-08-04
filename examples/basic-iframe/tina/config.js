@@ -93,7 +93,6 @@ export default defineConfig({
         frontmatterDelimiters: ['+++', '+++'],
         ui: {
           // Example of beforeSubmit
-          /** @type {(args: {cms: TinaCMS, values: Record<string, any>, form: any, tinaForm: any})=>Promise<Record<any,any>>} */
           beforeSubmit: async ({ values, cms, form, tinaForm }) => {
             return {
               ...values,
