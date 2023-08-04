@@ -91,6 +91,15 @@ export default defineConfig({
         format: 'mdx',
         frontmatterFormat: 'toml',
         frontmatterDelimiters: ['+++', '+++'],
+        ui: {
+          // Example of beforeSubmit
+          beforeSubmit: async ({ values }) => {
+            return {
+              ...values,
+              lastUpdated: new Date().toISOString(),
+            }
+          },
+        },
         fields: [
           {
             label: 'Title',
@@ -114,6 +123,13 @@ export default defineConfig({
               //     return 'Too Long!!!'
               //   }
               // },
+            },
+          },
+          {
+            name: 'lastUpdated',
+            type: 'datetime',
+            ui: {
+              component: 'hidden',
             },
           },
           {

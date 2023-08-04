@@ -749,7 +749,7 @@ type Document = {
     extension: string
   }
 }
-export interface UICollection {
+export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   /**
    * Customize the way filenames are generated during content creation
    */
@@ -795,6 +795,17 @@ export interface UICollection {
     document: Document
     collection: Collection<true>
   }) => string | undefined
+
+  /**
+   * The
+   *
+   */
+  beforeSubmit?: (arg: {
+    values: Record<string, unknown>
+    cms: CMS
+    form: Form
+    tinaForm: TinaForm
+  }) => Promise<void | Record<string, unknown>>
 }
 
 export type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
