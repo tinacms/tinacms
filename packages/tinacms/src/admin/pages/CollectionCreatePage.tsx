@@ -37,7 +37,14 @@ const createDocument = async (
   const api = new TinaAdminApi(cms)
   const { filename, ...leftover } = values
 
-  const relativePath = `${folder ? `${folder}/` : ''}${filename}.${
+  if (typeof filename !== 'string') {
+    throw new Error('Filename must be a string')
+  }
+
+  // Append the folder if it exists and the filename does not start with a slash
+  const appendFolder = folder && !filename.startsWith('/') ? `/${folder}` : ''
+
+  const relativePath = `${appendFolder ? `${folder}/` : ''}${filename}.${
     collection.format
   }`
   const params = api.schema.transformPayload(collection.name, {
@@ -192,11 +199,19 @@ export const RenderForm = ({
       extraSubscribeValues: { active: true, submitting: true, touched: true },
       onChange: (values) => {
         if (!values?.submitting) {
-          // keeps the forms relative path in sync with the filename
-          form.relativePath =
-            schemaCollection.path +
-            folderName +
-            `/${values?.values?.filename}.${schemaCollection.format || 'md'}`
+          const fileName: string = values?.values?.filename
+          // If the filename starts with "/" then it is an absolute path and we should not append the folder name
+          if (fileName?.startsWith('/')) {
+            form.relativePath =
+              schemaCollection.path +
+              `${values?.values?.filename}.${schemaCollection.format || 'md'}`
+          } else {
+            // keeps the forms relative path in sync with the filename
+            form.relativePath =
+              schemaCollection.path +
+              folderName +
+              `/${values?.values?.filename}.${schemaCollection.format || 'md'}`
+          }
         }
         if (
           slugFunction &&
@@ -246,9 +261,9 @@ export const RenderForm = ({
               return true
             }
 
-            const isValid = /^[_a-zA-Z0-9][\.\-_\/a-zA-Z0-9]*$/.test(value)
+            const isValid = /[\.\-_\/a-zA-Z0-9]*$/.test(value)
             if (value && !isValid) {
-              return 'Must begin with a-z, A-Z, 0-9, or _ and contain only a-z, A-Z, 0-9, -, _, ., or /.'
+              return 'Must contain only a-z, A-Z, 0-9, -, _, ., or /.'
             }
             // check if the filename is allowed by the collection.
             if (
