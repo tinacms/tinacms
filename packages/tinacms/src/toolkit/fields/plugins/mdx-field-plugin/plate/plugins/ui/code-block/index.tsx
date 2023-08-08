@@ -274,7 +274,7 @@ export const CodeBlock = ({
     >
       <style>
         {/* Disable hints (not ideal but it conflicts with the toolbar and other floating elements) */}
-        {`.tina-tailwind .monaco-editor .editor-widget {
+        {`.monaco-editor .editor-widget {
           display: none !important;
           visibility: hidden !important;
         }`}

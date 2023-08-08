@@ -8,7 +8,6 @@ import type { DatetimepickerProps } from 'react-datetime'
 import { format, parse, DEFAULT_DATE_DISPLAY_FORMAT } from './date-format'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore importing css is not recognized
-import DateFieldPluginCSS from './date-field-plugin.css'
 import { Field } from '../../forms'
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
@@ -70,7 +69,6 @@ export const ReactDateTimeWithStyles = (
 
   return (
     <>
-      <style>{DateFieldPluginCSS}</style>
       <div className="tina-date-field" ref={area}>
         <ReactDatetime {...props} isOpen={isOpen} />
       </div>

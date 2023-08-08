@@ -1,13 +1,7 @@
-/**
-
-*/
-
 import React from 'react'
 import { TinaCloudProvider } from './auth'
 
 import { LocalClient } from './internalClient/index'
-// @ts-ignore importing css is not recognized
-import styles from './styles.css'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { parseURL } from '@tinacms/schema-tools'
 import { TinaCMSProviderDefaultProps } from './types/cms'
@@ -197,7 +191,7 @@ export const TinaCMSProvider2 = ({
         schema={{ ...schema, config: { ...schema.config, ...props } }}
         tinaGraphQLVersion={props.tinaGraphQLVersion}
       >
-        <style>{styles}</style>
+        {/* <style>{styles}</style> */}
         <ErrorBoundary>{props.children}</ErrorBoundary>
       </TinaCloudProvider>
     </>

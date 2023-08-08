@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import * as React from 'react'
-// @ts-ignore
-import keyframes from './loading-dots.css'
 
 interface LoadingDotsProps {
   dotSize?: number
@@ -19,7 +17,6 @@ export const LoadingDots = ({
 }: LoadingDotsProps) => {
   return (
     <div>
-      <style>{keyframes}</style>
       <SingleDot dotSize={dotSize} color={color} />
       <SingleDot dotSize={dotSize} color={color} delay={0.3} />
       <SingleDot dotSize={dotSize} color={color} delay={0.5} />
