@@ -763,7 +763,10 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
      * slugify: (values) => values.title.toLowerCase().split(" ").join("-")
      * ```
      */
-    slugify?: (values: Record<string, any>) => string
+    slugify?: (
+      values: Record<string, any>,
+      meta: { collection: Collection; template: Template }
+    ) => string
     /**
      * When set to `true`, editors won't be able to modify the filename
      */

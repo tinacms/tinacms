@@ -204,7 +204,10 @@ export const RenderForm = ({
           !values?.submitting &&
           !values.touched?.filename
         ) {
-          const value = slugFunction(values?.values)
+          const value = slugFunction(values.values, {
+            template,
+            collection: schemaCollection,
+          })
           form.finalForm.change('filename', value)
         }
       },
