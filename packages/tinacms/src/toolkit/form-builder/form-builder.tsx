@@ -22,6 +22,7 @@ import {
 import { BiGitBranch } from 'react-icons/bi'
 import { MdOutlineSaveAlt } from 'react-icons/md'
 import { formatBranchName } from '@toolkit/plugin-branch-switcher'
+import { TinaSchema } from '@tinacms/schema-tools'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -159,7 +160,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     <FinalForm
       key={tinaForm.id}
       form={tinaForm.finalForm}
-      onSubmit={tinaForm.onSubmit}
+      onSubmit={async (values, form, cb) => {
+        const schema: TinaSchema = cms.api.tina.schema
+        const collection = schema.getCollectionByFullPath(tinaForm.relativePath)
+        const valOverride = collection?.ui?.beforeSubmit
+          ? await collection?.ui?.beforeSubmit({ cms, form, values, tinaForm })
+          : false
+        return tinaForm.onSubmit(valOverride || values, form, cb)
+      }}
     >
       {({
         handleSubmit,

@@ -749,7 +749,7 @@ type Document = {
     extension: string
   }
 }
-export interface UICollection {
+export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   /**
    * Customize the way filenames are generated during content creation
    */
@@ -795,6 +795,31 @@ export interface UICollection {
     document: Document
     collection: Collection<true>
   }) => string | undefined
+
+  /**
+   * This function is called before a document is created or updated. It can be used to modify the values that are saved to the CMS. It can also be used to perform side effects such as sending a notification or triggering a build.
+   *
+   * @example
+   *
+   *
+   *```js
+   * beforeSubmit: async ({ values }) => {
+   *   return {
+   *     ...values,
+   *     lastUpdated: new Date().toISOString(),
+   *   };
+   * },
+   *```
+   *
+   *
+   *
+   */
+  beforeSubmit?: (arg: {
+    values: Record<string, unknown>
+    cms: CMS
+    form: Form
+    tinaForm: TinaForm
+  }) => Promise<void | Record<string, unknown>>
 }
 
 export type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)

@@ -1,4 +1,4 @@
-import { defineConfig } from 'tinacms'
+import { TinaCMS, defineConfig } from 'tinacms'
 
 export default defineConfig({
   // Example of how you can override the frontend url
@@ -91,6 +91,15 @@ export default defineConfig({
         format: 'mdx',
         frontmatterFormat: 'toml',
         frontmatterDelimiters: ['+++', '+++'],
+        ui: {
+          // Example of beforeSubmit
+          beforeSubmit: async ({ values, cms, form, tinaForm }) => {
+            return {
+              ...values,
+              lastUpdated: new Date().toISOString(),
+            }
+          },
+        },
         fields: [
           {
             label: 'Title',
@@ -114,6 +123,13 @@ export default defineConfig({
               //     return 'Too Long!!!'
               //   }
               // },
+            },
+          },
+          {
+            name: 'lastUpdated',
+            type: 'datetime',
+            ui: {
+              component: 'hidden',
             },
           },
           {
