@@ -42,11 +42,9 @@ const createDocument = async (
   }
 
   // Append the folder if it exists and the filename does not start with a slash
-  const appendFolder = folder && !filename.startsWith('/') ? `/${folder}` : ''
+  const appendFolder = folder && !filename.startsWith('/') ? `/${folder}/` : '/'
+  const relativePath = `${appendFolder}${filename}.${collection.format}`
 
-  const relativePath = `${appendFolder ? `${folder}/` : ''}${filename}.${
-    collection.format
-  }`
   const params = api.schema.transformPayload(collection.name, {
     _collection: collection.name,
     ...(template && { _template: template.name }),
@@ -199,19 +197,17 @@ export const RenderForm = ({
       extraSubscribeValues: { active: true, submitting: true, touched: true },
       onChange: (values) => {
         if (!values?.submitting) {
-          const fileName: string = values?.values?.filename
+          const filename: string = values?.values?.filename
+
           // If the filename starts with "/" then it is an absolute path and we should not append the folder name
-          if (fileName?.startsWith('/')) {
-            form.relativePath =
-              schemaCollection.path +
-              `${values?.values?.filename}.${schemaCollection.format || 'md'}`
-          } else {
-            // keeps the forms relative path in sync with the filename
-            form.relativePath =
-              schemaCollection.path +
-              folderName +
-              `/${values?.values?.filename}.${schemaCollection.format || 'md'}`
-          }
+          const appendFolder =
+            folderName && !filename?.startsWith('/') ? `/${folderName}/` : '/'
+
+          // keeps the forms relative path in sync with the filename
+          form.relativePath =
+            schemaCollection.path +
+            appendFolder +
+            `${filename}.${schemaCollection.format || 'md'}`
         }
         if (
           slugFunction &&
