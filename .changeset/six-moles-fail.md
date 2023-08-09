@@ -1,5 +1,5 @@
 ---
-'@tinacms/toolkit': patch
+'tinacms': patch
 '@tinacms/cli': patch
 ---
 
