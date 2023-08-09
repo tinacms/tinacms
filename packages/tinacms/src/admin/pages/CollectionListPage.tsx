@@ -176,6 +176,22 @@ export const handleNavigate = (
   }
 }
 
+function getUniqueTemplateFields(collection: Collection<true>): TinaField[] {
+  const fieldSet: TinaField[] = []
+
+  collection.templates.forEach((template) => {
+    template.fields
+      .filter((f) => {
+        return fieldSet.find((x) => x.name === f.name) === undefined
+      })
+      .forEach((field) => {
+        fieldSet.push(field as TinaField)
+      })
+  })
+
+  return [...fieldSet]
+}
+
 const CollectionListPage = () => {
   const navigate = useNavigate()
   const { collectionName } = useParams()
@@ -285,28 +301,10 @@ const CollectionListPage = () => {
                 const admin: TinaAdminApi = cms.api.admin
                 const pageInfo = collection.documents.pageInfo
 
-                function getUniqueFields(collection): TinaField[] {
-                  const fieldSet: TinaField[] = []
-
-                  collection.templates.forEach((template) => {
-                    template.fields
-                      .filter((f) => {
-                        return (
-                          fieldSet.find((x) => x.name === f.name) === undefined
-                        )
-                      })
-                      .forEach((field) => {
-                        fieldSet.push(field as TinaField)
-                      })
-                  })
-
-                  return [...fieldSet]
-                }
-
                 // get unique fields from all templates
                 const fields = (
                   collectionExtra.templates?.length
-                    ? getUniqueFields(collectionExtra)
+                    ? getUniqueTemplateFields(collectionExtra)
                     : collectionExtra.fields
                 ).filter((x) =>
                   // only allow sortable fields
