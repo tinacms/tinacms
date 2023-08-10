@@ -127,6 +127,7 @@ export const EditoralBranchSwitcher = ({
           })
           cancelFuncs.push(cancelWaitForIndexFunc)
           waitForIndexStatusPromise
+            // @ts-ignore
             .then((indexStatus) => {
               setBranchList((previousBranchList) => {
                 // update the index status of the branch

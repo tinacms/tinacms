@@ -54,6 +54,7 @@ const ListBranchResponse = z
     githubPullRequestUrl: z.string().optional(),
   })
   .array()
+  .nonempty()
 
 const IndexStatusResponse = z.object({
   status: z
@@ -346,7 +347,8 @@ mutation addPendingDocumentMutation(
       variables: props,
     })
 
-    return result
+    // TODO: fix this type
+    return result as any
   }
 
   getSchema = async () => {
@@ -753,7 +755,7 @@ mutation addPendingDocumentMutation(
         method: 'GET',
       })
       const branches = await res.json()
-      const parsedBranches = ListBranchResponse.parse(branches)
+      const parsedBranches = await ListBranchResponse.parseAsync(branches)
       if (args?.includeIndexStatus === false) {
         return parsedBranches
       }

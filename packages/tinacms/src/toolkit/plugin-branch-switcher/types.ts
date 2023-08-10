@@ -1,6 +1,6 @@
 // TODO: Consolidate these types with the ones from the internal client
 export interface Branch {
-  indexStatus: {
+  indexStatus?: {
     status?: 'unknown' | 'complete' | 'failed' | 'inprogress' | 'timeout'
     timestamp?: number
   }

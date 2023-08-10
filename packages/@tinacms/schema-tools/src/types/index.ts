@@ -817,8 +817,7 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   beforeSubmit?: (arg: {
     values: Record<string, unknown>
     cms: CMS
-    form: Form
-    tinaForm: TinaForm
+    form: TinaForm
   }) => Promise<void | Record<string, unknown>>
 }
 

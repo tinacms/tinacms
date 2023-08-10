@@ -12,6 +12,7 @@ export { RouteMappingPlugin } from './admin/plugins/route-mapping'
 export { TinaAdminApi } from './admin/api'
 
 export * from './toolkit'
+export { Form } from './toolkit/forms/form'
 export { MdxFieldPluginExtendible } from '@tinacms/toolkit'
 
 import { TinaCMSProvider2, DocumentCreatorCallback } from './tina-cms'

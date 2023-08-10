@@ -41,6 +41,7 @@ import {
 import { MediaManagerScreenPlugin } from '@toolkit/plugin-screens/media-manager-screen'
 import { createCloudConfig } from '@toolkit/react-cloud-config'
 import { TinaAction, TinaState } from './tina-state'
+import type { Client } from '../internalClient'
 
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
@@ -78,6 +79,8 @@ export class TinaCMS extends CMS {
   _alerts?: Alerts
   state: TinaState
   dispatch: React.Dispatch<TinaAction>
+  // We always attach the tina client to the cms instance
+  api: { [key: string]: any; tina?: Client } = {}
 
   constructor({
     sidebar,

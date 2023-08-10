@@ -164,7 +164,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         const schema: TinaSchema = cms.api.tina.schema
         const collection = schema.getCollectionByFullPath(tinaForm.relativePath)
         const valOverride = collection?.ui?.beforeSubmit
-          ? await collection?.ui?.beforeSubmit({ cms, form, values, tinaForm })
+          ? await collection?.ui?.beforeSubmit({ cms, values, form: tinaForm })
           : false
         return tinaForm.onSubmit(valOverride || values, form, cb)
       }}
@@ -469,11 +469,9 @@ export const CreateBranchModel = ({
             onClick={async () => {
               setDisabled(true)
               // get the list of branches form tina
-              const branchList: { name: string }[] = await tinaApi.listBranches(
-                {
-                  includeIndexStatus: false,
-                }
-              )
+              const branchList = await tinaApi.listBranches({
+                includeIndexStatus: false,
+              })
               // filter out the branches that are not content branches
               const contentBranches = branchList
                 .filter((x) => x?.name?.startsWith('tina/'))
