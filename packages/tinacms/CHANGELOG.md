@@ -1,5 +1,71 @@
 # tinacms
 
+## 1.5.18
+
+### Patch Changes
+
+- 9c27087fb: Show filter/search inputs on collections with templates instead of fields
+- 65d0a701f: Show search input even when collection contains only non-filterable fields
+- 133e97d5b: Update the before submit types to not pass the finalForm form since it is contained in the TinaForm
+- f02b4368b: Adds a second parameter to the slugify function that passes the current collection and template.
+- 37cf8bd40: Updated so a user can add an absolute path to the filename
+
+  Before all files where created reletive to the users current folder and we gave an error if the filename started with a `/`.
+
+  Now we check if the filename starts with a `/` and if it does we use that as the absolute path to the file.
+
+  Demo: https://www.loom.com/share/5256114d1ce648eda69881e33f8f6bd4?sid=3eafb588-c4da-49eb-ace2-d6b02313e14c
+
+- ad22e0950: Consolidate tailwind usage
+- 8db979b9f: Add support for "static" setting in Tina media, which preprocesses the available media files and disables uploads and deletions of media from the CMS.
+- 7991e097e: Add a `beforeSubmit` hook function on a collection.ui. This give users the ability to run a function before the form is submitted.
+
+  If the function returns values those values will be used will be submitted instead of the form values.
+
+  If the function returns a falsy value the original form values will be submitted.
+
+  ### Example
+
+  ```js
+  // tina/config.{ts.js}
+
+  export default defineConfig({
+    schema: {
+      collections: [
+        {
+          ui: {
+            // Example of beforeSubmit
+            beforeSubmit: async ({ values }) => {
+              return {
+                ...values,
+                lastUpdated: new Date().toISOString(),
+              }
+            },
+            //...
+          },
+          //...
+        },
+        //...
+      ],
+    },
+    //...
+  })
+  ```
+
+- 30c7eac58: Do not show tina cloud link when self hosting
+- 121bd9fc4: Absorb @tinacms/toolkit into tinacms
+
+  fix: Use clean page-sizes on media manager (to make pagination more obvious)
+
+  Fix issue with uploading media in a folder with tina cloud
+
+- Updated dependencies [133e97d5b]
+- Updated dependencies [f02b4368b]
+- Updated dependencies [7991e097e]
+  - @tinacms/schema-tools@1.4.10
+  - @tinacms/search@1.0.8
+  - @tinacms/sharedctx@1.0.2
+
 ## 1.5.17
 
 ### Patch Changes
