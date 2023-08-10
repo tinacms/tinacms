@@ -248,12 +248,14 @@ export const TinaCloudProvider = (
     !client.schema?.config?.config?.admin?.auth?.customAuth
 
   const handleListBranches = async (): Promise<Branch[]> => {
-    const { owner, repo } = props
-    const branches = await cms.api.tina.listBranches({ owner, repo })
+    const branches = await cms.api.tina.listBranches({
+      includeIndexStatus: true,
+    })
 
     if (!Array.isArray(branches)) {
       return []
     }
+    // @ts-ignore
     return branches
   }
   const handleCreateBranch = async (data) => {
