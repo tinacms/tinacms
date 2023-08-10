@@ -1,5 +1,16 @@
 # @tinacms/mdx
 
+## 1.3.16
+
+### Patch Changes
+
+- 8aae69436: Ensure urls are sanitized in a tags for rich-text
+- a78c81f14: Fix issue where non-object lists weren't handled properly for rich-text embeds
+- Updated dependencies [133e97d5b]
+- Updated dependencies [f02b4368b]
+- Updated dependencies [7991e097e]
+  - @tinacms/schema-tools@1.4.10
+
 ## 1.3.15
 
 ### Patch Changes
