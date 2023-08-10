@@ -49,7 +49,7 @@ import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
-import type { Collection } from '@tinacms/schema-tools'
+import type { Collection, TinaField } from '@tinacms/schema-tools'
 import { CollectionFolder, useCollectionFolder } from './utils'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
@@ -176,6 +176,22 @@ export const handleNavigate = (
   }
 }
 
+function getUniqueTemplateFields(collection: Collection<true>): TinaField[] {
+  const fieldSet: TinaField[] = []
+
+  collection.templates.forEach((template) => {
+    template.fields
+      .filter((f) => {
+        return fieldSet.find((x) => x.name === f.name) === undefined
+      })
+      .forEach((field) => {
+        fieldSet.push(field as TinaField)
+      })
+  })
+
+  return [...fieldSet]
+}
+
 const CollectionListPage = () => {
   const navigate = useNavigate()
   const { collectionName } = useParams()
@@ -284,10 +300,17 @@ const CollectionListPage = () => {
                 const documents = collection.documents.edges
                 const admin: TinaAdminApi = cms.api.admin
                 const pageInfo = collection.documents.pageInfo
-                const fields = collectionExtra.fields?.filter((x) =>
+
+                // get unique fields from all templates
+                const fields = (
+                  collectionExtra.templates?.length
+                    ? getUniqueTemplateFields(collectionExtra)
+                    : collectionExtra.fields
+                ).filter((x) =>
                   // only allow sortable fields
                   ['string', 'number', 'datetime', 'boolean'].includes(x.type)
                 )
+
                 const sortField = fields?.find(
                   (field) => field.name === sortName
                 )
