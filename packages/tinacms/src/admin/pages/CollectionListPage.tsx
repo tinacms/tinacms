@@ -487,33 +487,33 @@ const CollectionListPage = () => {
                                     />
                                   </div>
                                 )}
-                                <div className="flex flex-1 flex-col gap-2 items-start w-full">
-                                  {searchEnabled ? (
-                                    <SearchInput
-                                      loading={_loading}
-                                      search={search}
-                                      setSearch={setSearch}
-                                      searchInput={searchInput}
-                                      setSearchInput={setSearchInput}
-                                    />
-                                  ) : (
-                                    <>
-                                      <label className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal">
-                                        Search
-                                      </label>
-                                      <Message
-                                        link="https://tina.io/docs/reference/search/overview"
-                                        linkLabel="Read The Docs"
-                                        type="info"
-                                        size="small"
-                                      >
-                                        Search not configured.
-                                      </Message>
-                                    </>
-                                  )}
-                                </div>
                               </>
                             )}
+                            <div className="flex flex-1 flex-col gap-2 items-start w-full">
+                              {searchEnabled ? (
+                                <SearchInput
+                                  loading={_loading}
+                                  search={search}
+                                  setSearch={setSearch}
+                                  searchInput={searchInput}
+                                  setSearchInput={setSearchInput}
+                                />
+                              ) : (
+                                <>
+                                  <label className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal">
+                                    Search
+                                  </label>
+                                  <Message
+                                    link="https://tina.io/docs/reference/search/overview"
+                                    linkLabel="Read The Docs"
+                                    type="info"
+                                    size="small"
+                                  >
+                                    Search not configured.
+                                  </Message>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                         <div className="flex self-end	justify-self-end">
