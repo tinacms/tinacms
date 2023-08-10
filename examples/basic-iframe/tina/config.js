@@ -68,6 +68,18 @@ export default defineConfig({
   schema: {
     collections: [
       {
+        ui: {
+          filename: {
+            slugify: (values, meta) => {
+              if (meta.template.name === 'tem1') {
+                return 'tem1/' + (values?.foo || '')
+              }
+              if (meta.template.name === 'tem2') {
+                return 'tem2/' + (values?.bar || '')
+              }
+            },
+          },
+        },
         name: 'test',
         path: 'content/test',
         label: 'Test',
