@@ -206,6 +206,13 @@ export function stringifyProps(
         } else {
           const joiner = flatten ? ' ' : '\n'
           let val = ''
+          // The rich-text editor can sometimes pass an empty value {}, consider that nullable
+          if (
+            isPlainObject(value) &&
+            Object.keys(value as object).length === 0
+          ) {
+            return
+          }
           assertShape<Plate.RootElement>(
             value,
             (value) => value.type === 'root' && Array.isArray(value.children),
@@ -310,4 +317,8 @@ export function assertShape<T>(
   if (!callback(value)) {
     throw new Error(errorMessage || `Failed to assert shape`)
   }
+}
+
+function isPlainObject(value: unknown) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
