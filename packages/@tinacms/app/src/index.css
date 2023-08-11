@@ -1,3 +1,5 @@
+@import 'global.css';
+@import 'preflight.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,4 +7,378 @@
 /* Tailwind reset clobbers some playground styles */
 .graphiql-execute-button {
   @apply bg-blue-600 !important;
+}
+
+.icon-parent svg {
+  fill: currentColor;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+div.graphiql-explorer-root > div:last-child {
+  display: none;
+}
+
+.graphiql-container {
+  height: 100vh !important;
+  width: 100vw !important;
+}
+
+/* if the last block has margin-bottom it makes the text box larger but some of it isn't clickable */
+.tina-prose [data-slate-editor='true'] {
+  padding-bottom: 0.5em;
+  /* Outline is placed on the parent element for styling consistency with other elements */
+  outline: none;
+}
+/* prose adds backticks, which look like they should be editable */
+.tina-prose [data-slate-editor='true'] .slate-code::before {
+  content: '';
+}
+.tina-prose [data-slate-editor='true'] .slate-code::after {
+  content: '';
+}
+.tina-prose [data-slate-editor='true'] .slate-code_block {
+  margin: 0;
+}
+/* code lines as part of a block don't need the same background formatting */
+.tina-prose [data-slate-editor='true'] .slate-code_block .slate-code {
+  background: none;
+}
+/* prose makes the first p in a block slightly larger */
+.tina-prose [data-slate-editor='true'] p:first-of-type {
+  font-size: 1em;
+}
+
+/* experimental floating toolbar doesn't need a large text area */
+.with-toolbar [data-slate-editor='true'] {
+  min-height: 72px;
+}
+
+@keyframes color-popup-keyframes {
+  0% {
+    transform: translate3d(-50%, 0, 0) scale3d(0.5, 0.5, 1);
+  }
+  100% {
+    transform: translate3d(-50%, 8px, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes color-popup-open-top-keyframes {
+  0% {
+    transform: translate3d(-50%, -100%, 0) scale3d(0.5, 0.5, 1);
+  }
+  100% {
+    transform: translate3d(-50%, calc(-100% - 8px), 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes loading-dots-scale-up-and-down {
+  0% {
+    transform: scale(0.1);
+  }
+
+  50% {
+    transform: scale(1);
+  }
+
+  90% {
+    transform: scale(0.1);
+  }
+
+  100% {
+    transform: scale(0.1);
+  }
+}
+
+.color-picker-clip-path::before,
+.color-picker-clip-path::after {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.color-picker-on-top-clip-path::before,
+.color-picker-on-top-clip-path::after {
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}
+
+.tina-date-field .rdt {
+  position: relative;
+}
+
+.tina-date-field .rdtPicker {
+  display: none;
+  position: absolute;
+  width: 100%;
+  max-width: 350px;
+  padding: 4px;
+  margin-top: 4px;
+  z-index: 99999 !important;
+  background: var(--tina-color-grey-0);
+  border-radius: var(--tina-radius-small);
+  box-shadow: var(--tina-shadow-big);
+  border: 1px solid var(--tina-color-grey-2);
+}
+
+.tina-date-field .rdtOpen .rdtPicker {
+  display: block;
+}
+
+.tina-date-field .rdtStatic .rdtPicker {
+  box-shadow: none;
+  position: static;
+}
+
+.tina-date-field .rdtPicker .rdtTimeToggle {
+  text-align: center;
+}
+
+.tina-date-field .rdtPicker table {
+  width: 100%;
+  margin: 0;
+}
+
+.tina-date-field .rdtPicker td,
+.rdtPicker th {
+  text-align: center;
+  height: 28px;
+}
+
+.tina-date-field .rdtPicker td {
+  cursor: pointer;
+}
+
+.tina-date-field .rdtPicker td.rdtDay:hover,
+.tina-date-field .rdtPicker td.rdtHour:hover,
+.tina-date-field .rdtPicker td.rdtMinute:hover,
+.tina-date-field .rdtPicker td.rdtSecond:hover,
+.tina-date-field .rdtPicker .rdtTimeToggle:hover {
+  background: var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+  cursor: pointer;
+}
+
+.tina-date-field .rdtPicker td.rdtDay:hover:active,
+.tina-date-field .rdtPicker td.rdtHour:hover:active,
+.tina-date-field .rdtPicker td.rdtMinute:hover:active,
+.tina-date-field .rdtPicker td.rdtSecond:hover:active,
+.tina-date-field .rdtPicker .rdtTimeToggle:hover:active {
+  background: var(--tina-color-primary);
+  color: var(--tina-color-grey-0);
+  border-radius: var(--tina-radius-small);
+}
+
+.tina-date-field .rdtPicker td.rdtOld,
+.rdtPicker td.rdtNew {
+  color: var(--tina-color-grey-6);
+}
+
+.tina-date-field .rdtPicker td.rdtToday {
+  position: relative;
+}
+
+.tina-date-field .rdtPicker td.rdtToday:before {
+  content: '';
+  display: inline-block;
+  border-left: 7px solid transparent;
+  border-bottom: 7px solid var(--tina-color-primary);
+  border-radius: 20px;
+  border-top-color: rgba(0, 0, 0, 0.2);
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+}
+
+.tina-date-field .rdtPicker td.rdtActive,
+.rdtPicker td.rdtActive:hover {
+  background-color: var(--tina-color-primary);
+  color: var(--tina-color-grey-0);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.tina-date-field .rdtPicker td.rdtActive.rdtToday:before {
+  border-bottom-color: var(--tina-color-grey-0);
+}
+
+.tina-date-field .rdtPicker td.rdtDisabled,
+.rdtPicker td.rdtDisabled:hover {
+  background: none;
+  color: var(--tina-color-grey-6);
+  cursor: not-allowed;
+}
+
+.tina-date-field .rdtPicker td span.rdtOld {
+  color: var(--tina-color-grey-6);
+}
+
+.tina-date-field .rdtPicker td span.rdtDisabled,
+.rdtPicker td span.rdtDisabled:hover {
+  background: none;
+  color: var(--tina-color-grey-6);
+  cursor: not-allowed;
+}
+
+.tina-date-field .rdtPicker th {
+  border-bottom: 1px solid var(--tina-color-grey-1);
+}
+
+.tina-date-field .rdtPicker .dow {
+  width: 14.2857%;
+  border-bottom: none;
+  cursor: default;
+}
+
+.tina-date-field .rdtPicker th.rdtSwitch {
+  width: 100px;
+}
+
+.tina-date-field .rdtPicker th.rdtNext,
+.rdtPicker th.rdtPrev {
+  font-size: 21px;
+  vertical-align: top;
+}
+
+.tina-date-field .rdtPrev span,
+.rdtNext span {
+  display: block;
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Chrome/Safari/Opera */
+  -khtml-user-select: none;
+  /* Konqueror */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+}
+
+.tina-date-field .rdtPicker th.rdtDisabled,
+.rdtPicker th.rdtDisabled:hover {
+  background: none;
+  color: var(--tina-color-grey-6);
+  cursor: not-allowed;
+}
+
+.tina-date-field .rdtPicker thead tr:first-child th {
+  cursor: pointer;
+}
+
+.tina-date-field .rdtPicker thead tr:first-child th:hover {
+  background: var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+}
+
+.tina-date-field .rdtPicker tfoot {
+  border-top: 1px solid var(--tina-color-grey-1);
+}
+
+.tina-date-field .rdtPicker button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.tina-date-field .rdtPicker button:hover {
+  background: var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+}
+
+.tina-date-field .rdtPicker thead button {
+  width: 100%;
+  height: 100%;
+}
+
+.tina-date-field td.rdtMonth,
+td.rdtYear {
+  height: 50px;
+  width: 25%;
+  cursor: pointer;
+}
+
+.tina-date-field td.rdtMonth:hover,
+td.rdtYear:hover {
+  background: var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+}
+
+.tina-date-field .rdtCounters {
+  display: inline-block;
+}
+
+.tina-date-field .rdtCounters > div {
+  float: left;
+}
+
+.tina-date-field .rdtCounter {
+  height: 100px;
+}
+
+.tina-date-field .rdtCounter {
+  width: 40px;
+}
+
+.tina-date-field .rdtCounterSeparator {
+  line-height: 100px;
+}
+
+.tina-date-field .rdtCounter .rdtBtn {
+  height: 40%;
+  line-height: 40px;
+  cursor: pointer;
+  display: block;
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Chrome/Safari/Opera */
+  -khtml-user-select: none;
+  /* Konqueror */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+}
+
+.tina-date-field .rdtCounter .rdtBtn:hover {
+  background: var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+}
+
+.tina-date-field .rdtCounter .rdtCount {
+  height: 20%;
+  font-size: 1.2em;
+}
+
+.tina-date-field .rdtMilli {
+  vertical-align: middle;
+  padding-left: 8px;
+  width: 48px;
+}
+
+.tina-date-field .rdtMilli input {
+  width: 100%;
+  font-size: 1.2em;
+  margin-top: 37px;
+}
+
+.tina-date-field .rdtTime td {
+  cursor: default;
 }

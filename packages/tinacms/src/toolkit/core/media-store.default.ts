@@ -34,6 +34,23 @@ export class DummyMediaStore implements MediaStore {
   }
 }
 
+interface StaticMediaItem {
+  id: string
+  filename: string
+  src: string
+  directory: string
+  thumbnails: {
+    '75x75': string
+    '400x400': string
+    '1000x1000': string
+  }
+  type: 'file' | 'dir'
+  children?: StaticMedia
+}
+export interface StaticMedia {
+  [offset: string]: StaticMediaItem[]
+}
+
 export class TinaMediaStore implements MediaStore {
   fetchFunction = (input: RequestInfo, init?: RequestInit) => {
     return fetch(input, init)
@@ -43,8 +60,15 @@ export class TinaMediaStore implements MediaStore {
   private cms: CMS
   private isLocal: boolean
   private url: string
-  constructor(cms: CMS) {
+  private staticMedia: StaticMedia
+  isStatic?: boolean
+
+  constructor(cms: CMS, staticMedia?: StaticMedia) {
     this.cms = cms
+    if (staticMedia && Object.keys(staticMedia).length > 0) {
+      this.isStatic = true
+      this.staticMedia = staticMedia
+    }
   }
 
   setup() {
@@ -304,6 +328,39 @@ export class TinaMediaStore implements MediaStore {
       })
     }
 
+    if (this.staticMedia) {
+      const offset = options.offset || 0
+      const media = this.staticMedia[String(offset)]
+      let hasMore = false
+      if (this.staticMedia[String(Number(offset) + 20)]) {
+        hasMore = true
+      }
+      if (options.directory) {
+        let depth = 0
+        const pathToDirectory = options.directory.split('/')
+        let currentFolder = media
+        let hasMore = false
+        while (depth < pathToDirectory.length) {
+          const nextFolder = currentFolder.find(
+            (item) =>
+              item.type === 'dir' && item.filename === pathToDirectory[depth]
+          )
+          if (nextFolder) {
+            const offset = options.offset || 0
+            currentFolder = nextFolder.children[String(offset)]
+            if (nextFolder.children[String(Number(offset) + 20)]) {
+              hasMore = true
+            }
+          }
+          depth++
+        }
+        return {
+          items: currentFolder,
+          nextOffset: hasMore ? Number(offset) + 20 : null,
+        }
+      }
+      return { items: media, nextOffset: hasMore ? Number(offset) + 20 : null }
+    }
     return {
       items,
       nextOffset: cursor || 0,

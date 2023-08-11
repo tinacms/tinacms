@@ -1,13 +1,7 @@
-/**
-
-*/
-
 import React from 'react'
 import { TinaCloudProvider } from './auth'
 
 import { LocalClient } from './internalClient/index'
-// @ts-ignore importing css is not recognized
-import styles from './styles.css'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { parseURL } from '@tinacms/schema-tools'
 import { TinaCMSProviderDefaultProps } from './types/cms'
@@ -191,12 +185,13 @@ export const TinaCMSProvider2 = ({
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}
         apiUrl={apiURL}
+        staticMedia={props.staticMedia}
         // Not ideal but we need this for backwards compatibility for now. We can clean this up when we require a config.{js,ts} file
         // @ts-ignore
         schema={{ ...schema, config: { ...schema.config, ...props } }}
         tinaGraphQLVersion={props.tinaGraphQLVersion}
       >
-        <style>{styles}</style>
+        {/* <style>{styles}</style> */}
         <ErrorBoundary>{props.children}</ErrorBoundary>
       </TinaCloudProvider>
     </>

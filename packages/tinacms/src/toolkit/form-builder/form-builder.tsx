@@ -22,6 +22,7 @@ import {
 import { BiGitBranch } from 'react-icons/bi'
 import { MdOutlineSaveAlt } from 'react-icons/md'
 import { formatBranchName } from '@toolkit/plugin-branch-switcher'
+import { TinaSchema } from '@tinacms/schema-tools'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -159,7 +160,22 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     <FinalForm
       key={tinaForm.id}
       form={tinaForm.finalForm}
-      onSubmit={tinaForm.onSubmit}
+      onSubmit={async (values, form, cb) => {
+        const schema: TinaSchema = cms.api.tina.schema
+        const collection = schema.getCollectionByFullPath(tinaForm.relativePath)
+        const valOverride = collection?.ui?.beforeSubmit
+          ? await collection?.ui?.beforeSubmit({ cms, values, form: tinaForm })
+          : false
+
+        // Update the values on the frontend to reflect the changes made in the beforeSubmit hook
+        if (valOverride) {
+          for (const [key, value] of Object.entries(valOverride)) {
+            form.change(key, value)
+          }
+        }
+
+        return tinaForm.onSubmit(valOverride || values, form, cb)
+      }}
     >
       {({
         handleSubmit,
@@ -461,11 +477,9 @@ export const CreateBranchModel = ({
             onClick={async () => {
               setDisabled(true)
               // get the list of branches form tina
-              const branchList: { name: string }[] = await tinaApi.listBranches(
-                {
-                  includeIndexStatus: false,
-                }
-              )
+              const branchList = await tinaApi.listBranches({
+                includeIndexStatus: false,
+              })
               // filter out the branches that are not content branches
               const contentBranches = branchList
                 .filter((x) => x?.name?.startsWith('tina/'))

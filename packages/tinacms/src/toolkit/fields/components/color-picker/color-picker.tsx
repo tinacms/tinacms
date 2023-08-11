@@ -5,9 +5,6 @@ import * as pkg from 'react-color'
 const { SketchPicker, BlockPicker } = pkg
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
 import { useFormPortal } from '@toolkit/form-builder'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore importing css is not recognized
-import keyframes from './index.css'
 
 type DivProps = any
 type WrappedFieldProps = any
@@ -227,7 +224,6 @@ export const ColorPicker: React.FC<Props> = ({
 
   return (
     <div className="relative" ref={triggerRef}>
-      <style>{keyframes}</style>
       <Swatch
         onClick={toggleColorPicker}
         colorRGBA={getColorRGBA}

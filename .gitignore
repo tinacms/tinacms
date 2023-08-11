@@ -44,3 +44,5 @@ dist/**
 
 # Ignore all .env files
 **/**/.env
+# All .env files
+**/.env

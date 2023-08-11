@@ -378,29 +378,31 @@ export function MediaPicker({
               <Breadcrumb directory={directory} setDirectory={setDirectory} />
             </div>
 
-            <div className="flex flex-wrap items-center gap-4">
-              <Button
-                busy={false}
-                variant="white"
-                onClick={loadMedia}
-                className="whitespace-nowrap"
-              >
-                Refresh
-                <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
-              </Button>
-              <Button
-                busy={false}
-                variant="white"
-                onClick={() => {
-                  setNewFolderModalOpen(true)
-                }}
-                className="whitespace-nowrap"
-              >
-                New Folder
-                <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
-              </Button>
-              <UploadButton onClick={onClick} uploading={uploading} />
-            </div>
+            {cms.media.store.isStatic ? null : (
+              <div className="flex flex-wrap items-center gap-4">
+                <Button
+                  busy={false}
+                  variant="white"
+                  onClick={loadMedia}
+                  className="whitespace-nowrap"
+                >
+                  Refresh
+                  <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+                </Button>
+                <Button
+                  busy={false}
+                  variant="white"
+                  onClick={() => {
+                    setNewFolderModalOpen(true)
+                  }}
+                  className="whitespace-nowrap"
+                >
+                  New Folder
+                  <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+                </Button>
+                <UploadButton onClick={onClick} uploading={uploading} />
+              </div>
+            )}
           </div>
 
           <div className="flex h-full overflow-hidden bg-white">
@@ -414,7 +416,7 @@ export function MediaPicker({
                 } ${
                   list.items.length > 0 &&
                   viewMode === 'grid' &&
-                  'w-full p-4 gap-4 grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-cols-6 @6xl:grid-cols-9 auto-rows-auto content-start justify-start'
+                  'w-full p-4 gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 4xl:grid-cols-6 6xl:grid-cols-9 auto-rows-auto content-start justify-start'
                 } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
               >
                 <input {...getInputProps()} />
@@ -458,7 +460,7 @@ export function MediaPicker({
               activeItem={activeItem}
               close={closePreview}
               selectMediaItem={selectMediaItem}
-              allowDelete={allowDelete}
+              allowDelete={cms.media.store.isStatic ? false : allowDelete}
               deleteMediaItem={() => {
                 setDeleteModalOpen(true)
               }}
@@ -603,8 +605,8 @@ const SyncStatusContainer = ({ children }) => {
   const cms = useCMS()
   const isLocal = cms.api.tina.isLocalMode
 
-  const tinaMedia = cms.api.tina.schema.schema?.config?.media?.tina || {}
-  const hasTinaMedia = !!(tinaMedia.mediaRoot || tinaMedia.publicFolder)
+  const tinaMedia = cms.api.tina.schema.schema?.config?.media?.tina
+  const hasTinaMedia = !!(tinaMedia?.mediaRoot || tinaMedia?.publicFolder)
 
   const doCheckSyncStatus = hasTinaMedia && !isLocal
   const [syncStatus, setSyncStatus] = useState<

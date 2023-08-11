@@ -10,7 +10,7 @@ export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
   return (
     <Popover.Root>
       <Popover.Trigger
-        className={`cursor-pointer relative justify-center inline-flex border items-center p-3 text-sm font-medium focus:outline-1 focus:outline-blue-200 pointer-events-auto ${
+        className={`cursor-pointer relative justify-center inline-flex items-center p-3 text-sm font-medium focus:outline-1 focus:outline-blue-200 pointer-events-auto ${
           open ? `text-blue-400` : `text-gray-300 hover:text-blue-500`
         } ${className}}`}
       >

@@ -71,6 +71,13 @@ export interface MediaStore {
    * Lists all media in a specific directory.
    */
   list(options?: MediaListOptions): Promise<MediaList>
+
+  /**
+   * Indicates that uploads and deletions are not supported
+   *
+   * @default false
+   */
+  isStatic?: boolean
 }
 
 export declare type MediaListOffset = string | number

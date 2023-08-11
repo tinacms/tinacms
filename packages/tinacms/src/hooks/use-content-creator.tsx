@@ -5,6 +5,7 @@
 import React from 'react'
 import { useCMS } from '@tinacms/toolkit'
 import { ContentCreatorPlugin, OnNewDocument } from './create-page-plugin'
+import { Template } from '@tinacms/schema-tools'
 
 export type FilterCollections = (
   options: {
@@ -32,7 +33,14 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
       /**
        * Query for Collections and Templates
        */
-      const res = await cms.api.tina.request(
+      const res: {
+        collections: {
+          label?: string
+          slug: string
+          format: string
+          templates: Template[]
+        }[]
+      } = await cms.api.tina.request(
         (gql) => gql`
           {
             collections {
@@ -86,6 +94,7 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
           (c) => c.slug === values.collection
         )
         filteredCollection?.templates?.forEach((template) => {
+          // @ts-ignore
           templateOptions.push({ value: template.name, label: template.label })
         })
       }
@@ -97,6 +106,7 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
         new ContentCreatorPlugin({
           label: 'Add Document',
           onNewDocument: args && args.onNewDocument,
+          // @ts-ignore
           collections: res.collections,
           onChange: async ({ values }) => {
             setValues(values)
