@@ -127,7 +127,7 @@ const TemplateMenu = ({
   )
 }
 
-export const handleNavigate = (
+export const handleNavigate = async (
   navigate: NavigateFunction,
   cms: TinaCMS,
   // FIXME: `Collection` is deceiving because it's just the value we get back from the API request
@@ -147,7 +147,7 @@ export const handleNavigate = (
    * Determine if the document has a route mapped
    */
   let routeOverride = collectionDefinition.ui?.router
-    ? collectionDefinition.ui?.router({
+    ? await collectionDefinition.ui?.router({
         document,
         collection: collectionDefinition,
       })
