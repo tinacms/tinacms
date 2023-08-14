@@ -1,5 +1,13 @@
 # @tinacms/mdx
 
+## 1.3.17
+
+### Patch Changes
+
+- 0e94b2725: Fix issue where empty nested rich-text fields would throw an error if they'd been marked as dirty during editing
+- Updated dependencies [1563ce5b2]
+  - @tinacms/schema-tools@1.4.11
+
 ## 1.3.16
 
 ### Patch Changes

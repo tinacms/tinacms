@@ -1,5 +1,22 @@
 # @tinacms/schema-tools
 
+## 1.4.11
+
+### Patch Changes
+
+- 1563ce5b2: Update the router function to work asynchronously. This means that a user can now fetch data or perform other async operations in the router function.
+
+  Example:
+
+  ```ts
+   router: async ({ document }) => {
+    const res = await client.queries.post({
+      relativePath: document._sys.relativePath,
+    })
+    return `/posts/${res.data.slug}`
+  },
+  ```
+
 ## 1.4.10
 
 ### Patch Changes
