@@ -3,7 +3,7 @@ import { logger } from '../../../logger'
 import { command } from '../../../cmds/init'
 
 export class InitCommand extends Command {
-  static paths = [['init']]
+  static paths = [['init'], ['init', 'backend']]
   pathToForestryConfig = Option.String('--forestryPath', {
     description:
       'Specify the relative path to the .forestry directory, if importing an existing forestry site.',
@@ -33,8 +33,10 @@ export class InitCommand extends Command {
   }
 
   async execute(): Promise<number | void> {
+    const isBackend = Boolean(this.path.find((x) => x === 'backend'))
     const rootPath = this.rootPath || process.cwd()
     await command.execute({
+      isBackendInit: isBackend,
       rootPath: rootPath,
       pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,

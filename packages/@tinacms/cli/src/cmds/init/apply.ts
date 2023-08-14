@@ -111,6 +111,7 @@ async function apply({
       config,
     })
   }
+  const usingDataLayer = config.hosting === 'self-host'
 
   // add tina/config.{js,ts}]
   await addConfigFile({
@@ -128,8 +129,8 @@ async function apply({
     templateOptions: {
       nextAuth: config.nextAuth,
       isForestryMigration,
-      selfHosted: config.dataLayer,
-      dataLayer: config.dataLayer,
+      selfHosted: usingDataLayer,
+      dataLayer: usingDataLayer,
     },
     baseDir,
     framework: config.framework,
@@ -137,7 +138,7 @@ async function apply({
     config,
   })
 
-  if (config.dataLayer) {
+  if (usingDataLayer) {
     await addDatabaseFile({
       config,
       generatedFile: env.generatedFiles['database'],
@@ -190,15 +191,15 @@ async function apply({
       usingSrc: env.usingSrc,
       usingTypescript: config.typescript,
       isLocalEnvVarName: config.isLocalEnvVarName,
-      dataLayer: config.dataLayer,
+      dataLayer: usingDataLayer,
       nextAuthProvider: config.nextAuthProvider,
     })
   }
 
-  await addDependencies(config, env, params)
+  // await addDependencies(config, env, params)
 
   logNextSteps({
-    dataLayer: config.dataLayer,
+    dataLayer: usingDataLayer,
     packageManager: config.packageManager,
     framework: config.framework,
   })

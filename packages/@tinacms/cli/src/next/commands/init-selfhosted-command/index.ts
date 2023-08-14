@@ -1,3 +1,5 @@
+// TODO: Delete this file
+
 import { Command, Option } from 'clipanion'
 import { logger } from '../../../logger'
 import { command } from '../../../cmds/init'
@@ -38,7 +40,7 @@ export class InitSelfHostedCommand extends Command {
       rootPath: rootPath,
       pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,
-      showSelfHosted: true,
+      isBackendInit: true,
       debug: this.debug,
       tinaVersion: this.tinaVersion,
     })

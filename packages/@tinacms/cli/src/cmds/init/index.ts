@@ -1,3 +1,8 @@
+/*
+The "Init" command.
+This init command is a simple setup command that gets a user up and running locally.
+*/
+
 import { logger } from '../../logger'
 import detectEnvironment from './detectEnvironment'
 import configure from './configure'
@@ -47,13 +52,14 @@ export type InitEnvironment = {
     [key in GeneratedFileType]: GeneratedFile
   }
   usingSrc: boolean
+  tinaConfigExists: boolean
 }
 
 export type InitParams = {
   rootPath: string
   pathToForestryConfig: string
   noTelemetry: boolean
-  showSelfHosted?: boolean
+  isBackendInit: boolean
   baseDir?: string
   debug?: boolean
   tinaVersion?: string
@@ -81,9 +87,9 @@ export const command = new CLICommand<InitEnvironment, InitParams>({
   },
   configure(
     env: InitEnvironment,
-    { debug = false, showSelfHosted = false }: InitParams
+    { debug = false, isBackendInit = false }: InitParams
   ): Promise<Record<any, any>> {
-    return configure(env, { debug, showSelfHosted })
+    return configure(env, { debug, isBacked: isBackendInit })
   },
   apply(
     config: Record<any, any>,
