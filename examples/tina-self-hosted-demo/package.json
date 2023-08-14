@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/self-hosted-starter",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "private": true,
   "scripts": {
     "dev": "tinacms dev -c \"next dev\"",
