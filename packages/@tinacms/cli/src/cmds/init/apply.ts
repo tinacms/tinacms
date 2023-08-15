@@ -294,7 +294,6 @@ const addDependencies = async (
 ) => {
   const tagVersion = params.tinaVersion ? `@${params.tinaVersion}` : ''
   const { dataLayer, dataLayerAdapter, nextAuth, packageManager } = config
-  logger.info(logText('Adding dependencies, this might take a moment...'))
   let deps = [`tinacms`, '@tinacms/cli']
   let devDeps = []
   if (nextAuth) {
@@ -327,8 +326,12 @@ const addDependencies = async (
     npm: `npm install ${deps.join(' ')}`,
     yarn: `yarn add ${deps.join(' ')}`,
   }
-  logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`))
-  await execShellCommand(packageManagers[packageManager])
+
+  if (packageManagers[packageManager]) {
+    logger.info(logText('Adding dependencies, this might take a moment...'))
+    logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`))
+    await execShellCommand(packageManagers[packageManager])
+  }
 
   // dev dependencies
   if (devDeps.length > 0) {
@@ -339,8 +342,13 @@ const addDependencies = async (
       npm: `npm install -D ${devDeps.join(' ')}`,
       yarn: `yarn add -D ${devDeps.join(' ')}`,
     }
-    logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`))
-    await execShellCommand(packageManagers[packageManager])
+    if (packageManagers[packageManager]) {
+      logger.info(
+        logText('Adding dev dependencies, this might take a moment...')
+      )
+      logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`))
+      await execShellCommand(packageManagers[packageManager])
+    }
   }
 }
 
