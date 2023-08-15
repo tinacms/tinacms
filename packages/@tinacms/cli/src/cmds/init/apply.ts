@@ -145,8 +145,39 @@ async function apply({
       generatedFile: env.generatedFiles['config'],
       config,
     })
+  } else if (
+    params.isBackendInit &&
+    config.nextAuth &&
+    config.hosting === 'self-host'
+  ) {
+    // if we are doing a backend init we should print out what they need to add to the config
+    logger.info(
+      'Please add the following to your tina config:\n' +
+        format(
+          `
+  import { createTinaNextAuthHandler } from 'tinacms-next-auth'
+  //...
+  export default defineConfig({
+    //...
+    admin: {
+      auth: {
+        useLocalAuth: isLocal,
+        customAuth: !isLocal,
+        ...createTinaNextAuthHandler({
+          callbackUrl: '/admin/index.html',
+          isLocalDevelopment: isLocal,
+          name: '${config.nextAuthCredentialsProviderName}',
+        })
+    }
+    },
+  })
+  `,
+          {
+            parser: 'babel',
+          }
+        )
+    )
   }
-
   if (usingDataLayer) {
     await addDatabaseFile({
       config,
