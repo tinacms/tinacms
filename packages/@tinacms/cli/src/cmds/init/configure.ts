@@ -20,7 +20,7 @@ async function writeTinaEnv(config: Record<any, any>) {
   if (config.vercelKVNextAuthCredentialsKey !== undefined) {
     envFile += `NEXTAUTH_CREDENTIALS_KEY=${config.vercelKVNextAuthCredentialsKey}\n`
   }
-  if (config.clientId !== undefined && config.framework.name === 'next') {
+  if (config.clientId !== undefined) {
     envFile += `NEXT_PUBLIC_TINA_CLIENT_ID=${config.clientId}\n`
   }
   if (config.githubToken !== undefined) {
@@ -43,21 +43,22 @@ async function configure(
     answers.framework.name === 'next' ? promptType : null
   const isNextAuth = (promptType: PromptType) => (_, answers) =>
     answers.nextAuth ? promptType : null
-  const dataLayerEnabled = (promptType: PromptType) => (_, answers) =>
-    answers.dataLayer ? promptType : null
-  // const isBackend = (promptType: PromptType) =>
-  //   opts.isBacked ? promptType : null
 
   // conditionally generate overwrite prompts for generated ts/js
   const generatedFileOverwritePrompt = ({
     condition,
     configName,
     generatedFile,
+    env,
   }: {
     configName: string
     condition: (answers: any) => boolean
     generatedFile: GeneratedFile
+    env: InitEnvironment
   }) => {
+    if (env.tinaConfigExists) {
+      return []
+    }
     const results = []
     if (generatedFile.javascriptExists) {
       results.push({
@@ -81,6 +82,9 @@ async function configure(
   const forestryDisclaimer = logText(
     `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
   )
+  if (opts.isBacked && !env.tinaConfigExists) {
+    logger.info('Looks like Tin has not been setup, setting up now...')
+  }
 
   // This is always run durring tinacms init
   const tinaSetupPrompts: prompts.PromptObject[] = [
@@ -181,7 +185,7 @@ async function configure(
     {
       name: 'githubToken',
       type: (_, answers) => {
-        return answers.hosting === 'tina-cloud' ? 'text' : null
+        return answers.hosting === 'self-host' ? 'text' : null
       },
       message: `What is your GitHub Personal Access Token? (Hit enter to skip and set up later)\n${logText(
         'Create one here: '
@@ -191,7 +195,11 @@ async function configure(
     {
       name: 'dataLayerAdapter',
       message: 'Select a self-hosted data layer adapter',
-      type: dataLayerEnabled('select'),
+      type: (_, answers) => {
+        if (answers.hosting === 'self-host') {
+          return 'select'
+        }
+      },
       choices: (_, answers) => {
         if (answers.framework.name === 'next') {
           return [
@@ -301,6 +309,7 @@ async function configure(
     logger.info(
       `Tina config already exists, skipping setup. (If you want to init tina from sratch, delete your tina config file and run this command again)`
     )
+    process.exit(0)
   }
 
   let config: Record<any, any> = await prompts(
@@ -329,30 +338,35 @@ async function configure(
         condition: (_) => true,
         configName: 'Config',
         generatedFile: env.generatedFiles['config'],
+        env,
       }),
       // tina/database.ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!answers.dataLayer,
         configName: 'Database',
         generatedFile: env.generatedFiles['database'],
+        env,
       }),
       // tina/auth.ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!answers.nextAuthProvider,
         configName: 'Auth',
         generatedFile: env.generatedFiles['auth'],
+        env,
       }),
       // pages/api/gql.ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!answers.dataLayer,
         configName: 'GqlApiHandler',
         generatedFile: env.generatedFiles['gql-api-handler'],
+        env,
       }),
       // pages/api/auth/[...nextauth].ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!answers.nextAuthProvider,
         configName: 'NextAuthApiHandler',
         generatedFile: env.generatedFiles['next-auth-api-handler'],
+        env,
       }),
       // pages/auth/signin.tsx
       ...generatedFileOverwritePrompt({
@@ -361,6 +375,7 @@ async function configure(
         configName: 'VercelKVCredentialsProviderSignin',
         generatedFile:
           env.generatedFiles['vercel-kv-credentials-provider-signin'],
+        env,
       }),
       // pages/auth/register.tsx
       ...generatedFileOverwritePrompt({
@@ -369,6 +384,7 @@ async function configure(
         configName: 'VercelKVCredentialsProviderRegister',
         generatedFile:
           env.generatedFiles['vercel-kv-credentials-provider-register'],
+        env,
       }),
       // pages/auth/tw.module.css
       ...generatedFileOverwritePrompt({
@@ -377,6 +393,7 @@ async function configure(
         configName: 'VercelKVCredentialsProviderTailwindCSS',
         generatedFile:
           env.generatedFiles['vercel-kv-credentials-provider-tailwindcss'],
+        env,
       }),
       // pages/api/credentials/register.ts
       ...generatedFileOverwritePrompt({
@@ -387,13 +404,15 @@ async function configure(
           env.generatedFiles[
             'vercel-kv-credentials-provider-register-api-handler'
           ],
+        env,
       }),
       {
         name: 'overwriteSampleContent',
-        type: (_) => (env.sampleContentExists ? 'confirm' : null),
+        type: (_) =>
+          env.sampleContentExists && !env.tinaConfigExists ? 'confirm' : null,
         message: `Found existing file at ${env.sampleContentPath}. Would you like to overwrite?`,
       },
-    ].filter(Boolean),
+    ],
     promptOptions
   )
 

@@ -1,7 +1,7 @@
 import path from 'path'
 import { generateCollections } from '../forestry-migrate'
 import { addVariablesToCode } from '../forestry-migrate/util/codeTransformer'
-import { log, logger } from '../../logger'
+import { logger } from '../../logger'
 import {
   cmdText,
   focusText,
@@ -49,10 +49,8 @@ async function apply({
   let extraText: string | null | undefined
 
   if (env.nextAppDir && config.framework.name === 'next') {
-    console.log(
-      `❌Error: the init command does not currently support the app dir. You will have to setup Tina manually`
-    )
-    process.exit(1)
+    // instead of causing an error lets not generate an example
+    config.framework.name = 'other'
   }
 
   let isForestryMigration = false
@@ -104,7 +102,7 @@ async function apply({
     }
   }
 
-  if (isForestryMigration) {
+  if (isForestryMigration && !env.tinaConfigExists) {
     await addTemplateFile({
       generatedFile: env.generatedFiles['templates'],
       content: templateCode,
@@ -113,30 +111,32 @@ async function apply({
   }
   const usingDataLayer = config.hosting === 'self-host'
 
-  // add tina/config.{js,ts}]
-  await addConfigFile({
-    templateVariables: {
-      // remove process fom pathToForestryConfig and add publicFolder
-      publicFolder: path.join(
-        path.relative(process.cwd(), pathToForestryConfig),
-        config.publicFolder
-      ),
-      collections,
-      extraText,
-      isLocalEnvVarName: config.isLocalEnvVarName,
-      nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
-    },
-    templateOptions: {
-      nextAuth: config.nextAuth,
-      isForestryMigration,
-      selfHosted: usingDataLayer,
-      dataLayer: usingDataLayer,
-    },
-    baseDir,
-    framework: config.framework,
-    generatedFile: env.generatedFiles['config'],
-    config,
-  })
+  if (!env.tinaConfigExists) {
+    // add tina/config.{js,ts}]
+    await addConfigFile({
+      templateVariables: {
+        // remove process fom pathToForestryConfig and add publicFolder
+        publicFolder: path.join(
+          path.relative(process.cwd(), pathToForestryConfig),
+          config.publicFolder
+        ),
+        collections,
+        extraText,
+        isLocalEnvVarName: config.isLocalEnvVarName,
+        nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
+      },
+      templateOptions: {
+        nextAuth: config.nextAuth,
+        isForestryMigration,
+        selfHosted: usingDataLayer,
+        dataLayer: usingDataLayer,
+      },
+      baseDir,
+      framework: config.framework,
+      generatedFile: env.generatedFiles['config'],
+      config,
+    })
+  }
 
   if (usingDataLayer) {
     await addDatabaseFile({
@@ -179,12 +179,12 @@ async function apply({
     }
   }
 
-  if (!env.forestryConfigExists) {
+  if (!env.forestryConfigExists && !env.tinaConfigExists) {
     // add /content/posts/hello-world.md
     await addContentFile({ config, env })
   }
 
-  if (config.framework.reactive) {
+  if (config.framework.reactive && !env.tinaConfigExists) {
     await addReactiveFile[config.framework.name]({
       baseDir,
       framework: config.framework,
@@ -196,9 +196,10 @@ async function apply({
     })
   }
 
-  // await addDependencies(config, env, params)
+  await addDependencies(config, env, params)
 
   logNextSteps({
+    isBackend: env.tinaConfigExists,
     dataLayer: usingDataLayer,
     packageManager: config.packageManager,
     framework: config.framework,
@@ -510,28 +511,42 @@ const logNextSteps = ({
   dataLayer,
   framework,
   packageManager,
+  isBackend,
 }: {
+  isBackend: boolean
   dataLayer: boolean
   packageManager: string
   framework: Framework
 }) => {
-  logger.info(focusText(`\n${titleText(' TinaCMS ')} has been initialized!`))
-  if (dataLayer) {
-    logger.info('Copy .env.tina to .env')
+  if (isBackend) {
     logger.info(
-      'If you are deploying to vercel make sure to add the environment variables to your project.'
+      focusText(`\n${titleText(' TinaCMS ')} backend been initialized!`)
+    )
+    logger.info('Make sure  to push tina-lock.json to your GitHub repo')
+    logger.info('You can now run your build command and deploy your site.')
+  } else {
+    logger.info(focusText(`\n${titleText(' TinaCMS ')} has been initialized!`))
+    if (dataLayer) {
+      logger.info('Copy .env.tina to .env')
+      logger.info(
+        'If you are deploying to vercel make sure to add the environment variables to your project.'
+      )
+    }
+    logger.info(
+      'To get started run: ' +
+        cmdText(frameworkDevCmds[framework.name]({ packageManager }))
+    )
+    logger.info(
+      'To get your site production ready, run: ' +
+        cmdText(`tinacms init backend`)
+    )
+    logger.info('Make sure  to push tina-lock.json to your GitHub repo')
+    logger.info(
+      `\nOnce your site is running, access the CMS at ${linkText(
+        '<YourDevURL>/admin/index.html'
+      )}`
     )
   }
-  logger.info(
-    'To get started run: ' +
-      cmdText(frameworkDevCmds[framework.name]({ packageManager }))
-  )
-  logger.info('Make sure  to push tina-lock.json to your GitHub repo')
-  logger.info(
-    `\nOnce your site is running, access the CMS at ${linkText(
-      '<YourDevURL>/admin/index.html'
-    )}`
-  )
 }
 
 const other = ({ packageManager }: { packageManager: string }) => {
