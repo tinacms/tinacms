@@ -19,6 +19,7 @@ import {
   FormOptions,
   GlobalFormPlugin,
   TinaState,
+  ErrorDialog,
 } from 'tinacms'
 import { createForm, createGlobalForm, FormifyCallback } from './build-form'
 import type {
@@ -602,7 +603,13 @@ const onSubmit = async (
     })
     cms.alerts.success('Document saved!')
   } catch (e) {
-    cms.alerts.error('There was a problem saving your document')
+    cms.alerts.error(() =>
+      ErrorDialog({
+        title: 'There was a problem saving your document',
+        message: 'Tina caught an error while updating the page',
+        error: e,
+      })
+    )
     console.error(e)
   }
 }

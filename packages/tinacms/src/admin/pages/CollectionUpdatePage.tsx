@@ -5,13 +5,13 @@ import GetDocument from '../components/GetDocument'
 import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm, Collection } from '@tinacms/schema-tools'
 import { Link, useParams } from 'react-router-dom'
-import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { useWindowWidth } from '@react-hook/window-size'
 import { useCollectionFolder } from './utils'
+import { ErrorDialog } from '../components/ErrorDialog'
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -132,6 +132,13 @@ const RenderForm = ({
           )
           cms.alerts.success('Document updated!')
         } catch (error) {
+          cms.alerts.error(() =>
+            ErrorDialog({
+              title: 'There was a problem saving your document',
+              message: 'Tina caught an error while updating the page',
+              error,
+            })
+          )
           console.error(error)
           throw new Error(
             `[${error.name}] UpdateDocument failed: ${error.message}`
