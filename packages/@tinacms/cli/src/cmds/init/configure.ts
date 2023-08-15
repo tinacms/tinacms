@@ -56,9 +56,6 @@ async function configure(
     generatedFile: GeneratedFile
     env: InitEnvironment
   }) => {
-    if (env.tinaConfigExists) {
-      return []
-    }
     const results = []
     if (generatedFile.javascriptExists) {
       results.push({
@@ -245,24 +242,19 @@ async function configure(
     },
     {
       name: 'clientId',
-      type: (_, answers) =>
-        !answers.dataLayer || (answers.dataLayer && !answers.nextAuth)
-          ? 'text'
-          : null,
+      type: (_, answers) => {
+        return answers.hosting === 'self-host' ? null : 'text'
+      },
       message: `What is your Tina Cloud Client ID? (Hit enter to skip and set up yourself later)\n${logText(
         "Don't have a Client ID? Create one here: "
       )}${linkText('https://app.tina.io/projects/new')}`,
-      initial: (_, answers) =>
-        answers.framework.name === 'next'
-          ? process.env.NEXT_PUBLIC_TINA_CLIENT_ID
-          : undefined,
+      initial: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
     },
     {
       name: 'token',
-      type: (_, answers) =>
-        !answers.dataLayer || (answers.dataLayer && !answers.nextAuth)
-          ? 'text'
-          : null,
+      type: (_, answers) => {
+        return answers.hosting === 'self-host' ? null : 'text'
+      },
       message: (prev) =>
         `What is your Tina Cloud Read Only Token?\n${logText(
           "Don't have a Read Only Token? Create one here: "
@@ -335,14 +327,14 @@ async function configure(
       ...(opts.isBacked ? backendSetupCommands : []),
       // tina/config.ts
       ...generatedFileOverwritePrompt({
-        condition: (_) => true,
+        condition: (_) => !env.tinaConfigExists,
         configName: 'Config',
         generatedFile: env.generatedFiles['config'],
         env,
       }),
       // tina/database.ts
       ...generatedFileOverwritePrompt({
-        condition: (answers) => !!answers.dataLayer,
+        condition: (answers) => !!(answers.hosting === 'self-host'),
         configName: 'Database',
         generatedFile: env.generatedFiles['database'],
         env,
@@ -356,7 +348,7 @@ async function configure(
       }),
       // pages/api/gql.ts
       ...generatedFileOverwritePrompt({
-        condition: (answers) => !!answers.dataLayer,
+        condition: (answers) => !!(answers.hosting === 'self-host'),
         configName: 'GqlApiHandler',
         generatedFile: env.generatedFiles['gql-api-handler'],
         env,

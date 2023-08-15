@@ -6,6 +6,7 @@ import {
   cmdText,
   focusText,
   indentedCmd,
+  indentText,
   linkText,
   logText,
   titleText,
@@ -43,6 +44,14 @@ async function apply({
   params: InitParams
   config: Record<any, any>
 }) {
+  if (config.framework.name === 'other' && config.hosting === 'self-host') {
+    logger.error(
+      logText(
+        'Self-hosted Tina requires init setup only works with next.js right now. Please check out the docs for info on how to setup Tina on another framework: https://tina.io/docs/self-hosted/existing-site/'
+      )
+    )
+    return
+  }
   const { pathToForestryConfig, noTelemetry, baseDir = '' } = params
   let collections: string | null | undefined
   let templateCode: string | null | undefined
@@ -369,7 +378,10 @@ const writeGeneratedFile = async ({
       logger.info(`Overwriting file at ${path}... ✅`)
       await fs.outputFileSync(path, content)
     } else {
-      logger.info(logText(`Not overwriting file at ${path}.`))
+      logger.info(`Not overwriting file at ${path}.`)
+      logger.info(
+        logText(`Please add the following to ${path}:\n${indentText(content)}}`)
+      )
     }
   } else {
     logger.info(`Adding file at ${path}... ✅`)
@@ -662,7 +674,7 @@ async function addNextAuthApiHandler({
     typescript: config.typescript,
     overwrite: config.typescript
       ? config.overwriteNextAuthApiHandlerTS
-      : config.overwriteNextAuthApiHandlerTS,
+      : config.overwriteNextAuthApiHandlerJS,
     content,
   })
 }
