@@ -80,7 +80,7 @@ async function configure(
     `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
   )
   if (opts.isBacked && !env.tinaConfigExists) {
-    logger.info('Looks like Tin has not been setup, setting up now...')
+    logger.info('Looks like Tina has not been setup, setting up now...')
   }
 
   // This is always run durring tinacms init
