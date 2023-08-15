@@ -416,8 +416,11 @@ async function configure(
     promptOptions
   )
 
-  config.vercelKVNextAuthCredentialsKey =
-    process.env.NEXTAUTH_CREDENTIALS_KEY || 'tinacms_users'
+  // If we are doing a backend init we can set the vercelKVNextAuthCredentialsKey default
+  if (opts.isBacked) {
+    config.vercelKVNextAuthCredentialsKey =
+      process.env.NEXTAUTH_CREDENTIALS_KEY || 'tinacms_users'
+  }
 
   config.nextAuthCredentialsProviderName = 'VercelKVCredentialsProvider'
   config.isLocalEnvVarName = 'TINA_PUBLIC_IS_LOCAL'
