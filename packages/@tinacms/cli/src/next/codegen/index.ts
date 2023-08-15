@@ -149,22 +149,40 @@ export class Codegen {
       await unlinkIfExists(this.configManager.generatedTypesDFilePath)
       await unlinkIfExists(this.configManager.generatedTypesJSFilePath)
     } else {
+      // Write out the generated types.
+      // write types.js and types.d.ts
       await fs.outputFile(
         this.configManager.generatedTypesDFilePath,
         codeString
       )
-      const jsCode = await transform(codeString, { loader: 'ts' })
+      const jsTypes = await transform(codeString, { loader: 'ts' })
       await fs.outputFile(
         this.configManager.generatedTypesJSFilePath,
-        jsCode.code
+        jsTypes.code
       )
+      // Write out the generated client.
+      // write client.js and client.d.ts
       await fs.outputFile(
-        this.configManager.generatedClientJSFilePath,
+        this.configManager.generatedClientDFilePath,
         clientString
       )
+      const jsClient = await transform(clientString, { loader: 'ts' })
+      await fs.outputFile(
+        this.configManager.generatedClientJSFilePath,
+        jsClient.code
+      )
       if (this.configManager.hasSelfHostedConfig) {
+        /// Write out the generated client
+        // write databaseClient.js and databaseClient.d.ts
+        const jsDatabaseClient = await transform(databaseClientString, {
+          loader: 'ts',
+        })
         await fs.outputFile(
-          this.configManager.generatedClientJSFilePath,
+          this.configManager.generatedDatabaseClientJSFilePath,
+          jsDatabaseClient.code
+        )
+        await fs.outputFile(
+          this.configManager.generatedDatabaseClientDFilePath,
           databaseClientString
         )
       }

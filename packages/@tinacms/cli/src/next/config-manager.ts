@@ -38,8 +38,10 @@ export class ConfigManager {
   generatedTypesDFilePath: string
   generatedClientTSFilePath: string
   generatedClientJSFilePath: string
+  generatedClientDFilePath: string
   generatedDatabaseClientJSFilePath: string
   generatedDatabaseClientTSFilePath: string
+  generatedDatabaseClientDFilePath: string
   generatedQueriesFilePath: string
   generatedFragmentsFilePath: string
   generatedQueriesAndFragmentsGlob: string
@@ -167,6 +169,15 @@ export class ConfigManager {
     this.generatedClientJSFilePath = path.join(
       this.generatedFolderPath,
       'client.js'
+    )
+    this.generatedClientDFilePath = path.join(
+      this.generatedFolderPath,
+      'client.d.ts'
+    )
+
+    this.generatedDatabaseClientDFilePath = path.join(
+      this.generatedFolderPath,
+      'databaseClient.d.ts'
     )
     this.generatedDatabaseClientTSFilePath = path.join(
       this.generatedFolderPath,
