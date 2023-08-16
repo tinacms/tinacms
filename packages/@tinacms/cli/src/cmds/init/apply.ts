@@ -351,6 +351,9 @@ const addDependencies = async (
     deps.push('upstash-redis-level')
     deps.push('@upstash/redis')
   }
+  if (config.nextAuth) {
+    deps.push('next-tinacms-auth')
+  }
 
   // add tag version if this is a pr tagged version
   if (tagVersion) {
