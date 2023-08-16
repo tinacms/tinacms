@@ -192,8 +192,8 @@ export class Codegen {
           this.configManager.generatedDatabaseClientTSFilePath
         )
       }
-      return apiURL
     }
+    return apiURL
   }
   private _createApiUrl() {
     const branch = this.configManager.config?.branch
