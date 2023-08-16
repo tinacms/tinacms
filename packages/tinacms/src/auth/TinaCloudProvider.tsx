@@ -28,7 +28,7 @@ import { CreateClientProps, createClient } from '../utils'
 import { setEditing } from '@tinacms/sharedctx'
 import { TinaAdminApi } from '../admin/api'
 
-type ModalNames = null | 'authenticate'
+type ModalNames = null | 'authenticate' | 'error'
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -63,29 +63,60 @@ export const AuthWallInner = ({
     !client.schema?.config?.config?.admin?.auth?.customAuth
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
+  const [errorMessage, setErrorMessage] = useState<
+    { title: string; message: string } | undefined
+  >()
   const [showChildren, setShowChildren] = useState<boolean>(false)
 
   React.useEffect(() => {
-    client.isAuthenticated().then((isAuthenticated) => {
-      if (isAuthenticated) {
-        setShowChildren(true)
-        cms.enable()
-      } else {
-        // FIXME: might be some sort of race-condition when loading styles
-        sleep(500).then(() => {
-          setActiveModal('authenticate')
-        })
-      }
-    })
+    client
+      .isAuthenticated()
+      .then((isAuthenticated) => {
+        if (isAuthenticated) {
+          client
+            .isAuthorized()
+            .then((isAuthorized) => {
+              if (isAuthorized) {
+                setShowChildren(true)
+                cms.enable()
+              } else {
+                setErrorMessage({
+                  title: 'Access Denied:',
+                  message: 'Not Authorized To Edit',
+                })
+                setActiveModal('error')
+              }
+            })
+            .catch((e) => {
+              console.error(e)
+              setErrorMessage({ title: 'Unexpected Error:', message: `${e}` })
+              setActiveModal('error')
+            })
+        } else {
+          // FIXME: might be some sort of race-condition when loading styles
+          sleep(500).then(() => {
+            setActiveModal('authenticate')
+          })
+        }
+      })
+      .catch((e) => {
+        console.error(e)
+        setErrorMessage({ title: 'Unexpected Error:', message: `${e}` })
+        setActiveModal('error')
+      })
   }, [])
 
-  const onAuthSuccess = async () => {
-    if (await client.isAuthenticated()) {
+  const onAuthenticated = async () => {
+    if (await client.isAuthorized()) {
       setShowChildren(true)
       setActiveModal(null)
       cms.events.dispatch({ type: 'cms:login' })
     } else {
-      throw new Error('No access to repo') // TODO - display modal here
+      setErrorMessage({
+        title: 'Access Denied:',
+        message: 'Not Authorized To Edit',
+      })
+      setActiveModal('error')
     }
   }
 
@@ -106,7 +137,7 @@ export const AuthWallInner = ({
           }
           message={
             isTinaCloud
-              ? 'To save edits, Tina Cloud authorization is required. On save, changes will get commited using your account.'
+              ? 'To save edits, Tina Cloud authorization is required. On save, changes will get committed using your account.'
               : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
           }
           close={close}
@@ -129,11 +160,57 @@ export const AuthWallInner = ({
             {
               name: isTinaCloud ? 'Continue to Tina Cloud' : 'Enter Edit Mode',
               action: async () => {
-                const token = await client.authenticate()
-                if (typeof client?.onLogin === 'function') {
-                  await client?.onLogin({ token })
+                try {
+                  const token = await client.authenticate()
+                  if (typeof client?.onLogin === 'function') {
+                    await client?.onLogin({ token })
+                  }
+                  return onAuthenticated()
+                } catch (e) {
+                  console.error(e)
+                  setActiveModal('error')
+                  setErrorMessage({
+                    title: 'Unexpected Error:',
+                    message: `${e}`,
+                  })
                 }
-                onAuthSuccess()
+              },
+              primary: true,
+            },
+          ]}
+        />
+      )}
+      {activeModal === 'error' && errorMessage && (
+        <ModalBuilder
+          title={
+            isTinaCloud ? 'Tina Cloud Authorization' : 'Enter into edit mode'
+          }
+          message={errorMessage.title}
+          error={errorMessage.message}
+          close={close}
+          actions={[
+            ...otherModalActions,
+            {
+              name: 'Retry',
+              action: async () => {
+                try {
+                  setActiveModal(null)
+                  setErrorMessage(undefined)
+                  await client.logout()
+                  await client.onLogout()
+                  const token = await client.authenticate()
+                  if (typeof client?.onLogin === 'function') {
+                    await client?.onLogin({ token })
+                  }
+                  return onAuthenticated()
+                } catch (e) {
+                  console.error(e)
+                  setActiveModal('error')
+                  setErrorMessage({
+                    title: 'Unexpected Error:',
+                    message: `${e}`,
+                  })
+                }
               },
               primary: true,
             },
