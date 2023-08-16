@@ -185,8 +185,10 @@ async function configure(
         return answers.hosting === 'self-host' ? 'text' : null
       },
       message: `What is your GitHub Personal Access Token? (Hit enter to skip and set up later)\n${logText(
-        'Create one here: '
-      )}${linkText('https://github.com/settings/tokens?type=beta')}`,
+        'Learn more here: '
+      )}${linkText(
+        'https://tina.io/docs/self-hosted/starters/nextjs-vercel/'
+      )}`,
       initial: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
     },
     {

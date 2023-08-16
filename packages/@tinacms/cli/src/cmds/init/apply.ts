@@ -120,64 +120,6 @@ async function apply({
   }
   const usingDataLayer = config.hosting === 'self-host'
 
-  if (!env.tinaConfigExists) {
-    // add tina/config.{js,ts}]
-    await addConfigFile({
-      templateVariables: {
-        // remove process fom pathToForestryConfig and add publicFolder
-        publicFolder: path.join(
-          path.relative(process.cwd(), pathToForestryConfig),
-          config.publicFolder
-        ),
-        collections,
-        extraText,
-        isLocalEnvVarName: config.isLocalEnvVarName,
-        nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
-      },
-      templateOptions: {
-        nextAuth: config.nextAuth,
-        isForestryMigration,
-        selfHosted: usingDataLayer,
-        dataLayer: usingDataLayer,
-      },
-      baseDir,
-      framework: config.framework,
-      generatedFile: env.generatedFiles['config'],
-      config,
-    })
-  } else if (
-    params.isBackendInit &&
-    config.nextAuth &&
-    config.hosting === 'self-host'
-  ) {
-    // if we are doing a backend init we should print out what they need to add to the config
-    logger.info(
-      'Please add the following to your tina config:\n' +
-        format(
-          `
-  import { createTinaNextAuthHandler } from 'tinacms-next-auth'
-  //...
-  export default defineConfig({
-    //...
-    admin: {
-      auth: {
-        useLocalAuth: isLocal,
-        customAuth: !isLocal,
-        ...createTinaNextAuthHandler({
-          callbackUrl: '/admin/index.html',
-          isLocalDevelopment: isLocal,
-          name: '${config.nextAuthCredentialsProviderName}',
-        })
-    }
-    },
-  })
-  `,
-          {
-            parser: 'babel',
-          }
-        )
-    )
-  }
   if (usingDataLayer) {
     await addDatabaseFile({
       config,
@@ -237,6 +179,68 @@ async function apply({
   }
 
   await addDependencies(config, env, params)
+
+  if (!env.tinaConfigExists) {
+    // add tina/config.{js,ts}]
+    await addConfigFile({
+      templateVariables: {
+        // remove process fom pathToForestryConfig and add publicFolder
+        publicFolder: path.join(
+          path.relative(process.cwd(), pathToForestryConfig),
+          config.publicFolder
+        ),
+        collections,
+        extraText,
+        isLocalEnvVarName: config.isLocalEnvVarName,
+        nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
+      },
+      templateOptions: {
+        nextAuth: config.nextAuth,
+        isForestryMigration,
+        selfHosted: usingDataLayer,
+        dataLayer: usingDataLayer,
+      },
+      baseDir,
+      framework: config.framework,
+      generatedFile: env.generatedFiles['config'],
+      config,
+    })
+  } else if (
+    params.isBackendInit &&
+    config.nextAuth &&
+    config.hosting === 'self-host'
+  ) {
+    // if we are doing a backend init we should print out what they need to add to the config
+    logger.info(
+      'Please add the following to your tina config:\n' +
+        cmdText(
+          format(
+            `
+  import { createTinaNextAuthHandler } from "tinacms-next-auth/dist/tinacms";
+  //...
+  export default defineConfig({
+    //...
+    contentApiUrlOverride: '/api/gql',
+    admin: {
+      auth: {
+        useLocalAuth: isLocal,
+        customAuth: !isLocal,
+        ...createTinaNextAuthHandler({
+          callbackUrl: '/admin/index.html',
+          isLocalDevelopment: isLocal,
+          name: '${config.nextAuthCredentialsProviderName}',
+        })
+      },
+    },
+  })
+  `,
+            {
+              parser: 'babel',
+            }
+          )
+        )
+    )
+  }
 
   logNextSteps({
     isBackend: env.tinaConfigExists,
@@ -591,7 +595,6 @@ const logNextSteps = ({
       'To get your site production ready, run: ' +
         cmdText(`tinacms init backend`)
     )
-    logger.info('Make sure  to push tina-lock.json to your GitHub repo')
     logger.info(
       `\nOnce your site is running, access the CMS at ${linkText(
         '<YourDevURL>/admin/index.html'
