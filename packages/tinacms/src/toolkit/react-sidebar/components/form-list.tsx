@@ -58,12 +58,25 @@ const FormListItem = ({
   depth: number
   setActiveFormId: (id: string) => void
 }) => {
+  const subItems = React.useMemo(
+    () =>
+      item.subItems.filter((subItem, index, self) => {
+        return (
+          subItem.type === 'document' &&
+          index ===
+            self.findIndex(
+              (s) => s.type === 'document' && s.formId === subItem.formId
+            )
+        )
+      }),
+    [item.subItems]
+  )
   return (
     <div className={`divide-y divide-gray-200`}>
       <Item setActiveFormId={setActiveFormId} item={item} depth={depth} />
       {item.subItems && (
         <ul className="divide-y divide-gray-200">
-          {item.subItems?.map((subItem) => {
+          {subItems.map((subItem) => {
             if (subItem.type === 'document') {
               return (
                 <li key={subItem.formId}>
