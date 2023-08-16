@@ -121,7 +121,7 @@ export class Codegen {
     await maybeWarnFragmentSize(this.configManager.generatedFragmentsFilePath)
 
     const { clientString } = await this.genClient()
-    const databaseClientString = this.configManager.hasSelfHostedConfig
+    const databaseClientString = this.configManager.hasSelfHostedConfig()
       ? await this.genDatabaseClient()
       : ''
     const { codeString, schemaString } = await this.genTypes()
@@ -139,7 +139,7 @@ export class Codegen {
         this.configManager.generatedClientTSFilePath,
         clientString
       )
-      if (this.configManager.hasSelfHostedConfig) {
+      if (this.configManager.hasSelfHostedConfig()) {
         await fs.outputFile(
           this.configManager.generatedDatabaseClientTSFilePath,
           databaseClientString
@@ -171,6 +171,9 @@ export class Codegen {
         this.configManager.generatedClientJSFilePath,
         jsClient.code
       )
+      await unlinkIfExists(this.configManager.generatedTypesTSFilePath)
+      await unlinkIfExists(this.configManager.generatedClientTSFilePath)
+
       if (this.configManager.hasSelfHostedConfig()) {
         /// Write out the generated client
         // write databaseClient.js and databaseClient.d.ts
@@ -185,11 +188,12 @@ export class Codegen {
           this.configManager.generatedDatabaseClientDFilePath,
           databaseClientString
         )
+        await unlinkIfExists(
+          this.configManager.generatedDatabaseClientTSFilePath
+        )
       }
-      await unlinkIfExists(this.configManager.generatedTypesTSFilePath)
-      await unlinkIfExists(this.configManager.generatedClientTSFilePath)
+      return apiURL
     }
-    return apiURL
   }
   private _createApiUrl() {
     const branch = this.configManager.config?.branch
