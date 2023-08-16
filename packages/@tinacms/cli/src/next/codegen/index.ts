@@ -121,7 +121,7 @@ export class Codegen {
     await maybeWarnFragmentSize(this.configManager.generatedFragmentsFilePath)
 
     const { clientString } = await this.genClient()
-    const databaseClientString = this.configManager.hasSelfHostedConfig
+    const databaseClientString = this.configManager.hasSelfHostedConfig()
       ? await this.genDatabaseClient()
       : ''
     const { codeString, schemaString } = await this.genTypes()
@@ -139,7 +139,7 @@ export class Codegen {
         this.configManager.generatedClientTSFilePath,
         clientString
       )
-      if (this.configManager.hasSelfHostedConfig) {
+      if (this.configManager.hasSelfHostedConfig()) {
         await fs.outputFile(
           this.configManager.generatedDatabaseClientTSFilePath,
           databaseClientString
@@ -162,7 +162,7 @@ export class Codegen {
         this.configManager.generatedClientJSFilePath,
         clientString
       )
-      if (this.configManager.hasSelfHostedConfig) {
+      if (this.configManager.hasSelfHostedConfig()) {
         await fs.outputFile(
           this.configManager.generatedClientJSFilePath,
           databaseClientString
