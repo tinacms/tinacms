@@ -171,7 +171,7 @@ export class Codegen {
         this.configManager.generatedClientJSFilePath,
         jsClient.code
       )
-      if (this.configManager.hasSelfHostedConfig) {
+      if (this.configManager.hasSelfHostedConfig()) {
         /// Write out the generated client
         // write databaseClient.js and databaseClient.d.ts
         const jsDatabaseClient = await transform(databaseClientString, {
