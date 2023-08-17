@@ -580,16 +580,14 @@ const logNextSteps = ({
     logger.info(
       focusText(`\n${titleText(' TinaCMS ')} backend been initialized!`)
     )
+    logger.info('Copy .env.tina to .env')
+    logger.info(
+      'If you are deploying to vercel make sure to add the environment variables to your project.'
+    )
     logger.info('Make sure  to push tina-lock.json to your GitHub repo')
     logger.info('You can now run your build command and deploy your site.')
   } else {
     logger.info(focusText(`\n${titleText(' TinaCMS ')} has been initialized!`))
-    if (dataLayer) {
-      logger.info('Copy .env.tina to .env')
-      logger.info(
-        'If you are deploying to vercel make sure to add the environment variables to your project.'
-      )
-    }
     logger.info(
       'To get started run: ' +
         cmdText(frameworkDevCmds[framework.name]({ packageManager }))
