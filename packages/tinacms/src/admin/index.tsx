@@ -143,6 +143,7 @@ const CheckSchema = ({
           if (e.message.includes('has not been indexed by Tina Cloud')) {
             setSchemaMissingError(true)
           } else {
+            cms.alerts.error(`Unexpected error checking schema: ${e}`)
             throw e
           }
         })

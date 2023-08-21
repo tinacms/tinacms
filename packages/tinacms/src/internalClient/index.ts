@@ -215,6 +215,9 @@ export class Client {
     if (options.schema?.config?.admin?.auth?.authenticate) {
       this.authenticate = options.schema?.config?.admin?.auth?.authenticate
     }
+    if (options.schema?.config?.admin?.auth?.authorize) {
+      this.authorize = options.schema?.config?.admin?.auth?.authorize
+    }
     if (options.schema) {
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
@@ -427,9 +430,11 @@ mutation addPendingDocumentMutation(
       if (resBody.message) {
         errorMessage = `${errorMessage}, Response: ${resBody.message}`
       }
-      errorMessage = `${errorMessage}, Please check that the following information is correct: \n\tclientId: ${this.options.clientId}\n\tbranch: ${this.branch}.`
-      if (this.branch !== 'main') {
-        errorMessage = `${errorMessage}\n\tNote: This error can occur if the branch does not exist on GitHub or on Tina Cloud`
+      if (!this.isCustomContentApi) {
+        errorMessage = `${errorMessage}, Please check that the following information is correct: \n\tclientId: ${this.options.clientId}\n\tbranch: ${this.branch}.`
+        if (this.branch !== 'main') {
+          errorMessage = `${errorMessage}\n\tNote: This error can occur if the branch does not exist on GitHub or on Tina Cloud`
+        }
       }
 
       throw new Error(errorMessage)
@@ -600,8 +605,8 @@ mutation addPendingDocumentMutation(
     return Promise.resolve({ access_token, id_token, refresh_token })
   }
 
-  async isAuthorized(): Promise<boolean> {
-    return this.isAuthenticated() // TODO - check access
+  async isAuthorized(context?: any): Promise<boolean> {
+    return !!(await this.authorize(context))
   }
 
   async isAuthenticated(): Promise<boolean> {
@@ -617,6 +622,12 @@ mutation addPendingDocumentMutation(
     this.setToken(token)
     return token
   }
+
+  async authorize(context?: any): Promise<any> {
+    // by default, the existence of a token is enough to be authorized
+    return this.getToken()
+  }
+
   /**
    * Wraps the normal fetch function with same API but adds the authorization header token.
    *

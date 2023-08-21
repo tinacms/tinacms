@@ -54,6 +54,10 @@ export const Nav = ({
     setEventsOpen(false)
   }
 
+  const WrappedSyncStatus = React.forwardRef(
+    (props: { cms; setEventsOpen }, ref) => <SyncStatus {...props} />
+  )
+
   return (
     <div
       className={`relative z-30 flex flex-col bg-white border-r border-gray-200 w-96 h-full ${className}`}
@@ -109,13 +113,19 @@ export const Nav = ({
                             sidebarWidth: null,
                             resizingSidebar: false,
                           })
-                          if (cms?.api?.tina?.logout) {
-                            await cms.api.tina.logout()
-                            if (cms?.api?.tina?.onLogout) {
-                              await cms?.api?.tina?.onLogout()
+                          try {
+                            if (cms?.api?.tina?.logout) {
+                              await cms.api.tina.logout()
+                              if (cms?.api?.tina?.onLogout) {
+                                await cms?.api?.tina?.onLogout()
+                              }
                             }
+                            setEdit(false)
+                          } catch (e) {
+                            cms.alerts.error(`Error logging out: ${e}`)
+                            console.error('Unexpected error calling logout')
+                            console.error(e)
                           }
-                          setEdit(false)
                         }}
                       >
                         <BiExit className="w-6 h-auto mr-2 text-blue-400" /> Log
@@ -123,7 +133,10 @@ export const Nav = ({
                       </button>
                     </Menu.Item>
                     <Menu.Item>
-                      <SyncStatus cms={cms} setEventsOpen={setEventsOpen} />
+                      <WrappedSyncStatus
+                        cms={cms}
+                        setEventsOpen={setEventsOpen}
+                      />
                     </Menu.Item>
                   </Menu.Items>
                 </Transition>

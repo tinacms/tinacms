@@ -470,6 +470,16 @@ export interface Config<
        **/
       getUser?: () => Promise<any | null>
       /**
+       *  Used to authorize the user with the custom auth provider.
+       *
+       *  If this returns a truthy value, the user will be logged in and the CMS will be enabled.
+       *
+       *  If not provided, the existence of a user will be enough to authorize the user.
+       *
+       * @param context
+       */
+      authorize?: (context?: any) => Promise<any | null>
+      /**
        * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
        *
        **/
