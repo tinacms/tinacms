@@ -193,9 +193,7 @@ async function configure(
       },
       message: `What is your GitHub Personal Access Token? (Hit enter to skip and set up later)\n${logText(
         'Learn more here: '
-      )}${linkText(
-        'https://tina.io/docs/self-hosted/starters/nextjs-vercel/'
-      )}`,
+      )}${linkText('https://tina.io/docs/self-hosted/existing-site/')}`,
       initial: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
     },
     {
