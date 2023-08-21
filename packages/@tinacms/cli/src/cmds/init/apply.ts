@@ -212,7 +212,7 @@ async function apply({
   ) {
     // if we are doing a backend init we should print out what they need to add to the config
     logger.info(
-      'Please add the following to your tina config:\n' +
+      '\nPlease add the following to your tina config:\n' +
         cmdText(
           format(
             `
