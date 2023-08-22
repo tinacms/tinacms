@@ -32,22 +32,24 @@ const branch = (process.env.GITHUB_BRANCH ||
 const redisUrl = process.env.KV_REST_API_URL
 const redisToken = process.env.KV_REST_API_TOKEN
 
-if (!branch) {
-  throw new Error(
-    "No branch found. Make sure that you have set the GITHUB_BRANCH or process.env.VERCEL_GIT_COMMIT_REF environment variable."
-  );
-}
+if(!isLocal) {
+  if (!branch) {
+    throw new Error(
+      "No branch found. Make sure that you have set the GITHUB_BRANCH or process.env.VERCEL_GIT_COMMIT_REF environment variable."
+    );
+  }
 
-if (!redisUrl) {
-  throw new Error(
-    "No KV_REST_API_URL found. Make sure that you have set the KV_REST_API_URL environment variable."
-  )
-}
+  if (!redisUrl) {
+    throw new Error(
+      "No KV_REST_API_URL found. Make sure that you have set the KV_REST_API_URL environment variable."
+    )
+  }
 
-if (!redisToken) {
-  throw new Error(
-    "No KV_REST_API_TOKEN found. Make sure that you have set the KV_REST_API_TOKEN environment variable."
-  )
+  if (!redisToken) {
+    throw new Error(
+      "No KV_REST_API_TOKEN found. Make sure that you have set the KV_REST_API_TOKEN environment variable."
+    )
+  }
 }
 
 export default isLocal

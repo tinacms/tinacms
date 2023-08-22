@@ -1,5 +1,6 @@
 export type Variables = {
   isLocalEnvVarName: string
+  typescript?: boolean
 }
 export type GQLEndpointTypes = 'custom' | 'tinacms-next-auth' | 'tina-cloud'
 
@@ -9,10 +10,13 @@ export const templates: {
   ['custom']: (
     vars: Variables
   ) => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
-import { NextApiHandler } from 'next'
-import databaseClient from '../../tina/__generated__/databaseClient'
+${
+  vars.typescript ? `import { NextApiHandler } from 'next'\n` : ''
+}import databaseClient from '../../tina/__generated__/databaseClient'
 
-const nextApiHandler: NextApiHandler = async (req, res) => {
+const nextApiHandler${
+    vars.typescript ? `: NextApiHandler` : ''
+  } = async (req, res) => {
   const isAuthorized =
     process.env.${vars.isLocalEnvVarName} === 'true' ||
     // add your own authorization logic here
@@ -32,19 +36,24 @@ export default nextApiHandler;
   ['tinacms-next-auth']: (
     vars: Variables
   ) => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
-import { NextApiHandler } from 'next'
-import databaseClient from '../../tina/__generated__/databaseClient'
+${
+  vars.typescript ? `import { NextApiHandler } from 'next'\n` : ''
+}import databaseClient from '../../tina/__generated__/databaseClient'
 import { withNextAuthApiRoute } from 'tinacms-next-auth/dist/index'
 import { authOptions } from '../../tina/auth'
 
-const nextApiHandler: NextApiHandler = async (req, res) => {
+const nextApiHandler${
+    vars.typescript ? `: NextApiHandler` : ''
+  } = async (req, res) => {
   const { query, variables } = req.body
   const result = await databaseClient.request({ query, variables })
   return res.json(result)
 }
 
 export default withNextAuthApiRoute(
-  nextApiHandler, { authOptions, isLocalDevelopment: process.env.${vars.isLocalEnvVarName} === 'true' }
+  nextApiHandler, { authOptions, isLocalDevelopment: process.env.${
+    vars.isLocalEnvVarName
+  } === 'true' }
 )
 `,
   ['tina-cloud']: (
