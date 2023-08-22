@@ -1,5 +1,14 @@
 # @tinacms/starter
 
+## 0.1.16
+
+### Patch Changes
+
+- Updated dependencies [7e4de0b2a]
+- Updated dependencies [1144af060]
+  - tinacms@1.5.20
+  - @tinacms/vercel-previews@0.0.16
+
 ## 0.1.15
 
 ### Patch Changes
