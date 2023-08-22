@@ -28,6 +28,12 @@ npm run build
 # Start Next.js Demo
 cd packages/demo-next
 npm run develop
+
+## When you modify Tina, the demo won't automatically show your updates, you will need to also either build with `npm run build` or execute a watch on the package you are modifying
+## you can do this in a separate terminal tab by logging into a new docker shell. i.e.
+## NOTE: these updates take several seconds, not sure why. Also, when watching all files, it seems to not update at all.
+docker exec -it tina-dev /bin/bash
+npm run watch -- --scope=@einsteinindustries/tinacms
 ```
 
 ### To publish package to Einstein's npm

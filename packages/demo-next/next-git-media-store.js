@@ -19,6 +19,11 @@ limitations under the License.
 import { GitMediaStore } from '@einsteinindustries/tinacms-git-client'
 
 export class NextGitMediaStore extends GitMediaStore {
+  tabs = [
+    { name: 'Client', accept: ['image/*'] },
+    { name: 'Einstein', accept: ['image/*'] },
+    { name: 'Files', accept: ['.pdf', '.mp4', '.avi', '.docx'] },
+  ]
   previewSrc(src) {
     return /jpg|jpeg|png|svg|gif$/.test(src.toLowerCase())
       ? src.replace(/\/?public/, '')

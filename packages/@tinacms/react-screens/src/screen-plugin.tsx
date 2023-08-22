@@ -43,8 +43,6 @@ export interface ScreenPlugin<ExtraProps = {}> extends Plugin {
  */
 export interface ScreenComponentProps {
   close(): void
-  currentTab?: number
-  setAllTabs?: (tabsArray: string[]) => void
 }
 
 /**

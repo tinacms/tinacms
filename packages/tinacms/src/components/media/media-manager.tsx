@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
 
  Copyright 2021 Forestry.io Holdings, Inc.
@@ -34,7 +33,6 @@ import {
   MediaListOffset,
   MediaListError,
 } from '@einsteinindustries/tinacms-core'
-
 import { Button } from '@einsteinindustries/tinacms-styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, CursorPaginator } from './index'
@@ -45,9 +43,32 @@ export interface MediaRequest {
   onSelect?(media: Media): void
   close?(): void
   allowDelete?: boolean
-  currentTab?: number
-  setAllTabs?: (tabsArray: string[]) => void
 }
+
+const StyledTab = styled.button<{ isActive: boolean }>`
+  padding: 10px;
+  border: 0;
+  // border-bottom: ${props => props.isActive && '2px solid cornflowerblue'};
+  cursor: pointer;
+  background-color: ${props =>
+    props.isActive ? 'var(--tina-color-grey-4)' : 'var(--tina-color-grey-2)'};
+`
+
+const StyledTabWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+
+  button:first-child {
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+  }
+  button:last-child {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+`
 
 export function MediaManager() {
   const cms = useCMS()
@@ -88,8 +109,6 @@ export function MediaPicker({
   allowDelete,
   onSelect,
   close,
-  currentTab,
-  setAllTabs,
   ...props
 }: MediaRequest) {
   const cms = useCMS()
@@ -97,6 +116,8 @@ export function MediaPicker({
     if (cms.media.isConfigured) return 'loading'
     return 'not-configured'
   })
+
+  const tabs = cms.media.store?.tabs ?? []
 
   const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
@@ -115,6 +136,7 @@ export function MediaPicker({
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
   const [itemModal, setItemModal] = useState<Media | null>(null)
   const [search, setSearch] = useState('')
+  const [currentTab, setCurrentTab] = useState(0)
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
@@ -128,9 +150,9 @@ export function MediaPicker({
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
   const resetLocalStorage = () => {
-    localStorage.removeItem('Media - 0')
-    localStorage.removeItem('Media - 1')
-    localStorage.removeItem('Media - 2')
+    tabs.forEach((_, i) => {
+      localStorage.removeItem(`Media - ${i}`)
+    })
   }
 
   const loadMedia = useCallback(() => {
@@ -155,17 +177,16 @@ export function MediaPicker({
   }, [currentTab, offset, search])
 
   useEffect(() => {
-    if (setAllTabs) {
-      setAllTabs(['Client', 'Einstein', 'Files'])
-    }
-  }, [setAllTabs])
-
-  useEffect(() => {
     if (!cms.media.isConfigured) return
     function loadMedia() {
       setListState('loading')
       cms.media
-        .list({ offset, limit: cms.media.pageSize, directory })
+        .list({
+          offset,
+          limit: cms.media.pageSize,
+          directory,
+          currentList: currentTab,
+        })
         .then(list => {
           setList(list)
           setListState('loaded')
@@ -233,7 +254,7 @@ export function MediaPicker({
   }
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: currentTab === 2 ? ['.pdf', '.mp4', '.avi', '.docx'] : 'image/*',
+    accept: tabs?.[currentTab]?.accept ?? cms.media.store.accept,
 
     onDrop: async files => {
       try {
@@ -302,10 +323,26 @@ export function MediaPicker({
     e.preventDefault()
     loadMedia()
   }
+  const handleTabChange = (idx: number) => {
+    setCurrentTab(idx)
+  }
 
   return (
     <>
       <MediaPickerWrap>
+        {tabs.length > 0 && (
+          <StyledTabWrap>
+            {tabs.map((tab, i) => (
+              <StyledTab
+                key={i}
+                onClick={() => handleTabChange(i)}
+                isActive={i === currentTab}
+              >
+                {tab.name}
+              </StyledTab>
+            ))}
+          </StyledTabWrap>
+        )}
         <Header>
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
           <form onSubmit={e => handleSubmit(e)}>

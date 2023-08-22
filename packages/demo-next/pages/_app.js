@@ -19,10 +19,7 @@ limitations under the License.
 import React from 'react'
 import App from 'next/app'
 import { TinaProvider, TinaCMS, withTina } from '@einsteinindustries/tinacms'
-import {
-  GitClient,
-  GitMediaStore,
-} from '@einsteinindustries/tinacms-git-client'
+import { GitClient } from '@einsteinindustries/tinacms-git-client'
 import { GlobalStyles as TinaCustomStyles } from '@einsteinindustries/tinacms-styles'
 import { NextGitMediaStore } from '../next-git-media-store'
 import { MarkdownFieldPlugin } from '@einsteinindustries/react-tinacms-editor'

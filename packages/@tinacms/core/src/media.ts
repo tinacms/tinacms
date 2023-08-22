@@ -69,6 +69,11 @@ export interface MediaUploadOptions {
  */
 export interface MediaStore {
   /**
+   * Custom tabs for displaying different asset sources, etc.
+   */
+  tabs?: { name: string; accept: string[] }[]
+
+  /**
    * The [input accept string](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept)
    * that describes what kind of files the Media Store will accept.
    */

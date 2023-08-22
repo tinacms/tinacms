@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import {
   Modal,
   ModalHeader,
@@ -38,23 +38,14 @@ export const ScreenPluginModal: FC<ScreenPluginModalProps> = ({
   close,
   back,
 }) => {
-  const [currentTab, setCurrentTab] = useState<number>(0)
-  const [allTabs, setAllTabs] = useState<string[]>([])
   return (
     <ModalLayout
       name={screen.name}
       close={close}
-      // @ts-ignore
       back={back}
       layout={screen.layout}
-      updateCurrentTab={setCurrentTab}
-      allTabs={allTabs}
     >
-      <screen.Component
-        close={close}
-        currentTab={currentTab}
-        setAllTabs={setAllTabs}
-      />
+      <screen.Component close={close} />
     </ModalLayout>
   )
 }
@@ -65,8 +56,6 @@ interface ModalLayoutProps {
   close: any
   back(): void
   layout?: 'fullscreen' | 'popup'
-  updateCurrentTab?: (tab: number) => void
-  allTabs?: string[]
 }
 
 const ModalLayout = ({
@@ -75,8 +64,6 @@ const ModalLayout = ({
   close,
   back,
   layout,
-  updateCurrentTab,
-  allTabs,
 }: ModalLayoutProps) => {
   let Wrapper
 
@@ -95,13 +82,7 @@ const ModalLayout = ({
   return (
     <Modal>
       <Wrapper>
-        <ModalHeader
-          close={close}
-          // @ts-ignore
-          back={back}
-          updateCurrentTab={updateCurrentTab}
-          allTabs={allTabs}
-        >
+        <ModalHeader close={close} back={back}>
           {name}
         </ModalHeader>
         <ModalBody>{children}</ModalBody>
