@@ -94,6 +94,13 @@ const detectEnvironment = async ({
     : fs.pathExistsSync(path.join(baseDir, 'app'))
 
   const tinaFolder = path.join(baseDir, 'tina')
+  const tinaConfigExists = Boolean(
+    // Does the tina folder exist?
+    (await fs.pathExists(tinaFolder)) &&
+      // Does the tina folder contain a config file?
+      (await fs.readdir(tinaFolder)).find((x) => x.includes('config'))
+  )
+
   const generatedFiles = {
     auth: await makeGeneratedFile('auth', tinaFolder),
     config: await makeGeneratedFile('config', tinaFolder),
@@ -174,6 +181,7 @@ const detectEnvironment = async ({
     sampleContentPath,
     generatedFiles,
     usingSrc,
+    tinaConfigExists,
   }
   if (debug) {
     console.log('Environment:')

@@ -32,10 +32,12 @@ const other = (vars: ConfigTemplateVariables, opts: ConfigTemplateOptions) => {
   const authConfig =
     (!opts.selfHosted &&
       `  clientId: ${
-        vars.clientId ? `'${vars.clientId}'` : 'null'
+        vars.clientId
+          ? `'${vars.clientId}'`
+          : 'process.env.NEXT_PUBLIC_TINA_CLIENT_ID'
       }, // Get this from tina.io
   token:  ${
-    vars.token ? `'${vars.token}'` : 'null'
+    vars.token ? `'${vars.token}'` : 'process.env.TINA_TOKEN'
   }, // Get this from tina.io`) ||
     ''
   return `
@@ -114,10 +116,12 @@ export const configExamples: {
       }
       },`
       : `clientId: ${
-          args.clientId ? `'${args.clientId}'` : 'null'
+          args.clientId
+            ? `'${args.clientId}'`
+            : 'process.env.NEXT_PUBLIC_TINA_CLIENT_ID'
         }, // Get this from tina.io
     token:  ${
-      args.token ? `'${args.token}'` : 'null'
+      args.token ? `'${args.token}'` : 'process.env.TINA_TOKEN'
     }, // Get this from tina.io`
     return `import { defineConfig } from 'tinacms'
   ${

@@ -72,14 +72,3 @@ export const getPath = ({
 
   return inputFile
 }
-
-/*
- * Get the clientPath for a given project dir.
- * It throws an error if there is no `.tina/client.{ts,js}` present
- */
-export const getClientPath = ({ projectDir }: { projectDir: string }) => {
-  const filename = 'client'
-  const allowedTypes = ['js', 'ts']
-  const errorMessage = 'Must provide a `.tina/client.{ts,js}`'
-  return getPath({ projectDir, filename, allowedTypes, errorMessage })
-}
