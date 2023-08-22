@@ -71,10 +71,6 @@ const detectEnvironment = async ({
   debug?: boolean
   tinaVersion?: string
 }): Promise<InitEnvironment> => {
-  if (fs.pathExistsSync('.env.tina')) {
-    dotenv.config({ path: '.env.tina' })
-  }
-
   // If there is a forestry config, ask user to migrate it to tina collections
   const hasForestryConfig = await fs.pathExists(
     path.join(pathToForestryConfig, '.forestry', 'settings.yml')
