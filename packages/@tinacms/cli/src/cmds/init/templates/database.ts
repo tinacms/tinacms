@@ -26,11 +26,11 @@ const isLocal = process.env.${vars.isLocalEnvVarName} === "true";
 const branch = (process.env.GITHUB_BRANCH ||
   process.env.VERCEL_GIT_COMMIT_REF ||
   process.env.HEAD ||
-  "main") as string;
+  "main")
 
 
-const redisUrl = process.env.KV_REST_API_URL as string
-const redisToken = process.env.KV_REST_API_TOKEN as string
+const redisUrl = process.env.KV_REST_API_URL
+const redisToken = process.env.KV_REST_API_TOKEN
 
 if (!branch) {
   throw new Error(
@@ -59,7 +59,7 @@ export default isLocal
         token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN || 'missing-token',
         branch,
       }),
-      databaseAdapter: new RedisLevel<string, Record<string, any>>({
+      databaseAdapter: new RedisLevel({
         redis: new Redis({
           url: redisUrl,
           token: redisToken,

@@ -51,10 +51,9 @@ export default withNextAuthApiRoute(
     vars: Variables
   ) => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
 import { isUserAuthorized } from '@tinacms/auth'
-import { NextApiHandler } from 'next'
 import databaseClient from '../../tina/__generated__/databaseClient'
 
-const nextApiHandler: NextApiHandler = async (req, res) => {
+const nextApiHandler = async (req, res) => {
    const isAuthorized = process.env.${vars.isLocalEnvVarName} === 'true' || await isUserAuthorized({
        token: req.headers.authorization,
        clientID: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
