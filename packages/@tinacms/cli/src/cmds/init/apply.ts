@@ -496,6 +496,7 @@ const addDatabaseFile = async ({
 const addGqlApiHandler = async ({ config, generatedFile }) => {
   let vars: GQLTemplateVariables = {
     isLocalEnvVarName: config.isLocalEnvVarName,
+    typescript: config.typescript,
   }
   let content = GQLTemplates['custom'](vars)
   if (config.nextAuth) {
