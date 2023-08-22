@@ -113,7 +113,8 @@ export class TinaSchema {
       if (collection?.match?.include || collection?.match?.exclude) {
         // if the collection has a match or exclude, we need to check if the file matches
         const matches = this.getMatches({ collection })
-        const match = picomatch([filepath], matches).length > 0
+        const match = picomatch.isMatch(filepath, matches)
+
         if (!match) {
           return false
         }
