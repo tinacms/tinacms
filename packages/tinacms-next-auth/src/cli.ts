@@ -27,6 +27,8 @@ const isValidUrl = (urlString) => {
   }
 }
 
+const defaultUsersKey = 'tinacms_users'
+
 const promptUserForToken = async () => {
   console.log('Did not find KV store url and token in .env file.')
   // Prompt user for KV store url and token
@@ -41,12 +43,6 @@ const promptUserForToken = async () => {
       message: `Enter your Vercel KV Database token:`,
       type: () => (process.env.KV_REST_API_TOKEN ? null : 'text'),
     },
-    {
-      type: () => (process.env.NEXTAUTH_CREDENTIALS_KEY ? null : 'text'),
-      name: 'credentials_key',
-      message: `Enter your Credentials key (default: 'tinacms_users'):`,
-      initial: 'tinacms_users',
-    },
   ])
 
   if (answers.url && !process.env.KV_REST_API_URL) {
@@ -59,13 +55,13 @@ const promptUserForToken = async () => {
     })
     process.env.KV_REST_API_TOKEN = answers.token
   }
-  if (answers.credentials_key && !process.env.NEXTAUTH_CREDENTIALS_KEY) {
-    fs.writeFileSync(
-      '.env',
-      `NEXTAUTH_CREDENTIALS_KEY=${answers.credentials_key}\n`,
-      { flag: 'a' }
-    )
-    process.env.NEXTAUTH_CREDENTIALS_KEY = answers.credentials_key
+  // don't bother asking about this one, but generate it to show that it's configurable for the
+  // rare case
+  if (!process.env.NEXTAUTH_CREDENTIALS_KEY) {
+    fs.writeFileSync('.env', `NEXTAUTH_CREDENTIALS_KEY=${defaultUsersKey}\n`, {
+      flag: 'a',
+    })
+    process.env.NEXTAUTH_CREDENTIALS_KEY = defaultUsersKey
   }
 }
 
@@ -135,26 +131,15 @@ class SetupCommand extends Command {
 
     console.log(chalk.green('Welcome to TinaCMS!'))
 
-    if (
-      !process.env.KV_REST_API_URL ||
-      !process.env.KV_REST_API_TOKEN ||
-      !process.env.NEXTAUTH_CREDENTIALS_KEY
-    ) {
+    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
       try {
         await promptUserForToken()
-        if (
-          !process.env.KV_REST_API_URL ||
-          !process.env.KV_REST_API_TOKEN ||
-          !process.env.NEXTAUTH_CREDENTIALS_KEY
-        ) {
+        if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
           throw new Error('Missing KV store url or token!')
         }
         // Check to make sure they have to correct format
         if (!isValidUrl(process.env.KV_REST_API_URL)) {
           throw new Error('Invalid KV store url!')
-        }
-        if (typeof process.env.NEXTAUTH_CREDENTIALS_KEY !== 'string') {
-          throw new Error('Invalid NEXTAUTH_CREDENTIALS_KEY! Must be a string.')
         }
         if (typeof process.env.KV_REST_API_TOKEN !== 'string') {
           throw new Error('Invalid KV_REST_API_TOKEN! Must be a string.')
@@ -162,7 +147,7 @@ class SetupCommand extends Command {
       } catch (e) {
         console.log(
           chalk.red(
-            'Error: Could not setup process.env.KV_REST_API_URL or process.env.KV_REST_API_TOKEN or process.env.NEXTAUTH_CREDENTIALS_KEY'
+            'Error: Could not setup process.env.KV_REST_API_URL or process.env.KV_REST_API_TOKEN'
           )
         )
         console.log(e.message)
@@ -173,10 +158,13 @@ class SetupCommand extends Command {
     let done = false
     let userStore: RedisUserStore
     try {
-      userStore = new RedisUserStore(process.env.NEXTAUTH_CREDENTIALS_KEY, {
-        url: process.env.KV_REST_API_URL,
-        token: process.env.KV_REST_API_TOKEN,
-      })
+      userStore = new RedisUserStore(
+        process.env.NEXTAUTH_CREDENTIALS_KEY || defaultUsersKey,
+        {
+          url: process.env.KV_REST_API_URL,
+          token: process.env.KV_REST_API_TOKEN,
+        }
+      )
       await userStore.isInitialized()
     } catch (e) {
       console.error(
