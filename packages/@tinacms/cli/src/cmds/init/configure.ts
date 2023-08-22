@@ -193,12 +193,14 @@ async function configure(
       },
       message: `What is your GitHub Personal Access Token? (Hit enter to skip and set up later)\n${logText(
         'Learn more here: '
-      )}${linkText('https://tina.io/docs/self-hosted/existing-site/#github-personal-access-token')}`,
+      )}${linkText(
+        'https://tina.io/docs/self-hosted/existing-site/#github-personal-access-token'
+      )}`,
       initial: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
     },
     {
       name: 'dataLayerAdapter',
-      message: 'Select a self-hosted data layer adapter',
+      message: 'Select a self-hosted Database Adapter',
       type: (_, answers) => {
         if (answers.hosting === 'self-host') {
           return 'select'
