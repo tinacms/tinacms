@@ -337,13 +337,13 @@ const addDependencies = async (
   params: InitParams
 ) => {
   const tagVersion = params.tinaVersion ? `@${params.tinaVersion}` : ''
-  const { dataLayer, dataLayerAdapter, nextAuth, packageManager } = config
+  const { dataLayerAdapter, nextAuth, packageManager } = config
   let deps = [`tinacms`, '@tinacms/cli']
   let devDeps = []
   if (nextAuth) {
     deps.push('tinacms-next-auth', 'next-auth')
   }
-  if (dataLayer) {
+  if (config?.hosting === 'self-host') {
     deps.push('@tinacms/datalayer')
     deps.push('tinacms-gitprovider-github')
   }
