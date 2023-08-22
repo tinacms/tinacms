@@ -1,5 +1,13 @@
 # @tinacms/schema-tools
 
+## 1.4.12
+
+### Patch Changes
+
+- 7e4de0b2a: Improvements to error handling with auth
+- 099bf5646: Make router optionally async
+- c92de7b1d: fix: Fix matches regression where matches on collections wouldn't match proper collection
+
 ## 1.4.11
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @tinacms/self-hosted-starter
 
+## 0.1.34
+
+### Patch Changes
+
+- Updated dependencies [7e4de0b2a]
+- Updated dependencies [1144af060]
+  - tinacms@1.5.20
+  - @tinacms/datalayer@1.2.25
+
 ## 0.1.33
 
 ### Patch Changes
