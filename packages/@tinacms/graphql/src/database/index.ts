@@ -325,7 +325,20 @@ export class Database {
     if (this.bridge) {
       await this.bridge.put(normalizedPath, stringifiedFile)
     }
-    await this.onPut(normalizedPath, stringifiedFile)
+
+    try {
+      await this.onPut(normalizedPath, stringifiedFile)
+    } catch (e) {
+      throw new GraphQLError(
+        `Error running onPut hook for ${filepath}: ${e}`,
+        null,
+        null,
+        null,
+        null,
+        e
+      )
+    }
+
     const folderTreeBuilder = new FolderTreeBuilder()
     const folderKey = folderTreeBuilder.update(filepath, collection.path || '')
 
@@ -448,7 +461,19 @@ export class Database {
         if (this.bridge) {
           await this.bridge.put(normalizedPath, stringifiedFile)
         }
-        await this.onPut(normalizedPath, stringifiedFile)
+        try {
+          await this.onPut(normalizedPath, stringifiedFile)
+        } catch (e) {
+          throw new GraphQLError(
+            `Error running onPut hook for ${filepath}: ${e}`,
+            null,
+            null,
+            null,
+            null,
+            e
+          )
+        }
+
         const folderTreeBuilder = new FolderTreeBuilder()
         const folderKey = folderTreeBuilder.update(
           filepath,
@@ -521,6 +546,9 @@ export class Database {
       }
       return true
     } catch (error) {
+      if (error instanceof GraphQLError) {
+        throw error
+      }
       throw new TinaFetchError(`Error in PUT for ${filepath}`, {
         originalError: error,
         file: filepath,
@@ -1202,7 +1230,18 @@ export class Database {
     if (this.bridge) {
       await this.bridge.delete(normalizePath(filepath))
     }
-    await this.onDelete(normalizePath(filepath))
+    try {
+      await this.onDelete(normalizePath(filepath))
+    } catch (e) {
+      throw new GraphQLError(
+        `Error running onDelete hook for ${filepath}: ${e}`,
+        null,
+        null,
+        null,
+        null,
+        e
+      )
+    }
   }
 
   public _indexAllContent = async (level: Level, schema?: Schema) => {

@@ -25,6 +25,7 @@ import type { TinaCMS } from '@tinacms/toolkit'
 import { useWindowWidth } from '@react-hook/window-size'
 import { FaLock, FaUnlock } from 'react-icons/fa'
 import { useCollectionFolder } from './utils'
+import { ErrorDialog } from '../components/ErrorDialog'
 
 const createDocument = async (
   cms: TinaCMS,
@@ -307,10 +308,16 @@ export const RenderForm = ({
           const defaultErrorText = 'There was a problem saving your document.'
           if (error.message.includes('already exists')) {
             cms.alerts.error(
-              `${defaultErrorText} The "Filename" is alredy used for another document, please modify it.`
+              `${defaultErrorText} The "Filename" is already used for another document, please modify it.`
             )
           } else {
-            cms.alerts.error(defaultErrorText)
+            cms.alerts.error(() =>
+              ErrorDialog({
+                title: defaultErrorText,
+                message: 'Tina caught an error while creating the page',
+                error,
+              })
+            )
           }
           throw new Error(
             `[${error.name}] CreateDocument failed: ${error.message}`

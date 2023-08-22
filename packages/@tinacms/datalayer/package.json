@@ -1,7 +1,7 @@
 {
   "name": "@tinacms/datalayer",
-  "main": "dist/index",
-  "version": "1.2.23",
+  "version": "1.2.24",
+  "main": "dist/index.js",
   "module": "dist/index.mjs",
   "typings": "dist/index",
   "files": [

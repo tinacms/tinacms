@@ -470,6 +470,16 @@ export interface Config<
        **/
       getUser?: () => Promise<any | null>
       /**
+       *  Used to authorize the user with the custom auth provider.
+       *
+       *  If this returns a truthy value, the user will be logged in and the CMS will be enabled.
+       *
+       *  If not provided, the existence of a user will be enough to authorize the user.
+       *
+       * @param context
+       */
+      authorize?: (context?: any) => Promise<any | null>
+      /**
        * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
        *
        **/
@@ -797,7 +807,7 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   router?: (args: {
     document: Document
     collection: Collection<true>
-  }) => string | undefined
+  }) => Promise<string | undefined> | string | undefined
 
   /**
    * This function is called before a document is created or updated. It can be used to modify the values that are saved to the CMS. It can also be used to perform side effects such as sending a notification or triggering a build.

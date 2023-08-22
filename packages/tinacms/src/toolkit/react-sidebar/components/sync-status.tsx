@@ -40,7 +40,11 @@ export const useGetEvents = (
 
   React.useEffect(() => {
     const fetchEvents = async () => {
-      if (!cms.api?.tina?.isCustomContentApi && cms.api.tina.isAuthorized()) {
+      let doFetchEvents = false
+      if (!cms.api?.tina?.isCustomContentApi) {
+        doFetchEvents = await cms.api?.tina?.isAuthenticated()
+      }
+      if (doFetchEvents) {
         try {
           const { events: nextEvents, cursor: nextCursor } =
             await cms.api.tina.fetchEvents(15, cursor)
@@ -75,7 +79,11 @@ function useSyncStatus(cms) {
 
   React.useEffect(() => {
     const interval = setInterval(async () => {
-      if (!cms.api?.tina?.isCustomContentApi && cms.api.tina.isAuthorized()) {
+      let doFetchEvents = false
+      if (!cms.api?.tina?.isCustomContentApi) {
+        doFetchEvents = await cms.api?.tina?.isAuthenticated()
+      }
+      if (doFetchEvents) {
         const { events } = await cms.api.tina.fetchEvents()
         if (events.length === 0) {
           setSyncStatus({ state: 'success', message: 'No Events' })
@@ -94,7 +102,7 @@ function useSyncStatus(cms) {
       }
     }, 5000)
     return () => clearInterval(interval)
-  }, [cms])
+  }, [cms.api?.tina?.isCustomContentApi])
 
   return syncStatus
 }

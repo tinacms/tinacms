@@ -19,6 +19,7 @@ import {
   FormOptions,
   GlobalFormPlugin,
   TinaState,
+  ErrorDialog,
 } from 'tinacms'
 import { createForm, createGlobalForm, FormifyCallback } from './build-form'
 import type {
@@ -29,6 +30,7 @@ import type {
 } from './types'
 import { getFormAndFieldNameFromMetadata } from './util'
 import { useSearchParams } from 'react-router-dom'
+import { showErrorModal } from './errors'
 
 const sysSchema = z.object({
   breadcrumbs: z.array(z.string()),
@@ -152,6 +154,14 @@ const astNodeWithMeta: G.DocumentNode = {
 const schema = G.buildASTSchema(astNode)
 const schemaForResolver = G.buildASTSchema(astNodeWithMeta)
 
+const isRejected = (
+  input: PromiseSettledResult<unknown>
+): input is PromiseRejectedResult => input.status === 'rejected'
+
+const isFulfilled = <T>(
+  input: PromiseSettledResult<T>
+): input is PromiseFulfilledResult<T> => input.status === 'fulfilled'
+
 export const useGraphQLReducer = (
   iframe: React.MutableRefObject<HTMLIFrameElement>,
   url: string
@@ -159,6 +169,7 @@ export const useGraphQLReducer = (
   const cms = useCMS()
   const tinaSchema = cms.api.tina.schema as TinaSchema
   const [payloads, setPayloads] = React.useState<Payload[]>([])
+  const [requestErrors, setRequestErrors] = React.useState<string[]>([])
   const [searchParams, setSearchParams] = useSearchParams()
   const [results, setResults] = React.useState<
     {
@@ -204,7 +215,9 @@ export const useGraphQLReducer = (
    */
   React.useEffect(() => {
     const run = async () => {
-      return Promise.all(
+      setRequestErrors([])
+      // gather the errors and display an error message containing each error unique message
+      return Promise.allSettled(
         payloads.map(async (payload) => {
           // This payload has already been expanded, skip it.
           if (payload.expandedQuery) {
@@ -219,7 +232,10 @@ export const useGraphQLReducer = (
     }
     if (payloads.length) {
       run().then((updatedPayloads) => {
-        setPayloads(updatedPayloads)
+        setPayloads(updatedPayloads.filter(isFulfilled).map((p) => p.value))
+        setRequestErrors(
+          updatedPayloads.filter(isRejected).map((p) => String(p.reason))
+        )
       })
     }
   }, [JSON.stringify(payloads), cms])
@@ -575,6 +591,12 @@ export const useGraphQLReducer = (
       cms.dispatch({ type: 'set-edit-mode', value: 'basic' })
     }
   }, [iframe.current, JSON.stringify(results)])
+
+  React.useEffect(() => {
+    if (requestErrors.length) {
+      showErrorModal('Unexpected error querying content', requestErrors, cms)
+    }
+  }, [requestErrors])
 }
 
 const onSubmit = async (
@@ -602,7 +624,13 @@ const onSubmit = async (
     })
     cms.alerts.success('Document saved!')
   } catch (e) {
-    cms.alerts.error('There was a problem saving your document')
+    cms.alerts.error(() =>
+      ErrorDialog({
+        title: 'There was a problem saving your document',
+        message: 'Tina caught an error while updating the page',
+        error: e,
+      })
+    )
     console.error(e)
   }
 }
@@ -834,12 +862,15 @@ _internalSys: _sys {
   return response.node
 }
 
-const expandPayload = async (payload: Payload, cms: TinaCMS) => {
+const expandPayload = async (
+  payload: Payload,
+  cms: TinaCMS
+): Promise<Payload> => {
   const { query, variables } = payload
   const documentNode = G.parse(query)
   const expandedDocumentNode = expandQuery({ schema, documentNode })
   const expandedQuery = G.print(expandedDocumentNode)
-  const expandedData = await cms.api.tina.request(expandedQuery, {
+  const expandedData = await cms.api.tina.request<object>(expandedQuery, {
     variables,
   })
 
