@@ -6,7 +6,7 @@ import { logger } from '../../logger'
 
 async function configure(
   env: InitEnvironment,
-  opts: { debug?: boolean; isBacked?: boolean }
+  opts: { debug?: boolean; isBackend?: boolean }
 ) {
   const promptOptions = { onCancel: () => process.exit(0) } // allow ctrl + c to exit
 
@@ -51,7 +51,7 @@ async function configure(
   const forestryDisclaimer = logText(
     `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
   )
-  if (opts.isBacked && !env.tinaConfigExists) {
+  if (opts.isBackend && !env.tinaConfigExists) {
     logger.info('Looks like Tina has not been setup, setting up now...')
   }
 
@@ -290,7 +290,7 @@ async function configure(
     ]
   }
 
-  if (env.tinaConfigExists && !opts.isBacked) {
+  if (env.tinaConfigExists && !opts.isBackend) {
     logger.info(
       `Tina config already exists, skipping setup. (If you want to init tina from sratch, delete your tina config file and run this command again)`
     )
@@ -320,7 +320,7 @@ async function configure(
       // only setup TinaCMS if they don't have a tina config
       ...(skipTinaSetupCommands ? [] : tinaSetupPrompts),
       // Only add the backend init quesitons if they are running the backend init command
-      ...(opts.isBacked ? backendSetupCommands(skipTinaSetupCommands) : []),
+      ...(opts.isBackend ? backendSetupCommands(skipTinaSetupCommands) : []),
       // tina/config.ts
       ...generatedFileOverwritePrompt({
         condition: (_) => !env.tinaConfigExists,
@@ -411,7 +411,7 @@ async function configure(
   }
 
   // If we are doing a backend init we can set the vercelKVNextAuthCredentialsKey default
-  if (opts.isBacked) {
+  if (opts.isBackend) {
     config.vercelKVNextAuthCredentialsKey =
       process.env.NEXTAUTH_CREDENTIALS_KEY || 'tinacms_users'
   }
