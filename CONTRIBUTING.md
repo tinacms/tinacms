@@ -40,15 +40,21 @@ npm run watch -- --scope=@einsteinindustries/tinacms
 
 #### Before Publishing
 
-1. Don't forget to bump the version in lerna.json, and the packages you wish to publish following semantic versioning
-2. You will also need to manually go into each package and update intra dependencies' versions
-   - I've found that it's way easier to just keep a fixed version on all packages, so even if you update only one package, upping the version on every package and every intra dependency is much easier
-3. You have to commit your changes
+- Ensure you have had your work and branch reviewed and approved
+- Switch to your host computer's terminal or login to GitHub on the container
+- Switch back to your branch and run
 
 ```bash
-# navigate back to tinacms root directory
+# this will automatically commit new versioning to your branch
+lerna version --no-private # follow prompts and select appropriate versioning
+```
+
+### Go back to the container's terminal and run
+
+```bash
+# navigate back to tinacms root directory if not already in it
 cd ../../
-npm login # follow prompts
+npm login # follow prompts and use einstein's NPM token
 npm run build
 npm run lerna -- publish from-package --yes
 ```
