@@ -54,7 +54,7 @@ lerna version --no-private # follow prompts and select appropriate versioning
 ```bash
 # navigate back to tinacms root directory if not already in it
 cd ../../
-npm login # follow prompts and use einstein's NPM token
+npm login # follow prompts and use einstein's NPM credentials. Not the NPM token!
 npm run build
 npm run lerna -- publish from-package --yes
 ```
