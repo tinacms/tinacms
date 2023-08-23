@@ -159,145 +159,142 @@ async function configure(
     },
   ]
   // These questions are adding when running `tinacms init backend`
-  // askForPackageManager is true when they skipped the normal init setup
-  const backendSetupCommands = (): prompts.PromptObject[] => {
-    return [
-      {
-        name: 'hosting',
-        type: 'select',
-        choices: [
-          {
-            title: 'Tina Cloud',
-            value: 'tina-cloud',
-          },
-          {
-            title: 'Self Host',
-            value: 'self-host',
-          },
-        ],
-        message:
-          'Do you want to use Tina Cloud to host your backend or self-host? (In self hosting you will have to bring your own auth, database and backend)',
-      },
-      {
-        name: 'githubToken',
-        type: (_, answers) => {
-          return answers.hosting === 'self-host' ? 'text' : null
+  const backendSetupCommands: prompts.PromptObject[] = [
+    {
+      name: 'hosting',
+      type: 'select',
+      choices: [
+        {
+          title: 'Tina Cloud',
+          value: 'tina-cloud',
         },
-        message: `What is your GitHub Personal Access Token? (Hit enter to skip and set up later)\n${logText(
-          'Learn more here: '
+        {
+          title: 'Self Host',
+          value: 'self-host',
+        },
+      ],
+      message:
+        'Do you want to use Tina Cloud to host your backend or self-host? (In self hosting you will have to bring your own auth, database and backend)',
+    },
+    {
+      name: 'githubToken',
+      type: (_, answers) => {
+        return answers.hosting === 'self-host' ? 'text' : null
+      },
+      message: `What is your GitHub Personal Access Token? (Hit enter to skip and set up later)\n${logText(
+        'Learn more here: '
+      )}${linkText(
+        'https://tina.io/docs/self-hosted/existing-site/#github-personal-access-token'
+      )}`,
+      initial: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+    },
+    {
+      name: 'dataLayerAdapter',
+      message: 'Select a self-hosted Database Adapter',
+      type: (_, answers) => {
+        if (answers.hosting === 'self-host') {
+          return 'select'
+        }
+      },
+      choices: (_, answers) => {
+        if (answers.framework.name === 'next') {
+          return [
+            { title: 'Vercel KV', value: 'upstash-redis' },
+            { title: 'Upstash Redis', value: 'upstash-redis' },
+          ]
+        } else {
+          return [{ title: 'Upstash Redis', value: 'upstash-redis' }]
+        }
+      },
+    },
+    {
+      name: 'kvRestApiUrl',
+      type: (_, answers) =>
+        answers.dataLayerAdapter === 'upstash-redis' ? 'text' : null,
+      message: `What is the KV (Redis) Rest API URL? (Hit enter to skip and set up yourself later)`,
+      initial: process.env.KV_REST_API_URL,
+    },
+    {
+      name: 'kvRestApiToken',
+      type: (prev, answers) =>
+        prev !== undefined && answers.hosting === 'self-host' ? 'text' : null,
+      message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
+      initial: process.env.KV_REST_API_TOKEN,
+    },
+    {
+      name: 'nextAuth',
+      type: (_, answers) => {
+        return answers.hosting === 'self-host' && isNext('confirm')
+          ? 'confirm'
+          : null
+      },
+      initial: 'true',
+      message: 'Enable NextAuth.js integration?',
+    },
+    {
+      name: 'nextAuthSecret',
+      type: (_, answers) => (answers.nextAuth ? 'text' : null),
+      message: `What is the NextAuth.js Secret? (Hit enter to use a randomly generated secret)`,
+      initial:
+        process.env.NEXTAUTH_SECRET ||
+        crypto.lib.WordArray.random(16).toString(),
+    },
+    {
+      name: 'clientId',
+      type: (_, answers) => {
+        return answers.hosting === 'self-host' ? null : 'text'
+      },
+      message: `What is your Tina Cloud Client ID? (Hit enter to skip and set up yourself later)\n${logText(
+        "Don't have a Client ID? Create one here: "
+      )}${linkText('https://app.tina.io/projects/new')}`,
+      initial: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
+    },
+    {
+      name: 'token',
+      type: (_, answers) => {
+        return answers.hosting === 'self-host' ? null : 'text'
+      },
+      message: (prev) =>
+        `What is your Tina Cloud Read Only Token?\n${logText(
+          "Don't have a Read Only Token? Create one here: "
         )}${linkText(
-          'https://tina.io/docs/self-hosted/existing-site/#github-personal-access-token'
+          `https://app.tina.io/projects/${prev || '[XXX]'}/tokens`
         )}`,
-        initial: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-      },
-      {
-        name: 'dataLayerAdapter',
-        message: 'Select a self-hosted Database Adapter',
-        type: (_, answers) => {
-          if (answers.hosting === 'self-host') {
-            return 'select'
-          }
+      initial: process.env.TINA_TOKEN,
+    },
+    {
+      name: 'nextAuthProvider',
+      message: 'Select a NextAuth Credentials Provider',
+      type: isNextAuth('select'),
+      choices: [
+        {
+          title: 'Vercel KV Credentials Provider',
+          value: 'vercel-kv-credentials-provider',
         },
-        choices: (_, answers) => {
-          if (answers.framework.name === 'next') {
-            return [
-              { title: 'Vercel KV', value: 'upstash-redis' },
-              { title: 'Upstash Redis', value: 'upstash-redis' },
-            ]
-          } else {
-            return [{ title: 'Upstash Redis', value: 'upstash-redis' }]
-          }
-        },
-      },
-      {
-        name: 'kvRestApiUrl',
-        type: (_, answers) =>
-          answers.dataLayerAdapter === 'upstash-redis' ? 'text' : null,
-        message: `What is the KV (Redis) Rest API URL? (Hit enter to skip and set up yourself later)`,
-        initial: process.env.KV_REST_API_URL,
-      },
-      {
-        name: 'kvRestApiToken',
-        type: (prev, answers) =>
-          prev !== undefined && answers.hosting === 'self-host' ? 'text' : null,
-        message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
-        initial: process.env.KV_REST_API_TOKEN,
-      },
-      {
-        name: 'nextAuth',
-        type: (_, answers) => {
-          return answers.hosting === 'self-host' && isNext('confirm')
-            ? 'confirm'
-            : null
-        },
-        initial: 'true',
-        message: 'Enable NextAuth.js integration?',
-      },
-      {
-        name: 'nextAuthSecret',
-        type: (_, answers) => (answers.nextAuth ? 'text' : null),
-        message: `What is the NextAuth.js Secret? (Hit enter to use a randomly generated secret)`,
-        initial:
-          process.env.NEXTAUTH_SECRET ||
-          crypto.lib.WordArray.random(16).toString(),
-      },
-      {
-        name: 'clientId',
-        type: (_, answers) => {
-          return answers.hosting === 'self-host' ? null : 'text'
-        },
-        message: `What is your Tina Cloud Client ID? (Hit enter to skip and set up yourself later)\n${logText(
-          "Don't have a Client ID? Create one here: "
-        )}${linkText('https://app.tina.io/projects/new')}`,
-        initial: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
-      },
-      {
-        name: 'token',
-        type: (_, answers) => {
-          return answers.hosting === 'self-host' ? null : 'text'
-        },
-        message: (prev) =>
-          `What is your Tina Cloud Read Only Token?\n${logText(
-            "Don't have a Read Only Token? Create one here: "
-          )}${linkText(
-            `https://app.tina.io/projects/${prev || '[XXX]'}/tokens`
-          )}`,
-        initial: process.env.TINA_TOKEN,
-      },
-      {
-        name: 'nextAuthProvider',
-        message: 'Select a NextAuth Credentials Provider',
-        type: isNextAuth('select'),
-        choices: [
-          {
-            title: 'Vercel KV Credentials Provider',
-            value: 'vercel-kv-credentials-provider',
-          },
-        ],
-      },
-      {
-        name: 'kvRestApiUrl',
-        type: (_, answers) =>
-          answers.nextAuthProvider === 'vercel-kv-credentials-provider' &&
-          answers.kvRestApiUrl === undefined
-            ? 'text'
-            : null,
-        message: `What is the KV (Redis) Rest API URL? (Hit enter to skip and set up yourself later)`,
-        initial: process.env.KV_REST_API_URL,
-      },
-      {
-        name: 'kvRestApiToken',
-        type: (_, answers) =>
-          answers.nextAuthProvider === 'vercel-kv-credentials-provider' &&
-          answers.kvRestApiUrl !== undefined &&
-          answers.kvRestApiToken === undefined
-            ? 'text'
-            : null,
-        message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
-        initial: process.env.KV_REST_API_TOKEN,
-      },
-    ]
-  }
+      ],
+    },
+    {
+      name: 'kvRestApiUrl',
+      type: (_, answers) =>
+        answers.nextAuthProvider === 'vercel-kv-credentials-provider' &&
+        answers.kvRestApiUrl === undefined
+          ? 'text'
+          : null,
+      message: `What is the KV (Redis) Rest API URL? (Hit enter to skip and set up yourself later)`,
+      initial: process.env.KV_REST_API_URL,
+    },
+    {
+      name: 'kvRestApiToken',
+      type: (_, answers) =>
+        answers.nextAuthProvider === 'vercel-kv-credentials-provider' &&
+        answers.kvRestApiUrl !== undefined &&
+        answers.kvRestApiToken === undefined
+          ? 'text'
+          : null,
+      message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
+      initial: process.env.KV_REST_API_TOKEN,
+    },
+  ]
 
   if (env.tinaConfigExists && !opts.isBacked) {
     logger.info(
@@ -339,7 +336,7 @@ async function configure(
       // only setup TinaCMS if they don't have a tina config
       ...(skipTinaSetupCommands ? [] : tinaSetupPrompts),
       // Only add the backend init quesitons if they are running the backend init command
-      ...(opts.isBacked ? backendSetupCommands() : []),
+      ...(opts.isBacked ? backendSetupCommands : []),
       // tina/config.ts
       ...generatedFileOverwritePrompt({
         condition: (_) => !env.tinaConfigExists,
