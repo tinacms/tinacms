@@ -93,16 +93,6 @@ async function configure(
   // This is always run durring tinacms init
   const tinaSetupPrompts: prompts.PromptObject[] = [
     {
-      name: 'packageManager',
-      type: 'select',
-      message: 'Choose your package manager',
-      choices: [
-        { title: 'PNPM', value: 'pnpm' },
-        { title: 'Yarn', value: 'yarn' },
-        { title: 'NPM', value: 'npm' },
-      ],
-    },
-    {
       name: 'typescript',
       type: 'confirm',
       initial: true,
@@ -170,24 +160,8 @@ async function configure(
   ]
   // These questions are adding when running `tinacms init backend`
   // askForPackageManager is true when they skipped the normal init setup
-  const backendSetupCommands = (
-    askForPackageManager: boolean
-  ): prompts.PromptObject[] => {
-    const maybeCommands: prompts.PromptObject[] = []
-    if (askForPackageManager) {
-      maybeCommands.push({
-        name: 'packageManager',
-        type: 'select',
-        message: 'Choose your package manager',
-        choices: [
-          { title: 'PNPM', value: 'pnpm' },
-          { title: 'Yarn', value: 'yarn' },
-          { title: 'NPM', value: 'npm' },
-        ],
-      })
-    }
+  const backendSetupCommands = (): prompts.PromptObject[] => {
     return [
-      ...maybeCommands,
       {
         name: 'hosting',
         type: 'select',
@@ -351,11 +325,21 @@ async function configure(
           },
         ] as { title: string; value: Framework }[],
       },
+      {
+        name: 'packageManager',
+        type: 'select',
+        message: 'Choose your package manager',
+        choices: [
+          { title: 'PNPM', value: 'pnpm' },
+          { title: 'Yarn', value: 'yarn' },
+          { title: 'NPM', value: 'npm' },
+        ],
+      },
 
       // only setup TinaCMS if they don't have a tina config
       ...(skipTinaSetupCommands ? [] : tinaSetupPrompts),
       // Only add the backend init quesitons if they are running the backend init command
-      ...(opts.isBacked ? backendSetupCommands(skipTinaSetupCommands) : []),
+      ...(opts.isBacked ? backendSetupCommands() : []),
       // tina/config.ts
       ...generatedFileOverwritePrompt({
         condition: (_) => !env.tinaConfigExists,

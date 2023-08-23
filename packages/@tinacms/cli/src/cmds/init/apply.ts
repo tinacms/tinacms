@@ -338,7 +338,11 @@ const addDependencies = async (
 ) => {
   const tagVersion = params.tinaVersion ? `@${params.tinaVersion}` : ''
   const { dataLayerAdapter, nextAuth, packageManager } = config
-  let deps = [`tinacms`, '@tinacms/cli']
+  let deps = []
+  if (!env.tinaConfigExists) {
+    deps.push('tinacms')
+    deps.push('@tinacms/cli')
+  }
   let devDeps = []
   if (nextAuth) {
     deps.push('tinacms-next-auth', 'next-auth')
@@ -371,7 +375,7 @@ const addDependencies = async (
     yarn: `yarn add ${deps.join(' ')}`,
   }
 
-  if (packageManagers[packageManager]) {
+  if (packageManagers[packageManager] && deps.length > 0) {
     logger.info(logText('Adding dependencies, this might take a moment...'))
     logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`))
     await execShellCommand(packageManagers[packageManager])
@@ -493,7 +497,13 @@ const addDatabaseFile = async ({
   })
 }
 
-const addGqlApiHandler = async ({ config, generatedFile }) => {
+const addGqlApiHandler = async ({
+  config,
+  generatedFile,
+}: {
+  config: Record<any, any>
+  generatedFile: GeneratedFile
+}) => {
   let vars: GQLTemplateVariables = {
     isLocalEnvVarName: config.isLocalEnvVarName,
     typescript: config.typescript,
