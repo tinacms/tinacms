@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-webpack-helpers",
-  "version": "0.44.310",
+  "version": "0.44.311",
   "license": "Apache-2.0",
   "main": "index.js",
   "repository": {
