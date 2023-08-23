@@ -89,7 +89,7 @@ export const command = new CLICommand<InitEnvironment, InitParams>({
     env: InitEnvironment,
     { debug = false, isBackendInit = false }: InitParams
   ): Promise<Record<any, any>> {
-    return configure(env, { debug, isBacked: isBackendInit })
+    return configure(env, { debug, isBackend: isBackendInit })
   },
   apply(
     config: Record<any, any>,

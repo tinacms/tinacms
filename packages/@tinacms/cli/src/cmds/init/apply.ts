@@ -100,9 +100,6 @@ async function apply({
     if (!env.gitIgoreNodeModulesExists) {
       itemsToAdd.push('node_modules')
     }
-    if (!env.gitIgnoreTinaEnvExists) {
-      itemsToAdd.push('.env.tina')
-    }
     if (!env.gitIgnoreEnvExists) {
       itemsToAdd.push('.env')
     }
@@ -309,10 +306,7 @@ const createPackageJSON = async () => {
 }
 const createGitignore = async ({ baseDir }: { baseDir: string }) => {
   logger.info(logText('No .gitignore found, creating one'))
-  await fs.outputFileSync(
-    path.join(baseDir, '.gitignore'),
-    'node_modules\n.env.tina'
-  )
+  fs.outputFileSync(path.join(baseDir, '.gitignore'), 'node_modules')
 }
 
 const updateGitIgnore = async ({
@@ -588,7 +582,6 @@ const logNextSteps = ({
     logger.info(
       focusText(`\n${titleText(' TinaCMS ')} backend been initialized!`)
     )
-    logger.info('Copy .env.tina to .env')
     logger.info(
       'If you are deploying to vercel make sure to add the environment variables to your project.'
     )
