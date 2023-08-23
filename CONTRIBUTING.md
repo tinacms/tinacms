@@ -59,6 +59,10 @@ npm run build
 npm run lerna -- publish from-package --yes
 ```
 
+At this point, your branch is ready to be merged to master.
+
+- You may now merge, or ask reviewers to approve again and let them know that the only new changes are related to versioning.
+
 **WARNING: Do not run `npm install` from inside the `packages` directory**
 
 TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developing locally. This allows the various packages to reference each other via symlinks. Running `npm install` from within a package replaces the symlinks with references to the packages in the npm registry.
