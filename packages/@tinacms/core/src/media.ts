@@ -18,6 +18,7 @@ limitations under the License.
 */
 
 import { EventBus } from './event'
+import React from 'react'
 
 /**
  * Represents an individual file in the MediaStore
@@ -72,6 +73,12 @@ export interface MediaStore {
    * Custom tabs for displaying different asset sources, etc.
    */
   tabs?: { name: string; accept: string[] }[]
+
+  /**
+   * A component to handle click events when image cannot be inserted into an img placeholder
+   *
+   */
+  onItemClick?(media: Media): React.ReactElement
 
   /**
    * The [input accept string](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept)

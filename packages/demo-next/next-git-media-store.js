@@ -20,17 +20,36 @@ import { GitMediaStore } from '@einsteinindustries/tinacms-git-client'
 
 export class NextGitMediaStore extends GitMediaStore {
   tabs = [
-    { name: 'Client', accept: ['image/*'] },
-    { name: 'Einstein', accept: ['image/*'] },
+    { name: 'Fruits', accept: ['image/*'] },
+    { name: 'Animals', accept: ['image/*'] },
     { name: 'Files', accept: ['.pdf', '.mp4', '.avi', '.docx'] },
   ]
+
+  onItemClick(media) {
+    return (
+      <>
+        <img src={media.previewSrc} alt={'clicked image'}></img>
+        <p>{media.previewSrc}</p>
+      </>
+    )
+  }
+
   previewSrc(src) {
     return /jpg|jpeg|png|svg|gif$/.test(src.toLowerCase())
       ? src.replace(/\/?public/, '')
       : null
   }
   async list(options) {
-    const listItems = await super.list(options)
+    const directories = [
+      '/public/images/',
+      '/public/images2/',
+      '/public/files/',
+    ]
+    const newOptions = {
+      ...options,
+      directory: directories[options.currentList],
+    }
+    const listItems = await super.list(newOptions)
     return {
       ...listItems,
       items: listItems.items.map(media => ({

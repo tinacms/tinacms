@@ -38,6 +38,8 @@ import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, CursorPaginator } from './index'
 import { LoadingDots } from '@einsteinindustries/tinacms-form-builder'
 
+const MEDIA_STORAGE_META_KEY = 'media-meta'
+
 export interface MediaRequest {
   directory?: string
   onSelect?(media: Media): void
@@ -48,7 +50,6 @@ export interface MediaRequest {
 const StyledTab = styled.button<{ isActive: boolean }>`
   padding: 10px;
   border: 0;
-  // border-bottom: ${props => props.isActive && '2px solid cornflowerblue'};
   cursor: pointer;
   background-color: ${props =>
     props.isActive ? 'var(--tina-color-grey-4)' : 'var(--tina-color-grey-2)'};
@@ -117,7 +118,7 @@ export function MediaPicker({
     return 'not-configured'
   })
 
-  const tabs = cms.media.store?.tabs ?? []
+  const { tabs = [], onItemClick } = cms.media.store
 
   const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
@@ -138,6 +139,8 @@ export function MediaPicker({
   const [search, setSearch] = useState('')
   const [currentTab, setCurrentTab] = useState(0)
   const offset = offsetHistory[offsetHistory.length - 1]
+
+  const localStorageKey = `Media-${currentTab}-${offset ?? 0}-${search}`
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
     if (!list.nextOffset) return
@@ -150,12 +153,18 @@ export function MediaPicker({
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
   const resetLocalStorage = () => {
-    tabs.forEach((_, i) => {
-      localStorage.removeItem(`Media - ${i}`)
-    })
+    const itemsMeta = localStorage.getItem(MEDIA_STORAGE_META_KEY)
+    if (itemsMeta) {
+      const storedObjects = JSON.parse(itemsMeta) as string[]
+      storedObjects.forEach(item => {
+        localStorage.removeItem(item)
+      })
+      localStorage.removeItem(MEDIA_STORAGE_META_KEY)
+    }
   }
 
   const loadMedia = useCallback(() => {
+    if (!cms.media.isConfigured) return
     setListState('loading')
     cms.media
       .list({
@@ -168,41 +177,19 @@ export function MediaPicker({
       .then(list => {
         setList(list)
         setListState('loaded')
-        localStorage.setItem(`Media - ${currentTab}`, JSON.stringify(list))
+        const meta = JSON.parse(
+          localStorage.getItem(MEDIA_STORAGE_META_KEY) ?? '[]'
+        )
+        meta.push(localStorageKey)
+        localStorage.setItem(MEDIA_STORAGE_META_KEY, JSON.stringify(meta))
+        localStorage.setItem(localStorageKey, JSON.stringify(list))
       })
       .catch(e => {
         console.error(e)
+        setListError(e)
         setListState('error')
       })
-  }, [currentTab, offset, search])
-
-  useEffect(() => {
-    if (!cms.media.isConfigured) return
-    function loadMedia() {
-      setListState('loading')
-      cms.media
-        .list({
-          offset,
-          limit: cms.media.pageSize,
-          directory,
-          currentList: currentTab,
-        })
-        .then(list => {
-          setList(list)
-          setListState('loaded')
-        })
-        .catch(e => {
-          console.error(e)
-          if (e.ERR_TYPE === 'MediaListError') {
-            setListError(e)
-          } else {
-            setListError(defaultListError)
-          }
-          setListState('error')
-        })
-    }
-    loadMedia()
-  }, [offset])
+  }, [localStorageKey])
 
   function refresh() {
     resetLocalStorage()
@@ -211,25 +198,23 @@ export function MediaPicker({
   }
 
   useEffect(() => {
-    if (offsetHistory.length) {
-      resetOffset()
-      resetLocalStorage()
+    if (!cms.media.isConfigured) return
+    const data = localStorage.getItem(localStorageKey)
+    if (data) {
+      setList(JSON.parse(data))
+      setListState('loaded')
     } else {
-      const data = localStorage.getItem(`Media - ${currentTab}`)
-      if (!data) {
-        loadMedia()
-      } else {
-        setListState('loading')
-        setList(JSON.parse(data))
-        setListState('loaded')
-      }
+      loadMedia()
     }
 
     return cms.events.subscribe(
       ['media:upload:success', 'media:delete:success', 'media:pageSize'],
-      loadMedia
+      () => {
+        resetLocalStorage()
+        loadMedia()
+      }
     )
-  }, [offset, directory, cms.media.isConfigured, currentTab])
+  }, [directory, cms.media.isConfigured, localStorageKey])
 
   const onClickMediaItem = (item: Media) => {
     setItemModal(item)
@@ -325,6 +310,7 @@ export function MediaPicker({
   }
   const handleTabChange = (idx: number) => {
     setCurrentTab(idx)
+    resetOffset()
   }
 
   return (
@@ -393,8 +379,12 @@ export function MediaPicker({
           hasPrev={hasPrev}
           navigatePrev={navigatePrev}
         />
-        {itemModal && (
-          <ItemModal close={() => setItemModal(null)} item={itemModal} />
+        {itemModal && onItemClick && (
+          <ItemModal
+            close={() => setItemModal(null)}
+            item={itemModal}
+            childComponent={onItemClick}
+          />
         )}
       </MediaPickerWrap>
     </>
@@ -404,6 +394,7 @@ export function MediaPicker({
 interface ItemModal {
   close: () => void
   item: Media
+  childComponent(item: Media): React.ReactElement
 }
 
 const StyledSearch = styled.input`
@@ -423,80 +414,12 @@ const StyledSearch = styled.input`
   box-shadow: 0 0 0 2px transparent;
 `
 
-const StyledImg = styled.img`
-  border-radius: 30px;
-  object-fit: cover;
-  width: 100%;
-  object-position: center;
-`
-
-const objToStringArray = (item: any) => {
-  const arr: any = []
-  for (const [key, value] of Object.entries(item)) {
-    let valueStr = ''
-    if (typeof value === 'string') {
-      valueStr = value
-    } else if (typeof value === 'boolean' || typeof value === 'number') {
-      valueStr = value.toString()
-    } else if (value === null) {
-      valueStr = 'null'
-    } else if (typeof value === 'object') {
-      valueStr = objToStringArray(value)
-    }
-    arr.push([key, valueStr])
-  }
-  return arr
-}
-
-const ItemModal = ({ close, item }: ItemModal) => {
-  const imgix = item.metaData?.attributes
-  const tags = imgix?.tags
-  const colors = imgix?.colors['dominant_colors']
-  const meta = objToStringArray(imgix || item.metaData)
+const ItemModal = ({ close, item, childComponent }: ItemModal) => {
   return (
     <Modal>
       <PopupModal style={{ width: '70%' }}>
         <ModalHeader close={close}>Details for {item.filename}</ModalHeader>
-        <ModalBody>
-          <div style={{ display: 'flex', margin: '50px auto', width: '80%' }}>
-            <div style={{ width: '70%' }}>
-              <StyledImg src={item.previewSrc} alt="clicked image" />
-            </div>
-            <div style={{ width: '100%' }}>
-              <ul style={{ listStyle: 'none', marginLeft: '20px' }}>
-                <li style={{ marginBottom: '5px' }}>name: {item.filename}</li>
-                <li style={{ marginBottom: '5px' }}>url: {item.previewSrc}</li>
-                <li style={{ marginBottom: '5px' }}>id: {item.id}</li>
-                <li style={{ marginBottom: '5px' }}>type: {item.type}</li>
-                {meta.map(
-                  ([key, value]: [string, any]) =>
-                    typeof value !== 'object' && (
-                      <li key={key} style={{ marginBottom: '5px' }}>
-                        {key}: {value}
-                      </li>
-                    )
-                )}
-                {tags &&
-                  Object.entries(tags).map(([key, value]) => (
-                    <li key={key} style={{ marginBottom: '5px' }}>
-                      {key}: {value}
-                    </li>
-                  ))}
-                {colors &&
-                  Object.entries(colors).map(([key, value]) => (
-                    <li key={key} style={{ marginBottom: '5px' }}>
-                      {key}: {value}
-                    </li>
-                  ))}
-                {item.metaData?.LastModified && (
-                  <li style={{ marginBottom: '5px' }}>
-                    last modified: {item.metaData?.LastModified.toString()}
-                  </li>
-                )}
-              </ul>
-            </div>
-          </div>
-        </ModalBody>
+        <ModalBody>{childComponent(item)}</ModalBody>
       </PopupModal>
     </Modal>
   )

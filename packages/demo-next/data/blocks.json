@@ -12,7 +12,7 @@
     },
     {
       "_template": "image",
-      "src": "/images/img1.wallspic.com-plant-blossom-season-deciduous-petal-9448x6112.jpg",
+      "src": "/images/MSC16006197_s.jpg",
       "alt": "image alt text"
     },
     {
@@ -20,5 +20,5 @@
       "content": "# Hello World"
     }
   ],
-  "hero_image": "/images/iceland-thumb.jpg"
+  "hero_image": "/images/23fruit-superJumbo.jpg"
 }
