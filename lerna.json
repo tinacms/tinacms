@@ -1,6 +1,6 @@
 {
   "packages": ["packages/@testing/*", "packages/@tinacms/*", "packages/[!@]*"],
-  "version": "0.44.312",
+  "version": "0.44.313",
   "command": {
     "publish": {
       "ignoreChanges": ["packages/demo-*", "packages/@testing/**"]
