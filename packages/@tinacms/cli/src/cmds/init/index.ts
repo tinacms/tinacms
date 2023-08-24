@@ -42,7 +42,7 @@ export type InitEnvironment = {
   forestryConfigExists: boolean
   frontMatterFormat: 'yaml' | 'toml' | 'json'
   gitIgnoreExists: boolean
-  gitIgoreNodeModulesExists: boolean
+  gitIgnoreNodeModulesExists: boolean
   gitIgnoreTinaEnvExists: boolean
   gitIgnoreEnvExists: boolean
   nextAppDir: boolean
