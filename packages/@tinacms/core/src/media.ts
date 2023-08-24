@@ -76,9 +76,14 @@ export interface MediaStore {
 
   /**
    * A component to handle click events when image cannot be inserted into an img placeholder
-   *
    */
-  onItemClick?(media: Media): React.ReactElement
+  onItemClick?: React.FC<Media>
+
+  /**
+   * A debounce time to prevent search on every keystroke
+   * Default value is 500ms
+   */
+  debouncedSearchTime?: number
 
   /**
    * The [input accept string](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept)

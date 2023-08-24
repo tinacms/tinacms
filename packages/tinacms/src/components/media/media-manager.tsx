@@ -16,8 +16,8 @@
 
  */
 
-import React, { useCallback } from 'react'
-import { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useDebounce } from 'react-use'
 import styled, { css } from 'styled-components'
 import { useCMS } from '../../react-tinacms'
 import {
@@ -137,6 +137,7 @@ export function MediaPicker({
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
   const [itemModal, setItemModal] = useState<Media | null>(null)
   const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [currentTab, setCurrentTab] = useState(0)
   const offset = offsetHistory[offsetHistory.length - 1]
 
@@ -192,10 +193,18 @@ export function MediaPicker({
   }, [localStorageKey])
 
   function refresh() {
-    resetLocalStorage()
     resetOffset()
+    resetLocalStorage()
     loadMedia()
   }
+
+  useDebounce(
+    () => {
+      setSearch(searchInput)
+    },
+    cms.media.store.debouncedSearchTime ?? 500,
+    [searchInput]
+  )
 
   useEffect(() => {
     if (!cms.media.isConfigured) return
@@ -335,8 +344,8 @@ export function MediaPicker({
             <StyledSearch
               type="text"
               placeholder="Search"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
             />
           </form>
           <div>
@@ -383,7 +392,7 @@ export function MediaPicker({
           <ItemModal
             close={() => setItemModal(null)}
             item={itemModal}
-            childComponent={onItemClick}
+            ChildComponent={onItemClick}
           />
         )}
       </MediaPickerWrap>
@@ -394,7 +403,7 @@ export function MediaPicker({
 interface ItemModal {
   close: () => void
   item: Media
-  childComponent(item: Media): React.ReactElement
+  ChildComponent: React.FC<Media>
 }
 
 const StyledSearch = styled.input`
@@ -414,12 +423,14 @@ const StyledSearch = styled.input`
   box-shadow: 0 0 0 2px transparent;
 `
 
-const ItemModal = ({ close, item, childComponent }: ItemModal) => {
+const ItemModal = ({ close, item, ChildComponent }: ItemModal) => {
   return (
     <Modal>
       <PopupModal style={{ width: '70%' }}>
         <ModalHeader close={close}>Details for {item.filename}</ModalHeader>
-        <ModalBody>{childComponent(item)}</ModalBody>
+        <ModalBody>
+          <ChildComponent {...item} />
+        </ModalBody>
       </PopupModal>
     </Modal>
   )

@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import { GitMediaStore } from '@einsteinindustries/tinacms-git-client'
+import MediaPreview from './components/mediaPreview'
 
 export class NextGitMediaStore extends GitMediaStore {
   tabs = [
@@ -25,14 +26,7 @@ export class NextGitMediaStore extends GitMediaStore {
     { name: 'Files', accept: ['.pdf', '.mp4', '.avi', '.docx'] },
   ]
 
-  onItemClick(media) {
-    return (
-      <>
-        <img src={media.previewSrc} alt={'clicked image'}></img>
-        <p>{media.previewSrc}</p>
-      </>
-    )
-  }
+  onItemClick = MediaPreview
 
   previewSrc(src) {
     return /jpg|jpeg|png|svg|gif$/.test(src.toLowerCase())
