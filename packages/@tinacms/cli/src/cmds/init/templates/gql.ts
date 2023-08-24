@@ -24,7 +24,7 @@ const nextApiHandler${
 
   if (isAuthorized) {
     const { query, variables } = req.body
-    const result = await databaseClient({ query, variables })
+    const result = await databaseClient.request({ query, variables })
     return res.json(result)
   } else {
     return res.status(401).json({ error: 'Unauthorized' })
