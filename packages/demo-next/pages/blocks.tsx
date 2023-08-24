@@ -184,7 +184,16 @@ const image_template: BlockTemplate = {
     src: '/images/davisco-5E5N49RWtbA-unsplash.jpg',
     alt: 'image alt text',
   },
-  fields: [{ name: 'alt', label: 'Image Alt', component: 'text' }],
+  fields: [
+    { name: 'src', label: 'Image', component: 'image' },
+    {
+      name: 'src',
+      label: 'External Image',
+      component: 'text',
+      key: 'src.external',
+    },
+    { name: 'alt', label: 'Image Alt', component: 'text' },
+  ],
 }
 
 const wysi_template: BlockTemplate = {
