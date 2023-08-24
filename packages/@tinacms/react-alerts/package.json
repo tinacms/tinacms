@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-react-alerts",
-  "version": "0.44.311",
+  "version": "0.44.312",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -23,7 +23,7 @@
   "devDependencies": {
     "@einsteinindustries/tinacms-alerts": "^0.44.311",
     "@einsteinindustries/tinacms-icons": "^0.44.311",
-    "@einsteinindustries/tinacms-react-core": "^0.44.311",
+    "@einsteinindustries/tinacms-react-core": "^0.44.312",
     "@einsteinindustries/tinacms-scripts": "^0.44.311",
     "@einsteinindustries/tinacms-styles": "^0.44.311"
   },

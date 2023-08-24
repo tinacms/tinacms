@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-react-core",
-  "version": "0.44.311",
+  "version": "0.44.312",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@einsteinindustries/tinacms-core": "^0.44.311",
-    "@einsteinindustries/tinacms-forms": "^0.44.311"
+    "@einsteinindustries/tinacms-forms": "^0.44.312"
   },
   "peerDependencies": {
     "react": ">=16.8"
