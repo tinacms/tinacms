@@ -333,7 +333,9 @@ const addDependencies = async (
   const tagVersion = params.tinaVersion ? `@${params.tinaVersion}` : ''
   const { dataLayerAdapter, nextAuth, packageManager } = config
   let deps = []
-  if (!env.tinaConfigExists) {
+
+  // If TinaCMS is already installed, don't add it again
+  if (!env.hasTinaDeps) {
     deps.push('tinacms')
     deps.push('@tinacms/cli')
   }

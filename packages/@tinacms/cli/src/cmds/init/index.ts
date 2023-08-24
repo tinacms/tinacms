@@ -38,6 +38,7 @@ export type GeneratedFile = {
 }
 
 export type InitEnvironment = {
+  hasTinaDeps: boolean
   forestryConfigExists: boolean
   frontMatterFormat: 'yaml' | 'toml' | 'json'
   gitIgnoreExists: boolean
