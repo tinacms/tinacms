@@ -97,7 +97,7 @@ async function apply({
     await createGitignore({ baseDir })
   } else {
     let itemsToAdd = []
-    if (!env.gitIgoreNodeModulesExists) {
+    if (!env.gitIgnoreNodeModulesExists) {
       itemsToAdd.push('node_modules')
     }
     if (!env.gitIgnoreEnvExists) {

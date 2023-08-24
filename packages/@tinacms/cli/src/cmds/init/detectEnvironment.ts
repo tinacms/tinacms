@@ -1,7 +1,6 @@
 import fs from 'fs-extra'
 import path from 'path'
 import { InitEnvironment } from './index'
-import dotenv from 'dotenv'
 
 const checkGitignoreForItem = async ({
   baseDir,
@@ -168,7 +167,7 @@ const detectEnvironment = async ({
     forestryConfigExists: hasForestryConfig,
     frontMatterFormat,
     gitIgnoreExists: hasGitIgnore,
-    gitIgoreNodeModulesExists: hasGitIgnoreNodeModules,
+    gitIgnoreNodeModulesExists: hasGitIgnoreNodeModules,
     gitIgnoreEnvExists: hasGitIgnoreEnv,
     gitIgnoreTinaEnvExists: hasEnvTina,
     nextAppDir: hasAppDir,
