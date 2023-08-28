@@ -29,10 +29,13 @@ import {
   useInlineForm,
 } from '@einsteinindustries/react-tinacms-inline'
 import grayMatter from 'gray-matter'
-import { useCMS, usePlugin } from '@einsteinindustries/tinacms'
 import { InlineWysiwyg } from '@einsteinindustries/react-tinacms-editor'
 import Link from 'next/link'
-import { ContentCreatorPlugin } from '@einsteinindustries/tinacms-forms'
+import {
+  ContentCreatorPlugin,
+  useCMS,
+  usePlugin,
+} from '@einsteinindustries/tinacms'
 
 const addBlogPlugin: ContentCreatorPlugin<any> = {
   __type: 'content-creator',

@@ -28,24 +28,40 @@ npm run build
 # Start Next.js Demo
 cd packages/demo-next
 npm run develop
+
+## When you modify Tina, the demo won't automatically show your updates, you will need to also either build with `npm run build` or execute a watch on the package you are modifying
+## you can do this in a separate terminal tab by logging into a new docker shell. i.e.
+## NOTE: these updates take several seconds, not sure why. Also, when watching all files, it seems to not update at all.
+docker exec -it tina-dev /bin/bash
+npm run watch -- --scope=@einsteinindustries/tinacms
 ```
 
 ### To publish package to Einstein's npm
 
 #### Before Publishing
 
-1. Don't forget to bump the version in lerna.json, and the packages you wish to publish following semantic versioning
-2. You will also need to manually go into each package and update intra dependencies' versions
-   - I've found that it's way easier to just keep a fixed version on all packages, so even if you update only one package, upping the version on every package and every intra dependency is much easier
-3. You have to commit your changes
+- Ensure you have had your work and branch reviewed and approved
+- Switch to your host computer's terminal or login to GitHub on the container
+- Switch back to your branch and run
 
 ```bash
-# navigate back to tinacms root directory
+# this will automatically commit new versioning to your branch
+lerna version --no-private # follow prompts and select appropriate versioning
+```
+
+### Go back to the container's terminal and run
+
+```bash
+# navigate back to tinacms root directory if not already in it
 cd ../../
-npm login # follow prompts
+npm login # follow prompts and use einstein's NPM credentials. Not the NPM token! You will also need to contact Dennis or Jon and ask for the OTP when prompted. You will need to do this twice
 npm run build
 npm run lerna -- publish from-package --yes
 ```
+
+At this point, your branch is ready to be merged to master.
+
+- You may now merge, or ask reviewers to approve again and let them know that the only new changes are related to versioning.
 
 **WARNING: Do not run `npm install` from inside the `packages` directory**
 

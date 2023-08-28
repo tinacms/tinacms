@@ -18,6 +18,7 @@ limitations under the License.
 */
 
 import { EventBus } from './event'
+import React from 'react'
 
 /**
  * Represents an individual file in the MediaStore
@@ -68,6 +69,22 @@ export interface MediaUploadOptions {
  * managing media.
  */
 export interface MediaStore {
+  /**
+   * Custom tabs for displaying different asset sources, etc.
+   */
+  tabs?: { name: string; accept: string[] }[]
+
+  /**
+   * A component to handle click events when image cannot be inserted into an img placeholder
+   */
+  onItemClick?: React.FC<Media>
+
+  /**
+   * A debounce time to prevent search on every keystroke
+   * Default value is 500ms
+   */
+  debouncedSearchTime?: number
+
   /**
    * The [input accept string](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept)
    * that describes what kind of files the Media Store will accept.

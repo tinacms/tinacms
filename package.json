@@ -8,6 +8,7 @@
     "postinstall": "npm run bootstrap",
     "bs": "npm run bootstrap",
     "dev": "lerna run dev --reject-cycles",
+    "watch": "lerna run watch",
     "nuke": "./scripts/nuke.sh",
     "lerna": "lerna",
     "hard-reset": "npm run nuke && npm run bs && npm run build",

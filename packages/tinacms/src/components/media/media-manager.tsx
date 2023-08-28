@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
 
  Copyright 2021 Forestry.io Holdings, Inc.
@@ -17,8 +16,8 @@
 
  */
 
-import React, { useCallback } from 'react'
-import { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useDebounce } from 'react-use'
 import styled, { css } from 'styled-components'
 import { useCMS } from '../../react-tinacms'
 import {
@@ -34,20 +33,43 @@ import {
   MediaListOffset,
   MediaListError,
 } from '@einsteinindustries/tinacms-core'
-
 import { Button } from '@einsteinindustries/tinacms-styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, CursorPaginator } from './index'
 import { LoadingDots } from '@einsteinindustries/tinacms-form-builder'
+
+const MEDIA_STORAGE_META_KEY = 'media-meta'
 
 export interface MediaRequest {
   directory?: string
   onSelect?(media: Media): void
   close?(): void
   allowDelete?: boolean
-  currentTab?: number
-  setAllTabs?: (tabsArray: string[]) => void
 }
+
+const StyledTab = styled.button<{ isActive: boolean }>`
+  padding: 10px;
+  border: 0;
+  cursor: pointer;
+  background-color: ${props =>
+    props.isActive ? 'var(--tina-color-grey-4)' : 'var(--tina-color-grey-2)'};
+`
+
+const StyledTabWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+
+  button:first-child {
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+  }
+  button:last-child {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+`
 
 export function MediaManager() {
   const cms = useCMS()
@@ -88,8 +110,6 @@ export function MediaPicker({
   allowDelete,
   onSelect,
   close,
-  currentTab,
-  setAllTabs,
   ...props
 }: MediaRequest) {
   const cms = useCMS()
@@ -97,6 +117,8 @@ export function MediaPicker({
     if (cms.media.isConfigured) return 'loading'
     return 'not-configured'
   })
+
+  const { tabs = [], onItemClick } = cms.media.store
 
   const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
@@ -115,7 +137,11 @@ export function MediaPicker({
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
   const [itemModal, setItemModal] = useState<Media | null>(null)
   const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [currentTab, setCurrentTab] = useState(0)
   const offset = offsetHistory[offsetHistory.length - 1]
+
+  const localStorageKey = `Media-${currentTab}-${offset ?? 0}-${search}`
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
     if (!list.nextOffset) return
@@ -128,12 +154,18 @@ export function MediaPicker({
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
   const resetLocalStorage = () => {
-    localStorage.removeItem('Media - 0')
-    localStorage.removeItem('Media - 1')
-    localStorage.removeItem('Media - 2')
+    const itemsMeta = localStorage.getItem(MEDIA_STORAGE_META_KEY)
+    if (itemsMeta) {
+      const storedObjects = JSON.parse(itemsMeta) as string[]
+      storedObjects.forEach(item => {
+        localStorage.removeItem(item)
+      })
+      localStorage.removeItem(MEDIA_STORAGE_META_KEY)
+    }
   }
 
   const loadMedia = useCallback(() => {
+    if (!cms.media.isConfigured) return
     setListState('loading')
     cms.media
       .list({
@@ -146,69 +178,52 @@ export function MediaPicker({
       .then(list => {
         setList(list)
         setListState('loaded')
-        localStorage.setItem(`Media - ${currentTab}`, JSON.stringify(list))
+        const meta = JSON.parse(
+          localStorage.getItem(MEDIA_STORAGE_META_KEY) ?? '[]'
+        )
+        meta.push(localStorageKey)
+        localStorage.setItem(MEDIA_STORAGE_META_KEY, JSON.stringify(meta))
+        localStorage.setItem(localStorageKey, JSON.stringify(list))
       })
       .catch(e => {
         console.error(e)
+        setListError(e)
         setListState('error')
       })
-  }, [currentTab, offset, search])
-
-  useEffect(() => {
-    if (setAllTabs) {
-      setAllTabs(['Client', 'Einstein', 'Files'])
-    }
-  }, [setAllTabs])
-
-  useEffect(() => {
-    if (!cms.media.isConfigured) return
-    function loadMedia() {
-      setListState('loading')
-      cms.media
-        .list({ offset, limit: cms.media.pageSize, directory })
-        .then(list => {
-          setList(list)
-          setListState('loaded')
-        })
-        .catch(e => {
-          console.error(e)
-          if (e.ERR_TYPE === 'MediaListError') {
-            setListError(e)
-          } else {
-            setListError(defaultListError)
-          }
-          setListState('error')
-        })
-    }
-    loadMedia()
-  }, [offset])
+  }, [localStorageKey])
 
   function refresh() {
-    resetLocalStorage()
     resetOffset()
+    resetLocalStorage()
     loadMedia()
   }
 
+  useDebounce(
+    () => {
+      setSearch(searchInput)
+    },
+    cms.media.store.debouncedSearchTime ?? 500,
+    [searchInput]
+  )
+
   useEffect(() => {
-    if (offsetHistory.length) {
-      resetOffset()
-      resetLocalStorage()
+    if (!cms.media.isConfigured) return
+    const data = localStorage.getItem(localStorageKey)
+    if (data) {
+      setList(JSON.parse(data))
+      setListState('loaded')
     } else {
-      const data = localStorage.getItem(`Media - ${currentTab}`)
-      if (!data) {
-        loadMedia()
-      } else {
-        setListState('loading')
-        setList(JSON.parse(data))
-        setListState('loaded')
-      }
+      loadMedia()
     }
 
     return cms.events.subscribe(
       ['media:upload:success', 'media:delete:success', 'media:pageSize'],
-      loadMedia
+      () => {
+        resetLocalStorage()
+        loadMedia()
+      }
     )
-  }, [offset, directory, cms.media.isConfigured, currentTab])
+  }, [directory, cms.media.isConfigured, localStorageKey])
 
   const onClickMediaItem = (item: Media) => {
     setItemModal(item)
@@ -233,7 +248,7 @@ export function MediaPicker({
   }
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: currentTab === 2 ? ['.pdf', '.mp4', '.avi', '.docx'] : 'image/*',
+    accept: tabs?.[currentTab]?.accept ?? cms.media.store.accept,
 
     onDrop: async files => {
       try {
@@ -302,18 +317,35 @@ export function MediaPicker({
     e.preventDefault()
     loadMedia()
   }
+  const handleTabChange = (idx: number) => {
+    setCurrentTab(idx)
+    resetOffset()
+  }
 
   return (
     <>
       <MediaPickerWrap>
+        {tabs.length > 0 && (
+          <StyledTabWrap>
+            {tabs.map((tab, i) => (
+              <StyledTab
+                key={i}
+                onClick={() => handleTabChange(i)}
+                isActive={i === currentTab}
+              >
+                {tab.name}
+              </StyledTab>
+            ))}
+          </StyledTabWrap>
+        )}
         <Header>
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
           <form onSubmit={e => handleSubmit(e)}>
             <StyledSearch
               type="text"
               placeholder="Search"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
             />
           </form>
           <div>
@@ -356,8 +388,12 @@ export function MediaPicker({
           hasPrev={hasPrev}
           navigatePrev={navigatePrev}
         />
-        {itemModal && (
-          <ItemModal close={() => setItemModal(null)} item={itemModal} />
+        {itemModal && onItemClick && (
+          <ItemModal
+            close={() => setItemModal(null)}
+            item={itemModal}
+            ChildComponent={onItemClick}
+          />
         )}
       </MediaPickerWrap>
     </>
@@ -367,6 +403,7 @@ export function MediaPicker({
 interface ItemModal {
   close: () => void
   item: Media
+  ChildComponent: React.FC<Media>
 }
 
 const StyledSearch = styled.input`
@@ -386,79 +423,13 @@ const StyledSearch = styled.input`
   box-shadow: 0 0 0 2px transparent;
 `
 
-const StyledImg = styled.img`
-  border-radius: 30px;
-  object-fit: cover;
-  width: 100%;
-  object-position: center;
-`
-
-const objToStringArray = (item: any) => {
-  const arr: any = []
-  for (const [key, value] of Object.entries(item)) {
-    let valueStr = ''
-    if (typeof value === 'string') {
-      valueStr = value
-    } else if (typeof value === 'boolean' || typeof value === 'number') {
-      valueStr = value.toString()
-    } else if (value === null) {
-      valueStr = 'null'
-    } else if (typeof value === 'object') {
-      valueStr = objToStringArray(value)
-    }
-    arr.push([key, valueStr])
-  }
-  return arr
-}
-
-const ItemModal = ({ close, item }: ItemModal) => {
-  const imgix = item.metaData?.attributes
-  const tags = imgix?.tags
-  const colors = imgix?.colors['dominant_colors']
-  const meta = objToStringArray(imgix || item.metaData)
+const ItemModal = ({ close, item, ChildComponent }: ItemModal) => {
   return (
     <Modal>
       <PopupModal style={{ width: '70%' }}>
         <ModalHeader close={close}>Details for {item.filename}</ModalHeader>
         <ModalBody>
-          <div style={{ display: 'flex', margin: '50px auto', width: '80%' }}>
-            <div style={{ width: '70%' }}>
-              <StyledImg src={item.previewSrc} alt="clicked image" />
-            </div>
-            <div style={{ width: '100%' }}>
-              <ul style={{ listStyle: 'none', marginLeft: '20px' }}>
-                <li style={{ marginBottom: '5px' }}>name: {item.filename}</li>
-                <li style={{ marginBottom: '5px' }}>url: {item.previewSrc}</li>
-                <li style={{ marginBottom: '5px' }}>id: {item.id}</li>
-                <li style={{ marginBottom: '5px' }}>type: {item.type}</li>
-                {meta.map(
-                  ([key, value]: [string, any]) =>
-                    typeof value !== 'object' && (
-                      <li key={key} style={{ marginBottom: '5px' }}>
-                        {key}: {value}
-                      </li>
-                    )
-                )}
-                {tags &&
-                  Object.entries(tags).map(([key, value]) => (
-                    <li key={key} style={{ marginBottom: '5px' }}>
-                      {key}: {value}
-                    </li>
-                  ))}
-                {colors &&
-                  Object.entries(colors).map(([key, value]) => (
-                    <li key={key} style={{ marginBottom: '5px' }}>
-                      {key}: {value}
-                    </li>
-                  ))}
-                {item.metaData?.LastModified && (
-                  <li style={{ marginBottom: '5px' }}>
-                    last modified: {item.metaData?.LastModified.toString()}
-                  </li>
-                )}
-              </ul>
-            </div>
-          </div>
+          <ChildComponent {...item} />
         </ModalBody>
       </PopupModal>
     </Modal>

@@ -19,21 +19,12 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { CloseIcon } from '@einsteinindustries/tinacms-icons'
-import { useState } from 'react'
 
 export interface ModalHeaderProps {
   children: React.ReactChild | React.ReactChild[]
   back?(): void
   close?(): void
-  updateCurrentTab?: (tabNumber: number) => void
-  allTabs?: string[]
 }
-
-const StyledTab = styled.button<{ isActive: boolean }>`
-  border: none;
-  border-bottom: ${props => props.isActive && '2px solid cornflowerblue'};
-  cursor: pointer;
-`
 
 const BackArrow = () => {
   return (
@@ -49,35 +40,10 @@ const BackArrow = () => {
 }
 
 export const ModalHeader = styled(
-  ({
-    children,
-    close,
-    back,
-    updateCurrentTab,
-    allTabs,
-    ...styleProps
-  }: ModalHeaderProps) => {
-    const [currentTab, setCurrentTab] = useState(0)
-    const handleClick = (idx: number) => {
-      setCurrentTab(idx)
-      updateCurrentTab && updateCurrentTab(idx)
-    }
+  ({ children, close, back, ...styleProps }: ModalHeaderProps) => {
     return (
       <div {...styleProps}>
         <ModalTitle>{children}</ModalTitle>
-        {allTabs && (
-          <div>
-            {allTabs.map((tab, i) => (
-              <StyledTab
-                key={i}
-                onClick={() => handleClick(i)}
-                isActive={i === currentTab}
-              >
-                {tab}
-              </StyledTab>
-            ))}
-          </div>
-        )}
         <div style={{ display: 'flex' }}>
           {back && (
             <NavigationButton onClick={back} style={{ marginRight: '35px' }}>

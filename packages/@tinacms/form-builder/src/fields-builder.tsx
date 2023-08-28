@@ -62,7 +62,7 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
         return (
           <FinalField
             name={field.name}
-            key={field.name}
+            key={field.key ?? field.name}
             type={type}
             parse={
               parse

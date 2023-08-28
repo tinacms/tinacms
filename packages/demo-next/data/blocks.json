@@ -12,7 +12,7 @@
     },
     {
       "_template": "image",
-      "src": "/images/iceland-thumb.jpg",
+      "src": "/images/MSC16006197_s.jpg",
       "alt": "image alt text"
     },
     {
@@ -20,5 +20,5 @@
       "content": "# Hello World"
     }
   ],
-  "hero_image": "/images/davisco-5E5N49RWtbA-unsplash.jpg"
+  "hero_image": "/images2/final_animals-homeschooling_credit-alamy.jpg"
 }

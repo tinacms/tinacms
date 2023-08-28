@@ -34,4 +34,5 @@ export interface Field<F extends Field = AnyField> {
   ): string | object | undefined
   defaultValue?: any
   fields?: F[]
+  key?: string
 }

@@ -17,15 +17,33 @@ limitations under the License.
 */
 
 import { GitMediaStore } from '@einsteinindustries/tinacms-git-client'
+import MediaPreview from './components/mediaPreview'
 
 export class NextGitMediaStore extends GitMediaStore {
+  tabs = [
+    { name: 'Fruits', accept: ['image/*'] },
+    { name: 'Animals', accept: ['image/*'] },
+    { name: 'Files', accept: ['.pdf', '.mp4', '.avi', '.docx'] },
+  ]
+
+  onItemClick = MediaPreview
+
   previewSrc(src) {
     return /jpg|jpeg|png|svg|gif$/.test(src.toLowerCase())
       ? src.replace(/\/?public/, '')
       : null
   }
   async list(options) {
-    const listItems = await super.list(options)
+    const directories = [
+      '/public/images/',
+      '/public/images2/',
+      '/public/files/',
+    ]
+    const newOptions = {
+      ...options,
+      directory: directories[options.currentList],
+    }
+    const listItems = await super.list(newOptions)
     return {
       ...listItems,
       items: listItems.items.map(media => ({
