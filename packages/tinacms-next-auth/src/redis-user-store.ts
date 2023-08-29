@@ -36,12 +36,12 @@ export class RedisUserStore implements UserStore {
   async getUser(username: string) {
     const keys = await this.redis.json.objkeys(
       this.authCollectionName,
-      `$.${username}`
+      `$.["${username}"]`
     )
     if (keys && keys.length > 0) {
       const user = await this.redis.json.get(
         this.authCollectionName,
-        `$.${username}`
+        `$.["${username}"]`
       )
       if (user) {
         return user[0]
