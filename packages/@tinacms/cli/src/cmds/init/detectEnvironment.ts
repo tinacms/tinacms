@@ -1,5 +1,6 @@
 import fs from 'fs-extra'
 import path from 'path'
+import { logger } from '../../logger'
 import { InitEnvironment } from './index'
 
 const checkGitignoreForItem = async ({
@@ -146,6 +147,28 @@ const detectEnvironment = async ({
 
   const hasSampleContent = await fs.pathExists(sampleContentPath)
   const hasPackageJSON = await fs.pathExists('package.json')
+  let hasTinaDeps = false
+
+  if (hasPackageJSON) {
+    try {
+      const packageJSON = await fs.readJSON('package.json')
+      const deps: string[] = []
+      if (packageJSON?.dependencies) {
+        deps.push(...Object.keys(packageJSON.dependencies))
+      }
+      if (packageJSON?.devDependencies) {
+        deps.push(...Object.keys(packageJSON.devDependencies))
+      }
+      if (deps.includes('@tinacms/cli') && deps.includes('tinacms')) {
+        hasTinaDeps = true
+      }
+    } catch (e) {
+      logger.error(
+        'Error reading package.json assuming that no Tina dependencies are installed'
+      )
+    }
+  }
+
   const hasGitIgnore = await fs.pathExists(path.join('.gitignore'))
   const hasGitIgnoreNodeModules =
     hasGitIgnore &&
@@ -177,6 +200,7 @@ const detectEnvironment = async ({
     generatedFiles,
     usingSrc,
     tinaConfigExists,
+    hasTinaDeps,
   }
   if (debug) {
     console.log('Environment:')
