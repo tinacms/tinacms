@@ -314,7 +314,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   }
   private getFieldGroup({
     formOrObjectField,
-    values,
+    values = {},
     namePathIndex,
     namePath,
   }: {
