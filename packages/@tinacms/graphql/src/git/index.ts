@@ -94,3 +94,17 @@ export const getChangedFiles = async ({
   })
   return results
 }
+
+export const shaExists = async ({
+  fs,
+  dir,
+  sha,
+}: {
+  fs: CallbackFsClient | PromiseFsClient
+  dir: string
+  sha: string
+}): Promise<boolean> =>
+  git
+    .readCommit({ fs, dir, oid: sha })
+    .then(() => true)
+    .catch(() => false)

@@ -1,5 +1,17 @@
 # tinacms
 
+## 1.5.20
+
+### Patch Changes
+
+- 7e4de0b2a: Improvements to error handling with auth
+- 1144af060: Improve error messaging when onPut / onDelete hooks throw errors
+- Updated dependencies [7e4de0b2a]
+- Updated dependencies [099bf5646]
+- Updated dependencies [c92de7b1d]
+  - @tinacms/schema-tools@1.4.12
+  - @tinacms/search@1.0.10
+
 ## 1.5.19
 
 ### Patch Changes

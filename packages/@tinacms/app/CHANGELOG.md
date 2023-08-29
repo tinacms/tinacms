@@ -1,5 +1,16 @@
 # @tinacms/app
 
+## 1.2.27
+
+### Patch Changes
+
+- 7e4de0b2a: Improvements to error handling with auth
+- 1144af060: Improve error messaging when onPut / onDelete hooks throw errors
+- Updated dependencies [7e4de0b2a]
+- Updated dependencies [1144af060]
+  - tinacms@1.5.20
+  - @tinacms/mdx@1.3.18
+
 ## 1.2.26
 
 ### Patch Changes
