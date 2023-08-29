@@ -11,7 +11,7 @@ import { startSubprocess2 } from '../../utils/start-subprocess'
 import { logger } from '../../logger'
 import { spin } from '../../utils/spinner'
 import { warnText } from '../../utils/theme'
-import { getChangedFiles, getSha } from '@tinacms/graphql'
+import { getChangedFiles, getSha, shaExists } from '@tinacms/graphql'
 import fs from 'fs-extra'
 import { ConfigManager } from '../config-manager'
 
@@ -126,8 +126,10 @@ export abstract class BaseCommand extends Command {
           }
         }
         const lastSha = await database.getMetadata('lastSha')
+        const exists =
+          lastSha && (await shaExists({ fs, dir: rootPath, sha: lastSha }))
         let res
-        if (partialReindex && lastSha && sha) {
+        if (partialReindex && lastSha && exists && sha) {
           const pathFilter: Record<string, { matches?: string[] }> = {}
           if (configManager.isUsingLegacyFolder) {
             pathFilter['.tina/__generated__/_schema.json'] = {}
