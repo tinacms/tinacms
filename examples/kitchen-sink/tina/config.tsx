@@ -16,27 +16,26 @@ const router = ({ document, collection }) => {
 const extendedRouter = ({ document, collection }) => {
   return `/${collection.name}/${document._sys.breadcrumbs.join('/')}`
 }
+
+const customAuthProvider = {
+  getToken: async () => {
+    return { id_token: 'some-token' }
+  },
+  logout: async () => {
+    localStorage.removeItem(TINA_TOKEN_KEY)
+  },
+  authenticate: async () => {
+    localStorage.setItem(TINA_TOKEN_KEY, 'some-token')
+    return true
+  },
+  getUser: async () => {
+    return localStorage.getItem(TINA_TOKEN_KEY)
+  },
+}
 export default defineConfig({
   // contentApiUrlOverride: '/api/gql',
   admin: {
-    auth: {
-      useLocalAuth: true,
-      // If you wanted to use custom auth
-      customAuth: true,
-      getToken: async () => {
-        return { id_token: 'some-token' }
-      },
-      logout: async () => {
-        localStorage.removeItem(TINA_TOKEN_KEY)
-      },
-      authenticate: async () => {
-        localStorage.setItem(TINA_TOKEN_KEY, 'some-token')
-        return true
-      },
-      getUser: async () => {
-        return localStorage.getItem(TINA_TOKEN_KEY)
-      },
-    },
+    auth: customAuthProvider,
   },
   build: {
     outputFolder: 'admin',

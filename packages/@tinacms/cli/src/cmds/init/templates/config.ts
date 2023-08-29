@@ -105,15 +105,11 @@ export const configExamples: {
   next: (args, opts) => {
     const authConfig = opts.nextAuth
       ? `admin: {
-        auth: {
-          useLocalAuth: isLocal,
-          customAuth: !isLocal,
-          ...createTinaNextAuthHandler({
+          auth: createTinaNextAuthHandler({
             callbackUrl: '/admin/index.html',
             isLocalDevelopment: isLocal,
             name: '${args.nextAuthCredentialsProviderName}',
           })
-      }
       },`
       : `clientId: ${
           args.clientId

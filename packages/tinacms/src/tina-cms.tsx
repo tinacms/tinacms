@@ -144,7 +144,6 @@ export const TinaCMSProvider2 = ({
     )
   }
   const apiURL = props?.client?.apiUrl || props?.apiURL
-  const isLocalOverride = schema?.config?.admin?.auth?.useLocalAuth
   const { branch, clientId, isLocalClient } = apiURL
     ? parseURL(apiURL)
     : {
@@ -180,7 +179,7 @@ export const TinaCMSProvider2 = ({
         branch={branch}
         clientId={clientId || schema?.config?.clientId}
         tinaioConfig={props.tinaioConfig}
-        isLocalClient={isLocalOverride || isLocalClient}
+        isLocalClient={isLocalClient}
         isSelfHosted={!!schema?.config?.contentApiUrlOverride}
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}

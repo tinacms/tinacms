@@ -59,8 +59,7 @@ export const AuthWallInner = ({
   const client: Client = cms.api.tina
   // Weather or not we are using Tina Cloud for auth
   const isTinaCloud =
-    !client.isLocalMode &&
-    !client.schema?.config?.config?.admin?.auth?.customAuth
+    !client.isLocalMode && !client.schema?.config?.config?.admin?.auth
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [errorMessage, setErrorMessage] = useState<
@@ -321,8 +320,7 @@ export const TinaCloudProvider = (
   const client: Client = cms.api.tina
   // Weather or not we are using Tina Cloud for auth
   const isTinaCloud =
-    !client.isLocalMode &&
-    !client.schema?.config?.config?.admin?.auth?.customAuth
+    !client.isLocalMode && !client.schema?.config?.config?.admin?.auth
 
   const handleListBranches = async (): Promise<Branch[]> => {
     const branches = await cms.api.tina.listBranches({

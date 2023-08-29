@@ -430,6 +430,45 @@ type TokenObject = {
   refresh_token?: string
 }
 
+interface AuthProvider {
+  /**
+   *  Used for getting the token from the custom auth provider
+   *
+   * @returns {Promise<TokenObject | null>}
+   **/
+  getToken: () => Promise<TokenObject | null>
+  /**
+   *  Used to logout from the custom auth provider
+   *
+   **/
+  logout: () => Promise<void>
+  /**
+   *  Used for getting the user from the custom auth provider. If this returns a truthy value, the user will be logged in and the CMS will be enabled.
+   *
+   *  If this returns a falsy value, the user will be logged out and the CMS will be disabled.
+   *
+   **/
+  getUser: () => Promise<any | null>
+  /**
+   *  Used to authorize the user with the custom auth provider.
+   *
+   *  If this returns a truthy value, the user will be logged in and the CMS will be enabled.
+   *
+   *  If not provided, the existence of a user will be enough to authorize the user.
+   *
+   * @param context
+   */
+  authorize?: (context?: any) => Promise<any | null>
+  /**
+   * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
+   *
+   **/
+  authenticate: () => Promise<any | null>
+
+  onLogin?: (args: { token: TokenObject }) => Promise<void>
+  onLogout?: () => Promise<void>
+}
+
 export interface Config<
   CMSCallback = undefined,
   FormifyCallback = undefined,
@@ -439,55 +478,7 @@ export interface Config<
 > {
   contentApiUrlOverride?: string
   admin?: {
-    auth?: {
-      /**
-       * If you wish to use the local auth provider, set this to true
-       *
-       * This will take precedence over the customAuth option (if set to true)
-       *
-       **/
-      useLocalAuth?: boolean
-      /**
-       * If you are using a custom auth provider, set this to true
-       **/
-      customAuth?: boolean
-      /**
-       *  Used for getting the token from the custom auth provider
-       *
-       * @returns {Promise<TokenObject | null>}
-       **/
-      getToken?: () => Promise<TokenObject | null>
-      /**
-       *  Used to logout from the custom auth provider
-       *
-       **/
-      logout?: () => Promise<void>
-      /**
-       *  Used for getting the user from the custom auth provider. If this returns a truthy value, the user will be logged in and the CMS will be enabled.
-       *
-       *  If this returns a falsy value, the user will be logged out and the CMS will be disabled.
-       *
-       **/
-      getUser?: () => Promise<any | null>
-      /**
-       *  Used to authorize the user with the custom auth provider.
-       *
-       *  If this returns a truthy value, the user will be logged in and the CMS will be enabled.
-       *
-       *  If not provided, the existence of a user will be enough to authorize the user.
-       *
-       * @param context
-       */
-      authorize?: (context?: any) => Promise<any | null>
-      /**
-       * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
-       *
-       **/
-      authenticate?: () => Promise<any | null>
-
-      onLogin?: (args: { token: TokenObject }) => Promise<void>
-      onLogout?: () => Promise<void>
-    }
+    auth?: AuthProvider
   }
   /**
    * The Schema is used to define the shape of the content.

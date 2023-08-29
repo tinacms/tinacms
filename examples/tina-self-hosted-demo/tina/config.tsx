@@ -12,24 +12,22 @@ import { iconSchema } from '../components/util/icon'
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/gql',
   admin: {
-    auth: {
-      useLocalAuth: true,
-      // If you wanted to use custom auth
-      customAuth: true,
-      getToken: async () => {
-        return { id_token: 'some-token' }
-      },
-      logout: async () => {
-        localStorage.removeItem(TINA_TOKEN_KEY)
-      },
-      authenticate: async () => {
-        localStorage.setItem(TINA_TOKEN_KEY, 'some-token')
-        return true
-      },
-      getUser: async () => {
-        return localStorage.getItem(TINA_TOKEN_KEY)
-      },
-    },
+    // auth: {
+    //   // If you wanted to use custom auth
+    //   getToken: async () => {
+    //     return { id_token: 'some-token' }
+    //   },
+    //   logout: async () => {
+    //     localStorage.removeItem(TINA_TOKEN_KEY)
+    //   },
+    //   authenticate: async () => {
+    //     localStorage.setItem(TINA_TOKEN_KEY, 'some-token')
+    //     return true
+    //   },
+    //   getUser: async () => {
+    //     return localStorage.getItem(TINA_TOKEN_KEY)
+    //   },
+    // },
   },
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
   branch:

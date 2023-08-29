@@ -220,8 +220,6 @@ async function apply({
     contentApiUrlOverride: '/api/gql',
     admin: {
       auth: {
-        useLocalAuth: isLocal,
-        customAuth: !isLocal,
         ...createTinaNextAuthHandler({
           callbackUrl: '/admin/index.html',
           isLocalDevelopment: isLocal,
