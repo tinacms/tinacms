@@ -1,6 +1,7 @@
 import { MdOutlineCloud } from 'react-icons/md'
 
 import { Plugin } from '@toolkit/core'
+import type { IconType } from 'react-icons'
 
 /**
  * Represents a Tina Cloud Config that should be accessible via the CMS.
@@ -32,6 +33,7 @@ export interface CloudConfigOptions {
     text: string
     href: string
   }
+  Icon?: IconType
 }
 
 /**

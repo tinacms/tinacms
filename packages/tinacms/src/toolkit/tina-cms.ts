@@ -42,7 +42,8 @@ import { MediaManagerScreenPlugin } from '@toolkit/plugin-screens/media-manager-
 import { createCloudConfig } from '@toolkit/react-cloud-config'
 import { TinaAction, TinaState } from './tina-state'
 import type { Client } from '../internalClient'
-
+import { MdOutlinePerson } from 'react-icons/md'
+import { MdOutlineHelpOutline } from 'react-icons/md'
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
   TextareaFieldPlugin,
@@ -140,6 +141,17 @@ export class TinaCMS extends CMS {
               text: 'User Management',
               href: `https://app.tina.io/projects/${clientId}/collaborators`,
             },
+            Icon: MdOutlinePerson,
+          })
+        )
+        this.plugins.add(
+          createCloudConfig({
+            name: 'Support',
+            link: {
+              text: 'Support',
+              href: `https:/tina.io/docs/support`,
+            },
+            Icon: MdOutlineHelpOutline,
           })
         )
       } else if (!isSelfHosted) {
