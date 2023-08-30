@@ -105,9 +105,8 @@ export const configExamples: {
   next: (args, opts) => {
     const authConfig = opts.nextAuth
       ? `admin: {
-          auth: createTinaNextAuthHandler({
+          auth: new NextAuthProvider({
             callbackUrl: '/admin/index.html',
-            isLocalDevelopment: isLocal,
             name: '${args.nextAuthCredentialsProviderName}',
           })
       },`
@@ -122,7 +121,7 @@ export const configExamples: {
     return `import { defineConfig } from 'tinacms'
   ${
     opts.nextAuth
-      ? `import { createTinaNextAuthHandler } from 'tinacms-next-auth/dist/tinacms'
+      ? `import { NextAuthProvider } from 'tinacms-next-auth/dist/tinacms'
   `
       : ''
   }
