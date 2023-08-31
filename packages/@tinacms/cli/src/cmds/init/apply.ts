@@ -163,13 +163,10 @@ async function apply({
     await addContentFile({ config, env })
   }
 
-  if (config.framework.reactive && !env.tinaConfigExists) {
+  if (config.framework.reactive && addReactiveFile[config.framework.name]) {
     await addReactiveFile[config.framework.name]({
       baseDir,
       framework: config.framework,
-      usingSrc: env.usingSrc,
-      usingTypescript: config.typescript,
-      isLocalEnvVarName: config.isLocalEnvVarName,
       dataLayer: usingDataLayer,
       nextAuthProvider: config.nextAuthProvider,
     })
@@ -649,52 +646,49 @@ const authContent = (authType: string, vars: AuthTemplateVariables) => {
 }
 
 const addReactiveFile = {
-  next: ({
+  next: async ({
+    generatedFile,
+    config,
+    env,
     baseDir,
-    isLocalEnvVarName,
-    usingSrc,
-    usingTypescript,
     dataLayer,
-    nextAuthProvider,
   }: {
+    generatedFile: GeneratedFile
+    config: Record<any, any>
+    env: InitEnvironment
     baseDir: string
-    isLocalEnvVarName: string
-    usingSrc: boolean
-    usingTypescript: boolean
     dataLayer: boolean
-    nextAuthProvider: string
   }) => {
-    const pagesPath = path.join(baseDir, usingSrc ? 'src' : '', 'pages')
-    const packageJSONPath = path.join(baseDir, 'package.json')
-    const tinaBlogPagePath = path.join(pagesPath, 'demo', 'blog')
-    const tinaBlogPagePathFile = path.join(
-      tinaBlogPagePath,
-      `[filename].${usingTypescript ? 'tsx' : 'js'}`
-    )
-    if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
-      fs.mkdirpSync(tinaBlogPagePath)
-      fs.writeFileSync(
-        tinaBlogPagePathFile,
-        NextTemplates['demo-post-page']({ usingSrc, dataLayer })
-      )
-    }
+    const packageJsonPath = path.join(baseDir, 'package.json')
+    await writeGeneratedFile({
+      generatedFile,
+      typescript: config.typescript,
+      overwrite: config.typescript
+        ? config.overwriteNextAuthApiHandlerTS
+        : config.overwriteNextAuthApiHandlerJS,
+      content: NextTemplates['demo-post-page']({
+        usingSrc: env.usingSrc,
+        dataLayer,
+      }),
+    })
     logger.info('Adding a nextjs example... ✅')
 
     // 4. update the users package.json
-    const pack = JSON.parse(fs.readFileSync(packageJSONPath).toString())
-    const oldScripts = pack.scripts || {}
-    const newPack = JSON.stringify(
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString())
+    const scripts = packageJson.scripts || {}
+    const updatedPackageJson = JSON.stringify(
       {
-        ...pack,
-        scripts: extendNextScripts(oldScripts, {
-          isLocalEnvVarName,
-          addSetupUsers: nextAuthProvider === 'vercel-kv-credentials-provider',
+        ...packageJson,
+        scripts: extendNextScripts(scripts, {
+          isLocalEnvVarName: config.isLocalEnvVarName,
+          addSetupUsers:
+            config.nextAuthProvider === 'vercel-kv-credentials-provider',
         }),
       },
       null,
       2
     )
-    fs.writeFileSync(packageJSONPath, newPack)
+    fs.writeFileSync(packageJsonPath, updatedPackageJson)
   },
 }
 

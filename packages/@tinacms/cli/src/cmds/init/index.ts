@@ -26,6 +26,7 @@ type GeneratedFileType =
   | 'next-auth-api-handler'
   | 'gql-api-handler'
   | 'tina.svg'
+  | 'reactive-example'
 
 export type GeneratedFile = {
   fullPathJS: string
