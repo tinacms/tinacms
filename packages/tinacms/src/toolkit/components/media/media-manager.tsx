@@ -507,7 +507,7 @@ const ActiveItemPreview = ({
           {isImage(thumbnail) ? (
             <div className="w-full max-h-[75%]">
               <img
-                className="block border border-gray-100 rounded-md overflow-hidden max-w-full max-h-full object-fit h-auto shadow"
+                className="block border border-gray-100 rounded-md overflow-hidden object-center object-contain w-full h-full shadow"
                 src={thumbnail}
                 alt={activeItem.filename}
               />
