@@ -585,9 +585,7 @@ const logNextSteps = ({
   framework: Framework
 }) => {
   if (isBackend) {
-    logger.info(
-      focusText(`\n${titleText(' TinaCMS ')} backend been initialized!`)
-    )
+    logger.info(focusText(`\n${titleText(' TinaCMS ')} backend initialized!`))
     logger.info(
       'If you are deploying to vercel make sure to add the environment variables to your project.'
     )
