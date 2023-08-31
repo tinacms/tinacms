@@ -130,7 +130,7 @@ export class Client {
     // TODO: auth provider should be dynamically passed in
     // TODO: update auth provider whenever the clientID or url change
     this.authProvider =
-      this.schema.config.config.authProvider ||
+      this.schema?.config?.config?.authProvider ||
       new TinaCloudAuthProvider({
         clientId: options.clientId,
         identityApiUrl: this.identityApiUrl,
