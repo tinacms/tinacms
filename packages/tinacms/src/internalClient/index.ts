@@ -97,8 +97,12 @@ export class Client {
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.tinaGraphQLVersion = options.tinaGraphQLVersion
-    this.onLogin = options.schema?.config?.admin?.auth?.onLogin
-    this.onLogout = options.schema?.config?.admin?.auth?.onLogout
+    this.onLogin =
+      options.schema?.config?.admin?.authHooks?.onLogin ||
+      options.schema?.config?.admin?.auth?.onLogin
+    this.onLogout =
+      options.schema?.config?.admin?.authHooks?.onLogout ||
+      options.schema?.config?.admin?.auth?.onLogout
 
     if (options.schema) {
       const enrichedSchema = new TinaSchema({
