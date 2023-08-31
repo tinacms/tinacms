@@ -17,7 +17,7 @@ export class TinaCloudCloudinaryMediaStore extends CloudinaryMediaStore {
           client.clientId
         }`
 
-        const res = client.fetchWithToken(url + query, init)
+        const res = client.authProvider.fetchWithToken(url + query, init)
         return res
       } catch (error) {
         console.error(error)

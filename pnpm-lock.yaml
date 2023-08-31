@@ -1303,6 +1303,7 @@ importers:
       prompts: ^2.4.1
       react: ^18
       react-dom: ^18
+      tinacms: workspace:*
       typescript: 4.3.5
     dependencies:
       '@upstash/redis': 1.22.0
@@ -1319,6 +1320,7 @@ importers:
       next-auth: 4.22.1_bhgafntz2ozm43l35i5qtimxry
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+      tinacms: link:../tinacms
       typescript: 4.3.5
 
 packages:

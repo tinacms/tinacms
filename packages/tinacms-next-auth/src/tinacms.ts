@@ -1,6 +1,7 @@
 import { getSession, signIn, signOut } from 'next-auth/react'
+import { AbstractAuthProvider } from 'tinacms'
 
-export class NextAuthProvider {
+export class NextAuthProvider extends AbstractAuthProvider {
   callbackUrl: string
   name: string
   constructor({
@@ -10,6 +11,7 @@ export class NextAuthProvider {
     name?: string
     callbackUrl?: string
   }) {
+    super()
     this.name = name
     this.callbackUrl = callbackUrl
   }

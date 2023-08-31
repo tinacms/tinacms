@@ -37,7 +37,7 @@ export class TinaAdminApi {
   }
 
   async isAuthenticated() {
-    return await this.api.isAuthenticated()
+    return await this.api.authProvider.isAuthenticated()
   }
 
   async checkGraphqlSchema({ localSchema }: { localSchema: any }) {

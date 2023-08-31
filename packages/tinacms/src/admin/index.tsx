@@ -239,7 +239,11 @@ export const TinaAdmin = ({
                     )}
                     <Route
                       path="login"
-                      element={<DefaultWrapper cms={cms}></DefaultWrapper>}
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <LoginPage />
+                        </DefaultWrapper>
+                      }
                     />
                     <Route
                       path="graphql"

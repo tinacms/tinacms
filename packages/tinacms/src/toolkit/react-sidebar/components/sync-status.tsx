@@ -42,7 +42,7 @@ export const useGetEvents = (
     const fetchEvents = async () => {
       let doFetchEvents = false
       if (!cms.api?.tina?.isCustomContentApi) {
-        doFetchEvents = await cms.api?.tina?.isAuthenticated()
+        doFetchEvents = await cms.api?.tina?.authProvider?.isAuthenticated()
       }
       if (doFetchEvents) {
         try {

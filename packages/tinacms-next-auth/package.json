@@ -47,13 +47,15 @@
     "next-auth": "4.22.1",
     "react": "^18",
     "react-dom": "^18",
+    "tinacms": "workspace:*",
     "typescript": "4.3.5"
   },
   "peerDependencies": {
     "next": "^12.2.5 || ^13",
     "next-auth": "^4.22.1",
     "react": "^17.0.2 || ^18",
-    "react-dom": "^17.0.2 || ^18"
+    "react-dom": "^17.0.2 || ^18",
+    "tinacms": "workspace:*"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

@@ -430,7 +430,7 @@ type TokenObject = {
   refresh_token?: string
 }
 
-interface AuthProvider {
+export interface AuthProvider {
   /**
    *  Used for getting the token from the custom auth provider
    *
@@ -458,16 +458,23 @@ interface AuthProvider {
    *
    * @param context
    */
-  authorize?: (context?: any) => Promise<any | null>
+  authorize: (context?: any) => Promise<any | null>
   /**
    * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
    *
    **/
   authenticate: () => Promise<any | null>
+  fetchWithToken: typeof fetch
+  isAuthorized: (context?: any) => Promise<boolean>
+  isAuthenticated: () => Promise<boolean>
+}
 
+interface AuthHooks {
   onLogin?: (args: { token: TokenObject }) => Promise<void>
   onLogout?: () => Promise<void>
 }
+
+type AuthOptions = AuthHooks & AuthProvider
 
 export interface Config<
   CMSCallback = undefined,
@@ -477,8 +484,16 @@ export interface Config<
   SearchClient = undefined
 > {
   contentApiUrlOverride?: string
+  authProvider?: AuthProvider
   admin?: {
-    auth?: AuthProvider
+    /**
+     * @deprecated use `authProvider`and admin.authHooks instead
+     */
+    auth?: AuthOptions
+    /**
+     * Hook functions that can be used to run logic when certain events happen
+     */
+    authHooks: AuthHooks
   }
   /**
    * The Schema is used to define the shape of the content.
