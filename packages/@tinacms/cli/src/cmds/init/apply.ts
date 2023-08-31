@@ -33,7 +33,13 @@ import { templates as NextTemplates } from './templates/next'
 import { helloWorldPost } from './templates/content'
 import { format } from 'prettier'
 import { extendNextScripts } from '../../utils/script-helpers'
-import { Framework, GeneratedFile, InitEnvironment, InitParams } from './index'
+import {
+  Framework,
+  GeneratedFile,
+  InitEnvironment,
+  InitParams,
+  ReactiveFramework,
+} from './index'
 
 async function apply({
   env,
@@ -164,11 +170,12 @@ async function apply({
   }
 
   if (config.framework.reactive && addReactiveFile[config.framework.name]) {
-    await addReactiveFile[config.framework.name]({
+    await addReactiveFile[config.framework.name as ReactiveFramework]({
       baseDir,
-      framework: config.framework,
+      config,
+      env,
       dataLayer: usingDataLayer,
-      nextAuthProvider: config.nextAuthProvider,
+      generatedFile: env.generatedFiles['reactive-example'],
     })
   }
 
@@ -645,20 +652,24 @@ const authContent = (authType: string, vars: AuthTemplateVariables) => {
   })
 }
 
-const addReactiveFile = {
+type AddReactiveParams = {
+  baseDir: string
+  config: Record<any, any>
+  env: InitEnvironment
+  dataLayer: boolean
+  generatedFile: GeneratedFile
+}
+
+const addReactiveFile: {
+  [key in ReactiveFramework]: (params: AddReactiveParams) => Promise<void>
+} = {
   next: async ({
     generatedFile,
     config,
     env,
     baseDir,
     dataLayer,
-  }: {
-    generatedFile: GeneratedFile
-    config: Record<any, any>
-    env: InitEnvironment
-    baseDir: string
-    dataLayer: boolean
-  }) => {
+  }: AddReactiveParams) => {
     const packageJsonPath = path.join(baseDir, 'package.json')
     await writeGeneratedFile({
       generatedFile,

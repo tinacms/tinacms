@@ -14,6 +14,8 @@ export interface Framework {
   reactive: boolean
 }
 
+export type ReactiveFramework = 'next'
+
 type GeneratedFileType =
   | 'auth'
   | 'config'
