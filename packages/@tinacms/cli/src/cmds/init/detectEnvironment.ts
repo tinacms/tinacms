@@ -143,6 +143,13 @@ const detectEnvironment = async ({
         extensionOverride: 'svg',
       }
     ),
+    ['reactive-example']: await makeGeneratedFile(
+      '[filename]',
+      path.join(baseDir, usingSrc ? 'src' : 'pages', 'demo', 'blog'),
+      {
+        typescriptSuffix: 'tsx',
+      }
+    ),
   }
 
   const hasSampleContent = await fs.pathExists(sampleContentPath)

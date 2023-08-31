@@ -21,12 +21,10 @@ async function configure(
     condition,
     configName,
     generatedFile,
-    env,
   }: {
     configName: string
     condition: (answers: any) => boolean
     generatedFile: GeneratedFile
-    env: InitEnvironment
   }) => {
     const results = []
     if (generatedFile.javascriptExists) {
@@ -300,42 +298,37 @@ async function configure(
 
       // only setup TinaCMS if they don't have a tina config
       ...(skipTinaSetupCommands ? [] : tinaSetupPrompts),
-      // Only add the backend init quesitons if they are running the backend init command
+      // Only add the backend init questions if they are running the backend init command
       ...(opts.isBackend ? backendSetupCommands : []),
       // tina/config.ts
       ...generatedFileOverwritePrompt({
         condition: (_) => !env.tinaConfigExists,
         configName: 'Config',
         generatedFile: env.generatedFiles['config'],
-        env,
       }),
       // tina/database.ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!(answers.hosting === 'self-host'),
         configName: 'Database',
         generatedFile: env.generatedFiles['database'],
-        env,
       }),
       // tina/auth.ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!answers.nextAuthProvider,
         configName: 'Auth',
         generatedFile: env.generatedFiles['auth'],
-        env,
       }),
       // pages/api/gql.ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!(answers.hosting === 'self-host'),
         configName: 'GqlApiHandler',
         generatedFile: env.generatedFiles['gql-api-handler'],
-        env,
       }),
       // pages/api/auth/[...nextauth].ts
       ...generatedFileOverwritePrompt({
         condition: (answers) => !!answers.nextAuthProvider,
         configName: 'NextAuthApiHandler',
         generatedFile: env.generatedFiles['next-auth-api-handler'],
-        env,
       }),
       // pages/auth/signin.tsx
       ...generatedFileOverwritePrompt({
@@ -344,7 +337,6 @@ async function configure(
         configName: 'VercelKVCredentialsProviderSignin',
         generatedFile:
           env.generatedFiles['vercel-kv-credentials-provider-signin'],
-        env,
       }),
       // pages/auth/register.tsx
       ...generatedFileOverwritePrompt({
@@ -353,7 +345,6 @@ async function configure(
         configName: 'VercelKVCredentialsProviderRegister',
         generatedFile:
           env.generatedFiles['vercel-kv-credentials-provider-register'],
-        env,
       }),
       // pages/auth/tw.module.css
       ...generatedFileOverwritePrompt({
@@ -362,7 +353,6 @@ async function configure(
         configName: 'VercelKVCredentialsProviderTailwindCSS',
         generatedFile:
           env.generatedFiles['vercel-kv-credentials-provider-tailwindcss'],
-        env,
       }),
       // pages/api/credentials/register.ts
       ...generatedFileOverwritePrompt({
@@ -373,7 +363,12 @@ async function configure(
           env.generatedFiles[
             'vercel-kv-credentials-provider-register-api-handler'
           ],
-        env,
+      }),
+      // pages/demo/blog/[filename].tsx
+      ...generatedFileOverwritePrompt({
+        condition: (answers) => answers.framework.reactive,
+        configName: 'ReactiveExample',
+        generatedFile: env.generatedFiles['reactive-example'],
       }),
       {
         name: 'overwriteSampleContent',
