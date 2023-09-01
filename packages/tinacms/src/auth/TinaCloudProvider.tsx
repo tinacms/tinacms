@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import { ModalBuilder } from './AuthModal'
 import React, { useEffect, useState } from 'react'
 import {
@@ -59,8 +55,7 @@ export const AuthWallInner = ({
   const client: Client = cms.api.tina
   // Weather or not we are using Tina Cloud for auth
   const isTinaCloud =
-    !client.isLocalMode &&
-    !client.schema?.config?.config?.admin?.auth?.customAuth
+    !client.isLocalMode && !client.schema?.config?.config?.contentApiUrlOverride
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [errorMessage, setErrorMessage] = useState<
@@ -69,11 +64,11 @@ export const AuthWallInner = ({
   const [showChildren, setShowChildren] = useState<boolean>(false)
 
   React.useEffect(() => {
-    client
+    client.authProvider
       .isAuthenticated()
       .then((isAuthenticated) => {
         if (isAuthenticated) {
-          client
+          client.authProvider
             .isAuthorized()
             .then((isAuthorized) => {
               if (isAuthorized) {
@@ -107,7 +102,7 @@ export const AuthWallInner = ({
   }, [])
 
   const onAuthenticated = async () => {
-    if (await client.isAuthorized()) {
+    if (await client.authProvider.isAuthorized()) {
       setShowChildren(true)
       setActiveModal(null)
       cms.events.dispatch({ type: 'cms:login' })
@@ -161,7 +156,7 @@ export const AuthWallInner = ({
               name: isTinaCloud ? 'Continue to Tina Cloud' : 'Enter Edit Mode',
               action: async () => {
                 try {
-                  const token = await client.authenticate()
+                  const token = await client.authProvider.authenticate()
                   if (typeof client?.onLogin === 'function') {
                     await client?.onLogin({ token })
                   }
@@ -196,9 +191,12 @@ export const AuthWallInner = ({
                 try {
                   setActiveModal(null)
                   setErrorMessage(undefined)
-                  await client.logout()
-                  await client.onLogout()
-                  const token = await client.authenticate()
+                  const { authProvider } = client
+                  await authProvider.logout()
+                  if (typeof client?.onLogout === 'function') {
+                    await client.onLogout()
+                  }
+                  const token = await authProvider.authenticate()
                   if (typeof client?.onLogin === 'function') {
                     await client?.onLogin({ token })
                   }
@@ -321,8 +319,7 @@ export const TinaCloudProvider = (
   const client: Client = cms.api.tina
   // Weather or not we are using Tina Cloud for auth
   const isTinaCloud =
-    !client.isLocalMode &&
-    !client.schema?.config?.config?.admin?.auth?.customAuth
+    !client.isLocalMode && !client.schema?.config?.config?.contentApiUrlOverride
 
   const handleListBranches = async (): Promise<Branch[]> => {
     const branches = await cms.api.tina.listBranches({

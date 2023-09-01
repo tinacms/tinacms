@@ -217,21 +217,16 @@ async function apply({
         cmdText(
           format(
             `
-  import { createTinaNextAuthHandler } from "tinacms-next-auth/dist/tinacms";
+  import { NextAuthProvider } from "tinacms-next-auth/dist/tinacms";
   //...
   export default defineConfig({
     //...
     contentApiUrlOverride: '/api/gql',
     admin: {
-      auth: {
-        useLocalAuth: isLocal,
-        customAuth: !isLocal,
-        ...createTinaNextAuthHandler({
-          callbackUrl: '/admin/index.html',
-          isLocalDevelopment: isLocal,
-          name: '${config.nextAuthCredentialsProviderName}',
-        })
-      },
+      auth: new NextAuthProvider({
+        callbackUrl: '/admin/index.html',
+        name: '${config.nextAuthCredentialsProviderName}',
+      })
     },
   })
   `,

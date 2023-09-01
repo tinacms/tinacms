@@ -16,8 +16,9 @@ export const LogoutRedirect = () => {
   const [searchParams] = useSearchParams()
   const slug = searchParams.get('slug') || '/'
   const logout = async () => {
-    if (cms?.api?.tina?.logout) {
-      await cms.api.tina.logout()
+    if (cms?.api?.tina?.authProvider?.logout) {
+      await cms?.api?.tina?.authProvider?.logout()
+      // TODO: what to do with onLogout?
       if (cms?.api?.tina?.onLogout) {
         await cms?.api?.tina?.onLogout()
       }

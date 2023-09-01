@@ -1,0 +1,38 @@
+{
+    "name": "tinacms-clerk",
+    "version": "0.0.1",
+    "main": "dist/index.js",
+    "module": "dist/index.mjs",
+    "files": [
+      "dist"
+    ],
+    "typings": "dist/index.d.ts",
+    "license": "Apache-2.0",
+    "buildConfig": {
+      "entryPoints": [
+        "src/index.ts"
+      ]
+    },
+    "scripts": {
+      "types": "pnpm tsc",
+      "build": "tinacms-scripts build"
+    },
+    "devDependencies": {
+      "@tinacms/scripts": "workspace:*",
+      "@clerk/clerk-js": "4.56.2",
+      "tinacms": "workspace:*",
+      "typescript": "4.3.5"
+    },
+    "peerDependencies": {
+      "@clerk/clerk-js": "4.x",
+      "tinacms": "workspace:*"
+    },
+    "publishConfig": {
+      "registry": "https://registry.npmjs.org"
+    },
+    "repository": {
+      "url": "https://github.com/tinacms/tinacms.git",
+      "directory": "packages/next-auth"
+    }
+  }
+  

@@ -114,8 +114,8 @@ export const Nav = ({
                             resizingSidebar: false,
                           })
                           try {
-                            if (cms?.api?.tina?.logout) {
-                              await cms.api.tina.logout()
+                            if (cms?.api?.tina?.authProvider?.logout) {
+                              await cms.api.tina?.authProvider.logout()
                               if (cms?.api?.tina?.onLogout) {
                                 await cms?.api?.tina?.onLogout()
                               }

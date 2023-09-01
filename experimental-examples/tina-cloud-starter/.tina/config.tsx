@@ -16,9 +16,8 @@ const config = defineConfig({
     process.env.HEAD!, // Netlify branch env
   token: process.env.TINA_TOKEN!,
   admin: {
-    auth: {
-      useLocalAuth: true,
-    },
+    // auth: {
+    // },
   },
   media: {
     // If you wanted cloudinary do this

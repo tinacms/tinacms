@@ -1,34 +1,31 @@
 import { getSession, signIn, signOut } from 'next-auth/react'
+import { AbstractAuthProvider } from 'tinacms'
 
-export const createTinaNextAuthHandler = (opts: {
-  isLocalDevelopment: boolean
-  name?: string
-  callbackUrl?: string
-}) => {
-  const name = opts.name || 'Credentials'
-  const callbackUrl = opts.callbackUrl || '/admin/index.html'
-  return {
-    authenticate: async () => {
-      if (opts.isLocalDevelopment) {
-        return true
-      }
-      return signIn(name, { callbackUrl })
-    },
-    getToken: async () => {
-      return { id_token: '' }
-    },
-    getUser: async () => {
-      if (opts.isLocalDevelopment) {
-        return true
-      }
-      const session = await getSession()
-      return !!session
-    },
-    logout: async () => {
-      if (opts.isLocalDevelopment) {
-        return
-      }
-      return signOut({ callbackUrl })
-    },
+export class NextAuthProvider extends AbstractAuthProvider {
+  callbackUrl: string
+  name: string
+  constructor({
+    name = 'Credentials',
+    callbackUrl = '/admin/index.html',
+  }: {
+    name?: string
+    callbackUrl?: string
+  }) {
+    super()
+    this.name = name
+    this.callbackUrl = callbackUrl
+  }
+  public authenticate() {
+    return signIn(this.name, { callbackUrl: this.callbackUrl })
+  }
+  getToken() {
+    return { id_token: '' }
+  }
+  async getUser() {
+    const session = await getSession()
+    return !!session
+  }
+  logout() {
+    return signOut({ callbackUrl: this.callbackUrl })
   }
 }
