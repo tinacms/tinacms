@@ -452,7 +452,11 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
           }
         } else {
           const childrenIndex = namePathIndex + 1
-          const propsIndex = namePath.findIndex((value) => value === 'props')
+          // Find the props for the next item, ignoring parent 'props'
+          const propsIndex =
+            namePath
+              .slice(childrenIndex)
+              .findIndex((value) => value === 'props') + childrenIndex
           const itemName = namePath.slice(childrenIndex, propsIndex).join('.')
           const item = getIn(value, itemName)
           const props = item.props
