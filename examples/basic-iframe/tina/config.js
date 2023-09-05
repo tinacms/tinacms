@@ -189,6 +189,9 @@ export default defineConfig({
             name: 'body',
             isBody: true,
             label: 'Body',
+            parser: {
+              type: 'mdx',
+            },
             templates: [
               {
                 name: 'Tabs',
@@ -196,7 +199,7 @@ export default defineConfig({
                 fields: [
                   {
                     type: 'rich-text',
-                    name: '_value',
+                    name: 'children',
                     label: 'Content',
                     parser: {
                       type: 'markdown',
@@ -212,9 +215,29 @@ export default defineConfig({
                             label: 'Label',
                           },
                           {
-                            type: 'string',
-                            name: '_value',
+                            type: 'rich-text',
+                            name: 'children',
                             label: 'Content',
+                            // To prevent rich-text, use a custom component
+                            ui: {
+                              component: 'textarea',
+                              parse: (value) => {
+                                return {
+                                  type: 'root',
+                                  children: [
+                                    {
+                                      type: 'p',
+                                      children: [
+                                        { type: 'text', text: value || '' },
+                                      ],
+                                    },
+                                  ],
+                                }
+                              },
+                              format: (value) => {
+                                return value.children[0].children[0].text
+                              },
+                            },
                           },
                         ],
                       },
