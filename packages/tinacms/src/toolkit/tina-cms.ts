@@ -81,6 +81,7 @@ export class TinaCMS extends CMS {
   dispatch: React.Dispatch<TinaAction>
   // We always attach the tina client to the cms instance
   api: { [key: string]: any; tina?: Client } = {}
+  isSelfHosted?: boolean
 
   constructor({
     sidebar,
@@ -91,6 +92,8 @@ export class TinaCMS extends CMS {
     ...config
   }: TinaCMSConfig = {}) {
     super(config)
+
+    this.isSelfHosted = isSelfHosted
 
     this.alerts.setMap({
       'media:upload:failure': (

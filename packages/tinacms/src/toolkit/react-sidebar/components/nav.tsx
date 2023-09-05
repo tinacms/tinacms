@@ -193,7 +193,7 @@ export const Nav = ({
             </ul>
           </>
         )}
-        {!!cloudConfigs?.length && (
+        {!cms.isSelfHosted && !!cloudConfigs?.length && (
           <>
             <h4 className="uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">
               Cloud
