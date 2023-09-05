@@ -35,7 +35,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
       <div className="w-16 h-16 bg-gray-50 border-r border-gray-150 overflow-hidden flex justify-center flex-shrink-0">
         {isImage(thumbnail) ? (
           <img
-            className="object-cover w-full h-full object-center origin-center transition-all duration-150 ease-out group-hover:scale-110"
+            className="object-contain object-center w-full h-full origin-center transition-all duration-150 ease-out group-hover:scale-110"
             src={thumbnail}
             alt={item.filename}
           />
@@ -80,7 +80,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
       >
         {isImage(thumbnail) ? (
           <img
-            className="object-cover w-full h-full object-center"
+            className="object-contain object-center w-full h-full"
             src={thumbnail}
             alt={item.filename}
           />
