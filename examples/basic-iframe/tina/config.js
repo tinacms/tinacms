@@ -184,6 +184,46 @@ export default defineConfig({
             label: 'Title',
             name: 'title',
           },
+          {
+            type: 'rich-text',
+            name: 'body',
+            isBody: true,
+            label: 'Body',
+            templates: [
+              {
+                name: 'Tabs',
+                label: 'Tabs',
+                fields: [
+                  {
+                    type: 'rich-text',
+                    name: '_value',
+                    label: 'Content',
+                    parser: {
+                      type: 'markdown',
+                    },
+                    templates: [
+                      {
+                        name: 'TabItem',
+                        label: 'Tab Item',
+                        fields: [
+                          {
+                            type: 'string',
+                            name: 'label',
+                            label: 'Label',
+                          },
+                          {
+                            type: 'string',
+                            name: '_value',
+                            label: 'Content',
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
         ],
       },
       {
