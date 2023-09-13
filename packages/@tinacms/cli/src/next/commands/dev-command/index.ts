@@ -100,14 +100,26 @@ export class DevCommand extends BaseCommand {
           const schemaObject = require(configManager.generatedSchemaJSONPath)
           const lookupObject = require(configManager.generatedLookupJSONPath)
           const graphqlSchemaObject = require(configManager.generatedGraphQLJSONPath)
+
+          const tinaLockFilename = 'tina-lock.json'
+          const tinaLockContent = JSON.stringify({
+            schema: schemaObject,
+            lookup: lookupObject,
+            graphql: graphqlSchemaObject,
+          })
           await fs.writeFileSync(
-            path.join(configManager.tinaFolderPath, 'tina-lock.json'),
-            JSON.stringify({
-              schema: schemaObject,
-              lookup: lookupObject,
-              graphql: graphqlSchemaObject,
-            })
+            path.join(configManager.tinaFolderPath, tinaLockFilename),
+            tinaLockContent
           )
+
+          if (configManager.hasSeparateContentRoot()) {
+            const rootPath = await configManager.getTinaFolderPath(
+              configManager.contentRootPath
+            )
+            const filePath = path.join(rootPath, tinaLockFilename)
+            await fs.ensureFile(filePath)
+            await fs.outputFile(filePath, tinaLockContent)
+          }
         }
 
         if (!this.noWatch) {
