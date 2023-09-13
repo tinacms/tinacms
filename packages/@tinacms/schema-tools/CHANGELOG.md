@@ -1,5 +1,100 @@
 # @tinacms/schema-tools
 
+## 1.4.12
+
+### Patch Changes
+
+- 7e4de0b2a: Improvements to error handling with auth
+- 099bf5646: Make router optionally async
+- c92de7b1d: fix: Fix matches regression where matches on collections wouldn't match proper collection
+
+## 1.4.11
+
+### Patch Changes
+
+- 1563ce5b2: Update the router function to work asynchronously. This means that a user can now fetch data or perform other async operations in the router function.
+
+  Example:
+
+  ```ts
+   router: async ({ document }) => {
+    const res = await client.queries.post({
+      relativePath: document._sys.relativePath,
+    })
+    return `/posts/${res.data.slug}`
+  },
+  ```
+
+## 1.4.10
+
+### Patch Changes
+
+- 133e97d5b: Update the before submit types to not pass the finalForm form since it is contained in the TinaForm
+- f02b4368b: Adds a second parameter to the slugify function that passes the current collection and template.
+- 7991e097e: Add a `beforeSubmit` hook function on a collection.ui. This give users the ability to run a function before the form is submitted.
+
+  If the function returns values those values will be used will be submitted instead of the form values.
+
+  If the function returns a falsy value the original form values will be submitted.
+
+  ### Example
+
+  ```js
+  // tina/config.{ts.js}
+
+  export default defineConfig({
+    schema: {
+      collections: [
+        {
+          ui: {
+            // Example of beforeSubmit
+            beforeSubmit: async ({ values }) => {
+              return {
+                ...values,
+                lastUpdated: new Date().toISOString(),
+              }
+            },
+            //...
+          },
+          //...
+        },
+        //...
+      ],
+    },
+    //...
+  })
+  ```
+
+## 1.4.9
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+
+## 1.4.8
+
+### Patch Changes
+
+- 019920a35: Make clientId, branch and token optional in the config.
+
+## 1.4.7
+
+### Patch Changes
+
+- fe13b4ed9: Fix search index tokenizer regex to not treat underscores as token separators
+
+## 1.4.6
+
+### Patch Changes
+
+- a94e123b6: Fix optional config validation for search
+
+## 1.4.5
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+
 ## 1.4.4
 
 ### Patch Changes

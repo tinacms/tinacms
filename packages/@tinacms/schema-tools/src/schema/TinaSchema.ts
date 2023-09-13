@@ -1,4 +1,7 @@
-import micromatch from 'micromatch'
+// micromatch/picomatch are not compatible in the browser
+// https://github.com/micromatch/picomatch/pull/73#issuecomment-992497433
+import picomatch from 'picomatch-browser'
+
 import {
   Schema,
   Collection,
@@ -36,6 +39,14 @@ export class TinaSchema {
     // @ts-ignore
     this.schema = config
     this.walkFields(({ field, collection, path }) => {
+      // set defaults for field searchability
+      if (!('searchable' in field)) {
+        if (field.type === 'image') {
+          field.searchable = false
+        } else {
+          field.searchable = true
+        }
+      }
       if (field.type === 'rich-text') {
         if (field.parser) {
           return
@@ -43,18 +54,6 @@ export class TinaSchema {
         if (collection.format === 'mdx') {
           field.parser = { type: 'mdx' }
         } else {
-          field.templates?.forEach((template) => {
-            if (!template.match) {
-              console.warn(
-                `WARNING: Found rich-text template at ${
-                  collection.name
-                }.${path.join(
-                  '.'
-                )} with no matches property.\nVisit https://tina.io/docs/reference/types/rich-text/#custom-shortcode-syntax to learn more
-                `
-              )
-            }
-          })
           field.parser = { type: 'markdown' }
         }
       }
@@ -114,7 +113,8 @@ export class TinaSchema {
       if (collection?.match?.include || collection?.match?.exclude) {
         // if the collection has a match or exclude, we need to check if the file matches
         const matches = this.getMatches({ collection })
-        const match = micromatch([filepath], matches).length > 0
+        const match = picomatch.isMatch(filepath, matches)
+
         if (!match) {
           return false
         }
@@ -360,7 +360,7 @@ export class TinaSchema {
   public getTemplatesForCollectable = (
     collection: Collectable
   ): CollectionTemplateable => {
-    let extraFields: TinaField<true>[] = []
+    const extraFields: TinaField<true>[] = []
     if (collection?.fields) {
       const template = collection
 
@@ -476,7 +476,7 @@ export class TinaSchema {
     files: string[]
   }) {
     const matches = this.getMatches({ collection })
-    const matchedFiles = micromatch(files, matches)
+    const matchedFiles = picomatch(files, matches)
     return matchedFiles
   }
 }

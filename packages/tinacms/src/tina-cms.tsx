@@ -1,13 +1,7 @@
-/**
-
-*/
-
 import React from 'react'
 import { TinaCloudProvider } from './auth'
 
 import { LocalClient } from './internalClient/index'
-// @ts-ignore importing css is not recognized
-import styles from './styles.css'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { parseURL } from '@tinacms/schema-tools'
 import { TinaCMSProviderDefaultProps } from './types/cms'
@@ -48,10 +42,6 @@ class ErrorBoundary extends React.Component {
    * again in the new, hopefully valid, state.
    */
   render() {
-    const branchData =
-      window.localStorage &&
-      window.localStorage.getItem('tinacms-current-branch')
-    const hasBranchData = branchData && branchData.length > 0
     // @ts-ignore
     if (this.state.hasError && !this.state.pageRefresh) {
       return (
@@ -123,39 +113,6 @@ class ErrorBoundary extends React.Component {
             >
               Refresh
             </button>
-            {hasBranchData && (
-              <>
-                <p>
-                  If you're using the branch switcher, you may currently be on a
-                  "stale" branch that has been deleted or whose content is not
-                  compatible with the latest version of the site's layout. Click
-                  the button below to switch back to the default branch for this
-                  deployment.
-                </p>
-                <p>
-                  See our{' '}
-                  <a
-                    className="text-gray-600"
-                    style={{ textDecoration: 'underline' }}
-                    href="https://tina.io/docs/errors/faq/"
-                    target="_blank"
-                  >
-                    {' '}
-                    Error FAQ{' '}
-                  </a>{' '}
-                  for more information.
-                </p>
-                <button
-                  style={errorButtonStyles as any}
-                  onClick={() => {
-                    window.localStorage.removeItem('tinacms-current-branch')
-                    window.location.reload()
-                  }}
-                >
-                  Switch to default branch
-                </button>
-              </>
-            )}
           </div>
         </div>
       )
@@ -187,9 +144,7 @@ export const TinaCMSProvider2 = ({
     )
   }
   const apiURL = props?.client?.apiUrl || props?.apiURL
-
   const isLocalOverride = schema?.config?.admin?.auth?.useLocalAuth
-
   const { branch, clientId, isLocalClient } = apiURL
     ? parseURL(apiURL)
     : {
@@ -226,15 +181,17 @@ export const TinaCMSProvider2 = ({
         clientId={clientId || schema?.config?.clientId}
         tinaioConfig={props.tinaioConfig}
         isLocalClient={isLocalOverride || isLocalClient}
+        isSelfHosted={!!schema?.config?.contentApiUrlOverride}
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}
         apiUrl={apiURL}
+        staticMedia={props.staticMedia}
         // Not ideal but we need this for backwards compatibility for now. We can clean this up when we require a config.{js,ts} file
         // @ts-ignore
         schema={{ ...schema, config: { ...schema.config, ...props } }}
         tinaGraphQLVersion={props.tinaGraphQLVersion}
       >
-        <style>{styles}</style>
+        {/* <style>{styles}</style> */}
         <ErrorBoundary>{props.children}</ErrorBoundary>
       </TinaCloudProvider>
     </>

@@ -3,15 +3,11 @@
 */
 
 import React from 'react'
-// @ts-ignore importing css is not recognized
-import styles from '../../styles.css'
 
 const Layout = ({ children }: { children: any }) => {
   return (
     <>
-      <style>{styles}</style>
       <div
-        className="tina-tailwind"
         style={{
           position: 'fixed',
           top: 0,

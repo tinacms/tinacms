@@ -3,27 +3,27 @@ import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import GetDocument from '../components/GetDocument'
 import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
+import { TinaSchema, resolveForm, Collection } from '@tinacms/schema-tools'
 import { Link, useParams } from 'react-router-dom'
-import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { useWindowWidth } from '@react-hook/window-size'
 import { useCollectionFolder } from './utils'
+import { ErrorDialog } from '../components/ErrorDialog'
 
 const updateDocument = async (
   cms: TinaCMS,
   relativePath: string,
-  collection: { name: string },
+  collection: Collection,
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
   const api = new TinaAdminApi(cms)
   const params = api.schema.transformPayload(collection.name, values)
   if (await api.isAuthenticated()) {
-    await api.updateDocument(collection.name, relativePath, params)
+    await api.updateDocument(collection, relativePath, params)
   } else {
     const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`
     cms.alerts.error(authMessage)
@@ -116,7 +116,8 @@ const RenderForm = ({
 
   const form = useMemo(() => {
     return new Form({
-      id: 'update-form',
+      // id is the full document path
+      id: `${schemaCollection.path}/${relativePath}`,
       label: 'form',
       fields: formInfo.fields as any,
       initialValues: document._values,
@@ -131,6 +132,13 @@ const RenderForm = ({
           )
           cms.alerts.success('Document updated!')
         } catch (error) {
+          cms.alerts.error(() =>
+            ErrorDialog({
+              title: 'There was a problem saving your document',
+              message: 'Tina caught an error while updating the page',
+              error,
+            })
+          )
           console.error(error)
           throw new Error(
             `[${error.name}] UpdateDocument failed: ${error.message}`
@@ -164,23 +172,21 @@ const RenderForm = ({
     <>
       {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
       <div
-        className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
+        className={`pt-3 pb-4 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center ${headerPadding}`}
       >
-        <div className="max-w-form mx-auto">
-          <div className="mb-2">
-            <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
-              <Link
-                to={`/collections/${collection.name}/~${parentFolder}`}
-                className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
-              >
-                {collection.label ? collection.label : collection.name}
-              </Link>
-              <HiChevronRight className="inline-block -mt-0.5 opacity-50" />
-            </span>
-            <span className="text-xl text-gray-700 font-medium leading-tight">
-              Edit {`${filename}.${collection.format}`}
-            </span>
-          </div>
+        <div className="w-full max-w-form flex gap-1.5 justify-between items-center">
+          <Link
+            to={`/collections/${collection.name}/~${parentFolder}`}
+            className="flex-0 text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 text-sm leading-tight whitespace-nowrap truncate transition-all duration-150 ease-out"
+          >
+            {collection.label ? collection.label : collection.name}
+          </Link>
+          <span className="opacity-30 text-sm leading-tight whitespace-nowrap flex-0">
+            /
+          </span>
+          <span className="flex-1 w-full text-sm leading-tight whitespace-nowrap truncate">
+            {`${filename}.${collection.format}`}
+          </span>
           <FormStatus pristine={formIsPristine} />
         </div>
       </div>

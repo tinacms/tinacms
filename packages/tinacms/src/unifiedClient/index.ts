@@ -1,10 +1,11 @@
-/**
-
-*/
-
 import fetchPonyfill from 'fetch-ponyfill'
 
-const { fetch, Headers } = fetchPonyfill()
+const { fetch: fetchPonyfillFN, Headers: HeadersPonyfill } = fetchPonyfill()
+
+// if fetch or Headers are already defined in the global scope, use them
+const fetchDefined = typeof fetch === 'undefined' ? fetchPonyfillFN : fetch
+const HeadersDefined =
+  typeof Headers === 'undefined' ? HeadersPonyfill : Headers
 
 export const TINA_HOST = 'content.tinajs.io'
 export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
@@ -39,8 +40,8 @@ export class TinaClient<GenQueries> {
   public async request<DataType extends Record<string, any> = any>(
     args: TinaClientRequestArgs
   ): Promise<{ data: DataType; query: string }> {
-    let data: DataType = {} as DataType
-    const headers = new Headers()
+    const data: DataType = {} as DataType
+    const headers = new HeadersDefined()
     if (this.readonlyToken) {
       headers.append('X-API-KEY', this.readonlyToken)
     }
@@ -52,7 +53,7 @@ export class TinaClient<GenQueries> {
     })
     const url = args?.url || this.apiUrl
 
-    const res = await fetch(url, {
+    const res = await fetchDefined(url, {
       method: 'POST',
       headers,
       body: bodyString,

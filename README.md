@@ -1,33 +1,39 @@
-[![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint%20for%20Master/badge.svg)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-103-orange.svg?style=flat-square)](#contributors-)
+[![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms)
+[![Build, Test, Lint for Main](https://github.com/tinacms/tinacms/actions/workflows/main.yml/badge.svg?branch=main&event=push)](https://github.com/tinacms/tinacms/actions/workflows/main.yml)
+
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
+[![All Contributors](https://img.shields.io/github/all-contributors/tinacms/tinacms?color=ec4815)](#contributors)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tina.io)
+# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/c_scale,w_400/v1694189357/tina-brand-assets/logos/png/Logo_Full_-_Default.png 'Visit tinacms.org')](https://tina.io)
 
-> Tina is a Git-backed headless content management system with support for visual editing.
+[![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/tina-io/new-homepage/homepage-demo-2.gif)](https://tina.io/)
 
-[![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tina.io/)
-
-- [Community Discord](https://discord.com/invite/zumN63Ybpf)
+Tina is a headless content management system with support for visual editing and Git.
 
 ## Getting Started
 
-Checkout the [tutorial](https://tina.io/docs/setup-overview/) to get started with TinaCMS.
+Test a TinaCMS starter site locally
+
+```
+npx create-tina-app@latest
+```
+
+Or try a [demo site](https://app.tina.io/quickstart) on Tina Cloud
 
 ## Documentation
 
-Visit https://tina.io/docs/ to view the full documentation.
-
-<!-- ## Development Process
-
-See our [ROADMAP.md](https://github.com/tinacms/tinacms/blob/main/ROADMAP.md) to learn how the maintainers work. -->
+Visit [Tina's documentation](https://tina.io/docs/) to learn more.
 
 ## Questions?
 
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tinacms%20on%20GitHub%20and%20it%20is%20sweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
 [![Forum](https://shields.io/github/discussions/tinacms/tinacms)](https://github.com/tinacms/tinacms/discussions)
 
-Visit the [Github forum](https://github.com/tinacms/tinacms/discussions) or our [Community Discord](https://discord.com/invite/zumN63Ybpf) to ask questions, or look us up on on Twitter at [@tinacms](https://twitter.com/tinacms).
+Visit the [Github Discussions](https://github.com/tinacms/tinacms/discussions) or our [Community Discord](https://discord.com/invite/zumN63Ybpf) to ask questions, or look us up on on Twitter at [@tinacms](https://twitter.com/tinacms).
 
 <!-- ## Changelog
 
@@ -39,12 +45,10 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 
 ### Maintainers
 
-- Scott Byrne ([@scottpbyrne](https://twitter.com/scottpbyrne)) – Forestry.io
-- Jeff See ([@jeffsee55](https://github.com/jeffsee55)) - Forestry.io
-- Logan Anderson ([@logan_anders0n](https://twitter.com/logan_anders0n)) - Forestry.io
-- Kelly Davis ([@kldavis](https://github.com/kldavis4)) - Forestry.io
-- James O'Halloran ([@jamespohalloran](https://github.com/jamespohalloran)) - Forestry.io
-
+- Jeff See ([@jeffsee55](https://github.com/jeffsee55))
+- James O'Halloran ([@jamespohalloran](https://github.com/jamespohalloran))
+- Logan Anderson ([@logan_anders0n](https://twitter.com/logan_anders0n))
+- Kelly Davis ([@kldavis](https://github.com/kldavis4))
 
 ### All Contributors ✨
 

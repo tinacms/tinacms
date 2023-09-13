@@ -2,14 +2,17 @@ import { Command, Option } from 'clipanion'
 import fs from 'fs-extra'
 import path from 'path'
 import chokidar from 'chokidar'
-import { buildSchema, Database } from '@tinacms/graphql'
+import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { devHTML } from './html'
 import { logger, summary } from '../../../logger'
+import { dangerText, warnText } from '../../../utils/theme'
 import { createDevServer } from './server'
 import { Codegen } from '../../codegen'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { BaseCommand } from '../baseCommands'
+import { spin } from '../../../utils/spinner'
+import { SearchIndexer, LocalSearchIndexClient } from '@tinacms/search'
 
 export class DevCommand extends BaseCommand {
   static paths = [['dev'], ['server:start']]
@@ -20,6 +23,9 @@ export class DevCommand extends BaseCommand {
   })
   noWatch = Option.Boolean('--noWatch', false, {
     description: "Don't regenerate config on file changes",
+  })
+  outputSearchIndexPath = Option.String('--outputSearchIndexPath', {
+    description: 'Path to write the search index to',
   })
 
   static usage = Command.Usage({
@@ -62,72 +68,94 @@ export class DevCommand extends BaseCommand {
     const setup = async ({ firstTime }: { firstTime: boolean }) => {
       try {
         await configManager.processConfig()
+        if (firstTime) {
+          database = await createAndInitializeDatabase(
+            configManager,
+            Number(this.datalayerPort)
+          )
+        } else {
+          database.clearCache()
+        }
+
+        const { tinaSchema, graphQLSchema, lookup, queryDoc, fragDoc } =
+          await buildSchema(configManager.config)
+
+        const codegen = new Codegen({
+          isLocal: true,
+          configManager: configManager,
+          port: Number(this.port),
+          queryDoc,
+          fragDoc,
+          graphqlSchemaDoc: graphQLSchema,
+          tinaSchema,
+          lookup,
+        })
+        const apiURL = await codegen.execute()
+
+        if (!configManager.isUsingLegacyFolder) {
+          delete require.cache[configManager.generatedSchemaJSONPath]
+          delete require.cache[configManager.generatedLookupJSONPath]
+          delete require.cache[configManager.generatedGraphQLJSONPath]
+
+          const schemaObject = require(configManager.generatedSchemaJSONPath)
+          const lookupObject = require(configManager.generatedLookupJSONPath)
+          const graphqlSchemaObject = require(configManager.generatedGraphQLJSONPath)
+
+          const tinaLockFilename = 'tina-lock.json'
+          const tinaLockContent = JSON.stringify({
+            schema: schemaObject,
+            lookup: lookupObject,
+            graphql: graphqlSchemaObject,
+          })
+          await fs.writeFileSync(
+            path.join(configManager.tinaFolderPath, tinaLockFilename),
+            tinaLockContent
+          )
+
+          if (configManager.hasSeparateContentRoot()) {
+            const rootPath = await configManager.getTinaFolderPath(
+              configManager.contentRootPath
+            )
+            const filePath = path.join(rootPath, tinaLockFilename)
+            await fs.ensureFile(filePath)
+            await fs.outputFile(filePath, tinaLockContent)
+          }
+        }
+
+        if (!this.noWatch) {
+          this.watchQueries(configManager, async () => await codegen.execute())
+        }
+
+        await this.indexContentWithSpinner({
+          database,
+          graphQLSchema,
+          tinaSchema,
+          configManager,
+        })
+        if (!firstTime) {
+          logger.error('Re-index complete')
+        }
+        return { apiURL, database, graphQLSchema, tinaSchema }
       } catch (e) {
-        logger.error(e.message)
+        logger.error(dangerText(e.message))
         if (this.verbose) {
           console.error(e)
         }
         if (firstTime) {
           logger.error(
-            'Unable to start dev server, please fix your Tina config and try again'
+            warnText(
+              'Unable to start dev server, please fix your Tina config and try again'
+            )
           )
           process.exit(1)
+        } else {
+          logger.error(warnText('Dev server has not been restarted'))
         }
       }
-      if (firstTime) {
-        database = await createAndInitializeDatabase(
-          configManager,
-          Number(this.datalayerPort)
-        )
-      } else {
-        database.clearCache()
-      }
-
-      const { tinaSchema, graphQLSchema, lookup, queryDoc, fragDoc } =
-        await buildSchema(configManager.config)
-
-      const codegen = new Codegen({
-        isLocal: true,
-        configManager: configManager,
-        port: Number(this.port),
-        queryDoc,
-        fragDoc,
-        graphqlSchemaDoc: graphQLSchema,
-        tinaSchema,
-        lookup,
-      })
-      const apiURL = await codegen.execute()
-
-      if (!configManager.isUsingLegacyFolder) {
-        delete require.cache[configManager.generatedSchemaJSONPath]
-        delete require.cache[configManager.generatedLookupJSONPath]
-        delete require.cache[configManager.generatedGraphQLJSONPath]
-
-        const schemaObject = require(configManager.generatedSchemaJSONPath)
-        const lookupObject = require(configManager.generatedLookupJSONPath)
-        const graphqlSchemaObject = require(configManager.generatedGraphQLJSONPath)
-        await fs.writeFileSync(
-          path.join(configManager.tinaFolderPath, 'tina-lock.json'),
-          JSON.stringify({
-            schema: schemaObject,
-            lookup: lookupObject,
-            graphql: graphqlSchemaObject,
-          })
-        )
-      }
-
-      if (!this.noWatch) {
-        this.watchQueries(configManager, async () => await codegen.execute())
-      }
-
-      await this.indexContentWithSpinner({
-        database,
-        graphQLSchema,
-        tinaSchema,
-      })
-      return { apiURL, database }
     }
-    const { apiURL } = await setup({ firstTime: true })
+    const { apiURL, graphQLSchema, tinaSchema } = await setup({
+      firstTime: true,
+    })
 
     await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port))
     // Add the gitignore so the index.html and assets are committed to git
@@ -135,37 +163,60 @@ export class DevCommand extends BaseCommand {
       configManager.outputGitignorePath,
       'index.html\nassets/'
     )
+    const searchIndexClient = new LocalSearchIndexClient({
+      stopwordLanguages: configManager.config.search?.tina?.stopwordLanguages,
+      tokenSplitRegex: configManager.config.search?.tina?.tokenSplitRegex,
+    })
+    await searchIndexClient.onStartIndexing()
+
     const server = await createDevServer(
       configManager,
       database,
+      searchIndexClient.searchIndex,
       apiURL,
       this.noWatch
     )
     await server.listen(Number(this.port))
+    const searchIndexer = new SearchIndexer({
+      batchSize: configManager.config.search?.indexBatchSize || 100,
+      bridge: new FilesystemBridge(
+        configManager.rootPath,
+        configManager.contentRootPath
+      ),
+      schema: tinaSchema,
+      client: searchIndexClient,
+      textIndexLength:
+        configManager.config.search?.maxSearchIndexFieldLength || 100,
+    })
 
-    if (!this.noWatch) {
-      this.watchContentFiles(configManager, database)
+    if (configManager.config.search) {
+      await spin({
+        waitFor: async () => {
+          await searchIndexer.indexAllContent()
+        },
+        text: 'Building search index',
+      })
+
+      if (this.outputSearchIndexPath) {
+        await searchIndexClient.export(this.outputSearchIndexPath)
+      }
     }
 
-    server.watcher.on('change', async (changedPath) => {
-      if (changedPath.includes('__generated__')) {
-        return
-      }
-      if (changedPath.includes('@tinacms/app')) {
-        return
-      }
-      if (changedPath.includes('tinacms/dist')) {
-        return
-      }
-      try {
-        // await server.reloadModule
-        logger.info('Tina config updated')
+    if (!this.noWatch) {
+      this.watchContentFiles(
+        configManager,
+        database,
+        configManager.config.search && searchIndexer
+      )
+      chokidar.watch(configManager.watchList).on('change', async () => {
+        logger.info(`Tina config change detected, rebuilding`)
         await setup({ firstTime: false })
-        // await server.restart()
-      } catch (e) {
-        logger.error(e.message)
-      }
-    })
+        // The setup process results in an update to the prebuild file
+        // But Vite doesn't reload when it's changed for some reason
+        // So we're triggering the reload ourselves
+        server.ws.send({ type: 'full-reload', path: '*' })
+      })
+    }
 
     const subItems = []
 
@@ -238,7 +289,11 @@ export class DevCommand extends BaseCommand {
     await this.startSubCommand()
   }
 
-  watchContentFiles(configManager: ConfigManager, database: Database) {
+  watchContentFiles(
+    configManager: ConfigManager,
+    database: Database,
+    searchIndexer?: SearchIndexer
+  ) {
     const collectionContentFiles = []
     configManager.config.schema.collections.forEach((collection) => {
       const collectionGlob = `${path.join(
@@ -265,17 +320,32 @@ export class DevCommand extends BaseCommand {
           return
         }
         const pathFromRoot = configManager.printContentRelativePath(addedFile)
-        database.indexContentByPaths([pathFromRoot]).catch(console.error)
+        await database.indexContentByPaths([pathFromRoot]).catch(console.error)
+        if (searchIndexer) {
+          await searchIndexer
+            .indexContentByPaths([pathFromRoot])
+            .catch(console.error)
+        }
       })
       .on('change', async (changedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(changedFile)
         // Optionally we can reload the page when this happens
         // server.ws.send({ type: 'full-reload', path: '*' })
-        database.indexContentByPaths([pathFromRoot]).catch(console.error)
+        await database.indexContentByPaths([pathFromRoot]).catch(console.error)
+        if (searchIndexer) {
+          await searchIndexer
+            .indexContentByPaths([pathFromRoot])
+            .catch(console.error)
+        }
       })
       .on('unlink', async (removedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(removedFile)
-        database.deleteContentByPaths([pathFromRoot]).catch(console.error)
+        await database.deleteContentByPaths([pathFromRoot]).catch(console.error)
+        if (searchIndexer) {
+          await searchIndexer
+            .deleteIndexContent([pathFromRoot])
+            .catch(console.error)
+        }
       })
   }
   watchQueries(configManager: ConfigManager, callback: () => Promise<string>) {

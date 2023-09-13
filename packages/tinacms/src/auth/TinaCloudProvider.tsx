@@ -3,7 +3,7 @@
 */
 
 import { ModalBuilder } from './AuthModal'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   TinaCMS,
   TinaProvider,
@@ -14,15 +14,21 @@ import {
   useLocalStorage,
   DummyMediaStore,
   TinaMediaStore,
+  StaticMedia,
 } from '@tinacms/toolkit'
 
-import { Client, TinaIOConfig } from '../internalClient'
+import {
+  Client,
+  LocalSearchClient,
+  TinaCMSSearchClient,
+  TinaIOConfig,
+} from '../internalClient'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
 import { setEditing } from '@tinacms/sharedctx'
 import { TinaAdminApi } from '../admin/api'
 
-type ModalNames = null | 'authenticate'
+type ModalNames = null | 'authenticate' | 'error'
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -57,28 +63,60 @@ export const AuthWallInner = ({
     !client.schema?.config?.config?.admin?.auth?.customAuth
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
+  const [errorMessage, setErrorMessage] = useState<
+    { title: string; message: string } | undefined
+  >()
   const [showChildren, setShowChildren] = useState<boolean>(false)
 
   React.useEffect(() => {
-    client.isAuthenticated().then((isAuthenticated) => {
-      if (isAuthenticated) {
-        setShowChildren(true)
-        cms.enable()
-      } else {
-        // FIXME: might be some sort of race-condition when loading styles
-        sleep(500).then(() => {
-          setActiveModal('authenticate')
-        })
-      }
-    })
+    client
+      .isAuthenticated()
+      .then((isAuthenticated) => {
+        if (isAuthenticated) {
+          client
+            .isAuthorized()
+            .then((isAuthorized) => {
+              if (isAuthorized) {
+                setShowChildren(true)
+                cms.enable()
+              } else {
+                setErrorMessage({
+                  title: 'Access Denied:',
+                  message: 'Not Authorized To Edit',
+                })
+                setActiveModal('error')
+              }
+            })
+            .catch((e) => {
+              console.error(e)
+              setErrorMessage({ title: 'Unexpected Error:', message: `${e}` })
+              setActiveModal('error')
+            })
+        } else {
+          // FIXME: might be some sort of race-condition when loading styles
+          sleep(500).then(() => {
+            setActiveModal('authenticate')
+          })
+        }
+      })
+      .catch((e) => {
+        console.error(e)
+        setErrorMessage({ title: 'Unexpected Error:', message: `${e}` })
+        setActiveModal('error')
+      })
   }, [])
 
-  const onAuthSuccess = async () => {
-    if (await client.isAuthenticated()) {
+  const onAuthenticated = async () => {
+    if (await client.isAuthorized()) {
       setShowChildren(true)
       setActiveModal(null)
+      cms.events.dispatch({ type: 'cms:login' })
     } else {
-      throw new Error('No access to repo') // TODO - display modal here
+      setErrorMessage({
+        title: 'Access Denied:',
+        message: 'Not Authorized To Edit',
+      })
+      setActiveModal('error')
     }
   }
 
@@ -99,7 +137,7 @@ export const AuthWallInner = ({
           }
           message={
             isTinaCloud
-              ? 'To save edits, Tina Cloud authorization is required. On save, changes will get commited using your account.'
+              ? 'To save edits, Tina Cloud authorization is required. On save, changes will get committed using your account.'
               : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
           }
           close={close}
@@ -122,11 +160,57 @@ export const AuthWallInner = ({
             {
               name: isTinaCloud ? 'Continue to Tina Cloud' : 'Enter Edit Mode',
               action: async () => {
-                const token = await client.authenticate()
-                if (typeof client?.onLogin === 'function') {
-                  await client?.onLogin({ token })
+                try {
+                  const token = await client.authenticate()
+                  if (typeof client?.onLogin === 'function') {
+                    await client?.onLogin({ token })
+                  }
+                  return onAuthenticated()
+                } catch (e) {
+                  console.error(e)
+                  setActiveModal('error')
+                  setErrorMessage({
+                    title: 'Unexpected Error:',
+                    message: `${e}`,
+                  })
                 }
-                onAuthSuccess()
+              },
+              primary: true,
+            },
+          ]}
+        />
+      )}
+      {activeModal === 'error' && errorMessage && (
+        <ModalBuilder
+          title={
+            isTinaCloud ? 'Tina Cloud Authorization' : 'Enter into edit mode'
+          }
+          message={errorMessage.title}
+          error={errorMessage.message}
+          close={close}
+          actions={[
+            ...otherModalActions,
+            {
+              name: 'Retry',
+              action: async () => {
+                try {
+                  setActiveModal(null)
+                  setErrorMessage(undefined)
+                  await client.logout()
+                  await client.onLogout()
+                  const token = await client.authenticate()
+                  if (typeof client?.onLogin === 'function') {
+                    await client?.onLogin({ token })
+                  }
+                  return onAuthenticated()
+                } catch (e) {
+                  console.error(e)
+                  setActiveModal('error')
+                  setErrorMessage({
+                    title: 'Unexpected Error:',
+                    message: `${e}`,
+                  })
+                }
               },
               primary: true,
             },
@@ -145,7 +229,10 @@ export const AuthWallInner = ({
  */
 export const TinaCloudProvider = (
   props: TinaCloudAuthWallProps &
-    CreateClientProps & { cmsCallback?: (cms: TinaCMS) => TinaCMS }
+    CreateClientProps & {
+      cmsCallback?: (cms: TinaCMS) => TinaCMS
+      staticMedia: StaticMedia
+    }
 ) => {
   const baseBranch = props.branch || 'main'
   const [currentBranch, setCurrentBranch] = useLocalStorage(
@@ -160,6 +247,7 @@ export const TinaCloudProvider = (
         enabled: true,
         sidebar: true,
         isLocalClient: props.isLocalClient,
+        isSelfHosted: props.isSelfHosted,
         clientId: props.clientId,
       }),
     [props.cms]
@@ -170,20 +258,43 @@ export const TinaCloudProvider = (
     cms.api.tina.setBranch(currentBranch)
   }
 
+  useEffect(() => {
+    let searchClient
+    // if local and search is configured then we always use the local client
+    // if not local, then determine if search is enabled and use the client from the config
+    if (props.isLocalClient) {
+      searchClient = new LocalSearchClient(cms.api.tina)
+    } else {
+      const hasTinaSearch = Boolean(props.schema.config?.search?.tina)
+      if (hasTinaSearch) {
+        searchClient = new TinaCMSSearchClient(
+          cms.api.tina,
+          props.schema.config?.search?.tina
+        )
+      } else {
+        searchClient = props.schema.config?.search?.searchClient
+      }
+    }
+
+    if (searchClient) {
+      cms.registerApi('search', searchClient)
+    }
+  }, [props])
+
   if (!cms.api.admin) {
     cms.registerApi('admin', new TinaAdminApi(cms))
   }
 
-  const setupMedia = async () => {
+  const setupMedia = async (staticMedia: StaticMedia) => {
     const hasTinaMedia = Boolean(props.schema.config?.media?.tina)
 
-    /* 
+    /*
      Has tina media (set up in the schema)
     */
     if (hasTinaMedia) {
-      cms.media.store = new TinaMediaStore(cms)
+      cms.media.store = new TinaMediaStore(cms, staticMedia)
     } else if (
-      /* 
+      /*
      Has tina custom media (set up in the schema or define schema)
       */
       props.schema.config?.media?.loadCustomStore ||
@@ -207,14 +318,21 @@ export const TinaCloudProvider = (
       cms.media.store = new DummyMediaStore()
     }
   }
+  const client: Client = cms.api.tina
+  // Weather or not we are using Tina Cloud for auth
+  const isTinaCloud =
+    !client.isLocalMode &&
+    !client.schema?.config?.config?.admin?.auth?.customAuth
 
   const handleListBranches = async (): Promise<Branch[]> => {
-    const { owner, repo } = props
-    const branches = await cms.api.tina.listBranches({ owner, repo })
+    const branches = await cms.api.tina.listBranches({
+      includeIndexStatus: true,
+    })
 
     if (!Array.isArray(branches)) {
       return []
     }
+    // @ts-ignore
     return branches
   }
   const handleCreateBranch = async (data) => {
@@ -223,7 +341,7 @@ export const TinaCloudProvider = (
     return newBranch
   }
 
-  setupMedia()
+  setupMedia(props.staticMedia)
 
   const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
     cms.flags.get('branch-switcher')
@@ -258,6 +376,28 @@ export const TinaCloudProvider = (
       props.cmsCallback(cms)
     }
   }, [])
+
+  React.useEffect(() => {
+    const setupEditorialWorkflow = () => {
+      client.getProject().then((project) => {
+        if (project?.features?.includes('editorial-workflow')) {
+          cms.flags.set('branch-switcher', true)
+          client.usingEditorialWorkflow = true
+          client.protectedBranches = project.protectedBranches
+        }
+      })
+    }
+    if (isTinaCloud) {
+      setupEditorialWorkflow()
+    }
+    // If the user logs in after the cms is initialized
+    const unsubscribe = cms.events.subscribe('cms:login', () => {
+      if (isTinaCloud) {
+        setupEditorialWorkflow()
+      }
+    })
+    return unsubscribe
+  }, [isTinaCloud, cms])
 
   return (
     <BranchDataProvider

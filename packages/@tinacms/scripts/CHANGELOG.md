@@ -1,5 +1,21 @@
 # Change Log
 
+## 1.1.2
+
+### Patch Changes
+
+- 121bd9fc4: Absorb @tinacms/toolkit into tinacms
+
+  fix: Use clean page-sizes on media manager (to make pagination more obvious)
+
+  Fix issue with uploading media in a folder with tina cloud
+
+## 1.1.1
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+
 ## 1.1.0
 
 ### Minor Changes

@@ -14,6 +14,13 @@ import {
 
 import gql from 'graphql-tag'
 import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
+import { TinaCloudProject } from './types'
+import {
+  optionsToSearchIndexOptions,
+  parseSearchIndexResponse,
+  queryToSearchIndexQuery,
+  SearchClient,
+} from '@tinacms/search/dist/index-client'
 
 export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
 
@@ -43,8 +50,11 @@ const parseRefForBranchName = (ref: string) => {
 const ListBranchResponse = z
   .object({
     name: z.string(),
+    protected: z.boolean().optional().default(false),
+    githubPullRequestUrl: z.string().optional(),
   })
   .array()
+  .nonempty()
 
 const IndexStatusResponse = z.object({
   status: z
@@ -182,14 +192,15 @@ export class Client {
   schema?: TinaSchema
   clientId: string
   contentApiBase: string
-  query: string
   tinaGraphQLVersion: string
   setToken: (_token: TokenObject) => void
   private getToken: () => Promise<TokenObject>
-  private token: string // used with memory storage
-  private branch: string
+  token: string // used with memory storage
+  branch: string
   private options: ServerOptions
-  events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
+  events = new EventBus() // automatically hooked into global event bus when attached via cms.
+  protectedBranches: string[] = []
+  usingEditorialWorkflow: boolean = false
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.tinaGraphQLVersion = options.tinaGraphQLVersion
@@ -203,6 +214,9 @@ export class Client {
     }
     if (options.schema?.config?.admin?.auth?.authenticate) {
       this.authenticate = options.schema?.config?.admin?.auth?.authenticate
+    }
+    if (options.schema?.config?.admin?.auth?.authorize) {
+      this.authorize = options.schema?.config?.admin?.auth?.authorize
     }
     if (options.schema) {
       const enrichedSchema = new TinaSchema({
@@ -280,6 +294,10 @@ export class Client {
     return false
   }
 
+  public get isCustomContentApi() {
+    return !!this.options.customContentApiUrl
+  }
+
   setBranch(branchName: string) {
     const encodedBranch = encodeURIComponent(branchName)
     this.branch = encodedBranch
@@ -297,6 +315,10 @@ export class Client {
     this.contentApiUrl =
       this.options.customContentApiUrl ||
       `${this.contentApiBase}/${this.tinaGraphQLVersion}/content/${this.options.clientId}/github/${encodedBranch}`
+  }
+
+  getBranch() {
+    return this.branch
   }
 
   addPendingContent = async (props) => {
@@ -328,7 +350,8 @@ mutation addPendingDocumentMutation(
       variables: props,
     })
 
-    return result
+    // TODO: fix this type
+    return result as any
   }
 
   getSchema = async () => {
@@ -407,9 +430,11 @@ mutation addPendingDocumentMutation(
       if (resBody.message) {
         errorMessage = `${errorMessage}, Response: ${resBody.message}`
       }
-      errorMessage = `${errorMessage}, Please check that the following information is correct: \n\tclientId: ${this.options.clientId}\n\tbranch: ${this.branch}.`
-      if (this.branch !== 'main') {
-        errorMessage = `${errorMessage}\n\tNote: This error can occur if the branch does not exist on GitHub or on Tina Cloud`
+      if (!this.isCustomContentApi) {
+        errorMessage = `${errorMessage}, Please check that the following information is correct: \n\tclientId: ${this.options.clientId}\n\tbranch: ${this.branch}.`
+        if (this.branch !== 'main') {
+          errorMessage = `${errorMessage}\n\tNote: This error can occur if the branch does not exist on GitHub or on Tina Cloud`
+        }
       }
 
       throw new Error(errorMessage)
@@ -427,13 +452,8 @@ mutation addPendingDocumentMutation(
     return json.data as ReturnType
   }
 
-  async syncTinaMedia(): Promise<{ assetsSyncing: string[] }> {
-    const res = await this.fetchWithToken(
-      `${this.contentApiBase}/assets/${this.clientId}/sync/${this.branch}`,
-      { method: 'POST' }
-    )
-    const jsonRes = await res.json()
-    return jsonRes
+  get appDashboardLink() {
+    return `${this.frontendUrl}/projects/${this.clientId}`
   }
 
   async checkSyncStatus({
@@ -453,6 +473,53 @@ mutation addPendingDocumentMutation(
     )
     const jsonRes = await res.json()
     return jsonRes
+  }
+
+  async getProject() {
+    const res = await this.fetchWithToken(
+      `${this.identityApiUrl}/v2/apps/${this.clientId}`,
+      {
+        method: 'GET',
+      }
+    )
+    const val = await res.json()
+    return val as TinaCloudProject
+  }
+
+  async createPullRequest({
+    baseBranch,
+    branch,
+    title,
+  }: {
+    baseBranch: string
+    branch: string
+    title: string
+  }) {
+    const url = `${this.contentApiBase}/github/${this.clientId}/create_pull_request`
+
+    try {
+      const res = await this.fetchWithToken(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          baseBranch,
+          branch,
+          title,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!res.ok) {
+        throw new Error(
+          `There was an error creating a new branch. ${res.statusText}`
+        )
+      }
+      const values = await res.json()
+      return values
+    } catch (error) {
+      console.error('There was an error creating a new branch.', error)
+      throw error
+    }
   }
 
   async fetchEvents(
@@ -538,8 +605,8 @@ mutation addPendingDocumentMutation(
     return Promise.resolve({ access_token, id_token, refresh_token })
   }
 
-  async isAuthorized(): Promise<boolean> {
-    return this.isAuthenticated() // TODO - check access
+  async isAuthorized(context?: any): Promise<boolean> {
+    return !!(await this.authorize(context))
   }
 
   async isAuthenticated(): Promise<boolean> {
@@ -555,6 +622,12 @@ mutation addPendingDocumentMutation(
     this.setToken(token)
     return token
   }
+
+  async authorize(context?: any): Promise<any> {
+    // by default, the existence of a token is enough to be authorized
+    return this.getToken()
+  }
+
   /**
    * Wraps the normal fetch function with same API but adds the authorization header token.
    *
@@ -633,6 +706,7 @@ mutation addPendingDocumentMutation(
   }
 
   waitForIndexStatus({ ref }: { ref: string }) {
+    let unknownCount = 0
     try {
       const [prom, cancel] = asyncPoll(
         async (): Promise<AsyncData<any>> => {
@@ -646,6 +720,14 @@ mutation addPendingDocumentMutation(
                 data: result,
               })
             } else {
+              if (result.status === 'unknown') {
+                unknownCount++
+                if (unknownCount > 5) {
+                  throw new Error(
+                    'AsyncPoller: status unknown for too long, please check indexing progress the Tina Cloud dashboard'
+                  )
+                }
+              }
               return Promise.resolve({
                 done: false,
               })
@@ -663,9 +745,7 @@ mutation addPendingDocumentMutation(
     } catch (error) {
       if (error.message === 'AsyncPoller: reached timeout') {
         console.warn(error)
-        return {
-          status: 'timeout',
-        }
+        return [Promise.resolve({ status: 'timeout' }), () => {}]
       }
       throw error
     }
@@ -679,14 +759,17 @@ mutation addPendingDocumentMutation(
     return parsedResult
   }
 
-  async listBranches() {
+  async listBranches(args?: { includeIndexStatus?: boolean }) {
     try {
       const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
       const res = await this.fetchWithToken(url, {
         method: 'GET',
       })
       const branches = await res.json()
-      const parsedBranches = ListBranchResponse.parse(branches)
+      const parsedBranches = await ListBranchResponse.parseAsync(branches)
+      if (args?.includeIndexStatus === false) {
+        return parsedBranches
+      }
       const indexStatusPromises = parsedBranches.map(async (branch) => {
         const indexStatus = await this.getIndexStatus({ ref: branch.name })
         return {
@@ -694,6 +777,9 @@ mutation addPendingDocumentMutation(
           indexStatus,
         }
       })
+      this.protectedBranches = parsedBranches
+        .filter((x) => x.protected)
+        .map((x) => x.name)
       const indexStatus = await Promise.all(indexStatusPromises)
 
       return indexStatus
@@ -701,6 +787,12 @@ mutation addPendingDocumentMutation(
       console.error('There was an error listing branches.', error)
       throw error
     }
+  }
+  usingProtectedBranch() {
+    return (
+      this.usingEditorialWorkflow &&
+      this.protectedBranches?.includes(this.branch)
+    )
   }
   async createBranch({ baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`
@@ -716,10 +808,16 @@ mutation addPendingDocumentMutation(
           'Content-Type': 'application/json',
         },
       })
-      return await res.json().then((r) => parseRefForBranchName(r.data.ref))
+      if (!res.ok) {
+        console.error('There was an error creating a new branch.')
+        const error = await res.json()
+        throw new Error(error?.message)
+      }
+      const values = await res.json()
+      return parseRefForBranchName(values.data.ref)
     } catch (error) {
       console.error('There was an error creating a new branch.', error)
-      return null
+      throw error
     }
   }
 }
@@ -764,5 +862,111 @@ export class LocalClient extends Client {
 
   async getUser(): Promise<boolean> {
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
+  }
+}
+
+export class TinaCMSSearchClient implements SearchClient {
+  constructor(
+    private client: Client,
+    private tinaSearchConfig?: { stopwordLanguages?: string[] }
+  ) {}
+  async query(
+    query: string,
+    options?: {
+      limit?: number
+      cursor?: string
+    }
+  ): Promise<{
+    results: any[]
+    nextCursor: string | null
+    total: number
+    prevCursor: string | null
+  }> {
+    const q = queryToSearchIndexQuery(
+      query,
+      this.tinaSearchConfig?.stopwordLanguages
+    )
+    const opt = optionsToSearchIndexOptions(options)
+    const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
+    const res = await this.client.fetchWithToken(
+      `${this.client.contentApiBase}/searchIndex/${
+        this.client.clientId
+      }/${this.client.getBranch()}?q=${JSON.stringify(q)}${optionsParam}`
+    )
+    return parseSearchIndexResponse(await res.json(), options)
+  }
+
+  async del(ids: string[]): Promise<any> {
+    const res = await this.client.fetchWithToken(
+      `${this.client.contentApiBase}/searchIndex/${
+        this.client.clientId
+      }/${this.client.getBranch()}?ids=${ids.join(',')}`,
+      {
+        method: 'DELETE',
+      }
+    )
+    if (res.status !== 200) {
+      throw new Error('Failed to update search index')
+    }
+  }
+
+  async put(docs: any[]): Promise<any> {
+    // TODO should only be called if search is enabled and supportsClientSideIndexing is true
+    const res = await this.client.fetchWithToken(
+      `${this.client.contentApiBase}/searchIndex/${
+        this.client.clientId
+      }/${this.client.getBranch()}`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ docs }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    if (res.status !== 200) {
+      throw new Error('Failed to update search index')
+    }
+  }
+
+  supportsClientSideIndexing(): boolean {
+    return true
+  }
+}
+
+export class LocalSearchClient implements SearchClient {
+  constructor(private client: Client) {}
+  async query(
+    query: string,
+    options?: {
+      limit?: number
+      cursor?: string
+    }
+  ): Promise<{
+    results: any[]
+    nextCursor: string | null
+    total: number
+    prevCursor: string | null
+  }> {
+    const q = queryToSearchIndexQuery(query)
+    const opt = optionsToSearchIndexOptions(options)
+    const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
+    const res = await this.client.fetchWithToken(
+      `http://localhost:4001/searchIndex?q=${JSON.stringify(q)}${optionsParam}`
+    )
+    return parseSearchIndexResponse(await res.json(), options)
+  }
+
+  del(ids: string[]): Promise<any> {
+    return Promise.resolve(undefined)
+  }
+
+  put(docs: any[]): Promise<any> {
+    return Promise.resolve(undefined)
+  }
+
+  supportsClientSideIndexing(): boolean {
+    // chokidar will keep index updated
+    return false
   }
 }

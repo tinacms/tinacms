@@ -1,5 +1,161 @@
 # @tinacms/app
 
+## 1.2.27
+
+### Patch Changes
+
+- 7e4de0b2a: Improvements to error handling with auth
+- 1144af060: Improve error messaging when onPut / onDelete hooks throw errors
+- Updated dependencies [7e4de0b2a]
+- Updated dependencies [1144af060]
+  - tinacms@1.5.20
+  - @tinacms/mdx@1.3.18
+
+## 1.2.26
+
+### Patch Changes
+
+- Updated dependencies [1563ce5b2]
+- Updated dependencies [0e94b2725]
+- Updated dependencies [e83ba8855]
+  - tinacms@1.5.19
+  - @tinacms/mdx@1.3.17
+
+## 1.2.25
+
+### Patch Changes
+
+- 121bd9fc4: Absorb @tinacms/toolkit into tinacms
+
+  fix: Use clean page-sizes on media manager (to make pagination more obvious)
+
+  Fix issue with uploading media in a folder with tina cloud
+
+- Updated dependencies [9c27087fb]
+- Updated dependencies [65d0a701f]
+- Updated dependencies [133e97d5b]
+- Updated dependencies [f02b4368b]
+- Updated dependencies [37cf8bd40]
+- Updated dependencies [8aae69436]
+- Updated dependencies [a78c81f14]
+- Updated dependencies [ad22e0950]
+- Updated dependencies [8db979b9f]
+- Updated dependencies [7991e097e]
+- Updated dependencies [30c7eac58]
+- Updated dependencies [121bd9fc4]
+  - tinacms@1.5.18
+  - @tinacms/mdx@1.3.16
+
+## 1.2.24
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [bc812441b]
+  - @tinacms/toolkit@1.7.13
+  - @tinacms/mdx@1.3.15
+  - tinacms@1.5.17
+
+## 1.2.23
+
+### Patch Changes
+
+- Updated dependencies [1889422b0]
+  - @tinacms/toolkit@1.7.12
+  - tinacms@1.5.16
+
+## 1.2.22
+
+### Patch Changes
+
+- @tinacms/mdx@1.3.14
+- tinacms@1.5.15
+- @tinacms/toolkit@1.7.11
+
+## 1.2.21
+
+### Patch Changes
+
+- Updated dependencies [f1e8828c8]
+- Updated dependencies [304e23318]
+- Updated dependencies [a5d986477]
+  - @tinacms/toolkit@1.7.10
+  - tinacms@1.5.14
+
+## 1.2.20
+
+### Patch Changes
+
+- Updated dependencies [d73d03f8f]
+- Updated dependencies [745e30708]
+- Updated dependencies [495108725]
+- Updated dependencies [b0eba5d49]
+- Updated dependencies [7d6e6ff3d]
+- Updated dependencies [808d5cc6c]
+  - @tinacms/toolkit@1.7.9
+  - tinacms@1.5.13
+
+## 1.2.19
+
+### Patch Changes
+
+- Updated dependencies [f6efd498e]
+  - @tinacms/toolkit@1.7.8
+  - tinacms@1.5.12
+
+## 1.2.18
+
+### Patch Changes
+
+- 1176d569a: Ensure tinaField links to references land on the select field instead of the referenced form
+- Updated dependencies [c7fa6ddc0]
+- Updated dependencies [8710dec4b]
+- Updated dependencies [6e192cc38]
+- Updated dependencies [5aaae9902]
+  - tinacms@1.5.11
+  - @tinacms/toolkit@1.7.7
+  - @tinacms/mdx@1.3.13
+
+## 1.2.17
+
+### Patch Changes
+
+- @tinacms/toolkit@1.7.6
+- tinacms@1.5.10
+- @tinacms/mdx@1.3.12
+
+## 1.2.16
+
+### Patch Changes
+
+- Updated dependencies [c385b5615]
+- Updated dependencies [d2ddfa5a6]
+- Updated dependencies [9489d5d47]
+  - @tinacms/toolkit@1.7.5
+  - tinacms@1.5.9
+  - @tinacms/mdx@1.3.11
+
+## 1.2.15
+
+### Patch Changes
+
+- Updated dependencies [cc621f665]
+  - @tinacms/toolkit@1.7.4
+  - tinacms@1.5.8
+
+## 1.2.14
+
+### Patch Changes
+
+- 52b1762e2: Prevent unhandled promise rejection when not able to determine collection for file
+- 16b0c8073: Fix issue where activeField search param would be called twice, resulting in the incorrect form being focused.
+- Updated dependencies [70c74bb55]
+- Updated dependencies [385c8a865]
+- Updated dependencies [ccd928bc3]
+- Updated dependencies [1aea2c6a4]
+  - @tinacms/toolkit@1.7.3
+  - tinacms@1.5.7
+
 ## 1.2.13
 
 ### Patch Changes

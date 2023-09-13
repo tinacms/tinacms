@@ -87,13 +87,13 @@ export const waitForDB = async (
         // Index Failed
       } else if (status === STATUS_FAILED) {
         throw new IndexFailedError(
-          `Attempting to index but responded with status 'failed', To retry the indexing process, click “Reset Repository Cache” in tina cloud advance settings.  ${error}`
+          `Attempting to index but responded with status 'failed'. To retry the indexing process, click the "Reindex" button for '${branch}' in the Tina Cloud configuration for this project.  ${error}`
         )
 
         // Index Unknown
       } else {
         throw new IndexFailedError(
-          `Attempting to index but responded with status 'unknown', To retry the indexing process, click “Reset Repository Cache” in tina cloud advance settings.  ${error}`
+          `Attempting to index but responded with status 'unknown'. To retry the indexing process, click the "Reindex" button for '${branch}' in the Tina Cloud configuration for this project.  ${error}`
         )
       }
     } catch (e) {

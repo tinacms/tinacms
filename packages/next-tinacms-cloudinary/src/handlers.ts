@@ -3,7 +3,7 @@
 */
 
 import { v2 as cloudinary } from 'cloudinary'
-import type { Media, MediaListOptions } from '@tinacms/toolkit'
+import type { Media, MediaListOptions } from 'tinacms'
 import path from 'path'
 import { NextApiRequest, NextApiResponse } from 'next'
 import multer from 'multer'
@@ -206,14 +206,14 @@ function getCloudinaryToTinaFunc(opts: CloudinaryOptions) {
       directory,
       src: file[sel],
       thumbnails: {
-        '75x75': transformCloudinaryImage(file[sel], 'w_75,h_75,c_fill,q_auto'),
+        '75x75': transformCloudinaryImage(file[sel], 'w_75,h_75,c_fit,q_auto'),
         '400x400': transformCloudinaryImage(
           file[sel],
-          'w_400,h_400,c_fill,q_auto'
+          'w_400,h_400,c_fit,q_auto'
         ),
         '1000x1000': transformCloudinaryImage(
           file[sel],
-          'w_1000,h_1000,c_fill,q_auto'
+          'w_1000,h_1000,c_fit,q_auto'
         ),
       },
       type: 'file',

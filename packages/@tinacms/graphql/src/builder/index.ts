@@ -3,7 +3,7 @@
 */
 
 import { LookupMapType } from '../database'
-import { astBuilder, NAMER } from '../ast-builder'
+import { astBuilder, NAMER, SysFieldDefinition } from '../ast-builder'
 import { sequential } from '../util'
 import { staticDefinitions } from './static-definitions'
 
@@ -601,6 +601,7 @@ export class Builder {
               selectionSet: {
                 kind: 'SelectionSet',
                 selections: [
+                  SysFieldDefinition,
                   {
                     kind: 'Field',
                     name: {

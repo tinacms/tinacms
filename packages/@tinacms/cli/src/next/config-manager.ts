@@ -47,11 +47,13 @@ export class ConfigManager {
   outputHTMLFilePath: string
   outputGitignorePath: string
   selfHostedDatabaseFilePath?: string
+  prebuildFilePath?: string
   spaRootPath: string
   spaMainPath: string
   spaHTMLPath: string
   tinaGraphQLVersionFromCLI?: string
   legacyNoSDK?: boolean
+  watchList?: string[]
 
   constructor({
     rootPath = process.cwd(),
@@ -186,10 +188,13 @@ export class ConfigManager {
     }
 
     // Load the config file with ES build
-    this.config = await this.loadConfigFile(
+    const { config, prebuildPath, watchList } = await this.loadConfigFile(
       this.generatedFolderPath,
       this.tinaConfigFilePath
     )
+    this.watchList = watchList
+    this.config = config
+    this.prebuildFilePath = prebuildPath
 
     this.publicFolderPath = path.join(
       this.rootPath,
@@ -294,6 +299,11 @@ export class ConfigManager {
     }
     throw `No path provided to print`
   }
+  printPrebuildFilePath() {
+    return this.prebuildFilePath
+      .replace(/\\/g, '/')
+      .replace(`${this.rootPath}/${this.tinaFolderPath}/`, '')
+  }
   printContentRelativePath(filename: string) {
     if (filename) {
       return filename
@@ -348,14 +358,36 @@ export class ConfigManager {
     // good way of invalidating them when this file changes
     // https://github.com/nodejs/modules/issues/307
     const tmpdir = path.join(os.tmpdir(), Date.now().toString())
+    const prebuild = path.join(this.generatedFolderPath, 'config.prebuild.jsx')
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
     await fs.outputFileSync(tempTSConfigFile, '{}')
+    const result2 = await esbuild.build({
+      entryPoints: [configFilePath],
+      bundle: true,
+      target: ['es2020'],
+      platform: 'browser',
+      format: 'esm',
+      logLevel: 'silent',
+      packages: 'external',
+      ignoreAnnotations: true,
+      outfile: prebuild,
+      loader: loaders,
+      metafile: true,
+    })
+    const flattenedList = []
+    Object.keys(result2.metafile.inputs).forEach((key) => {
+      if (key.includes('node_modules') || key.includes('__generated__')) {
+        return
+      }
+      flattenedList.push(key)
+    })
     await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
       target: ['es2020'],
+      logLevel: 'silent',
       platform: 'node',
       outfile,
       loader: loaders,
@@ -363,6 +395,8 @@ export class ConfigManager {
     await esbuild.build({
       entryPoints: [outfile],
       bundle: true,
+      // Suppress warning about comparison with -0 from client module
+      logLevel: 'silent',
       platform: 'node',
       outfile: outfile2,
       loader: loaders,
@@ -370,7 +404,11 @@ export class ConfigManager {
     const result = require(outfile2)
     await fs.removeSync(outfile)
     await fs.removeSync(outfile2)
-    return result.default
+    return {
+      config: result.default,
+      prebuildPath: prebuild,
+      watchList: flattenedList,
+    }
   }
 }
 

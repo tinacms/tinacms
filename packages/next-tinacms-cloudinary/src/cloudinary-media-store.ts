@@ -1,15 +1,11 @@
-/**
-
-*/
-
 import type {
   Media,
   MediaList,
   MediaListOptions,
   MediaStore,
   MediaUploadOptions,
-} from '@tinacms/toolkit'
-import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@tinacms/toolkit'
+} from 'tinacms'
+import { DEFAULT_MEDIA_UPLOAD_TYPES } from 'tinacms'
 
 import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors'
 
@@ -58,11 +54,11 @@ export class CloudinaryMediaStore implements MediaStore {
         filename: fileRes.original_filename,
         directory: '/',
         thumbnails: {
-          '75x75': fileRes.url,
-          '400x400': fileRes.url,
-          '1000x1000': fileRes.url,
+          '75x75': fileRes.secure_url,
+          '400x400': fileRes.secure_url,
+          '1000x1000': fileRes.secure_url,
         },
-        src: fileRes.url,
+        src: fileRes.secure_url,
       }
 
       newFiles.push(parsedRes)

@@ -1,5 +1,222 @@
 # tinacms
 
+## 1.5.20
+
+### Patch Changes
+
+- 7e4de0b2a: Improvements to error handling with auth
+- 1144af060: Improve error messaging when onPut / onDelete hooks throw errors
+- Updated dependencies [7e4de0b2a]
+- Updated dependencies [099bf5646]
+- Updated dependencies [c92de7b1d]
+  - @tinacms/schema-tools@1.4.12
+  - @tinacms/search@1.0.10
+
+## 1.5.19
+
+### Patch Changes
+
+- 1563ce5b2: Update the router function to work asynchronously. This means that a user can now fetch data or perform other async operations in the router function.
+
+  Example:
+
+  ```ts
+   router: async ({ document }) => {
+    const res = await client.queries.post({
+      relativePath: document._sys.relativePath,
+    })
+    return `/posts/${res.data.slug}`
+  },
+  ```
+
+- e83ba8855: Update generated client to work in an edge runtime
+- Updated dependencies [1563ce5b2]
+  - @tinacms/schema-tools@1.4.11
+  - @tinacms/search@1.0.9
+
+## 1.5.18
+
+### Patch Changes
+
+- 9c27087fb: Show filter/search inputs on collections with templates instead of fields
+- 65d0a701f: Show search input even when collection contains only non-filterable fields
+- 133e97d5b: Update the before submit types to not pass the finalForm form since it is contained in the TinaForm
+- f02b4368b: Adds a second parameter to the slugify function that passes the current collection and template.
+- 37cf8bd40: Updated so a user can add an absolute path to the filename
+
+  Before all files where created reletive to the users current folder and we gave an error if the filename started with a `/`.
+
+  Now we check if the filename starts with a `/` and if it does we use that as the absolute path to the file.
+
+  Demo: https://www.loom.com/share/5256114d1ce648eda69881e33f8f6bd4?sid=3eafb588-c4da-49eb-ace2-d6b02313e14c
+
+- ad22e0950: Consolidate tailwind usage
+- 8db979b9f: Add support for "static" setting in Tina media, which preprocesses the available media files and disables uploads and deletions of media from the CMS.
+- 7991e097e: Add a `beforeSubmit` hook function on a collection.ui. This give users the ability to run a function before the form is submitted.
+
+  If the function returns values those values will be used will be submitted instead of the form values.
+
+  If the function returns a falsy value the original form values will be submitted.
+
+  ### Example
+
+  ```js
+  // tina/config.{ts.js}
+
+  export default defineConfig({
+    schema: {
+      collections: [
+        {
+          ui: {
+            // Example of beforeSubmit
+            beforeSubmit: async ({ values }) => {
+              return {
+                ...values,
+                lastUpdated: new Date().toISOString(),
+              }
+            },
+            //...
+          },
+          //...
+        },
+        //...
+      ],
+    },
+    //...
+  })
+  ```
+
+- 30c7eac58: Do not show tina cloud link when self hosting
+- 121bd9fc4: Absorb @tinacms/toolkit into tinacms
+
+  fix: Use clean page-sizes on media manager (to make pagination more obvious)
+
+  Fix issue with uploading media in a folder with tina cloud
+
+- Updated dependencies [133e97d5b]
+- Updated dependencies [f02b4368b]
+- Updated dependencies [7991e097e]
+  - @tinacms/schema-tools@1.4.10
+  - @tinacms/search@1.0.8
+  - @tinacms/sharedctx@1.0.2
+
+## 1.5.17
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [bc812441b]
+  - @tinacms/schema-tools@1.4.9
+  - @tinacms/sharedctx@1.0.2
+  - @tinacms/toolkit@1.7.13
+  - @tinacms/search@1.0.7
+
+## 1.5.16
+
+### Patch Changes
+
+- 1889422b0: Fix issue where deeply nested rich-text fields weren't selectable
+- Updated dependencies [1889422b0]
+- Updated dependencies [ad6a166a6]
+  - @tinacms/toolkit@1.7.12
+  - @tinacms/search@1.0.6
+
+## 1.5.15
+
+### Patch Changes
+
+- Updated dependencies [019920a35]
+  - @tinacms/schema-tools@1.4.8
+  - @tinacms/search@1.0.5
+  - @tinacms/toolkit@1.7.11
+
+## 1.5.14
+
+### Patch Changes
+
+- f1e8828c8: fix: resort prop overrides to allow for style & className merging of list items
+- 304e23318: - Update pull request title to include the branch name
+  - Slugify brach name when typing in the title
+- Updated dependencies [f1e8828c8]
+- Updated dependencies [304e23318]
+- Updated dependencies [a5d986477]
+  - @tinacms/toolkit@1.7.10
+
+## 1.5.13
+
+### Patch Changes
+
+- 495108725: Disable tina cloud specific calls when using custom content api
+- b0eba5d49: Upgrade prism react renderer, allow for theming
+- Updated dependencies [d73d03f8f]
+- Updated dependencies [745e30708]
+- Updated dependencies [495108725]
+- Updated dependencies [7d6e6ff3d]
+- Updated dependencies [808d5cc6c]
+  - @tinacms/toolkit@1.7.9
+  - @tinacms/search@1.0.4
+
+## 1.5.12
+
+### Patch Changes
+
+- Updated dependencies [f6efd498e]
+  - @tinacms/toolkit@1.7.8
+
+## 1.5.11
+
+### Patch Changes
+
+- c7fa6ddc0: Add dev-tools export to make it easy to see Tina data when building a page
+- 6e192cc38: Improve type signature for tinaField so potentially null fields don't show a Typescript error
+- 5aaae9902: Clear the search state when switching between collections
+- Updated dependencies [fe13b4ed9]
+- Updated dependencies [812df6ace]
+- Updated dependencies [8710dec4b]
+  - @tinacms/schema-tools@1.4.7
+  - @tinacms/search@1.0.3
+  - @tinacms/toolkit@1.7.7
+
+## 1.5.10
+
+### Patch Changes
+
+- Updated dependencies [ee9acb5e5]
+- Updated dependencies [a94e123b6]
+  - @tinacms/search@1.0.2
+  - @tinacms/schema-tools@1.4.6
+  - @tinacms/toolkit@1.7.6
+
+## 1.5.9
+
+### Patch Changes
+
+- c385b5615: Initial implementation of search functionality
+- d2ddfa5a6: Remove type: module from TinaCMS package
+- 9489d5d47: Add `{type: "module"}` to tinacms package
+- Updated dependencies [c385b5615]
+  - @tinacms/schema-tools@1.4.5
+  - @tinacms/toolkit@1.7.5
+  - @tinacms/search@1.0.1
+
+## 1.5.8
+
+### Patch Changes
+
+- Updated dependencies [cc621f665]
+  - @tinacms/toolkit@1.7.4
+
+## 1.5.7
+
+### Patch Changes
+
+- 385c8a865: Update Media Manager to sync media from Cloud dashboard
+- ccd928bc3: Fix to decode the folder name from the url
+- Updated dependencies [70c74bb55]
+- Updated dependencies [385c8a865]
+- Updated dependencies [1aea2c6a4]
+  - @tinacms/toolkit@1.7.3
+
 ## 1.5.6
 
 ### Patch Changes

@@ -1,5 +1,69 @@
 # @tinacms/mdx
 
+## 1.3.18
+
+### Patch Changes
+
+- Updated dependencies [7e4de0b2a]
+- Updated dependencies [099bf5646]
+- Updated dependencies [c92de7b1d]
+  - @tinacms/schema-tools@1.4.12
+
+## 1.3.17
+
+### Patch Changes
+
+- 0e94b2725: Fix issue where empty nested rich-text fields would throw an error if they'd been marked as dirty during editing
+- Updated dependencies [1563ce5b2]
+  - @tinacms/schema-tools@1.4.11
+
+## 1.3.16
+
+### Patch Changes
+
+- 8aae69436: Ensure urls are sanitized in a tags for rich-text
+- a78c81f14: Fix issue where non-object lists weren't handled properly for rich-text embeds
+- Updated dependencies [133e97d5b]
+- Updated dependencies [f02b4368b]
+- Updated dependencies [7991e097e]
+  - @tinacms/schema-tools@1.4.10
+
+## 1.3.15
+
+### Patch Changes
+
+- bc812441b: Use .mjs extension for ES modules
+- Updated dependencies [bc812441b]
+  - @tinacms/schema-tools@1.4.9
+
+## 1.3.14
+
+### Patch Changes
+
+- Updated dependencies [019920a35]
+  - @tinacms/schema-tools@1.4.8
+
+## 1.3.13
+
+### Patch Changes
+
+- Updated dependencies [fe13b4ed9]
+  - @tinacms/schema-tools@1.4.7
+
+## 1.3.12
+
+### Patch Changes
+
+- Updated dependencies [a94e123b6]
+  - @tinacms/schema-tools@1.4.6
+
+## 1.3.11
+
+### Patch Changes
+
+- Updated dependencies [c385b5615]
+  - @tinacms/schema-tools@1.4.5
+
 ## 1.3.10
 
 ### Patch Changes

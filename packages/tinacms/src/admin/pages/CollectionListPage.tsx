@@ -25,6 +25,7 @@ import {
   Button,
   CursorPaginator,
   Input,
+  Message,
   Modal,
   ModalActions,
   ModalBody,
@@ -36,6 +37,7 @@ import {
   textFieldClasses,
   TinaCMS,
   Toggle,
+  CreateBranchModel,
 } from '@tinacms/toolkit'
 import type {
   CollectionResponse,
@@ -47,7 +49,7 @@ import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
-import type { Collection } from '@tinacms/schema-tools'
+import type { Collection, TinaField } from '@tinacms/schema-tools'
 import { CollectionFolder, useCollectionFolder } from './utils'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
@@ -125,7 +127,7 @@ const TemplateMenu = ({
   )
 }
 
-export const handleNavigate = (
+export const handleNavigate = async (
   navigate: NavigateFunction,
   cms: TinaCMS,
   // FIXME: `Collection` is deceiving because it's just the value we get back from the API request
@@ -145,7 +147,7 @@ export const handleNavigate = (
    * Determine if the document has a route mapped
    */
   let routeOverride = collectionDefinition.ui?.router
-    ? collectionDefinition.ui?.router({
+    ? await collectionDefinition.ui?.router({
         document,
         collection: collectionDefinition,
       })
@@ -174,6 +176,22 @@ export const handleNavigate = (
   }
 }
 
+function getUniqueTemplateFields(collection: Collection<true>): TinaField[] {
+  const fieldSet: TinaField[] = []
+
+  collection.templates.forEach((template) => {
+    template.fields
+      .filter((f) => {
+        return fieldSet.find((x) => x.name === f.name) === undefined
+      })
+      .forEach((field) => {
+        fieldSet.push(field as TinaField)
+      })
+  })
+
+  return [...fieldSet]
+}
+
 const CollectionListPage = () => {
   const navigate = useNavigate()
   const { collectionName } = useParams()
@@ -190,7 +208,6 @@ const CollectionListPage = () => {
     after: '',
     booleanEquals: null,
   })
-  const [activeSearch, setActiveSearch] = React.useState(false)
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
   const [sortKey, setSortKey] = useState(
@@ -203,6 +220,9 @@ const CollectionListPage = () => {
             name: '',
           })
   )
+  const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+
   const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order)
   const loc = useLocation()
@@ -219,6 +239,8 @@ const CollectionListPage = () => {
     // reset state when the route is changed
     setEndCursor('')
     setPrevCursors([])
+    setSearch('')
+    setSearchInput('')
   }, [loc])
 
   useEffect(() => {
@@ -266,6 +288,7 @@ const CollectionListPage = () => {
                       booleanEquals: null,
                     }
               }
+              search={search}
             >
               {(
                 collection: CollectionResponse,
@@ -277,34 +300,23 @@ const CollectionListPage = () => {
                 const documents = collection.documents.edges
                 const admin: TinaAdminApi = cms.api.admin
                 const pageInfo = collection.documents.pageInfo
-                const fields = collectionExtra.fields?.filter((x) =>
+
+                // get unique fields from all templates
+                const fields = (
+                  collectionExtra.templates?.length
+                    ? getUniqueTemplateFields(collectionExtra)
+                    : collectionExtra.fields
+                ).filter((x) =>
                   // only allow sortable fields
                   ['string', 'number', 'datetime', 'boolean'].includes(x.type)
                 )
+
                 const sortField = fields?.find(
                   (field) => field.name === sortName
                 )
 
-                const filterFields = collectionExtra.fields?.filter((x) => {
-                  // only allow fileable fields. Currently only string, datetime, and boolean of non-list type
-                  return (
-                    ['string', 'datetime', 'boolean'].includes(x.type) &&
-                    !x.list
-                  )
-                })
-
-                const filterField = filterFields?.find(
-                  (x) => x.name === vars.filterField
-                )
-                const showStartsWith =
-                  filterField?.type === 'string' && !filterField.list
-                const showDateFilter = filterField?.type === 'datetime'
-
-                const showBooleanToggle =
-                  filterField?.type === 'boolean' && !filterField.list
-
-                // TODO: add other fields
-                // const showNumberFilter = sortField?.type === 'number' && !sortField.list
+                const searchEnabled =
+                  !!cms.api.tina.schema?.config?.config?.search
 
                 const collectionDefinition = cms.api.tina.schema.getCollection(
                   collection.name
@@ -319,10 +331,39 @@ const CollectionListPage = () => {
 
                 return (
                   <>
-                    {deleteModalOpen && (
-                      <DeleteModal
-                        filename={vars.relativePath}
-                        deleteFunc={async () => {
+                    {/* Normal Flow */}
+                    {deleteModalOpen &&
+                      !cms.api.tina.usingProtectedBranch() && (
+                        <DeleteModal
+                          filename={vars.relativePath}
+                          deleteFunc={async () => {
+                            try {
+                              await admin.deleteDocument(vars)
+                              cms.alerts.info(
+                                'Document was successfully deleted'
+                              )
+                              reFetchCollection()
+                            } catch (error) {
+                              cms.alerts.warn(
+                                'Document was not deleted, ask a developer for help or check the console for an error message'
+                              )
+                              console.error(error)
+                              throw error
+                            }
+                          }}
+                          close={() => setDeleteModalOpen(false)}
+                        />
+                      )}
+                    {/* Editorial workflow  */}
+                    {deleteModalOpen && cms.api.tina.usingProtectedBranch() && (
+                      <CreateBranchModel
+                        crudType="delete"
+                        relativePath={
+                          collectionExtra.path + '/' + vars.relativePath
+                        }
+                        values={vars}
+                        close={() => setDeleteModalOpen(false)}
+                        safeSubmit={async () => {
                           try {
                             await admin.deleteDocument(vars)
                             cms.alerts.info('Document was successfully deleted')
@@ -335,7 +376,6 @@ const CollectionListPage = () => {
                             throw error
                           }
                         }}
-                        close={() => setDeleteModalOpen(false)}
                       />
                     )}
 
@@ -380,278 +420,100 @@ const CollectionListPage = () => {
                               : collection.name}
                           </h3>
 
-                          <div className="flex gap-4 items-end flex-wrap">
+                          <div className="flex gap-4 items-start flex-wrap">
                             {fields?.length > 0 && (
                               <>
-                                <div className="flex flex-col gap-2 items-start">
-                                  <label
-                                    htmlFor="sort"
-                                    className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                  >
-                                    Sort by
-                                  </label>
-                                  <Select
-                                    name="sort"
-                                    options={[
-                                      {
-                                        label: 'Default',
-                                        value: JSON.stringify({
-                                          order: 'asc',
-                                          name: '',
-                                        }),
-                                      },
-                                      ...fields
-                                        .map((x) => [
-                                          {
-                                            label:
-                                              (x.label || x.name) +
-                                              (x.type === 'datetime'
-                                                ? ' (Oldest First)'
-                                                : ' (Ascending)'),
-                                            value: JSON.stringify({
-                                              name: x.name,
-                                              order: 'asc',
-                                            }),
-                                          },
-                                          {
-                                            label:
-                                              (x.label || x.name) +
-                                              (x.type === 'datetime'
-                                                ? ' (Newest First)'
-                                                : ' (Descending)'),
-                                            value: JSON.stringify({
-                                              name: x.name,
-                                              order: 'desc',
-                                            }),
-                                          },
-                                        ])
-                                        .flat(),
-                                    ]}
-                                    input={{
-                                      id: 'sort',
-                                      name: 'sort',
-                                      value: sortKey,
-                                      onChange: (e) => {
-                                        const val = JSON.parse(e.target.value)
-                                        setEndCursor('')
-                                        setPrevCursors([])
-                                        window?.localStorage.setItem(
-                                          `${LOCAL_STORAGE_KEY}.${collectionName}`,
-                                          e.target.value
-                                        )
-                                        setSortKey(e.target.value)
-                                        setSortOrder(val.order)
-                                      },
-                                    }}
-                                  />
-                                </div>
-                                <form className="flex flex-wrap gap-4 items-end">
-                                  <div className="flex flex-shrink-0 flex-col gap-2 items-start">
+                                {!search && (
+                                  <div className="flex flex-col gap-2 items-start">
                                     <label
-                                      htmlFor="filter"
+                                      htmlFor="sort"
                                       className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
                                     >
-                                      Filter by
+                                      Sort by
                                     </label>
                                     <Select
-                                      name="filter"
+                                      name="sort"
                                       options={[
                                         {
-                                          label: 'None',
-                                          value: '',
+                                          label: 'Default',
+                                          value: JSON.stringify({
+                                            order: 'asc',
+                                            name: '',
+                                          }),
                                         },
-                                        ...filterFields.map((x) => ({
-                                          label:
-                                            (typeof x.label === 'string' &&
-                                              x.label) ||
-                                            x.name,
-                                          value: x.name,
-                                        })),
+                                        ...fields
+                                          .map((x) => [
+                                            {
+                                              label:
+                                                (x.label || x.name) +
+                                                (x.type === 'datetime'
+                                                  ? ' (Oldest First)'
+                                                  : ' (Ascending)'),
+                                              value: JSON.stringify({
+                                                name: x.name,
+                                                order: 'asc',
+                                              }),
+                                            },
+                                            {
+                                              label:
+                                                (x.label || x.name) +
+                                                (x.type === 'datetime'
+                                                  ? ' (Newest First)'
+                                                  : ' (Descending)'),
+                                              value: JSON.stringify({
+                                                name: x.name,
+                                                order: 'desc',
+                                              }),
+                                            },
+                                          ])
+                                          .flat(),
                                       ]}
                                       input={{
-                                        id: 'filter',
-                                        name: 'filter',
-                                        value: vars.filterField,
+                                        id: 'sort',
+                                        name: 'sort',
+                                        value: sortKey,
                                         onChange: (e) => {
-                                          const val = e.target.value
+                                          const val = JSON.parse(e.target.value)
                                           setEndCursor('')
                                           setPrevCursors([])
-                                          setVars((old) => ({
-                                            ...old,
-                                            filterField: val,
-                                          }))
-                                          // if we clear the filter, we need to re-fetch the collection
-                                          if (!val) {
-                                            reFetchCollection()
-                                          }
+                                          window?.localStorage.setItem(
+                                            `${LOCAL_STORAGE_KEY}.${collectionName}`,
+                                            e.target.value
+                                          )
+                                          setSortKey(e.target.value)
+                                          setSortOrder(val.order)
                                         },
                                       }}
                                     />
                                   </div>
-                                  {showStartsWith && (
-                                    <>
-                                      <div className="flex flex-shrink-0 flex-col gap-2 items-start">
-                                        <label
-                                          htmlFor="startsWith"
-                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                        >
-                                          Starts with
-                                        </label>
-                                        <Input
-                                          name="startsWith"
-                                          id="startsWith"
-                                          value={vars.startsWith}
-                                          onChange={(e) => {
-                                            const val = e.target.value
-                                            setVars((old) => ({
-                                              ...old,
-                                              startsWith: val,
-                                              after: '',
-                                              before: '',
-                                              booleanEquals: null,
-                                            }))
-                                          }}
-                                        />
-                                      </div>
-                                    </>
-                                  )}
-                                  {showDateFilter && (
-                                    <div className="flex flex-shrink-0 gap-4">
-                                      <div className="flex flex-col gap-2 items-start">
-                                        <label
-                                          htmlFor="dateAfter"
-                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                        >
-                                          After
-                                        </label>
-                                        <ReactDateTimeWithStyles
-                                          inputProps={{
-                                            className: textFieldClasses,
-                                          }}
-                                          value={vars.after}
-                                          onChange={(e) => {
-                                            setVars((old) => ({
-                                              ...old,
-                                              after:
-                                                // @ts-ignore
-                                                typeof e.format === 'function'
-                                                  ? // @ts-ignore
-                                                    e.format()
-                                                  : '',
-                                              booleanEquals: null,
-                                              startsWith: '',
-                                            }))
-                                          }}
-                                        />
-                                      </div>
-                                      <div className="flex flex-col gap-2 items-start">
-                                        <label
-                                          htmlFor="dateBefore"
-                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                        >
-                                          Before
-                                        </label>
-                                        <ReactDateTimeWithStyles
-                                          inputProps={{
-                                            className: textFieldClasses,
-                                          }}
-                                          value={vars.before}
-                                          onChange={(e) => {
-                                            setVars((old) => ({
-                                              ...old,
-                                              before:
-                                                // @ts-ignore
-                                                typeof e.format === 'function'
-                                                  ? // @ts-ignore
-                                                    e.format()
-                                                  : '',
-                                              booleanEquals: null,
-                                              startsWith: '',
-                                            }))
-                                          }}
-                                        />
-                                      </div>
-                                    </div>
-                                  )}
-                                  {showBooleanToggle && (
-                                    <>
-                                      <div className="flex flex-col gap-2 items-start">
-                                        <label
-                                          htmlFor="toggle"
-                                          className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                        >
-                                          {filterField.label ||
-                                            filterField.name}
-                                        </label>
-                                        <Toggle
-                                          // @ts-ignore
-                                          field={filterField}
-                                          input={{
-                                            name: 'toggle',
-                                            value: vars.booleanEquals ?? false,
-                                            onChange: () => {
-                                              setVars((old) => ({
-                                                ...old,
-                                                booleanEquals:
-                                                  !old.booleanEquals,
-                                                after: '',
-                                                before: '',
-                                                startsWith: '',
-                                              }))
-                                            },
-                                          }}
-                                          name="toggle"
-                                        />
-                                      </div>
-                                    </>
-                                  )}
-                                  {(showStartsWith ||
-                                    showDateFilter ||
-                                    showBooleanToggle) && (
-                                    <div className="flex gap-3">
-                                      <Button
-                                        onClick={() => {
-                                          setActiveSearch(true)
-                                          setEndCursor('')
-                                          setPrevCursors([])
-                                          reFetchCollection()
-                                        }}
-                                        variant="primary"
-                                        type="submit"
-                                      >
-                                        Search{' '}
-                                        <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
-                                      </Button>
-                                      {(vars.startsWith ||
-                                        vars.after ||
-                                        vars.before ||
-                                        vars.booleanEquals) && (
-                                        <Button
-                                          onClick={() => {
-                                            setActiveSearch(false)
-                                            setVars((old) => ({
-                                              ...old,
-                                              filterField: '',
-                                              startsWith: '',
-                                              after: '',
-                                              before: '',
-                                              booleanEquals: null,
-                                            }))
-                                            setEndCursor('')
-                                            setPrevCursors([])
-                                            reFetchCollection()
-                                          }}
-                                          variant="white"
-                                        >
-                                          Clear{' '}
-                                          <BiX className="w-5 h-full ml-1 opacity-70" />
-                                        </Button>
-                                      )}
-                                    </div>
-                                  )}
-                                </form>
+                                )}
                               </>
                             )}
+                            <div className="flex flex-1 flex-col gap-2 items-start w-full">
+                              {searchEnabled ? (
+                                <SearchInput
+                                  loading={_loading}
+                                  search={search}
+                                  setSearch={setSearch}
+                                  searchInput={searchInput}
+                                  setSearchInput={setSearchInput}
+                                />
+                              ) : (
+                                <>
+                                  <label className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal">
+                                    Search
+                                  </label>
+                                  <Message
+                                    link="https://tina.io/docs/reference/search/overview"
+                                    linkLabel="Read The Docs"
+                                    type="info"
+                                    size="small"
+                                  >
+                                    Search not configured.
+                                  </Message>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                         <div className="flex self-end	justify-self-end">
@@ -700,7 +562,7 @@ const CollectionListPage = () => {
                         {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
-                              {!activeSearch && folder.name && (
+                              {folder.name && !search ? (
                                 <tr>
                                   <td colSpan={5}>
                                     <Breadcrumb
@@ -710,7 +572,7 @@ const CollectionListPage = () => {
                                     />
                                   </td>
                                 </tr>
-                              )}
+                              ) : null}
                               {documents.map((document) => {
                                 if (document.node.__typename === 'Folder') {
                                   return (
@@ -989,6 +851,70 @@ const CollectionListPage = () => {
         )
       }}
     </GetCMS>
+  )
+}
+
+const SearchInput = ({
+  loading,
+  search,
+  setSearch,
+  searchInput,
+  setSearchInput,
+}) => {
+  const [searchLoaded, setSearchLoaded] = useState(false)
+  useEffect(() => {
+    if (loading) {
+      setSearchLoaded(false)
+    } else {
+      setSearchLoaded(true)
+    }
+  }, [loading])
+
+  return (
+    <form className="flex flex-1 flex-col gap-2 items-start w-full">
+      <label
+        htmlFor="search"
+        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+      >
+        Search
+      </label>
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex-1 min-w-[200px]">
+          <Input
+            type="text"
+            name="search"
+            placeholder="Search"
+            value={searchInput}
+            onChange={(e) => {
+              setSearchInput(e.target.value)
+            }}
+          />
+        </div>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => {
+              setSearch(searchInput)
+              setSearchLoaded(false)
+            }}
+            variant="primary"
+            type="submit"
+          >
+            Search <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
+          </Button>
+          {search && searchLoaded && (
+            <Button
+              onClick={() => {
+                setSearch('')
+                setSearchInput('')
+              }}
+              variant="white"
+            >
+              Clear <BiX className="w-5 h-full ml-1 opacity-70" />
+            </Button>
+          )}
+        </div>
+      </div>
+    </form>
   )
 }
 

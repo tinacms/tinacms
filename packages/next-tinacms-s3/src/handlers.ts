@@ -13,7 +13,7 @@ import {
   DeleteObjectCommand,
   DeleteObjectCommandInput,
 } from '@aws-sdk/client-s3'
-import { Media, MediaListOptions } from '@tinacms/toolkit'
+import { Media, MediaListOptions } from 'tinacms'
 import path from 'path'
 import fs from 'fs'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -89,7 +89,7 @@ async function uploadMedia(
     const upload = promisify(
       multer({
         storage: multer.diskStorage({
-          // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           directory: (req, file, cb) => {
             cb(null, '/tmp')
@@ -100,7 +100,7 @@ async function uploadMedia(
         }),
       }).single('file')
     )
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     await upload(req, res)
 
@@ -108,7 +108,7 @@ async function uploadMedia(
     let prefix = directory.replace(/^\//, '').replace(/\/$/, '')
     if (prefix) prefix = prefix + '/'
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const filePath = req.file.path
     const blob = fs.readFileSync(filePath)

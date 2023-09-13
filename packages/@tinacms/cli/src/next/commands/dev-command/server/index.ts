@@ -12,12 +12,13 @@ import {
 export const createDevServer = async (
   configManager: ConfigManager,
   database: Database,
+  searchIndex: any,
   apiURL: string,
   noWatch: boolean
 ) => {
   const plugins: Plugin[] = [
     transformTsxPlugin({ configManager }),
-    devServerEndPointsPlugin({ apiURL, configManager, database }),
+    devServerEndPointsPlugin({ apiURL, configManager, database, searchIndex }),
     viteTransformExtension(),
   ]
   return createViteServer(

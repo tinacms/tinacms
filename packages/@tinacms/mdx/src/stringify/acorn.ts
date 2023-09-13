@@ -3,7 +3,10 @@
 
 
 */
-import { format } from 'prettier'
+// @ts-ignore Fix this by updating prettier
+import prettier from 'prettier/esm/standalone.mjs'
+// @ts-ignore Fix this by updating prettier
+import parser from 'prettier/esm/parser-espree.mjs'
 import type { RichTextType, RichTextTemplate } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
@@ -203,6 +206,13 @@ export function stringifyProps(
         } else {
           const joiner = flatten ? ' ' : '\n'
           let val = ''
+          // The rich-text editor can sometimes pass an empty value {}, consider that nullable
+          if (
+            isPlainObject(value) &&
+            Object.keys(value as object).length === 0
+          ) {
+            return
+          }
           assertShape<Plate.RootElement>(
             value,
             (value) => value.type === 'root' && Array.isArray(value.children),
@@ -282,11 +292,13 @@ export function stringifyProps(
 function stringifyObj(obj: unknown, flatten: boolean) {
   if (typeof obj === 'object' && obj !== null) {
     const dummyFunc = `const dummyFunc = `
-    const res = format(`${dummyFunc}${JSON.stringify(obj)}`, {
-      parser: 'acorn',
-      trailingComma: 'none',
-      semi: false,
-    })
+    const res = prettier
+      .format(`${dummyFunc}${JSON.stringify(obj)}`, {
+        parser: 'acorn',
+        trailingComma: 'none',
+        semi: false,
+        plugins: [parser],
+      })
       .trim()
       .replace(dummyFunc, '')
     return flatten ? res.replaceAll('\n', '').replaceAll('  ', ' ') : res
@@ -297,7 +309,7 @@ function stringifyObj(obj: unknown, flatten: boolean) {
   }
 }
 
-export function assertShape<T extends unknown>(
+export function assertShape<T>(
   value: unknown,
   callback: (item: any) => boolean,
   errorMessage?: string
@@ -305,4 +317,8 @@ export function assertShape<T extends unknown>(
   if (!callback(value)) {
     throw new Error(errorMessage || `Failed to assert shape`)
   }
+}
+
+function isPlainObject(value: unknown) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }

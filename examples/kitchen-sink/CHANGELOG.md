@@ -1,5 +1,128 @@
 # e2e-next
 
+## 0.1.51
+
+### Patch Changes
+
+- Updated dependencies [7e4de0b2a]
+- Updated dependencies [1144af060]
+  - tinacms@1.5.20
+  - @tinacms/datalayer@1.2.25
+
+## 0.1.50
+
+### Patch Changes
+
+- Updated dependencies [1563ce5b2]
+- Updated dependencies [e83ba8855]
+  - tinacms@1.5.19
+  - @tinacms/datalayer@1.2.24
+
+## 0.1.49
+
+### Patch Changes
+
+- Updated dependencies [9c27087fb]
+- Updated dependencies [65d0a701f]
+- Updated dependencies [133e97d5b]
+- Updated dependencies [f02b4368b]
+- Updated dependencies [37cf8bd40]
+- Updated dependencies [ad22e0950]
+- Updated dependencies [8db979b9f]
+- Updated dependencies [7991e097e]
+- Updated dependencies [30c7eac58]
+- Updated dependencies [121bd9fc4]
+  - tinacms@1.5.18
+  - @tinacms/datalayer@1.2.23
+
+## 0.1.48
+
+### Patch Changes
+
+- Updated dependencies [bc812441b]
+  - @tinacms/datalayer@1.2.22
+  - tinacms@1.5.17
+
+## 0.1.47
+
+### Patch Changes
+
+- Updated dependencies [1889422b0]
+  - tinacms@1.5.16
+  - @tinacms/datalayer@1.2.21
+
+## 0.1.46
+
+### Patch Changes
+
+- tinacms@1.5.15
+- @tinacms/datalayer@1.2.20
+
+## 0.1.45
+
+### Patch Changes
+
+- Updated dependencies [f1e8828c8]
+- Updated dependencies [304e23318]
+  - tinacms@1.5.14
+
+## 0.1.44
+
+### Patch Changes
+
+- Updated dependencies [495108725]
+- Updated dependencies [b0eba5d49]
+  - tinacms@1.5.13
+  - @tinacms/datalayer@1.2.19
+
+## 0.1.43
+
+### Patch Changes
+
+- tinacms@1.5.12
+
+## 0.1.42
+
+### Patch Changes
+
+- Updated dependencies [c7fa6ddc0]
+- Updated dependencies [6e192cc38]
+- Updated dependencies [5aaae9902]
+  - tinacms@1.5.11
+  - @tinacms/datalayer@1.2.18
+
+## 0.1.41
+
+### Patch Changes
+
+- tinacms@1.5.10
+- @tinacms/datalayer@1.2.17
+
+## 0.1.40
+
+### Patch Changes
+
+- Updated dependencies [c385b5615]
+- Updated dependencies [d2ddfa5a6]
+- Updated dependencies [9489d5d47]
+  - tinacms@1.5.9
+  - @tinacms/datalayer@1.2.16
+
+## 0.1.39
+
+### Patch Changes
+
+- tinacms@1.5.8
+
+## 0.1.38
+
+### Patch Changes
+
+- Updated dependencies [385c8a865]
+- Updated dependencies [ccd928bc3]
+  - tinacms@1.5.7
+  - @tinacms/datalayer@1.2.15
+
 ## 0.1.37
 
 ### Patch Changes

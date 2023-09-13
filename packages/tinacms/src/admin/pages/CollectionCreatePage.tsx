@@ -7,7 +7,12 @@ import {
 } from '@tinacms/toolkit'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm, normalizePath } from '@tinacms/schema-tools'
+import {
+  TinaSchema,
+  resolveForm,
+  normalizePath,
+  Collection,
+} from '@tinacms/schema-tools'
 import type { Template } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
@@ -20,10 +25,11 @@ import type { TinaCMS } from '@tinacms/toolkit'
 import { useWindowWidth } from '@react-hook/window-size'
 import { FaLock, FaUnlock } from 'react-icons/fa'
 import { useCollectionFolder } from './utils'
+import { ErrorDialog } from '../components/ErrorDialog'
 
 const createDocument = async (
   cms: TinaCMS,
-  collection: { name: string; format: string },
+  collection: Collection,
   template: { name: string },
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   folder: string,
@@ -32,9 +38,14 @@ const createDocument = async (
   const api = new TinaAdminApi(cms)
   const { filename, ...leftover } = values
 
-  const relativePath = `${folder ? `${folder}/` : ''}${filename}.${
-    collection.format
-  }`
+  if (typeof filename !== 'string') {
+    throw new Error('Filename must be a string')
+  }
+
+  // Append the folder if it exists and the filename does not start with a slash
+  const appendFolder = folder && !filename.startsWith('/') ? `/${folder}/` : '/'
+  const relativePath = `${appendFolder}${filename}.${collection.format}`
+
   const params = api.schema.transformPayload(collection.name, {
     _collection: collection.name,
     ...(template && { _template: template.name }),
@@ -42,7 +53,7 @@ const createDocument = async (
   })
 
   if (await api.isAuthenticated()) {
-    await api.createDocument(collection.name, relativePath, params)
+    await api.createDocument(collection, relativePath, params)
   } else {
     const authMessage = `CreateDocument failed: User is no longer authenticated; please login and try again.`
     cms.alerts.error(authMessage)
@@ -179,22 +190,43 @@ export const RenderForm = ({
     template?.defaultItem
 
   const form = useMemo(() => {
+    const folderName = folder.fullyQualifiedName ? folder.name : ''
     return new Form({
+      crudType: 'create',
       initialValues:
         typeof defaultItem === 'function' ? defaultItem() : defaultItem,
       extraSubscribeValues: { active: true, submitting: true, touched: true },
       onChange: (values) => {
+        if (!values?.submitting) {
+          const filename: string = values?.values?.filename
+
+          // If the filename starts with "/" then it is an absolute path and we should not append the folder name
+          const appendFolder =
+            folderName && !filename?.startsWith('/') ? `/${folderName}/` : '/'
+
+          // keeps the forms relative path in sync with the filename
+          form.relativePath =
+            schemaCollection.path +
+            appendFolder +
+            `${filename}.${schemaCollection.format || 'md'}`
+        }
         if (
           slugFunction &&
           values?.active !== 'filename' &&
           !values?.submitting &&
           !values.touched?.filename
         ) {
-          const value = slugFunction(values?.values)
+          const value = slugFunction(values.values, {
+            template,
+            collection: schemaCollection,
+          })
           form.finalForm.change('filename', value)
         }
       },
-      id: 'create-form',
+      id:
+        schemaCollection.path +
+        folderName +
+        `/new-post.${schemaCollection.format || 'md'}`,
       label: 'form',
       fields: [
         ...(formInfo.fields as any),
@@ -205,7 +237,7 @@ export const RenderForm = ({
             ? wrapFieldsWithMeta(({ field, input, meta }) => {
                 return (
                   <FilenameInput
-                    readonly={schemaCollection?.ui?.filename?.readonly}
+                    readOnly={schemaCollection?.ui?.filename?.readonly}
                     {...input}
                   />
                 )
@@ -229,9 +261,9 @@ export const RenderForm = ({
               return true
             }
 
-            const isValid = /^[_a-zA-Z0-9][\.\-_\/a-zA-Z0-9]*$/.test(value)
+            const isValid = /[\.\-_\/a-zA-Z0-9]*$/.test(value)
             if (value && !isValid) {
-              return 'Must begin with a-z, A-Z, 0-9, or _ and contain only a-z, A-Z, 0-9, -, _, ., or /.'
+              return 'Must contain only a-z, A-Z, 0-9, -, _, ., or /.'
             }
             // check if the filename is allowed by the collection.
             if (
@@ -276,10 +308,16 @@ export const RenderForm = ({
           const defaultErrorText = 'There was a problem saving your document.'
           if (error.message.includes('already exists')) {
             cms.alerts.error(
-              `${defaultErrorText} The "Filename" is alredy used for another document, please modify it.`
+              `${defaultErrorText} The "Filename" is already used for another document, please modify it.`
             )
           } else {
-            cms.alerts.error(defaultErrorText)
+            cms.alerts.error(() =>
+              ErrorDialog({
+                title: defaultErrorText,
+                message: 'Tina caught an error while creating the page',
+                error,
+              })
+            )
           }
           throw new Error(
             `[${error.name}] CreateDocument failed: ${error.message}`
@@ -313,31 +351,29 @@ export const RenderForm = ({
     <PageWrapper>
       <>
         {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
+
         <div
-          className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
+          className={`pt-3 pb-4 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center ${headerPadding}`}
         >
-          <div className="max-w-form mx-auto">
-            <div className="mb-2">
-              <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
-                <Link
-                  to={`/collections/${collection.name}${
-                    folder.fullyQualifiedName
-                      ? `/${folder.fullyQualifiedName}`
-                      : ''
-                  }`}
-                  className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
-                >
-                  {collection.label ? collection.label : collection.name}
-                </Link>
-                <HiChevronRight className="inline-block -mt-0.5 opacity-50" />
-              </span>
-              <span className="text-xl text-gray-700 font-medium leading-tight">
-                Create New
-              </span>
-            </div>
+          <div className="w-full max-w-form flex gap-1.5 justify-between items-center">
+            <Link
+              to={`/collections/${collection.name}${
+                folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
+              }`}
+              className="flex-0 text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 text-sm leading-tight whitespace-nowrap truncate transition-all duration-150 ease-out"
+            >
+              {collection.label ? collection.label : collection.name}
+            </Link>
+            <span className="opacity-30 text-sm leading-tight whitespace-nowrap flex-0">
+              /
+            </span>
+            <span className="flex-1 w-full text-sm leading-tight whitespace-nowrap truncate">
+              Create New
+            </span>
             <FormStatus pristine={formIsPristine} />
           </div>
         </div>
+
         {activeForm && (
           <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
         )}
