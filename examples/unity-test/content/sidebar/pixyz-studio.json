@@ -1,0 +1,28 @@
+{
+  "title": "Pixyz Studio",
+  "version": "1.0.0",
+  "locale": "en",
+  "links": [
+    {
+      "title": "Pixyz Documentation",
+      "_template": "label"
+    },
+    {
+      "reference": "content/pages/home.mdx",
+      "children": [
+        {}
+      ],
+      "_template": "page"
+    },
+    {
+      "reference": "content/pages/get-started.mdx",
+      "children": [
+        {
+          "reference": "content/pages/get-started-sub-section.mdx"
+        }
+      ],
+      "_template": "page"
+    }
+  ],
+  "type": "manual"
+}

@@ -1,0 +1,43 @@
+fragment SidebarParts on Sidebar {
+  title
+  version
+  locale
+  type
+  links {
+    __typename
+    ... on SidebarLinksLabel {
+      title
+    }
+    ... on SidebarLinksPage {
+      reference {
+        ... on Page {
+          title
+          body
+          slug
+        }
+        ... on Document {
+          id
+        }
+      }
+      children {
+        __typename
+        reference {
+          ... on Page {
+            title
+            body
+            slug
+          }
+          ... on Document {
+            id
+          }
+        }
+      }
+    }
+  }
+}
+
+fragment PageParts on Page {
+  title
+  body
+  slug
+}

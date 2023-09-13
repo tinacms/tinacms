@@ -31,3 +31,9 @@ projects:
       - experimental-examples/tina-cloud-starter/**/*.tsx
       - experimental-examples/tina-cloud-starter/**/*.ts
       - experimental-examples/tina-cloud-starter/**/*.gql
+  unityTest:
+    schema: examples/unity-test/.tina/__generated__/schema.gql
+    documents:
+      - examples/unity-test/**/*.tsx
+      - examples/unity-test/**/*.ts
+      - examples/unity-test/**/*.gql
