@@ -97,6 +97,11 @@ const detectEnvironment = async ({
       (await fs.readdir(tinaFolder)).find((x) => x.includes('config'))
   )
 
+  // The path to the pages directory. If using src, it will be <baseDir>/src/pages
+  const pagesDir = [baseDir, usingSrc ? 'src' : false, 'pages'].filter(
+    Boolean
+  ) as string[]
+
   const generatedFiles = {
     auth: await makeGeneratedFile('auth', tinaFolder),
     config: await makeGeneratedFile('config', tinaFolder),
@@ -104,37 +109,37 @@ const detectEnvironment = async ({
     templates: await makeGeneratedFile('templates', tinaFolder),
     ['vercel-kv-credentials-provider-signin']: await makeGeneratedFile(
       'signin',
-      path.join(baseDir, usingSrc ? 'src' : 'pages', 'auth'),
+      path.join(...pagesDir, 'auth'),
       {
         typescriptSuffix: 'tsx',
       }
     ),
     ['vercel-kv-credentials-provider-register']: await makeGeneratedFile(
       'register',
-      path.join(baseDir, usingSrc ? 'src' : 'pages', 'auth'),
+      path.join(...pagesDir, 'auth'),
       {
         typescriptSuffix: 'tsx',
       }
     ),
     ['vercel-kv-credentials-provider-tailwindcss']: await makeGeneratedFile(
       'tw.module',
-      path.join(baseDir, usingSrc ? 'src' : 'pages', 'auth'),
+      path.join(...pagesDir, 'auth'),
       {
         extensionOverride: 'css',
       }
     ),
     ['next-auth-api-handler']: await makeGeneratedFile(
       '[...nextauth]',
-      path.join(baseDir, usingSrc ? 'src' : 'pages', 'api', 'auth')
+      path.join(...pagesDir, 'api', 'auth')
     ),
     ['vercel-kv-credentials-provider-register-api-handler']:
       await makeGeneratedFile(
         'register',
-        path.join(baseDir, usingSrc ? 'src' : 'pages', 'api', 'credentials')
+        path.join(...pagesDir, 'api', 'credentials')
       ),
     ['gql-api-handler']: await makeGeneratedFile(
       'gql',
-      path.join(baseDir, usingSrc ? 'src' : 'pages', 'api')
+      path.join(...pagesDir, 'api')
     ),
     ['tina.svg']: await makeGeneratedFile(
       'tina',
@@ -145,7 +150,7 @@ const detectEnvironment = async ({
     ),
     ['reactive-example']: await makeGeneratedFile(
       '[filename]',
-      path.join(baseDir, usingSrc ? 'src' : 'pages', 'demo', 'blog'),
+      path.join(...pagesDir, 'demo', 'blog'),
       {
         typescriptSuffix: 'tsx',
       }
