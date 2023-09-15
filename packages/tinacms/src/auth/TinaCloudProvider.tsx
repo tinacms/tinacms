@@ -182,7 +182,7 @@ export const AuthWallInner = ({
       {activeModal === 'authenticate' &&
         loginStrategy === 'UsernamePassword' && (
           <ModalBuilder
-            title={'Login'}
+            title={'Sign in to Tina'}
             message={''}
             close={close}
             actions={[
@@ -194,27 +194,55 @@ export const AuthWallInner = ({
               },
             ]}
           >
-            <div>
-              <input
-                type="text"
-                value={authProps.username}
-                onChange={(e) =>
-                  setAuthProps({
-                    username: e.target.value,
-                    password: authProps.password,
-                  })
-                }
-              />
-              <input
-                type="password"
-                value={authProps.password}
-                onChange={(e) =>
-                  setAuthProps({
-                    username: authProps.username,
-                    password: e.target.value,
-                  })
-                }
-              />
+            <div className="flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
+              <div className="max-w-md w-full space-y-8">
+                <div className="mt-8 space-y-6">
+                  <div className="rounded-md shadow-sm -space-y-px">
+                    <div>
+                      <label htmlFor="username" className="sr-only">
+                        Username
+                      </label>
+                      <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        autoComplete="username"
+                        required
+                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                        placeholder="Username"
+                        value={authProps.username}
+                        onChange={(e) =>
+                          setAuthProps((prevState) => ({
+                            ...prevState,
+                            username: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="password" className="sr-only">
+                        Password
+                      </label>
+                      <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autoComplete="current-password"
+                        required
+                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                        placeholder="Password"
+                        value={authProps.password}
+                        onChange={(e) =>
+                          setAuthProps((prevState) => ({
+                            ...prevState,
+                            password: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </ModalBuilder>
         )}

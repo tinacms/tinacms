@@ -14,7 +14,7 @@ import React, { useCallback, useState } from 'react'
 
 interface ModalBuilderProps {
   title: string
-  message: string
+  message?: string
   error?: string
   actions: ButtonProps[]
   close(): void
@@ -27,7 +27,7 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
       <ModalPopup>
         <ModalHeader>{modalProps.title}</ModalHeader>
         <ModalBody padded>
-          <p>{modalProps.message}</p>
+          {modalProps.message && <p>{modalProps.message}</p>}
           {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
           {modalProps.children}
         </ModalBody>
