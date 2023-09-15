@@ -14,7 +14,6 @@ const config = defineStaticConfig({
   contentApiUrlOverride: '/api/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
   admin: {
-    authHooks: {}, // TODO why is this required?
     authCollection: 'user',
   },
   // @ts-ignore

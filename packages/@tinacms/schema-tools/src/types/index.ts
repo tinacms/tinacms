@@ -505,7 +505,7 @@ export interface Config<
     /**
      * Hook functions that can be used to run logic when certain events happen
      */
-    authHooks: AuthHooks
+    authHooks?: AuthHooks
     /**
      *
      */
