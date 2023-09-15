@@ -13,7 +13,6 @@ const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
-  // @ts-ignore
   authProvider:
     !isLocal &&
     new UsernamePasswordNextAuthProvider({

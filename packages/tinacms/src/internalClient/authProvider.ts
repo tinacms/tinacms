@@ -218,7 +218,7 @@ export class LocalAuthProvider extends AbstractAuthProvider {
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
   }
   async getToken() {
-    return { id_token: '' }
+    return Promise.resolve({ id_token: '' })
   }
   async logout() {
     localStorage.removeItem(LOCAL_CLIENT_KEY)

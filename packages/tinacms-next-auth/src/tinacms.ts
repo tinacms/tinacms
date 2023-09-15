@@ -20,7 +20,7 @@ export class DefaultNextAuthProvider extends AbstractAuthProvider {
     return signIn(this.name, { callbackUrl: this.callbackUrl })
   }
   getToken() {
-    return { id_token: '' }
+    return Promise.resolve({ id_token: '' })
   }
   async getUser() {
     return !!(await getSession())
