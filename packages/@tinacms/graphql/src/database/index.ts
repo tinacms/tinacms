@@ -54,8 +54,8 @@ import {
 } from './level'
 import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
 import sha from 'js-sha1'
-import { FilesystemBridge, mapPasswordFields, TinaLevelClient } from '..'
-import { generatePasswordHash } from '../auth/utils'
+import { FilesystemBridge, TinaLevelClient } from '..'
+import { generatePasswordHash, mapPasswordFields } from '../auth/utils'
 import { get, set } from 'lodash'
 
 type IndexStatusEvent = {
