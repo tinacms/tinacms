@@ -16,6 +16,14 @@ fragment SidebarParts on Sidebar {
           slug
         }
         ... on Document {
+          _sys {
+            filename
+            basename
+            breadcrumbs
+            path
+            relativePath
+            extension
+          }
           id
         }
       }
@@ -28,6 +36,14 @@ fragment SidebarParts on Sidebar {
             slug
           }
           ... on Document {
+            _sys {
+              filename
+              basename
+              breadcrumbs
+              path
+              relativePath
+              extension
+            }
             id
           }
         }

@@ -29,6 +29,15 @@ type PageInfo {
   endCursor: String!
 }
 
+input SysFilterOperations {
+  startsWith: String
+  eq: String
+}
+
+input SysFilter {
+  relativePath: SysFilterOperations
+}
+
 """"""
 interface Node {
   id: ID!
@@ -62,6 +71,7 @@ type Query {
 input DocumentFilter {
   sidebar: SidebarFilter
   page: PageFilter
+  _sys: SysFilter
 }
 
 type DocumentConnectionEdges {
@@ -128,23 +138,28 @@ input StringFilter {
 
 input SidebarLinksLabelFilter {
   title: StringFilter
+  _sys: SysFilter
 }
 
 input SidebarLinksPageReferenceFilter {
   page: PageFilter
+  _sys: SysFilter
 }
 
 input SidebarLinksPageChildrenReferenceFilter {
   page: PageFilter
+  _sys: SysFilter
 }
 
 input SidebarLinksPageChildrenFilter {
   reference: SidebarLinksPageChildrenReferenceFilter
+  _sys: SysFilter
 }
 
 input SidebarLinksPageFilter {
   reference: SidebarLinksPageReferenceFilter
   children: SidebarLinksPageChildrenFilter
+  _sys: SysFilter
 }
 
 input SidebarLinksFilter {
@@ -158,6 +173,7 @@ input SidebarFilter {
   locale: StringFilter
   type: StringFilter
   links: SidebarLinksFilter
+  _sys: SysFilter
 }
 
 type SidebarConnectionEdges {
@@ -190,6 +206,7 @@ input PageFilter {
   title: StringFilter
   body: RichTextFilter
   slug: StringFilter
+  _sys: SysFilter
 }
 
 type PageConnectionEdges {

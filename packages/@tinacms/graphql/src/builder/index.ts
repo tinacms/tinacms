@@ -5,7 +5,7 @@
 import { LookupMapType } from '../database'
 import { astBuilder, NAMER, SysFieldDefinition } from '../ast-builder'
 import { sequential } from '../util'
-import { staticDefinitions } from './static-definitions'
+import { staticDefinitions, sysFilter } from './static-definitions'
 
 import type {
   UnionTypeDefinitionNode,
@@ -849,7 +849,7 @@ export class Builder {
     })
     return astBuilder.InputObjectTypeDefinition({
       name: NAMER.dataFilterTypeName(template.namespace),
-      fields: fields,
+      fields: [...fields, sysFilter],
     })
   }
 
@@ -1259,13 +1259,15 @@ export class Builder {
         name: 'filter',
         type: astBuilder.InputObjectTypeDefinition({
           name: NAMER.dataFilterTypeName(namespace),
-          fields: await sequential(collections, async (collection) => {
-            return astBuilder.InputValueDefinition({
-              // @ts-ignore
-              name: collection.name,
-              type: NAMER.dataFilterTypeName(collection.namespace),
-            })
-          }),
+          fields: [
+            ...(await sequential(collections, async (collection) => {
+              return astBuilder.InputValueDefinition({
+                name: collection.name,
+                type: NAMER.dataFilterTypeName(collection.namespace),
+              })
+            })),
+            sysFilter,
+          ],
         }),
       })
     } else if (collection) {

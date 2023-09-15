@@ -188,4 +188,33 @@ const scalarDefinitions = [
   }),
 ]
 
-export const staticDefinitions = [...scalarDefinitions, interfaceDefinitions]
+export const sysFilter = astBuilder.InputValueDefinition({
+  name: '_sys',
+  type: astBuilder.InputObjectTypeDefinition({
+    name: `SysFilter`,
+    fields: [
+      astBuilder.InputValueDefinition({
+        name: 'relativePath',
+        type: astBuilder.InputObjectTypeDefinition({
+          name: 'SysFilterOperations',
+          fields: [
+            astBuilder.InputValueDefinition({
+              name: 'startsWith',
+              type: astBuilder.TYPES.String,
+            }),
+            astBuilder.InputValueDefinition({
+              name: 'eq',
+              type: astBuilder.TYPES.String,
+            }),
+          ],
+        }),
+      }),
+    ],
+  }),
+})
+
+export const staticDefinitions = [
+  ...scalarDefinitions,
+  sysFilter,
+  interfaceDefinitions,
+]

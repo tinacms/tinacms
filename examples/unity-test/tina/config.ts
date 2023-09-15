@@ -75,6 +75,13 @@ export default defineConfig({
         label: 'Sidebar',
         path: 'content/sidebar',
         format: 'json',
+        ui: {
+          async beforeSubmit(arg) {
+            const values = arg.values
+            console.log(arg)
+            return values
+          },
+        },
         fields: [
           {
             name: 'title',
