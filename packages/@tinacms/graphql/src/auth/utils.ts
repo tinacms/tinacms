@@ -114,3 +114,22 @@ export const checkPasswordHash = async ({
   }
   return true
 }
+type FieldLike = {
+  name: string
+  type: string
+  fields?: FieldLike[]
+}
+
+export const mapPasswordFields = (
+  fields: FieldLike[],
+  prefix: string[] = [],
+  result: string[][]
+) => {
+  fields.forEach((field) => {
+    if (field.type === 'password') {
+      result.push([...prefix, field.name])
+    } else if (field.fields) {
+      mapPasswordFields(field.fields, [...prefix, field.name], result)
+    }
+  })
+}

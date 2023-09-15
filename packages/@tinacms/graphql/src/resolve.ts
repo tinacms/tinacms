@@ -13,7 +13,8 @@ import type { GraphQLResolveInfo } from 'graphql'
 import type { Database } from './database'
 import { NAMER } from './ast-builder'
 import { handleFetchErrorError } from './resolver/error'
-import { checkPasswordHash } from './auth/utils'
+import { checkPasswordHash, mapPasswordFields } from './auth/utils'
+import { get } from 'lodash'
 
 export const resolve = async ({
   config,
@@ -182,8 +183,21 @@ export const resolve = async ({
               `${collection.path}/${args.sub}.${collection.format}`
             )
             if (info.fieldName === 'authenticate') {
+              const passwordFields: string[][] = []
+              mapPasswordFields(collection.fields, ['_rawData'], passwordFields)
+              if (!passwordFields.length) {
+                throw new Error(
+                  `No password field found in collection ${collection.name}`
+                )
+              }
+              if (passwordFields.length > 1) {
+                throw new Error(
+                  `Multiple password fields found in collection ${collection.name}`
+                )
+              }
+
               const matches = await checkPasswordHash({
-                saltedHash: userDoc['_rawData']['password'], // TODO should find the password field using the schema
+                saltedHash: get(userDoc, passwordFields[0]),
                 password: args.password,
               })
 

@@ -54,7 +54,7 @@ import {
 } from './level'
 import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
 import sha from 'js-sha1'
-import { FilesystemBridge, TinaLevelClient } from '..'
+import { FilesystemBridge, mapPasswordFields, TinaLevelClient } from '..'
 import { generatePasswordHash } from '../auth/utils'
 import { get, set } from 'lodash'
 
@@ -1566,24 +1566,4 @@ const _deleteIndexContent = async (
       )
     )
   }
-}
-
-type FieldLike = {
-  name: string
-  type: string
-  fields?: FieldLike[]
-}
-
-const mapPasswordFields = (
-  fields: FieldLike[],
-  prefix: string[] = [],
-  result: string[][]
-) => {
-  fields.forEach((field) => {
-    if (field.type === 'password') {
-      result.push([...prefix, field.name])
-    } else if (field.fields) {
-      mapPasswordFields(field.fields, [...prefix, field.name], result)
-    }
-  })
 }
