@@ -58,6 +58,8 @@ export const CollectionBaseSchema = z.object({
       }
     }),
   format: z.enum(FORMATS).optional(),
+  isAuthCollection: z.boolean().optional(),
+  applicationData: z.boolean().optional(),
 })
 
 // Zod did not handel this union very well so we will handle it ourselves
@@ -122,6 +124,14 @@ export const TinaCloudSchemaZod = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `${dups} are duplicate names in your collections. Collection names must be unique.`,
+        fatal: true,
+      })
+    }
+
+    if (val.collections?.filter((x) => x.isAuthCollection).length > 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Only one collection can be marked as isAuthCollection`,
         fatal: true,
       })
     }

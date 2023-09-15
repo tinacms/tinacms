@@ -13,9 +13,6 @@ const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
-  admin: {
-    authCollection: 'user',
-  },
   // @ts-ignore
   authProvider:
     !isLocal &&
@@ -48,6 +45,7 @@ const config = defineStaticConfig({
     collections: [
       {
         applicationData: true,
+        isAuthCollection: true,
         label: 'Users',
         name: 'user',
         path: 'content/users',

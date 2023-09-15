@@ -23,7 +23,6 @@ export const resolve = async ({
   silenceErrors,
   verbose,
   isAudit,
-  authCollection,
 }: {
   config?: GraphQLConfig
   query: string
@@ -32,7 +31,6 @@ export const resolve = async ({
   silenceErrors?: boolean
   verbose?: boolean
   isAudit?: boolean
-  authCollection?: string
 }) => {
   try {
     const verboseValue = verbose ?? true
@@ -173,12 +171,11 @@ export const resolve = async ({
             info.fieldName === 'authenticate' ||
             info.fieldName === 'authorize'
           ) {
-            if (!authCollection) {
-              throw new Error('No auth collection defined')
-            }
-            const collection = tinaSchema.getCollection(authCollection)
+            const collection = tinaSchema
+              .getCollections()
+              .find((c) => c.isAuthCollection)
             if (!collection) {
-              throw new Error(`Auth collection not found: ${authCollection}`)
+              throw new Error(`Auth collection not found`)
             }
 
             const userDoc = await resolver.getDocument(

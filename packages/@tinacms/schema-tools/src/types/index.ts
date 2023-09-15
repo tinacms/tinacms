@@ -506,10 +506,6 @@ export interface Config<
      * Hook functions that can be used to run logic when certain events happen
      */
     authHooks?: AuthHooks
-    /**
-     *
-     */
-    authCollection?: string
   }
   /**
    * The Schema is used to define the shape of the content.
@@ -746,6 +742,7 @@ interface BaseCollection {
     exclude?: string
   }
   applicationData?: boolean
+  isAuthCollection?: boolean
 }
 
 type TemplateCollection<WithNamespace extends boolean = false> = {

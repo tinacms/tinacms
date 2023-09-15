@@ -258,7 +258,6 @@ export async function databaseRequest({ query, variables }) {
     query,
     variables,
     verbose: true,
-    authCollection: '${this.configManager.config.admin?.authCollection || ''}',
   });
 
   return result;
