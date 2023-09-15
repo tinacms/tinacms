@@ -36,7 +36,9 @@ export const buildDotTinaFiles = async ({
   const builder = await createBuilder({
     tinaSchema,
   })
-  const graphQLSchema = await _buildSchema(builder, tinaSchema)
+  const graphQLSchema = await _buildSchema(builder, tinaSchema, {
+    authCollection: config.admin?.authCollection,
+  })
   let fragDoc = ''
   let queryDoc = ''
   if (buildSDK) {
@@ -118,7 +120,11 @@ const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
   return print(queryDoc)
 }
 
-const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
+const _buildSchema = async (
+  builder: Builder,
+  tinaSchema: TinaSchema,
+  opts: { authCollection?: string }
+) => {
   /**
    * Definitions for the GraphQL AST
    */
@@ -176,6 +182,15 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
    */
   await sequential(collections, async (collection) => {
     queryTypeDefinitionFields.push(await builder.collectionDocument(collection))
+
+    if (collection.name === opts?.authCollection) {
+      queryTypeDefinitionFields.push(
+        await builder.authenticationCollectionDocument(collection)
+      )
+      queryTypeDefinitionFields.push(
+        await builder.authorizationCollectionDocument(collection)
+      )
+    }
 
     mutationTypeDefinitionFields.push(
       await builder.updateCollectionDocumentMutation(collection)

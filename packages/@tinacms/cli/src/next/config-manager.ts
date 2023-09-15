@@ -339,7 +339,7 @@ export class ConfigManager {
    */
   async getPathWithExtension(filepath: string) {
     const extensions = ['tsx', 'ts', 'jsx', 'js']
-    let result
+    let result: string | undefined
     await Promise.all(
       extensions.map(async (ext) => {
         // If we found one, stop checking
@@ -347,7 +347,7 @@ export class ConfigManager {
           return
         }
         const filepathWithExtension = `${filepath}.${ext}`
-        const exists = await fs.existsSync(filepathWithExtension)
+        const exists = fs.existsSync(filepathWithExtension)
         if (exists) {
           result = filepathWithExtension
         }
@@ -370,7 +370,7 @@ export class ConfigManager {
       loader: loaders,
     })
     const result = require(outfile)
-    await fs.removeSync(outfile)
+    fs.removeSync(outfile)
     return result.default
   }
 
@@ -383,7 +383,7 @@ export class ConfigManager {
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
-    await fs.outputFileSync(tempTSConfigFile, '{}')
+    fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
@@ -422,9 +422,16 @@ export class ConfigManager {
       outfile: outfile2,
       loader: loaders,
     })
-    const result = require(outfile2)
-    await fs.removeSync(outfile)
-    await fs.removeSync(outfile2)
+    let result: { default: any }
+    try {
+      result = require(outfile2)
+    } catch (e) {
+      console.error('Unexpected error loading config')
+      console.error(e)
+      throw e
+    }
+    fs.removeSync(outfile)
+    fs.removeSync(outfile2)
     return {
       config: result.default,
       prebuildPath: prebuild,

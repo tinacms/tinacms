@@ -13,6 +13,7 @@ import type { GraphQLResolveInfo } from 'graphql'
 import type { Database } from './database'
 import { NAMER } from './ast-builder'
 import { handleFetchErrorError } from './resolver/error'
+import { checkPasswordHash } from './auth/utils'
 
 export const resolve = async ({
   config,
@@ -22,6 +23,7 @@ export const resolve = async ({
   silenceErrors,
   verbose,
   isAudit,
+  authCollection,
 }: {
   config?: GraphQLConfig
   query: string
@@ -30,6 +32,7 @@ export const resolve = async ({
   silenceErrors?: boolean
   verbose?: boolean
   isAudit?: boolean
+  authCollection?: string
 }) => {
   try {
     const verboseValue = verbose ?? true
@@ -47,7 +50,7 @@ export const resolve = async ({
       // @ts-ignore
       flags: tinaConfig?.meta?.flags,
     })) as unknown as TinaSchema
-    const resolver = await createResolver({
+    const resolver = createResolver({
       config,
       database,
       tinaSchema,
@@ -163,6 +166,41 @@ export const resolve = async ({
               throw new Error(
                 `Invalid query provided, Error message: ${e.message}`
               )
+            }
+          }
+
+          if (
+            info.fieldName === 'authenticate' ||
+            info.fieldName === 'authorize'
+          ) {
+            if (!authCollection) {
+              throw new Error('No auth collection defined')
+            }
+            const collection = tinaSchema.getCollection(authCollection)
+            if (!collection) {
+              throw new Error(`Auth collection not found: ${authCollection}`)
+            }
+
+            const userDoc = await resolver.getDocument(
+              `${collection.path}/${args.sub}.${collection.format}`
+            )
+            if (info.fieldName === 'authenticate') {
+              const matches = await checkPasswordHash({
+                saltedHash: userDoc['_rawData']['password'], // TODO should find the password field using the schema
+                password: args.password,
+              })
+
+              if (matches) {
+                return userDoc
+              } else {
+                throw new Error('Invalid password')
+              }
+            } else {
+              if (userDoc) {
+                return userDoc
+              } else {
+                throw new Error('Not authorized')
+              }
             }
           }
 

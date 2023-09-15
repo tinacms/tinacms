@@ -231,6 +231,14 @@ export type ReferenceField = (
     collections: string[]
   }
 
+export type PasswordField = (
+  | FieldGeneric<string, undefined>
+  | FieldGeneric<string, false>
+) &
+  BaseField & {
+    type: 'password'
+  }
+
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
@@ -380,6 +388,7 @@ type Field<WithNamespace extends boolean = false> = (
   | ReferenceField
   | RichTextField<WithNamespace>
   | ObjectField<WithNamespace>
+  | PasswordField
 ) &
   MaybeNamespace<WithNamespace>
 
@@ -430,6 +439,8 @@ type TokenObject = {
   refresh_token?: string
 }
 
+export type LoginStrategy = 'UsernamePassword' | 'Redirect'
+
 export interface AuthProvider {
   /**
    *  Used for getting the token from the custom auth provider
@@ -463,10 +474,11 @@ export interface AuthProvider {
    * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
    *
    **/
-  authenticate: () => Promise<any | null>
+  authenticate: (props?: Record<string, any>) => Promise<any | null>
   fetchWithToken: typeof fetch
   isAuthorized: (context?: any) => Promise<boolean>
   isAuthenticated: () => Promise<boolean>
+  getLoginStrategy: () => LoginStrategy
 }
 
 interface AuthHooks {
@@ -494,6 +506,10 @@ export interface Config<
      * Hook functions that can be used to run logic when certain events happen
      */
     authHooks: AuthHooks
+    /**
+     *
+     */
+    authCollection?: string
   }
   /**
    * The Schema is used to define the shape of the content.
@@ -729,6 +745,7 @@ interface BaseCollection {
     include?: string
     exclude?: string
   }
+  applicationData?: boolean
 }
 
 type TemplateCollection<WithNamespace extends boolean = false> = {

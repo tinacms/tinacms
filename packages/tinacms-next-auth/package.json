@@ -32,22 +32,15 @@
     "run-self-script": "node bin/tinacms-next-auth setup"
   },
   "dependencies": {
-    "@upstash/redis": "^1.22.0",
-    "bcryptjs": "^2.4.3",
-    "chalk": "^2.4.2",
-    "clipanion": "^3.2.0",
-    "dotenv": "^16.3.1",
-    "isomorphic-fetch": "^3.0.0",
-    "prompts": "^2.4.1"
-  },
-  "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
-    "@types/prompts": "^2.0.13",
     "next": "12.3.4",
     "next-auth": "4.22.1",
     "react": "^18",
     "react-dom": "^18",
-    "tinacms": "workspace:*",
+    "@tinacms/schema-tools": "workspace:*",
+    "tinacms": "workspace:*"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
     "typescript": "4.3.5"
   },
   "peerDependencies": {

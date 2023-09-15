@@ -60,6 +60,12 @@ const StringField = TinaScalerBase.extend({
   }),
   isTitle: z.boolean().optional(),
 })
+const PasswordField = TinaScalerBase.extend({
+  type: z.literal('password', {
+    invalid_type_error: typeTypeError,
+    required_error: typeRequiredError,
+  }),
+})
 const BooleanField = TinaScalerBase.extend({
   type: z.literal('boolean' as const, {
     invalid_type_error: typeTypeError,
@@ -190,6 +196,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
         ReferenceField,
         ObjectField,
         RichTextField,
+        PasswordField,
       ],
       {
         errorMap: (issue, ctx) => {

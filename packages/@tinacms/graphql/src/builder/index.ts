@@ -197,7 +197,7 @@ export class Builder {
       }),
     ]
 
-    await this.addToLookupMap({
+    this.addToLookupMap({
       type: astBuilder.TYPES.Node,
       resolveType: 'nodeDocument',
     })
@@ -431,13 +431,48 @@ export class Builder {
         type: astBuilder.TYPES.String,
       }),
     ]
-    await this.addToLookupMap({
+    this.addToLookupMap({
       type: type.name.value,
       resolveType: 'collectionDocument',
       collection: collection.name,
       [NAMER.createName([collection.name])]: 'create',
       [NAMER.updateName([collection.name])]: 'update',
     })
+    return astBuilder.FieldDefinition({ type, name, args, required: true })
+  }
+
+  public authenticationCollectionDocument = async (
+    collection: Collection<true>
+  ) => {
+    const name = 'authenticate'
+    const type = await this._buildCollectionDocumentType(collection)
+    const args = [
+      astBuilder.InputValueDefinition({
+        name: 'sub',
+        type: astBuilder.TYPES.String,
+        required: true,
+      }),
+      astBuilder.InputValueDefinition({
+        name: 'password',
+        type: astBuilder.TYPES.String,
+        required: true,
+      }),
+    ]
+    return astBuilder.FieldDefinition({ type, name, args, required: true })
+  }
+
+  public authorizationCollectionDocument = async (
+    collection: Collection<true>
+  ) => {
+    const name = 'authorize'
+    const type = await this._buildCollectionDocumentType(collection)
+    const args = [
+      astBuilder.InputValueDefinition({
+        name: 'sub',
+        type: astBuilder.TYPES.String,
+        required: true,
+      }),
+    ]
     return astBuilder.FieldDefinition({ type, name, args, required: true })
   }
 
@@ -516,6 +551,7 @@ export class Builder {
       case 'number':
       case 'boolean':
       case 'rich-text':
+      case 'password':
         return astBuilder.FieldNodeDefinition(field)
       case 'object':
         if (field.fields?.length > 0) {
@@ -1132,6 +1168,7 @@ export class Builder {
         })
       case 'datetime':
       case 'image':
+      case 'password':
       case 'string':
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1369,6 +1406,7 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
           console.warn(listWarningMsg)
         }
       case 'image':
+      case 'password':
       case 'string':
         return astBuilder.FieldDefinition({
           name: field.name,

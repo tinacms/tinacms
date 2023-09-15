@@ -18,6 +18,7 @@ interface ModalBuilderProps {
   error?: string
   actions: ButtonProps[]
   close(): void
+  children?: React.ReactNode
 }
 
 export function ModalBuilder(modalProps: ModalBuilderProps) {
@@ -28,6 +29,7 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
         <ModalBody padded>
           <p>{modalProps.message}</p>
           {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
+          {modalProps.children}
         </ModalBody>
         <ModalActions>
           {modalProps.actions.map((action) => (

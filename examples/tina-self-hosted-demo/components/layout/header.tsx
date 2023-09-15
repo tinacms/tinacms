@@ -71,7 +71,7 @@ export const Header = ({ data }) => {
       <Container size="custom" className="py-0 relative z-10 max-w-8xl">
         <div className="flex items-center justify-between gap-6">
           <h4 className="select-none text-lg font-bold tracking-tight my-4 transition duration-150 ease-out transform">
-            <Link href="/" passHref>
+            <Link legacyBehavior href="/" passHref>
               <a className="flex gap-1 items-center whitespace-nowrap tracking-[.002em]">
                 <Icon
                   parentColor={data.color}
@@ -99,7 +99,11 @@ export const Header = ({ data }) => {
                       activeItem ? activeItemClasses[theme.color] : ''
                     }`}
                   >
-                    <Link href={`${prefix}/${item.href}`} passHref>
+                    <Link
+                      legacyBehavior
+                      href={`${prefix}/${item.href}`}
+                      passHref
+                    >
                       <a
                         className={`relative select-none	text-base inline-block tracking-wide transition duration-150 ease-out hover:opacity-100 py-8 px-4 ${
                           activeItem ? `` : `opacity-70`

@@ -1,4 +1,4 @@
-import { AuthProvider } from '@tinacms/schema-tools'
+import { AuthProvider, LoginStrategy } from '@tinacms/schema-tools'
 import { authenticate, AUTH_TOKEN_KEY, TokenObject } from '../auth/authenticate'
 
 export abstract class AbstractAuthProvider implements AuthProvider {
@@ -38,10 +38,14 @@ export abstract class AbstractAuthProvider implements AuthProvider {
     return !!(await this.getUser())
   }
 
+  getLoginStrategy(): LoginStrategy {
+    return 'Redirect'
+  }
+
   abstract getToken()
   abstract getUser()
   abstract logout()
-  abstract authenticate()
+  abstract authenticate(props?: Record<string, string>)
 }
 
 export class TinaCloudAuthProvider extends AbstractAuthProvider {
@@ -214,7 +218,7 @@ export class LocalAuthProvider extends AbstractAuthProvider {
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
   }
   async getToken() {
-    return { token: '' }
+    return { id_token: '' }
   }
   async logout() {
     localStorage.removeItem(LOCAL_CLIENT_KEY)

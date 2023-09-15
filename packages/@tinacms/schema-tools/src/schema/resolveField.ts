@@ -174,6 +174,12 @@ export const resolveField = (
         component: 'rich-text',
         ...extraFields,
       }
+    case 'password':
+      return {
+        component: 'text', // TODO this should be a password component
+        ...field,
+        ...extraFields,
+      }
     case 'reference':
       return {
         ...field,

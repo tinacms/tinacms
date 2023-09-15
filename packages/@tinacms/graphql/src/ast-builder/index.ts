@@ -522,6 +522,7 @@ export const astBuilder = {
         datetime: 'String', // FIXME
         image: 'String', // FIXME
         text: 'String',
+        password: 'String',
       }
       return scalars[type]
     },
@@ -529,6 +530,7 @@ export const astBuilder = {
     CollectionDocumentUnion: 'DocumentUnion',
     Folder: 'Folder',
     String: 'String',
+    Password: 'Password',
     Reference: 'Reference',
     Collection: 'Collection',
     ID: 'ID',
@@ -1043,6 +1045,7 @@ type scalarNames =
   | 'image'
   | 'text'
   | 'number'
+  | 'password'
 
 const capitalize = (s: string) => {
   if (typeof s !== 'string') return ''

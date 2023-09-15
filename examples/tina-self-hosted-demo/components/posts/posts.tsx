@@ -29,6 +29,7 @@ export const Posts = ({ data }) => {
         }
         return (
           <Link
+            legacyBehavior
             key={post._sys.filename}
             href={`/posts/` + post._sys.filename}
             passHref
