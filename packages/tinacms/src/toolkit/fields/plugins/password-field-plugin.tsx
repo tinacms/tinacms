@@ -42,6 +42,7 @@ export const PasswordFieldComponent = wrapFieldsWithMeta<
   return (
     <div className="flex flex-row space-x-4">
       <BasePasswordField
+        autoComplete={'off'}
         value={password ?? PasswordMask}
         ref={ref1}
         disabled={field?.disabled ?? false}
@@ -60,6 +61,7 @@ export const PasswordFieldComponent = wrapFieldsWithMeta<
         }}
       />
       <BasePasswordField
+        autoComplete={'off'}
         ref={ref2}
         value={confirmPassword ?? PasswordMask}
         disabled={field?.disabled ?? false}
