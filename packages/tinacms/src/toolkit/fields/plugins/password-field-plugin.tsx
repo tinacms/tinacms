@@ -28,12 +28,9 @@ export const PasswordFieldComponent = wrapFieldsWithMeta<
     if (password) {
       if (password === confirmPassword) {
         setError(false)
-        // form.getFieldState(field.name)?.
-        // form.mutators.update(field.name, 0, password)
         form.change(field.name, password)
       } else {
         setError(true)
-        // form.mutators.update(field.name, 0, '')
         form.change(field.name, '')
       }
     }
