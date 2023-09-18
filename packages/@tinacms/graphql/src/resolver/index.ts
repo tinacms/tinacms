@@ -74,7 +74,7 @@ const resolveFieldData = async (
       }
       break
     case 'password':
-      accumulator[field.name] = '********'
+      accumulator[field.name] = undefined
       break
     case 'image':
       accumulator[field.name] = resolveMediaRelativeToCloud(

@@ -30,6 +30,7 @@ import {
   ReferenceFieldPlugin,
   ButtonToggleFieldPlugin,
   HiddenFieldPlugin,
+  PasswordFieldPlugin,
 } from '@toolkit/fields'
 import { Form } from '@toolkit/forms'
 import { Alerts, EventsToAlerts } from '@toolkit/alerts'
@@ -64,6 +65,7 @@ const DEFAULT_FIELDS = [
   ReferenceFieldPlugin,
   ButtonToggleFieldPlugin,
   HiddenFieldPlugin,
+  PasswordFieldPlugin,
 ]
 
 export interface TinaCMSConfig extends CMSConfig {

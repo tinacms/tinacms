@@ -64,6 +64,7 @@ const config = defineStaticConfig({
             type: 'password',
             label: 'Password',
             name: 'password',
+            required: true,
           },
         ],
       },

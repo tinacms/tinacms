@@ -176,7 +176,7 @@ export const resolveField = (
       }
     case 'password':
       return {
-        component: 'text', // TODO this should be a password component
+        component: 'password',
         ...field,
         ...extraFields,
       }
