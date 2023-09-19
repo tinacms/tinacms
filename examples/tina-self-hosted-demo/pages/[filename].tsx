@@ -1,4 +1,3 @@
-import React from 'react'
 import { Blocks } from '../components/blocks-renderer'
 import { useTina } from 'tinacms/dist/react'
 import { Layout } from '../components/layout'

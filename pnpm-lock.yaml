@@ -113,7 +113,7 @@ importers:
       graphql: ^15.1.0
       jest-file-snapshot: ^0.5.0
       mongodb-level: ^0.0.2
-      next: ^13.4.19
+      next: 12.2.4
       postcss: ^8.4.18
       puppeteer: ^18.0.5
       react: 18.2.0
@@ -133,7 +133,7 @@ importers:
       graphql: 15.8.0
       jest-file-snapshot: 0.5.0
       mongodb-level: 0.0.2
-      next: 13.4.19_biqbaboplfbrettd7655fr4n2y
+      next: 12.2.4_biqbaboplfbrettd7655fr4n2y
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-icons: 4.7.1_react@18.2.0
@@ -162,16 +162,13 @@ importers:
       '@tailwindcss/typography': ^0.5.8
       '@tinacms/cli': workspace:*
       '@tinacms/datalayer': workspace:*
-      '@types/js-cookie': ^3.0.0
       '@types/node': ^16.11.7
       '@types/react': 17.0.47
-      '@types/styled-components': ^5.1.15
       '@typescript-eslint/eslint-plugin': ^5.60.0
       '@typescript-eslint/parser': ^5.20.0
       autoprefixer: ^10.4.0
       date-fns: ^2.23.0
       eslint: ^8.13.0
-      js-base64: ^3.7.4
       mongodb-level: ^0.0.2
       next: ^13.4.19
       next-auth: ^4.22.1
@@ -192,7 +189,6 @@ importers:
       '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.7
       '@tinacms/datalayer': link:../../packages/@tinacms/datalayer
       date-fns: 2.28.0
-      js-base64: 3.7.5
       mongodb-level: 0.0.2
       next: 13.4.19_biqbaboplfbrettd7655fr4n2y
       next-auth: 4.22.1_m2l4knchnqa6bzxbbtfxlzoxdy
@@ -205,10 +201,8 @@ importers:
     devDependencies:
       '@svgr/webpack': 8.0.1
       '@tinacms/cli': link:../../packages/@tinacms/cli
-      '@types/js-cookie': 3.0.2
       '@types/node': 16.11.41
       '@types/react': 17.0.47
-      '@types/styled-components': 5.1.25
       '@typescript-eslint/eslint-plugin': 5.60.0_2ppg4eqo6qarmck7tdsljpa7qq
       '@typescript-eslint/parser': 5.53.0_ypn2ylkkyfa5i233caldtndbqa
       autoprefixer: 10.4.7_postcss@8.4.18
@@ -11572,7 +11566,7 @@ packages:
       }
     dependencies:
       '@types/connect': 3.4.35
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
     dev: true
 
   /@types/braces/3.0.1:
@@ -11763,7 +11757,7 @@ packages:
         integrity: sha512-uMd++6dMKS32EOuw1Uli3e3BPgdLIXmezcfHv7N4c1s3gkhikBplORPpMq3fuWkxncZN1reb16d5n8yhQ80x7Q==,
       }
     dependencies:
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
       '@types/qs': 6.9.7
       '@types/range-parser': 1.2.4
     dev: true
@@ -12409,7 +12403,7 @@ packages:
       }
     dependencies:
       '@types/mime': 1.3.2
-      '@types/node': 14.18.29
+      '@types/node': 18.7.18
     dev: true
 
   /@types/sinonjs__fake-timers/8.1.1:
@@ -14743,7 +14737,7 @@ packages:
       acorn: 7.4.1
     dev: true
 
-  /acorn-jsx/5.3.2_acorn@8.8.0:
+  /acorn-jsx/5.3.2_acorn@8.9.0:
     resolution:
       {
         integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==,
@@ -14751,19 +14745,7 @@ packages:
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
     dependencies:
-      acorn: 8.8.0
-    dev: false
-
-  /acorn-jsx/5.3.2_acorn@8.8.2:
-    resolution:
-      {
-        integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==,
-      }
-    peerDependencies:
-      acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
-    dependencies:
-      acorn: 8.8.2
-    dev: true
+      acorn: 8.9.0
 
   /acorn-node/1.8.2:
     resolution:
@@ -14797,15 +14779,6 @@ packages:
     engines: { node: '>=0.4.0' }
     hasBin: true
 
-  /acorn/8.8.0:
-    resolution:
-      {
-        integrity: sha512-QOxyigPVrpZ2GXT+PFyZTl6TtOFc5egxHIP9IlQ+RbupQuX4RkT/Bee4/kQuC02Xkzg84JcT7oLYtDIQxp+v7w==,
-      }
-    engines: { node: '>=0.4.0' }
-    hasBin: true
-    dev: false
-
   /acorn/8.8.2:
     resolution:
       {
@@ -14821,7 +14794,6 @@ packages:
       }
     engines: { node: '>=0.4.0' }
     hasBin: true
-    dev: true
 
   /agent-base/6.0.2:
     resolution:
@@ -17869,7 +17841,7 @@ packages:
     dependencies:
       '@babel/runtime': 7.21.0
       compute-scroll-into-view: 1.0.17
-      prop-types: 15.7.2
+      prop-types: 15.8.1
       react: 17.0.2
       react-is: 17.0.2
       tslib: 2.5.0
@@ -19180,8 +19152,8 @@ packages:
       }
     engines: { node: ^12.22.0 || ^14.17.0 || >=16.0.0 }
     dependencies:
-      acorn: 8.8.2
-      acorn-jsx: 5.3.2_acorn@8.8.2
+      acorn: 8.9.0
+      acorn-jsx: 5.3.2_acorn@8.9.0
       eslint-visitor-keys: 3.3.0
     dev: true
 
@@ -19192,8 +19164,8 @@ packages:
       }
     engines: { node: ^12.22.0 || ^14.17.0 || >=16.0.0 }
     dependencies:
-      acorn: 8.8.2
-      acorn-jsx: 5.3.2_acorn@8.8.2
+      acorn: 8.9.0
+      acorn-jsx: 5.3.2_acorn@8.9.0
       eslint-visitor-keys: 3.4.1
     dev: true
 
@@ -24038,8 +24010,8 @@ packages:
         integrity: sha512-TZZRZgeHvtgm+IhtgC2+uDMR7h8eTKF0QUX9YsgoL9+bADBpBY6SiLvWqnBlLbCEevITmTqmEuY3FoxMKVs1rQ==,
       }
     dependencies:
-      acorn: 8.8.0
-      acorn-jsx: 5.3.2_acorn@8.8.0
+      acorn: 8.9.0
+      acorn-jsx: 5.3.2_acorn@8.9.0
       micromark-extension-mdx-expression: 1.0.3
       micromark-extension-mdx-jsx: 1.0.3
       micromark-extension-mdx-md: 1.0.0
@@ -26653,6 +26625,7 @@ packages:
         integrity: sha512-7+UhmYa7wxPh2oMRwA++k8UGVDxh3YdWFB52r9C3tM81T6BU7cuusUSxImz0GEYSOYUKk/YzIhkQ6+vc0gHbxQ==,
       }
     engines: { node: '>=14.1.0' }
+    deprecated: < 19.4.0 is no longer supported
     requiresBuild: true
     dependencies:
       https-proxy-agent: 5.0.1
@@ -30920,7 +30893,7 @@ packages:
     engines: { node: '>=6.0' }
     hasBin: true
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.9.0
       acorn-walk: 8.2.0
     dev: false
     optional: true
