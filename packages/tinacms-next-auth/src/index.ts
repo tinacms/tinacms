@@ -79,6 +79,7 @@ const TinaNextAuthOptions = ({
     session: async ({ session, token: jwt }) => {
       // forward the role to the session
       ;(session.user as any).role = jwt.role
+      ;(session.user as any).sub = jwt.sub
       return session
     },
   },
@@ -116,7 +117,7 @@ const withNextAuthApiRoute = (
         })
       }
 
-      if (!session?.user?.name) {
+      if (!session?.user) {
         return res.status(401).json({ error: 'Unauthorized' })
       }
 
