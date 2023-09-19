@@ -13,8 +13,12 @@ import type { GraphQLResolveInfo } from 'graphql'
 import type { Database } from './database'
 import { NAMER } from './ast-builder'
 import { handleFetchErrorError } from './resolver/error'
-import { checkPasswordHash, mapPasswordFields } from './auth/utils'
-import { get } from 'lodash'
+import {
+  checkPasswordHash,
+  generatePasswordHash,
+  mapPasswordFields,
+} from './auth/utils'
+import { get, set } from 'lodash'
 
 export const resolve = async ({
   config,
@@ -24,6 +28,7 @@ export const resolve = async ({
   silenceErrors,
   verbose,
   isAudit,
+  user,
 }: {
   config?: GraphQLConfig
   query: string
@@ -32,6 +37,7 @@ export const resolve = async ({
   silenceErrors?: boolean
   verbose?: boolean
   isAudit?: boolean
+  user?: { sub: string }
 }) => {
   try {
     const verboseValue = verbose ?? true
@@ -213,6 +219,56 @@ export const resolve = async ({
                 throw new Error('Not authorized')
               }
             }
+          }
+
+          if (info.fieldName === 'updatePassword') {
+            if (!user?.sub) {
+              throw new Error('Not authorized')
+            }
+
+            if (!args.password) {
+              throw new Error('No password provided')
+            }
+
+            const collection = tinaSchema
+              .getCollections()
+              .find((c) => c.isAuthCollection)
+            if (!collection) {
+              throw new Error(`Auth collection not found`)
+            }
+            const realPath = `${collection.path}/${user.sub}.${collection.format}`
+            const userDoc = await resolver.getDocument(realPath)
+            if (!userDoc) {
+              throw new Error('Not authorized')
+            }
+
+            const passwordFields: string[][] = []
+            mapPasswordFields(collection.fields, ['user'], passwordFields)
+            if (!passwordFields.length) {
+              throw new Error(
+                `No password field found in collection ${collection.name}`
+              )
+            }
+            if (passwordFields.length > 1) {
+              throw new Error(
+                `Multiple password fields found in collection ${collection.name}`
+              )
+            }
+
+            const params = {}
+            set(
+              params,
+              passwordFields[0],
+              await generatePasswordHash({ password: args.password })
+            )
+
+            return await resolver.updateResolveDocument({
+              collection,
+              args: { params },
+              realPath,
+              isCollectionSpecific: false,
+              isAddPendingDocument: false,
+            })
           }
 
           // We assume the value is already fully resolved

@@ -184,6 +184,9 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       queryTypeDefinitionFields.push(
         await builder.authorizationCollectionDocument(collection)
       )
+      mutationTypeDefinitionFields.push(
+        await builder.updatePasswordMutation(collection)
+      )
     }
 
     mutationTypeDefinitionFields.push(

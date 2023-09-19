@@ -461,6 +461,21 @@ export class Builder {
     return astBuilder.FieldDefinition({ type, name, args, required: true })
   }
 
+  public updatePasswordMutation = async (collection: Collection<true>) => {
+    return astBuilder.FieldDefinition({
+      type: await this._buildCollectionDocumentType(collection),
+      name: 'updatePassword',
+      required: true,
+      args: [
+        astBuilder.InputValueDefinition({
+          name: 'password',
+          required: true,
+          type: astBuilder.TYPES.String,
+        }),
+      ],
+    })
+  }
+
   public authorizationCollectionDocument = async (
     collection: Collection<true>
   ) => {

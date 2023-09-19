@@ -3,7 +3,11 @@ import { TinaNextAuthOptions, withNextAuthApiRoute } from 'tinacms-next-auth'
 
 async function handler(req, res) {
   const { query, variables } = req.body
-  const result = await databaseClient.request({ query, variables })
+  const result = await databaseClient.request({
+    query,
+    variables,
+    user: req.session?.user,
+  })
   return res.json(result)
 }
 

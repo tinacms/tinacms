@@ -249,7 +249,7 @@ import type { TinaClient } from "tinacms/dist/client";
 import { queries } from "./types";
 import database from "../database";
 
-export async function databaseRequest({ query, variables }) {
+export async function databaseRequest({ query, variables, user }) {
   const result = await resolve({
     config: {
       useRelativeMedia: true,
@@ -258,6 +258,7 @@ export async function databaseRequest({ query, variables }) {
     query,
     variables,
     verbose: true,
+    user,
   });
 
   return result;
@@ -270,8 +271,8 @@ function createDatabaseClient<GenQueries = Record<string, unknown>>({
     request: TinaClient<GenQueries>["request"];
   }) => GenQueries;
 }) {
-  const request = async ({ query, variables }) => {
-    const data = await databaseRequest({ query, variables });
+  const request = async ({ query, variables, user }) => {
+    const data = await databaseRequest({ query, variables, user });
     return { data: data.data as any, query, variables, errors: data.errors };
   };
   const q = queries({
