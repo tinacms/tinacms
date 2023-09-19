@@ -1,56 +1,3 @@
-query sidebar($relativePath: String!) {
-  sidebar(relativePath: $relativePath) {
-    ... on Document {
-      _sys {
-        filename
-        basename
-        breadcrumbs
-        path
-        relativePath
-        extension
-      }
-      id
-    }
-    ...SidebarParts
-  }
-}
-
-query sidebarConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: SidebarFilter) {
-  sidebarConnection(
-    before: $before
-    after: $after
-    first: $first
-    last: $last
-    sort: $sort
-    filter: $filter
-  ) {
-    pageInfo {
-      hasPreviousPage
-      hasNextPage
-      startCursor
-      endCursor
-    }
-    totalCount
-    edges {
-      cursor
-      node {
-        ... on Document {
-          _sys {
-            filename
-            basename
-            breadcrumbs
-            path
-            relativePath
-            extension
-          }
-          id
-        }
-        ...SidebarParts
-      }
-    }
-  }
-}
-
 query page($relativePath: String!) {
   page(relativePath: $relativePath) {
     ... on Document {
@@ -99,6 +46,59 @@ query pageConnection($before: String, $after: String, $first: Float, $last: Floa
           id
         }
         ...PageParts
+      }
+    }
+  }
+}
+
+query manual($relativePath: String!) {
+  manual(relativePath: $relativePath) {
+    ... on Document {
+      _sys {
+        filename
+        basename
+        breadcrumbs
+        path
+        relativePath
+        extension
+      }
+      id
+    }
+    ...ManualParts
+  }
+}
+
+query manualConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: ManualFilter) {
+  manualConnection(
+    before: $before
+    after: $after
+    first: $first
+    last: $last
+    sort: $sort
+    filter: $filter
+  ) {
+    pageInfo {
+      hasPreviousPage
+      hasNextPage
+      startCursor
+      endCursor
+    }
+    totalCount
+    edges {
+      cursor
+      node {
+        ... on Document {
+          _sys {
+            filename
+            basename
+            breadcrumbs
+            path
+            relativePath
+            extension
+          }
+          id
+        }
+        ...ManualParts
       }
     }
   }

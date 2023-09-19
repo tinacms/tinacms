@@ -952,7 +952,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
         </button>
         {folderArray.map((node, index) => {
           return (
-            <>
+            <React.Fragment key={index}>
               <span className="text-gray-200 shrink-0">/</span>
               {index < folderArray.length - 1 ? (
                 <button
@@ -977,7 +977,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
               ) : (
                 <span className="whitespace-nowrap truncate">{node}</span>
               )}
-            </>
+            </React.Fragment>
           )
         })}
       </span>

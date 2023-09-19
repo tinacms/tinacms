@@ -849,7 +849,8 @@ export class Builder {
     })
     return astBuilder.InputObjectTypeDefinition({
       name: NAMER.dataFilterTypeName(template.namespace),
-      fields: [...fields, sysFilter],
+      // fields: [...fields, sysFilter],
+      fields: [...fields],
     })
   }
 
@@ -1266,7 +1267,7 @@ export class Builder {
                 type: NAMER.dataFilterTypeName(collection.namespace),
               })
             })),
-            sysFilter,
+            // sysFilter,
           ],
         }),
       })

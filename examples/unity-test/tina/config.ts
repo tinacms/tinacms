@@ -1,4 +1,4 @@
-import { Template, TinaField, defineConfig } from 'tinacms'
+import { Collection, Template, TinaField, defineConfig } from 'tinacms'
 
 const links: TinaField = {
   label: 'Links',
@@ -14,6 +14,7 @@ const links: TinaField = {
           if (item) {
             return { label: item.title }
           }
+          return {}
         },
       },
       fields: [
@@ -32,6 +33,7 @@ const links: TinaField = {
           if (item) {
             return { label: item.reference }
           }
+          return {}
         },
       },
       fields: [
@@ -60,6 +62,41 @@ const links: TinaField = {
   ],
 }
 
+const pageFields: Partial<Collection> = {
+  ui: {
+    filename: {
+      slugify: (values, meta) => {
+        if (meta.template.name === 'toc') {
+          return `_index`
+        }
+        return ''
+      },
+    },
+  },
+  templates: [
+    {
+      name: 'toc',
+      label: 'Table of Contents',
+      fields: [{ name: 'title', type: 'string' }],
+    },
+    {
+      name: 'landing',
+      label: 'Landing Page',
+      fields: [{ name: 'title', type: 'string' }],
+    },
+    {
+      name: 'manual',
+      label: 'Manual Page',
+      fields: [{ name: 'title', type: 'string' }],
+    },
+    {
+      name: 'reference',
+      label: 'Reference Page',
+      fields: [{ name: 'title', type: 'string' }],
+    },
+  ],
+}
+
 export default defineConfig({
   build: {
     outputFolder: 'admin',
@@ -71,73 +108,18 @@ export default defineConfig({
   schema: {
     collections: [
       {
-        name: 'sidebar',
-        label: 'Sidebar',
-        path: 'content/sidebar',
-        format: 'json',
-        ui: {
-          async beforeSubmit(arg) {
-            const values = arg.values
-            console.log(arg)
-            return values
-          },
-        },
-        fields: [
-          {
-            name: 'title',
-            type: 'string',
-            label: 'Title',
-            isTitle: true,
-            required: true,
-          },
-          {
-            name: 'version',
-            type: 'string',
-            label: 'Version',
-          },
-          {
-            name: 'locale',
-            type: 'string',
-            label: 'Locale',
-            options: ['en', 'sp'],
-          },
-          {
-            name: 'type',
-            type: 'string',
-            label: 'Type',
-            options: [
-              { label: 'User Manual', value: 'manual' },
-              { label: 'Reference', value: 'reference' },
-              { label: 'Landing Page', value: 'landing' },
-            ],
-          },
-          links,
-        ],
-      },
-      {
         name: 'page',
         label: 'Page',
         path: 'content/pages',
         format: 'mdx',
-        fields: [
-          {
-            name: 'title',
-            type: 'string',
-            label: 'Title',
-            isTitle: true,
-            required: true,
-          },
-          {
-            name: 'body',
-            label: 'Body',
-            type: 'rich-text',
-          },
-          {
-            name: 'slug',
-            label: 'Slug',
-            type: 'string',
-          },
-        ],
+        ...pageFields,
+      },
+      {
+        name: 'manual',
+        label: 'Manual',
+        path: 'content/manual',
+        format: 'mdx',
+        ...pageFields,
       },
     ],
   },

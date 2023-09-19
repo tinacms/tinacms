@@ -58,15 +58,6 @@ export type PageInfo = {
   endCursor: Scalars['String']['output'];
 };
 
-export type SysFilterOperations = {
-  startsWith?: InputMaybe<Scalars['String']['input']>;
-  eq?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type SysFilter = {
-  relativePath?: InputMaybe<SysFilterOperations>;
-};
-
 export type Node = {
   id: Scalars['ID']['output'];
 };
@@ -90,10 +81,10 @@ export type Query = {
   collections: Array<Collection>;
   node: Node;
   document: DocumentNode;
-  sidebar: Sidebar;
-  sidebarConnection: SidebarConnection;
   page: Page;
   pageConnection: PageConnection;
+  manual: Manual;
+  manualConnection: ManualConnection;
 };
 
 
@@ -118,21 +109,6 @@ export type QueryDocumentArgs = {
 };
 
 
-export type QuerySidebarArgs = {
-  relativePath?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type QuerySidebarConnectionArgs = {
-  before?: InputMaybe<Scalars['String']['input']>;
-  after?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Float']['input']>;
-  last?: InputMaybe<Scalars['Float']['input']>;
-  sort?: InputMaybe<Scalars['String']['input']>;
-  filter?: InputMaybe<SidebarFilter>;
-};
-
-
 export type QueryPageArgs = {
   relativePath?: InputMaybe<Scalars['String']['input']>;
 };
@@ -147,10 +123,24 @@ export type QueryPageConnectionArgs = {
   filter?: InputMaybe<PageFilter>;
 };
 
+
+export type QueryManualArgs = {
+  relativePath?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryManualConnectionArgs = {
+  before?: InputMaybe<Scalars['String']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Float']['input']>;
+  last?: InputMaybe<Scalars['Float']['input']>;
+  sort?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<ManualFilter>;
+};
+
 export type DocumentFilter = {
-  sidebar?: InputMaybe<SidebarFilter>;
   page?: InputMaybe<PageFilter>;
-  _sys?: InputMaybe<SysFilter>;
+  manual?: InputMaybe<ManualFilter>;
 };
 
 export type DocumentConnectionEdges = {
@@ -190,41 +180,41 @@ export type CollectionDocumentsArgs = {
   folder?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type DocumentNode = Sidebar | Page | Folder;
+export type DocumentNode = PageToc | PageLanding | PageManual | PageReference | ManualToc | ManualLanding | ManualManual | ManualReference | Folder;
 
-export type SidebarLinksLabel = {
-  __typename?: 'SidebarLinksLabel';
+export type PageToc = Node & Document & {
+  __typename?: 'PageToc';
   title?: Maybe<Scalars['String']['output']>;
-};
-
-export type SidebarLinksPageReference = Page;
-
-export type SidebarLinksPageChildrenReference = Page;
-
-export type SidebarLinksPageChildren = {
-  __typename?: 'SidebarLinksPageChildren';
-  reference?: Maybe<SidebarLinksPageChildrenReference>;
-};
-
-export type SidebarLinksPage = {
-  __typename?: 'SidebarLinksPage';
-  reference?: Maybe<SidebarLinksPageReference>;
-  children?: Maybe<Array<Maybe<SidebarLinksPageChildren>>>;
-};
-
-export type SidebarLinks = SidebarLinksLabel | SidebarLinksPage;
-
-export type Sidebar = Node & Document & {
-  __typename?: 'Sidebar';
-  title: Scalars['String']['output'];
-  version?: Maybe<Scalars['String']['output']>;
-  locale?: Maybe<Scalars['String']['output']>;
-  type?: Maybe<Scalars['String']['output']>;
-  links?: Maybe<Array<Maybe<SidebarLinks>>>;
   id: Scalars['ID']['output'];
   _sys: SystemInfo;
   _values: Scalars['JSON']['output'];
 };
+
+export type PageLanding = Node & Document & {
+  __typename?: 'PageLanding';
+  title?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON']['output'];
+};
+
+export type PageManual = Node & Document & {
+  __typename?: 'PageManual';
+  title?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON']['output'];
+};
+
+export type PageReference = Node & Document & {
+  __typename?: 'PageReference';
+  title?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON']['output'];
+};
+
+export type Page = PageToc | PageLanding | PageManual | PageReference;
 
 export type StringFilter = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
@@ -233,80 +223,27 @@ export type StringFilter = {
   in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
-export type SidebarLinksLabelFilter = {
+export type PageTocFilter = {
   title?: InputMaybe<StringFilter>;
-  _sys?: InputMaybe<SysFilter>;
 };
 
-export type SidebarLinksPageReferenceFilter = {
-  page?: InputMaybe<PageFilter>;
-  _sys?: InputMaybe<SysFilter>;
-};
-
-export type SidebarLinksPageChildrenReferenceFilter = {
-  page?: InputMaybe<PageFilter>;
-  _sys?: InputMaybe<SysFilter>;
-};
-
-export type SidebarLinksPageChildrenFilter = {
-  reference?: InputMaybe<SidebarLinksPageChildrenReferenceFilter>;
-  _sys?: InputMaybe<SysFilter>;
-};
-
-export type SidebarLinksPageFilter = {
-  reference?: InputMaybe<SidebarLinksPageReferenceFilter>;
-  children?: InputMaybe<SidebarLinksPageChildrenFilter>;
-  _sys?: InputMaybe<SysFilter>;
-};
-
-export type SidebarLinksFilter = {
-  label?: InputMaybe<SidebarLinksLabelFilter>;
-  page?: InputMaybe<SidebarLinksPageFilter>;
-};
-
-export type SidebarFilter = {
+export type PageLandingFilter = {
   title?: InputMaybe<StringFilter>;
-  version?: InputMaybe<StringFilter>;
-  locale?: InputMaybe<StringFilter>;
-  type?: InputMaybe<StringFilter>;
-  links?: InputMaybe<SidebarLinksFilter>;
-  _sys?: InputMaybe<SysFilter>;
 };
 
-export type SidebarConnectionEdges = {
-  __typename?: 'SidebarConnectionEdges';
-  cursor: Scalars['String']['output'];
-  node?: Maybe<Sidebar>;
+export type PageManualFilter = {
+  title?: InputMaybe<StringFilter>;
 };
 
-export type SidebarConnection = Connection & {
-  __typename?: 'SidebarConnection';
-  pageInfo: PageInfo;
-  totalCount: Scalars['Float']['output'];
-  edges?: Maybe<Array<Maybe<SidebarConnectionEdges>>>;
-};
-
-export type Page = Node & Document & {
-  __typename?: 'Page';
-  title: Scalars['String']['output'];
-  body?: Maybe<Scalars['JSON']['output']>;
-  slug?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  _sys: SystemInfo;
-  _values: Scalars['JSON']['output'];
-};
-
-export type RichTextFilter = {
-  startsWith?: InputMaybe<Scalars['String']['input']>;
-  eq?: InputMaybe<Scalars['String']['input']>;
-  exists?: InputMaybe<Scalars['Boolean']['input']>;
+export type PageReferenceFilter = {
+  title?: InputMaybe<StringFilter>;
 };
 
 export type PageFilter = {
-  title?: InputMaybe<StringFilter>;
-  body?: InputMaybe<RichTextFilter>;
-  slug?: InputMaybe<StringFilter>;
-  _sys?: InputMaybe<SysFilter>;
+  toc?: InputMaybe<PageTocFilter>;
+  landing?: InputMaybe<PageLandingFilter>;
+  manual?: InputMaybe<PageManualFilter>;
+  reference?: InputMaybe<PageReferenceFilter>;
 };
 
 export type PageConnectionEdges = {
@@ -322,16 +259,86 @@ export type PageConnection = Connection & {
   edges?: Maybe<Array<Maybe<PageConnectionEdges>>>;
 };
 
+export type ManualToc = Node & Document & {
+  __typename?: 'ManualToc';
+  title?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON']['output'];
+};
+
+export type ManualLanding = Node & Document & {
+  __typename?: 'ManualLanding';
+  title?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON']['output'];
+};
+
+export type ManualManual = Node & Document & {
+  __typename?: 'ManualManual';
+  title?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON']['output'];
+};
+
+export type ManualReference = Node & Document & {
+  __typename?: 'ManualReference';
+  title?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON']['output'];
+};
+
+export type Manual = ManualToc | ManualLanding | ManualManual | ManualReference;
+
+export type ManualTocFilter = {
+  title?: InputMaybe<StringFilter>;
+};
+
+export type ManualLandingFilter = {
+  title?: InputMaybe<StringFilter>;
+};
+
+export type ManualManualFilter = {
+  title?: InputMaybe<StringFilter>;
+};
+
+export type ManualReferenceFilter = {
+  title?: InputMaybe<StringFilter>;
+};
+
+export type ManualFilter = {
+  toc?: InputMaybe<ManualTocFilter>;
+  landing?: InputMaybe<ManualLandingFilter>;
+  manual?: InputMaybe<ManualManualFilter>;
+  reference?: InputMaybe<ManualReferenceFilter>;
+};
+
+export type ManualConnectionEdges = {
+  __typename?: 'ManualConnectionEdges';
+  cursor: Scalars['String']['output'];
+  node?: Maybe<Manual>;
+};
+
+export type ManualConnection = Connection & {
+  __typename?: 'ManualConnection';
+  pageInfo: PageInfo;
+  totalCount: Scalars['Float']['output'];
+  edges?: Maybe<Array<Maybe<ManualConnectionEdges>>>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addPendingDocument: DocumentNode;
   updateDocument: DocumentNode;
   deleteDocument: DocumentNode;
   createDocument: DocumentNode;
-  updateSidebar: Sidebar;
-  createSidebar: Sidebar;
   updatePage: Page;
   createPage: Page;
+  updateManual: Manual;
+  createManual: Manual;
 };
 
 
@@ -362,18 +369,6 @@ export type MutationCreateDocumentArgs = {
 };
 
 
-export type MutationUpdateSidebarArgs = {
-  relativePath: Scalars['String']['input'];
-  params: SidebarMutation;
-};
-
-
-export type MutationCreateSidebarArgs = {
-  relativePath: Scalars['String']['input'];
-  params: SidebarMutation;
-};
-
-
 export type MutationUpdatePageArgs = {
   relativePath: Scalars['String']['input'];
   params: PageMutation;
@@ -385,78 +380,101 @@ export type MutationCreatePageArgs = {
   params: PageMutation;
 };
 
+
+export type MutationUpdateManualArgs = {
+  relativePath: Scalars['String']['input'];
+  params: ManualMutation;
+};
+
+
+export type MutationCreateManualArgs = {
+  relativePath: Scalars['String']['input'];
+  params: ManualMutation;
+};
+
 export type DocumentUpdateMutation = {
-  sidebar?: InputMaybe<SidebarMutation>;
   page?: InputMaybe<PageMutation>;
+  manual?: InputMaybe<ManualMutation>;
   relativePath?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type DocumentMutation = {
-  sidebar?: InputMaybe<SidebarMutation>;
   page?: InputMaybe<PageMutation>;
+  manual?: InputMaybe<ManualMutation>;
 };
 
-export type SidebarLinksLabelMutation = {
+export type PageTocMutation = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type SidebarLinksPageChildrenMutation = {
-  reference?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type SidebarLinksPageMutation = {
-  reference?: InputMaybe<Scalars['String']['input']>;
-  children?: InputMaybe<Array<InputMaybe<SidebarLinksPageChildrenMutation>>>;
-};
-
-export type SidebarLinksMutation = {
-  label?: InputMaybe<SidebarLinksLabelMutation>;
-  page?: InputMaybe<SidebarLinksPageMutation>;
-};
-
-export type SidebarMutation = {
+export type PageLandingMutation = {
   title?: InputMaybe<Scalars['String']['input']>;
-  version?: InputMaybe<Scalars['String']['input']>;
-  locale?: InputMaybe<Scalars['String']['input']>;
-  type?: InputMaybe<Scalars['String']['input']>;
-  links?: InputMaybe<Array<InputMaybe<SidebarLinksMutation>>>;
+};
+
+export type PageManualMutation = {
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PageReferenceMutation = {
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type PageMutation = {
-  title?: InputMaybe<Scalars['String']['input']>;
-  body?: InputMaybe<Scalars['JSON']['input']>;
-  slug?: InputMaybe<Scalars['String']['input']>;
+  toc?: InputMaybe<PageTocMutation>;
+  landing?: InputMaybe<PageLandingMutation>;
+  manual?: InputMaybe<PageManualMutation>;
+  reference?: InputMaybe<PageReferenceMutation>;
 };
 
-export type SidebarPartsFragment = { __typename?: 'Sidebar', title: string, version?: string | null, locale?: string | null, type?: string | null, links?: Array<{ __typename: 'SidebarLinksLabel', title?: string | null } | { __typename: 'SidebarLinksPage', reference?: { __typename?: 'Page', title: string, body?: any | null, slug?: string | null, id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null, children?: Array<{ __typename: 'SidebarLinksPageChildren', reference?: { __typename?: 'Page', title: string, body?: any | null, slug?: string | null, id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } | null> | null };
+export type ManualTocMutation = {
+  title?: InputMaybe<Scalars['String']['input']>;
+};
 
-export type PagePartsFragment = { __typename?: 'Page', title: string, body?: any | null, slug?: string | null };
+export type ManualLandingMutation = {
+  title?: InputMaybe<Scalars['String']['input']>;
+};
 
-export type SidebarQueryVariables = Exact<{
-  relativePath: Scalars['String']['input'];
-}>;
+export type ManualManualMutation = {
+  title?: InputMaybe<Scalars['String']['input']>;
+};
 
+export type ManualReferenceMutation = {
+  title?: InputMaybe<Scalars['String']['input']>;
+};
 
-export type SidebarQuery = { __typename?: 'Query', sidebar: { __typename?: 'Sidebar', id: string, title: string, version?: string | null, locale?: string | null, type?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, links?: Array<{ __typename: 'SidebarLinksLabel', title?: string | null } | { __typename: 'SidebarLinksPage', reference?: { __typename?: 'Page', title: string, body?: any | null, slug?: string | null, id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null, children?: Array<{ __typename: 'SidebarLinksPageChildren', reference?: { __typename?: 'Page', title: string, body?: any | null, slug?: string | null, id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } | null> | null } };
+export type ManualMutation = {
+  toc?: InputMaybe<ManualTocMutation>;
+  landing?: InputMaybe<ManualLandingMutation>;
+  manual?: InputMaybe<ManualManualMutation>;
+  reference?: InputMaybe<ManualReferenceMutation>;
+};
 
-export type SidebarConnectionQueryVariables = Exact<{
-  before?: InputMaybe<Scalars['String']['input']>;
-  after?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Float']['input']>;
-  last?: InputMaybe<Scalars['Float']['input']>;
-  sort?: InputMaybe<Scalars['String']['input']>;
-  filter?: InputMaybe<SidebarFilter>;
-}>;
+type PageParts_PageToc_Fragment = { __typename?: 'PageToc', title?: string | null };
 
+type PageParts_PageLanding_Fragment = { __typename?: 'PageLanding', title?: string | null };
 
-export type SidebarConnectionQuery = { __typename?: 'Query', sidebarConnection: { __typename?: 'SidebarConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges?: Array<{ __typename?: 'SidebarConnectionEdges', cursor: string, node?: { __typename?: 'Sidebar', id: string, title: string, version?: string | null, locale?: string | null, type?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, links?: Array<{ __typename: 'SidebarLinksLabel', title?: string | null } | { __typename: 'SidebarLinksPage', reference?: { __typename?: 'Page', title: string, body?: any | null, slug?: string | null, id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null, children?: Array<{ __typename: 'SidebarLinksPageChildren', reference?: { __typename?: 'Page', title: string, body?: any | null, slug?: string | null, id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } | null> | null } | null } | null> | null } };
+type PageParts_PageManual_Fragment = { __typename?: 'PageManual', title?: string | null };
+
+type PageParts_PageReference_Fragment = { __typename?: 'PageReference', title?: string | null };
+
+export type PagePartsFragment = PageParts_PageToc_Fragment | PageParts_PageLanding_Fragment | PageParts_PageManual_Fragment | PageParts_PageReference_Fragment;
+
+type ManualParts_ManualToc_Fragment = { __typename?: 'ManualToc', title?: string | null };
+
+type ManualParts_ManualLanding_Fragment = { __typename?: 'ManualLanding', title?: string | null };
+
+type ManualParts_ManualManual_Fragment = { __typename?: 'ManualManual', title?: string | null };
+
+type ManualParts_ManualReference_Fragment = { __typename?: 'ManualReference', title?: string | null };
+
+export type ManualPartsFragment = ManualParts_ManualToc_Fragment | ManualParts_ManualLanding_Fragment | ManualParts_ManualManual_Fragment | ManualParts_ManualReference_Fragment;
 
 export type PageQueryVariables = Exact<{
   relativePath: Scalars['String']['input'];
 }>;
 
 
-export type PageQuery = { __typename?: 'Query', page: { __typename?: 'Page', id: string, title: string, body?: any | null, slug?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+export type PageQuery = { __typename?: 'Query', page: { __typename?: 'PageToc', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'PageLanding', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'PageManual', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'PageReference', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type PageConnectionQueryVariables = Exact<{
   before?: InputMaybe<Scalars['String']['input']>;
@@ -468,125 +486,59 @@ export type PageConnectionQueryVariables = Exact<{
 }>;
 
 
-export type PageConnectionQuery = { __typename?: 'Query', pageConnection: { __typename?: 'PageConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges?: Array<{ __typename?: 'PageConnectionEdges', cursor: string, node?: { __typename?: 'Page', id: string, title: string, body?: any | null, slug?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
+export type PageConnectionQuery = { __typename?: 'Query', pageConnection: { __typename?: 'PageConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges?: Array<{ __typename?: 'PageConnectionEdges', cursor: string, node?: { __typename?: 'PageToc', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'PageLanding', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'PageManual', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'PageReference', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
 
-export const SidebarPartsFragmentDoc = gql`
-    fragment SidebarParts on Sidebar {
-  title
-  version
-  locale
-  type
-  links {
-    __typename
-    ... on SidebarLinksLabel {
-      title
-    }
-    ... on SidebarLinksPage {
-      reference {
-        ... on Page {
-          title
-          body
-          slug
-        }
-        ... on Document {
-          _sys {
-            filename
-            basename
-            breadcrumbs
-            path
-            relativePath
-            extension
-          }
-          id
-        }
-      }
-      children {
-        __typename
-        reference {
-          ... on Page {
-            title
-            body
-            slug
-          }
-          ... on Document {
-            _sys {
-              filename
-              basename
-              breadcrumbs
-              path
-              relativePath
-              extension
-            }
-            id
-          }
-        }
-      }
-    }
-  }
-}
-    `;
+export type ManualQueryVariables = Exact<{
+  relativePath: Scalars['String']['input'];
+}>;
+
+
+export type ManualQuery = { __typename?: 'Query', manual: { __typename?: 'ManualToc', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'ManualLanding', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'ManualManual', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'ManualReference', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+
+export type ManualConnectionQueryVariables = Exact<{
+  before?: InputMaybe<Scalars['String']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Float']['input']>;
+  last?: InputMaybe<Scalars['Float']['input']>;
+  sort?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<ManualFilter>;
+}>;
+
+
+export type ManualConnectionQuery = { __typename?: 'Query', manualConnection: { __typename?: 'ManualConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasPreviousPage: boolean, hasNextPage: boolean, startCursor: string, endCursor: string }, edges?: Array<{ __typename?: 'ManualConnectionEdges', cursor: string, node?: { __typename?: 'ManualToc', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'ManualLanding', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'ManualManual', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'ManualReference', id: string, title?: string | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
+
 export const PagePartsFragmentDoc = gql`
     fragment PageParts on Page {
-  title
-  body
-  slug
+  ... on PageToc {
+    title
+  }
+  ... on PageLanding {
+    title
+  }
+  ... on PageManual {
+    title
+  }
+  ... on PageReference {
+    title
+  }
 }
     `;
-export const SidebarDocument = gql`
-    query sidebar($relativePath: String!) {
-  sidebar(relativePath: $relativePath) {
-    ... on Document {
-      _sys {
-        filename
-        basename
-        breadcrumbs
-        path
-        relativePath
-        extension
-      }
-      id
-    }
-    ...SidebarParts
+export const ManualPartsFragmentDoc = gql`
+    fragment ManualParts on Manual {
+  ... on ManualToc {
+    title
+  }
+  ... on ManualLanding {
+    title
+  }
+  ... on ManualManual {
+    title
+  }
+  ... on ManualReference {
+    title
   }
 }
-    ${SidebarPartsFragmentDoc}`;
-export const SidebarConnectionDocument = gql`
-    query sidebarConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: SidebarFilter) {
-  sidebarConnection(
-    before: $before
-    after: $after
-    first: $first
-    last: $last
-    sort: $sort
-    filter: $filter
-  ) {
-    pageInfo {
-      hasPreviousPage
-      hasNextPage
-      startCursor
-      endCursor
-    }
-    totalCount
-    edges {
-      cursor
-      node {
-        ... on Document {
-          _sys {
-            filename
-            basename
-            breadcrumbs
-            path
-            relativePath
-            extension
-          }
-          id
-        }
-        ...SidebarParts
-      }
-    }
-  }
-}
-    ${SidebarPartsFragmentDoc}`;
+    `;
 export const PageDocument = gql`
     query page($relativePath: String!) {
   page(relativePath: $relativePath) {
@@ -642,20 +594,75 @@ export const PageConnectionDocument = gql`
   }
 }
     ${PagePartsFragmentDoc}`;
+export const ManualDocument = gql`
+    query manual($relativePath: String!) {
+  manual(relativePath: $relativePath) {
+    ... on Document {
+      _sys {
+        filename
+        basename
+        breadcrumbs
+        path
+        relativePath
+        extension
+      }
+      id
+    }
+    ...ManualParts
+  }
+}
+    ${ManualPartsFragmentDoc}`;
+export const ManualConnectionDocument = gql`
+    query manualConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: ManualFilter) {
+  manualConnection(
+    before: $before
+    after: $after
+    first: $first
+    last: $last
+    sort: $sort
+    filter: $filter
+  ) {
+    pageInfo {
+      hasPreviousPage
+      hasNextPage
+      startCursor
+      endCursor
+    }
+    totalCount
+    edges {
+      cursor
+      node {
+        ... on Document {
+          _sys {
+            filename
+            basename
+            breadcrumbs
+            path
+            relativePath
+            extension
+          }
+          id
+        }
+        ...ManualParts
+      }
+    }
+  }
+}
+    ${ManualPartsFragmentDoc}`;
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
   export function getSdk<C>(requester: Requester<C>) {
     return {
-      sidebar(variables: SidebarQueryVariables, options?: C): Promise<{data: SidebarQuery, variables: SidebarQueryVariables, query: string}> {
-        return requester<{data: SidebarQuery, variables: SidebarQueryVariables, query: string}, SidebarQueryVariables>(SidebarDocument, variables, options);
-      },
-    sidebarConnection(variables?: SidebarConnectionQueryVariables, options?: C): Promise<{data: SidebarConnectionQuery, variables: SidebarConnectionQueryVariables, query: string}> {
-        return requester<{data: SidebarConnectionQuery, variables: SidebarConnectionQueryVariables, query: string}, SidebarConnectionQueryVariables>(SidebarConnectionDocument, variables, options);
-      },
-    page(variables: PageQueryVariables, options?: C): Promise<{data: PageQuery, variables: PageQueryVariables, query: string}> {
+      page(variables: PageQueryVariables, options?: C): Promise<{data: PageQuery, variables: PageQueryVariables, query: string}> {
         return requester<{data: PageQuery, variables: PageQueryVariables, query: string}, PageQueryVariables>(PageDocument, variables, options);
       },
     pageConnection(variables?: PageConnectionQueryVariables, options?: C): Promise<{data: PageConnectionQuery, variables: PageConnectionQueryVariables, query: string}> {
         return requester<{data: PageConnectionQuery, variables: PageConnectionQueryVariables, query: string}, PageConnectionQueryVariables>(PageConnectionDocument, variables, options);
+      },
+    manual(variables: ManualQueryVariables, options?: C): Promise<{data: ManualQuery, variables: ManualQueryVariables, query: string}> {
+        return requester<{data: ManualQuery, variables: ManualQueryVariables, query: string}, ManualQueryVariables>(ManualDocument, variables, options);
+      },
+    manualConnection(variables?: ManualConnectionQueryVariables, options?: C): Promise<{data: ManualConnectionQuery, variables: ManualConnectionQueryVariables, query: string}> {
+        return requester<{data: ManualConnectionQuery, variables: ManualConnectionQueryVariables, query: string}, ManualConnectionQueryVariables>(ManualConnectionDocument, variables, options);
       }
     };
   }

@@ -26,7 +26,7 @@ import {
   resolveMediaRelativeToCloud,
   resolveMediaCloudToRelative,
 } from './media-utils'
-import { GraphQLError } from 'graphql'
+import { GraphQLError, __DirectiveLocation } from 'graphql'
 import { FilterCondition, makeFilterChain } from '../database/datalayer'
 
 interface ResolverConfig {

@@ -1,59 +1,29 @@
-fragment SidebarParts on Sidebar {
-  title
-  version
-  locale
-  type
-  links {
-    __typename
-    ... on SidebarLinksLabel {
-      title
-    }
-    ... on SidebarLinksPage {
-      reference {
-        ... on Page {
-          title
-          body
-          slug
-        }
-        ... on Document {
-          _sys {
-            filename
-            basename
-            breadcrumbs
-            path
-            relativePath
-            extension
-          }
-          id
-        }
-      }
-      children {
-        __typename
-        reference {
-          ... on Page {
-            title
-            body
-            slug
-          }
-          ... on Document {
-            _sys {
-              filename
-              basename
-              breadcrumbs
-              path
-              relativePath
-              extension
-            }
-            id
-          }
-        }
-      }
-    }
+fragment PageParts on Page {
+  ... on PageToc {
+    title
+  }
+  ... on PageLanding {
+    title
+  }
+  ... on PageManual {
+    title
+  }
+  ... on PageReference {
+    title
   }
 }
 
-fragment PageParts on Page {
-  title
-  body
-  slug
+fragment ManualParts on Manual {
+  ... on ManualToc {
+    title
+  }
+  ... on ManualLanding {
+    title
+  }
+  ... on ManualManual {
+    title
+  }
+  ... on ManualReference {
+    title
+  }
 }

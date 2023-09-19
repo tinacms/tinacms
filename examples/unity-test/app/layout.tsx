@@ -18,19 +18,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <div className="h-screen w-full bg-green-100 flex">
-          <div className="h-screen w-24 bg-red-100"></div>
+          <div className="h-screen w-16 bg-red-100 flex flex-col gap-2">
+            <div>Logo</div>
+            <div>Core</div>
+            <div>Pix</div>
+          </div>
           {children}
         </div>
       </body>
     </html>
   )
-}
-{
-  /* <div className="h-screen w-full bg-green-100 flex">
-<div className="h-screen w-24 bg-red-100"></div>
-<div className="h-screen w-96 bg-blue-100"></div>
-<div className="w-full h-full bg-yellow-100">
-  <div className="h-24 bg-orange-100 w-full"></div>
-</div>
-</div> */
 }

@@ -215,6 +215,6 @@ export const sysFilter = astBuilder.InputValueDefinition({
 
 export const staticDefinitions = [
   ...scalarDefinitions,
-  sysFilter,
+  // sysFilter,
   interfaceDefinitions,
 ]

@@ -29,15 +29,6 @@ type PageInfo {
   endCursor: String!
 }
 
-input SysFilterOperations {
-  startsWith: String
-  eq: String
-}
-
-input SysFilter {
-  relativePath: SysFilterOperations
-}
-
 """"""
 interface Node {
   id: ID!
@@ -62,16 +53,15 @@ type Query {
   collections: [Collection!]!
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
-  sidebar(relativePath: String): Sidebar!
-  sidebarConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: SidebarFilter): SidebarConnection!
   page(relativePath: String): Page!
   pageConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PageFilter): PageConnection!
+  manual(relativePath: String): Manual!
+  manualConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: ManualFilter): ManualConnection!
 }
 
 input DocumentFilter {
-  sidebar: SidebarFilter
   page: PageFilter
-  _sys: SysFilter
+  manual: ManualFilter
 }
 
 type DocumentConnectionEdges {
@@ -97,37 +87,37 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter, folder: String): DocumentConnection!
 }
 
-union DocumentNode = Sidebar | Page | Folder
+union DocumentNode = PageToc | PageLanding | PageManual | PageReference | ManualToc | ManualLanding | ManualManual | ManualReference | Folder
 
-type SidebarLinksLabel {
+type PageToc implements Node & Document {
   title: String
-}
-
-union SidebarLinksPageReference = Page
-
-union SidebarLinksPageChildrenReference = Page
-
-type SidebarLinksPageChildren {
-  reference: SidebarLinksPageChildrenReference
-}
-
-type SidebarLinksPage {
-  reference: SidebarLinksPageReference
-  children: [SidebarLinksPageChildren]
-}
-
-union SidebarLinks = SidebarLinksLabel | SidebarLinksPage
-
-type Sidebar implements Node & Document {
-  title: String!
-  version: String
-  locale: String
-  type: String
-  links: [SidebarLinks]
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
 }
+
+type PageLanding implements Node & Document {
+  title: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+type PageManual implements Node & Document {
+  title: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+type PageReference implements Node & Document {
+  title: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+union Page = PageToc | PageLanding | PageManual | PageReference
 
 input StringFilter {
   startsWith: String
@@ -136,77 +126,27 @@ input StringFilter {
   in: [String]
 }
 
-input SidebarLinksLabelFilter {
+input PageTocFilter {
   title: StringFilter
-  _sys: SysFilter
 }
 
-input SidebarLinksPageReferenceFilter {
-  page: PageFilter
-  _sys: SysFilter
-}
-
-input SidebarLinksPageChildrenReferenceFilter {
-  page: PageFilter
-  _sys: SysFilter
-}
-
-input SidebarLinksPageChildrenFilter {
-  reference: SidebarLinksPageChildrenReferenceFilter
-  _sys: SysFilter
-}
-
-input SidebarLinksPageFilter {
-  reference: SidebarLinksPageReferenceFilter
-  children: SidebarLinksPageChildrenFilter
-  _sys: SysFilter
-}
-
-input SidebarLinksFilter {
-  label: SidebarLinksLabelFilter
-  page: SidebarLinksPageFilter
-}
-
-input SidebarFilter {
+input PageLandingFilter {
   title: StringFilter
-  version: StringFilter
-  locale: StringFilter
-  type: StringFilter
-  links: SidebarLinksFilter
-  _sys: SysFilter
 }
 
-type SidebarConnectionEdges {
-  cursor: String!
-  node: Sidebar
+input PageManualFilter {
+  title: StringFilter
 }
 
-type SidebarConnection implements Connection {
-  pageInfo: PageInfo!
-  totalCount: Float!
-  edges: [SidebarConnectionEdges]
-}
-
-type Page implements Node & Document {
-  title: String!
-  body: JSON
-  slug: String
-  id: ID!
-  _sys: SystemInfo!
-  _values: JSON!
-}
-
-input RichTextFilter {
-  startsWith: String
-  eq: String
-  exists: Boolean
+input PageReferenceFilter {
+  title: StringFilter
 }
 
 input PageFilter {
-  title: StringFilter
-  body: RichTextFilter
-  slug: StringFilter
-  _sys: SysFilter
+  toc: PageTocFilter
+  landing: PageLandingFilter
+  manual: PageManualFilter
+  reference: PageReferenceFilter
 }
 
 type PageConnectionEdges {
@@ -220,58 +160,136 @@ type PageConnection implements Connection {
   edges: [PageConnectionEdges]
 }
 
+type ManualToc implements Node & Document {
+  title: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+type ManualLanding implements Node & Document {
+  title: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+type ManualManual implements Node & Document {
+  title: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+type ManualReference implements Node & Document {
+  title: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+union Manual = ManualToc | ManualLanding | ManualManual | ManualReference
+
+input ManualTocFilter {
+  title: StringFilter
+}
+
+input ManualLandingFilter {
+  title: StringFilter
+}
+
+input ManualManualFilter {
+  title: StringFilter
+}
+
+input ManualReferenceFilter {
+  title: StringFilter
+}
+
+input ManualFilter {
+  toc: ManualTocFilter
+  landing: ManualLandingFilter
+  manual: ManualManualFilter
+  reference: ManualReferenceFilter
+}
+
+type ManualConnectionEdges {
+  cursor: String!
+  node: Manual
+}
+
+type ManualConnection implements Connection {
+  pageInfo: PageInfo!
+  totalCount: Float!
+  edges: [ManualConnectionEdges]
+}
+
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentUpdateMutation!): DocumentNode!
   deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updateSidebar(relativePath: String!, params: SidebarMutation!): Sidebar!
-  createSidebar(relativePath: String!, params: SidebarMutation!): Sidebar!
   updatePage(relativePath: String!, params: PageMutation!): Page!
   createPage(relativePath: String!, params: PageMutation!): Page!
+  updateManual(relativePath: String!, params: ManualMutation!): Manual!
+  createManual(relativePath: String!, params: ManualMutation!): Manual!
 }
 
 input DocumentUpdateMutation {
-  sidebar: SidebarMutation
   page: PageMutation
+  manual: ManualMutation
   relativePath: String
 }
 
 input DocumentMutation {
-  sidebar: SidebarMutation
   page: PageMutation
+  manual: ManualMutation
 }
 
-input SidebarLinksLabelMutation {
+input PageTocMutation {
   title: String
 }
 
-input SidebarLinksPageChildrenMutation {
-  reference: String
-}
-
-input SidebarLinksPageMutation {
-  reference: String
-  children: [SidebarLinksPageChildrenMutation]
-}
-
-input SidebarLinksMutation {
-  label: SidebarLinksLabelMutation
-  page: SidebarLinksPageMutation
-}
-
-input SidebarMutation {
+input PageLandingMutation {
   title: String
-  version: String
-  locale: String
-  type: String
-  links: [SidebarLinksMutation]
+}
+
+input PageManualMutation {
+  title: String
+}
+
+input PageReferenceMutation {
+  title: String
 }
 
 input PageMutation {
+  toc: PageTocMutation
+  landing: PageLandingMutation
+  manual: PageManualMutation
+  reference: PageReferenceMutation
+}
+
+input ManualTocMutation {
   title: String
-  body: JSON
-  slug: String
+}
+
+input ManualLandingMutation {
+  title: String
+}
+
+input ManualManualMutation {
+  title: String
+}
+
+input ManualReferenceMutation {
+  title: String
+}
+
+input ManualMutation {
+  toc: ManualTocMutation
+  landing: ManualLandingMutation
+  manual: ManualManualMutation
+  reference: ManualReferenceMutation
 }
 
 schema {
