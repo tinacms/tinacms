@@ -32,6 +32,7 @@ export function UpdatePassword(props: {}) {
     if (!res?.updatePassword?.id) {
       setResult('Error updating password')
     } else {
+      setDirty(false)
       setPassword('')
       setConfirmPassword('')
       setResult('Password updated')
