@@ -39,6 +39,8 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
   const navBreakpoint = 1000
   const windowWidth = useWindowWidth()
   const renderDesktopNav = windowWidth > navBreakpoint
+  const usernamePasswordEnabled =
+    cms.api.tina.authProvider?.getLoginStrategy() === 'UsernamePassword'
 
   return (
     <>
@@ -48,7 +50,10 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
           sidebarWidth={360}
           showCollections={true}
           collectionsInfo={collectionsInfo}
-          screens={screens}
+          screens={screens.filter(
+            (screen) =>
+              !usernamePasswordEnabled && screen.navCategory === 'Account'
+          )}
           cloudConfigs={cloudConfigs}
           contentCreators={[]}
           RenderNavSite={({ view }) => (
