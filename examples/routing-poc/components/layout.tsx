@@ -5,6 +5,7 @@ import {
   PageSidebar,
   PageSidebarSidebarSections,
   PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDirectPageLink,
+  PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDropdownLinkChildren,
 } from '@/tina/__generated__/types'
 import { Disclosure } from '@headlessui/react'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
@@ -31,6 +32,9 @@ export function Layout({
     }
     case 'PageVersionedSidebar': {
       return <Wrapper sidebar={'Versioned Sidebar'}>{children}</Wrapper>
+    }
+    default: {
+      return null
     }
   }
 }
@@ -140,6 +144,8 @@ const Section = (props: PageSidebarSidebarSections) => {
                           if (
                             subItem?.reference?.__typename === 'PageContent'
                           ) {
+                            subItem.__typename ===
+                              'PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDropdownLinkChildren'
                             return (
                               <li key={subItem?.reference?.id}>
                                 <Link
@@ -175,7 +181,9 @@ const Section = (props: PageSidebarSidebarSections) => {
 }
 
 const getSidebarItemLink = (
-  item: PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDirectPageLink
+  item:
+    | PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDirectPageLink
+    | PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDropdownLinkChildren
 ) => {
   if (item.reference?.__typename === 'PageVersionedSidebar') {
     const latestVersion = item?.reference?.versionedSidebar?.versions?.at(0)
@@ -194,7 +202,7 @@ const getSidebarItemLink = (
   } else {
     return `/${
       item?.reference?._sys.breadcrumbs
-        .filter((item) => !['_overview', '_sidebar'].includes(item))
+        .filter((item: string) => !['_overview', '_sidebar'].includes(item))
         .join('/') || ''
     }`
   }
