@@ -165,6 +165,12 @@ const pageFields: Partial<Collection> = {
             },
           ],
         },
+        {
+          type: 'rich-text',
+          name: 'body',
+          label: 'Body',
+          isBody: true,
+        },
       ],
     },
     {
