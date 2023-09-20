@@ -29,10 +29,6 @@ export function extendNextScripts(
       !scripts?.build || !scripts?.build?.startsWith('tinacms build &&')
         ? `tinacms build && ${scripts?.build || 'next build'}`
         : scripts?.build,
-    start:
-      !scripts?.start || !scripts?.start?.startsWith('tinacms build &&')
-        ? `tinacms build && ${scripts?.start || 'next start'}`
-        : scripts?.start,
   }
 
   if (opts?.addSetupUsers && !scripts['setup:users']) {
