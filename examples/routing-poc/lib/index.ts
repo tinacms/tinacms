@@ -2,7 +2,6 @@ import { client } from '@/tina/__generated__/client'
 import { PageQuery } from '@/tina/__generated__/types'
 
 export const findPageOrOverview = async (slug: string[]) => {
-  console.log(slug)
   try {
     const page = await client.queries.page({
       relativePath: `${slug.join('/')}.mdx`,
