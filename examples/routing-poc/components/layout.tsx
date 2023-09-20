@@ -19,7 +19,7 @@ export function Layout({
   }
   return (
     <div className="h-screen w-full bg-green-100 flex">
-      <div className="h-screen w-64 bg-white flex flex-col gap-2 overflow-scroll p-4">
+      <div className="h-screen w-64 bg-white flex flex-col gap-2 overflow-scroll p-4 border-r border-slate-200">
         {parent && parent?.data.page.id !== result.data.page.id && (
           <div className="pb-8">
             <Link
