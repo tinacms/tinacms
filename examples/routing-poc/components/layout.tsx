@@ -156,7 +156,7 @@ export function Layout({
       </div>
       <div className="flex-1">
         <div className="h-10 border-b border-slate-200"></div>
-        {children}
+        <div className="px-20 py-10">{children}</div>
       </div>
     </div>
   )

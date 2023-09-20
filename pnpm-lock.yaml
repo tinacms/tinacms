@@ -160,6 +160,7 @@ importers:
     specifiers:
       '@headlessui/react': ^1.7.17
       '@heroicons/react': ^2.0.18
+      '@tailwindcss/typography': ^0.5.10
       '@tinacms/cli': workspace:*
       '@types/node': 20.6.0
       '@types/react': 17.0.47
@@ -193,6 +194,8 @@ importers:
       tailwindcss: 3.3.3
       tinacms: link:../../packages/tinacms
       typescript: 5.2.2
+    devDependencies:
+      '@tailwindcss/typography': 0.5.10_tailwindcss@3.3.3
 
   examples/tina-self-hosted-demo:
     specifiers:
@@ -10089,6 +10092,21 @@ packages:
     dependencies:
       tailwindcss: 3.2.7
     dev: false
+
+  /@tailwindcss/typography/0.5.10_tailwindcss@3.3.3:
+    resolution:
+      {
+        integrity: sha512-Pe8BuPJQJd3FfRnm6H0ulKIGoMEQS+Vq01R6M5aCrFB/ccR/shT+0kXLjouGC1gFLm9hopTFN+DMP0pfwRWzPw==,
+      }
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 3.3.3
+    dev: true
 
   /@tailwindcss/typography/0.5.2_tailwindcss@3.2.7:
     resolution:
@@ -21969,7 +21987,6 @@ packages:
       {
         integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==,
       }
-    dev: false
 
   /lodash.debounce/4.0.8:
     resolution:
@@ -21990,7 +22007,6 @@ packages:
       {
         integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==,
       }
-    dev: false
 
   /lodash.merge/4.6.2:
     resolution:
@@ -24829,7 +24845,6 @@ packages:
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.2
-    dev: false
 
   /postcss-js/4.0.0_postcss@8.4.29:
     resolution:
@@ -24866,7 +24881,6 @@ packages:
     dependencies:
       camelcase-css: 2.0.1
       postcss: 8.4.29
-    dev: false
 
   /postcss-load-config/3.1.4_postcss@8.4.14:
     resolution:
@@ -24944,7 +24958,6 @@ packages:
       lilconfig: 2.1.0
       postcss: 8.4.29
       yaml: 2.2.2
-    dev: false
 
   /postcss-nested/6.0.0_postcss@8.4.29:
     resolution:
@@ -24981,7 +24994,6 @@ packages:
     dependencies:
       postcss: 8.4.29
       postcss-selector-parser: 6.0.11
-    dev: false
 
   /postcss-nesting/10.1.9_postcss@8.4.18:
     resolution:
@@ -25020,7 +25032,6 @@ packages:
     dependencies:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
-    dev: false
 
   /postcss-selector-parser/6.0.11:
     resolution:
@@ -27962,7 +27973,6 @@ packages:
       sucrase: 3.32.0
     transitivePeerDependencies:
       - ts-node
-    dev: false
 
   /tapable/2.2.1:
     resolution:

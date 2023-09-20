@@ -1,10 +1,15 @@
+import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { client } from '@/tina/__generated__/client'
 
 export const dynamic = 'force-dynamic'
 
 export default async function Page({ params }: { params: { slug: string[] } }) {
   const result = await findItem(params)
-  return <div>{result.data.page.title}</div>
+  return (
+    <article className="prose lg:prose-sm m-auto">
+      <TinaMarkdown components={{}} content={result.data.page.body} />
+    </article>
+  )
 }
 
 const findItem = async ({

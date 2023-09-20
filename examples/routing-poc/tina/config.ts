@@ -172,6 +172,12 @@ const pageFields: Partial<Collection> = {
       label: 'Content',
       fields: [
         { name: 'title', type: 'string', isTitle: true, required: true },
+        {
+          type: 'rich-text',
+          name: 'body',
+          label: 'Body',
+          isBody: true,
+        },
       ],
     },
   ],
