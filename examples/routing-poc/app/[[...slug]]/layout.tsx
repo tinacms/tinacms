@@ -20,7 +20,6 @@ export default async function Page({
         0,
         result.data.page._sys.breadcrumbs?.length - 2
       ) || []
-    console.log(parentSlug)
     parent = await findDeepestOverview({
       slug: parentSlug,
     })
