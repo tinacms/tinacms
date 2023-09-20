@@ -18,7 +18,7 @@ export function Layout({
     throw new Error('Expected overview document to be of overview template')
   }
   return (
-    <div className="h-screen w-full bg-green-100 flex">
+    <div className="h-screen w-full flex">
       <div className="h-screen w-64 bg-white flex flex-col gap-2 overflow-scroll p-4 border-r border-slate-200">
         {parent && parent?.data.page.id !== result.data.page.id && (
           <div className="pb-8">
@@ -154,7 +154,10 @@ export function Layout({
           </ul>
         </nav>
       </div>
-      {children}
+      <div className="flex-1">
+        <div className="h-10 border-b border-slate-200"></div>
+        {children}
+      </div>
     </div>
   )
 }
