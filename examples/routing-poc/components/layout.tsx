@@ -4,6 +4,7 @@ import { PageQuery } from '@/tina/__generated__/types'
 import { Disclosure } from '@headlessui/react'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export function Layout({
   result,
@@ -14,6 +15,7 @@ export function Layout({
   parent?: { data: PageQuery }
   children: React.ReactNode
 }) {
+  const pathname = usePathname()
   if (result.data.page.__typename !== 'PageOverview') {
     throw new Error('Expected overview document to be of overview template')
   }
@@ -64,6 +66,12 @@ export function Layout({
                         item?.__typename ===
                         'PageOverviewSidebarSectionsItemsDirectPageLink'
                       ) {
+                        const isSelected =
+                          pathname ===
+                          item!.reference?._sys.path
+                            .replace('content/pages', '')
+                            .replace('.mdx', '')
+
                         return (
                           <li key={item?.label}>
                             <Link
@@ -73,7 +81,7 @@ export function Layout({
                                   .join('/') || ''
                               }`}
                               className={classNames(
-                                false
+                                isSelected
                                   ? 'bg-gray-50 text-indigo-600'
                                   : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50',
                                 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
@@ -112,6 +120,12 @@ export function Layout({
                                     className="mt-1 px-2"
                                   >
                                     {item?.children?.map((subItem) => {
+                                      const isSelected =
+                                        pathname ===
+                                        subItem!.reference?._sys.path
+                                          .replace('content/pages', '')
+                                          .replace('.mdx', '')
+
                                       if (
                                         subItem?.reference?.__typename ===
                                         'PageContent'
@@ -124,7 +138,7 @@ export function Layout({
                                                 '/'
                                               )}`}
                                               className={classNames(
-                                                false
+                                                isSelected
                                                   ? 'bg-gray-50'
                                                   : 'hover:bg-gray-50',
                                                 'block rounded-md py-2 pr-2 pl-4 text-sm leading-6 text-gray-700'
