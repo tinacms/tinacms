@@ -5,7 +5,7 @@ import { Disclosure } from '@headlessui/react'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
+import { VersionSelect } from './version-select'
 export function Layout({
   result,
   parent,
@@ -23,7 +23,12 @@ export function Layout({
     <div className="h-screen w-full flex">
       <div className="h-screen w-64 bg-white flex flex-col gap-2 overflow-scroll p-4 border-r border-slate-200">
         {parent && parent?.data.page.id !== result.data.page.id && (
-          <div className="pb-8">
+          <div className="py-4 border-b border-slate-200">
+            <VersionSelect />
+          </div>
+        )}
+        {parent && parent?.data.page.id !== result.data.page.id && (
+          <div className="py-4">
             <Link
               href={`/${parent?.data.page._sys.breadcrumbs
                 .filter((item) => item !== '_overview')
