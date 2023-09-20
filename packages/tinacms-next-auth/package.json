@@ -27,11 +27,12 @@
     "run-self-script": "node bin/tinacms-next-auth setup"
   },
   "dependencies": {
+    "@tinacms/schema-tools": "workspace:*",
+    "bcryptjs": "^2.4.3",
     "next": "12.3.4",
     "next-auth": "4.22.1",
     "react": "^18",
     "react-dom": "^18",
-    "@tinacms/schema-tools": "workspace:*",
     "tinacms": "workspace:*"
   },
   "devDependencies": {

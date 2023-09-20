@@ -1300,6 +1300,7 @@ importers:
     specifiers:
       '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
+      bcryptjs: ^2.4.3
       next: 12.3.4
       next-auth: 4.22.1
       react: ^18
@@ -1308,6 +1309,7 @@ importers:
       typescript: 4.3.5
     dependencies:
       '@tinacms/schema-tools': link:../@tinacms/schema-tools
+      bcryptjs: 2.4.3
       next: 12.3.4_biqbaboplfbrettd7655fr4n2y
       next-auth: 4.22.1_bhgafntz2ozm43l35i5qtimxry
       react: 18.2.0
@@ -15593,6 +15595,13 @@ packages:
     dependencies:
       tweetnacl: 0.14.5
     dev: true
+
+  /bcryptjs/2.4.3:
+    resolution:
+      {
+        integrity: sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==,
+      }
+    dev: false
 
   /before-after-hook/2.2.2:
     resolution:
