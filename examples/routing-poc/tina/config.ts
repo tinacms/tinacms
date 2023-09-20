@@ -62,12 +62,120 @@ const links: TinaField = {
   ],
 }
 
+const sidebar = {
+  name: 'sidebar',
+  label: 'Sidebar',
+  type: 'object',
+  fields: [
+    {
+      name: 'sections',
+      label: 'Section',
+      type: 'object',
+      list: true,
+      ui: {
+        itemProps: (item) => {
+          if (item) {
+            return { label: item.title }
+          }
+        },
+      },
+      fields: [
+        {
+          name: 'title',
+          type: 'string',
+        },
+        {
+          name: 'items',
+          type: 'object',
+          list: true,
+          templates: [
+            {
+              name: 'dropdownLink',
+              ui: {
+                itemProps: (item) => {
+                  if (item) {
+                    return { label: item.label }
+                  }
+                },
+              },
+              fields: [
+                { type: 'string', name: 'label' },
+                {
+                  type: 'object',
+                  list: true,
+                  name: 'children',
+                  ui: {
+                    itemProps: (item) => {
+                      if (item) {
+                        return { label: item.reference }
+                      }
+                    },
+                  },
+                  fields: [
+                    { type: 'string', name: 'label' },
+                    {
+                      type: 'reference',
+                      name: 'reference',
+                      label: 'Reference',
+                      collections: ['page'],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              name: 'directPageLink',
+              ui: {
+                itemProps: (item) => {
+                  if (item) {
+                    return { label: item.label }
+                  }
+                },
+              },
+              fields: [
+                { type: 'string', name: 'label' },
+                {
+                  type: 'reference',
+                  name: 'reference',
+                  label: 'Reference',
+                  collections: ['page'],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+
+const versionedSidebar = {
+  name: 'versionedSidebar',
+  label: 'Versioned Sidebar',
+  type: 'object',
+  fields: [
+    { name: 'tags', type: 'string', list: true, ui: { component: 'tags' } },
+    {
+      name: 'versions',
+      list: true,
+      type: 'object',
+      fields: [{ name: 'name', type: 'string' }, sidebar],
+    },
+  ],
+}
+
 const pageFields: Partial<Collection> = {
   ui: {
     filename: {
       slugify: (values, meta) => {
         if (meta.template.name === 'overview') {
           return `_overview`
+        }
+        if (meta.template.name === 'versionedSidebar') {
+          return `_sidebar`
+        }
+        if (meta.template.name === 'sidebar') {
+          return `_sidebar`
         }
         return ''
       },
@@ -97,106 +205,29 @@ const pageFields: Partial<Collection> = {
       name: 'overview',
       label: 'Overview',
       fields: [
-        { name: 'title', type: 'string', required: true },
-        {
-          name: 'typename',
-          type: 'string',
-          isTitle: true,
-          required: true,
-          label: 'ID',
-        },
-        {
-          name: 'sidebar',
-          label: 'Sidebar',
-          type: 'object',
-          fields: [
-            {
-              name: 'sections',
-              label: 'Section',
-              type: 'object',
-              list: true,
-              ui: {
-                itemProps: (item) => {
-                  if (item) {
-                    return { label: item.title }
-                  }
-                },
-              },
-              fields: [
-                {
-                  name: 'title',
-                  type: 'string',
-                },
-                {
-                  name: 'items',
-                  type: 'object',
-                  list: true,
-                  templates: [
-                    {
-                      name: 'dropdownLink',
-                      ui: {
-                        itemProps: (item) => {
-                          if (item) {
-                            return { label: item.label }
-                          }
-                        },
-                      },
-                      fields: [
-                        { type: 'string', name: 'label' },
-                        {
-                          type: 'object',
-                          list: true,
-                          name: 'children',
-                          ui: {
-                            itemProps: (item) => {
-                              if (item) {
-                                return { label: item.reference }
-                              }
-                            },
-                          },
-                          fields: [
-                            { type: 'string', name: 'label' },
-                            {
-                              type: 'reference',
-                              name: 'reference',
-                              label: 'Reference',
-                              collections: ['page'],
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                    {
-                      name: 'directPageLink',
-                      ui: {
-                        itemProps: (item) => {
-                          if (item) {
-                            return { label: item.label }
-                          }
-                        },
-                      },
-                      fields: [
-                        { type: 'string', name: 'label' },
-                        {
-                          type: 'reference',
-                          name: 'reference',
-                          label: 'Reference',
-                          collections: ['page'],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
+        { name: 'title', type: 'string', required: true, isTitle: true },
         {
           type: 'rich-text',
           name: 'body',
           label: 'Body',
           isBody: true,
         },
+      ],
+    },
+    {
+      name: 'sidebar',
+      label: 'Sidebar',
+      fields: [
+        { name: 'title', type: 'string', required: true, isTitle: true },
+        sidebar,
+      ],
+    },
+    {
+      name: 'versionedSidebar',
+      label: 'Versioned Sidebar',
+      fields: [
+        { name: 'title', type: 'string', required: true, isTitle: true },
+        versionedSidebar,
       ],
     },
     {
@@ -232,13 +263,6 @@ export default defineConfig({
         format: 'mdx',
         ...pageFields,
       },
-      // {
-      //   name: 'manual',
-      //   label: 'Manual',
-      //   path: 'content/manual',
-      //   format: 'mdx',
-      //   ...pageFields,
-      // },
     ],
   },
 })
