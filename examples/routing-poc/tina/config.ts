@@ -78,7 +78,14 @@ const pageFields: Partial<Collection> = {
       name: 'overview',
       label: 'Overview',
       fields: [
-        { name: 'title', type: 'string', isTitle: true, required: true },
+        { name: 'title', type: 'string', required: true },
+        {
+          name: 'typename',
+          type: 'string',
+          isTitle: true,
+          required: true,
+          label: 'ID',
+        },
         {
           name: 'sidebar',
           label: 'Sidebar',
