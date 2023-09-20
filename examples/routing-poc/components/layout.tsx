@@ -8,10 +8,12 @@ import { usePathname } from 'next/navigation'
 import { VersionSelect } from './version-select'
 export function Layout({
   result,
+  versions,
   parent,
   children,
 }: {
   result: { data: PageQuery }
+  versions: any
   parent?: { data: PageQuery }
   children: React.ReactNode
 }) {
@@ -22,10 +24,12 @@ export function Layout({
   return (
     <div className="h-screen w-full flex">
       <div className="h-screen w-64 bg-white flex flex-col gap-2 overflow-scroll p-4 border-r border-slate-200">
-        {parent && parent?.data.page.id !== result.data.page.id && (
+        {versions?.length ? (
           <div className="py-4 border-b border-slate-200">
-            <VersionSelect />
+            <VersionSelect versions={versions} />
           </div>
+        ) : (
+          <></>
         )}
         {parent && parent?.data.page.id !== result.data.page.id && (
           <div className="py-4">

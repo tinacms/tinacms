@@ -1,24 +1,22 @@
 'use client'
 
-import { useState, Fragment } from 'react'
+import React, { useState, Fragment } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
-
-const versions = [
-  { id: 1, name: 'v2.0.0' },
-  { id: 1, name: 'v1.6.9' },
-  { id: 1, name: 'v1.6.7' },
-]
+import Link from 'next/link'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-export function VersionSelect() {
-  const [selected, setSelected] = useState(versions[0])
-
+export function VersionSelect({
+  versions,
+}: {
+  versions: { name: string; id: string; selected: boolean; url: string }[]
+}) {
+  const selected = versions.find((v) => v.selected)!
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox value={selected.name}>
       {({ open }) => (
         <>
           <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">
@@ -44,40 +42,45 @@ export function VersionSelect() {
             >
               <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 {versions.map((person) => (
-                  <Listbox.Option
-                    key={person.id}
-                    className={({ active }) =>
-                      classNames(
-                        active ? 'bg-indigo-600 text-white' : 'text-gray-900',
-                        'relative cursor-default select-none py-2 pl-3 pr-9'
-                      )
-                    }
-                    value={person}
-                  >
-                    {({ selected, active }) => (
-                      <>
-                        <span
-                          className={classNames(
-                            selected ? 'font-semibold' : 'font-normal',
-                            'block truncate'
-                          )}
-                        >
-                          {person.name}
-                        </span>
-
-                        {selected ? (
+                  <Link href={person.url}>
+                    <Listbox.Option
+                      key={person.id}
+                      className={({ active }) =>
+                        classNames(
+                          active ? 'bg-indigo-600 text-white' : 'text-gray-900',
+                          'relative cursor-default select-none py-2 pl-3 pr-9'
+                        )
+                      }
+                      value={person}
+                    >
+                      {({ selected, active }) => (
+                        <>
                           <span
                             className={classNames(
-                              active ? 'text-white' : 'text-indigo-600',
-                              'absolute inset-y-0 right-0 flex items-center pr-4'
+                              selected ? 'font-semibold' : 'font-normal',
+                              'block truncate'
                             )}
                           >
-                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                            {person.name}
                           </span>
-                        ) : null}
-                      </>
-                    )}
-                  </Listbox.Option>
+
+                          {selected ? (
+                            <span
+                              className={classNames(
+                                active ? 'text-white' : 'text-indigo-600',
+                                'absolute inset-y-0 right-0 flex items-center pr-4'
+                              )}
+                            >
+                              <CheckIcon
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            </span>
+                          ) : null}
+                        </>
+                      )}
+                    </Listbox.Option>
+                  </Link>
                 ))}
               </Listbox.Options>
             </Transition>

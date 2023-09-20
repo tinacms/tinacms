@@ -10,6 +10,7 @@ export default async function Page({
   params: { slug: string[] }
   children: React.ReactNode
 }) {
+  const versions = await findVersions({ slugs: params.slug || [] })
   const result = await findDeepestOverview({
     slug: params.slug || [],
   })
@@ -28,10 +29,60 @@ export default async function Page({
     throw new Error('Expected overview document to be of overview template')
   }
   return (
-    <Layout result={result} parent={parent}>
+    <Layout result={result} versions={versions} parent={parent}>
       {children}
     </Layout>
   )
+}
+
+const findVersions = async ({ slugs }: { slugs: string[] }): Promise<any> => {
+  let path = slugs.join('/')
+  const versions = (
+    await client.queries.pageConnection({
+      filter: {
+        version_meta: {
+          typename: {
+            // TODO - Search on filename instead of typename once we have that capability
+            in: ['version_meta'],
+          },
+        },
+      },
+    })
+  ).data.pageConnection.edges?.filter((edge) => {
+    return slugs
+      .join('/')
+      .startsWith(
+        edge!.node!._sys.relativePath!.replace('/version-meta.mdx', '')
+      )
+  })
+
+  if (!versions?.length) {
+    return []
+  }
+
+  const latestBranch = versions![versions!.length - 1]!
+  const versionRoot = latestBranch.node!._sys.relativePath!.replace(
+    '/version-meta.mdx',
+    ''
+  )
+
+  const currentVersionContext = path.split(versionRoot)[1].split('/')[1]
+
+  const branches = (
+    versions!.length > 0 ? versions![versions!.length - 1]!.node!.version : []
+  ).map((branch) => {
+    console.log('branch', branch)
+    console.log('currentVersionContext', currentVersionContext)
+
+    return {
+      name: branch,
+      id: branch,
+      selected: branch === currentVersionContext,
+      url: `/${versionRoot}/${branch}`,
+    }
+  })
+
+  return branches
 }
 
 const findDeepestOverview = async ({
