@@ -75,6 +75,7 @@ export function Layout({
                           pathname ===
                           item!.reference?._sys.path
                             .replace('content/pages', '')
+                            .replace('/_overview.mdx', '')
                             .replace('.mdx', '')
 
                         return (
@@ -129,6 +130,7 @@ export function Layout({
                                         pathname ===
                                         subItem!.reference?._sys.path
                                           .replace('content/pages', '')
+                                          .replace('/_overview.mdx', '')
                                           .replace('.mdx', '')
 
                                       if (
@@ -144,8 +146,8 @@ export function Layout({
                                               )}`}
                                               className={classNames(
                                                 isSelected
-                                                  ? 'bg-gray-50'
-                                                  : 'hover:bg-gray-50',
+                                                  ? 'bg-gray-50 text-indigo-600'
+                                                  : 'hover:text-indigo-600 hover:bg-gray-50',
                                                 'block rounded-md py-2 pr-2 pl-4 text-sm leading-6 text-gray-700'
                                               )}
                                             >
