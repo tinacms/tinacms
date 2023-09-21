@@ -10,7 +10,7 @@ import {
   ModalActions,
 } from '@tinacms/toolkit'
 import { LoadingDots, Button } from '@tinacms/toolkit'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 interface ModalBuilderProps {
   title: string
@@ -53,8 +53,15 @@ interface ButtonProps {
 
 export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
   const [submitting, setSubmitting] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    return () => setMounted(false)
+  }, [])
 
   const onClick = useCallback(async () => {
+    if (!mounted) return
     setSubmitting(true)
     try {
       await action()
@@ -63,7 +70,7 @@ export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
       setSubmitting(false)
       throw e
     }
-  }, [action, setSubmitting])
+  }, [action, setSubmitting, mounted])
 
   return (
     <Button
