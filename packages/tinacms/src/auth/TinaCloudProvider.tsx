@@ -70,13 +70,16 @@ export const AuthWallInner = ({
   }>({ username: '', password: '' })
 
   React.useEffect(() => {
+    let mounted = true
     client.authProvider
       .isAuthenticated()
       .then((isAuthenticated) => {
+        if (!mounted) return
         if (isAuthenticated) {
           client.authProvider
             .isAuthorized()
             .then((isAuthorized) => {
+              if (!mounted) return
               if (isAuthorized) {
                 setShowChildren(true)
                 cms.enable()
@@ -89,6 +92,7 @@ export const AuthWallInner = ({
               }
             })
             .catch((e) => {
+              if (!mounted) return
               console.error(e)
               setErrorMessage({ title: 'Unexpected Error:', message: `${e}` })
               setActiveModal('error')
@@ -101,10 +105,14 @@ export const AuthWallInner = ({
         }
       })
       .catch((e) => {
+        if (!mounted) return
         console.error(e)
         setErrorMessage({ title: 'Unexpected Error:', message: `${e}` })
         setActiveModal('error')
       })
+    return () => {
+      mounted = false
+    }
   }, [])
 
   const onAuthenticated = async () => {
