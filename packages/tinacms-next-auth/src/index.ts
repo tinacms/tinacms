@@ -55,9 +55,7 @@ const TinaNextAuthOptions = ({
   },
   session: { strategy: 'jwt' },
   secret,
-  providers: providers || [
-    TinaCredentialsProvider({ name: 'Credentials', databaseClient }),
-  ],
+  providers: providers || [TinaCredentialsProvider({ databaseClient })],
   ...overrides,
 })
 
@@ -105,7 +103,7 @@ const TinaCredentialsProvider = ({
   name = 'Credentials',
 }: {
   databaseClient: any // TODO can we type this?
-  name: string
+  name?: string
 }) =>
   CredentialsProvider({
     name,

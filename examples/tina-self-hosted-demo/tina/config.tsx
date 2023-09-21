@@ -13,12 +13,7 @@ const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
-  authProvider:
-    !isLocal &&
-    new UsernamePasswordNextAuthProvider({
-      name: 'Credentials',
-      callbackUrl: '/admin/index.html',
-    }),
+  authProvider: !isLocal && new UsernamePasswordNextAuthProvider(),
   branch:
     process.env.NEXT_PUBLIC_TINA_BRANCH! || // custom branch env override
     process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF! || // Vercel branch env

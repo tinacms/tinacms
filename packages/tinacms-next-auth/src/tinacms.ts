@@ -1,20 +1,13 @@
 import { LoginStrategy } from '@tinacms/schema-tools'
 import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react'
 import { AbstractAuthProvider } from 'tinacms'
-
 export class DefaultNextAuthProvider extends AbstractAuthProvider {
   readonly callbackUrl: string
   readonly name: string
-  constructor({
-    name = 'Credentials',
-    callbackUrl = '/admin/index.html',
-  }: {
-    name?: string
-    callbackUrl?: string
-  }) {
+  constructor(props?: { name?: string; callbackUrl?: string }) {
     super()
-    this.name = name
-    this.callbackUrl = callbackUrl
+    this.name = props?.name || 'Credentials'
+    this.callbackUrl = props?.callbackUrl || '/admin/index.html'
   }
   async authenticate(props?: {}): Promise<any> {
     return signIn(this.name, { callbackUrl: this.callbackUrl })
