@@ -199,7 +199,6 @@ const VersionedSidebar = (
   }
 ) => {
   const parent = props.sidebars[1]
-  console.log({ parent })
   // TODO: choose the correct version
   const version = props.versionedSidebar?.versions?.at(0)
   return (
@@ -265,8 +264,30 @@ const Sidebar = (
   }
 ) => {
   const parent = props.sidebars[1]
+  const sidebarParent = props.sidebars.find(
+    (s) => s.data.page.__typename === 'PageVersionedSidebar'
+  )
+  const versionedSidebar = sidebarParent?.data.page.versionedSidebar
   return (
     <nav className="flex flex-1 flex-col" aria-label="Sidebar">
+      {versionedSidebar && (
+        <div className="py-4 border-b border-slate-200 flex flex-col gap-2">
+          <VersionSelect versions={versionedSidebar?.versions} />
+          <div className="flex gap-2 items-center">
+            {versionedSidebar?.tags?.map((tag, i) => {
+              const classes = [
+                'inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10',
+                'inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-800 ring-1 ring-inset ring-green-600/20',
+              ]
+              return (
+                <span key={i} className={classes[i]}>
+                  {tag}
+                </span>
+              )
+            })}
+          </div>
+        </div>
+      )}
       {parent && (
         <div className="py-6">
           <Link
