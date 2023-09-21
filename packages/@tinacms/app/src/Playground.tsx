@@ -89,7 +89,8 @@ const Playground = () => {
                 let relativePath = ''
                 if (collection) {
                   relativePath =
-                    collection.documents.edges[0].node._sys.relativePath
+                    collection?.documents?.edges[0]?.node?._sys.relativePath ||
+                    ''
                   variables = JSON.stringify({ relativePath }, null, 2)
                 }
                 return (
