@@ -374,29 +374,23 @@ const Section = (props: PageSidebarSidebarSections) => {
                       </Disclosure.Button>
                       <Disclosure.Panel as="ul" className="mt-1 px-2">
                         {item?.children?.map((subItem) => {
-                          if (
-                            subItem?.reference?.__typename === 'PageContent'
-                          ) {
-                            subItem.__typename ===
-                              'PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDropdownLinkChildren'
-                            return (
-                              <li key={subItem?.reference?.id}>
-                                <Link
-                                  href={getSidebarItemLink(subItem)}
-                                  className={classNames(
-                                    isSelected(subItem!)
-                                      ? 'bg-gray-50 text-gray-600'
-                                      : 'hover:text-gray-600 hover:bg-gray-50',
-                                    'block rounded-md py-2 pr-2 pl-4 text-sm leading-6 text-gray-700'
-                                  )}
-                                >
-                                  {subItem?.reference.title}
-                                </Link>
-                              </li>
-                            )
-                          } else {
-                            throw new Error(`Exptected refern`)
-                          }
+                          subItem.__typename ===
+                            'PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDropdownLinkChildren'
+                          return (
+                            <li key={subItem?.reference?.id}>
+                              <Link
+                                href={getSidebarItemLink(subItem)}
+                                className={classNames(
+                                  isSelected(subItem!)
+                                    ? 'bg-gray-50 text-gray-600'
+                                    : 'hover:text-gray-600 hover:bg-gray-50',
+                                  'block rounded-md py-2 pr-2 pl-4 text-sm leading-6 text-gray-700'
+                                )}
+                              >
+                                {subItem?.reference.title}
+                              </Link>
+                            </li>
+                          )
                         })}
                       </Disclosure.Panel>
                     </>
