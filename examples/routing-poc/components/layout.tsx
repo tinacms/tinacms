@@ -14,14 +14,15 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { VersionSelect } from './version-select'
+import { PageResultWithActiveVersion } from '@/lib'
 
 export function Layout({
   sidebars,
   page,
   children,
 }: {
-  sidebars: { data: PageQuery }[]
-  page: Page
+  sidebars: PageResultWithActiveVersion[]
+  page: PageQuery['page']
   children: React.ReactNode
 }) {
   const currentSidebar = sidebars[0]
@@ -64,8 +65,8 @@ export function Layout({
 
 const Wrapper = (props: {
   sidebar: React.ReactNode
-  sidebars: { data: PageQuery }[]
-  page: Page
+  sidebars: PageResultWithActiveVersion[]
+  page: PageQuery['page']
   children: React.ReactNode
 }) => {
   return (
@@ -111,8 +112,8 @@ const Wrapper = (props: {
 }
 
 export function Breadcrumbs(props: {
-  sidebars: { data: PageQuery }[]
-  page: Page
+  sidebars: PageResultWithActiveVersion[]
+  page: PageQuery['page']
 }) {
   return (
     <nav className="flex pb-8" aria-label="Breadcrumb">
@@ -264,7 +265,7 @@ const BackToLink = ({ parent }: { parent: any }) => {
 }
 
 const Sidebar = (
-  props: Omit<PageSidebar, '_values' | '_sys'> & {
+  props: PageQuery['page'] & {
     sidebars: { data: PageQuery }[]
   }
 ) => {
@@ -278,7 +279,6 @@ const Sidebar = (
       {versionedSidebar && (
         <div className="py-4 border-b border-slate-200 flex flex-col gap-2">
           <VersionSelect {...sidebarParent.data.page} />
-          {/* <VersionSelect versions={versionedSidebar?.versions} /> */}
           <div className="flex gap-2 items-center">
             {versionedSidebar?.tags?.map((tag: string, i: number) => {
               const classes = [
@@ -413,7 +413,9 @@ const getSidebarItemLink = (
   return getSidebarItemLinkInner(item.reference)
 }
 
-const getSidebarItemLinkInner = (page: Page | null | undefined) => {
+const getSidebarItemLinkInner = (
+  page: PageQuery['page'] | null | undefined
+) => {
   if (page) {
     if (page.__typename === 'PageVersionedSidebar') {
       // This should be based on which version is active

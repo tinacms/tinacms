@@ -21,11 +21,22 @@ export const findPageOrOverview = async (slug: string[]) => {
   }
 }
 
+type PageResult = Awaited<
+  Promise<ReturnType<(typeof client)['queries']['page']>>
+>
+type PageResultData = PageResult['data']
+type PageResultDataPage = PageResult['data']['page']
+export type PageResultWithActiveVersion = PageResult & {
+  data: PageResultData & {
+    page: PageResultDataPage & { activeVersion?: string }
+  }
+}
+
 const findDeepestSidebar = async ({
   slug,
 }: {
   slug: string[]
-}): Promise<ReturnType<(typeof client)['queries']['page']>> => {
+}): Promise<PageResultWithActiveVersion> => {
   let path
   try {
     path = `${[...slug, '_sidebar'].join('/')}.mdx`
@@ -62,8 +73,8 @@ const findDeepestSidebar = async ({
 
 export const findSidebarAncestry = async (
   slug: string[],
-  accumulator: { data: PageQuery }[] = []
-) => {
+  accumulator: PageResultWithActiveVersion[] = []
+): Promise<PageResultWithActiveVersion[]> => {
   try {
     const result = await findDeepestSidebar({
       slug: slug || [],

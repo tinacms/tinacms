@@ -62,7 +62,7 @@ const links: TinaField = {
   ],
 }
 
-const sidebar = {
+const sidebar: TinaField = {
   name: 'sidebar',
   label: 'Sidebar',
   type: 'object',
@@ -73,10 +73,11 @@ const sidebar = {
       type: 'object',
       list: true,
       ui: {
-        itemProps: (item) => {
+        itemProps: (item: { title?: string } | undefined) => {
           if (item) {
             return { label: item.title }
           }
+          return {}
         },
       },
       fields: [
@@ -97,10 +98,11 @@ const sidebar = {
               name: 'dropdownLink',
               label: 'Dropdown Link',
               ui: {
-                itemProps: (item) => {
+                itemProps: (item: { label?: string } | undefined) => {
                   if (item) {
                     return { label: item.label }
                   }
+                  return {}
                 },
               },
               fields: [
@@ -116,10 +118,11 @@ const sidebar = {
                   list: true,
                   name: 'children',
                   ui: {
-                    itemProps: (item) => {
+                    itemProps: (item: { reference?: string } | undefined) => {
                       if (item) {
                         return { label: item.reference }
                       }
+                      return {}
                     },
                   },
                   fields: [
@@ -143,10 +146,11 @@ const sidebar = {
               name: 'directPageLink',
               label: 'Direct Page Link',
               ui: {
-                itemProps: (item) => {
+                itemProps: (item: { label?: string } | undefined) => {
                   if (item) {
                     return { label: item.label }
                   }
+                  return {}
                 },
               },
               fields: [
@@ -172,7 +176,7 @@ const sidebar = {
   ],
 }
 
-const versionedSidebar = {
+const versionedSidebar: TinaField = {
   name: 'versionedSidebar',
   label: 'Versioned Sidebar',
   type: 'object',
@@ -183,84 +187,6 @@ const versionedSidebar = {
       list: true,
       type: 'object',
       fields: [{ name: 'name', type: 'string' }, sidebar],
-    },
-  ],
-}
-
-const pageFields: Partial<Collection> = {
-  ui: {
-    filename: {
-      slugify: (values, meta) => {
-        if (meta.template.name === 'overview') {
-          return `_overview`
-        }
-        if (meta.template.name === 'versionedSidebar') {
-          return `_sidebar`
-        }
-        if (meta.template.name === 'sidebar') {
-          return `_sidebar`
-        }
-        return ''
-      },
-    },
-  },
-  templates: [
-    {
-      name: 'overview',
-      label: 'Overview',
-      fields: [
-        { name: 'title', type: 'string', required: true, isTitle: true },
-        {
-          type: 'rich-text',
-          name: 'body',
-          label: 'Body',
-          isBody: true,
-        },
-      ],
-    },
-    {
-      name: 'sidebar',
-      label: 'Sidebar',
-      fields: [
-        { name: 'title', type: 'string', required: true },
-        {
-          name: 'type_title',
-          type: 'string',
-          label: 'ID',
-          description:
-            'This is the title that appears in the list-view. READONLY',
-          required: true,
-          isTitle: true,
-        },
-        sidebar,
-      ],
-    },
-    {
-      name: 'versionedSidebar',
-      label: 'Versioned Sidebar',
-      fields: [
-        { name: 'title', type: 'string', required: true },
-        {
-          name: 'type_title',
-          type: 'string',
-          required: true,
-          isTitle: true,
-        },
-        versionedSidebar,
-      ],
-    },
-    {
-      name: 'content',
-      label: 'Content',
-      fields: [
-        { name: 'title', type: 'string', isTitle: true, required: true },
-        {
-          type: 'rich-text',
-          name: 'body',
-          label: 'Body',
-          isBody: true,
-        },
-      ],
     },
   ],
 }
@@ -280,7 +206,81 @@ export default defineConfig({
         label: 'Page',
         path: 'content/pages',
         format: 'mdx',
-        ...pageFields,
+        ui: {
+          filename: {
+            slugify: (values, meta) => {
+              if (meta.template.name === 'overview') {
+                return `_overview`
+              }
+              if (meta.template.name === 'versionedSidebar') {
+                return `_sidebar`
+              }
+              if (meta.template.name === 'sidebar') {
+                return `_sidebar`
+              }
+              return ''
+            },
+          },
+        },
+        templates: [
+          {
+            name: 'overview',
+            label: 'Overview',
+            fields: [
+              { name: 'title', type: 'string', required: true, isTitle: true },
+              {
+                type: 'rich-text',
+                name: 'body',
+                label: 'Body',
+                isBody: true,
+              },
+            ],
+          },
+          {
+            name: 'sidebar',
+            label: 'Sidebar',
+            fields: [
+              { name: 'title', type: 'string', required: true },
+              {
+                name: 'type_title',
+                type: 'string',
+                label: 'ID',
+                description:
+                  'This is the title that appears in the list-view. READONLY',
+                required: true,
+                isTitle: true,
+              },
+              sidebar,
+            ],
+          },
+          {
+            name: 'versionedSidebar',
+            label: 'Versioned Sidebar',
+            fields: [
+              { name: 'title', type: 'string', required: true },
+              {
+                name: 'type_title',
+                type: 'string',
+                required: true,
+                isTitle: true,
+              },
+              versionedSidebar,
+            ],
+          },
+          {
+            name: 'content',
+            label: 'Content',
+            fields: [
+              { name: 'title', type: 'string', isTitle: true, required: true },
+              {
+                type: 'rich-text',
+                name: 'body',
+                label: 'Body',
+                isBody: true,
+              },
+            ],
+          },
+        ],
       },
     ],
   },
