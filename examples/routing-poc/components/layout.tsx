@@ -195,9 +195,14 @@ const VersionedSidebar = (
 ) => {
   const parent = props.sidebars[1]
   // TODO: choose the correct version
-  const version = props.versionedSidebar?.versions?.at(0)
+  let activeVersion = props?.versionedSidebar?.versions?.find(
+    (v) => v.name === props.activeVersion
+  )
+  if (!activeVersion) {
+    activeVersion = props?.versionedSidebar?.versions?.at(0)
+  }
   return (
-    <div key={version?.name}>
+    <div key={activeVersion?.name}>
       <div className="py-4 border-b border-slate-200 flex flex-col gap-2">
         <VersionSelect {...props} />
         <div className="flex gap-2 items-center">
@@ -216,12 +221,12 @@ const VersionedSidebar = (
       </div>
       {parent && <BackToLink parent={parent} />}
       <nav
-        key={version?.name}
+        key={activeVersion?.name}
         className="flex flex-1 flex-col"
         aria-label="Sidebar"
       >
         <ul>
-          {version?.sidebar?.sections?.map((section) => (
+          {activeVersion?.sidebar?.sections?.map((section) => (
             <Section key={section?.title} {...section} />
           ))}
         </ul>
