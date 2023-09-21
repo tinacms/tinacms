@@ -302,8 +302,6 @@ const Section = (props: PageSidebarSidebarSections) => {
   const currPath = usePathname()
 
   const isSelected = (item: any) => {
-    debugger
-
     if (item!.children?.length) {
       return item!.children.some((child: any) => {
         return isSelected(child)
