@@ -299,7 +299,23 @@ const Sidebar = (
   )
 }
 const Section = (props: PageSidebarSidebarSections) => {
-  const pathname = usePathname()
+  const currPath = usePathname()
+
+  const isSelected = (item: any) => {
+    debugger
+
+    if (item!.children?.length) {
+      return item!.children.some((child: any) => {
+        return isSelected(child)
+      })
+    } else {
+      const itemPath = item.reference._sys
+        .path!.replace('content/pages', '')
+        .replace('/_overview.mdx', '')
+        .replace('.mdx', '')
+      return currPath === itemPath
+    }
+  }
 
   return (
     <li className="pb-5">
@@ -312,19 +328,12 @@ const Section = (props: PageSidebarSidebarSections) => {
             item?.__typename ===
             'PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDirectPageLink'
           ) {
-            const isSelected =
-              pathname ===
-              item!.reference?._sys.path
-                .replace('content/pages', '')
-                .replace('/_overview.mdx', '')
-                .replace('.mdx', '')
-
             return (
               <li key={item?.label}>
                 <Link
                   href={getSidebarItemLink(item)}
                   className={classNames(
-                    isSelected
+                    isSelected(item!)
                       ? 'bg-gray-50 text-gray-600'
                       : 'text-gray-700 hover:text-gray-600 hover:bg-gray-50',
                     'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
@@ -341,7 +350,7 @@ const Section = (props: PageSidebarSidebarSections) => {
           ) {
             return (
               <li key={item?.label}>
-                <Disclosure as="div">
+                <Disclosure as="div" defaultOpen={isSelected(item!)}>
                   {({ open }) => (
                     <>
                       <Disclosure.Button
@@ -362,13 +371,6 @@ const Section = (props: PageSidebarSidebarSections) => {
                       </Disclosure.Button>
                       <Disclosure.Panel as="ul" className="mt-1 px-2">
                         {item?.children?.map((subItem) => {
-                          const isSelected =
-                            pathname ===
-                            subItem!.reference?._sys.path
-                              .replace('content/pages', '')
-                              .replace('/_overview.mdx', '')
-                              .replace('.mdx', '')
-
                           if (
                             subItem?.reference?.__typename === 'PageContent'
                           ) {
@@ -379,7 +381,7 @@ const Section = (props: PageSidebarSidebarSections) => {
                                 <Link
                                   href={getSidebarItemLink(subItem)}
                                   className={classNames(
-                                    isSelected
+                                    isSelected(subItem!)
                                       ? 'bg-gray-50 text-gray-600'
                                       : 'hover:text-gray-600 hover:bg-gray-50',
                                     'block rounded-md py-2 pr-2 pl-4 text-sm leading-6 text-gray-700'
