@@ -199,7 +199,13 @@ const pageFields: Partial<Collection> = {
       name: 'sidebar',
       label: 'Sidebar',
       fields: [
-        { name: 'title', type: 'string', required: true, isTitle: true },
+        { name: 'title', type: 'string', required: true },
+        {
+          name: 'type_title',
+          type: 'string',
+          required: true,
+          isTitle: true,
+        },
         sidebar,
       ],
     },
@@ -207,7 +213,13 @@ const pageFields: Partial<Collection> = {
       name: 'versionedSidebar',
       label: 'Versioned Sidebar',
       fields: [
-        { name: 'title', type: 'string', required: true, isTitle: true },
+        { name: 'title', type: 'string', required: true },
+        {
+          name: 'type_title',
+          type: 'string',
+          required: true,
+          isTitle: true,
+        },
         versionedSidebar,
       ],
     },
