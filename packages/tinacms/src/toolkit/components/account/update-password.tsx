@@ -22,14 +22,14 @@ export function UpdatePassword(props: {}) {
     setResult(null)
     setFormState('busy')
     const res = (await cms.api.tina.request(
-      `mutation($password: String!) { updatePassword(password: $password) { id } }`,
+      `mutation($password: String!) { updatePassword(password: $password) }`,
       {
         variables: {
           password,
         },
       }
-    )) as { updatePassword: { id: string } | null }
-    if (!res?.updatePassword?.id) {
+    )) as { updatePassword: boolean | null }
+    if (!res?.updatePassword) {
       setResult('Error updating password')
     } else {
       setDirty(false)

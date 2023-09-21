@@ -27,6 +27,7 @@ import type {
   Template,
 } from '@tinacms/schema-tools'
 import { TinaSchema } from '@tinacms/schema-tools'
+import { mapUserFields } from '../auth/utils'
 
 export const createBuilder = async ({
   tinaSchema,
@@ -445,7 +446,7 @@ export class Builder {
     collection: Collection<true>
   ) => {
     const name = 'authenticate'
-    const type = await this._buildCollectionDocumentType(collection)
+    const type = await this._buildAuthDocumentType(collection)
     const args = [
       astBuilder.InputValueDefinition({
         name: 'sub',
@@ -463,7 +464,7 @@ export class Builder {
 
   public updatePasswordMutation = async (collection: Collection<true>) => {
     return astBuilder.FieldDefinition({
-      type: await this._buildCollectionDocumentType(collection),
+      type: astBuilder.TYPES.Boolean,
       name: 'updatePassword',
       required: true,
       args: [
@@ -480,14 +481,8 @@ export class Builder {
     collection: Collection<true>
   ) => {
     const name = 'authorize'
-    const type = await this._buildCollectionDocumentType(collection)
-    const args = [
-      astBuilder.InputValueDefinition({
-        name: 'sub',
-        type: astBuilder.TYPES.String,
-        required: true,
-      }),
-    ]
+    const type = await this._buildAuthDocumentType(collection)
+    const args = []
     return astBuilder.FieldDefinition({ type, name, args, required: true })
   }
 
@@ -867,6 +862,41 @@ export class Builder {
           type: 'JSON',
         }),
       ],
+    })
+  }
+
+  private _buildAuthDocumentType = async (
+    collection: Collection<true>,
+    suffix: string = '',
+    extraFields: FieldDefinitionNode[] = [],
+    extraInterfaces: NamedTypeNode[] = []
+  ) => {
+    const usersFields = mapUserFields(collection, [])
+    if (!usersFields.length) {
+      throw new Error('Auth collection must have a user field')
+    }
+    if (usersFields.length > 1) {
+      throw new Error('Auth collection cannot have more than one user field')
+    }
+    const usersField = usersFields[0].collectable
+    const documentTypeName = NAMER.documentTypeName(usersField.namespace)
+    const templateInfo = this.tinaSchema.getTemplatesForCollectable(usersField)
+
+    if (templateInfo.type === 'union') {
+      throw new Error('Auth collection user field cannot be a union')
+    }
+    const fields = templateInfo.template.fields
+    const templateFields = await sequential(fields, async (field) => {
+      return this._buildDataField(field)
+    })
+    return astBuilder.ObjectTypeDefinition({
+      name: documentTypeName + suffix,
+      interfaces: [
+        astBuilder.NamedType({ name: astBuilder.TYPES.Node }),
+        astBuilder.NamedType({ name: astBuilder.TYPES.Document }),
+        ...extraInterfaces,
+      ],
+      fields: [...templateFields],
     })
   }
 

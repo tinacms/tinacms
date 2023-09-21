@@ -16,7 +16,7 @@ import { handleFetchErrorError } from './resolver/error'
 import {
   checkPasswordHash,
   generatePasswordHash,
-  mapPasswordFields,
+  mapUserFields,
 } from './auth/utils'
 import { get, set } from 'lodash'
 
@@ -28,7 +28,7 @@ export const resolve = async ({
   silenceErrors,
   verbose,
   isAudit,
-  user,
+  ctxUser,
 }: {
   config?: GraphQLConfig
   query: string
@@ -37,7 +37,7 @@ export const resolve = async ({
   silenceErrors?: boolean
   verbose?: boolean
   isAudit?: boolean
-  user?: { sub: string }
+  ctxUser?: { sub: string }
 }) => {
   try {
     const verboseValue = verbose ?? true
@@ -178,6 +178,7 @@ export const resolve = async ({
             info.fieldName === 'authenticate' ||
             info.fieldName === 'authorize'
           ) {
+            const sub = args.sub || ctxUser?.sub
             const collection = tinaSchema
               .getCollections()
               .find((c) => c.isAuthCollection)
@@ -185,44 +186,49 @@ export const resolve = async ({
               throw new Error(`Auth collection not found`)
             }
 
-            const userDoc = await resolver.getDocument(
-              `${collection.path}/${args.sub}.${collection.format}`
-            )
-            if (info.fieldName === 'authenticate') {
-              const passwordFields: string[][] = []
-              mapPasswordFields(collection.fields, ['_rawData'], passwordFields)
-              if (!passwordFields.length) {
-                throw new Error(
-                  `No password field found in collection ${collection.name}`
-                )
-              }
-              if (passwordFields.length > 1) {
-                throw new Error(
-                  `Multiple password fields found in collection ${collection.name}`
-                )
-              }
+            const userFields = mapUserFields(collection, ['_rawData'])
+            if (!userFields.length) {
+              throw new Error(
+                `No user field found in collection ${collection.name}`
+              )
+            }
+            if (userFields.length > 1) {
+              throw new Error(
+                `Multiple user fields found in collection ${collection.name}`
+              )
+            }
+            const userField = userFields[0]
 
+            const realPath = `${collection.path}/index.json`
+            const userDoc = await resolver.getDocument(realPath)
+            const users = get(userDoc, userField.path)
+            if (!users) {
+              throw new Error('No users found')
+            }
+            const { idFieldName, passwordFieldName } = userField
+            const user = users.find((u) => u[idFieldName] === sub)
+            if (!user) {
+              throw new Error('Not authorized')
+            }
+
+            if (info.fieldName === 'authenticate') {
               const matches = await checkPasswordHash({
-                saltedHash: get(userDoc, passwordFields[0]),
+                saltedHash: get(user, passwordFieldName),
                 password: args.password,
               })
 
               if (matches) {
-                return userDoc
+                return user
               } else {
                 throw new Error('Invalid password')
               }
             } else {
-              if (userDoc) {
-                return userDoc
-              } else {
-                throw new Error('Not authorized')
-              }
+              return user
             }
           }
 
           if (info.fieldName === 'updatePassword') {
-            if (!user?.sub) {
+            if (!ctxUser?.sub) {
               throw new Error('Not authorized')
             }
 
@@ -236,39 +242,61 @@ export const resolve = async ({
             if (!collection) {
               throw new Error(`Auth collection not found`)
             }
-            const realPath = `${collection.path}/${user.sub}.${collection.format}`
+
+            const userFields = mapUserFields(collection, ['_rawData'])
+            if (!userFields.length) {
+              throw new Error(
+                `No user field found in collection ${collection.name}`
+              )
+            }
+            if (userFields.length > 1) {
+              throw new Error(
+                `Multiple user fields found in collection ${collection.name}`
+              )
+            }
+            const userField = userFields[0]
+            const realPath = `${collection.path}/index.json`
             const userDoc = await resolver.getDocument(realPath)
-            if (!userDoc) {
+            const users = get(userDoc, userField.path)
+            if (!users) {
+              throw new Error('No users found')
+            }
+            const { idFieldName, passwordFieldName } = userField
+            const user = users.find((u) => u[idFieldName] === ctxUser.sub)
+            if (!user) {
               throw new Error('Not authorized')
             }
 
-            const passwordFields: string[][] = []
-            mapPasswordFields(collection.fields, ['user'], passwordFields)
-            if (!passwordFields.length) {
-              throw new Error(
-                `No password field found in collection ${collection.name}`
-              )
-            }
-            if (passwordFields.length > 1) {
-              throw new Error(
-                `Multiple password fields found in collection ${collection.name}`
-              )
-            }
+            user[passwordFieldName] = await generatePasswordHash({
+              password: args.password,
+            })
 
             const params = {}
             set(
               params,
-              passwordFields[0],
-              await generatePasswordHash({ password: args.password })
+              userField.path.slice(1), // remove _rawData from users path
+              users.map((u) => {
+                if (user[idFieldName] === u[idFieldName]) {
+                  return user
+                } else {
+                  return {
+                    // don't overwrite other users' passwords
+                    ...u,
+                    [passwordFieldName]: '',
+                  }
+                }
+              })
             )
 
-            return await resolver.updateResolveDocument({
+            await resolver.updateResolveDocument({
               collection,
               args: { params },
               realPath,
-              isCollectionSpecific: false,
+              isCollectionSpecific: true,
               isAddPendingDocument: false,
             })
+
+            return true
           }
 
           // We assume the value is already fully resolved

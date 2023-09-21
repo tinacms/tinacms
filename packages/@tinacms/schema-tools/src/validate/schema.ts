@@ -59,7 +59,7 @@ export const CollectionBaseSchema = z.object({
     }),
   format: z.enum(FORMATS).optional(),
   isAuthCollection: z.boolean().optional(),
-  applicationData: z.boolean().optional(),
+  isDetached: z.boolean().optional(),
 })
 
 // Zod did not handel this union very well so we will handle it ourselves
@@ -85,6 +85,26 @@ const TinaCloudCollection = CollectionBaseSchema.extend({
       },
       {
         message: 'Fields can only have one use of `isTitle`',
+      }
+    )
+    .refine(
+      // It is valid if it is 0 or 1
+      (val) => {
+        const arr = val?.filter((x) => x.isIdentifier) || []
+        return arr.length < 2
+      },
+      {
+        message: 'Fields can only have one use of `isIdentifier`',
+      }
+    )
+    .refine(
+      // It is valid if it is 0 or 1
+      (val) => {
+        const arr = val?.filter((x) => x.type === 'password') || []
+        return arr.length < 2
+      },
+      {
+        message: 'Fields can only have one use of `password` type',
       }
     ),
   templates: z

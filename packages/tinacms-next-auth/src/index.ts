@@ -9,42 +9,12 @@ const authenticate = async (
   password: string
 ) => {
   try {
-    const result = await databaseClient.request({
-      query: `query auth($username:String!, $password:String!) {
-              authenticate(sub:$username, password:$password) {
-                name
-                email
-                _sys {
-                  filename
-                }
-              }
-            }`,
-      variables: { username, password },
-    })
-    if (result.data) {
-      return {
-        id: result.data?.authenticate?._sys?.filename,
-        name: result.data?.authenticate?.name,
-        email: result.data?.authenticate?.email,
-      }
-    }
+    const result = await databaseClient.authenticate({ username, password })
+    return result.data?.authenticate || null
   } catch (e) {
     console.error(e)
   }
   return null
-}
-
-const isAuthorized = async (databaseClient: any, username: string) => {
-  try {
-    const result = await databaseClient.request({
-      query: `query authz($username:String!) { authorize(sub:$username) { name } }`,
-      variables: { username },
-    })
-    return !!result?.data?.authorize
-  } catch (e) {
-    console.error(e)
-  }
-  return false
 }
 
 const TinaNextAuthOptions = ({
@@ -64,7 +34,7 @@ const TinaNextAuthOptions = ({
         // first time logging in
         try {
           jwt.role =
-            jwt.sub && (await isAuthorized(databaseClient, jwt.sub))
+            jwt.sub && (await databaseClient.authorize({ sub: jwt.sub }))
               ? 'user'
               : 'guest'
         } catch (error) {

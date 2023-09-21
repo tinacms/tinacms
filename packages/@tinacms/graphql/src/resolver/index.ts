@@ -362,14 +362,43 @@ export class Resolver {
     await this.database.delete(fullPath)
   }
 
-  public buildObjectMutations = async (fieldValue: any, field: Collectable) => {
+  public buildObjectMutations = async (
+    fieldValue: any,
+    field: Collectable,
+    existingData?: Record<string, any> | Record<string, any>[]
+  ) => {
     if (field.fields) {
       const objectTemplate = field
       if (Array.isArray(fieldValue)) {
+        const idField = objectTemplate.fields.find(
+          (field) => field.isIdentifier
+        )
+        if (idField) {
+          // check for duplicate ids in the data array
+          const ids = fieldValue.map((d) => d[idField.name])
+          const duplicateIds = ids.filter(
+            (id, index) => ids.indexOf(id) !== index
+          )
+          if (duplicateIds.length > 0) {
+            throw new Error(
+              `Duplicate ids found in array for field marked as identifier: ${idField.name}`
+            )
+          }
+        }
         return Promise.all(
           fieldValue.map(async (item) =>
             // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
-            this.buildFieldMutations(item, objectTemplate)
+            {
+              return this.buildFieldMutations(
+                item,
+                objectTemplate as any,
+                idField &&
+                  existingData &&
+                  existingData?.find(
+                    (d) => d[idField.name] === item[idField.name]
+                  )
+              )
+            }
           )
         )
       } else {
@@ -377,7 +406,8 @@ export class Resolver {
           // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
           fieldValue,
           //@ts-ignore
-          objectTemplate
+          objectTemplate,
+          existingData
         )
       }
     }
@@ -537,7 +567,8 @@ export class Resolver {
           if (params) {
             const values = await this.buildFieldMutations(
               params,
-              templateInfo.template
+              templateInfo.template,
+              oldDoc
             )
             await this.database.put(
               realPath,
@@ -572,7 +603,8 @@ export class Resolver {
     const params = await this.buildObjectMutations(
       //@ts-ignore
       isCollectionSpecific ? args.params : args.params[collection.name],
-      collection
+      collection,
+      oldDoc
     )
     //@ts-ignore
     await this.database.put(realPath, { ...oldDoc, ...params }, collection.name)
@@ -880,9 +912,18 @@ export class Resolver {
 
   private buildFieldMutations = async (
     fieldParams: FieldParams,
-    template: Template<true>
+    template: Template<true>,
+    existingData?: Record<string, any>
   ) => {
     const accum: { [key: string]: unknown } = {}
+    // since password fields may not always be set, we use the template fields to populate an empty string
+    for (const passwordField of template.fields.filter(
+      (f) => f.type === 'password'
+    )) {
+      if (!fieldParams[passwordField.name]) {
+        fieldParams[passwordField.name] = ''
+      }
+    }
     for (const [fieldName, fieldValue] of Object.entries(fieldParams)) {
       if (Array.isArray(fieldValue)) {
         if (fieldValue.length === 0) {
@@ -912,12 +953,20 @@ export class Resolver {
           )
           break
         case 'object':
-          accum[fieldName] = await this.buildObjectMutations(fieldValue, field)
+          accum[fieldName] = await this.buildObjectMutations(
+            fieldValue,
+            field,
+            existingData?.[fieldName]
+          )
           break
         case 'password':
-          accum[fieldName] = await generatePasswordHash({
-            password: fieldValue as string,
-          })
+          if (fieldValue) {
+            accum[fieldName] = await generatePasswordHash({
+              password: fieldValue as string,
+            })
+          } else {
+            accum[fieldName] = existingData?.[fieldName]
+          }
           break
         case 'rich-text':
           // @ts-ignore

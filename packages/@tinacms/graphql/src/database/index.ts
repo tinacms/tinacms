@@ -55,7 +55,7 @@ import {
 import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
 import sha from 'js-sha1'
 import { FilesystemBridge, TinaLevelClient } from '..'
-import { generatePasswordHash, mapPasswordFields } from '../auth/utils'
+import { generatePasswordHash, mapUserFields } from '../auth/utils'
 import { get, set } from 'lodash'
 
 type IndexStatusEvent = {
@@ -292,7 +292,7 @@ export class Database {
       let level = this.contentLevel
       if (this.appLevel) {
         collection = await this.collectionForPath(filepath)
-        if (collection?.applicationData) {
+        if (collection?.isDetached) {
           level = this.appLevel.sublevel(collection.name, SUBLEVEL_OPTIONS)
         }
       }
@@ -335,7 +335,7 @@ export class Database {
     const indexDefinitions = await this.getIndexDefinitions(this.contentLevel)
     const collectionIndexDefinitions = indexDefinitions?.[collection.name]
     const normalizedPath = normalizePath(filepath)
-    if (!collection?.applicationData) {
+    if (!collection?.isDetached) {
       if (this.bridge) {
         await this.bridge.put(normalizedPath, stringifiedFile)
       }
@@ -355,7 +355,7 @@ export class Database {
     }
 
     let level = this.contentLevel
-    if (collection?.applicationData) {
+    if (collection?.isDetached) {
       level = this.appLevel.sublevel(collection.name, SUBLEVEL_OPTIONS)
     }
     const folderTreeBuilder = new FolderTreeBuilder()
@@ -482,7 +482,7 @@ export class Database {
           collection
         )
 
-        if (!collection?.applicationData) {
+        if (!collection?.isDetached) {
           if (this.bridge) {
             await this.bridge.put(normalizedPath, stringifiedFile)
           }
@@ -506,7 +506,7 @@ export class Database {
           filepath,
           collection.path || ''
         )
-        const level = collection?.applicationData
+        const level = collection?.isDetached
           ? this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
           : this.contentLevel
         const putOps = [
@@ -903,7 +903,7 @@ export class Database {
       | undefined
     const filterSuffixes =
       indexDefinition && makeFilterSuffixes(filterChain, indexDefinition)
-    const level = collection?.applicationData
+    const level = collection?.isDetached
       ? this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
       : this.contentLevel
     const rootLevel = level.sublevel<string, Record<string, any>>(
@@ -1187,7 +1187,7 @@ export class Database {
         tinaSchema,
         documentPaths,
         async (collection, documentPaths) => {
-          if (collection && !collection.applicationData) {
+          if (collection && !collection.isDetached) {
             await _indexContent(
               this,
               this.contentLevel,
@@ -1213,7 +1213,7 @@ export class Database {
     const collectionIndexDefinitions = indexDefinitions?.[collection.name]
 
     let level = this.contentLevel
-    if (collection?.applicationData) {
+    if (collection?.isDetached) {
       level = this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
     }
     const itemKey = normalizePath(filepath)
@@ -1254,7 +1254,7 @@ export class Database {
       ])
     }
 
-    if (!collection?.applicationData) {
+    if (!collection?.isDetached) {
       if (this.bridge) {
         await this.bridge.delete(normalizePath(filepath))
       }
@@ -1288,9 +1288,8 @@ export class Database {
       tinaSchema,
       this.bridge,
       async (collection, contentPaths) => {
-        const passwordFields = []
-        mapPasswordFields(collection.fields, [], passwordFields)
-        if (collection.applicationData) {
+        const userFields = mapUserFields(collection, [])
+        if (collection.isDetached) {
           const level = this.appLevel.sublevel(
             collection.name,
             SUBLEVEL_OPTIONS
@@ -1304,7 +1303,10 @@ export class Database {
               contentPaths,
               enqueueOps,
               collection,
-              passwordFields
+              userFields.map((field) => [
+                ...field.path,
+                field.passwordFieldName,
+              ])
             )
           }
         } else {
@@ -1372,18 +1374,40 @@ type UnionDataLookup = {
   typeMap: { [templateName: string]: string }
 }
 
-const hashPasswordValues = async (data: object, passwordFields: string[][]) => {
-  for (const passwordField of passwordFields) {
-    const plaintextPassword = get(data, passwordField)
-    if (plaintextPassword) {
-      set(
-        data,
-        passwordField,
-        await generatePasswordHash({ password: plaintextPassword })
-      )
-    }
+const hashPasswordVisitor = async (node: any, path: string[]) => {
+  const plaintextPassword = get(node, path)
+  if (plaintextPassword) {
+    set(node, path, await generatePasswordHash({ password: plaintextPassword }))
   }
 }
+
+const visitNodes = async (
+  node: any,
+  path: string[],
+  callback: (node: any, path: string[]) => Promise<void> | void
+) => {
+  const [currentLevel, ...remainingLevels] = path
+  if (!remainingLevels?.length) {
+    return callback(node, path)
+  }
+  if (Array.isArray(node[currentLevel])) {
+    for (const item of node[currentLevel]) {
+      await visitNodes(item, remainingLevels, callback)
+    }
+  } else {
+    await visitNodes(node[currentLevel], remainingLevels, callback)
+  }
+}
+
+const hashPasswordValues = async (
+  data: Record<string, any>,
+  passwordFields: string[][]
+) =>
+  Promise.all(
+    passwordFields.map(async (passwordField) =>
+      visitNodes(data, passwordField, hashPasswordVisitor)
+    )
+  )
 
 const _indexContent = async (
   database: Database,

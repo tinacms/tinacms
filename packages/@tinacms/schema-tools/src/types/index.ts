@@ -151,6 +151,7 @@ export interface BaseField {
   nameOverride?: string
   description?: string
   searchable?: boolean
+  isIdentifier?: boolean
 }
 
 export type StringField = (
@@ -741,7 +742,7 @@ interface BaseCollection {
     include?: string
     exclude?: string
   }
-  applicationData?: boolean
+  isDetached?: boolean
   isAuthCollection?: boolean
 }
 

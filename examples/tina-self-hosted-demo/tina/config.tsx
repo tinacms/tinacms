@@ -43,28 +43,57 @@ const config = defineStaticConfig({
   schema: {
     collections: [
       {
-        applicationData: true,
+        ui: {
+          global: true,
+          allowedActions: {
+            create: false,
+            delete: false,
+          },
+        },
         isAuthCollection: true,
+        isDetached: true,
         label: 'Users',
         name: 'user',
         path: 'content/users',
-        format: 'md',
+        format: 'json',
         fields: [
           {
-            type: 'string',
-            label: 'Name',
-            name: 'name',
-          },
-          {
-            type: 'string',
-            label: 'Email',
-            name: 'email',
-          },
-          {
-            type: 'password',
-            label: 'Password',
-            name: 'password',
-            required: true,
+            type: 'object',
+            name: 'users',
+            list: true,
+            ui: {
+              defaultItem: {
+                username: 'new-user',
+                name: 'New User',
+                password: '',
+              },
+              itemProps: (item) => ({ label: item?.username }),
+            },
+            fields: [
+              {
+                type: 'string',
+                label: 'Username',
+                name: 'username',
+                isIdentifier: true,
+                required: true,
+              },
+              {
+                type: 'string',
+                label: 'Name',
+                name: 'name',
+              },
+              {
+                type: 'string',
+                label: 'Email',
+                name: 'email',
+              },
+              {
+                type: 'password',
+                label: 'Password',
+                name: 'password',
+                required: true,
+              },
+            ],
           },
         ],
       },

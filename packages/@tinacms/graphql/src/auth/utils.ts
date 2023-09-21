@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import scmp from 'scmp'
+import { Collectable } from '@tinacms/schema-tools'
 
 const DEFAULT_SALT_LENGTH = 32
 const DEFAULT_KEY_LENGTH = 512
@@ -114,22 +115,39 @@ export const checkPasswordHash = async ({
   }
   return true
 }
-type FieldLike = {
-  name: string
-  type: string
-  fields?: FieldLike[]
-}
 
-export const mapPasswordFields = (
-  fields: FieldLike[],
-  prefix: string[] = [],
-  result: string[][]
+export const mapUserFields = (
+  collectable: Collectable,
+  prefix: string[] = []
 ) => {
-  fields.forEach((field) => {
-    if (field.type === 'password') {
-      result.push([...prefix, field.name])
-    } else if (field.fields) {
-      mapPasswordFields(field.fields, [...prefix, field.name], result)
+  const results: {
+    path: string[]
+    collectable: Collectable
+    idFieldName?: string
+    passwordFieldName?: string
+  }[] = []
+  const passwordFields = collectable.fields?.filter(
+    (field) => field.type === 'password'
+  )
+  if (passwordFields.length > 1) {
+    throw new Error('Only one password field is allowed')
+  }
+  const idFields = collectable.fields?.filter((field) => field.isIdentifier)
+  if (idFields.length > 1) {
+    throw new Error('Only one id field is allowed')
+  }
+  if (passwordFields.length || idFields.length) {
+    results.push({
+      path: prefix,
+      collectable,
+      idFieldName: idFields[0]?.name,
+      passwordFieldName: passwordFields[0]?.name,
+    })
+  }
+  collectable.fields?.forEach((field) => {
+    if (field.type === 'object' && field.fields) {
+      results.push(...mapUserFields(field, [...prefix, field.name]))
     }
   })
+  return results
 }
