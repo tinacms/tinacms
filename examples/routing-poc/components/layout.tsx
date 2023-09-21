@@ -126,10 +126,7 @@ export function Breadcrumbs(props: {
                 <li key={sidebar.data.page.title}>
                   <div>
                     <Link
-                      // href={page.href}
-                      href={`/${filterBreadcrumbs(
-                        sidebar.data.page._sys.breadcrumbs
-                      )}`}
+                      href={getSidebarItemLinkInner(sidebar.data.page)}
                       className="text-sm font-medium text-gray-500 hover:text-gray-700"
                       // aria-current={page.current ? 'page' : undefined}
                     >
@@ -147,9 +144,7 @@ export function Breadcrumbs(props: {
                     aria-hidden="true"
                   />
                   <Link
-                    href={`/${filterBreadcrumbs(
-                      sidebar.data.page._sys.breadcrumbs
-                    )}`}
+                    href={getSidebarItemLinkInner(sidebar.data.page)}
                     className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
                     // aria-current={page.current ? 'page' : undefined}
                   >
@@ -219,30 +214,7 @@ const VersionedSidebar = (
           })}
         </div>
       </div>
-      {parent && (
-        <div className="py-6">
-          <Link
-            href={`/${filterBreadcrumbs(parent?.data.page._sys.breadcrumbs)}`}
-            className="text-xs font-semibold leading-6 text-gray-400  flex gap-2 items-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-              />
-            </svg>
-            Back to {parent?.data.page?.title}
-          </Link>
-        </div>
-      )}
+      {parent && <BackToLink parent={parent} />}
       <nav
         key={version?.name}
         className="flex flex-1 flex-col"
@@ -258,6 +230,35 @@ const VersionedSidebar = (
   )
 }
 
+const BackToLink = ({ parent }: { parent: any }) => {
+  console.log(parent)
+  return (
+    <div className="py-6">
+      <Link
+        // href={`/${filterBreadcrumbs(parent?.data.page._sys.breadcrumbs)}`}
+        href={getSidebarItemLinkInner(parent?.data.page)}
+        className="text-xs font-semibold leading-6 text-gray-400  flex gap-2 items-center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-4 h-4"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+          />
+        </svg>
+        Back to {parent?.data.page?.title}
+      </Link>
+    </div>
+  )
+}
+
 const Sidebar = (
   props: Omit<PageSidebar, '_values' | '_sys'> & {
     sidebars: { data: PageQuery }[]
@@ -267,14 +268,14 @@ const Sidebar = (
   const sidebarParent = props.sidebars.find(
     (s) => s.data.page.__typename === 'PageVersionedSidebar'
   )
-  const versionedSidebar = sidebarParent?.data.page.versionedSidebar
+  const versionedSidebar = sidebarParent?.data?.page?.versionedSidebar
   return (
     <nav className="flex flex-1 flex-col" aria-label="Sidebar">
       {versionedSidebar && (
         <div className="py-4 border-b border-slate-200 flex flex-col gap-2">
           <VersionSelect versions={versionedSidebar?.versions} />
           <div className="flex gap-2 items-center">
-            {versionedSidebar?.tags?.map((tag, i) => {
+            {versionedSidebar?.tags?.map((tag: string, i: number) => {
               const classes = [
                 'inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10',
                 'inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-800 ring-1 ring-inset ring-green-600/20',
@@ -288,30 +289,7 @@ const Sidebar = (
           </div>
         </div>
       )}
-      {parent && (
-        <div className="py-6">
-          <Link
-            href={`/${filterBreadcrumbs(parent?.data.page._sys.breadcrumbs)}`}
-            className="text-xs font-semibold leading-6 text-gray-400  flex gap-2 items-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-              />
-            </svg>
-            Back to {parent?.data.page?.title}
-          </Link>
-        </div>
-      )}
+      {parent && <BackToLink parent={parent} />}
       <ul>
         {props.sidebar?.sections?.map((section) => (
           <Section key={section?.title} {...section} />
@@ -428,29 +406,33 @@ const Section = (props: PageSidebarSidebarSections) => {
     </li>
   )
 }
-
 const getSidebarItemLink = (
   item:
     | PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDirectPageLink
     | PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDropdownLinkChildren
 ) => {
-  if (item.reference?.__typename === 'PageVersionedSidebar') {
-    const latestVersion = item?.reference?.versionedSidebar?.versions?.at(0)
-    if (latestVersion) {
-      const path = [
-        ...item.reference._sys.breadcrumbs.slice(
-          0,
-          item.reference._sys.breadcrumbs.length - 1
-        ),
-        latestVersion.name,
-      ]
-      return `/${path.join('/')}`
+  return getSidebarItemLinkInner(item.reference)
+}
+
+const getSidebarItemLinkInner = (page: Page | null | undefined) => {
+  if (page) {
+    if (page.__typename === 'PageVersionedSidebar') {
+      // This should be based on which version is active
+      const latestVersion = page?.versionedSidebar?.versions?.at(0)
+      if (latestVersion) {
+        const path = [
+          ...page._sys.breadcrumbs.slice(0, page._sys.breadcrumbs.length - 1),
+          latestVersion.name,
+        ]
+        return `/${path.join('/')}`
+      } else {
+        throw new Error(`Expected versioned sidebar to have a "versions" array`)
+      }
     } else {
-      throw new Error(`Expected versioned sidebar to have a "versions" array`)
+      return `/${filterBreadcrumbs(page._sys.breadcrumbs)}`
     }
-  } else {
-    return `/${filterBreadcrumbs(item?.reference?._sys.breadcrumbs)}`
   }
+  return '/'
 }
 
 const filterBreadcrumbs = (breadcrumbs: string[] = []) => {
