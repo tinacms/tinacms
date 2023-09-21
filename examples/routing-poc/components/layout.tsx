@@ -93,7 +93,7 @@ const Wrapper = (props: {
               Documentation
             </div>
             <div className="text-sm font-semibold leading-6 text-gray-600 leading-5">
-              Pixzy
+              Pixyz
             </div>
           </div>
         </Link>
