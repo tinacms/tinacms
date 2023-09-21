@@ -64,7 +64,10 @@ export const AuthWallInner = ({
     { title: string; message: string } | undefined
   >()
   const [showChildren, setShowChildren] = useState<boolean>(false)
-  const [authProps, setAuthProps] = useState<Record<string, any>>({})
+  const [authProps, setAuthProps] = useState<{
+    username: string
+    password: string
+  }>({ username: '', password: '' })
 
   React.useEffect(() => {
     client.authProvider
