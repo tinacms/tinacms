@@ -34,7 +34,6 @@ const findDeepestSidebar = async ({
     })
     return result
   } catch (e) {
-    console.log('find deepest', path)
     if (slug.length === 0) {
       throw new Error(`Unable to find any ToC. Path ${path}`)
     }
