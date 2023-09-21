@@ -183,25 +183,6 @@ const pageFields: Partial<Collection> = {
   },
   templates: [
     {
-      name: 'version_meta',
-      label: 'Version Meta',
-      fields: [
-        {
-          name: 'version',
-          type: 'string',
-          label: 'Version',
-          list: true,
-        },
-        {
-          name: 'typename',
-          type: 'string',
-          isTitle: true,
-          required: true,
-          label: 'ID',
-        },
-      ],
-    },
-    {
       name: 'overview',
       label: 'Overview',
       fields: [

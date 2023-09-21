@@ -299,6 +299,8 @@ const Sidebar = (
   )
 }
 const Section = (props: PageSidebarSidebarSections) => {
+  const pathname = usePathname()
+
   return (
     <li className="pb-5">
       <div className="text-xs font-semibold leading-6 text-gray-400">
@@ -310,21 +312,20 @@ const Section = (props: PageSidebarSidebarSections) => {
             item?.__typename ===
             'PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDirectPageLink'
           ) {
-            // const isSelected =
-            //   pathname ===
-            //   item!.reference?._sys.path
-            //     .replace('content/pages', '')
-            //     .replace('/_overview.mdx', '')
-            //     .replace('.mdx', '')
+            const isSelected =
+              pathname ===
+              item!.reference?._sys.path
+                .replace('content/pages', '')
+                .replace('/_overview.mdx', '')
+                .replace('.mdx', '')
 
             return (
               <li key={item?.label}>
                 <Link
                   href={getSidebarItemLink(item)}
                   className={classNames(
-                    false
-                      ? // isSelected
-                        'bg-gray-50 text-gray-600'
+                    isSelected
+                      ? 'bg-gray-50 text-gray-600'
                       : 'text-gray-700 hover:text-gray-600 hover:bg-gray-50',
                     'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                   )}
@@ -361,12 +362,12 @@ const Section = (props: PageSidebarSidebarSections) => {
                       </Disclosure.Button>
                       <Disclosure.Panel as="ul" className="mt-1 px-2">
                         {item?.children?.map((subItem) => {
-                          // const isSelected =
-                          //   pathname ===
-                          //   subItem!.reference?._sys.path
-                          //     .replace('content/pages', '')
-                          //     .replace('/_overview.mdx', '')
-                          //     .replace('.mdx', '')
+                          const isSelected =
+                            pathname ===
+                            subItem!.reference?._sys.path
+                              .replace('content/pages', '')
+                              .replace('/_overview.mdx', '')
+                              .replace('.mdx', '')
 
                           if (
                             subItem?.reference?.__typename === 'PageContent'
@@ -378,9 +379,8 @@ const Section = (props: PageSidebarSidebarSections) => {
                                 <Link
                                   href={getSidebarItemLink(subItem)}
                                   className={classNames(
-                                    false
-                                      ? // isSelected
-                                        'bg-gray-50 text-gray-600'
+                                    isSelected
+                                      ? 'bg-gray-50 text-gray-600'
                                       : 'hover:text-gray-600 hover:bg-gray-50',
                                     'block rounded-md py-2 pr-2 pl-4 text-sm leading-6 text-gray-700'
                                   )}
