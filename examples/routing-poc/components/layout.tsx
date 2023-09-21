@@ -199,7 +199,7 @@ const VersionedSidebar = (
   return (
     <div key={version?.name}>
       <div className="py-4 border-b border-slate-200 flex flex-col gap-2">
-        <VersionSelect versions={props.versionedSidebar?.versions} />
+        <VersionSelect {...props} />
         <div className="flex gap-2 items-center">
           {props.versionedSidebar?.tags?.map((tag, i) => {
             const classes = [
@@ -231,7 +231,6 @@ const VersionedSidebar = (
 }
 
 const BackToLink = ({ parent }: { parent: any }) => {
-  console.log(parent)
   return (
     <div className="py-6">
       <Link
@@ -273,7 +272,8 @@ const Sidebar = (
     <nav className="flex flex-1 flex-col" aria-label="Sidebar">
       {versionedSidebar && (
         <div className="py-4 border-b border-slate-200 flex flex-col gap-2">
-          <VersionSelect versions={versionedSidebar?.versions} />
+          <VersionSelect {...sidebarParent.data.page} />
+          {/* <VersionSelect versions={versionedSidebar?.versions} /> */}
           <div className="flex gap-2 items-center">
             {versionedSidebar?.tags?.map((tag: string, i: number) => {
               const classes = [
@@ -418,15 +418,22 @@ const getSidebarItemLinkInner = (page: Page | null | undefined) => {
   if (page) {
     if (page.__typename === 'PageVersionedSidebar') {
       // This should be based on which version is active
-      const latestVersion = page?.versionedSidebar?.versions?.at(0)
-      if (latestVersion) {
+      let activeVersion = page?.versionedSidebar?.versions?.find(
+        (v) => v.name === page.activeVersion
+      )
+      if (!activeVersion) {
+        activeVersion = page?.versionedSidebar?.versions?.at(0)
+      }
+      if (activeVersion) {
         const path = [
           ...page._sys.breadcrumbs.slice(0, page._sys.breadcrumbs.length - 1),
-          latestVersion.name,
+          activeVersion.name,
         ]
         return `/${path.join('/')}`
       } else {
-        throw new Error(`Expected versioned sidebar to have a "versions" array`)
+        console.error('No version found')
+        return ''
+        // throw new Error(`Expected versioned sidebar to have a "versions" array`)
       }
     } else {
       return `/${filterBreadcrumbs(page._sys.breadcrumbs)}`
@@ -435,7 +442,7 @@ const getSidebarItemLinkInner = (page: Page | null | undefined) => {
   return '/'
 }
 
-const filterBreadcrumbs = (breadcrumbs: string[] = []) => {
+export const filterBreadcrumbs = (breadcrumbs: string[] = []) => {
   return (
     breadcrumbs
       .filter((item: string) => !['_overview', '_sidebar'].includes(item))

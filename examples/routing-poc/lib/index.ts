@@ -37,9 +37,23 @@ const findDeepestSidebar = async ({
     if (slug.length === 0) {
       throw new Error(`Unable to find any ToC. Path ${path}`)
     }
-    return findDeepestSidebar({
+    const result = await findDeepestSidebar({
       slug: slug.slice(0, slug.length - 1),
     })
+    if (result.data.page.__typename === 'PageVersionedSidebar') {
+      return {
+        ...result,
+        data: {
+          ...result.data,
+          page: {
+            ...result.data.page,
+            activeVersion: slug.at(slug.length - 1),
+          },
+        },
+      }
+    } else {
+      return result
+    }
   }
 }
 
