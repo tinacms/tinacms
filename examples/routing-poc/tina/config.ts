@@ -82,15 +82,20 @@ const sidebar = {
       fields: [
         {
           name: 'title',
+          label: 'Title',
           type: 'string',
+          isTitle: true,
+          required: true,
         },
         {
           name: 'items',
+          label: 'Items',
           type: 'object',
           list: true,
           templates: [
             {
               name: 'dropdownLink',
+              label: 'Dropdown Link',
               ui: {
                 itemProps: (item) => {
                   if (item) {
@@ -99,7 +104,13 @@ const sidebar = {
                 },
               },
               fields: [
-                { type: 'string', name: 'label' },
+                {
+                  type: 'string',
+                  name: 'label',
+                  label: 'Label',
+                  isTitle: true,
+                  required: true,
+                },
                 {
                   type: 'object',
                   list: true,
@@ -112,7 +123,12 @@ const sidebar = {
                     },
                   },
                   fields: [
-                    { type: 'string', name: 'label' },
+                    {
+                      type: 'string',
+                      name: 'label',
+                      isTitle: true,
+                      required: true,
+                    },
                     {
                       type: 'reference',
                       name: 'reference',
@@ -125,6 +141,7 @@ const sidebar = {
             },
             {
               name: 'directPageLink',
+              label: 'Direct Page Link',
               ui: {
                 itemProps: (item) => {
                   if (item) {
@@ -133,7 +150,13 @@ const sidebar = {
                 },
               },
               fields: [
-                { type: 'string', name: 'label' },
+                {
+                  type: 'string',
+                  name: 'label',
+                  label: 'Label',
+                  isTitle: true,
+                  required: true,
+                },
                 {
                   type: 'reference',
                   name: 'reference',
@@ -203,6 +226,9 @@ const pageFields: Partial<Collection> = {
         {
           name: 'type_title',
           type: 'string',
+          label: 'ID',
+          description:
+            'This is the title that appears in the list-view. READONLY',
           required: true,
           isTitle: true,
         },
