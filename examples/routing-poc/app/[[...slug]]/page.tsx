@@ -6,6 +6,8 @@ import { findPageOrOverview, findSidebarAncestry } from '@/lib'
 export default async function Page({ params }: { params: { slug: string[] } }) {
   const page = await findPageOrOverview(params.slug || [])
   const sidebars = await findSidebarAncestry(params.slug || [])
+  console.log(params)
+  console.log(sidebars)
 
   switch (page.data.page.__typename) {
     case 'PageContent': {
