@@ -109,18 +109,11 @@ const Wrapper = (props: {
     </div>
   )
 }
-import { HomeIcon } from '@heroicons/react/20/solid'
-
-const pages = [
-  { name: 'Projects', href: '#', current: false },
-  { name: 'Project Nero', href: '#', current: true },
-]
 
 export function Breadcrumbs(props: {
   sidebars: { data: PageQuery }[]
   page: Page
 }) {
-  console.log(props.page._sys)
   return (
     <nav className="flex pb-8" aria-label="Breadcrumb">
       <ol role="list" className="flex items-center space-x-4">
@@ -206,6 +199,7 @@ const VersionedSidebar = (
   }
 ) => {
   const parent = props.sidebars[1]
+  console.log({ parent })
   // TODO: choose the correct version
   const version = props.versionedSidebar?.versions?.at(0)
   return (
@@ -263,7 +257,6 @@ const VersionedSidebar = (
       </nav>
     </div>
   )
-  return 'Versioned Sidebar!'
 }
 
 const Sidebar = (
@@ -271,9 +264,33 @@ const Sidebar = (
     sidebars: { data: PageQuery }[]
   }
 ) => {
-  const parentSidebar = props.sidebars[1]
+  const parent = props.sidebars[1]
   return (
     <nav className="flex flex-1 flex-col" aria-label="Sidebar">
+      {parent && (
+        <div className="py-6">
+          <Link
+            href={`/${filterBreadcrumbs(parent?.data.page._sys.breadcrumbs)}`}
+            className="text-xs font-semibold leading-6 text-gray-400  flex gap-2 items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+              />
+            </svg>
+            Back to {parent?.data.page?.title}
+          </Link>
+        </div>
+      )}
       <ul>
         {props.sidebar?.sections?.map((section) => (
           <Section key={section?.title} {...section} />
