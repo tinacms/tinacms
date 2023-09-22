@@ -129,6 +129,9 @@ export const mapUserFields = (
   const passwordFields = collectable.fields?.filter(
     (field) => field.type === 'password'
   )
+  if (!passwordFields?.length) {
+    return results
+  }
   if (passwordFields.length > 1) {
     throw new Error('Only one password field is allowed')
   }
