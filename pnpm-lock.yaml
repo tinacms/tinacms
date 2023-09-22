@@ -180,8 +180,8 @@ importers:
       react-icons: ^4.7.1
       tailwindcss: ^3.2.7
       tinacms: workspace:*
+      tinacms-authjs: workspace:*
       tinacms-gitprovider-github: workspace:*
-      tinacms-next-auth: workspace:*
       typescript: ^4.5.2
     dependencies:
       '@headlessui/react': 1.7.5_biqbaboplfbrettd7655fr4n2y
@@ -196,8 +196,8 @@ importers:
       react-dom: 18.2.0_react@18.2.0
       react-icons: 4.7.1_react@18.2.0
       tinacms: link:../../packages/tinacms
+      tinacms-authjs: link:../../packages/tinacms-authjs
       tinacms-gitprovider-github: link:../../packages/tinacms-gitprovider-github
-      tinacms-next-auth: link:../../packages/tinacms-next-auth
     devDependencies:
       '@svgr/webpack': 8.0.1
       '@tinacms/cli': link:../../packages/@tinacms/cli
@@ -1269,6 +1269,27 @@ importers:
       vite: 4.3.9_@types+node@14.18.21
       vitest: 0.32.2_happy-dom@10.5.2
 
+  packages/tinacms-authjs:
+    specifiers:
+      '@tinacms/schema-tools': workspace:*
+      '@tinacms/scripts': workspace:*
+      next: 12.3.4
+      next-auth: 4.22.1
+      react: ^18
+      react-dom: ^18
+      tinacms: workspace:*
+      typescript: 4.3.5
+    dependencies:
+      '@tinacms/schema-tools': link:../@tinacms/schema-tools
+      next: 12.3.4_biqbaboplfbrettd7655fr4n2y
+      next-auth: 4.22.1_bhgafntz2ozm43l35i5qtimxry
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      tinacms: link:../tinacms
+    devDependencies:
+      '@tinacms/scripts': link:../@tinacms/scripts
+      typescript: 4.3.5
+
   packages/tinacms-clerk:
     specifiers:
       '@clerk/clerk-js': 4.56.2
@@ -1295,29 +1316,6 @@ importers:
       '@tinacms/datalayer': link:../@tinacms/datalayer
       '@tinacms/scripts': link:../@tinacms/scripts
       '@types/node': 13.13.52
-
-  packages/tinacms-next-auth:
-    specifiers:
-      '@tinacms/schema-tools': workspace:*
-      '@tinacms/scripts': workspace:*
-      bcryptjs: ^2.4.3
-      next: 12.3.4
-      next-auth: 4.22.1
-      react: ^18
-      react-dom: ^18
-      tinacms: workspace:*
-      typescript: 4.3.5
-    dependencies:
-      '@tinacms/schema-tools': link:../@tinacms/schema-tools
-      bcryptjs: 2.4.3
-      next: 12.3.4_biqbaboplfbrettd7655fr4n2y
-      next-auth: 4.22.1_bhgafntz2ozm43l35i5qtimxry
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      tinacms: link:../tinacms
-    devDependencies:
-      '@tinacms/scripts': link:../@tinacms/scripts
-      typescript: 4.3.5
 
 packages:
   /@adobe/css-tools/4.2.0:
@@ -15595,13 +15593,6 @@ packages:
     dependencies:
       tweetnacl: 0.14.5
     dev: true
-
-  /bcryptjs/2.4.3:
-    resolution:
-      {
-        integrity: sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==,
-      }
-    dev: false
 
   /before-after-hook/2.2.2:
     resolution:

@@ -24,7 +24,7 @@
     "react-icons": "^4.7.1",
     "tinacms": "workspace:*",
     "tinacms-gitprovider-github": "workspace:*",
-    "tinacms-next-auth": "workspace:*"
+    "tinacms-authjs": "workspace:*"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.0.1",

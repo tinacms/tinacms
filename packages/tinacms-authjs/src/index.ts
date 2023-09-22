@@ -1,4 +1,3 @@
-import { NextApiHandler } from 'next'
 import { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { getServerSession } from 'next-auth/next'
@@ -17,7 +16,7 @@ const authenticate = async (
   return null
 }
 
-const TinaNextAuthOptions = ({
+const TinaAuthJSOptions = ({
   databaseClient,
   overrides,
   secret,
@@ -59,8 +58,8 @@ const TinaNextAuthOptions = ({
   ...overrides,
 })
 
-const withNextAuthApiRoute = (
-  handler: NextApiHandler,
+const withAuthJSApiRoute = (
+  handler: (req, res) => unknown | Promise<unknown>,
   opts?: { authOptions: AuthOptions; disabled: boolean }
 ) => {
   return async (req, res) => {
@@ -115,4 +114,4 @@ const TinaCredentialsProvider = ({
       authenticate(databaseClient, credentials.username, credentials.password),
   })
 
-export { TinaCredentialsProvider, TinaNextAuthOptions, withNextAuthApiRoute }
+export { TinaCredentialsProvider, TinaAuthJSOptions, withAuthJSApiRoute }

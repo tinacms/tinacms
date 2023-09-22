@@ -6,7 +6,7 @@ import { heroBlockSchema } from '../components/blocks/hero'
 import { testimonialBlockSchema } from '../components/blocks/testimonial'
 import { ColorPickerInput } from '../components/fields/color'
 import { iconSchema } from '../components/util/icon'
-import { UsernamePasswordNextAuthProvider } from 'tinacms-next-auth/dist/tinacms'
+import { UsernamePasswordAuthJSProvider } from 'tinacms-authjs/dist/tinacms'
 
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 
@@ -15,7 +15,7 @@ const config = defineStaticConfig({
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
   authProvider: isLocal
     ? new LocalAuthProvider()
-    : new UsernamePasswordNextAuthProvider(),
+    : new UsernamePasswordAuthJSProvider(),
   branch:
     process.env.NEXT_PUBLIC_TINA_BRANCH! || // custom branch env override
     process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF! || // Vercel branch env

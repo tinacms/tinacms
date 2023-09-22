@@ -1,7 +1,7 @@
 import { LoginStrategy } from '@tinacms/schema-tools'
 import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react'
 import { AbstractAuthProvider } from 'tinacms'
-export class DefaultNextAuthProvider extends AbstractAuthProvider {
+export class DefaultAuthJSProvider extends AbstractAuthProvider {
   readonly callbackUrl: string
   readonly name: string
   constructor(props?: { name?: string; callbackUrl?: string }) {
@@ -26,7 +26,7 @@ export class DefaultNextAuthProvider extends AbstractAuthProvider {
   }
 }
 
-export class UsernamePasswordNextAuthProvider extends DefaultNextAuthProvider {
+export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
   async authenticate(props: { username: string; password: string }) {
     const csrfToken = await getCsrfToken()
     // TODO make api baseUrl configurable

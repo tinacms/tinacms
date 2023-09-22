@@ -1,17 +1,13 @@
 {
-  "name": "tinacms-next-auth",
+  "name": "tinacms-authjs",
   "version": "0.0.1",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "files": [
-    "bin/*",
     "dist"
   ],
   "typings": "dist/index.d.ts",
   "license": "Apache-2.0",
-  "bin": {
-    "tinacms-next-auth": "bin/tinacms-next-auth"
-  },
   "buildConfig": {
     "entryPoints": [
       {
@@ -24,11 +20,10 @@
   "scripts": {
     "types": "pnpm tsc",
     "build": "tinacms-scripts build",
-    "run-self-script": "node bin/tinacms-next-auth setup"
+    "run-self-script": "node bin/tinacms-authjs setup"
   },
   "dependencies": {
     "@tinacms/schema-tools": "workspace:*",
-    "bcryptjs": "^2.4.3",
     "next": "12.3.4",
     "next-auth": "4.22.1",
     "react": "^18",
