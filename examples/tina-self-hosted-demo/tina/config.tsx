@@ -1,4 +1,4 @@
-import { defineStaticConfig } from 'tinacms'
+import { defineStaticConfig, LocalAuthProvider } from 'tinacms'
 
 import { contentBlockSchema } from '../components/blocks/content'
 import { featureBlockSchema } from '../components/blocks/features'
@@ -13,7 +13,9 @@ const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
-  authProvider: !isLocal && new UsernamePasswordNextAuthProvider(),
+  authProvider: isLocal
+    ? new LocalAuthProvider()
+    : new UsernamePasswordNextAuthProvider(),
   branch:
     process.env.NEXT_PUBLIC_TINA_BRANCH! || // custom branch env override
     process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF! || // Vercel branch env
