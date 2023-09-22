@@ -131,10 +131,9 @@ export const mapUserFields = (
   if (passwordFields.length > 1) {
     throw new Error('Only one password field is allowed')
   }
-  const idFields =
-    collectable.fields?.filter((field) => field.isIdentifier) || []
+  const idFields = collectable.fields?.filter((field) => field.uid) || []
   if (idFields.length > 1) {
-    throw new Error('Only one id field is allowed')
+    throw new Error('Only one uid field is allowed')
   }
   if (passwordFields.length || idFields.length) {
     results.push({

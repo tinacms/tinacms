@@ -32,13 +32,13 @@ export const TextFieldPlugin = {
   Component: TextField,
   validate(value: any, allValues: any, meta: any, field: any) {
     if (field.required && !value) return 'Required'
-    if (field.isIdentifier) {
+    if (field.uid) {
       const path = field.name.split('.')
       const fieldName = path[path.length - 1]
       const parent = path.slice(0, path.length - 2)
       const items = get(allValues, parent)
       if (items?.filter((item: any) => item[fieldName] === value)?.length > 1) {
-        return `Item with this identifier already exists`
+        return `Item with this unique id already exists`
       }
     }
   },

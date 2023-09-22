@@ -370,9 +370,7 @@ export class Resolver {
     if (field.fields) {
       const objectTemplate = field
       if (Array.isArray(fieldValue)) {
-        const idField = objectTemplate.fields.find(
-          (field) => field.isIdentifier
-        )
+        const idField = objectTemplate.fields.find((field) => field.uid)
         if (idField) {
           // check for duplicate ids in the data array
           const ids = fieldValue.map((d) => d[idField.name])

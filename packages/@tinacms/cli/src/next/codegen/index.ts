@@ -258,7 +258,7 @@ export class Codegen {
       authFields = usersFields[0]?.collectable?.fields
         ?.filter((f) => f.type !== 'password' && f.type !== 'object')
         .map((f) => {
-          if (f.isIdentifier) {
+          if (f.uid) {
             return `id:${f.name}`
           } else {
             return `${f.name}`

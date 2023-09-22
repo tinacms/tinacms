@@ -151,7 +151,7 @@ export interface BaseField {
   nameOverride?: string
   description?: string
   searchable?: boolean
-  isIdentifier?: boolean
+  uid?: boolean
 }
 
 export type StringField = (

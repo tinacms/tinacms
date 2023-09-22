@@ -71,7 +71,7 @@ const config = defineStaticConfig({
                 type: 'string',
                 label: 'Username',
                 name: 'username',
-                isIdentifier: true,
+                uid: true,
                 required: true,
               },
               {

@@ -52,7 +52,7 @@ const FieldWithList = TinaField.extend({ list: z.boolean().optional() })
 // ==========
 const TinaScalerBase = FieldWithList.extend({
   options: z.array(Option).optional(),
-  isIdentifier: z.boolean().optional(),
+  uid: z.boolean().optional(),
 })
 const StringField = TinaScalerBase.extend({
   type: z.literal('string', {
@@ -240,11 +240,11 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
             })
           }
         }
-        if (val.isIdentifier) {
+        if (val.uid) {
           if (val.list) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: `Can not have \`list: true\` when using \`isIdentifier\`. Error in value \n${JSON.stringify(
+              message: `Can not have \`list: true\` when using \`uid\`. Error in value \n${JSON.stringify(
                 val,
                 null,
                 2
@@ -254,7 +254,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
           if (!val.required) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: `Must have { required: true } when using \`isIdentifier\` Error in value \n${JSON.stringify(
+              message: `Must have { required: true } when using \`uid\` Error in value \n${JSON.stringify(
                 val,
                 null,
                 2

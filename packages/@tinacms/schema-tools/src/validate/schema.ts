@@ -90,11 +90,11 @@ const TinaCloudCollection = CollectionBaseSchema.extend({
     .refine(
       // It is valid if it is 0 or 1
       (val) => {
-        const arr = val?.filter((x) => x.isIdentifier) || []
+        const arr = val?.filter((x) => x.uid) || []
         return arr.length < 2
       },
       {
-        message: 'Fields can only have one use of `isIdentifier`',
+        message: 'Fields can only have one use of `uid`',
       }
     )
     .refine(
