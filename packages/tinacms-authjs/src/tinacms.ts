@@ -1,6 +1,7 @@
-import { LoginStrategy } from '@tinacms/schema-tools'
+import { Collection, LoginStrategy } from '@tinacms/schema-tools'
 import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react'
 import { AbstractAuthProvider } from 'tinacms'
+
 export class DefaultAuthJSProvider extends AbstractAuthProvider {
   readonly callbackUrl: string
   readonly name: string
@@ -50,4 +51,60 @@ export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
   getLoginStrategy(): LoginStrategy {
     return 'UsernamePassword'
   }
+}
+
+export const TinaUserCollection: Collection = {
+  ui: {
+    global: true,
+    allowedActions: {
+      create: false,
+      delete: false,
+    },
+  },
+  isAuthCollection: true,
+  isDetached: true,
+  label: 'Users',
+  name: 'user',
+  path: 'content/users',
+  format: 'json',
+  fields: [
+    {
+      type: 'object',
+      name: 'users',
+      list: true,
+      ui: {
+        defaultItem: {
+          username: 'new-user',
+          name: 'New User',
+          password: '',
+        },
+        itemProps: (item) => ({ label: item?.username }),
+      },
+      fields: [
+        {
+          type: 'string',
+          label: 'Username',
+          name: 'username',
+          uid: true,
+          required: true,
+        },
+        {
+          type: 'string',
+          label: 'Name',
+          name: 'name',
+        },
+        {
+          type: 'string',
+          label: 'Email',
+          name: 'email',
+        },
+        {
+          type: 'password',
+          label: 'Password',
+          name: 'password',
+          required: true,
+        },
+      ],
+    },
+  ],
 }
