@@ -67,7 +67,7 @@ describe('The schema validation', () => {
         ],
       })
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"'type' must be one of: string, number, boolean, datetime, image, reference, object, rich-text, but got 'some-type' at someName.myTitle"`
+      `"'type' must be one of: string, number, boolean, datetime, image, reference, object, rich-text, password, but got 'some-type' at someName.myTitle"`
     )
   })
   it(`Trims the "collection.path" missing`, async () => {
