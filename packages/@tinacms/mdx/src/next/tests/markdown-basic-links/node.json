@@ -48,6 +48,78 @@
           "text": " to join now"
         }
       ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Click "
+        },
+        {
+          "type": "a",
+          "url": "mailto:me@example.com",
+          "title": "Tester",
+          "children": [
+            {
+              "type": "text",
+              "text": "here"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " to join now"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Click "
+        },
+        {
+          "type": "a",
+          "url": "tel:4134324230",
+          "title": "Tester",
+          "children": [
+            {
+              "type": "text",
+              "text": "here"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " to join now"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Click "
+        },
+        {
+          "type": "a",
+          "url": "xref:some-link",
+          "title": "Tester",
+          "children": [
+            {
+              "type": "text",
+              "text": "here"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": " to join now"
+        }
+      ]
     }
   ]
 }
