@@ -1192,7 +1192,8 @@ export class Database {
               this,
               this.contentLevel,
               documentPaths,
-              enqueueOps
+              enqueueOps,
+              collection
             )
           }
         }
