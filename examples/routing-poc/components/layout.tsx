@@ -1,9 +1,7 @@
 'use client'
 
 import {
-  Page,
   PageQuery,
-  PageSidebar,
   PageSidebarSidebarSections,
   PageVersionedSidebar,
   PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDirectPageLink,
@@ -33,9 +31,7 @@ export function Layout({
         <Wrapper
           sidebars={sidebars}
           page={page}
-          sidebar={
-            <Sidebar {...currentSidebar.data.page} sidebars={sidebars} />
-          }
+          sidebar={<Sidebar {...currentSidebar} sidebars={sidebars} />}
         >
           {children}
         </Wrapper>
@@ -46,12 +42,7 @@ export function Layout({
         <Wrapper
           sidebars={sidebars}
           page={page}
-          sidebar={
-            <VersionedSidebar
-              {...currentSidebar.data.page}
-              sidebars={sidebars}
-            />
-          }
+          sidebar={<VersionedSidebar {...currentSidebar} sidebars={sidebars} />}
         >
           {children}
         </Wrapper>
@@ -190,50 +181,39 @@ function classNames(...classes: string[]) {
 }
 
 const VersionedSidebar = (
-  props: Omit<PageVersionedSidebar, '_values' | '_sys'> & {
+  props: PageResultWithActiveVersion & {
     sidebars: { data: PageQuery }[]
   }
 ) => {
-  const parent = props.sidebars[1]
-  // TODO: choose the correct version
-  let activeVersion = props?.versionedSidebar?.versions?.find(
-    (v) => v.name === props.activeVersion
-  )
-  if (!activeVersion) {
-    activeVersion = props?.versionedSidebar?.versions?.at(0)
-  }
-  return (
-    <div key={activeVersion?.name}>
-      <div className="py-4 border-b border-slate-200 flex flex-col gap-2">
+  if (props.data.page.__typename === 'PageVersionedSidebar') {
+    const parent = props.sidebars[1]
+    // TODO: choose the correct version
+    let activeVersion = props.data.page.versionedSidebar?.versions?.find(
+      (v) => v?.name === props.data.page.activeVersion
+    )
+    if (!activeVersion) {
+      activeVersion = props.data.page?.versionedSidebar?.versions?.at(0)
+    }
+    return (
+      <div key={activeVersion?.name}>
         <VersionSelect {...props} />
-        <div className="flex gap-2 items-center">
-          {props.versionedSidebar?.tags?.map((tag, i) => {
-            const classes = [
-              'inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10',
-              'inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-800 ring-1 ring-inset ring-green-600/20',
-            ]
-            return (
-              <span key={i} className={classes[i]}>
-                {tag}
-              </span>
-            )
-          })}
-        </div>
+        {parent && <BackToLink parent={parent} />}
+        <nav
+          key={activeVersion?.name}
+          className="flex flex-1 flex-col"
+          aria-label="Sidebar"
+        >
+          <ul>
+            {activeVersion?.sidebar?.sections?.map((section) => (
+              <Section key={section?.title} {...section} />
+            ))}
+          </ul>
+        </nav>
       </div>
-      {parent && <BackToLink parent={parent} />}
-      <nav
-        key={activeVersion?.name}
-        className="flex flex-1 flex-col"
-        aria-label="Sidebar"
-      >
-        <ul>
-          {activeVersion?.sidebar?.sections?.map((section) => (
-            <Section key={section?.title} {...section} />
-          ))}
-        </ul>
-      </nav>
-    </div>
-  )
+    )
+  } else {
+    return null
+  }
 }
 
 const BackToLink = ({ parent }: { parent: any }) => {
@@ -265,45 +245,37 @@ const BackToLink = ({ parent }: { parent: any }) => {
 }
 
 const Sidebar = (
-  props: PageQuery['page'] & {
-    sidebars: { data: PageQuery }[]
+  props: PageResultWithActiveVersion & {
+    sidebars: PageResultWithActiveVersion[]
   }
 ) => {
   const parent = props.sidebars[1]
   const sidebarParent = props.sidebars.find(
     (s) => s.data.page.__typename === 'PageVersionedSidebar'
   )
-  const versionedSidebar = sidebarParent?.data?.page?.versionedSidebar
-  return (
-    <nav className="flex flex-1 flex-col" aria-label="Sidebar">
-      {versionedSidebar && (
-        <div className="py-4 border-b border-slate-200 flex flex-col gap-2">
-          <VersionSelect {...sidebarParent.data.page} />
-          <div className="flex gap-2 items-center">
-            {versionedSidebar?.tags?.map((tag: string, i: number) => {
-              const classes = [
-                'inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10',
-                'inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-800 ring-1 ring-inset ring-green-600/20',
-              ]
-              return (
-                <span key={i} className={classes[i]}>
-                  {tag}
-                </span>
-              )
-            })}
-          </div>
-        </div>
-      )}
-      {parent && <BackToLink parent={parent} />}
-      <ul>
-        {props.sidebar?.sections?.map((section) => (
-          <Section key={section?.title} {...section} />
-        ))}
-      </ul>
-    </nav>
-  )
+  if (props.data.page.__typename === 'PageSidebar') {
+    return (
+      <nav className="flex flex-1 flex-col" aria-label="Sidebar">
+        {sidebarParent?.data.page.__typename === 'PageVersionedSidebar' && (
+          <VersionSelect {...sidebarParent} />
+        )}
+        {parent && <BackToLink parent={parent} />}
+        <ul>
+          {props.data.page.sidebar?.sections?.map((section) => (
+            <Section key={section?.title} {...section} />
+          ))}
+        </ul>
+      </nav>
+    )
+  }
+  return null
 }
-const Section = (props: PageSidebarSidebarSections) => {
+type Nullable<T> = {
+  [P in keyof T]?: Nullable<T[P]> | null
+}
+const Section = (
+  props: Nullable<Omit<PageSidebarSidebarSections, '__typename'>>
+) => {
   const currPath = usePathname()
 
   const isSelected = (item: any) => {
@@ -374,23 +346,27 @@ const Section = (props: PageSidebarSidebarSections) => {
                       </Disclosure.Button>
                       <Disclosure.Panel as="ul" className="mt-1 px-2">
                         {item?.children?.map((subItem) => {
-                          subItem.__typename ===
-                            'PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDropdownLinkChildren'
-                          return (
-                            <li key={subItem?.reference?.id}>
-                              <Link
-                                href={getSidebarItemLink(subItem)}
-                                className={classNames(
-                                  isSelected(subItem!)
-                                    ? 'bg-gray-50 text-gray-600'
-                                    : 'hover:text-gray-600 hover:bg-gray-50',
-                                  'block rounded-md py-2 pr-2 pl-4 text-sm leading-6 text-gray-700'
-                                )}
-                              >
-                                {subItem?.reference.title}
-                              </Link>
-                            </li>
-                          )
+                          if (subItem) {
+                            subItem.__typename ===
+                              'PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDropdownLinkChildren'
+                            return (
+                              <li key={subItem?.reference?.id}>
+                                <Link
+                                  href={getSidebarItemLink(subItem)}
+                                  className={classNames(
+                                    isSelected(subItem!)
+                                      ? 'bg-gray-50 text-gray-600'
+                                      : 'hover:text-gray-600 hover:bg-gray-50',
+                                    'block rounded-md py-2 pr-2 pl-4 text-sm leading-6 text-gray-700'
+                                  )}
+                                >
+                                  {subItem?.reference?.title}
+                                </Link>
+                              </li>
+                            )
+                          } else {
+                            return null
+                          }
                         })}
                       </Disclosure.Panel>
                     </>
@@ -406,28 +382,42 @@ const Section = (props: PageSidebarSidebarSections) => {
   )
 }
 const getSidebarItemLink = (
-  item:
-    | PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDirectPageLink
-    | PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDropdownLinkChildren
+  item?:
+    | Nullable<
+        Omit<
+          PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDirectPageLink,
+          '__typename'
+        >
+      >
+    | Nullable<
+        Omit<
+          PageVersionedSidebarVersionedSidebarVersionsSidebarSectionsItemsDropdownLinkChildren,
+          '__typename'
+        >
+      >
+    | null
 ) => {
-  return getSidebarItemLinkInner(item.reference)
+  return getSidebarItemLinkInner(item?.reference)
 }
 
 const getSidebarItemLinkInner = (
-  page: PageQuery['page'] | null | undefined
+  page: Nullable<PageResultWithActiveVersion['data']['page']> | null | undefined
 ) => {
   if (page) {
     if (page.__typename === 'PageVersionedSidebar') {
       // This should be based on which version is active
       let activeVersion = page?.versionedSidebar?.versions?.find(
-        (v) => v.name === page.activeVersion
+        (v) => v?.name === page.activeVersion
       )
       if (!activeVersion) {
         activeVersion = page?.versionedSidebar?.versions?.at(0)
       }
       if (activeVersion) {
         const path = [
-          ...page._sys.breadcrumbs.slice(0, page._sys.breadcrumbs.length - 1),
+          ...(page?._sys?.breadcrumbs?.slice(
+            0,
+            page?._sys?.breadcrumbs?.length - 1
+          ) || []),
           activeVersion.name,
         ]
         return `/${path.join('/')}`
@@ -437,16 +427,26 @@ const getSidebarItemLinkInner = (
         // throw new Error(`Expected versioned sidebar to have a "versions" array`)
       }
     } else {
-      return `/${filterBreadcrumbs(page._sys.breadcrumbs)}`
+      return `/${filterBreadcrumbs(page?._sys?.breadcrumbs || [])}`
     }
   }
   return '/'
 }
 
-export const filterBreadcrumbs = (breadcrumbs: string[] = []) => {
+export const filterBreadcrumbs = (
+  breadcrumbs: (string | null | undefined)[] = []
+) => {
+  if (!breadcrumbs) {
+    return ''
+  }
   return (
     breadcrumbs
-      .filter((item: string) => !['_overview', '_sidebar'].includes(item))
+      .filter((item) => {
+        if (typeof item === 'string') {
+          return !['_overview', '_sidebar'].includes(item)
+        }
+        return true
+      })
       .join('/') || ''
   )
 }
