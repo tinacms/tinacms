@@ -126,16 +126,13 @@ export const mapUserFields = (
     idFieldName?: string
     passwordFieldName?: string
   }[] = []
-  const passwordFields = collectable.fields?.filter(
-    (field) => field.type === 'password'
-  )
-  if (!passwordFields?.length) {
-    return results
-  }
+  const passwordFields =
+    collectable.fields?.filter((field) => field.type === 'password') || []
   if (passwordFields.length > 1) {
     throw new Error('Only one password field is allowed')
   }
-  const idFields = collectable.fields?.filter((field) => field.isIdentifier)
+  const idFields =
+    collectable.fields?.filter((field) => field.isIdentifier) || []
   if (idFields.length > 1) {
     throw new Error('Only one id field is allowed')
   }
