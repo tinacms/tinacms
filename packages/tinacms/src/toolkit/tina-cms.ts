@@ -125,8 +125,8 @@ export class TinaCMS extends CMS {
       }
     })
     this.plugins.add(MediaManagerScreenPlugin)
-    this.plugins.add(PasswordScreenPlugin)
     if (isLocalClient !== true) {
+      this.plugins.add(PasswordScreenPlugin)
       if (clientId) {
         this.plugins.add(
           createCloudConfig({

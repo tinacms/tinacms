@@ -41,6 +41,9 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
   const renderDesktopNav = windowWidth > navBreakpoint
   const usernamePasswordEnabled =
     cms.api.tina.authProvider?.getLoginStrategy() === 'UsernamePassword'
+  const activeScreens = screens.filter(
+    (screen) => !usernamePasswordEnabled && screen.navCategory === 'Account'
+  )
 
   return (
     <>
@@ -50,10 +53,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
           sidebarWidth={360}
           showCollections={true}
           collectionsInfo={collectionsInfo}
-          screens={screens.filter(
-            (screen) =>
-              !usernamePasswordEnabled && screen.navCategory === 'Account'
-          )}
+          screens={activeScreens}
           cloudConfigs={cloudConfigs}
           contentCreators={[]}
           RenderNavSite={({ view }) => (
@@ -91,7 +91,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                 sidebarWidth={360}
                 showCollections={true}
                 collectionsInfo={collectionsInfo}
-                screens={screens}
+                screens={activeScreens}
                 cloudConfigs={cloudConfigs}
                 contentCreators={[]}
                 RenderNavSite={({ view }) => (
