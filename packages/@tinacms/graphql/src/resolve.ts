@@ -206,6 +206,12 @@ export const resolve = async ({
               throw new Error('No users found')
             }
             const { idFieldName, passwordFieldName } = userField
+            if (!idFieldName) {
+              throw new Error('No uid field found on user field')
+            }
+            if (!passwordFieldName) {
+              throw new Error('No password field found on user field')
+            }
             const user = users.find((u) => u[idFieldName] === sub)
             if (!user) {
               throw new Error('Not authorized')
