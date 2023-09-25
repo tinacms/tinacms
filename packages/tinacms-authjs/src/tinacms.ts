@@ -23,7 +23,8 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
     return signOut({ callbackUrl: this.callbackUrl })
   }
   async authorize(context?: any): Promise<any> {
-    return ((await getSession(context))?.user as any).role === 'user'
+    const user: any = (await getSession(context)) || {}
+    return user.role === 'user'
   }
 }
 
