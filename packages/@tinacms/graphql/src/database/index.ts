@@ -56,7 +56,7 @@ import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
 import sha from 'js-sha1'
 import { FilesystemBridge, TinaLevelClient } from '..'
 import { generatePasswordHash, mapUserFields } from '../auth/utils'
-import { get, set } from 'lodash'
+import _ from 'lodash'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -1376,9 +1376,13 @@ type UnionDataLookup = {
 }
 
 const hashPasswordVisitor = async (node: any, path: string[]) => {
-  const plaintextPassword = get(node, path)
+  const plaintextPassword = _.get(node, path)
   if (plaintextPassword) {
-    set(node, path, await generatePasswordHash({ password: plaintextPassword }))
+    _.set(
+      node,
+      path,
+      await generatePasswordHash({ password: plaintextPassword })
+    )
   }
 }
 

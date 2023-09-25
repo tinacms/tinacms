@@ -18,7 +18,7 @@ import {
   generatePasswordHash,
   mapUserFields,
 } from './auth/utils'
-import { get, set } from 'lodash'
+import _ from 'lodash'
 
 export const resolve = async ({
   config,
@@ -201,7 +201,7 @@ export const resolve = async ({
 
             const realPath = `${collection.path}/index.json`
             const userDoc = await resolver.getDocument(realPath)
-            const users = get(userDoc, userField.path)
+            const users = _.get(userDoc, userField.path)
             if (!users) {
               throw new Error('No users found')
             }
@@ -213,7 +213,7 @@ export const resolve = async ({
 
             if (info.fieldName === 'authenticate') {
               const matches = await checkPasswordHash({
-                saltedHash: get(user, passwordFieldName),
+                saltedHash: _.get(user, passwordFieldName),
                 password: args.password,
               })
 
@@ -257,7 +257,7 @@ export const resolve = async ({
             const userField = userFields[0]
             const realPath = `${collection.path}/index.json`
             const userDoc = await resolver.getDocument(realPath)
-            const users = get(userDoc, userField.path)
+            const users = _.get(userDoc, userField.path)
             if (!users) {
               throw new Error('No users found')
             }
@@ -272,7 +272,7 @@ export const resolve = async ({
             })
 
             const params = {}
-            set(
+            _.set(
               params,
               userField.path.slice(1), // remove _rawData from users path
               users.map((u) => {
