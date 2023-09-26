@@ -273,9 +273,7 @@ export const resolve = async ({
               throw new Error('Not authorized')
             }
 
-            user[passwordFieldName] = await generatePasswordHash({
-              password: args.password,
-            })
+            user[passwordFieldName] = args.password
 
             const params = {}
             _.set(
