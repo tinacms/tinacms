@@ -130,7 +130,7 @@ const Sidebar = ({
   const activeScreens = allScreens.filter(
     (screen) =>
       screen.navCategory !== 'Account' ||
-      cms.api.tina.authProvider?.getLoginStrategy() === 'UsernamePassword'
+      cms.api.tina?.authProvider?.getLoginStrategy() === 'UsernamePassword'
   )
 
   const setDisplayState = (value: 'closed' | 'fullscreen' | 'open') =>
