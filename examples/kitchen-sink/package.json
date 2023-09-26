@@ -13,7 +13,8 @@
     "replay": "replay ./recording.json",
     "start": "next start",
     "lint": "next lint",
-    "searchindex": "tinacms search-index"
+    "searchindex": "tinacms search-index",
+    "codemod": "tinacms codemod enable-tina-auth"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.3",
