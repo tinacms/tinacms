@@ -14,7 +14,7 @@ import {
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 
 const config = defineStaticConfig({
-  contentApiUrlOverride: !isLocal && '/api/gql',
+  contentApiUrlOverride: '/api/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
   authProvider: isLocal
     ? new LocalAuthProvider()

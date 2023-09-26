@@ -39,10 +39,10 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
   const navBreakpoint = 1000
   const windowWidth = useWindowWidth()
   const renderDesktopNav = windowWidth > navBreakpoint
-  const usernamePasswordEnabled =
-    cms.api.tina.authProvider?.getLoginStrategy() === 'UsernamePassword'
   const activeScreens = screens.filter(
-    (screen) => !usernamePasswordEnabled && screen.navCategory === 'Account'
+    (screen) =>
+      screen.navCategory !== 'Account' ||
+      cms.api.tina.authProvider?.getLoginStrategy() === 'UsernamePassword'
   )
 
   return (

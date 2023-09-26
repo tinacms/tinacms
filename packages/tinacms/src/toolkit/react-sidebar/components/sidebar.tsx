@@ -127,6 +127,11 @@ const Sidebar = ({
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
+  const activeScreens = allScreens.filter(
+    (screen) =>
+      screen.navCategory !== 'Account' ||
+      cms.api.tina.authProvider?.getLoginStrategy() === 'UsernamePassword'
+  )
 
   const setDisplayState = (value: 'closed' | 'fullscreen' | 'open') =>
     cms.dispatch({ type: 'sidebar:set-display-state', value: value })
@@ -258,7 +263,7 @@ const Sidebar = ({
               isLocalMode={cms.api?.tina?.isLocalMode}
               showCollections={isTinaAdminEnabled}
               collectionsInfo={collectionsInfo}
-              screens={allScreens}
+              screens={activeScreens}
               cloudConfigs={allConfigs}
               contentCreators={contentCreators}
               sidebarWidth={sidebarWidth}
@@ -320,7 +325,7 @@ const Sidebar = ({
                   className="rounded-r-md"
                   showCollections={isTinaAdminEnabled}
                   collectionsInfo={collectionsInfo}
-                  screens={allScreens}
+                  screens={activeScreens}
                   cloudConfigs={allConfigs}
                   contentCreators={contentCreators}
                   sidebarWidth={sidebarWidth}
