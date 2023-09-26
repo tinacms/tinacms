@@ -1,9 +1,7 @@
 import React from 'react'
 import { defineConfig } from 'tinacms'
 import { BiBall, BiBasketball, BiBaseball, BiFootball } from 'react-icons/bi'
-
 const TINA_TOKEN_KEY = 'tina_token_key'
-
 const slugify = (values) => {
   return `${(values?.name || values?.title || `document-${Date.now()}`)
     .toLowerCase()
@@ -16,7 +14,6 @@ const router = ({ document, collection }) => {
 const extendedRouter = ({ document, collection }) => {
   return `/${collection.name}/${document._sys.breadcrumbs.join('/')}`
 }
-
 const customAuthProvider = {
   getToken: async () => {
     return { id_token: 'some-token' }
