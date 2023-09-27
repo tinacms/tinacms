@@ -41,8 +41,8 @@ const TinaAuthJSOptions = ({
         try {
           if (jwt?.[uidProp]) {
             const sub = jwt[uidProp]
-            const data = await databaseClient.authorize({ sub })
-            jwt.role = !!data?.authorize ? 'user' : 'guest'
+            const result = await databaseClient.authorize({ sub })
+            jwt.role = !!result.data?.authorize ? 'user' : 'guest'
           } else if (debug) {
             console.log(`jwt missing specified uidProp: ${uidProp}`)
           }
