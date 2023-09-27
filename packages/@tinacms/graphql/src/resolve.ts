@@ -209,15 +209,16 @@ export const resolve = async ({
             if (!idFieldName) {
               throw new Error('No uid field found on user field')
             }
-            if (!passwordFieldName) {
-              throw new Error('No password field found on user field')
-            }
             const user = users.find((u) => u[idFieldName] === sub)
             if (!user) {
               return null
             }
 
             if (info.fieldName === 'authenticate') {
+              if (!passwordFieldName) {
+                throw new Error('No password field found on user field')
+              }
+
               const matches = await checkPasswordHash({
                 saltedHash: _.get(user, passwordFieldName),
                 password: args.password,
