@@ -214,7 +214,7 @@ export const resolve = async ({
             }
             const user = users.find((u) => u[idFieldName] === sub)
             if (!user) {
-              throw new Error('Not authorized')
+              return null
             }
 
             if (info.fieldName === 'authenticate') {
@@ -226,7 +226,7 @@ export const resolve = async ({
               if (matches) {
                 return user
               } else {
-                throw new Error('Invalid password')
+                return null
               }
             } else {
               return user

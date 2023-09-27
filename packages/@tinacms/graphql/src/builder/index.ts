@@ -459,7 +459,7 @@ export class Builder {
         required: true,
       }),
     ]
-    return astBuilder.FieldDefinition({ type, name, args, required: true })
+    return astBuilder.FieldDefinition({ type, name, args, required: false })
   }
 
   public updatePasswordMutation = async (collection: Collection<true>) => {
@@ -483,7 +483,7 @@ export class Builder {
     const name = 'authorize'
     const type = await this._buildAuthDocumentType(collection)
     const args = []
-    return astBuilder.FieldDefinition({ type, name, args, required: true })
+    return astBuilder.FieldDefinition({ type, name, args, required: false })
   }
 
   /**
