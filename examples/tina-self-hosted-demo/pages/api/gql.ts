@@ -1,5 +1,5 @@
-import { databaseClient } from '../../tina/__generated__/databaseClient'
-import { TinaAuthJSOptions, withAuthJSApiRoute } from 'tinacms-authjs'
+import withTinaAuth from '../../tina/auth'
+import databaseClient from '../../tina/__generated__/databaseClient'
 
 async function handler(req, res) {
   const { query, variables } = req.body
@@ -11,10 +11,4 @@ async function handler(req, res) {
   return res.json(result)
 }
 
-export default withAuthJSApiRoute(handler, {
-  authOptions: TinaAuthJSOptions({
-    databaseClient,
-    secret: process.env.NEXTAUTH_SECRET,
-  }),
-  disabled: process.env.TINA_PUBLIC_IS_LOCAL === 'true',
-})
+export default withTinaAuth(handler)
