@@ -33,7 +33,7 @@ const TinaAuthJSOptions = ({
         // only set for newly created jwts
         try {
           if (jwt.sub) {
-            const data = await databaseClient.request({ sub: jwt.sub })
+            const data = await databaseClient.authorize({ sub: jwt.sub })
             jwt.role = !!data?.authorize ? 'user' : 'guest'
           }
         } catch (error) {
