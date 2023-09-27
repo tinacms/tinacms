@@ -74,6 +74,7 @@ export interface DatabaseArgs {
   tinaDirectory?: string
   indexStatusCallback?: IndexStatusCallback
   version?: boolean
+  namespace?: string
 }
 
 export interface GitProvider {
@@ -206,6 +207,7 @@ export class Database {
   private readonly onPut: OnPutCallback
   private readonly onDelete: OnDeleteCallback
   private tinaSchema: TinaSchema | undefined
+  private contentNamespace: string | undefined
 
   private collectionIndexDefinitions:
     | Record<string, Record<string, IndexDefinition>>
@@ -221,6 +223,7 @@ export class Database {
       config.indexStatusCallback || defaultStatusCallback
     this.onPut = config.onPut || defaultOnPut
     this.onDelete = config.onDelete || defaultOnDelete
+    this.contentNamespace = config.namespace
   }
 
   private collectionForPath = async (filepath: string) => {
@@ -252,7 +255,11 @@ export class Database {
 
     this.appLevel = this.rootLevel.sublevel('_appData', SUBLEVEL_OPTIONS)
     if (!this.config.version) {
-      this.contentLevel = this.rootLevel.sublevel('_content', SUBLEVEL_OPTIONS)
+      this.contentLevel = this.contentNamespace
+        ? this.rootLevel
+            .sublevel('_content', SUBLEVEL_OPTIONS)
+            .sublevel(this.contentNamespace, SUBLEVEL_OPTIONS)
+        : this.rootLevel.sublevel('_content', SUBLEVEL_OPTIONS)
     } else {
       let version = await this.getDatabaseVersion()
       if (!version) {
@@ -261,7 +268,12 @@ export class Database {
           await this.updateDatabaseVersion(version)
         } catch (e) {} // this might fail on queries that don't have a version
       }
-      this.contentLevel = this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
+      this.contentLevel = this.contentNamespace
+        ? this.rootLevel
+            .sublevel('_content')
+            .sublevel(this.contentNamespace, SUBLEVEL_OPTIONS)
+            .sublevel(version, SUBLEVEL_OPTIONS)
+        : this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
     }
 
     // Make sure this error bubbles up to the user

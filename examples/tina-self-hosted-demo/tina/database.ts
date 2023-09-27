@@ -14,8 +14,9 @@ export default isLocal
         token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
       }),
       databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-        collectionName: process.env.GITHUB_BRANCH,
+        collectionName: 'tinacms',
         dbName: 'tinacms',
         mongoUri: process.env.MONGODB_URI,
       }),
+      namespace: process.env.GITHUB_BRANCH,
     })
