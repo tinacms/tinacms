@@ -30,12 +30,12 @@ const TinaAuthJSOptions = ({
   callbacks: {
     jwt: async ({ token: jwt, account }) => {
       if (account) {
-        // first time logging in
+        // only set for newly created jwts
         try {
-          jwt.role =
-            jwt.sub && (await databaseClient.authorize({ sub: jwt.sub }))
-              ? 'user'
-              : 'guest'
+          if (jwt.sub) {
+            const data = await databaseClient.request({ sub: jwt.sub })
+            jwt.role = !!data?.authorize ? 'user' : 'guest'
+          }
         } catch (error) {
           console.log(error)
         }
