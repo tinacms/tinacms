@@ -58,6 +58,15 @@ const TinaAuthJSOptions = ({
   ...overrides,
 })
 
+const createAuthJSApiRoute = (args?: {
+  authOptions: AuthOptions
+  disabled: boolean
+}) => {
+  return (handler: (req, res) => unknown | Promise<unknown>) => {
+    return withAuthJSApiRoute(handler, args)
+  }
+}
+
 const withAuthJSApiRoute = (
   handler: (req, res) => unknown | Promise<unknown>,
   opts?: { authOptions: AuthOptions; disabled: boolean }
@@ -114,4 +123,10 @@ const TinaCredentialsProvider = ({
       authenticate(databaseClient, credentials.username, credentials.password),
   })
 
-export { TinaCredentialsProvider, TinaAuthJSOptions, withAuthJSApiRoute }
+export {
+  TinaCredentialsProvider,
+  TinaAuthJSOptions,
+  withAuthJSApiRoute,
+  // TODO: This probably needs a better name?
+  createAuthJSApiRoute,
+}
