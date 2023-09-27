@@ -59,10 +59,11 @@ const TinaAuthJSOptions = ({
 })
 
 const createAuthJSApiRoute = (args?: {
-  opts?: { authOptions: AuthOptions; disabled: boolean }
+  authOptions: AuthOptions
+  disabled: boolean
 }) => {
   return (handler: (req, res) => unknown | Promise<unknown>) => {
-    return withAuthJSApiRoute(handler, args?.opts)
+    return withAuthJSApiRoute(handler, args)
   }
 }
 

@@ -7,8 +7,6 @@ export const AuthJsOptions = TinaAuthJSOptions({
 })
 
 export default createAuthJSApiRoute({
-  opts: {
-    authOptions: AuthJsOptions,
-    disabled: process.env.TINA_PUBLIC_IS_LOCAL === 'true',
-  },
+  authOptions: AuthJsOptions,
+  disabled: process.env.TINA_PUBLIC_IS_LOCAL === 'true',
 })
