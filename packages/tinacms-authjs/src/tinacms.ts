@@ -28,6 +28,37 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
   }
 }
 
+const errorRegex = /\?error=([^&]*)/
+// https://github.com/nextauthjs/next-auth/blob/ce7a49910e2ea8fb98f6f9cfb1b1f307aa3dc46f/packages/next-auth/src/core/pages/signin.tsx#L8
+export type SignInErrorTypes =
+  | 'Signin'
+  | 'OAuthSignin'
+  | 'OAuthCallback'
+  | 'OAuthCreateAccount'
+  | 'EmailCreateAccount'
+  | 'Callback'
+  | 'OAuthAccountNotLinked'
+  | 'EmailSignin'
+  | 'CredentialsSignin'
+  | 'SessionRequired'
+  | 'default'
+
+const errorMap: Record<SignInErrorTypes, string> = {
+  Signin: 'Try signing in with a different account.',
+  OAuthSignin: 'Try signing in with a different account.',
+  OAuthCallback: 'Try signing in with a different account.',
+  OAuthCreateAccount: 'Try signing in with a different account.',
+  EmailCreateAccount: 'Try signing in with a different account.',
+  Callback: 'Try signing in with a different account.',
+  OAuthAccountNotLinked:
+    'To confirm your identity, sign in with the same account you used originally.',
+  EmailSignin: 'The e-mail could not be sent.',
+  CredentialsSignin:
+    'Sign in failed. Check the details you provided are correct.',
+  SessionRequired: 'Please sign in to access this page.',
+  default: 'Unable to sign in.',
+}
+
 export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
   async authenticate(props: { username: string; password: string }) {
     const csrfToken = await getCsrfToken()
@@ -40,13 +71,29 @@ export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
       },
       body: new URLSearchParams({
         csrfToken,
+        redirect: 'false',
+        json: 'true',
         ...props,
       }).toString(),
     })
-      .then((_) => {
-        throw new Error('Failed to login')
+      .then(async (res) => {
+        const { url } = await res.json()
+        if (!url) {
+          throw new Error('Unexpected error on login')
+        }
+        // extract error message from url
+        const error = url.match(errorRegex)?.[1]
+        if (error) {
+          if (error in errorMap) {
+            throw errorMap[error as SignInErrorTypes]
+          } else {
+            throw errorMap['default']
+          }
+        }
       })
-      .catch((_) => null)
+      .catch((err) => {
+        throw err
+      })
   }
 
   getLoginStrategy(): LoginStrategy {

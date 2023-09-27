@@ -148,9 +148,29 @@ export const AuthWallInner = ({
       console.error(e)
       setActiveModal('error')
       setErrorMessage({
-        title: 'Unexpected Error:',
+        title: 'Authentication Error',
         message: `${e}`,
       })
+    }
+  }
+
+  let modalTitle = 'Tina Cloud Authorization'
+  if (
+    activeModal === 'authenticate' &&
+    loginStrategy === 'Redirect' &&
+    !isTinaCloud
+  ) {
+    modalTitle = 'Enter into edit mode'
+  } else if (
+    activeModal === 'authenticate' &&
+    loginStrategy === 'UsernamePassword'
+  ) {
+    modalTitle = 'Sign in to Tina'
+  } else if (activeModal === 'error') {
+    if (loginStrategy === 'Redirect' && !isTinaCloud) {
+      modalTitle = 'Enter into edit mode'
+    } else if (loginStrategy === 'UsernamePassword') {
+      modalTitle = 'Sign in to Tina'
     }
   }
 
@@ -158,9 +178,7 @@ export const AuthWallInner = ({
     <>
       {activeModal === 'authenticate' && loginStrategy === 'Redirect' && (
         <ModalBuilder
-          title={
-            isTinaCloud ? 'Tina Cloud Authorization' : 'Enter into edit mode'
-          }
+          title={modalTitle}
           message={
             isTinaCloud
               ? 'To save edits, Tina Cloud authorization is required. On save, changes will get committed using your account.'
@@ -194,7 +212,7 @@ export const AuthWallInner = ({
       {activeModal === 'authenticate' &&
         loginStrategy === 'UsernamePassword' && (
           <ModalBuilder
-            title={'Sign in to Tina'}
+            title={modalTitle}
             message={''}
             close={close}
             actions={[
@@ -250,9 +268,7 @@ export const AuthWallInner = ({
         )}
       {activeModal === 'error' && errorMessage && (
         <ModalBuilder
-          title={
-            isTinaCloud ? 'Tina Cloud Authorization' : 'Enter into edit mode'
-          }
+          title={modalTitle}
           message={errorMessage.title}
           error={errorMessage.message}
           close={close}
