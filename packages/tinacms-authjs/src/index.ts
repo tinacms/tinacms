@@ -18,11 +18,13 @@ const authenticate = async (
 
 const TinaAuthJSOptions = ({
   databaseClient,
+  uidProp = 'sub',
   overrides,
   secret,
   providers,
 }: {
   databaseClient: any // TODO can we type this?
+  uidProp?: string
   overrides?: AuthOptions
   providers?: AuthOptions['providers']
   secret: string
@@ -32,8 +34,9 @@ const TinaAuthJSOptions = ({
       if (account) {
         // only set for newly created jwts
         try {
-          if (jwt.sub) {
-            const data = await databaseClient.authorize({ sub: jwt.sub })
+          if (jwt?.[uidProp]) {
+            const sub = jwt[uidProp]
+            const data = await databaseClient.authorize({ sub })
             jwt.role = !!data?.authorize ? 'user' : 'guest'
           }
         } catch (error) {
