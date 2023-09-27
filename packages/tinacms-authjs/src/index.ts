@@ -19,12 +19,14 @@ const authenticate = async (
 const TinaAuthJSOptions = ({
   databaseClient,
   uidProp = 'sub',
+  debug = false,
   overrides,
   secret,
   providers,
 }: {
   databaseClient: any // TODO can we type this?
   uidProp?: string
+  debug?: boolean
   overrides?: AuthOptions
   providers?: AuthOptions['providers']
   secret: string
@@ -32,12 +34,17 @@ const TinaAuthJSOptions = ({
   callbacks: {
     jwt: async ({ token: jwt, account }) => {
       if (account) {
+        if (debug) {
+          console.table(jwt)
+        }
         // only set for newly created jwts
         try {
           if (jwt?.[uidProp]) {
             const sub = jwt[uidProp]
             const data = await databaseClient.authorize({ sub })
             jwt.role = !!data?.authorize ? 'user' : 'guest'
+          } else if (debug) {
+            console.log(`jwt missing specified uidProp: ${uidProp}`)
           }
         } catch (error) {
           console.log(error)
@@ -51,7 +58,7 @@ const TinaAuthJSOptions = ({
     session: async ({ session, token: jwt }) => {
       // forward the role to the session
       ;(session.user as any).role = jwt.role
-      ;(session.user as any).sub = jwt.sub
+      ;(session.user as any)[uidProp] = jwt[uidProp]
       return session
     },
   },
