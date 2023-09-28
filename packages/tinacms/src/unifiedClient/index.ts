@@ -1,4 +1,5 @@
 import fetchPonyfill from 'fetch-ponyfill'
+import type { GraphQLError } from 'graphql'
 
 const { fetch: fetchPonyfillFN, Headers: HeadersPonyfill } = fetchPonyfill()
 
@@ -16,6 +17,7 @@ export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
 export type TinaClientRequestArgs = {
   variables?: Record<string, any>
   query: string
+  errorPolicy?: 'none' | 'all'
 } & Partial<Omit<TinaClientArgs, 'queries'>>
 
 export type TinaClientURLParts = {
@@ -37,10 +39,14 @@ export class TinaClient<GenQueries> {
     this.queries = queries(this)
   }
 
-  public async request<DataType extends Record<string, any> = any>(
-    args: TinaClientRequestArgs
-  ): Promise<{ data: DataType; query: string }> {
-    const data: DataType = {} as DataType
+  public async request<DataType extends Record<string, any> = any>({
+    errorPolicy = 'none',
+    ...args
+  }: TinaClientRequestArgs): Promise<{
+    data: DataType
+    errors: GraphQLError[]
+    query: string
+  }> {
     const headers = new HeadersDefined()
     if (this.readonlyToken) {
       headers.append('X-API-KEY', this.readonlyToken)
@@ -73,15 +79,15 @@ export class TinaClient<GenQueries> {
       )
     }
     const json = await res.json()
-    if (json.errors) {
+    if (json.errors && errorPolicy === 'none') {
       throw new Error(
         `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
-
         Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
       )
     }
     return {
       data: json?.data as DataType,
+      errors: json?.errors,
       query: args.query,
     }
   }
