@@ -438,7 +438,7 @@ export class Builder {
       [NAMER.createName([collection.name])]: 'create',
       [NAMER.updateName([collection.name])]: 'update',
     })
-    return astBuilder.FieldDefinition({ type, name, args, required: true })
+    return astBuilder.FieldDefinition({ type, name, args, required: false })
   }
 
   /**
