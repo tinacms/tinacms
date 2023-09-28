@@ -39,14 +39,23 @@ export class TinaClient<GenQueries> {
     this.queries = queries(this)
   }
 
+  public async request<DataType extends Record<string, any> = any>(
+    args: Omit<TinaClientRequestArgs, 'errorPolicy'> & { errorPolicy: 'none' }
+  ): Promise<{
+    data: DataType
+    query: string
+  }>
+  public async request<DataType extends Record<string, any> = any>(
+    args: Omit<TinaClientRequestArgs, 'errorPolicy'> & { errorPolicy: 'all' }
+  ): Promise<{
+    data: DataType
+    query: string
+    errors: GraphQLError[]
+  }>
   public async request<DataType extends Record<string, any> = any>({
     errorPolicy = 'none',
     ...args
-  }: TinaClientRequestArgs): Promise<{
-    data: DataType
-    errors: GraphQLError[]
-    query: string
-  }> {
+  }: TinaClientRequestArgs) {
     const headers = new HeadersDefined()
     if (this.readonlyToken) {
       headers.append('X-API-KEY', this.readonlyToken)
