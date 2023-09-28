@@ -58,6 +58,17 @@ export const Nav = ({
     (props: { cms; setEventsOpen }, ref) => <SyncStatus {...props} />
   )
 
+  // partition screens by navCategory prop
+  const screenCategories = screens.reduce(
+    (acc, screen) => {
+      const category = screen.navCategory || 'Site'
+      acc[category] = acc[category] || []
+      acc[category].push(screen)
+      return acc
+    },
+    { Site: [] }
+  )
+
   return (
     <div
       className={`relative z-30 flex flex-col bg-white border-r border-gray-200 w-96 h-full ${className}`}
@@ -171,13 +182,13 @@ export const Nav = ({
             />
           </>
         )}
-        {(screens.length > 0 || contentCreators.length) > 0 && (
+        {(screenCategories.Site.length > 0 || contentCreators.length) > 0 && (
           <>
             <h4 className="uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">
               Site
             </h4>
             <ul className="flex flex-col gap-4">
-              {screens.map((view) => {
+              {screenCategories.Site.map((view) => {
                 return (
                   <li key={`nav-site-${view.name}`}>
                     <RenderNavSite view={view} />
@@ -193,6 +204,26 @@ export const Nav = ({
             </ul>
           </>
         )}
+        {Object.entries(screenCategories).map(([category, screens]) => {
+          if (category !== 'Site') {
+            return (
+              <div key={category}>
+                <h4 className="uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">
+                  {category}
+                </h4>
+                <ul className="flex flex-col gap-4">
+                  {screens.map((view) => {
+                    return (
+                      <li key={`nav-site-${view.name}`}>
+                        <RenderNavSite view={view} />
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            )
+          }
+        })}
         {!!cloudConfigs?.length && (
           <>
             <h4 className="uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">

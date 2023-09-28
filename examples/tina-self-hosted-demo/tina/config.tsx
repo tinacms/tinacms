@@ -1,6 +1,4 @@
-import { defineStaticConfig } from 'tinacms'
-
-const TINA_TOKEN_KEY = 'tina_token_key'
+import { defineStaticConfig, LocalAuthProvider } from 'tinacms'
 
 import { contentBlockSchema } from '../components/blocks/content'
 import { featureBlockSchema } from '../components/blocks/features'
@@ -8,28 +6,19 @@ import { heroBlockSchema } from '../components/blocks/hero'
 import { testimonialBlockSchema } from '../components/blocks/testimonial'
 import { ColorPickerInput } from '../components/fields/color'
 import { iconSchema } from '../components/util/icon'
+import {
+  TinaUserCollection,
+  UsernamePasswordAuthJSProvider,
+} from 'tinacms-authjs/dist/tinacms'
+
+const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/gql',
-  admin: {
-    // auth: {
-    //   // If you wanted to use custom auth
-    //   getToken: async () => {
-    //     return { id_token: 'some-token' }
-    //   },
-    //   logout: async () => {
-    //     localStorage.removeItem(TINA_TOKEN_KEY)
-    //   },
-    //   authenticate: async () => {
-    //     localStorage.setItem(TINA_TOKEN_KEY, 'some-token')
-    //     return true
-    //   },
-    //   getUser: async () => {
-    //     return localStorage.getItem(TINA_TOKEN_KEY)
-    //   },
-    // },
-  },
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
+  authProvider: isLocal
+    ? new LocalAuthProvider()
+    : new UsernamePasswordAuthJSProvider(),
   branch:
     process.env.NEXT_PUBLIC_TINA_BRANCH! || // custom branch env override
     process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF! || // Vercel branch env
@@ -53,6 +42,7 @@ const config = defineStaticConfig({
   },
   schema: {
     collections: [
+      TinaUserCollection,
       {
         label: 'Blog Posts',
         name: 'post',

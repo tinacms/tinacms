@@ -28,6 +28,7 @@ import {
 } from './media-utils'
 import { GraphQLError } from 'graphql'
 import { FilterCondition, makeFilterChain } from '../database/datalayer'
+import { generatePasswordHash } from '../auth/utils'
 
 interface ResolverConfig {
   config?: GraphQLConfig
@@ -71,6 +72,9 @@ const resolveFieldData = async (
       if (value) {
         accumulator[field.name] = value
       }
+      break
+    case 'password':
+      accumulator[field.name] = undefined
       break
     case 'image':
       accumulator[field.name] = resolveMediaRelativeToCloud(
@@ -358,50 +362,85 @@ export class Resolver {
     await this.database.delete(fullPath)
   }
 
-  public buildObjectMutations = (fieldValue: any, field: Collectable) => {
+  public buildObjectMutations = async (
+    fieldValue: any,
+    field: Collectable,
+    existingData?: Record<string, any> | Record<string, any>[]
+  ) => {
     if (field.fields) {
       const objectTemplate = field
       if (Array.isArray(fieldValue)) {
-        return fieldValue.map((item) =>
-          // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
-          this.buildFieldMutations(item, objectTemplate)
+        const idField = objectTemplate.fields.find((field) => field.uid)
+        if (idField) {
+          // check for duplicate ids in the data array
+          const ids = fieldValue.map((d) => d[idField.name])
+          const duplicateIds = ids.filter(
+            (id, index) => ids.indexOf(id) !== index
+          )
+          if (duplicateIds.length > 0) {
+            throw new Error(
+              `Duplicate ids found in array for field marked as identifier: ${idField.name}`
+            )
+          }
+        }
+        return Promise.all(
+          fieldValue.map(async (item) =>
+            // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
+            {
+              return this.buildFieldMutations(
+                item,
+                objectTemplate as any,
+                idField &&
+                  existingData &&
+                  existingData?.find(
+                    (d) => d[idField.name] === item[idField.name]
+                  )
+              )
+            }
+          )
         )
       } else {
         return this.buildFieldMutations(
           // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
           fieldValue,
           //@ts-ignore
-          objectTemplate
+          objectTemplate,
+          existingData
         )
       }
     }
     if (field.templates) {
       if (Array.isArray(fieldValue)) {
-        return fieldValue.map((item) => {
-          if (typeof item === 'string') {
-            throw new Error(
+        return Promise.all(
+          fieldValue.map(async (item) => {
+            if (typeof item === 'string') {
+              throw new Error(
+                //@ts-ignore
+                `Expected object for template value for field ${field.name}`
+              )
+            }
+            const templates = field.templates.map((templateOrTemplateName) => {
+              return templateOrTemplateName
+            })
+            const [templateName] = Object.entries(item)[0]
+            const template = templates.find(
               //@ts-ignore
-              `Expected object for template value for field ${field.name}`
+              (template) => template.name === templateName
             )
-          }
-          const templates = field.templates.map((templateOrTemplateName) => {
-            return templateOrTemplateName
+            if (!template) {
+              throw new Error(`Expected to find template ${templateName}`)
+            }
+            return {
+              // @ts-ignore FIXME Argument of type 'unknown' is not assignable to parameter of type '{ [fieldName: string]: string | { [key: string]: unknown; } | (string | { [key: string]: unknown; })[]; }'
+              ...(await this.buildFieldMutations(
+                item[template.name],
+                template
+              )),
+              //@ts-ignore
+              _template: template.name,
+            }
           })
-          const [templateName] = Object.entries(item)[0]
-          const template = templates.find(
-            //@ts-ignore
-            (template) => template.name === templateName
-          )
-          if (!template) {
-            throw new Error(`Expected to find template ${templateName}`)
-          }
-          return {
-            // @ts-ignore FIXME Argument of type 'unknown' is not assignable to parameter of type '{ [fieldName: string]: string | { [key: string]: unknown; } | (string | { [key: string]: unknown; })[]; }'
-            ...this.buildFieldMutations(item[template.name], template),
-            //@ts-ignore
-            _template: template.name,
-          }
-        })
+        )
       } else {
         if (typeof fieldValue === 'string') {
           throw new Error(
@@ -422,7 +461,10 @@ export class Resolver {
         }
         return {
           // @ts-ignore FIXME Argument of type 'unknown' is not assignable to parameter of type '{ [fieldName: string]: string | { [key: string]: unknown; } | (string | { [key: string]: unknown; })[]; }'
-          ...this.buildFieldMutations(fieldValue[template.name], template),
+          ...(await this.buildFieldMutations(
+            fieldValue[template.name],
+            template
+          )),
           //@ts-ignore
           _template: template.name,
         }
@@ -483,7 +525,7 @@ export class Resolver {
       return this.getDocument(realPath)
     }
 
-    const params = this.buildObjectMutations(
+    const params = await this.buildObjectMutations(
       // @ts-ignore
       args.params[collection.name],
       collection
@@ -521,9 +563,10 @@ export class Resolver {
       switch (templateInfo.type) {
         case 'object':
           if (params) {
-            const values = this.buildFieldMutations(
+            const values = await this.buildFieldMutations(
               params,
-              templateInfo.template
+              templateInfo.template,
+              oldDoc
             )
             await this.database.put(
               realPath,
@@ -545,7 +588,7 @@ export class Resolver {
               const values = {
                 ...oldDoc,
                 // @ts-ignore FIXME: failing on unknown, which we don't need to know because it's recursive
-                ...this.buildFieldMutations(templateParams, template),
+                ...(await this.buildFieldMutations(templateParams, template)),
                 _template: lastItem(template.namespace),
               }
               await this.database.put(realPath, values, collection.name)
@@ -555,10 +598,11 @@ export class Resolver {
       return this.getDocument(realPath)
     }
 
-    const params = this.buildObjectMutations(
+    const params = await this.buildObjectMutations(
       //@ts-ignore
       isCollectionSpecific ? args.params : args.params[collection.name],
-      collection
+      collection,
+      oldDoc
     )
     //@ts-ignore
     await this.database.put(realPath, { ...oldDoc, ...params }, collection.name)
@@ -864,12 +908,21 @@ export class Resolver {
     }
   }
 
-  private buildFieldMutations = (
+  private buildFieldMutations = async (
     fieldParams: FieldParams,
-    template: Template<true>
+    template: Template<true>,
+    existingData?: Record<string, any>
   ) => {
     const accum: { [key: string]: unknown } = {}
-    Object.entries(fieldParams).forEach(([fieldName, fieldValue]) => {
+    // since password fields may not always be set, we use the template fields to populate an empty string
+    for (const passwordField of template.fields.filter(
+      (f) => f.type === 'password'
+    )) {
+      if (!fieldParams[passwordField.name]) {
+        fieldParams[passwordField.name] = ''
+      }
+    }
+    for (const [fieldName, fieldValue] of Object.entries(fieldParams)) {
       if (Array.isArray(fieldValue)) {
         if (fieldValue.length === 0) {
           accum[fieldName] = []
@@ -898,7 +951,20 @@ export class Resolver {
           )
           break
         case 'object':
-          accum[fieldName] = this.buildObjectMutations(fieldValue, field)
+          accum[fieldName] = await this.buildObjectMutations(
+            fieldValue,
+            field,
+            existingData?.[fieldName]
+          )
+          break
+        case 'password':
+          if (fieldValue) {
+            accum[fieldName] = await generatePasswordHash({
+              password: fieldValue as string,
+            })
+          } else {
+            accum[fieldName] = existingData?.[fieldName]
+          }
           break
         case 'rich-text':
           // @ts-ignore
@@ -917,7 +983,7 @@ export class Resolver {
           // @ts-ignore
           throw new Error(`No mutation builder for field type ${field.type}`)
       }
-    })
+    }
     return accum
   }
 

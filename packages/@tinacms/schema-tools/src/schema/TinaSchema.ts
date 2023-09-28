@@ -57,6 +57,7 @@ export class TinaSchema {
           field.parser = { type: 'markdown' }
         }
       }
+      field.uid = field.uid || false
     })
   }
   public getIsTitleFieldName = (collection: string) => {

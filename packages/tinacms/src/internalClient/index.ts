@@ -13,7 +13,12 @@ import {
 } from 'graphql'
 
 import gql from 'graphql-tag'
-import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
+import {
+  TinaSchema,
+  addNamespaceToSchema,
+  Schema,
+  AuthProvider,
+} from '@tinacms/schema-tools'
 import { TinaCloudProject } from './types'
 import {
   optionsToSearchIndexOptions,
@@ -22,15 +27,11 @@ import {
   SearchClient,
 } from '@tinacms/search/dist/index-client'
 import { AsyncData, asyncPoll } from './asyncPoll'
-import {
-  AbstractAuthProvider,
-  LocalAuthProvider,
-  TinaCloudAuthProvider,
-} from './authProvider'
+import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider'
 
 export * from './authProvider'
 
-export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
+export type OnLoginFunc = (args: { token?: TokenObject }) => Promise<void>
 
 export type TinaIOConfig = {
   assetsApiUrlOverride?: string // https://assets.tinajs.io
@@ -77,7 +78,7 @@ const IndexStatusResponse = z.object({
 })
 
 export class Client {
-  authProvider: AbstractAuthProvider | TinaCloudAuthProvider
+  authProvider: AuthProvider
   onLogin?: OnLoginFunc
   onLogout?: () => Promise<void>
   frontendUrl: string

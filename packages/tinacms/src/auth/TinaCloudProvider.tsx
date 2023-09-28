@@ -1,6 +1,7 @@
 import { ModalBuilder } from './AuthModal'
 import React, { useEffect, useState } from 'react'
 import {
+  BaseTextField,
   TinaCMS,
   TinaProvider,
   MediaStore,
@@ -53,24 +54,32 @@ export const AuthWallInner = ({
   getModalActions,
 }: TinaCloudAuthWallProps) => {
   const client: Client = cms.api.tina
-  // Weather or not we are using Tina Cloud for auth
+  // Whether we are using Tina Cloud for auth
   const isTinaCloud =
     !client.isLocalMode && !client.schema?.config?.config?.contentApiUrlOverride
+  const loginStrategy = client.authProvider.getLoginStrategy()
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [errorMessage, setErrorMessage] = useState<
     { title: string; message: string } | undefined
   >()
   const [showChildren, setShowChildren] = useState<boolean>(false)
+  const [authProps, setAuthProps] = useState<{
+    username: string
+    password: string
+  }>({ username: '', password: '' })
 
   React.useEffect(() => {
+    let mounted = true
     client.authProvider
       .isAuthenticated()
       .then((isAuthenticated) => {
+        if (!mounted) return
         if (isAuthenticated) {
           client.authProvider
             .isAuthorized()
             .then((isAuthorized) => {
+              if (!mounted) return
               if (isAuthorized) {
                 setShowChildren(true)
                 cms.enable()
@@ -83,6 +92,7 @@ export const AuthWallInner = ({
               }
             })
             .catch((e) => {
+              if (!mounted) return
               console.error(e)
               setErrorMessage({ title: 'Unexpected Error:', message: `${e}` })
               setActiveModal('error')
@@ -95,10 +105,14 @@ export const AuthWallInner = ({
         }
       })
       .catch((e) => {
+        if (!mounted) return
         console.error(e)
         setErrorMessage({ title: 'Unexpected Error:', message: `${e}` })
         setActiveModal('error')
       })
+    return () => {
+      mounted = false
+    }
   }, [])
 
   const onAuthenticated = async () => {
@@ -123,13 +137,48 @@ export const AuthWallInner = ({
       })
     : []
 
+  const onAuthenticate = async () => {
+    try {
+      const token = await client.authProvider.authenticate(authProps)
+      if (typeof client?.onLogin === 'function') {
+        await client?.onLogin({ token })
+      }
+      return onAuthenticated()
+    } catch (e) {
+      console.error(e)
+      setActiveModal('error')
+      setErrorMessage({
+        title: 'Authentication Error',
+        message: `${e}`,
+      })
+    }
+  }
+
+  let modalTitle = 'Tina Cloud Authorization'
+  if (
+    activeModal === 'authenticate' &&
+    loginStrategy === 'Redirect' &&
+    !isTinaCloud
+  ) {
+    modalTitle = 'Enter into edit mode'
+  } else if (
+    activeModal === 'authenticate' &&
+    loginStrategy === 'UsernamePassword'
+  ) {
+    modalTitle = 'Sign in to Tina'
+  } else if (activeModal === 'error') {
+    if (loginStrategy === 'Redirect' && !isTinaCloud) {
+      modalTitle = 'Enter into edit mode'
+    } else if (loginStrategy === 'UsernamePassword') {
+      modalTitle = 'Sign in to Tina'
+    }
+  }
+
   return (
     <>
-      {activeModal === 'authenticate' && (
+      {activeModal === 'authenticate' && loginStrategy === 'Redirect' && (
         <ModalBuilder
-          title={
-            isTinaCloud ? 'Tina Cloud Authorization' : 'Enter into edit mode'
-          }
+          title={modalTitle}
           message={
             isTinaCloud
               ? 'To save edits, Tina Cloud authorization is required. On save, changes will get committed using your account.'
@@ -154,32 +203,72 @@ export const AuthWallInner = ({
             },
             {
               name: isTinaCloud ? 'Continue to Tina Cloud' : 'Enter Edit Mode',
-              action: async () => {
-                try {
-                  const token = await client.authProvider.authenticate()
-                  if (typeof client?.onLogin === 'function') {
-                    await client?.onLogin({ token })
-                  }
-                  return onAuthenticated()
-                } catch (e) {
-                  console.error(e)
-                  setActiveModal('error')
-                  setErrorMessage({
-                    title: 'Unexpected Error:',
-                    message: `${e}`,
-                  })
-                }
-              },
+              action: onAuthenticate,
               primary: true,
             },
           ]}
-        />
+        ></ModalBuilder>
       )}
+      {activeModal === 'authenticate' &&
+        loginStrategy === 'UsernamePassword' && (
+          <ModalBuilder
+            title={modalTitle}
+            message={''}
+            close={close}
+            actions={[
+              ...otherModalActions,
+              {
+                name: 'Login',
+                action: onAuthenticate,
+                primary: true,
+              },
+            ]}
+          >
+            <div className="flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
+              <div className="max-w-md w-full space-y-6">
+                <label className="block">
+                  <span className="text-gray-700">Username</span>
+                  <BaseTextField
+                    id="username"
+                    name="username"
+                    type="text"
+                    autoComplete="username"
+                    required
+                    placeholder="Username"
+                    value={authProps.username}
+                    onChange={(e) =>
+                      setAuthProps((prevState) => ({
+                        ...prevState,
+                        username: e.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-gray-700">Password</span>
+                  <BaseTextField
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    placeholder="Password"
+                    value={authProps.password}
+                    onChange={(e) =>
+                      setAuthProps((prevState) => ({
+                        ...prevState,
+                        password: e.target.value,
+                      }))
+                    }
+                  />
+                </label>
+              </div>
+            </div>
+          </ModalBuilder>
+        )}
       {activeModal === 'error' && errorMessage && (
         <ModalBuilder
-          title={
-            isTinaCloud ? 'Tina Cloud Authorization' : 'Enter into edit mode'
-          }
+          title={modalTitle}
           message={errorMessage.title}
           error={errorMessage.message}
           close={close}

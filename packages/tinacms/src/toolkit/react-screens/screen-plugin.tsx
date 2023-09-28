@@ -18,6 +18,7 @@ export interface ScreenPlugin<ExtraProps = {}> extends Plugin {
   Component(props: ScreenComponentProps & ExtraProps): React.ReactElement
   Icon: any
   layout: 'fullscreen' | 'popup'
+  navCategory?: 'Account' | 'Site'
 }
 
 /**
@@ -36,6 +37,7 @@ export interface ScreenOptions<ExtraProps = {}> {
   Icon: any
   layout?: ScreenPlugin['layout']
   props?: ExtraProps
+  navCategory?: 'Account' | 'Site'
 }
 
 /**

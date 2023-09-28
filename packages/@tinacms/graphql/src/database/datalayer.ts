@@ -689,7 +689,7 @@ export class FolderTreeBuilder {
 export const makeFolderOpsForCollection = <T extends object>(
   folderTree: FolderTree,
   collection: Collection<true>,
-  indexDefinitions: IndexDefinition[],
+  indexDefinitions: Record<string, IndexDefinition>,
   opType: 'put' | 'del',
   level: Level,
   escapeStr: StringEscaper = stringEscaper

@@ -6,7 +6,7 @@
 '@tinacms/self-hosted-starter': patch
 '@tinacms/schema-tools': patch
 '@tinacms/datalayer': patch
-'tinacms-next-auth': patch
+'tinacms-authjs': patch
 '@tinacms/graphql': patch
 '@tinacms/scripts': patch
 'next-tinacms-dos': patch

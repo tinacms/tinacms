@@ -256,7 +256,6 @@ export function stringifyProps(
         }
         break
       default:
-        // @ts-expect-error error type is never
         throw new Error(`Stringify props: ${field.type} not yet supported`)
     }
   })
