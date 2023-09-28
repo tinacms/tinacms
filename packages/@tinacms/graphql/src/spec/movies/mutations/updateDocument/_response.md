@@ -1,8 +1,8 @@
 ---
 title: A New Hope
-director: content/directors/george.md
-genre: scifi
 rating: 10
+genre: scifi
+director: content/directors/george.md
 ---
 
 Here is some `inline code`.
