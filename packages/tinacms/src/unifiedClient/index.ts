@@ -17,7 +17,7 @@ export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
 export type TinaClientRequestArgs = {
   variables?: Record<string, any>
   query: string
-  errorPolicy?: 'none' | 'all'
+  errorPolicy?: 'throw' | 'include'
 } & Partial<Omit<TinaClientArgs, 'queries'>>
 
 export type TinaClientURLParts = {
@@ -40,20 +40,24 @@ export class TinaClient<GenQueries> {
   }
 
   public async request<DataType extends Record<string, any> = any>(
-    args: Omit<TinaClientRequestArgs, 'errorPolicy'> & { errorPolicy: 'none' }
+    args: Omit<TinaClientRequestArgs, 'errorPolicy'> & {
+      errorPolicy: 'throw'
+    }
   ): Promise<{
     data: DataType
     query: string
   }>
   public async request<DataType extends Record<string, any> = any>(
-    args: Omit<TinaClientRequestArgs, 'errorPolicy'> & { errorPolicy: 'all' }
+    args: Omit<TinaClientRequestArgs, 'errorPolicy'> & {
+      errorPolicy: 'include'
+    }
   ): Promise<{
     data: DataType
     query: string
     errors: GraphQLError[]
   }>
   public async request<DataType extends Record<string, any> = any>({
-    errorPolicy = 'none',
+    errorPolicy = 'throw',
     ...args
   }: TinaClientRequestArgs) {
     const headers = new HeadersDefined()
@@ -88,7 +92,7 @@ export class TinaClient<GenQueries> {
       )
     }
     const json = await res.json()
-    if (json.errors && errorPolicy === 'none') {
+    if (json.errors && errorPolicy === 'throw') {
       throw new Error(
         `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
         Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
