@@ -206,11 +206,14 @@ export class Codegen {
 
   async genClient() {
     const token = this.configManager.config?.token
+    const errorPolicy = this.configManager.config?.client?.errorPolicy
     const apiURL = this.getApiURL()
 
     const clientString = `import { createClient } from "tinacms/dist/client";
 import { queries } from "./types";
-export const client = createClient({ url: '${apiURL}', token: '${token}', queries });
+export const client = createClient({ url: '${apiURL}', token: '${token}', queries, ${
+      errorPolicy ? `errorPolicy: '${errorPolicy}'` : ''
+    } });
 export default client;
   `
     return { apiURL, clientString }

@@ -544,6 +544,12 @@ export interface Config<
      * @default 2
      */
     referenceDepth?: number
+    /**
+     * Determines how the client will handle errors. If it is set to `throw` the client will throw an error when a query fails. If it is set to `include` the client will return the error in the response.
+     *
+     * @default 'throw'
+     */
+    errorPolicy?: 'throw' | 'include'
   }
   /**
    *

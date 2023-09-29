@@ -1,5 +1,6 @@
 import fetchPonyfill from 'fetch-ponyfill'
 import type { GraphQLError } from 'graphql'
+import type { Config } from '@tinacms/schema-tools'
 
 const { fetch: fetchPonyfillFN, Headers: HeadersPonyfill } = fetchPonyfill()
 
@@ -13,6 +14,7 @@ export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
   url: string
   token?: string
   queries: (client: TinaClient<GenQueries>) => GenQueries
+  errorPolicy?: Config['client']['errorPolicy']
 }
 export type TinaClientRequestArgs = {
   variables?: Record<string, any>
@@ -29,37 +31,42 @@ export type TinaClientURLParts = {
 export class TinaClient<GenQueries> {
   public apiUrl: string
   public readonlyToken?: string
-  /**
-   *
-   */
   public queries: GenQueries
-  constructor({ token, url, queries }: TinaClientArgs<GenQueries>) {
+  public errorPolicy: Config['client']['errorPolicy']
+  constructor({
+    token,
+    url,
+    queries,
+    errorPolicy,
+  }: TinaClientArgs<GenQueries>) {
     this.apiUrl = url
     this.readonlyToken = token?.trim()
     this.queries = queries(this)
+    this.errorPolicy = errorPolicy || 'throw'
   }
 
-  public async request<DataType extends Record<string, any> = any>(
-    args: Omit<TinaClientRequestArgs, 'errorPolicy'> & {
-      errorPolicy: 'throw'
-    }
-  ): Promise<{
-    data: DataType
-    query: string
-  }>
-  public async request<DataType extends Record<string, any> = any>(
-    args: Omit<TinaClientRequestArgs, 'errorPolicy'> & {
-      errorPolicy: 'include'
-    }
-  ): Promise<{
-    data: DataType
-    query: string
-    errors: GraphQLError[]
-  }>
+  // public async request<DataType extends Record<string, any> = any>(
+  //   args: Omit<TinaClientRequestArgs, 'errorPolicy'> & {
+  //     errorPolicy: 'throw'
+  //   }
+  // ): Promise<{
+  //   data: DataType
+  //   query: string
+  // }>
+  // public async request<DataType extends Record<string, any> = any>(
+  //   args: Omit<TinaClientRequestArgs, 'errorPolicy'> & {
+  //     errorPolicy: 'include'
+  //   }
+  // ): Promise<{
+  //   data: DataType
+  //   query: string
+  //   errors: GraphQLError[]
+  // }>
   public async request<DataType extends Record<string, any> = any>({
-    errorPolicy = 'throw',
+    errorPolicy,
     ...args
   }: TinaClientRequestArgs) {
+    const errorPolicyDefined = errorPolicy || this.errorPolicy
     const headers = new HeadersDefined()
     if (this.readonlyToken) {
       headers.append('X-API-KEY', this.readonlyToken)
@@ -92,7 +99,8 @@ export class TinaClient<GenQueries> {
       )
     }
     const json = await res.json()
-    if (json.errors && errorPolicy === 'throw') {
+    console.log({ errorPolicyDefined })
+    if (json.errors && errorPolicyDefined === 'throw') {
       throw new Error(
         `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
         Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
@@ -100,7 +108,7 @@ export class TinaClient<GenQueries> {
     }
     return {
       data: json?.data as DataType,
-      errors: json?.errors,
+      errors: json?.errors as GraphQLError[] | undefined,
       query: args.query,
     }
   }

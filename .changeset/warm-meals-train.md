@@ -1,5 +1,6 @@
 ---
 '@tinacms/graphql': minor
+'@tinacms/schema-tools': minor
 'tinacms': patch
 ---
 
