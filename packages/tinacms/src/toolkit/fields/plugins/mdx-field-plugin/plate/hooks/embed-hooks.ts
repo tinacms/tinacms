@@ -1,7 +1,7 @@
 import React from 'react'
 import { Transforms } from 'slate'
 import { useSelected, ReactEditor } from 'slate-react'
-import isHotkey from 'is-hotkey'
+import { isHotkey } from 'is-hotkey'
 import { useCMS, useEvent } from '@toolkit/react-core'
 import { FieldFocusEvent } from '@toolkit/fields/field-events'
 
