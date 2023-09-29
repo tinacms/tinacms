@@ -1,5 +1,15 @@
 # @tinacms/mdx
 
+## 1.3.19
+
+### Patch Changes
+
+- 5040fc7cb: Add xref support to markdown links
+
+  ```md
+  Click [here](xref:some-link 'Tester') to join now
+  ```
+
 ## 1.3.18
 
 ### Patch Changes
