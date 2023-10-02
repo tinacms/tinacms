@@ -151,11 +151,10 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   }, [tinaForm, field, index])
 
   const duplicateItem = React.useCallback(() => {
-    const clonedItem = { ...item }
-    if (clonedItem.name) {
-      clonedItem.name = `${clonedItem.name} (copy)`
+    const clonedItem = {
+      ...item,
+      name: item.name ? `${item.name} (copy)` : 'Copied Item',
     }
-
     tinaForm.mutators.insert(field.name, index + 1, clonedItem)
   }, [tinaForm, field, index, item])
 
