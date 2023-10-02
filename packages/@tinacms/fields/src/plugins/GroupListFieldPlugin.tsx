@@ -28,7 +28,6 @@ import { Droppable, Draggable } from 'react-beautiful-dnd'
 import {
   AddIcon,
   DragIcon,
-  DuplicateIcon,
   ReorderIcon,
   TrashIcon,
   LeftArrowIcon,
@@ -145,20 +144,9 @@ interface ItemProps {
 const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   const FormPortal = useFormPortal()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
-
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
-
-  const duplicateItem = React.useCallback(() => {
-    const clonedItem = { ...item }
-    if (clonedItem.name) {
-      clonedItem.name = `${clonedItem.name} (copy)`
-    }
-
-    tinaForm.mutators.insert(field.name, index + 1, clonedItem)
-  }, [tinaForm, field, index, item])
-
   const title = label || (field.label || field.name) + ' Item'
   return (
     <Draggable
@@ -179,9 +167,6 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
             <ItemClickTarget onClick={() => setExpanded(true)}>
               <GroupLabel>{title}</GroupLabel>
             </ItemClickTarget>
-            <DuplicateButton onClick={duplicateItem}>
-              <DuplicateIcon />
-            </DuplicateButton>
             <DeleteButton onClick={removeItem}>
               <TrashIcon />
             </DeleteButton>
@@ -349,23 +334,6 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
 `
 
 const DeleteButton = styled.button`
-  text-align: center;
-  flex: 0 0 auto;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: 12px 8px;
-  margin: 0;
-  transition: all 85ms ease-out;
-  svg {
-    transition: all 85ms ease-out;
-  }
-  &:hover {
-    background-color: var(--tina-color-grey-1);
-  }
-`
-
-const DuplicateButton = styled.button`
   text-align: center;
   flex: 0 0 auto;
   border: 0;
