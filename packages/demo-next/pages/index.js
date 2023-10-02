@@ -72,6 +72,34 @@ const formOptions = {
       label: 'Home Page Content',
       component: 'markdown',
     },
+    {
+      label: 'Authors List',
+      name: 'rawJson.authors',
+      component: 'group-list',
+      description: 'Authors List',
+      itemProps: item => ({
+        key: item.id,
+        label: item.name,
+      }),
+      defaultItem: () => ({
+        name: 'New Author',
+        id: Math.random()
+          .toString(36)
+          .substr(2, 9),
+      }),
+      fields: [
+        {
+          label: 'Name',
+          name: 'name',
+          component: 'text',
+        },
+        {
+          label: 'Best Novel',
+          name: 'best-novel',
+          component: 'text',
+        },
+      ],
+    },
   ],
   buttons: {
     save: 'capture',

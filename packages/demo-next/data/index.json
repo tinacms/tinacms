@@ -12,5 +12,22 @@
       "_template": "cta",
       "text": "Log In"
     }
-  ]
+  ],
+  "GROUP": [{}],
+  "rawJson": {
+    "authors": [
+      {
+        "name": "New Author",
+        "id": "y0h34v2yf"
+      },
+      {
+        "name": "New Author (copy!",
+        "id": "y0h34v2yf"
+      },
+      {
+        "name": "A New Totally New Author",
+        "id": "y0h34v2yf"
+      }
+    ]
+  }
 }
