@@ -62,6 +62,7 @@ interface GroupFieldDefinititon extends Field {
      */
     label?: string
   }
+  canCopy?: boolean
 }
 
 interface GroupProps {
@@ -178,9 +179,11 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
             <ItemClickTarget onClick={() => setExpanded(true)}>
               <GroupLabel>{title}</GroupLabel>
             </ItemClickTarget>
-            <DuplicateButton onClick={duplicateItem}>
-              <DuplicateIcon />
-            </DuplicateButton>
+            {field.canCopy && (
+              <DuplicateButton onClick={duplicateItem}>
+                <DuplicateIcon />
+              </DuplicateButton>
+            )}
             <DeleteButton onClick={removeItem}>
               <TrashIcon />
             </DeleteButton>
