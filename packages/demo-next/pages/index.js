@@ -100,6 +100,35 @@ const formOptions = {
         },
       ],
     },
+    {
+      label: 'Authors List 2 ',
+      name: 'rawJson.authors2',
+      component: 'group-list',
+      description: 'Authors List with copy',
+      itemProps: item => ({
+        key: item.id,
+        label: item.name,
+      }),
+      defaultItem: () => ({
+        name: 'New Author',
+        id: Math.random()
+          .toString(36)
+          .substr(2, 9),
+      }),
+      fields: [
+        {
+          label: 'Name',
+          name: 'name',
+          component: 'text',
+        },
+        {
+          label: 'Best Novel',
+          name: 'best-novel',
+          component: 'text',
+        },
+      ],
+      allowItemDuplication: true,
+    },
   ],
   buttons: {
     save: 'capture',
