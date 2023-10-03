@@ -1,5 +1,15 @@
 # tinacms
 
+## 1.5.21
+
+### Patch Changes
+
+- 177002715: Fix/media thumbnail
+- e69a3ef81: fix: Fix active form on nested group when value is empty
+- c925786ef: Fix issue with undo/redo in rich-text editor
+- 9f01550dd: Fix issue where deeply nested mdx fields were not picking up the correct template"
+  - @tinacms/search@1.0.11
+
 ## 1.5.20
 
 ### Patch Changes

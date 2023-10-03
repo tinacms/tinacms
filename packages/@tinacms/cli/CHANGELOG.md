@@ -1,5 +1,26 @@
 # tinacms-cli
 
+## 1.5.30
+
+### Patch Changes
+
+- cb9871921: fix: add tina-lock file to external content directories when localContentPath is set
+- 0ec28c6ae: Update message to use defineSchema when frags is too large
+- 3b214ec6b: Fixes issue when an existing database contains sha metadata for partial reindexing and the sha is missing from the repository
+- Updated dependencies [177002715]
+- Updated dependencies [c244d963a]
+- Updated dependencies [e69a3ef81]
+- Updated dependencies [c925786ef]
+- Updated dependencies [841456237]
+- Updated dependencies [3b214ec6b]
+- Updated dependencies [9f01550dd]
+- Updated dependencies [8bd85b15e]
+  - tinacms@1.5.21
+  - @tinacms/graphql@1.4.26
+  - @tinacms/app@1.2.28
+  - @tinacms/datalayer@1.2.26
+  - @tinacms/search@1.0.11
+
 ## 1.5.29
 
 ### Patch Changes
