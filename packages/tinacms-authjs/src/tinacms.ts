@@ -1,5 +1,11 @@
 import { Collection, LoginStrategy } from '@tinacms/schema-tools'
-import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react'
+import {
+  getCsrfToken,
+  getSession,
+  signIn,
+  signOut,
+  SessionProvider,
+} from 'next-auth/react'
 import { AbstractAuthProvider } from 'tinacms'
 
 export class DefaultAuthJSProvider extends AbstractAuthProvider {
@@ -25,6 +31,10 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
   async authorize(context?: any): Promise<any> {
     const user: any = (await getSession(context))?.user || {}
     return user.role === 'user'
+  }
+
+  getSessionProvider() {
+    return SessionProvider
   }
 }
 
@@ -63,7 +73,7 @@ export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
   async authenticate(props: { username: string; password: string }) {
     const csrfToken = await getCsrfToken()
     // TODO make api baseUrl configurable
-    return fetch('/api/auth/callback/credentials', {
+    return fetch('/api/tina/auth/callback/credentials', {
       redirect: 'error', //redirect should throw an error
       method: 'POST',
       headers: {

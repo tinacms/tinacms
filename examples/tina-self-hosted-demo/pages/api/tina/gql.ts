@@ -1,5 +1,5 @@
-import withTinaAuth from '../../tina/auth'
-import databaseClient from '../../tina/__generated__/databaseClient'
+import withTinaAuth from '../../../tina/auth'
+import databaseClient from '../../../tina/__generated__/databaseClient'
 
 async function handler(req, res) {
   const { query, variables } = req.body

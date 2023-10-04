@@ -409,6 +409,7 @@ export const TinaCloudProvider = (
   // Weather or not we are using Tina Cloud for auth
   const isTinaCloud =
     !client.isLocalMode && !client.schema?.config?.config?.contentApiUrlOverride
+  const SessionProvider = client.authProvider.getSessionProvider()
 
   const handleListBranches = async (): Promise<Branch[]> => {
     const branches = await cms.api.tina.listBranches({
@@ -486,16 +487,18 @@ export const TinaCloudProvider = (
   }, [isTinaCloud, cms])
 
   return (
-    <BranchDataProvider
-      currentBranch={currentBranch}
-      setCurrentBranch={(b) => {
-        setCurrentBranch(b)
-      }}
-    >
-      <TinaProvider cms={cms}>
-        <AuthWallInner {...props} cms={cms} />
-      </TinaProvider>
-    </BranchDataProvider>
+    <SessionProvider basePath="/api/tina/auth">
+      <BranchDataProvider
+        currentBranch={currentBranch}
+        setCurrentBranch={(b) => {
+          setCurrentBranch(b)
+        }}
+      >
+        <TinaProvider cms={cms}>
+          <AuthWallInner {...props} cms={cms} />
+        </TinaProvider>
+      </BranchDataProvider>
+    </SessionProvider>
   )
 }
 
