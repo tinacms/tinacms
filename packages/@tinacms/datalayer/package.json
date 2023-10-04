@@ -20,6 +20,10 @@
         "name": "src/index.ts",
         "target": "node",
         "bundle": []
+      },
+      {
+        "name": "src/next.ts",
+        "target": "node"
       }
     ]
   },
@@ -54,6 +58,7 @@
     "jest-diff": "^29.5.0",
     "jest-file-snapshot": "^0.5.0",
     "jest-matcher-utils": "^29.5.0",
+    "next": "^13.5.4",
     "typescript": "4.3.5"
   }
 }

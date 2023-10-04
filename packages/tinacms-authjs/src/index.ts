@@ -1,4 +1,4 @@
-import { AuthOptions } from 'next-auth'
+import NextAuth, { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { getServerSession } from 'next-auth/next'
 
@@ -133,10 +133,46 @@ const TinaCredentialsProvider = ({
       authenticate(databaseClient, credentials.username, credentials.password),
   })
 
+const NextAuthAuthentication = ({
+  nextAuthOptions,
+}: {
+  nextAuthOptions: AuthOptions
+}) => {
+  return {
+    isAuthenticated: async (req: any, res: any) => {
+      const session = await getServerSession(req, res, nextAuthOptions)
+
+      // @ts-ignore
+      if (!req.session) {
+        Object.defineProperty(req, 'session', {
+          value: session,
+          writable: false,
+        })
+      }
+
+      if (!session?.user?.name) {
+        return false
+      }
+      return true
+    },
+    extraRoutes: {
+      auth: {
+        isAuthRequired: false,
+        handler: (req, res) => {
+          const { routes } = req.query
+          const [, ...rest] = routes
+          req.query.nextauth = rest
+          NextAuth(nextAuthOptions)(req, res)
+        },
+      },
+    },
+  }
+}
 export {
   TinaCredentialsProvider,
   TinaAuthJSOptions,
   withAuthJSApiRoute,
+  NextAuthAuthentication,
   // TODO: This probably needs a better name?
   createAuthJSApiRoute,
 }
