@@ -480,6 +480,7 @@ export interface AuthProvider {
   isAuthorized: (context?: any) => Promise<boolean>
   isAuthenticated: () => Promise<boolean>
   getLoginStrategy: () => LoginStrategy
+  getSessionProvider: () => React.ReactElement
 }
 
 interface AuthHooks {
