@@ -32,7 +32,6 @@
     },
     "repository": {
       "url": "https://github.com/tinacms/tinacms.git",
-      "directory": "packages/next-auth"
+      "directory": "packages/tinacms-clerk"
     }
   }
-  
