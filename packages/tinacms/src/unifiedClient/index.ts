@@ -99,7 +99,6 @@ export class TinaClient<GenQueries> {
       )
     }
     const json = await res.json()
-    console.log({ errorPolicyDefined })
     if (json.errors && errorPolicyDefined === 'throw') {
       throw new Error(
         `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
