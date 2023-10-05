@@ -158,7 +158,7 @@ const NextAuthAuthentication = ({
     extraRoutes: {
       auth: {
         isAuthRequired: false,
-        handler: (req, res) => {
+        handler: async (req, res) => {
           const { routes } = req.query
           const [, ...rest] = routes
           req.query.nextauth = rest
