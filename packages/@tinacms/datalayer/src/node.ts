@@ -19,6 +19,10 @@ export interface BackendAuthentication {
     }
   }
 }
+export const LocalAuthentication = () =>
+  ({
+    isAuthenticated: async () => true,
+  } as BackendAuthentication)
 
 export interface TinaBackendOptions {
   databaseClient: DatabaseClient
