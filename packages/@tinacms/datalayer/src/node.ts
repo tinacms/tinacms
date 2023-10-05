@@ -8,10 +8,19 @@ type NodeApiHandler = (
 type DatabaseClient = any
 
 export interface BackendAuthentication {
-  isAuthenticated: (
+  isAuthorized: (
     req: IncomingMessage,
     res: ServerResponse
-  ) => Promise<boolean>
+  ) => Promise<
+    | {
+        isAuthorized: true
+      }
+    | {
+        isAuthorized: false
+        errorMessage: string
+        errorCode: number
+      }
+  >
   extraRoutes?: {
     [key: string]: {
       isAuthRequired?: boolean
@@ -21,7 +30,7 @@ export interface BackendAuthentication {
 }
 export const LocalAuthentication = () =>
   ({
-    isAuthenticated: async () => true,
+    isAuthorized: async () => ({ isAuthorized: true }),
   } as BackendAuthentication)
 
 export interface TinaBackendOptions {
@@ -33,9 +42,9 @@ export function TinaNodeBackend({
   authentication,
   databaseClient,
 }: TinaBackendOptions) {
-  const { isAuthenticated, extraRoutes } = authentication
+  const { isAuthorized, extraRoutes } = authentication
   const handler = MakeNodeApiHandler({
-    isAuthenticated,
+    isAuthorized,
     extraRoutes,
     databaseClient,
   })
@@ -43,7 +52,7 @@ export function TinaNodeBackend({
 }
 
 function MakeNodeApiHandler({
-  isAuthenticated,
+  isAuthorized,
   extraRoutes,
   databaseClient,
 }: BackendAuthentication & { databaseClient: DatabaseClient }) {
@@ -130,10 +139,10 @@ function MakeNodeApiHandler({
     }
     const { handler, isAuthRequired } = currentRoute
     if (isAuthRequired) {
-      const isAuth = await isAuthenticated(...params)
-      if (!isAuth) {
-        res.statusCode = 401
-        res.write(JSON.stringify({ error: 'unauthorized' }))
+      const isAuth = await isAuthorized(...params)
+      if (isAuth.isAuthorized === false) {
+        res.statusCode = isAuth.errorCode
+        res.write(JSON.stringify({ error: isAuth.errorMessage || 'not found' }))
         res.end()
         return
       }

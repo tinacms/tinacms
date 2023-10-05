@@ -1,6 +1,7 @@
 import NextAuth, { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { getServerSession } from 'next-auth/next'
+import type { BackendAuthentication } from '@tinacms/datalayer/dist/node'
 
 const authenticate = async (
   databaseClient: any,
@@ -138,8 +139,9 @@ const NextAuthAuthentication = ({
 }: {
   nextAuthOptions: AuthOptions
 }) => {
-  return {
-    isAuthenticated: async (req: any, res: any) => {
+  const nextBackendAuthentication: BackendAuthentication = {
+    isAuthorized: async (req, res) => {
+      // @ts-ignore
       const session = await getServerSession(req, res, nextAuthOptions)
 
       // @ts-ignore
@@ -151,25 +153,36 @@ const NextAuthAuthentication = ({
       }
 
       if (!session?.user) {
-        return false
+        return {
+          errorCode: 401,
+          errorMessage: 'Unauthorized',
+          isAuthorized: false,
+        }
       }
       if ((session?.user as any).role !== 'user') {
-        return false
+        return {
+          errorCode: 403,
+          errorMessage: 'Forbidden',
+          isAuthorized: false,
+        }
       }
-      return true
+      return { isAuthorized: true }
     },
     extraRoutes: {
       auth: {
         isAuthRequired: false,
         handler: async (req, res) => {
+          // @ts-ignore
           const { routes } = req.query
           const [, ...rest] = routes
+          // @ts-ignore
           req.query.nextauth = rest
           NextAuth(nextAuthOptions)(req, res)
         },
       },
     },
   }
+  return nextBackendAuthentication
 }
 export {
   TinaCredentialsProvider,
