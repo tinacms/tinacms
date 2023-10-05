@@ -61,6 +61,7 @@ function MakeNodeApiHandler({
     const allRoutes = {
       gql: {
         handler: async (...params) => {
+          const [req, res] = params
           if (req.method !== 'POST') {
             res.statusCode = 405
             res.write(JSON.stringify({ error: 'method not allowed' }))
