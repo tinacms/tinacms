@@ -150,7 +150,10 @@ const NextAuthAuthentication = ({
         })
       }
 
-      if (!session?.user?.name) {
+      if (!session?.user) {
+        return false
+      }
+      if ((session?.user as any).role !== 'user') {
         return false
       }
       return true
