@@ -1,5 +1,6 @@
 import { AuthProvider, LoginStrategy } from '@tinacms/schema-tools'
 import { authenticate, AUTH_TOKEN_KEY, TokenObject } from '../auth/authenticate'
+import DefaultSessionProvider from '../auth/defaultSessionProvider'
 
 export abstract class AbstractAuthProvider implements AuthProvider {
   /**
@@ -40,6 +41,10 @@ export abstract class AbstractAuthProvider implements AuthProvider {
 
   getLoginStrategy(): LoginStrategy {
     return 'Redirect'
+  }
+
+  getSessionProvider() {
+    return DefaultSessionProvider
   }
 
   abstract getToken()
