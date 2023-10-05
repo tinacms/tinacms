@@ -45,9 +45,6 @@ function MakeNodeApiHandler({
 }: BackendAuthentication & { databaseClient: DatabaseClient }) {
   const handler: NodeApiHandler = async (...params) => {
     const [req, res] = params
-    console.log({
-      url: req.url,
-    })
     // remove leading slash
     const url = req?.url?.startsWith('/') ? req.url.slice(1) : req.url
     const paths = url?.split('/')
