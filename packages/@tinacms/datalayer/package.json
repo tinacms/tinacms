@@ -22,7 +22,7 @@
         "bundle": []
       },
       {
-        "name": "src/next.ts",
+        "name": "src/node.ts",
         "target": "node"
       }
     ]
@@ -58,7 +58,6 @@
     "jest-diff": "^29.5.0",
     "jest-file-snapshot": "^0.5.0",
     "jest-matcher-utils": "^29.5.0",
-    "next": "12.2.4",
     "typescript": "4.3.5"
   }
 }
