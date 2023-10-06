@@ -1,7 +1,4 @@
-import {
-  TinaNodeBackend,
-  LocalBackendAuthentication,
-} from '@tinacms/datalayer/dist/node'
+import { TinaNodeBackend, LocalBackendAuthentication } from '@tinacms/datalayer'
 
 import { TinaAuthJSOptions, AuthJsBackendAuthentication } from 'tinacms-authjs'
 

@@ -1,7 +1,7 @@
 import NextAuth, { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { getServerSession } from 'next-auth/next'
-import type { BackendAuthentication } from '@tinacms/datalayer/dist/node'
+import type { BackendAuthentication } from '@tinacms/datalayer'
 
 const authenticate = async (
   databaseClient: any,

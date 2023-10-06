@@ -27,10 +27,6 @@
         "name": "src/index.ts",
         "target": "node",
         "bundle": []
-      },
-      {
-        "name": "src/node.ts",
-        "target": "node"
       }
     ]
   },
