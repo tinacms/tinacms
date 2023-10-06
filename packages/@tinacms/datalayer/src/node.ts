@@ -23,7 +23,7 @@ export interface BackendAuthentication {
   >
   extraRoutes?: {
     [key: string]: {
-      isAuthRequired?: boolean
+      secure?: boolean
       handler: (req: IncomingMessage, res: ServerResponse) => Promise<void>
     }
   }
@@ -71,7 +71,7 @@ function MakeNodeApiHandler({
       res.end()
       return
     }
-    const allRoutes = {
+    const allRoutes: BackendAuthentication['extraRoutes'] = {
       gql: {
         handler: async (...params) => {
           const [req, res] = params
@@ -137,8 +137,8 @@ function MakeNodeApiHandler({
       res.end()
       return
     }
-    const { handler, isAuthRequired } = currentRoute
-    if (isAuthRequired) {
+    const { handler, secure } = currentRoute
+    if (secure) {
       const isAuth = await isAuthorized(...params)
       if (isAuth.isAuthorized === false) {
         res.statusCode = isAuth.errorCode

@@ -122,7 +122,7 @@ const AuthJsBackendAuthentication = ({
     },
     extraRoutes: {
       auth: {
-        isAuthRequired: false,
+        secure: false,
         handler: async (req, res) => {
           // @ts-ignore
           const { routes } = req.query
