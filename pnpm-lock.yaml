@@ -1271,6 +1271,7 @@ importers:
 
   packages/tinacms-authjs:
     specifiers:
+      '@tinacms/datalayer': workspace:*
       '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
       next: 12.3.4
@@ -1281,13 +1282,14 @@ importers:
       typescript: 4.3.5
     dependencies:
       '@tinacms/schema-tools': link:../@tinacms/schema-tools
+    devDependencies:
+      '@tinacms/datalayer': link:../@tinacms/datalayer
+      '@tinacms/scripts': link:../@tinacms/scripts
       next: 12.3.4_biqbaboplfbrettd7655fr4n2y
       next-auth: 4.22.1_bhgafntz2ozm43l35i5qtimxry
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       tinacms: link:../tinacms
-    devDependencies:
-      '@tinacms/scripts': link:../@tinacms/scripts
       typescript: 4.3.5
 
   packages/tinacms-clerk:
@@ -8850,7 +8852,7 @@ packages:
       {
         integrity: sha512-H/69Lc5Q02dq3o+dxxy5O/oNxFsZpdL6WREtOOtOM1B/weonIwDXkekr1KV5DPVPr12IHFPrMrcJQ6bgPMfn7A==,
       }
-    dev: false
+    dev: true
 
   /@next/env/13.4.1:
     resolution:
@@ -8895,7 +8897,7 @@ packages:
     cpu: [arm]
     os: [android]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-android-arm64/12.2.4:
@@ -8918,7 +8920,7 @@ packages:
     cpu: [arm64]
     os: [android]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-darwin-arm64/12.2.4:
@@ -8941,7 +8943,7 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-darwin-arm64/13.4.1:
@@ -8988,7 +8990,7 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-darwin-x64/13.4.1:
@@ -9035,7 +9037,7 @@ packages:
     cpu: [x64]
     os: [freebsd]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-linux-arm-gnueabihf/12.2.4:
@@ -9058,7 +9060,7 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-linux-arm64-gnu/12.2.4:
@@ -9081,7 +9083,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-linux-arm64-gnu/13.4.1:
@@ -9128,7 +9130,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-linux-arm64-musl/13.4.1:
@@ -9175,7 +9177,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-linux-x64-gnu/13.4.1:
@@ -9222,7 +9224,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-linux-x64-musl/13.4.1:
@@ -9269,7 +9271,7 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-win32-arm64-msvc/13.4.1:
@@ -9316,7 +9318,7 @@ packages:
     cpu: [ia32]
     os: [win32]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-win32-ia32-msvc/13.4.1:
@@ -9363,7 +9365,7 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
-    dev: false
+    dev: true
     optional: true
 
   /@next/swc-win32-x64-msvc/13.4.1:
@@ -9574,7 +9576,6 @@ packages:
       {
         integrity: sha512-dhPeilub1NuIG0X5Kvhh9lH4iW3ZsHlnzwgwbOlgwQ2wG1IqFzsgHqmKPk3WzsdWAeaxKJxgM0+W433RmN45GA==,
       }
-    dev: false
 
   /@pkgr/utils/2.3.1:
     resolution:
@@ -11193,7 +11194,7 @@ packages:
       }
     dependencies:
       tslib: 2.5.0
-    dev: false
+    dev: true
 
   /@swc/helpers/0.4.3:
     resolution:
@@ -16797,7 +16798,6 @@ packages:
         integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==,
       }
     engines: { node: '>= 0.6' }
-    dev: false
 
   /copy-to-clipboard/3.3.3:
     resolution:
@@ -22475,7 +22475,6 @@ packages:
       {
         integrity: sha512-j8GhLiKmUAh+dsFXlX1aJCbt5KMibuKb+d7j1JaOJG6s2UjX1PQlW+OKB/sD4a/5ZYF4RcmYmLSndOoU3Lt/3g==,
       }
-    dev: false
 
   /jotai/1.7.5_react@17.0.2:
     resolution:
@@ -24775,7 +24774,7 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       uuid: 8.3.2
-    dev: false
+    dev: true
 
   /next-auth/4.22.1_m2l4knchnqa6bzxbbtfxlzoxdy:
     resolution:
@@ -24946,7 +24945,7 @@ packages:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
-    dev: false
+    dev: true
 
   /next/13.4.19_biqbaboplfbrettd7655fr4n2y:
     resolution:
@@ -25255,7 +25254,6 @@ packages:
       {
         integrity: sha512-a5ERWK1kh38ExDEfoO6qUHJb32rd7aYmPHuyCu3Fta/cnICvYmgd2uhuKXvPD+PXB+gCEYYEaQdIRAjCOwAKNA==,
       }
-    dev: false
 
   /object-assign/3.0.0:
     resolution:
@@ -25278,7 +25276,6 @@ packages:
         integrity: sha512-gScRMn0bS5fH+IuwyIFgnh9zBdo4DV+6GhygmWM9HyNJSgS0hScp1f5vjtm7oIIOiT9trXrShAkLFSc2IqKNgw==,
       }
     engines: { node: '>= 6' }
-    dev: false
 
   /object-hash/3.0.0:
     resolution:
@@ -25364,7 +25361,6 @@ packages:
         integrity: sha512-IF4PcGgzAr6XXSff26Sk/+P4KZFJVuHAJZj3wgO3vX2bMdNVp/QXTP3P7CEm9V1IdG8lDLY3HhiqpsE/nOwpPw==,
       }
     engines: { node: ^10.13.0 || >=12.0.0 }
-    dev: false
 
   /on-finished/2.4.1:
     resolution:
@@ -25414,7 +25410,6 @@ packages:
       lru-cache: 6.0.0
       object-hash: 2.2.0
       oidc-token-hash: 5.0.3
-    dev: false
 
   /optionator/0.8.3:
     resolution:
@@ -26238,14 +26233,12 @@ packages:
     dependencies:
       preact: 10.16.0
       pretty-format: 3.8.0
-    dev: false
 
   /preact/10.16.0:
     resolution:
       {
         integrity: sha512-XTSj3dJ4roKIC93pald6rWuB2qQJO9gO2iLLyTe87MrjQN+HklueLsmskbywEWqCHlclgz3/M4YLL2iBr9UmMA==,
       }
-    dev: false
 
   /prebuild-install/7.1.1:
     resolution:
@@ -26378,7 +26371,6 @@ packages:
       {
         integrity: sha512-WuxUnVtlWL1OfZFQFuqvnvs6MiAGk9UNsBostyBOB0Is9wb5uRESevA6rnl/rkksXaGX3GzZhPup5d6Vp1nFew==,
       }
-    dev: false
 
   /pretty-quick/3.1.3_prettier@2.8.4:
     resolution:
@@ -26841,7 +26833,6 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.0
-    dev: false
 
   /react-dropzone/14.2.3_react@17.0.2:
     resolution:
@@ -27130,7 +27121,6 @@ packages:
     engines: { node: '>=0.10.0' }
     dependencies:
       loose-envify: 1.4.0
-    dev: false
 
   /reactcss/1.2.3_react@17.0.2:
     resolution:
@@ -27855,7 +27845,6 @@ packages:
       }
     dependencies:
       loose-envify: 1.4.0
-    dev: false
 
   /scmp/2.1.0:
     resolution:
@@ -28830,7 +28819,7 @@ packages:
         optional: true
     dependencies:
       react: 18.2.0
-    dev: false
+    dev: true
 
   /styled-jsx/5.1.1_react@18.2.0:
     resolution:
@@ -30436,7 +30425,6 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       react: 18.2.0
-    dev: false
 
   /util-deprecate/1.0.2:
     resolution:

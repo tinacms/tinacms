@@ -226,7 +226,10 @@ export const buildIt = async (entryPoint, packageJSON) => {
         // the syntax for optional chaining, should be supported on 14
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
         target: 'node12',
-        outfile: path.join(process.cwd(), 'dist', 'index.js'),
+        // Use the outfile if it is provided
+        outfile: outInfo.outfile
+          ? path.join(process.cwd(), 'dist', `${outInfo.outfile}.js`)
+          : path.join(process.cwd(), 'dist', 'index.js'),
         external: external.filter(
           (item) =>
             !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
@@ -238,7 +241,9 @@ export const buildIt = async (entryPoint, packageJSON) => {
         platform: 'node',
         target: 'es2020',
         format: 'esm',
-        outfile: path.join(process.cwd(), 'dist', 'index.mjs'),
+        outfile: outInfo.outfile
+          ? path.join(process.cwd(), 'dist', `${outInfo.outfile}.mjs`)
+          : path.join(process.cwd(), 'dist', 'index.mjs'),
         external,
       })
     } else if (['@tinacms/mdx'].includes(packageJSON.name)) {

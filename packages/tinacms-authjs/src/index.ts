@@ -1,6 +1,7 @@
-import { AuthOptions } from 'next-auth'
+import NextAuth, { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { getServerSession } from 'next-auth/next'
+import type { BackendAuthentication } from '@tinacms/datalayer'
 
 const authenticate = async (
   databaseClient: any,
@@ -68,54 +69,6 @@ const TinaAuthJSOptions = ({
   ...overrides,
 })
 
-const createAuthJSApiRoute = (args?: {
-  authOptions: AuthOptions
-  disabled: boolean
-}) => {
-  return (handler: (req, res) => unknown | Promise<unknown>) => {
-    return withAuthJSApiRoute(handler, args)
-  }
-}
-
-const withAuthJSApiRoute = (
-  handler: (req, res) => unknown | Promise<unknown>,
-  opts?: { authOptions: AuthOptions; disabled: boolean }
-) => {
-  return async (req, res) => {
-    if (opts?.disabled) {
-      if (!req.session?.user?.name) {
-        Object.defineProperty(req, 'session', {
-          value: {
-            user: {
-              name: 'local',
-              role: 'user',
-            },
-          },
-          writable: false,
-        })
-      }
-    } else {
-      const session = await getServerSession(req, res, opts?.authOptions)
-      if (!req.session) {
-        Object.defineProperty(req, 'session', {
-          value: session,
-          writable: false,
-        })
-      }
-
-      if (!session?.user) {
-        return res.status(401).json({ error: 'Unauthorized' })
-      }
-
-      if ((session?.user as any).role !== 'user') {
-        return res.status(403).json({ error: 'Forbidden' })
-      }
-    }
-
-    return handler(req, res)
-  }
-}
-
 const TinaCredentialsProvider = ({
   databaseClient,
   name = 'Credentials',
@@ -133,10 +86,58 @@ const TinaCredentialsProvider = ({
       authenticate(databaseClient, credentials.username, credentials.password),
   })
 
+const AuthJsBackendAuthentication = ({
+  authOptions,
+}: {
+  authOptions: AuthOptions
+}) => {
+  const backendAuthentication: BackendAuthentication = {
+    isAuthorized: async (req, res) => {
+      // @ts-ignore
+      const session = await getServerSession(req, res, authOptions)
+
+      // @ts-ignore
+      if (!req.session) {
+        Object.defineProperty(req, 'session', {
+          value: session,
+          writable: false,
+        })
+      }
+
+      if (!session?.user) {
+        return {
+          errorCode: 401,
+          errorMessage: 'Unauthorized',
+          isAuthorized: false,
+        }
+      }
+      if ((session?.user as any).role !== 'user') {
+        return {
+          errorCode: 403,
+          errorMessage: 'Forbidden',
+          isAuthorized: false,
+        }
+      }
+      return { isAuthorized: true }
+    },
+    extraRoutes: {
+      auth: {
+        secure: false,
+        handler: async (req, res) => {
+          // @ts-ignore
+          const { routes } = req.query
+          const [, ...rest] = routes
+          // @ts-ignore
+          req.query.nextauth = rest
+          NextAuth(authOptions)(req, res)
+        },
+      },
+    },
+  }
+  return backendAuthentication
+}
 export {
   TinaCredentialsProvider,
   TinaAuthJSOptions,
-  withAuthJSApiRoute,
-  // TODO: This probably needs a better name?
-  createAuthJSApiRoute,
+  AuthJsBackendAuthentication,
 }

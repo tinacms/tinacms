@@ -23,15 +23,16 @@
     "run-self-script": "node bin/tinacms-authjs setup"
   },
   "dependencies": {
-    "@tinacms/schema-tools": "workspace:*",
+    "@tinacms/schema-tools": "workspace:*"
+  },
+  "devDependencies": {
+    "@tinacms/datalayer": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
     "next": "12.3.4",
     "next-auth": "4.22.1",
     "react": "^18",
     "react-dom": "^18",
-    "tinacms": "workspace:*"
-  },
-  "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
+    "tinacms": "workspace:*",
     "typescript": "4.3.5"
   },
   "peerDependencies": {
