@@ -134,15 +134,15 @@ const TinaCredentialsProvider = ({
       authenticate(databaseClient, credentials.username, credentials.password),
   })
 
-const NextAuthAuthentication = ({
-  nextAuthOptions,
+const AuthJsBackendAuthentication = ({
+  authOptions,
 }: {
-  nextAuthOptions: AuthOptions
+  authOptions: AuthOptions
 }) => {
   const nextBackendAuthentication: BackendAuthentication = {
     isAuthorized: async (req, res) => {
       // @ts-ignore
-      const session = await getServerSession(req, res, nextAuthOptions)
+      const session = await getServerSession(req, res, authOptions)
 
       // @ts-ignore
       if (!req.session) {
@@ -177,7 +177,7 @@ const NextAuthAuthentication = ({
           const [, ...rest] = routes
           // @ts-ignore
           req.query.nextauth = rest
-          NextAuth(nextAuthOptions)(req, res)
+          NextAuth(authOptions)(req, res)
         },
       },
     },
@@ -188,7 +188,7 @@ export {
   TinaCredentialsProvider,
   TinaAuthJSOptions,
   withAuthJSApiRoute,
-  NextAuthAuthentication,
+  AuthJsBackendAuthentication,
   // TODO: This probably needs a better name?
   createAuthJSApiRoute,
 }

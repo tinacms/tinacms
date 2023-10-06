@@ -28,7 +28,7 @@ export interface BackendAuthentication {
     }
   }
 }
-export const LocalAuthentication = () =>
+export const LocalBackendAuthentication = () =>
   ({
     isAuthorized: async () => ({ isAuthorized: true }),
   } as BackendAuthentication)

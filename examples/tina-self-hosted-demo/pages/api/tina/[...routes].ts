@@ -1,22 +1,27 @@
 import {
   TinaNodeBackend,
-  LocalAuthentication,
+  LocalBackendAuthentication,
 } from '@tinacms/datalayer/dist/node'
-import { TinaAuthJSOptions, NextAuthAuthentication } from 'tinacms-authjs'
+
+import { TinaAuthJSOptions, AuthJsBackendAuthentication } from 'tinacms-authjs'
 
 import databaseClient from '../../../tina/__generated__/databaseClient'
 
-export const nextAuthOptions = TinaAuthJSOptions({
-  databaseClient: databaseClient,
-  secret: process.env.NEXTAUTH_SECRET,
-})
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 
-const tinaNodeBackend = TinaNodeBackend({
+const handler = TinaNodeBackend({
   authentication: isLocal
-    ? LocalAuthentication()
-    : NextAuthAuthentication({ nextAuthOptions }),
+    ? LocalBackendAuthentication()
+    : AuthJsBackendAuthentication({
+        authOptions: TinaAuthJSOptions({
+          databaseClient: databaseClient,
+          secret: process.env.NEXTAUTH_SECRET,
+        }),
+      }),
   databaseClient,
 })
 
-export default tinaNodeBackend
+export default (req, res) => {
+  // Modify the request here if you need to
+  return handler(req, res)
+}
