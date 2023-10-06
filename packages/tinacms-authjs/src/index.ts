@@ -69,54 +69,6 @@ const TinaAuthJSOptions = ({
   ...overrides,
 })
 
-const createAuthJSApiRoute = (args?: {
-  authOptions: AuthOptions
-  disabled: boolean
-}) => {
-  return (handler: (req, res) => unknown | Promise<unknown>) => {
-    return withAuthJSApiRoute(handler, args)
-  }
-}
-
-const withAuthJSApiRoute = (
-  handler: (req, res) => unknown | Promise<unknown>,
-  opts?: { authOptions: AuthOptions; disabled: boolean }
-) => {
-  return async (req, res) => {
-    if (opts?.disabled) {
-      if (!req.session?.user?.name) {
-        Object.defineProperty(req, 'session', {
-          value: {
-            user: {
-              name: 'local',
-              role: 'user',
-            },
-          },
-          writable: false,
-        })
-      }
-    } else {
-      const session = await getServerSession(req, res, opts?.authOptions)
-      if (!req.session) {
-        Object.defineProperty(req, 'session', {
-          value: session,
-          writable: false,
-        })
-      }
-
-      if (!session?.user) {
-        return res.status(401).json({ error: 'Unauthorized' })
-      }
-
-      if ((session?.user as any).role !== 'user') {
-        return res.status(403).json({ error: 'Forbidden' })
-      }
-    }
-
-    return handler(req, res)
-  }
-}
-
 const TinaCredentialsProvider = ({
   databaseClient,
   name = 'Credentials',
@@ -139,7 +91,7 @@ const AuthJsBackendAuthentication = ({
 }: {
   authOptions: AuthOptions
 }) => {
-  const nextBackendAuthentication: BackendAuthentication = {
+  const backendAuthentication: BackendAuthentication = {
     isAuthorized: async (req, res) => {
       // @ts-ignore
       const session = await getServerSession(req, res, authOptions)
@@ -182,13 +134,10 @@ const AuthJsBackendAuthentication = ({
       },
     },
   }
-  return nextBackendAuthentication
+  return backendAuthentication
 }
 export {
   TinaCredentialsProvider,
   TinaAuthJSOptions,
-  withAuthJSApiRoute,
   AuthJsBackendAuthentication,
-  // TODO: This probably needs a better name?
-  createAuthJSApiRoute,
 }
