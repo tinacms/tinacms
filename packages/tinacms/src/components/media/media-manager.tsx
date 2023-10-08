@@ -45,6 +45,7 @@ export interface MediaRequest {
   onSelect?(media: Media): void
   close?(): void
   allowDelete?: boolean
+  namespace?: string
 }
 
 const StyledTab = styled.button<{ isActive: boolean }>`
@@ -110,6 +111,7 @@ export function MediaPicker({
   allowDelete,
   onSelect,
   close,
+  namespace,
   ...props
 }: MediaRequest) {
   const cms = useCMS()
