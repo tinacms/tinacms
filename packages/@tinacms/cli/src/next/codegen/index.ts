@@ -261,11 +261,9 @@ const maybeWarnFragmentSize = async (filepath: string) => {
     )
     console.log(
       `const schema = defineSchema({
-        config: {
-            client: {
-                referenceDepth: 1,
-            },
-        }
+          client: {
+              referenceDepth: 1,
+          },
         // ...
     })`
     )

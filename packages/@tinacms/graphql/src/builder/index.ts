@@ -498,6 +498,10 @@ export class Builder {
     depth: number
   ) => {
     const selections = []
+    selections.push({
+      name: { kind: 'Name', value: '__typename' },
+      kind: 'Field',
+    })
     if (collection.fields?.length > 0) {
       await sequential(collection.fields, async (x) => {
         const field = await this._buildFieldNodeForFragments(x, depth)

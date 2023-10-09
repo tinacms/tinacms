@@ -1,5 +1,16 @@
 # next-tinacms-cloudinary
 
+## 4.3.6
+
+### Patch Changes
+
+- 177002715: Fix/media thumbnail
+- Updated dependencies [177002715]
+- Updated dependencies [e69a3ef81]
+- Updated dependencies [c925786ef]
+- Updated dependencies [9f01550dd]
+  - tinacms@1.5.21
+
 ## 4.3.5
 
 ### Patch Changes
