@@ -129,7 +129,7 @@ const AuthJsBackendAuthentication = ({
           const [, ...rest] = routes
           // @ts-ignore
           req.query.nextauth = rest
-          NextAuth(authOptions)(req, res)
+          return NextAuth(authOptions)(req, res)
         },
       },
     },
