@@ -37,7 +37,7 @@
   },
   "peerDependencies": {
     "next": "^12.2.5 || ^13",
-    "next-auth": "^4.22.1",
+    "next-auth": "^4.23.2",
     "react": "^17.0.2 || ^18",
     "react-dom": "^17.0.2 || ^18",
     "tinacms": "workspace:*"
