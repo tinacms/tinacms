@@ -143,7 +143,8 @@ export function MediaPicker({
   const [currentTab, setCurrentTab] = useState(0)
   const offset = offsetHistory[offsetHistory.length - 1]
 
-  const localStorageKey = `Media-${currentTab}-${offset ?? 0}-${search}`
+  const localStorageKey = `Media-${namespace ??
+    'default'}-${currentTab}-${offset ?? 0}-${search}`
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
     if (!list.nextOffset) return
