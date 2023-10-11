@@ -45,23 +45,6 @@ export class TinaClient<GenQueries> {
     this.errorPolicy = errorPolicy || 'throw'
   }
 
-  // public async request<DataType extends Record<string, any> = any>(
-  //   args: Omit<TinaClientRequestArgs, 'errorPolicy'> & {
-  //     errorPolicy: 'throw'
-  //   }
-  // ): Promise<{
-  //   data: DataType
-  //   query: string
-  // }>
-  // public async request<DataType extends Record<string, any> = any>(
-  //   args: Omit<TinaClientRequestArgs, 'errorPolicy'> & {
-  //     errorPolicy: 'include'
-  //   }
-  // ): Promise<{
-  //   data: DataType
-  //   query: string
-  //   errors: GraphQLError[]
-  // }>
   public async request<DataType extends Record<string, any> = any>({
     errorPolicy,
     ...args
