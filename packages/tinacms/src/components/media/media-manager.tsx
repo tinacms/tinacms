@@ -197,12 +197,7 @@ export function MediaPicker({
 
   function refresh() {
     resetOffset()
-    const localStorageKey = `Media-${namespace ?? 'default'}-${currentTab}-${offset ?? 0}-${search}`
-    if (namespace) {
-      localStorage.removeItem(localStorageKey)
-    } else {
-      resetLocalStorage()
-    }
+    resetLocalStorage()
     loadMedia()
   }
 
