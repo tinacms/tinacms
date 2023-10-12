@@ -54,6 +54,7 @@ import {
 } from './level'
 import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
 import sha from 'js-sha1'
+import { NotFoundError } from '../error'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -204,7 +205,7 @@ export class Database {
         .get(normalizePath(filepath))
 
       if (!contentObject) {
-        throw new GraphQLError(`Unable to find record ${filepath}`)
+        throw new NotFoundError(`Unable to find record ${filepath}`)
       }
       return transformDocument(
         filepath,

@@ -13,6 +13,7 @@ import type { GraphQLResolveInfo } from 'graphql'
 import type { Database } from './database'
 import { NAMER } from './ast-builder'
 import { handleFetchErrorError } from './resolver/error'
+import { NotFoundError } from './error'
 
 export const resolve = async ({
   config,
@@ -368,12 +369,16 @@ export const resolve = async ({
     if (res.errors) {
       if (!silenceErrors) {
         res.errors.map((e) => {
-          console.error(e.toString())
+          if (e instanceof NotFoundError) {
+            // do nothing
+          } else {
+            console.error(e.toString())
 
-          if (verboseValue) {
-            console.error('More error context below')
-            console.error(e.message)
-            console.error(e)
+            if (verboseValue) {
+              console.error('More error context below')
+              console.error(e.message)
+              console.error(e)
+            }
           }
         })
       }
