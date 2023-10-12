@@ -35,9 +35,7 @@ export class SearchIndexer {
 
   private makeIndexerCallback(itemCallback: (item: any) => Promise<void>) {
     return async (collection: Collection<true>, contentPaths: string[]) => {
-      const templateInfo = await this.schema.getTemplatesForCollectable(
-        collection
-      )
+      const templateInfo = this.schema.getTemplatesForCollectable(collection)
       await sequential(contentPaths as string[], async (path) => {
         const data = await transformDocumentIntoPayload(
           `${collection.path}/${path}`,
