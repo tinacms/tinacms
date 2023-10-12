@@ -38,48 +38,8 @@ const components: Components<{
   }
 }> = {
   code_block: (props) => <Prism {...props} />,
-  Table: (props) => {
-    const firstRowHeader = props.firstRowHeader
-    const rows = firstRowHeader
-      ? props.rows.filter((item, i) => i !== 0)
-      : props.rows
-    const header = props.rows[0]
-    return (
-      <table className="min-w-full divide-y divide-gray-300">
-        {firstRowHeader && (
-          <thead>
-            <tr>
-              {header.cells.map((c) => {
-                return (
-                  <th
-                    scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
-                  >
-                    <TinaMarkdown content={c.cell} />
-                  </th>
-                )
-              })}
-            </tr>
-          </thead>
-        )}
-        <tbody className="divide-y divide-gray-200">
-          {rows.map((row, i) => {
-            return (
-              <tr key={i}>
-                {row.cells.map((c) => {
-                  return (
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                      <TinaMarkdown content={c.cell} />
-                    </td>
-                  )
-                })}
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    )
-  },
+  th: (props) => <th className="bg-gray-100 font-bold" {...props} />,
+  td: (props) => <td className="bg-gray-100" {...props} />,
   BlockQuote: (props: {
     children: TinaMarkdownContent
     authorName: string

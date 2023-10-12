@@ -74,6 +74,27 @@ export const blockElement = (
         value: content.value,
       }
     case 'mdxJsxFlowElement':
+      if (content.name === 'table') {
+        return {
+          type: 'table',
+          children: content.props.tableRows.map((tableRow) => {
+            const tr: Md.TableRow = {
+              type: 'tableRow',
+              children: tableRow.tableCells.map(({ tableCell }) => {
+                return {
+                  type: 'tableCell',
+                  children: eat(
+                    tableCell.children[0].children,
+                    field,
+                    imageCallback
+                  ),
+                }
+              }),
+            }
+            return tr
+          }),
+        }
+      }
       const { children, attributes, useDirective, directiveType } =
         stringifyProps(content, field, false, imageCallback)
       return {
