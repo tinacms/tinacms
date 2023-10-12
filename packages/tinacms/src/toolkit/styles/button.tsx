@@ -22,7 +22,7 @@ export const Button = ({
   disabled,
   rounded = 'full',
   children,
-  className,
+  className = '',
   ...props
 }: ButtonProps) => {
   const baseClasses =
