@@ -736,11 +736,11 @@ importers:
       mdast-util-compact: 4.1.1
       mdast-util-directive: 2.2.4
       mdast-util-from-markdown: 1.3.0
-      mdast-util-gfm: 2.0.1
+      mdast-util-gfm: 2.0.2
       mdast-util-mdx: 2.0.1
       mdast-util-mdx-jsx: 2.1.2
       mdast-util-to-markdown: 1.5.0
-      micromark-extension-gfm: 2.0.1
+      micromark-extension-gfm: 2.0.3
       micromark-factory-mdx-expression: 1.0.7
       micromark-factory-space: 1.0.0
       micromark-factory-whitespace: 1.0.0
@@ -773,11 +773,11 @@ importers:
       mdast-util-compact: 4.1.1
       mdast-util-directive: 2.2.4
       mdast-util-from-markdown: 1.3.0
-      mdast-util-gfm: 2.0.1
+      mdast-util-gfm: 2.0.2
       mdast-util-mdx: 2.0.1
       mdast-util-mdx-jsx: 2.1.2
       mdast-util-to-markdown: 1.5.0
-      micromark-extension-gfm: 2.0.1
+      micromark-extension-gfm: 2.0.3
       micromark-factory-mdx-expression: 1.0.7
       micromark-factory-space: 1.0.0
       micromark-factory-whitespace: 1.0.0
@@ -23170,10 +23170,10 @@ packages:
       - supports-color
     dev: false
 
-  /mdast-util-gfm/2.0.1:
+  /mdast-util-gfm/2.0.2:
     resolution:
       {
-        integrity: sha512-42yHBbfWIFisaAfV1eixlabbsa6q7vHeSPY+cg+BBjX51M8xhgMacqH9g6TftB/9+YkcI0ooV4ncfrJslzm/RQ==,
+        integrity: sha512-qvZ608nBppZ4icQlhQQIAdc6S3Ffj9RGmzwUKUWuEICFnd1LVkN3EktF7ZHAgfcEdvZB5owU9tQgt99e2TlLjg==,
       }
     dependencies:
       mdast-util-from-markdown: 1.3.0
@@ -23674,10 +23674,10 @@ packages:
       micromark-util-types: 1.0.2
     dev: false
 
-  /micromark-extension-gfm/2.0.1:
+  /micromark-extension-gfm/2.0.3:
     resolution:
       {
-        integrity: sha512-p2sGjajLa0iYiGQdT0oelahRYtMWvLjy8J9LOCxzIQsllMCGLbsLW+Nc+N4vi02jcRJvedVJ68cjelKIO6bpDA==,
+        integrity: sha512-vb9OoHqrhCmbRidQv/2+Bc6pkP0FrtlhurxZofvOEy5o8RtuuvTq+RQ1Vw5ZDNrVraQZu3HixESqbG+0iKk/MQ==,
       }
     dependencies:
       micromark-extension-gfm-autolink-literal: 1.0.5
