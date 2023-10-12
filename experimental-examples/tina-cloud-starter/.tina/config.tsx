@@ -5,8 +5,13 @@ import { heroBlockSchema } from '../components/blocks/hero'
 import { testimonialBlockSchema } from '../components/blocks/testimonial'
 import { ColorPickerInput } from '../components/fields/color'
 import { iconSchema } from '../components/util/icon'
+import { stringifyMDX } from '@tinacms/mdx'
 
 export const shouldEncode = (path: string, value: string) => {}
+
+const stringifyCell = (cell: any) => {
+  return stringifyMDX(cell, { name: 'body', type: 'rich-text' }, () => '')
+}
 
 const config = defineConfig({
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
@@ -86,6 +91,60 @@ const config = defineConfig({
             label: 'Body',
             name: '_body',
             templates: [
+              {
+                name: 'Table',
+                label: 'Table',
+                fields: [
+                  {
+                    name: 'firstRowHeader',
+                    label: 'First row is a header',
+                    type: 'boolean',
+                  },
+                  {
+                    name: 'rows',
+                    label: 'Rows',
+                    type: 'object',
+                    list: true,
+                    ui: {
+                      itemProps: (value) => {
+                        if (value?.cells) {
+                          if (Array.isArray(value.cells)) {
+                            return {
+                              label: value.cells
+                                .map((cellItem) => stringifyCell(cellItem.cell))
+                                .join(' | '),
+                            }
+                          }
+                        }
+                        return {}
+                      },
+                    },
+                    fields: [
+                      {
+                        name: 'cells',
+                        label: 'Cells',
+                        list: true,
+                        type: 'object',
+                        ui: {
+                          itemProps: (value) => {
+                            if (value) {
+                              if (value.cell) {
+                                return {
+                                  label: stringifyCell(value.cell)?.trim(),
+                                }
+                              }
+                            }
+                            return {}
+                          },
+                        },
+                        fields: [
+                          { label: 'Cell', name: 'cell', type: 'rich-text' },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
               {
                 name: 'DateTime',
                 label: 'Date & Time',
