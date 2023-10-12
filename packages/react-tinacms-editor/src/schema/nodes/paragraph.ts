@@ -23,7 +23,7 @@ export const paragraph = {
   content: 'inline*',
   marks: '_',
   attrs: {
-    class: { default: 'pm-align--left' },
+    class: { default: '' },
     id: { default: '' },
   },
   group: 'block',
