@@ -205,16 +205,19 @@ export const blockElement = (
       }
     case 'mdxJsxFlowElement':
       if (content.name === 'table') {
+        const table = content.props as {
+          tableRows: { tableCells: { tableCell: any }[] }[]
+        }
         return {
           type: 'table',
-          children: content.props.tableRows.map((tableRow) => {
+          children: table.tableRows.map((tableRow) => {
             const tr: Md.TableRow = {
               type: 'tableRow',
               children: tableRow.tableCells.map(({ tableCell }) => {
                 return {
                   type: 'tableCell',
                   children: eat(
-                    tableCell.children[0].children,
+                    tableCell?.children?.at(0)?.children || [],
                     field,
                     imageCallback
                   ),
