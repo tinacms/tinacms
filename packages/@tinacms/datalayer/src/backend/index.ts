@@ -8,6 +8,7 @@ type NodeApiHandler = (
 type DatabaseClient = any
 
 export interface BackendAuthentication {
+  initialize?: () => Promise<void>
   isAuthorized: (
     req: IncomingMessage,
     res: ServerResponse
@@ -42,7 +43,10 @@ export function TinaNodeBackend({
   authentication,
   databaseClient,
 }: TinaBackendOptions) {
-  const { isAuthorized, extraRoutes } = authentication
+  const { initialize, isAuthorized, extraRoutes } = authentication
+  initialize?.().catch((e) => {
+    console.error(e)
+  })
   const handler = MakeNodeApiHandler({
     isAuthorized,
     extraRoutes,

@@ -69,9 +69,11 @@ const TinaAuthJSOptions = ({
   ...overrides,
 })
 
+const TINA_CREDENTIALS_PROVIDER_NAME = 'TinaCredentials'
+
 const TinaCredentialsProvider = ({
   databaseClient,
-  name = 'Credentials',
+  name = TINA_CREDENTIALS_PROVIDER_NAME,
 }: {
   databaseClient: any // TODO can we type this?
   name?: string
@@ -92,6 +94,21 @@ const AuthJsBackendAuthentication = ({
   authOptions: AuthOptions
 }) => {
   const backendAuthentication: BackendAuthentication = {
+    initialize: async () => {
+      if (!authOptions.providers?.length) {
+        throw new Error('No authentication providers specified')
+      }
+      const [provider, ...rest] = authOptions.providers
+      if (
+        rest.length > 0 ||
+        provider.type !== 'credentials' ||
+        provider.name !== TINA_CREDENTIALS_PROVIDER_NAME
+      ) {
+        console.warn(
+          `Catch-all api route ['/api/tina/*'] with specified Auth.js provider ['${provider.name}'] not supported. See https://tina.io/docs/self-hosted/overview/#customprovider for more information.`
+        )
+      }
+    },
     isAuthorized: async (req, res) => {
       // @ts-ignore
       const session = await getServerSession(req, res, authOptions)
