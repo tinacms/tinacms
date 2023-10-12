@@ -105,7 +105,7 @@ const AuthJsBackendAuthentication = ({
         provider.name !== TINA_CREDENTIALS_PROVIDER_NAME
       ) {
         console.warn(
-          `Catch-all api route ['/api/tina/*'] with specified Auth.js provider ['${provider.name}'] not supported. See https://tina.io/docs/self-hosted/overview/#customprovider for more information.`
+          `WARNING: Catch-all api route ['/api/tina/*'] with specified Auth.js provider ['${provider.name}'] not supported. See https://tina.io/docs/self-hosted/overview/#customprovider for more information.`
         )
       }
     },
