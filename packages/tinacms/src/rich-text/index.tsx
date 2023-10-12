@@ -33,6 +33,8 @@ type BaseComponents = {
   html_inline?: { value: string }
   th?: { children: JSX.Element }
   td?: { children: JSX.Element }
+  tr?: { children: JSX.Element }
+  table?: { children: JSX.Element }
   // Provide a fallback when a JSX component wasn't provided
   component_missing?: { name: string }
 }
@@ -331,13 +333,17 @@ const Node = ({ components, child }) => {
               ? child.props?.tableRows.filter((_, i) => i !== 0)
               : child.props?.tableRows) || []
           const header = child.props?.tableRows?.at(0)
+          const TableComponent =
+            components['table'] || ((props) => <table {...props} />)
+          const TrComponent = components['tr'] || ((props) => <tr {...props} />)
+          const ThComponent = components['th'] || ((props) => <th {...props} />)
+          const TdComponent = components['td'] || ((props) => <td {...props} />)
           return (
-            <table>
+            <TableComponent>
               {firstRowHeader && (
                 <thead>
-                  <tr>
+                  <TrComponent>
                     {header.tableCells.map((c, i) => {
-                      const ThComponent = components['th']
                       return (
                         <TinaMarkdown
                           key={i}
@@ -354,15 +360,14 @@ const Node = ({ components, child }) => {
                         />
                       )
                     })}
-                  </tr>
+                  </TrComponent>
                 </thead>
               )}
               <tbody>
                 {rows.map((row, i) => {
                   return (
-                    <tr key={i}>
+                    <TrComponent key={i}>
                       {row?.tableCells?.map((c, i) => {
-                        const TdComponent = components['td']
                         return (
                           <TinaMarkdown
                             key={i}
@@ -379,11 +384,11 @@ const Node = ({ components, child }) => {
                           />
                         )
                       })}
-                    </tr>
+                    </TrComponent>
                   )
                 })}
               </tbody>
-            </table>
+            </TableComponent>
           )
         }
         const ComponentMissing = components['component_missing']
