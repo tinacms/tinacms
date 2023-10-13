@@ -90,7 +90,7 @@ export const processDocumentForIndexing = (
     data['_id'] = `${collection.name}:${relPath}`
     data['_relativePath'] = relPath
   }
-  for (const f of collection.fields || field?.fields || []) {
+  for (const f of field?.fields || collection.fields || []) {
     if (!f.searchable) {
       delete data[f.name]
       continue
