@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-alerts",
-  "version": "0.44.313",
+  "version": "0.44.314",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -25,8 +25,8 @@
     "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-core": "^0.44.313",
-    "@einsteinindustries/tinacms-scripts": "^0.44.311"
+    "@einsteinindustries/tinacms-core": "^0.44.314",
+    "@einsteinindustries/tinacms-scripts": "^0.44.314"
   },
   "peerDependencies": {
     "@einsteinindustries/tinacms-core": ">=0.7"
