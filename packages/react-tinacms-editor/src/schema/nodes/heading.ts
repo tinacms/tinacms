@@ -22,7 +22,7 @@ import { getAttrsWith, docAttrs, domAttrs } from './utils'
 export const heading = {
   attrs: {
     level: { default: 1 },
-    class: { default: 'pm-align--left' },
+    class: { default: '' },
     id: { default: '' },
   },
   content: 'inline*',
