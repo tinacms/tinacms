@@ -70,7 +70,7 @@ export class GenericSdkVisitor extends ClientSideBaseVisitor<
         documentVariableName,
         operationType,
         // This is the only line that is different
-        operationResultType: `{data: ${operationResultType}, variables: ${operationVariablesTypes}, query: string}`,
+        operationResultType: `{data: ${operationResultType}, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: ${operationVariablesTypes}, query: string}`,
         operationVariablesTypes,
       })
     }

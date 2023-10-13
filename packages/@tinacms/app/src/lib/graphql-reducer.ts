@@ -271,14 +271,12 @@ export const useGraphQLReducer = (
             }
           })
           let value = source[fieldName] as unknown
-          if (!value) {
-            aliases.forEach((alias) => {
-              const aliasValue = source[alias]
-              if (aliasValue) {
-                value = aliasValue
-              }
-            })
-          }
+          aliases.forEach((alias) => {
+            const aliasValue = source[alias]
+            if (aliasValue) {
+              value = aliasValue
+            }
+          })
           if (fieldName === '_sys') {
             return source._internalSys
           }

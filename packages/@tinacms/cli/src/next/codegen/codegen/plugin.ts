@@ -33,7 +33,7 @@ const generateRequester = (
       url,
     })
 
-    return { data: data?.data, query: doc, variables: vars || {} }
+    return { data: data?.data, errors: data?.errors, query: doc, variables: vars || {} }
   }
 
   return requester
