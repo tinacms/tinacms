@@ -68,6 +68,39 @@ export default defineConfig({
   schema: {
     collections: [
       {
+        name: 'yaml_test',
+        path: 'content/yaml-folder',
+        fields: [
+          {
+            type: 'string',
+            label: 'Title',
+            name: 'title',
+          },
+        ],
+      },
+      {
+        name: 'json_test',
+        path: 'content/json-folder',
+        fields: [
+          {
+            type: 'string',
+            label: 'Title',
+            name: 'title',
+          },
+        ],
+      },
+      {
+        name: 'md_test',
+        path: 'content/md-folder',
+        fields: [
+          {
+            type: 'string',
+            label: 'Title',
+            name: 'title',
+          },
+        ],
+      },
+      {
         ui: {
           filename: {
             slugify: (values, meta) => {
