@@ -193,13 +193,13 @@ export const askTinaCloudSetup = async () => {
   return answers as { clientId?: string; token?: string }
 }
 
-interface importStatement {
+export interface ImportStatement {
   imported: string[]
   from: string
 }
-interface PromptGitProvider {
+export interface PromptGitProvider {
   gitProviderClassText: string
-  imports?: importStatement[]
+  imports?: ImportStatement[]
 }
 
 const supportedGitProviders: {
@@ -260,9 +260,9 @@ export const chooseGitProvider = async ({ config }: { config: Config }) => {
   return supportedGitProviders.github
 }
 
-interface PromptDatabaseAdapter {
+export interface PromptDatabaseAdapter {
   databaseAdapterClassText: string
-  imports?: importStatement[]
+  imports?: ImportStatement[]
 }
 const supportedDatabaseAdapters: {
   'upstash-redis': PromptDatabaseAdapter
@@ -380,13 +380,13 @@ export const chooseDatabaseAdapter = async ({
   return supportedDatabaseAdapters[chosen]
 }
 
-interface PromptAuthenticationProvider {
+export interface PromptAuthenticationProvider {
   // For tina/config file
   configAuthenticationClass?: string
-  configImports?: importStatement[]
+  configImports?: ImportStatement[]
   // for /api/tina/[...routes] file
   backendAuthentication?: string
-  backendAuthenticationImports?: importStatement[]
+  backendAuthenticationImports?: ImportStatement[]
 }
 
 export const supportedAuthenticationProviders: {
@@ -476,6 +476,7 @@ export const chooseAuthenticationProvider = async ({
     {
       name: 'authProvider',
       type: 'select',
+      message: 'Which authentication provider are you using?',
       choices,
     },
   ])
@@ -492,4 +493,15 @@ export const chooseAuthenticationProvider = async ({
   })
 
   return authProvider
+}
+
+export const makeImportString = (imports?: ImportStatement[]) => {
+  if (!imports) {
+    return ''
+  }
+  return imports
+    .map((x) => {
+      return `import { ${x.from} } from '${x.imported}'`
+    })
+    .join('\n')
 }

@@ -24,7 +24,8 @@ import {
   ConfigTemplateOptions,
   ConfigTemplateVariables,
 } from './templates/config'
-import { templates as DatabaseTemplates } from './templates/database'
+import { databaseTemplate } from './templates/database'
+import { nextApiRouteTemplate } from './templates/tinaNextRoute'
 import {
   templates as GQLTemplates,
   Variables as GQLTemplateVariables,
@@ -40,6 +41,7 @@ import {
   InitParams,
   ReactiveFramework,
 } from './index'
+import { Config } from './prompts'
 
 async function apply({
   env,
@@ -48,7 +50,7 @@ async function apply({
 }: {
   env: InitEnvironment
   params: InitParams
-  config: Record<any, any>
+  config: Config
 }) {
   if (config.framework.name === 'other' && config.hosting === 'self-host') {
     logger.error(
@@ -62,11 +64,6 @@ async function apply({
   let collections: string | null | undefined
   let templateCode: string | null | undefined
   let extraText: string | null | undefined
-
-  if (env.nextAppDir && config.framework.name === 'next') {
-    // instead of causing an error lets not generate an example
-    config.framework.name = 'other'
-  }
 
   let isForestryMigration = false
   if (env.forestryConfigExists) {
@@ -114,6 +111,7 @@ async function apply({
     }
   }
 
+  // if we are migrating forestry files add the tina/template file
   if (isForestryMigration && !env.tinaConfigExists) {
     await addTemplateFile({
       generatedFile: env.generatedFiles['templates'],
@@ -124,51 +122,25 @@ async function apply({
   const usingDataLayer = config.hosting === 'self-host'
 
   if (usingDataLayer) {
+    // add tina/database file
     await addDatabaseFile({
       config,
       generatedFile: env.generatedFiles['database'],
     })
-    await addGqlApiHandler({
+    // add pages/api/tina/[...routes].ts file
+    await addNextApiRoute({
       config,
       generatedFile: env.generatedFiles['gql-api-handler'],
     })
   }
 
-  if (config.nextAuthProvider) {
-    await addAuthFile({
-      config,
-      generatedFile: env.generatedFiles['auth'],
-    })
-
-    await addNextAuthApiHandler({
-      config,
-      generatedFile: env.generatedFiles['next-auth-api-handler'],
-      content: NextTemplates['next-auth-api-handler'](),
-    })
-
-    if (config.nextAuthProvider === 'vercel-kv-credentials-provider') {
-      await addVercelKVCredentialsProviderFiles({
-        generatedSignin:
-          env.generatedFiles['vercel-kv-credentials-provider-signin'],
-        generatedRegister:
-          env.generatedFiles['vercel-kv-credentials-provider-register'],
-        generatedTailwindCSS:
-          env.generatedFiles['vercel-kv-credentials-provider-tailwindcss'],
-        generatedRegisterApiHandler:
-          env.generatedFiles[
-            'vercel-kv-credentials-provider-register-api-handler'
-          ],
-        generatedTinaSVG: env.generatedFiles['tina.svg'],
-        config,
-      })
-    }
-  }
-
+  // add NextJS Demo file (First time init only)
   if (!env.forestryConfigExists && !env.tinaConfigExists) {
     // add /content/posts/hello-world.md
     await addContentFile({ config, env })
   }
 
+  // add nextJs example code
   if (config.framework.reactive && addReactiveFile[config.framework.name]) {
     await addReactiveFile[config.framework.name as ReactiveFramework]({
       baseDir,
@@ -179,7 +151,7 @@ async function apply({
     })
   }
 
-  await addDependencies(config, env, params)
+  // await addDependencies(config, env, params)
 
   if (!env.tinaConfigExists) {
     // add tina/config.{js,ts}]
@@ -478,20 +450,65 @@ const addDatabaseFile = async ({
   config,
   generatedFile,
 }: {
-  config: Record<any, any>
+  config: Config
   generatedFile: GeneratedFile
 }) => {
-  const { isLocalEnvVarName } = config
   await writeGeneratedFile({
     generatedFile,
-    overwrite: config.typescript
-      ? config.overwriteDatabaseTS
-      : config.overwriteDatabaseJS,
-    content: DatabaseTemplates[config.dataLayerAdapter]({ isLocalEnvVarName }),
+    // TODO: Figure out how to handle overwriting
+    overwrite: true,
+    // overwrite: config.typescript
+    //   ? config.overwriteDatabaseTS
+    //   : config.overwriteDatabaseJS,
+    content: databaseTemplate({ config }),
+    typescript: config.typescript,
+  })
+}
+const addNextApiRoute = async ({
+  config,
+  generatedFile,
+}: {
+  config: Config
+  generatedFile: GeneratedFile
+}) => {
+  await writeGeneratedFile({
+    generatedFile,
+    // TODO: Figure out how to handle overwriting
+    overwrite: true,
+    // overwrite: config.typescript
+    //   ? config.overwriteDatabaseTS
+    //   : config.overwriteDatabaseJS,
+    content: nextApiRouteTemplate({ config }),
     typescript: config.typescript,
   })
 }
 
+const addTinaBackendApiRoute = async ({
+  config,
+  generatedFile,
+}: {
+  config: Record<any, any>
+  generatedFile: GeneratedFile
+}) => {
+  let vars: GQLTemplateVariables = {
+    isLocalEnvVarName: config.isLocalEnvVarName,
+    typescript: config.typescript,
+  }
+  let content = GQLTemplates['custom'](vars)
+  if (config.nextAuth) {
+    content = GQLTemplates['tinacms-next-auth'](vars)
+  } else if (config.clientId || config.token) {
+    content = GQLTemplates['tina-cloud'](vars)
+  }
+  await writeGeneratedFile({
+    generatedFile,
+    overwrite: config.typescript
+      ? config.overwriteGqlApiHandlerTS
+      : config.overwriteGqlApiHandlerJS,
+    content,
+    typescript: config.typescript,
+  })
+}
 const addGqlApiHandler = async ({
   config,
   generatedFile,
