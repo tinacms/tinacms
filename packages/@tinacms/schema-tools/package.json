@@ -52,6 +52,6 @@
   "dependencies": {
     "picomatch-browser": "2.2.6",
     "url-pattern": "^1.0.3",
-    "zod": "^3.14.3"
+    "zod": "^3.22.3"
   }
 }

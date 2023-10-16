@@ -27,6 +27,6 @@
     "tailwindcss": "^3.2.7",
     "tinacms": "workspace:*",
     "typescript": "^4.6.4",
-    "zod": "^3.14.3"
+    "zod": "^3.22.3"
   }
 }

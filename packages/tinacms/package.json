@@ -115,7 +115,7 @@
     "slate-react": "^0.97.1",
     "webfontloader": "1.6.28",
     "yup": "^0.32.0",
-    "zod": "^3.14.3"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@graphql-tools/utils": "^8.6.1",
