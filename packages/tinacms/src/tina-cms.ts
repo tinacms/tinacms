@@ -16,6 +16,7 @@
 
  */
 
+
 import { CMS, CMSConfig, PluginType } from '@einsteinindustries/tinacms-core'
 import { FieldPlugin } from '@einsteinindustries/tinacms-form-builder'
 import { ScreenPlugin } from '@einsteinindustries/tinacms-react-screens'

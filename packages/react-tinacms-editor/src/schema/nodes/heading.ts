@@ -16,6 +16,7 @@ limitations under the License.
 
 */
 
+
 import { Node } from 'prosemirror-model'
 import { getAttrsWith, docAttrs, domAttrs } from './utils'
 
