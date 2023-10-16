@@ -90,7 +90,7 @@ export class TinaClient<GenQueries> {
     }
     return {
       data: json?.data as DataType,
-      errors: json?.errors as GraphQLError[] | undefined,
+      errors: (json?.errors || null) as GraphQLError[] | null,
       query: args.query,
     }
   }
