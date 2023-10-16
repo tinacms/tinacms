@@ -17,7 +17,7 @@ const branch = (process.env.GITHUB_BRANCH ||
   process.env.HEAD ||
   "main")
 
-const isLocal = ${config.isLocalEnvVarName} === 'true'
+const isLocal =  process.env.${config.isLocalEnvVarName} === 'true'
 
 export default isLocal
   ? createLocalDatabase()
