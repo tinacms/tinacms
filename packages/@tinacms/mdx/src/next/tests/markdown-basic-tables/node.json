@@ -1,0 +1,127 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "name": "table",
+      "props": {
+        "tableRows": [
+          {
+            "tableCells": [
+              {
+                "tableCell": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Syntax"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "tableCell": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Description"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "tableCells": [
+              {
+                "tableCell": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Header"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "tableCell": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Title"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "tableCells": [
+              {
+                "tableCell": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Paragraph"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "tableCell": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Text"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

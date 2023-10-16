@@ -31,6 +31,10 @@ type BaseComponents = {
   maybe_mdx?: { children: JSX.Element }
   html?: { value: string }
   html_inline?: { value: string }
+  th?: { children: JSX.Element }
+  td?: { children: JSX.Element }
+  tr?: { children: JSX.Element }
+  table?: { children: JSX.Element }
   // Provide a fallback when a JSX component wasn't provided
   component_missing?: { name: string }
 }
@@ -322,6 +326,71 @@ const Node = ({ components, child }) => {
         const props = child.props ? child.props : {}
         return <Component {...props} />
       } else {
+        if (child.name === 'table') {
+          const firstRowHeader = child.props?.firstRowHeader
+          const rows =
+            (firstRowHeader
+              ? child.props?.tableRows.filter((_, i) => i !== 0)
+              : child.props?.tableRows) || []
+          const header = child.props?.tableRows?.at(0)
+          const TableComponent =
+            components['table'] || ((props) => <table {...props} />)
+          const TrComponent = components['tr'] || ((props) => <tr {...props} />)
+          const ThComponent = components['th'] || ((props) => <th {...props} />)
+          const TdComponent = components['td'] || ((props) => <td {...props} />)
+          return (
+            <TableComponent>
+              {firstRowHeader && (
+                <thead>
+                  <TrComponent>
+                    {header.tableCells.map((c, i) => {
+                      return (
+                        <TinaMarkdown
+                          key={i}
+                          components={{
+                            p: (props) => {
+                              if (ThComponent) {
+                                return <ThComponent {...props} />
+                              } else {
+                                return <th {...props} />
+                              }
+                            },
+                          }}
+                          content={c.tableCell}
+                        />
+                      )
+                    })}
+                  </TrComponent>
+                </thead>
+              )}
+              <tbody>
+                {rows.map((row, i) => {
+                  return (
+                    <TrComponent key={i}>
+                      {row?.tableCells?.map((c, i) => {
+                        return (
+                          <TinaMarkdown
+                            key={i}
+                            components={{
+                              p: (props) => {
+                                if (TdComponent) {
+                                  return <TdComponent {...props} />
+                                } else {
+                                  return <td {...props} />
+                                }
+                              },
+                            }}
+                            content={c.tableCell}
+                          />
+                        )
+                      })}
+                    </TrComponent>
+                  )
+                })}
+              </tbody>
+            </TableComponent>
+          )
+        }
         const ComponentMissing = components['component_missing']
         if (ComponentMissing) {
           // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types

@@ -1,4 +1,4 @@
-import { defineConfig } from 'tinacms'
+import { defineConfig, tinaTableTemplate } from 'tinacms'
 import { contentBlockSchema } from '../components/blocks/content'
 import { featureBlockSchema } from '../components/blocks/features'
 import { heroBlockSchema } from '../components/blocks/hero'
@@ -86,6 +86,7 @@ const config = defineConfig({
             label: 'Body',
             name: '_body',
             templates: [
+              tinaTableTemplate,
               {
                 name: 'DateTime',
                 label: 'Date & Time',

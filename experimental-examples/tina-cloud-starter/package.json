@@ -29,6 +29,7 @@
   "dependencies": {
     "@headlessui/react": "1.7.5",
     "@tailwindcss/typography": "^0.5.8",
+    "@tinacms/mdx": "workspace:*",
     "@tinacms/vercel-previews": "workspace:*",
     "date-fns": "^2.23.0",
     "graphql": "15.8.0",
