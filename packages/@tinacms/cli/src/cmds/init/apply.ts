@@ -14,11 +14,7 @@ import {
 import { Telemetry } from '@tinacms/metrics'
 import fs from 'fs-extra'
 import { writeGitignore } from '../../next/commands/codemod-command'
-import { templates as AssetsTemplates } from './templates/assets'
-import {
-  templates as AuthTemplates,
-  Variables as AuthTemplateVariables,
-} from './templates/auth'
+import { templates as NextTemplates } from './templates/next'
 import {
   configExamples,
   ConfigTemplateOptions,
@@ -26,11 +22,6 @@ import {
 } from './templates/config'
 import { databaseTemplate } from './templates/database'
 import { nextApiRouteTemplate } from './templates/tinaNextRoute'
-import {
-  templates as GQLTemplates,
-  Variables as GQLTemplateVariables,
-} from './templates/gql'
-import { templates as NextTemplates } from './templates/next'
 import { helloWorldPost } from './templates/content'
 import { format } from 'prettier'
 import { extendNextScripts } from '../../utils/script-helpers'
@@ -151,7 +142,7 @@ async function apply({
     })
   }
 
-  // await addDependencies(config, env, params)
+  await addDependencies(config, env, params)
 
   if (!env.tinaConfigExists) {
     // add tina/config.{js,ts}]
@@ -168,7 +159,7 @@ async function apply({
         nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
       },
       templateOptions: {
-        nextAuth: config.nextAuth,
+        nextAuth: config.authenticationProvider?.name === 'next-auth',
         isForestryMigration,
         selfHosted: usingDataLayer,
         dataLayer: usingDataLayer,
@@ -180,7 +171,7 @@ async function apply({
     })
   } else if (
     params.isBackendInit &&
-    config.nextAuth &&
+    config.authenticationProvider.name !== 'tina-cloud' &&
     config.hosting === 'self-host'
   ) {
     // if we are doing a backend init we should print out what they need to add to the config
@@ -425,27 +416,6 @@ const addConfigFile = async ({
   }
 }
 
-const addAuthFile = async ({
-  config,
-  generatedFile,
-}: {
-  config: Record<any, any>
-  generatedFile: GeneratedFile
-}) => {
-  const { nextAuthProvider, nextAuthCredentialsProviderName } = config
-  const templateVariables = {
-    nextAuthCredentialsProviderName,
-  }
-  await writeGeneratedFile({
-    generatedFile,
-    overwrite: config.typescript
-      ? config.overwriteAuthTS
-      : config.overwriteAuthJS,
-    content: authContent(nextAuthProvider, templateVariables),
-    typescript: config.typescript,
-  })
-}
-
 const addDatabaseFile = async ({
   config,
   generatedFile,
@@ -479,59 +449,6 @@ const addNextApiRoute = async ({
     //   ? config.overwriteDatabaseTS
     //   : config.overwriteDatabaseJS,
     content: nextApiRouteTemplate({ config }),
-    typescript: config.typescript,
-  })
-}
-
-const addTinaBackendApiRoute = async ({
-  config,
-  generatedFile,
-}: {
-  config: Record<any, any>
-  generatedFile: GeneratedFile
-}) => {
-  let vars: GQLTemplateVariables = {
-    isLocalEnvVarName: config.isLocalEnvVarName,
-    typescript: config.typescript,
-  }
-  let content = GQLTemplates['custom'](vars)
-  if (config.nextAuth) {
-    content = GQLTemplates['tinacms-next-auth'](vars)
-  } else if (config.clientId || config.token) {
-    content = GQLTemplates['tina-cloud'](vars)
-  }
-  await writeGeneratedFile({
-    generatedFile,
-    overwrite: config.typescript
-      ? config.overwriteGqlApiHandlerTS
-      : config.overwriteGqlApiHandlerJS,
-    content,
-    typescript: config.typescript,
-  })
-}
-const addGqlApiHandler = async ({
-  config,
-  generatedFile,
-}: {
-  config: Record<any, any>
-  generatedFile: GeneratedFile
-}) => {
-  let vars: GQLTemplateVariables = {
-    isLocalEnvVarName: config.isLocalEnvVarName,
-    typescript: config.typescript,
-  }
-  let content = GQLTemplates['custom'](vars)
-  if (config.nextAuth) {
-    content = GQLTemplates['tinacms-next-auth'](vars)
-  } else if (config.clientId || config.token) {
-    content = GQLTemplates['tina-cloud'](vars)
-  }
-  await writeGeneratedFile({
-    generatedFile,
-    overwrite: config.typescript
-      ? config.overwriteGqlApiHandlerTS
-      : config.overwriteGqlApiHandlerJS,
-    content,
     typescript: config.typescript,
   })
 }
@@ -656,12 +573,6 @@ const configContent = (
   })
 }
 
-const authContent = (authType: string, vars: AuthTemplateVariables) => {
-  return format(AuthTemplates[authType](vars), {
-    parser: 'babel',
-  })
-}
-
 type AddReactiveParams = {
   baseDir: string
   config: Record<any, any>
@@ -711,83 +622,6 @@ const addReactiveFile: {
     )
     fs.writeFileSync(packageJsonPath, updatedPackageJson)
   },
-}
-
-async function addNextAuthApiHandler({
-  generatedFile,
-  config,
-  content,
-}: {
-  generatedFile: GeneratedFile
-  config: Record<any, any>
-  content: string
-}) {
-  await writeGeneratedFile({
-    generatedFile,
-    typescript: config.typescript,
-    overwrite: config.typescript
-      ? config.overwriteNextAuthApiHandlerTS
-      : config.overwriteNextAuthApiHandlerJS,
-    content,
-  })
-}
-
-const addVercelKVCredentialsProviderFiles = async ({
-  generatedSignin,
-  generatedRegister,
-  generatedTailwindCSS,
-  generatedRegisterApiHandler,
-  generatedTinaSVG,
-  config,
-}: {
-  generatedSignin: GeneratedFile
-  generatedRegister: GeneratedFile
-  generatedTailwindCSS: GeneratedFile
-  generatedRegisterApiHandler: GeneratedFile
-  generatedTinaSVG: GeneratedFile
-  config: Record<any, any>
-}) => {
-  await writeGeneratedFile({
-    generatedFile: generatedSignin,
-    overwrite: config.typescript
-      ? config.overwriteVercelKVCredentialsProviderSigninTS
-      : config.overwriteVercelKVCredentialsProviderSigninJS,
-    content: NextTemplates['vercel-kv-credentials-provider-signin'](),
-    typescript: config.typescript,
-  })
-  await writeGeneratedFile({
-    generatedFile: generatedRegister,
-    overwrite: config.typescript
-      ? config.overwriteVercelKVCredentialsProviderRegisterTS
-      : config.overwriteVercelKVCredentialsProviderRegisterJS,
-    content: NextTemplates['vercel-kv-credentials-provider-register']({
-      nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
-    }),
-    typescript: config.typescript,
-  })
-  await writeGeneratedFile({
-    generatedFile: generatedTailwindCSS,
-    overwrite: config.typescript
-      ? config.overwriteVercelKVCredentialsProviderTailwindCSSTS
-      : config.overwriteVercelKVCredentialsProviderTailwindCSSJS,
-    content: NextTemplates['vercel-kv-credentials-provider-tailwindcss'](),
-    typescript: config.typescript,
-  })
-  await writeGeneratedFile({
-    generatedFile: generatedRegisterApiHandler,
-    overwrite: config.typescript
-      ? config.overwriteVercelKVCredentialsProviderRegisterApiHandlerTS
-      : config.overwriteVercelKVCredentialsProviderRegisterApiHandlerJS,
-    content:
-      NextTemplates['vercel-kv-credentials-provider-register-api-handler'](),
-    typescript: config.typescript,
-  })
-  await writeGeneratedFile({
-    generatedFile: generatedTinaSVG,
-    overwrite: true,
-    content: AssetsTemplates['tina.svg'](),
-    typescript: config.typescript,
-  })
 }
 
 /**

@@ -381,6 +381,7 @@ export const chooseDatabaseAdapter = async ({
 }
 
 export interface PromptAuthenticationProvider {
+  name: string
   // For tina/config file
   configAuthenticationClass?: string
   configImports?: ImportStatement[]
@@ -394,12 +395,16 @@ export const supportedAuthenticationProviders: {
   'next-auth': PromptAuthenticationProvider
   other: PromptAuthenticationProvider
 } = {
-  other: {},
+  other: {
+    name: 'other',
+  },
   'tina-cloud': {
     configAuthenticationClass: '',
     backendAuthentication: 'TODO',
+    name: 'tina-cloud',
   },
   'next-auth': {
+    name: 'next-auth',
     configAuthenticationClass: `new UsernamePasswordAuthJSProvider()`,
     configImports: [
       {

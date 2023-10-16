@@ -256,7 +256,9 @@ async function configure(
       config: config,
     })
     config.typescript = typescript
-    config.publicFolder = publicFolder
+    if (publicFolder) {
+      config.publicFolder = publicFolder
+    }
   }
 
   if (env.forestryConfigExists) {
