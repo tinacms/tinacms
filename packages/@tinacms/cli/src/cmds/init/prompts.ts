@@ -215,7 +215,7 @@ const supportedGitProviders: {
         owner: process.env.GITHUB_OWNER,
         repo: process.env.GITHUB_REPO,
         token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-      }),`,
+      })`,
   },
   other: {
     gitProviderClassText: '',
@@ -270,12 +270,14 @@ const supportedDatabaseAdapters: {
   other: PromptDatabaseAdapter
 } = {
   ['upstash-redis']: {
-    databaseAdapterClassText: `new Redis({
-            url: process.env.KV_REST_API_URL || 'http://localhost:8079',
-            token: process.env.KV_REST_API_TOKEN || 'example_token',
-          }),
-          debug: process.env.DEBUG === 'true' || false,
-        }),`,
+    databaseAdapterClassText: `new RedisLevel({
+      namespace: branch,
+      redis: new Redis({
+        url: process.env.KV_REST_API_URL || 'http://localhost:8079',
+        token: process.env.KV_REST_API_TOKEN || 'example_token',
+      }),
+      debug: process.env.DEBUG === 'true' || false,
+    })`,
     imports: [
       {
         imported: ['RedisLevel'],
@@ -506,7 +508,7 @@ export const makeImportString = (imports?: ImportStatement[]) => {
   }
   return imports
     .map((x) => {
-      return `import { ${x.from} } from '${x.imported}'`
+      return `import { ${x.imported.join(',')} } from '${x.from}'`
     })
     .join('\n')
 }
