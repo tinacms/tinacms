@@ -1257,7 +1257,7 @@ const _indexContent = async (
   const tinaSchema = await database.getSchema()
   let templateInfo: CollectionTemplateable | null = null
   if (collection) {
-    templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
+    templateInfo = tinaSchema.getTemplatesForCollectable(collection)
   }
 
   const folderTreeBuilder = new FolderTreeBuilder()

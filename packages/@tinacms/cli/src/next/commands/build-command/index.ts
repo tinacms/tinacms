@@ -78,8 +78,10 @@ export class BuildCommand extends BaseCommand {
     try {
       await configManager.processConfig()
     } catch (e) {
-      logger.error(e.message)
-      logger.error('Unable to build, please fix your Tina config and try again')
+      logger.error(`\n${dangerText(e.message)}`)
+      logger.error(
+        dangerText('Unable to build, please fix your Tina config and try again')
+      )
       process.exit(1)
     }
     let server: ViteDevServer | undefined
@@ -114,14 +116,22 @@ export class BuildCommand extends BaseCommand {
       const text = this.localOption
         ? undefined
         : 'Indexing to self-hosted data layer'
-      await this.indexContentWithSpinner({
-        text,
-        database,
-        graphQLSchema,
-        tinaSchema,
-        configManager,
-        partialReindex: this.partialReindex,
-      })
+      try {
+        await this.indexContentWithSpinner({
+          text,
+          database,
+          graphQLSchema,
+          tinaSchema,
+          configManager,
+          partialReindex: this.partialReindex,
+        })
+      } catch (e) {
+        logger.error(`\n\n${dangerText(e.message)}\n`)
+        if (this.verbose) {
+          console.error(e)
+        }
+        process.exit(1)
+      }
     }
 
     if (this.localOption) {

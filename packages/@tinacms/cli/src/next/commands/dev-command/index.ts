@@ -107,7 +107,7 @@ export class DevCommand extends BaseCommand {
             lookup: lookupObject,
             graphql: graphqlSchemaObject,
           })
-          await fs.writeFileSync(
+          fs.writeFileSync(
             path.join(configManager.tinaFolderPath, tinaLockFilename),
             tinaLockContent
           )
@@ -137,14 +137,14 @@ export class DevCommand extends BaseCommand {
         }
         return { apiURL, database, graphQLSchema, tinaSchema }
       } catch (e) {
-        logger.error(dangerText(e.message))
+        logger.error(`\n\n${dangerText(e.message)}\n`)
         if (this.verbose) {
           console.error(e)
         }
         if (firstTime) {
           logger.error(
             warnText(
-              'Unable to start dev server, please fix your Tina config and try again'
+              'Unable to start dev server, please fix your Tina config / resolve any errors above and try again'
             )
           )
           process.exit(1)

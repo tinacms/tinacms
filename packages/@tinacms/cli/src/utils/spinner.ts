@@ -24,12 +24,9 @@ async function localSpin<T>({
 
   // spinner start
   spinner.start()
-  let res
-  try {
-    res = await waitFor()
-  } catch (e) {
-    console.error(e)
-  }
+
+  const res = await waitFor()
+
   // spinner stop
   spinner.stop()
   console.log('')
