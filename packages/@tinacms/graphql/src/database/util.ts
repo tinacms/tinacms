@@ -94,40 +94,45 @@ export const parseFile = <T extends object>(
     frontmatterDelimiters?: [string, string] | string
   }
 ): T => {
-  switch (format) {
-    case '.markdown':
-    case '.mdx':
-    case '.md':
-      const contentJSON = matter(content || '', {
-        language: markdownParseConfig?.frontmatterFormat ?? 'yaml',
-        delimiters: markdownParseConfig?.frontmatterDelimiters ?? '---',
-        engines: matterEngines,
-      })
-      const markdownData = {
-        ...contentJSON.data,
-        $_body: contentJSON.content,
-      }
-      assertShape<T>(markdownData, yupSchema)
-      return markdownData
-    case '.json':
-      if (!content) {
-        return {} as T
-      }
-      return JSON.parse(content)
-    case '.toml':
-      if (!content) {
-        return {} as T
-      }
-      return toml.parse(content) as T
-    case '.yaml':
-    case '.yml':
-      if (!content) {
-        return {} as T
-      }
-      return yaml.safeLoad(content) as T
-    default:
-      throw new Error(`Must specify a valid format, got ${format}`)
+  try {
+    switch (format) {
+      case '.markdown':
+      case '.mdx':
+      case '.md':
+        const contentJSON = matter(content || '', {
+          language: markdownParseConfig?.frontmatterFormat ?? 'yaml',
+          delimiters: markdownParseConfig?.frontmatterDelimiters ?? '---',
+          engines: matterEngines,
+        })
+        const markdownData = {
+          ...contentJSON.data,
+          $_body: contentJSON.content,
+        }
+        assertShape<T>(markdownData, yupSchema)
+        return markdownData
+      case '.json':
+        if (!content) {
+          return {} as T
+        }
+        return JSON.parse(content)
+      case '.toml':
+        if (!content) {
+          return {} as T
+        }
+        return toml.parse(content) as T
+      case '.yaml':
+      case '.yml':
+        if (!content) {
+          return {} as T
+        }
+        return yaml.safeLoad(content) as T
+    }
+  } catch (e) {
+    // ensure that parser errors are always logged out
+    console.error(e)
+    throw e
   }
+  throw new Error(`Must specify a valid format, got ${format}`)
 }
 
 export type FormatType = 'json' | 'md' | 'mdx' | 'markdown'
