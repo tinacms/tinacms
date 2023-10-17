@@ -14,8 +14,14 @@ const supportedAuthenticationProviders: {
   },
   'tina-cloud': {
     configAuthenticationClass: '',
-    backendAuthentication: 'TODO',
+    backendAuthentication: 'TinaCloudBackendAuthentication()',
     name: 'tina-cloud',
+    backendAuthenticationImports: [
+      {
+        imported: ['TinaCloudBackendAuthentication'],
+        from: '@tinacms/auth',
+      },
+    ],
   },
   'next-auth': {
     name: 'next-auth',

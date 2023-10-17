@@ -433,11 +433,7 @@ const addDatabaseFile = async ({
 }) => {
   await writeGeneratedFile({
     generatedFile,
-    // TODO: Figure out how to handle overwriting
-    overwrite: true,
-    // overwrite: config.typescript
-    //   ? config.overwriteDatabaseTS
-    //   : config.overwriteDatabaseJS,
+    overwrite: config.overwriteList?.includes('database'),
     content: databaseTemplate({ config }),
     typescript: config.typescript,
   })
@@ -451,11 +447,7 @@ const addNextApiRoute = async ({
 }) => {
   await writeGeneratedFile({
     generatedFile,
-    // TODO: Figure out how to handle overwriting
-    overwrite: true,
-    // overwrite: config.typescript
-    //   ? config.overwriteDatabaseTS
-    //   : config.overwriteDatabaseJS,
+    overwrite: config.overwriteList?.includes('next-api-handler'),
     content: nextApiRouteTemplate({ config }),
     typescript: config.typescript,
   })
