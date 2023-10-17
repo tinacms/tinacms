@@ -106,6 +106,7 @@ async function configure(
     // instead of causing an error lets not generate an example
     config.framework.name = 'other'
   }
+  const firstTimeSetup = !env.tinaConfigExists
   // ask about generated files
   // TODO: We directly repeat this logic in the apply function we are writing the files. Might be good to refactor this
   const generatedFilesInUse: GeneratedFile[] = []
@@ -116,10 +117,10 @@ async function configure(
     generatedFilesInUse.push(env.generatedFiles.database)
     generatedFilesInUse.push(env.generatedFiles['next-api-handler'])
   }
-  if (config.framework.reactive) {
+  if (config.framework.reactive && firstTimeSetup) {
     generatedFilesInUse.push(env.generatedFiles['reactive-example'])
   }
-  if (env.sampleContentExists && !env.tinaConfigExists) {
+  if (env.sampleContentExists && firstTimeSetup) {
     generatedFilesInUse.push(env.generatedFiles['sample-content'])
   }
 
