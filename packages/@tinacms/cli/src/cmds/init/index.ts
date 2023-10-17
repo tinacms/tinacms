@@ -8,6 +8,7 @@ import detectEnvironment from './detectEnvironment'
 import configure from './configure'
 import { CLICommand } from '../index'
 import apply from './apply'
+import { Config } from './prompts'
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other'
@@ -17,16 +18,10 @@ export interface Framework {
 export type ReactiveFramework = 'next'
 
 type GeneratedFileType =
-  | 'auth'
+  | 'next-api-handler'
   | 'config'
   | 'database'
   | 'templates'
-  | 'vercel-kv-credentials-provider-signin'
-  | 'vercel-kv-credentials-provider-register'
-  | 'vercel-kv-credentials-provider-tailwindcss'
-  | 'vercel-kv-credentials-provider-register-api-handler'
-  | 'next-auth-api-handler'
-  | 'gql-api-handler'
   | 'tina.svg'
   | 'reactive-example'
 
@@ -92,11 +87,11 @@ export const command = new CLICommand<InitEnvironment, InitParams>({
   configure(
     env: InitEnvironment,
     { debug = false, isBackendInit = false }: InitParams
-  ): Promise<Record<any, any>> {
+  ): Promise<Config> {
     return configure(env, { debug, isBackend: isBackendInit })
   },
   apply(
-    config: Record<any, any>,
+    config: Config,
     env: InitEnvironment,
     params: InitParams
   ): Promise<void> {

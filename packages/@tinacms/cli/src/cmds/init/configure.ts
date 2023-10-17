@@ -1,5 +1,4 @@
-import { Framework, GeneratedFile, InitEnvironment } from '.'
-import prompts, { PromptType } from 'prompts'
+import { InitEnvironment } from '.'
 import {
   askCommonSetUp,
   askForestryMigrate,
@@ -11,8 +10,6 @@ import {
   chooseGitProvider,
   Config,
 } from './prompts'
-import { linkText, logText } from '../../utils/theme'
-import crypto from 'crypto-js'
 import { logger } from '../../logger'
 
 async function configure(

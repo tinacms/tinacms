@@ -102,53 +102,18 @@ const detectEnvironment = async ({
     Boolean
   ) as string[]
 
-  const generatedFiles = {
-    auth: await makeGeneratedFile('auth', tinaFolder),
+  const generatedFiles: InitEnvironment['generatedFiles'] = {
     config: await makeGeneratedFile('config', tinaFolder),
     database: await makeGeneratedFile('database', tinaFolder),
     templates: await makeGeneratedFile('templates', tinaFolder),
-    ['vercel-kv-credentials-provider-signin']: await makeGeneratedFile(
-      'signin',
-      path.join(...pagesDir, 'auth'),
-      {
-        typescriptSuffix: 'tsx',
-      }
+    'next-api-handler': await makeGeneratedFile(
+      '[...routes]',
+      path.join(...pagesDir, 'api', 'tina')
     ),
-    ['vercel-kv-credentials-provider-register']: await makeGeneratedFile(
-      'register',
-      path.join(...pagesDir, 'auth'),
-      {
-        typescriptSuffix: 'tsx',
-      }
-    ),
-    ['vercel-kv-credentials-provider-tailwindcss']: await makeGeneratedFile(
-      'tw.module',
-      path.join(...pagesDir, 'auth'),
-      {
-        extensionOverride: 'css',
-      }
-    ),
-    ['next-auth-api-handler']: await makeGeneratedFile(
-      '[...nextauth]',
-      path.join(...pagesDir, 'api', 'auth')
-    ),
-    ['vercel-kv-credentials-provider-register-api-handler']:
-      await makeGeneratedFile(
-        'register',
-        path.join(...pagesDir, 'api', 'credentials')
-      ),
-    ['gql-api-handler']: await makeGeneratedFile(
-      'gql',
-      path.join(...pagesDir, 'api')
-    ),
-    ['tina.svg']: await makeGeneratedFile(
-      'tina',
-      path.join(baseDir, 'public'),
-      {
-        extensionOverride: 'svg',
-      }
-    ),
-    ['reactive-example']: await makeGeneratedFile(
+    'tina.svg': await makeGeneratedFile('tina', path.join(baseDir, 'public'), {
+      extensionOverride: 'svg',
+    }),
+    'reactive-example': await makeGeneratedFile(
       '[filename]',
       path.join(...pagesDir, 'demo', 'blog'),
       {

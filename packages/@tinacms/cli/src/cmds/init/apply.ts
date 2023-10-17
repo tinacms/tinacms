@@ -121,7 +121,7 @@ async function apply({
     // add pages/api/tina/[...routes].ts file
     await addNextApiRoute({
       config,
-      generatedFile: env.generatedFiles['gql-api-handler'],
+      generatedFile: env.generatedFiles['next-api-handler'],
     })
   }
 
