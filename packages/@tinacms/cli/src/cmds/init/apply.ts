@@ -295,13 +295,13 @@ const addDependencies = async (
   const { packageManager } = config
   const tagVersion = params.tinaVersion ? `@${params.tinaVersion}` : ''
   let deps = []
+  let devDeps = []
 
   // If TinaCMS is already installed, don't add it again
   if (!env.hasTinaDeps) {
     deps.push('tinacms')
-    deps.push('@tinacms/cli')
+    devDeps.push('@tinacms/cli')
   }
-  let devDeps = []
 
   if (config.typescript) {
     devDeps.push('@types/node')
