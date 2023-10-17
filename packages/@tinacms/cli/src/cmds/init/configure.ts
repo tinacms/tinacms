@@ -1,4 +1,4 @@
-import { InitEnvironment } from '.'
+import { GeneratedFile, InitEnvironment } from '.'
 import {
   askCommonSetUp,
   askForestryMigrate,
@@ -12,216 +12,47 @@ import {
 } from './prompts'
 import { logger } from '../../logger'
 
+// conditionally generate overwrite prompts for generated ts/js
+const generatedFileOverwritePrompt = ({
+  condition,
+  configName,
+  generatedFile,
+}: {
+  configName: string
+  condition: (answers: any) => boolean
+  generatedFile: GeneratedFile
+}) => {
+  const results = []
+  if (generatedFile.javascriptExists) {
+    results.push({
+      name: `overwrite${configName}JS`,
+      type: (_, answers) =>
+        !answers.typescript && condition(answers) ? 'confirm' : null,
+      message: `Found existing file at ${generatedFile.fullPathJS}. Would you like to overwrite?`,
+    })
+  }
+  if (generatedFile.typescriptExists) {
+    results.push({
+      name: `overwrite${configName}TS`,
+      type: (_, answers) =>
+        answers.typescript && condition(answers) ? 'confirm' : null,
+      message: `Found existing file at ${generatedFile.fullPathTS}. Would you like to overwrite?`,
+    })
+  }
+  return results
+}
+
 async function configure(
   env: InitEnvironment,
   opts: { debug?: boolean; isBackend?: boolean }
 ) {
-  // const promptOptions = { onCancel: () => process.exit(0) } // allow ctrl + c to exit
-
-  // // helpers
-  // const isNext = (promptType: PromptType) => (_, answers) =>
-  //   answers.framework.name === 'next' ? promptType : null
-  // const isNextAuth = (promptType: PromptType) => (_, answers) =>
-  //   answers.nextAuth ? promptType : null
-
-  // // conditionally generate overwrite prompts for generated ts/js
-  // const generatedFileOverwritePrompt = ({
-  //   condition,
-  //   configName,
-  //   generatedFile,
-  // }: {
-  //   configName: string
-  //   condition: (answers: any) => boolean
-  //   generatedFile: GeneratedFile
-  // }) => {
-  //   const results = []
-  //   if (generatedFile.javascriptExists) {
-  //     results.push({
-  //       name: `overwrite${configName}JS`,
-  //       type: (_, answers) =>
-  //         !answers.typescript && condition(answers) ? 'confirm' : null,
-  //       message: `Found existing file at ${generatedFile.fullPathJS}. Would you like to overwrite?`,
-  //     })
-  //   }
-  //   if (generatedFile.typescriptExists) {
-  //     results.push({
-  //       name: `overwrite${configName}TS`,
-  //       type: (_, answers) =>
-  //         answers.typescript && condition(answers) ? 'confirm' : null,
-  //       message: `Found existing file at ${generatedFile.fullPathTS}. Would you like to overwrite?`,
-  //     })
-  //   }
-  //   return results
-  // }
-
-  //   },
-  //   {
-  //     name: 'overwriteTemplatesJS',
-  //     type: (_, answers) =>
-  //       !answers.typescript
-  //         ? env.generatedFiles['templates'].javascriptExists
-  //           ? 'confirm'
-  //           : null
-  //         : null,
-  //     message: `Found existing file at ${env.generatedFiles['templates'].javascriptExists}. Would you like to overwrite?`,
-  //   },
-  //   {
-  //     name: 'overwriteTemplatesTS',
-  //     type: (_, answers) =>
-  //       answers.typescript
-  //         ? env.generatedFiles['templates'].typescriptExists
-  //           ? 'confirm'
-  //           : null
-  //         : null,
-  //     message: `Found existing file at ${env.generatedFiles['templates'].fullPathTS}. Would you like to overwrite?`,
-  //   },
-  // ]
-  // These questions are adding when running `tinacms init backend`
-
-  // const backendSetupCommands: prompts.PromptObject[] = [
-  //   {
-  //     name: 'hosting',
-  //     type: 'select',
-  //     choices: [
-  //       {
-  //         title: 'Tina Cloud',
-  //         value: 'tina-cloud',
-  //       },
-  //       {
-  //         title: 'Self Host',
-  //         value: 'self-host',
-  //       },
-  //     ],
-  //     message:
-  //       'Do you want to use Tina Cloud to host your backend or self-host? (In self hosting you will have to bring your own auth, database and backend)',
-  //   },
-  //   {
-  //     name: 'githubToken',
-  //     type: (_, answers) => {
-  //       return answers.hosting === 'self-host' ? 'text' : null
-  //     },
-  //     message: `What is your GitHub Personal Access Token? (Hit enter to skip and set up later)\n${logText(
-  //       'Learn more here: '
-  //     )}${linkText(
-  //       'https://tina.io/docs/self-hosted/existing-site/#github-personal-access-token'
-  //     )}`,
-  //     initial: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-  //   },
-  //   {
-  //     name: 'dataLayerAdapter',
-  //     message: 'Select a self-hosted Database Adapter',
-  //     type: (_, answers) => {
-  //       if (answers.hosting === 'self-host') {
-  //         return 'select'
-  //       }
-  //     },
-  //     choices: (_, answers) => {
-  //       if (answers.framework.name === 'next') {
-  //         return [
-  //           { title: 'Vercel KV', value: 'upstash-redis' },
-  //           { title: 'Upstash Redis', value: 'upstash-redis' },
-  //         ]
-  //       } else {
-  //         return [{ title: 'Upstash Redis', value: 'upstash-redis' }]
-  //       }
-  //     },
-  //   },
-  //   {
-  //     name: 'kvRestApiUrl',
-  //     type: (_, answers) =>
-  //       answers.dataLayerAdapter === 'upstash-redis' ? 'text' : null,
-  //     message: `What is the KV (Redis) Rest API URL? (Hit enter to skip and set up yourself later)`,
-  //     initial: process.env.KV_REST_API_URL,
-  //   },
-  //   {
-  //     name: 'kvRestApiToken',
-  //     type: (prev, answers) =>
-  //       prev !== undefined && answers.hosting === 'self-host' ? 'text' : null,
-  //     message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
-  //     initial: process.env.KV_REST_API_TOKEN,
-  //   },
-  //   {
-  //     name: 'nextAuth',
-  //     type: (_, answers) => {
-  //       return answers.hosting === 'self-host' && isNext('confirm')
-  //         ? 'confirm'
-  //         : null
-  //     },
-  //     initial: 'true',
-  //     message: 'Enable NextAuth.js integration?',
-  //   },
-  //   {
-  //     name: 'nextAuthSecret',
-  //     type: (_, answers) => (answers.nextAuth ? 'text' : null),
-  //     message: `What is the NextAuth.js Secret? (Hit enter to use a randomly generated secret)`,
-  //     initial:
-  //       process.env.NEXTAUTH_SECRET ||
-  //       crypto.lib.WordArray.random(16).toString(),
-  //   },
-  //   {
-  //     name: 'clientId',
-  //     type: (_, answers) => {
-  //       return answers.hosting === 'self-host' ? null : 'text'
-  //     },
-  //     message: `What is your Tina Cloud Client ID? (Hit enter to skip and set up yourself later)\n${logText(
-  //       "Don't have a Client ID? Create one here: "
-  //     )}${linkText('https://app.tina.io/projects/new')}`,
-  //     initial: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
-  //   },
-  //   {
-  //     name: 'token',
-  //     type: (_, answers) => {
-  //       return answers.hosting === 'self-host' ? null : 'text'
-  //     },
-  //     message: (prev) =>
-  //       `What is your Tina Cloud Read Only Token?\n${logText(
-  //         "Don't have a Read Only Token? Create one here: "
-  //       )}${linkText(
-  //         `https://app.tina.io/projects/${prev || '[XXX]'}/tokens`
-  //       )}`,
-  //     initial: process.env.TINA_TOKEN,
-  //   },
-  //   {
-  //     name: 'nextAuthProvider',
-  //     message: 'Select a NextAuth Credentials Provider',
-  //     type: isNextAuth('select'),
-  //     choices: [
-  //       {
-  //         title: 'Vercel KV Credentials Provider',
-  //         value: 'vercel-kv-credentials-provider',
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     name: 'kvRestApiUrl',
-  //     type: (_, answers) =>
-  //       answers.nextAuthProvider === 'vercel-kv-credentials-provider' &&
-  //       answers.kvRestApiUrl === undefined
-  //         ? 'text'
-  //         : null,
-  //     message: `What is the KV (Redis) Rest API URL? (Hit enter to skip and set up yourself later)`,
-  //     initial: process.env.KV_REST_API_URL,
-  //   },
-  //   {
-  //     name: 'kvRestApiToken',
-  //     type: (_, answers) =>
-  //       answers.nextAuthProvider === 'vercel-kv-credentials-provider' &&
-  //       answers.kvRestApiUrl !== undefined &&
-  //       answers.kvRestApiToken === undefined
-  //         ? 'text'
-  //         : null,
-  //     message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
-  //     initial: process.env.KV_REST_API_TOKEN,
-  //   },
-  // ]
-
   if (opts.isBackend && !env.tinaConfigExists) {
     logger.info('Looks like Tina has not been setup, setting up now...')
   }
 
   if (env.tinaConfigExists && !opts.isBackend) {
     logger.info(
-      `Tina config already exists, skipping setup. (If you want to init tina from sratch, delete your tina config file and run this command again)`
+      `Tina config already exists, skipping setup. (If you want to init tina from scratch, delete your tina config file and run this command again)`
     )
     process.exit(0)
   }
@@ -304,6 +135,7 @@ async function configure(
     // instead of causing an error lets not generate an example
     config.framework.name = 'other'
   }
+
   return config
 
   // let config: Record<any, any> = await prompts(
