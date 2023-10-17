@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import path from 'path'
 import { logger } from '../../logger'
-import { InitEnvironment } from './index'
+import { GeneratedFile, InitEnvironment } from './index'
 
 const checkGitignoreForItem = async ({
   baseDir,
@@ -33,6 +33,9 @@ const makeGeneratedFile = async (
       parentPath,
       `${name}.${opts?.extensionOverride || 'js'}`
     ),
+    fullPathOverride: opts?.extensionOverride
+      ? path.join(parentPath, `${name}.${opts?.extensionOverride}`)
+      : '',
     name,
     parentPath,
     typescriptExists: false,
@@ -51,7 +54,7 @@ const makeGeneratedFile = async (
               parentPath: this.parentPath,
             }
     },
-  }
+  } as GeneratedFile
 
   result.typescriptExists = await fs.pathExists(result.fullPathTS)
   result.javascriptExists = await fs.pathExists(result.fullPathJS)
@@ -110,15 +113,17 @@ const detectEnvironment = async ({
       '[...routes]',
       path.join(...pagesDir, 'api', 'tina')
     ),
-    'tina.svg': await makeGeneratedFile('tina', path.join(baseDir, 'public'), {
-      extensionOverride: 'svg',
-    }),
     'reactive-example': await makeGeneratedFile(
       '[filename]',
       path.join(...pagesDir, 'demo', 'blog'),
       {
         typescriptSuffix: 'tsx',
       }
+    ),
+    'sample-content': await makeGeneratedFile(
+      'hello-world',
+      path.join(baseDir, 'content', 'posts'),
+      { extensionOverride: 'md' }
     ),
   }
 

@@ -22,12 +22,13 @@ type GeneratedFileType =
   | 'config'
   | 'database'
   | 'templates'
-  | 'tina.svg'
   | 'reactive-example'
+  | 'sample-content'
 
 export type GeneratedFile = {
   fullPathJS: string
   fullPathTS: string
+  fullPathOverride?: string
   name: string
   parentPath: string
   typescriptExists: boolean

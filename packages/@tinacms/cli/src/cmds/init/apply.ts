@@ -90,7 +90,7 @@ async function apply({
   if (!env.gitIgnoreExists) {
     await createGitignore({ baseDir })
   } else {
-    let itemsToAdd = []
+    const itemsToAdd = []
     if (!env.gitIgnoreNodeModulesExists) {
       itemsToAdd.push('node_modules')
     }
@@ -288,12 +288,12 @@ const updateGitIgnore = async ({
   await fs.writeFile(path.join(baseDir, '.gitignore'), newGitignoreContent)
 }
 const addDependencies = async (
-  config: Record<any, any>,
+  config: Config,
   env: InitEnvironment,
   params: InitParams
 ) => {
+  const { packageManager } = config
   const tagVersion = params.tinaVersion ? `@${params.tinaVersion}` : ''
-  const { dataLayerAdapter, nextAuth, packageManager } = config
   let deps = []
 
   // If TinaCMS is already installed, don't add it again
@@ -302,17 +302,22 @@ const addDependencies = async (
     deps.push('@tinacms/cli')
   }
   let devDeps = []
-  if (nextAuth) {
-    deps.push('tinacms-next-auth', 'next-auth')
+
+  if (config.typescript) {
+    devDeps.push('@types/node')
   }
-  if (config?.hosting === 'self-host') {
-    deps.push('@tinacms/datalayer')
-    deps.push('tinacms-gitprovider-github')
-  }
-  if (dataLayerAdapter === 'upstash-redis') {
-    deps.push('upstash-redis-level')
-    deps.push('@upstash/redis')
-  }
+
+  // Add deps from database adapter, authentication provider, and git provider
+  deps.push(...(config.databaseAdapter?.imports?.map((x) => x.from) || []))
+  deps.push(
+    ...(config.authenticationProvider?.backendAuthenticationImports?.map(
+      (x) => x.from
+    ) || [])
+  )
+  deps.push(
+    ...(config.authenticationProvider?.configImports?.map((x) => x.from) || [])
+  )
+  deps.push(...(config.gitProvider?.imports?.map((x) => x.from) || []))
 
   // add tag version if this is a pr tagged version
   if (tagVersion) {
@@ -400,12 +405,10 @@ const addConfigFile = async ({
   templateOptions: ConfigTemplateOptions
   templateVariables: ConfigTemplateVariables
   generatedFile: GeneratedFile
-  config: Record<any, any>
+  config: Config
 }) => {
   await writeGeneratedFile({
-    overwrite: config.typescript
-      ? config.overwriteConfigTS
-      : config.overwriteConfigJS,
+    overwrite: config.overwriteList?.includes('config'),
     generatedFile,
     content: configContent(framework, templateVariables, templateOptions),
     typescript: config.typescript,
@@ -461,13 +464,11 @@ export const addTemplateFile = async ({
 }: {
   content: string
   generatedFile: GeneratedFile
-  config: Record<any, any>
+  config: Config
 }) => {
   await writeGeneratedFile({
     generatedFile,
-    overwrite: config.typescript
-      ? config.overwriteTemplatesTS
-      : config.overwriteTemplatesJS,
+    overwrite: config.overwriteList?.includes(generatedFile.name),
     content,
     typescript: config.typescript,
   })
@@ -477,7 +478,7 @@ const addContentFile = async ({
   config,
   env,
 }: {
-  config: Record<any, any>
+  config: Config
   env: InitEnvironment
 }) => {
   await writeGeneratedFile({
@@ -496,14 +497,14 @@ const addContentFile = async ({
         })
       },
     },
-    overwrite: config.overwriteSampleContent,
+    overwrite: config.overwriteList?.includes('hello-world'),
     content: helloWorldPost,
     typescript: false,
   })
 }
 
 const logNextSteps = ({
-  dataLayer,
+  dataLayer: _datalayer,
   framework,
   packageManager,
   isBackend,
@@ -575,7 +576,7 @@ const configContent = (
 
 type AddReactiveParams = {
   baseDir: string
-  config: Record<any, any>
+  config: Config
   env: InitEnvironment
   dataLayer: boolean
   generatedFile: GeneratedFile
@@ -595,9 +596,7 @@ const addReactiveFile: {
     await writeGeneratedFile({
       generatedFile,
       typescript: config.typescript,
-      overwrite: config.typescript
-        ? config.overwriteNextAuthApiHandlerTS
-        : config.overwriteNextAuthApiHandlerJS,
+      overwrite: config.overwriteList?.includes(generatedFile.name),
       content: NextTemplates['demo-post-page']({
         usingSrc: env.usingSrc,
         dataLayer,
@@ -613,8 +612,7 @@ const addReactiveFile: {
         ...packageJson,
         scripts: extendNextScripts(scripts, {
           isLocalEnvVarName: config.isLocalEnvVarName,
-          addSetupUsers:
-            config.nextAuthProvider === 'vercel-kv-credentials-provider',
+          addSetupUsers: config.authenticationProvider?.name === 'next-auth',
         }),
       },
       null,

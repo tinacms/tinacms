@@ -11,36 +11,7 @@ import {
   Config,
 } from './prompts'
 import { logger } from '../../logger'
-
-// conditionally generate overwrite prompts for generated ts/js
-const generatedFileOverwritePrompt = ({
-  condition,
-  configName,
-  generatedFile,
-}: {
-  configName: string
-  condition: (answers: any) => boolean
-  generatedFile: GeneratedFile
-}) => {
-  const results = []
-  if (generatedFile.javascriptExists) {
-    results.push({
-      name: `overwrite${configName}JS`,
-      type: (_, answers) =>
-        !answers.typescript && condition(answers) ? 'confirm' : null,
-      message: `Found existing file at ${generatedFile.fullPathJS}. Would you like to overwrite?`,
-    })
-  }
-  if (generatedFile.typescriptExists) {
-    results.push({
-      name: `overwrite${configName}TS`,
-      type: (_, answers) =>
-        answers.typescript && condition(answers) ? 'confirm' : null,
-      message: `Found existing file at ${generatedFile.fullPathTS}. Would you like to overwrite?`,
-    })
-  }
-  return results
-}
+import { askOverwriteGenerateFiles } from './prompts/generatedFiles'
 
 async function configure(
   env: InitEnvironment,
@@ -135,120 +106,29 @@ async function configure(
     // instead of causing an error lets not generate an example
     config.framework.name = 'other'
   }
+  // ask about generated files
+  // TODO: We directly repeat this logic in the apply function we are writing the files. Might be good to refactor this
+  const generatedFilesInUse: GeneratedFile[] = []
+  if (env.tinaConfigExists) {
+    generatedFilesInUse.push(env.generatedFiles.config)
+  }
+  if (config.hosting === 'self-host') {
+    generatedFilesInUse.push(env.generatedFiles.database)
+    generatedFilesInUse.push(env.generatedFiles['next-api-handler'])
+  }
+  if (config.framework.reactive) {
+    generatedFilesInUse.push(env.generatedFiles['reactive-example'])
+  }
+  if (env.sampleContentExists && !env.tinaConfigExists) {
+    generatedFilesInUse.push(env.generatedFiles['sample-content'])
+  }
+
+  config.overwriteList = await askOverwriteGenerateFiles({
+    generatedFiles: generatedFilesInUse,
+    config,
+  })
 
   return config
-
-  // let config: Record<any, any> = await prompts(
-  //   [
-  //     // Always ask for the framework
-  //     {
-  //       name: 'framework',
-  //       type: 'select',
-  //       message: 'What framework are you using?',
-  //       choices: [
-  //         { title: 'Next.js', value: { name: 'next', reactive: true } },
-  //         { title: 'Hugo', value: { name: 'hugo', reactive: false } },
-  //         { title: 'Jekyll', value: { name: 'jekyll', reactive: false } },
-  //         {
-  //           title: 'Other (SSG frameworks like gatsby, etc.)',
-  //           value: { name: 'other', reactive: false },
-  //         },
-  //       ] as { title: string; value: Framework }[],
-  //     },
-  //     {
-  //       name: 'packageManager',
-  //       type: 'select',
-  //       message: 'Choose your package manager',
-  //       choices: [
-  //         { title: 'PNPM', value: 'pnpm' },
-  //         { title: 'Yarn', value: 'yarn' },
-  //         { title: 'NPM', value: 'npm' },
-  //       ],
-  //     },
-
-  //     // only setup TinaCMS if they don't have a tina config
-  //     ...(skipTinaSetupCommands ? [] : tinaSetupPrompts),
-  //     // Only add the backend init questions if they are running the backend init command
-  //     ...(opts.isBackend ? backendSetupCommands : []),
-  //     // tina/config.ts
-  //     ...generatedFileOverwritePrompt({
-  //       condition: (_) => !env.tinaConfigExists,
-  //       configName: 'Config',
-  //       generatedFile: env.generatedFiles['config'],
-  //     }),
-  //     // tina/database.ts
-  //     ...generatedFileOverwritePrompt({
-  //       condition: (answers) => !!(answers.hosting === 'self-host'),
-  //       configName: 'Database',
-  //       generatedFile: env.generatedFiles['database'],
-  //     }),
-  //     // tina/auth.ts
-  //     ...generatedFileOverwritePrompt({
-  //       condition: (answers) => !!answers.nextAuthProvider,
-  //       configName: 'Auth',
-  //       generatedFile: env.generatedFiles['auth'],
-  //     }),
-  //     // pages/api/gql.ts
-  //     ...generatedFileOverwritePrompt({
-  //       condition: (answers) => !!(answers.hosting === 'self-host'),
-  //       configName: 'GqlApiHandler',
-  //       generatedFile: env.generatedFiles['gql-api-handler'],
-  //     }),
-  //     // pages/api/auth/[...nextauth].ts
-  //     ...generatedFileOverwritePrompt({
-  //       condition: (answers) => !!answers.nextAuthProvider,
-  //       configName: 'NextAuthApiHandler',
-  //       generatedFile: env.generatedFiles['next-auth-api-handler'],
-  //     }),
-  //     // pages/auth/signin.tsx
-  //     ...generatedFileOverwritePrompt({
-  //       condition: (answers) =>
-  //         answers.nextAuthProvider === 'vercel-kv-credentials-provider',
-  //       configName: 'VercelKVCredentialsProviderSignin',
-  //       generatedFile:
-  //         env.generatedFiles['vercel-kv-credentials-provider-signin'],
-  //     }),
-  //     // pages/auth/register.tsx
-  //     ...generatedFileOverwritePrompt({
-  //       condition: (answers) =>
-  //         answers.nextAuthProvider === 'vercel-kv-credentials-provider',
-  //       configName: 'VercelKVCredentialsProviderRegister',
-  //       generatedFile:
-  //         env.generatedFiles['vercel-kv-credentials-provider-register'],
-  //     }),
-  //     // pages/auth/tw.module.css
-  //     ...generatedFileOverwritePrompt({
-  //       condition: (answers) =>
-  //         answers.nextAuthProvider === 'vercel-kv-credentials-provider',
-  //       configName: 'VercelKVCredentialsProviderTailwindCSS',
-  //       generatedFile:
-  //         env.generatedFiles['vercel-kv-credentials-provider-tailwindcss'],
-  //     }),
-  //     // pages/api/credentials/register.ts
-  //     ...generatedFileOverwritePrompt({
-  //       condition: (answers) =>
-  //         answers.nextAuthProvider === 'vercel-kv-credentials-provider',
-  //       configName: 'VercelKVCredentialsProviderRegisterApiHandler',
-  //       generatedFile:
-  //         env.generatedFiles[
-  //           'vercel-kv-credentials-provider-register-api-handler'
-  //         ],
-  //     }),
-  //     // pages/demo/blog/[filename].tsx
-  //     ...generatedFileOverwritePrompt({
-  //       condition: (answers) => answers.framework.reactive,
-  //       configName: 'ReactiveExample',
-  //       generatedFile: env.generatedFiles['reactive-example'],
-  //     }),
-  //     {
-  //       name: 'overwriteSampleContent',
-  //       type: (_) =>
-  //         env.sampleContentExists && !env.tinaConfigExists ? 'confirm' : null,
-  //       message: `Found existing file at ${env.sampleContentPath}. Would you like to overwrite?`,
-  //     },
-  //   ],
-  //   promptOptions
-  // )
 }
 
 export default configure

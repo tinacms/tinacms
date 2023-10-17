@@ -21,6 +21,7 @@ export type Config = {
   vercelKVNextAuthCredentialsKey?: string
   nextAuthCredentialsProviderName?: string
   isLocalEnvVarName: string
+  overwriteList?: string[]
 }
 export interface ImportStatement {
   imported: string[]
