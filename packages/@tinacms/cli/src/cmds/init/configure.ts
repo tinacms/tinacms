@@ -32,6 +32,7 @@ async function configure(
 
   const { framework, packageManager } = await askCommonSetUp()
   const config: Config = {
+    envVars: [],
     framework,
     packageManager,
     forestryMigrate: false,
@@ -75,8 +76,16 @@ async function configure(
     config.hosting = result.hosting
     if (result.hosting === 'tina-cloud') {
       const { clientId, token } = await askTinaCloudSetup()
-      config.token = token
-      config.clientId = clientId
+      config.envVars.push(
+        {
+          key: 'NEXT_PUBLIC_TINA_CLIENT_ID',
+          value: clientId,
+        },
+        {
+          key: 'NEXT_PUBLIC_TINA_CLIENT_SECRET',
+          value: token,
+        }
+      )
     } else if (result.hosting === 'self-host') {
       config.gitProvider = await chooseGitProvider({ config })
       config.databaseAdapter = await chooseDatabaseAdapter({
@@ -90,10 +99,10 @@ async function configure(
     }
   }
   // If we are doing a backend init we can set the vercelKVNextAuthCredentialsKey default
-  if (opts.isBackend) {
-    config.vercelKVNextAuthCredentialsKey =
-      process.env.NEXTAUTH_CREDENTIALS_KEY || 'tinacms_users'
-  }
+  // if (opts.isBackend) {
+  //   config.vercelKVNextAuthCredentialsKey =
+  //     process.env.NEXTAUTH_CREDENTIALS_KEY || 'tinacms_users'
+  // }
 
   config.nextAuthCredentialsProviderName = 'VercelKVCredentialsProvider'
 

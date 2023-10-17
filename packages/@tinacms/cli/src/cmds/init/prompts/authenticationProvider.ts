@@ -50,9 +50,18 @@ const authenticationProviderUpdateConfig: {
 } = {
   other: async () => {},
   'tina-cloud': async ({ config }) => {
+    // TODO: Should this just call the AskTinaCLoudSetup function directly?
     const result = await prompts(tinaCloudSetupQuestions)
-    config.clientId = result.clientId
-    config.token = result.token
+    config.envVars.push(
+      {
+        key: 'NEXT_PUBLIC_TINA_CLIENT_ID',
+        value: result.clientId,
+      },
+      {
+        key: 'NEXT_PUBLIC_TINA_CLIENT_SECRET',
+        value: result.token,
+      }
+    )
   },
   'next-auth': async ({ config }) => {
     const result = await prompts([
@@ -65,7 +74,10 @@ const authenticationProviderUpdateConfig: {
           crypto.lib.WordArray.random(16).toString(),
       },
     ])
-    config.nextAuthSecret = result.nextAuthSecret
+    config.envVars.push({
+      key: 'NEXTAUTH_SECRET',
+      value: result.nextAuthSecret,
+    })
   },
 }
 export const chooseAuthenticationProvider = async ({

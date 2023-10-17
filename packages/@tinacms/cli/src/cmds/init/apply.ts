@@ -202,7 +202,8 @@ async function apply({
   }
 
   logNextSteps({
-    isBackend: env.tinaConfigExists,
+    config: config,
+    isBackend: params.isBackendInit,
     dataLayer: usingDataLayer,
     packageManager: config.packageManager,
     framework: config.framework,
@@ -504,11 +505,13 @@ const addContentFile = async ({
 }
 
 const logNextSteps = ({
+  config,
   dataLayer: _datalayer,
   framework,
   packageManager,
   isBackend,
 }: {
+  config: Config
   isBackend: boolean
   dataLayer: boolean
   packageManager: string
@@ -516,6 +519,18 @@ const logNextSteps = ({
 }) => {
   if (isBackend) {
     logger.info(focusText(`\n${titleText(' TinaCMS ')} backend initialized!`))
+    logger.info(
+      'Please add the following environment variables to your .env file'
+    )
+    logger.info(
+      indentText(
+        config.envVars
+          .map((x) => {
+            return `${x.key}=${x.value || '***'}`
+          })
+          .join('\n')
+      )
+    )
     logger.info(
       'If you are deploying to vercel make sure to add the environment variables to your project.'
     )

@@ -8,19 +8,12 @@ export type Config = {
   forestryMigrate: boolean
   frontMatterFormat?: 'yaml' | 'toml' | 'json'
   hosting?: 'tina-cloud' | 'self-host'
-  clientId?: string
-  token?: string
-  githubToken?: string
   gitProvider?: PromptGitProvider
   databaseAdapter?: PromptDatabaseAdapter
   authenticationProvider?: PromptAuthenticationProvider
-  kvRestApiUrl?: string
-  kvRestApiToken?: string
-  mongoDBUri?: string
-  nextAuthSecret?: string
-  vercelKVNextAuthCredentialsKey?: string
   nextAuthCredentialsProviderName?: string
   isLocalEnvVarName: string
+  envVars: { key: string; value: string }[]
   overwriteList?: string[]
 }
 export interface ImportStatement {

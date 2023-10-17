@@ -31,7 +31,7 @@ const supportedDatabaseAdapters: {
   mongodb: {
     databaseAdapterClassText: `new MongodbLevel<string, Record<string, any>>({
           // If you are not using branches you could pass a static collection name. ie: "tinacms"
-          collectionName: \`tinacms-\${branchName}\`,
+          collectionName: \`tinacms-\${branch}\`,
           dbName: 'tinacms',
           mongoUri: process.env.MONGODB_URI as string,
         })`,
@@ -59,7 +59,10 @@ const databaseAdapterUpdateConfig: {
         initial: process.env.MONGODB_URI,
       },
     ])
-    config.mongoDBUri = result.mongoDBUri
+    config.envVars.push({
+      key: 'MONGODB_URI',
+      value: result.mongoDBUri,
+    })
   },
   'upstash-redis': async ({ config }) => {
     const result = await prompts([
@@ -76,8 +79,16 @@ const databaseAdapterUpdateConfig: {
         initial: process.env.KV_REST_API_TOKEN,
       },
     ])
-    config.kvRestApiUrl = result.kvRestApiUrl
-    config.kvRestApiToken = result.kvRestApiToken
+    config.envVars.push(
+      {
+        key: 'KV_REST_API_URL',
+        value: result.kvRestApiUrl,
+      },
+      {
+        key: 'KV_REST_API_TOKEN',
+        value: result.kvRestApiToken,
+      }
+    )
   },
 }
 
