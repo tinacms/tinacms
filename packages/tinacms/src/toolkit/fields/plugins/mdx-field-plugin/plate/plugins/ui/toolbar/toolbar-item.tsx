@@ -3,7 +3,11 @@ import { PlusIcon, HeadingIcon, ToolbarIcon } from '../icons'
 import { Popover, Transition } from '@headlessui/react'
 import { useEditorState, isCollapsed } from '@udecode/plate-headless'
 import { insertMDX } from '../../create-mdx-plugins'
-import { LinkForm, isLinkActive } from '../../create-link-plugin'
+import {
+  LinkForm,
+  isLinkActive,
+  wrapOrRewrapLink,
+} from '../../create-link-plugin'
 
 import type { PlateEditor } from '@udecode/plate-headless'
 import type { MdxTemplate } from '../../../types'
@@ -137,6 +141,7 @@ export const ToolbarItem = ({
             if (isDisabled) {
               return
             }
+            wrapOrRewrapLink(editor)
             setIsExpanded((isExpanded) => !isExpanded)
           }}
         >

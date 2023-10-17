@@ -26,7 +26,7 @@ type LinkElement = {
   text: string | undefined
 }
 
-const wrapOrRewrapLink = (editor) => {
+export const wrapOrRewrapLink = (editor) => {
   const baseLink = {
     type: 'a',
     url: '',
@@ -89,7 +89,6 @@ export const LinkForm = (props) => {
       }
     }
 
-    wrapOrRewrapLink(editor)
     props.onClose()
   }, [editor, formValues])
 
@@ -113,27 +112,30 @@ export const LinkForm = (props) => {
       ]}
       initialValues={initialValues}
       onChange={(values: object) => setFormValues(values)}
-      onClose={props.onClose}
+      onClose={() => {
+        if (initialValues.title === '' && initialValues.url === '') {
+          unwrapLink(editor, selection)
+        }
+        props.onClose()
+      }}
     />
   )
 }
 
-export const isLinkActive = (editor) => {
-  const [link] = getLinks(editor)
-  return !!link
-}
-
 export const unwrapLink = (editor: PlateEditor, selection?: BaseRange) => {
   unwrapNodes(editor, {
-    match: (n) =>
-      !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK,
+    match: matchLink,
     at: selection || undefined,
   })
 }
 
 export const getLinks = (editor) => {
   return getNodeEntries<LinkElement>(editor, {
-    match: (n) =>
-      !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK,
+    match: matchLink,
   })
+}
+
+export const isLinkActive = (editor) => {
+  const [link] = getLinks(editor)
+  return !!link
 }
