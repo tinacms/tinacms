@@ -131,8 +131,12 @@ async function apply({
     await addContentFile({ config, env })
   }
 
-  // add nextJs example code
-  if (config.framework.reactive && addReactiveFile[config.framework.name]) {
+  // add nextJs example code (First time init only)
+  if (
+    config.framework.reactive &&
+    addReactiveFile[config.framework.name] &&
+    !env.tinaConfigExists
+  ) {
     await addReactiveFile[config.framework.name as ReactiveFramework]({
       baseDir,
       config,
