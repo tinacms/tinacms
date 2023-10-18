@@ -116,10 +116,13 @@ async function configure(
     config.framework.name = 'other'
   }
   const firstTimeSetup = !env.tinaConfigExists
+
   // ask about generated files
   // TODO: We directly repeat this logic in the apply function we are writing the files. Might be good to refactor this
   const generatedFilesInUse: GeneratedFile[] = []
-  if (env.tinaConfigExists) {
+
+  // overwrite the config file if it exists and we are not doing backend init. (ie we are doing tinacms init)
+  if (env.tinaConfigExists && !opts.isBackend) {
     generatedFilesInUse.push(env.generatedFiles.config)
   }
   if (config.hosting === 'self-host') {
