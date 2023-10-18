@@ -3,7 +3,7 @@ import crypto from 'crypto-js'
 
 import type { PromptAuthenticationProvider, Config } from './types'
 import type { Framework } from '../'
-import { tinaCloudSetupQuestions } from './tinaCloudSetupQuestions'
+import { askTinaCloudSetup } from './askTinaCloudSetup'
 const supportedAuthenticationProviders: {
   'tina-cloud': PromptAuthenticationProvider
   'next-auth': PromptAuthenticationProvider
@@ -58,20 +58,7 @@ const authenticationProviderUpdateConfig: {
   }) => Promise<void>
 } = {
   other: async () => {},
-  'tina-cloud': async ({ config }) => {
-    // TODO: Should this just call the AskTinaCLoudSetup function directly?
-    const result = await prompts(tinaCloudSetupQuestions)
-    config.envVars.push(
-      {
-        key: 'NEXT_PUBLIC_TINA_CLIENT_ID',
-        value: result.clientId,
-      },
-      {
-        key: 'NEXT_PUBLIC_TINA_CLIENT_SECRET',
-        value: result.token,
-      }
-    )
-  },
+  'tina-cloud': askTinaCloudSetup,
   'next-auth': async ({ config }) => {
     const result = await prompts([
       {

@@ -2,9 +2,9 @@ import prompts from 'prompts'
 import type { PromptObject } from 'prompts'
 import { linkText, logText } from '../../../utils/theme'
 import { Framework, InitEnvironment } from '../'
-import { tinaCloudSetupQuestions } from './tinaCloudSetupQuestions'
 import { Config, ImportStatement } from './types'
 
+export * from './askTinaCloudSetup'
 export * from './types'
 export * from './gitProvider'
 export * from './databaseAdapter'
@@ -149,11 +149,6 @@ export const askIfUsingSelfHosted = async () => {
     },
   ])
   return answers as { hosting: 'tina-cloud' | 'self-host' }
-}
-
-export const askTinaCloudSetup = async () => {
-  const answers = await prompts(tinaCloudSetupQuestions)
-  return answers as { clientId?: string; token?: string }
 }
 
 export const makeImportString = (imports?: ImportStatement[]) => {

@@ -75,17 +75,7 @@ async function configure(
     const result = await askIfUsingSelfHosted()
     config.hosting = result.hosting
     if (result.hosting === 'tina-cloud') {
-      const { clientId, token } = await askTinaCloudSetup()
-      config.envVars.push(
-        {
-          key: 'NEXT_PUBLIC_TINA_CLIENT_ID',
-          value: clientId,
-        },
-        {
-          key: 'NEXT_PUBLIC_TINA_CLIENT_SECRET',
-          value: token,
-        }
-      )
+      await askTinaCloudSetup({ config })
     } else if (result.hosting === 'self-host') {
       config.gitProvider = await chooseGitProvider({ config })
       config.databaseAdapter = await chooseDatabaseAdapter({
