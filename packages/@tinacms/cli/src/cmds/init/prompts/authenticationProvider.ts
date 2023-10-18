@@ -20,6 +20,7 @@ const supportedAuthenticationProviders: {
       {
         imported: ['TinaCloudBackendAuthentication'],
         from: '@tinacms/auth',
+        packageName: '@tinacms/auth',
       },
     ],
   },
@@ -30,6 +31,7 @@ const supportedAuthenticationProviders: {
       {
         imported: ['UsernamePasswordAuthJSProvider'],
         from: 'tinacms-authjs/dist/tinacms',
+        packageName: 'tinacms-authjs',
       },
     ],
     backendAuthentication: `AuthJsBackendAuthentication({
@@ -41,6 +43,7 @@ const supportedAuthenticationProviders: {
     backendAuthenticationImports: [
       {
         from: 'tinacms-authjs',
+        packageName: 'tinacms-authjs',
         imported: ['AuthJsBackendAuthentication', 'TinaAuthJSOptions'],
       },
     ],

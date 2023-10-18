@@ -19,6 +19,7 @@ export type Config = {
 export interface ImportStatement {
   imported: string[]
   from: string
+  packageName: string
 }
 
 export interface PromptGitProvider {

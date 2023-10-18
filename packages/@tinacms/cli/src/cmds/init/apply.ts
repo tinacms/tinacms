@@ -15,11 +15,7 @@ import { Telemetry } from '@tinacms/metrics'
 import fs from 'fs-extra'
 import { writeGitignore } from '../../next/commands/codemod-command'
 import { templates as NextTemplates } from './templates/next'
-import {
-  configExamples,
-  ConfigTemplateOptions,
-  ConfigTemplateVariables,
-} from './templates/config'
+import { ConfigTemplateArgs, generateConfig } from './templates/config'
 import { databaseTemplate } from './templates/database'
 import { nextApiRouteTemplate } from './templates/tinaNextRoute'
 import { helloWorldPost } from './templates/content'
@@ -151,8 +147,8 @@ async function apply({
   if (!env.tinaConfigExists) {
     // add tina/config.{js,ts}]
     await addConfigFile({
-      templateVariables: {
-        // remove process fom pathToForestryConfig and add publicFolder
+      configArgs: {
+        config,
         publicFolder: path.join(
           path.relative(process.cwd(), pathToForestryConfig),
           config.publicFolder
@@ -160,16 +156,10 @@ async function apply({
         collections,
         extraText,
         isLocalEnvVarName: config.isLocalEnvVarName,
-        nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
-      },
-      templateOptions: {
-        nextAuth: config.authenticationProvider?.name === 'next-auth',
         isForestryMigration,
         selfHosted: usingDataLayer,
-        dataLayer: usingDataLayer,
       },
       baseDir,
-      framework: config.framework,
       generatedFile: env.generatedFiles['config'],
       config,
     })
@@ -313,16 +303,20 @@ const addDependencies = async (
   }
 
   // Add deps from database adapter, authentication provider, and git provider
-  deps.push(...(config.databaseAdapter?.imports?.map((x) => x.from) || []))
+  deps.push(
+    ...(config.databaseAdapter?.imports?.map((x) => x.packageName) || [])
+  )
   deps.push(
     ...(config.authenticationProvider?.backendAuthenticationImports?.map(
-      (x) => x.from
+      (x) => x.packageName
     ) || [])
   )
   deps.push(
-    ...(config.authenticationProvider?.configImports?.map((x) => x.from) || [])
+    ...(config.authenticationProvider?.configImports?.map(
+      (x) => x.packageName
+    ) || [])
   )
-  deps.push(...(config.gitProvider?.imports?.map((x) => x.from) || []))
+  deps.push(...(config.gitProvider?.imports?.map((x) => x.packageName) || []))
 
   // add tag version if this is a pr tagged version
   if (tagVersion) {
@@ -399,23 +393,19 @@ const writeGeneratedFile = async ({
 
 const addConfigFile = async ({
   baseDir,
-  framework,
-  templateOptions,
-  templateVariables,
+  configArgs,
   generatedFile,
   config,
 }: {
   baseDir: string
-  framework: Framework
-  templateOptions: ConfigTemplateOptions
-  templateVariables: ConfigTemplateVariables
+  configArgs: ConfigTemplateArgs
   generatedFile: GeneratedFile
   config: Config
 }) => {
   await writeGeneratedFile({
     overwrite: config.overwriteList?.includes('config'),
     generatedFile,
-    content: configContent(framework, templateVariables, templateOptions),
+    content: generateConfig(configArgs),
     typescript: config.typescript,
   })
   const { exists } = generatedFile.resolve(config.typescript)
@@ -573,16 +563,6 @@ const frameworkDevCmds: {
     }
     return `${packageManagers[packageManager]} dev`
   },
-}
-
-const configContent = (
-  framework: Framework,
-  vars: ConfigTemplateVariables,
-  opts: ConfigTemplateOptions
-) => {
-  return format(configExamples[framework.name](vars, opts), {
-    parser: 'babel',
-  })
 }
 
 type AddReactiveParams = {

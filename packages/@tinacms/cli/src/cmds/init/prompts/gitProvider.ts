@@ -9,7 +9,11 @@ const supportedGitProviders: {
 } = {
   github: {
     imports: [
-      { from: 'tinacms-gitprovider-github', imported: ['GitHubProvider'] },
+      {
+        from: 'tinacms-gitprovider-github',
+        imported: ['GitHubProvider'],
+        packageName: 'tinacms-gitprovider-github',
+      },
     ],
     gitProviderClassText: `new GitHubProvider({
           branch,

@@ -21,10 +21,12 @@ const supportedDatabaseAdapters: {
       {
         imported: ['RedisLevel'],
         from: 'upstash-redis-level',
+        packageName: 'upstash-redis-level',
       },
       {
         imported: ['Redis'],
         from: '@upstash/redis',
+        packageName: '@upstash/redis',
       },
     ],
   },
@@ -35,7 +37,13 @@ const supportedDatabaseAdapters: {
           dbName: 'tinacms',
           mongoUri: process.env.MONGODB_URI as string,
         })`,
-    imports: [{ from: 'mongodb-level', imported: ['MongodbLevel'] }],
+    imports: [
+      {
+        from: 'mongodb-level',
+        imported: ['MongodbLevel'],
+        packageName: 'mongodb-level',
+      },
+    ],
   },
   other: {
     databaseAdapterClassText: '',

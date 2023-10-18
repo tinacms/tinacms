@@ -1,24 +1,13 @@
-/**
+import { Config, makeImportString } from '../prompts'
 
-*/
-
-import type { Framework } from '..'
-
-export type ConfigTemplateVariables = {
+export type ConfigTemplateArgs = {
   extraText?: string
   publicFolder: string
   collections?: string
-  token?: string
-  clientId?: string
-  nextAuthCredentialsProviderName?: string
   isLocalEnvVarName?: string
-}
-
-export type ConfigTemplateOptions = {
+  config: Config
   isForestryMigration?: boolean
-  nextAuth?: boolean
   selfHosted?: boolean
-  dataLayer?: boolean
 }
 
 const clientConfig = (isForestryMigration?: boolean) => {
@@ -27,120 +16,107 @@ const clientConfig = (isForestryMigration?: boolean) => {
   }
   return ''
 }
-
-const other = (vars: ConfigTemplateVariables, opts: ConfigTemplateOptions) => {
-  const authConfig =
-    (!opts.selfHosted &&
-      `  clientId: ${
-        vars.clientId
-          ? `'${vars.clientId}'`
-          : 'process.env.NEXT_PUBLIC_TINA_CLIENT_ID'
-      }, // Get this from tina.io
-  token:  ${
-    vars.token ? `'${vars.token}'` : 'process.env.TINA_TOKEN'
-  }, // Get this from tina.io`) ||
-    ''
-  return `
-import { defineConfig } from "tinacms";
-${vars.extraText || ''}
-
-// Your hosting provider likely exposes this as an environment variable
-const branch = process.env.GITHUB_BRANCH ||
-  process.env.VERCEL_GIT_COMMIT_REF ||
-  process.env.HEAD ||
-  "main"
-
-export default defineConfig({
-  branch,
-  ${authConfig}
-  ${clientConfig(opts.isForestryMigration)}
-  build: {
-    outputFolder: "admin",
-    publicFolder: "${vars.publicFolder}",
+const baseFields = `[
+  {
+    type: 'string',
+    name: 'title',
+    label: 'Title',
+    isTitle: true,
+    required: true,
   },
-  media: {
-    tina: {
-      mediaRoot: "",
-      publicFolder: "${vars.publicFolder}",
+  {
+    type: 'rich-text',
+    name: 'body',
+    label: 'Body',
+    isBody: true,
+  },
+]`
+const baseCollections = `[
+  {
+    name: 'post',
+    label: 'Posts',
+    path: 'content/posts',
+    fields: ${baseFields},
+  },
+]`
+const nextExampleCollection = `[
+  {
+    name: 'post',
+    label: 'Posts',
+    path: 'content/posts',
+    fields: ${baseFields},
+    ui: {
+      // This is an DEMO router. You can remove this to fit your site
+      router: ({ document }) => \`/demo/blog/\${document._sys.filename}\`,
     },
   },
-  schema: {
-    collections: ${
-      vars.collections ||
-      `[
-      {
-        name: "post",
-        label: "Posts",
-        path: "content/posts",
-        fields: [
-          {
-            type: "string",
-            name: "title",
-            label: "Title",
-            isTitle: true,
-            required: true,
-          },
-          {
-            type: "rich-text",
-            name: "body",
-            label: "Body",
-            isBody: true,
-          },
-        ],
-      },
-    ]`
-    },
-  },
-});
-`
-}
-type Keys = Framework['name']
+]`
 
-export const configExamples: {
-  [key in Keys]: (
-    vars?: ConfigTemplateVariables,
-    opts?: ConfigTemplateOptions
-  ) => string
-} = {
-  next: (args, opts) => {
-    const authConfig = opts.nextAuth
-      ? `admin: {
-          auth: new NextAuthProvider({
-            callbackUrl: '/admin/index.html',
-            name: '${args.nextAuthCredentialsProviderName}',
-          })
-      },`
-      : `clientId: ${
-          args.clientId
-            ? `'${args.clientId}'`
-            : 'process.env.NEXT_PUBLIC_TINA_CLIENT_ID'
-        }, // Get this from tina.io
-    token:  ${
-      args.token ? `'${args.token}'` : 'process.env.TINA_TOKEN'
-    }, // Get this from tina.io`
-    return `import { defineConfig } from 'tinacms'
-  ${
-    opts.nextAuth
-      ? `import { NextAuthProvider } from 'tinacms-next-auth/dist/tinacms'
-  `
-      : ''
+export const generateConfig = (args: ConfigTemplateArgs) => {
+  const isUsingTinaCloud =
+    !args.selfHosted || args.config.authenticationProvider.name === 'tina-cloud'
+
+  let extraImports = ''
+  if (args.selfHosted) {
+    // add imports for authentication provider
+    if (args.config.authenticationProvider) {
+      extraImports =
+        extraImports +
+        makeImportString(args.config.authenticationProvider?.configImports)
+    }
+    // if wer are not using tina cloud, we need to import the local auth provider
+    if (!isUsingTinaCloud) {
+      extraImports =
+        extraImports + `\nimport { LocalAuthProvider } from "tinacms";`
+    }
   }
+
+  return `
+  import { defineConfig } from "tinacms";
+  ${extraImports}
+  ${args.extraText || ''}
+  
   // Your hosting provider likely exposes this as an environment variable
   const branch = process.env.GITHUB_BRANCH ||
-  process.env.VERCEL_GIT_COMMIT_REF ||
-  process.env.HEAD ||
-  "main"
+    process.env.VERCEL_GIT_COMMIT_REF ||
+    process.env.HEAD ||
+    "main"
   ${
     (args.isLocalEnvVarName &&
-      `const isLocal = process.env.${args.isLocalEnvVarName} === 'true' || false`) ||
+      args.selfHosted &&
+      `const isLocal = process.env.${args.isLocalEnvVarName} === 'true'`) ||
     ''
   }
 
+
   export default defineConfig({
-    ${opts.dataLayer ? `contentApiUrlOverride: "/api/gql",` : ''}
+    ${
+      args.selfHosted && !isUsingTinaCloud
+        ? `contentApiUrlOverride: "/api/tina/gql",`
+        : ''
+    }
     branch,
-    ${authConfig}
-    ${clientConfig(opts.isForestryMigration)}
+    ${
+      args.selfHosted && !isUsingTinaCloud
+        ? `authProvider: isLocal
+    ? new LocalAuthProvider()
+    :${args.config?.authenticationProvider.configAuthenticationClass},`
+        : ''
+    }
+    ${
+      isUsingTinaCloud
+        ? `// Get this from tina.io
+        clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,`
+        : ''
+    }
+    ${
+      isUsingTinaCloud
+        ? `// Get this from tina.io
+    token: process.env.TINA_TOKEN,`
+        : ''
+    }
+
+    ${clientConfig(args.isForestryMigration)}
     build: {
       outputFolder: "admin",
       publicFolder: "${args.publicFolder}",
@@ -153,39 +129,11 @@ export const configExamples: {
     },
     schema: {
       collections:${
-        args.collections ||
-        `[
-        {
-          name: 'post',
-          label: 'Posts',
-          path: 'content/posts',
-          fields: [
-            {
-              type: 'string',
-              name: 'title',
-              label: 'Title',
-              isTitle: true,
-              required: true,
-            },
-            {
-              type: 'rich-text',
-              name: 'body',
-              label: 'Body',
-              isBody: true,
-            },
-          ],
-          ui: {
-            // This is an DEMO router. You can remove this to fit your site
-            router: ({ document }) => \`/demo/blog/\${document._sys.filename}\`,
-          },
-        },
-      ]`
+        args.collections || args.config.framework.name === 'next'
+          ? nextExampleCollection
+          : baseCollections
       },
     },
-  })
-  `
-  },
-  other,
-  hugo: other,
-  jekyll: other,
+  });  
+`
 }
