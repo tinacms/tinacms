@@ -16,7 +16,6 @@
 
  */
 
-
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDebounce } from 'react-use'
 import styled, { css } from 'styled-components'
@@ -46,7 +45,6 @@ export interface MediaRequest {
   onSelect?(media: Media): void
   close?(): void
   allowDelete?: boolean
-  namespace?: string
 }
 
 const StyledTab = styled.button<{ isActive: boolean }>`
@@ -112,7 +110,6 @@ export function MediaPicker({
   allowDelete,
   onSelect,
   close,
-  namespace,
   ...props
 }: MediaRequest) {
   const cms = useCMS()
@@ -121,7 +118,7 @@ export function MediaPicker({
     return 'not-configured'
   })
 
-  const { tabs = [], onItemClick } = cms.media.store
+  const { tabs = [], onItemClick, namespace } = cms.media.store
 
   const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
