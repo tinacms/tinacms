@@ -5,8 +5,8 @@ import { useEditorState, isCollapsed } from '@udecode/plate-headless'
 import { insertMDX } from '../../create-mdx-plugins'
 import {
   LinkForm,
-  wrapOrRewrapLink,
   isLinkActive,
+  wrapOrRewrapLink,
 } from '../../create-link-plugin'
 
 import type { PlateEditor } from '@udecode/plate-headless'
