@@ -164,10 +164,14 @@ async function apply({
       config,
     })
   } else if (
+    // Are we running tinacms init backend
     params.isBackendInit &&
-    config.authenticationProvider.name !== 'tina-cloud' &&
-    config.hosting === 'self-host'
+    // Do the user choose the 'self-host' option
+    config.hosting === 'self-host' &&
+    // the user did not choose the 'tina-cloud' authentication provider
+    (config.authenticationProvider?.name || '') !== 'tina-cloud'
   ) {
+    // TODO: update config instead of logging out the config
     // if we are doing a backend init we should print out what they need to add to the config
     logger.info(
       '\nPlease add the following to your tina/config.{ts,js} file:\n' +

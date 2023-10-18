@@ -54,7 +54,8 @@ const nextExampleCollection = `[
 
 export const generateConfig = (args: ConfigTemplateArgs) => {
   const isUsingTinaCloud =
-    !args.selfHosted || args.config.authenticationProvider.name === 'tina-cloud'
+    !args.selfHosted ||
+    args.config.authenticationProvider?.name === 'tina-cloud'
 
   let extraImports = ''
   if (args.selfHosted) {
@@ -87,8 +88,6 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
       `const isLocal = process.env.${args.isLocalEnvVarName} === 'true'`) ||
     ''
   }
-
-
   export default defineConfig({
     ${
       args.selfHosted && !isUsingTinaCloud
@@ -127,6 +126,7 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
         publicFolder: "${args.publicFolder}",
       },
     },
+    // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/schema/
     schema: {
       collections:${
         args.collections || args.config.framework.name === 'next'
