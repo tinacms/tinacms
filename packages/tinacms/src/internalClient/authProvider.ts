@@ -13,9 +13,9 @@ export abstract class AbstractAuthProvider implements AuthProvider {
    * @param init fetch function init
    */
   async fetchWithToken(
-    input: RequestInfo,
-    init?: RequestInit
-  ): Promise<Response> {
+    input?: Parameters<typeof fetch>[0],
+    init?: Parameters<typeof fetch>[1]
+  ): ReturnType<typeof fetch> {
     const headers = init?.headers || {}
     const token = await this.getToken()
     if (token?.id_token) {
