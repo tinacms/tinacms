@@ -402,10 +402,13 @@ const addConfigFile = async ({
   generatedFile: GeneratedFile
   config: Config
 }) => {
+  const content = await format(generateConfig(configArgs), {
+    parser: 'babel',
+  })
   await writeGeneratedFile({
     overwrite: config.overwriteList?.includes('config'),
     generatedFile,
-    content: generateConfig(configArgs),
+    content,
     typescript: config.typescript,
   })
   const { exists } = generatedFile.resolve(config.typescript)
