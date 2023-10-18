@@ -1,6 +1,14 @@
+import { InitEnvironment } from '..'
 import { Config, makeImportString } from '../prompts'
 
-export const nextApiRouteTemplate = ({ config }: { config: Config }) => {
+export const nextApiRouteTemplate = ({
+  config,
+  env,
+}: {
+  config: Config
+  env: InitEnvironment
+}) => {
+  const extraPath = env.usingSrc ? '../' : ''
   return `import { TinaNodeBackend, LocalBackendAuthentication } from '@tinacms/datalayer'
   ${makeImportString(
     config.authenticationProvider?.backendAuthenticationImports
@@ -8,7 +16,7 @@ export const nextApiRouteTemplate = ({ config }: { config: Config }) => {
  
 
   
-  import databaseClient from '../../../tina/__generated__/databaseClient'
+  import databaseClient from '${extraPath}../../../tina/__generated__/databaseClient'
   
   const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
   

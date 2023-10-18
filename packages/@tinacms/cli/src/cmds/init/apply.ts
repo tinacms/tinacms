@@ -116,6 +116,7 @@ async function apply({
     })
     // add pages/api/tina/[...routes].ts file
     await addNextApiRoute({
+      env,
       config,
       generatedFile: env.generatedFiles['next-api-handler'],
     })
@@ -438,14 +439,19 @@ const addDatabaseFile = async ({
 const addNextApiRoute = async ({
   config,
   generatedFile,
+  env,
 }: {
+  env: InitEnvironment
   config: Config
   generatedFile: GeneratedFile
 }) => {
+  const content = await format(nextApiRouteTemplate({ config, env }), {
+    parser: 'babel',
+  })
   await writeGeneratedFile({
     generatedFile,
     overwrite: config.overwriteList?.includes('next-api-handler'),
-    content: nextApiRouteTemplate({ config }),
+    content,
     typescript: config.typescript,
   })
 }
