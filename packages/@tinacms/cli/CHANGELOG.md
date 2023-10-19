@@ -1,5 +1,24 @@
 # tinacms-cli
 
+## 1.5.31
+
+### Patch Changes
+
+- a58c5b12f: Update dev & build commands to log and exit on indexing errors
+- Updated dependencies [b6fbab887]
+- Updated dependencies [939147364]
+- Updated dependencies [857414612]
+- Updated dependencies [4ae43fdde]
+- Updated dependencies [a58c5b12f]
+- Updated dependencies [6861b5e01]
+- Updated dependencies [aec44a7dc]
+  - tinacms@1.5.22
+  - @tinacms/search@1.0.12
+  - @tinacms/graphql@1.4.27
+  - @tinacms/schema-tools@1.4.13
+  - @tinacms/app@1.2.29
+  - @tinacms/datalayer@1.2.27
+
 ## 1.5.30
 
 ### Patch Changes

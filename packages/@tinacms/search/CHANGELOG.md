@@ -1,5 +1,17 @@
 # @tinacms/search
 
+## 1.0.12
+
+### Patch Changes
+
+- 939147364: Fix search indexing of list objects
+- Updated dependencies [857414612]
+- Updated dependencies [a58c5b12f]
+- Updated dependencies [6861b5e01]
+- Updated dependencies [aec44a7dc]
+  - @tinacms/graphql@1.4.27
+  - @tinacms/schema-tools@1.4.13
+
 ## 1.0.11
 
 ### Patch Changes
