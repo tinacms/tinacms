@@ -47,6 +47,7 @@ const supportedAuthenticationProviders: {
         imported: ['AuthJsBackendAuthentication', 'TinaAuthJSOptions'],
       },
     ],
+    peerDependencies: ['next-auth'],
   },
 }
 

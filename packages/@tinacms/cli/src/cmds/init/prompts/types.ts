@@ -39,4 +39,5 @@ export interface PromptAuthenticationProvider {
   // for /api/tina/[...routes] file
   backendAuthentication?: string
   backendAuthenticationImports?: ImportStatement[]
+  peerDependencies?: string[]
 }

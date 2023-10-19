@@ -315,6 +315,7 @@ const addDependencies = async (
   deps.push(
     ...(config.databaseAdapter?.imports?.map((x) => x.packageName) || [])
   )
+  deps.push(...(config.authenticationProvider?.peerDependencies || []))
   deps.push(
     ...(config.authenticationProvider?.backendAuthenticationImports?.map(
       (x) => x.packageName
