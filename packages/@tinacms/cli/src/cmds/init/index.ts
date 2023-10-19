@@ -36,10 +36,12 @@ export type GeneratedFile = {
   resolve: (boolean) => { exists: boolean; path: string; parentPath: string }
 }
 
+export type FrontmatterFormat = 'yaml' | 'toml' | 'json'
+
 export type InitEnvironment = {
   hasTinaDeps: boolean
   forestryConfigExists: boolean
-  frontMatterFormat: 'yaml' | 'toml' | 'json'
+  frontMatterFormat: FrontmatterFormat
   gitIgnoreExists: boolean
   gitIgnoreNodeModulesExists: boolean
   gitIgnoreTinaEnvExists: boolean

@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import path from 'path'
 import { logger } from '../../logger'
-import { GeneratedFile, InitEnvironment } from './index'
+import { FrontmatterFormat, GeneratedFile, InitEnvironment } from './index'
 
 const checkGitignoreForItem = async ({
   baseDir,
@@ -160,12 +160,20 @@ const detectEnvironment = async ({
     (await checkGitignoreForItem({ baseDir, line: '.env.tina' }))
   const hasGitIgnoreEnv =
     hasGitIgnore && (await checkGitignoreForItem({ baseDir, line: '.env' }))
-  let frontMatterFormat
+  let frontMatterFormat: FrontmatterFormat
   if (hasForestryConfig) {
     const hugoConfigPath = path.join(rootPath, 'config.toml')
     if (await fs.pathExists(hugoConfigPath)) {
       const hugoConfig = await fs.readFile(hugoConfigPath, 'utf8')
-      frontMatterFormat = hugoConfig.match(/metaDataFormat = "(.*)"/)
+      const metaDataFormat = hugoConfig.match(/metaDataFormat = "(.*)"/)?.[1]
+      if (
+        metaDataFormat &&
+        (metaDataFormat === 'yaml' ||
+          metaDataFormat === 'toml' ||
+          metaDataFormat === 'json')
+      ) {
+        frontMatterFormat = metaDataFormat
+      }
     }
   }
   const env = {
