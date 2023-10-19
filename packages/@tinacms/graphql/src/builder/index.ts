@@ -442,7 +442,7 @@ export class Builder {
       type,
       name,
       args,
-      required: false,
+      required: true,
     })
   }
 
