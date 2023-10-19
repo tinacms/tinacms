@@ -824,6 +824,7 @@ importers:
     specifiers:
       '@tinacms/scripts': workspace:*
       '@types/micromatch': ^4.0.2
+      '@types/react': 17.0.47
       '@types/yup': ^0.29.10
       jest: ^29.5.0
       picomatch-browser: 2.2.6
@@ -839,6 +840,7 @@ importers:
     devDependencies:
       '@tinacms/scripts': link:../scripts
       '@types/micromatch': 4.0.2
+      '@types/react': 17.0.47
       '@types/yup': 0.29.14
       jest: 29.5.0
       react: 17.0.2

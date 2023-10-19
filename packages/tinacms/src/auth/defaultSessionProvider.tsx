@@ -1,6 +1,6 @@
 import React from 'react'
 
-const DefaultSessionProvider = ({
+const DefaultSessionProvider: React.FC = ({
   children,
 }: {
   children: React.ReactNode
