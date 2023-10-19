@@ -307,6 +307,10 @@ const addDependencies = async (
     devDeps.push('@types/node')
   }
 
+  if (config.hosting === 'self-host') {
+    deps.push('@tinacms/datalayer')
+  }
+
   // Add deps from database adapter, authentication provider, and git provider
   deps.push(
     ...(config.databaseAdapter?.imports?.map((x) => x.packageName) || [])
