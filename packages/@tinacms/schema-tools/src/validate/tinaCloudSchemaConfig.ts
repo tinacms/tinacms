@@ -22,7 +22,12 @@ const tinaSearchKey = z
   .strict()
   .optional()
 export const tinaConfigZod = z.object({
-  client: z.object({ referenceDepth: z.number().optional() }).optional(),
+  client: z
+    .object({
+      referenceDepth: z.number().optional(),
+      errorPolicy: z.enum(['include', 'throw']).optional(),
+    })
+    .optional(),
   media: z
     .object({
       tina: tinaConfigKey,
