@@ -438,11 +438,17 @@ export class Builder {
       [NAMER.createName([collection.name])]: 'create',
       [NAMER.updateName([collection.name])]: 'update',
     })
+
+    // Is errorPolicy set to include?
+    const errorPolicyInclude =
+      this.config.tinaSchema.config?.config?.client?.errorPolicy === 'include'
     return astBuilder.FieldDefinition({
       type,
       name,
       args,
-      required: false,
+      // If the error policy is set to include, we need to make the field optional
+      // if it is set to throw it is required
+      required: !errorPolicyInclude,
     })
   }
 
