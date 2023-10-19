@@ -1,5 +1,18 @@
 # tina-graphql
 
+## 1.4.27
+
+### Patch Changes
+
+- 857414612: Don't log "not found" errors to the console from the GraphQL server
+- a58c5b12f: Change content parsing logic to unconditionally log parse errors
+- aec44a7dc: Allow backend/client to include partial queries
+- Updated dependencies [b6fbab887]
+- Updated dependencies [6861b5e01]
+- Updated dependencies [aec44a7dc]
+  - @tinacms/mdx@1.3.20
+  - @tinacms/schema-tools@1.4.13
+
 ## 1.4.26
 
 ### Patch Changes
