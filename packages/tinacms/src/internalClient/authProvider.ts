@@ -2,6 +2,10 @@ import { AuthProvider, LoginStrategy } from '@tinacms/schema-tools'
 import { authenticate, AUTH_TOKEN_KEY, TokenObject } from '../auth/authenticate'
 import DefaultSessionProvider from '../auth/defaultSessionProvider'
 
+type Input = Parameters<AuthProvider['fetchWithToken']>[0]
+type Init = Parameters<AuthProvider['fetchWithToken']>[1]
+type FetchReturn = ReturnType<AuthProvider['fetchWithToken']>
+
 export abstract class AbstractAuthProvider implements AuthProvider {
   /**
    * Wraps the normal fetch function with same API but adds the authorization header token.
@@ -12,10 +16,7 @@ export abstract class AbstractAuthProvider implements AuthProvider {
    * @param input fetch function input
    * @param init fetch function init
    */
-  async fetchWithToken(
-    input: RequestInfo,
-    init?: RequestInit
-  ): Promise<Response> {
+  async fetchWithToken(input: Input, init: Init): FetchReturn {
     const headers = init?.headers || {}
     const token = await this.getToken()
     if (token?.id_token) {

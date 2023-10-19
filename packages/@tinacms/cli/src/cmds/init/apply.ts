@@ -14,22 +14,10 @@ import {
 import { Telemetry } from '@tinacms/metrics'
 import fs from 'fs-extra'
 import { writeGitignore } from '../../next/commands/codemod-command'
-import { templates as AssetsTemplates } from './templates/assets'
-import {
-  templates as AuthTemplates,
-  Variables as AuthTemplateVariables,
-} from './templates/auth'
-import {
-  configExamples,
-  ConfigTemplateOptions,
-  ConfigTemplateVariables,
-} from './templates/config'
-import { templates as DatabaseTemplates } from './templates/database'
-import {
-  templates as GQLTemplates,
-  Variables as GQLTemplateVariables,
-} from './templates/gql'
 import { templates as NextTemplates } from './templates/next'
+import { ConfigTemplateArgs, generateConfig } from './templates/config'
+import { databaseTemplate } from './templates/database'
+import { nextApiRouteTemplate } from './templates/tinaNextRoute'
 import { helloWorldPost } from './templates/content'
 import { format } from 'prettier'
 import { extendNextScripts } from '../../utils/script-helpers'
@@ -40,6 +28,7 @@ import {
   InitParams,
   ReactiveFramework,
 } from './index'
+import { Config } from './prompts'
 
 async function apply({
   env,
@@ -48,7 +37,7 @@ async function apply({
 }: {
   env: InitEnvironment
   params: InitParams
-  config: Record<any, any>
+  config: Config
 }) {
   if (config.framework.name === 'other' && config.hosting === 'self-host') {
     logger.error(
@@ -62,11 +51,6 @@ async function apply({
   let collections: string | null | undefined
   let templateCode: string | null | undefined
   let extraText: string | null | undefined
-
-  if (env.nextAppDir && config.framework.name === 'next') {
-    // instead of causing an error lets not generate an example
-    config.framework.name = 'other'
-  }
 
   let isForestryMigration = false
   if (env.forestryConfigExists) {
@@ -102,7 +86,7 @@ async function apply({
   if (!env.gitIgnoreExists) {
     await createGitignore({ baseDir })
   } else {
-    let itemsToAdd = []
+    const itemsToAdd = []
     if (!env.gitIgnoreNodeModulesExists) {
       itemsToAdd.push('node_modules')
     }
@@ -114,6 +98,7 @@ async function apply({
     }
   }
 
+  // if we are migrating forestry files add the tina/template file
   if (isForestryMigration && !env.tinaConfigExists) {
     await addTemplateFile({
       generatedFile: env.generatedFiles['templates'],
@@ -124,52 +109,31 @@ async function apply({
   const usingDataLayer = config.hosting === 'self-host'
 
   if (usingDataLayer) {
+    // add tina/database file
     await addDatabaseFile({
       config,
       generatedFile: env.generatedFiles['database'],
     })
-    await addGqlApiHandler({
+    // add pages/api/tina/[...routes].ts file
+    await addNextApiRoute({
+      env,
       config,
-      generatedFile: env.generatedFiles['gql-api-handler'],
+      generatedFile: env.generatedFiles['next-api-handler'],
     })
   }
 
-  if (config.nextAuthProvider) {
-    await addAuthFile({
-      config,
-      generatedFile: env.generatedFiles['auth'],
-    })
-
-    await addNextAuthApiHandler({
-      config,
-      generatedFile: env.generatedFiles['next-auth-api-handler'],
-      content: NextTemplates['next-auth-api-handler'](),
-    })
-
-    if (config.nextAuthProvider === 'vercel-kv-credentials-provider') {
-      await addVercelKVCredentialsProviderFiles({
-        generatedSignin:
-          env.generatedFiles['vercel-kv-credentials-provider-signin'],
-        generatedRegister:
-          env.generatedFiles['vercel-kv-credentials-provider-register'],
-        generatedTailwindCSS:
-          env.generatedFiles['vercel-kv-credentials-provider-tailwindcss'],
-        generatedRegisterApiHandler:
-          env.generatedFiles[
-            'vercel-kv-credentials-provider-register-api-handler'
-          ],
-        generatedTinaSVG: env.generatedFiles['tina.svg'],
-        config,
-      })
-    }
-  }
-
+  // add NextJS Demo file (First time init only)
   if (!env.forestryConfigExists && !env.tinaConfigExists) {
     // add /content/posts/hello-world.md
     await addContentFile({ config, env })
   }
 
-  if (config.framework.reactive && addReactiveFile[config.framework.name]) {
+  // add nextJs example code (First time init only)
+  if (
+    config.framework.reactive &&
+    addReactiveFile[config.framework.name] &&
+    !env.tinaConfigExists
+  ) {
     await addReactiveFile[config.framework.name as ReactiveFramework]({
       baseDir,
       config,
@@ -184,8 +148,8 @@ async function apply({
   if (!env.tinaConfigExists) {
     // add tina/config.{js,ts}]
     await addConfigFile({
-      templateVariables: {
-        // remove process fom pathToForestryConfig and add publicFolder
+      configArgs: {
+        config,
         publicFolder: path.join(
           path.relative(process.cwd(), pathToForestryConfig),
           config.publicFolder
@@ -193,24 +157,22 @@ async function apply({
         collections,
         extraText,
         isLocalEnvVarName: config.isLocalEnvVarName,
-        nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
-      },
-      templateOptions: {
-        nextAuth: config.nextAuth,
         isForestryMigration,
         selfHosted: usingDataLayer,
-        dataLayer: usingDataLayer,
       },
       baseDir,
-      framework: config.framework,
       generatedFile: env.generatedFiles['config'],
       config,
     })
   } else if (
+    // Are we running tinacms init backend
     params.isBackendInit &&
-    config.nextAuth &&
-    config.hosting === 'self-host'
+    // Do the user choose the 'self-host' option
+    config.hosting === 'self-host' &&
+    // the user did not choose the 'tina-cloud' authentication provider
+    (config.authenticationProvider?.name || '') !== 'tina-cloud'
   ) {
+    // TODO: update config instead of logging out the config
     // if we are doing a backend init we should print out what they need to add to the config
     logger.info(
       '\nPlease add the following to your tina/config.{ts,js} file:\n' +
@@ -239,7 +201,8 @@ async function apply({
   }
 
   logNextSteps({
-    isBackend: env.tinaConfigExists,
+    config: config,
+    isBackend: params.isBackendInit,
     dataLayer: usingDataLayer,
     packageManager: config.packageManager,
     framework: config.framework,
@@ -325,31 +288,40 @@ const updateGitIgnore = async ({
   await fs.writeFile(path.join(baseDir, '.gitignore'), newGitignoreContent)
 }
 const addDependencies = async (
-  config: Record<any, any>,
+  config: Config,
   env: InitEnvironment,
   params: InitParams
 ) => {
+  const { packageManager } = config
   const tagVersion = params.tinaVersion ? `@${params.tinaVersion}` : ''
-  const { dataLayerAdapter, nextAuth, packageManager } = config
   let deps = []
+  let devDeps = []
 
   // If TinaCMS is already installed, don't add it again
   if (!env.hasTinaDeps) {
     deps.push('tinacms')
-    deps.push('@tinacms/cli')
+    devDeps.push('@tinacms/cli')
   }
-  let devDeps = []
-  if (nextAuth) {
-    deps.push('tinacms-next-auth', 'next-auth')
+
+  if (config.typescript) {
+    devDeps.push('@types/node')
   }
-  if (config?.hosting === 'self-host') {
-    deps.push('@tinacms/datalayer')
-    deps.push('tinacms-gitprovider-github')
-  }
-  if (dataLayerAdapter === 'upstash-redis') {
-    deps.push('upstash-redis-level')
-    deps.push('@upstash/redis')
-  }
+
+  // Add deps from database adapter, authentication provider, and git provider
+  deps.push(
+    ...(config.databaseAdapter?.imports?.map((x) => x.packageName) || [])
+  )
+  deps.push(
+    ...(config.authenticationProvider?.backendAuthenticationImports?.map(
+      (x) => x.packageName
+    ) || [])
+  )
+  deps.push(
+    ...(config.authenticationProvider?.configImports?.map(
+      (x) => x.packageName
+    ) || [])
+  )
+  deps.push(...(config.gitProvider?.imports?.map((x) => x.packageName) || []))
 
   // add tag version if this is a pr tagged version
   if (tagVersion) {
@@ -426,25 +398,22 @@ const writeGeneratedFile = async ({
 
 const addConfigFile = async ({
   baseDir,
-  framework,
-  templateOptions,
-  templateVariables,
+  configArgs,
   generatedFile,
   config,
 }: {
   baseDir: string
-  framework: Framework
-  templateOptions: ConfigTemplateOptions
-  templateVariables: ConfigTemplateVariables
+  configArgs: ConfigTemplateArgs
   generatedFile: GeneratedFile
-  config: Record<any, any>
+  config: Config
 }) => {
+  const content = await format(generateConfig(configArgs), {
+    parser: 'babel',
+  })
   await writeGeneratedFile({
-    overwrite: config.typescript
-      ? config.overwriteConfigTS
-      : config.overwriteConfigJS,
+    overwrite: config.overwriteList?.includes('config'),
     generatedFile,
-    content: configContent(framework, templateVariables, templateOptions),
+    content,
     typescript: config.typescript,
   })
   const { exists } = generatedFile.resolve(config.typescript)
@@ -453,67 +422,35 @@ const addConfigFile = async ({
   }
 }
 
-const addAuthFile = async ({
-  config,
-  generatedFile,
-}: {
-  config: Record<any, any>
-  generatedFile: GeneratedFile
-}) => {
-  const { nextAuthProvider, nextAuthCredentialsProviderName } = config
-  const templateVariables = {
-    nextAuthCredentialsProviderName,
-  }
-  await writeGeneratedFile({
-    generatedFile,
-    overwrite: config.typescript
-      ? config.overwriteAuthTS
-      : config.overwriteAuthJS,
-    content: authContent(nextAuthProvider, templateVariables),
-    typescript: config.typescript,
-  })
-}
-
 const addDatabaseFile = async ({
   config,
   generatedFile,
 }: {
-  config: Record<any, any>
+  config: Config
   generatedFile: GeneratedFile
 }) => {
-  const { isLocalEnvVarName } = config
   await writeGeneratedFile({
     generatedFile,
-    overwrite: config.typescript
-      ? config.overwriteDatabaseTS
-      : config.overwriteDatabaseJS,
-    content: DatabaseTemplates[config.dataLayerAdapter]({ isLocalEnvVarName }),
+    overwrite: config.overwriteList?.includes('database'),
+    content: databaseTemplate({ config }),
     typescript: config.typescript,
   })
 }
-
-const addGqlApiHandler = async ({
+const addNextApiRoute = async ({
   config,
   generatedFile,
+  env,
 }: {
-  config: Record<any, any>
+  env: InitEnvironment
+  config: Config
   generatedFile: GeneratedFile
 }) => {
-  let vars: GQLTemplateVariables = {
-    isLocalEnvVarName: config.isLocalEnvVarName,
-    typescript: config.typescript,
-  }
-  let content = GQLTemplates['custom'](vars)
-  if (config.nextAuth) {
-    content = GQLTemplates['tinacms-next-auth'](vars)
-  } else if (config.clientId || config.token) {
-    content = GQLTemplates['tina-cloud'](vars)
-  }
+  const content = await format(nextApiRouteTemplate({ config, env }), {
+    parser: 'babel',
+  })
   await writeGeneratedFile({
     generatedFile,
-    overwrite: config.typescript
-      ? config.overwriteGqlApiHandlerTS
-      : config.overwriteGqlApiHandlerJS,
+    overwrite: config.overwriteList?.includes('next-api-handler'),
     content,
     typescript: config.typescript,
   })
@@ -527,13 +464,11 @@ export const addTemplateFile = async ({
 }: {
   content: string
   generatedFile: GeneratedFile
-  config: Record<any, any>
+  config: Config
 }) => {
   await writeGeneratedFile({
     generatedFile,
-    overwrite: config.typescript
-      ? config.overwriteTemplatesTS
-      : config.overwriteTemplatesJS,
+    overwrite: config.overwriteList?.includes(generatedFile.name),
     content,
     typescript: config.typescript,
   })
@@ -543,7 +478,7 @@ const addContentFile = async ({
   config,
   env,
 }: {
-  config: Record<any, any>
+  config: Config
   env: InitEnvironment
 }) => {
   await writeGeneratedFile({
@@ -562,18 +497,20 @@ const addContentFile = async ({
         })
       },
     },
-    overwrite: config.overwriteSampleContent,
+    overwrite: config.overwriteList?.includes('hello-world'),
     content: helloWorldPost,
     typescript: false,
   })
 }
 
 const logNextSteps = ({
-  dataLayer,
+  config,
+  dataLayer: _datalayer,
   framework,
   packageManager,
   isBackend,
 }: {
+  config: Config
   isBackend: boolean
   dataLayer: boolean
   packageManager: string
@@ -581,6 +518,18 @@ const logNextSteps = ({
 }) => {
   if (isBackend) {
     logger.info(focusText(`\n${titleText(' TinaCMS ')} backend initialized!`))
+    logger.info(
+      'Please add the following environment variables to your .env file'
+    )
+    logger.info(
+      indentText(
+        config.envVars
+          .map((x) => {
+            return `${x.key}=${x.value || '***'}`
+          })
+          .join('\n')
+      )
+    )
     logger.info(
       'If you are deploying to vercel make sure to add the environment variables to your project.'
     )
@@ -629,25 +578,9 @@ const frameworkDevCmds: {
   },
 }
 
-const configContent = (
-  framework: Framework,
-  vars: ConfigTemplateVariables,
-  opts: ConfigTemplateOptions
-) => {
-  return format(configExamples[framework.name](vars, opts), {
-    parser: 'babel',
-  })
-}
-
-const authContent = (authType: string, vars: AuthTemplateVariables) => {
-  return format(AuthTemplates[authType](vars), {
-    parser: 'babel',
-  })
-}
-
 type AddReactiveParams = {
   baseDir: string
-  config: Record<any, any>
+  config: Config
   env: InitEnvironment
   dataLayer: boolean
   generatedFile: GeneratedFile
@@ -667,9 +600,7 @@ const addReactiveFile: {
     await writeGeneratedFile({
       generatedFile,
       typescript: config.typescript,
-      overwrite: config.typescript
-        ? config.overwriteNextAuthApiHandlerTS
-        : config.overwriteNextAuthApiHandlerJS,
+      overwrite: config.overwriteList?.includes(generatedFile.name),
       content: NextTemplates['demo-post-page']({
         usingSrc: env.usingSrc,
         dataLayer,
@@ -685,8 +616,7 @@ const addReactiveFile: {
         ...packageJson,
         scripts: extendNextScripts(scripts, {
           isLocalEnvVarName: config.isLocalEnvVarName,
-          addSetupUsers:
-            config.nextAuthProvider === 'vercel-kv-credentials-provider',
+          addSetupUsers: config.authenticationProvider?.name === 'next-auth',
         }),
       },
       null,
@@ -694,83 +624,6 @@ const addReactiveFile: {
     )
     fs.writeFileSync(packageJsonPath, updatedPackageJson)
   },
-}
-
-async function addNextAuthApiHandler({
-  generatedFile,
-  config,
-  content,
-}: {
-  generatedFile: GeneratedFile
-  config: Record<any, any>
-  content: string
-}) {
-  await writeGeneratedFile({
-    generatedFile,
-    typescript: config.typescript,
-    overwrite: config.typescript
-      ? config.overwriteNextAuthApiHandlerTS
-      : config.overwriteNextAuthApiHandlerJS,
-    content,
-  })
-}
-
-const addVercelKVCredentialsProviderFiles = async ({
-  generatedSignin,
-  generatedRegister,
-  generatedTailwindCSS,
-  generatedRegisterApiHandler,
-  generatedTinaSVG,
-  config,
-}: {
-  generatedSignin: GeneratedFile
-  generatedRegister: GeneratedFile
-  generatedTailwindCSS: GeneratedFile
-  generatedRegisterApiHandler: GeneratedFile
-  generatedTinaSVG: GeneratedFile
-  config: Record<any, any>
-}) => {
-  await writeGeneratedFile({
-    generatedFile: generatedSignin,
-    overwrite: config.typescript
-      ? config.overwriteVercelKVCredentialsProviderSigninTS
-      : config.overwriteVercelKVCredentialsProviderSigninJS,
-    content: NextTemplates['vercel-kv-credentials-provider-signin'](),
-    typescript: config.typescript,
-  })
-  await writeGeneratedFile({
-    generatedFile: generatedRegister,
-    overwrite: config.typescript
-      ? config.overwriteVercelKVCredentialsProviderRegisterTS
-      : config.overwriteVercelKVCredentialsProviderRegisterJS,
-    content: NextTemplates['vercel-kv-credentials-provider-register']({
-      nextAuthCredentialsProviderName: config.nextAuthCredentialsProviderName,
-    }),
-    typescript: config.typescript,
-  })
-  await writeGeneratedFile({
-    generatedFile: generatedTailwindCSS,
-    overwrite: config.typescript
-      ? config.overwriteVercelKVCredentialsProviderTailwindCSSTS
-      : config.overwriteVercelKVCredentialsProviderTailwindCSSJS,
-    content: NextTemplates['vercel-kv-credentials-provider-tailwindcss'](),
-    typescript: config.typescript,
-  })
-  await writeGeneratedFile({
-    generatedFile: generatedRegisterApiHandler,
-    overwrite: config.typescript
-      ? config.overwriteVercelKVCredentialsProviderRegisterApiHandlerTS
-      : config.overwriteVercelKVCredentialsProviderRegisterApiHandlerJS,
-    content:
-      NextTemplates['vercel-kv-credentials-provider-register-api-handler'](),
-    typescript: config.typescript,
-  })
-  await writeGeneratedFile({
-    generatedFile: generatedTinaSVG,
-    overwrite: true,
-    content: AssetsTemplates['tina.svg'](),
-    typescript: config.typescript,
-  })
 }
 
 /**

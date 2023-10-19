@@ -476,11 +476,11 @@ export interface AuthProvider {
    *
    **/
   authenticate: (props?: Record<string, any>) => Promise<any | null>
-  fetchWithToken: typeof fetch
+  fetchWithToken: (input: RequestInfo, init?: RequestInit) => Promise<Response>
   isAuthorized: (context?: any) => Promise<boolean>
   isAuthenticated: () => Promise<boolean>
   getLoginStrategy: () => LoginStrategy
-  getSessionProvider: () => React.ReactElement
+  getSessionProvider: () => FC<{ basePath?: string }>
 }
 
 interface AuthHooks {
