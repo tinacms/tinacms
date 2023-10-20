@@ -20,15 +20,12 @@ import { MediaIcon } from '@einsteinindustries/tinacms-icons'
 import { createScreen } from '@einsteinindustries/tinacms-react-screens'
 import { MediaPicker } from '../../components/media'
 
-export function createMediaManagerScreenPlugin(namespace?: string) {
-  return createScreen({
-    name: 'Assets Manager',
-    Component: MediaPicker,
-    Icon: MediaIcon,
-    layout: 'fullscreen',
-    props: {
-      allowDelete: true,
-      namespace
-    },
-  })
-}
+export const MediaManagerScreenPlugin = createScreen({
+  name: 'Assets Manager',
+  Component: MediaPicker,
+  Icon: MediaIcon,
+  layout: 'fullscreen',
+  props: {
+    allowDelete: true,
+  },
+})
