@@ -1,5 +1,61 @@
 # tinacms
 
+## 1.5.22
+
+### Patch Changes
+
+- b6fbab887: Add support for basic markdown tables.
+
+  ### Usage
+
+  ```ts
+  // tina/config.ts
+  import `tinaTableTemplate` from `tinacms`
+
+  // add it to the rich-text template
+    {
+      type: 'rich-text',
+      label: 'Body',
+      name: '_body',
+      templates: [
+        tinaTableTemplate
+      ///
+  ```
+
+  Customize the `th` and `td` fields in the `<TinaMarkdown>` component:
+
+  ```tsx
+  <TinaMarkdown
+    content={props.body}
+    components={{
+      th: (props) => <th className="bg-gray-100 font-bold" {...props} />,
+      td: (props) => <td className="bg-gray-100" {...props} />,
+    }}
+  />
+  ```
+
+  To control the rendering for `
+
+- 4ae43fdde: UX improvements for editor link plugin
+- aec44a7dc: Allow backend/client to include partial queries
+- Updated dependencies [b6fbab887]
+- Updated dependencies [939147364]
+- Updated dependencies [6861b5e01]
+- Updated dependencies [aec44a7dc]
+  - @tinacms/mdx@1.3.20
+  - @tinacms/search@1.0.12
+  - @tinacms/schema-tools@1.4.13
+
+## 1.5.21
+
+### Patch Changes
+
+- 177002715: Fix/media thumbnail
+- e69a3ef81: fix: Fix active form on nested group when value is empty
+- c925786ef: Fix issue with undo/redo in rich-text editor
+- 9f01550dd: Fix issue where deeply nested mdx fields were not picking up the correct template"
+  - @tinacms/search@1.0.11
+
 ## 1.5.20
 
 ### Patch Changes

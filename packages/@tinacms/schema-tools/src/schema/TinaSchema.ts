@@ -105,6 +105,7 @@ export class TinaSchema {
   }
   public getCollectionByFullPath = (filepath: string) => {
     const fileExtension = filepath.split('.').pop()
+    const normalizedPath = filepath.replace(/\\/g, '/')
 
     const possibleCollections = this.getCollections().filter((collection) => {
       // filter out file extensions that don't match the collection format
@@ -114,7 +115,7 @@ export class TinaSchema {
       if (collection?.match?.include || collection?.match?.exclude) {
         // if the collection has a match or exclude, we need to check if the file matches
         const matches = this.getMatches({ collection })
-        const match = picomatch.isMatch(filepath, matches)
+        const match = picomatch.isMatch(normalizedPath, matches)
 
         if (!match) {
           return false
@@ -122,7 +123,7 @@ export class TinaSchema {
       }
       // add / to the end of the path if it is not "''"
       const path = collection.path ? collection.path.replace(/\/?$/, '/') : ''
-      return filepath.replace(/\\/g, '/').startsWith(path)
+      return normalizedPath.startsWith(path)
     })
 
     // No matches

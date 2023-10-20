@@ -43,6 +43,36 @@ export const remarkToSlate = (
 
   const content = (content: Md.Content): Plate.BlockElement => {
     switch (content.type) {
+      case 'table': {
+        return {
+          type: 'mdxJsxFlowElement',
+          children: [{ type: 'text', text: '' }],
+          name: 'table',
+          props: {
+            tableRows: content.children.map((child) => {
+              return {
+                tableCells: child.children.map((child) => {
+                  return {
+                    tableCell: {
+                      type: 'root',
+                      children: [
+                        {
+                          type: 'p',
+                          children: flatten(
+                            child.children.map((child) =>
+                              phrasingContent(child)
+                            )
+                          ),
+                        },
+                      ],
+                    },
+                  }
+                }),
+              }
+            }),
+          },
+        }
+      }
       case 'blockquote':
         const children: Plate.InlineElement[] = []
         content.children.map((child) => {
@@ -509,7 +539,7 @@ export class RichTextParseError extends Error {
 
 // Prevent javascript scheme (eg. `javascript:alert(document.domain)`)
 const sanitizeUrl = (url: string | undefined) => {
-  const allowedSchemes = ['http', 'https', 'mailto', 'tel']
+  const allowedSchemes = ['http', 'https', 'mailto', 'tel', 'xref']
   if (!url) return ''
 
   let parsedUrl: URL | null = null

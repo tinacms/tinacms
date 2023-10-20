@@ -1,5 +1,55 @@
 # @tinacms/mdx
 
+## 1.3.20
+
+### Patch Changes
+
+- b6fbab887: Add support for basic markdown tables.
+
+  ### Usage
+
+  ```ts
+  // tina/config.ts
+  import `tinaTableTemplate` from `tinacms`
+
+  // add it to the rich-text template
+    {
+      type: 'rich-text',
+      label: 'Body',
+      name: '_body',
+      templates: [
+        tinaTableTemplate
+      ///
+  ```
+
+  Customize the `th` and `td` fields in the `<TinaMarkdown>` component:
+
+  ```tsx
+  <TinaMarkdown
+    content={props.body}
+    components={{
+      th: (props) => <th className="bg-gray-100 font-bold" {...props} />,
+      td: (props) => <td className="bg-gray-100" {...props} />,
+    }}
+  />
+  ```
+
+  To control the rendering for `
+
+- Updated dependencies [6861b5e01]
+- Updated dependencies [aec44a7dc]
+  - @tinacms/schema-tools@1.4.13
+
+## 1.3.19
+
+### Patch Changes
+
+- 5040fc7cb: Add xref support to markdown links
+
+  ```md
+  Click [here](xref:some-link 'Tester') to join now
+  ```
+
 ## 1.3.18
 
 ### Patch Changes

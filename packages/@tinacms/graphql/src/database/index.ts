@@ -57,6 +57,7 @@ import sha from 'js-sha1'
 import { FilesystemBridge, TinaLevelClient } from '..'
 import { generatePasswordHash, mapUserFields } from '../auth/utils'
 import _ from 'lodash'
+import { NotFoundError } from '../error'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -316,7 +317,7 @@ export class Database {
         .get(normalizePath(filepath))
 
       if (!contentObject) {
-        throw new GraphQLError(`Unable to find record ${filepath}`)
+        throw new NotFoundError(`Unable to find record ${filepath}`)
       }
       return transformDocument(
         filepath,

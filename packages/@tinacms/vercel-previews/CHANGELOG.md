@@ -1,5 +1,24 @@
 # Change Log
 
+## 0.0.18
+
+### Patch Changes
+
+- Updated dependencies [b6fbab887]
+- Updated dependencies [4ae43fdde]
+- Updated dependencies [aec44a7dc]
+  - tinacms@1.5.22
+
+## 0.0.17
+
+### Patch Changes
+
+- Updated dependencies [177002715]
+- Updated dependencies [e69a3ef81]
+- Updated dependencies [c925786ef]
+- Updated dependencies [9f01550dd]
+  - tinacms@1.5.21
+
 ## 0.0.16
 
 ### Patch Changes

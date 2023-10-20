@@ -551,7 +551,7 @@ export class Resolver {
   }) => {
     const doc = await this.getDocument(realPath)
 
-    const oldDoc = doc?._rawData || {}
+    const oldDoc = this.resolveLegacyValues(doc?._rawData || {}, collection)
     /**
      * TODO: Remove when `addPendingDocument` is no longer needed.
      */
@@ -607,6 +607,42 @@ export class Resolver {
     //@ts-ignore
     await this.database.put(realPath, { ...oldDoc, ...params }, collection.name)
     return this.getDocument(realPath)
+  }
+
+  /**
+   * Returns top-level fields which are not defined in the collection, so their
+   * values are not eliminated from Tina when new values are saved
+   */
+  public resolveLegacyValues = (oldDoc, collection: Collection<true>) => {
+    const legacyValues = {}
+    Object.entries(oldDoc).forEach(([key, value]) => {
+      const reservedKeys = [
+        '$_body',
+        '_collection',
+        '_keepTemplateKey',
+        '_template',
+        '_relativePath',
+        '_id',
+      ]
+      if (reservedKeys.includes(key)) {
+        return
+      }
+      if (oldDoc._template) {
+        const template = collection.templates?.find(
+          ({ name }) => name === oldDoc._template
+        )
+        if (template) {
+          if (!template.fields.find(({ name }) => name === key)) {
+            legacyValues[key] = value
+          }
+        }
+      } else {
+        if (!collection.fields.find(({ name }) => name === key)) {
+          legacyValues[key] = value
+        }
+      }
+    })
+    return legacyValues
   }
 
   public resolveDocument = async ({

@@ -6,6 +6,9 @@
 
 import { remark } from 'remark'
 import remarkMdx, { Root } from 'remark-mdx'
+import { gfm } from 'micromark-extension-gfm'
+import { gfmFromMarkdown } from 'mdast-util-gfm'
+import remarkGfm from 'remark-gfm'
 import { parseMDX as parseMDXNext } from '../next'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
@@ -82,12 +85,12 @@ export const markdownToAst = (value: string, field: RichTextType) => {
     }
   })
   return fromMarkdown(value, {
-    extensions: [tinaDirective(patterns)],
-    mdastExtensions: [directiveFromMarkdown],
+    extensions: [gfm(), tinaDirective(patterns)],
+    mdastExtensions: [gfmFromMarkdown(), directiveFromMarkdown],
   })
 }
 export const mdxToAst = (value: string) => {
-  return remark().use(remarkMdx).parse(value)
+  return remark().use(remarkMdx).use(remarkGfm).parse(value)
 }
 export const MDX_PARSE_ERROR_MSG =
   'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'

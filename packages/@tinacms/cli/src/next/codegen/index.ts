@@ -331,11 +331,14 @@ export default databaseClient;
 
   async genClient() {
     const token = this.configManager.config?.token
+    const errorPolicy = this.configManager.config?.client?.errorPolicy
     const apiURL = this.getApiURL()
 
     const clientString = `import { createClient } from "tinacms/dist/client";
 import { queries } from "./types";
-export const client = createClient({ url: '${apiURL}', token: '${token}', queries });
+export const client = createClient({ url: '${apiURL}', token: '${token}', queries, ${
+      errorPolicy ? `errorPolicy: '${errorPolicy}'` : ''
+    } });
 export default client;
   `
     return { apiURL, clientString }
@@ -383,11 +386,9 @@ const maybeWarnFragmentSize = async (filepath: string) => {
     )
     console.log(
       `const schema = defineSchema({
-        config: {
-            client: {
-                referenceDepth: 1,
-            },
-        }
+          client: {
+              referenceDepth: 1,
+          },
         // ...
     })`
     )

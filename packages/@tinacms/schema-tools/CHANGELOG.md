@@ -1,5 +1,12 @@
 # @tinacms/schema-tools
 
+## 1.4.13
+
+### Patch Changes
+
+- 6861b5e01: Fix bug where match property was not working on windows
+- aec44a7dc: Allow backend/client to include partial queries
+
 ## 1.4.12
 
 ### Patch Changes

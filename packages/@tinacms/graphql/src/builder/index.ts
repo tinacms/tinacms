@@ -439,7 +439,12 @@ export class Builder {
       [NAMER.createName([collection.name])]: 'create',
       [NAMER.updateName([collection.name])]: 'update',
     })
-    return astBuilder.FieldDefinition({ type, name, args, required: true })
+    return astBuilder.FieldDefinition({
+      type,
+      name,
+      args,
+      required: true,
+    })
   }
 
   public authenticationCollectionDocument = async (
@@ -534,6 +539,10 @@ export class Builder {
     depth: number
   ) => {
     const selections = []
+    selections.push({
+      name: { kind: 'Name', value: '__typename' },
+      kind: 'Field',
+    })
     if (collection.fields?.length > 0) {
       await sequential(collection.fields, async (x) => {
         const field = await this._buildFieldNodeForFragments(x, depth)

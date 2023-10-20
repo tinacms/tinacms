@@ -13,8 +13,7 @@ export const NestedForm = (props: {
   onChange: (values: object) => void
 }) => {
   const FormPortal = useFormPortal()
-  // const id = [editorContext.formId, props.id].join('.')
-  const id = React.useMemo(() => uuid(), [props.id])
+  const id = React.useMemo(() => uuid(), [props.id, props.initialValues])
   const form = React.useMemo(() => {
     return new Form({
       ...props,
@@ -24,7 +23,8 @@ export const NestedForm = (props: {
       },
       onSubmit: () => {},
     })
-  }, [id])
+  }, [id, props.onChange])
+
   return (
     <FormPortal>
       {({ zIndexShift }) => (

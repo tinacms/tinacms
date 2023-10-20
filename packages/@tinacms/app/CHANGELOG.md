@@ -1,5 +1,28 @@
 # @tinacms/app
 
+## 1.2.29
+
+### Patch Changes
+
+- Updated dependencies [b6fbab887]
+- Updated dependencies [4ae43fdde]
+- Updated dependencies [aec44a7dc]
+  - @tinacms/mdx@1.3.20
+  - tinacms@1.5.22
+
+## 1.2.28
+
+### Patch Changes
+
+- 841456237: Fix issue where an error would occur if the folder button was clicked in the playground
+- Updated dependencies [5040fc7cb]
+- Updated dependencies [177002715]
+- Updated dependencies [e69a3ef81]
+- Updated dependencies [c925786ef]
+- Updated dependencies [9f01550dd]
+  - @tinacms/mdx@1.3.19
+  - tinacms@1.5.21
+
 ## 1.2.27
 
 ### Patch Changes

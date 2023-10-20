@@ -1,6 +1,8 @@
 import { fromMarkdown as mdastFromMarkdown } from 'mdast-util-from-markdown'
 import { mdxJsx } from '../shortcodes'
 import { mdxJsxFromMarkdown } from '../shortcodes/mdast'
+import { gfm } from 'micromark-extension-gfm'
+import { gfmFromMarkdown } from 'mdast-util-gfm'
 import { getFieldPatterns } from '../util'
 import * as acorn from 'acorn'
 import type { RichTextField, Template } from '@tinacms/schema-tools'
@@ -17,9 +19,10 @@ export const fromMarkdown = (value: string, field: RichTextField) => {
   // }
   const tree = mdastFromMarkdown(value, {
     extensions: [
+      gfm(),
       mdxJsx({ acorn: acornDefault, patterns, addResult: true, skipHTML }),
     ],
-    mdastExtensions: [mdxJsxFromMarkdown({ patterns })],
+    mdastExtensions: [gfmFromMarkdown(), mdxJsxFromMarkdown({ patterns })],
   })
 
   return tree

@@ -6,6 +6,7 @@
 
 import { Handlers, toMarkdown } from 'mdast-util-to-markdown'
 import { text } from 'mdast-util-to-markdown/lib/handle/text'
+import { gfmToMarkdown } from 'mdast-util-gfm'
 import {
   mdxJsxToMarkdown,
   MdxJsxTextElement,
@@ -133,7 +134,11 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
     return text(node, parent, context, safeOptions)
   }
   return toMarkdown(tree, {
-    extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
+    extensions: [
+      directiveToMarkdown(patterns),
+      mdxJsxToMarkdown(),
+      gfmToMarkdown(),
+    ],
     listItemIndent: 'one',
     handlers,
   })
@@ -199,6 +204,30 @@ export const blockElement = (
         value: content.value,
       }
     case 'mdxJsxFlowElement':
+      if (content.name === 'table') {
+        const table = content.props as {
+          tableRows: { tableCells: { tableCell: any }[] }[]
+        }
+        return {
+          type: 'table',
+          children: table.tableRows.map((tableRow) => {
+            const tr: Md.TableRow = {
+              type: 'tableRow',
+              children: tableRow.tableCells.map(({ tableCell }) => {
+                return {
+                  type: 'tableCell',
+                  children: eat(
+                    tableCell?.children?.at(0)?.children || [],
+                    field,
+                    imageCallback
+                  ),
+                }
+              }),
+            }
+            return tr
+          }),
+        }
+      }
       const { children, attributes, useDirective, directiveType } =
         stringifyProps(content, field, false, imageCallback)
       if (useDirective) {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   useEditorState,
   getNodeEntries,
@@ -11,9 +11,12 @@ import {
   getPluginType,
   createLinkPlugin,
   ELEMENT_LINK,
+  ENode,
+  Value,
 } from '@udecode/plate-headless'
 import { Editor, Element, BaseRange, Transforms } from 'slate'
 import { NestedForm } from '../../nested-form'
+import { Button } from '@tinacms/toolkit'
 
 export { createLinkPlugin }
 
@@ -52,33 +55,51 @@ export const wrapOrRewrapLink = (editor) => {
   wrapNodes(editor, baseLink, { split: true })
 }
 
+const matchLink = (n: ENode<Value>) =>
+  !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK
+
 export const LinkForm = (props) => {
+  const [initialValues, setInitialValues] = React.useState<{
+    url: string
+    title: string
+  }>({ url: '', title: '' })
+  const [formValues, setFormValues] = React.useState<any>({})
   const editor = useEditorState()!
   // Memoize selection so we hang onto when editor loses focus
   const selection = React.useMemo(() => editor.selection, [])
+  useEffect(() => {
+    const [link] = getLinks(editor)
+    setInitialValues({
+      url: link && link[0].url ? link[0].url : '',
+      title: link && link[0].title ? link[0].title : '',
+    })
+  }, [editor, setInitialValues])
 
-  const handleChange = (values) => {
+  const handleUpdate = React.useCallback(() => {
     const linksInSelection = getNodeEntries<LinkElement>(editor, {
-      match: (n) =>
-        !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK,
+      match: matchLink,
       at: selection,
     })
     if (linksInSelection) {
       for (const [, location] of linksInSelection) {
-        setNodes(editor, values, {
-          match: (n) => {
-            return (
-              !Editor.isEditor(n) &&
-              Element.isElement(n) &&
-              n.type === ELEMENT_LINK
-            )
-          },
+        setNodes(editor, formValues, {
+          match: matchLink,
           at: location,
         })
       }
     }
-  }
-  const [link] = getLinks(editor)
+
+    props.onClose()
+  }, [editor, formValues])
+
+  const UpdateLink = React.useCallback(
+    () => (
+      <Button variant="primary" onClick={handleUpdate}>
+        Update Link
+      </Button>
+    ),
+    [handleUpdate]
+  )
 
   return (
     <NestedForm
@@ -87,33 +108,34 @@ export const LinkForm = (props) => {
       fields={[
         { label: 'URL', name: 'url', component: 'text' },
         { label: 'Title', name: 'title', component: 'text' },
+        { component: UpdateLink, name: 'update' },
       ]}
-      initialValues={{
-        url: link ? link[0].url : '',
-        title: link ? link[0].title : '',
+      initialValues={initialValues}
+      onChange={(values: object) => setFormValues(values)}
+      onClose={() => {
+        if (initialValues.title === '' && initialValues.url === '') {
+          unwrapLink(editor, selection)
+        }
+        props.onClose()
       }}
-      onChange={handleChange}
-      onClose={props.onClose}
     />
   )
 }
 
-export const isLinkActive = (editor) => {
-  const [link] = getLinks(editor)
-  return !!link
-}
-
 export const unwrapLink = (editor: PlateEditor, selection?: BaseRange) => {
   unwrapNodes(editor, {
-    match: (n) =>
-      !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK,
+    match: matchLink,
     at: selection || undefined,
   })
 }
 
 export const getLinks = (editor) => {
   return getNodeEntries<LinkElement>(editor, {
-    match: (n) =>
-      !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK,
+    match: matchLink,
   })
+}
+
+export const isLinkActive = (editor) => {
+  const [link] = getLinks(editor)
+  return !!link
 }

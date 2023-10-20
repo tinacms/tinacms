@@ -4,6 +4,34 @@
 
 ### Patch Changes
 
+- Updated dependencies [b6fbab887]
+- Updated dependencies [857414612]
+- Updated dependencies [4ae43fdde]
+- Updated dependencies [a58c5b12f]
+- Updated dependencies [aec44a7dc]
+  - tinacms@1.5.22
+  - @tinacms/graphql@1.4.27
+  - @tinacms/datalayer@1.2.27
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [177002715]
+- Updated dependencies [c244d963a]
+- Updated dependencies [e69a3ef81]
+- Updated dependencies [c925786ef]
+- Updated dependencies [3b214ec6b]
+- Updated dependencies [9f01550dd]
+- Updated dependencies [8bd85b15e]
+  - tinacms@1.5.21
+  - @tinacms/graphql@1.4.26
+  - @tinacms/datalayer@1.2.26
+
+## null
+
+### Patch Changes
+
 - Updated dependencies [7e4de0b2a]
 - Updated dependencies [1144af060]
   - tinacms@1.5.20

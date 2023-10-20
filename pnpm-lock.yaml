@@ -242,6 +242,7 @@ importers:
       '@svgr/webpack': ^8.0.1
       '@tailwindcss/typography': ^0.5.8
       '@tinacms/cli': workspace:*
+      '@tinacms/mdx': workspace:*
       '@tinacms/vercel-previews': workspace:*
       '@types/js-cookie': ^3.0.0
       '@types/node': ^16.11.7
@@ -267,6 +268,7 @@ importers:
     dependencies:
       '@headlessui/react': 1.7.5_biqbaboplfbrettd7655fr4n2y
       '@tailwindcss/typography': 0.5.9_tailwindcss@3.3.2
+      '@tinacms/mdx': link:../../packages/@tinacms/mdx
       '@tinacms/vercel-previews': link:../../packages/@tinacms/vercel-previews
       date-fns: 2.28.0
       graphql: 15.8.0
@@ -730,9 +732,11 @@ importers:
       mdast-util-compact: 4.1.1
       mdast-util-directive: 2.2.4
       mdast-util-from-markdown: 1.3.0
+      mdast-util-gfm: 2.0.2
       mdast-util-mdx: 2.0.1
       mdast-util-mdx-jsx: 2.1.2
       mdast-util-to-markdown: 1.5.0
+      micromark-extension-gfm: 2.0.3
       micromark-factory-mdx-expression: 1.0.7
       micromark-factory-space: 1.0.0
       micromark-factory-whitespace: 1.0.0
@@ -742,6 +746,7 @@ importers:
       parse-entities: 4.0.1
       prettier: ^2.7.1
       remark: 14.0.2
+      remark-gfm: ^2.0.0
       remark-mdx: 2.3.0
       stringify-entities: 4.0.3
       ts-node: ^10.8.2
@@ -764,9 +769,11 @@ importers:
       mdast-util-compact: 4.1.1
       mdast-util-directive: 2.2.4
       mdast-util-from-markdown: 1.3.0
+      mdast-util-gfm: 2.0.2
       mdast-util-mdx: 2.0.1
       mdast-util-mdx-jsx: 2.1.2
       mdast-util-to-markdown: 1.5.0
+      micromark-extension-gfm: 2.0.3
       micromark-factory-mdx-expression: 1.0.7
       micromark-factory-space: 1.0.0
       micromark-factory-whitespace: 1.0.0
@@ -776,6 +783,7 @@ importers:
       parse-entities: 4.0.1
       prettier: 2.7.1
       remark: 14.0.2
+      remark-gfm: 2.0.0
       remark-mdx: 2.3.0
       stringify-entities: 4.0.3
       unist-util-source: 4.0.2
@@ -1112,6 +1120,7 @@ importers:
       '@testing-library/react': ^12.0.0
       '@testing-library/react-hooks': ^7.0.2
       '@testing-library/user-event': ^12.7.0
+      '@tinacms/mdx': workspace:*
       '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
       '@tinacms/search': workspace:*
@@ -1194,6 +1203,7 @@ importers:
       '@react-types/combobox': 3.5.1_react@17.0.2
       '@react-types/shared': 3.13.1_react@17.0.2
       '@sambego/storybook-styles': 1.0.0
+      '@tinacms/mdx': link:../@tinacms/mdx
       '@tinacms/schema-tools': link:../@tinacms/schema-tools
       '@tinacms/search': link:../@tinacms/search
       '@tinacms/sharedctx': link:../@tinacms/sharedctx
@@ -11807,7 +11817,7 @@ packages:
         integrity: sha512-wLEm0QvaoawEDoTRwzTXp4b4jpwiJDvR5KMnFnVodm3scufTlBOWRD6N1OBf9TZMhjlNsSfcO5V+7AF4+Vy+9g==,
       }
     dependencies:
-      '@types/unist': 2.0.6
+      '@types/unist': 3.0.0
     dev: false
 
   /@types/hoist-non-react-statics/3.3.1:
@@ -12482,6 +12492,13 @@ packages:
       {
         integrity: sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==,
       }
+
+  /@types/unist/3.0.0:
+    resolution:
+      {
+        integrity: sha512-MFETx3tbTjE7Uk6vvnWINA/1iJ7LuMdO4fcq8UfF0pRbj01aGLduVvQcRyswuACJdpnHgg8E3rQLhaRdNEJS0w==,
+      }
+    dev: false
 
   /@types/webidl-conversions/7.0.0:
     resolution:
@@ -18485,6 +18502,14 @@ packages:
     engines: { node: '>=10' }
     dev: true
 
+  /escape-string-regexp/5.0.0:
+    resolution:
+      {
+        integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==,
+      }
+    engines: { node: '>=12' }
+    dev: false
+
   /escodegen/1.14.3:
     resolution:
       {
@@ -23354,6 +23379,13 @@ packages:
       repeat-string: 1.6.1
     dev: true
 
+  /markdown-table/3.0.3:
+    resolution:
+      {
+        integrity: sha512-Z1NL3Tb1M9wH4XESsCDEksWoKTdlUafKc4pt0GRwjUyXaCFZ+dc3g2erqB6zm3szA2IUSi7VnPI+o/9jnxh9hw==,
+      }
+    dev: false
+
   /marked/4.2.3:
     resolution:
       {
@@ -23418,6 +23450,18 @@ packages:
       unist-util-visit-parents: 3.1.1
     dev: true
 
+  /mdast-util-find-and-replace/2.2.2:
+    resolution:
+      {
+        integrity: sha512-MTtdFRz/eMDHXzeK6W3dO7mXUlF82Gom4y0oOgvHhh/HXZAGvIQDUvQ0SuUx+j2tv44b8xTHOm8K/9OoRFnXKw==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      escape-string-regexp: 5.0.0
+      unist-util-is: 5.1.1
+      unist-util-visit-parents: 5.1.3
+    dev: false
+
   /mdast-util-footnote/0.1.7:
     resolution:
       {
@@ -23443,28 +23487,6 @@ packages:
       unist-util-stringify-position: 2.0.3
     transitivePeerDependencies:
       - supports-color
-
-  /mdast-util-from-markdown/1.2.0:
-    resolution:
-      {
-        integrity: sha512-iZJyyvKD1+K7QX1b5jXdE7Sc5dtoTry1vzV28UZZe8Z1xVnB/czKntJ7ZAkG0tANqRnBF6p3p7GpU1y19DTf2Q==,
-      }
-    dependencies:
-      '@types/mdast': 3.0.10
-      '@types/unist': 2.0.6
-      decode-named-character-reference: 1.0.2
-      mdast-util-to-string: 3.1.0
-      micromark: 3.0.10
-      micromark-util-decode-numeric-character-reference: 1.0.0
-      micromark-util-decode-string: 1.0.2
-      micromark-util-normalize-identifier: 1.0.0
-      micromark-util-symbol: 1.0.1
-      micromark-util-types: 1.0.2
-      unist-util-stringify-position: 3.0.3
-      uvu: 0.5.6
-    transitivePeerDependencies:
-      - supports-color
-    dev: false
 
   /mdast-util-from-markdown/1.3.0:
     resolution:
@@ -23510,6 +23532,29 @@ packages:
       - supports-color
     dev: true
 
+  /mdast-util-gfm-autolink-literal/1.0.3:
+    resolution:
+      {
+        integrity: sha512-My8KJ57FYEy2W2LyNom4n3E7hKTuQk/0SES0u16tjA9Z3oFkF4RrC/hPAPgjlSpezsOvI8ObcXcElo92wn5IGA==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      ccount: 2.0.1
+      mdast-util-find-and-replace: 2.2.2
+      micromark-util-character: 1.1.0
+    dev: false
+
+  /mdast-util-gfm-footnote/1.0.2:
+    resolution:
+      {
+        integrity: sha512-56D19KOGbE00uKVj3sgIykpwKL179QsVFwx/DCW0u/0+URsryacI4MAdNJl0dh+u2PSsD9FtxPFbHCzJ78qJFQ==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      mdast-util-to-markdown: 1.5.0
+      micromark-util-normalize-identifier: 1.0.0
+    dev: false
+
   /mdast-util-gfm-strikethrough/0.2.3:
     resolution:
       {
@@ -23518,6 +23563,16 @@ packages:
     dependencies:
       mdast-util-to-markdown: 0.6.5
     dev: true
+
+  /mdast-util-gfm-strikethrough/1.0.3:
+    resolution:
+      {
+        integrity: sha512-DAPhYzTYrRcXdMjUtUjKvW9z/FNAMTdU0ORyMcbmkwYNbKocDpdk+PX1L1dQgOID/+vVs1uBQ7ElrBQfZ0cuiQ==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      mdast-util-to-markdown: 1.5.0
+    dev: false
 
   /mdast-util-gfm-table/0.1.6:
     resolution:
@@ -23529,6 +23584,20 @@ packages:
       mdast-util-to-markdown: 0.6.5
     dev: true
 
+  /mdast-util-gfm-table/1.0.7:
+    resolution:
+      {
+        integrity: sha512-jjcpmNnQvrmN5Vx7y7lEc2iIOEytYv7rTvu+MeyAsSHTASGCCRA79Igg2uKssgOs1i1po8s3plW0sTu1wkkLGg==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      markdown-table: 3.0.3
+      mdast-util-from-markdown: 1.3.0
+      mdast-util-to-markdown: 1.5.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /mdast-util-gfm-task-list-item/0.1.6:
     resolution:
       {
@@ -23537,6 +23606,16 @@ packages:
     dependencies:
       mdast-util-to-markdown: 0.6.5
     dev: true
+
+  /mdast-util-gfm-task-list-item/1.0.2:
+    resolution:
+      {
+        integrity: sha512-PFTA1gzfp1B1UaiJVyhJZA1rm0+Tzn690frc/L8vNX1Jop4STZgOE6bxUhnzdVSB+vm2GU1tIsuQcA9bxTQpMQ==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      mdast-util-to-markdown: 1.5.0
+    dev: false
 
   /mdast-util-gfm/0.1.2:
     resolution:
@@ -23552,6 +23631,37 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /mdast-util-gfm/1.0.0:
+    resolution:
+      {
+        integrity: sha512-JY4qImsTqivQ0Gl3qvdaizCpomFaNrHnjEhNjNNKeNEA5jZHAJDYu1+yO4V9jn4/ti8GrKdAScaT4F71knoxsA==,
+      }
+    dependencies:
+      mdast-util-gfm-autolink-literal: 1.0.3
+      mdast-util-gfm-strikethrough: 1.0.3
+      mdast-util-gfm-table: 1.0.7
+      mdast-util-gfm-task-list-item: 1.0.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /mdast-util-gfm/2.0.2:
+    resolution:
+      {
+        integrity: sha512-qvZ608nBppZ4icQlhQQIAdc6S3Ffj9RGmzwUKUWuEICFnd1LVkN3EktF7ZHAgfcEdvZB5owU9tQgt99e2TlLjg==,
+      }
+    dependencies:
+      mdast-util-from-markdown: 1.3.0
+      mdast-util-gfm-autolink-literal: 1.0.3
+      mdast-util-gfm-footnote: 1.0.2
+      mdast-util-gfm-strikethrough: 1.0.3
+      mdast-util-gfm-table: 1.0.7
+      mdast-util-gfm-task-list-item: 1.0.2
+      mdast-util-to-markdown: 1.5.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /mdast-util-mdx-expression/1.2.1:
     resolution:
@@ -23892,6 +24002,34 @@ packages:
       - supports-color
     dev: true
 
+  /micromark-extension-gfm-autolink-literal/1.0.5:
+    resolution:
+      {
+        integrity: sha512-z3wJSLrDf8kRDOh2qBtoTRD53vJ+CWIyo7uyZuxf/JAbNJjiHsOpG1y5wxk8drtv3ETAHutCu6N3thkOOgueWg==,
+      }
+    dependencies:
+      micromark-util-character: 1.1.0
+      micromark-util-sanitize-uri: 1.0.0
+      micromark-util-symbol: 1.0.1
+      micromark-util-types: 1.0.2
+    dev: false
+
+  /micromark-extension-gfm-footnote/1.1.2:
+    resolution:
+      {
+        integrity: sha512-Yxn7z7SxgyGWRNa4wzf8AhYYWNrwl5q1Z8ii+CSTTIqVkmGZF1CElX2JI8g5yGoM3GAman9/PVCUFUSJ0kB/8Q==,
+      }
+    dependencies:
+      micromark-core-commonmark: 1.0.6
+      micromark-factory-space: 1.0.0
+      micromark-util-character: 1.1.0
+      micromark-util-normalize-identifier: 1.0.0
+      micromark-util-sanitize-uri: 1.0.0
+      micromark-util-symbol: 1.0.1
+      micromark-util-types: 1.0.2
+      uvu: 0.5.6
+    dev: false
+
   /micromark-extension-gfm-strikethrough/0.6.5:
     resolution:
       {
@@ -23902,6 +24040,20 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /micromark-extension-gfm-strikethrough/1.0.7:
+    resolution:
+      {
+        integrity: sha512-sX0FawVE1o3abGk3vRjOH50L5TTLr3b5XMqnP9YDRb34M0v5OoZhG+OHFz1OffZ9dlwgpTBKaT4XW/AsUVnSDw==,
+      }
+    dependencies:
+      micromark-util-chunked: 1.0.0
+      micromark-util-classify-character: 1.0.0
+      micromark-util-resolve-all: 1.0.0
+      micromark-util-symbol: 1.0.1
+      micromark-util-types: 1.0.2
+      uvu: 0.5.6
+    dev: false
 
   /micromark-extension-gfm-table/0.4.3:
     resolution:
@@ -23914,12 +24066,34 @@ packages:
       - supports-color
     dev: true
 
+  /micromark-extension-gfm-table/1.0.7:
+    resolution:
+      {
+        integrity: sha512-3ZORTHtcSnMQEKtAOsBQ9/oHp9096pI/UvdPtN7ehKvrmZZ2+bbWhi0ln+I9drmwXMt5boocn6OlwQzNXeVeqw==,
+      }
+    dependencies:
+      micromark-factory-space: 1.0.0
+      micromark-util-character: 1.1.0
+      micromark-util-symbol: 1.0.1
+      micromark-util-types: 1.0.2
+      uvu: 0.5.6
+    dev: false
+
   /micromark-extension-gfm-tagfilter/0.3.0:
     resolution:
       {
         integrity: sha512-9GU0xBatryXifL//FJH+tAZ6i240xQuFrSL7mYi8f4oZSbc+NvXjkrHemeYP0+L4ZUT+Ptz3b95zhUZnMtoi/Q==,
       }
     dev: true
+
+  /micromark-extension-gfm-tagfilter/1.0.2:
+    resolution:
+      {
+        integrity: sha512-5XWB9GbAUSHTn8VPU8/1DBXMuKYT5uOgEjJb8gN3mW0PNW5OPHpSdojoqf+iq1xo7vWzw/P8bAHY0n6ijpXF7g==,
+      }
+    dependencies:
+      micromark-util-types: 1.0.2
+    dev: false
 
   /micromark-extension-gfm-task-list-item/0.3.3:
     resolution:
@@ -23931,6 +24105,19 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /micromark-extension-gfm-task-list-item/1.0.5:
+    resolution:
+      {
+        integrity: sha512-RMFXl2uQ0pNQy6Lun2YBYT9g9INXtWJULgbt01D/x8/6yJ2qpKyzdZD3pi6UIkzF++Da49xAelVKUeUMqd5eIQ==,
+      }
+    dependencies:
+      micromark-factory-space: 1.0.0
+      micromark-util-character: 1.1.0
+      micromark-util-symbol: 1.0.1
+      micromark-util-types: 1.0.2
+      uvu: 0.5.6
+    dev: false
 
   /micromark-extension-gfm/0.3.3:
     resolution:
@@ -23947,6 +24134,37 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /micromark-extension-gfm/1.0.0:
+    resolution:
+      {
+        integrity: sha512-OjqbQPL1Vec/4l5hnC8WnMNmWwgrT9JvzR2udqIGrGKecZsdwY9GAWZ5482CuD12SXuHNj8aS8epni6ip0Pwog==,
+      }
+    dependencies:
+      micromark-extension-gfm-autolink-literal: 1.0.5
+      micromark-extension-gfm-strikethrough: 1.0.7
+      micromark-extension-gfm-table: 1.0.7
+      micromark-extension-gfm-tagfilter: 1.0.2
+      micromark-extension-gfm-task-list-item: 1.0.5
+      micromark-util-combine-extensions: 1.0.0
+      micromark-util-types: 1.0.2
+    dev: false
+
+  /micromark-extension-gfm/2.0.3:
+    resolution:
+      {
+        integrity: sha512-vb9OoHqrhCmbRidQv/2+Bc6pkP0FrtlhurxZofvOEy5o8RtuuvTq+RQ1Vw5ZDNrVraQZu3HixESqbG+0iKk/MQ==,
+      }
+    dependencies:
+      micromark-extension-gfm-autolink-literal: 1.0.5
+      micromark-extension-gfm-footnote: 1.1.2
+      micromark-extension-gfm-strikethrough: 1.0.7
+      micromark-extension-gfm-table: 1.0.7
+      micromark-extension-gfm-tagfilter: 1.0.2
+      micromark-extension-gfm-task-list-item: 1.0.5
+      micromark-util-combine-extensions: 1.0.0
+      micromark-util-types: 1.0.2
+    dev: false
 
   /micromark-extension-mdx-expression/1.0.3:
     resolution:
@@ -24250,33 +24468,6 @@ packages:
       parse-entities: 2.0.0
     transitivePeerDependencies:
       - supports-color
-
-  /micromark/3.0.10:
-    resolution:
-      {
-        integrity: sha512-ryTDy6UUunOXy2HPjelppgJ2sNfcPz1pLlMdA6Rz9jPzhLikWXv/irpWV/I2jd68Uhmny7hHxAlAhk4+vWggpg==,
-      }
-    dependencies:
-      '@types/debug': 4.1.7
-      debug: 4.3.4
-      decode-named-character-reference: 1.0.2
-      micromark-core-commonmark: 1.0.6
-      micromark-factory-space: 1.0.0
-      micromark-util-character: 1.1.0
-      micromark-util-chunked: 1.0.0
-      micromark-util-combine-extensions: 1.0.0
-      micromark-util-decode-numeric-character-reference: 1.0.0
-      micromark-util-encode: 1.0.1
-      micromark-util-normalize-identifier: 1.0.0
-      micromark-util-resolve-all: 1.0.0
-      micromark-util-sanitize-uri: 1.0.0
-      micromark-util-subtokenize: 1.0.2
-      micromark-util-symbol: 1.0.1
-      micromark-util-types: 1.0.2
-      uvu: 0.5.6
-    transitivePeerDependencies:
-      - supports-color
-    dev: false
 
   /micromark/3.1.0:
     resolution:
@@ -27457,6 +27648,20 @@ packages:
       - supports-color
     dev: true
 
+  /remark-gfm/2.0.0:
+    resolution:
+      {
+        integrity: sha512-waIv4Tjcd2CTUDxKRYzuPyIHw1FoX4H2GjXAzXV9PxQWb+dU4fJivd/FZ+nxyzPARrqTjMIkwIwPoWNbpBhjcQ==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      mdast-util-gfm: 1.0.0
+      micromark-extension-gfm: 1.0.0
+      unified: 10.1.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /remark-mdx/2.3.0:
     resolution:
       {
@@ -27476,7 +27681,7 @@ packages:
       }
     dependencies:
       '@types/mdast': 3.0.10
-      mdast-util-from-markdown: 1.2.0
+      mdast-util-from-markdown: 1.3.0
       unified: 10.1.2
     transitivePeerDependencies:
       - supports-color
@@ -30041,7 +30246,7 @@ packages:
       is-buffer: 2.0.5
       is-plain-obj: 4.1.0
       trough: 2.1.0
-      vfile: 5.3.4
+      vfile: 5.3.7
     dev: false
 
   /unified/9.2.2:
@@ -30583,18 +30788,6 @@ packages:
       is-buffer: 2.0.5
       unist-util-stringify-position: 2.0.3
       vfile-message: 2.0.4
-
-  /vfile/5.3.4:
-    resolution:
-      {
-        integrity: sha512-KI+7cnst03KbEyN1+JE504zF5bJBZa+J+CrevLeyIMq0aPU681I2rQ5p4PlnQ6exFtWiUrg26QUdFMnAKR6PIw==,
-      }
-    dependencies:
-      '@types/unist': 2.0.6
-      is-buffer: 2.0.5
-      unist-util-stringify-position: 3.0.3
-      vfile-message: 3.1.4
-    dev: false
 
   /vfile/5.3.7:
     resolution:

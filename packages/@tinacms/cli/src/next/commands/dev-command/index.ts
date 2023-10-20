@@ -100,14 +100,26 @@ export class DevCommand extends BaseCommand {
           const schemaObject = require(configManager.generatedSchemaJSONPath)
           const lookupObject = require(configManager.generatedLookupJSONPath)
           const graphqlSchemaObject = require(configManager.generatedGraphQLJSONPath)
-          await fs.writeFileSync(
-            path.join(configManager.tinaFolderPath, 'tina-lock.json'),
-            JSON.stringify({
-              schema: schemaObject,
-              lookup: lookupObject,
-              graphql: graphqlSchemaObject,
-            })
+
+          const tinaLockFilename = 'tina-lock.json'
+          const tinaLockContent = JSON.stringify({
+            schema: schemaObject,
+            lookup: lookupObject,
+            graphql: graphqlSchemaObject,
+          })
+          fs.writeFileSync(
+            path.join(configManager.tinaFolderPath, tinaLockFilename),
+            tinaLockContent
           )
+
+          if (configManager.hasSeparateContentRoot()) {
+            const rootPath = await configManager.getTinaFolderPath(
+              configManager.contentRootPath
+            )
+            const filePath = path.join(rootPath, tinaLockFilename)
+            await fs.ensureFile(filePath)
+            await fs.outputFile(filePath, tinaLockContent)
+          }
         }
 
         if (!this.noWatch) {
@@ -125,14 +137,14 @@ export class DevCommand extends BaseCommand {
         }
         return { apiURL, database, graphQLSchema, tinaSchema }
       } catch (e) {
-        logger.error(dangerText(e.message))
+        logger.error(`\n\n${dangerText(e.message)}\n`)
         if (this.verbose) {
           console.error(e)
         }
         if (firstTime) {
           logger.error(
             warnText(
-              'Unable to start dev server, please fix your Tina config and try again'
+              'Unable to start dev server, please fix your Tina config / resolve any errors above and try again'
             )
           )
           process.exit(1)

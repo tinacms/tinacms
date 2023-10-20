@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "1.5.20",
+  "version": "1.5.22",
   "main": "dist/index.js",
   "module": "./dist/index.mjs",
   "exports": {
@@ -77,6 +77,7 @@
     "@sambego/storybook-styles": "^1.0.0",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/search": "workspace:*",
+    "@tinacms/mdx": "workspace:*",
     "@tinacms/sharedctx": "workspace:*",
     "@udecode/plate-headless": "^21.4.0",
     "atob": "2.1.2",
