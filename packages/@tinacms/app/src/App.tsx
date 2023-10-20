@@ -51,7 +51,7 @@ const SetPreview = (props: {
         ''
       )}`
     )
-    props.setBasePath?.(cms.flags.get('tina-preview') || '')
+    props.setBasePath?.(basePath ? `${basePath}/` : '')
   }, [props.setBasePath])
   return null
 }
