@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-
 import * as React from 'react'
 import { Field, Form } from '@einsteinindustries/tinacms-forms'
 import styled, { css } from 'styled-components'
