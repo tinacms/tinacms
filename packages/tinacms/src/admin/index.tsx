@@ -186,11 +186,13 @@ const CheckSchema = ({
 }
 
 export const TinaAdmin = ({
+  basePath,
   preview,
   Playground,
   config,
   schemaJson,
 }: {
+  basePath: string
   schemaJson?: any
   preview?: (props: object) => JSX.Element
   Playground?: (props: object) => JSX.Element
@@ -225,7 +227,7 @@ export const TinaAdmin = ({
           return (
             <>
               <CheckSchema schemaJson={schemaJson}>
-                <Router>
+                <Router basename={basePath}>
                   {/* @ts-ignore */}
                   <SetPreviewFlag preview={preview} cms={cms} />
                   <Routes>
@@ -353,7 +355,7 @@ export const TinaAdmin = ({
         } else {
           return (
             <Layout>
-              <Router>
+              <Router basename={basePath}>
                 <Routes>
                   <Route path="logout" element={<LogoutPage />} />
                   <Route path="/" element={<Redirect />} />

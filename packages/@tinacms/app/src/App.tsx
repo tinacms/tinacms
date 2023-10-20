@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react'
+import React, { Dispatch, SetStateAction, Suspense, useEffect } from 'react'
 import TinaCMS, { TinaAdmin, useCMS, MdxFieldPluginExtendible } from 'tinacms'
 import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
 import { Preview } from './preview'
@@ -30,7 +30,9 @@ const Editor = (props) => {
   )
 }
 
-const SetPreview = () => {
+const SetPreview = (props: {
+  setBasePath?: Dispatch<SetStateAction<string>>
+}) => {
   const cms = useCMS()
   React.useEffect(() => {
     // Override original 'rich-text' field with one that has raw mode support
@@ -49,12 +51,14 @@ const SetPreview = () => {
         ''
       )}`
     )
-  }, [])
+    props.setBasePath?.(cms.flags.get('tina-preview') || '')
+  }, [props.setBasePath])
   return null
 }
 
 export const TinaAdminWrapper = () => {
   const schema = { ...config?.schema, config }
+  const [basePath, setBasePath] = React.useState('')
   return (
     // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
     <TinaCMS
@@ -65,8 +69,9 @@ export const TinaAdminWrapper = () => {
       // THis will be replaced by the version of the graphql package or --garphql-version flag. It is replaced by vite at compile time
       tinaGraphQLVersion={__TINA_GRAPHQL_VERSION__}
     >
-      <SetPreview />
+      <SetPreview setBasePath={setBasePath} />
       <TinaAdmin
+        basePath={basePath}
         preview={Preview}
         Playground={Playground}
         config={config}
