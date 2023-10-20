@@ -52,10 +52,12 @@ const MaybeRedirectToPreview = ({
   redirect: boolean
   children: JSX.Element
 }) => {
+  const cms = useCMS()
   const navigate = useNavigate()
   React.useEffect(() => {
+    const basePath = cms.flags.get('tina-basepath')
     if (redirect) {
-      navigate('/~')
+      navigate(`/~${basePath ? `/${basePath}` : ''}`)
     }
   }, [redirect])
 

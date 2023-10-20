@@ -38,10 +38,8 @@ const SetPreview = () => {
       ...MdxFieldPluginExtendible,
       Component: Editor,
     })
-    let basePath
-    if (config.build.basePath) {
-      basePath = config.build.basePath.replace(/^\/|\/$/g, '')
-    }
+    const basePath = __BASE_PATH__.replace(/^\/|\/$/g, '')
+    cms.flags.set('tina-basepath', basePath)
     cms.flags.set(
       'tina-preview',
       `${basePath ? `${basePath}/` : ''}${config.build.outputFolder.replace(
