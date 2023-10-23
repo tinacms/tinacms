@@ -5,6 +5,7 @@ import {
   Route,
   useNavigate,
   useParams,
+  useSearchParams,
 } from 'react-router-dom'
 import {
   Button,
@@ -79,11 +80,15 @@ const SetPreviewFlag = ({
 
 const PreviewInner = ({ preview, config }) => {
   const params = useParams()
+  const [searchParams] = useSearchParams()
+
   const navigate = useNavigate()
   const [url, setURL] = React.useState(`/${params['*']}`)
   const [reportedURL, setReportedURL] = useState<string | null>(null)
   const ref = React.useRef<HTMLIFrameElement>(null)
-  const paramURL = `/${params['*']}`
+  const paramURL = `/${params['*']}${
+    searchParams ? `?${searchParams.toString()}` : ''
+  }`
 
   React.useEffect(() => {
     if (reportedURL !== paramURL && paramURL) {
