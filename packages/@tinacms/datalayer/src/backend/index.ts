@@ -128,6 +128,7 @@ function MakeNodeApiHandler({
           res.end()
           return
         },
+        secure: true,
       },
       ...(extraRoutes || {}),
     }
