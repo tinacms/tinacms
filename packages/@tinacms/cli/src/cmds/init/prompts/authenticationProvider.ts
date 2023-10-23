@@ -84,12 +84,12 @@ export const chooseAuthenticationProvider = async ({
   config: Config
   framework: Framework
 }) => {
-  const choices = [
-    {
-      title: 'Tina Cloud for Auth',
-      value: 'tina-cloud',
-    },
-  ]
+  // Could add this back in later if we want to support tina-cloud in init.
+  // {
+  //   title: 'Tina Cloud for Auth',
+  //   value: 'tina-cloud',
+  // },
+  const choices = []
   if (framework.name === 'next') {
     choices.push({
       value: 'next-auth',
