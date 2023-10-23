@@ -31,26 +31,41 @@ const baseFields = `[
     isBody: true,
   },
 ]`
-const baseCollections = `[
-  {
-    name: 'post',
-    label: 'Posts',
-    path: 'content/posts',
-    fields: ${baseFields},
-  },
-]`
-const nextExampleCollection = `[
-  {
-    name: 'post',
-    label: 'Posts',
-    path: 'content/posts',
-    fields: ${baseFields},
-    ui: {
-      // This is an DEMO router. You can remove this to fit your site
-      router: ({ document }) => \`/demo/blog/\${document._sys.filename}\`,
+
+const generateCollectionString = (args: ConfigTemplateArgs) => {
+  if (args.collections) {
+    return args.collections
+  }
+  const extraTinaCollections =
+    args.config.authenticationProvider?.extraTinaCollections?.join(',\n') + ','
+
+  const baseCollections = `[
+    ${extraTinaCollections || ''}
+    {
+      name: 'post',
+      label: 'Posts',
+      path: 'content/posts',
+      fields: ${baseFields},
     },
-  },
-]`
+  ]`
+  const nextExampleCollection = `[
+    {
+      ${extraTinaCollections || ''}
+      name: 'post',
+      label: 'Posts',
+      path: 'content/posts',
+      fields: ${baseFields},
+      ui: {
+        // This is an DEMO router. You can remove this to fit your site
+        router: ({ document }) => \`/demo/blog/\${document._sys.filename}\`,
+      },
+    },
+  ]`
+  if (args.config?.framework?.name === 'next') {
+    return nextExampleCollection
+  }
+  return baseCollections
+}
 
 export const generateConfig = (args: ConfigTemplateArgs) => {
   const isUsingTinaCloud =
@@ -128,11 +143,7 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
     },
     // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/schema/
     schema: {
-      collections:${
-        args.collections || args.config.framework.name === 'next'
-          ? nextExampleCollection
-          : baseCollections
-      },
+      collections: ${generateCollectionString(args)},
     },
   });  
 `
