@@ -36,6 +36,7 @@ export interface PromptAuthenticationProvider {
   // For tina/config file
   configAuthenticationClass?: string
   configImports?: ImportStatement[]
+  extraTinaCollections?: string[]
   // for /api/tina/[...routes] file
   backendAuthentication?: string
   backendAuthenticationImports?: ImportStatement[]

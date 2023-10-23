@@ -29,11 +29,12 @@ const supportedAuthenticationProviders: {
     configAuthenticationClass: `new UsernamePasswordAuthJSProvider()`,
     configImports: [
       {
-        imported: ['UsernamePasswordAuthJSProvider'],
+        imported: ['UsernamePasswordAuthJSProvider', 'TinaUserCollection'],
         from: 'tinacms-authjs/dist/tinacms',
         packageName: 'tinacms-authjs',
       },
     ],
+    extraTinaCollections: ['TinaUserCollection'],
     backendAuthentication: `AuthJsBackendAuthentication({
           authOptions: TinaAuthJSOptions({
             databaseClient: databaseClient,
@@ -84,39 +85,44 @@ export const chooseAuthenticationProvider = async ({
   config: Config
   framework: Framework
 }) => {
-  // Could add this back in later if we want to support tina-cloud in init.
+  // Could add this back in later if we want to support things other then next-auth in the init
   // {
   //   title: 'Tina Cloud for Auth',
   //   value: 'tina-cloud',
   // },
-  const choices = []
-  if (framework.name === 'next') {
-    choices.push({
-      value: 'next-auth',
-      title: 'Next Auth (recommended)',
-    })
-  }
-  choices.push({
-    value: 'other',
-    title: 'I will create my own authentication provider',
-  })
-  const authProviderChoice = await prompts([
-    {
-      name: 'authProvider',
-      type: 'select',
-      message: 'Which authentication provider are you using?',
-      choices,
-    },
-  ])
-  if (typeof authProviderChoice.authProvider === 'undefined') {
-    throw new Error('Authentication provider is required')
-  }
-  const authProvider =
-    supportedAuthenticationProviders[
-      authProviderChoice.authProvider as 'tina-cloud' | 'next-auth' | 'other'
-    ]
+  // const choices = []
+  // if (framework.name === 'next') {
+  //   choices.push({
+  //     value: 'next-auth',
+  //     title: 'Next Auth (recommended)',
+  //   })
+  // }
+  // choices.push({
+  //   value: 'other',
+  //   title: 'I will create my own authentication provider',
+  // })
+  // const authProviderChoice = await prompts([
+  //   {
+  //     name: 'authProvider',
+  //     type: 'select',
+  //     message: 'Which authentication provider are you using?',
+  //     choices,
+  //   },
+  // ])
+  // if (typeof authProviderChoice.authProvider === 'undefined') {
+  //   throw new Error('Authentication provider is required')
+  // }
+  // const authProvider =
+  //   supportedAuthenticationProviders[
+  //     authProviderChoice.authProvider as 'tina-cloud' | 'next-auth' | 'other'
+  //   ]
 
-  await authenticationProviderUpdateConfig[authProviderChoice.authProvider]({
+  // await authenticationProviderUpdateConfig[authProviderChoice.authProvider]({
+  //   config,
+  // })
+  const authProvider = supportedAuthenticationProviders['next-auth']
+
+  await authenticationProviderUpdateConfig['next-auth']({
     config,
   })
 
