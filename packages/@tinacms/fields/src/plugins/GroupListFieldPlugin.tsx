@@ -35,6 +35,7 @@ import {
 } from '@einsteinindustries/tinacms-icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { FieldDescription } from './wrapFieldWithMeta'
+import type {Mutators} from 'final-form-arrays'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -62,7 +63,7 @@ interface GroupFieldDefinititon extends Field {
      */
     label?: string
   }
-  allowItemDuplication?: boolean
+  onItemDuplication?: (name: string, index: number, value: any, callback: Mutators['insert']) => void
 }
 
 interface GroupProps {
@@ -157,7 +158,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
       name: item.name ? `${item.name} copy` : undefined,
       isCopy: true,
     }
-    tinaForm.mutators.insert(field.name, index + 1, newItem)
+    field.onItemDuplication?.(field.name, index + 1, newItem, tinaForm.mutators.insert)
   }, [tinaForm, field, index, item])
 
   const title = label || (field.label || field.name) + ' Item'
@@ -180,7 +181,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
             <ItemClickTarget onClick={() => setExpanded(true)}>
               <GroupLabel>{title}</GroupLabel>
             </ItemClickTarget>
-            {field.allowItemDuplication && (
+            {field.onItemDuplication && (
               <DuplicateButton onClick={duplicateItem}>
                 <DuplicateIcon />
               </DuplicateButton>
