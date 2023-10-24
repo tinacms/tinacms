@@ -16,14 +16,13 @@ limitations under the License.
 
 */
 
-
 import { Node } from 'prosemirror-model'
 import { getAttrsWith, docAttrs, domAttrs } from './utils'
 
 export const heading = {
   attrs: {
     level: { default: 1 },
-    class: { default: '' },
+    class: { default: 'pm-align--left' },
     id: { default: '' },
   },
   content: 'inline*',

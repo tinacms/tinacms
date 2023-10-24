@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms",
-  "version": "0.44.314",
+  "version": "0.44.313",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [],
@@ -25,25 +25,25 @@
     "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.44.314",
+    "@einsteinindustries/tinacms-scripts": "^0.44.311",
     "@types/styled-components": "4.1.8",
     "styled-components": ">=4.1"
   },
   "dependencies": {
-    "@einsteinindustries/tinacms-alerts": "^0.44.314",
-    "@einsteinindustries/tinacms-core": "^0.44.314",
-    "@einsteinindustries/tinacms-fields": "^0.44.314",
-    "@einsteinindustries/tinacms-form-builder": "^0.44.314",
-    "@einsteinindustries/tinacms-forms": "^0.44.314",
-    "@einsteinindustries/tinacms-icons": "^0.44.314",
-    "@einsteinindustries/tinacms-react-alerts": "^0.44.314",
-    "@einsteinindustries/tinacms-react-core": "^0.44.314",
-    "@einsteinindustries/tinacms-react-forms": "^0.44.314",
-    "@einsteinindustries/tinacms-react-modals": "^0.44.314",
-    "@einsteinindustries/tinacms-react-screens": "^0.44.314",
-    "@einsteinindustries/tinacms-react-sidebar": "^0.44.314",
-    "@einsteinindustries/tinacms-react-toolbar": "^0.44.314",
-    "@einsteinindustries/tinacms-styles": "^0.44.314",
+    "@einsteinindustries/tinacms-alerts": "^0.44.313",
+    "@einsteinindustries/tinacms-core": "^0.44.313",
+    "@einsteinindustries/tinacms-fields": "^0.44.313",
+    "@einsteinindustries/tinacms-form-builder": "^0.44.313",
+    "@einsteinindustries/tinacms-forms": "^0.44.313",
+    "@einsteinindustries/tinacms-icons": "^0.44.311",
+    "@einsteinindustries/tinacms-react-alerts": "^0.44.313",
+    "@einsteinindustries/tinacms-react-core": "^0.44.313",
+    "@einsteinindustries/tinacms-react-forms": "^0.44.313",
+    "@einsteinindustries/tinacms-react-modals": "^0.44.313",
+    "@einsteinindustries/tinacms-react-screens": "^0.44.313",
+    "@einsteinindustries/tinacms-react-sidebar": "^0.44.313",
+    "@einsteinindustries/tinacms-react-toolbar": "^0.44.313",
+    "@einsteinindustries/tinacms-styles": "^0.44.311",
     "react-dropzone": "^11.1.0"
   },
   "peerDependencies": {

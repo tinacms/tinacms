@@ -12,14 +12,5 @@
       "_template": "cta",
       "text": "Log In"
     }
-  ],
-  "rawJson": {
-    "authors": [
-      {
-        "name": "New Author",
-        "id": "f7c6zgwp6",
-        "best-novel": "A Crime Novel"
-      }
-    ]
-  }
+  ]
 }
