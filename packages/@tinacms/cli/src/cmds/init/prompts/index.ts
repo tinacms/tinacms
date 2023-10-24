@@ -140,12 +140,12 @@ export const askIfUsingSelfHosted = async () => {
           value: 'tina-cloud',
         },
         {
-          title: 'Self Host',
+          title: 'Self-Hosted',
           value: 'self-host',
         },
       ],
       message:
-        'Do you want to use Tina Cloud to host your backend or self-host? (In self hosting you will have to bring your own auth, database and backend)',
+        'Do you want to host your project on Tina Cloud or self-host? (With self-hosting, the graphql api, authentication and database will be hosted on your own server.)',
     },
   ])
   return answers as { hosting: 'tina-cloud' | 'self-host' }

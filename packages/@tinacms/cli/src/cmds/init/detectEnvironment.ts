@@ -18,6 +18,7 @@ const checkGitignoreForItem = async ({
 
 const makeGeneratedFile = async (
   name: string,
+  generatedFileType: string,
   parentPath: string,
   opts?: {
     typescriptSuffix?: string
@@ -36,6 +37,7 @@ const makeGeneratedFile = async (
     fullPathOverride: opts?.extensionOverride
       ? path.join(parentPath, `${name}.${opts?.extensionOverride}`)
       : '',
+    generatedFileType,
     name,
     parentPath,
     typescriptExists: false,
@@ -106,15 +108,17 @@ const detectEnvironment = async ({
   ) as string[]
 
   const generatedFiles: InitEnvironment['generatedFiles'] = {
-    config: await makeGeneratedFile('config', tinaFolder),
-    database: await makeGeneratedFile('database', tinaFolder),
-    templates: await makeGeneratedFile('templates', tinaFolder),
+    config: await makeGeneratedFile('config', 'config', tinaFolder),
+    database: await makeGeneratedFile('database', 'database', tinaFolder),
+    templates: await makeGeneratedFile('templates', 'templates', tinaFolder),
     'next-api-handler': await makeGeneratedFile(
       '[...routes]',
+      'next-api-handler',
       path.join(...pagesDir, 'api', 'tina')
     ),
     'reactive-example': await makeGeneratedFile(
       '[filename]',
+      'reactive-example',
       path.join(...pagesDir, 'demo', 'blog'),
       {
         typescriptSuffix: 'tsx',
@@ -122,6 +126,7 @@ const detectEnvironment = async ({
     ),
     'sample-content': await makeGeneratedFile(
       'hello-world',
+      'sample-content',
       path.join(baseDir, 'content', 'posts'),
       { extensionOverride: 'md' }
     ),

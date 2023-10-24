@@ -38,14 +38,14 @@ export const askOverwriteGenerateFiles = async ({
   for (let i = 0; i < generatedFiles.length; i++) {
     const generatedFile = generatedFiles[i]
 
-    if ((await generatedFile.resolve(config.typescript)).exists) {
+    if (generatedFile.resolve(config.typescript).exists) {
       // if the file exists, ask if we should overwrite
       const overwrite = await askIfOverride({
         generatedFile,
         usingTypescript: config.typescript,
       })
       if (overwrite) {
-        overwriteList.push(generatedFile.name)
+        overwriteList.push(generatedFile.generatedFileType)
       }
     }
   }

@@ -17,7 +17,7 @@ export interface Framework {
 
 export type ReactiveFramework = 'next'
 
-type GeneratedFileType =
+export type GeneratedFileType =
   | 'next-api-handler'
   | 'config'
   | 'database'
@@ -29,11 +29,16 @@ export type GeneratedFile = {
   fullPathJS: string
   fullPathTS: string
   fullPathOverride?: string
+  generatedFileType: GeneratedFileType
   name: string
   parentPath: string
   typescriptExists: boolean
   javascriptExists: boolean
-  resolve: (boolean) => { exists: boolean; path: string; parentPath: string }
+  resolve: (typescript: boolean) => {
+    exists: boolean
+    path: string
+    parentPath: string
+  }
 }
 
 export type FrontmatterFormat = 'yaml' | 'toml' | 'json'
