@@ -79,32 +79,20 @@ importers:
   examples/empty:
     specifiers:
       '@tinacms/cli': workspace:*
-      '@tinacms/datalayer': workspace:^1.2.27
-      '@types/node': ^17.0.45
-      '@upstash/redis': ^1.23.4
+      '@types/node': ^17.0.21
       eslint: '7'
       next: 12.2.4
-      next-auth: ^4.24.3
       react: 17.0.2
       react-dom: 17.0.2
       react-is: ^17.0.2
       tinacms: workspace:*
-      tinacms-authjs: workspace:^0.0.1
-      tinacms-gitprovider-github: workspace:^0.0.1
-      upstash-redis-level: ^1.0.0
     dependencies:
       '@tinacms/cli': link:../../packages/@tinacms/cli
-      '@tinacms/datalayer': link:../../packages/@tinacms/datalayer
-      '@upstash/redis': 1.23.4
       next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
-      next-auth: 4.24.3_4u6zbjx6dbt7fttn6k4hvqzi7a
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
       tinacms: link:../../packages/tinacms
-      tinacms-authjs: link:../../packages/tinacms-authjs
-      tinacms-gitprovider-github: link:../../packages/tinacms-gitprovider-github
-      upstash-redis-level: 1.0.0
     devDependencies:
       '@types/node': 17.0.45
       eslint: 7.32.0
@@ -14466,17 +14454,6 @@ packages:
       - scheduler
     dev: false
 
-  /@upstash/redis/1.23.4:
-    resolution:
-      {
-        integrity: sha512-7KtG6RE5W7QbByDjQq7cEpwG2ir46VrEXZ8NFRn17FYSJUHKeHl6qnAqQJIR5rAItQWtyrKNYBij5IGEjUevhA==,
-      }
-    dependencies:
-      isomorphic-fetch: 3.0.0_encoding@0.1.13
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
   /@vercel/stega/0.0.5:
     resolution:
       {
@@ -24724,34 +24701,6 @@ packages:
       uuid: 8.3.2
     dev: false
 
-  /next-auth/4.24.3_4u6zbjx6dbt7fttn6k4hvqzi7a:
-    resolution:
-      {
-        integrity: sha512-n1EvmY7MwQMSOkCh6jhI6uBneB6VVtkYELVMEwVaCLD1mBD3IAAucwk+90kgxramW09nSp5drvynwfNCi1JjaQ==,
-      }
-    peerDependencies:
-      next: ^12.2.5 || ^13
-      nodemailer: ^6.6.5
-      react: ^17.0.2 || ^18
-      react-dom: ^17.0.2 || ^18
-    peerDependenciesMeta:
-      nodemailer:
-        optional: true
-    dependencies:
-      '@babel/runtime': 7.21.0
-      '@panva/hkdf': 1.1.1
-      cookie: 0.5.0
-      jose: 4.14.4
-      next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
-      oauth: 0.9.15
-      openid-client: 5.4.3
-      preact: 10.16.0
-      preact-render-to-string: 5.2.6_preact@10.16.0
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      uuid: 8.3.2
-    dev: false
-
   /next/12.2.4_biqbaboplfbrettd7655fr4n2y:
     resolution:
       {
@@ -28907,7 +28856,7 @@ packages:
     peerDependencies:
       react: ^16.11.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      use-sync-external-store: 1.2.0_react@18.2.0
+      use-sync-external-store: 1.2.0_react@17.0.2
     dev: true
 
   /synckit/0.8.5:
@@ -30194,19 +30143,6 @@ packages:
       }
     dependencies:
       tslib: 2.5.0
-    dev: false
-
-  /upstash-redis-level/1.0.0:
-    resolution:
-      {
-        integrity: sha512-8SNsmx4BZCpsF4XRs2MCnhjZTgu9kC9ooLg6NqSix8IFMP2p14+g+cEn/45OEZ/4geeSObAUSnW1om48EtKQMg==,
-      }
-    dependencies:
-      '@upstash/redis': 1.23.4
-      abstract-level: 1.0.3
-      module-error: 1.0.2
-    transitivePeerDependencies:
-      - encoding
     dev: false
 
   /uri-js/4.4.1:
