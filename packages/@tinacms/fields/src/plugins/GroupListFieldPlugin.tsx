@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-
 import * as React from 'react'
 import { Field, Form } from '@einsteinindustries/tinacms-forms'
 import styled, { css } from 'styled-components'
@@ -157,6 +156,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
     const newItem = {
       ...deepCopy,
       name: item.name ? `${item.name} (copy)` : undefined,
+      isCopy: true,
     }
     tinaForm.mutators.insert(field.name, index + 1, newItem)
   }, [tinaForm, field, index, item])
