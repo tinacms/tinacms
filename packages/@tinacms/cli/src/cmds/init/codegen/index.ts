@@ -356,15 +356,22 @@ export const addSelfHostedTinaAuthToConfig = async (
     fs.readFileSync(pathToConfig, 'utf8'),
     config.typescript ? ts.ScriptTarget.Latest : ts.ScriptTarget.ESNext
   )
+  const { configImports, configAuthenticationClass, extraTinaCollections } =
+    config.authenticationProvider
+
+  const importMap: Record<string, string[]> = {
+    // iterate over configImports and add them to the import map
+    ...configImports.reduce((acc, { from, imported }) => {
+      acc[from] = imported
+      return acc
+    }, {} as Record<string, string[]>),
+  }
 
   const transformedSourceFileResult = ts.transform(
     sourceFile,
     [
       makeImportsVisitor(sourceFile, {
-        'tinacms-authjs/dist/tinacms': [
-          'TinaUserCollection',
-          'UsernamePasswordAuthJSProvider',
-        ],
+        ...importMap,
         tinacms: ['LocalAuthProvider'],
       }),
       makeVariableStatementVisitor(
@@ -378,7 +385,7 @@ export const addSelfHostedTinaAuthToConfig = async (
         'defineConfig',
         'authProvider',
         ...parseExpression(
-          'isLocal ? new LocalAuthProvider() : new UsernamePasswordAuthJSProvider()'
+          `isLocal ? new LocalAuthProvider() : ${configAuthenticationClass}`
         )
       ),
       makeUpdateObjectLiteralPropertyVisitor(
@@ -387,10 +394,12 @@ export const addSelfHostedTinaAuthToConfig = async (
         'contentApiUrlOverride',
         ...parseExpression("'/api/tina/gql'")
       ),
-      makeAddExpressionToSchemaCollectionVisitor(
-        sourceFile,
-        'defineConfig',
-        ...parseExpression('TinaUserCollection')
+      ...extraTinaCollections.map((collectionName) =>
+        makeAddExpressionToSchemaCollectionVisitor(
+          sourceFile,
+          'defineConfig',
+          ...parseExpression(collectionName)
+        )
       ),
     ].map((visitor) => makeTransformer(visitor))
   )
