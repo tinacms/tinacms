@@ -118,6 +118,12 @@ export class TinaMediaStore implements MediaStore {
           { method: 'GET' }
         )
 
+        if (res.status === 412) {
+          const { message = 'Unexpected error generating upload url' } =
+            await res.json()
+          throw new Error(message)
+        }
+
         const { signedUrl } = await res.json()
         if (!signedUrl) {
           throw new Error('Unexpected error generating upload url')
