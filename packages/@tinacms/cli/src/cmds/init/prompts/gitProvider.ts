@@ -28,29 +28,29 @@ const supportedGitProviders: {
 }
 
 export const chooseGitProvider = async ({ config }: { config: Config }) => {
-  const answers = await prompts([
-    {
-      name: 'provider',
-      type: 'select',
-      choices: [
-        {
-          title: 'GitHub',
-          value: 'github',
-        },
-        {
-          title: 'I will make my own git provider',
-          value: 'other',
-        },
-      ],
-      message: 'Which Git provider are you using?',
-    },
-  ])
-  if (typeof answers.provider === 'undefined') {
-    throw new Error('Git provider is required')
-  }
-  if (answers.provider === 'other') {
-    return supportedGitProviders.other
-  }
+  // const answers = await prompts([
+  //   {
+  //     name: 'provider',
+  //     type: 'select',
+  //     choices: [
+  //       {
+  //         title: 'GitHub',
+  //         value: 'github',
+  //       },
+  //       {
+  //         title: 'Other', // TODO should this be an input for init? it just leaves a broken database.ts file
+  //         value: 'other',
+  //       },
+  //     ],
+  //     message: 'Which Git provider are you using?',
+  //   },
+  // ])
+  // if (typeof answers.provider === 'undefined') {
+  //   throw new Error('Git provider is required')
+  // }
+  // if (answers.provider === 'other') {
+  //   return supportedGitProviders.other
+  // }
   const result = await prompts([
     {
       name: 'githubToken',
