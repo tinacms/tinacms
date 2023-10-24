@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-
 import * as React from 'react'
 import { Field, Form } from '@einsteinindustries/tinacms-forms'
 import styled, { css } from 'styled-components'
@@ -147,7 +146,6 @@ interface ItemProps {
 const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   const FormPortal = useFormPortal()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
-
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
@@ -156,7 +154,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
     const deepCopy = JSON.parse(JSON.stringify(item))
     const newItem = {
       ...deepCopy,
-      name: item.name ? `${item.name} (copy)` : undefined,
+      name: item.name ? `${item.name} copy` : undefined,
     }
     tinaForm.mutators.insert(field.name, index + 1, newItem)
   }, [tinaForm, field, index, item])
