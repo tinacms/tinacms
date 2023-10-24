@@ -1,5 +1,5 @@
 import prompts from 'prompts'
-import type { GeneratedFile } from '..'
+import type { GeneratedFile, GeneratedFileType } from '..'
 import type { Config } from './types'
 
 // conditionally generate overwrite prompts for generated ts/js
@@ -34,7 +34,7 @@ export const askOverwriteGenerateFiles = async ({
   generatedFiles: GeneratedFile[]
   config: Config
 }) => {
-  const overwriteList: string[] = []
+  const overwriteList: GeneratedFileType[] = []
   for (let i = 0; i < generatedFiles.length; i++) {
     const generatedFile = generatedFiles[i]
 
