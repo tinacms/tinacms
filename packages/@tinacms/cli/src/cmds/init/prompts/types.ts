@@ -1,4 +1,4 @@
-import { Framework } from '../'
+import { Framework, GeneratedFileType } from '../'
 
 export type Config = {
   typescript: boolean
@@ -14,7 +14,7 @@ export type Config = {
   nextAuthCredentialsProviderName?: string
   isLocalEnvVarName: string
   envVars: { key: string; value: string }[]
-  overwriteList?: string[]
+  overwriteList?: GeneratedFileType[]
 }
 export interface ImportStatement {
   imported: string[]

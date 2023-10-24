@@ -121,10 +121,10 @@ export const chooseDatabaseAdapter = async ({
           title: 'MongoDB',
           value: 'mongodb',
         },
-        {
-          title: "I'll create my own database adapter",
-          value: 'other',
-        },
+        // {
+        //   title: "I'll create my own database adapter",
+        //   value: 'other',
+        // },
       ],
     },
   ])

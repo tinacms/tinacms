@@ -29,6 +29,7 @@ import {
   ReactiveFramework,
 } from './index'
 import { Config } from './prompts'
+import { addSelfHostedTinaAuthToConfig } from './codegen'
 
 async function apply({
   env,
@@ -164,7 +165,9 @@ async function apply({
       generatedFile: env.generatedFiles['config'],
       config,
     })
-  } else if (
+  }
+
+  if (
     // Are we running tinacms init backend
     params.isBackendInit &&
     // Do the user choose the 'self-host' option
@@ -172,32 +175,7 @@ async function apply({
     // the user did not choose the 'tina-cloud' authentication provider
     (config.authenticationProvider?.name || '') !== 'tina-cloud'
   ) {
-    // TODO: update config instead of logging out the config
-    // if we are doing a backend init we should print out what they need to add to the config
-    logger.info(
-      '\nPlease add the following to your tina/config.{ts,js} file:\n' +
-        cmdText(
-          format(
-            `
-  import { NextAuthProvider } from "tinacms-next-auth/dist/tinacms";
-  //...
-  export default defineConfig({
-    //...
-    contentApiUrlOverride: '/api/gql',
-    admin: {
-      auth: new NextAuthProvider({
-        callbackUrl: '/admin/index.html',
-        name: '${config.nextAuthCredentialsProviderName}',
-      })
-    },
-  })
-  `,
-            {
-              parser: 'babel',
-            }
-          )
-        )
-    )
+    await addSelfHostedTinaAuthToConfig(config, env.generatedFiles['config'])
   }
 
   logNextSteps({
@@ -387,7 +365,7 @@ const writeGeneratedFile = async ({
   if (exists) {
     if (overwrite) {
       logger.info(`Overwriting file at ${path}... ✅`)
-      await fs.outputFileSync(path, content)
+      fs.outputFileSync(path, content)
     } else {
       logger.info(`Not overwriting file at ${path}.`)
       logger.info(
@@ -397,7 +375,7 @@ const writeGeneratedFile = async ({
   } else {
     logger.info(`Adding file at ${path}... ✅`)
     await fs.ensureDir(parentPath)
-    await fs.outputFileSync(path, content)
+    fs.outputFileSync(path, content)
   }
 }
 
@@ -412,7 +390,7 @@ const addConfigFile = async ({
   generatedFile: GeneratedFile
   config: Config
 }) => {
-  const content = await format(generateConfig(configArgs), {
+  const content = format(generateConfig(configArgs), {
     parser: 'babel',
   })
   await writeGeneratedFile({
@@ -450,7 +428,7 @@ const addNextApiRoute = async ({
   config: Config
   generatedFile: GeneratedFile
 }) => {
-  const content = await format(nextApiRouteTemplate({ config, env }), {
+  const content = format(nextApiRouteTemplate({ config, env }), {
     parser: 'babel',
   })
   await writeGeneratedFile({
@@ -473,7 +451,7 @@ export const addTemplateFile = async ({
 }) => {
   await writeGeneratedFile({
     generatedFile,
-    overwrite: config.overwriteList?.includes(generatedFile.name),
+    overwrite: config.overwriteList?.includes(generatedFile.generatedFileType),
     content,
     typescript: config.typescript,
   })
@@ -492,6 +470,7 @@ const addContentFile = async ({
       typescriptExists: false,
       fullPathJS: '',
       fullPathTS: '',
+      generatedFileType: 'sample-content',
       name: '',
       parentPath: '',
       get resolve() {
@@ -502,7 +481,7 @@ const addContentFile = async ({
         })
       },
     },
-    overwrite: config.overwriteList?.includes('hello-world'),
+    overwrite: config.overwriteList?.includes('sample-content'),
     content: helloWorldPost,
     typescript: false,
   })
@@ -605,7 +584,9 @@ const addReactiveFile: {
     await writeGeneratedFile({
       generatedFile,
       typescript: config.typescript,
-      overwrite: config.overwriteList?.includes(generatedFile.name),
+      overwrite: config.overwriteList?.includes(
+        generatedFile.generatedFileType
+      ),
       content: NextTemplates['demo-post-page']({
         usingSrc: env.usingSrc,
         dataLayer,
