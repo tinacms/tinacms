@@ -12,6 +12,8 @@ import {
  * Takes in a source file, variable statement source file, and a variable statement, and returns a custom transformation visitor.
  * The visitor will traverse the AST and perform the necessary transformations on variable statements.
  *
+ * The variable statement will be inserted after the last import statement in the source file.
+ *
  * @param {ts.SourceFile} sourceFile - The source file being transformed.
  * @param {ts.SourceFile} variableStmtSourceFile - The source file of the variable statement.
  * @param {ts.VariableStatement} variableStmt - The variable statement to be inserted.
