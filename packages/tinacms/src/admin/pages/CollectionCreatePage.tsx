@@ -187,14 +187,17 @@ export const RenderForm = ({
     // @ts-ignore internal types aren't up to date
     template.ui?.defaultItem ||
     // @ts-ignore
-    template?.defaultItem
+    template?.defaultItem ||
+    {}
 
   const form = useMemo(() => {
     const folderName = folder.fullyQualifiedName ? folder.name : ''
     return new Form({
       crudType: 'create',
       initialValues:
-        typeof defaultItem === 'function' ? defaultItem() : defaultItem,
+        typeof defaultItem === 'function'
+          ? { ...defaultItem(), _template: templateName }
+          : { ...defaultItem, _template: templateName },
       extraSubscribeValues: { active: true, submitting: true, touched: true },
       onChange: (values) => {
         if (!values?.submitting) {
