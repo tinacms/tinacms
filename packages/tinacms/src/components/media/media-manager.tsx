@@ -16,7 +16,6 @@
 
  */
 
-
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDebounce } from 'react-use'
 import styled, { css } from 'styled-components'
@@ -46,7 +45,6 @@ export interface MediaRequest {
   onSelect?(media: Media): void
   close?(): void
   allowDelete?: boolean
-  namespace?: string
 }
 
 const StyledTab = styled.button<{ isActive: boolean }>`
@@ -112,7 +110,6 @@ export function MediaPicker({
   allowDelete,
   onSelect,
   close,
-  namespace,
   ...props
 }: MediaRequest) {
   const cms = useCMS()
@@ -144,8 +141,7 @@ export function MediaPicker({
   const [currentTab, setCurrentTab] = useState(0)
   const offset = offsetHistory[offsetHistory.length - 1]
 
-  const localStorageKey = `Media-${namespace ??
-    'default'}-${currentTab}-${offset ?? 0}-${search}`
+  const localStorageKey = `Media-${currentTab}-${offset ?? 0}-${search}`
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
     if (!list.nextOffset) return

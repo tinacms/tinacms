@@ -16,7 +16,6 @@
 
  */
 
-
 import { CMS, CMSConfig, PluginType } from '@einsteinindustries/tinacms-core'
 import { FieldPlugin } from '@einsteinindustries/tinacms-form-builder'
 import { ScreenPlugin } from '@einsteinindustries/tinacms-react-screens'
@@ -50,7 +49,7 @@ import {
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
 } from './plugins/fields/markdown'
-import { createMediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
+import { MediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
 
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
@@ -75,25 +74,20 @@ export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions | boolean
   toolbar?: ToolbarStateOptions | boolean
   alerts?: EventsToAlerts
-  namespace?: string
 }
 
 export class TinaCMS extends CMS {
   sidebar?: SidebarState
   toolbar?: ToolbarState
   _alerts?: Alerts
-  namespace?: string
 
   constructor({
     sidebar,
     toolbar,
     alerts = {},
-    namespace,
     ...config
   }: TinaCMSConfig = {}) {
     super(config)
-
-    this.namespace = namespace
 
     this.alerts.setMap({
       'media:upload:failure': () => ({
@@ -122,9 +116,7 @@ export class TinaCMS extends CMS {
         this.fields.add(field)
       }
     })
-
-    const mediaManagerScreenPlugin = createMediaManagerScreenPlugin(this.namespace)
-    this.plugins.add(mediaManagerScreenPlugin)
+    this.plugins.add(MediaManagerScreenPlugin)
   }
 
   get alerts() {
