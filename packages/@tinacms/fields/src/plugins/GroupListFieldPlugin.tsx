@@ -155,8 +155,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
     const deepCopy = JSON.parse(JSON.stringify(item))
     const newItem = {
       ...deepCopy,
-      name: item.name ? `${item.name} copy` : undefined,
-      isCopy: true,
+      name: item.name ? `${item.name} copy` : undefined
     }
     field.onItemDuplication?.(field.name, index + 1, newItem, tinaForm.mutators.insert)
   }, [tinaForm, field, index, item])
