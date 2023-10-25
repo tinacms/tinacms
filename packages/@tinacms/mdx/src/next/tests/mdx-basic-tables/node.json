@@ -11,11 +11,12 @@
       ],
       "name": "table",
       "props": {
+        "align": [],
         "tableRows": [
           {
             "tableCells": [
               {
-                "tableCell": {
+                "value": {
                   "type": "root",
                   "children": [
                     {
@@ -31,7 +32,7 @@
                 }
               },
               {
-                "tableCell": {
+                "value": {
                   "type": "root",
                   "children": [
                     {
@@ -51,7 +52,7 @@
           {
             "tableCells": [
               {
-                "tableCell": {
+                "value": {
                   "type": "root",
                   "children": [
                     {
@@ -67,7 +68,7 @@
                 }
               },
               {
-                "tableCell": {
+                "value": {
                   "type": "root",
                   "children": [
                     {
@@ -87,7 +88,7 @@
           {
             "tableCells": [
               {
-                "tableCell": {
+                "value": {
                   "type": "root",
                   "children": [
                     {
@@ -103,7 +104,7 @@
                 }
               },
               {
-                "tableCell": {
+                "value": {
                   "type": "root",
                   "children": [
                     {
@@ -112,6 +113,181 @@
                         {
                           "type": "text",
                           "text": "Text"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "name": "table",
+      "props": {
+        "align": [
+          "left",
+          "left",
+          "right"
+        ],
+        "tableRows": [
+          {
+            "tableCells": [
+              {
+                "value": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Syntax"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "value": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Description"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "value": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Test Text"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "tableCells": [
+              {
+                "value": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Header"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "value": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Title"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "value": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Here's this"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "tableCells": [
+              {
+                "value": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Paragraph"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "value": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Text"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "value": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "And more"
                         }
                       ]
                     }

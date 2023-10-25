@@ -76,18 +76,20 @@ export const blockElement = (
     case 'mdxJsxFlowElement':
       if (content.name === 'table') {
         const table = content.props as {
-          tableRows: { tableCells: { tableCell: any }[] }[]
+          align: Md.AlignType[] | undefined
+          tableRows: { tableCells: { value: any }[] }[]
         }
         return {
           type: 'table',
+          align: table.align,
           children: table.tableRows.map((tableRow) => {
             const tr: Md.TableRow = {
               type: 'tableRow',
-              children: tableRow.tableCells.map(({ tableCell }) => {
+              children: tableRow.tableCells.map(({ value }) => {
                 return {
                   type: 'tableCell',
                   children: eat(
-                    tableCell?.children?.at(0)?.children || [],
+                    value?.children?.at(0)?.children || [],
                     field,
                     imageCallback
                   ),

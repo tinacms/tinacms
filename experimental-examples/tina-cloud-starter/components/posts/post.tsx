@@ -38,8 +38,6 @@ const components: Components<{
   }
 }> = {
   code_block: (props) => <Prism {...props} />,
-  th: (props) => <th className="bg-gray-100 font-bold" {...props} />,
-  td: (props) => <td className="bg-gray-100" {...props} />,
   BlockQuote: (props: {
     children: TinaMarkdownContent
     authorName: string

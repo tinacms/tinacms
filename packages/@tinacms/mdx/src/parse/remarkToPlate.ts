@@ -49,11 +49,12 @@ export const remarkToSlate = (
           children: [{ type: 'text', text: '' }],
           name: 'table',
           props: {
+            align: content.align?.filter((item) => !!item),
             tableRows: content.children.map((child) => {
               return {
                 tableCells: child.children.map((child) => {
                   return {
-                    tableCell: {
+                    value: {
                       type: 'root',
                       children: [
                         {
