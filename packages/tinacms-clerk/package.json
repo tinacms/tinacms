@@ -10,7 +10,11 @@
     "license": "Apache-2.0",
     "buildConfig": {
       "entryPoints": [
-        "src/index.ts"
+        {
+          "name": "src/index.ts",
+          "target": "node"
+        },
+        "src/tinacms.ts"
       ]
     },
     "scripts": {
@@ -19,12 +23,15 @@
     },
     "devDependencies": {
       "@tinacms/scripts": "workspace:*",
+      "@types/node": "16.6.1",
+      "@clerk/backend": "0.31.3",
       "@clerk/clerk-js": "4.56.2",
       "tinacms": "workspace:*",
       "typescript": "4.3.5"
     },
     "peerDependencies": {
       "@clerk/clerk-js": "4.x",
+      "@clerk/backend": "0.x",
       "tinacms": "workspace:*"
     },
     "publishConfig": {
