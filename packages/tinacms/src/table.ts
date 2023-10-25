@@ -71,7 +71,7 @@ export const tinaTableTemplate: RichTextTemplate = {
                     tableCellSchema.parse(value)
                   } catch (e) {
                     if (e instanceof z.ZodError) {
-                      return e.errors.at(0).message
+                      return e.errors[0].message
                     }
                     return e.message
                   }
@@ -96,7 +96,7 @@ const tableCellSchema = z.object({
     )
     .refine(
       (value) => {
-        const firstValue = value.at(0)
+        const firstValue = value[0]
         return firstValue && firstValue.type === 'p'
       },
       {
@@ -106,11 +106,11 @@ const tableCellSchema = z.object({
     .refine(
       (value) => {
         if (value.length > 1) {
-          const secondBlock = value.at(1)
+          const secondBlock = value[1]
           return (
             secondBlock &&
             secondBlock.children.length === 1 &&
-            !secondBlock.children.at(0)?.text
+            !secondBlock.children[0]?.text
           )
         }
         return true
