@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/react-tinacms-inline",
-  "version": "0.45.0",
+  "version": "0.45.1",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "typings": "dist/src/index.d.ts",
@@ -29,12 +29,12 @@
     "styled-components": ">=4.1"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms": "^0.45.0",
-    "@einsteinindustries/tinacms-form-builder": "^0.45.0",
-    "@einsteinindustries/tinacms-icons": "^0.45.0",
-    "@einsteinindustries/tinacms-react-forms": "^0.45.0",
-    "@einsteinindustries/tinacms-scripts": "^0.45.0",
-    "@einsteinindustries/tinacms-styles": "^0.45.0",
+    "@einsteinindustries/tinacms": "^0.45.1",
+    "@einsteinindustries/tinacms-form-builder": "^0.45.1",
+    "@einsteinindustries/tinacms-icons": "^0.45.1",
+    "@einsteinindustries/tinacms-react-forms": "^0.45.1",
+    "@einsteinindustries/tinacms-scripts": "^0.45.1",
+    "@einsteinindustries/tinacms-styles": "^0.45.1",
     "@testing-library/react": "^11.1.2",
     "jest": "^26.6.3",
     "react-dropzone": "^11.1.0"
