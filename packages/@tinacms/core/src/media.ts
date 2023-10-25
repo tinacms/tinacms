@@ -86,6 +86,11 @@ export interface MediaStore {
   debouncedSearchTime?: number
 
   /**
+   * Namespace for the Media Store. Useful for isolating caches.
+   */
+  namespace?: string
+
+  /**
    * The [input accept string](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept)
    * that describes what kind of files the Media Store will accept.
    */

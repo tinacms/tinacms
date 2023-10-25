@@ -116,6 +116,7 @@ export class TinaCMS extends CMS {
         this.fields.add(field)
       }
     })
+
     this.plugins.add(MediaManagerScreenPlugin)
   }
 

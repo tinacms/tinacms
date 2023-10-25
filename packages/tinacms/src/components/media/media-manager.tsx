@@ -118,7 +118,7 @@ export function MediaPicker({
     return 'not-configured'
   })
 
-  const { tabs = [], onItemClick } = cms.media.store
+  const { tabs = [], onItemClick, namespace } = cms.media.store
 
   const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
