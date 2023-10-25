@@ -99,7 +99,12 @@ const formOptions = {
           component: 'text',
         },
       ],
-      allowItemDuplication: true,
+      onItemDuplication: (name, index, value, callback) => {
+        callback(name, index, {
+          ...value,
+          name: `${value.name} (intercepted)`,
+        })
+      }
     },
   ],
   buttons: {

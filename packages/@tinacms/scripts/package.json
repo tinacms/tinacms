@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-scripts",
-  "version": "0.45.0",
+  "version": "0.45.1",
   "license": "Apache-2.0",
   "main": "index.js",
   "repository": {
