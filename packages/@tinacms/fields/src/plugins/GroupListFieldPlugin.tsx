@@ -63,7 +63,7 @@ interface GroupFieldDefinititon extends Field {
      */
     label?: string
   }
-  onItemDuplication?: (name: string, index: number, value: any, callback: Mutators['insert']) => void
+  onItemDuplication?: (name: string, index: number, value: any, formInsert: Mutators['insert']) => void
 }
 
 interface GroupProps {
