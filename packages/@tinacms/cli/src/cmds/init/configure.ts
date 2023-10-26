@@ -118,6 +118,7 @@ async function configure(
   if (config.hosting === 'self-host') {
     generatedFilesInUse.push(env.generatedFiles.database)
     generatedFilesInUse.push(env.generatedFiles['next-api-handler'])
+    generatedFilesInUse.push(env.generatedFiles['users-json'])
   }
   if (config.framework.reactive && firstTimeSetup) {
     generatedFilesInUse.push(env.generatedFiles['reactive-example'])

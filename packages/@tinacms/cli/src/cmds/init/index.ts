@@ -24,6 +24,7 @@ export type GeneratedFileType =
   | 'templates'
   | 'reactive-example'
   | 'sample-content'
+  | 'users-json'
 
 export type GeneratedFile = {
   fullPathJS: string
