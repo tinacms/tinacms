@@ -121,7 +121,7 @@ async function apply({
       config,
       generatedFile: env.generatedFiles['next-api-handler'],
     })
-    // add pages/api/tina/users.json file
+    // add content/users/index.json file
     await addTemplateFile({
       config,
       generatedFile: env.generatedFiles['users-json'],
