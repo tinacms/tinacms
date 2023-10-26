@@ -124,6 +124,12 @@ const detectEnvironment = async ({
         typescriptSuffix: 'tsx',
       }
     ),
+    'users-json': await makeGeneratedFile(
+      'index',
+      'users-json',
+      path.join(baseDir, 'content', 'users'),
+      { extensionOverride: 'json' }
+    ),
     'sample-content': await makeGeneratedFile(
       'hello-world',
       'sample-content',

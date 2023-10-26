@@ -121,6 +121,25 @@ async function apply({
       config,
       generatedFile: env.generatedFiles['next-api-handler'],
     })
+    // add content/users/index.json file
+    await addTemplateFile({
+      config,
+      generatedFile: env.generatedFiles['users-json'],
+      content: JSON.stringify(
+        {
+          users: [
+            {
+              name: 'Tina User',
+              email: 'user@example.com',
+              username: 'admin',
+              password: 'admin',
+            },
+          ],
+        },
+        null,
+        2
+      ),
+    })
   }
 
   // add NextJS Demo file (First time init only)
