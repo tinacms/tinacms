@@ -1,0 +1,16 @@
+FROM cli-testing-base
+
+ENV STARTER_FOLDER=/starters
+ENV TINAVERSION=0.0.0-20231024174613
+ENV NEXTVERSION=13.5.6
+ENV INIT_RUNNER=pnpm
+ENV INIT_ARGS=dlx
+ENV PACKAGE_MANAGER=pnpm
+ENV PNPM_HOME=/usr/local/bin
+ENV CI=true
+
+RUN npm install -g pnpm@7.17.1
+
+WORKDIR /app
+
+COPY tests .

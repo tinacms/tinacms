@@ -1,0 +1,15 @@
+FROM cli-testing-base
+
+ENV STARTER_FOLDER=/starters
+ENV TINAVERSION=0.0.0-20231024174613
+ENV NEXTVERSION=13.5.6
+ENV INIT_RUNNER=npx
+ENV INIT_ARGS=
+ENV PACKAGE_MANAGER=yarn
+ENV CI=true
+
+RUN npm install -g yarn
+
+WORKDIR /app
+
+COPY tests .
