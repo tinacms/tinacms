@@ -7,6 +7,7 @@ import { name } from './properties'
 import { findDuplicates } from '../util'
 import { TinaFieldZod } from './fields'
 import { tinaConfigZod } from './tinaCloudSchemaConfig'
+import { ObjectField } from '../types'
 const FORMATS = [
   'json',
   'md',
@@ -15,6 +16,7 @@ const FORMATS = [
   'toml',
   'yaml',
   'yml',
+  'csv',
 ] as const
 
 const Template = z
@@ -178,3 +180,53 @@ export const TinaCloudSchemaZod = z
       })
     }
   })
+// .superRefine((val, ctx) => {
+//   for (const collection of val.collections) {
+//     if (collection.format === 'csv') {
+//       const fields = collection.fields
+//       if (
+//         fields.length === 0 ||
+//         fields.length > 1 ||
+//         !(fields[0].type === 'object' && fields[0].list)
+//       ) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           message: `CSV collections must have exactly one list field of type 'object'`,
+//           path: ['collections', collection.name, 'fields'],
+//         })
+//         return
+//       }
+//       const childFields = (fields[0] as ObjectField<true>).fields
+//       for (const field of childFields) {
+//         if (field.type === 'object') {
+//           ctx.addIssue({
+//             code: z.ZodIssueCode.custom,
+//             message: `CSV collections cannot have nested objects`,
+//             path: [
+//               'collections',
+//               collection.name,
+//               'fields',
+//               fields[0].name,
+//               'fields',
+//               field.name,
+//             ],
+//           })
+//         }
+//         if (field.list) {
+//           ctx.addIssue({
+//             code: z.ZodIssueCode.custom,
+//             message: `CSV collections cannot have nested lists`,
+//             path: [
+//               'collections',
+//               collection.name,
+//               'fields',
+//               fields[0].name,
+//               'fields',
+//               field.name,
+//             ],
+//           })
+//         }
+//       }
+//     }
+//   }
+// })

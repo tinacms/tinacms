@@ -31,6 +31,8 @@ export * from './auth/utils'
 export { sequential, assertShape } from './util'
 export {
   loadAndParseWithAliases,
+  bridgeDataLoader,
+  csvDataLoader,
   stringifyFile,
   parseFile,
   scanAllContent,

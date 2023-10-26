@@ -7,6 +7,7 @@ import { AuditCommand } from './next/commands/audit-command'
 import { InitCommand } from './next/commands/init-command'
 import { CodemodCommand } from './next/commands/codemod-command'
 import { SearchIndexCommand } from './next/commands/searchindex-command'
+import { MediaCommand } from './next/commands/media-command'
 
 export type {
   Schema,
@@ -27,6 +28,7 @@ cli.register(AuditCommand)
 cli.register(InitCommand)
 cli.register(CodemodCommand)
 cli.register(SearchIndexCommand)
+cli.register(MediaCommand)
 cli.register(Builtins.DefinitionsCommand)
 cli.register(Builtins.HelpCommand)
 cli.register(Builtins.VersionCommand)

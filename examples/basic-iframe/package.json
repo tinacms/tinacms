@@ -7,7 +7,8 @@
     "build:local": "tinacms build --local --skip-cloud-checks -c \"next build\"",
     "start": "next start",
     "lint": "next lint",
-    "searchindex": "tinacms search-index"
+    "searchindex": "tinacms search-index",
+    "media:update": "tinacms media update"
   },
   "dependencies": {
     "@octokit/rest": "^19.0.5",

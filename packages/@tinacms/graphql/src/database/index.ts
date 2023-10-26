@@ -7,15 +7,20 @@ import micromatch from 'micromatch'
 import { createSchema } from '../schema/createSchema'
 import { atob, btoa, lastItem, sequential } from '../util'
 import {
+  bridgeDataLoader,
+  DataLoader,
   getTemplateForFile,
   hasOwnProperty,
   loadAndParseWithAliases,
   normalizePath,
+  parseCSV,
   partitionPathsByCollection,
   scanAllContent,
   scanContentByPaths,
+  csvDataLoader,
   stringifyFile,
   transformDocument,
+  stringifyCSV,
 } from './util'
 import type {
   Collection,
@@ -484,9 +489,10 @@ export class Database {
           collectionIndexDefinitions = indexDefinitions?.[collectionName]
         }
 
-        const normalizedPath = normalizePath(filepath)
+        let normalizedPath = normalizePath(filepath)
         const dataFields = await this.formatBodyOnPayload(filepath, data)
         const collection = await this.collectionForPath(filepath)
+        console.log('!!', collection.fields)
         if (!collection) {
           // noinspection ExceptionCaughtLocallyJS
           throw new GraphQLError(`Unable to find collection for ${filepath}.`)
@@ -494,30 +500,86 @@ export class Database {
 
         // If a collection match is specified, make sure the file matches the glob.
         // TODO: Maybe we should service this error better in the frontend?
-        if (collection.match?.exclude || collection.match?.include) {
-          const matches = this.tinaSchema.getMatches({ collection })
+        let stringifiedFile: string
+        if (!collection.singleFile) {
+          if (collection.match?.exclude || collection.match?.include) {
+            const matches = this.tinaSchema.getMatches({ collection })
 
-          const match = micromatch.isMatch(filepath, matches)
+            const match = micromatch.isMatch(filepath, matches)
 
-          if (!match) {
-            // noinspection ExceptionCaughtLocallyJS
+            if (!match) {
+              // noinspection ExceptionCaughtLocallyJS
+              throw new GraphQLError(
+                `File ${filepath} does not match collection ${
+                  collection.name
+                } glob ${matches.join(
+                  ','
+                )}. Please change the filename or update matches for ${
+                  collection.name
+                } in your config file.`
+              )
+            }
+          }
+
+          stringifiedFile = filepath.endsWith(
+            `.gitkeep.${collection.format || 'md'}`
+          )
+            ? ''
+            : await this.stringifyFile(
+            filepath,
+            dataFields,
+            collection
+          )
+        } else {
+          if (collection.format !== 'csv') {
             throw new GraphQLError(
-              `File ${filepath} does not match collection ${
-                collection.name
-              } glob ${matches.join(
-                ','
-              )}. Please change the filename or update matches for ${
-                collection.name
-              } in your config file.`
+              `Collection ${collection.name} is configured as single file, but is not a csv.`
             )
           }
+          const singleFilePath = `${collection.path}/index.${collection.format}`
+          const stringCSV = await this.bridge.get(singleFilePath)
+          const rows = parseCSV(stringCSV, collection).sort((a, b) =>
+            a['_id_'].localeCompare(b['_id_'])
+          )
+          console.log('sorted!', rows)
+          let itemId = normalizedPath.replace(`${collection.path}/`, '')
+          itemId = itemId.substring(
+            0,
+            itemId.lastIndexOf(collection.format) - 1
+          )
+          let insertIdx = -1
+          let isUpdate = false
+          for (let i = 0; i < rows.length; i++) {
+            console.log({
+              a: rows[i]['_id_'],
+              b: itemId,
+            })
+            if (rows[i]['_id_'] === itemId) {
+              console.log('updating existing', dataFields)
+              Object.assign(rows[i], dataFields)
+              isUpdate = true
+              break
+            }
+            if (rows[i]['_id_'] > itemId) {
+              console.log('found insert idx')
+              insertIdx = i
+              break
+            }
+          }
+          if (!isUpdate) {
+            console.log('!update')
+            if (insertIdx === -1) {
+              console.log('appending')
+              rows.push(dataFields)
+            } else {
+              console.log('splicing into ', insertIdx)
+              rows.splice(insertIdx, 0, dataFields)
+            }
+          }
+          stringifiedFile = stringifyCSV(collection, rows)
+          console.log({ stringifiedFile })
+          normalizedPath = singleFilePath
         }
-
-        const stringifiedFile = filepath.endsWith(
-          `.gitkeep.${collection.format || 'md'}`
-        )
-          ? ''
-          : await this.stringifyFile(filepath, dataFields, collection)
 
         if (!collection?.isDetached) {
           if (this.bridge) {
@@ -536,6 +598,11 @@ export class Database {
               e
             )
           }
+        }
+
+        if (collection.singleFile) {
+          // reset normalizedPath to the specified path for indexing
+          normalizedPath = normalizePath(filepath)
         }
 
         const folderTreeBuilder = new FolderTreeBuilder()
@@ -1329,6 +1396,7 @@ export class Database {
       tinaSchema,
       this.bridge,
       async (collection, contentPaths) => {
+        console.log(collection.name, contentPaths)
         const userFields = mapUserFields(collection, [])
         if (collection.isDetached) {
           const level = this.appLevel.sublevel(
@@ -1479,14 +1547,44 @@ const _indexContent = async (
   if (collection) {
     templateInfo = tinaSchema.getTemplatesForCollectable(collection)
   }
+  let dataLoader: DataLoader = bridgeDataLoader({
+    bridge: database.bridge,
+    collection,
+  })
+  if (collection.singleFile) {
+    if (documentPaths.length > 1) {
+      throw new Error(
+        `Unable to index multiple documents for collection ${collection.name} because it is a single file collection`
+      )
+    }
+    if (collection.format !== 'csv') {
+      throw new Error(`Single file collection ${collection.name} must be a csv`)
+    }
+
+    const sourcePath = documentPaths[0]
+    console.log(sourcePath)
+    // clean up this redundancy
+    const stringCSV = await database.bridge.get(sourcePath)
+    console.log(stringCSV)
+    documentPaths = parseCSV(stringCSV, collection).map(
+      (row) => `${collection.path}/${row['_id_']}.${collection.format}`
+    )
+    console.log(documentPaths)
+    dataLoader = await csvDataLoader({
+      bridge: database.bridge,
+      collection,
+      pathField: '_id_',
+      sourcePath,
+    })
+  }
 
   const folderTreeBuilder = new FolderTreeBuilder()
   await sequential(documentPaths, async (filepath) => {
+    console.log({ filepath })
     try {
       const aliasedData = await loadAndParseWithAliases(
-        database.bridge,
+        dataLoader,
         filepath,
-        collection,
         templateInfo
       )
 
@@ -1534,6 +1632,7 @@ const _indexContent = async (
         },
       ])
     } catch (error) {
+      console.log(error)
       throw new TinaFetchError(`Unable to seed ${filepath}`, {
         originalError: error,
         file: filepath,

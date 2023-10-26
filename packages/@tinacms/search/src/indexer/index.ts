@@ -7,6 +7,7 @@ import {
   scanContentByPaths,
   transformDocument,
   transformDocumentIntoPayload,
+  bridgeDataLoader,
 } from '@tinacms/graphql'
 import { SearchClient } from '../types'
 import { processDocumentForIndexing } from './utils'
@@ -36,15 +37,20 @@ export class SearchIndexer {
   private makeIndexerCallback(itemCallback: (item: any) => Promise<void>) {
     return async (collection: Collection<true>, contentPaths: string[]) => {
       const templateInfo = this.schema.getTemplatesForCollectable(collection)
+      // TODO I think this will also need to handle single file collections
+      const dataLoader = bridgeDataLoader({
+        bridge: this.bridge,
+        collection,
+      })
       await sequential(contentPaths as string[], async (path) => {
         const data = await transformDocumentIntoPayload(
           `${collection.path}/${path}`,
           transformDocument(
             path,
             await loadAndParseWithAliases(
-              this.bridge,
+              dataLoader,
               path,
-              collection,
+              // collection,
               templateInfo
             ),
             this.schema

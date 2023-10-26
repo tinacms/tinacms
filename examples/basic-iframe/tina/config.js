@@ -69,6 +69,22 @@ export default defineConfig({
   schema: {
     collections: [
       {
+        label: 'Media',
+        name: 'media',
+        path: 'content/media',
+        format: 'csv',
+        singleFile: {
+          pathField: 'filename', // isSingleFile + isPathField on string field type?
+        },
+        fields: [
+          {
+            type: 'string',
+            label: 'Hash',
+            name: 'hash',
+          },
+        ],
+      },
+      {
         ui: {
           filename: {
             slugify: (values, meta) => {

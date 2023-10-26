@@ -774,6 +774,13 @@ interface BaseCollection {
   }
   isDetached?: boolean
   isAuthCollection?: boolean
+  singleFile?: {
+    pathField: string
+  }
+  media?: {
+    idField: string
+    pathField: string
+  }
 }
 
 type TemplateCollection<WithNamespace extends boolean = false> = {
