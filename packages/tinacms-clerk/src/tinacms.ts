@@ -52,20 +52,28 @@ export class ClerkAuthProvider extends AbstractAuthProvider {
       },
     })
   }
-  async getUser() {
+  async authorize(context?: any): Promise<any> {
     await this.clerk.load()
     if (this.clerk.user) {
       if (
-        this.isUserAllowed(this.clerk.user.primaryEmailAddress.emailAddress)
+        await this.isUserAllowed?.(
+          this.clerk.user.primaryEmailAddress.emailAddress
+        )
       ) {
-        return this.clerk.user as any
+        return true
       }
       // Handle when a user is logged in outside of the org
-      this.clerk.session.end()
+      await this.clerk.session.end()
     }
     return false
   }
-  isUserAllowed(emailAddress: string) {
+
+  async getUser(): Promise<any> {
+    await this.clerk.load()
+    return this.clerk.user
+  }
+
+  async isUserAllowed(emailAddress: string) {
     if (this.allowedList.includes(emailAddress)) {
       return true
     }
