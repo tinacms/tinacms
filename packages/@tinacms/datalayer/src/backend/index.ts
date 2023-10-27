@@ -7,7 +7,7 @@ type NodeApiHandler = (
 
 type DatabaseClient = any
 
-export interface BackendAuthentication {
+export interface BackendAuthProvider {
   initialize?: () => Promise<void>
   isAuthorized: (
     req: IncomingMessage,
@@ -29,21 +29,21 @@ export interface BackendAuthentication {
     }
   }
 }
-export const LocalBackendAuthentication = () =>
+export const LocalBackendAuthProvider = () =>
   ({
     isAuthorized: async () => ({ isAuthorized: true }),
-  } as BackendAuthentication)
+  } as BackendAuthProvider)
 
 export interface TinaBackendOptions {
   databaseClient: DatabaseClient
-  authentication: BackendAuthentication
+  authProvider: BackendAuthProvider
 }
 
 export function TinaNodeBackend({
-  authentication,
+  authProvider,
   databaseClient,
 }: TinaBackendOptions) {
-  const { initialize, isAuthorized, extraRoutes } = authentication
+  const { initialize, isAuthorized, extraRoutes } = authProvider
   initialize?.().catch((e) => {
     console.error(e)
   })
@@ -59,7 +59,7 @@ function MakeNodeApiHandler({
   isAuthorized,
   extraRoutes,
   databaseClient,
-}: BackendAuthentication & { databaseClient: DatabaseClient }) {
+}: BackendAuthProvider & { databaseClient: DatabaseClient }) {
   const handler: NodeApiHandler = async (...params) => {
     const [req, res] = params
     // remove leading slash
@@ -75,7 +75,7 @@ function MakeNodeApiHandler({
       res.end()
       return
     }
-    const allRoutes: BackendAuthentication['extraRoutes'] = {
+    const allRoutes: BackendAuthProvider['extraRoutes'] = {
       gql: {
         handler: async (...params) => {
           const [req, res] = params

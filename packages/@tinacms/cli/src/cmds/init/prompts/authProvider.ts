@@ -1,24 +1,24 @@
 import prompts from 'prompts'
 import crypto from 'crypto-js'
 
-import type { PromptAuthenticationProvider, Config } from './types'
+import type { PromptAuthProvider, Config } from './types'
 import type { Framework } from '../'
 import { askTinaCloudSetup } from './askTinaCloudSetup'
-const supportedAuthenticationProviders: {
-  'tina-cloud': PromptAuthenticationProvider
-  'next-auth': PromptAuthenticationProvider
-  other: PromptAuthenticationProvider
+const supportedAuthProviders: {
+  'tina-cloud': PromptAuthProvider
+  'next-auth': PromptAuthProvider
+  other: PromptAuthProvider
 } = {
   other: {
     name: 'other',
   },
   'tina-cloud': {
-    configAuthenticationClass: '',
-    backendAuthentication: 'TinaCloudBackendAuthentication()',
+    configAuthProviderClass: '',
+    backendAuthProvider: 'TinaCloudBackendAuthProvider()',
     name: 'tina-cloud',
-    backendAuthenticationImports: [
+    backendAuthProviderImports: [
       {
-        imported: ['TinaCloudBackendAuthentication'],
+        imported: ['TinaCloudBackendAuthProvider'],
         from: '@tinacms/auth',
         packageName: '@tinacms/auth',
       },
@@ -26,7 +26,7 @@ const supportedAuthenticationProviders: {
   },
   'next-auth': {
     name: 'next-auth',
-    configAuthenticationClass: `new UsernamePasswordAuthJSProvider()`,
+    configAuthProviderClass: `new UsernamePasswordAuthJSProvider()`,
     configImports: [
       {
         imported: ['UsernamePasswordAuthJSProvider', 'TinaUserCollection'],
@@ -35,25 +35,25 @@ const supportedAuthenticationProviders: {
       },
     ],
     extraTinaCollections: ['TinaUserCollection'],
-    backendAuthentication: `AuthJsBackendAuthentication({
+    backendAuthProvider: `AuthJsBackendAuthProvider({
           authOptions: TinaAuthJSOptions({
             databaseClient: databaseClient,
             secret: process.env.NEXTAUTH_SECRET,
           }),
         })`,
-    backendAuthenticationImports: [
+    backendAuthProviderImports: [
       {
         from: 'tinacms-authjs',
         packageName: 'tinacms-authjs',
-        imported: ['AuthJsBackendAuthentication', 'TinaAuthJSOptions'],
+        imported: ['AuthJsBackendAuthProvider', 'TinaAuthJSOptions'],
       },
     ],
     peerDependencies: ['next-auth'],
   },
 }
 
-const authenticationProviderUpdateConfig: {
-  [key in keyof typeof supportedAuthenticationProviders]: ({
+const authProviderUpdateConfig: {
+  [key in keyof typeof supportedAuthProviders]: ({
     config,
   }: {
     config: Config
@@ -78,7 +78,7 @@ const authenticationProviderUpdateConfig: {
     })
   },
 }
-export const chooseAuthenticationProvider = async ({
+export const chooseAuthProvider = async ({
   framework,
   config,
 }: {
@@ -99,30 +99,30 @@ export const chooseAuthenticationProvider = async ({
   // }
   // choices.push({
   //   value: 'other',
-  //   title: 'I will create my own authentication provider',
+  //   title: 'I will create my own auth provider',
   // })
   // const authProviderChoice = await prompts([
   //   {
   //     name: 'authProvider',
   //     type: 'select',
-  //     message: 'Which authentication provider are you using?',
+  //     message: 'Which auth provider are you using?',
   //     choices,
   //   },
   // ])
   // if (typeof authProviderChoice.authProvider === 'undefined') {
-  //   throw new Error('Authentication provider is required')
+  //   throw new Error('Auth provider is required')
   // }
   // const authProvider =
-  //   supportedAuthenticationProviders[
+  //   supportedAuthProviders[
   //     authProviderChoice.authProvider as 'tina-cloud' | 'next-auth' | 'other'
   //   ]
 
-  // await authenticationProviderUpdateConfig[authProviderChoice.authProvider]({
+  // await authProviderUpdateConfig[authProviderChoice.authProvider]({
   //   config,
   // })
-  const authProvider = supportedAuthenticationProviders['next-auth']
+  const authProvider = supportedAuthProviders['next-auth']
 
-  await authenticationProviderUpdateConfig['next-auth']({
+  await authProviderUpdateConfig['next-auth']({
     config,
   })
 

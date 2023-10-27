@@ -9,10 +9,8 @@ export const nextApiRouteTemplate = ({
   env: InitEnvironment
 }) => {
   const extraPath = env.usingSrc ? '../' : ''
-  return `import { TinaNodeBackend, LocalBackendAuthentication } from '@tinacms/datalayer'
-  ${makeImportString(
-    config.authenticationProvider?.backendAuthenticationImports
-  )}
+  return `import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  ${makeImportString(config.authProvider?.backendAuthProviderImports)}
  
 
   
@@ -21,9 +19,9 @@ export const nextApiRouteTemplate = ({
   const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
   
   const handler = TinaNodeBackend({
-    authentication: isLocal
-      ? LocalBackendAuthentication()
-      : ${config.authenticationProvider?.backendAuthentication || ''},
+    authProvider: isLocal
+      ? LocalBackendAuthProvider()
+      : ${config.authProvider?.backendAuthProvider || ''},
     databaseClient,
   })
   

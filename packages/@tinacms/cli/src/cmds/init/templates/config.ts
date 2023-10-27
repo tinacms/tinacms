@@ -37,7 +37,7 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
     return args.collections
   }
   const extraTinaCollections =
-    args.config.authenticationProvider?.extraTinaCollections?.join(',\n') + ','
+    args.config.authProvider?.extraTinaCollections?.join(',\n') + ','
 
   const baseCollections = `[
     ${extraTinaCollections || ''}
@@ -69,16 +69,14 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
 
 export const generateConfig = (args: ConfigTemplateArgs) => {
   const isUsingTinaCloud =
-    !args.selfHosted ||
-    args.config.authenticationProvider?.name === 'tina-cloud'
+    !args.selfHosted || args.config.authProvider?.name === 'tina-cloud'
 
   let extraImports = ''
   if (args.selfHosted) {
-    // add imports for authentication provider
-    if (args.config.authenticationProvider) {
+    // add imports for auth provider
+    if (args.config.authProvider) {
       extraImports =
-        extraImports +
-        makeImportString(args.config.authenticationProvider?.configImports)
+        extraImports + makeImportString(args.config.authProvider?.configImports)
     }
     // if wer are not using tina cloud, we need to import the local auth provider
     if (!isUsingTinaCloud) {
@@ -114,7 +112,7 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
       args.selfHosted && !isUsingTinaCloud
         ? `authProvider: isLocal
     ? new LocalAuthProvider()
-    :${args.config?.authenticationProvider.configAuthenticationClass},`
+    :${args.config?.authProvider.configAuthProviderClass},`
         : ''
     }
     ${

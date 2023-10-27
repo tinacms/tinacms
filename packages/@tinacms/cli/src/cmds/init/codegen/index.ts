@@ -356,8 +356,8 @@ export const addSelfHostedTinaAuthToConfig = async (
     fs.readFileSync(pathToConfig, 'utf8'),
     config.typescript ? ts.ScriptTarget.Latest : ts.ScriptTarget.ESNext
   )
-  const { configImports, configAuthenticationClass, extraTinaCollections } =
-    config.authenticationProvider
+  const { configImports, configAuthProviderClass, extraTinaCollections } =
+    config.authProvider
 
   const importMap: Record<string, string[]> = {
     // iterate over configImports and add them to the import map
@@ -385,7 +385,7 @@ export const addSelfHostedTinaAuthToConfig = async (
         'defineConfig',
         'authProvider',
         ...parseExpression(
-          `isLocal ? new LocalAuthProvider() : ${configAuthenticationClass}`
+          `isLocal ? new LocalAuthProvider() : ${configAuthProviderClass}`
         )
       ),
       makeUpdateObjectLiteralPropertyVisitor(

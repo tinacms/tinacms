@@ -191,8 +191,8 @@ async function apply({
     params.isBackendInit &&
     // Do the user choose the 'self-host' option
     config.hosting === 'self-host' &&
-    // the user did not choose the 'tina-cloud' authentication provider
-    (config.authenticationProvider?.name || '') !== 'tina-cloud'
+    // the user did not choose the 'tina-cloud' auth provider
+    (config.authProvider?.name || '') !== 'tina-cloud'
   ) {
     await addSelfHostedTinaAuthToConfig(config, env.generatedFiles['config'])
   }
@@ -308,20 +308,18 @@ const addDependencies = async (
     deps.push('@tinacms/datalayer')
   }
 
-  // Add deps from database adapter, authentication provider, and git provider
+  // Add deps from database adapter, auth provider, and git provider
   deps.push(
     ...(config.databaseAdapter?.imports?.map((x) => x.packageName) || [])
   )
-  deps.push(...(config.authenticationProvider?.peerDependencies || []))
+  deps.push(...(config.authProvider?.peerDependencies || []))
   deps.push(
-    ...(config.authenticationProvider?.backendAuthenticationImports?.map(
+    ...(config.authProvider?.backendAuthProviderImports?.map(
       (x) => x.packageName
     ) || [])
   )
   deps.push(
-    ...(config.authenticationProvider?.configImports?.map(
-      (x) => x.packageName
-    ) || [])
+    ...(config.authProvider?.configImports?.map((x) => x.packageName) || [])
   )
   deps.push(...(config.gitProvider?.imports?.map((x) => x.packageName) || []))
 
@@ -621,7 +619,7 @@ const addReactiveFile: {
         ...packageJson,
         scripts: extendNextScripts(scripts, {
           isLocalEnvVarName: config.isLocalEnvVarName,
-          addSetupUsers: config.authenticationProvider?.name === 'next-auth',
+          addSetupUsers: config.authProvider?.name === 'next-auth',
         }),
       },
       null,
