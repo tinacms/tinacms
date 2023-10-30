@@ -17,6 +17,7 @@ export class ClerkAuthProvider extends AbstractAuthProvider {
      * https://clerk.com/docs/authentication/allowlist
      */
     allowedList?: string[]
+    // Ensure the user is a member of an the provided orgId
     orgId?: string
   }) {
     super()
