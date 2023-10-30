@@ -442,7 +442,7 @@ export class BuildCommand extends BaseCommand {
         bar.tick({
           prog: '❌',
         })
-        let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to Github to update your remote GraphQL schema.`
+        let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to GitHub to update your remote GraphQL schema.`
         if (config?.branch) {
           errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
         }

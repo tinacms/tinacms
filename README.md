@@ -34,7 +34,7 @@ Visit [Tina's documentation](https://tina.io/docs/) to learn more.
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tinacms%20on%20GitHub%20and%20it%20is%20sweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
 [![Forum](https://shields.io/github/discussions/tinacms/tinacms)](https://github.com/tinacms/tinacms/discussions)
 
-Visit the [Github Discussions](https://github.com/tinacms/tinacms/discussions) or our [Community Discord](https://discord.com/invite/zumN63Ybpf) to ask questions, or look us up on on Twitter at [@tinacms](https://twitter.com/tinacms).
+Visit the [GitHub Discussions](https://github.com/tinacms/tinacms/discussions) or our [Community Discord](https://discord.com/invite/zumN63Ybpf) to ask questions, or look us up on on Twitter at [@tinacms](https://twitter.com/tinacms).
 
 <!-- ## Changelog
 

@@ -308,7 +308,7 @@ export class DevCommand extends BaseCommand {
      * editing in their IDE or Tina pushing the update via the Filesystem bridge. It's a simple
      * enough update that it's fine that when Tina pushes a change, we go and push that same
      * thing back through the database, and Tina Cloud does the same thing when it receives
-     * a push from Github.
+     * a push from GitHub.
      */
     chokidar
       .watch(collectionContentFiles)
@@ -355,7 +355,7 @@ export class DevCommand extends BaseCommand {
      * editing in their IDE or Tina pushing the update via the Filesystem bridge. It's a simple
      * enough update that it's fine that when Tina pushes a change, we go and push that same
      * thing back through the database, and Tina Cloud does the same thing when it receives
-     * a push from Github.
+     * a push from GitHub.
      */
     chokidar
       .watch(configManager.userQueriesAndFragmentsGlob)
