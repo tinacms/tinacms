@@ -263,7 +263,7 @@ const config = defineStaticConfig({
                   },
                   {
                     type: 'string',
-                    label: 'Github',
+                    label: 'GitHub',
                     name: 'github',
                   },
                 ],
