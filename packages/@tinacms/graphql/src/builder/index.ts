@@ -570,8 +570,30 @@ export class Builder {
       case 'number':
       case 'boolean':
       case 'rich-text':
-      case 'password':
         return astBuilder.FieldNodeDefinition(field)
+      case 'password':
+        const passwordValue = await this._buildFieldNodeForFragments(
+          {
+            name: 'value',
+            namespace: [...field.namespace, 'value'],
+            type: 'string',
+            required: true,
+          } as TinaField<true>,
+          depth
+        )
+        const passwordChangeRequired = await this._buildFieldNodeForFragments(
+          {
+            name: 'passwordChangeRequired',
+            namespace: [...field.namespace, 'passwordChangeRequired'],
+            type: 'boolean',
+            required: false,
+          },
+          depth
+        )
+        return astBuilder.FieldWithSelectionSetDefinition({
+          name: field.name,
+          selections: filterSelections([passwordValue, passwordChangeRequired]),
+        })
       case 'object':
         if (field.fields?.length > 0) {
           const selections = []
@@ -1192,9 +1214,7 @@ export class Builder {
         const filter = await this._connectionFilterBuilder({
           fieldName: field.name,
           namespace: field.namespace,
-          collections: await this.tinaSchema.getCollectionsByName(
-            field.collections
-          ),
+          collections: this.tinaSchema.getCollectionsByName(field.collections),
         })
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1222,13 +1242,14 @@ export class Builder {
         })
       case 'datetime':
       case 'image':
-      case 'password':
       case 'string':
         return astBuilder.InputValueDefinition({
           name: field.name,
           list: field.list,
           type: astBuilder.TYPES.String,
         })
+      case 'password':
+        return this._buildPasswordMutation(field)
       case 'object':
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1269,6 +1290,32 @@ export class Builder {
           })
         }
       ),
+    })
+  }
+
+  private _buildPasswordMutation = async (field: {
+    list?: boolean
+    name: string
+    namespace: string[]
+  }) => {
+    return astBuilder.InputValueDefinition({
+      name: field.name,
+      list: field.list,
+      type: astBuilder.InputObjectTypeDefinition({
+        name: NAMER.dataMutationTypeName(field.namespace),
+        fields: [
+          astBuilder.InputValueDefinition({
+            name: 'value',
+            type: astBuilder.TYPES.String,
+            required: false,
+          }),
+          astBuilder.InputValueDefinition({
+            name: 'passwordChangeRequired',
+            type: astBuilder.TYPES.Boolean,
+            required: true,
+          }),
+        ],
+      }),
     })
   }
 
@@ -1460,13 +1507,35 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
           console.warn(listWarningMsg)
         }
       case 'image':
-      case 'password':
       case 'string':
         return astBuilder.FieldDefinition({
           name: field.name,
           list: field.list,
           required: field.required,
           type: astBuilder.TYPES.Scalar(field.type),
+        })
+      case 'password':
+        return astBuilder.FieldDefinition({
+          name: field.name,
+          list: field.list,
+          required: field.required,
+          type: astBuilder.ObjectTypeDefinition({
+            name: NAMER.dataTypeName(field.namespace),
+            fields: [
+              await this._buildDataField({
+                name: 'value',
+                namespace: [...field.namespace, 'value'],
+                type: 'string',
+                required: true,
+              }),
+              await this._buildDataField({
+                name: 'passwordChangeRequired',
+                namespace: [...field.namespace, 'passwordChangeRequired'],
+                type: 'boolean',
+                required: false,
+              }),
+            ],
+          }),
         })
       case 'object':
         return astBuilder.FieldDefinition({

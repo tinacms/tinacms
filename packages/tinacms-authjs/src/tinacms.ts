@@ -23,7 +23,8 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
     return Promise.resolve({ id_token: '' })
   }
   async getUser() {
-    return !!(await getSession())
+    const session = await getSession()
+    return session?.user || false
   }
   logout() {
     return signOut({ callbackUrl: this.callbackUrl })

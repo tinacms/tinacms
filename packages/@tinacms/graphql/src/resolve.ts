@@ -212,12 +212,13 @@ export const resolve = async ({
             }
 
             if (info.fieldName === 'authenticate') {
-              if (!passwordFieldName) {
+              const saltedHash = _.get(user, [passwordFieldName || '', 'value'])
+              if (!saltedHash) {
                 throw new Error('No password field found on user field')
               }
 
               const matches = await checkPasswordHash({
-                saltedHash: _.get(user, passwordFieldName),
+                saltedHash,
                 password: args.password,
               })
 
@@ -271,7 +272,10 @@ export const resolve = async ({
               throw new Error('Not authorized')
             }
 
-            user[passwordFieldName] = args.password
+            user[passwordFieldName] = {
+              value: args.password,
+              passwordChangedRequired: false,
+            }
 
             const params = {}
             _.set(
@@ -284,7 +288,10 @@ export const resolve = async ({
                   return {
                     // don't overwrite other users' passwords
                     ...u,
-                    [passwordFieldName]: '',
+                    [passwordFieldName]: {
+                      value: '',
+                      ...u[passwordFieldName],
+                    },
                   }
                 }
               })

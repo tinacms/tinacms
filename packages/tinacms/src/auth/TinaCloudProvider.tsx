@@ -68,6 +68,7 @@ export const AuthWallInner = ({
     username: string
     password: string
   }>({ username: '', password: '' })
+  const [authenticated, setAuthenticated] = useState<boolean>(false)
 
   React.useEffect(() => {
     let mounted = true
@@ -78,9 +79,13 @@ export const AuthWallInner = ({
         if (isAuthenticated) {
           client.authProvider
             .isAuthorized()
-            .then((isAuthorized) => {
+            .then(async (isAuthorized) => {
               if (!mounted) return
               if (isAuthorized) {
+                const user = await client.authProvider.getUser()
+                if (user.passwordChangeRequired) {
+                  window.location.hash = '#/screens/change_password'
+                }
                 setShowChildren(true)
                 cms.enable()
               } else {
@@ -113,20 +118,12 @@ export const AuthWallInner = ({
     return () => {
       mounted = false
     }
-  }, [])
+  }, [authenticated])
 
   const onAuthenticated = async () => {
-    if (await client.authProvider.isAuthorized()) {
-      setShowChildren(true)
-      setActiveModal(null)
-      cms.events.dispatch({ type: 'cms:login' })
-    } else {
-      setErrorMessage({
-        title: 'Access Denied:',
-        message: 'Not Authorized To Edit',
-      })
-      setActiveModal('error')
-    }
+    setAuthenticated(true)
+    setActiveModal(null)
+    cms.events.dispatch({ type: 'cms:login' })
   }
 
   const otherModalActions = getModalActions
@@ -137,8 +134,9 @@ export const AuthWallInner = ({
       })
     : []
 
-  const onAuthenticate = async () => {
+  const handleAuthenticate = async () => {
     try {
+      setAuthenticated(false)
       const token = await client.authProvider.authenticate(authProps)
       if (typeof client?.onLogin === 'function') {
         await client?.onLogin({ token })
@@ -203,7 +201,7 @@ export const AuthWallInner = ({
             },
             {
               name: isTinaCloud ? 'Continue to Tina Cloud' : 'Enter Edit Mode',
-              action: onAuthenticate,
+              action: handleAuthenticate,
               primary: true,
             },
           ]}
@@ -219,7 +217,7 @@ export const AuthWallInner = ({
               ...otherModalActions,
               {
                 name: 'Login',
-                action: onAuthenticate,
+                action: handleAuthenticate,
                 primary: true,
               },
             ]}
@@ -428,7 +426,9 @@ export const TinaCloudProvider = (
     return newBranch
   }
 
-  setupMedia(props.staticMedia)
+  setupMedia(props.staticMedia).catch((e) => {
+    console.error(e)
+  })
 
   const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
     cms.flags.get('branch-switcher')
