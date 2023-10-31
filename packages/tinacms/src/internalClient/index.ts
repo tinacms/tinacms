@@ -574,7 +574,9 @@ export class LocalClient extends Client {
           : DEFAULT_LOCAL_TINA_GQL_SERVER_URL,
     }
     super(clientProps)
-    this.authProvider = new LocalAuthProvider()
+    // use whatever auth provider is passed in, or default to local auth provider
+    this.authProvider =
+      this.schema?.config?.config?.authProvider || new LocalAuthProvider()
   }
   public get isLocalMode() {
     return true
