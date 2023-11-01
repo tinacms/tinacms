@@ -152,7 +152,7 @@ export const createConfig = async ({
       }
     } catch (error) {
       // if we can't stringify it, we'll just warn the user
-      console.warn(`Could not stringify env.${key} env from tina/config file`)
+      console.warn(`Could not stringify env.${key} from tina/config file`)
       console.warn(error)
     }
   })
