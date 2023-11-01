@@ -8,12 +8,14 @@ import {
 } from 'next-auth/react'
 import { AbstractAuthProvider } from 'tinacms'
 
+export const TINA_CREDENTIALS_PROVIDER_NAME = 'TinaCredentials'
+
 export class DefaultAuthJSProvider extends AbstractAuthProvider {
   readonly callbackUrl: string
   readonly name: string
   constructor(props?: { name?: string; callbackUrl?: string }) {
     super()
-    this.name = props?.name || 'Credentials'
+    this.name = props?.name || TINA_CREDENTIALS_PROVIDER_NAME
     this.callbackUrl = props?.callbackUrl || '/admin/index.html'
   }
   async authenticate(props?: {}): Promise<any> {
