@@ -23,8 +23,9 @@ export const PasswordFieldComponent = wrapFieldsWithMeta<
   const [confirmPassword, setConfirmPassword] = React.useState<
     string | undefined
   >()
-  const [passwordChangeRequired, setPasswordChangeRequired] =
-    React.useState<boolean>(input.value?.passwordChangeRequired ?? true)
+  const [passwordChangeRequired, setPasswordChangeRequired] = React.useState<
+    boolean | undefined
+  >(input.value.passwordChangeRequired)
 
   React.useEffect(() => {
     if (password) {
@@ -33,11 +34,11 @@ export const PasswordFieldComponent = wrapFieldsWithMeta<
         form.change(field.name, { value: password, passwordChangeRequired })
       } else {
         setError(true)
-        form.change(field.name, { value: '', passwordChangeRequired })
+        form.change(field.name, undefined)
       }
     } else {
       setError(false)
-      form.change(field.name, { value: '', passwordChangeRequired })
+      form.change(field.name, { passwordChangeRequired })
     }
   }, [password, confirmPassword, passwordChangeRequired])
 
@@ -71,6 +72,7 @@ export const PasswordFieldComponent = wrapFieldsWithMeta<
           error={error}
           placeholder={field.confirmPlaceholder || 'Confirm Password'}
           onKeyDown={(_) => {
+            setPasswordChangeRequired(true)
             if (password === undefined) {
               setPassword('')
             }
@@ -89,6 +91,7 @@ export const PasswordFieldComponent = wrapFieldsWithMeta<
             setError(false)
             setPassword(undefined)
             setConfirmPassword(undefined)
+            setPasswordChangeRequired(undefined)
             form.change(field.name, undefined)
           }}
         >
@@ -99,7 +102,7 @@ export const PasswordFieldComponent = wrapFieldsWithMeta<
         <Toggle
           field={{ name: 'passwordChangeRequired', component: 'toggle' }}
           input={{
-            value: passwordChangeRequired,
+            value: passwordChangeRequired ?? true,
             onChange: () => setPasswordChangeRequired(!passwordChangeRequired),
           }}
           name="passwordChangeRequired"
@@ -122,10 +125,10 @@ export const PasswordFieldPlugin = {
     if (Array.isArray(value)) {
       password = value[0]
     }
-    if (password !== undefined) {
-      if (field.required && !password.value) {
-        return 'Required'
-      }
+    // passwordChangeRequired undefined indicates this is a new user and
+    // the password hasn't been set
+    if (field.required && password?.passwordChangeRequired === undefined) {
+      return 'Required'
     }
   },
   parse,

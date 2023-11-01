@@ -135,7 +135,7 @@ export const TinaUserCollection: Collection = {
         defaultItem: {
           username: 'new-user',
           name: 'New User',
-          password: '',
+          password: undefined,
         },
         itemProps: (item) => ({ label: item?.username }),
       },
