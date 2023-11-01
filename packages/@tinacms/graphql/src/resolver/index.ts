@@ -590,8 +590,8 @@ export class Resolver {
               }
               const values = {
                 ...oldDoc,
-                // @ts-ignore FIXME: failing on unknown, which we don't need to know because it's recursive
                 ...(await this.buildFieldMutations(
+                  // @ts-ignore FIXME: failing on unknown, which we don't need to know because it's recursive
                   templateParams,
                   template,
                   doc?._rawData
