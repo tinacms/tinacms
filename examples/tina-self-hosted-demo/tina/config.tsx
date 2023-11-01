@@ -16,6 +16,9 @@ const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 // console.log(process.env.NEXTAUTH_URL)
 
 const config = defineStaticConfig({
+  env: {
+    NEXTAUTH_URL: 'http://localhost:3000/api/tina',
+  },
   contentApiUrlOverride: '/api/tina/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
   authProvider: isLocal

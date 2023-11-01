@@ -73,7 +73,11 @@ export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
   async authenticate(props: { username: string; password: string }) {
     const csrfToken = await getCsrfToken()
     // TODO make api baseUrl configurable
-    return fetch('/api/tina/auth/callback/credentials', {
+    const baseUrl = process.env.NEXTAUTH_URL || ''
+    const url = baseUrl
+      ? `${baseUrl}/auth/callback/credentials`
+      : '/api/tina/auth/callback/credentials'
+    return fetch(url, {
       redirect: 'error', //redirect should throw an error
       method: 'POST',
       headers: {
