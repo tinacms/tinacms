@@ -497,6 +497,19 @@ export interface Config<
   Store = undefined,
   SearchClient = undefined
 > {
+  /**
+   * This will populate browsers process.env (Polyfilled) with the values provided
+   *
+   * EX:
+   *   env: {
+   *     FOO: 'bar'
+   *   }
+   *
+   *  will result in:
+   *
+   *  process.env.FOO === 'bar'
+   */
+  env?: Record<string, string>
   contentApiUrlOverride?: string
   authProvider?: AuthProvider
   admin?: {

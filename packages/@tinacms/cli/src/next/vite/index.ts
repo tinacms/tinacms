@@ -115,6 +115,7 @@ export const createConfig = async ({
 }) => {
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {}
+  const tinaEnv = configManager.config.env || {}
   Object.keys(process.env).forEach((key) => {
     if (
       key.startsWith('TINA_PUBLIC_') ||
@@ -137,6 +138,22 @@ export const createConfig = async ({
         )
         console.warn(error)
       }
+    }
+  })
+
+  Object.keys(tinaEnv).forEach((key) => {
+    try {
+      // if the value is a string, we can just use it
+      if (typeof tinaEnv[key] === 'string') {
+        publicEnv[key] = tinaEnv[key] as string
+      } else {
+        // otherwise, we need to stringify it
+        publicEnv[key] = JSON.stringify(tinaEnv[key])
+      }
+    } catch (error) {
+      // if we can't stringify it, we'll just warn the user
+      console.warn(`Could not stringify public env tinaEnv.${key} env variable`)
+      console.warn(error)
     }
   })
 
