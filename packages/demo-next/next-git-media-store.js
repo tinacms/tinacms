@@ -25,6 +25,7 @@ export class NextGitMediaStore extends GitMediaStore {
     { name: 'Animals', accept: ['image/*'] },
     { name: 'Files', accept: ['.pdf', '.mp4', '.avi', '.docx'] },
   ]
+  namespace = 'demo'
 
   onItemClick = MediaPreview
 
