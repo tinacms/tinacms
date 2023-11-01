@@ -289,8 +289,8 @@ export const resolve = async ({
                     // don't overwrite other users' passwords
                     ...u,
                     [passwordFieldName]: {
-                      value: '',
                       ...u[passwordFieldName],
+                      value: '',
                     },
                   }
                 }
