@@ -98,6 +98,7 @@ const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
     <FinalField
       name={field.name}
       key={field.name}
+      isEqual={(a, b) => isEqual(field, a, b)}
       type={type}
       parse={
         parse
@@ -182,4 +183,26 @@ function getProp(
     prop = plugin[name]
   }
   return prop
+}
+
+/**
+ * Since rich-text values are objects the default comparison always returns `false`
+ * There's also a Slate plugin which adds "id" fields to each node for copy/paste
+ * behavior, so we ignore those within the `JSON.stringify` function. Defaults to `a === b`
+ *
+ * https://final-form.org/docs/final-form/types/FieldConfig#isequal
+ */
+const isEqual = (field, a, b) => {
+  const replacer = (key, value) => {
+    if (key === 'id') {
+      return undefined
+    }
+    return value
+  }
+
+  if (field.type === 'rich-text') {
+    return JSON.stringify(a, replacer) === JSON.stringify(b, replacer)
+  }
+
+  return a === b
 }

@@ -106,13 +106,13 @@ models:
             label: Youtube
           - type: string
             name: github
-            label: Github
+            label: GitHub
           - type: string
             name: gitlab
-            label: Gitlab
+            label: GitLab
           - type: string
             name: linkedin
-            label: Linkedin
+            label: LinkedIn
           - type: string
             name: mastodon
             label: Mastodon

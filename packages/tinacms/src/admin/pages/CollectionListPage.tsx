@@ -897,7 +897,6 @@ const SearchInput = ({
               setSearchLoaded(false)
             }}
             variant="primary"
-            type="submit"
           >
             Search <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
           </Button>

@@ -8,11 +8,6 @@ import { queries } from 'CLIENT_IMPORT'
 
 import 'graphiql/graphiql.min.css'
 
-const fetcher = createGraphiQLFetcher({
-  url: __API_URL__,
-  headers: { 'X-API-KEY': __TOKEN__ },
-})
-
 const Playground = () => {
   const cms = useCMS()
   const [query, setQuery] = React.useState('')
@@ -60,6 +55,10 @@ const Playground = () => {
   }, [])
 
   const ref = React.useRef()
+
+  const getToken = () => {
+    return JSON.parse(localStorage.getItem('tinacms-auth') || '{}')?.id_token
+  }
 
   if (!autoQueries) {
     return null
@@ -130,11 +129,16 @@ const Playground = () => {
       </div>
     )
   }
-
   return (
     <div style={{ height: '100vh' }}>
       <GraphiQL
-        fetcher={fetcher}
+        fetcher={async (params, options) => {
+          const fetcher = createGraphiQLFetcher({
+            url: __API_URL__,
+            headers: { Authorization: `Bearer ${getToken()}` },
+          })
+          return fetcher(params, options)
+        }}
         query={query}
         defaultEditorToolsVisibility="variables"
         isHeadersEditorEnabled={false}

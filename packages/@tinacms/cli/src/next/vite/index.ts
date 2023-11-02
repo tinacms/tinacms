@@ -206,7 +206,7 @@ export const createConfig = async ({
       // Used by picomatch https://github.com/micromatch/picomatch/blob/master/lib/utils.js#L4
       'process.platform': `"${process.platform}"`,
       __API_URL__: `"${apiURL}"`,
-      __TOKEN__: `"${configManager.config.token}"`,
+      __BASE_PATH__: `"${configManager.config?.build?.basePath || ''}"`,
       __TINA_GRAPHQL_VERSION__: `"${configManager.getTinaGraphQLVersion()}"`,
     },
     logLevel: 'error', // Vite import warnings are noisy

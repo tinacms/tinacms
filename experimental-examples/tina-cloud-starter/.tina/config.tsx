@@ -246,7 +246,7 @@ const config = defineConfig({
                   },
                   {
                     type: 'string',
-                    label: 'Github',
+                    label: 'GitHub',
                     name: 'github',
                   },
                 ],

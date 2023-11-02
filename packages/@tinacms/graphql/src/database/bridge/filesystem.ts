@@ -7,7 +7,7 @@ import type { Bridge } from './index'
 /**
  * This is the bridge from whatever datasource we need for I/O.
  * The basic example here is for the filesystem, one is needed
- * for Github has well.
+ * for GitHub has well.
  */
 export class FilesystemBridge implements Bridge {
   public rootPath: string

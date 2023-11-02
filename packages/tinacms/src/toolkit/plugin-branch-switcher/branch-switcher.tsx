@@ -487,7 +487,7 @@ const BranchSelector = ({
                         toolbarItems={[
                           branch.githubPullRequestUrl && {
                             name: 'github-pr',
-                            label: 'View in Github',
+                            label: 'View in GitHub',
                             Icon: (
                               <BiLinkExternal className="w-5 h-auto text-blue-500 opacity-70" />
                             ),

@@ -104,7 +104,7 @@ export class TinaCMS extends CMS {
           level: 'error',
           message: `Failed to upload file(s) ${event?.uploaded
             .map((x) => x.file.name)
-            .join(', ')}. See error message: \n\n ${event?.error.toString()}`,
+            .join(', ')}. \n\n ${event?.error.toString()}`,
         }
       },
       'media:delete:failure': () => ({

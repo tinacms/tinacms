@@ -341,7 +341,7 @@ export const loadAndParseWithAliases = async (
   const template = getTemplateForFile(templateInfo, data as any)
   if (!template) {
     console.warn(
-      `Document: ${filepath} has an ambiguous template, skipping from indexing`
+      `Document: ${filepath} has an ambiguous template, skipping from indexing. See https://tina.io/docs/errors/ambiguous-template/ for more info.`
     )
     return
   }
