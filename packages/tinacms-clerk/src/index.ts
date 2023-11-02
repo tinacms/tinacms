@@ -7,7 +7,7 @@ export const ClerkBackendAuthentication = ({
   orgId,
 }: {
   secretKey: string
-  // Ensure the user is the int allowList
+  // Ensure the user is the in allowList
   allowList?: string[]
   // Ensure the user is a member of an the provided orgId
   orgId?: string
