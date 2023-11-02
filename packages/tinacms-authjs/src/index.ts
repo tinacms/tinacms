@@ -2,6 +2,7 @@ import NextAuth, { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { getServerSession } from 'next-auth/next'
 import type { BackendAuthProvider } from '@tinacms/datalayer'
+import { TINA_CREDENTIALS_PROVIDER_NAME } from './tinacms'
 
 const authenticate = async (
   databaseClient: any,
@@ -69,17 +70,14 @@ const TinaAuthJSOptions = ({
   ...overrides,
 })
 
-const TINA_CREDENTIALS_PROVIDER_NAME = 'TinaCredentials'
-
 const TinaCredentialsProvider = ({
   databaseClient,
   name = TINA_CREDENTIALS_PROVIDER_NAME,
 }: {
   databaseClient: any // TODO can we type this?
   name?: string
-}) =>
-  CredentialsProvider({
-    name,
+}) => {
+  const p = CredentialsProvider({
     credentials: {
       username: { label: 'Username', type: 'text' },
       password: { label: 'Password', type: 'password' },
@@ -87,6 +85,9 @@ const TinaCredentialsProvider = ({
     authorize: async (credentials) =>
       authenticate(databaseClient, credentials.username, credentials.password),
   })
+  p.name = name
+  return p
+}
 
 const AuthJsBackendAuthProvider = ({
   authOptions,

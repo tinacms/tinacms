@@ -1,74 +1,68 @@
-import { AbstractAuthProvider } from 'tinacms'
+import { Clerk } from '@clerk/backend'
+import type { IncomingMessage, ServerResponse } from 'http'
 
-import type Clerk from '@clerk/clerk-js'
+export const ClerkBackendAuthentication = ({
+  secretKey,
+  allowList,
+  orgId,
+}: {
+  secretKey: string
+  // Ensure the user is the in allowList
+  allowList?: string[]
+  // Ensure the user is a member of the provided orgId
+  orgId?: string
+}) => {
+  const clerk = Clerk({
+    secretKey,
+  })
 
-export class ClerkProvider extends AbstractAuthProvider {
-  clerk: Clerk
-  allowedList?: string[]
-  constructor({
-    clerk,
-    allowedList,
-  }: {
-    clerk: Clerk
-    /**
-     * For premium Clerk users, you can use restrictions
-     * https://clerk.com/docs/authentication/allowlist
-     */
-    allowedList?: string[]
-  }) {
-    super()
-    this.clerk = clerk
+  return {
+    isAuthorized: async (req: IncomingMessage, _res: ServerResponse) => {
+      const token = req.headers['authorization']
+      const tokenWithoutBearer = token?.replace('Bearer ', '').trim()
+      const requestState = await clerk.authenticateRequest({
+        headerToken: tokenWithoutBearer,
+      })
 
-    this.allowedList = allowedList
-  }
-  /**
-   * Generates a short-lived token when Tina makes a request
-   */
-  async getToken() {
-    await this.clerk.load()
-    if (this.clerk.session) {
-      return { id_token: await this.clerk.session.getToken() }
-    }
-  }
-
-  async logout() {
-    await this.clerk.load()
-    await this.clerk.session.remove()
-  }
-  async authenticate() {
-    this.clerk.openSignIn({
-      redirectUrl: '/admin/index.html', // This should be the Tina admin path
-      appearance: {
-        elements: {
-          // Tina's sign in modal is in the way without this
-          modalBackdrop: { zIndex: 20000 },
-          // Some styles clash with Tina's styling
-          socialButtonsBlockButton: 'px-4 py-2 border border-gray-100',
-          formFieldInput: `px-4 py-2`,
-          formButtonPrimary: 'bg-blue-600 text-white p-4',
-          formFieldInputShowPasswordButton: 'm-2',
-          dividerText: 'px-2',
-        },
-      },
-    })
-  }
-  async getUser() {
-    await this.clerk.load()
-    if (this.clerk.user) {
-      if (
-        this.isUserAllowed(this.clerk.user.primaryEmailAddress.emailAddress)
-      ) {
-        return this.clerk.user as any
+      if (requestState.status === 'signed-in') {
+        const user = await clerk.users.getUser(requestState.toAuth().userId)
+        if (orgId) {
+          // Get the list of member id's for the organization
+          const membershipList = (
+            await clerk.organizations.getOrganizationMembershipList({
+              organizationId: orgId,
+            })
+          ).map((x) => x.publicUserData?.userId)
+          // if the user is not in the list, they are not authorized
+          if (!membershipList.includes(user.id))
+            return {
+              isAuthorized: false as const,
+              errorMessage:
+                'User not authorized. Not a member of the provided organization.',
+              errorCode: 401,
+            }
+        }
+        // if the user's email is not in the allowList, they are not authorized
+        const primaryEmail = user.emailAddresses.find(
+          ({ id }) => id === user.primaryEmailAddressId
+        )
+        if (primaryEmail && !allowList) {
+          return { isAuthorized: true as const }
+        }
+        // If they pass an allowList, check if the user is in it
+        if (primaryEmail && allowList?.includes(primaryEmail.emailAddress)) {
+          return { isAuthorized: true as const }
+        }
       }
-      // Handle when a user is logged in outside of the org
-      this.clerk.session.end()
-    }
-    return false
-  }
-  isUserAllowed(emailAddress: string) {
-    if (this.allowedList.includes(emailAddress)) {
-      return true
-    }
-    return false
+
+      if (requestState.reason === 'unexpected-error') {
+        console.error(requestState.message)
+      }
+      return {
+        isAuthorized: false as const,
+        errorMessage: 'User not authorized',
+        errorCode: 401,
+      }
+    },
   }
 }
