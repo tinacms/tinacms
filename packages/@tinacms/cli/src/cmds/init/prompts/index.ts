@@ -8,7 +8,7 @@ export * from './askTinaCloudSetup'
 export * from './types'
 export * from './gitProvider'
 export * from './databaseAdapter'
-export * from './authenticationProvider'
+export * from './authProvider'
 
 const forestryDisclaimer = logText(
   `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
@@ -145,7 +145,7 @@ export const askIfUsingSelfHosted = async () => {
         },
       ],
       message:
-        'Do you want to host your project on Tina Cloud or self-host? (With self-hosting, the graphql api, authentication and database will be hosted on your own server.)',
+        'Do you want to host your project on Tina Cloud or self-host? (With self-hosting, the graphql api, auth and database will be hosted on your own server.)',
     },
   ])
   return answers as { hosting: 'tina-cloud' | 'self-host' }

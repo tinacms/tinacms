@@ -10,7 +10,7 @@ export type Config = {
   hosting?: 'tina-cloud' | 'self-host'
   gitProvider?: PromptGitProvider
   databaseAdapter?: PromptDatabaseAdapter
-  authenticationProvider?: PromptAuthenticationProvider
+  authProvider?: PromptAuthProvider
   nextAuthCredentialsProviderName?: string
   isLocalEnvVarName: string
   envVars: { key: string; value: string }[]
@@ -31,14 +31,14 @@ export interface PromptDatabaseAdapter {
   databaseAdapterClassText: string
   imports?: ImportStatement[]
 }
-export interface PromptAuthenticationProvider {
+export interface PromptAuthProvider {
   name: string
   // For tina/config file
-  configAuthenticationClass?: string
+  configAuthProviderClass?: string
   configImports?: ImportStatement[]
   extraTinaCollections?: string[]
   // for /api/tina/[...routes] file
-  backendAuthentication?: string
-  backendAuthenticationImports?: ImportStatement[]
+  backendAuthProvider?: string
+  backendAuthProviderImports?: ImportStatement[]
   peerDependencies?: string[]
 }

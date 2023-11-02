@@ -5,7 +5,7 @@ import {
   askIfUsingSelfHosted,
   askTinaCloudSetup,
   askTinaSetupPrompts,
-  chooseAuthenticationProvider,
+  chooseAuthProvider,
   chooseDatabaseAdapter,
   chooseGitProvider,
   Config,
@@ -82,7 +82,7 @@ async function configure(
         framework,
         config,
       })
-      config.authenticationProvider = await chooseAuthenticationProvider({
+      config.authProvider = await chooseAuthProvider({
         framework,
         config,
       })

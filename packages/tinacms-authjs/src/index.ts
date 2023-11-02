@@ -1,7 +1,7 @@
 import NextAuth, { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { getServerSession } from 'next-auth/next'
-import type { BackendAuthentication } from '@tinacms/datalayer'
+import type { BackendAuthProvider } from '@tinacms/datalayer'
 import { TINA_CREDENTIALS_PROVIDER_NAME } from './tinacms'
 
 const authenticate = async (
@@ -89,15 +89,15 @@ const TinaCredentialsProvider = ({
   return p
 }
 
-const AuthJsBackendAuthentication = ({
+const AuthJsBackendAuthProvider = ({
   authOptions,
 }: {
   authOptions: AuthOptions
 }) => {
-  const backendAuthentication: BackendAuthentication = {
+  const authProvider: BackendAuthProvider = {
     initialize: async () => {
       if (!authOptions.providers?.length) {
-        throw new Error('No authentication providers specified')
+        throw new Error('No auth providers specified')
       }
       const [provider, ...rest] = authOptions.providers
       if (
@@ -152,10 +152,6 @@ const AuthJsBackendAuthentication = ({
       },
     },
   }
-  return backendAuthentication
+  return authProvider
 }
-export {
-  TinaCredentialsProvider,
-  TinaAuthJSOptions,
-  AuthJsBackendAuthentication,
-}
+export { TinaCredentialsProvider, TinaAuthJSOptions, AuthJsBackendAuthProvider }
