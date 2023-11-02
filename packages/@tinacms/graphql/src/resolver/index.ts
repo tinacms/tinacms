@@ -74,7 +74,10 @@ const resolveFieldData = async (
       }
       break
     case 'password':
-      accumulator[field.name] = undefined
+      accumulator[field.name] = {
+        value: undefined, // never resolve the password hash
+        passwordChangeRequired: value['passwordChangeRequired'] ?? false,
+      }
       break
     case 'image':
       accumulator[field.name] = resolveMediaRelativeToCloud(
@@ -112,7 +115,7 @@ const resolveFieldData = async (
           yup.array().of(yup.object().required())
         )
         accumulator[field.name] = await sequential(value, async (item) => {
-          const template = await tinaSchema.getTemplateForData({
+          const template = tinaSchema.getTemplateForData({
             data: item,
             collection: {
               namespace,
@@ -143,7 +146,7 @@ const resolveFieldData = async (
           return
         }
 
-        const template = await tinaSchema.getTemplateForData({
+        const template = tinaSchema.getTemplateForData({
           data: value,
           collection: {
             namespace,
@@ -566,7 +569,7 @@ export class Resolver {
             const values = await this.buildFieldMutations(
               params,
               templateInfo.template,
-              oldDoc
+              doc?._rawData
             )
             await this.database.put(
               realPath,
@@ -587,8 +590,12 @@ export class Resolver {
               }
               const values = {
                 ...oldDoc,
-                // @ts-ignore FIXME: failing on unknown, which we don't need to know because it's recursive
-                ...(await this.buildFieldMutations(templateParams, template)),
+                ...(await this.buildFieldMutations(
+                  // @ts-ignore FIXME: failing on unknown, which we don't need to know because it's recursive
+                  templateParams,
+                  template,
+                  doc?._rawData
+                )),
                 _template: lastItem(template.namespace),
               }
               await this.database.put(realPath, values, collection.name)
@@ -602,7 +609,7 @@ export class Resolver {
       //@ts-ignore
       isCollectionSpecific ? args.params : args.params[collection.name],
       collection,
-      oldDoc
+      doc?._rawData
     )
     //@ts-ignore
     await this.database.put(realPath, { ...oldDoc, ...params }, collection.name)
@@ -954,8 +961,11 @@ export class Resolver {
     for (const passwordField of template.fields.filter(
       (f) => f.type === 'password'
     )) {
-      if (!fieldParams[passwordField.name]) {
-        fieldParams[passwordField.name] = ''
+      if (!fieldParams[passwordField.name]['value']) {
+        fieldParams[passwordField.name] = {
+          ...(<object>fieldParams[passwordField.name]),
+          value: '',
+        }
       }
     }
     for (const [fieldName, fieldValue] of Object.entries(fieldParams)) {
@@ -994,12 +1004,25 @@ export class Resolver {
           )
           break
         case 'password':
-          if (fieldValue) {
-            accum[fieldName] = await generatePasswordHash({
-              password: fieldValue as string,
-            })
+          if (typeof fieldValue !== 'object') {
+            throw new Error(
+              `Expected to find object for password field ${fieldName}. Found ${typeof accum[
+                fieldName
+              ]}`
+            )
+          }
+          if (fieldValue['value']) {
+            accum[fieldName] = {
+              ...fieldValue,
+              value: await generatePasswordHash({
+                password: fieldValue['value'],
+              }),
+            }
           } else {
-            accum[fieldName] = existingData?.[fieldName]
+            accum[fieldName] = {
+              ...fieldValue,
+              value: existingData?.[fieldName]?.['value'],
+            }
           }
           break
         case 'rich-text':

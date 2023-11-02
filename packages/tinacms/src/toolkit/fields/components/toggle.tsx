@@ -7,9 +7,9 @@ export interface ToggleProps {
   input: any
   field: ToggleFieldDefinition
   disabled?: boolean
-  onBlur: <T>(_event?: React.FocusEvent<T>) => void
-  onChange: <T>(_event: React.ChangeEvent<T> | any) => void
-  onFocus: <T>(_event?: React.FocusEvent<T>) => void
+  onBlur?: <T>(_event?: React.FocusEvent<T>) => void
+  onChange?: <T>(_event: React.ChangeEvent<T> | any) => void
+  onFocus?: <T>(_event?: React.FocusEvent<T>) => void
 }
 
 interface ToggleFieldDefinition extends Field {

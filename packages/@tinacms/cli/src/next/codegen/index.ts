@@ -255,15 +255,17 @@ export class Codegen {
       if (usersFields.length > 1) {
         throw new Error('Only one user field is allowed')
       }
-      authFields = usersFields[0]?.collectable?.fields
-        ?.filter((f) => f.type !== 'password' && f.type !== 'object')
-        .map((f) => {
+      authFields = usersFields[0]?.collectable?.fields.map((f) => {
+        if (f.type !== 'password' && f.type !== 'object') {
           if (f.uid) {
             return `id:${f.name}`
           } else {
             return `${f.name}`
           }
-        })
+        } else if (f.type === 'password') {
+          return `_password: ${f.name} { passwordChangeRequired }`
+        }
+      })
     }
     return `// @ts-nocheck
 import { resolve } from "@tinacms/datalayer";

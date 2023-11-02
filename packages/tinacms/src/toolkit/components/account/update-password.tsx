@@ -1,13 +1,25 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BaseTextField, Button, useCMS } from '@tinacms/toolkit'
 
 export function UpdatePassword(props: {}) {
   const cms = useCMS()
+  const client = cms.api.tina
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [dirty, setDirty] = useState(false)
   const [result, setResult] = useState(null)
   const [formState, setFormState] = useState<'idle' | 'busy'>('idle')
+  const [passwordChangeRequired, setPasswordChangeRequired] =
+    useState<boolean>(false)
+
+  // check if the password is required to be changed
+  useEffect(() => {
+    client?.authProvider
+      ?.getUser()
+      .then((user) =>
+        setPasswordChangeRequired(user?.passwordChangeRequired ?? false)
+      )
+  }, [])
 
   let err = null
   if (dirty && password !== confirmPassword) {
@@ -36,6 +48,10 @@ export function UpdatePassword(props: {}) {
       setPassword('')
       setConfirmPassword('')
       setResult('Password updated')
+      setPasswordChangeRequired(false)
+      // sleep for 1 second to allow the user to see the success message
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      client?.authProvider?.logout().catch((e) => console.error(e))
     }
     setFormState('idle')
   }
@@ -44,6 +60,11 @@ export function UpdatePassword(props: {}) {
     <>
       <div className="flex justify-center items-center h-full">
         <div className="flex flex-col space-y-8 p-6">
+          {passwordChangeRequired && (
+            <div className="text-center text-red-500">
+              Your password has expired. Please update your password.
+            </div>
+          )}
           <label className="block">
             <span className="text-gray-700">New Password</span>
             <BaseTextField

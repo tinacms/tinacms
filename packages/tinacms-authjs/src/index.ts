@@ -45,6 +45,8 @@ const TinaAuthJSOptions = ({
             const sub = jwt[uidProp]
             const result = await databaseClient.authorize({ sub })
             jwt.role = !!result.data?.authorize ? 'user' : 'guest'
+            jwt.passwordChangeRequired =
+              result.data?.authorize?._password?.passwordChangeRequired || false
           } else if (debug) {
             console.log(`jwt missing specified uidProp: ${uidProp}`)
           }
@@ -60,6 +62,7 @@ const TinaAuthJSOptions = ({
     session: async ({ session, token: jwt }) => {
       // forward the role to the session
       ;(session.user as any).role = jwt.role
+      ;(session.user as any).passwordChangeRequired = jwt.passwordChangeRequired
       ;(session.user as any)[uidProp] = jwt[uidProp]
       return session
     },

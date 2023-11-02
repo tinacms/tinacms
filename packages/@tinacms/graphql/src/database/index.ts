@@ -1389,11 +1389,12 @@ type UnionDataLookup = {
 }
 
 const hashPasswordVisitor = async (node: any, path: string[]) => {
-  const plaintextPassword = _.get(node, path)
+  const passwordValuePath = [...path, 'value']
+  const plaintextPassword = _.get(node, passwordValuePath)
   if (plaintextPassword) {
     _.set(
       node,
-      path,
+      passwordValuePath,
       await generatePasswordHash({ password: plaintextPassword })
     )
   }
