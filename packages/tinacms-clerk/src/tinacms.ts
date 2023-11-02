@@ -5,7 +5,9 @@ import type Clerk from '@clerk/clerk-js'
 export class ClerkAuthProvider extends AbstractAuthProvider {
   clerk: Clerk
   allowedList?: string[]
+  orgId?: string
   constructor({
+    orgId,
     clerk,
     allowedList,
   }: {
@@ -15,11 +17,14 @@ export class ClerkAuthProvider extends AbstractAuthProvider {
      * https://clerk.com/docs/authentication/allowlist
      */
     allowedList?: string[]
+    // Ensure the user is a member of the provided orgId
+    orgId?: string
   }) {
     super()
     this.clerk = clerk
 
     this.allowedList = allowedList
+    this.orgId = orgId
   }
   /**
    * Generates a short-lived token when Tina makes a request
@@ -32,8 +37,8 @@ export class ClerkAuthProvider extends AbstractAuthProvider {
   }
 
   async logout() {
-    await this.clerk.load()
-    await this.clerk.session.remove()
+    await this.clerk?.load()
+    await this.clerk?.session?.remove()
   }
   async authenticate() {
     this.clerk.openSignIn({
@@ -56,27 +61,34 @@ export class ClerkAuthProvider extends AbstractAuthProvider {
     await this.clerk.load()
     if (this.clerk.user) {
       if (
-        await this.isUserAllowed?.(
+        this.allowedList &&
+        !this.allowedList.includes(
           this.clerk.user.primaryEmailAddress.emailAddress
         )
       ) {
-        return true
+        // if there is an allowList, and the user is not in it, return false
+        return false
       }
-      // Handle when a user is logged in outside of the org
-      await this.clerk.session.end()
+
+      if (
+        this.orgId &&
+        !this.clerk.user.organizationMemberships.find(
+          (x) => x.id === this.orgId
+        )
+      ) {
+        // if there is an orgId, and the user is not in it, return false
+        return false
+      }
+
+      return true
     }
+    // Handle when a user is logged in outside of the org
+    await this.clerk.session.end()
     return false
   }
 
   async getUser(): Promise<any> {
     await this.clerk.load()
     return this.clerk.user
-  }
-
-  async isUserAllowed(emailAddress: string) {
-    if (this.allowedList.includes(emailAddress)) {
-      return true
-    }
-    return false
   }
 }
