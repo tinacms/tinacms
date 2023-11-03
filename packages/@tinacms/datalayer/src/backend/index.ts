@@ -55,6 +55,8 @@ export type NodeApiHandler = (
   res: ServerResponse
 ) => Promise<void>
 
+type NodeRouterHandlerOptions = Required<TinaBackendOptions['options']>
+
 type NodeRouteHandler = (
   req: IncomingMessage,
   res: ServerResponse,
