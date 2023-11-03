@@ -111,7 +111,7 @@ function MakeNodeApiHandler({
     if (typeof routes === 'string') {
       throw new Error('Please name your next api route [...routes] not [route]')
     }
-    if (!routes?.length || routes.length === 0) {
+    if (!routes?.length) {
       console.error(
         `A request was made to ${opts.basePath} but no route was found`
       )
