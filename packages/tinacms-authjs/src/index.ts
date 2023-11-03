@@ -161,7 +161,7 @@ const AuthJsBackendAuthProvider = ({
 
           // This is required for NextAuth to work properly
           // @ts-ignore
-          req.query.nextauth = everythingAfterAuth
+          req.query.nextauth = authSubRoutes
           await NextAuth(authOptions)(req, res)
         },
       },
