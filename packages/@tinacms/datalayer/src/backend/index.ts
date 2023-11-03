@@ -74,7 +74,7 @@ export function TinaNodeBackend({
   })
   const basePath = options?.basePath ? `/${options.basePath.replace(/^\/?/, '').replace(/\/?$/, '')}/` : '/api/tina/'
 
-  const opts: Required<TinaBackendOptions['options']> = {
+  const opts: NodeRouterHandlerOptions = {
     basePath,
   }
   const handler = MakeNodeApiHandler({
