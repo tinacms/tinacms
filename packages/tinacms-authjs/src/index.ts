@@ -152,8 +152,6 @@ const AuthJsBackendAuthProvider = ({
             `http://${req.headers?.host || 'localhost'}`
           )
 
-          // basePath always has leading and trailing slash
-          const prefix = `${opts.basePath}auth/`
           // get everything in the path after `${basePath}auth/`
           const authSubRoutes = url.pathname
             ?.replace(`${opts.basePath}auth/`, '') // basePath always has leading and trailing slash
