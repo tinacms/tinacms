@@ -72,12 +72,7 @@ export function TinaNodeBackend({
   initialize?.().catch((e) => {
     console.error(e)
   })
-  // setup options
-  let basePath = options?.basePath || '/api/tina/'
-  // ensure basePath has trailing slash
-  basePath = basePath.endsWith('/') ? basePath : `${basePath}/`
-  // ensure basePath has leading slash
-  basePath = basePath.startsWith('/') ? basePath : `/${basePath}`
+  const basePath = options?.basePath ? `/${options.basePath.replace(/^\/?/, '').replace(/\/?$/, '')}/` : '/api/tina/'
 
   const opts: Required<TinaBackendOptions['options']> = {
     basePath,
