@@ -128,7 +128,7 @@ function MakeNodeApiHandler({
             res.statusCode = 405
             res.write(
               JSON.stringify({
-                error: 'Method not allowed. Can only post to /gql',
+                error: 'Method not allowed. Only POST requests are supported by /gql',
               })
             )
             res.end()
