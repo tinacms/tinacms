@@ -317,7 +317,7 @@ function createDatabaseClient<GenQueries = Record<string, unknown>>({
 }) {
   const request = async ({ query, variables, user }) => {
     const data = await databaseRequest({ query, variables, user });
-    return { data: data.data as any, query, variables, errors: data.errors };
+    return { data: data.data as any, query, variables, errors: data.errors || null };
   };
   const q = queries({
     request,
