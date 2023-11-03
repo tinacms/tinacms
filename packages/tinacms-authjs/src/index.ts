@@ -156,7 +156,7 @@ const AuthJsBackendAuthProvider = ({
           const prefix = `${opts.basePath}auth/`
           // get everything in the path after `${basePath}auth/`
           const authSubRoutes = url.pathname
-            ?.replace(prefix, '')
+            ?.replace(`${opts.basePath}auth/`, '') // basePath always has leading and trailing slash
             ?.split('/')
 
           // This is required for NextAuth to work properly
