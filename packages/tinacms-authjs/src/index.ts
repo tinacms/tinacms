@@ -152,7 +152,7 @@ const AuthJsBackendAuthProvider = ({
             `http://${req.headers?.host || 'localhost'}`
           )
 
-          // get everything in the path after `${basePath}auth/`
+          // extract next auth sub routes
           const authSubRoutes = url.pathname
             ?.replace(`${opts.basePath}auth/`, '') // basePath always has leading and trailing slash
             ?.split('/')
