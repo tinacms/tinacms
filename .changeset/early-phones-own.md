@@ -1,6 +1,7 @@
 ---
 'tinacms-gitprovider-github': patch
 'next-tinacms-cloudinary': patch
+'@tinacms/auth': patch
 '@tinacms/self-hosted-starter': patch
 '@tinacms/schema-tools': patch
 '@tinacms/datalayer': patch
