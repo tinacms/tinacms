@@ -155,7 +155,7 @@ const AuthJsBackendAuthProvider = ({
           // basePath always has leading and trailing slash
           const prefix = `${opts.basePath}auth/`
           // get everything in the path after `${basePath}auth/`
-          const everythingAfterAuth = url.pathname
+          const authSubRoutes = url.pathname
             ?.replace(prefix, '')
             ?.split('/')
 
