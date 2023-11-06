@@ -144,12 +144,22 @@ const AuthJsBackendAuthProvider = ({
     extraRoutes: {
       auth: {
         secure: false,
-        handler: async (req, res) => {
+
+        handler: async (req, res, opts) => {
+          // The domain is not important here, we just need to parse the pathName
+          const url = new URL(
+            req.url,
+            `http://${req.headers?.host || 'localhost'}`
+          )
+
+          // extract next auth sub routes
+          const authSubRoutes = url.pathname
+            ?.replace(`${opts.basePath}auth/`, '') // basePath always has leading and trailing slash
+            ?.split('/')
+
+          // This is required for NextAuth to work properly
           // @ts-ignore
-          const { routes } = req.query
-          const [, ...rest] = routes
-          // @ts-ignore
-          req.query.nextauth = rest
+          req.query.nextauth = authSubRoutes
           await NextAuth(authOptions)(req, res)
         },
       },
