@@ -93,7 +93,7 @@ function MakeNodeApiHandler({
   opts,
 }: BackendAuthProvider & {
   databaseClient: DatabaseClient
-  opts: NodeRouterHandlerOptions
+  opts: NodeRouteHandlerOptions
 }) {
   const tinaBackendHandler: NodeApiHandler = async (req, res) => {
     // remove leading slash
