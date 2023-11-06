@@ -161,6 +161,7 @@ export const createDatabase = (config: CreateDatabase) => {
     level: config.databaseAdapter,
     onPut: config.gitProvider.onPut.bind(config.gitProvider),
     onDelete: config.gitProvider.onDelete.bind(config.gitProvider),
+    namespace: config.namespace || 'tinacms',
   })
 }
 
