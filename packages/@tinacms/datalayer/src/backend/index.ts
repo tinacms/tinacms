@@ -60,7 +60,7 @@ type NodeRouteHandlerOptions = Required<TinaBackendOptions['options']>
 type NodeRouteHandler = (
   req: IncomingMessage,
   res: ServerResponse,
-  opts: NodeRouterHandlerOptions
+  opts: NodeRouteHandlerOptions
 ) => Promise<void>
 
 export function TinaNodeBackend({
