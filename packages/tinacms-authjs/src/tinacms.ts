@@ -7,6 +7,7 @@ import {
   SessionProvider,
 } from 'next-auth/react'
 import { AbstractAuthProvider } from 'tinacms'
+import type { FC } from 'react'
 
 export const TINA_CREDENTIALS_PROVIDER_NAME = 'TinaCredentials'
 
@@ -18,7 +19,7 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
     this.name = props?.name || TINA_CREDENTIALS_PROVIDER_NAME
     this.callbackUrl = props?.callbackUrl || '/admin/index.html'
   }
-  async authenticate(props?: {}): Promise<any> {
+  async authenticate(_props): Promise<any> {
     return signIn(this.name, { callbackUrl: this.callbackUrl })
   }
   getToken() {
@@ -37,7 +38,7 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
   }
 
   getSessionProvider() {
-    return SessionProvider
+    return SessionProvider as FC
   }
 }
 
@@ -73,7 +74,12 @@ const errorMap: Record<SignInErrorTypes, string> = {
 }
 
 export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
-  async authenticate(props: { username: string; password: string }) {
+  async authenticate(props?: Record<string, any>) {
+    const username = props?.username
+    const password = props?.password
+    if (!username || !password) {
+      throw new Error('Username and password are required')
+    }
     const csrfToken = await getCsrfToken()
     // TODO make api baseUrl configurable
     return fetch('/api/tina/auth/callback/credentials', {
@@ -86,7 +92,8 @@ export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
         csrfToken,
         redirect: 'false',
         json: 'true',
-        ...props,
+        username,
+        password,
       }).toString(),
     })
       .then(async (res) => {
