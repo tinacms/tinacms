@@ -7,6 +7,7 @@ import {
   SessionProvider,
 } from 'next-auth/react'
 import { AbstractAuthProvider } from 'tinacms'
+import type { FC } from 'react'
 
 export const TINA_CREDENTIALS_PROVIDER_NAME = 'TinaCredentials'
 
@@ -37,7 +38,7 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
   }
 
   getSessionProvider() {
-    return SessionProvider
+    return SessionProvider as FC
   }
 }
 
