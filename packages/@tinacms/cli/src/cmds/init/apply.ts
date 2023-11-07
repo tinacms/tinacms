@@ -130,9 +130,12 @@ async function apply({
           users: [
             {
               name: 'Tina User',
-              email: 'user@example.com',
-              username: 'admin',
-              password: 'admin',
+              email: 'user@tina.io',
+              username: 'tinauser',
+              password: {
+                value: 'tinarocks',
+                passwordChangeRequired: true,
+              },
             },
           ],
         },
