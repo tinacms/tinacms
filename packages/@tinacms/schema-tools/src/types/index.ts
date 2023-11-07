@@ -460,7 +460,7 @@ export interface AuthProvider {
    *  If this returns a falsy value, the user will be logged out and the CMS will be disabled.
    *
    **/
-  getUser: () => Promise<any | null>
+  getUser: () => Promise<any | null | boolean>
   /**
    *  Used to authorize the user with the custom auth provider.
    *

@@ -18,7 +18,7 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
     this.name = props?.name || TINA_CREDENTIALS_PROVIDER_NAME
     this.callbackUrl = props?.callbackUrl || '/admin/index.html'
   }
-  async authenticate(props?: {}): Promise<any> {
+  async authenticate(_props): Promise<any> {
     return signIn(this.name, { callbackUrl: this.callbackUrl })
   }
   getToken() {
