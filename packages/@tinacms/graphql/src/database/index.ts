@@ -239,13 +239,24 @@ export class Database {
     path.join(this.tinaDirectory, '__generated__')
 
   private async updateDatabaseVersion(version: string) {
-    const metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    if (this.contentNamespace) {
+      metadataLevel = metadataLevel.sublevel(
+        this.contentNamespace,
+        SUBLEVEL_OPTIONS
+      )
+    }
     await metadataLevel.put('metadata', { version })
   }
 
   private async getDatabaseVersion(): Promise<string | undefined> {
-    const metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
-
+    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    if (this.contentNamespace) {
+      metadataLevel = metadataLevel.sublevel(
+        this.contentNamespace,
+        SUBLEVEL_OPTIONS
+      )
+    }
     const metadata = await metadataLevel.get('metadata')
     return metadata?.version
   }
@@ -286,14 +297,26 @@ export class Database {
 
   public getMetadata = async (key: string) => {
     await this.initLevel()
-    const metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    if (this.contentNamespace) {
+      metadataLevel = metadataLevel.sublevel(
+        this.contentNamespace,
+        SUBLEVEL_OPTIONS
+      )
+    }
     const metadata = await metadataLevel.get(`metadata_${key}`)
     return metadata?.value
   }
 
   public setMetadata = async (key: string, value: string) => {
     await this.initLevel()
-    const metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    let metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
+    if (this.contentNamespace) {
+      metadataLevel = metadataLevel.sublevel(
+        this.contentNamespace,
+        SUBLEVEL_OPTIONS
+      )
+    }
     return metadataLevel.put(`metadata_${key}`, { value })
   }
 
