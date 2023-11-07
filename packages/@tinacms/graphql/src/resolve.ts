@@ -274,7 +274,7 @@ export const resolve = async ({
 
             user[passwordFieldName] = {
               value: args.password,
-              passwordChangedRequired: false,
+              passwordChangeRequired: false,
             }
 
             const params = {}
