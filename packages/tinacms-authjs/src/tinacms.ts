@@ -74,7 +74,12 @@ const errorMap: Record<SignInErrorTypes, string> = {
 }
 
 export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
-  async authenticate(props: { username: string; password: string }) {
+  async authenticate(props?: Record<string, any>) {
+    const username = props?.username
+    const password = props?.password
+    if (!username || !password) {
+      throw new Error('Username and password are required')
+    }
     const csrfToken = await getCsrfToken()
     // TODO make api baseUrl configurable
     return fetch('/api/tina/auth/callback/credentials', {
@@ -87,7 +92,8 @@ export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
         csrfToken,
         redirect: 'false',
         json: 'true',
-        ...props,
+        username,
+        password,
       }).toString(),
     })
       .then(async (res) => {
