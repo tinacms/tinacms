@@ -327,6 +327,8 @@ function createDatabaseClient<GenQueries = Record<string, unknown>>({
 
 export const databaseClient = createDatabaseClient({ queries });
 
+export const client = databaseClient;
+
 export default databaseClient;
 `
   }
