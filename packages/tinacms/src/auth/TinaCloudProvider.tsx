@@ -283,11 +283,7 @@ export const AuthWallInner = ({
                   if (typeof client?.onLogout === 'function') {
                     await client.onLogout()
                   }
-                  const token = await authProvider.authenticate()
-                  if (typeof client?.onLogin === 'function') {
-                    await client?.onLogin({ token })
-                  }
-                  return onAuthenticated()
+                  window.location.href = new URL(window.location.href).pathname
                 } catch (e) {
                   console.error(e)
                   setActiveModal('error')
