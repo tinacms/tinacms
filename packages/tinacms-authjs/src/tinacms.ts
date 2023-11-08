@@ -24,10 +24,12 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
     return signIn(this.name, { callbackUrl: this.callbackUrl })
   }
   getToken() {
+    console.log('DefaultAuthJSProvider.getToken')
     return Promise.resolve({ id_token: '' })
   }
   async getUser() {
     const session = await getSession()
+    console.log('DefaultAuthJSProvider.getUser', session?.user)
     return session?.user || false
   }
   logout() {
@@ -36,6 +38,7 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
   }
   async authorize(context?: any): Promise<any> {
     const user: any = (await getSession(context))?.user || {}
+    console.log('DefaultAuthJSProvider.authorize', user)
     return user.role === 'user'
   }
 
