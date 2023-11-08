@@ -13,10 +13,16 @@ export const TINA_CREDENTIALS_PROVIDER_NAME = 'TinaCredentials'
 export class DefaultAuthJSProvider extends AbstractAuthProvider {
   readonly callbackUrl: string
   readonly name: string
-  constructor(props?: { name?: string; callbackUrl?: string }) {
+  readonly redirect: boolean
+  constructor(props?: {
+    name?: string
+    callbackUrl?: string
+    redirect?: boolean
+  }) {
     super()
     this.name = props?.name || TINA_CREDENTIALS_PROVIDER_NAME
     this.callbackUrl = props?.callbackUrl || '/admin/index.html'
+    this.redirect = props?.redirect ?? false
     console.log('DefaultAuthJSProvider', this.name, this.callbackUrl)
   }
   async authenticate(props?: {}): Promise<any> {
@@ -34,7 +40,7 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
   }
   logout() {
     console.log('DefaultAuthJSProvider.logout', this.callbackUrl)
-    return signOut({ redirect: false, callbackUrl: this.callbackUrl })
+    return signOut({ redirect: this.redirect, callbackUrl: this.callbackUrl })
   }
   async authorize(context?: any): Promise<any> {
     const user: any = (await getSession(context))?.user || {}
