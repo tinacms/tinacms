@@ -17,8 +17,10 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
     super()
     this.name = props?.name || TINA_CREDENTIALS_PROVIDER_NAME
     this.callbackUrl = props?.callbackUrl || '/admin/index.html'
+    console.log('DefaultAuthJSProvider', this.name, this.callbackUrl)
   }
   async authenticate(props?: {}): Promise<any> {
+    console.log('DefaultAuthJSProvider.authenticate', this.callbackUrl)
     return signIn(this.name, { callbackUrl: this.callbackUrl })
   }
   getToken() {
@@ -29,6 +31,7 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
     return session?.user || false
   }
   logout() {
+    console.log('DefaultAuthJSProvider.logout', this.callbackUrl)
     return signOut({ callbackUrl: this.callbackUrl })
   }
   async authorize(context?: any): Promise<any> {
