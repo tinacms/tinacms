@@ -34,7 +34,7 @@ export class DefaultAuthJSProvider extends AbstractAuthProvider {
   }
   logout() {
     console.log('DefaultAuthJSProvider.logout', this.callbackUrl)
-    return signOut({ callbackUrl: this.callbackUrl })
+    return signOut({ redirect: false, callbackUrl: this.callbackUrl })
   }
   async authorize(context?: any): Promise<any> {
     const user: any = (await getSession(context))?.user || {}
