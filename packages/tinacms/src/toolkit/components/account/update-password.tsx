@@ -51,8 +51,15 @@ export function UpdatePassword(props: {}) {
       setPasswordChangeRequired(false)
       // sleep for 1 second to allow the user to see the success message
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      client?.authProvider?.logout().catch((e) => console.error(e))
-      window.location.href = new URL(window.location.href).pathname
+      client?.authProvider
+        ?.logout()
+        .then(async () => {
+          if (typeof client?.onLogout === 'function') {
+            await client.onLogout()
+          }
+          window.location.href = new URL(window.location.href).pathname
+        })
+        .catch((e) => console.error(e))
     }
     setFormState('idle')
   }
