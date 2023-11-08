@@ -1328,11 +1328,14 @@ export class Database {
       async (collection, contentPaths) => {
         const userFields = mapUserFields(collection, [])
         if (collection.isDetached) {
+          console.log(`Detached collection: ${collection.name}`)
+          console.log({ userFields })
           const level = this.appLevel.sublevel(
             collection.name,
             SUBLEVEL_OPTIONS
           )
           const doc = await level.keys({ limit: 1 }).next()
+          console.log({ doc })
           if (!doc) {
             // initialize app data with content from filesystem
             await _indexContent(
