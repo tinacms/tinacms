@@ -130,6 +130,9 @@ export const Nav = ({
                               if (cms?.api?.tina?.onLogout) {
                                 await cms?.api?.tina?.onLogout()
                               }
+                              window.location.href = new URL(
+                                window.location.href
+                              ).pathname
                             }
                             setEdit(false)
                           } catch (e) {
