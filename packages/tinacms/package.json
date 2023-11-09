@@ -86,7 +86,7 @@
     "date-fns": "2.30.0",
     "encoding": "0.1.13",
     "fetch-ponyfill": "^7.1.0",
-    "final-form": "4.20.4",
+    "final-form": "4.20.10",
     "final-form-arrays": "^3.0.1",
     "final-form-set-field-data": "^1.0.2",
     "graphql": "15.8.0",
