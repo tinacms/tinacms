@@ -12,7 +12,14 @@
 
 [![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/tina-io/new-homepage/homepage-demo-2.gif)](https://tina.io/)
 
-Tina is a headless content management system with support for visual editing and Git.
+Tina is a headless content management system with support for **Markdown**, MDX, JSON, Yaml, and more. 
+
+It comes with a GraphQL API:
+- Query your Markdown content like this 👉 `post.author.firstName`
+- Supports statically generated and server side rendered pages
+- Supports references between documents
+
+Tina offers a live preview (optional and opt-in) that makes editing Markdown files very intuitive for less-technical people. 
 
 ## Getting Started
 
