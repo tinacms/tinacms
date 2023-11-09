@@ -31,10 +31,13 @@ type BaseComponents = {
   maybe_mdx?: { children: JSX.Element }
   html?: { value: string }
   html_inline?: { value: string }
-  th?: { children: JSX.Element }
-  td?: { children: JSX.Element }
-  tr?: { children: JSX.Element }
-  table?: { children: JSX.Element }
+  // th?: { children: JSX.Element }
+  // td?: { children: JSX.Element }
+  // tr?: { children: JSX.Element }
+  table?: {
+    align?: ('left' | 'right' | 'center')[]
+    tableRows: { tableCells: { value: TinaMarkdownContent }[] }[]
+  }
   // Provide a fallback when a JSX component wasn't provided
   component_missing?: { name: string }
 }
@@ -336,8 +339,17 @@ const Node = ({ components, child }) => {
           const TableComponent =
             components['table'] || ((props) => <table {...props} />)
           const TrComponent = components['tr'] || ((props) => <tr {...props} />)
-          const ThComponent = components['th'] || ((props) => <th {...props} />)
-          const TdComponent = components['td'] || ((props) => <td {...props} />)
+          const ThComponent =
+            components['th'] ||
+            ((props) => (
+              <th style={{ textAlign: props?.align || 'auto' }} {...props} />
+            ))
+          const TdComponent =
+            components['td'] ||
+            ((props) => (
+              <td style={{ textAlign: props?.align || 'auto' }} {...props} />
+            ))
+          const align = child.props?.align || []
           return (
             <TableComponent>
               {firstRowHeader && (
@@ -348,15 +360,11 @@ const Node = ({ components, child }) => {
                         <TinaMarkdown
                           key={i}
                           components={{
-                            p: (props) => {
-                              if (ThComponent) {
-                                return <ThComponent {...props} />
-                              } else {
-                                return <th {...props} />
-                              }
-                            },
+                            p: (props) => (
+                              <ThComponent align={align[i]} {...props} />
+                            ),
                           }}
-                          content={c.tableCell}
+                          content={c.value}
                         />
                       )
                     })}
@@ -372,15 +380,11 @@ const Node = ({ components, child }) => {
                           <TinaMarkdown
                             key={i}
                             components={{
-                              p: (props) => {
-                                if (TdComponent) {
-                                  return <TdComponent {...props} />
-                                } else {
-                                  return <td {...props} />
-                                }
-                              },
+                              p: (props) => (
+                                <TdComponent align={align[i]} {...props} />
+                              ),
                             }}
-                            content={c.tableCell}
+                            content={c.value}
                           />
                         )
                       })}
