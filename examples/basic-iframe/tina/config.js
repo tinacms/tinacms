@@ -1,5 +1,65 @@
 import { TinaCMS, defineConfig } from 'tinacms'
 
+export const ReferenceTinaCollection = {
+  name: 'ref',
+  label: 'Reference',
+  path: 'reference',
+  format: 'yaml',
+  fields: [
+    {
+      type: 'object',
+      name: 'items',
+      label: 'Items',
+      list: true,
+      fields: [
+        {
+          type: 'string',
+          name: 'fullName',
+          label: 'Full Name',
+          required: true,
+        },
+        {
+          type: 'string',
+          name: 'langs',
+          label: 'Langs',
+          required: true,
+          list: true,
+        },
+        {
+          type: 'string',
+          name: 'name',
+          label: 'Name',
+          required: true,
+        },
+        {
+          type: 'string',
+          name: 'namespace',
+          label: 'Namespace',
+          required: true,
+        },
+        {
+          type: 'rich-text',
+          name: 'summary',
+          label: 'Summary',
+          required: true,
+        },
+        {
+          type: 'string',
+          name: 'type',
+          label: 'Type',
+          required: true,
+        },
+        {
+          type: 'string',
+          name: 'uid',
+          label: 'UID',
+          required: true,
+        },
+      ],
+    },
+  ],
+}
+
 export default defineConfig({
   // Example of how you can override the frontend url
   // contentApiUrlOverride: 'http://localhost:3000/api/gql',
@@ -67,6 +127,31 @@ export default defineConfig({
   },
   schema: {
     collections: [
+      ReferenceTinaCollection,
+      {
+        name: 'json_test',
+        format: 'json',
+        path: 'content/json-folder',
+        fields: [
+          {
+            type: 'string',
+            label: 'Title',
+            name: 'title',
+          },
+        ],
+      },
+      {
+        name: 'md_test',
+        path: 'content/md-folder',
+        format: 'md',
+        fields: [
+          {
+            type: 'string',
+            label: 'Title',
+            name: 'title',
+          },
+        ],
+      },
       {
         ui: {
           filename: {
