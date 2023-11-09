@@ -11,6 +11,12 @@ import { SyncStatus, SyncErrorWidget, SyncStatusModal } from './sync-status'
 import { useCMS } from '@toolkit/react-core'
 import { CloudConfigPlugin } from '@toolkit/react-cloud-config'
 
+interface NavCollection {
+  label?: string
+  name: string
+  isAuthCollection?: boolean
+}
+
 interface NavProps {
   isLocalMode: boolean
   children?: any
@@ -18,7 +24,7 @@ interface NavProps {
   userName?: string
   showCollections: boolean
   collectionsInfo: {
-    collections: { label?: string; name: string }[]
+    collections: NavCollection[]
   }
   contentCreators?: any
   screens?: ScreenPlugin[]
@@ -27,6 +33,9 @@ interface NavProps {
   RenderNavSite: React.ComponentType<{ view: ScreenPlugin }>
   RenderNavCloud: React.ComponentType<{ config: CloudConfigPlugin }>
   RenderNavCollection: React.ComponentType<{
+    collection: { label: string; name: string }
+  }>
+  AuthRenderNavCollection: React.ComponentType<{
     collection: { label: string; name: string }
   }>
 }
@@ -44,11 +53,32 @@ export const Nav = ({
   RenderNavSite,
   RenderNavCloud,
   RenderNavCollection,
+  AuthRenderNavCollection,
   ...props
 }: NavProps) => {
   const cms = useCMS()
   const { setEdit } = useEditState()
   const [eventsOpen, setEventsOpen] = React.useState(false)
+  const { contentCollections, authCollection } =
+    collectionsInfo.collections.reduce(
+      (
+        acc: {
+          contentCollections: NavCollection[]
+          authCollection?: NavCollection
+        },
+        collection: NavCollection
+      ) => {
+        if (collection.isAuthCollection) {
+          acc.authCollection = collection
+        } else {
+          acc.contentCollections.push(collection)
+        }
+        return acc
+      },
+      {
+        contentCollections: [],
+      }
+    )
 
   function closeEventsModal() {
     setEventsOpen(false)
@@ -181,7 +211,7 @@ export const Nav = ({
             </h4>
             <CollectionsList
               RenderNavCollection={RenderNavCollection}
-              {...collectionsInfo}
+              collections={contentCollections}
             />
           </>
         )}
@@ -204,6 +234,12 @@ export const Nav = ({
                   <CreateContentNavItem key={`plugin-${idx}`} plugin={plugin} />
                 )
               })}
+              {authCollection && (
+                <CollectionsList
+                  RenderNavCollection={AuthRenderNavCollection}
+                  collections={[authCollection]}
+                />
+              )}
             </ul>
           </>
         )}

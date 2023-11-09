@@ -4,7 +4,7 @@
 
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { ImFilesEmpty } from 'react-icons/im'
+import { ImFilesEmpty, ImUsers } from 'react-icons/im'
 import type { IconType } from 'react-icons/lib'
 
 import { Button, Nav } from '@tinacms/toolkit'
@@ -71,6 +71,13 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
               Icon={ImFilesEmpty}
             />
           )}
+          AuthRenderNavCollection={({ collection }) => (
+            <SidebarLink
+              label={collection.label ? collection.label : collection.name}
+              to={`/collections/${collection.name}/~`}
+              Icon={ImUsers}
+            />
+          )}
         />
       )}
       {!renderDesktopNav && (
@@ -114,6 +121,18 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                     }
                     to={`/collections/${collection.name}/~`}
                     Icon={ImFilesEmpty}
+                    onClick={() => {
+                      setMenuIsOpen(false)
+                    }}
+                  />
+                )}
+                AuthRenderNavCollection={({ collection }) => (
+                  <SidebarLink
+                    label={
+                      collection.label ? collection.label : collection.name
+                    }
+                    to={`/collections/${collection.name}/~`}
+                    Icon={ImUsers}
                     onClick={() => {
                       setMenuIsOpen(false)
                     }}
