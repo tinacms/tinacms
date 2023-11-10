@@ -539,7 +539,7 @@ const logNextSteps = ({
       logger.info(indentText(envFileText))
     }
     logger.info(
-      'Before you can start your site you will need to update your site to use the backend client.\nSee docs for more info: https://tina.io/docs/self-hosted/querying-data/'
+      'Before you can run your site you will need to update to use the backend client.\nSee docs for more info: https://tina.io/docs/self-hosted/querying-data/'
     )
     logger.info(
       'If you are deploying to vercel make sure to add the environment variables to your project.'
