@@ -90,9 +90,6 @@ const detectEnvironment = async ({
     fs.pathExistsSync(path.join(baseDir, 'src')) &&
     (fs.pathExistsSync(path.join(baseDir, 'src', 'app')) ||
       fs.pathExistsSync(path.join(baseDir, 'src', 'pages')))
-  const hasAppDir = usingSrc
-    ? fs.pathExistsSync(path.join(baseDir, 'src', 'app'))
-    : fs.pathExistsSync(path.join(baseDir, 'app'))
 
   const tinaFolder = path.join(baseDir, 'tina')
   const tinaConfigExists = Boolean(
@@ -194,7 +191,6 @@ const detectEnvironment = async ({
     gitIgnoreNodeModulesExists: hasGitIgnoreNodeModules,
     gitIgnoreEnvExists: hasGitIgnoreEnv,
     gitIgnoreTinaEnvExists: hasEnvTina,
-    nextAppDir: hasAppDir,
     packageJSONExists: hasPackageJSON,
     sampleContentExists: hasSampleContent,
     sampleContentPath,

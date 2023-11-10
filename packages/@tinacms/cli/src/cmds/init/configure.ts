@@ -101,10 +101,6 @@ async function configure(
     console.log(JSON.stringify(config, null, 2))
   }
 
-  if (env.nextAppDir && config.framework.name === 'next') {
-    // instead of causing an error lets not generate an example
-    config.framework.name = 'other'
-  }
   const firstTimeSetup = !env.tinaConfigExists
 
   // ask about generated files

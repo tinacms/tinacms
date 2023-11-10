@@ -65,12 +65,12 @@ export const chooseGitProvider = async ({ config }: { config: Config }) => {
     {
       name: 'githubOwner',
       type: 'text',
-      message: `What is your GitHub Owner (Your Github Username)? (Hit enter to skip and set up later)`,
+      message: `What is your GitHub Owner (Your Github Username)? \n(Hit enter to skip and set up later)\n`,
     },
     {
       name: 'githubRepo',
       type: 'text',
-      message: `What is your GitHub Repo name? (Hit enter to skip and set up later)`,
+      message: `What is your GitHub Repo name? Ex: my-nextjs-app \n(Hit enter to skip and set up later)\n`,
     },
   ])
   // Add the env vars to the config

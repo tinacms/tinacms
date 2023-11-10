@@ -63,7 +63,7 @@ const databaseAdapterUpdateConfig: {
       {
         name: 'mongoDBUri',
         type: 'text',
-        message: `What is the MongoDB URI(Hit enter to skip and set up yourself later)`,
+        message: `What is the MongoDB URI, Ex: mongodb+srv://<username>:<password>@cluster0.yoeujeh.mongodb.net/?retryWrites=true&w=majority\n(Hit enter to skip and set up yourself later)`,
         initial: process.env.MONGODB_URI,
       },
     ])
@@ -77,7 +77,7 @@ const databaseAdapterUpdateConfig: {
       {
         name: 'kvRestApiUrl',
         type: 'text',
-        message: `What is the KV (Redis) Rest API URL? (Hit enter to skip and set up yourself later)`,
+        message: `What is the KV (Redis) Rest API URL? Ex: https://***.upstash.io\n (Hit enter to skip and set up yourself later)`,
         initial: process.env.KV_REST_API_URL,
       },
       {
