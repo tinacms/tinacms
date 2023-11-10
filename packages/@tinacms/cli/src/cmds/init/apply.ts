@@ -190,6 +190,8 @@ async function apply({
   }
 
   if (
+    // if the config was just generated we do not need to update the config file because it will be generated correctly
+    env.tinaConfigExists &&
     // Are we running tinacms init backend
     params.isBackendInit &&
     // Do the user choose the 'self-host' option
