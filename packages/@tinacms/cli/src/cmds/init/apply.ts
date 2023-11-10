@@ -522,23 +522,29 @@ const logNextSteps = ({
 }) => {
   if (isBackend) {
     logger.info(focusText(`\n${titleText(' TinaCMS ')} backend initialized!`))
-    logger.info(
-      'Please add the following environment variables to your .env file'
-    )
-    logger.info(
-      indentText(
-        config.envVars
-          .map((x) => {
-            return `${x.key}=${x.value || '***'}`
-          })
-          .join('\n')
+    const envFileText =
+      config.envVars
+        .map((x) => {
+          return `${x.key}=${x.value || '***'}`
+        })
+        .join('\n') + `\nTINA_PUBLIC_IS_LOCAL=true`
+    const envFile = path.join(process.cwd(), '.env')
+    if (!fs.existsSync(envFile)) {
+      logger.info(`Adding .env file to your project... ✅`)
+      fs.writeFileSync(envFile, envFileText)
+    } else {
+      logger.info(
+        'Please add the following environment variables to your .env file'
       )
+      logger.info(indentText(envFileText))
+    }
+    logger.info(
+      'Before you can run your site you will need to update it to use the backend client.\nSee docs for more info: https://tina.io/docs/self-hosted/querying-data/'
     )
     logger.info(
       'If you are deploying to vercel make sure to add the environment variables to your project.'
     )
     logger.info('Make sure  to push tina-lock.json to your GitHub repo')
-    logger.info('You can now run your build command and deploy your site.')
   } else {
     logger.info(focusText(`\n${titleText(' TinaCMS ')} has been initialized!`))
     logger.info(
