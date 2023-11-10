@@ -20,7 +20,7 @@
     "@typescript-eslint/parser": "^5.20.0",
     "autoprefixer": "^10.4.0",
     "eslint": "^8.13.0",
-    "postcss": "^8.3.11",
+    "postcss": "^8.4.31",
     "postcss-import": "^14.0.2",
     "postcss-nesting": "^10.1.0"
   },

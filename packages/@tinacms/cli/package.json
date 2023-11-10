@@ -104,7 +104,7 @@
     "multer": "1.4.5-lts.1",
     "node-fetch": "2",
     "normalize-path": "^3.0.0",
-    "postcss": "^8.3.3",
+    "postcss": "^8.4.31",
     "prettier": "^2.2.1",
     "progress": "^2.0.3",
     "prompts": "^2.4.1",
