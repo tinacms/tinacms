@@ -522,18 +522,22 @@ const logNextSteps = ({
 }) => {
   if (isBackend) {
     logger.info(focusText(`\n${titleText(' TinaCMS ')} backend initialized!`))
-    logger.info(
-      'Please add the following environment variables to your .env file'
-    )
-    logger.info(
-      indentText(
-        config.envVars
-          .map((x) => {
-            return `${x.key}=${x.value || '***'}`
-          })
-          .join('\n')
+    const envFileText =
+      config.envVars
+        .map((x) => {
+          return `${x.key}=${x.value || '***'}`
+        })
+        .join('\n') + `\nTINA_PUBLIC_IS_LOCAL=true`
+    const envFile = path.join(process.cwd(), '.env')
+    if (!fs.existsSync(envFile)) {
+      logger.info(`Adding .env file to your project... ✅`)
+      fs.writeFileSync(envFile, envFileText)
+    } else {
+      logger.info(
+        'Please add the following environment variables to your .env file'
       )
-    )
+      logger.info(indentText(envFileText))
+    }
     logger.info(
       'If you are deploying to vercel make sure to add the environment variables to your project.'
     )
