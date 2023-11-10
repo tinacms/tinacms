@@ -539,10 +539,12 @@ const logNextSteps = ({
       logger.info(indentText(envFileText))
     }
     logger.info(
+      'Before you can start your site you will need to update your site to use the backend client.\nSee docs for more info: https://tina.io/docs/self-hosted/querying-data/'
+    )
+    logger.info(
       'If you are deploying to vercel make sure to add the environment variables to your project.'
     )
     logger.info('Make sure  to push tina-lock.json to your GitHub repo')
-    logger.info('You can now run your build command and deploy your site.')
   } else {
     logger.info(focusText(`\n${titleText(' TinaCMS ')} has been initialized!`))
     logger.info(
