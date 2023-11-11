@@ -116,7 +116,7 @@
     "vite": "^4.3.9",
     "yarn": "^1.22.17",
     "yup": "^0.32.9",
-    "zod": "^3.14.3"
+    "zod": "^3.22.3"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
