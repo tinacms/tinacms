@@ -1,5 +1,22 @@
 import React from 'react'
 
+export async function useTinaSSR<T extends object>(props: {
+  data: T
+  loadData: () => Promise<{ data: T }>
+}): Promise<{ data: T }> {
+  // return { data: props.data, isClient: true }
+
+  const initialRender = !Object.keys(props.data).length
+
+  if (initialRender) {
+    const res = await props.loadData()
+
+    return { data: res.data }
+  } else {
+    return { data: JSON.parse(Object.keys(props.data)[0]) }
+  }
+}
+
 export function useTina<T extends object>(props: {
   query: string
   variables: object
