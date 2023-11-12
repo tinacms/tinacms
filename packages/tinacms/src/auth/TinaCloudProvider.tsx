@@ -297,7 +297,11 @@ export const AuthWallInner = ({
           ]}
         />
       )}
-      {showChildren ? children : loginScreen ? loginScreen({}) : null}
+      {showChildren
+        ? children
+        : loginScreen
+        ? loginScreen({ handleAuthenticate, authProps, setAuthProps })
+        : null}
     </>
   )
 }

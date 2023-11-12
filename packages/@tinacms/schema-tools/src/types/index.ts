@@ -1,4 +1,3 @@
-import type { FC } from 'react'
 import type React from 'react'
 
 type Meta = {
@@ -442,6 +441,12 @@ type TokenObject = {
 
 export type LoginStrategy = 'UsernamePassword' | 'Redirect' | 'LoginScreen'
 
+type LoginScreenProps = {
+  handleAuthenticate: () => Promise<void>
+  authProps: Record<string, string>
+  setAuthProps: React.Dispatch<React.SetStateAction<Record<string, string>>>
+}
+
 export interface AuthProvider {
   /**
    *  Used for getting the token from the custom auth provider
@@ -480,8 +485,8 @@ export interface AuthProvider {
   isAuthorized: (context?: any) => Promise<boolean>
   isAuthenticated: () => Promise<boolean>
   getLoginStrategy: () => LoginStrategy
-  getLoginScreen: () => FC | null
-  getSessionProvider: () => FC<{ basePath?: string }>
+  getLoginScreen: () => React.FC<LoginScreenProps> | null
+  getSessionProvider: () => React.FC<{ basePath?: string }>
 }
 
 interface AuthHooks {
@@ -876,7 +881,7 @@ export type Option =
   | string
   | {
       label?: string
-      icon?: FC
+      icon?: React.FC
       value: string
     }
 
