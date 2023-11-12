@@ -45,7 +45,7 @@ export const ErrorLabel = ({ style = {}, ...props }) => (
   <p style={{ ...style, color: 'var(--tina-color-error)' }} {...props} />
 )
 
-interface ButtonProps {
+export interface ButtonProps {
   name: string
   action(): Promise<void>
   primary: boolean

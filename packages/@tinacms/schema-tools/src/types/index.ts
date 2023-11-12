@@ -439,12 +439,9 @@ type TokenObject = {
   refresh_token?: string
 }
 
-export type LoginStrategy = 'UsernamePassword' | 'Redirect' | 'LoginScreen'
-
-type LoginScreenProps = {
-  handleAuthenticate: () => Promise<void>
-  authProps: Record<string, string>
-  setAuthProps: React.Dispatch<React.SetStateAction<Record<string, string>>>
+export type LoginStrategy = 'Redirect' | 'LoginScreen' | 'UsernamePassword'
+export type LoginScreenProps = {
+  handleAuthenticate: (authProps?: Record<string, string>) => Promise<void>
 }
 
 export interface AuthProvider {

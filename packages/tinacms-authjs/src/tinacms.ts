@@ -6,6 +6,7 @@ import {
   signOut,
   SessionProvider,
 } from 'next-auth/react'
+import { UsernamePasswordLoginScreen } from './UsernamePasswordLoginScreen'
 import { AbstractAuthProvider } from 'tinacms'
 import type { FC } from 'react'
 
@@ -123,7 +124,12 @@ export class UsernamePasswordAuthJSProvider extends DefaultAuthJSProvider {
   }
 
   getLoginStrategy(): LoginStrategy {
+    // Would it make sense to change this to 'LoginScreen'?
     return 'UsernamePassword'
+  }
+
+  getLoginScreen() {
+    return UsernamePasswordLoginScreen as FC
   }
 }
 

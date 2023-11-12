@@ -1,7 +1,6 @@
-import { ModalBuilder } from './AuthModal'
+import { ModalBuilder, AsyncButton as ModalButton } from './AuthModal'
 import React, { useEffect, useState } from 'react'
 import {
-  BaseTextField,
   TinaCMS,
   TinaProvider,
   MediaStore,
@@ -24,6 +23,9 @@ import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
 import { setEditing } from '@tinacms/sharedctx'
 import { TinaAdminApi } from '../admin/api'
+
+// Export for use in the UsernamePasswordLoginScreen
+export const AsyncButton = ModalButton
 
 type ModalNames = null | 'authenticate' | 'error'
 
@@ -63,10 +65,6 @@ export const AuthWallInner = ({
     { title: string; message: string } | undefined
   >()
   const [showChildren, setShowChildren] = useState<boolean>(false)
-  const [authProps, setAuthProps] = useState<{
-    username: string
-    password: string
-  }>({ username: '', password: '' })
   const [authenticated, setAuthenticated] = useState<boolean>(false)
 
   React.useEffect(() => {
@@ -133,7 +131,7 @@ export const AuthWallInner = ({
       })
     : []
 
-  const handleAuthenticate = async () => {
+  const handleAuthenticate = async (authProps?: Record<string, string>) => {
     try {
       setAuthenticated(false)
       const token = await client.authProvider.authenticate(authProps)
@@ -152,23 +150,8 @@ export const AuthWallInner = ({
   }
 
   let modalTitle = 'Tina Cloud Authorization'
-  if (
-    activeModal === 'authenticate' &&
-    loginStrategy === 'Redirect' &&
-    !isTinaCloud
-  ) {
+  if (loginStrategy === 'Redirect' && !isTinaCloud) {
     modalTitle = 'Enter into edit mode'
-  } else if (
-    activeModal === 'authenticate' &&
-    loginStrategy === 'UsernamePassword'
-  ) {
-    modalTitle = 'Sign in to Tina'
-  } else if (activeModal === 'error') {
-    if (loginStrategy === 'Redirect' && !isTinaCloud) {
-      modalTitle = 'Enter into edit mode'
-    } else if (loginStrategy === 'UsernamePassword') {
-      modalTitle = 'Sign in to Tina'
-    }
   }
 
   return (
@@ -206,63 +189,6 @@ export const AuthWallInner = ({
           ]}
         ></ModalBuilder>
       )}
-      {activeModal === 'authenticate' &&
-        loginStrategy === 'UsernamePassword' && (
-          <ModalBuilder
-            title={modalTitle}
-            message={''}
-            close={close}
-            actions={[
-              ...otherModalActions,
-              {
-                name: 'Login',
-                action: handleAuthenticate,
-                primary: true,
-              },
-            ]}
-          >
-            <div className="flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
-              <div className="max-w-md w-full space-y-6">
-                <label className="block">
-                  <span className="text-gray-700">Username</span>
-                  <BaseTextField
-                    id="username"
-                    name="username"
-                    type="text"
-                    autoComplete="username"
-                    required
-                    placeholder="Username"
-                    value={authProps.username}
-                    onChange={(e) =>
-                      setAuthProps((prevState) => ({
-                        ...prevState,
-                        username: e.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-gray-700">Password</span>
-                  <BaseTextField
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    placeholder="Password"
-                    value={authProps.password}
-                    onChange={(e) =>
-                      setAuthProps((prevState) => ({
-                        ...prevState,
-                        password: e.target.value,
-                      }))
-                    }
-                  />
-                </label>
-              </div>
-            </div>
-          </ModalBuilder>
-        )}
       {activeModal === 'error' && errorMessage && (
         <ModalBuilder
           title={modalTitle}
@@ -300,7 +226,7 @@ export const AuthWallInner = ({
       {showChildren
         ? children
         : loginScreen
-        ? loginScreen({ handleAuthenticate, authProps, setAuthProps })
+        ? loginScreen({ handleAuthenticate })
         : null}
     </>
   )
