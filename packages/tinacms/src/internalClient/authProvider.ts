@@ -44,6 +44,14 @@ export abstract class AbstractAuthProvider implements AuthProvider {
     return 'Redirect'
   }
 
+  /**
+   * A React component that renders the custom UI for the login screen.
+   * Set the LoginStrategy to LoginScreen when providing this function.
+   */
+  getLoginScreen() {
+    return null
+  }
+
   getSessionProvider() {
     return DefaultSessionProvider
   }

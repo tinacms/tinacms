@@ -37,7 +37,6 @@ export interface TinaCloudMediaStoreClass {
 export interface TinaCloudAuthWallProps {
   cms?: TinaCMS
   children: React.ReactNode
-  loginScreen?: React.ReactNode
   tinaioConfig?: TinaIOConfig
   getModalActions?: (args: {
     closeModal: () => void
@@ -50,7 +49,6 @@ export interface TinaCloudAuthWallProps {
 export const AuthWallInner = ({
   children,
   cms,
-  loginScreen,
   getModalActions,
 }: TinaCloudAuthWallProps) => {
   const client: Client = cms.api.tina
@@ -58,6 +56,7 @@ export const AuthWallInner = ({
   const isTinaCloud =
     !client.isLocalMode && !client.schema?.config?.config?.contentApiUrlOverride
   const loginStrategy = client.authProvider.getLoginStrategy()
+  const loginScreen = client.authProvider.getLoginScreen()
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [errorMessage, setErrorMessage] = useState<
@@ -298,7 +297,7 @@ export const AuthWallInner = ({
           ]}
         />
       )}
-      {showChildren ? children : loginScreen ? loginScreen : null}
+      {showChildren ? children : loginScreen ? loginScreen({}) : null}
     </>
   )
 }
