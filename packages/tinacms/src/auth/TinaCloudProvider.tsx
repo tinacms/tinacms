@@ -85,6 +85,10 @@ export const AuthWallInner = ({
                 }
                 setShowChildren(true)
                 cms.enable()
+                cms.dispatch({
+                  type: 'sidebar:set-display-state',
+                  value: 'open',
+                })
               } else {
                 setErrorMessage({
                   title: 'Access Denied:',
@@ -254,7 +258,7 @@ export const TinaCloudProvider = (
     () =>
       props.cms ||
       new TinaCMS({
-        enabled: true,
+        enabled: false,
         sidebar: true,
         isLocalClient: props.isLocalClient,
         isSelfHosted: props.isSelfHosted,
