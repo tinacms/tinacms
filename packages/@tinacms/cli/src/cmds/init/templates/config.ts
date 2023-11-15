@@ -37,7 +37,7 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
     return args.collections
   }
   const extraTinaCollections =
-    args.config.authProvider?.extraTinaCollections?.join(',\n') + ','
+    args.config.authProvider?.extraTinaCollections?.join(',\n')
 
   const baseCollections = `[
     ${extraTinaCollections || ''}
@@ -51,6 +51,7 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
   const nextExampleCollection = `[
     ${extraTinaCollections || ''}
     {
+      ${extraTinaCollections ? `${extraTinaCollections},` : ''}
       name: 'post',
       label: 'Posts',
       path: 'content/posts',
