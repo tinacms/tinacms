@@ -31,11 +31,11 @@ const supportedDatabaseAdapters: {
     ],
   },
   mongodb: {
-    databaseAdapterClassText: `new MongodbLevel<string, Record<string, any>>({
+    databaseAdapterClassText: `new MongodbLevel({
           // If you are not using branches you could pass a static collection name. ie: "tinacms"
           collectionName: \`tinacms-\${branch}\`,
           dbName: 'tinacms',
-          mongoUri: process.env.MONGODB_URI as string,
+          mongoUri: process.env.MONGODB_URI,
         })`,
     imports: [
       {
