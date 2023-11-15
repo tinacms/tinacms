@@ -49,6 +49,7 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
     },
   ]`
   const nextExampleCollection = `[
+    ${extraTinaCollections || ''}
     {
       ${extraTinaCollections ? `${extraTinaCollections},` : ''}
       name: 'post',
