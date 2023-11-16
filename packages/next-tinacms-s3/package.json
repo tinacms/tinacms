@@ -46,6 +46,6 @@
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/next-tinacms-dos"
+    "directory": "packages/next-tinacms-s3"
   }
 }
