@@ -11,10 +11,10 @@ const supportedDatabaseAdapters: {
   ['upstash-redis']: {
     databaseAdapterClassText: `new RedisLevel({
         namespace: branch,
-        redis: new Redis({
+        redis: {
           url: process.env.KV_REST_API_URL || 'http://localhost:8079',
           token: process.env.KV_REST_API_TOKEN || 'example_token',
-        }),
+        },
         debug: process.env.DEBUG === 'true' || false,
       })`,
     imports: [
@@ -22,11 +22,6 @@ const supportedDatabaseAdapters: {
         imported: ['RedisLevel'],
         from: 'upstash-redis-level',
         packageName: 'upstash-redis-level',
-      },
-      {
-        imported: ['Redis'],
-        from: '@upstash/redis',
-        packageName: '@upstash/redis',
       },
     ],
   },
