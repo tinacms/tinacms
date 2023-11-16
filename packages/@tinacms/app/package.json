@@ -16,7 +16,7 @@
     "@monaco-editor/react": "4.4.5",
     "@tinacms/mdx": "workspace:*",
     "@xstate/react": "3.0.0",
-    "final-form": "4.20.7",
+    "final-form": "4.20.10",
     "graphiql": "3.0.0-alpha.1",
     "graphql": "15.8.0",
     "monaco-editor": "0.31.0",
