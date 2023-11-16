@@ -58,6 +58,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   loading: boolean = false
   relativePath: string
   crudType?: 'create' | 'update'
+  beforeSubmit?: (values: S) => Promise<void | S>
 
   constructor({
     id,
@@ -202,7 +203,16 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
 
   private handleSubmit: Config<S>['onSubmit'] = async (values, form, cb) => {
     try {
-      const response = await this.onSubmit(values, form, cb)
+      const valOverride = await this.beforeSubmit?.(values)
+
+      // Update the values on the frontend to reflect the changes made in the beforeSubmit hook
+      if (valOverride) {
+        for (const [key, value] of Object.entries(valOverride)) {
+          form.change(key as keyof S, value)
+        }
+      }
+
+      const response = await this.onSubmit(valOverride || values, form, cb)
       form.initialize(values)
       return response
     } catch (error) {
