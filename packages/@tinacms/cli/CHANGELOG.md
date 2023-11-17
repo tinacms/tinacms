@@ -1,5 +1,26 @@
 # tinacms-cli
 
+## 1.5.32
+
+### Patch Changes
+
+- 7eb8dca1d: Log the output location of the SPA html file
+- a937aabf0: Add support for build.basePath to be an environment variable
+- Updated dependencies [131b4dc55]
+- Updated dependencies [93bfc804a]
+- Updated dependencies [1fc2c4a99]
+- Updated dependencies [693cf5bd6]
+- Updated dependencies [afd1c7c97]
+- Updated dependencies [a937aabf0]
+- Updated dependencies [8b8a6c96b]
+- Updated dependencies [661239b2a]
+- Updated dependencies [630ab9436]
+  - tinacms@1.5.23
+  - @tinacms/app@1.2.30
+  - @tinacms/graphql@1.4.28
+  - @tinacms/datalayer@1.2.28
+  - @tinacms/search@1.0.13
+
 ## 1.5.31
 
 ### Patch Changes

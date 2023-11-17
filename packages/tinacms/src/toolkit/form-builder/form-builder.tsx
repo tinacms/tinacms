@@ -111,6 +111,17 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
   const tinaForm = form.tinaForm
   const finalForm = form.tinaForm.finalForm
+  const schema: TinaSchema = cms.api.tina.schema
+
+  React.useEffect(() => {
+    const collection = schema.getCollectionByFullPath(tinaForm.relativePath)
+    if (collection?.ui?.beforeSubmit) {
+      tinaForm.beforeSubmit = (values: any) =>
+        collection.ui.beforeSubmit({ cms, form: tinaForm, values })
+    } else {
+      tinaForm.beforeSubmit = undefined
+    }
+  }, [tinaForm.relativePath])
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
@@ -160,22 +171,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     <FinalForm
       key={tinaForm.id}
       form={tinaForm.finalForm}
-      onSubmit={async (values, form, cb) => {
-        const schema: TinaSchema = cms.api.tina.schema
-        const collection = schema.getCollectionByFullPath(tinaForm.relativePath)
-        const valOverride = collection?.ui?.beforeSubmit
-          ? await collection?.ui?.beforeSubmit({ cms, values, form: tinaForm })
-          : false
-
-        // Update the values on the frontend to reflect the changes made in the beforeSubmit hook
-        if (valOverride) {
-          for (const [key, value] of Object.entries(valOverride)) {
-            form.change(key, value)
-          }
-        }
-
-        return tinaForm.onSubmit(valOverride || values, form, cb)
-      }}
+      onSubmit={tinaForm.onSubmit}
     >
       {({
         handleSubmit,

@@ -1,5 +1,21 @@
 # tinacms
 
+## 1.5.23
+
+### Patch Changes
+
+- 131b4dc55: Fix button styling issue when using Firefox
+- 93bfc804a: Fix issue where \_template value was provided when creating a document from the editorial workflow
+- 1fc2c4a99: Fix media manager to pass back error when upload_url fails due to existing file
+- 693cf5bd6: Improve types for tables, add support for column alignment
+- afd1c7c97: Fix issue where Saved Changes indicator is not updated after a successful submit on a form
+- a937aabf0: Add support for build.basePath to be an environment variable
+- 661239b2a: update final form to fix peer deps issues
+- 630ab9436: No longer treat user touch event as pending change for rich-text fields
+- Updated dependencies [693cf5bd6]
+  - @tinacms/mdx@1.3.21
+  - @tinacms/search@1.0.13
+
 ## 1.5.22
 
 ### Patch Changes
