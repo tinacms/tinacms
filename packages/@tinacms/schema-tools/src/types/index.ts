@@ -440,7 +440,11 @@ type TokenObject = {
   refresh_token?: string
 }
 
-export type LoginStrategy = 'UsernamePassword' | 'Redirect'
+export type LoginStrategy = 'UsernamePassword' | 'Redirect' | 'LoginScreen'
+
+type LoginScreenProps = {
+  handleAuthenticate: (props?: Record<string, string>) => Promise<void>
+}
 
 export interface AuthProvider {
   /**
@@ -480,6 +484,7 @@ export interface AuthProvider {
   isAuthorized: (context?: any) => Promise<boolean>
   isAuthenticated: () => Promise<boolean>
   getLoginStrategy: () => LoginStrategy
+  getLoginScreen: () => FC<LoginScreenProps> | null
   getSessionProvider: () => FC<{ basePath?: string }>
 }
 
