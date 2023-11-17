@@ -12,8 +12,6 @@ import {
 } from 'tinacms-authjs/dist/tinacms'
 
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
-// process.env.NEXTAUTH_URL = process.env.NEXT_PUBLIC_NEXTAUTH_URL
-// console.log(process.env.NEXTAUTH_URL)
 
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/tina/gql',
