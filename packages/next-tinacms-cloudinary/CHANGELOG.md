@@ -1,5 +1,23 @@
 # next-tinacms-cloudinary
 
+## 4.4.0
+
+### Minor Changes
+
+- a7b7148c5: Update to latest cloudinary (1.41.0)
+
+### Patch Changes
+
+- Updated dependencies [131b4dc55]
+- Updated dependencies [93bfc804a]
+- Updated dependencies [1fc2c4a99]
+- Updated dependencies [693cf5bd6]
+- Updated dependencies [afd1c7c97]
+- Updated dependencies [a937aabf0]
+- Updated dependencies [661239b2a]
+- Updated dependencies [630ab9436]
+  - tinacms@1.5.23
+
 ## 4.3.7
 
 ### Patch Changes

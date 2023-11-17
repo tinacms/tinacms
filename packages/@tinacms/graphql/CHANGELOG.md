@@ -1,5 +1,13 @@
 # tina-graphql
 
+## 1.4.28
+
+### Patch Changes
+
+- 8b8a6c96b: add error link
+- Updated dependencies [693cf5bd6]
+  - @tinacms/mdx@1.3.21
+
 ## 1.4.27
 
 ### Patch Changes

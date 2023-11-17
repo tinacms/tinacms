@@ -1,5 +1,11 @@
 # @tinacms/mdx
 
+## 1.3.21
+
+### Patch Changes
+
+- 693cf5bd6: Improve types for tables, add support for column alignment
+
 ## 1.3.20
 
 ### Patch Changes
