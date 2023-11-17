@@ -1,5 +1,11 @@
 # tinacms-authjs
 
+## 1.0.1
+
+### Patch Changes
+
+- b1604e84d: Update peer deps
+
 ## 1.0.0
 
 ### Major Changes
