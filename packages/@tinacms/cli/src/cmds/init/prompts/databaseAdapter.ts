@@ -10,7 +10,6 @@ const supportedDatabaseAdapters: {
 } = {
   ['upstash-redis']: {
     databaseAdapterClassText: `new RedisLevel({
-        namespace: branch,
         redis: {
           url: process.env.KV_REST_API_URL || 'http://localhost:8079',
           token: process.env.KV_REST_API_TOKEN || 'example_token',
@@ -27,8 +26,7 @@ const supportedDatabaseAdapters: {
   },
   mongodb: {
     databaseAdapterClassText: `new MongodbLevel({
-          // If you are not using branches you could pass a static collection name. ie: "tinacms"
-          collectionName: \`tinacms-\${branch}\`,
+          collectionName: 'tinacms',
           dbName: 'tinacms',
           mongoUri: process.env.MONGODB_URI,
         })`,
