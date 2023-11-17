@@ -29,8 +29,7 @@ Test a TinaCMS starter site locally
 npx create-tina-app@latest
 ```
 
-Or try a [demo site](https://app.tina.io/quickstart) on Tina Cloud 
-
+Or try a [demo site](https://app.tina.io/quickstart) on Tina Cloud
 
 ## Documentation
 
@@ -53,11 +52,10 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 
 ### Maintainers
 
-- Jeff See ([@jeffsee55](https://github.com/jeffsee55)) 
-- James O'Halloran ([@jamespohalloran](https://github.com/jamespohalloran)) 
-- Logan Anderson ([@logan_anders0n](https://twitter.com/logan_anders0n)) 
+- Jeff See ([@jeffsee55](https://github.com/jeffsee55))
+- James O'Halloran ([@jamespohalloran](https://github.com/jamespohalloran))
+- Logan Anderson ([@logan_anders0n](https://twitter.com/logan_anders0n))
 - Kelly Davis ([@kldavis](https://github.com/kldavis4))
-
 
 ### All Contributors ✨
 

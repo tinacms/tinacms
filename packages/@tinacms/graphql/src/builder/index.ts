@@ -27,6 +27,7 @@ import type {
   Template,
 } from '@tinacms/schema-tools'
 import { TinaSchema } from '@tinacms/schema-tools'
+import { mapUserFields } from '../auth/utils'
 
 export const createBuilder = async ({
   tinaSchema,
@@ -197,7 +198,7 @@ export class Builder {
       }),
     ]
 
-    await this.addToLookupMap({
+    this.addToLookupMap({
       type: astBuilder.TYPES.Node,
       resolveType: 'nodeDocument',
     })
@@ -431,7 +432,7 @@ export class Builder {
         type: astBuilder.TYPES.String,
       }),
     ]
-    await this.addToLookupMap({
+    this.addToLookupMap({
       type: type.name.value,
       resolveType: 'collectionDocument',
       collection: collection.name,
@@ -444,6 +445,50 @@ export class Builder {
       args,
       required: true,
     })
+  }
+
+  public authenticationCollectionDocument = async (
+    collection: Collection<true>
+  ) => {
+    const name = 'authenticate'
+    const type = await this._buildAuthDocumentType(collection)
+    const args = [
+      astBuilder.InputValueDefinition({
+        name: 'sub',
+        type: astBuilder.TYPES.String,
+        required: true,
+      }),
+      astBuilder.InputValueDefinition({
+        name: 'password',
+        type: astBuilder.TYPES.String,
+        required: true,
+      }),
+    ]
+    return astBuilder.FieldDefinition({ type, name, args, required: false })
+  }
+
+  public updatePasswordMutation = async (collection: Collection<true>) => {
+    return astBuilder.FieldDefinition({
+      type: astBuilder.TYPES.Boolean,
+      name: 'updatePassword',
+      required: true,
+      args: [
+        astBuilder.InputValueDefinition({
+          name: 'password',
+          required: true,
+          type: astBuilder.TYPES.String,
+        }),
+      ],
+    })
+  }
+
+  public authorizationCollectionDocument = async (
+    collection: Collection<true>
+  ) => {
+    const name = 'authorize'
+    const type = await this._buildAuthDocumentType(collection)
+    const args = []
+    return astBuilder.FieldDefinition({ type, name, args, required: false })
   }
 
   /**
@@ -526,6 +571,29 @@ export class Builder {
       case 'boolean':
       case 'rich-text':
         return astBuilder.FieldNodeDefinition(field)
+      case 'password':
+        const passwordValue = await this._buildFieldNodeForFragments(
+          {
+            name: 'value',
+            namespace: [...field.namespace, 'value'],
+            type: 'string',
+            required: true,
+          } as TinaField<true>,
+          depth
+        )
+        const passwordChangeRequired = await this._buildFieldNodeForFragments(
+          {
+            name: 'passwordChangeRequired',
+            namespace: [...field.namespace, 'passwordChangeRequired'],
+            type: 'boolean',
+            required: false,
+          },
+          depth
+        )
+        return astBuilder.FieldWithSelectionSetDefinition({
+          name: field.name,
+          selections: filterSelections([passwordValue, passwordChangeRequired]),
+        })
       case 'object':
         if (field.fields?.length > 0) {
           const selections = []
@@ -828,6 +896,41 @@ export class Builder {
     })
   }
 
+  private _buildAuthDocumentType = async (
+    collection: Collection<true>,
+    suffix: string = '',
+    extraFields: FieldDefinitionNode[] = [],
+    extraInterfaces: NamedTypeNode[] = []
+  ) => {
+    const usersFields = mapUserFields(collection, [])
+    if (!usersFields.length) {
+      throw new Error('Auth collection must have a user field')
+    }
+    if (usersFields.length > 1) {
+      throw new Error('Auth collection cannot have more than one user field')
+    }
+    const usersField = usersFields[0].collectable
+    const documentTypeName = NAMER.documentTypeName(usersField.namespace)
+    const templateInfo = this.tinaSchema.getTemplatesForCollectable(usersField)
+
+    if (templateInfo.type === 'union') {
+      throw new Error('Auth collection user field cannot be a union')
+    }
+    const fields = templateInfo.template.fields
+    const templateFields = await sequential(fields, async (field) => {
+      return this._buildDataField(field)
+    })
+    return astBuilder.ObjectTypeDefinition({
+      name: documentTypeName + suffix,
+      interfaces: [
+        astBuilder.NamedType({ name: astBuilder.TYPES.Node }),
+        astBuilder.NamedType({ name: astBuilder.TYPES.Document }),
+        ...extraInterfaces,
+      ],
+      fields: [...templateFields],
+    })
+  }
+
   private _filterCollectionDocumentType = async (
     collection: Collectable
   ): Promise<InputObjectTypeDefinitionNode> => {
@@ -1111,9 +1214,7 @@ export class Builder {
         const filter = await this._connectionFilterBuilder({
           fieldName: field.name,
           namespace: field.namespace,
-          collections: await this.tinaSchema.getCollectionsByName(
-            field.collections
-          ),
+          collections: this.tinaSchema.getCollectionsByName(field.collections),
         })
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1147,6 +1248,8 @@ export class Builder {
           list: field.list,
           type: astBuilder.TYPES.String,
         })
+      case 'password':
+        return this._buildPasswordMutation(field)
       case 'object':
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1187,6 +1290,32 @@ export class Builder {
           })
         }
       ),
+    })
+  }
+
+  private _buildPasswordMutation = async (field: {
+    list?: boolean
+    name: string
+    namespace: string[]
+  }) => {
+    return astBuilder.InputValueDefinition({
+      name: field.name,
+      list: field.list,
+      type: astBuilder.InputObjectTypeDefinition({
+        name: NAMER.dataMutationTypeName(field.namespace),
+        fields: [
+          astBuilder.InputValueDefinition({
+            name: 'value',
+            type: astBuilder.TYPES.String,
+            required: false,
+          }),
+          astBuilder.InputValueDefinition({
+            name: 'passwordChangeRequired',
+            type: astBuilder.TYPES.Boolean,
+            required: true,
+          }),
+        ],
+      }),
     })
   }
 
@@ -1384,6 +1513,29 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
           list: field.list,
           required: field.required,
           type: astBuilder.TYPES.Scalar(field.type),
+        })
+      case 'password':
+        return astBuilder.FieldDefinition({
+          name: field.name,
+          list: field.list,
+          required: field.required,
+          type: astBuilder.ObjectTypeDefinition({
+            name: NAMER.dataTypeName(field.namespace),
+            fields: [
+              await this._buildDataField({
+                name: 'value',
+                namespace: [...field.namespace, 'value'],
+                type: 'string',
+                required: true,
+              }),
+              await this._buildDataField({
+                name: 'passwordChangeRequired',
+                namespace: [...field.namespace, 'passwordChangeRequired'],
+                type: 'boolean',
+                required: false,
+              }),
+            ],
+          }),
         })
       case 'object':
         return astBuilder.FieldDefinition({

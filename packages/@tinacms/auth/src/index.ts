@@ -1,7 +1,7 @@
 /**
 
 */
-
+import type { IncomingMessage, ServerResponse } from 'http'
 import type { NextApiRequest } from 'next'
 
 import fetchPonyfill from 'fetch-ponyfill'
@@ -118,3 +118,22 @@ export const isAuthorized = async (
  *
  */
 export const isAuthorizedNext = isAuthorized
+
+export const TinaCloudBackendAuthProvider = () => {
+  const backendAuthProvider = {
+    isAuthorized: async (req: IncomingMessage, _res: ServerResponse) => {
+      const user = await isAuthorized(req as NextApiRequest)
+      if (user && user.verified) {
+        return {
+          isAuthorized: true as const,
+        }
+      }
+      return {
+        isAuthorized: false as const,
+        errorCode: 401,
+        errorMessage: 'Unauthorized',
+      }
+    },
+  }
+  return backendAuthProvider
+}

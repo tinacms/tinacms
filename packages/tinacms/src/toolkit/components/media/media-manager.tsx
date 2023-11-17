@@ -623,7 +623,9 @@ const SyncStatusContainer = ({ children }) => {
       }
     }
 
-    checkSyncStatus()
+    if (!cms.media.store.isStatic) {
+      checkSyncStatus()
+    }
   }, [])
 
   return syncStatus == 'needs-sync' ? (

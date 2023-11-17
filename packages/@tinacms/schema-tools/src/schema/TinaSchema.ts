@@ -57,6 +57,7 @@ export class TinaSchema {
           field.parser = { type: 'markdown' }
         }
       }
+      field.uid = field.uid || false
     })
   }
   public getIsTitleFieldName = (collection: string) => {
@@ -369,7 +370,7 @@ export class TinaSchema {
         typeof template.fields === 'string' ||
         typeof template.fields === 'undefined'
       ) {
-        throw new Error('Exptected template to have fields but none were found')
+        throw new Error('Expected template to have fields but none were found')
       }
 
       return {

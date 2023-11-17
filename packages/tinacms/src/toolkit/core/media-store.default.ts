@@ -77,16 +77,19 @@ export class TinaMediaStore implements MediaStore {
 
       this.isLocal = !!this.api.isLocalMode
 
-      const contentApiUrl = new URL(this.api.contentApiUrl)
-      this.url = `${contentApiUrl.origin}/media`
-      if (!this.isLocal) {
-        if (this.api.options?.tinaioConfig?.assetsApiUrlOverride) {
-          const url = new URL(this.api.assetsApiUrl)
-          this.url = `${url.origin}/v1/${this.api.clientId}`
-        } else {
-          this.url = `${contentApiUrl.origin.replace('content', 'assets')}/v1/${
-            this.api.clientId
-          }`
+      if (!this.isStatic) {
+        const contentApiUrl = new URL(this.api.contentApiUrl)
+        this.url = `${contentApiUrl.origin}/media`
+        if (!this.isLocal) {
+          if (this.api.options?.tinaioConfig?.assetsApiUrlOverride) {
+            const url = new URL(this.api.assetsApiUrl)
+            this.url = `${url.origin}/v1/${this.api.clientId}`
+          } else {
+            this.url = `${contentApiUrl.origin.replace(
+              'content',
+              'assets'
+            )}/v1/${this.api.clientId}`
+          }
         }
       }
     }
@@ -271,6 +274,40 @@ export class TinaMediaStore implements MediaStore {
   async list(options?: MediaListOptions): Promise<MediaList> {
     this.setup()
 
+    if (this.staticMedia) {
+      const offset = options.offset || 0
+      const media = this.staticMedia[String(offset)]
+      let hasMore = false
+      if (this.staticMedia[String(Number(offset) + 20)]) {
+        hasMore = true
+      }
+      if (options.directory) {
+        let depth = 0
+        const pathToDirectory = options.directory.split('/')
+        let currentFolder = media
+        let hasMore = false
+        while (depth < pathToDirectory.length) {
+          const nextFolder = currentFolder.find(
+            (item) =>
+              item.type === 'dir' && item.filename === pathToDirectory[depth]
+          )
+          if (nextFolder) {
+            const offset = options.offset || 0
+            currentFolder = nextFolder.children[String(offset)]
+            if (nextFolder.children[String(Number(offset) + 20)]) {
+              hasMore = true
+            }
+          }
+          depth++
+        }
+        return {
+          items: currentFolder,
+          nextOffset: hasMore ? Number(offset) + 20 : null,
+        }
+      }
+      return { items: media, nextOffset: hasMore ? Number(offset) + 20 : null }
+    }
+
     let res
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
@@ -334,39 +371,6 @@ export class TinaMediaStore implements MediaStore {
       })
     }
 
-    if (this.staticMedia) {
-      const offset = options.offset || 0
-      const media = this.staticMedia[String(offset)]
-      let hasMore = false
-      if (this.staticMedia[String(Number(offset) + 20)]) {
-        hasMore = true
-      }
-      if (options.directory) {
-        let depth = 0
-        const pathToDirectory = options.directory.split('/')
-        let currentFolder = media
-        let hasMore = false
-        while (depth < pathToDirectory.length) {
-          const nextFolder = currentFolder.find(
-            (item) =>
-              item.type === 'dir' && item.filename === pathToDirectory[depth]
-          )
-          if (nextFolder) {
-            const offset = options.offset || 0
-            currentFolder = nextFolder.children[String(offset)]
-            if (nextFolder.children[String(Number(offset) + 20)]) {
-              hasMore = true
-            }
-          }
-          depth++
-        }
-        return {
-          items: currentFolder,
-          nextOffset: hasMore ? Number(offset) + 20 : null,
-        }
-      }
-      return { items: media, nextOffset: hasMore ? Number(offset) + 20 : null }
-    }
     return {
       items,
       nextOffset: cursor || 0,

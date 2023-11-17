@@ -151,6 +151,7 @@ export interface BaseField {
   nameOverride?: string
   description?: string
   searchable?: boolean
+  uid?: boolean
 }
 
 export type StringField = (
@@ -229,6 +230,14 @@ export type ReferenceField = (
      * ```
      */
     collections: string[]
+  }
+
+export type PasswordField = (
+  | FieldGeneric<string, undefined>
+  | FieldGeneric<string, false>
+) &
+  BaseField & {
+    type: 'password'
   }
 
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }
@@ -380,6 +389,7 @@ type Field<WithNamespace extends boolean = false> = (
   | ReferenceField
   | RichTextField<WithNamespace>
   | ObjectField<WithNamespace>
+  | PasswordField
 ) &
   MaybeNamespace<WithNamespace>
 
@@ -430,6 +440,56 @@ type TokenObject = {
   refresh_token?: string
 }
 
+export type LoginStrategy = 'UsernamePassword' | 'Redirect'
+
+export interface AuthProvider {
+  /**
+   *  Used for getting the token from the custom auth provider
+   *
+   * @returns {Promise<TokenObject | null>}
+   **/
+  getToken: () => Promise<TokenObject | null>
+  /**
+   *  Used to logout from the custom auth provider
+   *
+   **/
+  logout: () => Promise<void>
+  /**
+   *  Used for getting the user from the custom auth provider. If this returns a truthy value, the user will be logged in and the CMS will be enabled.
+   *
+   *  If this returns a falsy value, the user will be logged out and the CMS will be disabled.
+   *
+   **/
+  getUser: () => Promise<any | null | boolean>
+  /**
+   *  Used to authorize the user with the custom auth provider.
+   *
+   *  If this returns a truthy value, the user will be logged in and the CMS will be enabled.
+   *
+   *  If not provided, the existence of a user will be enough to authorize the user.
+   *
+   * @param context
+   */
+  authorize: (context?: any) => Promise<any | null>
+  /**
+   * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
+   *
+   **/
+  authenticate: (props?: Record<string, any>) => Promise<any | null>
+  fetchWithToken: (input: RequestInfo, init?: RequestInit) => Promise<Response>
+  isAuthorized: (context?: any) => Promise<boolean>
+  isAuthenticated: () => Promise<boolean>
+  getLoginStrategy: () => LoginStrategy
+  getSessionProvider: () => FC<{ basePath?: string }>
+}
+
+interface AuthHooks {
+  onLogin?: (args: { token: TokenObject }) => Promise<void>
+  onLogout?: () => Promise<void>
+}
+
+type AuthOptions = AuthHooks & AuthProvider
+
 export interface Config<
   CMSCallback = undefined,
   FormifyCallback = undefined,
@@ -438,56 +498,16 @@ export interface Config<
   SearchClient = undefined
 > {
   contentApiUrlOverride?: string
+  authProvider?: AuthProvider
   admin?: {
-    auth?: {
-      /**
-       * If you wish to use the local auth provider, set this to true
-       *
-       * This will take precedence over the customAuth option (if set to true)
-       *
-       **/
-      useLocalAuth?: boolean
-      /**
-       * If you are using a custom auth provider, set this to true
-       **/
-      customAuth?: boolean
-      /**
-       *  Used for getting the token from the custom auth provider
-       *
-       * @returns {Promise<TokenObject | null>}
-       **/
-      getToken?: () => Promise<TokenObject | null>
-      /**
-       *  Used to logout from the custom auth provider
-       *
-       **/
-      logout?: () => Promise<void>
-      /**
-       *  Used for getting the user from the custom auth provider. If this returns a truthy value, the user will be logged in and the CMS will be enabled.
-       *
-       *  If this returns a falsy value, the user will be logged out and the CMS will be disabled.
-       *
-       **/
-      getUser?: () => Promise<any | null>
-      /**
-       *  Used to authorize the user with the custom auth provider.
-       *
-       *  If this returns a truthy value, the user will be logged in and the CMS will be enabled.
-       *
-       *  If not provided, the existence of a user will be enough to authorize the user.
-       *
-       * @param context
-       */
-      authorize?: (context?: any) => Promise<any | null>
-      /**
-       * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
-       *
-       **/
-      authenticate?: () => Promise<any | null>
-
-      onLogin?: (args: { token: TokenObject }) => Promise<void>
-      onLogout?: () => Promise<void>
-    }
+    /**
+     * @deprecated use `authProvider`and admin.authHooks instead
+     */
+    auth?: AuthOptions
+    /**
+     * Hook functions that can be used to run logic when certain events happen
+     */
+    authHooks?: AuthHooks
   }
   /**
    * The Schema is used to define the shape of the content.
@@ -729,6 +749,8 @@ interface BaseCollection {
     include?: string
     exclude?: string
   }
+  isDetached?: boolean
+  isAuthCollection?: boolean
 }
 
 type TemplateCollection<WithNamespace extends boolean = false> = {

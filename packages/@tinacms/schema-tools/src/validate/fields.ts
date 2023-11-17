@@ -52,6 +52,7 @@ const FieldWithList = TinaField.extend({ list: z.boolean().optional() })
 // ==========
 const TinaScalerBase = FieldWithList.extend({
   options: z.array(Option).optional(),
+  uid: z.boolean().optional(),
 })
 const StringField = TinaScalerBase.extend({
   type: z.literal('string', {
@@ -59,6 +60,12 @@ const StringField = TinaScalerBase.extend({
     required_error: typeRequiredError,
   }),
   isTitle: z.boolean().optional(),
+})
+const PasswordField = TinaScalerBase.extend({
+  type: z.literal('password', {
+    invalid_type_error: typeTypeError,
+    required_error: typeRequiredError,
+  }),
 })
 const BooleanField = TinaScalerBase.extend({
   type: z.literal('boolean' as const, {
@@ -190,6 +197,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
         ReferenceField,
         ObjectField,
         RichTextField,
+        PasswordField,
       ],
       {
         errorMap: (issue, ctx) => {
@@ -225,6 +233,28 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Must have { required: true } when using \`isTitle\` Error in value \n${JSON.stringify(
+                val,
+                null,
+                2
+              )}\n`,
+            })
+          }
+        }
+        if (val.uid) {
+          if (val.list) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Can not have \`list: true\` when using \`uid\`. Error in value \n${JSON.stringify(
+                val,
+                null,
+                2
+              )}\n`,
+            })
+          }
+          if (!val.required) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Must have { required: true } when using \`uid\` Error in value \n${JSON.stringify(
                 val,
                 null,
                 2

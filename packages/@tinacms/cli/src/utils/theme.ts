@@ -15,7 +15,10 @@ export const indentedCmd = (str: any) => {
   return `  ┃ ` + str
 }
 export const indentText = (str: any) => {
-  return `   ` + str
+  return String(str)
+    .split('\n')
+    .map((line) => `   ${line}`)
+    .join('\n')
 }
 export const logText = chalk.italic.gray
 export const warnText = chalk.yellowBright.bgBlack

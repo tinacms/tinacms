@@ -1,9 +1,9 @@
 import { Command, Option } from 'clipanion'
 import { logger } from '../../../logger'
-import { initStaticTina } from '../../../cmds/init'
+import { command } from '../../../cmds/init'
 
 export class InitCommand extends Command {
-  static paths = [['init']]
+  static paths = [['init'], ['init', 'backend']]
   pathToForestryConfig = Option.String('--forestryPath', {
     description:
       'Specify the relative path to the .forestry directory, if importing an existing forestry site.',
@@ -12,8 +12,14 @@ export class InitCommand extends Command {
     description:
       'Specify the root directory to run the CLI from (defaults to current working directory)',
   })
+  debug = Option.Boolean('--debug', false, {
+    description: 'Enable debug logging',
+  })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
+  })
+  tinaVersion = Option.String('--tinaVersion', {
+    description: 'Specify a version for tina dependencies',
   })
   static usage = Command.Usage({
     category: `Commands`,
@@ -27,11 +33,15 @@ export class InitCommand extends Command {
   }
 
   async execute(): Promise<number | void> {
+    const isBackend = Boolean(this.path.find((x) => x === 'backend'))
     const rootPath = this.rootPath || process.cwd()
-    await initStaticTina({
+    await command.execute({
+      isBackendInit: isBackend,
       rootPath: rootPath,
       pathToForestryConfig: this.pathToForestryConfig || rootPath,
       noTelemetry: this.noTelemetry,
+      debug: this.debug,
+      tinaVersion: this.tinaVersion,
     })
     process.exit()
   }

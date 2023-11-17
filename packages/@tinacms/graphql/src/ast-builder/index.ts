@@ -529,6 +529,7 @@ export const astBuilder = {
     CollectionDocumentUnion: 'DocumentUnion',
     Folder: 'Folder',
     String: 'String',
+    Password: 'Password',
     Reference: 'Reference',
     Collection: 'Collection',
     ID: 'ID',

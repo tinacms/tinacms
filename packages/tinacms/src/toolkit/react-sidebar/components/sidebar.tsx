@@ -7,6 +7,7 @@
 import * as React from 'react'
 
 import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi'
+import { IconType } from 'react-icons/lib'
 import { ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
 import { useCMS, useSubscribable } from '@toolkit/react-core'
@@ -14,7 +15,7 @@ import { useState } from 'react'
 
 import { Button } from '@toolkit/styles'
 import { FormsView } from './sidebar-body'
-import { ImFilesEmpty } from 'react-icons/im'
+import { ImFilesEmpty, ImUsers } from 'react-icons/im'
 import { IoMdClose } from 'react-icons/io'
 import { BillingWarning, LocalWarning } from './local-warning'
 import { MdOutlineArrowBackIos } from 'react-icons/md'
@@ -127,6 +128,11 @@ const Sidebar = ({
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
+  const activeScreens = allScreens.filter(
+    (screen) =>
+      screen.navCategory !== 'Account' ||
+      cms.api.tina?.authProvider?.getLoginStrategy() === 'UsernamePassword'
+  )
 
   const setDisplayState = (value: 'closed' | 'fullscreen' | 'open') =>
     cms.dispatch({ type: 'sidebar:set-display-state', value: value })
@@ -258,7 +264,7 @@ const Sidebar = ({
               isLocalMode={cms.api?.tina?.isLocalMode}
               showCollections={isTinaAdminEnabled}
               collectionsInfo={collectionsInfo}
-              screens={allScreens}
+              screens={activeScreens}
               cloudConfigs={allConfigs}
               contentCreators={contentCreators}
               sidebarWidth={sidebarWidth}
@@ -280,6 +286,15 @@ const Sidebar = ({
                     setMenuIsOpen(false)
                   }}
                   collection={collection}
+                />
+              )}
+              AuthRenderNavCollection={({ collection }) => (
+                <SidebarCollectionLink
+                  onClick={() => {
+                    setMenuIsOpen(false)
+                  }}
+                  collection={collection}
+                  Icon={ImUsers}
                 />
               )}
             />
@@ -320,7 +335,7 @@ const Sidebar = ({
                   className="rounded-r-md"
                   showCollections={isTinaAdminEnabled}
                   collectionsInfo={collectionsInfo}
-                  screens={allScreens}
+                  screens={activeScreens}
                   cloudConfigs={allConfigs}
                   contentCreators={contentCreators}
                   sidebarWidth={sidebarWidth}
@@ -342,6 +357,15 @@ const Sidebar = ({
                         setMenuIsOpen(false)
                       }}
                       collection={collection}
+                    />
+                  )}
+                  AuthRenderNavCollection={({ collection }) => (
+                    <SidebarCollectionLink
+                      onClick={() => {
+                        setMenuIsOpen(false)
+                      }}
+                      collection={collection}
+                      Icon={ImUsers}
                     />
                   )}
                 >
@@ -550,9 +574,11 @@ const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
 }
 
 const SidebarCollectionLink = ({
+  Icon = ImFilesEmpty,
   collection,
   onClick,
 }: {
+  Icon?: IconType
   collection: {
     label: string
     name: string
@@ -569,7 +595,7 @@ const SidebarCollectionLink = ({
       }/collections/${collection.name}/~`}
       className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
     >
-      <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
+      <Icon className="mr-2 h-6 opacity-80 w-auto" />{' '}
       {collection.label ? collection.label : collection.name}
     </a>
   )

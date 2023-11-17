@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { AUTH_TOKEN_KEY, TokenObject, authenticate } from '../auth/authenticate'
+import { TokenObject } from '../auth/authenticate'
 //@ts-ignore can't locate BranchChangeEvent
 import { BranchChangeEvent, BranchData, EventBus } from '@tinacms/toolkit'
 import {
@@ -13,7 +13,12 @@ import {
 } from 'graphql'
 
 import gql from 'graphql-tag'
-import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
+import {
+  TinaSchema,
+  addNamespaceToSchema,
+  Schema,
+  AuthProvider,
+} from '@tinacms/schema-tools'
 import { TinaCloudProject } from './types'
 import {
   optionsToSearchIndexOptions,
@@ -21,8 +26,12 @@ import {
   queryToSearchIndexQuery,
   SearchClient,
 } from '@tinacms/search/dist/index-client'
+import { AsyncData, asyncPoll } from './asyncPoll'
+import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider'
 
-export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
+export * from './authProvider'
+
+export type OnLoginFunc = (args: { token?: TokenObject }) => Promise<void>
 
 export type TinaIOConfig = {
   assetsApiUrlOverride?: string // https://assets.tinajs.io
@@ -68,120 +77,8 @@ const IndexStatusResponse = z.object({
   timestamp: z.number().optional(),
 })
 
-/**
- * The function you pass to `asyncPoll` should return a promise
- * that resolves with object that satisfies this interface.
- *
- * The `done` property indicates to the async poller whether to
- * continue polling or not.
- *
- * When done is `true` that means you've got what you need
- * and the poller will resolve with `data`.
- *
- * When done is `false` taht means you don't have what you need
- * and the poller will continue polling.
- */
-export interface AsyncData<T> {
-  done: boolean
-  data?: T
-}
-
-/**
- * Your custom function you provide to the async poller should
- * satisfy this interface. Your function returns a promise that
- * resolves with `AsyncData` to indicate to the poller whether
- * you have what you need or we should continue polling.
- */
-export interface AsyncFunction<T> extends Function {
-  (): PromiseLike<AsyncData<T>>
-}
-
-/**
-* How to repeatedly call an async function until get a desired result.
-*
-* Inspired by the following gist:
-* https://gist.github.com/twmbx/2321921670c7e95f6fad164fbdf3170e#gistcomment-3053587
-* https://davidwalsh.name/javascript-polling
-*
-* Usage:
-  asyncPoll(
-      async (): Promise<AsyncData<any>> => {
-          try {
-              const result = await getYourAsyncResult();
-              if (result.isWhatYouWant) {
-                  return Promise.resolve({
-                      done: true,
-                      data: result,
-                  });
-              } else {
-                  return Promise.resolve({
-                      done: false
-                  });
-              }
-          } catch (err) {
-              return Promise.reject(err);
-          }
-      },
-      500,    // interval
-      15000,  // timeout
-  );
-*/
-export function asyncPoll<T>(
-  /**
-   * Function to call periodically until it resolves or rejects.
-   *
-   * It should resolve as soon as possible indicating if it found
-   * what it was looking for or not. If not then it will be reinvoked
-   * after the `pollInterval` if we haven't timed out.
-   *
-   * Rejections will stop the polling and be propagated.
-   */
-  fn: AsyncFunction<T>,
-  /**
-   * Milliseconds to wait before attempting to resolve the promise again.
-   * The promise won't be called concurrently. This is the wait period
-   * after the promise has resolved/rejected before trying again for a
-   * successful resolve so long as we haven't timed out.
-   *
-   * Default 5 seconds.
-   */
-  pollInterval: number = 5 * 1000,
-  /**
-   * Max time to keep polling to receive a successful resolved response.
-   * If the promise never resolves before the timeout then this method
-   * rejects with a timeout error.
-   *
-   * Default 30 seconds.
-   */
-  pollTimeout: number = 30 * 1000
-) {
-  const endTime = new Date().getTime() + pollTimeout
-  let stop = false
-  const cancel = () => {
-    stop = true
-  }
-  const checkCondition = (resolve: Function, reject: Function): void => {
-    Promise.resolve(fn())
-      .then((result) => {
-        const now = new Date().getTime()
-        if (stop) {
-          reject(new Error('AsyncPoller: cancelled'))
-        } else if (result.done) {
-          resolve(result.data)
-        } else if (now < endTime) {
-          setTimeout(checkCondition, pollInterval, resolve, reject)
-        } else {
-          reject(new Error('AsyncPoller: reached timeout'))
-        }
-      })
-      .catch((err) => {
-        reject(err)
-      })
-  }
-  return [new Promise(checkCondition) as Promise<T>, cancel]
-}
-
 export class Client {
+  authProvider: AuthProvider
   onLogin?: OnLoginFunc
   onLogout?: () => Promise<void>
   frontendUrl: string
@@ -193,9 +90,6 @@ export class Client {
   clientId: string
   contentApiBase: string
   tinaGraphQLVersion: string
-  setToken: (_token: TokenObject) => void
-  private getToken: () => Promise<TokenObject>
-  token: string // used with memory storage
   branch: string
   private options: ServerOptions
   events = new EventBus() // automatically hooked into global event bus when attached via cms.
@@ -204,20 +98,13 @@ export class Client {
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.tinaGraphQLVersion = options.tinaGraphQLVersion
-    this.onLogin = options.schema?.config?.admin?.auth?.onLogin
-    this.onLogout = options.schema?.config?.admin?.auth?.onLogout
-    if (options.schema?.config?.admin?.auth?.logout) {
-      this.onLogout = options.schema?.config?.admin?.auth?.logout
-    }
-    if (options.schema?.config?.admin?.auth?.getUser) {
-      this.getUser = options.schema?.config?.admin?.auth?.getUser
-    }
-    if (options.schema?.config?.admin?.auth?.authenticate) {
-      this.authenticate = options.schema?.config?.admin?.auth?.authenticate
-    }
-    if (options.schema?.config?.admin?.auth?.authorize) {
-      this.authorize = options.schema?.config?.admin?.auth?.authorize
-    }
+    this.onLogin =
+      options.schema?.config?.admin?.authHooks?.onLogin ||
+      options.schema?.config?.admin?.auth?.onLogin
+    this.onLogout =
+      options.schema?.config?.admin?.authHooks?.onLogout ||
+      options.schema?.config?.admin?.auth?.onLogout
+
     if (options.schema) {
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
@@ -241,53 +128,17 @@ export class Client {
     )
     this.clientId = options.clientId
 
-    switch (tokenStorage) {
-      case 'LOCAL_STORAGE':
-        this.getToken = async function () {
-          const tokens = localStorage.getItem(AUTH_TOKEN_KEY) || null
-          if (tokens) {
-            return await this.getRefreshedToken(tokens)
-          } else {
-            return {
-              access_token: null,
-              id_token: null,
-              refresh_token: null,
-            }
-          }
-        }
-        this.setToken = function (token) {
-          localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(token, null, 2))
-        }
-        break
-      case 'MEMORY':
-        this.getToken = async () => {
-          if (this.token) {
-            return await this.getRefreshedToken(this.token)
-          } else {
-            return {
-              access_token: null,
-              id_token: null,
-              refresh_token: null,
-            }
-          }
-        }
-        this.setToken = (token) => {
-          this.token = JSON.stringify(token, null, 2)
-        }
-        break
-      case 'CUSTOM':
-        if (!options.getTokenFn) {
-          throw new Error(
-            'When CUSTOM token storage is selected, a getTokenFn must be provided'
-          )
-        }
-        this.getToken = options.getTokenFn
-        break
-    }
-    // if the user provides a getToken function in the config we can use that
-    if (options.schema?.config?.admin?.auth?.getToken) {
-      this.getToken = options.schema?.config?.admin?.auth?.getToken
-    }
+    // TODO: auth provider should be dynamically passed in
+    // TODO: update auth provider whenever the clientID or url change
+    this.authProvider =
+      this.schema?.config?.config?.authProvider ||
+      new TinaCloudAuthProvider({
+        clientId: options.clientId,
+        identityApiUrl: this.identityApiUrl,
+        getTokenFn: options.getTokenFn,
+        tokenStorage: tokenStorage,
+        frontendUrl: this.frontendUrl,
+      })
   }
 
   public get isLocalMode() {
@@ -315,6 +166,10 @@ export class Client {
     this.contentApiUrl =
       this.options.customContentApiUrl ||
       `${this.contentApiBase}/${this.tinaGraphQLVersion}/content/${this.options.clientId}/github/${encodedBranch}`
+    if (this.authProvider instanceof TinaCloudAuthProvider) {
+      this.authProvider.identityApiUrl = this.identityApiUrl
+      this.authProvider.frontendUrl = this.frontendUrl
+    }
   }
 
   getBranch() {
@@ -408,7 +263,7 @@ mutation addPendingDocumentMutation(
     query: ((gqlTag: typeof gql) => DocumentNode) | string,
     { variables }: { variables: object }
   ): Promise<ReturnType> {
-    const token = await this.getToken()
+    const token = await this.authProvider.getToken()
     const headers = {
       'Content-Type': 'application/json',
     }
@@ -461,7 +316,7 @@ mutation addPendingDocumentMutation(
   }: {
     assetsSyncing: string[]
   }): Promise<{ assetsSyncing: string[] }> {
-    const res = await this.fetchWithToken(
+    const res = await this.authProvider.fetchWithToken(
       `${this.assetsApiUrl}/v1/${this.clientId}/syncStatus`,
       {
         method: 'POST',
@@ -476,7 +331,7 @@ mutation addPendingDocumentMutation(
   }
 
   async getProject() {
-    const res = await this.fetchWithToken(
+    const res = await this.authProvider.fetchWithToken(
       `${this.identityApiUrl}/v2/apps/${this.clientId}`,
       {
         method: 'GET',
@@ -498,7 +353,7 @@ mutation addPendingDocumentMutation(
     const url = `${this.contentApiBase}/github/${this.clientId}/create_pull_request`
 
     try {
-      const res = await this.fetchWithToken(url, {
+      const res = await this.authProvider.fetchWithToken(url, {
         method: 'POST',
         body: JSON.stringify({
           baseBranch,
@@ -541,7 +396,7 @@ mutation addPendingDocumentMutation(
       }
     } else {
       return (
-        await this.fetchWithToken(
+        await this.authProvider.fetchWithToken(
           `${this.contentApiBase}/events/${this.clientId}/${
             this.branch
           }?limit=${limit || 1}${cursor ? `&cursor=${cursor}` : ''}`,
@@ -551,129 +406,6 @@ mutation addPendingDocumentMutation(
     }
   }
 
-  parseJwt(token) {
-    const base64Url = token.split('.')[1]
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(function (c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-        })
-        .join('')
-    )
-    return JSON.parse(jsonPayload)
-  }
-
-  async getRefreshedToken(tokens: string): Promise<TokenObject> {
-    const { access_token, id_token, refresh_token } = JSON.parse(tokens)
-    const { exp, iss, client_id } = this.parseJwt(access_token)
-
-    // if the token is going to expire within the next two minutes, refresh it now
-    if (Date.now() / 1000 >= exp - 120) {
-      const refreshResponse = await fetch(iss, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-amz-json-1.1',
-          'x-amz-target': 'AWSCognitoIdentityProviderService.InitiateAuth',
-        },
-        body: JSON.stringify({
-          ClientId: client_id,
-          AuthFlow: 'REFRESH_TOKEN_AUTH',
-          AuthParameters: {
-            REFRESH_TOKEN: refresh_token,
-            DEVICE_KEY: null,
-          },
-        }),
-      })
-
-      if (refreshResponse.status !== 200) {
-        throw new Error('Unable to refresh auth tokens')
-      }
-
-      const responseJson = await refreshResponse.json()
-      const newToken = {
-        access_token: responseJson.AuthenticationResult.AccessToken,
-        id_token: responseJson.AuthenticationResult.IdToken,
-        refresh_token,
-      }
-      this.setToken(newToken)
-
-      return Promise.resolve(newToken)
-    }
-
-    return Promise.resolve({ access_token, id_token, refresh_token })
-  }
-
-  async isAuthorized(context?: any): Promise<boolean> {
-    return !!(await this.authorize(context))
-  }
-
-  async isAuthenticated(): Promise<boolean> {
-    return !!(await this.getUser())
-  }
-
-  async logout() {
-    this.setToken(null)
-  }
-
-  async authenticate() {
-    const token = await authenticate(this.clientId, this.frontendUrl)
-    this.setToken(token)
-    return token
-  }
-
-  async authorize(context?: any): Promise<any> {
-    // by default, the existence of a token is enough to be authorized
-    return this.getToken()
-  }
-
-  /**
-   * Wraps the normal fetch function with same API but adds the authorization header token.
-   *
-   * @example
-   * const test = await tinaCloudClient.fetchWithToken(`/mycustomAPI/thing/one`) // the token will be passed in the authorization header
-   *
-   * @param input fetch function input
-   * @param init fetch function init
-   */
-  async fetchWithToken(
-    input: RequestInfo,
-    init?: RequestInit
-  ): Promise<Response> {
-    const headers = init?.headers || {}
-    const token = await this.getToken()
-    if (token?.id_token) {
-      headers['Authorization'] = 'Bearer ' + token?.id_token
-    }
-    return await fetch(input, {
-      ...init,
-      headers: new Headers(headers),
-    })
-  }
-
-  async getUser() {
-    if (!this.clientId) {
-      return null
-    }
-
-    const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/currentUser`
-
-    try {
-      const res = await this.fetchWithToken(url, {
-        method: 'GET',
-      })
-      const val = await res.json()
-      if (!res.status.toString().startsWith('2')) {
-        console.error(val.error)
-        return null
-      }
-      return val
-    } catch (e) {
-      console.error(e)
-      return null
-    }
-  }
   async getBillingState() {
     if (!this.clientId) {
       return null
@@ -682,7 +414,7 @@ mutation addPendingDocumentMutation(
     const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/billing/state`
 
     try {
-      const res = await this.fetchWithToken(url, {
+      const res = await this.authProvider.fetchWithToken(url, {
         method: 'GET',
       })
       const val = await res.json()
@@ -753,7 +485,7 @@ mutation addPendingDocumentMutation(
 
   async getIndexStatus({ ref }: { ref: string }) {
     const url = `${this.contentApiBase}/db/${this.clientId}/status/${ref}`
-    const res = await this.fetchWithToken(url)
+    const res = await this.authProvider.fetchWithToken(url)
     const result = await res.json()
     const parsedResult = IndexStatusResponse.parse(result)
     return parsedResult
@@ -762,7 +494,7 @@ mutation addPendingDocumentMutation(
   async listBranches(args?: { includeIndexStatus?: boolean }) {
     try {
       const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
-      const res = await this.fetchWithToken(url, {
+      const res = await this.authProvider.fetchWithToken(url, {
         method: 'GET',
       })
       const branches = await res.json()
@@ -798,7 +530,7 @@ mutation addPendingDocumentMutation(
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`
 
     try {
-      const res = await this.fetchWithToken(url, {
+      const res = await this.authProvider.fetchWithToken(url, {
         method: 'POST',
         body: JSON.stringify({
           baseBranch,
@@ -824,8 +556,6 @@ mutation addPendingDocumentMutation(
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 
-const LOCAL_CLIENT_KEY = 'tina.local.isLogedIn'
-
 export class LocalClient extends Client {
   constructor(
     props?: {
@@ -844,24 +574,12 @@ export class LocalClient extends Client {
           : DEFAULT_LOCAL_TINA_GQL_SERVER_URL,
     }
     super(clientProps)
+    // use whatever auth provider is passed in, or default to local auth provider
+    this.authProvider =
+      this.schema?.config?.config?.authProvider || new LocalAuthProvider()
   }
-
   public get isLocalMode() {
     return true
-  }
-
-  // These functions allow the local client to have a login state so that we can correctly call the "OnLogin" callback. This is important for things like preview mode
-  async logout() {
-    localStorage.removeItem(LOCAL_CLIENT_KEY)
-  }
-
-  async authenticate() {
-    localStorage.setItem(LOCAL_CLIENT_KEY, 'true')
-    return { access_token: 'LOCAL', id_token: 'LOCAL', refresh_token: 'LOCAL' }
-  }
-
-  async getUser(): Promise<boolean> {
-    return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
   }
 }
 
@@ -888,7 +606,7 @@ export class TinaCMSSearchClient implements SearchClient {
     )
     const opt = optionsToSearchIndexOptions(options)
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
-    const res = await this.client.fetchWithToken(
+    const res = await this.client.authProvider.fetchWithToken(
       `${this.client.contentApiBase}/searchIndex/${
         this.client.clientId
       }/${this.client.getBranch()}?q=${JSON.stringify(q)}${optionsParam}`
@@ -897,7 +615,7 @@ export class TinaCMSSearchClient implements SearchClient {
   }
 
   async del(ids: string[]): Promise<any> {
-    const res = await this.client.fetchWithToken(
+    const res = await this.client.authProvider.fetchWithToken(
       `${this.client.contentApiBase}/searchIndex/${
         this.client.clientId
       }/${this.client.getBranch()}?ids=${ids.join(',')}`,
@@ -912,7 +630,7 @@ export class TinaCMSSearchClient implements SearchClient {
 
   async put(docs: any[]): Promise<any> {
     // TODO should only be called if search is enabled and supportsClientSideIndexing is true
-    const res = await this.client.fetchWithToken(
+    const res = await this.client.authProvider.fetchWithToken(
       `${this.client.contentApiBase}/searchIndex/${
         this.client.clientId
       }/${this.client.getBranch()}`,
@@ -951,7 +669,7 @@ export class LocalSearchClient implements SearchClient {
     const q = queryToSearchIndexQuery(query)
     const opt = optionsToSearchIndexOptions(options)
     const optionsParam = opt['PAGE'] ? `&options=${JSON.stringify(opt)}` : ''
-    const res = await this.client.fetchWithToken(
+    const res = await this.client.authProvider.fetchWithToken(
       `http://localhost:4001/searchIndex?q=${JSON.stringify(q)}${optionsParam}`
     )
     return parseSearchIndexResponse(await res.json(), options)

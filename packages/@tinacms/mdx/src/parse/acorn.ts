@@ -1,8 +1,3 @@
-/**
-
-
-
-*/
 import type {
   MdxJsxAttribute,
   MdxJsxAttributeValueExpression,
@@ -92,7 +87,6 @@ const extractAttribute = (
         return {}
       }
     default:
-      // @ts-expect-error
       throw new Error(`Extract attribute: Unhandled field type ${field.type}`)
   }
 }

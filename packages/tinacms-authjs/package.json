@@ -1,0 +1,52 @@
+{
+  "name": "tinacms-authjs",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "files": [
+    "dist"
+  ],
+  "typings": "dist/index.d.ts",
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node"
+      },
+      "src/tinacms.ts"
+    ]
+  },
+  "scripts": {
+    "types": "pnpm tsc",
+    "build": "tinacms-scripts build",
+    "run-self-script": "node bin/tinacms-authjs setup"
+  },
+  "dependencies": {
+    "@tinacms/schema-tools": "workspace:*"
+  },
+  "devDependencies": {
+    "@tinacms/datalayer": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
+    "next": "12.3.4",
+    "next-auth": "4.22.1",
+    "react": "^18",
+    "react-dom": "^18",
+    "tinacms": "workspace:*",
+    "typescript": "4.3.5"
+  },
+  "peerDependencies": {
+    "next": "^12.2.5 || ^13",
+    "next-auth": "^4.22.1",
+    "react": "^17.0.2 || ^18",
+    "react-dom": "^17.0.2 || ^18",
+    "tinacms": "workspace:*"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/next-auth"
+  }
+}

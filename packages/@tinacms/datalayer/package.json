@@ -3,14 +3,22 @@
   "version": "1.2.28",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/index",
   "files": [
     "package.json",
     "dist"
   ],
   "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.js"
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./dist/*":{
+      "import": "./dist/*.mjs",
+      "require": "./dist/*.js",
+      "types": "./dist/*.d.ts"
+    }
   },
   "license": "SEE LICENSE IN LICENSE",
   "buildConfig": {

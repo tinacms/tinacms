@@ -1,0 +1,42 @@
+{
+  "name": "tinacms-gitprovider-github",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "files": [
+    "dist"
+  ],
+  "typings": "dist/index.d.ts",
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node"
+      }
+    ]
+  },
+  "scripts": {
+    "types": "pnpm tsc",
+    "build": "tinacms-scripts build"
+  },
+  "dependencies": {
+    "@octokit/rest": "^19.0.7",
+    "js-base64": "^3.7.4"
+  },
+  "devDependencies": {
+    "@tinacms/datalayer": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
+    "@types/node": "^13.13.1"
+  },
+  "peerDependencies": {
+    "@tinacms/datalayer": "workspace:*"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/next-tinacms-dos"
+  }
+}

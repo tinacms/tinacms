@@ -18,6 +18,7 @@ import { ConfigManager } from '../config-manager'
 /**
  * Base Command for Dev and build
  */
+
 export abstract class BaseCommand extends Command {
   experimentalDataLayer = Option.Boolean('--experimentalData', {
     description:

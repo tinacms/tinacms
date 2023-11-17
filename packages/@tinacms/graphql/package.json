@@ -55,6 +55,7 @@
     "micromatch": "4.0.5",
     "normalize-path": "^3.0.0",
     "readable-stream": "^4.3.0",
+    "scmp": "^2.1.0",
     "yup": "^0.32.9"
   },
   "publishConfig": {
