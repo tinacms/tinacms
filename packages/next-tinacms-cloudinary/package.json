@@ -22,7 +22,7 @@
     "build": "tinacms-scripts build"
   },
   "dependencies": {
-    "cloudinary": "1.37.2",
+    "cloudinary": "^1.41.0",
     "multer": "1.4.5-lts.1"
   },
   "devDependencies": {
