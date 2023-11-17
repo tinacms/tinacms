@@ -34,9 +34,6 @@ const customAuthProvider = {
 }
 export default defineConfig({
   // contentApiUrlOverride: '/api/gql',
-  admin: {
-    auth: customAuthProvider,
-  },
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',
@@ -55,6 +52,7 @@ export default defineConfig({
   branch: null,
   clientId: null,
   token: null,
+  authProvider: customAuthProvider,
   schema: {
     collections: [
       {
