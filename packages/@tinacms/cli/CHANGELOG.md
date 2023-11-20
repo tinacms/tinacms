@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 1.5.34
+
+### Patch Changes
+
+- 39ce3a5ac: Fix the name of the read only token in the init process
+
 ## 1.5.33
 
 ### Patch Changes
