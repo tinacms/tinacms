@@ -32,7 +32,7 @@ export const askTinaCloudSetup = async ({ config }: { config: Config }) => {
       value: clientId,
     },
     {
-      key: 'NEXT_PUBLIC_TINA_CLIENT_SECRET',
+      key: 'TINA_TOKEN',
       value: token,
     }
   )
