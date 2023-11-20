@@ -3,7 +3,8 @@
 */
 
 import * as yup from 'yup'
-import toml from '@iarna/toml'
+import parseToml from '@iarna/toml/parse-string'
+import stringifyToml from '@iarna/toml/stringify'
 import yaml from 'js-yaml'
 import matter from 'gray-matter'
 import {
@@ -23,8 +24,8 @@ export { normalizePath }
 
 const matterEngines = {
   toml: {
-    parse: (val) => toml.parse(val),
-    stringify: (val) => toml.stringify(val),
+    parse: (val) => parseToml(val),
+    stringify: (val) => stringifyToml(val),
   },
 }
 
@@ -79,7 +80,7 @@ export const stringifyFile = (
     case '.yml':
       return yaml.safeDump(strippedContent)
     case '.toml':
-      return toml.stringify(strippedContent as any)
+      return stringifyToml(strippedContent as any)
     default:
       throw new Error(`Must specify a valid format, got ${format}`)
   }
@@ -119,7 +120,7 @@ export const parseFile = <T extends object>(
         if (!content) {
           return {} as T
         }
-        return toml.parse(content) as T
+        return parseToml(content) as T
       case '.yaml':
       case '.yml':
         if (!content) {
