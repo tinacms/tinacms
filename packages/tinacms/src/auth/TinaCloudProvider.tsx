@@ -133,10 +133,14 @@ export const AuthWallInner = ({
       })
     : []
 
-  const handleAuthenticate = async () => {
+  const handleAuthenticate = async (
+    loginScreenProps?: Record<string, string>
+  ) => {
     try {
       setAuthenticated(false)
-      const token = await client.authProvider.authenticate(authProps)
+      const token = await client.authProvider.authenticate(
+        loginScreenProps || authProps
+      )
       if (typeof client?.onLogin === 'function') {
         await client?.onLogin({ token })
       }
@@ -300,7 +304,10 @@ export const AuthWallInner = ({
       {showChildren
         ? children
         : loginScreen
-        ? loginScreen({ handleAuthenticate })
+        ? loginScreen({
+            handleAuthenticate: async (props: Record<string, string>) =>
+              handleAuthenticate(props),
+          })
         : null}
     </>
   )
