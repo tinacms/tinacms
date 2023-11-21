@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.4.30
+
+### Patch Changes
+
+- 476b9dfbe: Fixes https://github.com/tinacms/tinacms/issues/4355
+
 ## 1.4.29
 
 ### Patch Changes
