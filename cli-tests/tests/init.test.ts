@@ -225,7 +225,7 @@ describe('backend', () => {
       }
 
       await p.waitForCompletion(
-        'You can now run your build command and deploy your site.'
+        'Make sure  to push tina-lock.json to your GitHub repo'
       )
 
       const generatedFiles = makeGeneratedFilesList(framework, false, {

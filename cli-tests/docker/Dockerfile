@@ -2,7 +2,7 @@ FROM amazon/aws-lambda-nodejs:16
 
 WORKDIR /starters
 
-ENV TINAVERSION=0.0.0-20231024174613
+ENV TINAVERSION=0.0.0-20231120150403
 ENV NEXTVERSION=13.5.6
 
 RUN yum groupinstall -y 'Development Tools'

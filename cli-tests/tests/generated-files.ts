@@ -44,9 +44,6 @@ const databaseTs: GeneratedFileType = {
   ) => {
     const content = await loadFile(path, env)
     if (opts?.databaseAdapter === 'redis') {
-      if (content.indexOf('@upstash/redis') === -1) {
-        return 'databaseAdapter configured with upstash-redis but missing @upstash/redis import'
-      }
       if (content.indexOf('upstash-redis-level') === -1) {
         return 'databaseAdapter configured with upstash-redis but missing upstash-redis-level import'
       }
@@ -110,9 +107,6 @@ const packageJson: GeneratedFileType = {
     }
     if (opts?.selfHosted) {
       if (opts?.databaseAdapter === 'redis') {
-        if (!dependencies.includes('@upstash/redis')) {
-          return 'missing @upstash/redis dependency'
-        }
         if (!dependencies.includes('upstash-redis-level')) {
           return 'missing upstash-redis-level dependency'
         }
