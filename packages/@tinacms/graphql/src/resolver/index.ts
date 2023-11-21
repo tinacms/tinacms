@@ -972,7 +972,7 @@ export class Resolver {
       if (Array.isArray(fieldValue)) {
         if (fieldValue.length === 0) {
           accum[fieldName] = []
-          return
+          break
         }
       }
       const field = template.fields.find((field) => field.name === fieldName)
