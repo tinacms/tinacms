@@ -442,7 +442,7 @@ type TokenObject = {
 
 export type LoginStrategy = 'UsernamePassword' | 'Redirect' | 'LoginScreen'
 
-type LoginScreenProps = {
+export type LoginScreenProps = {
   handleAuthenticate: (props?: Record<string, string>) => Promise<void>
 }
 
