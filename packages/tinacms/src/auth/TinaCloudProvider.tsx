@@ -57,6 +57,11 @@ export const AuthWallInner = ({
     !client.isLocalMode && !client.schema?.config?.config?.contentApiUrlOverride
   const loginStrategy = client.authProvider.getLoginStrategy()
   const loginScreen = client.authProvider.getLoginScreen()
+  if (loginStrategy === 'LoginScreen' && !loginScreen) {
+    throw new Error(
+      'LoginScreen is set as the login strategy but no login screen component was provided'
+    )
+  }
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [errorMessage, setErrorMessage] = useState<
@@ -303,7 +308,8 @@ export const AuthWallInner = ({
       )}
       {showChildren
         ? children
-        : loginScreen
+        : client.authProvider?.getLoginStrategy() === 'LoginScreen' &&
+          loginScreen
         ? loginScreen({
             handleAuthenticate: async (props: Record<string, string>) =>
               handleAuthenticate(props),
