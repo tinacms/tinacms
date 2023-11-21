@@ -1,5 +1,11 @@
 # tinacms-clerk
 
+## 1.0.1
+
+### Patch Changes
+
+- tinacms@1.5.25
+
 ## 1.0.0
 
 ### Major Changes

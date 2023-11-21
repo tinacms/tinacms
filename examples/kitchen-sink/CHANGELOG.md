@@ -1,5 +1,12 @@
 # e2e-next
 
+## 0.1.56
+
+### Patch Changes
+
+- @tinacms/datalayer@1.2.30
+- tinacms@1.5.25
+
 ## 0.1.55
 
 ### Patch Changes
