@@ -683,7 +683,7 @@ const CollectionListPage = () => {
                                       </a>
                                     </td>
                                     {hasTitle && (
-                                      <td className="px-3 py-3 truncate max-w-0">
+                                      <td className="px-3 py-3 truncate max-w-0 lg:table-cell hidden">
                                         <span className="block text-xs text-gray-400 mb-1 uppercase">
                                           Filename
                                         </span>
@@ -699,7 +699,7 @@ const CollectionListPage = () => {
                                         </span>
                                       </td>
                                     )}
-                                    <td className="px-3 py-3 truncate w-[15%]">
+                                    <td className="px-3 py-3 truncate w-[15%] lg:table-cell hidden">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
                                         Extension
                                       </span>
@@ -707,7 +707,7 @@ const CollectionListPage = () => {
                                         {document.node._sys.extension}
                                       </span>
                                     </td>
-                                    <td className="px-3 py-3 truncate w-[15%]">
+                                    <td className="px-3 py-3 truncate w-[15%] lg:table-cell hidden">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
                                         Template
                                       </span>
