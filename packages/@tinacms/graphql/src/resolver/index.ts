@@ -631,10 +631,12 @@ export class Resolver {
         '_relativePath',
         '_id',
       ]
+      // ignore reserved keys
       if (reservedKeys.includes(key)) {
         return
       }
-      if (oldDoc._template) {
+      // if we have a template key and templates in the collection
+      if (oldDoc._template && collection.templates) {
         const template = collection.templates?.find(
           ({ name }) => name === oldDoc._template
         )
@@ -643,7 +645,9 @@ export class Resolver {
             legacyValues[key] = value
           }
         }
-      } else {
+      }
+      // if we have a collection key and fields in the collection
+      if (oldDoc._collection && collection.fields) {
         if (!collection.fields.find(({ name }) => name === key)) {
           legacyValues[key] = value
         }
