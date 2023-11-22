@@ -9,6 +9,7 @@ import {
 } from './media'
 import { CMS } from './cms'
 import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@toolkit/components/media/utils'
+import type { Client } from '../../internalClient'
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/
 
@@ -56,7 +57,7 @@ export class TinaMediaStore implements MediaStore {
     return fetch(input, init)
   }
 
-  private api: any
+  private api: Client
   private cms: CMS
   private isLocal: boolean
   private url: string
@@ -81,6 +82,8 @@ export class TinaMediaStore implements MediaStore {
         const contentApiUrl = new URL(this.api.contentApiUrl)
         this.url = `${contentApiUrl.origin}/media`
         if (!this.isLocal) {
+          // TODO: type options
+          // @ts-ignore
           if (this.api.options?.tinaioConfig?.assetsApiUrlOverride) {
             const url = new URL(this.api.assetsApiUrl)
             this.url = `${url.origin}/v1/${this.api.clientId}`
@@ -97,7 +100,7 @@ export class TinaMediaStore implements MediaStore {
 
   async isAuthenticated() {
     this.setup()
-    return await this.api.isAuthenticated()
+    return await this.api.authProvider.isAuthenticated()
   }
 
   accept = DEFAULT_MEDIA_UPLOAD_TYPES
@@ -116,7 +119,7 @@ export class TinaMediaStore implements MediaStore {
             ? `${directory}/${item.file.name}`
             : item.file.name
         }`
-        const res = await this.api.fetchWithToken(
+        const res = await this.api.authProvider.fetchWithToken(
           `${this.url}/upload_url/${path}`,
           { method: 'GET' }
         )
@@ -311,7 +314,7 @@ export class TinaMediaStore implements MediaStore {
     let res
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
-        res = await this.api.fetchWithToken(
+        res = await this.api.authProvider.fetchWithToken(
           `${this.url}/list/${options.directory || ''}?limit=${
             options.limit || 20
           }${options.offset ? `&cursor=${options.offset}` : ''}`
@@ -387,7 +390,7 @@ export class TinaMediaStore implements MediaStore {
     }`
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
-        await this.api.fetchWithToken(`${this.url}/${path}`, {
+        await this.api.authProvider.fetchWithToken(`${this.url}/${path}`, {
           method: 'DELETE',
         })
       } else {
