@@ -17,13 +17,15 @@ export const BaseTextField = React.forwardRef<
   React.ComponentProps<'input'>
 >(({ className, disabled, ...rest }, ref) => {
   return (
-    <input
-      ref={ref}
-      type="text"
-      className={`${textFieldClasses} ${
-        disabled ? disabledClasses : ''
-      } ${className}`}
-      {...rest}
-    />
+    <div className="w-full">
+      <input
+        ref={ref}
+        type="text"
+        className={`${textFieldClasses} ${
+          disabled ? disabledClasses : ''
+        } ${className}`}
+        {...rest}
+      />
+    </div>
   )
 })
