@@ -1,5 +1,12 @@
 # tinacms-clerk
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [9e1a22a53]
+  - tinacms@1.5.26
+
 ## 1.0.1
 
 ### Patch Changes
