@@ -1,5 +1,11 @@
 # tinacms
 
+## 1.5.26
+
+### Patch Changes
+
+- 9e1a22a53: Fix media store auth functions
+
 ## 1.5.25
 
 ### Patch Changes
