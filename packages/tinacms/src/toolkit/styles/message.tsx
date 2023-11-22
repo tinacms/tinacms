@@ -66,7 +66,7 @@ export const Message = ({
     <div
       className={`rounded-lg border shadow-sm ${sizeClasses[size]} ${containerClasses[type]} ${className}`}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <MessageIcon
           type={type}
           className={`${
