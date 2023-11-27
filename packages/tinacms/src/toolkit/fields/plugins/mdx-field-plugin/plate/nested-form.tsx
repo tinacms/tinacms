@@ -17,6 +17,7 @@ export const NestedForm = (props: {
   const form = React.useMemo(() => {
     return new Form({
       ...props,
+      relativePath: props.id,
       id,
       onChange: ({ values }) => {
         props.onChange(values)

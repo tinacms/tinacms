@@ -13,6 +13,7 @@ import type { PlateEditor } from '@udecode/plate-headless'
 import type { MdxTemplate } from '../../../types'
 import { insertImg } from '../../create-img-plugin'
 import { useCMS } from '@toolkit/react-core'
+import { Form } from '@toolkit/forms'
 
 export type ToolbarItemType = {
   label: string
@@ -24,6 +25,7 @@ export type ToolbarItemType = {
   icon?: string
   options?: {}[]
   isLastItem?: boolean
+  tinaForm: Form
 }
 
 export const ToolbarItem = ({
@@ -35,6 +37,7 @@ export const ToolbarItem = ({
   options,
   name,
   isLastItem = false,
+  tinaForm,
 }: ToolbarItemType) => {
   const editor = useEditorState()!
   const [selection, setSelection] = React.useState(null)
@@ -151,6 +154,7 @@ export const ToolbarItem = ({
 
         {isExpanded && (
           <LinkForm
+            id={tinaForm.id}
             selection={selection}
             onClose={() => {
               setIsExpanded(false)
