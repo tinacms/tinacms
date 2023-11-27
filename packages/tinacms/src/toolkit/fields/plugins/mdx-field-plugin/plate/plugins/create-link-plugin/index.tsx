@@ -103,7 +103,7 @@ export const LinkForm = (props) => {
 
   return (
     <NestedForm
-      id="link-form"
+      id={props.id}
       label="Link"
       fields={[
         { label: 'URL', name: 'url', component: 'text' },

@@ -32,6 +32,7 @@ import { ELEMENT_IMG } from '../../create-img-plugin'
 import type { MdxTemplate } from '../../../types'
 import { useEditorContext } from '../../../editor-context'
 import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block'
+import type { Form } from '@toolkit/forms'
 
 const headers = [
   {
@@ -67,7 +68,9 @@ const EMBED_ICON_WIDTH = 85
 
 export function Toolbar({
   templates,
+  tinaForm,
 }: {
+  tinaForm: Form
   inlineOnly: boolean
   templates: MdxTemplate[]
 }) {
@@ -87,6 +90,7 @@ export function Toolbar({
 
   const toolbarItems: ToolbarItemType[] = [
     {
+      tinaForm,
       name: 'heading',
       label: 'Heading',
       active: false,
@@ -107,16 +111,19 @@ export function Toolbar({
       )),
     },
     {
+      tinaForm,
       name: 'link',
       label: 'Link',
       active: isLinkActive,
     },
     {
+      tinaForm,
       name: 'image',
       label: 'Image',
       active: isImgActive,
     },
     {
+      tinaForm,
       name: 'quote',
       label: 'Quote',
       active: blockQuoteActive,
@@ -127,6 +134,7 @@ export function Toolbar({
       },
     },
     {
+      tinaForm,
       name: 'ul',
       label: 'Bullet List',
       active: ulActive,
@@ -137,6 +145,7 @@ export function Toolbar({
       },
     },
     {
+      tinaForm,
       name: 'ol',
       label: 'List',
       active: olActive,
@@ -147,6 +156,7 @@ export function Toolbar({
       },
     },
     {
+      tinaForm,
       name: 'code',
       label: 'Code',
       active: isCodeActive,
@@ -157,6 +167,7 @@ export function Toolbar({
       },
     },
     {
+      tinaForm,
       name: 'codeBlock',
       label: 'Code Block',
       active: codeBlockActive,
@@ -167,6 +178,7 @@ export function Toolbar({
       },
     },
     {
+      tinaForm,
       name: 'bold',
       label: 'Bold',
       active: isBoldActive,
@@ -177,6 +189,7 @@ export function Toolbar({
       },
     },
     {
+      tinaForm,
       name: 'italic',
       label: 'Italic',
       active: isItalicActive,
@@ -187,6 +200,7 @@ export function Toolbar({
       },
     },
     {
+      tinaForm,
       name: 'raw',
       label: 'Raw',
       active: false,
@@ -241,6 +255,7 @@ export function Toolbar({
               } else {
                 return (
                   <ToolbarItem
+                    tinaForm={tinaForm}
                     key={toolbarItem.name}
                     name={toolbarItem.name}
                     hidden={hidden}
@@ -256,6 +271,7 @@ export function Toolbar({
             } else {
               return (
                 <ToolbarItem
+                  tinaForm={tinaForm}
                   key={toolbarItem.name}
                   name={toolbarItem.name}
                   hidden={hidden}
@@ -278,12 +294,14 @@ export function Toolbar({
 
 export const FloatingToolbar = ({
   templates,
+  tinaForm,
 }: {
+  tinaForm: Form
   templates: MdxTemplate[]
 }) => {
   return (
     <FloatingToolbarWrapper>
-      <Toolbar templates={templates} inlineOnly={true} />
+      <Toolbar tinaForm={tinaForm} templates={templates} inlineOnly={true} />
     </FloatingToolbarWrapper>
   )
 }

@@ -83,9 +83,16 @@ export const RichEditor = (props: RichTextType) => {
         firstChildren={
           <>
             {withToolbar ? (
-              <Toolbar templates={props.field.templates} inlineOnly={false} />
+              <Toolbar
+                tinaForm={props.tinaForm}
+                templates={props.field.templates}
+                inlineOnly={false}
+              />
             ) : (
-              <FloatingToolbar templates={props.field.templates} />
+              <FloatingToolbar
+                tinaForm={props.tinaForm}
+                templates={props.field.templates}
+              />
             )}
             <FloatingLink />
           </>
