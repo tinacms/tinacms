@@ -721,6 +721,7 @@ export class Database {
   public clearCache() {
     this.tinaSchema = null
     this._lookup = null
+    this.collectionIndexDefinitions = null
   }
 
   public flush = async (filepath: string) => {
