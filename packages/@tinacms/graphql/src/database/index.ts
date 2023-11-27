@@ -734,7 +734,9 @@ export class Database {
     return this.stringifyFile(filepath, dataFields, collection)
   }
 
-  public getLookup = async (returnType: string): Promise<LookupMapType> => {
+  public getLookup = async (
+    returnType?: string
+  ): Promise<LookupMapType | Record<string, LookupMapType>> => {
     await this.initLevel()
     const lookupPath = normalizePath(
       path.join(this.getGeneratedFolder(), `_lookup.json`)
@@ -749,7 +751,7 @@ export class Database {
         )
         .get(lookupPath)
     }
-    return this._lookup[returnType]
+    return returnType ? this._lookup[returnType] : this._lookup
   }
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
     await this.initLevel()
