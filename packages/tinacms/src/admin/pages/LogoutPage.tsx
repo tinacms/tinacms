@@ -21,6 +21,7 @@ export const LogoutRedirect = () => {
       // TODO: what to do with onLogout?
       if (cms?.api?.tina?.onLogout) {
         await cms?.api?.tina?.onLogout()
+        await new Promise((resolve) => setTimeout(resolve, 500))
       }
     }
     setEdit(false)
