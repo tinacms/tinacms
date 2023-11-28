@@ -159,6 +159,9 @@ export const Nav = ({
                               await cms.api.tina?.authProvider.logout()
                               if (cms?.api?.tina?.onLogout) {
                                 await cms?.api?.tina?.onLogout()
+                                await new Promise((resolve) =>
+                                  setTimeout(resolve, 500)
+                                )
                               }
                               window.location.href = new URL(
                                 window.location.href

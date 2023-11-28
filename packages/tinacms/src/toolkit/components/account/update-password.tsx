@@ -56,6 +56,7 @@ export function UpdatePassword(props: {}) {
         .then(async () => {
           if (typeof client?.onLogout === 'function') {
             await client.onLogout()
+            await new Promise((resolve) => setTimeout(resolve, 500))
           }
           window.location.href = new URL(window.location.href).pathname
         })
