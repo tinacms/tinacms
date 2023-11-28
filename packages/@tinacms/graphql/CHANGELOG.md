@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 1.4.31
+
+### Patch Changes
+
+- 7779cdbf6: Fix resolveLegacyValues Logic
+- 031ce05c2: Clear collectionIndexDefinitions on server restart
+- Updated dependencies [64f8fa038]
+  - @tinacms/schema-tools@1.4.15
+  - @tinacms/mdx@1.3.23
+
 ## 1.4.30
 
 ### Patch Changes
