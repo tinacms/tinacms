@@ -1,5 +1,18 @@
 # tinacms
 
+## 1.5.27
+
+### Patch Changes
+
+- 4202c1028: Add support link in sidebar
+- 64f8fa038: This extends the existing `LoginStrategy` type to include a new `LoginScreen` option. A `getLoginScreen` function can be set on the AuthProvider to display a custom login screen, rather than showing the modal popups and forcing a redirect or displaying the default username and password form. This will hopefully simplify the process of creating custom auth providers and handling user authentication when self-hosting.
+- 548fe6d96: Fixes https://github.com/tinacms/tinacms/issues/4356
+- 50b20f809: Fix issue where the link form would not render.
+- Updated dependencies [64f8fa038]
+  - @tinacms/schema-tools@1.4.15
+  - @tinacms/search@1.0.16
+  - @tinacms/mdx@1.3.23
+
 ## 1.5.26
 
 ### Patch Changes
