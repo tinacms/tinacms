@@ -25,6 +25,7 @@ import { formifyCallback } from './hooks/use-graphql-forms'
 
 import { RichTextTemplate, validateSchema } from '@tinacms/schema-tools'
 export { NAMER, resolveField } from '@tinacms/schema-tools'
+export type { LoginScreenProps, LoginStrategy } from '@tinacms/schema-tools'
 
 import {
   TinaSchema,

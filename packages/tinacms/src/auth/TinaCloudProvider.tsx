@@ -37,7 +37,6 @@ export interface TinaCloudMediaStoreClass {
 export interface TinaCloudAuthWallProps {
   cms?: TinaCMS
   children: React.ReactNode
-  loginScreen?: React.ReactNode
   tinaioConfig?: TinaIOConfig
   getModalActions?: (args: {
     closeModal: () => void
@@ -50,7 +49,6 @@ export interface TinaCloudAuthWallProps {
 export const AuthWallInner = ({
   children,
   cms,
-  loginScreen,
   getModalActions,
 }: TinaCloudAuthWallProps) => {
   const client: Client = cms.api.tina
@@ -58,6 +56,12 @@ export const AuthWallInner = ({
   const isTinaCloud =
     !client.isLocalMode && !client.schema?.config?.config?.contentApiUrlOverride
   const loginStrategy = client.authProvider.getLoginStrategy()
+  const loginScreen = client.authProvider.getLoginScreen()
+  if (loginStrategy === 'LoginScreen' && !loginScreen) {
+    throw new Error(
+      'LoginScreen is set as the login strategy but no login screen component was provided'
+    )
+  }
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [errorMessage, setErrorMessage] = useState<
@@ -134,10 +138,14 @@ export const AuthWallInner = ({
       })
     : []
 
-  const handleAuthenticate = async () => {
+  const handleAuthenticate = async (
+    loginScreenProps?: Record<string, string>
+  ) => {
     try {
       setAuthenticated(false)
-      const token = await client.authProvider.authenticate(authProps)
+      const token = await client.authProvider.authenticate(
+        loginScreenProps || authProps
+      )
       if (typeof client?.onLogin === 'function') {
         await client?.onLogin({ token })
       }
@@ -299,7 +307,15 @@ export const AuthWallInner = ({
           ]}
         />
       )}
-      {showChildren ? children : loginScreen ? loginScreen : null}
+      {showChildren
+        ? children
+        : client.authProvider?.getLoginStrategy() === 'LoginScreen' &&
+          loginScreen
+        ? loginScreen({
+            handleAuthenticate: async (props: Record<string, string>) =>
+              handleAuthenticate(props),
+          })
+        : null}
     </>
   )
 }
