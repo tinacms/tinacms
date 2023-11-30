@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 4.4.5
+
+### Patch Changes
+
+- tinacms@1.5.28
+
 ## 4.4.4
 
 ### Patch Changes
