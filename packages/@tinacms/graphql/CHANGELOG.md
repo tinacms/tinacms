@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.4.32
+
+### Patch Changes
+
+- 1e5c94f05: Fix issue where items after an empty list would not be saved.
+
 ## 1.4.31
 
 ### Patch Changes
