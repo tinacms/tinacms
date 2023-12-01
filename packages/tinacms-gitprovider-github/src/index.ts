@@ -2,6 +2,9 @@ import { Octokit } from '@octokit/rest'
 import { Base64 } from 'js-base64'
 import type { GitProvider } from '@tinacms/datalayer'
 
+export { GitHubBridge } from './GitHubBridge'
+export type { SystemFiles } from './GitHubBridge'
+
 type OctokitOptions = ConstructorParameters<typeof Octokit>[0]
 export interface GitHubProviderOptions {
   owner: string

@@ -17,6 +17,7 @@ export type {
   DatabaseArgs,
   GitProvider,
   CreateDatabase,
+  LookupMapType,
 } from './database'
 export {
   Database,
