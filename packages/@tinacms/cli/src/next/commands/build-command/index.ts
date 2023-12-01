@@ -151,7 +151,13 @@ export class BuildCommand extends BaseCommand {
       this.skipCloudChecks || configManager.hasSelfHostedConfig()
 
     if (!skipCloudChecks) {
-      await this.checkClientInfo(configManager, codegen.productionUrl)
+      const { hasUpstream } = await this.checkClientInfo(
+        configManager,
+        codegen.productionUrl
+      )
+      if (hasUpstream) {
+        await this.syncUpstreamProject(configManager, codegen.productionUrl)
+      }
       await waitForDB(configManager.config, codegen.productionUrl, false)
       await this.checkGraphqlSchema(
         configManager,
@@ -283,7 +289,10 @@ export class BuildCommand extends BaseCommand {
     }
   }
 
-  async checkClientInfo(configManager: ConfigManager, apiURL: string) {
+  async checkClientInfo(
+    configManager: ConfigManager,
+    apiURL: string
+  ): Promise<{ hasUpstream: boolean }> {
     const { config } = configManager
     const token = config.token
     const { clientId, branch, host } = parseURL(apiURL)
@@ -293,6 +302,7 @@ export class BuildCommand extends BaseCommand {
 
     // Check the client information
     let branchKnown = false
+    let hasUpstream = false
     try {
       const res = await request({
         token,
@@ -303,6 +313,9 @@ export class BuildCommand extends BaseCommand {
       })
       if (!(res.status === 'unknown')) {
         branchKnown = true
+      }
+      if (res.hasUpstream) {
+        hasUpstream = true
       }
     } catch (e) {
       summary({
@@ -315,6 +328,10 @@ export class BuildCommand extends BaseCommand {
               {
                 key: 'clientId',
                 value: config.clientId,
+              },
+              {
+                key: 'branch',
+                value: config.branch,
               },
               {
                 key: 'token',
@@ -334,7 +351,9 @@ export class BuildCommand extends BaseCommand {
       branchBar.tick({
         prog: '✅',
       })
-      return
+      return {
+        hasUpstream,
+      }
     }
 
     // We know the branch is status: 'unknown'
@@ -395,6 +414,57 @@ export class BuildCommand extends BaseCommand {
       )}`
     )
     throw new Error('Branch is not on Tina Cloud')
+  }
+
+  async syncUpstreamProject(
+    configManager: ConfigManager,
+    apiURL: string
+  ): Promise<void> {
+    const { config } = configManager
+    const token = config.token
+    const { clientId, branch, host } = parseURL(apiURL)
+
+    const url = `https://${host}/db/${clientId}/reset/${branch}?refreshSchema=true&skipIfSchemaCurrent=true`
+    const bar = new Progress('Syncing Upstream Project. :prog', 1)
+
+    try {
+      const res = await request({
+        token,
+        url,
+        method: 'POST',
+      })
+      bar.tick({
+        prog: '✅',
+      })
+      if (res.status === 'success') {
+        return
+      }
+    } catch (e) {
+      summary({
+        heading: 'Error when requesting upstream project sync',
+        items: [
+          {
+            emoji: '❌',
+            heading: 'You provided',
+            subItems: [
+              {
+                key: 'clientId',
+                value: config.clientId,
+              },
+              {
+                key: 'branch',
+                value: config.branch,
+              },
+              {
+                key: 'token',
+                value: config.token,
+              },
+            ],
+          },
+        ],
+      })
+      throw e
+    }
   }
 
   async checkGraphqlSchema(
@@ -471,7 +541,8 @@ export class BuildCommand extends BaseCommand {
 async function request(args: {
   url: string
   token: string
-}): Promise<{ status: string; timestamp: number }> {
+  method?: string
+}): Promise<{ status: string; timestamp: number; hasUpstream: boolean }> {
   const headers = new Headers()
   if (args.token) {
     headers.append('X-API-KEY', args.token)
@@ -481,7 +552,7 @@ async function request(args: {
   const url = args?.url
 
   const res = await fetch(url, {
-    method: 'GET',
+    method: args.method || 'GET',
     headers,
     redirect: 'follow',
   })
@@ -511,7 +582,12 @@ async function request(args: {
   return {
     status: json?.status,
     timestamp: json?.timestamp,
-  } as { status: IndexStatusResponse['status']; timestamp: number }
+    hasUpstream: json?.hasUpstream || false,
+  } as {
+    status: IndexStatusResponse['status']
+    timestamp: number
+    hasUpstream: boolean
+  }
 }
 
 export const fetchRemoteGraphqlSchema = async ({
