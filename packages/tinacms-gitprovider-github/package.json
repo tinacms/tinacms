@@ -21,7 +21,6 @@
     "build": "tinacms-scripts build"
   },
   "dependencies": {
-    "@octokit/auth-app": "^6.0.1",
     "@octokit/rest": "^19.0.7",
     "graphql": "^16.8.1",
     "js-base64": "^3.7.4",
