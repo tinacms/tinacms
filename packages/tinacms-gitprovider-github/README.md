@@ -22,47 +22,37 @@ export default isLocal ? createLocalDatabase() ? createDatabase({
 
 ### Required Options
 
-| Option   | Description                                                                               |
-| -------- | ----------------------------------------------------------------------------------------- |
-| `branch` | The branch to save content to.                                                            |
-| `owner`  | The owner of the repo.                                                                    |
-| `repo`   | The repo to save content to.                                                              |
-| `token`  | A [Github Personal Access Token](https://github.com/settings/personal-access-tokens/new). |
+| Option   | Description                    |
+| -------- | ------------------------------ |
+| `branch` | The branch to save content to. |
+| `owner`  | The owner of the repo.         |
+| `repo`   | The repo to save content to.   |
 
 ### Optional Options
+
+You must either supply a `token` or an alternative authentication strategy via the `octokitOptions`
 
 | Option           | Description                                                                                                                 |
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `commitMessage`  | The commit message to use when saving content. Defaults to `Edited with TinaCMS`.                                           |
 | `rootPath`       | This path will be prefixed to all paths (good for monorepos)                                                                |
+| `token`          | A [Github Personal Access Token](https://github.com/settings/personal-access-tokens/new).                                   |
 | `octokitOptions` | Options passed to the [Octokit constructor ](https://github.com/octokit/octokit.js/blob/main/README.md#constructor-options) |
 
 ## Using the GitHubBridge
 
 - Designed for use in your `.tina/database.ts` or `tina/database.ts` file.
 - **Allows you to use Tina self-hosting in conjunction with separate content repositories**
-- One important caveat is that this approach could lead to GitHub rate limiting errors on certain projects, particularly larger sites with lots of pages/files
-- The ability to pass `systemFiles` to the `GithubBridge` is intended to allow multi-tenant projects where the content repos do not need to contain any Tina folders or files at all. The code repository can pass the necessary Tina system files to the GitHub bridge at built time, and no Tina files need to be committed or tracked in the content repositories. This is particularly useful when multiple content repositories/sites are built from a central code repository
+- One important caveat is that this approach could lead to GitHub rate limiting errors on certain projects, particularly larger sites with lots of pages/files. This could occur given the GitHubBridge makes requests directly to the GitHub API.
+- The ability to pass `tinaFilesConfig` is intended to support multi-tenant projects where the Tina folder lives in the code repository so the content repositories do not need to contain any Tina folders or files at all. In this case the GitHub bridge will defer to the FilesystemBridge to retrieve the auto-generated Tina files, so those files do not need to be committed or tracked in the content repositories. This is particularly useful when multiple content repositories/sites are built from a central code repository.
 
 ```ts
 import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
 import { RedisLevel } from 'upstash-redis-level'
-import {
-  GitHubProvider,
-  GitHubBridge,
-  type SystemFiles,
-} from 'tinacms-gitprovider-github'
+import { GitHubProvider, GitHubBridge } from 'tinacms-gitprovider-github'
 import { createAppAuth } from '@octokit/auth-app'
-// These example imports would be related to your database.ts file
-import graphql from './__generated__/_graphql.json'
-import lookup from './__generated__/_lookup.json'
 
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
-
-const systemFiles: SystemFiles = {
-  _graphql: graphql as SystemFiles['_graphql'],
-  _lookup: lookup as SystemFiles['_lookup'],
-}
 
 const github = {
   owner: 'your-org-or-username',
@@ -73,8 +63,6 @@ const github = {
 const database = isLocal
   ? createLocalDatabase()
   : createDatabase({
-      // You can pass system files to the GitHubBridge on init.
-      // It then fetches all other files from the content repo.
       bridge: isLocal
         ? undefined
         : new GithubBridge({
@@ -83,7 +71,6 @@ const database = isLocal
             branch: github.branch,
             // The rootPath value is particularly useful for mono repos
             // rootPath: 'packages/some-site',
-            systemFiles,
             // Either provide a token or a separate auth strategy like the example below
             // token: 'github-personal-access-token',
             octokitOptions: {
@@ -97,6 +84,11 @@ const database = isLocal
                 // permissions: {}, // Permissions
                 // refresh: true, // boolean
               },
+            },
+            // Optionally find Tina files in the code repo instead of the content repo
+            tinaFilesConfig: {
+              useFilesystemBridge: true,
+              tinaFolderPath: '',
             },
           }),
       // The contentNamespace for files in your site's Redis DB
@@ -149,19 +141,30 @@ export default database
 
 ## GitHubBridge options
 
-**Summary:** Supports all Git Provider Options listed above except for `commitMessage`, and also allows for `systemFiles` to be provided (containing a copy of the local `_graphql.json` and `_lookup.json`)
+**Summary:** Supports all Git Provider Options listed above except for `commitMessage`, and also allows for a `tinaFilesConfig` option to be provided (in order to configure the GitHubBridge to find the Tina files in the local filesystem of the content repository, rather than looking for those in the code repository)
 
-| Option   | Description                                                                               |
-| -------- | ----------------------------------------------------------------------------------------- |
-| `branch` | The branch to save content to.                                                            |
-| `owner`  | The owner of the repo.                                                                    |
-| `repo`   | The repo to save content to.                                                              |
-| `token`  | A [Github Personal Access Token](https://github.com/settings/personal-access-tokens/new). |
+| Option   | Description                    |
+| -------- | ------------------------------ |
+| `branch` | The branch to save content to. |
+| `owner`  | The owner of the repo.         |
+| `repo`   | The repo to save content to.   |
 
 ### Optional Options
 
-| Option           | Description                                                                                                                 |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `rootPath`       | This path will be prefixed to all paths (good for monorepos)                                                                |
-| `systemFiles`    | Pass the local `_graphql.json` and `_lookup.json` (useful to avoid committing Tina files to content repositories)           |
-| `octokitOptions` | Options passed to the [Octokit constructor ](https://github.com/octokit/octokit.js/blob/main/README.md#constructor-options) |
+You must either supply a `token` or an alternative authentication strategy via the `octokitOptions`
+
+| Option            | Description                                                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `rootPath`        | This path will be prefixed to all paths (good for monorepos)                                                                |
+| `token`           | A [Github Personal Access Token](https://github.com/settings/personal-access-tokens/new).                                   |
+| `octokitOptions`  | Options passed to the [Octokit constructor ](https://github.com/octokit/octokit.js/blob/main/README.md#constructor-options) |
+| `tinaFilesConfig` | Can be used to find Tina files in the code repository (useful to avoid committing Tina files to content repositories)       |
+
+### Notes on `tinaFilesConfig`
+
+**IMPORTANT:** If you're using the `tina` folder (rather than the `.tina` folder), then you will need to update your `.gitignore` to explicitly track the `_schema.json`, `_graphql.json` and `_lookup.json` files. Those files don't generally need to be tracked when using the newer `tina` folder naming convention, but you will need them if planning to retrieve those files from the code repository (rather than the content repository) when loading TinaCMS.
+
+The `tinaFilesConfig` option is an object with 2 keys:
+
+- the `useFilesystemBridge` is a boolean you can set to `true` if you would like to find Tina files in the local filesystem of the code repository, rather than retrieving those files from the content repository
+- the `tinaFolderPath` is the path to where the Tina folder resides in the local filesystem of the code repository

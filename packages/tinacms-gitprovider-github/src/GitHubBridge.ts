@@ -2,13 +2,13 @@ import path from 'path'
 import { flatten } from 'lodash-es'
 import { Octokit } from '@octokit/rest'
 import { GraphQLError } from 'graphql'
-import type { DocumentNode } from 'graphql'
-import type { Bridge, LookupMapType } from '@tinacms/graphql'
+import { FilesystemBridge } from '@tinacms/graphql'
+import type { Bridge } from '@tinacms/graphql'
 import type { GitHubProviderOptions } from './index'
 
 /**
- * NOTE: you can use a GitHub app rather than a personal token
- * using a version of the example code belowe
+ * NOTE: you can use GitHub App authentication instead of a
+ * personal access token following the code example below:
  */
 // import { createAppAuth } from '@octokit/auth-app'
 // const octokitOptions = {
@@ -24,41 +24,41 @@ import type { GitHubProviderOptions } from './index'
 //   },
 // }
 
-export type SystemFiles = {
-  // _schema: string
-  _graphql: DocumentNode
-  _lookup: { [returnType: string]: LookupMapType }
+type GitHubBridgeConfig = Omit<GitHubProviderOptions, 'commitMessage'> & {
+  tinaFilesConfig?: {
+    useFilesystemBridge: boolean
+    tinaFolderPath: string
+  }
 }
 
-type GitHubBridgeConfig = GitHubProviderOptions & {
-  systemFiles?: SystemFiles
-}
-
-export class GitHubBridge implements Bridge {
-  public rootPath: string
+export class GitHubBridge extends FilesystemBridge implements Bridge {
   private owner: string
   private repo: string
   private branch: string
+  private contentPath: string
   private octokit: Octokit
-  // private _schema: string | undefined
-  private _graphql: SystemFiles['_graphql'] | undefined
-  private _lookup: SystemFiles['_lookup'] | undefined
+  private useLocalTinaFiles: boolean
 
   constructor({
     owner,
     repo,
     branch,
-    rootPath,
-    systemFiles,
+    rootPath = '',
+    tinaFilesConfig,
     ...args
   }: GitHubBridgeConfig) {
-    this.rootPath = rootPath ?? ''
+    // The tinaFolderPath is used as the rootPath for the FilesystemBridge
+    // (this is useful to retrieve Tina files directly from the code repo)
+    super(tinaFilesConfig?.tinaFolderPath ?? rootPath)
+
+    // Optionally find Tina files in the code repo instead of the content repo
+    this.useLocalTinaFiles = tinaFilesConfig?.useFilesystemBridge ?? false
+
+    // The root path for the content repository
+    this.contentPath = rootPath
     this.owner = owner
     this.repo = repo
     this.branch = branch ?? 'main'
-    // this._schema = systemFiles?._schema
-    this._graphql = systemFiles?._graphql
-    this._lookup = systemFiles?._lookup
     this.octokit = new Octokit({
       auth: args.token,
       ...(args.octokitOptions || {}),
@@ -81,15 +81,14 @@ export class GitHubBridge implements Bridge {
   public async glob(pattern: string, extension: string) {
     const results = await this.readDir(pattern)
     return results.map((item) => {
-      const filepath = item.replace(this.rootPath, '')
+      const filepath = item.replace(this.contentPath, '')
       return this.removeSurroundingSlashes(filepath)
     })
   }
 
   public async get(filepath: string) {
-    if (this.isSystemFile(filepath)) {
-      const systemFile = this.getSystemFile(filepath)
-      if (systemFile) return systemFile
+    if (this.useLocalTinaFiles && this.isSystemFile(filepath)) {
+      return super.get(filepath)
     }
 
     const fullPath = this.buildFullPath(filepath)
@@ -105,14 +104,14 @@ export class GitHubBridge implements Bridge {
           return Buffer.from(response.data.content, 'base64').toString()
         } else {
           throw new Error(
-            `Could not find file at path: ${fullPath} in GitHub Repository: '${this.owner}/${this.repo}'`
+            `Could not find file at path: ${fullPath} in Github Repository: '${this.owner}/${this.repo}'`
           )
         }
       })
       .catch((e) => {
         if (e.status === 401) {
           throw new GraphQLError(
-            `Unauthorized request to GitHub Repository: '${this.owner}/${this.repo}', please ensure your access token is valid.`,
+            `Unauthorized request to Github Repository: '${this.owner}/${this.repo}', please ensure your access token is valid.`,
             null,
             null,
             null,
@@ -122,7 +121,7 @@ export class GitHubBridge implements Bridge {
           )
         }
         throw new GraphQLError(
-          `Unable to find record '${fullPath}' in GitHub Repository: '${this.owner}/${this.repo}', Branch: '${this.branch}'`,
+          `Unable to find record '${fullPath}' in Github Repository: '${this.owner}/${this.repo}', Branch: '${this.branch}'`,
           null,
           null,
           null,
@@ -138,34 +137,18 @@ export class GitHubBridge implements Bridge {
     return filepath.replace(/^\/|\/$/g, '')
   }
 
-  private systemFilenameMatches: Record<keyof SystemFiles, string> = {
-    // // _schema: '/_schema.json',
-    _lookup: '/_lookup.json',
-    _graphql: '/_graphql.json',
-  }
-
   private isSystemFile(filepath: string): boolean {
-    return Object.values(this.systemFilenameMatches).some((filename) =>
-      filepath.endsWith(filename)
-    )
-  }
-
-  private getSystemFile(filepath: string): string | undefined {
-    const filenameMatches = this.systemFilenameMatches
-    switch (true) {
-      // case filepath.endsWith(filenameMatches._schema):
-      //   return JSON.stringify(this._schema)
-      case filepath.endsWith(filenameMatches._lookup):
-        return JSON.stringify(this._lookup)
-      case filepath.endsWith(filenameMatches._graphql):
-        return JSON.stringify(this._graphql)
-      default:
-        return undefined
-    }
+    const systemFileNames = [
+      '/tina-lock.json',
+      '/_schema.json',
+      '/_graphql.json',
+      '/_lookup.json',
+    ]
+    return systemFileNames.some((filename) => filepath.endsWith(filename))
   }
 
   private buildFullPath(filepath: string): string {
-    return this.removeSurroundingSlashes(path.join(this.rootPath, filepath))
+    return this.removeSurroundingSlashes(path.join(this.contentPath, filepath))
   }
 
   private async readDir(filepath: string): Promise<string[]> {
@@ -199,7 +182,7 @@ export class GitHubBridge implements Bridge {
         }
 
         throw new Error(
-          `Expected to return an array from GitHub directory ${path}`
+          `Expected to return an array from Github directory ${path}`
         )
       })
     return flatten(repos)
