@@ -3,6 +3,7 @@ import path from 'path'
 import os from 'os'
 import * as esbuild from 'esbuild'
 import type { Loader } from 'esbuild'
+import type { Plugin } from 'vite'
 import { Config } from '@tinacms/schema-tools'
 import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
@@ -55,6 +56,7 @@ export class ConfigManager {
   spaRootPath: string
   spaMainPath: string
   spaHTMLPath: string
+  vitePlugins?: Array<(configManager: ConfigManager) => Plugin>
   tinaGraphQLVersionFromCLI?: string
   legacyNoSDK?: boolean
   watchList?: string[]
@@ -261,6 +263,7 @@ export class ConfigManager {
     )
     this.spaMainPath = require.resolve('@tinacms/app')
     this.spaRootPath = path.join(this.spaMainPath, '..', '..')
+    this.vitePlugins = this.config.ui?.vitePlugins
     // =================
     // End of paths that depend on the config file
   }
