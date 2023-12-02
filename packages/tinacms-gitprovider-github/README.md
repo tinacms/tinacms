@@ -160,10 +160,6 @@ You must either supply a `token` or an alternative authentication strategy via t
 | `octokitOptions`  | Options passed to the [Octokit constructor ](https://github.com/octokit/octokit.js/blob/main/README.md#constructor-options) |
 | `tinaFilesConfig` | Can be used to find Tina files in the code repository (useful to avoid committing Tina files to content repositories)       |
 
-### Notes on `tinaFilesConfig`
-
-**IMPORTANT:** If you're using the `tina` folder (rather than the `.tina` folder), then you will need to update your `.gitignore` to explicitly track the `_schema.json`, `_graphql.json` and `_lookup.json` files. Those files don't generally need to be tracked when using the newer `tina` folder naming convention, but you will need them if planning to retrieve those files from the code repository (rather than the content repository) when loading TinaCMS.
-
 The `tinaFilesConfig` option is an object with 2 keys:
 
 - the `useFilesystemBridge` is a boolean you can set to `true` if you would like to find Tina files in the local filesystem of the code repository, rather than retrieving those files from the content repository
