@@ -36,6 +36,11 @@ const supportedDatabaseAdapters: {
         imported: ['MongodbLevel'],
         packageName: 'mongodb-level',
       },
+      {
+        from: 'mongodb',
+        imported: [], // not explicitly imported
+        packageName: 'mongodb',
+      },
     ],
   },
   other: {
