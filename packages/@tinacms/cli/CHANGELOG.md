@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 1.5.39
+
+### Patch Changes
+
+- 0639228c9: Add mongodb to deps when using the mongo adapter
+
 ## 1.5.38
 
 ### Patch Changes
