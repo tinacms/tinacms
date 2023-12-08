@@ -3,21 +3,21 @@
 */
 
 import {
-  _Object,
-  S3Client,
-  S3ClientConfig,
+  DeleteObjectCommand,
+  DeleteObjectCommandInput,
   ListObjectsCommand,
   ListObjectsCommandInput,
   PutObjectCommand,
   PutObjectCommandInput,
-  DeleteObjectCommand,
-  DeleteObjectCommandInput,
+  S3Client,
+  S3ClientConfig,
+  _Object,
 } from '@aws-sdk/client-s3'
-import { Media, MediaListOptions } from 'tinacms'
-import path from 'path'
 import fs from 'fs'
-import { NextApiRequest, NextApiResponse } from 'next'
 import multer from 'multer'
+import { NextApiRequest, NextApiResponse } from 'next'
+import path from 'path'
+import { Media, MediaListOptions } from 'tinacms'
 import { promisify } from 'util'
 
 export interface S3Config {
@@ -111,6 +111,9 @@ async function uploadMedia(
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const filePath = req.file.path
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const fileType = req.file.type
     const blob = fs.readFileSync(filePath)
     const filename = path.basename(filePath)
     const params: PutObjectCommandInput = {
@@ -120,6 +123,7 @@ async function uploadMedia(
         : prefix + filename,
       Body: blob,
       ACL: 'public-read',
+      ContentType: fileType || 'application/octet-stream',
     }
     const command = new PutObjectCommand(params)
     try {
