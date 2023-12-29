@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { getDirection } from '../field-utils'
 
 type a = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -23,6 +24,7 @@ export const BaseTextField = React.forwardRef<
       className={`${textFieldClasses} ${
         disabled ? disabledClasses : ''
       } ${className}`}
+      dir={getDirection(rest.value)}
       {...rest}
     />
   )
