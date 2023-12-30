@@ -461,7 +461,9 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             }),
           }
         } else {
-          const childrenIndex = namePathIndex + 1
+          const childrenIndex = namePath.findIndex(
+            (value) => value === 'children'
+          )
           // Find the props for the next item, ignoring parent 'props'
           const propsIndex =
             namePath
@@ -471,7 +473,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
           const item = getIn(value, itemName)
           const props = item.props
           const templateString = item.name
-          const currentPathIndex = namePathIndex + 3
+          const currentPathIndex = namePathIndex + Math.max(propsIndex, 3)
           const isLastItem = currentPathIndex + 1 === namePath.length
           const template = field.templates.find(
             (t) => t.name === templateString
@@ -506,7 +508,9 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             }
           }
           if (!isLastItem) {
-            if (currentPathIndex === namePath.length) {
+            // The `propsIndex` is set to 0 when the namePath does NOT include 'props'
+            // e.g. when navigating from a rich-text template back to the parent field
+            if (currentPathIndex === namePath.length || propsIndex === 0) {
               return {
                 ...formOrObjectField,
                 name: namePath.slice(0, namePathIndex).join('.'),
@@ -526,7 +530,8 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
               formOrObjectField: template,
               values: props,
               namePath,
-              namePathIndex: namePathIndex + 4,
+              namePathIndex:
+                namePathIndex + Math.max(4, childrenIndex + propsIndex),
             })
           }
           if (!template) {
