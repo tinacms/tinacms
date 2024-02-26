@@ -1,7 +1,6 @@
 {
   "name": "root",
   "private": true,
-  "version": "1.0.0",
   "workspaces": [
     "packages/@tinacms/*",
     "examples/*",

@@ -50,7 +50,7 @@ jobs:
       - name: Build types
         run: pnpm types
       - name: Publish
-        run: pnpm publish
+        run: pnpm run publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create release pull request
