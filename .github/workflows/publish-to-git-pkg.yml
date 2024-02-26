@@ -18,7 +18,7 @@ jobs:
           registry-url: https://npm.pkg.github.com/
 
       - name: Install dependancies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
       - name: Build
         run: pnpm build
       - name: Build types
@@ -43,7 +43,7 @@ jobs:
           cache: 'pnpm'
           registry-url: https://npm.pkg.github.com/
       - name: Install dependancies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
       - name: Build
         run: pnpm build
       - name: Build types
