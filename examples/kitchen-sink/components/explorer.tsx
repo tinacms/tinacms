@@ -1,6 +1,6 @@
 import React from 'react'
-import type { TinaMarkdownContent } from 'tinacms/dist/rich-text'
-import { tinaField } from 'tinacms/dist/react'
+import type { TinaMarkdownContent } from '@strivemath/tinacms/dist/rich-text'
+import { tinaField } from '@strivemath/tinacms/dist/react'
 
 type RenderValue = (args: {
   value: unknown

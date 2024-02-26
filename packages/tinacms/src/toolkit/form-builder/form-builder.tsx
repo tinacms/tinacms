@@ -22,7 +22,7 @@ import {
 import { BiGitBranch } from 'react-icons/bi'
 import { MdOutlineSaveAlt } from 'react-icons/md'
 import { formatBranchName } from '@toolkit/plugin-branch-switcher'
-import { TinaSchema } from '@tinacms/schema-tools'
+import { TinaSchema } from '@strivemath/tinacms-schema-tools'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }

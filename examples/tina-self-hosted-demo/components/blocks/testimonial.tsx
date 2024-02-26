@@ -1,7 +1,7 @@
 import React from 'react'
 import { Container } from '../util/container'
 import { Section } from '../util/section'
-import type { TinaTemplate } from 'tinacms'
+import type { TinaTemplate } from '@strivemath/tinacms'
 
 export const Testimonial = ({ data, parentField = '' }) => {
   return (

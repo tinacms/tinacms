@@ -1,8 +1,8 @@
-import { staticRequest } from 'tinacms'
+import { staticRequest } from '@strivemath/tinacms'
 import client from '../tina/__generated__/client'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { TinaMarkdown } from '@strivemath/tinacms/dist/rich-text'
 import { Layout } from '../components/Layout'
-import { useTina } from 'tinacms/dist/react'
+import { useTina } from '@strivemath/tinacms/dist/react'
 
 const query = `query PageQuery {
   page(relativePath: "home.mdx"){

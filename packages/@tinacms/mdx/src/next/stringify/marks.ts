@@ -1,7 +1,7 @@
 import { getMarks } from '../../stringify'
 import type * as Md from 'mdast'
 import type * as Plate from '../../parse/plate'
-import type { RichTextField } from '@tinacms/schema-tools'
+import type { RichTextField } from '@strivemath/tinacms-schema-tools'
 import { stringifyPropsInline } from './acorn'
 
 const matches = (a: string[], b: string[]) => {

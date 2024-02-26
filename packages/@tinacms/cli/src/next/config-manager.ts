@@ -3,7 +3,7 @@ import path from 'path'
 import os from 'os'
 import * as esbuild from 'esbuild'
 import type { Loader } from 'esbuild'
-import { Config } from '@tinacms/schema-tools'
+import { Config } from '@strivemath/tinacms-schema-tools'
 import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
 import chalk from 'chalk'
@@ -259,7 +259,7 @@ export class ConfigManager {
       await this.getTinaFolderPath(this.contentRootPath),
       GENERATED_FOLDER
     )
-    this.spaMainPath = require.resolve('@tinacms/app')
+    this.spaMainPath = require.resolve('@strivemath/tinacms-app')
     this.spaRootPath = path.join(this.spaMainPath, '..', '..')
     // =================
     // End of paths that depend on the config file

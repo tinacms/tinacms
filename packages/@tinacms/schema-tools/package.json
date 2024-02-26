@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/schema-tools",
+  "name": "@strivemath/tinacms-schema-tools",
   "version": "1.4.15",
   "main": "dist/index.js",
   "module": "./dist/index.mjs",
@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@types/react": "17.0.2",
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "@types/micromatch": "^4.0.2",
     "@types/yup": "^0.29.10",
     "jest": "^29.5.0",
@@ -44,11 +44,11 @@
     "generate:schema": "yarn node scripts/generateSchema.js"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/@tinacms/cli"
+    "directory": "packages/@strivemath/tinacms-cli"
   },
   "dependencies": {
     "picomatch-browser": "2.2.6",

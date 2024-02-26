@@ -1,4 +1,4 @@
-import { AuthProvider, LoginStrategy } from '@tinacms/schema-tools'
+import { AuthProvider, LoginStrategy } from '@strivemath/tinacms-schema-tools'
 import { authenticate, AUTH_TOKEN_KEY, TokenObject } from '../auth/authenticate'
 import DefaultSessionProvider from '../auth/defaultSessionProvider'
 

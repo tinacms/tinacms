@@ -624,7 +624,7 @@ export interface Config<
          *
          * ```ts
          * loadCustomStore = async () => {
-         *   const pack = await import("next-tinacms-cloudinary");
+         *   const pack = await import("@strivemath/next-tinacms-cloudinary");
          *   return pack.TinaCloudCloudinaryMediaStore;
          * }
          * ```

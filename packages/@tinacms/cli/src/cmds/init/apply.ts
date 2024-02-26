@@ -11,7 +11,7 @@ import {
   logText,
   titleText,
 } from '../../utils/theme'
-import { Telemetry } from '@tinacms/metrics'
+import { Telemetry } from '@strivemath/tinacms-metrics'
 import fs from 'fs-extra'
 import { writeGitignore } from '../../next/commands/codemod-command'
 import { templates as NextTemplates } from './templates/next'
@@ -301,8 +301,8 @@ const addDependencies = async (
 
   // If TinaCMS is already installed, don't add it again
   if (!env.hasTinaDeps) {
-    deps.push('tinacms')
-    devDeps.push('@tinacms/cli')
+    deps.push('@strivemath/tinacms')
+    devDeps.push('@strivemath/tinacms-cli')
   }
 
   if (config.typescript) {
@@ -310,7 +310,7 @@ const addDependencies = async (
   }
 
   if (config.hosting === 'self-host') {
-    deps.push('@tinacms/datalayer')
+    deps.push('@strivemath/tinacms-datalayer')
   }
 
   // Add deps from database adapter, auth provider, and git provider

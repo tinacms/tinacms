@@ -84,7 +84,10 @@ export const run = async (args: { watch?: boolean; dir?: string }) => {
     await fs.readFileSync(path.join(packageDir, 'package.json')).toString()
   )
   if (
-    ['@tinacms/scripts', '@tinacms/webpack-helpers'].includes(packageJSON.name)
+    [
+      '@strivemath/tinacms-scripts',
+      '@strivemath/tinacms-webpack-helpers',
+    ].includes(packageJSON.name)
   ) {
     console.log(`skipping ${packageJSON.name}`)
     return
@@ -210,14 +213,18 @@ export const buildIt = async (entryPoint, packageJSON) => {
 
   const outInfo = out(entry)
 
-  if (['@tinacms/app'].includes(packageJSON.name)) {
-    console.log('skipping @tinacms/app')
+  if (['@strivemath/tinacms-app'].includes(packageJSON.name)) {
+    console.log('skipping @strivemath/tinacms-app')
     return
   }
 
   external.forEach((ext) => (globals[ext] = 'NOOP'))
   if (target === 'node') {
-    if (['@tinacms/graphql', '@tinacms/datalayer'].includes(packageJSON.name)) {
+    if (
+      ['@strivemath/tinacms-graphql', '@strivemath/tinacms-datalayer'].includes(
+        packageJSON.name
+      )
+    ) {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
@@ -246,7 +253,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
           : path.join(process.cwd(), 'dist', 'index.mjs'),
         external,
       })
-    } else if (['@tinacms/mdx'].includes(packageJSON.name)) {
+    } else if (['@strivemath/tinacms-mdx'].includes(packageJSON.name)) {
       const peerDeps = packageJSON.peerDependencies
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],

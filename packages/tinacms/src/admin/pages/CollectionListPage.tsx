@@ -49,7 +49,7 @@ import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
-import type { Collection, TinaField } from '@tinacms/schema-tools'
+import type { Collection, TinaField } from '@strivemath/tinacms-schema-tools'
 import { CollectionFolder, useCollectionFolder } from './utils'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'

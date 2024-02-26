@@ -6,7 +6,7 @@ import {
   PageBlocksFeatures,
   PageBlocksFeaturesItems,
 } from '../../.tina/__generated__/types'
-import { tinaField } from 'tinacms/dist/react'
+import { tinaField } from '@strivemath/tinacms/dist/react'
 
 export const Feature = ({
   featuresColor,

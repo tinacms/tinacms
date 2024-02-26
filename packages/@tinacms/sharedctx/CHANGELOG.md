@@ -1,4 +1,4 @@
-# @tinacms/sharedctx
+# @strivemath/tinacms-sharedctx
 
 ## 1.0.2
 

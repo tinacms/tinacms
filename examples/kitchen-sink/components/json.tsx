@@ -1,1 +1,1 @@
-export { Json } from 'tinacms/dist/dev-tools'
+export { Json } from '@strivemath/tinacms/dist/dev-tools'

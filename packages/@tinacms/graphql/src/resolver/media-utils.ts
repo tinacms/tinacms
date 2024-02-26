@@ -3,7 +3,7 @@
 */
 
 import type { GraphQLConfig } from '../types'
-import type { Schema } from '@tinacms/schema-tools'
+import type { Schema } from '@strivemath/tinacms-schema-tools'
 
 /**
  * Strips away the Tina Cloud Asset URL from an `image` value

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { wrapFieldsWithMeta } from 'tinacms'
+import { wrapFieldsWithMeta } from '@strivemath/tinacms'
 
 export const colorOptions = [
   'blue',

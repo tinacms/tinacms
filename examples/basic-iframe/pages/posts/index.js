@@ -1,7 +1,7 @@
-import { staticRequest } from 'tinacms'
+import { staticRequest } from '@strivemath/tinacms'
 import { Layout } from '../../components/Layout'
 import Link from 'next/link'
-import { useTina } from 'tinacms/dist/edit-state'
+import { useTina } from '@strivemath/tinacms/dist/edit-state'
 
 const query = `{
   postConnection {

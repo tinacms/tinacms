@@ -1,4 +1,4 @@
-import { getStaticPropsForTina } from 'tinacms'
+import { getStaticPropsForTina } from '@strivemath/tinacms'
 import { Layout } from '../../components/Layout'
 import Link from 'next/link'
 export default function Home(props) {

@@ -13,7 +13,7 @@ import {
   DeleteObjectCommand,
   DeleteObjectCommandInput,
 } from '@aws-sdk/client-s3'
-import type { Media, MediaListOptions } from 'tinacms'
+import type { Media, MediaListOptions } from '@strivemath/tinacms'
 import path from 'path'
 import fs from 'fs'
 import { NextApiRequest, NextApiResponse } from 'next'

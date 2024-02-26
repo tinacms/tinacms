@@ -1,24 +1,26 @@
-# _next-tinacms-dos_
+# _@strivemath/next-tinacms-dos_
 
 Manage **Digital Ocean Space media assets** in TinaCMS.
 
 ## Installation
 
 ### With Yarn
+
 ```bash
-yarn add next-tinacms-dos @tinacms/auth
+yarn add @strivemath/next-tinacms-dos @strivemath/tinacms-auth
 ```
 
 ### With NPM
+
 ```bash
-npm install next-tinacms-dos @tinacms/auth
+npm install @strivemath/next-tinacms-dos @strivemath/tinacms-auth
 ```
 
 ## Connect with Digital Ocean Space
 
 You need some credentials provided by Digital Ocean Space to set this up properly. If you do not already have an account, you can (register here)[https://cloud.digitalocean.com/registrations/new].
 
-**next-tinacms-dos** uses environment variables within the context of a Next.js site to properly access your Digital Ocean Space account.
+**@strivemath/next-tinacms-dos** uses environment variables within the context of a Next.js site to properly access your Digital Ocean Space account.
 
 Add the following variables to an `.env` file.
 
@@ -39,9 +41,9 @@ This is also where we can update our `mediaOptions` on the cms object.
 // Typically in the _app.js file of a Next.js project
 
 import dynamic from "next/dynamic";
-import { TinaEditProvider } from "tinacms/dist/edit-state";
+import { TinaEditProvider } from "@strivemath/tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
-const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
+const TinaCMS = dynamic(() => import("@strivemath/tinacms"), { ssr: false });
 
 const App = ({ Component, pageProps }) => {
   return (
@@ -53,7 +55,7 @@ const App = ({ Component, pageProps }) => {
             clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
             isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
             mediaStore={async () => {
-              const pack = await import("next-tinacms-dos");
+              const pack = await import("@strivemath/next-tinacms-dos");
               return pack.TinaCloudDOSMediaStore;
             }}
             {...pageProps}
@@ -90,10 +92,9 @@ Then add a new catch all API route for media.
 
 Call `createMediaHandler` to set up routes and connect your instance of the Media Store to your Digital Ocean Space.
 
-Import `isAuthorized` from [`@tinacms/auth`](https://github.com/tinacms/tinacms/tree/main/packages/%40tinacms/auth).
+Import `isAuthorized` from [`@strivemath/tinacms-auth`](https://github.com/tinacms/tinacms/tree/main/packages/%40tinacms/auth).
 
 The `authorized` key will make it so only authorized users within Tina Cloud can upload and make media edits.
-
 
 ```
 // pages/api/dos/[...media].ts
@@ -101,8 +102,8 @@ The `authorized` key will make it so only authorized users within Tina Cloud can
 import {
   mediaHandlerConfig,
   createMediaHandler,
-} from "next-tinacms-dos/dist/handlers";
-import { isAuthorized } from "@tinacms/auth";
+} from "@strivemath/next-tinacms-dos/dist/handlers";
+import { isAuthorized } from "@strivemath/tinacms-auth";
 
 export const config = mediaHandlerConfig;
 
@@ -145,6 +146,6 @@ In your `.tina/schema.ts` add a new field for the image, e.g:
   type: 'image',
   label: 'Hero Image',
  }
- ```
+```
 
- Now, when editing your site, the image field will allow you to connect to your Digital Ocean Space via the Media Store to manage your media assets.
+Now, when editing your site, the image field will allow you to connect to your Digital Ocean Space via the Media Store to manage your media assets.

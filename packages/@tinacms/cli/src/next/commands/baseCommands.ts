@@ -4,14 +4,14 @@ import chalk from 'chalk'
 import type { ChildProcess } from 'child_process'
 import type { DocumentNode } from 'graphql'
 
-import type { Database } from '@tinacms/graphql'
-import type { TinaSchema } from '@tinacms/schema-tools'
+import type { Database } from '@strivemath/tinacms-graphql'
+import type { TinaSchema } from '@strivemath/tinacms-schema-tools'
 
 import { startSubprocess2 } from '../../utils/start-subprocess'
 import { logger } from '../../logger'
 import { spin } from '../../utils/spinner'
 import { warnText } from '../../utils/theme'
-import { getChangedFiles, getSha, shaExists } from '@tinacms/graphql'
+import { getChangedFiles, getSha, shaExists } from '@strivemath/tinacms-graphql'
 import fs from 'fs-extra'
 import { ConfigManager } from '../config-manager'
 

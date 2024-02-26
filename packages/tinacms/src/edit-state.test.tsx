@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from 'vitest'
 
 import React from 'react'
 import { useTina } from './edit-state'
-import { TinaDataContext } from '@tinacms/sharedctx'
+import { TinaDataContext } from '@strivemath/tinacms-sharedctx'
 
 const query = `{}`
 const variables = { filename: 'neat.md' }

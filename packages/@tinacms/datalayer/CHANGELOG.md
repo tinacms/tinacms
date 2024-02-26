@@ -5,7 +5,7 @@
 ### Patch Changes
 
 - Updated dependencies [1e5c94f05]
-  - @tinacms/graphql@1.4.32
+  - @strivemath/tinacms-graphql@1.4.32
 
 ## 1.2.31
 
@@ -13,14 +13,14 @@
 
 - Updated dependencies [7779cdbf6]
 - Updated dependencies [031ce05c2]
-  - @tinacms/graphql@1.4.31
+  - @strivemath/tinacms-graphql@1.4.31
 
 ## 1.2.30
 
 ### Patch Changes
 
 - Updated dependencies [476b9dfbe]
-  - @tinacms/graphql@1.4.30
+  - @strivemath/tinacms-graphql@1.4.30
 
 ## 1.2.29
 
@@ -36,13 +36,16 @@
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
   - **New Package**: `tinacms-gitprovider-github`, exporting the `GitHubProvider` class.
-  - **Interface Addition**: `gitProvider` added to `@tinacms/graphql`.
+  - **Interface Addition**: `gitProvider` added to `@strivemath/tinacms-graphql`.
   - **Addition**: Generated database client.
 
   #### Updated `database.ts` Example
 
   ```typescript
-  import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
+  import {
+    createDatabase,
+    createLocalDatabase,
+  } from '@strivemath/tinacms-datalayer'
   import { MongodbLevel } from 'mongodb-level'
   import { GitHubProvider } from 'tinacms-gitprovider-github'
 
@@ -58,8 +61,8 @@
           token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         }),
         databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: '@strivemath/tinacms',
+          dbName: '@strivemath/tinacms',
           mongoUri: process.env.MONGODB_URI,
         }),
         namespace: process.env.GITHUB_BRANCH,
@@ -113,7 +116,7 @@
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
-  import { createLocalDatabase } from '@tinacms/datalayer'
+  import { createLocalDatabase } from '@strivemath/tinacms-datalayer'
   createLocalDatabase(port)
   ```
 
@@ -122,7 +125,7 @@
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
-  import { createDatabase, createLocalDatabase, GitHubProvider } from '@tinacms/datalayer';
+  import { createDatabase, createLocalDatabase, GitHubProvider } from '@strivemath/tinacms-datalayer';
   import { MongodbLevel } from 'mongodb-level';
   const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true';
   export default isLocal
@@ -167,7 +170,7 @@
   - **New API**:
 
   ```javascript
-  import { AbstractAuthProvider } from 'tinacms'
+  import { AbstractAuthProvider } from '@strivemath/tinacms'
   class CustomAuthProvider extends AbstractAuthProvider {
     login() {}
     logout() {}
@@ -181,8 +184,8 @@
 
   ### TinaCMS Self Hosted backend updates
 
-  - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
-  - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
+  - **New:** TinaNodeBackend is exported from `@strivemath/tinacms-datalayer`. This is used to host the TinaCMS backend in a single function.
+  - **New:** `LocalBackendAuthProvider` is exported from `@strivemath/tinacms-datalayer`. This is used to host the TinaCMS backend locally.
 
   - **New:** `AuthJsBackendAuthProvider` is exported from `tinacms-authjs`. This is used to host the TinaCMS backend with AuthJS.
 
@@ -193,7 +196,10 @@
   `/api/tina/[...routes].{ts,js}`
 
   ```typescript
-  import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  import {
+    TinaNodeBackend,
+    LocalBackendAuthProvider,
+  } from '@strivemath/tinacms-datalayer'
 
   import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
 
@@ -224,14 +230,14 @@
   Please [check out the docs](https://tina.io/docs/self-hosted/overview) for more information on self hosted TinaCMS.
 
 - Updated dependencies [a65ca13f2]
-  - @tinacms/graphql@1.4.29
+  - @strivemath/tinacms-graphql@1.4.29
 
 ## 1.2.28
 
 ### Patch Changes
 
 - Updated dependencies [8b8a6c96b]
-  - @tinacms/graphql@1.4.28
+  - @strivemath/tinacms-graphql@1.4.28
 
 ## 1.2.27
 
@@ -240,7 +246,7 @@
 - Updated dependencies [857414612]
 - Updated dependencies [a58c5b12f]
 - Updated dependencies [aec44a7dc]
-  - @tinacms/graphql@1.4.27
+  - @strivemath/tinacms-graphql@1.4.27
 
 ## 1.2.26
 
@@ -249,26 +255,26 @@
 - Updated dependencies [c244d963a]
 - Updated dependencies [3b214ec6b]
 - Updated dependencies [8bd85b15e]
-  - @tinacms/graphql@1.4.26
+  - @strivemath/tinacms-graphql@1.4.26
 
 ## 1.2.25
 
 ### Patch Changes
 
 - Updated dependencies [1144af060]
-  - @tinacms/graphql@1.4.25
+  - @strivemath/tinacms-graphql@1.4.25
 
 ## 1.2.24
 
 ### Patch Changes
 
-- @tinacms/graphql@1.4.24
+- @strivemath/tinacms-graphql@1.4.24
 
 ## 1.2.23
 
 ### Patch Changes
 
-- @tinacms/graphql@1.4.23
+- @strivemath/tinacms-graphql@1.4.23
 
 ## 1.2.22
 
@@ -277,40 +283,40 @@
 - bc812441b: Use .mjs extension for ES modules
 - Updated dependencies [0d8a19632]
 - Updated dependencies [bc812441b]
-  - @tinacms/graphql@1.4.22
+  - @strivemath/tinacms-graphql@1.4.22
 
 ## 1.2.21
 
 ### Patch Changes
 
 - Updated dependencies [94f353822]
-  - @tinacms/graphql@1.4.21
+  - @strivemath/tinacms-graphql@1.4.21
 
 ## 1.2.20
 
 ### Patch Changes
 
-- @tinacms/graphql@1.4.20
+- @strivemath/tinacms-graphql@1.4.20
 
 ## 1.2.19
 
 ### Patch Changes
 
 - Updated dependencies [495108725]
-  - @tinacms/graphql@1.4.19
+  - @strivemath/tinacms-graphql@1.4.19
 
 ## 1.2.18
 
 ### Patch Changes
 
 - Updated dependencies [e5e29ed58]
-  - @tinacms/graphql@1.4.18
+  - @strivemath/tinacms-graphql@1.4.18
 
 ## 1.2.17
 
 ### Patch Changes
 
-- @tinacms/graphql@1.4.17
+- @strivemath/tinacms-graphql@1.4.17
 
 ## 1.2.16
 
@@ -318,7 +324,7 @@
 
 - Updated dependencies [c385b5615]
 - Updated dependencies [1c78bafc2]
-  - @tinacms/graphql@1.4.16
+  - @strivemath/tinacms-graphql@1.4.16
 
 ## 1.2.15
 
@@ -326,14 +332,14 @@
 
 - Updated dependencies [a94bf721b]
 - Updated dependencies [52b1762e2]
-  - @tinacms/graphql@1.4.15
+  - @strivemath/tinacms-graphql@1.4.15
 
 ## 1.2.14
 
 ### Patch Changes
 
 - Updated dependencies [e731ab0c5]
-  - @tinacms/graphql@1.4.14
+  - @strivemath/tinacms-graphql@1.4.14
 
 ## 1.2.13
 
@@ -343,13 +349,13 @@
 - Updated dependencies [0f5557d23]
 - Updated dependencies [ff4c1e0f4]
 - Updated dependencies [6fefa56b0]
-  - @tinacms/graphql@1.4.13
+  - @strivemath/tinacms-graphql@1.4.13
 
 ## 1.2.12
 
 ### Patch Changes
 
-- @tinacms/graphql@1.4.12
+- @strivemath/tinacms-graphql@1.4.12
 
 ## 1.2.11
 
@@ -357,14 +363,14 @@
 
 - Updated dependencies [83b19fb8d]
 - Updated dependencies [1c7998b7e]
-  - @tinacms/graphql@1.4.11
+  - @strivemath/tinacms-graphql@1.4.11
 
 ## 1.2.10
 
 ### Patch Changes
 
 - Updated dependencies [a402c8010]
-  - @tinacms/graphql@1.4.10
+  - @strivemath/tinacms-graphql@1.4.10
 
 ## 1.2.9
 
@@ -372,7 +378,7 @@
 
 - Updated dependencies [89dcad9d9]
 - Updated dependencies [a0eb72ce0]
-  - @tinacms/graphql@1.4.9
+  - @strivemath/tinacms-graphql@1.4.9
 
 ## 1.2.8
 
@@ -381,7 +387,7 @@
 - Updated dependencies [f14f59a96]
 - Updated dependencies [eeedcfd30]
 - Updated dependencies [7d4be0e51]
-  - @tinacms/graphql@1.4.8
+  - @strivemath/tinacms-graphql@1.4.8
 
 ## 1.2.7
 
@@ -390,28 +396,28 @@
 - Updated dependencies [65d53d5b9]
 - Updated dependencies [40d15644f]
 - Updated dependencies [a6786cc73]
-  - @tinacms/graphql@1.4.7
+  - @strivemath/tinacms-graphql@1.4.7
 
 ## 1.2.6
 
 ### Patch Changes
 
 - Updated dependencies [75d5ed359]
-  - @tinacms/graphql@1.4.6
+  - @strivemath/tinacms-graphql@1.4.6
 
 ## 1.2.5
 
 ### Patch Changes
 
 - Updated dependencies [67c7a48b8]
-  - @tinacms/graphql@1.4.5
+  - @strivemath/tinacms-graphql@1.4.5
 
 ## 1.2.4
 
 ### Patch Changes
 
 - Updated dependencies [ae3abe927]
-  - @tinacms/graphql@1.4.4
+  - @strivemath/tinacms-graphql@1.4.4
 
 ## 1.2.3
 
@@ -419,7 +425,7 @@
 
 - Updated dependencies [40d908a79]
 - Updated dependencies [02a555c39]
-  - @tinacms/graphql@1.4.3
+  - @strivemath/tinacms-graphql@1.4.3
 
 ## 1.2.2
 
@@ -428,7 +434,7 @@
 - Updated dependencies [af5c32eae]
 - Updated dependencies [1f9f83718]
 - Updated dependencies [a70204500]
-  - @tinacms/graphql@1.4.2
+  - @strivemath/tinacms-graphql@1.4.2
 
 ## 1.2.1
 
@@ -437,7 +443,7 @@
 - Updated dependencies [e9514656c]
 - Updated dependencies [9a8074889]
 - Updated dependencies [13b809ff5]
-  - @tinacms/graphql@1.4.1
+  - @strivemath/tinacms-graphql@1.4.1
 
 ## 1.2.0
 
@@ -453,20 +459,20 @@
 - Updated dependencies [e3b58c03e]
 - Updated dependencies [0553035f5]
 - Updated dependencies [202cd714d]
-  - @tinacms/graphql@1.4.0
+  - @strivemath/tinacms-graphql@1.4.0
 
 ## 1.1.6
 
 ### Patch Changes
 
-- @tinacms/graphql@1.3.5
+- @strivemath/tinacms-graphql@1.3.5
 
 ## 1.1.5
 
 ### Patch Changes
 
 - Updated dependencies [b095d06a9]
-  - @tinacms/graphql@1.3.4
+  - @strivemath/tinacms-graphql@1.3.4
 
 ## 1.1.4
 
@@ -475,21 +481,21 @@
 - f831dcf4f: security: update some deps
 - Updated dependencies [0a5297800]
 - Updated dependencies [5427d03c6]
-  - @tinacms/graphql@1.3.3
+  - @strivemath/tinacms-graphql@1.3.3
 
 ## 1.1.3
 
 ### Patch Changes
 
 - Updated dependencies [aa0250979]
-  - @tinacms/graphql@1.3.2
+  - @strivemath/tinacms-graphql@1.3.2
 
 ## 1.1.2
 
 ### Patch Changes
 
 - Updated dependencies [3bbb621cd]
-  - @tinacms/graphql@1.3.1
+  - @strivemath/tinacms-graphql@1.3.1
 
 ## 1.1.1
 
@@ -499,7 +505,7 @@
 - Updated dependencies [94b8bb6e0]
 - Updated dependencies [e15d82c2e]
 - Updated dependencies [e732906b6]
-  - @tinacms/graphql@1.3.0
+  - @strivemath/tinacms-graphql@1.3.0
 
 ## 1.1.0
 
@@ -513,7 +519,7 @@
 - Updated dependencies [efd56e769]
 - Updated dependencies [efd56e769]
 - Updated dependencies [50f86caed]
-  - @tinacms/graphql@1.2.0
+  - @strivemath/tinacms-graphql@1.2.0
 
 ## 1.0.1
 
@@ -582,7 +588,7 @@
   ```ts
   // .tina/schema.ts
 
-  import { defineSchema } from 'tinacms'
+  import { defineSchema } from '@strivemath/tinacms'
 
   const schema = defineSchema({
     collections: [
@@ -635,7 +641,7 @@
 
 ### Patch Changes
 
-- 80732bd97: Create a @tinacms/datalayer package which houses the logic for data management for the GraphQL API. This simplifies the @tinacms/graphql package and allows for a clearer separation.
+- 80732bd97: Create a @strivemath/tinacms-datalayer package which houses the logic for data management for the GraphQL API. This simplifies the @strivemath/tinacms-graphql package and allows for a clearer separation.
 
 ## 0.59.1
 
@@ -651,7 +657,7 @@
 
 ### Patch Changes
 
-- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with Tina Cloud
+- bd4e1f802: Pin version number from @strivemath/tinacms-graphql during schema compilation. This can be used to ensure the proper version is provided when working with Tina Cloud
 
 ## 0.58.2
 
@@ -982,7 +988,7 @@
   And then when you register the plugin, provide your custom logic here:
 
   ```js
-  import { TextFieldPlugin } from 'tinacms'
+  import { TextFieldPlugin } from '@strivemath/tinacms'
 
   // ...
 

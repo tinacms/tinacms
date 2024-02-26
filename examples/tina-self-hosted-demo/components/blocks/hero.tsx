@@ -3,8 +3,8 @@ import { Actions } from '../util/actions'
 import { Container } from '../util/container'
 import { Section } from '../util/section'
 import { useTheme } from '../layout'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
-import type { TinaTemplate } from 'tinacms'
+import { TinaMarkdown } from '@strivemath/tinacms/dist/rich-text'
+import type { TinaTemplate } from '@strivemath/tinacms'
 
 export const Hero = ({ data, parentField }) => {
   const theme = useTheme()

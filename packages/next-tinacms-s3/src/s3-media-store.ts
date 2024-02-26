@@ -8,8 +8,8 @@ import type {
   MediaListOptions,
   MediaStore,
   MediaUploadOptions,
-} from 'tinacms'
-import { DEFAULT_MEDIA_UPLOAD_TYPES } from 'tinacms'
+} from '@strivemath/tinacms'
+import { DEFAULT_MEDIA_UPLOAD_TYPES } from '@strivemath/tinacms'
 
 import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors'
 

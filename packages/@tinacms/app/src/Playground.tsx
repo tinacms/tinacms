@@ -2,7 +2,7 @@ import { createGraphiQLFetcher } from '@graphiql/toolkit'
 import { GraphiQL } from 'graphiql'
 import { parse, print } from 'graphql'
 import React from 'react'
-import { useCMS } from 'tinacms'
+import { useCMS } from '@strivemath/tinacms'
 import { FolderIcon } from '@heroicons/react/outline'
 import { queries } from 'CLIENT_IMPORT'
 

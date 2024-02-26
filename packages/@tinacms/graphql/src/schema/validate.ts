@@ -13,7 +13,7 @@ import {
   Collection,
   Template,
   validateTinaCloudSchemaConfig,
-} from '@tinacms/schema-tools'
+} from '@strivemath/tinacms-schema-tools'
 
 const FIELD_TYPES: TinaField['type'][] = [
   'string',

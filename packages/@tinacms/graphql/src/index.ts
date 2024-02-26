@@ -2,7 +2,7 @@ import type {
   Schema,
   Collection,
   Template as TinaTemplate,
-} from '@tinacms/schema-tools'
+} from '@strivemath/tinacms-schema-tools'
 
 import { buildDotTinaFiles } from './build'
 export { resolve } from './resolve'
@@ -24,7 +24,7 @@ export {
   createDatabase,
   createLocalDatabase,
 } from './database'
-import type { Config } from '@tinacms/schema-tools'
+import type { Config } from '@strivemath/tinacms-schema-tools'
 export { getChangedFiles, getSha, shaExists } from './git'
 export * from './auth/utils'
 

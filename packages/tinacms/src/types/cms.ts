@@ -3,7 +3,7 @@
 */
 
 import type { StaticMedia, TinaCMS } from '@tinacms/toolkit'
-import type { Schema, Config } from '@tinacms/schema-tools'
+import type { Schema, Config } from '@strivemath/tinacms-schema-tools'
 import type { TinaCloudMediaStoreClass } from '../auth'
 import type { useDocumentCreatorPlugin } from '../hooks/use-content-creator'
 import type { formifyCallback } from '../hooks/use-graphql-forms'

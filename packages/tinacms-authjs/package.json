@@ -1,5 +1,5 @@
 {
-  "name": "tinacms-authjs",
+  "name": "@strivemath/tinacms-authjs",
   "version": "1.0.5",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -23,16 +23,16 @@
     "run-self-script": "node bin/tinacms-authjs setup"
   },
   "dependencies": {
-    "@tinacms/schema-tools": "workspace:*"
+    "@strivemath/tinacms-schema-tools": "workspace:*"
   },
   "devDependencies": {
-    "@tinacms/datalayer": "workspace:*",
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-datalayer": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "next": "12.3.4",
     "next-auth": "4.22.1",
     "react": "^18",
     "react-dom": "^18",
-    "tinacms": "workspace:*",
+    "@strivemath/tinacms": "workspace:*",
     "typescript": "4.3.5"
   },
   "peerDependencies": {
@@ -40,10 +40,10 @@
     "next-auth": "^4.22.1",
     "react": "^17.0.2 || ^18",
     "react-dom": "^17.0.2 || ^18",
-    "tinacms": "workspace:*"
+    "@strivemath/tinacms": "workspace:*"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",

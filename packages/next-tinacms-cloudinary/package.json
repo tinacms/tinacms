@@ -1,5 +1,5 @@
 {
-  "name": "next-tinacms-cloudinary",
+  "name": "@strivemath/next-tinacms-cloudinary",
   "version": "4.4.5",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -26,24 +26,24 @@
     "multer": "1.4.5-lts.1"
   },
   "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "@types/crypto-js": "^3.1.47",
     "@types/js-cookie": "^2.2.6",
     "@types/node": "^13.13.1",
     "next": "12.2.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "tinacms": "workspace:*",
+    "@strivemath/tinacms": "workspace:*",
     "typescript": "4.3.5"
   },
   "peerDependencies": {
-    "tinacms": "workspace:*"
+    "@strivemath/tinacms": "workspace:*"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/next-tinacms-cloudinary"
+    "directory": "packages/@strivemath/next-tinacms-cloudinary"
   }
 }

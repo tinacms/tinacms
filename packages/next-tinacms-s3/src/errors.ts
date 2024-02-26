@@ -23,13 +23,13 @@ class MediaListError extends Error {
 export const E_DEFAULT = new MediaListError({
   title: 'An Error Occurred',
   message: 'Something went wrong fetching your media from S3.',
-  docsLink: 'https://tina.io/packages/next-tinacms-s3',
+  docsLink: 'https://tina.io/packages/@strivemath/next-tinacms-s3',
 })
 
 export const E_UNAUTHORIZED = new MediaListError({
   title: 'Unauthorized',
   message: "You don't have access to this resource.",
-  docsLink: 'https://tina.io/packages/next-tinacms-s3',
+  docsLink: 'https://tina.io/packages/@strivemath/next-tinacms-s3',
 })
 
 export const E_CONFIG = new MediaListError({
@@ -49,7 +49,8 @@ export const E_KEY_FAIL = new MediaListError({
 export const E_BAD_ROUTE = new MediaListError({
   title: 'Bad Route',
   message: 'The S3 API route is missing or misconfigured.',
-  docsLink: 'https://tina.io/packages/next-tinacms-s3/#set-up-api-routes',
+  docsLink:
+    'https://tina.io/packages/@strivemath/next-tinacms-s3/#set-up-api-routes',
 })
 
 export const interpretErrorMessage = (message: string) => {

@@ -3,7 +3,11 @@ import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import GetDocument from '../components/GetDocument'
 import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm, Collection } from '@tinacms/schema-tools'
+import {
+  TinaSchema,
+  resolveForm,
+  Collection,
+} from '@strivemath/tinacms-schema-tools'
 import { Link, useParams } from 'react-router-dom'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'

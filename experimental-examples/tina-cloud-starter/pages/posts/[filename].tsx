@@ -1,6 +1,6 @@
 import { Post } from '../../components/posts/post'
 import { client } from '../../.tina/__generated__/client'
-import { useTina } from 'tinacms/dist/react'
+import { useTina } from '@strivemath/tinacms/dist/react'
 import { Layout } from '../../components/layout'
 import { InferGetStaticPropsType } from 'next'
 

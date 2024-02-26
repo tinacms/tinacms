@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
-import { TinaField } from '@tinacms/schema-tools'
+import { TinaField } from '@strivemath/tinacms-schema-tools'
 import { format } from 'prettier'
 import TsParser from 'prettier/parser-typescript'
 import { stringifyLabelWithField } from '..'
@@ -88,7 +88,7 @@ export const makeTemplateFile = async ({
     )
   }
   const templateCode = `
-${usingTypescript ? "import type { TinaField } from 'tinacms'" : ''}
+${usingTypescript ? "import type { TinaField } from '@strivemath/tinacms'" : ''}
 ${templateCodeText.join('\n')}
   `
 

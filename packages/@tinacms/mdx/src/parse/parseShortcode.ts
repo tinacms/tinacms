@@ -4,7 +4,7 @@
 
 */
 
-import { RichTextTemplate } from '@tinacms/schema-tools'
+import { RichTextTemplate } from '@strivemath/tinacms-schema-tools'
 import { replaceAll } from '.'
 
 export function parseShortcode(

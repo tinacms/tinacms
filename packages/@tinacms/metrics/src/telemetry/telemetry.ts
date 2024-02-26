@@ -23,7 +23,7 @@ export class Telemetry {
   private _disabled: boolean
 
   constructor({ disabled }: { disabled: any }) {
-    // this.config = new Conf({ projectName: 'tinacms', cwd: dir })
+    // this.config = new Conf({ projectName: '@strivemath/tinacms', cwd: dir })
     this.projectIDRaw = getID()
     const { NO_TELEMETRY } = process.env
     this._disabled =

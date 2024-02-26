@@ -3,7 +3,7 @@
 */
 
 import { CloudinaryMediaStore } from './cloudinary-media-store'
-import type { Client } from 'tinacms'
+import type { Client } from '@strivemath/tinacms'
 
 export class TinaCloudCloudinaryMediaStore extends CloudinaryMediaStore {
   client: Client

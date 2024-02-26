@@ -23,9 +23,15 @@ export default TinaCMSProvider2
 import { MediaStore, TinaCMS } from '@tinacms/toolkit'
 import { formifyCallback } from './hooks/use-graphql-forms'
 
-import { RichTextTemplate, validateSchema } from '@tinacms/schema-tools'
-export { NAMER, resolveField } from '@tinacms/schema-tools'
-export type { LoginScreenProps, LoginStrategy } from '@tinacms/schema-tools'
+import {
+  RichTextTemplate,
+  validateSchema,
+} from '@strivemath/tinacms-schema-tools'
+export { NAMER, resolveField } from '@strivemath/tinacms-schema-tools'
+export type {
+  LoginScreenProps,
+  LoginStrategy,
+} from '@strivemath/tinacms-schema-tools'
 
 import {
   TinaSchema,
@@ -34,7 +40,7 @@ import {
   Schema,
   Collection,
   Template,
-} from '@tinacms/schema-tools'
+} from '@strivemath/tinacms-schema-tools'
 
 export type { Config, Schema, Collection, Template, TinaField, TinaSchema }
 

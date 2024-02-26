@@ -1,6 +1,6 @@
-import { staticRequest } from 'tinacms'
+import { staticRequest } from '@strivemath/tinacms'
 import { Layout } from '../../components/Layout'
-import { useTina } from 'tinacms/dist/edit-state'
+import { useTina } from '@strivemath/tinacms/dist/edit-state'
 
 const query = `query getPost($relativePath: String!) {
   getPostDocument(relativePath: $relativePath) {

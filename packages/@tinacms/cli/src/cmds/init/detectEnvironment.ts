@@ -149,7 +149,10 @@ const detectEnvironment = async ({
       if (packageJSON?.devDependencies) {
         deps.push(...Object.keys(packageJSON.devDependencies))
       }
-      if (deps.includes('@tinacms/cli') && deps.includes('tinacms')) {
+      if (
+        deps.includes('@strivemath/tinacms-cli') &&
+        deps.includes('@strivemath/tinacms')
+      ) {
         hasTinaDeps = true
       }
     } catch (e) {

@@ -1,5 +1,5 @@
-import { staticRequest } from 'tinacms'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { staticRequest } from '@strivemath/tinacms'
+import { TinaMarkdown } from '@strivemath/tinacms/dist/rich-text'
 import { Layout } from '../../components/Layout'
 import { ExperimentalGetTinaClient } from '../../tina/__generated__/types.ts'
 

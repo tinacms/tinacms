@@ -1,6 +1,13 @@
 import React, { Suspense, useEffect } from 'react'
-import TinaCMS, { TinaAdmin, useCMS, MdxFieldPluginExtendible } from 'tinacms'
-import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
+import TinaCMS, {
+  TinaAdmin,
+  useCMS,
+  MdxFieldPluginExtendible,
+} from '@strivemath/tinacms'
+import {
+  TinaEditProvider,
+  useEditState,
+} from '@strivemath/tinacms/dist/edit-state'
 import { Preview } from './preview'
 import Playground from './Playground'
 

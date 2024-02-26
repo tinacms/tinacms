@@ -1,4 +1,7 @@
-import type { RichTextField, RichTextTemplate } from '@tinacms/schema-tools'
+import type {
+  RichTextField,
+  RichTextTemplate,
+} from '@strivemath/tinacms-schema-tools'
 import type { Pattern } from './shortcodes'
 
 export const getFieldPatterns = (field: RichTextField) => {

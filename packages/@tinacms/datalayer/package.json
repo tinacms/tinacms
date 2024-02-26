@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/datalayer",
+  "name": "@strivemath/tinacms-datalayer",
   "version": "1.2.32",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -36,17 +36,17 @@
     "test": "jest --passWithNoTests"
   },
   "dependencies": {
-    "@tinacms/graphql": "workspace:*"
+    "@strivemath/tinacms-graphql": "workspace:*"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/@tinacms/datalayer"
+    "directory": "packages/@strivemath/tinacms-datalayer"
   },
   "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "@types/fs-extra": "^9.0.2",
     "@types/jest": "^27.4.1",
     "@types/js-yaml": "^3.12.5",

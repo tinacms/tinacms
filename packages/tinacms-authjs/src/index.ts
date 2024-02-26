@@ -1,7 +1,7 @@
 import NextAuth, { AuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { getServerSession } from 'next-auth/next'
-import type { BackendAuthProvider } from '@tinacms/datalayer'
+import type { BackendAuthProvider } from '@strivemath/tinacms-datalayer'
 import { TINA_CREDENTIALS_PROVIDER_NAME } from './tinacms'
 
 const authenticate = async (

@@ -4,7 +4,7 @@
 
 */
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
-import type { RichTextType } from '@tinacms/schema-tools'
+import type { RichTextType } from '@strivemath/tinacms-schema-tools'
 import type * as Plate from './plate'
 import { extractAttributes } from './acorn'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
@@ -54,7 +54,7 @@ export function mdxJsxElement(
       }
     }
 
-    // FIXME: these should be passed through to the field resolver in @tinacms/graphql (via dependency injection)
+    // FIXME: these should be passed through to the field resolver in @strivemath/tinacms-graphql (via dependency injection)
     const props = extractAttributes(
       node.attributes,
       template.fields,

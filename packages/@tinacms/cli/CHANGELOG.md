@@ -11,11 +11,11 @@
 ### Patch Changes
 
 - Updated dependencies [1e5c94f05]
-  - @tinacms/graphql@1.4.32
-  - @tinacms/datalayer@1.2.32
-  - @tinacms/search@1.0.17
+  - @strivemath/tinacms-graphql@1.4.32
+  - @strivemath/tinacms-datalayer@1.2.32
+  - @strivemath/tinacms-search@1.0.17
   - tinacms@1.5.28
-  - @tinacms/app@1.2.35
+  - @strivemath/tinacms-app@1.2.35
 
 ## 1.5.37
 
@@ -28,11 +28,11 @@
 - Updated dependencies [031ce05c2]
 - Updated dependencies [50b20f809]
   - tinacms@1.5.27
-  - @tinacms/graphql@1.4.31
-  - @tinacms/schema-tools@1.4.15
-  - @tinacms/app@1.2.34
-  - @tinacms/datalayer@1.2.31
-  - @tinacms/search@1.0.16
+  - @strivemath/tinacms-graphql@1.4.31
+  - @strivemath/tinacms-schema-tools@1.4.15
+  - @strivemath/tinacms-app@1.2.34
+  - @strivemath/tinacms-datalayer@1.2.31
+  - @strivemath/tinacms-search@1.0.16
 
 ## 1.5.36
 
@@ -40,18 +40,18 @@
 
 - Updated dependencies [9e1a22a53]
   - tinacms@1.5.26
-  - @tinacms/app@1.2.33
+  - @strivemath/tinacms-app@1.2.33
 
 ## 1.5.35
 
 ### Patch Changes
 
 - Updated dependencies [476b9dfbe]
-  - @tinacms/graphql@1.4.30
-  - @tinacms/datalayer@1.2.30
-  - @tinacms/search@1.0.15
+  - @strivemath/tinacms-graphql@1.4.30
+  - @strivemath/tinacms-datalayer@1.2.30
+  - @strivemath/tinacms-search@1.0.15
   - tinacms@1.5.25
-  - @tinacms/app@1.2.32
+  - @strivemath/tinacms-app@1.2.32
 
 ## 1.5.34
 
@@ -73,13 +73,16 @@
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
   - **New Package**: `tinacms-gitprovider-github`, exporting the `GitHubProvider` class.
-  - **Interface Addition**: `gitProvider` added to `@tinacms/graphql`.
+  - **Interface Addition**: `gitProvider` added to `@strivemath/tinacms-graphql`.
   - **Addition**: Generated database client.
 
   #### Updated `database.ts` Example
 
   ```typescript
-  import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
+  import {
+    createDatabase,
+    createLocalDatabase,
+  } from '@strivemath/tinacms-datalayer'
   import { MongodbLevel } from 'mongodb-level'
   import { GitHubProvider } from 'tinacms-gitprovider-github'
 
@@ -95,8 +98,8 @@
           token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         }),
         databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: '@strivemath/tinacms',
+          dbName: '@strivemath/tinacms',
           mongoUri: process.env.MONGODB_URI,
         }),
         namespace: process.env.GITHUB_BRANCH,
@@ -150,7 +153,7 @@
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
-  import { createLocalDatabase } from '@tinacms/datalayer'
+  import { createLocalDatabase } from '@strivemath/tinacms-datalayer'
   createLocalDatabase(port)
   ```
 
@@ -159,7 +162,7 @@
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
-  import { createDatabase, createLocalDatabase, GitHubProvider } from '@tinacms/datalayer';
+  import { createDatabase, createLocalDatabase, GitHubProvider } from '@strivemath/tinacms-datalayer';
   import { MongodbLevel } from 'mongodb-level';
   const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true';
   export default isLocal
@@ -204,7 +207,7 @@
   - **New API**:
 
   ```javascript
-  import { AbstractAuthProvider } from 'tinacms'
+  import { AbstractAuthProvider } from '@strivemath/tinacms'
   class CustomAuthProvider extends AbstractAuthProvider {
     login() {}
     logout() {}
@@ -218,8 +221,8 @@
 
   ### TinaCMS Self Hosted backend updates
 
-  - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
-  - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
+  - **New:** TinaNodeBackend is exported from `@strivemath/tinacms-datalayer`. This is used to host the TinaCMS backend in a single function.
+  - **New:** `LocalBackendAuthProvider` is exported from `@strivemath/tinacms-datalayer`. This is used to host the TinaCMS backend locally.
 
   - **New:** `AuthJsBackendAuthProvider` is exported from `tinacms-authjs`. This is used to host the TinaCMS backend with AuthJS.
 
@@ -230,7 +233,10 @@
   `/api/tina/[...routes].{ts,js}`
 
   ```typescript
-  import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  import {
+    TinaNodeBackend,
+    LocalBackendAuthProvider,
+  } from '@strivemath/tinacms-datalayer'
 
   import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
 
@@ -261,13 +267,13 @@
   Please [check out the docs](https://tina.io/docs/self-hosted/overview) for more information on self hosted TinaCMS.
 
 - Updated dependencies [a65ca13f2]
-  - @tinacms/schema-tools@1.4.14
-  - @tinacms/datalayer@1.2.29
-  - @tinacms/graphql@1.4.29
+  - @strivemath/tinacms-schema-tools@1.4.14
+  - @strivemath/tinacms-datalayer@1.2.29
+  - @strivemath/tinacms-graphql@1.4.29
   - tinacms@1.5.24
-  - @tinacms/search@1.0.14
-  - @tinacms/metrics@1.0.2
-  - @tinacms/app@1.2.31
+  - @strivemath/tinacms-search@1.0.14
+  - @strivemath/tinacms-metrics@1.0.2
+  - @strivemath/tinacms-app@1.2.31
 
 ## 1.5.32
 
@@ -285,10 +291,10 @@
 - Updated dependencies [661239b2a]
 - Updated dependencies [630ab9436]
   - tinacms@1.5.23
-  - @tinacms/app@1.2.30
-  - @tinacms/graphql@1.4.28
-  - @tinacms/datalayer@1.2.28
-  - @tinacms/search@1.0.13
+  - @strivemath/tinacms-app@1.2.30
+  - @strivemath/tinacms-graphql@1.4.28
+  - @strivemath/tinacms-datalayer@1.2.28
+  - @strivemath/tinacms-search@1.0.13
 
 ## 1.5.31
 
@@ -303,11 +309,11 @@
 - Updated dependencies [6861b5e01]
 - Updated dependencies [aec44a7dc]
   - tinacms@1.5.22
-  - @tinacms/search@1.0.12
-  - @tinacms/graphql@1.4.27
-  - @tinacms/schema-tools@1.4.13
-  - @tinacms/app@1.2.29
-  - @tinacms/datalayer@1.2.27
+  - @strivemath/tinacms-search@1.0.12
+  - @strivemath/tinacms-graphql@1.4.27
+  - @strivemath/tinacms-schema-tools@1.4.13
+  - @strivemath/tinacms-app@1.2.29
+  - @strivemath/tinacms-datalayer@1.2.27
 
 ## 1.5.30
 
@@ -325,10 +331,10 @@
 - Updated dependencies [9f01550dd]
 - Updated dependencies [8bd85b15e]
   - tinacms@1.5.21
-  - @tinacms/graphql@1.4.26
-  - @tinacms/app@1.2.28
-  - @tinacms/datalayer@1.2.26
-  - @tinacms/search@1.0.11
+  - @strivemath/tinacms-graphql@1.4.26
+  - @strivemath/tinacms-app@1.2.28
+  - @strivemath/tinacms-datalayer@1.2.26
+  - @strivemath/tinacms-search@1.0.11
 
 ## 1.5.29
 
@@ -338,12 +344,12 @@
 - Updated dependencies [099bf5646]
 - Updated dependencies [1144af060]
 - Updated dependencies [c92de7b1d]
-  - @tinacms/schema-tools@1.4.12
+  - @strivemath/tinacms-schema-tools@1.4.12
   - tinacms@1.5.20
-  - @tinacms/app@1.2.27
-  - @tinacms/graphql@1.4.25
-  - @tinacms/search@1.0.10
-  - @tinacms/datalayer@1.2.25
+  - @strivemath/tinacms-app@1.2.27
+  - @strivemath/tinacms-graphql@1.4.25
+  - @strivemath/tinacms-search@1.0.10
+  - @strivemath/tinacms-datalayer@1.2.25
 
 ## 1.5.28
 
@@ -351,12 +357,12 @@
 
 - Updated dependencies [1563ce5b2]
 - Updated dependencies [e83ba8855]
-  - @tinacms/schema-tools@1.4.11
+  - @strivemath/tinacms-schema-tools@1.4.11
   - tinacms@1.5.19
-  - @tinacms/graphql@1.4.24
-  - @tinacms/search@1.0.9
-  - @tinacms/app@1.2.26
-  - @tinacms/datalayer@1.2.24
+  - @strivemath/tinacms-graphql@1.4.24
+  - @strivemath/tinacms-search@1.0.9
+  - @strivemath/tinacms-app@1.2.26
+  - @strivemath/tinacms-datalayer@1.2.24
 
 ## 1.5.27
 
@@ -382,12 +388,12 @@
 - Updated dependencies [30c7eac58]
 - Updated dependencies [121bd9fc4]
   - tinacms@1.5.18
-  - @tinacms/schema-tools@1.4.10
-  - @tinacms/app@1.2.25
-  - @tinacms/graphql@1.4.23
-  - @tinacms/search@1.0.8
-  - @tinacms/datalayer@1.2.23
-  - @tinacms/metrics@1.0.2
+  - @strivemath/tinacms-schema-tools@1.4.10
+  - @strivemath/tinacms-app@1.2.25
+  - @strivemath/tinacms-graphql@1.4.23
+  - @strivemath/tinacms-search@1.0.8
+  - @strivemath/tinacms-datalayer@1.2.23
+  - @strivemath/tinacms-metrics@1.0.2
 
 ## 1.5.26
 
@@ -395,12 +401,12 @@
 
 - Updated dependencies [0d8a19632]
 - Updated dependencies [bc812441b]
-  - @tinacms/graphql@1.4.22
-  - @tinacms/schema-tools@1.4.9
-  - @tinacms/datalayer@1.2.22
-  - @tinacms/search@1.0.7
-  - @tinacms/app@1.2.24
-  - @tinacms/metrics@1.0.2
+  - @strivemath/tinacms-graphql@1.4.22
+  - @strivemath/tinacms-schema-tools@1.4.9
+  - @strivemath/tinacms-datalayer@1.2.22
+  - @strivemath/tinacms-search@1.0.7
+  - @strivemath/tinacms-app@1.2.24
+  - @strivemath/tinacms-metrics@1.0.2
 
 ## 1.5.25
 
@@ -409,27 +415,27 @@
 - 94f353822: Fix to log errors in spinner
 - Updated dependencies [ad6a166a6]
 - Updated dependencies [94f353822]
-  - @tinacms/search@1.0.6
-  - @tinacms/graphql@1.4.21
-  - @tinacms/app@1.2.23
-  - @tinacms/datalayer@1.2.21
+  - @strivemath/tinacms-search@1.0.6
+  - @strivemath/tinacms-graphql@1.4.21
+  - @strivemath/tinacms-app@1.2.23
+  - @strivemath/tinacms-datalayer@1.2.21
 
 ## 1.5.24
 
 ### Patch Changes
 
 - Updated dependencies [019920a35]
-  - @tinacms/schema-tools@1.4.8
-  - @tinacms/graphql@1.4.20
-  - @tinacms/search@1.0.5
-  - @tinacms/datalayer@1.2.20
-  - @tinacms/app@1.2.22
+  - @strivemath/tinacms-schema-tools@1.4.8
+  - @strivemath/tinacms-graphql@1.4.20
+  - @strivemath/tinacms-search@1.0.5
+  - @strivemath/tinacms-datalayer@1.2.20
+  - @strivemath/tinacms-app@1.2.22
 
 ## 1.5.23
 
 ### Patch Changes
 
-- @tinacms/app@1.2.21
+- @strivemath/tinacms-app@1.2.21
 
 ## 1.5.22
 
@@ -437,17 +443,17 @@
 
 - 495108725: Add optional partialReindex flag to build command
 - Updated dependencies [495108725]
-  - @tinacms/graphql@1.4.19
-  - @tinacms/app@1.2.20
-  - @tinacms/datalayer@1.2.19
-  - @tinacms/search@1.0.4
+  - @strivemath/tinacms-graphql@1.4.19
+  - @strivemath/tinacms-app@1.2.20
+  - @strivemath/tinacms-datalayer@1.2.19
+  - @strivemath/tinacms-search@1.0.4
 
 ## 1.5.21
 
 ### Patch Changes
 
 - ca1298975: Fix issue where external React depenedencies we're being dynamically required
-  - @tinacms/app@1.2.19
+  - @strivemath/tinacms-app@1.2.19
 
 ## 1.5.20
 
@@ -462,11 +468,11 @@
 - Updated dependencies [e5e29ed58]
 - Updated dependencies [812df6ace]
 - Updated dependencies [1176d569a]
-  - @tinacms/schema-tools@1.4.7
-  - @tinacms/search@1.0.3
-  - @tinacms/graphql@1.4.18
-  - @tinacms/app@1.2.18
-  - @tinacms/datalayer@1.2.18
+  - @strivemath/tinacms-schema-tools@1.4.7
+  - @strivemath/tinacms-search@1.0.3
+  - @strivemath/tinacms-graphql@1.4.18
+  - @strivemath/tinacms-app@1.2.18
+  - @strivemath/tinacms-datalayer@1.2.18
 
 ## 1.5.19
 
@@ -475,11 +481,11 @@
 - 1751f2fd3: Update tailwind.ts
 - Updated dependencies [ee9acb5e5]
 - Updated dependencies [a94e123b6]
-  - @tinacms/search@1.0.2
-  - @tinacms/schema-tools@1.4.6
-  - @tinacms/graphql@1.4.17
-  - @tinacms/app@1.2.17
-  - @tinacms/datalayer@1.2.17
+  - @strivemath/tinacms-search@1.0.2
+  - @strivemath/tinacms-schema-tools@1.4.6
+  - @strivemath/tinacms-graphql@1.4.17
+  - @strivemath/tinacms-app@1.2.17
+  - @strivemath/tinacms-datalayer@1.2.17
 
 ## 1.5.18
 
@@ -489,11 +495,11 @@
 - 1c78bafc2: Fix local search indexing to properly update the index on filesystem changes
 - Updated dependencies [c385b5615]
 - Updated dependencies [1c78bafc2]
-  - @tinacms/schema-tools@1.4.5
-  - @tinacms/graphql@1.4.16
-  - @tinacms/search@1.0.1
-  - @tinacms/datalayer@1.2.16
-  - @tinacms/app@1.2.16
+  - @strivemath/tinacms-schema-tools@1.4.5
+  - @strivemath/tinacms-graphql@1.4.16
+  - @strivemath/tinacms-search@1.0.1
+  - @strivemath/tinacms-datalayer@1.2.16
+  - @strivemath/tinacms-app@1.2.16
 
 ## 1.5.17
 
@@ -506,7 +512,7 @@
 
 ### Patch Changes
 
-- @tinacms/app@1.2.15
+- @strivemath/tinacms-app@1.2.15
 
 ## 1.5.15
 
@@ -517,17 +523,17 @@
 - Updated dependencies [a94bf721b]
 - Updated dependencies [52b1762e2]
 - Updated dependencies [16b0c8073]
-  - @tinacms/graphql@1.4.15
-  - @tinacms/app@1.2.14
-  - @tinacms/datalayer@1.2.15
+  - @strivemath/tinacms-graphql@1.4.15
+  - @strivemath/tinacms-app@1.2.14
+  - @strivemath/tinacms-datalayer@1.2.15
 
 ## 1.5.14
 
 ### Patch Changes
 
 - Updated dependencies [e731ab0c5]
-  - @tinacms/graphql@1.4.14
-  - @tinacms/datalayer@1.2.14
+  - @strivemath/tinacms-graphql@1.4.14
+  - @strivemath/tinacms-datalayer@1.2.14
 
 ## 1.5.13
 
@@ -542,7 +548,7 @@
 
   The `tinaField` helper function should now only be used with the `[data-tina-field]` attibute.
 
-  Adds experimental support for Vercel previews, the `useVisualEditing` hook from `@tinacms/vercel-previews` can be used
+  Adds experimental support for Vercel previews, the `useVisualEditing` hook from `@strivemath/tinacms-vercel-previews` can be used
   to activate edit mode and listen for Vercel edit events.
 
 - Updated dependencies [ca74add40]
@@ -550,9 +556,9 @@
 - Updated dependencies [ff4c1e0f4]
 - Updated dependencies [6fefa56b0]
 - Updated dependencies [7f95c1ce5]
-  - @tinacms/graphql@1.4.13
-  - @tinacms/app@1.2.13
-  - @tinacms/datalayer@1.2.13
+  - @strivemath/tinacms-graphql@1.4.13
+  - @strivemath/tinacms-app@1.2.13
+  - @strivemath/tinacms-datalayer@1.2.13
 
 ## 1.5.12
 
@@ -574,10 +580,10 @@
 
 - Updated dependencies [31c160cdf]
 - Updated dependencies [beb179279]
-  - @tinacms/app@1.2.12
-  - @tinacms/schema-tools@1.4.4
-  - @tinacms/graphql@1.4.12
-  - @tinacms/datalayer@1.2.12
+  - @strivemath/tinacms-app@1.2.12
+  - @strivemath/tinacms-schema-tools@1.4.4
+  - @strivemath/tinacms-graphql@1.4.12
+  - @strivemath/tinacms-datalayer@1.2.12
 
 ## 1.5.11
 
@@ -586,18 +592,18 @@
 - 83b19fb8d: Update the bridge interface to remove properties that are no longer needed.
 - Updated dependencies [83b19fb8d]
 - Updated dependencies [1c7998b7e]
-  - @tinacms/graphql@1.4.11
-  - @tinacms/app@1.2.11
-  - @tinacms/datalayer@1.2.11
+  - @strivemath/tinacms-graphql@1.4.11
+  - @strivemath/tinacms-app@1.2.11
+  - @strivemath/tinacms-datalayer@1.2.11
 
 ## 1.5.10
 
 ### Patch Changes
 
 - Updated dependencies [a402c8010]
-  - @tinacms/graphql@1.4.10
-  - @tinacms/datalayer@1.2.10
-  - @tinacms/app@1.2.10
+  - @strivemath/tinacms-graphql@1.4.10
+  - @strivemath/tinacms-datalayer@1.2.10
+  - @strivemath/tinacms-app@1.2.10
 
 ## 1.5.9
 
@@ -605,9 +611,9 @@
 
 - Updated dependencies [89dcad9d9]
 - Updated dependencies [a0eb72ce0]
-  - @tinacms/graphql@1.4.9
-  - @tinacms/app@1.2.9
-  - @tinacms/datalayer@1.2.9
+  - @strivemath/tinacms-graphql@1.4.9
+  - @strivemath/tinacms-app@1.2.9
+  - @strivemath/tinacms-datalayer@1.2.9
 
 ## 1.5.8
 
@@ -616,7 +622,7 @@
 - 5cb73050e: fix issue where migration would error if a user selected no to migrating templates
 - 012ed53bf: Fix regression where `build.host` was not passed correctly
 - Updated dependencies [eba7e5e5e]
-  - @tinacms/app@1.2.8
+  - @strivemath/tinacms-app@1.2.8
 
 ## 1.5.7
 
@@ -629,10 +635,10 @@
 - Updated dependencies [f14f59a96]
 - Updated dependencies [eeedcfd30]
 - Updated dependencies [7d4be0e51]
-  - @tinacms/schema-tools@1.4.3
-  - @tinacms/graphql@1.4.8
-  - @tinacms/app@1.2.7
-  - @tinacms/datalayer@1.2.8
+  - @strivemath/tinacms-schema-tools@1.4.3
+  - @strivemath/tinacms-graphql@1.4.8
+  - @strivemath/tinacms-app@1.2.7
+  - @strivemath/tinacms-datalayer@1.2.8
 
 ## 1.5.6
 
@@ -643,9 +649,9 @@
 - Updated dependencies [65d53d5b9]
 - Updated dependencies [40d15644f]
 - Updated dependencies [a6786cc73]
-  - @tinacms/graphql@1.4.7
-  - @tinacms/datalayer@1.2.7
-  - @tinacms/app@1.2.6
+  - @strivemath/tinacms-graphql@1.4.7
+  - @strivemath/tinacms-datalayer@1.2.7
+  - @strivemath/tinacms-app@1.2.6
 
 ## 1.5.5
 
@@ -653,9 +659,9 @@
 
 - 75d5ed359: Add html tag back into rich-text response
 - Updated dependencies [75d5ed359]
-  - @tinacms/graphql@1.4.6
-  - @tinacms/app@1.2.5
-  - @tinacms/datalayer@1.2.6
+  - @strivemath/tinacms-graphql@1.4.6
+  - @strivemath/tinacms-app@1.2.5
+  - @strivemath/tinacms-datalayer@1.2.6
 
 ## 1.5.4
 
@@ -664,17 +670,17 @@
 - 9f9cc4799: better forestry template migration
 - 8f3767410: better matching on forestry pages
 - Updated dependencies [67c7a48b8]
-  - @tinacms/graphql@1.4.5
-  - @tinacms/app@1.2.4
-  - @tinacms/datalayer@1.2.5
+  - @strivemath/tinacms-graphql@1.4.5
+  - @strivemath/tinacms-app@1.2.4
+  - @strivemath/tinacms-datalayer@1.2.5
 
 ## 1.5.3
 
 ### Patch Changes
 
 - Updated dependencies [ae3abe927]
-  - @tinacms/graphql@1.4.4
-  - @tinacms/datalayer@1.2.4
+  - @strivemath/tinacms-graphql@1.4.4
+  - @strivemath/tinacms-datalayer@1.2.4
 
 ## 1.5.2
 
@@ -685,9 +691,9 @@
 - 9216a5bda: Allow svg imports
 - Updated dependencies [40d908a79]
 - Updated dependencies [02a555c39]
-  - @tinacms/graphql@1.4.3
-  - @tinacms/app@1.2.3
-  - @tinacms/datalayer@1.2.3
+  - @strivemath/tinacms-graphql@1.4.3
+  - @strivemath/tinacms-app@1.2.3
+  - @strivemath/tinacms-datalayer@1.2.3
 
 ## 1.5.1
 
@@ -699,10 +705,10 @@
 - Updated dependencies [af5c32eae]
 - Updated dependencies [1f9f83718]
 - Updated dependencies [a70204500]
-  - @tinacms/graphql@1.4.2
-  - @tinacms/schema-tools@1.4.2
-  - @tinacms/app@1.2.2
-  - @tinacms/datalayer@1.2.2
+  - @strivemath/tinacms-graphql@1.4.2
+  - @strivemath/tinacms-schema-tools@1.4.2
+  - @strivemath/tinacms-app@1.2.2
+  - @strivemath/tinacms-datalayer@1.2.2
 
 ## 1.5.0
 
@@ -716,7 +722,7 @@
 - 5fcef561d: - Pin vite version
   - Adds react plugin so that we no longer get a 404 on react /@react-refresh
   - Adds transform ts and tsx files in build as well as dev
-- 8fc99059f: Fix main export field for @tinacms/app
+- 8fc99059f: Fix main export field for @strivemath/tinacms-app
 - 9a8074889: Consolidate payload transform logic
 - e37f64b7f: feat: Skip blocks import, since it has some issues
   feat: Handle image gallery import
@@ -728,10 +734,10 @@
 - Updated dependencies [9a8074889]
 - Updated dependencies [c48326846]
 - Updated dependencies [13b809ff5]
-  - @tinacms/graphql@1.4.1
-  - @tinacms/app@1.2.1
-  - @tinacms/schema-tools@1.4.1
-  - @tinacms/datalayer@1.2.1
+  - @strivemath/tinacms-graphql@1.4.1
+  - @strivemath/tinacms-app@1.2.1
+  - @strivemath/tinacms-schema-tools@1.4.1
+  - @strivemath/tinacms-datalayer@1.2.1
 
 ## 1.4.0
 
@@ -757,32 +763,32 @@
 - Updated dependencies [0553035f5]
 - Updated dependencies [202cd714d]
 - Updated dependencies [3a1edd50d]
-  - @tinacms/schema-tools@1.4.0
-  - @tinacms/datalayer@1.2.0
-  - @tinacms/graphql@1.4.0
-  - @tinacms/app@1.2.0
-  - @tinacms/metrics@1.0.2
+  - @strivemath/tinacms-schema-tools@1.4.0
+  - @strivemath/tinacms-datalayer@1.2.0
+  - @strivemath/tinacms-graphql@1.4.0
+  - @strivemath/tinacms-app@1.2.0
+  - @strivemath/tinacms-metrics@1.0.2
 
 ## 1.3.3
 
 ### Patch Changes
 
 - Updated dependencies [d1cf65999]
-  - @tinacms/schema-tools@1.3.4
-  - @tinacms/app@1.1.2
-  - @tinacms/graphql@1.3.5
-  - @tinacms/datalayer@1.1.6
+  - @strivemath/tinacms-schema-tools@1.3.4
+  - @strivemath/tinacms-app@1.1.2
+  - @strivemath/tinacms-graphql@1.3.5
+  - @strivemath/tinacms-datalayer@1.1.6
 
 ## 1.3.2
 
 ### Patch Changes
 
 - Updated dependencies [b095d06a9]
-  - @tinacms/graphql@1.3.4
-  - @tinacms/app@1.1.2
-  - @tinacms/datalayer@1.1.5
-  - @tinacms/metrics@1.0.2
-  - @tinacms/schema-tools@1.3.3
+  - @strivemath/tinacms-graphql@1.3.4
+  - @strivemath/tinacms-app@1.1.2
+  - @strivemath/tinacms-datalayer@1.1.5
+  - @strivemath/tinacms-metrics@1.0.2
+  - @strivemath/tinacms-schema-tools@1.3.3
 
 ## 1.3.1
 
@@ -806,11 +812,11 @@
 - Updated dependencies [5427d03c6]
 - Updated dependencies [353899de1]
 - Updated dependencies [01b858e41]
-  - @tinacms/graphql@1.3.3
-  - @tinacms/schema-tools@1.3.3
-  - @tinacms/app@1.1.2
-  - @tinacms/datalayer@1.1.4
-  - @tinacms/metrics@1.0.2
+  - @strivemath/tinacms-graphql@1.3.3
+  - @strivemath/tinacms-schema-tools@1.3.3
+  - @strivemath/tinacms-app@1.1.2
+  - @strivemath/tinacms-datalayer@1.1.4
+  - @strivemath/tinacms-metrics@1.0.2
 
 ## 1.2.2
 
@@ -821,18 +827,18 @@
 - Updated dependencies [892b4e39e]
 - Updated dependencies [3b1fe23ef]
 - Updated dependencies [c97ffc20d]
-  - @tinacms/graphql@1.3.2
-  - @tinacms/schema-tools@1.3.2
-  - @tinacms/app@1.1.1
-  - @tinacms/datalayer@1.1.3
+  - @strivemath/tinacms-graphql@1.3.2
+  - @strivemath/tinacms-schema-tools@1.3.2
+  - @strivemath/tinacms-app@1.1.1
+  - @strivemath/tinacms-datalayer@1.1.3
 
 ## 1.2.1
 
 ### Patch Changes
 
 - Updated dependencies [3bbb621cd]
-  - @tinacms/graphql@1.3.1
-  - @tinacms/datalayer@1.1.2
+  - @strivemath/tinacms-graphql@1.3.1
+  - @strivemath/tinacms-datalayer@1.1.2
 
 ## 1.2.0
 
@@ -847,10 +853,10 @@
 - Updated dependencies [169147490]
 - Updated dependencies [e15d82c2e]
 - Updated dependencies [e732906b6]
-  - @tinacms/graphql@1.3.0
-  - @tinacms/app@1.1.0
-  - @tinacms/schema-tools@1.3.1
-  - @tinacms/datalayer@1.1.1
+  - @strivemath/tinacms-graphql@1.3.0
+  - @strivemath/tinacms-app@1.1.0
+  - @strivemath/tinacms-schema-tools@1.3.1
+  - @strivemath/tinacms-datalayer@1.1.1
 
 ## 1.1.0
 
@@ -864,25 +870,25 @@
 - Updated dependencies [efd56e769]
 - Updated dependencies [efd56e769]
 - Updated dependencies [50f86caed]
-  - @tinacms/app@1.0.7
-  - @tinacms/datalayer@1.1.0
-  - @tinacms/graphql@1.2.0
-  - @tinacms/metrics@1.0.2
-  - @tinacms/schema-tools@1.3.0
+  - @strivemath/tinacms-app@1.0.7
+  - @strivemath/tinacms-datalayer@1.1.0
+  - @strivemath/tinacms-graphql@1.2.0
+  - @strivemath/tinacms-metrics@1.0.2
+  - @strivemath/tinacms-schema-tools@1.3.0
 
 ## 1.0.9
 
 ### Patch Changes
 
 - Updated dependencies [61f8c0e50]
-  - @tinacms/app@1.0.6
+  - @strivemath/tinacms-app@1.0.6
 
 ## 1.0.8
 
 ### Patch Changes
 
 - 55f7953eb: Small cli styling change on public assets in init
-  - @tinacms/app@1.0.5
+  - @strivemath/tinacms-app@1.0.5
 
 ## 1.0.7
 
@@ -920,10 +926,10 @@
 - Updated dependencies [b7b05d03f]
 - Updated dependencies [4533d5d66]
 - Updated dependencies [31dacc176]
-  - @tinacms/schema-tools@1.2.1
-  - @tinacms/app@1.0.5
-  - @tinacms/datalayer@1.0.1
-  - @tinacms/graphql@1.1.0
+  - @strivemath/tinacms-schema-tools@1.2.1
+  - @strivemath/tinacms-app@1.0.5
+  - @strivemath/tinacms-datalayer@1.0.1
+  - @strivemath/tinacms-graphql@1.1.0
 
 ## 1.0.6
 
@@ -932,11 +938,11 @@
 - Updated dependencies [7d41435df]
 - Updated dependencies [3165f397d]
 - Updated dependencies [b2952a298]
-  - @tinacms/graphql@1.0.5
-  - @tinacms/schema-tools@1.2.0
-  - @tinacms/app@1.0.4
-  - @tinacms/datalayer@1.0.0
-  - @tinacms/metrics@1.0.1
+  - @strivemath/tinacms-graphql@1.0.5
+  - @strivemath/tinacms-schema-tools@1.2.0
+  - @strivemath/tinacms-app@1.0.4
+  - @strivemath/tinacms-datalayer@1.0.0
+  - @strivemath/tinacms-metrics@1.0.1
 
 ## 1.0.5
 
@@ -946,10 +952,10 @@
 - Updated dependencies [7554ea362]
 - Updated dependencies [1a75e8c13]
 - Updated dependencies [4ebc44068]
-  - @tinacms/schema-tools@1.1.0
-  - @tinacms/app@1.0.4
-  - @tinacms/metrics@1.0.1
-  - @tinacms/graphql@1.0.4
+  - @strivemath/tinacms-schema-tools@1.1.0
+  - @strivemath/tinacms-app@1.0.4
+  - @strivemath/tinacms-metrics@1.0.1
+  - @strivemath/tinacms-graphql@1.0.4
 
 ## 1.0.4
 
@@ -959,9 +965,9 @@
 - Updated dependencies [66ed1452b]
 - Updated dependencies [7495f032b]
 - Updated dependencies [de37c9eff]
-  - @tinacms/app@1.0.3
-  - @tinacms/schema-tools@1.0.3
-  - @tinacms/graphql@1.0.3
+  - @strivemath/tinacms-app@1.0.3
+  - @strivemath/tinacms-schema-tools@1.0.3
+  - @strivemath/tinacms-graphql@1.0.3
 
 ## 1.0.3
 
@@ -969,13 +975,13 @@
 
 - Updated dependencies [f13878798]
 - Updated dependencies [c62d2bad4]
-  - @tinacms/app@1.0.2
+  - @strivemath/tinacms-app@1.0.2
 
 ## 1.0.2
 
 ### Patch Changes
 
-- c91bc0fc9: Tweak CLI styling for create-tina-app, tinacms dev, and tinacms init
+- c91bc0fc9: Tweak CLI styling for @strivemath/create-tina-app, tinacms dev, and tinacms init
 - Updated dependencies [38438bad6]
 - Updated dependencies [c91bc0fc9]
 - Updated dependencies [78b9668b1]
@@ -983,9 +989,9 @@
 - Updated dependencies [7c1425a82]
 - Updated dependencies [c1ac4bf10]
 - Updated dependencies [9d4943a82]
-  - @tinacms/app@1.0.1
-  - @tinacms/schema-tools@1.0.2
-  - @tinacms/graphql@1.0.2
+  - @strivemath/tinacms-app@1.0.1
+  - @strivemath/tinacms-schema-tools@1.0.2
+  - @strivemath/tinacms-graphql@1.0.2
 
 ## 1.0.1
 
@@ -993,9 +999,9 @@
 
 - Updated dependencies [08e02ec21]
 - Updated dependencies [94a5da311]
-  - @tinacms/schema-tools@1.0.1
-  - @tinacms/graphql@1.0.1
-  - @tinacms/app@1.0.0
+  - @strivemath/tinacms-schema-tools@1.0.1
+  - @strivemath/tinacms-graphql@1.0.1
+  - @strivemath/tinacms-app@1.0.0
 
 ## 1.0.0
 
@@ -1008,11 +1014,11 @@
 ### Patch Changes
 
 - Updated dependencies [958d10c82]
-  - @tinacms/app@1.0.0
-  - @tinacms/datalayer@1.0.0
-  - @tinacms/graphql@1.0.0
-  - @tinacms/metrics@1.0.0
-  - @tinacms/schema-tools@1.0.0
+  - @strivemath/tinacms-app@1.0.0
+  - @strivemath/tinacms-datalayer@1.0.0
+  - @strivemath/tinacms-graphql@1.0.0
+  - @strivemath/tinacms-metrics@1.0.0
+  - @strivemath/tinacms-schema-tools@1.0.0
 
 ## 0.62.3
 
@@ -1021,9 +1027,9 @@
 - Updated dependencies [f4dcf3e27]
 - Updated dependencies [a5d6722c7]
 - Updated dependencies [231dcab2e]
-  - @tinacms/app@0.0.28
-  - @tinacms/schema-tools@0.2.2
-  - @tinacms/graphql@0.63.20
+  - @strivemath/tinacms-app@0.0.28
+  - @strivemath/tinacms-schema-tools@0.2.2
+  - @strivemath/tinacms-graphql@0.63.20
 
 ## 0.62.2
 
@@ -1034,9 +1040,9 @@
 - Updated dependencies [3370cefd8]
 - Updated dependencies [6c93834a2]
 - Updated dependencies [e720590e1]
-  - @tinacms/app@0.0.27
-  - @tinacms/schema-tools@0.2.1
-  - @tinacms/graphql@0.63.19
+  - @strivemath/tinacms-app@0.0.27
+  - @strivemath/tinacms-schema-tools@0.2.1
+  - @strivemath/tinacms-graphql@0.63.19
 
 ## 0.62.1
 
@@ -1058,16 +1064,16 @@
 - Updated dependencies [f7d3cf532]
 - Updated dependencies [774abcf9c]
 - Updated dependencies [245a65dfe]
-  - @tinacms/app@0.0.26
-  - @tinacms/schema-tools@0.2.0
-  - @tinacms/graphql@0.63.18
+  - @strivemath/tinacms-app@0.0.26
+  - @strivemath/tinacms-schema-tools@0.2.0
+  - @strivemath/tinacms-graphql@0.63.18
 
 ## 0.61.27
 
 ### Patch Changes
 
 - Updated dependencies [6d06e18a3]
-  - @tinacms/app@0.0.25
+  - @strivemath/tinacms-app@0.0.25
 
 ## 0.61.26
 
@@ -1076,8 +1082,8 @@
 - 194123d26: Update error message
 - 97f0b6472: Add raw editor support for static mode. Use `~` for preview path.
 - 660dc62fb: Show a deperecated notification for old schema file usage
-  - @tinacms/app@0.0.24
-  - @tinacms/graphql@0.63.17
+  - @strivemath/tinacms-app@0.0.24
+  - @strivemath/tinacms-graphql@0.63.17
 
 ## 0.61.25
 
@@ -1086,23 +1092,23 @@
 - ec73f1ea6: Check config.ts/config.tsx additionally for usingTs
 - Updated dependencies [15f7c18ef]
 - Updated dependencies [c4f9607ce]
-  - @tinacms/app@0.0.24
-  - @tinacms/schema-tools@0.1.9
-  - @tinacms/graphql@0.63.16
+  - @strivemath/tinacms-app@0.0.24
+  - @strivemath/tinacms-schema-tools@0.1.9
+  - @strivemath/tinacms-graphql@0.63.16
 
 ## 0.61.24
 
 ### Patch Changes
 
-- 009fe3180: Reorganize @tinacms/app so that it runs a local install in the working directory to ensure consistent dependencies
+- 009fe3180: Reorganize @strivemath/tinacms-app so that it runs a local install in the working directory to ensure consistent dependencies
 - 03aa3e09e: Remove the use of ESM package, which allowed CJS scripts to run as ES modules. This was initially used for yarn pnp support but is no longer necessary.
 - Updated dependencies [009fe3180]
 - Updated dependencies [2f6a3596d]
-  - @tinacms/app@0.0.23
-  - @tinacms/datalayer@0.2.4
-  - @tinacms/graphql@0.63.15
-  - @tinacms/metrics@0.0.3
-  - @tinacms/schema-tools@0.1.8
+  - @strivemath/tinacms-app@0.0.23
+  - @strivemath/tinacms-datalayer@0.2.4
+  - @strivemath/tinacms-graphql@0.63.15
+  - @strivemath/tinacms-metrics@0.0.3
+  - @strivemath/tinacms-schema-tools@0.1.8
 
 ## 0.61.23
 
@@ -1111,11 +1117,11 @@
 - 2422e505d: Removed styled-components as a dependency in tinacms.
   Removed deprecated react-toolbar in @tinacms/toolkit.
 - Updated dependencies [2422e505d]
-  - @tinacms/app@0.0.22
-  - @tinacms/graphql@0.63.15
-  - @tinacms/datalayer@0.2.4
-  - @tinacms/metrics@0.0.3
-  - @tinacms/schema-tools@0.1.8
+  - @strivemath/tinacms-app@0.0.22
+  - @strivemath/tinacms-graphql@0.63.15
+  - @strivemath/tinacms-datalayer@0.2.4
+  - @strivemath/tinacms-metrics@0.0.3
+  - @strivemath/tinacms-schema-tools@0.1.8
 
 ## 0.61.22
 
@@ -1123,9 +1129,9 @@
 
 - Updated dependencies [005e1d699]
 - Updated dependencies [ce6c1ccfb]
-  - @tinacms/schema-tools@0.1.8
-  - @tinacms/graphql@0.63.14
-  - @tinacms/app@0.0.21
+  - @strivemath/tinacms-schema-tools@0.1.8
+  - @strivemath/tinacms-graphql@0.63.14
+  - @strivemath/tinacms-app@0.0.21
 
 ## 0.61.21
 
@@ -1134,25 +1140,25 @@
 - 97225d5f0: Exit tinacms init when there's an error with dependency install
 - fce51ddd8: Remove extra space in tina init console.log
 - Updated dependencies [b1a357f60]
-  - @tinacms/schema-tools@0.1.7
-  - @tinacms/app@0.0.20
-  - @tinacms/graphql@0.63.13
+  - @strivemath/tinacms-schema-tools@0.1.7
+  - @strivemath/tinacms-app@0.0.20
+  - @strivemath/tinacms-graphql@0.63.13
 
 ## 0.61.20
 
 ### Patch Changes
 
 - Updated dependencies [c6e3bd321]
-  - @tinacms/schema-tools@0.1.6
-  - @tinacms/app@0.0.19
-  - @tinacms/graphql@0.63.12
+  - @strivemath/tinacms-schema-tools@0.1.6
+  - @strivemath/tinacms-app@0.0.19
+  - @strivemath/tinacms-graphql@0.63.12
 
 ## 0.61.19
 
 ### Patch Changes
 
 - 802381abd: Fix an issue where npm init didn't get awaited during init
-  - @tinacms/app@0.0.18
+  - @strivemath/tinacms-app@0.0.18
 
 ## 0.61.18
 
@@ -1160,28 +1166,28 @@
 
 - Updated dependencies [183249b11]
 - Updated dependencies [8060d0949]
-  - @tinacms/schema-tools@0.1.5
-  - @tinacms/app@0.0.17
-  - @tinacms/graphql@0.63.11
+  - @strivemath/tinacms-schema-tools@0.1.5
+  - @strivemath/tinacms-app@0.0.17
+  - @strivemath/tinacms-graphql@0.63.11
 
 ## 0.61.17
 
 ### Patch Changes
 
-- @tinacms/app@0.0.16
+- @strivemath/tinacms-app@0.0.16
 
 ## 0.61.16
 
 ### Patch Changes
 
 - a4a829734: Remove styled-components from static install
-  - @tinacms/app@0.0.15
+  - @strivemath/tinacms-app@0.0.15
 
 ## 0.61.15
 
 ### Patch Changes
 
-- @tinacms/app@0.0.14
+- @strivemath/tinacms-app@0.0.14
 
 ## 0.61.14
 
@@ -1204,10 +1210,10 @@
 - Updated dependencies [f3439ea35]
 - Updated dependencies [48032e2ba]
 - Updated dependencies [6e137ea85]
-  - @tinacms/schema-tools@0.1.4
-  - @tinacms/app@0.0.13
-  - @tinacms/datalayer@0.2.4
-  - @tinacms/graphql@0.63.10
+  - @strivemath/tinacms-schema-tools@0.1.4
+  - @strivemath/tinacms-app@0.0.13
+  - @strivemath/tinacms-datalayer@0.2.4
+  - @strivemath/tinacms-graphql@0.63.10
 
 ## 0.61.13
 
@@ -1221,25 +1227,25 @@
 - Updated dependencies [9183157c4]
 - Updated dependencies [4adf12619]
 - Updated dependencies [f8b89379c]
-  - @tinacms/app@0.0.12
-  - @tinacms/schema-tools@0.1.3
-  - @tinacms/graphql@0.63.9
+  - @strivemath/tinacms-app@0.0.12
+  - @strivemath/tinacms-schema-tools@0.1.3
+  - @strivemath/tinacms-graphql@0.63.9
 
 ## 0.61.12
 
 ### Patch Changes
 
 - Updated dependencies [87369d34c]
-  - @tinacms/graphql@0.63.8
+  - @strivemath/tinacms-graphql@0.63.8
 
 ## 0.61.11
 
 ### Patch Changes
 
 - Updated dependencies [777b1e08a]
-  - @tinacms/schema-tools@0.1.2
-  - @tinacms/graphql@0.63.7
-  - @tinacms/app@0.0.11
+  - @strivemath/tinacms-schema-tools@0.1.2
+  - @strivemath/tinacms-graphql@0.63.7
+  - @strivemath/tinacms-app@0.0.11
 
 ## 0.61.10
 
@@ -1254,9 +1260,9 @@
 - Updated dependencies [232ae6d52]
 - Updated dependencies [fd4d8c8ff]
 - Updated dependencies [9e5da3103]
-  - @tinacms/graphql@0.63.6
-  - @tinacms/schema-tools@0.1.1
-  - @tinacms/app@0.0.10
+  - @strivemath/tinacms-graphql@0.63.6
+  - @strivemath/tinacms-schema-tools@0.1.1
+  - @strivemath/tinacms-app@0.0.10
 
 ## 0.61.9
 
@@ -1264,47 +1270,47 @@
 
 - 2b60a7bd8: Improve audit so that it doesn't throw errors during the file list process. Also adds support for `--verbose` argument during `audit`.
 - Updated dependencies [2b60a7bd8]
-  - @tinacms/graphql@0.63.5
-  - @tinacms/app@0.0.9
+  - @strivemath/tinacms-graphql@0.63.5
+  - @strivemath/tinacms-app@0.0.9
 
 ## 0.61.8
 
 ### Patch Changes
 
 - b1f141e66: Fixes an issue where JSX inside the tina schema would break compilation for users using a later version of esbuild.
-  - @tinacms/app@0.0.8
+  - @strivemath/tinacms-app@0.0.8
 
 ## 0.61.7
 
 ### Patch Changes
 
 - Updated dependencies [1fc0e339e]
-  - @tinacms/datalayer@0.2.3
-  - @tinacms/graphql@0.63.4
+  - @strivemath/tinacms-datalayer@0.2.3
+  - @strivemath/tinacms-graphql@0.63.4
 
 ## 0.61.6
 
 ### Patch Changes
 
 - Updated dependencies [b369d7238]
-  - @tinacms/graphql@0.63.3
-  - @tinacms/app@0.0.7
+  - @strivemath/tinacms-graphql@0.63.3
+  - @strivemath/tinacms-app@0.0.7
 
 ## 0.61.5
 
 ### Patch Changes
 
-- @tinacms/graphql@0.63.2
+- @strivemath/tinacms-graphql@0.63.2
 
 ## 0.61.4
 
 ### Patch Changes
 
-- @tinacms/app@0.0.6
-- @tinacms/datalayer@0.2.2
-- @tinacms/graphql@0.63.1
-- @tinacms/metrics@0.0.3
-- @tinacms/schema-tools@0.1.0
+- @strivemath/tinacms-app@0.0.6
+- @strivemath/tinacms-datalayer@0.2.2
+- @strivemath/tinacms-graphql@0.63.1
+- @strivemath/tinacms-metrics@0.0.3
+- @strivemath/tinacms-schema-tools@0.1.0
 
 ## 0.61.3
 
@@ -1312,8 +1318,8 @@
 
 - Updated dependencies [067c49efd]
 - Updated dependencies [9ba09bd0c]
-  - @tinacms/graphql@0.63.1
-  - @tinacms/app@0.0.5
+  - @strivemath/tinacms-graphql@0.63.1
+  - @strivemath/tinacms-app@0.0.5
 
 ## 0.61.2
 
@@ -1356,11 +1362,11 @@
 
 - Updated dependencies [7b0dda55e]
 - Updated dependencies [8183b638c]
-  - @tinacms/graphql@0.63.0
-  - @tinacms/schema-tools@0.1.0
-  - @tinacms/app@0.0.4
-  - @tinacms/datalayer@0.2.2
-  - @tinacms/metrics@0.0.3
+  - @strivemath/tinacms-graphql@0.63.0
+  - @strivemath/tinacms-schema-tools@0.1.0
+  - @strivemath/tinacms-app@0.0.4
+  - @strivemath/tinacms-datalayer@0.2.2
+  - @strivemath/tinacms-metrics@0.0.3
 
 ## 0.61.1
 
@@ -1369,7 +1375,7 @@
 - 531347748: Update to use mkdirp to fix issue on windows
 - Updated dependencies [028e10686]
 - Updated dependencies [e27f5cce7]
-  - @tinacms/graphql@0.62.1
+  - @strivemath/tinacms-graphql@0.62.1
 
 ## 0.61.0
 
@@ -1473,16 +1479,16 @@
 - Updated dependencies [ae06f4a96]
 - Updated dependencies [660247b6b]
 - Updated dependencies [a7dcb8d44]
-  - @tinacms/graphql@0.62.0
-  - @tinacms/schema-tools@0.0.9
-  - @tinacms/datalayer@0.2.2
+  - @strivemath/tinacms-graphql@0.62.0
+  - @strivemath/tinacms-schema-tools@0.0.9
+  - @strivemath/tinacms-datalayer@0.2.2
 
 ## 0.60.28
 
 ### Patch Changes
 
 - Updated dependencies [0b5a8e6e7]
-  - @tinacms/graphql@0.61.3
+  - @strivemath/tinacms-graphql@0.61.3
 
 ## 0.60.27
 
@@ -1491,9 +1497,9 @@
 - 8e893a027: Fixed issue where having a src and pages dir would cause an issue
 - Updated dependencies [cf0f531a1]
 - Updated dependencies [b0dfc6205]
-  - @tinacms/datalayer@0.2.1
-  - @tinacms/schema-tools@0.0.8
-  - @tinacms/graphql@0.61.2
+  - @strivemath/tinacms-datalayer@0.2.1
+  - @strivemath/tinacms-schema-tools@0.0.8
+  - @strivemath/tinacms-graphql@0.61.2
 
 ## 0.60.26
 
@@ -1506,8 +1512,8 @@
 - Updated dependencies [7d87eb6b7]
 - Updated dependencies [67e291e56]
 - Updated dependencies [ae23e9ad6]
-  - @tinacms/graphql@0.61.1
-  - @tinacms/schema-tools@0.0.7
+  - @strivemath/tinacms-graphql@0.61.1
+  - @strivemath/tinacms-schema-tools@0.0.7
 
 ## 0.60.25
 
@@ -1532,17 +1538,17 @@
 - Updated dependencies [b348f8b6b]
 - Updated dependencies [fb73fb355]
 - Updated dependencies [4daf15b36]
-  - @tinacms/graphql@0.61.0
-  - @tinacms/datalayer@0.2.0
-  - @tinacms/schema-tools@0.0.6
-  - @tinacms/metrics@0.0.3
+  - @strivemath/tinacms-graphql@0.61.0
+  - @strivemath/tinacms-datalayer@0.2.0
+  - @strivemath/tinacms-schema-tools@0.0.6
+  - @strivemath/tinacms-metrics@0.0.3
 
 ## 0.60.23
 
 ### Patch Changes
 
 - Updated dependencies [3325cd226]
-  - @tinacms/graphql@0.60.8
+  - @strivemath/tinacms-graphql@0.60.8
 
 ## 0.60.22
 
@@ -1554,10 +1560,10 @@
 - Updated dependencies [b1a4290e6]
 - Updated dependencies [1955b8842]
 - Updated dependencies [8b81c3cf3]
-  - @tinacms/graphql@0.60.7
-  - @tinacms/schema-tools@0.0.5
-  - @tinacms/datalayer@0.1.1
-  - @tinacms/metrics@0.0.3
+  - @strivemath/tinacms-graphql@0.60.7
+  - @strivemath/tinacms-schema-tools@0.0.5
+  - @strivemath/tinacms-datalayer@0.1.1
+  - @strivemath/tinacms-metrics@0.0.3
 
 ## 0.60.21
 
@@ -1565,7 +1571,7 @@
 
 - Updated dependencies [e2aafcd93]
 - Updated dependencies [a20fed8b7]
-  - @tinacms/graphql@0.60.6
+  - @strivemath/tinacms-graphql@0.60.6
 
 ## 0.60.20
 
@@ -1573,7 +1579,7 @@
 
 - f71f55ac3: Fixd issue where --dev caused a breaking change
 - Updated dependencies [57f09bdd7]
-  - @tinacms/graphql@0.60.5
+  - @strivemath/tinacms-graphql@0.60.5
 
 ## 0.60.19
 
@@ -1582,7 +1588,7 @@
 - d103b27ad: Fix issue where new collections would not be added when CLI restarts
 - e06dbb3ca: Adds `waitForDB` cmd to cli
 - Updated dependencies [d103b27ad]
-  - @tinacms/graphql@0.60.4
+  - @strivemath/tinacms-graphql@0.60.4
 
 ## 0.60.18
 
@@ -1596,7 +1602,7 @@
 - Updated dependencies [3f46c6706]
 - Updated dependencies [db9168578]
 - Updated dependencies [91d6e6758]
-  - @tinacms/graphql@0.60.3
+  - @strivemath/tinacms-graphql@0.60.3
 
 ## 0.60.17
 
@@ -1608,8 +1614,8 @@
 - Updated dependencies [08cdb672a]
 - Updated dependencies [fdbfe9a16]
 - Updated dependencies [6e2ed31a2]
-  - @tinacms/graphql@0.60.2
-  - @tinacms/schema-tools@0.0.4
+  - @strivemath/tinacms-graphql@0.60.2
+  - @strivemath/tinacms-schema-tools@0.0.4
 
 ## 0.60.16
 
@@ -1617,7 +1623,7 @@
 
 - 7372f90ca: Adds a new client that can be used on the backend and frontend.
 - Updated dependencies [3b11ff6ad]
-  - @tinacms/graphql@0.60.1
+  - @strivemath/tinacms-graphql@0.60.1
 
 ## 0.60.15
 
@@ -1630,7 +1636,7 @@
 ### Patch Changes
 
 - Updated dependencies [6a6f137ae]
-  - @tinacms/graphql@0.60.0
+  - @strivemath/tinacms-graphql@0.60.0
 
 ## 0.60.13
 
@@ -1653,24 +1659,24 @@
 - Updated dependencies [558cc4368]
 - Updated dependencies [06666d39f]
 - Updated dependencies [3e2d9e43a]
-  - @tinacms/graphql@0.59.11
-  - @tinacms/schema-tools@0.0.3
-  - @tinacms/metrics@0.0.3
-  - @tinacms/datalayer@0.1.1
+  - @strivemath/tinacms-graphql@0.59.11
+  - @strivemath/tinacms-schema-tools@0.0.3
+  - @strivemath/tinacms-metrics@0.0.3
+  - @strivemath/tinacms-datalayer@0.1.1
 
 ## 0.60.11
 
 ### Patch Changes
 
 - Updated dependencies [cf33bcec1]
-  - @tinacms/graphql@0.59.10
+  - @strivemath/tinacms-graphql@0.59.10
 
 ## 0.60.10
 
 ### Patch Changes
 
 - 6154d12b8: Check for appropriate versions of react and react-dom before initializing with tinacms init
-- 8c23d69a2: Adds an MDX example when you run @tinacms/cli init
+- 8c23d69a2: Adds an MDX example when you run @strivemath/tinacms-cli init
 - abf25c673: The schema can now to used on the frontend (optional for now but will be the main path moving forward).
 
   ### How to migrate.
@@ -1678,7 +1684,7 @@
   If you gone though the `tinacms init` process there should be a file called `.tina/components/TinaProvider`. In that file you can import the schema from `schema.ts` and add it to the TinaCMS wrapper component.
 
   ```tsx
-  import TinaCMS from 'tinacms'
+  import TinaCMS from '@strivemath/tinacms'
   import schema, { tinaConfig } from '../schema.ts'
 
   // Importing the TinaProvider directly into your page will cause Tina to be added to the production bundle.
@@ -1705,8 +1711,8 @@
 - Updated dependencies [591640db0]
 - Updated dependencies [e8b0de1f7]
 - Updated dependencies [b01f2e382]
-  - @tinacms/datalayer@0.1.0
-  - @tinacms/graphql@0.59.9
+  - @strivemath/tinacms-datalayer@0.1.0
+  - @strivemath/tinacms-graphql@0.59.9
 
 ## 0.60.9
 
@@ -1715,7 +1721,7 @@
 - 048538625: fix: return cms on cmsCallback codegen (to fix broken typing)
 - Updated dependencies [e7b27ba3b]
 - Updated dependencies [11d55f441]
-  - @tinacms/graphql@0.59.8
+  - @strivemath/tinacms-graphql@0.59.8
 
 ## 0.60.8
 
@@ -1730,9 +1736,9 @@
 - 9e436f145: Update CLI to use defineConfig
 - 851e4be73: Update tina init to use the new way of laying out tina config
 - cc99e4309: update admin file path to /pages/admin.js to support the hash router
-  - @tinacms/datalayer@0.0.2
-  - @tinacms/graphql@0.59.7
-  - @tinacms/metrics@0.0.2
+  - @strivemath/tinacms-datalayer@0.0.2
+  - @strivemath/tinacms-graphql@0.59.7
+  - @strivemath/tinacms-metrics@0.0.2
 
 ## 0.60.6
 
@@ -1751,7 +1757,7 @@
 
 - Updated dependencies [c730fa1dd]
 - Updated dependencies [cd0f6f022]
-  - @tinacms/graphql@0.59.7
+  - @strivemath/tinacms-graphql@0.59.7
 
 ## 0.60.5
 
@@ -1769,9 +1775,9 @@
 
 - Updated dependencies [8bf0ac832]
 - Updated dependencies [a05546eb4]
-  - @tinacms/metrics@0.0.2
-  - @tinacms/datalayer@0.0.2
-  - @tinacms/graphql@0.59.6
+  - @strivemath/tinacms-metrics@0.0.2
+  - @strivemath/tinacms-datalayer@0.0.2
+  - @strivemath/tinacms-graphql@0.59.6
 
 ## 0.60.3
 
@@ -1780,8 +1786,8 @@
 - 43b40cc8b: Implement useTina in CLI init
 - b399c734c: Fixes support for collection.templates in graphql
 - Updated dependencies [b399c734c]
-  - @tinacms/datalayer@0.0.2
-  - @tinacms/graphql@0.59.6
+  - @strivemath/tinacms-datalayer@0.0.2
+  - @strivemath/tinacms-graphql@0.59.6
 
 ## 0.60.2
 
@@ -1799,8 +1805,8 @@
 - Updated dependencies [e3c41f69d]
 - Updated dependencies [f5390e841]
 - Updated dependencies [32082e0b3]
-  - @tinacms/graphql@0.59.5
-  - @tinacms/datalayer@0.0.1
+  - @strivemath/tinacms-graphql@0.59.5
+  - @strivemath/tinacms-datalayer@0.0.1
 
 ## 0.60.0
 
@@ -1814,7 +1820,7 @@
 - Updated dependencies [b66aefde1]
 - Updated dependencies [35884152b]
 - Updated dependencies [4948beec6]
-  - @tinacms/graphql@0.59.4
+  - @strivemath/tinacms-graphql@0.59.4
 
 ## 0.59.0
 
@@ -1824,22 +1830,22 @@
 
 ### Patch Changes
 
-- 80732bd97: Create a @tinacms/datalayer package which houses the logic for data management for the GraphQL API. This simplifies the @tinacms/graphql package and allows for a clearer separation.
+- 80732bd97: Create a @strivemath/tinacms-datalayer package which houses the logic for data management for the GraphQL API. This simplifies the @strivemath/tinacms-graphql package and allows for a clearer separation.
 - Updated dependencies [34cd3a44a]
 - Updated dependencies [b006a5ab9]
 - Updated dependencies [a324b9c37]
 - Updated dependencies [80732bd97]
 - Updated dependencies [0bec208e2]
 - Updated dependencies [5c070a83f]
-  - @tinacms/graphql@0.59.3
-  - @tinacms/datalayer@0.0.1
+  - @strivemath/tinacms-graphql@0.59.3
+  - @strivemath/tinacms-datalayer@0.0.1
 
 ## 0.58.5
 
 ### Patch Changes
 
 - Updated dependencies [212685fc3]
-  - @tinacms/graphql@0.59.2
+  - @strivemath/tinacms-graphql@0.59.2
 
 ## 0.58.4
 
@@ -1847,7 +1853,7 @@
 
 - 118524507: Fixed typo in admin link
 - Updated dependencies [f46c6f987]
-  - @tinacms/graphql@0.59.1
+  - @strivemath/tinacms-graphql@0.59.1
 
 ## 0.58.3
 
@@ -1855,21 +1861,21 @@
 
 - Updated dependencies [bd4e1f802]
 - Updated dependencies [62bea7019]
-  - @tinacms/graphql@0.59.0
+  - @strivemath/tinacms-graphql@0.59.0
 
 ## 0.58.2
 
 ### Patch Changes
 
 - Updated dependencies [fffce3af8]
-  - @tinacms/graphql@0.58.2
+  - @strivemath/tinacms-graphql@0.58.2
 
 ## 0.58.1
 
 ### Patch Changes
 
 - Updated dependencies [4700d7ae4]
-  - @tinacms/graphql@0.58.1
+  - @strivemath/tinacms-graphql@0.58.1
 
 ## 0.58.0
 
@@ -1884,7 +1890,7 @@
 - Updated dependencies [eb5fbfac7]
 - Updated dependencies [fa7a0419f]
 - Updated dependencies [47d126029]
-  - @tinacms/graphql@0.58.0
+  - @strivemath/tinacms-graphql@0.58.0
 
 ## 0.57.2
 
@@ -1892,7 +1898,7 @@
 
 - edb2f4011: Trim path property on collections during compilation
 - Updated dependencies [edb2f4011]
-  - @tinacms/graphql@0.57.2
+  - @strivemath/tinacms-graphql@0.57.2
 
 ## 0.57.1
 
@@ -1901,7 +1907,7 @@
 - 50710e1d0: Add no-check for Typescript-generated file
 - c78d981e6: Reset entire **generated** folder on re-compile
 - Updated dependencies [60729f60c]
-  - @tinacms/graphql@0.57.1
+  - @strivemath/tinacms-graphql@0.57.1
 
 ## 0.57.0
 
@@ -1916,7 +1922,7 @@
 - Updated dependencies [577d6a5ad]
 - Updated dependencies [ed277e3bd]
 - Updated dependencies [d1ed404ba]
-  - @tinacms/graphql@0.57.0
+  - @strivemath/tinacms-graphql@0.57.0
 
 ## 0.56.5
 
@@ -1924,7 +1930,7 @@
 
 - 33ebe7a41: updated cli generated files
 - Updated dependencies [4b7795612]
-  - @tinacms/graphql@0.56.1
+  - @strivemath/tinacms-graphql@0.56.1
 
 ## 0.56.4
 
@@ -1933,7 +1939,7 @@
 - b99baebf1: Add rich-text editor based on mdx, bump React dependency requirement to 16.14
 - Updated dependencies [891623c7c]
 - Updated dependencies [b99baebf1]
-  - @tinacms/graphql@0.56.0
+  - @strivemath/tinacms-graphql@0.56.0
 
 ## 0.56.3
 
@@ -1946,7 +1952,7 @@
 ### Patch Changes
 
 - Updated dependencies [9ecb392ca]
-  - @tinacms/graphql@0.55.2
+  - @strivemath/tinacms-graphql@0.55.2
 
 ## 0.56.1
 
@@ -1954,7 +1960,7 @@
 
 - Updated dependencies [ff4446c8e]
 - Updated dependencies [667c33e2a]
-  - @tinacms/graphql@0.55.1
+  - @strivemath/tinacms-graphql@0.55.1
 
 ## 0.56.0
 
@@ -1968,7 +1974,7 @@
 - Updated dependencies [2908f8176]
 - Updated dependencies [5d83643b2]
 - Updated dependencies [f3bddeb4a]
-  - @tinacms/graphql@0.55.0
+  - @strivemath/tinacms-graphql@0.55.0
 
 ## 0.55.2
 
@@ -1977,7 +1983,7 @@
 - e6e727697: feat: add simpler err message
 - 9b27192fe: Build packages with new scripting, which includes preliminary support for ES modules.
 - Updated dependencies [9b27192fe]
-  - @tinacms/graphql@0.54.3
+  - @strivemath/tinacms-graphql@0.54.3
 
 ## 0.55.1
 
@@ -1985,7 +1991,7 @@
 
 - d94fec611: Improve exported types for defineSchema
 - Updated dependencies [d94fec611]
-  - @tinacms/graphql@0.54.2
+  - @strivemath/tinacms-graphql@0.54.2
 
 ## 0.55.0
 
@@ -1998,14 +2004,14 @@
 ### Patch Changes
 
 - Updated dependencies [4de977f63]
-  - @tinacms/graphql@0.54.1
+  - @strivemath/tinacms-graphql@0.54.1
 
 ## 0.54.1
 
 ### Patch Changes
 
 - Updated dependencies [7663e0f7f]
-  - @tinacms/graphql@0.54.0
+  - @strivemath/tinacms-graphql@0.54.0
 
 ## 0.54.0
 
@@ -2016,29 +2022,29 @@
 ### Patch Changes
 
 - Updated dependencies [b4f5e973f]
-  - @tinacms/graphql@0.53.0
+  - @strivemath/tinacms-graphql@0.53.0
 
 ## 0.53.3
 
 ### Patch Changes
 
 - Updated dependencies [b4bbdda86]
-  - @tinacms/graphql@0.52.2
+  - @strivemath/tinacms-graphql@0.52.2
 
 ## 0.53.2
 
 ### Patch Changes
 
 - Updated dependencies [b05c91c6]
-  - @tinacms/graphql@0.52.1
+  - @strivemath/tinacms-graphql@0.52.1
 
 ## 0.53.1
 
 ### Patch Changes
 
-- 7d2307321: Fixed the new line character in the @tinacms/cli init command
+- 7d2307321: Fixed the new line character in the @strivemath/tinacms-cli init command
 - Updated dependencies [aa4507697]
-  - @tinacms/graphql@0.52.0
+  - @strivemath/tinacms-graphql@0.52.0
 
 ## 0.53.0
 
@@ -2051,7 +2057,7 @@
 ### Patch Changes
 
 - Updated dependencies [589c7806]
-  - @tinacms/graphql@0.51.1
+  - @strivemath/tinacms-graphql@0.51.1
 
 ## 0.52.1
 
@@ -2060,7 +2066,7 @@
 - c66b7eef: added regex to add css files to generated file
 - Updated dependencies [5a934f6b]
 - Updated dependencies [271a72d7]
-  - @tinacms/graphql@0.51.0
+  - @strivemath/tinacms-graphql@0.51.0
 
 ## 0.52.0
 
@@ -2077,7 +2083,7 @@
 ### Patch Changes
 
 - Updated dependencies [0970961f]
-  - @tinacms/graphql@0.50.2
+  - @strivemath/tinacms-graphql@0.50.2
 
 ## 0.51.0
 
@@ -2090,7 +2096,7 @@
 ### Patch Changes
 
 - Updated dependencies [65b3e3a3]
-  - @tinacms/graphql@0.50.1
+  - @strivemath/tinacms-graphql@0.50.1
 
 ## 0.50.0
 
@@ -2139,7 +2145,7 @@
 ### Patch Changes
 
 - Updated dependencies [7f3c8c1a]
-  - @tinacms/graphql@0.1.0
+  - @strivemath/tinacms-graphql@0.1.0
 
 ## 0.4.0
 
@@ -2263,7 +2269,7 @@
   And then when you register the plugin, provide your custom logic here:
 
   ```js
-  import { TextFieldPlugin } from 'tinacms'
+  import { TextFieldPlugin } from '@strivemath/tinacms'
 
   // ...
 

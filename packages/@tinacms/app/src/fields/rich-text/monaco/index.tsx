@@ -12,7 +12,7 @@ import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
  * easily install the current version of the mdx package in all scenarios
  * (when we're working in the monorepo, or working with a tagged npm version)
  */
-import { parseMDX, stringifyMDX } from '@tinacms/mdx'
+import { parseMDX, stringifyMDX } from '@strivemath/tinacms-mdx'
 import { useDebounce } from './use-debounce'
 import type * as monaco from 'monaco-editor'
 import {
@@ -20,7 +20,7 @@ import {
   ErrorMessage,
   InvalidMarkdownElement,
 } from './error-message'
-import { RichTextType } from 'tinacms'
+import { RichTextType } from '@strivemath/tinacms'
 
 export const uuid = () => {
   // @ts-ignore

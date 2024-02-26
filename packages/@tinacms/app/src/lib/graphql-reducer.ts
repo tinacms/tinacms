@@ -20,7 +20,7 @@ import {
   GlobalFormPlugin,
   TinaState,
   ErrorDialog,
-} from 'tinacms'
+} from '@strivemath/tinacms'
 import { createForm, createGlobalForm, FormifyCallback } from './build-form'
 import type {
   PostMessage,

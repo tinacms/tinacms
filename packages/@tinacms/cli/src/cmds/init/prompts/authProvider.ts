@@ -19,8 +19,8 @@ const supportedAuthProviders: {
     backendAuthProviderImports: [
       {
         imported: ['TinaCloudBackendAuthProvider'],
-        from: '@tinacms/auth',
-        packageName: '@tinacms/auth',
+        from: '@strivemath/tinacms-auth',
+        packageName: '@strivemath/tinacms-auth',
       },
     ],
   },
@@ -30,7 +30,7 @@ const supportedAuthProviders: {
     configImports: [
       {
         imported: ['UsernamePasswordAuthJSProvider', 'TinaUserCollection'],
-        from: 'tinacms-authjs/dist/tinacms',
+        from: '@strivemath/tinacms-authjs/dist/tinacms',
         packageName: 'tinacms-authjs',
       },
     ],

@@ -1,7 +1,7 @@
 /**
 
 */
-import { TinaSchema, Schema } from '@tinacms/schema-tools'
+import { TinaSchema, Schema } from '@strivemath/tinacms-schema-tools'
 
 import { validateSchema } from './validate'
 // @ts-ignore File '...' is not under 'rootDir'

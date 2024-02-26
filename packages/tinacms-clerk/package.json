@@ -1,5 +1,5 @@
 {
-  "name": "tinacms-clerk",
+  "name": "@strivemath/tinacms-clerk",
   "version": "1.0.4",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -22,20 +22,20 @@
     "build": "tinacms-scripts build"
   },
   "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "@types/node": "16.6.1",
     "@clerk/backend": "0.31.3",
     "@clerk/clerk-js": "4.56.2",
-    "tinacms": "workspace:*",
+    "@strivemath/tinacms": "workspace:*",
     "typescript": "4.3.5"
   },
   "peerDependencies": {
     "@clerk/clerk-js": "4.x",
     "@clerk/backend": "0.x",
-    "tinacms": "workspace:*"
+    "@strivemath/tinacms": "workspace:*"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",

@@ -4,19 +4,19 @@
 
 projects:
   forestry:
-    schema: packages/@tinacms/graphql/src/spec/forestry-sample/.tina/__generated__/schema.gql
+    schema: packages/@strivemath/tinacms-graphql/src/spec/forestry-sample/.tina/__generated__/schema.gql
     documents:
       - packages/**/*.forestry.gql
   movies:
-    schema: packages/@tinacms/graphql/src/spec/movies/.tina/__generated__/schema.gql
+    schema: packages/@strivemath/tinacms-graphql/src/spec/movies/.tina/__generated__/schema.gql
     documents:
       - packages/**/*.movies.gql
   moviesWithDatalayer:
-    schema: packages/@tinacms/graphql/src/spec/movies-with-datalayer/.tina/__generated__/schema.gql
+    schema: packages/@strivemath/tinacms-graphql/src/spec/movies-with-datalayer/.tina/__generated__/schema.gql
     documents:
       - packages/**/*.movies-with-datalayer.gql
   pageBuilder:
-    schema: packages/@tinacms/graphql/src/spec/page-builder/.tina/__generated__/schema.gql
+    schema: packages/@strivemath/tinacms-graphql/src/spec/page-builder/.tina/__generated__/schema.gql
     documents:
       - packages/**/*.page-builder.gql
   unitTestExample:

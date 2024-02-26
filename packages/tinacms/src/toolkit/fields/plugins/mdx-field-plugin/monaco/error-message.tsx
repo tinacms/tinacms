@@ -2,7 +2,7 @@ import React from 'react'
 import { XCircleIcon } from '@heroicons/react/solid'
 import { Popover, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
-// import { InvalidMarkdownElement } from '@tinacms/mdx/src/parse/plate'
+// import { InvalidMarkdownElement } from '@strivemath/tinacms-mdx/src/parse/plate'
 export type EmptyTextElement = { type: 'text'; text: '' }
 export type PositionItem = {
   line?: number | null

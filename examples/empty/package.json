@@ -8,12 +8,12 @@
     "init-dev": "tinacms init"
   },
   "dependencies": {
-    "@tinacms/cli": "workspace:*",
+    "@strivemath/tinacms-cli": "workspace:*",
     "next": "12.2.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-is": "^17.0.2",
-    "tinacms": "workspace:*"
+    "@strivemath/tinacms": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^17.0.21",

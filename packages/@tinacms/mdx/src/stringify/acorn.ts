@@ -7,7 +7,10 @@
 import prettier from 'prettier/esm/standalone.mjs'
 // @ts-ignore Fix this by updating prettier
 import parser from 'prettier/esm/parser-espree.mjs'
-import type { RichTextType, RichTextTemplate } from '@tinacms/schema-tools'
+import type {
+  RichTextType,
+  RichTextTemplate,
+} from '@strivemath/tinacms-schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'

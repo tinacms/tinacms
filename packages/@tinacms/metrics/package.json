@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/metrics",
+  "name": "@strivemath/tinacms-metrics",
   "version": "1.0.2",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "fs-extra": "^9.0.1"
   },
   "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "@types/fs-extra": "^9.0.11",
     "@types/isomorphic-fetch": "^0.0.35",
     "fs-extra": "^9.0.1",
@@ -35,11 +35,11 @@
     "generate:schema": "yarn node scripts/generateSchema.js"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/@tinacms/cli"
+    "directory": "packages/@strivemath/tinacms-cli"
   },
   "dependencies": {
     "isomorphic-fetch": "^3.0.0"

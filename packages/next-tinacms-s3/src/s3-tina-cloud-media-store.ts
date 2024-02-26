@@ -3,7 +3,7 @@
 */
 
 import { S3MediaStore } from './s3-media-store'
-import type { Client } from 'tinacms'
+import type { Client } from '@strivemath/tinacms'
 
 export class TinaCloudS3MediaStore extends S3MediaStore {
   client: Client

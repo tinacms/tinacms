@@ -12,7 +12,7 @@ import {
   Level,
   SUBLEVEL_OPTIONS,
 } from './level'
-import { Collection } from '@tinacms/schema-tools'
+import { Collection } from '@strivemath/tinacms-schema-tools'
 import path from 'path'
 import { normalizePath } from './util'
 

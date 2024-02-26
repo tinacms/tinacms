@@ -2,7 +2,7 @@
 
 */
 
-import { Telemetry } from '@tinacms/metrics'
+import { Telemetry } from '@strivemath/tinacms-metrics'
 import { Command } from 'commander'
 import prompts from 'prompts'
 import path from 'path'
@@ -105,7 +105,7 @@ export const run = async () => {
   }
   await telemetry.submitRecord({
     event: {
-      name: 'create-tina-app:invoke',
+      name: '@strivemath/create-tina-app:invoke',
       example,
       useYarn: Boolean(useYarn),
     },

@@ -1,4 +1,4 @@
-import { defineConfig } from 'tinacms'
+import { defineConfig } from '@strivemath/tinacms'
 import schema from './schema'
 
 export default defineConfig({

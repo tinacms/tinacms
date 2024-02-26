@@ -1,4 +1,4 @@
-# @tinacms/app
+# @strivemath/tinacms-app
 
 ## 1.2.35
 
@@ -15,7 +15,7 @@
 - Updated dependencies [548fe6d96]
 - Updated dependencies [50b20f809]
   - tinacms@1.5.27
-  - @tinacms/mdx@1.3.23
+  - @strivemath/tinacms-mdx@1.3.23
 
 ## 1.2.33
 
@@ -35,7 +35,7 @@
 ### Patch Changes
 
 - Updated dependencies [a65ca13f2]
-  - @tinacms/mdx@1.3.22
+  - @strivemath/tinacms-mdx@1.3.22
   - tinacms@1.5.24
 
 ## 1.2.30
@@ -53,7 +53,7 @@
 - Updated dependencies [661239b2a]
 - Updated dependencies [630ab9436]
   - tinacms@1.5.23
-  - @tinacms/mdx@1.3.21
+  - @strivemath/tinacms-mdx@1.3.21
 
 ## 1.2.29
 
@@ -62,7 +62,7 @@
 - Updated dependencies [b6fbab887]
 - Updated dependencies [4ae43fdde]
 - Updated dependencies [aec44a7dc]
-  - @tinacms/mdx@1.3.20
+  - @strivemath/tinacms-mdx@1.3.20
   - tinacms@1.5.22
 
 ## 1.2.28
@@ -75,7 +75,7 @@
 - Updated dependencies [e69a3ef81]
 - Updated dependencies [c925786ef]
 - Updated dependencies [9f01550dd]
-  - @tinacms/mdx@1.3.19
+  - @strivemath/tinacms-mdx@1.3.19
   - tinacms@1.5.21
 
 ## 1.2.27
@@ -87,7 +87,7 @@
 - Updated dependencies [7e4de0b2a]
 - Updated dependencies [1144af060]
   - tinacms@1.5.20
-  - @tinacms/mdx@1.3.18
+  - @strivemath/tinacms-mdx@1.3.18
 
 ## 1.2.26
 
@@ -97,7 +97,7 @@
 - Updated dependencies [0e94b2725]
 - Updated dependencies [e83ba8855]
   - tinacms@1.5.19
-  - @tinacms/mdx@1.3.17
+  - @strivemath/tinacms-mdx@1.3.17
 
 ## 1.2.25
 
@@ -122,7 +122,7 @@
 - Updated dependencies [30c7eac58]
 - Updated dependencies [121bd9fc4]
   - tinacms@1.5.18
-  - @tinacms/mdx@1.3.16
+  - @strivemath/tinacms-mdx@1.3.16
 
 ## 1.2.24
 
@@ -131,7 +131,7 @@
 - bc812441b: Use .mjs extension for ES modules
 - Updated dependencies [bc812441b]
   - @tinacms/toolkit@1.7.13
-  - @tinacms/mdx@1.3.15
+  - @strivemath/tinacms-mdx@1.3.15
   - tinacms@1.5.17
 
 ## 1.2.23
@@ -146,7 +146,7 @@
 
 ### Patch Changes
 
-- @tinacms/mdx@1.3.14
+- @strivemath/tinacms-mdx@1.3.14
 - tinacms@1.5.15
 - @tinacms/toolkit@1.7.11
 
@@ -192,7 +192,7 @@
 - Updated dependencies [5aaae9902]
   - tinacms@1.5.11
   - @tinacms/toolkit@1.7.7
-  - @tinacms/mdx@1.3.13
+  - @strivemath/tinacms-mdx@1.3.13
 
 ## 1.2.17
 
@@ -200,7 +200,7 @@
 
 - @tinacms/toolkit@1.7.6
 - tinacms@1.5.10
-- @tinacms/mdx@1.3.12
+- @strivemath/tinacms-mdx@1.3.12
 
 ## 1.2.16
 
@@ -211,7 +211,7 @@
 - Updated dependencies [9489d5d47]
   - @tinacms/toolkit@1.7.5
   - tinacms@1.5.9
-  - @tinacms/mdx@1.3.11
+  - @strivemath/tinacms-mdx@1.3.11
 
 ## 1.2.15
 
@@ -251,7 +251,7 @@
 ### Patch Changes
 
 - 31c160cdf: Placeholder view for when assets fail to load
-  - @tinacms/mdx@1.3.10
+  - @strivemath/tinacms-mdx@1.3.10
   - tinacms@1.5.5
 
 ## 1.2.11
@@ -300,7 +300,7 @@
 - Updated dependencies [804639965]
   - tinacms@1.5.0
   - @tinacms/toolkit@1.7.0
-  - @tinacms/mdx@1.3.9
+  - @strivemath/tinacms-mdx@1.3.9
 
 ## 1.2.6
 
@@ -315,7 +315,7 @@
 ### Patch Changes
 
 - Updated dependencies [75d5ed359]
-  - @tinacms/mdx@1.3.8
+  - @strivemath/tinacms-mdx@1.3.8
   - tinacms@1.4.5
 
 ## 1.2.4
@@ -342,7 +342,7 @@
 
 - Updated dependencies [0626ba381]
   - tinacms@1.4.2
-  - @tinacms/mdx@1.3.7
+  - @strivemath/tinacms-mdx@1.3.7
 
 ## 1.2.1
 
@@ -351,12 +351,12 @@
 - 5fcef561d: - Pin vite version
   - Adds react plugin so that we no longer get a 404 on react /@react-refresh
   - Adds transform ts and tsx files in build as well as dev
-- 8fc99059f: Fix main export field for @tinacms/app
+- 8fc99059f: Fix main export field for @strivemath/tinacms-app
 - c48326846: Move --skipSDK into config property: `client.skip = true`
 - Updated dependencies [5fcef561d]
 - Updated dependencies [9a8074889]
 - Updated dependencies [d0c4801b7]
-  - @tinacms/mdx@1.3.6
+  - @strivemath/tinacms-mdx@1.3.6
   - tinacms@1.4.1
   - @tinacms/toolkit@1.6.1
 
@@ -377,7 +377,7 @@
 - Updated dependencies [5d1e0e406]
 - Updated dependencies [202cd714d]
 - Updated dependencies [cbc1fb919]
-  - @tinacms/mdx@1.3.5
+  - @strivemath/tinacms-mdx@1.3.5
   - @tinacms/toolkit@1.6.0
   - tinacms@1.4.0
 
@@ -474,7 +474,7 @@
   EX:
 
   ```ts
-  import { defineConfig } from 'tinacms'
+  import { defineConfig } from '@strivemath/tinacms'
 
   export default defineConfig({
     admin: {
@@ -502,7 +502,7 @@
 
 ### Patch Changes
 
-- f4dcf3e27: Include dependencies as part of the build artifacts for @tinacms/app
+- f4dcf3e27: Include dependencies as part of the build artifacts for @strivemath/tinacms-app
 - 231dcab2e: Remove favicon
 
 ## 0.0.27
@@ -536,7 +536,7 @@
 
 ### Patch Changes
 
-- 009fe3180: Reorganize @tinacms/app so that it runs a local install in the working directory to ensure consistent dependencies
+- 009fe3180: Reorganize @strivemath/tinacms-app so that it runs a local install in the working directory to ensure consistent dependencies
 - 2f6a3596d: Upgrade to Vite 3
 
 ## 0.0.22
@@ -546,16 +546,16 @@
 - 2422e505d: Removed styled-components as a dependency in tinacms.
   Removed deprecated react-toolbar in @tinacms/toolkit.
 - Updated dependencies [2422e505d]
-  - @tinacms/scripts@0.51.2
+  - @strivemath/tinacms-scripts@0.51.2
   - tinacms@0.69.17
-  - @tinacms/schema-tools@0.1.8
+  - @strivemath/tinacms-schema-tools@0.1.8
 
 ## 0.0.21
 
 ### Patch Changes
 
 - Updated dependencies [005e1d699]
-  - @tinacms/schema-tools@0.1.8
+  - @strivemath/tinacms-schema-tools@0.1.8
   - tinacms@0.69.16
 
 ## 0.0.20
@@ -564,7 +564,7 @@
 
 - Updated dependencies [b1a357f60]
 - Updated dependencies [0c8c571d5]
-  - @tinacms/schema-tools@0.1.7
+  - @strivemath/tinacms-schema-tools@0.1.7
   - tinacms@0.69.15
 
 ## 0.0.19
@@ -572,7 +572,7 @@
 ### Patch Changes
 
 - Updated dependencies [c6e3bd321]
-  - @tinacms/schema-tools@0.1.6
+  - @strivemath/tinacms-schema-tools@0.1.6
   - tinacms@0.69.14
 
 ## 0.0.18
@@ -588,7 +588,7 @@
 
 - Updated dependencies [183249b11]
 - Updated dependencies [8060d0949]
-  - @tinacms/schema-tools@0.1.5
+  - @strivemath/tinacms-schema-tools@0.1.5
   - tinacms@0.69.12
 
 ## 0.0.16
@@ -622,7 +622,7 @@
 - Updated dependencies [48032e2ba]
 - Updated dependencies [112b7271d]
 - Updated dependencies [8688dbff9]
-  - @tinacms/schema-tools@0.1.4
+  - @strivemath/tinacms-schema-tools@0.1.4
   - tinacms@0.69.8
 
 ## 0.0.12
@@ -637,7 +637,7 @@
 - Updated dependencies [9183157c4]
 - Updated dependencies [4adf12619]
 - Updated dependencies [f8b89379c]
-  - @tinacms/schema-tools@0.1.3
+  - @strivemath/tinacms-schema-tools@0.1.3
   - tinacms@0.69.7
 
 ## 0.0.11
@@ -684,7 +684,7 @@
 ### Patch Changes
 
 - Updated dependencies [9fbb4e557]
-  - @tinacms/scripts@0.51.1
+  - @strivemath/tinacms-scripts@0.51.1
   - tinacms@0.69.1
 
 ## 0.0.5
@@ -735,5 +735,5 @@
 
 - Updated dependencies [7b0dda55e]
 - Updated dependencies [8183b638c]
-  - @tinacms/scripts@0.51.0
+  - @strivemath/tinacms-scripts@0.51.0
   - tinacms@0.69.0

@@ -9,7 +9,7 @@ To use Vercel's [visual editing](https://vercel.com/blog/visual-editing) feature
 Vercel's visual editing mode works by adding metadata to your page about where the content comes from. To get started, add the preview package:
 
 ```
-npm install @tinacms/vercel-previews
+npm install @strivemath/tinacms-vercel-previews
 ```
 
 There are two ways to indicate that a field is editable, **automatically** by enabling string-encoding and **manually** by adding data attributes to editable elements on your page.
@@ -18,8 +18,8 @@ There are two ways to indicate that a field is editable, **automatically** by en
 
 ```tsx
 // pages/[slug].tsx
-import { useTina } from 'tinacms/dist/react'
-import { useVisualEditing } from '@tinacms/vercel-previews'
+import { useTina } from '@strivemath/tinacms/dist/react'
+import { useVisualEditing } from '@strivemath/tinacms-vercel-previews'
 
 export const Post = (props) => {
   const { data: tinaData } = useTina(props)
@@ -68,8 +68,8 @@ Tina provides a helper function to add the necessary metadata to your element:
 
 ```tsx
 // pages/[slug].tsx
-import { useTina } from 'tinacms/dist/react'
-import { vercelEditInfo, useVisualEditing } from '@tinacms/vercel-previews'
+import { useTina } from '@strivemath/tinacms/dist/react'
+import { vercelEditInfo, useVisualEditing } from '@strivemath/tinacms-vercel-previews'
 
 export const Post = (props) => {
   const { data: tinaData } = useTina(props)

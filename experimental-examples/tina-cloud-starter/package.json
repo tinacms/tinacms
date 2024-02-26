@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@svgr/webpack": "^8.0.1",
-    "@tinacms/cli": "workspace:*",
+    "@strivemath/tinacms-cli": "workspace:*",
     "@types/js-cookie": "^3.0.0",
     "@types/node": "^16.11.7",
     "@types/react": "^17.0.35",
@@ -29,8 +29,8 @@
   "dependencies": {
     "@headlessui/react": "1.7.5",
     "@tailwindcss/typography": "^0.5.8",
-    "@tinacms/mdx": "workspace:*",
-    "@tinacms/vercel-previews": "workspace:*",
+    "@strivemath/tinacms-mdx": "workspace:*",
+    "@strivemath/tinacms-vercel-previews": "workspace:*",
     "date-fns": "^2.23.0",
     "graphql": "15.8.0",
     "mongodb-level": "^0.0.3",
@@ -38,7 +38,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.2.0",
-    "tinacms": "workspace:*",
+    "@strivemath/tinacms": "workspace:*",
     "typescript": "^4.5.2"
   }
 }

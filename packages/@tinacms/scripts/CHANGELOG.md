@@ -14,13 +14,16 @@
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
   - **New Package**: `tinacms-gitprovider-github`, exporting the `GitHubProvider` class.
-  - **Interface Addition**: `gitProvider` added to `@tinacms/graphql`.
+  - **Interface Addition**: `gitProvider` added to `@strivemath/tinacms-graphql`.
   - **Addition**: Generated database client.
 
   #### Updated `database.ts` Example
 
   ```typescript
-  import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
+  import {
+    createDatabase,
+    createLocalDatabase,
+  } from '@strivemath/tinacms-datalayer'
   import { MongodbLevel } from 'mongodb-level'
   import { GitHubProvider } from 'tinacms-gitprovider-github'
 
@@ -36,8 +39,8 @@
           token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         }),
         databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: '@strivemath/tinacms',
+          dbName: '@strivemath/tinacms',
           mongoUri: process.env.MONGODB_URI,
         }),
         namespace: process.env.GITHUB_BRANCH,
@@ -91,7 +94,7 @@
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
-  import { createLocalDatabase } from '@tinacms/datalayer'
+  import { createLocalDatabase } from '@strivemath/tinacms-datalayer'
   createLocalDatabase(port)
   ```
 
@@ -100,7 +103,7 @@
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
-  import { createDatabase, createLocalDatabase, GitHubProvider } from '@tinacms/datalayer';
+  import { createDatabase, createLocalDatabase, GitHubProvider } from '@strivemath/tinacms-datalayer';
   import { MongodbLevel } from 'mongodb-level';
   const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true';
   export default isLocal
@@ -145,7 +148,7 @@
   - **New API**:
 
   ```javascript
-  import { AbstractAuthProvider } from 'tinacms'
+  import { AbstractAuthProvider } from '@strivemath/tinacms'
   class CustomAuthProvider extends AbstractAuthProvider {
     login() {}
     logout() {}
@@ -159,8 +162,8 @@
 
   ### TinaCMS Self Hosted backend updates
 
-  - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
-  - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
+  - **New:** TinaNodeBackend is exported from `@strivemath/tinacms-datalayer`. This is used to host the TinaCMS backend in a single function.
+  - **New:** `LocalBackendAuthProvider` is exported from `@strivemath/tinacms-datalayer`. This is used to host the TinaCMS backend locally.
 
   - **New:** `AuthJsBackendAuthProvider` is exported from `tinacms-authjs`. This is used to host the TinaCMS backend with AuthJS.
 
@@ -171,7 +174,10 @@
   `/api/tina/[...routes].{ts,js}`
 
   ```typescript
-  import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  import {
+    TinaNodeBackend,
+    LocalBackendAuthProvider,
+  } from '@strivemath/tinacms-datalayer'
 
   import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
 
@@ -225,7 +231,7 @@
 
 ### Patch Changes
 
-- cbc1fb919: Provide browser-specific version of @tinacms/mdx
+- cbc1fb919: Provide browser-specific version of @strivemath/tinacms-mdx
 - 3a1edd50d: Bundle the MDX package with its dependencies so we can avoid awkward import issues related to the remark ecosystem modules
 
 ## 1.0.4
@@ -438,36 +444,36 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 # [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
 
-**Note:** Version bump only for package @tinacms/scripts
+**Note:** Version bump only for package @strivemath/tinacms-scripts
 
 # [0.26.0](https://github.com/tinacms/tinacms/compare/v0.25.0...v0.26.0) (2020-08-03)
 
-**Note:** Version bump only for package @tinacms/scripts
+**Note:** Version bump only for package @strivemath/tinacms-scripts
 
-## [0.1.13](https://github.com/tinacms/tinacms/compare/@tinacms/scripts@0.1.13-alpha.0...@tinacms/scripts@0.1.13) (2020-03-09)
+## [0.1.13](https://github.com/tinacms/tinacms/compare/@strivemath/tinacms-scripts@0.1.13-alpha.0...@strivemath/tinacms-scripts@0.1.13) (2020-03-09)
 
-**Note:** Version bump only for package @tinacms/scripts
+**Note:** Version bump only for package @strivemath/tinacms-scripts
 
-## [0.1.13-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/scripts@0.1.12...@tinacms/scripts@0.1.13-alpha.0) (2020-03-05)
+## [0.1.13-alpha.0](https://github.com/tinacms/tinacms/compare/@strivemath/tinacms-scripts@0.1.12...@strivemath/tinacms-scripts@0.1.13-alpha.0) (2020-03-05)
 
-**Note:** Version bump only for package @tinacms/scripts
+**Note:** Version bump only for package @strivemath/tinacms-scripts
 
-## [0.1.12](https://github.com/tinacms/tinacms/compare/@tinacms/scripts@0.1.12-alpha.0...@tinacms/scripts@0.1.12) (2020-02-11)
+## [0.1.12](https://github.com/tinacms/tinacms/compare/@strivemath/tinacms-scripts@0.1.12-alpha.0...@strivemath/tinacms-scripts@0.1.12) (2020-02-11)
 
-**Note:** Version bump only for package @tinacms/scripts
+**Note:** Version bump only for package @strivemath/tinacms-scripts
 
-## [0.1.12-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/scripts@0.1.11...@tinacms/scripts@0.1.12-alpha.0) (2020-02-11)
+## [0.1.12-alpha.0](https://github.com/tinacms/tinacms/compare/@strivemath/tinacms-scripts@0.1.11...@strivemath/tinacms-scripts@0.1.12-alpha.0) (2020-02-11)
 
-**Note:** Version bump only for package @tinacms/scripts
+**Note:** Version bump only for package @strivemath/tinacms-scripts
 
-## [0.1.11](https://github.com/tinacms/tinacms/compare/@tinacms/scripts@0.1.11-alpha.1...@tinacms/scripts@0.1.11) (2019-11-18)
+## [0.1.11](https://github.com/tinacms/tinacms/compare/@strivemath/tinacms-scripts@0.1.11-alpha.1...@strivemath/tinacms-scripts@0.1.11) (2019-11-18)
 
-**Note:** Version bump only for package @tinacms/scripts
+**Note:** Version bump only for package @strivemath/tinacms-scripts
 
-## [0.1.11-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/scripts@0.1.10...@tinacms/scripts@0.1.11-alpha.1) (2019-11-18)
+## [0.1.11-alpha.1](https://github.com/tinacms/tinacms/compare/@strivemath/tinacms-scripts@0.1.10...@strivemath/tinacms-scripts@0.1.11-alpha.1) (2019-11-18)
 
-**Note:** Version bump only for package @tinacms/scripts
+**Note:** Version bump only for package @strivemath/tinacms-scripts
 
-## [0.1.11-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/scripts@0.1.10...@tinacms/scripts@0.1.11-alpha.0) (2019-11-18)
+## [0.1.11-alpha.0](https://github.com/tinacms/tinacms/compare/@strivemath/tinacms-scripts@0.1.10...@strivemath/tinacms-scripts@0.1.11-alpha.0) (2019-11-18)
 
-**Note:** Version bump only for package @tinacms/scripts
+**Note:** Version bump only for package @strivemath/tinacms-scripts

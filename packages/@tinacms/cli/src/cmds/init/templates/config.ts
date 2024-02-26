@@ -82,12 +82,13 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
     // if wer are not using tina cloud, we need to import the local auth provider
     if (!isUsingTinaCloud) {
       extraImports =
-        extraImports + `\nimport { LocalAuthProvider } from "tinacms";`
+        extraImports +
+        `\nimport { LocalAuthProvider } from "@strivemath/tinacms";`
     }
   }
 
   return `
-  import { defineConfig } from "tinacms";
+  import { defineConfig } from "@strivemath/tinacms";
   ${extraImports}
   ${args.extraText || ''}
   

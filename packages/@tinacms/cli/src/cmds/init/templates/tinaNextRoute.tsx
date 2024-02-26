@@ -9,7 +9,7 @@ export const nextApiRouteTemplate = ({
   env: InitEnvironment
 }) => {
   const extraPath = env.usingSrc ? '../' : ''
-  return `import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  return `import { TinaNodeBackend, LocalBackendAuthProvider } from '@strivemath/tinacms-datalayer'
   ${makeImportString(config.authProvider?.backendAuthProviderImports)}
  
 

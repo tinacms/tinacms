@@ -1,7 +1,7 @@
 import React from 'react'
-import { staticRequest } from 'tinacms'
+import { staticRequest } from '@strivemath/tinacms'
 import { Layout } from '../../components/Layout'
-import { useEditState, useTina } from 'tinacms/dist/react'
+import { useEditState, useTina } from '@strivemath/tinacms/dist/react'
 
 const query = `query getPost($relativePath: String!) {
   post(relativePath: $relativePath) {

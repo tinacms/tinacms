@@ -1,4 +1,4 @@
-import { Collection, ObjectField } from '@tinacms/schema-tools'
+import { Collection, ObjectField } from '@strivemath/tinacms-schema-tools'
 import * as sw from 'stopword'
 
 class StringBuilder {

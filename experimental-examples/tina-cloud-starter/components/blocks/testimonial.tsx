@@ -1,9 +1,9 @@
 import React from 'react'
 import { Container } from '../util/container'
 import { Section } from '../util/section'
-import type { TinaTemplate } from 'tinacms'
+import type { TinaTemplate } from '@strivemath/tinacms'
 import { PageBlocksTestimonial } from '../../.tina/__generated__/types'
-import { tinaField } from 'tinacms/dist/react'
+import { tinaField } from '@strivemath/tinacms/dist/react'
 
 export const Testimonial = ({ data }: { data: PageBlocksTestimonial }) => {
   return (

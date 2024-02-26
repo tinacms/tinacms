@@ -1,5 +1,5 @@
 import { collectConditionsForField, resolveReferences } from './filter-utils'
-import { ReferenceType, TinaField } from '@tinacms/schema-tools'
+import { ReferenceType, TinaField } from '@strivemath/tinacms-schema-tools'
 import { FilterCondition } from '../database/datalayer'
 
 describe('resolveReferences', () => {

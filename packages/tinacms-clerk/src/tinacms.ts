@@ -1,4 +1,4 @@
-import { AbstractAuthProvider } from 'tinacms'
+import { AbstractAuthProvider } from '@strivemath/tinacms'
 
 import type Clerk from '@clerk/clerk-js'
 

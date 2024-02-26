@@ -1,4 +1,4 @@
-import { TinaCMS, defineConfig } from 'tinacms'
+import { TinaCMS, defineConfig } from '@strivemath/tinacms'
 
 export default defineConfig({
   // Example of how you can override the frontend url

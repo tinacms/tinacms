@@ -2,7 +2,7 @@
 
 */
 
-import { Schema } from '@tinacms/schema-tools'
+import { Schema } from '@strivemath/tinacms-schema-tools'
 import { richBody } from './body'
 
 const tinaSchema: Schema = {

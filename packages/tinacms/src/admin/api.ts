@@ -3,14 +3,14 @@ import { print, buildSchema } from 'graphql'
 
 import { diff } from '@graphql-inspector/core'
 
-import type { Collection, TinaSchema } from '@tinacms/schema-tools'
+import type { Collection, TinaSchema } from '@strivemath/tinacms-schema-tools'
 import type { Client } from '../internalClient'
 import type { CollectionResponse, DocumentForm } from './types'
 
 import {
   SearchClient,
   processDocumentForIndexing,
-} from '@tinacms/search/dist/index-client'
+} from '@strivemath/tinacms-search/dist/index-client'
 
 export interface FilterArgs {
   filterField: string

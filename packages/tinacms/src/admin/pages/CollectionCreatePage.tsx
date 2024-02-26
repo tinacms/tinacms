@@ -12,8 +12,8 @@ import {
   resolveForm,
   normalizePath,
   Collection,
-} from '@tinacms/schema-tools'
-import type { Template } from '@tinacms/schema-tools'
+} from '@strivemath/tinacms-schema-tools'
+import type { Template } from '@strivemath/tinacms-schema-tools'
 
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'

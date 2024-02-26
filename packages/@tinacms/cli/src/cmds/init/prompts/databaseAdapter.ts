@@ -26,8 +26,8 @@ const supportedDatabaseAdapters: {
   },
   mongodb: {
     databaseAdapterClassText: `new MongodbLevel({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: '@strivemath/tinacms',
+          dbName: '@strivemath/tinacms',
           mongoUri: process.env.MONGODB_URI,
         })`,
     imports: [

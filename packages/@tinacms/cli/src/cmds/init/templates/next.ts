@@ -19,8 +19,8 @@ export const templates: {
 // This is a demo file once you have tina setup feel free to delete this file
 
 import Head from 'next/head'
-import { useTina } from 'tinacms/dist/react'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { useTina } from '@strivemath/tinacms/dist/react'
+import { TinaMarkdown } from '@strivemath/tinacms/dist/rich-text'
 import client from '${usingSrc ? '../' : ''}../../../tina/__generated__/${
       dataLayer ? 'databaseClient' : 'client'
     }'

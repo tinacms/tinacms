@@ -14,7 +14,7 @@
     "@headlessui/react": "1.7.5",
     "@octokit/rest": "^19.0.7",
     "@tailwindcss/typography": "^0.5.8",
-    "@tinacms/datalayer": "workspace:*",
+    "@strivemath/tinacms-datalayer": "workspace:*",
     "date-fns": "^2.23.0",
     "mongodb-level": "^0.0.3",
     "next": "^13.4.19",
@@ -22,13 +22,13 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
-    "tinacms": "workspace:*",
-    "tinacms-gitprovider-github": "workspace:*",
-    "tinacms-authjs": "workspace:*"
+    "@strivemath/tinacms": "workspace:*",
+    "@strivemath/tinacms-gitprovider-github": "workspace:*",
+    "@strivemath/tinacms-authjs": "workspace:*"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.0.1",
-    "@tinacms/cli": "workspace:*",
+    "@strivemath/tinacms-cli": "workspace:*",
     "@types/node": "^16.11.7",
     "@types/react": "^17.0.14",
     "@typescript-eslint/eslint-plugin": "^5.60.0",

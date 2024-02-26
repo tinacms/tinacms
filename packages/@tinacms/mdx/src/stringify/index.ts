@@ -13,7 +13,7 @@ import {
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
 import { stringifyMDX as stringifyMDXNext } from '../next'
-import type { RichTextType } from '@tinacms/schema-tools'
+import type { RichTextType } from '@strivemath/tinacms-schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
 import { eat } from './marks'

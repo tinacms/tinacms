@@ -1,6 +1,6 @@
 import { InferGetStaticPropsType } from 'next'
 import { Json, Markdown } from '../../components/json'
-import { useTina } from 'tinacms/dist/react'
+import { useTina } from '@strivemath/tinacms/dist/react'
 import client from '../../tina/__generated__/client'
 
 export default function Home(

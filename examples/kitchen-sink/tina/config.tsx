@@ -1,5 +1,5 @@
 import React from 'react'
-import { defineConfig } from 'tinacms'
+import { defineConfig } from '@strivemath/tinacms'
 import { BiBall, BiBasketball, BiBaseball, BiFootball } from 'react-icons/bi'
 
 const TINA_TOKEN_KEY = 'tina_token_key'

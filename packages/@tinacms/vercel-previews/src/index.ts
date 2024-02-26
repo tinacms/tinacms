@@ -1,6 +1,6 @@
 import { vercelStegaCombine } from '@vercel/stega'
 import React from 'react'
-import { tinaField, useEditState } from 'tinacms/dist/react'
+import { tinaField, useEditState } from '@strivemath/tinacms/dist/react'
 import { useCallback, useEffect } from 'react'
 
 export const vercelEditInfo = <
@@ -16,7 +16,7 @@ export const vercelEditInfo = <
   index?: number
 ) => {
   const fieldName = tinaField(obj, field, index)
-  return JSON.stringify({ origin: 'tinacms', data: { fieldName } })
+  return JSON.stringify({ origin: '@strivemath/tinacms', data: { fieldName } })
 }
 
 export const useVisualEditing = <T extends object>({

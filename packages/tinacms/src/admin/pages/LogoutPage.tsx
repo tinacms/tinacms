@@ -6,7 +6,7 @@ import React, { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { BiLogOut } from 'react-icons/bi'
 import { MdOutlineArrowBack } from 'react-icons/md'
-import { useEditState, setEditing } from '@tinacms/sharedctx'
+import { useEditState, setEditing } from '@strivemath/tinacms-sharedctx'
 import AuthTemplate from '../components/AuthTemplate'
 import { Button, useCMS } from '@tinacms/toolkit'
 

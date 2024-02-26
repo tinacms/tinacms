@@ -11,18 +11,18 @@
   },
   "dependencies": {
     "@octokit/rest": "^19.0.5",
-    "@tinacms/datalayer": "workspace:*",
-    "@tinacms/graphql": "workspace:*",
+    "@strivemath/tinacms-datalayer": "workspace:*",
+    "@strivemath/tinacms-graphql": "workspace:*",
     "dotenv": "^16.0.3",
     "js-base64": "^3.7.4",
     "next": "12.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-is": "^18.2.0",
-    "tinacms": "workspace:*"
+    "@strivemath/tinacms": "workspace:*"
   },
   "devDependencies": {
-    "@tinacms/cli": "workspace:*",
+    "@strivemath/tinacms-cli": "workspace:*",
     "@types/node": "^17.0.21",
     "eslint": "7"
   },

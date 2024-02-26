@@ -10,7 +10,7 @@ export const AddGeneratedClientFunc: (apiURL: string) => PluginFunction = (
   return (_schema, _documents, _config, _info) => {
     return `
 // TinaSDK generated code
-import { createClient, TinaClient } from "tinacms/dist/client";
+import { createClient, TinaClient } from "@strivemath/tinacms/dist/client";
 
 const generateRequester = (
   client: TinaClient,

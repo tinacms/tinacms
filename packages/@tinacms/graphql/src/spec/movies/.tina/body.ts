@@ -2,7 +2,7 @@
 
 */
 
-import { Template, TinaField } from '@tinacms/schema-tools'
+import { Template, TinaField } from '@strivemath/tinacms-schema-tools'
 
 const cta: Template = {
   name: 'Cta',

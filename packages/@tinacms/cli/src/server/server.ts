@@ -9,14 +9,14 @@ import express from 'express'
 import { altairExpress } from 'altair-express-middleware'
 // @ts-ignore
 import bodyParser from 'body-parser'
-import type { Database } from '@tinacms/graphql'
+import type { Database } from '@strivemath/tinacms-graphql'
 import { createMediaRouter } from './routes'
 import { parseMediaFolder } from '../utils'
 
 export const gqlServer = async (database, verbose: boolean) => {
   // This is lazily required so we can update the module
   // without having to restart the server
-  const gqlPackage = require('@tinacms/graphql')
+  const gqlPackage = require('@strivemath/tinacms-graphql')
 
   const app = express()
   const server = http.createServer(app)

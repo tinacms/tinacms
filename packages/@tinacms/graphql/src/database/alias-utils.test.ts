@@ -1,4 +1,4 @@
-import { Template } from '@tinacms/schema-tools/src'
+import { Template } from '@strivemath/tinacms-schema-tools/src'
 import { replaceNameOverrides, applyNameOverrides } from './alias-utils'
 
 const template: Template<true> = {

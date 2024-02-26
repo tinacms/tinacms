@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { GoCircleSlash } from 'react-icons/go'
-import { Button, wrapFieldsWithMeta } from 'tinacms'
+import { Button, wrapFieldsWithMeta } from '@strivemath/tinacms'
 import { Popover, Transition } from '@headlessui/react'
 import { Icon, IconOptions } from '../util/icon'
 import { BiChevronRight } from 'react-icons/bi'

@@ -1,6 +1,6 @@
 import { InferGetStaticPropsType } from 'next'
 import { Blocks } from '../components/blocks-renderer'
-import { useTina } from 'tinacms/dist/react'
+import { useTina } from '@strivemath/tinacms/dist/react'
 import { Layout } from '../components/layout'
 import { client } from '../.tina/__generated__/client'
 import React from 'react'

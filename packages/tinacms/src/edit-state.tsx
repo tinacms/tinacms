@@ -8,13 +8,13 @@ import {
   isEditing,
   setEditing,
   useEditState as _useEditState,
-} from '@tinacms/sharedctx'
+} from '@strivemath/tinacms-sharedctx'
 
 import React, { useEffect, useState } from 'react'
 
 /**
  * @deprecated since version 1.0.
- * Use "import { useEditState } from 'tinacms/dist/react'" instead.
+ * Use "import { useEditState } from '@strivemath/tinacms/dist/react'" instead.
  * See https://tina.io/blog/upgrading-to-iframe/ for full migration details
  */
 const useEditState = _useEditState
@@ -44,7 +44,7 @@ export const TinaEditProvider = ({
 
 /**
  * @deprecated since version 1.0.
- * Use "import { useTina } from 'tinacms/dist/react'" instead.
+ * Use "import { useTina } from '@strivemath/tinacms/dist/react'" instead.
  * See https://tina.io/blog/upgrading-to-iframe/ for full migration details
  */
 export function useTina<T extends object>({
@@ -58,8 +58,8 @@ export function useTina<T extends object>({
 }): { data: T; isLoading: boolean } {
   React.useEffect(() => {
     console.warn(`
-  "useTina" from 'tinacms/dist/edit-state' is now deprecated
-  * Use "import { useTina } from 'tinacms/dist/react" instead.
+  "useTina" from '@strivemath/tinacms/dist/edit-state' is now deprecated
+  * Use "import { useTina } from '@strivemath/tinacms/dist/react" instead.
   * See https://tina.io/blog/upgrading-to-iframe/ for full migration details
   `)
   }, [])

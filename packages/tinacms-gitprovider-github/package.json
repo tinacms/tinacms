@@ -1,5 +1,5 @@
 {
-  "name": "tinacms-gitprovider-github",
+  "name": "@strivemath/tinacms-gitprovider-github",
   "version": "1.0.3",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -25,18 +25,18 @@
     "js-base64": "^3.7.4"
   },
   "devDependencies": {
-    "@tinacms/datalayer": "workspace:*",
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-datalayer": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "@types/node": "^13.13.1"
   },
   "peerDependencies": {
-    "@tinacms/datalayer": "workspace:*"
+    "@strivemath/tinacms-datalayer": "workspace:*"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/next-tinacms-dos"
+    "directory": "packages/@strivemath/next-tinacms-dos"
   }
 }

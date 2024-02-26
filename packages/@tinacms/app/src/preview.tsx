@@ -2,7 +2,7 @@
 
 */
 import React from 'react'
-import { defineConfig } from 'tinacms'
+import { defineConfig } from '@strivemath/tinacms'
 import { useGraphQLReducer } from './lib/graphql-reducer'
 
 type Config = Parameters<typeof defineConfig>[0]

@@ -1,6 +1,6 @@
-import { getStaticPropsForTina } from 'tinacms'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
-import { useTina } from 'tinacms/dist/react'
+import { getStaticPropsForTina } from '@strivemath/tinacms'
+import { TinaMarkdown } from '@strivemath/tinacms/dist/rich-text'
+import { useTina } from '@strivemath/tinacms/dist/react'
 import { Layout } from '../components/Layout'
 export default function Home(props) {
   const { data } = useTina({ ...props })

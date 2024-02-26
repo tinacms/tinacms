@@ -1,10 +1,10 @@
 import prompts from 'prompts'
-import { Telemetry } from '@tinacms/metrics'
+import { Telemetry } from '@strivemath/tinacms-metrics'
 import { neutralText } from '../../../utils/theme'
-import { resolve } from '@tinacms/graphql'
-import type { Database, Collection } from '@tinacms/graphql'
+import { resolve } from '@strivemath/tinacms-graphql'
+import type { Database, Collection } from '@strivemath/tinacms-graphql'
 import { logger } from '../../../logger'
-import { assertShape } from '@tinacms/graphql'
+import { assertShape } from '@strivemath/tinacms-graphql'
 import chalk from 'chalk'
 
 export const audit = async ({

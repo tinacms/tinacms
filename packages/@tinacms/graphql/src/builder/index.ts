@@ -25,8 +25,8 @@ import type {
   CollectionTemplateable,
   Collectable,
   Template,
-} from '@tinacms/schema-tools'
-import { TinaSchema } from '@tinacms/schema-tools'
+} from '@strivemath/tinacms-schema-tools'
+import { TinaSchema } from '@strivemath/tinacms-schema-tools'
 import { mapUserFields } from '../auth/utils'
 
 export const createBuilder = async ({

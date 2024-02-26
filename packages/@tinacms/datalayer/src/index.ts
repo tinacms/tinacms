@@ -1,4 +1,4 @@
-// Export from @tinacms/graphql to maintain backwards compatibility
+// Export from @strivemath/tinacms-graphql to maintain backwards compatibility
 export type {
   Bridge,
   // User facing
@@ -6,7 +6,7 @@ export type {
   OnDeleteCallback,
   Database,
   GitProvider,
-} from '@tinacms/graphql'
+} from '@strivemath/tinacms-graphql'
 export {
   FilesystemBridge,
   AuditFileSystemBridge,
@@ -16,6 +16,6 @@ export {
   resolve,
   createDatabase,
   createLocalDatabase,
-} from '@tinacms/graphql'
+} from '@strivemath/tinacms-graphql'
 
 export * from './backend'

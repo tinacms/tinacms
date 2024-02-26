@@ -7,7 +7,7 @@ import type {
   ReferenceType,
   Template,
   TinaField,
-} from '@tinacms/schema-tools'
+} from '@strivemath/tinacms-schema-tools'
 import { FilterCondition } from '../database/datalayer'
 
 export type ReferenceResolver = (

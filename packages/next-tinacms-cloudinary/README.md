@@ -1,24 +1,26 @@
-# _next-tinacms-cloudinary_
+# _@strivemath/next-tinacms-cloudinary_
 
 Manage **Cloudinary media assets** in TinaCMS.
 
 ## Installation
 
 ### With Yarn
+
 ```bash
-yarn add next-tinacms-cloudinary
+yarn add @strivemath/next-tinacms-cloudinary
 ```
 
 ### With NPM
+
 ```bash
-npm install next-tinacms-cloudinary
+npm install @strivemath/next-tinacms-cloudinary
 ```
 
 ## Connect with Cloudinary
 
 You need some credentials provided by Cloudinary to set this up properly. If you do not already have an account, you can (register here)[https://cloudinary.com/users/register/free].
 
-**next-tinacms-cloudinary** uses environment variables within the context of a Next.js site to properly access your Cloudinary account.
+**@strivemath/next-tinacms-cloudinary** uses environment variables within the context of a Next.js site to properly access your Cloudinary account.
 
 Add the following variables to an `.env` file.
 
@@ -38,10 +40,10 @@ This is also where we can update our `mediaOptions` on the cms object.
 // Typically in the _app.js file of a Next.js project
 
 import dynamic from "next/dynamic";
-import { TinaEditProvider } from "tinacms/dist/edit-state";
+import { TinaEditProvider } from "@strivemath/tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
-import { TinaCloudCloudinaryMediaStore } from "next-tinacms-cloudinary";
-const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
+import { TinaCloudCloudinaryMediaStore } from "@strivemath/next-tinacms-cloudinary";
+const TinaCMS = dynamic(() => import("@strivemath/tinacms"), { ssr: false });
 
 const App = ({ Component, pageProps }) => {
   return (
@@ -53,7 +55,7 @@ const App = ({ Component, pageProps }) => {
             clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
             isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
             mediaStore={async () => {
-              const pack = await import("next-tinacms-cloudinary");
+              const pack = await import("@strivemath/next-tinacms-cloudinary");
               return pack.TinaCloudCloudinaryMediaStore;
             }}
             {...pageProps}
@@ -90,10 +92,9 @@ Then add a new catch all API route for media.
 
 Call `createMediaHandler` to set up routes and connect your instance of the Media Store to your Cloudinary account.
 
-Import `isAuthorized` from [`@tinacms/auth`](https://github.com/tinacms/tinacms/tree/main/packages/%40tinacms/auth).
+Import `isAuthorized` from [`@strivemath/tinacms-auth`](https://github.com/tinacms/tinacms/tree/main/packages/%40tinacms/auth).
 
 The `authorized` key will make it so only authorized users within Tina Cloud can upload and make media edits.
-
 
 ```
 //[...media].tsx
@@ -101,8 +102,8 @@ The `authorized` key will make it so only authorized users within Tina Cloud can
 import {
   mediaHandlerConfig,
   createMediaHandler,
-} from "next-tinacms-cloudinary/dist/handlers";
-import { isAuthorized } from "@tinacms/auth";
+} from "@strivemath/next-tinacms-cloudinary/dist/handlers";
+import { isAuthorized } from "@strivemath/tinacms-auth";
 
 export const config = mediaHandlerConfig;
 
@@ -138,6 +139,6 @@ In your `.tina/schema.ts` add a new field for the image, e.g:
   type: 'image',
   label: 'Hero Image',
  }
- ```
+```
 
- Now, when editing your site, the image field will allow you to connect to your Cloudinary account via the Media Store to manage your media assets.
+Now, when editing your site, the image field will allow you to connect to your Cloudinary account via the Media Store to manage your media assets.

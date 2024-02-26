@@ -16,7 +16,7 @@ import type {
   TinaField,
   Template,
   TinaSchema,
-} from '@tinacms/schema-tools'
+} from '@strivemath/tinacms-schema-tools'
 
 import type { GraphQLConfig } from '../types'
 

@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/search",
+  "name": "@strivemath/tinacms-search",
   "version": "1.0.17",
   "main": "dist/index.js",
   "module": "dist/index-client.mjs",
@@ -37,8 +37,8 @@
     "test-watch": "jest --watch"
   },
   "dependencies": {
-    "@tinacms/graphql": "workspace:*",
-    "@tinacms/schema-tools": "workspace:*",
+    "@strivemath/tinacms-graphql": "workspace:*",
+    "@strivemath/tinacms-schema-tools": "workspace:*",
     "abstract-level": "^1.0.3",
     "memory-level": "^1.0.0",
     "module-error": "^1.0.2",
@@ -48,14 +48,14 @@
     "sqlite-level": "^1.0.1"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/@tinacms/search"
+    "directory": "packages/@strivemath/tinacms-search"
   },
   "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "@types/jest": "^26.0.4",
     "@types/micromatch": "^4.0.2",
     "@types/search-index": "^3.2.0",

@@ -1,4 +1,4 @@
-import { defineConfig, tinaTableTemplate } from 'tinacms'
+import { defineConfig, tinaTableTemplate } from '@strivemath/tinacms'
 import { contentBlockSchema } from '../components/blocks/content'
 import { featureBlockSchema } from '../components/blocks/features'
 import { heroBlockSchema } from '../components/blocks/hero'
@@ -22,7 +22,7 @@ const config = defineConfig({
   media: {
     // If you wanted cloudinary do this
     // loadCustomStore: async () => {
-    //   const pack = await import("next-tinacms-cloudinary");
+    //   const pack = await import("@strivemath/next-tinacms-cloudinary");
     //   return pack.TinaCloudCloudinaryMediaStore;
     // },
     // this is the config for the tina cloud media store

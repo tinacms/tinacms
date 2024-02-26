@@ -1,7 +1,7 @@
 import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import { visit } from 'unist-util-visit'
 import { remarkToSlate } from '../../parse/remarkToPlate'
-import { RichTextField } from '@tinacms/schema-tools'
+import { RichTextField } from '@strivemath/tinacms-schema-tools'
 import type { Root } from 'mdast'
 
 export const postProcessor = (

@@ -4,7 +4,7 @@ import {
   Database,
   TinaLevelClient,
   Bridge,
-} from '@tinacms/graphql'
+} from '@strivemath/tinacms-graphql'
 import {
   ConfigManager,
   LEGACY_TINA_FOLDER,

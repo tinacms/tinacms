@@ -7,8 +7,8 @@ import { transform as esbuildTransform } from 'esbuild'
 import path from 'path'
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import { resolve as gqlResolve } from '@tinacms/graphql'
-import type { Database } from '@tinacms/graphql'
+import { resolve as gqlResolve } from '@strivemath/tinacms-graphql'
+import type { Database } from '@strivemath/tinacms-graphql'
 import {
   parseMediaFolder,
   createMediaRouter,

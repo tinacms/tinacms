@@ -1,4 +1,4 @@
-import { defineStaticConfig, LocalAuthProvider } from 'tinacms'
+import { defineStaticConfig, LocalAuthProvider } from '@strivemath/tinacms'
 
 import { contentBlockSchema } from '../components/blocks/content'
 import { featureBlockSchema } from '../components/blocks/features'
@@ -9,7 +9,7 @@ import { iconSchema } from '../components/util/icon'
 import {
   TinaUserCollection,
   UsernamePasswordAuthJSProvider,
-} from 'tinacms-authjs/dist/tinacms'
+} from '@strivemath/tinacms-authjs/dist/tinacms'
 
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 
@@ -27,7 +27,7 @@ const config = defineStaticConfig({
   media: {
     // If you wanted cloudinary do this
     // loadCustomStore: async () => {
-    //   const pack = await import("next-tinacms-cloudinary");
+    //   const pack = await import("@strivemath/next-tinacms-cloudinary");
     //   return pack.TinaCloudCloudinaryMediaStore;
     // },
     // this is the config for the tina cloud media store

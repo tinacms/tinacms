@@ -7,7 +7,7 @@ import { FormBuilder, FormStatus } from '@toolkit/form-builder'
 import { FormMetaPlugin } from '@toolkit/plugin-form-meta'
 import { SidebarContext } from './sidebar'
 import { BiHomeAlt } from 'react-icons/bi'
-import { EditContext } from '@tinacms/sharedctx'
+import { EditContext } from '@strivemath/tinacms-sharedctx'
 import { PendingFormsPlaceholder } from './no-forms-placeholder'
 
 export const FormsView = ({

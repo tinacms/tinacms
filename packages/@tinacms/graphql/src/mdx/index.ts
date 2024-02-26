@@ -4,7 +4,7 @@
 
 */
 
-import { parseMDX, stringifyMDX } from '@tinacms/mdx'
+import { parseMDX, stringifyMDX } from '@strivemath/tinacms-mdx'
 
 export { parseMDX }
 export { stringifyMDX }

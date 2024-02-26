@@ -1,6 +1,6 @@
 {
-  "projectName": "tinacms",
-  "projectOwner": "tinacms",
+  "projectName": "@strivemath/tinacms",
+  "projectOwner": "@strivemath/tinacms",
   "repoType": "github",
   "repoHost": "https://github.com",
   "files": [

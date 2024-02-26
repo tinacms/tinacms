@@ -17,7 +17,7 @@ export const tinaTailwind = (
       const content = [
         path.join(spaPath, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
         prebuildFilePath,
-        require.resolve('tinacms'),
+        require.resolve('@strivemath/tinacms'),
       ]
 
       const tw = tailwind({

@@ -1,11 +1,11 @@
-# create-tina-app
+# @strivemath/create-tina-app
 
 ## 1.0.4
 
 ### Patch Changes
 
 - a9e04bf33: feat: Add docusaurus starter to cli
-  - @tinacms/metrics@1.0.2
+  - @strivemath/tinacms-metrics@1.0.2
 
 ## 1.0.3
 
@@ -13,20 +13,20 @@
 
 - efd56e769: Remove license headers
 - Updated dependencies [efd56e769]
-  - @tinacms/metrics@1.0.2
+  - @strivemath/tinacms-metrics@1.0.2
 
 ## 1.0.2
 
 ### Patch Changes
 
 - Updated dependencies [4ebc44068]
-  - @tinacms/metrics@1.0.1
+  - @strivemath/tinacms-metrics@1.0.1
 
 ## 1.0.1
 
 ### Patch Changes
 
-- c91bc0fc9: Tweak CLI styling for create-tina-app, tinacms dev, and tinacms init
+- c91bc0fc9: Tweak CLI styling for @strivemath/create-tina-app, tinacms dev, and tinacms init
 
 ## 1.0.0
 
@@ -39,7 +39,7 @@
 ### Patch Changes
 
 - Updated dependencies [958d10c82]
-  - @tinacms/metrics@1.0.0
+  - @strivemath/tinacms-metrics@1.0.0
 
 ## 0.2.0
 
@@ -52,7 +52,7 @@
 ### Patch Changes
 
 - 03aa3e09e: Remove the use of ESM package, which allowed CJS scripts to run as ES modules. This was initially used for yarn pnp support but is no longer necessary.
-  - @tinacms/metrics@0.0.3
+  - @strivemath/tinacms-metrics@0.0.3
 
 ## 0.1.8
 
@@ -71,14 +71,14 @@
 ### Patch Changes
 
 - Updated dependencies [ef450a53a]
-  - @tinacms/metrics@0.0.3
+  - @strivemath/tinacms-metrics@0.0.3
 
 ## 0.1.5
 
 ### Patch Changes
 
 - 9f609eb09: Warn user when using node version 15
-  - @tinacms/metrics@0.0.2
+  - @strivemath/tinacms-metrics@0.0.2
 
 ## 0.1.4
 
@@ -90,7 +90,7 @@
 
 - Updated dependencies [8bf0ac832]
 - Updated dependencies [a05546eb4]
-  - @tinacms/metrics@0.0.2
+  - @strivemath/tinacms-metrics@0.0.2
 
 ## 0.1.3
 

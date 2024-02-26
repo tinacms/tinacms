@@ -24,7 +24,7 @@ import type {
   Template,
   TinaField,
   TinaSchema,
-} from '@tinacms/schema-tools'
+} from '@strivemath/tinacms-schema-tools'
 import type { Bridge } from './bridge'
 import { TinaFetchError, TinaQueryError } from '../resolver/error'
 import {
@@ -161,7 +161,7 @@ export const createDatabase = (config: CreateDatabase) => {
     level: config.databaseAdapter,
     onPut: config.gitProvider.onPut.bind(config.gitProvider),
     onDelete: config.gitProvider.onDelete.bind(config.gitProvider),
-    namespace: config.namespace || 'tinacms',
+    namespace: config.namespace || '@strivemath/tinacms',
   })
 }
 

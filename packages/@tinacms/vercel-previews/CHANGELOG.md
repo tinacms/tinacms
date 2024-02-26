@@ -201,7 +201,7 @@
 
   The `tinaField` helper function should now only be used with the `[data-tina-field]` attibute.
 
-  Adds experimental support for Vercel previews, the `useVisualEditing` hook from `@tinacms/vercel-previews` can be used
+  Adds experimental support for Vercel previews, the `useVisualEditing` hook from `@strivemath/tinacms-vercel-previews` can be used
   to activate edit mode and listen for Vercel edit events.
 
 - Updated dependencies [5a6018916]

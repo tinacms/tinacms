@@ -3,7 +3,7 @@
 */
 
 import { v2 as cloudinary } from 'cloudinary'
-import type { Media, MediaListOptions } from 'tinacms'
+import type { Media, MediaListOptions } from '@strivemath/tinacms'
 import path from 'path'
 import { NextApiRequest, NextApiResponse } from 'next'
 import multer from 'multer'

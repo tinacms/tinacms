@@ -4,7 +4,7 @@
 
 import _ from 'lodash'
 import { print, OperationDefinitionNode } from 'graphql'
-import { TinaSchema, Config } from '@tinacms/schema-tools'
+import { TinaSchema, Config } from '@strivemath/tinacms-schema-tools'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 
 import { astBuilder, NAMER } from './ast-builder'

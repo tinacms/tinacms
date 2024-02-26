@@ -38,8 +38,8 @@ export const getTinaVersion = () => {
 export const getTinaCliVersion = () => {
   const pack = _getPack(process.cwd())
   const version =
-    pack?.devDependencies?.['@tinacms/cli'] ||
-    pack?.dependencies?.['@tinacms/cli']
+    pack?.devDependencies?.['@strivemath/tinacms-cli'] ||
+    pack?.dependencies?.['@strivemath/tinacms-cli']
   return version || ''
 }
 

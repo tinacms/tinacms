@@ -1,4 +1,7 @@
-import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+import {
+  TinaNodeBackend,
+  LocalBackendAuthProvider,
+} from '@strivemath/tinacms-datalayer'
 
 import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
 

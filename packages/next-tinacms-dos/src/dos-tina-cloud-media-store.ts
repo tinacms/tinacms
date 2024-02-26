@@ -3,7 +3,7 @@
 */
 
 import { DOSMediaStore } from './dos-media-store'
-import type { Client } from 'tinacms'
+import type { Client } from '@strivemath/tinacms'
 
 export class TinaCloudDOSMediaStore extends DOSMediaStore {
   client: Client

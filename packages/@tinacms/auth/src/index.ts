@@ -52,7 +52,7 @@ export const isUserAuthorized = async (args: {
  *
  * @example
  * import { NextApiHandler } from 'next'
- * import { isAuthorized } from '@tinacms/auth'
+ * import { isAuthorized } from '@strivemath/tinacms-auth'
  * const apiHandler: NextApiHandler = async (req, res) => {
  *   const user = await isAuthorized(req)
  *   if (user && user.verified) {
@@ -97,7 +97,7 @@ export const isAuthorized = async (
  *
  * @example
  * import { NextApiHandler } from 'next'
- * import { isAuthorized } from '@tinacms/auth'
+ * import { isAuthorized } from '@strivemath/tinacms-auth'
  * const apiHandler: NextApiHandler = async (req, res) => {
  *   const user = await isAuthorized(req)
  *   if (user && user.verified) {

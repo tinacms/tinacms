@@ -1,4 +1,4 @@
-import { RichTextField } from '@tinacms/schema-tools'
+import { RichTextField } from '@strivemath/tinacms-schema-tools'
 import type * as Plate from '../../parse/plate'
 import { toTinaMarkdown } from './to-markdown'
 import { preProcess } from './pre-processing'

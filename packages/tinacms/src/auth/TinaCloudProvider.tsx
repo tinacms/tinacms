@@ -22,7 +22,7 @@ import {
 } from '../internalClient'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
-import { setEditing } from '@tinacms/sharedctx'
+import { setEditing } from '@strivemath/tinacms-sharedctx'
 import { TinaAdminApi } from '../admin/api'
 
 type ModalNames = null | 'authenticate' | 'error'

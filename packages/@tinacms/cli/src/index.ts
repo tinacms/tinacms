@@ -13,7 +13,7 @@ export type {
   TinaSchema,
   Collection,
   TinaTemplate,
-} from '@tinacms/graphql'
+} from '@strivemath/tinacms-graphql'
 
 const cli = new Cli({
   binaryName: `tinacms`,

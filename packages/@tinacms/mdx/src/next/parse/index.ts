@@ -2,7 +2,7 @@ import { fromMarkdown } from './markdown'
 import { compact } from 'mdast-util-compact'
 import { postProcessor } from './post-processing'
 import type { Root } from 'mdast'
-import type { RichTextField } from '@tinacms/schema-tools'
+import type { RichTextField } from '@strivemath/tinacms-schema-tools'
 
 export const parseMDX = (
   value: string,

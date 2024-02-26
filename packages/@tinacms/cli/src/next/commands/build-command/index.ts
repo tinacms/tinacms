@@ -3,12 +3,16 @@ import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
 import type { ViteDevServer } from 'vite'
-import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql'
+import {
+  buildSchema,
+  Database,
+  FilesystemBridge,
+} from '@strivemath/tinacms-graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
 import { buildProductionSpa } from './server'
 import { Codegen } from '../../codegen'
-import { parseURL } from '@tinacms/schema-tools'
+import { parseURL } from '@strivemath/tinacms-schema-tools'
 import {
   buildASTSchema,
   buildClientSchema,
@@ -23,7 +27,7 @@ import {
   SearchClient,
   SearchIndexer,
   TinaCMSSearchIndexClient,
-} from '@tinacms/search'
+} from '@strivemath/tinacms-search'
 import { spin } from '../../../utils/spinner'
 import { createDevServer } from '../dev-command/server'
 import { BaseCommand } from '../baseCommands'
@@ -44,7 +48,7 @@ export class BuildCommand extends BaseCommand {
   })
   tinaGraphQLVersion = Option.String('--tina-graphql-version', {
     description:
-      'Specify the version of @tinacms/graphql to use (defaults to latest)',
+      'Specify the version of @strivemath/tinacms-graphql to use (defaults to latest)',
   })
   /**
    * This option allows the user to skip the tina cloud checks if they want to. This could be useful for mismatched GraphQL versions or if they want to build only using the local client and never connect to Tina Cloud

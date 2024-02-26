@@ -1,4 +1,4 @@
-import { Template, TinaField } from '@tinacms/schema-tools/src'
+import { Template, TinaField } from '@strivemath/tinacms-schema-tools/src'
 
 const replaceBlockAliases = (template: Template, item: any) => {
   const output = { ...item }

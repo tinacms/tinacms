@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest'
 import { Base64 } from 'js-base64'
-import type { GitProvider } from '@tinacms/datalayer'
+import type { GitProvider } from '@strivemath/tinacms-datalayer'
 
 type OctokitOptions = ConstructorParameters<typeof Octokit>[0]
 export interface GitHubProviderOptions {

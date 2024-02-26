@@ -1,4 +1,4 @@
-import { Collection, TinaSchema } from '@tinacms/schema-tools'
+import { Collection, TinaSchema } from '@strivemath/tinacms-schema-tools'
 import {
   Bridge,
   loadAndParseWithAliases,
@@ -7,7 +7,7 @@ import {
   scanContentByPaths,
   transformDocument,
   transformDocumentIntoPayload,
-} from '@tinacms/graphql'
+} from '@strivemath/tinacms-graphql'
 import { SearchClient } from '../types'
 import { processDocumentForIndexing } from './utils'
 

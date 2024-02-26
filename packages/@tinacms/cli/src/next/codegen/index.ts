@@ -5,8 +5,8 @@ import type { TypeDefinitionNode, GraphQLSchema } from 'graphql'
 import { generateTypes } from './codegen'
 import { transform } from 'esbuild'
 import { ConfigManager } from '../config-manager'
-import type { TinaSchema } from '@tinacms/schema-tools'
-import { mapUserFields } from '@tinacms/graphql'
+import type { TinaSchema } from '@strivemath/tinacms-schema-tools'
+import { mapUserFields } from '@strivemath/tinacms-graphql'
 export const TINA_HOST = 'content.tinajs.io'
 
 export class Codegen {
@@ -268,8 +268,8 @@ export class Codegen {
       })
     }
     return `// @ts-nocheck
-import { resolve } from "@tinacms/datalayer";
-import type { TinaClient } from "tinacms/dist/client";
+import { resolve } from "@strivemath/tinacms-datalayer";
+import type { TinaClient } from "@strivemath/tinacms/dist/client";
 
 import { queries } from "./types";
 import database from "../database";
@@ -338,7 +338,7 @@ export default databaseClient;
     const errorPolicy = this.configManager.config?.client?.errorPolicy
     const apiURL = this.getApiURL()
 
-    const clientString = `import { createClient } from "tinacms/dist/client";
+    const clientString = `import { createClient } from "@strivemath/tinacms/dist/client";
 import { queries } from "./types";
 export const client = createClient({ url: '${apiURL}', token: '${token}', queries, ${
       errorPolicy ? `errorPolicy: '${errorPolicy}'` : ''

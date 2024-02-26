@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/cli",
+  "name": "@strivemath/tinacms-cli",
   "version": "1.5.39",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -10,7 +10,7 @@
   ],
   "license": "Apache-2.0",
   "bin": {
-    "tinacms": "bin/tinacms"
+    "@strivemath/tinacms": "bin/tinacms"
   },
   "buildConfig": {
     "entryPoints": [
@@ -21,7 +21,7 @@
     ]
   },
   "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "@types/clear": "0.1.0",
     "@types/cli-spinner": "^0.2.1",
     "@types/cors": "2.8.5",
@@ -47,7 +47,7 @@
     "test": "jest --passWithNoTests",
     "types": "pnpm tsc",
     "test-watch": "jest  --passWithNoTests --watch",
-    "tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
+    "@strivemath/tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
     "generate:schema": "yarn node scripts/generateSchema.js"
   },
   "dependencies": {
@@ -65,13 +65,13 @@
     "@tailwindcss/aspect-ratio": "^0.4.0",
     "@tailwindcss/line-clamp": "^0.3.1",
     "@tailwindcss/typography": "^0.5.9",
-    "@tinacms/app": "workspace:*",
-    "tinacms": "workspace:*",
-    "@tinacms/datalayer": "workspace:*",
-    "@tinacms/graphql": "workspace:*",
-    "@tinacms/metrics": "workspace:*",
-    "@tinacms/schema-tools": "workspace:*",
-    "@tinacms/search": "workspace:*",
+    "@strivemath/tinacms-app": "workspace:*",
+    "@strivemath/tinacms": "workspace:*",
+    "@strivemath/tinacms-datalayer": "workspace:*",
+    "@strivemath/tinacms-graphql": "workspace:*",
+    "@strivemath/tinacms-metrics": "workspace:*",
+    "@strivemath/tinacms-schema-tools": "workspace:*",
+    "@strivemath/tinacms-search": "workspace:*",
     "@vitejs/plugin-react": "3.1.0",
     "ajv": "^6.12.3",
     "altair-express-middleware": "4.0.6",
@@ -120,10 +120,10 @@
     "zod": "^3.14.3"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/@tinacms/cli"
+    "directory": "packages/@strivemath/tinacms-cli"
   }
 }

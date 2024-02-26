@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- @tinacms/datalayer@1.2.32
+- @strivemath/tinacms-datalayer@1.2.32
 - tinacms@1.5.28
 
 ## 0.1.58
@@ -16,7 +16,7 @@
 - Updated dependencies [548fe6d96]
 - Updated dependencies [50b20f809]
   - tinacms@1.5.27
-  - @tinacms/datalayer@1.2.31
+  - @strivemath/tinacms-datalayer@1.2.31
 
 ## 0.1.57
 
@@ -29,7 +29,7 @@
 
 ### Patch Changes
 
-- @tinacms/datalayer@1.2.30
+- @strivemath/tinacms-datalayer@1.2.30
 - tinacms@1.5.25
 
 ## 0.1.55
@@ -46,13 +46,16 @@
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
   - **New Package**: `tinacms-gitprovider-github`, exporting the `GitHubProvider` class.
-  - **Interface Addition**: `gitProvider` added to `@tinacms/graphql`.
+  - **Interface Addition**: `gitProvider` added to `@strivemath/tinacms-graphql`.
   - **Addition**: Generated database client.
 
   #### Updated `database.ts` Example
 
   ```typescript
-  import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
+  import {
+    createDatabase,
+    createLocalDatabase,
+  } from '@strivemath/tinacms-datalayer'
   import { MongodbLevel } from 'mongodb-level'
   import { GitHubProvider } from 'tinacms-gitprovider-github'
 
@@ -68,8 +71,8 @@
           token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         }),
         databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: '@strivemath/tinacms',
+          dbName: '@strivemath/tinacms',
           mongoUri: process.env.MONGODB_URI,
         }),
         namespace: process.env.GITHUB_BRANCH,
@@ -123,7 +126,7 @@
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
-  import { createLocalDatabase } from '@tinacms/datalayer'
+  import { createLocalDatabase } from '@strivemath/tinacms-datalayer'
   createLocalDatabase(port)
   ```
 
@@ -132,7 +135,7 @@
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
-  import { createDatabase, createLocalDatabase, GitHubProvider } from '@tinacms/datalayer';
+  import { createDatabase, createLocalDatabase, GitHubProvider } from '@strivemath/tinacms-datalayer';
   import { MongodbLevel } from 'mongodb-level';
   const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true';
   export default isLocal
@@ -177,7 +180,7 @@
   - **New API**:
 
   ```javascript
-  import { AbstractAuthProvider } from 'tinacms'
+  import { AbstractAuthProvider } from '@strivemath/tinacms'
   class CustomAuthProvider extends AbstractAuthProvider {
     login() {}
     logout() {}
@@ -191,8 +194,8 @@
 
   ### TinaCMS Self Hosted backend updates
 
-  - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
-  - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
+  - **New:** TinaNodeBackend is exported from `@strivemath/tinacms-datalayer`. This is used to host the TinaCMS backend in a single function.
+  - **New:** `LocalBackendAuthProvider` is exported from `@strivemath/tinacms-datalayer`. This is used to host the TinaCMS backend locally.
 
   - **New:** `AuthJsBackendAuthProvider` is exported from `tinacms-authjs`. This is used to host the TinaCMS backend with AuthJS.
 
@@ -203,7 +206,10 @@
   `/api/tina/[...routes].{ts,js}`
 
   ```typescript
-  import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  import {
+    TinaNodeBackend,
+    LocalBackendAuthProvider,
+  } from '@strivemath/tinacms-datalayer'
 
   import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
 
@@ -234,7 +240,7 @@
   Please [check out the docs](https://tina.io/docs/self-hosted/overview) for more information on self hosted TinaCMS.
 
 - Updated dependencies [a65ca13f2]
-  - @tinacms/datalayer@1.2.29
+  - @strivemath/tinacms-datalayer@1.2.29
   - tinacms@1.5.24
 
 ## 0.1.54
@@ -250,7 +256,7 @@
 - Updated dependencies [661239b2a]
 - Updated dependencies [630ab9436]
   - tinacms@1.5.23
-  - @tinacms/datalayer@1.2.28
+  - @strivemath/tinacms-datalayer@1.2.28
 
 ## 0.1.53
 
@@ -260,7 +266,7 @@
 - Updated dependencies [4ae43fdde]
 - Updated dependencies [aec44a7dc]
   - tinacms@1.5.22
-  - @tinacms/datalayer@1.2.27
+  - @strivemath/tinacms-datalayer@1.2.27
 
 ## 0.1.52
 
@@ -271,7 +277,7 @@
 - Updated dependencies [c925786ef]
 - Updated dependencies [9f01550dd]
   - tinacms@1.5.21
-  - @tinacms/datalayer@1.2.26
+  - @strivemath/tinacms-datalayer@1.2.26
 
 ## 0.1.51
 
@@ -280,7 +286,7 @@
 - Updated dependencies [7e4de0b2a]
 - Updated dependencies [1144af060]
   - tinacms@1.5.20
-  - @tinacms/datalayer@1.2.25
+  - @strivemath/tinacms-datalayer@1.2.25
 
 ## 0.1.50
 
@@ -289,7 +295,7 @@
 - Updated dependencies [1563ce5b2]
 - Updated dependencies [e83ba8855]
   - tinacms@1.5.19
-  - @tinacms/datalayer@1.2.24
+  - @strivemath/tinacms-datalayer@1.2.24
 
 ## 0.1.49
 
@@ -306,14 +312,14 @@
 - Updated dependencies [30c7eac58]
 - Updated dependencies [121bd9fc4]
   - tinacms@1.5.18
-  - @tinacms/datalayer@1.2.23
+  - @strivemath/tinacms-datalayer@1.2.23
 
 ## 0.1.48
 
 ### Patch Changes
 
 - Updated dependencies [bc812441b]
-  - @tinacms/datalayer@1.2.22
+  - @strivemath/tinacms-datalayer@1.2.22
   - tinacms@1.5.17
 
 ## 0.1.47
@@ -322,14 +328,14 @@
 
 - Updated dependencies [1889422b0]
   - tinacms@1.5.16
-  - @tinacms/datalayer@1.2.21
+  - @strivemath/tinacms-datalayer@1.2.21
 
 ## 0.1.46
 
 ### Patch Changes
 
 - tinacms@1.5.15
-- @tinacms/datalayer@1.2.20
+- @strivemath/tinacms-datalayer@1.2.20
 
 ## 0.1.45
 
@@ -346,7 +352,7 @@
 - Updated dependencies [495108725]
 - Updated dependencies [b0eba5d49]
   - tinacms@1.5.13
-  - @tinacms/datalayer@1.2.19
+  - @strivemath/tinacms-datalayer@1.2.19
 
 ## 0.1.43
 
@@ -362,14 +368,14 @@
 - Updated dependencies [6e192cc38]
 - Updated dependencies [5aaae9902]
   - tinacms@1.5.11
-  - @tinacms/datalayer@1.2.18
+  - @strivemath/tinacms-datalayer@1.2.18
 
 ## 0.1.41
 
 ### Patch Changes
 
 - tinacms@1.5.10
-- @tinacms/datalayer@1.2.17
+- @strivemath/tinacms-datalayer@1.2.17
 
 ## 0.1.40
 
@@ -379,7 +385,7 @@
 - Updated dependencies [d2ddfa5a6]
 - Updated dependencies [9489d5d47]
   - tinacms@1.5.9
-  - @tinacms/datalayer@1.2.16
+  - @strivemath/tinacms-datalayer@1.2.16
 
 ## 0.1.39
 
@@ -394,13 +400,13 @@
 - Updated dependencies [385c8a865]
 - Updated dependencies [ccd928bc3]
   - tinacms@1.5.7
-  - @tinacms/datalayer@1.2.15
+  - @strivemath/tinacms-datalayer@1.2.15
 
 ## 0.1.37
 
 ### Patch Changes
 
-- @tinacms/datalayer@1.2.14
+- @strivemath/tinacms-datalayer@1.2.14
 
 ## 0.1.36
 
@@ -408,14 +414,14 @@
 
 - Updated dependencies [5a6018916]
   - tinacms@1.5.6
-  - @tinacms/datalayer@1.2.13
+  - @strivemath/tinacms-datalayer@1.2.13
 
 ## 0.1.35
 
 ### Patch Changes
 
 - tinacms@1.5.5
-- @tinacms/datalayer@1.2.12
+- @strivemath/tinacms-datalayer@1.2.12
 
 ## 0.1.34
 
@@ -424,7 +430,7 @@
 - 69145cf93: Fix dep issue
 - Updated dependencies [f6e2ec5e9]
   - tinacms@1.5.4
-  - @tinacms/datalayer@1.2.11
+  - @strivemath/tinacms-datalayer@1.2.11
 
 ## 0.1.33
 
@@ -433,7 +439,7 @@
 - Updated dependencies [3532d07f3]
 - Updated dependencies [6d1465fd8]
   - tinacms@1.5.3
-  - @tinacms/datalayer@1.2.10
+  - @strivemath/tinacms-datalayer@1.2.10
 
 ## 0.1.32
 
@@ -442,7 +448,7 @@
 - Updated dependencies [e7f4c0a96]
 - Updated dependencies [ff8673515]
   - tinacms@1.5.2
-  - @tinacms/datalayer@1.2.9
+  - @strivemath/tinacms-datalayer@1.2.9
 
 ## 0.1.31
 
@@ -464,7 +470,7 @@
 - Updated dependencies [d9d773a24]
 - Updated dependencies [63454fa1e]
   - tinacms@1.5.0
-  - @tinacms/datalayer@1.2.8
+  - @strivemath/tinacms-datalayer@1.2.8
 
 ## 0.1.29
 
@@ -472,7 +478,7 @@
 
 - Updated dependencies [709b6f2ec]
   - tinacms@1.4.6
-  - @tinacms/datalayer@1.2.7
+  - @strivemath/tinacms-datalayer@1.2.7
 
 ## 0.1.28
 
@@ -480,7 +486,7 @@
 
 - Updated dependencies [75d5ed359]
   - tinacms@1.4.5
-  - @tinacms/datalayer@1.2.6
+  - @strivemath/tinacms-datalayer@1.2.6
 
 ## 0.1.27
 
@@ -488,7 +494,7 @@
 
 - Updated dependencies [7c750e370]
   - tinacms@1.4.4
-  - @tinacms/datalayer@1.2.5
+  - @strivemath/tinacms-datalayer@1.2.5
 
 ## 0.1.26
 
@@ -496,7 +502,7 @@
 
 - Updated dependencies [1370ebae6]
   - tinacms@1.4.3
-  - @tinacms/datalayer@1.2.3
+  - @strivemath/tinacms-datalayer@1.2.3
 
 ## 0.1.25
 
@@ -504,7 +510,7 @@
 
 - Updated dependencies [0626ba381]
   - tinacms@1.4.2
-  - @tinacms/datalayer@1.2.2
+  - @strivemath/tinacms-datalayer@1.2.2
 
 ## 0.1.24
 
@@ -513,7 +519,7 @@
 - Updated dependencies [9a8074889]
 - Updated dependencies [d0c4801b7]
   - tinacms@1.4.1
-  - @tinacms/datalayer@1.2.1
+  - @strivemath/tinacms-datalayer@1.2.1
 
 ## 0.1.23
 
@@ -521,7 +527,7 @@
 
 - Updated dependencies [76c984bcc]
 - Updated dependencies [202cd714d]
-  - @tinacms/datalayer@1.2.0
+  - @strivemath/tinacms-datalayer@1.2.0
   - tinacms@1.4.0
 
 ## 0.1.22

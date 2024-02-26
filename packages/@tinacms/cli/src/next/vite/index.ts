@@ -7,7 +7,7 @@ import {
   splitVendorChunkPlugin,
 } from 'vite'
 import react from '@vitejs/plugin-react'
-import { Database } from '@tinacms/graphql'
+import { Database } from '@strivemath/tinacms-graphql'
 import { tinaTailwind } from './tailwind'
 import { ConfigManager } from '../config-manager'
 import normalizePath from 'normalize-path'
@@ -185,7 +185,7 @@ export const createConfig = async ({
     appType: 'spa',
     resolve: {
       alias,
-      dedupe: ['graphql', 'tinacms', 'react', 'react-dom'],
+      dedupe: ['graphql', '@strivemath/tinacms', 'react', 'react-dom'],
     },
     define: {
       /**

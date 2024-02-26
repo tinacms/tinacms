@@ -2,7 +2,7 @@
 
 */
 
-import { TinaSchema } from '@tinacms/schema-tools'
+import { TinaSchema } from '@strivemath/tinacms-schema-tools'
 
 describe('TinaSchema', () => {
   describe('with sibling collections of similar names', () => {

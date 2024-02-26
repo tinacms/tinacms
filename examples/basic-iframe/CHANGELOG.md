@@ -5,8 +5,8 @@
 ### Patch Changes
 
 - Updated dependencies [1e5c94f05]
-  - @tinacms/graphql@1.4.32
-  - @tinacms/datalayer@1.2.32
+  - @strivemath/tinacms-graphql@1.4.32
+  - @strivemath/tinacms-datalayer@1.2.32
   - tinacms@1.5.28
 
 ## null
@@ -20,8 +20,8 @@
 - Updated dependencies [031ce05c2]
 - Updated dependencies [50b20f809]
   - tinacms@1.5.27
-  - @tinacms/graphql@1.4.31
-  - @tinacms/datalayer@1.2.31
+  - @strivemath/tinacms-graphql@1.4.31
+  - @strivemath/tinacms-datalayer@1.2.31
 
 ## null
 
@@ -35,8 +35,8 @@
 ### Patch Changes
 
 - Updated dependencies [476b9dfbe]
-  - @tinacms/graphql@1.4.30
-  - @tinacms/datalayer@1.2.30
+  - @strivemath/tinacms-graphql@1.4.30
+  - @strivemath/tinacms-datalayer@1.2.30
   - tinacms@1.5.25
 
 ## null
@@ -44,8 +44,8 @@
 ### Patch Changes
 
 - Updated dependencies [a65ca13f2]
-  - @tinacms/datalayer@1.2.29
-  - @tinacms/graphql@1.4.29
+  - @strivemath/tinacms-datalayer@1.2.29
+  - @strivemath/tinacms-graphql@1.4.29
   - tinacms@1.5.24
 
 ## null
@@ -62,8 +62,8 @@
 - Updated dependencies [661239b2a]
 - Updated dependencies [630ab9436]
   - tinacms@1.5.23
-  - @tinacms/graphql@1.4.28
-  - @tinacms/datalayer@1.2.28
+  - @strivemath/tinacms-graphql@1.4.28
+  - @strivemath/tinacms-datalayer@1.2.28
 
 ## null
 
@@ -75,8 +75,8 @@
 - Updated dependencies [a58c5b12f]
 - Updated dependencies [aec44a7dc]
   - tinacms@1.5.22
-  - @tinacms/graphql@1.4.27
-  - @tinacms/datalayer@1.2.27
+  - @strivemath/tinacms-graphql@1.4.27
+  - @strivemath/tinacms-datalayer@1.2.27
 
 ## null
 
@@ -90,8 +90,8 @@
 - Updated dependencies [9f01550dd]
 - Updated dependencies [8bd85b15e]
   - tinacms@1.5.21
-  - @tinacms/graphql@1.4.26
-  - @tinacms/datalayer@1.2.26
+  - @strivemath/tinacms-graphql@1.4.26
+  - @strivemath/tinacms-datalayer@1.2.26
 
 ## null
 
@@ -100,8 +100,8 @@
 - Updated dependencies [7e4de0b2a]
 - Updated dependencies [1144af060]
   - tinacms@1.5.20
-  - @tinacms/graphql@1.4.25
-  - @tinacms/datalayer@1.2.25
+  - @strivemath/tinacms-graphql@1.4.25
+  - @strivemath/tinacms-datalayer@1.2.25
 
 ## null
 
@@ -110,8 +110,8 @@
 - Updated dependencies [1563ce5b2]
 - Updated dependencies [e83ba8855]
   - tinacms@1.5.19
-  - @tinacms/graphql@1.4.24
-  - @tinacms/datalayer@1.2.24
+  - @strivemath/tinacms-graphql@1.4.24
+  - @strivemath/tinacms-datalayer@1.2.24
 
 ## null
 
@@ -128,8 +128,8 @@
 - Updated dependencies [30c7eac58]
 - Updated dependencies [121bd9fc4]
   - tinacms@1.5.18
-  - @tinacms/graphql@1.4.23
-  - @tinacms/datalayer@1.2.23
+  - @strivemath/tinacms-graphql@1.4.23
+  - @strivemath/tinacms-datalayer@1.2.23
 
 ## null
 
@@ -137,8 +137,8 @@
 
 - Updated dependencies [0d8a19632]
 - Updated dependencies [bc812441b]
-  - @tinacms/graphql@1.4.22
-  - @tinacms/datalayer@1.2.22
+  - @strivemath/tinacms-graphql@1.4.22
+  - @strivemath/tinacms-datalayer@1.2.22
   - tinacms@1.5.17
 
 ## null
@@ -148,16 +148,16 @@
 - Updated dependencies [1889422b0]
 - Updated dependencies [94f353822]
   - tinacms@1.5.16
-  - @tinacms/graphql@1.4.21
-  - @tinacms/datalayer@1.2.21
+  - @strivemath/tinacms-graphql@1.4.21
+  - @strivemath/tinacms-datalayer@1.2.21
 
 ## null
 
 ### Patch Changes
 
-- @tinacms/graphql@1.4.20
+- @strivemath/tinacms-graphql@1.4.20
 - tinacms@1.5.15
-- @tinacms/datalayer@1.2.20
+- @strivemath/tinacms-datalayer@1.2.20
 
 ## null
 
@@ -175,8 +175,8 @@
 - Updated dependencies [b0eba5d49]
 - Updated dependencies [495108725]
   - tinacms@1.5.13
-  - @tinacms/graphql@1.4.19
-  - @tinacms/datalayer@1.2.19
+  - @strivemath/tinacms-graphql@1.4.19
+  - @strivemath/tinacms-datalayer@1.2.19
 
 ## null
 
@@ -192,17 +192,17 @@
 - Updated dependencies [c7fa6ddc0]
 - Updated dependencies [6e192cc38]
 - Updated dependencies [5aaae9902]
-  - @tinacms/graphql@1.4.18
+  - @strivemath/tinacms-graphql@1.4.18
   - tinacms@1.5.11
-  - @tinacms/datalayer@1.2.18
+  - @strivemath/tinacms-datalayer@1.2.18
 
 ## null
 
 ### Patch Changes
 
 - tinacms@1.5.10
-- @tinacms/graphql@1.4.17
-- @tinacms/datalayer@1.2.17
+- @strivemath/tinacms-graphql@1.4.17
+- @strivemath/tinacms-datalayer@1.2.17
 
 ## null
 
@@ -212,9 +212,9 @@
 - Updated dependencies [d2ddfa5a6]
 - Updated dependencies [1c78bafc2]
 - Updated dependencies [9489d5d47]
-  - @tinacms/graphql@1.4.16
+  - @strivemath/tinacms-graphql@1.4.16
   - tinacms@1.5.9
-  - @tinacms/datalayer@1.2.16
+  - @strivemath/tinacms-datalayer@1.2.16
 
 ## null
 
@@ -230,17 +230,17 @@
 - Updated dependencies [385c8a865]
 - Updated dependencies [ccd928bc3]
 - Updated dependencies [52b1762e2]
-  - @tinacms/graphql@1.4.15
+  - @strivemath/tinacms-graphql@1.4.15
   - tinacms@1.5.7
-  - @tinacms/datalayer@1.2.15
+  - @strivemath/tinacms-datalayer@1.2.15
 
 ## null
 
 ### Patch Changes
 
 - Updated dependencies [e731ab0c5]
-  - @tinacms/graphql@1.4.14
-  - @tinacms/datalayer@1.2.14
+  - @strivemath/tinacms-graphql@1.4.14
+  - @strivemath/tinacms-datalayer@1.2.14
 
 ## null
 
@@ -251,17 +251,17 @@
 - Updated dependencies [0f5557d23]
 - Updated dependencies [ff4c1e0f4]
 - Updated dependencies [6fefa56b0]
-  - @tinacms/graphql@1.4.13
+  - @strivemath/tinacms-graphql@1.4.13
   - tinacms@1.5.6
-  - @tinacms/datalayer@1.2.13
+  - @strivemath/tinacms-datalayer@1.2.13
 
 ## null
 
 ### Patch Changes
 
-- @tinacms/graphql@1.4.12
+- @strivemath/tinacms-graphql@1.4.12
 - tinacms@1.5.5
-- @tinacms/datalayer@1.2.12
+- @strivemath/tinacms-datalayer@1.2.12
 
 ## null
 
@@ -271,8 +271,8 @@
 - Updated dependencies [83b19fb8d]
 - Updated dependencies [1c7998b7e]
   - tinacms@1.5.4
-  - @tinacms/graphql@1.4.11
-  - @tinacms/datalayer@1.2.11
+  - @strivemath/tinacms-graphql@1.4.11
+  - @strivemath/tinacms-datalayer@1.2.11
 
 ## null
 
@@ -281,9 +281,9 @@
 - Updated dependencies [a402c8010]
 - Updated dependencies [3532d07f3]
 - Updated dependencies [6d1465fd8]
-  - @tinacms/graphql@1.4.10
+  - @strivemath/tinacms-graphql@1.4.10
   - tinacms@1.5.3
-  - @tinacms/datalayer@1.2.10
+  - @strivemath/tinacms-datalayer@1.2.10
 
 ## null
 
@@ -294,8 +294,8 @@
 - Updated dependencies [a0eb72ce0]
 - Updated dependencies [ff8673515]
   - tinacms@1.5.2
-  - @tinacms/graphql@1.4.9
-  - @tinacms/datalayer@1.2.9
+  - @strivemath/tinacms-graphql@1.4.9
+  - @strivemath/tinacms-datalayer@1.2.9
 
 ## null
 
@@ -318,8 +318,8 @@
 - Updated dependencies [d9d773a24]
 - Updated dependencies [63454fa1e]
   - tinacms@1.5.0
-  - @tinacms/graphql@1.4.8
-  - @tinacms/datalayer@1.2.8
+  - @strivemath/tinacms-graphql@1.4.8
+  - @strivemath/tinacms-datalayer@1.2.8
 
 ## null
 
@@ -329,18 +329,18 @@
 - Updated dependencies [40d15644f]
 - Updated dependencies [709b6f2ec]
 - Updated dependencies [a6786cc73]
-  - @tinacms/graphql@1.4.7
+  - @strivemath/tinacms-graphql@1.4.7
   - tinacms@1.4.6
-  - @tinacms/datalayer@1.2.7
+  - @strivemath/tinacms-datalayer@1.2.7
 
 ## null
 
 ### Patch Changes
 
 - Updated dependencies [75d5ed359]
-  - @tinacms/graphql@1.4.6
+  - @strivemath/tinacms-graphql@1.4.6
   - tinacms@1.4.5
-  - @tinacms/datalayer@1.2.6
+  - @strivemath/tinacms-datalayer@1.2.6
 
 ## null
 
@@ -349,16 +349,16 @@
 - Updated dependencies [7c750e370]
 - Updated dependencies [67c7a48b8]
   - tinacms@1.4.4
-  - @tinacms/graphql@1.4.5
-  - @tinacms/datalayer@1.2.5
+  - @strivemath/tinacms-graphql@1.4.5
+  - @strivemath/tinacms-datalayer@1.2.5
 
 ## null
 
 ### Patch Changes
 
 - Updated dependencies [ae3abe927]
-  - @tinacms/graphql@1.4.4
-  - @tinacms/datalayer@1.2.4
+  - @strivemath/tinacms-graphql@1.4.4
+  - @strivemath/tinacms-datalayer@1.2.4
 
 ## null
 
@@ -368,8 +368,8 @@
 - Updated dependencies [40d908a79]
 - Updated dependencies [02a555c39]
   - tinacms@1.4.3
-  - @tinacms/graphql@1.4.3
-  - @tinacms/datalayer@1.2.3
+  - @strivemath/tinacms-graphql@1.4.3
+  - @strivemath/tinacms-datalayer@1.2.3
 
 ## null
 
@@ -380,8 +380,8 @@
 - Updated dependencies [1f9f83718]
 - Updated dependencies [a70204500]
   - tinacms@1.4.2
-  - @tinacms/graphql@1.4.2
-  - @tinacms/datalayer@1.2.2
+  - @strivemath/tinacms-graphql@1.4.2
+  - @strivemath/tinacms-datalayer@1.2.2
 
 ## null
 
@@ -391,9 +391,9 @@
 - Updated dependencies [9a8074889]
 - Updated dependencies [d0c4801b7]
 - Updated dependencies [13b809ff5]
-  - @tinacms/graphql@1.4.1
+  - @strivemath/tinacms-graphql@1.4.1
   - tinacms@1.4.1
-  - @tinacms/datalayer@1.2.1
+  - @strivemath/tinacms-datalayer@1.2.1
 
 ## null
 
@@ -404,8 +404,8 @@
 - Updated dependencies [e3b58c03e]
 - Updated dependencies [0553035f5]
 - Updated dependencies [202cd714d]
-  - @tinacms/datalayer@1.2.0
-  - @tinacms/graphql@1.4.0
+  - @strivemath/tinacms-datalayer@1.2.0
+  - @strivemath/tinacms-graphql@1.4.0
   - tinacms@1.4.0
 
 ## null
@@ -413,8 +413,8 @@
 ### Patch Changes
 
 - tinacms@1.3.3
-- @tinacms/graphql@1.3.5
-- @tinacms/datalayer@1.1.6
+- @strivemath/tinacms-graphql@1.3.5
+- @strivemath/tinacms-datalayer@1.1.6
 
 ## null
 
@@ -427,9 +427,9 @@
 ### Patch Changes
 
 - Updated dependencies [b095d06a9]
-  - @tinacms/graphql@1.3.4
+  - @strivemath/tinacms-graphql@1.3.4
   - tinacms@1.3.1
-  - @tinacms/datalayer@1.1.5
+  - @strivemath/tinacms-datalayer@1.1.5
 
 ## null
 
@@ -443,8 +443,8 @@
 - Updated dependencies [5427d03c6]
 - Updated dependencies [8d5c923c7]
   - tinacms@1.3.0
-  - @tinacms/graphql@1.3.3
-  - @tinacms/datalayer@1.1.4
+  - @strivemath/tinacms-graphql@1.3.3
+  - @strivemath/tinacms-datalayer@1.1.4
 
 ## null
 
@@ -457,16 +457,16 @@
 - Updated dependencies [071b8fe59]
 - Updated dependencies [c97ffc20d]
   - tinacms@1.2.2
-  - @tinacms/graphql@1.3.2
-  - @tinacms/datalayer@1.1.3
+  - @strivemath/tinacms-graphql@1.3.2
+  - @strivemath/tinacms-datalayer@1.1.3
 
 ## null
 
 ### Patch Changes
 
 - Updated dependencies [3bbb621cd]
-  - @tinacms/graphql@1.3.1
-  - @tinacms/datalayer@1.1.2
+  - @strivemath/tinacms-graphql@1.3.1
+  - @strivemath/tinacms-datalayer@1.1.2
 
 ## null
 
@@ -479,9 +479,9 @@
 - Updated dependencies [e732906b6]
 - Updated dependencies [42536f6e2]
 - Updated dependencies [5d024e4f1]
-  - @tinacms/graphql@1.3.0
+  - @strivemath/tinacms-graphql@1.3.0
   - tinacms@1.2.1
-  - @tinacms/datalayer@1.1.1
+  - @strivemath/tinacms-datalayer@1.1.1
 
 ## null
 
@@ -490,8 +490,8 @@
 - Updated dependencies [efd56e769]
 - Updated dependencies [efd56e769]
 - Updated dependencies [50f86caed]
-  - @tinacms/datalayer@1.1.0
-  - @tinacms/graphql@1.2.0
+  - @strivemath/tinacms-datalayer@1.1.0
+  - @strivemath/tinacms-graphql@1.2.0
   - tinacms@1.2.0
 
 ## null

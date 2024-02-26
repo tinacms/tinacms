@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { useNavigate } from 'react-router-dom'
-import type { Collection, TinaSchema } from '@tinacms/schema-tools'
+import type { Collection, TinaSchema } from '@strivemath/tinacms-schema-tools'
 import { FilterArgs, TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
 import type { CollectionResponse, DocumentForm } from '../types'

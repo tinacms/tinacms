@@ -7,7 +7,7 @@ interface EventsBase {
 }
 
 export interface CreateTinaAppInvoke extends EventsBase {
-  name: 'create-tina-app:invoke'
+  name: '@strivemath/create-tina-app:invoke'
   example: string
   useYarn: boolean
 }

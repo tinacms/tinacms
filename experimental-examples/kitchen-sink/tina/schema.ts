@@ -1,4 +1,4 @@
-import { defineSchema } from 'tinacms'
+import { defineSchema } from '@strivemath/tinacms'
 
 export default defineSchema({
   collections: [

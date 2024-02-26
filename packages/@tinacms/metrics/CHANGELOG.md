@@ -1,4 +1,4 @@
-# @tinacms/metrics
+# @strivemath/tinacms-metrics
 
 ## 1.0.2
 

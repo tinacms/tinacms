@@ -1,5 +1,5 @@
 import React from 'react'
-import { TinaCMS } from 'tinacms'
+import { TinaCMS } from '@strivemath/tinacms'
 
 const ErrorModalContent = (props: { title: string; errors: string[] }) => {
   const { title, errors } = props

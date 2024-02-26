@@ -1,14 +1,12 @@
-
 <a name="readmemd"></a>
 
-@tinacms/mdx / [Exports](#modulesmd)
-
+@strivemath/tinacms-mdx / [Exports](#modulesmd)
 
 <a name="modulesmd"></a>
 
-[@tinacms/mdx](#readmemd) / Exports
+[@strivemath/tinacms-mdx](#readmemd) / Exports
 
-# @tinacms/mdx
+# @strivemath/tinacms-mdx
 
 ## Table of contents
 
@@ -48,7 +46,7 @@
 - [ListItemChildrenElement](#listitemchildrenelement)
 - [ListItemContentElement](#listitemcontentelement)
 
-### _MiscellaneousElement
+### \_MiscellaneousElement
 
 - [Position](#position)
 - [PositionItem](#positionitem)
@@ -62,9 +60,9 @@
 
 #### Defined in
 
-[plate.ts:144](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L144)
+[plate.ts:144](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L144)
 
-___
+---
 
 ### BlockquoteElement
 
@@ -72,16 +70,16 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                |
+| :--------- | :---------------------------------- |
 | `children` | [`InlineElement`](#inlineelement)[] |
-| `type` | ``"blockquote"`` |
+| `type`     | `"blockquote"`                      |
 
 #### Defined in
 
-[plate.ts:30](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L30)
+[plate.ts:30](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L30)
 
-___
+---
 
 ### CodeBlockElement
 
@@ -89,18 +87,18 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                      |
+| :--------- | :---------------------------------------- |
 | `children` | [[`EmptyTextElement`](#emptytextelement)] |
-| `lang?` | `string` |
-| `type` | ``"code_block"`` |
-| `value` | `string` |
+| `lang?`    | `string`                                  |
+| `type`     | `"code_block"`                            |
+| `value`    | `string`                                  |
 
 #### Defined in
 
-[plate.ts:37](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L37)
+[plate.ts:37](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L37)
 
-___
+---
 
 ### HTMLElement
 
@@ -108,17 +106,17 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                      |
+| :--------- | :---------------------------------------- |
 | `children` | [[`EmptyTextElement`](#emptytextelement)] |
-| `type` | ``"html"`` |
-| `value` | `string` |
+| `type`     | `"html"`                                  |
+| `value`    | `string`                                  |
 
 #### Defined in
 
-[plate.ts:61](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L61)
+[plate.ts:61](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L61)
 
-___
+---
 
 ### HeadingElement
 
@@ -126,16 +124,16 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
-| `children` | [`InlineElement`](#inlineelement)[] |
-| `type` | ``"h1"`` \| ``"h2"`` \| ``"h3"`` \| ``"h4"`` \| ``"h5"`` \| ``"h6"`` |
+| Name       | Type                                                     |
+| :--------- | :------------------------------------------------------- |
+| `children` | [`InlineElement`](#inlineelement)[]                      |
+| `type`     | `"h1"` \| `"h2"` \| `"h3"` \| `"h4"` \| `"h5"` \| `"h6"` |
 
 #### Defined in
 
-[plate.ts:46](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L46)
+[plate.ts:46](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L46)
 
-___
+---
 
 ### HrElement
 
@@ -143,16 +141,16 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                      |
+| :--------- | :---------------------------------------- |
 | `children` | [[`EmptyTextElement`](#emptytextelement)] |
-| `type` | ``"hr"`` |
+| `type`     | `"hr"`                                    |
 
 #### Defined in
 
-[plate.ts:54](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L54)
+[plate.ts:54](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L54)
 
-___
+---
 
 ### InvalidMarkdownElement
 
@@ -160,19 +158,19 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
-| `children` | [[`EmptyTextElement`](#emptytextelement)] |
-| `message` | `string` |
-| `position?` | [`Position`](#position) |
-| `type` | ``"invalid_markdown"`` |
-| `value` | `string` |
+| Name        | Type                                      |
+| :---------- | :---------------------------------------- |
+| `children`  | [[`EmptyTextElement`](#emptytextelement)] |
+| `message`   | `string`                                  |
+| `position?` | [`Position`](#position)                   |
+| `type`      | `"invalid_markdown"`                      |
+| `value`     | `string`                                  |
 
 #### Defined in
 
-[plate.ts:77](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L77)
+[plate.ts:77](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L77)
 
-___
+---
 
 ### ListItemElement
 
@@ -180,16 +178,16 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                                    |
+| :--------- | :------------------------------------------------------ |
 | `children` | [`ListItemChildrenElement`](#listitemchildrenelement)[] |
-| `type` | ``"li"`` |
+| `type`     | `"li"`                                                  |
 
 #### Defined in
 
-[plate.ts:106](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L106)
+[plate.ts:106](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L106)
 
-___
+---
 
 ### MdxBlockElement
 
@@ -197,18 +195,18 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                      |
+| :--------- | :---------------------------------------- |
 | `children` | [[`EmptyTextElement`](#emptytextelement)] |
-| `name` | `string` \| ``null`` |
-| `props` | `Record`<`string`, `unknown`\> |
-| `type` | ``"mdxJsxFlowElement"`` |
+| `name`     | `string` \| `null`                        |
+| `props`    | `Record`<`string`, `unknown`\>            |
+| `type`     | `"mdxJsxFlowElement"`                     |
 
 #### Defined in
 
-[plate.ts:120](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L120)
+[plate.ts:120](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L120)
 
-___
+---
 
 ### OrderedListElement
 
@@ -216,16 +214,16 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                    |
+| :--------- | :-------------------------------------- |
 | `children` | [`ListItemElement`](#listitemelement)[] |
-| `type` | ``"ol"`` |
+| `type`     | `"ol"`                                  |
 
 #### Defined in
 
-[plate.ts:129](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L129)
+[plate.ts:129](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L129)
 
-___
+---
 
 ### ParagraphElement
 
@@ -233,16 +231,16 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                |
+| :--------- | :---------------------------------- |
 | `children` | [`InlineElement`](#inlineelement)[] |
-| `type` | ``"p"`` |
+| `type`     | `"p"`                               |
 
 #### Defined in
 
-[plate.ts:136](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L136)
+[plate.ts:136](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L136)
 
-___
+---
 
 ### UnorderedListElement
 
@@ -250,14 +248,14 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                    |
+| :--------- | :-------------------------------------- |
 | `children` | [`ListItemElement`](#listitemelement)[] |
-| `type` | ``"ul"`` |
+| `type`     | `"ul"`                                  |
 
 #### Defined in
 
-[plate.ts:113](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L113)
+[plate.ts:113](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L113)
 
 ## InlineElement
 
@@ -267,16 +265,16 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                      |
+| :--------- | :---------------------------------------- |
 | `children` | [[`EmptyTextElement`](#emptytextelement)] |
-| `type` | ``"break"`` |
+| `type`     | `"break"`                                 |
 
 #### Defined in
 
-[plate.ts:211](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L211)
+[plate.ts:211](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L211)
 
-___
+---
 
 ### HTMLInlineElement
 
@@ -284,17 +282,17 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                      |
+| :--------- | :---------------------------------------- |
 | `children` | [[`EmptyTextElement`](#emptytextelement)] |
-| `type` | ``"html_inline"`` |
-| `value` | `string` |
+| `type`     | `"html_inline"`                           |
+| `value`    | `string`                                  |
 
 #### Defined in
 
-[plate.ts:69](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L69)
+[plate.ts:69](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L69)
 
-___
+---
 
 ### ImageElement
 
@@ -306,19 +304,19 @@ It may be beneficial to treat this as a block element
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
-| `alt?` | `string` |
-| `caption?` | `string` \| ``null`` |
+| Name       | Type                                      |
+| :--------- | :---------------------------------------- |
+| `alt?`     | `string`                                  |
+| `caption?` | `string` \| `null`                        |
 | `children` | [[`EmptyTextElement`](#emptytextelement)] |
-| `type` | ``"img"`` |
-| `url` | `string` |
+| `type`     | `"img"`                                   |
+| `url`      | `string`                                  |
 
 #### Defined in
 
-[plate.ts:192](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L192)
+[plate.ts:192](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L192)
 
-___
+---
 
 ### InlineElement
 
@@ -326,9 +324,9 @@ ___
 
 #### Defined in
 
-[plate.ts:224](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L224)
+[plate.ts:224](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L224)
 
-___
+---
 
 ### LinkElement
 
@@ -336,18 +334,18 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                |
+| :--------- | :---------------------------------- |
 | `children` | [`InlineElement`](#inlineelement)[] |
-| `title?` | `string` \| ``null`` |
-| `type` | ``"a"`` |
-| `url` | `string` |
+| `title?`   | `string` \| `null`                  |
+| `type`     | `"a"`                               |
+| `url`      | `string`                            |
 
 #### Defined in
 
-[plate.ts:202](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L202)
+[plate.ts:202](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L202)
 
-___
+---
 
 ### MdxInlineElement
 
@@ -355,18 +353,18 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                                      |
+| :--------- | :---------------------------------------- |
 | `children` | [[`EmptyTextElement`](#emptytextelement)] |
-| `name` | `string` \| ``null`` |
-| `props` | `Record`<`string`, `unknown`\> |
-| `type` | ``"mdxJsxTextElement"`` |
+| `name`     | `string` \| `null`                        |
+| `props`    | `Record`<`string`, `unknown`\>            |
+| `type`     | `"mdxJsxTextElement"`                     |
 
 #### Defined in
 
-[plate.ts:161](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L161)
+[plate.ts:161](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L161)
 
-___
+---
 
 ### TextElement
 
@@ -374,17 +372,17 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
-| `bold?` | `boolean` |
-| `code?` | `boolean` |
+| Name      | Type      |
+| :-------- | :-------- |
+| `bold?`   | `boolean` |
+| `code?`   | `boolean` |
 | `italic?` | `boolean` |
-| `text` | `string` |
-| `type` | ``"text"`` |
+| `text`    | `string`  |
+| `type`    | `"text"`  |
 
 #### Defined in
 
-[plate.ts:179](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L179)
+[plate.ts:179](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L179)
 
 ## MiscellaneousElement
 
@@ -399,14 +397,14 @@ the frontend rich-text editor for void nodes
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
-| `text` | ``""`` |
-| `type` | ``"text"`` |
+| Name   | Type     |
+| :----- | :------- |
+| `text` | `""`     |
+| `type` | `"text"` |
 
 #### Defined in
 
-[plate.ts:175](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L175)
+[plate.ts:175](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L175)
 
 ## ListElements
 
@@ -416,9 +414,9 @@ the frontend rich-text editor for void nodes
 
 #### Defined in
 
-[plate.ts:219](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L219)
+[plate.ts:219](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L219)
 
-___
+---
 
 ### List
 
@@ -426,9 +424,9 @@ ___
 
 #### Defined in
 
-[plate.ts:87](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L87)
+[plate.ts:87](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L87)
 
-___
+---
 
 ### ListItemChildrenElement
 
@@ -436,9 +434,9 @@ ___
 
 #### Defined in
 
-[plate.ts:98](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L98)
+[plate.ts:98](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L98)
 
-___
+---
 
 ### ListItemContentElement
 
@@ -446,16 +444,16 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                          |
+| :--------- | :---------------------------- |
 | `children` | [`LicElement`](#licelement)[] |
-| `type` | ``"lic"`` |
+| `type`     | `"lic"`                       |
 
 #### Defined in
 
-[plate.ts:91](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L91)
+[plate.ts:91](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L91)
 
-## _MiscellaneousElement
+## \_MiscellaneousElement
 
 ### Position
 
@@ -467,16 +465,16 @@ Positional information for error reporting
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
-| `end` | [`PositionItem`](#positionitem) |
+| Name    | Type                            |
+| :------ | :------------------------------ |
+| `end`   | [`PositionItem`](#positionitem) |
 | `start` | [`PositionItem`](#positionitem) |
 
 #### Defined in
 
-[plate.ts:238](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L238)
+[plate.ts:238](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L238)
 
-___
+---
 
 ### PositionItem
 
@@ -488,19 +486,19 @@ Positional information for error reporting
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
-| `_bufferIndex?` | `number` \| ``null`` |
-| `_index?` | `number` \| ``null`` |
-| `column?` | `number` \| ``null`` |
-| `line?` | `number` \| ``null`` |
-| `offset?` | `number` \| ``null`` |
+| Name            | Type               |
+| :-------------- | :----------------- |
+| `_bufferIndex?` | `number` \| `null` |
+| `_index?`       | `number` \| `null` |
+| `column?`       | `number` \| `null` |
+| `line?`         | `number` \| `null` |
+| `offset?`       | `number` \| `null` |
 
 #### Defined in
 
-[plate.ts:249](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L249)
+[plate.ts:249](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L249)
 
-___
+---
 
 ### RootElement
 
@@ -508,11 +506,11 @@ ___
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name       | Type                              |
+| :--------- | :-------------------------------- |
 | `children` | [`BlockElement`](#blockelement)[] |
-| `type` | ``"root"`` |
+| `type`     | `"root"`                          |
 
 #### Defined in
 
-[plate.ts:22](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L22)
+[plate.ts:22](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@strivemath/tinacms-mdx/src/parse/plate.ts#L22)

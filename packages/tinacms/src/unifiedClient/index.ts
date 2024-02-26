@@ -1,6 +1,6 @@
 import fetchPonyfill from 'fetch-ponyfill'
 import type { GraphQLError } from 'graphql'
-import type { Config } from '@tinacms/schema-tools'
+import type { Config } from '@strivemath/tinacms-schema-tools'
 
 const { fetch: fetchPonyfillFN, Headers: HeadersPonyfill } = fetchPonyfill()
 

@@ -5,7 +5,7 @@
 import React from 'react'
 import { useCMS } from '@tinacms/toolkit'
 import { ContentCreatorPlugin, OnNewDocument } from './create-page-plugin'
-import { Template } from '@tinacms/schema-tools'
+import { Template } from '@strivemath/tinacms-schema-tools'
 
 export type FilterCollections = (
   options: {

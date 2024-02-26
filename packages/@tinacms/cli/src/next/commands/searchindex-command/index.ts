@@ -1,12 +1,12 @@
 import { Command, Option } from 'clipanion'
 import { logger } from '../../../logger'
 import { ConfigManager } from '../../config-manager'
-import { createSchema, FilesystemBridge } from '@tinacms/graphql'
+import { createSchema, FilesystemBridge } from '@strivemath/tinacms-graphql'
 import {
   SearchClient,
   SearchIndexer,
   TinaCMSSearchIndexClient,
-} from '@tinacms/search'
+} from '@strivemath/tinacms-search'
 import { spin } from '../../../utils/spinner'
 import { dangerText } from '../../../utils/theme'
 

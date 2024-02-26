@@ -1,6 +1,6 @@
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
-import type { RichTextField } from '@tinacms/schema-tools'
+import type { RichTextField } from '@strivemath/tinacms-schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../../parse/plate'
 import type { RootElement } from '../../parse/plate'

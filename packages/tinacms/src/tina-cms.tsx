@@ -3,7 +3,7 @@ import { TinaCloudProvider } from './auth'
 
 import { LocalClient } from './internalClient/index'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
-import { parseURL } from '@tinacms/schema-tools'
+import { parseURL } from '@strivemath/tinacms-schema-tools'
 import { TinaCMSProviderDefaultProps } from './types/cms'
 
 const errorButtonStyles = {

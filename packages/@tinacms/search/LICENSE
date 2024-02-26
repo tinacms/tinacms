@@ -2,7 +2,7 @@ Copyright (c) 2023-present Forestry.io Holdings Inc.
 
 Portions of the TinaCMS software are licensed as follows:
 
-* All software that resides under the "packages/@tinacms/datalayer/" and the "packages/@tinacms/graphql/" directories (the "Tina Data Layer"), is licensed under the license defined in "packages/@tinacms/datalayer/LICENSE".
+* All software that resides under the "packages/@strivemath/tinacms-datalayer/" and the "packages/@strivemath/tinacms-graphql/" directories (the "Tina Data Layer"), is licensed under the license defined in "packages/@strivemath/tinacms-datalayer/LICENSE".
 
 * All software outside of the above-mentioned directories is available under the "Apache 2.0" license as set forth below.
 

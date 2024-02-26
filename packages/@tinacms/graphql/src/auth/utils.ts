@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import scmp from 'scmp'
-import { Collectable } from '@tinacms/schema-tools'
+import { Collectable } from '@strivemath/tinacms-schema-tools'
 
 const DEFAULT_SALT_LENGTH = 32
 const DEFAULT_KEY_LENGTH = 512

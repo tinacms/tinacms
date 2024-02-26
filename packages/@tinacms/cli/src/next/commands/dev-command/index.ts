@@ -2,7 +2,11 @@ import { Command, Option } from 'clipanion'
 import fs from 'fs-extra'
 import path from 'path'
 import chokidar from 'chokidar'
-import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql'
+import {
+  buildSchema,
+  Database,
+  FilesystemBridge,
+} from '@strivemath/tinacms-graphql'
 import { ConfigManager } from '../../config-manager'
 import { devHTML } from './html'
 import { logger, summary } from '../../../logger'
@@ -12,7 +16,10 @@ import { Codegen } from '../../codegen'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { BaseCommand } from '../baseCommands'
 import { spin } from '../../../utils/spinner'
-import { SearchIndexer, LocalSearchIndexClient } from '@tinacms/search'
+import {
+  SearchIndexer,
+  LocalSearchIndexClient,
+} from '@strivemath/tinacms-search'
 
 export class DevCommand extends BaseCommand {
   static paths = [['dev'], ['server:start']]

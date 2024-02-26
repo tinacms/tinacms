@@ -1,4 +1,4 @@
-import { Collection, LoginStrategy } from '@tinacms/schema-tools'
+import { Collection, LoginStrategy } from '@strivemath/tinacms-schema-tools'
 import {
   getCsrfToken,
   getSession,
@@ -6,7 +6,7 @@ import {
   signOut,
   SessionProvider,
 } from 'next-auth/react'
-import { AbstractAuthProvider } from 'tinacms'
+import { AbstractAuthProvider } from '@strivemath/tinacms'
 import type { FC } from 'react'
 
 export const TINA_CREDENTIALS_PROVIDER_NAME = 'TinaCredentials'

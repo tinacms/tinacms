@@ -18,14 +18,14 @@ import {
   addNamespaceToSchema,
   Schema,
   AuthProvider,
-} from '@tinacms/schema-tools'
+} from '@strivemath/tinacms-schema-tools'
 import { TinaCloudProject } from './types'
 import {
   optionsToSearchIndexOptions,
   parseSearchIndexResponse,
   queryToSearchIndexQuery,
   SearchClient,
-} from '@tinacms/search/dist/index-client'
+} from '@strivemath/tinacms-search/dist/index-client'
 import { AsyncData, asyncPoll } from './asyncPoll'
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider'
 

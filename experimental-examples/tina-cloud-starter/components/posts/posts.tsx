@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { TinaMarkdown } from '@strivemath/tinacms/dist/rich-text'
 import { BsArrowRight } from 'react-icons/bs'
 import { useTheme } from '../layout'
 import format from 'date-fns/format'

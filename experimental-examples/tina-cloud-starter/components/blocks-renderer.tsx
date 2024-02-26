@@ -3,7 +3,7 @@ import { Content } from './blocks/content'
 import { Features } from './blocks/features'
 import { Hero } from './blocks/hero'
 import { Testimonial } from './blocks/testimonial'
-import { tinaField } from 'tinacms/dist/react'
+import { tinaField } from '@strivemath/tinacms/dist/react'
 
 export const Blocks = (props: Omit<Page, 'id' | '_sys' | '_values'>) => {
   return (

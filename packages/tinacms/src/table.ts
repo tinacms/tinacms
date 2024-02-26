@@ -1,5 +1,5 @@
-import { RichTextTemplate } from '@tinacms/schema-tools'
-import { stringifyMDX } from '@tinacms/mdx'
+import { RichTextTemplate } from '@strivemath/tinacms-schema-tools'
+import { stringifyMDX } from '@strivemath/tinacms-mdx'
 import { z } from 'zod'
 
 /**

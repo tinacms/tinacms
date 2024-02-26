@@ -7,24 +7,24 @@ The CLI can be installed as a dev dependency in your project.
 Npm:
 
 ```bash
-npm install --save-dev @tinacms/cli
+npm install --save-dev @strivemath/tinacms-cli
 ```
 
 Yarn:
 
 ```bash
-yarn add --dev @tinacms/cli
+yarn add --dev @strivemath/tinacms-cli
 ```
 
 ## Usage
 
 ```
-Usage: @tinacms/cli command [options]
+Usage: @strivemath/tinacms-cli command [options]
 
 Options:
   -V, --version             output the version number
   -h, --help                display help for command
-  -v, --verbose             increase verbosity of console output   
+  -v, --verbose             increase verbosity of console output
 
 Commands:
   server:start [options]    Start Filesystem Graphql Server
@@ -51,59 +51,59 @@ mkdir .tina && touch .tina/schema.ts
 
 ```ts
 // .tina/schema.ts
-import { defineSchema } from "@tinacms/cli";
+import { defineSchema } from '@strivemath/tinacms-cli'
 
 export default defineSchema({
   collections: [
     {
-      label: "Blog Posts",
-      name: "post",
-      path: "content/posts",
+      label: 'Blog Posts',
+      name: 'post',
+      path: 'content/posts',
       templates: [
         {
-          label: "Article",
-          name: "article",
+          label: 'Article',
+          name: 'article',
           fields: [
             {
-              type: "text",
-              label: "Title",
-              name: "title",
+              type: 'text',
+              label: 'Title',
+              name: 'title',
             },
             {
-              type: "reference",
-              label: "Author",
-              name: "author",
-              collection: "authors",
+              type: 'reference',
+              label: 'Author',
+              name: 'author',
+              collection: 'authors',
             },
           ],
         },
       ],
     },
     {
-      label: "Authors",
-      name: "author",
-      path: "content/authors",
+      label: 'Authors',
+      name: 'author',
+      path: 'content/authors',
       templates: [
         {
-          label: "Author",
-          name: "basicAuthor",
+          label: 'Author',
+          name: 'basicAuthor',
           fields: [
             {
-              type: "text",
-              label: "Name",
-              name: "name",
+              type: 'text',
+              label: 'Name',
+              name: 'name',
             },
             {
-              type: "text",
-              label: "Avatar",
-              name: "avatar",
+              type: 'text',
+              label: 'Avatar',
+              name: 'avatar',
             },
           ],
         },
       ],
     },
   ],
-});
+})
 ```
 
 Be sure this is your default export from this file, we'll validate the schema and build out the GraphQL API with it.
@@ -232,7 +232,6 @@ getPostsDocument(relativePath: "voteForPedro.md") {
 To learn how to work with this data on a Tina-enabled site, check out the [client documentation](https://tina.io/docs/tina-cloud/client/)
 
 > This API is currently somewhat limited. Specifically there's no support for filtering and sorting "list" queries. We have plans to tackle that in upcoming cycles
-
 
 ## API Docs
 

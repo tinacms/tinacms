@@ -5,7 +5,7 @@ import { gfm } from 'micromark-extension-gfm'
 import { gfmFromMarkdown } from 'mdast-util-gfm'
 import { getFieldPatterns } from '../util'
 import * as acorn from 'acorn'
-import type { RichTextField, Template } from '@tinacms/schema-tools'
+import type { RichTextField, Template } from '@strivemath/tinacms-schema-tools'
 import type { Options } from '../shortcodes'
 
 export const fromMarkdown = (value: string, field: RichTextField) => {

@@ -1,10 +1,10 @@
 import { Command, Option } from 'clipanion'
-import { buildSchema } from '@tinacms/graphql'
+import { buildSchema } from '@strivemath/tinacms-graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger } from '../../../logger'
 import { audit } from './audit'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
-import { AuditFileSystemBridge } from '@tinacms/graphql'
+import { AuditFileSystemBridge } from '@strivemath/tinacms-graphql'
 import { spin } from '../../../utils/spinner'
 import { warnText } from '../../../utils/theme'
 

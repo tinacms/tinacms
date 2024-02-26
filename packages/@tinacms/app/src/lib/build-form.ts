@@ -1,4 +1,10 @@
-import { Field, Form, FormOptions, TinaCMS, TinaField } from 'tinacms'
+import {
+  Field,
+  Form,
+  FormOptions,
+  TinaCMS,
+  TinaField,
+} from '@strivemath/tinacms'
 
 export type FieldType = Field & TinaField
 export type FormValues = Record<string, unknown>

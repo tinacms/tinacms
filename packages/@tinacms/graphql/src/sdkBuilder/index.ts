@@ -2,7 +2,7 @@
 
 */
 
-import type { TinaSchema } from '@tinacms/schema-tools'
+import type { TinaSchema } from '@strivemath/tinacms-schema-tools'
 import { NAMER } from '../ast-builder'
 
 export const buildSKD = (tinaSchema: TinaSchema) => {

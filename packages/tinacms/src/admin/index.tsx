@@ -30,7 +30,7 @@ import CollectionDuplicatePage from './pages/CollectionDuplicatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 import ScreenPage from './pages/ScreenPage'
 
-import { useEditState } from '@tinacms/sharedctx'
+import { useEditState } from '@strivemath/tinacms-sharedctx'
 import { Client } from '../internalClient'
 import { TinaAdminApi } from './api'
 import { IndexingPage } from './pages/IndexingPage'

@@ -1,11 +1,11 @@
-# @tinacms/mdx
+# @strivemath/tinacms-mdx
 
 ## 1.3.23
 
 ### Patch Changes
 
 - Updated dependencies [64f8fa038]
-  - @tinacms/schema-tools@1.4.15
+  - @strivemath/tinacms-schema-tools@1.4.15
 
 ## 1.3.22
 
@@ -21,13 +21,16 @@
   - **Added**: `databaseAdapter` to replace `level`.
   - **Added**: `gitProvider` to substitute `onPut` and `onDelete`.
   - **New Package**: `tinacms-gitprovider-github`, exporting the `GitHubProvider` class.
-  - **Interface Addition**: `gitProvider` added to `@tinacms/graphql`.
+  - **Interface Addition**: `gitProvider` added to `@strivemath/tinacms-graphql`.
   - **Addition**: Generated database client.
 
   #### Updated `database.ts` Example
 
   ```typescript
-  import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
+  import {
+    createDatabase,
+    createLocalDatabase,
+  } from '@strivemath/tinacms-datalayer'
   import { MongodbLevel } from 'mongodb-level'
   import { GitHubProvider } from 'tinacms-gitprovider-github'
 
@@ -43,8 +46,8 @@
           token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         }),
         databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: '@strivemath/tinacms',
+          dbName: '@strivemath/tinacms',
           mongoUri: process.env.MONGODB_URI,
         }),
         namespace: process.env.GITHUB_BRANCH,
@@ -98,7 +101,7 @@
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
-  import { createLocalDatabase } from '@tinacms/datalayer'
+  import { createLocalDatabase } from '@strivemath/tinacms-datalayer'
   createLocalDatabase(port)
   ```
 
@@ -107,7 +110,7 @@
   - **Updated `database.{ts,js}` File**:
 
   ```typescript
-  import { createDatabase, createLocalDatabase, GitHubProvider } from '@tinacms/datalayer';
+  import { createDatabase, createLocalDatabase, GitHubProvider } from '@strivemath/tinacms-datalayer';
   import { MongodbLevel } from 'mongodb-level';
   const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true';
   export default isLocal
@@ -152,7 +155,7 @@
   - **New API**:
 
   ```javascript
-  import { AbstractAuthProvider } from 'tinacms'
+  import { AbstractAuthProvider } from '@strivemath/tinacms'
   class CustomAuthProvider extends AbstractAuthProvider {
     login() {}
     logout() {}
@@ -166,8 +169,8 @@
 
   ### TinaCMS Self Hosted backend updates
 
-  - **New:** TinaNodeBackend is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend in a single function.
-  - **New:** `LocalBackendAuthProvider` is exported from `@tinacms/datalayer`. This is used to host the TinaCMS backend locally.
+  - **New:** TinaNodeBackend is exported from `@strivemath/tinacms-datalayer`. This is used to host the TinaCMS backend in a single function.
+  - **New:** `LocalBackendAuthProvider` is exported from `@strivemath/tinacms-datalayer`. This is used to host the TinaCMS backend locally.
 
   - **New:** `AuthJsBackendAuthProvider` is exported from `tinacms-authjs`. This is used to host the TinaCMS backend with AuthJS.
 
@@ -178,7 +181,10 @@
   `/api/tina/[...routes].{ts,js}`
 
   ```typescript
-  import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  import {
+    TinaNodeBackend,
+    LocalBackendAuthProvider,
+  } from '@strivemath/tinacms-datalayer'
 
   import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
 
@@ -209,7 +215,7 @@
   Please [check out the docs](https://tina.io/docs/self-hosted/overview) for more information on self hosted TinaCMS.
 
 - Updated dependencies [a65ca13f2]
-  - @tinacms/schema-tools@1.4.14
+  - @strivemath/tinacms-schema-tools@1.4.14
 
 ## 1.3.21
 
@@ -255,7 +261,7 @@
 
 - Updated dependencies [6861b5e01]
 - Updated dependencies [aec44a7dc]
-  - @tinacms/schema-tools@1.4.13
+  - @strivemath/tinacms-schema-tools@1.4.13
 
 ## 1.3.19
 
@@ -274,7 +280,7 @@
 - Updated dependencies [7e4de0b2a]
 - Updated dependencies [099bf5646]
 - Updated dependencies [c92de7b1d]
-  - @tinacms/schema-tools@1.4.12
+  - @strivemath/tinacms-schema-tools@1.4.12
 
 ## 1.3.17
 
@@ -282,7 +288,7 @@
 
 - 0e94b2725: Fix issue where empty nested rich-text fields would throw an error if they'd been marked as dirty during editing
 - Updated dependencies [1563ce5b2]
-  - @tinacms/schema-tools@1.4.11
+  - @strivemath/tinacms-schema-tools@1.4.11
 
 ## 1.3.16
 
@@ -293,7 +299,7 @@
 - Updated dependencies [133e97d5b]
 - Updated dependencies [f02b4368b]
 - Updated dependencies [7991e097e]
-  - @tinacms/schema-tools@1.4.10
+  - @strivemath/tinacms-schema-tools@1.4.10
 
 ## 1.3.15
 
@@ -301,42 +307,42 @@
 
 - bc812441b: Use .mjs extension for ES modules
 - Updated dependencies [bc812441b]
-  - @tinacms/schema-tools@1.4.9
+  - @strivemath/tinacms-schema-tools@1.4.9
 
 ## 1.3.14
 
 ### Patch Changes
 
 - Updated dependencies [019920a35]
-  - @tinacms/schema-tools@1.4.8
+  - @strivemath/tinacms-schema-tools@1.4.8
 
 ## 1.3.13
 
 ### Patch Changes
 
 - Updated dependencies [fe13b4ed9]
-  - @tinacms/schema-tools@1.4.7
+  - @strivemath/tinacms-schema-tools@1.4.7
 
 ## 1.3.12
 
 ### Patch Changes
 
 - Updated dependencies [a94e123b6]
-  - @tinacms/schema-tools@1.4.6
+  - @strivemath/tinacms-schema-tools@1.4.6
 
 ## 1.3.11
 
 ### Patch Changes
 
 - Updated dependencies [c385b5615]
-  - @tinacms/schema-tools@1.4.5
+  - @strivemath/tinacms-schema-tools@1.4.5
 
 ## 1.3.10
 
 ### Patch Changes
 
 - Updated dependencies [beb179279]
-  - @tinacms/schema-tools@1.4.4
+  - @strivemath/tinacms-schema-tools@1.4.4
 
 ## 1.3.9
 
@@ -344,7 +350,7 @@
 
 - Updated dependencies [f14f59a96]
 - Updated dependencies [eeedcfd30]
-  - @tinacms/schema-tools@1.4.3
+  - @strivemath/tinacms-schema-tools@1.4.3
 
 ## 1.3.8
 
@@ -357,7 +363,7 @@
 ### Patch Changes
 
 - Updated dependencies [a70204500]
-  - @tinacms/schema-tools@1.4.2
+  - @strivemath/tinacms-schema-tools@1.4.2
 
 ## 1.3.6
 
@@ -368,7 +374,7 @@
   - Adds transform ts and tsx files in build as well as dev
 - Updated dependencies [9a8074889]
 - Updated dependencies [c48326846]
-  - @tinacms/schema-tools@1.4.1
+  - @strivemath/tinacms-schema-tools@1.4.1
 
 ## 1.3.5
 
@@ -381,11 +387,11 @@
   <Cta>Hello, world</Cta>
   ```
 
-- cbc1fb919: Provide browser-specific version of @tinacms/mdx
+- cbc1fb919: Provide browser-specific version of @strivemath/tinacms-mdx
 - Updated dependencies [76c984bcc]
 - Updated dependencies [5809796cf]
 - Updated dependencies [54aac9017]
-  - @tinacms/schema-tools@1.4.0
+  - @strivemath/tinacms-schema-tools@1.4.0
 
 ## 1.3.4
 
@@ -398,14 +404,14 @@
   - Fix display of .avif images in the media manager
 
 - Updated dependencies [d1cf65999]
-  - @tinacms/schema-tools@1.3.4
+  - @strivemath/tinacms-schema-tools@1.3.4
 
 ## 1.3.3
 
 ### Patch Changes
 
 - 290520682: Update handling of top-level images during stringify
-  - @tinacms/schema-tools@1.3.3
+  - @strivemath/tinacms-schema-tools@1.3.3
 
 ## 1.3.2
 
@@ -444,7 +450,7 @@
 - Updated dependencies [7a3e86ba1]
 - Updated dependencies [353899de1]
 - Updated dependencies [01b858e41]
-  - @tinacms/schema-tools@1.3.3
+  - @strivemath/tinacms-schema-tools@1.3.3
 
 ## 1.3.1
 
@@ -453,7 +459,7 @@
 - aa0250979: Fix issue where shortcode closing tags were backwards
 - Updated dependencies [892b4e39e]
 - Updated dependencies [c97ffc20d]
-  - @tinacms/schema-tools@1.3.2
+  - @strivemath/tinacms-schema-tools@1.3.2
 
 ## 1.3.0
 
@@ -464,7 +470,7 @@
 ### Patch Changes
 
 - Updated dependencies [e732906b6]
-  - @tinacms/schema-tools@1.3.1
+  - @strivemath/tinacms-schema-tools@1.3.1
 
 ## 1.2.0
 
@@ -477,7 +483,7 @@
 - efd56e769: Remove license headers
 - Updated dependencies [efd56e769]
 - Updated dependencies [efd56e769]
-  - @tinacms/schema-tools@1.3.0
+  - @strivemath/tinacms-schema-tools@1.3.0
 
 ## 1.1.1
 
@@ -485,7 +491,7 @@
 
 - Updated dependencies [84fe97ca7]
 - Updated dependencies [e7c404bcf]
-  - @tinacms/schema-tools@1.2.1
+  - @strivemath/tinacms-schema-tools@1.2.1
 
 ## 1.1.0
 
@@ -500,7 +506,7 @@
 - Updated dependencies [7d41435df]
 - Updated dependencies [3165f397d]
 - Updated dependencies [b2952a298]
-  - @tinacms/schema-tools@1.2.0
+  - @strivemath/tinacms-schema-tools@1.2.0
 
 ## 1.0.4
 
@@ -508,7 +514,7 @@
 
 - Updated dependencies [7554ea362]
 - Updated dependencies [4ebc44068]
-  - @tinacms/schema-tools@1.1.0
+  - @strivemath/tinacms-schema-tools@1.1.0
 
 ## 1.0.3
 
@@ -516,7 +522,7 @@
 
 - Updated dependencies [7495f032b]
 - Updated dependencies [de37c9eff]
-  - @tinacms/schema-tools@1.0.3
+  - @strivemath/tinacms-schema-tools@1.0.3
 
 ## 1.0.2
 
@@ -524,14 +530,14 @@
 
 - Updated dependencies [c91bc0fc9]
 - Updated dependencies [c1ac4bf10]
-  - @tinacms/schema-tools@1.0.2
+  - @strivemath/tinacms-schema-tools@1.0.2
 
 ## 1.0.1
 
 ### Patch Changes
 
 - Updated dependencies [08e02ec21]
-  - @tinacms/schema-tools@1.0.1
+  - @strivemath/tinacms-schema-tools@1.0.1
 
 ## 1.0.0
 
@@ -544,7 +550,7 @@
 ### Patch Changes
 
 - Updated dependencies [958d10c82]
-  - @tinacms/schema-tools@1.0.0
+  - @strivemath/tinacms-schema-tools@1.0.0
 
 ## 0.61.17
 
@@ -552,7 +558,7 @@
 
 - 14c5cdffe: Fixes an issue where deeply nested rich-text wasn't being parsed properly
 - Updated dependencies [a5d6722c7]
-  - @tinacms/schema-tools@0.2.2
+  - @strivemath/tinacms-schema-tools@0.2.2
 
 ## 0.61.16
 
@@ -564,7 +570,7 @@
   in parent `<p>` tags, which caused an error.
 
 - Updated dependencies [6c93834a2]
-  - @tinacms/schema-tools@0.2.1
+  - @strivemath/tinacms-schema-tools@0.2.1
 
 ## 0.61.15
 
@@ -572,7 +578,7 @@
 
 - Updated dependencies [774abcf9c]
 - Updated dependencies [245a65dfe]
-  - @tinacms/schema-tools@0.2.0
+  - @strivemath/tinacms-schema-tools@0.2.0
 
 ## 0.61.14
 
@@ -585,28 +591,28 @@
 ### Patch Changes
 
 - Updated dependencies [c4f9607ce]
-  - @tinacms/schema-tools@0.1.9
+  - @strivemath/tinacms-schema-tools@0.1.9
 
 ## 0.61.12
 
 ### Patch Changes
 
 - Updated dependencies [005e1d699]
-  - @tinacms/schema-tools@0.1.8
+  - @strivemath/tinacms-schema-tools@0.1.8
 
 ## 0.61.11
 
 ### Patch Changes
 
 - Updated dependencies [b1a357f60]
-  - @tinacms/schema-tools@0.1.7
+  - @strivemath/tinacms-schema-tools@0.1.7
 
 ## 0.61.10
 
 ### Patch Changes
 
 - Updated dependencies [c6e3bd321]
-  - @tinacms/schema-tools@0.1.6
+  - @strivemath/tinacms-schema-tools@0.1.6
 
 ## 0.61.9
 
@@ -614,7 +620,7 @@
 
 - Updated dependencies [183249b11]
 - Updated dependencies [8060d0949]
-  - @tinacms/schema-tools@0.1.5
+  - @strivemath/tinacms-schema-tools@0.1.5
 
 ## 0.61.8
 
@@ -625,7 +631,7 @@
 - Updated dependencies [7ae1b0697]
 - Updated dependencies [f3439ea35]
 - Updated dependencies [48032e2ba]
-  - @tinacms/schema-tools@0.1.4
+  - @strivemath/tinacms-schema-tools@0.1.4
 
 ## 0.61.7
 
@@ -634,14 +640,14 @@
 - Updated dependencies [9183157c4]
 - Updated dependencies [4adf12619]
 - Updated dependencies [f8b89379c]
-  - @tinacms/schema-tools@0.1.3
+  - @strivemath/tinacms-schema-tools@0.1.3
 
 ## 0.61.6
 
 ### Patch Changes
 
 - Updated dependencies [777b1e08a]
-  - @tinacms/schema-tools@0.1.2
+  - @strivemath/tinacms-schema-tools@0.1.2
 
 ## 0.61.5
 
@@ -651,7 +657,7 @@
 - Updated dependencies [232ae6d52]
 - Updated dependencies [fd4d8c8ff]
 - Updated dependencies [9e5da3103]
-  - @tinacms/schema-tools@0.1.1
+  - @strivemath/tinacms-schema-tools@0.1.1
 
 ## 0.61.4
 
@@ -697,4 +703,4 @@
 
 - Updated dependencies [7b0dda55e]
 - Updated dependencies [8183b638c]
-  - @tinacms/schema-tools@0.1.0
+  - @strivemath/tinacms-schema-tools@0.1.0

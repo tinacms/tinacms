@@ -9,7 +9,7 @@ export type DatabaseAdapterTypes = 'upstash-redis'
 
 export const databaseTemplate = ({ config }: { config: Config }) => {
   return `
-import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
+import { createDatabase, createLocalDatabase } from '@strivemath/tinacms-datalayer'
 ${makeImportString(config.gitProvider?.imports)}
 ${makeImportString(config.databaseAdapter?.imports)}
 

@@ -2,7 +2,10 @@
 import prettier from 'prettier/esm/standalone.mjs'
 // @ts-ignore TODO: Fix this
 import parser from 'prettier/esm/parser-espree.mjs'
-import type { RichTextField, RichTextTemplate } from '@tinacms/schema-tools'
+import type {
+  RichTextField,
+  RichTextTemplate,
+} from '@strivemath/tinacms-schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../../parse/plate'
 import type * as Md from 'mdast'

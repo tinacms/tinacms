@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/graphql",
+  "name": "@strivemath/tinacms-graphql",
   "version": "1.4.32",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -32,8 +32,8 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@tinacms/mdx": "workspace:*",
-    "@tinacms/schema-tools": "workspace:*",
+    "@strivemath/tinacms-mdx": "workspace:*",
+    "@strivemath/tinacms-schema-tools": "workspace:*",
     "abstract-level": "^1.0.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -59,15 +59,15 @@
     "yup": "^0.32.9"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
     "directory": "packages/tina-graphql"
   },
   "devDependencies": {
-    "@tinacms/schema-tools": "workspace:*",
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-schema-tools": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "@types/cors": "^2.8.7",
     "@types/estree": "^0.0.50",
     "@types/express": "^4.17.8",

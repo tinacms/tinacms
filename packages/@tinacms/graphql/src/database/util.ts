@@ -11,7 +11,7 @@ import {
   CollectionTemplateable,
   normalizePath,
   TinaSchema,
-} from '@tinacms/schema-tools'
+} from '@strivemath/tinacms-schema-tools'
 
 import { assertShape, lastItem, sequential } from '../util'
 import micromatch from 'micromatch'

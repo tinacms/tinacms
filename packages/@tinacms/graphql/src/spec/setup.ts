@@ -8,7 +8,7 @@ import { toMatchFile } from 'jest-file-snapshot'
 import { buildASTSchema, printSchema } from 'graphql'
 
 import { FilesystemBridge } from '../database/bridge/filesystem'
-import type { Schema } from '@tinacms/schema-tools'
+import type { Schema } from '@strivemath/tinacms-schema-tools'
 
 import { resolve } from '../resolve'
 import { createDatabaseInternal } from '../database'

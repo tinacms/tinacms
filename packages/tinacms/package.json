@@ -1,5 +1,5 @@
 {
-  "name": "tinacms",
+  "name": "@strivemath/tinacms",
   "version": "1.5.28",
   "main": "dist/index.js",
   "module": "./dist/index.mjs",
@@ -75,10 +75,10 @@
     "@react-types/combobox": "^3.2.0",
     "@react-types/shared": "^3.10.0",
     "@sambego/storybook-styles": "^1.0.0",
-    "@tinacms/schema-tools": "workspace:*",
-    "@tinacms/search": "workspace:*",
-    "@tinacms/mdx": "workspace:*",
-    "@tinacms/sharedctx": "workspace:*",
+    "@strivemath/tinacms-schema-tools": "workspace:*",
+    "@strivemath/tinacms-search": "workspace:*",
+    "@strivemath/tinacms-mdx": "workspace:*",
+    "@strivemath/tinacms-sharedctx": "workspace:*",
     "@udecode/plate-headless": "^21.4.0",
     "atob": "2.1.2",
     "color-string": "^1.5.3",
@@ -124,7 +124,7 @@
     "@testing-library/react": "^12.0.0",
     "@testing-library/react-hooks": "^7.0.2",
     "@testing-library/user-event": "^12.7.0",
-    "@tinacms/scripts": "workspace:*",
+    "@strivemath/tinacms-scripts": "workspace:*",
     "@types/atob": "^2.1.2",
     "@types/codemirror": "^0.0.71",
     "@types/color-string": "^1.5.0",
@@ -159,7 +159,7 @@
     "react-dom": ">=16.14.0"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "@strivemath:registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",

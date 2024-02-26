@@ -4,7 +4,7 @@ import type {
   MdxJsxExpressionAttribute,
 } from 'mdast-util-mdx-jsx'
 import type { ExpressionStatement, ObjectExpression, Property } from 'estree'
-import type { TinaField } from '@tinacms/schema-tools'
+import type { TinaField } from '@strivemath/tinacms-schema-tools'
 import { MDX_PARSE_ERROR_MSG, parseMDX } from '.'
 
 type TinaStringField =
