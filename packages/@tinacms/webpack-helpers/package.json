@@ -13,6 +13,9 @@
     "build": "echo 'build'",
     "dev": "echo 'dev'"
   },
+  "publishConfig": {
+    "@strivemath:registry": "https://npm.pkg.github.com"
+  },
   "keywords": [
     "@strivemath/tinacms",
     "webpack"

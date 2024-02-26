@@ -42,5 +42,8 @@
     "typescript": "^4.2.2",
     "vite": "^4.3.9",
     "yargs": "^17.0.1"
+  },
+  "publishConfig": {
+    "@strivemath:registry": "https://npm.pkg.github.com"
   }
 }

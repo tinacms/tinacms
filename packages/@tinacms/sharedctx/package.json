@@ -36,5 +36,8 @@
   "peerDependencies": {
     "react": ">=16.14",
     "react-dom": ">=16.14"
+  },
+  "publishConfig": {
+    "@strivemath:registry": "https://npm.pkg.github.com"
   }
 }

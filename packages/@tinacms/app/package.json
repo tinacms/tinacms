@@ -28,5 +28,8 @@
     "@strivemath/tinacms": "workspace:*",
     "typescript": "^4.6.4",
     "zod": "^3.14.3"
+  },
+  "publishConfig": {
+    "@strivemath:registry": "https://npm.pkg.github.com"
   }
 }

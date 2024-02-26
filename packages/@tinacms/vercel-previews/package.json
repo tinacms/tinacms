@@ -51,5 +51,8 @@
   "peerDependencies": {
     "react": ">=16.14"
   },
+  "publishConfig": {
+    "@strivemath:registry": "https://npm.pkg.github.com"
+  },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
