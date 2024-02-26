@@ -1,0 +1,29 @@
+name: Publish to git packages
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7.4.0
+      - uses: actions/node-setup@v3
+        with:
+          node-version: 16
+          cache: 'pnpm'
+          registry-url: https://npm.pkg.github.com/
+
+      - name: Install dependancies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Build types
+        run: pnpm types
+      - name: Publish
+        run: pnpm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
