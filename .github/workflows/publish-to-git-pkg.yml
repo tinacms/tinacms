@@ -1,4 +1,4 @@
-name: Publish to git packages
+name: Publish to git package repo
 on:
   push:
     branches: [main]
