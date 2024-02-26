@@ -53,6 +53,14 @@ jobs:
         run: pnpm run publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push tags
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          pnpm push-tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create release pull request
         uses: changesets/action@v1
         with:
