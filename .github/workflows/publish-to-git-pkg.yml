@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v2.2.2
         with:
           version: 7.4.0
@@ -52,7 +54,7 @@ jobs:
       - name: Set NPMRC
         run: echo "//npm.pkg.github.com.npmjs.org/:_authToken=${GPR_AUTH_TOKEN}" > .npmrc
         env:
-          GPR_AUTH_TOKEN: ${{ secrets.GPR_AUTH_TOKEN }}
+          GPR_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish
         run: pnpm run publish
         env:
@@ -64,7 +66,7 @@ jobs:
           pnpm push-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_AUTH_TOKEN: ${{ secrets.GPR_AUTH_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create release pull request
         uses: changesets/action@v1
         with:
