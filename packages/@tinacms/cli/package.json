@@ -10,7 +10,7 @@
   ],
   "license": "Apache-2.0",
   "bin": {
-    "@strivemath/tinacms": "bin/tinacms"
+    "tinacms": "bin/tinacms"
   },
   "buildConfig": {
     "entryPoints": [
