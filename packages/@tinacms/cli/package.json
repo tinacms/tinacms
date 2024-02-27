@@ -1,6 +1,6 @@
 {
   "name": "@strivemath/tinacms-cli",
-  "version": "1.5.40",
+  "version": "1.5.41",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [

@@ -4,6 +4,16 @@
 
 ### Patch Changes
 
+- Updated dependencies [b14f54ba0]
+- Updated dependencies [485af8a0d]
+  - @strivemath/tinacms-datalayer@1.2.33
+  - @strivemath/tinacms-graphql@1.4.33
+  - @strivemath/tinacms@1.5.29
+
+## null
+
+### Patch Changes
+
 - Updated dependencies [1e5c94f05]
   - @strivemath/tinacms-graphql@1.4.32
   - @strivemath/tinacms-datalayer@1.2.32

@@ -1,5 +1,12 @@
 # @strivemath/tinacms-metrics
 
+## 1.0.3
+
+### Patch Changes
+
+- b14f54ba0: Scope change ready to publish
+- 485af8a0d: Change scope
+
 ## 1.0.2
 
 ### Patch Changes

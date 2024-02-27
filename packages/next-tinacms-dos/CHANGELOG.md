@@ -1,5 +1,15 @@
 # @strivemath/next-tinacms-cloudinary
 
+## 1.3.14
+
+### Patch Changes
+
+- b14f54ba0: Scope change ready to publish
+- 485af8a0d: Change scope
+- Updated dependencies [b14f54ba0]
+- Updated dependencies [485af8a0d]
+  - @strivemath/tinacms@1.5.29
+
 ## 1.3.13
 
 ### Patch Changes

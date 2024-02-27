@@ -1,6 +1,6 @@
 {
   "name": "@strivemath/next-tinacms-cloudinary",
-  "version": "4.4.5",
+  "version": "4.4.6",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "files": [

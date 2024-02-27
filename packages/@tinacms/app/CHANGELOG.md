@@ -1,5 +1,16 @@
 # @strivemath/tinacms-app
 
+## 1.2.36
+
+### Patch Changes
+
+- b14f54ba0: Scope change ready to publish
+- 485af8a0d: Change scope
+- Updated dependencies [b14f54ba0]
+- Updated dependencies [485af8a0d]
+  - @strivemath/tinacms-mdx@1.3.24
+  - @strivemath/tinacms@1.5.29
+
 ## 1.2.35
 
 ### Patch Changes
