@@ -1,5 +1,17 @@
 # @tinacms/starter
 
+## 0.1.25
+
+### Patch Changes
+
+- b14f54ba0: Scope change ready to publish
+- 485af8a0d: Change scope
+- Updated dependencies [b14f54ba0]
+- Updated dependencies [485af8a0d]
+  - @strivemath/tinacms-mdx@1.3.24
+  - @strivemath/tinacms-vercel-previews@0.0.25
+  - @strivemath/tinacms@1.5.29
+
 ## 0.1.24
 
 ### Patch Changes

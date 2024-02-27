@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.1.4
+
+### Patch Changes
+
+- b14f54ba0: Scope change ready to publish
+- 485af8a0d: Change scope
+
 ## 1.1.3
 
 ### Patch Changes

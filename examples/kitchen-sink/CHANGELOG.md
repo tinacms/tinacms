@@ -1,5 +1,16 @@
 # e2e-next
 
+## 0.1.60
+
+### Patch Changes
+
+- b14f54ba0: Scope change ready to publish
+- 485af8a0d: Change scope
+- Updated dependencies [b14f54ba0]
+- Updated dependencies [485af8a0d]
+  - @strivemath/tinacms-datalayer@1.2.33
+  - @strivemath/tinacms@1.5.29
+
 ## 0.1.59
 
 ### Patch Changes

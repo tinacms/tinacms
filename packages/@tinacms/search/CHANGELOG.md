@@ -1,5 +1,16 @@
 # @strivemath/tinacms-search
 
+## 1.0.18
+
+### Patch Changes
+
+- b14f54ba0: Scope change ready to publish
+- 485af8a0d: Change scope
+- Updated dependencies [b14f54ba0]
+- Updated dependencies [485af8a0d]
+  - @strivemath/tinacms-graphql@1.4.33
+  - @strivemath/tinacms-schema-tools@1.4.16
+
 ## 1.0.17
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # @tinacms/self-hosted-starter
 
+## 0.1.44
+
+### Patch Changes
+
+- b14f54ba0: Scope change ready to publish
+- 485af8a0d: Change scope
+- Updated dependencies [b14f54ba0]
+- Updated dependencies [485af8a0d]
+  - @strivemath/tinacms-datalayer@1.2.33
+  - @strivemath/tinacms@1.5.29
+  - @strivemath/tinacms-authjs@1.0.6
+  - @strivemath/tinacms-gitprovider-github@1.0.4
+
 ## 0.1.43
 
 ### Patch Changes
