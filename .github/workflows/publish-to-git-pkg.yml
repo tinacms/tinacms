@@ -29,9 +29,7 @@ jobs:
   publish-gpr:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: write
+    permissions: write-all
     steps:
       - uses: actions/checkout@v4
         with:
