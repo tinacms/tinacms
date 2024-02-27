@@ -49,6 +49,10 @@ jobs:
         run: pnpm build
       - name: Build types
         run: pnpm types
+      - name: Set NPMRC
+        run: echo "//npm.pkg.github.com.npmjs.org/:_authToken=${GPR_AUTH_TOKEN}" > .npmrc
+        env:
+          GPR_AUTH_TOKEN: ${{ secrets.GPR_AUTH_TOKEN }}
       - name: Publish
         run: pnpm run publish
         env:
@@ -60,7 +64,7 @@ jobs:
           pnpm push-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.GPR_AUTH_TOKEN }}
       - name: Create release pull request
         uses: changesets/action@v1
         with:
