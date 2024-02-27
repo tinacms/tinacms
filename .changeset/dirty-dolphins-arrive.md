@@ -1,5 +1,5 @@
 ---
-'@strivemath/tinacms-cli': minor
+'@strivemath/tinacms-cli': patch
 ---
 
 fixed tinacms cli bin entry
