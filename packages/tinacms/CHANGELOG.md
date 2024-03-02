@@ -1,5 +1,11 @@
 # tinacms
 
+## 1.5.29
+
+### Patch Changes
+
+- @tinacms/search@1.0.18
+
 ## 1.5.28
 
 ### Patch Changes

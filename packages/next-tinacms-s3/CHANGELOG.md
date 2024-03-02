@@ -1,5 +1,11 @@
 # next-tinacms-s3
 
+## 1.3.14
+
+### Patch Changes
+
+- tinacms@1.5.29
+
 ## 1.3.13
 
 ### Patch Changes

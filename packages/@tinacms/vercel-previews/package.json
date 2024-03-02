@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/vercel-previews",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "./dist/index.mjs",
