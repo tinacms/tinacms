@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.4.33
+
+### Patch Changes
+
+- 67e7a2d82: Make return type optional on getLookup to allow entire file to be retrieved
+
 ## 1.4.32
 
 ### Patch Changes

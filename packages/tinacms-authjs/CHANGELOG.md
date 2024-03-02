@@ -1,5 +1,11 @@
 # tinacms-authjs
 
+## 1.0.6
+
+### Patch Changes
+
+- tinacms@1.5.29
+
 ## 1.0.5
 
 ### Patch Changes
