@@ -1,5 +1,11 @@
 # tinacms
 
+## 1.5.30
+
+### Patch Changes
+
+- 04704e3dc: Fix incorrect call to isAuthenticated
+
 ## 1.5.29
 
 ### Patch Changes
