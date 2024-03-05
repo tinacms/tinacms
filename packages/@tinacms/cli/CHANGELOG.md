@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 1.5.42
+
+### Patch Changes
+
+- 18286dadc: add skip indexing option to tinacms cli
+
 ## 1.5.41
 
 ### Patch Changes
