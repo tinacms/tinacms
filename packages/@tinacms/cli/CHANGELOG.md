@@ -1,5 +1,13 @@
 # tinacms-cli
 
+## 1.5.41
+
+### Patch Changes
+
+- Updated dependencies [04704e3dc]
+  - tinacms@1.5.30
+  - @tinacms/app@1.2.37
+
 ## 1.5.40
 
 ### Patch Changes

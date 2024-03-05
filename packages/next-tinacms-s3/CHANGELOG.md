@@ -1,5 +1,12 @@
 # next-tinacms-s3
 
+## 1.3.15
+
+### Patch Changes
+
+- Updated dependencies [04704e3dc]
+  - tinacms@1.5.30
+
 ## 1.3.14
 
 ### Patch Changes
