@@ -1,5 +1,11 @@
 # tinacms
 
+## 1.6.0
+
+### Minor Changes
+
+- c8ceba4d8: Fixes an issue where it was impossible to navigate to nested fields (e.g. object fields or list items) when editing the values for a rich-text template when that template was configured to be inline: true
+
 ## 1.5.30
 
 ### Patch Changes

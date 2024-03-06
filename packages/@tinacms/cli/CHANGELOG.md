@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 1.5.42
+
+### Patch Changes
+
+- de271d65a: Update CLI build command to support separate content repo schema synchronization
+- Updated dependencies [c8ceba4d8]
+  - tinacms@1.6.0
+  - @tinacms/app@1.2.38
+
 ## 1.5.41
 
 ### Patch Changes
