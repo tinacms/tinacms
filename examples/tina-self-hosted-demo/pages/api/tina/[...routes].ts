@@ -3,7 +3,10 @@ import {
   LocalBackendAuthProvider,
 } from '@strivemath/tinacms-datalayer'
 
-import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
+import {
+  TinaAuthJSOptions,
+  AuthJsBackendAuthProvider,
+} from '@strivemath/tinacms-authjs'
 
 import databaseClient from '../../../tina/__generated__/databaseClient'
 

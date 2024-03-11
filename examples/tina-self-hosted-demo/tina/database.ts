@@ -3,7 +3,7 @@ import {
   createLocalDatabase,
 } from '@strivemath/tinacms-datalayer'
 import { MongodbLevel } from 'mongodb-level'
-import { GitHubProvider } from 'tinacms-gitprovider-github'
+import { GitHubProvider } from '@strivemath/tinacms-gitprovider-github'
 
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 
