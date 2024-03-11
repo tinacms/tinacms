@@ -64,6 +64,7 @@ const TinaAuthJSOptions = ({
       ;(session.user as any).role = jwt.role
       ;(session.user as any).passwordChangeRequired = jwt.passwordChangeRequired
       ;(session.user as any)[uidProp] = jwt[uidProp]
+      ;(session.user as any).jwt = jwt
       return session
     },
   },
