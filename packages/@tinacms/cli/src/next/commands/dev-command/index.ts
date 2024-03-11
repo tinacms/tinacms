@@ -34,6 +34,10 @@ export class DevCommand extends BaseCommand {
   outputSearchIndexPath = Option.String('--outputSearchIndexPath', {
     description: 'Path to write the search index to',
   })
+  skipIndexing = Option.Boolean('--skip-indexing', false, {
+    description:
+      'Skips indexing the content. This can be used for building the site without indexing the content  (defaults to false)',
+  })
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -133,14 +137,16 @@ export class DevCommand extends BaseCommand {
           this.watchQueries(configManager, async () => await codegen.execute())
         }
 
-        await this.indexContentWithSpinner({
-          database,
-          graphQLSchema,
-          tinaSchema,
-          configManager,
-        })
-        if (!firstTime) {
-          logger.error('Re-index complete')
+        if (!this.skipIndexing) {
+          await this.indexContentWithSpinner({
+            database,
+            graphQLSchema,
+            tinaSchema,
+            configManager,
+          })
+          if (!firstTime) {
+            logger.error('Re-index complete')
+          }
         }
         return { apiURL, database, graphQLSchema, tinaSchema }
       } catch (e) {
