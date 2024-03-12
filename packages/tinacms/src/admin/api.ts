@@ -150,6 +150,28 @@ export class TinaAdminApi {
       }
     }
 
+    // const user = await this.api.authProvider.getUser();
+    // const collectionDefinition = this.schema.getCollection(collectionName)
+    // if (user?.group && collectionDefinition.fields.find(field => field.name === "group")) {
+    //   if (!filter) filter = { [collectionName]: {} };
+    //   if (!filter[collectionName].group) filter[collectionName].group = { eq: user?.group };
+    // }
+    // console.log({ filter });
+
+    console.log('fetchCollection', collectionName, {
+      includeDocuments,
+      folder,
+      after,
+      sortKey,
+      order,
+      filterArgs,
+    })
+
+    // if (collectionName === "post") {
+    //   const users = await this.fetchCollection("user", true);
+    //   console.log(users);
+    // }
+
     if (includeDocuments === true) {
       const sort = sortKey || this.schema.getIsTitleFieldName(collectionName)
       const response: { collection: CollectionResponse } =
@@ -259,12 +281,14 @@ export class TinaAdminApi {
               }
             )
 
+      console.log('response', collectionName, response.collection)
       return response.collection
     } else {
       try {
         // TODO: fix this type
         // @ts-ignore
         const collection: Collection = this.schema.getCollection(collectionName)
+        console.log('response', collectionName, collection)
         return collection
       } catch (e) {
         console.error(
