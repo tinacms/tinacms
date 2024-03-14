@@ -150,27 +150,16 @@ export class TinaAdminApi {
       }
     }
 
-    // const user = await this.api.authProvider.getUser();
-    // const collectionDefinition = this.schema.getCollection(collectionName)
-    // if (user?.group && collectionDefinition.fields.find(field => field.name === "group")) {
-    //   if (!filter) filter = { [collectionName]: {} };
-    //   if (!filter[collectionName].group) filter[collectionName].group = { eq: user?.group };
-    // }
-    // console.log({ filter });
-
-    console.log('fetchCollection', collectionName, {
-      includeDocuments,
-      folder,
-      after,
-      sortKey,
-      order,
-      filterArgs,
-    })
-
-    // if (collectionName === "post") {
-    //   const users = await this.fetchCollection("user", true);
-    //   console.log(users);
-    // }
+    const user = await this.getUser()
+    const collectionDefinition = this.schema.getCollection(collectionName)
+    if (user?.group && user?.group !== 'admin') {
+      if (collectionDefinition.fields.find((field) => field.name === 'group')) {
+        if (!filter) filter = { [collectionName]: {} }
+        if (!filter[collectionName].group)
+          filter[collectionName].group = { eq: user?.group }
+      }
+    }
+    console.log({ user, filter })
 
     if (includeDocuments === true) {
       const sort = sortKey || this.schema.getIsTitleFieldName(collectionName)
@@ -419,5 +408,33 @@ export class TinaAdminApi {
     }
 
     return response
+  }
+
+  async getUser() {
+    let authUser, userCollection
+    try {
+      authUser = await this.api.authProvider.getUser()
+
+      userCollection = await this.fetchDocument('user', 'index.json')
+      const authEmail = authUser === true ? 'user@tina.io' : authUser.email
+      const users = userCollection.document._values.users as {
+        email: string
+        group?: string
+      }[]
+
+      const user = users.find((user) => user.email === authEmail)
+
+      if (!user) {
+        console.log("couldn't find user", authEmail, users, {
+          authUser,
+          userCollection,
+        })
+      }
+
+      return user
+    } catch (err) {
+      console.log('error getting user', authUser, userCollection)
+      console.error(err)
+    }
   }
 }
