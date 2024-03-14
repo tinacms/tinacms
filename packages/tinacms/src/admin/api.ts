@@ -150,7 +150,7 @@ export class TinaAdminApi {
       }
     }
 
-    const user = await this.getUser()
+    const user = await this.fetchUser()
     const collectionDefinition = this.schema.getCollection(collectionName)
     if (user?.group && user?.group !== 'admin') {
       if (collectionDefinition.fields.find((field) => field.name === 'group')) {
@@ -410,13 +410,13 @@ export class TinaAdminApi {
     return response
   }
 
-  async getUser() {
+  async fetchUser() {
     let authUser, userCollection
     try {
       authUser = await this.api.authProvider.getUser()
+      const authEmail = authUser === true ? 'user@tina.io' : authUser.email
 
       userCollection = await this.fetchDocument('user', 'index.json')
-      const authEmail = authUser === true ? 'user@tina.io' : authUser.email
       const users = userCollection.document._values.users as {
         email: string
         group?: string
