@@ -108,8 +108,18 @@ export class TinaAdminApi {
     after?: string,
     sortKey?: string,
     order?: 'asc' | 'desc',
-    filterArgs?: FilterArgs
+    filterArgs?: FilterArgs,
+    graphqlFilter?: any
   ) {
+    console.log('fetchCollection', collectionName, {
+      includeDocuments,
+      folder,
+      after,
+      sortKey,
+      order,
+      filterArgs,
+    })
+
     let filter = null
     const filterField = filterArgs?.filterField
     if (filterField) {
@@ -157,8 +167,12 @@ export class TinaAdminApi {
         if (!filter) filter = { [collectionName]: {} }
         if (!filter[collectionName].group)
           filter[collectionName].group = { eq: user?.group }
+        filter.or = { __typename: 'Folder' }
       }
     }
+
+    if (graphqlFilter) filter = graphqlFilter
+
     console.log({ user, filter })
 
     if (includeDocuments === true) {
@@ -167,7 +181,7 @@ export class TinaAdminApi {
         order === 'asc'
           ? await this.api.request(
               `#graphql
-      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String, $filter: DocumentFilter, $folder: String){
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String, $filter: DocumentFilter, $folder: String) {
         collection(collection: $collection){
           name
           label
