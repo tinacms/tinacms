@@ -55,6 +55,16 @@ export class BuildCommand extends BaseCommand {
   skipSearchIndex = Option.Boolean('--skip-search-index', false, {
     description: 'Skip indexing the site for search',
   })
+  upstreamBranch = Option.String('--upstream-branch', {
+    description:
+      'Optional upstream branch with the schema. If not specified, default will be used.',
+  })
+  previewBaseBranch = Option.String('--preview-base-branch', {
+    description: 'The base branch for the preview',
+  })
+  previewName = Option.String('--preview-name', {
+    description: 'The name of the preview branch',
+  })
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -74,6 +84,24 @@ export class BuildCommand extends BaseCommand {
       tinaGraphQLVersion: this.tinaGraphQLVersion,
       legacyNoSDK: this.noSDK,
     })
+
+    if (this.previewName && !this.previewBaseBranch) {
+      logger.error(
+        `${dangerText(
+          `ERROR: preview name provided without a preview base branch.`
+        )}`
+      )
+      process.exit(1)
+    }
+
+    if (this.previewBaseBranch && !this.previewName) {
+      logger.error(
+        `${dangerText(
+          `ERROR: preview base branch provided without a preview name.`
+        )}`
+      )
+      process.exit(1)
+    }
 
     try {
       await configManager.processConfig()
@@ -155,10 +183,26 @@ export class BuildCommand extends BaseCommand {
         configManager,
         codegen.productionUrl
       )
-      if (hasUpstream) {
-        await this.syncUpstreamProject(configManager, codegen.productionUrl)
+      if (!hasUpstream && this.upstreamBranch) {
+        logger.warn(
+          `${dangerText(
+            `WARN: Upstream branch '${this.upstreamBranch}' specified but no upstream project was found.`
+          )}`
+        )
       }
-      await waitForDB(configManager.config, codegen.productionUrl, false)
+      if (hasUpstream || (this.previewBaseBranch && this.previewName)) {
+        await this.syncProject(configManager, codegen.productionUrl, {
+          upstreamBranch: this.upstreamBranch,
+          previewBaseBranch: this.previewBaseBranch,
+          previewName: this.previewName,
+        })
+      }
+      await waitForDB(
+        configManager.config,
+        codegen.productionUrl,
+        this.previewName,
+        false
+      )
       await this.checkGraphqlSchema(
         configManager,
         database,
@@ -416,16 +460,29 @@ export class BuildCommand extends BaseCommand {
     throw new Error('Branch is not on Tina Cloud')
   }
 
-  async syncUpstreamProject(
+  async syncProject(
     configManager: ConfigManager,
-    apiURL: string
+    apiURL: string,
+    options?: {
+      upstreamBranch?: string
+      previewBaseBranch?: string
+      previewName?: string
+    }
   ): Promise<void> {
     const { config } = configManager
     const token = config.token
     const { clientId, branch, host } = parseURL(apiURL)
+    const { previewName, previewBaseBranch, upstreamBranch } = options || {}
 
-    const url = `https://${host}/db/${clientId}/reset/${branch}?refreshSchema=true&skipIfSchemaCurrent=true`
-    const bar = new Progress('Syncing Upstream Project. :prog', 1)
+    let url = `https://${host}/db/${clientId}/reset/${branch}?refreshSchema=true&skipIfSchemaCurrent=true`
+    if (upstreamBranch && previewBaseBranch && previewName) {
+      url = `https://${host}/db/${clientId}/reset/${previewBaseBranch}?refreshSchema=true&skipIfSchemaCurrent=true&upstreamBranch=${upstreamBranch}&previewName=${branch}&previewName=${previewName}`
+    } else if (!upstreamBranch && previewBaseBranch && previewName) {
+      url = `https://${host}/db/${clientId}/reset/${previewBaseBranch}?refreshSchema=true&skipIfSchemaCurrent=true&previewName=${branch}&previewName=${previewName}`
+    } else if (upstreamBranch && !previewBaseBranch && !previewName) {
+      url = `https://${host}/db/${clientId}/reset/${branch}?refreshSchema=true&skipIfSchemaCurrent=true&upstreamBranch=${upstreamBranch}`
+    }
+    const bar = new Progress('Syncing Project. :prog', 1)
 
     try {
       const res = await request({
@@ -441,7 +498,7 @@ export class BuildCommand extends BaseCommand {
       }
     } catch (e) {
       summary({
-        heading: 'Error when requesting upstream project sync',
+        heading: `Error when requesting project sync`,
         items: [
           {
             emoji: '❌',
