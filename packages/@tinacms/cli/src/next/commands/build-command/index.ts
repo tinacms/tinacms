@@ -181,7 +181,8 @@ export class BuildCommand extends BaseCommand {
     if (!skipCloudChecks) {
       const { hasUpstream } = await this.checkClientInfo(
         configManager,
-        codegen.productionUrl
+        codegen.productionUrl,
+        this.previewBaseBranch
       )
       if (!hasUpstream && this.upstreamBranch) {
         logger.warn(
@@ -335,13 +336,16 @@ export class BuildCommand extends BaseCommand {
 
   async checkClientInfo(
     configManager: ConfigManager,
-    apiURL: string
+    apiURL: string,
+    previewBaseBranch?: string
   ): Promise<{ hasUpstream: boolean }> {
     const { config } = configManager
     const token = config.token
     const { clientId, branch, host } = parseURL(apiURL)
 
-    const url = `https://${host}/db/${clientId}/status/${branch}`
+    const url = `https://${host}/db/${clientId}/status/${
+      previewBaseBranch || branch
+    }`
     const bar = new Progress('Checking clientId and token. :prog', 1)
 
     // Check the client information
