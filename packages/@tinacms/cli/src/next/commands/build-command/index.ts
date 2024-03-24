@@ -480,9 +480,9 @@ export class BuildCommand extends BaseCommand {
 
     let url = `https://${host}/db/${clientId}/reset/${branch}?refreshSchema=true&skipIfSchemaCurrent=true`
     if (upstreamBranch && previewBaseBranch && previewName) {
-      url = `https://${host}/db/${clientId}/reset/${previewBaseBranch}?refreshSchema=true&skipIfSchemaCurrent=true&upstreamBranch=${upstreamBranch}&previewName=${branch}&previewName=${previewName}`
+      url = `https://${host}/db/${clientId}/reset/${previewBaseBranch}?refreshSchema=true&skipIfSchemaCurrent=true&upstreamBranch=${upstreamBranch}&previewName=${previewName}`
     } else if (!upstreamBranch && previewBaseBranch && previewName) {
-      url = `https://${host}/db/${clientId}/reset/${previewBaseBranch}?refreshSchema=true&skipIfSchemaCurrent=true&previewName=${branch}&previewName=${previewName}`
+      url = `https://${host}/db/${clientId}/reset/${previewBaseBranch}?refreshSchema=true&skipIfSchemaCurrent=true&previewName=${branch}`
     } else if (upstreamBranch && !previewBaseBranch && !previewName) {
       url = `https://${host}/db/${clientId}/reset/${branch}?refreshSchema=true&skipIfSchemaCurrent=true&upstreamBranch=${upstreamBranch}`
     }
