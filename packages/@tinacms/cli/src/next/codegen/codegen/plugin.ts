@@ -14,12 +14,18 @@ import { createClient, TinaClient } from "tinacms/dist/client";
 
 const generateRequester = (
   client: TinaClient,
-  options?: { branch?: string }
 ) => {
   const requester: (
     doc: any,
     vars?: any,
-    options?: { branch?: string },
+    options?: {
+      branch?: string,
+      /**
+       * Aside from \`method\` and \`body\`, all fetch options are passed
+       * through to underlying fetch request
+       */
+      fetchOptions?: Omit<Parameters<typeof fetch>[1], 'body' | 'method'>,
+    },
     client
   ) => Promise<any> = async (doc, vars, options) => {
     let url = client.apiUrl
@@ -31,7 +37,7 @@ const generateRequester = (
       query: doc,
       variables: vars,
       url,
-    })
+    }, options)
 
     return { data: data?.data, errors: data?.errors, query: doc, variables: vars || {} }
   }
@@ -54,11 +60,8 @@ export const ExperimentalGetTinaClient = () =>
 
 export const queries = (
   client: TinaClient,
-  options?: {
-    branch?: string
-  }
 ) => {
-  const requester = generateRequester(client, options)
+  const requester = generateRequester(client)
   return getSdk(requester)
 }
 `

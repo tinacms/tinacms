@@ -45,16 +45,24 @@ export class TinaClient<GenQueries> {
     this.errorPolicy = errorPolicy || 'throw'
   }
 
-  public async request<DataType extends Record<string, any> = any>({
-    errorPolicy,
-    ...args
-  }: TinaClientRequestArgs) {
+  public async request<DataType extends Record<string, any> = any>(
+    { errorPolicy, ...args }: TinaClientRequestArgs,
+    options: { fetchOptions?: Parameters<typeof fetch>[1] }
+  ) {
     const errorPolicyDefined = errorPolicy || this.errorPolicy
     const headers = new HeadersDefined()
     if (this.readonlyToken) {
       headers.append('X-API-KEY', this.readonlyToken)
     }
     headers.append('Content-Type', 'application/json')
+    if (options?.fetchOptions) {
+      if (options?.fetchOptions?.headers) {
+        Object.entries(options.fetchOptions.headers).forEach(([key, value]) => {
+          headers.append(key, value)
+        })
+      }
+    }
+    const { headers: _, ...providedFetchOptions } = options?.fetchOptions || {}
 
     const bodyString = JSON.stringify({
       query: args.query,
@@ -62,12 +70,15 @@ export class TinaClient<GenQueries> {
     })
     const url = args?.url || this.apiUrl
 
-    const res = await fetchDefined(url, {
+    const optionsObject: Parameters<typeof fetch>[1] = {
       method: 'POST',
       headers,
       body: bodyString,
       redirect: 'follow',
-    })
+      ...providedFetchOptions,
+    }
+
+    const res = await fetchDefined(url, optionsObject)
     if (!res.ok) {
       let additionalInfo = ''
       if (res.status === 401) {
