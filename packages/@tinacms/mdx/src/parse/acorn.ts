@@ -260,6 +260,7 @@ function assertType<T extends { type: string }, U extends T['type']>(
   type: U
 ): asserts val is Extract<T, { type: U }> {
   if (val.type !== type) {
+    console.log(val)
     throw new Error(
       `Expected type to be ${type} but received ${val.type}. ${MDX_PARSE_ERROR_MSG}`
     )
