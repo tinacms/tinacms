@@ -14,7 +14,6 @@ jobs:
         os:
           - ubuntu-latest
           - macOS-latest
-        node-version: [14.x]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     env:
@@ -31,7 +30,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version-file: '.nvmrc'
 
       - uses: pnpm/action-setup@v2.2.2
         name: Install pnpm
