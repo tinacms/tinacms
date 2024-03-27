@@ -139,6 +139,9 @@ export const createConfig = async ({
       }
     }
   })
+  const customPlugins: Plugin[] = configManager.vitePlugins
+    ? configManager.vitePlugins.map((pluginFn) => pluginFn(configManager))
+    : []
 
   const staticMediaPath: string = path.join(
     configManager.generatedFolderPath,
@@ -251,6 +254,7 @@ export const createConfig = async ({
       }),
       splitVendorChunkPlugin(),
       tinaTailwind(configManager.spaRootPath, configManager.prebuildFilePath),
+      ...customPlugins,
       ...plugins,
     ],
   }
