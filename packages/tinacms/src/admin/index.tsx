@@ -380,7 +380,7 @@ const DefaultWrapper = ({
     <Layout>
       <div className="flex items-stretch h-screen overflow-hidden">
         <Sidebar cms={cms} />
-        <div className="flex-1 relative">{children}</div>
+        <div className="w-full relative">{children}</div>
       </div>
     </Layout>
   )
