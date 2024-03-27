@@ -29,6 +29,7 @@ class IndexFailedError extends Error {
 export const waitForDB = async (
   config: Config<true>,
   apiUrl: string,
+  previewName?: string,
   verbose?: boolean
 ) => {
   const token = config.token
@@ -60,7 +61,7 @@ export const waitForDB = async (
       }
 
       const response = await fetch(
-        `https://${host}/db/${clientId}/status/${branch}`,
+        `https://${host}/db/${clientId}/status/${previewName || branch}`,
         {
           method: 'GET',
           headers,
@@ -87,13 +88,17 @@ export const waitForDB = async (
         // Index Failed
       } else if (status === STATUS_FAILED) {
         throw new IndexFailedError(
-          `Attempting to index but responded with status 'failed'. To retry the indexing process, click the "Reindex" button for '${branch}' in the Tina Cloud configuration for this project.  ${error}`
+          `Attempting to index but responded with status 'failed'. To retry the indexing process, click the "Reindex" button for '${
+            previewName || branch
+          }' in the Tina Cloud configuration for this project.  ${error}`
         )
 
         // Index Unknown
       } else {
         throw new IndexFailedError(
-          `Attempting to index but responded with status 'unknown'. To retry the indexing process, click the "Reindex" button for '${branch}' in the Tina Cloud configuration for this project.  ${error}`
+          `Attempting to index but responded with status 'unknown'. To retry the indexing process, click the "Reindex" button for '${
+            previewName || branch
+          }' in the Tina Cloud configuration for this project.  ${error}`
         )
       }
     } catch (e) {
