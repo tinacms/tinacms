@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 1.5.43
+
+### Patch Changes
+
+- 216cfff0c: Add fetch options to generated client
+- Updated dependencies [216cfff0c]
+  - tinacms@1.6.1
+  - @tinacms/app@1.2.39
+
 ## 1.5.42
 
 ### Patch Changes

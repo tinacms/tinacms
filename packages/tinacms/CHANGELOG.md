@@ -1,5 +1,11 @@
 # tinacms
 
+## 1.6.1
+
+### Patch Changes
+
+- 216cfff0c: Add fetch options to generated client
+
 ## 1.6.0
 
 ### Minor Changes
