@@ -1,5 +1,15 @@
 # tinacms-cli
 
+## 1.5.43
+
+### Patch Changes
+
+- 216cfff0c: Add fetch options to generated client
+- ee135ef03: Feat: add support for preview indexing and overriding upstream branch in separate content repo builds
+- Updated dependencies [216cfff0c]
+  - tinacms@1.6.1
+  - @tinacms/app@1.2.39
+
 ## 1.5.42
 
 ### Patch Changes

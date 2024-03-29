@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 1.0.5
+
+### Patch Changes
+
+- 11b09eb89: TinaCLI - added descriptions for starter templates
+
 ## 1.0.4
 
 ### Patch Changes
