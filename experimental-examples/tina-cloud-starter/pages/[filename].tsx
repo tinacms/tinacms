@@ -18,9 +18,16 @@ export default function HomePage(
 }
 
 export const getStaticProps = async ({ params }) => {
-  const tinaProps = await client.queries.contentQuery({
-    relativePath: `${params.filename}.md`,
-  })
+  const tinaProps = await client.queries.contentQuery(
+    {
+      relativePath: `${params.filename}.md`,
+    },
+    {
+      fetchOptions: {
+        headers: { 'x-doit': 'ok' },
+      },
+    }
+  )
   return {
     props: {
       data: tinaProps.data,
