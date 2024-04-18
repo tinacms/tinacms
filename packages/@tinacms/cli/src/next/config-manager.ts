@@ -24,6 +24,7 @@ export class ConfigManager {
   tinaFolderPath: string
   isUsingLegacyFolder: boolean
   tinaConfigFilePath: string
+  tinaTsConfigFilePath: string
   tinaSpaPackagePath: string
   contentRootPath?: string
   envFilePath: string
@@ -105,6 +106,9 @@ export class ConfigManager {
     // =================
     this.tinaConfigFilePath = await this.getPathWithExtension(
       path.join(this.tinaFolderPath, 'config')
+    )
+    this.tinaTsConfigFilePath = await this.getPathWithExtension(
+      path.join(this.tinaFolderPath, 'tsconfig')
     )
     if (!this.tinaConfigFilePath) {
       throw new Error(
@@ -211,7 +215,8 @@ export class ConfigManager {
     // Load the config file with ES build
     const { config, prebuildPath, watchList } = await this.loadConfigFile(
       this.generatedFolderPath,
-      this.tinaConfigFilePath
+      this.tinaConfigFilePath,
+      this.tinaTsConfigFilePath
     )
     this.watchList = watchList
     this.config = config
@@ -374,7 +379,11 @@ export class ConfigManager {
     return result.default
   }
 
-  async loadConfigFile(generatedFolderPath: string, configFilePath: string) {
+  async loadConfigFile(
+    generatedFolderPath: string,
+    configFilePath: string,
+    tsConfigFilePath: string
+  ) {
     // Date.now because imports are cached, we don't have a
     // good way of invalidating them when this file changes
     // https://github.com/nodejs/modules/issues/307
@@ -383,7 +392,10 @@ export class ConfigManager {
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
-    fs.outputFileSync(tempTSConfigFile, '{}')
+    const tsConfigContent = fs.existsSync(tsConfigFilePath)
+      ? fs.readFileSync(tsConfigFilePath)
+      : '{}'
+    fs.outputFileSync(tempTSConfigFile, tsConfigContent)
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
