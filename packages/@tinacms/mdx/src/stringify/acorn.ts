@@ -11,6 +11,7 @@ import type {
   RichTextField,
   RichTextTemplate,
   ObjectField,
+  TinaField,
 } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
@@ -190,7 +191,11 @@ export function stringifyProps(
         }
         break
       case 'object':
-        const result = stringifyArray(field, value, imageCallback)
+        const result = findAndTransformNestedRichText(
+          field,
+          value,
+          imageCallback
+        )
         attributes.push({
           type: 'mdxJsxAttribute',
           name,
@@ -326,51 +331,57 @@ export function assertShape<T>(
 function isPlainObject(value: unknown) {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
-const stringifyArray = (
-  field: ObjectField<false>,
+
+/**
+ * Traverse an object field before stringifying so that we can first stringify
+ * any rich-text fields we come across. Beware that this mutates the value in-place for
+ * simplicity, and the assumption here is that this is ok because the object
+ * is not long-lived.
+ */
+const findAndTransformNestedRichText = (
+  field: TinaField<false>,
   value: unknown,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  parentValue: object = {}
 ) => {
-  if (field.list) {
-    if (Array.isArray(value)) {
-      value.map((v) => {
-        Object.entries(v).map(([key, vv]) => {
-          const subField = field.fields?.find((f) => f.name === key)
-          if (subField?.list) {
-            if (Array.isArray(vv)) {
-              vv.map((vvv, i) => {
-                Object.entries(vvv).map(([key2, vvvv]) => {
-                  if (subField.type === 'object') {
-                    const subSubField = subField?.fields?.find(
-                      (f) => f.name === key2
-                    )
-                    if (subSubField && subSubField.type === 'rich-text') {
-                      assertShape<Plate.RootElement>(
-                        vvvv,
-                        (value) =>
-                          value.type === 'root' &&
-                          Array.isArray(value.children),
-                        `Nested rich-text element is not a valid shape for field ${field.name}`
-                      )
-                      vvv[key2] = stringifyMDX(vvvv, subSubField, imageCallback)
-                    }
-                  } else {
-                    // throw ?
-                  }
-                })
-                vv[i] = vvv
-              })
-            }
-          }
-        })
-      })
+  switch (field.type) {
+    case 'rich-text': {
+      assertShape<Plate.RootElement>(
+        value,
+        (value) => value.type === 'root' && Array.isArray(value.children),
+        `Nested rich-text element is not a valid shape for field ${field.name}`
+      )
+      parentValue[field.name] = stringifyMDX(value, field, imageCallback)
+      break
     }
-  } else {
-    throw 'not handled'
+    case 'object': {
+      if (field.list) {
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            Object.entries(item).forEach(([key, subValue]) => {
+              if (field.fields) {
+                const subField = field.fields.find(({ name }) => name === key)
+                if (subField) {
+                  findAndTransformNestedRichText(
+                    subField,
+                    subValue,
+                    imageCallback,
+                    item
+                  )
+                }
+                // }
+              } else {
+                throw new Error(
+                  `Support for deeply-nested rich-text template objects not yet supported`
+                )
+              }
+            })
+          })
+        }
+      } else {
+      }
+      break
+    }
   }
   return value
-}
-
-const stringifyObj2 = (field: ObjectField<false>, value: object) => {
-  console.log(field, value)
 }
