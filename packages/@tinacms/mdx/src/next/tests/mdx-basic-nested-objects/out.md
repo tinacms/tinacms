@@ -1,14 +1,3 @@
 Hello
 
-<Table rows={[
-    {
-      columns: [
-        {
-          content: {
-            type: "root",
-            children: []
-          }
-        }
-      ]
-    }
-  ]} />
+<Table rows={[{ columns: [{ content: "# Hello\n" }] }]} />

@@ -7,7 +7,11 @@
 import prettier from 'prettier/esm/standalone.mjs'
 // @ts-ignore Fix this by updating prettier
 import parser from 'prettier/esm/parser-espree.mjs'
-import type { RichTextType, RichTextTemplate } from '@tinacms/schema-tools'
+import type {
+  RichTextField,
+  RichTextTemplate,
+  ObjectField,
+} from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
@@ -15,14 +19,14 @@ import { rootElement, stringifyMDX } from '.'
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] } => {
   return stringifyProps(element, field, true, imageCallback)
 }
 export function stringifyProps(
   element: Plate.MdxInlineElement,
-  parentField: RichTextType,
+  parentField: RichTextField,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -33,7 +37,7 @@ export function stringifyProps(
 }
 export function stringifyProps(
   element: Plate.MdxBlockElement,
-  parentField: RichTextType,
+  parentField: RichTextField,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -44,7 +48,7 @@ export function stringifyProps(
 }
 export function stringifyProps(
   element: Plate.MdxBlockElement | Plate.MdxInlineElement,
-  parentField: RichTextType,
+  parentField: RichTextField,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -186,12 +190,13 @@ export function stringifyProps(
         }
         break
       case 'object':
+        const result = stringifyArray(field, value)
         attributes.push({
           type: 'mdxJsxAttribute',
           name,
           value: {
             type: 'mdxJsxAttributeValueExpression',
-            value: stringifyObj(value, flatten),
+            value: stringifyObj(result, flatten),
           },
         })
         break
@@ -320,4 +325,38 @@ export function assertShape<T>(
 
 function isPlainObject(value: unknown) {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+const stringifyArray = (field: ObjectField<false>, value: object) => {
+  if (field.list) {
+    if (Array.isArray(value)) {
+      value.map((v) => {
+        Object.entries(v).map(([key, vv]) => {
+          const subField = field.fields?.find((f) => f.name === key)
+          if (subField?.list) {
+            if (Array.isArray(vv)) {
+              const array1 = vv
+              vv.map((vvv, i) => {
+                const obj1 = vvv
+                Object.entries(vvv).map(([key2, vvvv]) => {
+                  const subSubField = subField?.fields?.find(
+                    (f) => f.name === key2
+                  )
+                  // const v = value[0].columns[0].content
+                  obj1[key2] = stringifyMDX(vvvv, subSubField, () => {})
+                })
+                array1[i] = obj1
+              })
+            }
+          }
+        })
+      })
+    }
+  } else {
+    throw 'not handled'
+  }
+  return value
+}
+
+const stringifyObj2 = (field: ObjectField<false>, value: object) => {
+  console.log(field, value)
 }

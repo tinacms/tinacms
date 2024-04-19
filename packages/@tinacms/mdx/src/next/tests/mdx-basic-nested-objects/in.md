@@ -4,10 +4,7 @@ Hello
     {
       columns: [
         {
-          content: {
-            type: "root",
-            children: []
-          }
+          content: "# Hello"
         }
       ]
     }

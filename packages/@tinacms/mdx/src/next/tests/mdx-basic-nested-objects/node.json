@@ -2,15 +2,47 @@
   "type": "root",
   "children": [
     {
-      "type": "invalid_markdown",
-      "value": "Hello\n\n<Table rows={[\n    {\n      columns: [\n        {\n          content: {\n            type: \"root\",\n            children: []\n          }\n        }\n      ]\n    }\n  ]} />\n",
-      "message": "Unable to parse field value for field \"rows\" (type: object). Expected type to be Literal but received ObjectExpression. TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations",
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Hello"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Table",
       "children": [
         {
           "type": "text",
           "text": ""
         }
-      ]
+      ],
+      "props": {
+        "rows": [
+          {
+            "columns": [
+              {
+                "content": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "h1",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Hello"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }
