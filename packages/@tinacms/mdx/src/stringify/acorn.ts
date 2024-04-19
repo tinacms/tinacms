@@ -190,7 +190,7 @@ export function stringifyProps(
         }
         break
       case 'object':
-        const result = stringifyArray(field, value)
+        const result = stringifyArray(field, value, imageCallback)
         attributes.push({
           type: 'mdxJsxAttribute',
           name,
@@ -326,7 +326,11 @@ export function assertShape<T>(
 function isPlainObject(value: unknown) {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
-const stringifyArray = (field: ObjectField<false>, value: object) => {
+const stringifyArray = (
+  field: ObjectField<false>,
+  value: unknown,
+  imageCallback: (url: string) => string
+) => {
   if (field.list) {
     if (Array.isArray(value)) {
       value.map((v) => {
@@ -334,17 +338,27 @@ const stringifyArray = (field: ObjectField<false>, value: object) => {
           const subField = field.fields?.find((f) => f.name === key)
           if (subField?.list) {
             if (Array.isArray(vv)) {
-              const array1 = vv
               vv.map((vvv, i) => {
-                const obj1 = vvv
                 Object.entries(vvv).map(([key2, vvvv]) => {
-                  const subSubField = subField?.fields?.find(
-                    (f) => f.name === key2
-                  )
-                  // const v = value[0].columns[0].content
-                  obj1[key2] = stringifyMDX(vvvv, subSubField, () => {})
+                  if (subField.type === 'object') {
+                    const subSubField = subField?.fields?.find(
+                      (f) => f.name === key2
+                    )
+                    if (subSubField && subSubField.type === 'rich-text') {
+                      assertShape<Plate.RootElement>(
+                        vvvv,
+                        (value) =>
+                          value.type === 'root' &&
+                          Array.isArray(value.children),
+                        `Nested rich-text element is not a valid shape for field ${field.name}`
+                      )
+                      vvv[key2] = stringifyMDX(vvvv, subSubField, imageCallback)
+                    }
+                  } else {
+                    // throw ?
+                  }
                 })
-                array1[i] = obj1
+                vv[i] = vvv
               })
             }
           }
