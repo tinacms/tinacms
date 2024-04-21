@@ -342,7 +342,7 @@ const findAndTransformNestedRichText = (
   field: TinaField<false>,
   value: unknown,
   imageCallback: (url: string) => string,
-  parentValue: object = {}
+  parentValue: Record<string, unknown> = {}
 ) => {
   switch (field.type) {
     case 'rich-text': {
@@ -379,9 +379,33 @@ const findAndTransformNestedRichText = (
           })
         }
       } else {
+        if (isObject(value)) {
+          Object.entries(value).forEach(([key, subValue]) => {
+            if (field.fields) {
+              const subField = field.fields.find(({ name }) => name === key)
+              if (subField) {
+                findAndTransformNestedRichText(
+                  subField,
+                  subValue,
+                  imageCallback,
+                  value
+                )
+              }
+              // }
+            } else {
+              throw new Error(
+                `Support for deeply-nested rich-text template objects not yet supported`
+              )
+            }
+          })
+        }
       }
       break
     }
   }
   return value
+}
+
+function isObject(value: any): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
