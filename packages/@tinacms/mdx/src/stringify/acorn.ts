@@ -369,11 +369,6 @@ const findAndTransformNestedRichText = (
                     item
                   )
                 }
-                // }
-              } else {
-                throw new Error(
-                  `Support for deeply-nested rich-text template objects not yet supported`
-                )
               }
             })
           })
@@ -391,11 +386,6 @@ const findAndTransformNestedRichText = (
                   value
                 )
               }
-              // }
-            } else {
-              throw new Error(
-                `Support for deeply-nested rich-text template objects not yet supported`
-              )
             }
           })
         }
