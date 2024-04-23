@@ -1,5 +1,12 @@
 # tinacms-authjs
 
+## 2.0.2
+
+### Patch Changes
+
+- Updated dependencies [141e78c04]
+  - tinacms@1.6.2
+
 ## 2.0.1
 
 ### Patch Changes
