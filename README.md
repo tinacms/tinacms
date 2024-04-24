@@ -29,7 +29,7 @@ Test a TinaCMS starter site locally
 npx create-tina-app@latest
 ```
 
-Or try a [demo site](https://app.tina.io/quickstart) on Tina Cloud
+Or try a [demo site](https://app.tina.io/quickstart) on Tina Cloud.
 
 ## Documentation
 
