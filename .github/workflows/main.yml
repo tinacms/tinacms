@@ -55,7 +55,7 @@ jobs:
 
       # Checking if this is the issue. 
       - name: Install node-gyp@10.1.0 locally 
-        run: npm install node-gyp@10.1.0 
+        run: pnpm install node-gyp@10.1.0 
 
       - name: Install dependencies
         run: pnpm install
