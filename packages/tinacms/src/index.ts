@@ -23,7 +23,7 @@ export default TinaCMSProvider2
 import { MediaStore, TinaCMS } from '@tinacms/toolkit'
 import { formifyCallback } from './hooks/use-graphql-forms'
 
-import { RichTextTemplate, validateSchema } from '@tinacms/schema-tools'
+import { validateSchema } from '@tinacms/schema-tools'
 export { NAMER, resolveField } from '@tinacms/schema-tools'
 export type { LoginScreenProps, LoginStrategy } from '@tinacms/schema-tools'
 
