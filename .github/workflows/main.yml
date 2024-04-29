@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 2
@@ -52,6 +52,10 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      # Checking if this is the issue. 
+      - name: Install node-gyp@10.1.0 locally 
+        run: npm install node-gyp@10.1.0 
 
       - name: Install dependencies
         run: pnpm install
