@@ -1,5 +1,0 @@
----
-'tinacms': patch
----
-
-Cleanup

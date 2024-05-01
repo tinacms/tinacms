@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/search",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "main": "dist/index.js",
   "module": "dist/index-client.mjs",
   "typings": "dist/index.d.ts",

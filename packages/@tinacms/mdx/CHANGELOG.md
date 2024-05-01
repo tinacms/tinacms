@@ -1,5 +1,11 @@
 # @tinacms/mdx
 
+## 1.3.24
+
+### Patch Changes
+
+- b3ad50a62: Fix issue where rich-text nested inside JSX objects wasn't being parsed/stringified properly.
+
 ## 1.3.23
 
 ### Patch Changes

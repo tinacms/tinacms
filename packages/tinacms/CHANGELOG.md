@@ -1,5 +1,15 @@
 # tinacms
 
+## 1.6.3
+
+### Patch Changes
+
+- 66f7e2074: Cleanup
+- b3ad50a62: Fix issue where rich-text nested inside JSX objects wasn't being parsed/stringified properly.
+- Updated dependencies [b3ad50a62]
+  - @tinacms/mdx@1.3.24
+  - @tinacms/search@1.0.19
+
 ## 1.6.2
 
 ### Patch Changes
