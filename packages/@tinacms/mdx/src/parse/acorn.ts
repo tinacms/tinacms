@@ -78,7 +78,7 @@ const extractAttribute = (
         return extractString(attribute, field)
       }
     case 'object':
-      return extractObject(extractExpression(attribute), field)
+      return extractObject(extractExpression(attribute), field, imageCallback)
     case 'rich-text':
       const JSXString = extractRaw(attribute)
       if (JSXString) {
@@ -120,28 +120,30 @@ const extractScalar = <
 
 const extractObject = <T extends Extract<TinaField, { type: 'object' }>>(
   attribute: ExpressionStatement,
-  field: T
+  field: T,
+  imageCallback: (image: string) => string
 ) => {
   if (field.list) {
     assertType(attribute.expression, 'ArrayExpression')
     return attribute.expression.elements.map((element) => {
       assertHasType(element)
       assertType(element, 'ObjectExpression')
-      return extractObjectExpression(element, field)
+      return extractObjectExpression(element, field, imageCallback)
     })
   } else {
     assertType(attribute.expression, 'ObjectExpression')
-    return extractObjectExpression(attribute.expression, field)
+    return extractObjectExpression(attribute.expression, field, imageCallback)
   }
 }
 const extractObjectExpression = (
   expression: ObjectExpression,
-  field: Extract<TinaField, { type: 'object' }>
+  field: Extract<TinaField, { type: 'object' }>,
+  imageCallback: (image: string) => string
 ) => {
   const properties: Record<string, unknown> = {}
   expression.properties?.forEach((property) => {
     assertType(property, 'Property')
-    const { key, value } = extractKeyValue(property, field)
+    const { key, value } = extractKeyValue(property, field, imageCallback)
     properties[key] = value
   })
   return properties
@@ -161,7 +163,8 @@ const getField = (
 
 const extractKeyValue = (
   property: Property,
-  parentField: Extract<TinaField, { type: 'object' }>
+  parentField: Extract<TinaField, { type: 'object' }>,
+  imageCallback: (image: string) => string
 ) => {
   assertType(property.key, 'Identifier')
   const key = property.key.name
@@ -172,12 +175,16 @@ const extractKeyValue = (
       const value = property.value.elements.map((element) => {
         assertHasType(element)
         assertType(element, 'ObjectExpression')
-        return extractObjectExpression(element, field)
+        return extractObjectExpression(element, field, imageCallback)
       })
       return { key, value }
     } else {
       assertType(property.value, 'ObjectExpression')
-      const value = extractObjectExpression(property.value, field)
+      const value = extractObjectExpression(
+        property.value,
+        field,
+        imageCallback
+      )
       return { key, value }
     }
   } else if (field?.list) {
@@ -188,6 +195,13 @@ const extractKeyValue = (
       return element.value
     })
     return { key, value }
+  } else if (field?.type === 'rich-text') {
+    assertType(property.value, 'Literal')
+    const raw = property.value.value
+    if (typeof raw === 'string') {
+      return { key, value: parseMDX(raw, field, imageCallback) }
+    }
+    throw new Error(`Unable to parse rich-text`)
   } else {
     assertType(property.value, 'Literal')
     return { key, value: property.value.value }
