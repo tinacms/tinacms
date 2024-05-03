@@ -11,7 +11,7 @@ export function useFormBrowserCache(form: Form<any>, editing: boolean) {
 
   const saveToStorage = useCallback(
     (_formData) => {
-      cms.api.storage.save(form.id, getFlattenedFormValues(form))
+      cms.api.tina.storage.save(form.id, getFlattenedFormValues(form))
     },
     [form.id]
   )
@@ -22,8 +22,13 @@ export function useFormBrowserCache(form: Form<any>, editing: boolean) {
   // load from storage on boot
   useEffect(() => {
     if (!editing) return
+    console.log('loading from storage -- Form ID: ', form.id)
+    console.log(form)
 
-    const values = cms.api.storage.load(form.id)
+    console.log(`Current Form Values: `, getFlattenedFormValues(form))
+
+    const values = cms.api.tina.storage.load(form.id)
+
     if (values) {
       form.updateValues(values)
     }

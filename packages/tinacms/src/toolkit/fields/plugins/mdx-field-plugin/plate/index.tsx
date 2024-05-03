@@ -13,15 +13,34 @@ import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-p
 import { createLinkPlugin } from './plugins/create-link-plugin'
 import { uuid } from './plugins/ui/helpers'
 import { RichTextType } from '..'
+import { useRichEditorSave } from '@toolkit/browser-storage/useRichEditorSave'
 
 export const RichEditor = (props: RichTextType) => {
+  const [key, setKey] = React.useState(0)
+  const { renderInitalValue } = useRichEditorSave(
+    props.tinaForm.id,
+    props.input.name,
+    props.meta.dirty,
+    props.input.value,
+    props.tinaForm
+  )
+
+  console.log(`😅😅😅😅 Render Value: `, renderInitalValue?.[props.input.name])
+
   const initialValue = React.useMemo(
     () =>
       props.input.value?.children?.length
         ? props.input.value.children.map(helpers.normalize)
         : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
-    []
+    [props.input.value?.children]
   )
+
+  const newInitialValue = React.useMemo(() => {
+    setKey(1)
+    return renderInitalValue?.[props.input.name].children.map(helpers.normalize)
+  }, [renderInitalValue])
+
+  console.log('Initial Value ::: ', initialValue)
 
   const plugins = React.useMemo(
     () =>
@@ -69,9 +88,12 @@ export const RichEditor = (props: RichTextType) => {
     <div ref={ref} className={withToolbar ? 'with-toolbar' : ''}>
       <Plate
         id={id}
-        initialValue={initialValue}
+        key={key}
+        initialValue={newInitialValue || initialValue}
         plugins={plugins}
         onChange={(value) => {
+          console.log('RichEditor: onChange', value)
+
           props.input.onChange({
             type: 'root',
             children: value,
@@ -101,3 +123,5 @@ export const RichEditor = (props: RichTextType) => {
     </div>
   )
 }
+
+// export const RichEditor = wrapFieldsWithMeta(RichTextEditor)

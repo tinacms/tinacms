@@ -621,6 +621,9 @@ const onSubmit = async (
       },
     })
     cms.alerts.success('Document saved!')
+
+    // Clear localStorage on successful save
+    cms.api.tina.storage.clear(`${collection.path}/${relativePath}`)
   } catch (e) {
     cms.alerts.error(() =>
       ErrorDialog({

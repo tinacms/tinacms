@@ -28,6 +28,7 @@ import {
 } from '@tinacms/search/dist/index-client'
 import { AsyncData, asyncPoll } from './asyncPoll'
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider'
+import { BrowserStorageClient } from '@toolkit/browser-storage'
 
 export * from './authProvider'
 
@@ -95,6 +96,7 @@ export class Client {
   events = new EventBus() // automatically hooked into global event bus when attached via cms.
   protectedBranches: string[] = []
   usingEditorialWorkflow: boolean = false
+  storage = new BrowserStorageClient(localStorage)
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.tinaGraphQLVersion = options.tinaGraphQLVersion

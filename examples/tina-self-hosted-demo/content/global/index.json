@@ -1,11 +1,11 @@
 {
   "header": {
-    "name": "Tina Starter",
     "icon": {
+      "name": "Tina",
       "color": "orange",
-      "style": "float",
-      "name": "Tina"
+      "style": "float"
     },
+    "name": "Tina Starter",
     "color": "default",
     "nav": [
       {
@@ -31,7 +31,7 @@
     }
   },
   "theme": {
-    "color": "blue",
+    "color": "orange",
     "font": "sans",
     "darkMode": "system"
   }

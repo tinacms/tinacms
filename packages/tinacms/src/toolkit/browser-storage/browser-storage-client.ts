@@ -18,7 +18,12 @@ export class BrowserStorageClient {
   }
 
   save(id: string, content: any) {
-    this.data[id] = content
+    if (this.data[id]) {
+      this.data[id] = { ...this.data[id], ...content }
+    } else {
+      this.data[id] = content
+    }
+
     this.debouncePersist()
   }
 

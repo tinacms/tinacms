@@ -4,6 +4,7 @@ import { InputFieldType, wrapFieldsWithMeta } from '../wrap-field-with-meta'
 import { RichEditor } from './plate'
 import { EditorContext } from './plate/editor-context'
 import type { MdxTemplate } from './plate/types'
+import { useRichEditorSave } from '@toolkit/browser-storage/useRichEditorSave'
 
 // TODO: there's an issue where void node values don't get updated if the editor hasn't been focused from another node first.
 // https://github.com/udecode/plate/issues/1519#issuecomment-1184933602
@@ -23,7 +24,6 @@ export const MdxFieldPlugin = {
     (props) => {
       const [rawMode, setRawMode] = React.useState(false)
       const [key, setKey] = React.useState(0)
-
       /**
        * Since slate keeps track of it's own state, and that state is an object rather
        * than something easily memoizable like a string it can be tricky to ensure

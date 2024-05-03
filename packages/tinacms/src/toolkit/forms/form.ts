@@ -213,6 +213,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       }
 
       const response = await this.onSubmit(valOverride || values, form, cb)
+      // TODO: Look into saving here
       form.initialize(values)
       return response
     } catch (error) {

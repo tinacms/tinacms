@@ -3,6 +3,7 @@ import { FieldProps } from './field-props'
 import { useEvent } from '@toolkit/react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events'
 import { Form } from '@toolkit/forms'
+import { useFormBrowserCache } from '@toolkit/browser-storage'
 
 export type InputFieldType<ExtraFieldProps, InputProps> =
   FieldProps<InputProps> & ExtraFieldProps
@@ -76,6 +77,9 @@ export const FieldMeta = ({
 }: FieldMetaProps) => {
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
+  // const localStorage = useLocalStorage();
+  useFormBrowserCache(tinaForm, true)
+
   return (
     <FieldWrapper
       margin={margin}
