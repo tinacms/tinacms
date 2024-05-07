@@ -37,7 +37,10 @@ interface ResolverConfig {
   isAudit: boolean
 }
 
+let queryCache: Record<string, any>
+
 export const createResolver = (args: ResolverConfig) => {
+  queryCache = {}
   return new Resolver(args)
 }
 
@@ -325,7 +328,11 @@ export class Resolver {
         `fullPath must be of type string for getDocumentOrDirectory request`
       )
     }
-    const rawData = await this.getRaw(fullPath)
+
+    let rawData = queryCache[fullPath]
+    if (!rawData) {
+      rawData = await this.getRaw(fullPath)
+    }
     if (rawData['__folderBasename']) {
       return {
         __typename: 'Folder',
@@ -928,7 +935,8 @@ export class Resolver {
 
     const result = await this.database.query(
       queryOptions,
-      hydrator ? hydrator : this.getDocumentOrDirectory
+      hydrator ? hydrator : this.getDocumentOrDirectory,
+      queryCache
     )
     const edges = result.edges
     const pageInfo = result.pageInfo

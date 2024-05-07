@@ -892,7 +892,11 @@ export class Database {
     return true
   }
 
-  public query = async (queryOptions: QueryOptions, hydrator) => {
+  public query = async (
+    queryOptions: QueryOptions,
+    hydrator,
+    cache: Record<string, any> = {}
+  ) => {
     await this.initLevel()
     const {
       first,
@@ -1036,6 +1040,7 @@ export class Database {
         }
         break
       }
+      cache[filepath] = { ...value, _collection: collection.name }
 
       startKey = startKey || key || ''
       endKey = key || ''

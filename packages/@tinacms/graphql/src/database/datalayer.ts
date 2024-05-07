@@ -785,7 +785,7 @@ export const makeIndexOpsForDocument = <T extends object>(
           type: opType,
           key: filepath,
           sublevel: indexSublevel,
-          value: opType === 'put' ? ({} as T) : undefined,
+          value: opType === 'put' ? data : undefined,
         })
       } else {
         if (indexedValue) {
@@ -793,7 +793,7 @@ export const makeIndexOpsForDocument = <T extends object>(
             type: opType,
             key: `${indexedValue}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`,
             sublevel: indexSublevel,
-            value: opType === 'put' ? ({} as T) : undefined,
+            value: opType === 'put' ? data : undefined,
           })
         }
       }
