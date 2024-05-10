@@ -13,7 +13,7 @@ import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-p
 import { createLinkPlugin } from './plugins/create-link-plugin'
 import { uuid } from './plugins/ui/helpers'
 import { RichTextType } from '..'
-import { useRichEditorSave } from '@toolkit/browser-storage/useRichEditorSave'
+import { useRichEditorSave } from '@toolkit/browser-storage/use-rich-editor-save'
 
 export const RichEditor = (props: RichTextType) => {
   const [key, setKey] = React.useState(0)

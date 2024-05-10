@@ -266,11 +266,16 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.finalForm.batch(() => {
       const activePath = this.finalForm.getState().active
 
+      // Validate state here before or after setting values
+      // ( I think set invalid state is fine )
+      console.log(this.finalForm)
+
       if (!activePath) {
         updateEverything<S>(this.finalForm, values)
       } else {
         updateSelectively<S>(this.finalForm, values)
       }
+      // this.finalForm.();
     })
   }
 
@@ -572,6 +577,8 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
 function updateEverything<S>(form: FormApi<any>, values: S) {
   Object.entries(values).forEach(([path, value]) => {
     form.change(path, value)
+    // Validate by resetting the field state
+    form.resetFieldState(path)
   })
 }
 
@@ -590,5 +597,7 @@ function updateSelectively<S>(form: FormApi<any>, values: S, prefix?: string) {
     } else if (path !== activePath) {
       form.change(path, value)
     }
+    // Validate by resetting the field state
+    // form.resetFieldState(path)
   })
 }

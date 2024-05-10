@@ -233,6 +233,9 @@ export function MediaPicker({
     }
   }
 
+  console.log('CMS: ', cms.media.accept)
+  console.log('DEFAULT_MEDIA_UPLOAD_TYPES: ', DEFAULT_MEDIA_UPLOAD_TYPES)
+
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: dropzoneAcceptFromString(

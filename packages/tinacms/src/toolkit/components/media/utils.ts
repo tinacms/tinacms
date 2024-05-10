@@ -9,6 +9,7 @@ const supportedFileTypes = [
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'image/*',
+  'video/*',
 ]
 export const DEFAULT_MEDIA_UPLOAD_TYPES = supportedFileTypes.join(',')
 
