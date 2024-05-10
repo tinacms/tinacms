@@ -102,6 +102,7 @@ const config = defineStaticConfig({
                     label: 'Format',
                     type: 'string',
                     options: ['utc', 'iso', 'local'],
+                    required: true,
                   },
                 ],
               },
