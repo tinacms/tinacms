@@ -190,6 +190,15 @@ export const RenderForm = ({
     template?.defaultItem ||
     {}
 
+  const slug = useMemo(() => {
+    if (slugFunction) {
+      return slugFunction(defaultItem, {
+        template,
+        collection: schemaCollection,
+      })
+    }
+  }, [slugFunction])
+
   const form = useMemo(() => {
     const folderName = folder.fullyQualifiedName ? folder.name : ''
     return new Form({
@@ -219,10 +228,7 @@ export const RenderForm = ({
           !values?.submitting &&
           !values.touched?.filename
         ) {
-          const value = slugFunction(values.values, {
-            template,
-            collection: schemaCollection,
-          })
+          const value = slug
           form.finalForm.change('filename', value)
         }
       },
