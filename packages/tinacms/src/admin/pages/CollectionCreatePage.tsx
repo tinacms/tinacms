@@ -228,8 +228,7 @@ export const RenderForm = ({
           !values?.submitting &&
           !values.touched?.filename
         ) {
-          const value = slug
-          form.finalForm.change('filename', value)
+          form.finalForm.change('filename', slug)
         }
       },
       id:
