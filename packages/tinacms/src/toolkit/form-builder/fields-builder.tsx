@@ -70,6 +70,8 @@ const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
   const parse = getProp('parse', field, plugin)
   const validate = getProp('validate', field, plugin)
 
+  console.log('validate field', validate)
+
   let format = field.format
 
   if (!format && plugin && plugin.format) {
@@ -113,6 +115,7 @@ const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
       // don't use the default value anymore
       // defaultValue={defaultValue}
       validate={(value, values, meta) => {
+        console.log('validate field', value, values, meta)
         if (validate) {
           return validate(value, values, meta, field)
         }

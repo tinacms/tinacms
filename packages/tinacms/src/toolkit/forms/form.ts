@@ -270,6 +270,8 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       // ( I think set invalid state is fine )
       console.log(this.finalForm)
 
+      console.log('What is activePath?', activePath)
+
       if (!activePath) {
         updateEverything<S>(this.finalForm, values)
       } else {
@@ -576,9 +578,17 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
 
 function updateEverything<S>(form: FormApi<any>, values: S) {
   Object.entries(values).forEach(([path, value]) => {
-    form.change(path, value)
+    console.log('Updating everything', path, value)
+
+    // if empty string turn to undefined.
+    const newValue = value === '' ? undefined : value
+
+    form.change(path, newValue)
     // Validate by resetting the field state
-    form.resetFieldState(path)
+    setTimeout(() => {
+      form.resetFieldState(path)
+    }, 200)
+    console.log('After Updating everything', path, newValue)
   })
 }
 

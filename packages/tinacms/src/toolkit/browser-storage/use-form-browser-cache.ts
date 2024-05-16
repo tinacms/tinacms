@@ -28,6 +28,7 @@ export function useFormBrowserCache(form: Form<any>, editing: boolean) {
     console.log(`Current Form Values: `, getFlattenedFormValues(form))
 
     const values = cms.api.tina.storage.load(form.id)
+    console.log(`Loaded Form Values: `, values)
 
     if (values) {
       form.updateValues(values)
