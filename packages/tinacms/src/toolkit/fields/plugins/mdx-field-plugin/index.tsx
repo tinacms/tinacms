@@ -79,6 +79,8 @@ export const MdxFieldPluginExtendible = {
   Component: wrapFieldsWithMeta<InputProps, { templates: MdxTemplate[] }>(
     (props) => {
       const [key, setKey] = React.useState(0)
+      //! NOTE: Maybe try moving the useRichEditorSave hook here
+      console.log('🚫 MdxFieldPluginExtendible props:', props)
 
       /**
        * Since slate keeps track of it's own state, and that state is an object rather
