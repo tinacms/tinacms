@@ -16,7 +16,6 @@ import { RichTextType } from '..'
 import { useRichEditorSave } from '@toolkit/browser-storage/use-rich-editor-save'
 
 export const RichEditor = (props: RichTextType) => {
-  const [key, setKey] = React.useState(0)
   const { renderInitalValue } = useRichEditorSave(
     props.tinaForm.id,
     props.input.name,
@@ -24,8 +23,6 @@ export const RichEditor = (props: RichTextType) => {
     props.input.value,
     props.tinaForm
   )
-
-  console.log(`😅😅😅😅 Render Value: `, renderInitalValue?.[props.input.name])
 
   const initialValue = React.useMemo(
     () =>
@@ -35,12 +32,7 @@ export const RichEditor = (props: RichTextType) => {
     [props.input.value?.children]
   )
 
-  const newInitialValue = React.useMemo(() => {
-    setKey(1)
-    return renderInitalValue?.[props.input.name].children.map(helpers.normalize)
-  }, [renderInitalValue])
-
-  console.log('Initial Value ::: ', initialValue)
+  // console.log('Initial Value ::: ', initialValue)
 
   const plugins = React.useMemo(
     () =>
@@ -84,12 +76,25 @@ export const RichEditor = (props: RichTextType) => {
     }
   }, [props.field.experimental_focusIntent, ref])
 
+  // 1. Try pass it up?
+  // 2. ???
+  React.useEffect(() => {
+    if (renderInitalValue) {
+      props.setKey(() =>
+        renderInitalValue?.[props.input.name].children.map(helpers.normalize)
+      )
+    }
+  }, [renderInitalValue])
+
+  console.log('❗️ RichEditor: props', props)
+  console.log('❗️ ref', ref)
+
   return (
     <div ref={ref} className={withToolbar ? 'with-toolbar' : ''}>
       <Plate
         id={id}
-        key={key}
-        initialValue={newInitialValue || initialValue}
+        initialValue={initialValue}
+        normalizeInitialValue={true}
         plugins={plugins}
         onChange={(value) => {
           console.log('RichEditor: onChange', value)

@@ -15,7 +15,9 @@ export type RichTextType = React.PropsWithChildren<
       templates: MdxTemplate[]
     }
   >
->
+> & {
+  setKey: any
+}
 
 export const MdxFieldPlugin = {
   name: 'rich-text',
@@ -23,6 +25,8 @@ export const MdxFieldPlugin = {
     (props) => {
       const [rawMode, setRawMode] = React.useState(false)
       const [key, setKey] = React.useState(0)
+      const [resetInitialData, setResetInitialData] =
+        React.useState<any>(undefined)
       /**
        * Since slate keeps track of it's own state, and that state is an object rather
        * than something easily memoizable like a string it can be tricky to ensure
@@ -36,6 +40,16 @@ export const MdxFieldPlugin = {
           return reset(initialValues)
         }
       }, [])
+
+      React.useMemo(() => {
+        if (resetInitialData) {
+          const { reset } = props.form
+          props.form.reset = () => {
+            setKey((key) => key + 1)
+            return reset(resetInitialData)
+          }
+        }
+      }, [resetInitialData])
 
       return (
         <EditorContext.Provider
@@ -53,7 +67,7 @@ export const MdxFieldPlugin = {
             }
           >
             {/* {rawMode ? <RawEditor {...props} /> : <RichEditor {...props} />} */}
-            <RichEditor {...props} />
+            <RichEditor {...props} setKey={setResetInitialData} />
           </div>
         </EditorContext.Provider>
       )
@@ -79,6 +93,9 @@ export const MdxFieldPluginExtendible = {
   Component: wrapFieldsWithMeta<InputProps, { templates: MdxTemplate[] }>(
     (props) => {
       const [key, setKey] = React.useState(0)
+      const [resetInitialData, setResetInitialData] =
+        React.useState<any>(undefined)
+
       //! NOTE: Maybe try moving the useRichEditorSave hook here
       console.log('🚫 MdxFieldPluginExtendible props:', props)
 
@@ -96,6 +113,16 @@ export const MdxFieldPluginExtendible = {
         }
       }, [])
 
+      React.useMemo(() => {
+        if (resetInitialData) {
+          const { reset } = props.form
+          props.form.reset = () => {
+            setKey((key) => key + 1)
+            return reset(resetInitialData)
+          }
+        }
+      }, [resetInitialData])
+
       return (
         <EditorContext.Provider
           key={key}
@@ -111,7 +138,11 @@ export const MdxFieldPluginExtendible = {
               'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md px-3 py-2'
             }
           >
-            {props.rawMode ? props.rawEditor : <RichEditor {...props} />}
+            {props.rawMode ? (
+              props.rawEditor
+            ) : (
+              <RichEditor {...props} setKey={setResetInitialData} />
+            )}
           </div>
         </EditorContext.Provider>
       )
