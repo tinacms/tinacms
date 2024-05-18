@@ -396,4 +396,22 @@ export class TinaAdminApi {
 
     return response
   }
+
+  async createFolder(collection, folderName) {
+    return this.api.request(
+      `#graphql
+      mutation($collection: String!, $folderName: String!) {
+        createFolder(
+          collection: $collection,
+          relativePath: $folderName
+        ){__typename}
+      }`,
+      {
+        variables: {
+          collection,
+          folderName,
+        },
+      }
+    )
+  }
 }
