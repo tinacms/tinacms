@@ -470,6 +470,7 @@ export class Database {
     collectionName?: string
   ) => {
     await this.initLevel()
+    const isGitKeep = filepath.endsWith('.gitkeep')
 
     try {
       if (SYSTEM_FILES.includes(filepath)) {
@@ -513,28 +514,12 @@ export class Database {
           }
         }
 
-        const stringifiedFile = await this.stringifyFile(
-          filepath,
-          dataFields,
-          collection
-        )
+        const stringifiedFile = isGitKeep
+          ? ''
+          : await this.stringifyFile(filepath, dataFields, collection)
 
         if (!collection?.isDetached) {
           if (this.bridge) {
-            // if there is a placeholder file, delete it
-            try {
-              const placeholder =
-                normalizedPath.split('/').slice(0, -1).join('/') +
-                `/.placeholder.${collection.format || '.mdx'}`
-              const placeholderContent = await this.bridge.get(placeholder)
-              if (
-                placeholderContent &&
-                placeholderContent.indexOf('_is_tina_folder_placeholder') > -1
-              ) {
-                await this.bridge.delete(placeholder)
-              }
-            } catch (e) {}
-
             await this.bridge.put(normalizedPath, stringifiedFile)
           }
           try {
