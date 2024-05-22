@@ -1145,7 +1145,7 @@ const FolderModal = ({
               close()
             }}
           >
-            Rename
+            Create
           </Button>
         </ModalActions>
       </PopupModal>
