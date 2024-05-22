@@ -822,6 +822,7 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   allowedActions?: {
     create?: boolean
     delete?: boolean
+    createNestedFolder?: boolean
   }
   /**
    * Forms for this collection will be editable from the global sidebar rather than the form panel

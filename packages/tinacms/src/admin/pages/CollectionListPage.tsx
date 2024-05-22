@@ -325,6 +325,9 @@ const CollectionListPage = () => {
                   collectionDefinition?.ui?.allowedActions?.create ?? true
                 const allowDelete =
                   collectionDefinition?.ui?.allowedActions?.delete ?? true
+                const allowCreateNestedFolder =
+                  collectionDefinition?.ui?.allowedActions
+                    ?.createNestedFolder ?? true
 
                 const folderView = folder.fullyQualifiedName !== ''
 
@@ -588,22 +591,24 @@ const CollectionListPage = () => {
                                 Create New{' '}
                                 <BiPlus className="w-5 h-full ml-1 opacity-70" />
                               </Link>
-                              <Link
-                                onMouseDown={(evt) => {
-                                  setVars((old) => ({
-                                    ...old,
-                                    collection: collectionName,
-                                    folderName: '',
-                                  }))
-                                  setFolderModalOpen(true)
-                                  evt.stopPropagation()
-                                }}
-                                to="/collections/new-folder"
-                                className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
-                              >
-                                Create Folder{' '}
-                                <BiPlus className="w-5 h-full ml-1 opacity-70" />
-                              </Link>
+                              {allowCreateNestedFolder && (
+                                <Link
+                                  onMouseDown={(evt) => {
+                                    setVars((old) => ({
+                                      ...old,
+                                      collection: collectionName,
+                                      folderName: '',
+                                    }))
+                                    setFolderModalOpen(true)
+                                    evt.stopPropagation()
+                                  }}
+                                  to="/collections/new-folder"
+                                  className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
+                                >
+                                  Create Folder{' '}
+                                  <BiPlus className="w-5 h-full ml-1 opacity-70" />
+                                </Link>
+                              )}
                             </>
                           )}
                           {collection.templates && allowCreate && (
