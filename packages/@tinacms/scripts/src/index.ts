@@ -116,10 +116,12 @@ const watch = () => {
       console.error(`exec error: ${error}`)
       return
     }
+
     const json = JSON.parse(stdout) as { name: string; path: string }[]
-    const watchPaths: string[] = []
+    const watchPaths = []
+
     json.forEach((pkg) => {
-      if (pkg.path.includes('/packages/')) {
+      if (pkg.path.includes(path.join('packages', ''))) {
         watchPaths.push(pkg.path)
       }
     })
@@ -127,14 +129,12 @@ const watch = () => {
     chokidar
       .watch(
         watchPaths.map((p) => path.join(p, 'src', '**/*')),
-        {
-          ignored: ['**/spec/**/*', 'node_modules'],
-        }
+        { ignored: ['**/spec/**/*', 'node_modules'] }
       )
       .on('change', async (path) => {
         const changedPackagePath = watchPaths.find((p) => path.startsWith(p))
         await run({ dir: changedPackagePath })
-        // console.log('change', changedPackagePath)
+        // console.log('change', changedPackagePath);
       })
   })
 }
