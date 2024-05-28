@@ -52,7 +52,7 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 - Matt Wicks ([@wicksipedia](https://github.com/wicksipedia))
 - Jack Pettit ([@JackDevAU](https://github.com/JackDevAU))
 - Nick Curran ([@ncn-ssw](https://github.com/ncn-ssw))
-- Brook Jeynes ([@BrookJeynes](https://github.com/BrookJeynes))
+- Brook Jeynes ([@brookjeynes-ssw](https://github.com/brookjeynes-ssw))
 - Ben Neoh ([@Ben0189](https://github.com/Ben0189))
 - Warwick Leahy ([@leahy268](https://github.com/leahy268))
 - Seth Daily ([@sethdaily ](https://github.com/sethdaily))
