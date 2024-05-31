@@ -134,7 +134,6 @@ const watch = () => {
       .on('change', async (path) => {
         const changedPackagePath = watchPaths.find((p) => path.startsWith(p))
         await run({ dir: changedPackagePath })
-        // console.log('change', changedPackagePath);
       })
   })
 }
