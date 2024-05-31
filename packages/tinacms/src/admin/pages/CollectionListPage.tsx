@@ -48,6 +48,7 @@ import { PageBody, PageHeader, PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { Collection, TinaField } from '@tinacms/schema-tools'
 import { CollectionFolder, useCollectionFolder } from './utils'
+import { FaFile, FaFolder } from 'react-icons/fa'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
 const isSSR = typeof window === 'undefined'
@@ -570,6 +571,24 @@ const CollectionListPage = () => {
                         <div className="flex self-end	justify-self-end">
                           {!collection.templates && allowCreate && (
                             <>
+                              {allowCreateNestedFolder && (
+                                <Link
+                                  onMouseDown={(evt) => {
+                                    setVars((old) => ({
+                                      ...old,
+                                      collection: collectionName,
+                                      folderName: '',
+                                    }))
+                                    setFolderModalOpen(true)
+                                    evt.stopPropagation()
+                                  }}
+                                  to="/collections/new-folder"
+                                  className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 text-sm h-10 px-6 mr-4"
+                                >
+                                  <FaFolder className="mr-2" />
+                                  Add Folder{' '}
+                                </Link>
+                              )}
                               <Link
                                 to={`/${
                                   folder.fullyQualifiedName
@@ -586,29 +605,11 @@ const CollectionListPage = () => {
                                         collectionName,
                                       ].join('/')
                                 }`}
-                                className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
+                                className="inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 text-sm h-10 px-6"
                               >
-                                Create New{' '}
-                                <BiPlus className="w-5 h-full ml-1 opacity-70" />
+                                <FaFile className="mr-2" />
+                                Add Files{' '}
                               </Link>
-                              {allowCreateNestedFolder && (
-                                <Link
-                                  onMouseDown={(evt) => {
-                                    setVars((old) => ({
-                                      ...old,
-                                      collection: collectionName,
-                                      folderName: '',
-                                    }))
-                                    setFolderModalOpen(true)
-                                    evt.stopPropagation()
-                                  }}
-                                  to="/collections/new-folder"
-                                  className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
-                                >
-                                  Create Folder{' '}
-                                  <BiPlus className="w-5 h-full ml-1 opacity-70" />
-                                </Link>
-                              )}
                             </>
                           )}
                           {collection.templates && allowCreate && (
