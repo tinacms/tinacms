@@ -87,7 +87,7 @@
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.1",
     "esbuild": "^0.18.10",
-    "express": "^4.17.1",
+    "express": "^4.19.2",
     "fast-glob": "^3.2.4",
     "fs-extra": "^9.0.1",
     "graphql": "15.8.0",
