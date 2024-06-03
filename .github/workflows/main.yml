@@ -5,10 +5,11 @@ on:
     branches:
       - main
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, labeled]
 
 jobs:
   build:
+    if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'tagged')
     strategy:
       matrix:
         os:
