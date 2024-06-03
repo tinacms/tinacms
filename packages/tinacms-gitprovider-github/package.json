@@ -22,10 +22,13 @@
   },
   "dependencies": {
     "@octokit/rest": "^19.0.7",
-    "js-base64": "^3.7.4"
+    "graphql": "^16.8.1",
+    "js-base64": "^3.7.4",
+    "lodash-es": "4.17.21"
   },
   "devDependencies": {
     "@tinacms/datalayer": "workspace:*",
+    "@tinacms/graphql": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/node": "^13.13.1"
   },

@@ -2,11 +2,13 @@ import { Octokit } from '@octokit/rest'
 import { Base64 } from 'js-base64'
 import type { GitProvider } from '@tinacms/datalayer'
 
+export { GitHubBridge } from './GitHubBridge'
+
 type OctokitOptions = ConstructorParameters<typeof Octokit>[0]
 export interface GitHubProviderOptions {
   owner: string
   repo: string
-  token: string
+  token?: string // Token is optional if using a different auth strategy in the octokitOptions
   branch: string
   commitMessage?: string
   rootPath?: string

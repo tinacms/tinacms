@@ -54,7 +54,10 @@ export async function createAndInitializeDatabase(
     configManager.config.contentApiUrlOverride
   ) {
     database = (await configManager.loadDatabaseFile()) as Database
-    database.bridge = bridge
+    // Use the bridge specified in the database file if one exists
+    if (!database.bridge) {
+      database.bridge = bridge
+    }
   } else {
     if (
       configManager.hasSelfHostedConfig() &&
