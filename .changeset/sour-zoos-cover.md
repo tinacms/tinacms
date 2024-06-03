@@ -4,4 +4,4 @@
 'tinacms': patch
 ---
 
-Implement Create folder feature for tinacms
+Implement Create folder feature for tinacms.
