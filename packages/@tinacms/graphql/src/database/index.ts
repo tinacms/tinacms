@@ -470,6 +470,7 @@ export class Database {
     collectionName?: string
   ) => {
     await this.initLevel()
+    const isGitKeep = filepath.endsWith('.gitkeep')
 
     try {
       if (SYSTEM_FILES.includes(filepath)) {
@@ -513,11 +514,9 @@ export class Database {
           }
         }
 
-        const stringifiedFile = await this.stringifyFile(
-          filepath,
-          dataFields,
-          collection
-        )
+        const stringifiedFile = isGitKeep
+          ? ''
+          : await this.stringifyFile(filepath, dataFields, collection)
 
         if (!collection?.isDetached) {
           if (this.bridge) {

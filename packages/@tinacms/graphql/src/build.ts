@@ -170,6 +170,9 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   mutationTypeDefinitionFields.push(
     await builder.buildCreateCollectionDocumentMutation(collections)
   )
+  mutationTypeDefinitionFields.push(
+    await builder.buildCreateCollectionFolderMutation()
+  )
 
   /**
    * Collection queries/mutations/fragments
