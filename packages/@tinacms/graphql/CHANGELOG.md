@@ -1,5 +1,14 @@
 # tina-graphql
 
+## 1.4.35
+
+### Patch Changes
+
+- 2e3393ef5: Implement Create folder feature for tinacms.
+- Updated dependencies [2e3393ef5]
+  - @tinacms/schema-tools@1.4.16
+  - @tinacms/mdx@1.3.25
+
 ## 1.4.34
 
 ### Patch Changes

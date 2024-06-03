@@ -1,5 +1,16 @@
 # @tinacms/self-hosted-starter
 
+## 0.1.50
+
+### Patch Changes
+
+- 8ee81d026: fix watch script for window environment
+- Updated dependencies [2e3393ef5]
+  - tinacms@1.6.4
+  - tinacms-authjs@2.0.4
+  - @tinacms/datalayer@1.2.35
+  - tinacms-gitprovider-github@1.0.6
+
 ## 0.1.49
 
 ### Patch Changes

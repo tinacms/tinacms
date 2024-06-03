@@ -1,5 +1,13 @@
 # @tinacms/search
 
+## 1.0.20
+
+### Patch Changes
+
+- Updated dependencies [2e3393ef5]
+  - @tinacms/schema-tools@1.4.16
+  - @tinacms/graphql@1.4.35
+
 ## 1.0.19
 
 ### Patch Changes

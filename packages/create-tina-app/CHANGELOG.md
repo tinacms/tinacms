@@ -1,5 +1,15 @@
 # create-tina-app
 
+## 1.1.0
+
+### Minor Changes
+
+- 011571c8a: Added demo docs starter
+
+### Patch Changes
+
+- @tinacms/metrics@1.0.2
+
 ## 1.0.5
 
 ### Patch Changes
