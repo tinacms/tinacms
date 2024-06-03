@@ -1168,7 +1168,7 @@ const RenameModal = ({
   filename,
   newRelativePath,
   setNewRelativePath,
-}: RenameModalProps) => {
+}: ModalProps) => {
   return (
     <Modal>
       <PopupModal>
