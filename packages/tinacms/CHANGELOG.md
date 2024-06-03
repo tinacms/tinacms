@@ -1,5 +1,16 @@
 # tinacms
 
+## 1.6.4
+
+### Patch Changes
+
+- 2e3393ef5: Implement Create folder feature for tinacms.
+- Updated dependencies [2e3393ef5]
+  - @tinacms/schema-tools@1.4.16
+  - @tinacms/mdx@1.3.25
+  - @tinacms/search@1.0.20
+  - @tinacms/sharedctx@1.0.2
+
 ## 1.6.3
 
 ### Patch Changes

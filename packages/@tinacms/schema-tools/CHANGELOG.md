@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.4.16
+
+### Patch Changes
+
+- 2e3393ef5: Implement Create folder feature for tinacms.
+
 ## 1.4.15
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.4
+
+### Patch Changes
+
+- 8ee81d026: fix watch script for window environment
+
 ## 1.1.3
 
 ### Patch Changes
