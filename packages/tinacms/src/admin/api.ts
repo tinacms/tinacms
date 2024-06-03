@@ -14,7 +14,11 @@ import {
 
 export interface FilterArgs {
   filterField: string
+  collection?: string
+  relativePath?: string
+  newRelativePath?: string
   startsWith?: string
+  endsWith?: string
   before?: string
   after?: string
   booleanEquals?: boolean
