@@ -1,0 +1,23 @@
+name: Build Pull request
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+env:
+  NEXT_PUBLIC_TINA_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_TINA_CLIENT_ID }}
+  TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+  NEXT_PUBLIC_TINA_BRANCH: ${{ github.head_ref }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["16", "17", "18"]
+    name: Node ${{ matrix.node }} sample
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - run: yarn install
+      - run: yarn build

@@ -1,0 +1,22 @@
+{
+  "name": "starter-basic",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tinacms dev -c \"next dev\"",
+    "build": "tinacms build && next build",
+    "start": "tinacms build && next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^12.0.4",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "tinacms": "^1.5.24"
+  },
+  "devDependencies": {
+    "@tinacms/cli": "^1.5.34",
+    "eslint": "7",
+    "eslint-config-next": "12.0.3"
+  }
+}
