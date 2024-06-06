@@ -16,6 +16,7 @@
     "tinacms": "workspace:*"
   },
   "devDependencies": {
+    "@playwright/test": "^1.44.1",
     "@types/node": "^17.0.21",
     "eslint": "7"
   },
