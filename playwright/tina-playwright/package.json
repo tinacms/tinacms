@@ -1,5 +1,5 @@
 {
-  "name": "starter-empty",
+  "name": "playwright-testing",
   "private": true,
   "scripts": {
     "dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev\"",
