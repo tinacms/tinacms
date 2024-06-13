@@ -1,6 +1,7 @@
 import { defineConfig } from "tinacms";
 import page from "./collections/page";
 import post from "./collections/post";
+import author from "./collections/author";
 
 export const config = defineConfig({
   branch: "",
@@ -11,7 +12,7 @@ export const config = defineConfig({
     outputFolder: "admin", // within the public folder
   },
   schema: {
-    collections: [page, post],
+    collections: [page, post, author],
   },
 });
 
