@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "tinacms dev -c \"next dev\"",
-    "build": "tinacms build && next build",
-    "start": "tinacms build && next start",
+    "build": "tinacms dev -c \"next build\"",
+    "start": "tinacms dev -c \"next start\"",
     "lint": "next lint",
     "audit": "tinacms audit",
     "test:e2e": "playwright test"

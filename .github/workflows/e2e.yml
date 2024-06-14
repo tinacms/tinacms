@@ -59,7 +59,7 @@ jobs:
       - name: Build tinacms package
         run: |
           cd playwright/tina-playwright
-          pnpm build
+          pnpm run build
       - name: Start Playwright example project
         run: |
           cd playwright/tina-playwright
