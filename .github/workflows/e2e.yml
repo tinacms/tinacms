@@ -65,9 +65,7 @@ jobs:
       - name: Start Playwright example project
         run: |
           cd playwright/tina-playwright
-          pnpm run dev &
-      - name: Wait for server to be ready
-        run: npx wait-on http://localhost:3000
+          pnpm run dev
       - name: Run playwright test
         run: |
           cd playwright/tina-playwright
