@@ -56,10 +56,8 @@ jobs:
         with:
           version: 7.4.0
           run_install: true
-      - name: Install dependencies
-        run: |
-          cd playwright/tina-playwright
-          pnpm install
+      - name: Build root package
+        run: pnpm run build
       - name: Build tinacms package
         run: |
           cd playwright/tina-playwright
