@@ -24,9 +24,7 @@ test.skip("Local storage retain edit test", () => {
 
     // Verify that the input field retains the new value
     const inputValue = await page.inputValue(inputSelector);
-    expect(inputValue).toBe("My first Author");
-
-    // expect(inputValue).toBe(newValue);
+    expect(inputValue).toBe(newValue);
   });
 
   test("Rich text editor retains value when page reload without saving", async ({
@@ -56,10 +54,6 @@ test.skip("Local storage retain edit test", () => {
       return span ? span.innerHTML : "";
     });
 
-    expect(richTextValue).toBe(
-      "Page for rich text editor local storage value retain test"
-    );
-
-    // expect(richTextValue).toBe(richTextNewValue);
+    expect(richTextValue).toBe(richTextNewValue);
   });
 });
