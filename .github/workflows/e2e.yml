@@ -57,6 +57,6 @@ jobs:
           version: 7.4.0
           run_install: true
       - name: Run your tests
-        run: npx playwright test
-        env:
-          HOME: /root
+        run: |
+          cd playwright/tina-playwright
+          npx playwright test
