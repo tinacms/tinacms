@@ -58,15 +58,9 @@ jobs:
           run_install: true
       - name: Build root package
         run: pnpm run build
-      - name: Build tinacms package
+      - name: Start and test Playwright example project
         run: |
           cd playwright/tina-playwright
-          pnpm run build
-      - name: Start Playwright example project
-        run: |
-          cd playwright/tina-playwright
-          pnpm run dev
-      - name: Run playwright test
-        run: |
-          cd playwright/tina-playwright
+          pnpm run dev &
+          npx wait-on http://localhost:3000
           npx playwright test
