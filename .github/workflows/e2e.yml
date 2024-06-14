@@ -48,9 +48,10 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.44.1-jammy
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v2.2.2
         with:
-          node-version: 18
+          version: 7.4.0
+          run_install: true
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Run your tests
