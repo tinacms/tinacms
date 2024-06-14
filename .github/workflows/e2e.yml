@@ -47,7 +47,7 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.44.1-jammy
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
       - uses: pnpm/action-setup@v2.2.2
         with:
           version: 7.4.0
