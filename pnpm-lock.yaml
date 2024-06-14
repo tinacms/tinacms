@@ -1339,8 +1339,6 @@ importers:
     specifiers:
       '@playwright/test': ^1.44.1
       '@tinacms/cli': workspace:*
-      '@tinacms/datalayer': workspace:*
-      '@tinacms/graphql': workspace:*
       '@types/node': ^17.0.21
       eslint: '7'
       eslint-config-next: 12.0.3
@@ -1350,8 +1348,6 @@ importers:
       react-is: ^17.0.2
       tinacms: workspace:*
     dependencies:
-      '@tinacms/datalayer': link:../../packages/@tinacms/datalayer
-      '@tinacms/graphql': link:../../packages/@tinacms/graphql
       next: 12.0.4_sfoxds7t5ydpegc3knd667wn6m
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -8432,7 +8428,7 @@ packages:
         integrity: sha512-D94LjX4Sp0xJFVaoQOd3OO9k7tpBYNOXdVhkltUbGv2Qb9OXdrg/CpsjlZv7ia14Sylv398LswWBVVu5nqKzAQ==,
       }
     peerDependencies:
-      '@types/react': 17.0.47
+      '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0
     peerDependenciesMeta:
       '@types/react':
@@ -8485,7 +8481,7 @@ packages:
         integrity: sha512-v/5RegiJWYdoCvMnITBkNNx6bCj20fiaJnWtRkU18yITptraXjffz5Qbn05uOiQnOvi+dbkznkoaMltz1GnszQ==,
       }
     peerDependencies:
-      '@types/react': 17.0.47
+      '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0
     peerDependenciesMeta:
       '@types/react':
