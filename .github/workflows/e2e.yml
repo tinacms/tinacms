@@ -56,7 +56,13 @@ jobs:
         with:
           version: 7.4.0
           run_install: true
-      - name: Run your tests
+      - name: Start Playwright example project
+        run: |
+          cd packages/playwright-tests
+          pnpm run dev &
+      - name: Wait for server to be ready
+        run: npx wait-on http://localhost:3000
+      - name: Run playwright test
         run: |
           cd playwright/tina-playwright
           npx playwright test
