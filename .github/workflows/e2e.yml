@@ -7,7 +7,7 @@ jobs:
     # container: cypress/browsers:node14.17.6-chrome100-ff98
     # container: cypress/browsers:node14.17.0-chrome88-ff89
     container: cypress/browsers:node16.5.0-chrome94-ff93
-    name: E2E on Tests
+    name: Cypress E2E on Tests
     strategy:
       matrix:
         browser: ['chrome', 'firefox']
@@ -42,7 +42,7 @@ jobs:
           path: cypress/videos
 
   playwright:
-    name: 'Playwright Tests'
+    name: 'Playwright E2E on Tests'
     runs-on: ubuntu-20.04
     container:
       image: mcr.microsoft.com/playwright:v1.44.1-jammy
@@ -56,6 +56,10 @@ jobs:
         with:
           version: 7.4.0
           run_install: true
+      - name: Build tinacms package
+        run: |
+          cd playwright/tina-playwright
+          pnpm build
       - name: Start Playwright example project
         run: |
           cd playwright/tina-playwright
