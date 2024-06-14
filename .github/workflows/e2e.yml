@@ -52,7 +52,7 @@ jobs:
         with:
           node-version: 18
       - name: Install dependencies
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile
       - name: Run your tests
         run: npx playwright test
         env:
