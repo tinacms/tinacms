@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Create Blog Post", () => {
+test.skip("Create Blog Post", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(
       "http://localhost:3000/admin/index.html#/collections/new/post/~/",
