@@ -106,11 +106,13 @@ export class TinaSchema {
   public getCollectionByFullPath = (filepath: string) => {
     const fileExtension = filepath.split('.').pop()
     const normalizedPath = filepath.replace(/\\/g, '/')
-    const isGitKeep = normalizedPath.endsWith('.gitkeep')
 
     const possibleCollections = this.getCollections().filter((collection) => {
       // filter out file extensions that don't match the collection format
-      if (!isGitKeep && fileExtension !== (collection.format || 'md')) {
+      if (
+        !normalizedPath.endsWith(`.gitkeep.${collection.format || 'md'}`) &&
+        fileExtension !== (collection.format || 'md')
+      ) {
         return false
       }
       if (collection?.match?.include || collection?.match?.exclude) {
