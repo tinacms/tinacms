@@ -714,7 +714,7 @@ export class Resolver {
     const collection = await this.tinaSchema.getCollection(collectionLookup)
     let realPath = path.join(collection?.path, args.relativePath)
     if (isFolderCreation) {
-      realPath = `${realPath}/.gitkeep`
+      realPath = `${realPath}/.gitkeep.${collection.format || 'md'}`
     }
     const alreadyExists = await this.database.documentExists(realPath)
 
