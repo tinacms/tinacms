@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import deleteBlogPost from "../utils/deleteBlogPost";
 
 test.describe("Create Blog Post", () => {
   test.beforeEach(async ({ page }) => {
@@ -18,9 +19,7 @@ test.describe("Create Blog Post", () => {
   let isNewBlogCreated = false;
 
   test("should be able to create a blog", async ({ page }) => {
-    const input = page.locator('input[name="title"]');
-
-    await input.fill(blogTitle);
+    await page.fill('input[name="title"]', blogTitle);
 
     await page.fill('textarea[name="body"]', blogContent);
 
@@ -37,28 +36,17 @@ test.describe("Create Blog Post", () => {
     isNewBlogCreated = true;
   });
 
-  test.afterEach(async ({ page }) => {
+  test.afterEach(async () => {
     if (isNewBlogCreated) {
-      await page.goto(
-        "http://localhost:3000/admin/index.html#/collections/post/~",
-        { waitUntil: "domcontentloaded" }
-      );
+      const collection = "post";
+      const relativePath = "My_Document.md";
 
-      const dropdownButton = page.locator('button[aria-haspopup="dialog"]');
-      await dropdownButton.click();
-
-      const deleteOption = page.locator(
-        'span[data-test="deleteOverflowButton"]'
-      );
-      await deleteOption.waitFor();
-      await deleteOption.click();
-
-      const confirmDeleteButton = page.locator("button", { hasText: "Delete" });
-      await confirmDeleteButton.waitFor();
-      await confirmDeleteButton.click();
-
-      const blogPost = await page.locator(`text=${blogFilename}`);
-      await expect(blogPost).toBeHidden();
+      try {
+        const response = await deleteBlogPost(collection, relativePath);
+        console.log("Delete response:", response);
+      } catch (error) {
+        console.error("Error deleting blog post:", error);
+      }
     }
   });
 });
