@@ -13,7 +13,7 @@ const deleteBlogPost = async (
   collection: string,
   relativePath: string
 ): Promise<DeleteBlogPostResponse> => {
-  const DELETE_DOCUMENT = `
+  const DELETE_BLOGPOST = `
     mutation DeleteDocument($collection: String!, $relativePath: String!) {
       deleteDocument(collection: $collection, relativePath: $relativePath) {
         __typename
@@ -22,9 +22,9 @@ const deleteBlogPost = async (
   `;
 
   const response = await axios.post<DeleteBlogPostResponse>(
-    "http://localhost:4001/graphql", // Replace with your GraphQL endpoint
+    "http://localhost:4001/graphql",
     {
-      query: DELETE_DOCUMENT,
+      query: DELETE_BLOGPOST,
       variables: { collection, relativePath },
     },
     {
