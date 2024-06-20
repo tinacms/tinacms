@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import deleteBlogPost from "../utils/deleteBlogPost";
+import { client } from "../tina/__generated__/client";
 
 test.describe("Create Blog Post", () => {
   test.beforeEach(async ({ page }) => {
@@ -39,9 +40,10 @@ test.describe("Create Blog Post", () => {
   test.afterEach(async () => {
     if (isNewBlogCreated) {
       const collection = "post";
-      const relativePath = "My_Document.md";
+      const relativePath = `${blogFilename}.md`;
 
       try {
+        //TODO: Another better way calling the backend is using the import client from the generated/client
         const response = await deleteBlogPost(collection, relativePath);
         console.log("Delete response:", response);
       } catch (error) {
