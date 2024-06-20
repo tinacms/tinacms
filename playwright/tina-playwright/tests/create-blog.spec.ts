@@ -26,7 +26,7 @@ test.describe("Create Blog Post", () => {
 
     await page.fill('input[name="filename"]', blogFilename);
 
-    // await page.click('button:has-text("Save")');
+    await page.click('button:has-text("Save")');
 
     await page.goto(
       "http://localhost:3000/admin/index.html#/collections/post/~"
