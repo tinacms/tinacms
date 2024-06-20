@@ -10,7 +10,7 @@ import { defineConfig, devices } from "@playwright/test";
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  timeout: 30 * 1000,
+  timeout: 5000,
 
   testDir: "./tests",
   /* Run tests in files in parallel */
@@ -38,7 +38,7 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
-
+    //TODO : Consider enable testing in fire fox browser
     // {
     //   name: "firefox",
     //   use: { ...devices["Desktop Firefox"] },
