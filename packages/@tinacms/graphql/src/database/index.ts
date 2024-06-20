@@ -470,7 +470,6 @@ export class Database {
     collectionName?: string
   ) => {
     await this.initLevel()
-    const isGitKeep = filepath.endsWith('.gitkeep')
 
     try {
       if (SYSTEM_FILES.includes(filepath)) {
@@ -514,7 +513,9 @@ export class Database {
           }
         }
 
-        const stringifiedFile = isGitKeep
+        const stringifiedFile = filepath.endsWith(
+          `.gitkeep.${collection.format || 'md'}`
+        )
           ? ''
           : await this.stringifyFile(filepath, dataFields, collection)
 
