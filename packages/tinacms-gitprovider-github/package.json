@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "@octokit/rest": "^19.0.7",
-    "js-base64": "^3.7.4"
+    "js-base64": "^3.7.4",
+    "typescript": "^5.5.2"
   },
   "devDependencies": {
     "@tinacms/datalayer": "workspace:*",

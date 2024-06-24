@@ -37,10 +37,10 @@
     "jest-diff": "^29.5.0",
     "jest-matcher-utils": "^29.5.0",
     "next": "12.2.4",
+    "nodemon": "2.0.19",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "nodemon": "2.0.19",
-    "typescript": "4.3.5"
+    "typescript": "5.5.2"
   },
   "dependencies": {
     "fetch-ponyfill": "^7.1.0"

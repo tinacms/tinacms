@@ -121,6 +121,7 @@ const makeImportsVisitor =
             // Create new import specifiers
             const importSpecifiers = newImports.map((i) =>
               ts.factory.createImportSpecifier(
+                false,
                 undefined,
                 ts.factory.createIdentifier(i)
               )
@@ -138,8 +139,8 @@ const makeImportsVisitor =
             const importDec = ts.factory.createImportDeclaration(
               undefined,
               undefined,
-              importClause,
-              ts.factory.createStringLiteral(moduleName)
+              importClause as any,
+              ts.factory.createStringLiteral(moduleName) as any
             )
 
             // replace the import statement with the updated one
@@ -153,6 +154,7 @@ const makeImportsVisitor =
         if (!foundImportStatement) {
           const importSpecifiers = imports.map((i) =>
             ts.factory.createImportSpecifier(
+              false,
               undefined,
               ts.factory.createIdentifier(i)
             )
@@ -166,8 +168,8 @@ const makeImportsVisitor =
           const importDec = ts.factory.createImportDeclaration(
             undefined,
             undefined,
-            importClause,
-            ts.factory.createStringLiteral(moduleName)
+            importClause as any,
+            ts.factory.createStringLiteral(moduleName) as any
           )
           newStatements.unshift(importDec)
 
@@ -197,7 +199,7 @@ const makeAddExpressionToSchemaCollectionVisitor =
     newExpressionSourceFile: ts.SourceFile,
     newExpression: ts.Expression
   ): ts.TransformerFactory<ts.SourceFile> =>
-  (ctx: ts.TransformationContext) => {
+  (ctx: ts.TransformationContext): any => {
     const visit = (node: ts.Node) => {
       if (
         ts.isCallExpression(node) &&
@@ -301,7 +303,7 @@ const makeUpdateObjectLiteralPropertyVisitor =
     propertyValueExpressionSourceFile: ts.SourceFile,
     propertyValue: ts.Expression
   ): ts.TransformerFactory<ts.SourceFile> =>
-  (ctx: ts.TransformationContext) => {
+  (ctx: ts.TransformationContext): any => {
     const visitor = (node: ts.Node) => {
       if (
         ts.isCallExpression(node) &&

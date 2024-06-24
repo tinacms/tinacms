@@ -4,7 +4,7 @@ export const makeTransformer =
   <T extends ts.Node>(
     makeVisitor: (ctx: ts.TransformationContext) => ts.Visitor
   ): ts.TransformerFactory<T> =>
-  (ctx: ts.TransformationContext) =>
+  (ctx: ts.TransformationContext): any =>
   (node) =>
     ts.visitNode(node, makeVisitor(ctx))
 

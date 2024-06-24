@@ -69,7 +69,7 @@ export function useTina<T extends object>({
     state,
     isDummyContainer,
     isLoading: contextLoading,
-  } = React.useContext(TinaDataContext)
+  }: any = React.useContext(TinaDataContext)
 
   const [waitForContextRerender, setWaitForContextRerender] = useState<boolean>(
     !isDummyContainer
