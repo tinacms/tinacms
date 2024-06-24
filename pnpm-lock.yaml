@@ -673,8 +673,6 @@ importers:
       '@iarna/toml': 2.2.5
       '@tinacms/mdx': link:../mdx
       '@tinacms/schema-tools': link:../schema-tools
-      '@types/react': 17.0.47
-      '@types/react-dom': 18.3.0
       abstract-level: 1.0.4
       body-parser: 1.20.2
       cors: 2.8.5
@@ -714,6 +712,8 @@ importers:
       '@types/micromatch': 4.0.7
       '@types/node': 14.18.63
       '@types/normalize-path': 3.0.2
+      '@types/react': 17.0.47
+      '@types/react-dom': 18.3.0
       '@types/ws': 7.4.7
       '@types/yup': 0.29.14
       jest: 29.7.0_@types+node@14.18.63
@@ -924,8 +924,12 @@ importers:
       '@tinacms/graphql': workspace:*
       '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
+      '@types/cors': ^2.8.17
+      '@types/istanbul-reports': ^3.0.4
       '@types/jest': ^26.0.4
+      '@types/js-yaml': ^4.0.9
       '@types/micromatch': ^4.0.2
+      '@types/react': 17.0.47
       '@types/search-index': ^3.2.0
       abstract-level: ^1.0.3
       jest: ^29.5.0
@@ -951,8 +955,12 @@ importers:
       stopword: 2.0.8
     devDependencies:
       '@tinacms/scripts': link:../scripts
+      '@types/cors': 2.8.17
+      '@types/istanbul-reports': 3.0.4
       '@types/jest': 26.0.4
+      '@types/js-yaml': 4.0.9
       '@types/micromatch': 4.0.7
+      '@types/react': 17.0.47
       '@types/search-index': 3.2.4
       jest: 29.7.0
       jest-diff: 29.7.0
@@ -10917,6 +10925,7 @@ packages:
       }
     dependencies:
       '@types/react': 17.0.47
+    dev: true
 
   /@types/react-redux/7.1.33:
     resolution:
