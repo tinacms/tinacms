@@ -635,6 +635,8 @@ importers:
       '@types/micromatch': ^4.0.2
       '@types/node': ^14.17.34
       '@types/normalize-path': ^3.0.0
+      '@types/react': 17.0.47
+      '@types/react-dom': ^18.3.0
       '@types/ws': ^7.2.6
       '@types/yup': ^0.29.7
       abstract-level: ^1.0.3
@@ -671,6 +673,8 @@ importers:
       '@iarna/toml': 2.2.5
       '@tinacms/mdx': link:../mdx
       '@tinacms/schema-tools': link:../schema-tools
+      '@types/react': 17.0.47
+      '@types/react-dom': 18.3.0
       abstract-level: 1.0.4
       body-parser: 1.20.2
       cors: 2.8.5
@@ -10005,7 +10009,7 @@ packages:
     dependencies:
       '@babel/runtime': 7.24.7
       '@types/react': 17.0.47
-      '@types/react-dom': 17.0.25
+      '@types/react-dom': 18.3.0
       '@types/react-test-renderer': 18.3.0
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -10906,6 +10910,14 @@ packages:
     dependencies:
       '@types/react': 17.0.47
 
+  /@types/react-dom/18.3.0:
+    resolution:
+      {
+        integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==,
+      }
+    dependencies:
+      '@types/react': 17.0.47
+
   /@types/react-redux/7.1.33:
     resolution:
       {
@@ -10925,7 +10937,7 @@ packages:
       }
     dependencies:
       '@types/react': 17.0.47
-      '@types/react-dom': 17.0.25
+      '@types/react-dom': 18.3.0
       '@types/react-transition-group': 4.4.10
     dev: true
 

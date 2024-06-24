@@ -38,6 +38,8 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dataloader": "^2.0.0",
+    "@types/react": "17.0.47",
+    "@types/react-dom": "^18.3.0",
     "date-fns": "^2.21.1",
     "encoding-down": "^7.1.0",
     "estree-walker": "^3.0.0",
