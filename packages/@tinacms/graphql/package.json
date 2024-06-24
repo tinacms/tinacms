@@ -25,9 +25,9 @@
   "scripts": {
     "types": "pnpm tsc",
     "build": "tinacms-scripts build",
-    "docs": "yarn typedoc",
-    "serve": "yarn nodemon dist/server.js",
-    "test": "jest",
+    "docs": "pnpm typedoc",
+    "serve": "pnpm nodemon dist/server.js",
+    "test": "pnpm jest",
     "test-watch": "jest --watch"
   },
   "dependencies": {

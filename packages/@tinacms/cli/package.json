@@ -48,7 +48,7 @@
     "types": "pnpm tsc",
     "test-watch": "jest  --passWithNoTests --watch",
     "tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
-    "generate:schema": "yarn node scripts/generateSchema.js"
+    "generate:schema": "pnpm node scripts/generateSchema.js"
   },
   "dependencies": {
     "@graphql-codegen/core": "^2.1.0",
@@ -115,7 +115,6 @@
     "typescript": "4.3.5",
     "url-pattern": "^1.0.3",
     "vite": "^4.3.9",
-    "yarn": "^1.22.17",
     "yup": "^0.32.9",
     "zod": "^3.14.3"
   },

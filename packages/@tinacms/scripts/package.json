@@ -15,7 +15,7 @@
   "scripts": {
     "build:all": "bin/tina-build build:all",
     "watch": "node bin/tina-build watch",
-    "build": "yarn tsup src/jest-runner.ts src/css-transform.ts src/index.ts --format cjs"
+    "build": "pnpm tsup src/jest-runner.ts src/css-transform.ts src/index.ts --format cjs"
   },
   "dependencies": {
     "@babel/core": "^7.21.0",
