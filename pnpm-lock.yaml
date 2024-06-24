@@ -1129,7 +1129,6 @@ importers:
       '@headlessui/react': ^1.5.0
       '@heroicons/react': ^1.0.4
       '@monaco-editor/react': 4.4.5
-      '@radix-ui/react-popover': 1.1.1
       '@react-aria/i18n': ^3.3.4
       '@react-hook/window-size': ^3.0.7
       '@react-types/combobox': ^3.2.0
@@ -1217,7 +1216,6 @@ importers:
       '@headlessui/react': 1.7.5_sfoxds7t5ydpegc3knd667wn6m
       '@heroicons/react': 1.0.6_react@17.0.2
       '@monaco-editor/react': 4.4.5_ilaxvrtg3zfidjpyrhsbytq244
-      '@radix-ui/react-popover': 1.1.1_2mb3ll2svg7hjtyqlqocczafqe
       '@react-aria/i18n': 3.11.1_react@17.0.2
       '@react-hook/window-size': 3.1.1_react@17.0.2
       '@react-types/combobox': 3.11.1_react@17.0.2
@@ -7769,43 +7767,6 @@ packages:
       react-remove-scroll: 2.5.7_sudpmbbyhqtxq6t4xf6jlicdem
     dev: false
 
-  /@radix-ui/react-popover/1.1.1_2mb3ll2svg7hjtyqlqocczafqe:
-    resolution:
-      {
-        integrity: sha512-3y1A3isulwnWhvTTwmIreiB8CF4L+qRjZnK1wYLO7pplddzXKby/GnZ2M7OZY3qgnl6p9AodUIHRYGXNah8Y7g==,
-      }
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-    dependencies:
-      '@radix-ui/primitive': 1.1.0
-      '@radix-ui/react-compose-refs': 1.1.0_sudpmbbyhqtxq6t4xf6jlicdem
-      '@radix-ui/react-context': 1.1.0_sudpmbbyhqtxq6t4xf6jlicdem
-      '@radix-ui/react-dismissable-layer': 1.1.0_2mb3ll2svg7hjtyqlqocczafqe
-      '@radix-ui/react-focus-guards': 1.1.0_sudpmbbyhqtxq6t4xf6jlicdem
-      '@radix-ui/react-focus-scope': 1.1.0_2mb3ll2svg7hjtyqlqocczafqe
-      '@radix-ui/react-id': 1.1.0_sudpmbbyhqtxq6t4xf6jlicdem
-      '@radix-ui/react-popper': 1.2.0_2mb3ll2svg7hjtyqlqocczafqe
-      '@radix-ui/react-portal': 1.1.1_2mb3ll2svg7hjtyqlqocczafqe
-      '@radix-ui/react-presence': 1.1.0_2mb3ll2svg7hjtyqlqocczafqe
-      '@radix-ui/react-primitive': 2.0.0_2mb3ll2svg7hjtyqlqocczafqe
-      '@radix-ui/react-slot': 1.1.0_sudpmbbyhqtxq6t4xf6jlicdem
-      '@radix-ui/react-use-controllable-state': 1.1.0_sudpmbbyhqtxq6t4xf6jlicdem
-      '@types/react': 17.0.47
-      '@types/react-dom': 17.0.25
-      aria-hidden: 1.2.4
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-remove-scroll: 2.5.7_sudpmbbyhqtxq6t4xf6jlicdem
-    dev: false
-
   /@radix-ui/react-popper/1.2.0_2mb3ll2svg7hjtyqlqocczafqe:
     resolution:
       {
@@ -8131,7 +8092,7 @@ packages:
         integrity: sha512-CasTfvsy+frcFkbXtSJ2Zu9JHpN8TYKxkgJGWbjiZhFivxaeW7rMeZt7QELGVLaYVfFMsKHjb7Ak0nMEe+2Vfw==,
       }
     peerDependencies:
-      '@types/react': 17.0.47
+      '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
@@ -8181,7 +8142,7 @@ packages:
         integrity: sha512-+FPE0rOdziWSrH9athwI1R0HDVbWlEhd+FR+aSDk4uWGmSJ9Z54sdZVDQPZAinJhJXwfT+qnj969mCsT2gfm5w==,
       }
     peerDependencies:
-      '@types/react': 17.0.47
+      '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
