@@ -1457,12 +1457,15 @@ importers:
       '@types/prompts':
         specifier: ^2.0.14
         version: 2.4.9
+      '@types/rimraf':
+        specifier: ^4.0.5
+        version: 4.0.5
       '@types/tar':
         specifier: 4.0.3
         version: 4.0.3
       typescript:
-        specifier: 4.3.5
-        version: 4.3.5
+        specifier: 4.6.4
+        version: 4.6.4
 
   packages/next-tinacms-cloudinary:
     dependencies:
@@ -7102,6 +7105,13 @@ packages:
       {
         integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==,
       }
+
+  '@types/rimraf@4.0.5':
+    resolution:
+      {
+        integrity: sha512-DTCZoIQotB2SUJnYgrEx43cQIUYOlNZz0AZPbKU4PSLYTUdML5Gox0++z4F9kQocxStrCmRNhi4x5x/UlwtKUA==,
+      }
+    deprecated: This is a stub types definition. rimraf provides its own type definitions, so you do not need this installed.
 
   '@types/scheduler@0.23.0':
     resolution:
@@ -17585,6 +17595,14 @@ packages:
     engines: { node: '>=4.2.0' }
     hasBin: true
 
+  typescript@4.6.4:
+    resolution:
+      {
+        integrity: sha512-9ia/jWHIEbo49HfjrLGfKbZSuWo9iTMwXO+Ca3pRsSpbsMbc7/IU8NKdCZVRRBafVPGnoJeFL76ZOAA84I9fEg==,
+      }
+    engines: { node: '>=4.2.0' }
+    hasBin: true
+
   typescript@4.9.5:
     resolution:
       {
@@ -23355,6 +23373,10 @@ snapshots:
   '@types/responselike@1.0.3':
     dependencies:
       '@types/node': 14.18.63
+
+  '@types/rimraf@4.0.5':
+    dependencies:
+      rimraf: 5.0.7
 
   '@types/scheduler@0.23.0': {}
 
@@ -32188,6 +32210,8 @@ snapshots:
       typescript: 4.9.5
 
   typescript@4.3.5: {}
+
+  typescript@4.6.4: {}
 
   typescript@4.9.5: {}
 
