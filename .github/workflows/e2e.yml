@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Skip Cypress Tests
         run: |
-          echo "Skipping Cypress tests as we transition to a new playwright"
+          echo "Skipping Cypress tests as we transition to Playwright as per https://github.com/tinacms/tinacms/issues/4580"
           exit 0
 
       # - uses: actions/checkout@v2
