@@ -21,7 +21,7 @@
   "scripts": {
     "types": "pnpm tsc",
     "build": "tinacms-scripts build",
-    "test-run-bin": "yarn create-tina-app"
+    "test-run-bin": "pnpm create-tina-app"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
