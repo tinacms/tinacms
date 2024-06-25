@@ -11,6 +11,11 @@ jobs:
       matrix:
         browser: ['chrome', 'firefox']
     steps:
+      - name: Skip Cypress Tests
+        run: |
+          echo "Skipping Cypress tests as we transition to a new playwright"
+          exit 0
+
       - uses: actions/checkout@v2
 
       - name: Set up .npmrc
