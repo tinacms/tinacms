@@ -1,42 +1,56 @@
 name: e2e Tests
+
 on: [push]
+
 jobs:
   cypress-run-ubuntu:
     runs-on: ubuntu-20.04
-    # There is currently a bug on chrome 100 that adds an extra space in the editor
-    # container: cypress/browsers:node14.17.6-chrome100-ff98
-    # container: cypress/browsers:node14.17.0-chrome88-ff89
     container: cypress/browsers:node16.5.0-chrome94-ff93
-    name: E2E on Tests
+    name: E2E Tests
     strategy:
       matrix:
         browser: ['chrome', 'firefox']
     steps:
       - uses: actions/checkout@v2
+
       - uses: pnpm/action-setup@v2.2.2
         with:
           version: 7.4.0
           run_install: true
-      - name: Cypress run
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build E2E
+        run: pnpm build:e2e
+
+      - name: Start E2E
+        run: pnpm start:e2e &
+        env:
+          NEXT_PUBLIC_USE_LOCAL_CLIENT: 1
+
+      - name: Wait on http://localhost:3000
+        run: npx wait-on http://localhost:3000 --timeout 180000
+
+      - name: Run Cypress
         uses: cypress-io/github-action@v4
         with:
-          install: false
           browser: ${{ matrix.browser }}
-          env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
-          build: pnpm build:e2e
-          command: pnpm test:e2e
-          start: pnpm start:e2e
-          wait-on: 'http://localhost:3000'
-          # wait for 3 minutes for the server to respond
-          wait-on-timeout: 180
-      - uses: actions/upload-artifact@v2
+          start: false
+          wait-on: false
+        env:
+          NEXT_PUBLIC_USE_LOCAL_CLIENT: 1
+
+      - name: Upload Cypress screenshots
         if: failure()
+        uses: actions/upload-artifact@v2
         with:
           name: cypress-screenshots
           path: cypress/screenshots
-      # Test run video was always captured, so this action uses "always()" condition
-      - uses: actions/upload-artifact@v2
+
+      - name: Upload Cypress videos
         if: always()
+        uses: actions/upload-artifact@v2
         with:
           name: cypress-videos
           path: cypress/videos
