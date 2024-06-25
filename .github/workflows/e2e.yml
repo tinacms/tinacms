@@ -23,11 +23,6 @@ jobs:
           version: 7.4.0
           run_install: true
 
-      - name: Create Cypress config directory with correct permissions
-        run: |
-          mkdir -p /github/home/.config/Cypress/cy/production
-          sudo chown -R 1000:1000 /github/home/.config/Cypress
-
       - name: Install dependencies
         run: pnpm recursive install
 
