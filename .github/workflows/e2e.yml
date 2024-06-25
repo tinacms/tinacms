@@ -5,7 +5,7 @@ on: [push]
 jobs:
   cypress-run-ubuntu:
     runs-on: ubuntu-20.04
-    container: cypress/browsers:node16.5.0-chrome94-ff93
+    container: cypress/browsers:node18.12.0-chrome103-ff107
     name: E2E Tests
     strategy:
       matrix:
@@ -23,10 +23,10 @@ jobs:
           version: 7.4.0
           run_install: true
 
-      - name: Set up Cypress cache directory permissions
+      - name: Create Cypress directories with correct permissions
         run: |
-          mkdir -p /github/home/.cache/Cypress
-          chown -R $(id -u):$(id -g) /github/home/.cache/Cypress
+          mkdir -p /tmp/.cache/Cypress /tmp/.config/Cypress/cy/production
+          chown -R $(id -u):$(id -g) /tmp/.cache/Cypress /tmp/.config/Cypress
 
       - name: Install dependencies
         run: pnpm recursive install
@@ -50,7 +50,8 @@ jobs:
           wait-on: false
         env:
           NEXT_PUBLIC_USE_LOCAL_CLIENT: 1
-          XDG_CONFIG_HOME: /github/home/.config
+          CYPRESS_CACHE_FOLDER: /tmp/.cache/Cypress
+          XDG_CONFIG_HOME: /tmp/.config
 
       - name: Upload Cypress screenshots
         if: failure()
