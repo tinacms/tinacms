@@ -12,31 +12,35 @@ jobs:
       matrix:
         browser: ['chrome', 'firefox']
     steps:
-      - uses: actions/checkout@v2
-      - uses: pnpm/action-setup@v2.0.1
-        with:
-          version: 7.4.0
-          run_install: true
-      - name: Cypress run
-        uses: cypress-io/github-action@v2
-        with:
-          install: false
-          browser: ${{ matrix.browser }}
-          env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
-          build: pnpm build:e2e
-          command: pnpm test:e2e
-          start: pnpm start:e2e:dev
-          wait-on: 'http://localhost:3000'
-          # wait for 3 minutes for the server to respond
-          wait-on-timeout: 180
-      - uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots
-      # Test run video was always captured, so this action uses "always()" condition
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: cypress-videos
-          path: cypress/videos
+      - name: Skip Cypress Tests
+        run: |
+          echo "Skipping Cypress tests as we transition to Playwright as per https://github.com/tinacms/tinacms/issues/4580"
+          exit 0
+      # - uses: actions/checkout@v2
+      # - uses: pnpm/action-setup@v2.0.1
+      #   with:
+      #     version: 7.4.0
+      #     run_install: true
+      # - name: Cypress run
+      #   uses: cypress-io/github-action@v2
+      #   with:
+      #     install: false
+      #     browser: ${{ matrix.browser }}
+      #     env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
+      #     build: pnpm build:e2e
+      #     command: pnpm test:e2e
+      #     start: pnpm start:e2e:dev
+      #     wait-on: 'http://localhost:3000'
+      #     # wait for 3 minutes for the server to respond
+      #     wait-on-timeout: 180
+      # - uses: actions/upload-artifact@v2
+      #   if: failure()
+      #   with:
+      #     name: cypress-screenshots
+      #     path: cypress/screenshots
+      # # Test run video was always captured, so this action uses "always()" condition
+      # - uses: actions/upload-artifact@v2
+      #   if: always()
+      #   with:
+      #     name: cypress-videos
+      #     path: cypress/videos
