@@ -13,13 +13,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up .npmrc
+        run: |
+          echo "auto-install-peers=true" >> .npmrc
+          echo "strict-peer-dependencies=false" >> .npmrc
+
       - uses: pnpm/action-setup@v2.2.2
         with:
           version: 7.4.0
           run_install: true
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm recursive install
 
       - name: Build E2E
         run: pnpm build:e2e
