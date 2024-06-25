@@ -23,6 +23,11 @@ jobs:
           version: 7.4.0
           run_install: true
 
+      - name: Create Cypress config directory with correct permissions
+        run: |
+          mkdir -p /home/runner/.config/Cypress/cy/production
+          chown -R $(id -u):$(id -g) /home/runner/.config/Cypress
+
       - name: Install dependencies
         run: pnpm recursive install
 
@@ -45,6 +50,7 @@ jobs:
           wait-on: false
         env:
           NEXT_PUBLIC_USE_LOCAL_CLIENT: 1
+          XDG_CONFIG_HOME: /home/runner/.config
 
       - name: Upload Cypress screenshots
         if: failure()
