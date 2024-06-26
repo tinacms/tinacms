@@ -43,11 +43,13 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |
           pnpm version:snapshot
           pnpm run publish:beta
+
       - name: Publish
         if: matrix.channel == 'latest'
         run: |
@@ -61,10 +63,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Generate GitHub App token
+        uses: tibdex/github-app-token@v2
+        if: matrix.channel == 'latest'
+        id: generate-token
+        with:
+          # uses https://github.com/organizations/tinacms/settings/apps/release-bot-allow-prs-and-push
+          app_id: ${{ secrets.BOT_APP_ID }}
+          private_key: ${{ secrets.BOT_APP_SECRET }}
+
       - name: Create release pull request
         uses: changesets/action@v1
         if: matrix.channel == 'latest'
         with:
           version: pnpm run version
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
