@@ -62,5 +62,6 @@
     "@types/log4js": "^2.3.5",
     "rimraf": "^5.0.7",
     "typedoc": "^0.23.28"
-  }
+  },
+  "packageManager": "pnpm@9.4.0"
 }
