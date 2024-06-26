@@ -80,7 +80,9 @@ const extractAttribute = (
     case 'object':
       return extractObject(extractExpression(attribute), field, imageCallback)
     case 'rich-text':
+      console.log('extractAttribute', attribute)
       const JSXString = extractRaw(attribute)
+      console.log('extractAttribute', JSXString)
       if (JSXString) {
         return parseMDX(JSXString, field, imageCallback)
       } else {
@@ -266,6 +268,7 @@ const extractRaw = (attribute: MdxJsxAttribute): string => {
   assertHasType(attribute.value)
   assertType(attribute.value, 'mdxJsxAttributeValueExpression')
   const rawValue = attribute.value.value
+  console.log({ rawValue, f: trimFragments(rawValue) })
   return trimFragments(rawValue)
 }
 
@@ -292,9 +295,13 @@ function assertHasType(
 }
 
 export const trimFragments = (string: string) => {
+  let trimmedString = string.replace(/^<>|<\/>$/g, '')
+  trimmedString = trimmedString.trim()
+  return trimmedString
   const rawArr = string.split('\n')
   let openingFragmentIndex: number | null = null
   let closingFragmentIndex: number | null = null
+  console.log(rawArr)
   rawArr.forEach((item, index) => {
     if (item.trim() === '<>') {
       if (!openingFragmentIndex) {
