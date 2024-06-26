@@ -18,10 +18,9 @@ You _should_ :fingers_crossed: be able to just run these commands. (Please make 
 # check the node version, 18 or greater is required
 node -v
 # you can use nvm (https://github.com/nvm-sh/nvm) to switch version
-# install pnpm (see docs for other options https://pnpm.io/installation)
-# We are currently using pnpm@7
-npm install -g pnpm@7.32.4
-# ensure you have the correct version (7.32.4)
+# install pnpm via corepack
+corepack enable
+# ensure you have the correct version (check version number in package.json)
 pnpm -v
 # some packages rely on yarn, so you may need to install that too
 npm install -g yarn
