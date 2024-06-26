@@ -6,8 +6,6 @@
 "@tinacms/schema-tools": patch
 "@tinacms/scripts": patch
 "@tinacms/search": patch
-"e2e-next": patch
-"kitchen-sink-starter": patch
 ---
 
 Remove yarn for pnpm
