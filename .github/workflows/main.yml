@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - changeset-release/main
   pull_request:
     types: [opened, synchronize, reopened, labeled]
 
