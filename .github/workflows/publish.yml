@@ -83,14 +83,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: Generate GitHub App token
-        uses: tibdex/github-app-token@v2
+      - name: Generate a token
+        uses: actions/create-github-app-token@v1
         if: matrix.channel == 'latest'
         id: generate-token
         with:
           # uses https://github.com/organizations/tinacms/settings/apps/release-bot-allow-prs-and-push
-          app_id: ${{ secrets.BOT_APP_ID }}
-          private_key: ${{ secrets.BOT_APP_SECRET }}
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_SECRET }}
 
       - name: Create release pull request
         uses: changesets/action@v1
