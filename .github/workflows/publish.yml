@@ -17,9 +17,19 @@ jobs:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
+      - name: Generate a token
+        uses: actions/create-github-app-token@v1
+        if: matrix.channel == 'latest'
+        id: generate-token
+        with:
+          # uses https://github.com/organizations/tinacms/settings/apps/release-bot-allow-prs-and-push
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_SECRET }}
+
       - name: Check out code
         uses: actions/checkout@v4
         with:
+          token: ${{ steps.generate-token.outputs.token }}
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
 
@@ -76,21 +86,10 @@ jobs:
       - name: Push tags
         if: matrix.channel == 'latest'
         run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
           pnpm push-tags
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
-      - name: Generate a token
-        uses: actions/create-github-app-token@v1
-        if: matrix.channel == 'latest'
-        id: generate-token
-        with:
-          # uses https://github.com/organizations/tinacms/settings/apps/release-bot-allow-prs-and-push
-          app-id: ${{ secrets.BOT_APP_ID }}
-          private-key: ${{ secrets.BOT_APP_SECRET }}
 
       - name: Create release pull request
         uses: changesets/action@v1
