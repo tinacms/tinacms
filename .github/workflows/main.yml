@@ -24,7 +24,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 2
 
       - name: Setup Node.js environment
@@ -32,11 +31,11 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
-      - uses: pnpm/action-setup@v2.2.2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 9
+          package_json_file: package.json
           run_install: false
 
       - name: Get pnpm store directory
@@ -45,7 +44,7 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}

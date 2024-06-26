@@ -16,16 +16,16 @@ jobs:
           echo "Skipping Cypress tests as we transition to Playwright as per https://github.com/tinacms/tinacms/issues/4580"
           exit 0
 
-      # - uses: actions/checkout@v2
+      # - uses: actions/checkout@v4
 
       # - name: Set up .npmrc
       #   run: |
       #     echo "auto-install-peers=true" >> .npmrc
       #     echo "strict-peer-dependencies=false" >> .npmrc
 
-      # - uses: pnpm/action-setup@v2.2.2
+      # - uses: pnpm/action-setup@v4
       #   with:
-      #     version: 7.4.0
+      #     package_json_file: package.json
       #     run_install: true
 
       # - name: Create Cypress directories with correct permissions
@@ -60,14 +60,14 @@ jobs:
 
       # - name: Upload Cypress screenshots
       #   if: failure()
-      #   uses: actions/upload-artifact@v2
+      #   uses: actions/upload-artifact@v4
       #   with:
       #     name: cypress-screenshots
       #     path: cypress/screenshots
 
       # - name: Upload Cypress videos
       #   if: always()
-      #   uses: actions/upload-artifact@v2
+      #   uses: actions/upload-artifact@v4
       #   with:
       #     name: cypress-videos
       #     path: cypress/videos
