@@ -87,7 +87,7 @@
     "ts-node": "^10.8.2",
     "typedoc": "^0.26.2",
     "typedoc-plugin-markdown": "^3.13.6",
-    "typescript": "^4.7.4",
+    "typescript": "4.6.4",
     "vite": "^4.3.9",
     "vitest": "^0.32.2",
     "concat-md": "^0.5.1"

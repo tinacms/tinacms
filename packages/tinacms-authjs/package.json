@@ -33,7 +33,8 @@
     "react": "^18",
     "react-dom": "^18",
     "tinacms": "workspace:*",
-    "typescript": "4.3.5"
+    "typescript": "4.6.4"
+
   },
   "peerDependencies": {
     "next": "^12.2.5 || ^13 || ^14",
