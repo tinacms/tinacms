@@ -32,7 +32,7 @@
     "test": "jest --passWithNoTests",
     "types": "pnpm tsc",
     "test-watch": "jest  --passWithNoTests --watch",
-    "generate:schema": "yarn node scripts/generateSchema.js"
+    "generate:schema": "pnpm node scripts/generateSchema.js"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
