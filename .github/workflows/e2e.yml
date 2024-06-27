@@ -96,4 +96,5 @@ jobs:
           cd playwright/tina-playwright
           pnpm run dev &
           npx wait-on http://localhost:3000
+          npx playwright install
           npx playwright test
