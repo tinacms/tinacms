@@ -1,6 +1,5 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import deleteBlogPost from "../utils/deleteBlogPost";
-import { client } from "../tina/__generated__/client";
 
 test.describe("Create Blog Post", () => {
   test.beforeEach(async ({ page }) => {
@@ -11,7 +10,7 @@ test.describe("Create Blog Post", () => {
 
     //Need to dismiss the popup dialog to enter edit mode
     //TODO : Remove this click once figure out how the dialog state changes (ideal solution is to set the relevant state when the page load dialog dismiss during the e2e test)
-    page.click('button[data-test="enter-edit-mode"]');
+    await page.click('button[data-test="enter-edit-mode"]');
   });
 
   const blogTitle = "Test Blog Title";
