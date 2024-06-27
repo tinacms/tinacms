@@ -78,15 +78,17 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.44.1-jammy
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
-      - uses: pnpm/action-setup@v2.2.2
+          node-version-file: '.nvmrc'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        id: pnpm-install
         with:
-          version: 7.4.0
-          run_install: true
+          package_json_file: package.json
+          run_install: false
       - name: Build root package
         run: pnpm run build
       - name: Start and test Playwright example project
