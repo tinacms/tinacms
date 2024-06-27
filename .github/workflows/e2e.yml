@@ -88,7 +88,7 @@ jobs:
         id: pnpm-install
         with:
           package_json_file: package.json
-          run_install: false
+          run_install: true
       - name: Build root package
         run: pnpm run build
       - name: Start and test Playwright example project
