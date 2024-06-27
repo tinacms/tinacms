@@ -94,7 +94,6 @@ jobs:
       - name: Start and test Playwright example project
         run: |
           cd playwright/tina-playwright
-          pnpm run dev &
-          npx wait-on http://localhost:3000
+          pnpm run dev 
           npx playwright install
           npx playwright test
