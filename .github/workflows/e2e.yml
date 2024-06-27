@@ -72,6 +72,32 @@ jobs:
       #     name: cypress-videos
       #     path: cypress/videos
 
+  # playwright:
+  #   name: 'Playwright E2E on Tests'
+  #   runs-on: ubuntu-20.04
+  #   container:
+  #     image: mcr.microsoft.com/playwright:v1.44.1-jammy
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Setup Node.js environment
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version-file: '.nvmrc'
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v4
+  #       id: pnpm-install
+  #       with:
+  #         package_json_file: package.json
+  #         run_install: true
+  #     - name: Build root package
+  #       run: pnpm run build
+  #     - name: Start and test Playwright example project
+  #       run: |
+  #         cd playwright/tina-playwright
+  #         pnpm run dev
+  #         npx playwright install
+  #         npx playwright test
+
   playwright:
     name: 'Playwright E2E on Tests'
     runs-on: ubuntu-20.04
@@ -94,6 +120,5 @@ jobs:
       - name: Start and test Playwright example project
         run: |
           cd playwright/tina-playwright
-          pnpm run dev 
           npx playwright install
           npx playwright test
