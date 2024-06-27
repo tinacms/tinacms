@@ -120,5 +120,7 @@ jobs:
       - name: Start and test Playwright example project
         run: |
           cd playwright/tina-playwright
+          echo "Starting the web server..."
           npx playwright install
+          echo "Running Playwright tests..."
           npx playwright test
