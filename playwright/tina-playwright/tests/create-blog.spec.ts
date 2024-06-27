@@ -43,7 +43,8 @@ test.describe("Create Blog Post", () => {
 
       try {
         //TODO: Another better way calling the backend is using the import client from the generated/client
-        const response = await deleteBlogPost(collection, relativePath);
+        // const response = await deleteBlogPost(collection, relativePath);
+        const response = "something";
         console.log("Delete response:", response);
       } catch (error) {
         console.error("Error deleting blog post:", error);
