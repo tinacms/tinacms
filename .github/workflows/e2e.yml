@@ -71,3 +71,29 @@ jobs:
       #   with:
       #     name: cypress-videos
       #     path: cypress/videos
+
+  playwright:
+    name: 'Playwright E2E on Tests'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        id: pnpm-install
+        with:
+          package_json_file: package.json
+          run_install: false
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build root package
+        run: pnpm build
+      - name: Install playwright
+        working-directory: playwright/tina-playwright
+        run: npx playwright install
+      - name: Run Playwright tests
+        working-directory: playwright/tina-playwright
+        run: npx playwright test
