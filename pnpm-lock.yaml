@@ -111,7 +111,7 @@ importers:
         version: link:../../packages/@tinacms/cli
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -306,7 +306,7 @@ importers:
     dependencies:
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -482,9 +482,12 @@ importers:
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../scripts
+      jest:
+        specifier: ^29.5.0
+        version: 29.7.0(@types/node@20.14.7)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.6.4))
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -1298,7 +1301,7 @@ importers:
         version: 13.13.52
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -1335,7 +1338,7 @@ importers:
         version: 13.13.52
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -1375,7 +1378,7 @@ importers:
         version: 17.0.47
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -1604,7 +1607,7 @@ importers:
         version: 0.5.0
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -28650,7 +28653,7 @@ snapshots:
       react-dom: 18.2.0(react@18.2.0)
       uuid: 8.3.2
 
-  next@12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
+  next@12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
     dependencies:
       '@next/env': 12.2.4
       '@swc/helpers': 0.4.3
@@ -28658,7 +28661,7 @@ snapshots:
       postcss: 8.4.14
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
-      styled-jsx: 5.0.2(@babel/core@7.24.7)(react@17.0.2)
+      styled-jsx: 5.0.2(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react@17.0.2)
       use-sync-external-store: 1.2.0(react@17.0.2)
     optionalDependencies:
       '@next/swc-android-arm-eabi': 12.2.4
@@ -30339,11 +30342,12 @@ snapshots:
       hey-listen: 1.0.8
       tslib: 2.6.3
 
-  styled-jsx@5.0.2(@babel/core@7.24.7)(react@17.0.2):
+  styled-jsx@5.0.2(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react@17.0.2):
     dependencies:
       react: 17.0.2
     optionalDependencies:
       '@babel/core': 7.24.7
+      babel-plugin-macros: 3.1.0
 
   styled-jsx@5.0.2(react@18.2.0):
     dependencies:
