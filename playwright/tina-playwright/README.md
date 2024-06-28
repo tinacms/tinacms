@@ -2,8 +2,7 @@ This is a [Tina CMS](https://tina.io/) project for E2E testing.
 
 Run the test manually
 
-1. In this project directory run 'npm run dev' to start the project
-2. Run npx playwright test.
+1. In playwright/tina-playwright directory run 'npx playwright test' locally to run the e2e test
 
 ⚠️ Note
 
