@@ -49,7 +49,7 @@ export function tryGitInit(root: string): boolean {
     }
 
     execSync('git init', { stdio: 'ignore' })
-    didInit = false
+    didInit = true
 
     execSync('git checkout -b main', { stdio: 'ignore' })
 
