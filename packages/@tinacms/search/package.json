@@ -39,9 +39,7 @@
   "dependencies": {
     "@tinacms/graphql": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
-    "abstract-level": "^1.0.3",
     "memory-level": "^1.0.0",
-    "module-error": "^1.0.2",
     "node-fetch": "2",
     "search-index": "4.0.0",
     "sqlite-level": "^1.0.1",
