@@ -74,9 +74,7 @@ jobs:
 
   playwright:
     name: 'Playwright E2E on Tests'
-    runs-on: ubuntu-20.04
-    container:
-      image: mcr.microsoft.com/playwright:v1.44.1-jammy
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js environment
@@ -89,11 +87,13 @@ jobs:
         with:
           package_json_file: package.json
           run_install: false
+      - name: Install dependencies
+        run: pnpm install
       - name: Build root package
-        run: pnpm run build
-      - name: Start and test Playwright example project
-        run: |
-          cd playwright/tina-playwright
-          pnpm run dev &
-          npx wait-on http://localhost:3000
-          npx playwright test
+        run: pnpm build
+      - name: Install playwright
+        working-directory: playwright/tina-playwright
+        run: npx playwright install
+      - name: Run Playwright tests
+        working-directory: playwright/tina-playwright
+        run: npx playwright test
