@@ -69,7 +69,7 @@ jobs:
         run: pnpm types
 
       - name: Set NPMRC
-        run: echo "\n//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
@@ -83,12 +83,13 @@ jobs:
         if: matrix.channel == 'latest'
         run: |
           pnpm run publish
+
       - name: Push tags
         if: matrix.channel == 'latest'
         run: |
           pnpm push-tags
         env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Create release pull request
@@ -97,4 +98,4 @@ jobs:
         with:
           version: pnpm run version
         env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN  }}
