@@ -536,9 +536,11 @@ export function MediaPicker({
                 setSearchInput={setSearchInput}
                 onSearch={() => {
                   setList({ items: [], nextOffset: undefined })
+                  setOffsetHistory([])
                 }}
                 onClear={() => {
                   setList({ items: [], nextOffset: undefined })
+                  setOffsetHistory([])
                 }}
               />
             </div>
