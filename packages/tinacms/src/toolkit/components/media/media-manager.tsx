@@ -344,6 +344,7 @@ export function MediaPicker({
     if (!item) {
       setActiveItem(false)
     } else if (item.type === 'dir') {
+      setList({ items: [], nextOffset: undefined })
       // Only join when there is a directory to join to
       setDirectory(
         item.directory === '.' || item.directory === ''
@@ -526,7 +527,14 @@ export function MediaPicker({
           <div className="flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0">
             <div className="flex flex-1 items-center gap-4">
               <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
-              <Breadcrumb directory={directory} setDirectory={setDirectory} />
+              <Breadcrumb
+                directory={directory}
+                setDirectory={(dir: string) => {
+                  setList({ items: [], nextOffset: undefined })
+                  resetOffset()
+                  setDirectory(dir)
+                }}
+              />
               <SearchInput
                 enabled={cacheState.loaded}
                 loading={cacheState.loading}
@@ -536,11 +544,11 @@ export function MediaPicker({
                 setSearchInput={setSearchInput}
                 onSearch={() => {
                   setList({ items: [], nextOffset: undefined })
-                  setOffsetHistory([])
+                  resetOffset()
                 }}
                 onClear={() => {
                   setList({ items: [], nextOffset: undefined })
-                  setOffsetHistory([])
+                  resetOffset()
                 }}
               />
             </div>
@@ -552,7 +560,7 @@ export function MediaPicker({
                   variant="white"
                   onClick={() => {
                     setRefreshing(true)
-                    setOffsetHistory([])
+                    resetOffset()
                     setList({ items: [], nextOffset: undefined })
                   }}
                   className="whitespace-nowrap"
