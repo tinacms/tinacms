@@ -7,9 +7,15 @@ interface MediaItemProps {
   item: Media & { new?: boolean }
   onClick(_item: Media | false): void
   active: boolean
+  showDirectory?: boolean
 }
 
-export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
+export function ListMediaItem({
+  item,
+  onClick,
+  active,
+  showDirectory,
+}: MediaItemProps) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
   const thumbnail = (item.thumbnails || {})['75x75']
   return (
@@ -46,7 +52,9 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
       <span
         className={'text-base flex-grow w-full break-words truncate px-3 py-2'}
       >
-        {item.filename}
+        {showDirectory && item.directory
+          ? `${item.directory}/${item.filename}`
+          : item.filename}
       </span>
     </li>
   )

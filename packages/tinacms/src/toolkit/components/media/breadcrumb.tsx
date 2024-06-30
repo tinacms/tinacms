@@ -32,7 +32,7 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   }
 
   return (
-    <div className="w-full flex items-center text-[16px] text-gray-300">
+    <div className="flex items-center text-[16px] text-gray-300">
       {directory !== '' && (
         <IconButton
           variant="ghost"

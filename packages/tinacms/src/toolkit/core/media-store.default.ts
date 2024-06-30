@@ -351,26 +351,30 @@ export class TinaMediaStore implements MediaStore {
     const { cursor, files, directories } = await res.json()
 
     const items: Media[] = []
+    for (const dir of directories) {
+      const filename = dir.startsWith('/') ? dir.substr(1) : dir
+      items.push({
+        type: 'dir',
+        id: options.directory ? `${options.directory}/${filename}` : filename,
+        directory: options.directory || '',
+        filename,
+      })
+    }
+
     for (const file of files) {
+      const filename = file.filename.startsWith('/')
+        ? file.filename.startsWith('/')
+        : file.filename
       items.push({
         directory: options.directory || '',
         type: 'file',
-        id: file.filename,
-        filename: file.filename,
+        id: filename,
+        filename,
         src: file.src,
         thumbnails: options.thumbnailSizes.reduce((acc, { w, h }) => {
           acc[`${w}x${h}`] = this.genThumbnail(file.src, { w, h })
           return acc
         }, {}),
-      })
-    }
-
-    for (const dir of directories) {
-      items.push({
-        type: 'dir',
-        id: dir,
-        directory: options.directory || '',
-        filename: dir,
       })
     }
 

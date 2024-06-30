@@ -1,5 +1,6 @@
 import { EventBus } from './event'
 import { DummyMediaStore } from './media-store.default'
+import MiniSearch from 'minisearch'
 
 /**
  * Represents an individual file in the MediaStore
@@ -115,6 +116,15 @@ export interface MediaList {
  */
 export class MediaManager implements MediaStore {
   private _pageSize: number = 36
+  private loaded: boolean = false
+  private loading: boolean = false
+  private _mediaPages: {
+    [directory: string]: Media[]
+  } = {}
+  private minisearch = new MiniSearch({
+    fields: ['id', 'filename'],
+    storeFields: ['item'],
+  })
 
   constructor(public store: MediaStore, private events: EventBus) {}
 
@@ -143,6 +153,74 @@ export class MediaManager implements MediaStore {
 
   get accept() {
     return this.store.accept
+  }
+
+  async fetchDirectory(
+    directory: string | undefined,
+    thumbnailSizes: { w: number; h: number }[]
+  ) {
+    const results: Media[] = []
+    let offset: number = 0
+
+    while (true) {
+      const { items } = await this.store.list({
+        offset,
+        limit: this.pageSize,
+        thumbnailSizes,
+        directory,
+      })
+      if (!items || !items.length) break
+      for (const item of items) {
+        if (item.type !== 'dir') {
+          this.minisearch.add({
+            id: directory ? `${directory}/${item.id}` : item.id,
+            filename: item.filename,
+            item,
+          })
+        }
+        results.push(item)
+      }
+      offset += this.pageSize
+    }
+
+    let key = '.'
+    if (directory) {
+      key = directory
+    }
+
+    this._mediaPages[key] = results
+
+    for (const media of results) {
+      if (media.type === 'dir') {
+        await this.fetchDirectory(media.id, thumbnailSizes)
+      }
+    }
+  }
+
+  async refreshCache(
+    thumbnailSizes: { w: number; h: number }[],
+    callback?: (loading: boolean, loaded: boolean) => void
+  ) {
+    this.minisearch.removeAll()
+    callback && callback(true, false)
+    await this.fetchDirectory(undefined, thumbnailSizes)
+    callback && callback(false, true)
+    this.loaded = true
+  }
+
+  loadFromCache(options: MediaListOptions): MediaList {
+    const directory = options.directory || '.'
+    const media = this._mediaPages[directory]
+    if (!media) {
+      throw new Error(`No media found for directory: ${directory}`)
+    }
+
+    const offset = options.offset || 0
+    const limit = options.limit || this.pageSize
+    const start = offset as number
+    const end = start + limit
+    const items = media.slice(start, end)
+    return { items, nextOffset: end < media.length ? end : undefined }
   }
 
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
@@ -187,7 +265,34 @@ export class MediaManager implements MediaStore {
   async list(options: MediaListOptions): Promise<MediaList> {
     try {
       this.events.dispatch({ type: 'media:list:start', ...options })
-      const media = await this.store.list(options)
+      let media: MediaList
+      if (!this.loaded && !this.loading) {
+        media = await this.store.list(options)
+      } else {
+        media = this.loadFromCache(options)
+      }
+      this.events.dispatch({ type: 'media:list:success', ...options, media })
+      return media
+    } catch (error) {
+      this.events.dispatch({ type: 'media:list:failure', ...options, error })
+      throw error
+    }
+  }
+
+  async search(query: string, options: MediaListOptions): Promise<MediaList> {
+    try {
+      this.events.dispatch({ type: 'media:list:start', ...options })
+      let media: MediaList
+      if (this.loaded) {
+        const results = this.minisearch.search(query)
+        let items = results.map((result) => result.item)
+        const start = (options.offset || 0) as number
+        const end = start + (options.limit || this.pageSize)
+        items = items.slice(start, end)
+        media = { items, nextOffset: end < items.length ? end : undefined }
+      } else {
+        throw new Error('Media cache not loaded')
+      }
       this.events.dispatch({ type: 'media:list:success', ...options, media })
       return media
     } catch (error) {
