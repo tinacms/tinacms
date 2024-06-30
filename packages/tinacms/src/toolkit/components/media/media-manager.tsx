@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useEffect, useState } from 'react'
 import { useCMS } from '../../react-tinacms/use-cms'
 import {
@@ -9,6 +9,7 @@ import {
   BiGridAlt,
   BiLinkExternal,
   BiListUl,
+  BiSearch,
   BiX,
 } from 'react-icons/bi'
 import { Modal, ModalBody, FullscreenModal } from '@toolkit/react-modals'
@@ -22,7 +23,6 @@ import {
 import { Button, IconButton } from '@toolkit/styles'
 import * as dropzone from 'react-dropzone'
 import type { FileError } from 'react-dropzone'
-import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '@toolkit/form-builder'
@@ -37,6 +37,7 @@ import {
 import { DeleteModal, NewFolderModal } from './modal'
 import { CopyField } from './copy-field'
 import { createContext, useContext } from 'react'
+import { Input } from '@toolkit/fields/components/input'
 const { useDropzone } = dropzone
 // Can not use path.join on the frontend
 const join = function (...parts) {
@@ -116,6 +117,71 @@ const defaultListError = new MediaListError({
   docsLink: 'https://tina.io/docs/media/#media-store',
 })
 
+const SearchInput = ({
+  enabled,
+  loading,
+  search,
+  setSearch,
+  searchInput,
+  setSearchInput,
+  onSearch,
+  onClear,
+}) => {
+  const [searchLoaded, setSearchLoaded] = useState(false)
+  useEffect(() => {
+    if (loading) {
+      setSearchLoaded(false)
+    } else {
+      setSearchLoaded(true)
+    }
+  }, [loading])
+
+  return (
+    <form className="flex flex-1 flex-col gap-2 items-start w-full">
+      <div className="flex flex-wrap items-center gap-3 ">
+        <div className="flex-1 min-w-[200px]">
+          <Input
+            type="text"
+            name="search"
+            placeholder="Search"
+            value={searchInput}
+            onChange={(e) => {
+              setSearchInput(e.target.value)
+            }}
+            disabled={!enabled}
+          />
+        </div>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => {
+              setSearch(searchInput)
+              setSearchLoaded(false)
+              onSearch && onSearch()
+            }}
+            variant="primary"
+            disabled={!enabled}
+          >
+            <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
+          </Button>
+          {search && searchLoaded && (
+            <Button
+              onClick={() => {
+                setSearch('')
+                setSearchInput('')
+                onClear && onClear()
+              }}
+              variant="white"
+              disabled={!enabled}
+            >
+              Clear <BiX className="w-5 h-full ml-1 opacity-70" />
+            </Button>
+          )}
+        </div>
+      </div>
+    </form>
+  )
+}
+
 export function MediaPicker({
   allowDelete,
   onSelect,
@@ -143,6 +209,7 @@ export function MediaPicker({
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeItem, setActiveItem] = useState<Media | false>(false)
   const closePreview = () => setActiveItem(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   /**
    * current offset is last element in offsetHistory[]
@@ -156,40 +223,96 @@ export function MediaPicker({
     if (!list.nextOffset) return
     setOffsetHistory([...offsetHistory, list.nextOffset])
   }
-  const navigatePrev = () => {
-    const offsets = offsetHistory.slice(0, offsetHistory.length - 1)
-    setOffsetHistory(offsets)
-  }
-  const hasPrev = offsetHistory.length > 0
-  const hasNext = !!list.nextOffset
+
+  const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [cacheState, setCacheState] = useState({
+    loading: false,
+    loaded: false,
+  })
 
   function loadMedia() {
     setListState('loading')
+    if (!search) {
+      cms.media
+        .list({
+          offset,
+          limit: cms.media.pageSize,
+          directory,
+          thumbnailSizes: [
+            { w: 75, h: 75 },
+            { w: 400, h: 400 },
+            { w: 1000, h: 1000 },
+          ],
+        })
+        .then((_list) => {
+          setList({
+            items: [...list.items, ..._list.items],
+            nextOffset: _list.nextOffset,
+          })
+          setListState('loaded')
+        })
+        .catch((e) => {
+          console.error(e)
+          if (e.ERR_TYPE === 'MediaListError') {
+            setListError(e)
+          } else {
+            setListError(defaultListError)
+          }
+          setListState('error')
+        })
+    } else {
+      cms.media
+        .search(search, {
+          offset,
+          limit: cms.media.pageSize,
+          directory,
+          thumbnailSizes: [
+            { w: 75, h: 75 },
+            { w: 400, h: 400 },
+            { w: 1000, h: 1000 },
+          ],
+        })
+        .then((_list) => {
+          setList({
+            items: [...list.items, ..._list.items],
+            nextOffset: _list.nextOffset,
+          })
+          setListState('loaded')
+        })
+        .catch((e) => {
+          console.error(e)
+          if (e.ERR_TYPE === 'MediaListError') {
+            setListError(e)
+          } else {
+            setListError(defaultListError)
+          }
+          setListState('error')
+        })
+    }
+  }
+
+  useEffect(() => {
+    if (!refreshing) return
     cms.media
-      .list({
-        offset,
-        limit: cms.media.pageSize,
-        directory,
-        thumbnailSizes: [
+      .refreshCache(
+        [
           { w: 75, h: 75 },
           { w: 400, h: 400 },
           { w: 1000, h: 1000 },
         ],
-      })
-      .then((list) => {
-        setList(list)
-        setListState('loaded')
-      })
-      .catch((e) => {
-        console.error(e)
-        if (e.ERR_TYPE === 'MediaListError') {
-          setListError(e)
-        } else {
-          setListError(defaultListError)
+        (loading, loaded) => {
+          setCacheState({
+            loading,
+            loaded,
+          })
         }
-        setListState('error')
+      )
+      .then(() => {
+        loadMedia()
+        setRefreshing(false)
       })
-  }
+  }, [refreshing])
 
   useEffect(() => {
     if (!cms.media.isConfigured) return
@@ -199,7 +322,23 @@ export function MediaPicker({
       ['media:delete:success', 'media:pageSize'],
       loadMedia
     )
-  }, [offset, directory, cms.media.isConfigured])
+  }, [offset, directory, cms.media.isConfigured, search])
+
+  useEffect(() => {
+    cms.media.refreshCache(
+      [
+        { w: 75, h: 75 },
+        { w: 400, h: 400 },
+        { w: 1000, h: 1000 },
+      ],
+      (loading, loaded) => {
+        setCacheState({
+          loading,
+          loaded,
+        })
+      }
+    )
+  }, [])
 
   const onClickMediaItem = (item: Media) => {
     if (!item) {
@@ -232,6 +371,18 @@ export function MediaPicker({
       if (close) close()
     }
   }
+
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLUListElement>) => {
+      const bottom =
+        e.currentTarget.scrollHeight - e.currentTarget.scrollTop <
+        e.currentTarget.clientHeight + 10
+      if (bottom) {
+        navigateNext()
+      }
+    },
+    [navigateNext]
+  )
 
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -321,7 +472,7 @@ export function MediaPicker({
 
   useEffect(disableScrollBody, [])
 
-  if (listState === 'loading' || uploading) {
+  if ((listState === 'loading' && !list?.items?.length) || uploading) {
     return <LoadingMediaList extraText={loadingText} />
   }
 
@@ -376,6 +527,22 @@ export function MediaPicker({
             <div className="flex flex-1 items-center gap-4">
               <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
               <Breadcrumb directory={directory} setDirectory={setDirectory} />
+              <SearchInput
+                enabled={cacheState.loaded}
+                loading={cacheState.loading}
+                search={search}
+                setSearch={setSearch}
+                searchInput={searchInput}
+                setSearchInput={setSearchInput}
+                onSearch={() => {
+                  setSearching(true)
+                  setList({ items: [], nextOffset: undefined })
+                }}
+                onClear={() => {
+                  setSearching(false)
+                  setList({ items: [], nextOffset: undefined })
+                }}
+              />
             </div>
 
             {cms.media.store.isStatic ? null : (
@@ -383,7 +550,11 @@ export function MediaPicker({
                 <Button
                   busy={false}
                   variant="white"
-                  onClick={loadMedia}
+                  onClick={() => {
+                    setRefreshing(true)
+                    setOffsetHistory([])
+                    setList({ items: [], nextOffset: undefined })
+                  }}
                   className="whitespace-nowrap"
                 >
                   Refresh
@@ -408,6 +579,7 @@ export function MediaPicker({
           <div className="flex h-full overflow-hidden bg-white">
             <div className="flex w-full flex-col h-full @container">
               <ul
+                onScroll={handleScroll}
                 {...rootProps}
                 className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
                   list.items.length === 0 ||
@@ -428,32 +600,32 @@ export function MediaPicker({
                 {viewMode === 'list' &&
                   list.items.map((item: Media) => (
                     <ListMediaItem
-                      key={item.id}
+                      key={`${item.directory}/${item.id}`}
                       item={item}
                       onClick={onClickMediaItem}
-                      active={activeItem && activeItem.id === item.id}
+                      active={
+                        activeItem &&
+                        activeItem.id === item.id &&
+                        activeItem.directory === item.directory
+                      }
+                      showDirectory={!!search}
                     />
                   ))}
 
                 {viewMode === 'grid' &&
                   list.items.map((item: Media) => (
                     <GridMediaItem
-                      key={item.id}
+                      key={`${item.directory}/${item.id}`}
                       item={item}
                       onClick={onClickMediaItem}
-                      active={activeItem && activeItem.id === item.id}
+                      active={
+                        activeItem &&
+                        activeItem.id === item.id &&
+                        activeItem.directory === item.directory
+                      }
                     />
                   ))}
               </ul>
-
-              <div className="bg-gradient-to-r to-gray-50/50 from-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
-                <CursorPaginator
-                  hasNext={hasNext}
-                  navigateNext={navigateNext}
-                  hasPrev={hasPrev}
-                  navigatePrev={navigatePrev}
-                />
-              </div>
             </div>
 
             <ActiveItemPreview
