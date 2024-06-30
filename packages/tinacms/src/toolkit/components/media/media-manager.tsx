@@ -535,11 +535,9 @@ export function MediaPicker({
                 searchInput={searchInput}
                 setSearchInput={setSearchInput}
                 onSearch={() => {
-                  setSearching(true)
                   setList({ items: [], nextOffset: undefined })
                 }}
                 onClear={() => {
-                  setSearching(false)
                   setList({ items: [], nextOffset: undefined })
                 }}
               />
