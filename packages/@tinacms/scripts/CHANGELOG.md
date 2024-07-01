@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.5
+
+### Patch Changes
+
+- dffa355: Remove yarn for pnpm
+
 ## 1.1.4
 
 ### Patch Changes

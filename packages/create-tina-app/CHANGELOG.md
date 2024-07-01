@@ -1,5 +1,13 @@
 # create-tina-app
 
+## 1.1.1
+
+### Patch Changes
+
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [dffa355]
+  - @tinacms/metrics@1.0.3
+
 ## 1.1.0
 
 ### Minor Changes

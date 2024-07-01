@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.4.17
+
+### Patch Changes
+
+- dffa355: Remove yarn for pnpm
+
 ## 1.4.16
 
 ### Patch Changes

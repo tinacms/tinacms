@@ -1,5 +1,15 @@
 # @tinacms/search
 
+## 1.0.21
+
+### Patch Changes
+
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [76c1a2e]
+- Updated dependencies [dffa355]
+  - @tinacms/graphql@1.4.36
+  - @tinacms/schema-tools@1.4.17
+
 ## 1.0.20
 
 ### Patch Changes
