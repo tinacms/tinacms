@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 1.4.36
+
+### Patch Changes
+
+- 76c1a2e: Fix issue where empty folders were not visible #4566
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [dffa355]
+  - @tinacms/schema-tools@1.4.17
+  - @tinacms/mdx@1.3.26
+
 ## 1.4.35
 
 ### Patch Changes

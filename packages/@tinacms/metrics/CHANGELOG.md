@@ -1,5 +1,11 @@
 # @tinacms/metrics
 
+## 1.0.3
+
+### Patch Changes
+
+- dffa355: Remove yarn for pnpm
+
 ## 1.0.2
 
 ### Patch Changes

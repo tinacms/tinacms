@@ -1,5 +1,16 @@
 # tinacms
 
+## 1.6.5
+
+### Patch Changes
+
+- 04f0bf3: CMS - Fix broken link in error message of CMS startup. Broken link was replaced by https://tina.io/docs/tina-cloud/overview
+- Updated dependencies [dffa355]
+  - @tinacms/schema-tools@1.4.17
+  - @tinacms/search@1.0.21
+  - @tinacms/mdx@1.3.26
+  - @tinacms/sharedctx@1.0.2
+
 ## 1.6.4
 
 ### Patch Changes
