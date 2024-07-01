@@ -218,7 +218,7 @@ export class Codegen {
       throw new Error(
         `Client not configured properly. Missing ${missing.join(
           ', '
-        )}. Please visit https://tina.io/docs/tina-cloud/deployment-options/vercel/ for more information`
+        )}. Please visit https://tina.io/docs/tina-cloud/overview/#deploying-your-site-with-the-tinacms-admin for more information`
       )
     }
     let localUrl = `http://localhost:${this.port}/graphql`
