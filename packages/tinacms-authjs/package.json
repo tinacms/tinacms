@@ -29,7 +29,7 @@
     "@tinacms/datalayer": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "next": "12.3.4",
-    "next-auth": "4.22.1",
+    "next-auth": "4.24.5",
     "react": "^18",
     "react-dom": "^18",
     "tinacms": "workspace:*",
