@@ -16,5 +16,8 @@
   "keywords": [
     "tinacms",
     "webpack"
-  ]
+  ],
+  "dependencies": {
+    "typescript": "4.6.4"
+  }
 }

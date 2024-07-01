@@ -19,7 +19,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-is": "^18.2.0",
-    "tinacms": "workspace:*"
+    "tinacms": "workspace:*",
+    "typescript": "4.6.4"
   },
   "devDependencies": {
     "@tinacms/cli": "workspace:*",
