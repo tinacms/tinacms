@@ -37,6 +37,7 @@ You need to setup S3 Bucket and IAM user correctly.
 
     "s3:ListBucket",
     "s3:PutObject",
+    "s3:PutObjectAcl",
     "s3:DeleteObject"
 
 - The S3 bucket should have ACLs enabled.
@@ -71,6 +72,15 @@ You need to setup S3 Bucket and IAM user correctly.
                     "s3:DeleteObject"
                 ],
                 "Resource": "arn:aws:s3:::<S3-Bucket-NAME>/*"
+            },
+            {
+                "Sid": "ListBucket",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "<ARN of the IAM user>"
+                },
+                "Action": "s3:ListBucket",
+                "Resource": "arn:aws:s3:::<S3-Bucket-NAME>"
             }
         ]
     }
