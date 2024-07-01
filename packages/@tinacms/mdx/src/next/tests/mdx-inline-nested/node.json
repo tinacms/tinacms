@@ -1,0 +1,62 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Hello "
+        },
+        {
+          "type": "mdxJsxTextElement",
+          "name": "dropBox",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ],
+          "props": {
+            "title": "Hello tere",
+            "body": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "h1",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "This is some more rich-text with "
+                    },
+                    {
+                      "type": "mdxJsxTextElement",
+                      "name": "dropBox",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": ""
+                        }
+                      ],
+                      "props": {
+                        "title": "Hi again"
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "text": " nested inside of it"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "text",
+          "text": " and we're continuing with the rest of the sentence."
+        }
+      ]
+    }
+  ]
+}
