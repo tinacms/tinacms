@@ -16,6 +16,8 @@ import {
   ELEMENT_H5,
   ELEMENT_H6,
   KEYS_HEADING,
+  ELEMENT_LIC,
+  ELEMENT_TD,
 } from '@udecode/plate-headless'
 import { createSoftBreakPlugin } from '../soft-break'
 import { autoformatRules } from './autoformat/autoformat-rules'
@@ -30,6 +32,8 @@ export const HANDLES_MDX = [
   ELEMENT_H5,
   ELEMENT_H6,
   ELEMENT_PARAGRAPH,
+  ELEMENT_LIC,
+  ELEMENT_TD,
 ]
 
 const resetBlockTypesCommonRule = {
