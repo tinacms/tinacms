@@ -11,6 +11,9 @@ export const stringifyMDX = (
   if (!value) {
     return
   }
+  // We want to retain the JSON structure of the Slate Document, so we return the value as it is
+  return value
+
   const mdTree = preProcess(value, field, imageCallback)
   return toTinaMarkdown(mdTree, field)
 }
