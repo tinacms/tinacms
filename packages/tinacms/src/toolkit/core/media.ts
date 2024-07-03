@@ -121,7 +121,6 @@ export class MediaManager implements MediaStore {
   private _mediaPages: {
     [directory: string]: Media[]
   } = {}
-  // @ts-ignore
   private minisearch = new MiniSearch({
     fields: ['id', 'filename'],
     storeFields: ['item'],

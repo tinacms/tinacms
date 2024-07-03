@@ -94,7 +94,7 @@
     "is-hotkey": "^0.2.0",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
-    "minisearch": "^6.3.0",
+    "minisearch": "5.1.0",
     "moment": "2.29.4",
     "monaco-editor": "0.31.0",
     "prism-react-renderer": "^2.0.6",
