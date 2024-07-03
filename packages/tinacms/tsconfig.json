@@ -6,7 +6,8 @@
     "baseUrl": "./",
     "paths": {
       "@tinacms/toolkit": ["./src/toolkit/index.ts"],
-      "@toolkit/*": ["./src/toolkit/*"]
+      "@toolkit/*": ["./src/toolkit/*"],
+      "minisearch": ["./src/empty-module.ts"]
     },
   },
   "exclude": [
