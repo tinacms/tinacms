@@ -115,7 +115,7 @@ export interface MediaList {
  * ```
  */
 export class MediaManager implements MediaStore {
-  private _pageSize: number = 36
+  private _pageSize: number = 100
   private loaded: boolean = false
   private loading: boolean = false
   private _mediaPages: {

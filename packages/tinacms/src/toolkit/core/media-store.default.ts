@@ -62,6 +62,7 @@ export class TinaMediaStore implements MediaStore {
   private isLocal: boolean
   private url: string
   private staticMedia: StaticMedia
+  private lastAuth: number = 0
   isStatic?: boolean
 
   constructor(cms: CMS, staticMedia?: StaticMedia) {
@@ -100,7 +101,18 @@ export class TinaMediaStore implements MediaStore {
 
   async isAuthenticated() {
     this.setup()
-    return await this.api.authProvider.isAuthenticated()
+
+    // If we've authenticated in the last 5 minutes, return true
+    if (this.lastAuth && Date.now() - this.lastAuth < 1000 * 60 * 5) {
+      return true
+    }
+
+    // Otherwise, check if we're authenticated
+    const authenticated = await this.api.authProvider.isAuthenticated()
+    if (authenticated) {
+      this.lastAuth = Date.now()
+    }
+    return authenticated
   }
 
   accept = DEFAULT_MEDIA_UPLOAD_TYPES
