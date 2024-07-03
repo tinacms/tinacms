@@ -1,0 +1,99 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Hello, world"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Hero",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "subTitle": {
+          "type": "root",
+          "children": [
+            {
+              "type": "h2",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Some slogan"
+                }
+              ]
+            },
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "Cta",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "props": {
+                "title": "Get Started"
+              }
+            }
+          ]
+        },
+        "config": {
+          "variant": "primary"
+        },
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "h1",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Welcome to my website"
+                }
+              ]
+            },
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "Cta",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "props": {
+                "title": "Get Started",
+                "actions": [
+                  {
+                    "_template": "popup",
+                    "title": "Click Here!",
+                    "body": "please?"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "More here"
+        }
+      ]
+    }
+  ]
+}
