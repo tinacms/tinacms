@@ -64,6 +64,9 @@ importers:
       mime-types:
         specifier: ^2.1.35
         version: 2.1.35
+      next:
+        specifier: 14.2.3
+        version: 14.2.3(@playwright/test@1.45.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       prettier:
         specifier: ^2.8.4
         version: 2.8.8
@@ -130,7 +133,7 @@ importers:
         version: link:../../packages/@tinacms/cli
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -322,7 +325,7 @@ importers:
     dependencies:
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -545,7 +548,7 @@ importers:
         version: 0.29.14
       jest:
         specifier: ^29.5.0
-        version: 29.7.0(@types/node@20.14.7)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
+        version: 29.7.0(@types/node@14.18.63)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
       jest-diff:
         specifier: ^29.5.0
         version: 29.7.0
@@ -554,7 +557,7 @@ importers:
         version: 29.7.0
       next:
         specifier: 12.2.4
-        version: 12.2.4(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       nodemon:
         specifier: 2.0.19
         version: 2.0.19
@@ -605,13 +608,13 @@ importers:
         version: 6.3.1
       '@tailwindcss/aspect-ratio':
         specifier: ^0.4.0
-        version: 0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))
+        version: 0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))
       '@tailwindcss/line-clamp':
         specifier: ^0.3.1
-        version: 0.3.1(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))
+        version: 0.3.1(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))
       '@tailwindcss/typography':
         specifier: ^0.5.9
-        version: 0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))
+        version: 0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))
       '@tinacms/app':
         specifier: workspace:*
         version: link:../app
@@ -632,7 +635,7 @@ importers:
         version: link:../search
       '@vitejs/plugin-react':
         specifier: 3.1.0
-        version: 3.1.0(vite@4.5.3(@types/node@14.18.63))
+        version: 3.1.0(vite@4.5.3(@types/node@20.14.7))
       ajv:
         specifier: ^6.12.3
         version: 6.12.6
@@ -746,7 +749,7 @@ importers:
         version: 5.12.0(rollup@3.29.4)
       tailwindcss:
         specifier: ^3.2.7
-        version: 3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
+        version: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
       tinacms:
         specifier: workspace:*
         version: link:../../tinacms
@@ -761,7 +764,7 @@ importers:
         version: 1.0.3
       vite:
         specifier: ^4.3.9
-        version: 4.5.3(@types/node@14.18.63)
+        version: 4.5.3(@types/node@20.14.7)
       yup:
         specifier: ^0.32.9
         version: 0.32.11
@@ -828,7 +831,7 @@ importers:
         version: 0.29.14
       jest:
         specifier: ^29.5.0
-        version: 29.7.0(@types/node@14.18.63)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
+        version: 29.7.0(@types/node@20.14.7)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
 
   packages/@tinacms/datalayer:
     dependencies:
@@ -1490,7 +1493,7 @@ importers:
         version: 13.13.52
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -1527,7 +1530,7 @@ importers:
         version: 13.13.52
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -1570,7 +1573,7 @@ importers:
         version: 17.0.47
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -1826,7 +1829,7 @@ importers:
         version: 0.5.0
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -4812,6 +4815,12 @@ packages:
         integrity: sha512-Yac/bV5sBGkkEXmAX5FWPS9Mmo2rthrOPRQQNfycJPkjUAUclomCPH7QFVCDQ4Mp2k2K1SSM6m0zrxYrOwtFQw==,
       }
 
+  '@next/env@14.2.3':
+    resolution:
+      {
+        integrity: sha512-W7fd7IbkfmeeY2gXrzJYDx8D2lWKbVoTIj1o1ScPHNzvp30s1AuoEFSdr39bC5sjxJaxTtq3OTCZboNp0lNWHA==,
+      }
+
   '@next/eslint-plugin-next@12.0.3':
     resolution:
       {
@@ -4936,6 +4945,15 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
+  '@next/swc-darwin-arm64@14.2.3':
+    resolution:
+      {
+        integrity: sha512-3pEYo/RaGqPP0YzwnlmPN2puaF2WMLM3apt5jLW2fFdXD9+pqcoTzRk+iZsf8ta7+quAe4Q6Ms0nR0SFGFdS1A==,
+      }
+    engines: { node: '>= 10' }
+    cpu: [arm64]
+    os: [darwin]
+
   '@next/swc-darwin-x64@12.0.4':
     resolution:
       {
@@ -4967,6 +4985,15 @@ packages:
     resolution:
       {
         integrity: sha512-6cgBfxg98oOCSr4BckWjLLgiVwlL3vlLj8hXg2b+nDgm4bC/qVXXLfpLB9FHdoDu4057hzywbxKvmYGmi7yUzA==,
+      }
+    engines: { node: '>= 10' }
+    cpu: [x64]
+    os: [darwin]
+
+  '@next/swc-darwin-x64@14.2.3':
+    resolution:
+      {
+        integrity: sha512-6adp7waE6P1TYFSXpY366xwsOnEXM+y1kgRpjSRVI2CBDOcbRjsJ67Z6EgKIqWIue52d2q/Mx8g9MszARj8IEA==,
       }
     engines: { node: '>= 10' }
     cpu: [x64]
@@ -5053,6 +5080,15 @@ packages:
     cpu: [arm64]
     os: [linux]
 
+  '@next/swc-linux-arm64-gnu@14.2.3':
+    resolution:
+      {
+        integrity: sha512-cuzCE/1G0ZSnTAHJPUT1rPgQx1w5tzSX7POXSLaS7w2nIUJUD+e25QoXD/hMfxbsT9rslEXugWypJMILBj/QsA==,
+      }
+    engines: { node: '>= 10' }
+    cpu: [arm64]
+    os: [linux]
+
   '@next/swc-linux-arm64-musl@12.0.4':
     resolution:
       {
@@ -5084,6 +5120,15 @@ packages:
     resolution:
       {
         integrity: sha512-cGd+H8amifT86ZldVJtAKDxUqeFyLWW+v2NlBULnLAdWsiuuN8TuhVBt8ZNpCqcAuoruoSWynvMWixTFcroq+Q==,
+      }
+    engines: { node: '>= 10' }
+    cpu: [arm64]
+    os: [linux]
+
+  '@next/swc-linux-arm64-musl@14.2.3':
+    resolution:
+      {
+        integrity: sha512-0D4/oMM2Y9Ta3nGuCcQN8jjJjmDPYpHX9OJzqk42NZGJocU2MqhBq5tWkJrUQOQY9N+In9xOdymzapM09GeiZw==,
       }
     engines: { node: '>= 10' }
     cpu: [arm64]
@@ -5125,6 +5170,15 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@next/swc-linux-x64-gnu@14.2.3':
+    resolution:
+      {
+        integrity: sha512-ENPiNnBNDInBLyUU5ii8PMQh+4XLr4pG51tOp6aJ9xqFQ2iRI6IH0Ds2yJkAzNV1CfyagcyzPfROMViS2wOZ9w==,
+      }
+    engines: { node: '>= 10' }
+    cpu: [x64]
+    os: [linux]
+
   '@next/swc-linux-x64-musl@12.0.4':
     resolution:
       {
@@ -5156,6 +5210,15 @@ packages:
     resolution:
       {
         integrity: sha512-CFHvP9Qz98NruJiUnCe61O6GveKKHpJLloXbDSWRhqhkJdZD2zU5hG+gtVJR//tyW897izuHpM6Gtf6+sNgJPQ==,
+      }
+    engines: { node: '>= 10' }
+    cpu: [x64]
+    os: [linux]
+
+  '@next/swc-linux-x64-musl@14.2.3':
+    resolution:
+      {
+        integrity: sha512-BTAbq0LnCbF5MtoM7I/9UeUu/8ZBY0i8SFjUMCbPDOLv+un67e2JgyN4pmgfXBwy/I+RHu8q+k+MCkDN6P9ViQ==,
       }
     engines: { node: '>= 10' }
     cpu: [x64]
@@ -5197,6 +5260,15 @@ packages:
     cpu: [arm64]
     os: [win32]
 
+  '@next/swc-win32-arm64-msvc@14.2.3':
+    resolution:
+      {
+        integrity: sha512-AEHIw/dhAMLNFJFJIJIyOFDzrzI5bAjI9J26gbO5xhAKHYTZ9Or04BesFPXiAYXDNdrwTP2dQceYA4dL1geu8A==,
+      }
+    engines: { node: '>= 10' }
+    cpu: [arm64]
+    os: [win32]
+
   '@next/swc-win32-ia32-msvc@12.0.4':
     resolution:
       {
@@ -5233,6 +5305,15 @@ packages:
     cpu: [ia32]
     os: [win32]
 
+  '@next/swc-win32-ia32-msvc@14.2.3':
+    resolution:
+      {
+        integrity: sha512-vga40n1q6aYb0CLrM+eEmisfKCR45ixQYXuBXxOOmmoV8sYST9k7E3US32FsY+CkkF7NtzdcebiFT4CHuMSyZw==,
+      }
+    engines: { node: '>= 10' }
+    cpu: [ia32]
+    os: [win32]
+
   '@next/swc-win32-x64-msvc@12.0.4':
     resolution:
       {
@@ -5264,6 +5345,15 @@ packages:
     resolution:
       {
         integrity: sha512-Cqfe1YmOS7k+5mGu92nl5ULkzpKuxJrP3+4AEuPmrpFZ3BHxTY3TnHmU1On3bFmFFs6FbTcdF58CCUProGpIGQ==,
+      }
+    engines: { node: '>= 10' }
+    cpu: [x64]
+    os: [win32]
+
+  '@next/swc-win32-x64-msvc@14.2.3':
+    resolution:
+      {
+        integrity: sha512-Q1/zm43RWynxrO7lW4ehciQVj+5ePBhOK+/K2P7pLFX3JaJ/IZVC69SHidrmZSOkqz7ECIOhhy7XhAFG4JYyHA==,
       }
     engines: { node: '>= 10' }
     cpu: [x64]
@@ -6530,6 +6620,12 @@ packages:
       }
     engines: { node: '>=14' }
 
+  '@swc/counter@0.1.3':
+    resolution:
+      {
+        integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==,
+      }
+
   '@swc/helpers@0.4.11':
     resolution:
       {
@@ -6552,6 +6648,12 @@ packages:
     resolution:
       {
         integrity: sha512-E4KcWTpoLHqwPHLxidpOqQbcrZVgi0rsmmZXUle1jXmJfuIf/UWpczUJ7MZZ5tlxytgJXyp0w4PGkkeLiuIdZw==,
+      }
+
+  '@swc/helpers@0.5.5':
+    resolution:
+      {
+        integrity: sha512-KGYxvIOXcceOAbEk4bi/dVLEK9z8sZ0uBB3Il5b1rhfClSpcX0yfRO0KmTkqR2cnQDymwLB+25ZyMzICg/cm/A==,
       }
 
   '@szmarczak/http-timer@4.0.6':
@@ -15082,6 +15184,27 @@ packages:
       sass:
         optional: true
 
+  next@14.2.3:
+    resolution:
+      {
+        integrity: sha512-dowFkFTR8v79NPJO4QsBUtxv0g9BrS/phluVpMAt2ku7H+cbcBJlopXjkWlwxrk/xGqMemr7JkGPGemPrLLX7A==,
+      }
+    engines: { node: '>=18.17.0' }
+    hasBin: true
+    peerDependencies:
+      '@opentelemetry/api': ^1.1.0
+      '@playwright/test': ^1.41.2
+      react: ^18.2.0
+      react-dom: ^18.2.0
+      sass: ^1.3.0
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
+      '@playwright/test':
+        optional: true
+      sass:
+        optional: true
+
   ngraminator@3.0.2:
     resolution:
       {
@@ -22571,6 +22694,8 @@ snapshots:
 
   '@next/env@13.5.6': {}
 
+  '@next/env@14.2.3': {}
+
   '@next/eslint-plugin-next@12.0.3':
     dependencies:
       glob: 7.1.7
@@ -22628,6 +22753,9 @@ snapshots:
   '@next/swc-darwin-arm64@13.5.6':
     optional: true
 
+  '@next/swc-darwin-arm64@14.2.3':
+    optional: true
+
   '@next/swc-darwin-x64@12.0.4':
     optional: true
 
@@ -22638,6 +22766,9 @@ snapshots:
     optional: true
 
   '@next/swc-darwin-x64@13.5.6':
+    optional: true
+
+  '@next/swc-darwin-x64@14.2.3':
     optional: true
 
   '@next/swc-freebsd-x64@12.2.4':
@@ -22667,6 +22798,9 @@ snapshots:
   '@next/swc-linux-arm64-gnu@13.5.6':
     optional: true
 
+  '@next/swc-linux-arm64-gnu@14.2.3':
+    optional: true
+
   '@next/swc-linux-arm64-musl@12.0.4':
     optional: true
 
@@ -22677,6 +22811,9 @@ snapshots:
     optional: true
 
   '@next/swc-linux-arm64-musl@13.5.6':
+    optional: true
+
+  '@next/swc-linux-arm64-musl@14.2.3':
     optional: true
 
   '@next/swc-linux-x64-gnu@12.0.4':
@@ -22691,6 +22828,9 @@ snapshots:
   '@next/swc-linux-x64-gnu@13.5.6':
     optional: true
 
+  '@next/swc-linux-x64-gnu@14.2.3':
+    optional: true
+
   '@next/swc-linux-x64-musl@12.0.4':
     optional: true
 
@@ -22701,6 +22841,9 @@ snapshots:
     optional: true
 
   '@next/swc-linux-x64-musl@13.5.6':
+    optional: true
+
+  '@next/swc-linux-x64-musl@14.2.3':
     optional: true
 
   '@next/swc-win32-arm64-msvc@12.0.4':
@@ -22715,6 +22858,9 @@ snapshots:
   '@next/swc-win32-arm64-msvc@13.5.6':
     optional: true
 
+  '@next/swc-win32-arm64-msvc@14.2.3':
+    optional: true
+
   '@next/swc-win32-ia32-msvc@12.0.4':
     optional: true
 
@@ -22727,6 +22873,9 @@ snapshots:
   '@next/swc-win32-ia32-msvc@13.5.6':
     optional: true
 
+  '@next/swc-win32-ia32-msvc@14.2.3':
+    optional: true
+
   '@next/swc-win32-x64-msvc@12.0.4':
     optional: true
 
@@ -22737,6 +22886,9 @@ snapshots:
     optional: true
 
   '@next/swc-win32-x64-msvc@13.5.6':
+    optional: true
+
+  '@next/swc-win32-x64-msvc@14.2.3':
     optional: true
 
   '@nodelib/fs.scandir@2.1.5':
@@ -23922,6 +24074,8 @@ snapshots:
       - supports-color
       - typescript
 
+  '@swc/counter@0.1.3': {}
+
   '@swc/helpers@0.4.11':
     dependencies:
       tslib: 2.6.3
@@ -23938,13 +24092,18 @@ snapshots:
     dependencies:
       tslib: 2.6.3
 
+  '@swc/helpers@0.5.5':
+    dependencies:
+      '@swc/counter': 0.1.3
+      tslib: 2.6.3
+
   '@szmarczak/http-timer@4.0.6':
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tailwindcss/aspect-ratio@0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))':
+  '@tailwindcss/aspect-ratio@0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))':
     dependencies:
-      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
+      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
 
   '@tailwindcss/aspect-ratio@0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5)))':
     dependencies:
@@ -23954,21 +24113,13 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5))
 
-  '@tailwindcss/line-clamp@0.3.1(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))':
+  '@tailwindcss/line-clamp@0.3.1(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))':
     dependencies:
-      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
+      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
 
   '@tailwindcss/line-clamp@0.3.1(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5)))':
     dependencies:
       tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5))
-
-  '@tailwindcss/typography@0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))':
-    dependencies:
-      lodash.castarray: 4.4.0
-      lodash.isplainobject: 4.0.6
-      lodash.merge: 4.6.2
-      postcss-selector-parser: 6.0.10
-      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
 
   '@tailwindcss/typography@0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.9.5)))':
     dependencies:
@@ -23985,6 +24136,14 @@ snapshots:
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@16.18.98)(typescript@4.9.5))
+
+  '@tailwindcss/typography@0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))':
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
 
   '@tailwindcss/typography@0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5)))':
     dependencies:
@@ -25938,14 +26097,14 @@ snapshots:
 
   '@vercel/stega@0.0.5': {}
 
-  '@vitejs/plugin-react@3.1.0(vite@4.5.3(@types/node@14.18.63))':
+  '@vitejs/plugin-react@3.1.0(vite@4.5.3(@types/node@20.14.7))':
     dependencies:
       '@babel/core': 7.24.7
       '@babel/plugin-transform-react-jsx-self': 7.24.7(@babel/core@7.24.7)
       '@babel/plugin-transform-react-jsx-source': 7.24.7(@babel/core@7.24.7)
       magic-string: 0.27.0
       react-refresh: 0.14.2
-      vite: 4.5.3(@types/node@14.18.63)
+      vite: 4.5.3(@types/node@20.14.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -31395,7 +31554,7 @@ snapshots:
       - supports-color
       - webpack
 
-  next@12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
+  next@12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
     dependencies:
       '@next/env': 12.2.4
       '@swc/helpers': 0.4.3
@@ -31403,35 +31562,7 @@ snapshots:
       postcss: 8.4.14
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
-      styled-jsx: 5.0.2(@babel/core@7.24.7)(react@17.0.2)
-      use-sync-external-store: 1.2.0(react@17.0.2)
-    optionalDependencies:
-      '@next/swc-android-arm-eabi': 12.2.4
-      '@next/swc-android-arm64': 12.2.4
-      '@next/swc-darwin-arm64': 12.2.4
-      '@next/swc-darwin-x64': 12.2.4
-      '@next/swc-freebsd-x64': 12.2.4
-      '@next/swc-linux-arm-gnueabihf': 12.2.4
-      '@next/swc-linux-arm64-gnu': 12.2.4
-      '@next/swc-linux-arm64-musl': 12.2.4
-      '@next/swc-linux-x64-gnu': 12.2.4
-      '@next/swc-linux-x64-musl': 12.2.4
-      '@next/swc-win32-arm64-msvc': 12.2.4
-      '@next/swc-win32-ia32-msvc': 12.2.4
-      '@next/swc-win32-x64-msvc': 12.2.4
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
-
-  next@12.2.4(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
-    dependencies:
-      '@next/env': 12.2.4
-      '@swc/helpers': 0.4.3
-      caniuse-lite: 1.0.30001628
-      postcss: 8.4.14
-      react: 17.0.2
-      react-dom: 17.0.2(react@17.0.2)
-      styled-jsx: 5.0.2(babel-plugin-macros@3.1.0)(react@17.0.2)
+      styled-jsx: 5.0.2(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react@17.0.2)
       use-sync-external-store: 1.2.0(react@17.0.2)
     optionalDependencies:
       '@next/swc-android-arm-eabi': 12.2.4
@@ -31528,6 +31659,32 @@ snapshots:
       '@next/swc-win32-arm64-msvc': 13.5.6
       '@next/swc-win32-ia32-msvc': 13.5.6
       '@next/swc-win32-x64-msvc': 13.5.6
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+
+  next@14.2.3(@playwright/test@1.45.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+    dependencies:
+      '@next/env': 14.2.3
+      '@swc/helpers': 0.5.5
+      busboy: 1.6.0
+      caniuse-lite: 1.0.30001628
+      graceful-fs: 4.2.11
+      postcss: 8.4.31
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      styled-jsx: 5.1.1(@babel/core@7.24.7)(react@18.2.0)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 14.2.3
+      '@next/swc-darwin-x64': 14.2.3
+      '@next/swc-linux-arm64-gnu': 14.2.3
+      '@next/swc-linux-arm64-musl': 14.2.3
+      '@next/swc-linux-x64-gnu': 14.2.3
+      '@next/swc-linux-x64-musl': 14.2.3
+      '@next/swc-win32-arm64-msvc': 14.2.3
+      '@next/swc-win32-ia32-msvc': 14.2.3
+      '@next/swc-win32-x64-msvc': 14.2.3
+      '@playwright/test': 1.45.0
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
@@ -31955,14 +32112,6 @@ snapshots:
       postcss: 8.4.38
       ts-node: 10.9.2(@types/node@20.14.7)(typescript@4.9.5)
 
-  postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)):
-    dependencies:
-      lilconfig: 3.1.1
-      yaml: 2.4.3
-    optionalDependencies:
-      postcss: 8.4.38
-      ts-node: 10.9.2(@types/node@14.18.63)(typescript@4.3.5)
-
   postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.9.5)):
     dependencies:
       lilconfig: 3.1.1
@@ -31978,6 +32127,14 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.38
       ts-node: 10.9.2(@types/node@16.18.98)(typescript@4.9.5)
+
+  postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)):
+    dependencies:
+      lilconfig: 3.1.1
+      yaml: 2.4.3
+    optionalDependencies:
+      postcss: 8.4.38
+      ts-node: 10.9.2(@types/node@20.14.7)(typescript@4.3.5)
 
   postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5)):
     dependencies:
@@ -33300,16 +33457,11 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.24.7
 
-  styled-jsx@5.0.2(@babel/core@7.24.7)(react@17.0.2):
+  styled-jsx@5.0.2(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react@17.0.2):
     dependencies:
       react: 17.0.2
     optionalDependencies:
       '@babel/core': 7.24.7
-
-  styled-jsx@5.0.2(babel-plugin-macros@3.1.0)(react@17.0.2):
-    dependencies:
-      react: 17.0.2
-    optionalDependencies:
       babel-plugin-macros: 3.1.0
 
   styled-jsx@5.0.2(react@18.2.0):
@@ -33392,33 +33544,6 @@ snapshots:
       string-width: 4.2.3
       strip-ansi: 6.0.1
 
-  tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)):
-    dependencies:
-      '@alloc/quick-lru': 5.2.0
-      arg: 5.0.2
-      chokidar: 3.6.0
-      didyoumean: 1.2.2
-      dlv: 1.1.3
-      fast-glob: 3.3.2
-      glob-parent: 6.0.2
-      is-glob: 4.0.3
-      jiti: 1.21.3
-      lilconfig: 2.1.0
-      micromatch: 4.0.5
-      normalize-path: 3.0.0
-      object-hash: 3.0.0
-      picocolors: 1.0.1
-      postcss: 8.4.38
-      postcss-import: 15.1.0(postcss@8.4.38)
-      postcss-js: 4.0.1(postcss@8.4.38)
-      postcss-load-config: 4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
-      postcss-nested: 6.0.1(postcss@8.4.38)
-      postcss-selector-parser: 6.1.0
-      resolve: 1.22.8
-      sucrase: 3.35.0
-    transitivePeerDependencies:
-      - ts-node
-
   tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.9.5)):
     dependencies:
       '@alloc/quick-lru': 5.2.0
@@ -33466,6 +33591,33 @@ snapshots:
       postcss-import: 15.1.0(postcss@8.4.38)
       postcss-js: 4.0.1(postcss@8.4.38)
       postcss-load-config: 4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@16.18.98)(typescript@4.9.5))
+      postcss-nested: 6.0.1(postcss@8.4.38)
+      postcss-selector-parser: 6.1.0
+      resolve: 1.22.8
+      sucrase: 3.35.0
+    transitivePeerDependencies:
+      - ts-node
+
+  tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)):
+    dependencies:
+      '@alloc/quick-lru': 5.2.0
+      arg: 5.0.2
+      chokidar: 3.6.0
+      didyoumean: 1.2.2
+      dlv: 1.1.3
+      fast-glob: 3.3.2
+      glob-parent: 6.0.2
+      is-glob: 4.0.3
+      jiti: 1.21.3
+      lilconfig: 2.1.0
+      micromatch: 4.0.5
+      normalize-path: 3.0.0
+      object-hash: 3.0.0
+      picocolors: 1.0.1
+      postcss: 8.4.38
+      postcss-import: 15.1.0(postcss@8.4.38)
+      postcss-js: 4.0.1(postcss@8.4.38)
+      postcss-load-config: 4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
       postcss-nested: 6.0.1(postcss@8.4.38)
       postcss-selector-parser: 6.1.0
       resolve: 1.22.8
