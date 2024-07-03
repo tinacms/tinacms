@@ -38,7 +38,6 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "next": "14.2.3",
     "husky": "^7.0.4",
     "mime-types": "^2.1.35",
     "prettier": "^2.8.4",
