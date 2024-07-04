@@ -1,0 +1,204 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "h3",
+      "children": [
+        {
+          "text": "Acute Asthma"
+        }
+      ],
+      "id": 1719987453595
+    },
+    {
+      "type": "p",
+      "id": 1719987453595,
+      "children": [
+        {
+          "text": "This pathway is for children aged 11 years and younger."
+        }
+      ]
+    },
+    {
+      "type": "ol",
+      "children": [
+        {
+          "type": "li",
+          "children": [
+            {
+              "type": "lic",
+              "children": [
+                {
+                  "text": "Take a "
+                },
+                {
+                  "text": "brief history",
+                  "bold": true
+                },
+                {
+                  "text": " and "
+                },
+                {
+                  "text": "perform",
+                  "italic": true
+                },
+                {
+                  "text": " rapid examination."
+                }
+              ],
+              "id": 1719987453595
+            }
+          ],
+          "id": 1719987453595
+        },
+        {
+          "type": "li",
+          "children": [
+            {
+              "type": "lic",
+              "children": [
+                {
+                  "text": "Decide if asthma is the most likely diagnosis. Consider:"
+                }
+              ],
+              "id": 1719987453595
+            },
+            {
+              "type": "ul",
+              "children": [
+                {
+                  "type": "li",
+                  "children": [
+                    {
+                      "type": "lic",
+                      "children": [
+                        {
+                          "text": "the "
+                        },
+                        {
+                          "type": "mdxJsxTextElement",
+                          "name": "dropBox",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": ""
+                            }
+                          ],
+                          "props": {
+                            "title": "likelihood of acute asthma",
+                            "content": {
+                              "type": "root",
+                              "children": [
+                                {
+                                  "type": "p",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "text": "Dropbox content here"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          },
+                          "id": 1719987453595
+                        },
+                        {
+                          "text": ""
+                        }
+                      ],
+                      "id": 1719987453595
+                    }
+                  ],
+                  "id": 1719987453595
+                }
+              ],
+              "id": 1719987453595
+            }
+          ],
+          "id": 1719987453595
+        }
+      ],
+      "id": 1719987453595
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "text": "A textblock next"
+        }
+      ],
+      "id": 1719987453595
+    },
+    {
+      "type": "p",
+      "id": 1719987453595,
+      "children": [
+        {
+          "text": ""
+        },
+        {
+          "type": "mdxJsxTextElement",
+          "name": "textBlock",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ],
+          "props": {
+            "block": "content/text-blocks/Spacer.json"
+          },
+          "id": 1719987453595
+        },
+        {
+          "text": ""
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "id": "49hl1",
+      "children": [
+        {
+          "text": "And a "
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "id": "3dkun",
+      "children": [
+        {
+          "text": ""
+        }
+      ],
+      "name": "practicePoint",
+      "props": {
+        "content": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Practice tipps"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "text": ""
+        }
+      ],
+      "id": "81ei2"
+    }
+  ]
+}

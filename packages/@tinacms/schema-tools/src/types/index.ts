@@ -271,6 +271,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
           skipEscaping?: 'all' | 'html' | 'none'
         }
       | { type: 'mdx' }
+      | { type: 'xml' }
   }
 export type RichTextTemplate<WithNamespace extends boolean = false> =
   Template<WithNamespace> & {
