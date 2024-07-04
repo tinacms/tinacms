@@ -157,7 +157,7 @@ importers:
         version: 0.5.0
       mongodb-level:
         specifier: ^0.0.4
-        version: 0.0.4(mongodb@4.17.2(aws-crt@1.21.2))
+        version: 0.0.4(mongodb@4.17.2(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))
       next:
         specifier: 12.2.4
         version: 12.2.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -215,7 +215,7 @@ importers:
         version: 4.5.3(@types/node@14.18.63)
       vitest:
         specifier: ^0.32.2
-        version: 0.32.4(happy-dom@10.11.2)(playwright@1.45.0)
+        version: 0.32.4(happy-dom@10.11.2)(playwright@1.45.1)
 
   examples/tina-self-hosted-demo:
     dependencies:
@@ -236,7 +236,7 @@ importers:
         version: 2.30.0
       mongodb-level:
         specifier: ^0.0.3
-        version: 0.0.3(aws-crt@1.21.2)
+        version: 0.0.3(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
       next:
         specifier: ^13.4.19
         version: 13.5.6(@babel/core@7.24.7)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -355,7 +355,7 @@ importers:
         version: 15.8.0
       mongodb-level:
         specifier: ^0.0.3
-        version: 0.0.3(aws-crt@1.21.2)
+        version: 0.0.3(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       next:
         specifier: ^13.3.1
         version: 13.5.6(@babel/core@7.24.7)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -461,7 +461,7 @@ importers:
         version: link:../../tinacms
       typescript:
         specifier: ^4.6.4
-        version: 4.6.4
+        version: 4.9.5
       zod:
         specifier: ^3.14.3
         version: 3.23.8
@@ -531,10 +531,10 @@ importers:
         specifier: 6.3.1
         version: 6.3.1
       '@tailwindcss/aspect-ratio':
-        specifier: ^0.4.0
+        specifier: ^0.4.2
         version: 0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.6.4)))
       '@tailwindcss/typography':
-        specifier: ^0.5.9
+        specifier: ^0.5.13
         version: 0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.6.4)))
       '@tinacms/app':
         specifier: workspace:*
@@ -556,7 +556,7 @@ importers:
         version: 3.1.0(vite@4.5.3(@types/node@20.14.7))
       altair-express-middleware:
         specifier: ^7.2.1
-        version: 7.2.1
+        version: 7.2.2
       auto-bind:
         specifier: ^4.0.0
         version: 4.0.0
@@ -630,7 +630,7 @@ importers:
         specifier: ^4.3.0
         version: 4.5.2
       tailwindcss:
-        specifier: ^3.2.7
+        specifier: ^3.4.4
         version: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.6.4))
       tinacms:
         specifier: workspace:*
@@ -1043,7 +1043,7 @@ importers:
         version: 4.5.3(@types/node@14.18.63)
       vitest:
         specifier: ^0.32.2
-        version: 0.32.4(happy-dom@10.11.2)(playwright@1.45.0)
+        version: 0.32.4(happy-dom@10.11.2)(playwright@1.45.1)
 
   packages/@tinacms/metrics:
     dependencies:
@@ -1396,7 +1396,7 @@ importers:
     dependencies:
       '@floating-ui/dom':
         specifier: ^1.6.6
-        version: 1.6.6
+        version: 1.6.7
       '@floating-ui/react-dom':
         specifier: ^2.0.1
         version: 2.1.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
@@ -1631,7 +1631,7 @@ importers:
         version: 4.5.3(@types/node@14.18.63)
       vitest:
         specifier: ^0.32.2
-        version: 0.32.4(happy-dom@10.11.2)(playwright@1.45.0)
+        version: 0.32.4(happy-dom@10.11.2)(playwright@1.45.1)
 
   packages/tinacms-authjs:
     dependencies:
@@ -1730,7 +1730,7 @@ importers:
     devDependencies:
       '@playwright/test':
         specifier: ^1.44.1
-        version: 1.45.0
+        version: 1.45.1
       '@tinacms/cli':
         specifier: workspace:*
         version: link:../../packages/@tinacms/cli
@@ -1742,7 +1742,7 @@ importers:
         version: 7.32.0
       eslint-config-next:
         specifier: 12.0.3
-        version: 12.0.3(eslint@7.32.0)(next@12.0.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(typescript@4.6.4)
+        version: 12.0.3(eslint@7.32.0)(next@12.0.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(typescript@4.9.5)
 
 packages:
   '@adobe/css-tools@4.4.0':
@@ -3364,10 +3364,10 @@ packages:
         integrity: sha512-QkEyUiLhsJoZkbumGZlswmAhA7CBU02Wrz7zvH4SrcifbsqwlXShVXg65f3v/ts57W3dqyamEriMhij1Z3Zz4A==,
       }
 
-  '@codemirror/view@6.28.2':
+  '@codemirror/view@6.27.0':
     resolution:
       {
-        integrity: sha512-A3DmyVfjgPsGIjiJqM/zvODUAPQdQl3ci0ghehYNnbt5x+o76xq+dL5+mMBuysDXnI3kapgOkoeJ0sbtL/3qPw==,
+        integrity: sha512-8kqX1sHbVW1lVzWwrjAbh4dR7eKhV8eIQ952JKaBXOoXE04WncoqCy4DMU701LSrPZ3N2Q4zsTawz7GQ+2mrUw==,
       }
 
   '@colors/colors@1.5.0':
@@ -3767,10 +3767,10 @@ packages:
         integrity: sha512-+2XpQV9LLZeanU4ZevzRnGFg2neDeKHgFLjP6YLW+tly0IvrhqT4u8enLGjLH3qeh85g19xY5rsAusfwTdn5lg==,
       }
 
-  '@floating-ui/dom@1.6.6':
+  '@floating-ui/dom@1.6.7':
     resolution:
       {
-        integrity: sha512-qiTYajAnh3P+38kECeffMSQgbvXty2VB6rS+42iWR4FPIlZjLK84E9qtLnMTLIpPz2znD/TaFqaiavMUrS+Hcw==,
+        integrity: sha512-wmVfPG5o2xnKDU4jx/m4w5qva9FWHcnZ8BvzEe90D/RpwsJaTAVYPEPdQ8sbr/N8zZTAHlZUTQdqg8ZUbzHmng==,
       }
 
   '@floating-ui/react-dom@1.3.0':
@@ -3809,10 +3809,10 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  '@floating-ui/utils@0.2.3':
+  '@floating-ui/utils@0.2.4':
     resolution:
       {
-        integrity: sha512-XGndio0l5/Gvd6CLIABvsav9HHezgDFFhDfHk1bvLfr9ni8dojqLSvBbotJEjmIwNHL7vK4QzBJTdBRoB+c1ww==,
+        integrity: sha512-dWO2pw8hhi+WrXq1YJy2yCuWoL20PddgGaqTgVe4cOS9Q6qklXCiA1tJEqX6BEwRNSCP84/afac9hd4MS+zEUA==,
       }
 
   '@graphiql/react@0.18.0':
@@ -5055,10 +5055,10 @@ packages:
       }
     engines: { node: '>=14' }
 
-  '@playwright/test@1.45.0':
+  '@playwright/test@1.45.1':
     resolution:
       {
-        integrity: sha512-TVYsfMlGAaxeUllNkywbwek67Ncf8FRGn8ZlRdO291OL3NjG9oMbfVhyP82HQF0CZLMrYsvesqoUekxdWuF9Qw==,
+        integrity: sha512-Wo1bWTzQvGA7LyKGIZc8nFSTFf2TkthGIFBR+QVNilvwouGzFd4PYukZe3rvf5PSqjHi1+1NyKSDZKcQWETzaA==,
       }
     engines: { node: '>=18' }
     hasBin: true
@@ -5530,10 +5530,10 @@ packages:
         integrity: sha512-qC/xYId4NMebE6w/V33Fh9gWxLgURiNYgVNObbJl2LZv0GUUItCcCqC5axQSwRaAgaxl2mELq1rMzlswaQ0Zxg==,
       }
 
-  '@shikijs/core@1.9.1':
+  '@shikijs/core@1.10.1':
     resolution:
       {
-        integrity: sha512-EmUful2MQtY8KgCF1OkBtOuMcvaZEvmdubhW0UHCGXi21O9dRLeADVCj+k6ZS+de7Mz9d2qixOXJ+GLhcK3pXg==,
+        integrity: sha512-qdiJS5a/QGCff7VUFIqd0hDdWly9rDp8lhVmXVrS11aazX8LOTRLHAXkkEeONNsS43EcCd7gax9LLoOz4vlFQA==,
       }
 
   '@sinclair/typebox@0.27.8':
@@ -7895,17 +7895,17 @@ packages:
         integrity: sha512-F0twR8U1ZU67JIEtekUcLkXkoO5mMMmgGD8sK/xUFzJ805jxHQl92hImFAqqXMyMYjSPOyUPAwHYhB72g5sTXw==,
       }
 
-  altair-express-middleware@7.2.1:
+  altair-express-middleware@7.2.2:
     resolution:
       {
-        integrity: sha512-1Gg3A2xkAR0EuhUP6mfvC9yn/Z9izmxzZ+AHJZvgxeABB5I6oVLrAJNWboDmvbSub2+TRSBvg08kPuKnAm7UOw==,
+        integrity: sha512-vBF+e1pwmiDvS5SoaVVPuxcDzR/BnIZs6zPTrkd28+m4KyQYsvZom8Fn/VqfGLE2fNjntzqVW8PWTtfuLmx19A==,
       }
     engines: { node: '>= 12' }
 
-  altair-static@7.2.1:
+  altair-static@7.2.2:
     resolution:
       {
-        integrity: sha512-Qs66T28wq/rR9SiDJa1177UxnhZb24DoqM8f0UxZd/qjNJkVZw/7VsggfiD/RpEqu2Q9lp5glAvpR3MgQjM6Jw==,
+        integrity: sha512-c4IWYtGQR+1HuQDnARrTp2VdFLRFXK0IByMfQ3ho+xDZqZxTQlrUuODcpSUaMxxboAoBzG5OegO4Vp/vo9Nk3w==,
       }
     engines: { node: '>= 6.9.1' }
 
@@ -15142,18 +15142,18 @@ packages:
         integrity: sha512-fnWVljUchTro6RiCFvCXBbNhJc2NijN7oIQxbwsyL0buWJPG85v81ehlHI9fXrJsMNgTofEoWIQeClKpgxFLrg==,
       }
 
-  playwright-core@1.45.0:
+  playwright-core@1.45.1:
     resolution:
       {
-        integrity: sha512-lZmHlFQ0VYSpAs43dRq1/nJ9G/6SiTI7VPqidld9TDefL9tX87bTKExWZZUF5PeRyqtXqd8fQi2qmfIedkwsNQ==,
+        integrity: sha512-LF4CUUtrUu2TCpDw4mcrAIuYrEjVDfT1cHbJMfwnE2+1b8PZcFzPNgvZCvq2JfQ4aTjRCCHw5EJ2tmr2NSzdPg==,
       }
     engines: { node: '>=18' }
     hasBin: true
 
-  playwright@1.45.0:
+  playwright@1.45.1:
     resolution:
       {
-        integrity: sha512-4z3ac3plDfYzGB6r0Q3LF8POPR20Z8D0aXcxbJvmfMgSSq1hkcgvFRXJk9rUq5H/MJ0Ktal869hhOdI/zUTeLA==,
+        integrity: sha512-Hjrgae4kpSQBr98nhCj3IScxVeVUixqj+5oyif8TdIn2opTCPEzqAqNMeK42i3cWDCVu9MI+ZsGWw+gVR4ISBg==,
       }
     engines: { node: '>=18' }
     hasBin: true
@@ -15577,9 +15577,6 @@ packages:
         integrity: sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==,
       }
     engines: { node: '>=0.6.0', teleport: '>=0.2.0' }
-    deprecated: |-
-      You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-      (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qrcode.react@3.1.0:
     resolution:
@@ -16550,10 +16547,10 @@ packages:
         integrity: sha512-Vpfqwm4EnqGdlsBFNmHhxhElJYrdfcxPThu+ryKS5J8L/fhAwLazFZtq+S+TWZ9ANj2piSQLGj6NQg+lKPmxrw==,
       }
 
-  shiki@1.9.1:
+  shiki@1.10.1:
     resolution:
       {
-        integrity: sha512-8PDkgb5ja3nfujTjvC4VytL6wGOGCtFAClUb2r3QROevYXxcq+/shVJK5s6gy0HZnjaJgFxd6BpPqpRfqne5rA==,
+        integrity: sha512-uafV7WCgN4YYrccH6yxpnps6k38sSTlFRrwc4jycWmhWxJIm9dPrk+XkY1hZ2t0I7jmacMNb15Lf2fspa/Y3lg==,
       }
 
   side-channel@1.0.6:
@@ -17869,6 +17866,14 @@ packages:
     engines: { node: '>=4.2.0' }
     hasBin: true
 
+  typescript@4.9.5:
+    resolution:
+      {
+        integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==,
+      }
+    engines: { node: '>=4.2.0' }
+    hasBin: true
+
   ua-parser-js@0.7.33:
     resolution:
       {
@@ -18998,7 +19003,7 @@ snapshots:
       '@aws-sdk/client-sso-oidc': 3.590.0(aws-crt@1.21.2)
       '@aws-sdk/client-sts': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/core': 3.588.0
-      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/middleware-host-header': 3.577.0
       '@aws-sdk/middleware-logger': 3.577.0
       '@aws-sdk/middleware-recursion-detection': 3.577.0
@@ -19046,7 +19051,7 @@ snapshots:
       '@aws-sdk/client-sso-oidc': 3.590.0(aws-crt@1.21.2)
       '@aws-sdk/client-sts': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/core': 3.588.0
-      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/middleware-bucket-endpoint': 3.587.0
       '@aws-sdk/middleware-expect-continue': 3.577.0
       '@aws-sdk/middleware-flexible-checksums': 3.587.0
@@ -19154,7 +19159,7 @@ snapshots:
       '@aws-crypto/sha256-js': 3.0.0
       '@aws-sdk/client-sts': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/core': 3.588.0
-      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/middleware-host-header': 3.577.0
       '@aws-sdk/middleware-logger': 3.577.0
       '@aws-sdk/middleware-recursion-detection': 3.577.0
@@ -19242,7 +19247,7 @@ snapshots:
       '@aws-crypto/sha256-js': 3.0.0
       '@aws-sdk/client-sso-oidc': 3.590.0(aws-crt@1.21.2)
       '@aws-sdk/core': 3.588.0
-      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/middleware-host-header': 3.577.0
       '@aws-sdk/middleware-logger': 3.577.0
       '@aws-sdk/middleware-recursion-detection': 3.577.0
@@ -19329,7 +19334,7 @@ snapshots:
       '@aws-sdk/credential-provider-http': 3.587.0
       '@aws-sdk/credential-provider-process': 3.587.0
       '@aws-sdk/credential-provider-sso': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
-      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))
+      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))
       '@aws-sdk/types': 3.577.0
       '@smithy/credential-provider-imds': 3.1.0
       '@smithy/property-provider': 3.1.0
@@ -19341,14 +19346,14 @@ snapshots:
       - aws-crt
     optional: true
 
-  '@aws-sdk/credential-provider-ini@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)':
+  '@aws-sdk/credential-provider-ini@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)':
     dependencies:
       '@aws-sdk/client-sts': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/credential-provider-env': 3.587.0
       '@aws-sdk/credential-provider-http': 3.587.0
       '@aws-sdk/credential-provider-process': 3.587.0
       '@aws-sdk/credential-provider-sso': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
-      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))
+      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))
       '@aws-sdk/types': 3.577.0
       '@smithy/credential-provider-imds': 3.1.0
       '@smithy/property-provider': 3.1.0
@@ -19366,7 +19371,7 @@ snapshots:
       '@aws-sdk/credential-provider-ini': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/credential-provider-process': 3.587.0
       '@aws-sdk/credential-provider-sso': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
-      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))
+      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))
       '@aws-sdk/types': 3.577.0
       '@smithy/credential-provider-imds': 3.1.0
       '@smithy/property-provider': 3.1.0
@@ -19379,14 +19384,14 @@ snapshots:
       - aws-crt
     optional: true
 
-  '@aws-sdk/credential-provider-node@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)':
+  '@aws-sdk/credential-provider-node@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)':
     dependencies:
       '@aws-sdk/credential-provider-env': 3.587.0
       '@aws-sdk/credential-provider-http': 3.587.0
-      '@aws-sdk/credential-provider-ini': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-ini': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/credential-provider-process': 3.587.0
       '@aws-sdk/credential-provider-sso': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
-      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))
+      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))
       '@aws-sdk/types': 3.577.0
       '@smithy/credential-provider-imds': 3.1.0
       '@smithy/property-provider': 3.1.0
@@ -19433,7 +19438,7 @@ snapshots:
       - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
-  '@aws-sdk/credential-provider-web-identity@3.587.0(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))':
+  '@aws-sdk/credential-provider-web-identity@3.587.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))':
     dependencies:
       '@aws-sdk/client-sts': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/types': 3.577.0
@@ -19441,7 +19446,7 @@ snapshots:
       '@smithy/types': 3.0.0
       tslib: 2.6.3
 
-  '@aws-sdk/credential-providers@3.590.0(aws-crt@1.21.2)':
+  '@aws-sdk/credential-providers@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)':
     dependencies:
       '@aws-sdk/client-cognito-identity': 3.590.0(aws-crt@1.21.2)
       '@aws-sdk/client-sso': 3.590.0(aws-crt@1.21.2)
@@ -19453,7 +19458,30 @@ snapshots:
       '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/credential-provider-process': 3.587.0
       '@aws-sdk/credential-provider-sso': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
-      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))
+      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))
+      '@aws-sdk/types': 3.577.0
+      '@smithy/credential-provider-imds': 3.1.0
+      '@smithy/property-provider': 3.1.0
+      '@smithy/types': 3.0.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - aws-crt
+    optional: true
+
+  '@aws-sdk/credential-providers@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)':
+    dependencies:
+      '@aws-sdk/client-cognito-identity': 3.590.0(aws-crt@1.21.2)
+      '@aws-sdk/client-sso': 3.590.0(aws-crt@1.21.2)
+      '@aws-sdk/client-sts': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-cognito-identity': 3.590.0(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-env': 3.587.0
+      '@aws-sdk/credential-provider-http': 3.587.0
+      '@aws-sdk/credential-provider-ini': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-process': 3.587.0
+      '@aws-sdk/credential-provider-sso': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))
       '@aws-sdk/types': 3.577.0
       '@smithy/credential-provider-imds': 3.1.0
       '@smithy/property-provider': 3.1.0
@@ -20775,7 +20803,7 @@ snapshots:
   '@codemirror/language@6.0.0':
     dependencies:
       '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.2
+      '@codemirror/view': 6.27.0
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
       '@lezer/lr': 1.4.1
@@ -20783,7 +20811,7 @@ snapshots:
 
   '@codemirror/state@6.4.1': {}
 
-  '@codemirror/view@6.28.2':
+  '@codemirror/view@6.27.0':
     dependencies:
       '@codemirror/state': 6.4.1
       style-mod: 4.1.2
@@ -21027,28 +21055,28 @@ snapshots:
 
   '@floating-ui/core@1.6.2':
     dependencies:
-      '@floating-ui/utils': 0.2.3
+      '@floating-ui/utils': 0.2.4
 
-  '@floating-ui/dom@1.6.6':
+  '@floating-ui/dom@1.6.7':
     dependencies:
       '@floating-ui/core': 1.6.2
-      '@floating-ui/utils': 0.2.3
+      '@floating-ui/utils': 0.2.4
 
   '@floating-ui/react-dom@1.3.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)':
     dependencies:
-      '@floating-ui/dom': 1.6.6
+      '@floating-ui/dom': 1.6.7
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
 
   '@floating-ui/react-dom@1.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@floating-ui/dom': 1.6.6
+      '@floating-ui/dom': 1.6.7
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
   '@floating-ui/react-dom@2.1.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)':
     dependencies:
-      '@floating-ui/dom': 1.6.6
+      '@floating-ui/dom': 1.6.7
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
 
@@ -21068,7 +21096,7 @@ snapshots:
       react-dom: 17.0.2(react@17.0.2)
       tabbable: 6.2.0
 
-  '@floating-ui/utils@0.2.3': {}
+  '@floating-ui/utils@0.2.4': {}
 
   '@graphiql/react@0.18.0(@codemirror/language@6.0.0)(@types/node@20.14.7)(@types/react-dom@17.0.2)(@types/react@17.0.47)(graphql@15.8.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)':
     dependencies:
@@ -22007,9 +22035,9 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@playwright/test@1.45.0':
+  '@playwright/test@1.45.1':
     dependencies:
-      playwright: 1.45.0
+      playwright: 1.45.1
 
   '@puppeteer/replay@1.3.2(puppeteer@18.2.1(encoding@0.1.13))':
     dependencies:
@@ -22550,7 +22578,7 @@ snapshots:
 
   '@rushstack/eslint-patch@1.10.3': {}
 
-  '@shikijs/core@1.9.1': {}
+  '@shikijs/core@1.10.1': {}
 
   '@sinclair/typebox@0.27.8': {}
 
@@ -23635,15 +23663,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@4.6.4)':
+  '@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@4.9.5)':
     dependencies:
       '@typescript-eslint/scope-manager': 4.33.0
       '@typescript-eslint/types': 4.33.0
-      '@typescript-eslint/typescript-estree': 4.33.0(typescript@4.6.4)
+      '@typescript-eslint/typescript-estree': 4.33.0(typescript@4.9.5)
       debug: 4.3.5(supports-color@8.1.1)
       eslint: 7.32.0
     optionalDependencies:
-      typescript: 4.6.4
+      typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
 
@@ -23709,7 +23737,7 @@ snapshots:
 
   '@typescript-eslint/types@5.62.0': {}
 
-  '@typescript-eslint/typescript-estree@4.33.0(typescript@4.6.4)':
+  '@typescript-eslint/typescript-estree@4.33.0(typescript@4.9.5)':
     dependencies:
       '@typescript-eslint/types': 4.33.0
       '@typescript-eslint/visitor-keys': 4.33.0
@@ -23717,9 +23745,9 @@ snapshots:
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.5.2
-      tsutils: 3.21.0(typescript@4.6.4)
+      tsutils: 3.21.0(typescript@4.9.5)
     optionalDependencies:
-      typescript: 4.6.4
+      typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
 
@@ -25063,14 +25091,14 @@ snapshots:
       require-from-string: 2.0.2
       uri-js: 4.4.1
 
-  altair-express-middleware@7.2.1:
+  altair-express-middleware@7.2.2:
     dependencies:
-      altair-static: 7.2.1
+      altair-static: 7.2.2
       express: 4.19.2
     transitivePeerDependencies:
       - supports-color
 
-  altair-static@7.2.1: {}
+  altair-static@7.2.2: {}
 
   anchor-markdown-header@0.6.0:
     dependencies:
@@ -26890,21 +26918,21 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
-  eslint-config-next@12.0.3(eslint@7.32.0)(next@12.0.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(typescript@4.6.4):
+  eslint-config-next@12.0.3(eslint@7.32.0)(next@12.0.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(typescript@4.9.5):
     dependencies:
       '@next/eslint-plugin-next': 12.0.3
       '@rushstack/eslint-patch': 1.10.3
-      '@typescript-eslint/parser': 4.33.0(eslint@7.32.0)(typescript@4.6.4)
+      '@typescript-eslint/parser': 4.33.0(eslint@7.32.0)(typescript@4.9.5)
       eslint: 7.32.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 2.7.1(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@7.32.0))(eslint@7.32.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@4.6.4))(eslint-import-resolver-typescript@2.7.1)(eslint@7.32.0)
+      eslint-import-resolver-typescript: 2.7.1(eslint-plugin-import@2.29.1)(eslint@7.32.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@7.32.0)
       eslint-plugin-jsx-a11y: 6.8.0(eslint@7.32.0)
       eslint-plugin-react: 7.34.2(eslint@7.32.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@7.32.0)
       next: 12.0.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
     optionalDependencies:
-      typescript: 4.6.4
+      typescript: 4.9.5
     transitivePeerDependencies:
       - eslint-import-resolver-webpack
       - supports-color
@@ -26934,8 +26962,8 @@ snapshots:
       '@typescript-eslint/parser': 5.62.0(eslint@8.24.0)(typescript@4.6.4)
       eslint: 8.24.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0))(eslint@8.24.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.24.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0)
       eslint-plugin-jsx-a11y: 6.8.0(eslint@8.24.0)
       eslint-plugin-react: 7.34.2(eslint@8.24.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.24.0)
@@ -26957,11 +26985,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@2.7.1(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@7.32.0))(eslint@7.32.0):
+  eslint-import-resolver-typescript@2.7.1(eslint-plugin-import@2.29.1)(eslint@7.32.0):
     dependencies:
       debug: 4.3.5(supports-color@8.1.1)
       eslint: 7.32.0
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@4.6.4))(eslint-import-resolver-typescript@2.7.1)(eslint@7.32.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@7.32.0)
       glob: 7.2.3
       is-glob: 4.0.3
       resolve: 1.22.8
@@ -26986,13 +27014,13 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0))(eslint@8.24.0):
+  eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.24.0):
     dependencies:
       debug: 4.3.5(supports-color@8.1.1)
       enhanced-resolve: 5.17.0
       eslint: 8.24.0
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.24.0))(eslint@8.24.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
       is-core-module: 2.13.1
@@ -27001,17 +27029,6 @@ snapshots:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
       - eslint-import-resolver-webpack
-      - supports-color
-
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@2.7.1(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@7.32.0))(eslint@7.32.0))(eslint@7.32.0):
-    dependencies:
-      debug: 3.2.7(supports-color@5.5.0)
-    optionalDependencies:
-      '@typescript-eslint/parser': 4.33.0(eslint@7.32.0)(typescript@4.6.4)
-      eslint: 7.32.0
-      eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 2.7.1(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@7.32.0))(eslint@7.32.0)
-    transitivePeerDependencies:
       - supports-color
 
   eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@7.32.0))(eslint@7.32.0):
@@ -27025,42 +27042,35 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.24.0))(eslint@8.24.0):
     dependencies:
       debug: 3.2.7(supports-color@5.5.0)
     optionalDependencies:
       '@typescript-eslint/parser': 5.62.0(eslint@8.24.0)(typescript@4.6.4)
       eslint: 8.24.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0))(eslint@8.24.0)
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.24.0)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@4.6.4))(eslint-import-resolver-typescript@2.7.1)(eslint@7.32.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint@7.32.0):
     dependencies:
-      array-includes: 3.1.8
-      array.prototype.findlastindex: 1.2.5
-      array.prototype.flat: 1.3.2
-      array.prototype.flatmap: 1.3.2
       debug: 3.2.7(supports-color@5.5.0)
-      doctrine: 2.1.0
+    optionalDependencies:
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@4.6.4)
       eslint: 7.32.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@2.7.1(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@7.32.0))(eslint@7.32.0))(eslint@7.32.0)
-      hasown: 2.0.2
-      is-core-module: 2.13.1
-      is-glob: 4.0.3
-      minimatch: 3.1.2
-      object.fromentries: 2.0.8
-      object.groupby: 1.0.3
-      object.values: 1.2.0
-      semver: 7.5.2
-      tsconfig-paths: 3.15.0
-    optionalDependencies:
-      '@typescript-eslint/parser': 4.33.0(eslint@7.32.0)(typescript@4.6.4)
     transitivePeerDependencies:
-      - eslint-import-resolver-typescript
-      - eslint-import-resolver-webpack
+      - supports-color
+
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint@8.24.0):
+    dependencies:
+      debug: 3.2.7(supports-color@5.5.0)
+    optionalDependencies:
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@4.6.4)
+      eslint: 8.24.0
+      eslint-import-resolver-node: 0.3.9
+    transitivePeerDependencies:
       - supports-color
 
   eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@4.6.4))(eslint-import-resolver-typescript@3.6.1)(eslint@7.32.0):
@@ -27090,7 +27100,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0):
+  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@7.32.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
@@ -27098,9 +27108,9 @@ snapshots:
       array.prototype.flatmap: 1.3.2
       debug: 3.2.7(supports-color@5.5.0)
       doctrine: 2.1.0
-      eslint: 8.24.0
+      eslint: 7.32.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint@7.32.0)
       hasown: 2.0.2
       is-core-module: 2.13.1
       is-glob: 4.0.3
@@ -27111,7 +27121,34 @@ snapshots:
       semver: 7.5.2
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 5.62.0(eslint@8.24.0)(typescript@4.6.4)
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@4.6.4)
+    transitivePeerDependencies:
+      - eslint-import-resolver-typescript
+      - eslint-import-resolver-webpack
+      - supports-color
+
+  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.24.0):
+    dependencies:
+      array-includes: 3.1.8
+      array.prototype.findlastindex: 1.2.5
+      array.prototype.flat: 1.3.2
+      array.prototype.flatmap: 1.3.2
+      debug: 3.2.7(supports-color@5.5.0)
+      doctrine: 2.1.0
+      eslint: 8.24.0
+      eslint-import-resolver-node: 0.3.9
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint-import-resolver-node@0.3.9)(eslint@8.24.0)
+      hasown: 2.0.2
+      is-core-module: 2.13.1
+      is-glob: 4.0.3
+      minimatch: 3.1.2
+      object.fromentries: 2.0.8
+      object.groupby: 1.0.3
+      object.values: 1.2.0
+      semver: 7.5.2
+      tsconfig-paths: 3.15.0
+    optionalDependencies:
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@4.6.4)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -30014,28 +30051,49 @@ snapshots:
       '@types/whatwg-url': 8.2.2
       whatwg-url: 11.0.0
 
-  mongodb-level@0.0.3(aws-crt@1.21.2):
+  mongodb-level@0.0.3(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2):
     dependencies:
       abstract-level: 1.0.4
       module-error: 1.0.2
-      mongodb: 4.17.2(aws-crt@1.21.2)
+      mongodb: 4.17.2(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
     transitivePeerDependencies:
       - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
-  mongodb-level@0.0.4(mongodb@4.17.2(aws-crt@1.21.2)):
+  mongodb-level@0.0.3(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2):
     dependencies:
       abstract-level: 1.0.4
       module-error: 1.0.2
-      mongodb: 4.17.2(aws-crt@1.21.2)
+      mongodb: 4.17.2(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - aws-crt
 
-  mongodb@4.17.2(aws-crt@1.21.2):
+  mongodb-level@0.0.4(mongodb@4.17.2(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)):
+    dependencies:
+      abstract-level: 1.0.4
+      module-error: 1.0.2
+      mongodb: 4.17.2(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+
+  mongodb@4.17.2(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2):
     dependencies:
       bson: 4.7.2
       mongodb-connection-string-url: 2.6.0
       socks: 2.8.3
     optionalDependencies:
-      '@aws-sdk/credential-providers': 3.590.0(aws-crt@1.21.2)
+      '@aws-sdk/credential-providers': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@mongodb-js/saslprep': 1.1.7
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - aws-crt
+
+  mongodb@4.17.2(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2):
+    dependencies:
+      bson: 4.7.2
+      mongodb-connection-string-url: 2.6.0
+      socks: 2.8.3
+    optionalDependencies:
+      '@aws-sdk/credential-providers': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@mongodb-js/saslprep': 1.1.7
     transitivePeerDependencies:
       - '@aws-sdk/client-sso-oidc'
@@ -30694,11 +30752,11 @@ snapshots:
 
   platform@1.3.6: {}
 
-  playwright-core@1.45.0: {}
+  playwright-core@1.45.1: {}
 
-  playwright@1.45.0:
+  playwright@1.45.1:
     dependencies:
-      playwright-core: 1.45.0
+      playwright-core: 1.45.1
     optionalDependencies:
       fsevents: 2.3.2
 
@@ -31674,9 +31732,9 @@ snapshots:
 
   shell-quote@1.7.3: {}
 
-  shiki@1.9.1:
+  shiki@1.10.1:
     dependencies:
-      '@shikijs/core': 1.9.1
+      '@shikijs/core': 1.10.1
 
   side-channel@1.0.6:
     dependencies:
@@ -32454,6 +32512,11 @@ snapshots:
       tslib: 1.14.1
       typescript: 4.6.4
 
+  tsutils@3.21.0(typescript@4.9.5):
+    dependencies:
+      tslib: 1.14.1
+      typescript: 4.9.5
+
   tty-browserify@0.0.1: {}
 
   tty-table@4.2.3:
@@ -32581,11 +32644,13 @@ snapshots:
       lunr: 2.3.9
       markdown-it: 14.1.0
       minimatch: 9.0.5
-      shiki: 1.9.1
+      shiki: 1.10.1
       typescript: 4.6.4
       yaml: 2.4.5
 
   typescript@4.6.4: {}
+
+  typescript@4.9.5: {}
 
   ua-parser-js@0.7.33: {}
 
@@ -32923,7 +32988,7 @@ snapshots:
       '@types/node': 20.14.7
       fsevents: 2.3.3
 
-  vitest@0.32.4(happy-dom@10.11.2)(playwright@1.45.0):
+  vitest@0.32.4(happy-dom@10.11.2)(playwright@1.45.1):
     dependencies:
       '@types/chai': 4.3.16
       '@types/chai-subset': 1.3.5
@@ -32951,7 +33016,7 @@ snapshots:
       why-is-node-running: 2.2.2
     optionalDependencies:
       happy-dom: 10.11.2
-      playwright: 1.45.0
+      playwright: 1.45.1
     transitivePeerDependencies:
       - less
       - lightningcss
