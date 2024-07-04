@@ -1,5 +1,13 @@
 # tinacms-gitprovider-github
 
+## 1.0.7
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- Updated dependencies [0503072]
+  - @tinacms/datalayer@1.2.36
+
 ## 1.0.6
 
 ### Patch Changes
