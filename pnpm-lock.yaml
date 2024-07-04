@@ -365,8 +365,8 @@ importers:
       '@graphql-tools/load': ^7.3.2
       '@rollup/pluginutils': ^5.0.2
       '@svgr/core': 6.3.1
-      '@tailwindcss/aspect-ratio': ^0.4.0
-      '@tailwindcss/typography': ^0.5.9
+      '@tailwindcss/aspect-ratio': ^0.4.2
+      '@tailwindcss/typography': ^0.5.13
       '@tinacms/app': workspace:*
       '@tinacms/graphql': workspace:*
       '@tinacms/metrics': workspace:*
@@ -436,8 +436,8 @@ importers:
       '@graphql-tools/load': 7.7.0_graphql@15.8.0
       '@rollup/pluginutils': 5.0.2
       '@svgr/core': 6.3.1
-      '@tailwindcss/aspect-ratio': 0.4.0_tailwindcss@3.4.4
-      '@tailwindcss/typography': 0.5.9_tailwindcss@3.4.4
+      '@tailwindcss/aspect-ratio': 0.4.2_tailwindcss@3.4.4
+      '@tailwindcss/typography': 0.5.13_tailwindcss@3.4.4
       '@tinacms/app': link:../app
       '@tinacms/graphql': link:../graphql
       '@tinacms/metrics': link:../metrics
@@ -10764,14 +10764,29 @@ packages:
       defer-to-connect: 2.0.1
     dev: false
 
-  /@tailwindcss/aspect-ratio/0.4.0_tailwindcss@3.4.4:
+  /@tailwindcss/aspect-ratio/0.4.2_tailwindcss@3.4.4:
     resolution:
       {
-        integrity: sha512-WJu0I4PpqNPuutpaA9zDUq2JXR+lorZ7PbLcKNLmb6GL9/HLfC7w3CRsMhJF4BbYd/lkY6CfXOvkYpuGnZfkpQ==,
+        integrity: sha512-8QPrypskfBa7QIMuKHg2TA7BqES6vhBrDLOv8Unb6FcFyd3TjKbc6lcmb9UPQHxfl24sXoJ41ux/H7qQQvfaSQ==,
       }
     peerDependencies:
       tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
     dependencies:
+      tailwindcss: 3.4.4
+    dev: false
+
+  /@tailwindcss/typography/0.5.13_tailwindcss@3.4.4:
+    resolution:
+      {
+        integrity: sha512-ADGcJ8dX21dVVHIwTRgzrcunY6YY9uSlAHHGVKvkA+vLc5qLwEszvKts40lx7z0qc4clpjclwLeK5rVCV2P/uw==,
+      }
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.4
     dev: false
 
@@ -10818,21 +10833,6 @@ packages:
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.3.2
-    dev: false
-
-  /@tailwindcss/typography/0.5.9_tailwindcss@3.4.4:
-    resolution:
-      {
-        integrity: sha512-t8Sg3DyynFysV9f4JDOVISGsjazNb48AeIYQwcL+Bsq5uf4RYL75C1giZ43KISjeDGBaTN3Kxh7Xj/vRSMJUUg==,
-      }
-    peerDependencies:
-      tailwindcss: '>=3.0.0 || insiders'
-    dependencies:
-      lodash.castarray: 4.4.0
-      lodash.isplainobject: 4.0.6
-      lodash.merge: 4.6.2
-      postcss-selector-parser: 6.0.10
-      tailwindcss: 3.4.4
     dev: false
 
   /@testing-library/dom/7.31.2:
