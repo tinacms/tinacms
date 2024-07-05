@@ -1,3 +1,5 @@
+import { DOMParser } from '@xmldom/xmldom'
+
 export interface SlateNode {
   type: string
   children?: SlateNode[]
@@ -74,30 +76,26 @@ function convertChildrenToXml(children?: SlateNode[]) {
   return xml
 }
 
-function formatXml(xml: string, tab: string = '  '): string {
-  let formatted = ''
-  const regex = /(>)(<)(\/*)/g
-  xml = xml.replace(regex, '$1\r\n$2$3')
-  let pad = 0
-  xml.split('\r\n').forEach((node) => {
-    let indent = 0
-    if (node.match(/.+<\/\w[^>]*>$/)) {
-      indent = 0
-    } else if (node.match(/^<\/\w/)) {
-      if (pad !== 0) {
-        pad -= 1
-      }
-    } else if (node.match(/^<\w([^>]*[^\/])?>.*$/)) {
-      indent = 1
-    } else {
-      indent = 0
-    }
+function formatXML(xml: string, tab = '  ', nl = '\n') {
+  let formatted = '',
+    indent = ''
+  const nodes = xml.slice(1, -1).split(/>\s*</)
+  if (nodes.length === 0 || !nodes[0]) return ''
 
-    const padding = new Array(pad + 1).join(tab)
-    formatted += padding + node + '\r\n'
-    pad += indent
-  })
-  return formatted.trim()
+  if (nodes[0][0] == '?') formatted += '<' + nodes.shift() + '>' + nl
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    if (!node) continue
+    if (node[0]! == '/') indent = indent.slice(tab.length) // decrease indent
+    formatted += indent + '<' + node + '>' + nl
+    if (
+      node[0] != '/' &&
+      node[node.length - 1] != '/' &&
+      node.indexOf('</') == -1
+    )
+      indent += tab // increase indent
+  }
+  return formatted
 }
 
 export function stringifyToXML(slateDoc: SlateNode): string {
@@ -107,5 +105,88 @@ export function stringifyToXML(slateDoc: SlateNode): string {
     )
   }
 
-  return formatXml(convertChildrenToXml(slateDoc.children))
+  return formatXML(`<data>${convertChildrenToXml(slateDoc.children)}</data>`)
+}
+
+function parseXmlToSlateNode(node: Element): SlateNode {
+  const type = node.getAttribute('type') || node.nodeName
+  const isMdxNode = type.startsWith('mdxJsx')
+  const name = isMdxNode ? node.nodeName : undefined
+  const slateNode: SlateNode = { type, name }
+
+  if (node.hasAttribute('id')) {
+    slateNode.id = node.getAttribute('id')!
+  }
+
+  if (node.nodeName === 'bold' || node.nodeName === 'italic') {
+    return {
+      type: 'text',
+      text: node.textContent || '',
+      bold: node.nodeName === 'bold' ? true : undefined,
+      italic: node.nodeName === 'italic' ? true : undefined,
+    }
+  }
+
+  if (node.childNodes && node.childNodes.length > 0) {
+    const childNodes = []
+    for (let i = 0; i < node.childNodes.length; i++) {
+      const childNode = node.childNodes[i]
+      if (!childNode) continue
+      if (childNode.nodeType === 1) {
+        childNodes.push(parseXmlToSlateNode(childNode as Element))
+      } else if (
+        childNode.nodeType === 3 &&
+        !childNode?.nodeValue?.startsWith('\n')
+      ) {
+        childNodes.push({
+          type: 'text',
+          text: childNode.nodeValue || '',
+        })
+      }
+    }
+    if (isMdxNode) {
+      slateNode.children = [
+        {
+          type: 'text',
+          text: '',
+        },
+      ]
+      slateNode.props = {
+        content: {
+          type: 'root',
+          children: childNodes,
+        },
+      }
+    } else {
+      slateNode.children = childNodes
+    }
+  }
+
+  if (node.hasAttributes()) {
+    slateNode.props = slateNode.props || {}
+    for (let i = 0; i < node.attributes.length; i++) {
+      const attr = node.attributes[i]
+      if (!attr) continue
+      if (attr.name !== 'id' && attr?.name !== 'type') {
+        slateNode.props[attr.name] = attr.value
+      }
+    }
+  }
+
+  return slateNode
+}
+
+export function parseFromXml(xml: string): SlateNode {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(xml, 'text/xml')
+  const root = doc.documentElement
+
+  const childNodes = Array.from(root.childNodes)
+  const children = childNodes
+    .filter((node) => node.nodeType === 1)
+    .map((node) => parseXmlToSlateNode(node as Element))
+  return {
+    type: 'root',
+    children,
+  }
 }

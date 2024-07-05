@@ -130,7 +130,7 @@ importers:
         version: link:../../packages/@tinacms/cli
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -322,7 +322,7 @@ importers:
     dependencies:
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -545,7 +545,7 @@ importers:
         version: 0.29.14
       jest:
         specifier: ^29.5.0
-        version: 29.7.0(@types/node@20.14.7)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
+        version: 29.7.0(@types/node@14.18.63)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
       jest-diff:
         specifier: ^29.5.0
         version: 29.7.0
@@ -554,7 +554,7 @@ importers:
         version: 29.7.0
       next:
         specifier: 12.2.4
-        version: 12.2.4(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       nodemon:
         specifier: 2.0.19
         version: 2.0.19
@@ -605,13 +605,13 @@ importers:
         version: 6.3.1
       '@tailwindcss/aspect-ratio':
         specifier: ^0.4.0
-        version: 0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))
+        version: 0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))
       '@tailwindcss/line-clamp':
         specifier: ^0.3.1
-        version: 0.3.1(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))
+        version: 0.3.1(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))
       '@tailwindcss/typography':
         specifier: ^0.5.9
-        version: 0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))
+        version: 0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))
       '@tinacms/app':
         specifier: workspace:*
         version: link:../app
@@ -632,7 +632,7 @@ importers:
         version: link:../search
       '@vitejs/plugin-react':
         specifier: 3.1.0
-        version: 3.1.0(vite@4.5.3(@types/node@14.18.63))
+        version: 3.1.0(vite@4.5.3(@types/node@20.14.7))
       ajv:
         specifier: ^6.12.3
         version: 6.12.6
@@ -746,7 +746,7 @@ importers:
         version: 5.12.0(rollup@3.29.4)
       tailwindcss:
         specifier: ^3.2.7
-        version: 3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
+        version: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
       tinacms:
         specifier: workspace:*
         version: link:../../tinacms
@@ -761,7 +761,7 @@ importers:
         version: 1.0.3
       vite:
         specifier: ^4.3.9
-        version: 4.5.3(@types/node@14.18.63)
+        version: 4.5.3(@types/node@20.14.7)
       yup:
         specifier: ^0.32.9
         version: 0.32.11
@@ -828,7 +828,7 @@ importers:
         version: 0.29.14
       jest:
         specifier: ^29.5.0
-        version: 29.7.0(@types/node@14.18.63)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
+        version: 29.7.0(@types/node@20.14.7)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
 
   packages/@tinacms/datalayer:
     dependencies:
@@ -1044,6 +1044,9 @@ importers:
       '@tinacms/schema-tools':
         specifier: workspace:*
         version: link:../schema-tools
+      '@xmldom/xmldom':
+        specifier: ^0.8.10
+        version: 0.8.10
       acorn:
         specifier: 8.8.2
         version: 8.8.2
@@ -1490,7 +1493,7 @@ importers:
         version: 13.13.52
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -1527,7 +1530,7 @@ importers:
         version: 13.13.52
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -1570,7 +1573,7 @@ importers:
         version: 17.0.47
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -1826,7 +1829,7 @@ importers:
         version: 0.5.0
       next:
         specifier: 12.2.4
-        version: 12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -8233,6 +8236,13 @@ packages:
         integrity: sha512-0LRYNcKW2t/bWJmiKYhPIUVwz4iMNpC3aPh3UdvfUS8B+68kHpdht7pPcuawb08057rXuyuxZXavcVpoVL01AA==,
       }
     engines: { node: '>=12' }
+
+  '@xmldom/xmldom@0.8.10':
+    resolution:
+      {
+        integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==,
+      }
+    engines: { node: '>=10.0.0' }
 
   '@xstate/react@3.0.0':
     resolution:
@@ -20026,6 +20036,25 @@ snapshots:
       - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
+  '@aws-sdk/credential-provider-ini@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)':
+    dependencies:
+      '@aws-sdk/client-sts': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-env': 3.587.0
+      '@aws-sdk/credential-provider-http': 3.587.0
+      '@aws-sdk/credential-provider-process': 3.587.0
+      '@aws-sdk/credential-provider-sso': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))
+      '@aws-sdk/types': 3.577.0
+      '@smithy/credential-provider-imds': 3.1.0
+      '@smithy/property-provider': 3.1.0
+      '@smithy/shared-ini-file-loader': 3.1.0
+      '@smithy/types': 3.0.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - aws-crt
+    optional: true
+
   '@aws-sdk/credential-provider-ini@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)':
     dependencies:
       '@aws-sdk/client-sts': 3.590.0(aws-crt@1.21.2)
@@ -20065,6 +20094,26 @@ snapshots:
       - aws-crt
 
   '@aws-sdk/credential-provider-node@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)':
+    dependencies:
+      '@aws-sdk/credential-provider-env': 3.587.0
+      '@aws-sdk/credential-provider-http': 3.587.0
+      '@aws-sdk/credential-provider-ini': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-process': 3.587.0
+      '@aws-sdk/credential-provider-sso': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))
+      '@aws-sdk/types': 3.577.0
+      '@smithy/credential-provider-imds': 3.1.0
+      '@smithy/property-provider': 3.1.0
+      '@smithy/shared-ini-file-loader': 3.1.0
+      '@smithy/types': 3.0.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - '@aws-sdk/client-sts'
+      - aws-crt
+    optional: true
+
+  '@aws-sdk/credential-provider-node@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)':
     dependencies:
       '@aws-sdk/credential-provider-env': 3.587.0
       '@aws-sdk/credential-provider-http': 3.587.0
@@ -20131,7 +20180,7 @@ snapshots:
       '@aws-sdk/credential-provider-env': 3.587.0
       '@aws-sdk/credential-provider-http': 3.587.0
       '@aws-sdk/credential-provider-ini': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
-      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))(aws-crt@1.21.2)
+      '@aws-sdk/credential-provider-node': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(@aws-sdk/client-sts@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/credential-provider-process': 3.587.0
       '@aws-sdk/credential-provider-sso': 3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2)
       '@aws-sdk/credential-provider-web-identity': 3.587.0(@aws-sdk/client-sts@3.590.0(@aws-sdk/client-sso-oidc@3.590.0(aws-crt@1.21.2))(aws-crt@1.21.2))
@@ -23942,9 +23991,9 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tailwindcss/aspect-ratio@0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))':
+  '@tailwindcss/aspect-ratio@0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))':
     dependencies:
-      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
+      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
 
   '@tailwindcss/aspect-ratio@0.4.2(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5)))':
     dependencies:
@@ -23954,21 +24003,13 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5))
 
-  '@tailwindcss/line-clamp@0.3.1(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))':
+  '@tailwindcss/line-clamp@0.3.1(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))':
     dependencies:
-      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
+      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
 
   '@tailwindcss/line-clamp@0.3.1(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5)))':
     dependencies:
       tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5))
-
-  '@tailwindcss/typography@0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)))':
-    dependencies:
-      lodash.castarray: 4.4.0
-      lodash.isplainobject: 4.0.6
-      lodash.merge: 4.6.2
-      postcss-selector-parser: 6.0.10
-      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
 
   '@tailwindcss/typography@0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.9.5)))':
     dependencies:
@@ -23985,6 +24026,14 @@ snapshots:
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@16.18.98)(typescript@4.9.5))
+
+  '@tailwindcss/typography@0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)))':
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
 
   '@tailwindcss/typography@0.5.13(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5)))':
     dependencies:
@@ -25938,14 +25987,14 @@ snapshots:
 
   '@vercel/stega@0.0.5': {}
 
-  '@vitejs/plugin-react@3.1.0(vite@4.5.3(@types/node@14.18.63))':
+  '@vitejs/plugin-react@3.1.0(vite@4.5.3(@types/node@20.14.7))':
     dependencies:
       '@babel/core': 7.24.7
       '@babel/plugin-transform-react-jsx-self': 7.24.7(@babel/core@7.24.7)
       '@babel/plugin-transform-react-jsx-source': 7.24.7(@babel/core@7.24.7)
       magic-string: 0.27.0
       react-refresh: 0.14.2
-      vite: 4.5.3(@types/node@14.18.63)
+      vite: 4.5.3(@types/node@20.14.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -25982,6 +26031,8 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 4.5.2
       varint: 5.0.2
+
+  '@xmldom/xmldom@0.8.10': {}
 
   '@xstate/react@3.0.0(@types/react@17.0.47)(react@17.0.2)':
     dependencies:
@@ -31395,7 +31446,7 @@ snapshots:
       - supports-color
       - webpack
 
-  next@12.2.4(@babel/core@7.24.7)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
+  next@12.2.4(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
     dependencies:
       '@next/env': 12.2.4
       '@swc/helpers': 0.4.3
@@ -31403,35 +31454,7 @@ snapshots:
       postcss: 8.4.14
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
-      styled-jsx: 5.0.2(@babel/core@7.24.7)(react@17.0.2)
-      use-sync-external-store: 1.2.0(react@17.0.2)
-    optionalDependencies:
-      '@next/swc-android-arm-eabi': 12.2.4
-      '@next/swc-android-arm64': 12.2.4
-      '@next/swc-darwin-arm64': 12.2.4
-      '@next/swc-darwin-x64': 12.2.4
-      '@next/swc-freebsd-x64': 12.2.4
-      '@next/swc-linux-arm-gnueabihf': 12.2.4
-      '@next/swc-linux-arm64-gnu': 12.2.4
-      '@next/swc-linux-arm64-musl': 12.2.4
-      '@next/swc-linux-x64-gnu': 12.2.4
-      '@next/swc-linux-x64-musl': 12.2.4
-      '@next/swc-win32-arm64-msvc': 12.2.4
-      '@next/swc-win32-ia32-msvc': 12.2.4
-      '@next/swc-win32-x64-msvc': 12.2.4
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
-
-  next@12.2.4(babel-plugin-macros@3.1.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
-    dependencies:
-      '@next/env': 12.2.4
-      '@swc/helpers': 0.4.3
-      caniuse-lite: 1.0.30001628
-      postcss: 8.4.14
-      react: 17.0.2
-      react-dom: 17.0.2(react@17.0.2)
-      styled-jsx: 5.0.2(babel-plugin-macros@3.1.0)(react@17.0.2)
+      styled-jsx: 5.0.2(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react@17.0.2)
       use-sync-external-store: 1.2.0(react@17.0.2)
     optionalDependencies:
       '@next/swc-android-arm-eabi': 12.2.4
@@ -31955,14 +31978,6 @@ snapshots:
       postcss: 8.4.38
       ts-node: 10.9.2(@types/node@20.14.7)(typescript@4.9.5)
 
-  postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)):
-    dependencies:
-      lilconfig: 3.1.1
-      yaml: 2.4.3
-    optionalDependencies:
-      postcss: 8.4.38
-      ts-node: 10.9.2(@types/node@14.18.63)(typescript@4.3.5)
-
   postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.9.5)):
     dependencies:
       lilconfig: 3.1.1
@@ -31978,6 +31993,14 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.38
       ts-node: 10.9.2(@types/node@16.18.98)(typescript@4.9.5)
+
+  postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)):
+    dependencies:
+      lilconfig: 3.1.1
+      yaml: 2.4.3
+    optionalDependencies:
+      postcss: 8.4.38
+      ts-node: 10.9.2(@types/node@20.14.7)(typescript@4.3.5)
 
   postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.9.5)):
     dependencies:
@@ -33300,16 +33323,11 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.24.7
 
-  styled-jsx@5.0.2(@babel/core@7.24.7)(react@17.0.2):
+  styled-jsx@5.0.2(@babel/core@7.24.7)(babel-plugin-macros@3.1.0)(react@17.0.2):
     dependencies:
       react: 17.0.2
     optionalDependencies:
       '@babel/core': 7.24.7
-
-  styled-jsx@5.0.2(babel-plugin-macros@3.1.0)(react@17.0.2):
-    dependencies:
-      react: 17.0.2
-    optionalDependencies:
       babel-plugin-macros: 3.1.0
 
   styled-jsx@5.0.2(react@18.2.0):
@@ -33392,33 +33410,6 @@ snapshots:
       string-width: 4.2.3
       strip-ansi: 6.0.1
 
-  tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5)):
-    dependencies:
-      '@alloc/quick-lru': 5.2.0
-      arg: 5.0.2
-      chokidar: 3.6.0
-      didyoumean: 1.2.2
-      dlv: 1.1.3
-      fast-glob: 3.3.2
-      glob-parent: 6.0.2
-      is-glob: 4.0.3
-      jiti: 1.21.3
-      lilconfig: 2.1.0
-      micromatch: 4.0.5
-      normalize-path: 3.0.0
-      object-hash: 3.0.0
-      picocolors: 1.0.1
-      postcss: 8.4.38
-      postcss-import: 15.1.0(postcss@8.4.38)
-      postcss-js: 4.0.1(postcss@8.4.38)
-      postcss-load-config: 4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.3.5))
-      postcss-nested: 6.0.1(postcss@8.4.38)
-      postcss-selector-parser: 6.1.0
-      resolve: 1.22.8
-      sucrase: 3.35.0
-    transitivePeerDependencies:
-      - ts-node
-
   tailwindcss@3.4.4(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.9.5)):
     dependencies:
       '@alloc/quick-lru': 5.2.0
@@ -33466,6 +33457,33 @@ snapshots:
       postcss-import: 15.1.0(postcss@8.4.38)
       postcss-js: 4.0.1(postcss@8.4.38)
       postcss-load-config: 4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@16.18.98)(typescript@4.9.5))
+      postcss-nested: 6.0.1(postcss@8.4.38)
+      postcss-selector-parser: 6.1.0
+      resolve: 1.22.8
+      sucrase: 3.35.0
+    transitivePeerDependencies:
+      - ts-node
+
+  tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5)):
+    dependencies:
+      '@alloc/quick-lru': 5.2.0
+      arg: 5.0.2
+      chokidar: 3.6.0
+      didyoumean: 1.2.2
+      dlv: 1.1.3
+      fast-glob: 3.3.2
+      glob-parent: 6.0.2
+      is-glob: 4.0.3
+      jiti: 1.21.3
+      lilconfig: 2.1.0
+      micromatch: 4.0.5
+      normalize-path: 3.0.0
+      object-hash: 3.0.0
+      picocolors: 1.0.1
+      postcss: 8.4.38
+      postcss-import: 15.1.0(postcss@8.4.38)
+      postcss-js: 4.0.1(postcss@8.4.38)
+      postcss-load-config: 4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.7)(typescript@4.3.5))
       postcss-nested: 6.0.1(postcss@8.4.38)
       postcss-selector-parser: 6.1.0
       resolve: 1.22.8
