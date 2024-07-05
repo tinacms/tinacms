@@ -13,13 +13,15 @@ export interface SlateNode {
   }
 }
 
+// These attributes are either to be ignored or are manually added elsewehere
+const ignoreThisAttributes = ['type', 'name', 'id']
 function propsToAttributes(node?: { [key: string]: any }) {
   if (!node) return ''
 
   let attributes = ''
 
   for (const key in node) {
-    if (node.hasOwnProperty(key)) {
+    if (node.hasOwnProperty(key) && !ignoreThisAttributes.includes(key)) {
       const value = node[key]
       if (typeof value !== 'object') {
         attributes += ` ${key}="${value}"`
@@ -53,12 +55,11 @@ function convertSlateToXml(node: SlateNode): string {
       if (node.italic) text = `<italic>${text}</italic>`
       return text
     default:
-      // xml = `<${node.type} id="${node.id}"`;
-      xml = `<${node.type}`
+      xml = `<${node.type}${propsToAttributes(node)}`
       if (node.children) {
-        xml += '>'
-        xml += convertChildrenToXml(node.children)
-        return `${xml}</${node.type}>`
+        // xml += '>'
+        const children = convertChildrenToXml(node.children)
+        return children ? `${xml}>${children}</${node.type}>` : `${xml} />`
       }
       return `${xml} />`
   }
