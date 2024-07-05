@@ -37,6 +37,31 @@ Visit [Tina's documentation](https://tina.io/docs/) to learn more.
 
 Visit the [GitHub Discussions](https://github.com/tinacms/tinacms/discussions) or our [Community Discord](https://discord.com/invite/zumN63Ybpf) to ask questions, or look us up on on Twitter at [@tinacms](https://twitter.com/tinacms).
 
+## TinaCMS Dev Licence 🧑‍🎓
+
+All devs should get their “TinaCMS licence” - that is get it up and running, and complete the basics before implementing TinaCMS on a real project.
+
+1. Join [Tina's discord channel](https://discord.com/invite/zumN63Ybpf) - Leave message on the `#introductions`, i.e.:
+
+    > Hi, I am trying out TinaCMS with {{ TECH eg. NextJS }}.  
+    > After I have evaluated TinaCMS I plan to use it in the industry of {{ INDUSTRY }}  
+    > Previous CMS’s I have used is {{ FILL IN }}
+
+2. Create an Tina instance using the default template on [tina.io](https://tina.io) and [TinaCloud](https://app.tina.io/signin)
+
+3. Record a [Done Video](https://www.ssw.com.au/rules/record-a-quick-and-dirty-done-video/) explaining how Tina works.
+
+    Here is a sample Done Videos : https://www.youtube.com/watch?v=OhVYTOKCsWI  
+    ⭐ Of course mention any feedback or suggestions you have from your initial try out.
+    Note: each suggestions should be a separate tab opened for the GitHub Issue
+
+4. (Optional) Post your video on socials (e.g. LinkedIn, Discord, X...) and add a link to the post on your email.
+
+5. Email your Done Video to badge@tina.io
+
+6. The tina team will check your video and issue you a LinkedIn badge (via [Credly](https://info.credly.com/))
+
+
 <!-- ## Changelog
 
 Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.  -->
