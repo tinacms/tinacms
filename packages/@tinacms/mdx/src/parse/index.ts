@@ -114,6 +114,10 @@ export const parseMDX = (
     if (field.parser?.type === 'xml') {
       return parseFromXml(value) as Plate.RootElement
     }
+    if (field.parser?.type === 'json') {
+      // value is already a RootElement. Casting via unknown to reflect this.
+      return value as unknown as Plate.RootElement
+    }
     let preprocessedString = value
     const templatesWithMatchers = field.templates?.filter(
       (template) => template.match

@@ -11,6 +11,9 @@ export interface SlateNode {
   props?: {
     [key: string]: any
   }
+  url?: string
+  alt?: string
+  caption?: string
 }
 
 // These attributes are either to be ignored or are manually added elsewehere
@@ -49,6 +52,7 @@ function convertSlateToXml(node: SlateNode): string {
         : `${xml} />`
     case 'text':
     // Slate seems to be inconsistent with adding "type": "text" to text elements
+    // so if there is no "type" it is a "text"
     case undefined:
       let text = node.text || ''
       if (node.bold) text = `<bold>${text}</bold>`
@@ -106,7 +110,10 @@ export function stringifyToXML(slateDoc: SlateNode): string {
     )
   }
 
-  return formatXML(`<data>${convertChildrenToXml(slateDoc.children)}</data>`)
+  const xml = convertChildrenToXml(slateDoc.children)
+  // Make sure there's no leading or trailing empty paragraph. Slate throws errors in this case
+  const sanitisedXml = xml.replace(/^<p\s*\/>/, '').replace(/<p\s*\/>$/, '')
+  return formatXML(`<data>${sanitisedXml}</data>`)
 }
 
 function parseXmlToSlateNode(node: Element): SlateNode {
@@ -163,13 +170,21 @@ function parseXmlToSlateNode(node: Element): SlateNode {
     }
   }
 
-  if (node.hasAttributes()) {
-    slateNode.props = slateNode.props || {}
-    for (let i = 0; i < node.attributes.length; i++) {
-      const attr = node.attributes[i]
-      if (!attr) continue
-      if (attr.name !== 'id' && attr?.name !== 'type') {
-        slateNode.props[attr.name] = attr.value
+  if (type === 'img' || type === 'a') {
+    // This might need better handling, e.g. parsing the "title" of a link etc
+    slateNode.url = node.getAttribute('url') || ''
+    slateNode.alt = node.getAttribute('alt') || undefined
+    slateNode.caption = node.getAttribute('caption') || undefined
+  } else {
+    if (node.hasAttributes()) {
+      slateNode.props = slateNode.props || {}
+      for (let i = 0; i < node.attributes.length; i++) {
+        const attr = node.attributes[i]
+        if (!attr) continue
+
+        if (attr.name !== 'id' && attr?.name !== 'type') {
+          slateNode.props[attr.name] = attr.value
+        }
       }
     }
   }

@@ -49,6 +49,9 @@ export const stringifyMDX = (
   if (field.parser?.type === 'xml') {
     return stringifyToXML(value as SlateNode)
   }
+  if (field.parser?.type === 'json') {
+    return value
+  }
   if (!value) {
     return
   }

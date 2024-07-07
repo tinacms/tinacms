@@ -701,6 +701,7 @@ export class Database {
     )
     const writeTemplateKey = templateDetails.info.type === 'union'
 
+    // console.log('payload', JSON.stringify(payload));
     const aliasedData = applyNameOverrides(templateDetails.template, payload)
 
     const extension = path.extname(filepath)
