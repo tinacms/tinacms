@@ -469,7 +469,7 @@ const CollectionListPage = () => {
                             ? collection.label
                             : collection.name}
                         </h3>
-                        <div className="flex justify-between pt-2">
+                        <div className="flex flex-col lg:flex-row justify-between items-center lg:items-end pt-2">
                           <div className="flex gap-4 items-start">
                             {fields?.length > 0 && (
                               <>
@@ -565,7 +565,7 @@ const CollectionListPage = () => {
                               )}
                             </div>
                           </div>
-                          <div className="flex flex-row items-end">
+                          <div className="flex flex-row items-end pt-4 lg:pt-0">
                             {!collection.templates && allowCreate && (
                               <>
                                 {allowCreateNestedFolder && (
