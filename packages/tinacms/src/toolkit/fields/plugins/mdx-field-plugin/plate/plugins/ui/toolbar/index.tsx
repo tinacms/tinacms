@@ -112,26 +112,31 @@ export function Toolbar({
     },
     {
       tinaForm,
-      name: 'link',
-      label: 'Link',
-      active: isLinkActive,
-    },
-    {
-      tinaForm,
-      name: 'image',
-      label: 'Image',
-      active: isImgActive,
-    },
-    {
-      tinaForm,
-      name: 'quote',
-      label: 'Quote',
-      active: blockQuoteActive,
+      name: 'bold',
+      label: 'Bold',
+      active: isBoldActive,
       onMouseDown: (e) => {
         e.preventDefault()
         e.stopPropagation()
-        toggleNodeType(editor, { activeType: ELEMENT_BLOCKQUOTE })
+        toggleMark(editor, { key: MARK_BOLD })
       },
+    },
+    {
+      tinaForm,
+      name: 'italic',
+      label: 'Italic',
+      active: isItalicActive,
+      onMouseDown: (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        toggleMark(editor, { key: MARK_ITALIC })
+      },
+    },
+    {
+      tinaForm,
+      name: 'link',
+      label: 'Link',
+      active: isLinkActive,
     },
     {
       tinaForm,
@@ -157,48 +162,43 @@ export function Toolbar({
     },
     {
       tinaForm,
-      name: 'code',
-      label: 'Code',
-      active: isCodeActive,
-      onMouseDown: (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        toggleMark(editor, { key: MARK_CODE })
-      },
+      name: 'image',
+      label: 'Image',
+      active: isImgActive,
     },
-    {
-      tinaForm,
-      name: 'codeBlock',
-      label: 'Code Block',
-      active: codeBlockActive,
-      onMouseDown: (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        insertEmptyCodeBlock(editor)
-      },
-    },
-    {
-      tinaForm,
-      name: 'bold',
-      label: 'Bold',
-      active: isBoldActive,
-      onMouseDown: (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        toggleMark(editor, { key: MARK_BOLD })
-      },
-    },
-    {
-      tinaForm,
-      name: 'italic',
-      label: 'Italic',
-      active: isItalicActive,
-      onMouseDown: (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        toggleMark(editor, { key: MARK_ITALIC })
-      },
-    },
+    // {
+    //   tinaForm,
+    //   name: 'quote',
+    //   label: 'Quote',
+    //   active: blockQuoteActive,
+    //   onMouseDown: (e) => {
+    //     e.preventDefault()
+    //     e.stopPropagation()
+    //     toggleNodeType(editor, { activeType: ELEMENT_BLOCKQUOTE })
+    //   },
+    // },
+    // {
+    //   tinaForm,
+    //   name: 'code',
+    //   label: 'Code',
+    //   active: isCodeActive,
+    //   onMouseDown: (e) => {
+    //     e.preventDefault()
+    //     e.stopPropagation()
+    //     toggleMark(editor, { key: MARK_CODE })
+    //   },
+    // },
+    // {
+    //   tinaForm,
+    //   name: 'codeBlock',
+    //   label: 'Code Block',
+    //   active: codeBlockActive,
+    //   onMouseDown: (e) => {
+    //     e.preventDefault()
+    //     e.stopPropagation()
+    //     insertEmptyCodeBlock(editor)
+    //   },
+    // },
     {
       tinaForm,
       name: 'raw',
