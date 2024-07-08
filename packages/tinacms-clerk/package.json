@@ -1,6 +1,6 @@
 {
   "name": "tinacms-clerk",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "files": [

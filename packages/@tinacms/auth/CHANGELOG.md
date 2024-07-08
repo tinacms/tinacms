@@ -1,5 +1,11 @@
 # @tinacms/auth
 
+## 1.0.5
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+
 ## 1.0.4
 
 ### Patch Changes
