@@ -49,11 +49,12 @@ type Components = {
   DateTime: React.FC<DateTimeProps>
   NewsletterSignup: React.FC<NewsletterSignupProps>
   DropBox: React.FC<DropBoxProps>
-  code_block: React.FC<any> // Replace 'any' with the appropriate type if available
+  code_block: React.FC<any> //TODO: Check if we still need this component
 }
 
 // Implement the components
 const components: Components = {
+  //TODO: Check if we still need this component
   code_block: (props) => <Prism {...props} />,
 
   BlockQuote: ({ children, authorName }: BlockQuoteProps) => (
