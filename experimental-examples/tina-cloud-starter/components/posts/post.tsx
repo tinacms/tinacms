@@ -50,7 +50,6 @@ type Components = {
   NewsletterSignup: React.FC<NewsletterSignupProps>
   DropBox: React.FC<DropBoxProps>
   code_block: React.FC<any> // Replace 'any' with the appropriate type if available
-  img: React.FC<{ url: string; alt: string }>
 }
 
 // Implement the components
@@ -122,12 +121,6 @@ const components: Components = {
         </div>
       </div>
     </div>
-  ),
-
-  img: ({ url, alt }) => (
-    <span className="flex items-center justify-center">
-      <img src={url} alt={alt} />
-    </span>
   ),
 
   DropBox: ({ title, body }: DropBoxProps) => (
