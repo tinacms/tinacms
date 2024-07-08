@@ -1,0 +1,21 @@
+<data>
+  <p>With some content</p>
+  <p>and a <dropBox type="mdxJsxTextElement" title="drop box">
+    <p>dropbox content <bold>here</bold>
+  </p>
+  <p>and a nested <dropBox type="mdxJsxTextElement" title="drop box">
+    <p>nested dropbox content <bold>here</bold>
+  </p>
+</dropBox>
+</p>
+</dropBox>
+</p>
+<practicePoint type="mdxJsxFlowElement">
+  <h2>With tipps</h2>
+  <p>
+    <img url="/images/CanterburyLogo.png" caption="" alt="" />
+  </p>
+  <blockquote>and a quote</blockquote>
+  <p />
+</practicePoint>
+</data>
