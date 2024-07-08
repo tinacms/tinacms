@@ -86,7 +86,7 @@ const config = defineConfig({
             name: '_body',
             templates: [
               {
-                name: 'DropBox',
+                name: 'dropBox',
                 label: 'DropBox',
                 inline: true,
                 fields: [
@@ -101,6 +101,21 @@ const config = defineConfig({
                     label: 'Expanded Information',
                     type: 'rich-text',
                     required: true,
+                    templates: [
+                      {
+                        name: 'dropBox',
+                        label: 'DropBox',
+                        inline: true,
+                        fields: [
+                          {
+                            name: 'title',
+                            label: 'Short Description',
+                            type: 'string',
+                            required: true,
+                          },
+                        ],
+                      },
+                    ],
                   },
                 ],
               },

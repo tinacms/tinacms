@@ -16,7 +16,8 @@ type TinaStringField =
 export const extractAttributes = (
   attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
   fields: TinaField[],
-  imageCallback: (image: string) => string
+  imageCallback: (image: string) => string,
+  inline?: boolean
 ) => {
   const properties: Record<string, unknown> = {}
   attributes?.forEach((attribute) => {
@@ -31,9 +32,11 @@ export const extractAttributes = (
       properties[attribute.name] = extractAttribute(
         attribute,
         field,
-        imageCallback
+        imageCallback,
+        inline
       )
     } catch (e) {
+      console.log(e)
       if (e instanceof Error) {
         throw new Error(
           `Unable to parse field value for field "${field.name}" (type: ${field.type}). ${e.message}`
@@ -47,7 +50,8 @@ export const extractAttributes = (
 const extractAttribute = (
   attribute: MdxJsxAttribute,
   field: TinaField,
-  imageCallback: (image: string) => string
+  imageCallback: (image: string) => string,
+  inline?: boolean
 ) => {
   switch (field.type) {
     case 'boolean':
@@ -80,7 +84,24 @@ const extractAttribute = (
     case 'object':
       return extractObject(extractExpression(attribute), field, imageCallback)
     case 'rich-text':
+      if (inline) {
+        console.dir(attribute, { depth: null })
+        /**
+         * Syntax can either be string (eg. body="# hello") or backticks (eg. body={`# hello`})
+         */
+        if (typeof attribute.value === 'string') {
+          const parsed = JSON.parse(`{ "value": "${attribute.value}" }`)
+          const valueWithNewlinesPreserved = parsed.cooked
+          return parseMDX(valueWithNewlinesPreserved, field, imageCallback)
+        } else {
+          const value =
+            attribute.value.data.estree.body[0].expression.quasis[0].value
+              .cooked
+          return parseMDX(value, field, imageCallback)
+        }
+      }
       const JSXString = extractRaw(attribute)
+
       if (JSXString) {
         return parseMDX(JSXString, field, imageCallback)
       } else {

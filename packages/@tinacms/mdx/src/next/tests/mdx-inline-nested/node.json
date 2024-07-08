@@ -27,24 +27,26 @@
                   "children": [
                     {
                       "type": "text",
-                      "text": "This is some more rich-text with "
-                    },
-                    {
-                      "type": "mdxJsxTextElement",
-                      "name": "dropBox",
-                      "children": [
-                        {
-                          "type": "text",
-                          "text": ""
-                        }
-                      ],
-                      "props": {
-                        "title": "Hi again"
-                      }
-                    },
+                      "text": "hello"
+                    }
+                  ]
+                },
+                {
+                  "type": "code_block",
+                  "value": "console.log(a)",
+                  "children": [
                     {
                       "type": "text",
-                      "text": " nested inside of it"
+                      "text": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Goodbye."
                     }
                   ]
                 }
