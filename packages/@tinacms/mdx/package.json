@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@tinacms/schema-tools": "workspace:*",
+    "@xmldom/xmldom": "^0.8.10",
     "acorn": "8.8.2",
     "ccount": "2.0.1",
     "estree-util-is-identifier-name": "2.1.0",
@@ -58,8 +59,8 @@
     "parse-entities": "4.0.1",
     "prettier": "^2.7.1",
     "remark": "14.0.2",
-    "remark-mdx": "2.3.0",
     "remark-gfm": "^2.0.0",
+    "remark-mdx": "2.3.0",
     "stringify-entities": "4.0.3",
     "unist-util-source": "4.0.2",
     "unist-util-stringify-position": "3.0.3",
@@ -76,20 +77,20 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
-    "@types/mdast": "^3.0.10",
-    "@types/unist": "^2.0.6",
     "@types/estree": "1.0.0",
     "@types/lodash-es": "4.17.6",
+    "@types/mdast": "^3.0.10",
     "@types/node": "^14.18.21",
     "@types/prettier": "^2.6.3",
+    "@types/unist": "^2.0.6",
     "c8": "^7.11.3",
+    "concat-md": "^0.5.1",
     "jest-file-snapshot": "^0.5.0",
     "ts-node": "^10.8.2",
     "typedoc": "^0.23.21",
     "typedoc-plugin-markdown": "^3.13.6",
     "typescript": "^4.7.4",
     "vite": "^4.3.9",
-    "vitest": "^0.32.2",
-    "concat-md": "^0.5.1"
+    "vitest": "^0.32.2"
   }
 }

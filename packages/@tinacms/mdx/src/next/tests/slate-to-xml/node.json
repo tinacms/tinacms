@@ -1,0 +1,104 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [{ "type": "text", "text": "With some content" }]
+    },
+    {
+      "type": "p",
+      "children": [
+        { "type": "text", "text": "and a " },
+        {
+          "type": "mdxJsxTextElement",
+          "name": "dropBox",
+          "children": [{ "type": "text", "text": "" }],
+          "props": {
+            "content": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    { "type": "text", "text": "dropbox content " },
+                    { "type": "text", "text": "here", "bold": true }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "children": [
+                    { "type": "text", "text": "and a nested " },
+                    {
+                      "type": "mdxJsxTextElement",
+                      "name": "dropBox",
+                      "children": [{ "type": "text", "text": "" }],
+                      "props": {
+                        "content": {
+                          "type": "root",
+                          "children": [
+                            {
+                              "type": "p",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "text": "nested dropbox content "
+                                },
+                                { "type": "text", "text": "here", "bold": true }
+                              ]
+                            }
+                          ]
+                        },
+                        "title": "drop box"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "title": "drop box"
+          }
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "practicePoint",
+      "children": [{ "type": "text", "text": "" }],
+      "props": {
+        "content": {
+          "type": "root",
+          "children": [
+            {
+              "type": "h2",
+              "children": [{ "type": "text", "text": "With tipps" }],
+              "id": 1720157227844
+            },
+            {
+              "type": "p",
+              "children": [
+                { "text": "" },
+                {
+                  "type": "img",
+                  "children": [{ "text": "" }],
+                  "url": "/images/CanterburyLogo.png",
+                  "caption": "",
+                  "alt": "",
+                  "id": "1s80h"
+                },
+                { "text": "" }
+              ],
+              "id": 1720157227844
+            },
+            {
+              "type": "blockquote",
+              "id": "4ay50",
+              "children": [{ "text": "and a quote" }]
+            },
+            { "type": "p", "children": [{ "text": "" }], "id": "o4s7g" }
+          ]
+        }
+      }
+    },
+    { "type": "p", "children": [] }
+  ]
+}

@@ -18,6 +18,7 @@ import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdo
 import { tinaDirective } from '../extensions/tina-shortcodes/extension'
 import { Pattern } from '../stringify'
 import { parseShortcode } from './parseShortcode'
+import { parseFromXml } from '../next/xml-parser'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -109,6 +110,13 @@ export const parseMDX = (
   try {
     if (field.parser?.type === 'markdown') {
       return parseMDXNext(value, field, imageCallback)
+    }
+    if (field.parser?.type === 'xml') {
+      return parseFromXml(value) as Plate.RootElement
+    }
+    if (field.parser?.type === 'json') {
+      // value is already a RootElement. Casting via unknown to reflect this.
+      return value as unknown as Plate.RootElement
     }
     let preprocessedString = value
     const templatesWithMatchers = field.templates?.filter(

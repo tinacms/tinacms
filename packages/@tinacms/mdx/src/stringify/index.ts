@@ -20,6 +20,7 @@ import { eat } from './marks'
 import { stringifyProps } from './acorn'
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
 import { stringifyShortcode } from './stringifyShortcode'
+import { SlateNode, stringifyToXML } from '../next/xml-parser'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -44,6 +45,12 @@ export const stringifyMDX = (
 ) => {
   if (field.parser?.type === 'markdown') {
     return stringifyMDXNext(value, field, imageCallback)
+  }
+  if (field.parser?.type === 'xml') {
+    return stringifyToXML(value as SlateNode)
+  }
+  if (field.parser?.type === 'json') {
+    return value
   }
   if (!value) {
     return
