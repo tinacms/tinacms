@@ -49,7 +49,7 @@ export const PageHeader = ({
       {isLocalMode && <LocalWarning />}
       {!isLocalMode && <BillingWarning />}
 
-      <div className="pt-16 lg:pt-12 px-12">
+      <div className="pt-16 xl:pt-12 px-12">
         <div className="w-full mx-auto max-w-screen-xl">
           <div className="w-full flex justify-between items-end">
             {children}
