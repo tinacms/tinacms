@@ -22,7 +22,6 @@ import {
 } from '../internalClient'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
-import { setEditing } from '@tinacms/sharedctx'
 import { TinaAdminApi } from '../admin/api'
 
 type ModalNames = null | 'authenticate' | 'error'
@@ -160,7 +159,7 @@ export const AuthWallInner = ({
     }
   }
 
-  let modalTitle = 'Tina Cloud Authorization'
+  let modalTitle = 'Tina Cloud'
   if (
     activeModal === 'authenticate' &&
     loginStrategy === 'Redirect' &&
@@ -187,28 +186,14 @@ export const AuthWallInner = ({
           title={modalTitle}
           message={
             isTinaCloud
-              ? 'To save edits, Tina Cloud authorization is required. On save, changes will get committed using your account.'
+              ? 'Your site uses Tina Cloud to track changes. To make edits, you must log in.'
               : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
           }
           close={close}
           actions={[
             ...otherModalActions,
             {
-              action: async () => {
-                // This does not work it looks like we have somehow getting two contexts
-                // console.log({ setEdit })
-                // setEdit(false)
-                // setActiveModal(null)
-
-                // This is a temp fix
-                setEditing(false) // set editing just sets the local storage
-                window.location.reload()
-              },
-              name: 'Close',
-              primary: false,
-            },
-            {
-              name: isTinaCloud ? 'Continue to Tina Cloud' : 'Enter Edit Mode',
+              name: isTinaCloud ? 'Log in' : 'Enter Edit Mode',
               action: handleAuthenticate,
               primary: true,
             },
