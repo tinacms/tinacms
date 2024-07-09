@@ -565,7 +565,7 @@ const CollectionListPage = () => {
                               )}
                             </div>
                           </div>
-                          <div className="flex flex-row items-end pt-4 lg:pt-0">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2 sm:gap-0 pt-4 lg:pt-0">
                             {!collection.templates && allowCreate && (
                               <>
                                 {allowCreateNestedFolder && (
