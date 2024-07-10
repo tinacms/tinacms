@@ -279,18 +279,15 @@ export const FormStatus = ({ pristine }) => {
     <div className="flex flex-0 items-center">
       {!pristine && (
         <>
-          <span className="w-3 h-3 flex-0 rounded-full bg-yellow-300 border border-yellow-400 mr-2"></span>{' '}
-          <p className="text-gray-500 text-xs leading-tight whitespace-nowrap">
+          <p className="text-gray-500 text-xs leading-tight whitespace-nowrap mr-2">
             Unsaved Changes
           </p>
+          <span className="w-3 h-3 flex-0 rounded-full bg-red-300 border border-red-400"></span>{' '}
         </>
       )}
       {pristine && (
         <>
-          <span className="w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400 mr-2"></span>{' '}
-          <p className="text-gray-500 text-xs leading-tight whitespace-nowrap">
-            No Changes
-          </p>
+          <span className="w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400"></span>{' '}
         </>
       )}
     </div>
