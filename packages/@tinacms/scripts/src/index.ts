@@ -294,6 +294,19 @@ export const buildIt = async (entryPoint, packageJSON) => {
         external,
         target: 'node12',
       })
+      if (packageJSON.module) {
+        await esbuild({
+          entryPoints: [path.join(process.cwd(), entry)],
+          bundle: true,
+          platform: 'node',
+          target: 'es2020',
+          format: 'esm',
+          outfile: outInfo.outfile
+            ? path.join(process.cwd(), 'dist', `${outInfo.outfile}.mjs`)
+            : path.join(process.cwd(), 'dist', 'index.mjs'),
+          external,
+        })
+      }
     }
 
     const extension = path.extname(entry)
