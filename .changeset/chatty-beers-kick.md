@@ -1,5 +1,5 @@
 ---
-'tinacms': minor
+'tinacms': patch
 ---
 
 updated TinaCloud auth modal text
