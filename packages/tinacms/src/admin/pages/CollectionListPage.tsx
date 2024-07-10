@@ -474,7 +474,7 @@ const CollectionListPage = () => {
                             {fields?.length > 0 && (
                               <>
                                 {!search && (
-                                  <div className="flex flex-col gap-2 items-start">
+                                  <div className="flex flex-col gap-2 items-start w-full md:w-auto">
                                     <label
                                       htmlFor="sort"
                                       className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
