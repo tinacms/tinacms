@@ -22,93 +22,113 @@ import type { TinaMarkdownContent, Components } from 'tinacms/dist/rich-text'
 import { PostType } from '../../pages/posts/[filename]'
 import { tinaField } from 'tinacms/dist/react'
 
-const components: Components<{
-  BlockQuote: {
-    children: TinaMarkdownContent
-    authorName: string
-  }
-  DateTime: {
-    format?: string
-  }
-  NewsletterSignup: {
-    placeholder: string
-    buttonText: string
-    children: TinaMarkdownContent
-    disclaimer?: TinaMarkdownContent
-  }
-}> = {
-  code_block: (props) => <Prism {...props} />,
-  BlockQuote: (props: {
-    children: TinaMarkdownContent
-    authorName: string
-  }) => {
-    return (
-      <div>
-        <blockquote>
-          <TinaMarkdown content={props.children} />
-          {props.authorName}
-        </blockquote>
-      </div>
-    )
-  },
-  DateTime: (props) => {
-    const dt = React.useMemo(() => {
-      return new Date()
-    }, [])
+interface BlockQuoteProps {
+  children: TinaMarkdownContent
+  authorName: string
+}
 
-    switch (props.format) {
-      case 'iso':
-        return <span>{dt.toISOString()}</span>
-      case 'utc':
-        return <span>{dt.toUTCString()}</span>
-      case 'local':
-        return <span>{dt.toLocaleDateString()}</span>
-      default:
-        return <span>{dt.toLocaleDateString()}</span>
+interface DateTimeProps {
+  format?: string
+}
+
+interface NewsletterSignupProps {
+  placeholder: string
+  buttonText: string
+  children: TinaMarkdownContent
+  disclaimer?: TinaMarkdownContent
+}
+
+interface DropBoxProps {
+  title: string
+  body: TinaMarkdownContent
+}
+
+// Define the Components type
+type Components = {
+  BlockQuote: React.FC<BlockQuoteProps>
+  DateTime: React.FC<DateTimeProps>
+  NewsletterSignup: React.FC<NewsletterSignupProps>
+  DropBox: React.FC<DropBoxProps>
+  code_block: React.FC<any> //TODO: Check if we still need this component
+}
+
+// Implement the components
+const components: Components = {
+  //TODO: Check if we still need this component
+  code_block: (props) => <Prism {...props} />,
+
+  BlockQuote: ({ children, authorName }: BlockQuoteProps) => (
+    <div>
+      <blockquote>
+        <TinaMarkdown content={children} />
+        {authorName}
+      </blockquote>
+    </div>
+  ),
+
+  DateTime: ({ format }: DateTimeProps) => {
+    const dt = React.useMemo(() => new Date(), [])
+    const formatDate = () => {
+      switch (format) {
+        case 'iso':
+          return dt.toISOString()
+        case 'utc':
+          return dt.toUTCString()
+        case 'local':
+        default:
+          return dt.toLocaleDateString()
+      }
     }
+    return <span>{formatDate()}</span>
   },
-  NewsletterSignup: (props) => {
-    return (
-      <div className="bg-white">
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-          <div className="">
-            <TinaMarkdown content={props.children} />
-          </div>
-          <div className="mt-8 ">
-            <form className="sm:flex">
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email-address"
-                name="email-address"
-                type="email"
-                autoComplete="email"
-                required
-                className="w-full px-5 py-3 border border-gray-300 shadow-sm placeholder-gray-400 focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:max-w-xs rounded-md"
-                placeholder={props.placeholder}
-              />
-              <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
-                <button
-                  type="submit"
-                  className="w-full flex items-center justify-center py-3 px-5 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                >
-                  {props.buttonText}
-                </button>
-              </div>
-            </form>
-            <div className="mt-3 text-sm text-gray-500">
-              {props.disclaimer && <TinaMarkdown content={props.disclaimer} />}
+
+  NewsletterSignup: ({
+    placeholder,
+    buttonText,
+    children,
+    disclaimer,
+  }: NewsletterSignupProps) => (
+    <div className="bg-white">
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="">
+          <TinaMarkdown content={children} />
+        </div>
+        <div className="mt-8">
+          <form className="sm:flex">
+            <label htmlFor="email-address" className="sr-only">
+              Email address
+            </label>
+            <input
+              id="email-address"
+              name="email-address"
+              type="email"
+              autoComplete="email"
+              required
+              className="w-full px-5 py-3 border border-gray-300 shadow-sm placeholder-gray-400 focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:max-w-xs rounded-md"
+              placeholder={placeholder}
+            />
+            <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
+              <button
+                type="submit"
+                className="w-full flex items-center justify-center py-3 px-5 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+              >
+                {buttonText}
+              </button>
             </div>
+          </form>
+          <div className="mt-3 text-sm text-gray-500">
+            {disclaimer && <TinaMarkdown content={disclaimer} />}
           </div>
         </div>
       </div>
-    )
-  },
-  img: (props) => (
-    <span className="flex items-center justify-center">
-      <img src={props.url} alt={props.alt} />
-    </span>
+    </div>
+  ),
+
+  DropBox: ({ title, body }: DropBoxProps) => (
+    <>
+      <h2>{title}</h2>
+      <TinaMarkdown content={body} />
+    </>
   ),
 }
 
