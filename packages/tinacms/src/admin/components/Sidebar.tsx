@@ -36,7 +36,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
   const [menuIsOpen, setMenuIsOpen] = React.useState(false)
 
   const isLocalMode = cms.api?.tina?.isLocalMode
-  const navBreakpoint = 1000
+  const navBreakpoint = 1279
   const windowWidth = useWindowWidth()
   const renderDesktopNav = windowWidth > navBreakpoint
   const activeScreens = screens.filter(

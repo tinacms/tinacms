@@ -296,7 +296,6 @@ const CollectionListPage = () => {
                 reFetchCollection,
                 collectionExtra: Collection<true>
               ) => {
-                const totalCount = collection.documents.totalCount
                 const documents = collection.documents.edges
                 const admin: TinaAdminApi = cms.api.admin
                 const pageInfo = collection.documents.pageInfo
@@ -464,19 +463,18 @@ const CollectionListPage = () => {
                     )}
 
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
-                      <div className="w-full grid grid-flow-col items-end gap-4">
-                        <div className="flex flex-col gap-4">
-                          <h3 className="font-sans text-2xl text-gray-700">
-                            {collection.label
-                              ? collection.label
-                              : collection.name}
-                          </h3>
-
-                          <div className="flex gap-4 items-start flex-wrap">
+                      <div className="w-full">
+                        <h3 className="font-sans text-2xl text-gray-700">
+                          {collection.label
+                            ? collection.label
+                            : collection.name}
+                        </h3>
+                        <div className="flex flex-col lg:flex-row justify-between lg:items-end pt-2">
+                          <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-start">
                             {fields?.length > 0 && (
                               <>
                                 {!search && (
-                                  <div className="flex flex-col gap-2 items-start">
+                                  <div className="flex flex-col gap-2 items-start w-full md:w-auto">
                                     <label
                                       htmlFor="sort"
                                       className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
@@ -567,58 +565,58 @@ const CollectionListPage = () => {
                               )}
                             </div>
                           </div>
-                        </div>
-                        <div className="flex self-end	justify-self-end">
-                          {!collection.templates && allowCreate && (
-                            <>
-                              {allowCreateNestedFolder && (
+                          <div className="flex flex-col md:flex-row items-start md:items-end gap-2 md:gap-0 pt-4 lg:pt-0">
+                            {!collection.templates && allowCreate && (
+                              <>
+                                {allowCreateNestedFolder && (
+                                  <Link
+                                    onMouseDown={(evt) => {
+                                      setVars((old) => ({
+                                        ...old,
+                                        collection: collectionName,
+                                        folderName: '',
+                                      }))
+                                      setFolderModalOpen(true)
+                                      evt.stopPropagation()
+                                    }}
+                                    to="/collections/new-folder"
+                                    className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4"
+                                  >
+                                    <FaFolder className="mr-2" />
+                                    Add Folder{' '}
+                                  </Link>
+                                )}
                                 <Link
-                                  onMouseDown={(evt) => {
-                                    setVars((old) => ({
-                                      ...old,
-                                      collection: collectionName,
-                                      folderName: '',
-                                    }))
-                                    setFolderModalOpen(true)
-                                    evt.stopPropagation()
-                                  }}
-                                  to="/collections/new-folder"
-                                  className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 text-sm h-10 px-6 mr-4"
+                                  to={`/${
+                                    folder.fullyQualifiedName
+                                      ? [
+                                          'collections',
+                                          'new',
+                                          collectionName,
+                                          '~',
+                                          folder.name,
+                                        ].join('/')
+                                      : [
+                                          'collections',
+                                          'new',
+                                          collectionName,
+                                        ].join('/')
+                                  }`}
+                                  className="inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6"
                                 >
-                                  <FaFolder className="mr-2" />
-                                  Add Folder{' '}
+                                  <FaFile className="mr-2" />
+                                  Add Files{' '}
                                 </Link>
-                              )}
-                              <Link
-                                to={`/${
-                                  folder.fullyQualifiedName
-                                    ? [
-                                        'collections',
-                                        'new',
-                                        collectionName,
-                                        '~',
-                                        folder.name,
-                                      ].join('/')
-                                    : [
-                                        'collections',
-                                        'new',
-                                        collectionName,
-                                      ].join('/')
-                                }`}
-                                className="inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 text-sm h-10 px-6"
-                              >
-                                <FaFile className="mr-2" />
-                                Add Files{' '}
-                              </Link>
-                            </>
-                          )}
-                          {collection.templates && allowCreate && (
-                            <TemplateMenu
-                              collectionName={collectionName}
-                              templates={collection.templates}
-                              folder={folder}
-                            />
-                          )}
+                              </>
+                            )}
+                            {collection.templates && allowCreate && (
+                              <TemplateMenu
+                                collectionName={collectionName}
+                                templates={collection.templates}
+                                folder={folder}
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
                     </PageHeader>
@@ -956,8 +954,8 @@ const SearchInput = ({
       >
         Search
       </label>
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex-1 min-w-[200px]">
+      <div className="flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3">
+        <div className="flex-1 min-w-[200px] w-full md:w-auto">
           <Input
             type="text"
             name="search"
@@ -968,13 +966,14 @@ const SearchInput = ({
             }}
           />
         </div>
-        <div className="flex gap-3">
+        <div className="flex w-full md:w-auto gap-3">
           <Button
             onClick={() => {
               setSearch(searchInput)
               setSearchLoaded(false)
             }}
             variant="primary"
+            className="w-full md:w-auto"
           >
             Search <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
           </Button>
