@@ -66,14 +66,16 @@ export const Message = ({
     <div
       className={`rounded-lg border shadow-sm ${sizeClasses[size]} ${containerClasses[type]} ${className}`}
     >
-      <div className="flex items-center gap-2">
-        <MessageIcon
-          type={type}
-          className={`${
-            size === 'small' ? 'w-5' : 'w-6'
-          } h-auto flex-shrink-0 ${iconClasses[type]}`}
-        />
-        <div className={`flex-1 ${textClasses[type]}`}>{children}</div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+        <div className="flex items-center gap-2">
+          <MessageIcon
+            type={type}
+            className={`${
+              size === 'small' ? 'w-5' : 'w-6'
+            } h-auto flex-shrink-0 ${iconClasses[type]}`}
+          />
+          <div className={`flex-1 ${textClasses[type]}`}>{children}</div>
+        </div>
         {link && (
           <a
             href={link}
