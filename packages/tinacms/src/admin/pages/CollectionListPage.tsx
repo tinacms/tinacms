@@ -954,8 +954,8 @@ const SearchInput = ({
       >
         Search
       </label>
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex-1 min-w-[200px]">
+      <div className="flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3">
+        <div className="flex-1 min-w-[200px] w-full md:w-auto">
           <Input
             type="text"
             name="search"
@@ -966,13 +966,14 @@ const SearchInput = ({
             }}
           />
         </div>
-        <div className="flex gap-3">
+        <div className="flex w-full md:w-auto gap-3">
           <Button
             onClick={() => {
               setSearch(searchInput)
               setSearchLoaded(false)
             }}
             variant="primary"
+            className="w-full md:w-auto"
           >
             Search <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
           </Button>
