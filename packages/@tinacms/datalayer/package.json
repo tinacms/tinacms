@@ -31,7 +31,7 @@
       },
       {
         "name": "src/index-edge.ts",
-        "target": "edge",
+        "target": "node",
         "bundle": []
       }
     ]

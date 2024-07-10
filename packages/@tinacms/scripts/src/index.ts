@@ -4,7 +4,6 @@
 
 import { build } from 'vite'
 import { build as esbuild } from 'esbuild'
-import { polyfillNode } from 'esbuild-plugin-polyfill-node'
 import fs from 'fs-extra'
 import path from 'path'
 import chokidar from 'chokidar'
@@ -217,30 +216,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
   }
 
   external.forEach((ext) => (globals[ext] = 'NOOP'))
-  if (target === 'edge') {
-    await esbuild({
-      entryPoints: [path.join(process.cwd(), entry)],
-      bundle: true,
-      treeShaking: true,
-      conditions: ['worker'],
-      define: {
-        global: 'globalThis',
-      },
-      plugins: [
-        polyfillNode({
-          polyfills: {
-            fs: 'empty', // see https://github.com/jonschlinkert/gray-matter/issues/50
-          },
-        }),
-      ],
-      format: 'esm',
-      // Use the outfile if it is provided
-      outfile: outInfo.outfile
-        ? path.join(process.cwd(), 'dist', `${outInfo.outfile}.mjs`)
-        : path.join(process.cwd(), 'dist', 'index.mjs'),
-    })
-    return true
-  } else if (target === 'node') {
+  if (target === 'node') {
     if (['@tinacms/graphql', '@tinacms/datalayer'].includes(packageJSON.name)) {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],
