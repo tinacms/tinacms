@@ -285,6 +285,15 @@ export const buildIt = async (entryPoint, packageJSON) => {
         // development, which we don't want to expose our users to.
         external: Object.keys({ ...peerDeps }),
       })
+      // Additional bundle to target edge runtimes:
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        conditions: ['worker'],
+        target: 'es2020',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'index.edge.mjs'),
+      })
     } else {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],
