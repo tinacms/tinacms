@@ -8,22 +8,13 @@ import {
   AbstractSublevelOptions,
 } from 'abstract-level'
 
-export type Level = AbstractLevel<
-  Buffer | Uint8Array | string,
-  string,
-  Record<string, any>
->
+export type Level = AbstractLevel<any, string, Record<string, any>>
 
 export type PutOp = {
   type: 'put'
   key: string
   value: Record<string, any>
-  sublevel?: AbstractSublevel<
-    Level,
-    Buffer | Uint8Array | string,
-    string,
-    Record<string, any>
-  >
+  sublevel?: AbstractSublevel<Level, any, string, Record<string, any>>
 }
 
 export type DelOp = {
@@ -31,7 +22,7 @@ export type DelOp = {
   key: string
   sublevel?: AbstractSublevel<
     Level,
-    Buffer | Uint8Array | string,
+    any,
     string,
     Record<string, Record<string, any>>
   >
