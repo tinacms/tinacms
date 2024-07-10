@@ -565,7 +565,7 @@ const CollectionListPage = () => {
                               )}
                             </div>
                           </div>
-                          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2 sm:gap-0 pt-4 lg:pt-0">
+                          <div className="flex flex-col md:flex-row items-start md:items-end gap-2 md:gap-0 pt-4 lg:pt-0">
                             {!collection.templates && allowCreate && (
                               <>
                                 {allowCreateNestedFolder && (
@@ -580,7 +580,7 @@ const CollectionListPage = () => {
                                       evt.stopPropagation()
                                     }}
                                     to="/collections/new-folder"
-                                    className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 text-sm h-10 px-6 mr-4"
+                                    className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4"
                                   >
                                     <FaFolder className="mr-2" />
                                     Add Folder{' '}
@@ -602,7 +602,7 @@ const CollectionListPage = () => {
                                           collectionName,
                                         ].join('/')
                                   }`}
-                                  className="inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 text-sm h-10 px-6"
+                                  className="inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6"
                                 >
                                   <FaFile className="mr-2" />
                                   Add Files{' '}
