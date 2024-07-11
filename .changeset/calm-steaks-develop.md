@@ -1,5 +1,4 @@
 ---
-'@tinacms/self-hosted-starter': patch
 'tinacms': patch
 ---
 
