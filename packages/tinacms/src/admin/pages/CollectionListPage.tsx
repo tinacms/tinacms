@@ -718,7 +718,6 @@ const CollectionListPage = () => {
                                     return (
                                       <tr
                                         key={`document-${document.node._sys.relativePath}`}
-                                        className=""
                                       >
                                         <td
                                           className="pl-5 pr-3 py-3"
