@@ -46,7 +46,6 @@
   "buildConfig": {
     "entryPoints": [
       "src/index.ts",
-      "src/edit-state.tsx",
       "src/rich-text/index.tsx",
       "src/rich-text/prism.tsx",
       "src/react.tsx",
@@ -74,7 +73,6 @@
     "@tinacms/mdx": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/search": "workspace:*",
-    "@tinacms/sharedctx": "workspace:*",
     "@udecode/plate-headless": "^21.4.0",
     "color-string": "^1.5.3",
     "crypto-js": "^4.1.1",

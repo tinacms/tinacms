@@ -7,8 +7,6 @@ import { FormBuilder, FormStatus } from '@toolkit/form-builder'
 import { FormMetaPlugin } from '@toolkit/plugin-form-meta'
 import { SidebarContext } from './sidebar'
 import { BiHomeAlt } from 'react-icons/bi'
-import { EditContext } from '@tinacms/sharedctx'
-import { PendingFormsPlaceholder } from './no-forms-placeholder'
 
 export const FormsView = ({
   children,
@@ -17,22 +15,6 @@ export const FormsView = ({
 }) => {
   const cms = useCMS()
   const { setFormIsPristine } = React.useContext(SidebarContext)
-  const { formsRegistering, setFormsRegistering } = React.useContext<{
-    formsRegistering: boolean
-    setFormsRegistering: (_value: boolean) => void
-  }>(EditContext)
-
-  React.useMemo(
-    () =>
-      cms.events.subscribe('forms:register', (event) => {
-        if (event.value === 'start') {
-          setFormsRegistering(true)
-        } else {
-          setFormsRegistering(false)
-        }
-      }),
-    []
-  )
 
   const isMultiform = cms.state.forms.length > 1
   const activeForm = cms.state.forms.find(
@@ -44,7 +26,6 @@ export const FormsView = ({
    * No Forms
    */
   if (!cms.state.formLists.length) {
-    if (formsRegistering) return <PendingFormsPlaceholder />
     return <> {children} </>
   }
 
