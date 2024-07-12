@@ -17,7 +17,6 @@ import type { Template } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
-import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
@@ -330,7 +329,7 @@ export const RenderForm = ({
     })
   }, [cms, collection, mutationInfo])
 
-  const navBreakpoint = 1000
+  const navBreakpoint = 1279
   const windowWidth = useWindowWidth()
   const renderNavToggle = windowWidth < navBreakpoint + 1
   const headerPadding = renderNavToggle ? 'px-20' : 'px-6'
