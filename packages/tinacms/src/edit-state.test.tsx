@@ -1,5 +1,5 @@
 import { render, waitFor } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import { describe, it, expect, vi } from 'vitest'
 
 import React from 'react'
