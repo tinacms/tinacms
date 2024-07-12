@@ -356,7 +356,7 @@ export const RenderForm = ({
         {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
 
         <div
-          className={`pt-3 pb-4 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center ${headerPadding}`}
+          className={`pt-10 xl:pt-3 pb-10 xl:pb-4 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center ${headerPadding}`}
         >
           <div className="w-full max-w-form flex gap-1.5 justify-between items-center">
             <Link
