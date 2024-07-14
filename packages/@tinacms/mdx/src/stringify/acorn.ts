@@ -213,7 +213,7 @@ export function stringifyProps(
         if (field.list) {
           throw new Error(`Rich-text list is not supported`)
         } else {
-          if (template.inline) {
+          if (template?.inline) {
             const root = value as Plate.RootElement
             const stringValue = stringifyMDX(root, field, imageCallback)
             let s = stringValue || ''
