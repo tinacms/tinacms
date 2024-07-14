@@ -1,7 +1,7 @@
 import React from 'react'
 import { Media } from '@toolkit/core'
-import { BiFolder, BiFile } from 'react-icons/bi'
-import { isImage } from './utils'
+import { BiFolder, BiFile, BiMovie } from 'react-icons/bi'
+import { isImage, isVideo } from './utils'
 
 interface MediaItemProps {
   item: Media & { new?: boolean }
@@ -10,7 +10,12 @@ interface MediaItemProps {
 }
 
 export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
-  const FileIcon = item.type === 'dir' ? BiFolder : BiFile
+  let FileIcon = BiFile
+  if (item.type === 'dir') {
+    FileIcon = BiFolder
+  } else if (isVideo(item.src)) {
+    FileIcon = BiMovie
+  }
   const thumbnail = (item.thumbnails || {})['75x75']
   return (
     <li
@@ -53,7 +58,12 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
 }
 
 export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
-  const FileIcon = item.type === 'dir' ? BiFolder : BiFile
+  let FileIcon = BiFile
+  if (item.type === 'dir') {
+    FileIcon = BiFolder
+  } else if (isVideo(item.src)) {
+    FileIcon = BiMovie
+  }
   const thumbnail = (item.thumbnails || {})['400x400']
   return (
     <li
