@@ -64,15 +64,6 @@ export function mdxJsxElement(
     const childField = template.fields.find(
       (field) => field.name === 'children'
     )
-    template.fields.forEach((field) => {
-      if (field.type === 'rich-text') {
-        const value = props[field.name]
-        if (typeof value !== 'string') {
-          // props[field.name] = toTinaMarkdown({ type: 'root', children: value }, field)
-        }
-        // console.dir(props[field.name], { depth: null })
-      }
-    })
     if (childField) {
       if (childField.type === 'rich-text') {
         if (node.type === 'mdxJsxTextElement') {
