@@ -10,7 +10,6 @@ import parser from 'prettier/esm/parser-espree.mjs'
 import type {
   RichTextField,
   RichTextTemplate,
-  ObjectField,
   TinaField,
 } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
@@ -215,14 +214,18 @@ export function stringifyProps(
           throw new Error(`Rich-text list is not supported`)
         } else {
           if (template.inline) {
-            // console.dir(value, { depth: null })
-            const stringValue = stringifyMDX(value, field, imageCallback)
-            console.log(`string value`, JSON.stringify(stringValue))
-            console.log(`single line`, stringValue?.split('\n').join('\\n'))
+            const root = value as Plate.RootElement
+            const stringValue = stringifyMDX(root, field, imageCallback)
+            let s = stringValue || ''
+            s = s.replace(/`/g, '\\`')
+            s = s.replace(/\n/g, '\\n')
             attributes.push({
               type: 'mdxJsxAttribute',
               name,
-              value: stringValue,
+              value: {
+                type: 'mdxJsxAttributeValueExpression',
+                value: `\`${s}\``,
+              },
             })
           } else {
             const joiner = flatten ? ' ' : '\n'

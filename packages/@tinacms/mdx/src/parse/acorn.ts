@@ -85,7 +85,6 @@ const extractAttribute = (
       return extractObject(extractExpression(attribute), field, imageCallback)
     case 'rich-text':
       if (inline) {
-        console.dir(attribute, { depth: null })
         /**
          * Syntax can either be string (eg. body="# hello") or backticks (eg. body={`# hello`})
          */
@@ -94,10 +93,24 @@ const extractAttribute = (
           const valueWithNewlinesPreserved = parsed.cooked
           return parseMDX(valueWithNewlinesPreserved, field, imageCallback)
         } else {
-          const value =
-            attribute.value.data.estree.body[0].expression.quasis[0].value
-              .cooked
-          return parseMDX(value, field, imageCallback)
+          attribute.value
+          if (attribute.value) {
+            const estree = attribute.value.data?.estree
+            if (estree) {
+              const firstNode = estree.body.at(0)
+              if (firstNode?.type === 'ExpressionStatement') {
+                if (firstNode.expression.type === 'TemplateLiteral') {
+                  const templateElement = firstNode.expression.quasis.at(0)
+                  if (templateElement) {
+                    const value = templateElement.value.cooked
+                    if (value) {
+                      return parseMDX(value, field, imageCallback)
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
       const JSXString = extractRaw(attribute)
