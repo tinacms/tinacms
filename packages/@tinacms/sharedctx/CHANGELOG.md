@@ -1,5 +1,11 @@
 # @tinacms/sharedctx
 
+## 1.0.3
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+
 ## 1.0.2
 
 ### Patch Changes

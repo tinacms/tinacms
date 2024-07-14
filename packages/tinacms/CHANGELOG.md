@@ -1,5 +1,19 @@
 # tinacms
 
+## 1.6.5
+
+### Patch Changes
+
+- 04f0bf3: CMS - Fix broken link in error message of CMS startup. Broken link was replaced by https://tina.io/docs/tina-cloud/overview
+- 0503072: update ts, remove rimraf, fix types
+- 1104006: Update tailwind to v3.4.4 + fix media manager height overflow on mobile screens
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/mdx@1.3.26
+  - @tinacms/schema-tools@1.4.17
+  - @tinacms/search@1.0.21
+  - @tinacms/sharedctx@1.0.3
+
 ## 1.6.4
 
 ### Patch Changes

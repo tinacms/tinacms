@@ -4,7 +4,7 @@
 
 import { execSync } from 'child_process'
 import path from 'path'
-import rimraf from 'rimraf'
+
 import fs from 'fs-extra'
 import chalk from 'chalk'
 
@@ -61,7 +61,7 @@ export function tryGitInit(root: string): boolean {
   } catch (e) {
     if (didInit) {
       try {
-        rimraf.sync(path.join(root, '.git'))
+        fs.removeSync(path.join(root, '.git'))
       } catch (_) {}
     }
     return false

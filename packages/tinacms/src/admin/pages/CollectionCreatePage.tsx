@@ -17,7 +17,6 @@ import type { Template } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
-import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
@@ -330,10 +329,10 @@ export const RenderForm = ({
     })
   }, [cms, collection, mutationInfo])
 
-  const navBreakpoint = 1000
+  const navBreakpoint = 1279
   const windowWidth = useWindowWidth()
   const renderNavToggle = windowWidth < navBreakpoint + 1
-  const headerPadding = renderNavToggle ? 'px-20' : 'px-6'
+  const headerPadding = renderNavToggle ? 'px-20' : 'px-12'
 
   React.useEffect(() => {
     cms.dispatch({ type: 'forms:add', value: form })
@@ -356,9 +355,9 @@ export const RenderForm = ({
         {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
 
         <div
-          className={`pt-3 pb-4 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center ${headerPadding}`}
+          className={`pt-10 xl:pt-3 pb-10 xl:pb-4 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center ${headerPadding}`}
         >
-          <div className="w-full max-w-form flex gap-1.5 justify-between items-center">
+          <div className="w-full flex gap-1.5 justify-between items-center">
             <Link
               to={`/collections/${collection.name}${
                 folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''

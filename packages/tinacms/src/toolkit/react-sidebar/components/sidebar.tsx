@@ -628,12 +628,12 @@ const SidebarWrapper = ({ children }) => {
 
   return (
     <div
-      className={`fixed top-0 left-0 h-screen z-base ${
+      className={`fixed top-0 left-0 h-dvh z-base ${
         displayState === 'closed' ? `pointer-events-none` : ``
       }`}
     >
       <div
-        className={`relative h-screen transform flex ${
+        className={`relative h-dvh transform flex ${
           displayState !== 'closed' ? `` : `-translate-x-full`
         } ${
           resizingSidebar

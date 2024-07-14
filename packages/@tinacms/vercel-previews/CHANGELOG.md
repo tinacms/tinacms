@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.0.32
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- Updated dependencies [04f0bf3]
+- Updated dependencies [0503072]
+- Updated dependencies [1104006]
+  - tinacms@1.6.5
+
 ## 0.0.31
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.1.5
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+
 ## 1.1.4
 
 ### Patch Changes
