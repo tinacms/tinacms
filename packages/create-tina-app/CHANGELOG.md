@@ -1,5 +1,21 @@
 # create-tina-app
 
+## 1.1.2
+
+### Patch Changes
+
+- bce9ae1: Create-tina-app - Revert back to using require
+
+## 1.1.1
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/metrics@1.0.3
+
 ## 1.1.0
 
 ### Minor Changes

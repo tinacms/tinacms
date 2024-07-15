@@ -1,5 +1,26 @@
 # tinacms-cli
 
+## 1.5.47
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- 0ba0e59: Fix remix visual editing error
+- dc632f3: cli - fix broken link to do with client variables not being configured properly. (Link to https://tina.io/docs/tina-cloud/overview/)
+- 1104006: Update tailwind to v3.4.4 + fix media manager height overflow on mobile screens
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [76c1a2e]
+- Updated dependencies [04f0bf3]
+- Updated dependencies [0503072]
+- Updated dependencies [1104006]
+- Updated dependencies [dffa355]
+  - @tinacms/graphql@1.4.36
+  - tinacms@1.6.5
+  - @tinacms/metrics@1.0.3
+  - @tinacms/schema-tools@1.4.17
+  - @tinacms/search@1.0.21
+  - @tinacms/app@1.2.43
+
 ## 1.5.46
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @tinacms/schema-tools
 
+## 1.4.17
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+
 ## 1.4.16
 
 ### Patch Changes

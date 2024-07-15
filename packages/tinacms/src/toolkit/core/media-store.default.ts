@@ -105,6 +105,9 @@ export class TinaMediaStore implements MediaStore {
 
   accept = DEFAULT_MEDIA_UPLOAD_TYPES
 
+  // allow up to 100MB uploads
+  maxSize = 100 * 1024 * 1024
+
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = []
 

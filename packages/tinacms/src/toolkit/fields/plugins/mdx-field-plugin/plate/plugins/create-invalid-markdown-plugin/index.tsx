@@ -27,7 +27,7 @@ export function ErrorMessage({ error }) {
     <div contentEditable={false} className="bg-red-50 sm:rounded-lg">
       <div className="px-4 py-5 sm:p-6">
         <h3 className="text-lg leading-6 font-medium text-red-800">
-          Error parsing markdown
+          ❌ Error parsing markdown
         </h3>
         <div className="mt-2 max-w-xl text-sm text-red-800 space-y-4">
           <p>{message}</p>
