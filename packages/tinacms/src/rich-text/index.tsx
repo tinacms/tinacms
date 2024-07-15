@@ -12,6 +12,7 @@ type BaseComponents = {
   h5?: { children: JSX.Element }
   h6?: { children: JSX.Element }
   p?: { children: JSX.Element }
+  inline_content_block?: { children: JSX.Element }
   a?: { url: string; children: JSX.Element }
   italic?: { children: JSX.Element }
   bold?: { children: JSX.Element }
@@ -252,6 +253,7 @@ const Node = ({ components, child }) => {
       return React.createElement(child.type, {
         children: <TinaMarkdown components={components} content={children} />,
       })
+
     case 'lic': // List Item Content
       if (components.lic) {
         const Component = components.lic
@@ -266,6 +268,9 @@ const Node = ({ components, child }) => {
           <TinaMarkdown components={components} content={child.children} />
         </div>
       )
+    //SNZ change: added inline_content_block. This will render the nested content block inline with the text of the parent rich-text by omitting the wrapping <div>
+    case 'inline_content_block':
+      return <TinaMarkdown components={components} content={child.children} />
     case 'img':
       if (components[child.type]) {
         const Component = components[child.type]
