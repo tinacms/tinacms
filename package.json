@@ -52,7 +52,9 @@
       "ua-parser-js": "0.7.33",
       "fast-xml-parser": "4.2.5",
       "semver": "7.5.2",
-      "loader-utils@<1.4.1": ">=1.4.1"
+      "loader-utils@<1.4.1": ">=1.4.1",
+      "ws@>=8.0.0 <8.17.1": ">=8.17.1",
+      "ws@>=7.0.0 <7.5.10": ">=7.5.10"
     }
   },
   "packageManager": "pnpm@9.4.0"
