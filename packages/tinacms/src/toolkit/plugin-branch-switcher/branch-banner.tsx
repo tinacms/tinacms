@@ -8,7 +8,6 @@ import {
 import { useBranchData } from './branch-data'
 import { BranchModal } from './branch-modal'
 import { Button } from '@toolkit/styles'
-import { useWindowWidth } from '@react-hook/window-size'
 import { useCMS } from '@toolkit/react-tinacms/use-cms'
 
 // trim 'tina/' prefix from branch name
@@ -23,9 +22,6 @@ export const BranchBanner = () => {
   const { currentBranch } = useBranchData()
   const isProtected = cms.api.tina.usingProtectedBranch()
 
-  const navBreakpoint = 1000
-  const windowWidth = useWindowWidth()
-  const renderNavToggle = windowWidth < navBreakpoint + 1
   const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
   const branch = decodeURIComponent(cms.api.tina.branch)
   const previewUrl = previewFunction ? previewFunction({ branch })?.url : null
@@ -33,9 +29,7 @@ export const BranchBanner = () => {
   return (
     <>
       <div
-        className={`w-full bg-white flex items-center gap-2 -mb-px border-b border-gray-100 py-3 pr-4 ${
-          renderNavToggle ? 'pl-20' : 'pl-4'
-        }`}
+        className={`w-full bg-white flex items-center gap-2 -mb-px border-b border-gray-100 py-3 pr-4 pl-20 xl:pl-4`}
       >
         <Button
           variant={isProtected ? 'primary' : 'white'}
