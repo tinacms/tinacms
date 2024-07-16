@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.2.37
+
+### Patch Changes
+
+- @tinacms/graphql@1.4.37
+
 ## 1.2.36
 
 ### Patch Changes

@@ -50,3 +50,7 @@ export const getYarnVersion = () => {
 export const getNpmVersion = () => {
   return _executeCommand('npm -v') || ''
 }
+
+export const getPnpmVersion = () => {
+  return _executeCommand('pnpm -v') || ''
+}
