@@ -1,5 +1,22 @@
 # tinacms
 
+## 1.6.6
+
+### Patch Changes
+
+- a9b461c: updated 'file has changes' indicator ui
+- 3034430: Make padding between collection list page and singular pages consistent. Ensure navigation bar padding does not overlap with the burger icon on collection singular pages
+- 171f5a5: Fix collections body not working with smaller screens
+- fd216f3: updated TinaCloud auth modal text
+- d004af2: improve error message by adding emoji
+- 20f972a: Fix collections header styling for smaller screens
+- 2a36b65: Remove unnecessary usage of @react-hook/window-size
+- f26b40d: Allow customization of accepted media types in media manager
+- Updated dependencies [f26b40d]
+  - @tinacms/schema-tools@1.4.18
+  - @tinacms/mdx@1.3.27
+  - @tinacms/search@1.0.22
+
 ## 1.6.5
 
 ### Patch Changes
