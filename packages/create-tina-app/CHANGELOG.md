@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 1.1.3
+
+### Patch Changes
+
+- 789ecba: create-tina-app - Change from 'Tailwind starter' to 'NextJS starter'
+
 ## 1.1.2
 
 ### Patch Changes
