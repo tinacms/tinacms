@@ -1,5 +1,13 @@
 # @tinacms/app
 
+## 1.2.45
+
+### Patch Changes
+
+- 2940594: Add pnpm option to create-tina-app
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+
 ## 1.2.44
 
 ### Patch Changes

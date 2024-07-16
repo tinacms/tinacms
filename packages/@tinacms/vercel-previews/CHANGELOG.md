@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.0.34
+
+### Patch Changes
+
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+
 ## 0.0.33
 
 ### Patch Changes
