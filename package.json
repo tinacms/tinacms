@@ -51,7 +51,8 @@
       "json5": "1.0.2",
       "ua-parser-js": "0.7.33",
       "fast-xml-parser": "4.2.5",
-      "semver": "7.5.2"
+      "semver": "7.5.2",
+      "loader-utils@<1.4.1": ">=1.4.1"
     }
   },
   "packageManager": "pnpm@9.4.0"
