@@ -53,7 +53,7 @@ export const EXAMPLES: Example[] = [
       'Transform documentation with Smooth Doc: Features MDX support, light/dark mode, and seamless Vercel deployment for a dynamic, interactive experience.',
     value: 'demo-docs',
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/demo-docs'
+    gitURL: 'https://github.com/tinacms/demo-docs',
   },
   {
     title: 'Docusaurus Starter',
