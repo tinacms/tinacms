@@ -1,5 +1,11 @@
 # tinacms
 
+## 1.6.7
+
+### Patch Changes
+
+- 82ab066: upgrade vulnerable packages in example project, test project and peer dependency packages
+
 ## 1.6.6
 
 ### Patch Changes

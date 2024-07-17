@@ -1,5 +1,12 @@
 # next-tinacms-cloudinary
 
+## 5.0.7
+
+### Patch Changes
+
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+
 ## 5.0.6
 
 ### Patch Changes
