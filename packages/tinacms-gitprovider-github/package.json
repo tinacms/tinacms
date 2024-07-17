@@ -21,14 +21,14 @@
     "build": "tinacms-scripts build"
   },
   "dependencies": {
-    "@octokit/rest": "^19.0.7",
-    "js-base64": "^3.7.4",
+    "@octokit/rest": "^19.0.13",
+    "js-base64": "^3.7.7",
     "typescript": "4.6.4"
   },
   "devDependencies": {
     "@tinacms/datalayer": "workspace:*",
     "@tinacms/scripts": "workspace:*",
-    "@types/node": "^13.13.1"
+    "@types/node": "^13.13.52"
   },
   "peerDependencies": {
     "@tinacms/datalayer": "workspace:*"

@@ -27,8 +27,8 @@
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
     "@types/crypto-js": "^3.1.47",
-    "@types/js-cookie": "^2.2.6",
-    "@types/node": "^13.13.1",
+    "@types/js-cookie": "^2.2.7",
+    "@types/node": "^13.13.52",
     "next": "12.2.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -43,7 +43,7 @@
     "directory": "packages/next-tinacms-dos"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.357.0",
+    "@aws-sdk/client-s3": "^3.614.0",
     "multer": "1.4.5-lts.1"
   }
 }
