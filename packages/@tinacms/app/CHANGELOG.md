@@ -1,5 +1,29 @@
 # @tinacms/app
 
+## 1.2.45
+
+### Patch Changes
+
+- 2940594: Add pnpm option to create-tina-app
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+
+## 1.2.44
+
+### Patch Changes
+
+- a9b461c: updated 'file has changes' indicator ui
+- Updated dependencies [a9b461c]
+- Updated dependencies [3034430]
+- Updated dependencies [171f5a5]
+- Updated dependencies [fd216f3]
+- Updated dependencies [d004af2]
+- Updated dependencies [20f972a]
+- Updated dependencies [2a36b65]
+- Updated dependencies [f26b40d]
+  - tinacms@1.6.6
+  - @tinacms/mdx@1.3.27
+
 ## 1.2.43
 
 ### Patch Changes

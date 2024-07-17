@@ -631,6 +631,7 @@ export interface Config<
          */
         loadCustomStore: () => Promise<Store>
         tina?: never
+        accept?: string | string[]
       }
     | {
         /**
@@ -653,6 +654,7 @@ export interface Config<
           static?: boolean
         }
         loadCustomStore?: never
+        accept?: string | string[]
       }
   search?: (
     | {

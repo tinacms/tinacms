@@ -1,7 +1,7 @@
 import { staticRequest } from 'tinacms'
 import { Layout } from '../../components/Layout'
 import Link from 'next/link'
-import { useTina } from 'tinacms/dist/edit-state'
+import { useTina } from 'tinacms/dist/react'
 
 const query = `{
   postConnection {

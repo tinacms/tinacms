@@ -25,6 +25,10 @@ export const isImage = (filename: string): boolean => {
   return /\.(gif|jpg|jpeg|tiff|png|svg|webp|avif)(\?.*)?$/i.test(filename)
 }
 
+export const isVideo = (filename: string): boolean => {
+  return /\.(mp4|webm|ogg|m4v|mov|avi|flv|mkv)(\?.*)?$/i.test(filename)
+}
+
 export const absoluteImgURL = (str: string) => {
   if (str.startsWith('http')) return str
   return `${window.location.origin}${str}`

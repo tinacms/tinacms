@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.4.18
+
+### Patch Changes
+
+- f26b40d: Allow customization of accepted media types in media manager
+
 ## 1.4.17
 
 ### Patch Changes
