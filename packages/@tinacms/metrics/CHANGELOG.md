@@ -1,5 +1,11 @@
 # @tinacms/metrics
 
+## 1.0.4
+
+### Patch Changes
+
+- 2940594: Add pnpm option to create-tina-app
+
 ## 1.0.3
 
 ### Patch Changes

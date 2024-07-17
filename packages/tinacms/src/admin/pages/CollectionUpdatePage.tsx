@@ -9,7 +9,6 @@ import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
-import { useWindowWidth } from '@react-hook/window-size'
 import { useCollectionFolder } from './utils'
 import { ErrorDialog } from '../components/ErrorDialog'
 
@@ -148,11 +147,6 @@ const RenderForm = ({
     })
   }, [cms, document, relativePath, collection, mutationInfo])
 
-  const navBreakpoint = 1279
-  const windowWidth = useWindowWidth()
-  const renderNavToggle = windowWidth < navBreakpoint + 1
-  const headerPadding = renderNavToggle ? 'px-20' : 'px-12'
-
   React.useEffect(() => {
     cms.dispatch({ type: 'forms:add', value: form })
     cms.dispatch({ type: 'forms:set-active-form-id', value: form.id })
@@ -172,7 +166,7 @@ const RenderForm = ({
     <>
       {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
       <div
-        className={`pt-10 xl:pt-3 pb-10 xl:pb-4 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center ${headerPadding}`}
+        className={`pt-10 xl:pt-3 pb-10 xl:pb-4 px-20 xl:px-12 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
       >
         <div className="w-full flex gap-1.5 justify-between items-center">
           <Link

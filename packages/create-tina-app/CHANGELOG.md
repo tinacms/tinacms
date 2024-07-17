@@ -1,5 +1,20 @@
 # create-tina-app
 
+## 1.1.4
+
+### Patch Changes
+
+- 2940594: Add pnpm option to create-tina-app
+- 82ab066: upgrade vulnerable packages in example project, test project and peer dependency packages
+- Updated dependencies [2940594]
+  - @tinacms/metrics@1.0.4
+
+## 1.1.3
+
+### Patch Changes
+
+- 789ecba: create-tina-app - Change from 'Tailwind starter' to 'NextJS starter'
+
 ## 1.1.2
 
 ### Patch Changes

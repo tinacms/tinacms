@@ -24,17 +24,9 @@ export type Example = InternalExample | ExternalExample
 
 export const EXAMPLES: Example[] = [
   {
-    title: 'Bare bones starter',
+    title: '⭐ NextJS starter',
     description:
-      'Stripped down to essentials, this starter is the canvas for pure, unadulterated code creativity.',
-    value: 'basic',
-    isInternal: false,
-    gitURL: 'https://github.com/tinacms/tina-barebones-starter',
-  },
-  {
-    title: '⭐ Tailwind Starter',
-    description:
-      'Choosing Tailwind makes you feel like you are god with CSS. You can do anything.',
+      'Kickstart your project with NextJS – our top recommendation for a seamless, performant, and versatile web experience.',
     value: 'tina-cloud-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-cloud-starter',
@@ -61,7 +53,7 @@ export const EXAMPLES: Example[] = [
       'Transform documentation with Smooth Doc: Features MDX support, light/dark mode, and seamless Vercel deployment for a dynamic, interactive experience.',
     value: 'demo-docs',
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/demo-docs'
+    gitURL: 'https://github.com/tinacms/demo-docs',
   },
   {
     title: 'Docusaurus Starter',
@@ -70,6 +62,14 @@ export const EXAMPLES: Example[] = [
     value: 'tinasaurus',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tinasaurus',
+  },
+  {
+    title: 'Bare bones starter',
+    description:
+      'Stripped down to essentials, this starter is the canvas for pure, unadulterated code creativity.',
+    value: 'basic',
+    isInternal: false,
+    gitURL: 'https://github.com/tinacms/tina-barebones-starter',
   },
 ]
 

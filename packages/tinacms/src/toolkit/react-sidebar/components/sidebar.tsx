@@ -30,7 +30,7 @@ export const SidebarContext = React.createContext<any>(null)
 
 export const minPreviewWidth = 440
 export const minSidebarWidth = 360
-export const navBreakpoint = 1000
+export const navBreakpoint = 1279
 
 const LOCALSTATEKEY = 'tina.sidebarState'
 const LOCALWIDTHKEY = 'tina.sidebarWidth'
