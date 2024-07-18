@@ -1,5 +1,21 @@
 # tina-graphql
 
+## 1.2.37
+
+### Patch Changes
+
+- @tinacms/graphql@1.4.37
+
+## 1.2.36
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- Updated dependencies [76c1a2e]
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/graphql@1.4.36
+
 ## 1.2.35
 
 ### Patch Changes

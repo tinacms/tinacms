@@ -5,12 +5,10 @@ import { VscNewFile } from 'react-icons/vsc'
 import { Menu, Transition } from '@headlessui/react'
 import { updateBodyDisplacement } from './sidebar'
 import { FormModal } from '@toolkit/react-forms'
-import { useEditState } from '@tinacms/sharedctx'
 import type { ScreenPlugin } from '@toolkit/react-screens'
 import { SyncStatus, SyncErrorWidget, SyncStatusModal } from './sync-status'
 import { useCMS } from '@toolkit/react-core'
 import { CloudConfigPlugin } from '@toolkit/react-cloud-config'
-import { logo } from './logo.png'
 
 interface NavCollection {
   label?: string
@@ -58,7 +56,6 @@ export const Nav = ({
   ...props
 }: NavProps) => {
   const cms = useCMS()
-  const { setEdit } = useEditState()
   const [eventsOpen, setEventsOpen] = React.useState(false)
   const { contentCollections, authCollection } =
     collectionsInfo.collections.reduce(
@@ -293,7 +290,6 @@ export const Nav = ({
                                 window.location.href
                               ).pathname
                             }
-                            setEdit(false)
                           } catch (e) {
                             cms.alerts.error(`Error logging out: ${e}`)
                             console.error('Unexpected error calling logout')

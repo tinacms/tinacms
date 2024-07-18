@@ -1,5 +1,39 @@
 # tinacms-authjs
 
+## 2.0.7
+
+### Patch Changes
+
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+
+## 2.0.6
+
+### Patch Changes
+
+- Updated dependencies [a9b461c]
+- Updated dependencies [3034430]
+- Updated dependencies [171f5a5]
+- Updated dependencies [fd216f3]
+- Updated dependencies [d004af2]
+- Updated dependencies [20f972a]
+- Updated dependencies [2a36b65]
+- Updated dependencies [f26b40d]
+  - tinacms@1.6.6
+  - @tinacms/schema-tools@1.4.18
+
+## 2.0.5
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- Updated dependencies [04f0bf3]
+- Updated dependencies [0503072]
+- Updated dependencies [1104006]
+- Updated dependencies [dffa355]
+  - tinacms@1.6.5
+  - @tinacms/schema-tools@1.4.17
+
 ## 2.0.4
 
 ### Patch Changes

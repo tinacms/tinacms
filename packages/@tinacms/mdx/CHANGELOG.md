@@ -1,5 +1,21 @@
 # @tinacms/mdx
 
+## 1.3.27
+
+### Patch Changes
+
+- Updated dependencies [f26b40d]
+  - @tinacms/schema-tools@1.4.18
+
+## 1.3.26
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/schema-tools@1.4.17
+
 ## 1.3.25
 
 ### Patch Changes

@@ -1,5 +1,25 @@
 # tina-graphql
 
+## 1.4.37
+
+### Patch Changes
+
+- Updated dependencies [f26b40d]
+  - @tinacms/schema-tools@1.4.18
+  - @tinacms/mdx@1.3.27
+
+## 1.4.36
+
+### Patch Changes
+
+- 76c1a2e: Fix issue where empty folders were not visible #4566
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/mdx@1.3.26
+  - @tinacms/schema-tools@1.4.17
+
 ## 1.4.35
 
 ### Patch Changes

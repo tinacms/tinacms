@@ -51,6 +51,7 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 - Jeff See ([@jeffsee55](https://github.com/jeffsee55))
 - Matt Wicks ([@wicksipedia](https://github.com/wicksipedia))
 - Jack Pettit ([@JackDevAU](https://github.com/JackDevAU))
+- Jord Gui ([@Jord-Gui](https://github.com/Jord-Gui))
 - Nick Curran ([@ncn-ssw](https://github.com/ncn-ssw))
 - Brook Jeynes ([@brookjeynes-ssw](https://github.com/brookjeynes-ssw))
 - Ben Neoh ([@Ben0189](https://github.com/Ben0189))

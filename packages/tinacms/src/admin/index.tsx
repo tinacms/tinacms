@@ -21,8 +21,6 @@ import Layout from './components/Layout'
 import Sidebar from './components/Sidebar'
 import GetCMS from './components/GetCMS'
 
-import LoginPage from './pages/LoginPage'
-import LogoutPage, { LogoutRedirect } from './pages/LogoutPage'
 import DashboardPage from './pages/DashboardPage'
 import CollectionListPage from './pages/CollectionListPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
@@ -30,7 +28,6 @@ import CollectionDuplicatePage from './pages/CollectionDuplicatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 import ScreenPage from './pages/ScreenPage'
 
-import { useEditState } from '@tinacms/sharedctx'
 import { Client } from '../internalClient'
 import { TinaAdminApi } from './api'
 import { IndexingPage } from './pages/IndexingPage'
@@ -199,17 +196,8 @@ export const TinaAdmin = ({
   config: object
 }) => {
   const isSSR = typeof window === 'undefined'
-  const { edit } = useEditState()
   if (isSSR) {
     return null
-  }
-
-  if (!edit) {
-    return (
-      <Layout>
-        <LoginPage />
-      </Layout>
-    )
   }
 
   return (
@@ -328,14 +316,6 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="logout"
-                      element={
-                        <DefaultWrapper cms={cms}>
-                          <LogoutRedirect />
-                        </DefaultWrapper>
-                      }
-                    />
-                    <Route
                       path="/"
                       element={
                         <MaybeRedirectToPreview
@@ -357,7 +337,6 @@ export const TinaAdmin = ({
             <Layout>
               <Router>
                 <Routes>
-                  <Route path="logout" element={<LogoutPage />} />
                   <Route path="/" element={<Redirect />} />
                 </Routes>
               </Router>
@@ -378,7 +357,7 @@ const DefaultWrapper = ({
 }) => {
   return (
     <Layout>
-      <div className="flex items-stretch h-screen overflow-hidden">
+      <div className="flex items-stretch h-dvh overflow-hidden">
         <Sidebar cms={cms} />
         <div className="w-full relative">{children}</div>
       </div>

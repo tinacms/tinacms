@@ -55,6 +55,12 @@ export interface MediaStore {
    * that describes what kind of files the Media Store will accept.
    */
   accept: string
+
+  /**
+   * The maximum size of a file that can be uploaded.
+   */
+  maxSize?: number
+
   /**
    * Uploads a set of files to the Media Store and
    * returns a Promise containing the Media objects
@@ -143,6 +149,10 @@ export class MediaManager implements MediaStore {
 
   get accept() {
     return this.store.accept
+  }
+
+  get maxSize() {
+    return this.store.maxSize || undefined
   }
 
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {

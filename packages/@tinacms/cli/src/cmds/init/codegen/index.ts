@@ -122,6 +122,7 @@ const makeImportsVisitor =
             const importSpecifiers = newImports.map((i) =>
               ts.factory.createImportSpecifier(
                 undefined,
+                ts.factory.createIdentifier(i),
                 ts.factory.createIdentifier(i)
               )
             )
@@ -154,6 +155,7 @@ const makeImportsVisitor =
           const importSpecifiers = imports.map((i) =>
             ts.factory.createImportSpecifier(
               undefined,
+              ts.factory.createIdentifier(i),
               ts.factory.createIdentifier(i)
             )
           )

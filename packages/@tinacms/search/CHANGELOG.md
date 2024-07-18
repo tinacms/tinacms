@@ -1,5 +1,25 @@
 # @tinacms/search
 
+## 1.0.22
+
+### Patch Changes
+
+- Updated dependencies [f26b40d]
+  - @tinacms/schema-tools@1.4.18
+  - @tinacms/graphql@1.4.37
+
+## 1.0.21
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [76c1a2e]
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/graphql@1.4.36
+  - @tinacms/schema-tools@1.4.17
+
 ## 1.0.20
 
 ### Patch Changes
