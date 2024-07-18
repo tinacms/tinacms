@@ -41,6 +41,10 @@ Visit the [GitHub Discussions](https://github.com/tinacms/tinacms/discussions) o
 
 Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.  -->
 
+## Roadmap
+
+Our development priorities can be read on our [Public Roadmap](https://tina.io/roadmap/).
+
 ## Contributing
 
 Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/CONTRIBUTING.md)
