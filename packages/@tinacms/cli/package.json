@@ -60,7 +60,7 @@
     "@graphql-tools/graphql-file-loader": "^7.2.0",
     "@graphql-tools/load": "^7.3.2",
     "@rollup/pluginutils": "^5.0.2",
-    "@svgr/core": "6.3.1",
+    "@svgr/core": "8.1.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/typography": "^0.5.13",
     "@tinacms/app": "workspace:*",
@@ -97,7 +97,7 @@
     "tailwindcss": "^3.4.4",
     "tinacms": "workspace:*",
     "typanion": "3.13.0",
-    "typescript": "4.6.4",
+    "typescript": "^5.5.3",
     "vite": "^4.3.9",
     "yup": "^0.32.9",
     "zod": "^3.14.3"
