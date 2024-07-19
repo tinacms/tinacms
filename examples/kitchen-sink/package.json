@@ -35,7 +35,7 @@
     "@tinacms/app": "workspace:*",
     "@tinacms/cli": "workspace:*",
     "autoprefixer": "^10.4.0",
-    "cypress": "^10.10.0",
+    "cypress": "^13.13.1",
     "eslint": "8.24.0",
     "eslint-config-next": "^13.4.7",
     "postcss": "^8.4.39",

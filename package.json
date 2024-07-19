@@ -32,7 +32,7 @@
     "@changesets/cli": "^2.26.0",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
-    "cypress": "9.7.0",
+    "cypress": "13.13.1",
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-react": "^7.32.2",
