@@ -222,6 +222,7 @@ export const ColorPicker: React.FC<Props> = ({
     }
   }
 
+  // TODO: Chekc what Dismissible is doing?
   return (
     <div className="relative" ref={triggerRef}>
       <Swatch

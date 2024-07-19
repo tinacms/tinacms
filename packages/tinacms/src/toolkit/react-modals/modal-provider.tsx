@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { useCallback, useState } from 'react'
 
-export const ModalProvider: React.FC = ({ children }) => {
+type ModalProviderProps = {
+  children?: React.ReactNode
+}
+
+export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [modalRootContainerRef, setModalRootContainerRef] = useState(
     null as Element | null
   )

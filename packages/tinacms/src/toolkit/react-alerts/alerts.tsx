@@ -1,5 +1,4 @@
-import React from 'react'
-import { Alerts as AlertsCollection, AlertLevel } from '@toolkit/alerts'
+import type { Alerts as AlertsCollection, AlertLevel } from '@toolkit/alerts'
 import { useSubscribable } from '@toolkit/react-core'
 import {
   Modal,
@@ -9,6 +8,7 @@ import {
   PopupModal,
 } from '@toolkit/react-modals'
 import { Button } from '@toolkit/styles'
+import React from 'react'
 import { BiCheckCircle, BiError, BiInfoCircle, BiX } from 'react-icons/bi'
 
 export interface AlertsProps {
@@ -42,7 +42,7 @@ export function Alerts({ alerts }: AlertsProps) {
                   <BiError className="w-5 h-auto opacity-70" />
                 )}
                 <p className="m-0 flex-1 max-w-[680px] text-left">
-                  {alert.message}
+                  {alert.message.toString()}
                 </p>
                 <CloseAlert
                   onClick={() => {
@@ -63,7 +63,7 @@ export function Alerts({ alerts }: AlertsProps) {
               ? () => {
                   return (
                     <p className="text-base mb-3 overflow-y-auto">
-                      {alert.message}
+                      {alert.message.toString()}
                     </p>
                   )
                 }
@@ -86,7 +86,7 @@ export function Alerts({ alerts }: AlertsProps) {
                   </div>
                 </ModalBody>
                 <ModalActions>
-                  <div className="flex-1"></div>
+                  <div className="flex-1" />
                   <Button
                     style={{ flexGrow: 1 }}
                     onClick={() => {
@@ -104,7 +104,10 @@ export function Alerts({ alerts }: AlertsProps) {
   )
 }
 
-const Alert: React.FC<{ level: AlertLevel }> = ({ level, ...props }) => {
+const Alert: React.FC<{ level: AlertLevel; children: React.ReactNode }> = ({
+  level,
+  ...props
+}) => {
   const colorClasses = {
     info: 'bg-blue-100 border-blue-500 text-blue-600 fill-blue-500',
     success: 'bg-green-100 border-green-500 text-green-600 fill-green-500',
