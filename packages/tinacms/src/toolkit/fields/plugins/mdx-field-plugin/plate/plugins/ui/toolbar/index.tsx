@@ -66,13 +66,28 @@ const headers = [
 const ICON_WIDTH = 40
 const EMBED_ICON_WIDTH = 85
 
+export type toolbarItemName =
+  | 'heading'
+  | 'link'
+  | 'image'
+  | 'quote'
+  | 'ul'
+  | 'ol'
+  | 'code'
+  | 'codeBlock'
+  | 'bold'
+  | 'italic'
+  | 'raw'
+
 export function Toolbar({
   templates,
+  toolbarOverride,
   tinaForm,
 }: {
   tinaForm: Form
   inlineOnly: boolean
   templates: MdxTemplate[]
+  toolbarOverride: toolbarItemName[] | undefined
 }) {
   const { setRawMode } = useEditorContext()
   const showEmbed = templates.length > 0
@@ -88,8 +103,8 @@ export function Toolbar({
   const blockQuoteActive = helpers.isNodeActive(editor, ELEMENT_BLOCKQUOTE)
   const isImgActive = helpers.isNodeActive(editor, ELEMENT_IMG)
 
-  const toolbarItems: ToolbarItemType[] = [
-    {
+  const toolbarItemLookup: { [key in toolbarItemName]: ToolbarItemType } = {
+    heading: {
       tinaForm,
       name: 'heading',
       label: 'Heading',
@@ -110,19 +125,19 @@ export function Toolbar({
         </span>
       )),
     },
-    {
+    link: {
       tinaForm,
       name: 'link',
       label: 'Link',
       active: isLinkActive,
     },
-    {
+    image: {
       tinaForm,
       name: 'image',
       label: 'Image',
       active: isImgActive,
     },
-    {
+    quote: {
       tinaForm,
       name: 'quote',
       label: 'Quote',
@@ -133,7 +148,7 @@ export function Toolbar({
         toggleNodeType(editor, { activeType: ELEMENT_BLOCKQUOTE })
       },
     },
-    {
+    ul: {
       tinaForm,
       name: 'ul',
       label: 'Bullet List',
@@ -144,7 +159,7 @@ export function Toolbar({
         toggleList(editor, { type: ELEMENT_UL })
       },
     },
-    {
+    ol: {
       tinaForm,
       name: 'ol',
       label: 'List',
@@ -155,7 +170,7 @@ export function Toolbar({
         toggleList(editor, { type: ELEMENT_OL })
       },
     },
-    {
+    code: {
       tinaForm,
       name: 'code',
       label: 'Code',
@@ -166,7 +181,7 @@ export function Toolbar({
         toggleMark(editor, { key: MARK_CODE })
       },
     },
-    {
+    codeBlock: {
       tinaForm,
       name: 'codeBlock',
       label: 'Code Block',
@@ -177,7 +192,7 @@ export function Toolbar({
         insertEmptyCodeBlock(editor)
       },
     },
-    {
+    bold: {
       tinaForm,
       name: 'bold',
       label: 'Bold',
@@ -188,7 +203,7 @@ export function Toolbar({
         toggleMark(editor, { key: MARK_BOLD })
       },
     },
-    {
+    italic: {
       tinaForm,
       name: 'italic',
       label: 'Italic',
@@ -199,14 +214,22 @@ export function Toolbar({
         toggleMark(editor, { key: MARK_ITALIC })
       },
     },
-    {
+    raw: {
       tinaForm,
       name: 'raw',
       label: 'Raw',
       active: false,
       onMouseDown: () => setRawMode(true),
     },
-  ]
+  }
+
+  const toolbarItems: ToolbarItemType[] =
+    toolbarOverride === undefined
+      ? Object.values(toolbarItemLookup)
+      : toolbarOverride
+          .map((item) => toolbarItemLookup[item])
+          .filter((item) => item !== undefined)
+
   const [itemsShown, setItemsShown] = React.useState(toolbarItems.length)
 
   useResize(toolbarRef, (entry) => {
@@ -295,13 +318,20 @@ export function Toolbar({
 export const FloatingToolbar = ({
   templates,
   tinaForm,
+  toolbarOverride,
 }: {
   tinaForm: Form
   templates: MdxTemplate[]
+  toolbarOverride: toolbarItemName[] | undefined
 }) => {
   return (
     <FloatingToolbarWrapper>
-      <Toolbar tinaForm={tinaForm} templates={templates} inlineOnly={true} />
+      <Toolbar
+        tinaForm={tinaForm}
+        templates={templates}
+        toolbarOverride={toolbarOverride}
+        inlineOnly={true}
+      />
     </FloatingToolbarWrapper>
   )
 }

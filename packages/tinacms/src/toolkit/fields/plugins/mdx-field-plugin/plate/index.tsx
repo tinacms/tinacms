@@ -85,6 +85,7 @@ export const RichEditor = (props: RichTextType) => {
             {withToolbar ? (
               <Toolbar
                 tinaForm={props.tinaForm}
+                toolbarOverride={props.field.toolbar}
                 templates={props.field.templates}
                 inlineOnly={false}
               />
@@ -92,6 +93,7 @@ export const RichEditor = (props: RichTextType) => {
               <FloatingToolbar
                 tinaForm={props.tinaForm}
                 templates={props.field.templates}
+                toolbarOverride={props.field.toolbar}
               />
             )}
             <FloatingLink />
