@@ -6,7 +6,7 @@ import { TinaCloudSchemaZod } from './schema'
 export { validateTinaCloudSchemaConfig } from './tinaCloudSchemaConfig'
 
 export class TinaSchemaValidationError extends Error {
-  constructor(message: any) {
+  constructor(message: string) {
     super(message)
     this.name = 'TinaSchemaValidationError'
   }

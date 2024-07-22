@@ -6,7 +6,7 @@ import type { ZodError } from 'zod'
 
 export const parseZodError = ({ zodError }: { zodError: ZodError }) => {
   const errors = zodError.flatten((issue) => {
-    const moreInfo: any[] = []
+    const moreInfo: unknown[] = []
     if (issue.code === 'invalid_union') {
       issue.unionErrors.map((unionError) => {
         moreInfo.push(parseZodError({ zodError: unionError }))

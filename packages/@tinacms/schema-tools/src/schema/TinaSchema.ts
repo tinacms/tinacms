@@ -281,7 +281,7 @@ export class TinaSchema {
     payload: object,
     collection: Collectable
   ) => {
-    const accumulator: { [key: string]: any } = {}
+    const accumulator: { [key: string]: unknown } = {}
     // biome-ignore lint/complexity/noForEach: <explanation>
     Object.entries(payload).forEach(([key, value]) => {
       if (typeof collection.fields === 'string') {
