@@ -187,7 +187,7 @@ export class TinaSchema {
     if (!collection) {
       return undefined
     }
-    let template: any
+    let template: Template<true>
 
     const templates = this.getTemplatesForCollectable(collection)
     if (templates.type === 'union') {
