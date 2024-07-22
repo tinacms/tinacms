@@ -266,7 +266,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
      * will be stored as frontmatter
      */
     isBody?: boolean
-    toolbarOverride: toolbarItemName[]
+    toolbarOverride?: toolbarItemName[]
     templates?: RichTextTemplate<WithNamespace>[]
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser
