@@ -185,7 +185,6 @@ export class TinaSchema {
     const collection = this.getCollectionByFullPath(filepath)
 
     if (!collection) {
-      // Handle the case where no collection is found
       return undefined
     }
     let template: any

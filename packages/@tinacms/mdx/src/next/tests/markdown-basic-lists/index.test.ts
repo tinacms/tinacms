@@ -6,9 +6,6 @@ import input from './in.md?raw'
 import * as util from '../util'
 
 it('matches input', () => {
-  console.log('--------------------')
-  console.log(input)
-
   const tree = parseMDX(input, field, (v) => v)
   expect(util.print(tree)).toMatchFile(util.nodePath(__dirname))
   const string = stringifyMDX(tree, field, (v) => v)
