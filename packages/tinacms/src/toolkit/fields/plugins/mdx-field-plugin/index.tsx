@@ -14,7 +14,7 @@ export type RichTextType = React.PropsWithChildren<
     InputProps,
     {
       templates: MdxTemplate[]
-      toolbarOverride: toolbarItemName[] | undefined
+      toolbarOverride?: toolbarItemName[]
     }
   >
 >
@@ -23,7 +23,7 @@ export const MdxFieldPlugin = {
   name: 'rich-text',
   Component: wrapFieldsWithMeta<
     InputProps,
-    { templates: MdxTemplate[]; toolbarOverride: toolbarItemName[] | undefined }
+    { templates: MdxTemplate[]; toolbarOverride?: toolbarItemName[] }
   >((props) => {
     const [rawMode, setRawMode] = React.useState(false)
     const [key, setKey] = React.useState(0)
@@ -82,7 +82,7 @@ export const MdxFieldPluginExtendible = {
   },
   Component: wrapFieldsWithMeta<
     InputProps,
-    { templates: MdxTemplate[]; toolbarOverride: toolbarItemName[] | undefined }
+    { templates: MdxTemplate[]; toolbarOverride?: toolbarItemName[] }
   >((props) => {
     const [key, setKey] = React.useState(0)
 

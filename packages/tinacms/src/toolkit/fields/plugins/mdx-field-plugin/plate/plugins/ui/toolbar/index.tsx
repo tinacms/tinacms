@@ -87,7 +87,7 @@ export function Toolbar({
   tinaForm: Form
   inlineOnly: boolean
   templates: MdxTemplate[]
-  toolbarOverride: toolbarItemName[] | undefined
+  toolbarOverride?: toolbarItemName[]
 }) {
   const { setRawMode } = useEditorContext()
   const showEmbed = templates.length > 0
@@ -322,7 +322,7 @@ export const FloatingToolbar = ({
 }: {
   tinaForm: Form
   templates: MdxTemplate[]
-  toolbarOverride: toolbarItemName[] | undefined
+  toolbarOverride?: toolbarItemName[]
 }) => {
   return (
     <FloatingToolbarWrapper>
