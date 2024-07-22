@@ -21,6 +21,9 @@ importers:
       '@types/jest':
         specifier: ^29.5.12
         version: 29.5.12
+      '@types/picomatch':
+        specifier: ^3.0.0
+        version: 3.0.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.60.0
         version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.6.4))(eslint@8.57.0)(typescript@4.6.4)
@@ -45,6 +48,9 @@ importers:
       husky:
         specifier: ^7.0.4
         version: 7.0.4
+      picomatch:
+        specifier: ^4.0.2
+        version: 4.0.2
       prettier:
         specifier: ^2.8.4
         version: 2.8.8
@@ -1259,6 +1265,9 @@ importers:
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
+      '@types/cross-spawn':
+        specifier: ^6.0.6
+        version: 6.0.6
       '@types/fs-extra':
         specifier: ^9.0.13
         version: 9.0.13
@@ -6687,6 +6696,12 @@ packages:
         integrity: sha512-GmK8AKu8i+s+EChK/uZ5IbrXPcPaQKWaNSGevDT/7o3gFObwSUQwqb1jMqxuo+YPvj0ckGzINI+EO7EHcmJjKg==,
       }
 
+  '@types/cross-spawn@6.0.6':
+    resolution:
+      {
+        integrity: sha512-fXRhhUkG4H3TQk5dBhQ7m/JDdSNHKwR2BBia62lhwEIq9xGiQKLxd6LymNhn47SjXhsUEPmxi+PKw2OkW4LLjA==,
+      }
+
   '@types/crypto-js@3.1.47':
     resolution:
       {
@@ -7078,6 +7093,12 @@ packages:
     resolution:
       {
         integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==,
+      }
+
+  '@types/picomatch@3.0.0':
+    resolution:
+      {
+        integrity: sha512-iX/Qwk9vU17N/5Q7QrV46wzciloTdCqTRt6z8A7uFFADM2+Sy5oQh9ldZhAiTXH+l0sM/EkXatEhJIs8FUyOBQ==,
       }
 
   '@types/prettier@2.7.3':
@@ -14981,6 +15002,13 @@ packages:
         integrity: sha512-I3EurrIQMlRc9IaAZnqRR044Phh2DXY+55o7uJ0V+hYZAcQYSuFWsc9q5PvyDHUSCe1Qxn/iBz+78s86zWnGag==,
       }
     engines: { node: '>=10' }
+
+  picomatch@4.0.2:
+    resolution:
+      {
+        integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==,
+      }
+    engines: { node: '>=12' }
 
   pify@2.3.0:
     resolution:
@@ -22903,6 +22931,10 @@ snapshots:
     dependencies:
       '@types/express': 4.17.21
 
+  '@types/cross-spawn@6.0.6':
+    dependencies:
+      '@types/node': 14.18.63
+
   '@types/crypto-js@3.1.47': {}
 
   '@types/crypto-js@4.2.2': {}
@@ -23116,6 +23148,8 @@ snapshots:
   '@types/normalize-path@3.0.2': {}
 
   '@types/parse-json@4.0.2': {}
+
+  '@types/picomatch@3.0.0': {}
 
   '@types/prettier@2.7.3': {}
 
@@ -30220,6 +30254,8 @@ snapshots:
   picomatch@2.3.1: {}
 
   picomatch@3.0.1: {}
+
+  picomatch@4.0.2: {}
 
   pify@2.3.0: {}
 

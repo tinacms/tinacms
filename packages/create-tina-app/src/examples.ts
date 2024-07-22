@@ -84,9 +84,13 @@ export const downloadExample = async (example: Example, root: string) => {
     const repoInfo2 = repoInfo
     console.log(
       `Downloading files from repo ${chalk.cyan(
-        repoInfo.username + '/' + repoInfo.name
+        `${repoInfo?.username}/${repoInfo?.name}`
       )}. This might take a moment.`
     )
+
+    if (!repoInfo2) {
+      throw new Error('downloadExample Failed. Repo info not found')
+    }
 
     await downloadAndExtractRepo(root, repoInfo2)
   } else {
