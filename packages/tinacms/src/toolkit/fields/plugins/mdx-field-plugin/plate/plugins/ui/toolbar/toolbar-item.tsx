@@ -23,7 +23,7 @@ export type ToolbarItemType = {
   active?: boolean
   onMouseDown?: (event: any) => void
   icon?: string
-  options?: {}[]
+  options?: any[]
   isLastItem?: boolean
   tinaForm: Form
 }

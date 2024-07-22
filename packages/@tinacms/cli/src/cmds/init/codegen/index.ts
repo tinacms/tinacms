@@ -138,7 +138,6 @@ const makeImportsVisitor =
             // Create new import declarations
             const importDec = ts.factory.createImportDeclaration(
               undefined,
-              undefined,
               importClause,
               ts.factory.createStringLiteral(moduleName)
             )
@@ -166,7 +165,6 @@ const makeImportsVisitor =
             namedImports
           )
           const importDec = ts.factory.createImportDeclaration(
-            undefined,
             undefined,
             importClause,
             ts.factory.createStringLiteral(moduleName)
@@ -200,7 +198,7 @@ const makeAddExpressionToSchemaCollectionVisitor =
     newExpression: ts.Expression
   ): ts.TransformerFactory<ts.SourceFile> =>
   (ctx: ts.TransformationContext) => {
-    const visit = (node: ts.Node) => {
+    const visit: ts.Visitor = (node: ts.Node): ts.Node => {
       if (
         ts.isCallExpression(node) &&
         ts.isIdentifier(node.expression) &&
@@ -281,7 +279,10 @@ const makeAddExpressionToSchemaCollectionVisitor =
 
       return ts.visitEachChild(node, visit, ctx)
     }
-    return visit
+
+    return (sourceFile: ts.SourceFile): ts.SourceFile => {
+      return ts.visitEachChild(sourceFile, visit, ctx)
+    }
   }
 
 /**
@@ -304,7 +305,7 @@ const makeUpdateObjectLiteralPropertyVisitor =
     propertyValue: ts.Expression
   ): ts.TransformerFactory<ts.SourceFile> =>
   (ctx: ts.TransformationContext) => {
-    const visitor = (node: ts.Node) => {
+    const visitor: ts.Visitor = (node: ts.Node): ts.Node => {
       if (
         ts.isCallExpression(node) &&
         ts.isIdentifier(node.expression) &&
@@ -345,7 +346,10 @@ const makeUpdateObjectLiteralPropertyVisitor =
 
       return ts.visitEachChild(node, visitor, ctx)
     }
-    return visitor
+
+    return (sourceFile: ts.SourceFile): ts.SourceFile => {
+      return ts.visitNode(sourceFile, visitor) as ts.SourceFile
+    }
   }
 
 export const addSelfHostedTinaAuthToConfig = async (

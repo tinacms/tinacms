@@ -13,7 +13,7 @@ async function localSpin<T>({
 }) {
   const spinner = new Spinner({
     text: `${text} %s`,
-    stream: process.stderr,
+    stream: process.stderr as unknown as NodeJS.WritableStream,
     onTick: function (msg) {
       this.clearLine(this.stream)
       this.stream.write(msg)

@@ -29,11 +29,6 @@
       "import": "./dist/rich-text/index.mjs",
       "require": "./dist/rich-text/index.js"
     },
-    "./dist/dev-tools": {
-      "types": "./dist/dev-tools.d.ts",
-      "import": "./dist/dev-tools.mjs",
-      "require": "./dist/dev-tools.js"
-    },
     "./dist/rich-text/prism": {
       "types": "./dist/rich-text/prism.d.ts",
       "import": "./dist/rich-text/prism.mjs",
@@ -49,8 +44,7 @@
       "src/rich-text/index.tsx",
       "src/rich-text/prism.tsx",
       "src/react.tsx",
-      "src/client.ts",
-      "src/dev-tools.tsx"
+      "src/client.ts"
     ]
   },
   "typings": "dist/index.d.ts",
@@ -111,7 +105,6 @@
     "@testing-library/dom": "^10.3.1",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
-    "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.5.2",
     "@tinacms/scripts": "workspace:*",
     "@types/atob": "^2.1.2",

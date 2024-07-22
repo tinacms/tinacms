@@ -1,5 +1,5 @@
 import React from 'react'
-import { EventBus, Callback, CMSEvent } from '@toolkit/core'
+import type { EventBus, Callback, CMSEvent } from '@toolkit/core'
 
 export interface EventsToAlerts {
   [key: string]: ToAlert | AlertArgs
@@ -46,7 +46,7 @@ export class Alerts {
   add(
     level: AlertLevel,
     message: string | React.FunctionComponent,
-    timeout: number = 4000
+    timeout = 4000
   ): () => void {
     const alert = {
       level,
