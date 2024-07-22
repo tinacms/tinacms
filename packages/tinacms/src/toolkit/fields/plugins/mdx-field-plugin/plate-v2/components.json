@@ -1,0 +1,14 @@
+{
+  "$schema": "https://platejs.org/schema.json",
+  "style": "default",
+  "rsc": true,
+  "tailwind": {
+    "config": "",
+    "css": "",
+    "baseColor": "slate",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "./"
+  }
+}
