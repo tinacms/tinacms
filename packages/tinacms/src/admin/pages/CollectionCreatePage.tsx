@@ -253,7 +253,7 @@ export const RenderForm = ({
               <code>sub-folder/My_Document</code>
             </span>
           ),
-          placeholder: `My_Document`,
+          placeholder: 'My_Document',
           validate: (value, allValues, meta) => {
             if (!value) {
               if (meta.dirty) {
@@ -274,11 +274,11 @@ export const RenderForm = ({
               const filePath = `${normalizePath(
                 schemaCollection.path
               )}/${value}.${schemaCollection.format || 'md'}`
-              const match = schema.matchFiles({
+              const match = schema?.matchFiles({
                 files: [filePath],
                 collection: schemaCollection,
               })
-              if (match.length === 0) {
+              if (match?.length === 0) {
                 return `The filename "${value}" is not allowed for this collection.`
               }
             }

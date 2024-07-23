@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import git from 'isomorphic-git'
 import { IsomorphicBridge } from './isomorphic'
 
@@ -27,8 +27,8 @@ describe('isomorphic bridge', () => {
 
     contentMap = {
       'README.md': '# TEST Repository',
-      'content/posts/voteForPedro.mdx': `# Vote For Pedro`,
-      'content/posts/anotherPost.mdx': `# Another Post`,
+      'content/posts/voteForPedro.mdx': '# Vote For Pedro',
+      'content/posts/anotherPost.mdx': '# Another Post',
       'content/authors/napoleon.mdx': '# Napoleon',
       'content/authors/pedro.mdx': '# Pedro',
     }

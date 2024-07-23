@@ -2,8 +2,8 @@
 
 */
 
-import { TinaField } from '../types/index'
-import { TinaSchema } from './TinaSchema'
+import type { TinaField } from '../types/index'
+import type { TinaSchema } from './TinaSchema'
 import { lastItem, NAMER } from '../util'
 
 /**
@@ -15,7 +15,7 @@ export const resolveField = (
 ): {
   [key: string]: unknown
   name: string
-  component: TinaField<true>['ui']['component']
+  component: NonNullable<TinaField<true>['ui']>['component']
   type: string
 } => {
   const extraFields = field.ui || {}
@@ -84,7 +84,7 @@ export const resolveField = (
           options:
             field.ui && field.ui.component !== 'select'
               ? field.options
-              : [{ label: `Choose an option`, value: '' }, ...field.options],
+              : [{ label: 'Choose an option', value: '' }, ...field.options],
         }
       }
       if (field.list) {
@@ -104,7 +104,7 @@ export const resolveField = (
         ...field,
         ...extraFields,
       }
-    case 'object':
+    case 'object': {
       const templateInfo = schema.getTemplatesForCollectable(field)
       if (templateInfo.type === 'object') {
         // FIXME: need to finish group/group-list
@@ -144,6 +144,7 @@ export const resolveField = (
       } else {
         throw new Error(`Unknown object for resolveField function`)
       }
+    }
     case 'rich-text':
       const templates: { [key: string]: object } = {}
       const typeMap: { [key: string]: string } = {}

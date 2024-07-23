@@ -5,8 +5,8 @@ export const makeTransformer =
     makeVisitor: (ctx: ts.TransformationContext) => ts.Visitor
   ): ts.TransformerFactory<T> =>
   (ctx: ts.TransformationContext) =>
-  (node) =>
-    ts.visitNode(node, makeVisitor(ctx))
+  (node: T) =>
+    ts.visitNode(node, makeVisitor(ctx)) as T
 
 export function parseExpression(
   expression: string

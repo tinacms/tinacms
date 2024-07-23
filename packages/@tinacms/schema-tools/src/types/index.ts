@@ -485,7 +485,10 @@ export interface AuthProvider {
   isAuthenticated: () => Promise<boolean>
   getLoginStrategy: () => LoginStrategy
   getLoginScreen: () => FC<LoginScreenProps> | null
-  getSessionProvider: () => FC<{ basePath?: string }>
+  getSessionProvider: () => FC<{
+    basePath?: string
+    children?: React.ReactNode
+  }>
 }
 
 interface AuthHooks {

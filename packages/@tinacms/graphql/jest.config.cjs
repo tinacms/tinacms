@@ -1,8 +1,10 @@
-/**
-
-*/
-
 const mod = require('@tinacms/scripts/dist/jest-runner.js')
+
+// Check if mod.default exists and has a config property
+if (!mod.default || !mod.default.config) {
+  throw new Error('Invalid jest-runner configuration')
+}
+
 module.exports = {
   ...mod.default.config,
   transform: {

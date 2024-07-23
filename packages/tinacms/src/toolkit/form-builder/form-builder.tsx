@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { FC, useEffect } from 'react'
-import { Form } from '@toolkit/forms'
+import { type FC, useEffect } from 'react'
+import type { Form } from '@toolkit/forms'
 import { Form as FinalForm } from 'react-final-form'
 
-import { DragDropContext, DropResult } from 'react-beautiful-dnd'
+import { DragDropContext, type DropResult } from 'react-beautiful-dnd'
 import { Button, OverflowMenu } from '@toolkit/styles'
 import { LoadingDots } from './loading-dots'
 import { FormPortalProvider } from './form-portal'
@@ -22,7 +22,7 @@ import {
 import { BiGitBranch } from 'react-icons/bi'
 import { MdOutlineSaveAlt } from 'react-icons/md'
 import { formatBranchName } from '@toolkit/plugin-branch-switcher'
-import { TinaSchema } from '@tinacms/schema-tools'
+import type { TinaSchema } from '@tinacms/schema-tools'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -221,7 +221,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                   header={<PanelHeader {...fieldGroup} id={tinaForm.id} />}
                   id={tinaForm.id}
                 >
-                  {tinaForm && tinaForm.fields.length ? (
+                  {tinaForm?.fields.length ? (
                     <FieldsBuilder
                       form={tinaForm}
                       activeFieldName={form.activeFieldName}
@@ -282,12 +282,12 @@ export const FormStatus = ({ pristine }) => {
           <p className="text-gray-500 text-xs leading-tight whitespace-nowrap mr-2">
             Unsaved Changes
           </p>
-          <span className="w-3 h-3 flex-0 rounded-full bg-red-300 border border-red-400"></span>{' '}
+          <span className="w-3 h-3 flex-0 rounded-full bg-red-300 border border-red-400" />{' '}
         </>
       )}
       {pristine && (
         <>
-          <span className="w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400"></span>{' '}
+          <span className="w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400" />{' '}
         </>
       )}
     </div>
@@ -346,6 +346,7 @@ const PanelHeader = (props: { label?: string; name?: string; id: string }) => {
 
   return (
     <button
+      type="button"
       className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
    border-gray-100 px-6 -mt-px`}
       onClick={() => {
