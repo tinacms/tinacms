@@ -77,6 +77,7 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
     folder: directory.replace(/^\//, ''),
     use_filename: true,
     overwrite: false,
+    resource_type: 'auto',
   })
 
   res.json(result)
