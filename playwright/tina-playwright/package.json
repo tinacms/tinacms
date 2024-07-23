@@ -24,5 +24,5 @@
     "eslint": "7",
     "eslint-config-next": "12.0.3"
   },
-  "version": null
+  "version": "0.0.0"
 }
