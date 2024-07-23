@@ -20,5 +20,5 @@
     "@types/node": "^17.0.21",
     "eslint": "7"
   },
-  "version": null
+  "version": "0.0.0"
 }
