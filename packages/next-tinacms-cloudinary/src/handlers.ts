@@ -72,15 +72,19 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
 
   const { directory } = req.body
 
-  //@ts-ignore
-  const result = await cloudinary.uploader.upload(req.file.path, {
-    folder: directory.replace(/^\//, ''),
-    use_filename: true,
-    overwrite: false,
-    resource_type: 'auto',
-  })
+  try {
+    //@ts-ignore
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: directory.replace(/^\//, ''),
+      use_filename: true,
+      overwrite: false,
+      resource_type: 'auto',
+    })
 
-  res.json(result)
+    res.json(result)
+  } catch (error) {
+    res.status(error.http_code).json({ message: error.message })
+  }
 }
 
 async function listMedia(
