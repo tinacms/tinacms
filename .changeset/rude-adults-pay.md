@@ -2,7 +2,6 @@
 '@tinacms/vercel-previews': patch
 'next-tinacms-cloudinary': patch
 '@tinacms/schema-tools': patch
-'@tinacms/sharedctx': patch
 'next-tinacms-dos': patch
 'next-tinacms-s3': patch
 'tinacms-authjs': patch
