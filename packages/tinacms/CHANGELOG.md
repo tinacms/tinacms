@@ -1,5 +1,25 @@
 # tinacms
 
+## 2.0.0
+
+### Major Changes
+
+- 957fa26: Removed deprecated useTina hook
+  This was deprecated as part of the v1 release and shouldn't have been in use by anyone
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 957fa26: update to React 18
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/mdx@1.3.28
+  - @tinacms/schema-tools@1.4.19
+  - @tinacms/search@1.0.23
+
 ## 1.6.7
 
 ### Patch Changes

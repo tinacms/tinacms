@@ -1,5 +1,12 @@
 # @tinacms/metrics
 
+## 1.0.5
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+
 ## 1.0.4
 
 ### Patch Changes
