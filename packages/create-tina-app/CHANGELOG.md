@@ -1,5 +1,15 @@
 # create-tina-app
 
+## 1.1.5
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [e58b951]
+- Updated dependencies [9076d09]
+  - @tinacms/metrics@1.0.5
+
 ## 1.1.4
 
 ### Patch Changes

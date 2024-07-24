@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.6
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+
 ## 1.1.5
 
 ### Patch Changes

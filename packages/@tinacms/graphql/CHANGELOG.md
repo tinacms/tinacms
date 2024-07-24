@@ -1,5 +1,19 @@
 # tina-graphql
 
+## 1.4.38
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/mdx@1.3.28
+  - @tinacms/schema-tools@1.4.19
+
 ## 1.4.37
 
 ### Patch Changes

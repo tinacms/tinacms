@@ -1,5 +1,14 @@
 # @tinacms/schema-tools
 
+## 1.4.19
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+- e58b951: update vulnerable packages so npm audit does not complain
+- 957fa26: update to React 18
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+
 ## 1.4.18
 
 ### Patch Changes
