@@ -1,5 +1,19 @@
 # tinacms
 
+## 2.1.0
+
+### Minor Changes
+
+- cb83dc2: add `toolbarOverride` option to `rich-text` fields
+
+### Patch Changes
+
+- 1b3584c: Add cloudinary supported files to the default media upload types
+- Updated dependencies [cb83dc2]
+  - @tinacms/schema-tools@1.5.0
+  - @tinacms/mdx@1.3.29
+  - @tinacms/search@1.0.24
+
 ## 2.0.0
 
 ### Major Changes

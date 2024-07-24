@@ -1,5 +1,13 @@
 # next-tinacms-s3
 
+## 4.0.0
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+
 ## 3.0.0
 
 ### Patch Changes
