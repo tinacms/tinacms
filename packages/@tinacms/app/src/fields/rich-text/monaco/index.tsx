@@ -160,9 +160,9 @@ export const RawEditor = (props: RichTextType) => {
 
   return (
     <div className="relative">
-      <div className="sticky top-1 w-full flex justify-between mb-2 z-50 max-w-full">
+      <div className="sticky top-1 w-full flex justify-between mb-2 z-50 max-w-full bg-white">
         <Button onClick={() => props.setRawMode(false)}>
-          View in rich-text editor
+          View in rich-text editor 📝
         </Button>
         <ErrorMessage error={error} />
       </div>
@@ -222,7 +222,7 @@ const Button = (props) => {
         props.align === 'left'
           ? 'rounded-l-md border-r-0'
           : 'rounded-r-md border-l-0'
-      } shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+      } flex justify-center w-full shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
       type="button"
       onClick={props.onClick}
     >
