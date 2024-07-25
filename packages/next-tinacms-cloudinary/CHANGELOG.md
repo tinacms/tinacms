@@ -1,5 +1,14 @@
 # next-tinacms-cloudinary
 
+## 7.0.0
+
+### Patch Changes
+
+- 37b5332: Add support to upload non-image files to Cloudinary
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+
 ## 6.0.0
 
 ### Patch Changes

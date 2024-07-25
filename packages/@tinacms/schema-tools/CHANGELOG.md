@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.5.0
+
+### Minor Changes
+
+- cb83dc2: add `toolbarOverride` option to `rich-text` fields
+
 ## 1.4.19
 
 ### Patch Changes
