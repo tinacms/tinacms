@@ -8,7 +8,18 @@ const supportedFileTypes = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/postscript',
+  'model/fbx',
+  'model/gltf+json',
+  'model/ply',
+  'model/u3d+mesh',
+  'model/vnd.usdz+zip',
+  'application/x-indesign',
+  'application/vnd.apple.mpegurl',
+  'application/dash+xml',
+  'application/mxf',
   'image/*',
+  'video/*',
 ]
 export const DEFAULT_MEDIA_UPLOAD_TYPES = supportedFileTypes.join(',')
 

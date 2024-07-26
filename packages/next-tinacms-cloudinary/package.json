@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-cloudinary",
-  "version": "5.0.7",
+  "version": "7.0.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "files": [
@@ -30,7 +30,7 @@
     "@types/crypto-js": "^3.1.47",
     "@types/js-cookie": "^2.2.6",
     "@types/node": "^13.13.1",
-    "next": "12.2.4",
+    "next": "14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tinacms": "workspace:*",

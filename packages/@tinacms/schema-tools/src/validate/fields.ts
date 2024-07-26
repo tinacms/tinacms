@@ -210,7 +210,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
             }
           }
           return {
-            message: issue.message,
+            message: issue.message || '',
           }
         },
       }

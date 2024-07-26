@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { ReactNode, useState } from 'react'
 import { TinaCloudProvider } from './auth'
 
 import { LocalClient } from './internalClient/index'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { parseURL } from '@tinacms/schema-tools'
-import { TinaCMSProviderDefaultProps } from './types/cms'
+import type { TinaCMSProviderDefaultProps } from './types/cms'
 
 const errorButtonStyles = {
   background: '#eb6337',
@@ -19,7 +19,11 @@ const errorButtonStyles = {
   margin: '1rem 0',
 }
 
-class ErrorBoundary extends React.Component {
+interface ErrorBoundaryProps {
+  children: ReactNode
+  hasError?: boolean
+}
+class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
   constructor(props) {
     super(props)
 
@@ -101,6 +105,7 @@ class ErrorBoundary extends React.Component {
               for more information.
             </p>
             <button
+              type="button"
               style={errorButtonStyles as any}
               onClick={() => {
                 /* @ts-ignore */
@@ -383,16 +388,4 @@ This will work when developing locally but NOT when deployed to production.
   }
 
   return client.request(query, { variables })
-}
-/**
- * A passthru function which allows editors
- * to know the temlpate string is a GraphQL
- * query or muation
- */
-export function gql(strings: TemplateStringsArray, ...args: string[]): string {
-  let str = ''
-  strings.forEach((string, i) => {
-    str += string + (args[i] || '')
-  })
-  return str
 }

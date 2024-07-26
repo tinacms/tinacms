@@ -40,7 +40,7 @@ export function install(
     let args: string[]
     const command: string = packageManager
 
-    if (dependencies && dependencies.length) {
+    if (dependencies?.length) {
       /**
        * If there are dependencies, run a variation of `{packageManager} add`.
        */
