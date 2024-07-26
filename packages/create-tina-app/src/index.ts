@@ -47,8 +47,8 @@ export const run = async () => {
     name: 'packageManager',
     type: 'select',
     choices: [
-      { title: 'Yarn', value: 'yarn' },
-      { title: 'NPM', value: 'npm' },
+      { title: 'yarn', value: 'yarn' },
+      { title: 'npm', value: 'npm' },
       { title: 'pnpm', value: 'pnpm' },
     ],
   })
