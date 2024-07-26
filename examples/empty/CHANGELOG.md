@@ -1,5 +1,11 @@
 # starter-empty
 
+## 0.0.3
+
+### Patch Changes
+
+- @tinacms/cli@1.5.52
+
 ## 0.0.2
 
 ### Patch Changes

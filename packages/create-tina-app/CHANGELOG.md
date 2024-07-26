@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 1.1.6
+
+### Patch Changes
+
+- af3c593: Updates tar and other packages. Leaves chalk at version 4 due to esm issue with chalk 5.
+
 ## 1.1.5
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @tinacms/app
 
+## 2.0.2
+
+### Patch Changes
+
+- 4128128: Fix markdown editor button styling
+
 ## 2.0.1
 
 ### Patch Changes
