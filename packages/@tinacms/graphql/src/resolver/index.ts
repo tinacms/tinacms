@@ -723,7 +723,7 @@ export class Resolver {
         /**
          * createDocument, create<Collection>Document
          */
-        if (alreadyExists === true) {
+        if (alreadyExists) {
           throw new Error(`Unable to add document, ${realPath} already exists`)
         }
         return this.createResolveDocument({
@@ -736,7 +736,7 @@ export class Resolver {
         /**
          * createFolder, create<Collection>Folder
          */
-        if (alreadyExists === true) {
+        if (alreadyExists) {
           throw new Error(`Unable to add folder, ${realPath} already exists`)
         }
         await this.database.put(
@@ -765,6 +765,11 @@ export class Resolver {
         return doc
       }
       if (isUpdateName) {
+        if (alreadyExists) {
+          throw new Error(
+            `Unable to rename document, ${realPath} already exists`
+          )
+        }
         // Must provide a new relative path in the params
         assertShape<{ params: string }>(args, (yup) =>
           yup.object({ params: yup.object().required() })

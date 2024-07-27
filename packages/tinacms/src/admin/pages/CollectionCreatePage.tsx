@@ -310,7 +310,7 @@ export const RenderForm = ({
           const defaultErrorText = 'There was a problem saving your document.'
           if (error.message.includes('already exists')) {
             cms.alerts.error(
-              `${defaultErrorText} The "Filename" is already used for another document, please modify it.`
+              `${defaultErrorText} The "filename" is already used for another document, please modify it.`
             )
           } else {
             cms.alerts.error(() =>

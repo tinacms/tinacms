@@ -416,9 +416,17 @@ const CollectionListPage = () => {
                             cms.alerts.info('Document was successfully renamed')
                             reFetchCollection()
                           } catch (error) {
-                            cms.alerts.warn(
-                              'Document was not renamed, ask a developer for help or check the console for an error message'
-                            )
+                            const defaultErrorText =
+                              'There was a problem renaming the document.'
+                            if (error.message.includes('already exists')) {
+                              cms.alerts.error(
+                                `${defaultErrorText} The "filename" is already used for another document, please modify it.`
+                              )
+                            } else {
+                              cms.alerts.warn(
+                                `${defaultErrorText} Ask a developer for help or check the console for an error message`
+                              )
+                            }
                             console.error(error)
                             throw error
                           }
