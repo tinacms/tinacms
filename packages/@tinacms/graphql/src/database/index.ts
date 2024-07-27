@@ -474,6 +474,7 @@ export class Database {
     data: { [key: string]: unknown },
     collectionName?: string
   ) => {
+    console.log('put', filepath)
     await this.initLevel()
 
     try {
@@ -525,11 +526,7 @@ export class Database {
             `.gitkeep.${collection.format || 'md'}`
           )
             ? ''
-            : await this.stringifyFile(
-            filepath,
-            dataFields,
-            collection
-          )
+            : await this.stringifyFile(filepath, dataFields, collection)
         } else {
           if (collection.format !== 'csv') {
             throw new GraphQLError(
@@ -775,6 +772,7 @@ export class Database {
       aliasedData,
       extension,
       writeTemplateKey, //templateInfo.type === 'union',
+      collection,
       {
         frontmatterFormat: collection?.frontmatterFormat,
         frontmatterDelimiters: collection?.frontmatterDelimiters,
@@ -1325,17 +1323,20 @@ export class Database {
       level = this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
     }
     const itemKey = normalizePath(filepath)
+    console.log({ itemKey })
     const rootSublevel = level.sublevel<string, Record<string, any>>(
       CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
     )
     const item = await rootSublevel.get(itemKey)
+    console.log({ item })
     if (item) {
       const folderTreeBuilder = new FolderTreeBuilder()
       const folderKey = folderTreeBuilder.update(
         filepath,
         collection.path || ''
       )
+      console.log({ folderKey })
       await this.contentLevel.batch([
         ...makeIndexOpsForDocument<Record<string, any>>(
           filepath,
@@ -1364,10 +1365,49 @@ export class Database {
 
     if (!collection?.isDetached) {
       if (this.bridge) {
-        await this.bridge.delete(normalizePath(filepath))
+        console.log('calling bridge delete on ', filepath)
+
+        if (!collection.singleFile) {
+          await this.bridge.delete(normalizePath(filepath))
+        } else {
+          if (collection.format !== 'csv') {
+            throw new GraphQLError(
+              `Collection ${collection.name} is configured as single file, but is not a csv.`
+            )
+          }
+          const singleFilePath = `${collection.path}/index.${collection.format}`
+          const stringCSV = await this.bridge.get(singleFilePath)
+          const rows = parseCSV(stringCSV, collection).sort((a, b) =>
+            a['_id_'].localeCompare(b['_id_'])
+          )
+          console.log('sorted!', rows)
+          let itemId = itemKey.replace(`${collection.path}/`, '')
+          itemId = itemId.substring(
+            0,
+            itemId.lastIndexOf(collection.format) - 1
+          )
+          let deleteIdx = -1
+          for (let i = 0; i < rows.length; i++) {
+            console.log({
+              a: rows[i]['_id_'],
+              b: itemId,
+            })
+            if (rows[i]['_id_'] === itemId) {
+              deleteIdx = i
+              break
+            }
+          }
+          if (deleteIdx !== -1) {
+            rows.splice(deleteIdx, 1)
+            const stringifiedFile = stringifyCSV(collection, rows)
+            await this.bridge.put(singleFilePath, stringifiedFile)
+          }
+        }
       }
       try {
-        await this.onDelete(normalizePath(filepath))
+        if (!collection.singleFile) {
+          await this.onDelete(normalizePath(filepath))
+        }
       } catch (e) {
         throw new GraphQLError(
           `Error running onDelete hook for ${filepath}: ${e}`,

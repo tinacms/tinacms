@@ -754,7 +754,7 @@ interface BaseCollection {
   name: string
   path: string
   indexes?: IndexType[]
-  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml'
+  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml' | 'csv'
   ui?: UICollection
   /**
    * @deprecated - use `ui.defaultItem` on the each `template` instead

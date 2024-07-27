@@ -778,6 +778,13 @@ export class Resolver {
           collection?.path,
           args.params.relativePath
         )
+        if (collection.singleFile) {
+          doc._rawData['_id_'] = newRealPath
+            .substring(collection.path.length + 1)
+            .split('.')
+            .slice(0, -1)
+            .join('.')
+        }
         // Update the document
         await this.database.put(newRealPath, doc._rawData, collection.name)
         // Delete the old document

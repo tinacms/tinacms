@@ -58,4 +58,5 @@ export interface CollectionResponse {
     }
     edges?: DocumentNode[]
   }
+  singleFile?: any
 }

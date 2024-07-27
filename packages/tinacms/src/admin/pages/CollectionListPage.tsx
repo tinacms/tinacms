@@ -337,7 +337,14 @@ const CollectionListPage = () => {
                     {deleteModalOpen &&
                       !cms.api.tina.usingProtectedBranch() && (
                         <DeleteModal
-                          filename={vars.relativePath}
+                          filename={
+                            collection.singleFile
+                              ? vars.relativePath
+                              : vars.relativePath
+                                  .split('.')
+                                  .slice(0, -1)
+                                  .join('.')
+                          }
                           deleteFunc={async () => {
                             try {
                               await admin.deleteDocument(vars)
@@ -383,7 +390,14 @@ const CollectionListPage = () => {
 
                     {renameModalOpen && (
                       <RenameModal
-                        filename={vars.relativePath}
+                        filename={
+                          collection.singleFile
+                            ? vars.relativePath
+                            : vars.relativePath
+                                .split('.')
+                                .slice(0, -1)
+                                .join('.')
+                        }
                         newRelativePath={vars.newRelativePath}
                         setNewRelativePath={(newRelativePath) => {
                           setVars((vars) => {
@@ -1073,7 +1087,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
 
 interface ResetModalProps {
   close(): void
-  deleteFunc(): void
+  deleteFunc(): Promise<void>
   filename: string
 }
 
@@ -1093,7 +1107,9 @@ const DeleteModal = ({ close, deleteFunc, filename }: ResetModalProps) => {
       <PopupModal>
         <ModalHeader close={close}>Delete {filename}</ModalHeader>
         <ModalBody padded={true}>
-          <p>{`Are you sure you want to delete ${filename}?`}</p>
+          <p className="mb-4">
+            Are you sure you want to delete <strong>{filename}</strong>?
+          </p>
         </ModalBody>
         <ModalActions>
           <Button style={{ flexGrow: 2 }} onClick={close}>

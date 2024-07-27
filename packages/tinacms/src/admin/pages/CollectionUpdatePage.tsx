@@ -118,7 +118,7 @@ const RenderForm = ({
       // id is the full document path
       id: `${schemaCollection.path}/${relativePath}`,
       label: 'form',
-      fields: formInfo.fields as any,
+      fields: formInfo.fields.filter((field) => field.name != '_id_') as any,
       initialValues: document._values,
       onSubmit: async (values) => {
         try {

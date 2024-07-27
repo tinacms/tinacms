@@ -48,6 +48,7 @@ const createDocument = async (
     _collection: collection.name,
     ...(template && { _template: template.name }),
     ...leftover,
+    ...(collection.singleFile && { ['_id_']: filename }),
   })
 
   if (await api.isAuthenticated()) {
@@ -230,7 +231,7 @@ export const RenderForm = ({
         `/new-post.${schemaCollection.format || 'md'}`,
       label: 'form',
       fields: [
-        ...(formInfo.fields as any),
+        ...(formInfo.fields.filter((field) => field.name != '_id_') as any),
         {
           name: 'filename',
           label: 'Filename',
