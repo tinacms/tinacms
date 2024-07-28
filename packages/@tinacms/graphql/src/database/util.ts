@@ -448,17 +448,6 @@ export const loadAndParseWithAliases = async (
   // collection?: Collection<true>,
   templateInfo?: CollectionTemplateable
 ) => {
-  // const dataString = await bridge.get(normalizePath(filepath))
-  // const data = parseFile(
-  //   dataString,
-  //   path.extname(filepath),
-  //   (yup) => yup.object({}),
-  //   collection,
-  //   {
-  //     frontmatterDelimiters: collection?.frontmatterDelimiters,
-  //     frontmatterFormat: collection?.frontmatterFormat,
-  //   }
-  // )
   const data = await dataLoader(filepath)
   const template = getTemplateForFile(templateInfo, data as any)
   if (!template) {
