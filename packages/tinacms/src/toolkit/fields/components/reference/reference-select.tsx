@@ -5,6 +5,24 @@ import { selectFieldClasses } from '../select'
 import { LoadingDots } from '@toolkit/form-builder'
 import { MdKeyboardArrowDown } from 'react-icons/md'
 import { Field } from '@toolkit/forms'
+// import * as Popover from '@radix-ui/react-popover';
+
+import {
+  Popover,
+  PopoverArrow,
+  PopoverClose,
+  PopoverContent,
+  PopoverPortal,
+  PopoverTrigger,
+} from '@radix-ui/react-popover'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from 'cmdk'
+import { Button } from './to-remove/button'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
@@ -112,6 +130,10 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
     return <LoadingDots color="var(--tina-color-primary)" />
   }
 
+  console.log('cms', cms)
+  console.log('input', input)
+  console.log('field', field)
+
   return (
     <>
       <select
@@ -145,5 +167,80 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
     </>
   )
 }
+const frameworks = [
+  {
+    value: 'next.js',
+    label: 'Next.js',
+  },
+  {
+    value: 'sveltekit',
+    label: 'SvelteKit',
+  },
+  {
+    value: 'nuxt.js',
+    label: 'Nuxt.js',
+  },
+  {
+    value: 'remix',
+    label: 'Remix',
+  },
+  {
+    value: 'astro',
+    label: 'Astro',
+  },
+]
 
-export default ReferenceSelect
+const ComboboxDemo = ({ cms, input, field }) => {
+  const [open, setOpen] = React.useState(false)
+  const [value, setValue] = React.useState('')
+
+  return (
+    <>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-[200px] justify-between"
+          >
+            {value
+              ? frameworks.find((framework) => framework.value === value)?.label
+              : 'Select framework...'}
+            {/* <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /> */}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput placeholder="Search framework..." />
+            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandGroup>
+              <p>something to test</p>
+              {/* {frameworks.map((framework) => (
+              <CommandItem
+                key={framework.value}
+                value={framework.value}
+                onSelect={(currentValue) => {
+                  setValue(currentValue === value ? "" : currentValue)
+                  setOpen(false)
+                }}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    value === framework.value ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {framework.label}
+              </CommandItem>
+            ))} */}
+            </CommandGroup>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </>
+  )
+}
+
+// export default ReferenceSelect
+export default ComboboxDemo
