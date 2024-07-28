@@ -10,7 +10,6 @@ import {
   Collection,
   CollectionTemplateable,
   normalizePath,
-  ObjectField,
   TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools'
@@ -33,7 +32,6 @@ const matterEngines = {
 export const stringifyCSV = (collection: Collection<true>, items: any[]) => {
   const lines: string[] = []
   const fields = collection.fields
-  console.log({ fields })
   const fieldLookup = fields.reduce((acc, field) => {
     acc[field.name] = field
     return acc
@@ -123,46 +121,18 @@ export const stringifyFile = (
 }
 
 export function parseCSV(content: string, collection: Collection<true>) {
-  // const dataField = collection.fields.find(
-  //   (field) => field.type === 'object' && field.list
-  // )
-  // if (!dataField) {
-  //   throw new Error(`CSV collection must specify a root-level object list`)
-  // }
-  console.log({ content, len: content.length })
   const fields = collection.fields
   const fieldLookup = fields.reduce((acc, field) => {
     acc[field.name] = field
     return acc
   }, {} as { [key: string]: TinaField<true> })
   const lines = content.split('\n')
-  console.log({ lines })
   const headers = lines[0].split(',')
-  console.log({ headers })
   const rows = lines
     .slice(1)
     .map((line) => line.split(','))
     .filter((row) => row.length === headers.length)
-  // const result = {
-  //   [dataField.name]: rows.map((row) => {
-  //     const obj: any = {}
-  //     headers.forEach((header, i) => {
-  //       const field = fields.find((field) => field.name === header)
-  //       if (field) {
-  //         const fieldType = fieldLookup[header].type
-  //         if (fieldType === 'number' || fieldType === 'boolean') {
-  //           obj[header] = row[i]
-  //         } else {
-  //           obj[header] = row[i].slice(1, -1).replace(/\\"/g, '"')
-  //         }
-  //       }
-  //     })
-  //     return obj
-  //   }),
-  // }
-  // return result
 
-  console.log({ rows })
   return rows.map((row) => {
     const obj: any = {}
     headers.forEach((header, i) => {
