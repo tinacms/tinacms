@@ -662,6 +662,13 @@ export class Database {
         const ops: BatchOp[] = [
           ...delOps,
           ...putOps,
+          ...makeFolderOpsForCollection(
+            folderTreeBuilder.tree,
+            collection,
+            collectionIndexDefinitions,
+            'put',
+            level
+          ),
           {
             type: 'put',
             key: normalizedPath,
