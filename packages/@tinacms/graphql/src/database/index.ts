@@ -474,7 +474,6 @@ export class Database {
     data: { [key: string]: unknown },
     collectionName?: string
   ) => {
-    console.log('put', filepath)
     await this.initLevel()
 
     try {
@@ -493,7 +492,6 @@ export class Database {
         let normalizedPath = normalizePath(filepath)
         const dataFields = await this.formatBodyOnPayload(filepath, data)
         const collection = await this.collectionForPath(filepath)
-        console.log('!!', collection.fields)
         if (!collection) {
           // noinspection ExceptionCaughtLocallyJS
           throw new GraphQLError(`Unable to find collection for ${filepath}.`)
@@ -538,7 +536,6 @@ export class Database {
           const rows = parseCSV(stringCSV, collection).sort((a, b) =>
             a['_id_'].localeCompare(b['_id_'])
           )
-          console.log('sorted!', rows)
           let itemId = normalizedPath.replace(`${collection.path}/`, '')
           itemId = itemId.substring(
             0,
@@ -547,34 +544,24 @@ export class Database {
           let insertIdx = -1
           let isUpdate = false
           for (let i = 0; i < rows.length; i++) {
-            console.log({
-              a: rows[i]['_id_'],
-              b: itemId,
-            })
             if (rows[i]['_id_'] === itemId) {
-              console.log('updating existing', dataFields)
               Object.assign(rows[i], dataFields)
               isUpdate = true
               break
             }
             if (rows[i]['_id_'] > itemId) {
-              console.log('found insert idx')
               insertIdx = i
               break
             }
           }
           if (!isUpdate) {
-            console.log('!update')
             if (insertIdx === -1) {
-              console.log('appending')
               rows.push(dataFields)
             } else {
-              console.log('splicing into ', insertIdx)
               rows.splice(insertIdx, 0, dataFields)
             }
           }
           stringifiedFile = stringifyCSV(collection, rows)
-          console.log({ stringifiedFile })
           normalizedPath = singleFilePath
         }
 
@@ -1330,20 +1317,17 @@ export class Database {
       level = this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
     }
     const itemKey = normalizePath(filepath)
-    console.log({ itemKey })
     const rootSublevel = level.sublevel<string, Record<string, any>>(
       CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
     )
     const item = await rootSublevel.get(itemKey)
-    console.log({ item })
     if (item) {
       const folderTreeBuilder = new FolderTreeBuilder()
       const folderKey = folderTreeBuilder.update(
         filepath,
         collection.path || ''
       )
-      console.log({ folderKey })
       await this.contentLevel.batch([
         ...makeIndexOpsForDocument<Record<string, any>>(
           filepath,
@@ -1372,8 +1356,6 @@ export class Database {
 
     if (!collection?.isDetached) {
       if (this.bridge) {
-        console.log('calling bridge delete on ', filepath)
-
         if (!collection.singleFile) {
           await this.bridge.delete(normalizePath(filepath))
         } else {
@@ -1387,7 +1369,6 @@ export class Database {
           const rows = parseCSV(stringCSV, collection).sort((a, b) =>
             a['_id_'].localeCompare(b['_id_'])
           )
-          console.log('sorted!', rows)
           let itemId = itemKey.replace(`${collection.path}/`, '')
           itemId = itemId.substring(
             0,
@@ -1395,10 +1376,6 @@ export class Database {
           )
           let deleteIdx = -1
           for (let i = 0; i < rows.length; i++) {
-            console.log({
-              a: rows[i]['_id_'],
-              b: itemId,
-            })
             if (rows[i]['_id_'] === itemId) {
               deleteIdx = i
               break
@@ -1443,7 +1420,6 @@ export class Database {
       tinaSchema,
       this.bridge,
       async (collection, contentPaths) => {
-        console.log(collection.name, contentPaths)
         const userFields = mapUserFields(collection, [])
         if (collection.isDetached) {
           const level = this.appLevel.sublevel(
@@ -1609,14 +1585,11 @@ const _indexContent = async (
     }
 
     const sourcePath = documentPaths[0]
-    console.log(sourcePath)
-    // clean up this redundancy
+    // TODO clean up this redundancy
     const stringCSV = await database.bridge.get(sourcePath)
-    console.log(stringCSV)
     documentPaths = parseCSV(stringCSV, collection).map(
       (row) => `${collection.path}/${row['_id_']}.${collection.format}`
     )
-    console.log(documentPaths)
     dataLoader = await csvDataLoader({
       bridge: database.bridge,
       collection,
@@ -1627,7 +1600,6 @@ const _indexContent = async (
 
   const folderTreeBuilder = new FolderTreeBuilder()
   await sequential(documentPaths, async (filepath) => {
-    console.log({ filepath })
     try {
       const aliasedData = await loadAndParseWithAliases(
         dataLoader,
