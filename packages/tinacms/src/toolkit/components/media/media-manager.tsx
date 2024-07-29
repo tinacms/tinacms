@@ -149,7 +149,6 @@ export function MediaPicker({
    * control offset by pushing/popping to offsetHistory
    */
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
-  const [loadingText, setLoadingText] = useState('')
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
@@ -328,7 +327,7 @@ export function MediaPicker({
   useEffect(disableScrollBody, [])
 
   if (listState === 'loading' || uploading) {
-    return <LoadingMediaList extraText={loadingText} />
+    return <LoadingMediaList />
   }
 
   if (listState === 'not-configured') {
