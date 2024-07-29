@@ -79,6 +79,13 @@ export default defineConfig({
         fields: [
           {
             type: 'string',
+            label: 'Filename',
+            name: 'path',
+            uid: true,
+            required: true,
+          },
+          {
+            type: 'string',
             label: 'Hash',
             name: 'hash',
           },

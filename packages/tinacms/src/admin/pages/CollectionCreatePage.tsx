@@ -20,7 +20,7 @@ import GetCollection from '../components/GetCollection'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
-import type { TinaCMS } from '@tinacms/toolkit'
+import type { Field, TinaCMS } from '@tinacms/toolkit'
 import { FaLock, FaUnlock } from 'react-icons/fa'
 import { useCollectionFolder } from './utils'
 import { ErrorDialog } from '../components/ErrorDialog'
@@ -43,12 +43,17 @@ const createDocument = async (
   // Append the folder if it exists and the filename does not start with a slash
   const appendFolder = folder && !filename.startsWith('/') ? `/${folder}/` : '/'
   const relativePath = `${appendFolder}${filename}.${collection.format}`
-
+  const uidField = collection.fields.find((field) => !!field.uid)
+  if (!uidField) {
+    throw new Error(
+      `Collection ${collection.name} is configured as single file, but does not have a field with uid set.`
+    )
+  }
   const params = api.schema.transformPayload(collection.name, {
     _collection: collection.name,
     ...(template && { _template: template.name }),
     ...leftover,
-    ...(collection.singleFile && { ['_id_']: filename }),
+    ...(collection.singleFile && { [uidField.name]: filename }),
   })
 
   if (await api.isAuthenticated()) {
@@ -190,6 +195,15 @@ export const RenderForm = ({
     {}
 
   const form = useMemo(() => {
+    let uidField: Field | undefined
+    if (collection.singleFile) {
+      uidField = collection.fields.find((field) => !!field.uid)
+      if (!uidField) {
+        throw new Error(
+          `Collection ${collection.name} is configured as single file, but does not have a field with uid set.`
+        )
+      }
+    }
     const folderName = folder.fullyQualifiedName ? folder.name : ''
     return new Form({
       crudType: 'create',
@@ -231,7 +245,9 @@ export const RenderForm = ({
         `/new-post.${schemaCollection.format || 'md'}`,
       label: 'form',
       fields: [
-        ...(formInfo.fields.filter((field) => field.name != '_id_') as any),
+        ...(formInfo.fields.filter(
+          (field) => field.name != uidField?.name
+        ) as any),
         {
           name: 'filename',
           label: 'Filename',

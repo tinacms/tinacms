@@ -35,23 +35,6 @@ export class TinaSchema {
   constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
     this.schema = config
-    this.schema.collections.forEach((collection) => {
-      if (!collection.singleFile) {
-        return
-      }
-      if (!collection?.fields?.map((f) => f.name).includes('_id_')) {
-        const idField: TinaField<true> = {
-          name: '_id_',
-          type: 'string',
-          label: 'Path',
-          indexed: true,
-          searchable: true,
-          required: true,
-          namespace: [...collection.namespace, '_id_'],
-        }
-        collection.fields = [idField, ...collection.fields]
-      }
-    })
 
     this.walkFields(({ field, collection, path }) => {
       // set defaults for field searchability
@@ -129,7 +112,6 @@ export class TinaSchema {
         !normalizedPath.endsWith(`.gitkeep.${collection.format || 'md'}`) &&
         !collection.singleFile &&
         fileExtension !== (collection.format || 'md')
-      
       ) {
         return false
       }

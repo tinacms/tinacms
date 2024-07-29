@@ -767,7 +767,7 @@ export class Resolver {
       if (isUpdateName) {
         if (!alreadyExists) {
           throw new Error(
-            `Unable to rename document, ${realPath} already exists`
+            `Unable to rename document, ${realPath} does not exist`
           )
         }
         // Must provide a new relative path in the params
@@ -784,7 +784,13 @@ export class Resolver {
           args.params.relativePath
         )
         if (collection.singleFile) {
-          doc._rawData['_id_'] = newRealPath
+          const uidField = collection.fields.find((field) => !!field.uid)
+          if (!uidField) {
+            throw new GraphQLError(
+              `Collection ${collection.name} is configured as single file, but does not have a field with uid set.`
+            )
+          }
+          doc._rawData[uidField.name] = newRealPath
             .substring(collection.path.length + 1)
             .split('.')
             .slice(0, -1)

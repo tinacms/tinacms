@@ -8,7 +8,7 @@ import { Link, useParams } from 'react-router-dom'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
-import type { TinaCMS } from '@tinacms/toolkit'
+import type { Field, TinaCMS } from '@tinacms/toolkit'
 import { useCollectionFolder } from './utils'
 import { ErrorDialog } from '../components/ErrorDialog'
 
@@ -114,11 +114,22 @@ const RenderForm = ({
   })
 
   const form = useMemo(() => {
+    let uidField: Field | undefined
+    if (collection.singleFile) {
+      uidField = collection.fields.find((field) => !!field.uid)
+      if (!uidField) {
+        throw new Error(
+          `Collection ${collection.name} is configured as single file, but does not have a field with uid set.`
+        )
+      }
+    }
     return new Form({
       // id is the full document path
       id: `${schemaCollection.path}/${relativePath}`,
       label: 'form',
-      fields: formInfo.fields.filter((field) => field.name != '_id_') as any,
+      fields: formInfo.fields.filter(
+        (field) => field.name != uidField?.name
+      ) as any,
       initialValues: document._values,
       onSubmit: async (values) => {
         try {

@@ -531,10 +531,17 @@ export class Database {
               `Collection ${collection.name} is configured as single file, but is not a csv.`
             )
           }
+          const uidField = collection.fields.find((field) => !!field.uid)
+          if (!uidField) {
+            throw new GraphQLError(
+              `Collection ${collection.name} is configured as single file, but does not have a field with uid set.`
+            )
+          }
+          const pathField = uidField.name
           const singleFilePath = `${collection.path}/index.${collection.format}`
           const stringCSV = await this.bridge.get(singleFilePath)
           const rows = parseCSV(stringCSV, collection).sort((a, b) =>
-            a['_id_'].localeCompare(b['_id_'])
+            a[pathField].localeCompare(b[pathField])
           )
           let itemId = normalizedPath.replace(`${collection.path}/`, '')
           itemId = itemId.substring(
@@ -544,12 +551,12 @@ export class Database {
           let insertIdx = -1
           let isUpdate = false
           for (let i = 0; i < rows.length; i++) {
-            if (rows[i]['_id_'] === itemId) {
+            if (rows[i][pathField] === itemId) {
               Object.assign(rows[i], dataFields)
               isUpdate = true
               break
             }
-            if (rows[i]['_id_'] > itemId) {
+            if (rows[i][pathField] > itemId) {
               insertIdx = i
               break
             }
@@ -1364,10 +1371,17 @@ export class Database {
               `Collection ${collection.name} is configured as single file, but is not a csv.`
             )
           }
+          const uidField = collection.fields.find((field) => !!field.uid)
+          if (!uidField) {
+            throw new GraphQLError(
+              `Collection ${collection.name} is configured as single file, but does not have a field with uid set.`
+            )
+          }
+          const pathField = uidField.name
           const singleFilePath = `${collection.path}/index.${collection.format}`
           const stringCSV = await this.bridge.get(singleFilePath)
           const rows = parseCSV(stringCSV, collection).sort((a, b) =>
-            a['_id_'].localeCompare(b['_id_'])
+            a[pathField].localeCompare(b[pathField])
           )
           let itemId = itemKey.replace(`${collection.path}/`, '')
           itemId = itemId.substring(
@@ -1376,7 +1390,7 @@ export class Database {
           )
           let deleteIdx = -1
           for (let i = 0; i < rows.length; i++) {
-            if (rows[i]['_id_'] === itemId) {
+            if (rows[i][pathField] === itemId) {
               deleteIdx = i
               break
             }
@@ -1583,17 +1597,23 @@ const _indexContent = async (
     if (collection.format !== 'csv') {
       throw new Error(`Single file collection ${collection.name} must be a csv`)
     }
-
+    const uidField = collection.fields.find((field) => !!field.uid)
+    if (!uidField) {
+      throw new GraphQLError(
+        `Collection ${collection.name} is configured as single file, but does not have a field with uid set.`
+      )
+    }
+    const pathField = uidField.name
     const sourcePath = documentPaths[0]
     // TODO clean up this redundancy
     const stringCSV = await database.bridge.get(sourcePath)
     documentPaths = parseCSV(stringCSV, collection).map(
-      (row) => `${collection.path}/${row['_id_']}.${collection.format}`
+      (row) => `${collection.path}/${row[pathField]}.${collection.format}`
     )
     dataLoader = await csvDataLoader({
       bridge: database.bridge,
       collection,
-      pathField: '_id_',
+      pathField,
       sourcePath,
     })
   }
