@@ -35,7 +35,6 @@ export class TinaSchema {
   constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
     this.schema = config
-
     this.walkFields(({ field, collection, path }) => {
       // set defaults for field searchability
       if (!('searchable' in field)) {
@@ -86,7 +85,6 @@ export class TinaSchema {
         extraFields.templates = templateInfo.templates
         break
     }
-
     return {
       // @ts-ignore FIXME: backwards compatibility, using `slug` should probably be deprecated
       slug: collection.name,
