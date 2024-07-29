@@ -767,7 +767,7 @@ export class Resolver {
       if (isUpdateName) {
         if (!alreadyExists) {
           throw new Error(
-            `Unable to rename document, ${realPath} does not exist`
+            `Unable to rename document, ${realPath} already exists`
           )
         }
         // Must provide a new relative path in the params
