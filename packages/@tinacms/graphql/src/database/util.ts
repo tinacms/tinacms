@@ -445,7 +445,6 @@ export type DataLoader = (fp: string) => Promise<any>
 export const loadAndParseWithAliases = async (
   dataLoader: DataLoader,
   filepath: string,
-  // collection?: Collection<true>,
   templateInfo?: CollectionTemplateable
 ) => {
   const data = await dataLoader(filepath)
