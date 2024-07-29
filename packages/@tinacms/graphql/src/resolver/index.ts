@@ -783,7 +783,7 @@ export class Resolver {
           collection?.path,
           args.params.relativePath
         )
-        if (collection.singleFile) {
+        if (collection.isSingleFile) {
           const uidField = collection.fields.find((field) => !!field.uid)
           if (!uidField) {
             throw new GraphQLError(

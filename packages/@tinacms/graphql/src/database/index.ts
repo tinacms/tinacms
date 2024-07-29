@@ -500,7 +500,7 @@ export class Database {
         // If a collection match is specified, make sure the file matches the glob.
         // TODO: Maybe we should service this error better in the frontend?
         let stringifiedFile: string
-        if (!collection.singleFile) {
+        if (!collection.isSingleFile) {
           if (collection.match?.exclude || collection.match?.include) {
             const matches = this.tinaSchema.getMatches({ collection })
 
@@ -591,7 +591,7 @@ export class Database {
           }
         }
 
-        if (collection.singleFile) {
+        if (collection.isSingleFile) {
           // reset normalizedPath to the specified path for indexing
           normalizedPath = normalizePath(filepath)
         }
@@ -1363,7 +1363,7 @@ export class Database {
 
     if (!collection?.isDetached) {
       if (this.bridge) {
-        if (!collection.singleFile) {
+        if (!collection.isSingleFile) {
           await this.bridge.delete(normalizePath(filepath))
         } else {
           if (collection.format !== 'csv') {
@@ -1403,7 +1403,7 @@ export class Database {
         }
       }
       try {
-        if (!collection.singleFile) {
+        if (!collection.isSingleFile) {
           await this.onDelete(normalizePath(filepath))
         }
       } catch (e) {
@@ -1588,7 +1588,7 @@ const _indexContent = async (
     bridge: database.bridge,
     collection,
   })
-  if (collection.singleFile) {
+  if (collection.isSingleFile) {
     if (documentPaths.length > 1) {
       throw new Error(
         `Unable to index multiple documents for collection ${collection.name} because it is a single file collection`

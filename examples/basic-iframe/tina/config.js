@@ -73,9 +73,7 @@ export default defineConfig({
         name: 'media',
         path: 'content/media',
         format: 'csv',
-        singleFile: {
-          pathField: 'filename', // isSingleFile + isPathField on string field type?
-        },
+        isSingleFile: true,
         fields: [
           {
             type: 'string',

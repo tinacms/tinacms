@@ -110,12 +110,12 @@ export class TinaSchema {
       // filter out file extensions that don't match the collection format
       if (
         !normalizedPath.endsWith(`.gitkeep.${collection.format || 'md'}`) &&
-        !collection.singleFile &&
+        !collection.isSingleFile &&
         fileExtension !== (collection.format || 'md')
       ) {
         return false
       }
-      if (!collection.singleFile) {
+      if (!collection.isSingleFile) {
         if (collection?.match?.include || collection?.match?.exclude) {
           // if the collection has a match or exclude, we need to check if the file matches
           const matches = this.getMatches({ collection })

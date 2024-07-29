@@ -774,9 +774,7 @@ interface BaseCollection {
   }
   isDetached?: boolean
   isAuthCollection?: boolean
-  singleFile?: {
-    pathField: string
-  }
+  isSingleFile?: boolean
   media?: {
     idField: string
     pathField: string
