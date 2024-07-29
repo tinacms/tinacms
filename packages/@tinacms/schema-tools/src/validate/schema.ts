@@ -62,6 +62,7 @@ export const CollectionBaseSchema = z.object({
   format: z.enum(FORMATS).optional(),
   isAuthCollection: z.boolean().optional(),
   isDetached: z.boolean().optional(),
+  isSingleFile: z.boolean().optional(),
 })
 
 // Zod did not handel this union very well so we will handle it ourselves
@@ -180,53 +181,47 @@ export const TinaCloudSchemaZod = z
       })
     }
   })
-// .superRefine((val, ctx) => {
-//   for (const collection of val.collections) {
-//     if (collection.format === 'csv') {
-//       const fields = collection.fields
-//       if (
-//         fields.length === 0 ||
-//         fields.length > 1 ||
-//         !(fields[0].type === 'object' && fields[0].list)
-//       ) {
-//         ctx.addIssue({
-//           code: z.ZodIssueCode.custom,
-//           message: `CSV collections must have exactly one list field of type 'object'`,
-//           path: ['collections', collection.name, 'fields'],
-//         })
-//         return
-//       }
-//       const childFields = (fields[0] as ObjectField<true>).fields
-//       for (const field of childFields) {
-//         if (field.type === 'object') {
-//           ctx.addIssue({
-//             code: z.ZodIssueCode.custom,
-//             message: `CSV collections cannot have nested objects`,
-//             path: [
-//               'collections',
-//               collection.name,
-//               'fields',
-//               fields[0].name,
-//               'fields',
-//               field.name,
-//             ],
-//           })
-//         }
-//         if (field.list) {
-//           ctx.addIssue({
-//             code: z.ZodIssueCode.custom,
-//             message: `CSV collections cannot have nested lists`,
-//             path: [
-//               'collections',
-//               collection.name,
-//               'fields',
-//               fields[0].name,
-//               'fields',
-//               field.name,
-//             ],
-//           })
-//         }
-//       }
-//     }
-//   }
-// })
+  .superRefine((val, ctx) => {
+    for (const collection of val.collections) {
+      if (collection.isSingleFile && collection.format !== 'csv') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `isSingleFile can only be used with the 'csv' format`,
+          path: ['collections', collection.name],
+        })
+      }
+      if (collection.format === 'csv' && !collection.isSingleFile) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `CSV collections must be marked as isSingleFile`,
+          path: ['collections', collection.name],
+        })
+      }
+      if (collection.isSingleFile) {
+        const fields = collection.fields
+        const uidField = fields.find((field) => field.uid)
+        if (!uidField) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `isSingleFile collections must have a field marked as 'uid'`,
+            path: ['collections', collection.name],
+          })
+        }
+        for (const field of fields) {
+          if (field.type === 'object') {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `isSingleFile collections cannot have nested objects`,
+              path: ['collections', collection.name, 'fields', field.name],
+            })
+          } else if (field.list) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `isSingleFile collections cannot have nested lists`,
+              path: ['collections', collection.name, 'fields', field.name],
+            })
+          }
+        }
+      }
+    }
+  })
