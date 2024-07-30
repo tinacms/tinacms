@@ -331,15 +331,12 @@ export function MediaPicker({
   const loaderRef = useRef(null)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0]
-        if (target.isIntersecting) {
-          navigateNext()
-        }
-      },
-      { threshold: 1 }
-    )
+    const observer = new IntersectionObserver((entries) => {
+      const target = entries[0]
+      if (target.isIntersecting) {
+        navigateNext()
+      }
+    })
 
     if (loaderRef.current) {
       observer.observe(loaderRef.current)
