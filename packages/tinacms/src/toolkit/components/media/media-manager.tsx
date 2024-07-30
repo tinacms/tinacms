@@ -21,7 +21,6 @@ import {
 import { Button, IconButton } from '@toolkit/styles'
 import * as dropzone from 'react-dropzone'
 import type { FileError } from 'react-dropzone'
-import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '@toolkit/form-builder'
@@ -154,11 +153,6 @@ export function MediaPicker({
     if (!list.nextOffset) return
     setOffsetHistory([...offsetHistory, list.nextOffset])
   }
-  const navigatePrev = () => {
-    const offsets = offsetHistory.slice(0, offsetHistory.length - 1)
-    setOffsetHistory(offsets)
-  }
-  const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
 
   function loadMedia() {
@@ -473,17 +467,8 @@ export function MediaPicker({
                     />
                   ))}
 
-                <LoadingMediaList ref={loaderRef} />
+                {hasNext && <LoadingMediaList ref={loaderRef} />}
               </ul>
-
-              <div className="bg-gradient-to-r to-gray-50/50 from-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
-                <CursorPaginator
-                  hasNext={hasNext}
-                  navigateNext={navigateNext}
-                  hasPrev={hasPrev}
-                  navigatePrev={navigatePrev}
-                />
-              </div>
             </div>
 
             <ActiveItemPreview
