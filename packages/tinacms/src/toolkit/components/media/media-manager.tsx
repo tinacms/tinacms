@@ -349,7 +349,7 @@ export function MediaPicker({
     }
   }, [navigateNext])
 
-  if (listState === 'loading' || uploading) {
+  if ((listState === 'loading' && !list?.items?.length) || uploading) {
     return <LoadingMediaList />
   }
 
