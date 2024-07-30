@@ -4,10 +4,10 @@ import {
   type InputFieldType,
   wrapFieldsWithMeta,
 } from '../wrap-field-with-meta'
-import { RichEditor2 } from './plate-v2'
 import { EditorContext } from './plate/editor-context'
-import { toolbarItemName } from './plate/plugins/ui/toolbar'
+import type { toolbarItemName } from './plate/plugins/ui/toolbar'
 import type { MdxTemplate } from './plate/types'
+import { RichEditor } from './plate'
 
 export type RichTextType = React.PropsWithChildren<
   InputFieldType<

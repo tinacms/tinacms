@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
 import { PlusIcon, HeadingIcon, ToolbarIcon } from '../icons'
 import { Popover, Transition } from '@headlessui/react'
-import { useEditorState, isCollapsed } from '@udecode/plate-headless'
+// import { useEditorState, isCollapsed } from '@udecode/plate'
 import { insertMDX } from '../../create-mdx-plugins'
 import {
   LinkForm,
@@ -9,11 +9,16 @@ import {
   wrapOrRewrapLink,
 } from '../../create-link-plugin'
 
-import type { PlateEditor } from '@udecode/plate-headless'
+// import type { PlateEditor } from '@udecode/plate'
 import type { MdxTemplate } from '../../../types'
 import { insertImg } from '../../create-img-plugin'
 import { useCMS } from '@toolkit/react-core'
-import { Form } from '@toolkit/forms'
+import type { Form } from '@toolkit/forms'
+import {
+  isCollapsed,
+  type PlateEditor,
+  useEditorState,
+} from '@udecode/plate-common'
 
 export type ToolbarItemType = {
   label: string
@@ -206,8 +211,8 @@ export const EmbedButton = ({
             }}
             className={`cursor-pointer relative inline-flex items-center px-2 py-2 rounded-r-md border text-sm font-medium transition-all ease-out duration-150 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
               open
-                ? `bg-gray-50 border-gray-200 text-blue-500`
-                : `text-white border-blue-500 bg-blue-500`
+                ? 'bg-gray-50 border-gray-200 text-blue-500'
+                : 'text-white border-blue-500 bg-blue-500'
             }`}
           >
             <span className="text-sm font-semibold tracking-wide align-baseline mr-1">
@@ -215,7 +220,7 @@ export const EmbedButton = ({
             </span>
             <PlusIcon
               className={`origin-center transition-all ease-out duration-150 ${
-                open ? `rotate-45` : ``
+                open ? 'rotate-45' : ''
               }`}
             />
           </Popover.Button>
@@ -231,7 +236,7 @@ export const EmbedButton = ({
             <Popover.Panel>
               {({ close }) => (
                 <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none max-h-[13rem] overflow-y-auto">
-                  <div className="sticky z-10 top-0 w-full h-8 -mb-8 opacity-10 bg-gradient-to-b from-blue-600 to-transparent"></div>
+                  <div className="sticky z-10 top-0 w-full h-8 -mb-8 opacity-10 bg-gradient-to-b from-blue-600 to-transparent" />
                   <div className="relative py-1 z-20">
                     {templates.map((template) => (
                       <span
@@ -241,15 +246,17 @@ export const EmbedButton = ({
                           close()
                           insertMDX(editor, template)
                         }}
-                        className={`relative z-30 hover:bg-gray-400/10 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center`}
+                        className={
+                          'relative z-30 hover:bg-gray-400/10 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center'
+                        }
                       >
                         {template.label || template.name}
                       </span>
                     ))}
-                    <div className="absolute top-0 w-full h-8 bg-gradient-to-b from-white to-transparent"></div>
-                    <div className="absolute bottom-0 w-full h-8 bg-gradient-to-t from-white to-transparent"></div>
+                    <div className="absolute top-0 w-full h-8 bg-gradient-to-b from-white to-transparent" />
+                    <div className="absolute bottom-0 w-full h-8 bg-gradient-to-t from-white to-transparent" />
                   </div>
-                  <div className="sticky z-10 bottom-0 w-full h-8 -mt-8 opacity-10 bg-gradient-to-t from-blue-600 to-transparent"></div>
+                  <div className="sticky z-10 bottom-0 w-full h-8 -mt-8 opacity-10 bg-gradient-to-t from-blue-600 to-transparent" />
                 </div>
               )}
             </Popover.Panel>

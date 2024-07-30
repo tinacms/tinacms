@@ -1,22 +1,26 @@
 import React, { useEffect } from 'react'
 import {
-  useEditorState,
-  getNodeEntries,
-  unwrapNodes,
+  Editor,
+  Element,
+  type BaseRange,
+  Transforms,
   setNodes,
+  unwrapNodes,
   wrapNodes,
-  PlateEditor,
-  isCollapsed,
-  getAboveNode,
-  getPluginType,
-  createLinkPlugin,
-  ELEMENT_LINK,
-  ENode,
-  Value,
-} from '@udecode/plate-headless'
-import { Editor, Element, BaseRange, Transforms } from 'slate'
+} from 'slate'
 import { NestedForm } from '../../nested-form'
 import { Button } from '@tinacms/toolkit'
+import { createLinkPlugin, ELEMENT_LINK } from '@udecode/plate-link'
+import {
+  type ENode,
+  getAboveNode,
+  getNodeEntries,
+  getPluginType,
+  isCollapsed,
+  type PlateEditor,
+  useEditorState,
+  type Value,
+} from '@udecode/plate-common'
 
 export { createLinkPlugin }
 
@@ -70,8 +74,8 @@ export const LinkForm = (props) => {
   useEffect(() => {
     const [link] = getLinks(editor)
     setInitialValues({
-      url: link && link[0].url ? link[0].url : '',
-      title: link && link[0].title ? link[0].title : '',
+      url: link?.[0].url ? link[0].url : '',
+      title: link?.[0].title ? link[0].title : '',
     })
   }, [editor, setInitialValues])
 

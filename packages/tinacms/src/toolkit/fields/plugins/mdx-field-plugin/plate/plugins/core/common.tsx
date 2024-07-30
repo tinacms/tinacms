@@ -1,12 +1,12 @@
 import {
-  someNode,
-  getPluginType,
-  isMarkActive as isMarkActiveBase,
-  insertNodes,
-  setNodes,
-  findNode,
-  PlateEditor,
-  getBlockAbove,
+  // someNode,
+  // getPluginType,
+  // isMarkActive as isMarkActiveBase,
+  // insertNodes,
+  // setNodes,
+  // findNode,
+  // type PlateEditor,
+  // getBlockAbove,
   createParagraphPlugin,
   createHorizontalRulePlugin,
   createNodeIdPlugin,
@@ -18,7 +18,7 @@ import {
   createItalicPlugin,
   createUnderlinePlugin,
   createCodePlugin,
-} from '@udecode/plate-headless'
+} from '@udecode/plate'
 import { ReactEditor } from 'slate-react'
 import {
   createCodeBlockPlugin,
@@ -29,6 +29,15 @@ import { Editor, Node, Transforms } from 'slate'
 import { ELEMENT_IMG } from '../create-img-plugin'
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins'
 import { HANDLES_MDX } from './formatting'
+import {
+  findNode,
+  getBlockAbove,
+  getPluginType,
+  insertNodes,
+  type PlateEditor,
+  setNodes,
+  someNode,
+} from '@udecode/plate-common'
 
 export const plugins = [
   createHeadingPlugin(),
@@ -54,7 +63,8 @@ const isNodeActive = (editor, type) => {
   )
 }
 const isMarkActive = (editor, type) => {
-  return !!editor?.selection && isMarkActiveBase(editor, type)
+  return !!editor?.selection
+  //&& isMarkActiveBase(editor, type)
 }
 const isListActive = (editor, type) => {
   const res = !!editor?.selection && getListItemEntry(editor)
@@ -78,13 +88,12 @@ const normalize = (node: any) => {
         children: node.children.map(normalize),
         id: Date.now(),
       }
-    } else {
-      // Always supply an empty text leaf
-      return {
-        ...node,
-        children: [{ text: '' }],
-        id: Date.now(),
-      }
+    }
+    // Always supply an empty text leaf
+    return {
+      ...node,
+      children: [{ text: '' }],
+      id: Date.now(),
     }
   }
   return node

@@ -18,7 +18,7 @@ import {
   MARK_CODE,
   MARK_BOLD,
   MARK_ITALIC,
-} from '@udecode/plate-headless'
+} from '@udecode/plate'
 import { CodeBlock } from './code-block'
 import { classNames } from './helpers'
 import { useSelected } from 'slate-react'
@@ -120,7 +120,7 @@ export const components = () => {
         className={classNames(
           blockClasses,
           className,
-          `text-base font-normal mb-4 last:mb-0`
+          'text-base font-normal mb-4 last:mb-0'
         )}
         {...attributes}
         {...props}

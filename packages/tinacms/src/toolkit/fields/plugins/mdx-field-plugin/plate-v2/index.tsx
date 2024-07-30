@@ -67,29 +67,27 @@ export const RichEditor2 = (props: RichTextType) => {
   return (
     <div ref={ref} className={withToolbar ? 'with-toolbar' : ''}>
       <TooltipProvider>
-        <DndProvider backend={HTML5Backend}>
-          <Plate
-            id={id}
-            initialValue={initialValue}
-            plugins={plugins}
-            onChange={(value) => {
-              props.input.onChange({
-                type: 'root',
-                children: value,
-              })
-            }}
-          >
-            <FixedToolbar>
-              <FixedToolbarButtons />
-            </FixedToolbar>
+        <Plate
+          id={id}
+          initialValue={initialValue}
+          plugins={plugins}
+          onChange={(value) => {
+            props.input.onChange({
+              type: 'root',
+              children: value,
+            })
+          }}
+        >
+          <FixedToolbar>
+            <FixedToolbarButtons />
+          </FixedToolbar>
 
-            <Editor />
+          <Editor />
 
-            <FloatingToolbar>
-              <FloatingToolbarButtons />
-            </FloatingToolbar>
-          </Plate>
-        </DndProvider>
+          <FloatingToolbar>
+            <FloatingToolbarButtons />
+          </FloatingToolbar>
+        </Plate>
       </TooltipProvider>
     </div>
   )

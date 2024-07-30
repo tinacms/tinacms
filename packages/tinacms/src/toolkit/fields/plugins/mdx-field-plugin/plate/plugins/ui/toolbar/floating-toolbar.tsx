@@ -1,11 +1,11 @@
 import * as React from 'react'
+import { Range } from 'slate'
+import { computePosition, flip, shift } from '@floating-ui/dom'
 import {
   getEditorString,
   isEditorFocused,
   useEditorState,
-} from '@udecode/plate-headless'
-import { Range } from 'slate'
-import { computePosition, flip, shift } from '@floating-ui/dom'
+} from '@udecode/plate-common'
 
 export const FloatingToolbarWrapper = ({
   children,

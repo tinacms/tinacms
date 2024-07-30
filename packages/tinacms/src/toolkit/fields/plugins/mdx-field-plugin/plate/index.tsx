@@ -1,5 +1,4 @@
 import React from 'react'
-import { Plate, createPlugins } from '@udecode/plate-headless'
 import { components } from './plugins/ui/components'
 import { Toolbar, FloatingToolbar, FloatingLink } from './plugins/ui/toolbar'
 import { formattingPlugins, commonPlugins } from './plugins/core'
@@ -12,7 +11,9 @@ import { createImgPlugin } from './plugins/create-img-plugin'
 import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin'
 import { createLinkPlugin } from './plugins/create-link-plugin'
 import { uuid } from './plugins/ui/helpers'
-import { RichTextType } from '..'
+import type { RichTextType } from '..'
+import { createPlugins, Plate } from '@udecode/plate-common'
+import { Editor } from '../plate-v2/components/editor'
 
 export const RichEditor = (props: RichTextType) => {
   const initialValue = React.useMemo(
@@ -77,29 +78,26 @@ export const RichEditor = (props: RichTextType) => {
             children: value,
           })
         }}
-        // Some nodes aren't ready when this runs
-        // Fixed in a later release https://github.com/udecode/plate/pull/1689/files
-        // normalizeInitialValue={true}
-        firstChildren={
-          <>
-            {withToolbar ? (
-              <Toolbar
-                tinaForm={props.tinaForm}
-                toolbarOverride={props.field?.toolbarOverride}
-                templates={props.field.templates}
-                inlineOnly={false}
-              />
-            ) : (
-              <FloatingToolbar
-                tinaForm={props.tinaForm}
-                templates={props.field.templates}
-                toolbarOverride={props.field?.toolbarOverride}
-              />
-            )}
-            <FloatingLink />
-          </>
-        }
-      ></Plate>
+      >
+        <>
+          {withToolbar ? (
+            <Toolbar
+              tinaForm={props.tinaForm}
+              toolbarOverride={props.field?.toolbarOverride}
+              templates={props.field.templates}
+              inlineOnly={false}
+            />
+          ) : (
+            <FloatingToolbar
+              tinaForm={props.tinaForm}
+              templates={props.field.templates}
+              toolbarOverride={props.field?.toolbarOverride}
+            />
+          )}
+          <FloatingLink />
+        </>
+        <Editor />
+      </Plate>
     </div>
   )
 }

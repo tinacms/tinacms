@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {
-  useEditorState,
-  toggleMark,
-  toggleNodeType,
+  // useEditorState,
+  // toggleMark,
+  // toggleNodeType,
   toggleList,
   ELEMENT_LINK,
   ELEMENT_H1,
@@ -19,8 +19,8 @@ import {
   MARK_BOLD,
   MARK_ITALIC,
   MARK_CODE,
-} from '@udecode/plate-headless'
-import { ToolbarItem, ToolbarItemType, EmbedButton } from './toolbar-item'
+} from '@udecode/plate'
+import { ToolbarItem, type ToolbarItemType, EmbedButton } from './toolbar-item'
 import { OverflowMenu } from './overflow-menu'
 import { helpers } from '../../core/common'
 import { classNames } from '../helpers'
@@ -33,6 +33,11 @@ import type { MdxTemplate } from '../../../types'
 import { useEditorContext } from '../../../editor-context'
 import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block'
 import type { Form } from '@toolkit/forms'
+import {
+  toggleMark,
+  toggleNodeType,
+  useEditorState,
+} from '@udecode/plate-common'
 
 const headers = [
   {
@@ -275,23 +280,7 @@ export function Toolbar({
                     showEmbed={showEmbed}
                   />
                 )
-              } else {
-                return (
-                  <ToolbarItem
-                    tinaForm={tinaForm}
-                    key={toolbarItem.name}
-                    name={toolbarItem.name}
-                    hidden={hidden}
-                    active={toolbarItem.active}
-                    onMouseDown={toolbarItem.onMouseDown}
-                    label={toolbarItem.label}
-                    options={toolbarItem.options}
-                    icon={toolbarItem.name}
-                    isLastItem={isLastItem && !showEmbed}
-                  />
-                )
               }
-            } else {
               return (
                 <ToolbarItem
                   tinaForm={tinaForm}
@@ -307,6 +296,20 @@ export function Toolbar({
                 />
               )
             }
+            return (
+              <ToolbarItem
+                tinaForm={tinaForm}
+                key={toolbarItem.name}
+                name={toolbarItem.name}
+                hidden={hidden}
+                active={toolbarItem.active}
+                onMouseDown={toolbarItem.onMouseDown}
+                label={toolbarItem.label}
+                options={toolbarItem.options}
+                icon={toolbarItem.name}
+                isLastItem={isLastItem && !showEmbed}
+              />
+            )
           })}
         </div>
         {showEmbed && <EmbedButton templates={templates} editor={editor} />}
@@ -343,6 +346,7 @@ export const FloatingLink = () => {
     <FloatingToolbarWrapper position="bottom">
       {isLinkActive && (
         <button
+          type="button"
           onMouseDown={(e) => {
             e.preventDefault()
             unwrapLink(editor)
