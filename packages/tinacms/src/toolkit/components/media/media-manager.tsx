@@ -1,5 +1,4 @@
-import React from 'react'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState, forwardRef, useRef } from 'react'
 import { useCMS } from '../../react-tinacms/use-cms'
 import {
   BiArrowToBottom,
@@ -175,8 +174,11 @@ export function MediaPicker({
           { w: 1000, h: 1000 },
         ],
       })
-      .then((list) => {
-        setList(list)
+      .then((_list) => {
+        setList({
+          items: [...list.items, ..._list.items],
+          nextOffset: _list.nextOffset,
+        })
         setListState('loaded')
       })
       .catch((e) => {
@@ -326,6 +328,30 @@ export function MediaPicker({
 
   useEffect(disableScrollBody, [])
 
+  const loaderRef = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0]
+        if (target.isIntersecting) {
+          navigateNext()
+        }
+      },
+      { threshold: 1 }
+    )
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current)
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current)
+      }
+    }
+  }, [navigateNext])
+
   if (listState === 'loading' || uploading) {
     return <LoadingMediaList />
   }
@@ -449,6 +475,8 @@ export function MediaPicker({
                       active={activeItem && activeItem.id === item.id}
                     />
                   ))}
+
+                <LoadingMediaList ref={loaderRef} />
               </ul>
 
               <div className="bg-gradient-to-r to-gray-50/50 from-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
@@ -577,18 +605,21 @@ const UploadButton = ({ onClick, uploading }: any) => {
   )
 }
 
-const LoadingMediaList = (props) => {
-  const { extraText, ...rest } = props
-  return (
-    <div
-      className="w-full h-full flex flex-col items-center justify-center"
-      {...rest}
-    >
-      {extraText && <p>{props}</p>}
-      <LoadingDots color={'var(--tina-color-primary)'} />
-    </div>
-  )
-}
+const LoadingMediaList = forwardRef<HTMLDivElement, { extraText?: string }>(
+  (props, ref) => {
+    const { extraText, ...rest } = props
+    return (
+      <div
+        ref={ref}
+        className="w-full h-full flex flex-col items-center justify-center"
+        {...rest}
+      >
+        {extraText && <p>{extraText}</p>}
+        <LoadingDots color={'var(--tina-color-primary)'} />
+      </div>
+    )
+  }
+)
 
 const MediaPickerWrap = ({ children }) => {
   return (
