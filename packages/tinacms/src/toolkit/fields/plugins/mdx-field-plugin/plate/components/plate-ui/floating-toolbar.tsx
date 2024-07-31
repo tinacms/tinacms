@@ -17,7 +17,7 @@ import {
   useFloatingToolbarState,
 } from '@udecode/plate-floating'
 
-import { Toolbar } from '../../plate/components/plate-ui/toolbar'
+import { Toolbar } from './toolbar'
 
 export const FloatingToolbar = withRef<
   typeof Toolbar,
@@ -64,7 +64,7 @@ export const FloatingToolbar = withRef<
     <PortalBody>
       <Toolbar
         className={cn(
-          'absolute z-50 whitespace-nowrap border bg-popover px-1 opacity-100 shadow-md print:hidden'
+          'absolute z-[999999] whitespace-nowrap border bg-popover px-1 opacity-100 shadow-md print:hidden'
         )}
         ref={ref}
         {...rootProps}

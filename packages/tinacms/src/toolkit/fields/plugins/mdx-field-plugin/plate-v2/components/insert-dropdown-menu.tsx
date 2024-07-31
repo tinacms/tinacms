@@ -29,7 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   useOpenState,
-} from './dropdown-menu'
+} from '../../plate/components/plate-ui/dropdown-menu'
 import { ToolbarButton } from '../../plate/components/plate-ui/toolbar'
 import { ELEMENT_HR, ELEMENT_TABLE } from '@udecode/plate'
 

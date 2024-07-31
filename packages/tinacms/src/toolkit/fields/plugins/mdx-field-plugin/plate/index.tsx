@@ -1,6 +1,10 @@
 import React from 'react'
 import { components } from './plugins/ui/components'
-import { Toolbar, FloatingToolbar, FloatingLink } from './plugins/ui/toolbar'
+import {
+  Toolbar as OldToolbar,
+  FloatingToolbar as OldFloatingToolbar,
+  FloatingLink,
+} from './plugins/ui/toolbar'
 import { formattingPlugins, commonPlugins } from './plugins/core'
 import { helpers } from './plugins/core/common'
 import {
@@ -15,8 +19,11 @@ import type { RichTextType } from '..'
 import { createPlugins, Plate } from '@udecode/plate-common'
 import { Editor } from './components/editor'
 import { ToolbarSeparator } from './components/plate-ui/toolbar'
-import { FixedToolbar } from './components/fixed-toolbar'
+import { FixedToolbar } from './components/plate-ui/fixed-toolbar'
 import { TooltipProvider } from './components/plate-ui/tooltip'
+import FixedToolbarButtons from './components/fixed-toolbar-buttons'
+import { FloatingToolbar } from './components/plate-ui/floating-toolbar'
+import FloatingToolbarButtons from './components/floating-toolbar-buttons'
 
 export const RichEditor = (props: RichTextType) => {
   const initialValue = React.useMemo(
@@ -38,7 +45,6 @@ export const RichEditor = (props: RichTextType) => {
           createImgPlugin(),
           createInvalidMarkdownPlugin(),
           createLinkPlugin(),
-          // This is a bit buggy
         ],
         {
           components: components(),
@@ -84,23 +90,30 @@ export const RichEditor = (props: RichTextType) => {
       >
         <TooltipProvider>
           <>
-            {withToolbar ? (
-              // <FixedToolbar>
+            <FixedToolbar>
+              <FixedToolbarButtons />
+            </FixedToolbar>
+            <FloatingToolbar>
+              <FloatingToolbarButtons />
+            </FloatingToolbar>
 
-              //   </FixedToolbar>
-              <Toolbar
-                tinaForm={props.tinaForm}
-                toolbarOverride={props.field?.toolbarOverride}
-                templates={props.field.templates}
-                inlineOnly={false}
-              />
-            ) : (
-              <FloatingToolbar
-                tinaForm={props.tinaForm}
-                templates={props.field.templates}
-                toolbarOverride={props.field?.toolbarOverride}
-              />
-            )}
+            {/* {withToolbar ? (
+							<FixedToolbar>
+								<FixedToolbarButtons />
+							</FixedToolbar>
+							// <Toolbar
+							//   tinaForm={props.tinaForm}
+							//   toolbarOverride={props.field?.toolbarOverride}
+							//   templates={props.field.templates}
+							//   inlineOnly={false}
+							// />
+						) : (
+							<FloatingToolbar
+								tinaForm={props.tinaForm}
+								templates={props.field.templates}
+								toolbarOverride={props.field?.toolbarOverride}
+							/>
+						)} */}
             <FloatingLink />
           </>
           <Editor />

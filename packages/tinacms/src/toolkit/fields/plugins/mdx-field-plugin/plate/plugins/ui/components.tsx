@@ -18,12 +18,17 @@ import {
   MARK_CODE,
   MARK_BOLD,
   MARK_ITALIC,
+  MARK_STRIKETHROUGH,
+  MARK_UNDERLINE,
 } from '@udecode/plate'
 import { CodeBlock } from './code-block'
 import { classNames } from './helpers'
 import { useSelected } from 'slate-react'
 import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command'
 import { SlashInputElement } from '../../components/plate-ui/slash-input-element'
+import { withProps } from '@udecode/cn'
+import { PlateElement, PlateLeaf } from '@udecode/plate-common'
+import { ListElement } from '../../components/plate-ui/list-element'
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -175,44 +180,47 @@ export const components = () => {
         </span>
       )
     },
-    [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
-      <ul
-        className={classNames(
-          blockClasses,
-          className,
-          'mb-4 pl-4 list-disc list-inside last:mb-0'
-        )}
-        {...attributes}
-        {...props}
-      />
-    ),
-    [ELEMENT_OL]: ({ attributes, editor, className, element, ...props }) => (
-      <ol
-        className={classNames(
-          blockClasses,
-          className,
-          'mb-4 pl-4 list-decimal list-inside last:mb-0'
-        )}
-        {...attributes}
-        {...props}
-      />
-    ),
-    [ELEMENT_LI]: ({ attributes, className, editor, element, ...props }) => (
-      <li
-        className={classNames('p-0 mt-0 mb-0 list-outside', className)}
-        {...attributes}
-        {...props}
-      />
-    ),
-    /** "list item content" */
-    [ELEMENT_LIC]: ({ attributes, editor, element, className, ...props }) => (
-      <span
-        // without a min-width the cursor is hidden when the list is empty
-        className={classNames(className, 'w-full inline-block align-top mb-2')}
-        {...attributes}
-        {...props}
-      />
-    ),
+    // [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
+    // 	<ul
+    // 		className={classNames(
+    // 			blockClasses,
+    // 			className,
+    // 			"mb-4 pl-4 list-disc list-inside last:mb-0",
+    // 		)}
+    // 		{...attributes}
+    // 		{...props}
+    // 	/>
+    // ),
+    // [ELEMENT_OL]: ({ attributes, editor, className, element, ...props }) => (
+    // 	<ol
+    // 		className={classNames(
+    // 			blockClasses,
+    // 			className,
+    // 			"mb-4 pl-4 list-decimal list-inside last:mb-0",
+    // 		)}
+    // 		{...attributes}
+    // 		{...props}
+    // 	/>
+    // ),
+    // [ELEMENT_LI]: ({ attributes, className, editor, element, ...props }) => (
+    // 	<li
+    // 		className={classNames("p-0 mt-0 mb-0 list-outside", className)}
+    // 		{...attributes}
+    // 		{...props}
+    // 	/>
+    // ),
+    // /** "list item content" */
+    // [ELEMENT_LIC]: ({ attributes, editor, element, className, ...props }) => (
+    // 	<span
+    // 		// without a min-width the cursor is hidden when the list is empty
+    // 		className={classNames(className, "w-full inline-block align-top mb-2")}
+    // 		{...attributes}
+    // 		{...props}
+    // 	/>
+    // ),
+    [ELEMENT_UL]: withProps(ListElement, { variant: 'ul' }),
+    [ELEMENT_OL]: withProps(ListElement, { variant: 'ol' }),
+    [ELEMENT_LI]: withProps(PlateElement, { as: 'li' }),
     [ELEMENT_LINK]: ({
       attributes,
       editor,
@@ -237,9 +245,15 @@ export const components = () => {
         {...props}
       />
     ),
-    [MARK_ITALIC]: ({ editor, leaf, text, ...props }) => (
-      <em {...props.attributes} {...props} />
-    ),
+    // [MARK_ITALIC]: ({ editor, leaf, text, ...props }) => (
+    //   <em {...props.attributes} {...props} />
+    // ),
+    // [ELEMENT_UL]: withProps(ListElement, { variant: "ul" }),
+    // [ELEMENT_OL]: withProps(ListElement, { variant: "ol" }),
+    // [ELEMENT_LI]: withProps(PlateElement, { as: "li" }),
+    [MARK_UNDERLINE]: withProps(PlateLeaf, { as: 'u' }),
+    [MARK_STRIKETHROUGH]: withProps(PlateLeaf, { as: 's' }),
+    [MARK_ITALIC]: withProps(PlateLeaf, { as: 'em' }),
     [MARK_BOLD]: ({ editor, leaf, text, ...props }) => (
       <strong {...props.attributes} {...props} />
     ),

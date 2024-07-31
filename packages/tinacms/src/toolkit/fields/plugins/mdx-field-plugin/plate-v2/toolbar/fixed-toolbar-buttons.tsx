@@ -28,7 +28,7 @@ import { InsertDropdownMenu } from '../components/insert-dropdown-menu'
 import { MarkToolbarButton } from '../components/mark-toolbar-button'
 import { ModeDropdownMenu } from '../components/mode-dropdown-menu'
 import { ToolbarGroup } from '../../plate/components/plate-ui/toolbar'
-import { TurnIntoDropdownMenu } from '../components/turn-into-dropdown-menu'
+import { TurnIntoDropdownMenu } from '../../plate/components/plate-ui/turn-into-dropdown-menu'
 import { Icons } from '../../plate/components/plate-ui/icons'
 
 export function FixedToolbarButtons() {

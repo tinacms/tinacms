@@ -34,7 +34,7 @@ import {
   DropdownMenuContent,
   DropdownMenuPortal,
   DropdownMenuTrigger,
-} from './dropdown-menu'
+} from '../../plate/components/plate-ui/dropdown-menu'
 import { Popover, PopoverContent, popoverVariants } from './popover'
 import { Separator } from '../../plate/components/plate-ui/separator'
 

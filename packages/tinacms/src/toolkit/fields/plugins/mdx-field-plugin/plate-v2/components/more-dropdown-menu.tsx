@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   useOpenState,
-} from './dropdown-menu'
+} from '../../plate/components/plate-ui/dropdown-menu'
 import { ToolbarButton } from '../../plate/components/plate-ui/toolbar'
 
 export function MoreDropdownMenu(props: DropdownMenuProps) {

@@ -38,7 +38,7 @@ const editorVariants = cva(
       },
       variant: {
         ghost: '',
-        outline: 'border border-input',
+        outline: '',
       },
     },
   }

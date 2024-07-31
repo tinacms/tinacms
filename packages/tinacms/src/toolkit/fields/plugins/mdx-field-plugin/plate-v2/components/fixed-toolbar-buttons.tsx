@@ -15,7 +15,7 @@ import { InsertDropdownMenu } from './insert-dropdown-menu'
 import { MarkToolbarButton } from './mark-toolbar-button'
 import { ModeDropdownMenu } from './mode-dropdown-menu'
 import { ToolbarGroup } from '../../plate/components/plate-ui/toolbar'
-import { TurnIntoDropdownMenu } from './turn-into-dropdown-menu'
+import { TurnIntoDropdownMenu } from '../../plate/components/plate-ui/turn-into-dropdown-menu'
 
 export function FixedToolbarButtons() {
   const readOnly = useEditorReadOnly()

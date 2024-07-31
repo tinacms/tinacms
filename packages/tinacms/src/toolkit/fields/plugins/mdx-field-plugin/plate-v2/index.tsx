@@ -23,7 +23,7 @@ import { commonPlugins } from './plugins/common'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { Editor } from '../plate/components/editor'
-import { FloatingToolbar } from './components/floating-toolbar'
+import { FloatingToolbar } from '../plate/components/plate-ui/floating-toolbar'
 import { FloatingToolbarButtons } from './components/floating-toolbar-buttons'
 import { AllPlugins } from './plugins/core/all'
 

@@ -15,7 +15,7 @@ import {
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 
-import { Icons } from '../../plate/components/plate-ui/icons'
+import { Icons } from './icons'
 
 import {
   DropdownMenu,
@@ -26,7 +26,13 @@ import {
   DropdownMenuTrigger,
   useOpenState,
 } from './dropdown-menu'
-import { ToolbarButton } from '../../plate/components/plate-ui/toolbar'
+import { ToolbarButton } from './toolbar'
+import {
+  KEY_LIST_STYLE_TYPE,
+  toggleIndentList,
+  toggleList,
+  unwrapList,
+} from '@udecode/plate'
 
 const items = [
   {
@@ -59,18 +65,18 @@ const items = [
     label: 'Quote',
     value: ELEMENT_BLOCKQUOTE,
   },
-  // {
-  //   value: 'ul',
-  //   label: 'Bulleted list',
-  //   description: 'Bulleted list',
-  //   icon: Icons.ul,
-  // },
-  // {
-  //   value: 'ol',
-  //   label: 'Numbered list',
-  //   description: 'Numbered list',
-  //   icon: Icons.ol,
-  // },
+  {
+    value: 'ul',
+    label: 'Bulleted list',
+    description: 'Bulleted list',
+    icon: Icons.ul,
+  },
+  {
+    value: 'ol',
+    label: 'Numbered list',
+    description: 'Numbered list',
+    icon: Icons.ol,
+  },
 ]
 
 const defaultItem = items.find((item) => item.value === ELEMENT_PARAGRAPH)!
@@ -123,18 +129,18 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
         <DropdownMenuRadioGroup
           className="flex flex-col gap-0.5"
           onValueChange={(type) => {
-            // if (type === 'ul' || type === 'ol') {
-            //   if (settingsStore.get.checkedId(KEY_LIST_STYLE_TYPE)) {
-            //     toggleIndentList(editor, {
-            //       listStyleType: type === 'ul' ? 'disc' : 'decimal',
-            //     });
-            //   } else if (settingsStore.get.checkedId('list')) {
-            //     toggleList(editor, { type });
-            //   }
-            // } else {
-            //   unwrapList(editor);
-            toggleNodeType(editor, { activeType: type })
-            // }
+            if (type === 'ul' || type === 'ol') {
+              // if (settingsStore.get.checkedId(KEY_LIST_STYLE_TYPE)) {
+              // 	toggleIndentList(editor, {
+              // 		listStyleType: type === "ul" ? "disc" : "decimal",
+              // 	});
+              // } else if (settingsStore.get.checkedId("list")) {
+              // 	toggleList(editor, { type });
+              // }
+            } else {
+              unwrapList(editor)
+              toggleNodeType(editor, { activeType: type })
+            }
 
             collapseSelection(editor)
             focusEditor(editor)

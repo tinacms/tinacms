@@ -1,12 +1,4 @@
 import {
-  // someNode,
-  // getPluginType,
-  // isMarkActive as isMarkActiveBase,
-  // insertNodes,
-  // setNodes,
-  // findNode,
-  // type PlateEditor,
-  // getBlockAbove,
   createParagraphPlugin,
   createHorizontalRulePlugin,
   createNodeIdPlugin,
@@ -18,6 +10,8 @@ import {
   createItalicPlugin,
   createUnderlinePlugin,
   createCodePlugin,
+  createIndentPlugin,
+  createIndentListPlugin,
 } from '@udecode/plate'
 import { ReactEditor } from 'slate-react'
 import {
@@ -52,6 +46,8 @@ export const plugins = [
   createUnderlinePlugin(),
   createCodePlugin(),
   createListPlugin(),
+  createIndentPlugin(),
+  createIndentListPlugin(),
   createHorizontalRulePlugin(),
   // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
   createNodeIdPlugin(),
