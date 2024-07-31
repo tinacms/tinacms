@@ -1,4 +1,10 @@
-import React, { useEffect, useState, forwardRef, useRef } from 'react'
+import React, {
+  useEffect,
+  useState,
+  forwardRef,
+  useRef,
+  useCallback,
+} from 'react'
 import { useCMS } from '../../react-tinacms/use-cms'
 import {
   BiArrowToBottom,
@@ -149,11 +155,11 @@ export function MediaPicker({
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
-  const navigateNext = () => {
-    if (!list.nextOffset) return
-    setOffsetHistory([...offsetHistory, list.nextOffset])
-  }
   const hasNext = !!list.nextOffset
+  const navigateNext = useCallback(() => {
+    if (!list.nextOffset) return
+    setOffsetHistory((offsetHistory) => [...offsetHistory, list.nextOffset])
+  }, [list.nextOffset])
 
   function loadMedia() {
     setListState('loading')
