@@ -155,11 +155,6 @@ export function MediaPicker({
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
-  const hasNext = !!list.nextOffset
-  const navigateNext = useCallback(() => {
-    if (!list.nextOffset) return
-    setOffsetHistory((offsetHistory) => [...offsetHistory, list.nextOffset])
-  }, [list.nextOffset])
 
   function loadMedia() {
     setListState('loading')
@@ -333,8 +328,8 @@ export function MediaPicker({
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       const target = entries[0]
-      if (target.isIntersecting) {
-        navigateNext()
+      if (target.isIntersecting && list.nextOffset) {
+        setOffsetHistory((offsetHistory) => [...offsetHistory, list.nextOffset])
       }
     })
 
@@ -347,7 +342,7 @@ export function MediaPicker({
         observer.unobserve(loaderRef.current)
       }
     }
-  }, [navigateNext])
+  }, [list.nextOffset])
 
   if ((listState === 'loading' && !list?.items?.length) || uploading) {
     return <LoadingMediaList />
@@ -473,7 +468,7 @@ export function MediaPicker({
                     />
                   ))}
 
-                {hasNext && <LoadingMediaList ref={loaderRef} />}
+                {!!list.nextOffset && <LoadingMediaList ref={loaderRef} />}
               </ul>
             </div>
 
