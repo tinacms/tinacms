@@ -22,6 +22,8 @@ import {
 import { CodeBlock } from './code-block'
 import { classNames } from './helpers'
 import { useSelected } from 'slate-react'
+import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command'
+import { SlashInputElement } from '../../components/plate-ui/slash-input-element'
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -35,6 +37,7 @@ const headerClasses = 'font-normal'
 
 export const components = () => {
   return {
+    [ELEMENT_SLASH_INPUT]: SlashInputElement,
     [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (
       <h1
         className={classNames(

@@ -38,6 +38,7 @@ import {
   setNodes,
   someNode,
 } from '@udecode/plate-common'
+import { createSlashPlugin } from '@udecode/plate-slash-command'
 
 export const plugins = [
   createHeadingPlugin(),
@@ -54,6 +55,7 @@ export const plugins = [
   createHorizontalRulePlugin(),
   // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
   createNodeIdPlugin(),
+  createSlashPlugin(),
 ]
 
 const isNodeActive = (editor, type) => {

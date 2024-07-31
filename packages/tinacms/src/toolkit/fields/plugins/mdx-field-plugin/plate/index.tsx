@@ -13,7 +13,10 @@ import { createLinkPlugin } from './plugins/create-link-plugin'
 import { uuid } from './plugins/ui/helpers'
 import type { RichTextType } from '..'
 import { createPlugins, Plate } from '@udecode/plate-common'
-import { Editor } from '../plate-v2/components/editor'
+import { Editor } from './components/editor'
+import { ToolbarSeparator } from './components/plate-ui/toolbar'
+import { FixedToolbar } from './components/fixed-toolbar'
+import { TooltipProvider } from './components/plate-ui/tooltip'
 
 export const RichEditor = (props: RichTextType) => {
   const initialValue = React.useMemo(
@@ -79,24 +82,29 @@ export const RichEditor = (props: RichTextType) => {
           })
         }}
       >
-        <>
-          {withToolbar ? (
-            <Toolbar
-              tinaForm={props.tinaForm}
-              toolbarOverride={props.field?.toolbarOverride}
-              templates={props.field.templates}
-              inlineOnly={false}
-            />
-          ) : (
-            <FloatingToolbar
-              tinaForm={props.tinaForm}
-              templates={props.field.templates}
-              toolbarOverride={props.field?.toolbarOverride}
-            />
-          )}
-          <FloatingLink />
-        </>
-        <Editor />
+        <TooltipProvider>
+          <>
+            {withToolbar ? (
+              // <FixedToolbar>
+
+              //   </FixedToolbar>
+              <Toolbar
+                tinaForm={props.tinaForm}
+                toolbarOverride={props.field?.toolbarOverride}
+                templates={props.field.templates}
+                inlineOnly={false}
+              />
+            ) : (
+              <FloatingToolbar
+                tinaForm={props.tinaForm}
+                templates={props.field.templates}
+                toolbarOverride={props.field?.toolbarOverride}
+              />
+            )}
+            <FloatingLink />
+          </>
+          <Editor />
+        </TooltipProvider>
       </Plate>
     </div>
   )

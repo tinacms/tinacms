@@ -19,7 +19,7 @@ import {
 } from '@udecode/plate-heading'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 
-import { Icons } from './icons'
+import { Icons } from '../../plate/components/plate-ui/icons'
 
 import {
   DropdownMenu,
@@ -30,7 +30,7 @@ import {
   DropdownMenuTrigger,
   useOpenState,
 } from './dropdown-menu'
-import { ToolbarButton } from './toolbar'
+import { ToolbarButton } from '../../plate/components/plate-ui/toolbar'
 import { ELEMENT_HR, ELEMENT_TABLE } from '@udecode/plate'
 
 const items = [

@@ -5,7 +5,7 @@ import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { cn, createPrimitiveElement, withCn, withRef } from '@udecode/cn'
 
-import { Icons } from './icons'
+import { Icons } from '../../plate/components/plate-ui/icons'
 
 export const Dialog = DialogPrimitive.Root
 

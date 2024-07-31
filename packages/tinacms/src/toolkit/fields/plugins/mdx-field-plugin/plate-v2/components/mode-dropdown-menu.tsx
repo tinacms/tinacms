@@ -9,7 +9,7 @@ import {
   usePlateStore,
 } from '@udecode/plate-common'
 
-import { Icons } from './icons'
+import { Icons } from '../../plate/components/plate-ui/icons'
 
 import {
   DropdownMenu,
@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
   useOpenState,
 } from './dropdown-menu'
-import { ToolbarButton } from './toolbar'
+import { ToolbarButton } from '../../plate/components/plate-ui/toolbar'
 
 export function ModeDropdownMenu(props: DropdownMenuProps) {
   const editor = useEditorRef()

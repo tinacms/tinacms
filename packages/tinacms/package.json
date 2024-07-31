@@ -114,6 +114,7 @@
     "@udecode/plate-serializer-csv": "^36.2.0",
     "@udecode/plate-serializer-docx": "^36.2.2",
     "@udecode/plate-serializer-md": "^36.0.7",
+    "@udecode/plate-slash-command": "^36.0.0",
     "@udecode/plate-tabbable": "^36.0.0",
     "@udecode/plate-table": "^36.2.0",
     "@udecode/plate-toggle": "^36.0.0",

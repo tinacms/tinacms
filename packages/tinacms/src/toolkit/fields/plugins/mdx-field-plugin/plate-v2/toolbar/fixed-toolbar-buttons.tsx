@@ -27,9 +27,9 @@ import { ELEMENT_IMAGE } from '@udecode/plate-media'
 import { InsertDropdownMenu } from '../components/insert-dropdown-menu'
 import { MarkToolbarButton } from '../components/mark-toolbar-button'
 import { ModeDropdownMenu } from '../components/mode-dropdown-menu'
-import { ToolbarGroup } from '../components/toolbar'
+import { ToolbarGroup } from '../../plate/components/plate-ui/toolbar'
 import { TurnIntoDropdownMenu } from '../components/turn-into-dropdown-menu'
-import { Icons } from '../components/icons'
+import { Icons } from '../../plate/components/plate-ui/icons'
 
 export function FixedToolbarButtons() {
   const readOnly = useEditorReadOnly()

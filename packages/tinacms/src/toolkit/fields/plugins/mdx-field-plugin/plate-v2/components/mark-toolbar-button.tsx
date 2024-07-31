@@ -8,7 +8,7 @@ import {
   useMarkToolbarButtonState,
 } from '@udecode/plate-common'
 
-import { ToolbarButton } from './toolbar'
+import { ToolbarButton } from '../../plate/components/plate-ui/toolbar'
 
 export const MarkToolbarButton = withRef<
   typeof ToolbarButton,

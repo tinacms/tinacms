@@ -17,7 +17,7 @@ import {
   useFloatingToolbarState,
 } from '@udecode/plate-floating'
 
-import { Toolbar } from './toolbar'
+import { Toolbar } from '../../plate/components/plate-ui/toolbar'
 
 export const FloatingToolbar = withRef<
   typeof Toolbar,

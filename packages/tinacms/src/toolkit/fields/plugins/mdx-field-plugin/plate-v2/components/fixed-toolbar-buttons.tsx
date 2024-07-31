@@ -9,12 +9,12 @@ import {
 } from '@udecode/plate-basic-marks'
 import { useEditorReadOnly } from '@udecode/plate-common'
 
-import { Icons } from './icons'
+import { Icons } from '../../plate/components/plate-ui/icons'
 
 import { InsertDropdownMenu } from './insert-dropdown-menu'
 import { MarkToolbarButton } from './mark-toolbar-button'
 import { ModeDropdownMenu } from './mode-dropdown-menu'
-import { ToolbarGroup } from './toolbar'
+import { ToolbarGroup } from '../../plate/components/plate-ui/toolbar'
 import { TurnIntoDropdownMenu } from './turn-into-dropdown-menu'
 
 export function FixedToolbarButtons() {

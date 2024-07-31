@@ -2,7 +2,7 @@ import { withRef } from '@udecode/cn'
 import { PlateElement, useElement } from '@udecode/plate-common'
 import { useToggleButton, useToggleButtonState } from '@udecode/plate-toggle'
 
-import { Icons } from './icons'
+import { Icons } from '../../plate/components/plate-ui/icons'
 
 export const ToggleElement = withRef<typeof PlateElement>(
   ({ children, ...props }, ref) => {

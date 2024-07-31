@@ -12,7 +12,7 @@ import {
 // Prism must be imported before all language files
 import Prism from 'prismjs'
 
-import { Icons } from './icons'
+import { Icons } from '../../plate/components/plate-ui/icons'
 
 import { Button } from './button'
 import {

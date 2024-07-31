@@ -15,7 +15,7 @@ import {
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 
-import { Icons } from './icons'
+import { Icons } from '../../plate/components/plate-ui/icons'
 
 import {
   DropdownMenu,
@@ -26,7 +26,7 @@ import {
   DropdownMenuTrigger,
   useOpenState,
 } from './dropdown-menu'
-import { ToolbarButton } from './toolbar'
+import { ToolbarButton } from '../../plate/components/plate-ui/toolbar'
 
 const items = [
   {

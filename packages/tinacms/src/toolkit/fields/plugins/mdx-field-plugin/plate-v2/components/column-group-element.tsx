@@ -14,11 +14,11 @@ import {
 } from '@udecode/plate-layout'
 import { useReadOnly } from 'slate-react'
 
-import { Icons } from './icons'
+import { Icons } from '../../plate/components/plate-ui/icons'
 
 import { Button } from './button'
 import { Popover, PopoverAnchor, PopoverContent } from './popover'
-import { Separator } from './separator'
+import { Separator } from '../../plate/components/plate-ui/separator'
 
 export const ColumnGroupElement = withRef<typeof PlateElement>(
   ({ children, className, ...props }, ref) => {
