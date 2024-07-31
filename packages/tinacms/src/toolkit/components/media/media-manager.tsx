@@ -1,11 +1,5 @@
-import React, {
-  useEffect,
-  useState,
-  forwardRef,
-  useRef,
-  useCallback,
-} from 'react'
-import { useCMS } from '../../react-tinacms/use-cms'
+import React, { useEffect, useState, forwardRef, useRef } from 'react'
+import { useCMS } from '@toolkit/react-tinacms'
 import {
   BiArrowToBottom,
   BiCloudUpload,
@@ -156,10 +150,10 @@ export function MediaPicker({
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
 
-  function loadMedia() {
+  async function loadMedia() {
     setListState('loading')
-    cms.media
-      .list({
+    try {
+      const _list = await cms.media.list({
         offset,
         limit: cms.media.pageSize,
         directory,
@@ -169,22 +163,20 @@ export function MediaPicker({
           { w: 1000, h: 1000 },
         ],
       })
-      .then((_list) => {
-        setList({
-          items: [...list.items, ..._list.items],
-          nextOffset: _list.nextOffset,
-        })
-        setListState('loaded')
+      setList({
+        items: [...list.items, ..._list.items],
+        nextOffset: _list.nextOffset,
       })
-      .catch((e) => {
-        console.error(e)
-        if (e.ERR_TYPE === 'MediaListError') {
-          setListError(e)
-        } else {
-          setListError(defaultListError)
-        }
-        setListState('error')
-      })
+      setListState('loaded')
+    } catch (e) {
+      console.error(e)
+      if (e.ERR_TYPE === 'MediaListError') {
+        setListError(e)
+      } else {
+        setListError(defaultListError)
+      }
+      setListState('error')
+    }
   }
 
   useEffect(() => {
@@ -295,7 +287,7 @@ export function MediaPicker({
           setList((mediaList) => {
             return {
               items: [
-                // all of the newly added items are new
+                // all the newly added items are new
                 ...mediaItems.map((x) => ({ ...x, new: true })),
                 ...mediaList.items,
               ],
