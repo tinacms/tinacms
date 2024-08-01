@@ -137,10 +137,16 @@ export function MediaPicker({
     items: [],
     nextOffset: undefined,
   })
+  const resetList = () =>
+    setList({
+      items: [],
+      nextOffset: undefined,
+    })
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeItem, setActiveItem] = useState<Media | false>(false)
   const closePreview = () => setActiveItem(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   /**
    * current offset is last element in offsetHistory[]
@@ -181,13 +187,15 @@ export function MediaPicker({
 
   useEffect(() => {
     if (!cms.media.isConfigured) return
+
     loadMedia()
+    if (refreshing) setRefreshing(false)
 
     return cms.events.subscribe(
       ['media:delete:success', 'media:pageSize'],
       loadMedia
     )
-  }, [offset, directory, cms.media.isConfigured])
+  }, [offset, refreshing, directory, cms.media.isConfigured])
 
   const onClickMediaItem = (item: Media) => {
     if (!item) {
@@ -398,7 +406,11 @@ export function MediaPicker({
                 <Button
                   busy={false}
                   variant="white"
-                  onClick={loadMedia}
+                  onClick={() => {
+                    setRefreshing(true)
+                    resetOffset()
+                    resetList()
+                  }}
                   className="whitespace-nowrap"
                 >
                   Refresh
