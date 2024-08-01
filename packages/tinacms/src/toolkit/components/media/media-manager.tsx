@@ -201,6 +201,7 @@ export function MediaPicker({
     if (!item) {
       setActiveItem(false)
     } else if (item.type === 'dir') {
+      resetList()
       // Only join when there is a directory to join to
       setDirectory(
         item.directory === '.' || item.directory === ''
