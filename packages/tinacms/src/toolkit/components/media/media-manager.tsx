@@ -399,7 +399,14 @@ export function MediaPicker({
           <div className="flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0">
             <div className="flex flex-1 items-center gap-4">
               <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
-              <Breadcrumb directory={directory} setDirectory={setDirectory} />
+              <Breadcrumb
+                directory={directory}
+                setDirectory={(dir: string) => {
+                  resetList()
+                  resetOffset()
+                  setDirectory(dir)
+                }}
+              />
             </div>
 
             {cms.media.store.isStatic ? null : (
