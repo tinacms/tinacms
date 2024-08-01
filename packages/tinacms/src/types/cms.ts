@@ -67,4 +67,5 @@ export type TinaCMSProviderDefaultProps = QueryProviderProps &
   BaseProviderProps &
   Config & {
     tinaGraphQLVersion: string
+    children?: React.ReactNode
   }

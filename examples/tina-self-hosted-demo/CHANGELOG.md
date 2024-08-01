@@ -1,5 +1,77 @@
 # @tinacms/self-hosted-starter
 
+## 0.1.55
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+  - tinacms-authjs@4.0.0
+  - @tinacms/datalayer@1.2.39
+  - tinacms-gitprovider-github@1.0.10
+
+## 0.1.54
+
+### Patch Changes
+
+- Updated dependencies [957fa26]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - tinacms@2.0.0
+  - tinacms-gitprovider-github@1.0.9
+  - @tinacms/datalayer@1.2.38
+  - tinacms-authjs@3.0.0
+
+## 0.1.53
+
+### Patch Changes
+
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+  - tinacms-authjs@2.0.7
+
+## 0.1.52
+
+### Patch Changes
+
+- Updated dependencies [a9b461c]
+- Updated dependencies [3034430]
+- Updated dependencies [171f5a5]
+- Updated dependencies [fd216f3]
+- Updated dependencies [d004af2]
+- Updated dependencies [20f972a]
+- Updated dependencies [2a36b65]
+- Updated dependencies [f26b40d]
+  - tinacms@1.6.6
+  - tinacms-authjs@2.0.6
+  - @tinacms/datalayer@1.2.37
+  - tinacms-gitprovider-github@1.0.8
+
+## 0.1.51
+
+### Patch Changes
+
+- Updated dependencies [04f0bf3]
+- Updated dependencies [0503072]
+- Updated dependencies [1104006]
+  - tinacms@1.6.5
+  - tinacms-authjs@2.0.5
+  - tinacms-gitprovider-github@1.0.7
+  - @tinacms/datalayer@1.2.36
+
+## 0.1.50
+
+### Patch Changes
+
+- 8ee81d026: fix watch script for window environment
+- Updated dependencies [2e3393ef5]
+  - tinacms@1.6.4
+  - tinacms-authjs@2.0.4
+  - @tinacms/datalayer@1.2.35
+  - tinacms-gitprovider-github@1.0.6
+
 ## 0.1.49
 
 ### Patch Changes

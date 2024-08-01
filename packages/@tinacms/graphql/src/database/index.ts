@@ -513,11 +513,11 @@ export class Database {
           }
         }
 
-        const stringifiedFile = await this.stringifyFile(
-          filepath,
-          dataFields,
-          collection
+        const stringifiedFile = filepath.endsWith(
+          `.gitkeep.${collection.format || 'md'}`
         )
+          ? ''
+          : await this.stringifyFile(filepath, dataFields, collection)
 
         if (!collection?.isDetached) {
           if (this.bridge) {

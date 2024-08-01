@@ -185,7 +185,7 @@ export const createConfig = async ({
     appType: 'spa',
     resolve: {
       alias,
-      dedupe: ['graphql', 'tinacms', 'react', 'react-dom'],
+      dedupe: ['graphql', 'tinacms', 'react', 'react-dom', 'react-router-dom'],
     },
     define: {
       /**

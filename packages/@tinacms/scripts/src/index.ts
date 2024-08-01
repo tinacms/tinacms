@@ -5,9 +5,9 @@
 import { build } from 'vite'
 import { build as esbuild } from 'esbuild'
 import fs from 'fs-extra'
-import path from 'path'
+import path from 'node:path'
 import chokidar from 'chokidar'
-import { exec } from 'child_process'
+import { exec } from 'node:child_process'
 import chalk from 'chalk'
 
 import * as commander from 'commander'
@@ -29,7 +29,7 @@ interface Option {
 }
 
 const program = new commander.Command('Tina Build')
-const registerCommands = (commands: Command[], noHelp: boolean = false) => {
+const registerCommands = (commands: Command[], noHelp = false) => {
   commands.forEach((command, i) => {
     let newCmd = program
       .command(command.command, { noHelp })
@@ -42,7 +42,7 @@ const registerCommands = (commands: Command[], noHelp: boolean = false) => {
       newCmd = newCmd.alias(command.alias)
     }
 
-    newCmd.on('--help', function () {
+    newCmd.on('--help', () => {
       if (command.examples) {
         console.log(`\nExamples:\n  ${command.examples}`)
       }
@@ -116,10 +116,12 @@ const watch = () => {
       console.error(`exec error: ${error}`)
       return
     }
+
     const json = JSON.parse(stdout) as { name: string; path: string }[]
-    const watchPaths: string[] = []
+    const watchPaths = []
+
     json.forEach((pkg) => {
-      if (pkg.path.includes('/packages/')) {
+      if (pkg.path.includes(path.join('packages', ''))) {
         watchPaths.push(pkg.path)
       }
     })
@@ -127,14 +129,11 @@ const watch = () => {
     chokidar
       .watch(
         watchPaths.map((p) => path.join(p, 'src', '**/*')),
-        {
-          ignored: ['**/spec/**/*', 'node_modules'],
-        }
+        { ignored: ['**/spec/**/*', 'node_modules'] }
       )
       .on('change', async (path) => {
         const changedPackagePath = watchPaths.find((p) => path.startsWith(p))
         await run({ dir: changedPackagePath })
-        // console.log('change', changedPackagePath)
       })
   })
 }

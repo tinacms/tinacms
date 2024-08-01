@@ -1,5 +1,62 @@
 # create-tina-app
 
+## 1.1.6
+
+### Patch Changes
+
+- af3c593: Updates tar and other packages. Leaves chalk at version 4 due to esm issue with chalk 5.
+
+## 1.1.5
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [e58b951]
+- Updated dependencies [9076d09]
+  - @tinacms/metrics@1.0.5
+
+## 1.1.4
+
+### Patch Changes
+
+- 2940594: Add pnpm option to create-tina-app
+- 82ab066: upgrade vulnerable packages in example project, test project and peer dependency packages
+- Updated dependencies [2940594]
+  - @tinacms/metrics@1.0.4
+
+## 1.1.3
+
+### Patch Changes
+
+- 789ecba: create-tina-app - Change from 'Tailwind starter' to 'NextJS starter'
+
+## 1.1.2
+
+### Patch Changes
+
+- bce9ae1: Create-tina-app - Revert back to using require
+
+## 1.1.1
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/metrics@1.0.3
+
+## 1.1.0
+
+### Minor Changes
+
+- 011571c8a: Added demo docs starter
+
+### Patch Changes
+
+- @tinacms/metrics@1.0.2
+
 ## 1.0.5
 
 ### Patch Changes

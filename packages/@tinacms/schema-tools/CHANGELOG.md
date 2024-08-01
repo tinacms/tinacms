@@ -1,5 +1,39 @@
 # @tinacms/schema-tools
 
+## 1.5.0
+
+### Minor Changes
+
+- cb83dc2: add `toolbarOverride` option to `rich-text` fields
+
+## 1.4.19
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+- e58b951: update vulnerable packages so npm audit does not complain
+- 957fa26: update to React 18
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+
+## 1.4.18
+
+### Patch Changes
+
+- f26b40d: Allow customization of accepted media types in media manager
+
+## 1.4.17
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+
+## 1.4.16
+
+### Patch Changes
+
+- 2e3393ef5: Implement Create folder feature for tinacms.
+
 ## 1.4.15
 
 ### Patch Changes

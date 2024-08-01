@@ -1,0 +1,28 @@
+{
+  "name": "playwright-testing",
+  "private": true,
+  "scripts": {
+    "dev": "tinacms dev -c \"next dev\"",
+    "build": "tinacms dev -c \"next build\"",
+    "start": "tinacms dev -c \"next start\"",
+    "lint": "next lint",
+    "audit": "tinacms audit",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "axios": "1.7.2",
+    "next": "14.2.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-is": "^18.2.0",
+    "tinacms": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.1",
+    "@tinacms/cli": "workspace:*",
+    "@types/node": "^17.0.21",
+    "eslint": "7",
+    "eslint-config-next": "12.0.3"
+  },
+  "version": "0.0.0"
+}

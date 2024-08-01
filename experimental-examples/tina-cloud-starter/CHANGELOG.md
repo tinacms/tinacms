@@ -1,5 +1,72 @@
 # @tinacms/starter
 
+## 0.1.36
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+  - @tinacms/vercel-previews@0.0.36
+  - @tinacms/mdx@1.3.29
+
+## 0.1.35
+
+### Patch Changes
+
+- Updated dependencies [f567fc8]
+- Updated dependencies [957fa26]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/mdx@1.3.28
+  - tinacms@2.0.0
+  - @tinacms/vercel-previews@0.0.35
+
+## 0.1.34
+
+### Patch Changes
+
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+  - @tinacms/vercel-previews@0.0.34
+
+## 0.1.33
+
+### Patch Changes
+
+- Updated dependencies [a9b461c]
+- Updated dependencies [3034430]
+- Updated dependencies [171f5a5]
+- Updated dependencies [fd216f3]
+- Updated dependencies [d004af2]
+- Updated dependencies [20f972a]
+- Updated dependencies [2a36b65]
+- Updated dependencies [f26b40d]
+  - tinacms@1.6.6
+  - @tinacms/vercel-previews@0.0.33
+  - @tinacms/mdx@1.3.27
+
+## 0.1.32
+
+### Patch Changes
+
+- Updated dependencies [04f0bf3]
+- Updated dependencies [0503072]
+- Updated dependencies [1104006]
+  - tinacms@1.6.5
+  - @tinacms/mdx@1.3.26
+  - @tinacms/vercel-previews@0.0.32
+
+## 0.1.31
+
+### Patch Changes
+
+- Updated dependencies [2e3393ef5]
+  - tinacms@1.6.4
+  - @tinacms/mdx@1.3.25
+  - @tinacms/vercel-previews@0.0.31
+
 ## 0.1.30
 
 ### Patch Changes

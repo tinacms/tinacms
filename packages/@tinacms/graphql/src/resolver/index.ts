@@ -662,6 +662,7 @@ export class Resolver {
     isMutation,
     isCreation,
     isDeletion,
+    isFolderCreation,
     isAddPendingDocument,
     isCollectionSpecific,
     isUpdateName,
@@ -671,6 +672,7 @@ export class Resolver {
     isMutation: boolean
     isCreation?: boolean
     isDeletion?: boolean
+    isFolderCreation?: boolean
     isAddPendingDocument?: boolean
     isCollectionSpecific?: boolean
     isUpdateName?: boolean
@@ -710,7 +712,10 @@ export class Resolver {
     )
 
     const collection = await this.tinaSchema.getCollection(collectionLookup)
-    const realPath = path.join(collection?.path, args.relativePath)
+    let realPath = path.join(collection?.path, args.relativePath)
+    if (isFolderCreation) {
+      realPath = `${realPath}/.gitkeep.${collection.format || 'md'}`
+    }
     const alreadyExists = await this.database.documentExists(realPath)
 
     if (isMutation) {
@@ -727,6 +732,19 @@ export class Resolver {
           args,
           isAddPendingDocument,
         })
+      } else if (isFolderCreation) {
+        /**
+         * createFolder, create<Collection>Folder
+         */
+        if (alreadyExists === true) {
+          throw new Error(`Unable to add folder, ${realPath} already exists`)
+        }
+        await this.database.put(
+          realPath,
+          { _is_tina_folder_placeholder: true },
+          collection.name
+        )
+        return this.getDocument(realPath)
       }
       // if we are deleting a document or updating its name we should check if it exists
       if (!alreadyExists) {

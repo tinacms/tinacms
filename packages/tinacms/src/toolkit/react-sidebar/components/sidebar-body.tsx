@@ -1,14 +1,12 @@
 import * as React from 'react'
 
-import { Form } from '@toolkit/forms'
+import type { Form } from '@toolkit/forms'
 import { FormLists } from './form-list'
 import { useCMS } from '@toolkit/react-core'
 import { FormBuilder, FormStatus } from '@toolkit/form-builder'
-import { FormMetaPlugin } from '@toolkit/plugin-form-meta'
+import type { FormMetaPlugin } from '@toolkit/plugin-form-meta'
 import { SidebarContext } from './sidebar'
 import { BiHomeAlt } from 'react-icons/bi'
-import { EditContext } from '@tinacms/sharedctx'
-import { PendingFormsPlaceholder } from './no-forms-placeholder'
 
 export const FormsView = ({
   children,
@@ -17,22 +15,6 @@ export const FormsView = ({
 }) => {
   const cms = useCMS()
   const { setFormIsPristine } = React.useContext(SidebarContext)
-  const { formsRegistering, setFormsRegistering } = React.useContext<{
-    formsRegistering: boolean
-    setFormsRegistering: (_value: boolean) => void
-  }>(EditContext)
-
-  React.useMemo(
-    () =>
-      cms.events.subscribe('forms:register', (event) => {
-        if (event.value === 'start') {
-          setFormsRegistering(true)
-        } else {
-          setFormsRegistering(false)
-        }
-      }),
-    []
-  )
 
   const isMultiform = cms.state.forms.length > 1
   const activeForm = cms.state.forms.find(
@@ -44,7 +26,6 @@ export const FormsView = ({
    * No Forms
    */
   if (!cms.state.formLists.length) {
-    if (formsRegistering) return <PendingFormsPlaceholder />
     return <> {children} </>
   }
 
@@ -60,16 +41,12 @@ export const FormsView = ({
         <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
           {isMultiform && <MultiformFormHeader activeForm={activeForm} />}
           {!isMultiform && <FormHeader activeForm={activeForm} />}
-          {formMetas &&
-            formMetas.map((meta) => (
-              <React.Fragment key={meta.name}>
-                <meta.Component />
-              </React.Fragment>
-            ))}
-          <FormBuilder
-            form={activeForm as any}
-            onPristineChange={setFormIsPristine}
-          />
+          {formMetas?.map((meta) => (
+            <React.Fragment key={meta.name}>
+              <meta.Component />
+            </React.Fragment>
+          ))}
+          <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
         </FormWrapper>
       )}
     </>
@@ -77,8 +54,9 @@ export const FormsView = ({
 }
 
 interface FormWrapperProps {
-  isEditing: Boolean
-  isMultiform: Boolean
+  isEditing: boolean
+  isMultiform: boolean
+  children: React.ReactNode
 }
 
 const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
@@ -117,10 +95,13 @@ export const MultiformFormHeader = ({
 
   return (
     <div
-      className={`pt-18 pb-4 px-6 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50`}
+      className={
+        'pt-18 pb-4 px-6 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50'
+      }
     >
       <div className="max-w-form mx-auto flex gap-2 justify-between items-center">
         <button
+          type="button"
           className="pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150"
           onClick={() => {
             const state = activeForm.tinaForm.finalForm.getState()
@@ -158,7 +139,9 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
 
   return (
     <div
-      className={`pt-18 pb-4 px-6 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50`}
+      className={
+        'pt-18 pb-4 px-6 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50'
+      }
     >
       <div className="max-w-form mx-auto flex gap-2 justify-between items-center">
         {shortFormLabel && (

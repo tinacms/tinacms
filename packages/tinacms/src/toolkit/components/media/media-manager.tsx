@@ -234,10 +234,16 @@ export function MediaPicker({
   }
 
   const [uploading, setUploading] = useState(false)
+  const accept = Array.isArray(
+    cms.api.tina.schema.schema?.config?.media?.accept
+  )
+    ? cms.api.tina.schema.schema?.config?.media?.accept.join(',')
+    : cms.api.tina.schema.schema?.config?.media?.accept
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: dropzoneAcceptFromString(
-      cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
+      accept || cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
     ),
+    maxSize: cms.media.maxSize,
     multiple: true,
     onDrop: async (files, fileRejections) => {
       try {

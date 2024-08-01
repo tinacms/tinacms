@@ -240,6 +240,18 @@ export type PasswordField = (
     type: 'password'
   }
 
+type toolbarItemName =
+  | 'heading'
+  | 'link'
+  | 'image'
+  | 'quote'
+  | 'ul'
+  | 'ol'
+  | 'code'
+  | 'codeBlock'
+  | 'bold'
+  | 'italic'
+  | 'raw'
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
@@ -254,6 +266,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
      * will be stored as frontmatter
      */
     isBody?: boolean
+    toolbarOverride?: toolbarItemName[]
     templates?: RichTextTemplate<WithNamespace>[]
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser
@@ -485,7 +498,10 @@ export interface AuthProvider {
   isAuthenticated: () => Promise<boolean>
   getLoginStrategy: () => LoginStrategy
   getLoginScreen: () => FC<LoginScreenProps> | null
-  getSessionProvider: () => FC<{ basePath?: string }>
+  getSessionProvider: () => FC<{
+    basePath?: string
+    children?: React.ReactNode
+  }>
 }
 
 interface AuthHooks {
@@ -631,6 +647,7 @@ export interface Config<
          */
         loadCustomStore: () => Promise<Store>
         tina?: never
+        accept?: string | string[]
       }
     | {
         /**
@@ -653,6 +670,7 @@ export interface Config<
           static?: boolean
         }
         loadCustomStore?: never
+        accept?: string | string[]
       }
   search?: (
     | {
@@ -822,6 +840,7 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
   allowedActions?: {
     create?: boolean
     delete?: boolean
+    createNestedFolder?: boolean
   }
   /**
    * Forms for this collection will be editable from the global sidebar rather than the form panel

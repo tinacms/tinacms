@@ -1,5 +1,45 @@
 # tina-graphql
 
+## 1.2.39
+
+### Patch Changes
+
+- @tinacms/graphql@1.4.39
+
+## 1.2.38
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [e58b951]
+- Updated dependencies [9076d09]
+  - @tinacms/graphql@1.4.38
+
+## 1.2.37
+
+### Patch Changes
+
+- @tinacms/graphql@1.4.37
+
+## 1.2.36
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- Updated dependencies [76c1a2e]
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/graphql@1.4.36
+
+## 1.2.35
+
+### Patch Changes
+
+- Updated dependencies [2e3393ef5]
+  - @tinacms/graphql@1.4.35
+
 ## 1.2.34
 
 ### Patch Changes

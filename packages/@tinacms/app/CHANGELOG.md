@@ -1,5 +1,83 @@
 # @tinacms/app
 
+## 2.0.2
+
+### Patch Changes
+
+- 4128128: Fix markdown editor button styling
+
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+  - @tinacms/mdx@1.3.29
+
+## 2.0.0
+
+### Major Changes
+
+- 957fa26: Removed deprecated useTina hook
+  This was deprecated as part of the v1 release and shouldn't have been in use by anyone
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+- e58b951: update vulnerable packages so npm audit does not complain
+- 957fa26: update to React 18
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [957fa26]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/mdx@1.3.28
+  - tinacms@2.0.0
+
+## 1.2.45
+
+### Patch Changes
+
+- 2940594: Add pnpm option to create-tina-app
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+
+## 1.2.44
+
+### Patch Changes
+
+- a9b461c: updated 'file has changes' indicator ui
+- Updated dependencies [a9b461c]
+- Updated dependencies [3034430]
+- Updated dependencies [171f5a5]
+- Updated dependencies [fd216f3]
+- Updated dependencies [d004af2]
+- Updated dependencies [20f972a]
+- Updated dependencies [2a36b65]
+- Updated dependencies [f26b40d]
+  - tinacms@1.6.6
+  - @tinacms/mdx@1.3.27
+
+## 1.2.43
+
+### Patch Changes
+
+- Updated dependencies [04f0bf3]
+- Updated dependencies [0503072]
+- Updated dependencies [1104006]
+  - tinacms@1.6.5
+  - @tinacms/mdx@1.3.26
+
+## 1.2.42
+
+### Patch Changes
+
+- Updated dependencies [2e3393ef5]
+  - tinacms@1.6.4
+  - @tinacms/mdx@1.3.25
+
 ## 1.2.41
 
 ### Patch Changes

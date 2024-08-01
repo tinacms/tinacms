@@ -359,10 +359,11 @@ export const resolve = async ({
                   'createDocument',
                   'updateDocument',
                   'deleteDocument',
+                  'createFolder',
                 ].includes(info.fieldName)
               ) {
                 /**
-                 * `getDocument`/`createDocument`/`updateDocument`/`deleteDocument`
+                 * `getDocument`/`createDocument`/`updateDocument`/`deleteDocument`/`createFolder`
                  */
                 const result = await resolver.resolveDocument({
                   args,
@@ -371,6 +372,7 @@ export const resolve = async ({
                   isCreation,
                   // Right now this is the only case for deletion
                   isDeletion: info.fieldName === 'deleteDocument',
+                  isFolderCreation: info.fieldName === 'createFolder',
                   isUpdateName: Boolean(args?.params?.relativePath),
                   isAddPendingDocument: false,
                   isCollectionSpecific: false,

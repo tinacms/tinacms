@@ -1,5 +1,65 @@
 # next-tinacms-cloudinary
 
+## 7.0.0
+
+### Patch Changes
+
+- 37b5332: Add support to upload non-image files to Cloudinary
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+
+## 6.0.0
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 957fa26: update to React 18
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [957fa26]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - tinacms@2.0.0
+
+## 5.0.7
+
+### Patch Changes
+
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+
+## 5.0.6
+
+### Patch Changes
+
+- Updated dependencies [a9b461c]
+- Updated dependencies [3034430]
+- Updated dependencies [171f5a5]
+- Updated dependencies [fd216f3]
+- Updated dependencies [d004af2]
+- Updated dependencies [20f972a]
+- Updated dependencies [2a36b65]
+- Updated dependencies [f26b40d]
+  - tinacms@1.6.6
+
+## 5.0.5
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- Updated dependencies [04f0bf3]
+- Updated dependencies [0503072]
+- Updated dependencies [1104006]
+  - tinacms@1.6.5
+
+## 5.0.4
+
+### Patch Changes
+
+- Updated dependencies [2e3393ef5]
+  - tinacms@1.6.4
+
 ## 5.0.3
 
 ### Patch Changes

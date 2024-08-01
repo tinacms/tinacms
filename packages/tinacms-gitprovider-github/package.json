@@ -1,6 +1,6 @@
 {
   "name": "tinacms-gitprovider-github",
-  "version": "1.0.5",
+  "version": "1.0.10",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "files": [
@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "@octokit/rest": "^19.0.7",
-    "js-base64": "^3.7.4"
+    "js-base64": "^3.7.4",
+    "typescript": "4.6.4"
   },
   "devDependencies": {
     "@tinacms/datalayer": "workspace:*",
