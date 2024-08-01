@@ -64,6 +64,7 @@
     "@monaco-editor/react": "4.4.5",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-dialog": "^1.0.7",
     "@react-hook/window-size": "^3.0.7",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
