@@ -5,24 +5,16 @@ import { selectFieldClasses } from '../select'
 import { LoadingDots } from '@toolkit/form-builder'
 import { MdKeyboardArrowDown } from 'react-icons/md'
 import { Field } from '@toolkit/forms'
-// import * as Popover from '@radix-ui/react-popover';
-
-import {
-  Popover,
-  PopoverArrow,
-  PopoverClose,
-  PopoverContent,
-  PopoverPortal,
-  PopoverTrigger,
-} from '@radix-ui/react-popover'
+import { Popover, PopoverContent, PopoverTrigger } from './to-remove/popover'
+import { Button } from './to-remove/button'
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from 'cmdk'
-import { Button } from './to-remove/button'
+  CommandList,
+} from './to-remove/command'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
@@ -193,7 +185,7 @@ const frameworks = [
 const ComboboxDemo = ({ cms, input, field }) => {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState('')
-
+  console.log('frameworks', value)
   return (
     <>
       <Popover open={open} onOpenChange={setOpen}>
@@ -210,30 +202,31 @@ const ComboboxDemo = ({ cms, input, field }) => {
             {/* <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /> */}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
+        <PopoverContent className="w-[200px] p-0 relative">
           <Command>
             <CommandInput placeholder="Search framework..." />
             <CommandEmpty>No framework found.</CommandEmpty>
             <CommandGroup>
-              <p>something to test</p>
-              {/* {frameworks.map((framework) => (
-              <CommandItem
-                key={framework.value}
-                value={framework.value}
-                onSelect={(currentValue) => {
-                  setValue(currentValue === value ? "" : currentValue)
-                  setOpen(false)
-                }}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === framework.value ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {framework.label}
-              </CommandItem>
-            ))} */}
+              <CommandList>
+                {frameworks.map((framework) => (
+                  <CommandItem
+                    key={framework.value}
+                    value={framework.value}
+                    onSelect={(currentValue) => {
+                      setValue(currentValue === value ? '' : currentValue)
+                      setOpen(false)
+                    }}
+                  >
+                    {/* <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === framework.value ? "opacity-100" : "opacity-0"
+                      )}
+                    /> */}
+                    {framework.label}
+                  </CommandItem>
+                ))}
+              </CommandList>
             </CommandGroup>
           </Command>
         </PopoverContent>
