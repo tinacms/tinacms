@@ -8,7 +8,7 @@ An issue can be considered "done" when the following criteria are met:
 4. The change has been reviewed by another team member
 5. No high priority bugs are outstanding arising from that issue
 6. The code has been merged into `main` branch
-7. Tina Cloud has been updated if affected
+7. TinaCloud has been updated if affected
 8. The starter templates have been updated if they are affected:
    1. [tina-self-hosted-demo](https://github.com/tinacms/tina-self-hosted-demo)
    2. [tina-barebones-starter](https://github.com/tinacms/tina-barebones-starter)
