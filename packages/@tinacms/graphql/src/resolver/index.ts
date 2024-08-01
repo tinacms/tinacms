@@ -87,6 +87,7 @@ const resolveFieldData = async (
       )
       break
     case 'rich-text':
+      console.log('about to parse', value)
       // @ts-ignore value is unknown
       const tree = parseMDX(value, field, (value) =>
         resolveMediaRelativeToCloud(value, config, tinaSchema.schema)
@@ -281,6 +282,7 @@ export class Resolver {
   public database: Database
   public tinaSchema: TinaSchema
   public isAudit: boolean
+  public context = {}
   constructor(public init: ResolverConfig) {
     this.config = init.config
     this.database = init.database

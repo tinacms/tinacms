@@ -21,15 +21,17 @@ import { rootElement, stringifyMDX } from '.'
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
   field: RichTextField,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context: Record<string, any>
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] } => {
-  return stringifyProps(element, field, true, imageCallback)
+  return stringifyProps(element, field, true, imageCallback, context)
 }
 export function stringifyProps(
   element: Plate.MdxInlineElement,
   parentField: RichTextField,
   flatten: boolean,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context: Record<string, any>
 ): {
   attributes: MdxJsxAttribute[]
   children: Md.PhrasingContent[]
@@ -40,7 +42,8 @@ export function stringifyProps(
   element: Plate.MdxBlockElement,
   parentField: RichTextField,
   flatten: boolean,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context: Record<string, any>
 ): {
   attributes: MdxJsxAttribute[]
   children: Md.BlockContent[]
@@ -51,7 +54,8 @@ export function stringifyProps(
   element: Plate.MdxBlockElement | Plate.MdxInlineElement,
   parentField: RichTextField,
   flatten: boolean,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context: Record<string, any>
 ): {
   attributes: MdxJsxAttribute[]
   children: Md.BlockContent[] | Md.PhrasingContent[]
@@ -228,41 +232,26 @@ export function stringifyProps(
             (value) => value.type === 'root' && Array.isArray(value.children),
             `Nested rich-text element is not a valid shape for field ${field.name}`
           )
+          const code = value.embed?.split('.')[1]
           if (field.name === 'children') {
-            const root = rootElement(value, field, imageCallback)
+            const root = rootElement(value, field, imageCallback, context)
             root.children.forEach((child) => {
               children.push(child)
             })
             return
           } else {
             const stringValue = stringifyMDX(value, field, imageCallback)
-            if (stringValue) {
-              val = stringValue
-                .trim()
-                .split('\n')
-                .map((str) => `  ${str.trim()}`)
-                .join(joiner)
-            }
+            context.embeds = context.embeds || {}
+            context.embeds[code] = stringValue
           }
-          if (flatten) {
-            attributes.push({
-              type: 'mdxJsxAttribute',
-              name,
-              value: {
-                type: 'mdxJsxAttributeValueExpression',
-                value: `<>${val.trim()}</>`,
-              },
-            })
-          } else {
-            attributes.push({
-              type: 'mdxJsxAttribute',
-              name,
-              value: {
-                type: 'mdxJsxAttributeValueExpression',
-                value: `<>\n${val}\n</>`,
-              },
-            })
-          }
+          attributes.push({
+            type: 'mdxJsxAttribute',
+            name,
+            value: {
+              type: 'mdxJsxAttributeValueExpression',
+              value: `embeds.${code}`,
+            },
+          })
         }
         break
       default:

@@ -16,7 +16,8 @@ type TinaStringField =
 export const extractAttributes = (
   attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
   fields: TinaField[],
-  imageCallback: (image: string) => string
+  imageCallback: (image: string) => string,
+  context: Record<string, unknown> = {}
 ) => {
   const properties: Record<string, unknown> = {}
   attributes?.forEach((attribute) => {
@@ -31,7 +32,8 @@ export const extractAttributes = (
       properties[attribute.name] = extractAttribute(
         attribute,
         field,
-        imageCallback
+        imageCallback,
+        context
       )
     } catch (e) {
       if (e instanceof Error) {
@@ -47,7 +49,8 @@ export const extractAttributes = (
 const extractAttribute = (
   attribute: MdxJsxAttribute,
   field: TinaField,
-  imageCallback: (image: string) => string
+  imageCallback: (image: string) => string,
+  context: Record<string, unknown>
 ) => {
   switch (field.type) {
     case 'boolean':
@@ -80,6 +83,20 @@ const extractAttribute = (
     case 'object':
       return extractObject(extractExpression(attribute), field, imageCallback)
     case 'rich-text':
+      if (attribute.type === 'mdxJsxAttribute') {
+        if (typeof attribute.value !== 'string') {
+          if (attribute?.value?.type === 'mdxJsxAttributeValueExpression') {
+            if (attribute.value.value.startsWith('embed')) {
+              const value = get(context, attribute.value.value)
+              if (typeof value === 'string') {
+                const ast = parseMDX(value, field, imageCallback, context)
+                ast.embed = attribute.value.value
+                return ast
+              }
+            }
+          }
+        }
+      }
       const JSXString = extractRaw(attribute)
       if (JSXString) {
         return parseMDX(JSXString, field, imageCallback)
@@ -315,4 +332,38 @@ export const trimFragments = (string: string) => {
     .slice(openingFragmentIndex || 0, closingFragmentIndex || rawArr.length - 1)
     .join('\n')
   return value
+}
+
+type PathImpl<T, Key extends keyof T> = Key extends string
+  ? T[Key] extends Record<string, any>
+    ?
+        | `${Key}.${PathImpl<T[Key], Exclude<keyof T[Key], keyof any[]>>}`
+        | `${Key}.${Exclude<keyof T[Key], keyof any[]> & string}`
+    : never
+  : never
+
+type Path<T> = Exclude<PathImpl<T, keyof T> | keyof T, symbol | number>
+
+type PathValue<T, P extends Path<T>> = P extends `${infer Key}.${infer Rest}`
+  ? Key extends keyof T
+    ? Rest extends Path<T[Key]>
+      ? PathValue<T[Key], Rest>
+      : never
+    : never
+  : P extends keyof T
+  ? T[P]
+  : never
+
+function get<T, P extends Path<T>>(obj: T, path: P): PathValue<T, P> {
+  const keys = path.split('.') as Array<keyof any>
+  let result: any = obj
+
+  for (const key of keys) {
+    if (result == null) {
+      return undefined as any
+    }
+    result = result[key]
+  }
+
+  return result as PathValue<T, P>
 }

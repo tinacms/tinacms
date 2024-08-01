@@ -46,6 +46,9 @@ export const nodePath = (dir: string) => {
 export const mdPath = (dir: string) => {
   return join(dir, './out.md')
 }
+export const mdContextPath = (dir: string) => {
+  return join(dir, './out-context.md')
+}
 
 const walkThrough = function* (obj: object) {
   // @ts-ignore

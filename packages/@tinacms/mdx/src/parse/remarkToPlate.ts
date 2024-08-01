@@ -35,7 +35,8 @@ export const remarkToSlate = (
   field: RichTextType,
   imageCallback: (url: string) => string,
   raw?: string,
-  skipMDXProcess?: boolean
+  skipMDXProcess?: boolean,
+  context?: Record<string, unknown>
 ): Plate.RootElement => {
   const mdxJsxElement = skipMDXProcess
     ? (node: any) => node
@@ -93,7 +94,7 @@ export const remarkToSlate = (
       case 'paragraph':
         return paragraph(content)
       case 'mdxJsxFlowElement':
-        return mdxJsxElement(content, field, imageCallback)
+        return mdxJsxElement(content, field, imageCallback, context)
       case 'thematicBreak':
         return {
           type: 'hr',
@@ -210,7 +211,8 @@ export const remarkToSlate = (
                 mdxJsxElement(
                   { ...child, type: 'mdxJsxTextElement' as const },
                   field,
-                  imageCallback
+                  imageCallback,
+                  context
                 ),
               ],
             }
@@ -321,7 +323,7 @@ export const remarkToSlate = (
   ): Plate.InlineElement | Plate.InlineElement[] => {
     switch (content.type) {
       case 'mdxJsxTextElement':
-        return mdxJsxElement(content, field, imageCallback)
+        return mdxJsxElement(content, field, imageCallback, context)
       case 'text':
         return text(content)
       case 'inlineCode':
@@ -348,7 +350,7 @@ export const remarkToSlate = (
       case 'image':
         return image(content)
       case 'mdxJsxTextElement':
-        return mdxJsxElement(content, field, imageCallback)
+        return mdxJsxElement(content, field, imageCallback, context)
       case 'emphasis':
         return phrashingMark(content)
       case 'strong':
