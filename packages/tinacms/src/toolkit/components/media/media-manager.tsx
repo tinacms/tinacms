@@ -343,7 +343,7 @@ export function MediaPicker({
         observer.unobserve(loaderRef.current)
       }
     }
-  }, [list.nextOffset])
+  }, [list.nextOffset, loaderRef.current])
 
   if ((listState === 'loading' && !list?.items?.length) || uploading) {
     return <LoadingMediaList />
