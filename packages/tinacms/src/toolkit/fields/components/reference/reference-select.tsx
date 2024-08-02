@@ -5,8 +5,8 @@ import { selectFieldClasses } from '../select'
 import { LoadingDots } from '@toolkit/form-builder'
 import { MdKeyboardArrowDown } from 'react-icons/md'
 import { Field } from '@toolkit/forms'
-import { Popover, PopoverContent, PopoverTrigger } from './to-remove/popover'
-import { Button } from './to-remove/button'
+import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
+import { Button } from './components/button'
 import {
   Command,
   CommandEmpty,
@@ -14,7 +14,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from './to-remove/command'
+} from './components/command'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
