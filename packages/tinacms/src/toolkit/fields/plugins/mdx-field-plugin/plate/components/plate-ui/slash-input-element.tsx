@@ -7,7 +7,7 @@ import {
   toggleNodeType,
 } from '@udecode/plate-common'
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading'
-import { ListStyleType, toggleIndentList } from '@udecode/plate-indent-list'
+// import { ListStyleType, toggleIndentList } from "@udecode/plate-indent-list";
 
 import { Icons } from './icons'
 
@@ -18,7 +18,7 @@ import {
   InlineComboboxInput,
   InlineComboboxItem,
 } from './inline-combobox'
-import { ELEMENT_OL, ELEMENT_UL } from '@udecode/plate'
+import { ELEMENT_OL, ELEMENT_UL, toggleList } from '@udecode/plate'
 
 interface SlashCommandRule {
   icon: ComponentType<SVGProps<SVGSVGElement>>
@@ -53,7 +53,7 @@ const rules: SlashCommandRule[] = [
     icon: Icons.ul,
     keywords: ['ul', 'unordered list'],
     onSelect: (editor) => {
-      toggleNodeType(editor, { activeType: ELEMENT_UL })
+      toggleList(editor, { type: ELEMENT_UL })
     },
     value: 'Bulleted list',
   },
@@ -61,7 +61,9 @@ const rules: SlashCommandRule[] = [
     icon: Icons.ol,
     keywords: ['ol', 'ordered list'],
     onSelect: (editor) => {
-      toggleNodeType(editor, { activeType: ELEMENT_OL })
+      toggleList(editor, { type: ELEMENT_OL })
+
+      // toggleNodeType(editor, { activeType: ListStyleType.Decimal });
     },
     value: 'Numbered list',
   },

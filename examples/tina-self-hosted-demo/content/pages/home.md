@@ -33,23 +33,64 @@ blocks:
       # dsad
 
 
-      This project is set up to **show** you the *basics* of working with Tina.
-      You're looking at the landing page, which pulls content from
+      This project is set up to **`show`** you the *basics* of working with
+      Tina. You're looking at the landing page, which pulls content from
       content/pages/home.md, components from components/blocks, and puts them
       all *together* in pages/\[filename].tsx, all based on a schema defined in
-      **.*tina/schema.ts.***
+      \*\*.\*tina/schema.ts.\*\*\*This project is set up to show you the basics
+      of working with Tina. You're looking at the landing page, which pulls
+      content from content/pages/home.md, components from components/blocks, and
+      puts them all together in pages/\[filename].tsx, all based on a config
+      tina/config.tsx.This project is set up to *show* you the basics of
+      *working* with Tina.
+
+
+      ```javascript
+
+      {
+        const test = () => {
+          console.log("woo");
+        }
+      }
+
+      ```
+
+
+      * You're looking at the landing page, which pulls content from
+      `content/pages/home.md`, components from components/blocks, and puts them
+      all together in `pages/[filename].tsx`, all based on a config
+      `tina/config.tsx`.This project is set up to show you the basics of working
+      with Tina. You're **looking** at the landing page, which pulls content
+      from `content/pages/home.md`, [components](asdsa/asda "test") from
+      components/blocks, and puts them all together in `pages/[filename].tsx`,
+      all based on a config `tina/config.tsx`.
+
+
+      asdad
+
+
+      > This project is set up to show you the [basics](/test) of working with
+      Tina. You're **looking** at the landing page, which pulls content from
+      `content/pages/home.md`, [components](asdsa/asda "test") from
+      components/blocks, and puts them all together in `pages/[filename].tsx`,
+      all based on a config `tina/config.tsx`.
+
+
+      asd
+
+
+      asdasd
+
+
+      dadwdasd
+
 
       * jijij
         * dfs
           * asda
             * asd
+              * [asda](asda)
               * asda
-
-      <!---->
-
-
-      * asda
-
       * asdad
         * asdsad
 
@@ -62,7 +103,7 @@ blocks:
                   1. asd
                      1. ads
 
-      ### asd
+      > asd
 
 
       ## asdad
@@ -75,6 +116,21 @@ blocks:
 
 
       > woooo
+
+
+      #### asdasd
+
+
+      1. asdasd
+
+
+      ## asdasd
+
+
+      ### asdad
+
+
+      * asdasd
     actions:
       - label: Get Started
         type: button

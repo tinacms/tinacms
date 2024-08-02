@@ -10,21 +10,25 @@ import {
   useEditorRef,
   useEditorSelector,
 } from '@udecode/plate-common'
-import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading'
+import {
+  ELEMENT_H1,
+  ELEMENT_H2,
+  ELEMENT_H3,
+  ELEMENT_H4,
+  ELEMENT_H5,
+} from '@udecode/plate-heading'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 import { ToolbarButton } from './plate-ui/toolbar'
 
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   useOpenState,
 } from './plate-ui/dropdown-menu'
 import { Icons } from './plate-ui/icons'
-import { unwrapList } from '@udecode/plate'
 
 const items = [
   {
@@ -51,9 +55,22 @@ const items = [
     label: 'Heading 3',
     value: ELEMENT_H3,
   },
+  {
+    description: 'Heading 4',
+    icon: Icons.h4,
+    label: 'Heading 4',
+    value: ELEMENT_H4,
+  },
+  {
+    description: 'Heading 5',
+    icon: Icons.h5,
+    label: 'Heading 5',
+    value: ELEMENT_H5,
+  },
 ]
 
-const defaultItem = items.find((item) => item.value === ELEMENT_PARAGRAPH)!
+const defaultItem =
+  items.find((item) => item.value === ELEMENT_PARAGRAPH) || items[0]
 
 export function HeadingsMenu(props: DropdownMenuProps) {
   const value: string = useEditorSelector((editor) => {

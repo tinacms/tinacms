@@ -27,7 +27,7 @@ import { useReadOnly, useSelected } from 'slate-react'
 
 import { Icons, iconVariants } from '../../plate/components/plate-ui/icons'
 
-import { Button } from './button'
+import { Button } from '../../plate/components/plate-ui/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -35,7 +35,11 @@ import {
   DropdownMenuPortal,
   DropdownMenuTrigger,
 } from '../../plate/components/plate-ui/dropdown-menu'
-import { Popover, PopoverContent, popoverVariants } from './popover'
+import {
+  Popover,
+  PopoverContent,
+  popoverVariants,
+} from '../../plate/components/plate-ui/popover'
 import { Separator } from '../../plate/components/plate-ui/separator'
 
 export const TableBordersDropdownMenuContent = withRef<

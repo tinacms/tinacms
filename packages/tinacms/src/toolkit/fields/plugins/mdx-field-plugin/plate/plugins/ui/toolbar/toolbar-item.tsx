@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react'
 import { PlusIcon, HeadingIcon, ToolbarIcon } from '../icons'
 import { Popover, Transition } from '@headlessui/react'
-// import { useEditorState, isCollapsed } from '@udecode/plate'
 import { insertMDX } from '../../create-mdx-plugins'
 import {
   LinkForm,
@@ -9,7 +8,6 @@ import {
   wrapOrRewrapLink,
 } from '../../create-link-plugin'
 
-// import type { PlateEditor } from '@udecode/plate'
 import type { MdxTemplate } from '../../../types'
 import { insertImg } from '../../create-img-plugin'
 import { useCMS } from '@toolkit/react-core'
@@ -44,7 +42,7 @@ export const ToolbarItem = ({
   isLastItem = false,
   tinaForm,
 }: ToolbarItemType) => {
-  const editor = useEditorState()!
+  const editor = useEditorState()
   const [selection, setSelection] = React.useState(null)
 
   const cms = useCMS()
@@ -199,7 +197,7 @@ export const EmbedButton = ({
   return (
     <Popover
       as="span"
-      className="relative z-10 block"
+      className="relative z-[99999] block"
       style={{ width: '85px' }}
     >
       {({ open }) => (
@@ -235,7 +233,7 @@ export const EmbedButton = ({
           >
             <Popover.Panel>
               {({ close }) => (
-                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none max-h-[13rem] overflow-y-auto">
+                <div className="z-[99999] origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none max-h-[13rem] overflow-y-auto">
                   <div className="sticky z-10 top-0 w-full h-8 -mb-8 opacity-10 bg-gradient-to-b from-blue-600 to-transparent" />
                   <div className="relative py-1 z-20">
                     {templates.map((template) => (

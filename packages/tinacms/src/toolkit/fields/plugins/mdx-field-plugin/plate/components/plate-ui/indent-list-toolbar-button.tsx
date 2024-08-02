@@ -1,34 +1,36 @@
 import React from 'react'
-
 import { withRef } from '@udecode/cn'
-import {
-  ListStyleType,
-  useIndentListToolbarButton,
-  useIndentListToolbarButtonState,
-} from '@udecode/plate-indent-list'
-
 import { Icons } from './icons'
-
+import {
+  type ELEMENT_OL,
+  ELEMENT_UL,
+  toggleList,
+  useListToolbarButton,
+  useListToolbarButtonState,
+} from '@udecode/plate'
 import { ToolbarButton } from './toolbar'
+import { useEditorState } from '@udecode/plate-common'
 
 export const IndentListToolbarButton = withRef<
   typeof ToolbarButton,
   {
-    nodeType?: ListStyleType
+    nodeType?: typeof ELEMENT_UL | typeof ELEMENT_OL
   }
->(({ nodeType = ListStyleType.Disc }, ref) => {
-  const state = useIndentListToolbarButtonState({ nodeType })
-  const { props } = useIndentListToolbarButton(state)
+>(({ nodeType = ELEMENT_UL }, ref) => {
+  const editor = useEditorState()
+  const state = useListToolbarButtonState({ nodeType })
+  const { props } = useListToolbarButton(state)
 
   return (
     <ToolbarButton
       ref={ref}
-      tooltip={
-        nodeType === ListStyleType.Disc ? 'Bulleted List' : 'Numbered List'
-      }
+      tooltip={nodeType === ELEMENT_UL ? 'Bulleted List' : 'Numbered List'}
       {...props}
+      onClick={() => {
+        toggleList(editor, { type: nodeType })
+      }}
     >
-      {nodeType === ListStyleType.Disc ? <Icons.ul /> : <Icons.ol />}
+      {nodeType === ELEMENT_UL ? <Icons.ul /> : <Icons.ol />}
     </ToolbarButton>
   )
 })

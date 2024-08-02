@@ -15,10 +15,14 @@ import { useReadOnly, useSelected } from 'slate-react'
 
 import { Icons } from '../../plate/components/plate-ui/icons'
 
-import { Button, buttonVariants } from './button'
+import { Button, buttonVariants } from '../../plate/components/plate-ui/button'
 import { CaptionButton } from './caption'
-import { inputVariants } from './input'
-import { Popover, PopoverAnchor, PopoverContent } from './popover'
+import { inputVariants } from '../../plate/components/plate-ui/input'
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+} from '../../plate/components/plate-ui/popover'
 import { Separator } from '../../plate/components/plate-ui/separator'
 
 export interface MediaPopoverProps {

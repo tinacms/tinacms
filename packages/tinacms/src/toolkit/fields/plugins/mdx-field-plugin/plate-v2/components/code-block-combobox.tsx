@@ -14,7 +14,7 @@ import Prism from 'prismjs'
 
 import { Icons } from '../../plate/components/plate-ui/icons'
 
-import { Button } from './button'
+import { Button } from '../../plate/components/plate-ui/button'
 import {
   Command,
   CommandEmpty,
@@ -22,7 +22,11 @@ import {
   CommandItem,
   CommandList,
 } from './command'
-import { Popover, PopoverContent, PopoverTrigger } from './popover'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '../../plate/components/plate-ui/popover'
 
 import 'prismjs/components/prism-antlr4.js'
 import 'prismjs/components/prism-bash.js'

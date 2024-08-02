@@ -24,6 +24,9 @@ import { TooltipProvider } from './components/plate-ui/tooltip'
 import FixedToolbarButtons from './components/fixed-toolbar-buttons'
 import { FloatingToolbar } from './components/plate-ui/floating-toolbar'
 import FloatingToolbarButtons from './components/floating-toolbar-buttons'
+import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar'
+import { isUrl } from './transforms/is-url'
+import { ToolbarProvider } from './toolbar/toolbar-provider'
 
 export const RichEditor = (props: RichTextType) => {
   const initialValue = React.useMemo(
@@ -44,7 +47,14 @@ export const RichEditor = (props: RichTextType) => {
           createMdxInlinePlugin(),
           createImgPlugin(),
           createInvalidMarkdownPlugin(),
-          createLinkPlugin(),
+          createLinkPlugin({
+            options: {
+              //? NOTE: This is a custom validation function that allows for relative links i.e. /about
+              isUrl: (url: string) => isUrl(url),
+              // dangerouslySkipSanitization: true,
+            },
+            renderAfterEditable: LinkFloatingToolbar,
+          }),
         ],
         {
           components: components(),
@@ -89,33 +99,19 @@ export const RichEditor = (props: RichTextType) => {
         }}
       >
         <TooltipProvider>
-          <>
+          <ToolbarProvider
+            tinaForm={props.tinaForm}
+            templates={props.field.templates}
+            overrides={props.field?.toolbarOverride}
+          >
             <FixedToolbar>
               <FixedToolbarButtons />
             </FixedToolbar>
             <FloatingToolbar>
               <FloatingToolbarButtons />
             </FloatingToolbar>
-
-            {/* {withToolbar ? (
-							<FixedToolbar>
-								<FixedToolbarButtons />
-							</FixedToolbar>
-							// <Toolbar
-							//   tinaForm={props.tinaForm}
-							//   toolbarOverride={props.field?.toolbarOverride}
-							//   templates={props.field.templates}
-							//   inlineOnly={false}
-							// />
-						) : (
-							<FloatingToolbar
-								tinaForm={props.tinaForm}
-								templates={props.field.templates}
-								toolbarOverride={props.field?.toolbarOverride}
-							/>
-						)} */}
             <FloatingLink />
-          </>
+          </ToolbarProvider>
           <Editor />
         </TooltipProvider>
       </Plate>

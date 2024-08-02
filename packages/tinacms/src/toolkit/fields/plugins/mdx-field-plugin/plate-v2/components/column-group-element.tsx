@@ -16,8 +16,12 @@ import { useReadOnly } from 'slate-react'
 
 import { Icons } from '../../plate/components/plate-ui/icons'
 
-import { Button } from './button'
-import { Popover, PopoverAnchor, PopoverContent } from './popover'
+import { Button } from '../../plate/components/plate-ui/button'
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+} from '../../plate/components/plate-ui/popover'
 import { Separator } from '../../plate/components/plate-ui/separator'
 
 export const ColumnGroupElement = withRef<typeof PlateElement>(

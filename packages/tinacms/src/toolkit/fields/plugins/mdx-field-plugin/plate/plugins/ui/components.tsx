@@ -20,6 +20,8 @@ import {
   MARK_ITALIC,
   MARK_STRIKETHROUGH,
   MARK_UNDERLINE,
+  ELEMENT_CODE_LINE,
+  ELEMENT_CODE_SYNTAX,
 } from '@udecode/plate'
 import { CodeBlock } from './code-block'
 import { classNames } from './helpers'
@@ -29,6 +31,11 @@ import { SlashInputElement } from '../../components/plate-ui/slash-input-element
 import { withProps } from '@udecode/cn'
 import { PlateElement, PlateLeaf } from '@udecode/plate-common'
 import { ListElement } from '../../components/plate-ui/list-element'
+import { BlockquoteElement } from '../../components/plate-ui/blockquote-element'
+import { CodeLeaf } from '../../components/plate-ui/code-leaf'
+import { CodeLineElement } from '../../components/plate-ui/code-line-element'
+import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf'
+import { CodeBlockElement } from '../../components/plate-ui/code-block-element'
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -134,24 +141,11 @@ export const components = () => {
         {...props}
       />
     ),
-    [ELEMENT_BLOCKQUOTE]: ({
-      className,
-      attributes,
-      editor,
-      element,
-      ...props
-    }) => (
-      <blockquote
-        className={classNames(
-          'not-italic mb-4 last:mb-0 border-l-3 border-gray-200 pl-3',
-          blockClasses,
-          className
-        )}
-        {...attributes}
-        {...props}
-      />
-    ),
-    [ELEMENT_CODE_BLOCK]: (props) => <CodeBlock {...props} />,
+    [ELEMENT_BLOCKQUOTE]: BlockquoteElement,
+    [ELEMENT_CODE_BLOCK]: CodeBlockElement,
+    [ELEMENT_CODE_LINE]: CodeLineElement,
+    [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,
+    // [ELEMENT_CODE_BLOCK]: (props) => ,
     html: ({ attributes, editor, element, children, className }) => {
       return (
         <div
@@ -238,13 +232,8 @@ export const components = () => {
         {...props}
       />
     ),
-    [MARK_CODE]: ({ editor, leaf, text, attributes, className, ...props }) => (
-      <code
-        className={classNames('bg-gray-100 p-1 rounded-sm', className)}
-        {...attributes}
-        {...props}
-      />
-    ),
+    [MARK_CODE]: CodeLeaf,
+
     // [MARK_ITALIC]: ({ editor, leaf, text, ...props }) => (
     //   <em {...props.attributes} {...props} />
     // ),

@@ -12,7 +12,13 @@ import {
   useEditorRef,
   useEditorSelector,
 } from '@udecode/plate-common'
-import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading'
+import {
+  ELEMENT_H1,
+  ELEMENT_H2,
+  ELEMENT_H3,
+  ELEMENT_H4,
+  ELEMENT_H5,
+} from '@udecode/plate-heading'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 
 import { Icons } from './icons'
@@ -60,22 +66,16 @@ const items = [
     value: ELEMENT_H3,
   },
   {
-    description: 'Quote (⌘+⇧+.)',
-    icon: Icons.blockquote,
-    label: 'Quote',
-    value: ELEMENT_BLOCKQUOTE,
+    description: 'Heading 4',
+    icon: Icons.h4,
+    label: 'Heading 4',
+    value: ELEMENT_H4,
   },
   {
-    value: 'ul',
-    label: 'Bulleted list',
-    description: 'Bulleted list',
-    icon: Icons.ul,
-  },
-  {
-    value: 'ol',
-    label: 'Numbered list',
-    description: 'Numbered list',
-    icon: Icons.ol,
+    description: 'Heading 5',
+    icon: Icons.h5,
+    label: 'Heading 5',
+    value: ELEMENT_H5,
   },
 ]
 
@@ -118,8 +118,8 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
           pressed={openState.open}
           tooltip="Turn into"
         >
-          <SelectedItemIcon className="size-5 lg:hidden" />
-          <span className="max-lg:hidden">{selectedItemLabel}</span>
+          {/* <SelectedItemIcon className="size-5 lg:hidden" /> */}
+          <span className="">{selectedItemLabel}</span>
         </ToolbarButton>
       </DropdownMenuTrigger>
 
@@ -131,11 +131,11 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
           onValueChange={(type) => {
             if (type === 'ul' || type === 'ol') {
               // if (settingsStore.get.checkedId(KEY_LIST_STYLE_TYPE)) {
-              // 	toggleIndentList(editor, {
-              // 		listStyleType: type === "ul" ? "disc" : "decimal",
-              // 	});
+              // toggleIndentList(editor, {
+              // 	listStyleType: type === "ul" ? "disc" : "decimal",
+              // });
               // } else if (settingsStore.get.checkedId("list")) {
-              // 	toggleList(editor, { type });
+              toggleList(editor, { type })
               // }
             } else {
               unwrapList(editor)

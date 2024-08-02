@@ -54,7 +54,7 @@ export const MdxFieldPlugin = {
       >
         <div
           className={
-            'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md px-3 py-2'
+            'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md pt-0 py-2'
           }
         >
           {/* {rawMode ? <RawEditor {...props} /> : <RichEditor {...props} />} */}
@@ -76,9 +76,8 @@ export const MdxFieldPluginExtendible = {
       value.children[0].type === 'invalid_markdown'
     ) {
       return 'Unable to parse rich-text'
-    } else {
-      return undefined
     }
+    return undefined
   },
   Component: wrapFieldsWithMeta<
     InputProps,
@@ -112,7 +111,7 @@ export const MdxFieldPluginExtendible = {
       >
         <div
           className={
-            'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md px-3 py-2'
+            'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md pt-0 py-2'
           }
         >
           {props.rawMode ? props.rawEditor : <RichEditor {...props} />}

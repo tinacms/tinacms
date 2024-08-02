@@ -13,7 +13,9 @@ import {
   insertNodes,
   isCollapsed,
   isElement,
+  type PlateEditor,
   setNodes,
+  type TElement,
 } from '@udecode/plate-common'
 
 type Monaco = typeof monaco
