@@ -1,27 +1,29 @@
-/**
-
-*/
-
-import { CloudinaryMediaStore } from './cloudinary-media-store'
 import type { Client } from 'tinacms'
+import type { TinaCloudCloudinaryOptions } from './options'
+import { createCloudinaryMediaStore } from './cloudinary-media-store'
 
-export class TinaCloudCloudinaryMediaStore extends CloudinaryMediaStore {
-  client: Client
-  constructor(client: Client) {
-    super()
-    this.client = client
-    this.fetchFunction = async (input: RequestInfo, init?: RequestInit) => {
-      try {
-        const url = input.toString()
-        const query = `${url.includes('?') ? '&' : '?'}clientID=${
-          client.clientId
-        }`
+export const createTinaCloudinaryMediaStore = (
+  options: TinaCloudCloudinaryOptions = { baseURL: '/api/cloudinary/media' }
+) =>
+  class TinaCloudCloudinaryMediaStore extends createCloudinaryMediaStore(
+    options
+  ) {
+    client: Client
+    constructor(client: Client) {
+      super()
+      this.client = client
+      this.fetchFunction = async (input: RequestInfo, init?: RequestInit) => {
+        try {
+          const url = input.toString()
+          const query = `${url.includes('?') ? '&' : '?'}clientID=${
+            client.clientId
+          }`
 
-        const res = client.authProvider.fetchWithToken(url + query, init)
-        return res
-      } catch (error) {
-        console.error(error)
+          const res = client.authProvider.fetchWithToken(url + query, init)
+          return res
+        } catch (error) {
+          console.error(error)
+        }
       }
     }
   }
-}
