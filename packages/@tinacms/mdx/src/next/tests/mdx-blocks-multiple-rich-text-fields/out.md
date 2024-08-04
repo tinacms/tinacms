@@ -1,7 +1,3 @@
-<Cta
-  description={<>
-    Read our privacy policy [here](http://example.com)
-  </>}
->
+<Cta description={embeds.wbbntf}>
   Click **here**!
 </Cta>

@@ -1,29 +1,3 @@
-<Test
-  leftColumn={<>
-    foo bar baz left
-  </>}
-  rightColumn={<>
-    foo bar baz right
-    
-    <Highlight
-    content={<>
-    Foo bar baz
-    </>}
-    />
-  </>}
-/>
+<Test leftColumn={embeds.vxwpno} rightColumn={embeds.somjyf} />
 
-<Test
-  leftColumn={<>
-    foo bar baz left
-  </>}
-  rightColumn={<>
-    foo bar baz right
-    
-    <Highlight
-    content={<>
-    Foo bar baz
-    </>}
-    />
-  </>}
-/>
+<Test leftColumn={embeds.kuvkxz} rightColumn={embeds.llovpr} />

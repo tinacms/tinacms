@@ -232,7 +232,17 @@ export function stringifyProps(
             (value) => value.type === 'root' && Array.isArray(value.children),
             `Nested rich-text element is not a valid shape for field ${field.name}`
           )
-          const code = value.embed?.split('.')[1]
+          function generateRandom6LetterString() {
+            const characters = 'abcdefghijklmnopqrstuvwxyz'
+            let result = ''
+            for (let i = 0; i < 6; i++) {
+              const randomIndex = Math.floor(Math.random() * characters.length)
+              result += characters[randomIndex]
+            }
+            return result
+          }
+          const code =
+            value.embedCode?.split('.')[1] || generateRandom6LetterString()
           if (field.name === 'children') {
             const root = rootElement(value, field, imageCallback, context)
             root.children.forEach((child) => {

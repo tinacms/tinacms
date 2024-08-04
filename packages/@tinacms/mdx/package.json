@@ -66,7 +66,8 @@
     "unist-util-stringify-position": "3.0.3",
     "unist-util-visit": "4.1.2",
     "uvu": "0.5.6",
-    "vfile-message": "3.1.4"
+    "vfile-message": "3.1.4",
+    "zod": "^3.14.3"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
@@ -87,8 +88,8 @@
     "c8": "^7.11.3",
     "concat-md": "^0.5.1",
     "jest-file-snapshot": "^0.5.0",
-    "mdast-util-frontmatter": "^2.0.1",
-    "micromark-extension-frontmatter": "^2.0.0",
+    "mdast-util-frontmatter": "1.0.1",
+    "micromark-extension-frontmatter": "1.1.1",
     "ts-node": "^10.8.2",
     "typedoc-plugin-markdown": "^3.13.6",
     "typescript": "^5.5.3",

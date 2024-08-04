@@ -17,7 +17,7 @@ export const extractAttributes = (
   attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
   fields: TinaField[],
   imageCallback: (image: string) => string,
-  context: Record<string, unknown> = {}
+  context: Record<string, Record<string, string>>
 ) => {
   const properties: Record<string, unknown> = {}
   attributes?.forEach((attribute) => {
@@ -86,11 +86,11 @@ const extractAttribute = (
       if (attribute.type === 'mdxJsxAttribute') {
         if (typeof attribute.value !== 'string') {
           if (attribute?.value?.type === 'mdxJsxAttributeValueExpression') {
-            if (attribute.value.value.startsWith('embed')) {
+            if (attribute.value.value.startsWith('embeds')) {
               const value = get(context, attribute.value.value)
               if (typeof value === 'string') {
                 const ast = parseMDX(value, field, imageCallback, context)
-                ast.embed = attribute.value.value
+                ast.embedCode = attribute.value.value
                 return ast
               }
             }
