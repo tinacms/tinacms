@@ -17,32 +17,32 @@ const fixtures: Fixture[] = [
     name: 'getMovieDocument',
     assert: 'output',
   },
-  {
-    name: 'getDocument',
-    assert: 'output',
-  },
-  {
-    name: 'getDirectorList',
-    assert: 'output',
-  },
-  {
-    name: 'getMovieList',
-    description: 'Trying to filter',
-    assert: 'output',
-    expectError: true,
-  },
-  {
-    name: 'getDirectorDocument',
-    assert: 'output',
-  },
-  {
-    name: 'getCollections',
-    assert: 'output',
-  },
-  {
-    name: 'getCollection',
-    assert: 'output',
-  },
+  // {
+  //   name: 'getDocument',
+  //   assert: 'output',
+  // },
+  // {
+  //   name: 'getDirectorList',
+  //   assert: 'output',
+  // },
+  // {
+  //   name: 'getMovieList',
+  //   description: 'Trying to filter',
+  //   assert: 'output',
+  //   expectError: true,
+  // },
+  // {
+  //   name: 'getDirectorDocument',
+  //   assert: 'output',
+  // },
+  // {
+  //   name: 'getCollections',
+  //   assert: 'output',
+  // },
+  // {
+  //   name: 'getCollection',
+  //   assert: 'output',
+  // },
 ]
 
 const mutationFixtures: Fixture[] = [

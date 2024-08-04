@@ -281,6 +281,7 @@ export class Resolver {
   public database: Database
   public tinaSchema: TinaSchema
   public isAudit: boolean
+  public context = {}
   constructor(public init: ResolverConfig) {
     this.config = init.config
     this.database = init.database

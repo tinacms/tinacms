@@ -40,7 +40,8 @@ declare module 'mdast' {
 export const stringifyMDX = (
   value: Plate.RootElement,
   field: RichTextType,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context: Record<string, any> = {}
 ) => {
   if (field.parser?.type === 'markdown') {
     return stringifyMDXNext(value, field, imageCallback)
@@ -56,7 +57,7 @@ export const stringifyMDX = (
       return value.children[0].value
     }
   }
-  const tree = rootElement(value, field, imageCallback)
+  const tree = rootElement(value, field, imageCallback, context)
   const res = toTinaMarkdown(tree, field)
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
@@ -147,11 +148,12 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
 export const rootElement = (
   content: Plate.RootElement,
   field: RichTextType,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context: Record<string, any>
 ): Md.Root => {
   const children: Md.Content[] = []
   content.children?.forEach((child) => {
-    const value = blockElement(child, field, imageCallback)
+    const value = blockElement(child, field, imageCallback, context)
     if (value) {
       children.push(value)
     }
@@ -165,7 +167,8 @@ export const rootElement = (
 export const blockElement = (
   content: Plate.BlockElement,
   field: RichTextType,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context: Record<string, any>
 ): Md.Content | null => {
   switch (content.type) {
     case 'h1':
@@ -231,7 +234,7 @@ export const blockElement = (
         }
       }
       const { children, attributes, useDirective, directiveType } =
-        stringifyProps(content, field, false, imageCallback)
+        stringifyProps(content, field, false, imageCallback, context)
       if (useDirective) {
         const name = content.name
         if (!name) {
