@@ -41,237 +41,6 @@ export const createResolver = (args: ResolverConfig) => {
   return new Resolver(args)
 }
 
-const resolveFieldData = async (
-  { namespace, ...field }: TinaField<true>,
-  rawData: unknown,
-  accumulator: { [key: string]: unknown },
-  tinaSchema: TinaSchema,
-  config?: GraphQLConfig,
-  isAudit?: boolean
-) => {
-  if (!rawData) {
-    return undefined
-  }
-  assertShape<{ [key: string]: unknown }>(rawData, (yup) => yup.object())
-  const value = rawData[field.name]
-  switch (field.type) {
-    case 'datetime':
-      // See you in March ;)
-      if (value instanceof Date) {
-        accumulator[field.name] = value.toISOString()
-      } else {
-        accumulator[field.name] = value
-      }
-      break
-    case 'string':
-    case 'boolean':
-    case 'number':
-      accumulator[field.name] = value
-      break
-    case 'reference':
-      if (value) {
-        accumulator[field.name] = value
-      }
-      break
-    case 'password':
-      accumulator[field.name] = {
-        value: undefined, // never resolve the password hash
-        passwordChangeRequired: value['passwordChangeRequired'] ?? false,
-      }
-      break
-    case 'image':
-      accumulator[field.name] = resolveMediaRelativeToCloud(
-        value as string,
-        config,
-        tinaSchema.schema
-      )
-      break
-    case 'rich-text':
-      // @ts-ignore value is unknown
-      const tree = parseMDX(value, field, (value) =>
-        resolveMediaRelativeToCloud(value, config, tinaSchema.schema)
-      )
-      if (tree?.children[0]?.type === 'invalid_markdown') {
-        if (isAudit) {
-          const invalidNode = tree?.children[0]
-          throw new GraphQLError(
-            `${invalidNode?.message}${
-              invalidNode.position
-                ? ` at line ${invalidNode.position.start.line}, column ${invalidNode.position.start.column}`
-                : ''
-            }`
-          )
-        }
-      }
-      accumulator[field.name] = tree
-      break
-    case 'object':
-      if (field.list) {
-        if (!value) {
-          return
-        }
-
-        assertShape<{ [key: string]: unknown }[]>(value, (yup) =>
-          yup.array().of(yup.object().required())
-        )
-        accumulator[field.name] = await sequential(value, async (item) => {
-          const template = tinaSchema.getTemplateForData({
-            data: item,
-            collection: {
-              namespace,
-              ...field,
-            },
-          })
-          const payload = {}
-          await sequential(template.fields, async (field) => {
-            await resolveFieldData(
-              field,
-              item,
-              payload,
-              tinaSchema,
-              config,
-              isAudit
-            )
-          })
-          const isUnion = !!field.templates
-          return isUnion
-            ? {
-                _template: lastItem(template.namespace),
-                ...payload,
-              }
-            : payload
-        })
-      } else {
-        if (!value) {
-          return
-        }
-
-        const template = tinaSchema.getTemplateForData({
-          data: value,
-          collection: {
-            namespace,
-            ...field,
-          },
-        })
-        const payload = {}
-        await sequential(template.fields, async (field) => {
-          await resolveFieldData(
-            field,
-            value,
-            payload,
-            tinaSchema,
-            config,
-            isAudit
-          )
-        })
-        const isUnion = !!field.templates
-        accumulator[field.name] = isUnion
-          ? {
-              _template: lastItem(template.namespace),
-              ...payload,
-            }
-          : payload
-      }
-
-      break
-    default:
-      return field
-  }
-  return accumulator
-}
-
-export const transformDocumentIntoPayload = async (
-  fullPath: string,
-  rawData: { _collection; _template },
-  tinaSchema: TinaSchema,
-  config?: GraphQLConfig,
-  isAudit?: boolean
-) => {
-  const collection = tinaSchema.getCollection(rawData._collection)
-  try {
-    const template = tinaSchema.getTemplateForData({
-      data: rawData,
-      collection,
-    })
-
-    const {
-      base: basename,
-      ext: extension,
-      name: filename,
-    } = path.parse(fullPath)
-
-    const relativePath = fullPath
-      .replace(/\\/g, '/')
-      .replace(collection.path, '')
-      .replace(/^\/|\/$/g, '')
-
-    const breadcrumbs = relativePath.replace(extension, '').split('/')
-
-    const data = {
-      _collection: rawData._collection,
-      _template: rawData._template,
-    }
-    try {
-      await sequential(template.fields, async (field) => {
-        return resolveFieldData(
-          field,
-          rawData,
-          data,
-          tinaSchema,
-          config,
-          isAudit
-        )
-      })
-    } catch (e) {
-      throw new TinaParseDocumentError({
-        originalError: e,
-        collection: collection.name,
-        includeAuditMessage: !isAudit,
-        file: relativePath,
-        stack: e.stack,
-      })
-    }
-
-    const titleField = template.fields.find((x) => {
-      // @ts-ignore
-      if (x.type === 'string' && x?.isTitle) {
-        return true
-      }
-    })
-    const titleFieldName = titleField?.name
-    const title = data[titleFieldName || ' '] || null
-
-    return {
-      __typename: collection.fields
-        ? NAMER.documentTypeName(collection.namespace)
-        : NAMER.documentTypeName(template.namespace),
-      id: fullPath,
-      ...data,
-      _sys: {
-        title: title || '',
-        basename,
-        filename,
-        extension,
-        path: fullPath,
-        relativePath,
-        breadcrumbs,
-        collection,
-        template: lastItem(template.namespace),
-      },
-      _values: data,
-      _rawData: rawData,
-    }
-  } catch (e) {
-    if (e instanceof TinaGraphQLError) {
-      // Attach additional information
-      throw new TinaGraphQLError(e.message, {
-        requestedDocument: fullPath,
-        ...e.extensions,
-      })
-    }
-    throw e
-  }
-}
 /**
  * The resolver provides functions for all possible types of lookup
  * values and retrieves them from the database
@@ -334,7 +103,7 @@ export class Resolver {
         path: rawData['__folderPath'],
       }
     } else {
-      return transformDocumentIntoPayload(
+      return this.transformDocumentIntoPayload(
         fullPath,
         rawData,
         this.tinaSchema,
@@ -349,13 +118,251 @@ export class Resolver {
     }
 
     const rawData = await this.getRaw(fullPath)
-    return transformDocumentIntoPayload(
+    return this.transformDocumentIntoPayload(
       fullPath,
       rawData,
       this.tinaSchema,
       this.config,
       this.isAudit
     )
+  }
+
+  async transformDocumentIntoPayload(
+    fullPath: string,
+    rawData: { _collection; _template },
+    tinaSchema: TinaSchema,
+    config?: GraphQLConfig,
+    isAudit?: boolean
+  ) {
+    this.context = { ...rawData }
+    delete rawData['embeds']
+    const collection = tinaSchema.getCollection(rawData._collection)
+    try {
+      const template = tinaSchema.getTemplateForData({
+        data: rawData,
+        collection,
+      })
+
+      const {
+        base: basename,
+        ext: extension,
+        name: filename,
+      } = path.parse(fullPath)
+
+      const relativePath = fullPath
+        .replace(/\\/g, '/')
+        .replace(collection.path, '')
+        .replace(/^\/|\/$/g, '')
+
+      const breadcrumbs = relativePath.replace(extension, '').split('/')
+
+      const data = {
+        _collection: rawData._collection,
+        _template: rawData._template,
+      }
+      try {
+        await sequential(template.fields, async (field) => {
+          return this.resolveFieldData(
+            field,
+            rawData,
+            data,
+            tinaSchema,
+            config,
+            isAudit
+          )
+        })
+      } catch (e) {
+        throw new TinaParseDocumentError({
+          originalError: e,
+          collection: collection.name,
+          includeAuditMessage: !isAudit,
+          file: relativePath,
+          stack: e.stack,
+        })
+      }
+
+      const titleField = template.fields.find((x) => {
+        // @ts-ignore
+        if (x.type === 'string' && x?.isTitle) {
+          return true
+        }
+      })
+      const titleFieldName = titleField?.name
+      const title = data[titleFieldName || ' '] || null
+
+      return {
+        __typename: collection.fields
+          ? NAMER.documentTypeName(collection.namespace)
+          : NAMER.documentTypeName(template.namespace),
+        id: fullPath,
+        ...data,
+        _sys: {
+          title: title || '',
+          basename,
+          filename,
+          extension,
+          path: fullPath,
+          relativePath,
+          breadcrumbs,
+          collection,
+          template: lastItem(template.namespace),
+        },
+        _values: data,
+        _rawData: rawData,
+      }
+    } catch (e) {
+      if (e instanceof TinaGraphQLError) {
+        // Attach additional information
+        throw new TinaGraphQLError(e.message, {
+          requestedDocument: fullPath,
+          ...e.extensions,
+        })
+      }
+      throw e
+    }
+  }
+
+  async resolveFieldData(
+    { namespace, ...field }: TinaField<true>,
+    rawData: unknown,
+    accumulator: { [key: string]: unknown },
+    tinaSchema: TinaSchema,
+    config?: GraphQLConfig,
+    isAudit?: boolean
+  ) {
+    if (!rawData) {
+      return undefined
+    }
+    assertShape<{ [key: string]: unknown }>(rawData, (yup) => yup.object())
+    const value = rawData[field.name]
+    switch (field.type) {
+      case 'datetime':
+        // See you in March ;)
+        if (value instanceof Date) {
+          accumulator[field.name] = value.toISOString()
+        } else {
+          accumulator[field.name] = value
+        }
+        break
+      case 'string':
+      case 'boolean':
+      case 'number':
+        accumulator[field.name] = value
+        break
+      case 'reference':
+        if (value) {
+          accumulator[field.name] = value
+        }
+        break
+      case 'password':
+        accumulator[field.name] = {
+          value: undefined, // never resolve the password hash
+          passwordChangeRequired: value['passwordChangeRequired'] ?? false,
+        }
+        break
+      case 'image':
+        accumulator[field.name] = resolveMediaRelativeToCloud(
+          value as string,
+          config,
+          tinaSchema.schema
+        )
+        break
+      case 'rich-text':
+        const tree = parseMDX(
+          // @ts-ignore value is unknown
+          value,
+          field,
+          (value) =>
+            resolveMediaRelativeToCloud(value, config, tinaSchema.schema),
+          this.context
+        )
+        if (tree?.children[0]?.type === 'invalid_markdown') {
+          if (isAudit) {
+            const invalidNode = tree?.children[0]
+            throw new GraphQLError(
+              `${invalidNode?.message}${
+                invalidNode.position
+                  ? ` at line ${invalidNode.position.start.line}, column ${invalidNode.position.start.column}`
+                  : ''
+              }`
+            )
+          }
+        }
+        accumulator[field.name] = tree
+        break
+      case 'object':
+        if (field.list) {
+          if (!value) {
+            return
+          }
+
+          assertShape<{ [key: string]: unknown }[]>(value, (yup) =>
+            yup.array().of(yup.object().required())
+          )
+          accumulator[field.name] = await sequential(value, async (item) => {
+            const template = tinaSchema.getTemplateForData({
+              data: item,
+              collection: {
+                namespace,
+                ...field,
+              },
+            })
+            const payload = {}
+            await sequential(template.fields, async (field) => {
+              await this.resolveFieldData(
+                field,
+                item,
+                payload,
+                tinaSchema,
+                config,
+                isAudit
+              )
+            })
+            const isUnion = !!field.templates
+            return isUnion
+              ? {
+                  _template: lastItem(template.namespace),
+                  ...payload,
+                }
+              : payload
+          })
+        } else {
+          if (!value) {
+            return
+          }
+
+          const template = tinaSchema.getTemplateForData({
+            data: value,
+            collection: {
+              namespace,
+              ...field,
+            },
+          })
+          const payload = {}
+          await sequential(template.fields, async (field) => {
+            await this.resolveFieldData(
+              field,
+              value,
+              payload,
+              tinaSchema,
+              config,
+              isAudit
+            )
+          })
+          const isUnion = !!field.templates
+          accumulator[field.name] = isUnion
+            ? {
+                _template: lastItem(template.namespace),
+                ...payload,
+              }
+            : payload
+        }
+
+        break
+      default:
+        return field
+    }
+    return accumulator
   }
 
   public deleteDocument = async (fullPath: unknown) => {
@@ -556,6 +563,9 @@ export class Resolver {
     const doc = await this.getDocument(realPath)
 
     const oldDoc = this.resolveLegacyValues(doc?._rawData || {}, collection)
+    let values: {
+      [key: string]: unknown
+    }
     /**
      * TODO: Remove when `addPendingDocument` is no longer needed.
      */
@@ -567,19 +577,15 @@ export class Resolver {
       switch (templateInfo.type) {
         case 'object':
           if (params) {
-            const values = await this.buildFieldMutations(
+            const mutationValues = await this.buildFieldMutations(
               params,
               templateInfo.template,
               doc?._rawData
             )
-            await this.database.put(
-              realPath,
-              { ...oldDoc, ...values },
-              collection.name
-            )
+            values = { ...oldDoc, ...mutationValues }
           }
           break
-        case 'union':
+        case 'union': {
           // FIXME: ensure only one field is passed here
           await sequential(templateInfo.templates, async (template) => {
             const templateParams = params[lastItem(template.namespace)]
@@ -589,7 +595,7 @@ export class Resolver {
                   `Expected to find an object for template params, but got string`
                 )
               }
-              const values = {
+              values = {
                 ...oldDoc,
                 ...(await this.buildFieldMutations(
                   // @ts-ignore FIXME: failing on unknown, which we don't need to know because it's recursive
@@ -599,21 +605,22 @@ export class Resolver {
                 )),
                 _template: lastItem(template.namespace),
               }
-              await this.database.put(realPath, values, collection.name)
             }
           })
+        }
       }
-      return this.getDocument(realPath)
+    } else {
+      const params = await this.buildObjectMutations(
+        //@ts-expect-error FIXME: Argument of type 'unknown' is not assignable to parameter of type 'FieldParams'
+        isCollectionSpecific ? args.params : args.params[collection.name],
+        collection,
+        doc?._rawData
+      )
+      values = { ...oldDoc, ...params }
     }
 
-    const params = await this.buildObjectMutations(
-      //@ts-ignore
-      isCollectionSpecific ? args.params : args.params[collection.name],
-      collection,
-      doc?._rawData
-    )
-    //@ts-ignore
-    await this.database.put(realPath, { ...oldDoc, ...params }, collection.name)
+    const embeds = this.context?.embeds ? { embeds: this.context.embeds } : {}
+    await this.database.put(realPath, { ...values, ...embeds }, collection.name)
     return this.getDocument(realPath)
   }
 
@@ -1049,13 +1056,17 @@ export class Resolver {
           }
           break
         case 'rich-text':
-          // @ts-ignore
-          accum[fieldName] = stringifyMDX(fieldValue, field, (fieldValue) =>
-            resolveMediaCloudToRelative(
-              fieldValue as string,
-              this.config,
-              this.tinaSchema.schema
-            )
+          accum[fieldName] = stringifyMDX(
+            // @ts-ignore
+            fieldValue,
+            field,
+            (fieldValue) =>
+              resolveMediaCloudToRelative(
+                fieldValue as string,
+                this.config,
+                this.tinaSchema.schema
+              ),
+            this.context
           )
           break
         case 'reference':

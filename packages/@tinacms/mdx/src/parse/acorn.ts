@@ -90,7 +90,7 @@ const extractAttribute = (
               const value = get(context, attribute.value.value)
               if (typeof value === 'string') {
                 const ast = parseMDX(value, field, imageCallback, context)
-                ast.embedCode = attribute.value.value
+                ast.embedCode = attribute.value.value.split('.')[1]
                 return ast
               }
             }

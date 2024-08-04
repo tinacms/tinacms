@@ -241,8 +241,7 @@ export function stringifyProps(
             }
             return result
           }
-          const code =
-            value.embedCode?.split('.')[1] || generateRandom6LetterString()
+          const code = value.embedCode || generateRandom6LetterString()
           if (field.name === 'children') {
             const root = rootElement(value, field, imageCallback, context)
             root.children.forEach((child) => {
