@@ -25,6 +25,9 @@ interface ReferenceSelectProps {
 interface Node {
   id: string
   _internalSys: {
+    filename: string | null
+  }
+  _values: {
     title: string | null
   }
 }
@@ -51,6 +54,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
 
   React.useEffect(() => {
     const fetchOptionSets = async () => {
+      console.log(collections)
       const optionSets = await Promise.all(
         collections.map(async (collection) => {
           try {
@@ -65,8 +69,14 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
                         id,
                       }
                       ...on Document {
+                        _values
                         _internalSys: _sys {
-                          title
+                          filename
+                          basename
+                          breadcrumbs
+                          path
+                          relativePath
+                          extension
                         }
                       }
                     }
@@ -144,11 +154,13 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
                 ({
                   node: {
                     id,
-                    _internalSys: { title },
+                    _internalSys: { filename },
+                    _values: { title },
                   },
                 }) => (
                   <option key={`${id}-option`} value={id}>
                     {title || id}
+                    <p>{filename}</p>
                   </option>
                 )
               )}
@@ -159,33 +171,21 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
     </>
   )
 }
-const frameworks = [
-  {
-    value: 'next.js',
-    label: 'Next.js',
-  },
-  {
-    value: 'sveltekit',
-    label: 'SvelteKit',
-  },
-  {
-    value: 'nuxt.js',
-    label: 'Nuxt.js',
-  },
-  {
-    value: 'remix',
-    label: 'Remix',
-  },
-  {
-    value: 'astro',
-    label: 'Astro',
-  },
-]
 
-const ComboboxDemo = ({ cms, input, field }) => {
+const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
+  cms,
+  input,
+  field,
+}) => {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState('')
-  console.log('frameworks', value)
+
+  const { optionSets, loading } = useGetOptionSets(cms, field.collections)
+
+  optionSets.map(({ collection, edges }: OptionSet) => {
+    console.log('frameworks edges', edges)
+  })
+
   return (
     <>
       <Popover open={open} onOpenChange={setOpen}>
@@ -196,38 +196,46 @@ const ComboboxDemo = ({ cms, input, field }) => {
             aria-expanded={open}
             className="w-[200px] justify-between"
           >
-            {value
-              ? frameworks.find((framework) => framework.value === value)?.label
-              : 'Select framework...'}
+            {value ? value : 'Select reference...'}
             {/* <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /> */}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0 relative">
           <Command>
             <CommandInput placeholder="Search framework..." />
-            <CommandEmpty>No framework found.</CommandEmpty>
-            <CommandGroup>
-              <CommandList>
-                {frameworks.map((framework) => (
-                  <CommandItem
-                    key={framework.value}
-                    value={framework.value}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue === value ? '' : currentValue)
-                      setOpen(false)
-                    }}
-                  >
-                    {/* <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === framework.value ? "opacity-100" : "opacity-0"
-                      )}
-                    /> */}
-                    {framework.label}
-                  </CommandItem>
-                ))}
-              </CommandList>
-            </CommandGroup>
+            <CommandEmpty>No reference found</CommandEmpty>
+            {optionSets.length > 0 &&
+              optionSets.map(({ collection, edges }: OptionSet) => (
+                <CommandGroup key={`${collection}-group`} title={collection}>
+                  <CommandList>
+                    {edges.map(
+                      ({
+                        node: {
+                          id,
+                          _internalSys: { filename },
+                          _values: { title },
+                        },
+                      }) => (
+                        <CommandItem
+                          key={`${id}-option`}
+                          value={id}
+                          onSelect={(currentValue) => {
+                            setValue(currentValue === value ? '' : currentValue)
+                            setOpen(false)
+                          }}
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-base">
+                              {title || id}
+                            </span>
+                            <span className="text-x">{filename}</span>
+                          </div>
+                        </CommandItem>
+                      )
+                    )}
+                  </CommandList>
+                </CommandGroup>
+              ))}
           </Command>
         </PopoverContent>
       </Popover>
