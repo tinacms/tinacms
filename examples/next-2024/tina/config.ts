@@ -32,6 +32,7 @@ export default defineConfig({
         name: 'post',
         label: 'Posts',
         path: 'content/posts',
+        format: 'mdx',
         fields: [
           {
             type: 'string',
@@ -50,6 +51,15 @@ export default defineConfig({
             type: 'rich-text',
             label: 'Test Templates',
             name: 'template',
+            isBody: true,
+            toolbarOverride: [
+              'heading',
+              'bold',
+              'italic',
+              'image',
+              'link',
+              'embed',
+            ],
             templates: [
               {
                 name: 'DateTime',

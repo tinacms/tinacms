@@ -83,6 +83,7 @@ export type toolbarItemName =
   | 'bold'
   | 'italic'
   | 'raw'
+  | 'embed'
 
 export function Toolbar({
   templates,
@@ -97,7 +98,7 @@ export function Toolbar({
   const { setRawMode } = useEditorContext()
   const showEmbed = templates.length > 0
   const toolbarRef = React.useRef(null)
-  const editor = useEditorState()!
+  const editor = useEditorState()
   const isBoldActive = helpers.isMarkActive(editor, MARK_BOLD)
   const isCodeActive = helpers.isMarkActive(editor, MARK_CODE)
   const isItalicActive = helpers.isMarkActive(editor, MARK_ITALIC)
@@ -226,6 +227,7 @@ export function Toolbar({
       active: false,
       onMouseDown: () => setRawMode(true),
     },
+    embed: { label: '', name: 'embed', active: false, tinaForm },
   }
 
   const toolbarItems: ToolbarItemType[] =

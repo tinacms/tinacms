@@ -64,6 +64,7 @@ const ToolbarButton = withTooltip(
     {
       isDropdown?: boolean
       pressed?: boolean
+      showArrow?: boolean
     } & Omit<
       React.ComponentPropsWithoutRef<typeof ToolbarToggleItem>,
       'asChild' | 'value'
@@ -71,7 +72,16 @@ const ToolbarButton = withTooltip(
       VariantProps<typeof toolbarButtonVariants>
   >(
     (
-      { children, className, isDropdown, pressed, size, variant, ...props },
+      {
+        children,
+        className,
+        isDropdown = true,
+        showArrow,
+        pressed,
+        size,
+        variant,
+        ...props
+      },
       ref
     ) => {
       return typeof pressed === 'boolean' ? (
@@ -93,7 +103,7 @@ const ToolbarButton = withTooltip(
             value={pressed ? 'single' : ''}
             {...props}
           >
-            {isDropdown ? (
+            {isDropdown && showArrow ? (
               <>
                 <div className="flex flex-1">{children}</div>
                 <div>

@@ -35,10 +35,8 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
   const [open, setOpen] = useState(false)
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger className="ring-none focus-none focus-visible:ring-none w-full h-full cursor-pointer relative inline-flex items-center px-2 py-2 rounded-r-md text-sm font-medium transition-all ease-out duration-150">
-        <span className="text-sm font-semibold tracking-wide align-baseline mr-1">
-          Embed
-        </span>
+      <DropdownMenuTrigger className="inline-flex items-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg:not([data-icon])]:size-5 h-9 px-2 bg-transparent hover:bg-muted hover:text-muted-foreground aria-checked:bg-accent aria-checked:text-accent-foreground my-1 justify-between pr-1">
+        <span className="flex">Embed</span>
         <PlusIcon
           className={`origin-center transition-all ease-out duration-150 ${
             open ? 'rotate-45' : ''

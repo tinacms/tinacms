@@ -26,7 +26,9 @@ export const IndentListToolbarButton = withRef<
       ref={ref}
       tooltip={nodeType === ELEMENT_UL ? 'Bulleted List' : 'Numbered List'}
       {...props}
-      onClick={() => {
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
         toggleList(editor, { type: nodeType })
       }}
     >

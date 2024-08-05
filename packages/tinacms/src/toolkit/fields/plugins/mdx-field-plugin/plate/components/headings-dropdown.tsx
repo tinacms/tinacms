@@ -104,13 +104,14 @@ export function HeadingsMenu(props: DropdownMenuProps) {
     <DropdownMenu modal={false} {...openState} {...props}>
       <DropdownMenuTrigger asChild>
         <ToolbarButton
-          className="lg:min-w-[130px]"
+          // className="lg:min-w-[130px]"
+          showArrow
           isDropdown
           pressed={openState.open}
           tooltip="Headings"
         >
-          <SelectedItemIcon className="size-5 lg:hidden" />
-          <span className="max-lg:hidden">{selectedItemLabel}</span>
+          <SelectedItemIcon className="size-5" />
+          <span className="hidden 2xl:flex">{selectedItemLabel}</span>
         </ToolbarButton>
       </DropdownMenuTrigger>
 

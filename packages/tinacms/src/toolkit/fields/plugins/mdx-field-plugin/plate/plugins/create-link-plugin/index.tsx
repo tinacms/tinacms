@@ -68,7 +68,7 @@ export const LinkForm = (props) => {
     title: string
   }>({ url: '', title: '' })
   const [formValues, setFormValues] = React.useState<any>({})
-  const editor = useEditorState()!
+  const editor = useEditorState()
   // Memoize selection so we hang onto when editor loses focus
   const selection = React.useMemo(() => editor.selection, [])
   useEffect(() => {

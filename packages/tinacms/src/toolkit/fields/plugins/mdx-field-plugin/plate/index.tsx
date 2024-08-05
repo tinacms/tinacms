@@ -27,6 +27,7 @@ import FloatingToolbarButtons from './components/floating-toolbar-buttons'
 import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar'
 import { isUrl } from './transforms/is-url'
 import { ToolbarProvider } from './toolbar/toolbar-provider'
+import ToolbarOverrideButtons from './toolbar/toolbar-overrides'
 
 export const RichEditor = (props: RichTextType) => {
   const initialValue = React.useMemo(
@@ -86,7 +87,7 @@ export const RichEditor = (props: RichTextType) => {
   }, [props.field.experimental_focusIntent, ref])
 
   return (
-    <div ref={ref} className={withToolbar ? 'with-toolbar' : ''}>
+    <div ref={ref}>
       <Plate
         id={id}
         initialValue={initialValue}
@@ -106,6 +107,8 @@ export const RichEditor = (props: RichTextType) => {
           >
             <FixedToolbar>
               <FixedToolbarButtons />
+              {/* Custom Toolbar Buttons use the below commented code */}
+              {/* <ToolbarOverrideButtons /> */}
             </FixedToolbar>
             <FloatingToolbar>
               <FloatingToolbarButtons />
