@@ -93,8 +93,8 @@ export default defineSchema({
       fields: [
         {
           type: 'string',
-          label: 'Name',
-          name: 'name',
+          label: 'Title',
+          name: 'title',
           required: true,
         },
       ],
