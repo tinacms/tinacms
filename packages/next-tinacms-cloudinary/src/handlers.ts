@@ -97,6 +97,7 @@ async function listMedia(
       directory = '""',
       limit = 500,
       offset,
+      filesOnly = false,
     } = req.query as MediaListOptions
 
     const useRootDirectory =
@@ -122,34 +123,37 @@ async function listMedia(
     }
     let folders: string[] = []
     let folderRes = null
+    const loadFolders = !(filesOnly == 'true')
 
-    try {
-      // @ts-ignore
-      folderRes = await cloudinary.api.folders(directory)
-    } catch (e) {
-      // If the folder doesn't exist, just return an empty array
-      if (e.error?.message.startsWith("Can't find folder with path")) {
-        // ignore
-      } else {
-        console.error('Error getting folders')
-        console.error(e)
-        throw e
-      }
-    }
-
-    if (folderRes?.folders) {
-      folders = folderRes.folders.map(function (folder: {
-        name: string
-        path: string
-      }): Media {
-        'empty-repo/004'
-        return {
-          id: folder.path,
-          type: 'dir',
-          filename: path.basename(folder.path),
-          directory: path.dirname(folder.path),
+    if (loadFolders) {
+      try {
+        // @ts-ignore
+        folderRes = await cloudinary.api.folders(directory)
+      } catch (e) {
+        // If the folder doesn't exist, just return an empty array
+        if (e.error?.message.startsWith("Can't find folder with path")) {
+          // ignore
+        } else {
+          console.error('Error getting folders')
+          console.error(e)
+          throw e
         }
-      })
+      }
+
+      if (folderRes?.folders) {
+        folders = folderRes.folders.map(function (folder: {
+          name: string
+          path: string
+        }): Media {
+          'empty-repo/004'
+          return {
+            id: folder.path,
+            type: 'dir',
+            filename: path.basename(folder.path),
+            directory: path.dirname(folder.path),
+          }
+        })
+      }
     }
 
     res.json({
