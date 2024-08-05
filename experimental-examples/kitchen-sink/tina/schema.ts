@@ -49,7 +49,7 @@ export default defineSchema({
           label: 'Author',
           name: 'author',
           type: 'reference',
-          collections: ['author'],
+          collections: ['author', 'post'],
         },
       ],
     },
@@ -93,8 +93,8 @@ export default defineSchema({
       fields: [
         {
           type: 'string',
-          label: 'Title',
-          name: 'title',
+          label: 'Name',
+          name: 'name',
           required: true,
         },
       ],

@@ -22,20 +22,23 @@ interface ReferenceSelectProps {
   field: ReferenceFieldProps & Field
 }
 
+type Edge = {
+  node: Node
+}
+
 interface Node {
   id: string
   _internalSys: {
-    filename: string | null
+    filename: string
   }
   _values: {
     title: string | null
+    name: string | null
   }
 }
 interface OptionSet {
   collection: string
-  edges: {
-    node: Node
-  }[]
+  edges: Edge[]
 }
 
 interface Response {
@@ -54,7 +57,6 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
 
   React.useEffect(() => {
     const fetchOptionSets = async () => {
-      console.log(collections)
       const optionSets = await Promise.all(
         collections.map(async (collection) => {
           try {
@@ -115,61 +117,16 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
   return { optionSets, loading }
 }
 
-const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
-  cms,
-  input,
-  field,
-}) => {
-  const { optionSets, loading } = useGetOptionSets(cms, field.collections)
-  const ref = React.useRef(null)
-  React.useEffect(() => {
-    if (ref.current && field.experimental_focusIntent) {
-      ref.current.focus()
-    }
-  }, [field.experimental_focusIntent, ref])
-
-  if (loading === true) {
-    return <LoadingDots color="var(--tina-color-primary)" />
-  }
-
-  console.log('cms', cms)
-  console.log('input', input)
-  console.log('field', field)
-
-  return (
-    <>
-      <select
-        ref={ref}
-        id={input.name}
-        value={input.value}
-        onChange={input.onChange}
-        className={selectFieldClasses}
-        {...input}
-      >
-        <option value={''}>Choose an option</option>
-        {optionSets.length > 0 &&
-          optionSets.map(({ collection, edges }: OptionSet) => (
-            <optgroup key={`${collection}-group`} label={collection}>
-              {edges.map(
-                ({
-                  node: {
-                    id,
-                    _internalSys: { filename },
-                    _values: { title },
-                  },
-                }) => (
-                  <option key={`${id}-option`} value={id}>
-                    {title || id}
-                    <p>{filename}</p>
-                  </option>
-                )
-              )}
-            </optgroup>
-          ))}
-      </select>
-      <MdKeyboardArrowDown className="absolute top-1/2 right-3 w-6 h-auto -translate-y-1/2 text-gray-300 group-hover:text-blue-500 transition duration-150 ease-out" />
-    </>
+//function to get filename from optionSets for display text in combobox
+//file name is used for display text because title can be nullable (user can defined name rather than title field)
+const getFilename = (optionSets: OptionSet[], value: string): string | null => {
+  // Flatten the optionSets array to a single array of nodes
+  const nodes = optionSets.flatMap((optionSet) =>
+    optionSet.edges.map((edge) => edge.node)
   )
+  const node = nodes.find((node) => node.id === value)
+
+  return node ? node._internalSys.filename : null
 }
 
 const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
@@ -177,15 +134,15 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   input,
   field,
 }) => {
-  const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState('')
-
+  const [open, setOpen] = React.useState<boolean>(false)
+  const [value, setValue] = React.useState<string | null>(input.value)
+  const [displayText, setDisplayText] = React.useState<string | null>(null) //store display text for selected option
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
 
   React.useEffect(() => {
-    // Update form state when the value changes
+    setDisplayText(getFilename(optionSets, value))
     input.onChange(value)
-  }, [value, input])
+  }, [value, input, optionSets])
 
   if (loading === true) {
     return <LoadingDots color="var(--tina-color-primary)" />
@@ -201,10 +158,10 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
             aria-expanded={open}
             className="w-[200px] justify-between"
           >
-            <p className="truncate">{value ? value : 'Choose an option...'}</p>
+            <p className="truncate">{displayText ?? 'Choose an option...'}</p>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className=" p-0 relative">
+        <PopoverContent className="p-0 relative">
           <Command>
             <CommandInput placeholder="Search reference..." />
             <CommandEmpty>No reference found</CommandEmpty>
@@ -217,22 +174,24 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                         node: {
                           id,
                           _internalSys: { filename },
-                          _values: { title },
+                          _values: { title, name },
                         },
                       }) => (
                         <CommandItem
                           key={`${id}-option`}
                           value={id}
-                          onSelect={(currentValue) => {
-                            setValue(currentValue === value ? '' : currentValue)
+                          onSelect={() => {
+                            setValue(id)
                             setOpen(false)
                           }}
                         >
                           <div className="flex flex-col">
                             <span className="font-semibold text-sm">
-                              {title || id}
+                              {title || name || id}
                             </span>
-                            <span className="text-x">{filename}</span>
+                            {(title || name) && (
+                              <span className="text-x">{filename}</span>
+                            )}
                           </div>
                         </CommandItem>
                       )
@@ -247,5 +206,4 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   )
 }
 
-// export default ReferenceSelect
 export default ComboboxDemo
