@@ -182,9 +182,14 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
 
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
 
-  optionSets.map(({ collection, edges }: OptionSet) => {
-    console.log('frameworks edges', edges)
-  })
+  React.useEffect(() => {
+    // Update form state when the value changes
+    input.onChange(value)
+  }, [value, input])
+
+  if (loading === true) {
+    return <LoadingDots color="var(--tina-color-primary)" />
+  }
 
   return (
     <>
@@ -196,17 +201,16 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
             aria-expanded={open}
             className="w-[200px] justify-between"
           >
-            {value ? value : 'Select reference...'}
-            {/* <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /> */}
+            <p className="truncate">{value ? value : 'Choose an option...'}</p>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0 relative">
+        <PopoverContent className=" p-0 relative">
           <Command>
-            <CommandInput placeholder="Search framework..." />
+            <CommandInput placeholder="Search reference..." />
             <CommandEmpty>No reference found</CommandEmpty>
             {optionSets.length > 0 &&
               optionSets.map(({ collection, edges }: OptionSet) => (
-                <CommandGroup key={`${collection}-group`} title={collection}>
+                <CommandGroup key={`${collection}-group`} heading={collection}>
                   <CommandList>
                     {edges.map(
                       ({
@@ -225,7 +229,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                           }}
                         >
                           <div className="flex flex-col">
-                            <span className="font-semibold text-base">
+                            <span className="font-semibold text-sm">
                               {title || id}
                             </span>
                             <span className="text-x">{filename}</span>
