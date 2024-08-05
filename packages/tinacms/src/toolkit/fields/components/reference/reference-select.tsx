@@ -156,7 +156,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-[200px] justify-between"
+            className="w-52 justify-between"
           >
             <p className="truncate">{displayText ?? 'Choose an option...'}</p>
           </Button>
