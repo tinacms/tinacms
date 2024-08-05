@@ -1,5 +1,43 @@
 # tinacms-cli
 
+## 1.5.52
+
+### Patch Changes
+
+- Updated dependencies [4128128]
+  - @tinacms/app@2.0.2
+
+## 1.5.51
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+  - @tinacms/schema-tools@1.5.0
+  - @tinacms/app@2.0.1
+  - @tinacms/graphql@1.4.39
+  - @tinacms/search@1.0.24
+
+## 1.5.50
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [957fa26]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/app@2.0.0
+  - @tinacms/graphql@1.4.38
+  - @tinacms/schema-tools@1.4.19
+  - tinacms@2.0.0
+  - @tinacms/metrics@1.0.5
+  - @tinacms/search@1.0.23
+
 ## 1.5.49
 
 ### Patch Changes

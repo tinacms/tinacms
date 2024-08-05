@@ -240,6 +240,18 @@ export type PasswordField = (
     type: 'password'
   }
 
+type toolbarItemName =
+  | 'heading'
+  | 'link'
+  | 'image'
+  | 'quote'
+  | 'ul'
+  | 'ol'
+  | 'code'
+  | 'codeBlock'
+  | 'bold'
+  | 'italic'
+  | 'raw'
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
@@ -254,6 +266,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
      * will be stored as frontmatter
      */
     isBody?: boolean
+    toolbarOverride?: toolbarItemName[]
     templates?: RichTextTemplate<WithNamespace>[]
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser

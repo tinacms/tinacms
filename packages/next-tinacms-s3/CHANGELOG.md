@@ -1,5 +1,26 @@
 # next-tinacms-s3
 
+## 4.0.0
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+
+## 3.0.0
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 957fa26: update to React 18
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [957fa26]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - tinacms@2.0.0
+
 ## 2.0.7
 
 ### Patch Changes
