@@ -202,7 +202,11 @@ export function MediaPicker({
 
     return cms.events.subscribe(
       ['media:delete:success', 'media:pageSize'],
-      () => loadMedia()
+      () => {
+        setRefreshing(true)
+        resetOffset()
+        resetList()
+      }
     )
   }, [offset, directory, cms.media.isConfigured])
 
@@ -224,10 +228,10 @@ export function MediaPicker({
     }
   }
 
-  let deleteMediaItem: (_item: Media) => void
+  let deleteMediaItem: (_item: Media) => Promise<void>
   if (allowDelete) {
-    deleteMediaItem = (item: Media) => {
-      cms.media.delete(item)
+    deleteMediaItem = async (item: Media) => {
+      await cms.media.delete(item)
     }
   }
 
@@ -379,9 +383,9 @@ export function MediaPicker({
       {deleteModalOpen && (
         <DeleteModal
           filename={activeItem ? activeItem.filename : ''}
-          deleteFunc={() => {
+          deleteFunc={async () => {
             if (activeItem) {
-              deleteMediaItem(activeItem)
+              await deleteMediaItem(activeItem)
               setActiveItem(false)
             }
           }}
