@@ -13,7 +13,7 @@ import {
 
 export const ELEMENT_IMG = 'img'
 
-export const createImgPlugin = createPluginFactory({
+const createImgPlugin = createPluginFactory({
   key: ELEMENT_IMG,
   isVoid: true,
   isInline: true,
@@ -45,6 +45,8 @@ export const insertImg = (editor: PlateEditor, media: Media) => {
     })
   }
 
-  // FIXME: not sure why this was needed
+  // Normalizing the editor after insertion
   normalizeEditor(editor, { force: true })
 }
+
+export default createImgPlugin

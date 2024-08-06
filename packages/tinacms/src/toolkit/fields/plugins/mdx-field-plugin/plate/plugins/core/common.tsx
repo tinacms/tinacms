@@ -19,7 +19,6 @@ import {
   createHTMLBlockPlugin,
   createHTMLInlinePlugin,
 } from '../create-code-block'
-import { Editor, Node, Transforms } from 'slate'
 import { ELEMENT_IMG } from '../create-img-plugin'
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins'
 import { HANDLES_MDX } from './formatting'
@@ -33,6 +32,7 @@ import {
   someNode,
 } from '@udecode/plate-common'
 import { createSlashPlugin } from '@udecode/plate-slash-command'
+import { Transforms, Editor } from 'slate'
 
 export const plugins = [
   createHeadingPlugin(),

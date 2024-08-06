@@ -7,14 +7,14 @@ import type { TinaSchema } from '@tinacms/schema-tools'
 import type { GraphQLConfig } from './types'
 import { createSchema } from './schema/createSchema'
 import { createResolver } from './resolver'
-import { assertShape } from './util'
+import { assertShape, get } from './util'
+import set from 'lodash.set'
 
 import type { GraphQLResolveInfo } from 'graphql'
 import type { Database } from './database'
 import { NAMER } from './ast-builder'
 import { handleFetchErrorError } from './resolver/error'
 import { checkPasswordHash, mapUserFields } from './auth/utils'
-import _ from 'lodash'
 import { NotFoundError } from './error'
 
 export const resolve = async ({
@@ -40,7 +40,7 @@ export const resolve = async ({
     const verboseValue = verbose ?? true
     const graphQLSchemaAst = await database.getGraphQLSchema()
     if (!graphQLSchemaAst) {
-      throw new GraphQLError(`GraphQL schema not found`)
+      throw new GraphQLError('GraphQL schema not found')
     }
     const graphQLSchema = buildASTSchema(graphQLSchemaAst)
 
@@ -73,9 +73,8 @@ export const resolve = async ({
         const lookup = await database.getLookup(namedType)
         if (lookup.resolveType === 'unionData') {
           return lookup.typeMap[source._template]
-        } else {
-          throw new Error(`Unable to find lookup key for ${namedType}`)
         }
+        throw new Error(`Unable to find lookup key for ${namedType}`)
       },
       fieldResolver: async (
         source: { [key: string]: undefined | Record<string, unknown> } = {},
@@ -180,7 +179,7 @@ export const resolve = async ({
               .getCollections()
               .find((c) => c.isAuthCollection)
             if (!collection) {
-              throw new Error(`Auth collection not found`)
+              throw new Error('Auth collection not found')
             }
 
             const userFields = mapUserFields(collection, ['_rawData'])
@@ -198,7 +197,7 @@ export const resolve = async ({
 
             const realPath = `${collection.path}/index.json`
             const userDoc = await resolver.getDocument(realPath)
-            const users = _.get(userDoc, userField.path)
+            const users = get(userDoc, userField.path)
             if (!users) {
               throw new Error('No users found')
             }
@@ -212,7 +211,7 @@ export const resolve = async ({
             }
 
             if (info.fieldName === 'authenticate') {
-              const saltedHash = _.get(user, [passwordFieldName || '', 'value'])
+              const saltedHash = get(user, [passwordFieldName || '', 'value'])
               if (!saltedHash) {
                 throw new Error('No password field found on user field')
               }
@@ -224,12 +223,10 @@ export const resolve = async ({
 
               if (matches) {
                 return user
-              } else {
-                return null
               }
-            } else {
-              return user
+              return null
             }
+            return user
           }
 
           if (info.fieldName === 'updatePassword') {
@@ -245,7 +242,7 @@ export const resolve = async ({
               .getCollections()
               .find((c) => c.isAuthCollection)
             if (!collection) {
-              throw new Error(`Auth collection not found`)
+              throw new Error('Auth collection not found')
             }
 
             const userFields = mapUserFields(collection, ['_rawData'])
@@ -262,7 +259,7 @@ export const resolve = async ({
             const userField = userFields[0]
             const realPath = `${collection.path}/index.json`
             const userDoc = await resolver.getDocument(realPath)
-            const users = _.get(userDoc, userField.path)
+            const users = get(userDoc, userField.path)
             if (!users) {
               throw new Error('No users found')
             }
@@ -278,21 +275,20 @@ export const resolve = async ({
             }
 
             const params = {}
-            _.set(
+            set(
               params,
               userField.path.slice(1), // remove _rawData from users path
               users.map((u) => {
                 if (user[idFieldName] === u[idFieldName]) {
                   return user
-                } else {
-                  return {
-                    // don't overwrite other users' passwords
-                    ...u,
-                    [passwordFieldName]: {
-                      ...u[passwordFieldName],
-                      value: '',
-                    },
-                  }
+                }
+                return {
+                  // don't overwrite other users' passwords
+                  ...u,
+                  [passwordFieldName]: {
+                    ...u[passwordFieldName],
+                    value: '',
+                  },
                 }
               })
             )
@@ -336,11 +332,7 @@ export const resolve = async ({
                  */
                 return resolver.getDocument(value)
               }
-              if (
-                args &&
-                args.collection &&
-                info.fieldName === 'addPendingDocument'
-              ) {
+              if (args?.collection && info.fieldName === 'addPendingDocument') {
                 /**
                  * `addPendingDocument`
                  * FIXME: this should probably be it's own lookup
@@ -392,7 +384,8 @@ export const resolve = async ({
                     return { node: document }
                   }),
                 }
-              } else if (
+              }
+              if (
                 info.fieldName === 'documents' &&
                 value?.collection &&
                 value?.hasDocuments
@@ -427,11 +420,10 @@ export const resolve = async ({
                   // @ts-ignore
                   collection: value.collection,
                 })
-              } else {
-                throw new Error(
-                  `Expected an array for result of ${info.fieldName} at ${info.path}`
-                )
               }
+              throw new Error(
+                `Expected an array for result of ${info.fieldName} at ${info.path}`
+              )
             /**
              * Collections-specific getter
              * eg. `getPostDocument`/`createPostDocument`/`updatePostDocument`
@@ -439,7 +431,7 @@ export const resolve = async ({
              * if coming from a query result
              * the field will be `node`
              */
-            case 'collectionDocument':
+            case 'collectionDocument': {
               if (value) {
                 return value
               }
@@ -454,6 +446,7 @@ export const resolve = async ({
                   isCollectionSpecific: true,
                 }))
               return result
+            }
             /**
              * Collections-specific list getter
              * eg. `getPageList`
@@ -501,7 +494,7 @@ export const resolve = async ({
               return value
             default:
               console.error(lookup)
-              throw new Error(`Unexpected resolve type`)
+              throw new Error('Unexpected resolve type')
           }
         } catch (e) {
           handleFetchErrorError(e, verboseValue)
@@ -535,8 +528,7 @@ export const resolve = async ({
       return {
         errors: [e],
       }
-    } else {
-      throw e
     }
+    throw e
   }
 }

@@ -47,7 +47,7 @@ const blockClasses = 'mt-0.5'
 /** prose sets a bold font, making bold marks impossible to see */
 const headerClasses = 'font-normal'
 
-export const components = () => {
+export const Components = () => {
   return {
     [ELEMENT_SLASH_INPUT]: SlashInputElement,
     [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (

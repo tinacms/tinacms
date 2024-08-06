@@ -1,5 +1,5 @@
 import React from 'react'
-import { components } from './plugins/ui/components'
+import { Components } from './plugins/ui/components'
 import {
   Toolbar as OldToolbar,
   FloatingToolbar as OldFloatingToolbar,
@@ -11,7 +11,7 @@ import {
   createMdxBlockPlugin,
   createMdxInlinePlugin,
 } from './plugins/create-mdx-plugins'
-import { createImgPlugin } from './plugins/create-img-plugin'
+import createImgPlugin from './plugins/create-img-plugin'
 import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin'
 import { createLinkPlugin } from './plugins/create-link-plugin'
 import { uuid } from './plugins/ui/helpers'
@@ -58,7 +58,7 @@ export const RichEditor = (props: RichTextType) => {
           }),
         ],
         {
-          components: components(),
+          components: Components(),
         }
       ),
     []
