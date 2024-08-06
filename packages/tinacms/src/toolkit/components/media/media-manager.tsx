@@ -147,6 +147,7 @@ export function MediaPicker({
   const [activeItem, setActiveItem] = useState<Media | false>(false)
   const closePreview = () => setActiveItem(false)
   const [refreshing, setRefreshing] = useState(false)
+  const [loadFolders, setLoadFolders] = useState(true)
 
   /**
    * current offset is last element in offsetHistory[]
@@ -156,7 +157,7 @@ export function MediaPicker({
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
 
-  async function loadMedia() {
+  async function loadMedia(loadFolders = true) {
     setListState('loading')
     try {
       const _list = await cms.media.list({
@@ -168,6 +169,7 @@ export function MediaPicker({
           { w: 400, h: 400 },
           { w: 1000, h: 1000 },
         ],
+        filesOnly: !loadFolders,
       })
       setList({
         items: [...list.items, ..._list.items],
@@ -195,11 +197,12 @@ export function MediaPicker({
     if (!cms.media.isConfigured) return
     if (refreshing) return
 
-    loadMedia()
+    loadMedia(loadFolders)
+    if (loadFolders) setLoadFolders(false)
 
     return cms.events.subscribe(
       ['media:delete:success', 'media:pageSize'],
-      loadMedia
+      () => loadMedia()
     )
   }, [offset, directory, cms.media.isConfigured])
 
@@ -207,14 +210,15 @@ export function MediaPicker({
     if (!item) {
       setActiveItem(false)
     } else if (item.type === 'dir') {
-      resetList()
       // Only join when there is a directory to join to
       setDirectory(
         item.directory === '.' || item.directory === ''
           ? item.filename
           : join(item.directory, item.filename)
       )
+      setLoadFolders(true)
       resetOffset()
+      resetList()
     } else {
       setActiveItem(item)
     }
@@ -395,6 +399,7 @@ export function MediaPicker({
               }
             })
             resetOffset()
+            resetList()
           }}
           close={() => setNewFolderModalOpen(false)}
         />
@@ -408,9 +413,10 @@ export function MediaPicker({
               <Breadcrumb
                 directory={directory}
                 setDirectory={(dir: string) => {
-                  resetList()
-                  resetOffset()
                   setDirectory(dir)
+                  setLoadFolders(true)
+                  resetOffset()
+                  resetList()
                 }}
               />
             </div>
