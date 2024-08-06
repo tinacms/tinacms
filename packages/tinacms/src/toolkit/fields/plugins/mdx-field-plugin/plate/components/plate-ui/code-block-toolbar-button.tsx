@@ -5,12 +5,9 @@ import { withRef } from '@udecode/cn'
 import { Icons } from './icons'
 
 import { ToolbarButton } from './toolbar'
-import { toggleNodeType, useEditorState } from '@udecode/plate-common'
+import { useEditorState } from '@udecode/plate-common'
 import { helpers } from '../../plugins/core/common'
-import {
-  ELEMENT_CODE_BLOCK,
-  useCodeBlockElementState,
-} from '@udecode/plate-code-block'
+import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block'
 import { insertEmptyCodeBlock } from '../../transforms/insert-empty-block'
 
 const useCodeBlockToolbarButtonState = () => {
@@ -27,7 +24,6 @@ const useCodeBlockToolbarButton = (state) => {
   const editor = useEditorState()
 
   const onClick = () => {
-    // insertEmptyCodeBlock(editor);
     insertEmptyCodeBlock(editor)
   }
 

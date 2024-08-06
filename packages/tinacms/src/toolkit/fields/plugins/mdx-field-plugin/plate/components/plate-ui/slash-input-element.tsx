@@ -7,7 +7,6 @@ import {
   toggleNodeType,
 } from '@udecode/plate-common'
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading'
-// import { ListStyleType, toggleIndentList } from "@udecode/plate-indent-list";
 
 import { Icons } from './icons'
 
@@ -62,8 +61,6 @@ const rules: SlashCommandRule[] = [
     keywords: ['ol', 'ordered list'],
     onSelect: (editor) => {
       toggleList(editor, { type: ELEMENT_OL })
-
-      // toggleNodeType(editor, { activeType: ListStyleType.Decimal });
     },
     value: 'Numbered list',
   },

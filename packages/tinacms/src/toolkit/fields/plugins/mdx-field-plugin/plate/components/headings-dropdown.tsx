@@ -104,7 +104,6 @@ export function HeadingsMenu(props: DropdownMenuProps) {
     <DropdownMenu modal={false} {...openState} {...props}>
       <DropdownMenuTrigger asChild>
         <ToolbarButton
-          // className="lg:min-w-[130px]"
           showArrow
           isDropdown
           pressed={openState.open}
@@ -119,7 +118,6 @@ export function HeadingsMenu(props: DropdownMenuProps) {
         <DropdownMenuRadioGroup
           className="flex flex-col gap-0.5"
           onValueChange={(type) => {
-            // unwrapList(editor);
             toggleNodeType(editor, { activeType: type })
             collapseSelection(editor)
             focusEditor(editor)

@@ -139,33 +139,3 @@ export default function FixedToolbarButtons() {
     </div>
   )
 }
-
-//? Note - Ideal look of the toolbar
-/* 
-<ToolbarGroup noSeparator>
-						<HeadingsMenu />
-					</ToolbarGroup> 
-<ToolbarGroup>
-						<MarkToolbarButton tooltip="Bold (⌘+B)" nodeType={MARK_BOLD}>
-							<Icons.bold />
-						</MarkToolbarButton>
-						<MarkToolbarButton tooltip="Italic (⌘+I)" nodeType={MARK_ITALIC}>
-							<Icons.italic />
-						</MarkToolbarButton>
-						<MarkToolbarButton tooltip="Code (⌘+E)" nodeType={MARK_CODE}>
-							<Icons.code />
-						</MarkToolbarButton>
-						<QuoteToolbarButton tooltip="Quote Quote (⌘+⇧+.)" />
-						<CodeBlockToolbarButton />
-					</ToolbarGroup>
-					<ToolbarGroup>
-						<IndentListToolbarButton nodeType={ELEMENT_UL} />
-						<IndentListToolbarButton nodeType={ELEMENT_OL} />
-					</ToolbarGroup>
-
-					<ToolbarGroup>
-						<LinkToolbarButton />
-						<ImageToolbarButton />
-						<RawMarkdownToolbarButton />
-						<TemplatesToolbarButton />
-					</ToolbarGroup> */

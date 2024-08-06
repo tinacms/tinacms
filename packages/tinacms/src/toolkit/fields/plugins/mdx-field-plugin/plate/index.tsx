@@ -1,10 +1,5 @@
 import React from 'react'
 import { Components } from './plugins/ui/components'
-import {
-  Toolbar as OldToolbar,
-  FloatingToolbar as OldFloatingToolbar,
-  FloatingLink,
-} from './plugins/ui/toolbar'
 import { formattingPlugins, commonPlugins } from './plugins/core'
 import { helpers } from './plugins/core/common'
 import {
@@ -18,7 +13,6 @@ import { uuid } from './plugins/ui/helpers'
 import type { RichTextType } from '..'
 import { createPlugins, Plate } from '@udecode/plate-common'
 import { Editor } from './components/editor'
-import { ToolbarSeparator } from './components/plate-ui/toolbar'
 import { FixedToolbar } from './components/plate-ui/fixed-toolbar'
 import { TooltipProvider } from './components/plate-ui/tooltip'
 import FixedToolbarButtons from './components/fixed-toolbar-buttons'
@@ -27,7 +21,6 @@ import FloatingToolbarButtons from './components/floating-toolbar-buttons'
 import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar'
 import { isUrl } from './transforms/is-url'
 import { ToolbarProvider } from './toolbar/toolbar-provider'
-import ToolbarOverrideButtons from './toolbar/toolbar-overrides'
 
 export const RichEditor = (props: RichTextType) => {
   const initialValue = React.useMemo(
@@ -52,7 +45,6 @@ export const RichEditor = (props: RichTextType) => {
             options: {
               //? NOTE: This is a custom validation function that allows for relative links i.e. /about
               isUrl: (url: string) => isUrl(url),
-              // dangerouslySkipSanitization: true,
             },
             renderAfterEditable: LinkFloatingToolbar,
           }),
@@ -107,13 +99,10 @@ export const RichEditor = (props: RichTextType) => {
           >
             <FixedToolbar>
               <FixedToolbarButtons />
-              {/* Custom Toolbar Buttons use the below commented code */}
-              {/* <ToolbarOverrideButtons /> */}
             </FixedToolbar>
             <FloatingToolbar>
               <FloatingToolbarButtons />
             </FloatingToolbar>
-            <FloatingLink />
           </ToolbarProvider>
           <Editor />
         </TooltipProvider>

@@ -22,10 +22,6 @@ const useImageToolbarButtonState = () => {
 const useImageToolbarButton = (state) => {
   const editor = useEditorState()
   const cms = useCMS()
-  const onClick = () => {
-    // insertEmptyImage(editor);
-    // insertEmptyImage(editor);
-  }
 
   const onMouseDown = (e) => {
     e.preventDefault()
@@ -41,7 +37,6 @@ const useImageToolbarButton = (state) => {
 
   return {
     props: {
-      onClick,
       onMouseDown,
       pressed: state.pressed,
     },

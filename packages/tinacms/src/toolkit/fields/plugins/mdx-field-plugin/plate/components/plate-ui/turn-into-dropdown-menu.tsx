@@ -2,7 +2,6 @@ import React from 'react'
 
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu'
 
-import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote'
 import {
   collapseSelection,
   focusEditor,
@@ -33,12 +32,7 @@ import {
   useOpenState,
 } from './dropdown-menu'
 import { ToolbarButton } from './toolbar'
-import {
-  KEY_LIST_STYLE_TYPE,
-  toggleIndentList,
-  toggleList,
-  unwrapList,
-} from '@udecode/plate'
+import { toggleList, unwrapList } from '@udecode/plate'
 
 const items = [
   {
@@ -79,7 +73,7 @@ const items = [
   },
 ]
 
-const defaultItem = items.find((item) => item.value === ELEMENT_PARAGRAPH)!
+const defaultItem = items.find((item) => item.value === ELEMENT_PARAGRAPH)
 
 export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const value: string = useEditorSelector((editor) => {
@@ -119,7 +113,6 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
           pressed={openState.open}
           tooltip="Turn into"
         >
-          {/* <SelectedItemIcon className="size-5 lg:hidden" /> */}
           <span className="">{selectedItemLabel}</span>
         </ToolbarButton>
       </DropdownMenuTrigger>
@@ -131,13 +124,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
           className="flex flex-col gap-0.5"
           onValueChange={(type) => {
             if (type === 'ul' || type === 'ol') {
-              // if (settingsStore.get.checkedId(KEY_LIST_STYLE_TYPE)) {
-              // toggleIndentList(editor, {
-              // 	listStyleType: type === "ul" ? "disc" : "decimal",
-              // });
-              // } else if (settingsStore.get.checkedId("list")) {
               toggleList(editor, { type })
-              // }
             } else {
               unwrapList(editor)
               toggleNodeType(editor, { activeType: type })

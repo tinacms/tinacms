@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useToolbarContext } from '../../toolbar/toolbar-provider'
-// import { EmbedButton } from "../../plugins/ui/toolbar/toolbar-item";
 import { type PlateEditor, useEditorState } from '@udecode/plate-common'
 import type { MdxTemplate } from '../../types'
 import {

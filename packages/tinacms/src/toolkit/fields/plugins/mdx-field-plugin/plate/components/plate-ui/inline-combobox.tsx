@@ -171,7 +171,6 @@ const InlineCombobox = ({
   )
 
   const store = useComboboxStore({
-    // open: ,
     setValue: (newValue) => startTransition(() => setValue(newValue)),
   })
 
@@ -218,7 +217,7 @@ const InlineComboboxInput = forwardRef<
     trigger,
   } = useContext(InlineComboboxContext)
 
-  const store = useComboboxContext()!
+  const store = useComboboxContext()
   const value = store.useState('value')
 
   const ref = useComposedRef(propRef, contextRef)
@@ -308,7 +307,7 @@ const InlineComboboxItem = ({
 
   const { filter, removeInput } = useContext(InlineComboboxContext)
 
-  const store = useComboboxContext()!
+  const store = useComboboxContext()
 
   // Optimization: Do not subscribe to value if filter is false
   const search = filter && store.useState('value')
@@ -337,7 +336,7 @@ const InlineComboboxEmpty = ({
   className,
 }: HTMLAttributes<HTMLDivElement>) => {
   const { setHasEmpty } = useContext(InlineComboboxContext)
-  const store = useComboboxContext()!
+  const store = useComboboxContext()
   const items = store.useState('items')
 
   useEffect(() => {

@@ -60,10 +60,7 @@ const isNodeActive = (editor, type) => {
     !!editor?.selection && someNode(editor, { match: { type: pluginType } })
   )
 }
-const isMarkActive = (editor, type) => {
-  return !!editor?.selection
-  //&& isMarkActiveBase(editor, type)
-}
+
 const isListActive = (editor, type) => {
   const res = !!editor?.selection && getListItemEntry(editor)
   return !!res && res.list[0].type === type
@@ -165,7 +162,6 @@ const currentNodeSupportsMDX = (editor: PlateEditor) =>
 
 export const helpers = {
   isNodeActive,
-  isMarkActive,
   isListActive,
   currentNodeSupportsMDX,
   normalize,
