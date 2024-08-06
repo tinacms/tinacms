@@ -35,7 +35,9 @@
 			"require": "./dist/rich-text/prism.js"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"buildConfig": {
 		"entryPoints": [
 			"src/index.ts",
@@ -76,6 +78,7 @@
 		"@udecode/cn": "^33.0.0",
 		"@udecode/plate": "^36.3.6",
 		"@udecode/plate-autoformat": "^36.0.0",
+		"@udecode/plate-block-quote": "^36.0.0",
 		"@udecode/plate-code-block": "^36.0.0",
 		"@udecode/plate-combobox": "^36.0.0",
 		"@udecode/plate-common": "^36.3.4",
