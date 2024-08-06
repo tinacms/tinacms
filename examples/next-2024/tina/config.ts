@@ -77,10 +77,10 @@ export default defineConfig({
             ],
           },
         ],
-        ui: {
-          // This is an DEMO router. You can remove this to fit your site
-          router: ({ document }) => `/posts/${document._sys.filename}`,
-        },
+        // ui: {
+        // 	// This is an DEMO router. You can remove this to fit your site
+        // 	router: ({ document }) => `/posts/${document._sys.filename}`,
+        // },
       },
     ],
   },
