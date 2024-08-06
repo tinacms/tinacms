@@ -4,10 +4,7 @@
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
-	"files": [
-		"package.json",
-		"dist"
-	],
+	"files": ["package.json", "dist"],
 	"exports": {
 		"import": "./dist/index.mjs",
 		"require": "./dist/index.js"
@@ -45,6 +42,7 @@
 		"js-sha1": "^0.6.0",
 		"js-yaml": "^3.14.1",
 		"jsonpath-plus": "^6.0.1",
+		"lodash.clonedeep": "^4.5.0",
 		"lodash.set": "^4.3.2",
 		"lodash.uniqby": "^4.7.0",
 		"many-level": "^2.0.0",
