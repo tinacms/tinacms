@@ -186,16 +186,22 @@ export function MediaPicker({
   }
 
   useEffect(() => {
+    if (!refreshing) return
+    loadMedia()
+    setRefreshing(false)
+  }, [refreshing])
+
+  useEffect(() => {
     if (!cms.media.isConfigured) return
+    if (refreshing) return
 
     loadMedia()
-    if (refreshing) setRefreshing(false)
 
     return cms.events.subscribe(
       ['media:delete:success', 'media:pageSize'],
       loadMedia
     )
-  }, [offset, refreshing, directory, cms.media.isConfigured])
+  }, [offset, directory, cms.media.isConfigured])
 
   const onClickMediaItem = (item: Media) => {
     if (!item) {
