@@ -1,12 +1,12 @@
-import * as React from 'react'
-import { Field, Form } from '@toolkit/forms'
+import React from 'react'
+import type { Field, Form } from '@toolkit/forms'
 import { FieldsBuilder, useFormPortal } from '@toolkit/form-builder'
 import { IconButton } from '@toolkit/styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '@toolkit/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './group-field-plugin'
 import { useEvent } from '@toolkit/react-core/use-cms-event'
-import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
+import type { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 import { useCMS } from '@toolkit/react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
 import { EmptyList, ListFieldMeta, ListPanel } from './list-field-meta'
@@ -67,7 +67,7 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
   )
 
   // @ts-ignore
-  const isMax = items.length >= (field.max || Infinity)
+  const isMax = items.length >= (field.max || Number.POSITIVE_INFINITY)
   // @ts-ignore
   const isMin = items.length <= (field.min || 0)
   // @ts-ignore
@@ -150,13 +150,13 @@ const Item = ({
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
-  const title = label || (field.label || field.name) + ' Item'
+  const title = label || `${field.label || field.name} Item`
 
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
   return (
     <Draggable
-      type={field.name}
+      // type={field.name}
       draggableId={`${field.name}.${index}`}
       index={index}
     >

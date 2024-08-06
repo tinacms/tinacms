@@ -4,7 +4,10 @@
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
-	"files": ["package.json", "dist"],
+	"files": [
+		"package.json",
+		"dist"
+	],
 	"exports": {
 		"import": "./dist/index.mjs",
 		"require": "./dist/index.js"
@@ -82,6 +85,6 @@
 		"jest-matcher-utils": "^29.7.0",
 		"memory-level": "^1.0.0",
 		"nodemon": "2.0.19",
-		"typescript": "4.6.4"
+		"typescript": "^5.5.4"
 	}
 }

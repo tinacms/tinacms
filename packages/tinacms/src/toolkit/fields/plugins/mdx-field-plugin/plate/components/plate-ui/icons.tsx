@@ -403,9 +403,9 @@ export const Icons = {
   twitter: Twitter,
 }
 
-export const ToolbarIcon = ({ name }: { name: string }) => {
-  return iconEl[name]
-}
+// export const ToolbarIcon = ({ name }: { name: string }) => {
+//   return iconEl[name]
+// }
 
 export const EllipsisIcon = ({ title }) => {
   return (

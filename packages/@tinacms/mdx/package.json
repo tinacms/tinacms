@@ -5,7 +5,10 @@
 	"main": "dist/index.js",
 	"browser": "dist/index.browser.mjs",
 	"module": "dist/index.mjs",
-	"files": ["package.json", "dist"],
+	"files": [
+		"package.json",
+		"dist"
+	],
 	"exports": {
 		".": {
 			"import": "./dist/index.mjs",
@@ -84,7 +87,7 @@
 		"jest-file-snapshot": "^0.5.0",
 		"ts-node": "^10.8.2",
 		"typedoc-plugin-markdown": "^3.13.6",
-		"typescript": "^5.5.3",
+		"typescript": "^5.5.4",
 		"vite": "^4.3.9",
 		"vitest": "^0.32.2"
 	}

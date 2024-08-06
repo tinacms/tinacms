@@ -32,7 +32,7 @@ import {
   someNode,
 } from '@udecode/plate-common'
 import { createSlashPlugin } from '@udecode/plate-slash-command'
-import { Transforms, Editor } from 'slate'
+import { Transforms, Editor, Node } from 'slate'
 
 export const plugins = [
   createHeadingPlugin(),

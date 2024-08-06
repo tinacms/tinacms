@@ -1,5 +1,4 @@
 import React from 'react'
-import type { InputProps } from 'react-select/lib/components/Input'
 import {
   type InputFieldType,
   wrapFieldsWithMeta,
@@ -8,6 +7,7 @@ import { EditorContext } from './plate/editor-context'
 import type { toolbarItemName } from './plate/plugins/ui/toolbar'
 import type { MdxTemplate } from './plate/types'
 import { RichEditor } from './plate'
+import type { InputProps } from '@toolkit/fields/components'
 
 export type RichTextType = React.PropsWithChildren<
   InputFieldType<

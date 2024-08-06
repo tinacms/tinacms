@@ -197,7 +197,7 @@ const BlockListItem = ({
   return (
     <Draggable
       key={index}
-      type={field.name}
+      // type={field.name}
       draggableId={`${field.name}.${index}`}
       index={index}
     >
@@ -278,7 +278,7 @@ const InvalidBlockListItem = ({
   return (
     <Draggable
       key={index}
-      type={field.name}
+      // type={field.name}
       draggableId={`${field.name}.${index}`}
       index={index}
     >

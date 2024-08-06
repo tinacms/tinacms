@@ -153,13 +153,13 @@ const Item = ({
       parentTypename: field.parentTypename,
       ...field.field,
       label: false,
-      name: field.name + '.' + index,
+      name: `${field.name}.${index}`,
     },
   ]
 
   return (
     <Draggable
-      type={field.name}
+      // type={field.name}
       draggableId={`${field.name}.${index}`}
       index={index}
     >
