@@ -131,7 +131,9 @@ export default function FixedToolbarButtons() {
           ))}
           {toolbarItemsArray.length > itemsShown && (
             <OverflowMenu>
-              {toolbarItemsArray.slice(itemsShown).flatMap((c) => c.Component)}
+              {toolbarItemsArray.slice(itemsShown).flatMap((c) => (
+                <React.Fragment key={c.label}>{c.Component}</React.Fragment>
+              ))}
             </OverflowMenu>
           )}
         </>

@@ -77,14 +77,14 @@ importers:
         specifier: ^3.7.4
         version: 3.7.7
       next:
-        specifier: 14.2.5
-        version: 14.2.5(@playwright/test@1.46.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: ^14.2.5
+        version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
-        specifier: 18.2.0
-        version: 18.2.0
+        specifier: ^18.3.1
+        version: 18.3.1
       react-dom:
-        specifier: 18.2.0
-        version: 18.2.0(react@18.2.0)
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
       react-is:
         specifier: ^18.2.0
         version: 18.3.1
@@ -92,7 +92,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tinacms
       typescript:
-        specifier: 4.6.4
+        specifier: ^4.6.4
         version: 4.6.4
     devDependencies:
       '@tinacms/cli':
@@ -111,14 +111,14 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/cli
       next:
-        specifier: 14.2.5
-        version: 14.2.5(@playwright/test@1.46.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        specifier: ^14.2.5
+        version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
-        specifier: 17.0.2
-        version: 17.0.2
+        specifier: ^18.3.1
+        version: 18.3.1
       react-dom:
-        specifier: 17.0.2
-        version: 17.0.2(react@17.0.2)
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
       react-is:
         specifier: ^17.0.2
         version: 17.0.2
@@ -126,7 +126,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tinacms
       typescript:
-        specifier: 4.6.4
+        specifier: ^4.6.4
         version: 4.6.4
     devDependencies:
       '@types/node':
@@ -140,10 +140,10 @@ importers:
     dependencies:
       '@headlessui/react':
         specifier: ^1.7.3
-        version: 1.7.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 1.7.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@heroicons/react':
         specifier: ^2.0.12
-        version: 2.1.5(react@18.2.0)
+        version: 2.1.5(react@18.3.1)
       '@tailwindcss/typography':
         specifier: ^0.5.7
         version: 0.5.13(tailwindcss@3.4.7(ts-node@10.9.2(@types/node@14.18.63)(typescript@5.5.4)))
@@ -160,17 +160,17 @@ importers:
         specifier: ^0.0.4
         version: 0.0.4(mongodb@4.17.2)
       next:
-        specifier: 14.2.5
-        version: 14.2.5(@playwright/test@1.46.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: ^14.2.5
+        version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
-        specifier: 18.2.0
-        version: 18.2.0
+        specifier: ^18.3.1
+        version: 18.3.1
       react-dom:
-        specifier: 18.2.0
-        version: 18.2.0(react@18.2.0)
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
       react-icons:
         specifier: ^4.7.1
-        version: 4.12.0(react@18.2.0)
+        version: 4.12.0(react@18.3.1)
       remove:
         specifier: ^0.1.5
         version: 0.1.5
@@ -236,10 +236,10 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
-        specifier: ^18
+        specifier: ^18.3.1
         version: 18.3.1
       react-dom:
-        specifier: ^18
+        specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       tailwind-merge:
         specifier: ^2.4.0
@@ -306,7 +306,7 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       react-icons:
         specifier: ^4.7.1
@@ -422,7 +422,7 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       react-icons:
         specifier: ^4.2.0
@@ -1823,14 +1823,14 @@ importers:
         specifier: 1.7.2
         version: 1.7.2
       next:
-        specifier: 14.2.5
-        version: 14.2.5(@playwright/test@1.46.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: ^14.2.5
+        version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
-        specifier: 18.2.0
-        version: 18.2.0
+        specifier: ^18.3.1
+        version: 18.3.1
       react-dom:
-        specifier: 18.2.0
-        version: 18.2.0(react@18.2.0)
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
       react-is:
         specifier: ^18.3.1
         version: 18.3.1
@@ -1852,7 +1852,7 @@ importers:
         version: 7.32.0
       eslint-config-next:
         specifier: 12.0.3
-        version: 12.0.3(eslint@7.32.0)(next@14.2.5(@playwright/test@1.46.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(typescript@5.5.4)
+        version: 12.0.3(eslint@7.32.0)(next@14.2.5(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.5.4)
 
 packages:
   '@adobe/css-tools@4.4.0':
@@ -15800,14 +15800,6 @@ packages:
       moment: ^2.16.0
       react: ^16.5.0 || ^17.0.0 || ^18.0.0
 
-  react-dom@17.0.2:
-    resolution:
-      {
-        integrity: sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==,
-      }
-    peerDependencies:
-      react: 17.0.2
-
   react-dom@18.2.0:
     resolution:
       {
@@ -15996,13 +15988,6 @@ packages:
         optional: true
       react-native:
         optional: true
-
-  react@17.0.2:
-    resolution:
-      {
-        integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==,
-      }
-    engines: { node: '>=0.10.0' }
 
   react@18.2.0:
     resolution:
@@ -16444,12 +16429,6 @@ packages:
     resolution:
       {
         integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==,
-      }
-
-  scheduler@0.20.2:
-    resolution:
-      {
-        integrity: sha512-2eWfGgAqqWFGqtdMmcL5zCMK1U8KlXv8SQFGglL3CEtd0aDVDWgeF/YoCmvln55m5zSk3J/20hTaSBeSObsQDQ==,
       }
 
   scheduler@0.23.2:
@@ -21344,12 +21323,6 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@headlessui/react@1.7.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
-    dependencies:
-      client-only: 0.0.1
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-
   '@headlessui/react@1.7.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       client-only: 0.0.1
@@ -21369,9 +21342,9 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  '@heroicons/react@2.1.5(react@18.2.0)':
+  '@heroicons/react@2.1.5(react@18.3.1)':
     dependencies:
-      react: 18.2.0
+      react: 18.3.1
 
   '@humanwhocodes/config-array@0.10.7':
     dependencies:
@@ -26082,7 +26055,7 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
-  eslint-config-next@12.0.3(eslint@7.32.0)(next@14.2.5(@playwright/test@1.46.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(typescript@5.5.4):
+  eslint-config-next@12.0.3(eslint@7.32.0)(next@14.2.5(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.5.4):
     dependencies:
       '@next/eslint-plugin-next': 12.0.3
       '@rushstack/eslint-patch': 1.10.4
@@ -26094,7 +26067,7 @@ snapshots:
       eslint-plugin-jsx-a11y: 6.9.0(eslint@7.32.0)
       eslint-plugin-react: 7.35.0(eslint@7.32.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@7.32.0)
-      next: 14.2.5(@playwright/test@1.46.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      next: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     optionalDependencies:
       typescript: 5.5.4
     transitivePeerDependencies:
@@ -29417,32 +29390,6 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  next@14.2.5(@playwright/test@1.46.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
-    dependencies:
-      '@next/env': 14.2.5
-      '@swc/helpers': 0.5.5
-      busboy: 1.6.0
-      caniuse-lite: 1.0.30001649
-      graceful-fs: 4.2.11
-      postcss: 8.4.31
-      react: 17.0.2
-      react-dom: 17.0.2(react@17.0.2)
-      styled-jsx: 5.1.1(react@17.0.2)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 14.2.5
-      '@next/swc-darwin-x64': 14.2.5
-      '@next/swc-linux-arm64-gnu': 14.2.5
-      '@next/swc-linux-arm64-musl': 14.2.5
-      '@next/swc-linux-x64-gnu': 14.2.5
-      '@next/swc-linux-x64-musl': 14.2.5
-      '@next/swc-win32-arm64-msvc': 14.2.5
-      '@next/swc-win32-ia32-msvc': 14.2.5
-      '@next/swc-win32-x64-msvc': 14.2.5
-      '@playwright/test': 1.46.0
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
-
   next@14.2.5(@playwright/test@1.46.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       '@next/env': 14.2.5
@@ -30175,13 +30122,6 @@ snapshots:
       prop-types: 15.7.2
       react: 18.3.1
 
-  react-dom@17.0.2(react@17.0.2):
-    dependencies:
-      loose-envify: 1.4.0
-      object-assign: 4.1.1
-      react: 17.0.2
-      scheduler: 0.20.2
-
   react-dom@18.2.0(react@18.2.0):
     dependencies:
       loose-envify: 1.4.0
@@ -30211,10 +30151,6 @@ snapshots:
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-
-  react-icons@4.12.0(react@18.2.0):
-    dependencies:
-      react: 18.2.0
 
   react-icons@4.12.0(react@18.3.1):
     dependencies:
@@ -30302,11 +30238,6 @@ snapshots:
       use-context-selector: 1.4.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
     optionalDependencies:
       react-dom: 18.3.1(react@18.3.1)
-
-  react@17.0.2:
-    dependencies:
-      loose-envify: 1.4.0
-      object-assign: 4.1.1
 
   react@18.2.0:
     dependencies:
@@ -30631,11 +30562,6 @@ snapshots:
       is-regex: 1.1.4
 
   safer-buffer@2.1.2: {}
-
-  scheduler@0.20.2:
-    dependencies:
-      loose-envify: 1.4.0
-      object-assign: 4.1.1
 
   scheduler@0.23.2:
     dependencies:
@@ -31080,11 +31006,6 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.25.2
       babel-plugin-macros: 3.1.0
-
-  styled-jsx@5.1.1(react@17.0.2):
-    dependencies:
-      client-only: 0.0.1
-      react: 17.0.2
 
   styled-jsx@5.1.1(react@18.2.0):
     dependencies:

@@ -1,31 +1,31 @@
 {
-  "name": "starter-basic-iframe",
-  "private": true,
-  "scripts": {
-    "dev": "tinacms dev --noTelemetry -c \"next dev\"",
-    "build": "tinacms build --skip-cloud-checks && next build",
-    "build:local": "tinacms build --local --skip-cloud-checks -c \"next build\"",
-    "start": "next start",
-    "lint": "next lint",
-    "searchindex": "tinacms search-index"
-  },
-  "dependencies": {
-    "@octokit/rest": "^19.0.5",
-    "@tinacms/datalayer": "workspace:*",
-    "@tinacms/graphql": "workspace:*",
-    "dotenv": "^16.0.3",
-    "js-base64": "^3.7.4",
-    "next": "14.2.5",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-is": "^18.2.0",
-    "tinacms": "workspace:*",
-    "typescript": "4.6.4"
-  },
-  "devDependencies": {
-    "@tinacms/cli": "workspace:*",
-    "@types/node": "^17.0.21",
-    "eslint": "7"
-  },
-  "version": null
+	"name": "starter-basic-iframe",
+	"private": true,
+	"scripts": {
+		"dev": "tinacms dev --noTelemetry -c \"next dev\"",
+		"build": "tinacms build --skip-cloud-checks && next build",
+		"build:local": "tinacms build --local --skip-cloud-checks -c \"next build\"",
+		"start": "next start",
+		"lint": "next lint",
+		"searchindex": "tinacms search-index"
+	},
+	"dependencies": {
+		"@octokit/rest": "^19.0.5",
+		"@tinacms/datalayer": "workspace:*",
+		"@tinacms/graphql": "workspace:*",
+		"dotenv": "^16.0.3",
+		"js-base64": "^3.7.4",
+		"next": "^14.2.5",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-is": "^18.2.0",
+		"tinacms": "workspace:*",
+		"typescript": "^4.6.4"
+	},
+	"devDependencies": {
+		"@tinacms/cli": "workspace:*",
+		"@types/node": "^17.0.21",
+		"eslint": "7"
+	},
+	"version": null
 }
