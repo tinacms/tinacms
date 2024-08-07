@@ -53,11 +53,11 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     Component: <QuoteToolbarButton tooltip="Quote Quote (⌘+⇧+.)" />,
   },
   ul: {
-    label: 'Indent List',
+    label: 'Unordered List',
     Component: <IndentListToolbarButton nodeType={ELEMENT_UL} />,
   },
   ol: {
-    label: 'Indent List',
+    label: 'Ordered List',
     Component: <IndentListToolbarButton nodeType={ELEMENT_OL} />,
   },
   bold: {
