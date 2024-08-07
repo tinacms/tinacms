@@ -93,7 +93,7 @@ jobs:
         run: pnpm build
       - name: Install playwright
         working-directory: playwright/tina-playwright
-        run: pnpm dlx playwright install
+        run: npx playwright install
       - name: Run Playwright tests
         working-directory: playwright/tina-playwright
-        run: pnpm dlx playwright test
+        run: npx playwright test
