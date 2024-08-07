@@ -107,7 +107,7 @@ export class CloudinaryMediaStore implements MediaStore {
     return img.src
   }
 
-  private buildQuery(options: MediaListOptions) {
+  buildQuery(options: MediaListOptions) {
     const params = Object.keys(options)
       .filter((key) => options[key] !== '' && options[key] !== undefined)
       .map((key) => `${key}=${options[key]}`)
