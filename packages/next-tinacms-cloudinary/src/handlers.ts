@@ -95,10 +95,10 @@ async function listMedia(
   try {
     const {
       directory = '""',
-      limit = 500,
+      limit = '500',
       offset,
-      filesOnly = false,
-    } = req.query as MediaListOptions
+      filesOnly = 'false',
+    } = req.query
 
     const useRootDirectory =
       !directory || directory === '/' || directory === '""'
@@ -107,7 +107,7 @@ async function listMedia(
 
     const response = await cloudinary.search
       .expression(query)
-      .max_results(limit)
+      .max_results(parseInt(limit as string, 10))
       .next_cursor(offset as string)
       .execute()
 
@@ -123,7 +123,7 @@ async function listMedia(
     }
     let folders: string[] = []
     let folderRes = null
-    const loadFolders = !((filesOnly as string) == 'true')
+    const loadFolders = !(filesOnly == 'true')
 
     if (loadFolders) {
       try {
