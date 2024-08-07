@@ -123,7 +123,7 @@ async function listMedia(
     }
     let folders: string[] = []
     let folderRes = null
-    const loadFolders = !(filesOnly == 'true')
+    const loadFolders = !((filesOnly as string) == 'true')
 
     if (loadFolders) {
       try {
