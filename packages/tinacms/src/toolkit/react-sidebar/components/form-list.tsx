@@ -95,7 +95,6 @@ export const FormLists = (props: { isEditing: boolean }) => {
         enterFrom="opacity-0 -translate-x-1/2"
         enterTo="opacity-100"
         leave="transition-all ease-out duration-150"
-        // className={"overflow-scroll"}
         leaveFrom="opacity-100"
         leaveTo="opacity-0 -translate-x-1/2"
       >

@@ -1,13 +1,12 @@
 import React from 'react'
 
 import { withRef } from '@udecode/cn'
+import { useEditorState } from '@udecode/plate-common'
+import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block'
 
 import { Icons } from './icons'
-
 import { ToolbarButton } from './toolbar'
-import { useEditorState } from '@udecode/plate-common'
 import { helpers } from '../../plugins/core/common'
-import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block'
 import { insertEmptyCodeBlock } from '../../transforms/insert-empty-block'
 
 const useCodeBlockToolbarButtonState = () => {

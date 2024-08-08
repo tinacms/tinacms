@@ -158,11 +158,7 @@ const Item = ({
   ]
 
   return (
-    <Draggable
-      // type={field.name}
-      draggableId={`${field.name}.${index}`}
-      index={index}
-    >
+    <Draggable draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
         <ItemHeader provider={provider} isDragging={snapshot.isDragging} {...p}>
           <DragHandle isDragging={snapshot.isDragging} />

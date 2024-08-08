@@ -1,10 +1,8 @@
 import React from 'react'
 import type { Field, Form } from '@toolkit/forms'
-import { FieldsBuilder, useFormPortal } from '@toolkit/form-builder'
 import { IconButton } from '@toolkit/styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '@toolkit/icons'
-import { GroupPanel, PanelHeader, PanelBody } from './group-field-plugin'
 import { useEvent } from '@toolkit/react-core/use-cms-event'
 import type { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 import { useCMS } from '@toolkit/react-core/use-cms'
@@ -145,8 +143,6 @@ const Item = ({
   ...p
 }: ItemProps) => {
   const cms = useCMS()
-  const FormPortal = useFormPortal()
-  const [isExpanded, setExpanded] = React.useState<boolean>(false)
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
@@ -155,11 +151,7 @@ const Item = ({
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
   return (
-    <Draggable
-      // type={field.name}
-      draggableId={`${field.name}.${index}`}
-      index={index}
-    >
+    <Draggable draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
         <>
           <ItemHeader
@@ -184,7 +176,6 @@ const Item = ({
                   return
                 }
 
-                // setExpanded(true)
                 cms.dispatch({
                   type: 'forms:set-active-field-name',
                   value: {
@@ -205,19 +196,6 @@ const Item = ({
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />
             )}
           </ItemHeader>
-          {/* <FormPortal>
-            {({ zIndexShift }) => (
-              <Panel
-                isExpanded={isExpanded}
-                setExpanded={setExpanded}
-                field={field}
-                index={index}
-                tinaForm={tinaForm}
-                itemTitle={title}
-                zIndexShift={zIndexShift}
-              />
-            )}
-          </FormPortal> */}
         </>
       )}
     </Draggable>
@@ -245,7 +223,7 @@ export const GroupLabel = ({
   return (
     <span
       className={`m-0 text-xs font-semibold flex-1 text-ellipsis overflow-hidden transition-all ease-out duration-100 text-left ${
-        error ? `text-red-500` : `text-gray-600 group-hover:text-inherit`
+        error ? 'text-red-500' : 'text-gray-600 group-hover:text-inherit'
       }`}
     >
       {children}
@@ -271,8 +249,8 @@ export const ItemHeader = ({
       {...props}
       className={`relative group cursor-pointer flex justify-between items-stretch bg-white border border-gray-100 -mb-px overflow-visible p-0 text-sm font-normal ${
         isDragging
-          ? `rounded shadow text-blue-600`
-          : `text-gray-600 first:rounded-t last:rounded-b`
+          ? 'rounded shadow text-blue-600'
+          : 'text-gray-600 first:rounded-t last:rounded-b'
       } ${props.className ?? ''}`}
       style={{
         ...(provider.draggableProps.style ?? {}),
@@ -325,50 +303,6 @@ interface PanelProps {
   field: GroupFieldDefinititon
   itemTitle: string
   zIndexShift: number
-}
-
-const Panel = function Panel({
-  setExpanded,
-  isExpanded,
-  tinaForm,
-  field,
-  index,
-  itemTitle,
-  zIndexShift,
-}: PanelProps) {
-  const cms = useCMS()
-  const fields: any[] = React.useMemo(() => {
-    return field.fields.map((subField: any) => ({
-      ...subField,
-      name: `${field.name}.${index}.${subField.name}`,
-    }))
-  }, [field.fields, field.name, index])
-
-  return (
-    <GroupPanel isExpanded={isExpanded} style={{ zIndex: zIndexShift + 1000 }}>
-      <PanelHeader
-        onClick={() => {
-          const state = tinaForm.finalForm.getState()
-          if (state.invalid === true) {
-            // @ts-ignore
-            cms.alerts.error('Cannot navigate away from an invalid form.')
-            return
-          }
-
-          setExpanded(false)
-        }}
-      >
-        {itemTitle}
-      </PanelHeader>
-      <PanelBody id={tinaForm.id}>
-        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
-      </PanelBody>
-    </GroupPanel>
-  )
-}
-
-interface GroupFieldProps {
-  field: Field
 }
 
 export const GroupListField = Group

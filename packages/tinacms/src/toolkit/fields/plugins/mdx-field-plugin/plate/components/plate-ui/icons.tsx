@@ -6,12 +6,10 @@ import {
   AlignLeft,
   AlignRight,
   Baseline,
-  Bold,
   Check,
   ChevronDown,
   ChevronRight,
   ChevronsUpDown,
-  Code2,
   Combine,
   Edit2,
   ExternalLink,
@@ -24,14 +22,9 @@ import {
   Heading4,
   Heading5,
   Heading6,
-  Image,
   Indent,
-  Italic,
   Keyboard,
-  Link2,
   Link2Off,
-  List,
-  ListOrdered,
   type LucideProps,
   MessageSquare,
   MessageSquarePlus,
@@ -402,10 +395,6 @@ export const Icons = {
   sun: SunMedium,
   twitter: Twitter,
 }
-
-// export const ToolbarIcon = ({ name }: { name: string }) => {
-//   return iconEl[name]
-// }
 
 export const EllipsisIcon = ({ title }) => {
   return (

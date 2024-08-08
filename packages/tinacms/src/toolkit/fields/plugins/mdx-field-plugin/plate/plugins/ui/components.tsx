@@ -8,7 +8,6 @@ import {
   ELEMENT_LI,
   ELEMENT_OL,
   ELEMENT_UL,
-  ELEMENT_LIC,
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
@@ -23,7 +22,6 @@ import {
   ELEMENT_CODE_LINE,
   ELEMENT_CODE_SYNTAX,
 } from '@udecode/plate'
-import { CodeBlock } from './code-block'
 import { classNames } from './helpers'
 import { useSelected } from 'slate-react'
 import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command'
@@ -145,7 +143,6 @@ export const Components = () => {
     [ELEMENT_CODE_BLOCK]: CodeBlockElement,
     [ELEMENT_CODE_LINE]: CodeLineElement,
     [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,
-    // [ELEMENT_CODE_BLOCK]: (props) => ,
     html: ({ attributes, editor, element, children, className }) => {
       return (
         <div
@@ -174,44 +171,6 @@ export const Components = () => {
         </span>
       )
     },
-    // [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
-    // 	<ul
-    // 		className={classNames(
-    // 			blockClasses,
-    // 			className,
-    // 			"mb-4 pl-4 list-disc list-inside last:mb-0",
-    // 		)}
-    // 		{...attributes}
-    // 		{...props}
-    // 	/>
-    // ),
-    // [ELEMENT_OL]: ({ attributes, editor, className, element, ...props }) => (
-    // 	<ol
-    // 		className={classNames(
-    // 			blockClasses,
-    // 			className,
-    // 			"mb-4 pl-4 list-decimal list-inside last:mb-0",
-    // 		)}
-    // 		{...attributes}
-    // 		{...props}
-    // 	/>
-    // ),
-    // [ELEMENT_LI]: ({ attributes, className, editor, element, ...props }) => (
-    // 	<li
-    // 		className={classNames("p-0 mt-0 mb-0 list-outside", className)}
-    // 		{...attributes}
-    // 		{...props}
-    // 	/>
-    // ),
-    // /** "list item content" */
-    // [ELEMENT_LIC]: ({ attributes, editor, element, className, ...props }) => (
-    // 	<span
-    // 		// without a min-width the cursor is hidden when the list is empty
-    // 		className={classNames(className, "w-full inline-block align-top mb-2")}
-    // 		{...attributes}
-    // 		{...props}
-    // 	/>
-    // ),
     [ELEMENT_UL]: withProps(ListElement, { variant: 'ul' }),
     [ELEMENT_OL]: withProps(ListElement, { variant: 'ol' }),
     [ELEMENT_LI]: withProps(PlateElement, { as: 'li' }),
@@ -233,13 +192,6 @@ export const Components = () => {
       />
     ),
     [MARK_CODE]: CodeLeaf,
-
-    // [MARK_ITALIC]: ({ editor, leaf, text, ...props }) => (
-    //   <em {...props.attributes} {...props} />
-    // ),
-    // [ELEMENT_UL]: withProps(ListElement, { variant: "ul" }),
-    // [ELEMENT_OL]: withProps(ListElement, { variant: "ol" }),
-    // [ELEMENT_LI]: withProps(PlateElement, { as: "li" }),
     [MARK_UNDERLINE]: withProps(PlateLeaf, { as: 'u' }),
     [MARK_STRIKETHROUGH]: withProps(PlateLeaf, { as: 's' }),
     [MARK_ITALIC]: withProps(PlateLeaf, { as: 'em' }),
