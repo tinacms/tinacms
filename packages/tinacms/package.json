@@ -121,6 +121,7 @@
 		"slate-react": "^0.107.1",
 		"webfontloader": "1.6.28",
 		"tailwind-merge": "^2.4.0",
+		"clsx": "^2.1.1",
 		"yup": "^1.4.0",
 		"zod": "^3.23.8"
 	},
