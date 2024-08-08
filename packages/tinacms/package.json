@@ -35,9 +35,7 @@
 			"require": "./dist/rich-text/prism.js"
 		}
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"buildConfig": {
 		"entryPoints": [
 			"src/index.ts",
@@ -56,6 +54,7 @@
 		"test-watch": "vitest"
 	},
 	"dependencies": {
+		"cmdk": "^1.0.0",
 		"@ariakit/react": "^0.4.7",
 		"@floating-ui/dom": "^1.6.9",
 		"@floating-ui/react-dom": "^2.1.1",
@@ -107,7 +106,6 @@
 		"moment": "2.29.4",
 		"monaco-editor": "0.31.0",
 		"prism-react-renderer": "^2.3.1",
-		"prismjs": "^1.29.0",
 		"prop-types": "15.7.2",
 		"react-beautiful-dnd": "^13.1.1",
 		"react-color": "^2.19.3",
@@ -115,7 +113,6 @@
 		"react-dropzone": "14.2.3",
 		"react-final-form": "^6.5.9",
 		"react-icons": "^5.2.1",
-		"react-lite-youtube-embed": "^2.4.0",
 		"react-onclickoutside": "^6.13.1",
 		"react-router-dom": "6.3.0",
 		"slate": "^0.103.0",
@@ -123,6 +120,7 @@
 		"slate-hyperscript": "^0.100.0",
 		"slate-react": "^0.107.1",
 		"webfontloader": "1.6.28",
+		"tailwind-merge": "^2.4.0",
 		"yup": "^1.4.0",
 		"zod": "^3.23.8"
 	},

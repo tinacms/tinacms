@@ -4,10 +4,7 @@
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index",
-	"files": [
-		"package.json",
-		"dist"
-	],
+	"files": ["package.json", "dist"],
 	"exports": {
 		".": {
 			"import": "./dist/index.mjs",
