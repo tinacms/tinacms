@@ -72,11 +72,6 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
                         _values
                         _internalSys: _sys {
                           filename
-                          basename
-                          breadcrumbs
-                          path
-                          relativePath
-                          extension
                         }
                       }
                     }
@@ -115,8 +110,8 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
   return { optionSets, loading }
 }
 
-//function to get filename from optionSets for display text in combobox
-//file name is used for display text because title can be nullable (user can defined name rather than title field)
+// function to get filename from optionSets for display text in combobox
+// file name is used for display text because title can be nullable (user can defined name rather than title field)
 const getFilename = (optionSets: OptionSet[], value: string): string | null => {
   // Flatten the optionSets array to a single array of nodes
   const nodes = optionSets.flatMap((optionSet) =>
