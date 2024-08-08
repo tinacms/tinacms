@@ -1,11 +1,7 @@
-import * as React from 'react'
-import type { TinaCMS } from '@toolkit/tina-cms'
-import type { ReferenceFieldProps } from './index'
-import { selectFieldClasses } from '../select'
 import { LoadingDots } from '@toolkit/form-builder'
-import { MdKeyboardArrowDown } from 'react-icons/md'
 import { Field } from '@toolkit/forms'
-import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
+import type { TinaCMS } from '@toolkit/tina-cms'
+import * as React from 'react'
 import { Button } from './components/button'
 import {
   Command,
@@ -15,6 +11,8 @@ import {
   CommandItem,
   CommandList,
 } from './components/command'
+import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
+import type { ReferenceFieldProps } from './index'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
