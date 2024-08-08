@@ -115,8 +115,9 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
   return { optionSets, loading }
 }
 
-//function to get filename from optionSets for display text in combobox
-//file name is used for display text because title can be nullable (user can defined name rather than title field)
+// function to get the filename from optionSets to display text in the combobox
+// file name is used to display text as the title can be nullable (user can define the name rather than title field)
+//? Note - This is looking for a field with `name` or `title`
 const getFilename = (optionSets: OptionSet[], value: string): string | null => {
   // Flatten the optionSets array to a single array of nodes
   const nodes = optionSets.flatMap((optionSet) =>
