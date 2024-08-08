@@ -96,7 +96,7 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
             }/collections/${
               document._sys.collection.name
             }/${document._sys.breadcrumbs.join('/')}`}
-            className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"
+            className="text-gray-700 hover:text-blue-500 inline-flex items-center uppercase text-sm mt-2 mb-2 leading-none"
           >
             <BiEdit className="h-5 w-auto opacity-80 mr-2" />
             Edit in CMS
