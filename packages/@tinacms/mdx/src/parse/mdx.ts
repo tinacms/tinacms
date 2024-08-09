@@ -58,7 +58,8 @@ export function mdxJsxElement(
     const props = extractAttributes(
       node.attributes,
       template.fields,
-      imageCallback
+      imageCallback,
+      template.inline
     )
     const childField = template.fields.find(
       (field) => field.name === 'children'
