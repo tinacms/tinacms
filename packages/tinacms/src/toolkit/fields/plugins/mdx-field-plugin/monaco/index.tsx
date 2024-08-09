@@ -1,16 +1,15 @@
 import React from 'react'
 import { uuid } from '../plate/plugins/ui/helpers'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
-// import { parseMDX, stringifyMDX } from '@tinacms/mdx'
 import { useEditorContext } from '../plate/editor-context'
 import { useDebounce } from './use-debounce'
 import type * as monaco from 'monaco-editor'
 import {
   buildError,
   ErrorMessage,
-  InvalidMarkdownElement,
+  type InvalidMarkdownElement,
 } from './error-message'
-import { RichTextType } from '..'
+import type { RichTextType } from '..'
 
 const parseMDX = (value: string) => ({ type: 'root', children: [] })
 const stringifyMDX = (value: any) => ''

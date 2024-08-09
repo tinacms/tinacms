@@ -39,7 +39,7 @@ export const getStaticPaths = async () => {
 
 export const getStaticProps = async (ctx) => {
   const { data, query, variables } = await client.queries.post({
-    relativePath: ctx.params.slug + ".md",
+    relativePath: `${ctx.params.slug}.md`,
   });
 
   return {

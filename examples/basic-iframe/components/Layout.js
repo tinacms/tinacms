@@ -14,13 +14,9 @@ export const Layout = (props) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <header>
-        <Link href="/">
-          <a>Home</a>
-        </Link>
+        <Link href="/">Home</Link>
         {' | '}
-        <Link href="/posts">
-          <a>Posts</a>
-        </Link>
+        <Link href="/posts">Posts</Link>
       </header>
       <main>{props.children}</main>
     </div>

@@ -1,21 +1,18 @@
+import { preFormat } from './autoformat-utils'
+import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block'
+import type { AutoformatRule } from '@udecode/plate-autoformat'
 import {
-  ELEMENT_CODE_BLOCK,
-  ELEMENT_HR,
   ELEMENT_BLOCKQUOTE,
+  ELEMENT_CODE_BLOCK,
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
   ELEMENT_H4,
   ELEMENT_H5,
   ELEMENT_H6,
-  ELEMENT_DEFAULT,
-  insertNodes,
-  setNodes,
-} from '@udecode/plate-headless'
-import type { AutoformatRule } from '@udecode/plate-headless'
-
-import { preFormat } from './autoformat-utils'
-import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block'
+  ELEMENT_HR,
+} from '@udecode/plate'
+import { ELEMENT_DEFAULT, insertNodes, setNodes } from '@udecode/plate-common'
 
 export const autoformatBlocks: AutoformatRule[] = [
   {

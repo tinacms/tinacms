@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BiEdit } from 'react-icons/bi'
 import { Transition } from '@headlessui/react'
-import { TinaState } from '@toolkit/tina-state'
+import type { TinaState } from '@toolkit/tina-state'
 import { useCMS } from '@toolkit/react-tinacms'
 
 type FormListItem = TinaState['formLists'][number]['items'][number]
@@ -24,6 +24,7 @@ const Item = ({
 
   return (
     <button
+      type="button"
       key={item.path}
       onClick={() => setActiveFormId(item.formId)}
       className={`${
@@ -45,7 +46,7 @@ const Item = ({
 export interface FormsListProps {
   formList: FormListItem[]
   setActiveFormId(id: string): void
-  isEditing: Boolean
+  isEditing: boolean
   hidden?: boolean
 }
 
@@ -59,7 +60,7 @@ const FormListItem = ({
   setActiveFormId: (id: string) => void
 }) => {
   return (
-    <div className={`divide-y divide-gray-200`}>
+    <div className={'divide-y divide-gray-200'}>
       <Item setActiveFormId={setActiveFormId} item={item} depth={depth} />
       {item.subItems && (
         <ul className="divide-y divide-gray-200">
@@ -94,7 +95,6 @@ export const FormLists = (props: { isEditing: boolean }) => {
         enterFrom="opacity-0 -translate-x-1/2"
         enterTo="opacity-100"
         leave="transition-all ease-out duration-150"
-        className={'overflow-scroll'}
         leaveFrom="opacity-100"
         leaveTo="opacity-0 -translate-x-1/2"
       >

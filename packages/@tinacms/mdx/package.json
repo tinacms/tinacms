@@ -1,94 +1,94 @@
 {
-  "name": "@tinacms/mdx",
-  "version": "1.3.29",
-  "typings": "dist/index.d.ts",
-  "main": "dist/index.js",
-  "browser": "dist/index.browser.mjs",
-  "module": "dist/index.mjs",
-  "files": [
-    "package.json",
-    "dist"
-  ],
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "browser": "./dist/index.browser.mjs"
-    }
-  },
-  "license": "Apache-2.0",
-  "buildConfig": {
-    "entryPoints": [
-      {
-        "name": "src/index.ts",
-        "target": "node",
-        "bundleDeps": true
-      }
-    ]
-  },
-  "scripts": {
-    "types": "tsc",
-    "build": "tinacms-scripts build",
-    "docs": "typedoc --plugin typedoc-plugin-markdown src/parse/plate.ts --theme markdown && concat-md --decrease-title-levels --dir-name-as-title docs > spec.md",
-    "serve": "nodemon dist/server.js",
-    "test": "vitest",
-    "coverage": "vitest run --coverage",
-    "test-watch": "jest --watch"
-  },
-  "dependencies": {
-    "@tinacms/schema-tools": "workspace:*",
-    "acorn": "8.8.2",
-    "ccount": "2.0.1",
-    "estree-util-is-identifier-name": "2.1.0",
-    "lodash-es": "4.17.21",
-    "mdast-util-compact": "4.1.1",
-    "mdast-util-directive": "2.2.4",
-    "mdast-util-from-markdown": "1.3.0",
-    "mdast-util-gfm": "2.0.2",
-    "mdast-util-mdx-jsx": "2.1.2",
-    "mdast-util-to-markdown": "1.5.0",
-    "micromark-extension-gfm": "2.0.3",
-    "micromark-factory-mdx-expression": "1.0.7",
-    "micromark-factory-space": "1.0.0",
-    "micromark-factory-whitespace": "1.0.0",
-    "micromark-util-character": "1.1.0",
-    "micromark-util-symbol": "1.0.1",
-    "micromark-util-types": "1.0.2",
-    "parse-entities": "4.0.1",
-    "prettier": "^2.7.1",
-    "remark": "14.0.2",
-    "remark-gfm": "^2.0.0",
-    "remark-mdx": "2.3.0",
-    "stringify-entities": "4.0.3",
-    "typedoc": "^0.26.3",
-    "unist-util-source": "4.0.2",
-    "unist-util-stringify-position": "3.0.3",
-    "unist-util-visit": "4.1.2",
-    "uvu": "0.5.6",
-    "vfile-message": "3.1.4"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
-  "repository": {
-    "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/tina-graphql"
-  },
-  "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
-    "@types/estree": "1.0.0",
-    "@types/lodash-es": "4.17.6",
-    "@types/mdast": "^3.0.10",
-    "@types/node": "^14.18.21",
-    "@types/prettier": "^2.6.3",
-    "@types/unist": "^2.0.6",
-    "c8": "^7.11.3",
-    "concat-md": "^0.5.1",
-    "jest-file-snapshot": "^0.5.0",
-    "ts-node": "^10.8.2",
-    "typedoc-plugin-markdown": "^3.13.6",
-    "typescript": "^5.5.3",
-    "vite": "^4.3.9",
-    "vitest": "^0.32.2"
-  }
+	"name": "@tinacms/mdx",
+	"version": "1.3.29",
+	"typings": "dist/index.d.ts",
+	"main": "dist/index.js",
+	"browser": "dist/index.browser.mjs",
+	"module": "dist/index.mjs",
+	"files": [
+		"package.json",
+		"dist"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js",
+			"browser": "./dist/index.browser.mjs"
+		}
+	},
+	"license": "Apache-2.0",
+	"buildConfig": {
+		"entryPoints": [
+			{
+				"name": "src/index.ts",
+				"target": "node",
+				"bundleDeps": true
+			}
+		]
+	},
+	"scripts": {
+		"types": "tsc",
+		"build": "tinacms-scripts build",
+		"docs": "typedoc --plugin typedoc-plugin-markdown src/parse/plate.ts --theme markdown && concat-md --decrease-title-levels --dir-name-as-title docs > spec.md",
+		"serve": "nodemon dist/server.js",
+		"test": "vitest",
+		"coverage": "vitest run --coverage",
+		"test-watch": "jest --watch"
+	},
+	"dependencies": {
+		"@tinacms/schema-tools": "workspace:*",
+		"acorn": "8.8.2",
+		"ccount": "2.0.1",
+		"estree-util-is-identifier-name": "2.1.0",
+		"lodash.flatten": "4.4.0",
+		"mdast-util-compact": "4.1.1",
+		"mdast-util-directive": "2.2.4",
+		"mdast-util-from-markdown": "1.3.0",
+		"mdast-util-gfm": "2.0.2",
+		"mdast-util-mdx-jsx": "2.1.2",
+		"mdast-util-to-markdown": "1.5.0",
+		"micromark-extension-gfm": "2.0.3",
+		"micromark-factory-mdx-expression": "1.0.7",
+		"micromark-factory-space": "1.0.0",
+		"micromark-factory-whitespace": "1.0.0",
+		"micromark-util-character": "1.1.0",
+		"micromark-util-symbol": "1.0.1",
+		"micromark-util-types": "1.0.2",
+		"parse-entities": "4.0.1",
+		"prettier": "^2.7.1",
+		"remark": "14.0.2",
+		"remark-gfm": "^2.0.0",
+		"remark-mdx": "2.3.0",
+		"stringify-entities": "4.0.3",
+		"typedoc": "^0.26.3",
+		"unist-util-source": "4.0.2",
+		"unist-util-stringify-position": "3.0.3",
+		"unist-util-visit": "4.1.2",
+		"uvu": "0.5.6",
+		"vfile-message": "3.1.4"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org"
+	},
+	"repository": {
+		"url": "https://github.com/tinacms/tinacms.git",
+		"directory": "packages/tina-graphql"
+	},
+	"devDependencies": {
+		"@tinacms/scripts": "workspace:*",
+		"@types/estree": "1.0.0",
+		"@types/lodash.flatten": "^4.4.9",
+		"@types/mdast": "^3.0.10",
+		"@types/node": "^14.18.21",
+		"@types/prettier": "^2.6.3",
+		"@types/unist": "^2.0.6",
+		"c8": "^7.11.3",
+		"concat-md": "^0.5.1",
+		"jest-file-snapshot": "^0.5.0",
+		"ts-node": "^10.8.2",
+		"typedoc-plugin-markdown": "^3.13.6",
+		"typescript": "^5.5.4",
+		"vite": "^4.3.9",
+		"vitest": "^0.32.2"
+	}
 }

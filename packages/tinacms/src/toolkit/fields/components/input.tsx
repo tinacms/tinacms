@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { textFieldClasses } from './text-field'
 
 export interface InputProps {

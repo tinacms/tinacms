@@ -1,7 +1,6 @@
 import React from 'react'
 import { Element } from 'slate'
 import { useSelected, ReactEditor } from 'slate-react'
-import { ELEMENT_PARAGRAPH, insertNodes } from '@udecode/plate-headless'
 import { Transition, Popover } from '@headlessui/react'
 import { NestedForm } from '../../nested-form'
 import { classNames } from '../ui/helpers'
@@ -9,6 +8,8 @@ import { ELEMENT_MDX_INLINE } from '.'
 import { EllipsisIcon } from '../ui/icons'
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks'
 import { useTemplates } from '../../editor-context'
+import { insertNodes } from '@udecode/plate-common'
+import { ELEMENT_PARAGRAPH } from '@udecode/plate'
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div'
@@ -212,6 +213,7 @@ const DotMenu = ({ onOpen, onRemove }) => {
                 Edit
               </span>
               <button
+                type="button"
                 onMouseDown={(e) => {
                   e.preventDefault()
                   onRemove()

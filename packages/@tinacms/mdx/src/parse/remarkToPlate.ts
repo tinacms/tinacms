@@ -4,13 +4,13 @@
 
 */
 
-import { flatten } from 'lodash-es'
+import flatten from 'lodash.flatten'
 import { directiveElement, mdxJsxElement as mdxJsxElementDefault } from './mdx'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
 import type { RichTextType } from '@tinacms/schema-tools'
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
-import { ContainerDirective } from 'mdast-util-directive'
+import type { ContainerDirective } from 'mdast-util-directive'
 
 export type { Position, PositionItem } from './plate'
 

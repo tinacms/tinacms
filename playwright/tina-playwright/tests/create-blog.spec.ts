@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import deleteBlogPost from "../utils/deleteBlogPost";
-import { client } from "../tina/__generated__/client";
 
 test.describe("Create Blog Post", () => {
   test.beforeEach(async ({ page }) => {

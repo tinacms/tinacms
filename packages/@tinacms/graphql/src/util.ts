@@ -70,3 +70,25 @@ export const btoa = (string: string) => {
 export const lastItem = (arr: (number | string)[]) => {
   return arr[arr.length - 1]
 }
+
+//? Note: https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_get
+//! Replaces _.get()
+export const get = (obj, path, defaultValue = undefined) => {
+  const travel = (regexp) =>
+    String.prototype.split
+      .call(path, regexp)
+      .filter(Boolean)
+      .reduce(
+        (res, key) => (res !== null && res !== undefined ? res[key] : res),
+        obj
+      )
+  const result = travel(/[,[\]]+?/) || travel(/[,[\].]+?/)
+  return result === undefined || result === obj ? defaultValue : result
+}
+
+//? Note: https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_flattendeep
+//! Replaces _.flattenDeep()
+export const flattenDeep = (arr) =>
+  arr.flatMap((subArray, index) =>
+    Array.isArray(subArray) ? flattenDeep(subArray) : subArray
+  )

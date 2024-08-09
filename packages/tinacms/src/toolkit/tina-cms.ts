@@ -1,16 +1,12 @@
-/**
-
-*/
-
 import {
   CMS,
-  CMSConfig,
-  CMSEvent,
-  MediaUploadOptions,
-  PluginType,
+  type CMSConfig,
+  type CMSEvent,
+  type MediaUploadOptions,
+  type PluginType,
 } from '@toolkit/core'
-import { FieldPlugin } from '@toolkit/form-builder'
-import { ScreenPlugin } from '@toolkit/react-screens'
+import type { FieldPlugin } from '@toolkit/form-builder'
+import type { ScreenPlugin } from '@toolkit/react-screens'
 import {
   TextFieldPlugin,
   TextareaFieldPlugin,
@@ -32,9 +28,9 @@ import {
   HiddenFieldPlugin,
   PasswordFieldPlugin,
 } from '@toolkit/fields'
-import { Form } from '@toolkit/forms'
-import { Alerts, EventsToAlerts } from '@toolkit/alerts'
-import { SidebarState, SidebarStateOptions } from '@toolkit/react-sidebar'
+import type { Form } from '@toolkit/forms'
+import { Alerts, type EventsToAlerts } from '@toolkit/alerts'
+import { SidebarState, type SidebarStateOptions } from '@toolkit/react-sidebar'
 import {
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
@@ -42,7 +38,7 @@ import {
 import { MediaManagerScreenPlugin } from '@toolkit/plugin-screens/media-manager-screen'
 import { PasswordScreenPlugin } from '@toolkit/plugin-screens/password-screen'
 import { createCloudConfig } from '@toolkit/react-cloud-config'
-import { TinaAction, TinaState } from './tina-state'
+import type { TinaAction, TinaState } from './tina-state'
 import type { Client } from '../internalClient'
 import { MdOutlinePerson } from 'react-icons/md'
 import { MdOutlineHelpOutline } from 'react-icons/md'
@@ -122,6 +118,7 @@ export class TinaCMS extends CMS {
 
     DEFAULT_FIELDS.forEach((field) => {
       if (!this.fields.find(field.name)) {
+        //@ts-ignore //? Note - Not sure what this is doing
         this.fields.add(field)
       }
     })
@@ -153,7 +150,7 @@ export class TinaCMS extends CMS {
             name: 'Support',
             link: {
               text: 'Support',
-              href: `https:/tina.io/docs/support`,
+              href: 'https:/tina.io/docs/support',
             },
             Icon: MdOutlineHelpOutline,
           })
@@ -165,7 +162,7 @@ export class TinaCMS extends CMS {
             text: 'No project configured, set one up ',
             link: {
               text: 'here',
-              href: `https://app.tina.io`,
+              href: 'https://app.tina.io',
             },
           })
         )

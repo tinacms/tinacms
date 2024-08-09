@@ -1,6 +1,5 @@
 import React from 'react'
 import { useSelected } from 'slate-react'
-import { insertNodes, ELEMENT_PARAGRAPH } from '@udecode/plate-headless'
 import { NestedForm } from '../../nested-form'
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks'
 import { useTemplates } from '../../editor-context'
@@ -10,6 +9,8 @@ import {
   StyledImage,
 } from '../../../../../components'
 import { isImage } from '@toolkit/components/media/utils'
+import { insertNodes } from '@udecode/plate-common'
+import { ELEMENT_PARAGRAPH } from '@udecode/plate'
 
 export const ImgEmbed = ({
   attributes,
@@ -33,10 +34,11 @@ export const ImgEmbed = ({
       {element.url ? (
         <div
           className={`relative w-full max-w-full flex justify-start ${
-            isImage(element.url) ? `items-start gap-3` : `items-center gap-2`
+            isImage(element.url) ? 'items-start gap-3' : 'items-center gap-2'
           }`}
         >
           <button
+            type="button"
             className={`flex-shrink min-w-0 focus-within:shadow-outline focus-within:border-blue-500 rounded outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100 ${
               selected ? 'shadow-outline border-blue-500' : ''
             }`}
@@ -57,6 +59,7 @@ export const ImgEmbed = ({
         </div>
       ) : (
         <button
+          type="button"
           className="outline-none relative hover:opacity-60 w-full"
           onClick={handleSelect}
         >

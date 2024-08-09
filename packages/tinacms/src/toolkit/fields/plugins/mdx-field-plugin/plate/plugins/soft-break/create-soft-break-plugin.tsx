@@ -1,7 +1,7 @@
 import React from 'react'
-import { createPluginFactory } from '@udecode/plate-headless'
 import { onKeyDownSoftBreak } from './on-key-down-soft-break'
-import { SoftBreakPlugin } from './types'
+import type { SoftBreakPlugin } from './types'
+import { createPluginFactory } from '@udecode/plate-common'
 
 export const KEY_SOFT_BREAK = 'break'
 
