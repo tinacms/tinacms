@@ -1,5 +1,16 @@
 # tinacms-cli
 
+## 1.5.53
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- Updated dependencies [d9b23fc]
+  - tinacms@2.1.1
+  - @tinacms/app@2.0.3
+  - @tinacms/graphql@1.4.40
+  - @tinacms/search@1.0.25
+
 ## 1.5.52
 
 ### Patch Changes

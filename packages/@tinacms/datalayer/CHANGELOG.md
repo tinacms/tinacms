@@ -1,5 +1,13 @@
 # tina-graphql
 
+## 1.2.40
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- Updated dependencies [d9b23fc]
+  - @tinacms/graphql@1.4.40
+
 ## 1.2.39
 
 ### Patch Changes

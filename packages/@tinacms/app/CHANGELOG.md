@@ -1,5 +1,13 @@
 # @tinacms/app
 
+## 2.0.3
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- Updated dependencies [d9b23fc]
+  - tinacms@2.1.1
+
 ## 2.0.2
 
 ### Patch Changes

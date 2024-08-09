@@ -1,5 +1,13 @@
 # tinacms-gitprovider-github
 
+## 1.0.11
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- Updated dependencies [d9b23fc]
+  - @tinacms/datalayer@1.2.40
+
 ## 1.0.10
 
 ### Patch Changes

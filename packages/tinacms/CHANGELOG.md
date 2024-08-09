@@ -1,5 +1,12 @@
 # tinacms
 
+## 2.1.1
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+  - @tinacms/search@1.0.25
+
 ## 2.1.0
 
 ### Minor Changes
