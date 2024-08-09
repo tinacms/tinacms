@@ -9,7 +9,15 @@ import { DEFAULT_MEDIA_UPLOAD_TYPES } from 'tinacms'
 
 import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors'
 
+export type CloudinaryMediaStoreOptions = {
+  baseUrl?: string
+}
+
 export class CloudinaryMediaStore implements MediaStore {
+  baseUrl: any
+  constructor(options?: CloudinaryMediaStoreOptions) {
+    this.baseUrl = options?.baseUrl || '/api/cloudinary/media'
+  }
   fetchFunction = (input: RequestInfo, init?: RequestInit) => {
     return fetch(input, init)
   }
@@ -25,7 +33,7 @@ export class CloudinaryMediaStore implements MediaStore {
       formData.append('directory', directory)
       formData.append('filename', file.name)
 
-      const res = await this.fetchFunction(`/api/cloudinary/media`, {
+      const res = await this.fetchFunction(this.baseUrl, {
         method: 'POST',
         body: formData,
       })
@@ -67,7 +75,7 @@ export class CloudinaryMediaStore implements MediaStore {
   }
   async delete(media: Media) {
     await this.fetchFunction(
-      `/api/cloudinary/media/${encodeURIComponent(media.id)}`,
+      `${this.baseUrl}/${encodeURIComponent(media.id)}`,
       {
         method: 'DELETE',
       }
@@ -75,7 +83,7 @@ export class CloudinaryMediaStore implements MediaStore {
   }
   async list(options: MediaListOptions): Promise<MediaList> {
     const query = this.buildQuery(options)
-    const response = await this.fetchFunction('/api/cloudinary/media' + query)
+    const response = await this.fetchFunction(this.baseUrl + query)
 
     if (response.status == 401) {
       throw E_UNAUTHORIZED
@@ -99,7 +107,7 @@ export class CloudinaryMediaStore implements MediaStore {
     return img.src
   }
 
-  private buildQuery(options: MediaListOptions) {
+  buildQuery(options: MediaListOptions) {
     const params = Object.keys(options)
       .filter((key) => options[key] !== '' && options[key] !== undefined)
       .map((key) => `${key}=${options[key]}`)
