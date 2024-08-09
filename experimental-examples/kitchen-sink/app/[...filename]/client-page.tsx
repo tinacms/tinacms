@@ -13,18 +13,23 @@ interface ClientPageProps {
 }
 
 export default function ClientPage(props: ClientPageProps) {
-  //data passes though in production mode and data is updated to the sidebar data in edit-mode
-  const { data } = useTina({
-    query: props.query,
-    variables: props.variables,
-    data: props.data,
-  })
+  const { data } = useTina({ ...props })
+  const { heading, subtitle, body } = data.page
 
-  const content = data.page.body
   return (
     <div data-tina-field={tinaField(data.page, 'body')}>
-      <p>test</p>
-      <TinaMarkdown content={content} />
+      <h1 data-test="heading">{heading}</h1>
+      <div data-test="subtitle">{subtitle}</div>
+      <hr />
+      <div data-test="rich-text-body">
+        <TinaMarkdown
+          content={body}
+          components={{
+            component1: (props) => <div>{JSON.stringify(props)}</div>,
+            component2: (props) => <div>{JSON.stringify(props)}</div>,
+          }}
+        />
+      </div>
     </div>
   )
 }
