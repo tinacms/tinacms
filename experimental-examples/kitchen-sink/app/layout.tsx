@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
         }}
       >
         <header>
-          <Link href="/">Home</Link>
+          <Link href="/home">Home</Link>
           {' | '}
           <Link href="/posts">Posts</Link>
         </header>
