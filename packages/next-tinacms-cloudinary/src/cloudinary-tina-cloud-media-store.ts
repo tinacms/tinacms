@@ -1,16 +1,14 @@
 import type { Client } from 'tinacms'
-import type { TinaCloudCloudinaryOptions } from './options'
-import { createCloudinaryMediaStore } from './cloudinary-media-store'
+import type { CloudinaryMediaStoreOptions } from './cloudinary-media-store'
+import { CloudinaryMediaStore } from './cloudinary-media-store'
 
-export const createTinaCloudinaryMediaStore = (
-  options: TinaCloudCloudinaryOptions = { baseURL: '/api/cloudinary/media' }
+export const createTinaCloudCloudinaryMediaStore = (
+  options: CloudinaryMediaStoreOptions = { baseUrl: '/api/cloudinary/media' }
 ) =>
-  class TinaCloudCloudinaryMediaStore extends createCloudinaryMediaStore(
-    options
-  ) {
+  class TinaCloudCloudinaryMediaStore extends CloudinaryMediaStore {
     client: Client
     constructor(client: Client) {
-      super()
+      super(options)
       this.client = client
       this.fetchFunction = async (input: RequestInfo, init?: RequestInit) => {
         try {
@@ -27,3 +25,6 @@ export const createTinaCloudinaryMediaStore = (
       }
     }
   }
+
+export const TinaCloudCloudinaryMediaStore =
+  createTinaCloudCloudinaryMediaStore()
