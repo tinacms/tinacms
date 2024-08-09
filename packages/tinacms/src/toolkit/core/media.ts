@@ -95,6 +95,7 @@ export interface MediaListOptions {
   limit?: number
   offset?: MediaListOffset
   thumbnailSizes?: { w: number; h: number }[]
+  filesOnly?: boolean
 }
 
 /**

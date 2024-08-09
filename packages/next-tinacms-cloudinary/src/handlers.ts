@@ -95,9 +95,10 @@ async function listMedia(
   try {
     const {
       directory = '""',
-      limit = 500,
+      limit = '500',
       offset,
-    } = req.query as MediaListOptions
+      filesOnly = 'false',
+    } = req.query
 
     const useRootDirectory =
       !directory || directory === '/' || directory === '""'
@@ -106,7 +107,7 @@ async function listMedia(
 
     const response = await cloudinary.search
       .expression(query)
-      .max_results(limit)
+      .max_results(parseInt(limit as string, 10))
       .next_cursor(offset as string)
       .execute()
 
@@ -122,34 +123,37 @@ async function listMedia(
     }
     let folders: string[] = []
     let folderRes = null
+    const loadFolders = !(filesOnly == 'true')
 
-    try {
-      // @ts-ignore
-      folderRes = await cloudinary.api.folders(directory)
-    } catch (e) {
-      // If the folder doesn't exist, just return an empty array
-      if (e.error?.message.startsWith("Can't find folder with path")) {
-        // ignore
-      } else {
-        console.error('Error getting folders')
-        console.error(e)
-        throw e
-      }
-    }
-
-    if (folderRes?.folders) {
-      folders = folderRes.folders.map(function (folder: {
-        name: string
-        path: string
-      }): Media {
-        'empty-repo/004'
-        return {
-          id: folder.path,
-          type: 'dir',
-          filename: path.basename(folder.path),
-          directory: path.dirname(folder.path),
+    if (loadFolders) {
+      try {
+        // @ts-ignore
+        folderRes = await cloudinary.api.folders(directory)
+      } catch (e) {
+        // If the folder doesn't exist, just return an empty array
+        if (e.error?.message.startsWith("Can't find folder with path")) {
+          // ignore
+        } else {
+          console.error('Error getting folders')
+          console.error(e)
+          throw e
         }
-      })
+      }
+
+      if (folderRes?.folders) {
+        folders = folderRes.folders.map(function (folder: {
+          name: string
+          path: string
+        }): Media {
+          'empty-repo/004'
+          return {
+            id: folder.path,
+            type: 'dir',
+            filename: path.basename(folder.path),
+            directory: path.dirname(folder.path),
+          }
+        })
+      }
     }
 
     res.json({
