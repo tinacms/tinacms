@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.4.40
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+
 ## 1.4.39
 
 ### Patch Changes

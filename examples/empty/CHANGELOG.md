@@ -1,5 +1,13 @@
 # starter-empty
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [d9b23fc]
+  - tinacms@2.1.1
+  - @tinacms/cli@1.5.53
+
 ## 0.0.3
 
 ### Patch Changes
