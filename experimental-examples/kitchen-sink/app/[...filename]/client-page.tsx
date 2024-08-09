@@ -1,12 +1,23 @@
-import { getStaticPropsForTina } from 'tinacms'
+'use client'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
-import { useTina } from 'tinacms/dist/react'
-import { Layout } from '../components/Layout'
-export default function Home(props) {
+import { tinaField, useTina } from 'tinacms/dist/react'
+import { PageQuery } from '../../tina/__generated__/types'
+import React from 'react'
+
+interface ClientPageProps {
+  query: string
+  variables: {
+    relativePath: string
+  }
+  data: { page: PageQuery['page'] }
+}
+
+export default function ClientPage(props: ClientPageProps) {
   const { data } = useTina({ ...props })
   const { heading, subtitle, body } = data.page
+
   return (
-    <Layout>
+    <div data-tina-field={tinaField(data.page, 'body')}>
       <h1 data-test="heading">{heading}</h1>
       <div data-test="subtitle">{subtitle}</div>
       <hr />
@@ -19,25 +30,6 @@ export default function Home(props) {
           }}
         />
       </div>
-    </Layout>
+    </div>
   )
-}
-
-export const getStaticProps = async () => {
-  const tinaProps = await getStaticPropsForTina({
-    query: `{
-      page(relativePath: "home.mdx"){
-        body
-        heading
-        subtitle
-      }
-    }`,
-    variables: {},
-  })
-
-  return {
-    props: {
-      ...tinaProps,
-    },
-  }
 }

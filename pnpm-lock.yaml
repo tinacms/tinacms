@@ -341,7 +341,7 @@ importers:
         specifier: ^13.4.7
         version: 13.5.6(eslint@7.32.0)(typescript@5.5.4)
       typescript:
-        specifier: ^5.5.3
+        specifier: 5.5.4
         version: 5.5.4
 
   experimental-examples/tina-cloud-starter:
