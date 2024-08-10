@@ -78,7 +78,7 @@ export class CloudinaryMediaStore implements MediaStore {
   }
   async list(options: MediaListOptions): Promise<MediaList> {
     const query = this.buildQuery(options)
-    const response = await this.fetchFunction(options.baseUrl + query)
+    const response = await this.fetchFunction(this.baseUrl + query)
 
     if (response.status == 401) {
       throw E_UNAUTHORIZED
