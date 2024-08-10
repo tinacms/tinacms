@@ -72,7 +72,7 @@ export class CloudinaryMediaStore implements MediaStore {
     return newFiles
   }
   async delete(media: Media) {
-    await this.fetchFunction(this.baseUrl + encodeURIComponent(media.id), {
+    await this.fetchFunction(`${this.baseUrl}/${encodeURIComponent(media.id)}`, {
       method: 'DELETE',
     })
   }
