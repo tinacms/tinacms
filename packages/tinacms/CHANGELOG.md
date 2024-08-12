@@ -1,5 +1,15 @@
 # tinacms
 
+## 2.1.1
+
+### Patch Changes
+
+- c6e9afb: fix reference field selector styling
+- d9b23fc: Improve reference field selector
+- 1c69338: fix reference field search and styling
+- a1a767d: add icon to reference selector
+  - @tinacms/search@1.0.25
+
 ## 2.1.0
 
 ### Minor Changes

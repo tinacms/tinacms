@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 1.4.40
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- 613e9c5: Filter .gitkeep.\* files during indexing
+
 ## 1.4.39
 
 ### Patch Changes
