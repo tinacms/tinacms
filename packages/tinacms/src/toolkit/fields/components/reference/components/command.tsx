@@ -1,8 +1,6 @@
-import { Dialog, DialogContent } from '@radix-ui/react-dialog'
-import { type DialogProps } from '@radix-ui/react-dialog'
-import * as React from 'react'
 import { Command as CommandPrimitive } from 'cmdk'
 import { Search } from 'lucide-react'
+import * as React from 'react'
 import { cn } from '../../../../../lib/utils' //TODO : improve this import path (breaking vite build without ../../../../../)
 
 const Command = React.forwardRef<
@@ -45,7 +43,7 @@ const CommandList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
-    className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden', className)}
+    className={cn('overflow-x-hidden', className)}
     {...props}
   />
 ))
@@ -99,9 +97,9 @@ CommandItem.displayName = CommandPrimitive.Item.displayName
 
 export {
   Command,
-  CommandInput,
-  CommandList,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
+  CommandList,
 }
