@@ -13,6 +13,11 @@ import {
 } from './components/command'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
 import type { ReferenceFieldProps } from './index'
+import {
+  IoIosArrowDropdown,
+  IoMdArrowDropdown,
+  IoMdArrowDropup,
+} from 'react-icons/io'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
@@ -153,6 +158,11 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
             className="w-52 justify-between"
           >
             <p className="truncate">{displayText ?? 'Choose an option...'}</p>
+            {open ? (
+              <IoMdArrowDropup size={20} />
+            ) : (
+              <IoMdArrowDropdown size={20} />
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-0 relative">
