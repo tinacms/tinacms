@@ -28,7 +28,7 @@ const useImageToolbarButton = (state) => {
 
     cms.media.open({
       allowDelete: true,
-      directory: '', //TODO: get actual directory?
+      directory: '',
       onSelect: (media) => {
         insertImg(editor, media)
       },
