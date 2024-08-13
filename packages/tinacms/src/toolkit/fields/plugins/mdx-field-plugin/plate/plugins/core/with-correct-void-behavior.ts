@@ -1,4 +1,3 @@
-// import { isElement } from '@udecode/plate'
 import { isElement } from '@udecode/plate-common'
 import { Editor, Node, Path, Range, Transforms } from 'slate'
 
