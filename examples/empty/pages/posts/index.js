@@ -1,5 +1,5 @@
 import { staticRequest } from 'tinacms'
-import { Layout } from '../../components/Layout'
+
 import Link from 'next/link'
 import { useTina } from 'tinacms/dist/react'
 
@@ -22,20 +22,21 @@ export default function Home(props) {
     variables: {},
     data: props.data,
   })
-  const postsList = data.getPostList.edges
+
+  const postsList = data?.getPostList?.edges
   return (
-    <Layout>
+    <>
       <h1>Posts</h1>
       <div>
-        {postsList.map((post) => (
+        {postsList?.map((post) => (
           <div key={post.node.id}>
             <Link href={`/posts/${post.node.sys.filename}`}>
-              <a>{post.node.sys.filename}</a>
+              {post.node.sys.filename}
             </Link>
           </div>
         ))}
       </div>
-    </Layout>
+    </>
   )
 }
 

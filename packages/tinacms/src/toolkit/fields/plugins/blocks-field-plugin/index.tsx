@@ -1,8 +1,6 @@
 import * as React from 'react'
-import { Field, Form } from '@toolkit/forms'
-import { FieldsBuilder, useFormPortal } from '@toolkit/form-builder'
+import type { Field, Form } from '@toolkit/forms'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { GroupPanel, PanelHeader, PanelBody } from '../group-field-plugin'
 import {
   GroupLabel,
   ItemDeleteButton,
@@ -12,7 +10,10 @@ import {
 } from '../group-list-field-plugin'
 import { useCMS } from '@toolkit/react-core/use-cms'
 import { useEvent } from '@toolkit/react-core'
-import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events'
+import type {
+  FieldHoverEvent,
+  FieldFocusEvent,
+} from '@toolkit/fields/field-events'
 import { BlockSelector } from './block-selector'
 import { BlockSelectorBig } from './block-selector-big'
 import { BiPencil } from 'react-icons/bi'
@@ -179,13 +180,10 @@ const BlockListItem = ({
   field,
   index,
   template,
-  block,
   isMin,
   fixedLength,
 }: BlockListItemProps) => {
   const cms = useCMS()
-  const FormPortal = useFormPortal()
-  const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
@@ -195,12 +193,7 @@ const BlockListItem = ({
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
 
   return (
-    <Draggable
-      key={index}
-      type={field.name}
-      draggableId={`${field.name}.${index}`}
-      index={index}
-    >
+    <Draggable key={index} draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
         <>
           <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
@@ -241,21 +234,6 @@ const BlockListItem = ({
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />
             )}
           </ItemHeader>
-          {/* <FormPortal>
-            {({ zIndexShift }) => (
-              <Panel
-                zIndexShift={zIndexShift}
-                isExpanded={isExpanded}
-                setExpanded={setExpanded}
-                field={field}
-                item={block}
-                index={index}
-                tinaForm={tinaForm}
-                label={label || template.label}
-                template={template}
-              />
-            )}
-          </FormPortal> */}
         </>
       )}
     </Draggable>
@@ -276,12 +254,7 @@ const InvalidBlockListItem = ({
   }, [tinaForm, field, index])
 
   return (
-    <Draggable
-      key={index}
-      type={field.name}
-      draggableId={`${field.name}.${index}`}
-      index={index}
-    >
+    <Draggable key={index} draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
         <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
           <DragHandle isDragging={snapshot.isDragging} />
@@ -292,63 +265,6 @@ const InvalidBlockListItem = ({
         </ItemHeader>
       )}
     </Draggable>
-  )
-}
-
-interface PanelProps {
-  setExpanded(next: boolean): void
-  isExpanded: boolean
-  tinaForm: Form
-  index: number
-  field: BlocksFieldDefinititon
-  item: any
-  label: string
-  template: BlockTemplate
-  zIndexShift: number
-}
-
-const Panel = function Panel({
-  setExpanded,
-  isExpanded,
-  tinaForm,
-  field,
-  index,
-  label,
-  template,
-  zIndexShift,
-}: PanelProps) {
-  const cms = useCMS()
-
-  const fields: any[] = React.useMemo(() => {
-    if (!template.fields) return []
-
-    return template.fields.map((subField: any) => ({
-      ...subField,
-      name: `${field.name}.${index}.${subField.name}`,
-    }))
-  }, [field.name, index, template.fields])
-
-  return (
-    <GroupPanel isExpanded={isExpanded} style={{ zIndex: zIndexShift + 1000 }}>
-      <PanelHeader
-        onClick={() => {
-          const state = tinaForm.finalForm.getState()
-          if (state.invalid === true) {
-            // @ts-ignore
-            cms.alerts.error('Cannot navigate away from an invalid form.')
-            return
-          }
-
-          setExpanded(false)
-        }}
-      >
-        {label}
-      </PanelHeader>
-      <PanelBody id={tinaForm.id}>
-        {/* RENDER OPTIMIZATION: Only render fields of expanded fields.  */}
-        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
-      </PanelBody>
-    </GroupPanel>
   )
 }
 

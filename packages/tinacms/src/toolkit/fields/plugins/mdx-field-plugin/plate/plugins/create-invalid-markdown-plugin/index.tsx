@@ -1,5 +1,5 @@
 import React from 'react'
-import { createPluginFactory } from '@udecode/plate-headless'
+import { createPluginFactory } from '@udecode/plate-common'
 import { useEditorContext } from '../../editor-context'
 import { buildErrorMessage } from '../../../monaco/error-message'
 
@@ -33,21 +33,13 @@ export function ErrorMessage({ error }) {
           <p>{message}</p>
           <p>To fix these errors, edit the content in raw-mode.</p>
           <button
+            type="button"
             onClick={() => setRawMode(true)}
             className="rounded-l-md border-r-0 shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-gray-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
           >
             Switch to raw-mode
           </button>
         </div>
-        {/* <div className="mt-5">
-          <button
-            type="button"
-            onClick={() => setRawMode(true)}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm"
-          >
-            Fix Errors
-          </button>
-        </div> */}
       </div>
     </div>
   )

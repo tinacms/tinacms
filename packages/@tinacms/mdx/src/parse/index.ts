@@ -5,7 +5,7 @@
 */
 
 import { remark } from 'remark'
-import remarkMdx, { Root } from 'remark-mdx'
+import remarkMdx, { type Root } from 'remark-mdx'
 import { gfm } from 'micromark-extension-gfm'
 import { gfmFromMarkdown } from 'mdast-util-gfm'
 import remarkGfm from 'remark-gfm'
@@ -16,7 +16,7 @@ import type { RichTextType } from '@tinacms/schema-tools'
 import type * as Plate from './plate'
 import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown'
 import { tinaDirective } from '../extensions/tina-shortcodes/extension'
-import { Pattern } from '../stringify'
+import type { Pattern } from '../stringify'
 import { parseShortcode } from './parseShortcode'
 /**
  * ### Convert the MDXAST into an API-friendly format
