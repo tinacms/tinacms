@@ -214,8 +214,20 @@ export type ImageField = (
   }
 
 export type ReferenceField = (
-  | FieldGeneric<string, undefined>
-  | FieldGeneric<string, false>
+  | FieldGeneric<
+      string,
+      undefined,
+      { selectComponent: (props: any) => Element | undefined }
+    >
+  | FieldGeneric<
+      string,
+      false,
+      {
+        selectComponent: (props: {
+          values: Record<string, unknown> & { _collection: string }
+        }) => Element | undefined
+      }
+    >
 ) &
   BaseField & {
     type: 'reference'

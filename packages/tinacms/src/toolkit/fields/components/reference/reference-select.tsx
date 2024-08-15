@@ -143,6 +143,9 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
     input.onChange(value)
   }, [value, input, optionSets])
 
+  console.log(field)
+  console.log(optionSets)
+
   if (loading === true) {
     return <LoadingDots color="var(--tina-color-primary)" />
   }
