@@ -213,24 +213,39 @@ export type ImageField = (
     type: 'image'
   }
 
-export type ReferenceField = (
-  | FieldGeneric<string, undefined>
-  | FieldGeneric<string, false>
-) &
-  BaseField & {
-    type: 'reference'
-    /**
-     * The names of the collections this field can use as a reference
-     * ```ts
-     * {
-     *   type: 'reference',
-     *   name: 'author',
-     *   collections: ['author'],
-     * }
-     * ```
-     */
-    collections: string[]
-  }
+export type ReferenceField =
+  // These types are either wrong or in the wrong place, but somewhere in here you'll want to provide the `selectComponent` type defs so the person
+  // writing the config knows what they're getting in the props
+  (
+    | FieldGeneric<
+        string,
+        undefined,
+        { selectComponent: (props: any) => Element | undefined }
+      >
+    | FieldGeneric<
+        string,
+        false,
+        {
+          selectComponent: (props: {
+            values: Record<string, unknown> & { _collection: string }
+          }) => Element | undefined
+        }
+      >
+  ) &
+    BaseField & {
+      type: 'reference'
+      /**
+       * The names of the collections this field can use as a reference
+       * ```ts
+       * {
+       *   type: 'reference',
+       *   name: 'author',
+       *   collections: ['author'],
+       * }
+       * ```
+       */
+      collections: string[]
+    }
 
 export type PasswordField = (
   | FieldGeneric<string, undefined>

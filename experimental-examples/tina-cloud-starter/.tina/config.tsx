@@ -5,6 +5,7 @@ import { heroBlockSchema } from '../components/blocks/hero'
 import { testimonialBlockSchema } from '../components/blocks/testimonial'
 import { ColorPickerInput } from '../components/fields/color'
 import { iconSchema } from '../components/util/icon'
+import React from 'react'
 
 export const shouldEncode = (path: string, value: string) => {}
 
@@ -69,7 +70,22 @@ const config = defineConfig({
             type: 'reference',
             label: 'Author',
             name: 'author',
-            collections: ['author'],
+            ui: {
+              selectComponent: (props) => {
+                console.log(props.values._collection)
+                if (props.values._collection === 'author') {
+                  return (
+                    <div>
+                      <img src={props.values.avatar} /> {props.values.name}
+                    </div>
+                  )
+                }
+                if (props.values._collection === 'post') {
+                  return <div>{props.values.title}</div>
+                }
+              },
+            },
+            collections: ['author', 'post'],
           },
           {
             type: 'datetime',

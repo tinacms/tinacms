@@ -58,6 +58,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
                         _internalSys: _sys {
                           title
                         }
+                         _values
                       }
                     }
                   }
@@ -112,6 +113,33 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
     return <LoadingDots color="var(--tina-color-primary)" />
   }
 
+  console.log(field)
+  console.log(optionSets)
+
+  return (
+    <div>
+      {optionSets.length > 0 &&
+        optionSets.map(({ collection, edges }: OptionSet) => (
+          <div key={`${collection}-group`} label={collection}>
+            {edges.map(
+              ({
+                node: {
+                  id,
+                  _values,
+                  _internalSys: { title },
+                },
+              }) => (
+                <button key={`${id}-option`} value={id}>
+                  {/* {title || id} */}
+                  {field.ui.selectComponent({ values: _values })}
+                </button>
+              )
+            )}
+          </div>
+        ))}
+    </div>
+  )
+
   return (
     <>
       <select
@@ -130,11 +158,13 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
                 ({
                   node: {
                     id,
+                    _values,
                     _internalSys: { title },
                   },
                 }) => (
                   <option key={`${id}-option`} value={id}>
-                    {title || id}
+                    {/* {title || id} */}
+                    {field.ui.selectComponent({ values: _values })}
                   </option>
                 )
               )}
