@@ -143,8 +143,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
     input.onChange(value)
   }, [value, input, optionSets])
 
-  console.log(field)
-  console.log(optionSets)
+  console.log('Field', field)
 
   if (loading === true) {
     return <LoadingDots color="var(--tina-color-primary)" />
@@ -185,14 +184,14 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                     heading={collection}
                   >
                     <CommandList>
-                      {edges.map(
-                        ({
-                          node: {
-                            id,
-                            _internalSys: { filename },
-                            _values: { title, name },
-                          },
-                        }) => (
+                      {edges.map(({ node }) => {
+                        const {
+                          id,
+                          _internalSys: { filename },
+                          _values: { title, name },
+                        } = node
+
+                        return (
                           <CommandItem
                             key={`${id}-option`}
                             value={id || title}
@@ -205,13 +204,16 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                               <span className="font-semibold text-sm">
                                 {title || name || id}
                               </span>
-                              {(title || name) && (
+                              {/* {(title || name) && (
                                 <span className="text-x">{filename}</span>
-                              )}
+                              )} */}
+                              <div>
+                                {field.ui.selectComponents(node._values)}
+                              </div>
                             </div>
                           </CommandItem>
                         )
-                      )}
+                      })}
                     </CommandList>
                   </CommandGroup>
                 ))}

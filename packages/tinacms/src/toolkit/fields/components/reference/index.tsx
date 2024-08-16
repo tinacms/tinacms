@@ -14,6 +14,7 @@ export interface ReferenceFieldProps {
   component: string
   collections: string[]
   options: (Option | string)[]
+  ui?: any
 }
 
 export interface ReferenceProps {
