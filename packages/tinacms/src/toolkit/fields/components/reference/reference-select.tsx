@@ -13,6 +13,11 @@ import {
 } from './components/command'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
 import type { ReferenceFieldProps } from './index'
+import {
+  IoIosArrowDropdown,
+  IoMdArrowDropdown,
+  IoMdArrowDropup,
+} from 'react-icons/io'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
@@ -153,46 +158,61 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
             className="w-52 justify-between"
           >
             <p className="truncate">{displayText ?? 'Choose an option...'}</p>
+            {open ? (
+              <IoMdArrowDropup size={20} />
+            ) : (
+              <IoMdArrowDropdown size={20} />
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-0 relative">
-          <Command>
+          <Command
+            filter={(value, search) => {
+              if (value.includes(search)) return 1
+              return 0
+            }}
+          >
             <CommandInput placeholder="Search reference..." />
             <CommandEmpty>No reference found</CommandEmpty>
-            {optionSets.length > 0 &&
-              optionSets.map(({ collection, edges }: OptionSet) => (
-                <CommandGroup key={`${collection}-group`} heading={collection}>
-                  <CommandList>
-                    {edges.map(
-                      ({
-                        node: {
-                          id,
-                          _internalSys: { filename },
-                          _values: { title, name },
-                        },
-                      }) => (
-                        <CommandItem
-                          key={`${id}-option`}
-                          value={id}
-                          onSelect={() => {
-                            setValue(id)
-                            setOpen(false)
-                          }}
-                        >
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-sm">
-                              {title || name || id}
-                            </span>
-                            {(title || name) && (
-                              <span className="text-x">{filename}</span>
-                            )}
-                          </div>
-                        </CommandItem>
-                      )
-                    )}
-                  </CommandList>
-                </CommandGroup>
-              ))}
+            <CommandList>
+              {optionSets.length > 0 &&
+                optionSets.map(({ collection, edges }: OptionSet) => (
+                  <CommandGroup
+                    key={`${collection}-group`}
+                    heading={collection}
+                  >
+                    <CommandList>
+                      {edges.map(
+                        ({
+                          node: {
+                            id,
+                            _internalSys: { filename },
+                            _values: { title, name },
+                          },
+                        }) => (
+                          <CommandItem
+                            key={`${id}-option`}
+                            value={id || title}
+                            onSelect={() => {
+                              setValue(id)
+                              setOpen(false)
+                            }}
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-semibold text-sm">
+                                {title || name || id}
+                              </span>
+                              {(title || name) && (
+                                <span className="text-x">{filename}</span>
+                              )}
+                            </div>
+                          </CommandItem>
+                        )
+                      )}
+                    </CommandList>
+                  </CommandGroup>
+                ))}
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>

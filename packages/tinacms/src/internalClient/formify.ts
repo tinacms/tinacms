@@ -3,25 +3,25 @@
 */
 
 import {
-  ASTKindToNode,
-  ASTNode,
-  DocumentNode,
-  FieldNode,
+  type ASTKindToNode,
+  type ASTNode,
+  type DocumentNode,
+  type FieldNode,
   getNamedType,
-  GraphQLField,
-  GraphQLNamedType,
+  type GraphQLField,
+  type GraphQLNamedType,
   GraphQLObjectType,
-  GraphQLSchema,
+  type GraphQLSchema,
   GraphQLUnionType,
-  InlineFragmentNode,
+  type InlineFragmentNode,
   isLeafType,
   isScalarType,
   TypeInfo,
   visit,
-  Visitor,
+  type Visitor,
   visitWithTypeInfo,
 } from 'graphql'
-import { set } from 'lodash'
+import set from 'lodash.set'
 
 type VisitorType = Visitor<ASTKindToNode, ASTNode>
 

@@ -72,9 +72,12 @@ export class CloudinaryMediaStore implements MediaStore {
     return newFiles
   }
   async delete(media: Media) {
-    await this.fetchFunction(`${this.baseUrl}/${encodeURIComponent(media.id)}`, {
-      method: 'DELETE',
-    })
+    await this.fetchFunction(
+      `${this.baseUrl}/${encodeURIComponent(media.id)}`,
+      {
+        method: 'DELETE',
+      }
+    )
   }
   async list(options: MediaListOptions): Promise<MediaList> {
     const query = this.buildQuery(options)

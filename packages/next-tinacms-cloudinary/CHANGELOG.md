@@ -1,5 +1,19 @@
 # next-tinacms-cloudinary
 
+## 7.1.0
+
+### Minor Changes
+
+- ab586bc: extended cloudinary media store with options
+
+### Patch Changes
+
+- Updated dependencies [c6e9afb]
+- Updated dependencies [d9b23fc]
+- Updated dependencies [1c69338]
+- Updated dependencies [a1a767d]
+  - tinacms@2.1.1
+
 ## 7.0.0
 
 ### Patch Changes

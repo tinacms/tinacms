@@ -3,15 +3,15 @@
 */
 
 import { addNamespaceToSchema } from '../ast-builder'
-import _ from 'lodash'
+import deepClone from 'lodash.clonedeep'
 import { sequential } from '../util'
 import * as yup from 'yup'
 
 import {
-  TinaField,
-  Schema,
-  Collection,
-  Template,
+  type TinaField,
+  type Schema,
+  type Collection,
+  type Template,
   validateTinaCloudSchemaConfig,
 } from '@tinacms/schema-tools'
 
@@ -29,7 +29,7 @@ const FIELD_TYPES: TinaField['type'][] = [
 
 export const validateSchema = async (schema: Schema) => {
   const schema2: Schema<true> = addNamespaceToSchema<Schema<true>>(
-    _.cloneDeep(schema) as unknown as Schema<true>
+    deepClone(schema) as unknown as Schema<true>
   )
   const collections = await sequential(
     schema2.collections,
@@ -195,7 +195,7 @@ const validateCollection = async (
   }
   if (validCollection.fields) {
     if (typeof validCollection.fields === 'string') {
-      throw new Error(`Global templates are not yet supported`)
+      throw new Error('Global templates are not yet supported')
     }
     fields = await sequential(validCollection.fields, async (field) => {
       return validateField(field)

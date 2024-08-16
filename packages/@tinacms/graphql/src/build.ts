@@ -2,10 +2,10 @@
 
 */
 
-import _ from 'lodash'
-import { print, OperationDefinitionNode } from 'graphql'
-import { TinaSchema, Config } from '@tinacms/schema-tools'
+import { print, type OperationDefinitionNode } from 'graphql'
+import type { TinaSchema, Config } from '@tinacms/schema-tools'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
+import uniqBy from 'lodash.uniqby'
 
 import { astBuilder, NAMER } from './ast-builder'
 import { sequential } from './util'
@@ -14,7 +14,6 @@ import { createSchema } from './schema/createSchema'
 import { extractInlineTypes } from './ast-builder'
 
 import type { Builder } from './builder'
-import { LookupMapType } from './database'
 
 export const buildDotTinaFiles = async ({
   config,
@@ -66,7 +65,7 @@ const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
 
   const fragDoc = {
     kind: 'Document' as const,
-    definitions: _.uniqBy(
+    definitions: uniqBy(
       // @ts-ignore
       extractInlineTypes(fragmentDefinitionsFields),
       (node) => node.name.value
@@ -108,7 +107,7 @@ const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
 
   const queryDoc = {
     kind: 'Document' as const,
-    definitions: _.uniqBy(
+    definitions: uniqBy(
       // @ts-ignore
       extractInlineTypes(operationsDefinitions),
       (node) => node.name.value
@@ -218,7 +217,7 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
 
   return {
     kind: 'Document' as const,
-    definitions: _.uniqBy(
+    definitions: uniqBy(
       // @ts-ignore
       extractInlineTypes(definitions),
       (node) => node.name.value
