@@ -143,8 +143,6 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
     input.onChange(value)
   }, [value, input, optionSets])
 
-  console.log('Field', field)
-
   if (loading === true) {
     return <LoadingDots color="var(--tina-color-primary)" />
   }
@@ -188,7 +186,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                         const {
                           id,
                           _internalSys: { filename },
-                          _values: { title, name },
+                          _values: { title },
                         } = node
 
                         return (
@@ -201,14 +199,14 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                             }}
                           >
                             <div className="flex flex-col">
-                              <span className="font-semibold text-sm">
+                              {/* <span className="font-semibold text-sm">
                                 {title || name || id}
-                              </span>
-                              {/* {(title || name) && (
-                                <span className="text-x">{filename}</span>
-                              )} */}
+                              </span> */}
+                              {<span className="text-x">{filename}</span>}
                               <div>
-                                {field.ui.selectComponents(node._values)}
+                                {field?.ui?.selectComponents && node._values
+                                  ? field.ui.selectComponents(node._values)
+                                  : null}
                               </div>
                             </div>
                           </CommandItem>

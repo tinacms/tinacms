@@ -93,6 +93,12 @@ export default defineSchema({
           name: 'name',
           required: true,
         },
+        {
+          type: 'string',
+          label: 'something',
+          name: 'something',
+          required: true,
+        },
       ],
     },
   ],
