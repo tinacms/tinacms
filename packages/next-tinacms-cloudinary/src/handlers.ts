@@ -94,9 +94,9 @@ async function listMedia(
 ) {
   try {
     const mediaListOptions: MediaListOptions = {
-      directory: req.query.directory || '""',
+      directory: (req.query.directory as string) || '""',
       limit: parseInt(req.query.limit as string, 10) || 500,
-      offset: req.query.offset,
+      offset: req.query.offset as string,
       filesOnly: req.query.filesOnly === 'true' || false,
     }
 
@@ -112,7 +112,7 @@ async function listMedia(
     const response = await cloudinary.search
       .expression(query)
       .max_results(mediaListOptions.limit)
-      .next_cursor(mediaListOptions.offset)
+      .next_cursor(mediaListOptions.offset as string)
       .execute()
 
     const files = response.resources.map(getCloudinaryToTinaFunc(opts))
