@@ -93,7 +93,10 @@ function MakeEdgeApiHandler({
     const path = req.url?.startsWith('/') ? req.url.slice(1) : req.url
 
     // The domain is not important here, we just need to parse the pathName
-    const url = new URL(path, `http://${req.headers?.host || 'localhost'}`)
+    const url = new URL(
+      path,
+      `http://${req.headers.get('host') || 'localhost'}`
+    )
 
     // Remove the basePath from the url
     const routes = url.pathname?.replace(opts.basePath, '')?.split('/')
