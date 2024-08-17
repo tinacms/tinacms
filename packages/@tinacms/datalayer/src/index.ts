@@ -18,4 +18,4 @@ export {
   createLocalDatabase,
 } from '@tinacms/graphql'
 
-export * from './backend'
+export * from './backend/node'
