@@ -1,2 +1,2 @@
-export * from './remote'
+export * from './shared'
 export * from './local'

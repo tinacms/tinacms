@@ -1,6 +1,6 @@
 import { TinaLevelClient } from '../level/tinaLevel'
 import { FilesystemBridge } from './bridge/filesystem'
-import { Database, DatabaseArgs } from './remote'
+import { Database, DatabaseArgs } from './shared'
 
 export type CreateLocalDatabaseArgs = Omit<DatabaseArgs, 'level'> & {
   port?: number

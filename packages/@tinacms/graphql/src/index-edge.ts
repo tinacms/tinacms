@@ -1,2 +1,2 @@
-export * from './database/remote'
+export * from './database/shared'
 export { resolve } from './resolve'
