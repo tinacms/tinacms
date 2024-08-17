@@ -5,7 +5,6 @@ import { VscNewFile } from 'react-icons/vsc'
 import { Menu, Transition } from '@headlessui/react'
 import { updateBodyDisplacement } from './sidebar'
 import { FormModal } from '@toolkit/react-forms'
-import { useEditState } from '@tinacms/sharedctx'
 import type { ScreenPlugin } from '@toolkit/react-screens'
 import { SyncStatus, SyncErrorWidget, SyncStatusModal } from './sync-status'
 import { useCMS } from '@toolkit/react-core'
@@ -57,7 +56,6 @@ export const Nav = ({
   ...props
 }: NavProps) => {
   const cms = useCMS()
-  const { setEdit } = useEditState()
   const [eventsOpen, setEventsOpen] = React.useState(false)
   const { contentCollections, authCollection } =
     collectionsInfo.collections.reduce(
@@ -159,12 +157,14 @@ export const Nav = ({
                               await cms.api.tina?.authProvider.logout()
                               if (cms?.api?.tina?.onLogout) {
                                 await cms?.api?.tina?.onLogout()
+                                await new Promise((resolve) =>
+                                  setTimeout(resolve, 500)
+                                )
                               }
                               window.location.href = new URL(
                                 window.location.href
                               ).pathname
                             }
-                            setEdit(false)
                           } catch (e) {
                             cms.alerts.error(`Error logging out: ${e}`)
                             console.error('Unexpected error calling logout')

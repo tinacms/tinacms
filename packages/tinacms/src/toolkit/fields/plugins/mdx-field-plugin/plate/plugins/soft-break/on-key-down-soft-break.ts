@@ -1,6 +1,6 @@
-import { getBlockAbove, queryNode, insertNodes } from '@udecode/plate-headless'
 import { isHotkey } from 'is-hotkey'
 import { KEY_SOFT_BREAK } from './create-soft-break-plugin'
+import { getBlockAbove, insertNodes, queryNode } from '@udecode/plate-common'
 
 export const onKeyDownSoftBreak =
   (editor, { options: { rules = [] } }) =>

@@ -8,10 +8,11 @@ import {
   ModalActions,
 } from '@toolkit/react-modals'
 import { Button } from '@toolkit/styles'
+import { LoadingDots } from '@tinacms/toolkit'
 
 interface DeleteModalProps {
   close(): void
-  deleteFunc(): void
+  deleteFunc(): Promise<void>
   filename: string
 }
 interface NewFolderModalProps {
@@ -24,6 +25,7 @@ export const DeleteModal = ({
   deleteFunc,
   filename,
 }: DeleteModalProps) => {
+  const [processing, setProcessing] = React.useState(false)
   return (
     <Modal>
       <PopupModal>
@@ -34,18 +36,21 @@ export const DeleteModal = ({
           </p>
         </ModalBody>
         <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
+          <Button style={{ flexGrow: 2 }} disabled={processing} onClick={close}>
             Cancel
           </Button>
           <Button
             style={{ flexGrow: 3 }}
+            disabled={processing}
             variant="danger"
-            onClick={() => {
-              deleteFunc()
+            onClick={async () => {
+              setProcessing(true)
+              await deleteFunc()
               close()
             }}
           >
-            Delete
+            <span className="mr-1">Delete</span>
+            {processing && <LoadingDots />}
           </Button>
         </ModalActions>
       </PopupModal>

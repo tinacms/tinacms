@@ -1,19 +1,19 @@
 import React from 'react'
 import { ImgEmbed } from './component'
+import { ReactEditor } from 'slate-react'
+import { insertInlineElement } from '../core/common'
+import type { Media } from '../../../../../../core/media'
+import { isImage } from '@toolkit/components/media/utils'
 import {
   createPluginFactory,
   normalizeEditor,
-  PlateEditor,
+  type PlateEditor,
   setNodes,
-} from '@udecode/plate-headless'
-import { ReactEditor } from 'slate-react'
-import { insertInlineElement } from '../core/common'
-import { Media } from '../../../../../../core/media'
-import { isImage } from '@toolkit/components/media/utils'
+} from '@udecode/plate-common'
 
 export const ELEMENT_IMG = 'img'
 
-export const createImgPlugin = createPluginFactory({
+const createImgPlugin = createPluginFactory({
   key: ELEMENT_IMG,
   isVoid: true,
   isInline: true,
@@ -45,6 +45,8 @@ export const insertImg = (editor: PlateEditor, media: Media) => {
     })
   }
 
-  // FIXME: not sure why this was needed
+  // Normalizing the editor after insertion
   normalizeEditor(editor, { force: true })
 }
+
+export default createImgPlugin

@@ -414,6 +414,38 @@ export class Builder {
    * ```graphql
    * # ex.
    * {
+   *   createFolder(folderName: $folderName, params: $params) {
+   *     id
+   *     data {...}
+   *   }
+   * }
+   * ```
+   *
+   * @param collections
+   */
+  public buildCreateCollectionFolderMutation = async () => {
+    return astBuilder.FieldDefinition({
+      name: 'createFolder',
+      args: [
+        astBuilder.InputValueDefinition({
+          name: 'collection',
+          required: false,
+          type: astBuilder.TYPES.String,
+        }),
+        astBuilder.InputValueDefinition({
+          name: 'relativePath',
+          required: true,
+          type: astBuilder.TYPES.String,
+        }),
+      ],
+      required: true,
+      type: astBuilder.TYPES.MultiCollectionDocument,
+    })
+  }
+  /**
+   * ```graphql
+   * # ex.
+   * {
    *   getPostDocument(relativePath: $relativePath) {
    *     id
    *     data {...}

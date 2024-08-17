@@ -1,5 +1,168 @@
 # tinacms
 
+## 2.1.1
+
+### Patch Changes
+
+- c6e9afb: fix reference field selector styling
+- d9b23fc: Improve reference field selector
+- 1c69338: fix reference field search and styling
+- a1a767d: add icon to reference selector
+  - @tinacms/search@1.0.25
+
+## 2.1.0
+
+### Minor Changes
+
+- cb83dc2: add `toolbarOverride` option to `rich-text` fields
+
+### Patch Changes
+
+- 1b3584c: Add cloudinary supported files to the default media upload types
+- Updated dependencies [cb83dc2]
+  - @tinacms/schema-tools@1.5.0
+  - @tinacms/mdx@1.3.29
+  - @tinacms/search@1.0.24
+
+## 2.0.0
+
+### Major Changes
+
+- 957fa26: Removed deprecated useTina hook
+  This was deprecated as part of the v1 release and shouldn't have been in use by anyone
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 957fa26: update to React 18
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/mdx@1.3.28
+  - @tinacms/schema-tools@1.4.19
+  - @tinacms/search@1.0.23
+
+## 1.6.7
+
+### Patch Changes
+
+- 82ab066: upgrade vulnerable packages in example project, test project and peer dependency packages
+
+## 1.6.6
+
+### Patch Changes
+
+- a9b461c: updated 'file has changes' indicator ui
+- 3034430: Make padding between collection list page and singular pages consistent. Ensure navigation bar padding does not overlap with the burger icon on collection singular pages
+- 171f5a5: Fix collections body not working with smaller screens
+- fd216f3: updated TinaCloud auth modal text
+- d004af2: improve error message by adding emoji
+- 20f972a: Fix collections header styling for smaller screens
+- 2a36b65: Remove unnecessary usage of @react-hook/window-size
+- f26b40d: Allow customization of accepted media types in media manager
+- Updated dependencies [f26b40d]
+  - @tinacms/schema-tools@1.4.18
+  - @tinacms/mdx@1.3.27
+  - @tinacms/search@1.0.22
+
+## 1.6.5
+
+### Patch Changes
+
+- 04f0bf3: CMS - Fix broken link in error message of CMS startup. Broken link was replaced by https://tina.io/docs/tina-cloud/overview
+- 0503072: update ts, remove rimraf, fix types
+- 1104006: Update tailwind to v3.4.4 + fix media manager height overflow on mobile screens
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/mdx@1.3.26
+  - @tinacms/schema-tools@1.4.17
+  - @tinacms/search@1.0.21
+  - @tinacms/sharedctx@1.0.3
+
+## 1.6.4
+
+### Patch Changes
+
+- 2e3393ef5: Implement Create folder feature for tinacms.
+- Updated dependencies [2e3393ef5]
+  - @tinacms/schema-tools@1.4.16
+  - @tinacms/mdx@1.3.25
+  - @tinacms/search@1.0.20
+  - @tinacms/sharedctx@1.0.2
+
+## 1.6.3
+
+### Patch Changes
+
+- 66f7e2074: Cleanup
+- b3ad50a62: Fix issue where rich-text nested inside JSX objects wasn't being parsed/stringified properly.
+- Updated dependencies [b3ad50a62]
+  - @tinacms/mdx@1.3.24
+  - @tinacms/search@1.0.19
+
+## 1.6.2
+
+### Patch Changes
+
+- 141e78c04: Fix for issue where content creation UI on mobile is stretched beyond the screen size by changing the style from flex-1 to w-full and then adding dynamic top padding so it doesn't conflict with hamburger menu
+
+## 1.6.1
+
+### Patch Changes
+
+- 216cfff0c: Add fetch options to generated client
+
+## 1.6.0
+
+### Minor Changes
+
+- c8ceba4d8: Fixes an issue where it was impossible to navigate to nested fields (e.g. object fields or list items) when editing the values for a rich-text template when that template was configured to be inline: true
+
+## 1.5.30
+
+### Patch Changes
+
+- 04704e3dc: Fix incorrect call to isAuthenticated
+
+## 1.5.29
+
+### Patch Changes
+
+- @tinacms/search@1.0.18
+
+## 1.5.28
+
+### Patch Changes
+
+- @tinacms/search@1.0.17
+
+## 1.5.27
+
+### Patch Changes
+
+- 4202c1028: Add support link in sidebar
+- 64f8fa038: This extends the existing `LoginStrategy` type to include a new `LoginScreen` option. A `getLoginScreen` function can be set on the AuthProvider to display a custom login screen, rather than showing the modal popups and forcing a redirect or displaying the default username and password form. This will hopefully simplify the process of creating custom auth providers and handling user authentication when self-hosting.
+- 548fe6d96: Fixes https://github.com/tinacms/tinacms/issues/4356
+- 50b20f809: Fix issue where the link form would not render.
+- Updated dependencies [64f8fa038]
+  - @tinacms/schema-tools@1.4.15
+  - @tinacms/search@1.0.16
+  - @tinacms/mdx@1.3.23
+
+## 1.5.26
+
+### Patch Changes
+
+- 9e1a22a53: Fix media store auth functions
+
+## 1.5.25
+
+### Patch Changes
+
+- @tinacms/search@1.0.15
+
 ## 1.5.24
 
 ### Patch Changes

@@ -1,5 +1,167 @@
 # @tinacms/app
 
+## 2.0.3
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- Updated dependencies [c6e9afb]
+- Updated dependencies [d9b23fc]
+- Updated dependencies [1c69338]
+- Updated dependencies [a1a767d]
+  - tinacms@2.1.1
+
+## 2.0.2
+
+### Patch Changes
+
+- 4128128: Fix markdown editor button styling
+
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+  - @tinacms/mdx@1.3.29
+
+## 2.0.0
+
+### Major Changes
+
+- 957fa26: Removed deprecated useTina hook
+  This was deprecated as part of the v1 release and shouldn't have been in use by anyone
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+- e58b951: update vulnerable packages so npm audit does not complain
+- 957fa26: update to React 18
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [957fa26]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/mdx@1.3.28
+  - tinacms@2.0.0
+
+## 1.2.45
+
+### Patch Changes
+
+- 2940594: Add pnpm option to create-tina-app
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+
+## 1.2.44
+
+### Patch Changes
+
+- a9b461c: updated 'file has changes' indicator ui
+- Updated dependencies [a9b461c]
+- Updated dependencies [3034430]
+- Updated dependencies [171f5a5]
+- Updated dependencies [fd216f3]
+- Updated dependencies [d004af2]
+- Updated dependencies [20f972a]
+- Updated dependencies [2a36b65]
+- Updated dependencies [f26b40d]
+  - tinacms@1.6.6
+  - @tinacms/mdx@1.3.27
+
+## 1.2.43
+
+### Patch Changes
+
+- Updated dependencies [04f0bf3]
+- Updated dependencies [0503072]
+- Updated dependencies [1104006]
+  - tinacms@1.6.5
+  - @tinacms/mdx@1.3.26
+
+## 1.2.42
+
+### Patch Changes
+
+- Updated dependencies [2e3393ef5]
+  - tinacms@1.6.4
+  - @tinacms/mdx@1.3.25
+
+## 1.2.41
+
+### Patch Changes
+
+- Updated dependencies [66f7e2074]
+- Updated dependencies [b3ad50a62]
+  - tinacms@1.6.3
+  - @tinacms/mdx@1.3.24
+
+## 1.2.40
+
+### Patch Changes
+
+- Updated dependencies [141e78c04]
+  - tinacms@1.6.2
+
+## 1.2.39
+
+### Patch Changes
+
+- Updated dependencies [216cfff0c]
+  - tinacms@1.6.1
+
+## 1.2.38
+
+### Patch Changes
+
+- Updated dependencies [c8ceba4d8]
+  - tinacms@1.6.0
+
+## 1.2.37
+
+### Patch Changes
+
+- Updated dependencies [04704e3dc]
+  - tinacms@1.5.30
+
+## 1.2.36
+
+### Patch Changes
+
+- tinacms@1.5.29
+
+## 1.2.35
+
+### Patch Changes
+
+- tinacms@1.5.28
+
+## 1.2.34
+
+### Patch Changes
+
+- Updated dependencies [4202c1028]
+- Updated dependencies [64f8fa038]
+- Updated dependencies [548fe6d96]
+- Updated dependencies [50b20f809]
+  - tinacms@1.5.27
+  - @tinacms/mdx@1.3.23
+
+## 1.2.33
+
+### Patch Changes
+
+- Updated dependencies [9e1a22a53]
+  - tinacms@1.5.26
+
+## 1.2.32
+
+### Patch Changes
+
+- tinacms@1.5.25
+
 ## 1.2.31
 
 ### Patch Changes

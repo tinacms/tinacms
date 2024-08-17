@@ -14,8 +14,14 @@ export function useFormPortal() {
   return useContext(FormPortalContext)
 }
 
-export const FormPortalProvider: React.FC = ({ children }) => {
-  const wrapperRef = React.useRef<HTMLDivElement | null>(null)
+type FormPortalProviderProps = {
+  children?: React.ReactNode
+}
+
+export const FormPortalProvider: React.FC<FormPortalProviderProps> = ({
+  children,
+}) => {
+  const wrapperRef = React.useRef<any | null>(null)
   const zIndexRef = React.useRef<number>(0)
 
   const FormPortal = React.useCallback(

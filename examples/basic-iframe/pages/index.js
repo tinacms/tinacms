@@ -1,4 +1,3 @@
-import { staticRequest } from 'tinacms'
 import client from '../tina/__generated__/client'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Layout } from '../components/Layout'

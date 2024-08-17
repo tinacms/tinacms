@@ -5,18 +5,20 @@ Manage **S3 Bucket media assets** in TinaCMS.
 ## Installation
 
 ### With Yarn
+
 ```bash
 yarn add next-tinacms-s3
 ```
 
 ### With NPM
+
 ```bash
 npm install next-tinacms-s3
 ```
 
 ## Connect with S3 Bucket
 
-You need some credentials provided to access AWS S3 Bucket to set this up properly. 
+You need some credentials provided to access AWS S3 Bucket to set this up properly.
 
 **next-tinacms-s3** uses environment variables within the context of a Next.js site to properly access your S3 Bucket account.
 
@@ -35,46 +37,57 @@ You need to setup S3 Bucket and IAM user correctly.
 
 - The IAM user should have at least the following permissions for your bucket.
 
-    "s3:ListBucket",
-    "s3:PutObject",
-    "s3:DeleteObject"
+  "s3:ListBucket",
+  "s3:PutObject",
+  "s3:PutObjectAcl",
+  "s3:DeleteObject"
 
 - The S3 bucket should have ACLs enabled.
-    
-    You should be able to go to the AWS S3 console and navigate to the bucket details for the bucket you try to write objects to. You'll see a tab called 'Permissions'. There you have the option to change the "Object Ownership" at a block with the same title.
 
-    Once there, you can choose the option "ACLs enabled".
+  You should be able to go to the AWS S3 console and navigate to the bucket details for the bucket you try to write objects to. You'll see a tab called 'Permissions'. There you have the option to change the "Object Ownership" at a block with the same title.
+
+  Once there, you can choose the option "ACLs enabled".
 
 - You should ensure objects in the S3 bucket are readable by anonymous users and writable by the IAM user.
 
-    i.e. You can disable `block public access settings` and set up the bucket policy like following:
-    ```
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "PublicRead",
-                "Effect": "Allow",
-                "Principal": "*",
-                "Action": "s3:GetObject",
-                "Resource": "arn:aws:s3:::<S3-Bucket-NAME>/*"
-            },
-            {
-                "Sid": "LimitedWrite",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "<ARN of the IAM user>"
-                },
-                "Action": [
-                    "s3:PutObject",
-                    "s3:PutObjectAcl",
-                    "s3:DeleteObject"
-                ],
-                "Resource": "arn:aws:s3:::<S3-Bucket-NAME>/*"
-            }
-        ]
-    }
-    ```
+  i.e. You can disable `block public access settings` and set up the bucket policy like following:
+
+  ```
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Sid": "PublicRead",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": "arn:aws:s3:::<S3-Bucket-NAME>/*"
+          },
+          {
+              "Sid": "LimitedWrite",
+              "Effect": "Allow",
+              "Principal": {
+                  "AWS": "<ARN of the IAM user>"
+              },
+              "Action": [
+                  "s3:PutObject",
+                  "s3:PutObjectAcl",
+                  "s3:DeleteObject"
+              ],
+              "Resource": "arn:aws:s3:::<S3-Bucket-NAME>/*"
+          },
+          {
+              "Sid": "ListBucket",
+              "Effect": "Allow",
+              "Principal": {
+                  "AWS": "<ARN of the IAM user>"
+              },
+              "Action": "s3:ListBucket",
+              "Resource": "arn:aws:s3:::<S3-Bucket-NAME>"
+          }
+      ]
+  }
+  ```
 
 ## Register the Media Store
 
@@ -141,7 +154,6 @@ Import `isAuthorized` from [`@tinacms/auth`](https://github.com/tinacms/tinacms/
 
 The `authorized` key will make it so only authorized users within Tina Cloud can upload and make media edits.
 
-
 ```
 // pages/api/s3/[...media].ts
 
@@ -190,6 +202,6 @@ In your `.tina/schema.ts` add a new field for the image, e.g:
   type: 'image',
   label: 'Hero Image',
  }
- ```
+```
 
- Now, when editing your site, the image field will allow you to connect to your S3 Bucket via the Media Store to manage your media assets.
+Now, when editing your site, the image field will allow you to connect to your S3 Bucket via the Media Store to manage your media assets.

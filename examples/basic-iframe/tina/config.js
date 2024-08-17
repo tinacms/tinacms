@@ -64,6 +64,7 @@ export default defineConfig({
       mediaRoot: 'uploads',
       publicFolder: 'public',
     },
+    accept: ['image/jpeg', 'video/mp4'],
   },
   schema: {
     collections: [

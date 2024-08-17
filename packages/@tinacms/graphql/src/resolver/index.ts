@@ -631,10 +631,12 @@ export class Resolver {
         '_relativePath',
         '_id',
       ]
+      // ignore reserved keys
       if (reservedKeys.includes(key)) {
         return
       }
-      if (oldDoc._template) {
+      // if we have a template key and templates in the collection
+      if (oldDoc._template && collection.templates) {
         const template = collection.templates?.find(
           ({ name }) => name === oldDoc._template
         )
@@ -643,7 +645,9 @@ export class Resolver {
             legacyValues[key] = value
           }
         }
-      } else {
+      }
+      // if we have a collection key and fields in the collection
+      if (oldDoc._collection && collection.fields) {
         if (!collection.fields.find(({ name }) => name === key)) {
           legacyValues[key] = value
         }
@@ -658,6 +662,7 @@ export class Resolver {
     isMutation,
     isCreation,
     isDeletion,
+    isFolderCreation,
     isAddPendingDocument,
     isCollectionSpecific,
     isUpdateName,
@@ -667,6 +672,7 @@ export class Resolver {
     isMutation: boolean
     isCreation?: boolean
     isDeletion?: boolean
+    isFolderCreation?: boolean
     isAddPendingDocument?: boolean
     isCollectionSpecific?: boolean
     isUpdateName?: boolean
@@ -706,7 +712,10 @@ export class Resolver {
     )
 
     const collection = await this.tinaSchema.getCollection(collectionLookup)
-    const realPath = path.join(collection?.path, args.relativePath)
+    let realPath = path.join(collection?.path, args.relativePath)
+    if (isFolderCreation) {
+      realPath = `${realPath}/.gitkeep.${collection.format || 'md'}`
+    }
     const alreadyExists = await this.database.documentExists(realPath)
 
     if (isMutation) {
@@ -723,6 +732,19 @@ export class Resolver {
           args,
           isAddPendingDocument,
         })
+      } else if (isFolderCreation) {
+        /**
+         * createFolder, create<Collection>Folder
+         */
+        if (alreadyExists === true) {
+          throw new Error(`Unable to add folder, ${realPath} already exists`)
+        }
+        await this.database.put(
+          realPath,
+          { _is_tina_folder_placeholder: true },
+          collection.name
+        )
+        return this.getDocument(realPath)
       }
       // if we are deleting a document or updating its name we should check if it exists
       if (!alreadyExists) {
@@ -972,7 +994,7 @@ export class Resolver {
       if (Array.isArray(fieldValue)) {
         if (fieldValue.length === 0) {
           accum[fieldName] = []
-          return
+          continue
         }
       }
       const field = template.fields.find((field) => field.name === fieldName)

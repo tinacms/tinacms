@@ -1,5 +1,24 @@
 # Change Log
 
+## 1.1.6
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+
+## 1.1.5
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+
+## 1.1.4
+
+### Patch Changes
+
+- 8ee81d026: fix watch script for window environment
+
 ## 1.1.3
 
 ### Patch Changes

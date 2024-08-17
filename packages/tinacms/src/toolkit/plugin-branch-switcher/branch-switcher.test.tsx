@@ -1,5 +1,5 @@
 import { formatBranchName, getFilteredBranchList } from './branch-switcher'
-import { Branch } from './types'
+import type { Branch } from './types'
 import { describe, it, expect } from 'vitest'
 
 const branches: Branch[] = [

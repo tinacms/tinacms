@@ -81,7 +81,8 @@ function useSyncStatus(cms) {
     const interval = setInterval(async () => {
       let doFetchEvents = false
       if (!cms.api?.tina?.isCustomContentApi) {
-        doFetchEvents = await cms.api?.tina?.isAuthenticated()
+        // update this?
+        doFetchEvents = await cms.api?.tina?.authProvider?.isAuthenticated()
       }
       if (doFetchEvents) {
         const { events } = await cms.api.tina.fetchEvents()

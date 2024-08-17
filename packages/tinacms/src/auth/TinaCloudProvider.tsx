@@ -22,7 +22,6 @@ import {
 } from '../internalClient'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
-import { setEditing } from '@tinacms/sharedctx'
 import { TinaAdminApi } from '../admin/api'
 
 type ModalNames = null | 'authenticate' | 'error'
@@ -37,7 +36,6 @@ export interface TinaCloudMediaStoreClass {
 export interface TinaCloudAuthWallProps {
   cms?: TinaCMS
   children: React.ReactNode
-  loginScreen?: React.ReactNode
   tinaioConfig?: TinaIOConfig
   getModalActions?: (args: {
     closeModal: () => void
@@ -50,7 +48,6 @@ export interface TinaCloudAuthWallProps {
 export const AuthWallInner = ({
   children,
   cms,
-  loginScreen,
   getModalActions,
 }: TinaCloudAuthWallProps) => {
   const client: Client = cms.api.tina
@@ -58,6 +55,12 @@ export const AuthWallInner = ({
   const isTinaCloud =
     !client.isLocalMode && !client.schema?.config?.config?.contentApiUrlOverride
   const loginStrategy = client.authProvider.getLoginStrategy()
+  const loginScreen = client.authProvider.getLoginScreen()
+  if (loginStrategy === 'LoginScreen' && !loginScreen) {
+    throw new Error(
+      'LoginScreen is set as the login strategy but no login screen component was provided'
+    )
+  }
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [errorMessage, setErrorMessage] = useState<
@@ -134,10 +137,14 @@ export const AuthWallInner = ({
       })
     : []
 
-  const handleAuthenticate = async () => {
+  const handleAuthenticate = async (
+    loginScreenProps?: Record<string, string>
+  ) => {
     try {
       setAuthenticated(false)
-      const token = await client.authProvider.authenticate(authProps)
+      const token = await client.authProvider.authenticate(
+        loginScreenProps || authProps
+      )
       if (typeof client?.onLogin === 'function') {
         await client?.onLogin({ token })
       }
@@ -152,7 +159,7 @@ export const AuthWallInner = ({
     }
   }
 
-  let modalTitle = 'Tina Cloud Authorization'
+  let modalTitle = 'Tina Cloud'
   if (
     activeModal === 'authenticate' &&
     loginStrategy === 'Redirect' &&
@@ -179,28 +186,14 @@ export const AuthWallInner = ({
           title={modalTitle}
           message={
             isTinaCloud
-              ? 'To save edits, Tina Cloud authorization is required. On save, changes will get committed using your account.'
+              ? 'Your site uses Tina Cloud to track changes. To make edits, you must log in.'
               : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
           }
           close={close}
           actions={[
             ...otherModalActions,
             {
-              action: async () => {
-                // This does not work it looks like we have somehow getting two contexts
-                // console.log({ setEdit })
-                // setEdit(false)
-                // setActiveModal(null)
-
-                // This is a temp fix
-                setEditing(false) // set editing just sets the local storage
-                window.location.reload()
-              },
-              name: 'Close',
-              primary: false,
-            },
-            {
-              name: isTinaCloud ? 'Continue to Tina Cloud' : 'Enter Edit Mode',
+              name: isTinaCloud ? 'Log in' : 'Enter Edit Mode',
               action: handleAuthenticate,
               primary: true,
             },
@@ -282,6 +275,7 @@ export const AuthWallInner = ({
                   await authProvider.logout()
                   if (typeof client?.onLogout === 'function') {
                     await client.onLogout()
+                    await new Promise((resolve) => setTimeout(resolve, 500))
                   }
                   window.location.href = new URL(window.location.href).pathname
                 } catch (e) {
@@ -298,7 +292,15 @@ export const AuthWallInner = ({
           ]}
         />
       )}
-      {showChildren ? children : loginScreen ? loginScreen : null}
+      {showChildren
+        ? children
+        : client.authProvider?.getLoginStrategy() === 'LoginScreen' &&
+          loginScreen
+        ? loginScreen({
+            handleAuthenticate: async (props: Record<string, string>) =>
+              handleAuthenticate(props),
+          })
+        : null}
     </>
   )
 }

@@ -1,5 +1,61 @@
 # @tinacms/mdx
 
+## 1.3.29
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+  - @tinacms/schema-tools@1.5.0
+
+## 1.3.28
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/schema-tools@1.4.19
+
+## 1.3.27
+
+### Patch Changes
+
+- Updated dependencies [f26b40d]
+  - @tinacms/schema-tools@1.4.18
+
+## 1.3.26
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/schema-tools@1.4.17
+
+## 1.3.25
+
+### Patch Changes
+
+- Updated dependencies [2e3393ef5]
+  - @tinacms/schema-tools@1.4.16
+
+## 1.3.24
+
+### Patch Changes
+
+- b3ad50a62: Fix issue where rich-text nested inside JSX objects wasn't being parsed/stringified properly.
+
+## 1.3.23
+
+### Patch Changes
+
+- Updated dependencies [64f8fa038]
+  - @tinacms/schema-tools@1.4.15
+
 ## 1.3.22
 
 ### Patch Changes

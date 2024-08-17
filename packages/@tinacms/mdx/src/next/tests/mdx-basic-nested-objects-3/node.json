@@ -1,0 +1,59 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Hello"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Table",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "rows": [
+          {
+            "columns": [
+              {
+                "content": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "h1",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Hello "
+                        },
+                        {
+                          "type": "mdxJsxTextElement",
+                          "name": "World",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": ""
+                            }
+                          ],
+                          "props": {}
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

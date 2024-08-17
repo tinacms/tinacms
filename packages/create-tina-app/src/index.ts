@@ -1,18 +1,14 @@
-/**
-
-*/
-
 import { Telemetry } from '@tinacms/metrics'
 import { Command } from 'commander'
 import prompts from 'prompts'
-import path from 'path'
+import path from 'node:path'
 //@ts-ignore
 import { version, name } from '../package.json'
 import { isWriteable, makeDir, isFolderEmpty } from './util/fileUtil'
 import { install } from './util/install'
 import chalk from 'chalk'
 import { tryGitInit } from './util/git'
-import { exit } from 'process'
+import { exit } from 'node:process'
 import { EXAMPLES, downloadExample } from './examples'
 import { preRunChecks } from './util/preRunChecks'
 
@@ -48,16 +44,17 @@ export const run = async () => {
 
   const res = await prompts({
     message: 'Which package manager would you like to use?',
-    name: 'useYarn',
+    name: 'packageManager',
     type: 'select',
     choices: [
-      { title: 'Yarn', value: 'yarn' },
-      { title: 'NPM', value: 'npm' },
+      { title: 'yarn', value: 'yarn' },
+      { title: 'npm', value: 'npm' },
+      { title: 'pnpm', value: 'pnpm' },
     ],
   })
 
-  const useYarn = res.useYarn === 'yarn'
-  const displayedCommand = useYarn ? 'yarn' : 'npm'
+  const packageManager = res.packageManager
+  const displayedCommand = packageManager
 
   // If there is no project name passed in the CLI ask for one
   if (!projectName) {
@@ -103,14 +100,14 @@ export const run = async () => {
       )}`
     )
   }
+  //TODO: Update this?
   await telemetry.submitRecord({
     event: {
       name: 'create-tina-app:invoke',
       example,
-      useYarn: Boolean(useYarn),
+      useYarn: Boolean(res.packageManager === 'yarn'),
     },
   })
-
   // Setup directory
   const root = path.join(process.cwd(), dirName)
 
@@ -133,6 +130,15 @@ export const run = async () => {
     process.exit(1)
   }
 
+  if (!chosenExample) {
+    console.error(
+      `The example provided is not a valid example. Please provide one of the following; ${EXAMPLES.map(
+        (x) => x.value
+      )}`
+    )
+    throw new Error('Invalid example')
+  }
+
   await downloadExample(chosenExample, root)
 
   console.log(
@@ -141,7 +147,7 @@ export const run = async () => {
   console.log()
 
   // Run install command
-  await install(root, null, { useYarn, isOnline: true })
+  await install(root, null, { packageManager, isOnline: true })
 
   if (tryGitInit(root)) {
     console.log(logText('Initializing git repository.'))
@@ -151,9 +157,11 @@ export const run = async () => {
   console.log(`${successText('Starter successfully created!')}`)
 
   console.log(chalk.bold('\nTo launch your app, run:\n'))
-  console.log('  ' + cmdText(`cd ${appName}`))
+  console.log(`  ${cmdText(`cd ${appName}`)}`)
   console.log(
-    '  ' + `${cmdText(`${displayedCommand} ${useYarn ? '' : 'run '}dev`)}`
+    `  ${cmdText(
+      `${displayedCommand} ${packageManager === 'npm' ? 'run ' : ''}dev`
+    )}`
   )
   console.log()
   console.log('Next steps:')

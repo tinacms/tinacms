@@ -3,3 +3,4 @@ packages:
   - 'packages/@tinacms/*'
   - 'examples/*'
   - 'experimental-examples/*'
+  - 'playwright/*'

@@ -8,7 +8,6 @@ import {
   ELEMENT_LI,
   ELEMENT_OL,
   ELEMENT_UL,
-  ELEMENT_LIC,
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
@@ -18,10 +17,23 @@ import {
   MARK_CODE,
   MARK_BOLD,
   MARK_ITALIC,
-} from '@udecode/plate-headless'
-import { CodeBlock } from './code-block'
+  MARK_STRIKETHROUGH,
+  MARK_UNDERLINE,
+  ELEMENT_CODE_LINE,
+  ELEMENT_CODE_SYNTAX,
+} from '@udecode/plate'
 import { classNames } from './helpers'
 import { useSelected } from 'slate-react'
+import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command'
+import { SlashInputElement } from '../../components/plate-ui/slash-input-element'
+import { withProps } from '@udecode/cn'
+import { PlateElement, PlateLeaf } from '@udecode/plate-common'
+import { ListElement } from '../../components/plate-ui/list-element'
+import { BlockquoteElement } from '../../components/plate-ui/blockquote-element'
+import { CodeLeaf } from '../../components/plate-ui/code-leaf'
+import { CodeLineElement } from '../../components/plate-ui/code-line-element'
+import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf'
+import { CodeBlockElement } from '../../components/plate-ui/code-block-element'
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -33,8 +45,9 @@ const blockClasses = 'mt-0.5'
 /** prose sets a bold font, making bold marks impossible to see */
 const headerClasses = 'font-normal'
 
-export const components = () => {
+export const Components = () => {
   return {
+    [ELEMENT_SLASH_INPUT]: SlashInputElement,
     [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (
       <h1
         className={classNames(
@@ -120,30 +133,16 @@ export const components = () => {
         className={classNames(
           blockClasses,
           className,
-          `text-base font-normal mb-4 last:mb-0`
+          'text-base font-normal mb-4 last:mb-0'
         )}
         {...attributes}
         {...props}
       />
     ),
-    [ELEMENT_BLOCKQUOTE]: ({
-      className,
-      attributes,
-      editor,
-      element,
-      ...props
-    }) => (
-      <blockquote
-        className={classNames(
-          'not-italic mb-4 last:mb-0 border-l-3 border-gray-200 pl-3',
-          blockClasses,
-          className
-        )}
-        {...attributes}
-        {...props}
-      />
-    ),
-    [ELEMENT_CODE_BLOCK]: (props) => <CodeBlock {...props} />,
+    [ELEMENT_BLOCKQUOTE]: BlockquoteElement,
+    [ELEMENT_CODE_BLOCK]: CodeBlockElement,
+    [ELEMENT_CODE_LINE]: CodeLineElement,
+    [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,
     html: ({ attributes, editor, element, children, className }) => {
       return (
         <div
@@ -172,44 +171,9 @@ export const components = () => {
         </span>
       )
     },
-    [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
-      <ul
-        className={classNames(
-          blockClasses,
-          className,
-          'mb-4 pl-4 list-disc list-inside last:mb-0'
-        )}
-        {...attributes}
-        {...props}
-      />
-    ),
-    [ELEMENT_OL]: ({ attributes, editor, className, element, ...props }) => (
-      <ol
-        className={classNames(
-          blockClasses,
-          className,
-          'mb-4 pl-4 list-decimal list-inside last:mb-0'
-        )}
-        {...attributes}
-        {...props}
-      />
-    ),
-    [ELEMENT_LI]: ({ attributes, className, editor, element, ...props }) => (
-      <li
-        className={classNames('p-0 mt-0 mb-0 list-outside', className)}
-        {...attributes}
-        {...props}
-      />
-    ),
-    /** "list item content" */
-    [ELEMENT_LIC]: ({ attributes, editor, element, className, ...props }) => (
-      <span
-        // without a min-width the cursor is hidden when the list is empty
-        className={classNames(className, 'w-full inline-block align-top mb-2')}
-        {...attributes}
-        {...props}
-      />
-    ),
+    [ELEMENT_UL]: withProps(ListElement, { variant: 'ul' }),
+    [ELEMENT_OL]: withProps(ListElement, { variant: 'ol' }),
+    [ELEMENT_LI]: withProps(PlateElement, { as: 'li' }),
     [ELEMENT_LINK]: ({
       attributes,
       editor,
@@ -227,16 +191,10 @@ export const components = () => {
         {...props}
       />
     ),
-    [MARK_CODE]: ({ editor, leaf, text, attributes, className, ...props }) => (
-      <code
-        className={classNames('bg-gray-100 p-1 rounded-sm', className)}
-        {...attributes}
-        {...props}
-      />
-    ),
-    [MARK_ITALIC]: ({ editor, leaf, text, ...props }) => (
-      <em {...props.attributes} {...props} />
-    ),
+    [MARK_CODE]: CodeLeaf,
+    [MARK_UNDERLINE]: withProps(PlateLeaf, { as: 'u' }),
+    [MARK_STRIKETHROUGH]: withProps(PlateLeaf, { as: 's' }),
+    [MARK_ITALIC]: withProps(PlateLeaf, { as: 'em' }),
     [MARK_BOLD]: ({ editor, leaf, text, ...props }) => (
       <strong {...props.attributes} {...props} />
     ),

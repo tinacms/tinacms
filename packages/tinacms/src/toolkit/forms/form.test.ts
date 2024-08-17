@@ -217,4 +217,187 @@ describe('Form', () => {
       })
     })
   })
+  describe('#getActiveField', () => {
+    describe('when called without a field name', () => {
+      it('returns the form itself', async () => {
+        const form = new Form(DEFAULTS)
+        const fieldName = null
+        expect(form.getActiveField(fieldName)).toEqual(form)
+      })
+    })
+
+    describe('when called for an object field', () => {
+      it('returns the correct template with namespaced field names', async () => {
+        const form = new Form({
+          ...DEFAULTS,
+          fields: [
+            {
+              type: 'object',
+              name: 'testobject',
+              fields: [{ type: 'string', name: 'text' }],
+            },
+          ],
+        })
+
+        const fieldName = 'testobject'
+        // This is called when opening an object field in the sidebar
+        // or admin portal to edit the object's nested fields
+        const activeField = form.getActiveField(fieldName)
+
+        expect(activeField.name).toEqual(fieldName)
+        expect(activeField).toEqual({
+          type: 'object',
+          name: 'testobject',
+          fields: [{ type: 'string', name: 'testobject.text' }],
+        })
+      })
+    })
+
+    describe('when called for a rich-text embed', () => {
+      it('returns the correct template name and fields', async () => {
+        // Note that this rich-text template is NOT inline
+        const richTextTemplate = {
+          inline: false,
+          name: 'underline',
+          fields: [{ type: 'string', name: 'text', required: true }],
+        }
+        const richTextContent = {
+          type: 'root',
+          children: [
+            {
+              type: 'p',
+              children: [
+                {
+                  type: 'text',
+                  text: 'This is a test!',
+                },
+              ],
+            },
+            {
+              type: 'mdxJsxTextElement',
+              name: 'underline',
+              children: [
+                {
+                  type: 'text',
+                  text: '',
+                },
+              ],
+              props: {
+                text: 'underlined text',
+              },
+            },
+          ],
+        }
+
+        const form = new Form({
+          ...DEFAULTS,
+          fields: [
+            {
+              type: 'rich-text',
+              name: 'body',
+              isBody: true,
+              templates: [richTextTemplate],
+            },
+          ],
+          initialValues: { body: richTextContent },
+        })
+
+        const fieldName = 'body.children.1.props'
+        // This is called when opening a rich-text field in the sidebar
+        // or admin portal to edit the rich-text template's nested fields
+        const activeField = form.getActiveField(fieldName)
+
+        expect(activeField.name).toEqual(fieldName)
+        expect(activeField).toEqual({
+          inline: false,
+          name: 'body.children.1.props',
+          fields: richTextTemplate.fields.map((field) => ({
+            ...field,
+            name: `body.children.1.props.${field.name}`,
+          })),
+        })
+      })
+
+      describe('with `inline: true`', () => {
+        it('returns the correct template with namespaced field names', async () => {
+          const templateTextField = {
+            type: 'string',
+            name: 'text',
+            required: true,
+          }
+          const templateObjectField = {
+            type: 'object',
+            name: 'objectfield',
+            fields: [{ type: 'string', name: 'nestedtextfield' }],
+          }
+          const inlineRichTextTemplate = {
+            inline: true,
+            name: 'underline',
+            fields: [templateTextField, templateObjectField],
+          }
+          const richTextContent = {
+            type: 'root',
+            children: [
+              {
+                type: 'p',
+                children: [
+                  {
+                    type: 'text',
+                    text: 'Rabble rabble rabble ',
+                  },
+                  {
+                    type: 'mdxJsxTextElement',
+                    name: 'underline',
+                    children: [
+                      {
+                        type: 'text',
+                        text: '',
+                      },
+                    ],
+                    props: {
+                      text: 'underlined text',
+                    },
+                  },
+                ],
+              },
+            ],
+          }
+
+          const form = new Form({
+            ...DEFAULTS,
+            fields: [
+              {
+                type: 'rich-text',
+                name: 'body',
+                isBody: true,
+                templates: [inlineRichTextTemplate],
+              },
+            ],
+            initialValues: { body: richTextContent },
+          })
+
+          const fieldName = 'body.children.0.children.1.props'
+          // This is called when opening a rich-text field in the sidebar
+          // or admin portal to edit the rich-text template's nested fields
+          const activeField = form.getActiveField(fieldName)
+
+          expect(activeField.name).toEqual(fieldName)
+          expect(activeField).toEqual({
+            inline: true,
+            name: 'body.children.0.children.1.props',
+            fields: [
+              {
+                ...templateTextField,
+                name: `body.children.0.children.1.props.${templateTextField.name}`,
+              },
+              {
+                ...templateObjectField,
+                name: `body.children.0.children.1.props.${templateObjectField.name}`,
+              },
+            ],
+          })
+        })
+      })
+    })
+  })
 })

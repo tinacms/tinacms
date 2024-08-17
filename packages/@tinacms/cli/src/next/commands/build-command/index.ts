@@ -55,6 +55,16 @@ export class BuildCommand extends BaseCommand {
   skipSearchIndex = Option.Boolean('--skip-search-index', false, {
     description: 'Skip indexing the site for search',
   })
+  upstreamBranch = Option.String('--upstream-branch', {
+    description:
+      'Optional upstream branch with the schema. If not specified, default will be used.',
+  })
+  previewBaseBranch = Option.String('--preview-base-branch', {
+    description: 'The base branch for the preview',
+  })
+  previewName = Option.String('--preview-name', {
+    description: 'The name of the preview branch',
+  })
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -74,6 +84,24 @@ export class BuildCommand extends BaseCommand {
       tinaGraphQLVersion: this.tinaGraphQLVersion,
       legacyNoSDK: this.noSDK,
     })
+
+    if (this.previewName && !this.previewBaseBranch) {
+      logger.error(
+        `${dangerText(
+          `ERROR: preview name provided without a preview base branch.`
+        )}`
+      )
+      process.exit(1)
+    }
+
+    if (this.previewBaseBranch && !this.previewName) {
+      logger.error(
+        `${dangerText(
+          `ERROR: preview base branch provided without a preview name.`
+        )}`
+      )
+      process.exit(1)
+    }
 
     try {
       await configManager.processConfig()
@@ -151,8 +179,31 @@ export class BuildCommand extends BaseCommand {
       this.skipCloudChecks || configManager.hasSelfHostedConfig()
 
     if (!skipCloudChecks) {
-      await this.checkClientInfo(configManager, codegen.productionUrl)
-      await waitForDB(configManager.config, codegen.productionUrl, false)
+      const { hasUpstream } = await this.checkClientInfo(
+        configManager,
+        codegen.productionUrl,
+        this.previewBaseBranch
+      )
+      if (!hasUpstream && this.upstreamBranch) {
+        logger.warn(
+          `${dangerText(
+            `WARN: Upstream branch '${this.upstreamBranch}' specified but no upstream project was found.`
+          )}`
+        )
+      }
+      if (hasUpstream || (this.previewBaseBranch && this.previewName)) {
+        await this.syncProject(configManager, codegen.productionUrl, {
+          upstreamBranch: this.upstreamBranch,
+          previewBaseBranch: this.previewBaseBranch,
+          previewName: this.previewName,
+        })
+      }
+      await waitForDB(
+        configManager.config,
+        codegen.productionUrl,
+        this.previewName,
+        false
+      )
       await this.checkGraphqlSchema(
         configManager,
         database,
@@ -283,16 +334,23 @@ export class BuildCommand extends BaseCommand {
     }
   }
 
-  async checkClientInfo(configManager: ConfigManager, apiURL: string) {
+  async checkClientInfo(
+    configManager: ConfigManager,
+    apiURL: string,
+    previewBaseBranch?: string
+  ): Promise<{ hasUpstream: boolean }> {
     const { config } = configManager
     const token = config.token
     const { clientId, branch, host } = parseURL(apiURL)
 
-    const url = `https://${host}/db/${clientId}/status/${branch}`
+    const url = `https://${host}/db/${clientId}/status/${
+      previewBaseBranch || branch
+    }`
     const bar = new Progress('Checking clientId and token. :prog', 1)
 
     // Check the client information
     let branchKnown = false
+    let hasUpstream = false
     try {
       const res = await request({
         token,
@@ -303,6 +361,9 @@ export class BuildCommand extends BaseCommand {
       })
       if (!(res.status === 'unknown')) {
         branchKnown = true
+      }
+      if (res.hasUpstream) {
+        hasUpstream = true
       }
     } catch (e) {
       summary({
@@ -315,6 +376,10 @@ export class BuildCommand extends BaseCommand {
               {
                 key: 'clientId',
                 value: config.clientId,
+              },
+              {
+                key: 'branch',
+                value: config.branch,
               },
               {
                 key: 'token',
@@ -334,7 +399,9 @@ export class BuildCommand extends BaseCommand {
       branchBar.tick({
         prog: '✅',
       })
-      return
+      return {
+        hasUpstream,
+      }
     }
 
     // We know the branch is status: 'unknown'
@@ -395,6 +462,70 @@ export class BuildCommand extends BaseCommand {
       )}`
     )
     throw new Error('Branch is not on Tina Cloud')
+  }
+
+  async syncProject(
+    configManager: ConfigManager,
+    apiURL: string,
+    options?: {
+      upstreamBranch?: string
+      previewBaseBranch?: string
+      previewName?: string
+    }
+  ): Promise<void> {
+    const { config } = configManager
+    const token = config.token
+    const { clientId, branch, host } = parseURL(apiURL)
+    const { previewName, previewBaseBranch, upstreamBranch } = options || {}
+
+    let url = `https://${host}/db/${clientId}/reset/${branch}?refreshSchema=true&skipIfSchemaCurrent=true`
+    if (upstreamBranch && previewBaseBranch && previewName) {
+      url = `https://${host}/db/${clientId}/reset/${previewBaseBranch}?refreshSchema=true&skipIfSchemaCurrent=true&upstreamBranch=${upstreamBranch}&previewName=${previewName}`
+    } else if (!upstreamBranch && previewBaseBranch && previewName) {
+      url = `https://${host}/db/${clientId}/reset/${previewBaseBranch}?refreshSchema=true&skipIfSchemaCurrent=true&previewName=${branch}`
+    } else if (upstreamBranch && !previewBaseBranch && !previewName) {
+      url = `https://${host}/db/${clientId}/reset/${branch}?refreshSchema=true&skipIfSchemaCurrent=true&upstreamBranch=${upstreamBranch}`
+    }
+    const bar = new Progress('Syncing Project. :prog', 1)
+
+    try {
+      const res = await request({
+        token,
+        url,
+        method: 'POST',
+      })
+      bar.tick({
+        prog: '✅',
+      })
+      if (res.status === 'success') {
+        return
+      }
+    } catch (e) {
+      summary({
+        heading: `Error when requesting project sync`,
+        items: [
+          {
+            emoji: '❌',
+            heading: 'You provided',
+            subItems: [
+              {
+                key: 'clientId',
+                value: config.clientId,
+              },
+              {
+                key: 'branch',
+                value: config.branch,
+              },
+              {
+                key: 'token',
+                value: config.token,
+              },
+            ],
+          },
+        ],
+      })
+      throw e
+    }
   }
 
   async checkGraphqlSchema(
@@ -471,7 +602,8 @@ export class BuildCommand extends BaseCommand {
 async function request(args: {
   url: string
   token: string
-}): Promise<{ status: string; timestamp: number }> {
+  method?: string
+}): Promise<{ status: string; timestamp: number; hasUpstream: boolean }> {
   const headers = new Headers()
   if (args.token) {
     headers.append('X-API-KEY', args.token)
@@ -481,7 +613,7 @@ async function request(args: {
   const url = args?.url
 
   const res = await fetch(url, {
-    method: 'GET',
+    method: args.method || 'GET',
     headers,
     redirect: 'follow',
   })
@@ -511,7 +643,12 @@ async function request(args: {
   return {
     status: json?.status,
     timestamp: json?.timestamp,
-  } as { status: IndexStatusResponse['status']; timestamp: number }
+    hasUpstream: json?.hasUpstream || false,
+  } as {
+    status: IndexStatusResponse['status']
+    timestamp: number
+    hasUpstream: boolean
+  }
 }
 
 export const fetchRemoteGraphqlSchema = async ({

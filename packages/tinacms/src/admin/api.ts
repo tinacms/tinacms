@@ -14,7 +14,11 @@ import {
 
 export interface FilterArgs {
   filterField: string
+  collection?: string
+  relativePath?: string
+  newRelativePath?: string
   startsWith?: string
+  endsWith?: string
   before?: string
   after?: string
   booleanEquals?: boolean
@@ -395,5 +399,23 @@ export class TinaAdminApi {
     }
 
     return response
+  }
+
+  async createFolder(collection, folderName) {
+    return this.api.request(
+      `#graphql
+      mutation($collection: String!, $folderName: String!) {
+        createFolder(
+          collection: $collection,
+          relativePath: $folderName
+        ){__typename}
+      }`,
+      {
+        variables: {
+          collection,
+          folderName,
+        },
+      }
+    )
   }
 }

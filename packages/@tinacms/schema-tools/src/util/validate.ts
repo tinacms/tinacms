@@ -13,7 +13,7 @@ export function assertShape<T>(
   const shape = yupSchema(yup)
   try {
     shape.validateSync(value)
-  } catch (e) {
+  } catch (e: any) {
     const message = errorMessage || `Failed to assertShape - ${e.message}`
     throw new Error(message)
   }

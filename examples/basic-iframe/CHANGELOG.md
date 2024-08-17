@@ -4,6 +4,101 @@
 
 ### Patch Changes
 
+- Updated dependencies [2e3393ef5]
+  - @tinacms/graphql@1.4.35
+  - tinacms@1.6.4
+  - @tinacms/datalayer@1.2.35
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [66f7e2074]
+- Updated dependencies [b3ad50a62]
+  - tinacms@1.6.3
+  - @tinacms/graphql@1.4.34
+  - @tinacms/datalayer@1.2.34
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [141e78c04]
+  - tinacms@1.6.2
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [216cfff0c]
+  - tinacms@1.6.1
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [c8ceba4d8]
+  - tinacms@1.6.0
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [04704e3dc]
+  - tinacms@1.5.30
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [67e7a2d82]
+  - @tinacms/graphql@1.4.33
+  - @tinacms/datalayer@1.2.33
+  - tinacms@1.5.29
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [1e5c94f05]
+  - @tinacms/graphql@1.4.32
+  - @tinacms/datalayer@1.2.32
+  - tinacms@1.5.28
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [4202c1028]
+- Updated dependencies [7779cdbf6]
+- Updated dependencies [64f8fa038]
+- Updated dependencies [548fe6d96]
+- Updated dependencies [031ce05c2]
+- Updated dependencies [50b20f809]
+  - tinacms@1.5.27
+  - @tinacms/graphql@1.4.31
+  - @tinacms/datalayer@1.2.31
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [9e1a22a53]
+  - tinacms@1.5.26
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [476b9dfbe]
+  - @tinacms/graphql@1.4.30
+  - @tinacms/datalayer@1.2.30
+  - tinacms@1.5.25
+
+## null
+
+### Patch Changes
+
 - Updated dependencies [a65ca13f2]
   - @tinacms/datalayer@1.2.29
   - @tinacms/graphql@1.4.29

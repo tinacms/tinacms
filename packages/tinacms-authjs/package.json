@@ -1,6 +1,6 @@
 {
   "name": "tinacms-authjs",
-  "version": "1.0.1",
+  "version": "4.0.1",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "files": [
@@ -28,12 +28,12 @@
   "devDependencies": {
     "@tinacms/datalayer": "workspace:*",
     "@tinacms/scripts": "workspace:*",
-    "next": "12.3.4",
-    "next-auth": "4.22.1",
-    "react": "^18",
-    "react-dom": "^18",
+    "next": "14.2.5",
+    "next-auth": "4.24.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tinacms": "workspace:*",
-    "typescript": "4.3.5"
+    "typescript": "4.6.4"
   },
   "peerDependencies": {
     "next": "^12.2.5 || ^13 || ^14",

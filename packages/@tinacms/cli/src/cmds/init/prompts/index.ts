@@ -155,7 +155,11 @@ export const makeImportString = (imports?: ImportStatement[]) => {
   if (!imports) {
     return ''
   }
-  return imports
+  const filtered = imports.filter((x) => x.imported.length > 0)
+  if (filtered.length === 0) {
+    return ''
+  }
+  return filtered
     .map((x) => {
       return `import { ${x.imported.join(',')} } from '${x.from}'`
     })

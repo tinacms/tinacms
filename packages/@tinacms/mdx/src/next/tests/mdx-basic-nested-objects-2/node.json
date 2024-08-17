@@ -1,0 +1,50 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Hello"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "Table",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "rows": [
+          {
+            "columns": [
+              {
+                "content": {
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "h1",
+                        "children": [
+                          {
+                            "type": "text",
+                            "text": "Hello"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

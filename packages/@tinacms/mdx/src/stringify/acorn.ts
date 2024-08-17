@@ -7,7 +7,12 @@
 import prettier from 'prettier/esm/standalone.mjs'
 // @ts-ignore Fix this by updating prettier
 import parser from 'prettier/esm/parser-espree.mjs'
-import type { RichTextType, RichTextTemplate } from '@tinacms/schema-tools'
+import type {
+  RichTextField,
+  RichTextTemplate,
+  ObjectField,
+  TinaField,
+} from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
@@ -15,14 +20,14 @@ import { rootElement, stringifyMDX } from '.'
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] } => {
   return stringifyProps(element, field, true, imageCallback)
 }
 export function stringifyProps(
   element: Plate.MdxInlineElement,
-  parentField: RichTextType,
+  parentField: RichTextField,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -33,7 +38,7 @@ export function stringifyProps(
 }
 export function stringifyProps(
   element: Plate.MdxBlockElement,
-  parentField: RichTextType,
+  parentField: RichTextField,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -44,7 +49,7 @@ export function stringifyProps(
 }
 export function stringifyProps(
   element: Plate.MdxBlockElement | Plate.MdxInlineElement,
-  parentField: RichTextType,
+  parentField: RichTextField,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -186,12 +191,17 @@ export function stringifyProps(
         }
         break
       case 'object':
+        const result = findAndTransformNestedRichText(
+          field,
+          value,
+          imageCallback
+        )
         attributes.push({
           type: 'mdxJsxAttribute',
           name,
           value: {
             type: 'mdxJsxAttributeValueExpression',
-            value: stringifyObj(value, flatten),
+            value: stringifyObj(result, flatten),
           },
         })
         break
@@ -319,5 +329,73 @@ export function assertShape<T>(
 }
 
 function isPlainObject(value: unknown) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/**
+ * Traverse an object field before stringifying so that we can first stringify
+ * any rich-text fields we come across. Beware that this mutates the value in-place for
+ * simplicity, and the assumption here is that this is ok because the object
+ * is not long-lived.
+ */
+const findAndTransformNestedRichText = (
+  field: TinaField<false>,
+  value: unknown,
+  imageCallback: (url: string) => string,
+  parentValue: Record<string, unknown> = {}
+) => {
+  switch (field.type) {
+    case 'rich-text': {
+      assertShape<Plate.RootElement>(
+        value,
+        (value) => value.type === 'root' && Array.isArray(value.children),
+        `Nested rich-text element is not a valid shape for field ${field.name}`
+      )
+      parentValue[field.name] = stringifyMDX(value, field, imageCallback)
+      break
+    }
+    case 'object': {
+      if (field.list) {
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            Object.entries(item).forEach(([key, subValue]) => {
+              if (field.fields) {
+                const subField = field.fields.find(({ name }) => name === key)
+                if (subField) {
+                  findAndTransformNestedRichText(
+                    subField,
+                    subValue,
+                    imageCallback,
+                    item
+                  )
+                }
+              }
+            })
+          })
+        }
+      } else {
+        if (isObject(value)) {
+          Object.entries(value).forEach(([key, subValue]) => {
+            if (field.fields) {
+              const subField = field.fields.find(({ name }) => name === key)
+              if (subField) {
+                findAndTransformNestedRichText(
+                  subField,
+                  subValue,
+                  imageCallback,
+                  value
+                )
+              }
+            }
+          })
+        }
+      }
+      break
+    }
+  }
+  return value
+}
+
+function isObject(value: any): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }

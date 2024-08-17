@@ -1,5 +1,99 @@
 # @tinacms/search
 
+## 1.0.25
+
+### Patch Changes
+
+- Updated dependencies [d9b23fc]
+- Updated dependencies [613e9c5]
+  - @tinacms/graphql@1.4.40
+
+## 1.0.24
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+  - @tinacms/schema-tools@1.5.0
+  - @tinacms/graphql@1.4.39
+
+## 1.0.23
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/graphql@1.4.38
+  - @tinacms/schema-tools@1.4.19
+
+## 1.0.22
+
+### Patch Changes
+
+- Updated dependencies [f26b40d]
+  - @tinacms/schema-tools@1.4.18
+  - @tinacms/graphql@1.4.37
+
+## 1.0.21
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [76c1a2e]
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/graphql@1.4.36
+  - @tinacms/schema-tools@1.4.17
+
+## 1.0.20
+
+### Patch Changes
+
+- Updated dependencies [2e3393ef5]
+  - @tinacms/schema-tools@1.4.16
+  - @tinacms/graphql@1.4.35
+
+## 1.0.19
+
+### Patch Changes
+
+- @tinacms/graphql@1.4.34
+
+## 1.0.18
+
+### Patch Changes
+
+- Updated dependencies [67e7a2d82]
+  - @tinacms/graphql@1.4.33
+
+## 1.0.17
+
+### Patch Changes
+
+- Updated dependencies [1e5c94f05]
+  - @tinacms/graphql@1.4.32
+
+## 1.0.16
+
+### Patch Changes
+
+- Updated dependencies [7779cdbf6]
+- Updated dependencies [64f8fa038]
+- Updated dependencies [031ce05c2]
+  - @tinacms/graphql@1.4.31
+  - @tinacms/schema-tools@1.4.15
+
+## 1.0.15
+
+### Patch Changes
+
+- Updated dependencies [476b9dfbe]
+  - @tinacms/graphql@1.4.30
+
 ## 1.0.14
 
 ### Patch Changes

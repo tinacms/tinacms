@@ -1,5 +1,231 @@
 # tinacms-cli
 
+## 1.5.53
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- Updated dependencies [c6e9afb]
+- Updated dependencies [d9b23fc]
+- Updated dependencies [613e9c5]
+- Updated dependencies [1c69338]
+- Updated dependencies [a1a767d]
+  - tinacms@2.1.1
+  - @tinacms/app@2.0.3
+  - @tinacms/graphql@1.4.40
+  - @tinacms/search@1.0.25
+
+## 1.5.52
+
+### Patch Changes
+
+- Updated dependencies [4128128]
+  - @tinacms/app@2.0.2
+
+## 1.5.51
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+  - @tinacms/schema-tools@1.5.0
+  - @tinacms/app@2.0.1
+  - @tinacms/graphql@1.4.39
+  - @tinacms/search@1.0.24
+
+## 1.5.50
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [957fa26]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/app@2.0.0
+  - @tinacms/graphql@1.4.38
+  - @tinacms/schema-tools@1.4.19
+  - tinacms@2.0.0
+  - @tinacms/metrics@1.0.5
+  - @tinacms/search@1.0.23
+
+## 1.5.49
+
+### Patch Changes
+
+- Updated dependencies [2940594]
+- Updated dependencies [82ab066]
+  - @tinacms/app@1.2.45
+  - @tinacms/metrics@1.0.4
+  - tinacms@1.6.7
+
+## 1.5.48
+
+### Patch Changes
+
+- Updated dependencies [a9b461c]
+- Updated dependencies [3034430]
+- Updated dependencies [171f5a5]
+- Updated dependencies [fd216f3]
+- Updated dependencies [d004af2]
+- Updated dependencies [20f972a]
+- Updated dependencies [2a36b65]
+- Updated dependencies [f26b40d]
+  - @tinacms/app@1.2.44
+  - tinacms@1.6.6
+  - @tinacms/schema-tools@1.4.18
+  - @tinacms/graphql@1.4.37
+  - @tinacms/search@1.0.22
+
+## 1.5.47
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- 0ba0e59: Fix remix visual editing error
+- dc632f3: cli - fix broken link to do with client variables not being configured properly. (Link to https://tina.io/docs/tina-cloud/overview/)
+- 1104006: Update tailwind to v3.4.4 + fix media manager height overflow on mobile screens
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [76c1a2e]
+- Updated dependencies [04f0bf3]
+- Updated dependencies [0503072]
+- Updated dependencies [1104006]
+- Updated dependencies [dffa355]
+  - @tinacms/graphql@1.4.36
+  - tinacms@1.6.5
+  - @tinacms/metrics@1.0.3
+  - @tinacms/schema-tools@1.4.17
+  - @tinacms/search@1.0.21
+  - @tinacms/app@1.2.43
+
+## 1.5.46
+
+### Patch Changes
+
+- Updated dependencies [2e3393ef5]
+  - @tinacms/schema-tools@1.4.16
+  - @tinacms/graphql@1.4.35
+  - tinacms@1.6.4
+  - @tinacms/search@1.0.20
+  - @tinacms/datalayer@1.2.35
+  - @tinacms/app@1.2.42
+  - @tinacms/metrics@1.0.2
+
+## 1.5.45
+
+### Patch Changes
+
+- Updated dependencies [66f7e2074]
+- Updated dependencies [b3ad50a62]
+  - tinacms@1.6.3
+  - @tinacms/app@1.2.41
+  - @tinacms/graphql@1.4.34
+  - @tinacms/datalayer@1.2.34
+  - @tinacms/search@1.0.19
+
+## 1.5.44
+
+### Patch Changes
+
+- Updated dependencies [141e78c04]
+  - tinacms@1.6.2
+  - @tinacms/app@1.2.40
+
+## 1.5.43
+
+### Patch Changes
+
+- 216cfff0c: Add fetch options to generated client
+- ee135ef03: Feat: add support for preview indexing and overriding upstream branch in separate content repo builds
+- Updated dependencies [216cfff0c]
+  - tinacms@1.6.1
+  - @tinacms/app@1.2.39
+
+## 1.5.42
+
+### Patch Changes
+
+- de271d65a: Update CLI build command to support separate content repo schema synchronization
+- Updated dependencies [c8ceba4d8]
+  - tinacms@1.6.0
+  - @tinacms/app@1.2.38
+
+## 1.5.41
+
+### Patch Changes
+
+- Updated dependencies [04704e3dc]
+  - tinacms@1.5.30
+  - @tinacms/app@1.2.37
+
+## 1.5.40
+
+### Patch Changes
+
+- Updated dependencies [67e7a2d82]
+  - @tinacms/graphql@1.4.33
+  - @tinacms/datalayer@1.2.33
+  - @tinacms/search@1.0.18
+  - tinacms@1.5.29
+  - @tinacms/app@1.2.36
+
+## 1.5.39
+
+### Patch Changes
+
+- 0639228c9: Add mongodb to deps when using the mongo adapter
+
+## 1.5.38
+
+### Patch Changes
+
+- Updated dependencies [1e5c94f05]
+  - @tinacms/graphql@1.4.32
+  - @tinacms/datalayer@1.2.32
+  - @tinacms/search@1.0.17
+  - tinacms@1.5.28
+  - @tinacms/app@1.2.35
+
+## 1.5.37
+
+### Patch Changes
+
+- Updated dependencies [4202c1028]
+- Updated dependencies [7779cdbf6]
+- Updated dependencies [64f8fa038]
+- Updated dependencies [548fe6d96]
+- Updated dependencies [031ce05c2]
+- Updated dependencies [50b20f809]
+  - tinacms@1.5.27
+  - @tinacms/graphql@1.4.31
+  - @tinacms/schema-tools@1.4.15
+  - @tinacms/app@1.2.34
+  - @tinacms/datalayer@1.2.31
+  - @tinacms/search@1.0.16
+
+## 1.5.36
+
+### Patch Changes
+
+- Updated dependencies [9e1a22a53]
+  - tinacms@1.5.26
+  - @tinacms/app@1.2.33
+
+## 1.5.35
+
+### Patch Changes
+
+- Updated dependencies [476b9dfbe]
+  - @tinacms/graphql@1.4.30
+  - @tinacms/datalayer@1.2.30
+  - @tinacms/search@1.0.15
+  - tinacms@1.5.25
+  - @tinacms/app@1.2.32
+
 ## 1.5.34
 
 ### Patch Changes
