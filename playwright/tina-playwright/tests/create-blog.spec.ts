@@ -31,7 +31,7 @@ test.describe("Create Blog Post", () => {
       "http://localhost:3000/admin/index.html#/collections/post/~"
     );
 
-    const blogPost = await page.locator(`text=${blogFilename}`);
+    const blogPost = await page.locator(`text=${blogFilename}`).first();
     await expect(blogPost).toBeVisible();
     isNewBlogCreated = true;
   });
