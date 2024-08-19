@@ -2,6 +2,7 @@ import { LoadingDots } from '@toolkit/form-builder'
 import { Field } from '@toolkit/forms'
 import type { TinaCMS } from '@toolkit/tina-cms'
 import * as React from 'react'
+import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io'
 import { Button } from './components/button'
 import {
   Command,
@@ -13,11 +14,6 @@ import {
 } from './components/command'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
 import type { ReferenceFieldProps } from './index'
-import {
-  IoIosArrowDropdown,
-  IoMdArrowDropdown,
-  IoMdArrowDropup,
-} from 'react-icons/io'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
@@ -34,10 +30,8 @@ interface Node {
   _internalSys: {
     filename: string
   }
-  _values: {
-    title: string | null
-    name: string | null
-  }
+  //Using uknown type as _values can be any type from the collection user degined in schema
+  _values: unknown
 }
 interface OptionSet {
   collection: string
@@ -168,7 +162,14 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
         <PopoverContent className="p-0 relative">
           <Command
             filter={(value, search) => {
-              if (value.includes(search)) return 1
+              //Replace / in the file path with empty string to make it searchable
+              if (
+                value
+                  .toLowerCase()
+                  .replace(/\//g, '')
+                  .includes(search.toLowerCase())
+              )
+                return 1
               return 0
             }}
           >
