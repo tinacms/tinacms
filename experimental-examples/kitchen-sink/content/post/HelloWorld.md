@@ -1,5 +1,5 @@
 ---
-title: This is a title
+title: hello world
 author: content/author/test-author.md
 ---
 
