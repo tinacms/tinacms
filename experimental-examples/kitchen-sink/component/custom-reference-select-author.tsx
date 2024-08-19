@@ -1,4 +1,5 @@
 import React from 'react'
+import { AuthorProps } from '../tina/custom-component-reference-select/model'
 
 const CustomDisplayAuthorComponent: React.FC<AuthorProps> = ({
   name,
