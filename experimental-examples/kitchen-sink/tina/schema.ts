@@ -95,8 +95,8 @@ export default defineSchema({
         },
         {
           type: 'string',
-          label: 'something',
-          name: 'something',
+          label: 'description',
+          name: 'description',
           required: true,
         },
       ],
