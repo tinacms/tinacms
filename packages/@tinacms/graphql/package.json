@@ -1,10 +1,13 @@
 {
 	"name": "@tinacms/graphql",
-	"version": "1.4.40",
+	"version": "1.5.0",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
-	"files": ["package.json", "dist"],
+	"files": [
+		"package.json",
+		"dist"
+	],
 	"exports": {
 		"import": "./dist/index.mjs",
 		"require": "./dist/index.js"
