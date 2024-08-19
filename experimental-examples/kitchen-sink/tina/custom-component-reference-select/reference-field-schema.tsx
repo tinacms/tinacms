@@ -1,6 +1,6 @@
 import React from 'react'
-import CustomDisplayAuthorComponent from '../../component/custom-reference-select-author'
-import CustomDisplayPostComponent from '../../component/custom-reference-select-post'
+import AuthorCollectionCustomReference from '../../component/custom-reference-select-author'
+import PostCollectionCustomReference from '../../component/custom-reference-select-post'
 import { CollectionProps, COLLECTIONS } from './model'
 
 const referenceField = {
@@ -12,14 +12,14 @@ const referenceField = {
       switch (props._collection) {
         case COLLECTIONS.AUTHOR:
           return (
-            <CustomDisplayAuthorComponent
+            <AuthorCollectionCustomReference
               name={props.name}
               description={props.description}
             />
           )
 
         case COLLECTIONS.POST:
-          return <CustomDisplayPostComponent title={props.title} />
+          return <PostCollectionCustomReference title={props.title} />
 
         default:
           return filepath
