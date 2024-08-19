@@ -183,11 +183,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                   >
                     <CommandList>
                       {edges.map(({ node }) => {
-                        const {
-                          id,
-                          _internalSys: { filename },
-                          _values: { title },
-                        } = node
+                        const { id, _values } = node
 
                         return (
                           <CommandItem
@@ -200,8 +196,8 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                           >
                             <div className="flex flex-col">
                               <div>
-                                {field?.ui?.selectComponents && node._values ? (
-                                  field.ui.selectComponents(node._values, {
+                                {field?.ui?.selectComponents && _values ? (
+                                  field.ui.selectComponents(_values, {
                                     filepath: id,
                                   })
                                 ) : (
