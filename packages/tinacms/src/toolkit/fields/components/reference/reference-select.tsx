@@ -192,21 +192,21 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                         return (
                           <CommandItem
                             key={`${id}-option`}
-                            value={id || title}
+                            value={id}
                             onSelect={() => {
                               setValue(id)
                               setOpen(false)
                             }}
                           >
                             <div className="flex flex-col">
-                              {/* <span className="font-semibold text-sm">
-                                {title || name || id}
-                              </span> */}
-                              {<span className="text-x">{filename}</span>}
                               <div>
-                                {field?.ui?.selectComponents && node._values
-                                  ? field.ui.selectComponents(node._values)
-                                  : null}
+                                {field?.ui?.selectComponents && node._values ? (
+                                  field.ui.selectComponents(node._values, {
+                                    filepath: id,
+                                  })
+                                ) : (
+                                  <span className="text-x">{id}</span>
+                                )}
                               </div>
                             </div>
                           </CommandItem>
