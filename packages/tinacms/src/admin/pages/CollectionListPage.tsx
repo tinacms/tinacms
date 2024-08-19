@@ -757,16 +757,11 @@ const CollectionListPage = () => {
                                                         .filename}
                                                 </span>
                                               </span>
+                                              <span className="block text-xs text-gray-400 mb-1">
+                                                {document.node._sys.path}
+                                              </span>
                                             </span>
                                           </a>
-                                        </td>
-                                        <td className="px-3 py-3">
-                                          <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                            Path
-                                          </span>
-                                          <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
-                                            {document.node._sys.path}
-                                          </span>
                                         </td>
                                         {hasTitle && (
                                           <td className="px-3 py-3">
