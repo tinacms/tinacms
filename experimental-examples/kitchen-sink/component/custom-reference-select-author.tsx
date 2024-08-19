@@ -1,25 +1,16 @@
 import React from 'react'
 
-interface CustomDisplayAuthorComponentProps {
-  something: string
-}
-
-const CustomDisplayAuthorComponent: React.FC<
-  CustomDisplayAuthorComponentProps
-> = ({ something }) => {
+const CustomDisplayAuthorComponent: React.FC<AuthorProps> = ({
+  name,
+  description,
+}: AuthorProps) => {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        fontSize: '1.2rem',
-        padding: '10px',
-        backgroundColor: '#f0f4f8',
-        borderRadius: '8px',
-      }}
-    >
-      <span style={{ marginRight: '8px' }}>🚀</span>
-      <span>{something}</span>
+    <div className="flex items-center text-lg p-4 bg-gray-100 rounded-lg">
+      <span className="mr-2">🚀</span>
+      <div>
+        <div className="font-semibold">{name}</div>
+        <div>{description}</div>
+      </div>
     </div>
   )
 }
