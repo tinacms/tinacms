@@ -1,10 +1,4 @@
 import React from 'react'
-import {
-  createPluginFactory,
-  setNodes,
-  normalizeEditor,
-  PlateEditor,
-} from '@udecode/plate-headless'
 import { ReactEditor } from 'slate-react'
 import { BlockEmbed, InlineEmbed } from './component'
 import {
@@ -13,6 +7,12 @@ import {
   helpers,
 } from '../core/common'
 import type { MdxTemplate } from '../../types'
+import {
+  createPluginFactory,
+  normalizeEditor,
+  type PlateEditor,
+  setNodes,
+} from '@udecode/plate-common'
 
 export const ELEMENT_MDX_INLINE = 'mdxJsxTextElement'
 export const ELEMENT_MDX_BLOCK = 'mdxJsxFlowElement'
@@ -47,7 +47,7 @@ export const createMdxBlockPlugin = createPluginFactory({
 })
 
 export const insertMDX = (editor: PlateEditor, value: MdxTemplate) => {
-  const flow = value.inline ? false : true
+  const flow = !value.inline
   if (!helpers.currentNodeSupportsMDX(editor)) {
     return
   }

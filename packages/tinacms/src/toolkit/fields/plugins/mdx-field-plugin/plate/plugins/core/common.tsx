@@ -1,12 +1,4 @@
 import {
-  someNode,
-  getPluginType,
-  isMarkActive as isMarkActiveBase,
-  insertNodes,
-  setNodes,
-  findNode,
-  PlateEditor,
-  getBlockAbove,
   createParagraphPlugin,
   createHorizontalRulePlugin,
   createNodeIdPlugin,
@@ -18,17 +10,29 @@ import {
   createItalicPlugin,
   createUnderlinePlugin,
   createCodePlugin,
-} from '@udecode/plate-headless'
+  createIndentPlugin,
+  createIndentListPlugin,
+} from '@udecode/plate'
 import { ReactEditor } from 'slate-react'
 import {
   createCodeBlockPlugin,
   createHTMLBlockPlugin,
   createHTMLInlinePlugin,
 } from '../create-code-block'
-import { Editor, Node, Transforms } from 'slate'
 import { ELEMENT_IMG } from '../create-img-plugin'
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins'
 import { HANDLES_MDX } from './formatting'
+import {
+  findNode,
+  getBlockAbove,
+  getPluginType,
+  insertNodes,
+  type PlateEditor,
+  setNodes,
+  someNode,
+} from '@udecode/plate-common'
+import { createSlashPlugin } from '@udecode/plate-slash-command'
+import { Transforms, Editor, Node } from 'slate'
 
 export const plugins = [
   createHeadingPlugin(),
@@ -42,9 +46,12 @@ export const plugins = [
   createUnderlinePlugin(),
   createCodePlugin(),
   createListPlugin(),
+  createIndentPlugin(),
+  createIndentListPlugin(),
   createHorizontalRulePlugin(),
   // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
   createNodeIdPlugin(),
+  createSlashPlugin(),
 ]
 
 const isNodeActive = (editor, type) => {
@@ -53,9 +60,7 @@ const isNodeActive = (editor, type) => {
     !!editor?.selection && someNode(editor, { match: { type: pluginType } })
   )
 }
-const isMarkActive = (editor, type) => {
-  return !!editor?.selection && isMarkActiveBase(editor, type)
-}
+
 const isListActive = (editor, type) => {
   const res = !!editor?.selection && getListItemEntry(editor)
   return !!res && res.list[0].type === type
@@ -78,13 +83,12 @@ const normalize = (node: any) => {
         children: node.children.map(normalize),
         id: Date.now(),
       }
-    } else {
-      // Always supply an empty text leaf
-      return {
-        ...node,
-        children: [{ text: '' }],
-        id: Date.now(),
-      }
+    }
+    // Always supply an empty text leaf
+    return {
+      ...node,
+      children: [{ text: '' }],
+      id: Date.now(),
     }
   }
   return node
@@ -158,7 +162,6 @@ const currentNodeSupportsMDX = (editor: PlateEditor) =>
 
 export const helpers = {
   isNodeActive,
-  isMarkActive,
   isListActive,
   currentNodeSupportsMDX,
   normalize,

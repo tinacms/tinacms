@@ -93,21 +93,26 @@ async function listMedia(
   opts?: CloudinaryOptions
 ) {
   try {
-    const {
-      directory = '""',
-      limit = 500,
-      offset,
-    } = req.query as MediaListOptions
+    const mediaListOptions: MediaListOptions = {
+      directory: (req.query.directory as string) || '""',
+      limit: parseInt(req.query.limit as string, 10) || 500,
+      offset: req.query.offset as string,
+      filesOnly: req.query.filesOnly === 'true' || false,
+    }
 
     const useRootDirectory =
-      !directory || directory === '/' || directory === '""'
+      !mediaListOptions.directory ||
+      mediaListOptions.directory === '/' ||
+      mediaListOptions.directory === '""'
 
-    const query = useRootDirectory ? 'folder=""' : `folder="${directory}"`
+    const query = useRootDirectory
+      ? 'folder=""'
+      : `folder="${mediaListOptions.directory}"`
 
     const response = await cloudinary.search
       .expression(query)
-      .max_results(limit)
-      .next_cursor(offset as string)
+      .max_results(mediaListOptions.limit)
+      .next_cursor(mediaListOptions.offset as string)
       .execute()
 
     const files = response.resources.map(getCloudinaryToTinaFunc(opts))
@@ -123,9 +128,17 @@ async function listMedia(
     let folders: string[] = []
     let folderRes = null
 
+    if (mediaListOptions.filesOnly) {
+      res.json({
+        items: [...files],
+        offset: response.next_cursor,
+      })
+      return
+    }
+
     try {
       // @ts-ignore
-      folderRes = await cloudinary.api.folders(directory)
+      folderRes = await cloudinary.api.folders(mediaListOptions.directory)
     } catch (e) {
       // If the folder doesn't exist, just return an empty array
       if (e.error?.message.startsWith("Can't find folder with path")) {

@@ -742,7 +742,7 @@ const CollectionListPage = () => {
                                                   ? 'Title'
                                                   : 'Filename'}
                                               </span>
-                                              <span className="h-5 leading-5 block truncate">
+                                              <span className="h-5 leading-5 block truncate mb-1">
                                                 {!folderView &&
                                                   !hasTitle &&
                                                   subfolders && (
@@ -756,6 +756,9 @@ const CollectionListPage = () => {
                                                     : document.node._sys
                                                         .filename}
                                                 </span>
+                                              </span>
+                                              <span className="block text-xs text-gray-400">
+                                                {document.node._sys.path}
                                               </span>
                                             </span>
                                           </a>

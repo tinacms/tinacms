@@ -1,22 +1,22 @@
 import React from 'react'
-import {
-  ELEMENT_DEFAULT,
-  insertNodes,
-  PlateEditor,
-  setNodes,
-  TElement,
-  isElement,
-  findNodePath,
-  getPointAfter,
-  focusEditor,
-  getPointBefore,
-  isCollapsed,
-} from '@udecode/plate-headless'
 import { uuid } from '../helpers'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
 import type * as monaco from 'monaco-editor'
 import { useSelected } from 'slate-react'
 import { Autocomplete } from '../autocomplete'
+import {
+  ELEMENT_DEFAULT,
+  findNodePath,
+  focusEditor,
+  getPointAfter,
+  getPointBefore,
+  insertNodes,
+  isCollapsed,
+  isElement,
+  type PlateEditor,
+  setNodes,
+  type TElement,
+} from '@udecode/plate-common'
 
 type Monaco = typeof monaco
 
@@ -75,7 +75,7 @@ export const CodeBlock = ({
 
   const value = element.value || ''
   if (typeof value !== 'string') {
-    throw new Error(`Element must be of type string for code block`)
+    throw new Error('Element must be of type string for code block')
   }
 
   const language = restrictLanguage || element.lang

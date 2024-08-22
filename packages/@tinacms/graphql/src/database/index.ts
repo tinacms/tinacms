@@ -1,11 +1,11 @@
-import path from 'path'
+import path from 'node:path'
 import fs from 'fs-extra'
 import type { DocumentNode } from 'graphql'
 import { GraphQLError } from 'graphql'
 import micromatch from 'micromatch'
 
 import { createSchema } from '../schema/createSchema'
-import { atob, btoa, lastItem, sequential } from '../util'
+import { atob, btoa, get, lastItem, sequential } from '../util'
 import {
   getTemplateForFile,
   hasOwnProperty,
@@ -28,36 +28,36 @@ import type {
 import type { Bridge } from './bridge'
 import { TinaFetchError, TinaQueryError } from '../resolver/error'
 import {
-  BinaryFilter,
+  type BinaryFilter,
   coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
   FOLDER_ROOT,
   FolderTreeBuilder,
-  IndexDefinition,
+  type IndexDefinition,
   makeFilter,
   makeFilterSuffixes,
   makeFolderOpsForCollection,
   makeIndexOpsForDocument,
-  TernaryFilter,
+  type TernaryFilter,
 } from './datalayer'
 import {
   ARRAY_ITEM_VALUE_SEPARATOR,
-  BatchOp,
+  type BatchOp,
   CONTENT_ROOT_PREFIX,
-  DelOp,
+  type DelOp,
   INDEX_KEY_FIELD_SEPARATOR,
-  Level,
+  type Level,
   LevelProxy,
-  PutOp,
+  type PutOp,
   SUBLEVEL_OPTIONS,
 } from './level'
 import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
 import sha from 'js-sha1'
 import { FilesystemBridge, TinaLevelClient } from '..'
 import { generatePasswordHash, mapUserFields } from '../auth/utils'
-import _ from 'lodash'
 import { NotFoundError } from '../error'
+import set from 'lodash.set'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -1072,10 +1072,9 @@ export class Database {
               collection: collection.name,
               stack: error.stack,
             })
-          } else {
-            // I dont think this should ever happen
-            throw error
           }
+          // I dont think this should ever happen
+          throw error
         }
       }),
       pageInfo: {
@@ -1426,9 +1425,9 @@ type UnionDataLookup = {
 
 const hashPasswordVisitor = async (node: any, path: string[]) => {
   const passwordValuePath = [...path, 'value']
-  const plaintextPassword = _.get(node, passwordValuePath)
+  const plaintextPassword = get(node, passwordValuePath)
   if (plaintextPassword) {
-    _.set(
+    set(
       node,
       passwordValuePath,
       await generatePasswordHash({ password: plaintextPassword })
