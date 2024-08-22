@@ -1,4 +1,4 @@
-type Option = {
+export type Option = {
   value: string
   label: string
 }
@@ -19,12 +19,4 @@ export interface ReferenceFieldProps {
   collections: string[]
   options: (Option | string)[]
   optionComponent: OptionComponent
-}
-
-export interface ReferenceProps {
-  name: string
-  input: any
-  field: ReferenceFieldProps
-  disabled?: boolean
-  options?: (Option | string)[]
 }
