@@ -1,5 +1,106 @@
 # @tinacms/app
 
+## 2.1.0
+
+### Minor Changes
+
+- 324950a: Updates Plate Editor to latest version 36.
+
+  - Upgrades all remaining packages `Typescript` to version `^5`
+  - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
+  - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
+  - Updates and removes old version of plate (`plate-headless`) for latest version `^36`
+  - Starts removing and cleaning up some of the old Plate code.
+
+### Patch Changes
+
+- Updated dependencies [324950a]
+- Updated dependencies [f378f11]
+- Updated dependencies [ceb0c07]
+  - @tinacms/mdx@1.4.0
+  - tinacms@2.2.0
+
+## 2.0.3
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- Updated dependencies [c6e9afb]
+- Updated dependencies [d9b23fc]
+- Updated dependencies [1c69338]
+- Updated dependencies [a1a767d]
+  - tinacms@2.1.1
+
+## 2.0.2
+
+### Patch Changes
+
+- 4128128: Fix markdown editor button styling
+
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+  - @tinacms/mdx@1.3.29
+
+## 2.0.0
+
+### Major Changes
+
+- 957fa26: Removed deprecated useTina hook
+  This was deprecated as part of the v1 release and shouldn't have been in use by anyone
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+- e58b951: update vulnerable packages so npm audit does not complain
+- 957fa26: update to React 18
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [957fa26]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/mdx@1.3.28
+  - tinacms@2.0.0
+
+## 1.2.45
+
+### Patch Changes
+
+- 2940594: Add pnpm option to create-tina-app
+- Updated dependencies [82ab066]
+  - tinacms@1.6.7
+
+## 1.2.44
+
+### Patch Changes
+
+- a9b461c: updated 'file has changes' indicator ui
+- Updated dependencies [a9b461c]
+- Updated dependencies [3034430]
+- Updated dependencies [171f5a5]
+- Updated dependencies [fd216f3]
+- Updated dependencies [d004af2]
+- Updated dependencies [20f972a]
+- Updated dependencies [2a36b65]
+- Updated dependencies [f26b40d]
+  - tinacms@1.6.6
+  - @tinacms/mdx@1.3.27
+
+## 1.2.43
+
+### Patch Changes
+
+- Updated dependencies [04f0bf3]
+- Updated dependencies [0503072]
+- Updated dependencies [1104006]
+  - tinacms@1.6.5
+  - @tinacms/mdx@1.3.26
+
 ## 1.2.42
 
 ### Patch Changes

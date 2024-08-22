@@ -1,5 +1,5 @@
+import type { Form } from '@toolkit/forms'
 import get from 'lodash.get'
-import { Form } from '@toolkit/forms'
 
 export function getFlattenedFormValues(form: Form) {
   const flatData: any = {}

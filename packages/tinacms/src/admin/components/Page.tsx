@@ -10,11 +10,7 @@ import {
   useCMS,
 } from '@tinacms/toolkit'
 
-export const PageWrapper = ({
-  children,
-}: {
-  children: React.ReactChild | React.ReactChildren
-}) => {
+export const PageWrapper = ({ children }: { children: React.ReactNode }) => {
   const cms = useCMS()
   const isLocalMode = cms.api?.tina?.isLocalMode
 
@@ -42,14 +38,14 @@ export const PageHeader = ({
   children,
 }: {
   isLocalMode?: boolean
-  children: React.ReactChild | React.ReactChildren
+  children: React.ReactNode
 }) => {
   return (
     <>
       {isLocalMode && <LocalWarning />}
       {!isLocalMode && <BillingWarning />}
 
-      <div className="pt-12 px-12">
+      <div className="pt-16 xl:pt-12 px-6 xl:px-12">
         <div className="w-full mx-auto max-w-screen-xl">
           <div className="w-full flex justify-between items-end">
             {children}
@@ -60,18 +56,12 @@ export const PageHeader = ({
   )
 }
 
-export const PageBody = ({
-  children,
-}: {
-  children: React.ReactChild | React.ReactChildren
-}) => <div className="py-8 px-12">{children}</div>
+export const PageBody = ({ children }: { children: React.ReactNode }) => (
+  <div className="py-8 px-6 xl:px-12">{children}</div>
+)
 
-export const PageBodyNarrow = ({
-  children,
-}: {
-  children: React.ReactChild | React.ReactChildren
-}) => (
-  <div className="py-10 px-12">
+export const PageBodyNarrow = ({ children }: { children: React.ReactNode }) => (
+  <div className="py-10 px-6 xl:px-12">
     <div className="w-full mx-auto max-w-screen-xl">{children}</div>
   </div>
 )

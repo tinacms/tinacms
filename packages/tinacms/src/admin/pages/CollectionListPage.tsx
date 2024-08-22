@@ -296,7 +296,6 @@ const CollectionListPage = () => {
                 reFetchCollection,
                 collectionExtra: Collection<true>
               ) => {
-                const totalCount = collection.documents.totalCount
                 const documents = collection.documents.edges
                 const admin: TinaAdminApi = cms.api.admin
                 const pageInfo = collection.documents.pageInfo
@@ -464,19 +463,18 @@ const CollectionListPage = () => {
                     )}
 
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
-                      <div className="w-full grid grid-flow-col items-end gap-4">
-                        <div className="flex flex-col gap-4">
-                          <h3 className="font-sans text-2xl text-gray-700">
-                            {collection.label
-                              ? collection.label
-                              : collection.name}
-                          </h3>
-
-                          <div className="flex gap-4 items-start flex-wrap">
+                      <div className="w-full">
+                        <h3 className="font-sans text-2xl text-gray-700">
+                          {collection.label
+                            ? collection.label
+                            : collection.name}
+                        </h3>
+                        <div className="flex flex-col lg:flex-row justify-between lg:items-end pt-2">
+                          <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-start">
                             {fields?.length > 0 && (
                               <>
                                 {!search && (
-                                  <div className="flex flex-col gap-2 items-start">
+                                  <div className="flex flex-col gap-2 items-start w-full md:w-auto">
                                     <label
                                       htmlFor="sort"
                                       className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
@@ -567,58 +565,58 @@ const CollectionListPage = () => {
                               )}
                             </div>
                           </div>
-                        </div>
-                        <div className="flex self-end	justify-self-end">
-                          {!collection.templates && allowCreate && (
-                            <>
-                              {allowCreateNestedFolder && (
+                          <div className="flex flex-col md:flex-row items-start md:items-end gap-2 md:gap-0 pt-4 lg:pt-0">
+                            {!collection.templates && allowCreate && (
+                              <>
+                                {allowCreateNestedFolder && (
+                                  <Link
+                                    onMouseDown={(evt) => {
+                                      setVars((old) => ({
+                                        ...old,
+                                        collection: collectionName,
+                                        folderName: '',
+                                      }))
+                                      setFolderModalOpen(true)
+                                      evt.stopPropagation()
+                                    }}
+                                    to="/collections/new-folder"
+                                    className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4"
+                                  >
+                                    <FaFolder className="mr-2" />
+                                    Add Folder{' '}
+                                  </Link>
+                                )}
                                 <Link
-                                  onMouseDown={(evt) => {
-                                    setVars((old) => ({
-                                      ...old,
-                                      collection: collectionName,
-                                      folderName: '',
-                                    }))
-                                    setFolderModalOpen(true)
-                                    evt.stopPropagation()
-                                  }}
-                                  to="/collections/new-folder"
-                                  className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 text-sm h-10 px-6 mr-4"
+                                  to={`/${
+                                    folder.fullyQualifiedName
+                                      ? [
+                                          'collections',
+                                          'new',
+                                          collectionName,
+                                          '~',
+                                          folder.name,
+                                        ].join('/')
+                                      : [
+                                          'collections',
+                                          'new',
+                                          collectionName,
+                                        ].join('/')
+                                  }`}
+                                  className="inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6"
                                 >
-                                  <FaFolder className="mr-2" />
-                                  Add Folder{' '}
+                                  <FaFile className="mr-2" />
+                                  Add Files{' '}
                                 </Link>
-                              )}
-                              <Link
-                                to={`/${
-                                  folder.fullyQualifiedName
-                                    ? [
-                                        'collections',
-                                        'new',
-                                        collectionName,
-                                        '~',
-                                        folder.name,
-                                      ].join('/')
-                                    : [
-                                        'collections',
-                                        'new',
-                                        collectionName,
-                                      ].join('/')
-                                }`}
-                                className="inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 text-sm h-10 px-6"
-                              >
-                                <FaFile className="mr-2" />
-                                Add Files{' '}
-                              </Link>
-                            </>
-                          )}
-                          {collection.templates && allowCreate && (
-                            <TemplateMenu
-                              collectionName={collectionName}
-                              templates={collection.templates}
-                              folder={folder}
-                            />
-                          )}
+                              </>
+                            )}
+                            {collection.templates && allowCreate && (
+                              <TemplateMenu
+                                collectionName={collectionName}
+                                templates={collection.templates}
+                                folder={folder}
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
                     </PageHeader>
@@ -633,267 +631,280 @@ const CollectionListPage = () => {
                             </em>
                           </p>
                         )}
-                        {((folder.name && !search) || documents.length > 0) && (
-                          <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
-                            <tbody className="divide-y divide-gray-150">
-                              {folder.name && !search ? (
-                                <tr>
-                                  <td colSpan={5}>
-                                    <Breadcrumb
-                                      folder={folder}
-                                      navigate={navigate}
-                                      collectionName={collectionName}
-                                    />
-                                  </td>
-                                </tr>
-                              ) : null}
-                              {documents.length > 0 &&
-                                documents.map((document) => {
-                                  if (document.node.__typename === 'Folder') {
+                        <div className="w-full overflow-x-auto">
+                          {((folder.name && !search) ||
+                            documents.length > 0) && (
+                            <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
+                              <tbody className="divide-y divide-gray-150">
+                                {folder.name && !search ? (
+                                  <tr>
+                                    <td colSpan={5}>
+                                      <Breadcrumb
+                                        folder={folder}
+                                        navigate={navigate}
+                                        collectionName={collectionName}
+                                      />
+                                    </td>
+                                  </tr>
+                                ) : null}
+                                {documents.length > 0 &&
+                                  documents.map((document) => {
+                                    if (document.node.__typename === 'Folder') {
+                                      return (
+                                        <tr
+                                          key={`folder-${document.node.path}`}
+                                        >
+                                          <td className="pl-5 pr-3 py-3">
+                                            <a
+                                              className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate"
+                                              onClick={() => {
+                                                navigate(
+                                                  `/${[
+                                                    'collections',
+                                                    collectionName,
+                                                    document.node.path,
+                                                  ].join('/')}`,
+                                                  { replace: true }
+                                                )
+                                              }}
+                                            >
+                                              <BiFolder className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
+                                              <span className="truncate block">
+                                                <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                                  Name
+                                                </span>
+                                                <span className="h-5 leading-5 block truncate">
+                                                  <span>
+                                                    {document.node.name}
+                                                  </span>
+                                                </span>
+                                              </span>
+                                            </a>
+                                          </td>
+                                          <td className="px-3 py-3" colSpan={4}>
+                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                              Path
+                                            </span>
+                                            <span className="leading-5 block text-sm font-medium text-gray-900 truncate">
+                                              {document.node.path
+                                                .substring(2)
+                                                .split('/')
+                                                .map((node) => {
+                                                  return (
+                                                    <span key={node}>
+                                                      <span className="text-gray-300 pr-0.5">
+                                                        /
+                                                      </span>
+                                                      <span className="pr-0.5">
+                                                        {node}
+                                                      </span>
+                                                    </span>
+                                                  )
+                                                })}
+                                            </span>
+                                          </td>
+                                        </tr>
+                                      )
+                                    }
+
+                                    const hasTitle = Boolean(
+                                      document.node._sys.title
+                                    )
+                                    const subfolders =
+                                      document.node._sys.breadcrumbs
+                                        .slice(0, -1)
+                                        .join('/')
+
                                     return (
-                                      <tr key={`folder-${document.node.path}`}>
-                                        <td className="pl-5 pr-3 py-3 truncate max-w-0">
+                                      <tr
+                                        key={`document-${document.node._sys.relativePath}`}
+                                      >
+                                        <td
+                                          className="pl-5 pr-3 py-3"
+                                          colSpan={hasTitle ? 1 : 2}
+                                        >
                                           <a
                                             className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate"
                                             onClick={() => {
-                                              navigate(
-                                                `/${[
-                                                  'collections',
-                                                  collectionName,
-                                                  document.node.path,
-                                                ].join('/')}`,
-                                                { replace: true }
+                                              handleNavigate(
+                                                navigate,
+                                                cms,
+                                                collection,
+                                                collectionDefinition,
+                                                document.node
                                               )
                                             }}
                                           >
-                                            <BiFolder className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
+                                            <BiFile className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
                                             <span className="truncate block">
                                               <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                                Name
+                                                {hasTitle
+                                                  ? 'Title'
+                                                  : 'Filename'}
                                               </span>
-                                              <span className="h-5 leading-5 block truncate">
+                                              <span className="h-5 leading-5 block truncate mb-1">
+                                                {!folderView &&
+                                                  !hasTitle &&
+                                                  subfolders && (
+                                                    <span className="text-xs text-gray-400">
+                                                      {`${subfolders}/`}
+                                                    </span>
+                                                  )}
                                                 <span>
-                                                  {document.node.name}
+                                                  {hasTitle
+                                                    ? document.node._sys?.title
+                                                    : document.node._sys
+                                                        .filename}
                                                 </span>
+                                              </span>
+                                              <span className="block text-xs text-gray-400">
+                                                {document.node._sys.path}
                                               </span>
                                             </span>
                                           </a>
                                         </td>
-                                        <td
-                                          className="px-3 py-3 truncate max-w-0"
-                                          colSpan={4}
-                                        >
+                                        {hasTitle && (
+                                          <td className="px-3 py-3">
+                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                              Filename
+                                            </span>
+                                            <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
+                                              {!folderView && subfolders && (
+                                                <span className="text-xs text-gray-400">
+                                                  {`${subfolders}/`}
+                                                </span>
+                                              )}
+                                              <span>
+                                                {document.node._sys.filename}
+                                              </span>
+                                            </span>
+                                          </td>
+                                        )}
+                                        <td className="px-3 py-3">
                                           <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                            Path
+                                            Extension
                                           </span>
-                                          <span className="leading-5 block text-sm font-medium text-gray-900 truncate">
-                                            {document.node.path
-                                              .substring(2)
-                                              .split('/')
-                                              .map((node) => {
-                                                return (
-                                                  <span key={node}>
-                                                    <span className="text-gray-300 pr-0.5">
-                                                      /
-                                                    </span>
-                                                    <span className="pr-0.5">
-                                                      {node}
-                                                    </span>
-                                                  </span>
-                                                )
-                                              })}
+                                          <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                            {document.node._sys.extension}
                                           </span>
+                                        </td>
+                                        <td className="px-3 py-3">
+                                          <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                            Template
+                                          </span>
+                                          <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                            {document.node._sys.template}
+                                          </span>
+                                        </td>
+                                        <td className="w-0">
+                                          <OverflowMenu
+                                            toolbarItems={[
+                                              {
+                                                name: 'edit',
+                                                label: 'Edit in Admin',
+                                                Icon: <BiEdit size="1.3rem" />,
+                                                onMouseDown: () => {
+                                                  const pathToDoc =
+                                                    document.node._sys
+                                                      .breadcrumbs
+                                                  if (
+                                                    folder.fullyQualifiedName
+                                                  ) {
+                                                    pathToDoc.unshift('~')
+                                                  }
+                                                  navigate(
+                                                    `/${[
+                                                      'collections',
+                                                      'edit',
+                                                      collectionName,
+                                                      ...pathToDoc,
+                                                    ].join('/')}`,
+                                                    { replace: true }
+                                                  )
+                                                },
+                                              },
+                                              allowCreate && {
+                                                name: 'duplicate',
+                                                label: 'Duplicate',
+                                                Icon: <BiCopy size="1.3rem" />,
+                                                onMouseDown: () => {
+                                                  const pathToDoc =
+                                                    document.node._sys
+                                                      .breadcrumbs
+                                                  if (
+                                                    folder.fullyQualifiedName
+                                                  ) {
+                                                    pathToDoc.unshift('~')
+                                                  }
+                                                  navigate(
+                                                    `/${[
+                                                      'collections',
+                                                      'duplicate',
+                                                      collectionName,
+                                                      ...pathToDoc,
+                                                    ].join('/')}`,
+                                                    { replace: true }
+                                                  )
+                                                },
+                                              },
+                                              allowDelete && {
+                                                name: 'delete',
+                                                label: 'Delete',
+                                                Icon: (
+                                                  <BiTrash
+                                                    size="1.3rem"
+                                                    className="text-red-500"
+                                                  />
+                                                ),
+                                                onMouseDown: () => {
+                                                  setVars((old) => ({
+                                                    ...old,
+                                                    collection: collectionName,
+                                                    relativePath:
+                                                      document.node._sys.breadcrumbs.join(
+                                                        '/'
+                                                      ) +
+                                                      document.node._sys
+                                                        .extension,
+                                                    newRelativePath: '',
+                                                  }))
+                                                  setDeleteModalOpen(true)
+                                                },
+                                              },
+                                              allowDelete && {
+                                                name: 'rename',
+                                                label: 'Rename',
+                                                Icon: (
+                                                  <BiRename
+                                                    size="1.3rem"
+                                                    className="text-red-500"
+                                                  />
+                                                ),
+                                                onMouseDown: () => {
+                                                  setVars((old) => ({
+                                                    ...old,
+                                                    collection: collectionName,
+                                                    relativePath:
+                                                      document.node._sys.breadcrumbs.join(
+                                                        '/'
+                                                      ) +
+                                                      document.node._sys
+                                                        .extension,
+                                                    newRelativePath: '',
+                                                  }))
+                                                  setRenameModalOpen(true)
+                                                },
+                                              },
+                                            ].filter(Boolean)}
+                                          />
                                         </td>
                                       </tr>
                                     )
-                                  }
-
-                                  const hasTitle = Boolean(
-                                    document.node._sys.title
-                                  )
-                                  const subfolders =
-                                    document.node._sys.breadcrumbs
-                                      .slice(0, -1)
-                                      .join('/')
-
-                                  return (
-                                    <tr
-                                      key={`document-${document.node._sys.relativePath}`}
-                                      className=""
-                                    >
-                                      <td
-                                        className="pl-5 pr-3 py-3 truncate max-w-0"
-                                        colSpan={hasTitle ? 1 : 2}
-                                      >
-                                        <a
-                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate"
-                                          onClick={() => {
-                                            handleNavigate(
-                                              navigate,
-                                              cms,
-                                              collection,
-                                              collectionDefinition,
-                                              document.node
-                                            )
-                                          }}
-                                        >
-                                          <BiFile className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
-                                          <span className="truncate block">
-                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                              {hasTitle ? 'Title' : 'Filename'}
-                                            </span>
-                                            <span className="h-5 leading-5 block truncate">
-                                              {!folderView &&
-                                                !hasTitle &&
-                                                subfolders && (
-                                                  <span className="text-xs text-gray-400">
-                                                    {`${subfolders}/`}
-                                                  </span>
-                                                )}
-                                              <span>
-                                                {hasTitle
-                                                  ? document.node._sys?.title
-                                                  : document.node._sys.filename}
-                                              </span>
-                                            </span>
-                                          </span>
-                                        </a>
-                                      </td>
-                                      {hasTitle && (
-                                        <td className="px-3 py-3 truncate max-w-0">
-                                          <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                            Filename
-                                          </span>
-                                          <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
-                                            {!folderView && subfolders && (
-                                              <span className="text-xs text-gray-400">
-                                                {`${subfolders}/`}
-                                              </span>
-                                            )}
-                                            <span>
-                                              {document.node._sys.filename}
-                                            </span>
-                                          </span>
-                                        </td>
-                                      )}
-                                      <td className="px-3 py-3 truncate w-[15%]">
-                                        <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                          Extension
-                                        </span>
-                                        <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
-                                          {document.node._sys.extension}
-                                        </span>
-                                      </td>
-                                      <td className="px-3 py-3 truncate w-[15%]">
-                                        <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                          Template
-                                        </span>
-                                        <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
-                                          {document.node._sys.template}
-                                        </span>
-                                      </td>
-                                      <td className="w-0">
-                                        <OverflowMenu
-                                          toolbarItems={[
-                                            {
-                                              name: 'edit',
-                                              label: 'Edit in Admin',
-                                              Icon: <BiEdit size="1.3rem" />,
-                                              onMouseDown: () => {
-                                                const pathToDoc =
-                                                  document.node._sys.breadcrumbs
-                                                if (folder.fullyQualifiedName) {
-                                                  pathToDoc.unshift('~')
-                                                }
-                                                navigate(
-                                                  `/${[
-                                                    'collections',
-                                                    'edit',
-                                                    collectionName,
-                                                    ...pathToDoc,
-                                                  ].join('/')}`,
-                                                  { replace: true }
-                                                )
-                                              },
-                                            },
-                                            allowCreate && {
-                                              name: 'duplicate',
-                                              label: 'Duplicate',
-                                              Icon: <BiCopy size="1.3rem" />,
-                                              onMouseDown: () => {
-                                                const pathToDoc =
-                                                  document.node._sys.breadcrumbs
-                                                if (folder.fullyQualifiedName) {
-                                                  pathToDoc.unshift('~')
-                                                }
-                                                navigate(
-                                                  `/${[
-                                                    'collections',
-                                                    'duplicate',
-                                                    collectionName,
-                                                    ...pathToDoc,
-                                                  ].join('/')}`,
-                                                  { replace: true }
-                                                )
-                                              },
-                                            },
-                                            allowDelete && {
-                                              name: 'delete',
-                                              label: 'Delete',
-                                              Icon: (
-                                                <BiTrash
-                                                  size="1.3rem"
-                                                  className="text-red-500"
-                                                />
-                                              ),
-                                              onMouseDown: () => {
-                                                setVars((old) => ({
-                                                  ...old,
-                                                  collection: collectionName,
-                                                  relativePath:
-                                                    document.node._sys.breadcrumbs.join(
-                                                      '/'
-                                                    ) +
-                                                    document.node._sys
-                                                      .extension,
-                                                  newRelativePath: '',
-                                                }))
-                                                setDeleteModalOpen(true)
-                                              },
-                                            },
-                                            allowDelete && {
-                                              name: 'rename',
-                                              label: 'Rename',
-                                              Icon: (
-                                                <BiRename
-                                                  size="1.3rem"
-                                                  className="text-red-500"
-                                                />
-                                              ),
-                                              onMouseDown: () => {
-                                                setVars((old) => ({
-                                                  ...old,
-                                                  collection: collectionName,
-                                                  relativePath:
-                                                    document.node._sys.breadcrumbs.join(
-                                                      '/'
-                                                    ) +
-                                                    document.node._sys
-                                                      .extension,
-                                                  newRelativePath: '',
-                                                }))
-                                                setRenameModalOpen(true)
-                                              },
-                                            },
-                                          ].filter(Boolean)}
-                                        />
-                                      </td>
-                                    </tr>
-                                  )
-                                })}
-                            </tbody>
-                          </table>
-                        )}
+                                  })}
+                              </tbody>
+                            </table>
+                          )}
+                        </div>
                         {documents.length === 0 && <NoDocumentsPlaceholder />}
                         <div className="pt-4">
                           <CursorPaginator
@@ -956,8 +967,8 @@ const SearchInput = ({
       >
         Search
       </label>
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex-1 min-w-[200px]">
+      <div className="flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3">
+        <div className="flex-1 min-w-[200px] w-full md:w-auto">
           <Input
             type="text"
             name="search"
@@ -968,13 +979,14 @@ const SearchInput = ({
             }}
           />
         </div>
-        <div className="flex gap-3">
+        <div className="flex w-full md:w-auto gap-3">
           <Button
             onClick={() => {
               setSearch(searchInput)
               setSearchLoaded(false)
             }}
             variant="primary"
+            className="w-full md:w-auto"
           >
             Search <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
           </Button>

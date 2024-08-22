@@ -1,5 +1,30 @@
 # Change Log
 
+## 1.2.0
+
+### Minor Changes
+
+- 324950a: Updates Plate Editor to latest version 36.
+
+  - Upgrades all remaining packages `Typescript` to version `^5`
+  - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
+  - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
+  - Updates and removes old version of plate (`plate-headless`) for latest version `^36`
+  - Starts removing and cleaning up some of the old Plate code.
+
+## 1.1.6
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+
+## 1.1.5
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+
 ## 1.1.4
 
 ### Patch Changes

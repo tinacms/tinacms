@@ -240,6 +240,19 @@ export type PasswordField = (
     type: 'password'
   }
 
+type toolbarItemName =
+  | 'heading'
+  | 'link'
+  | 'image'
+  | 'quote'
+  | 'ul'
+  | 'ol'
+  | 'code'
+  | 'codeBlock'
+  | 'bold'
+  | 'italic'
+  | 'raw'
+  | 'embed'
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
@@ -254,6 +267,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
      * will be stored as frontmatter
      */
     isBody?: boolean
+    toolbarOverride?: toolbarItemName[]
     templates?: RichTextTemplate<WithNamespace>[]
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser
@@ -357,28 +371,27 @@ type ObjectUiProps = {
   visualSelector?: boolean
 }
 
-export type ObjectField<WithNamespace extends boolean = false> =
-  | (
-      | FieldGeneric<string, undefined, ObjectUiProps>
-      | FieldGeneric<string, true, ObjectUiProps>
-      | FieldGeneric<string, false, ObjectUiProps>
-    ) &
-      MaybeNamespace<WithNamespace> &
-      BaseField &
-      (
-        | {
-            type: 'object'
-            fields: Field<WithNamespace>[]
-            templates?: undefined
-            ui?: Template['ui']
-          }
-        | {
-            type: 'object'
-            fields?: undefined
-            templates: Template<WithNamespace>[]
-            templateKey?: string
-          }
-      )
+export type ObjectField<WithNamespace extends boolean = false> = (
+  | FieldGeneric<string, undefined, ObjectUiProps>
+  | FieldGeneric<string, true, ObjectUiProps>
+  | FieldGeneric<string, false, ObjectUiProps>
+) &
+  MaybeNamespace<WithNamespace> &
+  BaseField &
+  (
+    | {
+        type: 'object'
+        fields: Field<WithNamespace>[]
+        templates?: undefined
+        ui?: Template['ui']
+      }
+    | {
+        type: 'object'
+        fields?: undefined
+        templates: Template<WithNamespace>[]
+        templateKey?: string
+      }
+  )
 
 type Field<WithNamespace extends boolean = false> = (
   | StringField
@@ -485,7 +498,10 @@ export interface AuthProvider {
   isAuthenticated: () => Promise<boolean>
   getLoginStrategy: () => LoginStrategy
   getLoginScreen: () => FC<LoginScreenProps> | null
-  getSessionProvider: () => FC<{ basePath?: string }>
+  getSessionProvider: () => FC<{
+    basePath?: string
+    children?: React.ReactNode
+  }>
 }
 
 interface AuthHooks {
@@ -631,6 +647,7 @@ export interface Config<
          */
         loadCustomStore: () => Promise<Store>
         tina?: never
+        accept?: string | string[]
       }
     | {
         /**
@@ -653,6 +670,7 @@ export interface Config<
           static?: boolean
         }
         loadCustomStore?: never
+        accept?: string | string[]
       }
   search?: (
     | {

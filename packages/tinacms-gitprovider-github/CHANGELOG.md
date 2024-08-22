@@ -1,5 +1,50 @@
 # tinacms-gitprovider-github
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies [324950a]
+  - @tinacms/datalayer@1.3.0
+
+## 1.0.11
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- Updated dependencies [d9b23fc]
+  - @tinacms/datalayer@1.2.40
+
+## 1.0.10
+
+### Patch Changes
+
+- @tinacms/datalayer@1.2.39
+
+## 1.0.9
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [e58b951]
+- Updated dependencies [9076d09]
+  - @tinacms/datalayer@1.2.38
+
+## 1.0.8
+
+### Patch Changes
+
+- @tinacms/datalayer@1.2.37
+
+## 1.0.7
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- Updated dependencies [0503072]
+  - @tinacms/datalayer@1.2.36
+
 ## 1.0.6
 
 ### Patch Changes

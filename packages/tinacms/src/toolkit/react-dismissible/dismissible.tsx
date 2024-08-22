@@ -34,6 +34,7 @@ export interface DismissibleProps {
    * dismissible area to propagate to their intended target.
    */
   allowClickPropagation?: boolean
+  children?: React.ReactNode
 }
 
 export const Dismissible: React.FC<DismissibleProps> = ({

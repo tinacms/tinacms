@@ -1,6 +1,5 @@
-import React, { Suspense, useEffect } from 'react'
+import React, { Suspense } from 'react'
 import TinaCMS, { TinaAdmin, useCMS, MdxFieldPluginExtendible } from 'tinacms'
-import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
 import { Preview } from './preview'
 import Playground from './Playground'
 
@@ -74,19 +73,7 @@ export const TinaAdminWrapper = () => {
   )
 }
 
-const GoToEdit = () => {
-  const { setEdit } = useEditState()
-  useEffect(() => {
-    setEdit(true)
-  }, [])
-  return <div>Going into edit mode</div>
-}
-
 function App() {
-  return (
-    <TinaEditProvider editMode={<TinaAdminWrapper />}>
-      <GoToEdit />
-    </TinaEditProvider>
-  )
+  return <TinaAdminWrapper />
 }
 export default App

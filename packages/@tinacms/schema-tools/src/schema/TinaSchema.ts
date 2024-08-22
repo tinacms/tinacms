@@ -1,15 +1,12 @@
-// micromatch/picomatch are not compatible in the browser
-// https://github.com/micromatch/picomatch/pull/73#issuecomment-992497433
-import picomatch from 'picomatch-browser'
+import picomatch from 'picomatch'
 
-import {
+import type {
   Schema,
   Collection,
   Template,
   Collectable,
   CollectionTemplateable,
   TinaField,
-  ObjectField,
 } from '../types/index'
 import { lastItem, assertShape } from '../util'
 import { normalizePath } from '../util/normalizePath'
@@ -82,10 +79,10 @@ export class TinaSchema {
     const templateInfo = this.getTemplatesForCollectable(collection)
     switch (templateInfo.type) {
       case 'object':
-        extraFields['fields'] = templateInfo.template.fields
+        extraFields.fields = templateInfo.template.fields
         break
       case 'union':
-        extraFields['templates'] = templateInfo.templates
+        extraFields.templates = templateInfo.templates
         break
     }
     return {
@@ -175,15 +172,22 @@ export class TinaSchema {
       return longestMatch
     }
   }
+
   public getCollectionAndTemplateByFullPath = (
     filepath: string,
     templateName?: string
-  ): {
-    collection: Collection<true>
-    template: Template<true>
-  } => {
-    let template
+  ):
+    | {
+        collection: Collection<true>
+        template: Template<true>
+      }
+    | undefined => {
     const collection = this.getCollectionByFullPath(filepath)
+
+    if (!collection) {
+      return undefined
+    }
+    let template: Template<true>
 
     const templates = this.getTemplatesForCollectable(collection)
     if (templates.type === 'union') {
@@ -213,6 +217,7 @@ export class TinaSchema {
 
     return { collection: collection, template: template }
   }
+
   public getTemplateForData = ({
     data,
     collection,
@@ -224,7 +229,7 @@ export class TinaSchema {
     switch (templateInfo.type) {
       case 'object':
         return templateInfo.template
-      case 'union':
+      case 'union': {
         assertShape<{ _template: string }>(data, (yup) =>
           yup.object({ _template: yup.string().required() })
         )
@@ -241,6 +246,7 @@ export class TinaSchema {
           )
         }
         return template
+      }
     }
   }
 
@@ -251,11 +257,12 @@ export class TinaSchema {
         if (typeof template === 'string') {
           throw new Error('Global templates not supported')
         }
-        return payload['_template'] === template.name
+        // TECH DEBT: This is a hack - Refactor this later.
+        return (payload as any)?._template === template.name
       })
       if (!template) {
         console.error(payload)
-        throw new Error(`Unable to find template for payload`)
+        throw new Error('Unable to find template for payload')
       }
       if (typeof template === 'string') {
         throw new Error('Global templates not supported')
@@ -265,22 +272,22 @@ export class TinaSchema {
           [template.name]: this.transformCollectablePayload(payload, template),
         },
       }
-    } else {
-      return {
-        [collectionName]: this.transformCollectablePayload(payload, collection),
-      }
+    }
+    return {
+      [collectionName]: this.transformCollectablePayload(payload, collection),
     }
   }
   private transformCollectablePayload = (
     payload: object,
     collection: Collectable
   ) => {
-    const accumulator = {}
+    const accumulator: { [key: string]: unknown } = {}
+    // biome-ignore lint/complexity/noForEach: <explanation>
     Object.entries(payload).forEach(([key, value]) => {
       if (typeof collection.fields === 'string') {
         throw new Error('Global templates not supported')
       }
-      const field = collection.fields.find((field) => {
+      const field = collection?.fields?.find((field) => {
         if (typeof field === 'string') {
           throw new Error('Global templates not supported')
         }
@@ -310,6 +317,10 @@ export class TinaSchema {
             })
             if (typeof template === 'string') {
               throw new Error('Global templates not supported')
+            }
+
+            if (!template) {
+              throw new Error(`Expected to find template named '${_template}'`)
             }
             return {
               [_template]: this.transformCollectablePayload(rest, template),
@@ -481,7 +492,8 @@ export class TinaSchema {
     files: string[]
   }) {
     const matches = this.getMatches({ collection })
-    const matchedFiles = picomatch(files, matches)
+    const matcher = picomatch(matches)
+    const matchedFiles = files.filter((file) => matcher(file))
     return matchedFiles
   }
 }

@@ -1,5 +1,72 @@
 # tina-graphql
 
+## 1.5.0
+
+### Minor Changes
+
+- 324950a: Updates Plate Editor to latest version 36.
+
+  - Upgrades all remaining packages `Typescript` to version `^5`
+  - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
+  - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
+  - Updates and removes old version of plate (`plate-headless`) for latest version `^36`
+  - Starts removing and cleaning up some of the old Plate code.
+
+### Patch Changes
+
+- Updated dependencies [324950a]
+  - @tinacms/schema-tools@1.6.0
+  - @tinacms/mdx@1.4.0
+
+## 1.4.40
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- 613e9c5: Filter .gitkeep.\* files during indexing
+
+## 1.4.39
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+  - @tinacms/schema-tools@1.5.0
+  - @tinacms/mdx@1.3.29
+
+## 1.4.38
+
+### Patch Changes
+
+- f567fc8: More React 18 upgrades and fixes
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+- Updated dependencies [f567fc8]
+- Updated dependencies [e58b951]
+- Updated dependencies [957fa26]
+- Updated dependencies [9076d09]
+  - @tinacms/mdx@1.3.28
+  - @tinacms/schema-tools@1.4.19
+
+## 1.4.37
+
+### Patch Changes
+
+- Updated dependencies [f26b40d]
+  - @tinacms/schema-tools@1.4.18
+  - @tinacms/mdx@1.3.27
+
+## 1.4.36
+
+### Patch Changes
+
+- 76c1a2e: Fix issue where empty folders were not visible #4566
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+- Updated dependencies [0503072]
+- Updated dependencies [dffa355]
+  - @tinacms/mdx@1.3.26
+  - @tinacms/schema-tools@1.4.17
+
 ## 1.4.35
 
 ### Patch Changes

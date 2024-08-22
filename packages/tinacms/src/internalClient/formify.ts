@@ -3,25 +3,23 @@
 */
 
 import {
-  parse,
-  isLeafType,
-  visit,
-  GraphQLNamedType,
-  GraphQLSchema,
-  Visitor,
-  ASTKindToNode,
-  GraphQLField,
-  DocumentNode,
-  ASTNode,
+  type ASTKindToNode,
+  type ASTNode,
+  type DocumentNode,
+  type FieldNode,
   getNamedType,
-  TypeInfo,
-  visitWithTypeInfo,
-  FieldNode,
-  InlineFragmentNode,
+  type GraphQLField,
+  type GraphQLNamedType,
   GraphQLObjectType,
+  type GraphQLSchema,
   GraphQLUnionType,
-  print,
+  type InlineFragmentNode,
+  isLeafType,
   isScalarType,
+  TypeInfo,
+  visit,
+  type Visitor,
+  visitWithTypeInfo,
 } from 'graphql'
 import set from 'lodash.set'
 

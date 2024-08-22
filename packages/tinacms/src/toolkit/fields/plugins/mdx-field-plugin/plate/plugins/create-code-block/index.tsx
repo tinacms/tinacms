@@ -1,4 +1,4 @@
-import { createPluginFactory } from '@udecode/plate-headless'
+import { createPluginFactory } from '@udecode/plate-common'
 
 export const createCodeBlockPlugin = createPluginFactory({
   key: 'code_block',

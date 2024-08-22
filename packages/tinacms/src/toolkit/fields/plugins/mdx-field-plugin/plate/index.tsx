@@ -1,18 +1,26 @@
 import React from 'react'
-import { Plate, createPlugins } from '@udecode/plate-headless'
-import { components } from './plugins/ui/components'
-import { Toolbar, FloatingToolbar, FloatingLink } from './plugins/ui/toolbar'
+import { Components } from './plugins/ui/components'
 import { formattingPlugins, commonPlugins } from './plugins/core'
 import { helpers } from './plugins/core/common'
 import {
   createMdxBlockPlugin,
   createMdxInlinePlugin,
 } from './plugins/create-mdx-plugins'
-import { createImgPlugin } from './plugins/create-img-plugin'
+import createImgPlugin from './plugins/create-img-plugin'
 import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin'
 import { createLinkPlugin } from './plugins/create-link-plugin'
 import { uuid } from './plugins/ui/helpers'
-import { RichTextType } from '..'
+import type { RichTextType } from '..'
+import { createPlugins, Plate } from '@udecode/plate-common'
+import { Editor } from './components/editor'
+import { FixedToolbar } from './components/plate-ui/fixed-toolbar'
+import { TooltipProvider } from './components/plate-ui/tooltip'
+import FixedToolbarButtons from './components/fixed-toolbar-buttons'
+import { FloatingToolbar } from './components/plate-ui/floating-toolbar'
+import FloatingToolbarButtons from './components/floating-toolbar-buttons'
+import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar'
+import { isUrl } from './transforms/is-url'
+import { ToolbarProvider } from './toolbar/toolbar-provider'
 
 export const RichEditor = (props: RichTextType) => {
   const initialValue = React.useMemo(
@@ -33,11 +41,16 @@ export const RichEditor = (props: RichTextType) => {
           createMdxInlinePlugin(),
           createImgPlugin(),
           createInvalidMarkdownPlugin(),
-          createLinkPlugin(),
-          // This is a bit buggy
+          createLinkPlugin({
+            options: {
+              //? NOTE: This is a custom validation function that allows for relative links i.e. /about
+              isUrl: (url: string) => isUrl(url),
+            },
+            renderAfterEditable: LinkFloatingToolbar,
+          }),
         ],
         {
-          components: components(),
+          components: Components(),
         }
       ),
     []
@@ -66,7 +79,7 @@ export const RichEditor = (props: RichTextType) => {
   }, [props.field.experimental_focusIntent, ref])
 
   return (
-    <div ref={ref} className={withToolbar ? 'with-toolbar' : ''}>
+    <div ref={ref}>
       <Plate
         id={id}
         initialValue={initialValue}
@@ -77,27 +90,23 @@ export const RichEditor = (props: RichTextType) => {
             children: value,
           })
         }}
-        // Some nodes aren't ready when this runs
-        // Fixed in a later release https://github.com/udecode/plate/pull/1689/files
-        // normalizeInitialValue={true}
-        firstChildren={
-          <>
-            {withToolbar ? (
-              <Toolbar
-                tinaForm={props.tinaForm}
-                templates={props.field.templates}
-                inlineOnly={false}
-              />
-            ) : (
-              <FloatingToolbar
-                tinaForm={props.tinaForm}
-                templates={props.field.templates}
-              />
-            )}
-            <FloatingLink />
-          </>
-        }
-      ></Plate>
+      >
+        <TooltipProvider>
+          <ToolbarProvider
+            tinaForm={props.tinaForm}
+            templates={props.field.templates}
+            overrides={props.field?.toolbarOverride}
+          >
+            <FixedToolbar>
+              <FixedToolbarButtons />
+            </FixedToolbar>
+            <FloatingToolbar>
+              <FloatingToolbarButtons />
+            </FloatingToolbar>
+          </ToolbarProvider>
+          <Editor />
+        </TooltipProvider>
+      </Plate>
     </div>
   )
 }

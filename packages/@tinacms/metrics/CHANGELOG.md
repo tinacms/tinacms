@@ -1,5 +1,25 @@
 # @tinacms/metrics
 
+## 1.0.5
+
+### Patch Changes
+
+- e58b951: update vulnerable packages so npm audit does not complain
+- 9076d09: update next js version from 12 to 14 in tinacms packages
+
+## 1.0.4
+
+### Patch Changes
+
+- 2940594: Add pnpm option to create-tina-app
+
+## 1.0.3
+
+### Patch Changes
+
+- 0503072: update ts, remove rimraf, fix types
+- dffa355: Remove yarn for pnpm
+
 ## 1.0.2
 
 ### Patch Changes

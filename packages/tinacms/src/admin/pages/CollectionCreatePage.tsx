@@ -17,12 +17,10 @@ import type { Template } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
-import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
-import { useWindowWidth } from '@react-hook/window-size'
 import { FaLock, FaUnlock } from 'react-icons/fa'
 import { useCollectionFolder } from './utils'
 import { ErrorDialog } from '../components/ErrorDialog'
@@ -255,7 +253,7 @@ export const RenderForm = ({
               <code>sub-folder/My_Document</code>
             </span>
           ),
-          placeholder: `My_Document`,
+          placeholder: 'My_Document',
           validate: (value, allValues, meta) => {
             if (!value) {
               if (meta.dirty) {
@@ -276,11 +274,11 @@ export const RenderForm = ({
               const filePath = `${normalizePath(
                 schemaCollection.path
               )}/${value}.${schemaCollection.format || 'md'}`
-              const match = schema.matchFiles({
+              const match = schema?.matchFiles({
                 files: [filePath],
                 collection: schemaCollection,
               })
-              if (match.length === 0) {
+              if (match?.length === 0) {
                 return `The filename "${value}" is not allowed for this collection.`
               }
             }
@@ -330,11 +328,6 @@ export const RenderForm = ({
     })
   }, [cms, collection, mutationInfo])
 
-  const navBreakpoint = 1000
-  const windowWidth = useWindowWidth()
-  const renderNavToggle = windowWidth < navBreakpoint + 1
-  const headerPadding = renderNavToggle ? 'px-20' : 'px-6'
-
   React.useEffect(() => {
     cms.dispatch({ type: 'forms:add', value: form })
     cms.dispatch({ type: 'forms:set-active-form-id', value: form.id })
@@ -356,9 +349,9 @@ export const RenderForm = ({
         {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
 
         <div
-          className={`pt-3 pb-4 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center ${headerPadding}`}
+          className={`pt-10 xl:pt-3 pb-10 xl:pb-4 px-20 xl:px-12 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
         >
-          <div className="w-full max-w-form flex gap-1.5 justify-between items-center">
+          <div className="w-full flex gap-1.5 justify-between items-center">
             <Link
               to={`/collections/${collection.name}${
                 folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
