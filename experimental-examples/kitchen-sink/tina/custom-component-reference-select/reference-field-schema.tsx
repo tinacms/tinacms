@@ -8,7 +8,7 @@ const referenceField = {
   name: 'author',
   type: 'reference',
   ui: {
-    selectComponents: (props: CollectionProps, filepath: string) => {
+    optionComponents: (props: CollectionProps, filepath: string) => {
       switch (props._collection) {
         case COLLECTIONS.AUTHOR:
           return (

@@ -8,7 +8,7 @@ type Option = {
   label: string
 }
 
-type SelectComponent = (
+type SptionComponent = (
   props: unknown,
   filepath: string
 ) => React.ReactElement | string
@@ -19,7 +19,7 @@ export interface ReferenceFieldProps {
   component: string
   collections: string[]
   options: (Option | string)[]
-  selectComponents: SelectComponent
+  optionComponent: SptionComponent
 }
 
 export interface ReferenceProps {

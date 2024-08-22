@@ -197,8 +197,8 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                           >
                             <div className="flex flex-col">
                               <div>
-                                {field?.selectComponents && _values ? (
-                                  field.selectComponents(_values, id)
+                                {field?.optionComponent && _values ? (
+                                  field.optionComponent(_values, id)
                                 ) : (
                                   <span className="text-x">{id}</span>
                                 )}
