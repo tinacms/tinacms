@@ -18,4 +18,10 @@ export enum COLLECTIONS {
   POST = 'post',
 }
 
+// InternalSys is from tinacms where it gives a lot of useful information for user to customize their custom component
+export interface InternalSys {
+  filename: string
+  path: string
+}
+
 export type CollectionProps = AuthorProps | PostProps

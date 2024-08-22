@@ -217,14 +217,20 @@ export type ReferenceField = (
   | FieldGeneric<
       string,
       undefined,
-      { optionComponent: (props: any) => Element | undefined }
+      {
+        optionComponent?: (props: {
+          values: Record<string, unknown>
+          _sys: Document['_sys']
+        }) => Element | undefined
+      }
     >
   | FieldGeneric<
       string,
       false,
       {
-        optionComponent: (props: {
-          values: Record<string, unknown> & { _collection: string }
+        optionComponent?: (props: {
+          values: Record<string, unknown>
+          _sys: Document['_sys']
         }) => Element | undefined
       }
     >

@@ -13,7 +13,7 @@ import {
   CommandList,
 } from './components/command'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
-import type { ReferenceFieldProps } from './index'
+import type { InternalSys, ReferenceFieldProps } from './index'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
@@ -27,9 +27,7 @@ type Edge = {
 
 interface Node {
   id: string
-  _internalSys: {
-    filename: string
-  }
+  _internalSys: InternalSys
   //Using uknown type as _values can be any type from the collection user degined in schema
   _values: unknown
 }
@@ -71,6 +69,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
                         _values
                         _internalSys: _sys {
                           filename
+                          path
                         }
                       }
                     }
@@ -198,7 +197,10 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                             <div className="flex flex-col">
                               <div>
                                 {field?.optionComponent && _values ? (
-                                  field.optionComponent(_values, id)
+                                  field.optionComponent(
+                                    _values,
+                                    node._internalSys
+                                  )
                                 ) : (
                                   <span className="text-x">{id}</span>
                                 )}

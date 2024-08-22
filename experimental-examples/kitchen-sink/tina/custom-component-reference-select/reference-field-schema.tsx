@@ -1,14 +1,14 @@
 import React from 'react'
 import AuthorCollectionCustomReference from '../../component/custom-reference-select-author'
 import PostCollectionCustomReference from '../../component/custom-reference-select-post'
-import { CollectionProps, COLLECTIONS } from './model'
+import { CollectionProps, COLLECTIONS, InternalSys } from './model'
 
 const referenceField = {
   label: 'Author',
   name: 'author',
   type: 'reference',
   ui: {
-    optionComponents: (props: CollectionProps, filepath: string) => {
+    optionComponent: (props: CollectionProps, _internalSys: InternalSys) => {
       switch (props._collection) {
         case COLLECTIONS.AUTHOR:
           return (
@@ -22,7 +22,7 @@ const referenceField = {
           return <PostCollectionCustomReference title={props.title} />
 
         default:
-          return filepath
+          return _internalSys.path
       }
     },
   },

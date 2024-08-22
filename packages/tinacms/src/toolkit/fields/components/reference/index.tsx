@@ -8,18 +8,22 @@ type Option = {
   label: string
 }
 
-type SptionComponent = (
+type OptionComponent = (
   props: unknown,
-  filepath: string
+  _sys: InternalSys
 ) => React.ReactElement | string
 
+export interface InternalSys {
+  filename: string
+  path: string
+}
 export interface ReferenceFieldProps {
   label?: string
   name: string
   component: string
   collections: string[]
   options: (Option | string)[]
-  optionComponent: SptionComponent
+  optionComponent: OptionComponent
 }
 
 export interface ReferenceProps {
