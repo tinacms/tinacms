@@ -135,7 +135,8 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
 }) => {
   const [open, setOpen] = React.useState<boolean>(false)
   const [value, setValue] = React.useState<string | null>(input.value)
-  const [displayText, setDisplayText] = React.useState<string | null>(null) //store display text for selected option
+  //Store display text for selected option
+  const [displayText, setDisplayText] = React.useState<string | null>(null)
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
 
   React.useEffect(() => {
