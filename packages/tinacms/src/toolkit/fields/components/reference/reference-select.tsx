@@ -189,8 +189,10 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                           <CommandItem
                             key={`${id}-option`}
                             value={id}
-                            onSelect={() => {
-                              setValue(id)
+                            onSelect={(currentValue) => {
+                              setValue(
+                                currentValue === value ? '' : currentValue
+                              )
                               setOpen(false)
                             }}
                           >
