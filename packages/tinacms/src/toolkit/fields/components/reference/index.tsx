@@ -8,13 +8,18 @@ type Option = {
   label: string
 }
 
+type SelectComponent = (
+  props: unknown,
+  filepath: string
+) => React.ReactElement | string
+
 export interface ReferenceFieldProps {
   label?: string
   name: string
   component: string
   collections: string[]
   options: (Option | string)[]
-  ui?: any
+  selectComponents: SelectComponent
 }
 
 export interface ReferenceProps {
