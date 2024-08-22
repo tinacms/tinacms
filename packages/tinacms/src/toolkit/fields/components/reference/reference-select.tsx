@@ -9,9 +9,9 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from './components/command'
+import OptionComponent from './components/option-component'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
 import { InternalSys, ReferenceFieldProps } from './model/reference-field-props'
 interface ReferenceSelectProps {
@@ -183,31 +183,18 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                     <CommandList>
                       {edges.map(({ node }) => {
                         const { id, _values } = node
-
                         return (
-                          <CommandItem
-                            key={`${id}-option`}
-                            value={id}
+                          <OptionComponent
+                            id={id}
+                            value={value}
+                            field={field}
+                            _values={_values}
+                            node={node}
                             onSelect={(currentValue) => {
-                              setValue(
-                                currentValue === value ? '' : currentValue
-                              )
+                              setValue(currentValue)
                               setOpen(false)
                             }}
-                          >
-                            <div className="flex flex-col">
-                              <div>
-                                {field?.optionComponent && _values ? (
-                                  field.optionComponent(
-                                    _values,
-                                    node._internalSys
-                                  )
-                                ) : (
-                                  <span className="text-x">{id}</span>
-                                )}
-                              </div>
-                            </div>
-                          </CommandItem>
+                          />
                         )
                       })}
                     </CommandList>
