@@ -13,8 +13,7 @@ import {
   CommandList,
 } from './components/command'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
-import type { InternalSys, ReferenceFieldProps } from './index'
-
+import { InternalSys, ReferenceFieldProps } from './model/reference-field-props'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
