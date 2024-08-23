@@ -338,7 +338,6 @@ export default databaseClient;
   }
 
   async genClient() {
-    console.log('DEBUG ', this.noClientBuildCache)
     const token = this.configManager.config?.token
     const errorPolicy = this.configManager.config?.client?.errorPolicy
     const apiURL = this.getApiURL()
