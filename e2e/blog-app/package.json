@@ -1,0 +1,16 @@
+{
+  "name": "fixture-blog-app",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test": "tinacms dev -c \"vitest\""
+  },
+  "devDependencies": {
+    "@tinacms/cli": "workspace:*"
+  },
+  "dependencies": {
+    "tinacms": "workspace:*",
+    "typescript": "^5.5.3",
+    "vitest": "2.0.5"
+  }
+}
