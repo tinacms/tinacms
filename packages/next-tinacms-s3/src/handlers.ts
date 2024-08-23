@@ -3,21 +3,21 @@
 */
 
 import {
-  DeleteObjectCommand,
-  DeleteObjectCommandInput,
+  _Object,
+  S3Client,
+  S3ClientConfig,
   ListObjectsCommand,
   ListObjectsCommandInput,
   PutObjectCommand,
   PutObjectCommandInput,
-  S3Client,
-  S3ClientConfig,
-  _Object,
+  DeleteObjectCommand,
+  DeleteObjectCommandInput,
 } from '@aws-sdk/client-s3'
-import fs from 'fs'
-import multer from 'multer'
-import { NextApiRequest, NextApiResponse } from 'next'
-import path from 'path'
 import { Media, MediaListOptions } from 'tinacms'
+import path from 'path'
+import fs from 'fs'
+import { NextApiRequest, NextApiResponse } from 'next'
+import multer from 'multer'
 import { promisify } from 'util'
 
 export interface S3Config {
