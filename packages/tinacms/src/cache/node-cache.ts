@@ -1,4 +1,3 @@
-import fs from 'fs'
 import shajs from 'sha.js'
 import type { Cache } from './index'
 
@@ -7,7 +6,7 @@ const makeKey = (key: any) => {
   return shajs('sha256').update(input).digest('hex')
 }
 
-export const NodeCache = (dir: string): Cache => {
+export const NodeCache = (dir: string, fs: any): Cache => {
   return {
     makeKey,
     get: async (key: string) => {

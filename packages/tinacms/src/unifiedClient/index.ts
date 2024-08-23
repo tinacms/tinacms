@@ -55,7 +55,10 @@ export class TinaClient<GenQueries> {
       process.versions.node
     ) {
       const { NodeCache } = require('tinacms/dist/cache')
-      this.cache = NodeCache(`${cacheDir || `${process.cwd()}/.tina-cache`}`)
+      this.cache = NodeCache(
+        `${cacheDir || `${process.cwd()}/.tina-cache`}`,
+        require('fs')
+      )
     }
   }
 
