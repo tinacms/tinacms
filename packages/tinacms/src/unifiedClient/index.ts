@@ -1,7 +1,7 @@
 import fetchPonyfill from 'fetch-ponyfill'
 import type { GraphQLError } from 'graphql'
 import type { Config } from '@tinacms/schema-tools'
-import type { Cache } from './cache'
+import type { Cache } from '../cache/index'
 
 const { fetch: fetchPonyfillFN, Headers: HeadersPonyfill } = fetchPonyfill()
 
@@ -54,7 +54,7 @@ export class TinaClient<GenQueries> {
       process.versions &&
       process.versions.node
     ) {
-      const { NodeCache } = require('./node-cache')
+      const { NodeCache } = require('tinacms/dist/cache')
       this.cache = NodeCache(`${cacheDir || `${process.cwd()}/.tina-cache`}`)
     }
   }

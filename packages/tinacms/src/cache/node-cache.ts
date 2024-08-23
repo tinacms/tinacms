@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { createHash } from 'crypto'
-import type { Cache } from './cache'
+import type { Cache } from './index'
 
 const makeKey = (key: any) => {
   const input = key && key instanceof Object ? JSON.stringify(key) : key || ''
