@@ -49,7 +49,8 @@
 			"src/rich-text/index.tsx",
 			"src/rich-text/prism.tsx",
 			"src/react.tsx",
-			"src/client.ts"
+			"src/client.ts",
+			"src/cache.ts"
 		]
 	},
 	"typings": "dist/index.d.ts",
