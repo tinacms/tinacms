@@ -89,6 +89,7 @@ export class DevCommand extends BaseCommand {
           graphqlSchemaDoc: graphQLSchema,
           tinaSchema,
           lookup,
+          noClientBuildCache: true,
         })
         const apiURL = await codegen.execute()
 
