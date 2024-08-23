@@ -123,6 +123,7 @@
 		"react-icons": "^5.2.1",
 		"react-onclickoutside": "^6.13.1",
 		"react-router-dom": "6.3.0",
+		"sha.js": "~2.4.11",
 		"slate": "^0.103.0",
 		"slate-history": "^0.100.0",
 		"slate-hyperscript": "^0.100.0",

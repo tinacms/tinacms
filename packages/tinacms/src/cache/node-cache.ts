@@ -1,10 +1,10 @@
 import fs from 'fs'
-import { createHash } from 'crypto'
+import shajs from 'sha.js'
 import type { Cache } from './index'
 
 const makeKey = (key: any) => {
   const input = key && key instanceof Object ? JSON.stringify(key) : key || ''
-  return createHash('sha256').update(input).digest('base64')
+  return shajs('sha256').update(input).digest('hex')
 }
 
 export const NodeCache = (dir: string): Cache => {
