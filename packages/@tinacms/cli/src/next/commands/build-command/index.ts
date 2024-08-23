@@ -65,6 +65,9 @@ export class BuildCommand extends BaseCommand {
   previewName = Option.String('--preview-name', {
     description: 'The name of the preview branch',
   })
+  noClientBuildCache = Option.Boolean('--no-client-build-cache', false, {
+    description: 'Disables the client build cache',
+  })
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -132,6 +135,7 @@ export class BuildCommand extends BaseCommand {
       graphqlSchemaDoc: graphQLSchema,
       tinaSchema,
       lookup,
+      noClientBuildCache: this.noClientBuildCache,
     })
     const apiURL = await codegen.execute()
 
