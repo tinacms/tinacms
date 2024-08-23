@@ -338,6 +338,7 @@ export default databaseClient;
   }
 
   async genClient() {
+    console.log('DEBUG ', this.noClientBuildCache)
     const token = this.configManager.config?.token
     const errorPolicy = this.configManager.config?.client?.errorPolicy
     const apiURL = this.getApiURL()
@@ -345,7 +346,7 @@ export default databaseClient;
     const clientString = `import { createClient } from "tinacms/dist/client";
 import { queries } from "./types";
 export const client = createClient({ ${
-      !this.noClientBuildCache
+      this.noClientBuildCache == false
         ? `cacheDir: '${this.configManager.generatedCachePath}', `
         : ''
     }url: '${apiURL}', token: '${token}', queries, ${
