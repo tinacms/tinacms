@@ -2,6 +2,7 @@ import { LoadingDots } from '@toolkit/form-builder'
 import { Field } from '@toolkit/forms'
 import type { TinaCMS } from '@toolkit/tina-cms'
 import * as React from 'react'
+import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io'
 import { Button } from './components/button'
 import {
   Command,
@@ -12,12 +13,7 @@ import {
   CommandList,
 } from './components/command'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
-import type { ReferenceFieldProps } from './index'
-import {
-  IoIosArrowDropdown,
-  IoMdArrowDropdown,
-  IoMdArrowDropup,
-} from 'react-icons/io'
+import type { InternalSys, ReferenceFieldProps } from './index'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
@@ -31,13 +27,9 @@ type Edge = {
 
 interface Node {
   id: string
-  _internalSys: {
-    filename: string
-  }
-  _values: {
-    title: string | null
-    name: string | null
-  }
+  _internalSys: InternalSys
+  //Using uknown type as _values can be any type from the collection user degined in schema
+  _values: unknown
 }
 interface OptionSet {
   collection: string
@@ -77,6 +69,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
                         _values
                         _internalSys: _sys {
                           filename
+                          path
                         }
                       }
                     }
@@ -168,7 +161,14 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
         <PopoverContent className="p-0 relative">
           <Command
             filter={(value, search) => {
-              if (value.includes(search)) return 1
+              //Replace / in the file path with empty string to make it searchable
+              if (
+                value
+                  .toLowerCase()
+                  .replace(/\//g, '')
+                  .includes(search.toLowerCase())
+              )
+                return 1
               return 0
             }}
           >
@@ -182,33 +182,35 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                     heading={collection}
                   >
                     <CommandList>
-                      {edges.map(
-                        ({
-                          node: {
-                            id,
-                            _internalSys: { filename },
-                            _values: { title, name },
-                          },
-                        }) => (
+                      {edges.map(({ node }) => {
+                        const { id, _values } = node
+
+                        return (
                           <CommandItem
                             key={`${id}-option`}
-                            value={id || title}
-                            onSelect={() => {
-                              setValue(id)
+                            value={id}
+                            onSelect={(currentValue) => {
+                              setValue(
+                                currentValue === value ? '' : currentValue
+                              )
                               setOpen(false)
                             }}
                           >
                             <div className="flex flex-col">
-                              <span className="font-semibold text-sm">
-                                {title || name || id}
-                              </span>
-                              {(title || name) && (
-                                <span className="text-x">{filename}</span>
-                              )}
+                              <div>
+                                {field?.optionComponent && _values ? (
+                                  field.optionComponent(
+                                    _values,
+                                    node._internalSys
+                                  )
+                                ) : (
+                                  <span className="text-x">{id}</span>
+                                )}
+                              </div>
                             </div>
                           </CommandItem>
                         )
-                      )}
+                      })}
                     </CommandList>
                   </CommandGroup>
                 ))}
