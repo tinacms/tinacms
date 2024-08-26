@@ -3,4 +3,4 @@
 '@tinacms/cli': patch
 ---
 
-Client caching
+CLI - Adds client caching and cli flag to disable: --no-client-build-cache
