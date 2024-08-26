@@ -111,7 +111,7 @@ async function uploadMedia(
   const filePath = req.file.path
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const fileType = req.file.mimetype
+  const fileType = req.file?.mimetype
   const blob = fs.readFileSync(filePath)
   const filename = path.basename(filePath)
   const params: PutObjectCommandInput = {
