@@ -34,6 +34,8 @@ import { CodeLeaf } from '../../components/plate-ui/code-leaf'
 import { CodeLineElement } from '../../components/plate-ui/code-line-element'
 import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf'
 import { CodeBlockElement } from '../../components/plate-ui/code-block-element'
+import { ELEMENT_MERMAID } from '../custom/mermaid-plugin'
+import { MermaidElement } from '../../components/plate-ui/mermaid-element'
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -143,6 +145,7 @@ export const Components = () => {
     [ELEMENT_CODE_BLOCK]: CodeBlockElement,
     [ELEMENT_CODE_LINE]: CodeLineElement,
     [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,
+    [ELEMENT_MERMAID]: MermaidElement,
     html: ({ attributes, editor, element, children, className }) => {
       return (
         <div

@@ -314,6 +314,7 @@ export const Icons = {
   clear: X,
   close: X,
   // code: Code2,
+  paint: PaintBucket,
   codeblock: FileCode,
   color: Baseline,
   column: RectangleVertical,

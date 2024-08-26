@@ -14,6 +14,7 @@ import { HeadingsMenu } from './headings-dropdown'
 import { LinkToolbarButton } from './plate-ui/link-toolbar-button'
 import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button'
 import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button'
+import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button'
 import { ImageToolbarButton } from './plate-ui/image-toolbar-button'
 import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button'
 import TemplatesToolbarButton from './plate-ui/templates-toolbar-button'
@@ -25,6 +26,7 @@ import {
 import { useResize } from '../hooks/use-resize'
 import OverflowMenu from './plate-ui/overflow-menu'
 import { useToolbarContext } from '../toolbar/toolbar-provider'
+import { MermaidElement } from './plate-ui/mermaid-element'
 
 export type ToolbarItem = {
   label: string
@@ -87,6 +89,10 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   codeBlock: {
     label: 'Code Block',
     Component: <CodeBlockToolbarButton />,
+  },
+  mermaid: {
+    label: 'Mermaid',
+    Component: <MermaidToolbarButton />,
   },
   raw: {
     label: 'Raw Markdown',
