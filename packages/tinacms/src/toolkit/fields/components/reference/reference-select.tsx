@@ -9,12 +9,11 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from './components/command'
+import OptionComponent from './components/option-component'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
-import type { InternalSys, ReferenceFieldProps } from './index'
-
+import { InternalSys, ReferenceFieldProps } from './model/reference-field-props'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
@@ -121,6 +120,14 @@ const getFilename = (optionSets: OptionSet[], value: string): string | null => {
   return node ? node._internalSys.filename : null
 }
 
+// function to filter the options based on the search value
+const filterBySearch = (value: string, search: string): number => {
+  // Replace / in the file path with an empty string to make it searchable
+  return value.toLowerCase().replace(/\//g, '').includes(search.toLowerCase())
+    ? 1
+    : 0
+}
+
 const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   cms,
   input,
@@ -128,7 +135,8 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
 }) => {
   const [open, setOpen] = React.useState<boolean>(false)
   const [value, setValue] = React.useState<string | null>(input.value)
-  const [displayText, setDisplayText] = React.useState<string | null>(null) //store display text for selected option
+  //Store display text for selected option
+  const [displayText, setDisplayText] = React.useState<string | null>(null)
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
 
   React.useEffect(() => {
@@ -159,19 +167,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-0 relative">
-          <Command
-            filter={(value, search) => {
-              //Replace / in the file path with empty string to make it searchable
-              if (
-                value
-                  .toLowerCase()
-                  .replace(/\//g, '')
-                  .includes(search.toLowerCase())
-              )
-                return 1
-              return 0
-            }}
-          >
+          <Command filter={filterBySearch}>
             <CommandInput placeholder="Search reference..." />
             <CommandEmpty>No reference found</CommandEmpty>
             <CommandList>
@@ -184,31 +180,18 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                     <CommandList>
                       {edges.map(({ node }) => {
                         const { id, _values } = node
-
                         return (
-                          <CommandItem
-                            key={`${id}-option`}
-                            value={id}
+                          <OptionComponent
+                            id={id}
+                            value={value}
+                            field={field}
+                            _values={_values}
+                            node={node}
                             onSelect={(currentValue) => {
-                              setValue(
-                                currentValue === value ? '' : currentValue
-                              )
+                              setValue(currentValue)
                               setOpen(false)
                             }}
-                          >
-                            <div className="flex flex-col">
-                              <div>
-                                {field?.optionComponent && _values ? (
-                                  field.optionComponent(
-                                    _values,
-                                    node._internalSys
-                                  )
-                                ) : (
-                                  <span className="text-x">{id}</span>
-                                )}
-                              </div>
-                            </div>
-                          </CommandItem>
+                          />
                         )
                       })}
                     </CommandList>
