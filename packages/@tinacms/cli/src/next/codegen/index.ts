@@ -345,7 +345,7 @@ export default databaseClient;
     const clientString = `import { createClient } from "tinacms/dist/client";
 import { queries } from "./types";
 export const client = createClient({ ${
-      this.noClientBuildCache == false
+      this.noClientBuildCache === false
         ? `cacheDir: '${this.configManager.generatedCachePath}', `
         : ''
     }url: '${apiURL}', token: '${token}', queries, ${
