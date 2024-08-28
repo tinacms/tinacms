@@ -49,12 +49,7 @@ export class TinaClient<GenQueries> {
     this.errorPolicy = errorPolicy || 'throw'
 
     // if we're in node, use the fs cache
-    if (
-      cacheDir &&
-      typeof process !== 'undefined' &&
-      process.versions &&
-      process.versions.node
-    ) {
+    if (cacheDir && typeof require !== 'undefined') {
       const { NodeCache } = require('tinacms/dist/cache')
       this.cache = NodeCache(cacheDir, require('fs'))
     }
