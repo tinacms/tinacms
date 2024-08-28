@@ -1,12 +1,6 @@
-// import shajs from 'sha.js'
 import type { Cache } from './index'
-
-// const makeKey = (key: any) => {
-//   const input = key && key instanceof Object ? JSON.stringify(key) : key || ''
-//   return shajs('sha256').update(input).digest('hex')
-// }
-
 const { createHash } = require('crypto')
+
 const makeKey = (key: any) => {
   const input = key && key instanceof Object ? JSON.stringify(key) : key || ''
   return createHash('sha256').update(input).digest('hex')
