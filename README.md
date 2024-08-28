@@ -37,7 +37,7 @@ Visit [Tina's documentation](https://tina.io/docs/) to learn more.
 
 Visit the [GitHub Discussions](https://github.com/tinacms/tinacms/discussions) or our [Community Discord](https://discord.com/invite/zumN63Ybpf) to ask questions, or look us up on on Twitter at [@tinacms](https://twitter.com/tinacms).
 
-## 🧑‍🎓 Tina Creadly Badge 
+## 🧑‍🎓 Earn a Tina Badge
 
 If you want to go the extra mile and earn a Tina Dev Licence, follow this doc: [Earn a Tina Credly badge](./_docs/Dev-Licence.md)
 <!-- ## Changelog
