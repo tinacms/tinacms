@@ -9,7 +9,7 @@ Here are the steps to complete your journey:
     > After I have evaluated TinaCMS, I plan to use it in the {{ INDUSTRY }} industry.  
     > Previous CMSs I have used include {{ FILL IN }}.
 
-2. Create an Tina instance using the default template on [tina.io](https://tina.io) and [TinaCloud](https://app.tina.io/signin).
+2. Create a Tina instance using the default template on [tina.io](https://tina.io) and [TinaCloud](https://app.tina.io/signin).
 
 3. Record a [Done Video](https://www.ssw.com.au/rules/record-a-quick-and-dirty-done-video/) explaining how Tina works.
 

@@ -39,7 +39,7 @@ Visit the [GitHub Discussions](https://github.com/tinacms/tinacms/discussions) o
 
 ## 🧑‍🎓 Earn a Tina Badge
 
-If you want to go the extra mile and earn a Tina Dev Licence, follow this doc: [Earn a Tina Credly badge](./_docs/Dev-Licence.md)
+Go the extra mile and earn a Tina Dev Licence 🦙: [Earn a Tina Credly badge](./_docs/Dev-Licence.md)
 <!-- ## Changelog
 
 Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.  -->
