@@ -41,6 +41,14 @@ export const buildProductionSpa = async (
     database,
     apiURL,
     noWatch: true,
+    rollupOptions: {
+      onwarn(warning, warn) {
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+          return
+        }
+        warn(warning)
+      },
+    },
   })
   return build(config)
 }
