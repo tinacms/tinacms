@@ -3,4 +3,4 @@
 'tinacms': patch
 ---
 
-Implementation for custom reference field selector
+Minor code refactor in reference field selector

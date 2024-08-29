@@ -1,5 +1,16 @@
 # tinacms
 
+## 2.2.1
+
+### Patch Changes
+
+- ae03e8e: Implementation for custom reference field selector
+- 4c9f221: Fix alt tags in TinaMarkdown
+- Updated dependencies [ae03e8e]
+  - @tinacms/schema-tools@1.6.1
+  - @tinacms/mdx@1.4.1
+  - @tinacms/search@1.0.27
+
 ## 2.2.0
 
 ### Minor Changes
