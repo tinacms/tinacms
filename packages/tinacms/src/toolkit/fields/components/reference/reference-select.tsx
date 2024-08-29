@@ -148,8 +148,6 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
     return <LoadingDots color="var(--tina-color-primary)" />
   }
 
-  console.log('Field Props', field)
-
   return (
     <>
       <Popover open={open} onOpenChange={setOpen}>
