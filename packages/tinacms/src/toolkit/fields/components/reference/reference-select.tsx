@@ -170,22 +170,18 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
         </PopoverTrigger>
         <PopoverContent className="p-0 relative">
           <Command
-            shouldFilter={false}
-            // filter={(value, search) => {
-            // 	if (field.experimental___filter && optionSets.length > 0) {
-
-            // 	}
-
-            // 	//Replace / in the file path with empty string to make it searchable
-            // 	if (
-            // 		value
-            // 			.toLowerCase()
-            // 			.replace(/\//g, "")
-            // 			.includes(search.toLowerCase())
-            // 	)
-            // 		return 1;
-            // 	return 0;
-            // }}
+            shouldFilter={!field.experimental___filter}
+            filter={(value, search) => {
+              //Replace / in the file path with empty string to make it searchable
+              if (
+                value
+                  .toLowerCase()
+                  .replace(/\//g, '')
+                  .includes(search.toLowerCase())
+              )
+                return 1
+              return 0
+            }}
           >
             <CommandInput
               placeholder="Search reference..."

@@ -10,7 +10,6 @@ const referenceField: ReferenceField = {
   type: 'reference',
   ui: {
     experimental___filter(list, searchQuery) {
-      console.log('experimental___filter', list, searchQuery)
       if (!searchQuery) {
         return [list[0]]
       }
@@ -23,12 +22,9 @@ const referenceField: ReferenceField = {
             .toLowerCase()
             .includes(searchQuery?.toLowerCase())
         ) {
-          console.log('item.node._values.name', item.node._values.name)
-
           return item
         }
       })
-      console.log(' @ filteredList', filteredListZeroEdges)
 
       return [
         {
