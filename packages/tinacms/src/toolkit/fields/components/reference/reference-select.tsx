@@ -1,5 +1,5 @@
 import { LoadingDots } from '@toolkit/form-builder'
-import { Field } from '@toolkit/forms'
+import type { Field } from '@toolkit/forms'
 import type { TinaCMS } from '@toolkit/tina-cms'
 import * as React from 'react'
 import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io'
@@ -130,15 +130,25 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   const [value, setValue] = React.useState<string | null>(input.value)
   const [displayText, setDisplayText] = React.useState<string | null>(null) //store display text for selected option
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
+  const [filteredOptionsList, setFilteredOptionsList] =
+    React.useState<OptionSet[]>(optionSets)
 
   React.useEffect(() => {
     setDisplayText(getFilename(optionSets, value))
     input.onChange(value)
   }, [value, input, optionSets])
 
+  React.useEffect(() => {
+    if (field.experimental___filter && optionSets.length > 0) {
+      setFilteredOptionsList(field.experimental___filter(optionSets, undefined))
+    }
+  }, [optionSets, field.experimental___filter])
+
   if (loading === true) {
     return <LoadingDots color="var(--tina-color-primary)" />
   }
+
+  console.log('Field Props', field)
 
   return (
     <>
@@ -160,29 +170,43 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
         </PopoverTrigger>
         <PopoverContent className="p-0 relative">
           <Command
-            filter={(value, search) => {
-              //Replace / in the file path with empty string to make it searchable
-              if (
-                value
-                  .toLowerCase()
-                  .replace(/\//g, '')
-                  .includes(search.toLowerCase())
-              )
-                return 1
-              return 0
-            }}
+            shouldFilter={false}
+            // filter={(value, search) => {
+            // 	if (field.experimental___filter && optionSets.length > 0) {
+
+            // 	}
+
+            // 	//Replace / in the file path with empty string to make it searchable
+            // 	if (
+            // 		value
+            // 			.toLowerCase()
+            // 			.replace(/\//g, "")
+            // 			.includes(search.toLowerCase())
+            // 	)
+            // 		return 1;
+            // 	return 0;
+            // }}
           >
-            <CommandInput placeholder="Search reference..." />
+            <CommandInput
+              placeholder="Search reference..."
+              onValueChange={(search) => {
+                if (field.experimental___filter) {
+                  setFilteredOptionsList(
+                    field.experimental___filter(optionSets, search)
+                  )
+                }
+              }}
+            />
             <CommandEmpty>No reference found</CommandEmpty>
             <CommandList>
-              {optionSets.length > 0 &&
-                optionSets.map(({ collection, edges }: OptionSet) => (
+              {filteredOptionsList.length > 0 &&
+                filteredOptionsList?.map(({ collection, edges }: OptionSet) => (
                   <CommandGroup
                     key={`${collection}-group`}
                     heading={collection}
                   >
                     <CommandList>
-                      {edges.map(({ node }) => {
+                      {edges?.map(({ node }) => {
                         const { id, _values } = node
 
                         return (
