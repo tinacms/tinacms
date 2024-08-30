@@ -52,5 +52,9 @@
 		"micromatch": "4.0.8",
 		"ws": "8.17.1"
 	  },
+	"packageComments":{
+		"micromatch": "Overriding the version of micromatch to 4.0.8 to fix a vulnerability issue, Remove the override once the parent packages @changesets/cli and @typescript-eslint/parser are updated to a version that use latest micromatch.",
+		"ws": "Overriding the version of ws to 8.17.1 to fix a vulnerability issue. Remove the override once the parent package tailwind is updated to a version that use latest ws."
+	},
 	"packageManager": "pnpm@9.4.0"
 }
