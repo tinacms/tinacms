@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.6.1
+
+### Patch Changes
+
+- ae03e8e: Implementation for custom reference field selector
+
 ## 1.6.0
 
 ### Minor Changes

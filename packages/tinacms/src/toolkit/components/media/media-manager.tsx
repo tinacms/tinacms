@@ -223,6 +223,7 @@ export function MediaPicker({
       setLoadFolders(true)
       resetOffset()
       resetList()
+      setActiveItem(false)
     } else {
       setActiveItem(item)
     }
@@ -421,6 +422,7 @@ export function MediaPicker({
                   setLoadFolders(true)
                   resetOffset()
                   resetList()
+                  setActiveItem(false)
                 }}
               />
             </div>
@@ -434,6 +436,7 @@ export function MediaPicker({
                     setRefreshing(true)
                     resetOffset()
                     resetList()
+                    setActiveItem(false)
                   }}
                   className="whitespace-nowrap"
                 >

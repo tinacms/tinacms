@@ -2,23 +2,18 @@ import { LoadingDots } from '@toolkit/form-builder'
 import { Field } from '@toolkit/forms'
 import type { TinaCMS } from '@toolkit/tina-cms'
 import * as React from 'react'
+import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io'
 import { Button } from './components/button'
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from './components/command'
+import OptionComponent from './components/option-component'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
-import type { ReferenceFieldProps } from './index'
-import {
-  IoIosArrowDropdown,
-  IoMdArrowDropdown,
-  IoMdArrowDropup,
-} from 'react-icons/io'
-
+import { InternalSys, ReferenceFieldProps } from './model/reference-field-props'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
@@ -31,13 +26,9 @@ type Edge = {
 
 interface Node {
   id: string
-  _internalSys: {
-    filename: string
-  }
-  _values: {
-    title: string | null
-    name: string | null
-  }
+  _internalSys: InternalSys
+  //Using uknown type as _values can be any type from the collection user degined in schema
+  _values: unknown
 }
 interface OptionSet {
   collection: string
@@ -77,6 +68,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
                         _values
                         _internalSys: _sys {
                           filename
+                          path
                         }
                       }
                     }
@@ -128,6 +120,14 @@ const getFilename = (optionSets: OptionSet[], value: string): string | null => {
   return node ? node._internalSys.filename : null
 }
 
+// function to filter the options based on the search value
+const filterBySearch = (value: string, search: string): number => {
+  // Replace / in the file path with an empty string to make it searchable
+  return value.toLowerCase().replace(/\//g, '').includes(search.toLowerCase())
+    ? 1
+    : 0
+}
+
 const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   cms,
   input,
@@ -135,7 +135,8 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
 }) => {
   const [open, setOpen] = React.useState<boolean>(false)
   const [value, setValue] = React.useState<string | null>(input.value)
-  const [displayText, setDisplayText] = React.useState<string | null>(null) //store display text for selected option
+  //Store display text for selected option
+  const [displayText, setDisplayText] = React.useState<string | null>(null)
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
 
   React.useEffect(() => {
@@ -166,12 +167,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-0 relative">
-          <Command
-            filter={(value, search) => {
-              if (value.includes(search)) return 1
-              return 0
-            }}
-          >
+          <Command filter={filterBySearch}>
             <CommandInput placeholder="Search reference..." />
             <CommandEmpty>No reference found</CommandEmpty>
             <CommandList>
@@ -182,33 +178,22 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                     heading={collection}
                   >
                     <CommandList>
-                      {edges.map(
-                        ({
-                          node: {
-                            id,
-                            _internalSys: { filename },
-                            _values: { title, name },
-                          },
-                        }) => (
-                          <CommandItem
-                            key={`${id}-option`}
-                            value={id || title}
-                            onSelect={() => {
-                              setValue(id)
+                      {edges.map(({ node }) => {
+                        const { id, _values } = node
+                        return (
+                          <OptionComponent
+                            id={id}
+                            value={value}
+                            field={field}
+                            _values={_values}
+                            node={node}
+                            onSelect={(currentValue) => {
+                              setValue(currentValue)
                               setOpen(false)
                             }}
-                          >
-                            <div className="flex flex-col">
-                              <span className="font-semibold text-sm">
-                                {title || name || id}
-                              </span>
-                              {(title || name) && (
-                                <span className="text-x">{filename}</span>
-                              )}
-                            </div>
-                          </CommandItem>
+                          />
                         )
-                      )}
+                      })}
                     </CommandList>
                   </CommandGroup>
                 ))}

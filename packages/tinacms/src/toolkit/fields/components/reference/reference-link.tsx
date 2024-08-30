@@ -1,24 +1,11 @@
 import * as React from 'react'
 import type { TinaCMS } from '@toolkit/tina-cms'
 import { BiEdit } from 'react-icons/bi'
-
-interface ReferenceLinkProps {
-  cms: TinaCMS
-  input: any
-}
-
-type Document = {
-  _sys: {
-    collection: {
-      name: string
-    }
-    breadcrumbs: string[]
-  }
-}
-
-interface Response {
-  node: Document
-}
+import {
+  ReferenceLinkProps,
+  Document,
+  Response,
+} from './model/reference-link-props'
 
 const useGetNode = (cms: TinaCMS, id: string) => {
   const [document, setDocument] = React.useState<Document | undefined>(
