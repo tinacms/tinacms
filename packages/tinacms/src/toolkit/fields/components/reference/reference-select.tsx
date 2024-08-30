@@ -13,7 +13,10 @@ import {
 } from './components/command'
 import OptionComponent from './components/option-component'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
-import { InternalSys, ReferenceFieldProps } from './model/reference-field-props'
+import type {
+  InternalSys,
+  ReferenceFieldProps,
+} from './model/reference-field-props'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
@@ -213,6 +216,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
                         return (
                           <OptionComponent
                             id={id}
+                            key={id}
                             value={value}
                             field={field}
                             _values={_values}

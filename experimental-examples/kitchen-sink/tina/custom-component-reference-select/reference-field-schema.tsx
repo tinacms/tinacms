@@ -2,9 +2,8 @@ import React from 'react'
 import AuthorCollectionCustomReference from '../../component/custom-reference-select-author'
 import PostCollectionCustomReference from '../../component/custom-reference-select-post'
 import { type CollectionProps, COLLECTIONS, type InternalSys } from './model'
-import type { ReferenceField } from '../../../../packages/@tinacms/schema-tools/src'
 
-const referenceField: ReferenceField = {
+const referenceField = {
   label: 'Author',
   name: 'author',
   type: 'reference',
