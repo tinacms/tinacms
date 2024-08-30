@@ -2,4 +2,4 @@
 'tinacms': patch
 ---
 
-fix vulnerability packages
+Updates`puppeteer` & `@changesets/cli` 
