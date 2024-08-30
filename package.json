@@ -30,7 +30,7 @@
 		"postinstall": "husky install"
 	},
 	"devDependencies": {
-		"@changesets/cli": "2.27.0",
+		"@changesets/cli": "2.27.7",
 		"@types/jest": "^29.5.12",
 		"@types/picomatch": "^3.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.60.0",
@@ -48,10 +48,7 @@
 		"typescript": "^5.5.4",
 		"vite": "^4.3.9"
 	},
-	"resolutions": {
-		"micromatch": "4.0.8",
-		"ws": "8.17.1"
-	  },
+
 	"packageComments":{
 		"micromatch": "Overriding the version of micromatch to 4.0.8 to fix a vulnerability issue, Remove the override once the parent packages @changesets/cli and @typescript-eslint/parser are updated to a version that use latest micromatch.",
 		"ws": "Overriding the version of ws to 8.17.1 to fix a vulnerability issue. Remove the override once the parent package tailwind is updated to a version that use latest ws."
