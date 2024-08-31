@@ -94,6 +94,10 @@ export class Codegen {
       '_graphql.json',
       JSON.stringify(this.graphqlSchemaDoc)
     )
+
+    const { search, ...rest } = this.tinaSchema.schema.config
+    this.tinaSchema.schema.config = rest
+
     // update _schema.json
     await this.writeConfigFile(
       '_schema.json',
