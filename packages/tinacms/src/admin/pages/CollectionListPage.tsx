@@ -981,7 +981,8 @@ const SearchInput = ({
         </div>
         <div className="flex w-full md:w-auto gap-3">
           <Button
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
               setSearch(searchInput)
               setSearchLoaded(false)
             }}
@@ -993,6 +994,7 @@ const SearchInput = ({
           {search && searchLoaded && (
             <Button
               onClick={() => {
+                e.preventDefault()
                 setSearch('')
                 setSearchInput('')
               }}
