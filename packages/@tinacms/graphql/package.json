@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/graphql",
-	"version": "1.4.40",
+	"version": "1.5.1",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
@@ -96,7 +96,7 @@
 		"jest-file-snapshot": "^0.5.0",
 		"jest-matcher-utils": "^29.7.0",
 		"memory-level": "^1.0.0",
-		"nodemon": "2.0.19",
+		"nodemon": "3.1.4",
 		"typescript": "^5.5.4"
 	}
 }

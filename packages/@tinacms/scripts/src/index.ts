@@ -355,6 +355,12 @@ export const buildIt = async (entryPoint, packageJSON) => {
       emptyOutDir: false, // we build multiple files in to the dir
       sourcemap: false, // true | 'inline' (note: inline will go straight into your bundle size)
       rollupOptions: {
+        onwarn(warning, warn) {
+          if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+            return
+          }
+          warn(warning)
+        },
         // /**
         //  * FIXME: rollup-plugin-node-polyfills is only needed for node targets
         //  */

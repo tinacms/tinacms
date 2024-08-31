@@ -1,5 +1,41 @@
 # tinacms-cli
 
+## 1.6.1
+
+### Patch Changes
+
+- Updated dependencies [ae03e8e]
+- Updated dependencies [4c9f221]
+  - @tinacms/schema-tools@1.6.1
+  - tinacms@2.2.1
+  - @tinacms/graphql@1.5.1
+  - @tinacms/search@1.0.27
+  - @tinacms/app@2.1.1
+
+## 1.6.0
+
+### Minor Changes
+
+- 324950a: Updates Plate Editor to latest version 36.
+
+  - Upgrades all remaining packages `Typescript` to version `^5`
+  - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
+  - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
+  - Updates and removes old version of plate (`plate-headless`) for latest version `^36`
+  - Starts removing and cleaning up some of the old Plate code.
+
+### Patch Changes
+
+- Updated dependencies [324950a]
+- Updated dependencies [f378f11]
+- Updated dependencies [ceb0c07]
+  - @tinacms/schema-tools@1.6.0
+  - @tinacms/graphql@1.5.0
+  - @tinacms/app@2.1.0
+  - tinacms@2.2.0
+  - @tinacms/search@1.0.26
+  - @tinacms/metrics@1.0.5
+
 ## 1.5.53
 
 ### Patch Changes

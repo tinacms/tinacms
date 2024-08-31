@@ -1,5 +1,28 @@
 # @tinacms/self-hosted-starter
 
+## 0.1.58
+
+### Patch Changes
+
+- Updated dependencies [ae03e8e]
+- Updated dependencies [4c9f221]
+  - tinacms@2.2.1
+  - tinacms-authjs@5.0.1
+  - @tinacms/datalayer@1.3.1
+  - tinacms-gitprovider-github@2.0.1
+
+## 0.1.57
+
+### Patch Changes
+
+- Updated dependencies [324950a]
+- Updated dependencies [f378f11]
+- Updated dependencies [ceb0c07]
+  - @tinacms/datalayer@1.3.0
+  - tinacms@2.2.0
+  - tinacms-authjs@5.0.0
+  - tinacms-gitprovider-github@2.0.0
+
 ## 0.1.56
 
 ### Patch Changes
