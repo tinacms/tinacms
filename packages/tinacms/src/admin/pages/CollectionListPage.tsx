@@ -993,7 +993,7 @@ const SearchInput = ({
           </Button>
           {search && searchLoaded && (
             <Button
-              onClick={() => {
+              onClick={(e) => {
                 e.preventDefault()
                 setSearch('')
                 setSearchInput('')
