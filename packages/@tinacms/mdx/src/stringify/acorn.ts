@@ -256,10 +256,7 @@ export function stringifyProps(
           attributes.push({
             type: 'mdxJsxAttribute',
             name,
-            value: {
-              type: 'mdxJsxAttributeValueExpression',
-              value: `embeds.${code}`,
-            },
+            value: `embeds.${code}`,
           })
         }
         break

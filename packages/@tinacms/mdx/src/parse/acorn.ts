@@ -84,15 +84,13 @@ const extractAttribute = (
       return extractObject(extractExpression(attribute), field, imageCallback)
     case 'rich-text':
       if (attribute.type === 'mdxJsxAttribute') {
-        if (typeof attribute.value !== 'string') {
-          if (attribute?.value?.type === 'mdxJsxAttributeValueExpression') {
-            if (attribute.value.value.startsWith('embeds')) {
-              const value = get(context, attribute.value.value)
-              if (typeof value === 'string') {
-                const ast = parseMDX(value, field, imageCallback, context)
-                ast.embedCode = attribute.value.value.split('.')[1]
-                return ast
-              }
+        if (typeof attribute.value === 'string') {
+          if (attribute.value.startsWith('embeds')) {
+            const value = get(context, attribute.value)
+            if (typeof value === 'string') {
+              const ast = parseMDX(value, field, imageCallback, context)
+              ast.embedCode = attribute.value.split('.')[1]
+              return ast
             }
           }
         }
