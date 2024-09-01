@@ -1,15 +1,15 @@
 ---
-embeds:
+_tinaEmbeds:
   vxwpno: |
     foo bar baz left
   somjyf: |
     foo bar baz right
 
-    <Highlight content={embeds.adzxof} />
+    <Highlight content={_tinaEmbeds.adzxof} />
   kuvkxz: |
     foo bar baz left
   llovpr: |
     foo bar baz right
 
-    <Highlight content={embeds.amdiuy} />
+    <Highlight content={_tinaEmbeds.amdiuy} />
 ---

@@ -135,7 +135,7 @@ export class Resolver {
     isAudit?: boolean
   ) {
     this.context = { ...rawData }
-    delete rawData['embeds']
+    delete rawData['_tinaEmbeds']
     const collection = tinaSchema.getCollection(rawData._collection)
     try {
       const template = tinaSchema.getTemplateForData({
@@ -619,8 +619,14 @@ export class Resolver {
       values = { ...oldDoc, ...params }
     }
 
-    const embeds = this.context?.embeds ? { embeds: this.context.embeds } : {}
-    await this.database.put(realPath, { ...values, ...embeds }, collection.name)
+    const _tinaEmbeds = this.context?._tinaEmbeds
+      ? { _tinaEmbeds: this.context._tinaEmbeds }
+      : {}
+    await this.database.put(
+      realPath,
+      { ...values, ..._tinaEmbeds },
+      collection.name
+    )
     return this.getDocument(realPath)
   }
 

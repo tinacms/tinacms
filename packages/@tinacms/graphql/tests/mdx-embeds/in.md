@@ -1,5 +1,5 @@
 ---
-embeds:
+_tinaEmbeds:
   defghi: |
     Quote from [Somebody](https://example.com)
 
@@ -10,12 +10,12 @@ embeds:
     # Hello, world!
 ---
 
-<Quote description={embeds.defghi}>
+<Quote description="_tinaEmbeds.defghi">
   # Hello, world!
 </Quote>
 
 ---
 
-<Quote description={embeds.def}>
+<Quote description="_tinaEmbeds.def">
   # Hello, again
 </Quote>

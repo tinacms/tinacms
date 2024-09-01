@@ -1,5 +1,5 @@
 ---
-embeds:
+_tinaEmbeds:
   defghi: |
     Quote from [Somebody](https://example.com)
 

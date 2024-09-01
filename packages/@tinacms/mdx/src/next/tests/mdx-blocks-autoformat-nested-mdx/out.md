@@ -1,3 +1,3 @@
-<Test leftColumn={embeds.vxwpno} rightColumn={embeds.somjyf} />
+<Test leftColumn={_tinaEmbeds.vxwpno} rightColumn={_tinaEmbeds.somjyf} />
 
-<Test leftColumn={embeds.kuvkxz} rightColumn={embeds.llovpr} />
+<Test leftColumn={_tinaEmbeds.kuvkxz} rightColumn={_tinaEmbeds.llovpr} />

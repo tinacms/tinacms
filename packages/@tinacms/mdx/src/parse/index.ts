@@ -101,7 +101,7 @@ export const parseMDX = (
   value: string,
   field: RichTextType,
   imageCallback: (s: string) => string,
-  context?: { embeds?: Record<string, string> | null | undefined }
+  context?: { _tinaEmbeds?: Record<string, string> | null | undefined }
 ): Plate.RootElement => {
   if (!value) {
     return { type: 'root', children: [] }

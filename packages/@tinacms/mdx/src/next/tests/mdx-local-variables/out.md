@@ -1,9 +1,9 @@
-<Quote description="embeds.defghi">
+<Quote description="_tinaEmbeds.defghi">
   # Hello, world!
 </Quote>
 
 ***
 
-<Quote description="embeds.def">
+<Quote description="_tinaEmbeds.def">
   # Hello, again
 </Quote>

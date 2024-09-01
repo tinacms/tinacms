@@ -67,7 +67,7 @@ export const frontmatterContext = (contextMarkdown: string) => {
 
   const frontmatterValue = yaml.load(frontmatter2.value)
   return z
-    .object({ embeds: z.record(z.string()).nullish() })
+    .object({ _tinaEmbeds: z.record(z.string()).nullish() })
     .parse(frontmatterValue)
 }
 

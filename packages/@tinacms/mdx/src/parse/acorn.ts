@@ -85,7 +85,7 @@ const extractAttribute = (
     case 'rich-text':
       if (attribute.type === 'mdxJsxAttribute') {
         if (typeof attribute.value === 'string') {
-          if (attribute.value.startsWith('embeds')) {
+          if (attribute.value.startsWith('_tinaEmbeds')) {
             const value = get(context, attribute.value)
             if (typeof value === 'string') {
               const ast = parseMDX(value, field, imageCallback, context)

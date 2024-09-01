@@ -250,13 +250,13 @@ export function stringifyProps(
             return
           } else {
             const stringValue = stringifyMDX(value, field, imageCallback)
-            context.embeds = context.embeds || {}
-            context.embeds[code] = stringValue
+            context._tinaEmbeds = context._tinaEmbeds || {}
+            context._tinaEmbeds[code] = stringValue
           }
           attributes.push({
             type: 'mdxJsxAttribute',
             name,
-            value: `embeds.${code}`,
+            value: `_tinaEmbeds.${code}`,
           })
         }
         break

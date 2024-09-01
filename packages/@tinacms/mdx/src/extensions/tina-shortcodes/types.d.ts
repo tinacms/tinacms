@@ -156,7 +156,7 @@ declare module 'mdast-util-to-markdown' {
 
 // Add nodes to content.
 declare module 'mdast' {
-  // We populate the `embeds` field with the embeds found in any rich-text nodes.
+  // We populate the `_tinaEmbeds` field with the _tinaEmbeds found in any rich-text nodes.
   // More info here: https://github.com/tinacms/tinacms/pull/4700
   interface Root extends MdastRoot {
     embedCode?: string
