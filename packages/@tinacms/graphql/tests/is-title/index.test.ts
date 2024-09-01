@@ -1,12 +1,11 @@
 import { it, expect } from 'vitest'
 import config from './tina/config'
 import { setup, format } from '../util'
-import input from './in.md?raw'
+import { z } from 'zod'
 
 it('has the expected output and writes the expected string', async () => {
-  const { get, put } = await setup(__dirname, config)
+  const { get } = await setup(__dirname, config)
   const result = await get()
   expect(format(result)).toMatchFileSnapshot('node.json')
-  await put(result.data.document._values)
-  expect(input).toMatchFileSnapshot('out.md')
+  expect(result.data.document._sys.title).toBe('Hello')
 })

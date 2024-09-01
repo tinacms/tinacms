@@ -938,6 +938,9 @@ importers:
       vitest:
         specifier: ^0.32.2
         version: 0.32.4(happy-dom@10.11.2)
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
 
   packages/@tinacms/mdx:
     dependencies:
@@ -29297,7 +29300,6 @@ packages:
       {
         integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==,
       }
-    dev: false
 
   /zustand@3.7.2(react@18.3.1):
     resolution:

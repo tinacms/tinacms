@@ -1,119 +1,130 @@
 {
-  "body": {
-    "type": "root",
-    "children": [
-      {
-        "type": "mdxJsxFlowElement",
-        "name": "Quote",
-        "children": [
-          {
-            "type": "text",
-            "text": ""
-          }
-        ],
-        "props": {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "p",
-                "children": [
-                  {
-                    "type": "text",
-                    "text": "Quote from "
-                  },
-                  {
-                    "type": "a",
-                    "url": "https://example.com",
-                    "title": null,
-                    "children": [
-                      {
-                        "type": "text",
-                        "text": "Somebody"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "code_block",
-                "value": "some other block",
-                "children": [
-                  {
-                    "type": "text",
-                    "text": ""
-                  }
-                ]
-              }
-            ],
-            "embedCode": "defghi"
-          },
-          "children": {
-            "type": "root",
-            "children": [
-              {
-                "type": "h1",
-                "children": [
-                  {
-                    "type": "text",
-                    "text": "Hello, world!"
-                  }
-                ]
-              }
-            ]
-          }
-        }
+  "data": {
+    "document": {
+      "_sys": {
+        "title": ""
       },
-      {
-        "type": "hr",
-        "children": [
-          {
-            "type": "text",
-            "text": ""
-          }
-        ]
-      },
-      {
-        "type": "mdxJsxFlowElement",
-        "name": "Quote",
-        "children": [
-          {
-            "type": "text",
-            "text": ""
-          }
-        ],
-        "props": {
-          "description": {
-            "type": "root",
-            "children": [
-              {
-                "type": "h1",
-                "children": [
-                  {
-                    "type": "text",
-                    "text": "Hello, world!"
-                  }
-                ]
+      "_values": {
+        "_collection": "post",
+        "_template": "post",
+        "body": {
+          "type": "root",
+          "children": [
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "Quote",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "props": {
+                "description": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Quote from "
+                        },
+                        {
+                          "type": "a",
+                          "url": "https://example.com",
+                          "title": null,
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Somebody"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "code_block",
+                      "value": "some other block",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": ""
+                        }
+                      ]
+                    }
+                  ],
+                  "embedCode": "defghi"
+                },
+                "children": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "h1",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Hello, world!"
+                        }
+                      ]
+                    }
+                  ]
+                }
               }
-            ],
-            "embedCode": "def"
-          },
-          "children": {
-            "type": "root",
-            "children": [
-              {
-                "type": "h1",
-                "children": [
-                  {
-                    "type": "text",
-                    "text": "Hello, again"
-                  }
-                ]
+            },
+            {
+              "type": "hr",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "Quote",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "props": {
+                "description": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "h1",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Hello, world!"
+                        }
+                      ]
+                    }
+                  ],
+                  "embedCode": "def"
+                },
+                "children": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "h1",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Hello, again"
+                        }
+                      ]
+                    }
+                  ]
+                }
               }
-            ]
-          }
+            }
+          ]
         }
       }
-    ]
+    }
   }
 }

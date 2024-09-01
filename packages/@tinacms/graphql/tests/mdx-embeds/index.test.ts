@@ -3,11 +3,10 @@ import config from './tina/config'
 import { setup, format } from '../util'
 import input from './in.md?raw'
 
-it('get-basic', async () => {
+it('has the expected output and writes the expected string', async () => {
   const { get, put } = await setup(__dirname, config)
-  const data = await get()
-  expect(format(data)).toMatchFileSnapshot('node.json')
-  const data2 = await put(data)
-  expect(data2).toEqual(data)
+  const result = await get()
+  expect(format(result)).toMatchFileSnapshot('node.json')
+  await put(result.data.document._values)
   expect(input).toMatchFileSnapshot('out.md')
 })
