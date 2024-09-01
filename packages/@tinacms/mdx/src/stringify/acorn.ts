@@ -22,9 +22,9 @@ export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
   field: RichTextField,
   imageCallback: (url: string) => string,
-  context: Record<string, any>
+  context?: Record<string, any>
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] } => {
-  return stringifyProps(element, field, true, imageCallback, context)
+  return stringifyProps(element, field, true, imageCallback, context || {})
 }
 export function stringifyProps(
   element: Plate.MdxInlineElement,

@@ -17,7 +17,7 @@ export const extractAttributes = (
   attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
   fields: TinaField[],
   imageCallback: (image: string) => string,
-  context: Record<string, Record<string, string>>
+  context: Record<string, unknown> | undefined
 ) => {
   const properties: Record<string, unknown> = {}
   attributes?.forEach((attribute) => {
@@ -50,7 +50,7 @@ const extractAttribute = (
   attribute: MdxJsxAttribute,
   field: TinaField,
   imageCallback: (image: string) => string,
-  context: Record<string, unknown>
+  context: Record<string, unknown> | undefined
 ) => {
   switch (field.type) {
     case 'boolean':
@@ -86,7 +86,12 @@ const extractAttribute = (
       if (attribute.type === 'mdxJsxAttribute') {
         if (typeof attribute.value === 'string') {
           if (attribute.value.startsWith('_tinaEmbeds')) {
-            const value = get(context, attribute.value)
+            const embedValue = context?._tinaEmbeds as Record<string, unknown>
+            const key = attribute.value.split('.')[1]
+            if (typeof key !== 'string') {
+              throw new Error(`Unable to extract key from embed value`)
+            }
+            const value = embedValue[key]
             if (typeof value === 'string') {
               const ast = parseMDX(value, field, imageCallback, context)
               ast.embedCode = attribute.value.split('.')[1]
@@ -330,38 +335,4 @@ export const trimFragments = (string: string) => {
     .slice(openingFragmentIndex || 0, closingFragmentIndex || rawArr.length - 1)
     .join('\n')
   return value
-}
-
-type PathImpl<T, Key extends keyof T> = Key extends string
-  ? T[Key] extends Record<string, any>
-    ?
-        | `${Key}.${PathImpl<T[Key], Exclude<keyof T[Key], keyof any[]>>}`
-        | `${Key}.${Exclude<keyof T[Key], keyof any[]> & string}`
-    : never
-  : never
-
-type Path<T> = Exclude<PathImpl<T, keyof T> | keyof T, symbol | number>
-
-type PathValue<T, P extends Path<T>> = P extends `${infer Key}.${infer Rest}`
-  ? Key extends keyof T
-    ? Rest extends Path<T[Key]>
-      ? PathValue<T[Key], Rest>
-      : never
-    : never
-  : P extends keyof T
-  ? T[P]
-  : never
-
-function get<T, P extends Path<T>>(obj: T, path: P): PathValue<T, P> {
-  const keys = path.split('.') as Array<keyof any>
-  let result: any = obj
-
-  for (const key of keys) {
-    if (result == null) {
-      return undefined as any
-    }
-    result = result[key]
-  }
-
-  return result as PathValue<T, P>
 }
