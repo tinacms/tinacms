@@ -45,7 +45,7 @@
               ]
             }
           ],
-          "embedCode": "embeds.defghi"
+          "embedCode": "defghi"
         },
         "children": {
           "type": "root",
@@ -95,7 +95,7 @@
               ]
             }
           ],
-          "embedCode": "embeds.def"
+          "embedCode": "def"
         },
         "children": {
           "type": "root",
