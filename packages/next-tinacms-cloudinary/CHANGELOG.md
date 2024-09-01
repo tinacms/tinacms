@@ -1,5 +1,49 @@
 # next-tinacms-cloudinary
 
+## 8.0.1
+
+### Patch Changes
+
+- Updated dependencies [ae03e8e]
+- Updated dependencies [4c9f221]
+  - tinacms@2.2.1
+
+## 8.0.0
+
+### Minor Changes
+
+- ceb0c07: Add infinite scroll to the media manager
+
+### Patch Changes
+
+- Updated dependencies [324950a]
+- Updated dependencies [f378f11]
+- Updated dependencies [ceb0c07]
+  - tinacms@2.2.0
+
+## 7.1.0
+
+### Minor Changes
+
+- ab586bc: extended cloudinary media store with options
+
+### Patch Changes
+
+- Updated dependencies [c6e9afb]
+- Updated dependencies [d9b23fc]
+- Updated dependencies [1c69338]
+- Updated dependencies [a1a767d]
+  - tinacms@2.1.1
+
+## 7.0.0
+
+### Patch Changes
+
+- 37b5332: Add support to upload non-image files to Cloudinary
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+
 ## 6.0.0
 
 ### Patch Changes

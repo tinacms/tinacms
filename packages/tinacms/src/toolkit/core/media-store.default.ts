@@ -354,6 +354,15 @@ export class TinaMediaStore implements MediaStore {
     const { cursor, files, directories } = await res.json()
 
     const items: Media[] = []
+    for (const dir of directories) {
+      items.push({
+        type: 'dir',
+        id: dir,
+        directory: options.directory || '',
+        filename: dir,
+      })
+    }
+
     for (const file of files) {
       items.push({
         directory: options.directory || '',
@@ -365,15 +374,6 @@ export class TinaMediaStore implements MediaStore {
           acc[`${w}x${h}`] = this.genThumbnail(file.src, { w, h })
           return acc
         }, {}),
-      })
-    }
-
-    for (const dir of directories) {
-      items.push({
-        type: 'dir',
-        id: dir,
-        directory: options.directory || '',
-        filename: dir,
       })
     }
 

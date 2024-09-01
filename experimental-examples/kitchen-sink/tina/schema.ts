@@ -1,4 +1,5 @@
 import { defineSchema } from 'tinacms'
+import referenceField from './custom-component-reference-select/reference-field-schema'
 
 export default defineSchema({
   collections: [
@@ -45,6 +46,7 @@ export default defineSchema({
             },
           ],
         },
+        referenceField,
       ],
     },
     {
@@ -70,6 +72,32 @@ export default defineSchema({
           label: 'Blog Post Body',
           name: 'body',
           isBody: true,
+        },
+        {
+          label: 'Author',
+          name: 'author',
+          type: 'reference',
+          collections: ['author'],
+        },
+      ],
+    },
+    {
+      label: 'Authors',
+      name: 'author',
+      path: 'content/author',
+      format: 'md',
+      fields: [
+        {
+          type: 'string',
+          label: 'Name',
+          name: 'name',
+          required: true,
+        },
+        {
+          type: 'string',
+          label: 'description',
+          name: 'description',
+          required: true,
         },
       ],
     },

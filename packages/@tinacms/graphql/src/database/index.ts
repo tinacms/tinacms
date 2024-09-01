@@ -1,11 +1,11 @@
-import path from 'path'
+import path from 'node:path'
 import fs from 'fs-extra'
 import type { DocumentNode } from 'graphql'
 import { GraphQLError } from 'graphql'
 import micromatch from 'micromatch'
 
 import { createSchema } from '../schema/createSchema'
-import { atob, btoa, lastItem, sequential } from '../util'
+import { atob, btoa, get, lastItem, sequential } from '../util'
 import {
   getTemplateForFile,
   hasOwnProperty,
@@ -28,36 +28,36 @@ import type {
 import type { Bridge } from './bridge'
 import { TinaFetchError, TinaQueryError } from '../resolver/error'
 import {
-  BinaryFilter,
+  type BinaryFilter,
   coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
   FOLDER_ROOT,
   FolderTreeBuilder,
-  IndexDefinition,
+  type IndexDefinition,
   makeFilter,
   makeFilterSuffixes,
   makeFolderOpsForCollection,
   makeIndexOpsForDocument,
-  TernaryFilter,
+  type TernaryFilter,
 } from './datalayer'
 import {
   ARRAY_ITEM_VALUE_SEPARATOR,
-  BatchOp,
+  type BatchOp,
   CONTENT_ROOT_PREFIX,
-  DelOp,
+  type DelOp,
   INDEX_KEY_FIELD_SEPARATOR,
-  Level,
+  type Level,
   LevelProxy,
-  PutOp,
+  type PutOp,
   SUBLEVEL_OPTIONS,
 } from './level'
 import { applyNameOverrides, replaceNameOverrides } from './alias-utils'
 import sha from 'js-sha1'
 import { FilesystemBridge, TinaLevelClient } from '..'
 import { generatePasswordHash, mapUserFields } from '../auth/utils'
-import _ from 'lodash'
 import { NotFoundError } from '../error'
+import set from 'lodash.set'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -398,54 +398,58 @@ export class Database {
     const folderTreeBuilder = new FolderTreeBuilder()
     const folderKey = folderTreeBuilder.update(filepath, collection.path || '')
 
-    const putOps = [
-      ...makeIndexOpsForDocument(
-        normalizedPath,
-        collection?.name,
-        collectionIndexDefinitions,
-        dataFields,
-        'put',
-        level
-      ),
-      // folder indices
-      ...makeIndexOpsForDocument(
-        normalizedPath,
-        `${collection?.name}_${folderKey}`,
-        collectionIndexDefinitions,
-        dataFields,
-        'put',
-        level
-      ),
-    ]
+    let putOps: BatchOp[] = []
+    let delOps: BatchOp[] = []
+    if (!isGitKeep(normalizedPath, collection)) {
+      putOps = [
+        ...makeIndexOpsForDocument(
+          normalizedPath,
+          collection?.name,
+          collectionIndexDefinitions,
+          dataFields,
+          'put',
+          level
+        ),
+        // folder indices
+        ...makeIndexOpsForDocument(
+          normalizedPath,
+          `${collection?.name}_${folderKey}`,
+          collectionIndexDefinitions,
+          dataFields,
+          'put',
+          level
+        ),
+      ]
 
-    const existingItem = await level
-      .sublevel<string, Record<string, any>>(
-        CONTENT_ROOT_PREFIX,
-        SUBLEVEL_OPTIONS
-      )
-      .get(normalizedPath)
+      const existingItem = await level
+        .sublevel<string, Record<string, any>>(
+          CONTENT_ROOT_PREFIX,
+          SUBLEVEL_OPTIONS
+        )
+        .get(normalizedPath)
 
-    const delOps = existingItem
-      ? [
-          ...makeIndexOpsForDocument(
-            normalizedPath,
-            collection?.name,
-            collectionIndexDefinitions,
-            existingItem,
-            'del',
-            level
-          ),
-          // folder indices
-          ...makeIndexOpsForDocument(
-            normalizedPath,
-            `${collection?.name}_${folderKey}`,
-            collectionIndexDefinitions,
-            existingItem,
-            'del',
-            level
-          ),
-        ]
-      : []
+      delOps = existingItem
+        ? [
+            ...makeIndexOpsForDocument(
+              normalizedPath,
+              collection?.name,
+              collectionIndexDefinitions,
+              existingItem,
+              'del',
+              level
+            ),
+            // folder indices
+            ...makeIndexOpsForDocument(
+              normalizedPath,
+              `${collection?.name}_${folderKey}`,
+              collectionIndexDefinitions,
+              existingItem,
+              'del',
+              level
+            ),
+          ]
+        : []
+    }
 
     const ops: BatchOp[] = [
       ...delOps,
@@ -546,54 +550,59 @@ export class Database {
         const level = collection?.isDetached
           ? this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
           : this.contentLevel
-        const putOps = [
-          ...makeIndexOpsForDocument(
-            normalizedPath,
-            collectionName,
-            collectionIndexDefinitions,
-            dataFields,
-            'put',
-            level
-          ),
-          // folder indices
-          ...makeIndexOpsForDocument(
-            normalizedPath,
-            `${collection?.name}_${folderKey}`,
-            collectionIndexDefinitions,
-            dataFields,
-            'put',
-            level
-          ),
-        ]
 
-        const existingItem = await level
-          .sublevel<string, Record<string, any>>(
-            CONTENT_ROOT_PREFIX,
-            SUBLEVEL_OPTIONS
-          )
-          .get(normalizedPath)
+        let putOps: BatchOp[] = []
+        let delOps: BatchOp[] = []
+        if (!isGitKeep(normalizedPath, collection)) {
+          putOps = [
+            ...makeIndexOpsForDocument(
+              normalizedPath,
+              collectionName,
+              collectionIndexDefinitions,
+              dataFields,
+              'put',
+              level
+            ),
+            // folder indices
+            ...makeIndexOpsForDocument(
+              normalizedPath,
+              `${collection?.name}_${folderKey}`,
+              collectionIndexDefinitions,
+              dataFields,
+              'put',
+              level
+            ),
+          ]
 
-        const delOps = existingItem
-          ? [
-              ...makeIndexOpsForDocument(
-                normalizedPath,
-                collectionName,
-                collectionIndexDefinitions,
-                existingItem,
-                'del',
-                level
-              ),
-              // folder indices
-              ...makeIndexOpsForDocument(
-                normalizedPath,
-                `${collection?.name}_${folderKey}`,
-                collectionIndexDefinitions,
-                existingItem,
-                'del',
-                level
-              ),
-            ]
-          : []
+          const existingItem = await level
+            .sublevel<string, Record<string, any>>(
+              CONTENT_ROOT_PREFIX,
+              SUBLEVEL_OPTIONS
+            )
+            .get(normalizedPath)
+
+          delOps = existingItem
+            ? [
+                ...makeIndexOpsForDocument(
+                  normalizedPath,
+                  collectionName,
+                  collectionIndexDefinitions,
+                  existingItem,
+                  'del',
+                  level
+                ),
+                // folder indices
+                ...makeIndexOpsForDocument(
+                  normalizedPath,
+                  `${collection?.name}_${folderKey}`,
+                  collectionIndexDefinitions,
+                  existingItem,
+                  'del',
+                  level
+                ),
+              ]
+            : []
+        }
 
         const ops: BatchOp[] = [
           ...delOps,
@@ -1063,10 +1072,9 @@ export class Database {
               collection: collection.name,
               stack: error.stack,
             })
-          } else {
-            // I dont think this should ever happen
-            throw error
           }
+          // I dont think this should ever happen
+          throw error
         }
       }),
       pageInfo: {
@@ -1417,9 +1425,9 @@ type UnionDataLookup = {
 
 const hashPasswordVisitor = async (node: any, path: string[]) => {
   const passwordValuePath = [...path, 'value']
-  const plaintextPassword = _.get(node, passwordValuePath)
+  const plaintextPassword = get(node, passwordValuePath)
   if (plaintextPassword) {
-    _.set(
+    set(
       node,
       passwordValuePath,
       await generatePasswordHash({ password: plaintextPassword })
@@ -1454,6 +1462,9 @@ const hashPasswordValues = async (
       visitNodes(data, passwordField, hashPasswordVisitor)
     )
   )
+
+const isGitKeep = (filepath: string, collection?: Collection<true>) =>
+  filepath.endsWith(`.gitkeep.${collection?.format || 'md'}`)
 
 const _indexContent = async (
   database: Database,
@@ -1505,34 +1516,36 @@ const _indexContent = async (
         collectionPath || ''
       )
 
-      await enqueueOps([
-        ...makeIndexOpsForDocument<Record<string, any>>(
-          normalizedPath,
-          collection?.name,
-          collectionIndexDefinitions,
-          aliasedData,
-          'put',
-          level
-        ),
-        // folder indexes
-        ...makeIndexOpsForDocument<Record<string, any>>(
-          normalizedPath,
-          `${collection?.name}_${folderKey}`,
-          collectionIndexDefinitions,
-          aliasedData,
-          'put',
-          level
-        ),
-        {
-          type: 'put',
-          key: normalizedPath,
-          value: aliasedData as any,
-          sublevel: level.sublevel<string, Record<string, any>>(
-            CONTENT_ROOT_PREFIX,
-            SUBLEVEL_OPTIONS
+      if (!isGitKeep(filepath, collection)) {
+        await enqueueOps([
+          ...makeIndexOpsForDocument<Record<string, any>>(
+            normalizedPath,
+            collection?.name,
+            collectionIndexDefinitions,
+            aliasedData,
+            'put',
+            level
           ),
-        },
-      ])
+          // folder indexes
+          ...makeIndexOpsForDocument<Record<string, any>>(
+            normalizedPath,
+            `${collection?.name}_${folderKey}`,
+            collectionIndexDefinitions,
+            aliasedData,
+            'put',
+            level
+          ),
+          {
+            type: 'put',
+            key: normalizedPath,
+            value: aliasedData as any,
+            sublevel: level.sublevel<string, Record<string, any>>(
+              CONTENT_ROOT_PREFIX,
+              SUBLEVEL_OPTIONS
+            ),
+          },
+        ])
+      }
     } catch (error) {
       throw new TinaFetchError(`Unable to seed ${filepath}`, {
         originalError: error,

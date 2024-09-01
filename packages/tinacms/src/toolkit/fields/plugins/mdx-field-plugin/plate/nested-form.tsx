@@ -1,7 +1,7 @@
 import React from 'react'
 import { useFormPortal, FormBuilder } from '@toolkit/form-builder'
 import { PanelHeader, GroupPanel } from '../../group-field-plugin'
-import { Form, Field } from '@toolkit/forms'
+import { Form, type Field } from '@toolkit/forms'
 import { uuid } from './plugins/ui/helpers'
 
 export const NestedForm = (props: {
@@ -29,7 +29,7 @@ export const NestedForm = (props: {
   return (
     <FormPortal>
       {({ zIndexShift }) => (
-        <GroupPanel isExpanded={true} style={{ zIndex: zIndexShift + 1000 }}>
+        <GroupPanel isExpanded={true} style={{ zIndex: zIndexShift + 1000000 }}>
           <PanelHeader onClick={props.onClose}>{props.label}</PanelHeader>
           <FormBuilder form={{ tinaForm: form }} hideFooter={true} />
         </GroupPanel>

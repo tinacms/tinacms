@@ -1,5 +1,43 @@
 # tina-graphql
 
+## 1.3.1
+
+### Patch Changes
+
+- @tinacms/graphql@1.5.1
+
+## 1.3.0
+
+### Minor Changes
+
+- 324950a: Updates Plate Editor to latest version 36.
+
+  - Upgrades all remaining packages `Typescript` to version `^5`
+  - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
+  - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
+  - Updates and removes old version of plate (`plate-headless`) for latest version `^36`
+  - Starts removing and cleaning up some of the old Plate code.
+
+### Patch Changes
+
+- Updated dependencies [324950a]
+  - @tinacms/graphql@1.5.0
+
+## 1.2.40
+
+### Patch Changes
+
+- d9b23fc: Improve reference field selector
+- Updated dependencies [d9b23fc]
+- Updated dependencies [613e9c5]
+  - @tinacms/graphql@1.4.40
+
+## 1.2.39
+
+### Patch Changes
+
+- @tinacms/graphql@1.4.39
+
 ## 1.2.38
 
 ### Patch Changes

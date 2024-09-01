@@ -1,5 +1,62 @@
 # tinacms
 
+## 2.2.1
+
+### Patch Changes
+
+- ae03e8e: Implementation for custom reference field selector
+- 4c9f221: Fix alt tags in TinaMarkdown
+- Updated dependencies [ae03e8e]
+  - @tinacms/schema-tools@1.6.1
+  - @tinacms/mdx@1.4.1
+  - @tinacms/search@1.0.27
+
+## 2.2.0
+
+### Minor Changes
+
+- 324950a: Updates Plate Editor to latest version 36.
+
+  - Upgrades all remaining packages `Typescript` to version `^5`
+  - Adds Shadcn/ui styles/colours to our `tinatailwind` config (`packages/@tinacms/cli/src/next/vite/tailwind.ts`)
+  - Replaces some `lodash` deps with either the specific function i.e. `lodash.set` or implements them in a utility file
+  - Updates and removes old version of plate (`plate-headless`) for latest version `^36`
+  - Starts removing and cleaning up some of the old Plate code.
+
+- ceb0c07: Add infinite scroll to the media manager
+
+### Patch Changes
+
+- f378f11: Add filepath to collection items
+- Updated dependencies [324950a]
+  - @tinacms/schema-tools@1.6.0
+  - @tinacms/mdx@1.4.0
+  - @tinacms/search@1.0.26
+
+## 2.1.1
+
+### Patch Changes
+
+- c6e9afb: fix reference field selector styling
+- d9b23fc: Improve reference field selector
+- 1c69338: fix reference field search and styling
+- a1a767d: add icon to reference selector
+  - @tinacms/search@1.0.25
+
+## 2.1.0
+
+### Minor Changes
+
+- cb83dc2: add `toolbarOverride` option to `rich-text` fields
+
+### Patch Changes
+
+- 1b3584c: Add cloudinary supported files to the default media upload types
+- Updated dependencies [cb83dc2]
+  - @tinacms/schema-tools@1.5.0
+  - @tinacms/mdx@1.3.29
+  - @tinacms/search@1.0.24
+
 ## 2.0.0
 
 ### Major Changes

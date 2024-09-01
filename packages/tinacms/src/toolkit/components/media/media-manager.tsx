@@ -1,6 +1,5 @@
-import React from 'react'
-import { useEffect, useState } from 'react'
-import { useCMS } from '../../react-tinacms/use-cms'
+import React, { useEffect, useState, forwardRef, useRef } from 'react'
+import { useCMS } from '@toolkit/react-tinacms'
 import {
   BiArrowToBottom,
   BiCloudUpload,
@@ -22,7 +21,6 @@ import {
 import { Button, IconButton } from '@toolkit/styles'
 import * as dropzone from 'react-dropzone'
 import type { FileError } from 'react-dropzone'
-import { CursorPaginator } from './pagination'
 import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '@toolkit/form-builder'
@@ -139,34 +137,30 @@ export function MediaPicker({
     items: [],
     nextOffset: undefined,
   })
+  const resetList = () =>
+    setList({
+      items: [],
+      nextOffset: undefined,
+    })
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeItem, setActiveItem] = useState<Media | false>(false)
   const closePreview = () => setActiveItem(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [loadFolders, setLoadFolders] = useState(true)
 
   /**
    * current offset is last element in offsetHistory[]
    * control offset by pushing/popping to offsetHistory
    */
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
-  const [loadingText, setLoadingText] = useState('')
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
-  const navigateNext = () => {
-    if (!list.nextOffset) return
-    setOffsetHistory([...offsetHistory, list.nextOffset])
-  }
-  const navigatePrev = () => {
-    const offsets = offsetHistory.slice(0, offsetHistory.length - 1)
-    setOffsetHistory(offsets)
-  }
-  const hasPrev = offsetHistory.length > 0
-  const hasNext = !!list.nextOffset
 
-  function loadMedia() {
+  async function loadMedia(loadFolders = true) {
     setListState('loading')
-    cms.media
-      .list({
+    try {
+      const _list = await cms.media.list({
         offset,
         limit: cms.media.pageSize,
         directory,
@@ -175,29 +169,44 @@ export function MediaPicker({
           { w: 400, h: 400 },
           { w: 1000, h: 1000 },
         ],
+        filesOnly: !loadFolders,
       })
-      .then((list) => {
-        setList(list)
-        setListState('loaded')
+      setList({
+        items: [...list.items, ..._list.items],
+        nextOffset: _list.nextOffset,
       })
-      .catch((e) => {
-        console.error(e)
-        if (e.ERR_TYPE === 'MediaListError') {
-          setListError(e)
-        } else {
-          setListError(defaultListError)
-        }
-        setListState('error')
-      })
+      setListState('loaded')
+    } catch (e) {
+      console.error(e)
+      if (e.ERR_TYPE === 'MediaListError') {
+        setListError(e)
+      } else {
+        setListError(defaultListError)
+      }
+      setListState('error')
+    }
   }
 
   useEffect(() => {
-    if (!cms.media.isConfigured) return
+    if (!refreshing) return
     loadMedia()
+    setRefreshing(false)
+  }, [refreshing])
+
+  useEffect(() => {
+    if (!cms.media.isConfigured) return
+    if (refreshing) return
+
+    loadMedia(loadFolders)
+    if (loadFolders) setLoadFolders(false)
 
     return cms.events.subscribe(
       ['media:delete:success', 'media:pageSize'],
-      loadMedia
+      () => {
+        setRefreshing(true)
+        resetOffset()
+        resetList()
+      }
     )
   }, [offset, directory, cms.media.isConfigured])
 
@@ -211,16 +220,19 @@ export function MediaPicker({
           ? item.filename
           : join(item.directory, item.filename)
       )
+      setLoadFolders(true)
       resetOffset()
+      resetList()
+      setActiveItem(false)
     } else {
       setActiveItem(item)
     }
   }
 
-  let deleteMediaItem: (_item: Media) => void
+  let deleteMediaItem: (_item: Media) => Promise<void>
   if (allowDelete) {
-    deleteMediaItem = (item: Media) => {
-      cms.media.delete(item)
+    deleteMediaItem = async (item: Media) => {
+      await cms.media.delete(item)
     }
   }
 
@@ -299,7 +311,7 @@ export function MediaPicker({
           setList((mediaList) => {
             return {
               items: [
-                // all of the newly added items are new
+                // all the newly added items are new
                 ...mediaItems.map((x) => ({ ...x, new: true })),
                 ...mediaList.items,
               ],
@@ -327,8 +339,29 @@ export function MediaPicker({
 
   useEffect(disableScrollBody, [])
 
-  if (listState === 'loading' || uploading) {
-    return <LoadingMediaList extraText={loadingText} />
+  const loaderRef = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      const target = entries[0]
+      if (target.isIntersecting && list.nextOffset) {
+        setOffsetHistory((offsetHistory) => [...offsetHistory, list.nextOffset])
+      }
+    })
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current)
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current)
+      }
+    }
+  }, [list.nextOffset, loaderRef.current])
+
+  if ((listState === 'loading' && !list?.items?.length) || uploading) {
+    return <LoadingMediaList />
   }
 
   if (listState === 'not-configured') {
@@ -351,9 +384,9 @@ export function MediaPicker({
       {deleteModalOpen && (
         <DeleteModal
           filename={activeItem ? activeItem.filename : ''}
-          deleteFunc={() => {
+          deleteFunc={async () => {
             if (activeItem) {
-              deleteMediaItem(activeItem)
+              await deleteMediaItem(activeItem)
               setActiveItem(false)
             }
           }}
@@ -371,6 +404,7 @@ export function MediaPicker({
               }
             })
             resetOffset()
+            resetList()
           }}
           close={() => setNewFolderModalOpen(false)}
         />
@@ -381,7 +415,16 @@ export function MediaPicker({
           <div className="flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0">
             <div className="flex flex-1 items-center gap-4">
               <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
-              <Breadcrumb directory={directory} setDirectory={setDirectory} />
+              <Breadcrumb
+                directory={directory}
+                setDirectory={(dir: string) => {
+                  setDirectory(dir)
+                  setLoadFolders(true)
+                  resetOffset()
+                  resetList()
+                  setActiveItem(false)
+                }}
+              />
             </div>
 
             {cms.media.store.isStatic ? null : (
@@ -389,7 +432,12 @@ export function MediaPicker({
                 <Button
                   busy={false}
                   variant="white"
-                  onClick={loadMedia}
+                  onClick={() => {
+                    setRefreshing(true)
+                    resetOffset()
+                    resetList()
+                    setActiveItem(false)
+                  }}
                   className="whitespace-nowrap"
                 >
                   Refresh
@@ -450,16 +498,9 @@ export function MediaPicker({
                       active={activeItem && activeItem.id === item.id}
                     />
                   ))}
-              </ul>
 
-              <div className="bg-gradient-to-r to-gray-50/50 from-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
-                <CursorPaginator
-                  hasNext={hasNext}
-                  navigateNext={navigateNext}
-                  hasPrev={hasPrev}
-                  navigatePrev={navigatePrev}
-                />
-              </div>
+                {!!list.nextOffset && <LoadingMediaList ref={loaderRef} />}
+              </ul>
             </div>
 
             <ActiveItemPreview
@@ -578,18 +619,21 @@ const UploadButton = ({ onClick, uploading }: any) => {
   )
 }
 
-const LoadingMediaList = (props) => {
-  const { extraText, ...rest } = props
-  return (
-    <div
-      className="w-full h-full flex flex-col items-center justify-center"
-      {...rest}
-    >
-      {extraText && <p>{props}</p>}
-      <LoadingDots color={'var(--tina-color-primary)'} />
-    </div>
-  )
-}
+const LoadingMediaList = forwardRef<HTMLDivElement, { extraText?: string }>(
+  (props, ref) => {
+    const { extraText, ...rest } = props
+    return (
+      <div
+        ref={ref}
+        className="w-full h-full flex flex-col items-center justify-center"
+        {...rest}
+      >
+        {extraText && <p>{extraText}</p>}
+        <LoadingDots color={'var(--tina-color-primary)'} />
+      </div>
+    )
+  }
+)
 
 const MediaPickerWrap = ({ children }) => {
   return (

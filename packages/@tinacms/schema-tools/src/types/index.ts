@@ -214,8 +214,26 @@ export type ImageField = (
   }
 
 export type ReferenceField = (
-  | FieldGeneric<string, undefined>
-  | FieldGeneric<string, false>
+  | FieldGeneric<
+      string,
+      undefined,
+      {
+        optionComponent?: (props: {
+          values: Record<string, unknown>
+          _sys: Document['_sys']
+        }) => Element | undefined
+      }
+    >
+  | FieldGeneric<
+      string,
+      false,
+      {
+        optionComponent?: (props: {
+          values: Record<string, unknown>
+          _sys: Document['_sys']
+        }) => Element | undefined
+      }
+    >
 ) &
   BaseField & {
     type: 'reference'
@@ -252,6 +270,7 @@ type toolbarItemName =
   | 'bold'
   | 'italic'
   | 'raw'
+  | 'embed'
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
@@ -370,28 +389,27 @@ type ObjectUiProps = {
   visualSelector?: boolean
 }
 
-export type ObjectField<WithNamespace extends boolean = false> =
-  | (
-      | FieldGeneric<string, undefined, ObjectUiProps>
-      | FieldGeneric<string, true, ObjectUiProps>
-      | FieldGeneric<string, false, ObjectUiProps>
-    ) &
-      MaybeNamespace<WithNamespace> &
-      BaseField &
-      (
-        | {
-            type: 'object'
-            fields: Field<WithNamespace>[]
-            templates?: undefined
-            ui?: Template['ui']
-          }
-        | {
-            type: 'object'
-            fields?: undefined
-            templates: Template<WithNamespace>[]
-            templateKey?: string
-          }
-      )
+export type ObjectField<WithNamespace extends boolean = false> = (
+  | FieldGeneric<string, undefined, ObjectUiProps>
+  | FieldGeneric<string, true, ObjectUiProps>
+  | FieldGeneric<string, false, ObjectUiProps>
+) &
+  MaybeNamespace<WithNamespace> &
+  BaseField &
+  (
+    | {
+        type: 'object'
+        fields: Field<WithNamespace>[]
+        templates?: undefined
+        ui?: Template['ui']
+      }
+    | {
+        type: 'object'
+        fields?: undefined
+        templates: Template<WithNamespace>[]
+        templateKey?: string
+      }
+  )
 
 type Field<WithNamespace extends boolean = false> = (
   | StringField

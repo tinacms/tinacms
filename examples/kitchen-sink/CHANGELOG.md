@@ -1,5 +1,44 @@
 # e2e-next
 
+## 0.1.74
+
+### Patch Changes
+
+- Updated dependencies [ae03e8e]
+- Updated dependencies [4c9f221]
+  - tinacms@2.2.1
+  - @tinacms/datalayer@1.3.1
+
+## 0.1.73
+
+### Patch Changes
+
+- Updated dependencies [324950a]
+- Updated dependencies [f378f11]
+- Updated dependencies [ceb0c07]
+  - @tinacms/datalayer@1.3.0
+  - tinacms@2.2.0
+
+## 0.1.72
+
+### Patch Changes
+
+- Updated dependencies [c6e9afb]
+- Updated dependencies [d9b23fc]
+- Updated dependencies [1c69338]
+- Updated dependencies [a1a767d]
+  - tinacms@2.1.1
+  - @tinacms/datalayer@1.2.40
+
+## 0.1.71
+
+### Patch Changes
+
+- Updated dependencies [cb83dc2]
+- Updated dependencies [1b3584c]
+  - tinacms@2.1.0
+  - @tinacms/datalayer@1.2.39
+
 ## 0.1.70
 
 ### Patch Changes

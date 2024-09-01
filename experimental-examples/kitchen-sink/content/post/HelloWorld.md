@@ -1,7 +1,8 @@
 ---
-title: This is a title
+title: hello world
+author: content/author/test-author.md
 ---
 
-This is a test
+Hello s
 
 How are you doing?

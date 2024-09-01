@@ -3,29 +3,29 @@
 */
 
 import {
-  FieldDefinitionNode,
-  ScalarTypeDefinitionNode,
-  InputValueDefinitionNode,
-  ObjectTypeDefinitionNode,
-  InterfaceTypeDefinitionNode,
-  NamedTypeNode,
-  UnionTypeDefinitionNode,
-  TypeDefinitionNode,
-  DirectiveNode,
-  EnumTypeDefinitionNode,
-  InputObjectTypeDefinitionNode,
-  DocumentNode,
-  FragmentDefinitionNode,
-  SelectionNode,
+  type FieldDefinitionNode,
+  type ScalarTypeDefinitionNode,
+  type InputValueDefinitionNode,
+  type ObjectTypeDefinitionNode,
+  type InterfaceTypeDefinitionNode,
+  type NamedTypeNode,
+  type UnionTypeDefinitionNode,
+  type TypeDefinitionNode,
+  type DirectiveNode,
+  type EnumTypeDefinitionNode,
+  type InputObjectTypeDefinitionNode,
+  type DocumentNode,
+  type FragmentDefinitionNode,
+  type SelectionNode,
   SelectionSetNode,
-  FieldNode,
-  InlineFragmentNode,
-  OperationDefinitionNode,
-  VariableDefinitionNode,
-  ArgumentNode,
+  type FieldNode,
+  type InlineFragmentNode,
+  type OperationDefinitionNode,
+  type VariableDefinitionNode,
+  type ArgumentNode,
 } from 'graphql'
-import _ from 'lodash'
-import { lastItem } from '../util'
+import { flattenDeep, lastItem } from '../util'
+import uniqBy from 'lodash.uniqby'
 
 export const SysFieldDefinition = {
   kind: 'Field' as const,
@@ -1021,7 +1021,7 @@ export const astBuilder = {
     query: TypeDefinitionNode
     definitions: TypeDefinitionNode[]
   }): DocumentNode => {
-    const definitions = _.uniqBy(
+    const definitions = uniqBy(
       [
         ...extractInlineTypes(ast.query),
         ...extractInlineTypes(ast.globalTemplates),
@@ -1058,29 +1058,28 @@ export const extractInlineTypes = (
     const accumulator: TypeDefinitionNode[] = item.map((i) => {
       return extractInlineTypes(i)
     })
-    return _.flattenDeep(accumulator)
-  } else {
-    const accumulator: TypeDefinitionNode[] = [item]
-    // @ts-ignore
-    for (const node of walk(item)) {
-      if (node.kind === 'UnionTypeDefinition') {
-        // @ts-ignore
-        node.types = _.uniqBy(node.types, (type) => type.name.value)
-      }
+    return flattenDeep(accumulator)
+  }
+  const accumulator: TypeDefinitionNode[] = [item]
+  // @ts-ignore
+  for (const node of walk(item)) {
+    if (node.kind === 'UnionTypeDefinition') {
       // @ts-ignore
-      if (node.kind === 'NamedType') {
+      node.types = uniqBy(node.types, (type) => type.name.value)
+    }
+    // @ts-ignore
+    if (node.kind === 'NamedType') {
+      // @ts-ignore
+      if (typeof node.name.value !== 'string') {
         // @ts-ignore
-        if (typeof node.name.value !== 'string') {
-          // @ts-ignore
-          accumulator.push(node.name.value)
-          // @ts-ignore
-          node.name.value = node.name.value.name.value
-        }
+        accumulator.push(node.name.value)
+        // @ts-ignore
+        node.name.value = node.name.value.name.value
       }
     }
-
-    return accumulator
   }
+
+  return accumulator
 }
 
 export function* walk(

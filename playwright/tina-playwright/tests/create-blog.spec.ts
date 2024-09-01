@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import deleteBlogPost from "../utils/deleteBlogPost";
-import { client } from "../tina/__generated__/client";
 
 test.describe("Create Blog Post", () => {
   test.beforeEach(async ({ page }) => {
@@ -32,7 +31,7 @@ test.describe("Create Blog Post", () => {
       "http://localhost:3000/admin/index.html#/collections/post/~"
     );
 
-    const blogPost = await page.locator(`text=${blogFilename}`);
+    const blogPost = await page.locator(`text=${blogFilename}`).first();
     await expect(blogPost).toBeVisible();
     isNewBlogCreated = true;
   });

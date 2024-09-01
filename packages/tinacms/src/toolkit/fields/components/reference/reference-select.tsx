@@ -1,28 +1,38 @@
-import * as React from 'react'
-import type { TinaCMS } from '@toolkit/tina-cms'
-import type { ReferenceFieldProps } from './index'
-import { selectFieldClasses } from '../select'
 import { LoadingDots } from '@toolkit/form-builder'
-import { MdKeyboardArrowDown } from 'react-icons/md'
 import { Field } from '@toolkit/forms'
-
+import type { TinaCMS } from '@toolkit/tina-cms'
+import * as React from 'react'
+import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io'
+import { Button } from './components/button'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandList,
+} from './components/command'
+import OptionComponent from './components/option-component'
+import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
+import { InternalSys, ReferenceFieldProps } from './model/reference-field-props'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
   field: ReferenceFieldProps & Field
 }
 
+type Edge = {
+  node: Node
+}
+
 interface Node {
   id: string
-  _internalSys: {
-    title: string | null
-  }
+  _internalSys: InternalSys
+  //Using uknown type as _values can be any type from the collection user degined in schema
+  _values: unknown
 }
 interface OptionSet {
   collection: string
-  edges: {
-    node: Node
-  }[]
+  edges: Edge[]
 }
 
 interface Response {
@@ -55,8 +65,10 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
                         id,
                       }
                       ...on Document {
+                        _values
                         _internalSys: _sys {
-                          title
+                          filename
+                          path
                         }
                       }
                     }
@@ -95,18 +107,42 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
   return { optionSets, loading }
 }
 
-const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
+// function to get the filename from optionSets to display text in the combobox
+// file name is used to display text as the title can be nullable (user can define the name rather than title field)
+//? Note - This is looking for a field with `name` or `title`
+const getFilename = (optionSets: OptionSet[], value: string): string | null => {
+  // Flatten the optionSets array to a single array of nodes
+  const nodes = optionSets.flatMap((optionSet) =>
+    optionSet.edges.map((edge) => edge.node)
+  )
+  const node = nodes.find((node) => node.id === value)
+
+  return node ? node._internalSys.filename : null
+}
+
+// function to filter the options based on the search value
+const filterBySearch = (value: string, search: string): number => {
+  // Replace / in the file path with an empty string to make it searchable
+  return value.toLowerCase().replace(/\//g, '').includes(search.toLowerCase())
+    ? 1
+    : 0
+}
+
+const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   cms,
   input,
   field,
 }) => {
+  const [open, setOpen] = React.useState<boolean>(false)
+  const [value, setValue] = React.useState<string | null>(input.value)
+  //Store display text for selected option
+  const [displayText, setDisplayText] = React.useState<string | null>(null)
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
-  const ref = React.useRef(null)
+
   React.useEffect(() => {
-    if (ref.current && field.experimental_focusIntent) {
-      ref.current.focus()
-    }
-  }, [field.experimental_focusIntent, ref])
+    setDisplayText(getFilename(optionSets, value))
+    input.onChange(value)
+  }, [value, input, optionSets])
 
   if (loading === true) {
     return <LoadingDots color="var(--tina-color-primary)" />
@@ -114,36 +150,59 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
 
   return (
     <>
-      <select
-        ref={ref}
-        id={input.name}
-        value={input.value}
-        onChange={input.onChange}
-        className={selectFieldClasses}
-        {...input}
-      >
-        <option value={''}>Choose an option</option>
-        {optionSets.length > 0 &&
-          optionSets.map(({ collection, edges }: OptionSet) => (
-            <optgroup key={`${collection}-group`} label={collection}>
-              {edges.map(
-                ({
-                  node: {
-                    id,
-                    _internalSys: { title },
-                  },
-                }) => (
-                  <option key={`${id}-option`} value={id}>
-                    {title || id}
-                  </option>
-                )
-              )}
-            </optgroup>
-          ))}
-      </select>
-      <MdKeyboardArrowDown className="absolute top-1/2 right-3 w-6 h-auto -translate-y-1/2 text-gray-300 group-hover:text-blue-500 transition duration-150 ease-out" />
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-52 justify-between"
+          >
+            <p className="truncate">{displayText ?? 'Choose an option...'}</p>
+            {open ? (
+              <IoMdArrowDropup size={20} />
+            ) : (
+              <IoMdArrowDropdown size={20} />
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="p-0 relative">
+          <Command filter={filterBySearch}>
+            <CommandInput placeholder="Search reference..." />
+            <CommandEmpty>No reference found</CommandEmpty>
+            <CommandList>
+              {optionSets.length > 0 &&
+                optionSets.map(({ collection, edges }: OptionSet) => (
+                  <CommandGroup
+                    key={`${collection}-group`}
+                    heading={collection}
+                  >
+                    <CommandList>
+                      {edges.map(({ node }) => {
+                        const { id, _values } = node
+                        return (
+                          <OptionComponent
+                            id={id}
+                            value={value}
+                            field={field}
+                            _values={_values}
+                            node={node}
+                            onSelect={(currentValue) => {
+                              setValue(currentValue)
+                              setOpen(false)
+                            }}
+                          />
+                        )
+                      })}
+                    </CommandList>
+                  </CommandGroup>
+                ))}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </>
   )
 }
 
-export default ReferenceSelect
+export default ComboboxDemo

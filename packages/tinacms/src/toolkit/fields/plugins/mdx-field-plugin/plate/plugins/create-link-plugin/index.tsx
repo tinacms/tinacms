@@ -1,22 +1,26 @@
 import React, { useEffect } from 'react'
 import {
-  useEditorState,
-  getNodeEntries,
-  unwrapNodes,
+  Editor,
+  Element,
+  type BaseRange,
+  Transforms,
   setNodes,
+  unwrapNodes,
   wrapNodes,
-  PlateEditor,
-  isCollapsed,
-  getAboveNode,
-  getPluginType,
-  createLinkPlugin,
-  ELEMENT_LINK,
-  ENode,
-  Value,
-} from '@udecode/plate-headless'
-import { Editor, Element, BaseRange, Transforms } from 'slate'
+} from 'slate'
 import { NestedForm } from '../../nested-form'
 import { Button } from '@tinacms/toolkit'
+import { createLinkPlugin, ELEMENT_LINK } from '@udecode/plate-link'
+import {
+  type ENode,
+  getAboveNode,
+  getNodeEntries,
+  getPluginType,
+  isCollapsed,
+  type PlateEditor,
+  useEditorState,
+  type Value,
+} from '@udecode/plate-common'
 
 export { createLinkPlugin }
 
@@ -64,14 +68,14 @@ export const LinkForm = (props) => {
     title: string
   }>({ url: '', title: '' })
   const [formValues, setFormValues] = React.useState<any>({})
-  const editor = useEditorState()!
+  const editor = useEditorState()
   // Memoize selection so we hang onto when editor loses focus
   const selection = React.useMemo(() => editor.selection, [])
   useEffect(() => {
     const [link] = getLinks(editor)
     setInitialValues({
-      url: link && link[0].url ? link[0].url : '',
-      title: link && link[0].title ? link[0].title : '',
+      url: link?.[0].url ? link[0].url : '',
+      title: link?.[0].title ? link[0].title : '',
     })
   }, [editor, setInitialValues])
 

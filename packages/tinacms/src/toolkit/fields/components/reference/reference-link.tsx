@@ -1,24 +1,11 @@
 import * as React from 'react'
 import type { TinaCMS } from '@toolkit/tina-cms'
 import { BiEdit } from 'react-icons/bi'
-
-interface ReferenceLinkProps {
-  cms: TinaCMS
-  input: any
-}
-
-type Document = {
-  _sys: {
-    collection: {
-      name: string
-    }
-    breadcrumbs: string[]
-  }
-}
-
-interface Response {
-  node: Document
-}
+import {
+  ReferenceLinkProps,
+  Document,
+  Response,
+} from './model/reference-link-props'
 
 const useGetNode = (cms: TinaCMS, id: string) => {
   const [document, setDocument] = React.useState<Document | undefined>(
@@ -96,7 +83,7 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
             }/collections/${
               document._sys.collection.name
             }/${document._sys.breadcrumbs.join('/')}`}
-            className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"
+            className="text-gray-700 hover:text-blue-500 inline-flex items-center uppercase text-sm mt-2 mb-2 leading-none"
           >
             <BiEdit className="h-5 w-auto opacity-80 mr-2" />
             Edit in CMS
