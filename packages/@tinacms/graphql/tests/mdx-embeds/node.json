@@ -1,9 +1,6 @@
 {
   "data": {
     "document": {
-      "_sys": {
-        "title": ""
-      },
       "_values": {
         "_collection": "post",
         "_template": "post",
@@ -124,6 +121,9 @@
             }
           ]
         }
+      },
+      "_sys": {
+        "title": ""
       }
     }
   }

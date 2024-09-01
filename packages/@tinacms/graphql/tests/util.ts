@@ -1,4 +1,6 @@
 import { MemoryLevel } from 'memory-level'
+import fs from 'fs-extra'
+import path from 'path'
 import {
   createDatabaseInternal,
   FilesystemBridge,
@@ -20,7 +22,13 @@ const dataSchema = z.object({
   }),
 })
 
+const defaultQuery = `query { document(collection: "post", relativePath: "in.md") { ...on Document { _values, _sys { title } }} }`
+
 export const setup = async (dir: string, config: any) => {
+  const hasGraphQL = await fs.existsSync(path.join(dir, 'query.gql'))
+  const query = hasGraphQL
+    ? await fs.readFile(path.join(dir, 'query.gql'), 'utf-8')
+    : defaultQuery
   const bridge = new OutputBridge(dir, dir)
   const level = new MemoryLevel<string, Record<string, any>>()
   const database = createDatabaseInternal({
@@ -36,13 +44,10 @@ export const setup = async (dir: string, config: any) => {
   }) => {
     const result = await resolve({
       database,
-      query:
-        options?.query ||
-        `query { document(collection: "post", relativePath: "in.md") { ...on Document { _values, _sys { title } }} }`,
+      query: options?.query || query,
       variables: options?.variables || {},
     })
-    const schema = options?.schema || dataSchema
-    return z.object({ data: schema, errors: z.any() }).parse(result)
+    return result
   }
   const put = async (input: any) => {
     const { _collection, _template, ...data } = input
@@ -55,6 +60,10 @@ export const setup = async (dir: string, config: any) => {
     })
   }
   return { get, put }
+}
+
+export const assertDoc = (doc: any) => {
+  return z.object({ data: dataSchema, errors: z.any() }).parse(doc)
 }
 
 export const format = (data: any) => {

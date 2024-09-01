@@ -1,12 +1,12 @@
 {
   "data": {
     "document": {
-      "_sys": {
-        "title": "Hello"
-      },
       "_values": {
         "_collection": "post",
         "_template": "post",
+        "title": "Hello"
+      },
+      "_sys": {
         "title": "Hello"
       }
     }
