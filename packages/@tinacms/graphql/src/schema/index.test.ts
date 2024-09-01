@@ -3,6 +3,7 @@
 */
 
 import { TinaSchema } from '@tinacms/schema-tools'
+import { describe, test, expect } from 'vitest'
 
 describe('TinaSchema', () => {
   describe('with sibling collections of similar names', () => {

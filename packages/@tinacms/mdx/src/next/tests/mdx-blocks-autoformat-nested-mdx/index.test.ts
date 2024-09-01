@@ -11,6 +11,6 @@ it('matches input', () => {
   const contextOut = {}
   const string = stringifyMDX(tree, field, (v) => v, contextOut)
   const contextFrontmatter = util.frontmatterString(contextOut)
-  // expect(string).toMatchFile(util.mdPath(__dirname))
-  // expect(contextFrontmatter).toMatchFile(util.mdContextPath(__dirname))
+  expect(string).toMatchFile(util.mdPath(__dirname))
+  expect(contextFrontmatter).toMatchFile(util.mdContextPath(__dirname))
 })

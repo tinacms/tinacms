@@ -6,6 +6,7 @@ import path from 'path'
 import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
 import { MemoryLevel } from 'memory-level'
+import { describe, beforeEach, afterEach, expect, it, vi } from 'vitest'
 const rootPath = path.join(__dirname, '/')
 
 const level = new MemoryLevel<string, Record<string, any>>({
@@ -56,7 +57,7 @@ const mutationFixtures: Fixture[] = [
 
 let consoleErrMock
 beforeEach(() => {
-  consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
+  consoleErrMock = vi.spyOn(console, 'error').mockImplementation(() => {})
 })
 afterEach(() => {
   consoleErrMock.mockRestore()

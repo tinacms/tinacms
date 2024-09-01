@@ -6,6 +6,15 @@ import path from 'path'
 import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
 import { MemoryLevel } from 'memory-level'
+import {
+  beforeEach,
+  afterEach,
+  describe,
+  it,
+  expect,
+  vi,
+  SpyInstance,
+} from 'vitest'
 const rootPath = path.join(__dirname, '/')
 
 const level = new MemoryLevel<string, Record<string, any>>({
@@ -57,9 +66,9 @@ beforeEach(async () => {
   await level.clear()
 })
 
-let consoleErrMock
+let consoleErrMock: SpyInstance
 beforeEach(() => {
-  consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
+  consoleErrMock = vi.spyOn(console, 'error').mockImplementation(() => {})
 })
 afterEach(() => {
   consoleErrMock.mockRestore()

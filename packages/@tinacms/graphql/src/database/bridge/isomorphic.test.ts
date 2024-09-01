@@ -1,9 +1,10 @@
 import fs from 'node:fs'
 import git from 'isomorphic-git'
 import { IsomorphicBridge } from './isomorphic'
+import { test, afterEach, expect, describe, beforeEach, vi } from 'vitest'
 
 // Fix issue with test timing out
-jest.setTimeout(20000)
+vi.setConfig({ testTimeout: 20000 })
 
 describe('isomorphic bridge', () => {
   let contentMap: Record<string, string>
@@ -231,8 +232,8 @@ describe('isomorphic bridge', () => {
 
     test('non-existent post', async () => {
       const filepath = 'content/posts/foobar.mdx'
-      await expect(bridge.delete(filepath)).rejects.toMatchInlineSnapshot(
-        `[GraphQLError: Unable to resolve path: content/posts/foobar.mdx]`
+      await expect(bridge.delete(filepath)).rejects.toThrow(
+        `Unable to resolve path: content/posts/foobar.mdx`
       )
     })
 
