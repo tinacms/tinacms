@@ -1,4 +1,4 @@
-import type { FC } from 'react'
+import type { FC, ReactNode } from 'react'
 import type React from 'react'
 
 type Meta = {
@@ -213,27 +213,19 @@ export type ImageField = (
     type: 'image'
   }
 
+type ReferenceFieldOptions = {
+  optionComponent?: OptionComponent
+  experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>
+}
+
+type OptionComponent<P = Record<string, unknown>, S = Document['_sys']> = (
+  props: P,
+  _internalSys: S
+) => React.ReactNode | Element | undefined
+
 export type ReferenceField = (
-  | FieldGeneric<
-      string,
-      undefined,
-      {
-        optionComponent?: (props: {
-          values: Record<string, unknown>
-          _sys: Document['_sys']
-        }) => Element | undefined
-      }
-    >
-  | FieldGeneric<
-      string,
-      false,
-      {
-        optionComponent?: (props: {
-          values: Record<string, unknown>
-          _sys: Document['_sys']
-        }) => Element | undefined
-      }
-    >
+  | FieldGeneric<string, undefined, ReferenceFieldOptions>
+  | FieldGeneric<string, false, ReferenceFieldOptions>
 ) &
   BaseField & {
     type: 'reference'

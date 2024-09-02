@@ -1,12 +1,12 @@
 // You should define the types for the fields in the author collection for typesafety
-export interface AuthorProps {
+export type AuthorProps = {
   name: string
   description: string
   _collection: 'author'
 }
 
 // You should define the types for the fields in the post collection for typesafety
-export interface PostProps {
+export type PostProps = {
   title: string
   excerpt: string
   _collection: 'post'
