@@ -26,7 +26,6 @@ import {
 import { useResize } from '../hooks/use-resize'
 import OverflowMenu from './plate-ui/overflow-menu'
 import { useToolbarContext } from '../toolbar/toolbar-provider'
-import { MermaidElement } from './plate-ui/mermaid-element'
 
 export type ToolbarItem = {
   label: string

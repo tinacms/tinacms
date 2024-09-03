@@ -1,21 +1,14 @@
 import { useEffect, useRef } from 'react'
+import mermaid from 'mermaid'
 
 export const useMermaidElement = () => {
   const mermaidRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    let isMounted = true
+    if (mermaidRef.current) {
+      mermaid.initialize({ startOnLoad: true })
 
-    import('mermaid').then((mermaidModule) => {
-      if (isMounted && mermaidRef.current) {
-        const mermaid = mermaidModule.default
-        mermaid.initialize({ startOnLoad: false })
-        mermaid.init(undefined, mermaidRef.current)
-      }
-    })
-
-    return () => {
-      isMounted = false
+      mermaid.init(mermaidRef.current)
     }
   }, [])
 
