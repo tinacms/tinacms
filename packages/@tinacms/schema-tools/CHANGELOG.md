@@ -1,5 +1,13 @@
 # @tinacms/schema-tools
 
+## 1.6.2
+
+### Patch Changes
+
+- 6ccda6c: ⚗️ Experimental - added reference field filter
+  Note: this will be deprecated in the near future for a more robust soution
+- 33eaa81: Minor code refactor in reference field selector
+
 ## 1.6.1
 
 ### Patch Changes

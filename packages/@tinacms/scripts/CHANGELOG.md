@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.1
+
+### Patch Changes
+
+- acf8430: Add rollup option to ignore "MODULE_LEVEL_DIRECTIVE"
+
 ## 1.2.0
 
 ### Minor Changes
