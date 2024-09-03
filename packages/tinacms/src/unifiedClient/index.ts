@@ -1,6 +1,7 @@
 import fetchPonyfill from 'fetch-ponyfill'
 import type { GraphQLError } from 'graphql'
 import type { Config } from '@tinacms/schema-tools'
+import type { Cache } from '../cache/index'
 
 const { fetch: fetchPonyfillFN, Headers: HeadersPonyfill } = fetchPonyfill()
 
@@ -15,6 +16,7 @@ export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
   token?: string
   queries: (client: TinaClient<GenQueries>) => GenQueries
   errorPolicy?: Config['client']['errorPolicy']
+  cacheDir?: string
 }
 export type TinaClientRequestArgs = {
   variables?: Record<string, any>
@@ -33,16 +35,24 @@ export class TinaClient<GenQueries> {
   public readonlyToken?: string
   public queries: GenQueries
   public errorPolicy: Config['client']['errorPolicy']
+  cache: Cache
   constructor({
     token,
     url,
     queries,
     errorPolicy,
+    cacheDir,
   }: TinaClientArgs<GenQueries>) {
     this.apiUrl = url
     this.readonlyToken = token?.trim()
     this.queries = queries(this)
     this.errorPolicy = errorPolicy || 'throw'
+
+    // if we're in node, use the fs cache
+    if (cacheDir && typeof require !== 'undefined') {
+      const { NodeCache } = require('tinacms/dist/cache')
+      this.cache = NodeCache(cacheDir, require('fs'))
+    }
   }
 
   public async request<DataType extends Record<string, any> = any>(
@@ -78,6 +88,15 @@ export class TinaClient<GenQueries> {
       ...providedFetchOptions,
     }
 
+    let key = ''
+    if (this.cache) {
+      key = this.cache.makeKey(bodyString)
+      const value = await this.cache.get(key)
+      if (value) {
+        return value
+      }
+    }
+
     const res = await fetchDefined(url, optionsObject)
     if (!res.ok) {
       let additionalInfo = ''
@@ -99,11 +118,17 @@ export class TinaClient<GenQueries> {
         Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
       )
     }
-    return {
+    const result = {
       data: json?.data as DataType,
       errors: (json?.errors || null) as GraphQLError[] | null,
       query: args.query,
     }
+
+    if (this.cache) {
+      await this.cache.set(key, result)
+    }
+
+    return result
   }
 }
 
