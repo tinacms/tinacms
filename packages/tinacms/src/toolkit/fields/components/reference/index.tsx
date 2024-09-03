@@ -8,6 +8,11 @@ type Option = {
   label: string
 }
 
+type ReferenceFieldOptions = {
+  optionComponent?: OptionComponent
+  experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>
+}
+
 type OptionComponent = (
   props: unknown,
   _sys: InternalSys
@@ -17,13 +22,13 @@ export interface InternalSys {
   filename: string
   path: string
 }
-export interface ReferenceFieldProps {
+
+export interface ReferenceFieldProps extends ReferenceFieldOptions {
   label?: string
   name: string
   component: string
   collections: string[]
   options: (Option | string)[]
-  optionComponent: OptionComponent
 }
 
 export interface ReferenceProps {
