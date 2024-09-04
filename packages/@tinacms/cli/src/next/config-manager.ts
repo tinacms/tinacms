@@ -27,6 +27,7 @@ export class ConfigManager {
   tinaSpaPackagePath: string
   contentRootPath?: string
   envFilePath: string
+  generatedCachePath: string
   generatedFolderPath: string
   generatedFolderPathContentRepo: string
   generatedGraphQLGQLPath: string
@@ -115,6 +116,12 @@ export class ConfigManager {
       path.join(this.tinaFolderPath, 'database')
     )
     this.generatedFolderPath = path.join(this.tinaFolderPath, GENERATED_FOLDER)
+
+    this.generatedCachePath = path.join(
+      this.generatedFolderPath,
+      '.cache',
+      String(new Date().getTime())
+    )
 
     this.generatedGraphQLGQLPath = path.join(
       this.generatedFolderPath,
