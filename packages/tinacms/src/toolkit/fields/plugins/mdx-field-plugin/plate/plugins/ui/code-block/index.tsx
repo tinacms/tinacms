@@ -50,6 +50,7 @@ export const CodeBlock = ({
   editor,
   element,
   language: restrictLanguage,
+  onChangeCallback,
   ...props
 }: {
   attributes: Record<string, unknown>
@@ -57,6 +58,7 @@ export const CodeBlock = ({
   editor: PlateEditor
   language?: string
   children: React.ReactNode
+  onChangeCallback?: (value: string) => void
 }) => {
   const [navigateAway, setNavigateAway] = React.useState<
     'up' | 'down' | 'insertNext' | 'remove' | null
@@ -331,6 +333,7 @@ export const CodeBlock = ({
             onChange={(value) => {
               // FIXME: if a void is focused first, onChange doesn't fire until
               // https://github.com/udecode/plate/issues/1519#issuecomment-1184933602
+              onChangeCallback?.(value)
               setNodes(editor, { value, lang: language })
             }}
           />

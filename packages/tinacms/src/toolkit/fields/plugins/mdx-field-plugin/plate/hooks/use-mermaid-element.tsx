@@ -7,8 +7,7 @@ export const useMermaidElement = () => {
   useEffect(() => {
     if (mermaidRef.current) {
       mermaid.initialize({ startOnLoad: true })
-
-      mermaid.init(mermaidRef.current)
+      mermaid.run()
     }
   }, [])
 
