@@ -12,6 +12,7 @@ import {
   createCodePlugin,
   createIndentPlugin,
   createIndentListPlugin,
+  createTablePlugin,
 } from '@udecode/plate'
 import { ReactEditor } from 'slate-react'
 import {
@@ -52,6 +53,7 @@ export const plugins = [
   // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
   createNodeIdPlugin(),
   createSlashPlugin(),
+  createTablePlugin(),
 ]
 
 const isNodeActive = (editor, type) => {
