@@ -25,6 +25,7 @@ import {
 import { useResize } from '../hooks/use-resize'
 import OverflowMenu from './plate-ui/overflow-menu'
 import { useToolbarContext } from '../toolbar/toolbar-provider'
+import { TableDropdownMenu } from './plate-ui/table-dropdown-menu'
 
 export type ToolbarItem = {
   label: string
@@ -87,6 +88,10 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   codeBlock: {
     label: 'Code Block',
     Component: <CodeBlockToolbarButton />,
+  },
+  table: {
+    label: 'Table',
+    Component: <TableDropdownMenu />,
   },
   raw: {
     label: 'Raw Markdown',
