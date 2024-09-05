@@ -126,7 +126,7 @@ export default function FixedToolbarButtons() {
         }}
       >
         <>
-          {toolbarItemsArray.slice(0, itemsShown).map((item, index) => (
+          {toolbarItemsArray.slice(0, itemsShown).map((item, _) => (
             <React.Fragment key={item.label}>{item.Component}</React.Fragment>
           ))}
           {toolbarItemsArray.length > itemsShown && (
