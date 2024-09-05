@@ -141,6 +141,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
     input.onChange(value)
   }, [value, input, optionSets])
 
+  // Assign list of options to filteredOptionsList when list of options is fetched/updated
   React.useEffect(() => {
     if (field.experimental___filter && optionSets.length > 0) {
       setFilteredOptionsList(field.experimental___filter(optionSets, undefined))
