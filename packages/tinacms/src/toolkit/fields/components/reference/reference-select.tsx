@@ -123,14 +123,6 @@ const getFilename = (optionSets: OptionSet[], value: string): string | null => {
   return node ? node._internalSys.filename : null
 }
 
-// function to filter the options based on the search value
-const filterBySearch = (value: string, search: string): number => {
-  // Replace / in the file path with an empty string to make it searchable
-  return value.toLowerCase().replace(/\//g, '').includes(search.toLowerCase())
-    ? 1
-    : 0
-}
-
 const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   cms,
   input,
@@ -149,9 +141,12 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
     input.onChange(value)
   }, [value, input, optionSets])
 
+  // Assign list of options to filteredOptionsList when list of options is fetched/updated
   React.useEffect(() => {
     if (field.experimental___filter && optionSets.length > 0) {
       setFilteredOptionsList(field.experimental___filter(optionSets, undefined))
+    } else {
+      setFilteredOptionsList(optionSets)
     }
   }, [optionSets, field.experimental___filter])
 
