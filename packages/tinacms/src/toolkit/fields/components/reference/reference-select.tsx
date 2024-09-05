@@ -152,6 +152,8 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   React.useEffect(() => {
     if (field.experimental___filter && optionSets.length > 0) {
       setFilteredOptionsList(field.experimental___filter(optionSets, undefined))
+    } else {
+      setFilteredOptionsList(optionSets)
     }
   }, [optionSets, field.experimental___filter])
 
