@@ -123,14 +123,6 @@ const getFilename = (optionSets: OptionSet[], value: string): string | null => {
   return node ? node._internalSys.filename : null
 }
 
-// function to filter the options based on the search value
-const filterBySearch = (value: string, search: string): number => {
-  // Replace / in the file path with an empty string to make it searchable
-  return value.toLowerCase().replace(/\//g, '').includes(search.toLowerCase())
-    ? 1
-    : 0
-}
-
 const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   cms,
   input,
