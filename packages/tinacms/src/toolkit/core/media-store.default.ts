@@ -158,6 +158,7 @@ export class TinaMediaStore implements MediaStore {
           }
         }
 
+        const now = Date.now()
         while (true) {
           // sleep for 1 second
           await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -170,6 +171,10 @@ export class TinaMediaStore implements MediaStore {
               // success
               break
             }
+          }
+
+          if (Date.now() - now > 30000) {
+            throw new Error('Time out waiting for upload to complete')
           }
         }
 
