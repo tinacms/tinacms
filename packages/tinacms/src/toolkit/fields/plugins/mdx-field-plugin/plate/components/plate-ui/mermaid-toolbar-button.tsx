@@ -20,7 +20,7 @@ import { helpers } from '../../plugins/core/common'
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
 
 // TODO: Move this to transform utils
-export const insertMermaid = (editor: PlateEditor) => {
+export const insertEmptyMermaid = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
     node.type === getPluginType(editor, ELEMENT_MERMAID)
 

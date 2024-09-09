@@ -73,6 +73,7 @@ export function stringifyProps(
     directiveType = 'block'
   }
   useDirective = !!template.match
+  // biome-ignore lint/complexity/noForEach: <explanation>
   Object.entries(element.props).forEach(([name, value]) => {
     if (typeof template === 'string') {
       throw new Error(`Unable to find template for JSX element ${name}`)
@@ -200,6 +201,7 @@ export function stringifyProps(
         if (field.list) {
           throw new Error(`Rich-text list is not supported`)
         } else {
+          console.log('RICH-TEXT StringifyProps', value)
           const joiner = flatten ? ' ' : '\n'
           let val = ''
           assertShape<Plate.RootElement>(

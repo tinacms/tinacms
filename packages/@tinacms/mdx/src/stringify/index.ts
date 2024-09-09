@@ -152,6 +152,8 @@ export const rootElement = (
   const children: Md.Content[] = []
   content.children?.forEach((child) => {
     const value = blockElement(child, field, imageCallback)
+    console.error('VALUE FROM blockElement', value)
+
     if (value) {
       children.push(value)
     }
@@ -167,6 +169,9 @@ export const blockElement = (
   field: RichTextType,
   imageCallback: (url: string) => string
 ): Md.Content | null => {
+  console.log('BLOCK ELEMENT', content)
+  console.log("Shouldn't be called after mermaid check")
+
   switch (content.type) {
     case 'h1':
     case 'h2':
@@ -196,6 +201,12 @@ export const blockElement = (
       return {
         type: 'paragraph',
         children: eat(content.children, field, imageCallback),
+      }
+    case 'mermaid':
+      return {
+        type: 'code',
+        lang: 'mermaid',
+        value: content.value,
       }
     case 'code_block':
       return {
@@ -312,6 +323,7 @@ export const blockElement = (
         ],
       }
     default:
+      console.error('blockElement: content.type', content.type)
       throw new Error(`BlockElement: ${content.type} is not yet supported`)
   }
 }

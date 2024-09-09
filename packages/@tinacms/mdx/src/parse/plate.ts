@@ -127,6 +127,16 @@ export type ParagraphElement = {
 }
 
 /**
+ * @group MermaidElement
+ * TODO: REMOVE THIS
+ */
+export type MermaidElement = {
+  type: 'mermaid'
+  value: string
+  children: [EmptyTextElement]
+}
+
+/**
  * @group BlockElement
  */
 export type BlockElement =
@@ -140,6 +150,7 @@ export type BlockElement =
   | ListItemElement
   | MdxBlockElement
   | ParagraphElement
+  | MermaidElement
   | OrderedListElement
   | UnorderedListElement
 

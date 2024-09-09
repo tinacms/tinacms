@@ -211,9 +211,13 @@ export function stringifyProps(
             `Unexpected string for rich-text, ensure the value has been properly parsed`
           )
         }
+        console.log('Stringifying rich-text')
+
         if (field.list) {
           throw new Error(`Rich-text list is not supported`)
         } else {
+          console.log('Stringifying rich-text - NOT LIST')
+
           const joiner = flatten ? ' ' : '\n'
           let val = ''
           // The rich-text editor can sometimes pass an empty value {}, consider that nullable
@@ -243,6 +247,7 @@ export function stringifyProps(
                 .map((str) => `  ${str.trim()}`)
                 .join(joiner)
             }
+            console.log('Stringifying rich-text - NOT LIST - STRING VALUE', val)
           }
           if (flatten) {
             attributes.push({
