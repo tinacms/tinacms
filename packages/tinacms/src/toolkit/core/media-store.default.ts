@@ -414,9 +414,39 @@ export class TinaMediaStore implements MediaStore {
     }`
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
-        await this.api.authProvider.fetchWithToken(`${this.url}/${path}`, {
-          method: 'DELETE',
-        })
+        const res = await this.api.authProvider.fetchWithToken(
+          `${this.url}/${path}`,
+          {
+            method: 'DELETE',
+          }
+        )
+        if (res.status == 200) {
+          const { requestId } = await res.json()
+
+          const now = Date.now()
+          while (true) {
+            // sleep for 1 second
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+
+            const { error, message } = await this.api.getRequestStatus(
+              requestId
+            )
+            if (error !== undefined) {
+              if (error) {
+                throw new Error(message)
+              } else {
+                // success
+                break
+              }
+            }
+
+            if (Date.now() - now > 30000) {
+              throw new Error('Time out waiting for upload to complete')
+            }
+          }
+        } else {
+          throw new Error('Unexpected error deleting media asset')
+        }
       } else {
         throw E_UNAUTHORIZED
       }
