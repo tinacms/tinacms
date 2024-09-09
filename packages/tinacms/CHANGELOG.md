@@ -1,5 +1,11 @@
 # tinacms
 
+## 2.2.3
+
+### Patch Changes
+
+- 367faed: fix reference field search
+
 ## 2.2.2
 
 ### Patch Changes
