@@ -7,35 +7,11 @@ import { CodeBlock } from '../../plugins/ui/code-block'
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
 
 export const MermaidElement = withRef<typeof PlateElement>(
-  ({ children, nodeProps, ...props }, ref) => {
+  ({ children, nodeProps, element, ...props }, ref) => {
     const [isEditing, setIsEditing] = React.useState(false)
-    //! TODO: Remove this hardcoded value
-    const [mermaidConfig, setMermaidConfig] = React.useState(`
-              ---
-              config:
-                theme: dark
-              ---
-              classDiagram
-                Animal <|-- Duck
-                Animal <|-- Fish
-                Animal <|-- Zebra
-                Animal : +int age
-                Animal : +String gender
-                Animal: +isMammal()
-                Animal: +mate()
-                class Duck{
-                  +String beakColor
-                  +swim()
-                  +quack()
-                }
-                class Fish{
-                  -int sizeInFeet
-                  -canEat()
-                }
-                class Zebra{
-                  +bool is_wild
-                  +run()
-                }`)
+    const [mermaidConfig, setMermaidConfig] = React.useState(
+      element.value || ''
+    )
 
     const node = {
       type: ELEMENT_MERMAID,
@@ -44,7 +20,7 @@ export const MermaidElement = withRef<typeof PlateElement>(
     }
 
     return (
-      <PlateElement ref={ref} {...props}>
+      <PlateElement element={element} ref={ref} {...props}>
         <div className="relative">
           <div className="absolute top-2 right-2 z-10">
             <PencilIcon

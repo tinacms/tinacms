@@ -141,11 +141,11 @@ export const Components = () => {
         {...props}
       />
     ),
+    [ELEMENT_MERMAID]: MermaidElement,
     [ELEMENT_BLOCKQUOTE]: BlockquoteElement,
     [ELEMENT_CODE_BLOCK]: CodeBlockElement,
     [ELEMENT_CODE_LINE]: CodeLineElement,
     [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,
-    [ELEMENT_MERMAID]: MermaidElement,
     html: ({ attributes, editor, element, children, className }) => {
       return (
         <div

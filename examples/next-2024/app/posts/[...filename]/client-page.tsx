@@ -1,6 +1,8 @@
 'use client'
 import type { PostQuery } from '@/tina/__generated__/types'
 import { useTina } from 'tinacms/dist/react'
+import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import mermaid from 'mermaid'
 
 interface ClientPageProps {
   query: string
@@ -18,8 +20,25 @@ export default function Post(props: ClientPageProps) {
     data: props.data,
   })
   return (
-    <code>
-      <pre>{JSON.stringify(data.post, null, 2)}</pre>
-    </code>
+    <>
+      <TinaMarkdown
+        content={data.post.body}
+        components={{
+          mermaid(props) {
+            console.log(props)
+
+            mermaid.initialize({
+              startOnLoad: true,
+            })
+            ;<pre className="bg-blue-300">
+              <code>{props?.value}</code>
+            </pre>
+          },
+        }}
+      />
+      <code>
+        <pre>{JSON.stringify(data.post, null, 2)}</pre>
+      </code>
+    </>
   )
 }

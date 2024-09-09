@@ -25,6 +25,7 @@ type BaseComponents = {
   lic?: { children: JSX.Element }
   block_quote?: { children: JSX.Element }
   code_block?: { lang?: string; value: string }
+  mermaid?: { value: string }
   img?: { url: string; caption?: string; alt?: string }
   hr?: {}
   break?: {}
@@ -290,6 +291,7 @@ const Node = ({ components, child }) => {
           <TinaMarkdown components={components} content={children} />
         </a>
       )
+    case 'mermaid':
     case 'code_block':
       const value = child.value
       if (components[child.type]) {
