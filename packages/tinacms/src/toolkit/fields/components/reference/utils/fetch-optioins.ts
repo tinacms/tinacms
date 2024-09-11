@@ -2,9 +2,9 @@ export const mockFilters: FilterRecord = {
   author: {
     name: 'Napolean2',
   },
-  // post: {
-  //     title: "hello world",
-  // }
+  post: {
+    title: 'hello world',
+  },
 }
 
 // export const emptyMockFilters: FilterRecord = {
@@ -15,6 +15,7 @@ export const mockFilters: FilterRecord = {
 
 export type FilterRecord = Record<string, Record<string, any>>
 
+//TODO: only support eq filter
 export const buildFilter = (
   filter: Record<string, any>,
   collection: string
