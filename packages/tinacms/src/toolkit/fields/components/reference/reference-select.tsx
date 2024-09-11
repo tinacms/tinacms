@@ -17,6 +17,7 @@ import type {
   InternalSys,
   ReferenceFieldProps,
 } from './model/reference-field-props'
+import { buildFilter, FilterRecord, mockFilters } from './utils/fetch-optioins'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
@@ -48,20 +49,31 @@ interface Response {
   }
 }
 
-const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
+//TODO: Filter can be nullable
+const useGetOptionSets = (
+  cms: TinaCMS,
+  collections: string[],
+  filters?: FilterRecord | undefined // Record of filters, keyed by collection
+) => {
   const [optionSets, setOptionSets] = React.useState<OptionSet[]>([])
   const [loading, setLoading] = React.useState(true)
-
+  console.log('collections', collections)
   React.useEffect(() => {
     const fetchOptionSets = async () => {
       const optionSets = await Promise.all(
         collections.map(async (collection) => {
           try {
+            //TODO: Risk expose  Nullable exception
+            const filter = filters[collection]
+              ? buildFilter(filters[collection], collection)
+              : null
+            console.log('filter', filter)
+            // filter: {  author: { name: { eq: "Napolean" }}}
             const response: Response = await cms.api.tina.request(
               `#graphql
-            query ($collection: String!){
+            query ($collection: String!, $filter: DocumentFilter) {
               collection(collection: $collection) {
-                documents(first: -1) {
+                documents(first: -1, filter: $filter) {
                   edges {
                     node {
                       ...on Node {
@@ -80,7 +92,12 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
               }
             }
             `,
-              { variables: { collection } }
+              {
+                variables: {
+                  collection,
+                  filter,
+                },
+              }
             )
 
             return {
@@ -95,7 +112,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
           }
         })
       )
-
+      console.log('optionSets', optionSets)
       setOptionSets(optionSets)
       setLoading(false)
     }
@@ -132,7 +149,11 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   const [value, setValue] = React.useState<string | null>(input.value)
   //Store display text for selected option
   const [displayText, setDisplayText] = React.useState<string | null>(null)
-  const { optionSets, loading } = useGetOptionSets(cms, field.collections)
+  const { optionSets, loading } = useGetOptionSets(
+    cms,
+    field.collections,
+    mockFilters
+  )
   const [filteredOptionsList, setFilteredOptionsList] =
     React.useState<OptionSet[]>(optionSets)
 
