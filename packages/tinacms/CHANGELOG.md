@@ -1,5 +1,27 @@
 # tinacms
 
+## 2.2.3
+
+### Patch Changes
+
+- 367faed: fix reference field search
+
+## 2.2.2
+
+### Patch Changes
+
+- 6ccda6c: ⚗️ Experimental - added reference field filter
+  Note: this will be deprecated in the near future for a more robust soution
+- 33eaa81: Minor code refactor in reference field selector
+- f59d67b: Media Manager - Make active item disappear on navigation and refresh
+- daeeebf: Fix issue where clicking Search in the admin UI resulted in a redirect instead of loading the search results
+- 27bfe84: CLI - Adds client caching and cli flag to disable: --no-client-build-cache
+- Updated dependencies [6ccda6c]
+- Updated dependencies [33eaa81]
+  - @tinacms/schema-tools@1.6.2
+  - @tinacms/mdx@1.4.2
+  - @tinacms/search@1.0.28
+
 ## 2.2.1
 
 ### Patch Changes

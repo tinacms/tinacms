@@ -1,6 +1,6 @@
 {
 	"name": "e2e-next",
-	"version": "0.1.74",
+	"version": "0.1.76",
 	"private": true,
 	"scripts": {
 		"dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
@@ -39,7 +39,7 @@
 		"eslint": "8.24.0",
 		"eslint-config-next": "^13.4.7",
 		"postcss": "^8.4.39",
-		"puppeteer": "^18.0.5",
+		"puppeteer": "^23.2.1",
 		"tailwindcss": "^3.2.7",
 		"typescript": "^5.5.4",
 		"vite": "^4.3.9",

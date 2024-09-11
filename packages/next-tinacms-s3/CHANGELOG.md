@@ -1,5 +1,24 @@
 # next-tinacms-s3
 
+## 5.0.3
+
+### Patch Changes
+
+- Updated dependencies [367faed]
+  - tinacms@2.2.3
+
+## 5.0.2
+
+### Patch Changes
+
+- b33d525: Populate ContentType in the Headers sent to s3
+- Updated dependencies [6ccda6c]
+- Updated dependencies [33eaa81]
+- Updated dependencies [f59d67b]
+- Updated dependencies [daeeebf]
+- Updated dependencies [27bfe84]
+  - tinacms@2.2.2
+
 ## 5.0.1
 
 ### Patch Changes

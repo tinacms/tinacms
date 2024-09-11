@@ -1,5 +1,33 @@
 # tinacms-cli
 
+## 1.6.3
+
+### Patch Changes
+
+- Updated dependencies [367faed]
+  - tinacms@2.2.3
+  - @tinacms/app@2.1.3
+
+## 1.6.2
+
+### Patch Changes
+
+- acf8430: Add rollup option to ignore "MODULE_LEVEL_DIRECTIVE"
+- 110f1ce: Fix tina-lock.json to not include search configuration, including search indexer token
+- 27bfe84: CLI - Adds client caching and cli flag to disable: --no-client-build-cache
+- Updated dependencies [6ccda6c]
+- Updated dependencies [33eaa81]
+- Updated dependencies [f088b97]
+- Updated dependencies [f59d67b]
+- Updated dependencies [daeeebf]
+- Updated dependencies [27bfe84]
+  - tinacms@2.2.2
+  - @tinacms/schema-tools@1.6.2
+  - @tinacms/graphql@1.5.2
+  - @tinacms/app@2.1.2
+  - @tinacms/search@1.0.28
+  - @tinacms/metrics@1.0.5
+
 ## 1.6.1
 
 ### Patch Changes

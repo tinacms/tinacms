@@ -12,11 +12,16 @@ export interface InternalSys {
   filename: string
   path: string
 }
-export interface ReferenceFieldProps {
+
+type ReferenceFieldOptions = {
+  optionComponent?: OptionComponent
+  experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>
+}
+
+export interface ReferenceFieldProps extends ReferenceFieldOptions {
   label?: string
   name: string
   component: string
   collections: string[]
   options: (Option | string)[]
-  optionComponent: OptionComponent
 }

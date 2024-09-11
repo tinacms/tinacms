@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 1.5.2
+
+### Patch Changes
+
+- f088b97: Fix vulnerable packages - Update Nodemon from version `2.0.19` to `3.1.4`
+- Updated dependencies [6ccda6c]
+- Updated dependencies [33eaa81]
+  - @tinacms/schema-tools@1.6.2
+  - @tinacms/mdx@1.4.2
+
 ## 1.5.1
 
 ### Patch Changes

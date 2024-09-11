@@ -1,6 +1,6 @@
 {
 	"name": "tinacms",
-	"version": "2.2.1",
+	"version": "2.2.3",
 	"main": "dist/index.js",
 	"module": "./dist/index.mjs",
 	"exports": {
@@ -13,6 +13,11 @@
 			"types": "./dist/client.d.ts",
 			"import": "./dist/client.mjs",
 			"require": "./dist/client.js"
+		},
+		"./dist/cache": {
+			"types": "./dist/cache.d.ts",
+			"import": "./dist/cache.mjs",
+			"require": "./dist/cache.js"
 		},
 		"./dist/edit-state": {
 			"types": "./dist/edit-state.d.ts",
@@ -44,7 +49,8 @@
 			"src/rich-text/index.tsx",
 			"src/rich-text/prism.tsx",
 			"src/react.tsx",
-			"src/client.ts"
+			"src/client.ts",
+			"src/cache.ts"
 		]
 	},
 	"typings": "dist/index.d.ts",
