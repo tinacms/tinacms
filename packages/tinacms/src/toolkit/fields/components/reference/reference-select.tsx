@@ -63,10 +63,9 @@ const useGetOptionSets = (
       const optionSets = await Promise.all(
         collections.map(async (collection) => {
           try {
-            //TODO: Risk expose  Nullable exception
-            const filter = filters[collection]
+            const filter = filters
               ? buildFilter(filters[collection], collection)
-              : null
+              : {}
             console.log('filter', filter)
             // filter: {  author: { name: { eq: "Napolean" }}}
             const response: Response = await cms.api.tina.request(
@@ -149,11 +148,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   const [value, setValue] = React.useState<string | null>(input.value)
   //Store display text for selected option
   const [displayText, setDisplayText] = React.useState<string | null>(null)
-  const { optionSets, loading } = useGetOptionSets(
-    cms,
-    field.collections,
-    mockFilters
-  )
+  const { optionSets, loading } = useGetOptionSets(cms, field.collections)
   const [filteredOptionsList, setFilteredOptionsList] =
     React.useState<OptionSet[]>(optionSets)
 
