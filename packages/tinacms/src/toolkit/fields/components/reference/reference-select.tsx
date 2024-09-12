@@ -112,7 +112,6 @@ const useGetOptionSets = (
           }
         })
       )
-      console.log('optionSets', optionSets)
       setOptionSets(optionSets)
       setLoading(false)
     }
@@ -123,6 +122,7 @@ const useGetOptionSets = (
       setOptionSets([])
     }
   }, [cms, collections])
+  console.log('new optionSets', optionSets)
 
   return { optionSets, loading }
 }

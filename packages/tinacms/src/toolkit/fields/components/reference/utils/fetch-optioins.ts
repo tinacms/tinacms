@@ -1,17 +1,11 @@
 export const mockFilters: FilterRecord = {
   author: {
-    name: 'Napolean2',
+    name: 'Napolean',
   },
   post: {
     title: 'hello world',
   },
 }
-
-// export const emptyMockFilters: FilterRecord = {
-//     author: {
-//         name: "Napolean2",
-//     },
-// };
 
 export type FilterRecord = Record<string, Record<string, any>>
 
