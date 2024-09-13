@@ -2,4 +2,4 @@
 'tinacms': patch
 ---
 
-enable / in search
+enable / in search for reference field selection component
