@@ -64,7 +64,6 @@ const useGetOptionSets = (
             const filter = filters
               ? filterQueryBuilder(filters[collection], collection)
               : {}
-            // filter: {  author: { name: { eq: "Napolean" }}}
             const response: Response = await cms.api.tina.request(
               `#graphql
             query ($collection: String!, $filter: DocumentFilter) {
