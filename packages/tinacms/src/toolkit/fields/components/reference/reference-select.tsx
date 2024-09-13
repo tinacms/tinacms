@@ -176,14 +176,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
           <Command
             shouldFilter={!field.experimental___filter}
             filter={(value, search) => {
-              //Replace / in the file path with empty string to make it searchable
-              if (
-                value
-                  .toLowerCase()
-                  .replace(/\//g, '')
-                  .includes(search.toLowerCase())
-              )
-                return 1
+              if (value.toLowerCase().includes(search.toLowerCase())) return 1
               return 0
             }}
           >
