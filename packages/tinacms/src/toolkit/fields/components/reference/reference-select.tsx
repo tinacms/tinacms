@@ -17,7 +17,11 @@ import type {
   InternalSys,
   ReferenceFieldProps,
 } from './model/reference-field-props'
-import { buildFilter, FilterRecord, mockFilters } from './utils/fetch-optioins'
+import {
+  filterQueryBuilder,
+  CollectionFilters,
+  mockFilters,
+} from './utils/fetch-optioins'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
@@ -53,7 +57,7 @@ interface Response {
 const useGetOptionSets = (
   cms: TinaCMS,
   collections: string[],
-  filters?: FilterRecord | undefined // Record of filters, keyed by collection
+  filters?: CollectionFilters | undefined // Record of filters, keyed by collection
 ) => {
   const [optionSets, setOptionSets] = React.useState<OptionSet[]>([])
   const [loading, setLoading] = React.useState(true)
@@ -64,7 +68,7 @@ const useGetOptionSets = (
         collections.map(async (collection) => {
           try {
             const filter = filters
-              ? buildFilter(filters[collection], collection)
+              ? filterQueryBuilder(filters[collection], collection)
               : {}
             console.log('filter', filter)
             // filter: {  author: { name: { eq: "Napolean" }}}

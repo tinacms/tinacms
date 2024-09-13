@@ -1,24 +1,28 @@
-export const mockFilters: FilterRecord = {
+export const mockFilters: CollectionFilters = {
   author: {
     name: 'Napolean',
+    description: 'something',
   },
   post: {
     title: 'hello world',
   },
 }
 
-export type FilterValue = string // extend this type if needed for now filter value is only string
-export type FilterRecord = Record<string, Record<string, FilterValue>>
+export type FilterValue = string // extend this type if needed
+export type CollectionFilters = Record<string, Record<string, string>>
 
-//TODO: only support eq filter
-export const buildFilter = (
-  filter: Record<string, FilterValue>,
+//Currently only support eq for filter, this function will loop thorugh the record and build the filter query
+export const filterQueryBuilder = (
+  fieldFilterConfig: Record<string, FilterValue>,
   collection: string
 ) => {
   return {
-    [collection]: Object.entries(filter).reduce((acc, [key, value]) => {
-      acc[key] = { eq: value }
-      return acc
-    }, {} as Record<string, Record<string, FilterValue>>),
+    [collection]: Object.entries(fieldFilterConfig).reduce(
+      (acc, [key, value]) => {
+        acc[key] = { eq: value }
+        return acc
+      },
+      {} as Record<string, Record<string, FilterValue>>
+    ),
   }
 }
