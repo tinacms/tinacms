@@ -57,7 +57,6 @@ const useGetOptionSets = (
 ) => {
   const [optionSets, setOptionSets] = React.useState<OptionSet[]>([])
   const [loading, setLoading] = React.useState(true)
-  console.log('collections', collections)
   React.useEffect(() => {
     const fetchOptionSets = async () => {
       const optionSets = await Promise.all(
@@ -158,7 +157,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
     setDisplayText(getFilename(optionSets, value))
     input.onChange(value)
   }, [value, input, optionSets])
-  console.log('field', field)
+
   // Assign list of options to filteredOptionsList when list of options is fetched/updated
   React.useEffect(() => {
     if (field.experimental___filter && optionSets.length > 0) {
