@@ -1,3 +1,5 @@
+import { CollectionFilters } from '../utils/fetch-optioins'
+
 export type Option = {
   value: string
   label: string
@@ -16,7 +18,7 @@ export interface InternalSys {
 type ReferenceFieldOptions = {
   optionComponent?: OptionComponent
   experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>
-  collectionFilter?: Record<string, Record<string, string>>
+  collectionFilter?: CollectionFilters
 }
 
 export interface ReferenceFieldProps extends ReferenceFieldOptions {

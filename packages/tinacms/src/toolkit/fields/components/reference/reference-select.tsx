@@ -52,7 +52,7 @@ interface Response {
 const useGetOptionSets = (
   cms: TinaCMS,
   collections: string[],
-  filters?: CollectionFilters | undefined // Record of filters, keyed by collection
+  collectionFilter?: CollectionFilters | undefined // Record of filters, keyed by collection
 ) => {
   const [optionSets, setOptionSets] = React.useState<OptionSet[]>([])
   const [loading, setLoading] = React.useState(true)
@@ -61,9 +61,13 @@ const useGetOptionSets = (
       const optionSets = await Promise.all(
         collections.map(async (collection) => {
           try {
-            const filter = filters
-              ? filterQueryBuilder(filters[collection], collection)
+            const filter = collectionFilter
+              ? filterQueryBuilder(collectionFilter[collection], collection)
               : {}
+            console.log('collection', collection)
+
+            console.log('filter', filter)
+
             const response: Response = await cms.api.tina.request(
               `#graphql
             query ($collection: String!, $filter: DocumentFilter) {
