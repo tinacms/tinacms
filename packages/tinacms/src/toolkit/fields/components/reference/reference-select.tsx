@@ -49,7 +49,6 @@ interface Response {
   }
 }
 
-//TODO: Filter can be nullable
 const useGetOptionSets = (
   cms: TinaCMS,
   collections: string[],
