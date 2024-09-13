@@ -216,6 +216,7 @@ export type ImageField = (
 type ReferenceFieldOptions = {
   optionComponent?: OptionComponent
   experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>
+  collectionFilter?: Record<string, Record<string, string>>
 }
 
 type OptionComponent<P = Record<string, unknown>, S = Document['_sys']> = (

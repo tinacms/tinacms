@@ -8,30 +8,6 @@ const referenceField = {
   name: 'author',
   type: 'reference',
   ui: {
-    // experimental___filter(list, searchQuery) {
-    //   if (!searchQuery) {
-    //     return [list[0]]
-    //   }
-
-    //   const filteredListZeroEdges = list[0].edges?.filter((item) => {
-    //     console.log('item', item)
-
-    //     if (
-    //       item.node._values.name
-    //         .toLowerCase()
-    //         .includes(searchQuery?.toLowerCase())
-    //     ) {
-    //       return item
-    //     }
-    //   })
-
-    //   return [
-    //     {
-    //       collection: list[0].collection,
-    //       edges: filteredListZeroEdges,
-    //     },
-    //   ]
-    // },
     optionComponent: (values: CollectionProps, s: InternalSys) => {
       switch (values._collection) {
         case COLLECTIONS.AUTHOR:
@@ -48,6 +24,14 @@ const referenceField = {
         default:
           return s.path
       }
+    },
+    collectionFilter: {
+      author: {
+        name: 'Napolean',
+      },
+      post: {
+        title: 'hello world',
+      },
     },
   },
   collections: ['author', 'post'],

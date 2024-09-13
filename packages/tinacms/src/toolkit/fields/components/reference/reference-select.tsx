@@ -17,11 +17,7 @@ import type {
   InternalSys,
   ReferenceFieldProps,
 } from './model/reference-field-props'
-import {
-  filterQueryBuilder,
-  CollectionFilters,
-  mockFilters,
-} from './utils/fetch-optioins'
+import { CollectionFilters, filterQueryBuilder } from './utils/fetch-optioins'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
@@ -70,7 +66,6 @@ const useGetOptionSets = (
             const filter = filters
               ? filterQueryBuilder(filters[collection], collection)
               : {}
-            console.log('filter', filter)
             // filter: {  author: { name: { eq: "Napolean" }}}
             const response: Response = await cms.api.tina.request(
               `#graphql
@@ -125,7 +120,6 @@ const useGetOptionSets = (
       setOptionSets([])
     }
   }, [cms, collections])
-  console.log('new optionSets', optionSets)
 
   return { optionSets, loading }
 }
@@ -155,7 +149,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   const { optionSets, loading } = useGetOptionSets(
     cms,
     field.collections,
-    mockFilters
+    field.collectionFilter
   )
   const [filteredOptionsList, setFilteredOptionsList] =
     React.useState<OptionSet[]>(optionSets)
@@ -164,7 +158,7 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
     setDisplayText(getFilename(optionSets, value))
     input.onChange(value)
   }, [value, input, optionSets])
-
+  console.log('field', field)
   // Assign list of options to filteredOptionsList when list of options is fetched/updated
   React.useEffect(() => {
     if (field.experimental___filter && optionSets.length > 0) {

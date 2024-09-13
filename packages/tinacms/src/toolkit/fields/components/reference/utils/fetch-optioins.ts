@@ -1,13 +1,3 @@
-export const mockFilters: CollectionFilters = {
-  author: {
-    name: 'Napolean',
-    description: 'something',
-  },
-  post: {
-    title: 'hello world',
-  },
-}
-
 export type FilterValue = string // extend this type if needed
 export type CollectionFilters = Record<string, Record<string, string>>
 
