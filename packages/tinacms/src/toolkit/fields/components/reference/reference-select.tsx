@@ -64,9 +64,6 @@ const useGetOptionSets = (
             const filter = collectionFilter
               ? filterQueryBuilder(collectionFilter[collection], collection)
               : {}
-            console.log('collection', collection)
-
-            console.log('filter', filter)
 
             const response: Response = await cms.api.tina.request(
               `#graphql
