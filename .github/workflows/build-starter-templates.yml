@@ -1,0 +1,47 @@
+name: Build TinaCMS Starter Templates
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package-manager: [yarn, npm, pnpm]
+        template-repo:
+          - nextjs: https://github.com/tinacms/tina-cloud-starter
+          - hugo: https://github.com/tinacms/tina-hugo-starter
+          - remix: https://github.com/tinacms/tina-remix-starter
+          - documentation: https://github.com/tinacms/demo-docs
+          - docusaurus: https://github.com/tinacms/tinasaurus
+          - barebones: https://github.com/tinacms/tina-barebones-starter
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Clone the template repository
+        run: |
+          git clone ${{ matrix.template-repo }} template-repo
+        working-directory: ./
+
+      - name: Install dependencies
+        run: |
+          cd template-repo
+          if [ "${{ matrix.package-manager }}" == "pnpm" ]; then
+            npm install -g pnpm
+          fi 
+          ${{ matrix.package-manager }} install
+
+      - name: Run build
+        run: |
+          cd template-repo
+          ${{ matrix.package-manager }} run build
+
