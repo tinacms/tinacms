@@ -61,7 +61,7 @@ export class TinaClient<GenQueries> {
     }
     try {
       if (this.cacheDir && typeof require !== 'undefined') {
-        const fs = await import('fs')
+        const fs = require('fs')
         if (fs && fs.promises) {
           const { NodeCache } = await import('../cache/node-cache')
           this.cache = NodeCache(this.cacheDir, fs)
