@@ -35,6 +35,7 @@ export class TinaClient<GenQueries> {
   public readonlyToken?: string
   public queries: GenQueries
   public errorPolicy: Config['client']['errorPolicy']
+  cacheDir: string
   cache: Cache
   constructor({
     token,
@@ -47,11 +48,22 @@ export class TinaClient<GenQueries> {
     this.readonlyToken = token?.trim()
     this.queries = queries(this)
     this.errorPolicy = errorPolicy || 'throw'
+    this.cacheDir = cacheDir || ''
 
-    // if we're in node, use the fs cache
-    if (cacheDir && typeof require !== 'undefined') {
-      const { NodeCache } = require('tinacms/dist/cache')
-      this.cache = NodeCache(cacheDir, require('fs'))
+    // // if we're in node, use the fs cache
+    // if (cacheDir && typeof require !== 'undefined') {
+    //   import('tinacms/dist/cache').then((mod) => [
+    //     (this.cache = mod.NodeCache(cacheDir, require('fs'))),
+    //   ])
+    //   // const { NodeCache } = require('tinacms/dist/cache')
+    //   // this.cache = NodeCache(cacheDir, require('fs'))
+    // }
+  }
+
+  async init() {
+    if (!this.cache && this.cacheDir && typeof require !== 'undefined') {
+      const { NodeCache } = await import('../cache/node-cache')
+      this.cache = NodeCache(this.cacheDir, await import('fs'))
     }
   }
 
@@ -59,6 +71,7 @@ export class TinaClient<GenQueries> {
     { errorPolicy, ...args }: TinaClientRequestArgs,
     options: { fetchOptions?: Parameters<typeof fetch>[1] }
   ) {
+    await this.init()
     const errorPolicyDefined = errorPolicy || this.errorPolicy
     const headers = new HeadersDefined()
     if (this.readonlyToken) {
