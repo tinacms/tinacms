@@ -6,12 +6,31 @@ const makeKey = (key: any) => {
   return createHash('sha256').update(input).digest('hex')
 }
 
-export const NodeCache = (dir: string, fs: any): Cache => {
+// makeCacheDir creates the cache directory if it doesn't exist
+const makeCacheDir = (dir: string, fs: any) => {
+  const path = require('path')
+  const os = require('os')
+
+  const parts = dir.split(path.sep)
+
+  let cacheDir = dir
+  // check if the root directory exists, if not then create create in tmp and return new path
+  if (!fs.existsSync(parts[0])) {
+    cacheDir = path.join(os.tmpdir(), parts[0])
+  }
+
+  fs.mkdirSync(cacheDir, { recursive: true })
+  return cacheDir
+}
+
+export const NodeCache = (dir: string): Cache => {
+  const fs = require('fs')
+  const cacheDir = makeCacheDir(dir, fs)
   return {
     makeKey,
     get: async (key: string) => {
       try {
-        const data = await fs.promises.readFile(`${dir}/${key}`, 'utf-8')
+        const data = await fs.promises.readFile(`${cacheDir}/${key}`, 'utf-8')
         return JSON.parse(data)
       } catch (e) {
         if (e.code === 'ENOENT') {
@@ -21,9 +40,8 @@ export const NodeCache = (dir: string, fs: any): Cache => {
       }
     },
     set: async (key: string, value: any) => {
-      await fs.promises.mkdir(dir, { recursive: true })
       await fs.promises.writeFile(
-        `${dir}/${key}`,
+        `${cacheDir}/${key}`,
         JSON.stringify(value),
         'utf-8'
       )
