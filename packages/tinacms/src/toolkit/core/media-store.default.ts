@@ -158,7 +158,7 @@ export class TinaMediaStore implements MediaStore {
           }
         }
 
-        const now = Date.now()
+        const updateStartTime = Date.now()
         while (true) {
           // sleep for 1 second
           await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -173,7 +173,7 @@ export class TinaMediaStore implements MediaStore {
             }
           }
 
-          if (Date.now() - now > 30000) {
+          if (Date.now() - updateStartTime > 30000) {
             throw new Error('Time out waiting for upload to complete')
           }
         }
@@ -423,7 +423,7 @@ export class TinaMediaStore implements MediaStore {
         if (res.status == 200) {
           const { requestId } = await res.json()
 
-          const now = Date.now()
+          const deleteStartTime = Date.now()
           while (true) {
             // sleep for 1 second
             await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -440,8 +440,8 @@ export class TinaMediaStore implements MediaStore {
               }
             }
 
-            if (Date.now() - now > 30000) {
-              throw new Error('Time out waiting for upload to complete')
+            if (Date.now() - deleteStartTime > 30000) {
+              throw new Error('Time out waiting for delete to complete')
             }
           }
         } else {
