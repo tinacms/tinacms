@@ -2,27 +2,36 @@ import { Telemetry } from '@tinacms/metrics'
 import { Command } from 'commander'
 import prompts from 'prompts'
 import path from 'node:path'
-//@ts-ignore
 import { version, name } from '../package.json'
 import { isWriteable, makeDir, isFolderEmpty } from './util/fileUtil'
 import { install } from './util/install'
 import chalk from 'chalk'
 import { tryGitInit } from './util/git'
-import { exit } from 'node:process'
-import { EXAMPLES, downloadExample } from './examples'
+import { TEMPLATES, downloadTemplate } from './templates'
 import { preRunChecks } from './util/preRunChecks'
+
+const PKG_MANAGERS = ['yarn', 'npm', 'pnpm']
 
 const successText = chalk.bold.green
 const linkText = chalk.bold.cyan
 const cmdText = chalk.inverse
-
 const logText = chalk.italic.gray
 
-const program = new Command(name)
 let projectName = ''
+
+const program = new Command(name)
 program
   .version(version)
-  .option('-e, --example <example>', 'Choose which example to start from')
+  .option(
+    '-t, --template <template>',
+    `Choose which template to start from. Valid templates are: ${TEMPLATES.map(
+      (x) => x.value
+    )}`
+  )
+  .option(
+    '-p, --pkg-manager <pkg-manager>',
+    `Choose which package manager to use. Valid package managers are: ${PKG_MANAGERS}`
+  )
   .option('-d, --dir <dir>', 'Choose which directory to run this script from')
   .option('--noTelemetry', 'Disable anonymous telemetry that is collected')
   .arguments('[project-directory]')
@@ -33,6 +42,7 @@ program
 
 export const run = async () => {
   preRunChecks()
+
   program.parse(process.argv)
   const opts = program.opts()
   if (opts.dir) {
@@ -40,23 +50,41 @@ export const run = async () => {
   }
   const telemetry = new Telemetry({ disabled: opts?.noTelemetry })
 
-  let example = opts.example
+  let template = opts.template
+  if (template) {
+    template = TEMPLATES.find((_template) => _template.value === template)
+    if (!template) {
+      console.error(
+        `The provided template is invalid. Please provide one of the following: ${TEMPLATES.map(
+          (x) => x.value
+        )}`
+      )
+      throw new Error('Invalid template.')
+    }
+  }
 
-  const res = await prompts({
-    message: 'Which package manager would you like to use?',
-    name: 'packageManager',
-    type: 'select',
-    choices: [
-      { title: 'yarn', value: 'yarn' },
-      { title: 'npm', value: 'npm' },
-      { title: 'pnpm', value: 'pnpm' },
-    ],
-  })
+  let pkgManager = opts.pkgManager
+  if (pkgManager) {
+    if (!PKG_MANAGERS.find((_pkgManager) => _pkgManager === pkgManager)) {
+      console.error(
+        `The provided package manager is not supported. Please provide one of the following: ${PKG_MANAGERS}`
+      )
+      throw new Error('Invalid package manager.')
+    }
+  }
 
-  const packageManager = res.packageManager
-  const displayedCommand = packageManager
+  if (!pkgManager) {
+    const pkgManagerRes = await prompts({
+      message: 'Which package manager would you like to use?',
+      name: 'packageManager',
+      type: 'select',
+      choices: PKG_MANAGERS.map((manager) => {
+        return { title: manager, value: manager }
+      }),
+    })
+    pkgManager = pkgManagerRes.packageManager
+  }
 
-  // If there is no project name passed in the CLI ask for one
   if (!projectName) {
     const res = await prompts({
       name: 'name',
@@ -76,38 +104,25 @@ export const run = async () => {
   }
   const dirName = projectName
 
-  // If there is no --example passed thought the CLI
-  if (!example) {
-    const res = await prompts({
-      name: 'example',
+  if (!template) {
+    const templateRes = await prompts({
+      name: 'template',
       type: 'select',
       message: 'What starter code would you like to use?',
-      choices: EXAMPLES,
+      choices: TEMPLATES,
     })
-
-    if (typeof res.example !== 'string') {
-      console.error(chalk.red('Input must be a string'))
-      exit(1)
-    }
-    example = res.example
+    template = templateRes.template
   }
-  const chosenExample = EXAMPLES.find((x) => x.value === example)
 
-  if (!chosenExample) {
-    console.error(
-      `The example provided is not a valid example. Please provide one of the following; ${EXAMPLES.map(
-        (x) => x.value
-      )}`
-    )
-  }
   //TODO: Update this?
   await telemetry.submitRecord({
     event: {
       name: 'create-tina-app:invoke',
-      example,
-      useYarn: Boolean(res.packageManager === 'yarn'),
+      example: template,
+      useYarn: Boolean(pkgManager === 'yarn'),
     },
   })
+
   // Setup directory
   const root = path.join(process.cwd(), dirName)
 
@@ -130,42 +145,27 @@ export const run = async () => {
     process.exit(1)
   }
 
-  if (!chosenExample) {
-    console.error(
-      `The example provided is not a valid example. Please provide one of the following; ${EXAMPLES.map(
-        (x) => x.value
-      )}`
-    )
-    throw new Error('Invalid example')
-  }
-
-  await downloadExample(chosenExample, root)
+  await downloadTemplate(template, root)
 
   console.log(
-    logText('Installing packages. This might take a couple of minutes.')
+    logText('Installing packages. This might take a couple of minutes.\n')
   )
-  console.log()
 
   // Run install command
-  await install(root, null, { packageManager, isOnline: true })
+  await install(root, null, { packageManager: pkgManager, isOnline: true })
 
   if (tryGitInit(root)) {
-    console.log(logText('Initializing git repository.'))
-    console.log()
+    console.log(logText('Initializing git repository.\n'))
   }
 
   console.log(`${successText('Starter successfully created!')}`)
 
   console.log(chalk.bold('\nTo launch your app, run:\n'))
-  console.log(`  ${cmdText(`cd ${appName}`)}`)
+  console.log(`\t${cmdText(`cd ${appName}`)}`)
   console.log(
-    `  ${cmdText(
-      `${displayedCommand} ${packageManager === 'npm' ? 'run ' : ''}dev`
-    )}`
+    `  ${cmdText(`${pkgManager} ${pkgManager === 'npm' ? 'run ' : ''}dev`)}`
   )
-  console.log()
-  console.log('Next steps:')
-  console.log()
+  console.log('\nNext steps:\n')
   console.log(
     `• 📝 Edit some content on ${linkText(
       'http://localhost:3000'

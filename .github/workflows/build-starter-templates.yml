@@ -1,8 +1,9 @@
 name: Build TinaCMS Starter Templates
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: "0 0 * * 1"
+    - cron: '0 9 * * 1-5'
 
 jobs:
   test:
@@ -10,13 +11,13 @@ jobs:
     strategy:
       matrix:
         package-manager: [yarn, npm, pnpm]
-        template-repo:
-          - nextjs: https://github.com/tinacms/tina-cloud-starter
-          - hugo: https://github.com/tinacms/tina-hugo-starter
-          - remix: https://github.com/tinacms/tina-remix-starter
-          - documentation: https://github.com/tinacms/demo-docs
-          - docusaurus: https://github.com/tinacms/tinasaurus
-          - barebones: https://github.com/tinacms/tina-barebones-starter
+        template:
+          - tina-cloud-starter
+          - tina-hugo-starter
+          - tina-remix-starter
+          - demo-docs
+          - tinasaurus
+          - basic
 
     steps:
       - name: Checkout code
@@ -27,21 +28,28 @@ jobs:
         with:
           node-version: 22
 
-      - name: Clone the template repository
+      - name: Run create-tina-app
         run: |
-          git clone ${{ matrix.template-repo }} template-repo
+          npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }}
         working-directory: ./
-
-      - name: Install dependencies
-        run: |
-          cd template-repo
-          if [ "${{ matrix.package-manager }}" == "pnpm" ]; then
-            npm install -g pnpm
-          fi 
-          ${{ matrix.package-manager }} install
 
       - name: Run build
         run: |
           cd template-repo
           ${{ matrix.package-manager }} run build
 
+      - name: Report errors
+        if: failure()
+        run: |
+          ISSUE_TITLE="Starter template '${{ matrix.template }}' failed to build with ${{ matrix.package-manager }}"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          if gh issue list --state open --limit 100 --search "$ISSUE_TITLE" | grep -q "$ISSUE_TITLE"; then
+            echo "Issue already exists. Skipping issue creation."
+          else
+            echo "Creating a new issue..."
+            gh issue create --title "$ISSUE_TITLE" \
+              --body "The **${{ matrix.template }}** starter template failed to build using **${{ matrix.package-manager }}**.\n\nCheck the full workflow logs for more details: [View Workflow Run]($RUN_URL)" \
+              --labels "bug"
+          fi
