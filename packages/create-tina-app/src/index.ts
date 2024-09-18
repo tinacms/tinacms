@@ -118,8 +118,8 @@ export const run = async () => {
   await telemetry.submitRecord({
     event: {
       name: 'create-tina-app:invoke',
-      example: template,
-      useYarn: Boolean(pkgManager === 'yarn'),
+      template: template,
+      pkgManager: pkgManager,
     },
   })
 
