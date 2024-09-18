@@ -18,15 +18,16 @@ jobs:
           - demo-docs
           - tinasaurus
           - basic
+        node-version: [18, 20, 22]
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ matrix.node-version }}
 
       - name: Run create-tina-app
         run: |
