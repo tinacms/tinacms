@@ -10,7 +10,7 @@ import { tryGitInit } from './util/git'
 import { TEMPLATES, downloadTemplate } from './templates'
 import { preRunChecks } from './util/preRunChecks'
 
-const PKG_MANAGERS = ['yarn', 'npm', 'pnpm']
+const PKG_MANAGERS = ['npm', 'yarn', 'pnpm']
 
 const successText = chalk.bold.green
 const linkText = chalk.bold.cyan
