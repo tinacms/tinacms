@@ -294,6 +294,9 @@ const Node = ({ components, child }) => {
     case 'mermaid':
     case 'code_block':
       const value = child.value
+      console.log('value', value)
+      console.log('child', child)
+
       if (components[child.type]) {
         const Component = components[child.type]
         return (

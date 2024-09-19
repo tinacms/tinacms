@@ -128,7 +128,7 @@ export type ParagraphElement = {
 
 /**
  * @group MermaidElement
- * TODO: REMOVE THIS
+ * TODO: Is this correct?
  */
 export type MermaidElement = {
   type: 'mermaid'

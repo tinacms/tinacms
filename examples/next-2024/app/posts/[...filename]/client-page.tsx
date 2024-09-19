@@ -3,6 +3,22 @@ import type { PostQuery } from '@/tina/__generated__/types'
 import { useTina } from 'tinacms/dist/react'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import mermaid from 'mermaid'
+import { useEffect, useRef } from 'react'
+
+export const useMermaidElement = () => {
+  const mermaidRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (mermaidRef.current) {
+      mermaid.initialize({ startOnLoad: true })
+      mermaid.run()
+    }
+  }, [])
+
+  return {
+    mermaidRef,
+  }
+}
 
 interface ClientPageProps {
   query: string
@@ -25,14 +41,14 @@ export default function Post(props: ClientPageProps) {
         content={data.post.body}
         components={{
           mermaid(props) {
-            console.log(props)
-
-            mermaid.initialize({
-              startOnLoad: true,
-            })
-            ;<pre className="bg-blue-300">
-              <code>{props?.value}</code>
-            </pre>
+            const { mermaidRef } = useMermaidElement()
+            return (
+              <div contentEditable={false}>
+                <div ref={mermaidRef}>
+                  <pre className="mermaid">{props?.value}</pre>
+                </div>
+              </div>
+            )
           },
         }}
       />
