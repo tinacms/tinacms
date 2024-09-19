@@ -51,11 +51,9 @@ export class TinaClient<GenQueries> {
     this.queries = queries(this)
     this.errorPolicy = errorPolicy || 'throw'
     this.cacheDir = cacheDir || ''
-    console.log('TinaClient constructor')
   }
 
   async init() {
-    console.log('init')
     if (this.initialized) {
       return
     }
@@ -74,7 +72,6 @@ export class TinaClient<GenQueries> {
     { errorPolicy, ...args }: TinaClientRequestArgs,
     options: { fetchOptions?: Parameters<typeof fetch>[1] }
   ) {
-    console.log('request')
     await this.init()
     const errorPolicyDefined = errorPolicy || this.errorPolicy
     const headers = new HeadersDefined()
