@@ -49,7 +49,7 @@
 		"lodash.set": "^4.3.2",
 		"lodash.uniqby": "^4.7.0",
 		"many-level": "^2.0.0",
-		"micromatch": "4.0.5",
+		"micromatch": "4.0.8",
 		"normalize-path": "^3.0.0",
 		"readable-stream": "^4.5.2",
 		"scmp": "^2.1.0",
