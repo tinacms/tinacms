@@ -2,4 +2,4 @@
 'tinacms': patch
 ---
 
-Fix module not found error at runtime for tinacms/dist/cache
+Fix module not found `tinacms/dist/cache` error at runtime due to broken webpack bundling
