@@ -341,6 +341,20 @@ mutation addPendingDocumentMutation(
     return val as TinaCloudProject
   }
 
+  async getRequestStatus(requestId: string): Promise<{
+    error: boolean
+    message?: string
+  }> {
+    const res = await this.authProvider.fetchWithToken(
+      `${this.contentApiBase}/request-status/${this.clientId}/${requestId}`,
+      {
+        method: 'GET',
+      }
+    )
+    const val = await res.json()
+    return val
+  }
+
   async createPullRequest({
     baseBranch,
     branch,

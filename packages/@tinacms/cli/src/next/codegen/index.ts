@@ -7,6 +7,7 @@ import { transform } from 'esbuild'
 import { ConfigManager } from '../config-manager'
 import type { TinaSchema } from '@tinacms/schema-tools'
 import { mapUserFields } from '@tinacms/graphql'
+import normalizePath from 'normalize-path'
 export const TINA_HOST = 'content.tinajs.io'
 
 export class Codegen {
@@ -350,7 +351,9 @@ export default databaseClient;
 import { queries } from "./types";
 export const client = createClient({ ${
       this.noClientBuildCache === false
-        ? `cacheDir: '${this.configManager.generatedCachePath}', `
+        ? `cacheDir: '${normalizePath(
+            this.configManager.generatedCachePath
+          )}', `
         : ''
     }url: '${apiURL}', token: '${token}', queries, ${
       errorPolicy ? `errorPolicy: '${errorPolicy}'` : ''
