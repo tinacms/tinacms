@@ -1,6 +1,6 @@
 {
 	"name": "e2e-next",
-	"version": "0.1.76",
+	"version": "0.1.77",
 	"private": true,
 	"scripts": {
 		"dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
