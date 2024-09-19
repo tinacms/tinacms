@@ -128,7 +128,6 @@ export type ParagraphElement = {
 
 /**
  * @group MermaidElement
- * TODO: Is this correct?
  */
 export type MermaidElement = {
   type: 'mermaid'

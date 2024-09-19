@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { withRef } from '@udecode/cn'
 import {
   getPluginType,
@@ -19,7 +18,6 @@ import { helpers } from '../../plugins/core/common'
 
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
 
-// TODO: Move this to transform utils
 export const insertEmptyMermaid = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
     node.type === getPluginType(editor, ELEMENT_MERMAID)
@@ -31,8 +29,6 @@ export const insertEmptyMermaid = (editor: PlateEditor) => {
   ) {
     return
   }
-
-  console.log('insertMermaid match: ', matchCodeElements)
 
   const node = {
     type: ELEMENT_MERMAID,
@@ -61,7 +57,6 @@ const useMermaidToolbarButton = (state) => {
   const editor = useEditorState()
 
   const onClick = () => {
-    // insertMermaid(editor)
     insertEmptyElement(editor, ELEMENT_MERMAID, {
       nextBlock: true,
       select: true,
@@ -93,8 +88,8 @@ export const MermaidToolbarButton = withRef<
   const { props } = useMermaidToolbarButton(state)
 
   return (
-    <ToolbarButton ref={ref} tooltip="Link" {...rest} {...props}>
-      <Icons.paint />
+    <ToolbarButton ref={ref} tooltip="Mermaid" {...rest} {...props}>
+      <Icons.mermaid />
     </ToolbarButton>
   )
 })

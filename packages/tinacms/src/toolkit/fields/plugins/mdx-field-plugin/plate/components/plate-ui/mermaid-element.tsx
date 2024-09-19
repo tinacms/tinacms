@@ -9,6 +9,7 @@ import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
 export const MermaidElement = withRef<typeof PlateElement>(
   ({ children, nodeProps, element, ...props }, ref) => {
     const [isEditing, setIsEditing] = React.useState(false)
+    const [isLightMode, setIsLightMode] = React.useState(false)
     const [mermaidConfig, setMermaidConfig] = React.useState(
       element.value || ''
     )
@@ -27,6 +28,12 @@ export const MermaidElement = withRef<typeof PlateElement>(
               className="w-5 h-5 text-gray-500 cursor-pointer"
               onClick={() => {
                 setIsEditing(!isEditing)
+              }}
+            />
+            <PencilIcon
+              className="w-5 h-5 text-gray-500 cursor-pointer"
+              onClick={() => {
+                setIsLightMode(!isLightMode)
               }}
             />
           </div>

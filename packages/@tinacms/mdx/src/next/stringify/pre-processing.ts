@@ -37,8 +37,6 @@ export const blockElement = (
   field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.Content | null => {
-  console.log('PRE PROCESSING - blockElement: content.type', content.type)
-
   switch (content.type) {
     case 'h1':
     case 'h2':
@@ -155,8 +153,6 @@ export const blockElement = (
         ],
       }
     default:
-      console.error('PRE PROCESSING - blockElement: content.type', content.type)
-
       throw new Error(`BlockElement: ${content.type} is not yet supported`)
   }
 }
