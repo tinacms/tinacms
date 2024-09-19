@@ -1,5 +1,16 @@
 # tinacms-cli
 
+## 1.6.4
+
+### Patch Changes
+
+- a0ec2a5: Fix init bug causing invalid tina config
+- e24fe0b: Fix cacheDir path generation on Windows to avoid unescaped characters breaking esbuild
+- Updated dependencies [75cf194]
+- Updated dependencies [198c280]
+  - tinacms@2.2.4
+  - @tinacms/app@2.1.4
+
 ## 1.6.3
 
 ### Patch Changes
