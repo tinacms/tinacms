@@ -83,6 +83,11 @@ export const run = async () => {
       } catch {}
     }
 
+    if (installedPkgManagers.length === 0) {
+      console.error(`You have no supported package managers installed. Please install one of the following: ${PKG_MANAGERS}`)
+      throw new Error('No supported package managers installed.')
+    }
+
     const pkgManagerRes = await prompts({
       message: 'Which package manager would you like to use?',
       name: 'packageManager',
