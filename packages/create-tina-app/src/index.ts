@@ -11,7 +11,7 @@ import { TEMPLATES, downloadTemplate } from './templates'
 import { preRunChecks } from './util/preRunChecks'
 import { checkPackageExists } from './util/checkPkgManagers'
 
-const PKG_MANAGERS = ['npm', 'yarn', 'pnpm']
+export const PKG_MANAGERS = ['npm', 'yarn', 'pnpm']
 
 const successText = chalk.bold.green
 const linkText = chalk.bold.cyan
