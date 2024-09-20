@@ -9,6 +9,7 @@ import chalk from 'chalk'
 import { tryGitInit } from './util/git'
 import { TEMPLATES, downloadTemplate } from './templates'
 import { preRunChecks } from './util/preRunChecks'
+import { checkPackageExists } from './util/checkPkgManagers'
 
 const PKG_MANAGERS = ['npm', 'yarn', 'pnpm']
 
@@ -74,11 +75,19 @@ export const run = async () => {
   }
 
   if (!pkgManager) {
+    const installedPkgManagers = []
+    for (const pkg_manager of PKG_MANAGERS) {
+      try {
+        await checkPackageExists(pkg_manager)
+        installedPkgManagers.push(pkg_manager)
+      } catch {}
+    }
+
     const pkgManagerRes = await prompts({
       message: 'Which package manager would you like to use?',
       name: 'packageManager',
       type: 'select',
-      choices: PKG_MANAGERS.map((manager) => {
+      choices: installedPkgManagers.map((manager) => {
         return { title: manager, value: manager }
       }),
     })
