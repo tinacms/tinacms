@@ -1,5 +1,12 @@
 # tinacms
 
+## 2.2.4
+
+### Patch Changes
+
+- 75cf194: enable / in search for reference field selection component
+- 198c280: Media Manager: Update Tina media manager to report any errors that occur during asset upload / delete operations
+
 ## 2.2.3
 
 ### Patch Changes
