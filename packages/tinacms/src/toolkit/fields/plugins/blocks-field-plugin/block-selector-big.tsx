@@ -1,10 +1,15 @@
 import * as React from 'react'
 import { AddIcon } from '@toolkit/icons'
 import { IconButton } from '@toolkit/styles'
-import { Disclosure, Transition } from '@headlessui/react'
+import {
+  Disclosure,
+  DisclosurePanel,
+  Transition,
+  TransitionChild,
+} from '@headlessui/react'
 import { useFormPortal } from '@toolkit/form-builder'
 import { PanelHeader } from '../group-field-plugin'
-import { BlockTemplate } from '.'
+import type { BlockTemplate } from '.'
 import { MdKeyboardArrowDown, MdOutlineClear } from 'react-icons/md'
 import { BiSearch } from 'react-icons/bi'
 
@@ -79,7 +84,7 @@ export const BlockSelectorBig = ({
       <IconButton
         variant={pickerIsOpen ? 'secondary' : 'primary'}
         size="small"
-        className={`${pickerIsOpen ? `rotate-45 pointer-events-none` : ``}`}
+        className={`${pickerIsOpen ? 'rotate-45 pointer-events-none' : ''}`}
         onClick={() => setPickerIsOpen(!pickerIsOpen)}
       >
         <AddIcon className="w-5/6 h-auto" />
@@ -87,7 +92,7 @@ export const BlockSelectorBig = ({
       <FormPortal>
         {({ zIndexShift }) => (
           <Transition show={pickerIsOpen}>
-            <Transition.Child
+            <TransitionChild
               as={React.Fragment}
               enter="transform transition-all ease-out duration-200"
               enterFrom="opacity-0 -translate-x-1/2"
@@ -197,7 +202,7 @@ export const BlockSelectorBig = ({
                   </div>
                 </div>
               </div>
-            </Transition.Child>
+            </TransitionChild>
           </Transition>
         )}
       </FormPortal>
@@ -247,15 +252,20 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
             leaveFrom="transform scale-100 opacity-100"
             leaveTo="transform scale-95 opacity-0"
           >
-            <Disclosure.Panel>
+            <DisclosurePanel>
               {templates.length > 0 && (
                 <CardColumns>
-                  {templates.map(([name, template]) => (
-                    <BlockCard close={close} name={name} template={template} />
+                  {templates.map(([name, template], index) => (
+                    <BlockCard
+                      key={index}
+                      close={close}
+                      name={name}
+                      template={template}
+                    />
                   ))}
                 </CardColumns>
               )}
-            </Disclosure.Panel>
+            </DisclosurePanel>
           </Transition>
         </>
       )}

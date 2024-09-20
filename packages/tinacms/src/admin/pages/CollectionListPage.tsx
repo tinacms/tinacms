@@ -14,12 +14,18 @@ import {
 import { RiHome2Line } from 'react-icons/ri'
 import {
   Link,
-  NavigateFunction,
+  type NavigateFunction,
   useLocation,
   useNavigate,
   useParams,
 } from 'react-router-dom'
-import { Menu, Transition } from '@headlessui/react'
+import {
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Transition,
+} from '@headlessui/react'
 import {
   BaseTextField,
   Button,
@@ -33,7 +39,7 @@ import {
   OverflowMenu,
   PopupModal,
   Select,
-  TinaCMS,
+  type TinaCMS,
   CreateBranchModel,
 } from '@tinacms/toolkit'
 import type {
@@ -43,11 +49,11 @@ import type {
 } from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
-import { RouteMappingPlugin } from '../plugins/route-mapping'
+import type { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageBody, PageHeader, PageWrapper } from '../components/Page'
-import { TinaAdminApi } from '../api'
+import type { TinaAdminApi } from '../api'
 import type { Collection, TinaField } from '@tinacms/schema-tools'
-import { CollectionFolder, useCollectionFolder } from './utils'
+import { type CollectionFolder, useCollectionFolder } from './utils'
 import { FaFile, FaFolder } from 'react-icons/fa'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
@@ -67,9 +73,9 @@ const TemplateMenu = ({
       {() => (
         <div>
           <div>
-            <Menu.Button className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6">
+            <MenuButton className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6">
               Create New <BiPlus className="w-5 h-full ml-1 opacity-70" />
-            </Menu.Button>
+            </MenuButton>
           </div>
 
           <Transition
@@ -81,10 +87,10 @@ const TemplateMenu = ({
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="origin-top-right absolute right-0 mt-2 z-menu w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <MenuItems className="origin-top-right absolute right-0 mt-2 z-menu w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
                 {templates.map((template) => (
-                  <Menu.Item key={`${template.label}-${template.name}`}>
+                  <MenuItem key={`${template.label}-${template.name}`}>
                     {({ active }) => (
                       <Link
                         to={`/${
@@ -114,10 +120,10 @@ const TemplateMenu = ({
                         {template.label}
                       </Link>
                     )}
-                  </Menu.Item>
+                  </MenuItem>
                 ))}
               </div>
-            </Menu.Items>
+            </MenuItems>
           </Transition>
         </div>
       )}
@@ -360,9 +366,7 @@ const CollectionListPage = () => {
                     {deleteModalOpen && cms.api.tina.usingProtectedBranch() && (
                       <CreateBranchModel
                         crudType="delete"
-                        relativePath={
-                          collectionExtra.path + '/' + vars.relativePath
-                        }
+                        relativePath={`${collectionExtra.path}/${vars.relativePath}`}
                         values={vars}
                         close={() => setDeleteModalOpen(false)}
                         safeSubmit={async () => {
@@ -491,32 +495,30 @@ const CollectionListPage = () => {
                                             name: '',
                                           }),
                                         },
-                                        ...fields
-                                          .map((x) => [
-                                            {
-                                              label:
-                                                (x.label || x.name) +
-                                                (x.type === 'datetime'
-                                                  ? ' (Oldest First)'
-                                                  : ' (Ascending)'),
-                                              value: JSON.stringify({
-                                                name: x.name,
-                                                order: 'asc',
-                                              }),
-                                            },
-                                            {
-                                              label:
-                                                (x.label || x.name) +
-                                                (x.type === 'datetime'
-                                                  ? ' (Newest First)'
-                                                  : ' (Descending)'),
-                                              value: JSON.stringify({
-                                                name: x.name,
-                                                order: 'desc',
-                                              }),
-                                            },
-                                          ])
-                                          .flat(),
+                                        ...fields.flatMap((x) => [
+                                          {
+                                            label:
+                                              (x.label || x.name) +
+                                              (x.type === 'datetime'
+                                                ? ' (Oldest First)'
+                                                : ' (Ascending)'),
+                                            value: JSON.stringify({
+                                              name: x.name,
+                                              order: 'asc',
+                                            }),
+                                          },
+                                          {
+                                            label:
+                                              (x.label || x.name) +
+                                              (x.type === 'datetime'
+                                                ? ' (Newest First)'
+                                                : ' (Descending)'),
+                                            value: JSON.stringify({
+                                              name: x.name,
+                                              order: 'desc',
+                                            }),
+                                          },
+                                        ]),
                                       ]}
                                       input={{
                                         id: 'sort',
@@ -1145,7 +1147,7 @@ const FolderModal = ({
               placeholder="Enter the name of the new folder"
               value={folderName}
               onChange={(event) => setFolderName(event.target.value)}
-            ></BaseTextField>
+            />
           </>
         </ModalBody>
         <ModalActions>
@@ -1198,7 +1200,7 @@ const RenameModal = ({
               placeholder="Enter a new name for the document's file"
               value={newRelativePath}
               onChange={(event) => setNewRelativePath(event.target.value)}
-            ></BaseTextField>
+            />
           </>
         </ModalBody>
         <ModalActions>
