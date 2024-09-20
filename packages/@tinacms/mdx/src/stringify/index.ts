@@ -311,6 +311,25 @@ export const blockElement = (
           },
         ],
       }
+    case 'table':
+      return {
+        type: 'table',
+        children: content.children.map((tableRow) => {
+          return {
+            type: 'tableRow',
+            children: tableRow.children.map((tableCell) => {
+              return {
+                type: 'tableCell',
+                children: eat(
+                  tableCell.children?.at(0)?.children || [],
+                  field,
+                  imageCallback
+                ),
+              }
+            }),
+          }
+        }),
+      }
     default:
       throw new Error(`BlockElement: ${content.type} is not yet supported`)
   }
