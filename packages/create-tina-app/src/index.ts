@@ -125,7 +125,7 @@ export const run = async () => {
       message: 'What starter code would you like to use?',
       choices: TEMPLATES,
     })
-    template = templateRes.template
+    template = TEMPLATES.find((_template) => _template.value === templateRes.template)
   }
 
   //TODO: Update this?
