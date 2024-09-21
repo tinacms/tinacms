@@ -360,7 +360,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         output: {
           globals,
         },
-        external,
+        external: [...external, 'crypto', 'fs', 'path', 'os'],
       },
     },
   }
