@@ -1,10 +1,4 @@
 import type { Cache } from './index'
-import { createHash } from 'crypto'
-
-const makeKey = (key: any) => {
-  const input = key && key instanceof Object ? JSON.stringify(key) : key || ''
-  return createHash('sha256').update(input).digest('hex')
-}
 
 // makeCacheDir creates the cache directory if it doesn't exist
 const makeCacheDir = async (dir: string, fs: any) => {
@@ -25,9 +19,14 @@ const makeCacheDir = async (dir: string, fs: any) => {
 
 export const NodeCache = async (dir: string): Promise<Cache> => {
   const fs = await import('fs')
+  const { createHash } = await import('crypto')
   const cacheDir = makeCacheDir(dir, fs)
   return {
-    makeKey,
+    makeKey: (key: any) => {
+      const input =
+        key && key instanceof Object ? JSON.stringify(key) : key || ''
+      return createHash('sha256').update(input).digest('hex')
+    },
     get: async (key: string) => {
       try {
         const data = await fs.promises.readFile(`${cacheDir}/${key}`, 'utf-8')
