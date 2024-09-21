@@ -1,15 +1,9 @@
 import type { Cache } from './index'
-const { createHash } = require('crypto')
-
-const makeKey = (key: any) => {
-  const input = key && key instanceof Object ? JSON.stringify(key) : key || ''
-  return createHash('sha256').update(input).digest('hex')
-}
 
 // makeCacheDir creates the cache directory if it doesn't exist
-const makeCacheDir = (dir: string, fs: any) => {
-  const path = require('path')
-  const os = require('os')
+const makeCacheDir = async (dir: string, fs: any) => {
+  const path = await import('path')
+  const os = await import('os')
 
   const parts = dir.split(path.sep)
 
@@ -23,11 +17,16 @@ const makeCacheDir = (dir: string, fs: any) => {
   return cacheDir
 }
 
-export const NodeCache = (dir: string): Cache => {
-  const fs = require('fs')
-  const cacheDir = makeCacheDir(dir, fs)
+export const NodeCache = async (dir: string): Promise<Cache> => {
+  const fs = await import('fs')
+  const { createHash } = await import('crypto')
+  const cacheDir = await makeCacheDir(dir, fs)
   return {
-    makeKey,
+    makeKey: (key: any) => {
+      const input =
+        key && key instanceof Object ? JSON.stringify(key) : key || ''
+      return createHash('sha256').update(input).digest('hex')
+    },
     get: async (key: string) => {
       try {
         const data = await fs.promises.readFile(`${cacheDir}/${key}`, 'utf-8')
