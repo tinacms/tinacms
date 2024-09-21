@@ -50,7 +50,11 @@
 			"src/rich-text/prism.tsx",
 			"src/react.tsx",
 			"src/client.ts",
-			"src/cache.ts"
+			{
+				"name": "src/cache.ts",
+				"target": "node",
+				"bundle": []
+			}
 		]
 	},
 	"typings": "dist/index.d.ts",
