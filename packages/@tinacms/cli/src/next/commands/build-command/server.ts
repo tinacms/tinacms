@@ -48,6 +48,7 @@ export const buildProductionSpa = async (
         }
         warn(warning)
       },
+      external: ['fs', 'os', 'path', 'crypto'],
     },
   })
   return build(config)

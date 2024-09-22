@@ -44,6 +44,7 @@ export const createDevServer = async (
           }
           warn(warning)
         },
+        external: ['fs', 'os', 'path', 'crypto'],
       },
     })
   )
