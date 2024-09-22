@@ -14,11 +14,6 @@
 			"import": "./dist/client.mjs",
 			"require": "./dist/client.js"
 		},
-		"./dist/cache": {
-			"types": "./dist/cache.d.ts",
-			"import": "./dist/cache.mjs",
-			"require": "./dist/cache.js"
-		},
 		"./dist/edit-state": {
 			"types": "./dist/edit-state.d.ts",
 			"import": "./dist/edit-state.mjs",
