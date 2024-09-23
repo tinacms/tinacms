@@ -16,9 +16,6 @@ export const filterQueryBuilder = (
       (acc, [key, value]) => {
         // Check if value is a function
         const filterValue = typeof value === 'function' ? value() : value
-
-        console.log('value', value)
-
         acc[key] = { in: filterValue }
         return acc
       },
