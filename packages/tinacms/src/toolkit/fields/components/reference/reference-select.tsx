@@ -17,7 +17,10 @@ import type {
   InternalSys,
   ReferenceFieldProps,
 } from './model/reference-field-props'
-import { CollectionFilters, filterQueryBuilder } from './utils/fetch-optioins'
+import {
+  CollectionFilters,
+  filterQueryBuilder,
+} from './utils/fetch-optioins-query-builder'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
@@ -61,10 +64,9 @@ const useGetOptionSets = (
       const optionSets = await Promise.all(
         collections.map(async (collection) => {
           try {
-            const filter = collectionFilter
+            const filter = collectionFilter[collection]
               ? filterQueryBuilder(collectionFilter[collection], collection)
               : {}
-
             const response: Response = await cms.api.tina.request(
               `#graphql
             query ($collection: String!, $filter: DocumentFilter) {
@@ -118,7 +120,6 @@ const useGetOptionSets = (
       setOptionSets([])
     }
   }, [cms, collections])
-
   return { optionSets, loading }
 }
 
