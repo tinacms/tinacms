@@ -7,7 +7,12 @@ type Meta = {
   error?: any
 }
 
-export type FilterValue = string[] | string // extend this type if needed
+type StaticFilterValue = string[] | string // extend this type if needed
+type ValueToFilterFunction = () => string
+// export type CollectionFilters = Record<string, Record<string, FilterValue>>
+
+type DynamicFieldFilterValue = StaticFilterValue | ValueToFilterFunction
+type FieldFilter = Record<string, DynamicFieldFilterValue>
 
 type Component<Type, List> = (props: {
   field: TinaField & { namespace: string[] }
@@ -218,7 +223,7 @@ export type ImageField = (
 type ReferenceFieldOptions = {
   optionComponent?: OptionComponent
   experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>
-  collectionFilter?: Record<string, Record<string, FilterValue>>
+  collectionFilter?: Record<string, FieldFilter>
 }
 
 type OptionComponent<P = Record<string, unknown>, S = Document['_sys']> = (
