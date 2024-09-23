@@ -12,18 +12,17 @@ Currently this is a monorepo built with Turborepo and PNPM
 
 You _should_ :fingers_crossed: be able to just run these commands. (Please make a note of any hang-ups you ran into during this process and feel free to update this doc with any tips you have for others.)
 
+> [!TIP] We recommend using [fnm](https://github.com/Schniz/fnm) or [nvm](https://github.com/nvm-sh/nvm) to switch Node versions automatically
+
 > Having issues? Feel free to reach out on [Discord](https://discord.com/invite/zumN63Ybpf)
 
 ```sh
-# check the node version, 18 or greater is required
+# check the node version, the .nvmrc file lists the required version
 node -v
-# you can use nvm (https://github.com/nvm-sh/nvm) to switch version
 # install pnpm via corepack
 corepack enable
 # ensure you have the correct version (check version number in package.json)
 pnpm -v
-# some packages rely on yarn, so you may need to install that too
-npm install -g yarn
 # install dependencies
 pnpm install
 # build all the packages
