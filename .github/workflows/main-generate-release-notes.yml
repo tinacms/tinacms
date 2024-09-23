@@ -1,0 +1,49 @@
+name: Generate Release Notes
+
+on:
+  push:
+    tags:
+      - 'tinacms@*'
+
+jobs:
+  push-release-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get release info
+        id: release-info
+        run: |
+          release_info=$(gh release view "${{ github.ref_name }}" --json body,createdAt)
+          release_body=$(echo "$release_info" | jq -r .body)
+          release_created_at=$(echo "$release_info" | jq -r .createdAt)
+          echo "notes=$release_body" >> $GITHUB_OUTPUT
+          echo "created_at=$release_created_at" >> $GITHUB_OUTPUT
+
+          release_tag="${{ github.ref_name }}"
+          # replace "tina@v" with "v" to match the version number
+          release_tag=$(echo "$release_tag" | sed 's/tinacms@/v/')
+          echo "version=$release_tag" >> $GITHUB_OUTPUT
+
+      - name: Generate a token
+        uses: actions/create-github-app-token@v1
+        id: generate-token
+        with:
+          # uses https://github.com/organizations/tinacms/settings/apps/release-bot-allow-prs-and-push
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_SECRET }}
+          owner: tinacms
+          repositories: tina.io
+
+      - name: Publish release notes
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          repo: tinacms/tina.io
+          ref: main
+          workflow: dispatch-create-whats-new-page.yml
+          inputs: |
+            {
+              "project": "TinaCloud",
+              "versionNumber": "${{ steps.release-info.outputs.version }}",
+              "dateReleased": "${{ steps.release-info.outputs.created_at }}",
+              "releaseNotes": ${{ steps.release-info.outputs.notes }}
+            }
+          token: ${{ steps.generate-token.outputs.token }}
