@@ -1,27 +1,20 @@
-export type StaticFilterValue = string[] | string // extend this type if needed
-export type ValueToFilterFunction = () => string
-// export type CollectionFilters = Record<string, Record<string, FilterValue>>
-
-type DynamicFieldFilterValue = StaticFilterValue | ValueToFilterFunction
-type FieldFilter = Record<string, DynamicFieldFilterValue>
+export type FilterValue = string[] | string // extend this type if needed
 export type CollectionFilters =
-  | Record<string, FieldFilter>
-  | (() => Record<string, FieldFilter>)
+  | Record<string, FilterValue>
+  | (() => Record<string, FilterValue>)
 
 //Currently only support eq for filter, this function will loop thorugh the record and build the filter query
 export const filterQueryBuilder = (
-  fieldFilterConfig: FieldFilter,
+  fieldFilterConfig: FilterValue,
   collection: string
 ) => {
   return {
     [collection]: Object.entries(fieldFilterConfig).reduce(
       (acc, [key, value]) => {
-        const filterValue = typeof value === 'function' ? value() : value
-
-        acc[key] = { in: filterValue }
+        acc[key] = { in: value }
         return acc
       },
-      {} as Record<string, Record<string, StaticFilterValue>>
+      {} as Record<string, Record<string, FilterValue>>
     ),
   }
 }
