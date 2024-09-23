@@ -1,4 +1,4 @@
-import { CollectionFilters } from '../utils/fetch-optioins'
+import { CollectionFilters } from '../utils/fetch-optioins-query-builder'
 
 export type Option = {
   value: string
