@@ -15,7 +15,7 @@ export function getLocationFromHost(hostname: string): LocationEnum {
 export function customFilterAuthorReference() {
   return {
     author: {
-      location: getLocationFromHost('ndcmelbourne.com'),
+      location: getLocationFromHost('ndcsydney.com'),
     },
   }
 }

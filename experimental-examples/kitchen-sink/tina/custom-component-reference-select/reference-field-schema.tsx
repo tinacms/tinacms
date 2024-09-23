@@ -28,12 +28,13 @@ const referenceField = {
     },
     // collectionFilter: {
     //   author: {
-    //     name: 'Napolean',
+    //     location: 'melbourne',
     //   },
     //   post: {
     //     title: 'hello world',
     //   },
     // },
+    //TODO : Example of using dynamic function
     collectionFilter: DynamicFilterAuthorFuction,
   },
   collections: ['author', 'post'],
