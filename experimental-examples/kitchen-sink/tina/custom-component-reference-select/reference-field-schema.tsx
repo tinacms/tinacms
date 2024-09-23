@@ -2,7 +2,7 @@ import React from 'react'
 import AuthorCollectionCustomReference from '../../component/custom-reference-select-author'
 import PostCollectionCustomReference from '../../component/custom-reference-select-post'
 import { type CollectionProps, COLLECTIONS, type InternalSys } from './model'
-import { getLocationFromHost } from '../utils/author-location'
+import { customFilterAuthorReference as DynamicFilterAuthorFuction } from '../utils/author-location'
 
 const referenceField = {
   label: 'Author',
@@ -26,14 +26,15 @@ const referenceField = {
           return s.path
       }
     },
-    collectionFilter: {
-      author: {
-        location: getLocationFromHost('ndcsydney.com'),
-      },
-      post: {
-        title: 'hello world',
-      },
-    },
+    // collectionFilter: {
+    //   author: {
+    //     name: 'Napolean',
+    //   },
+    //   post: {
+    //     title: 'hello world',
+    //   },
+    // },
+    collectionFilter: DynamicFilterAuthorFuction,
   },
   collections: ['author', 'post'],
 }
