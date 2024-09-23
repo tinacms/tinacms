@@ -2,6 +2,7 @@ import React from 'react'
 import AuthorCollectionCustomReference from '../../component/custom-reference-select-author'
 import PostCollectionCustomReference from '../../component/custom-reference-select-post'
 import { type CollectionProps, COLLECTIONS, type InternalSys } from './model'
+import { getLocationFromHost } from '../utils/author-location'
 
 const referenceField = {
   label: 'Author',
@@ -27,7 +28,7 @@ const referenceField = {
     },
     collectionFilter: {
       author: {
-        name: 'Napolean',
+        location: getLocationFromHost('ndcsydney.com'),
       },
       post: {
         title: 'hello world',
