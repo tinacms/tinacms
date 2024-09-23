@@ -145,6 +145,7 @@ export type TableRowElement = {
 export type TableElement = {
   type: 'table'
   children: TableRowElement[]
+  props: Record<string, unknown>
 }
 
 /**

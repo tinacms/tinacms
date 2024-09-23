@@ -66,6 +66,9 @@ export const remarkToSlate = (
               }),
             }
           }),
+          props: {
+            align: content.align?.filter((item) => !!item),
+          },
         }
       }
       case 'blockquote':

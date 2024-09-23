@@ -312,8 +312,12 @@ export const blockElement = (
         ],
       }
     case 'table':
+      const table = content.props as {
+        align: Md.AlignType[] | undefined
+      }
       return {
         type: 'table',
+        align: table.align,
         children: content.children.map((tableRow) => {
           return {
             type: 'tableRow',
