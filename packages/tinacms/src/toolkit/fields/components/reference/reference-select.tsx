@@ -61,11 +61,16 @@ const useGetOptionSets = (
   const [loading, setLoading] = React.useState(true)
   React.useEffect(() => {
     const fetchOptionSets = async () => {
+      const filters =
+        typeof collectionFilter === 'function'
+          ? collectionFilter()
+          : collectionFilter
+
       const optionSets = await Promise.all(
         collections.map(async (collection) => {
           try {
-            const filter = collectionFilter[collection]
-              ? filterQueryBuilder(collectionFilter[collection], collection)
+            const filter = filters[collection]
+              ? filterQueryBuilder(filters[collection], collection)
               : {}
             const response: Response = await cms.api.tina.request(
               `#graphql
