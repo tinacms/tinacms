@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { GoCircleSlash } from 'react-icons/go'
 import { Button, wrapFieldsWithMeta } from 'tinacms'
-import { Popover, Transition } from '@headlessui/react'
+import {
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+  Transition,
+} from '@headlessui/react'
 import { Icon, IconOptions } from '../util/icon'
 import { BiChevronRight } from 'react-icons/bi'
 
@@ -9,9 +14,8 @@ const parseIconName = (name: string) => {
   const splitName = name.split(/(?=[A-Z])/)
   if (splitName.length > 1) {
     return splitName.slice(1).join(' ')
-  } else {
-    return name
   }
+  return name
 }
 
 export const IconPickerInput = wrapFieldsWithMeta(({ input }) => {
@@ -33,7 +37,7 @@ export const IconPickerInput = wrapFieldsWithMeta(({ input }) => {
       <Popover>
         {({ open }) => (
           <>
-            <Popover.Button as={'span'}>
+            <PopoverButton as={'span'}>
               <Button
                 className={`text-sm h-11 px-4 ${InputIcon ? 'h-11' : 'h-10'}`}
                 size="custom"
@@ -48,7 +52,7 @@ export const IconPickerInput = wrapFieldsWithMeta(({ input }) => {
                   <BiChevronRight className="w-5 h-auto fill-current opacity-70 ml-1" />
                 )}
               </Button>
-            </Popover.Button>
+            </PopoverButton>
             <div className="absolute w-full min-w-[192px] max-w-2xl -bottom-2 left-0 translate-y-full">
               <Transition
                 enter="transition duration-150 ease-out"
@@ -58,7 +62,7 @@ export const IconPickerInput = wrapFieldsWithMeta(({ input }) => {
                 leaveFrom="transform opacity-100 translate-y-0"
                 leaveTo="transform opacity-0 -translate-y-2"
               >
-                <Popover.Panel className="relative overflow-hidden rounded-lg shadow-lg bg-white border border-gray-150 z-50">
+                <PopoverPanel className="relative overflow-hidden rounded-lg shadow-lg bg-white border border-gray-150 z-50">
                   {({ close }) => (
                     <div className="max-h-[24rem] flex flex-col w-full h-full">
                       <div className="bg-gray-50 p-2 border-b border-gray-100 z-10 shadow-sm">
@@ -120,7 +124,7 @@ export const IconPickerInput = wrapFieldsWithMeta(({ input }) => {
                       )}
                     </div>
                   )}
-                </Popover.Panel>
+                </PopoverPanel>
               </Transition>
             </div>
           </>
