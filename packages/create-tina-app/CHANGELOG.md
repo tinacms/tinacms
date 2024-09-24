@@ -1,5 +1,13 @@
 # create-tina-app
 
+## 1.3.0
+
+### Minor Changes
+
+- 6d6ca77: - Added `--pkg-manager` option to `create-tina-app` cli.
+  - Renamed `--example` option to `--template` for `create-tina-app` cli.
+  - Added GitHub action to build / test starter templates using `create-tina-app`.
+
 ## 1.2.0
 
 ### Minor Changes
