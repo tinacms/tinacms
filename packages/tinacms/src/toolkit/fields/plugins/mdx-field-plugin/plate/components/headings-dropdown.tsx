@@ -16,6 +16,7 @@ import {
   ELEMENT_H3,
   ELEMENT_H4,
   ELEMENT_H5,
+  ELEMENT_H6,
 } from '@udecode/plate-heading'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 import { ToolbarButton } from './plate-ui/toolbar'
@@ -66,6 +67,12 @@ const items = [
     icon: Icons.h5,
     label: 'Heading 5',
     value: ELEMENT_H5,
+  },
+  {
+    description: 'Heading 6',
+    icon: Icons.h6,
+    label: 'Heading 6',
+    value: ELEMENT_H6,
   },
 ]
 
