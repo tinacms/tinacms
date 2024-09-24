@@ -1,5 +1,16 @@
 # tinacms-cli
 
+## 1.6.5
+
+### Patch Changes
+
+- Updated dependencies [cf1530d]
+- Updated dependencies [2762994]
+- Updated dependencies [ba5f7a3]
+  - tinacms@2.2.5
+  - @tinacms/search@1.0.29
+  - @tinacms/app@2.1.5
+
 ## 1.6.4
 
 ### Patch Changes
