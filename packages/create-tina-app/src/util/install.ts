@@ -82,7 +82,7 @@ export function install(
       if (!isOnline) {
         log.warn('You appear to be offline.')
         if (packageManager === 'yarn') {
-          console.warn('Falling back to the local Yarn cache.')
+          log.warn('Falling back to the local Yarn cache.')
           args.push('--offline')
         }
       }
