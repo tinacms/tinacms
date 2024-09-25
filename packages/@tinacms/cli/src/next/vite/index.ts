@@ -233,6 +233,10 @@ export const createConfig = async ({
       },
     },
     build: {
+      commonjsOptions: {
+        include: [/node_modules/],
+        exclude: [/crypto/, /fs/, /os/, /path/],
+      },
       sourcemap: false,
       outDir: configManager.outputFolderPath,
       emptyOutDir: true,
