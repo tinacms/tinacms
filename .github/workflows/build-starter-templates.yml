@@ -52,5 +52,5 @@ jobs:
             echo "Creating a new issue..."
             gh issue create --title "$ISSUE_TITLE" \
               --body "The **${{ matrix.template }}** starter template failed to build using **${{ matrix.package-manager }}**.\n\nCheck the full workflow logs for more details: [View Workflow Run]($RUN_URL)" \
-              --labels "bug"
+              --label "bug"
           fi
