@@ -32,6 +32,17 @@ interface EmbedButtonProps {
 
 const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
   const [open, setOpen] = useState(false)
+  const [filteredTemplates, setFilteredTemplates] = useState(templates)
+
+  const filterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const filterText = e.target.value.toLowerCase()
+    setFilteredTemplates(
+      templates.filter((template) =>
+        template.name.toLowerCase().includes(filterText)
+      )
+    )
+  }
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger className="inline-flex items-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg:not([data-icon])]:size-5 h-9 px-2 bg-transparent hover:bg-muted hover:text-muted-foreground aria-checked:bg-accent aria-checked:text-accent-foreground my-1 justify-between pr-1">
@@ -42,10 +53,17 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
           }`}
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>Templates</DropdownMenuLabel>
+      <DropdownMenuContent className="max-h-48 overflow-y-auto">
+        {templates.length > 10 && (
+          <input
+            type="text"
+            placeholder="Filter templates..."
+            className="w-full p-2 border border-gray-300 rounded-md"
+            onChange={filterChange}
+          />
+        )}
         <DropdownMenuSeparator />
-        {templates.map((template) => (
+        {filteredTemplates.map((template) => (
           <DropdownMenuItem
             key={template.name}
             onMouseDown={(e) => {
