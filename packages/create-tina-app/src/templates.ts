@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import { downloadAndExtractRepo, getRepoInfo } from './util/examples'
 import chalk from 'chalk'
 import { copy } from 'fs-extra'
@@ -13,16 +9,16 @@ type BaseExample = {
   value: string
 }
 
-export type InternalExample = BaseExample & {
+export type InternalTemplate = BaseExample & {
   isInternal: true
 }
-export type ExternalExample = BaseExample & {
+export type ExternalTemplate = BaseExample & {
   isInternal: false
   gitURL: string
 }
-export type Example = InternalExample | ExternalExample
+export type Template = InternalTemplate | ExternalTemplate
 
-export const EXAMPLES: Example[] = [
+export const TEMPLATES: Template[] = [
   {
     title: '⭐ NextJS starter',
     description:
@@ -73,12 +69,10 @@ export const EXAMPLES: Example[] = [
   },
 ]
 
-export const downloadExample = async (example: Example, root: string) => {
-  if (example.isInternal === false) {
-    // need to download example from github
-
+export const downloadTemplate = async (template: Template, root: string) => {
+  if (template.isInternal === false) {
     // Make a github URL
-    const repoURL = new URL(example.gitURL)
+    const repoURL = new URL(template.gitURL)
     // Download the Repo
     const repoInfo = await getRepoInfo(repoURL)
     const repoInfo2 = repoInfo
@@ -94,8 +88,8 @@ export const downloadExample = async (example: Example, root: string) => {
 
     await downloadAndExtractRepo(root, repoInfo2)
   } else {
-    // need to copy the example from local file system
-    const exampleFile = path.join(__dirname, '..', 'examples', example.value)
-    await copy(`${exampleFile}/`, './')
+    // need to copy the template from local file system
+    const templateFile = path.join(__dirname, '..', 'examples', template.value)
+    await copy(`${templateFile}/`, './')
   }
 }

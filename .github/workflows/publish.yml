@@ -79,23 +79,13 @@ jobs:
           pnpm version:snapshot
           pnpm run publish:beta
 
-      - name: Publish
-        if: matrix.channel == 'latest'
-        run: |
-          pnpm run publish
-
-      - name: Push tags
-        if: matrix.channel == 'latest'
-        run: |
-          pnpm push-tags
-        env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
-      - name: Create release pull request
+      - name: Create release pull request or publish packages
         uses: changesets/action@v1
+        id: changesets
         if: matrix.channel == 'latest'
         with:
           version: pnpm run version
+          publish: pnpm run publish
+          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN  }}

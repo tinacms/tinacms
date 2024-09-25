@@ -8,8 +8,8 @@ interface EventsBase {
 
 export interface CreateTinaAppInvoke extends EventsBase {
   name: 'create-tina-app:invoke'
-  example: string
-  useYarn: boolean
+  template: string
+  pkgManager: string
 }
 
 export interface TinaCMSAuditInvoke extends EventsBase {

@@ -1,5 +1,12 @@
 # @tinacms/search
 
+## 1.0.29
+
+### Patch Changes
+
+- 2762994: Fix node 22 issues with better-sqlite3. Updates sqlite-level
+- ba5f7a3: ⬆️ Update @headlessui/react from v1 to v2
+
 ## 1.0.28
 
 ### Patch Changes

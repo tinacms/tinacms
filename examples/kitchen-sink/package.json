@@ -1,6 +1,6 @@
 {
 	"name": "e2e-next",
-	"version": "0.1.76",
+	"version": "0.1.78",
 	"private": true,
 	"scripts": {
 		"dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
@@ -16,7 +16,7 @@
 		"searchindex": "tinacms search-index"
 	},
 	"dependencies": {
-		"@headlessui/react": "^1.7.3",
+		"@headlessui/react": "^2.1.8",
 		"@heroicons/react": "^2.0.12",
 		"@tailwindcss/typography": "^0.5.7",
 		"@tinacms/datalayer": "workspace:*",

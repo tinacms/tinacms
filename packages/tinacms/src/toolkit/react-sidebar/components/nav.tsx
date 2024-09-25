@@ -2,13 +2,19 @@ import * as React from 'react'
 import { BiExit } from 'react-icons/bi'
 import { FiMoreVertical, FiInfo } from 'react-icons/fi'
 import { VscNewFile } from 'react-icons/vsc'
-import { Menu, Transition } from '@headlessui/react'
+import {
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Transition,
+} from '@headlessui/react'
 import { updateBodyDisplacement } from './sidebar'
 import { FormModal } from '@toolkit/react-forms'
 import type { ScreenPlugin } from '@toolkit/react-screens'
 import { SyncStatus, SyncErrorWidget, SyncStatusModal } from './sync-status'
 import { useCMS } from '@toolkit/react-core'
-import { CloudConfigPlugin } from '@toolkit/react-cloud-config'
+import type { CloudConfigPlugin } from '@toolkit/react-cloud-config'
 
 interface NavCollection {
   label?: string
@@ -100,16 +106,16 @@ export const Nav = ({
   return (
     <div
       className={`relative z-30 flex flex-col bg-white border-r border-gray-200 w-96 h-full ${className}`}
-      style={{ maxWidth: sidebarWidth + 'px' }}
+      style={{ maxWidth: `${sidebarWidth}px` }}
       {...props}
     >
       <div className="border-b border-gray-200">
         <Menu as="div" className="relative block">
           {({ open }) => (
             <div>
-              <Menu.Button
+              <MenuButton
                 className={`group w-full px-6 py-3 gap-2 flex justify-between items-center transition-colors duration-150 ease-out ${
-                  open ? `bg-gray-50` : `bg-transparent`
+                  open ? 'bg-gray-50' : 'bg-transparent'
                 }`}
               >
                 <span className="text-left inline-flex items-center text-xl tracking-wide text-gray-800 flex-1 gap-1 opacity-80 group-hover:opacity-100 transition-opacity duration-150 ease-out">
@@ -128,11 +134,11 @@ export const Nav = ({
                 <FiMoreVertical
                   className={`flex-0 w-6 h-full inline-block group-hover:opacity-80 transition-all duration-300 ease-in-out transform ${
                     open
-                      ? `opacity-100 text-blue-400`
-                      : `text-gray-400 opacity-50 hover:opacity-70`
+                      ? 'opacity-100 text-blue-400'
+                      : 'text-gray-400 opacity-50 hover:opacity-70'
                   }`}
                 />
-              </Menu.Button>
+              </MenuButton>
               <div className="transform translate-y-full absolute bottom-3 right-5 z-50">
                 <Transition
                   enter="transition duration-150 ease-out"
@@ -142,8 +148,8 @@ export const Nav = ({
                   leaveFrom="transform opacity-100 translate-y-0"
                   leaveTo="transform opacity-0 -translate-y-2"
                 >
-                  <Menu.Items className="bg-white border border-gray-150 rounded-lg shadow-lg flex flex-col items-stretch overflow-hidden">
-                    <Menu.Item>
+                  <MenuItems className="bg-white border border-gray-150 rounded-lg shadow-lg flex flex-col items-stretch overflow-hidden">
+                    <MenuItem>
                       <button
                         className={`text-lg px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400 hover:bg-gray-50 hover:opacity-100`}
                         onClick={async () => {
@@ -175,14 +181,14 @@ export const Nav = ({
                         <BiExit className="w-6 h-auto mr-2 text-blue-400" /> Log
                         Out
                       </button>
-                    </Menu.Item>
-                    <Menu.Item>
+                    </MenuItem>
+                    <MenuItem>
                       <WrappedSyncStatus
                         cms={cms}
                         setEventsOpen={setEventsOpen}
                       />
-                    </Menu.Item>
-                  </Menu.Items>
+                    </MenuItem>
+                  </MenuItems>
                 </Transition>
               </div>
             </div>

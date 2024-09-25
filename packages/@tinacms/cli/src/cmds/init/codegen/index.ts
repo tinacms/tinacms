@@ -85,7 +85,7 @@ const makeImportsVisitor =
   (ctx: ts.TransformationContext) =>
   (node: ts.Node) => {
     if (ts.isSourceFile(node)) {
-      let newStatements = [...node.statements]
+      const newStatements = [...node.statements]
       let changed = false
 
       // Iterate over each module-import pair in the map

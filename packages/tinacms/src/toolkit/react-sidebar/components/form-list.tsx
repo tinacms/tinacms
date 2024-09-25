@@ -154,7 +154,7 @@ export const FormList = (props: {
 
   return (
     <ul>
-      <li className={`divide-y divide-gray-200`}>
+      <li className={'divide-y divide-gray-200'}>
         {listItems.map((item, index) => {
           if (item.type === 'list') {
             return (

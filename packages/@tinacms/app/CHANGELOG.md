@@ -1,5 +1,23 @@
 # @tinacms/app
 
+## 2.1.5
+
+### Patch Changes
+
+- ba5f7a3: ⬆️ Update @headlessui/react from v1 to v2
+- Updated dependencies [cf1530d]
+- Updated dependencies [2762994]
+- Updated dependencies [ba5f7a3]
+  - tinacms@2.2.5
+
+## 2.1.4
+
+### Patch Changes
+
+- Updated dependencies [75cf194]
+- Updated dependencies [198c280]
+  - tinacms@2.2.4
+
 ## 2.1.3
 
 ### Patch Changes
