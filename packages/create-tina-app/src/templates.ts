@@ -1,7 +1,7 @@
 import { downloadAndExtractRepo, getRepoInfo } from './util/examples'
-import chalk from 'chalk'
 import { copy } from 'fs-extra'
 import path from 'path'
+import { log, TextStyles } from './util/logger'
 
 type BaseExample = {
   title: string
@@ -69,26 +69,22 @@ export const TEMPLATES: Template[] = [
   },
 ]
 
-export const downloadTemplate = async (template: Template, root: string) => {
+export async function downloadTemplate(template: Template, root: string) {
   if (template.isInternal === false) {
-    // Make a github URL
     const repoURL = new URL(template.gitURL)
-    // Download the Repo
     const repoInfo = await getRepoInfo(repoURL)
-    const repoInfo2 = repoInfo
-    console.log(
-      `Downloading files from repo ${chalk.cyan(
-        `${repoInfo?.username}/${repoInfo?.name}`
-      )}. This might take a moment.`
-    )
-
-    if (!repoInfo2) {
-      throw new Error('downloadExample Failed. Repo info not found')
+    if (!repoInfo) {
+      throw new Error('Repository information not found.')
     }
 
-    await downloadAndExtractRepo(root, repoInfo2)
+    log.info(
+      `Downloading files from repo ${TextStyles.link(
+        `${repoInfo?.username}/${repoInfo?.name}`
+      )}.`
+    )
+    await downloadAndExtractRepo(root, repoInfo)
   } else {
-    // need to copy the template from local file system
+    // Copy the template from the local file system.
     const templateFile = path.join(__dirname, '..', 'examples', template.value)
     await copy(`${templateFile}/`, './')
   }
