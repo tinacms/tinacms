@@ -87,14 +87,6 @@ export interface MultiformFormHeaderProps {
   activeForm: { activeFieldName?: string; tinaForm: Form }
 }
 
-// ?
-const stripCollectionFromPath = (collectionPath: string, path: string) => {
-  const collectionPathParts = collectionPath.split('/')
-  const pathParts = path.split('/')
-  const strippedPathParts = pathParts.slice(collectionPathParts.length)
-  return strippedPathParts.join('/')
-}
-
 export const MultiformFormHeader = ({
   activeForm,
 }: MultiformFormHeaderProps) => {
