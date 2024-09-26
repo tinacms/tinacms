@@ -21,6 +21,7 @@ export const NodeCache = async (dir: string): Promise<Cache> => {
   const fs = await import('fs')
   const { createHash } = await import('crypto')
   const cacheDir = await makeCacheDir(dir, fs)
+  console.log('cacheDir', cacheDir)
   return {
     makeKey: (key: any) => {
       const input =
