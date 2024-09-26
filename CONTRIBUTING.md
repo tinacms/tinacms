@@ -101,16 +101,18 @@ Run `git checkout -- .` This will clear out the versioning changes.
 
 If the changes affect local use of the packages (i.e. not the ContentAPI), use the tina-cloud-starter found in the examples directory of this repo.
 
-To use a **tinacms** repository cloned locally, when running your application specify:
+To use a **tinacms** repository cloned locally, when running your application, use the `--rootPath` flag:
 
 ```
-TINA=../path/to/tinacms pnpm dev
+node bin/tinacms dev --rootPath {{ APPLICATION PROJECT PATH }}
 ```
 
-You can also specify which packages you want to watch:
+ex. `node bin/tinacms dev --rootPath ~/Developer/tina/tina-cloud-starter`
+
+Then inside another terminal (in the tinacms project), run:
 
 ```
-TINA=../path/to/tinacms TINA_WATCH=@tinacms/forms,react-tinacms-inline
+pnpm watch
 ```
 
 > ### Warning
