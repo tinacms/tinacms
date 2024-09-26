@@ -7,16 +7,16 @@ import { CodeBlock } from '../../plugins/ui/code-block'
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
 
 const LightModeComponent = ({ onToggleMode }) => {
-  const [isLightMode, setIsLightMode] = useState(true)
+  const [isLightMode, setIsLightMode] = useState(false)
 
-  // Toggle the light mode state
-  const handleToggle = () => {
+  const handleToggle = (e) => {
+    e.preventDefault()
     setIsLightMode((prevMode) => !prevMode)
   }
 
-  // Notify parent component of the class change
   useEffect(() => {
-    const modeClass = isLightMode ? 'light-mode' : 'dark-mode'
+    //? Note: Adding this class on a <pre/> will remove its base bg styling
+    const modeClass = isLightMode ? 'not-tina-prose' : ''
     if (onToggleMode) {
       onToggleMode(modeClass)
     }
@@ -29,14 +29,27 @@ const LightModeComponent = ({ onToggleMode }) => {
         onClick={handleToggle}
         className="flex items-center w-5 h-5 text-gray-500 cursor-pointer"
       >
-        {isLightMode ? <SunMoon /> : <Moon />}
+        {isLightMode ? <Moon /> : <SunMoon />}
       </button>
     </div>
   )
 }
+
+const MermaidElementWithRef = ({ config, lightMode }) => {
+  const { mermaidRef } = useMermaidElement()
+  return (
+    <div contentEditable={false}>
+      <div ref={mermaidRef}>
+        <pre className={`${lightMode} mermaid`}>{config}</pre>
+      </div>
+    </div>
+  )
+}
+
 export const MermaidElement = withRef<typeof PlateElement>(
   ({ children, nodeProps, element, ...props }, ref) => {
     const [isEditing, setIsEditing] = React.useState(false)
+    const [lightModeClass, setLightModeClass] = React.useState('')
     const [mermaidConfig, setMermaidConfig] = React.useState(
       element.value || ''
     )
@@ -50,16 +63,14 @@ export const MermaidElement = withRef<typeof PlateElement>(
     return (
       <PlateElement element={element} ref={ref} {...props}>
         <div className="relative">
-          <div className="absolute top-2 right-2 z-10">
+          <div className="absolute top-2 right-2 z-10 space-y-2">
             <PencilIcon
               className="w-5 h-5 text-gray-500 cursor-pointer"
               onClick={() => {
                 setIsEditing(!isEditing)
               }}
             />
-            <LightModeComponent
-              onToggleMode={() => console.log('mode changed')}
-            />
+            <LightModeComponent onToggleMode={(v) => setLightModeClass(v)} />
           </div>
           {isEditing ? (
             <CodeBlock
@@ -70,7 +81,10 @@ export const MermaidElement = withRef<typeof PlateElement>(
               onChangeCallback={(value) => setMermaidConfig(value)}
             />
           ) : (
-            <MermaidElementWithRef config={mermaidConfig} />
+            <MermaidElementWithRef
+              config={mermaidConfig}
+              lightMode={lightModeClass}
+            />
           )}
           {children}
         </div>
@@ -78,14 +92,3 @@ export const MermaidElement = withRef<typeof PlateElement>(
     )
   }
 )
-
-const MermaidElementWithRef = ({ config }) => {
-  const { mermaidRef } = useMermaidElement()
-  return (
-    <div contentEditable={false}>
-      <div ref={mermaidRef}>
-        <pre className="mermaid">{config}</pre>
-      </div>
-    </div>
-  )
-}
