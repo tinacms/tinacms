@@ -107,7 +107,7 @@ To use a **tinacms** repository cloned locally, when running your application, u
 node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath {{ APPLICATION PROJECT PATH }}
 ```
 
-ex. `node bin/tinacms dev --rootPath ~/Developer/tina/tina-cloud-starter`
+e.g. `node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath ~/Developer/tina/tina-cloud-starter`
 
 Then inside another terminal (in the tinacms project), run:
 
