@@ -130,26 +130,3 @@ In order to run the Cypress E2E tests:
    pnpm start:e2e
    ```
 2. Run the tests in a separate terminal `pnpm test:dev` or `pnpm test:e2e`
-
----
-
-## Testing Local Changes
-
-It's possible to modify a local copy of TinaCMS and use that with a app instance with the CMS as a package. 
-
-If you have the **tinacms** repository cloned locally you can use it when running you application:
-
-```
-TINA=../path/to/tinacms pnpm dev
-```
-
-You can also specify which packages you want to watch:
-
-```
-TINA=../path/to/tinacms TINA_WATCH=@tinacms/forms,react-tinacms-inline
-```
-
-> ### Warning
->
-> This will only work for packages loaded by webpack. That means that environments which don't use
-> webpack (i.e. SSR builds) will not use this alias
