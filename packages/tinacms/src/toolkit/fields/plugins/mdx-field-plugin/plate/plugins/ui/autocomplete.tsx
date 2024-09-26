@@ -67,7 +67,6 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
         </div>
       </div>
       <Transition
-        as={Fragment}
         enter="transition ease-out duration-100"
         enterFrom="transform opacity-0 scale-95"
         enterTo="transform opacity-100 scale-100"

@@ -79,7 +79,6 @@ const TemplateMenu = ({
           </div>
 
           <Transition
-            as={Fragment}
             enter="transition ease-out duration-100"
             enterFrom="transform opacity-0 scale-95"
             enterTo="transform opacity-100 scale-100"
@@ -91,7 +90,7 @@ const TemplateMenu = ({
               <div className="py-1">
                 {templates.map((template) => (
                   <MenuItem key={`${template.label}-${template.name}`}>
-                    {({ active }) => (
+                    {({ focus }) => (
                       <Link
                         to={`/${
                           folder.fullyQualifiedName
@@ -112,7 +111,7 @@ const TemplateMenu = ({
                         }`}
                         // to={`${template.name}/new`}
                         className={`w-full text-md px-4 py-2 tracking-wide flex items-center transition ease-out duration-100 ${
-                          active
+                          focus
                             ? 'text-blue-600 opacity-100 bg-gray-50'
                             : 'opacity-80 text-gray-600'
                         }`}
