@@ -15,6 +15,7 @@ import type { ScreenPlugin } from '@toolkit/react-screens'
 import { SyncStatus, SyncErrorWidget, SyncStatusModal } from './sync-status'
 import { useCMS } from '@toolkit/react-core'
 import type { CloudConfigPlugin } from '@toolkit/react-cloud-config'
+import { version } from '../../../../package.json'
 
 interface NavCollection {
   label?: string
@@ -199,7 +200,7 @@ export const Nav = ({
         <SyncStatusModal cms={cms} closeEventsModal={closeEventsModal} />
       )}
       {children}
-      <div className="px-6 flex-1 overflow-auto">
+      <div className="flex flex-col px-6 flex-1 overflow-auto">
         {showCollections && (
           <>
             <h4 className="flex space-x-1 justify-items-start uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">
@@ -285,6 +286,10 @@ export const Nav = ({
             </ul>
           </>
         )}
+        <div className="grow"></div>
+        <span className="font-sans font-light text-xs mb-3 mt-8 text-gray-500">
+          v{version}
+        </span>
       </div>
     </div>
   )
