@@ -258,6 +258,7 @@ export const createConfig = async ({
       ...plugins,
     ],
   }
+  console.log('Vite config:', JSON.stringify(config, null, 2))
 
   return config
 }
