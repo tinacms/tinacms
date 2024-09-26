@@ -99,6 +99,16 @@ export default defineSchema({
           name: 'description',
           required: true,
         },
+        {
+          name: 'dates',
+          label: 'Dates',
+          type: 'object',
+          list: true,
+          ui: {
+            // SORT FEATURE HERE?
+          },
+          fields: [{ name: 'date', label: 'Date', type: 'datetime' }],
+        },
       ],
     },
   ],
