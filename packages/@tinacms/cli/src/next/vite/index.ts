@@ -159,6 +159,10 @@ export const createConfig = async ({
     TINA_IMPORT: configManager.prebuildFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
     STATIC_MEDIA_IMPORT: staticMediaPath,
+    crypto: {},
+    fs: {},
+    os: {},
+    path: {},
   }
   if (configManager.shouldSkipSDK()) {
     alias['CLIENT_IMPORT'] = path.join(
@@ -233,10 +237,6 @@ export const createConfig = async ({
       },
     },
     build: {
-      commonjsOptions: {
-        include: [/node_modules/],
-        exclude: [/crypto/, /fs/, /os/, /path/],
-      },
       sourcemap: false,
       outDir: configManager.outputFolderPath,
       emptyOutDir: true,
