@@ -104,7 +104,7 @@ If the changes affect local use of the packages (i.e. not the ContentAPI), use t
 To use a **tinacms** repository cloned locally, when running your application, use the `--rootPath` flag:
 
 ```
-node bin/tinacms dev --rootPath {{ APPLICATION PROJECT PATH }}
+node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath {{ APPLICATION PROJECT PATH }}
 ```
 
 ex. `node bin/tinacms dev --rootPath ~/Developer/tina/tina-cloud-starter`
