@@ -6,11 +6,15 @@ const makeCacheDir = async (dir: string, fs: any) => {
   const os = await import('os')
 
   const parts = dir.split(path.sep)
+  console.log({
+    dir,
+    parts,
+  })
 
   let cacheDir = dir
   // check if the root directory exists, if not then create create in tmp and return new path
   if (!fs.existsSync(parts[0])) {
-    cacheDir = path.join(os.tmpdir(), parts[0])
+    cacheDir = path.join(os.tmpdir(), parts[parts.length - 1])
   }
 
   fs.mkdirSync(cacheDir, { recursive: true })
