@@ -3,11 +3,7 @@
 	"version": "1.6.5",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
-	"files": [
-		"dist",
-		"bin/*",
-		".env"
-	],
+	"files": ["dist", "bin/*", ".env"],
 	"license": "Apache-2.0",
 	"bin": {
 		"tinacms": "bin/tinacms"
@@ -86,7 +82,6 @@
 		"many-level": "^2.0.0",
 		"memory-level": "^1.0.0",
 		"minimatch": "^5.1.2",
-		"node-fetch": "3",
 		"normalize-path": "^3.0.0",
 		"prettier": "^2.2.1",
 		"progress": "^2.0.3",

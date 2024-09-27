@@ -4,10 +4,7 @@
 	"main": "dist/index.js",
 	"module": "dist/index-client.mjs",
 	"typings": "dist/index.d.ts",
-	"files": [
-		"package.json",
-		"dist"
-	],
+	"files": ["package.json", "dist"],
 	"exports": {
 		".": {
 			"import": "./dist/index.mjs",
@@ -40,7 +37,6 @@
 		"@tinacms/graphql": "workspace:*",
 		"@tinacms/schema-tools": "workspace:*",
 		"memory-level": "^1.0.0",
-		"node-fetch": "3",
 		"search-index": "4.0.0",
 		"sqlite-level": "^1.2.0",
 		"stopword": "^3.1.1"
