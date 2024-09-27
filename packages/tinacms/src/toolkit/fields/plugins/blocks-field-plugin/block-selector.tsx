@@ -1,8 +1,13 @@
 import * as React from 'react'
 import { AddIcon } from '@toolkit/icons'
 import { IconButton } from '@toolkit/styles'
-import { Popover, Transition } from '@headlessui/react'
-import { BlockTemplate } from '.'
+import {
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+  Transition,
+} from '@headlessui/react'
+import type { BlockTemplate } from '.'
 
 export const BlockSelector = ({
   templates,
@@ -30,7 +35,7 @@ export const BlockSelector = ({
     <Popover>
       {({ open }) => (
         <>
-          <Popover.Button as={'span'}>
+          <PopoverButton as={'span'}>
             <IconButton
               variant={open ? 'secondary' : 'primary'}
               size="small"
@@ -38,7 +43,7 @@ export const BlockSelector = ({
             >
               <AddIcon className="w-5/6 h-auto" />
             </IconButton>
-          </Popover.Button>
+          </PopoverButton>
           <div className="transform translate-y-full absolute -bottom-1 right-0 z-50">
             <Transition
               enter="transition duration-150 ease-out"
@@ -48,7 +53,7 @@ export const BlockSelector = ({
               leaveFrom="transform opacity-100 translate-y-0"
               leaveTo="transform opacity-0 -translate-y-2"
             >
-              <Popover.Panel className="relative overflow-hidden rounded-lg shadow-lg bg-white border border-gray-100">
+              <PopoverPanel className="relative overflow-hidden rounded-lg shadow-lg bg-white border border-gray-100">
                 {({ close }) => (
                   <div className="min-w-[192px] max-h-[24rem] overflow-y-auto flex flex-col w-full h-full">
                     {showFilter && (
@@ -89,7 +94,7 @@ export const BlockSelector = ({
                       ))}
                   </div>
                 )}
-              </Popover.Panel>
+              </PopoverPanel>
             </Transition>
           </div>
         </>

@@ -1,6 +1,6 @@
 {
 	"name": "tinacms",
-	"version": "2.2.4",
+	"version": "2.2.5",
 	"main": "dist/index.js",
 	"module": "./dist/index.mjs",
 	"exports": {
@@ -40,9 +40,7 @@
 			"require": "./dist/rich-text/prism.js"
 		}
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"buildConfig": {
 		"entryPoints": [
 			"src/index.ts",
@@ -66,7 +64,7 @@
 		"@floating-ui/dom": "^1.6.9",
 		"@floating-ui/react-dom": "^2.1.1",
 		"@graphql-inspector/core": "^6.1.0",
-		"@headlessui/react": "^2.1.2",
+		"@headlessui/react": "2.1.8",
 		"@heroicons/react": "^1.0.4",
 		"@monaco-editor/react": "4.4.5",
 		"@radix-ui/react-checkbox": "^1.1.1",

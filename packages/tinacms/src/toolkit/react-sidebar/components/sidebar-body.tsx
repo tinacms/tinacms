@@ -6,7 +6,7 @@ import { useCMS } from '@toolkit/react-core'
 import { FormBuilder, FormStatus } from '@toolkit/form-builder'
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta'
 import { SidebarContext } from './sidebar'
-import { BiHomeAlt } from 'react-icons/bi'
+import { BiDotsVertical, BiHomeAlt } from 'react-icons/bi'
 
 export const FormsView = ({
   children,
@@ -112,8 +112,24 @@ export const MultiformFormHeader = ({
             }
           }}
         >
+          <BiDotsVertical className="h-auto w-5 inline-block opacity-70" />
+        </button>
+        <button
+          type="button"
+          className="pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150"
+          onClick={() => {
+            const collectionName = cms.api.tina.schema.getCollectionByFullPath(
+              cms.state.activeFormId
+            ).name
+
+            window.location.href = `${
+              new URL(window.location.href).pathname
+            }#/collections/${collectionName}/~`
+          }}
+        >
           <BiHomeAlt className="h-auto w-5 inline-block opacity-70" />
         </button>
+
         <span className="opacity-30 text-sm leading-tight whitespace-nowrap flex-0">
           /
         </span>
@@ -132,6 +148,7 @@ export interface FormHeaderProps {
 
 export const FormHeader = ({ activeForm }: FormHeaderProps) => {
   const { formIsPristine } = React.useContext(SidebarContext)
+  const cms = useCMS()
 
   const shortFormLabel = activeForm.tinaForm.label
     ? activeForm.tinaForm.label.replace(/^.*[\\\/]/, '')
@@ -144,11 +161,26 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
       }
     >
       <div className="max-w-form mx-auto flex gap-2 justify-between items-center">
+        <button
+          type="button"
+          className="pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150"
+          onClick={() => {
+            const collectionName = cms.api.tina.schema.getCollectionByFullPath(
+              cms.state.activeFormId
+            ).name
+            window.location.href = `${
+              new URL(window.location.href).pathname
+            }#/collections/${collectionName}/~`
+          }}
+        >
+          <BiHomeAlt className="h-auto w-5 inline-block opacity-70" />
+        </button>
         {shortFormLabel && (
           <span className="block w-full text-sm leading-tight whitespace-nowrap truncate">
             {shortFormLabel}
           </span>
         )}
+
         <FormStatus pristine={formIsPristine} />
       </div>
     </div>

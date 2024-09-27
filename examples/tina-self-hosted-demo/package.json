@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/self-hosted-starter",
-	"version": "0.1.61",
+	"version": "0.1.62",
 	"private": true,
 	"scripts": {
 		"dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev\"",
@@ -11,7 +11,7 @@
 		"lint": "eslint . --ext .ts,.tsx"
 	},
 	"dependencies": {
-		"@headlessui/react": "1.7.5",
+		"@headlessui/react": "2.1.8",
 		"@octokit/rest": "^19.0.7",
 		"@tailwindcss/typography": "^0.5.8",
 		"@tinacms/datalayer": "workspace:*",

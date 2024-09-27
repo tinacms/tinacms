@@ -1,10 +1,13 @@
 {
 	"name": "@tinacms/search",
-	"version": "1.0.28",
+	"version": "1.0.29",
 	"main": "dist/index.js",
 	"module": "dist/index-client.mjs",
 	"typings": "dist/index.d.ts",
-	"files": ["package.json", "dist"],
+	"files": [
+		"package.json",
+		"dist"
+	],
 	"exports": {
 		".": {
 			"import": "./dist/index.mjs",
