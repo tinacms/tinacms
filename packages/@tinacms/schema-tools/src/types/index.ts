@@ -7,7 +7,9 @@ type Meta = {
   error?: any
 }
 
-export type FilterValue = string[] | string // extend this type if needed
+// This type is used in collectionFilter for reference field, it represent the datatype of the field in the referenced collection that will be used to do the filter
+// This type is extendable if we need to support more type for reference selection filter (e.g. boolean)
+type FilterValue = string[] | string
 
 type Component<Type, List> = (props: {
   field: TinaField & { namespace: string[] }
