@@ -5,7 +5,7 @@ const makeCacheDir = async (dir: string, fs: any) => {
   const path = await import('path')
   const os = await import('os')
 
-  const parts = dir.split(path.sep)
+  const parts = dir.split(path.sep).filter(Boolean)
   console.log({
     dir,
     parts,
