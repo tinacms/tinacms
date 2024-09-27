@@ -101,6 +101,26 @@ Run `git checkout -- .` This will clear out the versioning changes.
 
 If the changes affect local use of the packages (i.e. not the ContentAPI), use the tina-cloud-starter found in the examples directory of this repo.
 
+To use a **tinacms** repository cloned locally, when running your application, use the `--rootPath` flag:
+
+```
+node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath {{ APPLICATION PROJECT PATH }}
+```
+
+e.g. `node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath ~/Developer/tina/tina-cloud-starter`
+
+Then inside another terminal (in the tinacms project), run:
+
+```
+pnpm watch
+```
+
+> ### Warning
+>
+> This will only work for packages loaded by webpack. That means that environments which don't use
+> webpack (i.e. SSR builds) will not use this alias
+
+
 ## E2E tests
 
 In order to run the Cypress E2E tests:
