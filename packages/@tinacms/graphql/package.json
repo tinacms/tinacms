@@ -76,7 +76,7 @@
 		"@types/lru-cache": "^5.1.1",
 		"@types/mdast": "^3.0.15",
 		"@types/micromatch": "^4.0.9",
-		"@types/node": "^14.18.63",
+		"@types/node": "^22.7.3",
 		"@types/normalize-path": "^3.0.2",
 		"@types/ws": "^7.4.7",
 		"@types/yup": "^0.29.14",
@@ -86,6 +86,6 @@
 		"jest-matcher-utils": "^29.7.0",
 		"memory-level": "^1.0.0",
 		"nodemon": "3.1.4",
-		"typescript": "^5.5.4"
+		"typescript": "^5.6.2"
 	}
 }

@@ -3,7 +3,11 @@
 	"version": "1.6.5",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
-	"files": ["dist", "bin/*", ".env"],
+	"files": [
+		"dist",
+		"bin/*",
+		".env"
+	],
 	"license": "Apache-2.0",
 	"bin": {
 		"tinacms": "bin/tinacms"
@@ -90,7 +94,7 @@
 		"tailwindcss": "^3.4.4",
 		"tinacms": "workspace:*",
 		"typanion": "3.13.0",
-		"typescript": "^5.5.4",
+		"typescript": "^5.6.2",
 		"vite": "^4.3.9",
 		"yup": "^0.32.9",
 		"zod": "^3.14.3"

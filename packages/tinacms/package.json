@@ -40,7 +40,9 @@
 			"require": "./dist/rich-text/prism.js"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"buildConfig": {
 		"entryPoints": [
 			"src/index.ts",
@@ -143,7 +145,7 @@
 		"@types/color-string": "^1.5.5",
 		"@types/lodash.debounce": "^4.0.9",
 		"@types/lodash.get": "^4.4.9",
-		"@types/node": "^22.1.0",
+		"@types/node": "^22.7.3",
 		"@types/prop-types": "^15.7.12",
 		"@types/react": "^18.3.3",
 		"@types/react-beautiful-dnd": "^13.1.8",
@@ -160,7 +162,7 @@
 		"react-is": "^18.3.1",
 		"tsc-alias": "^1.8.10",
 		"tslib": "^2.6.3",
-		"typescript": "^5.5.4",
+		"typescript": "^5.6.2",
 		"vite": "^5.3.5",
 		"vitest": "^2.0.5"
 	},
