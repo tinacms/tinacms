@@ -2,7 +2,7 @@ import React from 'react'
 import AuthorCollectionCustomReference from '../../component/custom-reference-select-author'
 import PostCollectionCustomReference from '../../component/custom-reference-select-post'
 import { type CollectionProps, COLLECTIONS, type InternalSys } from './model'
-import { getLocationFromHost } from '../utils/author-location'
+import { LocationEnum } from '../model/location-enum'
 
 const referenceField = {
   label: 'Author',
@@ -39,7 +39,18 @@ const referenceField = {
     collectionFilter: () => {
       return {
         author: {
-          location: getLocationFromHost('ndcsydney.com'),
+          location: (hostname: string): LocationEnum => {
+            switch (true) {
+              case hostname.includes('ndcmelbourne.com'):
+                return LocationEnum.Melbourne
+
+              case hostname.includes('ndcsydney.com'):
+                return LocationEnum.Sydney
+              // Add more cases if needed
+              default:
+                return LocationEnum.Default
+            }
+          },
         },
       }
     },
