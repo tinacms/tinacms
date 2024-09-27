@@ -120,7 +120,6 @@ pnpm watch
 > This will only work for packages loaded by webpack. That means that environments which don't use
 > webpack (i.e. SSR builds) will not use this alias
 
-
 ## E2E tests
 
 In order to run the Cypress E2E tests:

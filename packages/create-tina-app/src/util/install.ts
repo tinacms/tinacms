@@ -1,5 +1,5 @@
-import chalk from 'chalk'
 import spawn from 'cross-spawn'
+import { log } from './logger'
 
 interface InstallArgs {
   /**
@@ -80,12 +80,10 @@ export function install(
        */
       args = ['install']
       if (!isOnline) {
-        console.log(chalk.yellow('You appear to be offline.'))
+        log.warn('You appear to be offline.')
         if (packageManager === 'yarn') {
-          console.log(chalk.yellow('Falling back to the local Yarn cache.'))
+          log.warn('Falling back to the local Yarn cache.')
           args.push('--offline')
-        } else {
-          console.log()
         }
       }
     }
