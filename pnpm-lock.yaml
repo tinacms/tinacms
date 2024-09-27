@@ -78,7 +78,7 @@ importers:
                 version: 3.7.7
             next:
                 specifier: ^14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -112,7 +112,7 @@ importers:
                 version: link:../../packages/@tinacms/cli
             next:
                 specifier: ^14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -158,10 +158,10 @@ importers:
                 version: 0.5.0
             mongodb-level:
                 specifier: ^0.0.4
-                version: 0.0.4(mongodb@4.17.2(@aws-sdk/client-sso-oidc@3.624.0(@aws-sdk/client-sts@3.624.0)))
+                version: 0.0.4(mongodb@4.17.2)
             next:
                 specifier: ^14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -230,8 +230,8 @@ importers:
                 specifier: ^2.1.1
                 version: 2.1.1
             next:
-                specifier: 14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                specifier: 14.2.10
+                version: 14.2.10(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             next-themes:
                 specifier: ^0.3.0
                 version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -295,13 +295,13 @@ importers:
                 version: 2.30.0
             mongodb-level:
                 specifier: ^0.0.3
-                version: 0.0.3(@aws-sdk/client-sso-oidc@3.624.0(@aws-sdk/client-sts@3.624.0))
+                version: 0.0.3
             next:
                 specifier: ^14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             next-auth:
                 specifier: ^4.24.7
-                version: 4.24.7(next@14.2.5(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 4.24.7(next@14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -365,7 +365,7 @@ importers:
         dependencies:
             next:
                 specifier: ^14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -414,10 +414,10 @@ importers:
                 version: 15.8.0
             mongodb-level:
                 specifier: ^0.0.3
-                version: 0.0.3(@aws-sdk/client-sso-oidc@3.624.0(@aws-sdk/client-sts@3.624.0))
+                version: 0.0.3
             next:
                 specifier: ^14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -545,8 +545,8 @@ importers:
                 specifier: ^29.5.0
                 version: 29.7.0(@types/node@14.18.63)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@14.18.63)(typescript@4.6.4))
             next:
-                specifier: 14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                specifier: 14.2.10
+                version: 14.2.10(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: 18.3.1
                 version: 18.3.1
@@ -671,8 +671,8 @@ importers:
                 specifier: ^5.1.2
                 version: 5.1.6
             node-fetch:
-                specifier: '2'
-                version: 2.7.0
+                specifier: '3'
+                version: 3.3.2
             normalize-path:
                 specifier: ^3.0.0
                 version: 3.0.0
@@ -874,8 +874,8 @@ importers:
                 specifier: ^2.0.0
                 version: 2.0.0
             micromatch:
-                specifier: 4.0.5
-                version: 4.0.5
+                specifier: 4.0.8
+                version: 4.0.8
             normalize-path:
                 specifier: ^3.0.0
                 version: 3.0.0
@@ -1208,8 +1208,8 @@ importers:
                 specifier: ^1.0.0
                 version: 1.0.0
             node-fetch:
-                specifier: '2'
-                version: 2.7.0
+                specifier: '3'
+                version: 3.3.2
             search-index:
                 specifier: 4.0.0
                 version: 4.0.0(abstract-level@1.0.4)
@@ -1353,8 +1353,8 @@ importers:
                 specifier: ^13.13.1
                 version: 13.13.52
             next:
-                specifier: 14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                specifier: 14.2.10
+                version: 14.2.10(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -1390,8 +1390,8 @@ importers:
                 specifier: ^13.13.1
                 version: 13.13.52
             next:
-                specifier: 14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                specifier: 14.2.10
+                version: 14.2.10(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -1430,8 +1430,8 @@ importers:
                 specifier: ^18.3.3
                 version: 18.3.3
             next:
-                specifier: 14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                specifier: 14.2.10
+                version: 14.2.10(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -1725,8 +1725,8 @@ importers:
                 specifier: ^0.7.0
                 version: 0.7.0
             next:
-                specifier: 14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                specifier: 14.2.10
+                version: 14.2.10(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -1765,11 +1765,11 @@ importers:
                 specifier: workspace:*
                 version: link:../@tinacms/scripts
             next:
-                specifier: 14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                specifier: 14.2.10
+                version: 14.2.10(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             next-auth:
                 specifier: 4.24.7
-                version: 4.24.7(next@14.2.5(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 4.24.7(next@14.2.10(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -1833,7 +1833,7 @@ importers:
                 version: 1.7.5
             next:
                 specifier: ^14.2.5
-                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -5029,6 +5029,12 @@ packages:
             }
         engines: { node: '>=12' }
 
+    '@next/env@14.2.10':
+        resolution:
+            {
+                integrity: sha512-dZIu93Bf5LUtluBXIv4woQw2cZVZ2DJTjax5/5DOs3lzEOeKLy7GxRSr4caK9/SCPdaW6bCgpye6+n4Dh9oJPw==,
+            }
+
     '@next/env@14.2.5':
         resolution:
             {
@@ -5053,6 +5059,15 @@ packages:
                 integrity: sha512-LY3btOpPh+OTIpviNojDpUdIbHW9j0JBYBjsIp8IxtDFfYFyORvw3yNq6N231FVqQA7n7lwaf7xHbVJlA1ED7g==,
             }
 
+    '@next/swc-darwin-arm64@14.2.10':
+        resolution:
+            {
+                integrity: sha512-V3z10NV+cvMAfxQUMhKgfQnPbjw+Ew3cnr64b0lr8MDiBJs3eLnM6RpGC46nhfMZsiXgQngCJKWGTC/yDcgrDQ==,
+            }
+        engines: { node: '>= 10' }
+        cpu: [arm64]
+        os: [darwin]
+
     '@next/swc-darwin-arm64@14.2.5':
         resolution:
             {
@@ -5060,6 +5075,15 @@ packages:
             }
         engines: { node: '>= 10' }
         cpu: [arm64]
+        os: [darwin]
+
+    '@next/swc-darwin-x64@14.2.10':
+        resolution:
+            {
+                integrity: sha512-Y0TC+FXbFUQ2MQgimJ/7Ina2mXIKhE7F+GUe1SgnzRmwFY3hX2z8nyVCxE82I2RicspdkZnSWMn4oTjIKz4uzA==,
+            }
+        engines: { node: '>= 10' }
+        cpu: [x64]
         os: [darwin]
 
     '@next/swc-darwin-x64@14.2.5':
@@ -5071,10 +5095,28 @@ packages:
         cpu: [x64]
         os: [darwin]
 
+    '@next/swc-linux-arm64-gnu@14.2.10':
+        resolution:
+            {
+                integrity: sha512-ZfQ7yOy5zyskSj9rFpa0Yd7gkrBnJTkYVSya95hX3zeBG9E55Z6OTNPn1j2BTFWvOVVj65C3T+qsjOyVI9DQpA==,
+            }
+        engines: { node: '>= 10' }
+        cpu: [arm64]
+        os: [linux]
+
     '@next/swc-linux-arm64-gnu@14.2.5':
         resolution:
             {
                 integrity: sha512-vlhB8wI+lj8q1ExFW8lbWutA4M2ZazQNvMWuEDqZcuJJc78iUnLdPPunBPX8rC4IgT6lIx/adB+Cwrl99MzNaA==,
+            }
+        engines: { node: '>= 10' }
+        cpu: [arm64]
+        os: [linux]
+
+    '@next/swc-linux-arm64-musl@14.2.10':
+        resolution:
+            {
+                integrity: sha512-n2i5o3y2jpBfXFRxDREr342BGIQCJbdAUi/K4q6Env3aSx8erM9VuKXHw5KNROK9ejFSPf0LhoSkU/ZiNdacpQ==,
             }
         engines: { node: '>= 10' }
         cpu: [arm64]
@@ -5089,10 +5131,28 @@ packages:
         cpu: [arm64]
         os: [linux]
 
+    '@next/swc-linux-x64-gnu@14.2.10':
+        resolution:
+            {
+                integrity: sha512-GXvajAWh2woTT0GKEDlkVhFNxhJS/XdDmrVHrPOA83pLzlGPQnixqxD8u3bBB9oATBKB//5e4vpACnx5Vaxdqg==,
+            }
+        engines: { node: '>= 10' }
+        cpu: [x64]
+        os: [linux]
+
     '@next/swc-linux-x64-gnu@14.2.5':
         resolution:
             {
                 integrity: sha512-8XFikMSxWleYNryWIjiCX+gU201YS+erTUidKdyOVYi5qUQo/gRxv/3N1oZFCgqpesN6FPeqGM72Zve+nReVXQ==,
+            }
+        engines: { node: '>= 10' }
+        cpu: [x64]
+        os: [linux]
+
+    '@next/swc-linux-x64-musl@14.2.10':
+        resolution:
+            {
+                integrity: sha512-opFFN5B0SnO+HTz4Wq4HaylXGFV+iHrVxd3YvREUX9K+xfc4ePbRrxqOuPOFjtSuiVouwe6uLeDtabjEIbkmDA==,
             }
         engines: { node: '>= 10' }
         cpu: [x64]
@@ -5107,6 +5167,15 @@ packages:
         cpu: [x64]
         os: [linux]
 
+    '@next/swc-win32-arm64-msvc@14.2.10':
+        resolution:
+            {
+                integrity: sha512-9NUzZuR8WiXTvv+EiU/MXdcQ1XUvFixbLIMNQiVHuzs7ZIFrJDLJDaOF1KaqttoTujpcxljM/RNAOmw1GhPPQQ==,
+            }
+        engines: { node: '>= 10' }
+        cpu: [arm64]
+        os: [win32]
+
     '@next/swc-win32-arm64-msvc@14.2.5':
         resolution:
             {
@@ -5116,6 +5185,15 @@ packages:
         cpu: [arm64]
         os: [win32]
 
+    '@next/swc-win32-ia32-msvc@14.2.10':
+        resolution:
+            {
+                integrity: sha512-fr3aEbSd1GeW3YUMBkWAu4hcdjZ6g4NBl1uku4gAn661tcxd1bHs1THWYzdsbTRLcCKLjrDZlNp6j2HTfrw+Bg==,
+            }
+        engines: { node: '>= 10' }
+        cpu: [ia32]
+        os: [win32]
+
     '@next/swc-win32-ia32-msvc@14.2.5':
         resolution:
             {
@@ -5123,6 +5201,15 @@ packages:
             }
         engines: { node: '>= 10' }
         cpu: [ia32]
+        os: [win32]
+
+    '@next/swc-win32-x64-msvc@14.2.10':
+        resolution:
+            {
+                integrity: sha512-UjeVoRGKNL2zfbcQ6fscmgjBAS/inHBh63mjIlfPg/NG8Yn2ztqylXt5qilYb6hoHIwaU2ogHknHWWmahJjgZQ==,
+            }
+        engines: { node: '>= 10' }
+        cpu: [x64]
         os: [win32]
 
     '@next/swc-win32-x64-msvc@14.2.5':
@@ -10234,6 +10321,13 @@ packages:
             }
         engines: { node: '>=0.10' }
 
+    data-uri-to-buffer@4.0.1:
+        resolution:
+            {
+                integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==,
+            }
+        engines: { node: '>= 12' }
+
     data-uri-to-buffer@6.0.2:
         resolution:
             {
@@ -11725,6 +11819,13 @@ packages:
                 integrity: sha512-lAkyiDSdQog0aqWhyO8/8gnwbh6k27bd18IWJw7IOl2EUWEh22O4C9ebnw8Li3E+HK3Plxgv6ql1Ty/C3gndvg==,
             }
 
+    fetch-blob@3.2.0:
+        resolution:
+            {
+                integrity: sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==,
+            }
+        engines: { node: ^12.20 || >= 14.13 }
+
     fetch-ponyfill@7.1.0:
         resolution:
             {
@@ -11933,6 +12034,13 @@ packages:
                 integrity: sha512-wzsgA6WOq+09wrU1tsJ09udeR/YZRaeArL9e1wPbFg3GG2yDnC2ldKpxs4xunpFF9DgqCqOIra3bc1HWrJ37Ww==,
             }
         engines: { node: '>=0.4.x' }
+
+    formdata-polyfill@4.0.10:
+        resolution:
+            {
+                integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==,
+            }
+        engines: { node: '>=12.20.0' }
 
     forwarded@0.2.0:
         resolution:
@@ -14765,6 +14873,13 @@ packages:
             }
         engines: { node: '>=8.6' }
 
+    micromatch@4.0.8:
+        resolution:
+            {
+                integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==,
+            }
+        engines: { node: '>=8.6' }
+
     mime-db@1.52.0:
         resolution:
             {
@@ -15089,6 +15204,27 @@ packages:
             react: ^16.8 || ^17 || ^18
             react-dom: ^16.8 || ^17 || ^18
 
+    next@14.2.10:
+        resolution:
+            {
+                integrity: sha512-sDDExXnh33cY3RkS9JuFEKaS4HmlWmDKP1VJioucCG6z5KuA008DPsDZOzi8UfqEk3Ii+2NCQSJrfbEWtZZfww==,
+            }
+        engines: { node: '>=18.17.0' }
+        hasBin: true
+        peerDependencies:
+            '@opentelemetry/api': ^1.1.0
+            '@playwright/test': ^1.41.2
+            react: ^18.2.0
+            react-dom: ^18.2.0
+            sass: ^1.3.0
+        peerDependenciesMeta:
+            '@opentelemetry/api':
+                optional: true
+            '@playwright/test':
+                optional: true
+            sass:
+                optional: true
+
     next@14.2.5:
         resolution:
             {
@@ -15129,6 +15265,13 @@ packages:
             }
         engines: { node: '>=10' }
 
+    node-domexception@1.0.0:
+        resolution:
+            {
+                integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==,
+            }
+        engines: { node: '>=10.5.0' }
+
     node-fetch-native@1.0.1:
         resolution:
             {
@@ -15158,6 +15301,13 @@ packages:
         peerDependenciesMeta:
             encoding:
                 optional: true
+
+    node-fetch@3.3.2:
+        resolution:
+            {
+                integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==,
+            }
+        engines: { node: ^12.20.0 || ^14.13.1 || >=16.0.0 }
 
     node-int64@0.4.0:
         resolution:
@@ -19059,6 +19209,13 @@ packages:
                 integrity: sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ==,
             }
 
+    web-streams-polyfill@3.3.3:
+        resolution:
+            {
+                integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==,
+            }
+        engines: { node: '>= 8' }
+
     webcrypto-core@1.8.0:
         resolution:
             {
@@ -19888,7 +20045,7 @@ snapshots:
             '@smithy/types': 3.3.0
             tslib: 2.6.3
 
-    '@aws-sdk/credential-providers@3.624.0(@aws-sdk/client-sso-oidc@3.624.0(@aws-sdk/client-sts@3.624.0))':
+    '@aws-sdk/credential-providers@3.624.0':
         dependencies:
             '@aws-sdk/client-cognito-identity': 3.624.0
             '@aws-sdk/client-sso': 3.624.0
@@ -21059,7 +21216,7 @@ snapshots:
             '@changesets/types': 6.0.0
             '@manypkg/get-packages': 1.1.3
             fs-extra: 7.0.1
-            micromatch: 4.0.5
+            micromatch: 4.0.8
 
     '@changesets/errors@0.2.0':
         dependencies:
@@ -21092,7 +21249,7 @@ snapshots:
             '@changesets/types': 6.0.0
             '@manypkg/get-packages': 1.1.3
             is-subdir: 1.2.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             spawndamnit: 2.0.0
 
     '@changesets/logger@0.1.0':
@@ -22014,7 +22171,7 @@ snapshots:
             jest-util: 29.7.0
             jest-validate: 29.7.0
             jest-watcher: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             pretty-format: 29.7.0
             slash: 3.0.0
             strip-ansi: 6.0.1
@@ -22049,7 +22206,7 @@ snapshots:
             jest-util: 29.7.0
             jest-validate: 29.7.0
             jest-watcher: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             pretty-format: 29.7.0
             slash: 3.0.0
             strip-ansi: 6.0.1
@@ -22084,7 +22241,7 @@ snapshots:
             jest-util: 29.7.0
             jest-validate: 29.7.0
             jest-watcher: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             pretty-format: 29.7.0
             slash: 3.0.0
             strip-ansi: 6.0.1
@@ -22119,7 +22276,7 @@ snapshots:
             jest-util: 29.7.0
             jest-validate: 29.7.0
             jest-watcher: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             pretty-format: 29.7.0
             slash: 3.0.0
             strip-ansi: 6.0.1
@@ -22154,7 +22311,7 @@ snapshots:
             jest-util: 29.7.0
             jest-validate: 29.7.0
             jest-watcher: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             pretty-format: 29.7.0
             slash: 3.0.0
             strip-ansi: 6.0.1
@@ -22265,7 +22422,7 @@ snapshots:
             jest-haste-map: 29.7.0
             jest-regex-util: 29.6.3
             jest-util: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             pirates: 4.0.6
             slash: 3.0.0
             write-file-atomic: 4.0.2
@@ -22401,6 +22558,8 @@ snapshots:
 
     '@n1ru4l/push-pull-async-iterable-iterator@3.2.0': {}
 
+    '@next/env@14.2.10': {}
+
     '@next/env@14.2.5': {}
 
     '@next/eslint-plugin-next@12.0.3':
@@ -22415,28 +22574,55 @@ snapshots:
         dependencies:
             glob: 10.3.10
 
+    '@next/swc-darwin-arm64@14.2.10':
+        optional: true
+
     '@next/swc-darwin-arm64@14.2.5':
+        optional: true
+
+    '@next/swc-darwin-x64@14.2.10':
         optional: true
 
     '@next/swc-darwin-x64@14.2.5':
         optional: true
 
+    '@next/swc-linux-arm64-gnu@14.2.10':
+        optional: true
+
     '@next/swc-linux-arm64-gnu@14.2.5':
+        optional: true
+
+    '@next/swc-linux-arm64-musl@14.2.10':
         optional: true
 
     '@next/swc-linux-arm64-musl@14.2.5':
         optional: true
 
+    '@next/swc-linux-x64-gnu@14.2.10':
+        optional: true
+
     '@next/swc-linux-x64-gnu@14.2.5':
+        optional: true
+
+    '@next/swc-linux-x64-musl@14.2.10':
         optional: true
 
     '@next/swc-linux-x64-musl@14.2.5':
         optional: true
 
+    '@next/swc-win32-arm64-msvc@14.2.10':
+        optional: true
+
     '@next/swc-win32-arm64-msvc@14.2.5':
         optional: true
 
+    '@next/swc-win32-ia32-msvc@14.2.10':
+        optional: true
+
     '@next/swc-win32-ia32-msvc@14.2.5':
+        optional: true
+
+    '@next/swc-win32-x64-msvc@14.2.10':
         optional: true
 
     '@next/swc-win32-x64-msvc@14.2.5':
@@ -26255,6 +26441,8 @@ snapshots:
         dependencies:
             assert-plus: 1.0.0
 
+    data-uri-to-buffer@4.0.1: {}
+
     data-uri-to-buffer@6.0.2: {}
 
     data-view-buffer@1.0.1:
@@ -26864,7 +27052,7 @@ snapshots:
             eslint-plugin-jsx-a11y: 6.9.0(eslint@7.32.0)
             eslint-plugin-react: 7.35.0(eslint@7.32.0)
             eslint-plugin-react-hooks: 4.6.2(eslint@7.32.0)
-            next: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+            next: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
         optionalDependencies:
             typescript: 5.6.2
         transitivePeerDependencies:
@@ -27647,7 +27835,7 @@ snapshots:
             '@nodelib/fs.walk': 1.2.8
             glob-parent: 5.1.2
             merge2: 1.4.1
-            micromatch: 4.0.5
+            micromatch: 4.0.8
 
     fast-json-stable-stringify@2.1.0: {}
 
@@ -27700,6 +27888,11 @@ snapshots:
             traverse: 0.6.7
         transitivePeerDependencies:
             - abstract-level
+
+    fetch-blob@3.2.0:
+        dependencies:
+            node-domexception: 1.0.0
+            web-streams-polyfill: 3.3.3
 
     fetch-ponyfill@7.1.0:
         dependencies:
@@ -27779,7 +27972,7 @@ snapshots:
 
     find-yarn-workspace-root2@1.2.16:
         dependencies:
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             pkg-dir: 4.2.0
 
     flat-cache@3.2.0:
@@ -27828,6 +28021,10 @@ snapshots:
             mime-types: 2.1.35
 
     format@0.2.2: {}
+
+    formdata-polyfill@4.0.10:
+        dependencies:
+            fetch-blob: 3.2.0
 
     forwarded@0.2.0: {}
 
@@ -28732,7 +28929,7 @@ snapshots:
             jest-runner: 29.7.0
             jest-util: 29.7.0
             jest-validate: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             parse-json: 5.2.0
             pretty-format: 29.7.0
             slash: 3.0.0
@@ -28763,7 +28960,7 @@ snapshots:
             jest-runner: 29.7.0
             jest-util: 29.7.0
             jest-validate: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             parse-json: 5.2.0
             pretty-format: 29.7.0
             slash: 3.0.0
@@ -28794,7 +28991,7 @@ snapshots:
             jest-runner: 29.7.0
             jest-util: 29.7.0
             jest-validate: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             parse-json: 5.2.0
             pretty-format: 29.7.0
             slash: 3.0.0
@@ -28825,7 +29022,7 @@ snapshots:
             jest-runner: 29.7.0
             jest-util: 29.7.0
             jest-validate: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             parse-json: 5.2.0
             pretty-format: 29.7.0
             slash: 3.0.0
@@ -28856,7 +29053,7 @@ snapshots:
             jest-runner: 29.7.0
             jest-util: 29.7.0
             jest-validate: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             parse-json: 5.2.0
             pretty-format: 29.7.0
             slash: 3.0.0
@@ -28887,7 +29084,7 @@ snapshots:
             jest-runner: 29.7.0
             jest-util: 29.7.0
             jest-validate: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             parse-json: 5.2.0
             pretty-format: 29.7.0
             slash: 3.0.0
@@ -28918,7 +29115,7 @@ snapshots:
             jest-runner: 29.7.0
             jest-util: 29.7.0
             jest-validate: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             parse-json: 5.2.0
             pretty-format: 29.7.0
             slash: 3.0.0
@@ -28949,7 +29146,7 @@ snapshots:
             jest-runner: 29.7.0
             jest-util: 29.7.0
             jest-validate: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             parse-json: 5.2.0
             pretty-format: 29.7.0
             slash: 3.0.0
@@ -29043,7 +29240,7 @@ snapshots:
             jest-regex-util: 29.6.3
             jest-util: 29.7.0
             jest-worker: 29.7.0
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             walker: 1.0.8
         optionalDependencies:
             fsevents: 2.3.3
@@ -29074,7 +29271,7 @@ snapshots:
             '@types/stack-utils': 2.0.3
             chalk: 4.1.2
             graceful-fs: 4.2.11
-            micromatch: 4.0.5
+            micromatch: 4.0.8
             pretty-format: 29.7.0
             slash: 3.0.0
             stack-utils: 2.0.6
@@ -30243,6 +30440,11 @@ snapshots:
             braces: 3.0.3
             picomatch: 2.3.1
 
+    micromatch@4.0.8:
+        dependencies:
+            braces: 3.0.3
+            picomatch: 2.3.1
+
     mime-db@1.52.0: {}
 
     mime-types@2.1.35:
@@ -30324,28 +30526,28 @@ snapshots:
             '@types/whatwg-url': 8.2.2
             whatwg-url: 11.0.0
 
-    mongodb-level@0.0.3(@aws-sdk/client-sso-oidc@3.624.0(@aws-sdk/client-sts@3.624.0)):
+    mongodb-level@0.0.3:
         dependencies:
             abstract-level: 1.0.4
             module-error: 1.0.2
-            mongodb: 4.17.2(@aws-sdk/client-sso-oidc@3.624.0(@aws-sdk/client-sts@3.624.0))
+            mongodb: 4.17.2
         transitivePeerDependencies:
             - '@aws-sdk/client-sso-oidc'
             - aws-crt
 
-    mongodb-level@0.0.4(mongodb@4.17.2(@aws-sdk/client-sso-oidc@3.624.0(@aws-sdk/client-sts@3.624.0))):
+    mongodb-level@0.0.4(mongodb@4.17.2):
         dependencies:
             abstract-level: 1.0.4
             module-error: 1.0.2
-            mongodb: 4.17.2(@aws-sdk/client-sso-oidc@3.624.0(@aws-sdk/client-sts@3.624.0))
+            mongodb: 4.17.2
 
-    mongodb@4.17.2(@aws-sdk/client-sso-oidc@3.624.0(@aws-sdk/client-sts@3.624.0)):
+    mongodb@4.17.2:
         dependencies:
             bson: 4.7.2
             mongodb-connection-string-url: 2.6.0
             socks: 2.8.3
         optionalDependencies:
-            '@aws-sdk/credential-providers': 3.624.0(@aws-sdk/client-sso-oidc@3.624.0(@aws-sdk/client-sts@3.624.0))
+            '@aws-sdk/credential-providers': 3.624.0
             '@mongodb-js/saslprep': 1.1.8
         transitivePeerDependencies:
             - '@aws-sdk/client-sso-oidc'
@@ -30393,13 +30595,28 @@ snapshots:
 
     netmask@2.0.2: {}
 
-    next-auth@4.24.7(next@14.2.5(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    next-auth@4.24.7(next@14.2.10(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
         dependencies:
             '@babel/runtime': 7.25.0
             '@panva/hkdf': 1.2.1
             cookie: 0.5.0
             jose: 4.15.9
-            next: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+            next: 14.2.10(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+            oauth: 0.9.15
+            openid-client: 5.6.5
+            preact: 10.23.1
+            preact-render-to-string: 5.2.6(preact@10.23.1)
+            react: 18.3.1
+            react-dom: 18.3.1(react@18.3.1)
+            uuid: 8.3.2
+
+    next-auth@4.24.7(next@14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+        dependencies:
+            '@babel/runtime': 7.25.0
+            '@panva/hkdf': 1.2.1
+            cookie: 0.5.0
+            jose: 4.15.9
+            next: 14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             oauth: 0.9.15
             openid-client: 5.6.5
             preact: 10.23.1
@@ -30413,7 +30630,33 @@ snapshots:
             react: 18.3.1
             react-dom: 18.3.1(react@18.3.1)
 
-    next@14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    next@14.2.10(@babel/core@7.25.2)(@playwright/test@1.46.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+        dependencies:
+            '@next/env': 14.2.10
+            '@swc/helpers': 0.5.5
+            busboy: 1.6.0
+            caniuse-lite: 1.0.30001649
+            graceful-fs: 4.2.11
+            postcss: 8.4.31
+            react: 18.3.1
+            react-dom: 18.3.1(react@18.3.1)
+            styled-jsx: 5.1.1(@babel/core@7.25.2)(babel-plugin-macros@3.1.0)(react@18.3.1)
+        optionalDependencies:
+            '@next/swc-darwin-arm64': 14.2.10
+            '@next/swc-darwin-x64': 14.2.10
+            '@next/swc-linux-arm64-gnu': 14.2.10
+            '@next/swc-linux-arm64-musl': 14.2.10
+            '@next/swc-linux-x64-gnu': 14.2.10
+            '@next/swc-linux-x64-musl': 14.2.10
+            '@next/swc-win32-arm64-msvc': 14.2.10
+            '@next/swc-win32-ia32-msvc': 14.2.10
+            '@next/swc-win32-x64-msvc': 14.2.10
+            '@playwright/test': 1.46.0
+        transitivePeerDependencies:
+            - '@babel/core'
+            - babel-plugin-macros
+
+    next@14.2.5(@babel/core@7.25.2)(@playwright/test@1.46.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
         dependencies:
             '@next/env': 14.2.5
             '@swc/helpers': 0.5.5
@@ -30450,6 +30693,8 @@ snapshots:
         dependencies:
             semver: 7.6.3
 
+    node-domexception@1.0.0: {}
+
     node-fetch-native@1.0.1: {}
 
     node-fetch@2.6.13:
@@ -30459,6 +30704,12 @@ snapshots:
     node-fetch@2.7.0:
         dependencies:
             whatwg-url: 5.0.0
+
+    node-fetch@3.3.2:
+        dependencies:
+            data-uri-to-buffer: 4.0.1
+            fetch-blob: 3.2.0
+            formdata-polyfill: 4.0.10
 
     node-int64@0.4.0: {}
 
@@ -33154,6 +33405,8 @@ snapshots:
     walker@1.0.8:
         dependencies:
             makeerror: 1.0.12
+
+    web-streams-polyfill@3.3.3: {}
 
     webcrypto-core@1.8.0:
         dependencies:
