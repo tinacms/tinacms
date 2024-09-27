@@ -6,10 +6,6 @@ const makeCacheDir = async (dir: string, fs: any) => {
   const os = await import('os')
 
   const parts = dir.split(path.sep).filter(Boolean)
-  console.log({
-    dir,
-    parts,
-  })
 
   let cacheDir = dir
   // check if the root directory exists, if not then create create in tmp and return new path
@@ -25,7 +21,7 @@ export const NodeCache = async (dir: string): Promise<Cache> => {
   const fs = await import('fs')
   const { createHash } = await import('crypto')
   const cacheDir = await makeCacheDir(dir, fs)
-  console.log('cacheDir', cacheDir)
+
   return {
     makeKey: (key: any) => {
       const input =
