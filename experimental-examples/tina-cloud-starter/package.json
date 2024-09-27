@@ -27,7 +27,7 @@
     "tailwindcss": "^3.3.2"
   },
   "dependencies": {
-    "@headlessui/react": "1.7.5",
+    "@headlessui/react": "2.1.8",
     "@tailwindcss/typography": "^0.5.8",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/vercel-previews": "workspace:*",

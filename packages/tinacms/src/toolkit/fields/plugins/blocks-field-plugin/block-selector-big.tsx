@@ -3,6 +3,7 @@ import { AddIcon } from '@toolkit/icons'
 import { IconButton } from '@toolkit/styles'
 import {
   Disclosure,
+  DisclosureButton,
   DisclosurePanel,
   Transition,
   TransitionChild,
@@ -93,7 +94,6 @@ export const BlockSelectorBig = ({
         {({ zIndexShift }) => (
           <Transition show={pickerIsOpen}>
             <TransitionChild
-              as={React.Fragment}
               enter="transform transition-all ease-out duration-200"
               enterFrom="opacity-0 -translate-x-1/2"
               enterTo="opacity-100 translate-x-0"
@@ -219,7 +219,7 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
     >
       {({ open }) => (
         <>
-          <Disclosure.Button
+          <DisclosureButton
             className={`relative block group text-left w-full text-base font-bold tracking-wide py-2 truncate ${
               templates.length === 0 ? `pointer-events-none` : ``
             } ${
@@ -242,7 +242,7 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
                 }`}
               />
             )}
-          </Disclosure.Button>
+          </DisclosureButton>
 
           <Transition
             enter="transition duration-100 ease-out"

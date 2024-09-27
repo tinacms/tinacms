@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"@graphiql/toolkit": "0.8.4",
-		"@headlessui/react": "^2.1.8",
+		"@headlessui/react": "2.1.8",
 		"@heroicons/react": "^1.0.6",
 		"@monaco-editor/react": "4.4.5",
 		"@tinacms/mdx": "workspace:*",
