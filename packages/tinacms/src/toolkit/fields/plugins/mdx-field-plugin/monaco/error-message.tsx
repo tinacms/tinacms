@@ -78,7 +78,6 @@ export function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
             <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
           </PopoverButton>
           <Transition
-            as={Fragment}
             enter="transition ease-out duration-200"
             enterFrom="opacity-0 translate-y-1"
             enterTo="opacity-100 translate-y-0"

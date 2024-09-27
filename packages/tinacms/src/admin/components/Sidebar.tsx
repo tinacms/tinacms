@@ -83,7 +83,6 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
       {!renderDesktopNav && (
         <Transition show={menuIsOpen}>
           <TransitionChild
-            as={React.Fragment}
             enter="transform transition-all ease-out duration-300"
             enterFrom="opacity-0 -translate-x-full"
             enterTo="opacity-100 translate-x-0"
@@ -155,7 +154,6 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
             </div>
           </TransitionChild>
           <TransitionChild
-            as={React.Fragment}
             enter="ease-out duration-300"
             enterFrom="opacity-0"
             enterTo="opacity-80"
