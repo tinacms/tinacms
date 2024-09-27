@@ -2,7 +2,7 @@ import React from 'react'
 import AuthorCollectionCustomReference from '../../component/custom-reference-select-author'
 import PostCollectionCustomReference from '../../component/custom-reference-select-post'
 import { type CollectionProps, COLLECTIONS, type InternalSys } from './model'
-import { customFilterAuthorReference as DynamicFilterAuthorFuction } from '../utils/author-location'
+import { getLocationFromHost } from '../utils/author-location'
 
 const referenceField = {
   label: 'Author',
@@ -26,6 +26,7 @@ const referenceField = {
           return s.path
       }
     },
+    //Static example - user can define which field and value they want to filter
     // collectionFilter: {
     //   author: {
     //     location: 'melbourne',
@@ -34,8 +35,14 @@ const referenceField = {
     //     title: 'hello world',
     //   },
     // },
-    //TODO : Example of using dynamic function
-    collectionFilter: DynamicFilterAuthorFuction,
+    //Dynamic example - user can define the function they want here but need to make sure the return type match the schema
+    collectionFilter: () => {
+      return {
+        author: {
+          location: getLocationFromHost('ndcsydney.com'),
+        },
+      }
+    },
   },
   collections: ['author', 'post'],
 }
