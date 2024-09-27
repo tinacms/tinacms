@@ -86,7 +86,7 @@
 		"many-level": "^2.0.0",
 		"memory-level": "^1.0.0",
 		"minimatch": "^5.1.2",
-		"node-fetch": "2",
+		"node-fetch": "3",
 		"normalize-path": "^3.0.0",
 		"prettier": "^2.2.1",
 		"progress": "^2.0.3",
