@@ -1,5 +1,12 @@
 import React, { Fragment } from 'react'
-import { Combobox, Transition } from '@headlessui/react'
+import {
+  Combobox,
+  ComboboxButton,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+  Transition,
+} from '@headlessui/react'
 import { classNames } from './helpers'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
@@ -43,7 +50,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
     >
       <div className="mt-1">
         <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left shadow-md sm:text-sm">
-          <Combobox.Input
+          <ComboboxInput
             className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300"
             displayValue={(item: AutocompleteItem) =>
               item?.label ?? 'Plain Text'
@@ -51,16 +58,15 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
             onChange={(event) => setQuery(event.target.value)}
             onClick={(ev) => ev.stopPropagation()}
           />
-          <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+          <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-2">
             <ChevronDownIcon
               className="h-5 w-5 text-gray-400"
               aria-hidden="true"
             />
-          </Combobox.Button>
+          </ComboboxButton>
         </div>
       </div>
       <Transition
-        as={Fragment}
         enter="transition ease-out duration-100"
         enterFrom="transform opacity-0 scale-95"
         enterTo="transform opacity-100 scale-100"
@@ -68,22 +74,22 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Combobox.Options className="origin-top-right absolute right-0 mt-1 w-full max-h-[300px] overflow-y-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <ComboboxOptions className="origin-top-right absolute right-0 mt-1 w-full max-h-[300px] overflow-y-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
           {filteredItems.map((item) => (
-            <Combobox.Option key={item.key} value={item}>
-              {({ active }) => (
+            <ComboboxOption key={item.key} value={item}>
+              {({ focus }) => (
                 <button
                   className={classNames(
-                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                    focus ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                     'block px-4 py-2 text-xs w-full text-right'
                   )}
                 >
                   {item.render(item)}
                 </button>
               )}
-            </Combobox.Option>
+            </ComboboxOption>
           ))}
-        </Combobox.Options>
+        </ComboboxOptions>
       </Transition>
     </Combobox>
   )

@@ -1,5 +1,16 @@
 # tinacms
 
+## 2.2.5
+
+### Patch Changes
+
+- cf1530d: Rich text editor - add h6 support
+- 2762994: Fix node 22 issues with better-sqlite3. Updates sqlite-level
+- ba5f7a3: ⬆️ Update @headlessui/react from v1 to v2
+- Updated dependencies [2762994]
+- Updated dependencies [ba5f7a3]
+  - @tinacms/search@1.0.29
+
 ## 2.2.4
 
 ### Patch Changes
