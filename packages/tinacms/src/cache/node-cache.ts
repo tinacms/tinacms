@@ -13,7 +13,7 @@ const makeCacheDir = async (dir: string, fs: any) => {
 
   let cacheDir = dir
   // check if the root directory exists, if not then create create in tmp and return new path
-  if (!fs.existsSync(parts[0])) {
+  if (!fs.existsSync(path.join(path.sep, parts[0]))) {
     cacheDir = path.join(os.tmpdir(), parts[parts.length - 1])
   }
 
