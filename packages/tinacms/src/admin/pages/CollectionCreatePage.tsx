@@ -202,7 +202,11 @@ export const RenderForm = ({
         })
       : 'text',
     disabled: schemaCollection?.ui?.filename?.readonly,
-    description: (
+    description: collection.ui?.filename?.description ? (
+      <span
+        dangerouslySetInnerHTML={{ __html: collection.ui.filename.description }}
+      />
+    ) : (
       <span>
         A unique filename for the content.
         <br />
@@ -281,9 +285,9 @@ export const RenderForm = ({
         `/new-post.${schemaCollection.format || 'md'}`,
       label: 'form',
       fields: [
-        collection.showFilenameFirst && filenameField,
+        collection.ui?.filename?.showFirst && filenameField,
         ...(formInfo.fields as any),
-        !collection.showFilenameFirst && filenameField,
+        !collection.ui?.filename?.showFirst && filenameField,
       ].filter((x) => !!x),
       onSubmit: async (values) => {
         try {
