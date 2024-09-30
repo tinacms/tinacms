@@ -842,6 +842,15 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
      * When set to `true`, editors won't be able to modify the filename
      */
     readonly?: boolean
+    /**
+     * When set to `true`, the filename will be shown first in the form
+     * @default false
+     */
+    showFirst?: boolean
+    /**
+     * Sets the description for the filename field
+     */
+    description?: string
   }
   /**
    * Determines whether or not this collection can accept new docments

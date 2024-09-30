@@ -105,6 +105,11 @@ export default defineConfig({
         frontmatterFormat: 'toml',
         frontmatterDelimiters: ['+++', '+++'],
         ui: {
+          filename: {
+            description:
+              'The name of the <span style="text-decoration:underline;font-weight:bold">file</span>',
+            showFirst: true,
+          },
           // Example of beforeSubmit
           beforeSubmit: async ({ values, cms, form, tinaForm }) => {
             return {
