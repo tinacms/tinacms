@@ -1,5 +1,23 @@
 # tinacms
 
+## 2.2.6
+
+### Patch Changes
+
+- [#4815](https://github.com/tinacms/tinacms/pull/4815) [`b64b046`](https://github.com/tinacms/tinacms/commit/b64b046dc67ae948513057f855b156ce0cf250d8) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Rich text editor | embed dropdown - added filtering and scroll support
+  Sidebar - added version number
+
+- [#4832](https://github.com/tinacms/tinacms/pull/4832) [`6cd3596`](https://github.com/tinacms/tinacms/commit/6cd35967ab0d34851be44199bc9821b128fcfc75) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Adds config options to allow users to customize position + description of filename fields
+
+- [#4818](https://github.com/tinacms/tinacms/pull/4818) [`96bdcb7`](https://github.com/tinacms/tinacms/commit/96bdcb79b30e96056c7b19614be260a6c3ef00da) Thanks [@JackDevAU](https://github.com/JackDevAU)! - lock headlessui to version 2.1.8
+
+- [#4803](https://github.com/tinacms/tinacms/pull/4803) [`a6a7735`](https://github.com/tinacms/tinacms/commit/a6a77351b97589c60de69445a9eb2ea57beb4343) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix module not found `tinacms/dist/cache` error at runtime due to broken webpack bundling
+
+- Updated dependencies [[`6cd3596`](https://github.com/tinacms/tinacms/commit/6cd35967ab0d34851be44199bc9821b128fcfc75), [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4)]:
+  - @tinacms/schema-tools@1.6.3
+  - @tinacms/mdx@1.4.3
+  - @tinacms/search@1.0.30
+
 ## 2.2.5
 
 ### Patch Changes

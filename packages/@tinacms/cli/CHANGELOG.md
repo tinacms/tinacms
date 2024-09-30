@@ -1,5 +1,21 @@
 # tinacms-cli
 
+## 1.6.6
+
+### Patch Changes
+
+- [#4803](https://github.com/tinacms/tinacms/pull/4803) [`a6a7735`](https://github.com/tinacms/tinacms/commit/a6a77351b97589c60de69445a9eb2ea57beb4343) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix module not found `tinacms/dist/cache` error at runtime due to broken webpack bundling
+
+- [#4804](https://github.com/tinacms/tinacms/pull/4804) [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4) Thanks [@dependabot](https://github.com/apps/dependabot)! - ⬆️ Updates Typescript to v5.5, @types/node to v22.x, next.js to latest version 14.x, and removes node-fetch
+
+- Updated dependencies [[`b64b046`](https://github.com/tinacms/tinacms/commit/b64b046dc67ae948513057f855b156ce0cf250d8), [`6cd3596`](https://github.com/tinacms/tinacms/commit/6cd35967ab0d34851be44199bc9821b128fcfc75), [`96bdcb7`](https://github.com/tinacms/tinacms/commit/96bdcb79b30e96056c7b19614be260a6c3ef00da), [`a6a7735`](https://github.com/tinacms/tinacms/commit/a6a77351b97589c60de69445a9eb2ea57beb4343), [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4)]:
+  - tinacms@2.2.6
+  - @tinacms/schema-tools@1.6.3
+  - @tinacms/app@2.1.6
+  - @tinacms/graphql@1.5.3
+  - @tinacms/metrics@1.0.6
+  - @tinacms/search@1.0.30
+
 ## 1.6.5
 
 ### Patch Changes
