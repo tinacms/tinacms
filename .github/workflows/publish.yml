@@ -79,13 +79,19 @@ jobs:
           pnpm version:snapshot
           pnpm run publish:beta
 
+      - name: Setup git credentials
+        if: matrix.channel == 'latest'
+        run: |
+          git config --global user.email "bot@tina.io"
+          git config --global user.name "Tina Realease Bot"
+
       - name: Create release pull request or publish packages
         uses: changesets/action@v1
         id: changesets
         if: matrix.channel == 'latest'
         with:
           version: pnpm run version
-          publish: pnpm run publish
           createGithubReleases: true
+          setupGitUser: false
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN  }}

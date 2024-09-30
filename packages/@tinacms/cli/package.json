@@ -86,7 +86,6 @@
 		"many-level": "^2.0.0",
 		"memory-level": "^1.0.0",
 		"minimatch": "^5.1.2",
-		"node-fetch": "2",
 		"normalize-path": "^3.0.0",
 		"prettier": "^2.2.1",
 		"progress": "^2.0.3",
@@ -95,7 +94,7 @@
 		"tailwindcss": "^3.4.4",
 		"tinacms": "workspace:*",
 		"typanion": "3.13.0",
-		"typescript": "^5.5.4",
+		"typescript": "^5.6.2",
 		"vite": "^4.3.9",
 		"yup": "^0.32.9",
 		"zod": "^3.14.3"

@@ -25,7 +25,7 @@
     "esbuild": "^0.15.5",
     "fs-extra": "^9.0.1",
     "tsup": "^8.1.2",
-    "typescript": "^5.5.4",
+    "typescript": "^5.6.2",
     "vite": "^4.3.9"
   }
 }
