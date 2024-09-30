@@ -44,6 +44,11 @@ jobs:
           npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }}
         working-directory: ./
 
+      - name: Run install
+        run: |
+          cd template-repo
+          ${{ matrix.package-manager }} install
+
       - name: Run build
         run: |
           cd template-repo
