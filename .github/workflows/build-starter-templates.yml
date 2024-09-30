@@ -6,11 +6,10 @@ on:
     - cron: '0 9 * * 1-5'
 
 jobs:
-  test:
+  build-templates:
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
-      fail-fast: false
       matrix:
         package-manager: [yarn, npm, pnpm]
         template:
@@ -64,4 +63,18 @@ jobs:
             gh issue create --title "$ISSUE_TITLE" \
               --body "The **${{ matrix.template }}** starter template failed to build using **${{ matrix.package-manager }}**.\n\nCheck the full workflow logs for more details: [View Workflow Run]($RUN_URL)" \
               --labels "bug"
+          fi
+
+  check-failures:
+    needs: build-templates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for failures
+        run: |
+          failed_jobs=$(jq -r '.jobs[].steps[] | select(.conclusion=="failure") | .name' $GITHUB_WORKFLOW_RESULT)
+          if [ ! -z "$failed_jobs" ]; then
+            echo "One or more builds failed."
+            exit 1
+          else
+            echo "All builds succeeded."
           fi
