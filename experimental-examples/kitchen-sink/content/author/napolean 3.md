@@ -1,5 +1,5 @@
 ---
-name: sydney - Napolean
+name: Sydney - Napolean
 description: test
 location: sydney
 ---
