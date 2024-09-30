@@ -230,7 +230,6 @@ export const RenderForm = ({
         `/new-post.${schemaCollection.format || 'md'}`,
       label: 'form',
       fields: [
-        ...(formInfo.fields as any),
         {
           name: 'filename',
           label: 'Filename',
@@ -284,6 +283,7 @@ export const RenderForm = ({
             }
           },
         },
+        ...(formInfo.fields as any),
       ],
       onSubmit: async (values) => {
         try {
