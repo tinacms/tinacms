@@ -20,7 +20,7 @@ import type {
 import {
   CollectionFilters,
   filterQueryBuilder,
-} from './utils/fetch-optioins-query-builder'
+} from './utils/fetch-options-query-builder'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
