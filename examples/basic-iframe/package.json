@@ -20,11 +20,11 @@
 		"react-dom": "^18.3.1",
 		"react-is": "^18.2.0",
 		"tinacms": "workspace:*",
-		"typescript": "^5.5.4"
+		"typescript": "^5.6.2"
 	},
 	"devDependencies": {
 		"@tinacms/cli": "workspace:*",
-		"@types/node": "^17.0.21",
+		"@types/node": "^22.7.3",
 		"eslint": "7"
 	},
 	"version": null
