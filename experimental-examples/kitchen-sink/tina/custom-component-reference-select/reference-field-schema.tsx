@@ -41,10 +41,10 @@ const referenceField = {
         author: {
           location: (hostname: string): LocationEnum => {
             switch (true) {
-              case hostname.includes('ndcmelbourne.com'):
+              case hostname.includes('bob-northwind-melbourne.com'):
                 return LocationEnum.Melbourne
 
-              case hostname.includes('ndcsydney.com'):
+              case hostname.includes('bob-northwind-sydney.com'):
                 return LocationEnum.Sydney
               // Add more cases if needed
               default:
