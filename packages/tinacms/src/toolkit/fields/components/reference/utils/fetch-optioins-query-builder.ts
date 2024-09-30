@@ -1,5 +1,5 @@
 // This type is used in collectionFilter for reference field, it represent the datatype of the field in the referenced collection that will be used to do the filter
-// This type is extendable if we need to support more type for reference selection filter (e.g. boolean)
+// It is extendable in case we need to support more types for the reference selection filter (e.g. boolean)
 export type FilterValue = string[] | string
 export type CollectionFilters =
   | Record<string, FilterValue>
