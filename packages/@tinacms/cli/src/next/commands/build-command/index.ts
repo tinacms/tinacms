@@ -1,9 +1,8 @@
-import fetch, { Headers } from 'node-fetch'
 import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
 import type { ViteDevServer } from 'vite'
-import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql'
+import { buildSchema, type Database, FilesystemBridge } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
 import { buildProductionSpa } from './server'
@@ -15,12 +14,12 @@ import {
   getIntrospectionQuery,
 } from 'graphql'
 import { diff } from '@graphql-inspector/core'
-import { IndexStatusResponse, waitForDB } from './waitForDB'
+import { type IndexStatusResponse, waitForDB } from './waitForDB'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { sleepAndCallFunc } from '../../../utils/sleep'
 import { dangerText, linkText, warnText } from '../../../utils/theme'
 import {
-  SearchClient,
+  type SearchClient,
   SearchIndexer,
   TinaCMSSearchIndexClient,
 } from '@tinacms/search'
@@ -666,7 +665,10 @@ export const fetchRemoteGraphqlSchema = async ({
   if (token) {
     headers.append('X-API-KEY', token)
   }
-  const body = JSON.stringify({ query: getIntrospectionQuery(), variables: {} })
+  const body = JSON.stringify({
+    query: getIntrospectionQuery(),
+    variables: {},
+  })
 
   headers.append('Content-Type', 'application/json')
 
