@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/mdx",
-	"version": "1.4.2",
+	"version": "1.4.3",
 	"typings": "dist/index.d.ts",
 	"main": "dist/index.js",
 	"browser": "dist/index.browser.mjs",
