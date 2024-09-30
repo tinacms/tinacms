@@ -14,11 +14,6 @@
 			"import": "./dist/client.mjs",
 			"require": "./dist/client.js"
 		},
-		"./dist/cache": {
-			"types": "./dist/cache.d.ts",
-			"import": "./dist/cache.mjs",
-			"require": "./dist/cache.js"
-		},
 		"./dist/edit-state": {
 			"types": "./dist/edit-state.d.ts",
 			"import": "./dist/edit-state.mjs",
@@ -49,9 +44,13 @@
 			"src/rich-text/index.tsx",
 			"src/rich-text/prism.tsx",
 			"src/react.tsx",
-			"src/client.ts",
-			"src/cache.ts"
-		]
+			"src/client.ts"
+		],
+		"build": {
+			"rollupOptions": {
+				"external": ["crypto", "fs", "path", "os"]
+			}
+		}
 	},
 	"typings": "dist/index.d.ts",
 	"license": "Apache-2.0",
