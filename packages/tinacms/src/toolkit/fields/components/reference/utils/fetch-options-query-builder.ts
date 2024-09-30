@@ -5,7 +5,6 @@ export type CollectionFilters =
   | Record<string, FilterValue>
   | (() => Record<string, FilterValue>)
 
-//Below function only support "in" for filter, this function will loop through the record and build the filter query
 export const filterQueryBuilder = (
   fieldFilterConfig: FilterValue,
   collection: string
