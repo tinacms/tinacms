@@ -1,6 +1,5 @@
 import Progress from 'progress'
-import { Config, parseURL } from '@tinacms/schema-tools'
-import fetch, { Headers } from 'node-fetch'
+import { type Config, parseURL } from '@tinacms/schema-tools'
 
 import { logger } from '../../../logger'
 import { spin } from '../../../utils/spinner'
