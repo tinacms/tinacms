@@ -104,6 +104,7 @@ export default defineConfig({
         format: 'mdx',
         frontmatterFormat: 'toml',
         frontmatterDelimiters: ['+++', '+++'],
+        // showFilenameFirst: true,
         ui: {
           // Example of beforeSubmit
           beforeSubmit: async ({ values, cms, form, tinaForm }) => {

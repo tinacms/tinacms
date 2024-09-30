@@ -784,6 +784,8 @@ interface BaseCollection {
   }
   isDetached?: boolean
   isAuthCollection?: boolean
+  showFilenameFirst?: boolean
+  filenameDescription?: string
 }
 
 type TemplateCollection<WithNamespace extends boolean = false> = {
