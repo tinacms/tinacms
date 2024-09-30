@@ -90,6 +90,7 @@ jobs:
         if: matrix.channel == 'latest'
         with:
           version: pnpm run version
+          publish: pnpm run publish
           createGithubReleases: true
           setupGitUser: false
         env:
