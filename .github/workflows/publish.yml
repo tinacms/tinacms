@@ -6,23 +6,17 @@ on:
 jobs:
   build:
     strategy:
-      max-parallel: 1
       matrix:
         channel:
           - latest
           - dev
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
-      statuses: read
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
       - name: Generate a token
         uses: actions/create-github-app-token@v1
-        if: matrix.channel == 'latest'
         id: generate-token
         with:
           # uses https://github.com/organizations/tinacms/settings/apps/release-bot-allow-prs-and-push
@@ -32,7 +26,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          token: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
+          token: ${{ steps.generate-token.outputs.token }}
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
 
@@ -97,4 +91,4 @@ jobs:
           createGithubReleases: true
           setupGitUser: false
         env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN  }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
