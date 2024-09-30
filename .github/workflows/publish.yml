@@ -75,6 +75,8 @@ jobs:
         run: |
           pnpm version:snapshot
           pnpm run publish:beta
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
 
       - name: Setup git credentials
         if: matrix.channel == 'latest'
