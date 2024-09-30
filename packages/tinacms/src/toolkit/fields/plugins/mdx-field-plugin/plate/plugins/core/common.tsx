@@ -56,6 +56,20 @@ export const plugins = [
   createTablePlugin(),
 ]
 
+export const unsupportedItemsInTable = new Set([
+  'Table',
+  'Code Block',
+  'Unordered List',
+  'Ordered List',
+  'Quote',
+  'Heading 1',
+  'Heading 2',
+  'Heading 3',
+  'Heading 4',
+  'Heading 5',
+  'Heading 6',
+])
+
 const isNodeActive = (editor, type) => {
   const pluginType = getPluginType(editor, type)
   return (
