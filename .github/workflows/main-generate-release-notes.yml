@@ -13,19 +13,10 @@ jobs:
     steps:
       - name: Get release info
         id: release-info
-        run: |
-          release_info=$(gh release view --repo ${{ github.repository }} "tinacms@${{ inputs.release_name }}" --json body,createdAt)
-          release_body=$(echo "$release_info" | jq -r .body)
-          release_created_at=$(echo "$release_info" | jq -r .createdAt)
-          echo "notes=$release_body" >> $GITHUB_OUTPUT
-          echo "created_at=$release_created_at" >> $GITHUB_OUTPUT
-
-          release_tag="${{ inputs.release_name }}"
-          # replace "tina@v" with "v" to match the version number
-          release_tag=$(echo "$release_tag" | sed 's/tinacms@/v/')
-          echo "version=$release_tag" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ github.token }}
+        uses: easyware-io/get-release@v1
+        with:
+          token: ${{ github.token }}
+          release_name: tinacms@${{ inputs.release_name }}
 
       - name: Generate a token
         uses: actions/create-github-app-token@v1
@@ -46,8 +37,8 @@ jobs:
           inputs: |
             {
               "project": "TinaCloud",
-              "versionNumber": "${{ steps.release-info.outputs.version }}",
+              "versionNumber": "${{ inputs.release_name }}",
               "dateReleased": "${{ steps.release-info.outputs.created_at }}",
-              "releaseNotes": ${{ steps.release-info.outputs.notes }}
+              "releaseNotes": ${{ steps.release-info.outputs.body }}
             }
           token: ${{ steps.generate-token.outputs.token }}
