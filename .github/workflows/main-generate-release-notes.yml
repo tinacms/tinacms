@@ -14,7 +14,7 @@ jobs:
       - name: Get release info
         id: release-info
         run: |
-          release_info=$(gh release view --repo ${{ github.repository }} "${{ inputs.release_name }}" --json body,createdAt)
+          release_info=$(gh release view --repo ${{ github.repository }} "tinacms@${{ inputs.release_name }}" --json body,createdAt)
           release_body=$(echo "$release_info" | jq -r .body)
           release_created_at=$(echo "$release_info" | jq -r .createdAt)
           echo "notes=$release_body" >> $GITHUB_OUTPUT
