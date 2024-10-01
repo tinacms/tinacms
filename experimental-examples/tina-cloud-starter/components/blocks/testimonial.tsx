@@ -1,7 +1,7 @@
 import React from 'react'
 import { Container } from '../util/container'
 import { Section } from '../util/section'
-import type { TinaTemplate } from 'tinacms'
+import type { Template } from 'tinacms'
 import { PageBlocksTestimonial } from '../../.tina/__generated__/types'
 import { tinaField } from 'tinacms/dist/react'
 
@@ -61,7 +61,7 @@ export const Testimonial = ({ data }: { data: PageBlocksTestimonial }) => {
   )
 }
 
-export const testimonialBlockSchema: TinaTemplate = {
+export const testimonialBlockSchema: Template = {
   name: 'testimonial',
   label: 'Testimonial',
   ui: {
