@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 1.6.8
+
+### Patch Changes
+
+- [#4843](https://github.com/tinacms/tinacms/pull/4843) [`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Update Minor & Patch Dependencies Versions
+
+- Updated dependencies [[`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a)]:
+  - tinacms@2.2.8
+  - @tinacms/app@2.1.8
+  - @tinacms/graphql@1.5.4
+  - @tinacms/metrics@1.0.7
+  - @tinacms/schema-tools@1.6.4
+  - @tinacms/search@1.0.31
+
 ## 1.6.7
 
 ### Patch Changes
