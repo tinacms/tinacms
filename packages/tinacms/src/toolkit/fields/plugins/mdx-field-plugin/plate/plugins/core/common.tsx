@@ -57,7 +57,6 @@ export const plugins = [
 ]
 
 export const unsupportedItemsInTable = new Set([
-  'Table',
   'Code Block',
   'Unordered List',
   'Ordered List',

@@ -61,6 +61,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
           <DropdownMenuSubContent>
             <DropdownMenuItem
               className="min-w-[180px]"
+              disabled={tableSelected}
               onSelect={() => {
                 insertTable(editor)
                 focusEditor(editor)
