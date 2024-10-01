@@ -39,6 +39,6 @@ jobs:
               "project": "TinaCloud",
               "versionNumber": "${{ inputs.release_name }}",
               "dateReleased": "${{ steps.release-info.outputs.created_at }}",
-              "releaseNotes": ${{ steps.release-info.outputs.body }}
+              "releaseNotes": ${{ toJson(steps.release-info.outputs.body) }}
             }
           token: ${{ steps.generate-token.outputs.token }}
