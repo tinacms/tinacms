@@ -1,5 +1,12 @@
 # next-2024
 
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies [[`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a)]:
+  - tinacms@2.2.8
+
 ## 0.1.8
 
 ### Patch Changes
