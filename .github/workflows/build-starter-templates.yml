@@ -27,6 +27,7 @@ jobs:
 
       - name: Create fresh install dir
         run: |
+          rm package.json
           cd ..
           mkdir -p template
 
@@ -40,6 +41,12 @@ jobs:
         with:
           version: 9
         if: ${{ matrix.package-manager == 'pnpm' }}
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 'latest'
+        if: ${{ matrix.template == 'tina-hugo-starter' }}
 
       - name: Run create-tina-app
         run: npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }}
