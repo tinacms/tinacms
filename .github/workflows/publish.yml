@@ -88,6 +88,7 @@ jobs:
         run: |
           pnpm version:snapshot
           pnpm run publish:beta
+          echo "::notice title=Version PR::A release PR has been created: https://github.com/${{ github.repository }}/pull/${{ steps.changesets.outputs.pullRequestNumber }}"
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
 
@@ -100,9 +101,9 @@ jobs:
           newTinaCMSVersion=$(echo $publishedPackages | jq -r '.[] | select(.name == "tinacms") | .version')
 
           if [ -z "$newTinaCMSVersion" ]; then
-            echo "TinaCMS not published"
+            echo "❌ TinaCMS not published"
           else
-            echo "TinaCMS published at $newTinaCMSVersion"
+            echo "::notice title=🚀 New TinaCMS release::A new version of TinaCMS was released: $newTinaCMSVersion"
           fi
 
           echo "newTinaCMSVersion=$newTinaCMSVersion" >> $GITHUB_OUTPUT
