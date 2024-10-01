@@ -86,9 +86,10 @@ jobs:
       - name: Release to @dev channel
         if: steps.changesets.outputs.hasChangesets == 'true'
         run: |
+          git checkout -- .
           pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
           pnpm run publish:beta
-          echo "A release PR has been created: <https://github.com/${{ github.repository }}/pull/${{ steps.changesets.outputs.pullRequestNumber }}>" >> $GITHUB_STEP_SUMMARY
+          echo "A release PR has been created: <https://github.com/tinacms/tinacms/pull/${{ steps.changesets.outputs.pullRequestNumber }}>" >> $GITHUB_STEP_SUMMARY
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
 
