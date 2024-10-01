@@ -24,6 +24,8 @@ jobs:
           # replace "tina@v" with "v" to match the version number
           release_tag=$(echo "$release_tag" | sed 's/tinacms@/v/')
           echo "version=$release_tag" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Generate a token
         uses: actions/create-github-app-token@v1
