@@ -20,6 +20,8 @@ jobs:
           - tinasaurus
           - basic
         node-version: [18, 20, 22]
+    outputs:
+      failed: ${{ steps.set-output.outputs.failed }}
 
     steps:
       - name: Set up Node.js
@@ -54,7 +56,8 @@ jobs:
           ISSUE_TITLE="Starter template '${{ matrix.template }}' failed to build with ${{ matrix.package-manager }}"
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-          echo "failed=true" >> $GITHUB_ENV
+          echo "::set-output name=failed::true"
+
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           if gh issue list --state open --limit 100 --search "$ISSUE_TITLE" | grep -q "$ISSUE_TITLE"; then
             echo "Issue already exists. Skipping issue creation."
@@ -71,7 +74,7 @@ jobs:
     steps:
       - name: Check if any job failed
         run: |
-          if [[ "$failed" == "true" ]]; then
+          if [[ "${{ needs.build-templates.outputs.failed }}" == "true" ]]; then
             echo "One or more commands failed."
             exit 1
           else
