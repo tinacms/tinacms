@@ -1,9 +1,11 @@
 name: Generate Release Notes
 
 on:
-  push:
-    tags:
-      - 'tinacms@*'
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Release name to generate release notes for'
+        required: true
 
 jobs:
   push-release-notes:
@@ -12,13 +14,13 @@ jobs:
       - name: Get release info
         id: release-info
         run: |
-          release_info=$(gh release view "${{ github.ref_name }}" --json body,createdAt)
+          release_info=$(gh release view "${{ inputs.release_name }}" --json body,createdAt)
           release_body=$(echo "$release_info" | jq -r .body)
           release_created_at=$(echo "$release_info" | jq -r .createdAt)
           echo "notes=$release_body" >> $GITHUB_OUTPUT
           echo "created_at=$release_created_at" >> $GITHUB_OUTPUT
 
-          release_tag="${{ github.ref_name }}"
+          release_tag="${{ inputs.release_name }}"
           # replace "tina@v" with "v" to match the version number
           release_tag=$(echo "$release_tag" | sed 's/tinacms@/v/')
           echo "version=$release_tag" >> $GITHUB_OUTPUT
