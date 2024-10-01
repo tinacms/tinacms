@@ -22,15 +22,6 @@ jobs:
         node-version: [18, 20, 22]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Create fresh install dir
-        run: |
-          rm package.json
-          cd ..
-          mkdir -p template
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -50,12 +41,11 @@ jobs:
 
       - name: Run create-tina-app
         run: npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }}
-        working-directory: ../template
 
       - name: Run build
         run: |
+          cd template-repo
           ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build-local
-        working-directory: ../template/template-repo
 
       - name: Report errors
         continue-on-error: false
