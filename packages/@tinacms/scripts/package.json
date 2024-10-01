@@ -19,13 +19,13 @@
   },
   "dependencies": {
     "@sucrase/jest-plugin": "^3.0.0",
-    "chalk": "^4.1.1",
-    "chokidar": "^3.5.2",
+    "chalk": "^4.1.2",
+    "chokidar": "^3.6.0",
     "commander": "^7.2.0",
-    "esbuild": "^0.15.5",
-    "fs-extra": "^9.0.1",
-    "tsup": "^8.1.2",
+    "esbuild": "^0.15.18",
+    "fs-extra": "^11.2.0",
+    "tsup": "^8.3.0",
     "typescript": "^5.6.2",
-    "vite": "^4.3.9"
+    "vite": "^4.5.5"
   }
 }
