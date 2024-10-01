@@ -66,9 +66,10 @@ jobs:
             echo "Creating a new issue..."
             gh issue create --title "$ISSUE_TITLE" \
               --body "The **${{ matrix.template }}** starter template failed to build using **${{ matrix.package-manager }}**.\n\nCheck the full workflow logs for more details: [View Workflow Run]($RUN_URL)" \
-              --labels "bug"
+              --label "bug"
           fi
 
+  # Required to check for failures due to the `continue-on-error` being set to true.
   check-failures:
     needs: build-templates
     runs-on: ubuntu-latest
