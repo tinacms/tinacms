@@ -1,7 +1,7 @@
 import React from 'react'
 import { Container } from '../util/container'
 import { Section } from '../util/section'
-import type { TinaTemplate } from 'tinacms'
+import type { Template } from 'tinacms'
 
 export const Testimonial = ({ data, parentField = '' }) => {
   return (
@@ -59,7 +59,7 @@ export const Testimonial = ({ data, parentField = '' }) => {
   )
 }
 
-export const testimonialBlockSchema: TinaTemplate = {
+export const testimonialBlockSchema: Template = {
   name: 'testimonial',
   label: 'Testimonial',
   ui: {

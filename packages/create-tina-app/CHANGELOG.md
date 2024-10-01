@@ -1,5 +1,14 @@
 # create-tina-app
 
+## 1.2.2
+
+### Patch Changes
+
+- [#4843](https://github.com/tinacms/tinacms/pull/4843) [`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Update Minor & Patch Dependencies Versions
+
+- Updated dependencies [[`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a)]:
+  - @tinacms/metrics@1.0.7
+
 ## 1.2.1
 
 ### Patch Changes

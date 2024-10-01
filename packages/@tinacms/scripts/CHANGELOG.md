@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.3
+
+### Patch Changes
+
+- [#4843](https://github.com/tinacms/tinacms/pull/4843) [`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Update Minor & Patch Dependencies Versions
+
 ## 1.2.2
 
 ### Patch Changes
