@@ -86,9 +86,9 @@ jobs:
       - name: Release to @dev channel
         if: steps.changesets.outputs.hasChangesets == 'true'
         run: |
-          pnpm version:snapshot
+          pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
           pnpm run publish:beta
-          echo "::notice title=Version PR::A release PR has been created: https://github.com/${{ github.repository }}/pull/${{ steps.changesets.outputs.pullRequestNumber }}"
+          echo "A release PR has been created: <https://github.com/${{ github.repository }}/pull/${{ steps.changesets.outputs.pullRequestNumber }}>" >> $GITHUB_STEP_SUMMARY
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
 
@@ -101,9 +101,9 @@ jobs:
           newTinaCMSVersion=$(echo $publishedPackages | jq -r '.[] | select(.name == "tinacms") | .version')
 
           if [ -z "$newTinaCMSVersion" ]; then
-            echo "❌ TinaCMS not published"
+            echo "❌ TinaCMS not published" >> $GITHUB_STEP_SUMMARY
           else
-            echo "::notice title=🚀 New TinaCMS release::A new version of TinaCMS was released: $newTinaCMSVersion"
+            echo "🚀 A new version of TinaCMS was released: $newTinaCMSVersion" >> $GITHUB_STEP_SUMMARY
           fi
 
           echo "newTinaCMSVersion=$newTinaCMSVersion" >> $GITHUB_OUTPUT
@@ -121,3 +121,8 @@ jobs:
               "release_name": "${{ steps.newTinaCMSVersion.outputs.newTinaCMSVersion }}"
             }
           token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Summary
+        if: steps.newTinaCMSVersion.outputs.newTinaCMSVersion == '' && steps.changesets.outputs.hasChangesets == 'false'
+        run: |
+          echo "❌ Nothing was published" >> $GITHUB_STEP_SUMMARY
