@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
 import { withRef } from '@udecode/cn'
 import { PlateElement } from '@udecode/plate-common'
-import { useMermaidElement } from '../../hooks/use-mermaid-element'
 import { Moon, PencilIcon, SunMoon } from 'lucide-react'
-import { CodeBlock } from '../../plugins/ui/code-block'
+import React, { useEffect, useState } from 'react'
+import { useMermaidElement } from '../../hooks/use-mermaid-element'
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
+import { CodeBlock } from '../../plugins/ui/code-block'
 
 const LightModeComponent = ({ onToggleMode }) => {
-  const [isLightMode, setIsLightMode] = useState(false)
+  const [isLightMode, setIsLightMode] = useState(true)
 
   const handleToggle = (e) => {
     e.preventDefault()
@@ -38,7 +38,7 @@ const LightModeComponent = ({ onToggleMode }) => {
 const MermaidElementWithRef = ({ config, lightMode }) => {
   const { mermaidRef } = useMermaidElement()
   return (
-    <div contentEditable={false}>
+    <div contentEditable={false} className="border-border border">
       <div ref={mermaidRef}>
         <pre className={`${lightMode} mermaid`}>{config}</pre>
       </div>
@@ -51,7 +51,10 @@ export const MermaidElement = withRef<typeof PlateElement>(
     const [isEditing, setIsEditing] = React.useState(false)
     const [lightModeClass, setLightModeClass] = React.useState('')
     const [mermaidConfig, setMermaidConfig] = React.useState(
-      element.value || ''
+      element.value ||
+        `graph TD;
+    id1(Click the ✏️ edit button at top right of mermaid component) --> id2(Modify this graph);
+    id2 --> id3(Click edit button again to preview the changes);`
     )
 
     const node = {

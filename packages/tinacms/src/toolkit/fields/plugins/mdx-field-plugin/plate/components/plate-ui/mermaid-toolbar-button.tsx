@@ -1,22 +1,20 @@
-import React from 'react'
 import { withRef } from '@udecode/cn'
 import {
+  type PlateEditor,
+  type TElement,
   getPluginType,
   insertEmptyElement,
   insertNode,
   isSelectionAtBlockStart,
-  type PlateEditor,
   setElements,
   someNode,
-  type TElement,
   useEditorState,
 } from '@udecode/plate-common'
-
+import React from 'react'
+import { helpers } from '../../plugins/core/common'
+import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
 import { Icons } from './icons'
 import { ToolbarButton } from './toolbar'
-import { helpers } from '../../plugins/core/common'
-
-import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
 
 export const insertEmptyMermaid = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
