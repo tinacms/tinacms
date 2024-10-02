@@ -38,6 +38,12 @@ export const createDevServer = async (
        */
       rollupOptions: {
         input: configManager.spaMainPath,
+        onwarn(warning, warn) {
+          if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+            return
+          }
+          warn(warning)
+        },
       },
     })
   )

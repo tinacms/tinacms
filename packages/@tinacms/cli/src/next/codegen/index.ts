@@ -7,6 +7,7 @@ import { transform } from 'esbuild'
 import { ConfigManager } from '../config-manager'
 import type { TinaSchema } from '@tinacms/schema-tools'
 import { mapUserFields } from '@tinacms/graphql'
+import normalizePath from 'normalize-path'
 export const TINA_HOST = 'content.tinajs.io'
 
 export class Codegen {
@@ -28,6 +29,7 @@ export class Codegen {
   }
   tinaSchema: TinaSchema
   lookup: any
+  noClientBuildCache: boolean
 
   constructor({
     configManager,
@@ -38,6 +40,7 @@ export class Codegen {
     graphqlSchemaDoc,
     tinaSchema,
     lookup,
+    noClientBuildCache,
   }: {
     configManager: ConfigManager
     port?: number
@@ -50,6 +53,7 @@ export class Codegen {
     }
     tinaSchema: TinaSchema
     lookup: any
+    noClientBuildCache: boolean
   }) {
     this.isLocal = isLocal
     this.graphqlSchemaDoc = graphqlSchemaDoc
@@ -60,6 +64,7 @@ export class Codegen {
     this.queryDoc = queryDoc
     this.fragDoc = fragDoc
     this.lookup = lookup
+    this.noClientBuildCache = noClientBuildCache
   }
 
   async writeConfigFile(fileName: string, data: string) {
@@ -94,6 +99,10 @@ export class Codegen {
       '_graphql.json',
       JSON.stringify(this.graphqlSchemaDoc)
     )
+
+    const { search, ...rest } = this.tinaSchema.schema.config
+    this.tinaSchema.schema.config = rest
+
     // update _schema.json
     await this.writeConfigFile(
       '_schema.json',
@@ -340,7 +349,13 @@ export default databaseClient;
 
     const clientString = `import { createClient } from "tinacms/dist/client";
 import { queries } from "./types";
-export const client = createClient({ url: '${apiURL}', token: '${token}', queries, ${
+export const client = createClient({ ${
+      this.noClientBuildCache === false
+        ? `cacheDir: '${normalizePath(
+            this.configManager.generatedCachePath
+          )}', `
+        : ''
+    }url: '${apiURL}', token: '${token}', queries, ${
       errorPolicy ? `errorPolicy: '${errorPolicy}'` : ''
     } });
 export default client;

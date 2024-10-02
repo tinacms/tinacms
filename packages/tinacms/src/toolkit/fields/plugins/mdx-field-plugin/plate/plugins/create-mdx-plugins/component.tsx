@@ -1,7 +1,12 @@
 import React from 'react'
 import { Element } from 'slate'
 import { useSelected, ReactEditor } from 'slate-react'
-import { Transition, Popover } from '@headlessui/react'
+import {
+  Transition,
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+} from '@headlessui/react'
 import { NestedForm } from '../../nested-form'
 import { classNames } from '../ui/helpers'
 import { ELEMENT_MDX_INLINE } from '.'
@@ -186,14 +191,13 @@ const EmbedNestedForm = ({
 const DotMenu = ({ onOpen, onRemove }) => {
   return (
     <Popover as="span" className="-ml-px relative block">
-      <Popover.Button
+      <PopoverButton
         as="span"
         className="cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r-md border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
       >
         <EllipsisIcon title="Open options" />
-      </Popover.Button>
+      </PopoverButton>
       <Transition
-        as={React.Fragment}
         enter="transition ease-out duration-100"
         enterFrom="transform opacity-0 scale-95"
         enterTo="transform opacity-100 scale-100"
@@ -201,7 +205,7 @@ const DotMenu = ({ onOpen, onRemove }) => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Popover.Panel className="z-30 absolute origin-top-right right-0">
+        <PopoverPanel className="z-30 absolute origin-top-right right-0">
           <div className="mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="py-1">
               <span
@@ -226,7 +230,7 @@ const DotMenu = ({ onOpen, onRemove }) => {
               </button>
             </div>
           </div>
-        </Popover.Panel>
+        </PopoverPanel>
       </Transition>
     </Popover>
   )

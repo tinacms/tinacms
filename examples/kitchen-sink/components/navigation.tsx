@@ -1,4 +1,8 @@
-import { Disclosure } from '@headlessui/react'
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+} from '@headlessui/react'
 import { Fragment } from 'react'
 import Link from 'next/link'
 
@@ -86,7 +90,7 @@ export default function Example(props: { items: Items }) {
               <Disclosure as="div" key={item.name} className="space-y-1">
                 {({ open }) => (
                   <>
-                    <Disclosure.Button
+                    <DisclosureButton
                       className={classNames(
                         item.current
                           ? 'bg-gray-100 text-gray-900'
@@ -105,18 +109,18 @@ export default function Example(props: { items: Items }) {
                         <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
                       </svg>
                       {item.name}
-                    </Disclosure.Button>
-                    <Disclosure.Panel className="space-y-1">
+                    </DisclosureButton>
+                    <DisclosurePanel className="space-y-1">
                       {item.children.map((subItem) => (
-                        <Disclosure.Button key={subItem.name} as={Fragment}>
+                        <DisclosureButton key={subItem.name} as={Fragment}>
                           <Link href={subItem.href}>
                             <a className="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                               {subItem.name}
                             </a>
                           </Link>
-                        </Disclosure.Button>
+                        </DisclosureButton>
                       ))}
-                    </Disclosure.Panel>
+                    </DisclosurePanel>
                   </>
                 )}
               </Disclosure>

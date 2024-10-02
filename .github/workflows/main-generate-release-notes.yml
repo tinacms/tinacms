@@ -1,0 +1,44 @@
+name: Generate Release Notes
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Release name to generate release notes for'
+        required: true
+
+jobs:
+  push-release-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get release info
+        id: release-info
+        uses: easyware-io/get-release@v1
+        with:
+          token: ${{ github.token }}
+          release_name: tinacms@${{ inputs.release_name }}
+
+      - name: Generate a token
+        uses: actions/create-github-app-token@v1
+        id: generate-token
+        with:
+          # uses https://github.com/organizations/tinacms/settings/apps/release-bot-allow-prs-and-push
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_SECRET }}
+          owner: tinacms
+          repositories: tina.io
+
+      - name: Publish release notes
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          repo: tinacms/tina.io
+          ref: main
+          workflow: dispatch-create-whats-new-page.yml
+          inputs: |
+            {
+              "project": "TinaCMS",
+              "versionNumber": "v${{ inputs.release_name }}",
+              "dateReleased": "${{ steps.release-info.outputs.created_at }}",
+              "releaseNotes": ${{ toJson(steps.release-info.outputs.body) }}
+            }
+          token: ${{ steps.generate-token.outputs.token }}

@@ -3,7 +3,13 @@
 */
 
 import { Fragment, useState, useEffect } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
+} from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { client } from '../tina/__generated__/client'
 import Navigation from './navigation'
@@ -64,14 +70,14 @@ export default function Example() {
       >
         Nav
       </button>
-      <Transition.Root show={open} as={Fragment}>
+      <Transition show={open} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={setOpen}>
           <div className="fixed inset-0" />
 
           <div className="fixed inset-0 overflow-hidden">
             <div className="absolute inset-0 overflow-hidden">
               <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-                <Transition.Child
+                <TransitionChild
                   as={Fragment}
                   enter="transform transition ease-in-out duration-500 sm:duration-700"
                   enterFrom="translate-x-full"
@@ -80,13 +86,13 @@ export default function Example() {
                   leaveFrom="translate-x-0"
                   leaveTo="translate-x-full"
                 >
-                  <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
+                  <DialogPanel className="pointer-events-auto w-screen max-w-md">
                     <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
                       <div className="px-4 sm:px-6">
                         <div className="flex items-start justify-between">
-                          <Dialog.Title className="text-lg font-medium text-gray-900">
+                          <DialogTitle className="text-lg font-medium text-gray-900">
                             Documents
-                          </Dialog.Title>
+                          </DialogTitle>
                           <div className="ml-3 flex h-7 items-center">
                             <button
                               type="button"
@@ -106,13 +112,13 @@ export default function Example() {
                         <Navigation items={collections} />
                       </div>
                     </div>
-                  </Dialog.Panel>
-                </Transition.Child>
+                  </DialogPanel>
+                </TransitionChild>
               </div>
             </div>
           </div>
         </Dialog>
-      </Transition.Root>
+      </Transition>
     </div>
   )
 }

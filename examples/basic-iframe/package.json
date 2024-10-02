@@ -10,21 +10,21 @@
 		"searchindex": "tinacms search-index"
 	},
 	"dependencies": {
-		"@octokit/rest": "^19.0.5",
+		"@octokit/rest": "^19.0.13",
 		"@tinacms/datalayer": "workspace:*",
 		"@tinacms/graphql": "workspace:*",
-		"dotenv": "^16.0.3",
-		"js-base64": "^3.7.4",
-		"next": "^14.2.5",
+		"dotenv": "^16.4.5",
+		"js-base64": "^3.7.7",
+		"next": "^14.2.13",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"react-is": "^18.2.0",
+		"react-is": "^18.3.1",
 		"tinacms": "workspace:*",
-		"typescript": "^5.5.4"
+		"typescript": "^5.6.2"
 	},
 	"devDependencies": {
 		"@tinacms/cli": "workspace:*",
-		"@types/node": "^17.0.21",
+		"@types/node": "^22.7.4",
 		"eslint": "7"
 	},
 	"version": null

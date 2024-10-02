@@ -1,24 +1,22 @@
 import { LoadingDots } from '@toolkit/form-builder'
-import { Field } from '@toolkit/forms'
+import type { Field } from '@toolkit/forms'
 import type { TinaCMS } from '@toolkit/tina-cms'
 import * as React from 'react'
+import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io'
 import { Button } from './components/button'
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from './components/command'
+import OptionComponent from './components/option-component'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
-import type { ReferenceFieldProps } from './index'
-import {
-  IoIosArrowDropdown,
-  IoMdArrowDropdown,
-  IoMdArrowDropup,
-} from 'react-icons/io'
-
+import type {
+  InternalSys,
+  ReferenceFieldProps,
+} from './model/reference-field-props'
 interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
@@ -31,13 +29,9 @@ type Edge = {
 
 interface Node {
   id: string
-  _internalSys: {
-    filename: string
-  }
-  _values: {
-    title: string | null
-    name: string | null
-  }
+  _internalSys: InternalSys
+  //Using uknown type as _values can be any type from the collection user degined in schema
+  _values: unknown
 }
 interface OptionSet {
   collection: string
@@ -77,6 +71,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
                         _values
                         _internalSys: _sys {
                           filename
+                          path
                         }
                       }
                     }
@@ -135,13 +130,25 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
 }) => {
   const [open, setOpen] = React.useState<boolean>(false)
   const [value, setValue] = React.useState<string | null>(input.value)
-  const [displayText, setDisplayText] = React.useState<string | null>(null) //store display text for selected option
+  //Store display text for selected option
+  const [displayText, setDisplayText] = React.useState<string | null>(null)
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
+  const [filteredOptionsList, setFilteredOptionsList] =
+    React.useState<OptionSet[]>(optionSets)
 
   React.useEffect(() => {
     setDisplayText(getFilename(optionSets, value))
     input.onChange(value)
   }, [value, input, optionSets])
+
+  // Assign list of options to filteredOptionsList when list of options is fetched/updated
+  React.useEffect(() => {
+    if (field.experimental___filter && optionSets.length > 0) {
+      setFilteredOptionsList(field.experimental___filter(optionSets, undefined))
+    } else {
+      setFilteredOptionsList(optionSets)
+    }
+  }, [optionSets, field.experimental___filter])
 
   if (loading === true) {
     return <LoadingDots color="var(--tina-color-primary)" />
@@ -167,48 +174,48 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
         </PopoverTrigger>
         <PopoverContent className="p-0 relative">
           <Command
+            shouldFilter={!field.experimental___filter}
             filter={(value, search) => {
-              if (value.includes(search)) return 1
+              if (value.toLowerCase().includes(search.toLowerCase())) return 1
               return 0
             }}
           >
-            <CommandInput placeholder="Search reference..." />
+            <CommandInput
+              placeholder="Search reference..."
+              onValueChange={(search) => {
+                if (field.experimental___filter) {
+                  setFilteredOptionsList(
+                    field.experimental___filter(optionSets, search)
+                  )
+                }
+              }}
+            />
             <CommandEmpty>No reference found</CommandEmpty>
             <CommandList>
-              {optionSets.length > 0 &&
-                optionSets.map(({ collection, edges }: OptionSet) => (
+              {filteredOptionsList.length > 0 &&
+                filteredOptionsList?.map(({ collection, edges }: OptionSet) => (
                   <CommandGroup
                     key={`${collection}-group`}
                     heading={collection}
                   >
                     <CommandList>
-                      {edges.map(
-                        ({
-                          node: {
-                            id,
-                            _internalSys: { filename },
-                            _values: { title, name },
-                          },
-                        }) => (
-                          <CommandItem
-                            key={`${id}-option`}
-                            value={id || title}
-                            onSelect={() => {
-                              setValue(id)
+                      {edges?.map(({ node }) => {
+                        const { id, _values } = node
+                        return (
+                          <OptionComponent
+                            id={id}
+                            key={id}
+                            value={value}
+                            field={field}
+                            _values={_values}
+                            node={node}
+                            onSelect={(currentValue) => {
+                              setValue(currentValue)
                               setOpen(false)
                             }}
-                          >
-                            <div className="flex flex-col">
-                              <span className="font-semibold text-sm">
-                                {title || name || id}
-                              </span>
-                              {(title || name) && (
-                                <span className="text-x">{filename}</span>
-                              )}
-                            </div>
-                          </CommandItem>
+                          />
                         )
-                      )}
+                      })}
                     </CommandList>
                   </CommandGroup>
                 ))}

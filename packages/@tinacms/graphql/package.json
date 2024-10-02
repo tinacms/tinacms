@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/graphql",
-	"version": "1.5.0",
+	"version": "1.5.4",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
@@ -37,7 +37,7 @@
 		"abstract-level": "^1.0.4",
 		"date-fns": "^2.30.0",
 		"fast-glob": "^3.3.2",
-		"fs-extra": "^9.1.0",
+		"fs-extra": "^11.2.0",
 		"glob-parent": "^6.0.2",
 		"graphql": "15.8.0",
 		"gray-matter": "^4.0.3",
@@ -49,7 +49,7 @@
 		"lodash.set": "^4.3.2",
 		"lodash.uniqby": "^4.7.0",
 		"many-level": "^2.0.0",
-		"micromatch": "4.0.5",
+		"micromatch": "4.0.8",
 		"normalize-path": "^3.0.0",
 		"readable-stream": "^4.5.2",
 		"scmp": "^2.1.0",
@@ -76,7 +76,7 @@
 		"@types/lru-cache": "^5.1.1",
 		"@types/mdast": "^3.0.15",
 		"@types/micromatch": "^4.0.9",
-		"@types/node": "^14.18.63",
+		"@types/node": "^22.7.4",
 		"@types/normalize-path": "^3.0.2",
 		"@types/ws": "^7.4.7",
 		"@types/yup": "^0.29.14",
@@ -85,7 +85,7 @@
 		"jest-file-snapshot": "^0.5.0",
 		"jest-matcher-utils": "^29.7.0",
 		"memory-level": "^1.0.0",
-		"nodemon": "2.0.19",
-		"typescript": "^5.5.4"
+		"nodemon": "3.1.4",
+		"typescript": "^5.6.2"
 	}
 }

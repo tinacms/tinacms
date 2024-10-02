@@ -8,7 +8,22 @@ type Option = {
   label: string
 }
 
-export interface ReferenceFieldProps {
+type ReferenceFieldOptions = {
+  optionComponent?: OptionComponent
+  experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>
+}
+
+type OptionComponent = (
+  props: unknown,
+  _sys: InternalSys
+) => React.ReactElement | string
+
+export interface InternalSys {
+  filename: string
+  path: string
+}
+
+export interface ReferenceFieldProps extends ReferenceFieldOptions {
   label?: string
   name: string
   component: string

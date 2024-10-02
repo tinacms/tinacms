@@ -274,7 +274,7 @@ const Node = ({ components, child }) => {
         return <Component {...props} />
       }
       // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-      return <img src={child.url} alt={child.caption} />
+      return <img src={child.url} alt={child.alt} />
     case 'a':
       if (components[child.type]) {
         const Component = components[child.type]

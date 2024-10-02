@@ -495,13 +495,15 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                 {
                   type: 'string',
                   label: 'Alt',
-                  name: [templateName, 'alt'].join('.'),
+                  name: [templateName.replace(/\.props$/, ''), 'alt'].join('.'),
                   component: 'text',
                 },
                 {
                   type: 'string',
                   label: 'Caption',
-                  name: [templateName, 'caption'].join('.'),
+                  name: [templateName.replace(/\.props$/, ''), 'caption'].join(
+                    '.'
+                  ),
                   component: 'text',
                 },
               ],

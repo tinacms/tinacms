@@ -1,44 +1,44 @@
 {
-  "name": "tinacms-clerk",
-  "version": "5.0.0",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "files": [
-    "dist"
-  ],
-  "typings": "dist/index.d.ts",
-  "license": "Apache-2.0",
-  "buildConfig": {
-    "entryPoints": [
-      {
-        "name": "src/index.ts",
-        "target": "node"
-      },
-      "src/tinacms.ts"
-    ]
-  },
-  "scripts": {
-    "types": "pnpm tsc",
-    "build": "tinacms-scripts build"
-  },
-  "devDependencies": {
-    "@clerk/backend": "0.31.3",
-    "@clerk/clerk-js": "4.56.2",
-    "@tinacms/scripts": "workspace:*",
-    "@types/node": "16.6.1",
-    "tinacms": "workspace:*",
-    "typescript": "4.6.4"
-  },
-  "peerDependencies": {
-    "@clerk/backend": "0.x",
-    "@clerk/clerk-js": "4.x",
-    "tinacms": "workspace:*"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
-  "repository": {
-    "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/tinacms-clerk"
-  }
+	"name": "tinacms-clerk",
+	"version": "5.0.8",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"files": [
+		"dist"
+	],
+	"typings": "dist/index.d.ts",
+	"license": "Apache-2.0",
+	"buildConfig": {
+		"entryPoints": [
+			{
+				"name": "src/index.ts",
+				"target": "node"
+			},
+			"src/tinacms.ts"
+		]
+	},
+	"scripts": {
+		"types": "pnpm tsc",
+		"build": "tinacms-scripts build"
+	},
+	"devDependencies": {
+		"@clerk/backend": "0.31.3",
+		"@clerk/clerk-js": "4.56.2",
+		"@tinacms/scripts": "workspace:*",
+		"@types/node": "^22.7.4",
+		"tinacms": "workspace:*",
+		"typescript": "^5.6.2"
+	},
+	"peerDependencies": {
+		"@clerk/backend": "0.x",
+		"@clerk/clerk-js": "4.x",
+		"tinacms": "workspace:*"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org"
+	},
+	"repository": {
+		"url": "https://github.com/tinacms/tinacms.git",
+		"directory": "packages/tinacms-clerk"
+	}
 }

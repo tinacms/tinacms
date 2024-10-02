@@ -1,4 +1,4 @@
-import type { FC } from 'react'
+import type { FC, ReactNode } from 'react'
 import type React from 'react'
 
 type Meta = {
@@ -213,9 +213,19 @@ export type ImageField = (
     type: 'image'
   }
 
+type ReferenceFieldOptions = {
+  optionComponent?: OptionComponent
+  experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>
+}
+
+type OptionComponent<P = Record<string, unknown>, S = Document['_sys']> = (
+  props: P,
+  _internalSys: S
+) => React.ReactNode | Element | undefined
+
 export type ReferenceField = (
-  | FieldGeneric<string, undefined>
-  | FieldGeneric<string, false>
+  | FieldGeneric<string, undefined, ReferenceFieldOptions>
+  | FieldGeneric<string, false, ReferenceFieldOptions>
 ) &
   BaseField & {
     type: 'reference'
@@ -833,6 +843,15 @@ export interface UICollection<Form = any, CMS = any, TinaForm = any> {
      * When set to `true`, editors won't be able to modify the filename
      */
     readonly?: boolean
+    /**
+     * When set to `true`, the filename will be shown first in the form
+     * @default false
+     */
+    showFirst?: boolean
+    /**
+     * Sets the description for the filename field
+     */
+    description?: string
   }
   /**
    * Determines whether or not this collection can accept new docments

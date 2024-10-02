@@ -1,12 +1,7 @@
-/**
-
-*/
-
 import { execSync } from 'child_process'
 import path from 'path'
-
+import { log } from './logger'
 import fs from 'fs-extra'
-import chalk from 'chalk'
 
 function isInGitRepository(): boolean {
   try {
@@ -24,46 +19,42 @@ function isInMercurialRepository(): boolean {
   return false
 }
 
-export function tryGitInit(root: string): boolean {
-  let didInit = false
+export function makeFirstCommit(root: string) {
   try {
-    execSync('git --version', { stdio: 'ignore' })
-    if (isInGitRepository() || isInMercurialRepository()) {
-      return false
-    }
-    if (!fs.existsSync('.gitignore')) {
-      console.warn(
-        chalk.yellow(
-          'There is no .gitignore file in this repository, creating one...'
-        )
-      )
-      fs.writeFileSync(
-        '.gitignore',
-        `node_modules
-.yarn/*
-.DS_Store
-.cache
-.next/
-`
-      )
-    }
-
-    execSync('git init', { stdio: 'ignore' })
-    didInit = true
-
     execSync('git checkout -b main', { stdio: 'ignore' })
 
     execSync('git add -A', { stdio: 'ignore' })
     execSync('git commit -m "Initial commit from Create Tina App"', {
       stdio: 'ignore',
     })
-    return true
-  } catch (e) {
-    if (didInit) {
-      try {
-        fs.removeSync(path.join(root, '.git'))
-      } catch (_) {}
-    }
+  } catch (err) {
+    fs.removeSync(path.join(root, '.git'))
+    throw err
+  }
+}
+
+export function initializeGit(): boolean {
+  execSync('git --version', { stdio: 'ignore' })
+
+  if (isInGitRepository() || isInMercurialRepository()) {
+    log.warn('Already in a Git repository, skipping.')
     return false
   }
+
+  if (!fs.existsSync('.gitignore')) {
+    log.warn('There is no .gitignore file in this repository, creating one...')
+    fs.writeFileSync(
+      '.gitignore',
+      `node_modules
+.yarn/*
+.DS_Store
+.cache
+.next/
+`
+    )
+  }
+
+  execSync('git init', { stdio: 'ignore' })
+
+  return true
 }
