@@ -57,6 +57,7 @@ jobs:
           ISSUE_TITLE="Starter template '${{ matrix.template }}' failed to build with ${{ matrix.package-manager }}"
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
+          echo $ISSUE_TITLE >> $GITHUB_STEP_SUMMARY
           echo "failed=true" >> "$GITHUB_OUTPUT"
 
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
