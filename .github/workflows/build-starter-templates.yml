@@ -56,7 +56,7 @@ jobs:
         run: |
           ISSUE_TITLE="Starter template '${{ matrix.template }}' failed to build with ${{ matrix.package-manager }} using Node ${{ matrix.node-version }}"
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          ISSUE_BODY="The **${{ matrix.template }}** starter template failed to build with **${{ matrix.package-manager }}** using Node **${{ matrix.node-version }}**.\n\nCheck the full workflow logs for more details: [View Workflow Run]($RUN_URL)"
+          ISSUE_BODY="The **${{ matrix.template }}** starter template failed to build with **${{ matrix.package-manager }}** using Node **${{ matrix.node-version }}**.\\n\\nCheck the full workflow logs for more details: [View Workflow Run]($RUN_URL)"
 
           echo $ISSUE_TITLE >> $GITHUB_STEP_SUMMARY
           echo "failed=true" >> "$GITHUB_OUTPUT"
@@ -66,8 +66,7 @@ jobs:
             echo "Issue already exists. Skipping issue creation."
           else
             echo "Creating a new issue..."
-            # Piping `ISSUE_BODY` in this way allows GitHub to register `\n` in the issue body.
-            echo "$ISSUE_BODY" | gh issue -R tinacms/tinacms create --title "$ISSUE_TITLE" --label "bug" -F -
+            gh issue -R tinacms/tinacms create --title "$ISSUE_TITLE" --label "bug" --body "$ISSUE_BODY"
           fi
 
   # Required to check for failures due to the `continue-on-error` being set to true.
