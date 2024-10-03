@@ -1,9 +1,9 @@
 'use client'
 import type { PostQuery } from '@/tina/__generated__/types'
-import { useTina } from 'tinacms/dist/react'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import mermaid from 'mermaid'
 import { useEffect, useRef } from 'react'
+import { useTina } from 'tinacms/dist/react'
+import { TinaMarkdown } from 'tinacms/dist/rich-text'
 
 export const useMermaidElement = () => {
   const mermaidRef = useRef<HTMLDivElement>(null)

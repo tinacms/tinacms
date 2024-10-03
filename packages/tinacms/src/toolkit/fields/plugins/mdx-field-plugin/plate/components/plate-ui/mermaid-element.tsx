@@ -1,6 +1,6 @@
 import { withRef } from '@udecode/cn'
 import { PlateElement } from '@udecode/plate-common'
-import { Moon, PencilIcon, SunMoon } from 'lucide-react'
+import { Eye, Moon, PencilIcon, SquarePen, SunMoon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useMermaidElement } from '../../hooks/use-mermaid-element'
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
@@ -27,9 +27,13 @@ const LightModeComponent = ({ onToggleMode }) => {
       <button
         type="button"
         onClick={handleToggle}
-        className="flex items-center w-5 h-5 text-gray-500 cursor-pointer"
+        className="flex items-center w-5 h-5 cursor-pointer"
       >
-        {isLightMode ? <Moon /> : <SunMoon />}
+        {isLightMode ? (
+          <Moon className="fill-white" />
+        ) : (
+          <SunMoon className="fill-white" />
+        )}
       </button>
     </div>
   )
@@ -38,10 +42,18 @@ const LightModeComponent = ({ onToggleMode }) => {
 const MermaidElementWithRef = ({ config, lightMode }) => {
   const { mermaidRef } = useMermaidElement()
   return (
-    <div contentEditable={false} className="border-border border">
+    <div contentEditable={false} className="border-border border-b">
       <div ref={mermaidRef}>
         <pre className={`${lightMode} mermaid`}>{config}</pre>
       </div>
+    </div>
+  )
+}
+
+const Bubble = ({ children }) => {
+  return (
+    <div className="bg-blue-600 rounded-full p-2 transition-transform duration-200 ease-in-out hover:scale-110">
+      {children}
     </div>
   )
 }
@@ -52,9 +64,9 @@ export const MermaidElement = withRef<typeof PlateElement>(
     const [lightModeClass, setLightModeClass] = React.useState('')
     const [mermaidConfig, setMermaidConfig] = React.useState(
       element.value ||
-        `graph TD;
-    id1(Click the ✏️ edit button at top right of mermaid component) --> id2(Modify this graph);
-    id2 --> id3(Click edit button again to preview the changes);`
+        `flowchart TD
+    id1(Click the ✏️ edit button at top right of mermaid component) --> id2(Modify this graph)
+    id2 --> id3(Click edit button again to preview the changes)`
     )
 
     const node = {
@@ -65,15 +77,28 @@ export const MermaidElement = withRef<typeof PlateElement>(
 
     return (
       <PlateElement element={element} ref={ref} {...props}>
-        <div className="relative">
-          <div className="absolute top-2 right-2 z-10 space-y-2">
-            <PencilIcon
-              className="w-5 h-5 text-gray-500 cursor-pointer"
-              onClick={() => {
-                setIsEditing(!isEditing)
-              }}
-            />
-            <LightModeComponent onToggleMode={(v) => setLightModeClass(v)} />
+        <div className="relative group">
+          <div className="absolute top-2 right-2 z-10 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out">
+            <Bubble>
+              {isEditing ? (
+                <Eye
+                  className="w-5 h-5 fill-white cursor-pointer"
+                  onClick={() => {
+                    setIsEditing(!isEditing)
+                  }}
+                />
+              ) : (
+                <SquarePen
+                  className="w-5 h-5 fill-white cursor-pointer"
+                  onClick={() => {
+                    setIsEditing(!isEditing)
+                  }}
+                />
+              )}
+            </Bubble>
+            <Bubble>
+              <LightModeComponent onToggleMode={(v) => setLightModeClass(v)} />
+            </Bubble>
           </div>
           {isEditing ? (
             <CodeBlock
