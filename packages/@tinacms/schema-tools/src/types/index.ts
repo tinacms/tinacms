@@ -219,9 +219,9 @@ export type ImageField = (
 
 type ReferenceFieldOptions = {
   optionComponent?: OptionComponent
-/**
-     * @deprecated use `collectionFilter` instead as experimental___Filter will be removed in a future release
-     */
+  /**
+   * @deprecated use `collectionFilter` instead as experimental___Filter will be removed in a future release
+   */
   experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>
   collectionFilter?:
     | Record<string, Record<string, FilterValue>>
