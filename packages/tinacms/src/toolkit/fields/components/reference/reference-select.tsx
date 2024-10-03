@@ -69,9 +69,10 @@ const useGetOptionSets = (
       const optionSets = await Promise.all(
         collections.map(async (collection) => {
           try {
-            const filter = filters[collection]
+            const filter = filters?.[collection]
               ? filterQueryBuilder(filters[collection], collection)
               : {}
+
             const response: Response = await cms.api.tina.request(
               `#graphql
             query ($collection: String!, $filter: DocumentFilter) {
