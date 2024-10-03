@@ -36,29 +36,29 @@ const referenceField = {
     //   },
     // },
     //Dynamic example - user can define the function they want here but need to make sure the return type match the schema
-    collectionFilter: () => {
-      const url = new URL('https://bob-northwind-sydney.com')
-      const hostname = url.hostname
-
-      let location: LocationEnum
-      switch (hostname) {
-        case 'bob-northwind-melbourne.com':
-          location = LocationEnum.Melbourne
-          break
-        case 'bob-northwind-sydney.com':
-          location = LocationEnum.Sydney
-          break
-        default:
-          location = LocationEnum.Default
-          break
-      }
-
-      return {
-        author: {
-          location,
-        },
-      }
-    },
+    // collectionFilter: () => {
+    //   const url = new URL('https://bob-northwind-sydney.com')
+    //   const hostname = url.hostname
+    //
+    //   let location: LocationEnum
+    //   switch (hostname) {
+    //     case 'bob-northwind-melbourne.com':
+    //       location = LocationEnum.Melbourne
+    //       break
+    //     case 'bob-northwind-sydney.com':
+    //       location = LocationEnum.Sydney
+    //       break
+    //     default:
+    //       location = LocationEnum.Default
+    //       break
+    //   }
+    //
+    //   return {
+    //     author: {
+    //       location,
+    //     },
+    //   }
+    // },
   },
   collections: ['author', 'post'],
 }
