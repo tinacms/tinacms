@@ -109,7 +109,10 @@ const useGetOptionSets = (
               edges: response.collection.documents.edges,
             }
           } catch (e) {
-            console.error('Unhandle exception:', e)
+            console.error(
+              'Exception thrown while building and running GraphQL query: ',
+              e
+            )
 
             return {
               collection,
