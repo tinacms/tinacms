@@ -2,8 +2,8 @@ import type { Cache } from './index'
 
 // makeCacheDir creates the cache directory if it doesn't exist
 const makeCacheDir = async (dir: string, fs: any) => {
-  const path = await import('path')
-  const os = await import('os')
+  const path = await import('node:path')
+  const os = await import('node:os')
 
   const parts = dir.split(path.sep).filter(Boolean)
 
@@ -18,8 +18,8 @@ const makeCacheDir = async (dir: string, fs: any) => {
 }
 
 export const NodeCache = async (dir: string): Promise<Cache> => {
-  const fs = await import('fs')
-  const { createHash } = await import('crypto')
+  const fs = await import('node:fs')
+  const { createHash } = await import('node:crypto')
   const cacheDir = await makeCacheDir(dir, fs)
 
   return {
