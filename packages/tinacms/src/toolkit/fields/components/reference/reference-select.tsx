@@ -109,6 +109,8 @@ const useGetOptionSets = (
               edges: response.collection.documents.edges,
             }
           } catch (e) {
+            console.error('Unhandle exception:', e)
+
             return {
               collection,
               edges: [],
