@@ -67,7 +67,7 @@ jobs:
           else
             echo "Creating a new issue..."
             # Piping `ISSUE_BODY` in this way allows GitHub to register `\n` in the issue body.
-            echo $ISSUE_BODY | gh issue -R tinacms/tinacms create --title "$ISSUE_TITLE" --label "bug" -F -
+            echo "$ISSUE_BODY" | gh issue -R tinacms/tinacms create --title "$ISSUE_TITLE" --label "bug" -F -
           fi
 
   # Required to check for failures due to the `continue-on-error` being set to true.
