@@ -56,7 +56,12 @@ jobs:
         run: |
           ISSUE_TITLE="Starter template '${{ matrix.template }}' failed to build with ${{ matrix.package-manager }} using Node ${{ matrix.node-version }}"
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          ISSUE_BODY="The **${{ matrix.template }}** starter template failed to build with **${{ matrix.package-manager }}** using Node **${{ matrix.node-version }}**.\\n\\nCheck the full workflow logs for more details: [View Workflow Run]($RUN_URL)"
+          ISSUE_BODY=$(cat <<EOF
+          The **${{ matrix.template }}** starter template failed to build with **${{ matrix.package-manager }}** using Node **${{ matrix.node-version }}**.
+
+          Check the full workflow logs for more details: [View Workflow Run]($RUN_URL)"
+          EOF
+          )
 
           echo $ISSUE_TITLE >> $GITHUB_STEP_SUMMARY
           echo "failed=true" >> "$GITHUB_OUTPUT"
