@@ -142,7 +142,7 @@ export const RenderForm = ({
   customDefaults,
 }: {
   cms: TinaCMS
-  collection
+  collection: Collection
   folder
   templateName
   mutationInfo
@@ -188,6 +188,61 @@ export const RenderForm = ({
     template?.defaultItem ||
     {}
 
+  const filenameField = {
+    name: 'filename',
+    label: 'Filename',
+    component: slugFunction
+      ? wrapFieldsWithMeta(({ field, input, meta }) => {
+          return (
+            <FilenameInput
+              readOnly={schemaCollection?.ui?.filename?.readonly}
+              {...input}
+            />
+          )
+        })
+      : 'text',
+    disabled: schemaCollection?.ui?.filename?.readonly,
+    description: collection.ui?.filename?.description ? (
+      <span
+        dangerouslySetInnerHTML={{ __html: collection.ui.filename.description }}
+      />
+    ) : (
+      <span>
+        A unique filename for the content.
+        <br />
+        Examples: <code>My_Document</code>, <code>My_Document.en</code>,{' '}
+        <code>sub-folder/My_Document</code>
+      </span>
+    ),
+    placeholder: 'My_Document',
+    validate: (value, allValues, meta) => {
+      if (!value) {
+        if (meta.dirty) {
+          return 'Required'
+        }
+        return true
+      }
+
+      const isValid = /[\.\-_\/a-zA-Z0-9]*$/.test(value)
+      if (value && !isValid) {
+        return 'Must contain only a-z, A-Z, 0-9, -, _, ., or /.'
+      }
+      // check if the filename is allowed by the collection.
+      if (schemaCollection.match?.exclude || schemaCollection.match?.include) {
+        const filePath = `${normalizePath(schemaCollection.path)}/${value}.${
+          schemaCollection.format || 'md'
+        }`
+        const match = schema?.matchFiles({
+          files: [filePath],
+          collection: schemaCollection,
+        })
+        if (match?.length === 0) {
+          return `The filename "${value}" is not allowed for this collection.`
+        }
+      }
+    },
+  }
+
   const form = useMemo(() => {
     const folderName = folder.fullyQualifiedName ? folder.name : ''
     return new Form({
@@ -230,61 +285,10 @@ export const RenderForm = ({
         `/new-post.${schemaCollection.format || 'md'}`,
       label: 'form',
       fields: [
+        collection.ui?.filename?.showFirst && filenameField,
         ...(formInfo.fields as any),
-        {
-          name: 'filename',
-          label: 'Filename',
-          component: slugFunction
-            ? wrapFieldsWithMeta(({ field, input, meta }) => {
-                return (
-                  <FilenameInput
-                    readOnly={schemaCollection?.ui?.filename?.readonly}
-                    {...input}
-                  />
-                )
-              })
-            : 'text',
-          disabled: schemaCollection?.ui?.filename?.readonly,
-          description: (
-            <span>
-              A unique filename for the content.
-              <br />
-              Examples: <code>My_Document</code>, <code>My_Document.en</code>,{' '}
-              <code>sub-folder/My_Document</code>
-            </span>
-          ),
-          placeholder: 'My_Document',
-          validate: (value, allValues, meta) => {
-            if (!value) {
-              if (meta.dirty) {
-                return 'Required'
-              }
-              return true
-            }
-
-            const isValid = /[\.\-_\/a-zA-Z0-9]*$/.test(value)
-            if (value && !isValid) {
-              return 'Must contain only a-z, A-Z, 0-9, -, _, ., or /.'
-            }
-            // check if the filename is allowed by the collection.
-            if (
-              schemaCollection.match?.exclude ||
-              schemaCollection.match?.include
-            ) {
-              const filePath = `${normalizePath(
-                schemaCollection.path
-              )}/${value}.${schemaCollection.format || 'md'}`
-              const match = schema?.matchFiles({
-                files: [filePath],
-                collection: schemaCollection,
-              })
-              if (match?.length === 0) {
-                return `The filename "${value}" is not allowed for this collection.`
-              }
-            }
-          },
-        },
-      ],
+        !collection.ui?.filename?.showFirst && filenameField,
+      ].filter((x) => !!x),
       onSubmit: async (values) => {
         try {
           const folderName = folder.fullyQualifiedName ? folder.name : ''

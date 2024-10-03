@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/search",
-	"version": "1.0.29",
+	"version": "1.0.31",
 	"main": "dist/index.js",
 	"module": "dist/index-client.mjs",
 	"typings": "dist/index.d.ts",
@@ -55,7 +55,7 @@
 		"@tinacms/scripts": "workspace:*",
 		"@types/jest": "^29.5.13",
 		"@types/micromatch": "^4.0.9",
-		"@types/node": "^22.7.3",
+		"@types/node": "^22.7.4",
 		"@types/search-index": "^3.2.4",
 		"jest": "^29.7.0",
 		"jest-diff": "^29.7.0",

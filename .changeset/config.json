@@ -1,6 +1,6 @@
 {
     "$schema": "https://unpkg.com/@changesets/config@3.0.3/schema.json",
-    "changelog": "@changesets/changelog-github",
+    "changelog": ["@changesets/changelog-github", { "repo": "tinacms/tinacms" }],
     "commit": false,
     "linked": [],
     "access": "public",
@@ -9,5 +9,5 @@
     "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
       "onlyUpdatePeerDependentsWhenOutOfRange": true
     },
-    "ignore": [],
+    "ignore": []
   }
