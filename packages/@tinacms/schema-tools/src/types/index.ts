@@ -221,8 +221,8 @@ type ReferenceFieldOptions = {
   optionComponent?: OptionComponent
   experimental___filter?: (list: Array<any>, searchQuery: string) => Array<any>
   collectionFilter?:
-    | Record<string, FilterValue>
-    | (() => Record<string, FilterValue>)
+    | Record<string, Record<string, FilterValue>>
+    | (() => Record<string, Record<string, FilterValue>>)
 }
 
 type OptionComponent<P = Record<string, unknown>, S = Document['_sys']> = (
