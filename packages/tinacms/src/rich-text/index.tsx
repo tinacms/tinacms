@@ -406,12 +406,22 @@ const Node = ({ components, child }) => {
     case 'table':
       const rows = child.children || []
       const TableComponent =
-        components['table'] || ((props) => <table {...props} />)
+        components['table'] ||
+        ((props) => (
+          <table style={{ border: '1px solid #EDECF3' }} {...props} />
+        ))
       const TrComponent = components['tr'] || ((props) => <tr {...props} />)
       const TdComponent =
         components['td'] ||
         ((props) => (
-          <td style={{ textAlign: props?.align || 'auto' }} {...props} />
+          <td
+            style={{
+              textAlign: props?.align || 'auto',
+              border: '1px solid #EDECF3',
+              padding: '0.25rem',
+            }}
+            {...props}
+          />
         ))
       const align = child.props?.align || []
       return (
