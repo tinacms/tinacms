@@ -11,6 +11,7 @@ import type * as Plate from './plate'
 import type { RichTextType } from '@tinacms/schema-tools'
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import type { ContainerDirective } from 'mdast-util-directive'
+import { markdownToAst } from '.'
 
 export type { Position, PositionItem } from './plate'
 
@@ -56,9 +57,27 @@ export const remarkToSlate = (
                     {
                       type: 'p',
                       children: flatten(
-                        tableCell.children.map((child) =>
-                          phrasingContent(child)
-                        )
+                        tableCell.children.map((child) => {
+                          if (child.type === 'text') {
+                            // Re-parse the string value as if it were top-level markdown
+                            // Note: this is a cyclic dependency, probably best to pass this in to `remarkSlate` as a callback instead
+                            const ast = markdownToAst(
+                              child.value,
+                              field,
+                              imageCallback
+                            )
+                            const blockChild = ast.children[0]
+                            if (['heading'].includes(blockChild?.type)) {
+                              // unwrapBlockContent probably needs to work with more types if you want to reuse it
+                              // And in general you might want to return something like {type: 'invalid_cell_content', children: blockChild}
+                              // which you can handle on the Plate editor with a custom element. Similar to how we handle HTML
+                              return unwrapBlockContent(blockChild)
+                            }
+                            return phrasingContent(child)
+                          } else {
+                            return phrasingContent(child)
+                          }
+                        })
                       ),
                     },
                   ],
