@@ -59,7 +59,7 @@ jobs:
           ISSUE_BODY=$(cat <<EOF
           The **${{ matrix.template }}** starter template failed to build with **${{ matrix.package-manager }}** using Node **${{ matrix.node-version }}**.
 
-          Check the full workflow logs for more details: [View Workflow Run]($RUN_URL)"
+          Check the full workflow logs for more details: [View Workflow Run]($RUN_URL)
           EOF
           )
 
