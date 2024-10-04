@@ -45,6 +45,7 @@ jobs:
         run: npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }}
 
       - name: Run build
+        id: build
         run: |
           cd template-repo
           BUILD_OUTPUT=$( ( ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build-local ) 2>&1 )
