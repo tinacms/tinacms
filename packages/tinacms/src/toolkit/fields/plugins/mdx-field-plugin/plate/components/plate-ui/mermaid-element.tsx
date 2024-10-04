@@ -1,6 +1,6 @@
 import { withRef } from '@udecode/cn'
 import { PlateElement } from '@udecode/plate-common'
-import { Eye, Moon, PencilIcon, SquarePen, SunMoon } from 'lucide-react'
+import { Eye, Moon, SquarePen, SunMoon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useMermaidElement } from '../../hooks/use-mermaid-element'
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
@@ -58,16 +58,22 @@ const Bubble = ({ children }) => {
   )
 }
 
+const DEFAULT_MERMAID_CONFIG = `flowchart TD
+    id1(this is an example flow diagram) 
+    --> id2(modify me to see changes!)
+    id2 
+    --> id3(Click the top button to preview the changes)
+    --> id4(Learn about mermaid diagrams @ mermaid.js.org)`
+
 export const MermaidElement = withRef<typeof PlateElement>(
   ({ children, nodeProps, element, ...props }, ref) => {
-    const [isEditing, setIsEditing] = React.useState(false)
-    const [lightModeClass, setLightModeClass] = React.useState('')
     const [mermaidConfig, setMermaidConfig] = React.useState(
-      element.value ||
-        `flowchart TD
-    id1(Click the ✏️ edit button at top right of mermaid component) --> id2(Modify this graph)
-    id2 --> id3(Click edit button again to preview the changes)`
+      element.value || DEFAULT_MERMAID_CONFIG
     )
+    const [isEditing, setIsEditing] = React.useState(
+      mermaidConfig === DEFAULT_MERMAID_CONFIG || false
+    )
+    const [lightModeClass, setLightModeClass] = React.useState('')
 
     const node = {
       type: ELEMENT_MERMAID,
@@ -106,6 +112,7 @@ export const MermaidElement = withRef<typeof PlateElement>(
               language="yaml"
               {...props}
               element={node}
+              defaultValue={mermaidConfig}
               onChangeCallback={(value) => setMermaidConfig(value)}
             />
           ) : (
