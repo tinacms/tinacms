@@ -24,13 +24,6 @@ jobs:
       failed: ${{ steps.report-errors.outputs.failed }}
 
     steps:
-      - name: Get Current Job Log URL
-        uses: Tiryoh/gha-jobid-action@v1
-        id: jobs
-        with:
-          job_name: 'build (${{ matrix.distro }})' # input job.<job-id>.name and matrix here.
-          per_page: 54 # This is the amount of jobs there are: `package-manager * template * node-version`
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -70,10 +63,11 @@ jobs:
           fi
 
           ISSUE_TITLE="Starter template '${{ matrix.template }}' failed during $ERROR_STEP with ${{ matrix.package-manager }} using Node ${{ matrix.node-version }}"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           ISSUE_BODY=$(cat <<EOF
           The **${{ matrix.template }}** starter template failed during $ERROR_STEP with **${{ matrix.package-manager }}** using Node **${{ matrix.node-version }}**.
 
-          Check the full workflow logs for more details: [View Workflow Run](${{ steps.jobs.outputs.html_url }})
+          Check the full workflow logs for more details: [View Workflow Run]($RUN_URL)
           EOF
           )
 
