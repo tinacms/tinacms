@@ -22,6 +22,7 @@ jobs:
         node-version: [18, 20, 22]
     outputs:
       failed: ${{ steps.report-errors.outputs.failed }}
+      build_output: ${{ steps.build.outputs.build_output }}
 
     steps:
       - name: Set up Node.js
