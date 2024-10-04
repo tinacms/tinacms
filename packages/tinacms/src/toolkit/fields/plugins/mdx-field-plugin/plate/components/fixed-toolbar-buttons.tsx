@@ -101,16 +101,19 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
 
 export default function FixedToolbarButtons() {
   const toolbarRef = React.useRef(null)
-  const [itemsShown, setItemsShown] = React.useState(11)
-  const { overrides } = useToolbarContext()
+  const [itemsShown, setItemsShown] = React.useState(10)
+  const { overrides, templates } = useToolbarContext()
+  const showEmbedButton = templates.length > 0
 
   useResize(toolbarRef, (entry) => {
     const width = entry.target.getBoundingClientRect().width
     const paragraphIconWidth = width < MD_BREAKPOINT ? 58 : 128
-    const itemsShown =
-      (width - EMBED_ICON_WIDTH - paragraphIconWidth) / ICON_WIDTH
+    //Substract the width of embed button only when it exist
+    const availableWidthForItems =
+      width - paragraphIconWidth - (showEmbedButton ? EMBED_ICON_WIDTH : 0)
 
-    setItemsShown(Math.floor(itemsShown))
+    const shownItemCount = availableWidthForItems / ICON_WIDTH
+    setItemsShown(Math.floor(shownItemCount))
   })
 
   const toolbarItemsArray: ToolbarItem[] =
