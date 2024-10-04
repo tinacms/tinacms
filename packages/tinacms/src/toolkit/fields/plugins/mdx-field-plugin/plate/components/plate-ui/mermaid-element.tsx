@@ -58,7 +58,8 @@ const Bubble = ({ children }) => {
   )
 }
 
-const DEFAULT_MERMAID_CONFIG = `flowchart TD
+const DEFAULT_MERMAID_CONFIG = `%% This won't render without implementing a rendering engine <TODO: Link to tina docs>
+flowchart TD
     id1(this is an example flow diagram) 
     --> id2(modify me to see changes!)
     id2 
