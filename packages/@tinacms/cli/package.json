@@ -60,6 +60,7 @@
 		"@rollup/pluginutils": "^5.1.2",
 		"@svgr/core": "8.1.0",
 		"@tailwindcss/aspect-ratio": "^0.4.2",
+		"@tailwindcss/container-queries": "^0.1.1",
 		"@tailwindcss/typography": "^0.5.15",
 		"@tinacms/app": "workspace:*",
 		"@tinacms/graphql": "workspace:*",
