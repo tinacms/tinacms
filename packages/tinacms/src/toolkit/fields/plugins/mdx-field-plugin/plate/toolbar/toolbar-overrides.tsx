@@ -14,3 +14,4 @@ export type ToolbarOverrideType =
 
 export const ICON_WIDTH = 32
 export const EMBED_ICON_WIDTH = 78
+export const MD_BREAKPOINT = 768 // Tailwind's 'md' breakpoint

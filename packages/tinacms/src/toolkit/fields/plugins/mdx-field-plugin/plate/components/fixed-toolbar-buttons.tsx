@@ -20,6 +20,7 @@ import TemplatesToolbarButton from './plate-ui/templates-toolbar-button'
 import {
   EMBED_ICON_WIDTH,
   ICON_WIDTH,
+  MD_BREAKPOINT,
   type ToolbarOverrideType,
 } from '../toolbar/toolbar-overrides'
 import { useResize } from '../hooks/use-resize'
@@ -105,7 +106,9 @@ export default function FixedToolbarButtons() {
 
   useResize(toolbarRef, (entry) => {
     const width = entry.target.getBoundingClientRect().width
-    const itemsShown = (width - EMBED_ICON_WIDTH) / ICON_WIDTH
+    const paragraphIconWidth = width < MD_BREAKPOINT ? 58 : 128
+    const itemsShown =
+      (width - EMBED_ICON_WIDTH - paragraphIconWidth) / ICON_WIDTH
 
     setItemsShown(Math.floor(itemsShown))
   })
