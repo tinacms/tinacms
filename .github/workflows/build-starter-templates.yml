@@ -44,7 +44,8 @@ jobs:
       - name: Run create-tina-app
         id: create-tina-app
         run: |
-          CREATE_TINA_OUTPUT=$(npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} | tee /dev/stderr )
+          npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }} 2>&1 >log.txt
+          CREATE_TINA_OUTPUT=$(cat log.txt)
           echo $CREATE_TINA_OUTPUT
           echo "create_tina_output=$CREATE_TINA_OUTPUT" >> $GITHUB_OUTPUT
 
@@ -52,7 +53,8 @@ jobs:
         id: build
         run: |
           cd template-repo
-          BUILD_OUTPUT=$(${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build-local | tee /dev/stderr )
+          ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build-local 2>&1 >log.txt
+          BUILD_OUTPUT=$(cat log.txt)
           echo $BUILD_OUTPUT
           echo "build_output=$BUILD_OUTPUT" >> $GITHUB_OUTPUT
 
