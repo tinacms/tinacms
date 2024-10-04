@@ -118,7 +118,7 @@ export default function FixedToolbarButtons() {
           .filter((item) => item !== undefined)
 
   return (
-    <div className="w-full overflow-hidden" ref={toolbarRef}>
+    <div className="w-full overflow-hidden @container/toolbar" ref={toolbarRef}>
       <div
         className="flex"
         style={{
