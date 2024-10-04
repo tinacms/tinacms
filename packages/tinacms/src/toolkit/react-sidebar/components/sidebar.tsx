@@ -1,18 +1,10 @@
-/**
-
-
-
-*/
-
 import * as React from 'react'
-
 import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi'
-import { IconType } from 'react-icons/lib'
-import { ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens'
-import { SidebarState, SidebarStateOptions } from '../sidebar'
+import type { IconType } from 'react-icons/lib'
+import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens'
+import type { SidebarState, SidebarStateOptions } from '../sidebar'
 import { useCMS, useSubscribable } from '@toolkit/react-core'
 import { useState } from 'react'
-
 import { Button } from '@toolkit/styles'
 import { FormsView } from './sidebar-body'
 import { ImFilesEmpty, ImUsers } from 'react-icons/im'
@@ -21,13 +13,12 @@ import { BillingWarning, LocalWarning } from './local-warning'
 import { MdOutlineArrowBackIos } from 'react-icons/md'
 import { Nav } from './nav'
 import { ResizeHandle } from './resize-handle'
-import { Transition } from '@headlessui/react'
+import { Transition, TransitionChild } from '@headlessui/react'
 import { useWindowWidth } from '@react-hook/window-size'
-import { CloudConfigPlugin } from '@toolkit/react-cloud-config'
+import type { CloudConfigPlugin } from '@toolkit/react-cloud-config'
 import { BranchButton } from '@toolkit/plugin-branch-switcher'
 
 export const SidebarContext = React.createContext<any>(null)
-
 export const minPreviewWidth = 440
 export const minSidebarWidth = 360
 export const navBreakpoint = 1279
@@ -319,9 +310,8 @@ const Sidebar = ({
           <ResizeHandle />
         </SidebarWrapper>
         {renderMobileNav && (
-          <Transition show={menuIsOpen}>
-            <Transition.Child
-              as={React.Fragment}
+          <Transition show={menuIsOpen} as="div">
+            <TransitionChild
               enter="transform transition-all ease-out duration-300"
               enterFrom="opacity-0 -translate-x-full"
               enterTo="opacity-100 translate-x-0"
@@ -376,16 +366,15 @@ const Sidebar = ({
                       onClick={() => {
                         setMenuIsOpen(false)
                       }}
-                      className={`transition-opacity duration-150 ease-out`}
+                      className={'transition-opacity duration-150 ease-out'}
                     >
                       <IoMdClose className="h-5 w-auto text-blue-500" />
                     </Button>
                   </div>
                 </Nav>
               </div>
-            </Transition.Child>
-            <Transition.Child
-              as={React.Fragment}
+            </TransitionChild>
+            <TransitionChild
               enter="ease-out duration-300"
               enterFrom="opacity-0"
               enterTo="opacity-80"
@@ -399,8 +388,8 @@ const Sidebar = ({
                   setMenuIsOpen(false)
                 }}
                 className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
-              ></div>
-            </Transition.Child>
+              />
+            </TransitionChild>
           </Transition>
         )}
       </>
@@ -432,7 +421,7 @@ export const updateBodyDisplacement = ({
         sidebarWidth,
         windowWidth - minPreviewWidth
       )
-      body.style.paddingLeft = bodyDisplacement + 'px'
+      body.style.paddingLeft = `${bodyDisplacement}px`
     } else {
       body.style.paddingLeft = '0'
     }
@@ -496,7 +485,9 @@ const SidebarHeader = ({
           )}
         </div>
         <div
-          className={`flex items-center pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
+          className={
+            'flex items-center pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px'
+          }
         >
           <Button
             rounded="left"
@@ -629,23 +620,23 @@ const SidebarWrapper = ({ children }) => {
   return (
     <div
       className={`fixed top-0 left-0 h-dvh z-base ${
-        displayState === 'closed' ? `pointer-events-none` : ``
+        displayState === 'closed' ? 'pointer-events-none' : ''
       }`}
     >
       <div
         className={`relative h-dvh transform flex ${
-          displayState !== 'closed' ? `` : `-translate-x-full`
+          displayState !== 'closed' ? '' : '-translate-x-full'
         } ${
           resizingSidebar
-            ? `transition-none`
+            ? 'transition-none'
             : displayState === 'closed'
-            ? `transition-all duration-300 ease-in`
+            ? 'transition-all duration-300 ease-in'
             : displayState === 'fullscreen'
-            ? `transition-all duration-150 ease-out`
-            : `transition-all duration-300 ease-out`
+            ? 'transition-all duration-150 ease-out'
+            : 'transition-all duration-300 ease-out'
         }`}
         style={{
-          width: displayState === 'fullscreen' ? '100vw' : sidebarWidth + 'px',
+          width: displayState === 'fullscreen' ? '100vw' : `${sidebarWidth}px`,
           maxWidth:
             displayState === 'fullscreen' ? '100vw' : 'calc(100vw - 8px)',
           minWidth: '360px',
@@ -660,7 +651,9 @@ const SidebarWrapper = ({ children }) => {
 const SidebarBody = ({ children }) => {
   return (
     <div
-      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white border-r border-gray-200 overflow-hidden`}
+      className={
+        'relative left-0 w-full h-full flex flex-col items-stretch bg-white border-r border-gray-200 overflow-hidden'
+      }
     >
       {children}
     </div>

@@ -99,6 +99,12 @@ export default defineSchema({
           name: 'description',
           required: true,
         },
+        {
+          type: 'string',
+          label: 'Location',
+          name: 'location',
+          required: true,
+        },
       ],
     },
   ],

@@ -1,23 +1,23 @@
 {
-  "name": "@tinacms/webpack-helpers",
-  "version": "1.0.2",
-  "license": "Apache-2.0",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/@tinacms/webpack-alias"
-  },
-  "scripts": {
-    "watch": "echo 'watch'",
-    "build": "echo 'build'",
-    "dev": "echo 'dev'"
-  },
-  "keywords": [
-    "tinacms",
-    "webpack"
-  ],
-  "dependencies": {
-    "typescript": "4.6.4"
-  }
+	"name": "@tinacms/webpack-helpers",
+	"version": "1.0.3",
+	"license": "Apache-2.0",
+	"main": "index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tinacms/tinacms.git",
+		"directory": "packages/@tinacms/webpack-alias"
+	},
+	"scripts": {
+		"watch": "echo 'watch'",
+		"build": "echo 'build'",
+		"dev": "echo 'dev'"
+	},
+	"keywords": [
+		"tinacms",
+		"webpack"
+	],
+	"dependencies": {
+		"typescript": "^5.6.2"
+	}
 }

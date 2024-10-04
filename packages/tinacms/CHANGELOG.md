@@ -1,5 +1,66 @@
 # tinacms
 
+## 2.2.8
+
+### Patch Changes
+
+- [#4843](https://github.com/tinacms/tinacms/pull/4843) [`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Update Minor & Patch Dependencies Versions
+
+- Updated dependencies [[`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a)]:
+  - @tinacms/mdx@1.4.4
+  - @tinacms/schema-tools@1.6.4
+  - @tinacms/search@1.0.31
+
+## 2.2.7
+
+### Patch Changes
+
+- [#4840](https://github.com/tinacms/tinacms/pull/4840) [`113f4db`](https://github.com/tinacms/tinacms/commit/113f4db4b5d5b7d4b95d612eca56f815f41b4f8c) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Attempt to fix `fs` not found issue
+
+- [#4826](https://github.com/tinacms/tinacms/pull/4826) [`f0994c8`](https://github.com/tinacms/tinacms/commit/f0994c8f49122cd9d784bf47171715c529d2528f) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ♻️ Add index to key
+
+## 2.2.6
+
+### Patch Changes
+
+- [#4815](https://github.com/tinacms/tinacms/pull/4815) [`b64b046`](https://github.com/tinacms/tinacms/commit/b64b046dc67ae948513057f855b156ce0cf250d8) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Rich text editor | embed dropdown - added filtering and scroll support
+  Sidebar - added version number
+
+- [#4832](https://github.com/tinacms/tinacms/pull/4832) [`6cd3596`](https://github.com/tinacms/tinacms/commit/6cd35967ab0d34851be44199bc9821b128fcfc75) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Adds config options to allow users to customize position + description of filename fields
+
+- [#4818](https://github.com/tinacms/tinacms/pull/4818) [`96bdcb7`](https://github.com/tinacms/tinacms/commit/96bdcb79b30e96056c7b19614be260a6c3ef00da) Thanks [@JackDevAU](https://github.com/JackDevAU)! - lock headlessui to version 2.1.8
+
+- [#4803](https://github.com/tinacms/tinacms/pull/4803) [`a6a7735`](https://github.com/tinacms/tinacms/commit/a6a77351b97589c60de69445a9eb2ea57beb4343) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix module not found `tinacms/dist/cache` error at runtime due to broken webpack bundling
+
+- Updated dependencies [[`6cd3596`](https://github.com/tinacms/tinacms/commit/6cd35967ab0d34851be44199bc9821b128fcfc75), [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4)]:
+  - @tinacms/schema-tools@1.6.3
+  - @tinacms/mdx@1.4.3
+  - @tinacms/search@1.0.30
+
+## 2.2.5
+
+### Patch Changes
+
+- cf1530d: Rich text editor - add h6 support
+- 2762994: Fix node 22 issues with better-sqlite3. Updates sqlite-level
+- ba5f7a3: ⬆️ Update @headlessui/react from v1 to v2
+- Updated dependencies [2762994]
+- Updated dependencies [ba5f7a3]
+  - @tinacms/search@1.0.29
+
+## 2.2.4
+
+### Patch Changes
+
+- 75cf194: enable / in search for reference field selection component
+- 198c280: Media Manager: Update Tina media manager to report any errors that occur during asset upload / delete operations
+
+## 2.2.3
+
+### Patch Changes
+
+- 367faed: fix reference field search
+
 ## 2.2.2
 
 ### Patch Changes

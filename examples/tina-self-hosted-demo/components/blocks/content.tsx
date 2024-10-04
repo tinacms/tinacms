@@ -2,7 +2,7 @@ import React from 'react'
 import { Container } from '../util/container'
 import { Section } from '../util/section'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
-import type { TinaTemplate } from 'tinacms'
+import type { Template } from 'tinacms'
 
 export const Content = ({ data, parentField = '' }) => {
   return (
@@ -21,7 +21,7 @@ export const Content = ({ data, parentField = '' }) => {
   )
 }
 
-export const contentBlockSchema: TinaTemplate = {
+export const contentBlockSchema: Template = {
   name: 'content',
   label: 'Content',
   ui: {

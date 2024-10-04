@@ -78,8 +78,8 @@ export const getChangedFiles = async ({
         return
       }
       if (matches) {
-        let oidA = await A?.oid()
-        let oidB = await B?.oid()
+        const oidA = await A?.oid()
+        const oidB = await B?.oid()
         if (oidA !== oidB) {
           if (oidA === undefined) {
             results.added.push(relativePath)

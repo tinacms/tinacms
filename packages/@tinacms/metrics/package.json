@@ -1,47 +1,47 @@
 {
-  "name": "@tinacms/metrics",
-  "version": "1.0.5",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "files": [
-    "dist",
-    ".env"
-  ],
-  "license": "Apache-2.0",
-  "buildConfig": {
-    "entryPoints": [
-      {
-        "name": "src/index.ts",
-        "target": "node"
-      }
-    ]
-  },
-  "peerDependencies": {
-    "fs-extra": "^9.0.1"
-  },
-  "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
-    "@types/fs-extra": "^9.0.11",
-    "@types/isomorphic-fetch": "^0.0.35",
-    "fs-extra": "^9.0.1",
-    "jest": "^29.5.0",
-    "typescript": "4.6.4"
-  },
-  "scripts": {
-    "build": "tinacms-scripts build",
-    "test": "jest --passWithNoTests",
-    "types": "pnpm tsc",
-    "test-watch": "jest  --passWithNoTests --watch",
-    "generate:schema": "pnpm node scripts/generateSchema.js"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
-  "repository": {
-    "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/@tinacms/cli"
-  },
-  "dependencies": {
-    "isomorphic-fetch": "^3.0.0"
-  }
+	"name": "@tinacms/metrics",
+	"version": "1.0.7",
+	"main": "dist/index.js",
+	"typings": "dist/index.d.ts",
+	"files": [
+		"dist",
+		".env"
+	],
+	"license": "Apache-2.0",
+	"buildConfig": {
+		"entryPoints": [
+			{
+				"name": "src/index.ts",
+				"target": "node"
+			}
+		]
+	},
+	"peerDependencies": {
+		"fs-extra": "^9.0.1"
+	},
+	"devDependencies": {
+		"@tinacms/scripts": "workspace:*",
+		"@types/fs-extra": "^9.0.13",
+		"@types/isomorphic-fetch": "^0.0.35",
+		"fs-extra": "^11.2.0",
+		"jest": "^29.7.0",
+		"typescript": "^5.6.2"
+	},
+	"scripts": {
+		"build": "tinacms-scripts build",
+		"test": "jest --passWithNoTests",
+		"types": "pnpm tsc",
+		"test-watch": "jest  --passWithNoTests --watch",
+		"generate:schema": "pnpm node scripts/generateSchema.js"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org"
+	},
+	"repository": {
+		"url": "https://github.com/tinacms/tinacms.git",
+		"directory": "packages/@tinacms/cli"
+	},
+	"dependencies": {
+		"isomorphic-fetch": "^3.0.0"
+	}
 }
