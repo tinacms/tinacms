@@ -22,7 +22,6 @@ jobs:
         node-version: [18, 20, 22]
     outputs:
       failed: ${{ steps.report-errors.outputs.failed }}
-      build_output: ${{ steps.build.outputs.build_output }}
 
     steps:
       - name: Set up Node.js
@@ -51,7 +50,7 @@ jobs:
           cd template-repo
           BUILD_OUTPUT=$( ( ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build-local ) 2>&1 )
           echo "$BUILD_OUTPUT"
-          echo "build_output=$BUILD_OUTPUT" >> "$GITHUB_OUTPUT"
+          echo "build_output=$BUILD_OUTPUT" >> $GITHUB_OUTPUT
 
       - name: Report errors
         continue-on-error: false
@@ -74,7 +73,7 @@ jobs:
           )
 
           echo $ISSUE_TITLE >> $GITHUB_STEP_SUMMARY
-          echo "failed=true" >> "$GITHUB_OUTPUT"
+          echo "failed=true" >> $GITHUB_OUTPUT
 
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           if gh issue -R tinacms/tinacms list --state open --limit 100 --search "$ISSUE_TITLE" | grep -q "$ISSUE_TITLE"; then
