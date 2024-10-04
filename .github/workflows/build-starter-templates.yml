@@ -47,14 +47,16 @@ jobs:
       - name: Run build
         run: |
           cd template-repo
-          ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build-local 2>&1 | tee build.log
+          BUILD_OUTPUT=$( ( ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build-local ) 2>&1 )
+          echo "$BUILD_OUTPUT"
+          echo "build_output=$BUILD_OUTPUT" >> "$GITHUB_OUTPUT"
 
       - name: Report errors
         continue-on-error: false
         id: report-errors
         if: failure()
         run: |
-          ERROR_LOG=$(cat build.log)
+          ERROR_LOG="${{ steps.build.outputs.build_output }}"
           ISSUE_TITLE="Starter template '${{ matrix.template }}' failed to build with ${{ matrix.package-manager }} using Node ${{ matrix.node-version }}"
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           ISSUE_BODY=$(cat <<EOF
