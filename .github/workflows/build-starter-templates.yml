@@ -56,6 +56,12 @@ jobs:
         id: report-errors
         if: failure()
         run: |
+          if [[ "${{ steps.create-tina-app.outcome }}" == "failure" ]]; then
+            ERROR_STEP="create-tina-app"
+          else
+            ERROR_STEP="build"
+          fi
+
           ISSUE_TITLE="Starter template '${{ matrix.template }}' failed during $ERROR_STEP with ${{ matrix.package-manager }} using Node ${{ matrix.node-version }}"
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ github.job }}"
           ISSUE_BODY=$(cat <<EOF
