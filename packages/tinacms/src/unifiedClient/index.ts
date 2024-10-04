@@ -60,7 +60,7 @@ export class TinaClient<GenQueries> {
     try {
       if (
         this.cacheDir &&
-        window === undefined &&
+        typeof window === 'undefined' &&
         typeof require !== 'undefined'
       ) {
         const { NodeCache } = await import('../cache/node-cache')
