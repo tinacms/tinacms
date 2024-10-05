@@ -56,6 +56,7 @@ export class S3MediaStore implements MediaStore {
         headers: {
           'Content-Type': item.file.type || 'application/octet-stream',
           'Content-Length': String(item.file.size),
+          Authorization: undefined,
         },
       })
 
