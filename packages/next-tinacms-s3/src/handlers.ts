@@ -65,7 +65,7 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
     }
     switch (req.method) {
       case 'GET':
-        if (req.url === '/api/s3/media/upload_url') {
+        if (req.url.startsWith('/api/s3/media/upload_url')) {
           const expiresIn: number =
             (req.query.expiresIn && Number(req.query.expiresIn)) || 3600
           const s3_key = req.query.key
