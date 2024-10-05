@@ -50,13 +50,11 @@ export class S3MediaStore implements MediaStore {
         throw new Error('Unexpected error generating upload url')
       }
 
-      const uploadRes = await this.fetchFunction(signedUrl, {
+      const uploadRes = await fetch(signedUrl, {
         method: 'PUT',
         body: item.file,
         headers: {
           'Content-Type': item.file.type || 'application/octet-stream',
-          'Content-Length': String(item.file.size),
-          Authorization: undefined,
         },
       })
 
