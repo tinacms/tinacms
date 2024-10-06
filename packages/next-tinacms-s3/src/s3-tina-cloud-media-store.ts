@@ -16,7 +16,6 @@ export class TinaCloudS3MediaStore extends S3MediaStore {
         const query = `${url.includes('?') ? '&' : '?'}clientID=${
           client.clientId
         }`
-        console.log('calling fetchwithToken', url + query)
         const res = client.authProvider.fetchWithToken(url + query, init)
         return res
       } catch (error) {
