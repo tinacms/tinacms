@@ -111,13 +111,14 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   }, [])
 
   const editor = useEditorRef()
-  const editorState = useEditorState()
   const openState = useOpenState()
-
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
 
   const selectedItem = items.find((item) => item.value === value) ?? defaultItem
   const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem
+
+  const editorState = useEditorState()
+  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
+  if (userInTable) return null
 
   return (
     <DropdownMenu modal={false} {...openState} {...props}>
@@ -151,23 +152,16 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
           }}
           value={value}
         >
-          {items
-            .filter((item) => {
-              if (userInTable) {
-                return !unsupportedItemsInTable.has(item.label)
-              }
-              return true
-            })
-            .map(({ icon: Icon, label, value: itemValue }) => (
-              <DropdownMenuRadioItem
-                className="min-w-[180px]"
-                key={itemValue}
-                value={itemValue}
-              >
-                <Icon className="mr-2 size-5" />
-                {label}
-              </DropdownMenuRadioItem>
-            ))}
+          {items.map(({ icon: Icon, label, value: itemValue }) => (
+            <DropdownMenuRadioItem
+              className="min-w-[180px]"
+              key={itemValue}
+              value={itemValue}
+            >
+              <Icon className="mr-2 size-5" />
+              {label}
+            </DropdownMenuRadioItem>
+          ))}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
