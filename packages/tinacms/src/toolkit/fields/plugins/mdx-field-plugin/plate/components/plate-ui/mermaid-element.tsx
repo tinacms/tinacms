@@ -1,50 +1,17 @@
 import { withRef } from '@udecode/cn'
 import { PlateElement } from '@udecode/plate-common'
-import { Eye, Moon, SquarePen, SunMoon } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { Eye, SquarePen } from 'lucide-react'
+import React from 'react'
 import { useMermaidElement } from '../../hooks/use-mermaid-element'
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
 import { CodeBlock } from '../../plugins/ui/code-block'
 
-const LightModeComponent = ({ onToggleMode }) => {
-  const [isLightMode, setIsLightMode] = useState(true)
-
-  const handleToggle = (e) => {
-    e.preventDefault()
-    setIsLightMode((prevMode) => !prevMode)
-  }
-
-  useEffect(() => {
-    //? Note: Adding this class on a <pre/> will remove its base bg styling
-    const modeClass = isLightMode ? 'not-tina-prose' : ''
-    if (onToggleMode) {
-      onToggleMode(modeClass)
-    }
-  }, [isLightMode, onToggleMode])
-
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={handleToggle}
-        className="flex items-center w-5 h-5 cursor-pointer"
-      >
-        {isLightMode ? (
-          <Moon className="fill-white" />
-        ) : (
-          <SunMoon className="fill-white" />
-        )}
-      </button>
-    </div>
-  )
-}
-
-const MermaidElementWithRef = ({ config, lightMode }) => {
+const MermaidElementWithRef = ({ config }) => {
   const { mermaidRef } = useMermaidElement()
   return (
     <div contentEditable={false} className="border-border border-b">
       <div ref={mermaidRef}>
-        <pre className={`${lightMode} mermaid`}>{config}</pre>
+        <pre className="mermaid">{config}</pre>
       </div>
     </div>
   )
@@ -74,7 +41,6 @@ export const MermaidElement = withRef<typeof PlateElement>(
     const [isEditing, setIsEditing] = React.useState(
       mermaidConfig === DEFAULT_MERMAID_CONFIG || false
     )
-    const [lightModeClass, setLightModeClass] = React.useState('')
 
     const node = {
       type: ELEMENT_MERMAID,
@@ -103,9 +69,6 @@ export const MermaidElement = withRef<typeof PlateElement>(
                 />
               )}
             </Bubble>
-            <Bubble>
-              <LightModeComponent onToggleMode={(v) => setLightModeClass(v)} />
-            </Bubble>
           </div>
           {isEditing ? (
             <CodeBlock
@@ -117,10 +80,7 @@ export const MermaidElement = withRef<typeof PlateElement>(
               onChangeCallback={(value) => setMermaidConfig(value)}
             />
           ) : (
-            <MermaidElementWithRef
-              config={mermaidConfig}
-              lightMode={lightModeClass}
-            />
+            <MermaidElementWithRef config={mermaidConfig} />
           )}
           {children}
         </div>
