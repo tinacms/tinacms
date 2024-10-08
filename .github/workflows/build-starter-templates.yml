@@ -16,7 +16,6 @@ jobs:
           - tina-cloud-starter
           - tina-hugo-starter
           - tina-remix-starter
-          - demo-docs
           - tinasaurus
           - basic
         node-version: [18, 20, 22]

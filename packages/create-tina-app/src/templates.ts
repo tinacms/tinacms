@@ -44,14 +44,6 @@ export const TEMPLATES: Template[] = [
     gitURL: 'https://github.com/tinacms/tina-remix-starter',
   },
   {
-    title: 'Documentation Starter',
-    description:
-      'Transform documentation with Smooth Doc: Features MDX support, light/dark mode, and seamless Vercel deployment for a dynamic, interactive experience.',
-    value: 'demo-docs',
-    isInternal: false,
-    gitURL: 'https://github.com/tinacms/demo-docs',
-  },
-  {
     title: 'Docusaurus Starter',
     description:
       'Docusaurus empowers you to build and evolve documentation like crafting a living, breathing knowledge repository.',
