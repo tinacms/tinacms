@@ -57,6 +57,7 @@ export const RichEditor = (props: RichTextType) => {
   )
 
   // This should be a plugin customization
+  const withToolbar = true
   const tempId = [props.tinaForm.id, props.input.name].join('.')
   const id = React.useMemo(() => uuid() + tempId, [tempId])
   const ref = React.useRef<HTMLDivElement>(null)
