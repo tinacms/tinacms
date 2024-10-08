@@ -9,6 +9,7 @@ import {
   isBlock,
   toggleNodeType,
   useEditorRef,
+  useEditorState,
   useEditorSelector,
 } from '@udecode/plate-common'
 import {
@@ -34,6 +35,11 @@ import {
 } from './dropdown-menu'
 import { ToolbarButton } from './toolbar'
 import { toggleList, unwrapList } from '@udecode/plate'
+import {
+  helpers,
+  unsupportedItemsInTable,
+} from '@toolkit/fields/plugins/mdx-field-plugin/plate/plugins/core/common'
+import { ELEMENT_TABLE } from '@udecode/plate-table'
 
 const items = [
   {
@@ -105,7 +111,10 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   }, [])
 
   const editor = useEditorRef()
+  const editorState = useEditorState()
   const openState = useOpenState()
+
+  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
 
   const selectedItem = items.find((item) => item.value === value) ?? defaultItem
   const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem
@@ -142,16 +151,23 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
           }}
           value={value}
         >
-          {items.map(({ icon: Icon, label, value: itemValue }) => (
-            <DropdownMenuRadioItem
-              className="min-w-[180px]"
-              key={itemValue}
-              value={itemValue}
-            >
-              <Icon className="mr-2 size-5" />
-              {label}
-            </DropdownMenuRadioItem>
-          ))}
+          {items
+            .filter((item) => {
+              if (userInTable) {
+                return !unsupportedItemsInTable.has(item.label)
+              }
+              return true
+            })
+            .map(({ icon: Icon, label, value: itemValue }) => (
+              <DropdownMenuRadioItem
+                className="min-w-[180px]"
+                key={itemValue}
+                value={itemValue}
+              >
+                <Icon className="mr-2 size-5" />
+                {label}
+              </DropdownMenuRadioItem>
+            ))}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
