@@ -30,12 +30,7 @@ interface Option {
 
 const deepMerge = (target, source) => {
   for (const key in source) {
-    if (
-      !source.hasOwnProperty(key) ||
-      key === '__proto__' ||
-      key === 'constructor'
-    )
-      continue
+    if (!source.hasOwnProperty(key) || key === '__proto__' || key === 'constructor') continue;
     if (
       source[key] instanceof Object &&
       !Array.isArray(source[key]) &&
