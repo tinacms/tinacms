@@ -1,5 +1,18 @@
 # tinacms
 
+## 2.2.9
+
+### Patch Changes
+
+- [#4780](https://github.com/tinacms/tinacms/pull/4780) [`31513bb`](https://github.com/tinacms/tinacms/commit/31513bb473cd1d349a3711ef7c5075cf9d03f121) Thanks [@Ben0189](https://github.com/Ben0189)! - improve reference field selector filter and simplyfy schema needed to be written by user
+
+- [#4991](https://github.com/tinacms/tinacms/pull/4991) [`3b2aba8`](https://github.com/tinacms/tinacms/commit/3b2aba80ac14a512592f67a04f9e1792667db9dd) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - - Correct 'window' variable definition test
+
+- Updated dependencies [[`31513bb`](https://github.com/tinacms/tinacms/commit/31513bb473cd1d349a3711ef7c5075cf9d03f121)]:
+  - @tinacms/schema-tools@1.6.5
+  - @tinacms/mdx@1.4.5
+  - @tinacms/search@1.0.32
+
 ## 2.2.8
 
 ### Patch Changes

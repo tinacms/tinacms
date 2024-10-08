@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 1.2.3
+
+### Patch Changes
+
+- [#5167](https://github.com/tinacms/tinacms/pull/5167) [`abdf668`](https://github.com/tinacms/tinacms/commit/abdf668daf7d9e679b26610f8cb66fecf86aef97) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - Remove `demo-docs` from `create-tina-app`
+
 ## 1.2.2
 
 ### Patch Changes
