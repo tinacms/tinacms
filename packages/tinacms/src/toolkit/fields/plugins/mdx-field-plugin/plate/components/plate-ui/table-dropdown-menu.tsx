@@ -3,13 +3,16 @@ import React from 'react'
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu'
 
 import {
+  isElement,
   focusEditor,
   someNode,
+  findNode,
   useEditorRef,
   useEditorSelector,
 } from '@udecode/plate-common'
 import {
   ELEMENT_TABLE,
+  getTableColumnCount,
   deleteColumn,
   deleteRow,
   deleteTable,
@@ -37,6 +40,18 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
     (editor) => someNode(editor, { match: { type: ELEMENT_TABLE } }),
     []
   )
+
+  const [enableDeleteColumn, enableDeleteRow] = useEditorSelector((editor) => {
+    const tableNodeEntry = findNode(editor, { match: { type: ELEMENT_TABLE } })
+    if (!tableNodeEntry) return [false, false]
+
+    const [tableNode] = tableNodeEntry
+    if (!isElement(tableNode)) return [false, false]
+
+    const columnCount = getTableColumnCount(tableNode)
+    const rowCount = tableNode.children.length
+    return [columnCount > 1, rowCount > 1]
+  }, [])
 
   const editor = useEditorRef()
   const openState = useOpenState()
@@ -95,7 +110,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             </DropdownMenuItem>
             <DropdownMenuItem
               className="min-w-[180px]"
-              disabled={!tableSelected}
+              disabled={!enableDeleteColumn}
               onSelect={() => {
                 deleteColumn(editor)
                 focusEditor(editor)
@@ -126,7 +141,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             </DropdownMenuItem>
             <DropdownMenuItem
               className="min-w-[180px]"
-              disabled={!tableSelected}
+              disabled={!enableDeleteRow}
               onSelect={() => {
                 deleteRow(editor)
                 focusEditor(editor)
