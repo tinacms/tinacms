@@ -1,13 +1,21 @@
 import { withRef } from '@udecode/cn'
 import { PlateElement } from '@udecode/plate-common'
 import { Eye, SquarePen } from 'lucide-react'
-import React from 'react'
-import { useMermaidElement } from '../../hooks/use-mermaid-element'
+import mermaid from 'mermaid'
+import React, { useEffect, useRef, useState } from 'react'
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin'
 import { CodeBlock } from '../../plugins/ui/code-block'
 
 const MermaidElementWithRef = ({ config }) => {
-  const { mermaidRef } = useMermaidElement()
+  const mermaidRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (mermaidRef.current) {
+      mermaid.initialize({ startOnLoad: true })
+      mermaid.run()
+    }
+  }, [config])
+
   return (
     <div contentEditable={false} className="border-border border-b">
       <div ref={mermaidRef}>
@@ -25,6 +33,17 @@ const Bubble = ({ children }) => {
   )
 }
 
+const ErrorMsg = ({ error }) => {
+  if (error) {
+    return (
+      <div className="font-mono bg-red-600 text-white p-2 rounded-md">
+        {error}
+      </div>
+    )
+  }
+  return null
+}
+
 const DEFAULT_MERMAID_CONFIG = `%% This won't render without implementing a rendering engine <TODO: Link to tina docs>
 flowchart TD
     id1(this is an example flow diagram) 
@@ -35,17 +54,31 @@ flowchart TD
 
 export const MermaidElement = withRef<typeof PlateElement>(
   ({ children, nodeProps, element, ...props }, ref) => {
-    const [mermaidConfig, setMermaidConfig] = React.useState(
+    const [mermaidConfig, setMermaidConfig] = useState(
       element.value || DEFAULT_MERMAID_CONFIG
     )
-    const [isEditing, setIsEditing] = React.useState(
+    const [isEditing, setIsEditing] = useState(
       mermaidConfig === DEFAULT_MERMAID_CONFIG || false
     )
+
+    const [mermaidError, setMermaidError] = useState<string | null>(null)
 
     const node = {
       type: ELEMENT_MERMAID,
       value: mermaidConfig,
       children: [{ type: 'text', text: '' }],
+    }
+
+    useEffect(() => {
+      if (mermaid.parse(mermaidConfig as string, { suppressErrors: false })) {
+        setMermaidError(null) // Clear errors on success
+      }
+    }, [mermaidConfig])
+
+    mermaid.parseError = (err: any, hash) => {
+      setMermaidError(
+        String(err.message) || 'An error occurred while parsing the diagram.'
+      )
     }
 
     return (
@@ -70,6 +103,7 @@ export const MermaidElement = withRef<typeof PlateElement>(
               )}
             </Bubble>
           </div>
+
           {isEditing ? (
             <CodeBlock
               children={''}
@@ -82,8 +116,9 @@ export const MermaidElement = withRef<typeof PlateElement>(
           ) : (
             <MermaidElementWithRef config={mermaidConfig} />
           )}
-          {children}
         </div>
+        {children}
+        <ErrorMsg error={mermaidError} />
       </PlateElement>
     )
   }
