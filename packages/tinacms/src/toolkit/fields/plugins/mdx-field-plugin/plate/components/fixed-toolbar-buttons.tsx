@@ -5,6 +5,7 @@ import {
   MARK_CODE,
   MARK_ITALIC,
 } from '@udecode/plate'
+import { ELEMENT_TABLE } from '@udecode/plate-table'
 import React from 'react'
 import { ToolbarGroup } from './plate-ui/toolbar'
 import { MarkToolbarButton } from './plate-ui/mark-toolbar-button'
@@ -25,6 +26,9 @@ import {
 import { useResize } from '../hooks/use-resize'
 import OverflowMenu from './plate-ui/overflow-menu'
 import { useToolbarContext } from '../toolbar/toolbar-provider'
+import { TableDropdownMenu } from './plate-ui/table-dropdown-menu'
+import { helpers, unsupportedItemsInTable } from '../plugins/core/common'
+import { useEditorState } from '@udecode/plate-common'
 
 export type ToolbarItem = {
   label: string
@@ -88,6 +92,10 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Code Block',
     Component: <CodeBlockToolbarButton />,
   },
+  table: {
+    label: 'Table',
+    Component: <TableDropdownMenu />,
+  },
   raw: {
     label: 'Raw Markdown',
     Component: <RawMarkdownToolbarButton />,
@@ -110,12 +118,20 @@ export default function FixedToolbarButtons() {
     setItemsShown(Math.floor(itemsShown))
   })
 
-  const toolbarItemsArray: ToolbarItem[] =
+  let toolbarItemsArray: ToolbarItem[] =
     overrides === undefined
       ? Object.values(toolbarItems)
       : overrides
           .map((item) => toolbarItems[item])
           .filter((item) => item !== undefined)
+
+  const editorState = useEditorState()
+  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
+  if (userInTable) {
+    toolbarItemsArray = toolbarItemsArray.filter(
+      (item) => !unsupportedItemsInTable.has(item.label)
+    )
+  }
 
   return (
     <div className="w-full overflow-hidden" ref={toolbarRef}>
@@ -126,7 +142,7 @@ export default function FixedToolbarButtons() {
         }}
       >
         <>
-          {toolbarItemsArray.slice(0, itemsShown).map((item, index) => (
+          {toolbarItemsArray.slice(0, itemsShown).map((item, _) => (
             <React.Fragment key={item.label}>{item.Component}</React.Fragment>
           ))}
           {toolbarItemsArray.length > itemsShown && (

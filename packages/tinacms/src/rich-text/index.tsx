@@ -403,6 +403,52 @@ const Node = ({ components, child }) => {
           return <span>{`No component provided for ${child.name}`}</span>
         }
       }
+    case 'table':
+      const rows = child.children || []
+      const TableComponent =
+        components['table'] ||
+        ((props) => (
+          <table style={{ border: '1px solid #EDECF3' }} {...props} />
+        ))
+      const TrComponent = components['tr'] || ((props) => <tr {...props} />)
+      const TdComponent =
+        components['td'] ||
+        ((props) => (
+          <td
+            style={{
+              textAlign: props?.align || 'auto',
+              border: '1px solid #EDECF3',
+              padding: '0.25rem',
+            }}
+            {...props}
+          />
+        ))
+      const align = child.props?.align || []
+      return (
+        <TableComponent>
+          <tbody>
+            {rows.map((row, i) => {
+              return (
+                <TrComponent key={i}>
+                  {row.children?.map((cell, i) => {
+                    return (
+                      <TinaMarkdown
+                        key={i}
+                        components={{
+                          p: (props) => (
+                            <TdComponent align={align[i]} {...props} />
+                          ),
+                        }}
+                        content={cell.children}
+                      />
+                    )
+                  })}
+                </TrComponent>
+              )
+            })}
+          </tbody>
+        </TableComponent>
+      )
     case 'maybe_mdx':
       /**
        * We don't want to render this as it's only displayed while editing an mdx node and should

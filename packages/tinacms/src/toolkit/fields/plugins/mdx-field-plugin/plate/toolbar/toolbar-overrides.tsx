@@ -11,6 +11,7 @@ export type ToolbarOverrideType =
   | 'italic'
   | 'raw'
   | 'embed'
+  | 'table'
 
 export const ICON_WIDTH = 32
 export const EMBED_ICON_WIDTH = 78
