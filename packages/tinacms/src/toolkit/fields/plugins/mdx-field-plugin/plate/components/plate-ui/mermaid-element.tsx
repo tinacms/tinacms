@@ -11,7 +11,7 @@ const MermaidElementWithRef = ({ config }) => {
   return (
     <div contentEditable={false} className="border-border border-b">
       <div ref={mermaidRef}>
-        <pre className="mermaid">{config}</pre>
+        <pre className="mermaid not-tina-prose">{config}</pre>
       </div>
     </div>
   )
