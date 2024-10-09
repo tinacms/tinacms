@@ -53,36 +53,28 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
         align="start"
         className="flex w-[180px] min-w-0 flex-col gap-0.5"
       >
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <Icons.table className={iconVariants({ variant: 'menuItem' })} />
-            <span>Table</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <DropdownMenuItem
-              className="min-w-[180px]"
-              disabled={tableSelected}
-              onSelect={() => {
-                insertTable(editor)
-                focusEditor(editor)
-              }}
-            >
-              <Icons.add className={iconVariants({ variant: 'menuItem' })} />
-              Insert table
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="min-w-[180px]"
-              disabled={!tableSelected}
-              onSelect={() => {
-                deleteTable(editor)
-                focusEditor(editor)
-              }}
-            >
-              <Icons.trash className={iconVariants({ variant: 'menuItem' })} />
-              Delete table
-            </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+        <DropdownMenuItem
+          className="min-w-[180px]"
+          disabled={tableSelected}
+          onSelect={() => {
+            insertTable(editor)
+            focusEditor(editor)
+          }}
+        >
+          <Icons.add className={iconVariants({ variant: 'menuItem' })} />
+          Insert table
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="min-w-[180px]"
+          disabled={!tableSelected}
+          onSelect={() => {
+            deleteTable(editor)
+            focusEditor(editor)
+          }}
+        >
+          <Icons.minus className={iconVariants({ variant: 'menuItem' })} />
+          Delete table
+        </DropdownMenuItem>
 
         <DropdownMenuSub>
           <DropdownMenuSubTrigger disabled={!tableSelected}>
