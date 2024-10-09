@@ -10,7 +10,6 @@ import {
   createItalicPlugin,
   createUnderlinePlugin,
   createCodePlugin,
-  createIndentPlugin,
   createIndentListPlugin,
   createTablePlugin,
 } from '@udecode/plate'
@@ -47,7 +46,6 @@ export const plugins = [
   createUnderlinePlugin(),
   createCodePlugin(),
   createListPlugin(),
-  createIndentPlugin(),
   createIndentListPlugin(),
   createHorizontalRulePlugin(),
   // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
