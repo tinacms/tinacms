@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './dropdown-menu'
@@ -15,12 +14,7 @@ import { insertMDX } from '../../plugins/create-mdx-plugins'
 
 export default function TemplatesToolbarButton() {
   const { templates } = useToolbarContext()
-  const showEmbed = templates.length > 0
   const editor = useEditorState()
-
-  if (!showEmbed) {
-    return null
-  }
 
   return <EmbedButton templates={templates} editor={editor} />
 }

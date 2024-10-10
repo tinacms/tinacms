@@ -1,5 +1,6 @@
 import path from 'node:path'
 import aspectRatio from '@tailwindcss/aspect-ratio'
+import containerQueries from '@tailwindcss/container-queries'
 import twTypography from '@tailwindcss/typography'
 import tailwind from 'tailwindcss'
 import defaultTheme from 'tailwindcss/defaultTheme.js'
@@ -253,7 +254,11 @@ export const tinaTailwind = (
           },
         },
         content,
-        plugins: [twTypography({ className: 'tina-prose' }), aspectRatio],
+        plugins: [
+          twTypography({ className: 'tina-prose' }),
+          aspectRatio,
+          containerQueries,
+        ],
       }) as unknown as Plugin
       plugins.push(tw)
 

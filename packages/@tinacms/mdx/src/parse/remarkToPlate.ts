@@ -45,32 +45,29 @@ export const remarkToSlate = (
     switch (content.type) {
       case 'table': {
         return {
-          type: 'mdxJsxFlowElement',
-          children: [{ type: 'text', text: '' }],
-          name: 'table',
+          type: 'table',
+          children: content.children.map((tableRow) => {
+            return {
+              type: 'tr',
+              children: tableRow.children.map((tableCell) => {
+                return {
+                  type: 'td',
+                  children: [
+                    {
+                      type: 'p',
+                      children: flatten(
+                        tableCell.children.map((child) =>
+                          phrasingContent(child)
+                        )
+                      ),
+                    },
+                  ],
+                }
+              }),
+            }
+          }),
           props: {
             align: content.align?.filter((item) => !!item),
-            tableRows: content.children.map((child) => {
-              return {
-                tableCells: child.children.map((child) => {
-                  return {
-                    value: {
-                      type: 'root',
-                      children: [
-                        {
-                          type: 'p',
-                          children: flatten(
-                            child.children.map((child) =>
-                              phrasingContent(child)
-                            )
-                          ),
-                        },
-                      ],
-                    },
-                  }
-                }),
-              }
-            }),
           },
         }
       }
