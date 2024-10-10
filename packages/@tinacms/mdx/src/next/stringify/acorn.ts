@@ -200,7 +200,6 @@ export function stringifyProps(
         if (field.list) {
           throw new Error(`Rich-text list is not supported`)
         } else {
-          console.log('RICH-TEXT StringifyProps', value)
           const joiner = flatten ? ' ' : '\n'
           let val = ''
           assertShape<Plate.RootElement>(
