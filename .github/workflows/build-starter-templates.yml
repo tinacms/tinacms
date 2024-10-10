@@ -59,6 +59,9 @@ jobs:
             echo "TINA_TOKEN=${{ secrets.BASIC_TOKEN }}" >> $GITHUB_ENV
           fi
 
+          echo "NEXT_PUBLIC_TINA_BRANCH=main" >> $GITHUB_ENV
+          echo "TINA_BRANCH=main" >> $GITHUB_ENV
+
       - name: Run create-tina-app
         id: create-tina-app
         run: npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }}
