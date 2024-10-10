@@ -1,11 +1,11 @@
 import {
   ELEMENT_OL,
+  ELEMENT_TABLE,
   ELEMENT_UL,
   MARK_BOLD,
   MARK_CODE,
   MARK_ITALIC,
 } from '@udecode/plate'
-import { ELEMENT_TABLE } from '@udecode/plate-table'
 import React from 'react'
 import { ToolbarGroup } from './plate-ui/toolbar'
 import { MarkToolbarButton } from './plate-ui/mark-toolbar-button'
@@ -141,6 +141,12 @@ export default function FixedToolbarButtons() {
 
   if (!showEmbedButton) {
     items = items.filter((item) => item.label !== toolbarItems.embed.label)
+  }
+
+  const editorState = useEditorState()
+  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
+  if (userInTable) {
+    items = items.filter((item) => !unsupportedItemsInTable.has(item.label))
   }
 
   useResize(toolbarRef, (entry) => {
