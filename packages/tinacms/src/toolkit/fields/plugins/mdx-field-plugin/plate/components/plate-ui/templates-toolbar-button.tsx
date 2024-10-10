@@ -14,12 +14,7 @@ import { insertMDX } from '../../plugins/create-mdx-plugins'
 
 export default function TemplatesToolbarButton() {
   const { templates } = useToolbarContext()
-  const showEmbedButton = templates.length > 0
   const editor = useEditorState()
-
-  if (!showEmbedButton) {
-    return null
-  }
 
   return <EmbedButton templates={templates} editor={editor} />
 }
