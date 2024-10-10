@@ -1,5 +1,18 @@
 # tinacms
 
+## 2.3.0
+
+### Minor Changes
+
+- [#5098](https://github.com/tinacms/tinacms/pull/5098) [`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36) Thanks [@Jord-Gui](https://github.com/Jord-Gui)! - Add table plugin to rich-text-editor
+
+### Patch Changes
+
+- Updated dependencies [[`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36)]:
+  - @tinacms/mdx@1.5.0
+  - @tinacms/schema-tools@1.6.5
+  - @tinacms/search@1.0.33
+
 ## 2.2.9
 
 ### Patch Changes
