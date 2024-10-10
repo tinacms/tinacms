@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 1.6.10
+
+### Patch Changes
+
+- [#5004](https://github.com/tinacms/tinacms/pull/5004) [`74014ed`](https://github.com/tinacms/tinacms/commit/74014ed2df67e96e1a5fb2950e973528322671a3) Thanks [@Ben0189](https://github.com/Ben0189)! - Fix toolbar floating icon show up in different screen size
+
+- Updated dependencies [[`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36), [`74014ed`](https://github.com/tinacms/tinacms/commit/74014ed2df67e96e1a5fb2950e973528322671a3)]:
+  - tinacms@2.3.0
+  - @tinacms/app@2.1.10
+  - @tinacms/graphql@1.5.6
+  - @tinacms/metrics@1.0.7
+  - @tinacms/schema-tools@1.6.5
+  - @tinacms/search@1.0.33
+
 ## 1.6.9
 
 ### Patch Changes
