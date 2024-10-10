@@ -67,6 +67,12 @@ export const blockElement = (
         type: 'paragraph',
         children: eat(content.children, field, imageCallback),
       }
+    case 'mermaid':
+      return {
+        type: 'code',
+        lang: 'mermaid',
+        value: content.value,
+      }
     case 'code_block':
       return {
         type: 'code',

@@ -86,7 +86,7 @@ export const remarkToSlate = (
       case 'heading':
         return heading(content)
       case 'code':
-        return code(content)
+        return parseCode(content)
       case 'paragraph':
         return paragraph(content)
       case 'mdxJsxFlowElement':
@@ -282,6 +282,23 @@ export const remarkToSlate = (
           // @ts-ignore
           content.position
         )
+    }
+  }
+
+  const parseCode = (
+    content: Md.Code
+  ): Plate.CodeBlockElement | Plate.MermaidElement => {
+    if (content.lang === 'mermaid') {
+      return mermaid(content)
+    }
+    return code(content)
+  }
+
+  const mermaid = (content: Md.Code): Plate.MermaidElement => {
+    return {
+      type: 'mermaid',
+      value: content.value,
+      children: [{ type: 'text', text: '' }],
     }
   }
 

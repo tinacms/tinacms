@@ -33,6 +33,11 @@ export default defineConfig({
         label: 'Posts',
         path: 'content/posts',
         format: 'mdx',
+        ui: {
+          router({ document }) {
+            return `/posts/${document._sys.filename}`
+          },
+        },
         fields: [
           {
             type: 'string',
