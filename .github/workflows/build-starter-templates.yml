@@ -40,6 +40,25 @@ jobs:
           hugo-version: 'latest'
         if: ${{ matrix.template == 'tina-hugo-starter' }}
 
+      - name: Setup build tokens
+        run: |
+          if [[ "${{ matrix.template }}" == "tina-cloud-starter" ]]; then
+            echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINA_CLOUD_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINA_CLOUD_STARTER_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "tina-hugo-starter" ]]; then
+            echo "TINA_CLIENT_ID=${{ secrets.TINA_HUGO_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINA_HUGO_STARTER_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "tina-remix-starter" ]]; then
+            echo "TINA_CLIENT_ID=${{ secrets.TINA_REMIX_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINA_REMIX_STARTER_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "tinasaurus" ]]; then
+            echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINASAURUS_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINASAURUS_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "basic" ]]; then
+            echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.BASIC_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.BASIC_TOKEN }}" >> $GITHUB_ENV
+          fi
+
       - name: Run create-tina-app
         id: create-tina-app
         run: npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }}
@@ -48,7 +67,7 @@ jobs:
         id: build
         run: |
           cd template-repo
-          ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build-local
+          ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build
 
       - name: Report errors
         continue-on-error: false
