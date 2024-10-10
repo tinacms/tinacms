@@ -253,7 +253,16 @@ async function deleteAsset(
   bucket: string
 ) {
   const { media } = req.query
-  const [, objectKey] = media as string[]
+  console.warn('Media: ', media)
+  let [, objectKey] = media as string[]
+  const objectKeyIsSplit =
+    media && media.length > 2 && typeof media !== 'string'
+  console.warn('objectKeyIsSplit: ', objectKeyIsSplit)
+
+  if (objectKeyIsSplit) {
+    objectKey = media.slice(1).join('/')
+  }
+  console.warn('objectKey: ', objectKey)
 
   const params: DeleteObjectCommandInput = {
     Bucket: bucket,
