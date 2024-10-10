@@ -21,6 +21,10 @@ import {
   MARK_UNDERLINE,
   ELEMENT_CODE_LINE,
   ELEMENT_CODE_SYNTAX,
+  ELEMENT_TABLE,
+  ELEMENT_TR,
+  ELEMENT_TD,
+  ELEMENT_TH,
 } from '@udecode/plate'
 import { classNames } from './helpers'
 import { useSelected } from 'slate-react'
@@ -34,6 +38,12 @@ import { CodeLeaf } from '../../components/plate-ui/code-leaf'
 import { CodeLineElement } from '../../components/plate-ui/code-line-element'
 import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf'
 import { CodeBlockElement } from '../../components/plate-ui/code-block-element'
+import { TableElement } from '../../components/plate-ui/table-element'
+import { TableRowElement } from '../../components/plate-ui/table-row-element'
+import {
+  TableCellElement,
+  TableCellHeaderElement,
+} from '../../components/plate-ui/table-cell-element'
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -223,5 +233,9 @@ export const Components = () => {
         </div>
       )
     },
+    [ELEMENT_TABLE]: TableElement,
+    [ELEMENT_TR]: TableRowElement,
+    [ELEMENT_TD]: TableCellElement,
+    [ELEMENT_TH]: TableCellHeaderElement,
   }
 }

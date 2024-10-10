@@ -5,6 +5,7 @@ import {
   MARK_CODE,
   MARK_ITALIC,
 } from '@udecode/plate'
+import { ELEMENT_TABLE } from '@udecode/plate-table'
 import React from 'react'
 import { ToolbarGroup } from './plate-ui/toolbar'
 import { MarkToolbarButton } from './plate-ui/mark-toolbar-button'
@@ -30,6 +31,9 @@ import {
 import { useResize } from '../hooks/use-resize'
 import OverflowMenu from './plate-ui/overflow-menu'
 import { useToolbarContext } from '../toolbar/toolbar-provider'
+import { TableDropdownMenu } from './plate-ui/table-dropdown-menu'
+import { helpers, unsupportedItemsInTable } from '../plugins/core/common'
+import { useEditorState } from '@udecode/plate-common'
 
 type ToolbarItem = {
   label: string
@@ -104,6 +108,11 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Code Block',
     width: () => STANDARD_ICON_WIDTH,
     Component: <CodeBlockToolbarButton />,
+  },
+  table: {
+    label: 'Table',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <TableDropdownMenu />,
   },
   raw: {
     label: 'Raw Markdown',

@@ -46,7 +46,8 @@ Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.  -->
 To be the world-leading CMS with Git support that developers love.
 
 ## Tech Stack
-See 
+
+See
 https://tina.io/docs/introduction/faq/#what-is-tinas-tech-stack
 
 ## Roadmap

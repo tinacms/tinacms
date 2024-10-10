@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.6.5
+
+### Patch Changes
+
+- [#4780](https://github.com/tinacms/tinacms/pull/4780) [`31513bb`](https://github.com/tinacms/tinacms/commit/31513bb473cd1d349a3711ef7c5075cf9d03f121) Thanks [@Ben0189](https://github.com/Ben0189)! - improve reference field selector filter and simplyfy schema needed to be written by user
+
 ## 1.6.4
 
 ### Patch Changes
