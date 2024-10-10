@@ -36,7 +36,10 @@ const Bubble = ({ children }) => {
 const ErrorMsg = ({ error }) => {
   if (error) {
     return (
-      <div className="font-mono bg-red-600 text-white p-2 rounded-md">
+      <div
+        contentEditable={false}
+        className="font-mono bg-red-600 text-white p-2 rounded-md cursor-default"
+      >
         {error}
       </div>
     )
@@ -44,7 +47,7 @@ const ErrorMsg = ({ error }) => {
   return null
 }
 
-const DEFAULT_MERMAID_CONFIG = `%% This won't render without implementing a rendering engine <TODO: Link to tina docs>
+const DEFAULT_MERMAID_CONFIG = `%% This won't render without implementing a rendering engine (e.g. mermaid on npm)
 flowchart TD
     id1(this is an example flow diagram) 
     --> id2(modify me to see changes!)
@@ -75,7 +78,7 @@ export const MermaidElement = withRef<typeof PlateElement>(
       }
     }, [mermaidConfig])
 
-    mermaid.parseError = (err: any, hash) => {
+    mermaid.parseError = (err: any) => {
       setMermaidError(
         String(err.message) || 'An error occurred while parsing the diagram.'
       )
