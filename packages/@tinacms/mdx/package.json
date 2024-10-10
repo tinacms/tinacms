@@ -11,6 +11,7 @@
 	],
 	"exports": {
 		".": {
+			"worker": "./dist/index.edge.mjs",
 			"import": "./dist/index.mjs",
 			"require": "./dist/index.js",
 			"browser": "./dist/index.browser.mjs"
