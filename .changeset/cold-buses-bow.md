@@ -1,5 +1,6 @@
 ---
 "tinacms": patch
+"@tinacms/cli": patch
 "@tinacms/mdx": patch
 "@tinacms/schema-tools": patch
 ---
