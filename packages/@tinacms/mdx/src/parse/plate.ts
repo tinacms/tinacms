@@ -149,6 +149,15 @@ export type TableElement = {
 }
 
 /**
+ * @group MermaidElement
+ */
+export type MermaidElement = {
+  type: 'mermaid'
+  value: string
+  children: [EmptyTextElement]
+}
+
+/**
  * @group BlockElement
  */
 export type BlockElement =
@@ -162,6 +171,7 @@ export type BlockElement =
   | ListItemElement
   | MdxBlockElement
   | ParagraphElement
+  | MermaidElement
   | OrderedListElement
   | UnorderedListElement
   | TableCellElement
