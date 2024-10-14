@@ -362,6 +362,11 @@ export class Resolver {
       throw new Error(`fullPath must be of type string for getDocument request`)
     }
 
+    const collection = this.tinaSchema.getCollectionByFullPath(fullPath)
+    if (await this.hasReferences(fullPath, collection)) {
+      throw new Error('Cannot delete document with references')
+    }
+
     await this.database.delete(fullPath)
   }
 
@@ -761,6 +766,11 @@ export class Resolver {
       }
       if (isDeletion) {
         const doc = await this.getDocument(realPath)
+        if (await this.hasReferences(realPath, collection)) {
+          throw new Error(
+            `Unable to delete document, ${realPath} has references`
+          )
+        }
         await this.deleteDocument(realPath)
         return doc
       }
@@ -772,6 +782,11 @@ export class Resolver {
         assertShape<{ relativePath: string }>(args?.params, (yup) =>
           yup.object({ relativePath: yup.string().required() })
         )
+        if (await this.hasReferences(realPath, collection)) {
+          throw new Error(
+            `Uanble to rename document, ${realPath} has references`
+          )
+        }
         // Get the real document
         const doc = await this.getDocument(realPath)
         const newRealPath = path.join(
@@ -931,6 +946,19 @@ export class Resolver {
       }
     }
 
+    if (args.reverseRef) {
+      const { id, collection } = args.reverseRef as Record<string, any>
+      conditions = conditions || []
+      conditions.push({
+        filterPath: collection,
+        filterExpression: {
+          _type: 'reference',
+          _list: false,
+          eq: id,
+        },
+      })
+    }
+
     const queryOptions = {
       filterChain: makeFilterChain({
         conditions: conditions || [],
@@ -951,16 +979,6 @@ export class Resolver {
     const edges = result.edges
     const pageInfo = result.pageInfo
 
-    // This was the non datalayer code
-    // } else {
-    //   const ext = collection?.format || '.md'
-    //   edges = (
-    //     await this.database.store.glob(collection.path, this.getDocument, ext)
-    //   ).map((document) => ({
-    //     node: document,
-    //   }))
-    // }
-
     return {
       totalCount: edges.length,
       edges,
@@ -971,6 +989,45 @@ export class Resolver {
         endCursor: '',
       },
     }
+  }
+
+  /**
+   * Checks if a document has references to it
+   * @param id  The id of the document to check for references
+   * @param c The collection to check for references
+   * @returns true if the document has references, false otherwise
+   */
+  private hasReferences = async (id: string, c: Collection) => {
+    let count = 0
+    for (const ref of this.tinaSchema.findReferences(c.name)) {
+      const collection = this.tinaSchema.getCollection(ref)
+      await this.database.query(
+        {
+          collection: collection.name,
+          filterChain: makeFilterChain({
+            conditions: [
+              {
+                filterPath: c.name,
+                filterExpression: {
+                  _type: 'reference',
+                  _list: false,
+                  eq: id,
+                },
+              },
+            ],
+          }),
+        },
+        (refId: string) => {
+          count++
+          return refId
+        }
+      )
+      if (count) {
+        return true
+      }
+    }
+
+    return false
   }
 
   private buildFieldMutations = async (

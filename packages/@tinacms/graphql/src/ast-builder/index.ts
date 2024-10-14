@@ -1203,6 +1203,9 @@ export const NAMER = {
   generateQueryListName: (namespace: string[]) => {
     return `${lastItem(namespace)}Connection`
   },
+  generateReverseQueryListName: (namespace: string[]) => {
+    return `${lastItem(namespace)}ReverseConnection`
+  },
   fragmentName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, '') + 'Parts'
   },
@@ -1217,6 +1220,9 @@ export const NAMER = {
   },
   referenceConnectionType: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, 'Connection')
+  },
+  reverseReferenceConnectionType: (namespace: string[]) => {
+    return generateNamespacedFieldName(namespace, 'ReverseConnection')
   },
   referenceConnectionEdgesTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, 'ConnectionEdges')
