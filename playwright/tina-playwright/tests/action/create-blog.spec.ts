@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import deleteBlogPost from "../utils/deleteBlogPost";
+import deleteBlogPost from "../../utils/deleteBlogPost";
 
 test.describe("Create Blog Post", () => {
   test.beforeEach(async ({ page }) => {
