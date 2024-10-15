@@ -35,10 +35,7 @@ import {
 } from './dropdown-menu'
 import { ToolbarButton } from './toolbar'
 import { toggleList, unwrapList } from '@udecode/plate'
-import {
-  helpers,
-  unsupportedItemsInTable,
-} from '@toolkit/fields/plugins/mdx-field-plugin/plate/plugins/core/common'
+import { helpers } from '@toolkit/fields/plugins/mdx-field-plugin/plate/plugins/core/common'
 import { ELEMENT_TABLE } from '@udecode/plate-table'
 
 const items = [
