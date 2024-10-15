@@ -1604,8 +1604,8 @@ importers:
                 specifier: ^0.424.0
                 version: 0.424.0(react@18.3.1)
             mermaid:
-                specifier: ^10.9.1
-                version: 10.9.1
+                specifier: 9.4.0
+                version: 9.4.0
             moment:
                 specifier: 2.29.4
                 version: 2.29.4
@@ -10684,6 +10684,12 @@ packages:
                 integrity: sha512-s9whTXInMSgAp/NVXVNuVxVKzGH2qck3aQlVHxDCdAEPgtMKwc4Wq6/QKhgdEdgbLSi9rBTAcPoRa6JpiG4ksg==,
             }
 
+    cose-base@2.2.0:
+        resolution:
+            {
+                integrity: sha512-AzlgcsCbUMymkADOJtQm3wO9S3ltPfYOFD5033keQn9NJzIbtnZj+UdBJe7DYml/8TdbtHJW3j58SOnKhWY/5g==,
+            }
+
     cosmiconfig@7.1.0:
         resolution:
             {
@@ -10857,6 +10863,14 @@ packages:
         resolution:
             {
                 integrity: sha512-wgQlVIUJF13Quxiv5e1gstZ08rnZj2XaLHGoFMYXz7SkNfCDOOteKBE6SYRfA9WxxI/iBc3ajfDoc6hb/MRAHQ==,
+            }
+        peerDependencies:
+            cytoscape: ^3.2.0
+
+    cytoscape-fcose@2.2.0:
+        resolution:
+            {
+                integrity: sha512-ki1/VuRIHFCzxWNrsshHYPs6L7TvLu3DL+TyIGEsRcvVERmxokbf5Gdk7mFxZnTdiGtnA4cfSmjZJMviqSuZrQ==,
             }
         peerDependencies:
             cytoscape: ^3.2.0
@@ -11116,6 +11130,12 @@ packages:
         resolution:
             {
                 integrity: sha512-qTCQmEhcynucuaZgY5/+ti3X/rnszKZhEQH/ZdWdtP1tA/y3VoHJzcVrO9pjjJCNpigfscAtoUB5ONcd2wNn0A==,
+            }
+
+    dagre-d3-es@7.0.8:
+        resolution:
+            {
+                integrity: sha512-eykdoYQ4FwCJinEYS0gPL2f2w+BPbSLvnQSJ3Ye1vAoPjdkq6xIMKBv+UkICd3qZE26wBKIn3p+6n0QC7R1LyA==,
             }
 
     damerau-levenshtein@1.0.8:
@@ -11596,6 +11616,12 @@ packages:
             }
         engines: { node: '>= 4' }
 
+    dompurify@2.4.3:
+        resolution:
+            {
+                integrity: sha512-q6QaLcakcRjebxjg8/+NP+h0rPfatOgOzc46Fst9VAA3jF2ApfKBNKMzdP4DYTqtUMXSCd5pRS/8Po/OmoCHZQ==,
+            }
+
     dompurify@3.1.6:
         resolution:
             {
@@ -11679,6 +11705,12 @@ packages:
         resolution:
             {
                 integrity: sha512-orzA81VqLyIGUEA77YkVA1D+N+nNfl2isJVjjmOyrlxuooZ19ynb+dOlaDTqd/idKRS9lDCSBmtzM+kyCsMnkA==,
+            }
+
+    elkjs@0.8.2:
+        resolution:
+            {
+                integrity: sha512-L6uRgvZTH+4OF5NE/MBbzQx/WYpru1xCBE9respNj6qznEewGUIfhzmm7horWWxbNO2M0WckQypGctR8lH79xQ==,
             }
 
     elkjs@0.9.3:
@@ -14750,6 +14782,12 @@ packages:
                 integrity: sha512-8h2oVEZNktL4BH2JCOI90iD1yXwL6iNW7KcCKT2QZgQJR2vbqDsldCTPRU9NifTCqHZci57XvQQ15YTu+sTYPg==,
             }
 
+    layout-base@2.0.1:
+        resolution:
+            {
+                integrity: sha512-dp3s92+uNI1hWIpPGH3jK2kxE2lMjdXdr+DH8ynZHpd6PUlH6x6cbuXnoMmiNumznqaNO31xu9e79F0uuZ0JFg==,
+            }
+
     lazy-ass@1.6.0:
         resolution:
             {
@@ -15454,6 +15492,12 @@ packages:
         resolution:
             {
                 integrity: sha512-Mx45Obds5W1UkW1nv/7dHRsbfMM1aOKA2+Pxs/IGHNonygDHwmng8xTHyS9z4KWVi0rbko8gjiBmuwwXQ7tiNA==,
+            }
+
+    mermaid@9.4.0:
+        resolution:
+            {
+                integrity: sha512-4PWbOND7CNRbjHrdG3WUUGBreKAFVnMhdlPjttuUkeHbCQmAHkwzSh5dGwbrKmXGRaR4uTvfFVYzUcg++h0DkA==,
             }
 
     meros@1.3.0:
@@ -18691,6 +18735,12 @@ packages:
         resolution:
             {
                 integrity: sha512-Orov6g6BB1sDfYgzWfTHDOxamtX1bE/zo104Dh9e6fqJ3PooipYyfJ0pUmrZO2wAvO8YbEyeFrkV91XTsGMSrw==,
+            }
+
+    stylis@4.3.4:
+        resolution:
+            {
+                integrity: sha512-osIBl6BGUmSfDkyH2mB7EFvCJntXDrLhKjHTRj/rK6xLH0yuPrHULDRQzKokSOD4VoorhtKpfcfW1GAntu8now==,
             }
 
     sucrase@3.35.0:
@@ -28070,6 +28120,10 @@ snapshots:
         dependencies:
             layout-base: 1.0.2
 
+    cose-base@2.2.0:
+        dependencies:
+            layout-base: 2.0.1
+
     cosmiconfig@7.1.0:
         dependencies:
             '@types/parse-json': 4.0.2
@@ -28270,6 +28324,11 @@ snapshots:
             cose-base: 1.0.3
             cytoscape: 3.30.2
 
+    cytoscape-fcose@2.2.0(cytoscape@3.30.2):
+        dependencies:
+            cose-base: 2.2.0
+            cytoscape: 3.30.2
+
     cytoscape@3.30.2: {}
 
     d3-array@2.12.1:
@@ -28440,6 +28499,11 @@ snapshots:
             d3-zoom: 3.0.0
 
     dagre-d3-es@7.0.10:
+        dependencies:
+            d3: 7.9.0
+            lodash-es: 4.17.21
+
+    dagre-d3-es@7.0.8:
         dependencies:
             d3: 7.9.0
             lodash-es: 4.17.21
@@ -28687,6 +28751,8 @@ snapshots:
         dependencies:
             domelementtype: 2.3.0
 
+    dompurify@2.4.3: {}
+
     dompurify@3.1.6: {}
 
     domutils@2.8.0:
@@ -28735,6 +28801,8 @@ snapshots:
             jake: 10.9.2
 
     electron-to-chromium@1.5.4: {}
+
+    elkjs@0.8.2: {}
 
     elkjs@0.9.3: {}
 
@@ -31297,6 +31365,8 @@ snapshots:
 
     layout-base@1.0.2: {}
 
+    layout-base@2.0.1: {}
+
     lazy-ass@1.6.0: {}
 
     level-read-stream@1.1.0(abstract-level@1.0.4):
@@ -31832,6 +31902,24 @@ snapshots:
             web-worker: 1.3.0
         transitivePeerDependencies:
             - supports-color
+
+    mermaid@9.4.0:
+        dependencies:
+            '@braintree/sanitize-url': 6.0.4
+            cytoscape: 3.30.2
+            cytoscape-cose-bilkent: 4.1.0(cytoscape@3.30.2)
+            cytoscape-fcose: 2.2.0(cytoscape@3.30.2)
+            d3: 7.9.0
+            dagre-d3-es: 7.0.8
+            dompurify: 2.4.3
+            elkjs: 0.8.2
+            khroma: 2.1.0
+            lodash-es: 4.17.21
+            moment: 2.29.4
+            non-layered-tidy-tree-layout: 2.0.2
+            stylis: 4.3.4
+            ts-dedent: 2.2.0
+            uuid: 9.0.1
 
     meros@1.3.0(@types/node@22.7.4):
         optionalDependencies:
@@ -34061,6 +34149,8 @@ snapshots:
     stylis@4.1.3: {}
 
     stylis@4.2.0: {}
+
+    stylis@4.3.4: {}
 
     sucrase@3.35.0:
         dependencies:
