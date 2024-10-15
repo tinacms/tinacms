@@ -12,7 +12,7 @@ const MermaidElementWithRef = ({ config }) => {
   useEffect(() => {
     if (mermaidRef.current) {
       mermaid.initialize({ startOnLoad: true })
-      mermaid.run()
+      mermaid.init()
     }
   }, [config])
 
@@ -53,7 +53,7 @@ flowchart TD
     --> id2(modify me to see changes!)
     id2 
     --> id3(Click the top button to preview the changes)
-    --> id4(Learn about mermaid diagrams @ mermaid.js.org)`
+    --> id4(Learn about mermaid diagrams - mermaid.js.org)`
 
 export const MermaidElement = withRef<typeof PlateElement>(
   ({ children, nodeProps, element, ...props }, ref) => {
@@ -73,7 +73,7 @@ export const MermaidElement = withRef<typeof PlateElement>(
     }
 
     useEffect(() => {
-      if (mermaid.parse(mermaidConfig as string, { suppressErrors: false })) {
+      if (mermaid.parse(mermaidConfig as string)) {
         setMermaidError(null) // Clear errors on success
       }
     }, [mermaidConfig])
