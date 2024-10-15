@@ -59,6 +59,7 @@ export const unsupportedItemsInTable = new Set([
   'Unordered List',
   'Ordered List',
   'Quote',
+  'Mermaid',
   'Heading 1',
   'Heading 2',
   'Heading 3',
