@@ -282,7 +282,6 @@ export class TinaSchema {
     collection: Collectable
   ) => {
     const accumulator: { [key: string]: unknown } = {}
-    // biome-ignore lint/complexity/noForEach: <explanation>
     Object.entries(payload).forEach(([key, value]) => {
       if (typeof collection.fields === 'string') {
         throw new Error('Global templates not supported')

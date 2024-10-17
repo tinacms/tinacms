@@ -6,34 +6,35 @@ import {
   MARK_CODE,
   MARK_ITALIC,
 } from '@udecode/plate'
-import React from 'react'
-import { ToolbarGroup } from './plate-ui/toolbar'
-import { MarkToolbarButton } from './plate-ui/mark-toolbar-button'
-import { Icons } from './plate-ui/icons'
-import { IndentListToolbarButton } from './plate-ui/indent-list-toolbar-button'
-import { HeadingsMenu } from './headings-dropdown'
-import { LinkToolbarButton } from './plate-ui/link-toolbar-button'
-import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button'
-import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button'
-import { ImageToolbarButton } from './plate-ui/image-toolbar-button'
-import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button'
-import TemplatesToolbarButton from './plate-ui/templates-toolbar-button'
-import {
-  EMBED_ICON_WIDTH,
-  STANDARD_ICON_WIDTH,
-  CONTAINER_MD_BREAKPOINT,
-  type ToolbarOverrideType,
-  FLOAT_BUTTON_WIDTH,
-  HEADING_ICON_WITH_TEXT,
-  HEADING_ICON_ONLY,
-  HEADING_LABEL,
-} from '../toolbar/toolbar-overrides'
-import { useResize } from '../hooks/use-resize'
-import OverflowMenu from './plate-ui/overflow-menu'
-import { useToolbarContext } from '../toolbar/toolbar-provider'
-import { TableDropdownMenu } from './plate-ui/table-dropdown-menu'
-import { helpers, unsupportedItemsInTable } from '../plugins/core/common'
 import { useEditorState } from '@udecode/plate-common'
+import React from 'react'
+import { useResize } from '../hooks/use-resize'
+import { helpers, unsupportedItemsInTable } from '../plugins/core/common'
+import {
+  CONTAINER_MD_BREAKPOINT,
+  EMBED_ICON_WIDTH,
+  FLOAT_BUTTON_WIDTH,
+  HEADING_ICON_ONLY,
+  HEADING_ICON_WITH_TEXT,
+  HEADING_LABEL,
+  STANDARD_ICON_WIDTH,
+  type ToolbarOverrideType,
+} from '../toolbar/toolbar-overrides'
+import { useToolbarContext } from '../toolbar/toolbar-provider'
+import { HeadingsMenu } from './headings-dropdown'
+import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button'
+import { Icons } from './plate-ui/icons'
+import { ImageToolbarButton } from './plate-ui/image-toolbar-button'
+import { IndentListToolbarButton } from './plate-ui/indent-list-toolbar-button'
+import { LinkToolbarButton } from './plate-ui/link-toolbar-button'
+import { MarkToolbarButton } from './plate-ui/mark-toolbar-button'
+import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button'
+import OverflowMenu from './plate-ui/overflow-menu'
+import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button'
+import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button'
+import { TableDropdownMenu } from './plate-ui/table-dropdown-menu'
+import TemplatesToolbarButton from './plate-ui/templates-toolbar-button'
+import { ToolbarGroup } from './plate-ui/toolbar'
 
 type ToolbarItem = {
   label: string
@@ -108,6 +109,11 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Code Block',
     width: () => STANDARD_ICON_WIDTH,
     Component: <CodeBlockToolbarButton />,
+  },
+  mermaid: {
+    label: 'Mermaid',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <MermaidToolbarButton />,
   },
   table: {
     label: 'Table',

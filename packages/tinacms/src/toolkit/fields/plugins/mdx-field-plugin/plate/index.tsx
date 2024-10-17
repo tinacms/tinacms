@@ -21,6 +21,7 @@ import FloatingToolbarButtons from './components/floating-toolbar-buttons'
 import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar'
 import { isUrl } from './transforms/is-url'
 import { ToolbarProvider } from './toolbar/toolbar-provider'
+import { createMermaidPlugin } from './plugins/custom/mermaid-plugin'
 
 export const RichEditor = (props: RichTextType) => {
   const initialValue = React.useMemo(
@@ -40,6 +41,7 @@ export const RichEditor = (props: RichTextType) => {
           createMdxBlockPlugin(),
           createMdxInlinePlugin(),
           createImgPlugin(),
+          createMermaidPlugin(),
           createInvalidMarkdownPlugin(),
           createLinkPlugin({
             options: {
