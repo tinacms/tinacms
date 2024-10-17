@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 import { checkMarkdownOutput } from "./markdown-parsing-utils";
 
-test.describe("Rich Text Editor Parsing Spec", () => {
+test.describe("should be able to parse italic from markdown", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("http://localhost:3000/admin/index.html#/~", {
       waitUntil: "domcontentloaded",
