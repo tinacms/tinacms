@@ -7,7 +7,6 @@ test.describe("Create Blog Post", () => {
       "http://localhost:3000/admin/index.html#/collections/new/post/~/",
       { waitUntil: "domcontentloaded" }
     );
-    //TODO : We should move this into a global place
     //Need to dismiss the popup dialog to enter edit mode
     //TODO : Remove this click once figure out how the dialog state changes (ideal solution is to set the relevant state when the page load dialog dismiss during the e2e test)
     page.click('button[data-test="enter-edit-mode"]');
