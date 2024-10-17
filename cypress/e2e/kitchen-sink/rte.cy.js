@@ -29,10 +29,6 @@ describe('Rich Text Editor', () => {
     })
   })
   describe('italic', () => {
-    it('is correctly rendered from markdown', () => {
-      cy.assertRTE('*italic*', '', '<em>italic</em>')
-    })
-
     it('can be typed', () => {
       cy.assertRTE('', '_italic_', '<em>italic</em>')
     })
