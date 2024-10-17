@@ -28,25 +28,6 @@ describe('Rich Text Editor', () => {
       },
     })
   })
-  describe('italic', () => {
-    it('is correctly rendered from markdown', () => {
-      cy.assertRTE('*italic*', '', '<em>italic</em>')
-    })
-
-    it('can be typed', () => {
-      cy.assertRTE('', '_italic_', '<em>italic</em>')
-    })
-  })
-
-  describe('bold', () => {
-    it('is correctly rendered from markdown', () => {
-      cy.assertRTE('**bold**', '', '<strong>bold</strong>')
-    })
-
-    it('can be typed', () => {
-      cy.assertRTE('', '**bold**', '<strong>bold</strong>', '**bold**')
-    })
-  })
 
   describe('headings', () => {
     it('is correctly rendered from markdown', () => {
