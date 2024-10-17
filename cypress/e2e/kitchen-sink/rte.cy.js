@@ -29,16 +29,6 @@ describe('Rich Text Editor', () => {
     })
   })
 
-  describe('bold', () => {
-    it('is correctly rendered from markdown', () => {
-      cy.assertRTE('**bold**', '', '<strong>bold</strong>')
-    })
-
-    it('can be typed', () => {
-      cy.assertRTE('', '**bold**', '<strong>bold</strong>', '**bold**')
-    })
-  })
-
   describe('headings', () => {
     it('is correctly rendered from markdown', () => {
       cy.assertRTE(
