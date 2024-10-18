@@ -3,7 +3,12 @@
 */
 
 import { print, type OperationDefinitionNode } from 'graphql'
-import type { TinaSchema, Config } from '@tinacms/schema-tools'
+import type {
+  TinaSchema,
+  Config,
+  Collection,
+  TinaField,
+} from '@tinacms/schema-tools'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 import uniqBy from 'lodash.uniqby'
 
@@ -200,6 +205,11 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     queryTypeDefinitionFields.push(
       await builder.collectionDocumentList(collection)
     )
+    if (collectionHasReferenceFields(collection)) {
+      queryTypeDefinitionFields.push(
+        await builder.reverseCollectionDocumentList(collection)
+      )
+    }
   })
 
   definitions.push(
@@ -223,4 +233,34 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       (node) => node.name.value
     ),
   }
+}
+
+function collectionHasReferenceFields(collection: Collection<true>) {
+  let result = false
+  for (const field of collection.fields) {
+    if (field.type === 'reference') {
+      result = true
+    } else if (field.type === 'object') {
+      if (fieldHasReferenceFields(field)) {
+        return true
+      }
+    }
+  }
+  return result
+}
+
+function fieldHasReferenceFields(field: TinaField) {
+  if (field.type === 'object') {
+    for (const subField of field.fields) {
+      if (subField.type === 'reference') {
+        return true
+      } else if (subField.type === 'object') {
+        if (fieldHasReferenceFields(subField)) {
+          return true
+        }
+      }
+    }
+  }
+
+  return false
 }
