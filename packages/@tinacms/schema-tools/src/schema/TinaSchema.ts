@@ -69,21 +69,19 @@ export class TinaSchema {
     )
   }
 
-  public findReferences(name: string): string[] {
-    const result = []
+  public findReferences(name: string) {
+    const result: Record<string, TinaField[]> = {}
     const collections = this.getCollections()
     for (const c of collections) {
-      let found = false
       for (const field of c.fields || []) {
         if (field.type === 'reference') {
           if (field.collections.includes(name)) {
-            found = true
-            break
+            if (result[c.name] === undefined) {
+              result[c.name] = []
+            }
+            result[c.name].push(field)
           }
         }
-      }
-      if (found) {
-        result.push(c.name)
       }
     }
     return result

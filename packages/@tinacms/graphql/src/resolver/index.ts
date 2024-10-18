@@ -185,7 +185,8 @@ export const transformDocumentIntoPayload = async (
   rawData: { _collection; _template },
   tinaSchema: TinaSchema,
   config?: GraphQLConfig,
-  isAudit?: boolean
+  isAudit?: boolean,
+  hasReferences?: boolean
 ) => {
   const collection = tinaSchema.getCollection(rawData._collection)
   try {
@@ -252,6 +253,7 @@ export const transformDocumentIntoPayload = async (
         basename,
         filename,
         extension,
+        hasReferences,
         path: fullPath,
         relativePath,
         breadcrumbs,
@@ -342,29 +344,35 @@ export class Resolver {
       )
     }
   }
-  public getDocument = async (fullPath: unknown) => {
+
+  public getDocument = async (
+    fullPath: unknown,
+    opts: {
+      collection?: Collection<true>
+      checkReferences?: boolean
+    } = {}
+  ) => {
     if (typeof fullPath !== 'string') {
       throw new Error(`fullPath must be of type string for getDocument request`)
     }
 
     const rawData = await this.getRaw(fullPath)
+    const hasReferences = opts?.checkReferences
+      ? await this.hasReferences(fullPath, opts.collection)
+      : undefined
     return transformDocumentIntoPayload(
       fullPath,
       rawData,
       this.tinaSchema,
       this.config,
-      this.isAudit
+      this.isAudit,
+      hasReferences
     )
   }
 
   public deleteDocument = async (fullPath: unknown) => {
     if (typeof fullPath !== 'string') {
       throw new Error(`fullPath must be of type string for getDocument request`)
-    }
-
-    const collection = this.tinaSchema.getCollectionByFullPath(fullPath)
-    if (await this.hasReferences(fullPath, collection)) {
-      throw new Error('Cannot delete document with references')
     }
 
     await this.database.delete(fullPath)
@@ -767,9 +775,18 @@ export class Resolver {
       if (isDeletion) {
         const doc = await this.getDocument(realPath)
         if (await this.hasReferences(realPath, collection)) {
-          throw new Error(
-            `Unable to delete document, ${realPath} has references`
-          )
+          const refs = await this.findReferences(realPath, collection)
+          for (const [c, val] of Object.entries(refs)) {
+            for (const item of val.items) {
+              const refDoc = await this.getRaw(item)
+              for (const f of val.fields) {
+                if (refDoc[f.name] === realPath) {
+                  refDoc[f.name] = null
+                  await this.database.put(item, refDoc, c)
+                }
+              }
+            }
+          }
         }
         await this.deleteDocument(realPath)
         return doc
@@ -782,11 +799,7 @@ export class Resolver {
         assertShape<{ relativePath: string }>(args?.params, (yup) =>
           yup.object({ relativePath: yup.string().required() })
         )
-        if (await this.hasReferences(realPath, collection)) {
-          throw new Error(
-            `Uanble to rename document, ${realPath} has references`
-          )
-        }
+
         // Get the real document
         const doc = await this.getDocument(realPath)
         const newRealPath = path.join(
@@ -797,6 +810,19 @@ export class Resolver {
         await this.database.put(newRealPath, doc._rawData, collection.name)
         // Delete the old document
         await this.deleteDocument(realPath)
+        // Update references to the document
+        const refs = await this.findReferences(realPath, collection)
+        for (const [c, val] of Object.entries(refs)) {
+          for (const item of val.items) {
+            const refDoc = await this.getRaw(item)
+            for (const f of val.fields) {
+              if (refDoc[f.name] === realPath) {
+                refDoc[f.name] = newRealPath
+                await this.database.put(item, refDoc, c)
+              }
+            }
+          }
+        }
         return this.getDocument(newRealPath)
       }
       /**
@@ -816,7 +842,10 @@ export class Resolver {
       /**
        * getDocument, get<Collection>Document
        */
-      return this.getDocument(realPath)
+      return this.getDocument(realPath, {
+        collection,
+        checkReferences: true,
+      })
     }
   }
 
@@ -999,7 +1028,7 @@ export class Resolver {
    */
   private hasReferences = async (id: string, c: Collection) => {
     let count = 0
-    for (const ref of this.tinaSchema.findReferences(c.name)) {
+    for (const ref of Object.keys(this.tinaSchema.findReferences(c.name))) {
       const collection = this.tinaSchema.getCollection(ref)
       await this.database.query(
         {
@@ -1028,6 +1057,48 @@ export class Resolver {
     }
 
     return false
+  }
+
+  /**
+   * Finds references to a document
+   * @param id
+   * @param c
+   * @returns references to the document as a map of collection names to field names and document ids
+   */
+  private findReferences = async (id: string, c: Collection) => {
+    const references: Record<string, { fields: TinaField[]; items: string[] }> =
+      {}
+    for (const [ref, fields] of Object.entries(
+      this.tinaSchema.findReferences(c.name)
+    )) {
+      const collection = this.tinaSchema.getCollection(ref)
+      await this.database.query(
+        {
+          collection: collection.name,
+          filterChain: makeFilterChain({
+            conditions: [
+              {
+                filterPath: c.name,
+                filterExpression: {
+                  _type: 'reference',
+                  _list: false,
+                  eq: id,
+                },
+              },
+            ],
+          }),
+        },
+        (refId: string) => {
+          if (!references[collection.name]) {
+            references[collection.name] = { fields: fields, items: [] }
+          }
+          references[collection.name].items.push(refId)
+          return refId
+        }
+      )
+    }
+
+    return references
   }
 
   private buildFieldMutations = async (

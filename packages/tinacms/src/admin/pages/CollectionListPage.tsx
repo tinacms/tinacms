@@ -343,6 +343,22 @@ const CollectionListPage = () => {
                       !cms.api.tina.usingProtectedBranch() && (
                         <DeleteModal
                           filename={vars.relativePath}
+                          checkRefsFunc={async () => {
+                            try {
+                              const doc = await admin.fetchDocument(
+                                collection.name,
+                                vars.relativePath,
+                                true
+                              )
+                              return doc?.document?._sys?.hasReferences
+                            } catch (error) {
+                              cms.alerts.error(
+                                'Document was not found, ask a developer for help or check the console for an error message'
+                              )
+                              console.error(error)
+                              throw error
+                            }
+                          }}
                           deleteFunc={async () => {
                             try {
                               await admin.deleteDocument(vars)
@@ -1089,9 +1105,10 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
   )
 }
 
-interface ResetModalProps {
+interface DeleteModalProps {
   close(): void
   deleteFunc(): void
+  checkRefsFunc(): Promise<true | false>
   filename: string
 }
 
@@ -1105,13 +1122,26 @@ const NoDocumentsPlaceholder = () => {
   )
 }
 
-const DeleteModal = ({ close, deleteFunc, filename }: ResetModalProps) => {
+const DeleteModal = ({
+  close,
+  deleteFunc,
+  checkRefsFunc,
+  filename,
+}: DeleteModalProps) => {
+  const [hasRefs, setHasRefs] = React.useState<true | false | undefined>()
+  useEffect(() => {
+    checkRefsFunc().then((result) => {
+      setHasRefs(result)
+    })
+  }, [filename, checkRefsFunc])
   return (
     <Modal>
       <PopupModal>
         <ModalHeader close={close}>Delete {filename}</ModalHeader>
         <ModalBody padded={true}>
-          <p>{`Are you sure you want to delete ${filename}?`}</p>
+          <p>{`Are you sure you want to delete ${filename}?${
+            hasRefs ? ' References to this document will also be deleted.' : ''
+          }`}</p>
         </ModalBody>
         <ModalActions>
           <Button style={{ flexGrow: 2 }} onClick={close}>

@@ -828,6 +828,7 @@ type Document = {
     relativePath: string
     filename: string
     extension: string
+    hasReferences?: boolean
   }
 }
 export interface UICollection<Form = any, CMS = any, TinaForm = any> {

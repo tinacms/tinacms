@@ -405,6 +405,11 @@ export class Builder {
           required: true,
           type: astBuilder.TYPES.String,
         }),
+        // astBuilder.InputValueDefinition({
+        //   name: 'updateReferences',
+        //   required: false,
+        //   type: astBuilder.TYPES.Boolean,
+        // }),
       ],
       required: true,
       type: astBuilder.TYPES.MultiCollectionDocument,
@@ -921,10 +926,12 @@ export class Builder {
       return this._buildDataField(field)
     })
     const others = []
-    for (const ref of this.tinaSchema.findReferences(collection.name)) {
-      const refCollection = this.tinaSchema.getCollection(ref)
+    for (const c of Object.keys(
+      this.tinaSchema.findReferences(collection.name)
+    )) {
+      const refCollection = this.tinaSchema.getCollection(c)
       if (!refCollection) {
-        throw new Error(`Collection ${ref} not found`)
+        throw new Error(`Collection ${c} not found`)
       }
       const refTypeName = NAMER.reverseReferenceConnectionType(
         refCollection.namespace
