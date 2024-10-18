@@ -405,11 +405,6 @@ export class Builder {
           required: true,
           type: astBuilder.TYPES.String,
         }),
-        // astBuilder.InputValueDefinition({
-        //   name: 'updateReferences',
-        //   required: false,
-        //   type: astBuilder.TYPES.Boolean,
-        // }),
       ],
       required: true,
       type: astBuilder.TYPES.MultiCollectionDocument,
