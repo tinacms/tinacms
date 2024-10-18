@@ -48,7 +48,7 @@ export const Button = ({
   }
   const sizeClasses = {
     small: `text-xs h-8 px-3`,
-    medium: `text-sm h-10 px-4`,
+    medium: `text-sm h-10 px-8`,
     custom: ``,
   }
 
