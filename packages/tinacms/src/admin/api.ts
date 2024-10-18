@@ -191,6 +191,7 @@ export class TinaAdminApi {
                     relativePath
                     filename
                     extension
+                    hasReferences
                   }
                 }
               }
@@ -291,6 +292,9 @@ export class TinaAdminApi {
           document(collection:$collection, relativePath:$relativePath) {
             ... on Document {
               _values
+              _sys {
+                hasReferences
+              }
             }
           }
         }`
