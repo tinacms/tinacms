@@ -1378,7 +1378,6 @@ export type LookupMapType =
   | MultiCollectionDocumentLookup
   | MultiCollectionDocumentListLookup
   | CollectionDocumentListLookup
-  | ReverseCollectionDocumentListLookup
   | UnionDataLookup
   | NodeDocument
 
@@ -1415,11 +1414,6 @@ type MultiCollectionDocumentListLookup = {
 export type CollectionDocumentListLookup = {
   type: string
   resolveType: 'collectionDocumentList'
-  collection: string
-}
-export type ReverseCollectionDocumentListLookup = {
-  type: string
-  resolveType: 'reverseCollectionDocumentList'
   collection: string
 }
 type UnionDataLookup = {

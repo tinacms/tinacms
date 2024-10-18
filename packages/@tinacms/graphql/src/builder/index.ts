@@ -849,27 +849,6 @@ export class Builder {
     })
   }
 
-  public reverseCollectionDocumentList = async (
-    collection: Collection<true>
-  ) => {
-    const connectionName = NAMER.reverseReferenceConnectionType(
-      collection.namespace
-    )
-
-    this.addToLookupMap({
-      type: connectionName,
-      resolveType: 'reverseCollectionDocumentList' as const,
-      collection: collection.name,
-    })
-    return this._connectionFieldBuilder({
-      fieldName: NAMER.generateReverseQueryListName(collection.namespace),
-      connectionName,
-      nodeType: NAMER.documentTypeName(collection.namespace),
-      namespace: collection.namespace,
-      collection,
-    })
-  }
-
   /**
    * GraphQL type definitions which remain unchanged regardless
    * of the supplied Tina schema. Ex. "node" interface
@@ -920,27 +899,6 @@ export class Builder {
     const templateFields = await sequential(fields, async (field) => {
       return this._buildDataField(field)
     })
-    const others = []
-    for (const c of Object.keys(
-      this.tinaSchema.findReferences(collection.name)
-    )) {
-      const refCollection = this.tinaSchema.getCollection(c)
-      if (!refCollection) {
-        throw new Error(`Collection ${c} not found`)
-      }
-      const refTypeName = NAMER.reverseReferenceConnectionType(
-        refCollection.namespace
-      )
-      // add a list of references
-      others.push(
-        astBuilder.FieldDefinition({
-          name: refCollection.name,
-          required: false,
-          type: refTypeName,
-          list: false,
-        })
-      )
-    }
     return astBuilder.ObjectTypeDefinition({
       name: documentTypeName + suffix,
       interfaces: [
@@ -955,7 +913,6 @@ export class Builder {
           required: true,
           type: astBuilder.TYPES.ID,
         }),
-        ...others,
         astBuilder.FieldDefinition({
           name: '_sys',
           required: true,

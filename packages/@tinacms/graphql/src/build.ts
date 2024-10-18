@@ -3,7 +3,7 @@
 */
 
 import { print, type OperationDefinitionNode } from 'graphql'
-import type { TinaSchema, Config, Collection } from '@tinacms/schema-tools'
+import type { TinaSchema, Config } from '@tinacms/schema-tools'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 import uniqBy from 'lodash.uniqby'
 
@@ -200,11 +200,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     queryTypeDefinitionFields.push(
       await builder.collectionDocumentList(collection)
     )
-    if (hasReferenceFields(collection)) {
-      queryTypeDefinitionFields.push(
-        await builder.reverseCollectionDocumentList(collection)
-      )
-    }
   })
 
   definitions.push(
@@ -228,13 +223,4 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       (node) => node.name.value
     ),
   }
-}
-function hasReferenceFields(collection: Collection<true>) {
-  let result = false
-  for (const field of collection.fields) {
-    if (field.type === 'reference') {
-      result = true
-    }
-  }
-  return result
 }
