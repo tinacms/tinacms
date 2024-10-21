@@ -1,5 +1,18 @@
 # @tinacms/mdx
 
+## 1.5.0
+
+### Minor Changes
+
+- [#5098](https://github.com/tinacms/tinacms/pull/5098) [`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36) Thanks [@Jord-Gui](https://github.com/Jord-Gui)! - Add table plugin to rich-text-editor
+
+### Patch Changes
+
+- [#4825](https://github.com/tinacms/tinacms/pull/4825) [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Add Mermaid Support to Rich Text Field (Plate)
+  🐛 Fix tooltip rendering behind TinaCMS app
+- Updated dependencies [[`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47)]:
+  - @tinacms/schema-tools@1.6.6
+
 ## 1.4.5
 
 ### Patch Changes
