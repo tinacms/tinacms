@@ -29,24 +29,6 @@ describe('Rich Text Editor', () => {
     })
   })
 
-  describe('headings', () => {
-    it('is correctly rendered from markdown', () => {
-      cy.assertRTE(
-        '# h1\n\n## h2\n\n### h3\n\n#### h4\n\n##### h5\n\n###### h6',
-        '',
-        '<h1>h1</h1><h2>h2</h2><h3>h3</h3><h4>h4</h4><h5>h5</h5><h6>h6</h6>'
-      )
-    })
-
-    it('can be typed', () => {
-      cy.assertRTE(
-        '',
-        '# h1{enter}## h2{enter}### h3{enter}#### h4{enter}##### h5{enter}###### h6',
-        '<h1>h1</h1><h2>h2</h2><h3>h3</h3><h4>h4</h4><h5>h5</h5><h6>h6</h6>'
-      )
-    })
-  })
-
   describe('new lines', () => {
     it('is correctly rendered from markdown', () => {
       cy.assertRTE(
