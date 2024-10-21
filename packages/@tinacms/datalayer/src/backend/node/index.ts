@@ -72,7 +72,9 @@ export function TinaNodeBackend({
   initialize?.().catch((e) => {
     console.error(e)
   })
-  const basePath = options?.basePath ? `/${options.basePath.replace(/^\/?/, '').replace(/\/?$/, '')}/` : '/api/tina/'
+  const basePath = options?.basePath
+    ? `/${options.basePath.replace(/^\/?/, '').replace(/\/?$/, '')}/`
+    : '/api/tina/'
 
   const opts: NodeRouteHandlerOptions = {
     basePath,
@@ -125,7 +127,8 @@ function MakeNodeApiHandler({
             res.statusCode = 405
             res.write(
               JSON.stringify({
-                error: 'Method not allowed. Only POST requests are supported by /gql',
+                error:
+                  'Method not allowed. Only POST requests are supported by /gql',
               })
             )
             res.end()
