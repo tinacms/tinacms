@@ -233,8 +233,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 </FormWrapper>
               </FormPortalProvider>
               {!hideFooter && (
-                <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
-                  <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
+                <div className="relative flex-none w-full h-16 px-12 bg-white border-t border-gray-100 flex items-center justify-end">
+                  <div className="flex-1 w-full justify-end gap-2	flex items-center max-w-form">
                     {tinaForm.reset && (
                       <ResetForm
                         pristine={pristine}
@@ -242,7 +242,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                           finalForm.reset()
                           await tinaForm.reset!()
                         }}
-                        style={{ flexGrow: 1 }}
                       >
                         {tinaForm.buttons.reset}
                       </ResetForm>
@@ -252,7 +251,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       disabled={!canSubmit}
                       busy={submitting}
                       variant="primary"
-                      style={{ flexGrow: 3 }}
                     >
                       {submitting && <LoadingDots />}
                       {!submitting && tinaForm.buttons.save}
