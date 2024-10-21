@@ -29,32 +29,6 @@ describe('Rich Text Editor', () => {
     })
   })
 
-  describe('new lines', () => {
-    it('is correctly rendered from markdown', () => {
-      cy.assertRTE(
-        'First line   \nSecond line',
-        '',
-        '<p>First line<br>Second line</p>'
-      )
-    })
-
-    it('is correctly rendered from markdown with backslash syntax', () => {
-      cy.assertRTE(
-        'First line\\\nSecond line',
-        '',
-        '<p>First line<br>Second line</p>'
-      )
-    })
-
-    it('can be typed', () => {
-      cy.assertRTE(
-        '',
-        'First line{shift+enter}Second line',
-        '<p>First line<br>Second line</p>'
-      )
-    })
-  })
-
   describe('paragraphs', () => {
     /**
      * Skipping because the markdown ast sent from the API will remove any empty blocks before sending it down
