@@ -12,6 +12,7 @@ import { Alerts } from '@toolkit/react-alerts'
 import { MediaManager } from './media'
 import { ActiveFieldIndicator } from './active-field-indicator'
 import { MutationSignalProvider } from './mutation-signal'
+import { FileProvider } from './context-files'
 
 export interface TinaUIProps {
   position?: SidebarPosition
@@ -26,22 +27,26 @@ export const TinaUI: React.FC<TinaUIProps> = ({ children, position }) => {
   return (
     <MutationSignalProvider>
       <ModalProvider>
-        <Alerts alerts={cms.alerts} />
-        <MediaManager />
-        {cms.sidebar && (
-          <SidebarProvider
-            resizingSidebar={resizingSidebar}
-            setResizingSidebar={setResizingSidebar}
-            position={position}
-            sidebar={cms.sidebar}
-          />
-        )}
-        <ActiveFieldIndicator />
-        {/* Dragging across the iframe causes mouse events to stop propagating so there's a laggy feeling without this */}
-        <div className={`${resizingSidebar ? 'pointer-events-none' : ''}`}>
-          {children}
-        </div>
+        <FileProvider>
+          <Alerts alerts={cms.alerts} />
+          <MediaManager />
+          {cms.sidebar && (
+            <SidebarProvider
+              resizingSidebar={resizingSidebar}
+              setResizingSidebar={setResizingSidebar}
+              position={position}
+              sidebar={cms.sidebar}
+            />
+          )}
+          <ActiveFieldIndicator />
+          {/* Dragging across the iframe causes mouse events to stop propagating so there's a laggy feeling without this */}
+          <div className={`${resizingSidebar ? 'pointer-events-none' : ''}`}>
+            {children}
+          </div>
+        </FileProvider>
       </ModalProvider>
     </MutationSignalProvider>
   )
 }
+
+// Create a context

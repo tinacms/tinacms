@@ -35,6 +35,7 @@ import {
 import { DeleteModal, NewFolderModal } from './modal'
 import { CopyField } from './copy-field'
 import { createContext, useContext } from 'react'
+import { useFiles } from '../context-files'
 const { useDropzone } = dropzone
 // Can not use path.join on the frontend
 const join = function (...parts) {
@@ -246,6 +247,7 @@ export function MediaPicker({
   }
 
   const [uploading, setUploading] = useState(false)
+  const { setFiles, setFileRejections } = useFiles()
   const accept = Array.isArray(
     cms.api.tina.schema.schema?.config?.media?.accept
   )
@@ -259,7 +261,12 @@ export function MediaPicker({
     multiple: true,
     onDrop: async (files, fileRejections) => {
       try {
+        // coming from protected branch
+        setFiles(files)
+        setFileRejections(fileRejections)
         setUploading(true)
+
+        // else:
         const mediaItems = await cms.media.persist(
           files.map((file) => {
             return {
@@ -268,44 +275,11 @@ export function MediaPicker({
             }
           })
         )
+        // end else
 
-        // Codes here https://github.com/react-dropzone/react-dropzone/blob/c36ab5bd8b8fd74e2074290d80e3ecb93d26b014/typings/react-dropzone.d.ts#LL13-L18C2
-        const errorCodes = {
-          'file-invalid-type': 'Invalid file type',
-          'file-too-large': 'File too large',
-          'file-too-small': 'File too small',
-          'too-many-files': 'Too many files',
-        }
+        UploadFilesHandler(fileRejections)
 
-        const printError = (error: FileError) => {
-          const message = errorCodes[error.code]
-          if (message) {
-            return message
-          }
-          console.error(error)
-          return 'Unknown error'
-        }
-
-        // Upload Failed
-        if (fileRejections.length > 0) {
-          const messages = []
-          fileRejections.map((fileRejection) => {
-            messages.push(
-              `${fileRejection.file.name}: ${fileRejection.errors
-                .map((error) => printError(error))
-                .join(', ')}`
-            )
-          })
-          cms.alerts.error(() => {
-            return (
-              <>
-                Upload Failed. <br />
-                {messages.join('. ')}.
-              </>
-            )
-          })
-        }
-        // if there are media items, set the first one as active and prepend all the items to the list
+        // If in media manager do this.
         if (mediaItems.length !== 0) {
           setActiveItem(mediaItems[0])
           setList((mediaList) => {
@@ -319,6 +293,45 @@ export function MediaPicker({
             }
           })
         }
+
+        // This has been moved to an external function
+        // // Codes here https://github.com/react-dropzone/react-dropzone/blob/c36ab5bd8b8fd74e2074290d80e3ecb93d26b014/typings/react-dropzone.d.ts#LL13-L18C2
+        // const errorCodes = {
+        // 	"file-invalid-type": "Invalid file type",
+        // 	"file-too-large": "File too large",
+        // 	"file-too-small": "File too small",
+        // 	"too-many-files": "Too many files",
+        // };
+
+        // const printError = (error: FileError) => {
+        // 	const message = errorCodes[error.code];
+        // 	if (message) {
+        // 		return message;
+        // 	}
+        // 	console.error(error);
+        // 	return "Unknown error";
+        // };
+
+        // // Upload Failed
+        // if (fileRejections.length > 0) {
+        // 	const messages = [];
+        // 	fileRejections.map((fileRejection) => {
+        // 		messages.push(
+        // 			`${fileRejection.file.name}: ${fileRejection.errors
+        // 				.map((error) => printError(error))
+        // 				.join(", ")}`,
+        // 		);
+        // 	});
+        // 	cms.alerts.error(() => {
+        // 		return (
+        // 			<>
+        // 				Upload Failed. <br />
+        // 				{messages.join(". ")}.
+        // 			</>
+        // 		);
+        // 	});
+        // }
+        // // if there are media items, set the first one as active and prepend all the items to the list
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
       }
@@ -471,7 +484,7 @@ export function MediaPicker({
                   list.items.length > 0 &&
                   viewMode === 'grid' &&
                   'w-full p-4 gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 4xl:grid-cols-6 6xl:grid-cols-9 auto-rows-auto content-start justify-start'
-                } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
+                } ${isDragActive ? 'border-2 border-blue-500 rounded-lg' : ''}`}
               >
                 <input {...getInputProps()} />
 
@@ -776,4 +789,44 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
       </button>
     </div>
   )
+}
+
+export const UploadFilesHandler = (fileRejections) => {
+  const cms = useCMS()
+  // Codes here https://github.com/react-dropzone/react-dropzone/blob/c36ab5bd8b8fd74e2074290d80e3ecb93d26b014/typings/react-dropzone.d.ts#LL13-L18C2
+  const errorCodes = {
+    'file-invalid-type': 'Invalid file type',
+    'file-too-large': 'File too large',
+    'file-too-small': 'File too small',
+    'too-many-files': 'Too many files',
+  }
+
+  const printError = (error: FileError) => {
+    const message = errorCodes[error.code]
+    if (message) {
+      return message
+    }
+    console.error(error)
+    return 'Unknown error'
+  }
+
+  // Upload Failed
+  if (fileRejections.length > 0) {
+    const messages = []
+    fileRejections.map((fileRejection) => {
+      messages.push(
+        `${fileRejection.file.name}: ${fileRejection.errors
+          .map((error) => printError(error))
+          .join(', ')}`
+      )
+    })
+    cms.alerts.error(() => {
+      return (
+        <>
+          Upload Failed. <br />
+          {messages.join('. ')}.
+        </>
+      )
+    })
+  }
 }
