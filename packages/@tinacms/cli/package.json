@@ -3,11 +3,7 @@
 	"version": "1.6.9",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
-	"files": [
-		"dist",
-		"bin/*",
-		".env"
-	],
+	"files": ["dist", "bin/*", ".env"],
 	"license": "Apache-2.0",
 	"bin": {
 		"tinacms": "bin/tinacms"
@@ -29,7 +25,7 @@
 		"@types/express": "^4.17.21",
 		"@types/express-graphql": "^0.9.0",
 		"@types/figlet": "1.2.0",
-		"@types/fs-extra": "^9.0.13",
+		"@types/fs-extra": "^11.0.4",
 		"@types/jest": "26.0.4",
 		"@types/js-yaml": "^4.0.9",
 		"@types/listr": "0.14.2",
@@ -37,7 +33,7 @@
 		"@types/multer": "^1.4.12",
 		"@types/progress": "^2.0.7",
 		"@types/prompts": "^2.4.9",
-		"@types/yup": "^0.29.14",
+		"@types/yup": "^0.32.0",
 		"jest": "^29.7.0"
 	},
 	"scripts": {
@@ -97,7 +93,7 @@
 		"typanion": "3.13.0",
 		"typescript": "^5.6.2",
 		"vite": "^4.5.5",
-		"yup": "^0.32.11",
+		"yup": "^1.4.0",
 		"zod": "^3.23.8"
 	},
 	"publishConfig": {
