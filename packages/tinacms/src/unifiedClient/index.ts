@@ -1,6 +1,7 @@
 import fetchPonyfill from 'fetch-ponyfill'
 import type { GraphQLError } from 'graphql'
 import type { Config } from '@tinacms/schema-tools'
+import type { Cache } from '../cache/index'
 
 const { fetch: fetchPonyfillFN, Headers: HeadersPonyfill } = fetchPonyfill()
 
@@ -15,6 +16,7 @@ export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
   token?: string
   queries: (client: TinaClient<GenQueries>) => GenQueries
   errorPolicy?: Config['client']['errorPolicy']
+  cacheDir?: string
 }
 export type TinaClientRequestArgs = {
   variables?: Record<string, any>
@@ -33,22 +35,48 @@ export class TinaClient<GenQueries> {
   public readonlyToken?: string
   public queries: GenQueries
   public errorPolicy: Config['client']['errorPolicy']
+  initialized: boolean = false
+  cacheDir: string
+  cache: Cache
+
   constructor({
     token,
     url,
     queries,
     errorPolicy,
+    cacheDir,
   }: TinaClientArgs<GenQueries>) {
     this.apiUrl = url
     this.readonlyToken = token?.trim()
     this.queries = queries(this)
     this.errorPolicy = errorPolicy || 'throw'
+    this.cacheDir = cacheDir || ''
+  }
+
+  async init() {
+    if (this.initialized) {
+      return
+    }
+    try {
+      if (
+        this.cacheDir &&
+        typeof window === 'undefined' &&
+        typeof require !== 'undefined'
+      ) {
+        const { NodeCache } = await import('../cache/node-cache')
+        this.cache = await NodeCache(this.cacheDir)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+    this.initialized = true
   }
 
   public async request<DataType extends Record<string, any> = any>(
     { errorPolicy, ...args }: TinaClientRequestArgs,
     options: { fetchOptions?: Parameters<typeof fetch>[1] }
   ) {
+    await this.init()
     const errorPolicyDefined = errorPolicy || this.errorPolicy
     const headers = new HeadersDefined()
     if (this.readonlyToken) {
@@ -78,6 +106,15 @@ export class TinaClient<GenQueries> {
       ...providedFetchOptions,
     }
 
+    let key = ''
+    if (this.cache) {
+      key = this.cache.makeKey(bodyString)
+      const value = await this.cache.get(key)
+      if (value) {
+        return value
+      }
+    }
+
     const res = await fetchDefined(url, optionsObject)
     if (!res.ok) {
       let additionalInfo = ''
@@ -99,11 +136,17 @@ export class TinaClient<GenQueries> {
         Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
       )
     }
-    return {
+    const result = {
       data: json?.data as DataType,
       errors: (json?.errors || null) as GraphQLError[] | null,
       query: args.query,
     }
+
+    if (this.cache) {
+      await this.cache.set(key, result)
+    }
+
+    return result
   }
 }
 

@@ -9,6 +9,7 @@ import {
   isBlock,
   toggleNodeType,
   useEditorRef,
+  useEditorState,
   useEditorSelector,
 } from '@udecode/plate-common'
 import {
@@ -17,6 +18,7 @@ import {
   ELEMENT_H3,
   ELEMENT_H4,
   ELEMENT_H5,
+  ELEMENT_H6,
 } from '@udecode/plate-heading'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 
@@ -33,6 +35,8 @@ import {
 } from './dropdown-menu'
 import { ToolbarButton } from './toolbar'
 import { toggleList, unwrapList } from '@udecode/plate'
+import { helpers } from '@toolkit/fields/plugins/mdx-field-plugin/plate/plugins/core/common'
+import { ELEMENT_TABLE } from '@udecode/plate-table'
 
 const items = [
   {
@@ -71,6 +75,12 @@ const items = [
     label: 'Heading 5',
     value: ELEMENT_H5,
   },
+  {
+    description: 'Heading 6',
+    icon: Icons.h6,
+    label: 'Heading 6',
+    value: ELEMENT_H6,
+  },
 ]
 
 const defaultItem = items.find((item) => item.value === ELEMENT_PARAGRAPH)
@@ -102,6 +112,10 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
 
   const selectedItem = items.find((item) => item.value === value) ?? defaultItem
   const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem
+
+  const editorState = useEditorState()
+  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
+  if (userInTable) return null
 
   return (
     <DropdownMenu modal={false} {...openState} {...props}>

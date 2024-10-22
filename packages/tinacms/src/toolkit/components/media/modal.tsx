@@ -45,8 +45,13 @@ export const DeleteModal = ({
             variant="danger"
             onClick={async () => {
               setProcessing(true)
-              await deleteFunc()
-              close()
+              try {
+                await deleteFunc()
+              } catch (e) {
+                console.error(e)
+              } finally {
+                close()
+              }
             }}
           >
             <span className="mr-1">Delete</span>

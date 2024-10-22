@@ -10,8 +10,8 @@ import {
   createItalicPlugin,
   createUnderlinePlugin,
   createCodePlugin,
-  createIndentPlugin,
   createIndentListPlugin,
+  createTablePlugin,
 } from '@udecode/plate'
 import { ReactEditor } from 'slate-react'
 import {
@@ -46,13 +46,27 @@ export const plugins = [
   createUnderlinePlugin(),
   createCodePlugin(),
   createListPlugin(),
-  createIndentPlugin(),
   createIndentListPlugin(),
   createHorizontalRulePlugin(),
   // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
   createNodeIdPlugin(),
   createSlashPlugin(),
+  createTablePlugin(),
 ]
+
+export const unsupportedItemsInTable = new Set([
+  'Code Block',
+  'Unordered List',
+  'Ordered List',
+  'Quote',
+  'Mermaid',
+  'Heading 1',
+  'Heading 2',
+  'Heading 3',
+  'Heading 4',
+  'Heading 5',
+  'Heading 6',
+])
 
 const isNodeActive = (editor, type) => {
   const pluginType = getPluginType(editor, type)

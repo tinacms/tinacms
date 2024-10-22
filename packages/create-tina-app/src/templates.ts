@@ -1,11 +1,7 @@
-/**
-
-*/
-
 import { downloadAndExtractRepo, getRepoInfo } from './util/examples'
-import chalk from 'chalk'
 import { copy } from 'fs-extra'
 import path from 'path'
+import { log, TextStyles } from './util/logger'
 
 type BaseExample = {
   title: string
@@ -13,16 +9,16 @@ type BaseExample = {
   value: string
 }
 
-export type InternalExample = BaseExample & {
+export type InternalTemplate = BaseExample & {
   isInternal: true
 }
-export type ExternalExample = BaseExample & {
+export type ExternalTemplate = BaseExample & {
   isInternal: false
   gitURL: string
 }
-export type Example = InternalExample | ExternalExample
+export type Template = InternalTemplate | ExternalTemplate
 
-export const EXAMPLES: Example[] = [
+export const TEMPLATES: Template[] = [
   {
     title: '⭐ NextJS starter',
     description:
@@ -48,14 +44,6 @@ export const EXAMPLES: Example[] = [
     gitURL: 'https://github.com/tinacms/tina-remix-starter',
   },
   {
-    title: 'Documentation Starter',
-    description:
-      'Transform documentation with Smooth Doc: Features MDX support, light/dark mode, and seamless Vercel deployment for a dynamic, interactive experience.',
-    value: 'demo-docs',
-    isInternal: false,
-    gitURL: 'https://github.com/tinacms/demo-docs',
-  },
-  {
     title: 'Docusaurus Starter',
     description:
       'Docusaurus empowers you to build and evolve documentation like crafting a living, breathing knowledge repository.',
@@ -73,29 +61,23 @@ export const EXAMPLES: Example[] = [
   },
 ]
 
-export const downloadExample = async (example: Example, root: string) => {
-  if (example.isInternal === false) {
-    // need to download example from github
-
-    // Make a github URL
-    const repoURL = new URL(example.gitURL)
-    // Download the Repo
+export async function downloadTemplate(template: Template, root: string) {
+  if (template.isInternal === false) {
+    const repoURL = new URL(template.gitURL)
     const repoInfo = await getRepoInfo(repoURL)
-    const repoInfo2 = repoInfo
-    console.log(
-      `Downloading files from repo ${chalk.cyan(
-        `${repoInfo?.username}/${repoInfo?.name}`
-      )}. This might take a moment.`
-    )
-
-    if (!repoInfo2) {
-      throw new Error('downloadExample Failed. Repo info not found')
+    if (!repoInfo) {
+      throw new Error('Repository information not found.')
     }
 
-    await downloadAndExtractRepo(root, repoInfo2)
+    log.info(
+      `Downloading files from repo ${TextStyles.link(
+        `${repoInfo?.username}/${repoInfo?.name}`
+      )}.`
+    )
+    await downloadAndExtractRepo(root, repoInfo)
   } else {
-    // need to copy the example from local file system
-    const exampleFile = path.join(__dirname, '..', 'examples', example.value)
-    await copy(`${exampleFile}/`, './')
+    // Copy the template from the local file system.
+    const templateFile = path.join(__dirname, '..', 'examples', template.value)
+    await copy(`${templateFile}/`, './')
   }
 }

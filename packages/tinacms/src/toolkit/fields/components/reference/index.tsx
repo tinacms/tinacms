@@ -2,27 +2,7 @@ import * as React from 'react'
 import { useCMS } from '@toolkit/react-tinacms/use-cms'
 import ReferenceSelect from './reference-select'
 import ReferenceLink from './reference-link'
-
-type Option = {
-  value: string
-  label: string
-}
-
-export interface ReferenceFieldProps {
-  label?: string
-  name: string
-  component: string
-  collections: string[]
-  options: (Option | string)[]
-}
-
-export interface ReferenceProps {
-  name: string
-  input: any
-  field: ReferenceFieldProps
-  disabled?: boolean
-  options?: (Option | string)[]
-}
+import { ReferenceProps } from './model/reference-props'
 
 export const Reference: React.FC<ReferenceProps> = ({ input, field }) => {
   const cms = useCMS()

@@ -9,13 +9,13 @@ import type { IconType } from 'react-icons/lib'
 
 import { Button, Nav } from '@tinacms/toolkit'
 import type { TinaCMS, ScreenPlugin } from '@tinacms/toolkit'
-import { Transition } from '@headlessui/react'
+import { Transition, TransitionChild } from '@headlessui/react'
 import { useWindowWidth } from '@react-hook/window-size'
 
 import { useGetCollections } from './GetCollections'
 import { IoMdClose } from 'react-icons/io'
 import { BiMenu } from 'react-icons/bi'
-import { CloudConfigPlugin } from '@tinacms/toolkit'
+import type { CloudConfigPlugin } from '@tinacms/toolkit'
 
 export const slugify = (text) => {
   return text
@@ -82,8 +82,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
       )}
       {!renderDesktopNav && (
         <Transition show={menuIsOpen}>
-          <Transition.Child
-            as={React.Fragment}
+          <TransitionChild
             enter="transform transition-all ease-out duration-300"
             enterFrom="opacity-0 -translate-x-full"
             enterTo="opacity-100 translate-x-0"
@@ -153,9 +152,8 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                 </div>
               </Nav>
             </div>
-          </Transition.Child>
-          <Transition.Child
-            as={React.Fragment}
+          </TransitionChild>
+          <TransitionChild
             enter="ease-out duration-300"
             enterFrom="opacity-0"
             enterTo="opacity-80"
@@ -169,8 +167,8 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                 setMenuIsOpen(false)
               }}
               className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
-            ></div>
-          </Transition.Child>
+            />
+          </TransitionChild>
         </Transition>
       )}
       {!renderDesktopNav && (
@@ -181,7 +179,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
             setMenuIsOpen(true)
           }}
           className={`pointer-events-auto -ml-px absolute left-0 z-50 ${
-            isLocalMode ? `top-10` : `top-4`
+            isLocalMode ? 'top-10' : 'top-4'
           }`}
         >
           <BiMenu className="h-7 w-auto" />

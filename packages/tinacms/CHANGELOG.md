@@ -1,5 +1,126 @@
 # tinacms
 
+## 2.3.0
+
+### Minor Changes
+
+- [#5098](https://github.com/tinacms/tinacms/pull/5098) [`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36) Thanks [@Jord-Gui](https://github.com/Jord-Gui)! - Add table plugin to rich-text-editor
+
+### Patch Changes
+
+- [#4825](https://github.com/tinacms/tinacms/pull/4825) [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Add Mermaid Support to Rich Text Field (Plate)
+  🐛 Fix tooltip rendering behind TinaCMS app
+
+- [#5205](https://github.com/tinacms/tinacms/pull/5205) [`eb519f2`](https://github.com/tinacms/tinacms/commit/eb519f27a4c0fe1b05c361db2c1fe2337e6c4e12) Thanks [@Jord-Gui](https://github.com/Jord-Gui)! - Add Mermaid to unsupported table cell formats
+
+- [#5204](https://github.com/tinacms/tinacms/pull/5204) [`00f6525`](https://github.com/tinacms/tinacms/commit/00f6525871c7c6bd40091424337df72c7bfcf783) Thanks [@JackDevAU](https://github.com/JackDevAU)! - lock mermaid to 9.4.0 to allow cjs
+
+- Updated dependencies [[`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36), [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47)]:
+  - @tinacms/mdx@1.5.0
+  - @tinacms/schema-tools@1.6.6
+  - @tinacms/search@1.0.33
+
+## 2.2.9
+
+### Patch Changes
+
+- [#4780](https://github.com/tinacms/tinacms/pull/4780) [`31513bb`](https://github.com/tinacms/tinacms/commit/31513bb473cd1d349a3711ef7c5075cf9d03f121) Thanks [@Ben0189](https://github.com/Ben0189)! - improve reference field selector filter and simplyfy schema needed to be written by user
+
+- [#4991](https://github.com/tinacms/tinacms/pull/4991) [`3b2aba8`](https://github.com/tinacms/tinacms/commit/3b2aba80ac14a512592f67a04f9e1792667db9dd) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - - Correct 'window' variable definition test
+
+- Updated dependencies [[`31513bb`](https://github.com/tinacms/tinacms/commit/31513bb473cd1d349a3711ef7c5075cf9d03f121)]:
+  - @tinacms/schema-tools@1.6.5
+  - @tinacms/mdx@1.4.5
+  - @tinacms/search@1.0.32
+
+## 2.2.8
+
+### Patch Changes
+
+- [#4843](https://github.com/tinacms/tinacms/pull/4843) [`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Update Minor & Patch Dependencies Versions
+
+- Updated dependencies [[`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a)]:
+  - @tinacms/mdx@1.4.4
+  - @tinacms/schema-tools@1.6.4
+  - @tinacms/search@1.0.31
+
+## 2.2.7
+
+### Patch Changes
+
+- [#4840](https://github.com/tinacms/tinacms/pull/4840) [`113f4db`](https://github.com/tinacms/tinacms/commit/113f4db4b5d5b7d4b95d612eca56f815f41b4f8c) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Attempt to fix `fs` not found issue
+
+- [#4826](https://github.com/tinacms/tinacms/pull/4826) [`f0994c8`](https://github.com/tinacms/tinacms/commit/f0994c8f49122cd9d784bf47171715c529d2528f) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ♻️ Add index to key
+
+## 2.2.6
+
+### Patch Changes
+
+- [#4815](https://github.com/tinacms/tinacms/pull/4815) [`b64b046`](https://github.com/tinacms/tinacms/commit/b64b046dc67ae948513057f855b156ce0cf250d8) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Rich text editor | embed dropdown - added filtering and scroll support
+  Sidebar - added version number
+
+- [#4832](https://github.com/tinacms/tinacms/pull/4832) [`6cd3596`](https://github.com/tinacms/tinacms/commit/6cd35967ab0d34851be44199bc9821b128fcfc75) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Adds config options to allow users to customize position + description of filename fields
+
+- [#4818](https://github.com/tinacms/tinacms/pull/4818) [`96bdcb7`](https://github.com/tinacms/tinacms/commit/96bdcb79b30e96056c7b19614be260a6c3ef00da) Thanks [@JackDevAU](https://github.com/JackDevAU)! - lock headlessui to version 2.1.8
+
+- [#4803](https://github.com/tinacms/tinacms/pull/4803) [`a6a7735`](https://github.com/tinacms/tinacms/commit/a6a77351b97589c60de69445a9eb2ea57beb4343) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix module not found `tinacms/dist/cache` error at runtime due to broken webpack bundling
+
+- Updated dependencies [[`6cd3596`](https://github.com/tinacms/tinacms/commit/6cd35967ab0d34851be44199bc9821b128fcfc75), [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4)]:
+  - @tinacms/schema-tools@1.6.3
+  - @tinacms/mdx@1.4.3
+  - @tinacms/search@1.0.30
+
+## 2.2.5
+
+### Patch Changes
+
+- cf1530d: Rich text editor - add h6 support
+- 2762994: Fix node 22 issues with better-sqlite3. Updates sqlite-level
+- ba5f7a3: ⬆️ Update @headlessui/react from v1 to v2
+- Updated dependencies [2762994]
+- Updated dependencies [ba5f7a3]
+  - @tinacms/search@1.0.29
+
+## 2.2.4
+
+### Patch Changes
+
+- 75cf194: enable / in search for reference field selection component
+- 198c280: Media Manager: Update Tina media manager to report any errors that occur during asset upload / delete operations
+
+## 2.2.3
+
+### Patch Changes
+
+- 367faed: fix reference field search
+
+## 2.2.2
+
+### Patch Changes
+
+- 6ccda6c: ⚗️ Experimental - added reference field filter
+  Note: this will be deprecated in the near future for a more robust soution
+- 33eaa81: Minor code refactor in reference field selector
+- f59d67b: Media Manager - Make active item disappear on navigation and refresh
+- daeeebf: Fix issue where clicking Search in the admin UI resulted in a redirect instead of loading the search results
+- 27bfe84: CLI - Adds client caching and cli flag to disable: --no-client-build-cache
+- Updated dependencies [6ccda6c]
+- Updated dependencies [33eaa81]
+  - @tinacms/schema-tools@1.6.2
+  - @tinacms/mdx@1.4.2
+  - @tinacms/search@1.0.28
+
+## 2.2.1
+
+### Patch Changes
+
+- ae03e8e: Implementation for custom reference field selector
+- 4c9f221: Fix alt tags in TinaMarkdown
+- Updated dependencies [ae03e8e]
+  - @tinacms/schema-tools@1.6.1
+  - @tinacms/mdx@1.4.1
+  - @tinacms/search@1.0.27
+
 ## 2.2.0
 
 ### Minor Changes

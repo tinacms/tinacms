@@ -1,10 +1,9 @@
 import type { SearchClient } from '../types'
 import { SqliteLevel } from 'sqlite-level'
-import * as zlib from 'zlib'
 import si from 'search-index'
 import { MemoryLevel } from 'memory-level'
 import { lookupStopwords } from '../indexer/utils'
-import fetch, { Headers } from 'node-fetch'
+import * as zlib from 'node:zlib'
 
 const DEFAULT_TOKEN_SPLIT_REGEX = /[\p{L}\d_]+/gu
 

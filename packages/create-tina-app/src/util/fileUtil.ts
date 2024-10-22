@@ -1,25 +1,18 @@
-/**
-
-*/
-
 import fs from 'fs-extra'
 import path from 'path'
-import chalk from 'chalk'
+import { log, TextStyles } from './logger'
 
 export async function isWriteable(directory: string): Promise<boolean> {
   try {
-    //   @ts-ignore
+    // @ts-ignore
     await fs.promises.access(directory, (fs.constants || fs).W_OK)
     return true
   } catch (err) {
     return false
   }
 }
-export function makeDir(root: string): Promise<void> {
-  return fs.mkdirp(root)
-}
 
-export function isFolderEmpty(root: string, name: string): boolean {
+export function folderContainsInstallConflicts(root: string): string[] {
   const validFiles = [
     '.DS_Store',
     '.git',
@@ -47,30 +40,51 @@ export function isFolderEmpty(root: string, name: string): boolean {
     // Support IntelliJ IDEA-based editors
     .filter((file) => !/\.iml$/.test(file))
 
+  return conflicts
+}
+
+export async function setupProjectDirectory(dir: string): Promise<string> {
+  const appName = path.basename(dir)
+
+  await fs.mkdirp(dir)
+  process.chdir(dir)
+
+  const conflicts = folderContainsInstallConflicts(dir)
   if (conflicts.length > 0) {
-    console.log(
-      `The directory ${chalk.green(name)} contains files that could conflict:`
+    log.err(
+      `The directory '${TextStyles.bold(
+        appName
+      )}' contains files that could conflict. Below is a list of conflicts, please remove them and try again.`
     )
-    console.log()
     for (const file of conflicts) {
       try {
-        const stats = fs.lstatSync(path.join(root, file))
+        const stats = fs.lstatSync(path.join(dir, file))
         if (stats.isDirectory()) {
-          console.log(`  ${chalk.blue(file)}/`)
+          log.log(`-  ${TextStyles.info(file)}/`)
         } else {
-          console.log(`  ${file}`)
+          log.log(`-  ${file}`)
         }
       } catch {
-        console.log(`  ${file}`)
+        log.log(`-  ${file}`)
       }
     }
-    console.log()
-    console.log(
-      'Either try using a new directory name, or remove the files listed above.'
-    )
-    console.log()
-    return false
+
+    process.exit(1)
   }
 
-  return true
+  return appName
+}
+
+export function updateProjectPackageName(dir: string, name: string) {
+  const packageJsonPath = path.join(dir, 'package.json')
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+  packageJson.name = name
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
+}
+
+export function updateProjectPackageVersion(dir: string, version: string) {
+  const packageJsonPath = path.join(dir, 'package.json')
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+  packageJson.version = version
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
 }

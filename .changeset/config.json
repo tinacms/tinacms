@@ -1,13 +1,13 @@
 {
-  "$schema": "https://unpkg.com/@changesets/config@1.6.0/schema.json",
-  "changelog": "@changesets/cli/changelog",
-  "commit": false,
-  "linked": [],
-  "access": "restricted",
-  "baseBranch": "main",
-  "updateInternalDependencies": "patch",
-  "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
-    "onlyUpdatePeerDependentsWhenOutOfRange": true
-  },
-  "ignore": []
-}
+    "$schema": "https://unpkg.com/@changesets/config@3.0.3/schema.json",
+    "changelog": ["@changesets/changelog-github", { "repo": "tinacms/tinacms" }],
+    "commit": false,
+    "linked": [],
+    "access": "public",
+    "baseBranch": "main",
+    "updateInternalDependencies": "patch",
+    "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
+      "onlyUpdatePeerDependentsWhenOutOfRange": true
+    },
+    "ignore": []
+  }

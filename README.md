@@ -44,6 +44,15 @@ Go the extra mile and earn a Tina Dev Badge 🦙: [Earn a Tina Credly badge](./_
 
 Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.  -->
 
+## Vision
+
+To be the world-leading CMS with Git support that developers love.
+
+## Tech Stack
+
+See
+https://tina.io/docs/introduction/faq/#what-is-tinas-tech-stack
+
 ## Roadmap
 
 Our development priorities can be read on our [Public Roadmap](https://tina.io/roadmap/).

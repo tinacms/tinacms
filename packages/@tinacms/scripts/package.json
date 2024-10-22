@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/scripts",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "main": "dist/index.js",
   "files": [
     "dist",
@@ -19,13 +19,13 @@
   },
   "dependencies": {
     "@sucrase/jest-plugin": "^3.0.0",
-    "chalk": "^4.1.1",
-    "chokidar": "^3.5.2",
+    "chalk": "^4.1.2",
+    "chokidar": "^3.6.0",
     "commander": "^7.2.0",
-    "esbuild": "^0.15.5",
-    "fs-extra": "^9.0.1",
-    "tsup": "^8.1.2",
-    "typescript": "^5.5.4",
-    "vite": "^4.3.9"
+    "esbuild": "^0.15.18",
+    "fs-extra": "^11.2.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2",
+    "vite": "^4.5.5"
   }
 }

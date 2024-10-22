@@ -1,5 +1,133 @@
 # tinacms-cli
 
+## 1.6.10
+
+### Patch Changes
+
+- [#4825](https://github.com/tinacms/tinacms/pull/4825) [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Add Mermaid Support to Rich Text Field (Plate)
+  🐛 Fix tooltip rendering behind TinaCMS app
+
+- [#5004](https://github.com/tinacms/tinacms/pull/5004) [`74014ed`](https://github.com/tinacms/tinacms/commit/74014ed2df67e96e1a5fb2950e973528322671a3) Thanks [@Ben0189](https://github.com/Ben0189)! - Fix toolbar floating icon show up in different screen size
+
+- Updated dependencies [[`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36), [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47), [`eb519f2`](https://github.com/tinacms/tinacms/commit/eb519f27a4c0fe1b05c361db2c1fe2337e6c4e12), [`74014ed`](https://github.com/tinacms/tinacms/commit/74014ed2df67e96e1a5fb2950e973528322671a3), [`00f6525`](https://github.com/tinacms/tinacms/commit/00f6525871c7c6bd40091424337df72c7bfcf783)]:
+  - tinacms@2.3.0
+  - @tinacms/schema-tools@1.6.6
+  - @tinacms/app@2.1.10
+  - @tinacms/graphql@1.5.6
+  - @tinacms/metrics@1.0.7
+  - @tinacms/search@1.0.33
+
+## 1.6.9
+
+### Patch Changes
+
+- Updated dependencies [[`31513bb`](https://github.com/tinacms/tinacms/commit/31513bb473cd1d349a3711ef7c5075cf9d03f121), [`3b2aba8`](https://github.com/tinacms/tinacms/commit/3b2aba80ac14a512592f67a04f9e1792667db9dd)]:
+  - tinacms@2.2.9
+  - @tinacms/schema-tools@1.6.5
+  - @tinacms/app@2.1.9
+  - @tinacms/graphql@1.5.5
+  - @tinacms/search@1.0.32
+
+## 1.6.8
+
+### Patch Changes
+
+- [#4843](https://github.com/tinacms/tinacms/pull/4843) [`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Update Minor & Patch Dependencies Versions
+
+- Updated dependencies [[`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a)]:
+  - tinacms@2.2.8
+  - @tinacms/app@2.1.8
+  - @tinacms/graphql@1.5.4
+  - @tinacms/metrics@1.0.7
+  - @tinacms/schema-tools@1.6.4
+  - @tinacms/search@1.0.31
+
+## 1.6.7
+
+### Patch Changes
+
+- Updated dependencies [[`113f4db`](https://github.com/tinacms/tinacms/commit/113f4db4b5d5b7d4b95d612eca56f815f41b4f8c), [`f0994c8`](https://github.com/tinacms/tinacms/commit/f0994c8f49122cd9d784bf47171715c529d2528f)]:
+  - tinacms@2.2.7
+  - @tinacms/app@2.1.7
+
+## 1.6.6
+
+### Patch Changes
+
+- [#4803](https://github.com/tinacms/tinacms/pull/4803) [`a6a7735`](https://github.com/tinacms/tinacms/commit/a6a77351b97589c60de69445a9eb2ea57beb4343) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix module not found `tinacms/dist/cache` error at runtime due to broken webpack bundling
+
+- [#4804](https://github.com/tinacms/tinacms/pull/4804) [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4) Thanks [@dependabot](https://github.com/apps/dependabot)! - ⬆️ Updates Typescript to v5.5, @types/node to v22.x, next.js to latest version 14.x, and removes node-fetch
+
+- Updated dependencies [[`b64b046`](https://github.com/tinacms/tinacms/commit/b64b046dc67ae948513057f855b156ce0cf250d8), [`6cd3596`](https://github.com/tinacms/tinacms/commit/6cd35967ab0d34851be44199bc9821b128fcfc75), [`96bdcb7`](https://github.com/tinacms/tinacms/commit/96bdcb79b30e96056c7b19614be260a6c3ef00da), [`a6a7735`](https://github.com/tinacms/tinacms/commit/a6a77351b97589c60de69445a9eb2ea57beb4343), [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4)]:
+  - tinacms@2.2.6
+  - @tinacms/schema-tools@1.6.3
+  - @tinacms/app@2.1.6
+  - @tinacms/graphql@1.5.3
+  - @tinacms/metrics@1.0.6
+  - @tinacms/search@1.0.30
+
+## 1.6.5
+
+### Patch Changes
+
+- Updated dependencies [cf1530d]
+- Updated dependencies [2762994]
+- Updated dependencies [ba5f7a3]
+  - tinacms@2.2.5
+  - @tinacms/search@1.0.29
+  - @tinacms/app@2.1.5
+
+## 1.6.4
+
+### Patch Changes
+
+- a0ec2a5: Fix init bug causing invalid tina config
+- e24fe0b: Fix cacheDir path generation on Windows to avoid unescaped characters breaking esbuild
+- Updated dependencies [75cf194]
+- Updated dependencies [198c280]
+  - tinacms@2.2.4
+  - @tinacms/app@2.1.4
+
+## 1.6.3
+
+### Patch Changes
+
+- Updated dependencies [367faed]
+  - tinacms@2.2.3
+  - @tinacms/app@2.1.3
+
+## 1.6.2
+
+### Patch Changes
+
+- acf8430: Add rollup option to ignore "MODULE_LEVEL_DIRECTIVE"
+- 110f1ce: Fix tina-lock.json to not include search configuration, including search indexer token
+- 27bfe84: CLI - Adds client caching and cli flag to disable: --no-client-build-cache
+- Updated dependencies [6ccda6c]
+- Updated dependencies [33eaa81]
+- Updated dependencies [f088b97]
+- Updated dependencies [f59d67b]
+- Updated dependencies [daeeebf]
+- Updated dependencies [27bfe84]
+  - tinacms@2.2.2
+  - @tinacms/schema-tools@1.6.2
+  - @tinacms/graphql@1.5.2
+  - @tinacms/app@2.1.2
+  - @tinacms/search@1.0.28
+  - @tinacms/metrics@1.0.5
+
+## 1.6.1
+
+### Patch Changes
+
+- Updated dependencies [ae03e8e]
+- Updated dependencies [4c9f221]
+  - @tinacms/schema-tools@1.6.1
+  - tinacms@2.2.1
+  - @tinacms/graphql@1.5.1
+  - @tinacms/search@1.0.27
+  - @tinacms/app@2.1.1
+
 ## 1.6.0
 
 ### Minor Changes

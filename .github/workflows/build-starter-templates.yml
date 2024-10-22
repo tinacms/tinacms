@@ -1,0 +1,118 @@
+name: Build TinaCMS Starter Templates
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * 1-5'
+
+jobs:
+  build-templates:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        package-manager: [yarn, npm, pnpm]
+        template:
+          - tina-cloud-starter
+          - tina-hugo-starter
+          - tina-remix-starter
+          - tinasaurus
+          - basic
+        node-version: [18, 20, 22]
+    outputs:
+      failed: ${{ steps.report-errors.outputs.failed }}
+
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: latest
+        if: ${{ matrix.package-manager == 'pnpm' }}
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 'latest'
+        if: ${{ matrix.template == 'tina-hugo-starter' }}
+
+      - name: Setup build tokens
+        run: |
+          if [[ "${{ matrix.template }}" == "tina-cloud-starter" ]]; then
+            echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINA_CLOUD_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINA_CLOUD_STARTER_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "tina-hugo-starter" ]]; then
+            echo "TINA_CLIENT_ID=${{ secrets.TINA_HUGO_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINA_HUGO_STARTER_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "tina-remix-starter" ]]; then
+            echo "TINA_CLIENT_ID=${{ secrets.TINA_REMIX_STARTER_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINA_REMIX_STARTER_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "tinasaurus" ]]; then
+            echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.TINASAURUS_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.TINASAURUS_TOKEN }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.template }}" == "basic" ]]; then
+            echo "NEXT_PUBLIC_TINA_CLIENT_ID=${{ secrets.BASIC_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "TINA_TOKEN=${{ secrets.BASIC_TOKEN }}" >> $GITHUB_ENV
+          fi
+
+          echo "NEXT_PUBLIC_TINA_BRANCH=main" >> $GITHUB_ENV
+          echo "TINA_BRANCH=main" >> $GITHUB_ENV
+
+      - name: Run create-tina-app
+        id: create-tina-app
+        run: npx create-tina-app@latest template-repo --pkg-manager ${{ matrix.package-manager }} --template ${{ matrix.template }}
+
+      - name: Run build
+        id: build
+        run: |
+          cd template-repo
+          ${{ matrix.package-manager }} install && ${{ matrix.package-manager }} run build
+
+      - name: Report errors
+        continue-on-error: false
+        id: report-errors
+        if: failure()
+        run: |
+          if [[ "${{ steps.create-tina-app.outcome }}" == "failure" ]]; then
+            ERROR_STEP="create-tina-app"
+          else
+            ERROR_STEP="build"
+          fi
+
+          ISSUE_TITLE="Starter template '${{ matrix.template }}' failed during $ERROR_STEP with ${{ matrix.package-manager }} using Node ${{ matrix.node-version }}"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ISSUE_BODY=$(cat <<EOF
+          The **${{ matrix.template }}** starter template failed during $ERROR_STEP with **${{ matrix.package-manager }}** using Node **${{ matrix.node-version }}**.
+
+          Check the full workflow logs for more details: [View Workflow Run]($RUN_URL)
+          EOF
+          )
+
+          echo $ISSUE_TITLE >> $GITHUB_STEP_SUMMARY
+          echo "failed=true" >> $GITHUB_OUTPUT
+
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          if gh issue -R tinacms/tinacms list --state open --limit 100 --search "$ISSUE_TITLE" | grep -q "$ISSUE_TITLE"; then
+            echo "Issue already exists. Skipping issue creation."
+          else
+            echo "Creating a new issue..."
+            gh issue -R tinacms/tinacms create --title "$ISSUE_TITLE" --label "bug" --body "$ISSUE_BODY"
+          fi
+
+  # Required to check for failures due to the `continue-on-error` being set to true.
+  check-failures:
+    needs: build-templates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if any job failed
+        run: |
+          if [[ "${{ needs.build-templates.outputs.failed }}" == "true" ]]; then
+            echo "One or more commands failed."
+            exit 1
+          else
+            echo "All commands succeeded."
+          fi

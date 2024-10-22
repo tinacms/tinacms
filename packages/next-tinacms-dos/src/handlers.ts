@@ -109,6 +109,9 @@ async function uploadMedia(
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const filePath = req.file.path
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const fileType = req.file?.mimetype
   const blob = fs.readFileSync(filePath)
   const filename = path.basename(filePath)
   const params: PutObjectCommandInput = {
@@ -118,6 +121,7 @@ async function uploadMedia(
       : prefix + filename,
     Body: blob,
     ACL: 'public-read',
+    ContentType: fileType || 'application/octet-stream',
   }
   const command = new PutObjectCommand(params)
 
@@ -249,7 +253,13 @@ async function deleteAsset(
   bucket: string
 ) {
   const { media } = req.query
-  const [, objectKey] = media as string[]
+  let [, objectKey] = media as string[]
+  const objectKeyIsSplit =
+    media && media.length > 2 && typeof media !== 'string'
+
+  if (objectKeyIsSplit) {
+    objectKey = media.slice(1).join('/')
+  }
 
   const params: DeleteObjectCommandInput = {
     Bucket: bucket,
