@@ -1,24 +1,19 @@
 import type { Cache } from './index'
 
-//? Note - These will need to be changed from using require to import when we eventually move to ESM
-// makeCacheDir creates the cache directory if it doesn't exist
+// Create the cache directory if it doesn't exist.
+// Returns the path of the cache directory.
 const makeCacheDir = async (dir: string, fs: any) => {
+  // TODO: These will need to be changed from using require to import when we eventually move to ESM
   const path = require('node:path')
   const os = require('node:os')
 
-  // Ensure that `dir` is a valid string
-  if (typeof dir !== 'string' || !dir.trim()) {
-    throw new Error('Invalid directory path')
-  }
-
   const pathParts = dir.split(path.sep)
   const cacheHash = pathParts[pathParts.length - 1]
+  const rootUser = pathParts[0]
   let cacheDir = dir
 
-  // ["Users", "jackpettit", "Developer", "tina", "tina-cloud-starter", "tina", "__generated__", "".cache", "1729659325506"]
-  // "/tmp/17.../"
-
-  if (!fs.existsSync(dir)) {
+  // Check if the root directory exists. If not, create the cache in the tmp directory.
+  if (!fs.existsSync(rootUser)) {
     cacheDir = path.join(os.tmpdir(), cacheHash)
   }
 
