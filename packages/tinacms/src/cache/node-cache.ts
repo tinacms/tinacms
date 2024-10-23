@@ -10,15 +10,15 @@ const makeCacheDir = async (dir: string, fs: any) => {
     throw new Error('Invalid directory path')
   }
 
-  const parts = dir.split(path.sep).filter(Boolean)
-
+  const pathParts = dir.split(path.sep)
+  const cacheHash = pathParts[pathParts.length - 1]
   let cacheDir = dir
 
-  console.log('Logging path: ', JSON.stringify(parts))
-  console.log('Logging joined: ', path.join(path.sep, parts[0]))
+  // ["Users", "jackpettit", "Developer", "tina", "tina-cloud-starter", "tina", "__generated__", "".cache", "1729659325506"]
+  // "/tmp/17.../"
 
-  if (!fs.existsSync(path.join(path.sep, parts?.[0]))) {
-    cacheDir = path.join(os.tmpdir(), parts?.[parts.length - 1])
+  if (!fs.existsSync(dir)) {
+    cacheDir = path.join(os.tmpdir(), cacheHash)
   }
 
   try {
