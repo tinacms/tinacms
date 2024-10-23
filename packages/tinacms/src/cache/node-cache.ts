@@ -14,7 +14,7 @@ const makeCacheDir = async (dir: string, fs: any) => {
 
   let cacheDir = dir
 
-  console.log('Logging path: ', path)
+  console.log('Logging path: ', JSON.stringify(parts))
   console.log('Logging joined: ', path.join(path.sep, parts[0]))
 
   if (!fs.existsSync(path.join(path.sep, parts?.[0]))) {
