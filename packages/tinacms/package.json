@@ -1,6 +1,6 @@
 {
 	"name": "tinacms",
-	"version": "2.2.9",
+	"version": "2.3.0",
 	"main": "dist/index.js",
 	"module": "./dist/index.mjs",
 	"exports": {
@@ -35,7 +35,9 @@
 			"require": "./dist/rich-text/prism.js"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"buildConfig": {
 		"entryPoints": [
 			"src/index.ts",
@@ -46,7 +48,12 @@
 		],
 		"build": {
 			"rollupOptions": {
-				"external": ["crypto", "fs", "path", "os"]
+				"external": [
+					"crypto",
+					"fs",
+					"path",
+					"os"
+				]
 			}
 		}
 	},
