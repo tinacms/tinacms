@@ -1,5 +1,6 @@
 import type { Cache } from './index'
 
+//? Note - These will need to be changed from using require to import when we eventually move to ESM
 // makeCacheDir creates the cache directory if it doesn't exist
 const makeCacheDir = async (dir: string, fs: any) => {
   const path = require('node:path')
@@ -10,7 +11,6 @@ const makeCacheDir = async (dir: string, fs: any) => {
     throw new Error('Invalid directory path')
   }
 
-  console.log('Path sep', path.sep)
   const pathParts = dir.split(path.sep)
   const cacheHash = pathParts[pathParts.length - 1]
   let cacheDir = dir
@@ -34,7 +34,6 @@ const makeCacheDir = async (dir: string, fs: any) => {
 export const NodeCache = async (dir: string): Promise<Cache> => {
   // Change to require?
   const fs = require('node:fs')
-  console.log('fs', JSON.stringify(fs))
 
   const { createHash } = require('node:crypto')
   const cacheDir = await makeCacheDir(dir, fs)
