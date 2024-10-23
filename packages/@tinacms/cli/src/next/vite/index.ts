@@ -157,8 +157,6 @@ export const createConfig = async ({
 
   const isBrowser = typeof window !== 'undefined'
 
-  console.log('configManager IS BROWSER? - ', isBrowser)
-
   const alias = {
     TINA_IMPORT: configManager.prebuildFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
@@ -172,8 +170,6 @@ export const createConfig = async ({
       path: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     }),
   }
-
-  console.log('alias - ', JSON.stringify(alias))
 
   if (configManager.shouldSkipSDK()) {
     alias['CLIENT_IMPORT'] = path.join(
@@ -230,7 +226,6 @@ export const createConfig = async ({
       // Not 100% sure why this isn't being picked up automatically, this works from within the monorepo
       // but breaks externally
       include: ['react/jsx-runtime', 'react/jsx-dev-runtime'],
-      exclude: ['fs', 'os', 'path', 'crypto'],
     },
     server: {
       host: configManager.config?.build?.host ?? false,

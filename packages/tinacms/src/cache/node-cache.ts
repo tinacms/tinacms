@@ -3,13 +3,14 @@ import type { Cache } from './index'
 // makeCacheDir creates the cache directory if it doesn't exist
 const makeCacheDir = async (dir: string, fs: any) => {
   const path = await import('node:path')
-  const os = await import('node:os')
+  const os = require('node:os')
 
   // Ensure that `dir` is a valid string
   if (typeof dir !== 'string' || !dir.trim()) {
     throw new Error('Invalid directory path')
   }
 
+  console.log('Path sep', path.sep)
   const pathParts = dir.split(path.sep)
   const cacheHash = pathParts[pathParts.length - 1]
   let cacheDir = dir
@@ -32,7 +33,7 @@ const makeCacheDir = async (dir: string, fs: any) => {
 
 export const NodeCache = async (dir: string): Promise<Cache> => {
   // Change to require?
-  const fs = await import('node:fs')
+  const fs = require('node:fs')
   console.log('fs', JSON.stringify(fs))
 
   const { createHash } = await import('node:crypto')
