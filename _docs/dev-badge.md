@@ -7,7 +7,7 @@ Here are the steps to complete your journey:
 1. Join [Tina's Discord channel](https://discord.com/invite/zumN63Ybpf) - You can leave a message on the `#introductions`, i.e.:
 
    > Hi, I am trying out TinaCMS with {{ TECH eg. NextJS }}
-     After I have evaluated TinaCMS, I plan to use it in to build {{ BLOG, PORTFOLIO, DOCUMENTATION SITE, ETC }}  
+     After I have evaluated TinaCMS, I plan to use it to build {{ BLOG, PORTFOLIO, DOCUMENTATION SITE, ETC }}  
      Previous CMSs I have used include {{ FILL IN }}
 
 2. Get TinaCMS running and deploy a site using [tina.io](https://tina.io) and [TinaCloud](https://app.tina.io/signin)
