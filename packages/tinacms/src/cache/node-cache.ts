@@ -31,7 +31,8 @@ const makeCacheDir = async (dir: string, fs: any) => {
 }
 
 export const NodeCache = async (dir: string): Promise<Cache> => {
-  const fs = await import('node:fs')
+  // Change to require?
+  const fs = require('node:fs')
   console.log('fs', JSON.stringify(fs))
 
   const { createHash } = await import('node:crypto')
