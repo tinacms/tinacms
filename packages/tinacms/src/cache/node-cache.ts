@@ -5,15 +5,28 @@ const makeCacheDir = async (dir: string, fs: any) => {
   const path = await import('node:path')
   const os = await import('node:os')
 
+  // Ensure that `dir` is a valid string
+  if (typeof dir !== 'string' || !dir.trim()) {
+    throw new Error('Invalid directory path')
+  }
+
   const parts = dir.split(path.sep).filter(Boolean)
 
   let cacheDir = dir
-  // check if the root directory exists, if not then create create in tmp and return new path
-  if (!fs.existsSync(path.join(path.sep, parts[0]))) {
-    cacheDir = path.join(os.tmpdir(), parts[parts.length - 1])
+
+  console.log('Logging path: ', path)
+  console.log('Logging joined: ', path.join(path.sep, parts[0]))
+
+  if (!fs.existsSync(path.join(path.sep, parts?.[0]))) {
+    cacheDir = path.join(os.tmpdir(), parts?.[parts.length - 1])
   }
 
-  fs.mkdirSync(cacheDir, { recursive: true })
+  try {
+    fs.mkdirSync(cacheDir, { recursive: true })
+  } catch (error) {
+    throw new Error(`Failed to create cache directory: ${error.message}`)
+  }
+
   return cacheDir
 }
 
