@@ -3,4 +3,4 @@
 "@tinacms/cli": patch
 ---
 
-⚠️  Don't Merge ⚠️  makeCacheDir Check
+🐛 fix r.join error when building pages
