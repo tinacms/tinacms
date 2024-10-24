@@ -10,13 +10,8 @@ describe('makeCacheDir', () => {
       mkdirSync: vi.fn(),
     }
 
-    const mockPath = {
-      sep: '/',
-      join: vi.fn((...args) => path.join(...args)),
-    }
-
     const dir = '/root/.cache/1234'
-    const result = await makeCacheDir(dir, mockFs, mockPath, {})
+    const result = await makeCacheDir(dir, mockFs, path, {})
 
     expect(result).toBe(dir)
     expect(mockFs.existsSync).toHaveBeenCalledWith('/root')
@@ -35,13 +30,8 @@ describe('makeCacheDir', () => {
       tmpdir: vi.fn().mockReturnValue('/var'),
     }
 
-    const mockPath = {
-      sep: '/',
-      join: vi.fn((...args) => path.join(...args)),
-    }
-
     const dir = '/nonexistent/.cache/1234'
-    const result = await makeCacheDir(dir, mockFs, mockPath, mockOs)
+    const result = await makeCacheDir(dir, mockFs, path, mockOs)
 
     expect(result).toBe('/var/1234')
     expect(mockFs.existsSync).toHaveBeenCalledWith('/nonexistent')
@@ -60,14 +50,9 @@ describe('makeCacheDir', () => {
       }),
     }
 
-    const mockPath = {
-      sep: '/',
-      join: vi.fn((...args) => path.join(...args)),
-    }
-
     const dir = '/root/.cache/1234'
 
-    await expect(makeCacheDir(dir, mockFs, mockPath, {})).rejects.toThrow(
+    await expect(makeCacheDir(dir, mockFs, path, {})).rejects.toThrow(
       'Failed to create cache directory: mkdir failed'
     )
   })
