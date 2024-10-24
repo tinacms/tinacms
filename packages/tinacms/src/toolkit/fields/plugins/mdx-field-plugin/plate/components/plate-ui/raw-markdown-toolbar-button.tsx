@@ -27,7 +27,13 @@ export const RawMarkdownToolbarButton = withRef<
 >(({ clear, ...rest }, ref) => {
   const { props } = useRawMarkdownToolbarButton()
   return (
-    <ToolbarButton ref={ref} tooltip="Link" {...rest} {...props}>
+    <ToolbarButton
+      ref={ref}
+      tooltip="Link"
+      {...rest}
+      {...props}
+      data-testid="markdown-button"
+    >
       <Icons.raw />
     </ToolbarButton>
   )
