@@ -85,6 +85,40 @@ const config = defineConfig({
             label: 'Body',
             name: '_body',
             templates: [
+              {
+                name: 'dropBox',
+                label: 'DropBox',
+                inline: true,
+                fields: [
+                  {
+                    name: 'title',
+                    label: 'Short Description',
+                    type: 'string',
+                    required: true,
+                  },
+                  {
+                    name: 'body',
+                    label: 'Expanded Information',
+                    type: 'rich-text',
+                    required: true,
+                    templates: [
+                      {
+                        name: 'dropBox',
+                        label: 'DropBox',
+                        inline: true,
+                        fields: [
+                          {
+                            name: 'title',
+                            label: 'Short Description',
+                            type: 'string',
+                            required: true,
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
               tinaTableTemplate,
               {
                 name: 'DateTime',
