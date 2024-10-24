@@ -159,13 +159,12 @@ export const createConfig = async ({
     TINA_IMPORT: configManager.prebuildFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
     STATIC_MEDIA_IMPORT: staticMediaPath,
-
-    // browser build only replacements
     crypto: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     fs: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     os: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     path: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
   }
+
   if (configManager.shouldSkipSDK()) {
     alias['CLIENT_IMPORT'] = path.join(
       configManager.spaRootPath,
