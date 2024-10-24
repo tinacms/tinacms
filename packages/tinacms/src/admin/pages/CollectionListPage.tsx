@@ -351,6 +351,12 @@ const CollectionListPage = () => {
                               )
                               reFetchCollection()
                             } catch (error) {
+                              if (error.message.indexOf('has references')) {
+                                cms.alerts.error(
+                                  error.message.split('\n\t').filter(Boolean)[1]
+                                )
+                                return
+                              }
                               cms.alerts.warn(
                                 'Document was not deleted, ask a developer for help or check the console for an error message'
                               )
@@ -405,6 +411,12 @@ const CollectionListPage = () => {
                             cms.alerts.info('Document was successfully renamed')
                             reFetchCollection()
                           } catch (error) {
+                            if (error.message.indexOf('has references')) {
+                              cms.alerts.error(
+                                error.message.split('\n\t').filter(Boolean)[1]
+                              )
+                              return
+                            }
                             cms.alerts.warn(
                               'Document was not renamed, ask a developer for help or check the console for an error message'
                             )
