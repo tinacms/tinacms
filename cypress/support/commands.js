@@ -34,10 +34,6 @@ Cypress.Commands.add('getRTE', () => {
   )
 })
 
-Cypress.Commands.add('focusRTE', () => {
-  return cy.getRTE().children().first().click('bottomLeft')
-})
-
 Cypress.Commands.add('getPageRTEBody', () => {
   return cy
     .get(`iframe[data-test="tina-iframe"]`)

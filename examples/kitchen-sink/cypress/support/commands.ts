@@ -42,10 +42,6 @@ const getIframeBody = () => {
   )
 }
 
-Cypress.Commands.add('focusRTE', () => {
-  return cy.getRTE().children().first().click('bottomLeft')
-})
-
 Cypress.Commands.add('getPageRTEBody', () => {
   return getIframeBody().find(`[data-test="rich-text-body"]`)
 })
