@@ -74,34 +74,3 @@ Cypress.Commands.add('getSaveButton', () => {
 Cypress.Commands.add('save', () => {
   cy.getSaveButton().click()
 })
-
-Cypress.Commands.add(
-  'assertRTE',
-  (markdown = '', typed = '', wantedHTML = '', wantedMD = '') => {
-    // This type of test is not support with the data layer so ignore for now
-    if (markdown) return
-    // if (markdown !== null) cy.task('writemdx', markdown)
-
-    cy.visit('/admin/index.html#/~')
-
-    cy.login()
-
-    cy.focusRTE()
-
-    if (typed) cy.getRTE().type(typed)
-
-    cy.getPageRTEBody().should('contain.html', wantedHTML)
-
-    if (!wantedMD) return
-
-    cy.save()
-
-    // TODO: See why this is needed on windows
-    cy.wait(4000)
-
-    cy.task('readrawmdx').then((content) => {
-      console.info('readrawmdx', content)
-      expect(content).to.contain(wantedMD)
-    })
-  }
-)
