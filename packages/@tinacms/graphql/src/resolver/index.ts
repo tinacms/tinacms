@@ -811,6 +811,7 @@ export class Resolver {
       }
       if (isDeletion) {
         const doc = await this.getDocument(realPath)
+        await this.deleteDocument(realPath)
         if (await this.hasReferences(realPath, collection)) {
           const collRefs = await this.findReferences(realPath, collection)
           for (const [collection, refFields] of Object.entries(collRefs)) {
