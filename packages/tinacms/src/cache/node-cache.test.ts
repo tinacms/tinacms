@@ -12,10 +12,10 @@ describe('makeCacheDir', () => {
 
     const mockPath = {
       sep: '/',
-      join: vi.fn((root) => path.join('/', root)),
+      join: vi.fn((...args) => path.join('/', ...args)),
     }
 
-    const dir = '/root/cache'
+    const dir = '/root/.cache/1234'
     const result = await makeCacheDir(dir, mockFs, mockPath, {})
 
     expect(result).toBe(dir)
@@ -37,15 +37,15 @@ describe('makeCacheDir', () => {
 
     const mockPath = {
       sep: '/',
-      join: vi.fn((root) => path.join('/', root)),
+      join: vi.fn((...args) => path.join('/', ...args)),
     }
 
-    const dir = '/nonexistent/cache'
+    const dir = '/nonexistent/.cache/1234'
     const result = await makeCacheDir(dir, mockFs, mockPath, mockOs)
 
-    expect(result).toBe('/var/cache')
+    expect(result).toBe('/var/1234')
     expect(mockFs.existsSync).toHaveBeenCalledWith('/nonexistent')
-    expect(mockFs.mkdirSync).toHaveBeenCalledWith('/var/cache', {
+    expect(mockFs.mkdirSync).toHaveBeenCalledWith('/var/1234', {
       recursive: true,
     })
   })
@@ -62,10 +62,10 @@ describe('makeCacheDir', () => {
 
     const mockPath = {
       sep: '/',
-      join: vi.fn((root) => path.join('/', root)),
+      join: vi.fn((...args) => path.join('/', ...args)),
     }
 
-    const dir = '/root/cache'
+    const dir = '/root/.cache/1234'
 
     await expect(makeCacheDir(dir, mockFs, mockPath, {})).rejects.toThrow(
       'Failed to create cache directory: mkdir failed'
