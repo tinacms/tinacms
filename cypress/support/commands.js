@@ -34,19 +34,6 @@ Cypress.Commands.add('getRTE', () => {
   )
 })
 
-Cypress.Commands.add('getPageRTEBody', () => {
-  return cy
-    .get(`iframe[data-test="tina-iframe"]`)
-    .should('exist')
-    .its('0.contentDocument')
-    .should('exist')
-    .its('body')
-    .should('not.be.undefined')
-    .then(cy.wrap)
-    .find('[data-test="rich-text-body"]')
-    .should('exist')
-})
-
 Cypress.Commands.add('login', () => {
   // Fake Login
   localStorage.setItem('tina.isEditing', 'true')

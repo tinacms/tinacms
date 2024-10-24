@@ -42,10 +42,6 @@ const getIframeBody = () => {
   )
 }
 
-Cypress.Commands.add('getPageRTEBody', () => {
-  return getIframeBody().find(`[data-test="rich-text-body"]`)
-})
-
 Cypress.Commands.add('login', () => {
   // Fake Login
   localStorage.setItem('tina.isEditing', 'true')
