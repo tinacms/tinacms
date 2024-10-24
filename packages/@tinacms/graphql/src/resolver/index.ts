@@ -1073,6 +1073,7 @@ export class Resolver {
                 },
               ],
             }),
+            sort: ref.field.name,
           },
           (refId: string) => {
             count++
@@ -1118,6 +1119,7 @@ export class Resolver {
                 },
               ],
             }),
+            sort: ref.field.name,
           },
           (refId: string) => {
             if (!references[collection]) {
