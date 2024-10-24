@@ -155,20 +155,14 @@ export const createConfig = async ({
     await fs.outputFile(staticMediaPath, `[]`)
   }
 
-  const isBrowser = typeof window !== 'undefined'
-
   const alias = {
     TINA_IMPORT: configManager.prebuildFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
     STATIC_MEDIA_IMPORT: staticMediaPath,
-
-    // browser build only replacements
-    ...(isBrowser && {
-      crypto: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
-      fs: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
-      os: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
-      path: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
-    }),
+    crypto: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
+    fs: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
+    os: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
+    path: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
   }
 
   if (configManager.shouldSkipSDK()) {
