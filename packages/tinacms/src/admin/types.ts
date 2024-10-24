@@ -28,6 +28,9 @@ export interface DocumentNode {
 
 export interface DocumentForm {
   _values: Object
+  _sys?: {
+    hasReferences?: boolean
+  }
 }
 
 export interface DocumentSys {

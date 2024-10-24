@@ -68,6 +68,22 @@ export class TinaSchema {
       collectionNames.includes(collection.name)
     )
   }
+
+  public findReferences(name: string) {
+    const result: Record<string, { path: string[]; field: TinaField }[]> = {}
+    this.walkFields(({ field, collection: c, path }) => {
+      if (field.type === 'reference') {
+        if (field.collections.includes(name)) {
+          if (result[c.name] === undefined) {
+            result[c.name] = []
+          }
+          result[c.name].push({ path, field })
+        }
+      }
+    })
+    return result
+  }
+
   public getCollection = (collectionName: string): Collection<true> => {
     const collection = this.schema.collections.find(
       (collection) => collection.name === collectionName

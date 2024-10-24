@@ -108,6 +108,11 @@ const scalarDefinitions = [
         type: astBuilder.TYPES.String,
       }),
       astBuilder.FieldDefinition({
+        name: 'hasReferences',
+        required: false,
+        type: astBuilder.TYPES.Boolean,
+      }),
+      astBuilder.FieldDefinition({
         name: 'breadcrumbs',
         required: true,
         type: astBuilder.TYPES.String,
