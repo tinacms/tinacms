@@ -1,6 +1,6 @@
 {
 	"name": "tinacms",
-	"version": "2.2.9",
+	"version": "2.3.0",
 	"main": "dist/index.js",
 	"module": "./dist/index.mjs",
 	"exports": {
@@ -117,6 +117,7 @@
 		"lodash.get": "^4.4.2",
 		"lodash.set": "^4.3.2",
 		"lucide-react": "^0.424.0",
+		"mermaid": "9.3.0",
 		"moment": "2.29.4",
 		"monaco-editor": "0.31.0",
 		"prism-react-renderer": "^2.4.0",

@@ -2,7 +2,7 @@
 
 */
 
-import { Schema } from '../types'
+import type { Schema } from '../types'
 import { validateSchema } from '.'
 
 let consoleErrMock: any
