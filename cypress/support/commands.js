@@ -34,14 +34,6 @@ Cypress.Commands.add('getRTE', () => {
   )
 })
 
-Cypress.Commands.add('login', () => {
-  // Fake Login
-  localStorage.setItem('tina.isEditing', 'true')
-  localStorage.setItem('tina.local.isLogedIn', 'true')
-
-  cy.reload()
-})
-
 Cypress.Commands.add('logout', () => {
   // Fake Logout
   localStorage.removeItem('tina.isEditing')
