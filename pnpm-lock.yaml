@@ -710,8 +710,8 @@ importers:
                 specifier: ^4.5.5
                 version: 4.5.5(@types/node@22.7.4)
             yup:
-                specifier: ^0.32.11
-                version: 0.32.11
+                specifier: ^1.4.0
+                version: 1.4.0
             zod:
                 specifier: ^3.23.8
                 version: 3.23.8
@@ -741,8 +741,8 @@ importers:
                 specifier: 1.2.0
                 version: 1.2.0
             '@types/fs-extra':
-                specifier: ^9.0.13
-                version: 9.0.13
+                specifier: ^11.0.4
+                version: 11.0.4
             '@types/jest':
                 specifier: 26.0.4
                 version: 26.0.4
@@ -765,8 +765,8 @@ importers:
                 specifier: ^2.4.9
                 version: 2.4.9
             '@types/yup':
-                specifier: ^0.29.14
-                version: 0.29.14
+                specifier: ^0.32.0
+                version: 0.32.0
             jest:
                 specifier: ^29.7.0
                 version: 29.7.0(@types/node@22.7.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.7.4)(typescript@5.6.2))

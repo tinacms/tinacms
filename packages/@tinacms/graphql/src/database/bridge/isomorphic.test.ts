@@ -232,7 +232,7 @@ describe('isomorphic bridge', () => {
     test('non-existent post', async () => {
       const filepath = 'content/posts/foobar.mdx'
       await expect(bridge.delete(filepath)).rejects.toMatchInlineSnapshot(
-        `[GraphQLError: Unable to resolve path: content/posts/foobar.mdx]`
+        '[GraphQLError: Unable to resolve path: content/posts/foobar.mdx]'
       )
     })
 
