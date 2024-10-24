@@ -1,5 +1,18 @@
 # tinacms-cli
 
+## 1.6.11
+
+### Patch Changes
+
+- [#5225](https://github.com/tinacms/tinacms/pull/5225) [`0daf0b6`](https://github.com/tinacms/tinacms/commit/0daf0b687b36614a1fdf904b1d5125e4c63e81a9) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Addresses peer dependency issues and applies necessary updates
+
+- Updated dependencies [[`bbf2f81`](https://github.com/tinacms/tinacms/commit/bbf2f81143eb400faf8aa4dff33b8a58fa5059c8), [`0daf0b6`](https://github.com/tinacms/tinacms/commit/0daf0b687b36614a1fdf904b1d5125e4c63e81a9)]:
+  - tinacms@2.3.1
+  - @tinacms/graphql@1.5.7
+  - @tinacms/schema-tools@1.6.7
+  - @tinacms/app@2.1.11
+  - @tinacms/search@1.0.34
+
 ## 1.6.10
 
 ### Patch Changes
