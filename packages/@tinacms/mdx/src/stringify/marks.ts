@@ -128,7 +128,22 @@ const inlineElementExceptLink = (
     default:
       // @ts-expect-error type is 'never'
       if (!content.type && typeof content.text === 'string') {
-        return text(content)
+        // It's possible that a node's `type` value is stripped out
+        // While that is a bug that should be fixed, we can handle it
+        // by assuming it's a text node and processing it as such
+        const contentAsObject = content as { text: string }
+        const nodes = eat(
+          [{ type: 'text', ...contentAsObject }],
+          field,
+          imageCallback
+        )
+        const first = nodes[0]
+
+        if (first) {
+          return first
+        } else {
+          return text(content)
+        }
       }
       throw new Error(`InlineElement: ${content.type} is not supported`)
   }
