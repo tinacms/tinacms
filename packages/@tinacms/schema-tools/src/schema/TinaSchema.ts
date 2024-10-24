@@ -70,20 +70,17 @@ export class TinaSchema {
   }
 
   public findReferences(name: string) {
-    const result: Record<string, TinaField[]> = {}
-    const collections = this.getCollections()
-    for (const c of collections) {
-      for (const field of c.fields || []) {
-        if (field.type === 'reference') {
-          if (field.collections.includes(name)) {
-            if (result[c.name] === undefined) {
-              result[c.name] = []
-            }
-            result[c.name].push(field)
+    const result: Record<string, { path: string[]; field: TinaField }[]> = {}
+    this.walkFields(({ field, collection: c, path }) => {
+      if (field.type === 'reference') {
+        if (field.collections.includes(name)) {
+          if (result[c.name] === undefined) {
+            result[c.name] = []
           }
+          result[c.name].push({ path, field })
         }
       }
-    }
+    })
     return result
   }
 

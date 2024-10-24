@@ -8,6 +8,7 @@ import { assertShape, lastItem, sequential } from '../util'
 import { NAMER } from '../ast-builder'
 import isValid from 'date-fns/isValid/index.js'
 import { parseMDX, stringifyMDX } from '../mdx'
+import { JSONPath } from 'jsonpath-plus'
 
 import type {
   Collectable,
@@ -274,6 +275,42 @@ export const transformDocumentIntoPayload = async (
     throw e
   }
 }
+
+/**
+ * Updates a property in an object using a JSONPath.
+ * @param {Object} obj - The object to update.
+ * @param {string} path - The JSONPath string.
+ * @param {*} newValue - The new value to set at the specified path.
+ * @returns {Object} - The updated object.
+ */
+const updateObjectWithJsonPath = (obj, path, newValue) => {
+  // Handle the case where path is a simple top-level property
+  if (!path.includes('.') && !path.includes('[')) {
+    if (path in obj) {
+      obj[path] = newValue
+    }
+    return obj
+  }
+
+  // For non-top-level properties, find the parent of the property to update
+  const parentPath = path.replace(/\.[^.]+$/, '')
+  const keyToUpdate = path.match(/[^.]+$/)[0]
+
+  // Retrieve the parent object using the parent path
+  const parents = JSONPath({ path: parentPath, json: obj, resultType: 'value' })
+
+  if (parents.length > 0) {
+    parents.forEach((parent) => {
+      if (parent && typeof parent === 'object' && keyToUpdate in parent) {
+        // Update the property with the new value
+        parent[keyToUpdate] = newValue
+      }
+    })
+  }
+
+  return obj
+}
+
 /**
  * The resolver provides functions for all possible types of lookup
  * values and retrieves them from the database
@@ -775,20 +812,21 @@ export class Resolver {
       if (isDeletion) {
         const doc = await this.getDocument(realPath)
         if (await this.hasReferences(realPath, collection)) {
-          const refs = await this.findReferences(realPath, collection)
-          for (const [c, val] of Object.entries(refs)) {
-            for (const item of val.items) {
-              const refDoc = await this.getRaw(item)
-              for (const f of val.fields) {
-                if (refDoc[f.name] === realPath) {
-                  refDoc[f.name] = null
-                  await this.database.put(item, refDoc, c)
-                }
+          const collRefs = await this.findReferences(realPath, collection)
+          for (const [collection, refFields] of Object.entries(collRefs)) {
+            for (const [refPath, refs] of Object.entries(refFields)) {
+              let refDoc = await this.getRaw(refPath)
+              for (const ref of refs) {
+                refDoc = updateObjectWithJsonPath(
+                  refDoc,
+                  ref.path.join('.'),
+                  null
+                )
               }
+              await this.database.put(refPath, refDoc, collection)
             }
           }
         }
-        await this.deleteDocument(realPath)
         return doc
       }
       if (isUpdateName) {
@@ -811,16 +849,18 @@ export class Resolver {
         // Delete the old document
         await this.deleteDocument(realPath)
         // Update references to the document
-        const refs = await this.findReferences(realPath, collection)
-        for (const [c, val] of Object.entries(refs)) {
-          for (const item of val.items) {
-            const refDoc = await this.getRaw(item)
-            for (const f of val.fields) {
-              if (refDoc[f.name] === realPath) {
-                refDoc[f.name] = newRealPath
-                await this.database.put(item, refDoc, c)
-              }
+        const collRefs = await this.findReferences(realPath, collection)
+        for (const [collection, refFields] of Object.entries(collRefs)) {
+          for (const [refPath, refs] of Object.entries(refFields)) {
+            let refDoc = await this.getRaw(refPath)
+            for (const ref of refs) {
+              refDoc = updateObjectWithJsonPath(
+                refDoc,
+                ref.path.join('.'),
+                newRealPath
+              )
             }
+            await this.database.put(refPath, refDoc, collection)
           }
         }
         return this.getDocument(newRealPath)
@@ -1015,31 +1055,33 @@ export class Resolver {
    */
   private hasReferences = async (id: string, c: Collection) => {
     let count = 0
-    for (const ref of Object.keys(this.tinaSchema.findReferences(c.name))) {
-      const collection = this.tinaSchema.getCollection(ref)
-      await this.database.query(
-        {
-          collection: collection.name,
-          filterChain: makeFilterChain({
-            conditions: [
-              {
-                filterPath: c.name,
-                filterExpression: {
-                  _type: 'reference',
-                  _list: false,
-                  eq: id,
+    const deepRefs = this.tinaSchema.findReferences(c.name)
+    for (const [collection, refs] of Object.entries(deepRefs)) {
+      for (const ref of refs) {
+        await this.database.query(
+          {
+            collection: collection,
+            filterChain: makeFilterChain({
+              conditions: [
+                {
+                  filterPath: ref.path.join('.'),
+                  filterExpression: {
+                    _type: 'reference',
+                    _list: false,
+                    eq: id,
+                  },
                 },
-              },
-            ],
-          }),
-        },
-        (refId: string) => {
-          count++
-          return refId
+              ],
+            }),
+          },
+          (refId: string) => {
+            count++
+            return refId
+          }
+        )
+        if (count) {
+          return true
         }
-      )
-      if (count) {
-        return true
       }
     }
 
@@ -1048,41 +1090,50 @@ export class Resolver {
 
   /**
    * Finds references to a document
-   * @param id
-   * @param c
-   * @returns references to the document as a map of collection names to field names and document ids
+   * @param id the id of the document to find references to
+   * @param c the collection to find references in
+   * @returns references to the document in the form of a map of collection names to a list of fields that reference the document
    */
   private findReferences = async (id: string, c: Collection) => {
-    const references: Record<string, { fields: TinaField[]; items: string[] }> =
-      {}
-    for (const [ref, fields] of Object.entries(
-      this.tinaSchema.findReferences(c.name)
-    )) {
-      const collection = this.tinaSchema.getCollection(ref)
-      await this.database.query(
-        {
-          collection: collection.name,
-          filterChain: makeFilterChain({
-            conditions: [
-              {
-                filterPath: c.name,
-                filterExpression: {
-                  _type: 'reference',
-                  _list: false,
-                  eq: id,
+    const references: Record<
+      string,
+      Record<string, { path: string[]; field: TinaField }[]>
+    > = {}
+    const deepRefs = this.tinaSchema.findReferences(c.name)
+
+    for (const [collection, refs] of Object.entries(deepRefs)) {
+      for (const ref of refs) {
+        await this.database.query(
+          {
+            collection: collection,
+            filterChain: makeFilterChain({
+              conditions: [
+                {
+                  filterPath: ref.path.join('.'),
+                  filterExpression: {
+                    _type: 'reference',
+                    _list: false,
+                    eq: id,
+                  },
                 },
-              },
-            ],
-          }),
-        },
-        (refId: string) => {
-          if (!references[collection.name]) {
-            references[collection.name] = { fields: fields, items: [] }
+              ],
+            }),
+          },
+          (refId: string) => {
+            if (!references[collection]) {
+              references[collection] = {}
+            }
+            if (!references[collection][refId]) {
+              references[collection][refId] = []
+            }
+            references[collection][refId].push({
+              path: ref.path,
+              field: ref.field,
+            })
+            return refId
           }
-          references[collection.name].items.push(refId)
-          return refId
-        }
-      )
+        )
+      }
     }
 
     return references
