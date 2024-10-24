@@ -12,7 +12,7 @@ describe('makeCacheDir', () => {
 
     const mockPath = {
       sep: '/',
-      join: vi.fn((...args) => path.join('/', ...args)),
+      join: vi.fn((...args) => path.join(...args)),
     }
 
     const dir = '/root/.cache/1234'
@@ -37,7 +37,7 @@ describe('makeCacheDir', () => {
 
     const mockPath = {
       sep: '/',
-      join: vi.fn((...args) => path.join('/', ...args)),
+      join: vi.fn((...args) => path.join(...args)),
     }
 
     const dir = '/nonexistent/.cache/1234'
@@ -62,7 +62,7 @@ describe('makeCacheDir', () => {
 
     const mockPath = {
       sep: '/',
-      join: vi.fn((...args) => path.join('/', ...args)),
+      join: vi.fn((...args) => path.join(...args)),
     }
 
     const dir = '/root/.cache/1234'
