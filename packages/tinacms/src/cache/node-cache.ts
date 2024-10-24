@@ -2,11 +2,12 @@ import type { Cache } from './index'
 
 // Create the cache directory if it doesn't exist.
 // Returns the path of the cache directory.
-export const makeCacheDir = async (dir: string, fs: any) => {
-  // TODO: These will need to be changed from using require to import when we eventually move to ESM
-  const path = require('node:path')
-  const os = require('node:os')
-
+export const makeCacheDir = async (
+  dir: string,
+  fs: any,
+  path: any,
+  os: any
+) => {
   const pathParts = dir.split(path.sep).filter(Boolean)
   const cacheHash = pathParts[pathParts.length - 1]
   const rootUser = pathParts[0]
@@ -27,10 +28,13 @@ export const makeCacheDir = async (dir: string, fs: any) => {
 }
 
 export const NodeCache = async (dir: string): Promise<Cache> => {
+  // TODO: These will need to be changed from using require to import when we eventually move to ESM
   const fs = require('node:fs')
+  const path = require('node:path')
+  const os = require('node:os')
 
   const { createHash } = require('node:crypto')
-  const cacheDir = await makeCacheDir(dir, fs)
+  const cacheDir = await makeCacheDir(dir, fs, path, os)
 
   return {
     makeKey: (key: any) => {
