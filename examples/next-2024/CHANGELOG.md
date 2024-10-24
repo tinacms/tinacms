@@ -1,5 +1,12 @@
 # next-2024
 
+## 0.1.12
+
+### Patch Changes
+
+- Updated dependencies [[`bbf2f81`](https://github.com/tinacms/tinacms/commit/bbf2f81143eb400faf8aa4dff33b8a58fa5059c8)]:
+  - tinacms@2.3.1
+
 ## 0.1.11
 
 ### Patch Changes
