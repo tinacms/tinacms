@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import deleteBlogPost from "../utils/deleteBlogPost";
+import deleteBlogPost from "../../utils/deleteBlogPost";
 
 test.describe("Create Blog Post", () => {
   test.beforeEach(async ({ page }) => {
@@ -7,7 +7,6 @@ test.describe("Create Blog Post", () => {
       "http://localhost:3000/admin/index.html#/collections/new/post/~/",
       { waitUntil: "domcontentloaded" }
     );
-
     //Need to dismiss the popup dialog to enter edit mode
     //TODO : Remove this click once figure out how the dialog state changes (ideal solution is to set the relevant state when the page load dialog dismiss during the e2e test)
     page.click('button[data-test="enter-edit-mode"]');
@@ -43,8 +42,7 @@ test.describe("Create Blog Post", () => {
 
       try {
         //TODO: Another better way calling the backend is using the import client from the generated/client
-        const response = await deleteBlogPost(collection, relativePath);
-        console.log("Delete response:", response);
+        await deleteBlogPost(collection, relativePath);
       } catch (error) {
         console.error("Error deleting blog post:", error);
       }
