@@ -14,7 +14,7 @@ test.describe("Create Blog Post", () => {
 
   const blogTitle = "Test Blog Title";
   const blogContent = "This is a test blog content.";
-  const blogFilename = "My_Document";
+  const blogFilename = "This File is Created From Playwright Test";
   let isNewBlogCreated = false;
 
   test("should be able to create a blog", async ({ page }) => {
