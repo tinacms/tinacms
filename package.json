@@ -36,7 +36,6 @@
 		"@types/picomatch": "^3.0.1",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
 		"@typescript-eslint/parser": "^5.62.0",
-		"cypress": "13.13.1",
 		"eslint": "^8.57.1",
 		"eslint-config-prettier": "^8.10.0",
 		"eslint-plugin-react": "^7.37.0",

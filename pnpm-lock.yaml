@@ -25,9 +25,6 @@ importers:
             '@typescript-eslint/parser':
                 specifier: ^5.62.0
                 version: 5.62.0(eslint@8.57.1)(typescript@5.6.2)
-            cypress:
-                specifier: 13.13.1
-                version: 13.13.1
             eslint:
                 specifier: ^8.57.1
                 version: 8.57.1
@@ -3788,13 +3785,6 @@ packages:
         engines: { node: ^14 || ^16 || >=18 }
         peerDependencies:
             postcss-selector-parser: ^6.0.10
-
-    '@cypress/request@3.0.1':
-        resolution:
-            {
-                integrity: sha512-TWivJlJi8ZDx2wGOw1dbLuHJKUYX7bWySw377nlnGOW3hP9/MUKIsEdXT/YngWxVdgNCHRBmFlBipE+5/2ZZlQ==,
-            }
-        engines: { node: '>= 6' }
 
     '@cypress/request@3.0.5':
         resolution:
@@ -10837,14 +10827,6 @@ packages:
                 integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==,
             }
 
-    cypress@13.13.1:
-        resolution:
-            {
-                integrity: sha512-8F9UjL5MDUdgC/S5hr8CGLHbS5gGht5UOV184qc2pFny43fnkoaKxlzH/U6//zmGu/xRTaKimNfjknLT8+UDFg==,
-            }
-        engines: { node: ^16.0.0 || ^18.0.0 || >=20.0.0 }
-        hasBin: true
-
     cypress@13.15.0:
         resolution:
             {
@@ -12857,13 +12839,6 @@ packages:
             }
         engines: { node: '>= 18' }
 
-    form-data@2.3.3:
-        resolution:
-            {
-                integrity: sha512-1lLKB2Mu3aGP1Q/2eCOx0fNbRMe7XdwktwOruhfqqd0rIJWwN4Dh+E3hrPSlDCXnSR7UtZ1N38rVXm+6+MEhJQ==,
-            }
-        engines: { node: '>= 0.12' }
-
     form-data@4.0.0:
         resolution:
             {
@@ -13458,13 +13433,6 @@ packages:
                 integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==,
             }
         engines: { node: '>= 14' }
-
-    http-signature@1.3.6:
-        resolution:
-            {
-                integrity: sha512-3adrsD6zqo4GsTqtO7FyrejHNv+NgiIfAfv68+jVlFmSr9OGy7zrxONceFRLKvnnZA5jbxQBX1u9PpB6Wi32Gw==,
-            }
-        engines: { node: '>=0.10' }
 
     http-signature@1.4.0:
         resolution:
@@ -17260,13 +17228,6 @@ packages:
             }
         peerDependencies:
             react: ^16.8.0 || ^17.0.0 || ^18.0.0
-
-    qs@6.10.4:
-        resolution:
-            {
-                integrity: sha512-OQiU+C+Ds5qiH91qh/mg0w+8nwQuLjM4F4M/PbmhDOoYehPh+Fb0bDjtR1sOvy7YKxvj28Y/M0PhP5uVX0kB+g==,
-            }
-        engines: { node: '>=0.6' }
 
     qs@6.11.0:
         resolution:
@@ -23054,27 +23015,6 @@ snapshots:
         dependencies:
             postcss-selector-parser: 6.1.1
 
-    '@cypress/request@3.0.1':
-        dependencies:
-            aws-sign2: 0.7.0
-            aws4: 1.13.1
-            caseless: 0.12.0
-            combined-stream: 1.0.8
-            extend: 3.0.2
-            forever-agent: 0.6.1
-            form-data: 2.3.3
-            http-signature: 1.3.6
-            is-typedarray: 1.0.0
-            isstream: 0.1.2
-            json-stringify-safe: 5.0.1
-            mime-types: 2.1.35
-            performance-now: 2.1.0
-            qs: 6.10.4
-            safe-buffer: 5.2.1
-            tough-cookie: 4.1.4
-            tunnel-agent: 0.6.0
-            uuid: 8.3.2
-
     '@cypress/request@3.0.5':
         dependencies:
             aws-sign2: 0.7.0
@@ -23443,7 +23383,7 @@ snapshots:
     '@eslint/eslintrc@2.1.4':
         dependencies:
             ajv: 6.12.6
-            debug: 4.3.6(supports-color@5.5.0)
+            debug: 4.3.6
             espree: 9.6.1
             globals: 13.24.0
             ignore: 5.3.1
@@ -23783,7 +23723,7 @@ snapshots:
     '@humanwhocodes/config-array@0.13.0':
         dependencies:
             '@humanwhocodes/object-schema': 2.0.3
-            debug: 4.3.6(supports-color@5.5.0)
+            debug: 4.3.6
             minimatch: 3.1.2
         transitivePeerDependencies:
             - supports-color
@@ -26199,7 +26139,7 @@ snapshots:
             '@typescript-eslint/scope-manager': 5.62.0
             '@typescript-eslint/type-utils': 5.62.0(eslint@8.57.1)(typescript@5.6.2)
             '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.6.2)
-            debug: 4.3.6(supports-color@5.5.0)
+            debug: 4.3.6
             eslint: 8.57.1
             graphemer: 1.4.0
             ignore: 5.3.1
@@ -26259,7 +26199,7 @@ snapshots:
             '@typescript-eslint/scope-manager': 5.62.0
             '@typescript-eslint/types': 5.62.0
             '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.6.2)
-            debug: 4.3.6(supports-color@5.5.0)
+            debug: 4.3.6
             eslint: 8.57.1
         optionalDependencies:
             typescript: 5.6.2
@@ -26292,7 +26232,7 @@ snapshots:
         dependencies:
             '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.6.2)
             '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.6.2)
-            debug: 4.3.6(supports-color@5.5.0)
+            debug: 4.3.6
             eslint: 8.57.1
             tsutils: 3.21.0(typescript@5.6.2)
         optionalDependencies:
@@ -26334,7 +26274,7 @@ snapshots:
         dependencies:
             '@typescript-eslint/types': 5.62.0
             '@typescript-eslint/visitor-keys': 5.62.0
-            debug: 4.3.6(supports-color@5.5.0)
+            debug: 4.3.6
             globby: 11.1.0
             is-glob: 4.0.3
             semver: 7.6.3
@@ -28205,51 +28145,6 @@ snapshots:
 
     csstype@3.1.3: {}
 
-    cypress@13.13.1:
-        dependencies:
-            '@cypress/request': 3.0.1
-            '@cypress/xvfb': 1.2.4(supports-color@8.1.1)
-            '@types/sinonjs__fake-timers': 8.1.1
-            '@types/sizzle': 2.3.8
-            arch: 2.2.0
-            blob-util: 2.0.2
-            bluebird: 3.7.2
-            buffer: 5.7.1
-            cachedir: 2.4.0
-            chalk: 4.1.2
-            check-more-types: 2.24.0
-            cli-cursor: 3.1.0
-            cli-table3: 0.6.5
-            commander: 6.2.1
-            common-tags: 1.8.2
-            dayjs: 1.11.12
-            debug: 4.3.6(supports-color@8.1.1)
-            enquirer: 2.4.1
-            eventemitter2: 6.4.7
-            execa: 4.1.0
-            executable: 4.1.1
-            extract-zip: 2.0.1(supports-color@8.1.1)
-            figures: 3.2.0
-            fs-extra: 9.1.0
-            getos: 3.2.1
-            is-ci: 3.0.1
-            is-installed-globally: 0.4.0
-            lazy-ass: 1.6.0
-            listr2: 3.14.0(enquirer@2.4.1)
-            lodash: 4.17.21
-            log-symbols: 4.1.0
-            minimist: 1.2.8
-            ospath: 1.2.2
-            pretty-bytes: 5.6.0
-            process: 0.11.10
-            proxy-from-env: 1.0.0
-            request-progress: 3.0.0
-            semver: 7.6.3
-            supports-color: 8.1.1
-            tmp: 0.2.3
-            untildify: 4.0.0
-            yauzl: 2.10.0
-
     cypress@13.15.0:
         dependencies:
             '@cypress/request': 3.0.5
@@ -28526,6 +28421,10 @@ snapshots:
             ms: 2.1.3
         optionalDependencies:
             supports-color: 8.1.1
+
+    debug@4.3.6:
+        dependencies:
+            ms: 2.1.2
 
     debug@4.3.6(supports-color@5.5.0):
         dependencies:
@@ -29626,7 +29525,7 @@ snapshots:
             ajv: 6.12.6
             chalk: 4.1.2
             cross-spawn: 7.0.3
-            debug: 4.3.6(supports-color@5.5.0)
+            debug: 4.3.6
             doctrine: 3.0.0
             escape-string-regexp: 4.0.0
             eslint-scope: 7.2.2
@@ -30054,12 +29953,6 @@ snapshots:
 
     form-data-encoder@4.0.2: {}
 
-    form-data@2.3.3:
-        dependencies:
-            asynckit: 0.4.0
-            combined-stream: 1.0.8
-            mime-types: 2.1.35
-
     form-data@4.0.0:
         dependencies:
             asynckit: 0.4.0
@@ -30456,12 +30349,6 @@ snapshots:
             debug: 4.3.6(supports-color@5.5.0)
         transitivePeerDependencies:
             - supports-color
-
-    http-signature@1.3.6:
-        dependencies:
-            assert-plus: 1.0.0
-            jsprim: 2.0.2
-            sshpk: 1.18.0
 
     http-signature@1.4.0:
         dependencies:
@@ -33128,10 +33015,6 @@ snapshots:
     qrcode.react@3.1.0(react@18.3.1):
         dependencies:
             react: 18.3.1
-
-    qs@6.10.4:
-        dependencies:
-            side-channel: 1.0.6
 
     qs@6.11.0:
         dependencies:
