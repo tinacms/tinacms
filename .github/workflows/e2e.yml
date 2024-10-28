@@ -1,0 +1,99 @@
+name: e2e Tests
+
+on: [push]
+
+jobs:
+  cypress-run-ubuntu:
+    runs-on: ubuntu-20.04
+    container: cypress/browsers:node18.12.0-chrome103-ff107
+    name: E2E Tests
+    strategy:
+      matrix:
+        browser: ['chrome', 'firefox']
+    steps:
+      - name: Skip Cypress Tests
+        run: |
+          echo "Skipping Cypress tests as we transition to Playwright as per https://github.com/tinacms/tinacms/issues/4580"
+          exit 0
+
+      # - uses: actions/checkout@v4
+
+      # - name: Set up .npmrc
+      #   run: |
+      #     echo "auto-install-peers=true" >> .npmrc
+      #     echo "strict-peer-dependencies=false" >> .npmrc
+
+      # - uses: pnpm/action-setup@v4
+      #   with:
+      #     package_json_file: package.json
+      #     run_install: true
+
+      # - name: Create Cypress directories with correct permissions
+      #   run: |
+      #     mkdir -p /tmp/.cache/Cypress /tmp/.config/Cypress/cy/production
+      #     chown -R $(id -u):$(id -g) /tmp/.cache/Cypress /tmp/.config/Cypress
+
+      # - name: Install dependencies
+      #   run: pnpm recursive install
+
+      # - name: Build E2E
+      #   run: pnpm build:e2e
+
+      # - name: Start E2E
+      #   run: pnpm start:e2e &
+      #   env:
+      #     NEXT_PUBLIC_USE_LOCAL_CLIENT: 1
+
+      # - name: Wait on http://localhost:3000
+      #   run: npx wait-on http://localhost:3000 --timeout 180000
+
+      # - name: Run Cypress
+      #   uses: cypress-io/github-action@v4
+      #   with:
+      #     browser: ${{ matrix.browser }}
+      #     start: false
+      #     wait-on: false
+      #   env:
+      #     NEXT_PUBLIC_USE_LOCAL_CLIENT: 1
+      #     CYPRESS_CACHE_FOLDER: /tmp/.cache/Cypress
+      #     XDG_CONFIG_HOME: /tmp/.config
+
+      # - name: Upload Cypress screenshots
+      #   if: failure()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: cypress-screenshots
+      #     path: cypress/screenshots
+
+      # - name: Upload Cypress videos
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: cypress-videos
+      #     path: cypress/videos
+
+  playwright:
+    name: 'Playwright E2E on Tests'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        id: pnpm-install
+        with:
+          package_json_file: package.json
+          run_install: false
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build root package
+        run: pnpm build
+      - name: Install playwright
+        working-directory: playwright/tina-playwright
+        run: npx playwright install
+      - name: Run Playwright tests
+        working-directory: playwright/tina-playwright
+        run: npx playwright test
