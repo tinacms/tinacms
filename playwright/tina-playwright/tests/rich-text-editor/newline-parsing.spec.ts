@@ -11,7 +11,7 @@ test.skip("should be able to parse newline from markdown", () => {
     page.click('button[data-test="enter-edit-mode"]');
   });
 
-  test("Newline is correctly rendered from markdown using #", async ({
+  test("Newline is correctly rendered from markdown using \n", async ({
     page,
   }) => {
     await checkMarkdownOutput(
