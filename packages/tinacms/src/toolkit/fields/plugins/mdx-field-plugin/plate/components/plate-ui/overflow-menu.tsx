@@ -23,6 +23,7 @@ export default function OverflowMenu({
       <DropdownMenuTrigger asChild>
         <ToolbarButton
           showArrow={false}
+          data-testid="rich-text-editor-overflow-menu-button"
           className="lg:min-w-[130px]"
           isDropdown
           pressed={openState.open}
