@@ -23,6 +23,9 @@ import { BiGitBranch } from 'react-icons/bi'
 import { MdOutlineSaveAlt } from 'react-icons/md'
 import { formatBranchName } from '@toolkit/plugin-branch-switcher'
 import type { TinaSchema } from '@tinacms/schema-tools'
+import { useBranchPickerContext } from '@toolkit/hooks/use-branch-picker'
+import { useFiles } from '@toolkit/components/context-files'
+import { UploadFilesHandler } from '@toolkit/components/media'
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string }
@@ -106,8 +109,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 }) => {
   const cms = useCMS()
   const hideFooter = !!rest.hideFooter
-  const [createBranchModalOpen, setCreateBranchModalOpen] =
-    React.useState(false)
+  const { createBranchModalOpen, setCreateBranchModalOpen } =
+    useBranchPickerContext()
 
   const tinaForm = form.tinaForm
   const finalForm = form.tinaForm.finalForm
@@ -412,6 +415,7 @@ export const CreateBranchModel = ({
   const [disabled, setDisabled] = React.useState(false)
   const [newBranchName, setNewBranchName] = React.useState('')
   const [error, setError] = React.useState('')
+  const { files, directory, fileRejections } = useFiles()
 
   const onCreateBranch = (newBranchName) => {
     localStorage.setItem('tina.createBranchState', 'starting')
@@ -498,9 +502,19 @@ export const CreateBranchModel = ({
                 name: 'override',
                 label: 'Save to Protected Branch',
                 Icon: <MdOutlineSaveAlt size="1rem" />,
-                onMouseDown: () => {
+                onMouseDown: async () => {
                   close()
-                  safeSubmit()
+                  await safeSubmit()
+
+                  await cms.media.persist(
+                    files.map((file) => {
+                      return {
+                        directory: directory || '/',
+                        file,
+                      }
+                    })
+                  )
+                  UploadFilesHandler(fileRejections)
                 },
               },
             ]}

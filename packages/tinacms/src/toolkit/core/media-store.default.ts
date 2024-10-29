@@ -122,8 +122,15 @@ export class TinaMediaStore implements MediaStore {
             ? `${directory}/${item.file.name}`
             : item.file.name
         }`
-        const res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/upload_url/${path}`,
+
+        let res: Response = undefined
+        // TODO: test for null
+        const branch =
+          window.localStorage &&
+          window.localStorage.getItem('tinacms-current-branch')
+        const b = JSON.parse(branch)
+        res = await this.api.authProvider.fetchWithToken(
+          `${this.url}/upload_url/${path}?repo_branch=${b}`,
           { method: 'GET' }
         )
 
@@ -173,9 +180,9 @@ export class TinaMediaStore implements MediaStore {
             }
           }
 
-          if (Date.now() - updateStartTime > 30000) {
-            throw new Error('Time out waiting for upload to complete')
-          }
+          // if (Date.now() - updateStartTime > 30000) {
+          //   throw new Error('Time out waiting for upload to complete')
+          // }
         }
 
         const src = `https://assets.tina.io/${this.api.clientId}/${path}`
@@ -339,9 +346,11 @@ export class TinaMediaStore implements MediaStore {
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
         res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/list/${options.directory || ''}?limit=${
-            options.limit || 20
-          }${options.offset ? `&cursor=${options.offset}` : ''}`
+          `${this.url}/list/${
+            options.directory || ''
+          }?repo_branch=${'test-branch'}&limit=${options.limit || 20}${
+            options.offset ? `&cursor=${options.offset}` : ''
+          }`
         )
 
         if (res.status == 401) {
@@ -356,9 +365,11 @@ export class TinaMediaStore implements MediaStore {
       }
     } else {
       res = await this.fetchFunction(
-        `${this.url}/list/${options.directory || ''}?limit=${
-          options.limit || 20
-        }${options.offset ? `&cursor=${options.offset}` : ''}`
+        `${this.url}/list/${
+          options.directory || ''
+        }?repo_branch=${'test-branch'}&limit=${options.limit || 20}${
+          options.offset ? `&cursor=${options.offset}` : ''
+        }`
       )
 
       if (res.status == 404) {
@@ -414,8 +425,16 @@ export class TinaMediaStore implements MediaStore {
     }`
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
+        const branch =
+          window.localStorage &&
+          window.localStorage.getItem('tinacms-current-branch')
+        if (!branch) {
+          // TODO: Do something
+        }
+        const b = JSON.parse(branch)
+
         const res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/${path}`,
+          `${this.url}/${path}?repo_branch=${b}`,
           {
             method: 'DELETE',
           }

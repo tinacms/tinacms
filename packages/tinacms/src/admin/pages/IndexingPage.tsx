@@ -4,6 +4,8 @@ import { useSearchParams } from 'react-router-dom'
 import { Client } from '../../internalClient'
 import { TinaAdminApi } from '../api'
 import { BiError, BiLoaderAlt } from 'react-icons/bi'
+import { useFiles } from '@toolkit/components/context-files'
+import { UploadFilesHandler } from '@toolkit/components/media'
 
 // TODO: Scott B styles
 type IndexingState =
@@ -29,6 +31,7 @@ export const IndexingPage: FC = () => {
     localStorage?.getItem('tina.createBranchState') as IndexingState
   )
   const [errorMessage, setErrorMessage] = React.useState('')
+  const { files, directory, fileRejections } = useFiles()
 
   const [baseBranch, setBaseBranch] = React.useState(
     localStorage?.getItem('tina.createBranchState.baseBranch') as string
@@ -111,8 +114,26 @@ export const IndexingPage: FC = () => {
               await api.deleteDocument(values)
             } else if (kind === 'create') {
               await api.createDocument(collection, relativePath, params)
+              await cms.media.persist(
+                files.map((file) => {
+                  return {
+                    directory: directory || '/',
+                    file,
+                  }
+                })
+              )
+              UploadFilesHandler(fileRejections)
             } else {
               await api.updateDocument(collection, relativePath, params)
+              await cms.media.persist(
+                files.map((file) => {
+                  return {
+                    directory: directory || '/',
+                    file,
+                  }
+                })
+              )
+              UploadFilesHandler(fileRejections)
             }
           } else {
             const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`
@@ -124,8 +145,8 @@ export const IndexingPage: FC = () => {
           cms.alerts.success('Content saved.')
           setState('creatingPR')
         } catch (e) {
-          console.error(e)
-          cms.alerts.error('Content save failed.')
+          console.error('[ERROR]', e)
+          cms.alerts.error(`Content save failed. ${e}`)
           setErrorMessage(
             'Content save failed, please try again. If the problem persists please contact support.'
           )

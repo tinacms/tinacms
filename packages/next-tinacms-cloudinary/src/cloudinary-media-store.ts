@@ -81,7 +81,9 @@ export class CloudinaryMediaStore implements MediaStore {
   }
   async list(options: MediaListOptions): Promise<MediaList> {
     const query = this.buildQuery(options)
-    const response = await this.fetchFunction(this.baseUrl + query)
+    const response = await this.fetchFunction(
+      this.baseUrl + query + `?repo_branch=${'test-branch'}`
+    )
 
     if (response.status == 401) {
       throw E_UNAUTHORIZED
@@ -96,7 +98,7 @@ export class CloudinaryMediaStore implements MediaStore {
     }
     const { items, offset } = await response.json()
     return {
-      items: items.map((item) => item),
+      items,
       nextOffset: offset,
     }
   }

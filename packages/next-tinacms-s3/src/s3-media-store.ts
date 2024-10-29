@@ -33,9 +33,8 @@ export class S3MediaStore implements MediaStore {
           ? `${directory}/${item.file.name}`
           : item.file.name
       }`
-
       const res = await this.fetchFunction(
-        `/api/s3/media/upload_url?key=${path}`,
+        `/api/s3/media/upload_url?key=${path}&repo_branch=${'test-branch'}`,
         {
           method: 'GET',
         }
@@ -104,7 +103,9 @@ export class S3MediaStore implements MediaStore {
   }
   async list(options: MediaListOptions): Promise<MediaList> {
     const query = this.buildQuery(options)
-    const response = await this.fetchFunction('/api/s3/media' + query)
+    const response = await this.fetchFunction(
+      `/api/s3/media${query}?repo_branch=${'test-branch'}`
+    )
 
     if (response.status == 401) {
       throw E_UNAUTHORIZED

@@ -35,6 +35,8 @@ import {
 import { DeleteModal, NewFolderModal } from './modal'
 import { CopyField } from './copy-field'
 import { createContext, useContext } from 'react'
+import { useBranchPickerContext } from '@toolkit/hooks/use-branch-picker'
+import { useFiles } from '../context-files'
 const { useDropzone } = dropzone
 // Can not use path.join on the frontend
 const join = function (...parts) {
@@ -126,6 +128,7 @@ export function MediaPicker({
     return 'not-configured'
   })
 
+  const { setCreateBranchModalOpen } = useBranchPickerContext()
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
   const [newFolderModalOpen, setNewFolderModalOpen] = React.useState(false)
   const [listError, setListError] = useState<MediaListError>(defaultListError)
@@ -246,6 +249,7 @@ export function MediaPicker({
   }
 
   const [uploading, setUploading] = useState(false)
+  const { setFiles, setFileRejections } = useFiles()
   const accept = Array.isArray(
     cms.api.tina.schema.schema?.config?.media?.accept
   )
@@ -259,6 +263,15 @@ export function MediaPicker({
     multiple: true,
     onDrop: async (files, fileRejections) => {
       try {
+        const usingProtectedBranch = cms.api.tina.usingProtectedBranch()
+        if (usingProtectedBranch) {
+          setCreateBranchModalOpen(true)
+          setFiles(files)
+          setFileRejections(fileRejections)
+          setUploading(true)
+          return
+        }
+
         setUploading(true)
         const mediaItems = await cms.media.persist(
           files.map((file) => {
@@ -269,42 +282,8 @@ export function MediaPicker({
           })
         )
 
-        // Codes here https://github.com/react-dropzone/react-dropzone/blob/c36ab5bd8b8fd74e2074290d80e3ecb93d26b014/typings/react-dropzone.d.ts#LL13-L18C2
-        const errorCodes = {
-          'file-invalid-type': 'Invalid file type',
-          'file-too-large': 'File too large',
-          'file-too-small': 'File too small',
-          'too-many-files': 'Too many files',
-        }
+        UploadFilesHandler(fileRejections)
 
-        const printError = (error: FileError) => {
-          const message = errorCodes[error.code]
-          if (message) {
-            return message
-          }
-          console.error(error)
-          return 'Unknown error'
-        }
-
-        // Upload Failed
-        if (fileRejections.length > 0) {
-          const messages = []
-          fileRejections.map((fileRejection) => {
-            messages.push(
-              `${fileRejection.file.name}: ${fileRejection.errors
-                .map((error) => printError(error))
-                .join(', ')}`
-            )
-          })
-          cms.alerts.error(() => {
-            return (
-              <>
-                Upload Failed. <br />
-                {messages.join('. ')}.
-              </>
-            )
-          })
-        }
         // if there are media items, set the first one as active and prepend all the items to the list
         if (mediaItems.length !== 0) {
           setActiveItem(mediaItems[0])
@@ -479,25 +458,27 @@ export function MediaPicker({
                   <EmptyMediaList />
                 )}
 
-                {viewMode === 'list' &&
-                  list.items.map((item: Media) => (
+                {list.items.map((item: Media) => {
+                  // const itemSplit = item.filename.split(':');
+                  // item = { ...item, filename: itemSplit.length > 1 ? itemSplit.splice(1).join(':') : item.filename }
+                  return viewMode === 'list' ? (
                     <ListMediaItem
                       key={item.id}
                       item={item}
                       onClick={onClickMediaItem}
                       active={activeItem && activeItem.id === item.id}
                     />
-                  ))}
-
-                {viewMode === 'grid' &&
-                  list.items.map((item: Media) => (
+                  ) : viewMode === 'grid' ? (
                     <GridMediaItem
                       key={item.id}
                       item={item}
                       onClick={onClickMediaItem}
                       active={activeItem && activeItem.id === item.id}
                     />
-                  ))}
+                  ) : (
+                    <></>
+                  )
+                })}
 
                 {!!list.nextOffset && <LoadingMediaList ref={loaderRef} />}
               </ul>
@@ -776,4 +757,44 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
       </button>
     </div>
   )
+}
+
+export const UploadFilesHandler = (fileRejections) => {
+  const cms = useCMS()
+  // Codes here https://github.com/react-dropzone/react-dropzone/blob/c36ab5bd8b8fd74e2074290d80e3ecb93d26b014/typings/react-dropzone.d.ts#LL13-L18C2
+  const errorCodes = {
+    'file-invalid-type': 'Invalid file type',
+    'file-too-large': 'File too large',
+    'file-too-small': 'File too small',
+    'too-many-files': 'Too many files',
+  }
+
+  const printError = (error: FileError) => {
+    const message = errorCodes[error.code]
+    if (message) {
+      return message
+    }
+    console.error(error)
+    return 'Unknown error'
+  }
+
+  // Upload Failed
+  if (fileRejections.length > 0) {
+    const messages = []
+    fileRejections.map((fileRejection) => {
+      messages.push(
+        `${fileRejection.file.name}: ${fileRejection.errors
+          .map((error) => printError(error))
+          .join(', ')}`
+      )
+    })
+    cms.alerts.error(() => {
+      return (
+        <>
+          Upload Failed. <br />
+          {messages.join('. ')}.
+        </>
+      )
+    })
+  }
 }

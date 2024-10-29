@@ -200,6 +200,9 @@ export class MediaManager implements MediaStore {
       this.events.dispatch({ type: 'media:list:start', ...options })
       const media = await this.store.list(options)
       this.events.dispatch({ type: 'media:list:success', ...options, media })
+      media.items.forEach((item) =>
+        item.filename.split(':').splice(1).join(':')
+      )
       return media
     } catch (error) {
       this.events.dispatch({ type: 'media:list:failure', ...options, error })
