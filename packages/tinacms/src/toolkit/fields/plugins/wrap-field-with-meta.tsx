@@ -152,9 +152,8 @@ export const FieldDescription = ({
     <span
       className={`block font-sans text-xs italic font-light text-gray-400 pt-0.5 whitespace-normal m-0 ${className}`}
       {...props}
-    >
-      {children}
-    </span>
+      dangerouslySetInnerHTML={{ __html: children }}
+    ></span>
   )
 }
 
