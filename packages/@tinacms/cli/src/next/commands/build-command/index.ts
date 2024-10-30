@@ -636,7 +636,6 @@ export class BuildCommand extends BaseCommand {
       url: `https://${host}/db/${clientId}/${previewName || branch}/schemaSha`,
       token,
     })
-    console.log({ remoteTinaSchemaSha })
 
     if (!remoteTinaSchemaSha) {
       bar.tick({
@@ -663,9 +662,8 @@ export class BuildCommand extends BaseCommand {
         .createHash('sha256')
         .update(JSON.stringify(localTinaSchema))
         .digest('hex')
-      console.log({ localTinaSchemaSha })
 
-      if (localTinaSchemaSha !== remoteTinaSchemaSha) {
+      if (localTinaSchemaSha === remoteTinaSchemaSha) {
         bar.tick({
           prog: '✅',
         })
@@ -773,7 +771,6 @@ export const fetchSchemaSha = async ({
   url: string
   token?: string
 }) => {
-  console.log(url)
   const headers = new Headers()
   if (token) {
     headers.append('X-API-KEY', token)
