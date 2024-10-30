@@ -214,7 +214,13 @@ export class BuildCommand extends BaseCommand {
         database,
         codegen.productionUrl
       )
-      await this.checkTinaSchema(configManager, database, codegen.productionUrl)
+      await this.checkTinaSchema(
+        configManager,
+        database,
+        codegen.productionUrl,
+        this.previewName,
+        this.verbose
+      )
     }
 
     await buildProductionSpa(configManager, database, codegen.productionUrl)
