@@ -1,26 +1,40 @@
 import type { Cache } from './index'
 
-// makeCacheDir creates the cache directory if it doesn't exist
-const makeCacheDir = async (dir: string, fs: any) => {
-  const path = await import('node:path')
-  const os = await import('node:os')
-
-  const parts = dir.split(path.sep).filter(Boolean)
-
+// Create the cache directory if it doesn't exist.
+// Returns the path of the cache directory.
+export const makeCacheDir = async (
+  dir: string,
+  fs: any,
+  path: any,
+  os: any
+) => {
+  const pathParts = dir.split(path.sep).filter(Boolean)
+  const cacheHash = pathParts[pathParts.length - 1]
+  const rootUser = pathParts[0]
   let cacheDir = dir
-  // check if the root directory exists, if not then create create in tmp and return new path
-  if (!fs.existsSync(path.join(path.sep, parts[0]))) {
-    cacheDir = path.join(os.tmpdir(), parts[parts.length - 1])
+
+  // Check if the root directory exists. If not, create the cache in the tmp directory.
+  if (!fs.existsSync(path.join(path.sep, rootUser))) {
+    cacheDir = path.join(os.tmpdir(), cacheHash)
   }
 
-  fs.mkdirSync(cacheDir, { recursive: true })
+  try {
+    fs.mkdirSync(cacheDir, { recursive: true })
+  } catch (error) {
+    throw new Error(`Failed to create cache directory: ${error.message}`)
+  }
+
   return cacheDir
 }
 
 export const NodeCache = async (dir: string): Promise<Cache> => {
-  const fs = await import('node:fs')
-  const { createHash } = await import('node:crypto')
-  const cacheDir = await makeCacheDir(dir, fs)
+  // TODO: These will need to be changed from using require to import when we eventually move to ESM
+  const fs = require('node:fs')
+  const path = require('node:path')
+  const os = require('node:os')
+
+  const { createHash } = require('node:crypto')
+  const cacheDir = await makeCacheDir(dir, fs, path, os)
 
   return {
     makeKey: (key: any) => {
