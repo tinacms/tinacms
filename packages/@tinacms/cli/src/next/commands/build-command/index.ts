@@ -212,6 +212,7 @@ export class BuildCommand extends BaseCommand {
         database,
         codegen.productionUrl
       )
+      await this.checkTinaSchema(configManager, database, codegen.productionUrl)
     }
 
     await buildProductionSpa(configManager, database, codegen.productionUrl)
@@ -598,6 +599,62 @@ export class BuildCommand extends BaseCommand {
       }
     }
   }
+
+  async checkTinaSchema(
+    configManager: ConfigManager,
+    database: Database,
+    apiURL: string
+  ) {
+    const bar = new Progress(
+      'Checking local Tina Schema matches server. :prog',
+      1
+    )
+    const { config } = configManager
+    const token = config.token
+
+    // Get the remote schema from the graphql endpoint
+    const remoteSchema = await fetchSchemaShas({
+      url: apiURL,
+      token,
+    })
+
+    if (!remoteSchema) {
+      bar.tick({
+        prog: '❌',
+      })
+      let errorMessage = `The remote Tina schema does not exist. Check indexing for this branch.`
+      if (config?.branch) {
+        errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
+      }
+      throw new Error(errorMessage)
+    }
+
+    const remoteGqlSchema = buildClientSchema(remoteSchema)
+
+    // This will always be the filesystem bridge.
+    const localSchemaDocument = await database.getGraphQLSchemaFromBridge()
+    const localGraphqlSchema = buildASTSchema(localSchemaDocument)
+    try {
+      const diffResult = await diff(localGraphqlSchema, remoteGqlSchema)
+
+      if (diffResult.length === 0) {
+        bar.tick({
+          prog: '✅',
+        })
+      } else {
+        bar.tick({
+          prog: '❌',
+        })
+        let errorMessage = `The local Tina schema doesn't match the remote Tina schema. Please push up your changes to GitHub to update your remote tina schema.`
+        if (config?.branch) {
+          errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
+        }
+        throw new Error(errorMessage)
+      }
+    } catch (e) {
+      throw e
+    }
+  }
 }
 
 //  This was taken from packages/tinacms/src/unifiedClient/index.ts
@@ -661,6 +718,34 @@ export const fetchRemoteGraphqlSchema = async ({
   url: string
   token?: string
 }) => {
+  const headers = new Headers()
+  if (token) {
+    headers.append('X-API-KEY', token)
+  }
+  const body = JSON.stringify({
+    query: getIntrospectionQuery(),
+    variables: {},
+  })
+
+  headers.append('Content-Type', 'application/json')
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers,
+    body,
+  })
+  const data = await res.json()
+  return data?.data
+}
+
+export const fetchSchemaShas = async ({
+  url,
+  token,
+}: {
+  url: string
+  token?: string
+}) => {
+  console.log(url)
   const headers = new Headers()
   if (token) {
     headers.append('X-API-KEY', token)
