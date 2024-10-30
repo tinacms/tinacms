@@ -1,5 +1,23 @@
 # tinacms
 
+## 2.4.0
+
+### Minor Changes
+
+- [#5246](https://github.com/tinacms/tinacms/pull/5246) [`bc59a81`](https://github.com/tinacms/tinacms/commit/bc59a819e1e68e48de027c4fac72551ca109185d) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Adds html formatting support for field descriptions
+  Note: wrapFieldWithError has been marked as deprecated
+
+### Patch Changes
+
+- [#5228](https://github.com/tinacms/tinacms/pull/5228) [`9bb408f`](https://github.com/tinacms/tinacms/commit/9bb408f1c45ecb1fd8e39faac652c4b342f74967) Thanks [@JackDevAU](https://github.com/JackDevAU)! - 🐛 fix r.join error when building pages
+
+- [#5216](https://github.com/tinacms/tinacms/pull/5216) [`bbf2f81`](https://github.com/tinacms/tinacms/commit/bbf2f81143eb400faf8aa4dff33b8a58fa5059c8) Thanks [@Ben0189](https://github.com/Ben0189)! - - Adjust Save button position and size on iPad
+  - Button size has been reduced as per feedback from @bettybondoc to improve the UI experience
+- Updated dependencies [[`0daf0b6`](https://github.com/tinacms/tinacms/commit/0daf0b687b36614a1fdf904b1d5125e4c63e81a9)]:
+  - @tinacms/schema-tools@1.6.7
+  - @tinacms/search@1.0.34
+  - @tinacms/mdx@1.5.1
+
 ## 2.3.0
 
 ### Minor Changes
