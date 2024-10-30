@@ -124,6 +124,8 @@ export default defineConfig({
             name: 'Title',
             type: 'string',
             ui: {
+              description:
+                'The title of the <span style="text-decoration:underline;font-weight:bold">page</span>',
               // defaultValue: 'Title',
               // Examples of how you COULD use a custom form
               // component: ({ form, field, input }) => {
@@ -212,12 +214,16 @@ export default defineConfig({
             type: 'image',
             list: true,
             name: 'images',
+            description:
+              'This is a list of <span style="text-decoration:underline;font-weight:bold">images</span>',
           },
           {
             type: 'object',
             label: 'Related Posts',
             name: 'posts',
             list: true,
+            description:
+              'This is a list of <span style="text-decoration:underline;font-weight:bold">related posts</span>',
             ui: {
               itemProps: (item) => {
                 return { label: item?.label }
@@ -239,6 +245,8 @@ export default defineConfig({
             type: 'object',
             label: 'Something',
             name: 'foo',
+            description:
+              'This is a description of an <span style="text-decoration:underline;font-weight:bold">object</span>',
             fields: [
               {
                 name: 'bar',
@@ -249,9 +257,10 @@ export default defineConfig({
           },
           {
             type: 'string',
-
             label: 'Topic',
             name: 'topic',
+            description:
+              'This is the <span style="text-decoration:underline;font-weight:bold">topic</span> of the blog post',
             options: ['programming', 'blacksmithing'],
             list: true,
           },
@@ -259,6 +268,8 @@ export default defineConfig({
             type: 'rich-text',
             label: 'Blog Post Body',
             name: 'body',
+            description:
+              'This is the <span style="text-decoration:underline;font-weight:bold">body</span> of the blog post',
             isBody: true,
             templates: [
               {
