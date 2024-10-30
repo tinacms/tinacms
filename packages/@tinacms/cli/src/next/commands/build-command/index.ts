@@ -1,6 +1,7 @@
 import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
+import crypto from 'crypto'
 import type { ViteDevServer } from 'vite'
 import { buildSchema, type Database, FilesystemBridge } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
@@ -26,6 +27,7 @@ import {
 import { spin } from '../../../utils/spinner'
 import { createDevServer } from '../dev-command/server'
 import { BaseCommand } from '../baseCommands'
+import { logText } from '../../../utils/theme'
 
 export class BuildCommand extends BaseCommand {
   static paths = [['build']]
@@ -603,7 +605,9 @@ export class BuildCommand extends BaseCommand {
   async checkTinaSchema(
     configManager: ConfigManager,
     database: Database,
-    apiURL: string
+    apiURL: string,
+    previewName: string,
+    verbose: boolean
   ) {
     const bar = new Progress(
       'Checking local Tina Schema matches server. :prog',
@@ -611,14 +615,23 @@ export class BuildCommand extends BaseCommand {
     )
     const { config } = configManager
     const token = config.token
+    const { clientId, branch, isLocalClient, host } = parseURL(apiURL)
+    // Can't check status if we're not using Tina Cloud
+    if (isLocalClient || !host || !clientId || !branch) {
+      if (verbose) {
+        logger.info(logText('Not using Tina Cloud, skipping Tina Schema check'))
+      }
+      return
+    }
 
     // Get the remote schema from the graphql endpoint
-    const remoteSchema = await fetchSchemaShas({
-      url: apiURL,
+    const { tinaSchema: remoteTinaSchemaSha } = await fetchSchemaSha({
+      url: `https://${host}/db/${clientId}/${previewName || branch}/schemaSha`,
       token,
     })
+    console.log({ remoteTinaSchemaSha })
 
-    if (!remoteSchema) {
+    if (!remoteTinaSchemaSha) {
       bar.tick({
         prog: '❌',
       })
@@ -629,15 +642,22 @@ export class BuildCommand extends BaseCommand {
       throw new Error(errorMessage)
     }
 
-    const remoteGqlSchema = buildClientSchema(remoteSchema)
+    if (!database.bridge) {
+      throw new Error(`No bridge configured`)
+    }
 
-    // This will always be the filesystem bridge.
-    const localSchemaDocument = await database.getGraphQLSchemaFromBridge()
-    const localGraphqlSchema = buildASTSchema(localSchemaDocument)
     try {
-      const diffResult = await diff(localGraphqlSchema, remoteGqlSchema)
+      const localTinaSchema = JSON.parse(
+        await database.bridge.get(configManager.generatedSchemaJSONPath)
+      )
+      localTinaSchema.version = undefined
+      const localTinaSchemaSha = crypto
+        .createHash('sha256')
+        .update(JSON.stringify(localTinaSchema))
+        .digest('hex')
+      console.log({ localTinaSchemaSha })
 
-      if (diffResult.length === 0) {
+      if (localTinaSchemaSha !== remoteTinaSchemaSha) {
         bar.tick({
           prog: '✅',
         })
@@ -738,7 +758,7 @@ export const fetchRemoteGraphqlSchema = async ({
   return data?.data
 }
 
-export const fetchSchemaShas = async ({
+export const fetchSchemaSha = async ({
   url,
   token,
 }: {
@@ -750,17 +770,11 @@ export const fetchSchemaShas = async ({
   if (token) {
     headers.append('X-API-KEY', token)
   }
-  const body = JSON.stringify({
-    query: getIntrospectionQuery(),
-    variables: {},
-  })
-
-  headers.append('Content-Type', 'application/json')
 
   const res = await fetch(url, {
-    method: 'POST',
+    method: 'GET',
     headers,
-    body,
+    cache: 'no-cache',
   })
   const data = await res.json()
   return data?.data
