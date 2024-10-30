@@ -2,6 +2,7 @@ import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
 import crypto from 'crypto'
+import path from 'path'
 import type { ViteDevServer } from 'vite'
 import { buildSchema, type Database, FilesystemBridge } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
@@ -651,10 +652,11 @@ export class BuildCommand extends BaseCommand {
     if (!database.bridge) {
       throw new Error(`No bridge configured`)
     }
-
     try {
       const localTinaSchema = JSON.parse(
-        await database.bridge.get(configManager.generatedSchemaJSONPath)
+        await database.bridge.get(
+          path.join(database.tinaDirectory, '__generated__', '_schema.json')
+        )
       )
       localTinaSchema.version = undefined
       const localTinaSchemaSha = crypto
