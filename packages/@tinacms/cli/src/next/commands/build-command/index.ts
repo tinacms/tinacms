@@ -782,7 +782,5 @@ export const fetchSchemaSha = async ({
     headers,
     cache: 'no-cache',
   })
-  const data = await res.json()
-  console.log({ data })
-  return data?.data || {}
+  return res.json()
 }
