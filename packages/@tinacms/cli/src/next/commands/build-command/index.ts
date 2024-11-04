@@ -651,34 +651,30 @@ export class BuildCommand extends BaseCommand {
     if (!database.bridge) {
       throw new Error(`No bridge configured`)
     }
-    try {
-      const localTinaSchema = JSON.parse(
-        await database.bridge.get(
-          path.join(database.tinaDirectory, '__generated__', '_schema.json')
-        )
+    const localTinaSchema = JSON.parse(
+      await database.bridge.get(
+        path.join(database.tinaDirectory, '__generated__', '_schema.json')
       )
-      localTinaSchema.version = undefined
-      const localTinaSchemaSha = crypto
-        .createHash('sha256')
-        .update(JSON.stringify(localTinaSchema))
-        .digest('hex')
+    )
+    localTinaSchema.version = undefined
+    const localTinaSchemaSha = crypto
+      .createHash('sha256')
+      .update(JSON.stringify(localTinaSchema))
+      .digest('hex')
 
-      if (localTinaSchemaSha === remoteTinaSchemaSha) {
-        bar.tick({
-          prog: '✅',
-        })
-      } else {
-        bar.tick({
-          prog: '❌',
-        })
-        let errorMessage = `The local Tina schema doesn't match the remote Tina schema. Please push up your changes to GitHub to update your remote tina schema.`
-        if (config?.branch) {
-          errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
-        }
-        throw new Error(errorMessage)
+    if (localTinaSchemaSha === remoteTinaSchemaSha) {
+      bar.tick({
+        prog: '✅',
+      })
+    } else {
+      bar.tick({
+        prog: '❌',
+      })
+      let errorMessage = `The local Tina schema doesn't match the remote Tina schema. Please push up your changes to GitHub to update your remote tina schema.`
+      if (config?.branch) {
+        errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
       }
-    } catch (e) {
-      throw e
+      throw new Error(errorMessage)
     }
   }
 }
