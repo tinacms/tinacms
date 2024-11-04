@@ -28,3 +28,9 @@ jobs:
       - name: Run Playwright tests
         working-directory: playwright/tina-playwright
         run: npx playwright test
+      - name: Playwright report summary
+        uses: daun/playwright-report-summary@v3
+        if: always()
+        with:
+          report-file: playwright-test-results.json
+          comment-title: 'Playwright E2E Test Results'
