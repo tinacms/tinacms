@@ -37,3 +37,5 @@ yarn-error.log*
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+/playwright-test-results.json
