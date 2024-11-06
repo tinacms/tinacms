@@ -268,7 +268,7 @@ export const ItemDeleteButton = ({ onClick, disabled = false }) => {
     <button
       type="button"
       className={`w-8 px-1 py-2.5 flex items-center justify-center text-gray-200 hover:opacity-100 opacity-30 hover:bg-gray-50 ${
-        disabled && 'cursor-not-allowed'
+        disabled && 'pointer-events-none opacity-30 cursor-not-allowed'
       }`}
       onClick={onClick}
     >
