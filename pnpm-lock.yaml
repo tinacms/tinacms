@@ -1598,8 +1598,8 @@ importers:
                 specifier: ^0.424.0
                 version: 0.424.0(react@18.3.1)
             mermaid:
-                specifier: 9.3.0
-                version: 9.3.0
+                specifier: ^10.9.1
+                version: 10.9.1
             moment:
                 specifier: 2.29.4
                 version: 2.29.4
@@ -10773,12 +10773,6 @@ packages:
                 integrity: sha512-qTCQmEhcynucuaZgY5/+ti3X/rnszKZhEQH/ZdWdtP1tA/y3VoHJzcVrO9pjjJCNpigfscAtoUB5ONcd2wNn0A==,
             }
 
-    dagre-d3-es@7.0.6:
-        resolution:
-            {
-                integrity: sha512-CaaE/nZh205ix+Up4xsnlGmpog5GGm81Upi2+/SBHxwNwrccBb3K51LzjZ1U6hgvOlAEUsVWf1xSTzCyKpJ6+Q==,
-            }
-
     damerau-levenshtein@1.0.8:
         resolution:
             {
@@ -11249,12 +11243,6 @@ packages:
                 integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==,
             }
         engines: { node: '>= 4' }
-
-    dompurify@2.4.1:
-        resolution:
-            {
-                integrity: sha512-ewwFzHzrrneRjxzmK6oVz/rZn9VWspGFRDb4/rRtIsM1n36t9AKma/ye8syCpcw+XJ25kOK/hOG7t1j2I2yBqA==,
-            }
 
     dompurify@3.1.6:
         resolution:
@@ -14934,12 +14922,6 @@ packages:
                 integrity: sha512-Mx45Obds5W1UkW1nv/7dHRsbfMM1aOKA2+Pxs/IGHNonygDHwmng8xTHyS9z4KWVi0rbko8gjiBmuwwXQ7tiNA==,
             }
 
-    mermaid@9.3.0:
-        resolution:
-            {
-                integrity: sha512-mGl0BM19TD/HbU/LmlaZbjBi//tojelg8P/mxD6pPZTAYaI+VawcyBdqRsoUHSc7j71PrMdJ3HBadoQNdvP5cg==,
-            }
-
     meros@1.3.0:
         resolution:
             {
@@ -15423,12 +15405,6 @@ packages:
                 integrity: sha512-0yuvsqSCv8LbaOKhnsQ/T5JhyFlCYLPXK3U2sgV10zoKQwzs/MyfuQUOZQ1V/6OCOJsK/TRgNVrPuPDqtdMFtA==,
             }
         engines: { node: '>=10' }
-
-    moment-mini@2.29.4:
-        resolution:
-            {
-                integrity: sha512-uhXpYwHFeiTbY9KSgPPRoo1nt8OxNVdMVoTBYHfSEKeRkIkwGpO+gERmhuhBtzfaeOyTkykSrm2+noJBgqt3Hg==,
-            }
 
     moment@2.29.4:
         resolution:
@@ -18090,12 +18066,6 @@ packages:
         resolution:
             {
                 integrity: sha512-Orov6g6BB1sDfYgzWfTHDOxamtX1bE/zo104Dh9e6fqJ3PooipYyfJ0pUmrZO2wAvO8YbEyeFrkV91XTsGMSrw==,
-            }
-
-    stylis@4.3.4:
-        resolution:
-            {
-                integrity: sha512-osIBl6BGUmSfDkyH2mB7EFvCJntXDrLhKjHTRj/rK6xLH0yuPrHULDRQzKokSOD4VoorhtKpfcfW1GAntu8now==,
             }
 
     sucrase@3.35.0:
@@ -27398,11 +27368,6 @@ snapshots:
             d3: 7.9.0
             lodash-es: 4.17.21
 
-    dagre-d3-es@7.0.6:
-        dependencies:
-            d3: 7.9.0
-            lodash-es: 4.17.21
-
     damerau-levenshtein@1.0.8: {}
 
     data-uri-to-buffer@6.0.2: {}
@@ -27633,8 +27598,6 @@ snapshots:
     domhandler@5.0.3:
         dependencies:
             domelementtype: 2.3.0
-
-    dompurify@2.4.1: {}
 
     dompurify@3.1.6: {}
 
@@ -28033,8 +27996,8 @@ snapshots:
             '@typescript-eslint/parser': 5.62.0(eslint@8.24.0)(typescript@5.6.2)
             eslint: 8.24.0
             eslint-import-resolver-node: 0.3.9
-            eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.24.0)
-            eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.1)(eslint@8.24.0)
+            eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.24.0))(eslint@8.24.0)
+            eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
             eslint-plugin-jsx-a11y: 6.9.0(eslint@8.24.0)
             eslint-plugin-react: 7.37.1(eslint@8.24.0)
             eslint-plugin-react-hooks: 4.6.2(eslint@8.24.0)
@@ -28087,13 +28050,13 @@ snapshots:
         transitivePeerDependencies:
             - supports-color
 
-    eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.24.0):
+    eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.24.0))(eslint@8.24.0):
         dependencies:
             debug: 4.3.6(supports-color@5.5.0)
             enhanced-resolve: 5.17.1
             eslint: 8.24.0
-            eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.24.0)
-            eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.1)(eslint@8.24.0)
+            eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
+            eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
             fast-glob: 3.3.2
             get-tsconfig: 4.7.6
             is-core-module: 2.15.0
@@ -28132,14 +28095,14 @@ snapshots:
         transitivePeerDependencies:
             - supports-color
 
-    eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.24.0):
+    eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0):
         dependencies:
             debug: 3.2.7
         optionalDependencies:
             '@typescript-eslint/parser': 5.62.0(eslint@8.57.1)(typescript@5.6.2)
             eslint: 8.24.0
             eslint-import-resolver-node: 0.3.9
-            eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.24.0)
+            eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.24.0))(eslint@8.24.0)
         transitivePeerDependencies:
             - supports-color
 
@@ -28181,7 +28144,7 @@ snapshots:
             - eslint-import-resolver-webpack
             - supports-color
 
-    eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.1)(eslint@8.24.0):
+    eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0):
         dependencies:
             array-includes: 3.1.8
             array.prototype.findlastindex: 1.2.5
@@ -28191,7 +28154,7 @@ snapshots:
             doctrine: 2.1.0
             eslint: 8.24.0
             eslint-import-resolver-node: 0.3.9
-            eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.24.0)
+            eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
             hasown: 2.0.2
             is-core-module: 2.15.0
             is-glob: 4.0.3
@@ -30663,19 +30626,6 @@ snapshots:
         transitivePeerDependencies:
             - supports-color
 
-    mermaid@9.3.0:
-        dependencies:
-            '@braintree/sanitize-url': 6.0.4
-            d3: 7.9.0
-            dagre-d3-es: 7.0.6
-            dompurify: 2.4.1
-            khroma: 2.1.0
-            lodash-es: 4.17.21
-            moment-mini: 2.29.4
-            non-layered-tidy-tree-layout: 2.0.2
-            stylis: 4.3.4
-            uuid: 9.0.1
-
     meros@1.3.0(@types/node@22.7.4):
         optionalDependencies:
             '@types/node': 22.7.4
@@ -31101,8 +31051,6 @@ snapshots:
             ufo: 1.5.4
 
     module-error@1.0.2: {}
-
-    moment-mini@2.29.4: {}
 
     moment@2.29.4: {}
 
@@ -32853,8 +32801,6 @@ snapshots:
     stylis@4.1.3: {}
 
     stylis@4.2.0: {}
-
-    stylis@4.3.4: {}
 
     sucrase@3.35.0:
         dependencies:
