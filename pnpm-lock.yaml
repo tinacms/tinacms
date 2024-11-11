@@ -227,8 +227,8 @@ importers:
                 specifier: ^2.1.1
                 version: 2.1.1
             mermaid:
-                specifier: ^10.9.1
-                version: 10.9.1
+                specifier: 9.3.0
+                version: 9.3.0
             next:
                 specifier: 14.2.10
                 version: 14.2.10(@babel/core@7.25.2)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -10773,6 +10773,12 @@ packages:
                 integrity: sha512-qTCQmEhcynucuaZgY5/+ti3X/rnszKZhEQH/ZdWdtP1tA/y3VoHJzcVrO9pjjJCNpigfscAtoUB5ONcd2wNn0A==,
             }
 
+    dagre-d3-es@7.0.6:
+        resolution:
+            {
+                integrity: sha512-CaaE/nZh205ix+Up4xsnlGmpog5GGm81Upi2+/SBHxwNwrccBb3K51LzjZ1U6hgvOlAEUsVWf1xSTzCyKpJ6+Q==,
+            }
+
     damerau-levenshtein@1.0.8:
         resolution:
             {
@@ -11243,6 +11249,12 @@ packages:
                 integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==,
             }
         engines: { node: '>= 4' }
+
+    dompurify@2.4.1:
+        resolution:
+            {
+                integrity: sha512-ewwFzHzrrneRjxzmK6oVz/rZn9VWspGFRDb4/rRtIsM1n36t9AKma/ye8syCpcw+XJ25kOK/hOG7t1j2I2yBqA==,
+            }
 
     dompurify@3.1.6:
         resolution:
@@ -14928,6 +14940,12 @@ packages:
                 integrity: sha512-Mx45Obds5W1UkW1nv/7dHRsbfMM1aOKA2+Pxs/IGHNonygDHwmng8xTHyS9z4KWVi0rbko8gjiBmuwwXQ7tiNA==,
             }
 
+    mermaid@9.3.0:
+        resolution:
+            {
+                integrity: sha512-mGl0BM19TD/HbU/LmlaZbjBi//tojelg8P/mxD6pPZTAYaI+VawcyBdqRsoUHSc7j71PrMdJ3HBadoQNdvP5cg==,
+            }
+
     meros@1.3.0:
         resolution:
             {
@@ -15411,6 +15429,12 @@ packages:
                 integrity: sha512-0yuvsqSCv8LbaOKhnsQ/T5JhyFlCYLPXK3U2sgV10zoKQwzs/MyfuQUOZQ1V/6OCOJsK/TRgNVrPuPDqtdMFtA==,
             }
         engines: { node: '>=10' }
+
+    moment-mini@2.29.4:
+        resolution:
+            {
+                integrity: sha512-uhXpYwHFeiTbY9KSgPPRoo1nt8OxNVdMVoTBYHfSEKeRkIkwGpO+gERmhuhBtzfaeOyTkykSrm2+noJBgqt3Hg==,
+            }
 
     moment@2.29.4:
         resolution:
@@ -27374,6 +27398,11 @@ snapshots:
             d3: 7.9.0
             lodash-es: 4.17.21
 
+    dagre-d3-es@7.0.6:
+        dependencies:
+            d3: 7.9.0
+            lodash-es: 4.17.21
+
     damerau-levenshtein@1.0.8: {}
 
     data-uri-to-buffer@6.0.2: {}
@@ -27604,6 +27633,8 @@ snapshots:
     domhandler@5.0.3:
         dependencies:
             domelementtype: 2.3.0
+
+    dompurify@2.4.1: {}
 
     dompurify@3.1.6: {}
 
@@ -30636,6 +30667,19 @@ snapshots:
         transitivePeerDependencies:
             - supports-color
 
+    mermaid@9.3.0:
+        dependencies:
+            '@braintree/sanitize-url': 6.0.4
+            d3: 7.9.0
+            dagre-d3-es: 7.0.6
+            dompurify: 2.4.1
+            khroma: 2.1.0
+            lodash-es: 4.17.21
+            moment-mini: 2.29.4
+            non-layered-tidy-tree-layout: 2.0.2
+            stylis: 4.2.0
+            uuid: 9.0.1
+
     meros@1.3.0(@types/node@22.7.4):
         optionalDependencies:
             '@types/node': 22.7.4
@@ -31061,6 +31105,8 @@ snapshots:
             ufo: 1.5.4
 
     module-error@1.0.2: {}
+
+    moment-mini@2.29.4: {}
 
     moment@2.29.4: {}
 
