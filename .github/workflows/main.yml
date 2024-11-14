@@ -6,6 +6,7 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -74,8 +75,9 @@ jobs:
         continue-on-error: true
         run: |
           echo running on branch ${BRANCH_NAME}
-          pnpm version:snapshot
+          pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
           pnpm publish -r --tag ${BRANCH_NAME} --no-git-checks --access public
+          echo "Published NPM tag: $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}

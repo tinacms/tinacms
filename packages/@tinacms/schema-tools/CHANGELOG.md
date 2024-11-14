@@ -1,5 +1,38 @@
 # @tinacms/schema-tools
 
+## 1.6.7
+
+### Patch Changes
+
+- [#5225](https://github.com/tinacms/tinacms/pull/5225) [`0daf0b6`](https://github.com/tinacms/tinacms/commit/0daf0b687b36614a1fdf904b1d5125e4c63e81a9) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Addresses peer dependency issues and applies necessary updates
+
+## 1.6.6
+
+### Patch Changes
+
+- [#4825](https://github.com/tinacms/tinacms/pull/4825) [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Add Mermaid Support to Rich Text Field (Plate)
+  🐛 Fix tooltip rendering behind TinaCMS app
+
+## 1.6.5
+
+### Patch Changes
+
+- [#4780](https://github.com/tinacms/tinacms/pull/4780) [`31513bb`](https://github.com/tinacms/tinacms/commit/31513bb473cd1d349a3711ef7c5075cf9d03f121) Thanks [@Ben0189](https://github.com/Ben0189)! - improve reference field selector filter and simplyfy schema needed to be written by user
+
+## 1.6.4
+
+### Patch Changes
+
+- [#4843](https://github.com/tinacms/tinacms/pull/4843) [`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Update Minor & Patch Dependencies Versions
+
+## 1.6.3
+
+### Patch Changes
+
+- [#4832](https://github.com/tinacms/tinacms/pull/4832) [`6cd3596`](https://github.com/tinacms/tinacms/commit/6cd35967ab0d34851be44199bc9821b128fcfc75) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Adds config options to allow users to customize position + description of filename fields
+
+- [#4804](https://github.com/tinacms/tinacms/pull/4804) [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4) Thanks [@dependabot](https://github.com/apps/dependabot)! - ⬆️ Updates Typescript to v5.5, @types/node to v22.x, next.js to latest version 14.x, and removes node-fetch
+
 ## 1.6.2
 
 ### Patch Changes

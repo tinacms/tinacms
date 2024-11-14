@@ -1,5 +1,63 @@
 # tinacms-authjs
 
+## 7.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`9bb408f`](https://github.com/tinacms/tinacms/commit/9bb408f1c45ecb1fd8e39faac652c4b342f74967), [`bbf2f81`](https://github.com/tinacms/tinacms/commit/bbf2f81143eb400faf8aa4dff33b8a58fa5059c8), [`bc59a81`](https://github.com/tinacms/tinacms/commit/bc59a819e1e68e48de027c4fac72551ca109185d), [`0daf0b6`](https://github.com/tinacms/tinacms/commit/0daf0b687b36614a1fdf904b1d5125e4c63e81a9)]:
+  - tinacms@2.4.0
+  - @tinacms/schema-tools@1.6.7
+
+## 6.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36), [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47), [`eb519f2`](https://github.com/tinacms/tinacms/commit/eb519f27a4c0fe1b05c361db2c1fe2337e6c4e12), [`00f6525`](https://github.com/tinacms/tinacms/commit/00f6525871c7c6bd40091424337df72c7bfcf783)]:
+  - tinacms@2.3.0
+  - @tinacms/schema-tools@1.6.6
+
+## 5.0.9
+
+### Patch Changes
+
+- Updated dependencies [[`31513bb`](https://github.com/tinacms/tinacms/commit/31513bb473cd1d349a3711ef7c5075cf9d03f121), [`3b2aba8`](https://github.com/tinacms/tinacms/commit/3b2aba80ac14a512592f67a04f9e1792667db9dd)]:
+  - tinacms@2.2.9
+  - @tinacms/schema-tools@1.6.5
+
+## 5.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a)]:
+  - tinacms@2.2.8
+  - @tinacms/schema-tools@1.6.4
+
+## 5.0.7
+
+### Patch Changes
+
+- Updated dependencies [[`113f4db`](https://github.com/tinacms/tinacms/commit/113f4db4b5d5b7d4b95d612eca56f815f41b4f8c), [`f0994c8`](https://github.com/tinacms/tinacms/commit/f0994c8f49122cd9d784bf47171715c529d2528f)]:
+  - tinacms@2.2.7
+
+## 5.0.6
+
+### Patch Changes
+
+- [#4804](https://github.com/tinacms/tinacms/pull/4804) [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4) Thanks [@dependabot](https://github.com/apps/dependabot)! - ⬆️ Updates Typescript to v5.5, @types/node to v22.x, next.js to latest version 14.x, and removes node-fetch
+
+- Updated dependencies [[`b64b046`](https://github.com/tinacms/tinacms/commit/b64b046dc67ae948513057f855b156ce0cf250d8), [`6cd3596`](https://github.com/tinacms/tinacms/commit/6cd35967ab0d34851be44199bc9821b128fcfc75), [`96bdcb7`](https://github.com/tinacms/tinacms/commit/96bdcb79b30e96056c7b19614be260a6c3ef00da), [`a6a7735`](https://github.com/tinacms/tinacms/commit/a6a77351b97589c60de69445a9eb2ea57beb4343), [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4)]:
+  - tinacms@2.2.6
+  - @tinacms/schema-tools@1.6.3
+
+## 5.0.5
+
+### Patch Changes
+
+- Updated dependencies [cf1530d]
+- Updated dependencies [2762994]
+- Updated dependencies [ba5f7a3]
+  - tinacms@2.2.5
+
 ## 5.0.4
 
 ### Patch Changes

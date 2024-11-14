@@ -1,6 +1,6 @@
 {
 	"name": "next-tinacms-s3",
-	"version": "5.0.4",
+	"version": "7.0.0",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"files": [
@@ -24,14 +24,14 @@
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",
 		"@types/crypto-js": "^3.1.47",
-		"@types/js-cookie": "^2.2.6",
-		"@types/node": "^13.13.1",
-		"@types/react": "^18.3.3",
-		"next": "14.2.5",
+		"@types/js-cookie": "^2.2.7",
+		"@types/node": "^22.7.4",
+		"@types/react": "^18.3.10",
+		"next": "14.2.10",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"tinacms": "workspace:*",
-		"typescript": "^5.5.4"
+		"typescript": "^5.6.2"
 	},
 	"peerDependencies": {
 		"tinacms": "workspace:*"
@@ -44,7 +44,7 @@
 		"directory": "packages/next-tinacms-s3"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "^3.357.0",
-		"multer": "1.4.5-lts.1"
+		"@aws-sdk/s3-request-presigner": "^3.658.1",
+		"@aws-sdk/client-s3": "^3.658.1"
 	}
 }

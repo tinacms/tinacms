@@ -1,0 +1,15 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mermaid",
+      "value": "---\nconfig:\n  theme: light\n---\nflowchart TD\n    A[Christmas] -->|Get money| B(Go shopping)\n    B --> C{Let me think}\n    C -->|One| D[Laptop]\n    C -->|Two| E[iPhone]",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,44 @@
 # tinacms-gitprovider-github
 
+## 2.0.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@1.3.7
+
+## 2.0.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@1.3.6
+
+## 2.0.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@1.3.5
+
+## 2.0.4
+
+### Patch Changes
+
+- [#4843](https://github.com/tinacms/tinacms/pull/4843) [`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Update Minor & Patch Dependencies Versions
+
+- Updated dependencies [[`4753c9b`](https://github.com/tinacms/tinacms/commit/4753c9b53854d19212229f985bc445b2794fad9a)]:
+  - @tinacms/datalayer@1.3.4
+
+## 2.0.3
+
+### Patch Changes
+
+- [#4804](https://github.com/tinacms/tinacms/pull/4804) [`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4) Thanks [@dependabot](https://github.com/apps/dependabot)! - ⬆️ Updates Typescript to v5.5, @types/node to v22.x, next.js to latest version 14.x, and removes node-fetch
+
+- Updated dependencies [[`d08053e`](https://github.com/tinacms/tinacms/commit/d08053e758b6910afa8ab8952a40984921cccbc4)]:
+  - @tinacms/datalayer@1.3.3
+
 ## 2.0.2
 
 ### Patch Changes

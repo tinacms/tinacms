@@ -3,15 +3,10 @@ on:
   push:
     branches: [main]
 
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
   build:
-    strategy:
-      max-parallel: 1
-      matrix:
-        channel:
-          - latest
-          - dev
-
     runs-on: ubuntu-latest
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -19,7 +14,6 @@ jobs:
     steps:
       - name: Generate a token
         uses: actions/create-github-app-token@v1
-        if: matrix.channel == 'latest'
         id: generate-token
         with:
           # uses https://github.com/organizations/tinacms/settings/apps/release-bot-allow-prs-and-push
@@ -29,7 +23,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          token: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
+          token: ${{ steps.generate-token.outputs.token }}
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
 
@@ -73,29 +67,63 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: Release to @dev channel
-        if: matrix.channel == 'dev'
+      - name: Setup git credentials
         run: |
-          pnpm version:snapshot
-          pnpm run publish:beta
+          git config --global user.email "bot@tina.io"
+          git config --global user.name "Tina Realease Bot"
 
-      - name: Publish
-        if: matrix.channel == 'latest'
-        run: |
-          pnpm run publish
-
-      - name: Push tags
-        if: matrix.channel == 'latest'
-        run: |
-          pnpm push-tags
-        env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
-      - name: Create release pull request
+      - name: Create release pull request or publish packages
         uses: changesets/action@v1
-        if: matrix.channel == 'latest'
+        id: changesets
         with:
           version: pnpm run version
+          publish: pnpm run publish
+          createGithubReleases: true
+          setupGitUser: false
         env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN  }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
+
+      - name: Release to @dev channel
+        if: steps.changesets.outputs.hasChangesets == 'true'
+        run: |
+          git checkout ${{ github.sha }}
+          pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
+          pnpm run publish:beta
+          echo "A release PR has been created: <https://github.com/tinacms/tinacms/pull/${{ steps.changesets.outputs.pullRequestNumber }}>" >> $GITHUB_STEP_SUMMARY
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token  }}
+
+      - name: Has TinaCMS been published
+        id: newTinaCMSVersion
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          # $publishedPackages is a json array of [{"name": "@xx/xx", "version": "1.2.0"}]
+          # work out if tinacms has been published and output the version number
+          newTinaCMSVersion=$(echo $publishedPackages | jq -r '.[] | select(.name == "tinacms") | .version')
+
+          if [ -z "$newTinaCMSVersion" ]; then
+            echo "❌ TinaCMS not published" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "🚀 A new version of TinaCMS was released: $newTinaCMSVersion" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "newTinaCMSVersion=$newTinaCMSVersion" >> $GITHUB_OUTPUT
+        env:
+          publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
+
+      - name: Publish release notes
+        if: steps.newTinaCMSVersion.outputs.newTinaCMSVersion != ''
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          ref: main
+          workflow: main-generate-release-notes.yml
+          inputs: |
+            {
+              "release_name": "${{ steps.newTinaCMSVersion.outputs.newTinaCMSVersion }}"
+            }
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Summary
+        if: steps.newTinaCMSVersion.outputs.newTinaCMSVersion == '' && steps.changesets.outputs.hasChangesets == 'false'
+        run: |
+          echo "❌ Nothing was published" >> $GITHUB_STEP_SUMMARY

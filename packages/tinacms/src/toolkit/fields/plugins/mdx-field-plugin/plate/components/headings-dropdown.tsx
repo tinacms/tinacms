@@ -8,6 +8,7 @@ import {
   isBlock,
   toggleNodeType,
   useEditorRef,
+  useEditorState,
   useEditorSelector,
 } from '@udecode/plate-common'
 import {
@@ -16,9 +17,11 @@ import {
   ELEMENT_H3,
   ELEMENT_H4,
   ELEMENT_H5,
+  ELEMENT_H6,
 } from '@udecode/plate-heading'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 import { ToolbarButton } from './plate-ui/toolbar'
+import { helpers, unsupportedItemsInTable } from '../plugins/core/common'
 
 import {
   DropdownMenu,
@@ -29,6 +32,7 @@ import {
   useOpenState,
 } from './plate-ui/dropdown-menu'
 import { Icons } from './plate-ui/icons'
+import { ELEMENT_TABLE } from '@udecode/plate-table'
 
 const items = [
   {
@@ -67,6 +71,12 @@ const items = [
     label: 'Heading 5',
     value: ELEMENT_H5,
   },
+  {
+    description: 'Heading 6',
+    icon: Icons.h6,
+    label: 'Heading 6',
+    value: ELEMENT_H6,
+  },
 ]
 
 const defaultItem =
@@ -95,7 +105,10 @@ export function HeadingsMenu(props: DropdownMenuProps) {
   }, [])
 
   const editor = useEditorRef()
+  const editorState = useEditorState()
   const openState = useOpenState()
+
+  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
 
   const selectedItem = items.find((item) => item.value === value) ?? defaultItem
   const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem
@@ -110,7 +123,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
           tooltip="Headings"
         >
           <SelectedItemIcon className="size-5" />
-          <span className="hidden 2xl:flex">{selectedItemLabel}</span>
+          <span className="@md/toolbar:flex hidden">{selectedItemLabel}</span>
         </ToolbarButton>
       </DropdownMenuTrigger>
 
@@ -124,16 +137,23 @@ export function HeadingsMenu(props: DropdownMenuProps) {
           }}
           value={value}
         >
-          {items.map(({ icon: Icon, label, value: itemValue }) => (
-            <DropdownMenuRadioItem
-              className="min-w-[180px]"
-              key={itemValue}
-              value={itemValue}
-            >
-              <Icon className="mr-2 size-5" />
-              {label}
-            </DropdownMenuRadioItem>
-          ))}
+          {items
+            .filter((item) => {
+              if (userInTable) {
+                return !unsupportedItemsInTable.has(item.label)
+              }
+              return true
+            })
+            .map(({ icon: Icon, label, value: itemValue }) => (
+              <DropdownMenuRadioItem
+                className="min-w-[180px]"
+                key={itemValue}
+                value={itemValue}
+              >
+                <Icon className="mr-2 size-5" />
+                {label}
+              </DropdownMenuRadioItem>
+            ))}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

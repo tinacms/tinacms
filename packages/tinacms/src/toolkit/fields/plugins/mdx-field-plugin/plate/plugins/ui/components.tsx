@@ -1,39 +1,51 @@
-import React from 'react'
+import { withProps } from '@udecode/cn'
 import {
-  ELEMENT_HR,
-  ELEMENT_LINK,
-  ELEMENT_PARAGRAPH,
-  ELEMENT_CODE_BLOCK,
   ELEMENT_BLOCKQUOTE,
-  ELEMENT_LI,
-  ELEMENT_OL,
-  ELEMENT_UL,
+  ELEMENT_CODE_BLOCK,
+  ELEMENT_CODE_LINE,
+  ELEMENT_CODE_SYNTAX,
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
   ELEMENT_H4,
   ELEMENT_H5,
   ELEMENT_H6,
-  MARK_CODE,
+  ELEMENT_HR,
+  ELEMENT_LI,
+  ELEMENT_LINK,
+  ELEMENT_OL,
+  ELEMENT_PARAGRAPH,
+  ELEMENT_TABLE,
+  ELEMENT_TD,
+  ELEMENT_TH,
+  ELEMENT_TR,
+  ELEMENT_UL,
   MARK_BOLD,
+  MARK_CODE,
   MARK_ITALIC,
   MARK_STRIKETHROUGH,
   MARK_UNDERLINE,
-  ELEMENT_CODE_LINE,
-  ELEMENT_CODE_SYNTAX,
 } from '@udecode/plate'
-import { classNames } from './helpers'
-import { useSelected } from 'slate-react'
-import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command'
-import { SlashInputElement } from '../../components/plate-ui/slash-input-element'
-import { withProps } from '@udecode/cn'
 import { PlateElement, PlateLeaf } from '@udecode/plate-common'
-import { ListElement } from '../../components/plate-ui/list-element'
+import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command'
+import React from 'react'
+import { useSelected } from 'slate-react'
 import { BlockquoteElement } from '../../components/plate-ui/blockquote-element'
+import { CodeBlockElement } from '../../components/plate-ui/code-block-element'
 import { CodeLeaf } from '../../components/plate-ui/code-leaf'
 import { CodeLineElement } from '../../components/plate-ui/code-line-element'
 import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf'
-import { CodeBlockElement } from '../../components/plate-ui/code-block-element'
+import { ListElement } from '../../components/plate-ui/list-element'
+import { MermaidElement } from '../../components/plate-ui/mermaid-element'
+import { SlashInputElement } from '../../components/plate-ui/slash-input-element'
+import {
+  TableCellElement,
+  TableCellHeaderElement,
+} from '../../components/plate-ui/table-cell-element'
+import { TableElement } from '../../components/plate-ui/table-element'
+import { TableRowElement } from '../../components/plate-ui/table-row-element'
+import { ELEMENT_MERMAID } from '../custom/mermaid-plugin'
+import { classNames } from './helpers'
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -139,6 +151,7 @@ export const Components = () => {
         {...props}
       />
     ),
+    [ELEMENT_MERMAID]: MermaidElement,
     [ELEMENT_BLOCKQUOTE]: BlockquoteElement,
     [ELEMENT_CODE_BLOCK]: CodeBlockElement,
     [ELEMENT_CODE_LINE]: CodeLineElement,
@@ -223,5 +236,9 @@ export const Components = () => {
         </div>
       )
     },
+    [ELEMENT_TABLE]: TableElement,
+    [ELEMENT_TR]: TableRowElement,
+    [ELEMENT_TD]: TableCellElement,
+    [ELEMENT_TH]: TableCellHeaderElement,
   }
 }
