@@ -48,5 +48,8 @@
 		"typescript": "^5.6.2",
 		"vite": "^4.5.5"
 	},
-	"packageManager": "pnpm@9.11.0"
+	"packageManager": "pnpm@9.11.0",
+	"overrides": {
+		"dompurify": "2.4.3"
+	}
 }
