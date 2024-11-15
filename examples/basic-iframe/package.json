@@ -15,16 +15,16 @@
 		"@tinacms/graphql": "workspace:*",
 		"dotenv": "^16.4.5",
 		"js-base64": "^3.7.7",
-		"next": "^14.2.13",
+		"next": "^14.2.18",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-is": "^18.3.1",
 		"tinacms": "workspace:*",
-		"typescript": "^5.6.2"
+		"typescript": "^5.6.3"
 	},
 	"devDependencies": {
 		"@tinacms/cli": "workspace:*",
-		"@types/node": "^22.7.4",
+		"@types/node": "^22.9.0",
 		"eslint": "7"
 	},
 	"version": null
