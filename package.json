@@ -49,7 +49,10 @@
 		"vite": "^4.5.5"
 	},
 	"packageManager": "pnpm@9.11.0",
-	"overrides": {
-		"dompurify": "2.4.3"
+	"_comment": "We override the version of 'dompurify' to ensure that the known prototype pollution vulnerability is patched. This override is necessary until the 'mermaid' package which have 'dompurify' as the transitive package is updated to a version that includes the fix.",
+	"pnpm": {
+		"overrides": {
+			"dompurify": "2.5.6"
+		}
 	}
 }
