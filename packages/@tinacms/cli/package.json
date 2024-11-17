@@ -3,7 +3,11 @@
 	"version": "1.6.11",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
-	"files": ["dist", "bin/*", ".env"],
+	"files": [
+		"dist",
+		"bin/*",
+		".env"
+	],
 	"license": "Apache-2.0",
 	"bin": {
 		"tinacms": "bin/tinacms"
@@ -101,5 +105,8 @@
 	"repository": {
 		"url": "https://github.com/tinacms/tinacms.git",
 		"directory": "packages/@tinacms/cli"
+	},
+	"resolutions": {
+		"dompurify": "2.5.7"
 	}
 }

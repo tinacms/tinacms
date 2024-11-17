@@ -5,7 +5,7 @@ settings:
     excludeLinksFromLockfile: false
 
 overrides:
-    dompurify: 2.5.6
+    dompurify: 2.5.7
 
 importers:
     .:
@@ -11016,10 +11016,10 @@ packages:
             }
         engines: { node: '>= 4' }
 
-    dompurify@2.5.6:
+    dompurify@2.5.7:
         resolution:
             {
-                integrity: sha512-zUTaUBO8pY4+iJMPE1B9XlO2tXVYIcEA4SNGtvDELzTSCQO7RzH+j7S180BmhmJId78lqGU2z19vgVx2Sxs/PQ==,
+                integrity: sha512-2q4bEI+coQM8f5ez7kt2xclg1XsecaV9ASJk/54vwlfRRNQfDqJz2pzQ8t0Ix/ToBpXlVjrRIx7pFC/o8itG2Q==,
             }
 
     domutils@2.8.0:
@@ -27115,7 +27115,7 @@ snapshots:
         dependencies:
             domelementtype: 2.3.0
 
-    dompurify@2.5.6: {}
+    dompurify@2.5.7: {}
 
     domutils@2.8.0:
         dependencies:
@@ -30115,7 +30115,7 @@ snapshots:
             d3-sankey: 0.12.3
             dagre-d3-es: 7.0.10
             dayjs: 1.11.13
-            dompurify: 2.5.6
+            dompurify: 2.5.7
             elkjs: 0.9.3
             katex: 0.16.11
             khroma: 2.1.0
@@ -30134,7 +30134,7 @@ snapshots:
             '@braintree/sanitize-url': 6.0.4
             d3: 7.9.0
             dagre-d3-es: 7.0.6
-            dompurify: 2.5.6
+            dompurify: 2.5.7
             khroma: 2.1.0
             lodash-es: 4.17.21
             moment-mini: 2.29.4
