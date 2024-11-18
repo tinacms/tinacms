@@ -183,7 +183,7 @@
 		"url": "https://github.com/tinacms/tinacms.git",
 		"directory": "packages/tinacms"
 	},
-	"overrides": {
+	"resolutions": {
 		"dompurify": "2.5.7"
 	}
 }
