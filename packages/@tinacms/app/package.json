@@ -24,8 +24,5 @@
 		"tinacms": "workspace:*",
 		"typescript": "^5.6.3",
 		"zod": "^3.23.8"
-	},
-	"resolutions": {
-		"dompurify": "2.5.7"
 	}
 }
