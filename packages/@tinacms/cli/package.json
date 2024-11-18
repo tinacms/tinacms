@@ -107,14 +107,6 @@
 		"directory": "packages/@tinacms/cli"
 	},
 	"overrides": {
-		"mermaid": {
-			"dompurify": "2.5.7"
-		},
-		"@tinacms/app > mermaid": {
-			"dompurify": "2.5.7"
-		},
-		"tinacms > mermaid": {
-			"dompurify": "2.5.7"
-		}
+		"dompurify": "2.5.7"
 	}
 }
