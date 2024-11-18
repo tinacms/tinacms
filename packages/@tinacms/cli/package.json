@@ -106,7 +106,7 @@
 		"url": "https://github.com/tinacms/tinacms.git",
 		"directory": "packages/@tinacms/cli"
 	},
-	"resolutions": {
+	"overrides": {
 		"dompurify": "2.5.7"
 	}
 }
