@@ -494,6 +494,9 @@ importers:
             '@tinacms/mdx':
                 specifier: workspace:*
                 version: link:../mdx
+            dompurify:
+                specifier: 2.5.7
+                version: 2.5.7
             final-form:
                 specifier: 4.20.10
                 version: 4.20.10
@@ -11017,6 +11020,12 @@ packages:
         resolution:
             {
                 integrity: sha512-ewwFzHzrrneRjxzmK6oVz/rZn9VWspGFRDb4/rRtIsM1n36t9AKma/ye8syCpcw+XJ25kOK/hOG7t1j2I2yBqA==,
+            }
+
+    dompurify@2.5.7:
+        resolution:
+            {
+                integrity: sha512-2q4bEI+coQM8f5ez7kt2xclg1XsecaV9ASJk/54vwlfRRNQfDqJz2pzQ8t0Ix/ToBpXlVjrRIx7pFC/o8itG2Q==,
             }
 
     dompurify@3.1.6:
@@ -27119,6 +27128,8 @@ snapshots:
             domelementtype: 2.3.0
 
     dompurify@2.4.1: {}
+
+    dompurify@2.5.7: {}
 
     dompurify@3.1.6: {}
 

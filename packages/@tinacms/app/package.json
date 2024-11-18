@@ -25,7 +25,9 @@
 		"typescript": "^5.6.3",
 		"zod": "^3.23.8"
 	},
-	"overrides": {
-		"dompurify": "2.5.7"
+	"pnpm": {
+		"overrides": {
+			"dompurify": "2.5.7"
+		}
 	}
 }

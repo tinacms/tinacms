@@ -106,7 +106,9 @@
 		"url": "https://github.com/tinacms/tinacms.git",
 		"directory": "packages/@tinacms/cli"
 	},
-	"overrides": {
-		"dompurify": "2.5.7"
+	"pnpm": {
+		"overrides": {
+			"dompurify": "2.5.7"
+		}
 	}
 }
