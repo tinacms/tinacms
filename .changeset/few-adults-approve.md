@@ -20,5 +20,5 @@
 "@tinacms/webpack-helpers": patch
 ---
 
-Apply `override` to addresses vulnerable package `dompurify` and performs updates to minor and patch dependencies
+Updates minor and patch dependencies
 
