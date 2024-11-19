@@ -1,5 +1,24 @@
 # tinacms
 
+## 2.5.0
+
+### Minor Changes
+
+- [#5218](https://github.com/tinacms/tinacms/pull/5218) [`03bb823`](https://github.com/tinacms/tinacms/commit/03bb8237df87dab9da503818b839d44209263a48) Thanks [@kldavis4](https://github.com/kldavis4)! - Adds referential integrity for renaming and deleting referenced documents.
+
+  When a document is renamed, any documents which reference the document will be updated with the new document name. When a document is deleted, the user will be warned and any references to the document will be deleted.
+
+### Patch Changes
+
+- [#5262](https://github.com/tinacms/tinacms/pull/5262) [`60fb710`](https://github.com/tinacms/tinacms/commit/60fb710addd539860eb7ba39196e02f3bb5f08c1) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Fixes a styling issue where the delete Block Icon was invisible when using Safari (Browser)
+
+- [#5267](https://github.com/tinacms/tinacms/pull/5267) [`f3aa146`](https://github.com/tinacms/tinacms/commit/f3aa1465423101520bd05939249228c8d8b2a0df) Thanks [@Ben0189](https://github.com/Ben0189)! - update packages jsonpath-plus and happy-dom
+
+- Updated dependencies [[`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6), [`ac2003f`](https://github.com/tinacms/tinacms/commit/ac2003f87381de36c417d69fdb59485dc96f334a), [`03bb823`](https://github.com/tinacms/tinacms/commit/03bb8237df87dab9da503818b839d44209263a48)]:
+  - @tinacms/mdx@1.5.2
+  - @tinacms/schema-tools@1.6.8
+  - @tinacms/search@1.0.35
+
 ## 2.4.0
 
 ### Minor Changes

@@ -1,5 +1,21 @@
 # tinacms-cli
 
+## 1.6.12
+
+### Patch Changes
+
+- [#5276](https://github.com/tinacms/tinacms/pull/5276) [`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6) Thanks [@Ben0189](https://github.com/Ben0189)! - Updates minor and patch dependencies
+
+- [#5248](https://github.com/tinacms/tinacms/pull/5248) [`97d38ab`](https://github.com/tinacms/tinacms/commit/97d38abd3db198d3b8bff70d5fe481d8215b4e06) Thanks [@kldavis4](https://github.com/kldavis4)! - Adds additional validation of the local tina schema and the remote version to prevent inconsistent behavior when changes are not committed to the remote GitHub repository. Related issue: https://github.com/tinacms/tinacms/issues/5221
+
+- Updated dependencies [[`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6), [`ac2003f`](https://github.com/tinacms/tinacms/commit/ac2003f87381de36c417d69fdb59485dc96f334a), [`03bb823`](https://github.com/tinacms/tinacms/commit/03bb8237df87dab9da503818b839d44209263a48), [`60fb710`](https://github.com/tinacms/tinacms/commit/60fb710addd539860eb7ba39196e02f3bb5f08c1), [`f3aa146`](https://github.com/tinacms/tinacms/commit/f3aa1465423101520bd05939249228c8d8b2a0df)]:
+  - @tinacms/app@2.1.12
+  - @tinacms/graphql@1.5.8
+  - @tinacms/metrics@1.0.8
+  - @tinacms/schema-tools@1.6.8
+  - @tinacms/search@1.0.35
+  - tinacms@2.5.0
+
 ## 1.6.11
 
 ### Patch Changes
