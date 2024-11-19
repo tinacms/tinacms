@@ -2,9 +2,9 @@
 
 */
 
-import path from 'path'
+import path from 'node:path'
 import cors from 'cors'
-import http from 'http'
+import http from 'node:http'
 import express from 'express'
 import { altairExpress } from 'altair-express-middleware'
 // @ts-ignore

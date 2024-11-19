@@ -24,8 +24,8 @@
     "commander": "^7.2.0",
     "esbuild": "^0.15.18",
     "fs-extra": "^11.2.0",
-    "tsup": "^8.3.0",
-    "typescript": "^5.6.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
     "vite": "^4.5.5"
   }
 }
