@@ -211,6 +211,7 @@ export function stringifyProps(
             `Unexpected string for rich-text, ensure the value has been properly parsed`
           )
         }
+
         if (field.list) {
           throw new Error(`Rich-text list is not supported`)
         } else {

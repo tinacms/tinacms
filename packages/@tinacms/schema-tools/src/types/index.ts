@@ -260,7 +260,7 @@ export type PasswordField = (
     type: 'password'
   }
 
-type toolbarItemName =
+type ToolbarOverrideType =
   | 'heading'
   | 'link'
   | 'image'
@@ -273,6 +273,8 @@ type toolbarItemName =
   | 'italic'
   | 'raw'
   | 'embed'
+  | 'mermaid'
+  | 'table'
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }
 export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
@@ -287,7 +289,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
      * will be stored as frontmatter
      */
     isBody?: boolean
-    toolbarOverride?: toolbarItemName[]
+    toolbarOverride?: ToolbarOverrideType[]
     templates?: RichTextTemplate<WithNamespace>[]
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser
@@ -828,6 +830,7 @@ type Document = {
     relativePath: string
     filename: string
     extension: string
+    hasReferences?: boolean
   }
 }
 export interface UICollection<Form = any, CMS = any, TinaForm = any> {

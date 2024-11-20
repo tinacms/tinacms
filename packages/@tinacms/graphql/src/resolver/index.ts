@@ -8,6 +8,7 @@ import { assertShape, lastItem, sequential } from '../util'
 import { NAMER } from '../ast-builder'
 import isValid from 'date-fns/isValid/index.js'
 import { parseMDX, stringifyMDX } from '../mdx'
+import { JSONPath } from 'jsonpath-plus'
 
 import type {
   Collectable,
@@ -185,7 +186,8 @@ export const transformDocumentIntoPayload = async (
   rawData: { _collection; _template },
   tinaSchema: TinaSchema,
   config?: GraphQLConfig,
-  isAudit?: boolean
+  isAudit?: boolean,
+  hasReferences?: boolean
 ) => {
   const collection = tinaSchema.getCollection(rawData._collection)
   try {
@@ -252,6 +254,7 @@ export const transformDocumentIntoPayload = async (
         basename,
         filename,
         extension,
+        hasReferences,
         path: fullPath,
         relativePath,
         breadcrumbs,
@@ -272,6 +275,42 @@ export const transformDocumentIntoPayload = async (
     throw e
   }
 }
+
+/**
+ * Updates a property in an object using a JSONPath.
+ * @param {Object} obj - The object to update.
+ * @param {string} path - The JSONPath string.
+ * @param {*} newValue - The new value to set at the specified path.
+ * @returns {Object} - The updated object.
+ */
+const updateObjectWithJsonPath = (obj, path, newValue) => {
+  // Handle the case where path is a simple top-level property
+  if (!path.includes('.') && !path.includes('[')) {
+    if (path in obj) {
+      obj[path] = newValue
+    }
+    return obj
+  }
+
+  // For non-top-level properties, find the parent of the property to update
+  const parentPath = path.replace(/\.[^.]+$/, '')
+  const keyToUpdate = path.match(/[^.]+$/)[0]
+
+  // Retrieve the parent object using the parent path
+  const parents = JSONPath({ path: parentPath, json: obj, resultType: 'value' })
+
+  if (parents.length > 0) {
+    parents.forEach((parent) => {
+      if (parent && typeof parent === 'object' && keyToUpdate in parent) {
+        // Update the property with the new value
+        parent[keyToUpdate] = newValue
+      }
+    })
+  }
+
+  return obj
+}
+
 /**
  * The resolver provides functions for all possible types of lookup
  * values and retrieves them from the database
@@ -342,18 +381,29 @@ export class Resolver {
       )
     }
   }
-  public getDocument = async (fullPath: unknown) => {
+
+  public getDocument = async (
+    fullPath: unknown,
+    opts: {
+      collection?: Collection<true>
+      checkReferences?: boolean
+    } = {}
+  ) => {
     if (typeof fullPath !== 'string') {
       throw new Error(`fullPath must be of type string for getDocument request`)
     }
 
     const rawData = await this.getRaw(fullPath)
+    const hasReferences = opts?.checkReferences
+      ? await this.hasReferences(fullPath, opts.collection)
+      : undefined
     return transformDocumentIntoPayload(
       fullPath,
       rawData,
       this.tinaSchema,
       this.config,
-      this.isAudit
+      this.isAudit,
+      hasReferences
     )
   }
 
@@ -762,6 +812,22 @@ export class Resolver {
       if (isDeletion) {
         const doc = await this.getDocument(realPath)
         await this.deleteDocument(realPath)
+        if (await this.hasReferences(realPath, collection)) {
+          const collRefs = await this.findReferences(realPath, collection)
+          for (const [collection, refFields] of Object.entries(collRefs)) {
+            for (const [refPath, refs] of Object.entries(refFields)) {
+              let refDoc = await this.getRaw(refPath)
+              for (const ref of refs) {
+                refDoc = updateObjectWithJsonPath(
+                  refDoc,
+                  ref.path.join('.'),
+                  null
+                )
+              }
+              await this.database.put(refPath, refDoc, collection)
+            }
+          }
+        }
         return doc
       }
       if (isUpdateName) {
@@ -772,6 +838,7 @@ export class Resolver {
         assertShape<{ relativePath: string }>(args?.params, (yup) =>
           yup.object({ relativePath: yup.string().required() })
         )
+
         // Get the real document
         const doc = await this.getDocument(realPath)
         const newRealPath = path.join(
@@ -782,6 +849,21 @@ export class Resolver {
         await this.database.put(newRealPath, doc._rawData, collection.name)
         // Delete the old document
         await this.deleteDocument(realPath)
+        // Update references to the document
+        const collRefs = await this.findReferences(realPath, collection)
+        for (const [collection, refFields] of Object.entries(collRefs)) {
+          for (const [refPath, refs] of Object.entries(refFields)) {
+            let refDoc = await this.getRaw(refPath)
+            for (const ref of refs) {
+              refDoc = updateObjectWithJsonPath(
+                refDoc,
+                ref.path.join('.'),
+                newRealPath
+              )
+            }
+            await this.database.put(refPath, refDoc, collection)
+          }
+        }
         return this.getDocument(newRealPath)
       }
       /**
@@ -801,7 +883,10 @@ export class Resolver {
       /**
        * getDocument, get<Collection>Document
        */
-      return this.getDocument(realPath)
+      return this.getDocument(realPath, {
+        collection,
+        checkReferences: true,
+      })
     }
   }
 
@@ -951,16 +1036,6 @@ export class Resolver {
     const edges = result.edges
     const pageInfo = result.pageInfo
 
-    // This was the non datalayer code
-    // } else {
-    //   const ext = collection?.format || '.md'
-    //   edges = (
-    //     await this.database.store.glob(collection.path, this.getDocument, ext)
-    //   ).map((document) => ({
-    //     node: document,
-    //   }))
-    // }
-
     return {
       totalCount: edges.length,
       edges,
@@ -971,6 +1046,100 @@ export class Resolver {
         endCursor: '',
       },
     }
+  }
+
+  /**
+   * Checks if a document has references to it
+   * @param id  The id of the document to check for references
+   * @param c The collection to check for references
+   * @returns true if the document has references, false otherwise
+   */
+  private hasReferences = async (id: string, c: Collection) => {
+    let count = 0
+    const deepRefs = this.tinaSchema.findReferences(c.name)
+    for (const [collection, refs] of Object.entries(deepRefs)) {
+      for (const ref of refs) {
+        await this.database.query(
+          {
+            collection: collection,
+            filterChain: makeFilterChain({
+              conditions: [
+                {
+                  filterPath: ref.path.join('.'),
+                  filterExpression: {
+                    _type: 'reference',
+                    _list: false,
+                    eq: id,
+                  },
+                },
+              ],
+            }),
+            sort: ref.field.name,
+          },
+          (refId: string) => {
+            count++
+            return refId
+          }
+        )
+        if (count) {
+          return true
+        }
+      }
+    }
+
+    return false
+  }
+
+  /**
+   * Finds references to a document
+   * @param id the id of the document to find references to
+   * @param c the collection to find references in
+   * @returns references to the document in the form of a map of collection names to a list of fields that reference the document
+   */
+  private findReferences = async (id: string, c: Collection) => {
+    const references: Record<
+      string,
+      Record<string, { path: string[]; field: TinaField }[]>
+    > = {}
+    const deepRefs = this.tinaSchema.findReferences(c.name)
+
+    for (const [collection, refs] of Object.entries(deepRefs)) {
+      for (const ref of refs) {
+        await this.database.query(
+          {
+            collection: collection,
+            filterChain: makeFilterChain({
+              conditions: [
+                {
+                  filterPath: ref.path.join('.'),
+                  filterExpression: {
+                    _type: 'reference',
+                    _list: false,
+                    eq: id,
+                  },
+                },
+              ],
+            }),
+            sort: ref.field.name,
+          },
+          (refId: string) => {
+            if (!references[collection]) {
+              references[collection] = {}
+            }
+            if (!references[collection][refId]) {
+              references[collection][refId] = []
+            }
+            references[collection][refId].push({
+              path: ref.path,
+              field: ref.field,
+            })
+            return refId
+          }
+        )
+      }
+    }
+
+    return references
   }
 
   private buildFieldMutations = async (

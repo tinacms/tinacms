@@ -41,6 +41,7 @@ const sysSchema = z.object({
   relativePath: z.string(),
   title: z.string().optional().nullable(),
   template: z.string(),
+  hasReferences: z.boolean().optional().nullable(),
   collection: z.object({
     name: z.string(),
     slug: z.string(),
@@ -838,6 +839,7 @@ _internalSys: _sys {
   extension
   relativePath
   title
+  hasReferences
   template
   collection {
     name

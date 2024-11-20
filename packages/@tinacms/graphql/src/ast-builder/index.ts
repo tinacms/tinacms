@@ -69,6 +69,15 @@ export const SysFieldDefinition = {
         kind: 'Field' as const,
         name: {
           kind: 'Name' as const,
+          value: 'hasReferences',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
           value: 'breadcrumbs',
         },
         arguments: [],

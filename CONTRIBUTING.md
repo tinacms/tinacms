@@ -122,12 +122,6 @@ pnpm watch
 
 ## E2E tests
 
-In order to run the Cypress E2E tests:
+In order to run the Playwright E2E tests locally:
 
-1. Build and start the E2E test project
-   ```sh
-   NEXT_PUBLIC_USE_LOCAL_CLIENT=1
-   pnpm build:e2e
-   pnpm start:e2e
-   ```
-2. Run the tests in a separate terminal `pnpm test:dev` or `pnpm test:e2e`
+Please refer to the readme file in playwright/tina-playwright

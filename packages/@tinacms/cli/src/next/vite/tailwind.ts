@@ -1,9 +1,10 @@
-import tailwind from 'tailwindcss'
-import type { Plugin } from 'vite'
-import defaultTheme from 'tailwindcss/defaultTheme.js'
-import twTypography from '@tailwindcss/typography'
-import aspectRatio from '@tailwindcss/aspect-ratio'
 import path from 'node:path'
+import aspectRatio from '@tailwindcss/aspect-ratio'
+import containerQueries from '@tailwindcss/container-queries'
+import twTypography from '@tailwindcss/typography'
+import tailwind from 'tailwindcss'
+import defaultTheme from 'tailwindcss/defaultTheme.js'
+import type { Plugin } from 'vite'
 
 export const tinaTailwind = (
   spaPath: string,
@@ -253,7 +254,11 @@ export const tinaTailwind = (
           },
         },
         content,
-        plugins: [twTypography({ className: 'tina-prose' }), aspectRatio],
+        plugins: [
+          twTypography({ className: 'tina-prose' }),
+          aspectRatio,
+          containerQueries,
+        ],
       }) as unknown as Plugin
       plugins.push(tw)
 
