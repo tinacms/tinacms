@@ -32,7 +32,6 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
       return ook(code)
     }
     const nok: State = function (code) {
-      // console.trace()
       return nnok(code)
     }
 
