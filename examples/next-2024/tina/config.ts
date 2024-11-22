@@ -83,6 +83,25 @@ export default defineConfig({
           },
         ],
       },
+      {
+        name: 'author',
+        label: 'authors',
+        path: 'content/author',
+        format: 'mdx',
+        ui: {
+          router({ document }) {
+            return `/author/${document._sys.filename}`
+          },
+        },
+        fields: [
+          {
+            type: 'rich-text',
+            label: 'test rich text',
+            name: 'testrich',
+            isBody: true,
+          },
+        ],
+      },
     ],
   },
 })
