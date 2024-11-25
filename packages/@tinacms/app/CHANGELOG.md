@@ -1,5 +1,19 @@
 # @tinacms/app
 
+## 2.1.12
+
+### Patch Changes
+
+- [#5276](https://github.com/tinacms/tinacms/pull/5276) [`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6) Thanks [@Ben0189](https://github.com/Ben0189)! - Updates minor and patch dependencies
+
+- [#5218](https://github.com/tinacms/tinacms/pull/5218) [`03bb823`](https://github.com/tinacms/tinacms/commit/03bb8237df87dab9da503818b839d44209263a48) Thanks [@kldavis4](https://github.com/kldavis4)! - Adds referential integrity for renaming and deleting referenced documents.
+
+  When a document is renamed, any documents which reference the document will be updated with the new document name. When a document is deleted, the user will be warned and any references to the document will be deleted.
+
+- Updated dependencies [[`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6), [`03bb823`](https://github.com/tinacms/tinacms/commit/03bb8237df87dab9da503818b839d44209263a48), [`60fb710`](https://github.com/tinacms/tinacms/commit/60fb710addd539860eb7ba39196e02f3bb5f08c1), [`f3aa146`](https://github.com/tinacms/tinacms/commit/f3aa1465423101520bd05939249228c8d8b2a0df)]:
+  - @tinacms/mdx@1.5.2
+  - tinacms@2.5.0
+
 ## 2.1.11
 
 ### Patch Changes
