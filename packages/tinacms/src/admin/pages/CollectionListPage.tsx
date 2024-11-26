@@ -744,6 +744,8 @@ const CollectionListPage = () => {
                                         .slice(0, -1)
                                         .join('/')
 
+                                    console.log('Subfolders: ', subfolders)
+
                                     return (
                                       <tr
                                         key={`document-${document.node._sys.relativePath}`}
