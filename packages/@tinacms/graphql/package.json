@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/graphql",
-	"version": "1.5.7",
+	"version": "1.5.8",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
@@ -76,7 +76,7 @@
 		"@types/lru-cache": "^5.1.1",
 		"@types/mdast": "^3.0.15",
 		"@types/micromatch": "^4.0.9",
-		"@types/node": "^22.7.4",
+		"@types/node": "^22.9.0",
 		"@types/normalize-path": "^3.0.2",
 		"@types/ws": "^7.4.7",
 		"@types/yup": "^0.29.14",
@@ -86,6 +86,6 @@
 		"jest-matcher-utils": "^29.7.0",
 		"memory-level": "^1.0.0",
 		"nodemon": "3.1.4",
-		"typescript": "^5.6.2"
+		"typescript": "^5.6.3"
 	}
 }

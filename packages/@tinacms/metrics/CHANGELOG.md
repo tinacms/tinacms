@@ -1,5 +1,11 @@
 # @tinacms/metrics
 
+## 1.0.8
+
+### Patch Changes
+
+- [#5276](https://github.com/tinacms/tinacms/pull/5276) [`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6) Thanks [@Ben0189](https://github.com/Ben0189)! - Updates minor and patch dependencies
+
 ## 1.0.7
 
 ### Patch Changes
