@@ -175,13 +175,12 @@ export const FieldDescription = ({
   children?: any | any[]
   className?: string
 }) => {
-  if (!children) return null
-
   if (typeof children === 'string') {
     return (
       <span
         className={`block font-sans text-xs italic font-light text-gray-400 pt-0.5 whitespace-normal m-0 ${className}`}
         {...props}
+        dangerouslySetInnerHTML={{ __html: children }}
       />
     )
   }
