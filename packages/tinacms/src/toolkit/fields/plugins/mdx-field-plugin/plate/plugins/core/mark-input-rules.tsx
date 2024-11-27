@@ -7,7 +7,7 @@ const isMark = (node: TNode) => {
   return MARKS.some((mark) => node[mark])
 }
 
-function debounce(func, timeout = 500) {
+function debounce(func, timeout = 1000) {
   let timer: NodeJS.Timeout
   return (...args) => {
     clearTimeout(timer)
@@ -37,17 +37,26 @@ export const markInputRules = <
           const text = node.text
           const trimmedText = text.trim()
           if (trimmedText !== text) {
-            Transforms.removeNodes(editor, { at: path })
-            Editor.insertNode(editor, {
-              ...node,
-              text: trimmedText,
-            })
+            // Select the text range to be replaced
+            const range = Editor.range(editor, path)
+
+            // Delete the existing text
+            Transforms.delete(editor, { at: range })
+
+            // Reapply the marks
+            const marks = Object.fromEntries(
+              Object.entries(node).filter(([key]) => MARKS.includes(key))
+            )
+
+            // Insert the trimmed text with the same marks
+            Transforms.insertText(editor, trimmedText, { at: path, ...marks })
+
             console.log(`Trimmed text at ${path}: "${trimmedText}"`)
           }
         }
       }
     })
-  }, 300)
+  })
 
   editor.onChange = () => {
     onChange()
