@@ -292,7 +292,7 @@ export const eat = (
   if (lastChild?.type === 'text') {
     const lastCharacter = lastChild.value.slice(-1)
     if (lastCharacter === ' ') {
-      function lastNonSpaceIndex(str) {
+      function lastNonSpaceIndex(str: string) {
         const trimmedLength = str.trimEnd().length
         return trimmedLength > 0 ? trimmedLength - 1 : -1
       }
