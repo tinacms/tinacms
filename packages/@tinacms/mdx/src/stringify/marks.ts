@@ -292,9 +292,13 @@ export const eat = (
   if (lastChild?.type === 'text') {
     const lastCharacter = lastChild.value.slice(-1)
     if (lastCharacter === ' ') {
-      const firstSpaceIndex = lastChild.value.lastIndexOf(' ')
-      const text = lastChild.value.slice(0, firstSpaceIndex)
-      endSpaces.value = lastChild.value.slice(firstSpaceIndex)
+      function lastNonSpaceIndex(str) {
+        const trimmedLength = str.trimEnd().length
+        return trimmedLength > 0 ? trimmedLength - 1 : -1
+      }
+      const indexOfLastNonSpace = lastNonSpaceIndex(lastChild.value)
+      const text = lastChild.value.slice(0, indexOfLastNonSpace + 1)
+      endSpaces.value = lastChild.value.slice(indexOfLastNonSpace + 1)
       lastChild.value = text
     }
   }

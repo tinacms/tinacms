@@ -12,6 +12,16 @@ it('matches input', () => {
         children: [
           {
             type: 'text',
+            text: 'boldd    ',
+            bold: true,
+          },
+        ],
+      },
+      {
+        type: 'p',
+        children: [
+          {
+            type: 'text',
             text: ' boldd',
             bold: true,
           },
