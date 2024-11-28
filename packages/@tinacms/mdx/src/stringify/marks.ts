@@ -89,41 +89,49 @@ const inlineElementExceptLink = (
   content: InlineElementWithCallback,
   field: RichTextType,
   imageCallback: (url: string) => string
-): Md.PhrasingContent => {
+): Md.PhrasingContent[] => {
   switch (content.type) {
     case 'a':
       throw new Error(
         `Unexpected node of type "a", link elements should be processed after all inline elements have resolved`
       )
     case 'img':
-      return {
-        type: 'image',
-        url: imageCallback(content.url),
-        alt: content.alt,
-        title: content.caption,
-      }
+      return [
+        {
+          type: 'image',
+          url: imageCallback(content.url),
+          alt: content.alt,
+          title: content.caption,
+        },
+      ]
     case 'break':
-      return {
-        type: 'break',
-      }
+      return [
+        {
+          type: 'break',
+        },
+      ]
     case 'mdxJsxTextElement': {
       const { attributes, children } = stringifyPropsInline(
         content,
         field,
         imageCallback
       )
-      return {
-        type: 'mdxJsxTextElement',
-        name: content.name,
-        attributes,
-        children,
-      }
+      return [
+        {
+          type: 'mdxJsxTextElement',
+          name: content.name,
+          attributes,
+          children,
+        },
+      ]
     }
     case 'html_inline': {
-      return {
-        type: 'html',
-        value: content.value,
-      }
+      return [
+        {
+          type: 'html',
+          value: content.value,
+        },
+      ]
     }
     default:
       // @ts-expect-error type is 'never'
@@ -137,12 +145,11 @@ const inlineElementExceptLink = (
           field,
           imageCallback
         )
-        const first = nodes[0]
 
-        if (first) {
-          return first
+        if (nodes.length > 0) {
+          return nodes
         } else {
-          return text(content)
+          return [text(content)]
         }
       }
       throw new Error(`InlineElement: ${content.type} is not supported`)
@@ -183,10 +190,8 @@ export const eat = (
       ]
     }
     // non-text nodes can't be merged. Eg. img, break. So process them and move on to the rest
-    return [
-      inlineElementExceptLink(first, field, imageCallback),
-      ...eat(content.slice(1), field, imageCallback),
-    ]
+    const nodes = inlineElementExceptLink(first, field, imageCallback)
+    return [...nodes, ...eat(content.slice(1), field, imageCallback)]
   }
   const marks = getMarks(first)
 
@@ -197,7 +202,12 @@ export const eat = (
         ...eat(content.slice(1), field, imageCallback),
       ]
     } else {
-      return [text(first), ...eat(content.slice(1), field, imageCallback)]
+      const rest = content.slice(1)
+
+      const restNodes = eat(rest, field, imageCallback)
+
+      const res = [text(first), ...restNodes]
+      return res
     }
   }
   let nonMatchingSiblingIndex: number = 0
@@ -252,21 +262,63 @@ export const eat = (
       ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
     ]
   }
-  return [
+
+  const children = eat(
+    [
+      ...[first, ...matchingSiblings].map((sibling) =>
+        cleanNode(sibling, markToProcess)
+      ),
+    ],
+    field,
+    imageCallback
+  )
+
+  const firstChild = children[0]
+  const lastChild = children[children.length - 1]
+  const beginSpaces = { type: 'text' as const, value: '' }
+  const endSpaces = { type: 'text' as const, value: '' }
+  /**
+   * If the last child is a text node and ends with a space, we need to split it into two nodes
+   * because the the stringify logic doesn't understand that `*hello *world` should be `*hello* world`
+   */
+  if (firstChild?.type === 'text') {
+    const firstSpaceIndex = firstChild.value.search(/\S/)
+    if (firstSpaceIndex !== -1) {
+      const text = firstChild.value.slice(firstSpaceIndex)
+      beginSpaces.value = firstChild.value.slice(0, firstSpaceIndex)
+      firstChild.value = text
+    }
+  }
+  if (lastChild?.type === 'text') {
+    const lastCharacter = lastChild.value.slice(-1)
+    if (lastCharacter === ' ') {
+      const firstSpaceIndex = lastChild.value.lastIndexOf(' ')
+      const text = lastChild.value.slice(0, firstSpaceIndex)
+      endSpaces.value = lastChild.value.slice(firstSpaceIndex)
+      lastChild.value = text
+    }
+  }
+
+  const nextChildren = eat(
+    content.slice(nonMatchingSiblingIndex + 1),
+    field,
+    imageCallback
+  )
+
+  const phrasingContent: Md.PhrasingContent[] = [
     {
       type: markToProcess,
-      children: eat(
-        [
-          ...[first, ...matchingSiblings].map((sibling) =>
-            cleanNode(sibling, markToProcess)
-          ),
-        ],
-        field,
-        imageCallback
-      ),
+      children,
     },
-    ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
   ]
+  if (beginSpaces.value.length > 0) {
+    phrasingContent.unshift(beginSpaces)
+  }
+  phrasingContent.push(endSpaces)
+  if (nextChildren.length > 0) {
+    phrasingContent.push(...nextChildren)
+  }
+  return phrasingContent
 }
 const cleanNode = (
   node: InlineElementWithCallback,

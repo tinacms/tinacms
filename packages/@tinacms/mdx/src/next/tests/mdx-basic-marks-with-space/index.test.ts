@@ -5,34 +5,58 @@ import * as util from '../util'
 
 it('matches input', () => {
   const tree = {
-    type: 'root' as const,
+    type: 'root',
     children: [
       {
+        type: 'p',
         children: [
           {
-            type: 'text' as const,
-            text: 'This is ',
-          },
-          {
-            // These should have a `type` property, but it was stripped out by the rich-text editor
-            text: 'italic ',
-            italic: true,
+            type: 'text',
+            text: ' boldd',
+            bold: true,
           },
         ],
-        type: 'p' as const,
       },
       {
-        type: 'p' as const,
+        type: 'p',
         children: [
           {
-            // These should have a `type` property, but it was stripped out by the rich-text editor
+            type: 'text',
+            text: 'something',
+          },
+          {
+            type: 'text',
+            text: ' boldd',
+            bold: true,
+          },
+        ],
+      },
+      {
+        type: 'p',
+        children: [
+          {
+            type: 'text',
+            text: 'boldd ',
+            bold: true,
+          },
+          {
+            type: 'text',
+            text: 'something',
+          },
+        ],
+      },
+      {
+        type: 'p',
+        children: [
+          {
+            type: 'text',
             text: 'boldd ',
             bold: true,
           },
         ],
       },
     ],
-  }
+  } as const
   // @ts-expect-error - `type` property is missing intentionally
   const string = stringifyMDX(tree, field, (v) => v)
   expect(string).toMatchFile(util.mdPath(__dirname))

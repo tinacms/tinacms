@@ -193,9 +193,24 @@ export const blockElement = (
           return null
         }
       }
+      const children2 = eat(content.children, field, imageCallback)
+      function removeLastSpaceNodes(arr, n) {
+        for (let i = arr.length - 1; i >= 0; i--) {
+          const item = arr[i]
+          if (item.type === 'text' && item.value.trim() === '') {
+            arr.splice(i, 1)
+          } else {
+            break
+          }
+        }
+
+        return arr // Return the modified array
+      }
+      const children3 = removeLastSpaceNodes(children2, 0)
+
       return {
         type: 'paragraph',
-        children: eat(content.children, field, imageCallback),
+        children: children3,
       }
     case 'code_block':
       return {
