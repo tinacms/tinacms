@@ -1,11 +1,8 @@
-import React from 'react'
-import { uuid } from '../helpers'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
-import type * as monaco from 'monaco-editor'
-import { useSelected } from 'slate-react'
-import { Autocomplete } from '../autocomplete'
 import {
   ELEMENT_DEFAULT,
+  type PlateEditor,
+  type TElement,
   findNodePath,
   focusEditor,
   getPointAfter,
@@ -13,10 +10,13 @@ import {
   insertNodes,
   isCollapsed,
   isElement,
-  type PlateEditor,
   setNodes,
-  type TElement,
 } from '@udecode/plate-common'
+import type * as monaco from 'monaco-editor'
+import React from 'react'
+import { useSelected } from 'slate-react'
+import { Autocomplete } from '../autocomplete'
+import { uuid } from '../helpers'
 
 type Monaco = typeof monaco
 
@@ -45,11 +45,14 @@ const retryFocus = (ref) => {
   }
 }
 
+const MINIMUM_HEIGHT = 75
 export const CodeBlock = ({
   attributes,
   editor,
   element,
   language: restrictLanguage,
+  onChangeCallback,
+  defaultValue,
   ...props
 }: {
   attributes: Record<string, unknown>
@@ -57,6 +60,8 @@ export const CodeBlock = ({
   editor: PlateEditor
   language?: string
   children: React.ReactNode
+  defaultValue?: unknown
+  onChangeCallback?: (value: string) => void
 }) => {
   const [navigateAway, setNavigateAway] = React.useState<
     'up' | 'down' | 'insertNext' | 'remove' | null
@@ -65,7 +70,7 @@ export const CodeBlock = ({
   const monacoEditorRef =
     React.useRef<monaco.editor.IStandaloneCodeEditor>(null)
   const selected = useSelected()
-  const [height, setHeight] = React.useState(28)
+  const [height, setHeight] = React.useState(MINIMUM_HEIGHT)
 
   React.useEffect(() => {
     if (selected && isCollapsed(editor.selection)) {
@@ -223,9 +228,15 @@ export const CodeBlock = ({
   ) {
     monacoEditorRef.current = monacoEditor
     monacoEditor.onDidContentSizeChange(() => {
-      setHeight(monacoEditor.getContentHeight())
+      setHeight(
+        monacoEditor.getContentHeight() > MINIMUM_HEIGHT
+          ? monacoEditor.getContentHeight()
+          : MINIMUM_HEIGHT
+      )
       monacoEditor.layout()
     })
+    // Set Default
+    setNodes(editor, { value: defaultValue, lang: language })
 
     monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       if (monacoEditor.hasTextFocus()) {
@@ -331,6 +342,7 @@ export const CodeBlock = ({
             onChange={(value) => {
               // FIXME: if a void is focused first, onChange doesn't fire until
               // https://github.com/udecode/plate/issues/1519#issuecomment-1184933602
+              onChangeCallback?.(value)
               setNodes(editor, { value, lang: language })
             }}
           />

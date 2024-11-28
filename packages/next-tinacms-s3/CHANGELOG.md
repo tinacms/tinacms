@@ -1,5 +1,23 @@
 # next-tinacms-s3
 
+## 7.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`9bb408f`](https://github.com/tinacms/tinacms/commit/9bb408f1c45ecb1fd8e39faac652c4b342f74967), [`bbf2f81`](https://github.com/tinacms/tinacms/commit/bbf2f81143eb400faf8aa4dff33b8a58fa5059c8), [`bc59a81`](https://github.com/tinacms/tinacms/commit/bc59a819e1e68e48de027c4fac72551ca109185d)]:
+  - tinacms@2.4.0
+
+## 6.0.0
+
+### Major Changes
+
+- [#5095](https://github.com/tinacms/tinacms/pull/5095) [`3bb00d6`](https://github.com/tinacms/tinacms/commit/3bb00d6ef3cb735dd29db644e8e634a878e4d7a4) Thanks [@kldavis4](https://github.com/kldavis4)! - Update s3 media manager to support presigned upload urls
+
+### Patch Changes
+
+- Updated dependencies [[`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36), [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47), [`eb519f2`](https://github.com/tinacms/tinacms/commit/eb519f27a4c0fe1b05c361db2c1fe2337e6c4e12), [`00f6525`](https://github.com/tinacms/tinacms/commit/00f6525871c7c6bd40091424337df72c7bfcf783)]:
+  - tinacms@2.3.0
+
 ## 5.0.9
 
 ### Patch Changes

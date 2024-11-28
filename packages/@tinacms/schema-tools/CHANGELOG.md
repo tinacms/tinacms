@@ -1,5 +1,18 @@
 # @tinacms/schema-tools
 
+## 1.6.7
+
+### Patch Changes
+
+- [#5225](https://github.com/tinacms/tinacms/pull/5225) [`0daf0b6`](https://github.com/tinacms/tinacms/commit/0daf0b687b36614a1fdf904b1d5125e4c63e81a9) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Addresses peer dependency issues and applies necessary updates
+
+## 1.6.6
+
+### Patch Changes
+
+- [#4825](https://github.com/tinacms/tinacms/pull/4825) [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Add Mermaid Support to Rich Text Field (Plate)
+  🐛 Fix tooltip rendering behind TinaCMS app
+
 ## 1.6.5
 
 ### Patch Changes

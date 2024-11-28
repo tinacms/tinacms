@@ -1,5 +1,23 @@
 # tina-graphql
 
+## 1.5.7
+
+### Patch Changes
+
+- [#5225](https://github.com/tinacms/tinacms/pull/5225) [`0daf0b6`](https://github.com/tinacms/tinacms/commit/0daf0b687b36614a1fdf904b1d5125e4c63e81a9) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Addresses peer dependency issues and applies necessary updates
+
+- Updated dependencies [[`0daf0b6`](https://github.com/tinacms/tinacms/commit/0daf0b687b36614a1fdf904b1d5125e4c63e81a9)]:
+  - @tinacms/schema-tools@1.6.7
+  - @tinacms/mdx@1.5.1
+
+## 1.5.6
+
+### Patch Changes
+
+- Updated dependencies [[`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36), [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47)]:
+  - @tinacms/mdx@1.5.0
+  - @tinacms/schema-tools@1.6.6
+
 ## 1.5.5
 
 ### Patch Changes

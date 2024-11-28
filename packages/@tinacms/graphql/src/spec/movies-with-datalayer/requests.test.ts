@@ -2,8 +2,8 @@
 
 */
 
-import path from 'path'
-import { setupFixture, setupFixture2, print, Fixture } from '../setup'
+import path from 'node:path'
+import { setupFixture, setupFixture2, print, type Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
 import { MemoryLevel } from 'memory-level'
 const rootPath = path.join(__dirname, '/')

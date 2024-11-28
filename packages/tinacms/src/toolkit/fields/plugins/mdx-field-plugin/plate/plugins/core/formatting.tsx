@@ -22,6 +22,7 @@ import {
   isBlockAboveEmpty,
   isSelectionAtBlockStart,
 } from '@udecode/plate-common'
+import { markInputRules } from './mark-input-rules'
 
 export const HANDLES_MDX = [
   ELEMENT_H1,
@@ -53,6 +54,12 @@ const createCorrectNodeBehaviorPlugin = createPluginFactory({
   key: 'WITH_CORRECT_NODE_BEHAVIOR',
   withOverrides: withCorrectVoidBehavior,
 })
+
+const createMarkInputRulesPlugin = createPluginFactory({
+  key: 'MARK_INPUT_RULES',
+  withOverrides: markInputRules,
+})
+
 export const plugins = [
   createTrailingBlockPlugin(),
   createCorrectNodeBehaviorPlugin(),
@@ -61,6 +68,7 @@ export const plugins = [
       rules: autoformatRules,
     },
   }),
+  createMarkInputRulesPlugin(),
   createExitBreakPlugin({
     options: {
       rules: [

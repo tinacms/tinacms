@@ -152,6 +152,7 @@ export const rootElement = (
   const children: Md.Content[] = []
   content.children?.forEach((child) => {
     const value = blockElement(child, field, imageCallback)
+
     if (value) {
       children.push(value)
     }
@@ -210,6 +211,12 @@ export const blockElement = (
       return {
         type: 'paragraph',
         children: removeLastSpaceNodes(children2),
+      }
+    case 'mermaid':
+      return {
+        type: 'code',
+        lang: 'mermaid',
+        value: content.value,
       }
     case 'code_block':
       return {

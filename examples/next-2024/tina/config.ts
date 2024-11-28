@@ -33,6 +33,11 @@ export default defineConfig({
         label: 'Posts',
         path: 'content/posts',
         format: 'mdx',
+        ui: {
+          router({ document }) {
+            return `/posts/${document._sys.filename}`
+          },
+        },
         fields: [
           {
             type: 'string',
@@ -75,6 +80,25 @@ export default defineConfig({
                 ],
               },
             ],
+          },
+        ],
+      },
+      {
+        name: 'author',
+        label: 'authors',
+        path: 'content/author',
+        format: 'mdx',
+        ui: {
+          router({ document }) {
+            return `/author/${document._sys.filename}`
+          },
+        },
+        fields: [
+          {
+            type: 'rich-text',
+            label: 'test rich text',
+            name: 'testrich',
+            isBody: true,
           },
         ],
       },

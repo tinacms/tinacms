@@ -10,6 +10,7 @@ import type {
   MediaUploadOptions,
 } from 'tinacms'
 import { DEFAULT_MEDIA_UPLOAD_TYPES } from 'tinacms'
+const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/
 
 import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors'
 
@@ -23,22 +24,51 @@ export class S3MediaStore implements MediaStore {
     const newFiles: Media[] = []
 
     for (const item of media) {
-      const { file, directory } = item
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('directory', directory)
-      formData.append('filename', file.name)
+      let directory = item.directory
+      if (directory?.endsWith('/')) {
+        directory = directory.substr(0, directory.length - 1)
+      }
+      const path = `${
+        directory && directory !== '/'
+          ? `${directory}/${item.file.name}`
+          : item.file.name
+      }`
 
-      const res = await this.fetchFunction(`/api/s3/media`, {
-        method: 'POST',
-        body: formData,
-      })
+      const res = await this.fetchFunction(
+        `/api/s3/media/upload_url?key=${path}`,
+        {
+          method: 'GET',
+        }
+      )
 
       if (res.status != 200) {
         const responseData = await res.json()
         throw new Error(responseData.message)
       }
-      const fileRes = await res.json()
+      const { signedUrl, src } = await res.json()
+      if (!signedUrl || !src) {
+        throw new Error('Unexpected error generating upload url')
+      }
+
+      const uploadRes = await fetch(signedUrl, {
+        method: 'PUT',
+        body: item.file,
+        headers: {
+          'Content-Type': item.file.type || 'application/octet-stream',
+        },
+      })
+
+      if (!uploadRes.ok) {
+        const xmlRes = await uploadRes.text()
+        const matches = s3ErrorRegex.exec(xmlRes)
+        console.error(xmlRes)
+        if (!matches) {
+          throw new Error('Unexpected error uploading media asset')
+        } else {
+          throw new Error(`Upload error: '${matches[2]}'`)
+        }
+      }
+
       /**
        * Images uploaded to S3 aren't instantly available via the API;
        * waiting a couple seconds here seems to ensure they show up in the next fetch.
@@ -52,7 +82,18 @@ export class S3MediaStore implements MediaStore {
        * uploading a directory is not supported as such, type is defaulted to `file`
        */
 
-      newFiles.push(fileRes)
+      newFiles.push({
+        directory: item.directory,
+        filename: item.file.name,
+        id: item.file.name,
+        type: 'file',
+        thumbnails: {
+          '75x75': src,
+          '400x400': src,
+          '1000x1000': src,
+        },
+        src,
+      })
     }
     return newFiles
   }

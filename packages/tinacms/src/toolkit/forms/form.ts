@@ -501,7 +501,9 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                 {
                   type: 'string',
                   label: 'Caption',
-                  name: [templateName.replace(/\.props$/, ''), 'caption'].join('.'),
+                  name: [templateName.replace(/\.props$/, ''), 'caption'].join(
+                    '.'
+                  ),
                   component: 'text',
                 },
               ],

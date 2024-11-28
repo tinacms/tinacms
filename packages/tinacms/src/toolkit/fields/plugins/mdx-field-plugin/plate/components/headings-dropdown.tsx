@@ -123,7 +123,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
           tooltip="Headings"
         >
           <SelectedItemIcon className="size-5" />
-          <span className="hidden 2xl:flex">{selectedItemLabel}</span>
+          <span className="@md/toolbar:flex hidden">{selectedItemLabel}</span>
         </ToolbarButton>
       </DropdownMenuTrigger>
 

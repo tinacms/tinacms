@@ -30,7 +30,34 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
   }
 }
 
-// Same as above but excludes the label, useful for fields that have their own label
+/**
+ * Same as wrapFieldsWithMeta but excludes the label, and description useful for fields that render their label and description
+ */
+export function wrapFieldWithNoHeader<ExtraFieldProps = {}, InputProps = {}>(
+  Field:
+    | React.FunctionComponent<InputFieldType<ExtraFieldProps, InputProps>>
+    | React.ComponentClass<InputFieldType<ExtraFieldProps, InputProps>>
+) {
+  return (props: InputFieldType<ExtraFieldProps, InputProps>) => {
+    return (
+      <FieldMeta
+        name={props.input.name}
+        label={false}
+        description={''}
+        error={props.meta.error}
+        index={props.index}
+        tinaForm={props.tinaForm}
+      >
+        <Field {...props} />
+      </FieldMeta>
+    )
+  }
+}
+
+/**
+ * Same as above but excludes the label, useful for fields that have their own label
+ * @deprecated This function is deprecated and will be removed in future versions.
+ */
 export function wrapFieldWithError<ExtraFieldProps = {}, InputProps = {}>(
   Field:
     | React.FunctionComponent<InputFieldType<ExtraFieldProps, InputProps>>
@@ -152,9 +179,8 @@ export const FieldDescription = ({
     <span
       className={`block font-sans text-xs italic font-light text-gray-400 pt-0.5 whitespace-normal m-0 ${className}`}
       {...props}
-    >
-      {children}
-    </span>
+      dangerouslySetInnerHTML={{ __html: children }}
+    ></span>
   )
 }
 

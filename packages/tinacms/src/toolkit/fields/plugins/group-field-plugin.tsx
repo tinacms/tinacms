@@ -8,7 +8,7 @@ import {
 import { useCMS } from '@toolkit/react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
 import { IoMdClose } from 'react-icons/io'
-import { wrapFieldWithError } from './wrap-field-with-meta'
+import { wrapFieldWithNoHeader } from './wrap-field-with-meta'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -23,38 +23,45 @@ export interface GroupProps {
   tinaForm: Form
 }
 
-export const Group = wrapFieldWithError(({ tinaForm, field }: GroupProps) => {
-  const cms = useCMS()
-  const [isExpanded, setExpanded] = React.useState<boolean>(false)
-  return (
-    <>
-      <Header
-        onClick={() => {
-          const state = tinaForm.finalForm.getState()
-          if (state.invalid === true) {
-            // @ts-ignore
-            cms.alerts.error('Cannot navigate away from an invalid form.')
-            return
-          }
+export const Group = wrapFieldWithNoHeader(
+  ({ tinaForm, field }: GroupProps) => {
+    const cms = useCMS()
+    return (
+      <>
+        <Header
+          onClick={() => {
+            const state = tinaForm.finalForm.getState()
+            if (state.invalid === true) {
+              // @ts-ignore
+              cms.alerts.error('Cannot navigate away from an invalid form.')
+              return
+            }
 
-          // setExpanded((p) => !p)
-          cms.dispatch({
-            type: 'forms:set-active-field-name',
-            value: { formId: tinaForm.id, fieldName: field.name },
-          })
-        }}
-      >
-        {field.label || field.name}
-      </Header>
-      {/* <Panel
+            // setExpanded((p) => !p)
+            cms.dispatch({
+              type: 'forms:set-active-field-name',
+              value: { formId: tinaForm.id, fieldName: field.name },
+            })
+          }}
+        >
+          {field.label || field.name}
+          {field.description && (
+            <span
+              className={`block font-sans text-xs italic font-light text-gray-400 pt-0.5 whitespace-normal m-0`}
+              dangerouslySetInnerHTML={{ __html: field.description }}
+            ></span>
+          )}
+        </Header>
+        {/* <Panel
         isExpanded={isExpanded}
         setExpanded={setExpanded}
         field={field}
         tinaForm={tinaForm}
       /> */}
-    </>
-  )
-})
+      </>
+    )
+  }
+)
 
 interface PanelProps {
   setExpanded(_next: boolean): void

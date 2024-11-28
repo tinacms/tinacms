@@ -1,5 +1,37 @@
 # tinacms-cli
 
+## 1.6.11
+
+### Patch Changes
+
+- [#5228](https://github.com/tinacms/tinacms/pull/5228) [`9bb408f`](https://github.com/tinacms/tinacms/commit/9bb408f1c45ecb1fd8e39faac652c4b342f74967) Thanks [@JackDevAU](https://github.com/JackDevAU)! - 🐛 fix r.join error when building pages
+
+- [#5225](https://github.com/tinacms/tinacms/pull/5225) [`0daf0b6`](https://github.com/tinacms/tinacms/commit/0daf0b687b36614a1fdf904b1d5125e4c63e81a9) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ⬆️ Addresses peer dependency issues and applies necessary updates
+
+- Updated dependencies [[`9bb408f`](https://github.com/tinacms/tinacms/commit/9bb408f1c45ecb1fd8e39faac652c4b342f74967), [`bbf2f81`](https://github.com/tinacms/tinacms/commit/bbf2f81143eb400faf8aa4dff33b8a58fa5059c8), [`bc59a81`](https://github.com/tinacms/tinacms/commit/bc59a819e1e68e48de027c4fac72551ca109185d), [`0daf0b6`](https://github.com/tinacms/tinacms/commit/0daf0b687b36614a1fdf904b1d5125e4c63e81a9)]:
+  - tinacms@2.4.0
+  - @tinacms/graphql@1.5.7
+  - @tinacms/schema-tools@1.6.7
+  - @tinacms/app@2.1.11
+  - @tinacms/search@1.0.34
+
+## 1.6.10
+
+### Patch Changes
+
+- [#4825](https://github.com/tinacms/tinacms/pull/4825) [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Add Mermaid Support to Rich Text Field (Plate)
+  🐛 Fix tooltip rendering behind TinaCMS app
+
+- [#5004](https://github.com/tinacms/tinacms/pull/5004) [`74014ed`](https://github.com/tinacms/tinacms/commit/74014ed2df67e96e1a5fb2950e973528322671a3) Thanks [@Ben0189](https://github.com/Ben0189)! - Fix toolbar floating icon show up in different screen size
+
+- Updated dependencies [[`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36), [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47), [`eb519f2`](https://github.com/tinacms/tinacms/commit/eb519f27a4c0fe1b05c361db2c1fe2337e6c4e12), [`74014ed`](https://github.com/tinacms/tinacms/commit/74014ed2df67e96e1a5fb2950e973528322671a3), [`00f6525`](https://github.com/tinacms/tinacms/commit/00f6525871c7c6bd40091424337df72c7bfcf783)]:
+  - tinacms@2.3.0
+  - @tinacms/schema-tools@1.6.6
+  - @tinacms/app@2.1.10
+  - @tinacms/graphql@1.5.6
+  - @tinacms/metrics@1.0.7
+  - @tinacms/search@1.0.33
+
 ## 1.6.9
 
 ### Patch Changes

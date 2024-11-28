@@ -1,5 +1,21 @@
 # next-tinacms-cloudinary
 
+## 7.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`9bb408f`](https://github.com/tinacms/tinacms/commit/9bb408f1c45ecb1fd8e39faac652c4b342f74967), [`bbf2f81`](https://github.com/tinacms/tinacms/commit/bbf2f81143eb400faf8aa4dff33b8a58fa5059c8), [`bc59a81`](https://github.com/tinacms/tinacms/commit/bc59a819e1e68e48de027c4fac72551ca109185d)]:
+  - tinacms@2.4.0
+
+## 6.0.0
+
+### Patch Changes
+
+- [#4845](https://github.com/tinacms/tinacms/pull/4845) [`55e4d24`](https://github.com/tinacms/tinacms/commit/55e4d240ba51d5eacfecf319ace3025e46a4b1e7) Thanks [@khnn](https://github.com/khnn)! - When hosted on Vercel and if the query parameters contain an encoded slash they will be split into and array of strings. This leads to elements in a folder not getting deleted because the objectKey is just the name of the first folder. This patch is aiming to solve that by rebuilding the objectKey including its paths.
+
+- Updated dependencies [[`c5dad82`](https://github.com/tinacms/tinacms/commit/c5dad82a3f1fc4f7686f1503a7894dfacffa8c36), [`ecea7ac`](https://github.com/tinacms/tinacms/commit/ecea7ac5e1c087954eaaf873df3a563ca08f3e47), [`eb519f2`](https://github.com/tinacms/tinacms/commit/eb519f27a4c0fe1b05c361db2c1fe2337e6c4e12), [`00f6525`](https://github.com/tinacms/tinacms/commit/00f6525871c7c6bd40091424337df72c7bfcf783)]:
+  - tinacms@2.3.0
+
 ## 5.0.9
 
 ### Patch Changes
