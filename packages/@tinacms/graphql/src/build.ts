@@ -236,20 +236,19 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
 }
 
 function collectionHasReferenceFields(collection: Collection<true>) {
-  let result = false
   if (!collection.fields) {
     return false
   }
   for (const field of collection.fields) {
     if (field.type === 'reference') {
-      result = true
+      return true
     } else if (field.type === 'object') {
       if (fieldHasReferenceFields(field)) {
         return true
       }
     }
   }
-  return result
+  return false
 }
 
 function fieldHasReferenceFields(field: TinaField) {
