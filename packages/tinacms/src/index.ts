@@ -79,7 +79,7 @@ export const defineLegacyConfig = (
   return config
 }
 
-interface MediaStoreClass {
+export interface MediaStoreClass {
   new (...args: any[]): MediaStore
 }
 
