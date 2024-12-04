@@ -6,15 +6,15 @@ import { heroBlockSchema } from '../components/blocks/hero'
 import { testimonialBlockSchema } from '../components/blocks/testimonial'
 import { ColorPickerInput } from '../components/fields/color'
 import { iconSchema } from '../components/util/icon'
-import { hello } from '@/utils'
 import {
   TinaUserCollection,
   UsernamePasswordAuthJSProvider,
 } from 'tinacms-authjs/dist/tinacms'
+import { hello } from '@/utils'
 
 hello()
-const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 
+const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/tina/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
