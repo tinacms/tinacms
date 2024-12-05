@@ -48,7 +48,6 @@
     "commander": "^12.1.0",
     "cross-spawn": "^7.0.5",
     "fs-extra": "^11.2.0",
-    "got": "^14.4.4",
     "prompts": "^2.4.2",
     "tar": "7.4.0",
     "validate-npm-package-name": "^5.0.1"
