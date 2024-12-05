@@ -9,14 +9,25 @@
 		"dist"
 	],
 	"exports": {
-		"import": "./dist/index.mjs",
-		"require": "./dist/index.js"
+		".": {
+			"worker": "./dist/index-edge.mjs",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		},
+		"./dist/index-edge": {
+			"import": "./dist/index-edge.mjs"
+		}
 	},
 	"license": "SEE LICENSE IN LICENSE",
 	"buildConfig": {
 		"entryPoints": [
 			{
 				"name": "src/index.ts",
+				"target": "node",
+				"bundle": []
+			},
+			{
+				"name": "src/index-edge.ts",
 				"target": "node",
 				"bundle": []
 			}
