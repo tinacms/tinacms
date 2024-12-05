@@ -49,6 +49,10 @@ export const buildProductionSpa = async (
         warn(warning)
       },
     },
+    viteConfigEnv: {
+      command: 'build',
+      mode: 'production',
+    },
   })
   return build(config)
 }

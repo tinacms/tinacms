@@ -10,9 +10,11 @@ import {
   TinaUserCollection,
   UsernamePasswordAuthJSProvider,
 } from 'tinacms-authjs/dist/tinacms'
+import { hello } from '@/utils'
+
+hello()
 
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
-
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/tina/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
