@@ -3,6 +3,7 @@ import { FieldProps } from './field-props'
 import { useEvent } from '@toolkit/react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events'
 import { Form } from '@toolkit/forms'
+import { getDirection } from '../field-utils'
 
 export type InputFieldType<ExtraFieldProps, InputProps> =
   FieldProps<InputProps> & ExtraFieldProps
@@ -109,7 +110,10 @@ export const FieldMeta = ({
       onMouseOver={() => setHoveredField({ id: tinaForm.id, fieldName: name })}
       onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
       onClick={() => setFocusedField({ id: tinaForm.id, fieldName: name })}
-      style={{ zIndex: index ? 1000 - index : undefined }}
+      style={{
+        zIndex: index ? 1000 - index : undefined,
+        direction: getDirection(label),
+      }}
       {...props}
     >
       {(label !== false || description) && (
