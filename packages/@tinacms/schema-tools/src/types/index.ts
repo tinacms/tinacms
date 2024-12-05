@@ -613,6 +613,15 @@ export interface Config<
      * @default 'throw'
      */
     errorPolicy?: 'throw' | 'include'
+    /**
+     * The path to where your custom GraphQL /queries folder can be found
+     * Supports files with the following extensions: *.{graphql,gql}
+     * One use case is to support patterns matching multiple folder paths
+     * e.g. if working in a monorepo and needing to support custom queries
+     * within each sub-folder as well as shared base queries at the root.
+     * That can be achieved with a value like: `root-path/{sub-path/,}tina`
+     */
+    graphqlQueriesPath?: string
   }
   /**
    *

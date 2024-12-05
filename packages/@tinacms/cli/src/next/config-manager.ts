@@ -160,10 +160,6 @@ export class ConfigManager {
       this.generatedFolderPath,
       'types.d.ts'
     )
-    this.userQueriesAndFragmentsGlob = path.join(
-      this.tinaFolderPath,
-      'queries/**/*.{graphql,gql}'
-    )
     this.generatedQueriesAndFragmentsGlob = path.join(
       this.generatedFolderPath,
       '*.{graphql,gql}'
@@ -238,6 +234,11 @@ export class ConfigManager {
     const fullLocalContentPath = path.join(
       this.tinaFolderPath,
       this.config.localContentPath || ''
+    )
+
+    this.userQueriesAndFragmentsGlob = path.join(
+      this.config.client?.graphqlQueriesPath ?? this.tinaFolderPath,
+      'queries/**/*.{graphql,gql}'
     )
 
     if (this.config.localContentPath) {
