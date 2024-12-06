@@ -117,7 +117,7 @@
 		"lodash.get": "^4.4.2",
 		"lodash.set": "^4.3.2",
 		"lucide-react": "^0.424.0",
-		"mermaid": "9.3.0",
+		"mermaid": "10.9.3",
 		"moment": "2.29.4",
 		"monaco-editor": "0.31.0",
 		"prism-react-renderer": "^2.4.0",
