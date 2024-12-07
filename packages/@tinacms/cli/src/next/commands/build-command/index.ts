@@ -597,10 +597,10 @@ export class BuildCommand extends BaseCommand {
         if (config?.branch) {
           errorMessage += `        Branch: ${config.branch}, Client ID: ${config.clientId}\n`
         }
-        errorMessage += `        Local graphql version: ${configManager.getTinaGraphQLVersion()} Remote graphql version: ${remoteVersion}\n`
-        errorMessage += `        Last index: ${new Date(
+        errorMessage += `        Local GraphQL version: ${configManager.getTinaGraphQLVersion()} / Remote GraphQL version: ${remoteVersion}\n`
+        errorMessage += `        Last indexed at: ${new Date(
           timestamp
-        ).toLocaleString()} / ${new Date(timestamp).toUTCString()}\n`
+        ).toUTCString()}\n`
         throw new Error(errorMessage)
       }
     } catch (e) {
@@ -687,9 +687,9 @@ export class BuildCommand extends BaseCommand {
       if (config?.branch) {
         errorMessage += `        Branch: ${config.branch}, Client ID: ${config.clientId}\n`
       }
-      errorMessage += `        Last index: ${new Date(
+      errorMessage += `        Last indexed at: ${new Date(
         timestamp
-      ).toLocaleString()} / ${new Date(timestamp).toUTCString()}\n`
+      ).toUTCString()}\n`
       throw new Error(errorMessage)
     }
   }
