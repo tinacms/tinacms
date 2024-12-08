@@ -1,6 +1,6 @@
 {
 	"name": "next-2024",
-	"version": "0.1.13",
+	"version": "0.1.14",
 	"private": true,
 	"scripts": {
 		"dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev\"",
