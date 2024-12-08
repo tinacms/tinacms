@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 1.2.5
+
+### Patch Changes
+
+- [#5341](https://github.com/tinacms/tinacms/pull/5341) [`d80714b`](https://github.com/tinacms/tinacms/commit/d80714bd1065f59fe1bb2c7da9dcf114faee5faf) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Remove `got` package
+
 ## 1.2.4
 
 ### Patch Changes

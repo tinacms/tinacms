@@ -1,5 +1,13 @@
 # tinacms
 
+## 2.5.1
+
+### Patch Changes
+
+- [#5284](https://github.com/tinacms/tinacms/pull/5284) [`bbfd415`](https://github.com/tinacms/tinacms/commit/bbfd415762a8b2c62b7653b497b94d67aaa8501a) Thanks [@Nopik](https://github.com/Nopik)! - Export MediaStoreClass interface
+
+- [#5325](https://github.com/tinacms/tinacms/pull/5325) [`83a25cf`](https://github.com/tinacms/tinacms/commit/83a25cf61b736e1867d37bee37f7514d349e4427) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Fix descriptions showing [Object, Object]
+
 ## 2.5.0
 
 ### Minor Changes

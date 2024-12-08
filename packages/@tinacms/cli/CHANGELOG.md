@@ -1,5 +1,15 @@
 # tinacms-cli
 
+## 1.6.13
+
+### Patch Changes
+
+- [#5350](https://github.com/tinacms/tinacms/pull/5350) [`7339bd1`](https://github.com/tinacms/tinacms/commit/7339bd1e1b020085048fef4880b0ce0771698dbb) Thanks [@kldavis4](https://github.com/kldavis4)! - Add detailed logging of version and indexing information on schema errors
+
+- Updated dependencies [[`bbfd415`](https://github.com/tinacms/tinacms/commit/bbfd415762a8b2c62b7653b497b94d67aaa8501a), [`83a25cf`](https://github.com/tinacms/tinacms/commit/83a25cf61b736e1867d37bee37f7514d349e4427)]:
+  - tinacms@2.5.1
+  - @tinacms/app@2.1.13
+
 ## 1.6.12
 
 ### Patch Changes
