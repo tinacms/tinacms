@@ -1,14 +1,10 @@
-import fetchPonyfill from 'fetch-ponyfill'
 import type { GraphQLError } from 'graphql'
 import type { Config } from '@tinacms/schema-tools'
 import type { Cache } from '../cache/index'
 
-const { fetch: fetchPonyfillFN, Headers: HeadersPonyfill } = fetchPonyfill()
-
 // if fetch or Headers are already defined in the global scope, use them
-const fetchDefined = typeof fetch === 'undefined' ? fetchPonyfillFN : fetch
-const HeadersDefined =
-  typeof Headers === 'undefined' ? HeadersPonyfill : Headers
+const fetchDefined = fetch
+const HeadersDefined = Headers
 
 export const TINA_HOST = 'content.tinajs.io'
 export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
