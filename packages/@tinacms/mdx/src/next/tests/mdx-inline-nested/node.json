@@ -1,0 +1,123 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Hello "
+        },
+        {
+          "type": "mdxJsxTextElement",
+          "name": "dropBox",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ],
+          "props": {
+            "title": "Hello tere",
+            "body": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "h1",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "hello"
+                    }
+                  ]
+                },
+                {
+                  "type": "code_block",
+                  "value": "console.log(a)",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Goodbye."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "text",
+          "text": " and we're continuing with the rest of the sentence."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Hello "
+        },
+        {
+          "type": "mdxJsxTextElement",
+          "name": "dropBox",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ],
+          "props": {
+            "title": "Hello tere",
+            "body": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "h1",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "hello"
+                    }
+                  ]
+                },
+                {
+                  "type": "code_block",
+                  "value": "console.log(a)",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Goodbye."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "text",
+          "text": " and we're continuing with the rest of the sentence."
+        }
+      ]
+    }
+  ]
+}
