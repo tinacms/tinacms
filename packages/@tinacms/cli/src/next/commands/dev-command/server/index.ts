@@ -45,6 +45,10 @@ export const createDevServer = async (
           warn(warning)
         },
       },
+      viteConfigEnv: {
+        command: 'serve',
+        mode: 'development',
+      },
     })
   )
 }

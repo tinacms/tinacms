@@ -7,6 +7,7 @@ import { Config } from '@tinacms/schema-tools'
 import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
 import chalk from 'chalk'
+import { loadProjectConfig } from '../next/vite'
 
 import { logger } from '../logger'
 
@@ -390,6 +391,13 @@ export class ConfigManager {
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
+    const viteConfig = await loadProjectConfig({
+      rootPath: this.rootPath,
+      viteConfigEnv: {
+        command: 'build',
+        mode: 'production',
+      },
+    })
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
@@ -403,6 +411,7 @@ export class ConfigManager {
       outfile: prebuild,
       loader: loaders,
       metafile: true,
+      alias: viteConfig.config.resolve?.alias as Record<string, string>,
     })
     const flattenedList = []
     Object.keys(result2.metafile.inputs).forEach((key) => {
@@ -419,6 +428,7 @@ export class ConfigManager {
       platform: 'node',
       outfile,
       loader: loaders,
+      alias: viteConfig.config.resolve?.alias as Record<string, string>,
     })
     await esbuild.build({
       entryPoints: [outfile],
