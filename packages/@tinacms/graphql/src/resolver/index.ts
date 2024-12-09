@@ -1016,6 +1016,19 @@ export class Resolver {
       }
     }
 
+    if (args.reverseRef) {
+      const { id, collection } = args.reverseRef as Record<string, any>
+      conditions = conditions || []
+      conditions.push({
+        filterPath: collection,
+        filterExpression: {
+          _type: 'reference',
+          _list: false,
+          eq: id,
+        },
+      })
+    }
+
     const queryOptions = {
       filterChain: makeFilterChain({
         conditions: conditions || [],
