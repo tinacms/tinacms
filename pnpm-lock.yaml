@@ -533,10 +533,6 @@ importers:
                 version: 18.3.1
 
     packages/@tinacms/auth:
-        dependencies:
-            fetch-ponyfill:
-                specifier: ^7.1.0
-                version: 7.1.0
         devDependencies:
             '@tinacms/scripts':
                 specifier: workspace:*
@@ -1561,9 +1557,6 @@ importers:
             date-fns:
                 specifier: 2.30.0
                 version: 2.30.0
-            fetch-ponyfill:
-                specifier: ^7.1.0
-                version: 7.1.0
             final-form:
                 specifier: 4.20.10
                 version: 4.20.10
@@ -12023,12 +12016,6 @@ packages:
                 integrity: sha512-lAkyiDSdQog0aqWhyO8/8gnwbh6k27bd18IWJw7IOl2EUWEh22O4C9ebnw8Li3E+HK3Plxgv6ql1Ty/C3gndvg==,
             }
 
-    fetch-ponyfill@7.1.0:
-        resolution:
-            {
-                integrity: sha512-FhbbL55dj/qdVO3YNK7ZEkshvj3eQ7EuIGV2I6ic/2YiocvyWv+7jg2s4AyS0wdRU75s3tA8ZxI/xPigb0v5Aw==,
-            }
-
     file-entry-cache@6.0.1:
         resolution:
             {
@@ -15335,18 +15322,6 @@ packages:
             {
                 integrity: sha512-VzW+TAk2wE4X9maiKMlT+GsPU4OMmR1U9CrHSmd3DFLn2IcZ9VJ6M6BBugGfYUnPCLSYxXdZy17M0BEJyhUTwg==,
             }
-
-    node-fetch@2.6.13:
-        resolution:
-            {
-                integrity: sha512-StxNAxh15zr77QvvkmveSQ8uCQ4+v5FkvNTj0OESmiHu+VRi/gXArXtkWMElOsOUNLtUEvI4yS+rdtOHZTwlQA==,
-            }
-        engines: { node: 4.x || >=6.0.0 }
-        peerDependencies:
-            encoding: ^0.1.0
-        peerDependenciesMeta:
-            encoding:
-                optional: true
 
     node-fetch@2.7.0:
         resolution:
@@ -28142,12 +28117,6 @@ snapshots:
         transitivePeerDependencies:
             - abstract-level
 
-    fetch-ponyfill@7.1.0:
-        dependencies:
-            node-fetch: 2.6.13
-        transitivePeerDependencies:
-            - encoding
-
     file-entry-cache@6.0.1:
         dependencies:
             flat-cache: 3.2.0
@@ -30567,10 +30536,6 @@ snapshots:
             semver: 7.6.3
 
     node-fetch-native@1.0.1: {}
-
-    node-fetch@2.6.13:
-        dependencies:
-            whatwg-url: 5.0.0
 
     node-fetch@2.7.0:
         dependencies:

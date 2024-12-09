@@ -4,10 +4,6 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import type { NextApiRequest } from 'next'
 
-import fetchPonyfill from 'fetch-ponyfill'
-
-const { fetch, Headers } = fetchPonyfill()
-
 export interface TinaCloudUser {
   id: string
   email: string
