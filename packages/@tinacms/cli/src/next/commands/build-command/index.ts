@@ -15,7 +15,7 @@ import {
   buildClientSchema,
   getIntrospectionQuery,
 } from 'graphql'
-import { diff } from '@graphql-inspector/core'
+import { ChangeType, diff } from '@graphql-inspector/core'
 import { type IndexStatusResponse, waitForDB } from './waitForDB'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { sleepAndCallFunc } from '../../../utils/sleep'
@@ -29,6 +29,7 @@ import { spin } from '../../../utils/spinner'
 import { createDevServer } from '../dev-command/server'
 import { BaseCommand } from '../baseCommands'
 import { logText } from '../../../utils/theme'
+import { getFaqLink } from '../../../utils'
 
 export class BuildCommand extends BaseCommand {
   static paths = [['build']]
@@ -592,15 +593,25 @@ export class BuildCommand extends BaseCommand {
         bar.tick({
           prog: '❌',
         })
-        let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to GitHub to update your remote GraphQL schema.`
+
+        const type: ChangeType = diffResult[0].type
+        const reason = diffResult[0].message
+        const errorLevel = diffResult[0].criticality.level
+        const faqLink = getFaqLink(type)
+
+        let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to GitHub to update your remote GraphQL schema. ${
+          faqLink && `\nCheck out '${faqLink}' for possible solutions.`
+        }`
         errorMessage += `\n\nAdditional info:\n\n`
         if (config?.branch) {
-          errorMessage += `        Branch: ${config.branch}, Client ID: ${config.clientId}\n`
+          errorMessage += `\tBranch: ${config.branch}, Client ID: ${config.clientId}\n`
         }
-        errorMessage += `        Local GraphQL version: ${configManager.getTinaGraphQLVersion()} / Remote GraphQL version: ${remoteVersion}\n`
-        errorMessage += `        Last indexed at: ${new Date(
+        // TODO: Get patch value
+        errorMessage += `\tLocal GraphQL version: ${configManager.getTinaGraphQLVersion()} / Remote GraphQL version: ${remoteVersion}\n`
+        errorMessage += `\tLast indexed at: ${new Date(
           timestamp
         ).toUTCString()}\n`
+        errorMessage += `\tReason: [${errorLevel} - ${type}] ${reason}\n`
         throw new Error(errorMessage)
       }
     } catch (e) {
