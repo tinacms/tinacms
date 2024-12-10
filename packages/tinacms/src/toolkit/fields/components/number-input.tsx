@@ -20,7 +20,7 @@ export const NumberInput: React.FC<NumberProps> = ({
     value={value}
     onChange={(event) => {
       const inputValue = event.target.value
-      const newValue = inputValue === '' ? null : inputValue
+      const newValue = inputValue === '' ? undefined : inputValue
       if (onChange) {
         const syntheticEvent = {
           ...event,

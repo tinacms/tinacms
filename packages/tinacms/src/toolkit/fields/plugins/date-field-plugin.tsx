@@ -17,7 +17,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
         <ReactDateTimeWithStyles
           value={input.value}
           onChange={(value) => {
-            const newValue = value === '' ? null : value
+            const newValue = value === '' ? undefined : value
             input.onChange(newValue)
           }}
           dateFormat={dateFormat || DEFAULT_DATE_DISPLAY_FORMAT}
