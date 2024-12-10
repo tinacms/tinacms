@@ -606,7 +606,6 @@ export class BuildCommand extends BaseCommand {
         if (config?.branch) {
           errorMessage += `\tBranch: ${config.branch}, Client ID: ${config.clientId}\n`
         }
-        // TODO: Get patch value
         errorMessage += `\tLocal GraphQL version: ${configManager.getTinaGraphQLVersion()} / Remote GraphQL version: ${remoteVersion}\n`
         errorMessage += `\tLast indexed at: ${new Date(
           timestamp
