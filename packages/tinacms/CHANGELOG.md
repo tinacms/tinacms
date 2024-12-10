@@ -1,5 +1,11 @@
 # tinacms
 
+## 2.5.2
+
+### Patch Changes
+
+- [#5352](https://github.com/tinacms/tinacms/pull/5352) [`b54b303`](https://github.com/tinacms/tinacms/commit/b54b303a8290528230dc83d8fb1b7535df7199f6) Thanks [@shuaixr](https://github.com/shuaixr)! - Fixes an issue where setting empty values in `NumberInput` and `DateField` would throw errors. (https://github.com/tinacms/tinacms/issues/2445)
+
 ## 2.5.1
 
 ### Patch Changes
