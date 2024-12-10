@@ -2,10 +2,6 @@ import type { GraphQLError } from 'graphql'
 import type { Config } from '@tinacms/schema-tools'
 import type { Cache } from '../cache/index'
 
-// if fetch or Headers are already defined in the global scope, use them
-const fetchDefined = fetch
-const HeadersDefined = Headers
-
 export const TINA_HOST = 'content.tinajs.io'
 export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
   url: string
@@ -74,7 +70,7 @@ export class TinaClient<GenQueries> {
   ) {
     await this.init()
     const errorPolicyDefined = errorPolicy || this.errorPolicy
-    const headers = new HeadersDefined()
+    const headers = new Headers()
     if (this.readonlyToken) {
       headers.append('X-API-KEY', this.readonlyToken)
     }
@@ -111,7 +107,7 @@ export class TinaClient<GenQueries> {
       }
     }
 
-    const res = await fetchDefined(url, optionsObject)
+    const res = await fetch(url, optionsObject)
     if (!res.ok) {
       let additionalInfo = ''
       if (res.status === 401) {
