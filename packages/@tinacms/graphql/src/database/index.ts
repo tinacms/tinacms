@@ -1195,7 +1195,6 @@ export class Database {
         })
       }
     }
-
     return {
       edges,
       hasPreviousPage: false,
@@ -1225,10 +1224,7 @@ export class Database {
       string | Buffer | Uint8Array,
       string,
       Record<string, any>
-    >,
-    edges: { cursor: string; path: string }[] = [],
-    startKey: string = '',
-    endKey: string = ''
+    >
   ): Promise<{
     edges: { cursor: string; path: string }[]
     hasPreviousPage: boolean
@@ -1237,8 +1233,17 @@ export class Database {
     endKey: string
   }> => {
     // Pre-check a batch of edges based on their keys
+    const itemRecordLoads: Promise<Record<string, any>>[] = []
     const possibleEdges: { cursor: string; path: string }[] = []
-    const firstCheckLimit = limit === -1 ? 50 : limit
+    const edges: { cursor: string; path: string }[] = []
+    let nextCheckLimit = limit === -1 ? 50 : Math.max(10, Math.min(50, limit))
+    let startKey = ''
+    let endKey = ''
+
+    console.log(
+      `>>> Loading level item records, limit = ${limit}, nextCheckLimit = ${nextCheckLimit}`
+    )
+
     for await (const pair of iterator) {
       const key = pair[0]
       const matcher = keyMatcher.exec(key)
@@ -1247,22 +1252,49 @@ export class Database {
       }
 
       const filepath = matcher.groups['_filepath_']
-      possibleEdges.push({
+      const cursorPathPair = {
         cursor: key,
         path: filepath,
-      })
-      if (possibleEdges.length >= firstCheckLimit) {
-        break
+      }
+      possibleEdges.push(cursorPathPair)
+      itemRecordLoads.push(level.get(filepath))
+
+      if (possibleEdges.length == nextCheckLimit) {
+        // Process what we have here, so that the iterator does not close upon exit from loop
+        // Filter the results
+        console.log(
+          `>>> batched ${possibleEdges.length} for consideration (limit ${limit})`
+        )
+        for (const i in possibleEdges) {
+          if (itemFilter(await itemRecordLoads[i])) {
+            const thisEdge = possibleEdges[i]
+            const key = possibleEdges[i].cursor
+            startKey = startKey || key || ''
+            endKey = key || ''
+            edges.push(thisEdge)
+            console.log('>>>    found')
+
+            if (edges.length == limit) {
+              console.log(`>>> reached limit of ${limit}`)
+              return {
+                edges,
+                hasPreviousPage: reverse,
+                hasNextPage: !reverse,
+                startKey,
+                endKey,
+              }
+            }
+          } else {
+            console.log('>>>    not found')
+          }
+        }
+
+        possibleEdges.length = 0
+        itemRecordLoads.length = 0
       }
     }
 
-    // Commence loading the actual content for those edges
-    const itemRecordLoads: Promise<Record<string, any>>[] = []
-    for (const i in possibleEdges) {
-      itemRecordLoads.push(level.get(possibleEdges[i].path))
-    }
-
-    // Filter the results
+    // Process any remaining
     for (const i in possibleEdges) {
       if (itemFilter(await itemRecordLoads[i])) {
         const thisEdge = possibleEdges[i]
@@ -1272,34 +1304,12 @@ export class Database {
         edges.push(thisEdge)
       }
     }
-
-    // Might be more to process, cannot tell without trying to access the next from the iterator
-    if (possibleEdges.length == firstCheckLimit) {
-      return this._loadLevelItemRecords(
-        iterator,
-        keyMatcher,
-        itemFilter,
-        limit == -1 ? -1 : limit - edges.length,
-        reverse,
-        level,
-        edges,
-        startKey,
-        endKey
-      )
-    }
-    if (edges.length == limit) {
-      return {
-        edges,
-        hasPreviousPage: reverse,
-        hasNextPage: !reverse,
-        startKey,
-        endKey,
-      }
-    }
+    console.log(`>>> reached end of iterator, found ${edges.length} edges`)
+    const foundLimitCount = edges.length == limit
     return {
       edges,
-      hasPreviousPage: false,
-      hasNextPage: false,
+      hasPreviousPage: foundLimitCount && reverse,
+      hasNextPage: foundLimitCount && !reverse,
       startKey,
       endKey,
     }
