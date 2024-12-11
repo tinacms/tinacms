@@ -1236,13 +1236,13 @@ export class Database {
     const itemRecordLoads: Promise<Record<string, any>>[] = []
     const possibleEdges: { cursor: string; path: string }[] = []
     const edges: { cursor: string; path: string }[] = []
-    let nextCheckLimit = limit === -1 ? 50 : Math.max(10, Math.min(50, limit))
+    const nextCheckLimit = limit === -1 ? 50 : Math.max(10, Math.min(50, limit))
     let startKey = ''
     let endKey = ''
 
-    console.log(
-      `>>> Loading level item records, limit = ${limit}, nextCheckLimit = ${nextCheckLimit}`
-    )
+    // console.log(
+    // `>>> Loading level item records, limit = ${limit}, nextCheckLimit = ${nextCheckLimit}`
+    // )
 
     for await (const pair of iterator) {
       const key = pair[0]
@@ -1262,9 +1262,9 @@ export class Database {
       if (possibleEdges.length == nextCheckLimit) {
         // Process what we have here, so that the iterator does not close upon exit from loop
         // Filter the results
-        console.log(
-          `>>> batched ${possibleEdges.length} for consideration (limit ${limit})`
-        )
+        // console.log(
+        //   `>>> batched ${possibleEdges.length} for consideration (limit ${limit})`
+        // )
         for (const i in possibleEdges) {
           if (itemFilter(await itemRecordLoads[i])) {
             const thisEdge = possibleEdges[i]
@@ -1272,10 +1272,10 @@ export class Database {
             startKey = startKey || key || ''
             endKey = key || ''
             edges.push(thisEdge)
-            console.log('>>>    found')
+            // console.log('>>>    found')
 
             if (edges.length == limit) {
-              console.log(`>>> reached limit of ${limit}`)
+              // console.log(`>>> reached limit of ${limit}`)
               return {
                 edges,
                 hasPreviousPage: reverse,
@@ -1284,8 +1284,8 @@ export class Database {
                 endKey,
               }
             }
-          } else {
-            console.log('>>>    not found')
+            // } else {
+            // console.log('>>>    not found')
           }
         }
 
@@ -1304,7 +1304,7 @@ export class Database {
         edges.push(thisEdge)
       }
     }
-    console.log(`>>> reached end of iterator, found ${edges.length} edges`)
+    // console.log(`>>> reached end of iterator, found ${edges.length} edges`)
     const foundLimitCount = edges.length == limit
     return {
       edges,
