@@ -290,22 +290,31 @@ export class ConfigManager {
     )
   }
 
-  getTinaGraphQLVersion() {
+  getTinaGraphQLVersion(): {
+    fullVersion: string
+    major: string
+    minor: string
+    patch: string
+  } {
     if (this.tinaGraphQLVersionFromCLI) {
-      return this.tinaGraphQLVersionFromCLI
+      const version = this.tinaGraphQLVersionFromCLI.split('.')
+      return {
+        fullVersion: this.tinaGraphQLVersionFromCLI,
+        major: version[0] || 'x',
+        minor: version[1] || 'x',
+        patch: version[2] || 'x',
+      }
     }
     const generatedSchema = fs.readJSONSync(this.generatedSchemaJSONPath)
     if (
       !generatedSchema ||
-      !(typeof generatedSchema?.version !== 'undefined') ||
-      !(typeof generatedSchema?.version?.major === 'string') ||
-      !(typeof generatedSchema?.version?.minor === 'string')
+      !(typeof generatedSchema?.version !== 'undefined')
     ) {
       throw new Error(
         `Can not find Tina GraphQL version in ${this.generatedSchemaJSONPath}`
       )
     }
-    return `${generatedSchema.version.major}.${generatedSchema.version.minor}`
+    return generatedSchema.version
   }
 
   printGeneratedClientFilePath() {
