@@ -561,10 +561,11 @@ export class BuildCommand extends BaseCommand {
     const token = config.token
 
     // Get the remote schema from the graphql endpoint
-    const { remoteSchema, remoteAppVersion } = await fetchRemoteGraphqlSchema({
-      url: apiURL,
-      token,
-    })
+    const { remoteSchema, remoteProjectVersion } =
+      await fetchRemoteGraphqlSchema({
+        url: apiURL,
+        token,
+      })
 
     if (!remoteSchema) {
       bar.tick({
@@ -607,7 +608,7 @@ export class BuildCommand extends BaseCommand {
         if (config?.branch) {
           errorMessage += `\tBranch: ${config.branch}, Client ID: ${config.clientId}\n`
         }
-        errorMessage += `\tLocal GraphQL version: ${tinaGraphQLVersion.fullVersion} / Remote GraphQL version: ${remoteAppVersion}\n`
+        errorMessage += `\tLocal GraphQL version: ${tinaGraphQLVersion.fullVersion} / Remote GraphQL version: ${remoteProjectVersion}\n`
         errorMessage += `\tLast indexed at: ${new Date(
           timestamp
         ).toUTCString()}\n`
@@ -788,7 +789,7 @@ export const fetchRemoteGraphqlSchema = async ({
   return {
     remoteSchema: data?.data,
     remoteRuntimeVersion: res.headers.get('tinacms-grapqhl-runtime-version'),
-    remoteAppVersion: res.headers.get('tinacms-grapqhl-project-version'),
+    remoteProjectVersion: res.headers.get('tinacms-grapqhl-project-version'),
   }
 }
 
