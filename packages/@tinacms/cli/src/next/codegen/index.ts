@@ -209,7 +209,8 @@ export class Codegen {
     const branch = this.configManager.config?.branch
     const clientId = this.configManager.config?.clientId
     const token = this.configManager.config?.token
-    const version = this.configManager.getTinaGraphQLVersion()
+    const fullVersion = this.configManager.getTinaGraphQLVersion()
+    const version = `${fullVersion.major}.${fullVersion.minor}`
     const baseUrl =
       this.configManager.config.tinaioConfig?.contentApiUrlOverride ||
       `https://${TINA_HOST}`
