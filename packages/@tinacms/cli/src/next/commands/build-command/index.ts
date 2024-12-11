@@ -788,7 +788,7 @@ export const fetchRemoteGraphqlSchema = async ({
   return {
     remoteSchema: data?.data,
     remoteRuntimeVersion: res.headers.get('tinacms-grapqhl-runtime-version'),
-    remoteAppVersion: res.headers.get('tinacms-grapqhl-app-version'),
+    remoteAppVersion: res.headers.get('tinacms-grapqhl-project-version'),
   }
 }
 
