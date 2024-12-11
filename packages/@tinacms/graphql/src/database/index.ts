@@ -1,5 +1,4 @@
 import path from 'node:path'
-import fs from 'fs-extra'
 import type { DocumentNode } from 'graphql'
 import { GraphQLError } from 'graphql'
 import micromatch from 'micromatch'
@@ -40,6 +39,7 @@ import {
   makeFolderOpsForCollection,
   makeIndexOpsForDocument,
   type TernaryFilter,
+  FilterOperand,
 } from './datalayer'
 import {
   ARRAY_ITEM_VALUE_SEPARATOR,
@@ -58,6 +58,7 @@ import { FilesystemBridge, TinaLevelClient } from '..'
 import { generatePasswordHash, mapUserFields } from '../auth/utils'
 import { NotFoundError } from '../error'
 import set from 'lodash.set'
+import { AbstractIterator, AbstractSublevel } from 'abstract-level'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -982,12 +983,6 @@ export class Database {
         : '\uFFFF'
     }
 
-    let edges: { cursor: string; path: string }[] = []
-    let startKey: string = ''
-    let endKey: string = ''
-    let hasPreviousPage = false
-    let hasNextPage = false
-
     const fieldsPattern = indexDefinition?.fields?.length
       ? `${indexDefinition.fields
           .map((p) => `(?<${p.name}>.+)${INDEX_KEY_FIELD_SEPARATOR}`)
@@ -1002,57 +997,46 @@ export class Database {
     // @ts-ignore
     // It looks like tslint is confused by the multiple iterator() overloads
     const iterator = sublevel.iterator<string, Record<string, any>>(query)
-    for await (const [key, value] of iterator) {
-      const matcher = valuesRegex.exec(key)
-      if (
-        !matcher ||
-        (indexDefinition &&
-          matcher.length !== indexDefinition.fields.length + 2)
-      ) {
-        continue
-      }
 
-      const filepath = matcher.groups['_filepath_']
-      let itemRecord: Record<string, any>
-      if (filterSuffixes) {
-        itemRecord = matcher.groups
-        // for index match fields, convert the array value from comma-separated string to array
-        for (const field of indexDefinition.fields) {
-          if (itemRecord[field.name]) {
-            if (field.list) {
-              itemRecord[field.name] = itemRecord[field.name].split(
-                ARRAY_ITEM_VALUE_SEPARATOR
-              )
-            }
-          }
-        }
+    let result: {
+      edges: { cursor: string; path: string }[]
+      hasPreviousPage: boolean
+      hasNextPage: boolean
+      startKey: string
+      endKey: string
+    }
+    if (filterSuffixes) {
+      result = await this._loadIndexedItemRecords(
+        iterator,
+        indexDefinition,
+        valuesRegex,
+        itemFilter,
+        limit,
+        query.reverse
+      )
+    } else {
+      if (indexDefinition) {
+        result = await this._loadLevelItemRecords(
+          iterator,
+          valuesRegex,
+          itemFilter,
+          limit,
+          query.reverse,
+          rootLevel
+        )
       } else {
-        if (indexDefinition) {
-          itemRecord = await rootLevel.get(filepath)
-        } else {
-          itemRecord = value
-        }
+        result = await this._useHeldItemRecords(
+          iterator,
+          valuesRegex,
+          itemFilter,
+          limit,
+          query.reverse
+        )
       }
-      if (!itemFilter(itemRecord)) {
-        continue
-      }
-
-      if (limit !== -1 && edges.length >= limit) {
-        if (query.reverse) {
-          hasPreviousPage = true
-        } else {
-          hasNextPage = true
-        }
-        break
-      }
-
-      startKey = startKey || key || ''
-      endKey = key || ''
-      edges = [...edges, { cursor: key, path: filepath }]
     }
 
     return {
-      edges: await sequential(edges, async (edge) => {
+      edges: await sequential(result.edges, async (edge) => {
         try {
           const node = await hydrator(edge.path)
           return {
@@ -1078,13 +1062,259 @@ export class Database {
         }
       }),
       pageInfo: {
-        hasPreviousPage,
-        hasNextPage,
-        startCursor: btoa(startKey),
-        endCursor: btoa(endKey),
+        hasPreviousPage: result.hasPreviousPage,
+        hasNextPage: result.hasNextPage,
+        startCursor: btoa(result.startKey),
+        endCursor: btoa(result.endKey),
       },
     }
   }
+
+  private _loadIndexedItemRecords = async (
+    iterator: AbstractIterator<
+      AbstractSublevel<
+        Level,
+        string | Buffer | Uint8Array,
+        string,
+        Record<string, any>
+      >,
+      string,
+      Record<string, any>
+    >,
+    indexDefinition: IndexDefinition,
+    keyMatcher: RegExp,
+    itemFilter: (values: Record<string, object | FilterOperand>) => boolean,
+    limit: number,
+    reverse: boolean
+  ): Promise<{
+    edges: { cursor: string; path: string }[]
+    hasPreviousPage: boolean
+    hasNextPage: boolean
+    startKey: string
+    endKey: string
+  }> => {
+    const edges: { cursor: string; path: string }[] = []
+    let startKey = ''
+    let endKey = ''
+
+    for await (const pair of iterator) {
+      const key = pair[0]
+      const matcher = keyMatcher.exec(key)
+      if (!matcher || matcher.length !== indexDefinition.fields.length + 2) {
+        continue
+      }
+
+      const itemRecord: Record<string, object | FilterOperand> = matcher.groups
+
+      // for index match fields, convert the array value from comma-separated string to array
+      for (const field of indexDefinition.fields) {
+        if (itemRecord[field.name]) {
+          if (field.list) {
+            itemRecord[field.name] = (itemRecord[field.name] as string).split(
+              ARRAY_ITEM_VALUE_SEPARATOR
+            )
+          }
+        }
+      }
+
+      if (itemFilter(itemRecord)) {
+        if (limit !== -1 && edges.length >= limit) {
+          return {
+            edges,
+            hasPreviousPage: reverse,
+            hasNextPage: !reverse,
+            startKey,
+            endKey,
+          }
+        }
+        startKey = startKey || key || ''
+        endKey = key || ''
+        edges.push({
+          cursor: key,
+          path: matcher.groups['_filepath_'],
+        })
+      }
+    }
+
+    return {
+      edges,
+      hasPreviousPage: false,
+      hasNextPage: false,
+      startKey,
+      endKey,
+    }
+  }
+
+  private _useHeldItemRecords = async (
+    iterator: AbstractIterator<
+      AbstractSublevel<
+        Level,
+        string | Buffer | Uint8Array,
+        string,
+        Record<string, any>
+      >,
+      string,
+      Record<string, any>
+    >,
+    keyMatcher: RegExp,
+    itemFilter: (values: Record<string, object | FilterOperand>) => boolean,
+    limit: number,
+    reverse: boolean
+  ): Promise<{
+    edges: { cursor: string; path: string }[]
+    hasPreviousPage: boolean
+    hasNextPage: boolean
+    startKey: string
+    endKey: string
+  }> => {
+    const edges: { cursor: string; path: string }[] = []
+    let startKey = ''
+    let endKey = ''
+
+    for await (const [key, itemRecord] of iterator) {
+      const matcher = keyMatcher.exec(key)
+      if (!matcher) {
+        continue
+      }
+
+      if (itemFilter(itemRecord)) {
+        if (limit !== -1 && edges.length >= limit) {
+          return {
+            edges,
+            hasPreviousPage: reverse,
+            hasNextPage: !reverse,
+            startKey,
+            endKey,
+          }
+        }
+        startKey = startKey || key || ''
+        endKey = key || ''
+        edges.push({
+          cursor: key,
+          path: matcher.groups['_filepath_'],
+        })
+      }
+    }
+    return {
+      edges,
+      hasPreviousPage: false,
+      hasNextPage: false,
+      startKey,
+      endKey,
+    }
+  }
+
+  private _loadLevelItemRecords = async (
+    iterator: AbstractIterator<
+      AbstractSublevel<
+        Level,
+        string | Buffer | Uint8Array,
+        string,
+        Record<string, any>
+      >,
+      string,
+      Record<string, any>
+    >,
+    keyMatcher: RegExp,
+    itemFilter: (values: Record<string, object | FilterOperand>) => boolean,
+    limit: number,
+    reverse: boolean,
+    level: AbstractSublevel<
+      Level,
+      string | Buffer | Uint8Array,
+      string,
+      Record<string, any>
+    >
+  ): Promise<{
+    edges: { cursor: string; path: string }[]
+    hasPreviousPage: boolean
+    hasNextPage: boolean
+    startKey: string
+    endKey: string
+  }> => {
+    // Pre-check a batch of edges based on their keys
+    const itemRecordLoads: Promise<Record<string, any>>[] = []
+    const possibleEdges: { cursor: string; path: string }[] = []
+    const edges: { cursor: string; path: string }[] = []
+    const nextCheckLimit = limit === -1 ? 50 : Math.max(10, Math.min(50, limit))
+    let startKey = ''
+    let endKey = ''
+
+    // console.log(
+    // `>>> Loading level item records, limit = ${limit}, nextCheckLimit = ${nextCheckLimit}`
+    // )
+
+    for await (const pair of iterator) {
+      const key = pair[0]
+      const matcher = keyMatcher.exec(key)
+      if (!matcher) {
+        continue
+      }
+
+      const filepath = matcher.groups['_filepath_']
+      const cursorPathPair = {
+        cursor: key,
+        path: filepath,
+      }
+      possibleEdges.push(cursorPathPair)
+      itemRecordLoads.push(level.get(filepath))
+
+      if (possibleEdges.length == nextCheckLimit) {
+        // Process what we have here, so that the iterator does not close upon exit from loop
+        // Filter the results
+        // console.log(
+        //   `>>> batched ${possibleEdges.length} for consideration (limit ${limit})`
+        // )
+        for (const i in possibleEdges) {
+          if (itemFilter(await itemRecordLoads[i])) {
+            const thisEdge = possibleEdges[i]
+            const key = possibleEdges[i].cursor
+            startKey = startKey || key || ''
+            endKey = key || ''
+            edges.push(thisEdge)
+            // console.log('>>>    found')
+
+            if (edges.length == limit) {
+              // console.log(`>>> reached limit of ${limit}`)
+              return {
+                edges,
+                hasPreviousPage: reverse,
+                hasNextPage: !reverse,
+                startKey,
+                endKey,
+              }
+            }
+            // } else {
+            // console.log('>>>    not found')
+          }
+        }
+
+        possibleEdges.length = 0
+        itemRecordLoads.length = 0
+      }
+    }
+
+    // Process any remaining
+    for (const i in possibleEdges) {
+      if (itemFilter(await itemRecordLoads[i])) {
+        const thisEdge = possibleEdges[i]
+        const key = possibleEdges[i].cursor
+        startKey = startKey || key || ''
+        endKey = key || ''
+        edges.push(thisEdge)
+      }
+    }
+    // console.log(`>>> reached end of iterator, found ${edges.length} edges`)
+    const foundLimitCount = edges.length == limit
+    return {
+      edges,
+      hasPreviousPage: foundLimitCount && reverse,
+      hasNextPage: foundLimitCount && !reverse,
+      startKey,
+      endKey,
+    }
+  }
+
   private async indexStatusCallbackWrapper<T>(
     fn: () => Promise<T>,
     post?: () => Promise<void>
