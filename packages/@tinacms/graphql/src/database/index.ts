@@ -1,5 +1,4 @@
 import path from 'node:path'
-import fs from 'fs-extra'
 import type { DocumentNode } from 'graphql'
 import { GraphQLError } from 'graphql'
 import micromatch from 'micromatch'
@@ -984,12 +983,6 @@ export class Database {
         : '\uFFFF'
     }
 
-    let edges: { cursor: string; path: string }[] = []
-    let startKey: string = ''
-    let endKey: string = ''
-    let hasPreviousPage = false
-    let hasNextPage = false
-
     const fieldsPattern = indexDefinition?.fields?.length
       ? `${indexDefinition.fields
           .map((p) => `(?<${p.name}>.+)${INDEX_KEY_FIELD_SEPARATOR}`)
@@ -1004,7 +997,6 @@ export class Database {
     // @ts-ignore
     // It looks like tslint is confused by the multiple iterator() overloads
     const iterator = sublevel.iterator<string, Record<string, any>>(query)
-    console.log(`Started the iterator for query: ${JSON.stringify(query)}`)
 
     let result: {
       edges: { cursor: string; path: string }[]
@@ -1024,14 +1016,6 @@ export class Database {
       )
     } else {
       if (indexDefinition) {
-        result = await this._useHeldItemRecords(
-          iterator,
-          valuesRegex,
-          itemFilter,
-          limit,
-          query.reverse
-        )
-      } else {
         result = await this._loadLevelItemRecords(
           iterator,
           valuesRegex,
@@ -1040,65 +1024,20 @@ export class Database {
           query.reverse,
           rootLevel
         )
+      } else {
+        result = await this._useHeldItemRecords(
+          iterator,
+          valuesRegex,
+          itemFilter,
+          limit,
+          query.reverse
+        )
       }
     }
-    /* for await (const [key, value] of iterator) {
-      console.log(`Processing key: ${key}`)
-      const matcher = valuesRegex.exec(key)
-      if (
-        !matcher ||
-        (indexDefinition &&
-          matcher.length !== indexDefinition.fields.length + 2)
-      ) {
-        continue
-      }
-
-      const filepath = matcher.groups['_filepath_']
-      let itemRecord: Record<string, any>
-      if (filterSuffixes) {
-        console.log(`Filtering suffixes`)
-        itemRecord = matcher.groups
-        // for index match fields, convert the array value from comma-separated string to array
-        for (const field of indexDefinition.fields) {
-          if (itemRecord[field.name]) {
-            if (field.list) {
-              itemRecord[field.name] = itemRecord[field.name].split(
-                ARRAY_ITEM_VALUE_SEPARATOR
-              )
-            }
-          }
-        }
-      } else {
-        console.log(`Not filtering suffixes`)
-        if (indexDefinition) {
-          console.log(`    Executing rootLevel get`)
-          itemRecord = await rootLevel.get(filepath)
-        } else {
-          itemRecord = value
-        }
-      }
-      if (!itemFilter(itemRecord)) {
-        continue
-      }
-
-      if (limit !== -1 && edges.length >= limit) {
-        if (query.reverse) {
-          hasPreviousPage = true
-        } else {
-          hasNextPage = true
-        }
-        break
-      }
-
-      startKey = startKey || key || ''
-      endKey = key || ''
-      edges = [...edges, { cursor: key, path: filepath }]
-    } */
 
     return {
-      edges: await sequential(edges, async (edge) => {
+      edges: await sequential(result.edges, async (edge) => {
         try {
-          console.log(`Loading edge for ${edge.path}`)
           const node = await hydrator(edge.path)
           return {
             node,
