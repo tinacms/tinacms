@@ -201,12 +201,16 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
       ],
       {
         errorMap: (issue, ctx) => {
-          // Add a better error message for invalid_union_discriminator
           if (issue.code === 'invalid_union_discriminator') {
+            const formattedTypes = `  - ${TypeName.join('\n  - ')}`
+            if (!ctx.data?.type) {
+              return {
+                message: `Missing \`type\` property in field \`${ctx.data.name}\`. Please add a \`type\` property with one of the following values:\n${formattedTypes}\n`,
+              }
+            }
+
             return {
-              message: `Invalid \`type\` property. In the schema is 'type: ${
-                ctx.data?.type
-              }' and expected one of ${TypeName.join(', ')}`,
+              message: `Invalid \`type\` property in field \`${ctx.data.name}\`. In the schema is 'type: ${ctx.data?.type}' but expected one of the following values:\n${formattedTypes}\n`,
             }
           }
           return {
