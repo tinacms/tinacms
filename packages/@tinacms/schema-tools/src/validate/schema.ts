@@ -20,8 +20,9 @@ const FORMATS = [
 const Template = z
   .object({
     label: z.string({
-      invalid_type_error: 'label must be a string',
-      required_error: 'label was not provided but is required',
+      invalid_type_error:
+        'Invalid data type for property `label`. Must be of type `string`',
+      required_error: 'Missing `label` property. Property `label` is required.',
     }),
     name: name,
     fields: z.array(TinaFieldZod),
@@ -42,7 +43,8 @@ export const CollectionBaseSchema = z.object({
     if (val === 'relativePath') {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `name cannot be 'relativePath'. 'relativePath' is a reserved field name.`,
+        message:
+          "Invalid `name` property. `name` cannot be 'relativePath' as it is a reserved field name.",
       })
     }
   }),
@@ -53,7 +55,8 @@ export const CollectionBaseSchema = z.object({
       if (val === '.') {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `path cannot be '.'. Please use '/' or '' instead. `,
+          message:
+            "Invalid `path` property. `path` cannot be '.'. Please use '/' or '' instead.",
         })
       }
     }),
@@ -77,36 +80,39 @@ const TinaCloudCollection = CollectionBaseSchema.extend({
         })
       }
     })
-    .refine(
-      // It is valid if it is 0 or 1
-      (val) => {
-        const arr = val?.filter((x) => x.type === 'string' && x.isTitle) || []
-        return arr.length < 2
-      },
-      {
-        message: 'Fields can only have one use of `isTitle`',
+    .superRefine((val, ctx) => {
+      const arr = val?.filter((x) => x.type === 'string' && x.isTitle) || []
+      if (arr.length > 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `The following fields have the property \`isTitle\`: [${arr
+            .map((field) => field.name)
+            .join(', ')}]. Only one can contain the property \`isTitle\`.`,
+        })
       }
-    )
-    .refine(
-      // It is valid if it is 0 or 1
-      (val) => {
-        const arr = val?.filter((x) => x.uid) || []
-        return arr.length < 2
-      },
-      {
-        message: 'Fields can only have one use of `uid`',
+    })
+    .superRefine((val, ctx) => {
+      const arr = val?.filter((x) => x.uid) || []
+      if (arr.length > 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `The following fields have the property \`uid\`: [${arr
+            .map((field) => field.name)
+            .join(', ')}]. Only one can contain the property \`uid\`.`,
+        })
       }
-    )
-    .refine(
-      // It is valid if it is 0 or 1
-      (val) => {
-        const arr = val?.filter((x) => x.type === 'password') || []
-        return arr.length < 2
-      },
-      {
-        message: 'Fields can only have one use of `password` type',
+    })
+    .superRefine((val, ctx) => {
+      const arr = val?.filter((x) => x.type === 'password') || []
+      if (arr.length > 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `The following fields have \`type: password\`: [${arr
+            .map((field) => field.name)
+            .join(', ')}]. Only one can be of \`type: password\`.`,
+        })
       }
-    ),
+    }),
   templates: z
     .array(Template)
     .min(1, 'Property `templates` cannot be empty.')
@@ -120,18 +126,27 @@ const TinaCloudCollection = CollectionBaseSchema.extend({
         })
       }
     }),
-}).refine(
-  (val) => {
-    let isValid = Boolean(val?.templates) || Boolean(val?.fields)
-    if (!isValid) {
-      return false
-    } else {
-      isValid = !(val?.templates && val?.fields)
-      return isValid
-    }
-  },
-  { message: 'Must provide one of templates or fields in your collection' }
-)
+}).superRefine((val, ctx) => {
+  // Must have at least one of these fields.
+  if (!val?.templates && !val?.fields) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        'Fields of `type: object` must have either `templates` or `fields` property.',
+    })
+    return false
+  }
+
+  // Cannot have both of these fields.
+  if (val?.templates && val?.fields) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        'Fields of `type: object` must have either `templates` or `fields` property, not both.',
+    })
+    return false
+  }
+})
 
 export const TinaCloudSchemaZod = z
   .object({
@@ -151,7 +166,7 @@ export const TinaCloudSchemaZod = z
     if (val.collections?.filter((x) => x.isAuthCollection).length > 1) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Only one collection can be marked as isAuthCollection`,
+        message: 'Only one collection can be marked as `isAuthCollection`.',
         fatal: true,
       })
     }
@@ -161,7 +176,7 @@ export const TinaCloudSchemaZod = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          'can not have both loadCustomStore and tina. Must use one or the other',
+          'Cannot have both `loadCustomStore` and `tina`. Must use one or the other.',
         fatal: true,
         path: ['config', 'media'],
       })
@@ -172,7 +187,7 @@ export const TinaCloudSchemaZod = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          'can not have both searchClient and tina. Must use one or the other',
+          'Cannot have both `searchClient` and `tina`. Must use one or the other.',
         fatal: true,
         path: ['config', 'search'],
       })

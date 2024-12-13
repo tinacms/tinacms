@@ -220,73 +220,60 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
     )
     .superRefine((val, ctx) => {
       if (val.type === 'string') {
+        const stringifiedField = JSON.stringify(val, null, 2)
+
         // refine isTitle to make sure the proper args are passed
-        if (val.isTitle) {
-          if (val.list) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Can not have \`list: true\` when using \`isTitle\`. Error in value \n${JSON.stringify(
-                val,
-                null,
-                2
-              )}\n`,
-            })
-          }
-          if (!val.required) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Must have { required: true } when using \`isTitle\` Error in value \n${JSON.stringify(
-                val,
-                null,
-                2
-              )}\n`,
-            })
-          }
-        }
-        if (val.uid) {
-          if (val.list) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Can not have \`list: true\` when using \`uid\`. Error in value \n${JSON.stringify(
-                val,
-                null,
-                2
-              )}\n`,
-            })
-          }
-          if (!val.required) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Must have { required: true } when using \`uid\` Error in value \n${JSON.stringify(
-                val,
-                null,
-                2
-              )}\n`,
-            })
-          }
-        }
-      }
-      // Adding the refine to ObjectField broke the discriminatedUnion so it will be added here
-      if (val.type === 'object') {
-        // TODO: Maybe clean up this code its sorta messy
-        const message =
-          'Must provide one of templates or fields in your collection'
-        let isValid = Boolean(val?.templates) || Boolean(val?.fields)
-        if (!isValid) {
+        if (val.isTitle && val.list) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message,
+            message: `\`list: true\` is not allowed when using \`isTitle\` for fields of \`type: string\`. Error found in field:\n${stringifiedField}`,
           })
-          return false
-        } else {
-          isValid = !(val?.templates && val?.fields)
-          if (!isValid) {
+        }
+
+        if (val.isTitle && !val.required) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Property \`required: true\` is required when using \`isTitle\` for fields of \`type: string\`. Error found in field:\n${stringifiedField}`,
+          })
+        }
+
+        if (val.uid && val.list) {
+          if (val.list) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message,
+              message: `\`list: true\` is not allowed when using \`uid\` for fields of \`type: string\`. Error found in field:\n${stringifiedField}`,
             })
           }
-          return isValid
+        }
+
+        if (val.uid && !val.required) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Property \`required: true\` is required when using \`uid\` for fields of \`type: string\`. Error found in field:\n${stringifiedField}`,
+          })
+        }
+      }
+
+      // Adding the refine to ObjectField broke the discriminatedUnion so it will be added here
+      if (val.type === 'object') {
+        // Must have at least one of these fields.
+        if (!val?.templates && !val?.fields) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              'Fields of `type: object` must have either `templates` or `fields` property.',
+          })
+          return false
+        }
+
+        // Cannot have both of these fields.
+        if (val?.templates && val?.fields) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              'Fields of `type: object` must have either `templates` or `fields` property, not both.',
+          })
+          return false
         }
       }
 
