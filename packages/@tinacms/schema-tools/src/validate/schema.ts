@@ -66,7 +66,7 @@ export const CollectionBaseSchema = z.object({
 const TinaCloudCollection = CollectionBaseSchema.extend({
   fields: z
     .array(TinaFieldZod)
-    .min(1)
+    .min(1, 'Property `fields` cannot be empty.')
     .optional()
     .superRefine((val, ctx) => {
       const dups = findDuplicates(val?.map((x) => x.name))
@@ -109,7 +109,7 @@ const TinaCloudCollection = CollectionBaseSchema.extend({
     ),
   templates: z
     .array(Template)
-    .min(1)
+    .min(1, 'Property `templates` cannot be empty.')
     .optional()
     .superRefine((val, ctx) => {
       const dups = findDuplicates(val?.map((x) => x.name))

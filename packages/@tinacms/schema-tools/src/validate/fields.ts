@@ -140,7 +140,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
     }),
     fields: z
       .array(TinaFieldZod)
-      .min(1)
+      .min(1, 'Property `fields` cannot be empty.')
       .optional()
       .superRefine((val, ctx) => {
         const dups = findDuplicates(val?.map((x) => x.name))
@@ -153,7 +153,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
       }),
     templates: z
       .array(TemplateTemp)
-      .min(1)
+      .min(1, 'Property `templates` cannot be empty.')
       .optional()
       .superRefine((val, ctx) => {
         const dups = findDuplicates(val?.map((x) => x.name))
