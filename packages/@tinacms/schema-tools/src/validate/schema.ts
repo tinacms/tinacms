@@ -1,12 +1,12 @@
-/**
-
-*/
-
 import { z } from 'zod'
 import { name } from './properties'
 import { findDuplicates } from '../util'
 import { TinaFieldZod } from './fields'
 import { tinaConfigZod } from './tinaCloudSchemaConfig'
+import {
+  duplicateCollectionErrorMessage,
+  duplicateFieldErrorMessage,
+} from './util'
 const FORMATS = [
   'json',
   'md',
@@ -31,7 +31,7 @@ const Template = z
     if (dups) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Fields must have a unique name, duplicate field names: ${dups}`,
+        message: duplicateFieldErrorMessage(dups),
       })
     }
   })
@@ -73,7 +73,7 @@ const TinaCloudCollection = CollectionBaseSchema.extend({
       if (dups) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Fields must have a unique name, duplicate field names: ${dups}`,
+          message: duplicateFieldErrorMessage(dups),
         })
       }
     })
@@ -116,7 +116,7 @@ const TinaCloudCollection = CollectionBaseSchema.extend({
       if (dups) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Templates must have a unique name, duplicate template names: ${dups}`,
+          message: duplicateFieldErrorMessage(dups),
         })
       }
     }),
@@ -143,7 +143,7 @@ export const TinaCloudSchemaZod = z
     if (dups) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `${dups} are duplicate names in your collections. Collection names must be unique.`,
+        message: duplicateCollectionErrorMessage(dups),
         fatal: true,
       })
     }

@@ -1,11 +1,11 @@
-/**
-
-*/
-
 import { z } from 'zod'
 import type { TinaField as TinaFieldType } from '../types/index'
 import { findDuplicates } from '../util'
 import { name } from './properties'
+import {
+  duplicateFieldErrorMessage,
+  duplicateTemplateErrorMessage,
+} from './util'
 
 const TypeName = [
   'string',
@@ -18,10 +18,9 @@ const TypeName = [
   'rich-text',
 ] as const
 
-const typeTypeError = `type must be one of ${TypeName.join(', ')}`
-const typeRequiredError = `type is required and must be one of ${TypeName.join(
-  ', '
-)}`
+const formattedTypes = `  - ${TypeName.join('\n  - ')}`
+const typeTypeError = `Invalid \`type\` property. \`type\` expected to be one of the following values:\n${formattedTypes}`
+const typeRequiredError = `Missing \`type\` property. Please add a \`type\` property with one of the following:\n${formattedTypes}`
 
 const Option = z.union(
   [
@@ -38,6 +37,7 @@ const Option = z.union(
     },
   }
 )
+
 const TinaField = z.object({
   name,
   label: z.string().or(z.boolean()).optional(),
@@ -127,7 +127,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
       if (dups) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Fields must have a unique name, duplicate field names: ${dups}`,
+          message: duplicateFieldErrorMessage(dups),
         })
       }
     })
@@ -147,7 +147,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
         if (dups) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Fields must have a unique name, duplicate field names: ${dups}`,
+            message: duplicateFieldErrorMessage(dups),
           })
         }
       }),
@@ -160,7 +160,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
         if (dups) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Templates must have a unique name, duplicate template names: ${dups}`,
+            message: duplicateTemplateErrorMessage(dups),
           })
         }
       }),
@@ -179,7 +179,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
         if (dups) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Templates must have a unique name, duplicate template names: ${dups}`,
+            message: duplicateTemplateErrorMessage(dups),
           })
         }
       }),
