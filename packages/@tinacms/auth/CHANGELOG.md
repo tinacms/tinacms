@@ -1,5 +1,11 @@
 # @tinacms/auth
 
+## 1.0.10
+
+### Patch Changes
+
+- [#5351](https://github.com/tinacms/tinacms/pull/5351) [`0345852`](https://github.com/tinacms/tinacms/commit/0345852e3a7568b61a1417cd037715ab0d0dca01) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Removes `fetch-ponyfill` dependency and use native fetch (node18+)
+
 ## 1.0.9
 
 ### Patch Changes
