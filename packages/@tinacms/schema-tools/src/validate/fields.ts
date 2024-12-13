@@ -1,11 +1,11 @@
-/**
-
-*/
-
 import { z } from 'zod'
 import type { TinaField as TinaFieldType } from '../types/index'
 import { findDuplicates } from '../util'
 import { name } from './properties'
+import {
+  duplicateFieldErrorMessage,
+  duplicateTemplateErrorMessage,
+} from './util'
 
 const TypeName = [
   'string',
@@ -18,10 +18,9 @@ const TypeName = [
   'rich-text',
 ] as const
 
-const typeTypeError = `type must be one of ${TypeName.join(', ')}`
-const typeRequiredError = `type is required and must be one of ${TypeName.join(
-  ', '
-)}`
+const formattedTypes = `  - ${TypeName.join('\n  - ')}`
+const typeTypeError = `Invalid \`type\` property. \`type\` expected to be one of the following values:\n${formattedTypes}`
+const typeRequiredError = `Missing \`type\` property. Please add a \`type\` property with one of the following:\n${formattedTypes}`
 
 const Option = z.union(
   [
@@ -38,6 +37,7 @@ const Option = z.union(
     },
   }
 )
+
 const TinaField = z.object({
   name,
   label: z.string().or(z.boolean()).optional(),
@@ -127,7 +127,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
       if (dups) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Fields must have a unique name, duplicate field names: ${dups}`,
+          message: duplicateFieldErrorMessage(dups),
         })
       }
     })
@@ -140,27 +140,27 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
     }),
     fields: z
       .array(TinaFieldZod)
-      .min(1)
+      .min(1, 'Property `fields` cannot be empty.')
       .optional()
       .superRefine((val, ctx) => {
         const dups = findDuplicates(val?.map((x) => x.name))
         if (dups) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Fields must have a unique name, duplicate field names: ${dups}`,
+            message: duplicateFieldErrorMessage(dups),
           })
         }
       }),
     templates: z
       .array(TemplateTemp)
-      .min(1)
+      .min(1, 'Property `templates` cannot be empty.')
       .optional()
       .superRefine((val, ctx) => {
         const dups = findDuplicates(val?.map((x) => x.name))
         if (dups) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Templates must have a unique name, duplicate template names: ${dups}`,
+            message: duplicateTemplateErrorMessage(dups),
           })
         }
       }),
@@ -179,7 +179,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
         if (dups) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Templates must have a unique name, duplicate template names: ${dups}`,
+            message: duplicateTemplateErrorMessage(dups),
           })
         }
       }),
@@ -201,12 +201,15 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
       ],
       {
         errorMap: (issue, ctx) => {
-          // Add a better error message for invalid_union_discriminator
           if (issue.code === 'invalid_union_discriminator') {
+            if (!ctx.data?.type) {
+              return {
+                message: `Missing \`type\` property in field \`${ctx.data.name}\`. Please add a \`type\` property with one of the following:\n${formattedTypes}`,
+              }
+            }
+
             return {
-              message: `Invalid \`type\` property. In the schema is 'type: ${
-                ctx.data?.type
-              }' and expected one of ${TypeName.join(', ')}`,
+              message: `Invalid \`type\` property in field \`${ctx.data.name}\`. In the schema is 'type: ${ctx.data?.type}' but expected one of the following:\n${formattedTypes}`,
             }
           }
           return {
@@ -217,73 +220,60 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
     )
     .superRefine((val, ctx) => {
       if (val.type === 'string') {
+        const stringifiedField = JSON.stringify(val, null, 2)
+
         // refine isTitle to make sure the proper args are passed
-        if (val.isTitle) {
-          if (val.list) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Can not have \`list: true\` when using \`isTitle\`. Error in value \n${JSON.stringify(
-                val,
-                null,
-                2
-              )}\n`,
-            })
-          }
-          if (!val.required) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Must have { required: true } when using \`isTitle\` Error in value \n${JSON.stringify(
-                val,
-                null,
-                2
-              )}\n`,
-            })
-          }
-        }
-        if (val.uid) {
-          if (val.list) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Can not have \`list: true\` when using \`uid\`. Error in value \n${JSON.stringify(
-                val,
-                null,
-                2
-              )}\n`,
-            })
-          }
-          if (!val.required) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Must have { required: true } when using \`uid\` Error in value \n${JSON.stringify(
-                val,
-                null,
-                2
-              )}\n`,
-            })
-          }
-        }
-      }
-      // Adding the refine to ObjectField broke the discriminatedUnion so it will be added here
-      if (val.type === 'object') {
-        // TODO: Maybe clean up this code its sorta messy
-        const message =
-          'Must provide one of templates or fields in your collection'
-        let isValid = Boolean(val?.templates) || Boolean(val?.fields)
-        if (!isValid) {
+        if (val.isTitle && val.list) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message,
+            message: `\`list: true\` is not allowed when using \`isTitle\` for fields of \`type: string\`. Error found in field:\n${stringifiedField}`,
           })
-          return false
-        } else {
-          isValid = !(val?.templates && val?.fields)
-          if (!isValid) {
+        }
+
+        if (val.isTitle && !val.required) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Property \`required: true\` is required when using \`isTitle\` for fields of \`type: string\`. Error found in field:\n${stringifiedField}`,
+          })
+        }
+
+        if (val.uid && val.list) {
+          if (val.list) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message,
+              message: `\`list: true\` is not allowed when using \`uid\` for fields of \`type: string\`. Error found in field:\n${stringifiedField}`,
             })
           }
-          return isValid
+        }
+
+        if (val.uid && !val.required) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Property \`required: true\` is required when using \`uid\` for fields of \`type: string\`. Error found in field:\n${stringifiedField}`,
+          })
+        }
+      }
+
+      // Adding the refine to ObjectField broke the discriminatedUnion so it will be added here
+      if (val.type === 'object') {
+        // Must have at least one of these fields.
+        if (!val?.templates && !val?.fields) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              'Fields of `type: object` must have either `templates` or `fields` property.',
+          })
+          return false
+        }
+
+        // Cannot have both of these fields.
+        if (val?.templates && val?.fields) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              'Fields of `type: object` must have either `templates` or `fields` property, not both.',
+          })
+          return false
         }
       }
 
