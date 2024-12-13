@@ -561,10 +561,11 @@ export class BuildCommand extends BaseCommand {
     const token = config.token
 
     // Get the remote schema from the graphql endpoint
-    const { remoteSchema, remoteVersion } = await fetchRemoteGraphqlSchema({
-      url: apiURL,
-      token,
-    })
+    const { remoteSchema, remoteProjectVersion } =
+      await fetchRemoteGraphqlSchema({
+        url: apiURL,
+        token,
+      })
 
     if (!remoteSchema) {
       bar.tick({
@@ -598,6 +599,7 @@ export class BuildCommand extends BaseCommand {
         const reason = diffResult[0].message
         const errorLevel = diffResult[0].criticality.level
         const faqLink = getFaqLink(type)
+        const tinaGraphQLVersion = configManager.getTinaGraphQLVersion()
 
         let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to GitHub to update your remote GraphQL schema. ${
           faqLink && `\nCheck out '${faqLink}' for possible solutions.`
@@ -606,7 +608,7 @@ export class BuildCommand extends BaseCommand {
         if (config?.branch) {
           errorMessage += `\tBranch: ${config.branch}, Client ID: ${config.clientId}\n`
         }
-        errorMessage += `\tLocal GraphQL version: ${configManager.getTinaGraphQLVersion()} / Remote GraphQL version: ${remoteVersion}\n`
+        errorMessage += `\tLocal GraphQL version: ${tinaGraphQLVersion.fullVersion} / Remote GraphQL version: ${remoteProjectVersion}\n`
         errorMessage += `\tLast indexed at: ${new Date(
           timestamp
         ).toUTCString()}\n`
@@ -782,10 +784,12 @@ export const fetchRemoteGraphqlSchema = async ({
     headers,
     body,
   })
+
   const data = await res.json()
   return {
     remoteSchema: data?.data,
-    remoteVersion: res.headers.get('tinacms-grapqhl-version'),
+    remoteRuntimeVersion: res.headers.get('tinacms-grapqhl-version'),
+    remoteProjectVersion: res.headers.get('tinacms-graphql-project-version'),
   }
 }
 
