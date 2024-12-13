@@ -13,7 +13,11 @@ export const parseZodError = ({ zodError }: { zodError: ZodError }) => {
       })
       // moreInfo.push(issue.unionErrors.map((x) => x.flatten()))
     }
-    const errorMessage = `${issue?.message} at path ${issue.path.join('.')}`
+    const errorMessage = `${
+      issue?.message
+    }\nAdditional information: \n\t- Error found at path ${issue.path.join(
+      '.'
+    )}\n`
     const errorMessages = [errorMessage, ...moreInfo]
 
     return {
