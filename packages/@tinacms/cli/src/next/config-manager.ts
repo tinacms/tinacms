@@ -9,7 +9,7 @@ import normalizePath from 'normalize-path'
 import chalk from 'chalk'
 import { loadProjectConfig } from '../next/vite'
 import { loadConfig } from 'tsconfig-paths'
-import { aliasPath } from 'esbuild-plugin-alias-path'
+import { aliasPath } from 'esbuild-plugin-alias-path' //TODO : remove esbuild-plugin-alias packages if using esbuild-plugin-alias-path
 import { logger } from '../logger'
 
 export const TINA_FOLDER = 'tina'
