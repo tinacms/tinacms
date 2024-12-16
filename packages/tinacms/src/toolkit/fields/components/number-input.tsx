@@ -13,4 +13,24 @@ export const NumberInput: React.FC<NumberProps> = ({
   onChange,
   value,
   step,
-}) => <Input type="number" step={step} value={value} onChange={onChange} />
+}) => (
+  <Input
+    type="number"
+    step={step}
+    value={value}
+    onChange={(event) => {
+      const inputValue = event.target.value
+      const newValue = inputValue === '' ? undefined : inputValue
+      if (onChange) {
+        const syntheticEvent = {
+          ...event,
+          target: {
+            ...event.target,
+            value: newValue,
+          },
+        }
+        onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>)
+      }
+    }}
+  />
+)

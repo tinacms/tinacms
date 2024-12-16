@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.6.9
+
+### Patch Changes
+
+- [#5363](https://github.com/tinacms/tinacms/pull/5363) [`c45ac5d`](https://github.com/tinacms/tinacms/commit/c45ac5d9c7219593cde63e0cc6fbf945480884f7) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - Improve schema validation messages
+
 ## 1.6.8
 
 ### Patch Changes

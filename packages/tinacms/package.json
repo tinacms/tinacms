@@ -1,6 +1,6 @@
 {
 	"name": "tinacms",
-	"version": "2.5.0",
+	"version": "2.5.2",
 	"main": "dist/index.js",
 	"module": "./dist/index.mjs",
 	"exports": {
@@ -107,7 +107,6 @@
 		"color-string": "^1.9.1",
 		"crypto-js": "^4.2.0",
 		"date-fns": "2.30.0",
-		"fetch-ponyfill": "^7.1.0",
 		"final-form": "4.20.10",
 		"final-form-arrays": "^3.1.0",
 		"final-form-set-field-data": "^1.0.2",

@@ -18,7 +18,7 @@ export const validateSchema = ({ schema }: { schema: Schema }) => {
   } catch (e) {
     if (e instanceof ZodError) {
       const errors = parseZodError({ zodError: e })
-      throw new TinaSchemaValidationError(errors.join(', \n'))
+      throw new TinaSchemaValidationError(errors.join('\n'))
     }
     throw new Error(e as any)
   }

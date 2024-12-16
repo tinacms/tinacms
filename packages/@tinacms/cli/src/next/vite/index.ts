@@ -213,6 +213,8 @@ export const createConfig = async ({
     basePath = configManager.config.build.basePath
   }
 
+  const fullVersion = configManager.getTinaGraphQLVersion()
+  const version = `${fullVersion.major}.${fullVersion.minor}`
   const config: InlineConfig = {
     root: configManager.spaRootPath,
     base: `/${basePath ? `${normalizePath(basePath)}/` : ''}${normalizePath(
@@ -246,7 +248,7 @@ export const createConfig = async ({
       'process.platform': `"${process.platform}"`,
       __API_URL__: `"${apiURL}"`,
       __BASE_PATH__: `"${configManager.config?.build?.basePath || ''}"`,
-      __TINA_GRAPHQL_VERSION__: `"${configManager.getTinaGraphQLVersion()}"`,
+      __TINA_GRAPHQL_VERSION__: version,
     },
     logLevel: 'error', // Vite import warnings are noisy
     optimizeDeps: {

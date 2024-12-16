@@ -1,5 +1,32 @@
 # tinacms-cli
 
+## 1.7.0
+
+### Minor Changes
+
+- [#5357](https://github.com/tinacms/tinacms/pull/5357) [`0ed5b0f`](https://github.com/tinacms/tinacms/commit/0ed5b0f5c24140befb425526b3d31c79b9071df4) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - Adds the patch version into the graphql errors when building a project.
+
+### Patch Changes
+
+- [#5354](https://github.com/tinacms/tinacms/pull/5354) [`4daaaf7`](https://github.com/tinacms/tinacms/commit/4daaaf72cb93f30988a78a88b28a0d80f4f96d5b) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - chore: added additional logging to graphql diff errors to display reason and a possible faq if a relevant one is found.
+
+- Updated dependencies [[`b54b303`](https://github.com/tinacms/tinacms/commit/b54b303a8290528230dc83d8fb1b7535df7199f6), [`c45ac5d`](https://github.com/tinacms/tinacms/commit/c45ac5d9c7219593cde63e0cc6fbf945480884f7), [`0345852`](https://github.com/tinacms/tinacms/commit/0345852e3a7568b61a1417cd037715ab0d0dca01)]:
+  - tinacms@2.5.2
+  - @tinacms/schema-tools@1.6.9
+  - @tinacms/app@2.1.14
+  - @tinacms/graphql@1.5.9
+  - @tinacms/search@1.0.36
+
+## 1.6.13
+
+### Patch Changes
+
+- [#5350](https://github.com/tinacms/tinacms/pull/5350) [`7339bd1`](https://github.com/tinacms/tinacms/commit/7339bd1e1b020085048fef4880b0ce0771698dbb) Thanks [@kldavis4](https://github.com/kldavis4)! - Add detailed logging of version and indexing information on schema errors
+
+- Updated dependencies [[`bbfd415`](https://github.com/tinacms/tinacms/commit/bbfd415762a8b2c62b7653b497b94d67aaa8501a), [`83a25cf`](https://github.com/tinacms/tinacms/commit/83a25cf61b736e1867d37bee37f7514d349e4427)]:
+  - tinacms@2.5.1
+  - @tinacms/app@2.1.13
+
 ## 1.6.12
 
 ### Patch Changes
