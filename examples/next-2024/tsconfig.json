@@ -28,6 +28,8 @@
       // ]
       "@lib/*": ["lib/*"],
       "@components/header": ["components/header.ts"],
+      "@/*": ["./*"],
+      "@tina/*": ["./tina/*"]
     }
   },
   "include": [
