@@ -394,10 +394,6 @@ export class ConfigManager {
   }
 
   async loadConfigFile(generatedFolderPath: string, configFilePath: string) {
-    console.log('Here is the configFilePath')
-
-    console.dir({ generatedFolderPath, configFilePath }, { depth: Infinity })
-
     // Date.now because imports are cached, we don't have a
     // good way of invalidating them when this file changes
     // https://github.com/nodejs/modules/issues/307
@@ -430,8 +426,6 @@ export class ConfigManager {
       if (tsConfigResult.resultType === 'success') {
         const { absoluteBaseUrl, paths } = tsConfigResult
         dynamicAliases = resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths)
-
-        console.log('Resolved dynamicAliases:', dynamicAliases)
       } else {
         console.error('Failed to load tsconfig.json:', tsConfigResult.message)
         throw new Error(`Invalid tsconfig.json at ${tsconfigPath}`)
@@ -441,10 +435,6 @@ export class ConfigManager {
         'Warning: tsconfig.json not found. Alias resolution will not be supported.'
       )
     }
-    console.log(
-      'Final dynamicAliases for aliasPath:',
-      JSON.stringify(dynamicAliases, null, 2)
-    )
 
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({

@@ -18,9 +18,6 @@ export function resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths) {
     - `dynamicAliases` will be an object mapping alias keys to their absolute paths, ready for esbuild.
 */
   return Object.entries(paths).reduce((aliases, [aliasKey, aliasPaths]) => {
-    console.log('aliasKey', aliasKey)
-    console.log('aliasPaths', aliasPaths)
-
     // Ignore "@/*" explicitly
     if (aliasKey === '@/*') {
       console.warn('Ignoring "@/*" alias due to potential conflicts.')
@@ -34,8 +31,6 @@ export function resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths) {
       aliasPaths[0].replace('/*', '')
     )
 
-    console.log('baseAliasKey', baseAliasKey)
-    console.log('baseAliasPath', baseAliasPath)
     if (hasWildcard) {
       aliases[`${baseAliasKey}/*`] = `${baseAliasPath}`
     } else {
