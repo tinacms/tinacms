@@ -23,9 +23,6 @@
     ],
     "baseUrl": ".",
     "paths": {
-      // "@/*": [
-      //   "./*"
-      // ]
       "@lib/*": ["lib/*"],
       "@components/header": ["components/header.ts"],
       "@/*": ["./*"],
