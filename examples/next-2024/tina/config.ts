@@ -1,7 +1,7 @@
 import { header } from '@components/header'
 import { hello } from '@lib/utils'
 import { defineConfig } from 'tinacms'
-// import { testcomp } from './collections/testcomp'
+import { testcomp } from '@tina/collections/testcomp'
 
 // Your hosting provider likely exposes this as an environment variable
 const branch =
@@ -12,7 +12,7 @@ const branch =
 
 hello()
 header()
-// testcomp()
+testcomp()
 
 export default defineConfig({
   branch,
