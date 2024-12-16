@@ -11,6 +11,7 @@ import { loadProjectConfig } from '../next/vite'
 import { loadConfig } from 'tsconfig-paths'
 import { aliasPath } from 'esbuild-plugin-alias-path' //TODO : remove esbuild-plugin-alias packages if using esbuild-plugin-alias-path
 import { logger } from '../logger'
+import { resolveTsPathsToEsbuildAliases } from '../utils/alias-helpers'
 
 export const TINA_FOLDER = 'tina'
 export const LEGACY_TINA_FOLDER = '.tina'
@@ -409,6 +410,7 @@ export class ConfigManager {
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
+
     const viteConfig = await loadProjectConfig({
       rootPath: this.rootPath,
       viteConfigEnv: {
@@ -423,36 +425,11 @@ export class ConfigManager {
 
     // Check if tsconfig.json exists
     if (fs.existsSync(tsconfigPath)) {
-      console.log('Found tsconfig.json at:', tsconfigPath)
-
       // Attempt to load tsconfig.json
       const tsConfigResult = loadConfig(tsconfigPath)
       if (tsConfigResult.resultType === 'success') {
         const { absoluteBaseUrl, paths } = tsConfigResult
-        console.log('Loaded tsconfig:', { absoluteBaseUrl, paths })
-
-        // Resolve aliases
-        dynamicAliases = Object.entries(paths).reduce(
-          (aliases, [aliasKey, aliasPaths]) => {
-            const hasWildcard = aliasKey.includes('*')
-            const baseAliasKey = hasWildcard
-              ? aliasKey.replace('/*', '')
-              : aliasKey
-            const baseAliasPath = path.resolve(
-              absoluteBaseUrl,
-              aliasPaths[0].replace('/*', '')
-            )
-
-            if (hasWildcard) {
-              aliases[`${baseAliasKey}/*`] = `${baseAliasPath}`
-            } else {
-              aliases[baseAliasKey] = baseAliasPath
-            }
-
-            return aliases
-          },
-          {}
-        )
+        dynamicAliases = resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths)
 
         console.log('Resolved dynamicAliases:', dynamicAliases)
       } else {
@@ -464,6 +441,10 @@ export class ConfigManager {
         'Warning: tsconfig.json not found. Alias resolution will not be supported.'
       )
     }
+    console.log(
+      'Final dynamicAliases for aliasPath:',
+      JSON.stringify(dynamicAliases, null, 2)
+    )
 
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
@@ -482,7 +463,6 @@ export class ConfigManager {
         ? [aliasPath({ alias: dynamicAliases })]
         : [], // Add plugin only if dynamicAliases are available
     })
-
     const flattenedList = []
 
     Object.keys(result2.metafile.inputs).forEach((key) => {
