@@ -17,13 +17,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "target": "ES6",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "lib/*"
-      ]
-    }
+    "target": "ES6"
   },
   "exclude": [
     "node_modules"
