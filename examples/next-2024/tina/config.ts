@@ -1,3 +1,4 @@
+import { header } from '@components/header'
 import { hello } from '@lib/utils'
 import { defineConfig } from 'tinacms'
 
@@ -9,6 +10,7 @@ const branch =
   'main'
 
 hello()
+header()
 
 export default defineConfig({
   branch,

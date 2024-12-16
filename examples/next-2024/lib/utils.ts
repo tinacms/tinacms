@@ -6,5 +6,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const hello = () => {
-  console.log('alias import success')
+  console.log('alias import lib util success')
 }

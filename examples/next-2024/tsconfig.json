@@ -26,7 +26,8 @@
       // "@/*": [
       //   "./*"
       // ]
-      "@lib/utils": ["lib/utils.ts"], 
+      "@lib/*": ["lib/*"],
+      "@components/header": ["components/header.ts"],
     }
   },
   "include": [
