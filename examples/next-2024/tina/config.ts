@@ -1,3 +1,4 @@
+import { hello } from '@/lib/utils'
 import { defineConfig } from 'tinacms'
 
 // Your hosting provider likely exposes this as an environment variable
@@ -6,6 +7,8 @@ const branch =
   process.env.VERCEL_GIT_COMMIT_REF ||
   process.env.HEAD ||
   'main'
+
+hello()
 
 export default defineConfig({
   branch,
