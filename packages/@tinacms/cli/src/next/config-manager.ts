@@ -9,7 +9,7 @@ import normalizePath from 'normalize-path'
 import chalk from 'chalk'
 import { loadProjectConfig } from '../next/vite'
 import { loadConfig } from 'tsconfig-paths'
-import alias from 'esbuild-plugin-alias'
+import { aliasPath } from 'esbuild-plugin-alias-path'
 import { logger } from '../logger'
 
 export const TINA_FOLDER = 'tina'
@@ -420,8 +420,38 @@ export class ConfigManager {
     const { absoluteBaseUrl, paths } = tsConfigResult
 
     console.log('Loaded tsconfig:', { absoluteBaseUrl, paths })
-    const resolvePath = (relativePath) =>
-      path.resolve(absoluteBaseUrl, relativePath)
+
+    // const dynamicAliases = Object.entries(paths).reduce((aliases, [aliasKey, aliasPaths]) => {
+    //   console.log('aliasKey', aliasKey)
+    //   console.log('aliasPaths', aliasPaths)
+
+    //   const resolvedPath = path.resolve(absoluteBaseUrl, aliasPaths[0]); // Resolve to absolute path
+    //   aliases[aliasKey] = resolvedPath; // Keep alias as-is, no modifications
+    //   return aliases;
+    // }, {});
+
+    const dynamicAliases = Object.entries(paths).reduce(
+      (aliases, [aliasKey, aliasPaths]) => {
+        const hasWildcard = aliasKey.includes('*')
+        const baseAliasKey = hasWildcard ? aliasKey.replace('/*', '') : aliasKey
+        const baseAliasPath = path.resolve(
+          absoluteBaseUrl,
+          aliasPaths[0].replace('/*', '')
+        )
+
+        // Create mapping for aliases
+        if (hasWildcard) {
+          aliases[`${baseAliasKey}/*`] = baseAliasPath
+        } else {
+          aliases[baseAliasKey] = baseAliasPath
+        }
+
+        return aliases
+      },
+      {}
+    )
+
+    console.log('dynamicAliases', dynamicAliases)
 
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
@@ -436,11 +466,10 @@ export class ConfigManager {
       outfile: preBuildConfigPath,
       loader: loaders,
       metafile: true,
-      // alias: alias as Record<string, string>,
       plugins: [
-        alias({
-          '@lib/utils': resolvePath('lib/utils.ts'), // Use absolute paths
-        }), // Pass resolved aliases to the plugin
+        aliasPath({
+          alias: dynamicAliases,
+        }),
       ],
     })
 
