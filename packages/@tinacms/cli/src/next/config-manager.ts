@@ -8,7 +8,8 @@ import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
 import chalk from 'chalk'
 import { loadProjectConfig } from '../next/vite'
-
+import { loadConfig } from 'tsconfig-paths'
+import alias from 'esbuild-plugin-alias'
 import { logger } from '../logger'
 
 export const TINA_FOLDER = 'tina'
@@ -383,11 +384,19 @@ export class ConfigManager {
   }
 
   async loadConfigFile(generatedFolderPath: string, configFilePath: string) {
+    console.log('Here is the configFilePath')
+
+    console.dir({ generatedFolderPath, configFilePath }, { depth: Infinity })
+
     // Date.now because imports are cached, we don't have a
     // good way of invalidating them when this file changes
     // https://github.com/nodejs/modules/issues/307
     const tmpdir = path.join(os.tmpdir(), Date.now().toString())
-    const prebuild = path.join(this.generatedFolderPath, 'config.prebuild.jsx')
+    const preBuildConfigPath = path.join(
+      this.generatedFolderPath,
+      'config.prebuild.jsx'
+    )
+
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
@@ -398,6 +407,22 @@ export class ConfigManager {
         mode: 'production',
       },
     })
+
+    const tsconfigPaths = path.join(this.rootPath, 'tsconfig.json')
+    // Load tsconfig.json using tsconfig-paths
+    const tsConfigResult = loadConfig(tsconfigPaths)
+
+    if (tsConfigResult.resultType !== 'success') {
+      console.error('Failed to load tsconfig.json:', tsConfigResult.message)
+      return
+    }
+
+    const { absoluteBaseUrl, paths } = tsConfigResult
+
+    console.log('Loaded tsconfig:', { absoluteBaseUrl, paths })
+    const resolvePath = (relativePath) =>
+      path.resolve(absoluteBaseUrl, relativePath)
+
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
@@ -408,18 +433,26 @@ export class ConfigManager {
       logLevel: 'silent',
       packages: 'external',
       ignoreAnnotations: true,
-      outfile: prebuild,
+      outfile: preBuildConfigPath,
       loader: loaders,
       metafile: true,
-      alias: viteConfig.config.resolve?.alias as Record<string, string>,
+      // alias: alias as Record<string, string>,
+      plugins: [
+        alias({
+          '@lib/utils': resolvePath('lib/utils.ts'), // Use absolute paths
+        }), // Pass resolved aliases to the plugin
+      ],
     })
+
     const flattenedList = []
+
     Object.keys(result2.metafile.inputs).forEach((key) => {
       if (key.includes('node_modules') || key.includes('__generated__')) {
         return
       }
       flattenedList.push(key)
     })
+
     await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
@@ -451,7 +484,7 @@ export class ConfigManager {
     fs.removeSync(outfile2)
     return {
       config: result.default,
-      prebuildPath: prebuild,
+      prebuildPath: preBuildConfigPath,
       watchList: flattenedList,
     }
   }

@@ -1,4 +1,4 @@
-import { hello } from '@/lib/utils'
+import { hello } from '@lib/utils'
 import { defineConfig } from 'tinacms'
 
 // Your hosting provider likely exposes this as an environment variable
