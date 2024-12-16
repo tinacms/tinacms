@@ -417,50 +417,53 @@ export class ConfigManager {
       },
     })
 
-    const tsconfigPaths = path.join(this.rootPath, 'tsconfig.json')
-    // Load tsconfig.json using tsconfig-paths
-    const tsConfigResult = loadConfig(tsconfigPaths)
+    const tsconfigPath = path.join(this.rootPath, 'tsconfig.json')
 
-    if (tsConfigResult.resultType !== 'success') {
-      console.error('Failed to load tsconfig.json:', tsConfigResult.message)
-      return
-    }
+    let dynamicAliases = {}
 
-    const { absoluteBaseUrl, paths } = tsConfigResult
+    // Check if tsconfig.json exists
+    if (fs.existsSync(tsconfigPath)) {
+      console.log('Found tsconfig.json at:', tsconfigPath)
 
-    console.log('Loaded tsconfig:', { absoluteBaseUrl, paths })
+      // Attempt to load tsconfig.json
+      const tsConfigResult = loadConfig(tsconfigPath)
+      if (tsConfigResult.resultType === 'success') {
+        const { absoluteBaseUrl, paths } = tsConfigResult
+        console.log('Loaded tsconfig:', { absoluteBaseUrl, paths })
 
-    // const dynamicAliases = Object.entries(paths).reduce((aliases, [aliasKey, aliasPaths]) => {
-    //   console.log('aliasKey', aliasKey)
-    //   console.log('aliasPaths', aliasPaths)
+        // Resolve aliases
+        dynamicAliases = Object.entries(paths).reduce(
+          (aliases, [aliasKey, aliasPaths]) => {
+            const hasWildcard = aliasKey.includes('*')
+            const baseAliasKey = hasWildcard
+              ? aliasKey.replace('/*', '')
+              : aliasKey
+            const baseAliasPath = path.resolve(
+              absoluteBaseUrl,
+              aliasPaths[0].replace('/*', '')
+            )
 
-    //   const resolvedPath = path.resolve(absoluteBaseUrl, aliasPaths[0]); // Resolve to absolute path
-    //   aliases[aliasKey] = resolvedPath; // Keep alias as-is, no modifications
-    //   return aliases;
-    // }, {});
+            if (hasWildcard) {
+              aliases[`${baseAliasKey}/*`] = `${baseAliasPath}`
+            } else {
+              aliases[baseAliasKey] = baseAliasPath
+            }
 
-    const dynamicAliases = Object.entries(paths).reduce(
-      (aliases, [aliasKey, aliasPaths]) => {
-        const hasWildcard = aliasKey.includes('*')
-        const baseAliasKey = hasWildcard ? aliasKey.replace('/*', '') : aliasKey
-        const baseAliasPath = path.resolve(
-          absoluteBaseUrl,
-          aliasPaths[0].replace('/*', '')
+            return aliases
+          },
+          {}
         )
 
-        // Create mapping for aliases
-        if (hasWildcard) {
-          aliases[`${baseAliasKey}/*`] = baseAliasPath
-        } else {
-          aliases[baseAliasKey] = baseAliasPath
-        }
-
-        return aliases
-      },
-      {}
-    )
-
-    console.log('dynamicAliases', dynamicAliases)
+        console.log('Resolved dynamicAliases:', dynamicAliases)
+      } else {
+        console.error('Failed to load tsconfig.json:', tsConfigResult.message)
+        throw new Error(`Invalid tsconfig.json at ${tsconfigPath}`)
+      }
+    } else {
+      console.warn(
+        'Warning: tsconfig.json not found. Alias resolution will not be supported.'
+      )
+    }
 
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
@@ -475,11 +478,9 @@ export class ConfigManager {
       outfile: preBuildConfigPath,
       loader: loaders,
       metafile: true,
-      plugins: [
-        aliasPath({
-          alias: dynamicAliases,
-        }),
-      ],
+      plugins: Object.keys(dynamicAliases).length
+        ? [aliasPath({ alias: dynamicAliases })]
+        : [], // Add plugin only if dynamicAliases are available
     })
 
     const flattenedList = []
