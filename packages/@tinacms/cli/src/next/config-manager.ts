@@ -419,7 +419,6 @@ export class ConfigManager {
 
     let dynamicAliases = {}
 
-    // Check if tsconfig.json exists
     if (fs.existsSync(tsconfigPath)) {
       // Attempt to load tsconfig.json
       const tsConfigResult = loadConfig(tsconfigPath)
