@@ -8,7 +8,10 @@ import { EditorContext } from './plate/editor-context'
 import type { MdxTemplate } from './plate/types'
 import { RichEditor } from './plate'
 import type { InputProps } from '@toolkit/fields/components'
-import type { ToolbarOverrideType } from './plate/toolbar/toolbar-overrides'
+import type {
+  ToolbarOverrides,
+  ToolbarOverrideType,
+} from './plate/toolbar/toolbar-overrides'
 
 export type RichTextType = React.PropsWithChildren<
   InputFieldType<
@@ -16,6 +19,7 @@ export type RichTextType = React.PropsWithChildren<
     {
       templates: MdxTemplate[]
       toolbarOverride?: ToolbarOverrideType[]
+      overrides?: ToolbarOverrides
     }
   >
 >
@@ -24,7 +28,11 @@ export const MdxFieldPlugin = {
   name: 'rich-text',
   Component: wrapFieldsWithMeta<
     InputProps,
-    { templates: MdxTemplate[]; toolbarOverride?: ToolbarOverrideType[] }
+    {
+      templates: MdxTemplate[]
+      toolbarOverride?: ToolbarOverrideType[]
+      overrides?: ToolbarOverrides
+    }
   >((props) => {
     const [rawMode, setRawMode] = React.useState(false)
     const [key, setKey] = React.useState(0)
@@ -82,7 +90,11 @@ export const MdxFieldPluginExtendible = {
   },
   Component: wrapFieldsWithMeta<
     InputProps,
-    { templates: MdxTemplate[]; toolbarOverride?: ToolbarOverrideType[] }
+    {
+      templates: MdxTemplate[]
+      toolbarOverride?: ToolbarOverrideType[]
+      overrides?: ToolbarOverrides
+    }
   >((props) => {
     const [key, setKey] = React.useState(0)
 

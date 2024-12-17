@@ -22,3 +22,8 @@ export const CONTAINER_MD_BREAKPOINT = 448 // Tailwind's 'md' breakpoint for con
 export const FLOAT_BUTTON_WIDTH = 25
 
 export const HEADING_LABEL = 'Headings'
+
+export type ToolbarOverrides = {
+  toolbar?: ToolbarOverrideType[]
+  showFloatingToolbar?: boolean
+}
