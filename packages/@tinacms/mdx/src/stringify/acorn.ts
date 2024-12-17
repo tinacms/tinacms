@@ -10,7 +10,6 @@ import parser from 'prettier/esm/parser-espree.mjs'
 import type {
   RichTextField,
   RichTextTemplate,
-  ObjectField,
   TinaField,
 } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
@@ -215,54 +214,70 @@ export function stringifyProps(
         if (field.list) {
           throw new Error(`Rich-text list is not supported`)
         } else {
-          const joiner = flatten ? ' ' : '\n'
-          let val = ''
-          // The rich-text editor can sometimes pass an empty value {}, consider that nullable
-          if (
-            isPlainObject(value) &&
-            Object.keys(value as object).length === 0
-          ) {
-            return
-          }
-          assertShape<Plate.RootElement>(
-            value,
-            (value) => value.type === 'root' && Array.isArray(value.children),
-            `Nested rich-text element is not a valid shape for field ${field.name}`
-          )
-          if (field.name === 'children') {
-            const root = rootElement(value, field, imageCallback)
-            root.children.forEach((child) => {
-              children.push(child)
+          if (template?.inline) {
+            const root = value as Plate.RootElement
+            const stringValue = stringifyMDX(root, field, imageCallback)
+            let s = stringValue || ''
+            s = s.replace(/`/g, '\\`')
+            s = s.replace(/\n/g, '\\n')
+            attributes.push({
+              type: 'mdxJsxAttribute',
+              name,
+              value: {
+                type: 'mdxJsxAttributeValueExpression',
+                value: `\`${s}\``,
+              },
             })
-            return
           } else {
-            const stringValue = stringifyMDX(value, field, imageCallback)
-            if (stringValue) {
-              val = stringValue
-                .trim()
-                .split('\n')
-                .map((str) => `  ${str.trim()}`)
-                .join(joiner)
+            const joiner = flatten ? ' ' : '\n'
+            let val = ''
+            // The rich-text editor can sometimes pass an empty value {}, consider that nullable
+            if (
+              isPlainObject(value) &&
+              Object.keys(value as object).length === 0
+            ) {
+              return
             }
-          }
-          if (flatten) {
-            attributes.push({
-              type: 'mdxJsxAttribute',
-              name,
-              value: {
-                type: 'mdxJsxAttributeValueExpression',
-                value: `<>${val.trim()}</>`,
-              },
-            })
-          } else {
-            attributes.push({
-              type: 'mdxJsxAttribute',
-              name,
-              value: {
-                type: 'mdxJsxAttributeValueExpression',
-                value: `<>\n${val}\n</>`,
-              },
-            })
+            assertShape<Plate.RootElement>(
+              value,
+              (value) => value.type === 'root' && Array.isArray(value.children),
+              `Nested rich-text element is not a valid shape for field ${field.name}`
+            )
+            if (field.name === 'children') {
+              const root = rootElement(value, field, imageCallback)
+              root.children.forEach((child) => {
+                children.push(child)
+              })
+              return
+            } else {
+              const stringValue = stringifyMDX(value, field, imageCallback)
+              if (stringValue) {
+                val = stringValue
+                  .trim()
+                  .split('\n')
+                  .map((str) => `  ${str.trim()}`)
+                  .join(joiner)
+              }
+            }
+            if (flatten) {
+              attributes.push({
+                type: 'mdxJsxAttribute',
+                name,
+                value: {
+                  type: 'mdxJsxAttributeValueExpression',
+                  value: `<>${val.trim()}</>`,
+                },
+              })
+            } else {
+              attributes.push({
+                type: 'mdxJsxAttribute',
+                name,
+                value: {
+                  type: 'mdxJsxAttributeValueExpression',
+                  value: `<>\n${val}\n</>`,
+                },
+              })
+            }
           }
         }
         break

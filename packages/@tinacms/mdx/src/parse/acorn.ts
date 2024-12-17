@@ -16,7 +16,8 @@ type TinaStringField =
 export const extractAttributes = (
   attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
   fields: TinaField[],
-  imageCallback: (image: string) => string
+  imageCallback: (image: string) => string,
+  inline?: boolean
 ) => {
   const properties: Record<string, unknown> = {}
   attributes?.forEach((attribute) => {
@@ -31,9 +32,11 @@ export const extractAttributes = (
       properties[attribute.name] = extractAttribute(
         attribute,
         field,
-        imageCallback
+        imageCallback,
+        inline
       )
     } catch (e) {
+      console.log(e)
       if (e instanceof Error) {
         throw new Error(
           `Unable to parse field value for field "${field.name}" (type: ${field.type}). ${e.message}`
@@ -47,7 +50,8 @@ export const extractAttributes = (
 const extractAttribute = (
   attribute: MdxJsxAttribute,
   field: TinaField,
-  imageCallback: (image: string) => string
+  imageCallback: (image: string) => string,
+  inline?: boolean
 ) => {
   switch (field.type) {
     case 'boolean':
@@ -80,7 +84,37 @@ const extractAttribute = (
     case 'object':
       return extractObject(extractExpression(attribute), field, imageCallback)
     case 'rich-text':
+      if (inline) {
+        /**
+         * Syntax can either be string (eg. body="# hello") or backticks (eg. body={`# hello`})
+         */
+        if (typeof attribute.value === 'string') {
+          const parsed = JSON.parse(`{ "value": "${attribute.value}" }`)
+          const valueWithNewlinesPreserved = parsed.cooked
+          return parseMDX(valueWithNewlinesPreserved, field, imageCallback)
+        } else {
+          attribute.value
+          if (attribute.value) {
+            const estree = attribute.value.data?.estree
+            if (estree) {
+              const firstNode = estree.body.at(0)
+              if (firstNode?.type === 'ExpressionStatement') {
+                if (firstNode.expression.type === 'TemplateLiteral') {
+                  const templateElement = firstNode.expression.quasis.at(0)
+                  if (templateElement) {
+                    const value = templateElement.value.cooked
+                    if (value) {
+                      return parseMDX(value, field, imageCallback)
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
       const JSXString = extractRaw(attribute)
+
       if (JSXString) {
         return parseMDX(JSXString, field, imageCallback)
       } else {
@@ -293,6 +327,12 @@ function assertHasType(
 
 export const trimFragments = (string: string) => {
   const rawArr = string.split('\n')
+  if (rawArr.length === 1) {
+    // This is inline, just trim the string
+    let trimmedString = string.replace(/^<>|<\/>$/g, '')
+    trimmedString = trimmedString.trim()
+    return trimmedString
+  }
   let openingFragmentIndex: number | null = null
   let closingFragmentIndex: number | null = null
   rawArr.forEach((item, index) => {
