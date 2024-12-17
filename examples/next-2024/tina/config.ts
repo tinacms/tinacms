@@ -65,6 +65,10 @@ export default defineConfig({
               'link',
               'embed',
             ],
+            overrides: {
+              toolbar: ['heading', 'bold', 'italic', 'image', 'link', 'embed'],
+              showFloatingToolbar: false,
+            },
             templates: [
               {
                 name: 'DateTime',
