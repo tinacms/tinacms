@@ -10,6 +10,7 @@
 	],
 	"exports": {
 		".": {
+			"worker": "./dist/index-edge.mjs",
 			"import": "./dist/index.mjs",
 			"require": "./dist/index.js",
 			"types": "./dist/index.d.ts"
@@ -25,6 +26,11 @@
 		"entryPoints": [
 			{
 				"name": "src/index.ts",
+				"target": "node",
+				"bundle": []
+			},
+			{
+				"name": "src/index-edge.ts",
 				"target": "node",
 				"bundle": []
 			}
