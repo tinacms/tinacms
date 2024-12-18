@@ -18,24 +18,22 @@ export function resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths) {
     - `dynamicAliases` will be an object mapping alias keys to their absolute paths, ready for esbuild.
 */
   return Object.entries(paths).reduce((aliases, [aliasKey, aliasPaths]) => {
-    // Resolve the base alias path
     const baseAliasPath = path.resolve(
       absoluteBaseUrl,
       aliasPaths[0].replace('*', '') // Remove the "*" wildcard to get the base path
     )
 
     // Check if the alias resolves to the root/base directory
-    if (
-      baseAliasPath === absoluteBaseUrl ||
-      baseAliasPath === path.resolve(absoluteBaseUrl, './')
-    ) {
-      console.warn(
-        `Ignoring alias "${aliasKey}" resolves to the root directory is not supported in esbuild plugin.`
-      )
-      return aliases // Skip this alias
-    }
+    // if (
+    //   baseAliasPath === absoluteBaseUrl ||
+    //   baseAliasPath === path.resolve(absoluteBaseUrl, './')
+    // ) {
+    //   console.warn(
+    //     `Ignoring alias "${aliasKey}" resolves to the root directory is not supported in esbuild plugin.`
+    //   )
+    //   return aliases
+    // }
 
-    // Otherwise, add the alias to the aliases object
     aliases[aliasKey] = baseAliasPath
     return aliases
   }, {})
