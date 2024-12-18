@@ -24,18 +24,18 @@ export function resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths) {
       return aliases
     }
 
-    const hasWildcard = aliasKey.includes('*')
-    const baseAliasKey = hasWildcard ? aliasKey.replace('/*', '') : aliasKey
+    // const hasWildcard = aliasKey.includes('*')
+    // const baseAliasKey = hasWildcard ? aliasKey.replace('/*', '') : aliasKey
     const baseAliasPath = path.resolve(
       absoluteBaseUrl,
-      aliasPaths[0].replace('/*', '')
+      aliasPaths[0].replace('*', '')
     )
 
-    if (hasWildcard) {
-      aliases[`${baseAliasKey}/*`] = `${baseAliasPath}`
-    } else {
-      aliases[baseAliasKey] = baseAliasPath
-    }
+    // if (hasWildcard) {
+    //   aliases[`${baseAliasKey}/*`] = `${baseAliasPath}`
+    // } else {
+      aliases[aliasKey] = baseAliasPath
+    // }
 
     return aliases
   }, {})
