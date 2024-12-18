@@ -12,15 +12,37 @@ export interface NormalizedAliasPathOptions
 
 export function recursiveResolve(
   alias: Record<string, string>,
-
   cwd: string
 ): Record<string, string> {
   console.log('recursiveResolve -> alias', alias)
   const result: Record<string, string> = {}
 
+  // Define directories or files to ignore
+  const ignoredPatterns = [
+    'node_modules',
+    '.next',
+    '.git',
+    'dist',
+    '.DS_Store',
+    '*.log',
+  ]
+
+  // Helper function to check if a path should be ignored
+  function shouldIgnore(fileOrDir: string): boolean {
+    return ignoredPatterns.some((pattern) =>
+      fileOrDir.match(new RegExp(pattern.replace(/\*/g, '.*'), 'i'))
+    )
+  }
+
   for (const [k, v] of Object.entries(alias)) {
     if (fs.statSync(v).isDirectory()) {
       fs.readdirSync(v).forEach((fileOrDir) => {
+        // Skip the ignored directory or file
+        if (shouldIgnore(fileOrDir)) {
+          console.warn(`Skipping ignored directory or file: ${fileOrDir}`)
+          return
+        }
+
         const isStillDir = fs.statSync(path.join(v, fileOrDir)).isDirectory()
 
         if (isStillDir) {
