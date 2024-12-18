@@ -15,8 +15,6 @@ export function escapeNamespace(keys: string[]) {
 
 export const aliasPath = (options: AliasPathOptions = {}): Plugin => {
   const { alias, skip } = normalizeOption(options)
-  console.log('After query normalization: ', alias)
-  console.log('aliasPath -> alias', alias)
   if (skip) {
     return {
       name: pluginName,

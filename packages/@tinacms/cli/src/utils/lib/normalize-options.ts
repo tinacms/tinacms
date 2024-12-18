@@ -14,7 +14,6 @@ export function recursiveResolve(
   alias: Record<string, string>,
   cwd: string
 ): Record<string, string> {
-  console.log('recursiveResolve -> alias', alias)
   const result: Record<string, string> = {}
 
   // Define directories or files to ignore
@@ -85,7 +84,6 @@ export function normalizeOption(
 ): NormalizedAliasPathOptions {
   const alias = options.alias ?? {}
   const cwd = options.cwd ?? process.cwd()
-  console.log('where am i now ')
   const resolvedAlias = recursiveResolve(alias, cwd)
   const shouldSkipThisPlugin =
     options.skip ?? !Object.keys(resolvedAlias).length
