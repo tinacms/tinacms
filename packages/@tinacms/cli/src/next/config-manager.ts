@@ -9,9 +9,9 @@ import normalizePath from 'normalize-path'
 import chalk from 'chalk'
 import { loadProjectConfig } from '../next/vite'
 import { loadConfig } from 'tsconfig-paths'
-import { aliasPath } from 'esbuild-plugin-alias-path'
 import { logger } from '../logger'
 import { resolveTsPathsToEsbuildAliases } from '../utils/alias-helpers'
+import { aliasPath } from '../utils/lib/esbuild-plugin-alias-path'
 
 export const TINA_FOLDER = 'tina'
 export const LEGACY_TINA_FOLDER = '.tina'
@@ -434,7 +434,6 @@ export class ConfigManager {
         'Warning: tsconfig.json not found. Alias resolution will not be supported.'
       )
     }
-
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
