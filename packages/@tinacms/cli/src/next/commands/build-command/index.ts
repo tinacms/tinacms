@@ -30,7 +30,7 @@ import { createDevServer } from '../dev-command/server'
 import { BaseCommand } from '../baseCommands'
 import { logText } from '../../../utils/theme'
 import { getFaqLink } from '../../../utils'
-import { removeNamespaceFromSchema } from 'tinacms/src/utils'
+import { removeNamespaceFromSchema } from 'tinacms'
 
 export class BuildCommand extends BaseCommand {
   static paths = [['build']]
