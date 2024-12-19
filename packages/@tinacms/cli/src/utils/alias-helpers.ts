@@ -23,17 +23,6 @@ export function resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths) {
       aliasPaths[0].replace('*', '') // Remove the "*" wildcard to get the base path
     )
 
-    // Check if the alias resolves to the root/base directory
-    // if (
-    //   baseAliasPath === absoluteBaseUrl ||
-    //   baseAliasPath === path.resolve(absoluteBaseUrl, './')
-    // ) {
-    //   console.warn(
-    //     `Ignoring alias "${aliasKey}" resolves to the root directory is not supported in esbuild plugin.`
-    //   )
-    //   return aliases
-    // }
-
     aliases[aliasKey] = baseAliasPath
     return aliases
   }, {})
