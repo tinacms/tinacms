@@ -30,6 +30,7 @@ import { createDevServer } from '../dev-command/server'
 import { BaseCommand } from '../baseCommands'
 import { logText } from '../../../utils/theme'
 import { getFaqLink } from '../../../utils'
+import { removeNamespaceFromSchema } from 'tinacms/src/utils'
 
 export class BuildCommand extends BaseCommand {
   static paths = [['build']]
@@ -675,12 +676,13 @@ export class BuildCommand extends BaseCommand {
     if (!database.bridge) {
       throw new Error(`No bridge configured`)
     }
-    const localTinaSchema = JSON.parse(
+    let localTinaSchema = JSON.parse(
       await database.bridge.get(
         path.join(database.tinaDirectory, '__generated__', '_schema.json')
       )
     )
     localTinaSchema.version = undefined
+    localTinaSchema = removeNamespaceFromSchema(localTinaSchema)
     const localTinaSchemaSha = crypto
       .createHash('sha256')
       .update(JSON.stringify(localTinaSchema))
