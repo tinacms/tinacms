@@ -295,13 +295,13 @@ importers:
                 version: 2.30.0
             mongodb-level:
                 specifier: ^0.0.3
-                version: 0.0.3(@aws-sdk/client-sso-oidc@3.693.0(@aws-sdk/client-sts@3.692.0))
+                version: 0.0.3(@aws-sdk/client-sso-oidc@3.693.0(@aws-sdk/client-sts@3.693.0))
             next:
                 specifier: ^14.2.18
                 version: 14.2.18(@babel/core@7.26.0)(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             next-auth:
                 specifier: ^4.24.10
-                version: 4.24.10(next@14.2.18(@babel/core@7.26.0)(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 4.24.10(next@14.2.18(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -414,7 +414,7 @@ importers:
                 version: 15.8.0
             mongodb-level:
                 specifier: ^0.0.3
-                version: 0.0.3(@aws-sdk/client-sso-oidc@3.693.0(@aws-sdk/client-sts@3.693.0))
+                version: 0.0.3(@aws-sdk/client-sso-oidc@3.693.0(@aws-sdk/client-sts@3.692.0))
             next:
                 specifier: ^14.2.18
                 version: 14.2.18(@babel/core@7.26.0)(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -757,6 +757,9 @@ importers:
             jest:
                 specifier: ^29.7.0
                 version: 29.7.0(@types/node@22.9.0)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))
+            tsconfig-paths:
+                specifier: ^4.2.0
+                version: 4.2.0
 
     packages/@tinacms/datalayer:
         dependencies:
@@ -18152,6 +18155,13 @@ packages:
                 integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==,
             }
 
+    tsconfig-paths@4.2.0:
+        resolution:
+            {
+                integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==,
+            }
+        engines: { node: '>=6' }
+
     tslib@1.14.1:
         resolution:
             {
@@ -30437,7 +30447,7 @@ snapshots:
 
     netmask@2.0.2: {}
 
-    next-auth@4.24.10(next@14.2.18(@babel/core@7.26.0)(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    next-auth@4.24.10(next@14.2.18(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
         dependencies:
             '@babel/runtime': 7.26.0
             '@panva/hkdf': 1.2.1
@@ -32348,6 +32358,12 @@ snapshots:
         dependencies:
             '@types/json5': 0.0.29
             json5: 1.0.2
+            minimist: 1.2.8
+            strip-bom: 3.0.0
+
+    tsconfig-paths@4.2.0:
+        dependencies:
+            json5: 2.2.3
             minimist: 1.2.8
             strip-bom: 3.0.0
 

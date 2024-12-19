@@ -7,8 +7,12 @@ import { Config } from '@tinacms/schema-tools'
 import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
 import chalk from 'chalk'
-
 import { logger } from '../logger'
+import {
+  loadViteConfig,
+  resolveDynamicAliases,
+} from '../utils/resolve-alias-helpers'
+import { aliasPath } from '../utils/esbuild-alias-lib/esbuild-plugin-alias-path'
 
 export const TINA_FOLDER = 'tina'
 export const LEGACY_TINA_FOLDER = '.tina'
@@ -395,10 +399,19 @@ export class ConfigManager {
     // good way of invalidating them when this file changes
     // https://github.com/nodejs/modules/issues/307
     const tmpdir = path.join(os.tmpdir(), Date.now().toString())
-    const prebuild = path.join(this.generatedFolderPath, 'config.prebuild.jsx')
+    const preBuildConfigPath = path.join(
+      this.generatedFolderPath,
+      'config.prebuild.jsx'
+    )
+
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
+    const tsconfigPath = path.join(this.rootPath, 'tsconfig.json')
+
+    const viteConfig = await loadViteConfig(this.rootPath)
+    const tsConfigAliases = resolveDynamicAliases(tsconfigPath)
+
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
@@ -409,17 +422,22 @@ export class ConfigManager {
       logLevel: 'silent',
       packages: 'external',
       ignoreAnnotations: true,
-      outfile: prebuild,
+      outfile: preBuildConfigPath,
       loader: loaders,
       metafile: true,
+      plugins: Object.keys(tsConfigAliases).length
+        ? [aliasPath({ alias: tsConfigAliases })]
+        : [], // Add plugin only if tsconfig are available
     })
     const flattenedList = []
+
     Object.keys(result2.metafile.inputs).forEach((key) => {
       if (key.includes('node_modules') || key.includes('__generated__')) {
         return
       }
       flattenedList.push(key)
     })
+
     await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
@@ -428,6 +446,7 @@ export class ConfigManager {
       platform: 'node',
       outfile,
       loader: loaders,
+      alias: viteConfig.config.resolve?.alias as Record<string, string>,
     })
     await esbuild.build({
       entryPoints: [outfile],
@@ -450,7 +469,7 @@ export class ConfigManager {
     fs.removeSync(outfile2)
     return {
       config: result.default,
-      prebuildPath: prebuild,
+      prebuildPath: preBuildConfigPath,
       watchList: flattenedList,
     }
   }
