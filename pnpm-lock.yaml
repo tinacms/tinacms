@@ -295,13 +295,13 @@ importers:
                 version: 2.30.0
             mongodb-level:
                 specifier: ^0.0.3
-                version: 0.0.3(@aws-sdk/client-sso-oidc@3.693.0(@aws-sdk/client-sts@3.692.0))
+                version: 0.0.3(@aws-sdk/client-sso-oidc@3.693.0(@aws-sdk/client-sts@3.693.0))
             next:
                 specifier: ^14.2.18
                 version: 14.2.18(@babel/core@7.26.0)(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             next-auth:
                 specifier: ^4.24.10
-                version: 4.24.10(next@14.2.18(@babel/core@7.26.0)(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+                version: 4.24.10(next@14.2.18(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
             react:
                 specifier: ^18.3.1
                 version: 18.3.1
@@ -414,7 +414,7 @@ importers:
                 version: 15.8.0
             mongodb-level:
                 specifier: ^0.0.3
-                version: 0.0.3(@aws-sdk/client-sso-oidc@3.693.0(@aws-sdk/client-sts@3.693.0))
+                version: 0.0.3(@aws-sdk/client-sso-oidc@3.693.0(@aws-sdk/client-sts@3.692.0))
             next:
                 specifier: ^14.2.18
                 version: 14.2.18(@babel/core@7.26.0)(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -648,9 +648,6 @@ importers:
             esbuild:
                 specifier: ^0.18.20
                 version: 0.18.20
-            esbuild-plugin-alias-path:
-                specifier: ^2.0.2
-                version: 2.0.2(esbuild@0.18.20)
             fs-extra:
                 specifier: ^11.2.0
                 version: 11.2.0
@@ -11356,14 +11353,6 @@ packages:
         cpu: [x64]
         os: [openbsd]
 
-    esbuild-plugin-alias-path@2.0.2:
-        resolution:
-            {
-                integrity: sha512-YK8H9bzx6/CG6YBV11XjoNLjRhNZP0Ta4xZ3ATHhPn7pN8ljQGg+zne4d47DpIzF8/sX2qM+xQWev0CvaD2rSQ==,
-            }
-        peerDependencies:
-            esbuild: '>= 0.14.0'
-
     esbuild-sunos-64@0.15.18:
         resolution:
             {
@@ -12246,13 +12235,6 @@ packages:
             {
                 integrity: sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==,
             }
-
-    fs-extra@10.1.0:
-        resolution:
-            {
-                integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==,
-            }
-        engines: { node: '>=12' }
 
     fs-extra@11.2.0:
         resolution:
@@ -27182,13 +27164,6 @@ snapshots:
     esbuild-openbsd-64@0.15.18:
         optional: true
 
-    esbuild-plugin-alias-path@2.0.2(esbuild@0.18.20):
-        dependencies:
-            esbuild: 0.18.20
-            find-up: 5.0.0
-            fs-extra: 10.1.0
-            jsonfile: 6.1.0
-
     esbuild-sunos-64@0.15.18:
         optional: true
 
@@ -28283,12 +28258,6 @@ snapshots:
             js-yaml: 3.14.1
 
     fs-constants@1.0.0: {}
-
-    fs-extra@10.1.0:
-        dependencies:
-            graceful-fs: 4.2.11
-            jsonfile: 6.1.0
-            universalify: 2.0.1
 
     fs-extra@11.2.0:
         dependencies:
@@ -30478,7 +30447,7 @@ snapshots:
 
     netmask@2.0.2: {}
 
-    next-auth@4.24.10(next@14.2.18(@babel/core@7.26.0)(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    next-auth@4.24.10(next@14.2.18(@playwright/test@1.48.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
         dependencies:
             '@babel/runtime': 7.26.0
             '@panva/hkdf': 1.2.1
