@@ -7,13 +7,8 @@ import { Config } from '@tinacms/schema-tools'
 import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
 import chalk from 'chalk'
-import { loadProjectConfig } from '../next/vite'
-import { loadConfig } from 'tsconfig-paths'
 import { logger } from '../logger'
-import {
-  loadViteConfig,
-  resolveTsPathsToEsbuildAliases,
-} from '../utils/alias-helpers'
+import { loadViteConfig, resolveDynamicAliases } from '../utils/alias-helpers'
 import { aliasPath } from '../utils/esbuild-alias-lib/esbuild-plugin-alias-path'
 
 export const TINA_FOLDER = 'tina'
@@ -414,23 +409,8 @@ export class ConfigManager {
 
     const tsconfigPath = path.join(this.rootPath, 'tsconfig.json')
 
-    let dynamicAliases = {}
+    const dynamicAliases = resolveDynamicAliases(tsconfigPath)
 
-    if (fs.existsSync(tsconfigPath)) {
-      // Attempt to load tsconfig.json
-      const tsConfigResult = loadConfig(tsconfigPath)
-      if (tsConfigResult.resultType === 'success') {
-        const { absoluteBaseUrl, paths } = tsConfigResult
-        dynamicAliases = resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths)
-      } else {
-        console.error('Failed to load tsconfig.json:', tsConfigResult.message)
-        throw new Error(`Invalid tsconfig.json at ${tsconfigPath}`)
-      }
-    } else {
-      console.warn(
-        'Warning: tsconfig.json not found. Alias resolution will not be supported.'
-      )
-    }
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
