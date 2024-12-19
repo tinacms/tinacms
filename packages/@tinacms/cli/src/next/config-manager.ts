@@ -407,12 +407,10 @@ export class ConfigManager {
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
-
-    const viteConfig = await loadViteConfig(this.rootPath)
-
     const tsconfigPath = path.join(this.rootPath, 'tsconfig.json')
 
-    const dynamicAliases = resolveDynamicAliases(tsconfigPath)
+    const viteConfig = await loadViteConfig(this.rootPath)
+    const tsConfigAliases = resolveDynamicAliases(tsconfigPath)
 
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
@@ -427,9 +425,9 @@ export class ConfigManager {
       outfile: preBuildConfigPath,
       loader: loaders,
       metafile: true,
-      plugins: Object.keys(dynamicAliases).length
-        ? [aliasPath({ alias: dynamicAliases })]
-        : [], // Add plugin only if dynamicAliases are available
+      plugins: Object.keys(tsConfigAliases).length
+        ? [aliasPath({ alias: tsConfigAliases })]
+        : [], // Add plugin only if tsconfig are available
     })
     const flattenedList = []
 
