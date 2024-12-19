@@ -1,4 +1,5 @@
 import path from 'path'
+import { loadProjectConfig } from '../next/vite'
 
 /**
  * Converts TypeScript-style `paths` aliases to esbuild-compatible format.
@@ -26,4 +27,19 @@ export function resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths) {
     aliases[aliasKey] = baseAliasPath
     return aliases
   }, {})
+}
+
+export async function loadViteConfig(rootPath: string) {
+  try {
+    return await loadProjectConfig({
+      rootPath,
+      viteConfigEnv: {
+        command: 'build',
+        mode: 'production',
+      },
+    })
+  } catch (error) {
+    console.error('Failed to load Vite config:', error.message)
+    throw new Error('Error loading Vite configuration')
+  }
 }

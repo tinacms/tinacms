@@ -10,7 +10,10 @@ import chalk from 'chalk'
 import { loadProjectConfig } from '../next/vite'
 import { loadConfig } from 'tsconfig-paths'
 import { logger } from '../logger'
-import { resolveTsPathsToEsbuildAliases } from '../utils/alias-helpers'
+import {
+  loadViteConfig,
+  resolveTsPathsToEsbuildAliases,
+} from '../utils/alias-helpers'
 import { aliasPath } from '../utils/esbuild-alias-lib/esbuild-plugin-alias-path'
 
 export const TINA_FOLDER = 'tina'
@@ -407,13 +410,7 @@ export class ConfigManager {
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
 
-    const viteConfig = await loadProjectConfig({
-      rootPath: this.rootPath,
-      viteConfigEnv: {
-        command: 'build',
-        mode: 'production',
-      },
-    })
+    const viteConfig = await loadViteConfig(this.rootPath)
 
     const tsconfigPath = path.join(this.rootPath, 'tsconfig.json')
 
