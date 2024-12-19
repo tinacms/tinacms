@@ -65,3 +65,20 @@ export function safeAssertShape<T>(
     return false
   }
 }
+
+export function removeNamespaceFromSchema(schema: any): Object {
+  if (typeof schema !== 'object') return schema
+
+  const schemaWithoutNamespace = {}
+  const currentLevelSchema = schema.namespace
+    ? { ...schema, namespace: undefined }
+    : schema
+
+  for (const levelKeys of Object.keys(currentLevelSchema)) {
+    schemaWithoutNamespace[levelKeys] = removeNamespaceFromSchema(
+      currentLevelSchema[levelKeys]
+    )
+  }
+
+  return schemaWithoutNamespace
+}
