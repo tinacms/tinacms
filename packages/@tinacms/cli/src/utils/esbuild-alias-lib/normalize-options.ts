@@ -16,7 +16,7 @@ export function recursiveResolve(
 ): Record<string, string> {
   const result: Record<string, string> = {}
 
-  // Define directories or files to ignore
+  // Define directories or files to ignore when resolving the alias path from ts config
   const ignoredPatterns = [
     'node_modules',
     '.next',
