@@ -60,3 +60,4 @@ export {
 } from './database/bridge/filesystem'
 export { IsomorphicBridge } from './database/bridge/isomorphic'
 export type { Bridge } from './database/bridge'
+export { addNamespaceToSchema } from './ast-builder'
