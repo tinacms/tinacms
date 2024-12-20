@@ -53,7 +53,7 @@ function resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths) {
     3. For non-wildcard aliases, simply resolve the base path.
 
     Result:
-    - `dynamicAliases` will be an object mapping alias keys to their absolute paths, ready for esbuild.
+    - An object mapping alias keys to their absolute paths, ready for esbuild.
 */
   return Object.entries(paths).reduce((aliases, [aliasKey, aliasPaths]) => {
     const baseAliasPath = path.resolve(

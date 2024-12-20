@@ -408,7 +408,6 @@ export class ConfigManager {
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
     const tsconfigPath = path.join(this.rootPath, 'tsconfig.json')
-
     const viteConfig = await loadViteConfig(this.rootPath)
     const tsConfigAliases = resolveDynamicAliases(tsconfigPath)
 
