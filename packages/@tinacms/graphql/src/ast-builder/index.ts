@@ -1120,52 +1120,39 @@ export function* walk(
   visited.add(maybeNode)
 }
 
-export function addNamespaceToSchema<T extends object | string>(
+type Node = {
+  name?: string
+  value?: string
+  namespace?: string[]
+  [key: string]: any
+}
+
+export function addNamespaceToSchema<T extends Node | string>(
   maybeNode: T,
   namespace: string[] = []
 ): T {
-  if (typeof maybeNode === 'string') {
-    return maybeNode
-  }
-  if (typeof maybeNode === 'boolean') {
+  if (typeof maybeNode !== 'object' || maybeNode === null) {
     return maybeNode
   }
 
-  // @ts-ignore
-  const newNode: {
-    [key in keyof T]: (T & { namespace?: string[] }) | string
-  } = maybeNode
-  // Traverse node's properties first
-  const keys = Object.keys(maybeNode)
-  Object.values(maybeNode).map((m, index) => {
-    const key = keys[index]
-    if (Array.isArray(m)) {
-      // @ts-ignore
-      newNode[key] = m.map((element) => {
-        if (!element) {
-          return
+  const newNode: Node = { ...maybeNode, namespace: [...namespace] }
+  Object.entries(maybeNode).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      newNode[key] = value.map((element) => {
+        if (element && typeof element === 'object' && 'name' in element) {
+          const valueName = element.name || element.value
+          return addNamespaceToSchema(element, [...namespace, valueName])
         }
-        if (!element.hasOwnProperty('name')) {
-          return element
-        }
-        const value = element.name || element.value // options field accepts an object with `value`  instead of `name`
-        return addNamespaceToSchema(element, [...namespace, value])
+        return element
       })
+    } else if (value && typeof value === 'object' && 'name' in value) {
+      newNode[key] = addNamespaceToSchema(value, [...namespace, value.name])
     } else {
-      if (!m) {
-        return
-      }
-      if (!m.hasOwnProperty('name')) {
-        // @ts-ignore
-        newNode[key] = m
-      } else {
-        // @ts-ignore
-        newNode[key] = addNamespaceToSchema(m, [...namespace, m.name])
-      }
+      newNode[key] = value
     }
   })
-  // @ts-ignore
-  return { ...newNode, namespace: namespace }
+
+  return newNode as T
 }
 
 const generateNamespacedFieldName = (names: string[], suffix: string = '') => {
