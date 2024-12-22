@@ -553,7 +553,7 @@ export class RichTextParseError extends Error {
 }
 
 // Prevent javascript scheme (eg. `javascript:alert(document.domain)`)
-const sanitizeUrl = (url: string | undefined) => {
+export const sanitizeUrl = (url: string | undefined) => {
   const allowedSchemes = ['http', 'https', 'mailto', 'tel', 'xref']
   if (!url) return ''
 
