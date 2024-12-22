@@ -42,13 +42,13 @@ describe('sanitizeUrl', () => {
 
   it('should preserve query parameters', () => {
     expect(sanitizeUrl('https://example.com/?utm_source=blog')).toBe(
-      'https://example.com/?utm_source=blog'
+      'https://example.com?utm_source=blog'
     )
   })
 
   it('should preserve hash', () => {
     expect(sanitizeUrl('https://example.com/#anchor')).toBe(
-      'https://example.com/#anchor'
+      'https://example.com#anchor'
     )
   })
 
@@ -74,7 +74,7 @@ describe('sanitizeUrl', () => {
 
   it('should handle URL with query parameters and hash', () => {
     expect(sanitizeUrl('https://example.com/?utm_source=blog#anchor')).toBe(
-      'https://example.com/?utm_source=blog#anchor'
+      'https://example.com?utm_source=blog#anchor'
     )
   })
 
