@@ -553,7 +553,7 @@ export class RichTextParseError extends Error {
 }
 
 // Prevent javascript scheme (eg. `javascript:alert(document.domain)`)
-export const sanitizeUrl = (url: string | undefined) => {
+const sanitizeUrl = (url: string | undefined) => {
   const allowedSchemes = ['http', 'https', 'mailto', 'tel', 'xref']
   if (!url) return ''
 
@@ -585,10 +585,8 @@ export const sanitizeUrl = (url: string | undefined) => {
     if (url.endsWith('/')) {
       return parsedUrl.href
     }
-    // If there are query parameters, include them
-    return parsedUrl.search
-      ? `${parsedUrl.origin}${parsedUrl.search}`
-      : parsedUrl.origin
+    // Include search (query parameters) and hash if they exist
+    return `${parsedUrl.origin}${parsedUrl.search}${parsedUrl.hash}`
   } else {
     return parsedUrl.href
   }
