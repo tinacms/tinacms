@@ -1,4 +1,5 @@
 import { sanitizeUrl } from './remarkToPlate'
+import { it, expect, describe } from 'vitest'
 
 describe('sanitizeUrl', () => {
   it('should return an empty string for undefined input', () => {
