@@ -5,7 +5,6 @@ import fs from 'fs-extra'
 import normalizePath from 'normalize-path'
 import {
   type BuildOptions,
-  ConfigEnv,
   type InlineConfig,
   type Plugin,
   splitVendorChunkPlugin,
@@ -112,7 +111,6 @@ export const createConfig = async ({
   noWatch: boolean
   plugins?: Plugin[]
   rollupOptions?: BuildOptions['rollupOptions']
-  viteConfigEnv?: ConfigEnv
 }) => {
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {}
