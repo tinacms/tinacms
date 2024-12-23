@@ -9,7 +9,6 @@ import normalizePath from 'normalize-path'
 import chalk from 'chalk'
 import { logger } from '../logger'
 import { loadViteConfig } from '../utils/resolve-alias-helpers'
-import { aliasPath } from '../utils/esbuild-alias-lib/esbuild-plugin-alias-path'
 
 export const TINA_FOLDER = 'tina'
 export const LEGACY_TINA_FOLDER = '.tina'
@@ -404,11 +403,8 @@ export class ConfigManager {
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
-    // const tsconfigPath = path.join(this.rootPath, 'tsconfig.json')
     const viteConfig = await loadViteConfig(this.rootPath)
-    // const tsConfigAliases = resolveDynamicAliases(tsconfigPath)
     console.log('latest')
-    console.log('Config file path ', configFilePath)
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
@@ -422,10 +418,6 @@ export class ConfigManager {
       outfile: preBuildConfigPath,
       loader: loaders,
       metafile: true,
-      // tsconfig: tsconfigPath
-      // plugins: Object.keys(tsConfigAliases).length
-      //   ? [aliasPath({ alias: tsConfigAliases })]
-      //   : [], // Add plugin only if tsconfig are available
     })
     const flattenedList = []
 
