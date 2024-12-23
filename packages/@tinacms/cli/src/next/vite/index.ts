@@ -8,8 +8,6 @@ import {
   ConfigEnv,
   type InlineConfig,
   type Plugin,
-  UserConfig,
-  loadConfigFromFile,
   splitVendorChunkPlugin,
 } from 'vite'
 import type { ConfigManager } from '../config-manager'
@@ -101,35 +99,12 @@ async function listFilesRecursively({
   return chunkArrayIntoObject(staticMediaItems, 20)
 }
 
-export const loadProjectConfig = async ({
-  rootPath,
-  viteConfigEnv,
-}: {
-  rootPath: string
-  viteConfigEnv?: ConfigEnv
-}) => {
-  if (viteConfigEnv) {
-    const configFileJs = path.join(rootPath, 'vite.config.js')
-    const configFileTs = path.join(rootPath, 'vite.config.ts')
-
-    if (fs.existsSync(configFileJs)) {
-      return await loadConfigFromFile(viteConfigEnv, configFileJs)
-    } else if (fs.existsSync(configFileTs)) {
-      return await loadConfigFromFile(viteConfigEnv, configFileTs)
-    }
-  }
-
-  return { config: {} as UserConfig }
-}
-
 export const createConfig = async ({
   configManager,
-  database,
   apiURL,
   plugins = [],
   noWatch,
   rollupOptions,
-  viteConfigEnv,
 }: {
   configManager: ConfigManager
   database: Database
@@ -139,11 +114,6 @@ export const createConfig = async ({
   rollupOptions?: BuildOptions['rollupOptions']
   viteConfigEnv?: ConfigEnv
 }) => {
-  const projectConfig = await loadProjectConfig({
-    rootPath: configManager.rootPath,
-    viteConfigEnv: viteConfigEnv,
-  })
-
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {}
   Object.keys(process.env).forEach((key) => {
@@ -222,10 +192,7 @@ export const createConfig = async ({
     )}/`,
     appType: 'spa',
     resolve: {
-      alias: {
-        ...projectConfig.config.resolve?.alias,
-        ...alias,
-      },
+      alias,
       dedupe: ['graphql', 'tinacms', 'react', 'react-dom', 'react-router-dom'],
     },
     define: {

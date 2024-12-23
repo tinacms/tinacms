@@ -8,7 +8,6 @@ import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
 import chalk from 'chalk'
 import { logger } from '../logger'
-import { loadViteConfig } from '../utils/resolve-alias-helpers'
 
 export const TINA_FOLDER = 'tina'
 export const LEGACY_TINA_FOLDER = '.tina'
@@ -403,8 +402,7 @@ export class ConfigManager {
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
-    const viteConfig = await loadViteConfig(this.rootPath)
-    console.log('latest')
+
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
@@ -436,7 +434,6 @@ export class ConfigManager {
       platform: 'node',
       outfile,
       loader: loaders,
-      alias: viteConfig.config.resolve?.alias as Record<string, string>,
     })
     await esbuild.build({
       entryPoints: [outfile],
