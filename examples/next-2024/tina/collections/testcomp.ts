@@ -1,3 +1,3 @@
-export const testcomp = () => {
-  console.log('alias import testcomp success')
+export const testPathAlias = () => {
+  console.log('alias import success')
 }

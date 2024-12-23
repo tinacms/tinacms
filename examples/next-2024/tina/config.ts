@@ -1,7 +1,5 @@
-import { header } from '@components/header'
-import { hello } from '@lib/utils'
 import { defineConfig } from 'tinacms'
-import { testcomp } from '@tina/collections/testcomp'
+import { testPathAlias } from '@tina/collections/testcomp'
 
 // Your hosting provider likely exposes this as an environment variable
 const branch =
@@ -10,9 +8,7 @@ const branch =
   process.env.HEAD ||
   'main'
 
-hello()
-header()
-testcomp()
+testPathAlias()
 
 export default defineConfig({
   branch,
