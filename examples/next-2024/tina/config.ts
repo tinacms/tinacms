@@ -1,5 +1,4 @@
 import { defineConfig } from 'tinacms'
-import { testPathAlias } from '@tina/collections/testcomp'
 
 // Your hosting provider likely exposes this as an environment variable
 const branch =
@@ -7,8 +6,6 @@ const branch =
   process.env.VERCEL_GIT_COMMIT_REF ||
   process.env.HEAD ||
   'main'
-
-testPathAlias()
 
 export default defineConfig({
   branch,
