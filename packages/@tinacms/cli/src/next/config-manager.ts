@@ -8,10 +8,7 @@ import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
 import chalk from 'chalk'
 import { logger } from '../logger'
-import {
-  loadViteConfig,
-  resolveDynamicAliases,
-} from '../utils/resolve-alias-helpers'
+import { loadViteConfig } from '../utils/resolve-alias-helpers'
 import { aliasPath } from '../utils/esbuild-alias-lib/esbuild-plugin-alias-path'
 
 export const TINA_FOLDER = 'tina'
