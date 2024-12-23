@@ -410,7 +410,7 @@ export class ConfigManager {
     // const tsconfigPath = path.join(this.rootPath, 'tsconfig.json')
     const viteConfig = await loadViteConfig(this.rootPath)
     // const tsConfigAliases = resolveDynamicAliases(tsconfigPath)
-
+    console.log('latest')
     console.log('Config file path ', configFilePath)
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
