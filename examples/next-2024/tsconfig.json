@@ -20,14 +20,7 @@
       {
         "name": "next"
       }
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@lib/*": ["lib/*"],
-      "@components/header": ["components/header.ts"],
-      "@/*": ["./*"],
-      "@tina/*": ["./tina/*"]
-    }
+    ]
   },
   "include": [
     "next-env.d.ts",
