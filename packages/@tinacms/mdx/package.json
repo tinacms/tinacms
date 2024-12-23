@@ -11,9 +11,9 @@
 	],
 	"exports": {
 		".": {
+			"browser": "./dist/index.browser.mjs",
 			"import": "./dist/index.mjs",
-			"require": "./dist/index.js",
-			"browser": "./dist/index.browser.mjs"
+			"require": "./dist/index.js"
 		}
 	},
 	"license": "Apache-2.0",
