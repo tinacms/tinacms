@@ -2,4 +2,4 @@
 '@tinacms/cli': minor
 ---
 
-support alias import from ts config file
+Added support for alias imports in `tina/config.ts`
