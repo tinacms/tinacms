@@ -79,7 +79,7 @@
 		"cors": "^2.8.5",
 		"crypto-js": "^4.2.0",
 		"dotenv": "^16.4.5",
-		"esbuild": "^0.18.20",
+		"esbuild": "^0.24.0",
 		"fs-extra": "^11.2.0",
 		"graphql": "15.8.0",
 		"js-yaml": "^4.1.0",

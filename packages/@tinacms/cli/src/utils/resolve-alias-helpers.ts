@@ -18,50 +18,50 @@ export async function loadViteConfig(rootPath: string) {
   }
 }
 
-export function resolveDynamicAliases(
-  tsconfigPath: string
-): Record<string, string> {
-  if (!fs.existsSync(tsconfigPath)) {
-    console.warn(
-      'Warning: tsconfig.json not found. Alias resolution will not be supported.'
-    )
-    return {}
-  }
+// export function resolveDynamicAliases(
+//   tsconfigPath: string
+// ): Record<string, string> {
+//   if (!fs.existsSync(tsconfigPath)) {
+//     console.warn(
+//       'Warning: tsconfig.json not found. Alias resolution will not be supported.'
+//     )
+//     return {}
+//   }
 
-  const tsConfigResult = loadConfig(tsconfigPath)
-  if (tsConfigResult.resultType !== 'success') {
-    console.error('Failed to load tsconfig.json:', tsConfigResult.message)
-    throw new Error(`Invalid tsconfig.json at ${tsconfigPath}`)
-  }
+//   const tsConfigResult = loadConfig(tsconfigPath)
+//   if (tsConfigResult.resultType !== 'success') {
+//     console.error('Failed to load tsconfig.json:', tsConfigResult.message)
+//     throw new Error(`Invalid tsconfig.json at ${tsconfigPath}`)
+//   }
 
-  const { absoluteBaseUrl, paths } = tsConfigResult
-  return resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths)
-}
+//   const { absoluteBaseUrl, paths } = tsConfigResult
+//   return resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths)
+// }
 
 /**
- * Converts TypeScript-style `paths` aliases to esbuild-compatible format.
- * @param {string} absoluteBaseUrl - The absolute base URL from tsconfig.
- * @param {Record<string, string[]>} paths - The alias paths from tsconfig.
- * @returns {Record<string, string>} - A mapping of esbuild-compatible aliases.
- */
-function resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths) {
-  /**
-    Convert TypeScript-style `paths` aliases to an esbuild-compatible format:
-    1. Ensure all alias paths are resolved to absolute paths (required by https://www.npmjs.com/package/esbuild-plugin-alias).
-    2. Handle wildcard (`*`) in the alias key by converting it to an esbuild-compatible format.
-        - Example: "alias/*" => "absolute/path/to/alias/*".
-    3. For non-wildcard aliases, simply resolve the base path.
+//  * Converts TypeScript-style `paths` aliases to esbuild-compatible format.
+//  * @param {string} absoluteBaseUrl - The absolute base URL from tsconfig.
+//  * @param {Record<string, string[]>} paths - The alias paths from tsconfig.
+//  * @returns {Record<string, string>} - A mapping of esbuild-compatible aliases.
+//  */
+// function resolveTsPathsToEsbuildAliases(absoluteBaseUrl, paths) {
+//   /**
+//     Convert TypeScript-style `paths` aliases to an esbuild-compatible format:
+//     1. Ensure all alias paths are resolved to absolute paths (required by https://www.npmjs.com/package/esbuild-plugin-alias).
+//     2. Handle wildcard (`*`) in the alias key by converting it to an esbuild-compatible format.
+//         - Example: "alias/*" => "absolute/path/to/alias/*".
+//     3. For non-wildcard aliases, simply resolve the base path.
 
-    Result:
-    - An object mapping alias keys to their absolute paths, ready for esbuild.
-*/
-  return Object.entries(paths).reduce((aliases, [aliasKey, aliasPaths]) => {
-    const baseAliasPath = path.resolve(
-      absoluteBaseUrl,
-      aliasPaths[0].replace('*', '') // Remove the "*" wildcard to get the base path
-    )
+//     Result:
+//     - An object mapping alias keys to their absolute paths, ready for esbuild.
+// */
+//   return Object.entries(paths).reduce((aliases, [aliasKey, aliasPaths]) => {
+//     const baseAliasPath = path.resolve(
+//       absoluteBaseUrl,
+//       aliasPaths[0].replace('*', '') // Remove the "*" wildcard to get the base path
+//     )
 
-    aliases[aliasKey] = baseAliasPath
-    return aliases
-  }, {})
-}
+//     aliases[aliasKey] = baseAliasPath
+//     return aliases
+//   }, {})
+// }
