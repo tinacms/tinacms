@@ -5,6 +5,7 @@ import {
   UsernamePasswordAuthJSProvider,
 } from 'tinacms-authjs/dist/tinacms'
 import { iconSchema } from '@/components/util/icon'
+import { featureBlockSchema } from '@/components/blocks/features'
 import { ColorPickerInput } from '@/components/fields/color'
 import { testimonialBlockSchema } from '@/components/blocks/testimonial'
 import { contentBlockSchema } from '@/components/blocks/content'
