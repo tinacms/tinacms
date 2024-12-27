@@ -2,4 +2,4 @@
 '@tinacms/mdx': patch
 ---
 
-Fix sanitizeUrl to not strip query parameters
+Rich text editor | hyperlinks - fixed sanitizeUrl to allow querystring parameters
