@@ -2,7 +2,7 @@
 
 */
 
-import { addNamespaceToSchema } from '../ast-builder'
+import { addNamespaceToSchema } from '@tinacms/schema-tools'
 import deepClone from 'lodash.clonedeep'
 import { sequential } from '../util'
 import * as yup from 'yup'
