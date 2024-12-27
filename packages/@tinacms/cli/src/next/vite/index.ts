@@ -100,7 +100,6 @@ async function listFilesRecursively({
 
 export const createConfig = async ({
   configManager,
-  database,
   apiURL,
   plugins = [],
   noWatch,
