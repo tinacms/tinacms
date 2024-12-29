@@ -31,9 +31,9 @@
 		"build": "tinacms-scripts build",
 		"docs": "typedoc --plugin typedoc-plugin-markdown src/parse/plate.ts --theme markdown && concat-md --decrease-title-levels --dir-name-as-title docs > spec.md",
 		"serve": "nodemon dist/server.js",
-		"test": "vitest",
+		"test": "vitest run",
 		"coverage": "vitest run --coverage",
-		"test-watch": "jest --watch"
+		"test-watch": "vitest"
 	},
 	"dependencies": {
 		"@tinacms/schema-tools": "workspace:*",
