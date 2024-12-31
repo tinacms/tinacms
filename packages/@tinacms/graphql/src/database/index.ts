@@ -1265,12 +1265,12 @@ export class Database {
     if (collection?.isDetached) {
       level = this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
     }
-    const itemKey = normalizePath(filepath)
+    const normalizedPath = normalizePath(filepath)
     const rootSublevel = level.sublevel<string, Record<string, any>>(
       CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
     )
-    const item = await rootSublevel.get(itemKey)
+    const item = await rootSublevel.get(normalizedPath)
     if (item) {
       const folderTreeBuilder = new FolderTreeBuilder()
       const folderKey = folderTreeBuilder.update(
@@ -1279,7 +1279,7 @@ export class Database {
       )
       await this.contentLevel.batch([
         ...makeIndexOpsForDocument<Record<string, any>>(
-          filepath,
+          normalizedPath,
           collection.name,
           collectionIndexDefinitions,
           item,
@@ -1288,7 +1288,7 @@ export class Database {
         ),
         // folder indices
         ...makeIndexOpsForDocument(
-          filepath,
+          normalizedPath,
           `${collection.name}_${folderKey}`,
           collectionIndexDefinitions,
           item,
@@ -1297,7 +1297,7 @@ export class Database {
         ),
         {
           type: 'del',
-          key: itemKey,
+          key: normalizedPath,
           sublevel: rootSublevel,
         },
       ])
@@ -1305,10 +1305,10 @@ export class Database {
 
     if (!collection?.isDetached) {
       if (this.bridge) {
-        await this.bridge.delete(normalizePath(filepath))
+        await this.bridge.delete(normalizedPath)
       }
       try {
-        await this.onDelete(normalizePath(filepath))
+        await this.onDelete(normalizedPath)
       } catch (e) {
         throw new GraphQLError(
           `Error running onDelete hook for ${filepath}: ${e}`,
