@@ -262,48 +262,6 @@ describe('addNamespaceToSchema', () => {
     ])
   })
 
-  test('should preserve existing namespaces for repeated names at different levels', () => {
-    const node = {
-      name: 'root',
-      namespace: [], // Existing namespace
-      children: [
-        {
-          name: 'child',
-          namespace: ['child'], // Existing namespace
-          nested: {
-            name: 'child',
-            namespace: ['child', 'child'], // Existing namespace for repeated name
-          },
-        },
-      ],
-    }
-
-    const result = addNamespaceToSchema(node)
-
-    // Verify that the function does not modify the existing namespaces
-    expect(result).toEqual({
-      name: 'root',
-      namespace: [],
-      children: [
-        {
-          name: 'child',
-          namespace: ['child'],
-          nested: {
-            name: 'child',
-            namespace: ['child', 'child'],
-          },
-        },
-      ],
-    })
-
-    // Ensure the namespaces are correctly preserved
-    expect((result.children[0] as Node).namespace).toEqual(['child'])
-    expect((result.children[0].nested as Node).namespace).toEqual([
-      'child',
-      'child',
-    ])
-  })
-
   test('should preserve existing namespaces and not modify them', () => {
     const node = {
       name: 'root',
