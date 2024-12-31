@@ -183,7 +183,7 @@ describe('addNamespaceToSchema', () => {
     ])
   })
 
-  test('should generate unique namespaces for nested nodes with similar names', () => {
+  test('should correctly construct namespaces for nodes with the same names', () => {
     const node = {
       name: 'root',
       children: [
@@ -194,7 +194,7 @@ describe('addNamespaceToSchema', () => {
 
     const result = addNamespaceToSchema(node)
 
-    // Verify that namespaces are correctly separated and unique
+    // Verify that namespaces are correctly constructed
     expect(result).toEqual({
       name: 'root',
       namespace: [],
@@ -216,7 +216,7 @@ describe('addNamespaceToSchema', () => {
       ],
     })
 
-    // Ensure namespaces do not share references and are independently constructed
+    // Ensure namespaces are independently constructed and not shared by reference
     expect((result.children[0] as Node).namespace).not.toBe(
       (result.children[1] as Node).namespace
     )
