@@ -69,7 +69,7 @@ export const RawRenderer = ({ rawData, parentColor }) => {
               </div>
             </TransitionChild>
 
-            <Transition.Child
+            <TransitionChild
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
@@ -90,7 +90,7 @@ export const RawRenderer = ({ rawData, parentColor }) => {
                   Great, thanks!
                 </button>
               </div>
-            </Transition.Child>
+            </TransitionChild>
           </div>
         </Dialog>
       </Transition>
