@@ -6,5 +6,5 @@
 ---
 
 Fixes for React 19 support
- - change react-use import statements to default import method
+ - Change react-use import statements to default import method
  - Fixed deprecated API from headless UI in the experimental example
