@@ -5,4 +5,4 @@
 'tinacms': patch
 ---
 
-fix import react-use to default import
+Fixes for React 19 support - fix import react-use using default import method
