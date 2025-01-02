@@ -46,7 +46,7 @@
     "@tinacms/metrics": "workspace:*",
     "chalk": "4.1.2",
     "commander": "^12.1.0",
-    "cross-spawn": "^7.0.5",
+    "cross-spawn": "^7.0.6",
     "fs-extra": "^11.2.0",
     "prompts": "^2.4.2",
     "tar": "7.4.0",
