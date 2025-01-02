@@ -1,5 +1,20 @@
 # tina-graphql
 
+## 1.5.10
+
+### Patch Changes
+
+- [#5396](https://github.com/tinacms/tinacms/pull/5396) [`7994046`](https://github.com/tinacms/tinacms/commit/79940467f97355651d86daace044717179a47734) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix issue with deleting files on windows in dev mode
+
+- [#5393](https://github.com/tinacms/tinacms/pull/5393) [`8d24f89`](https://github.com/tinacms/tinacms/commit/8d24f899838b9d5384782f699febd26be65902fd) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix issue with addNamespaceToSchema which caused https://github.com/tinacms/tinacms/issues/5364
+
+- [#5408](https://github.com/tinacms/tinacms/pull/5408) [`877699d`](https://github.com/tinacms/tinacms/commit/877699d08b3e2c2470742a3acf25d02a95e440b3) Thanks [@Ben0189](https://github.com/Ben0189)! - Fixes for React 19 support
+  - Change react-use import statements to default import method
+  - Fixed deprecated API from headless UI in the experimental example
+- Updated dependencies [[`92b683b`](https://github.com/tinacms/tinacms/commit/92b683bd3d73b47271eee5b8ff648ed4dcde51e3), [`82b0039`](https://github.com/tinacms/tinacms/commit/82b00393da8bbcc2cf357fbbb546904f07e8d89c)]:
+  - @tinacms/schema-tools@1.7.0
+  - @tinacms/mdx@1.5.4
+
 ## 1.5.9
 
 ### Patch Changes
