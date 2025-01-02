@@ -5,7 +5,7 @@ import MonthsView from './views/MonthsView'
 import YearsView from './views/YearsView'
 import TimeView from './views/TimeView'
 import React, { useRef } from 'react'
-import { useClickAway } from 'react-use'
+import useClickAway from 'react-use/lib/useClickAway'
 
 const viewModes = {
   YEARS: 'years',
