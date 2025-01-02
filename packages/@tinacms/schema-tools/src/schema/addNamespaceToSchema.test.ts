@@ -70,7 +70,6 @@ describe('addNamespaceToSchema', () => {
       children: [{ otherProp: 'childData' }],
     }
     const result = addNamespaceToSchema(node)
-    console.log(result)
     expect(result).toEqual({
       otherProp: 'data',
       namespace: [],
