@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.7.0
+
+### Minor Changes
+
+- [#5388](https://github.com/tinacms/tinacms/pull/5388) [`92b683b`](https://github.com/tinacms/tinacms/commit/92b683bd3d73b47271eee5b8ff648ed4dcde51e3) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Adds new `overrides` prop to rich text fields. `toolbarOverride` is now deprecated in favor of `overrides.toolbar`.
+
 ## 1.6.9
 
 ### Patch Changes
