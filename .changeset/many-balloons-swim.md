@@ -1,6 +1,6 @@
 ---
-"tinacms": patch
-"@tinacms/schema-tools": patch
+"tinacms": minor
+"@tinacms/schema-tools": minor
 ---
 
-✨ Add toolbar overrides and floating toolbar visibility option
+✨ Adds new `overrides` prop to rich text fields. `toolbarOverride` is now deprecated in favor of `overrides.toolbar`.
