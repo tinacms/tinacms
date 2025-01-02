@@ -3,12 +3,12 @@ import { type ReactNode, createContext, useContext } from 'react'
 
 import type { Form } from '@toolkit/forms'
 import type { MdxTemplate } from '../types'
-import type { ToolbarOverrideType } from './toolbar-overrides'
+import type { ToolbarOverrides, ToolbarOverrideType } from './toolbar-overrides'
 
 interface ToolbarContextProps {
   tinaForm: Form
   templates: MdxTemplate[]
-  overrides: ToolbarOverrideType[]
+  overrides: ToolbarOverrideType[] | ToolbarOverrides
 }
 
 interface ToolbarProviderProps extends ToolbarContextProps {

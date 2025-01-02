@@ -138,12 +138,23 @@ export default function FixedToolbarButtons() {
   const { overrides, templates } = useToolbarContext()
   const showEmbedButton = templates.length > 0
 
-  let items =
-    overrides === undefined
-      ? Object.values(toolbarItems)
-      : overrides
-          .map((item) => toolbarItems[item])
-          .filter((item) => item !== undefined)
+  let items = []
+
+  if (Array.isArray(overrides)) {
+    items =
+      overrides === undefined
+        ? Object.values(toolbarItems)
+        : overrides
+            .map((item) => toolbarItems[item])
+            .filter((item) => item !== undefined)
+  } else {
+    items =
+      overrides?.toolbar === undefined
+        ? Object.values(toolbarItems)
+        : overrides.toolbar
+            .map((item) => toolbarItems[item])
+            .filter((item) => item !== undefined)
+  }
 
   if (!showEmbedButton) {
     items = items.filter((item) => item.label !== toolbarItems.embed.label)
