@@ -1,5 +1,20 @@
 # tinacms-cli
 
+## 1.8.0
+
+### Minor Changes
+
+- [#5366](https://github.com/tinacms/tinacms/pull/5366) [`0f42cf1`](https://github.com/tinacms/tinacms/commit/0f42cf184a19e7e42d374285cf758a34bcc229b3) Thanks [@Ben0189](https://github.com/Ben0189)! - Added support for alias imports in `tina/config.ts`
+
+### Patch Changes
+
+- Updated dependencies [[`7994046`](https://github.com/tinacms/tinacms/commit/79940467f97355651d86daace044717179a47734), [`9931d5a`](https://github.com/tinacms/tinacms/commit/9931d5a0d7e5e9e5165170047cf5653041bddd7a), [`4aadf3e`](https://github.com/tinacms/tinacms/commit/4aadf3ee0b5e7ba6614baee9507a3b51abc92053), [`8d24f89`](https://github.com/tinacms/tinacms/commit/8d24f899838b9d5384782f699febd26be65902fd), [`92b683b`](https://github.com/tinacms/tinacms/commit/92b683bd3d73b47271eee5b8ff648ed4dcde51e3), [`877699d`](https://github.com/tinacms/tinacms/commit/877699d08b3e2c2470742a3acf25d02a95e440b3)]:
+  - @tinacms/graphql@1.5.10
+  - tinacms@2.6.0
+  - @tinacms/schema-tools@1.7.0
+  - @tinacms/search@1.0.37
+  - @tinacms/app@2.1.15
+
 ## 1.7.0
 
 ### Minor Changes

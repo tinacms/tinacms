@@ -1,5 +1,17 @@
 # @tinacms/starter
 
+## 0.1.53
+
+### Patch Changes
+
+- [#5408](https://github.com/tinacms/tinacms/pull/5408) [`877699d`](https://github.com/tinacms/tinacms/commit/877699d08b3e2c2470742a3acf25d02a95e440b3) Thanks [@Ben0189](https://github.com/Ben0189)! - Fixes for React 19 support
+  - Change react-use import statements to default import method
+  - Fixed deprecated API from headless UI in the experimental example
+- Updated dependencies [[`9931d5a`](https://github.com/tinacms/tinacms/commit/9931d5a0d7e5e9e5165170047cf5653041bddd7a), [`4aadf3e`](https://github.com/tinacms/tinacms/commit/4aadf3ee0b5e7ba6614baee9507a3b51abc92053), [`92b683b`](https://github.com/tinacms/tinacms/commit/92b683bd3d73b47271eee5b8ff648ed4dcde51e3), [`82b0039`](https://github.com/tinacms/tinacms/commit/82b00393da8bbcc2cf357fbbb546904f07e8d89c), [`877699d`](https://github.com/tinacms/tinacms/commit/877699d08b3e2c2470742a3acf25d02a95e440b3)]:
+  - tinacms@2.6.0
+  - @tinacms/mdx@1.5.4
+  - @tinacms/vercel-previews@0.0.53
+
 ## 0.1.52
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @tinacms/mdx
 
+## 1.5.4
+
+### Patch Changes
+
+- [#5397](https://github.com/tinacms/tinacms/pull/5397) [`82b0039`](https://github.com/tinacms/tinacms/commit/82b00393da8bbcc2cf357fbbb546904f07e8d89c) Thanks [@kldavis4](https://github.com/kldavis4)! - Rich text editor | hyperlinks - fixed sanitizeUrl to allow querystring parameters
+
+- Updated dependencies [[`92b683b`](https://github.com/tinacms/tinacms/commit/92b683bd3d73b47271eee5b8ff648ed4dcde51e3)]:
+  - @tinacms/schema-tools@1.7.0
+
 ## 1.5.3
 
 ### Patch Changes

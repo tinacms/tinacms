@@ -1,5 +1,13 @@
 # starter-empty
 
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies [[`9931d5a`](https://github.com/tinacms/tinacms/commit/9931d5a0d7e5e9e5165170047cf5653041bddd7a), [`4aadf3e`](https://github.com/tinacms/tinacms/commit/4aadf3ee0b5e7ba6614baee9507a3b51abc92053), [`92b683b`](https://github.com/tinacms/tinacms/commit/92b683bd3d73b47271eee5b8ff648ed4dcde51e3), [`877699d`](https://github.com/tinacms/tinacms/commit/877699d08b3e2c2470742a3acf25d02a95e440b3), [`0f42cf1`](https://github.com/tinacms/tinacms/commit/0f42cf184a19e7e42d374285cf758a34bcc229b3)]:
+  - tinacms@2.6.0
+  - @tinacms/cli@1.8.0
+
 ## 0.0.19
 
 ### Patch Changes
