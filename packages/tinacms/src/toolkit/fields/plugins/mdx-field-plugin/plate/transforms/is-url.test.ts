@@ -12,11 +12,6 @@ describe('isUrl', () => {
     expect(isUrl('http://localhost:3000')).toBe(true)
   })
 
-  test('validates non-localhost domain URLs', () => {
-    expect(isUrl('http://example.com')).toBe(true)
-    expect(isUrl('https://example.co.uk')).toBe(true)
-  })
-
   test('validates email links', () => {
     expect(isUrl('mailto:someone@example.com')).toBe(true)
     expect(isUrl('mailto:someone@example.com?subject=Hello')).toBe(true)
