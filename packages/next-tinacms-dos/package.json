@@ -28,12 +28,12 @@
 		"@tinacms/scripts": "workspace:*",
 		"@types/crypto-js": "^3.1.47",
 		"@types/js-cookie": "^2.2.7",
-		"@types/node": "^22.9.0",
+		"@types/node": "^22.10.5",
 		"next": "14.2.10",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"tinacms": "workspace:*",
-		"typescript": "^5.6.3"
+		"typescript": "^5.7.2"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
@@ -43,7 +43,7 @@
 		"directory": "packages/next-tinacms-dos"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "^3.693.0",
+		"@aws-sdk/client-s3": "^3.723.0",
 		"multer": "1.4.5-lts.1"
 	}
 }
