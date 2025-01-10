@@ -89,7 +89,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
           input.onChange({
             type: 'root',
             children: value,
-            embedCode: props.input.value.embedCode,
+            embedCode: input.value.embedCode,
           })
         }}
       >
