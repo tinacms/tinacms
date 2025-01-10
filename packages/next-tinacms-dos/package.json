@@ -1,49 +1,49 @@
 {
-  "name": "next-tinacms-dos",
-  "version": "5.0.3",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "files": [
-    "dist"
-  ],
-  "typings": "dist/index.d.ts",
-  "license": "Apache-2.0",
-  "buildConfig": {
-    "entryPoints": [
-      "src/index.ts",
-      {
-        "name": "src/handlers.ts",
-        "target": "node"
-      }
-    ]
-  },
-  "scripts": {
-    "types": "pnpm tsc",
-    "build": "tinacms-scripts build"
-  },
-  "peerDependencies": {
-    "tinacms": "workspace:*"
-  },
-  "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
-    "@types/crypto-js": "^3.1.47",
-    "@types/js-cookie": "^2.2.6",
-    "@types/node": "^13.13.1",
-    "next": "14.2.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tinacms": "workspace:*",
-    "typescript": "4.6.4"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
-  "repository": {
-    "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/next-tinacms-dos"
-  },
-  "dependencies": {
-    "@aws-sdk/client-s3": "^3.357.0",
-    "multer": "1.4.5-lts.1"
-  }
+	"name": "next-tinacms-dos",
+	"version": "9.0.0",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"files": [
+		"dist"
+	],
+	"typings": "dist/index.d.ts",
+	"license": "Apache-2.0",
+	"buildConfig": {
+		"entryPoints": [
+			"src/index.ts",
+			{
+				"name": "src/handlers.ts",
+				"target": "node"
+			}
+		]
+	},
+	"scripts": {
+		"types": "pnpm tsc",
+		"build": "tinacms-scripts build"
+	},
+	"peerDependencies": {
+		"tinacms": "workspace:*"
+	},
+	"devDependencies": {
+		"@tinacms/scripts": "workspace:*",
+		"@types/crypto-js": "^3.1.47",
+		"@types/js-cookie": "^2.2.7",
+		"@types/node": "^22.9.0",
+		"next": "14.2.10",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"tinacms": "workspace:*",
+		"typescript": "^5.6.3"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org"
+	},
+	"repository": {
+		"url": "https://github.com/tinacms/tinacms.git",
+		"directory": "packages/next-tinacms-dos"
+	},
+	"dependencies": {
+		"@aws-sdk/client-s3": "^3.693.0",
+		"multer": "1.4.5-lts.1"
+	}
 }

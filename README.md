@@ -37,9 +37,22 @@ Visit [Tina's documentation](https://tina.io/docs/) to learn more.
 
 Visit the [GitHub Discussions](https://github.com/tinacms/tinacms/discussions) or our [Community Discord](https://discord.com/invite/zumN63Ybpf) to ask questions, or look us up on on Twitter at [@tinacms](https://twitter.com/tinacms).
 
+## 🧑‍🎓 Earn a Tina Badge
+
+Go the extra mile and earn a Tina Dev Badge 🦙: [Earn a Tina Credly badge](./_docs/dev-badge.md)
+
 <!-- ## Changelog
 
 Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.  -->
+
+## Vision
+
+To be the world-leading CMS with Git support that developers love.
+
+## Tech Stack
+
+See
+https://tina.io/docs/introduction/faq/#what-is-tinas-tech-stack
 
 ## Roadmap
 

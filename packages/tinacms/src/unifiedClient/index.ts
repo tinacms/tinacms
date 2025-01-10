@@ -1,14 +1,6 @@
-import fetchPonyfill from 'fetch-ponyfill'
 import type { GraphQLError } from 'graphql'
 import type { Config } from '@tinacms/schema-tools'
 import type { Cache } from '../cache/index'
-
-const { fetch: fetchPonyfillFN, Headers: HeadersPonyfill } = fetchPonyfill()
-
-// if fetch or Headers are already defined in the global scope, use them
-const fetchDefined = typeof fetch === 'undefined' ? fetchPonyfillFN : fetch
-const HeadersDefined =
-  typeof Headers === 'undefined' ? HeadersPonyfill : Headers
 
 export const TINA_HOST = 'content.tinajs.io'
 export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
@@ -35,7 +27,10 @@ export class TinaClient<GenQueries> {
   public readonlyToken?: string
   public queries: GenQueries
   public errorPolicy: Config['client']['errorPolicy']
+  initialized: boolean = false
+  cacheDir: string
   cache: Cache
+
   constructor({
     token,
     url,
@@ -47,20 +42,35 @@ export class TinaClient<GenQueries> {
     this.readonlyToken = token?.trim()
     this.queries = queries(this)
     this.errorPolicy = errorPolicy || 'throw'
+    this.cacheDir = cacheDir || ''
+  }
 
-    // if we're in node, use the fs cache
-    if (cacheDir && typeof require !== 'undefined') {
-      const { NodeCache } = require('tinacms/dist/cache')
-      this.cache = NodeCache(cacheDir, require('fs'))
+  async init() {
+    if (this.initialized) {
+      return
     }
+    try {
+      if (
+        this.cacheDir &&
+        typeof window === 'undefined' &&
+        typeof require !== 'undefined'
+      ) {
+        const { NodeCache } = await import('../cache/node-cache')
+        this.cache = await NodeCache(this.cacheDir)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+    this.initialized = true
   }
 
   public async request<DataType extends Record<string, any> = any>(
     { errorPolicy, ...args }: TinaClientRequestArgs,
     options: { fetchOptions?: Parameters<typeof fetch>[1] }
   ) {
+    await this.init()
     const errorPolicyDefined = errorPolicy || this.errorPolicy
-    const headers = new HeadersDefined()
+    const headers = new Headers()
     if (this.readonlyToken) {
       headers.append('X-API-KEY', this.readonlyToken)
     }
@@ -97,7 +107,7 @@ export class TinaClient<GenQueries> {
       }
     }
 
-    const res = await fetchDefined(url, optionsObject)
+    const res = await fetch(url, optionsObject)
     if (!res.ok) {
       let additionalInfo = ''
       if (res.status === 401) {

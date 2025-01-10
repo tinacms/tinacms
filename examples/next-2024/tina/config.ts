@@ -33,6 +33,11 @@ export default defineConfig({
         label: 'Posts',
         path: 'content/posts',
         format: 'mdx',
+        ui: {
+          router({ document }) {
+            return `/posts/${document._sys.filename}`
+          },
+        },
         fields: [
           {
             type: 'string',
@@ -60,6 +65,10 @@ export default defineConfig({
               'link',
               'embed',
             ],
+            overrides: {
+              toolbar: ['heading', 'bold', 'italic', 'image', 'link', 'embed'],
+              showFloatingToolbar: false,
+            },
             templates: [
               {
                 name: 'DateTime',

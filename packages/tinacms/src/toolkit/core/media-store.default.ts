@@ -133,7 +133,7 @@ export class TinaMediaStore implements MediaStore {
           throw new Error(message)
         }
 
-        const { signedUrl } = await res.json()
+        const { signedUrl, requestId } = await res.json()
         if (!signedUrl) {
           throw new Error('Unexpected error generating upload url')
         }
@@ -157,6 +157,27 @@ export class TinaMediaStore implements MediaStore {
             throw new Error(`Upload error: '${matches[2]}'`)
           }
         }
+
+        const updateStartTime = Date.now()
+        while (true) {
+          // sleep for 1 second
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+
+          const { error, message } = await this.api.getRequestStatus(requestId)
+          if (error !== undefined) {
+            if (error) {
+              throw new Error(message)
+            } else {
+              // success
+              break
+            }
+          }
+
+          if (Date.now() - updateStartTime > 30000) {
+            throw new Error('Time out waiting for upload to complete')
+          }
+        }
+
         const src = `https://assets.tina.io/${this.api.clientId}/${path}`
 
         newFiles.push({
@@ -393,9 +414,39 @@ export class TinaMediaStore implements MediaStore {
     }`
     if (!this.isLocal) {
       if (await this.isAuthenticated()) {
-        await this.api.authProvider.fetchWithToken(`${this.url}/${path}`, {
-          method: 'DELETE',
-        })
+        const res = await this.api.authProvider.fetchWithToken(
+          `${this.url}/${path}`,
+          {
+            method: 'DELETE',
+          }
+        )
+        if (res.status == 200) {
+          const { requestId } = await res.json()
+
+          const deleteStartTime = Date.now()
+          while (true) {
+            // sleep for 1 second
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+
+            const { error, message } = await this.api.getRequestStatus(
+              requestId
+            )
+            if (error !== undefined) {
+              if (error) {
+                throw new Error(message)
+              } else {
+                // success
+                break
+              }
+            }
+
+            if (Date.now() - deleteStartTime > 30000) {
+              throw new Error('Time out waiting for delete to complete')
+            }
+          }
+        } else {
+          throw new Error('Unexpected error deleting media asset')
+        }
       } else {
         throw E_UNAUTHORIZED
       }

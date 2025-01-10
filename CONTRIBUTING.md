@@ -12,18 +12,17 @@ Currently this is a monorepo built with Turborepo and PNPM
 
 You _should_ :fingers_crossed: be able to just run these commands. (Please make a note of any hang-ups you ran into during this process and feel free to update this doc with any tips you have for others.)
 
+> [!TIP] We recommend using [fnm](https://github.com/Schniz/fnm) or [nvm](https://github.com/nvm-sh/nvm) to switch Node versions automatically
+
 > Having issues? Feel free to reach out on [Discord](https://discord.com/invite/zumN63Ybpf)
 
 ```sh
-# check the node version, 18 or greater is required
+# check the node version, the .nvmrc file lists the required version
 node -v
-# you can use nvm (https://github.com/nvm-sh/nvm) to switch version
 # install pnpm via corepack
 corepack enable
 # ensure you have the correct version (check version number in package.json)
 pnpm -v
-# some packages rely on yarn, so you may need to install that too
-npm install -g yarn
 # install dependencies
 pnpm install
 # build all the packages
@@ -102,14 +101,27 @@ Run `git checkout -- .` This will clear out the versioning changes.
 
 If the changes affect local use of the packages (i.e. not the ContentAPI), use the tina-cloud-starter found in the examples directory of this repo.
 
+To use a **tinacms** repository cloned locally, when running your application, use the `--rootPath` flag:
+
+```
+node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath {{ APPLICATION PROJECT PATH }}
+```
+
+e.g. `node tinacms/packages/@tinacms/cli/bin/tinacms dev --rootPath ~/Developer/tina/tina-cloud-starter`
+
+Then inside another terminal (in the tinacms project), run:
+
+```
+pnpm watch
+```
+
+> ### Warning
+>
+> This will only work for packages loaded by webpack. That means that environments which don't use
+> webpack (i.e. SSR builds) will not use this alias
+
 ## E2E tests
 
-In order to run the Cypress E2E tests:
+In order to run the Playwright E2E tests locally:
 
-1. Build and start the E2E test project
-   ```sh
-   NEXT_PUBLIC_USE_LOCAL_CLIENT=1
-   pnpm build:e2e
-   pnpm start:e2e
-   ```
-2. Run the tests in a separate terminal `pnpm test:dev` or `pnpm test:e2e`
+Please refer to the readme file in playwright/tina-playwright

@@ -1,16 +1,16 @@
-import path from 'path'
+import path from 'node:path'
+import type { Database } from '@tinacms/graphql'
+import react from '@vitejs/plugin-react'
 import fs from 'fs-extra'
+import normalizePath from 'normalize-path'
 import {
-  BuildOptions,
-  InlineConfig,
-  Plugin,
+  type BuildOptions,
+  type InlineConfig,
+  type Plugin,
   splitVendorChunkPlugin,
 } from 'vite'
-import react from '@vitejs/plugin-react'
-import { Database } from '@tinacms/graphql'
+import type { ConfigManager } from '../config-manager'
 import { tinaTailwind } from './tailwind'
-import { ConfigManager } from '../config-manager'
-import normalizePath from 'normalize-path'
 
 /**
  * This type is duplicated in he `TinaMediaStore`
@@ -100,7 +100,6 @@ async function listFilesRecursively({
 
 export const createConfig = async ({
   configManager,
-  database,
   apiURL,
   plugins = [],
   noWatch,
@@ -159,7 +158,12 @@ export const createConfig = async ({
     TINA_IMPORT: configManager.prebuildFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
     STATIC_MEDIA_IMPORT: staticMediaPath,
+    crypto: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
+    fs: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
+    os: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
+    path: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
   }
+
   if (configManager.shouldSkipSDK()) {
     alias['CLIENT_IMPORT'] = path.join(
       configManager.spaRootPath,
@@ -177,6 +181,8 @@ export const createConfig = async ({
     basePath = configManager.config.build.basePath
   }
 
+  const fullVersion = configManager.getTinaGraphQLVersion()
+  const version = `${fullVersion.major}.${fullVersion.minor}`
   const config: InlineConfig = {
     root: configManager.spaRootPath,
     base: `/${basePath ? `${normalizePath(basePath)}/` : ''}${normalizePath(
@@ -207,7 +213,7 @@ export const createConfig = async ({
       'process.platform': `"${process.platform}"`,
       __API_URL__: `"${apiURL}"`,
       __BASE_PATH__: `"${configManager.config?.build?.basePath || ''}"`,
-      __TINA_GRAPHQL_VERSION__: `"${configManager.getTinaGraphQLVersion()}"`,
+      __TINA_GRAPHQL_VERSION__: version,
     },
     logLevel: 'error', // Vite import warnings are noisy
     optimizeDeps: {

@@ -1,9 +1,10 @@
-import fetch, { Headers } from 'node-fetch'
 import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
+import crypto from 'crypto'
+import path from 'path'
 import type { ViteDevServer } from 'vite'
-import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql'
+import { buildSchema, type Database, FilesystemBridge } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
 import { buildProductionSpa } from './server'
@@ -14,19 +15,21 @@ import {
   buildClientSchema,
   getIntrospectionQuery,
 } from 'graphql'
-import { diff } from '@graphql-inspector/core'
-import { IndexStatusResponse, waitForDB } from './waitForDB'
+import { ChangeType, diff } from '@graphql-inspector/core'
+import { type IndexStatusResponse, waitForDB } from './waitForDB'
 import { createAndInitializeDatabase, createDBServer } from '../../database'
 import { sleepAndCallFunc } from '../../../utils/sleep'
 import { dangerText, linkText, warnText } from '../../../utils/theme'
 import {
-  SearchClient,
+  type SearchClient,
   SearchIndexer,
   TinaCMSSearchIndexClient,
 } from '@tinacms/search'
 import { spin } from '../../../utils/spinner'
 import { createDevServer } from '../dev-command/server'
 import { BaseCommand } from '../baseCommands'
+import { logText } from '../../../utils/theme'
+import { getFaqLink } from '../../../utils'
 
 export class BuildCommand extends BaseCommand {
   static paths = [['build']]
@@ -183,7 +186,7 @@ export class BuildCommand extends BaseCommand {
       this.skipCloudChecks || configManager.hasSelfHostedConfig()
 
     if (!skipCloudChecks) {
-      const { hasUpstream } = await this.checkClientInfo(
+      const { hasUpstream, timestamp } = await this.checkClientInfo(
         configManager,
         codegen.productionUrl,
         this.previewBaseBranch
@@ -211,7 +214,16 @@ export class BuildCommand extends BaseCommand {
       await this.checkGraphqlSchema(
         configManager,
         database,
-        codegen.productionUrl
+        codegen.productionUrl,
+        timestamp
+      )
+      await this.checkTinaSchema(
+        configManager,
+        database,
+        codegen.productionUrl,
+        this.previewName,
+        this.verbose,
+        timestamp
       )
     }
 
@@ -342,7 +354,7 @@ export class BuildCommand extends BaseCommand {
     configManager: ConfigManager,
     apiURL: string,
     previewBaseBranch?: string
-  ): Promise<{ hasUpstream: boolean }> {
+  ): Promise<{ hasUpstream: boolean; timestamp: number }> {
     const { config } = configManager
     const token = config.token
     const { clientId, branch, host } = parseURL(apiURL)
@@ -355,11 +367,13 @@ export class BuildCommand extends BaseCommand {
     // Check the client information
     let branchKnown = false
     let hasUpstream = false
+    let timestamp: number
     try {
       const res = await request({
         token,
         url,
       })
+      timestamp = res.timestamp || 0
       bar.tick({
         prog: '✅',
       })
@@ -405,6 +419,7 @@ export class BuildCommand extends BaseCommand {
       })
       return {
         hasUpstream,
+        timestamp,
       }
     }
 
@@ -535,7 +550,8 @@ export class BuildCommand extends BaseCommand {
   async checkGraphqlSchema(
     configManager: ConfigManager,
     database: Database,
-    apiURL: string
+    apiURL: string,
+    timestamp: number
   ) {
     const bar = new Progress(
       'Checking local GraphQL Schema matches server. :prog',
@@ -545,10 +561,11 @@ export class BuildCommand extends BaseCommand {
     const token = config.token
 
     // Get the remote schema from the graphql endpoint
-    const remoteSchema = await fetchRemoteGraphqlSchema({
-      url: apiURL,
-      token,
-    })
+    const { remoteSchema, remoteProjectVersion } =
+      await fetchRemoteGraphqlSchema({
+        url: apiURL,
+        token,
+      })
 
     if (!remoteSchema) {
       bar.tick({
@@ -577,10 +594,25 @@ export class BuildCommand extends BaseCommand {
         bar.tick({
           prog: '❌',
         })
-        let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to GitHub to update your remote GraphQL schema.`
+
+        const type: ChangeType = diffResult[0].type
+        const reason = diffResult[0].message
+        const errorLevel = diffResult[0].criticality.level
+        const faqLink = getFaqLink(type)
+        const tinaGraphQLVersion = configManager.getTinaGraphQLVersion()
+
+        let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to GitHub to update your remote GraphQL schema. ${
+          faqLink && `\nCheck out '${faqLink}' for possible solutions.`
+        }`
+        errorMessage += `\n\nAdditional info:\n\n`
         if (config?.branch) {
-          errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
+          errorMessage += `\tBranch: ${config.branch}, Client ID: ${config.clientId}\n`
         }
+        errorMessage += `\tLocal GraphQL version: ${tinaGraphQLVersion.fullVersion} / Remote GraphQL version: ${remoteProjectVersion}\n`
+        errorMessage += `\tLast indexed at: ${new Date(
+          timestamp
+        ).toUTCString()}\n`
+        errorMessage += `\tReason: [${errorLevel} - ${type}] ${reason}\n`
         throw new Error(errorMessage)
       }
     } catch (e) {
@@ -597,6 +629,80 @@ export class BuildCommand extends BaseCommand {
       } else {
         throw e
       }
+    }
+  }
+
+  async checkTinaSchema(
+    configManager: ConfigManager,
+    database: Database,
+    apiURL: string,
+    previewName: string,
+    verbose: boolean,
+    timestamp: number
+  ) {
+    const bar = new Progress(
+      'Checking local Tina Schema matches server. :prog',
+      1
+    )
+    const { config } = configManager
+    const token = config.token
+    const { clientId, branch, isLocalClient, host } = parseURL(apiURL)
+    // Can't check status if we're not using Tina Cloud
+    if (isLocalClient || !host || !clientId || !branch) {
+      if (verbose) {
+        logger.info(logText('Not using Tina Cloud, skipping Tina Schema check'))
+      }
+      return
+    }
+
+    // Get the remote schema from the graphql endpoint
+    const { tinaSchema: remoteTinaSchemaSha } = await fetchSchemaSha({
+      url: `https://${host}/db/${clientId}/${previewName || branch}/schemaSha`,
+      token,
+    })
+
+    if (!remoteTinaSchemaSha) {
+      bar.tick({
+        prog: '❌',
+      })
+      let errorMessage = `The remote Tina schema does not exist. Check indexing for this branch.`
+      if (config?.branch) {
+        errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
+      }
+      throw new Error(errorMessage)
+    }
+
+    if (!database.bridge) {
+      throw new Error(`No bridge configured`)
+    }
+    const localTinaSchema = JSON.parse(
+      await database.bridge.get(
+        path.join(database.tinaDirectory, '__generated__', '_schema.json')
+      )
+    )
+    localTinaSchema.version = undefined
+    const localTinaSchemaSha = crypto
+      .createHash('sha256')
+      .update(JSON.stringify(localTinaSchema))
+      .digest('hex')
+
+    if (localTinaSchemaSha === remoteTinaSchemaSha) {
+      bar.tick({
+        prog: '✅',
+      })
+    } else {
+      bar.tick({
+        prog: '❌',
+      })
+      let errorMessage = `The local Tina schema doesn't match the remote Tina schema. Please push up your changes to GitHub to update your remote tina schema.`
+      errorMessage += `\n\nAdditional info:\n\n`
+      if (config?.branch) {
+        errorMessage += `        Branch: ${config.branch}, Client ID: ${config.clientId}\n`
+      }
+      errorMessage += `        Last indexed at: ${new Date(
+        timestamp
+      ).toUTCString()}\n`
+      throw new Error(errorMessage)
     }
   }
 }
@@ -666,7 +772,10 @@ export const fetchRemoteGraphqlSchema = async ({
   if (token) {
     headers.append('X-API-KEY', token)
   }
-  const body = JSON.stringify({ query: getIntrospectionQuery(), variables: {} })
+  const body = JSON.stringify({
+    query: getIntrospectionQuery(),
+    variables: {},
+  })
 
   headers.append('Content-Type', 'application/json')
 
@@ -675,6 +784,31 @@ export const fetchRemoteGraphqlSchema = async ({
     headers,
     body,
   })
+
   const data = await res.json()
-  return data?.data
+  return {
+    remoteSchema: data?.data,
+    remoteRuntimeVersion: res.headers.get('tinacms-grapqhl-version'),
+    remoteProjectVersion: res.headers.get('tinacms-graphql-project-version'),
+  }
+}
+
+export const fetchSchemaSha = async ({
+  url,
+  token,
+}: {
+  url: string
+  token?: string
+}) => {
+  const headers = new Headers()
+  if (token) {
+    headers.append('X-API-KEY', token)
+  }
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers,
+    cache: 'no-cache',
+  })
+  return res.json()
 }

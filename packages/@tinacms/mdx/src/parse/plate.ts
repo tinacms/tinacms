@@ -126,6 +126,37 @@ export type ParagraphElement = {
   type: 'p'
   children: InlineElement[]
 }
+/**
+ * @group BlockElement
+ */
+export type TableCellElement = {
+  type: 'td'
+  children: ParagraphElement[]
+}
+/**
+ * @group BlockElement
+ */
+export type TableRowElement = {
+  type: 'tr'
+  children: TableCellElement[]
+}
+/**
+ * @group BlockElement
+ */
+export type TableElement = {
+  type: 'table'
+  children: TableRowElement[]
+  props: Record<string, unknown>
+}
+
+/**
+ * @group MermaidElement
+ */
+export type MermaidElement = {
+  type: 'mermaid'
+  value: string
+  children: [EmptyTextElement]
+}
 
 /**
  * @group BlockElement
@@ -141,8 +172,12 @@ export type BlockElement =
   | ListItemElement
   | MdxBlockElement
   | ParagraphElement
+  | MermaidElement
   | OrderedListElement
   | UnorderedListElement
+  | TableCellElement
+  | TableRowElement
+  | TableElement
 
 /**
  * @group InlineElement

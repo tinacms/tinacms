@@ -9,16 +9,15 @@ import {
   ListObjectsCommand,
   ListObjectsCommandInput,
   PutObjectCommand,
-  PutObjectCommandInput,
   DeleteObjectCommand,
   DeleteObjectCommandInput,
+  HeadObjectCommand,
+  HeadObjectCommandOutput,
 } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { Media, MediaListOptions } from 'tinacms'
 import path from 'path'
-import fs from 'fs'
 import { NextApiRequest, NextApiResponse } from 'next'
-import multer from 'multer'
-import { promisify } from 'util'
 
 export interface S3Config {
   config: S3ClientConfig
@@ -66,96 +65,36 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
     }
     switch (req.method) {
       case 'GET':
-        return listMedia(req, res, client, bucket, mediaRoot, cdnUrl)
-      case 'POST':
-        return uploadMedia(req, res, client, bucket, mediaRoot, cdnUrl)
+        if (req.url.startsWith('/api/s3/media/upload_url')) {
+          const expiresIn: number =
+            (req.query.expiresIn && Number(req.query.expiresIn)) || 3600
+          const s3_key = req.query.key
+            ? Array.isArray(req.query.key)
+              ? req.query.key[0]
+              : req.query.key
+            : null
+          if (!s3_key) {
+            return res.status(400).json({ message: 'key is required' })
+          }
+          if (await keyExists(client, bucket, s3_key)) {
+            return res.status(400).json({ message: 'key already exists' })
+          }
+          const signedUrl = await getUploadUrl(
+            bucket,
+            s3_key,
+            expiresIn,
+            client
+          )
+
+          return res.json({ signedUrl, src: cdnUrl + s3_key })
+        } else {
+          return listMedia(req, res, client, bucket, mediaRoot, cdnUrl)
+        }
       case 'DELETE':
         return deleteAsset(req, res, client, bucket)
       default:
         res.end(404)
     }
-  }
-}
-
-async function uploadMedia(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  client: S3Client,
-  bucket: string,
-  mediaRoot: string,
-  cdnUrl: string
-) {
-  try {
-    const upload = promisify(
-      multer({
-        storage: multer.diskStorage({
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          directory: (req, file, cb) => {
-            cb(null, '/tmp')
-          },
-          filename: (req, file, cb) => {
-            cb(null, file.originalname)
-          },
-        }),
-      }).single('file')
-    )
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    await upload(req, res)
-
-    const { directory } = req.body
-    let prefix = directory.replace(/^\//, '').replace(/\/$/, '')
-    if (prefix) prefix = prefix + '/'
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const filePath = req.file.path
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const fileType = req.file?.mimetype
-    const blob = fs.readFileSync(filePath)
-    const filename = path.basename(filePath)
-    const params: PutObjectCommandInput = {
-      Bucket: bucket,
-      Key: mediaRoot
-        ? path.join(mediaRoot, prefix + filename)
-        : prefix + filename,
-      Body: blob,
-      ACL: 'public-read',
-      ContentType: fileType || 'application/octet-stream',
-    }
-    const command = new PutObjectCommand(params)
-    try {
-      await client.send(command)
-      const src = cdnUrl + prefix + filename
-      res.json({
-        type: 'file',
-        id: prefix + filename,
-        filename,
-        directory: prefix,
-        thumbnails: {
-          '75x75': src,
-          '400x400': src,
-          '1000x1000': src,
-        },
-        src:
-          cdnUrl +
-          (mediaRoot
-            ? path.join(mediaRoot, prefix + filename)
-            : prefix + filename),
-      })
-    } catch (e) {
-      console.error('Error uploading media to s3')
-      console.error(e)
-      res.status(500).send(findErrorMessage(e))
-    }
-  } catch (e) {
-    console.error('Error uploading media')
-    console.error(e)
-    res.status(500)
-    const message = findErrorMessage(e)
-    res.json({ e: message })
   }
 }
 
@@ -282,6 +221,44 @@ async function deleteAsset(
     const message = findErrorMessage(e)
     res.json({ e: message })
   }
+}
+
+async function keyExists(client: S3Client, bucket: string, key: string) {
+  try {
+    const cmd = new HeadObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    })
+    const output: HeadObjectCommandOutput = await client.send(cmd)
+    return output && output.$metadata.httpStatusCode === 200
+  } catch (error: any) {
+    if (error.$metadata?.httpStatusCode === 404) {
+      // doesn't exist and permission policy includes s3:ListBucket
+      return false
+    } else if (error.$metadata?.httpStatusCode === 403) {
+      // doesn't exist, permission policy WITHOUT s3:ListBucket
+      return false
+    } else {
+      throw new Error('unexpected error checking if key exists')
+    }
+  }
+}
+
+export const getUploadUrl = async (
+  bucket: string,
+  key: string,
+  expiresIn: number,
+  client: S3Client
+): Promise<string> => {
+  // Create the presigned URL.
+  return getSignedUrl(
+    client,
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    }),
+    { expiresIn }
+  )
 }
 
 function getS3ToTinaFunc(cdnUrl, mediaRoot?: string) {

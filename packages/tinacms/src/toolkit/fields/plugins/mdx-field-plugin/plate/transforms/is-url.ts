@@ -15,6 +15,11 @@ export const isUrl = (string: any) => {
     return false
   }
 
+  // Check if the string is a bare hash link
+  if (string.startsWith('#')) {
+    return true
+  }
+
   const generalMatch = string.match(protocolAndDomainRE)
   const emailLinkMatch = string.match(emailLintRE)
   const localUrlMatch = string.match(localUrlRE) // Check for local URL match

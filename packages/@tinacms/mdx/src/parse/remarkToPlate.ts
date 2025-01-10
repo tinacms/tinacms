@@ -46,32 +46,29 @@ export const remarkToSlate = (
     switch (content.type) {
       case 'table': {
         return {
-          type: 'mdxJsxFlowElement',
-          children: [{ type: 'text', text: '' }],
-          name: 'table',
+          type: 'table',
+          children: content.children.map((tableRow) => {
+            return {
+              type: 'tr',
+              children: tableRow.children.map((tableCell) => {
+                return {
+                  type: 'td',
+                  children: [
+                    {
+                      type: 'p',
+                      children: flatten(
+                        tableCell.children.map((child) =>
+                          phrasingContent(child)
+                        )
+                      ),
+                    },
+                  ],
+                }
+              }),
+            }
+          }),
           props: {
             align: content.align?.filter((item) => !!item),
-            tableRows: content.children.map((child) => {
-              return {
-                tableCells: child.children.map((child) => {
-                  return {
-                    value: {
-                      type: 'root',
-                      children: [
-                        {
-                          type: 'p',
-                          children: flatten(
-                            child.children.map((child) =>
-                              phrasingContent(child)
-                            )
-                          ),
-                        },
-                      ],
-                    },
-                  }
-                }),
-              }
-            }),
           },
         }
       }
@@ -90,7 +87,7 @@ export const remarkToSlate = (
       case 'heading':
         return heading(content)
       case 'code':
-        return code(content)
+        return parseCode(content)
       case 'paragraph':
         return paragraph(content)
       case 'mdxJsxFlowElement':
@@ -287,6 +284,23 @@ export const remarkToSlate = (
           // @ts-ignore
           content.position
         )
+    }
+  }
+
+  const parseCode = (
+    content: Md.Code
+  ): Plate.CodeBlockElement | Plate.MermaidElement => {
+    if (content.lang === 'mermaid') {
+      return mermaid(content)
+    }
+    return code(content)
+  }
+
+  const mermaid = (content: Md.Code): Plate.MermaidElement => {
+    return {
+      type: 'mermaid',
+      value: content.value,
+      children: [{ type: 'text', text: '' }],
     }
   }
 
@@ -541,7 +555,7 @@ export class RichTextParseError extends Error {
 }
 
 // Prevent javascript scheme (eg. `javascript:alert(document.domain)`)
-const sanitizeUrl = (url: string | undefined) => {
+export const sanitizeUrl = (url: string | undefined) => {
   const allowedSchemes = ['http', 'https', 'mailto', 'tel', 'xref']
   if (!url) return ''
 
@@ -573,7 +587,8 @@ const sanitizeUrl = (url: string | undefined) => {
     if (url.endsWith('/')) {
       return parsedUrl.href
     }
-    return parsedUrl.origin
+    // Include search (query parameters) and hash if they exist
+    return `${parsedUrl.origin}${parsedUrl.search}${parsedUrl.hash}`
   } else {
     return parsedUrl.href
   }

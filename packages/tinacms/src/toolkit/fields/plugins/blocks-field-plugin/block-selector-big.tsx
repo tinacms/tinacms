@@ -1,10 +1,16 @@
 import * as React from 'react'
 import { AddIcon } from '@toolkit/icons'
 import { IconButton } from '@toolkit/styles'
-import { Disclosure, Transition } from '@headlessui/react'
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+  Transition,
+  TransitionChild,
+} from '@headlessui/react'
 import { useFormPortal } from '@toolkit/form-builder'
 import { PanelHeader } from '../group-field-plugin'
-import { BlockTemplate } from '.'
+import type { BlockTemplate } from '.'
 import { MdKeyboardArrowDown, MdOutlineClear } from 'react-icons/md'
 import { BiSearch } from 'react-icons/bi'
 
@@ -79,7 +85,7 @@ export const BlockSelectorBig = ({
       <IconButton
         variant={pickerIsOpen ? 'secondary' : 'primary'}
         size="small"
-        className={`${pickerIsOpen ? `rotate-45 pointer-events-none` : ``}`}
+        className={`${pickerIsOpen ? 'rotate-45 pointer-events-none' : ''}`}
         onClick={() => setPickerIsOpen(!pickerIsOpen)}
       >
         <AddIcon className="w-5/6 h-auto" />
@@ -87,8 +93,7 @@ export const BlockSelectorBig = ({
       <FormPortal>
         {({ zIndexShift }) => (
           <Transition show={pickerIsOpen}>
-            <Transition.Child
-              as={React.Fragment}
+            <TransitionChild
               enter="transform transition-all ease-out duration-200"
               enterFrom="opacity-0 -translate-x-1/2"
               enterTo="opacity-100 translate-x-0"
@@ -197,7 +202,7 @@ export const BlockSelectorBig = ({
                   </div>
                 </div>
               </div>
-            </Transition.Child>
+            </TransitionChild>
           </Transition>
         )}
       </FormPortal>
@@ -214,7 +219,7 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
     >
       {({ open }) => (
         <>
-          <Disclosure.Button
+          <DisclosureButton
             className={`relative block group text-left w-full text-base font-bold tracking-wide py-2 truncate ${
               templates.length === 0 ? `pointer-events-none` : ``
             } ${
@@ -237,7 +242,7 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
                 }`}
               />
             )}
-          </Disclosure.Button>
+          </DisclosureButton>
 
           <Transition
             enter="transition duration-100 ease-out"
@@ -247,15 +252,20 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
             leaveFrom="transform scale-100 opacity-100"
             leaveTo="transform scale-95 opacity-0"
           >
-            <Disclosure.Panel>
+            <DisclosurePanel>
               {templates.length > 0 && (
                 <CardColumns>
-                  {templates.map(([name, template]) => (
-                    <BlockCard close={close} name={name} template={template} />
+                  {templates.map(([name, template], index) => (
+                    <BlockCard
+                      key={index}
+                      close={close}
+                      name={name}
+                      template={template}
+                    />
                   ))}
                 </CardColumns>
               )}
-            </Disclosure.Panel>
+            </DisclosurePanel>
           </Transition>
         </>
       )}

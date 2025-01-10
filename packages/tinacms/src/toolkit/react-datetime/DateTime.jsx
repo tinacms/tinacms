@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types'
 import moment from 'moment'
-import React from 'react'
 import DaysView from './views/DaysView'
 import MonthsView from './views/MonthsView'
 import YearsView from './views/YearsView'
 import TimeView from './views/TimeView'
-import onClickOutside from 'react-onclickoutside/dist/react-onclickoutside.es'
+import React, { useRef } from 'react'
+import useClickAway from 'react-use/lib/useClickAway'
 
 const viewModes = {
   YEARS: 'years',
@@ -658,23 +658,16 @@ function log(message, method) {
   con[method]('***react-datetime:' + message)
 }
 
-class ClickOutBase extends React.Component {
-  container = React.createRef()
+function ClickableWrapper({ className, onClickOut, children }) {
+  const containerRef = useRef(null)
 
-  render() {
-    return (
-      <div className={this.props.className} ref={this.container}>
-        {this.props.children}
-      </div>
-    )
-  }
-  handleClickOutside(e) {
-    this.props.onClickOut(e)
-  }
+  useClickAway(containerRef, (event) => {
+    onClickOut(event)
+  })
 
-  setClickOutsideRef() {
-    return this.container.current
-  }
+  return (
+    <div className={className} ref={containerRef}>
+      {children}
+    </div>
+  )
 }
-
-const ClickableWrapper = onClickOutside(ClickOutBase)

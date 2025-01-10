@@ -233,7 +233,7 @@ describe('isomorphic bridge', () => {
     test('non-existent post', async () => {
       const filepath = 'content/posts/foobar.mdx'
       await expect(bridge.delete(filepath)).rejects.toThrow(
-        `Unable to resolve path: content/posts/foobar.mdx`
+        'Unable to resolve path: content/posts/foobar.mdx'
       )
     })
 

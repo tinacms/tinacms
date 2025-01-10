@@ -154,6 +154,7 @@ export const rootElement = (
   const children: Md.Content[] = []
   content.children?.forEach((child) => {
     const value = blockElement(child, field, imageCallback, context)
+
     if (value) {
       children.push(value)
     }
@@ -199,6 +200,12 @@ export const blockElement = (
       return {
         type: 'paragraph',
         children: eat(content.children, field, imageCallback),
+      }
+    case 'mermaid':
+      return {
+        type: 'code',
+        lang: 'mermaid',
+        value: content.value,
       }
     case 'code_block':
       return {
@@ -313,6 +320,31 @@ export const blockElement = (
             title: content.caption,
           },
         ],
+      }
+    case 'table':
+      const table = content.props as
+        | {
+            align: Md.AlignType[] | undefined
+          }
+        | undefined
+      return {
+        type: 'table',
+        align: table?.align,
+        children: content.children.map((tableRow) => {
+          return {
+            type: 'tableRow',
+            children: tableRow.children.map((tableCell) => {
+              return {
+                type: 'tableCell',
+                children: eat(
+                  tableCell.children?.at(0)?.children || [],
+                  field,
+                  imageCallback
+                ),
+              }
+            }),
+          }
+        }),
       }
     default:
       throw new Error(`BlockElement: ${content.type} is not yet supported`)

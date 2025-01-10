@@ -21,12 +21,13 @@ import FloatingToolbarButtons from './components/floating-toolbar-buttons'
 import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar'
 import { isUrl } from './transforms/is-url'
 import { ToolbarProvider } from './toolbar/toolbar-provider'
+import { createMermaidPlugin } from './plugins/custom/mermaid-plugin'
 
-export const RichEditor = (props: RichTextType) => {
+export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(
     () =>
-      props.input.value?.children?.length
-        ? props.input.value.children.map(helpers.normalize)
+      input.value?.children?.length
+        ? input.value.children.map(helpers.normalize)
         : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
     []
   )
@@ -40,6 +41,7 @@ export const RichEditor = (props: RichTextType) => {
           createMdxBlockPlugin(),
           createMdxInlinePlugin(),
           createImgPlugin(),
+          createMermaidPlugin(),
           createInvalidMarkdownPlugin(),
           createLinkPlugin({
             options: {
@@ -57,8 +59,7 @@ export const RichEditor = (props: RichTextType) => {
   )
 
   // This should be a plugin customization
-  const withToolbar = true
-  const tempId = [props.tinaForm.id, props.input.name].join('.')
+  const tempId = [tinaForm.id, input.name].join('.')
   const id = React.useMemo(() => uuid() + tempId, [tempId])
   const ref = React.useRef<HTMLDivElement>(null)
 
@@ -70,13 +71,13 @@ export const RichEditor = (props: RichTextType) => {
         const plateElement = ref.current?.querySelector(
           '[role="textbox"]'
         ) as HTMLElement
-        if (props.field.experimental_focusIntent && plateElement) {
+        if (field.experimental_focusIntent && plateElement) {
           if (plateElement) plateElement.focus()
         }
         // Slate takes a second to mount
       }, 100)
     }
-  }, [props.field.experimental_focusIntent, ref])
+  }, [field.experimental_focusIntent, ref])
 
   return (
     <div ref={ref}>
@@ -85,7 +86,7 @@ export const RichEditor = (props: RichTextType) => {
         initialValue={initialValue}
         plugins={plugins}
         onChange={(value) => {
-          props.input.onChange({
+          input.onChange({
             type: 'root',
             children: value,
             embedCode: props.input.value.embedCode,
@@ -94,16 +95,20 @@ export const RichEditor = (props: RichTextType) => {
       >
         <TooltipProvider>
           <ToolbarProvider
-            tinaForm={props.tinaForm}
-            templates={props.field.templates}
-            overrides={props.field?.toolbarOverride}
+            tinaForm={tinaForm}
+            templates={field.templates}
+            overrides={
+              field?.toolbarOverride ? field.toolbarOverride : field.overrides
+            }
           >
             <FixedToolbar>
               <FixedToolbarButtons />
             </FixedToolbar>
-            <FloatingToolbar>
-              <FloatingToolbarButtons />
-            </FloatingToolbar>
+            {field?.overrides?.showFloatingToolbar !== false ? (
+              <FloatingToolbar>
+                <FloatingToolbarButtons />
+              </FloatingToolbar>
+            ) : null}
           </ToolbarProvider>
           <Editor />
         </TooltipProvider>

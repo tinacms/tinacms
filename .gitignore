@@ -32,8 +32,6 @@ topologicalDeps.txt
 
 # Ignore any .next folder
 **/.next/**
-cypress/videos/all/edit.spec.js.mp4
-cypress/videos/kitchen-sink/sidebar.spec.js.mp4
 
 # Turborepo
 .turbo

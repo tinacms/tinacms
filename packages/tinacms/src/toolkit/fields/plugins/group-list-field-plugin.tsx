@@ -266,12 +266,13 @@ export const ItemHeader = ({
 export const ItemDeleteButton = ({ onClick, disabled = false }) => {
   return (
     <button
-      className={`w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 text-gray-200 hover:text-red-500 ${
+      type="button"
+      className={`w-8 px-1 py-2.5 flex items-center justify-center text-gray-200 hover:opacity-100 opacity-30 hover:bg-gray-50 ${
         disabled && 'pointer-events-none opacity-30 cursor-not-allowed'
       }`}
       onClick={onClick}
     >
-      <TrashIcon className="fill-current transition-colors ease-out duration-100" />
+      <TrashIcon className="h-5 w-auto fill-current text-red-500 transition-colors duration-150 ease-out" />
     </button>
   )
 }

@@ -7,7 +7,6 @@ import { Config } from '@tinacms/schema-tools'
 import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
 import chalk from 'chalk'
-
 import { logger } from '../logger'
 
 export const TINA_FOLDER = 'tina'
@@ -290,22 +289,31 @@ export class ConfigManager {
     )
   }
 
-  getTinaGraphQLVersion() {
+  getTinaGraphQLVersion(): {
+    fullVersion: string
+    major: string
+    minor: string
+    patch: string
+  } {
     if (this.tinaGraphQLVersionFromCLI) {
-      return this.tinaGraphQLVersionFromCLI
+      const version = this.tinaGraphQLVersionFromCLI.split('.')
+      return {
+        fullVersion: this.tinaGraphQLVersionFromCLI,
+        major: version[0] || 'x',
+        minor: version[1] || 'x',
+        patch: version[2] || 'x',
+      }
     }
     const generatedSchema = fs.readJSONSync(this.generatedSchemaJSONPath)
     if (
       !generatedSchema ||
-      !(typeof generatedSchema?.version !== 'undefined') ||
-      !(typeof generatedSchema?.version?.major === 'string') ||
-      !(typeof generatedSchema?.version?.minor === 'string')
+      !(typeof generatedSchema?.version !== 'undefined')
     ) {
       throw new Error(
         `Can not find Tina GraphQL version in ${this.generatedSchemaJSONPath}`
       )
     }
-    return `${generatedSchema.version.major}.${generatedSchema.version.minor}`
+    return generatedSchema.version
   }
 
   printGeneratedClientFilePath() {
@@ -386,10 +394,15 @@ export class ConfigManager {
     // good way of invalidating them when this file changes
     // https://github.com/nodejs/modules/issues/307
     const tmpdir = path.join(os.tmpdir(), Date.now().toString())
-    const prebuild = path.join(this.generatedFolderPath, 'config.prebuild.jsx')
+    const preBuildConfigPath = path.join(
+      this.generatedFolderPath,
+      'config.prebuild.jsx'
+    )
+
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
+
     fs.outputFileSync(tempTSConfigFile, '{}')
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
@@ -400,17 +413,19 @@ export class ConfigManager {
       logLevel: 'silent',
       packages: 'external',
       ignoreAnnotations: true,
-      outfile: prebuild,
+      outfile: preBuildConfigPath,
       loader: loaders,
       metafile: true,
     })
     const flattenedList = []
+
     Object.keys(result2.metafile.inputs).forEach((key) => {
       if (key.includes('node_modules') || key.includes('__generated__')) {
         return
       }
       flattenedList.push(key)
     })
+
     await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
@@ -441,7 +456,7 @@ export class ConfigManager {
     fs.removeSync(outfile2)
     return {
       config: result.default,
-      prebuildPath: prebuild,
+      prebuildPath: preBuildConfigPath,
       watchList: flattenedList,
     }
   }

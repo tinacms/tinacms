@@ -86,32 +86,31 @@ const FormListItem = ({
 export const FormLists = (props: { isEditing: boolean }) => {
   const cms = useCMS()
   return (
-    <>
-      <Transition
-        appear={true}
-        // show={props.isEditing}
-        show={true}
-        enter="transition-all ease-out duration-150"
-        enterFrom="opacity-0 -translate-x-1/2"
-        enterTo="opacity-100"
-        leave="transition-all ease-out duration-150"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-0 -translate-x-1/2"
-      >
-        {cms.state.formLists.map((formList) => (
-          <div key={formList.id} className="pt-16">
-            {/* TODO: add labels for each list */}
-            <FormList
-              isEditing={props.isEditing}
-              setActiveFormId={(id) => {
-                cms.dispatch({ type: 'forms:set-active-form-id', value: id })
-              }}
-              formList={formList}
-            />
-          </div>
-        ))}
-      </Transition>
-    </>
+    <Transition
+      appear={true}
+      // show={props.isEditing}
+      show={true}
+      as={'div'}
+      enter="transition-all ease-out duration-150"
+      enterFrom="opacity-0 -translate-x-1/2"
+      enterTo="opacity-100"
+      leave="transition-all ease-out duration-150"
+      leaveFrom="opacity-100"
+      leaveTo="opacity-0 -translate-x-1/2"
+    >
+      {cms.state.formLists.map((formList, index) => (
+        <div key={`${formList.id}-${index}`} className="pt-16">
+          {/* TODO: add labels for each list */}
+          <FormList
+            isEditing={props.isEditing}
+            setActiveFormId={(id) => {
+              cms.dispatch({ type: 'forms:set-active-form-id', value: id })
+            }}
+            formList={formList}
+          />
+        </div>
+      ))}
+    </Transition>
   )
 }
 
@@ -154,7 +153,7 @@ export const FormList = (props: {
 
   return (
     <ul>
-      <li className={`divide-y divide-gray-200`}>
+      <li className={'divide-y divide-gray-200'}>
         {listItems.map((item, index) => {
           if (item.type === 'list') {
             return (
