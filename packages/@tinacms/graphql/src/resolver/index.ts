@@ -273,7 +273,7 @@ export const transformDocumentIntoPayload = async (args: {
         basename,
         filename,
         extension,
-        hasReferences,
+        hasReferences: args.hasReferences,
         path: fullPath,
         relativePath,
         breadcrumbs,
