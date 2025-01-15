@@ -203,8 +203,9 @@ export const eat = (
     nonMatchingSiblingIndex = content.length - 1
   }
   const matchingSiblings = content.slice(1, nonMatchingSiblingIndex + 1)
-  const markCounts: { [key in 'strong' | 'emphasis' | 'inlineCode']?: number } =
-    {}
+  const markCounts: {
+    [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete']?: number
+  } = {}
   marks.forEach((mark) => {
     let count = 1
     matchingSiblings.every((sibling, index) => {
@@ -216,9 +217,10 @@ export const eat = (
     markCounts[mark] = count
   })
   let count = 0
-  let markToProcess: 'strong' | 'emphasis' | 'inlineCode' | null = null
+  let markToProcess: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null =
+    null
   Object.entries(markCounts).forEach(([mark, markCount]) => {
-    const m = mark as 'strong' | 'emphasis' | 'inlineCode'
+    const m = mark as 'strong' | 'emphasis' | 'inlineCode' | 'delete'
     if (markCount > count) {
       count = markCount
       markToProcess = m
@@ -258,7 +260,7 @@ export const eat = (
 }
 const cleanNode = (
   node: InlineElementWithCallback,
-  mark: 'strong' | 'emphasis' | 'inlineCode' | null
+  mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null
 ): Plate.InlineElement => {
   if (!mark) {
     return node
@@ -268,6 +270,7 @@ const cleanNode = (
     strong: 'bold',
     emphasis: 'italic',
     inlineCode: 'code',
+    delete: 'delete',
   }[mark]
   Object.entries(node).map(([key, value]) => {
     if (key !== markToClear) {

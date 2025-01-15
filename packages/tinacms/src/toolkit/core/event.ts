@@ -55,7 +55,6 @@ export class Listener<E extends CMSEvent = CMSEvent> {
 
   watchesEvent(currentEvent: E) {
     if (this.eventPattern === '*') return true
-
     const eventParts = currentEvent.type.split(':')
     const patternParts = this.eventPattern.split(':')
 
