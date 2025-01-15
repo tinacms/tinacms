@@ -20,11 +20,18 @@ interface TextNode extends Md.Literal {
 
 function formatTextNodeWithWhitespace(node: TextNode): string {
   const { value, position } = node
-  const { start, end } = position as Position
+  const { start, end } = position as Plate.Position
+
+  // Safely handle the case where start.column or end.column might be null or undefined
+  const startColumn = start.column ?? 1 // Default to 1 if undefined or null
+  const endColumn = end.column ?? startColumn + value.length // Default to startColumn + value length if undefined or null
 
   // Calculate the number of whitespaces needed before and after the text
-  const leadingWhitespaceCount = start.column - 1 // Columns are 1-based
-  const trailingWhitespaceCount = end.column - start.column - value.length
+  const leadingWhitespaceCount = Math.max(startColumn - 1, 0) // Ensure non-negative
+  const trailingWhitespaceCount = Math.max(
+    endColumn - startColumn - value.length,
+    0
+  ) // Ensure non-negative
 
   // Create leading and trailing whitespace strings
   const leadingWhitespace = ' '.repeat(leadingWhitespaceCount)
