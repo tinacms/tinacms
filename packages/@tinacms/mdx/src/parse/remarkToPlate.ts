@@ -20,7 +20,7 @@ interface TextNode extends Md.Literal {
 
 function formatTextNodeWithWhitespace(node: TextNode): string {
   const { value, position } = node
-  const { start, end } = position as Md.Position
+  const { start, end } = position as Position
 
   // Calculate the number of whitespaces needed before and after the text
   const leadingWhitespaceCount = start.column - 1 // Columns are 1-based
