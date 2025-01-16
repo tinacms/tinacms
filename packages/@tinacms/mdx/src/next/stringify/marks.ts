@@ -177,7 +177,7 @@ export const eat = (
     ]
   }
   const marks = getMarks(first)
-
+  console.log('marks: ', marks)
   if (marks.length === 0) {
     if (first.linkifyTextNode) {
       return [
@@ -203,6 +203,7 @@ export const eat = (
     nonMatchingSiblingIndex = content.length - 1
   }
   const matchingSiblings = content.slice(1, nonMatchingSiblingIndex + 1)
+  console.log('matchingSiblings', matchingSiblings)
   const markCounts: {
     [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete']?: number
   } = {}
@@ -242,6 +243,7 @@ export const eat = (
       ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
     ]
   }
+  console.log('markToProcess: ', markToProcess)
   return [
     {
       type: markToProcess,
@@ -270,7 +272,7 @@ const cleanNode = (
     strong: 'bold',
     emphasis: 'italic',
     inlineCode: 'code',
-    delete: 'delete',
+    delete: 'strikethrough',
   }[mark]
   Object.entries(node).map(([key, value]) => {
     if (key !== markToClear) {

@@ -2,11 +2,20 @@
   "type": "root",
   "children": [
     {
-      "type": "h2",
+      "type": "p",
       "children": [
         {
           "type": "text",
-          "text": "Strikethrough"
+          "text": "Some "
+        },
+        {
+          "type": "text",
+          "text": "strikethrough",
+          "strikethrough": true
+        },
+        {
+          "type": "text",
+          "text": " text"
         }
       ]
     },
@@ -15,21 +24,16 @@
       "children": [
         {
           "type": "text",
-          "text": "one",
-          "delete": true
+          "text": "Some "
         },
         {
           "type": "text",
-          "text": " or "
+          "text": "strikethrough",
+          "strikethrough": true
         },
         {
           "type": "text",
-          "text": "two",
-          "delete": true
-        },
-        {
-          "type": "text",
-          "text": " tildes."
+          "text": " text"
         }
       ]
     },

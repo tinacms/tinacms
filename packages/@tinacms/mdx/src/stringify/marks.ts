@@ -240,6 +240,8 @@ export const eat = (
     ]
   }
 
+  console.log('First vs match sib', first, matchingSiblings)
+  console.log('Mark to Process: ,', markToProcess)
   return [
     {
       type: markToProcess,

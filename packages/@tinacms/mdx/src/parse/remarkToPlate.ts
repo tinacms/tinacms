@@ -42,6 +42,7 @@ export const remarkToSlate = (
     : mdxJsxElementDefault
 
   const content = (content: Md.Content): Plate.BlockElement => {
+    console.log('[remarkToSlate] Content Type: ,', content.type)
     switch (content.type) {
       case 'table': {
         return {
@@ -354,6 +355,7 @@ export const remarkToSlate = (
   const phrasingContent = (
     content: Md.PhrasingContent
   ): Plate.InlineElement | Plate.InlineElement[] => {
+    console.log('phrasingContent: ,', content.type, content)
     switch (content.type) {
       case 'text':
         return text(content)
@@ -401,7 +403,7 @@ export const remarkToSlate = (
 
   const phrashingMark = (
     node: Md.PhrasingContent,
-    marks: ('delete' | 'bold' | 'italic' | 'code')[] = []
+    marks: ('strikethrough' | 'bold' | 'italic' | 'code')[] = []
   ): Plate.InlineElement[] => {
     const accum: Plate.InlineElement[] = []
     switch (node.type) {
@@ -428,11 +430,16 @@ export const remarkToSlate = (
         break
       }
       case 'delete': {
+        console.log('phrashingMark delete called')
         const children = flatten(
-          node.children.map((child) =>
-            phrashingMark(child, [...marks, 'delete'])
-          )
+          node.children.map((child) => {
+            console.log('Child: ,', child)
+            console.log('Marks: ,', ...marks)
+            console.log('Looking for "delete"')
+            return phrashingMark(child, [...marks, 'strikethrough'])
+          })
         )
+        console.log('delete children, ', JSON.stringify(children))
         children.forEach((child) => {
           accum.push(child)
         })
@@ -485,6 +492,7 @@ export const remarkToSlate = (
           node?.position
         )
     }
+    console.log('Accum: ', accum)
     return accum
   }
 
@@ -520,6 +528,10 @@ export const remarkToSlate = (
     content: Md.Paragraph
   ): Plate.ParagraphElement | Plate.HTMLElement => {
     const children = flatten(content.children.map(phrasingContent))
+    console.log(
+      'Paragraph children after phrasingContent: ',
+      JSON.stringify(children)
+    )
     // MDX treats <div>Hello</div> is inline even if it's isolated on one line
     // If that's the case, swap it out with html
     // TODO: probably need to do the same with JSX

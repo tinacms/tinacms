@@ -1,6 +1,6 @@
-## Strikethrough
+Some ~strikethrough~ text
 
-~one~ or ~~two~~ tildes.
+Some ~~strikethrough~~ text
 
 Some **bold** text
 
