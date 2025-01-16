@@ -432,19 +432,24 @@ export const remarkToSlate = (
       case 'delete': {
         console.log('phrashingMark delete called')
         const children = flatten(
-          node.children.map((child) => {
-            console.log('Child: ,', child)
-            console.log('Marks: ,', ...marks)
-            console.log('Looking for "delete"')
-            return phrashingMark(child, [...marks, 'strikethrough'])
-          })
+          node.children.map((child) =>
+            phrashingMark(child, [...marks, 'strikethrough'])
+          )
         )
+
+        // Ensure children are processed correctly
+        if (children.length) {
+          children.forEach((child) => {
+            accum.push({
+              ...child,
+              strikethrough: true, // Add the strikethrough property
+            })
+          })
+        }
         console.log('delete children, ', JSON.stringify(children))
-        children.forEach((child) => {
-          accum.push(child)
-        })
         break
       }
+
       case 'strong': {
         const children = flatten(
           node.children.map((child) => phrashingMark(child, [...marks, 'bold']))

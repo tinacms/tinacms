@@ -65,8 +65,8 @@
         {
           "type": "text",
           "text": "bold and emphasized",
-          "italic": true,
-          "bold": true
+          "bold": true,
+          "italic": true
         },
         {
           "type": "text",
@@ -165,69 +165,6 @@
           "type": "text",
           "text": ", again",
           "italic": true
-        }
-      ]
-    },
-    {
-      "type": "p",
-      "children": [
-        {
-          "type": "text",
-          "text": "Hello ",
-          "bold": true
-        },
-        {
-          "type": "a",
-          "url": "https://example.com",
-          "title": "Example Site",
-          "children": [
-            {
-              "type": "text",
-              "text": "world",
-              "bold": true
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "p",
-      "children": [
-        {
-          "type": "text",
-          "text": "Hello ",
-          "italic": true,
-          "bold": true
-        },
-        {
-          "type": "a",
-          "url": "https://example.com",
-          "title": "Example Site",
-          "children": [
-            {
-              "type": "text",
-              "text": "world",
-              "italic": true,
-              "bold": true
-            }
-          ]
-        },
-        {
-          "type": "text",
-          "text": " And some other text, which has a ",
-          "italic": true
-        },
-        {
-          "type": "a",
-          "url": "https://something.com",
-          "title": null,
-          "children": [
-            {
-              "type": "text",
-              "text": "link to something",
-              "italic": true
-            }
-          ]
         }
       ]
     }

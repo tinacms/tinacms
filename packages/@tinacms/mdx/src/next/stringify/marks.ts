@@ -1,7 +1,7 @@
 import { getMarks } from '../../stringify'
 import type * as Md from 'mdast'
 import type * as Plate from '../../parse/plate'
-import type { RichTextField } from '@tinacms/schema-tools'
+import type { RichTextField, RichTextType } from '@tinacms/schema-tools'
 import { stringifyPropsInline } from './acorn'
 
 const matches = (a: string[], b: string[]) => {
@@ -143,41 +143,34 @@ const text = (content: { text: string }) => {
     value: content.text,
   }
 }
-
 export const eat = (
   c: InlineElementWithCallback[],
-  field: RichTextField,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ): Md.PhrasingContent[] => {
   const content = replaceLinksWithTextNodes(c)
   const first = content[0]
-  if (!first) {
-    return []
-  }
-  if (first && first?.type !== 'text') {
+  if (!first) return []
+
+  if (first.type !== 'text') {
     if (first.type === 'a') {
       return [
         {
           type: 'link',
           url: first.url,
           title: first.title,
-          children: eat(
-            first.children,
-            field,
-            imageCallback
-          ) as Md.StaticPhrasingContent[],
+          children: eat(first.children, field, imageCallback),
         },
         ...eat(content.slice(1), field, imageCallback),
       ]
     }
-    // non-text nodes can't be merged. Eg. img, break. So process them and move on to the rest
     return [
       inlineElementExceptLink(first, field, imageCallback),
       ...eat(content.slice(1), field, imageCallback),
     ]
   }
+
   const marks = getMarks(first)
-  console.log('marks: ', marks)
   if (marks.length === 0) {
     if (first.linkifyTextNode) {
       return [
@@ -188,68 +181,27 @@ export const eat = (
       return [text(first), ...eat(content.slice(1), field, imageCallback)]
     }
   }
-  let nonMatchingSiblingIndex: number = 0
-  if (
-    content.slice(1).every((content, index) => {
-      if (matches(marks, getMarks(content))) {
-        return true
-      } else {
-        nonMatchingSiblingIndex = index
-        return false
-      }
-    })
-  ) {
-    // Every sibling matches, so capture all of them in this node
-    nonMatchingSiblingIndex = content.length - 1
-  }
-  const matchingSiblings = content.slice(1, nonMatchingSiblingIndex + 1)
-  console.log('matchingSiblings', matchingSiblings)
-  const markCounts: {
-    [key in 'strong' | 'emphasis' | 'inlineCode' | 'delete']?: number
-  } = {}
-  marks.forEach((mark) => {
-    let count = 1
-    matchingSiblings.every((sibling, index) => {
-      if (getMarks(sibling).includes(mark)) {
-        count = index + 1
-        return true
-      }
-    })
-    markCounts[mark] = count
-  })
-  let count = 0
-  let markToProcess: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null =
-    null
-  Object.entries(markCounts).forEach(([mark, markCount]) => {
-    const m = mark as 'strong' | 'emphasis' | 'inlineCode' | 'delete'
-    if (markCount > count) {
-      count = markCount
-      markToProcess = m
+
+  let nonMatchingSiblingIndex = 0
+  const matchingSiblings = content.slice(1).filter((content, index) => {
+    if (matches(marks, getMarks(content))) {
+      return true
+    } else {
+      nonMatchingSiblingIndex = index
+      return false
     }
   })
-  if (!markToProcess) {
-    return [text(first), ...eat(content.slice(1), field, imageCallback)]
-  }
-  if (markToProcess === 'inlineCode') {
-    if (nonMatchingSiblingIndex) {
-      throw new Error(`Marks inside inline code are not supported`)
-    }
-    const node = {
-      type: markToProcess,
-      value: first.text,
-    }
-    return [
-      first.linkifyTextNode?.(node) ?? node,
-      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
-    ]
-  }
-  console.log('markToProcess: ', markToProcess)
+
+  const markToProcess = marks[0] // Pick the first mark to process
+  const processedNode = cleanNode(first, markToProcess)
+
   return [
     {
       type: markToProcess,
       children: eat(
         [
-          ...[first, ...matchingSiblings].map((sibling) =>
+          processedNode,
+          ...matchingSiblings.map((sibling) =>
             cleanNode(sibling, markToProcess)
           ),
         ],
@@ -260,6 +212,7 @@ export const eat = (
     ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
   ]
 }
+
 const cleanNode = (
   node: InlineElementWithCallback,
   mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null

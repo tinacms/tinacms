@@ -228,7 +228,7 @@ export const eat = (
   }
   if (markToProcess === 'inlineCode') {
     if (nonMatchingSiblingIndex) {
-      throw new Error(`Marks inside inline code are not supported`)
+      throw new Error('Marks inside inline code are not supported')
     }
     const node = {
       type: markToProcess,
@@ -258,6 +258,7 @@ export const eat = (
     ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
   ]
 }
+
 const cleanNode = (
   node: InlineElementWithCallback,
   mark: 'strong' | 'emphasis' | 'inlineCode' | 'delete' | null
@@ -270,7 +271,7 @@ const cleanNode = (
     strong: 'bold',
     emphasis: 'italic',
     inlineCode: 'code',
-    delete: 's',
+    delete: 'strikethrough',
   }[mark]
   Object.entries(node).map(([key, value]) => {
     if (key !== markToClear) {
