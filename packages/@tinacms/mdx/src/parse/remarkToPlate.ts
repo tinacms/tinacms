@@ -430,23 +430,14 @@ export const remarkToSlate = (
         break
       }
       case 'delete': {
-        console.log('phrashingMark delete called')
         const children = flatten(
           node.children.map((child) =>
             phrashingMark(child, [...marks, 'strikethrough'])
           )
         )
-
-        // Ensure children are processed correctly
-        if (children.length) {
-          children.forEach((child) => {
-            accum.push({
-              ...child,
-              strikethrough: true, // Add the strikethrough property
-            })
-          })
-        }
-        console.log('delete children, ', JSON.stringify(children))
+        children.forEach((child) => {
+          accum.push(child)
+        })
         break
       }
 
