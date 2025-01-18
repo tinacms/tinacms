@@ -34,7 +34,10 @@ export const extractAttributes = (
         field,
         imageCallback,
         context,
-        (name: string, value: unknown) => (properties[name] = value)
+        ((name: string, value: unknown) => (properties[name] = value)) as (
+          name: string,
+          value: unknown
+        ) => void | undefined
       )
     } catch (e) {
       if (e instanceof Error) {
