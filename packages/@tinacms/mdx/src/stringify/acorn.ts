@@ -106,7 +106,7 @@ export function stringifyProps(
   for (const [embedKey, value] of Object.entries(element.props)) {
     if (embedKey.startsWith('_tinaEmbeds')) {
       const key = embedKey.replace('_tinaEmbeds.', '')
-      embedCodes[key] = value
+      embedCodes[key] = value as string
     }
   }
 
