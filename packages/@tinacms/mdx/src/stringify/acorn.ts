@@ -102,7 +102,7 @@ export function stringifyProps(
   }
 
   // gather embed codes
-  const embedCodes: Record<string, unknown> = {}
+  const embedCodes: Record<string, string> = {}
   for (const [embedKey, value] of Object.entries(element.props)) {
     if (embedKey.startsWith('_tinaEmbeds')) {
       const key = embedKey.replace('_tinaEmbeds.', '')
