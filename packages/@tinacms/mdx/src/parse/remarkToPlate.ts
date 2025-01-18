@@ -14,33 +14,6 @@ import type { ContainerDirective } from 'mdast-util-directive'
 
 export type { Position, PositionItem } from './plate'
 
-interface TextNode extends Md.Literal {
-  type: 'text'
-}
-
-function formatTextNodeWithWhitespace(node: TextNode): string {
-  const { value, position } = node
-  const { start, end } = position as Plate.Position
-
-  // Safely handle the case where start.column or end.column might be null or undefined
-  const startColumn = start.column ?? 1 // Default to 1 if undefined or null
-  const endColumn = end.column ?? startColumn + value.length // Default to startColumn + value length if undefined or null
-
-  // Calculate the number of whitespaces needed before and after the text
-  const leadingWhitespaceCount = Math.max(startColumn - 1, 0) // Ensure non-negative
-  const trailingWhitespaceCount = Math.max(
-    endColumn - startColumn - value.length,
-    0
-  ) // Ensure non-negative
-
-  // Create leading and trailing whitespace strings
-  const leadingWhitespace = ' '.repeat(leadingWhitespaceCount)
-  const trailingWhitespace = ' '.repeat(trailingWhitespaceCount)
-
-  // Concatenate the whitespaces and the value to form the final string
-  return `${leadingWhitespace}${value}${trailingWhitespace}`
-}
-
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
     mdxJsxTextElement: MdxJsxTextElement
@@ -516,7 +489,7 @@ export const remarkToSlate = (
   const text = (content: Md.Text): Plate.TextElement => {
     return {
       type: 'text',
-      text: formatTextNodeWithWhitespace(content),
+      text: content.value,
     }
   }
   const blockquote = (content: Md.Blockquote): Plate.BlockquoteElement => {
