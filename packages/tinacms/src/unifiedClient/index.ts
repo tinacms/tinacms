@@ -1,3 +1,4 @@
+import AsyncLock from 'async-lock'
 import type { GraphQLError } from 'graphql'
 import type { Config } from '@tinacms/schema-tools'
 import type { Cache } from '../cache/index'
@@ -22,12 +23,14 @@ export type TinaClientURLParts = {
   branch: string
   isLocalClient: boolean
 }
+
 export class TinaClient<GenQueries> {
   public apiUrl: string
   public readonlyToken?: string
   public queries: GenQueries
   public errorPolicy: Config['client']['errorPolicy']
-  initialized: boolean = false
+  initialized = false
+  cacheLock: AsyncLock | undefined
   cacheDir: string
   cache: Cache
 
@@ -57,6 +60,7 @@ export class TinaClient<GenQueries> {
       ) {
         const { NodeCache } = await import('../cache/node-cache')
         this.cache = await NodeCache(this.cacheDir)
+        this.cacheLock = new AsyncLock()
       }
     } catch (e) {
       console.error(e)
@@ -99,23 +103,29 @@ export class TinaClient<GenQueries> {
     }
 
     let key = ''
+    let result: { data: DataType; errors: GraphQLError[] | null; query: string }
     if (this.cache) {
       key = this.cache.makeKey(bodyString)
-      const value = await this.cache.get(key)
-      if (value) {
-        return value
-      }
-    }
+      await this.cacheLock.acquire(key, async () => {
+        result = await this.cache.get(key)
+        if (!result) {
+          result = await requestFromServer<DataType>(
+            url,
+            args.query,
+            optionsObject,
+            errorPolicyDefined
+          )
 
-    const result = await requestFromServer<DataType>(
-      url,
-      args.query,
-      optionsObject,
-      errorPolicyDefined
-    )
-
-    if (this.cache) {
-      await this.cache.set(key, result)
+          await this.cache.set(key, result)
+        }
+      })
+    } else {
+      result = await requestFromServer<DataType>(
+        url,
+        args.query,
+        optionsObject,
+        errorPolicyDefined
+      )
     }
 
     return result
