@@ -49,12 +49,14 @@ export const NodeCache = async (dir: string): Promise<Cache> => {
       let readValue: object | undefined
 
       await lock.acquire(key, async () => {
+        const cacheFilename = `${cacheDir}/${key}`
         try {
-          const data = await fs.promises.readFile(`${cacheDir}/${key}`, 'utf-8')
+          const data = await fs.promises.readFile(cacheFilename, 'utf-8')
           readValue = JSON.parse(data)
         } catch (e) {
           if (e.code !== 'ENOENT') {
-            throw e
+            // Try to continue the build regardless
+            console.error(`Failed to read cache file for ${key}: ${e.message}`)
           }
         }
       })
@@ -70,18 +72,19 @@ export const NodeCache = async (dir: string): Promise<Cache> => {
     set: async (key: string, value: any) => {
       console.log(`Cache storage for ${key}`)
       await lock.acquire(key, async () => {
+        const cacheFilename = `${cacheDir}/${key}`
         try {
-          await fs.promises.writeFile(
-            `${cacheDir}/${key}`,
-            JSON.stringify(value),
-            {
-              encoding: 'utf-8',
-              flag: 'wx', // Don't overwrite existing caches
-            }
-          )
+          await fs.promises.writeFile(cacheFilename, JSON.stringify(value), {
+            encoding: 'utf-8',
+            flag: 'wx', // Don't overwrite existing caches
+          })
           console.log(`  File written for ${key}`)
         } catch (e) {
-          console.error(`Failed to write cache file for ${key}: ${e.message}`)
+          if (e.code !== 'EEXIST') {
+            console.error(
+              `Failed to write cache file for ${cacheFilename}: ${e.message}`
+            )
+          }
         }
       })
     },
