@@ -51,7 +51,9 @@ export const NodeCache = async (dir: string): Promise<Cache> => {
         readValue = JSON.parse(data)
       } catch (e) {
         if (e.code !== 'ENOENT') {
-          console.error(`Failed to read cache file for ${key}: ${e.message}`)
+          console.error(
+            `Failed to read cache file to ${cacheFilename}: ${e.message}`
+          )
         }
       }
 
@@ -67,7 +69,7 @@ export const NodeCache = async (dir: string): Promise<Cache> => {
       } catch (e) {
         if (e.code !== 'EEXIST') {
           console.error(
-            `Failed to write cache file for ${cacheFilename}: ${e.message}`
+            `Failed to write cache file to ${cacheFilename}: ${e.message}`
           )
         }
       }
