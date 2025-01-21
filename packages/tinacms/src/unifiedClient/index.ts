@@ -107,32 +107,12 @@ export class TinaClient<GenQueries> {
       }
     }
 
-    const res = await fetch(url, optionsObject)
-    if (!res.ok) {
-      let additionalInfo = ''
-      if (res.status === 401) {
-        additionalInfo =
-          'Please check that your client ID, URL and read only token are configured properly.'
-      }
-
-      throw new Error(
-        `Server responded with status code ${res.status}, ${res.statusText}. ${
-          additionalInfo ? additionalInfo : ''
-        } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
-      )
-    }
-    const json = await res.json()
-    if (json.errors && errorPolicyDefined === 'throw') {
-      throw new Error(
-        `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
-        Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
-      )
-    }
-    const result = {
-      data: json?.data as DataType,
-      errors: (json?.errors || null) as GraphQLError[] | null,
-      query: args.query,
-    }
+    const result = await requestFromServer<DataType>(
+      url,
+      args.query,
+      optionsObject,
+      errorPolicyDefined
+    )
 
     if (this.cache) {
       await this.cache.set(key, result)
@@ -140,6 +120,41 @@ export class TinaClient<GenQueries> {
 
     return result
   }
+}
+
+async function requestFromServer<DataType extends Record<string, any> = any>(
+  url: string,
+  query: string,
+  optionsObject: RequestInit,
+  errorPolicyDefined: 'throw' | 'include'
+) {
+  const res = await fetch(url, optionsObject)
+  if (!res.ok) {
+    let additionalInfo = ''
+    if (res.status === 401) {
+      additionalInfo =
+        'Please check that your client ID, URL and read only token are configured properly.'
+    }
+
+    throw new Error(
+      `Server responded with status code ${res.status}, ${res.statusText}. ${
+        additionalInfo ? additionalInfo : ''
+      } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
+    )
+  }
+  const json = await res.json()
+  if (json.errors && errorPolicyDefined === 'throw') {
+    throw new Error(
+      `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
+      Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
+    )
+  }
+  const result = {
+    data: json?.data as DataType,
+    errors: (json?.errors || null) as GraphQLError[] | null,
+    query,
+  }
+  return result
 }
 
 export function createClient<GenQueries>(args: TinaClientArgs<GenQueries>) {
