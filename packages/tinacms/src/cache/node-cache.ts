@@ -1,7 +1,4 @@
-import AsyncLock from 'async-lock'
 import type { Cache } from './index'
-
-const lock = new AsyncLock()
 
 // Create the cache directory if it doesn't exist.
 // Returns the path of the cache directory.
@@ -48,45 +45,32 @@ export const NodeCache = async (dir: string): Promise<Cache> => {
     get: async (key: string) => {
       let readValue: object | undefined
 
-      await lock.acquire(key, async () => {
-        const cacheFilename = `${cacheDir}/${key}`
-        try {
-          const data = await fs.promises.readFile(cacheFilename, 'utf-8')
-          readValue = JSON.parse(data)
-        } catch (e) {
-          if (e.code !== 'ENOENT') {
-            // Try to continue the build regardless
-            console.error(`Failed to read cache file for ${key}: ${e.message}`)
-          }
+      const cacheFilename = `${cacheDir}/${key}`
+      try {
+        const data = await fs.promises.readFile(cacheFilename, 'utf-8')
+        readValue = JSON.parse(data)
+      } catch (e) {
+        if (e.code !== 'ENOENT') {
+          console.error(`Failed to read cache file for ${key}: ${e.message}`)
         }
-      })
-
-      if (readValue) {
-        console.log(`Cache hit for ${key}`)
-      } else {
-        console.log(`Cache miss for ${key}`)
       }
 
       return readValue
     },
     set: async (key: string, value: any) => {
-      console.log(`Cache storage for ${key}`)
-      await lock.acquire(key, async () => {
-        const cacheFilename = `${cacheDir}/${key}`
-        try {
-          await fs.promises.writeFile(cacheFilename, JSON.stringify(value), {
-            encoding: 'utf-8',
-            flag: 'wx', // Don't overwrite existing caches
-          })
-          console.log(`  File written for ${key}`)
-        } catch (e) {
-          if (e.code !== 'EEXIST') {
-            console.error(
-              `Failed to write cache file for ${cacheFilename}: ${e.message}`
-            )
-          }
+      const cacheFilename = `${cacheDir}/${key}`
+      try {
+        await fs.promises.writeFile(cacheFilename, JSON.stringify(value), {
+          encoding: 'utf-8',
+          flag: 'wx', // Don't overwrite existing caches
+        })
+      } catch (e) {
+        if (e.code !== 'EEXIST') {
+          console.error(
+            `Failed to write cache file for ${cacheFilename}: ${e.message}`
+          )
         }
-      })
+      }
     },
   }
 }

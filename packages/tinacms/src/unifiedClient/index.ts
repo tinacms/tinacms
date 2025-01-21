@@ -115,7 +115,6 @@ export class TinaClient<GenQueries> {
             optionsObject,
             errorPolicyDefined
           )
-
           await this.cache.set(key, result)
         }
       })
