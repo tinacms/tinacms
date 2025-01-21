@@ -1,5 +1,15 @@
 # create-tina-app
 
+## 1.3.0
+
+### Minor Changes
+
+- [#5433](https://github.com/tinacms/tinacms/pull/5433) [`ba036d7`](https://github.com/tinacms/tinacms/commit/ba036d71bacbcb98f3c7c63eaa4db26f754d8642) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Add Tina Astro Starter template to create-tina-app
+
+### Patch Changes
+
+- [#5411](https://github.com/tinacms/tinacms/pull/5411) [`fe34947`](https://github.com/tinacms/tinacms/commit/fe34947bd9ef0c510f4bf5a4933a375c956d7a92) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - refactor: support a range of node versions instead of specific versions.
+
 ## 1.2.5
 
 ### Patch Changes
