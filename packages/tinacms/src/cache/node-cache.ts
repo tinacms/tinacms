@@ -1,4 +1,7 @@
+import AsyncLock from 'async-lock'
 import type { Cache } from './index'
+
+const lock = new AsyncLock()
 
 // Create the cache directory if it doesn't exist.
 // Returns the path of the cache directory.
@@ -43,22 +46,44 @@ export const NodeCache = async (dir: string): Promise<Cache> => {
       return createHash('sha256').update(input).digest('hex')
     },
     get: async (key: string) => {
-      try {
-        const data = await fs.promises.readFile(`${cacheDir}/${key}`, 'utf-8')
-        return JSON.parse(data)
-      } catch (e) {
-        if (e.code === 'ENOENT') {
-          return undefined
+      let readValue: object | undefined
+
+      await lock.acquire(key, async () => {
+        try {
+          const data = await fs.promises.readFile(`${cacheDir}/${key}`, 'utf-8')
+          readValue = JSON.parse(data)
+        } catch (e) {
+          if (e.code !== 'ENOENT') {
+            throw e
+          }
         }
-        throw e
+      })
+
+      if (readValue) {
+        console.log(`Cache hit for ${key}`)
+      } else {
+        console.log(`Cache miss for ${key}`)
       }
+
+      return readValue
     },
     set: async (key: string, value: any) => {
-      await fs.promises.writeFile(
-        `${cacheDir}/${key}`,
-        JSON.stringify(value),
-        'utf-8'
-      )
+      console.log(`Cache storage for ${key}`)
+      await lock.acquire(key, async () => {
+        try {
+          await fs.promises.writeFile(
+            `${cacheDir}/${key}`,
+            JSON.stringify(value),
+            {
+              encoding: 'utf-8',
+              flag: 'wx', // Don't overwrite existing caches
+            }
+          )
+          console.log(`  File written for ${key}`)
+        } catch (e) {
+          console.error(`Failed to write cache file for ${key}: ${e.message}`)
+        }
+      })
     },
   }
 }
