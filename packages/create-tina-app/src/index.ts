@@ -120,7 +120,7 @@ export async function run() {
           path.basename(path.resolve(name))
         )
         if (validForNewPackages) return true
-        return 'Invalid project name: ' + errors[0]
+        return `Invalid project name: ${errors[0]}`
       },
     })
     if (!Object.hasOwn(res, 'name')) exit(1) // User most likely sent SIGINT.
