@@ -101,6 +101,7 @@
 		"@udecode/plate-resizable": "36.0.0",
 		"@udecode/plate-slash-command": "^36.0.0",
 		"@udecode/plate-table": "36.5.8",
+		"async-lock": "^1.4.1",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.0.4",
