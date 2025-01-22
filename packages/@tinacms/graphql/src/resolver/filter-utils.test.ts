@@ -1,6 +1,7 @@
 import { collectConditionsForField, resolveReferences } from './filter-utils'
 import { ReferenceType, TinaField } from '@tinacms/schema-tools'
 import { FilterCondition } from '../database/datalayer'
+import { describe, it, expect, vi } from 'vitest'
 
 describe('resolveReferences', () => {
   it('resolves reference to single item', async () => {
@@ -115,7 +116,7 @@ describe('resolveReferences', () => {
       },
     ]
 
-    const mockResolver = jest.fn()
+    const mockResolver = vi.fn()
     await expect(
       resolveReferences(filter, fields, mockResolver)
     ).rejects.toThrowError('Unable to find field silly')
@@ -330,7 +331,7 @@ describe('resolveReferences', () => {
       },
     ]
 
-    const resolver = jest.fn()
+    const resolver = vi.fn()
     await expect(
       resolveReferences(filter, fields, resolver)
     ).rejects.toThrowErrorMatchingInlineSnapshot(
