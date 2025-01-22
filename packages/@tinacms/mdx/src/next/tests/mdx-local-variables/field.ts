@@ -9,6 +9,10 @@ export const field: RichTextField = {
       name: 'Quote',
       fields: [
         {
+          name: 'quote',
+          type: 'string',
+        },
+        {
           name: 'description',
           type: 'rich-text',
         },

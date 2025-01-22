@@ -8,4 +8,7 @@ _tinaEmbeds:
     ```
   def: |
     # Hello, world!
+  qpd: |
+    Simply
+    Easy
 ---
