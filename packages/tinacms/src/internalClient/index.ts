@@ -302,8 +302,39 @@ mutation addPendingDocumentMutation(
           .map((error) => error.message)
           .join('\n')}`
       )
-      return json
     }
+
+    // Try create PR
+    // Remove URI encoding
+    const branch = this.branch.replace('%2F', '/')
+    const url = `${this.contentApiBase}/github/${this.clientId}/create_pull_request`
+    const create_pr_res = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        baseBranch: branch,
+        branch: branch.replace('tina/', ''),
+        title: `${branch
+          .replace('tina/', '')
+          .replace('-', ' ')} (PR from TinaCMS)`,
+      }),
+      headers,
+    })
+
+    const body = await create_pr_res.json()
+    if (!create_pr_res.ok) {
+      if (
+        create_pr_res.status === 422 &&
+        body.message.includes('A pull request already exists for')
+      ) {
+        // PR already exists, ignore.
+      } else {
+        console.error(`[ERROR] Failed to create PR: ${body}`)
+      }
+    } else {
+      console.log('PR created', body)
+      localStorage.setItem('tina.createBranchState', 'done')
+    }
+
     return json.data as ReturnType
   }
 

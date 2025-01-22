@@ -133,17 +133,26 @@ export const IndexingPage: FC = () => {
         }
       }
       if (state === 'creatingPR') {
-        const foo = await tinaApi.createPullRequest({
-          baseBranch,
-          branch: branch,
-          title: `${branch
-            .replace('tina/', '')
-            .replace('-', ' ')} (PR from TinaCMS)`,
-        })
-        console.log('PR created', foo)
-        cms.alerts.success('Pull request created.')
-        localStorage.setItem('tina.createBranchState', 'done')
-        setState('done')
+        try {
+          const foo = await tinaApi.createPullRequest({
+            baseBranch,
+            branch: branch,
+            title: `${branch
+              .replace('tina/', '')
+              .replace('-', ' ')} (PR from TinaCMS)`,
+          })
+          console.log('PR created', foo)
+          cms.alerts.success('Pull request created.')
+          localStorage.setItem('tina.createBranchState', 'done')
+          setState('done')
+        } catch (e) {
+          console.error(e)
+          cms.alerts.error('Failed to create PR')
+          setErrorMessage(
+            'Failed to create PR, please try again. If the problem persists please contact support.'
+          )
+          setState('error')
+        }
       }
       if (state === 'done') {
         window.location.href = back
