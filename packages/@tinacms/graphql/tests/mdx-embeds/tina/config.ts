@@ -16,6 +16,10 @@ export const schema: Schema = {
               name: 'Quote',
               fields: [
                 {
+                  name: 'quote',
+                  type: 'string',
+                },
+                {
                   name: 'description',
                   type: 'rich-text',
                 },

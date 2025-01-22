@@ -17,6 +17,8 @@
                 }
               ],
               "props": {
+                "_tinaEmbeds.quote": "qpd",
+                "quote": "Simply\nEasy\n",
                 "description": {
                   "type": "root",
                   "children": [
@@ -88,6 +90,7 @@
                 }
               ],
               "props": {
+                "quote": "Happy Milton",
                 "description": {
                   "type": "root",
                   "children": [
