@@ -305,8 +305,7 @@ mutation addPendingDocumentMutation(
     }
 
     // Try create PR
-    // Remove URI encoding
-    const branch = this.branch.replaceAll('%2F', '/')
+    const branch = decodeURIComponent(this.branch)
     const url = `${this.contentApiBase}/github/${this.clientId}/create_pull_request`
     const create_pr_res = await fetch(url, {
       method: 'POST',
