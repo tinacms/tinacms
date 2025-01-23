@@ -8,6 +8,7 @@ export default defineConfig({
   reporter: [
     ["list", { printSteps: true }],
     ["json", { outputFile: "playwright-test-results.json" }],
+    ["html", { outputFolder: "playwright-report" }],
   ],
   testDir: "./tests",
   /* Run tests in files in parallel */
@@ -22,6 +23,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     trace: "on-first-retry",
+    screenshot: "only-on-failure",
   },
 
   /* Configure projects for major browsers */

@@ -41,3 +41,9 @@ jobs:
           job-summary: true
           report-file: playwright/tina-playwright/playwright-test-results.json
           comment-title: 'Playwright E2E Test Results'
+      - name: Upload Playwright Test Results
+        if: failure() # Only upload if tests fail
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-test-results
+          path: playwright-report/
