@@ -1,5 +1,15 @@
 # tinacms-cli
 
+## 1.8.1
+
+### Patch Changes
+
+- [#5442](https://github.com/tinacms/tinacms/pull/5442) [`fd83453`](https://github.com/tinacms/tinacms/commit/fd834536f24fc44de24b40f8f06879c519192c7e) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - 🐛 Bug - Prevents lookup file disappearing during initial indexing
+
+- Updated dependencies [[`61c45f4`](https://github.com/tinacms/tinacms/commit/61c45f49a2abe82336b661dedbbe2a15d0f3da05)]:
+  - tinacms@2.6.1
+  - @tinacms/app@2.1.16
+
 ## 1.8.0
 
 ### Minor Changes
