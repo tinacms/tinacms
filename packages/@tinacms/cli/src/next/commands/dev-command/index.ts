@@ -1,3 +1,4 @@
+import AsyncLock from 'async-lock'
 import { Command, Option } from 'clipanion'
 import fs from 'fs-extra'
 import path from 'path'
@@ -350,28 +351,27 @@ export class DevCommand extends BaseCommand {
         }
       })
   }
+
   watchQueries(configManager: ConfigManager, callback: () => Promise<string>) {
-    let ready = false
+    // Locking prevents multiple near-simultaneous file changes from clobbering each other.
+    const callbackLock = new AsyncLock()
+    const executeCallback = async (_: unknown) => {
+      await callbackLock.acquire('C', async () => {
+        await callback()
+      })
+    }
+
     /**
      * This has no way of knowing whether the change to the file came from someone manually
      * editing in their IDE or Tina pushing the update via the Filesystem bridge. It's a simple
      * enough update that it's fine that when Tina pushes a change, we go and push that same
-     * thing back through the database, and Tina Cloud does the same thing when it receives
+     * thing back through the database, and TinaCloud does the same thing when it receives
      * a push from GitHub.
      */
     chokidar
       .watch(configManager.userQueriesAndFragmentsGlob)
-      .on('ready', () => {
-        ready = true
-      })
-      .on('add', async (addedFile) => {
-        await callback()
-      })
-      .on('change', async (changedFile) => {
-        await callback()
-      })
-      .on('unlink', async (removedFile) => {
-        await callback()
-      })
+      .on('add', executeCallback)
+      .on('change', executeCallback)
+      .on('unlink', executeCallback)
   }
 }
