@@ -43,7 +43,7 @@ jobs:
           comment-title: 'Playwright E2E Test Results'
       - name: Upload Playwright Test Results
         if: failure() # Only upload if tests fail
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-test-results
-          path: playwright/tina-playwright/test-results/
+          path: test-results/
