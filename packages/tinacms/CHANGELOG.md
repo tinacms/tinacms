@@ -1,5 +1,11 @@
 # tinacms
 
+## 2.6.1
+
+### Patch Changes
+
+- [#5436](https://github.com/tinacms/tinacms/pull/5436) [`61c45f4`](https://github.com/tinacms/tinacms/commit/61c45f49a2abe82336b661dedbbe2a15d0f3da05) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - 🐛 Bug - Fixes race condition in the request cache
+
 ## 2.6.0
 
 ### Minor Changes
