@@ -1,3 +1,4 @@
+import AsyncLock from 'async-lock'
 import type { GraphQLError } from 'graphql'
 import type { Config } from '@tinacms/schema-tools'
 import type { Cache } from '../cache/index'
@@ -22,12 +23,14 @@ export type TinaClientURLParts = {
   branch: string
   isLocalClient: boolean
 }
+
 export class TinaClient<GenQueries> {
   public apiUrl: string
   public readonlyToken?: string
   public queries: GenQueries
   public errorPolicy: Config['client']['errorPolicy']
-  initialized: boolean = false
+  initialized = false
+  cacheLock: AsyncLock | undefined
   cacheDir: string
   cache: Cache
 
@@ -57,6 +60,7 @@ export class TinaClient<GenQueries> {
       ) {
         const { NodeCache } = await import('../cache/node-cache')
         this.cache = await NodeCache(this.cacheDir)
+        this.cacheLock = new AsyncLock()
       }
     } catch (e) {
       console.error(e)
@@ -99,47 +103,67 @@ export class TinaClient<GenQueries> {
     }
 
     let key = ''
+    let result: { data: DataType; errors: GraphQLError[] | null; query: string }
     if (this.cache) {
       key = this.cache.makeKey(bodyString)
-      const value = await this.cache.get(key)
-      if (value) {
-        return value
-      }
-    }
-
-    const res = await fetch(url, optionsObject)
-    if (!res.ok) {
-      let additionalInfo = ''
-      if (res.status === 401) {
-        additionalInfo =
-          'Please check that your client ID, URL and read only token are configured properly.'
-      }
-
-      throw new Error(
-        `Server responded with status code ${res.status}, ${res.statusText}. ${
-          additionalInfo ? additionalInfo : ''
-        } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
+      await this.cacheLock.acquire(key, async () => {
+        result = await this.cache.get(key)
+        if (!result) {
+          result = await requestFromServer<DataType>(
+            url,
+            args.query,
+            optionsObject,
+            errorPolicyDefined
+          )
+          await this.cache.set(key, result)
+        }
+      })
+    } else {
+      result = await requestFromServer<DataType>(
+        url,
+        args.query,
+        optionsObject,
+        errorPolicyDefined
       )
-    }
-    const json = await res.json()
-    if (json.errors && errorPolicyDefined === 'throw') {
-      throw new Error(
-        `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
-        Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
-      )
-    }
-    const result = {
-      data: json?.data as DataType,
-      errors: (json?.errors || null) as GraphQLError[] | null,
-      query: args.query,
-    }
-
-    if (this.cache) {
-      await this.cache.set(key, result)
     }
 
     return result
   }
+}
+
+async function requestFromServer<DataType extends Record<string, any> = any>(
+  url: string,
+  query: string,
+  optionsObject: RequestInit,
+  errorPolicyDefined: 'throw' | 'include'
+) {
+  const res = await fetch(url, optionsObject)
+  if (!res.ok) {
+    let additionalInfo = ''
+    if (res.status === 401) {
+      additionalInfo =
+        'Please check that your client ID, URL and read only token are configured properly.'
+    }
+
+    throw new Error(
+      `Server responded with status code ${res.status}, ${res.statusText}. ${
+        additionalInfo ? additionalInfo : ''
+      } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
+    )
+  }
+  const json = await res.json()
+  if (json.errors && errorPolicyDefined === 'throw') {
+    throw new Error(
+      `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
+      Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
+    )
+  }
+  const result = {
+    data: json?.data as DataType,
+    errors: (json?.errors || null) as GraphQLError[] | null,
+    query,
+  }
+  return result
 }
 
 export function createClient<GenQueries>(args: TinaClientArgs<GenQueries>) {
