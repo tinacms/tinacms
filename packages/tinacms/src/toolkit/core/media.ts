@@ -3,7 +3,18 @@ import { DummyMediaStore } from './media-store.default'
 
 const encodeUrlIfNeeded = (url: string) => {
   if (url) {
-    return url.split('/').map(encodeURIComponent).join('/')
+    try {
+      const parsed = new URL(url)
+      parsed.pathname = parsed.pathname
+        .split('/')
+        .filter((part) => part !== '')
+        .map(encodeURIComponent)
+        .join('/')
+      return parsed.toString()
+    } catch (e) {
+      console.error('Failed to parse URL:', e)
+      return url
+    }
   } else {
     return url
   }
@@ -210,6 +221,11 @@ export class MediaManager implements MediaStore {
       media.items = media.items.map((item) => {
         if (item.type === 'dir') {
           return item
+        }
+        if (item.thumbnails) {
+          for (const [size, src] of Object.entries(item.thumbnails)) {
+            item.thumbnails[size] = encodeUrlIfNeeded(src)
+          }
         }
         return {
           ...item,
