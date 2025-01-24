@@ -1,6 +1,14 @@
 import { EventBus } from './event'
 import { DummyMediaStore } from './media-store.default'
 
+const encodeUrlIfNeeded = (url: string) => {
+  if (url) {
+    return url.split('/').map(encodeURIComponent).join('/')
+  } else {
+    return url
+  }
+}
+
 /**
  * Represents an individual file in the MediaStore
  */
@@ -199,6 +207,16 @@ export class MediaManager implements MediaStore {
     try {
       this.events.dispatch({ type: 'media:list:start', ...options })
       const media = await this.store.list(options)
+      media.items = media.items.map((item) => {
+        if (item.type === 'dir') {
+          return item
+        }
+        return {
+          ...item,
+          src: encodeUrlIfNeeded(item.src),
+        }
+      })
+
       this.events.dispatch({ type: 'media:list:success', ...options, media })
       return media
     } catch (error) {
