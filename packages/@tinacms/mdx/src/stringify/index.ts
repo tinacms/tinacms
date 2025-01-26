@@ -133,6 +133,8 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
     }
     return text(node, parent, context, safeOptions)
   }
+  handlers['break'] = () => '\n'
+
   return toMarkdown(tree, {
     extensions: [
       directiveToMarkdown(patterns),
