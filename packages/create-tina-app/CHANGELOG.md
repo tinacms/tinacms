@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 1.3.1
+
+### Patch Changes
+
+- [#5457](https://github.com/tinacms/tinacms/pull/5457) [`4b04107`](https://github.com/tinacms/tinacms/commit/4b04107f9799748f93205a743c393ed22fc5f424) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update template title for Astro Starter
+
 ## 1.3.0
 
 ### Minor Changes
