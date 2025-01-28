@@ -62,7 +62,7 @@ const EmbedButton: React.FC<EmbedButtonProps> = ({ editor, templates }) => {
             key={template.name}
             onMouseDown={(e) => {
               e.preventDefault()
-              close()
+              setOpen(false)
               insertMDX(editor, template)
             }}
             className={''}
