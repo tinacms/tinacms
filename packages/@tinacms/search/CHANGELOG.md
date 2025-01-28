@@ -1,5 +1,12 @@
 # @tinacms/search
 
+## 1.0.38
+
+### Patch Changes
+
+- Updated dependencies [[`47cfaf6`](https://github.com/tinacms/tinacms/commit/47cfaf63cee139309458fccc49670e3b5cbf430c)]:
+  - @tinacms/graphql@1.5.11
+
 ## 1.0.37
 
 ### Patch Changes
