@@ -129,6 +129,23 @@ const { GET } = handlers
 export { GET }
 ```
 
+The above route will handle all requests to `/api/media/xxxx/yyyy.zzz`. To map it to `/media/xxxx/yyyy.zzz` we need to add a rewrite to the project's `next.config.mjs` file like so:
+
+```mjs
+const nextConfig = {
+  // other config here
+  async rewrites() {
+    return [
+      {
+        source: '/media/:path*',
+        destination: '/api/media/:path*',
+      },
+      // more rewrites here
+    ]
+  },
+}
+```
+
 Note that the provided handler has built in support for image resizing and optimization according to the Next.js `next/image` loader directives, using the [Sharp](https://www.npmjs.com/package/sharp) package.
 
 ## Update Schema
