@@ -4,6 +4,7 @@
 
 import path from 'path'
 import fs from 'fs-extra'
+import { expect, vi } from 'vitest'
 import { toMatchFile } from 'jest-file-snapshot'
 import { buildASTSchema, printSchema } from 'graphql'
 
@@ -27,7 +28,7 @@ class MockFilesystemBridge extends FilesystemBridge {
 }
 
 // FIXME: CI for macos runs very slow
-jest.setTimeout(10000)
+vi.setConfig({ testTimeout: 10000 })
 
 export const setup = async (
   rootPath: string,

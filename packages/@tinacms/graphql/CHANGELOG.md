@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.5.11
+
+### Patch Changes
+
+- [#5439](https://github.com/tinacms/tinacms/pull/5439) [`47cfaf6`](https://github.com/tinacms/tinacms/commit/47cfaf63cee139309458fccc49670e3b5cbf430c) Thanks [@kldavis4](https://github.com/kldavis4)! - Test improvements for @tinacms/graphql including switching to vitest and additional tests
+
 ## 1.5.10
 
 ### Patch Changes

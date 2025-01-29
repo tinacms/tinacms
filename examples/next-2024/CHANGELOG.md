@@ -1,5 +1,12 @@
 # next-2024
 
+## 0.1.18
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@2.6.2
+
 ## 0.1.17
 
 ### Patch Changes
