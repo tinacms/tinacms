@@ -1,3 +1,3 @@
-<Cta description={_tinaEmbeds.wbbntf}>
+<Cta description="_tinaEmbeds.wbbntf">
   Click **here**!
 </Cta>
