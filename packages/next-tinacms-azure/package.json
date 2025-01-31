@@ -15,6 +15,10 @@
 			{
 				"name": "src/handlers.ts",
 				"target": "node"
+			},
+			{
+                "name": "src/delivery-handlers.ts",
+                "target": "node"
 			}
 		]
 	},

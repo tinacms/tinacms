@@ -1,5 +1,5 @@
 ---
-'next-tinacms-azure': major
+'next-tinacms-azure': minor
 ---
 
 Create package
