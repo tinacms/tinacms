@@ -8,6 +8,7 @@ import {
   resolveMediaRelativeToCloud,
   resolveMediaCloudToRelative,
 } from './media-utils'
+import { describe, it, expect } from 'vitest'
 
 describe('resolveMedia', () => {
   const schema: Schema<true> = {
