@@ -98,6 +98,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
   // https://spec.commonmark.org/0.17/#example-49
 
   // This function removes trailing empty strings following breaks
+  // to ensure that the markdown is formatted correctly
   visit(tree, 'paragraph', (node: ParagraphNode) => {
     const len = node.children.length
     if (len >= 2) {
