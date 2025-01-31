@@ -165,7 +165,6 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
     }
     return text(node, parent, context, safeOptions)
   }
-
   return toMarkdown(tree, {
     extensions: [
       directiveToMarkdown(patterns),
