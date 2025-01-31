@@ -1,5 +1,19 @@
 # next-tinacms-s3
 
+## 9.0.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@2.6.2
+
+## 9.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`61c45f4`](https://github.com/tinacms/tinacms/commit/61c45f49a2abe82336b661dedbbe2a15d0f3da05)]:
+  - tinacms@2.6.1
+
 ## 9.0.0
 
 ### Patch Changes

@@ -123,10 +123,6 @@ export class DevCommand extends BaseCommand {
           }
         }
 
-        if (!this.noWatch) {
-          this.watchQueries(configManager, async () => await codegen.execute())
-        }
-
         await this.indexContentWithSpinner({
           database,
           graphQLSchema,
@@ -136,6 +132,11 @@ export class DevCommand extends BaseCommand {
         if (!firstTime) {
           logger.error('Re-index complete')
         }
+
+        if (!this.noWatch) {
+          this.watchQueries(configManager, async () => await codegen.execute())
+        }
+
         return { apiURL, database, graphQLSchema, tinaSchema }
       } catch (e) {
         logger.error(`\n\n${dangerText(e.message)}\n`)

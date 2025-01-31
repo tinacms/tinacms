@@ -13,12 +13,12 @@ describe('TinaSchema', () => {
       const collection1 = schema.getCollectionByFullPath(
         'content/test/foobar.mdx'
       )
-      expect(collection1.name).toEqual('test')
+      expect(collection1?.name).toEqual('test')
 
       const collection2 = schema.getCollectionByFullPath(
         'content/test2/foobar.mdx'
       )
-      expect(collection2.name).toEqual('test2')
+      expect(collection2?.name).toEqual('test2')
     })
   })
 })

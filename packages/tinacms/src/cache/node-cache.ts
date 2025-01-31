@@ -43,22 +43,36 @@ export const NodeCache = async (dir: string): Promise<Cache> => {
       return createHash('sha256').update(input).digest('hex')
     },
     get: async (key: string) => {
+      let readValue: object | undefined
+
+      const cacheFilename = `${cacheDir}/${key}`
       try {
-        const data = await fs.promises.readFile(`${cacheDir}/${key}`, 'utf-8')
-        return JSON.parse(data)
+        const data = await fs.promises.readFile(cacheFilename, 'utf-8')
+        readValue = JSON.parse(data)
       } catch (e) {
-        if (e.code === 'ENOENT') {
-          return undefined
+        if (e.code !== 'ENOENT') {
+          console.error(
+            `Failed to read cache file to ${cacheFilename}: ${e.message}`
+          )
         }
-        throw e
       }
+
+      return readValue
     },
     set: async (key: string, value: any) => {
-      await fs.promises.writeFile(
-        `${cacheDir}/${key}`,
-        JSON.stringify(value),
-        'utf-8'
-      )
+      const cacheFilename = `${cacheDir}/${key}`
+      try {
+        await fs.promises.writeFile(cacheFilename, JSON.stringify(value), {
+          encoding: 'utf-8',
+          flag: 'wx', // Don't overwrite existing caches
+        })
+      } catch (e) {
+        if (e.code !== 'EEXIST') {
+          console.error(
+            `Failed to write cache file to ${cacheFilename}: ${e.message}`
+          )
+        }
+      }
     },
   }
 }
