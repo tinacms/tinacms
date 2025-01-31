@@ -20,6 +20,8 @@ import { eat } from './marks'
 import { stringifyProps } from './acorn'
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
 import { stringifyShortcode } from './stringifyShortcode'
+import { visit } from 'unist-util-visit'
+import { Node } from 'unist'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -81,7 +83,36 @@ export type Pattern = {
   type: 'block' | 'leaf'
 }
 
+type ParagraphNode = {
+  type: 'paragraph'
+  children: Node[]
+}
+
 export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
+  // In CommonMark (the specification remark follows),
+  // a backslash (\) at the end of a line only creates a
+  // hard break if it is followed by a space or another
+  // character. If the backslash is at the very end of the
+  // input (or the end of a paragraph), it is treated as a
+  // literal backslash.
+  // https://spec.commonmark.org/0.17/#example-49
+
+  // This function removes trailing empty strings following breaks
+  visit(tree, 'paragraph', (node: ParagraphNode) => {
+    const len = node.children.length
+    if (len >= 2) {
+      const lastNode = node.children[len - 1]
+      const secondLastNode = node.children[len - 2]
+      if (
+        lastNode?.type === 'text' &&
+        (lastNode as Md.Text).value === '' &&
+        secondLastNode?.type === 'break'
+      ) {
+        // remove last two nodes
+        node.children.splice(len - 2, 2)
+      }
+    }
+  })
   const patterns: Pattern[] = []
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
@@ -133,7 +164,6 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
     }
     return text(node, parent, context, safeOptions)
   }
-  handlers['break'] = () => '\n'
 
   return toMarkdown(tree, {
     extensions: [

@@ -12,7 +12,12 @@ describe('stringify', () => {
           {
             type: 'paragraph',
             children: [
-              { type: 'text', value: 'para1' },
+              { type: 'text', value: 'p1' },
+              { type: 'break' },
+              { type: 'break' },
+              { type: 'break' },
+              { type: 'break' },
+              { type: 'text', value: 'p2' },
               { type: 'break' },
               { type: 'text', value: '' },
             ],
@@ -23,7 +28,11 @@ describe('stringify', () => {
       const markdown = toTinaMarkdown(value as Md.Root, {} as RichTextField)
 
       expect(markdown).toMatchInlineSnapshot(`
-        "para1
+        "p1\\\\
+        \\\\
+        \\\\
+        \\\\
+        p2
         "
       `)
     })
