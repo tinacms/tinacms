@@ -16,7 +16,7 @@ import {
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { Media, MediaListOptions } from 'tinacms'
-import path from 'path'
+import path from 'node:path'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export interface S3Config {
