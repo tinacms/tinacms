@@ -36,7 +36,7 @@ export class AzureMediaStore implements MediaStore {
         body: formData,
       })
 
-      if (res.status != 200) {
+      if (res.status !== 200) {
         const responseData = await res.json()
         throw new Error(responseData.message)
       }
@@ -71,10 +71,10 @@ export class AzureMediaStore implements MediaStore {
     const query = this.buildQuery(options)
     const response = await this.fetchFunction(this.baseUrl + query)
 
-    if (response.status == 401) {
+    if (response.status === 401) {
       throw E_UNAUTHORIZED
     }
-    if (response.status == 404) {
+    if (response.status === 404) {
       throw E_BAD_ROUTE
     }
     if (response.status >= 500) {
@@ -84,8 +84,7 @@ export class AzureMediaStore implements MediaStore {
     }
     const { items, offset } = await response.json()
     return {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      items: items.map((item: any) => item),
+      items: items.map((item) => item),
       nextOffset: offset,
     }
   }

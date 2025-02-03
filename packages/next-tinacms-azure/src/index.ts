@@ -1,5 +1,5 @@
-import { TinaCloudUser } from '@tinacms/auth'
-import { NextRequest } from 'next/server'
+import type { TinaCloudUser } from '@tinacms/auth'
+import type { NextRequest } from 'next/server'
 import { headers } from 'next/headers'
 
 export * from './azure-media-store'

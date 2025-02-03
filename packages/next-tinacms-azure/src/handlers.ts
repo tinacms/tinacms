@@ -1,12 +1,12 @@
 import {
-  BlobDeleteOptions,
-  BlobPrefix,
+  type BlobDeleteOptions,
+  type BlobPrefix,
   BlobServiceClient,
 } from '@azure/storage-blob'
-import { AzureBlobStorageConfig } from './types'
+import type { AzureBlobStorageConfig } from './types'
 import type { MediaListOptions } from 'tinacms'
-import path from 'path'
-import { NextRequest, NextResponse } from 'next/server'
+import path from 'node:path'
+import { type NextRequest, NextResponse } from 'next/server'
 
 type RouteParams = { params: { media: string[] } }
 
@@ -17,7 +17,7 @@ export const createMediaHandlers = (config: AzureBlobStorageConfig) => {
       context?: RouteParams
     ) => Promise<NextResponse>
   ) {
-    return async function (request: NextRequest, context?: RouteParams) {
+    return async (request: NextRequest, context?: RouteParams) => {
       const authResult = await config.authorized(request)
       if (!authResult)
         return NextResponse.json(
@@ -36,7 +36,7 @@ export const createMediaHandlers = (config: AzureBlobStorageConfig) => {
       return withAuth((req) => uploadMedia(req, config))(req)
     },
     DELETE(req: NextRequest, context?: RouteParams) {
-      return withAuth((req) => deleteAsset(req, context!, config))(req)
+      return withAuth((req) => deleteAsset(req, context, config))(req)
     },
   }
 }
@@ -100,7 +100,8 @@ async function listMedia(req: NextRequest, config: AzureBlobStorageConfig) {
     const mediaListOptions: MediaListOptions = {
       directory: (req.nextUrl.searchParams.get('directory') as string) || '""',
       limit:
-        parseInt(req.nextUrl.searchParams.get('limit') as string, 10) || 500,
+        Number.parseInt(req.nextUrl.searchParams.get('limit') as string, 10) ||
+        500,
       offset: req.nextUrl.searchParams.get('offset') as string,
       filesOnly: req.nextUrl.searchParams.get('filesOnly') === 'true' || false,
     }
@@ -116,8 +117,8 @@ async function listMedia(req: NextRequest, config: AzureBlobStorageConfig) {
       ? mediaListOptions.directory
       : `${mediaListOptions.directory}/`
 
-    const files = [],
-      folders = []
+    const files = []
+    const folders = []
     for await (const blob of containerClient.listBlobsByHierarchy('/', {
       prefix,
     })) {
@@ -135,11 +136,10 @@ async function listMedia(req: NextRequest, config: AzureBlobStorageConfig) {
       return NextResponse.json({
         items: files.map(mapFile),
       })
-    } else {
-      return NextResponse.json({
-        items: [...folders.map(mapFolder), ...files.map(mapFile)],
-      })
     }
+    return NextResponse.json({
+      items: [...folders.map(mapFolder), ...files.map(mapFile)],
+    })
   } catch (e) {
     return NextResponse.json({ e }, { status: 500 })
   }

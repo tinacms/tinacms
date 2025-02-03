@@ -5,8 +5,8 @@ import {
   BlobSASPermissions,
 } from '@azure/storage-blob'
 import sharp from 'sharp'
-import { AzureBlobStorageConfig } from './types'
-import { NextRequest, NextResponse } from 'next/server'
+import type { AzureBlobStorageConfig } from './types'
+import { type NextRequest, NextResponse } from 'next/server'
 
 const SUPPORTED_IMAGE_TYPES = [
   'image/jpeg',
@@ -18,7 +18,7 @@ const SUPPORTED_IMAGE_TYPES = [
 
 type RouteParams = { params: { path: string[] } }
 
-export const createMediaHandlers = (config: AzureBlobStorageConfig) => {
+export const createMediaDeliveryHandlers = (config: AzureBlobStorageConfig) => {
   return {
     async GET(req: NextRequest, context: RouteParams) {
       try {
@@ -103,13 +103,13 @@ export const createMediaHandlers = (config: AzureBlobStorageConfig) => {
         const format = url.searchParams.get('fmt') || 'auto'
 
         // Input validation
-        if (width && isNaN(Number(width))) {
+        if (width && Number.isNaN(Number(width))) {
           return new NextResponse('Invalid width parameter', { status: 400 })
         }
-        if (height && isNaN(Number(height))) {
+        if (height && Number.isNaN(Number(height))) {
           return new NextResponse('Invalid height parameter', { status: 400 })
         }
-        if (isNaN(quality) || quality < 1 || quality > 100) {
+        if (Number.isNaN(quality) || quality < 1 || quality > 100) {
           return new NextResponse('Invalid quality parameter', { status: 400 })
         }
 
