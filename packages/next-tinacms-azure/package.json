@@ -13,6 +13,10 @@
 		"entryPoints": [
 			"src/index.ts",
 			{
+				"name": "src/auth.ts",
+				"target": "node"
+			},
+			{
 				"name": "src/handlers.ts",
 				"target": "node"
 			},

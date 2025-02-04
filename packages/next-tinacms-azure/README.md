@@ -67,7 +67,7 @@ The `authorized` key will make it so only authorized users within Tina Cloud can
 // route.ts
 
 import { createMediaHandlers } from 'next-tinacms-azure/dist/handlers'
-import { isAuthorized } from 'next-tinacms-azure'
+import { isAuthorized } from 'next-tinacms-azure/dist/auth'
 
 const handlers = createMediaHandlers({
   connectionString: process.env.AZURE_STORAGE_CONNECTION_STRING!,
@@ -80,7 +80,7 @@ const handlers = createMediaHandlers({
 
       const user = await isAuthorized(req)
 
-			return user?.verified || false;
+      return user?.verified || false
     } catch (e) {
       console.error(e)
       return false
@@ -114,7 +114,7 @@ To simplify this process, you can use the `createMediaDeliveryHandlers ` functio
 ```ts
 // route.ts
 
-import { createMediaDeliveryHandlers } from "next-tinacms-azure/dist/delivery-handlers";
+import { createMediaDeliveryHandlers } from 'next-tinacms-azure/dist/delivery-handlers'
 
 const handlers = createMediaDeliveryHandlers({
   connectionString: process.env.AZURE_STORAGE_CONNECTION_STRING!,
