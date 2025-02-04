@@ -2,4 +2,4 @@
 'next-tinacms-azure': minor
 ---
 
-Create package
+Adds a new TinaCMS media provider for Microsoft Azure Blob Storage, with built-in support for the Next.js App Router.
