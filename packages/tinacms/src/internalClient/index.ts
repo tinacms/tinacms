@@ -302,8 +302,8 @@ mutation addPendingDocumentMutation(
           .map((error) => error.message)
           .join('\n')}`
       )
-      return json
     }
+
     return json.data as ReturnType
   }
 
