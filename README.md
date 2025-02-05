@@ -40,6 +40,7 @@ Visit the [GitHub Discussions](https://github.com/tinacms/tinacms/discussions) o
 ## 🧑‍🎓 Earn a Tina Badge
 
 Go the extra mile and earn a Tina Dev Badge 🦙: [Earn a Tina Credly badge](./_docs/dev-badge.md)
+
 <!-- ## Changelog
 
 Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.  -->

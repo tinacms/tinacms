@@ -16,7 +16,8 @@ type TinaStringField =
 export const extractAttributes = (
   attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
   fields: TinaField[],
-  imageCallback: (image: string) => string
+  imageCallback: (image: string) => string,
+  context: Record<string, unknown> | undefined
 ) => {
   const properties: Record<string, unknown> = {}
   attributes?.forEach((attribute) => {
@@ -31,7 +32,12 @@ export const extractAttributes = (
       properties[attribute.name] = extractAttribute(
         attribute,
         field,
-        imageCallback
+        imageCallback,
+        context,
+        ((name: string, value: unknown) => (properties[name] = value)) as (
+          name: string,
+          value: unknown
+        ) => void | undefined
       )
     } catch (e) {
       if (e instanceof Error) {
@@ -47,7 +53,9 @@ export const extractAttributes = (
 const extractAttribute = (
   attribute: MdxJsxAttribute,
   field: TinaField,
-  imageCallback: (image: string) => string
+  imageCallback: (image: string) => string,
+  context: Record<string, unknown> | undefined,
+  addProperty: (name: string, value: unknown) => void | undefined
 ) => {
   switch (field.type) {
     case 'boolean':
@@ -58,7 +66,7 @@ const extractAttribute = (
       if (field.list) {
         return extractScalar(extractExpression(attribute), field)
       } else {
-        return extractString(attribute, field)
+        return extractString(attribute, field, context, addProperty)
       }
     case 'image':
       if (field.list) {
@@ -68,18 +76,35 @@ const extractAttribute = (
         ) as string
         return values.split(',').map((value) => imageCallback(value))
       } else {
-        const value = extractString(attribute, field)
+        const value = extractString(attribute, field, context, addProperty)
         return imageCallback(value)
       }
     case 'reference':
       if (field.list) {
         return extractScalar(extractExpression(attribute), field)
       } else {
-        return extractString(attribute, field)
+        return extractString(attribute, field, context, addProperty)
       }
     case 'object':
       return extractObject(extractExpression(attribute), field, imageCallback)
     case 'rich-text':
+      if (attribute.type === 'mdxJsxAttribute') {
+        if (typeof attribute.value === 'string') {
+          if (attribute.value.startsWith('_tinaEmbeds')) {
+            const embedValue = context?._tinaEmbeds as Record<string, unknown>
+            const key = attribute.value.split('.')[1]
+            if (typeof key !== 'string') {
+              throw new Error(`Unable to extract key from embed value`)
+            }
+            const value = embedValue[key]
+            if (typeof value === 'string') {
+              const ast = parseMDX(value, field, imageCallback, context)
+              ast.embedCode = attribute.value.split('.')[1]
+              return ast
+            }
+          }
+        }
+      }
       const JSXString = extractRaw(attribute)
       if (JSXString) {
         return parseMDX(JSXString, field, imageCallback)
@@ -228,9 +253,26 @@ const extractStatement = (
  * JSX props can be either expressions, or in the case of non-list strings, literals
  * eg. `<Cta label="hello" />` or `<Cta label={"hello"} />` are both valid
  */
-const extractString = (attribute: MdxJsxAttribute, field: TinaStringField) => {
+const extractString = (
+  attribute: MdxJsxAttribute,
+  field: TinaStringField,
+  context: Record<string, unknown> | undefined,
+  addProperty: (name: string, value: unknown) => void | undefined
+) => {
   if (attribute.type === 'mdxJsxAttribute') {
     if (typeof attribute.value === 'string') {
+      if (attribute.value.startsWith('_tinaEmbeds')) {
+        const embedValue = context?._tinaEmbeds as Record<string, unknown>
+        const key = attribute.value.split('.')[1]
+        if (typeof key !== 'string') {
+          throw new Error(`Unable to extract key from embed value`)
+        }
+        const value = embedValue[key]
+        if (typeof value === 'string') {
+          addProperty?.(`_tinaEmbeds.${attribute.name}`, key)
+          return value
+        }
+      }
       return attribute.value
     }
   }

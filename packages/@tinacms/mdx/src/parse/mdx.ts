@@ -18,19 +18,22 @@ export function mdxJsxElement(
   node: MdxJsxTextElement,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   field: RichTextType,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context?: Record<string, unknown>
 ): Plate.MdxInlineElement
 export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   node: MdxJsxFlowElement,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   field: RichTextType,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context?: Record<string, unknown>
 ): Plate.MdxBlockElement
 export function mdxJsxElement(
   node: MdxJsxTextElement | MdxJsxFlowElement,
   field: RichTextType,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context?: Record<string, unknown>
 ):
   | Plate.MdxInlineElement
   | Plate.MdxBlockElement
@@ -58,7 +61,8 @@ export function mdxJsxElement(
     const props = extractAttributes(
       node.attributes,
       template.fields,
-      imageCallback
+      imageCallback,
+      context
     )
     const childField = template.fields.find(
       (field) => field.name === 'children'

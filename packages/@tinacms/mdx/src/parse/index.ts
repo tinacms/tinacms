@@ -100,7 +100,8 @@ export const MDX_PARSE_ERROR_MSG_HTML =
 export const parseMDX = (
   value: string,
   field: RichTextType,
-  imageCallback: (s: string) => string
+  imageCallback: (s: string) => string,
+  context?: { _tinaEmbeds?: Record<string, string> | null | undefined }
 ): Plate.RootElement => {
   if (!value) {
     return { type: 'root', children: [] }
@@ -126,7 +127,7 @@ export const parseMDX = (
     })
     tree = mdxToAst(preprocessedString)
     if (tree) {
-      return remarkToSlate(tree, field, imageCallback, value)
+      return remarkToSlate(tree, field, imageCallback, value, false, context)
     } else {
       return { type: 'root', children: [] }
     }

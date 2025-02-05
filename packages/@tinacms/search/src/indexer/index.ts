@@ -37,9 +37,9 @@ export class SearchIndexer {
     return async (collection: Collection<true>, contentPaths: string[]) => {
       const templateInfo = this.schema.getTemplatesForCollectable(collection)
       await sequential(contentPaths as string[], async (path) => {
-        const data = await transformDocumentIntoPayload(
-          `${collection.path}/${path}`,
-          transformDocument(
+        const data = await transformDocumentIntoPayload({
+          fullPath: `${collection.path}/${path}`,
+          rawData: transformDocument(
             path,
             await loadAndParseWithAliases(
               this.bridge,
@@ -49,8 +49,9 @@ export class SearchIndexer {
             ),
             this.schema
           ),
-          this.schema
-        )
+          tinaSchema: this.schema,
+          context: {},
+        })
         await itemCallback(
           processDocumentForIndexing(
             data['_values'],
