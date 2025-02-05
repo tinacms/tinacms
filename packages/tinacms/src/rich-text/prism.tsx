@@ -5,6 +5,7 @@
 import React from 'react'
 import { Highlight, themes } from 'prism-react-renderer'
 
+//TODO: Check do we still need this component (could not found any reference
 export const Prism = (props: {
   value: string
   lang?: string

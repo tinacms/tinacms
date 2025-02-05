@@ -194,9 +194,23 @@ export const blockElement = (
           return null
         }
       }
+      const children2 = eat(content.children, field, imageCallback)
+      function removeLastSpaceNodes(arr: Md.PhrasingContent[]) {
+        for (let i = arr.length - 1; i >= 0; i--) {
+          const item = arr[i]
+          if (item?.type === 'text' && item.value.trim() === '') {
+            arr.splice(i, 1)
+          } else {
+            break
+          }
+        }
+
+        return arr
+      }
+
       return {
         type: 'paragraph',
-        children: eat(content.children, field, imageCallback),
+        children: removeLastSpaceNodes(children2),
       }
     case 'mermaid':
       return {

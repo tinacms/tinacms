@@ -1,0 +1,14 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "**bold **"
+        }
+      ]
+    }
+  ]
+}

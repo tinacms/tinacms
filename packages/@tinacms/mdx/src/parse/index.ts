@@ -12,7 +12,7 @@ import remarkGfm from 'remark-gfm'
 import { parseMDX as parseMDXNext } from '../next'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
-import type { RichTextType } from '@tinacms/schema-tools'
+import type { RichTextField, RichTextType } from '@tinacms/schema-tools'
 import type * as Plate from './plate'
 import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown'
 import { tinaDirective } from '../extensions/tina-shortcodes/extension'
@@ -99,7 +99,7 @@ export const MDX_PARSE_ERROR_MSG_HTML =
 
 export const parseMDX = (
   value: string,
-  field: RichTextType,
+  field: RichTextField,
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
   if (!value) {
