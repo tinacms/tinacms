@@ -12,7 +12,6 @@ const encodeUrlIfNeeded = (url: string) => {
         .join('/')
       return parsed.toString()
     } catch (e) {
-      console.error('Failed to parse URL:', e)
       return url
     }
   } else {
