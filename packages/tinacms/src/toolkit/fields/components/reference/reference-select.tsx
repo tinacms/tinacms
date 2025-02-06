@@ -147,11 +147,7 @@ const getFilename = (optionSets: OptionSet[], value: string): string | null => {
   return node ? node._internalSys.filename : null
 }
 
-const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
-  cms,
-  input,
-  field,
-}) => {
+const Combobox: React.FC<ReferenceSelectProps> = ({ cms, input, field }) => {
   const [open, setOpen] = React.useState<boolean>(false)
   const [value, setValue] = React.useState<string | null>(input.value)
   //Store display text for selected option
@@ -183,76 +179,71 @@ const ComboboxDemo: React.FC<ReferenceSelectProps> = ({
   }
 
   return (
-    <>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-52 justify-between"
-          >
-            <p className="truncate">{displayText ?? 'Choose an option...'}</p>
-            {open ? (
-              <IoMdArrowDropup size={20} />
-            ) : (
-              <IoMdArrowDropdown size={20} />
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="p-0 relative">
-          <Command
-            shouldFilter={!field.experimental___filter}
-            filter={(value, search) => {
-              if (value.toLowerCase().includes(search.toLowerCase())) return 1
-              return 0
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          <p className="truncate">{displayText ?? 'Choose an option...'}</p>
+          {open ? (
+            <IoMdArrowDropup size={20} />
+          ) : (
+            <IoMdArrowDropdown size={20} />
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 relative min-w-[var(--radix-popover-trigger-width)]">
+        <Command
+          shouldFilter={!field.experimental___filter}
+          filter={(value, search) => {
+            if (value.toLowerCase().includes(search.toLowerCase())) return 1
+            return 0
+          }}
+        >
+          <CommandInput
+            placeholder="Search reference..."
+            onValueChange={(search) => {
+              if (field.experimental___filter) {
+                setFilteredOptionsList(
+                  field.experimental___filter(optionSets, search)
+                )
+              }
             }}
-          >
-            <CommandInput
-              placeholder="Search reference..."
-              onValueChange={(search) => {
-                if (field.experimental___filter) {
-                  setFilteredOptionsList(
-                    field.experimental___filter(optionSets, search)
-                  )
-                }
-              }}
-            />
-            <CommandEmpty>No reference found</CommandEmpty>
-            <CommandList>
-              {filteredOptionsList.length > 0 &&
-                filteredOptionsList?.map(({ collection, edges }: OptionSet) => (
-                  <CommandGroup
-                    key={`${collection}-group`}
-                    heading={collection}
-                  >
-                    <CommandList>
-                      {edges?.map(({ node }) => {
-                        const { id, _values } = node
-                        return (
-                          <OptionComponent
-                            id={id}
-                            key={id}
-                            value={value}
-                            field={field}
-                            _values={_values}
-                            node={node}
-                            onSelect={(currentValue) => {
-                              setValue(currentValue)
-                              setOpen(false)
-                            }}
-                          />
-                        )
-                      })}
-                    </CommandList>
-                  </CommandGroup>
-                ))}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </>
+          />
+          <CommandEmpty>No reference found</CommandEmpty>
+          <CommandList>
+            {filteredOptionsList.length > 0 &&
+              filteredOptionsList?.map(({ collection, edges }: OptionSet) => (
+                <CommandGroup key={`${collection}-group`} heading={collection}>
+                  <CommandList>
+                    {edges?.map(({ node }) => {
+                      const { id, _values } = node
+                      return (
+                        <OptionComponent
+                          id={id}
+                          key={id}
+                          value={value}
+                          field={field}
+                          _values={_values}
+                          node={node}
+                          onSelect={(currentValue) => {
+                            setValue(currentValue)
+                            setOpen(false)
+                          }}
+                        />
+                      )
+                    })}
+                  </CommandList>
+                </CommandGroup>
+              ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 
-export default ComboboxDemo
+export default Combobox
