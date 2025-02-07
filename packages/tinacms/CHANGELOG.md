@@ -1,5 +1,17 @@
 # tinacms
 
+## 2.6.3
+
+### Patch Changes
+
+- [#5475](https://github.com/tinacms/tinacms/pull/5475) [`05ba069`](https://github.com/tinacms/tinacms/commit/05ba0692a7e990fbb671177829562869d517e7c1) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Remove the console.log for failing to encode a url
+
+- [#5474](https://github.com/tinacms/tinacms/pull/5474) [`42daaf7`](https://github.com/tinacms/tinacms/commit/42daaf7af125da265d2c5998168e9c7345dc0a59) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Reference dropdown - make it consume all the width of the sidebar
+
+- [#5447](https://github.com/tinacms/tinacms/pull/5447) [`bc986dd`](https://github.com/tinacms/tinacms/commit/bc986dd48f9a7da264281b55926ec51ce1068bb7) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix issue where browser was being closed when adding an embed in the rich text editor
+
+- [#5448](https://github.com/tinacms/tinacms/pull/5448) [`3af2354`](https://github.com/tinacms/tinacms/commit/3af23542b984c10e138d0cf10a165d50b99bb0e9) Thanks [@kldavis4](https://github.com/kldavis4)! - Encode urls in media manager to prevent unsafe characters from breaking images
+
 ## 2.6.2
 
 ### Patch Changes

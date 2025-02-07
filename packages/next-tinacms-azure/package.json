@@ -1,8 +1,8 @@
 {
-  "name": "next-tinacms-azure",
-  "version": "0.1.0",
-  "description": "",
-  "main": "dist/index.js",
+	"name": "next-tinacms-azure",
+	"version": "0.2.0",
+	"description": "",
+	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"files": [
 		"dist"
@@ -21,8 +21,8 @@
 				"target": "node"
 			},
 			{
-                "name": "src/delivery-handlers.ts",
-                "target": "node"
+				"name": "src/delivery-handlers.ts",
+				"target": "node"
 			}
 		]
 	},
