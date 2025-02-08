@@ -20,6 +20,8 @@ describe('stringify', () => {
               { type: 'text', value: 'p2' },
               { type: 'break' },
               { type: 'text', value: '' },
+              { type: 'break' },
+              { type: 'text', value: '' },
             ],
           },
         ],

@@ -100,8 +100,8 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
   // This function removes trailing empty strings following breaks
   // to ensure that the markdown is formatted correctly
   visit(tree, 'paragraph', (node: ParagraphNode) => {
-    const len = node.children.length
-    if (len >= 2) {
+    let len = node.children.length
+    while (len >= 2) {
       const lastNode = node.children[len - 1]
       const secondLastNode = node.children[len - 2]
       if (
@@ -111,6 +111,9 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
       ) {
         // remove last two nodes
         node.children.splice(len - 2, 2)
+        len = node.children.length
+      } else {
+        break
       }
     }
   })
