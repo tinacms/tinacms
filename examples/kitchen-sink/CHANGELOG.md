@@ -1,5 +1,12 @@
 # e2e-next
 
+## 0.1.91
+
+### Patch Changes
+
+- Updated dependencies [[`05ba069`](https://github.com/tinacms/tinacms/commit/05ba0692a7e990fbb671177829562869d517e7c1), [`42daaf7`](https://github.com/tinacms/tinacms/commit/42daaf7af125da265d2c5998168e9c7345dc0a59), [`bc986dd`](https://github.com/tinacms/tinacms/commit/bc986dd48f9a7da264281b55926ec51ce1068bb7), [`3af2354`](https://github.com/tinacms/tinacms/commit/3af23542b984c10e138d0cf10a165d50b99bb0e9)]:
+  - tinacms@2.6.3
+
 ## 0.1.90
 
 ### Patch Changes

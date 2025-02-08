@@ -1,6 +1,7 @@
 {
-	"name": "tinacms-clerk",
-	"version": "9.0.3",
+	"name": "next-tinacms-azure",
+	"version": "0.2.0",
+	"description": "",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"files": [
@@ -10,35 +11,49 @@
 	"license": "Apache-2.0",
 	"buildConfig": {
 		"entryPoints": [
+			"src/index.ts",
 			{
-				"name": "src/index.ts",
+				"name": "src/auth.ts",
 				"target": "node"
 			},
-			"src/tinacms.ts"
+			{
+				"name": "src/handlers.ts",
+				"target": "node"
+			},
+			{
+				"name": "src/delivery-handlers.ts",
+				"target": "node"
+			}
 		]
 	},
 	"scripts": {
 		"types": "pnpm tsc",
 		"build": "tinacms-scripts build"
 	},
+	"dependencies": {
+		"@azure/storage-blob": "^12.26.0",
+		"sharp": "^0.33.5"
+	},
 	"devDependencies": {
-		"@clerk/backend": "0.31.3",
-		"@clerk/clerk-js": "4.56.2",
 		"@tinacms/scripts": "workspace:*",
+		"@types/crypto-js": "^3.1.47",
+		"@types/js-cookie": "^2.2.7",
 		"@types/node": "^22.9.0",
+		"next": "14.2.10",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
 		"tinacms": "workspace:*",
 		"typescript": "^5.6.3"
 	},
 	"peerDependencies": {
-		"@clerk/backend": "0.x",
-		"@clerk/clerk-js": "4.x",
-		"tinacms": "workspace:*"
+		"tinacms": "workspace:*",
+		"@tinacms/auth": "workspace:*"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
 	},
 	"repository": {
 		"url": "https://github.com/tinacms/tinacms.git",
-		"directory": "packages/tinacms-clerk"
+		"directory": "packages/next-tinacms-azure"
 	}
 }
