@@ -1,9 +1,12 @@
 import AsyncLock from 'async-lock'
+import { Sema } from 'async-sema'
 import type { GraphQLError } from 'graphql'
 import type { Config } from '@tinacms/schema-tools'
 import type { Cache } from '../cache/index'
 
 export const TINA_HOST = 'content.tinajs.io'
+export const DEFAULT_CONCURRENT_REQUEST_ALLOWANCE = 8
+
 export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
   url: string
   token?: string
@@ -33,6 +36,7 @@ export class TinaClient<GenQueries> {
   cacheLock: AsyncLock | undefined
   cacheDir: string
   cache: Cache
+  concurrentRequestsRemaining: Sema
 
   constructor({
     token,
@@ -41,11 +45,15 @@ export class TinaClient<GenQueries> {
     errorPolicy,
     cacheDir,
   }: TinaClientArgs<GenQueries>) {
+    console.log('Creating build client')
     this.apiUrl = url
     this.readonlyToken = token?.trim()
     this.queries = queries(this)
     this.errorPolicy = errorPolicy || 'throw'
     this.cacheDir = cacheDir || ''
+    this.concurrentRequestsRemaining = new Sema(
+      DEFAULT_CONCURRENT_REQUEST_ALLOWANCE
+    )
   }
 
   async init() {
@@ -109,7 +117,7 @@ export class TinaClient<GenQueries> {
       await this.cacheLock.acquire(key, async () => {
         result = await this.cache.get(key)
         if (!result) {
-          result = await requestFromServer<DataType>(
+          result = await this.requestFromServer<DataType>(
             url,
             args.query,
             optionsObject,
@@ -119,7 +127,7 @@ export class TinaClient<GenQueries> {
         }
       })
     } else {
-      result = await requestFromServer<DataType>(
+      result = await this.requestFromServer<DataType>(
         url,
         args.query,
         optionsObject,
@@ -129,41 +137,51 @@ export class TinaClient<GenQueries> {
 
     return result
   }
-}
 
-async function requestFromServer<DataType extends Record<string, any> = any>(
-  url: string,
-  query: string,
-  optionsObject: RequestInit,
-  errorPolicyDefined: 'throw' | 'include'
-) {
-  const res = await fetch(url, optionsObject)
-  if (!res.ok) {
-    let additionalInfo = ''
-    if (res.status === 401) {
-      additionalInfo =
-        'Please check that your client ID, URL and read only token are configured properly.'
+  async requestFromServer<DataType extends Record<string, any> = any>(
+    url: string,
+    query: string,
+    optionsObject: RequestInit,
+    errorPolicyDefined: 'throw' | 'include'
+  ) {
+    await this.concurrentRequestsRemaining.acquire()
+    console.log('CR')
+    let res: Response
+    try {
+      res = await fetch(url, optionsObject)
+    } catch (fetchErr) {
+      throw fetchErr
+    } finally {
+      this.concurrentRequestsRemaining.release()
     }
 
-    throw new Error(
-      `Server responded with status code ${res.status}, ${res.statusText}. ${
-        additionalInfo ? additionalInfo : ''
-      } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
-    )
+    if (!res.ok) {
+      let additionalInfo = ''
+      if (res.status === 401) {
+        additionalInfo =
+          'Please check that your client ID, URL and read only token are configured properly.'
+      }
+
+      throw new Error(
+        `Server responded with status code ${res.status}, ${res.statusText}. ${
+          additionalInfo ? additionalInfo : ''
+        } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
+      )
+    }
+    const json = await res.json()
+    if (json.errors && errorPolicyDefined === 'throw') {
+      throw new Error(
+        `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
+        Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
+      )
+    }
+    const result = {
+      data: json?.data as DataType,
+      errors: (json?.errors || null) as GraphQLError[] | null,
+      query,
+    }
+    return result
   }
-  const json = await res.json()
-  if (json.errors && errorPolicyDefined === 'throw') {
-    throw new Error(
-      `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
-      Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
-    )
-  }
-  const result = {
-    data: json?.data as DataType,
-    errors: (json?.errors || null) as GraphQLError[] | null,
-    query,
-  }
-  return result
 }
 
 export function createClient<GenQueries>(args: TinaClientArgs<GenQueries>) {

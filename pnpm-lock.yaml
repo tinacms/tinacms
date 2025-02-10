@@ -1579,6 +1579,9 @@ importers:
             async-lock:
                 specifier: ^1.4.1
                 version: 1.4.1
+            async-sema:
+                specifier: ^3.1.1
+                version: 3.1.1
             class-variance-authority:
                 specifier: ^0.7.0
                 version: 0.7.0
@@ -9346,6 +9349,12 @@ packages:
         resolution:
             {
                 integrity: sha512-Az2ZTpuytrtqENulXwO3GGv1Bztugx6TT37NIo7imr/Qo0gsYiGtSdBa2B6fsXhTpVZDNfu1Qn3pk531e3q+nQ==,
+            }
+
+    async-sema@3.1.1:
+        resolution:
+            {
+                integrity: sha512-tLRNUXati5MFePdAk8dw7Qt7DpxPB60ofAgn8WRhW6a2rcimZnYBP9oxHiv0OHy+Wz7kPMG+t4LGdt31+4EmGg==,
             }
 
     async@3.2.6:
@@ -26186,6 +26195,8 @@ snapshots:
     astral-regex@2.0.0: {}
 
     async-lock@1.4.1: {}
+
+    async-sema@3.1.1: {}
 
     async@3.2.6: {}
 
