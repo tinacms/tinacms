@@ -1511,10 +1511,41 @@ const _indexContent = async (
       }
 
       const normalizedPath = normalizePath(filepath)
+      const rootSublevel = level.sublevel<string, Record<string, any>>(
+        CONTENT_ROOT_PREFIX,
+        SUBLEVEL_OPTIONS
+      )
       const folderKey = folderTreeBuilder.update(
         normalizedPath,
         collectionPath || ''
       )
+      const item = await rootSublevel.get(normalizedPath)
+      if (item) {
+        await database.contentLevel.batch([
+          ...makeIndexOpsForDocument<Record<string, any>>(
+            normalizedPath,
+            collection.name,
+            collectionIndexDefinitions,
+            item,
+            'del',
+            level
+          ),
+          // folder indices
+          ...makeIndexOpsForDocument(
+            normalizedPath,
+            `${collection.name}_${folderKey}`,
+            collectionIndexDefinitions,
+            item,
+            'del',
+            level
+          ),
+          {
+            type: 'del',
+            key: normalizedPath,
+            sublevel: rootSublevel,
+          },
+        ])
+      }
 
       if (!isGitKeep(filepath, collection)) {
         await enqueueOps([
