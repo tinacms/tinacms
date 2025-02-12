@@ -1,0 +1,9 @@
+query {
+  post(relativePath: "in.md") {
+    author {
+      ...on Author {
+        name
+      }
+    }
+  }
+}

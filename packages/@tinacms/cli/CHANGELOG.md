@@ -1,5 +1,43 @@
 # tinacms-cli
 
+## 1.8.4
+
+### Patch Changes
+
+- Updated dependencies [[`1d93305`](https://github.com/tinacms/tinacms/commit/1d93305e76c0dd0eee745a7770e01796b166a846)]:
+  - @tinacms/graphql@1.5.12
+  - @tinacms/search@1.0.39
+  - tinacms@2.6.4
+  - @tinacms/app@2.1.19
+
+## 1.8.3
+
+### Patch Changes
+
+- Updated dependencies [[`05ba069`](https://github.com/tinacms/tinacms/commit/05ba0692a7e990fbb671177829562869d517e7c1), [`42daaf7`](https://github.com/tinacms/tinacms/commit/42daaf7af125da265d2c5998168e9c7345dc0a59), [`bc986dd`](https://github.com/tinacms/tinacms/commit/bc986dd48f9a7da264281b55926ec51ce1068bb7), [`3af2354`](https://github.com/tinacms/tinacms/commit/3af23542b984c10e138d0cf10a165d50b99bb0e9)]:
+  - tinacms@2.6.3
+  - @tinacms/app@2.1.18
+
+## 1.8.2
+
+### Patch Changes
+
+- Updated dependencies [[`47cfaf6`](https://github.com/tinacms/tinacms/commit/47cfaf63cee139309458fccc49670e3b5cbf430c)]:
+  - @tinacms/graphql@1.5.11
+  - @tinacms/search@1.0.38
+  - tinacms@2.6.2
+  - @tinacms/app@2.1.17
+
+## 1.8.1
+
+### Patch Changes
+
+- [#5442](https://github.com/tinacms/tinacms/pull/5442) [`fd83453`](https://github.com/tinacms/tinacms/commit/fd834536f24fc44de24b40f8f06879c519192c7e) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - 🐛 Bug - Prevents lookup file disappearing during initial indexing
+
+- Updated dependencies [[`61c45f4`](https://github.com/tinacms/tinacms/commit/61c45f49a2abe82336b661dedbbe2a15d0f3da05)]:
+  - tinacms@2.6.1
+  - @tinacms/app@2.1.16
+
 ## 1.8.0
 
 ### Minor Changes
