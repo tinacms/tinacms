@@ -15,6 +15,8 @@ import { BaseCommand } from '../baseCommands'
 import { spin } from '../../../utils/spinner'
 import { SearchIndexer, LocalSearchIndexClient } from '@tinacms/search'
 
+const INDEX_LOCKING_KEY = 'C'
+
 export class DevCommand extends BaseCommand {
   static paths = [['dev'], ['server:start']]
   // NOTE: camelCase commands for string options don't work if there's an `=` used https://github.com/arcanis/clipanion/issues/141
@@ -28,6 +30,7 @@ export class DevCommand extends BaseCommand {
   outputSearchIndexPath = Option.String('--outputSearchIndexPath', {
     description: 'Path to write the search index to',
   })
+  indexingLock: AsyncLock = new AsyncLock() // Prevent indexes and reads occurring at once
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -172,14 +175,6 @@ export class DevCommand extends BaseCommand {
     })
     await searchIndexClient.onStartIndexing()
 
-    const server = await createDevServer(
-      configManager,
-      database,
-      searchIndexClient.searchIndex,
-      apiURL,
-      this.noWatch
-    )
-    await server.listen(Number(this.port))
     const searchIndexer = new SearchIndexer({
       batchSize: configManager.config.search?.indexBatchSize || 100,
       bridge: new FilesystemBridge(
@@ -211,13 +206,29 @@ export class DevCommand extends BaseCommand {
         database,
         configManager.config.search && searchIndexer
       )
+    }
+
+    const server = await createDevServer(
+      configManager,
+      database,
+      searchIndexClient.searchIndex,
+      apiURL,
+      this.noWatch,
+      this.indexingLock,
+      INDEX_LOCKING_KEY
+    )
+    await server.listen(Number(this.port))
+
+    if (!this.noWatch) {
       chokidar.watch(configManager.watchList).on('change', async () => {
-        logger.info(`Tina config change detected, rebuilding`)
-        await setup({ firstTime: false })
-        // The setup process results in an update to the prebuild file
-        // But Vite doesn't reload when it's changed for some reason
-        // So we're triggering the reload ourselves
-        server.ws.send({ type: 'full-reload', path: '*' })
+        await this.indexingLock.acquire(INDEX_LOCKING_KEY, async () => {
+          logger.info(`Tina config change detected, rebuilding`)
+          await setup({ firstTime: false })
+          // The setup process results in an update to the prebuild file
+          // But Vite doesn't reload when it's changed for some reason
+          // So we're triggering the reload ourselves
+          server.ws.send({ type: 'full-reload', path: '*' })
+        })
       })
     }
 
@@ -322,41 +333,53 @@ export class DevCommand extends BaseCommand {
         if (!ready) {
           return
         }
-        const pathFromRoot = configManager.printContentRelativePath(addedFile)
-        await database.indexContentByPaths([pathFromRoot]).catch(console.error)
-        if (searchIndexer) {
-          await searchIndexer
+        await this.indexingLock.acquire(INDEX_LOCKING_KEY, async () => {
+          const pathFromRoot = configManager.printContentRelativePath(addedFile)
+          await database
             .indexContentByPaths([pathFromRoot])
             .catch(console.error)
-        }
+          if (searchIndexer) {
+            await searchIndexer
+              .indexContentByPaths([pathFromRoot])
+              .catch(console.error)
+          }
+        })
       })
       .on('change', async (changedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(changedFile)
         // Optionally we can reload the page when this happens
         // server.ws.send({ type: 'full-reload', path: '*' })
-        await database.indexContentByPaths([pathFromRoot]).catch(console.error)
-        if (searchIndexer) {
-          await searchIndexer
+        await this.indexingLock.acquire(INDEX_LOCKING_KEY, async () => {
+          await database
             .indexContentByPaths([pathFromRoot])
             .catch(console.error)
-        }
+          if (searchIndexer) {
+            await searchIndexer
+              .indexContentByPaths([pathFromRoot])
+              .catch(console.error)
+          }
+        })
       })
       .on('unlink', async (removedFile) => {
-        const pathFromRoot = configManager.printContentRelativePath(removedFile)
-        await database.deleteContentByPaths([pathFromRoot]).catch(console.error)
-        if (searchIndexer) {
-          await searchIndexer
-            .deleteIndexContent([pathFromRoot])
+        await this.indexingLock.acquire(INDEX_LOCKING_KEY, async () => {
+          const pathFromRoot =
+            configManager.printContentRelativePath(removedFile)
+          await database
+            .deleteContentByPaths([pathFromRoot])
             .catch(console.error)
-        }
+          if (searchIndexer) {
+            await searchIndexer
+              .deleteIndexContent([pathFromRoot])
+              .catch(console.error)
+          }
+        })
       })
   }
 
   watchQueries(configManager: ConfigManager, callback: () => Promise<string>) {
     // Locking prevents multiple near-simultaneous file changes from clobbering each other.
-    const callbackLock = new AsyncLock()
     const executeCallback = async (_: unknown) => {
-      await callbackLock.acquire('C', async () => {
+      await this.indexingLock.acquire(INDEX_LOCKING_KEY, async () => {
         await callback()
       })
     }

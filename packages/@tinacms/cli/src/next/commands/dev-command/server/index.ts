@@ -1,3 +1,4 @@
+import AsyncLock from 'async-lock'
 import { createServer as createViteServer } from 'vite'
 import type { Plugin } from 'vite'
 import type { Database } from '@tinacms/graphql'
@@ -14,11 +15,20 @@ export const createDevServer = async (
   database: Database,
   searchIndex: any,
   apiURL: string,
-  noWatch: boolean
+  noWatch: boolean,
+  indexingLock: AsyncLock,
+  indexLockingKey: string
 ) => {
   const plugins: Plugin[] = [
     transformTsxPlugin({ configManager }),
-    devServerEndPointsPlugin({ apiURL, configManager, database, searchIndex }),
+    devServerEndPointsPlugin({
+      apiURL,
+      configManager,
+      database,
+      searchIndex,
+      indexingLock,
+      indexLockingKey,
+    }),
     viteTransformExtension(),
   ]
   return createViteServer(
