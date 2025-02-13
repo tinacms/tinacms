@@ -57,7 +57,7 @@ export class DevCommand extends BaseCommand {
       rootPath: this.rootPath,
       legacyNoSDK: this.noSDK,
     })
-    logger.info('Starting Tina Dev Server')
+    logger.info('🦙 TinaCMS Dev Server is initializing...')
     this.logDeprecationWarnings()
 
     // Initialize the host TCP server
@@ -211,7 +211,7 @@ export class DevCommand extends BaseCommand {
         configManager.config.search && searchIndexer
       )
       chokidar.watch(configManager.watchList).on('change', async () => {
-        logger.info(`Tina config change detected, rebuilding`)
+        logger.info(`TinaCMS config change detected, rebuilding...`)
         await setup({ firstTime: false })
         // The setup process results in an update to the prebuild file
         // But Vite doesn't reload when it's changed for some reason
@@ -232,7 +232,7 @@ export class DevCommand extends BaseCommand {
     const summaryItems = [
       {
         emoji: '🦙',
-        heading: 'Tina Config',
+        heading: 'TinaCMS URLs',
         subItems: [
           {
             key: 'CMS',
@@ -269,7 +269,7 @@ export class DevCommand extends BaseCommand {
     }
 
     summary({
-      heading: 'Tina Dev Server is running...',
+      heading: '✅ 🦙 TinaCMS Dev Server is active:',
       items: [
         ...summaryItems,
         // {
