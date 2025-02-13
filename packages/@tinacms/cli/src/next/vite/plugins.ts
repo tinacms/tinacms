@@ -115,11 +115,6 @@ export const devServerEndPointsPlugin = ({
               verbose: false,
             })
           })
-          /* if (result) {
-            console.log('result', JSON.stringify(result))
-          } else {
-            console.log('no-result')
-          } */
           res.end(JSON.stringify(result))
           return
         }
