@@ -208,14 +208,16 @@ export class DevCommand extends BaseCommand {
       )
     }
 
+    const dbLock = async (fn: () => Promise<void>) => {
+      return this.indexingLock.acquire(INDEX_LOCKING_KEY, fn)
+    }
     const server = await createDevServer(
       configManager,
       database,
       searchIndexClient.searchIndex,
       apiURL,
       this.noWatch,
-      this.indexingLock,
-      INDEX_LOCKING_KEY
+      dbLock
     )
     await server.listen(Number(this.port))
 

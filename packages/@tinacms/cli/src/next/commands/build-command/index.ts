@@ -178,8 +178,7 @@ export class BuildCommand extends BaseCommand {
         null,
         apiURL,
         true,
-        new AsyncLock(),
-        'indexing'
+        (lockedFn) => lockedFn()
       )
       await server.listen(Number(this.port))
       console.log('server listening on port', this.port)

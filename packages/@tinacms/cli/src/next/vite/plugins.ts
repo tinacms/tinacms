@@ -51,15 +51,13 @@ export const devServerEndPointsPlugin = ({
   apiURL,
   database,
   searchIndex,
-  indexingLock,
-  indexLockingKey,
+  databaseLock,
 }: {
   apiURL: string
   database: Database
   configManager: ConfigManager
   searchIndex: any
-  indexingLock: AsyncLock
-  indexLockingKey: string
+  databaseLock: (fn: () => Promise<void>) => Promise<void>
 }) => {
   const plug: Plugin = {
     name: 'graphql-endpoints',
@@ -106,7 +104,7 @@ export const devServerEndPointsPlugin = ({
           // @ts-ignore FIXME: req type doesn't match
           const { query, variables } = req.body
           let result: object
-          await indexingLock.acquire(indexLockingKey, async () => {
+          await databaseLock(async () => {
             result = await gqlResolve({
               config: {
                 useRelativeMedia: true,

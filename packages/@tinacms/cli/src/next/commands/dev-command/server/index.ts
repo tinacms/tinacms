@@ -16,8 +16,7 @@ export const createDevServer = async (
   searchIndex: any,
   apiURL: string,
   noWatch: boolean,
-  indexingLock: AsyncLock,
-  indexLockingKey: string
+  databaseLock: (fn: () => Promise<void>) => Promise<void>
 ) => {
   const plugins: Plugin[] = [
     transformTsxPlugin({ configManager }),
@@ -26,8 +25,7 @@ export const createDevServer = async (
       configManager,
       database,
       searchIndex,
-      indexingLock,
-      indexLockingKey,
+      databaseLock,
     }),
     viteTransformExtension(),
   ]
