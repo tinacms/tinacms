@@ -15,8 +15,6 @@ import { BaseCommand } from '../baseCommands'
 import { spin } from '../../../utils/spinner'
 import { SearchIndexer, LocalSearchIndexClient } from '@tinacms/search'
 
-const INDEX_LOCKING_KEY = 'C'
-
 export class DevCommand extends BaseCommand {
   static paths = [['dev'], ['server:start']]
   // NOTE: camelCase commands for string options don't work if there's an `=` used https://github.com/arcanis/clipanion/issues/141
@@ -68,6 +66,9 @@ export class DevCommand extends BaseCommand {
     createDBServer(Number(this.datalayerPort))
 
     let database: Database = null
+    const dbLock = async (fn: () => Promise<void>) => {
+      return this.indexingLock.acquire('Key', fn)
+    }
 
     const setup = async ({ firstTime }: { firstTime: boolean }) => {
       try {
@@ -138,7 +139,11 @@ export class DevCommand extends BaseCommand {
         }
 
         if (!this.noWatch) {
-          this.watchQueries(configManager, async () => await codegen.execute())
+          this.watchQueries(
+            configManager,
+            dbLock,
+            async () => await codegen.execute()
+          )
         }
 
         return { apiURL, database, graphQLSchema, tinaSchema }
@@ -204,13 +209,11 @@ export class DevCommand extends BaseCommand {
       this.watchContentFiles(
         configManager,
         database,
+        dbLock,
         configManager.config.search && searchIndexer
       )
     }
 
-    const dbLock = async (fn: () => Promise<void>) => {
-      return this.indexingLock.acquire(INDEX_LOCKING_KEY, fn)
-    }
     const server = await createDevServer(
       configManager,
       database,
@@ -223,7 +226,7 @@ export class DevCommand extends BaseCommand {
 
     if (!this.noWatch) {
       chokidar.watch(configManager.watchList).on('change', async () => {
-        await this.indexingLock.acquire(INDEX_LOCKING_KEY, async () => {
+        await dbLock(async () => {
           logger.info(`Tina config change detected, rebuilding`)
           await setup({ firstTime: false })
           // The setup process results in an update to the prebuild file
@@ -308,6 +311,7 @@ export class DevCommand extends BaseCommand {
   watchContentFiles(
     configManager: ConfigManager,
     database: Database,
+    databaseLock: (fn: () => Promise<void>) => Promise<void>,
     searchIndexer?: SearchIndexer
   ) {
     const collectionContentFiles = []
@@ -335,7 +339,7 @@ export class DevCommand extends BaseCommand {
         if (!ready) {
           return
         }
-        await this.indexingLock.acquire(INDEX_LOCKING_KEY, async () => {
+        await databaseLock(async () => {
           const pathFromRoot = configManager.printContentRelativePath(addedFile)
           await database
             .indexContentByPaths([pathFromRoot])
@@ -351,7 +355,7 @@ export class DevCommand extends BaseCommand {
         const pathFromRoot = configManager.printContentRelativePath(changedFile)
         // Optionally we can reload the page when this happens
         // server.ws.send({ type: 'full-reload', path: '*' })
-        await this.indexingLock.acquire(INDEX_LOCKING_KEY, async () => {
+        await databaseLock(async () => {
           await database
             .indexContentByPaths([pathFromRoot])
             .catch(console.error)
@@ -363,9 +367,8 @@ export class DevCommand extends BaseCommand {
         })
       })
       .on('unlink', async (removedFile) => {
-        await this.indexingLock.acquire(INDEX_LOCKING_KEY, async () => {
-          const pathFromRoot =
-            configManager.printContentRelativePath(removedFile)
+        const pathFromRoot = configManager.printContentRelativePath(removedFile)
+        await databaseLock(async () => {
           await database
             .deleteContentByPaths([pathFromRoot])
             .catch(console.error)
@@ -378,10 +381,14 @@ export class DevCommand extends BaseCommand {
       })
   }
 
-  watchQueries(configManager: ConfigManager, callback: () => Promise<string>) {
+  watchQueries(
+    configManager: ConfigManager,
+    databaseLock: (fn: () => Promise<void>) => Promise<void>,
+    callback: () => Promise<string>
+  ) {
     // Locking prevents multiple near-simultaneous file changes from clobbering each other.
     const executeCallback = async (_: unknown) => {
-      await this.indexingLock.acquire(INDEX_LOCKING_KEY, async () => {
+      await databaseLock(async () => {
         await callback()
       })
     }
