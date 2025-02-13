@@ -22,10 +22,10 @@
     "chalk": "^4.1.2",
     "chokidar": "^3.6.0",
     "commander": "^7.2.0",
-    "esbuild": "^0.24.0",
-    "fs-extra": "^11.2.0",
-    "tsup": "^8.3.5",
-    "typescript": "^5.6.3",
-    "vite": "^4.5.5"
+    "esbuild": "^0.24.2",
+    "fs-extra": "^11.3.0",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "vite": "^4.5.9"
   }
 }
