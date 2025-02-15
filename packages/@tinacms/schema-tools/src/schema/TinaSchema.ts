@@ -35,7 +35,7 @@ export class TinaSchema {
   constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
     this.schema = config
-    this.walkFields(({ field, collection, path }) => {
+    this.walkFields(({ field, collection }) => {
       // set defaults for field searchability
       if (!('searchable' in field)) {
         if (field.type === 'image') {
@@ -69,16 +69,19 @@ export class TinaSchema {
     )
   }
 
-  public findReferences(name: string) {
-    const result: Record<string, { path: string[]; field: TinaField }[]> = {}
+  public findReferencesFromCollection(name: string) {
+    const result: Record<string, string[]> = {}
     this.walkFields(({ field, collection: c, path }) => {
+      if (c.name !== name) {
+        return
+      }
       if (field.type === 'reference') {
-        if (field.collections.includes(name)) {
-          if (result[c.name] === undefined) {
-            result[c.name] = []
+        field.collections.forEach((name) => {
+          if (result[name] === undefined) {
+            result[name] = []
           }
-          result[c.name].push({ path, field })
-        }
+          result[name].push(path)
+        })
       }
     })
     return result
@@ -432,39 +435,50 @@ export class TinaSchema {
       }
     }
   }
-  public walkFields = (
+
+  public walkFields(
     cb: (args: {
-      field: TinaField
-      collection: Collection
-      path: string[]
+      field: any
+      collection: any
+      path: string
+      isListItem?: boolean
     }) => void
-  ) => {
+  ) {
     const walk = (
-      collectionOrObject: {
-        templates?: Template[]
-        fields?: TinaField[]
-      },
-      collection: Collection,
-      path: string[]
+      collectionOrObject: any,
+      collection: any,
+      path: string = '$'
     ) => {
       if (collectionOrObject.templates) {
-        collectionOrObject.templates.forEach((template) => {
-          template.fields.forEach((field) => {
-            cb({ field, collection, path: [...path, template.name] })
+        collectionOrObject.templates.forEach((template: any) => {
+          const templatePath = `${path}.${template.name}`
+          template.fields.forEach((field: any) => {
+            const fieldPath = field.list
+              ? `${templatePath}[*].${field.name}`
+              : `${templatePath}.${field.name}`
+            cb({ field, collection, path: fieldPath })
+            if (field.type === 'object') {
+              walk(field, collection, fieldPath)
+            }
           })
         })
       }
       if (collectionOrObject.fields) {
-        collectionOrObject.fields.forEach((field) => {
-          cb({ field, collection, path: [...path, field.name] })
-          if (field.type === 'rich-text' || field.type === 'object') {
-            walk(field, collection, [...path, field.name])
+        collectionOrObject.fields.forEach((field: any) => {
+          const fieldPath = field.list
+            ? `${path}.${field.name}[*]`
+            : `${path}.${field.name}`
+          cb({ field, collection, path: fieldPath })
+          if (field.type === 'object' && field.fields) {
+            walk(field, collection, fieldPath)
           }
         })
       }
     }
-    const collections = this.getCollections()
-    collections.forEach((collection) => walk(collection, collection, []))
+
+    this.getCollections().forEach((collection) => {
+      walk(collection, collection)
+    })
   }
 
   /**

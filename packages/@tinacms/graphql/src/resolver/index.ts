@@ -28,7 +28,11 @@ import {
   resolveMediaCloudToRelative,
 } from './media-utils'
 import { GraphQLError } from 'graphql'
-import { FilterCondition, makeFilterChain } from '../database/datalayer'
+import {
+  FilterCondition,
+  makeFilterChain,
+  REFS_KEY,
+} from '../database/datalayer'
 import { generatePasswordHash } from '../auth/utils'
 
 interface ResolverConfig {
@@ -814,17 +818,20 @@ export class Resolver {
         await this.deleteDocument(realPath)
         if (await this.hasReferences(realPath, collection)) {
           const collRefs = await this.findReferences(realPath, collection)
-          for (const [collection, refFields] of Object.entries(collRefs)) {
-            for (const [refPath, refs] of Object.entries(refFields)) {
-              let refDoc = await this.getRaw(refPath)
-              for (const ref of refs) {
-                refDoc = updateObjectWithJsonPath(
-                  refDoc,
-                  ref.path.join('.'),
-                  null
-                )
+          for (const [collection, docsWithRefs] of Object.entries(collRefs)) {
+            for (const [pathToDocWithRef, referencePaths] of Object.entries(
+              docsWithRefs
+            )) {
+              // load the doc with the references
+              let refDoc = await this.getRaw(pathToDocWithRef)
+
+              // Update each reference to the deleted document
+              for (const path of referencePaths) {
+                refDoc = updateObjectWithJsonPath(refDoc, path, null)
               }
-              await this.database.put(refPath, refDoc, collection)
+
+              // save the updated doc
+              await this.database.put(pathToDocWithRef, refDoc, collection)
             }
           }
         }
@@ -851,17 +858,24 @@ export class Resolver {
         await this.deleteDocument(realPath)
         // Update references to the document
         const collRefs = await this.findReferences(realPath, collection)
-        for (const [collection, refFields] of Object.entries(collRefs)) {
-          for (const [refPath, refs] of Object.entries(refFields)) {
-            let refDoc = await this.getRaw(refPath)
-            for (const ref of refs) {
-              refDoc = updateObjectWithJsonPath(
-                refDoc,
-                ref.path.join('.'),
+        for (const [collection, docsWithRefs] of Object.entries(collRefs)) {
+          for (const [pathToDocWithRef, referencePaths] of Object.entries(
+            docsWithRefs
+          )) {
+            // load the document with the references
+            let docWithRef = await this.getRaw(pathToDocWithRef)
+
+            // update each reference to the updated document
+            for (const path of referencePaths) {
+              docWithRef = updateObjectWithJsonPath(
+                docWithRef,
+                path,
                 newRealPath
               )
             }
-            await this.database.put(refPath, refDoc, collection)
+
+            // save the updated document
+            await this.database.put(pathToDocWithRef, docWithRef, collection)
           }
         }
         return this.getDocument(newRealPath)
@@ -1056,35 +1070,30 @@ export class Resolver {
    */
   private hasReferences = async (id: string, c: Collection) => {
     let count = 0
-    const deepRefs = this.tinaSchema.findReferences(c.name)
-    for (const [collection, refs] of Object.entries(deepRefs)) {
-      for (const ref of refs) {
-        await this.database.query(
-          {
-            collection: collection,
-            filterChain: makeFilterChain({
-              conditions: [
-                {
-                  filterPath: ref.path.join('.'),
-                  filterExpression: {
-                    _type: 'reference',
-                    _list: false,
-                    eq: id,
-                  },
-                },
-              ],
-            }),
-            sort: ref.field.name,
-          },
-          (refId: string) => {
-            count++
-            return refId
-          }
-        )
-        if (count) {
-          return true
-        }
+    await this.database.query(
+      {
+        collection: c.name,
+        filterChain: makeFilterChain({
+          conditions: [
+            {
+              filterPath: '_reference_',
+              filterExpression: {
+                _type: 'string',
+                _list: false,
+                eq: id,
+              },
+            },
+          ],
+        }),
+        sort: REFS_KEY,
+      },
+      (refId: string) => {
+        count++
+        return refId
       }
+    )
+    if (count) {
+      return true
     }
 
     return false
@@ -1097,48 +1106,38 @@ export class Resolver {
    * @returns references to the document in the form of a map of collection names to a list of fields that reference the document
    */
   private findReferences = async (id: string, c: Collection) => {
-    const references: Record<
-      string,
-      Record<string, { path: string[]; field: TinaField }[]>
-    > = {}
-    const deepRefs = this.tinaSchema.findReferences(c.name)
-
-    for (const [collection, refs] of Object.entries(deepRefs)) {
-      for (const ref of refs) {
-        await this.database.query(
-          {
-            collection: collection,
-            filterChain: makeFilterChain({
-              conditions: [
-                {
-                  filterPath: ref.path.join('.'),
-                  filterExpression: {
-                    _type: 'reference',
-                    _list: false,
-                    eq: id,
-                  },
-                },
-              ],
-            }),
-            sort: ref.field.name,
-          },
-          (refId: string) => {
-            if (!references[collection]) {
-              references[collection] = {}
-            }
-            if (!references[collection][refId]) {
-              references[collection][refId] = []
-            }
-            references[collection][refId].push({
-              path: ref.path,
-              field: ref.field,
-            })
-            return refId
-          }
-        )
+    const references: Record<string, Record<string, string[]>> = {}
+    await this.database.query(
+      {
+        collection: c.name,
+        filterChain: makeFilterChain({
+          conditions: [
+            {
+              filterPath: '_reference_',
+              filterExpression: {
+                _type: 'string',
+                _list: false,
+                eq: id,
+              },
+            },
+          ],
+        }),
+        sort: REFS_KEY,
+      },
+      (refId: string, rawItem: Record<string, any>) => {
+        if (!references[c.name]) {
+          references[c.name] = {}
+        }
+        if (!references[c.name][refId]) {
+          references[c.name][refId] = []
+        }
+        const referencePath = rawItem?.['_reference_path_']
+        if (referencePath) {
+          references[c.name][refId].push(referencePath)
+        }
+        return refId
       }
-    }
-
+    )
     return references
   }
 
