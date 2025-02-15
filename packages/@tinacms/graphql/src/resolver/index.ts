@@ -31,7 +31,9 @@ import { GraphQLError } from 'graphql'
 import {
   FilterCondition,
   makeFilterChain,
-  REFS_KEY,
+  REFS_COLLECTIONS_SORT_KEY,
+  REFS_PATH_FIELD,
+  REFS_REFERENCE_FIELD,
 } from '../database/datalayer'
 import { generatePasswordHash } from '../auth/utils'
 
@@ -1076,7 +1078,7 @@ export class Resolver {
         filterChain: makeFilterChain({
           conditions: [
             {
-              filterPath: '_reference_',
+              filterPath: REFS_REFERENCE_FIELD,
               filterExpression: {
                 _type: 'string',
                 _list: false,
@@ -1085,7 +1087,7 @@ export class Resolver {
             },
           ],
         }),
-        sort: REFS_KEY,
+        sort: REFS_COLLECTIONS_SORT_KEY,
       },
       (refId: string) => {
         count++
@@ -1103,7 +1105,7 @@ export class Resolver {
    * Finds references to a document
    * @param id the id of the document to find references to
    * @param c the collection to find references in
-   * @returns references to the document in the form of a map of collection names to a list of fields that reference the document
+   * @returns a map of references to the document
    */
   private findReferences = async (id: string, c: Collection) => {
     const references: Record<string, Record<string, string[]>> = {}
@@ -1113,7 +1115,7 @@ export class Resolver {
         filterChain: makeFilterChain({
           conditions: [
             {
-              filterPath: '_reference_',
+              filterPath: REFS_REFERENCE_FIELD,
               filterExpression: {
                 _type: 'string',
                 _list: false,
@@ -1122,7 +1124,7 @@ export class Resolver {
             },
           ],
         }),
-        sort: REFS_KEY,
+        sort: REFS_COLLECTIONS_SORT_KEY,
       },
       (refId: string, rawItem: Record<string, any>) => {
         if (!references[c.name]) {
@@ -1131,7 +1133,7 @@ export class Resolver {
         if (!references[c.name][refId]) {
           references[c.name][refId] = []
         }
-        const referencePath = rawItem?.['_reference_path_']
+        const referencePath = rawItem?.[REFS_PATH_FIELD]
         if (referencePath) {
           references[c.name][refId].push(referencePath)
         }

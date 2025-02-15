@@ -40,7 +40,9 @@ import {
   makeFolderOpsForCollection,
   makeIndexOpsForDocument,
   makeRefOpsForDocument,
-  REFS_KEY,
+  REFS_COLLECTIONS_SORT_KEY,
+  REFS_PATH_FIELD,
+  REFS_REFERENCE_FIELD,
   type TernaryFilter,
 } from './datalayer'
 import {
@@ -892,20 +894,21 @@ export class Database {
           for (const collection of collections) {
             const indexDefinitions = {
               [DEFAULT_COLLECTION_SORT_KEY]: { fields: [] }, // provide a default sort key which is the file sort
-              [REFS_KEY]: {
+              // pseudo-index for the collection's references
+              [REFS_COLLECTIONS_SORT_KEY]: {
                 fields: [
                   {
-                    name: '_reference_',
+                    name: REFS_REFERENCE_FIELD,
                     type: 'string',
                     list: false,
                   },
                   {
-                    name: '_reference_path_',
+                    name: REFS_PATH_FIELD,
                     type: 'string',
                     list: false,
                   },
                 ],
-              }, // provide a default refs key
+              },
             }
 
             if (collection.fields) {
