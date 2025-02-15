@@ -204,6 +204,7 @@ const CollectionListPage = () => {
   const [vars, setVars] = React.useState({
     collection: collectionName,
     relativePath: '',
+    relativePathWithoutExtension: '',
     newRelativePath: '',
     filterField: '',
     folderName: '',
@@ -254,6 +255,7 @@ const CollectionListPage = () => {
       ...old,
       collection: collectionName,
       relativePath: '',
+      relativePathWithoutExtension: '',
       newRelativePath: '',
       filterField: '',
       startsWith: '',
@@ -284,6 +286,7 @@ const CollectionListPage = () => {
                   : {
                       collection: collectionName,
                       relativePath: '',
+                      relativePathWithoutExtension: '',
                       newRelativePath: '',
                       filterField: '',
                       startsWith: '',
@@ -408,7 +411,7 @@ const CollectionListPage = () => {
 
                     {renameModalOpen && (
                       <RenameModal
-                        filename={vars.relativePath}
+                        filename={vars.relativePathWithoutExtension}
                         newRelativePath={vars.newRelativePath}
                         setNewRelativePath={(newRelativePath) => {
                           setVars((vars) => {
@@ -889,6 +892,10 @@ const CollectionListPage = () => {
                                                   setVars((old) => ({
                                                     ...old,
                                                     collection: collectionName,
+                                                    relativePathWithoutExtension:
+                                                      document.node._sys.breadcrumbs.join(
+                                                        '/'
+                                                      ),
                                                     relativePath:
                                                       document.node._sys.breadcrumbs.join(
                                                         '/'
@@ -913,6 +920,10 @@ const CollectionListPage = () => {
                                                   setVars((old) => ({
                                                     ...old,
                                                     collection: collectionName,
+                                                    relativePathWithoutExtension:
+                                                      document.node._sys.breadcrumbs.join(
+                                                        '/'
+                                                      ),
                                                     relativePath:
                                                       document.node._sys.breadcrumbs.join(
                                                         '/'
@@ -1255,6 +1266,7 @@ const RenameModal = ({
               await renameFunc()
               close()
             }}
+            disabled={!newRelativePath || newRelativePath === filename}
           >
             Rename
           </Button>
