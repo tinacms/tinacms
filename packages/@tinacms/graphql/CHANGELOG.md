@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.5.12
+
+### Patch Changes
+
+- [#5481](https://github.com/tinacms/tinacms/pull/5481) [`1d93305`](https://github.com/tinacms/tinacms/commit/1d93305e76c0dd0eee745a7770e01796b166a846) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix indexContentByPaths to delete existing indexes if they exist
+
 ## 1.5.11
 
 ### Patch Changes
