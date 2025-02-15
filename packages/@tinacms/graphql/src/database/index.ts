@@ -1628,6 +1628,14 @@ const _indexContent = async (
       const item = await rootSublevel.get(normalizedPath)
       if (item) {
         await database.contentLevel.batch([
+          ...makeRefOpsForDocument(
+            normalizedPath,
+            collection?.name,
+            collectionReferences,
+            item,
+            'del',
+            level
+          ),
           ...makeIndexOpsForDocument<Record<string, any>>(
             normalizedPath,
             collection.name,
