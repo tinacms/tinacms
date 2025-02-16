@@ -1234,6 +1234,8 @@ const RenameModal = ({
           <>
             <p className="mb-4">
               Are you sure you want to rename <strong>{filename}</strong>?
+              TinaCMS uses the filename as the ID; renaming this file could
+              result in unresolved references.
             </p>
             <BaseTextField
               placeholder="Enter a new name for the document's file"
