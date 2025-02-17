@@ -59,7 +59,7 @@ export class DevCommand extends BaseCommand {
       rootPath: this.rootPath,
       legacyNoSDK: this.noSDK,
     })
-    logger.info('Starting Tina Dev Server')
+    logger.info('🦙 TinaCMS Dev Server is initializing...')
     this.logDeprecationWarnings()
 
     // Initialize the host TCP server
@@ -249,7 +249,7 @@ export class DevCommand extends BaseCommand {
     const summaryItems = [
       {
         emoji: '🦙',
-        heading: 'Tina Config',
+        heading: 'TinaCMS URLs',
         subItems: [
           {
             key: 'CMS',
@@ -286,7 +286,7 @@ export class DevCommand extends BaseCommand {
     }
 
     summary({
-      heading: 'Tina Dev Server is running...',
+      heading: '✅ 🦙 TinaCMS Dev Server is active:',
       items: [
         ...summaryItems,
         // {
