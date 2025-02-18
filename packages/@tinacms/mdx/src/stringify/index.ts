@@ -194,7 +194,6 @@ export const blockElement = (
           return null
         }
       }
-      console.log('we here?', content.type)
       return {
         type: 'paragraph',
         children: eat(content.children, field, imageCallback),
@@ -413,7 +412,6 @@ export const getMarks = (content: Plate.InlineElement) => {
   if (content.type !== 'text') {
     return []
   }
-  console.log('Attempt to get mark: Checking... ', content)
   if (content.bold) {
     marks.push('strong')
   }
