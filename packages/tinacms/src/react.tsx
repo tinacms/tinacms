@@ -126,7 +126,6 @@ export function useTina<T extends object>(props: {
   }, [id])
 
   React.useEffect(() => {
-    console.log('Current ID: ', id, data)
     const { experimental___selectFormByFormId, ...rest } = props
     parent.postMessage({ type: 'open', ...rest, id }, window.location.origin)
     window.addEventListener('message', (event) => {
