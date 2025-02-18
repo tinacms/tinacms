@@ -28,6 +28,14 @@ export const TEMPLATES: Template[] = [
     gitURL: 'https://github.com/tinacms/tina-cloud-starter',
   },
   {
+    title: 'Astro Starter',
+    description:
+      'Get started with Astro - a modern static site generator designed for fast, lightweight, and flexible web projects.',
+    value: 'tina-astro-starter',
+    isInternal: false,
+    gitURL: 'https://github.com/tinacms/tina-astro-starter',
+  },
+  {
     title: 'Hugo Starter',
     description:
       'With Hugo, you wield the power of lightning-fast site generation, crafting web experiences at the speed of thought.',

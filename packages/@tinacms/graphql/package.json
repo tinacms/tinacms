@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/graphql",
-	"version": "1.5.10",
+	"version": "1.5.12",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
@@ -27,8 +27,8 @@
 		"build": "tinacms-scripts build",
 		"docs": "pnpm typedoc",
 		"serve": "pnpm nodemon dist/server.js",
-		"test": "jest",
-		"test-watch": "jest --watch"
+		"test": "vitest run",
+		"test-watch": "vitest"
 	},
 	"dependencies": {
 		"@iarna/toml": "^2.2.5",
@@ -69,7 +69,6 @@
 		"@types/estree": "^0.0.50",
 		"@types/express": "^4.17.21",
 		"@types/fs-extra": "^9.0.13",
-		"@types/jest": "^26.0.24",
 		"@types/js-yaml": "^3.12.10",
 		"@types/lodash.camelcase": "^4.3.9",
 		"@types/lodash.upperfirst": "^4.3.9",
@@ -80,12 +79,12 @@
 		"@types/normalize-path": "^3.0.2",
 		"@types/ws": "^7.4.7",
 		"@types/yup": "^0.29.14",
-		"jest": "^29.7.0",
-		"jest-diff": "^29.7.0",
 		"jest-file-snapshot": "^0.5.0",
-		"jest-matcher-utils": "^29.7.0",
 		"memory-level": "^1.0.0",
 		"nodemon": "3.1.4",
-		"typescript": "^5.6.3"
+		"typescript": "^5.6.3",
+		"vite": "^4.3.9",
+		"vitest": "^0.32.2",
+		"zod": "^3.23.8"
 	}
 }

@@ -4,6 +4,7 @@
 
 import { validateSchema } from '../../schema/validate'
 import { TinaField } from '../../..'
+import { describe, expect, it } from 'vitest'
 
 const baseField: TinaField = {
   label: 'Title',

@@ -1,5 +1,6 @@
 import { Template } from '@tinacms/schema-tools/src'
 import { replaceNameOverrides, applyNameOverrides } from './alias-utils'
+import { describe, it, expect } from 'vitest'
 
 const template: Template<true> = {
   name: 'template',

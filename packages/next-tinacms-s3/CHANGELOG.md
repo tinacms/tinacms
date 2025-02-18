@@ -1,5 +1,35 @@
 # next-tinacms-s3
 
+## 9.0.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@2.6.4
+
+## 9.0.3
+
+### Patch Changes
+
+- [#5469](https://github.com/tinacms/tinacms/pull/5469) [`0b51a7c`](https://github.com/tinacms/tinacms/commit/0b51a7c04c2b96d7012d9cb404eb28984ac6eea2) Thanks [@kourosh-alasti](https://github.com/kourosh-alasti)! - add node:\* prefix
+
+- Updated dependencies [[`05ba069`](https://github.com/tinacms/tinacms/commit/05ba0692a7e990fbb671177829562869d517e7c1), [`42daaf7`](https://github.com/tinacms/tinacms/commit/42daaf7af125da265d2c5998168e9c7345dc0a59), [`bc986dd`](https://github.com/tinacms/tinacms/commit/bc986dd48f9a7da264281b55926ec51ce1068bb7), [`3af2354`](https://github.com/tinacms/tinacms/commit/3af23542b984c10e138d0cf10a165d50b99bb0e9)]:
+  - tinacms@2.6.3
+
+## 9.0.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tinacms@2.6.2
+
+## 9.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`61c45f4`](https://github.com/tinacms/tinacms/commit/61c45f49a2abe82336b661dedbbe2a15d0f3da05)]:
+  - tinacms@2.6.1
+
 ## 9.0.0
 
 ### Patch Changes
