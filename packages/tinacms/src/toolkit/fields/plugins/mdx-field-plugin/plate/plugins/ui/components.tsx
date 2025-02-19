@@ -206,7 +206,9 @@ export const Components = () => {
     ),
     [MARK_CODE]: CodeLeaf,
     [MARK_UNDERLINE]: withProps(PlateLeaf, { as: 'u' }),
-    [MARK_STRIKETHROUGH]: withProps(PlateLeaf, { as: 's' }),
+    [MARK_STRIKETHROUGH]: ({ editor, leaf, text, ...props }) => (
+      <s {...props.attributes} {...props} />
+    ),
     [MARK_ITALIC]: withProps(PlateLeaf, { as: 'em' }),
     [MARK_BOLD]: ({ editor, leaf, text, ...props }) => (
       <strong {...props.attributes} {...props} />
