@@ -34,7 +34,7 @@
     "date-fns": "^2.30.0",
     "graphql": "15.8.0",
     "mongodb-level": "^0.0.3",
-    "next": "^14.2.24",
+    "next": "^14.2.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^4.12.0",
