@@ -244,22 +244,3 @@ const blockContentElement = (
       )
   }
 }
-
-export type Marks = 'strong' | 'emphasis' | 'inlineCode'
-
-export const getMarks = (content: Plate.InlineElement) => {
-  const marks: Marks[] = []
-  if (content.type !== 'text') {
-    return []
-  }
-  if (content.bold) {
-    marks.push('strong')
-  }
-  if (content.italic) {
-    marks.push('emphasis')
-  }
-  if (content.code) {
-    marks.push('inlineCode')
-  }
-  return marks
-}
