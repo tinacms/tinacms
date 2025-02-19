@@ -1,3 +1,4 @@
+import AsyncLock from 'async-lock'
 import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
@@ -176,7 +177,8 @@ export class BuildCommand extends BaseCommand {
         database,
         null,
         apiURL,
-        true
+        true,
+        (lockedFn) => lockedFn()
       )
       await server.listen(Number(this.port))
       console.log('server listening on port', this.port)

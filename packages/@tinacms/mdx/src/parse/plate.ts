@@ -205,6 +205,7 @@ export type TextElement = {
   bold?: boolean
   italic?: boolean
   code?: boolean
+  strikethrough?: boolean
 }
 /**
  * @remarks

@@ -615,6 +615,9 @@ importers:
             altair-express-middleware:
                 specifier: ^7.3.6
                 version: 7.3.6
+            async-lock:
+                specifier: ^1.4.1
+                version: 1.4.1
             auto-bind:
                 specifier: ^4.0.0
                 version: 4.0.0

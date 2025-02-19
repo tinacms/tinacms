@@ -16,6 +16,7 @@ export interface FilterArgs {
   filterField: string
   collection?: string
   relativePath?: string
+  relativePathWithoutExtension?: string
   newRelativePath?: string
   startsWith?: string
   endsWith?: string

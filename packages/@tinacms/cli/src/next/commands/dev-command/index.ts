@@ -1,3 +1,4 @@
+import AsyncLock from 'async-lock'
 import { Command, Option } from 'clipanion'
 import fs from 'fs-extra'
 import path from 'path'
@@ -27,6 +28,7 @@ export class DevCommand extends BaseCommand {
   outputSearchIndexPath = Option.String('--outputSearchIndexPath', {
     description: 'Path to write the search index to',
   })
+  indexingLock: AsyncLock = new AsyncLock() // Prevent indexes and reads occurring at once
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -57,13 +59,16 @@ export class DevCommand extends BaseCommand {
       rootPath: this.rootPath,
       legacyNoSDK: this.noSDK,
     })
-    logger.info('Starting Tina Dev Server')
+    logger.info('🦙 TinaCMS Dev Server is initializing...')
     this.logDeprecationWarnings()
 
     // Initialize the host TCP server
     createDBServer(Number(this.datalayerPort))
 
     let database: Database = null
+    const dbLock = async (fn: () => Promise<void>) => {
+      return this.indexingLock.acquire('Key', fn)
+    }
 
     const setup = async ({ firstTime }: { firstTime: boolean }) => {
       try {
@@ -134,7 +139,11 @@ export class DevCommand extends BaseCommand {
         }
 
         if (!this.noWatch) {
-          this.watchQueries(configManager, async () => await codegen.execute())
+          this.watchQueries(
+            configManager,
+            dbLock,
+            async () => await codegen.execute()
+          )
         }
 
         return { apiURL, database, graphQLSchema, tinaSchema }
@@ -171,14 +180,6 @@ export class DevCommand extends BaseCommand {
     })
     await searchIndexClient.onStartIndexing()
 
-    const server = await createDevServer(
-      configManager,
-      database,
-      searchIndexClient.searchIndex,
-      apiURL,
-      this.noWatch
-    )
-    await server.listen(Number(this.port))
     const searchIndexer = new SearchIndexer({
       batchSize: configManager.config.search?.indexBatchSize || 100,
       bridge: new FilesystemBridge(
@@ -208,15 +209,31 @@ export class DevCommand extends BaseCommand {
       this.watchContentFiles(
         configManager,
         database,
+        dbLock,
         configManager.config.search && searchIndexer
       )
+    }
+
+    const server = await createDevServer(
+      configManager,
+      database,
+      searchIndexClient.searchIndex,
+      apiURL,
+      this.noWatch,
+      dbLock
+    )
+    await server.listen(Number(this.port))
+
+    if (!this.noWatch) {
       chokidar.watch(configManager.watchList).on('change', async () => {
-        logger.info(`Tina config change detected, rebuilding`)
-        await setup({ firstTime: false })
-        // The setup process results in an update to the prebuild file
-        // But Vite doesn't reload when it's changed for some reason
-        // So we're triggering the reload ourselves
-        server.ws.send({ type: 'full-reload', path: '*' })
+        await dbLock(async () => {
+          logger.info(`Tina config change detected, rebuilding`)
+          await setup({ firstTime: false })
+          // The setup process results in an update to the prebuild file
+          // But Vite doesn't reload when it's changed for some reason
+          // So we're triggering the reload ourselves
+          server.ws.send({ type: 'full-reload', path: '*' })
+        })
       })
     }
 
@@ -232,7 +249,7 @@ export class DevCommand extends BaseCommand {
     const summaryItems = [
       {
         emoji: '🦙',
-        heading: 'Tina Config',
+        heading: 'TinaCMS URLs',
         subItems: [
           {
             key: 'CMS',
@@ -269,7 +286,7 @@ export class DevCommand extends BaseCommand {
     }
 
     summary({
-      heading: 'Tina Dev Server is running...',
+      heading: '✅ 🦙 TinaCMS Dev Server is active:',
       items: [
         ...summaryItems,
         // {
@@ -294,6 +311,7 @@ export class DevCommand extends BaseCommand {
   watchContentFiles(
     configManager: ConfigManager,
     database: Database,
+    databaseLock: (fn: () => Promise<void>) => Promise<void>,
     searchIndexer?: SearchIndexer
   ) {
     const collectionContentFiles = []
@@ -321,57 +339,71 @@ export class DevCommand extends BaseCommand {
         if (!ready) {
           return
         }
-        const pathFromRoot = configManager.printContentRelativePath(addedFile)
-        await database.indexContentByPaths([pathFromRoot]).catch(console.error)
-        if (searchIndexer) {
-          await searchIndexer
+        await databaseLock(async () => {
+          const pathFromRoot = configManager.printContentRelativePath(addedFile)
+          await database
             .indexContentByPaths([pathFromRoot])
             .catch(console.error)
-        }
+          if (searchIndexer) {
+            await searchIndexer
+              .indexContentByPaths([pathFromRoot])
+              .catch(console.error)
+          }
+        })
       })
       .on('change', async (changedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(changedFile)
         // Optionally we can reload the page when this happens
         // server.ws.send({ type: 'full-reload', path: '*' })
-        await database.indexContentByPaths([pathFromRoot]).catch(console.error)
-        if (searchIndexer) {
-          await searchIndexer
+        await databaseLock(async () => {
+          await database
             .indexContentByPaths([pathFromRoot])
             .catch(console.error)
-        }
+          if (searchIndexer) {
+            await searchIndexer
+              .indexContentByPaths([pathFromRoot])
+              .catch(console.error)
+          }
+        })
       })
       .on('unlink', async (removedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(removedFile)
-        await database.deleteContentByPaths([pathFromRoot]).catch(console.error)
-        if (searchIndexer) {
-          await searchIndexer
-            .deleteIndexContent([pathFromRoot])
+        await databaseLock(async () => {
+          await database
+            .deleteContentByPaths([pathFromRoot])
             .catch(console.error)
-        }
+          if (searchIndexer) {
+            await searchIndexer
+              .deleteIndexContent([pathFromRoot])
+              .catch(console.error)
+          }
+        })
       })
   }
-  watchQueries(configManager: ConfigManager, callback: () => Promise<string>) {
-    let ready = false
+
+  watchQueries(
+    configManager: ConfigManager,
+    databaseLock: (fn: () => Promise<void>) => Promise<void>,
+    callback: () => Promise<string>
+  ) {
+    // Locking prevents multiple near-simultaneous file changes from clobbering each other.
+    const executeCallback = async (_: unknown) => {
+      await databaseLock(async () => {
+        await callback()
+      })
+    }
+
     /**
      * This has no way of knowing whether the change to the file came from someone manually
      * editing in their IDE or Tina pushing the update via the Filesystem bridge. It's a simple
      * enough update that it's fine that when Tina pushes a change, we go and push that same
-     * thing back through the database, and Tina Cloud does the same thing when it receives
+     * thing back through the database, and TinaCloud does the same thing when it receives
      * a push from GitHub.
      */
     chokidar
       .watch(configManager.userQueriesAndFragmentsGlob)
-      .on('ready', () => {
-        ready = true
-      })
-      .on('add', async (addedFile) => {
-        await callback()
-      })
-      .on('change', async (changedFile) => {
-        await callback()
-      })
-      .on('unlink', async (removedFile) => {
-        await callback()
-      })
+      .on('add', executeCallback)
+      .on('change', executeCallback)
+      .on('unlink', executeCallback)
   }
 }
