@@ -828,10 +828,20 @@ export const makeRefOpsForDocument = <T extends object>(
       const references: Record<string, string[]> = {}
       for (const path of referencePaths) {
         const ref = JSONPath({ path, json: data })
-        if (references[ref]) {
-          references[ref].push(path)
+        if (Array.isArray(ref)) {
+          for (const r of ref) {
+            if (references[r]) {
+              references[r].push(path)
+            } else {
+              references[r] = [path]
+            }
+          }
         } else {
-          references[ref] = [path]
+          if (references[ref]) {
+            references[ref].push(path)
+          } else {
+            references[ref] = [path]
+          }
         }
       }
 
