@@ -284,32 +284,40 @@ export const transformDocumentIntoPayload = async (
 
 /**
  * Updates a property in an object using a JSONPath.
- * @param {Object} obj - The object to update.
- * @param {string} path - The JSONPath string.
- * @param {*} newValue - The new value to set at the specified path.
- * @returns {Object} - The updated object.
+ * @param obj - The object to update.
+ * @param path - The JSONPath string.
+ * @param newValue - The new value to set at the specified path.
+ * @returns the updated object.
  */
-const updateObjectWithJsonPath = (obj, path, newValue) => {
+export const updateObjectWithJsonPath = (
+  obj: any,
+  path: string,
+  oldValue: any,
+  newValue: any
+) => {
   // Handle the case where path is a simple top-level property
   if (!path.includes('.') && !path.includes('[')) {
-    if (path in obj) {
+    if (path in obj && obj[path] === oldValue) {
       obj[path] = newValue
     }
     return obj
   }
 
-  // For non-top-level properties, find the parent of the property to update
-  const parentPath = path.replace(/\.[^.]+$/, '')
-  const keyToUpdate = path.match(/[^.]+$/)[0]
+  // Extract the parent path (everything except the last segment)
+  const parentPath = path.replace(/\.[^.\[\]]+$/, '')
+  const keyToUpdate = path.match(/[^.\[\]]+$/)[0]
 
-  // Retrieve the parent object using the parent path
+  // Use JSONPath to locate all parent objects
   const parents = JSONPath({ path: parentPath, json: obj, resultType: 'value' })
 
   if (parents.length > 0) {
     parents.forEach((parent) => {
       if (parent && typeof parent === 'object' && keyToUpdate in parent) {
-        // Update the property with the new value
-        parent[keyToUpdate] = newValue
+        // Check if the current value matches the oldValue
+        if (parent[keyToUpdate] === oldValue) {
+          // Update the property with the new value
+          parent[keyToUpdate] = newValue
+        }
       }
     })
   }
@@ -829,7 +837,7 @@ export class Resolver {
 
               // Update each reference to the deleted document
               for (const path of referencePaths) {
-                refDoc = updateObjectWithJsonPath(refDoc, path, null)
+                refDoc = updateObjectWithJsonPath(refDoc, path, realPath, null)
               }
 
               // save the updated doc
@@ -878,6 +886,7 @@ export class Resolver {
               docWithRef = updateObjectWithJsonPath(
                 docWithRef,
                 path,
+                realPath,
                 newRealPath
               )
             }
