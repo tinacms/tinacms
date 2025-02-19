@@ -41,8 +41,8 @@
 		"@tinacms/schema-tools": "workspace:*",
 		"memory-level": "^1.0.0",
 		"search-index": "4.0.0",
-		"sqlite-level": "^1.2.0",
-		"stopword": "^3.1.1"
+		"sqlite-level": "^1.2.1",
+		"stopword": "^3.1.4"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
@@ -55,12 +55,12 @@
 		"@tinacms/scripts": "workspace:*",
 		"@types/jest": "^29.5.14",
 		"@types/micromatch": "^4.0.9",
-		"@types/node": "^22.9.0",
+		"@types/node": "^22.13.1",
 		"@types/search-index": "^3.2.4",
 		"jest": "^29.7.0",
 		"jest-diff": "^29.7.0",
 		"jest-file-snapshot": "^0.7.0",
 		"jest-matcher-utils": "^29.7.0",
-		"typescript": "^5.6.3"
+		"typescript": "^5.7.3"
 	}
 }
