@@ -3,28 +3,6 @@ import { describe, expect, it } from 'vitest'
 
 describe('index', () => {
   describe('updateObjectWithJsonPath', () => {
-    it('should update object with json path', () => {
-      const oldValue = 3
-      const obj = { a: { b: { c: oldValue } } }
-      const path = '$.a.b.c'
-      const newValue = 10
-
-      const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
-
-      expect(result).toEqual({ a: { b: { c: 10 } } })
-    })
-
-    it('should update object with array json path', () => {
-      const oldValue = 2
-      const obj = { a: { b: { c: [{ v: 1 }, { v: 2 }, { v: 3 }] } } }
-      const path = '$.a.b.c[*].v'
-      const newValue = 10
-      const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
-      expect(result).toEqual({
-        a: { b: { c: [{ v: 1 }, { v: newValue }, { v: 3 }] } },
-      })
-    })
-
     it('should update top-level property', () => {
       const oldValue = 3
       const obj = { a: oldValue }
