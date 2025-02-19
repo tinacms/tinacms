@@ -471,6 +471,19 @@ export class TinaSchema {
           cb({ field, collection, path: fieldPath })
           if (field.type === 'object' && field.fields) {
             walk(field, collection, fieldPath)
+          } else if (field.templates) {
+            field.templates.forEach((template: any) => {
+              const templatePath = `${fieldPath}.${template.name}`
+              template.fields.forEach((field: any) => {
+                const fieldPath = field.list
+                  ? `${templatePath}[*].${field.name}`
+                  : `${templatePath}.${field.name}`
+                cb({ field, collection, path: fieldPath })
+                if (field.type === 'object') {
+                  walk(field, collection, fieldPath)
+                }
+              })
+            })
           }
         })
       }

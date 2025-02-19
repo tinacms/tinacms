@@ -618,6 +618,167 @@ describe('TinaSchema', () => {
       })
     })
 
+    it('should walk body with templates', () => {
+      const schema = new TinaSchema({
+        collections: [
+          {
+            name: 'post',
+            path: 'post',
+            fields: [
+              {
+                name: 'body',
+                type: 'rich-text',
+                isBody: true,
+                templates: [
+                  {
+                    name: 'WarningCallout',
+                    label: 'WarningCallout',
+                    match: {
+                      start: '{%',
+                      end: '%}',
+                    },
+                    fields: [
+                      {
+                        name: 'text',
+                        label: 'Text',
+                        type: 'string',
+                        required: true,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+      const mockCb = jest.fn()
+      schema.walkFields(mockCb)
+
+      expect(mockCb).toHaveBeenCalledTimes(2)
+      expect(mockCb).toHaveBeenCalledWith({
+        collection: {
+          name: 'post',
+          format: 'md',
+          slug: 'post',
+          path: 'post',
+          fields: [
+            {
+              name: 'body',
+              type: 'rich-text',
+              isBody: true,
+              parser: {
+                type: 'markdown',
+              },
+              uid: false,
+              searchable: true,
+              templates: [
+                {
+                  name: 'WarningCallout',
+                  label: 'WarningCallout',
+                  match: {
+                    start: '{%',
+                    end: '%}',
+                  },
+                  fields: [
+                    {
+                      name: 'text',
+                      label: 'Text',
+                      type: 'string',
+                      required: true,
+                      searchable: true,
+                      uid: false,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        field: {
+          name: 'body',
+          type: 'rich-text',
+          isBody: true,
+          uid: false,
+          parser: {
+            type: 'markdown',
+          },
+          searchable: true,
+          templates: [
+            {
+              name: 'WarningCallout',
+              label: 'WarningCallout',
+              match: {
+                start: '{%',
+                end: '%}',
+              },
+              fields: [
+                {
+                  name: 'text',
+                  label: 'Text',
+                  type: 'string',
+                  required: true,
+                  searchable: true,
+                  uid: false,
+                },
+              ],
+            },
+          ],
+        },
+        path: '$.body',
+      })
+
+      expect(mockCb).toHaveBeenCalledWith({
+        collection: {
+          name: 'post',
+          format: 'md',
+          slug: 'post',
+          path: 'post',
+          fields: [
+            {
+              name: 'body',
+              type: 'rich-text',
+              isBody: true,
+              parser: {
+                type: 'markdown',
+              },
+              searchable: true,
+              templates: [
+                {
+                  name: 'WarningCallout',
+                  label: 'WarningCallout',
+                  match: {
+                    start: '{%',
+                    end: '%}',
+                  },
+                  fields: [
+                    {
+                      name: 'text',
+                      label: 'Text',
+                      type: 'string',
+                      required: true,
+                      searchable: true,
+                      uid: false,
+                    },
+                  ],
+                },
+              ],
+              uid: false,
+            },
+          ],
+        },
+        field: {
+          name: 'text',
+          label: 'Text',
+          type: 'string',
+          required: true,
+          searchable: true,
+          uid: false,
+        },
+        path: '$.body.WarningCallout.text',
+      })
+    })
+
     it('should handle an empty collection', () => {
       const schema = new TinaSchema({
         collections: [],
