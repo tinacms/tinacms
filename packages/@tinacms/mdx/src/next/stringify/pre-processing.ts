@@ -11,7 +11,6 @@ export const preProcess = (
   imageCallback: (url: string) => string
 ) => {
   const ast = rootElement(tree, field, imageCallback)
-  console.log('preProcess: ,', JSON.stringify(ast))
   return ast
 }
 
@@ -61,7 +60,6 @@ export const blockElement = (
           (onlyChild.type === 'text' || !onlyChild.type) &&
           onlyChild.text === ''
         ) {
-          console.log('p onlyChild truee: ,', onlyChild)
           return null
         }
       }
