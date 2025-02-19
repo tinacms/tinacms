@@ -25,13 +25,13 @@
 		"@tinacms/scripts": "workspace:*",
 		"@types/crypto-js": "^3.1.47",
 		"@types/js-cookie": "^2.2.7",
-		"@types/node": "^22.9.0",
-		"@types/react": "^18.3.12",
+		"@types/node": "^22.13.1",
+		"@types/react": "^18.3.18",
 		"next": "14.2.10",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"tinacms": "workspace:*",
-		"typescript": "^5.6.3"
+		"typescript": "^5.7.3"
 	},
 	"peerDependencies": {
 		"tinacms": "workspace:*"
@@ -44,7 +44,7 @@
 		"directory": "packages/next-tinacms-s3"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "^3.693.0",
-		"@aws-sdk/s3-request-presigner": "^3.693.0"
+		"@aws-sdk/client-s3": "^3.744.0",
+		"@aws-sdk/s3-request-presigner": "^3.744.0"
 	}
 }

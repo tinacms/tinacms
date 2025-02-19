@@ -854,6 +854,12 @@ export class Resolver {
           collection?.path,
           args.params.relativePath
         )
+
+        // don't update if the paths are the same
+        if (newRealPath === realPath) {
+          return doc
+        }
+
         // Update the document
         await this.database.put(newRealPath, doc._rawData, collection.name)
         // Delete the old document
