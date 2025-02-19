@@ -44,7 +44,7 @@
 		"isomorphic-git": "^1.27.1",
 		"js-sha1": "^0.6.0",
 		"js-yaml": "^3.14.1",
-		"jsonpath-plus": "10.1.0",
+		"jsonpath-plus": "10.3.0",
 		"lodash.clonedeep": "^4.5.0",
 		"lodash.set": "^4.3.2",
 		"lodash.uniqby": "^4.7.0",
@@ -83,8 +83,8 @@
 		"memory-level": "^1.0.0",
 		"nodemon": "3.1.4",
 		"typescript": "^5.6.3",
-		"vite": "^4.3.9",
-		"vitest": "^0.32.2",
+		"vite": "^4.5.6",
+		"vitest": "^0.33.0",
 		"zod": "^3.23.8"
 	}
 }
