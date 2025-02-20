@@ -4,6 +4,7 @@ export function useTina<T extends object>(props: {
   query: string
   variables: object
   data: T
+  experimental___selectFormByFormId?: () => string | false | undefined
 }): { data: T; isClient: boolean } {
   const stringifiedQuery = JSON.stringify({
     query: props.query,
@@ -116,7 +117,17 @@ export function useTina<T extends object>(props: {
   }, [quickEditEnabled, isInTinaIframe])
 
   React.useEffect(() => {
-    parent.postMessage({ type: 'open', ...props, id }, window.location.origin)
+    if (props?.experimental___selectFormByFormId) {
+      parent.postMessage({
+        type: 'user-select-form',
+        formId: props.experimental___selectFormByFormId(),
+      })
+    }
+  }, [id])
+
+  React.useEffect(() => {
+    const { experimental___selectFormByFormId, ...rest } = props
+    parent.postMessage({ type: 'open', ...rest, id }, window.location.origin)
     window.addEventListener('message', (event) => {
       if (event.data.type === 'quickEditEnabled') {
         setQuickEditEnabled(event.data.value)
