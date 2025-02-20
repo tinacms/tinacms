@@ -35,7 +35,11 @@ export class TinaSchema {
   constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
     this.schema = config
-    this.walkFields(({ field, collection, path }) => {
+    // NOTE: Any changes to the logic below or the legacyWalkFields
+    // function can impact the generated schema. This will result
+    // in schema mismatch errors when building with TinaCloud if the
+    // cli is on an older version of @tinacms/schema-tools than TinaCloud.
+    this.legacyWalkFields(({ field, collection }) => {
       // set defaults for field searchability
       if (!('searchable' in field)) {
         if (field.type === 'image') {
@@ -69,16 +73,19 @@ export class TinaSchema {
     )
   }
 
-  public findReferences(name: string) {
-    const result: Record<string, { path: string[]; field: TinaField }[]> = {}
+  public findReferencesFromCollection(name: string) {
+    const result: Record<string, string[]> = {}
     this.walkFields(({ field, collection: c, path }) => {
+      if (c.name !== name) {
+        return
+      }
       if (field.type === 'reference') {
-        if (field.collections.includes(name)) {
-          if (result[c.name] === undefined) {
-            result[c.name] = []
+        field.collections.forEach((name) => {
+          if (result[name] === undefined) {
+            result[name] = []
           }
-          result[c.name].push({ path, field })
-        }
+          result[name].push(path)
+        })
       }
     })
     return result
@@ -432,7 +439,79 @@ export class TinaSchema {
       }
     }
   }
-  public walkFields = (
+
+  /**
+   * Walk all fields in tina schema
+   *
+   * @param cb callback function invoked for each field
+   */
+  public walkFields(
+    cb: (args: {
+      field: any
+      collection: any
+      path: string
+      isListItem?: boolean
+    }) => void
+  ) {
+    const walk = (
+      collectionOrObject: any,
+      collection: any,
+      path: string = '$'
+    ) => {
+      if (collectionOrObject.templates) {
+        collectionOrObject.templates.forEach((template: any) => {
+          const templatePath = `${path}.${template.name}`
+          template.fields.forEach((field: any) => {
+            const fieldPath = field.list
+              ? `${templatePath}[*].${field.name}`
+              : `${templatePath}.${field.name}`
+            cb({ field, collection, path: fieldPath })
+            if (field.type === 'object') {
+              walk(field, collection, fieldPath)
+            }
+          })
+        })
+      }
+      if (collectionOrObject.fields) {
+        collectionOrObject.fields.forEach((field: any) => {
+          const fieldPath = field.list
+            ? `${path}.${field.name}[*]`
+            : `${path}.${field.name}`
+          cb({ field, collection, path: fieldPath })
+          if (field.type === 'object' && field.fields) {
+            walk(field, collection, fieldPath)
+          } else if (field.templates) {
+            field.templates.forEach((template: any) => {
+              const templatePath = `${fieldPath}.${template.name}`
+              template.fields.forEach((field: any) => {
+                const fieldPath = field.list
+                  ? `${templatePath}[*].${field.name}`
+                  : `${templatePath}.${field.name}`
+                cb({ field, collection, path: fieldPath })
+                if (field.type === 'object') {
+                  walk(field, collection, fieldPath)
+                }
+              })
+            })
+          }
+        })
+      }
+    }
+
+    this.getCollections().forEach((collection) => {
+      walk(collection, collection)
+    })
+  }
+
+  /**
+   * Walk all fields in Tina Schema
+   *
+   * This is a legacy version to preserve backwards compatibility for the tina generated schema. It does not
+   * traverse fields in object lists in rich-text templates.
+   *
+   * @param cb callback function invoked for each field
+   */
+  public legacyWalkFields = (
     cb: (args: {
       field: TinaField
       collection: Collection
