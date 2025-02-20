@@ -1,5 +1,17 @@
 # tina-graphql
 
+## 1.5.13
+
+### Patch Changes
+
+- [#5498](https://github.com/tinacms/tinacms/pull/5498) [`3974aa7`](https://github.com/tinacms/tinacms/commit/3974aa759192713140733b99ee0254a1a056e124) Thanks [@kldavis4](https://github.com/kldavis4)! - fix: correctly handle noop renames
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
+- Updated dependencies [[`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d), [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571)]:
+  - @tinacms/mdx@1.6.0
+  - @tinacms/schema-tools@1.7.1
+
 ## 1.5.12
 
 ### Patch Changes
