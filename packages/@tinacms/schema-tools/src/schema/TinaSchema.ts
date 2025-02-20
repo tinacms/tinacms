@@ -35,6 +35,10 @@ export class TinaSchema {
   constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
     this.schema = config
+    // NOTE: Any changes to the logic below or the legacyWalkFields
+    // function can impact the generated schema. This will result
+    // in schema mismatch errors when building with TinaCloud if the
+    // cli is on an older version of @tinacms/schema-tools than TinaCloud.
     this.legacyWalkFields(({ field, collection }) => {
       // set defaults for field searchability
       if (!('searchable' in field)) {
