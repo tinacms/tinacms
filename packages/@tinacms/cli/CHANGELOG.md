@@ -1,5 +1,25 @@
 # tinacms-cli
 
+## 1.9.0
+
+### Minor Changes
+
+- [#5446](https://github.com/tinacms/tinacms/pull/5446) [`d79e661`](https://github.com/tinacms/tinacms/commit/d79e661d0c9eeb17ba929fcddd807179f9bd6040) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - ⚡ Performance - Improve stability when reindexing required
+
+### Patch Changes
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
+- [#5488](https://github.com/tinacms/tinacms/pull/5488) [`7303f76`](https://github.com/tinacms/tinacms/commit/7303f76b36fb988ab2c6b4aa461b373a00f6a856) Thanks [@isaaclombardssw](https://github.com/isaaclombardssw)! - Updated the CLI initialisation routine text as per feedback, to improve clarity.
+
+- Updated dependencies [[`3974aa7`](https://github.com/tinacms/tinacms/commit/3974aa759192713140733b99ee0254a1a056e124), [`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d), [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571), [`99bb59f`](https://github.com/tinacms/tinacms/commit/99bb59ff7b9f3cf27a1382b91826eb81831ecb95)]:
+  - tinacms@2.7.0
+  - @tinacms/graphql@1.5.13
+  - @tinacms/app@2.2.0
+  - @tinacms/metrics@1.0.9
+  - @tinacms/schema-tools@1.7.1
+  - @tinacms/search@1.0.40
+
 ## 1.8.4
 
 ### Patch Changes

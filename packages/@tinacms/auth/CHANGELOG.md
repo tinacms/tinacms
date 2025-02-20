@@ -1,5 +1,11 @@
 # @tinacms/auth
 
+## 1.0.11
+
+### Patch Changes
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
 ## 1.0.10
 
 ### Patch Changes

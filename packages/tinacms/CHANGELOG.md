@@ -1,5 +1,28 @@
 # tinacms
 
+## 2.7.0
+
+### Minor Changes
+
+- [#5504](https://github.com/tinacms/tinacms/pull/5504) [`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d) Thanks [@Ben0189](https://github.com/Ben0189)! - Rich text editor - Add strikethrough support
+
+  - Added a strikethrough button in the rich text editor, allowing users to apply strikethrough formatting.
+  - Strikethrough syntax (`~~word~~`) correctly applies in Markdown mode.
+  - **Known Issue:** In the rich text editor, typing `~~word~~` does not currently auto-convert to strikethrough. A fix will follow in an upcoming patch.
+
+- [#5503](https://github.com/tinacms/tinacms/pull/5503) [`99bb59f`](https://github.com/tinacms/tinacms/commit/99bb59ff7b9f3cf27a1382b91826eb81831ecb95) Thanks [@JackDevAU](https://github.com/JackDevAU)! - feat: add experimental user form select to the useTina hook
+
+### Patch Changes
+
+- [#5498](https://github.com/tinacms/tinacms/pull/5498) [`3974aa7`](https://github.com/tinacms/tinacms/commit/3974aa759192713140733b99ee0254a1a056e124) Thanks [@kldavis4](https://github.com/kldavis4)! - fix: correctly handle noop renames
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
+- Updated dependencies [[`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d), [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571)]:
+  - @tinacms/mdx@1.6.0
+  - @tinacms/schema-tools@1.7.1
+  - @tinacms/search@1.0.40
+
 ## 2.6.4
 
 ### Patch Changes
