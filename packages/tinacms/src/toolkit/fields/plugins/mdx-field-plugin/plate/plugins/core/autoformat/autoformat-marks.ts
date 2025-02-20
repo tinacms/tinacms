@@ -3,6 +3,7 @@ import {
   MARK_BOLD,
   MARK_CODE,
   MARK_ITALIC,
+  MARK_STRIKETHROUGH,
 } from '@udecode/plate'
 
 export const autoformatMarks: AutoformatRule[] = [
@@ -30,5 +31,10 @@ export const autoformatMarks: AutoformatRule[] = [
     mode: 'mark',
     type: MARK_CODE,
     match: '`',
+  },
+  {
+    mode: 'mark',
+    type: MARK_STRIKETHROUGH,
+    match: '~~',
   },
 ]
