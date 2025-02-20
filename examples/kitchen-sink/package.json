@@ -13,7 +13,8 @@
 		"replay": "replay ./recording.json",
 		"start": "next start",
 		"lint": "next lint",
-		"searchindex": "tinacms search-index"
+		"searchindex": "tinacms search-index",
+		"diff-tina-lock": "tinacms-scripts diff-tina-lock"
 	},
 	"dependencies": {
 		"@headlessui/react": "^2.2.0",
@@ -34,6 +35,7 @@
 		"@puppeteer/replay": "^1.3.2",
 		"@tinacms/app": "workspace:*",
 		"@tinacms/cli": "workspace:*",
+		"@tinacms/scripts": "workspace:*",
 		"autoprefixer": "^10.4.20",
 		"eslint": "8.24.0",
 		"eslint-config-next": "^13.5.8",

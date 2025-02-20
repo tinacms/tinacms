@@ -8,7 +8,8 @@
 		"build": "tinacms build && next build",
 		"start": "tinacms build && next start",
 		"export": "npm run build && next export",
-		"lint": "eslint . --ext .ts,.tsx"
+		"lint": "eslint . --ext .ts,.tsx",
+		"diff-tina-lock": "tinacms-scripts diff-tina-lock"
 	},
 	"dependencies": {
 		"@headlessui/react": "2.1.8",
@@ -29,6 +30,7 @@
 	"devDependencies": {
 		"@svgr/webpack": "^8.1.0",
 		"@tinacms/cli": "workspace:*",
+		"@tinacms/scripts": "workspace:*",
 		"@types/node": "^22.13.1",
 		"@types/react": "^18.3.18",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
