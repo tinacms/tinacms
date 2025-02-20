@@ -1,5 +1,11 @@
 # tinacms
 
+## 2.7.1
+
+### Patch Changes
+
+- [#5509](https://github.com/tinacms/tinacms/pull/5509) [`06c1716`](https://github.com/tinacms/tinacms/commit/06c17163b558a96275b0ef66c746b005a6f90d13) Thanks [@Ben0189](https://github.com/Ben0189)! - add auto format for strikethrough
+
 ## 2.7.0
 
 ### Minor Changes
