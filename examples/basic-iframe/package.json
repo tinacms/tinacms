@@ -15,7 +15,7 @@
 		"@tinacms/graphql": "workspace:*",
 		"dotenv": "^16.4.7",
 		"js-base64": "^3.7.7",
-		"next": "^14.2.24",
+		"next": "^14.2.21",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-is": "^18.3.1",
