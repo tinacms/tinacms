@@ -71,19 +71,22 @@ export class TinaSchema {
 
   public findReferencesFromCollection(name: string) {
     const result: Record<string, string[]> = {}
-    this.walkFields(({ field, collection: c, path }) => {
-      if (c.name !== name) {
-        return
-      }
-      if (field.type === 'reference') {
-        field.collections.forEach((name) => {
-          if (result[name] === undefined) {
-            result[name] = []
-          }
-          result[name].push(path)
-        })
-      }
-    })
+    this.walkFields(
+      ({ field, collection: c, path }) => {
+        if (c.name !== name) {
+          return
+        }
+        if (field.type === 'reference') {
+          field.collections.forEach((name) => {
+            if (result[name] === undefined) {
+              result[name] = []
+            }
+            result[name].push(path)
+          })
+        }
+      },
+      { skipRichTextTemplates: false }
+    )
     return result
   }
 
@@ -436,13 +439,24 @@ export class TinaSchema {
     }
   }
 
+  /**
+   * Walk all fields in tina schema
+   *
+   * @param cb callback function invoked for each field
+   * @param options.skipRichTextTemplates boolean option preserves the legacy behavior of not
+   *   traversing templates on rich-text type fields. Defaults to true. Changing this when called
+   *   in the constructor to TinaSchema may result in structural changes to the generated schema.
+   */
   public walkFields(
     cb: (args: {
       field: any
       collection: any
       path: string
       isListItem?: boolean
-    }) => void
+    }) => void,
+    { skipRichTextTemplates = true }: { skipRichTextTemplates: boolean } = {
+      skipRichTextTemplates: true,
+    }
   ) {
     const walk = (
       collectionOrObject: any,
@@ -471,7 +485,10 @@ export class TinaSchema {
           cb({ field, collection, path: fieldPath })
           if (field.type === 'object' && field.fields) {
             walk(field, collection, fieldPath)
-          } else if (field.templates) {
+          } else if (
+            field.templates &&
+            (field.type != 'rich-text' || !skipRichTextTemplates)
+          ) {
             field.templates.forEach((template: any) => {
               const templatePath = `${fieldPath}.${template.name}`
               template.fields.forEach((field: any) => {

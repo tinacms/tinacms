@@ -618,7 +618,7 @@ describe('TinaSchema', () => {
       })
     })
 
-    it('should walk body with templates', () => {
+    it('should skip templates on body', () => {
       const schema = new TinaSchema({
         collections: [
           {
@@ -655,7 +655,7 @@ describe('TinaSchema', () => {
       const mockCb = jest.fn()
       schema.walkFields(mockCb)
 
-      expect(mockCb).toHaveBeenCalledTimes(2)
+      expect(mockCb).toHaveBeenCalledTimes(1)
       expect(mockCb).toHaveBeenCalledWith({
         collection: {
           name: 'post',
@@ -686,8 +686,6 @@ describe('TinaSchema', () => {
                       label: 'Text',
                       type: 'string',
                       required: true,
-                      searchable: true,
-                      uid: false,
                     },
                   ],
                 },
@@ -718,64 +716,12 @@ describe('TinaSchema', () => {
                   label: 'Text',
                   type: 'string',
                   required: true,
-                  searchable: true,
-                  uid: false,
                 },
               ],
             },
           ],
         },
         path: '$.body',
-      })
-
-      expect(mockCb).toHaveBeenCalledWith({
-        collection: {
-          name: 'post',
-          format: 'md',
-          slug: 'post',
-          path: 'post',
-          fields: [
-            {
-              name: 'body',
-              type: 'rich-text',
-              isBody: true,
-              parser: {
-                type: 'markdown',
-              },
-              searchable: true,
-              templates: [
-                {
-                  name: 'WarningCallout',
-                  label: 'WarningCallout',
-                  match: {
-                    start: '{%',
-                    end: '%}',
-                  },
-                  fields: [
-                    {
-                      name: 'text',
-                      label: 'Text',
-                      type: 'string',
-                      required: true,
-                      searchable: true,
-                      uid: false,
-                    },
-                  ],
-                },
-              ],
-              uid: false,
-            },
-          ],
-        },
-        field: {
-          name: 'text',
-          label: 'Text',
-          type: 'string',
-          required: true,
-          searchable: true,
-          uid: false,
-        },
-        path: '$.body.WarningCallout.text',
       })
     })
 
