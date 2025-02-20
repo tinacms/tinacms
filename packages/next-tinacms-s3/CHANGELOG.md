@@ -1,5 +1,12 @@
 # next-tinacms-s3
 
+## 10.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`06c1716`](https://github.com/tinacms/tinacms/commit/06c17163b558a96275b0ef66c746b005a6f90d13)]:
+  - tinacms@2.7.1
+
 ## 10.0.0
 
 ### Patch Changes
