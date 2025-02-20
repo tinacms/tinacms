@@ -35,7 +35,7 @@ export class TinaSchema {
   constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
     this.schema = config
-    this.walkFields(({ field, collection }) => {
+    this.legacyWalkFields(({ field, collection }) => {
       // set defaults for field searchability
       if (!('searchable' in field)) {
         if (field.type === 'image') {
@@ -71,22 +71,19 @@ export class TinaSchema {
 
   public findReferencesFromCollection(name: string) {
     const result: Record<string, string[]> = {}
-    this.walkFields(
-      ({ field, collection: c, path }) => {
-        if (c.name !== name) {
-          return
-        }
-        if (field.type === 'reference') {
-          field.collections.forEach((name) => {
-            if (result[name] === undefined) {
-              result[name] = []
-            }
-            result[name].push(path)
-          })
-        }
-      },
-      { skipRichTextTemplates: false }
-    )
+    this.walkFields(({ field, collection: c, path }) => {
+      if (c.name !== name) {
+        return
+      }
+      if (field.type === 'reference') {
+        field.collections.forEach((name) => {
+          if (result[name] === undefined) {
+            result[name] = []
+          }
+          result[name].push(path)
+        })
+      }
+    })
     return result
   }
 
@@ -443,9 +440,6 @@ export class TinaSchema {
    * Walk all fields in tina schema
    *
    * @param cb callback function invoked for each field
-   * @param options.skipRichTextTemplates boolean option preserves the legacy behavior of not
-   *   traversing templates on rich-text type fields. Defaults to true. Changing this when called
-   *   in the constructor to TinaSchema may result in structural changes to the generated schema.
    */
   public walkFields(
     cb: (args: {
@@ -453,10 +447,7 @@ export class TinaSchema {
       collection: any
       path: string
       isListItem?: boolean
-    }) => void,
-    { skipRichTextTemplates = true }: { skipRichTextTemplates: boolean } = {
-      skipRichTextTemplates: true,
-    }
+    }) => void
   ) {
     const walk = (
       collectionOrObject: any,
@@ -485,10 +476,7 @@ export class TinaSchema {
           cb({ field, collection, path: fieldPath })
           if (field.type === 'object' && field.fields) {
             walk(field, collection, fieldPath)
-          } else if (
-            field.templates &&
-            (field.type != 'rich-text' || !skipRichTextTemplates)
-          ) {
+          } else if (field.templates) {
             field.templates.forEach((template: any) => {
               const templatePath = `${fieldPath}.${template.name}`
               template.fields.forEach((field: any) => {
@@ -509,6 +497,49 @@ export class TinaSchema {
     this.getCollections().forEach((collection) => {
       walk(collection, collection)
     })
+  }
+
+  /**
+   * Walk all fields in Tina Schema
+   *
+   * This is a legacy version to preserve backwards compatibility for the tina generated schema. It does not
+   * traverse fields in object lists in rich-text templates.
+   *
+   * @param cb callback function invoked for each field
+   */
+  public legacyWalkFields = (
+    cb: (args: {
+      field: TinaField
+      collection: Collection
+      path: string[]
+    }) => void
+  ) => {
+    const walk = (
+      collectionOrObject: {
+        templates?: Template[]
+        fields?: TinaField[]
+      },
+      collection: Collection,
+      path: string[]
+    ) => {
+      if (collectionOrObject.templates) {
+        collectionOrObject.templates.forEach((template) => {
+          template.fields.forEach((field) => {
+            cb({ field, collection, path: [...path, template.name] })
+          })
+        })
+      }
+      if (collectionOrObject.fields) {
+        collectionOrObject.fields.forEach((field) => {
+          cb({ field, collection, path: [...path, field.name] })
+          if (field.type === 'rich-text' || field.type === 'object') {
+            walk(field, collection, [...path, field.name])
+          }
+        })
+      }
+    }
+    const collections = this.getCollections()
+    collections.forEach((collection) => walk(collection, collection, []))
   }
 
   /**
