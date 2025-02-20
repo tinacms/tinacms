@@ -35,6 +35,6 @@ export const autoformatMarks: AutoformatRule[] = [
   {
     mode: 'mark',
     type: MARK_STRIKETHROUGH,
-    match: '~~',
+    match: ['~~', '~'],
   },
 ]
