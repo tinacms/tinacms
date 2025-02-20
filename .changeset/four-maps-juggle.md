@@ -3,7 +3,7 @@
 "@tinacms/mdx": minor
 ---
 
-Feat - Add strikethrough support
+Rich text editor - Add strikethrough support
 
 - Added a strikethrough button in the rich text editor, allowing users to apply strikethrough formatting.
 - Strikethrough syntax (`~~word~~`) correctly applies in Markdown mode.
