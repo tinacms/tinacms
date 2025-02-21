@@ -173,8 +173,8 @@
 		"vitest": "^2.1.9"
 	},
 	"peerDependencies": {
-		"react": ">=16.14.0",
-		"react-dom": ">=16.14.0"
+		"react": ">=16.14.0 <19.0.0",
+		"react-dom": ">=16.14.0 <19.0.0"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
