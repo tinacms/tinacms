@@ -1642,6 +1642,9 @@ importers:
             prop-types:
                 specifier: 15.7.2
                 version: 15.7.2
+            react:
+                specifier: ^18.3.1
+                version: 18.3.1
             react-beautiful-dnd:
                 specifier: ^13.1.1
                 version: 13.1.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1651,6 +1654,9 @@ importers:
             react-datetime:
                 specifier: ^3.3.1
                 version: 3.3.1(moment@2.29.4)(react@18.3.1)
+            react-dom:
+                specifier: ^18.3.1
+                version: 18.3.1(react@18.3.1)
             react-dropzone:
                 specifier: 14.2.3
                 version: 14.2.3(react@18.3.1)
@@ -1760,12 +1766,6 @@ importers:
             next:
                 specifier: 14.2.10
                 version: 14.2.10(@babel/core@7.26.0)(@playwright/test@1.50.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-            react:
-                specifier: ^18.3.1
-                version: 18.3.1
-            react-dom:
-                specifier: ^18.3.1
-                version: 18.3.1(react@18.3.1)
             react-is:
                 specifier: ^18.3.1
                 version: 18.3.1
