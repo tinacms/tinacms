@@ -4,14 +4,9 @@ import { DummyMediaStore } from './media-store.default'
 const encodeUrlIfNeeded = (url: string) => {
   if (url) {
     try {
-      const parsed = new URL(url)
-      parsed.pathname = parsed.pathname
-        .split('/')
-        .filter((part) => part !== '')
-        .map(encodeURIComponent)
-        .join('/')
-      return parsed.toString()
+      return new URL(url).toString()
     } catch (e) {
+      // If URL parsing fails, return the original URL
       return url
     }
   } else {
