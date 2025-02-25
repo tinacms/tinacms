@@ -98,8 +98,8 @@ export class GenericSdkVisitor extends ClientSideBaseVisitor<
           o.operationResultType
         }> {
     return requester<${o.operationResultType}, ${o.operationVariablesTypes}>(${
-          o.documentVariableName
-        }, variables, options);
+      o.documentVariableName
+    }, variables, options);
   }`
       })
       .map((s) => indentMultiline(s, 2))

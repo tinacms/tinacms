@@ -151,31 +151,31 @@ export const EditoralBranchSwitcher = ({
   }, [listState, branchList.length])
 
   return (
-    <div className="w-full flex justify-center p-5">
-      <div className="w-full max-w-form">
+    <div className='w-full flex justify-center p-5'>
+      <div className='w-full max-w-form'>
         {isLocalMode ? (
-          <div className="px-6 py-8 w-full h-full flex flex-col items-center justify-center">
-            <p className="text-base mb-4 text-center">
-              <AiFillWarning className="w-7 h-auto inline-block mr-0.5 opacity-70 text-yellow-600" />
+          <div className='px-6 py-8 w-full h-full flex flex-col items-center justify-center'>
+            <p className='text-base mb-4 text-center'>
+              <AiFillWarning className='w-7 h-auto inline-block mr-0.5 opacity-70 text-yellow-600' />
             </p>
-            <p className="text-base mb-6 text-center">
+            <p className='text-base mb-6 text-center'>
               Tina's branch switcher isn't available in local mode.{' '}
               <a
-                target="_blank"
-                className="transition-all duration-150 ease-out text-blue-600 hover:text-blue-400 hover:underline no-underline"
-                href="https://tina.io/docs/tina-cloud/"
+                target='_blank'
+                className='transition-all duration-150 ease-out text-blue-600 hover:text-blue-400 hover:underline no-underline'
+                href='https://tina.io/docs/tina-cloud/'
               >
                 Learn more about moving to production with Tina Cloud.
               </a>
             </p>
             <p>
               <Button
-                href="https://tina.io/docs/tina-cloud/"
-                target="_blank"
-                as="a"
+                href='https://tina.io/docs/tina-cloud/'
+                target='_blank'
+                as='a'
               >
                 Read Our Docs{' '}
-                <MdArrowForward className="w-5 h-auto ml-1.5 opacity-80" />
+                <MdArrowForward className='w-5 h-auto ml-1.5 opacity-80' />
               </Button>
             </p>
           </div>
@@ -203,12 +203,12 @@ export const EditoralBranchSwitcher = ({
                 }}
               />
             ) : (
-              <div className="px-6 py-8 w-full h-full flex flex-col items-center justify-center">
-                <p className="text-base mb-4 text-center">
+              <div className='px-6 py-8 w-full h-full flex flex-col items-center justify-center'>
+                <p className='text-base mb-4 text-center'>
                   An error occurred while retrieving the branch list.
                 </p>
-                <Button className="mb-4" onClick={refreshBranchList}>
-                  Try again <BiRefresh className="w-6 h-full ml-1 opacity-70" />
+                <Button className='mb-4' onClick={refreshBranchList}>
+                  Try again <BiRefresh className='w-6 h-full ml-1 opacity-70' />
                 </Button>
               </div>
             )}
@@ -276,31 +276,31 @@ const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
 
   return (
     <form>
-      <div className="">
-        <p className="text-base text-gray-700 mb-4">
+      <div className=''>
+        <p className='text-base text-gray-700 mb-4'>
           Create a new branch from <strong>{currentBranch}</strong>.
         </p>
-        <div className="mb-3">
-          <FieldLabel name="current-branch-name">
+        <div className='mb-3'>
+          <FieldLabel name='current-branch-name'>
             Current Branch Name
           </FieldLabel>
           <BaseTextField
-            name="current-branch-name"
+            name='current-branch-name'
             value={currentBranch}
             disabled
           />
         </div>
-        <div className="mb-6">
-          <FieldLabel name="branch-name">New Branch Name</FieldLabel>
+        <div className='mb-6'>
+          <FieldLabel name='branch-name'>New Branch Name</FieldLabel>
           <PrefixedTextField
-            placeholder=""
-            name="branch-name"
+            placeholder=''
+            name='branch-name'
             value={branchName}
             onChange={(e) => setBranchName(e.target.value)}
           />
         </div>
       </div>
-      <div className="w-full flex justify-between gap-4 items-center">
+      <div className='w-full flex justify-between gap-4 items-center'>
         <Button
           style={{ flexGrow: 1 }}
           onClick={() => {
@@ -310,15 +310,15 @@ const BranchCreator = ({ setViewState, handleCreateBranch, currentBranch }) => {
           Cancel
         </Button>
         <Button
-          variant="primary"
-          type="submit"
+          variant='primary'
+          type='submit'
           style={{ flexGrow: 2 }}
           disabled={branchName === ''}
           onClick={() => {
             handleCreateBranch('tina/' + branchName)
           }}
         >
-          Create Branch <BiGitBranch className="w-5 h-full ml-1 opacity-70" />
+          Create Branch <BiGitBranch className='w-5 h-full ml-1 opacity-70' />
         </Button>
       </div>
     </form>
@@ -354,44 +354,44 @@ const BranchSelector = ({
   const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-end space-x-4">
+    <div className='flex flex-col gap-4'>
+      <div className='flex items-end space-x-4'>
         <div>
           <label
-            htmlFor="search"
-            className="text-xs mb-1 flex flex-col font-bold"
+            htmlFor='search'
+            className='text-xs mb-1 flex flex-col font-bold'
           >
             Search
           </label>
-          <div className="block relative group h-fit mb-auto">
+          <div className='block relative group h-fit mb-auto'>
             <BaseTextField
-              placeholder="Search"
+              placeholder='Search'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
             {search === '' ? (
-              <BiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150" />
+              <BiSearch className='absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150' />
             ) : (
               <button
                 onClick={() => {
                   setSearch('')
                 }}
-                className="outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150"
+                className='outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150'
               >
-                <MdOutlineClear className="w-5 h-auto text-gray-600" />
+                <MdOutlineClear className='w-5 h-auto text-gray-600' />
               </button>
             )}
           </div>
         </div>
         <div>
           <label
-            htmlFor="branch-type"
-            className="text-xs mb-1 flex flex-col font-bold"
+            htmlFor='branch-type'
+            className='text-xs mb-1 flex flex-col font-bold'
           >
             Branch Type
           </label>
           <Select
-            name="branch-type"
+            name='branch-type'
             input={{
               id: 'branch-type',
               name: 'branch-type',
@@ -419,12 +419,12 @@ const BranchSelector = ({
         </div> */}
       </div>
       {filteredBranchList.length === 0 && (
-        <div className="block relative text-gray-300 italic py-1">
+        <div className='block relative text-gray-300 italic py-1'>
           No branches to display
         </div>
       )}
       {filteredBranchList.length > 0 && (
-        <div className="min-w-[192px] max-h-[24rem] overflow-y-auto flex flex-col w-full h-full rounded-lg shadow-inner bg-white border border-gray-200">
+        <div className='min-w-[192px] max-h-[24rem] overflow-y-auto flex flex-col w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
           {filteredBranchList.map((branch) => {
             const isCurrentBranch = branch.name === currentBranch
             // @ts-ignore
@@ -435,29 +435,29 @@ const BranchSelector = ({
                   indexingStatus !== 'complete'
                     ? 'bg-gray-50 text-gray-400'
                     : isCurrentBranch
-                    ? 'border-blue-500 border-l-5 bg-blue-50 text-blue-800 border-b-0'
-                    : 'border-b-2'
+                      ? 'border-blue-500 border-l-5 bg-blue-50 text-blue-800 border-b-0'
+                      : 'border-b-2'
                 }`}
                 key={branch.name}
               >
-                <div className="w-1/2">
-                  <div className="flex items-center gap-1">
-                    <div className="flex-0">
+                <div className='w-1/2'>
+                  <div className='flex items-center gap-1'>
+                    <div className='flex-0'>
                       {branch.protected && (
-                        <BiLock className="w-5 h-auto opacity-70 text-blue-500" />
+                        <BiLock className='w-5 h-auto opacity-70 text-blue-500' />
                       )}
                     </div>
-                    <div className="truncate flex-1">{branch.name}</div>
+                    <div className='truncate flex-1'>{branch.name}</div>
                   </div>
                   {indexingStatus !== 'complete' && (
-                    <div className="w-fit">
+                    <div className='w-fit'>
                       <IndexStatus indexingStatus={branch.indexStatus.status} />
                     </div>
                   )}
                 </div>
-                <div className="flex-1">
-                  <div className="text-xs font-bold">Last Updated</div>
-                  <span className="text-sm leading-tight">
+                <div className='flex-1'>
+                  <div className='text-xs font-bold'>Last Updated</div>
+                  <span className='text-sm leading-tight'>
                     {formatDistanceToNow(
                       new Date(branch.indexStatus.timestamp),
                       {
@@ -466,30 +466,30 @@ const BranchSelector = ({
                     )}
                   </span>
                 </div>
-                <div className="flex items-center">
+                <div className='flex items-center'>
                   {indexingStatus === 'complete' && !isCurrentBranch && (
                     <Button
-                      variant="white"
-                      size="custom"
+                      variant='white'
+                      size='custom'
                       onClick={() => {
                         onChange(branch.name)
                       }}
-                      className="mr-auto cursor-pointer text-sm h-9 px-4 flex items-center gap-1"
+                      className='mr-auto cursor-pointer text-sm h-9 px-4 flex items-center gap-1'
                     >
-                      <BiPencil className="h-4 w-auto text-blue-500 opacity-70 -mt-px" />{' '}
+                      <BiPencil className='h-4 w-auto text-blue-500 opacity-70 -mt-px' />{' '}
                       Select
                     </Button>
                   )}
                   {(branch.githubPullRequestUrl ||
                     typeof previewFunction === 'function') && (
-                    <div className="ml-auto">
+                    <div className='ml-auto'>
                       <OverflowMenu
                         toolbarItems={[
                           branch.githubPullRequestUrl && {
                             name: 'github-pr',
                             label: 'View in GitHub',
                             Icon: (
-                              <BiLinkExternal className="w-5 h-auto text-blue-500 opacity-70" />
+                              <BiLinkExternal className='w-5 h-auto text-blue-500 opacity-70' />
                             ),
                             onMouseDown: () => {
                               window.open(branch.githubPullRequestUrl, '_blank')
@@ -537,8 +537,8 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-blue-500 border-blue-500',
       content: () => (
         <>
-          <GrCircleQuestion className="w-3 h-auto" />
-          <span className="">{`Unknown`}</span>
+          <GrCircleQuestion className='w-3 h-auto' />
+          <span className=''>{`Unknown`}</span>
         </>
       ),
     },
@@ -546,8 +546,8 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-blue-500 border-blue-500',
       content: () => (
         <>
-          <FaSpinner className="w-3 h-auto animate-spin" />
-          <span className="">{`Indexing`}</span>
+          <FaSpinner className='w-3 h-auto animate-spin' />
+          <span className=''>{`Indexing`}</span>
         </>
       ),
     },
@@ -555,8 +555,8 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-red-500 border-red-500',
       content: () => (
         <>
-          <BiError className="w-3 h-auto" />
-          <span className="">{`Indexing failed`}</span>
+          <BiError className='w-3 h-auto' />
+          <span className=''>{`Indexing failed`}</span>
         </>
       ),
     },
@@ -564,8 +564,8 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
       classes: 'text-red-500 border-red-500',
       content: () => (
         <>
-          <BiError className="w-3 h-auto" />
-          <span className="">{`Indexing timed out`}</span>
+          <BiError className='w-3 h-auto' />
+          <span className=''>{`Indexing timed out`}</span>
         </>
       ),
     },

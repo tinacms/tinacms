@@ -72,12 +72,12 @@ export const SlashInputElement = withRef<typeof PlateElement>(
 
     return (
       <PlateElement
-        as="span"
+        as='span'
         data-slate-value={element.value}
         ref={ref}
         {...props}
       >
-        <InlineCombobox element={element} trigger="/">
+        <InlineCombobox element={element} trigger='/'>
           <InlineComboboxInput />
 
           <InlineComboboxContent>
@@ -92,7 +92,7 @@ export const SlashInputElement = withRef<typeof PlateElement>(
                 onClick={() => onSelect(editor)}
                 value={value}
               >
-                <Icon aria-hidden className="mr-2 size-4" />
+                <Icon aria-hidden className='mr-2 size-4' />
                 {value}
               </InlineComboboxItem>
             ))}

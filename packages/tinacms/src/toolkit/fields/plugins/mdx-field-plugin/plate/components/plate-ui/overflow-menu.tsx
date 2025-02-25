@@ -23,17 +23,17 @@ export default function OverflowMenu({
       <DropdownMenuTrigger asChild>
         <ToolbarButton
           showArrow={false}
-          data-testid="rich-text-editor-overflow-menu-button"
-          className="lg:min-w-[130px]"
+          data-testid='rich-text-editor-overflow-menu-button'
+          className='lg:min-w-[130px]'
           isDropdown
           pressed={openState.open}
-          tooltip="Headings"
+          tooltip='Headings'
         >
-          <Icons.overflow className="size-5" />
+          <Icons.overflow className='size-5' />
         </ToolbarButton>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="min-w-0 flex flex-grow">
+      <DropdownMenuContent align='start' className='min-w-0 flex flex-grow'>
         {children}
       </DropdownMenuContent>
     </DropdownMenu>

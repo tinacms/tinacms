@@ -12,9 +12,9 @@ export const CopyField = ({ label, description, value }: CopyFieldProps) => {
   const [fadeOut, setFadeOut] = React.useState(false)
 
   return (
-    <div className="w-full">
+    <div className='w-full'>
       {label && (
-        <label className="w-full mb-1 block flex-1  text-sm font-bold leading-5 text-gray-700">
+        <label className='w-full mb-1 block flex-1  text-sm font-bold leading-5 text-gray-700'>
           {label}
         </label>
       )}
@@ -36,7 +36,7 @@ export const CopyField = ({ label, description, value }: CopyFieldProps) => {
           copied ? `pointer-events-none` : ``
         }`}
       >
-        <BiCopyAlt className="relative text-blue-500 shrink-0 w-5 h-auto mr-1.5 -ml-0.5 z-20" />{' '}
+        <BiCopyAlt className='relative text-blue-500 shrink-0 w-5 h-auto mr-1.5 -ml-0.5 z-20' />{' '}
         {value}{' '}
         {copied && (
           <span
@@ -49,7 +49,7 @@ export const CopyField = ({ label, description, value }: CopyFieldProps) => {
         )}
       </span>
       {description && (
-        <p className="mt-2 text-sm text-gray-500">{description}</p>
+        <p className='mt-2 text-sm text-gray-500'>{description}</p>
       )}
     </div>
   )

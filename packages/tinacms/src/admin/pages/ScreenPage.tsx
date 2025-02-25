@@ -21,7 +21,7 @@ const ScreenPage = () => {
           ({ name }) => slugify(name) === screenName
         )
         return (
-          <div className="relative w-full h-full flex flex-col items-stretch justify-between">
+          <div className='relative w-full h-full flex flex-col items-stretch justify-between'>
             {cms?.api?.tina?.isLocalMode ? (
               <LocalWarning />
             ) : (
@@ -32,7 +32,7 @@ const ScreenPage = () => {
             >
               {selectedScreen.name}
             </div>
-            <div className="flex-1 overflow-y-auto relative flex flex-col items-stretch justify-between">
+            <div className='flex-1 overflow-y-auto relative flex flex-col items-stretch justify-between'>
               <selectedScreen.Component close={() => {}} />
             </div>
           </div>

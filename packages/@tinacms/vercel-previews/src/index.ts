@@ -9,7 +9,7 @@ export const vercelEditInfo = <
       queryId: string
       path: (number | string)[]
     }
-  }
+  },
 >(
   obj: T,
   field?: keyof Omit<T, '__typename' | '_sys'>,

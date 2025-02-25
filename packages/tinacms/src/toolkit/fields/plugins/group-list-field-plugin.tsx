@@ -85,10 +85,10 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
           <IconButton
             onClick={addItem}
             disabled={isMax}
-            variant="primary"
-            size="small"
+            variant='primary'
+            size='small'
           >
-            <AddIcon className="w-5/6 h-auto" />
+            <AddIcon className='w-5/6 h-auto' />
           </IconButton>
         )
       }
@@ -190,7 +190,7 @@ const Item = ({
               }}
             >
               <GroupLabel>{title}</GroupLabel>
-              <BiPencil className="h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out" />
+              <BiPencil className='h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
             </ItemClickTarget>
             {(!fixedLength || (fixedLength && !isMin)) && (
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />
@@ -205,7 +205,7 @@ const Item = ({
 export const ItemClickTarget = ({ children, ...props }) => {
   return (
     <div
-      className="group text-gray-400 hover:text-blue-600 flex-1 min-w-0 relative flex justify-between items-center p-2"
+      className='group text-gray-400 hover:text-blue-600 flex-1 min-w-0 relative flex justify-between items-center p-2'
       {...props}
     >
       {children}
@@ -266,13 +266,13 @@ export const ItemHeader = ({
 export const ItemDeleteButton = ({ onClick, disabled = false }) => {
   return (
     <button
-      type="button"
+      type='button'
       className={`w-8 px-1 py-2.5 flex items-center justify-center text-gray-200 hover:opacity-100 opacity-30 hover:bg-gray-50 ${
         disabled && 'pointer-events-none opacity-30 cursor-not-allowed'
       }`}
       onClick={onClick}
     >
-      <TrashIcon className="h-5 w-auto fill-current text-red-500 transition-colors duration-150 ease-out" />
+      <TrashIcon className='h-5 w-auto fill-current text-red-500 transition-colors duration-150 ease-out' />
     </button>
   )
 }
@@ -285,11 +285,11 @@ export const DragHandle = ({ isDragging }: { isDragging: boolean }) => {
       }`}
     >
       {isDragging ? (
-        <ReorderIcon className="fill-current w-7 h-auto" />
+        <ReorderIcon className='fill-current w-7 h-auto' />
       ) : (
         <>
-          <DragIcon className="fill-current w-7 h-auto group-hover:opacity-0 transition-opacity duration-150 ease-out" />
-          <ReorderIcon className="fill-current w-7 h-auto absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out" />
+          <DragIcon className='fill-current w-7 h-auto group-hover:opacity-0 transition-opacity duration-150 ease-out' />
+          <ReorderIcon className='fill-current w-7 h-auto absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out' />
         </>
       )}
     </div>

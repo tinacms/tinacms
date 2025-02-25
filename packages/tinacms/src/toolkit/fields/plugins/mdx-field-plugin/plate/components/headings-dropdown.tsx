@@ -120,16 +120,16 @@ export function HeadingsMenu(props: DropdownMenuProps) {
           showArrow
           isDropdown
           pressed={openState.open}
-          tooltip="Headings"
+          tooltip='Headings'
         >
-          <SelectedItemIcon className="size-5" />
-          <span className="@md/toolbar:flex hidden">{selectedItemLabel}</span>
+          <SelectedItemIcon className='size-5' />
+          <span className='@md/toolbar:flex hidden'>{selectedItemLabel}</span>
         </ToolbarButton>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="min-w-0">
+      <DropdownMenuContent align='start' className='min-w-0'>
         <DropdownMenuRadioGroup
-          className="flex flex-col gap-0.5"
+          className='flex flex-col gap-0.5'
           onValueChange={(type) => {
             toggleNodeType(editor, { activeType: type })
             collapseSelection(editor)
@@ -146,11 +146,11 @@ export function HeadingsMenu(props: DropdownMenuProps) {
             })
             .map(({ icon: Icon, label, value: itemValue }) => (
               <DropdownMenuRadioItem
-                className="min-w-[180px]"
+                className='min-w-[180px]'
                 key={itemValue}
                 value={itemValue}
               >
-                <Icon className="mr-2 size-5" />
+                <Icon className='mr-2 size-5' />
                 {label}
               </DropdownMenuRadioItem>
             ))}

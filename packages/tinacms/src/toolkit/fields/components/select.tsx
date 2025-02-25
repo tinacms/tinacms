@@ -41,7 +41,7 @@ export const Select: React.FC<SelectProps> = ({
   }, [field?.experimental_focusIntent, ref])
 
   return (
-    <div className="relative group w-full md:w-auto">
+    <div className='relative group w-full md:w-auto'>
       <select
         id={input.name}
         ref={ref}
@@ -58,7 +58,7 @@ export const Select: React.FC<SelectProps> = ({
           <option>{input.value}</option>
         )}
       </select>
-      <MdKeyboardArrowDown className="absolute top-1/2 right-2 w-6 h-auto -translate-y-1/2 text-gray-300 group-hover:text-blue-500 transition duration-150 ease-out pointer-events-none" />
+      <MdKeyboardArrowDown className='absolute top-1/2 right-2 w-6 h-auto -translate-y-1/2 text-gray-300 group-hover:text-blue-500 transition duration-150 ease-out pointer-events-none' />
     </div>
   )
 }

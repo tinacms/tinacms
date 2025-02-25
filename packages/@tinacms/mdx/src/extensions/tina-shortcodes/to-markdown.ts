@@ -15,32 +15,31 @@ import { Context as State } from 'mdast-util-to-markdown'
 
 const own = {}.hasOwnProperty
 
-export const directiveToMarkdown: (
-  patterns: Pattern[]
-) => ToMarkdownExtension = (patterns) => ({
-  unsafe: [
-    {
-      character: '\r',
-      inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+export const directiveToMarkdown: (patterns: Pattern[]) => ToMarkdownExtension =
+  (patterns) => ({
+    unsafe: [
+      {
+        character: '\r',
+        inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+      },
+      {
+        character: '\n',
+        inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+      },
+      {
+        before: '[^:]',
+        character: ':',
+        after: '[A-Za-z]',
+        inConstruct: ['phrasing'],
+      },
+      { atBreak: true, character: ':', after: ':' },
+    ],
+    handlers: {
+      containerDirective: handleDirective(patterns),
+      leafDirective: handleDirective(patterns),
+      textDirective: handleDirective(patterns),
     },
-    {
-      character: '\n',
-      inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
-    },
-    {
-      before: '[^:]',
-      character: ':',
-      after: '[A-Za-z]',
-      inConstruct: ['phrasing'],
-    },
-    { atBreak: true, character: ':', after: ':' },
-  ],
-  handlers: {
-    containerDirective: handleDirective(patterns),
-    leafDirective: handleDirective(patterns),
-    textDirective: handleDirective(patterns),
-  },
-})
+  })
 
 const handleDirective: (patterns: Pattern[]) => ToMarkdownHandle = function (
   patterns

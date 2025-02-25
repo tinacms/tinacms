@@ -84,7 +84,7 @@ export type TinaMarkdownContent = {
 }
 
 export const TinaMarkdown = <
-  CustomComponents extends { [key: string]: object } = any
+  CustomComponents extends { [key: string]: object } = any,
 >({
   content,
   components = {},

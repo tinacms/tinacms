@@ -175,19 +175,19 @@ const Combobox: React.FC<ReferenceSelectProps> = ({ cms, input, field }) => {
   }, [optionSets, field.experimental___filter])
 
   if (loading === true) {
-    return <LoadingDots color="var(--tina-color-primary)" />
+    return <LoadingDots color='var(--tina-color-primary)' />
   }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
-          role="combobox"
+          variant='outline'
+          role='combobox'
           aria-expanded={open}
-          className="w-full justify-between"
+          className='w-full justify-between'
         >
-          <p className="truncate">{displayText ?? 'Choose an option...'}</p>
+          <p className='truncate'>{displayText ?? 'Choose an option...'}</p>
           {open ? (
             <IoMdArrowDropup size={20} />
           ) : (
@@ -195,7 +195,7 @@ const Combobox: React.FC<ReferenceSelectProps> = ({ cms, input, field }) => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0 relative min-w-[var(--radix-popover-trigger-width)]">
+      <PopoverContent className='p-0 relative min-w-[var(--radix-popover-trigger-width)]'>
         <Command
           shouldFilter={!field.experimental___filter}
           filter={(value, search) => {
@@ -204,7 +204,7 @@ const Combobox: React.FC<ReferenceSelectProps> = ({ cms, input, field }) => {
           }}
         >
           <CommandInput
-            placeholder="Search reference..."
+            placeholder='Search reference...'
             onValueChange={(search) => {
               if (field.experimental___filter) {
                 setFilteredOptionsList(

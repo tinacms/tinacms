@@ -67,7 +67,7 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   quote: {
     label: 'Quote',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <QuoteToolbarButton tooltip="Quote Quote (⌘+⇧+.)" />,
+    Component: <QuoteToolbarButton tooltip='Quote Quote (⌘+⇧+.)' />,
   },
   ul: {
     label: 'Unordered List',
@@ -83,7 +83,7 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Bold',
     width: () => STANDARD_ICON_WIDTH,
     Component: (
-      <MarkToolbarButton tooltip="Bold (⌘+B)" nodeType={MARK_BOLD}>
+      <MarkToolbarButton tooltip='Bold (⌘+B)' nodeType={MARK_BOLD}>
         <Icons.bold />
       </MarkToolbarButton>
     ),
@@ -92,7 +92,7 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Strikethrough',
     width: () => STANDARD_ICON_WIDTH,
     Component: (
-      <MarkToolbarButton tooltip="Strikethrough " nodeType={MARK_STRIKETHROUGH}>
+      <MarkToolbarButton tooltip='Strikethrough ' nodeType={MARK_STRIKETHROUGH}>
         <Icons.strikethrough />
       </MarkToolbarButton>
     ),
@@ -101,7 +101,7 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Italic',
     width: () => STANDARD_ICON_WIDTH,
     Component: (
-      <MarkToolbarButton tooltip="Italic (⌘+I)" nodeType={MARK_ITALIC}>
+      <MarkToolbarButton tooltip='Italic (⌘+I)' nodeType={MARK_ITALIC}>
         <Icons.italic />
       </MarkToolbarButton>
     ),
@@ -110,7 +110,7 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     label: 'Code',
     width: () => STANDARD_ICON_WIDTH,
     Component: (
-      <MarkToolbarButton tooltip="Code (⌘+E)" nodeType={MARK_CODE}>
+      <MarkToolbarButton tooltip='Code (⌘+E)' nodeType={MARK_CODE}>
         <Icons.code />
       </MarkToolbarButton>
     ),
@@ -207,9 +207,9 @@ export default function FixedToolbarButtons() {
   })
 
   return (
-    <div className="w-full overflow-hidden @container/toolbar" ref={toolbarRef}>
+    <div className='w-full overflow-hidden @container/toolbar' ref={toolbarRef}>
       <div
-        className="flex"
+        className='flex'
         style={{
           transform: 'translateX(calc(-1px))',
         }}

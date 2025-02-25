@@ -55,7 +55,7 @@ export const ListFieldMeta = ({
         <ListMeta>
           {label !== false && <ListLabel>{label || name}</ListLabel>}
           {description && (
-            <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
+            <FieldDescription className='whitespace-nowrap text-ellipsis overflow-hidden'>
               {description}
             </FieldDescription>
           )}
@@ -75,14 +75,14 @@ export const ListFieldMeta = ({
 
 export const ListHeader = ({ children }: { children?: any }) => {
   return (
-    <span className="relative flex gap-2 w-full justify-between items-center mb-2">
+    <span className='relative flex gap-2 w-full justify-between items-center mb-2'>
       {children}
     </span>
   )
 }
 
 export const ListMeta = ({ children }: { children?: any }) => {
-  return <div className="flex-1 truncate">{children}</div>
+  return <div className='flex-1 truncate'>{children}</div>
 }
 
 export const ListLabel = ({ children }: { children?: any }) => {
@@ -103,7 +103,7 @@ export const ListPanel = ({ className = '', ...props }) => (
 )
 
 export const EmptyList = ({ message = 'There are no items' }) => (
-  <div className="text-center bg-gray-100 text-gray-300 leading-[1.35] py-3 text-[15px] font-normal">
+  <div className='text-center bg-gray-100 text-gray-300 leading-[1.35] py-3 text-[15px] font-normal'>
     {message}
   </div>
 )

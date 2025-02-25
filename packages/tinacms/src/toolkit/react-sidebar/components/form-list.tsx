@@ -24,19 +24,19 @@ const Item = ({
 
   return (
     <button
-      type="button"
+      type='button'
       key={item.path}
       onClick={() => setActiveFormId(item.formId)}
       className={`${
         depths[depth] || 'pl-12'
       } pr-6 py-3 w-full h-full bg-transparent border-none text-lg text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center justify-between gap-2`}
     >
-      <BiEdit className="opacity-70 w-5 h-auto text-blue-500 flex-none" />
-      <div className="flex-1 flex flex-col gap-0.5 items-start">
-        <div className="group-hover:text-blue-500 font-sans text-xs font-semibold text-gray-700 whitespace-normal">
+      <BiEdit className='opacity-70 w-5 h-auto text-blue-500 flex-none' />
+      <div className='flex-1 flex flex-col gap-0.5 items-start'>
+        <div className='group-hover:text-blue-500 font-sans text-xs font-semibold text-gray-700 whitespace-normal'>
           {form.tinaForm.label}
         </div>
-        <div className="group-hover:text-blue-500 text-base truncate leading-tight text-gray-600">
+        <div className='group-hover:text-blue-500 text-base truncate leading-tight text-gray-600'>
           {form.tinaForm.id}
         </div>
       </div>
@@ -63,7 +63,7 @@ const FormListItem = ({
     <div className={'divide-y divide-gray-200'}>
       <Item setActiveFormId={setActiveFormId} item={item} depth={depth} />
       {item.subItems && (
-        <ul className="divide-y divide-gray-200">
+        <ul className='divide-y divide-gray-200'>
           {item.subItems?.map((subItem) => {
             if (subItem.type === 'document') {
               return (
@@ -91,15 +91,15 @@ export const FormLists = (props: { isEditing: boolean }) => {
       // show={props.isEditing}
       show={true}
       as={'div'}
-      enter="transition-all ease-out duration-150"
-      enterFrom="opacity-0 -translate-x-1/2"
-      enterTo="opacity-100"
-      leave="transition-all ease-out duration-150"
-      leaveFrom="opacity-100"
-      leaveTo="opacity-0 -translate-x-1/2"
+      enter='transition-all ease-out duration-150'
+      enterFrom='opacity-0 -translate-x-1/2'
+      enterTo='opacity-100'
+      leave='transition-all ease-out duration-150'
+      leaveFrom='opacity-100'
+      leaveTo='opacity-0 -translate-x-1/2'
     >
       {cms.state.formLists.map((formList, index) => (
-        <div key={`${formList.id}-${index}`} className="pt-16">
+        <div key={`${formList.id}-${index}`} className='pt-16'>
           {/* TODO: add labels for each list */}
           <FormList
             isEditing={props.isEditing}

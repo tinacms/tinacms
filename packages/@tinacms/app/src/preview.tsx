@@ -17,10 +17,10 @@ export const Preview = (
 
   return (
     <iframe
-      data-test="tina-iframe"
-      id="tina-iframe"
+      data-test='tina-iframe'
+      id='tina-iframe'
       ref={props.iframeRef}
-      className="h-screen w-full bg-white"
+      className='h-screen w-full bg-white'
       src={props.url}
     />
   )

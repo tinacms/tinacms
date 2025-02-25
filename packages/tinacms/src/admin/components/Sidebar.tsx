@@ -83,17 +83,17 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
       {!renderDesktopNav && (
         <Transition show={menuIsOpen}>
           <TransitionChild
-            enter="transform transition-all ease-out duration-300"
-            enterFrom="opacity-0 -translate-x-full"
-            enterTo="opacity-100 translate-x-0"
-            leave="transform transition-all ease-in duration-200"
-            leaveFrom="opacity-100 translate-x-0"
-            leaveTo="opacity-0 -translate-x-full"
+            enter='transform transition-all ease-out duration-300'
+            enterFrom='opacity-0 -translate-x-full'
+            enterTo='opacity-100 translate-x-0'
+            leave='transform transition-all ease-in duration-200'
+            leaveFrom='opacity-100 translate-x-0'
+            leaveTo='opacity-0 -translate-x-full'
           >
-            <div className="fixed left-0 top-0 z-overlay h-full transform">
+            <div className='fixed left-0 top-0 z-overlay h-full transform'>
               <Nav
                 isLocalMode={isLocalMode}
-                className="rounded-r-md"
+                className='rounded-r-md'
                 sidebarWidth={360}
                 showCollections={true}
                 collectionsInfo={collectionsInfo}
@@ -138,43 +138,43 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                   />
                 )}
               >
-                <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
+                <div className='absolute top-8 right-0 transform translate-x-full overflow-hidden'>
                   <Button
-                    rounded="right"
-                    variant="secondary"
+                    rounded='right'
+                    variant='secondary'
                     onClick={() => {
                       setMenuIsOpen(false)
                     }}
                     className={`transition-opacity duration-150 ease-out`}
                   >
-                    <IoMdClose className="h-6 w-auto" />
+                    <IoMdClose className='h-6 w-auto' />
                   </Button>
                 </div>
               </Nav>
             </div>
           </TransitionChild>
           <TransitionChild
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-80"
-            entered="opacity-80"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-80"
-            leaveTo="opacity-0"
+            enter='ease-out duration-300'
+            enterFrom='opacity-0'
+            enterTo='opacity-80'
+            entered='opacity-80'
+            leave='ease-in duration-200'
+            leaveFrom='opacity-80'
+            leaveTo='opacity-0'
           >
             <div
               onClick={() => {
                 setMenuIsOpen(false)
               }}
-              className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
+              className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
             />
           </TransitionChild>
         </Transition>
       )}
       {!renderDesktopNav && (
         <Button
-          rounded="right"
-          variant="secondary"
+          rounded='right'
+          variant='secondary'
           onClick={() => {
             setMenuIsOpen(true)
           }}
@@ -182,7 +182,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
             isLocalMode ? 'top-10' : 'top-4'
           }`}
         >
-          <BiMenu className="h-7 w-auto" />
+          <BiMenu className='h-7 w-auto' />
         </Button>
       )}
     </>
@@ -206,7 +206,7 @@ const SidebarLink = (props: {
       onClick={props.onClick ? props.onClick : () => {}}
       to={to}
     >
-      <Icon className="mr-2 h-6 opacity-80 w-auto" /> {label}
+      <Icon className='mr-2 h-6 opacity-80 w-auto' /> {label}
     </NavLink>
   )
 }
@@ -214,11 +214,11 @@ const SidebarLink = (props: {
 const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
   if (config.text) {
     return (
-      <span className="text-base tracking-wide text-gray-500 flex items-center opacity-90">
+      <span className='text-base tracking-wide text-gray-500 flex items-center opacity-90'>
         {config.text}{' '}
         <a
-          target="_blank"
-          className="ml-1 text-blue-600 hover:opacity-60"
+          target='_blank'
+          className='ml-1 text-blue-600 hover:opacity-60'
           href={config.link.href}
         >
           {config.link.text}
@@ -227,9 +227,9 @@ const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
     )
   }
   return (
-    <span className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100">
-      <config.Icon className="mr-2 h-6 opacity-80 w-auto" />
-      <a target="_blank" href={config.link.href}>
+    <span className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'>
+      <config.Icon className='mr-2 h-6 opacity-80 w-auto' />
+      <a target='_blank' href={config.link.href}>
         {config.link.text}
       </a>
     </span>

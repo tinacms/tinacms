@@ -127,21 +127,21 @@ export type UIField<Type, List extends boolean> = {
 type FieldGeneric<
   Type,
   List extends boolean | undefined,
-  ExtraFieldUIProps = {}
+  ExtraFieldUIProps = {},
 > = List extends true
   ? {
       list: true
       ui?: UIField<Type, true> & ExtraFieldUIProps
     }
   : List extends false
-  ? {
-      list?: false
-      ui?: UIField<Type, false> & ExtraFieldUIProps
-    }
-  : {
-      list?: undefined
-      ui?: UIField<Type, false> & ExtraFieldUIProps
-    }
+    ? {
+        list?: false
+        ui?: UIField<Type, false> & ExtraFieldUIProps
+      }
+    : {
+        list?: undefined
+        ui?: UIField<Type, false> & ExtraFieldUIProps
+      }
 
 type SearchableTextField = {
   maxSearchIndexFieldLength?: number
@@ -544,7 +544,7 @@ export interface Config<
   FormifyCallback = undefined,
   DocumentCreatorCallback = undefined,
   Store = undefined,
-  SearchClient = undefined
+  SearchClient = undefined,
 > {
   contentApiUrlOverride?: string
   authProvider?: AuthProvider
@@ -757,7 +757,7 @@ export type TinaCMSConfig<
   CMSCallback = undefined,
   FormifyCallback = undefined,
   DocumentCreatorCallback = undefined,
-  Store = undefined
+  Store = undefined,
 > = Config<CMSCallback, FormifyCallback, DocumentCreatorCallback, Store>
 
 export interface Schema<WithNamespace extends boolean = false> {

@@ -98,7 +98,7 @@ export const LinkForm = (props) => {
 
   const UpdateLink = React.useCallback(
     () => (
-      <Button variant="primary" onClick={handleUpdate}>
+      <Button variant='primary' onClick={handleUpdate}>
         Update Link
       </Button>
     ),
@@ -108,7 +108,7 @@ export const LinkForm = (props) => {
   return (
     <NestedForm
       id={props.id}
-      label="Link"
+      label='Link'
       fields={[
         { label: 'URL', name: 'url', component: 'text' },
         { label: 'Title', name: 'title', component: 'text' },

@@ -33,33 +33,33 @@ export const BranchBanner = () => {
       >
         <Button
           variant={isProtected ? 'primary' : 'white'}
-          size="small"
+          size='small'
           onClick={openModal}
         >
           {isProtected ? (
-            <BiLockAlt className="flex-shrink-0 w-4 h-auto text-white opacity-70 mr-1" />
+            <BiLockAlt className='flex-shrink-0 w-4 h-auto text-white opacity-70 mr-1' />
           ) : (
             <BiGitBranch
               className={`flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1`}
             />
           )}
-          <span className="truncate max-w-full">
+          <span className='truncate max-w-full'>
             {trimPrefix(currentBranch)}
           </span>
           <BiChevronDown
-            className="-mr-1 h-4 w-4 opacity-70 shrink-0"
-            aria-hidden="true"
+            className='-mr-1 h-4 w-4 opacity-70 shrink-0'
+            aria-hidden='true'
           />
         </Button>
         {previewUrl && (
           <Button
-            variant="white"
-            size="small"
+            variant='white'
+            size='small'
             onClick={() => {
               window.open(previewUrl, '_blank')
             }}
           >
-            <BiLinkExternal className="flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1" />
+            <BiLinkExternal className='flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1' />
             Preview
           </Button>
         )}

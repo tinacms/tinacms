@@ -43,7 +43,7 @@ export const DropdownMenuSubTrigger = withRef<
     {...props}
   >
     {children}
-    <Icons.chevronRight className="ml-auto size-4" />
+    <Icons.chevronRight className='ml-auto size-4' />
   </DropdownMenuPrimitive.SubTrigger>
 ))
 
@@ -99,9 +99,9 @@ export const DropdownMenuCheckboxItem = withRef<
     ref={ref}
     {...props}
   >
-    <span className="absolute left-2 flex size-3.5 items-center justify-center">
+    <span className='absolute left-2 flex size-3.5 items-center justify-center'>
       <DropdownMenuPrimitive.ItemIndicator>
-        <Icons.check className="size-4" />
+        <Icons.check className='size-4' />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -124,9 +124,9 @@ export const DropdownMenuRadioItem = withRef<
     {...props}
   >
     {!hideIcon && (
-      <span className="absolute right-2 flex size-3.5 items-center justify-center">
+      <span className='absolute right-2 flex size-3.5 items-center justify-center'>
         <DropdownMenuPrimitive.ItemIndicator>
-          <Icons.check className="size-4" />
+          <Icons.check className='size-4' />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
     )}

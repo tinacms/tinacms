@@ -183,8 +183,8 @@ export const IndexingPage: FC = () => {
       {state === 'submitting' && <p>Saving content&hellip;</p>}
       {state === 'creatingPR' && <p>Creating Pull Request&hellip;</p>}
       {state === 'error' && (
-        <p className="flex items-center gap-1 text-red-700">
-          <BiError className="w-7 h-auto text-red-400 flex-shrink-0" />{' '}
+        <p className='flex items-center gap-1 text-red-700'>
+          <BiError className='w-7 h-auto text-red-400 flex-shrink-0' />{' '}
           <b>Error:</b> {errorMessage}{' '}
         </p>
       )}
@@ -193,7 +193,7 @@ export const IndexingPage: FC = () => {
 }
 
 const Wrapper = ({ children }: any) => (
-  <div className="w-full h-full flex flex-col justify-center items-center gap-4 p-6 text-xl text-gray-700">
+  <div className='w-full h-full flex flex-col justify-center items-center gap-4 p-6 text-xl text-gray-700'>
     {children}
   </div>
 )

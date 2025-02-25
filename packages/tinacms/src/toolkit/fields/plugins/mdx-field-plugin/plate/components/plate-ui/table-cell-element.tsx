@@ -80,7 +80,7 @@ export const TableCellElement = withRef<
     >
       <Cell>
         <div
-          className="relative z-20 box-border h-full px-3 py-2"
+          className='relative z-20 box-border h-full px-3 py-2'
           style={{
             minHeight: rowSize,
           }}
@@ -90,7 +90,7 @@ export const TableCellElement = withRef<
 
         {!isSelectingCell && (
           <div
-            className="group absolute top-0 size-full select-none"
+            className='group absolute top-0 size-full select-none'
             contentEditable={false}
             suppressContentEditableWarning={true}
           >
@@ -98,16 +98,16 @@ export const TableCellElement = withRef<
               <>
                 <ResizeHandle
                   {...rightProps}
-                  className="-top-3 right-[-5px] w-[10px]"
+                  className='-top-3 right-[-5px] w-[10px]'
                 />
                 <ResizeHandle
                   {...bottomProps}
-                  className="bottom-[-5px] h-[10px]"
+                  className='bottom-[-5px] h-[10px]'
                 />
                 {!hiddenLeft && (
                   <ResizeHandle
                     {...leftProps}
-                    className="-top-3 left-[-5px] w-[10px]"
+                    className='-top-3 left-[-5px] w-[10px]'
                   />
                 )}
 

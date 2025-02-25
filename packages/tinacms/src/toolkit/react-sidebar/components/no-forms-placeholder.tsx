@@ -10,7 +10,7 @@ import { Button } from '@toolkit/styles'
 
 export const PendingFormsPlaceholder = () => (
   <div
-    className="relative flex flex-col items-center justify-center text-center p-5 pb-16 w-full h-full overflow-y-auto"
+    className='relative flex flex-col items-center justify-center text-center p-5 pb-16 w-full h-full overflow-y-auto'
     style={{
       animationName: 'fade-in',
       animationDelay: '300ms',
@@ -20,7 +20,7 @@ export const PendingFormsPlaceholder = () => (
       animationDuration: '150ms',
     }}
   >
-    <p className="block pb-5">
+    <p className='block pb-5'>
       Please wait while Tina
       <br />
       loads your forms
@@ -31,7 +31,7 @@ export const PendingFormsPlaceholder = () => (
 
 export const NoFormsPlaceholder = () => (
   <div
-    className="relative flex flex-col items-center justify-center text-center p-5 pb-16 w-full h-full overflow-y-auto"
+    className='relative flex flex-col items-center justify-center text-center p-5 pb-16 w-full h-full overflow-y-auto'
     style={{
       animationName: 'fade-in',
       animationDelay: '300ms',
@@ -41,19 +41,19 @@ export const NoFormsPlaceholder = () => (
       animationDuration: '150ms',
     }}
   >
-    <Emoji className="pb-5">🔎</Emoji>
-    <p className="block pb-5">
+    <Emoji className='pb-5'>🔎</Emoji>
+    <p className='block pb-5'>
       Looks like there's <br />
       nothing to edit on <br />
       this page.
     </p>
-    <p className="block">
+    <p className='block'>
       <Button
-        href="https://tina.io/docs/tinacms-context/"
-        target="_blank"
-        as="a"
+        href='https://tina.io/docs/tinacms-context/'
+        target='_blank'
+        as='a'
       >
-        <Emoji className="mr-1.5">📖</Emoji> Contextual Editing
+        <Emoji className='mr-1.5'>📖</Emoji> Contextual Editing
       </Button>
     </p>
   </div>

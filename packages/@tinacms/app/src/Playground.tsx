@@ -68,17 +68,17 @@ const Playground = () => {
     const noAutoQueries = Object.keys(autoQueries).length === 0
     return (
       <div>
-        <div className="graphiql-doc-explorer-title">Queries</div>
-        <div className="graphiql-doc-explorer-content">
-          <div className="graphiql-markdown-description">
+        <div className='graphiql-doc-explorer-title'>Queries</div>
+        <div className='graphiql-doc-explorer-content'>
+          <div className='graphiql-markdown-description'>
             {noAutoQueries
               ? 'No auto-generated queries found, the Tina config is likely set to client.skip = true'
               : "Tina's auto-generated queries can be found here as well as any queries you may have defined yourself."}{' '}
-            <a href="https://tina.io/docs/data-fetching/custom-queries/">
+            <a href='https://tina.io/docs/data-fetching/custom-queries/'>
               Learn more here
             </a>
           </div>
-          <nav className="space-y-1" aria-label="Sidebar">
+          <nav className='space-y-1' aria-label='Sidebar'>
             <ul>
               {Object.entries(autoQueries).map(([key, value]) => {
                 const collection = collectionInfo?.collections.find(
@@ -111,10 +111,10 @@ const Playground = () => {
                         }
                       }}
                     >
-                      <span className="truncate">
+                      <span className='truncate'>
                         {key}{' '}
                         {relativePath && (
-                          <span className="pl-2 text-sm text-gray-300">
+                          <span className='pl-2 text-sm text-gray-300'>
                             ({relativePath})
                           </span>
                         )}{' '}
@@ -140,7 +140,7 @@ const Playground = () => {
           return fetcher(params, options)
         }}
         query={query}
-        defaultEditorToolsVisibility="variables"
+        defaultEditorToolsVisibility='variables'
         isHeadersEditorEnabled={false}
         defaultTabs={[]}
         plugins={[

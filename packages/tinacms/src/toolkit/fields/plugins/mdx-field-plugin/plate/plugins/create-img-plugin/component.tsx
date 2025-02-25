@@ -29,7 +29,7 @@ export const ImgEmbed = ({
   })
 
   return (
-    <span {...attributes} className="">
+    <span {...attributes} className=''>
       {children}
       {element.url ? (
         <div
@@ -38,7 +38,7 @@ export const ImgEmbed = ({
           }`}
         >
           <button
-            type="button"
+            type='button'
             className={`flex-shrink min-w-0 focus-within:shadow-outline focus-within:border-blue-500 rounded outline-none overflow-visible cursor-pointer border-none hover:opacity-60 transition ease-out duration-100 ${
               selected ? 'shadow-outline border-blue-500' : ''
             }`}
@@ -59,11 +59,11 @@ export const ImgEmbed = ({
         </div>
       ) : (
         <button
-          type="button"
-          className="outline-none relative hover:opacity-60 w-full"
+          type='button'
+          className='outline-none relative hover:opacity-60 w-full'
           onClick={handleSelect}
         >
-          <div className="text-center rounded-[5px] bg-gray-100 text-gray-300 leading-[1.35] py-3 text-[15px] font-normal transition-all ease-out duration-100 hover:opacity-60">
+          <div className='text-center rounded-[5px] bg-gray-100 text-gray-300 leading-[1.35] py-3 text-[15px] font-normal transition-all ease-out duration-100 hover:opacity-60'>
             Click to select an image
           </div>
         </button>
@@ -83,8 +83,8 @@ export const ImgEmbed = ({
 export const ImageForm = (props) => {
   return (
     <NestedForm
-      id="image-form"
-      label="Image"
+      id='image-form'
+      label='Image'
       fields={[
         {
           label: 'URL',

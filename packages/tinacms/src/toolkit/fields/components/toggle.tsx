@@ -42,7 +42,7 @@ export const Toggle: FC<ToggleProps> = ({
   }
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className='flex gap-2 items-center'>
       {labels && (
         <span
           className={`text-sm ${
@@ -52,18 +52,18 @@ export const Toggle: FC<ToggleProps> = ({
           {labels.false}
         </span>
       )}
-      <div className="relative w-12 h-7">
-        <ToggleInput id={name} type="checkbox" {...input} />
+      <div className='relative w-12 h-7'>
+        <ToggleInput id={name} type='checkbox' {...input} />
         <label
-          className="bg-none p-0 outline-none w-12 h-7"
+          className='bg-none p-0 outline-none w-12 h-7'
           style={{
             opacity: disabled ? 0.4 : 1,
             pointerEvents: disabled ? 'none' : 'inherit',
           }}
           htmlFor={name}
-          role="switch"
+          role='switch'
         >
-          <div className="relative w-[48px] h-7 rounded-3xl bg-white shadow-inner border border-gray-200 pointer-events-none -ml-0.5">
+          <div className='relative w-[48px] h-7 rounded-3xl bg-white shadow-inner border border-gray-200 pointer-events-none -ml-0.5'>
             <span
               className={`absolute rounded-3xl left-0.5 top-1/2 w-[22px] h-[22px] shadow border transition-all ease-out duration-150 ${
                 checked

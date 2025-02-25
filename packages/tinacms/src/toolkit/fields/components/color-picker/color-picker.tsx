@@ -32,11 +32,11 @@ const Swatch = ({
   ...props
 }: SwatchProps) => (
   <div
-    className="bg-gray-100 rounded-3xl shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer w-full m-0"
+    className='bg-gray-100 rounded-3xl shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer w-full m-0'
     {...props}
   >
     <div
-      className="swatch-inner flex items-center justify-center text-[13px] font-bold w-full h-10 rounded-3xl hover:opacity-[.6]"
+      className='swatch-inner flex items-center justify-center text-[13px] font-bold w-full h-10 rounded-3xl hover:opacity-[.6]'
       style={{
         background: colorRGBA
           ? `rgba(${colorRGBA.r}, ${colorRGBA.g}, ${colorRGBA.b}, ${colorRGBA.a})`
@@ -223,7 +223,7 @@ export const ColorPicker: React.FC<Props> = ({
   }
 
   return (
-    <div className="relative" ref={triggerRef}>
+    <div className='relative' ref={triggerRef}>
       <Swatch
         onClick={toggleColorPicker}
         colorRGBA={getColorRGBA}

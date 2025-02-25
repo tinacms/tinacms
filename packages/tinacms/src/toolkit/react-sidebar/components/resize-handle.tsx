@@ -68,7 +68,7 @@ export const ResizeHandle = () => {
       } ${resizingSidebar ? `scale-110` : `scale-90 hover:scale-100`}`}
       style={{ cursor: 'grab' }}
     >
-      <span className="absolute top-1/2 left-1/2 h-4/6 w-px bg-gray-200 transform -translate-y-1/2 -translate-x-1/2 opacity-30 transition-opacity duration-150 ease-out group-hover:opacity-100"></span>
+      <span className='absolute top-1/2 left-1/2 h-4/6 w-px bg-gray-200 transform -translate-y-1/2 -translate-x-1/2 opacity-30 transition-opacity duration-150 ease-out group-hover:opacity-100'></span>
     </div>
   )
 }

@@ -21,7 +21,7 @@ export const TooltipContent = withCn(
 )
 
 export function withTooltip<
-  T extends React.ComponentType<any> | keyof HTMLElementTagNameMap
+  T extends React.ComponentType<any> | keyof HTMLElementTagNameMap,
 >(Component: T) {
   return React.forwardRef<
     React.ElementRef<T>,

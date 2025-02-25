@@ -15,7 +15,7 @@ export const NumberInput: React.FC<NumberProps> = ({
   step,
 }) => (
   <Input
-    type="number"
+    type='number'
     step={step}
     value={value}
     onChange={(event) => {

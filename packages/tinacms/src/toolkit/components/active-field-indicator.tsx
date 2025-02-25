@@ -6,7 +6,7 @@ import { useFieldReference } from '@toolkit/hooks/use-field-reference'
 
 const IndicatorWrap = ({ style = {}, position, ...props }) => (
   <div
-    className="fixed left-0 py-2 px-0 text-center"
+    className='fixed left-0 py-2 px-0 text-center'
     style={{
       ...style,
       marginLeft: 'var(--tina-sidebar-width)',
@@ -21,16 +21,16 @@ const IndicatorWrap = ({ style = {}, position, ...props }) => (
 
 const ArrowWrap = (props) => (
   <div
-    className="inline-block fill-white rounded-[50%] bg-blue-500 shadow-md"
+    className='inline-block fill-white rounded-[50%] bg-blue-500 shadow-md'
     {...props}
   />
 )
 
 const AboveViewportIndicator = () => {
   return (
-    <IndicatorWrap position="top">
+    <IndicatorWrap position='top'>
       <ArrowWrap>
-        <ChevronUpIcon className="w-8 h-auto" />
+        <ChevronUpIcon className='w-8 h-auto' />
       </ArrowWrap>
     </IndicatorWrap>
   )
@@ -38,9 +38,9 @@ const AboveViewportIndicator = () => {
 
 const BelowViewportIndicator = () => {
   return (
-    <IndicatorWrap position="bottom">
+    <IndicatorWrap position='bottom'>
       <ArrowWrap>
-        <ChevronDownIcon className="w-8 h-auto" />
+        <ChevronDownIcon className='w-8 h-auto' />
       </ArrowWrap>
     </IndicatorWrap>
   )

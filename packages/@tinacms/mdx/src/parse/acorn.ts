@@ -100,7 +100,7 @@ const extractScalar = <
     | { type: 'datetime' }
     | { type: 'image' }
     | { type: 'reference' }
-  >
+  >,
 >(
   attribute: ExpressionStatement,
   field: T

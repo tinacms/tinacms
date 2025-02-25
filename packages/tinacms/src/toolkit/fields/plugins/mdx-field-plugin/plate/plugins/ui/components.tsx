@@ -233,7 +233,7 @@ export const Components = () => {
         >
           {children}
           {selected && (
-            <span className="absolute h-4 -top-2 inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none" />
+            <span className='absolute h-4 -top-2 inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none' />
           )}
         </div>
       )

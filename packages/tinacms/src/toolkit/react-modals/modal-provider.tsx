@@ -18,7 +18,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
   return (
     <>
-      <div id="modal-root" ref={setModalRef} />
+      <div id='modal-root' ref={setModalRef} />
       <ModalContainerContext.Provider
         value={{ portalNode: modalRootContainerRef }}
       >

@@ -428,9 +428,8 @@ export class TinaMediaStore implements MediaStore {
             // sleep for 1 second
             await new Promise((resolve) => setTimeout(resolve, 1000))
 
-            const { error, message } = await this.api.getRequestStatus(
-              requestId
-            )
+            const { error, message } =
+              await this.api.getRequestStatus(requestId)
             if (error !== undefined) {
               if (error) {
                 throw new Error(message)

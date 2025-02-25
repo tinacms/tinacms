@@ -192,7 +192,7 @@ export const tinaField = <
         }
       })
     | undefined
-    | null
+    | null,
 >(
   object: T,
   property?: keyof Omit<NonNullable<T>, '__typename' | '_sys'>,

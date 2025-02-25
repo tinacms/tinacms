@@ -53,10 +53,10 @@ export const TableBordersDropdownMenuContent = withRef<
 
   return (
     <DropdownMenuContent
-      align="start"
+      align='start'
       className={cn('min-w-[220px]')}
       ref={ref}
-      side="right"
+      side='right'
       sideOffset={0}
       {...props}
     >
@@ -133,9 +133,9 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
         contentEditable={false}
         isMenu
         onClick={() => mergeTableCells(editor)}
-        variant="ghost"
+        variant='ghost'
       >
-        <Icons.combine className="mr-2 size-4" />
+        <Icons.combine className='mr-2 size-4' />
         Merge
       </Button>
     )
@@ -145,9 +145,9 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
         contentEditable={false}
         isMenu
         onClick={() => unmergeTableCells(editor)}
-        variant="ghost"
+        variant='ghost'
       >
-        <Icons.ungroup className="mr-2 size-4" />
+        <Icons.ungroup className='mr-2 size-4' />
         Unmerge
       </Button>
     )
@@ -156,8 +156,8 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
       <>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <Button isMenu variant="ghost">
-              <Icons.borderAll className="mr-2 size-4" />
+            <Button isMenu variant='ghost'>
+              <Icons.borderAll className='mr-2 size-4' />
               Borders
             </Button>
           </DropdownMenuTrigger>
@@ -167,8 +167,8 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
           </DropdownMenuPortal>
         </DropdownMenu>
 
-        <Button contentEditable={false} isMenu variant="ghost" {...buttonProps}>
-          <Icons.delete className="mr-2 size-4" />
+        <Button contentEditable={false} isMenu variant='ghost' {...buttonProps}>
+          <Icons.delete className='mr-2 size-4' />
           Delete
         </Button>
       </>
@@ -231,7 +231,7 @@ export const TableElement = withHOC(
                 ))}
               </colgroup>
 
-              <tbody className="min-w-full">{children}</tbody>
+              <tbody className='min-w-full'>{children}</tbody>
             </table>
           </PlateElement>
         </div>

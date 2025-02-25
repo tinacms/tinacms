@@ -114,8 +114,8 @@ async function listMedia(req: NextRequest, config: AzureBlobStorageConfig) {
     const prefix = useRootDirectory
       ? ''
       : mediaListOptions.directory?.endsWith('/')
-      ? mediaListOptions.directory
-      : `${mediaListOptions.directory}/`
+        ? mediaListOptions.directory
+        : `${mediaListOptions.directory}/`
 
     const files = []
     const folders = []

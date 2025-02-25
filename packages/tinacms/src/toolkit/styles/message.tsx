@@ -66,8 +66,8 @@ export const Message = ({
     <div
       className={`rounded-lg border shadow-sm ${sizeClasses[size]} ${containerClasses[type]} ${className}`}
     >
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-        <div className="flex items-center gap-2">
+      <div className='flex flex-col sm:flex-row items-start sm:items-center gap-2'>
+        <div className='flex items-center gap-2'>
           <MessageIcon
             type={type}
             className={`${
@@ -79,10 +79,10 @@ export const Message = ({
         {link && (
           <a
             href={link}
-            target="_blank"
-            className="flex-shrink-0 flex items-center gap-1 text-blue-600 underline decoration-blue-200 hover:text-blue-500 hover:decoration-blue-500 transition-all ease-out duration-150"
+            target='_blank'
+            className='flex-shrink-0 flex items-center gap-1 text-blue-600 underline decoration-blue-200 hover:text-blue-500 hover:decoration-blue-500 transition-all ease-out duration-150'
           >
-            {linkLabel} <BsArrowRightShort className="w-4 h-auto" />
+            {linkLabel} <BsArrowRightShort className='w-4 h-auto' />
           </a>
         )}
       </div>

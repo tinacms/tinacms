@@ -17,9 +17,9 @@ const MermaidElementWithRef = ({ config }) => {
   }, [config])
 
   return (
-    <div contentEditable={false} className="border-border border-b">
+    <div contentEditable={false} className='border-border border-b'>
       <div ref={mermaidRef}>
-        <pre className="mermaid not-tina-prose">{config}</pre>
+        <pre className='mermaid not-tina-prose'>{config}</pre>
       </div>
     </div>
   )
@@ -27,7 +27,7 @@ const MermaidElementWithRef = ({ config }) => {
 
 const Bubble = ({ children }) => {
   return (
-    <div className="bg-blue-600 rounded-full p-2 transition-transform duration-200 ease-in-out hover:scale-110">
+    <div className='bg-blue-600 rounded-full p-2 transition-transform duration-200 ease-in-out hover:scale-110'>
       {children}
     </div>
   )
@@ -38,7 +38,7 @@ const ErrorMsg = ({ error }) => {
     return (
       <div
         contentEditable={false}
-        className="font-mono bg-red-600 text-white p-2 rounded-md cursor-default"
+        className='font-mono bg-red-600 text-white p-2 rounded-md cursor-default'
       >
         {error}
       </div>
@@ -86,19 +86,19 @@ export const MermaidElement = withRef<typeof PlateElement>(
 
     return (
       <PlateElement element={element} ref={ref} {...props}>
-        <div className="relative group">
-          <div className="absolute top-2 right-2 z-10 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out">
+        <div className='relative group'>
+          <div className='absolute top-2 right-2 z-10 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out'>
             <Bubble>
               {isEditing ? (
                 <Eye
-                  className="w-5 h-5 fill-white cursor-pointer"
+                  className='w-5 h-5 fill-white cursor-pointer'
                   onClick={() => {
                     setIsEditing(!isEditing)
                   }}
                 />
               ) : (
                 <SquarePen
-                  className="w-5 h-5 fill-white cursor-pointer"
+                  className='w-5 h-5 fill-white cursor-pointer'
                   onClick={() => {
                     setIsEditing(!isEditing)
                   }}
@@ -110,7 +110,7 @@ export const MermaidElement = withRef<typeof PlateElement>(
           {isEditing ? (
             <CodeBlock
               children={''}
-              language="yaml"
+              language='yaml'
               {...props}
               element={node}
               defaultValue={mermaidConfig}

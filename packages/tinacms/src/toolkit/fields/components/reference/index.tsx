@@ -9,7 +9,7 @@ export const Reference: React.FC<ReferenceProps> = ({ input, field }) => {
 
   return (
     <>
-      <div className="relative group">
+      <div className='relative group'>
         <ReferenceSelect cms={cms} input={input} field={field} />
       </div>
       <ReferenceLink cms={cms} input={input} />

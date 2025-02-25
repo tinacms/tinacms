@@ -121,21 +121,21 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
     <DropdownMenu modal={false} {...openState} {...props}>
       <DropdownMenuTrigger asChild>
         <ToolbarButton
-          className="lg:min-w-[130px]"
+          className='lg:min-w-[130px]'
           isDropdown
           showArrow
           pressed={openState.open}
-          tooltip="Turn into"
+          tooltip='Turn into'
         >
-          <span className="">{selectedItemLabel}</span>
+          <span className=''>{selectedItemLabel}</span>
         </ToolbarButton>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="min-w-0">
+      <DropdownMenuContent align='start' className='min-w-0'>
         <DropdownMenuLabel>Turn into</DropdownMenuLabel>
 
         <DropdownMenuRadioGroup
-          className="flex flex-col gap-0.5"
+          className='flex flex-col gap-0.5'
           onValueChange={(type) => {
             if (type === 'ul' || type === 'ol') {
               toggleList(editor, { type })
@@ -151,11 +151,11 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
         >
           {items.map(({ icon: Icon, label, value: itemValue }) => (
             <DropdownMenuRadioItem
-              className="min-w-[180px]"
+              className='min-w-[180px]'
               key={itemValue}
               value={itemValue}
             >
-              <Icon className="mr-2 size-5" />
+              <Icon className='mr-2 size-5' />
               {label}
             </DropdownMenuRadioItem>
           ))}

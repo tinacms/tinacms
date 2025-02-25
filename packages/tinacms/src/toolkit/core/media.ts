@@ -136,7 +136,10 @@ export interface MediaList {
 export class MediaManager implements MediaStore {
   private _pageSize: number = 36
 
-  constructor(public store: MediaStore, private events: EventBus) {}
+  constructor(
+    public store: MediaStore,
+    private events: EventBus
+  ) {}
 
   get isConfigured() {
     return !(this.store instanceof DummyMediaStore)

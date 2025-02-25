@@ -51,8 +51,8 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
         }}
       >
         <input
-          className="absolute w-0 h-0 opacity-0 cursor-pointer"
-          type="radio"
+          className='absolute w-0 h-0 opacity-0 cursor-pointer'
+          type='radio'
           id={optionId}
           name={input.name}
           value={option.value}
@@ -91,7 +91,7 @@ const RadioOptions = ({ direction, children, ...props }) => (
 
 const RadioOption = ({ checked, htmlFor, children, ...props }) => (
   <label
-    className="cursor-pointer flex group items-center gap-2"
+    className='cursor-pointer flex group items-center gap-2'
     htmlFor={htmlFor}
     {...props}
   >

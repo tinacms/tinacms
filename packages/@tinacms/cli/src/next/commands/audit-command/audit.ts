@@ -81,9 +81,7 @@ export const audit = async ({
     error = error || returnError
   }
   if (error) {
-    logger.error(
-      chalk.redBright(`‼️ Audit ${chalk.bold('failed')} with errors`)
-    )
+    logger.error(chalk.redBright(`‼️ Audit ${chalk.bold('failed')} with errors`))
     // } else if (warning) {
     //   logger.warn(chalk.yellowBright('⚠️ Audit passed with warnings'))
   } else {

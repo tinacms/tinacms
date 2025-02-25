@@ -100,13 +100,13 @@ const FilenameInput = (props) => {
 
   return (
     <div
-      className="group relative block cursor-pointer"
+      className='group relative block cursor-pointer'
       onClick={() => {
         setFilenameTouched(true)
       }}
     >
       <input
-        type="text"
+        type='text'
         className={`shadow-inner focus:shadow-outline focus:border-blue-500 focus:outline-none block text-base pr-3 truncate py-2 w-full border transition-all ease-out duration-150 focus:text-gray-900 rounded-md ${
           props.readonly || !filenameTouched
             ? 'bg-gray-50 text-gray-300  border-gray-150 pointer-events-none pl-8 group-hover:bg-white group-hover:text-gray-600  group-hover:border-gray-200'
@@ -355,19 +355,19 @@ export const RenderForm = ({
         <div
           className={`pt-10 xl:pt-3 pb-10 xl:pb-4 px-20 xl:px-12 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
         >
-          <div className="w-full flex gap-1.5 justify-between items-center">
+          <div className='w-full flex gap-1.5 justify-between items-center'>
             <Link
               to={`/collections/${collection.name}${
                 folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
               }`}
-              className="flex-0 text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 text-sm leading-tight whitespace-nowrap truncate transition-all duration-150 ease-out"
+              className='flex-0 text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 text-sm leading-tight whitespace-nowrap truncate transition-all duration-150 ease-out'
             >
               {collection.label ? collection.label : collection.name}
             </Link>
-            <span className="opacity-30 text-sm leading-tight whitespace-nowrap flex-0">
+            <span className='opacity-30 text-sm leading-tight whitespace-nowrap flex-0'>
               /
             </span>
-            <span className="flex-1 w-full text-sm leading-tight whitespace-nowrap truncate">
+            <span className='flex-1 w-full text-sm leading-tight whitespace-nowrap truncate'>
               Create New
             </span>
             <FormStatus pristine={formIsPristine} />

@@ -53,8 +53,8 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
     return (
       <div key={option.value}>
         <input
-          className="absolute w-0 h-0 opacity-0 cursor-pointer"
-          type="checkbox"
+          className='absolute w-0 h-0 opacity-0 cursor-pointer'
+          type='checkbox'
           name={input.name}
           id={optionId}
           value={option.value}
@@ -77,7 +77,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
           }}
         />
         <label
-          className="cursor-pointer flex group items-center gap-2"
+          className='cursor-pointer flex group items-center gap-2'
           htmlFor={optionId}
         >
           <span

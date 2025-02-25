@@ -69,25 +69,25 @@ const TemplateMenu = ({
   folder: CollectionFolder
 }) => {
   return (
-    <Menu as="div" className="relative inline-block text-left">
+    <Menu as='div' className='relative inline-block text-left'>
       {() => (
         <div>
           <div>
-            <MenuButton className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6">
-              Create New <BiPlus className="w-5 h-full ml-1 opacity-70" />
+            <MenuButton className='icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6'>
+              Create New <BiPlus className='w-5 h-full ml-1 opacity-70' />
             </MenuButton>
           </div>
 
           <Transition
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
+            enter='transition ease-out duration-100'
+            enterFrom='transform opacity-0 scale-95'
+            enterTo='transform opacity-100 scale-100'
+            leave='transition ease-in duration-75'
+            leaveFrom='transform opacity-100 scale-100'
+            leaveTo='transform opacity-0 scale-95'
           >
-            <MenuItems className="origin-top-right absolute right-0 mt-2 z-menu w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <div className="py-1">
+            <MenuItems className='origin-top-right absolute right-0 mt-2 z-menu w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
+              <div className='py-1'>
                 {templates.map((template) => (
                   <MenuItem key={`${template.label}-${template.name}`}>
                     {({ focus }) => (
@@ -155,8 +155,8 @@ export const handleNavigate = async (
         collection: collectionDefinition,
       })
     : routeMapping
-    ? routeMapping.mapper(collection, document)
-    : undefined
+      ? routeMapping.mapper(collection, document)
+      : undefined
 
   /**
    * Redirect the browser if 'yes', else navigate react-router.
@@ -389,7 +389,7 @@ const CollectionListPage = () => {
                     {/* Editorial workflow  */}
                     {deleteModalOpen && cms.api.tina.usingProtectedBranch() && (
                       <CreateBranchModel
-                        crudType="delete"
+                        crudType='delete'
                         relativePath={`${collectionExtra.path}/${vars.relativePath}`}
                         values={vars}
                         close={() => setDeleteModalOpen(false)}
@@ -497,26 +497,26 @@ const CollectionListPage = () => {
                     )}
 
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
-                      <div className="w-full">
-                        <h3 className="font-sans text-2xl text-gray-700">
+                      <div className='w-full'>
+                        <h3 className='font-sans text-2xl text-gray-700'>
                           {collection.label
                             ? collection.label
                             : collection.name}
                         </h3>
-                        <div className="flex flex-col lg:flex-row justify-between lg:items-end pt-2">
-                          <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-start">
+                        <div className='flex flex-col lg:flex-row justify-between lg:items-end pt-2'>
+                          <div className='flex flex-col md:flex-row gap-2 md:gap-4 items-start'>
                             {fields?.length > 0 && (
                               <>
                                 {!search && (
-                                  <div className="flex flex-col gap-2 items-start w-full md:w-auto">
+                                  <div className='flex flex-col gap-2 items-start w-full md:w-auto'>
                                     <label
-                                      htmlFor="sort"
-                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                      htmlFor='sort'
+                                      className='block font-sans text-xs font-semibold text-gray-500 whitespace-normal'
                                     >
                                       Sort by
                                     </label>
                                     <Select
-                                      name="sort"
+                                      name='sort'
                                       options={[
                                         {
                                           label: 'Default',
@@ -571,7 +571,7 @@ const CollectionListPage = () => {
                                 )}
                               </>
                             )}
-                            <div className="flex flex-1 flex-col gap-2 items-start w-full">
+                            <div className='flex flex-1 flex-col gap-2 items-start w-full'>
                               {searchEnabled ? (
                                 <SearchInput
                                   loading={_loading}
@@ -582,14 +582,14 @@ const CollectionListPage = () => {
                                 />
                               ) : (
                                 <>
-                                  <label className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal">
+                                  <label className='block font-sans text-xs font-semibold text-gray-500 whitespace-normal'>
                                     Search
                                   </label>
                                   <Message
-                                    link="https://tina.io/docs/reference/search/overview"
-                                    linkLabel="Read The Docs"
-                                    type="info"
-                                    size="small"
+                                    link='https://tina.io/docs/reference/search/overview'
+                                    linkLabel='Read The Docs'
+                                    type='info'
+                                    size='small'
                                   >
                                     Search not configured.
                                   </Message>
@@ -597,7 +597,7 @@ const CollectionListPage = () => {
                               )}
                             </div>
                           </div>
-                          <div className="flex flex-col md:flex-row items-start md:items-end gap-2 md:gap-0 pt-4 lg:pt-0">
+                          <div className='flex flex-col md:flex-row items-start md:items-end gap-2 md:gap-0 pt-4 lg:pt-0'>
                             {!collection.templates && allowCreate && (
                               <>
                                 {allowCreateNestedFolder && (
@@ -611,10 +611,10 @@ const CollectionListPage = () => {
                                       setFolderModalOpen(true)
                                       evt.stopPropagation()
                                     }}
-                                    to="/collections/new-folder"
-                                    className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4"
+                                    to='/collections/new-folder'
+                                    className='icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4'
                                   >
-                                    <FaFolder className="mr-2" />
+                                    <FaFolder className='mr-2' />
                                     Add Folder{' '}
                                   </Link>
                                 )}
@@ -634,9 +634,9 @@ const CollectionListPage = () => {
                                           collectionName,
                                         ].join('/')
                                   }`}
-                                  className="inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6"
+                                  className='inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6'
                                 >
-                                  <FaFile className="mr-2" />
+                                  <FaFile className='mr-2' />
                                   Add Files{' '}
                                 </Link>
                               </>
@@ -653,9 +653,9 @@ const CollectionListPage = () => {
                       </div>
                     </PageHeader>
                     <PageBody>
-                      <div className="w-full mx-auto max-w-screen-xl">
+                      <div className='w-full mx-auto max-w-screen-xl'>
                         {sortField && !sortField.required && (
-                          <p className="mb-4 text-gray-500">
+                          <p className='mb-4 text-gray-500'>
                             <em>
                               Sorting on a non-required field. Some documents
                               may be excluded (if they don't have a value for{' '}
@@ -663,11 +663,11 @@ const CollectionListPage = () => {
                             </em>
                           </p>
                         )}
-                        <div className="w-full overflow-x-auto">
+                        <div className='w-full overflow-x-auto'>
                           {((folder.name && !search) ||
                             documents.length > 0) && (
-                            <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
-                              <tbody className="divide-y divide-gray-150">
+                            <table className='table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg'>
+                              <tbody className='divide-y divide-gray-150'>
                                 {folder.name && !search ? (
                                   <tr>
                                     <td colSpan={5}>
@@ -686,9 +686,9 @@ const CollectionListPage = () => {
                                         <tr
                                           key={`folder-${document.node.path}`}
                                         >
-                                          <td className="pl-5 pr-3 py-3">
+                                          <td className='pl-5 pr-3 py-3'>
                                             <a
-                                              className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate"
+                                              className='text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate'
                                               onClick={() => {
                                                 navigate(
                                                   `/${[
@@ -700,12 +700,12 @@ const CollectionListPage = () => {
                                                 )
                                               }}
                                             >
-                                              <BiFolder className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
-                                              <span className="truncate block">
-                                                <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                              <BiFolder className='inline-block h-6 w-auto flex-shrink-0 opacity-70' />
+                                              <span className='truncate block'>
+                                                <span className='block text-xs text-gray-400 mb-1 uppercase'>
                                                   Name
                                                 </span>
-                                                <span className="h-5 leading-5 block truncate">
+                                                <span className='h-5 leading-5 block truncate'>
                                                   <span>
                                                     {document.node.name}
                                                   </span>
@@ -713,21 +713,21 @@ const CollectionListPage = () => {
                                               </span>
                                             </a>
                                           </td>
-                                          <td className="px-3 py-3" colSpan={4}>
-                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                          <td className='px-3 py-3' colSpan={4}>
+                                            <span className='block text-xs text-gray-400 mb-1 uppercase'>
                                               Path
                                             </span>
-                                            <span className="leading-5 block text-sm font-medium text-gray-900 truncate">
+                                            <span className='leading-5 block text-sm font-medium text-gray-900 truncate'>
                                               {document.node.path
                                                 .substring(2)
                                                 .split('/')
                                                 .map((node) => {
                                                   return (
                                                     <span key={node}>
-                                                      <span className="text-gray-300 pr-0.5">
+                                                      <span className='text-gray-300 pr-0.5'>
                                                         /
                                                       </span>
-                                                      <span className="pr-0.5">
+                                                      <span className='pr-0.5'>
                                                         {node}
                                                       </span>
                                                     </span>
@@ -752,11 +752,11 @@ const CollectionListPage = () => {
                                         key={`document-${document.node._sys.relativePath}`}
                                       >
                                         <td
-                                          className="pl-5 pr-3 py-3"
+                                          className='pl-5 pr-3 py-3'
                                           colSpan={hasTitle ? 1 : 2}
                                         >
                                           <a
-                                            className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate"
+                                            className='text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate'
                                             onClick={() => {
                                               handleNavigate(
                                                 navigate,
@@ -767,18 +767,18 @@ const CollectionListPage = () => {
                                               )
                                             }}
                                           >
-                                            <BiFile className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
-                                            <span className="truncate block">
-                                              <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                            <BiFile className='inline-block h-6 w-auto flex-shrink-0 opacity-70' />
+                                            <span className='truncate block'>
+                                              <span className='block text-xs text-gray-400 mb-1 uppercase'>
                                                 {hasTitle
                                                   ? 'Title'
                                                   : 'Filename'}
                                               </span>
-                                              <span className="h-5 leading-5 block truncate mb-1">
+                                              <span className='h-5 leading-5 block truncate mb-1'>
                                                 {!folderView &&
                                                   !hasTitle &&
                                                   subfolders && (
-                                                    <span className="text-xs text-gray-400">
+                                                    <span className='text-xs text-gray-400'>
                                                       {`${subfolders}/`}
                                                     </span>
                                                   )}
@@ -789,20 +789,20 @@ const CollectionListPage = () => {
                                                         .filename}
                                                 </span>
                                               </span>
-                                              <span className="block text-xs text-gray-400">
+                                              <span className='block text-xs text-gray-400'>
                                                 {document.node._sys.path}
                                               </span>
                                             </span>
                                           </a>
                                         </td>
                                         {hasTitle && (
-                                          <td className="px-3 py-3">
-                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                          <td className='px-3 py-3'>
+                                            <span className='block text-xs text-gray-400 mb-1 uppercase'>
                                               Filename
                                             </span>
-                                            <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
+                                            <span className='h-5 leading-5 block text-sm font-medium text-gray-900 truncate'>
                                               {!folderView && subfolders && (
-                                                <span className="text-xs text-gray-400">
+                                                <span className='text-xs text-gray-400'>
                                                   {`${subfolders}/`}
                                                 </span>
                                               )}
@@ -812,29 +812,29 @@ const CollectionListPage = () => {
                                             </span>
                                           </td>
                                         )}
-                                        <td className="px-3 py-3">
-                                          <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                        <td className='px-3 py-3'>
+                                          <span className='block text-xs text-gray-400 mb-1 uppercase'>
                                             Extension
                                           </span>
-                                          <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                          <span className='h-5 leading-5 block text-sm font-medium text-gray-900'>
                                             {document.node._sys.extension}
                                           </span>
                                         </td>
-                                        <td className="px-3 py-3">
-                                          <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                        <td className='px-3 py-3'>
+                                          <span className='block text-xs text-gray-400 mb-1 uppercase'>
                                             Template
                                           </span>
-                                          <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                          <span className='h-5 leading-5 block text-sm font-medium text-gray-900'>
                                             {document.node._sys.template}
                                           </span>
                                         </td>
-                                        <td className="w-0">
+                                        <td className='w-0'>
                                           <OverflowMenu
                                             toolbarItems={[
                                               {
                                                 name: 'edit',
                                                 label: 'Edit in Admin',
-                                                Icon: <BiEdit size="1.3rem" />,
+                                                Icon: <BiEdit size='1.3rem' />,
                                                 onMouseDown: () => {
                                                   const pathToDoc =
                                                     document.node._sys
@@ -858,7 +858,7 @@ const CollectionListPage = () => {
                                               allowCreate && {
                                                 name: 'duplicate',
                                                 label: 'Duplicate',
-                                                Icon: <BiCopy size="1.3rem" />,
+                                                Icon: <BiCopy size='1.3rem' />,
                                                 onMouseDown: () => {
                                                   const pathToDoc =
                                                     document.node._sys
@@ -884,8 +884,8 @@ const CollectionListPage = () => {
                                                 label: 'Delete',
                                                 Icon: (
                                                   <BiTrash
-                                                    size="1.3rem"
-                                                    className="text-red-500"
+                                                    size='1.3rem'
+                                                    className='text-red-500'
                                                   />
                                                 ),
                                                 onMouseDown: () => {
@@ -912,8 +912,8 @@ const CollectionListPage = () => {
                                                 label: 'Rename',
                                                 Icon: (
                                                   <BiRename
-                                                    size="1.3rem"
-                                                    className="text-red-500"
+                                                    size='1.3rem'
+                                                    className='text-red-500'
                                                   />
                                                 ),
                                                 onMouseDown: () => {
@@ -946,9 +946,9 @@ const CollectionListPage = () => {
                           )}
                         </div>
                         {documents.length === 0 && <NoDocumentsPlaceholder />}
-                        <div className="pt-4">
+                        <div className='pt-4'>
                           <CursorPaginator
-                            variant="white"
+                            variant='white'
                             hasNext={
                               sortOrder === 'asc'
                                 ? pageInfo?.hasNextPage
@@ -1000,36 +1000,36 @@ const SearchInput = ({
   }, [loading])
 
   return (
-    <form className="flex flex-1 flex-col gap-2 items-start w-full">
+    <form className='flex flex-1 flex-col gap-2 items-start w-full'>
       <label
-        htmlFor="search"
-        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+        htmlFor='search'
+        className='block font-sans text-xs font-semibold text-gray-500 whitespace-normal'
       >
         Search
       </label>
-      <div className="flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3">
-        <div className="flex-1 min-w-[200px] w-full md:w-auto">
+      <div className='flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3'>
+        <div className='flex-1 min-w-[200px] w-full md:w-auto'>
           <Input
-            type="text"
-            name="search"
-            placeholder="Search"
+            type='text'
+            name='search'
+            placeholder='Search'
             value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value)
             }}
           />
         </div>
-        <div className="flex w-full md:w-auto gap-3">
+        <div className='flex w-full md:w-auto gap-3'>
           <Button
             onClick={(e) => {
               e.preventDefault()
               setSearch(searchInput)
               setSearchLoaded(false)
             }}
-            variant="primary"
-            className="w-full md:w-auto"
+            variant='primary'
+            className='w-full md:w-auto'
           >
-            Search <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
+            Search <BiSearch className='w-5 h-full ml-1.5 opacity-70' />
           </Button>
           {search && searchLoaded && (
             <Button
@@ -1038,9 +1038,9 @@ const SearchInput = ({
                 setSearch('')
                 setSearchInput('')
               }}
-              variant="white"
+              variant='white'
             >
-              Clear <BiX className="w-5 h-full ml-1 opacity-70" />
+              Clear <BiX className='w-5 h-full ml-1 opacity-70' />
             </Button>
           )}
         </div>
@@ -1053,7 +1053,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
   const folderArray = folder.name.split('/')
 
   return (
-    <div className="w-full bg-gray-50/30 flex items-stretch">
+    <div className='w-full bg-gray-50/30 flex items-stretch'>
       <button
         onClick={() => {
           const folders = folder.fullyQualifiedName.split('/')
@@ -1066,28 +1066,28 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
             { replace: true }
           )
         }}
-        className="px-3 py-2 bg-white hover:bg-gray-50/50 transition ease-out duration-100 border-r border-gray-100 text-blue-500 hover:text-blue-600"
+        className='px-3 py-2 bg-white hover:bg-gray-50/50 transition ease-out duration-100 border-r border-gray-100 text-blue-500 hover:text-blue-600'
       >
-        <BiArrowBack className="w-6 h-full opacity-70" />
+        <BiArrowBack className='w-6 h-full opacity-70' />
       </button>
-      <span className="px-3 py-2 text-gray-600 flex flex-wrap items-center justify-start gap-1">
+      <span className='px-3 py-2 text-gray-600 flex flex-wrap items-center justify-start gap-1'>
         <button
           onClick={() => {
             navigate(`/collections/${collectionName}/~`, {
               replace: true,
             })
           }}
-          className="shrink-0 bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100"
+          className='shrink-0 bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100'
         >
-          <RiHome2Line className="w-5 h-auto" />
+          <RiHome2Line className='w-5 h-auto' />
         </button>
         {folderArray.map((node, index) => {
           return (
             <>
-              <span className="text-gray-200 shrink-0">/</span>
+              <span className='text-gray-200 shrink-0'>/</span>
               {index < folderArray.length - 1 ? (
                 <button
-                  className="bg-transparent whitespace-nowrap truncate p-0 border-0 text-blue-500 hover:text-blue-600 transition-all ease-out duration-100 underline underline-offset-2 decoration-1	decoration-blue-200 hover:decoration-blue-400"
+                  className='bg-transparent whitespace-nowrap truncate p-0 border-0 text-blue-500 hover:text-blue-600 transition-all ease-out duration-100 underline underline-offset-2 decoration-1	decoration-blue-200 hover:decoration-blue-400'
                   onClick={() => {
                     const folders = folder.fullyQualifiedName.split('/')
                     navigate(
@@ -1106,7 +1106,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
                   {node}
                 </button>
               ) : (
-                <span className="whitespace-nowrap truncate">{node}</span>
+                <span className='whitespace-nowrap truncate'>{node}</span>
               )}
             </>
           )
@@ -1125,8 +1125,8 @@ interface DeleteModalProps {
 
 const NoDocumentsPlaceholder = () => {
   return (
-    <div className="text-center px-5 py-3 flex flex-col items-center justify-center shadow border border-gray-100 bg-gray-50 border-b border-gray-200 w-full max-w-full rounded-lg">
-      <p className="text-base italic font-medium text-gray-300">
+    <div className='text-center px-5 py-3 flex flex-col items-center justify-center shadow border border-gray-100 bg-gray-50 border-b border-gray-200 w-full max-w-full rounded-lg'>
+      <p className='text-base italic font-medium text-gray-300'>
         No documents found.
       </p>
     </div>
@@ -1160,7 +1160,7 @@ const DeleteModal = ({
           </Button>
           <Button
             style={{ flexGrow: 3 }}
-            variant="danger"
+            variant='danger'
             onClick={async () => {
               await deleteFunc()
               close()
@@ -1196,7 +1196,7 @@ const FolderModal = ({
             {/* <p className="mb-4">
             </p> */}
             <BaseTextField
-              placeholder="Enter the name of the new folder"
+              placeholder='Enter the name of the new folder'
               value={folderName}
               onChange={(event) => setFolderName(event.target.value)}
             />
@@ -1208,7 +1208,7 @@ const FolderModal = ({
           </Button>
           <Button
             style={{ flexGrow: 3 }}
-            variant="primary"
+            variant='primary'
             onClick={async () => {
               await createFunc()
               close()
@@ -1243,7 +1243,7 @@ const RenameModal = ({
         <ModalHeader close={close}>Rename {filename}</ModalHeader>
         <ModalBody padded={true}>
           <>
-            <p className="mb-4">
+            <p className='mb-4'>
               Are you sure you want to rename <strong>{filename}</strong>?
             </p>
             <BaseTextField
@@ -1259,7 +1259,7 @@ const RenameModal = ({
           </Button>
           <Button
             style={{ flexGrow: 3 }}
-            variant="primary"
+            variant='primary'
             onClick={async () => {
               await renameFunc()
               close()

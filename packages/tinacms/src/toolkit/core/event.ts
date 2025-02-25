@@ -43,7 +43,10 @@ export class EventBus {
 }
 
 export class Listener<E extends CMSEvent = CMSEvent> {
-  constructor(private eventPattern: E['type'], private callback: Callback<E>) {}
+  constructor(
+    private eventPattern: E['type'],
+    private callback: Callback<E>
+  ) {}
 
   handleEvent(event: E) {
     if (this.watchesEvent(event)) {

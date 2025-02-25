@@ -219,7 +219,10 @@ export class PluginType<T extends Plugin = Plugin> {
    *
    * @param __type The `__type` of plugin being managed.
    */
-  constructor(private __type: string, private events: EventBus) {}
+  constructor(
+    private __type: string,
+    private events: EventBus
+  ) {}
 
   /**
    * Adds a new plugin to the collection.

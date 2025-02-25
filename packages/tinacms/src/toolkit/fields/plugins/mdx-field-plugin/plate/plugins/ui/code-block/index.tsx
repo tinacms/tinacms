@@ -281,7 +281,7 @@ export const CodeBlock = ({
   return (
     <div
       {...attributes}
-      className="relative mb-2 mt-0.5 rounded-lg shadow-md p-2 border-gray-200 border"
+      className='relative mb-2 mt-0.5 rounded-lg shadow-md p-2 border-gray-200 border'
     >
       <style>
         {/* Disable hints (not ideal but it conflicts with the toolbar and other floating elements) */}
@@ -293,7 +293,7 @@ export const CodeBlock = ({
       {props.children}
       <div contentEditable={false}>
         {!restrictLanguage && (
-          <div className="flex justify-between pb-2">
+          <div className='flex justify-between pb-2'>
             <div />
             <Autocomplete
               items={items}

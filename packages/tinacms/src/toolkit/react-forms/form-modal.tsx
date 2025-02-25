@@ -34,7 +34,7 @@ export const FormModal = ({ plugin, close }: any) => {
   )
 
   return (
-    <Modal id="content-creator-modal" onClick={(e) => e.stopPropagation()}>
+    <Modal id='content-creator-modal' onClick={(e) => e.stopPropagation()}>
       <PopupModal>
         <ModalHeader close={close}>{plugin.name}</ModalHeader>
         <ModalBody>

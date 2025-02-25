@@ -231,10 +231,10 @@ const InlineComboboxInput = forwardRef<
     <>
       {showTrigger && trigger}
 
-      <span className="relative min-h-[1lh]">
+      <span className='relative min-h-[1lh]'>
         <span
-          aria-hidden="true"
-          className="invisible overflow-hidden text-nowrap"
+          aria-hidden='true'
+          className='invisible overflow-hidden text-nowrap'
         >
           {value || '\u200B'}
         </span>

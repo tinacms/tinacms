@@ -119,15 +119,15 @@ const Panel = function Panel({
 
 const Header = ({ onClick, children }) => {
   return (
-    <div className="pt-1 mb-5">
+    <div className='pt-1 mb-5'>
       <button
         onClick={onClick}
-        className="group px-4 py-3 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-blue-500 w-full border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-blue-400 focus:text-blue-500 rounded-md flex justify-between items-center gap-2"
+        className='group px-4 py-3 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-blue-500 w-full border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-blue-400 focus:text-blue-500 rounded-md flex justify-between items-center gap-2'
       >
-        <span className="text-left text-base font-medium overflow-hidden text-ellipsis whitespace-nowrap flex-1">
+        <span className='text-left text-base font-medium overflow-hidden text-ellipsis whitespace-nowrap flex-1'>
           {children}
         </span>{' '}
-        <BiPencil className="h-6 w-auto transition-opacity duration-150 ease-out opacity-80 group-hover:opacity-90" />
+        <BiPencil className='h-6 w-auto transition-opacity duration-150 ease-out opacity-80 group-hover:opacity-90' />
       </button>
     </div>
   )
@@ -141,9 +141,9 @@ export const PanelHeader = ({ onClick, children }) => {
       onClick={onClick}
       tabIndex={-1}
     >
-      <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
+      <div className='flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto'>
         {children}
-        <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+        <IoMdClose className='h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5' />
       </div>
     </button>
   )

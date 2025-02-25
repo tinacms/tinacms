@@ -118,9 +118,9 @@ export const SyncErrorWidget = ({ cms }: { cms: any }) => {
   return (
     <div
       title={syncStatus.message}
-      className="flex-grow-0 flex text-xs items-center"
+      className='flex-grow-0 flex text-xs items-center'
     >
-      <MdSyncProblem className="w-6 h-full ml-2 text-red-500 fill-current" />
+      <MdSyncProblem className='w-6 h-full ml-2 text-red-500 fill-current' />
     </div>
   )
 }
@@ -145,10 +145,10 @@ const EventsList = ({ cms }) => {
   } = useGetEvents(cms, cursor, existingEvents)
 
   return (
-    <div className="flex flex-col gap-4 w-full h-full grow-0">
+    <div className='flex flex-col gap-4 w-full h-full grow-0'>
       {events.length > 0 && (
-        <div className="shrink grow-0 overflow-scroll w-full rounded-md shadow ring-1 ring-black ring-opacity-5">
-          <table className="w-full divide-y divide-gray-100">
+        <div className='shrink grow-0 overflow-scroll w-full rounded-md shadow ring-1 ring-black ring-opacity-5'>
+          <table className='w-full divide-y divide-gray-100'>
             {events
               .map((event, index) => {
                 const date = new Date(event.timestamp).toDateString()
@@ -159,35 +159,35 @@ const EventsList = ({ cms }) => {
                     {event.isError ? (
                       <td
                         key={`${event.id}_error_icon`}
-                        className="py-3 pl-4 pr-0 w-0"
+                        className='py-3 pl-4 pr-0 w-0'
                       >
-                        <BsExclamationOctagonFill className="text-red-500 fill-current w-5 h-auto" />
+                        <BsExclamationOctagonFill className='text-red-500 fill-current w-5 h-auto' />
                       </td>
                     ) : (
                       <td
                         key={`${event.id}_ok_icon`}
-                        className="py-3 pl-4 pr-0 w-0"
+                        className='py-3 pl-4 pr-0 w-0'
                       >
-                        <BsCheckCircleFill className="text-green-500 fill-current w-5 h-auto" />
+                        <BsCheckCircleFill className='text-green-500 fill-current w-5 h-auto' />
                       </td>
                     )}
                     <td
                       key={`${event.id}_msg`}
-                      className="whitespace-nowrap p-3 text-base text-gray-500"
+                      className='whitespace-nowrap p-3 text-base text-gray-500'
                     >
                       {event.message}
                       {event.isError && (
-                        <div className="w-full text-gray-300 text-xs mt-0.5">
+                        <div className='w-full text-gray-300 text-xs mt-0.5'>
                           {event.id}
                         </div>
                       )}
                     </td>
                     <td
                       key={`${event.id}_ts`}
-                      className="whitespace-nowrap py-3 pl-3 pr-4 text-sm text-gray-500"
+                      className='whitespace-nowrap py-3 pl-3 pr-4 text-sm text-gray-500'
                     >
                       {date}
-                      <span className="w-full block text-gray-300 text-xs mt-0.5">
+                      <span className='w-full block text-gray-300 text-xs mt-0.5'>
                         {time}
                       </span>
                     </td>
@@ -199,10 +199,10 @@ const EventsList = ({ cms }) => {
         </div>
       )}
       {loading && (
-        <div className="text-sm text-gray-400 text-center">Loading...</div>
+        <div className='text-sm text-gray-400 text-center'>Loading...</div>
       )}
       {error && <div>Error: {error.message}</div>}
-      <div className="text-center flex-1">
+      <div className='text-center flex-1'>
         <Button
           onClick={() => {
             setExistingEvents(events)
@@ -220,7 +220,7 @@ export const SyncStatusModal = ({ closeEventsModal, cms }) => (
   <Modal>
     <FullscreenModal>
       <ModalHeader close={closeEventsModal}>Event Log</ModalHeader>
-      <ModalBody className="flex h-full flex-col" padded={true}>
+      <ModalBody className='flex h-full flex-col' padded={true}>
         <EventsList cms={cms} />
       </ModalBody>
     </FullscreenModal>
@@ -244,9 +244,9 @@ export const SyncStatus = ({ cms, setEventsOpen }) => {
         onClick={openEventsModal}
       >
         {syncStatus.state !== 'error' ? (
-          <HiOutlineClipboardList className="w-6 h-auto mr-2 text-blue-400" />
+          <HiOutlineClipboardList className='w-6 h-auto mr-2 text-blue-400' />
         ) : (
-          <MdSyncProblem className="w-6 h-auto mr-2 text-red-400" />
+          <MdSyncProblem className='w-6 h-auto mr-2 text-red-400' />
         )}{' '}
         Event Log
       </button>

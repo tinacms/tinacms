@@ -87,8 +87,8 @@ const ToolbarButton = withTooltip(
       return typeof pressed === 'boolean' ? (
         <ToolbarToggleGroup
           disabled={props.disabled}
-          type="single"
-          value="single"
+          type='single'
+          value='single'
         >
           <ToolbarToggleItem
             className={cn(
@@ -105,9 +105,9 @@ const ToolbarButton = withTooltip(
           >
             {isDropdown && showArrow ? (
               <>
-                <div className="flex flex-1">{children}</div>
+                <div className='flex flex-1'>{children}</div>
                 <div>
-                  <Icons.arrowDown className="ml-0.5 size-4" data-icon />
+                  <Icons.arrowDown className='ml-0.5 size-4' data-icon />
                 </div>
               </>
             ) : (
@@ -157,12 +157,12 @@ export const ToolbarGroup = withRef<
   return (
     <div className={cn('flex', className)} ref={ref}>
       {!noSeparator && (
-        <div className="h-full py-1">
-          <Separator orientation="vertical" />
+        <div className='h-full py-1'>
+          <Separator orientation='vertical' />
         </div>
       )}
 
-      <div className="mx-1 flex items-center gap-1">{children}</div>
+      <div className='mx-1 flex items-center gap-1'>{children}</div>
     </div>
   )
 })

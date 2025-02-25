@@ -118,7 +118,7 @@ const Blocks = ({
       <ListPanel>
         <Droppable droppableId={field.name} type={field.name}>
           {(provider) => (
-            <div ref={provider.innerRef} className="edit-page--list-parent">
+            <div ref={provider.innerRef} className='edit-page--list-parent'>
               {items.length === 0 && <EmptyList />}
               {items.map((block: any, index: any) => {
                 const template = field.templates[block._template]
@@ -228,7 +228,7 @@ const BlockListItem = ({
               onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
             >
               <GroupLabel>{label || template.label}</GroupLabel>
-              <BiPencil className="h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out" />
+              <BiPencil className='h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out' />
             </ItemClickTarget>
             {(!fixedLength || (fixedLength && !isMin)) && (
               <ItemDeleteButton disabled={isMin} onClick={removeItem} />

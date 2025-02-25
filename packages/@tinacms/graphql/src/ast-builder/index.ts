@@ -283,7 +283,7 @@ export const astBuilder = {
     ({
       name: { kind: 'Name' as const, value: name },
       kind: 'Field' as const,
-    } as FieldNode),
+    }) as FieldNode,
   FieldDefinition: ({
     name,
     type,

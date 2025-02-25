@@ -26,7 +26,7 @@ export const PageWrapper = ({ children }: { children: React.ReactNode }) => {
   }, [cms.events])
 
   return (
-    <div className="relative left-0 w-full h-full bg-gradient-to-b from-gray-50/50 to-gray-50 shadow-2xl overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100">
+    <div className='relative left-0 w-full h-full bg-gradient-to-b from-gray-50/50 to-gray-50 shadow-2xl overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100'>
       {branchingEnabled && !isLocalMode && <BranchBanner />}
       {children}
     </div>
@@ -45,9 +45,9 @@ export const PageHeader = ({
       {isLocalMode && <LocalWarning />}
       {!isLocalMode && <BillingWarning />}
 
-      <div className="pt-16 xl:pt-12 px-6 xl:px-12">
-        <div className="w-full mx-auto max-w-screen-xl">
-          <div className="w-full flex justify-between items-end">
+      <div className='pt-16 xl:pt-12 px-6 xl:px-12'>
+        <div className='w-full mx-auto max-w-screen-xl'>
+          <div className='w-full flex justify-between items-end'>
             {children}
           </div>
         </div>
@@ -57,11 +57,11 @@ export const PageHeader = ({
 }
 
 export const PageBody = ({ children }: { children: React.ReactNode }) => (
-  <div className="py-8 px-6 xl:px-12">{children}</div>
+  <div className='py-8 px-6 xl:px-12'>{children}</div>
 )
 
 export const PageBodyNarrow = ({ children }: { children: React.ReactNode }) => (
-  <div className="py-10 px-6 xl:px-12">
-    <div className="w-full mx-auto max-w-screen-xl">{children}</div>
+  <div className='py-10 px-6 xl:px-12'>
+    <div className='w-full mx-auto max-w-screen-xl'>{children}</div>
   </div>
 )

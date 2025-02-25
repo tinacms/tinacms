@@ -24,7 +24,7 @@ export function Alerts({ alerts }: AlertsProps) {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 p-6 flex flex-col items-center z-[999999] pointer-events-none">
+      <div className='fixed bottom-0 left-0 right-0 p-6 flex flex-col items-center z-[999999] pointer-events-none'>
         {alerts.all
           .filter((alert) => {
             return alert.level !== 'error'
@@ -33,15 +33,15 @@ export function Alerts({ alerts }: AlertsProps) {
             return (
               <Alert key={alert.id} level={alert.level}>
                 {alert.level === 'info' && (
-                  <BiInfoCircle className="w-5 h-auto opacity-70" />
+                  <BiInfoCircle className='w-5 h-auto opacity-70' />
                 )}
                 {alert.level === 'success' && (
-                  <BiCheckCircle className="w-5 h-auto opacity-70" />
+                  <BiCheckCircle className='w-5 h-auto opacity-70' />
                 )}
                 {alert.level === 'warn' && (
-                  <BiError className="w-5 h-auto opacity-70" />
+                  <BiError className='w-5 h-auto opacity-70' />
                 )}
-                <p className="m-0 flex-1 max-w-[680px] text-left">
+                <p className='m-0 flex-1 max-w-[680px] text-left'>
                   {alert.message.toString()}
                 </p>
                 <CloseAlert
@@ -62,7 +62,7 @@ export function Alerts({ alerts }: AlertsProps) {
             typeof alert.message === 'string'
               ? () => {
                   return (
-                    <p className="text-base mb-3 overflow-y-auto">
+                    <p className='text-base mb-3 overflow-y-auto'>
                       {alert.message.toString()}
                     </p>
                   )
@@ -77,16 +77,16 @@ export function Alerts({ alerts }: AlertsProps) {
                     alerts.dismiss(alert)
                   }}
                 >
-                  <BiError className="mr-1 w-6 h-auto fill-current inline-block text-red-600" />{' '}
+                  <BiError className='mr-1 w-6 h-auto fill-current inline-block text-red-600' />{' '}
                   Error
                 </ModalHeader>
                 <ModalBody padded={true}>
-                  <div className="tina-prose">
+                  <div className='tina-prose'>
                     <AlertMessage />
                   </div>
                 </ModalBody>
                 <ModalActions>
-                  <div className="flex-1" />
+                  <div className='flex-1' />
                   <Button
                     style={{ flexGrow: 1 }}
                     onClick={() => {
@@ -143,9 +143,9 @@ const Alert: React.FC<{ level: AlertLevel; children: React.ReactNode }> = ({
 
 const CloseAlert = ({ ...styleProps }) => (
   <button
-    className="border-none bg-transparent p-0 outline-none flex items-center"
+    className='border-none bg-transparent p-0 outline-none flex items-center'
     {...styleProps}
   >
-    <BiX className="w-5 auto flex-grow-0 flex-shrink-0 opacity-50" />
+    <BiX className='w-5 auto flex-grow-0 flex-shrink-0 opacity-50' />
   </button>
 )

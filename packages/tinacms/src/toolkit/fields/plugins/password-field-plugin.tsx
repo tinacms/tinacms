@@ -43,8 +43,8 @@ export const PasswordFieldComponent = wrapFieldsWithMeta<
   }, [password, confirmPassword, passwordChangeRequired])
 
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-row space-x-4">
+    <div className='flex flex-col'>
+      <div className='flex flex-row space-x-4'>
         <BasePasswordField
           autoComplete={'off'}
           value={password ?? PasswordMask}
@@ -98,17 +98,17 @@ export const PasswordFieldComponent = wrapFieldsWithMeta<
           Reset
         </Button>
       </div>
-      <div className="flex w-full items-center pl-1 pt-3">
+      <div className='flex w-full items-center pl-1 pt-3'>
         <Toggle
           field={{ name: 'passwordChangeRequired', component: 'toggle' }}
           input={{
             value: passwordChangeRequired ?? true,
             onChange: () => setPasswordChangeRequired(!passwordChangeRequired),
           }}
-          name="passwordChangeRequired"
+          name='passwordChangeRequired'
         />
         <div>
-          <label className="block font-sans text-xs font-semibold text-gray-700 whitespace-normal h-full items-center ml-1">
+          <label className='block font-sans text-xs font-semibold text-gray-700 whitespace-normal h-full items-center ml-1'>
             Require Password Change on Next Login
           </label>
         </div>

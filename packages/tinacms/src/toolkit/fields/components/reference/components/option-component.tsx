@@ -18,11 +18,11 @@ const OptionComponent: React.FC<OptionComponentProps> = ({
         onSelect(currentValue === value ? '' : currentValue)
       }}
     >
-      <div className="flex flex-col w-full">
+      <div className='flex flex-col w-full'>
         {field?.optionComponent && _values ? (
           field.optionComponent(_values, node._internalSys)
         ) : (
-          <span className="text-x">{id}</span>
+          <span className='text-x'>{id}</span>
         )}
       </div>
     </CommandItem>

@@ -20,7 +20,7 @@ export const BranchModal = ({ close }: SubmitModalProps) => {
 
   return (
     <Modal>
-      <PopupModal className=" w-[800px]">
+      <PopupModal className=' w-[800px]'>
         <ModalHeader close={close}>{modalTitle}</ModalHeader>
         <ModalBody padded={false}>
           <BranchSwitcher

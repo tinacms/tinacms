@@ -51,7 +51,7 @@ export const CodeBlockToolbarButton = withRef<
   const { props } = useCodeBlockToolbarButton(state)
 
   return (
-    <ToolbarButton ref={ref} tooltip="Link" {...rest} {...props}>
+    <ToolbarButton ref={ref} tooltip='Link' {...rest} {...props}>
       <Icons.codeBlock />
     </ToolbarButton>
   )

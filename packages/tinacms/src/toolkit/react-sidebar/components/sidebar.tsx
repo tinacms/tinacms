@@ -310,19 +310,19 @@ const Sidebar = ({
           <ResizeHandle />
         </SidebarWrapper>
         {renderMobileNav && (
-          <Transition show={menuIsOpen} as="div">
+          <Transition show={menuIsOpen} as='div'>
             <TransitionChild
-              enter="transform transition-all ease-out duration-300"
-              enterFrom="opacity-0 -translate-x-full"
-              enterTo="opacity-100 translate-x-0"
-              leave="transform transition-all ease-in duration-200"
-              leaveFrom="opacity-100 translate-x-0"
-              leaveTo="opacity-0 -translate-x-full"
+              enter='transform transition-all ease-out duration-300'
+              enterFrom='opacity-0 -translate-x-full'
+              enterTo='opacity-100 translate-x-0'
+              leave='transform transition-all ease-in duration-200'
+              leaveFrom='opacity-100 translate-x-0'
+              leaveTo='opacity-0 -translate-x-full'
             >
-              <div className="fixed left-0 top-0 z-overlay h-full transform">
+              <div className='fixed left-0 top-0 z-overlay h-full transform'>
                 <Nav
                   isLocalMode={cms.api?.tina?.isLocalMode}
-                  className="rounded-r-md"
+                  className='rounded-r-md'
                   showCollections={isTinaAdminEnabled}
                   collectionsInfo={collectionsInfo}
                   screens={activeScreens}
@@ -359,35 +359,35 @@ const Sidebar = ({
                     />
                   )}
                 >
-                  <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
+                  <div className='absolute top-8 right-0 transform translate-x-full overflow-hidden'>
                     <Button
-                      rounded="right"
-                      variant="secondary"
+                      rounded='right'
+                      variant='secondary'
                       onClick={() => {
                         setMenuIsOpen(false)
                       }}
                       className={'transition-opacity duration-150 ease-out'}
                     >
-                      <IoMdClose className="h-5 w-auto text-blue-500" />
+                      <IoMdClose className='h-5 w-auto text-blue-500' />
                     </Button>
                   </div>
                 </Nav>
               </div>
             </TransitionChild>
             <TransitionChild
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-80"
-              entered="opacity-80"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-80"
-              leaveTo="opacity-0"
+              enter='ease-out duration-300'
+              enterFrom='opacity-0'
+              enterTo='opacity-80'
+              entered='opacity-80'
+              leave='ease-in duration-200'
+              leaveFrom='opacity-80'
+              leaveTo='opacity-0'
             >
               <div
                 onClick={() => {
                   setMenuIsOpen(false)
                 }}
-                className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
+                className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
               />
             </TransitionChild>
           </Transition>
@@ -411,10 +411,10 @@ export const updateBodyDisplacement = ({
     body.style.transition = resizingSidebar
       ? ''
       : displayState === 'fullscreen'
-      ? 'padding 0ms 150ms'
-      : displayState === 'closed'
-      ? 'padding 0ms 0ms'
-      : 'padding 0ms 300ms'
+        ? 'padding 0ms 150ms'
+        : displayState === 'closed'
+          ? 'padding 0ms 0ms'
+          : 'padding 0ms 300ms'
 
     if (displayState === 'open') {
       const bodyDisplacement = Math.min(
@@ -451,34 +451,34 @@ const SidebarHeader = ({
       : null
 
   return (
-    <div className="flex-grow-0 w-full overflow-visible z-20">
+    <div className='flex-grow-0 w-full overflow-visible z-20'>
       {isLocalMode && <LocalWarning />}
       {!isLocalMode && <BillingWarning />}
 
-      <div className="mt-4 -mb-14 w-full flex gap-3 items-center justify-between pointer-events-none">
+      <div className='mt-4 -mb-14 w-full flex gap-3 items-center justify-between pointer-events-none'>
         {displayMenuButton && (
           <Button
-            rounded="right"
-            variant="white"
+            rounded='right'
+            variant='white'
             onClick={() => {
               setMenuIsOpen(true)
             }}
-            className="pointer-events-auto -ml-px"
+            className='pointer-events-auto -ml-px'
           >
-            <BiMenu className="h-6 w-auto text-blue-500" />
+            <BiMenu className='h-6 w-auto text-blue-500' />
           </Button>
         )}
-        <div className="flex-1 flex gap-3 items-center shrink min-w-0">
+        <div className='flex-1 flex gap-3 items-center shrink min-w-0'>
           {branchingEnabled && !isLocalMode && <BranchButton />}
           {branchingEnabled && !isLocalMode && previewUrl && (
             <button
-              className="pointer-events-auto flex min-w-0	shrink gap-1 items-center justify-between form-select text-sm h-10 px-4 shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100 transition-color duration-150 ease-out rounded-full focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight min-w-[5rem]"
+              className='pointer-events-auto flex min-w-0	shrink gap-1 items-center justify-between form-select text-sm h-10 px-4 shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100 transition-color duration-150 ease-out rounded-full focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight min-w-[5rem]'
               onClick={() => {
                 window.open(previewUrl, '_blank')
               }}
             >
-              <BiLinkExternal className="flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1" />
-              <span className="truncate max-w-full min-w-0 shrink">
+              <BiLinkExternal className='flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1' />
+              <span className='truncate max-w-full min-w-0 shrink'>
                 Preview
               </span>
             </button>
@@ -490,29 +490,29 @@ const SidebarHeader = ({
           }
         >
           <Button
-            rounded="left"
-            variant="white"
+            rounded='left'
+            variant='white'
             onClick={toggleSidebarOpen}
-            aria-label="closes cms sidebar"
-            className="-mr-px"
+            aria-label='closes cms sidebar'
+            className='-mr-px'
           >
-            <MdOutlineArrowBackIos className="h-[18px] w-auto -mr-1 text-blue-500" />
+            <MdOutlineArrowBackIos className='h-[18px] w-auto -mr-1 text-blue-500' />
           </Button>
-          <Button rounded="custom" variant="white" onClick={toggleFullscreen}>
+          <Button rounded='custom' variant='white' onClick={toggleFullscreen}>
             {displayState === 'fullscreen' ? (
               // BiCollapseAlt
               <svg
-                className="h-5 w-auto -mx-1 text-blue-500"
-                stroke="currentColor"
-                fill="currentColor"
-                stroke-width="0"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+                className='h-5 w-auto -mx-1 text-blue-500'
+                stroke='currentColor'
+                fill='currentColor'
+                stroke-width='0'
+                viewBox='0 0 24 24'
+                xmlns='http://www.w3.org/2000/svg'
               >
-                <path d="M2 15h7v7h2v-9H2v2zM15 2h-2v9h9V9h-7V2z"></path>
+                <path d='M2 15h7v7h2v-9H2v2zM15 2h-2v9h9V9h-7V2z'></path>
               </svg>
             ) : (
-              <BiExpandAlt className="h-5 -mx-1 w-auto text-blue-500" />
+              <BiExpandAlt className='h-5 -mx-1 w-auto text-blue-500' />
             )}
           </Button>
         </div>
@@ -530,11 +530,11 @@ const SidebarSiteLink = ({
 }) => {
   return (
     <button
-      className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
+      className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
       value={view.name}
       onClick={onClick}
     >
-      <view.Icon className="mr-2 h-6 opacity-80 w-auto" /> {view.name}
+      <view.Icon className='mr-2 h-6 opacity-80 w-auto' /> {view.name}
     </button>
   )
 }
@@ -542,11 +542,11 @@ const SidebarSiteLink = ({
 const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
   if (config.text) {
     return (
-      <span className="text-base tracking-wide text-gray-500 flex items-center opacity-90">
+      <span className='text-base tracking-wide text-gray-500 flex items-center opacity-90'>
         {config.text}{' '}
         <a
-          target="_blank"
-          className="ml-1 text-blue-600 hover:opacity-60"
+          target='_blank'
+          className='ml-1 text-blue-600 hover:opacity-60'
           href={config.link.href}
         >
           {config.link.text}
@@ -555,9 +555,9 @@ const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
     )
   }
   return (
-    <span className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100">
-      <config.Icon className="mr-2 h-6 opacity-80 w-auto" />
-      <a target="_blank" href={config.link.href}>
+    <span className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'>
+      <config.Icon className='mr-2 h-6 opacity-80 w-auto' />
+      <a target='_blank' href={config.link.href}>
         {config.link.text}
       </a>
     </span>
@@ -584,9 +584,9 @@ const SidebarCollectionLink = ({
       href={`${
         tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
       }/collections/${collection.name}/~`}
-      className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
+      className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
     >
-      <Icon className="mr-2 h-6 opacity-80 w-auto" />{' '}
+      <Icon className='mr-2 h-6 opacity-80 w-auto' />{' '}
       {collection.label ? collection.label : collection.name}
     </a>
   )
@@ -597,18 +597,18 @@ const EditButton = ({}) => {
 
   return (
     <Button
-      rounded="right"
-      variant="primary"
-      size="custom"
+      rounded='right'
+      variant='primary'
+      size='custom'
       onClick={toggleSidebarOpen}
       className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${
         displayState !== 'closed'
           ? 'opacity-0 ease-in pointer-events-none'
           : 'ease-out pointer-events-auto'
       }`}
-      aria-label="opens cms sidebar"
+      aria-label='opens cms sidebar'
     >
-      <BiPencil className="h-6 w-auto" />
+      <BiPencil className='h-6 w-auto' />
     </Button>
   )
 }
@@ -630,10 +630,10 @@ const SidebarWrapper = ({ children }) => {
           resizingSidebar
             ? 'transition-none'
             : displayState === 'closed'
-            ? 'transition-all duration-300 ease-in'
-            : displayState === 'fullscreen'
-            ? 'transition-all duration-150 ease-out'
-            : 'transition-all duration-300 ease-out'
+              ? 'transition-all duration-300 ease-in'
+              : displayState === 'fullscreen'
+                ? 'transition-all duration-150 ease-out'
+                : 'transition-all duration-300 ease-out'
         }`}
         style={{
           width: displayState === 'fullscreen' ? '100vw' : `${sidebarWidth}px`,

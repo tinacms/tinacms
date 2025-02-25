@@ -105,7 +105,9 @@ export class DevCommand extends BaseCommand {
 
           const schemaObject = require(configManager.generatedSchemaJSONPath)
           const lookupObject = require(configManager.generatedLookupJSONPath)
-          const graphqlSchemaObject = require(configManager.generatedGraphQLJSONPath)
+          const graphqlSchemaObject = require(
+            configManager.generatedGraphQLJSONPath
+          )
 
           const tinaLockFilename = 'tina-lock.json'
           const tinaLockContent = JSON.stringify({

@@ -76,25 +76,25 @@ export function LinkFloatingToolbar({ state }: LinkFloatingToolbarProps) {
   if (hidden) return null
 
   const input = (
-    <div className="flex max-w-[330px] flex-col" {...inputProps}>
-      <div className="flex items-center">
-        <div className="flex items-center pl-3 text-muted-foreground">
-          <Icons.link className="size-4" />
+    <div className='flex max-w-[330px] flex-col' {...inputProps}>
+      <div className='flex items-center'>
+        <div className='flex items-center pl-3 text-muted-foreground'>
+          <Icons.link className='size-4' />
         </div>
 
         <FloatingLinkUrlInput
           className={inputVariants({ h: 'sm', variant: 'ghost' })}
-          placeholder="Paste link"
+          placeholder='Paste link'
         />
       </div>
       <Separator />
-      <div className="flex items-center">
-        <div className="flex items-center pl-3 text-muted-foreground">
-          <Icons.text className="size-4" />
+      <div className='flex items-center'>
+        <div className='flex items-center pl-3 text-muted-foreground'>
+          <Icons.text className='size-4' />
         </div>
         <input
           className={inputVariants({ h: 'sm', variant: 'ghost' })}
-          placeholder="Text to display"
+          placeholder='Text to display'
           {...textInputProps}
         />
       </div>
@@ -104,16 +104,16 @@ export function LinkFloatingToolbar({ state }: LinkFloatingToolbarProps) {
   const editContent = editState.isEditing ? (
     input
   ) : (
-    <div className="box-content flex h-9 items-center gap-1">
+    <div className='box-content flex h-9 items-center gap-1'>
       <button
         className={buttonVariants({ size: 'sm', variant: 'ghost' })}
-        type="button"
+        type='button'
         {...editButtonProps}
       >
         Edit link
       </button>
 
-      <Separator orientation="vertical" />
+      <Separator orientation='vertical' />
 
       <LinkOpenButton
         className={buttonVariants({
@@ -124,14 +124,14 @@ export function LinkFloatingToolbar({ state }: LinkFloatingToolbarProps) {
         <Icons.externalLink width={18} />
       </LinkOpenButton>
 
-      <Separator orientation="vertical" />
+      <Separator orientation='vertical' />
 
       <button
         className={buttonVariants({
           size: 'sms',
           variant: 'ghost',
         })}
-        type="button"
+        type='button'
         {...unlinkButtonProps}
       >
         <Icons.unlink width={18} />

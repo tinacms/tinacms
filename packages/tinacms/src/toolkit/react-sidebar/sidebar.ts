@@ -36,7 +36,10 @@ export class SidebarState {
     reset: 'Reset',
   }
 
-  constructor(private events: EventBus, options: SidebarStateOptions = {}) {
+  constructor(
+    private events: EventBus,
+    options: SidebarStateOptions = {}
+  ) {
     // @ts-ignore FIXME twind
     this.position = options.position || 'displace'
     this.renderNav = options.renderNav || true

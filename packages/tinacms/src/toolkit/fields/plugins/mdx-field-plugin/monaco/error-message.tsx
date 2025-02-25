@@ -66,7 +66,7 @@ export function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
   const message = buildErrorMessage(error)
 
   return (
-    <Popover className="relative">
+    <Popover className='relative'>
       {() => (
         <>
           <PopoverButton
@@ -74,29 +74,29 @@ export function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
               error ? '' : ' opacity-0 hidden '
             }`}
           >
-            <span className="sr-only">Errors</span>
-            <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+            <span className='sr-only'>Errors</span>
+            <XCircleIcon className='h-5 w-5 text-red-400' aria-hidden='true' />
           </PopoverButton>
           <Transition
-            enter="transition ease-out duration-200"
-            enterFrom="opacity-0 translate-y-1"
-            enterTo="opacity-100 translate-y-0"
-            leave="transition ease-in duration-150"
-            leaveFrom="opacity-100 translate-y-0"
-            leaveTo="opacity-0 translate-y-1"
+            enter='transition ease-out duration-200'
+            enterFrom='opacity-0 translate-y-1'
+            enterTo='opacity-100 translate-y-0'
+            leave='transition ease-in duration-150'
+            leaveFrom='opacity-100 translate-y-0'
+            leaveTo='opacity-0 translate-y-1'
           >
-            <PopoverPanel className="absolute top-8 w-[300px] -right-3 z-10 mt-3 px-4 sm:px-0">
-              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                <div className="rounded-md bg-red-50 p-4 overflow-scroll">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
+            <PopoverPanel className='absolute top-8 w-[300px] -right-3 z-10 mt-3 px-4 sm:px-0'>
+              <div className='overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5'>
+                <div className='rounded-md bg-red-50 p-4 overflow-scroll'>
+                  <div className='flex'>
+                    <div className='flex-shrink-0'>
                       <XCircleIcon
-                        className="h-5 w-5 text-red-400"
-                        aria-hidden="true"
+                        className='h-5 w-5 text-red-400'
+                        aria-hidden='true'
                       />
                     </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-red-800 whitespace-pre-wrap">
+                    <div className='ml-3'>
+                      <h3 className='text-sm font-medium text-red-800 whitespace-pre-wrap'>
                         {message}
                       </h3>
                     </div>

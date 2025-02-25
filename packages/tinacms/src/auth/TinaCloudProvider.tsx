@@ -215,17 +215,17 @@ export const AuthWallInner = ({
               },
             ]}
           >
-            <div className="flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
-              <div className="max-w-md w-full space-y-6">
-                <label className="block">
-                  <span className="text-gray-700">Username</span>
+            <div className='flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8'>
+              <div className='max-w-md w-full space-y-6'>
+                <label className='block'>
+                  <span className='text-gray-700'>Username</span>
                   <BaseTextField
-                    id="username"
-                    name="username"
-                    type="text"
-                    autoComplete="username"
+                    id='username'
+                    name='username'
+                    type='text'
+                    autoComplete='username'
                     required
-                    placeholder="Username"
+                    placeholder='Username'
                     value={authProps.username}
                     onChange={(e) =>
                       setAuthProps((prevState) => ({
@@ -235,15 +235,15 @@ export const AuthWallInner = ({
                     }
                   />
                 </label>
-                <label className="block">
-                  <span className="text-gray-700">Password</span>
+                <label className='block'>
+                  <span className='text-gray-700'>Password</span>
                   <BaseTextField
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
+                    id='password'
+                    name='password'
+                    type='password'
+                    autoComplete='current-password'
                     required
-                    placeholder="Password"
+                    placeholder='Password'
                     value={authProps.password}
                     onChange={(e) =>
                       setAuthProps((prevState) => ({
@@ -295,12 +295,12 @@ export const AuthWallInner = ({
       {showChildren
         ? children
         : client.authProvider?.getLoginStrategy() === 'LoginScreen' &&
-          loginScreen
-        ? loginScreen({
-            handleAuthenticate: async (props: Record<string, string>) =>
-              handleAuthenticate(props),
-          })
-        : null}
+            loginScreen
+          ? loginScreen({
+              handleAuthenticate: async (props: Record<string, string>) =>
+                handleAuthenticate(props),
+            })
+          : null}
     </>
   )
 }
@@ -485,7 +485,7 @@ export const TinaCloudProvider = (
   }, [isTinaCloud, cms])
 
   return (
-    <SessionProvider basePath="/api/tina/auth">
+    <SessionProvider basePath='/api/tina/auth'>
       <BranchDataProvider
         currentBranch={currentBranch}
         setCurrentBranch={(b) => {

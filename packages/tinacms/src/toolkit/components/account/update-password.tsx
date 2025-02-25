@@ -67,20 +67,20 @@ export function UpdatePassword(props: {}) {
 
   return (
     <>
-      <div className="flex justify-center items-center h-full">
-        <div className="flex flex-col space-y-8 p-6">
+      <div className='flex justify-center items-center h-full'>
+        <div className='flex flex-col space-y-8 p-6'>
           {passwordChangeRequired && (
-            <div className="text-center text-red-500">
+            <div className='text-center text-red-500'>
               Your password has expired. Please update your password.
             </div>
           )}
-          <label className="block">
-            <span className="text-gray-700">New Password</span>
+          <label className='block'>
+            <span className='text-gray-700'>New Password</span>
             <BaseTextField
-              type="password"
-              name="password"
-              id="password"
-              placeholder="Enter password"
+              type='password'
+              name='password'
+              id='password'
+              placeholder='Enter password'
               className={
                 err
                   ? 'border-red-500'
@@ -95,13 +95,13 @@ export function UpdatePassword(props: {}) {
               required
             />
           </label>
-          <label className="block">
-            <span className="text-gray-700">Confirm New Password</span>
+          <label className='block'>
+            <span className='text-gray-700'>Confirm New Password</span>
             <BaseTextField
-              type="password"
-              name="confirmPassword"
-              id="confirmPassword"
-              placeholder="Confirm password"
+              type='password'
+              name='confirmPassword'
+              id='confirmPassword'
+              placeholder='Confirm password'
               className={
                 err
                   ? 'border-red-500'
@@ -117,9 +117,9 @@ export function UpdatePassword(props: {}) {
             />
           </label>
           {result && (
-            <div className="text-center text-sm text-gray-500">{result}</div>
+            <div className='text-center text-sm text-gray-500'>{result}</div>
           )}
-          {err && <div className="text-center text-sm text-red-500">{err}</div>}
+          {err && <div className='text-center text-sm text-red-500'>{err}</div>}
           <Button
             onClick={updatePassword}
             disabled={err}

@@ -33,7 +33,10 @@ export class Alerts {
     }
   }
 
-  constructor(private events: EventBus, private map: EventsToAlerts = {}) {
+  constructor(
+    private events: EventBus,
+    private map: EventsToAlerts = {}
+  ) {
     this.events.subscribe('*', this.mapEventToAlert)
   }
   setMap(eventsToAlerts: EventsToAlerts) {

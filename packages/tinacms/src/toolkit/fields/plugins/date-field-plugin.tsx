@@ -71,7 +71,7 @@ export const ReactDateTimeWithStyles = (
 
   return (
     <>
-      <div className="tina-date-field" ref={area}>
+      <div className='tina-date-field' ref={area}>
         <ReactDatetime {...props} isOpen={isOpen} />
       </div>
     </>

@@ -19,7 +19,7 @@ export const BaseTextField = React.forwardRef<
   return (
     <input
       ref={ref}
-      type="text"
+      type='text'
       className={`${textFieldClasses} ${
         disabled ? disabledClasses : ''
       } ${className}`}

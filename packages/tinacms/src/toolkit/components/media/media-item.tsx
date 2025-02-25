@@ -33,19 +33,19 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
       }}
     >
       {item.new && (
-        <span className="absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10">
+        <span className='absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
           NEW
         </span>
       )}
-      <div className="w-16 h-16 bg-gray-50 border-r border-gray-150 overflow-hidden flex justify-center flex-shrink-0">
+      <div className='w-16 h-16 bg-gray-50 border-r border-gray-150 overflow-hidden flex justify-center flex-shrink-0'>
         {isImage(thumbnail) ? (
           <img
-            className="object-contain object-center w-full h-full origin-center transition-all duration-150 ease-out group-hover:scale-110"
+            className='object-contain object-center w-full h-full origin-center transition-all duration-150 ease-out group-hover:scale-110'
             src={thumbnail}
             alt={item.filename}
           />
         ) : (
-          <FileIcon className="w-1/2 h-full fill-gray-300" />
+          <FileIcon className='w-1/2 h-full fill-gray-300' />
         )}
       </div>
       <span
@@ -74,12 +74,12 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
       } ${item.type === 'dir' ? 'cursor-pointer' : ''}`}
     >
       {item.new && (
-        <span className="absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10">
+        <span className='absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
           NEW
         </span>
       )}
       <button
-        className="absolute w-full h-full flex items-center justify-center bg-white"
+        className='absolute w-full h-full flex items-center justify-center bg-white'
         onClick={() => {
           if (!active) {
             onClick(item)
@@ -90,14 +90,14 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
       >
         {isImage(thumbnail) ? (
           <img
-            className="object-contain object-center w-full h-full"
+            className='object-contain object-center w-full h-full'
             src={thumbnail}
             alt={item.filename}
           />
         ) : (
-          <div className="p-4 w-full flex flex-col gap-4 items-center justify-center">
-            <FileIcon className="w-[30%] h-auto fill-gray-300" />
-            <span className="block text-base text-gray-600 w-full break-words truncate">
+          <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>
+            <FileIcon className='w-[30%] h-auto fill-gray-300' />
+            <span className='block text-base text-gray-600 w-full break-words truncate'>
               {item.filename}
             </span>
           </div>

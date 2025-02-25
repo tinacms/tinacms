@@ -27,7 +27,7 @@ export interface BackendAuthProvider {
 export const LocalBackendAuthProvider = () =>
   ({
     isAuthorized: async () => ({ isAuthorized: true }),
-  } as BackendAuthProvider)
+  }) as BackendAuthProvider
 
 export interface TinaBackendOptions {
   /**

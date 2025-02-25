@@ -155,18 +155,18 @@ const CheckSchema = ({
           <PopupModal>
             <ModalHeader>Branch Not Found</ModalHeader>
             <ModalBody padded={true}>
-              <div className="tina-prose">
+              <div className='tina-prose'>
                 The current branch (
-                <span className="font-bold">{currentBranch}</span>) has either
+                <span className='font-bold'>{currentBranch}</span>) has either
                 been merged or deleted.
               </div>
             </ModalBody>
             <ModalActions>
-              <div className="flex-1"></div>
+              <div className='flex-1'></div>
               <Button
                 style={{ flexGrow: 1 }}
-                className="w-full"
-                variant="primary"
+                className='w-full'
+                variant='primary'
                 onClick={() => {
                   window.localStorage.removeItem('tinacms-current-branch')
                   window.location.reload()
@@ -221,14 +221,14 @@ export const TinaAdmin = ({
                   <Routes>
                     {preview && (
                       <Route
-                        path="/~/*"
+                        path='/~/*'
                         element={
                           <PreviewInner config={config} preview={preview} />
                         }
                       />
                     )}
                     <Route
-                      path="graphql"
+                      path='graphql'
                       element={
                         <PlainLayout>
                           <Playground />
@@ -236,7 +236,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="branch/new"
+                      path='branch/new'
                       element={
                         <DefaultWrapper cms={cms}>
                           <IndexingPage />
@@ -244,7 +244,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="collections/new/:collectionName"
+                      path='collections/new/:collectionName'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionCreatePage />
@@ -252,7 +252,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="collections/duplicate/:collectionName/~/*"
+                      path='collections/duplicate/:collectionName/~/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionDuplicatePage />
@@ -260,7 +260,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="collections/duplicate/:collectionName/*"
+                      path='collections/duplicate/:collectionName/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionDuplicatePage />
@@ -268,7 +268,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="collections/new/:collectionName/:templateName"
+                      path='collections/new/:collectionName/:templateName'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionCreatePage />
@@ -276,7 +276,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="collections/new/:collectionName/:templateName/~/*"
+                      path='collections/new/:collectionName/:templateName/~/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionCreatePage />
@@ -284,7 +284,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="collections/new/:collectionName/~/*"
+                      path='collections/new/:collectionName/~/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionCreatePage />
@@ -292,7 +292,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="collections/edit/:collectionName/*"
+                      path='collections/edit/:collectionName/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionUpdatePage />
@@ -300,7 +300,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="collections/:collectionName/*"
+                      path='collections/:collectionName/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionListPage />
@@ -308,7 +308,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="screens/:screenName"
+                      path='screens/:screenName'
                       element={
                         <DefaultWrapper cms={cms}>
                           <ScreenPage />
@@ -316,7 +316,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path="/"
+                      path='/'
                       element={
                         <MaybeRedirectToPreview
                           redirect={!!preview && hasRouter}
@@ -337,7 +337,7 @@ export const TinaAdmin = ({
             <Layout>
               <Router>
                 <Routes>
-                  <Route path="/" element={<Redirect />} />
+                  <Route path='/' element={<Redirect />} />
                 </Routes>
               </Router>
             </Layout>
@@ -357,9 +357,9 @@ const DefaultWrapper = ({
 }) => {
   return (
     <Layout>
-      <div className="flex items-stretch h-dvh overflow-hidden">
+      <div className='flex items-stretch h-dvh overflow-hidden'>
         <Sidebar cms={cms} />
-        <div className="w-full relative">{children}</div>
+        <div className='w-full relative'>{children}</div>
       </div>
     </Layout>
   )

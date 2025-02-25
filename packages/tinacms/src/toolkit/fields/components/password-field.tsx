@@ -21,7 +21,7 @@ export const BasePasswordField = React.forwardRef<
   return (
     <input
       ref={ref}
-      type="password"
+      type='password'
       className={`${passwordFieldClasses} ${
         disabled ? disabledClasses : ''
       } ${className} ${error ? errorClasses : ''}`}

@@ -367,10 +367,13 @@ export const addSelfHostedTinaAuthToConfig = async (
 
   const importMap: Record<string, string[]> = {
     // iterate over configImports and add them to the import map
-    ...configImports.reduce((acc, { from, imported }) => {
-      acc[from] = imported
-      return acc
-    }, {} as Record<string, string[]>),
+    ...configImports.reduce(
+      (acc, { from, imported }) => {
+        acc[from] = imported
+        return acc
+      },
+      {} as Record<string, string[]>
+    ),
   }
 
   const transformedSourceFileResult = ts.transform(

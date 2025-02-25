@@ -62,7 +62,7 @@ const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
     ref
   ) => {
     return (
-      <div className="relative w-full" ref={ref}>
+      <div className='relative w-full' ref={ref}>
         <PlateContent
           aria-disabled={disabled}
           className={cn(

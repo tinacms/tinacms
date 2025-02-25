@@ -26,7 +26,7 @@ export const LoadingDots = ({
 
 const SingleDot = ({ delay = 0, color, dotSize }: SingleDotProps) => (
   <span
-    className="inline-block mr-1"
+    className='inline-block mr-1'
     style={{
       animation: 'loading-dots-scale-up-and-down 2s linear infinite',
       animationDelay: `${delay}s`,

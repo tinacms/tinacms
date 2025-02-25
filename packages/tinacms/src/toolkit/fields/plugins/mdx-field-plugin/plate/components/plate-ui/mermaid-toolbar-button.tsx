@@ -86,7 +86,7 @@ export const MermaidToolbarButton = withRef<
   const { props } = useMermaidToolbarButton(state)
 
   return (
-    <ToolbarButton ref={ref} tooltip="Mermaid" {...rest} {...props}>
+    <ToolbarButton ref={ref} tooltip='Mermaid' {...rest} {...props}>
       <Icons.mermaid />
     </ToolbarButton>
   )

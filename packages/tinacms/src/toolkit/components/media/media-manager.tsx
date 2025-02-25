@@ -87,18 +87,18 @@ export function MediaManager() {
   return (
     <Modal>
       <FullscreenModal>
-        <div className="w-full bg-gray-50 flex items-center justify-between px-5 pt-3 m-0">
-          <h2 className="text-gray-500 font-sans font-medium text-base leading-none m-0 block truncate">
+        <div className='w-full bg-gray-50 flex items-center justify-between px-5 pt-3 m-0'>
+          <h2 className='text-gray-500 font-sans font-medium text-base leading-none m-0 block truncate'>
             Media Manager
           </h2>
           <div
             onClick={close}
-            className="flex items-center fill-gray-400 cursor-pointer transition-colors duration-100 ease-out hover:fill-gray-700"
+            className='flex items-center fill-gray-400 cursor-pointer transition-colors duration-100 ease-out hover:fill-gray-700'
           >
-            <CloseIcon className="w-6 h-auto" />
+            <CloseIcon className='w-6 h-auto' />
           </div>
         </div>
-        <ModalBody className="flex h-full flex-col">
+        <ModalBody className='flex h-full flex-col'>
           <MediaPicker {...request} close={close} />
         </ModalBody>
       </FullscreenModal>
@@ -367,9 +367,9 @@ export function MediaPicker({
   if (listState === 'not-configured') {
     return (
       <DocsLink
-        title="No Media Store Configured"
-        message="To use the media manager, you need to configure a Media Store."
-        docsLink="https://tina.io/docs/reference/media/overview/"
+        title='No Media Store Configured'
+        message='To use the media manager, you need to configure a Media Store.'
+        docsLink='https://tina.io/docs/reference/media/overview/'
       />
     )
   }
@@ -412,8 +412,8 @@ export function MediaPicker({
 
       <MediaPickerWrap>
         <SyncStatusContainer>
-          <div className="flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0">
-            <div className="flex flex-1 items-center gap-4">
+          <div className='flex flex-wrap items-center bg-gray-50 border-b border-gray-150 gap-4 py-3 px-5 shadow-sm flex-shrink-0'>
+            <div className='flex flex-1 items-center gap-4'>
               <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
               <Breadcrumb
                 directory={directory}
@@ -428,39 +428,39 @@ export function MediaPicker({
             </div>
 
             {cms.media.store.isStatic ? null : (
-              <div className="flex flex-wrap items-center gap-4">
+              <div className='flex flex-wrap items-center gap-4'>
                 <Button
                   busy={false}
-                  variant="white"
+                  variant='white'
                   onClick={() => {
                     setRefreshing(true)
                     resetOffset()
                     resetList()
                     setActiveItem(false)
                   }}
-                  className="whitespace-nowrap"
+                  className='whitespace-nowrap'
                 >
                   Refresh
-                  <IoMdRefresh className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+                  <IoMdRefresh className='w-6 h-full ml-2 opacity-70 text-blue-500' />
                 </Button>
                 <Button
                   busy={false}
-                  variant="white"
+                  variant='white'
                   onClick={() => {
                     setNewFolderModalOpen(true)
                   }}
-                  className="whitespace-nowrap"
+                  className='whitespace-nowrap'
                 >
                   New Folder
-                  <BiFolder className="w-6 h-full ml-2 opacity-70 text-blue-500" />
+                  <BiFolder className='w-6 h-full ml-2 opacity-70 text-blue-500' />
                 </Button>
                 <UploadButton onClick={onClick} uploading={uploading} />
               </div>
             )}
           </div>
 
-          <div className="flex h-full overflow-hidden bg-white">
-            <div className="flex w-full flex-col h-full @container">
+          <div className='flex h-full overflow-hidden bg-white'>
+            <div className='flex w-full flex-col h-full @container'>
               <ul
                 {...rootProps}
                 className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
@@ -537,13 +537,13 @@ const ActiveItemPreview = ({
     >
       {activeItem && (
         <>
-          <div className="flex grow-0 shrink-0 gap-2 w-full items-center justify-between">
-            <h3 className="text-lg text-gray-600 w-full max-w-full break-words block truncate flex-1">
+          <div className='flex grow-0 shrink-0 gap-2 w-full items-center justify-between'>
+            <h3 className='text-lg text-gray-600 w-full max-w-full break-words block truncate flex-1'>
               {activeItem.filename}
             </h3>
             <IconButton
-              variant="ghost"
-              className="group grow-0 shrink-0"
+              variant='ghost'
+              className='group grow-0 shrink-0'
               onClick={close}
             >
               <BiX
@@ -552,43 +552,43 @@ const ActiveItemPreview = ({
             </IconButton>
           </div>
           {isImage(thumbnail) ? (
-            <div className="w-full max-h-[75%]">
+            <div className='w-full max-h-[75%]'>
               <img
-                className="block border border-gray-100 rounded-md overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow"
+                className='block border border-gray-100 rounded-md overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
                 src={thumbnail}
                 alt={activeItem.filename}
               />
             </div>
           ) : (
-            <span className="p-3 border border-gray-100 rounded-md overflow-hidden bg-gray-50 shadow">
-              <BiFile className="w-14 h-auto fill-gray-300" />
+            <span className='p-3 border border-gray-100 rounded-md overflow-hidden bg-gray-50 shadow'>
+              <BiFile className='w-14 h-auto fill-gray-300' />
             </span>
           )}
-          <div className="grow h-full w-full shrink flex flex-col gap-3 items-start justify-start">
-            <CopyField value={absoluteImgURL(activeItem.src)} label="URL" />
+          <div className='grow h-full w-full shrink flex flex-col gap-3 items-start justify-start'>
+            <CopyField value={absoluteImgURL(activeItem.src)} label='URL' />
           </div>
-          <div className="shrink-0 w-full flex flex-col justify-end items-start">
-            <div className="flex w-full gap-3">
+          <div className='shrink-0 w-full flex flex-col justify-end items-start'>
+            <div className='flex w-full gap-3'>
               {selectMediaItem && (
                 <Button
-                  size="medium"
-                  variant="primary"
-                  className="grow"
+                  size='medium'
+                  variant='primary'
+                  className='grow'
                   onClick={() => selectMediaItem(activeItem)}
                 >
                   Insert
-                  <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-white opacity-70" />
+                  <BiArrowToBottom className='ml-1 -mr-0.5 w-6 h-auto text-white opacity-70' />
                 </Button>
               )}
               {allowDelete && (
                 <Button
-                  variant="white"
-                  size="medium"
-                  className="grow max-w-[40%]"
+                  variant='white'
+                  size='medium'
+                  className='grow max-w-[40%]'
                   onClick={deleteMediaItem}
                 >
                   Delete
-                  <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
+                  <TrashIcon className='ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70' />
                 </Button>
               )}
             </div>
@@ -602,9 +602,9 @@ const ActiveItemPreview = ({
 const UploadButton = ({ onClick, uploading }: any) => {
   return (
     <Button
-      variant="primary"
-      size="custom"
-      className="text-sm h-10 px-6"
+      variant='primary'
+      size='custom'
+      className='text-sm h-10 px-6'
       busy={uploading}
       onClick={onClick}
     >
@@ -612,7 +612,7 @@ const UploadButton = ({ onClick, uploading }: any) => {
         <LoadingDots />
       ) : (
         <>
-          Upload <BiCloudUpload className="w-6 h-full ml-2 opacity-70" />
+          Upload <BiCloudUpload className='w-6 h-full ml-2 opacity-70' />
         </>
       )}
     </Button>
@@ -625,7 +625,7 @@ const LoadingMediaList = forwardRef<HTMLDivElement, { extraText?: string }>(
     return (
       <div
         ref={ref}
-        className="w-full h-full flex flex-col items-center justify-center"
+        className='w-full h-full flex flex-col items-center justify-center'
         {...rest}
       >
         {extraText && <p>{extraText}</p>}
@@ -637,7 +637,7 @@ const LoadingMediaList = forwardRef<HTMLDivElement, { extraText?: string }>(
 
 const MediaPickerWrap = ({ children }) => {
   return (
-    <div className="h-full flex-1 text-gray-700 flex flex-col relative bg-gray-50 outline-none active:outline-none focus:outline-none">
+    <div className='h-full flex-1 text-gray-700 flex flex-col relative bg-gray-50 outline-none active:outline-none focus:outline-none'>
       {children}
     </div>
   )
@@ -679,9 +679,9 @@ const SyncStatusContainer = ({ children }) => {
   }, [])
 
   return syncStatus == 'needs-sync' ? (
-    <div className="h-full flex items-center justify-center p-6 bg-gradient-to-t from-gray-200 to-transparent">
-      <div className="rounded-lg border shadow-sm px-4 lg:px-6 py-3 lg:py-4 bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 mx-auto mb-12">
-        <div className="flex items-start sm:items-center gap-2">
+    <div className='h-full flex items-center justify-center p-6 bg-gradient-to-t from-gray-200 to-transparent'>
+      <div className='rounded-lg border shadow-sm px-4 lg:px-6 py-3 lg:py-4 bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 mx-auto mb-12'>
+        <div className='flex items-start sm:items-center gap-2'>
           <BiError
             className={`w-7 h-auto flex-shrink-0 text-yellow-400 -mt-px`}
           />
@@ -690,8 +690,8 @@ const SyncStatusContainer = ({ children }) => {
           >
             Media needs to be turned on for this project.
             <a
-              className="transition-all duration-150 ease-out text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 font-medium flex items-center justify-start gap-1"
-              target="_blank"
+              className='transition-all duration-150 ease-out text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 font-medium flex items-center justify-start gap-1'
+              target='_blank'
               href={`${cms.api.tina.appDashboardLink}/media`}
             >
               Sync Your Media In Tina Cloud.
@@ -727,14 +727,14 @@ const EmptyMediaList = () => {
 
 const DocsLink = ({ title, message, docsLink, ...props }) => {
   return (
-    <div className="h-3/4 text-center flex flex-col justify-center" {...props}>
-      <h2 className="mb-3 text-xl text-gray-600">{title}</h2>
-      <div className="mb-3 text-base text-gray-700">{message}</div>
+    <div className='h-3/4 text-center flex flex-col justify-center' {...props}>
+      <h2 className='mb-3 text-xl text-gray-600'>{title}</h2>
+      <div className='mb-3 text-base text-gray-700'>{message}</div>
       <a
         href={docsLink}
-        target="_blank"
-        rel="noreferrer noopener"
-        className="font-bold text-blue-500 hover:text-blue-600 hover:underline transition-all ease-out duration-150"
+        target='_blank'
+        rel='noreferrer noopener'
+        className='font-bold text-blue-500 hover:text-blue-600 hover:underline transition-all ease-out duration-150'
       >
         Learn More
       </a>
@@ -762,7 +762,7 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
           setViewMode('grid')
         }}
       >
-        <BiGridAlt className="w-6 h-full opacity-70" />
+        <BiGridAlt className='w-6 h-full opacity-70' />
       </button>
       <button
         className={`${toggleClasses.base} px-2 rounded-r-md ${
@@ -772,7 +772,7 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
           setViewMode('list')
         }}
       >
-        <BiListUl className="w-8 h-full opacity-70" />
+        <BiListUl className='w-8 h-full opacity-70' />
       </button>
     </div>
   )
