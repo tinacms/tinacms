@@ -25,9 +25,8 @@
 		"publish:beta": "pnpm publish -r --tag beta --no-git-checks --access public",
 		"publish:dev": "pnpm publish -r --tag dev --no-git-checks --access public",
 		"push-tags": "pnpm exec changeset tag && git pull && git push --follow-tags",
-		"lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
-		"format": "prettier --write .",
-		"postinstall": "husky install"
+		"lint": "biome lint ./packages/**/*{.ts,.tsx}",
+		"format": "biome format --write ./packages/**/*{.ts,.tsx}"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
@@ -41,7 +40,6 @@
 		"eslint-config-prettier": "^8.10.0",
 		"eslint-plugin-react": "^7.37.4",
 		"eslint-plugin-react-hooks": "^4.6.2",
-		"husky": "^7.0.4",
 		"picomatch": "^4.0.2",
 		"prettier": "^2.8.8",
 		"pretty-quick": "^3.3.1",
