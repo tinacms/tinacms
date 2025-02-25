@@ -17,8 +17,14 @@ export const authenticate = (
   frontendUrl: string
 ): Promise<TokenObject> => {
   return new Promise((resolve) => {
-    // @ts-ignore
-    let authTab: Window | undefined
+    const origin = `${window.location.protocol}//${window.location.host}`
+    const authTab = popupWindow(
+      `${frontendUrl}/signin?clientId=${clientId}&origin=${origin}`,
+      '_blank',
+      window,
+      1000,
+      700
+    )
 
     // TODO - Grab this from the URL instead of passing through localstorage
     window.addEventListener('message', function (e: MessageEvent) {
@@ -33,13 +39,5 @@ export const authenticate = (
         })
       }
     })
-    const origin = `${window.location.protocol}//${window.location.host}`
-    authTab = popupWindow(
-      `${frontendUrl}/signin?clientId=${clientId}&origin=${origin}`,
-      '_blank',
-      window,
-      1000,
-      700
-    )
   })
 }
