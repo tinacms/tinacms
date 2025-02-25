@@ -147,7 +147,7 @@ export default class Datetime extends React.Component {
     const props = this.props
     const state = this.state
 
-    let viewProps = {
+    const viewProps = {
       viewDate: state.viewDate.clone(),
       selectedDate: this.getSelectedDate(),
       isValidDate: props.isValidDate,
@@ -188,9 +188,9 @@ export default class Datetime extends React.Component {
   }
 
   getInitialState() {
-    let props = this.props
-    let inputFormat = this.getFormat('datetime')
-    let selectedDate = this.parseDate(
+    const props = this.props
+    const inputFormat = this.getFormat('datetime')
+    const selectedDate = this.parseDate(
       props.value || props.initialValue,
       inputFormat
     )
@@ -228,7 +228,7 @@ export default class Datetime extends React.Component {
   }
 
   getInitialDate() {
-    let m = this.localMoment()
+    const m = this.localMoment()
     m.hour(0).minute(0).second(0).millisecond(0)
     return m
   }
@@ -252,8 +252,8 @@ export default class Datetime extends React.Component {
 
   getClassName() {
     let cn = 'rdt'
-    let props = this.props
-    let propCn = props.className
+    const props = this.props
+    const propCn = props.className
 
     if (Array.isArray(propCn)) {
       cn += ' ' + propCn.join(' ')
@@ -299,7 +299,7 @@ export default class Datetime extends React.Component {
   }
 
   getLocaleData() {
-    let p = this.props
+    const p = this.props
     return this.localMoment(
       p.value || p.defaultValue || new Date()
     ).localeData()
@@ -307,7 +307,7 @@ export default class Datetime extends React.Component {
 
   getDateFormat() {
     const locale = this.getLocaleData()
-    let format = this.props.dateFormat
+    const format = this.props.dateFormat
     if (format === true) return locale.longDateFormat('L')
     if (format) return format
     return ''
@@ -315,7 +315,7 @@ export default class Datetime extends React.Component {
 
   getTimeFormat() {
     const locale = this.getLocaleData()
-    let format = this.props.timeFormat
+    const format = this.props.timeFormat
     if (format === true) {
       return locale.longDateFormat('LT')
     }
@@ -329,8 +329,8 @@ export default class Datetime extends React.Component {
       return this.getTimeFormat()
     }
 
-    let dateFormat = this.getDateFormat()
-    let timeFormat = this.getTimeFormat()
+    const dateFormat = this.getDateFormat()
+    const timeFormat = this.getTimeFormat()
     return dateFormat && timeFormat
       ? dateFormat + ' ' + timeFormat
       : dateFormat || timeFormat
@@ -351,7 +351,7 @@ export default class Datetime extends React.Component {
   }
 
   updateTime(op, amount, type, toSelected) {
-    let update = {}
+    const update = {}
     const date = toSelected ? 'selectedDate' : 'viewDate'
 
     update[date] = this.state[date].clone()[op](amount, type)
@@ -362,10 +362,10 @@ export default class Datetime extends React.Component {
   viewToMethod = { days: 'date', months: 'month', years: 'year' }
   nextView = { days: 'time', months: 'days', years: 'months' }
   _updateDate = (e) => {
-    let state = this.state
-    let currentView = state.currentView
-    let updateOnView = this.getUpdateOn(this.getFormat('date'))
-    let viewDate = this.state.viewDate.clone()
+    const state = this.state
+    const currentView = state.currentView
+    const updateOnView = this.getUpdateOn(this.getFormat('date'))
+    const viewDate = this.state.viewDate.clone()
 
     // Set the value into day/month/year
     viewDate[this.viewToMethod[currentView]](
@@ -378,7 +378,7 @@ export default class Datetime extends React.Component {
       viewDate.year(parseInt(e.target.getAttribute('data-year'), 10))
     }
 
-    let update = { viewDate: viewDate }
+    const update = { viewDate: viewDate }
     if (currentView === updateOnView) {
       update.selectedDate = viewDate.clone()
       update.inputValue = viewDate.format(this.getFormat('datetime'))
@@ -400,7 +400,7 @@ export default class Datetime extends React.Component {
   }
 
   _viewNavigate = (modifier, unit) => {
-    let viewDate = this.state.viewDate.clone()
+    const viewDate = this.state.viewDate.clone()
 
     // Subtracting is just adding negative time
     viewDate.add(modifier, unit)
@@ -415,7 +415,7 @@ export default class Datetime extends React.Component {
   }
 
   _setTime = (type, value) => {
-    let date = (this.getSelectedDate() || this.state.viewDate).clone()
+    const date = (this.getSelectedDate() || this.state.viewDate).clone()
 
     date[type](value)
 
@@ -444,7 +444,7 @@ export default class Datetime extends React.Component {
   }
 
   _handleClickOutside = () => {
-    let props = this.props
+    const props = this.props
 
     if (
       props.input &&
@@ -489,7 +489,7 @@ export default class Datetime extends React.Component {
     if (prevProps === this.props) return
 
     let needsUpdate = false
-    let thisProps = this.props
+    const thisProps = this.props
 
     ;['locale', 'utc', 'displayZone', 'dateFormat', 'timeFormat'].forEach(
       function (p) {
@@ -510,8 +510,8 @@ export default class Datetime extends React.Component {
 
   regenerateDates() {
     const props = this.props
-    let viewDate = this.state.viewDate.clone()
-    let selectedDate =
+    const viewDate = this.state.viewDate.clone()
+    const selectedDate =
       this.state.selectedDate && this.state.selectedDate.clone()
 
     if (props.locale) {
@@ -529,7 +529,7 @@ export default class Datetime extends React.Component {
       selectedDate && selectedDate.locale()
     }
 
-    let update = { viewDate: viewDate, selectedDate: selectedDate }
+    const update = { viewDate: viewDate, selectedDate: selectedDate }
     if (selectedDate && selectedDate.isValid()) {
       update.inputValue = selectedDate.format(this.getFormat('datetime'))
     }
@@ -539,7 +539,7 @@ export default class Datetime extends React.Component {
 
   getSelectedDate() {
     if (this.props.value === undefined) return this.state.selectedDate
-    let selectedDate = this.parseDate(
+    const selectedDate = this.parseDate(
       this.props.value,
       this.getFormat('datetime')
     )
@@ -562,7 +562,7 @@ export default class Datetime extends React.Component {
   }
 
   getInputValue() {
-    let selectedDate = this.getSelectedDate()
+    const selectedDate = this.getSelectedDate()
     return selectedDate
       ? selectedDate.format(this.getFormat('datetime'))
       : this.state.inputValue
@@ -575,7 +575,7 @@ export default class Datetime extends React.Component {
    * @public
    */
   setViewDate(date) {
-    let logError = function () {
+    const logError = function () {
       return log('Invalid date passed to the `setViewDate` method: ' + date)
     }
 
@@ -610,7 +610,7 @@ export default class Datetime extends React.Component {
 
     const value = e.target ? e.target.value : e
     const localMoment = this.localMoment(value, this.getFormat('datetime'))
-    let update = { inputValue: value }
+    const update = { inputValue: value }
 
     if (localMoment.isValid()) {
       update.selectedDate = localMoment
@@ -649,7 +649,7 @@ export default class Datetime extends React.Component {
 }
 
 function log(message, method) {
-  let con = typeof window !== 'undefined' && window.console
+  const con = typeof window !== 'undefined' && window.console
   if (!con) return
 
   if (!method) {

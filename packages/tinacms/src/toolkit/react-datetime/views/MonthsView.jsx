@@ -20,7 +20,7 @@ export default class MonthsView extends React.Component {
   }
 
   renderNavigation() {
-    let year = this.props.viewDate.year()
+    const year = this.props.viewDate.year()
 
     return (
       <ViewNavigation
@@ -35,10 +35,10 @@ export default class MonthsView extends React.Component {
 
   renderMonths() {
     // 12 months in 3 rows for every view
-    let rows = [[], [], []]
+    const rows = [[], [], []]
 
     for (let month = 0; month < 12; month++) {
-      let row = getRow(rows, month)
+      const row = getRow(rows, month)
 
       row.push(this.renderMonth(month))
     }
@@ -65,7 +65,7 @@ export default class MonthsView extends React.Component {
       className += ' rdtActive'
     }
 
-    let props = { key: month, className, 'data-value': month, onClick }
+    const props = { key: month, className, 'data-value': month, onClick }
 
     if (this.props.renderMonth) {
       return this.props.renderMonth(
@@ -80,7 +80,7 @@ export default class MonthsView extends React.Component {
   }
 
   isDisabledMonth(month) {
-    let isValidDate = this.props.isValidDate
+    const isValidDate = this.props.isValidDate
 
     if (!isValidDate) {
       // If no validator is set, all days are valid
@@ -88,7 +88,7 @@ export default class MonthsView extends React.Component {
     }
 
     // If one day in the month is valid, the year should be clickable
-    let date = this.props.viewDate.clone().set({ month })
+    const date = this.props.viewDate.clone().set({ month })
     let day = date.endOf('month').date() + 1
 
     while (day-- > 1) {

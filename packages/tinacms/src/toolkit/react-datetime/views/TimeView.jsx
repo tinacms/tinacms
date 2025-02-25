@@ -28,7 +28,7 @@ const timeConstraints = {
 }
 
 function createConstraints(overrideTimeConstraints) {
-  let constraints = {}
+  const constraints = {}
 
   Object.keys(timeConstraints).forEach((type) => {
     constraints[type] = {
@@ -53,7 +53,7 @@ export default class TimeView extends React.Component {
   }
 
   render() {
-    let items = []
+    const items = []
     const timeParts = this.state
 
     this.getCounters().forEach((c, i) => {
@@ -148,8 +148,8 @@ export default class TimeView extends React.Component {
 
     if (type === 'ampm') return this.toggleDayPart()
 
-    let update = {}
-    let body = document.body
+    const update = {}
+    const body = document.body
     update[type] = this[action](type)
     this.setState(update)
 
@@ -199,8 +199,8 @@ export default class TimeView extends React.Component {
   }
 
   getCounters() {
-    let counters = []
-    let format = this.props.timeFormat
+    const counters = []
+    const format = this.props.timeFormat
 
     if (format.toLowerCase().indexOf('h') !== -1) {
       counters.push('hours')

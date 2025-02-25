@@ -43,7 +43,7 @@ export default class DaysView extends React.Component {
 
   renderDayHeaders() {
     const locale = this.props.viewDate.localeData()
-    let dayItems = getDaysOfWeek(locale).map((day, index) => (
+    const dayItems = getDaysOfWeek(locale).map((day, index) => (
       <th key={day + index} className="dow">
         {day}
       </th>
@@ -59,16 +59,16 @@ export default class DaysView extends React.Component {
 
     // We need 42 days in 6 rows
     // starting in the last week of the previous month
-    let rows = [[], [], [], [], [], []]
+    const rows = [[], [], [], [], [], []]
 
-    let startDate = date.clone().subtract(1, 'months')
+    const startDate = date.clone().subtract(1, 'months')
     startDate.date(startDate.daysInMonth()).startOf('week')
 
-    let endDate = startDate.clone().add(42, 'd')
+    const endDate = startDate.clone().add(42, 'd')
     let i = 0
 
     while (startDate.isBefore(endDate)) {
-      let row = getRow(rows, i++)
+      const row = getRow(rows, i++)
       row.push(this.renderDay(startDate, startOfMonth, endOfMonth))
       startDate.add(1, 'd')
     }
@@ -77,9 +77,9 @@ export default class DaysView extends React.Component {
   }
 
   renderDay(date, startOfMonth, endOfMonth) {
-    let selectedDate = this.props.selectedDate
+    const selectedDate = this.props.selectedDate
 
-    let dayProps = {
+    const dayProps = {
       key: date.format('M_D'),
       'data-value': date.date(),
       'data-month': date.month(),
@@ -149,7 +149,7 @@ function getRow(rows, day) {
  */
 function getDaysOfWeek(locale) {
   const first = locale.firstDayOfWeek()
-  let dow = []
+  const dow = []
   let i = 0
 
   locale._weekdaysMin.forEach(function (day) {

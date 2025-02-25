@@ -38,9 +38,9 @@ export default class YearsView extends React.Component {
   renderYears() {
     const viewYear = this.getViewYear()
     // 12 years in 3 rows for every view
-    let rows = [[], [], []]
+    const rows = [[], [], []]
     for (let year = viewYear - 1; year < viewYear + 11; year++) {
-      let row = getRow(rows, year - viewYear)
+      const row = getRow(rows, year - viewYear)
 
       row.push(this.renderYear(year))
     }
@@ -63,7 +63,7 @@ export default class YearsView extends React.Component {
       className += ' rdtActive'
     }
 
-    let props = { key: year, className, 'data-value': year, onClick }
+    const props = { key: year, className, 'data-value': year, onClick }
 
     return this.props.renderYear(
       props,
@@ -82,12 +82,12 @@ export default class YearsView extends React.Component {
 
   disabledYearsCache = {}
   isDisabledYear(year) {
-    let cache = this.disabledYearsCache
+    const cache = this.disabledYearsCache
     if (cache[year] !== undefined) {
       return cache[year]
     }
 
-    let isValidDate = this.props.isValidDate
+    const isValidDate = this.props.isValidDate
 
     if (!isValidDate) {
       // If no validator is set, all days are valid
@@ -95,7 +95,7 @@ export default class YearsView extends React.Component {
     }
 
     // If one day in the year is valid, the year should be clickable
-    let date = this.props.viewDate.clone().set({ year })
+    const date = this.props.viewDate.clone().set({ year })
     let day = date.endOf('year').dayOfYear() + 1
 
     while (day-- > 1) {

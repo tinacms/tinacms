@@ -39,7 +39,7 @@ export type OnNewDocument = (args: {
 }) => void
 
 export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
-  __type: 'content-creator' = 'content-creator'
+  __type = 'content-creator' as const
   fields: AddContentPlugin<FormShape>['fields']
   onNewDocument?: OnNewDocument
   onChange: (values: any) => void
