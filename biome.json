@@ -1,0 +1,126 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
+	"files": { "ignoreUnknown": false, "ignore": [] },
+	"formatter": {
+		"enabled": true,
+		"useEditorconfig": true,
+		"formatWithErrors": false,
+		"indentStyle": "space",
+		"indentWidth": 2,
+		"lineEnding": "lf",
+		"lineWidth": 80,
+		"attributePosition": "auto",
+		"bracketSpacing": true,
+		"ignore": [
+			"**/*.gql",
+			"**/*.json",
+			"**/__generated__",
+			"**/*/admin/**/*.js",
+			"**/.yarn",
+			"**/.pnp.js",
+			"**/.yarnrc.yml",
+			"**/node_modules",
+			"**/.build*",
+			"**/yarn.lock",
+			"**/package-lock.json",
+			"**/.changeset",
+			"js/dashboard/build",
+			"js/dashboard/src/styles.css",
+			"**/coverage",
+			"identity/CHANGELOG.md",
+			"js/dashboard/CHANGELOG.md",
+			"js/content-api/CHANGELOG.md",
+			"**/dist/",
+			"terraform/**/.terraform",
+			"**/*.tfstate",
+			"**/.next/**",
+			"examples/hugo-quickstart",
+			"**/out.md",
+			"**/_response.md"
+		]
+	},
+	"organizeImports": { "enabled": true },
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": false,
+			"complexity": {
+				"noBannedTypes": "off",
+				"noUselessTypeConstraint": "error"
+			},
+			"correctness": {
+				"noInvalidUseBeforeDeclaration": "off",
+				"noPrecisionLoss": "error",
+				"noUnusedVariables": "off",
+				"useArrayLiterals": "off",
+				"useExhaustiveDependencies": "off",
+				"useHookAtTopLevel": "warn"
+			},
+			"style": {
+				"noInferrableTypes": "off",
+				"noNamespace": "error",
+				"noNonNullAssertion": "off",
+				"useAsConstAssertion": "warn",
+				"useBlockStatements": "off",
+				"useConst": "warn"
+			},
+			"suspicious": {
+				"noEmptyBlockStatements": "off",
+				"noExplicitAny": "off",
+				"noExtraNonNullAssertion": "error",
+				"noMisleadingInstantiator": "error",
+				"useNamespaceKeyword": "error"
+			}
+		},
+		"ignore": ["packages/demo-*", "**/node_modules", "**/build", "**/*.d.ts"]
+	},
+	"javascript": {
+		"formatter": {
+			"jsxQuoteStyle": "double",
+			"quoteProperties": "asNeeded",
+			"trailingCommas": "es5",
+			"semicolons": "asNeeded",
+			"arrowParentheses": "always",
+			"bracketSameLine": false,
+			"quoteStyle": "single",
+			"attributePosition": "auto",
+			"bracketSpacing": true
+		}
+	},
+	"overrides": [
+		{
+			"include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noConstAssign": "off",
+						"noGlobalObjectCalls": "off",
+						"noInvalidConstructorSuper": "off",
+						"noNewSymbol": "off",
+						"noSetterReturn": "off",
+						"noUndeclaredVariables": "off",
+						"noUnreachable": "off",
+						"noUnreachableSuper": "off"
+					},
+					"style": {
+						"noArguments": "error",
+						"noVar": "error",
+						"useConst": "error"
+					},
+					"suspicious": {
+						"noDuplicateClassMembers": "off",
+						"noDuplicateObjectKeys": "off",
+						"noDuplicateParameters": "off",
+						"noFunctionAssign": "off",
+						"noImportAssign": "off",
+						"noRedeclare": "off",
+						"noUnsafeNegation": "off",
+						"useGetterReturn": "off",
+						"useValidTypeof": "off"
+					}
+				}
+			}
+		}
+	]
+}
