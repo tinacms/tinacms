@@ -187,55 +187,58 @@ const diffTinaLock = async () => {
     console.error('No schema found in the Tina lock ❌')
     process.exit(1)
   }
+  exec(
+    'pnpm exec tinacms dev --no-server',
+    { cwd: process.cwd() },
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error} ❌`)
+        return
+      }
+      if (stdout) {
+        console.log(
+          stdout
+            .split('\n')
+            .map((line) => `> ${line}`)
+            .join('\n')
+        )
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`)
+      }
 
-  exec('pnpm tinacms dev --no-server', (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error} ❌`)
-      return
-    }
-    if (stdout) {
-      console.log(
-        stdout
-          .split('\n')
-          .map((line) => `> ${line}`)
-          .join('\n')
+      const newTinaLock = JSON.parse(
+        fs.readFileSync(`${tinaFolder}/tina-lock.json`).toString()
       )
+
+      if (!newTinaLock.schema) {
+        console.error('No schema found in the new Tina lock ❌')
+        process.exit(1)
+      }
+
+      const { version, ...schema } = tinaLock.schema
+      const { version: newVersion, ...newSchema } = newTinaLock.schema
+
+      const schemaDiff = jsonDiff.diffString(schema, newSchema)
+      if (schemaDiff) {
+        console.error('Unexpected change(s) to Tina schema ❌')
+        console.log(schemaDiff)
+        process.exit(1)
+      }
+
+      const graphqlDiff = jsonDiff.diffString(
+        tinaLock.graphql,
+        newTinaLock.graphql
+      )
+      if (graphqlDiff) {
+        console.error('Unexpected change(s) to Tina graphql schema ❌')
+        console.log(graphqlDiff)
+        process.exit(1)
+      }
+
+      console.log('No changes found in Tina lock ✅')
     }
-    if (stderr) {
-      console.error(`stderr: ${stderr}`)
-    }
-
-    const newTinaLock = JSON.parse(
-      fs.readFileSync(`${tinaFolder}/tina-lock.json`).toString()
-    )
-
-    if (!newTinaLock.schema) {
-      console.error('No schema found in the new Tina lock ❌')
-      process.exit(1)
-    }
-
-    const { version, ...schema } = tinaLock.schema
-    const { version: newVersion, ...newSchema } = newTinaLock.schema
-
-    const schemaDiff = jsonDiff.diffString(schema, newSchema)
-    if (schemaDiff) {
-      console.error('Unexpected change(s) to Tina schema ❌')
-      console.log(schemaDiff)
-      process.exit(1)
-    }
-
-    const graphqlDiff = jsonDiff.diffString(
-      tinaLock.graphql,
-      newTinaLock.graphql
-    )
-    if (graphqlDiff) {
-      console.error('Unexpected change(s) to Tina graphql schema ❌')
-      console.log(graphqlDiff)
-      process.exit(1)
-    }
-
-    console.log('No changes found in Tina lock ✅')
-  })
+  )
 }
 
 export async function init(args: any) {
