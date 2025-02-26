@@ -23,7 +23,8 @@ export class S3MediaStore implements MediaStore {
 
   protected fetchWithBasePath(path: string, init?: RequestInit) {
     const fullPath = this.getFullPath(path)
-    return this.fetchFunction(fullPath, init)
+    const normalizedPath = fullPath.startsWith('/') ? fullPath : `/${fullPath}`
+    return this.fetchFunction(normalizedPath, init)
   }
 
   protected getFullPath(path: string): string {
