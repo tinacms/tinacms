@@ -9,7 +9,8 @@
 		"start": "tinacms build && next start",
 		"export": "npm run build && next export",
 		"lint": "eslint . --ext .ts,.tsx",
-		"diff-tina-lock": "TINA_PUBLIC_IS_LOCAL=true tinacms-scripts diff-tina-lock"
+		"diff-tina-lock": "TINA_PUBLIC_IS_LOCAL=true tinacms-scripts diff-tina-lock",
+		"update-tina-lock": "TINA_PUBLIC_IS_LOCAL=true tinacms dev --no-server"
 	},
 	"dependencies": {
 		"@headlessui/react": "2.1.8",

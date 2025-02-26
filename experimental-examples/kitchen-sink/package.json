@@ -6,7 +6,8 @@
 		"build": "tinacms dev -c \"NODE_ENV=production next build\"",
 		"start": "tinacms dev -c \"next start\"",
 		"lint": "next lint",
-		"diff-tina-lock": "tinacms-scripts diff-tina-lock"
+		"diff-tina-lock": "tinacms-scripts diff-tina-lock",
+		"update-tina-lock": "tinacms dev --no-server"
 	},
 	"dependencies": {
 		"next": "^14.2.24",
