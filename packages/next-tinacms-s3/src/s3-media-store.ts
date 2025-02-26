@@ -19,6 +19,16 @@ export class S3MediaStore implements MediaStore {
     return fetch(input, init)
   }
   accept = DEFAULT_MEDIA_UPLOAD_TYPES
+  basePath = ''
+
+  protected fetchWithBasePath(path: string, init?: RequestInit) {
+    const fullPath = this.getFullPath(path)
+    return this.fetchFunction(fullPath, init)
+  }
+
+  protected getFullPath(path: string): string {
+    return `${this.basePath}${path}`
+  }
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = []
@@ -34,7 +44,7 @@ export class S3MediaStore implements MediaStore {
           : item.file.name
       }`
 
-      const res = await this.fetchFunction(
+      const res = await this.fetchWithBasePath(
         `/api/s3/media/upload_url?key=${path}`,
         {
           method: 'GET',
@@ -98,13 +108,16 @@ export class S3MediaStore implements MediaStore {
     return newFiles
   }
   async delete(media: Media) {
-    await this.fetchFunction(`/api/s3/media/${encodeURIComponent(media.id)}`, {
-      method: 'DELETE',
-    })
+    await this.fetchWithBasePath(
+      `/api/s3/media/${encodeURIComponent(media.id)}`,
+      {
+        method: 'DELETE',
+      }
+    )
   }
   async list(options: MediaListOptions): Promise<MediaList> {
     const query = this.buildQuery(options)
-    const response = await this.fetchFunction('/api/s3/media' + query)
+    const response = await this.fetchWithBasePath('/api/s3/media' + query)
 
     if (response.status == 401) {
       throw E_UNAUTHORIZED

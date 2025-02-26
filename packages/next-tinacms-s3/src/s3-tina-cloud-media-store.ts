@@ -10,6 +10,10 @@ export class TinaCloudS3MediaStore extends S3MediaStore {
   constructor(client: Client) {
     super()
     this.client = client
+
+    const basePath = this.client.schema.config.config.build?.basePath
+    this.basePath = basePath || ''
+
     this.fetchFunction = async (input: RequestInfo, init?: RequestInit) => {
       try {
         const url = input.toString()
