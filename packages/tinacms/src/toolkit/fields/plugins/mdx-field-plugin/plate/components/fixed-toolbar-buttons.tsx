@@ -62,7 +62,7 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   image: {
     label: 'Image',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <ImageToolbarButton />,
+    Component: <ImageToolbarButton tooltip="Image" />,
   },
   quote: {
     label: 'Quote',
@@ -118,7 +118,7 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   codeBlock: {
     label: 'Code Block',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <CodeBlockToolbarButton />,
+    Component: <CodeBlockToolbarButton tooltip="Code Block" />,
   },
   mermaid: {
     label: 'Mermaid',
@@ -133,7 +133,7 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   raw: {
     label: 'Raw Markdown',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <RawMarkdownToolbarButton />,
+    Component: <RawMarkdownToolbarButton tooltip="Raw Markdown" />,
   },
   embed: {
     label: 'Templates',
