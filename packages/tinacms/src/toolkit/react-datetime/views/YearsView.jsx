@@ -2,13 +2,13 @@
 
 */
 
-import React from 'react'
-import ViewNavigation from '../parts/ViewNavigation'
+import React from 'react';
+import ViewNavigation from '../parts/ViewNavigation';
 
 export default class YearsView extends React.Component {
   static defaultProps = {
     renderYear: (props, year) => <td {...props}>{year}</td>,
-  }
+  };
 
   render() {
     return (
@@ -20,11 +20,11 @@ export default class YearsView extends React.Component {
           <tbody>{this.renderYears()}</tbody>
         </table>
       </div>
-    )
+    );
   }
 
   renderNavigation() {
-    const viewYear = this.getViewYear()
+    const viewYear = this.getViewYear();
     return (
       <ViewNavigation
         onClickPrev={() => this.props.navigate(-10, 'years')}
@@ -32,95 +32,95 @@ export default class YearsView extends React.Component {
         onClickNext={() => this.props.navigate(10, 'years')}
         switchContent={`${viewYear}-${viewYear + 9}`}
       />
-    )
+    );
   }
 
   renderYears() {
-    const viewYear = this.getViewYear()
+    const viewYear = this.getViewYear();
     // 12 years in 3 rows for every view
-    const rows = [[], [], []]
+    const rows = [[], [], []];
     for (let year = viewYear - 1; year < viewYear + 11; year++) {
-      const row = getRow(rows, year - viewYear)
+      const row = getRow(rows, year - viewYear);
 
-      row.push(this.renderYear(year))
+      row.push(this.renderYear(year));
     }
 
-    return rows.map((years, i) => <tr key={i}>{years}</tr>)
+    return rows.map((years, i) => <tr key={i}>{years}</tr>);
   }
 
   renderYear(year) {
-    const selectedYear = this.getSelectedYear()
-    let className = 'rdtYear'
-    let onClick
+    const selectedYear = this.getSelectedYear();
+    let className = 'rdtYear';
+    let onClick;
 
     if (this.isDisabledYear(year)) {
-      className += ' rdtDisabled'
+      className += ' rdtDisabled';
     } else {
-      onClick = this._updateSelectedYear
+      onClick = this._updateSelectedYear;
     }
 
     if (selectedYear === year) {
-      className += ' rdtActive'
+      className += ' rdtActive';
     }
 
-    const props = { key: year, className, 'data-value': year, onClick }
+    const props = { key: year, className, 'data-value': year, onClick };
 
     return this.props.renderYear(
       props,
       year,
       this.props.selectedDate && this.props.selectedDate.clone()
-    )
+    );
   }
 
   getViewYear() {
-    return parseInt(this.props.viewDate.year() / 10, 10) * 10
+    return parseInt(this.props.viewDate.year() / 10, 10) * 10;
   }
 
   getSelectedYear() {
-    return this.props.selectedDate && this.props.selectedDate.year()
+    return this.props.selectedDate && this.props.selectedDate.year();
   }
 
-  disabledYearsCache = {}
+  disabledYearsCache = {};
   isDisabledYear(year) {
-    const cache = this.disabledYearsCache
+    const cache = this.disabledYearsCache;
     if (cache[year] !== undefined) {
-      return cache[year]
+      return cache[year];
     }
 
-    const isValidDate = this.props.isValidDate
+    const isValidDate = this.props.isValidDate;
 
     if (!isValidDate) {
       // If no validator is set, all days are valid
-      return false
+      return false;
     }
 
     // If one day in the year is valid, the year should be clickable
-    const date = this.props.viewDate.clone().set({ year })
-    let day = date.endOf('year').dayOfYear() + 1
+    const date = this.props.viewDate.clone().set({ year });
+    let day = date.endOf('year').dayOfYear() + 1;
 
     while (day-- > 1) {
       if (isValidDate(date.dayOfYear(day))) {
-        cache[year] = false
-        return false
+        cache[year] = false;
+        return false;
       }
     }
 
-    cache[year] = true
-    return true
+    cache[year] = true;
+    return true;
   }
 
   _updateSelectedYear = (event) => {
-    this.props.updateDate(event)
-  }
+    this.props.updateDate(event);
+  };
 }
 
 function getRow(rows, year) {
   if (year < 3) {
-    return rows[0]
+    return rows[0];
   }
   if (year < 7) {
-    return rows[1]
+    return rows[1];
   }
 
-  return rows[2]
+  return rows[2];
 }

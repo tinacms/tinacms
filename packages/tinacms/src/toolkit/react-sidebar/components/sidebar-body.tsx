@@ -1,39 +1,39 @@
-import * as React from 'react'
+import * as React from 'react';
 
-import type { Form } from '@toolkit/forms'
-import { FormLists } from './form-list'
-import { useCMS } from '@toolkit/react-core'
-import { FormBuilder, FormStatus } from '@toolkit/form-builder'
-import type { FormMetaPlugin } from '@toolkit/plugin-form-meta'
-import { SidebarContext } from './sidebar'
-import { BiDotsVertical, BiHomeAlt } from 'react-icons/bi'
+import type { Form } from '@toolkit/forms';
+import { FormLists } from './form-list';
+import { useCMS } from '@toolkit/react-core';
+import { FormBuilder, FormStatus } from '@toolkit/form-builder';
+import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
+import { SidebarContext } from './sidebar';
+import { BiDotsVertical, BiHomeAlt } from 'react-icons/bi';
 
 export const FormsView = ({
   children,
 }: {
-  children?: React.ReactChild | React.ReactChild[]
+  children?: React.ReactChild | React.ReactChild[];
 }) => {
-  const cms = useCMS()
-  const { setFormIsPristine } = React.useContext(SidebarContext)
+  const cms = useCMS();
+  const { setFormIsPristine } = React.useContext(SidebarContext);
 
-  const isMultiform = cms.state.forms.length > 1
+  const isMultiform = cms.state.forms.length > 1;
   const activeForm = cms.state.forms.find(
     ({ tinaForm }) => tinaForm.id === cms.state.activeFormId
-  )
-  const isEditing = !!activeForm
+  );
+  const isEditing = !!activeForm;
 
   /**
    * No Forms
    */
   if (!cms.state.formLists.length) {
-    return <> {children} </>
+    return <> {children} </>;
   }
 
   if (isMultiform && !activeForm) {
-    return <FormLists isEditing={isEditing} />
+    return <FormLists isEditing={isEditing} />;
   }
 
-  const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta')
+  const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
 
   return (
     <>
@@ -50,13 +50,13 @@ export const FormsView = ({
         </FormWrapper>
       )}
     </>
-  )
-}
+  );
+};
 
 interface FormWrapperProps {
-  isEditing: boolean
-  isMultiform: boolean
-  children: React.ReactNode
+  isEditing: boolean;
+  isMultiform: boolean;
+  children: React.ReactNode;
 }
 
 const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
@@ -80,18 +80,18 @@ const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
 export interface MultiformFormHeaderProps {
-  activeForm: { activeFieldName?: string; tinaForm: Form }
+  activeForm: { activeFieldName?: string; tinaForm: Form };
 }
 
 export const MultiformFormHeader = ({
   activeForm,
 }: MultiformFormHeaderProps) => {
-  const cms = useCMS()
-  const { formIsPristine } = React.useContext(SidebarContext)
+  const cms = useCMS();
+  const { formIsPristine } = React.useContext(SidebarContext);
 
   return (
     <div
@@ -104,11 +104,11 @@ export const MultiformFormHeader = ({
           type='button'
           className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
           onClick={() => {
-            const state = activeForm.tinaForm.finalForm.getState()
+            const state = activeForm.tinaForm.finalForm.getState();
             if (state.invalid === true) {
-              cms.alerts.error('Cannot navigate away from an invalid form.')
+              cms.alerts.error('Cannot navigate away from an invalid form.');
             } else {
-              cms.dispatch({ type: 'forms:set-active-form-id', value: null })
+              cms.dispatch({ type: 'forms:set-active-form-id', value: null });
             }
           }}
         >
@@ -120,11 +120,11 @@ export const MultiformFormHeader = ({
           onClick={() => {
             const collectionName = cms.api.tina.schema.getCollectionByFullPath(
               cms.state.activeFormId
-            ).name
+            ).name;
 
             window.location.href = `${
               new URL(window.location.href).pathname
-            }#/collections/${collectionName}/~`
+            }#/collections/${collectionName}/~`;
           }}
         >
           <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
@@ -139,20 +139,20 @@ export const MultiformFormHeader = ({
         <FormStatus pristine={formIsPristine} />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export interface FormHeaderProps {
-  activeForm: { activeFieldName?: string; tinaForm: Form }
+  activeForm: { activeFieldName?: string; tinaForm: Form };
 }
 
 export const FormHeader = ({ activeForm }: FormHeaderProps) => {
-  const { formIsPristine } = React.useContext(SidebarContext)
-  const cms = useCMS()
+  const { formIsPristine } = React.useContext(SidebarContext);
+  const cms = useCMS();
 
   const shortFormLabel = activeForm.tinaForm.label
     ? activeForm.tinaForm.label.replace(/^.*[\\\/]/, '')
-    : false
+    : false;
 
   return (
     <div
@@ -167,10 +167,10 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
           onClick={() => {
             const collectionName = cms.api.tina.schema.getCollectionByFullPath(
               cms.state.activeFormId
-            ).name
+            ).name;
             window.location.href = `${
               new URL(window.location.href).pathname
-            }#/collections/${collectionName}/~`
+            }#/collections/${collectionName}/~`;
           }}
         >
           <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
@@ -184,5 +184,5 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
         <FormStatus pristine={formIsPristine} />
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,12 +1,12 @@
-import * as React from 'react'
+import * as React from 'react';
 
 type a = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
->
+>;
 export interface TextAreaProps extends a {
-  error?: boolean
-  ref?: any
+  error?: boolean;
+  ref?: any;
 }
 
 export const TextArea = React.forwardRef<
@@ -20,5 +20,5 @@ export const TextArea = React.forwardRef<
       ref={ref}
       style={{ minHeight: '160px' }}
     />
-  )
-})
+  );
+});

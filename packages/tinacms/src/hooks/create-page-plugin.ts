@@ -2,58 +2,58 @@
 
 */
 
-import { AddContentPlugin, TinaCMS } from '@tinacms/toolkit'
+import { AddContentPlugin, TinaCMS } from '@tinacms/toolkit';
 
 type CollectionShape = {
-  label: string
-  format: string
-  slug: string
-}
+  label: string;
+  format: string;
+  slug: string;
+};
 
 interface CreateContentButtonOptions {
-  label: string
-  fields: any[]
-  collections: CollectionShape[]
-  onNewDocument?: OnNewDocument
-  onChange: (values: any) => void
-  initialValues: any
+  label: string;
+  fields: any[];
+  collections: CollectionShape[];
+  onNewDocument?: OnNewDocument;
+  onChange: (values: any) => void;
+  initialValues: any;
 }
 
 type FormShape = {
-  collection: string
-  template: string
-  relativePath: string
-}
+  collection: string;
+  template: string;
+  relativePath: string;
+};
 
 type PayloadShape = {
-  collection: string
-  template: string
-  relativePath: string
-}
+  collection: string;
+  template: string;
+  relativePath: string;
+};
 
 export type OnNewDocument = (args: {
-  collection: { slug: string }
-  relativePath: string
-  breadcrumbs: string[]
-  path: string
-}) => void
+  collection: { slug: string };
+  relativePath: string;
+  breadcrumbs: string[];
+  path: string;
+}) => void;
 
 export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
-  __type = 'content-creator' as const
-  fields: AddContentPlugin<FormShape>['fields']
-  onNewDocument?: OnNewDocument
-  onChange: (values: any) => void
-  name: string
-  collections: CollectionShape[]
-  initialValues: any
+  __type = 'content-creator' as const;
+  fields: AddContentPlugin<FormShape>['fields'];
+  onNewDocument?: OnNewDocument;
+  onChange: (values: any) => void;
+  name: string;
+  collections: CollectionShape[];
+  initialValues: any;
 
   constructor(options: CreateContentButtonOptions) {
-    this.fields = options.fields
-    this.name = options.label
-    this.onNewDocument = options.onNewDocument
-    this.collections = options.collections
-    this.onChange = options.onChange
-    this.initialValues = options.initialValues
+    this.fields = options.fields;
+    this.name = options.label;
+    this.onNewDocument = options.onNewDocument;
+    this.collections = options.collections;
+    this.onChange = options.onChange;
+    this.initialValues = options.initialValues;
   }
 
   async onSubmit(
@@ -63,21 +63,21 @@ export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
     try {
       const selectedCollection = this.collections.find(
         (collectionItem) => collectionItem.slug === collection
-      )
-      const collectionFormat = selectedCollection.format
+      );
+      const collectionFormat = selectedCollection.format;
 
       /**
        * Check for and ensure `.md` or `.json` is appended to the end of `relativePath`
        */
-      const extensionLength = -1 * (collectionFormat.length + 1)
-      let relativePathWithExt = relativePath
+      const extensionLength = -1 * (collectionFormat.length + 1);
+      let relativePathWithExt = relativePath;
       if (
         relativePath.slice(extensionLength).toLocaleLowerCase() ===
         `.${collectionFormat}`
       ) {
-        relativePathWithExt = `${relativePath.slice(0, -3)}.${collectionFormat}`
+        relativePathWithExt = `${relativePath.slice(0, -3)}.${collectionFormat}`;
       } else {
-        relativePathWithExt = `${relativePath}.${collectionFormat}`
+        relativePathWithExt = `${relativePath}.${collectionFormat}`;
       }
 
       /**
@@ -87,25 +87,25 @@ export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
         relativePath: relativePathWithExt,
         collection,
         template,
-      }
+      };
 
       try {
-        const res = await cms.api.tina.addPendingContent(payload)
+        const res = await cms.api.tina.addPendingContent(payload);
         if (res.errors) {
           res.errors.map((e) => {
-            cms.alerts.error(e.message)
-          })
+            cms.alerts.error(e.message);
+          });
         } else {
-          cms.alerts.info('Document created!')
+          cms.alerts.info('Document created!');
           if (typeof this.onNewDocument === 'function') {
-            this.onNewDocument(res.addPendingDocument._sys)
+            this.onNewDocument(res.addPendingDocument._sys);
           }
         }
       } catch (e) {
-        cms.alerts.error(e.message)
+        cms.alerts.error(e.message);
       }
     } catch (e) {
-      cms.alerts.error(e.message)
+      cms.alerts.error(e.message);
     }
   }
 }

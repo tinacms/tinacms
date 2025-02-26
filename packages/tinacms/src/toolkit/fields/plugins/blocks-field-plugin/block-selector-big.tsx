@@ -1,18 +1,18 @@
-import * as React from 'react'
-import { AddIcon } from '@toolkit/icons'
-import { IconButton } from '@toolkit/styles'
+import * as React from 'react';
+import { AddIcon } from '@toolkit/icons';
+import { IconButton } from '@toolkit/styles';
 import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
   Transition,
   TransitionChild,
-} from '@headlessui/react'
-import { useFormPortal } from '@toolkit/form-builder'
-import { PanelHeader } from '../group-field-plugin'
-import type { BlockTemplate } from '.'
-import { MdKeyboardArrowDown, MdOutlineClear } from 'react-icons/md'
-import { BiSearch } from 'react-icons/bi'
+} from '@headlessui/react';
+import { useFormPortal } from '@toolkit/form-builder';
+import { PanelHeader } from '../group-field-plugin';
+import type { BlockTemplate } from '.';
+import { MdKeyboardArrowDown, MdOutlineClear } from 'react-icons/md';
+import { BiSearch } from 'react-icons/bi';
 
 export const BlockSelectorBig = ({
   templates,
@@ -20,26 +20,26 @@ export const BlockSelectorBig = ({
   label,
 }: {
   templates: {
-    [key: string]: BlockTemplate
-  }
-  addItem: any
-  label: string | boolean
+    [key: string]: BlockTemplate;
+  };
+  addItem: any;
+  label: string | boolean;
 }) => {
-  const FormPortal = useFormPortal()
-  const [pickerIsOpen, setPickerIsOpen] = React.useState(false)
+  const FormPortal = useFormPortal();
+  const [pickerIsOpen, setPickerIsOpen] = React.useState(false);
 
   const showFilter = React.useMemo(() => {
-    return Object.entries(templates).length > 6
-  }, [templates])
-  const [filter, setFilter] = React.useState('')
+    return Object.entries(templates).length > 6;
+  }, [templates]);
+  const [filter, setFilter] = React.useState('');
   const filteredTemplates = React.useMemo(() => {
     return Object.entries(templates).filter(([name, template]) => {
       return template.label
         ? template.label.toLowerCase().includes(filter.toLowerCase()) ||
             name.toLowerCase().includes(filter.toLowerCase())
-        : name.toLowerCase().includes(filter.toLowerCase())
-    })
-  }, [filter])
+        : name.toLowerCase().includes(filter.toLowerCase());
+    });
+  }, [filter]);
 
   const categories = React.useMemo(() => {
     return [
@@ -48,37 +48,37 @@ export const BlockSelectorBig = ({
         Object.entries(templates)
           .filter(([name, template]) => {
             //@ts-ignore
-            return template.category ? template.category : false
+            return template.category ? template.category : false;
           })
           .map(([name, template]) => {
             //@ts-ignore
-            return template.category
+            return template.category;
           })
       ),
-    ]
-  }, [templates])
+    ];
+  }, [templates]);
   const hasUncategorized = React.useMemo(() => {
     return (
       Object.entries(templates).filter(([name, template]) => {
         //@ts-ignore
-        return !template.category
+        return !template.category;
       }).length > 0
-    )
-  }, [templates])
+    );
+  }, [templates]);
   const uncategorized = React.useMemo(() => {
     return filteredTemplates.filter(([name, template]) => {
       //@ts-ignore
-      return !template.category
-    })
-  }, [filteredTemplates])
+      return !template.category;
+    });
+  }, [filteredTemplates]);
 
   const close = (name, template) => {
     if (name && template) {
-      addItem(name, template)
+      addItem(name, template);
     }
-    setFilter('')
-    setPickerIsOpen(false)
-  }
+    setFilter('');
+    setPickerIsOpen(false);
+  };
 
   return (
     <>
@@ -107,7 +107,7 @@ export const BlockSelectorBig = ({
               >
                 <PanelHeader
                   onClick={() => {
-                    setPickerIsOpen(false)
+                    setPickerIsOpen(false);
                   }}
                 >
                   {label} ⁠– Add New
@@ -123,12 +123,12 @@ export const BlockSelectorBig = ({
                               'shadow-inner focus:shadow-outline focus:border-blue-400 focus:outline-none block text-sm pl-2.5 pr-8 py-1.5 text-gray-600 w-full bg-white border border-gray-200 focus:text-gray-900 rounded-md placeholder-gray-400 hover:placeholder-gray-600 transition-all ease-out duration-150'
                             }
                             onClick={(event: any) => {
-                              event.stopPropagation()
-                              event.preventDefault()
+                              event.stopPropagation();
+                              event.preventDefault();
                             }}
                             value={filter}
                             onChange={(event: any) => {
-                              setFilter(event.target.value)
+                              setFilter(event.target.value);
                             }}
                             placeholder='Search'
                           />
@@ -137,7 +137,7 @@ export const BlockSelectorBig = ({
                           ) : (
                             <button
                               onClick={() => {
-                                setFilter('')
+                                setFilter('');
                               }}
                               className='outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150'
                             >
@@ -173,7 +173,7 @@ export const BlockSelectorBig = ({
                                   //@ts-ignore
                                   template.category === category
                                   ? true
-                                  : false
+                                  : false;
                               }
                             )}
                             category={category}
@@ -183,7 +183,7 @@ export const BlockSelectorBig = ({
                             }
                             close={close}
                           />
-                        )
+                        );
                       })}
                       {hasUncategorized && uncategorized.length === 0 && (
                         <div className='relative text-gray-500 block text-left w-full text-base font-bold tracking-wide py-2 truncate pointer-events-none opacity-50'>
@@ -207,8 +207,8 @@ export const BlockSelectorBig = ({
         )}
       </FormPortal>
     </>
-  )
-}
+  );
+};
 
 const BlockGroup = ({ category, templates, close, isLast = false }) => {
   return (
@@ -270,8 +270,8 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
         </>
       )}
     </Disclosure>
-  )
-}
+  );
+};
 
 const CardColumns = ({ children, className = '' }) => {
   return (
@@ -281,8 +281,8 @@ const CardColumns = ({ children, className = '' }) => {
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
 const BlockCard = ({ close, name, template }) => {
   return (
@@ -291,7 +291,7 @@ const BlockCard = ({ close, name, template }) => {
       style={{ breakInside: 'avoid', transform: 'translateZ(0)' }}
       key={name}
       onClick={() => {
-        close(name, template)
+        close(name, template);
       }}
     >
       {template.previewSrc && (
@@ -309,11 +309,11 @@ const BlockCard = ({ close, name, template }) => {
         <AddIcon className='w-5 h-auto group-hover:text-blue-500 opacity-30 transition-all ease-out duration-150 group-hover:opacity-80' />
       </span>
     </button>
-  )
-}
+  );
+};
 
 const EmptyState = ({ children }) => {
   return (
     <div className='block relative text-gray-300 italic py-1'>{children}</div>
-  )
-}
+  );
+};

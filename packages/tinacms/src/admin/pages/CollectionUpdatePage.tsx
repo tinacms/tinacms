@@ -1,16 +1,21 @@
-import { BillingWarning, Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
-import GetCMS from '../components/GetCMS'
-import GetCollection from '../components/GetCollection'
-import GetDocument from '../components/GetDocument'
-import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm, Collection } from '@tinacms/schema-tools'
-import { Link, useParams } from 'react-router-dom'
-import { LocalWarning } from '@tinacms/toolkit'
-import { PageWrapper } from '../components/Page'
-import { TinaAdminApi } from '../api'
-import type { TinaCMS } from '@tinacms/toolkit'
-import { useCollectionFolder } from './utils'
-import { ErrorDialog } from '../components/ErrorDialog'
+import {
+  BillingWarning,
+  Form,
+  FormBuilder,
+  FormStatus,
+} from '@tinacms/toolkit';
+import GetCMS from '../components/GetCMS';
+import GetCollection from '../components/GetCollection';
+import GetDocument from '../components/GetDocument';
+import React, { useMemo, useState } from 'react';
+import { TinaSchema, resolveForm, Collection } from '@tinacms/schema-tools';
+import { Link, useParams } from 'react-router-dom';
+import { LocalWarning } from '@tinacms/toolkit';
+import { PageWrapper } from '../components/Page';
+import { TinaAdminApi } from '../api';
+import type { TinaCMS } from '@tinacms/toolkit';
+import { useCollectionFolder } from './utils';
+import { ErrorDialog } from '../components/ErrorDialog';
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -19,24 +24,24 @@ const updateDocument = async (
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
-  const api = new TinaAdminApi(cms)
-  const params = api.schema.transformPayload(collection.name, values)
+  const api = new TinaAdminApi(cms);
+  const params = api.schema.transformPayload(collection.name, values);
   if (await api.isAuthenticated()) {
-    await api.updateDocument(collection, relativePath, params)
+    await api.updateDocument(collection, relativePath, params);
   } else {
-    const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`
-    cms.alerts.error(authMessage)
-    console.error(authMessage)
-    return false
+    const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`;
+    cms.alerts.error(authMessage);
+    console.error(authMessage);
+    return false;
   }
-}
+};
 
 const CollectionUpdatePage = () => {
-  const { collectionName, ...rest } = useParams()
-  const folder = useCollectionFolder()
-  const { '*': filename } = rest // TODO can just use the folder.name instead
+  const { collectionName, ...rest } = useParams();
+  const folder = useCollectionFolder();
+  const { '*': filename } = rest; // TODO can just use the folder.name instead
 
-  const resolvedFile = folder.fullyQualifiedName ? folder.name : filename
+  const resolvedFile = folder.fullyQualifiedName ? folder.name : filename;
   return (
     <GetCMS>
       {(cms: TinaCMS) => (
@@ -47,11 +52,11 @@ const CollectionUpdatePage = () => {
           includeDocuments={false}
         >
           {(collection) => {
-            const relativePath = `${resolvedFile}.${collection.format}`
+            const relativePath = `${resolvedFile}.${collection.format}`;
             const mutationInfo = {
               includeCollection: true,
               includeTemplate: !!collection.templates,
-            }
+            };
 
             return (
               <PageWrapper>
@@ -72,13 +77,13 @@ const CollectionUpdatePage = () => {
                   )}
                 </GetDocument>
               </PageWrapper>
-            )
+            );
           }}
         </GetCollection>
       )}
     </GetCMS>
-  )
-}
+  );
+};
 
 const RenderForm = ({
   cms,
@@ -88,30 +93,30 @@ const RenderForm = ({
   collection,
   mutationInfo,
 }: {
-  cms: TinaCMS
-  document
-  filename
-  relativePath
-  collection
-  mutationInfo
+  cms: TinaCMS;
+  document;
+  filename;
+  relativePath;
+  collection;
+  mutationInfo;
 }) => {
-  const [formIsPristine, setFormIsPristine] = useState(true)
-  const schema: TinaSchema | undefined = cms.api.tina.schema
-  const parentFolder = relativePath.split('/').slice(0, -1).join('/')
+  const [formIsPristine, setFormIsPristine] = useState(true);
+  const schema: TinaSchema | undefined = cms.api.tina.schema;
+  const parentFolder = relativePath.split('/').slice(0, -1).join('/');
 
   // the schema is being passed in from the frontend so we can use that
-  const schemaCollection = schema.getCollection(collection.name)
+  const schemaCollection = schema.getCollection(collection.name);
 
   const template = schema.getTemplateForData({
     collection: schemaCollection,
     data: document._values,
-  })
+  });
   const formInfo = resolveForm({
     collection: schemaCollection,
     basename: schemaCollection.name,
     schema: schema,
     template,
-  })
+  });
 
   const form = useMemo(() => {
     return new Form({
@@ -128,8 +133,8 @@ const RenderForm = ({
             collection,
             mutationInfo,
             values
-          )
-          cms.alerts.success('Document updated!')
+          );
+          cms.alerts.success('Document updated!');
         } catch (error) {
           cms.alerts.error(() =>
             ErrorDialog({
@@ -137,30 +142,30 @@ const RenderForm = ({
               message: 'Tina caught an error while updating the page',
               error,
             })
-          )
-          console.error(error)
+          );
+          console.error(error);
           throw new Error(
             `[${error.name}] UpdateDocument failed: ${error.message}`
-          )
+          );
         }
       },
-    })
-  }, [cms, document, relativePath, collection, mutationInfo])
+    });
+  }, [cms, document, relativePath, collection, mutationInfo]);
 
   React.useEffect(() => {
-    cms.dispatch({ type: 'forms:add', value: form })
-    cms.dispatch({ type: 'forms:set-active-form-id', value: form.id })
+    cms.dispatch({ type: 'forms:add', value: form });
+    cms.dispatch({ type: 'forms:set-active-form-id', value: form.id });
     return () => {
-      cms.dispatch({ type: 'forms:remove', value: form.id })
-      cms.dispatch({ type: 'forms:set-active-form-id', value: null })
-    }
-  }, [JSON.stringify(document._values)])
+      cms.dispatch({ type: 'forms:remove', value: form.id });
+      cms.dispatch({ type: 'forms:set-active-form-id', value: null });
+    };
+  }, [JSON.stringify(document._values)]);
   if (!cms.state.activeFormId) {
-    return null
+    return null;
   }
   const activeForm = cms.state.forms.find(
     ({ tinaForm }) => tinaForm.id === form.id
-  )
+  );
 
   return (
     <>
@@ -188,7 +193,7 @@ const RenderForm = ({
         <FormBuilder form={activeForm} onPristineChange={setFormIsPristine} />
       )}
     </>
-  )
-}
+  );
+};
 
-export default CollectionUpdatePage
+export default CollectionUpdatePage;

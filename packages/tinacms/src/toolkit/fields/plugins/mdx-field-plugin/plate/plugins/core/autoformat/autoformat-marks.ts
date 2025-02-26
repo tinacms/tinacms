@@ -4,7 +4,7 @@ import {
   MARK_CODE,
   MARK_ITALIC,
   MARK_STRIKETHROUGH,
-} from '@udecode/plate'
+} from '@udecode/plate';
 
 export const autoformatMarks: AutoformatRule[] = [
   {
@@ -37,4 +37,4 @@ export const autoformatMarks: AutoformatRule[] = [
     type: MARK_STRIKETHROUGH,
     match: ['~~', '~'],
   },
-]
+];

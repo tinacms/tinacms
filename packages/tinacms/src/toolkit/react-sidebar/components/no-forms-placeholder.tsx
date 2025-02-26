@@ -4,9 +4,9 @@
 
 */
 
-import * as React from 'react'
-import { LoadingDots } from '@toolkit/form-builder'
-import { Button } from '@toolkit/styles'
+import * as React from 'react';
+import { LoadingDots } from '@toolkit/form-builder';
+import { Button } from '@toolkit/styles';
 
 export const PendingFormsPlaceholder = () => (
   <div
@@ -27,7 +27,7 @@ export const PendingFormsPlaceholder = () => (
     </p>
     <LoadingDots color={'var(--tina-color-primary)'} />
   </div>
-)
+);
 
 export const NoFormsPlaceholder = () => (
   <div
@@ -57,11 +57,11 @@ export const NoFormsPlaceholder = () => (
       </Button>
     </p>
   </div>
-)
+);
 
 const Emoji = ({ className = '', ...props }) => (
   <span
     className={`text-[24px] leading-none inline-block ${className}`}
     {...props}
   />
-)
+);

@@ -1,47 +1,47 @@
-import * as React from 'react'
-import { Field, Form } from '@toolkit/forms'
+import * as React from 'react';
+import { Field, Form } from '@toolkit/forms';
 import {
   FieldsBuilder,
   useFormPortal,
   FormWrapper,
-} from '@toolkit/form-builder'
-import { useCMS } from '@toolkit/react-core/use-cms'
-import { BiPencil } from 'react-icons/bi'
-import { IoMdClose } from 'react-icons/io'
-import { wrapFieldWithNoHeader } from './wrap-field-with-meta'
+} from '@toolkit/form-builder';
+import { useCMS } from '@toolkit/react-core/use-cms';
+import { BiPencil } from 'react-icons/bi';
+import { IoMdClose } from 'react-icons/io';
+import { wrapFieldWithNoHeader } from './wrap-field-with-meta';
 
 export interface GroupFieldDefinititon extends Field {
-  component: 'group'
-  fields: Field[]
+  component: 'group';
+  fields: Field[];
 }
 
 export interface GroupProps {
-  input: any
-  meta: any
-  field: GroupFieldDefinititon
-  form: any
-  tinaForm: Form
+  input: any;
+  meta: any;
+  field: GroupFieldDefinititon;
+  form: any;
+  tinaForm: Form;
 }
 
 export const Group = wrapFieldWithNoHeader(
   ({ tinaForm, field }: GroupProps) => {
-    const cms = useCMS()
+    const cms = useCMS();
     return (
       <>
         <Header
           onClick={() => {
-            const state = tinaForm.finalForm.getState()
+            const state = tinaForm.finalForm.getState();
             if (state.invalid === true) {
               // @ts-ignore
-              cms.alerts.error('Cannot navigate away from an invalid form.')
-              return
+              cms.alerts.error('Cannot navigate away from an invalid form.');
+              return;
             }
 
             // setExpanded((p) => !p)
             cms.dispatch({
               type: 'forms:set-active-field-name',
               value: { formId: tinaForm.id, fieldName: field.name },
-            })
+            });
           }}
         >
           {field.label || field.name}
@@ -59,16 +59,16 @@ export const Group = wrapFieldWithNoHeader(
         tinaForm={tinaForm}
       /> */}
       </>
-    )
+    );
   }
-)
+);
 
 interface PanelProps {
-  setExpanded(_next: boolean): void
-  isExpanded: boolean
-  tinaForm: Form
-  field: GroupFieldDefinititon
-  children?: any
+  setExpanded(_next: boolean): void;
+  isExpanded: boolean;
+  tinaForm: Form;
+  field: GroupFieldDefinititon;
+  children?: any;
 }
 const Panel = function Panel({
   setExpanded,
@@ -76,14 +76,14 @@ const Panel = function Panel({
   tinaForm,
   field,
 }: PanelProps) {
-  const cms = useCMS()
-  const FormPortal = useFormPortal()
+  const cms = useCMS();
+  const FormPortal = useFormPortal();
   const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
       ...subField,
       name: `${field.name}.${subField.name}`,
-    }))
-  }, [field.fields, field.name])
+    }));
+  }, [field.fields, field.name]);
 
   return (
     <FormPortal>
@@ -94,14 +94,14 @@ const Panel = function Panel({
         >
           <PanelHeader
             onClick={() => {
-              const state = tinaForm.finalForm.getState()
+              const state = tinaForm.finalForm.getState();
               if (state.invalid === true) {
                 // @ts-ignore
-                cms.alerts.error('Cannot navigate away from an invalid form.')
-                return
+                cms.alerts.error('Cannot navigate away from an invalid form.');
+                return;
               }
 
-              setExpanded(false)
+              setExpanded(false);
             }}
           >
             {field.label || field.name}
@@ -114,8 +114,8 @@ const Panel = function Panel({
         </GroupPanel>
       )}
     </FormPortal>
-  )
-}
+  );
+};
 
 const Header = ({ onClick, children }) => {
   return (
@@ -130,8 +130,8 @@ const Header = ({ onClick, children }) => {
         <BiPencil className='h-6 w-auto transition-opacity duration-150 ease-out opacity-80 group-hover:opacity-90' />
       </button>
     </div>
-  )
-}
+  );
+};
 
 export const PanelHeader = ({ onClick, children }) => {
   return (
@@ -146,8 +146,8 @@ export const PanelHeader = ({ onClick, children }) => {
         <IoMdClose className='h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5' />
       </div>
     </button>
-  )
-}
+  );
+};
 
 export const PanelBody = ({ id, children }) => {
   return (
@@ -161,8 +161,8 @@ export const PanelBody = ({ id, children }) => {
     >
       <FormWrapper id={id}>{children}</FormWrapper>
     </div>
-  )
-}
+  );
+};
 
 export const GroupPanel = ({
   isExpanded,
@@ -191,17 +191,17 @@ export const GroupPanel = ({
     }}
     {...props}
   />
-)
+);
 
 export interface GroupFieldProps {
-  field: Field
+  field: Field;
 }
 
 export function GroupField(props: GroupFieldProps) {
-  return <div>Subfield: {props.field.label || props.field.name}</div>
+  return <div>Subfield: {props.field.label || props.field.name}</div>;
 }
 
 export const GroupFieldPlugin = {
   name: 'group',
   Component: Group,
-}
+};

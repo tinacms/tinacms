@@ -1,118 +1,118 @@
-import * as React from 'react'
-import { useState } from 'react'
-import { TinaCMS } from '@toolkit/tina-cms'
-import { MdSyncProblem } from 'react-icons/md'
-import { HiOutlineClipboardList } from 'react-icons/hi'
+import * as React from 'react';
+import { useState } from 'react';
+import { TinaCMS } from '@toolkit/tina-cms';
+import { MdSyncProblem } from 'react-icons/md';
+import { HiOutlineClipboardList } from 'react-icons/hi';
 import {
   FullscreenModal,
   Modal,
   ModalBody,
   ModalHeader,
-} from '@toolkit/react-modals'
-import { BsCheckCircleFill, BsExclamationOctagonFill } from 'react-icons/bs'
-import { Button } from '@toolkit/styles'
+} from '@toolkit/react-modals';
+import { BsCheckCircleFill, BsExclamationOctagonFill } from 'react-icons/bs';
+import { Button } from '@toolkit/styles';
 
-type EventListState = 'loading' | 'success' | 'error' | 'unauthorized'
+type EventListState = 'loading' | 'success' | 'error' | 'unauthorized';
 
 export const useGetEvents = (
   cms: TinaCMS,
   cursor?: string,
   existingEvents?: {
-    message: string
-    id: string
-    timestamp: number
-    isError: boolean
-    isGlobal: boolean
+    message: string;
+    id: string;
+    timestamp: number;
+    isError: boolean;
+    isGlobal: boolean;
   }[]
 ) => {
   const [events, setEvents] = useState<
     {
-      message: string
-      id: string
-      timestamp: number
-      isError: boolean
-      isGlobal: boolean
+      message: string;
+      id: string;
+      timestamp: number;
+      isError: boolean;
+      isGlobal: boolean;
     }[]
-  >([])
-  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<Error | undefined>(undefined)
+  >([]);
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
   React.useEffect(() => {
     const fetchEvents = async () => {
-      let doFetchEvents = false
+      let doFetchEvents = false;
       if (!cms.api?.tina?.isCustomContentApi) {
-        doFetchEvents = await cms.api?.tina?.authProvider?.isAuthenticated()
+        doFetchEvents = await cms.api?.tina?.authProvider?.isAuthenticated();
       }
       if (doFetchEvents) {
         try {
           const { events: nextEvents, cursor: nextCursor } =
-            await cms.api.tina.fetchEvents(15, cursor)
-          setEvents([...existingEvents, ...nextEvents])
-          setNextCursor(nextCursor)
+            await cms.api.tina.fetchEvents(15, cursor);
+          setEvents([...existingEvents, ...nextEvents]);
+          setNextCursor(nextCursor);
         } catch (error) {
           cms.alerts.error(
             `[${error.name}] GetEvents failed: ${error.message}`,
             30 * 1000 // 30 seconds
-          )
-          console.error(error)
-          setEvents(undefined)
-          setError(error)
+          );
+          console.error(error);
+          setEvents(undefined);
+          setError(error);
         }
 
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    setLoading(true)
-    fetchEvents()
-  }, [cms, cursor])
+    setLoading(true);
+    fetchEvents();
+  }, [cms, cursor]);
 
-  return { events, cursor: nextCursor, loading, error }
-}
+  return { events, cursor: nextCursor, loading, error };
+};
 
 function useSyncStatus(cms) {
   const [syncStatus, setSyncStatus] = useState<{
-    state: EventListState
-    message: string
-  }>({ state: 'loading', message: 'Loading...' })
+    state: EventListState;
+    message: string;
+  }>({ state: 'loading', message: 'Loading...' });
 
   React.useEffect(() => {
     const interval = setInterval(async () => {
-      let doFetchEvents = false
+      let doFetchEvents = false;
       if (!cms.api?.tina?.isCustomContentApi) {
         // update this?
-        doFetchEvents = await cms.api?.tina?.authProvider?.isAuthenticated()
+        doFetchEvents = await cms.api?.tina?.authProvider?.isAuthenticated();
       }
       if (doFetchEvents) {
-        const { events } = await cms.api.tina.fetchEvents()
+        const { events } = await cms.api.tina.fetchEvents();
         if (events.length === 0) {
-          setSyncStatus({ state: 'success', message: 'No Events' })
+          setSyncStatus({ state: 'success', message: 'No Events' });
         } else {
           if (events[0].isError) {
             setSyncStatus({
               state: 'error',
               message: `Sync Failure ${events[0].message}`,
-            })
+            });
           } else {
-            setSyncStatus({ state: 'success', message: 'Sync Successful' })
+            setSyncStatus({ state: 'success', message: 'Sync Successful' });
           }
         }
       } else {
-        setSyncStatus({ state: 'unauthorized', message: 'Not Authenticated' })
+        setSyncStatus({ state: 'unauthorized', message: 'Not Authenticated' });
       }
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [cms.api?.tina?.isCustomContentApi])
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [cms.api?.tina?.isCustomContentApi]);
 
-  return syncStatus
+  return syncStatus;
 }
 
 export const SyncErrorWidget = ({ cms }: { cms: any }) => {
-  const syncStatus = useSyncStatus(cms)
+  const syncStatus = useSyncStatus(cms);
 
   if (syncStatus.state !== 'error') {
-    return null
+    return null;
   }
 
   return (
@@ -122,27 +122,27 @@ export const SyncErrorWidget = ({ cms }: { cms: any }) => {
     >
       <MdSyncProblem className='w-6 h-full ml-2 text-red-500 fill-current' />
     </div>
-  )
-}
+  );
+};
 
 const EventsList = ({ cms }) => {
-  const [cursor, setCursor] = React.useState<string | undefined>(undefined)
+  const [cursor, setCursor] = React.useState<string | undefined>(undefined);
   const [existingEvents, setExistingEvents] = React.useState<
     {
-      message: string
-      id: string
-      timestamp: number
-      isError: boolean
-      isGlobal: boolean
+      message: string;
+      id: string;
+      timestamp: number;
+      isError: boolean;
+      isGlobal: boolean;
     }[]
-  >([])
+  >([]);
 
   const {
     events,
     cursor: nextCursor,
     loading,
     error,
-  } = useGetEvents(cms, cursor, existingEvents)
+  } = useGetEvents(cms, cursor, existingEvents);
 
   return (
     <div className='flex flex-col gap-4 w-full h-full grow-0'>
@@ -151,8 +151,8 @@ const EventsList = ({ cms }) => {
           <table className='w-full divide-y divide-gray-100'>
             {events
               .map((event, index) => {
-                const date = new Date(event.timestamp).toDateString()
-                const time = new Date(event.timestamp).toTimeString()
+                const date = new Date(event.timestamp).toDateString();
+                const time = new Date(event.timestamp).toTimeString();
 
                 return (
                   <tr className={index % 2 === 0 ? '' : 'bg-gray-50'}>
@@ -192,7 +192,7 @@ const EventsList = ({ cms }) => {
                       </span>
                     </td>
                   </tr>
-                )
+                );
               })
               .flat()}
           </table>
@@ -205,16 +205,16 @@ const EventsList = ({ cms }) => {
       <div className='text-center flex-1'>
         <Button
           onClick={() => {
-            setExistingEvents(events)
-            setCursor(nextCursor)
+            setExistingEvents(events);
+            setCursor(nextCursor);
           }}
         >
           Load More Events
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export const SyncStatusModal = ({ closeEventsModal, cms }) => (
   <Modal>
@@ -225,16 +225,16 @@ export const SyncStatusModal = ({ closeEventsModal, cms }) => (
       </ModalBody>
     </FullscreenModal>
   </Modal>
-)
+);
 export const SyncStatus = ({ cms, setEventsOpen }) => {
-  const syncStatus = useSyncStatus(cms)
+  const syncStatus = useSyncStatus(cms);
 
   function openEventsModal() {
-    setEventsOpen(true)
+    setEventsOpen(true);
   }
 
   if (cms.api?.tina?.isCustomContentApi) {
-    return null
+    return null;
   }
 
   return (
@@ -251,5 +251,5 @@ export const SyncStatus = ({ cms, setEventsOpen }) => {
         Event Log
       </button>
     </>
-  )
-}
+  );
+};

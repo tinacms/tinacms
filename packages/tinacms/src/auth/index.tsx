@@ -2,5 +2,5 @@
 
 */
 
-export * from './TinaCloudProvider'
-export * from './useTinaAuthRedirect'
+export * from './TinaCloudProvider';
+export * from './useTinaAuthRedirect';

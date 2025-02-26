@@ -3,54 +3,54 @@
 */
 
 const capitalize = (s: string) => {
-  if (typeof s !== 'string') return ''
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
+  if (typeof s !== 'string') return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
 const generateNamespacedFieldName = (names: string[], suffix: string = '') => {
-  return (suffix ? [...names, suffix] : names).map(capitalize).join('')
-}
+  return (suffix ? [...names, suffix] : names).map(capitalize).join('');
+};
 
 export const NAMER = {
   dataFilterTypeNameOn: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, '_FilterOn')
+    return generateNamespacedFieldName(namespace, '_FilterOn');
   },
   dataFilterTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Filter')
+    return generateNamespacedFieldName(namespace, 'Filter');
   },
   dataMutationTypeNameOn: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, '_MutationOn')
+    return generateNamespacedFieldName(namespace, '_MutationOn');
   },
   dataMutationTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Mutation')
+    return generateNamespacedFieldName(namespace, 'Mutation');
   },
   updateName: (namespace: string[]) => {
-    return 'update' + generateNamespacedFieldName(namespace, 'Document')
+    return 'update' + generateNamespacedFieldName(namespace, 'Document');
   },
   createName: (namespace: string[]) => {
-    return 'create' + generateNamespacedFieldName(namespace, 'Document')
+    return 'create' + generateNamespacedFieldName(namespace, 'Document');
   },
   queryName: (namespace: string[]) => {
-    return 'get' + generateNamespacedFieldName(namespace, 'Document')
+    return 'get' + generateNamespacedFieldName(namespace, 'Document');
   },
   generateQueryListName: (namespace: string[]) => {
-    return 'get' + generateNamespacedFieldName(namespace, 'List')
+    return 'get' + generateNamespacedFieldName(namespace, 'List');
   },
   fragmentName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, '') + 'Parts'
+    return generateNamespacedFieldName(namespace, '') + 'Parts';
   },
   collectionTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Collection')
+    return generateNamespacedFieldName(namespace, 'Collection');
   },
   documentTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Document')
+    return generateNamespacedFieldName(namespace, 'Document');
   },
   dataTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, '')
+    return generateNamespacedFieldName(namespace, '');
   },
   referenceConnectionType: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Connection')
+    return generateNamespacedFieldName(namespace, 'Connection');
   },
   referenceConnectionEdgesTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'ConnectionEdges')
+    return generateNamespacedFieldName(namespace, 'ConnectionEdges');
   },
-}
+};

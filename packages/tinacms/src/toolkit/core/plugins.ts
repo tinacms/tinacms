@@ -25,7 +25,7 @@
  * @packageDocumentation
  */
 
-import { EventBus, Callback } from './event'
+import { EventBus, Callback } from './event';
 
 /**
  * An object used to extend or modify the behaviour of the content management system.
@@ -34,13 +34,13 @@ export interface Plugin {
   /**
    * Used to organize plugins with a common purpose.
    */
-  __type: string
+  __type: string;
   /**
    * A unique identifier for the plugin.
    *
    * @todo Rename to `id`.
    */
-  name: string
+  name: string;
   /**
    * A string referencing an icon.
    *
@@ -48,7 +48,7 @@ export interface Plugin {
    *
    * This shouldn't be here. Please assume it isn't.
    */
-  icon?: string
+  icon?: string;
 }
 
 /**
@@ -58,7 +58,7 @@ export class PluginTypeManager {
   /**
    * @ignore
    */
-  private plugins: Map<PluginType> = {}
+  private plugins: Map<PluginType> = {};
 
   constructor(private events: EventBus) {}
 
@@ -85,7 +85,7 @@ export class PluginTypeManager {
    */
   getType<P extends Plugin = Plugin>(type: P['__type']): PluginType<P> {
     return (this.plugins[type] =
-      this.plugins[type] || new PluginType(type, this.events)) as PluginType<P>
+      this.plugins[type] || new PluginType(type, this.events)) as PluginType<P>;
   }
 
   /**
@@ -96,7 +96,7 @@ export class PluginTypeManager {
    * This name is unnecessarily verbose and weird.
    */
   findOrCreateMap<P extends Plugin = Plugin>(type: P['__type']): PluginType<P> {
-    return this.getType(type)
+    return this.getType(type);
   }
 
   /**
@@ -130,7 +130,7 @@ export class PluginTypeManager {
    * @todo Consider returning the plugin which was just added.
    */
   add<P extends Plugin = Plugin>(plugin: P) {
-    this.findOrCreateMap(plugin.__type).add(plugin)
+    this.findOrCreateMap(plugin.__type).add(plugin);
   }
 
   /**
@@ -160,7 +160,7 @@ export class PluginTypeManager {
    * @param plugin The plugin to be removed from the CMS.
    */
   remove<P extends Plugin = Plugin>(plugin: P) {
-    this.findOrCreateMap(plugin.__type).remove(plugin)
+    this.findOrCreateMap(plugin.__type).remove(plugin);
   }
 
   /**
@@ -190,7 +190,7 @@ export class PluginTypeManager {
    * @returns An array of all plugins of the given type.
    */
   all<P extends Plugin = Plugin>(type: string): P[] {
-    return this.findOrCreateMap<P>(type).all()
+    return this.findOrCreateMap<P>(type).all();
   }
 }
 
@@ -198,13 +198,13 @@ export class PluginTypeManager {
  * @ignore
  */
 interface Map<T> {
-  [key: string]: T
+  [key: string]: T;
 }
 
 /**
  * @ignore
  */
-type PluginMap<T extends Plugin = Plugin> = Map<T>
+type PluginMap<T extends Plugin = Plugin> = Map<T>;
 
 /**
  * A collection of plugins with the same `__type` value.
@@ -213,7 +213,7 @@ export class PluginType<T extends Plugin = Plugin> {
   /**
    * @ignore
    */
-  __plugins: PluginMap<T> = {}
+  __plugins: PluginMap<T> = {};
 
   /**
    *
@@ -242,18 +242,18 @@ export class PluginType<T extends Plugin = Plugin> {
    * @param plugin A new plugin. The `__type` is optional and will be added if it's missing.
    */
   add(plugin: T | Omit<T, '__type'>) {
-    const p = plugin as T
+    const p = plugin as T;
 
     if (!p.__type) {
-      p.__type = this.__type
+      p.__type = this.__type;
     }
 
-    this.__plugins[p.name] = p
-    this.events.dispatch({ type: `plugin:add:${this.__type}` })
+    this.__plugins[p.name] = p;
+    this.events.dispatch({ type: `plugin:add:${this.__type}` });
   }
 
   all(): T[] {
-    return Object.keys(this.__plugins).map((name) => this.__plugins[name])
+    return Object.keys(this.__plugins).map((name) => this.__plugins[name]);
   }
 
   /**
@@ -274,7 +274,7 @@ export class PluginType<T extends Plugin = Plugin> {
    * @param name The `name` of the plugin to be retrieved.
    */
   find(name: string): T | undefined {
-    return this.__plugins[name]
+    return this.__plugins[name];
   }
 
   /**
@@ -286,16 +286,16 @@ export class PluginType<T extends Plugin = Plugin> {
    */
   remove(pluginOrName: string | T): T | undefined {
     const name =
-      typeof pluginOrName === 'string' ? pluginOrName : pluginOrName.name
+      typeof pluginOrName === 'string' ? pluginOrName : pluginOrName.name;
 
-    const plugin = this.__plugins[name]
+    const plugin = this.__plugins[name];
 
-    delete this.__plugins[name]
-    this.events.dispatch({ type: `plugin:remove:${this.__type}` })
+    delete this.__plugins[name];
+    this.events.dispatch({ type: `plugin:remove:${this.__type}` });
 
-    return plugin
+    return plugin;
   }
   subscribe(cb: Callback): () => void {
-    return this.events.subscribe(`plugin:*:${this.__type}`, cb)
+    return this.events.subscribe(`plugin:*:${this.__type}`, cb);
   }
 }

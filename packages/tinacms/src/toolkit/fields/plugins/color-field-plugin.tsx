@@ -1,12 +1,12 @@
-import * as React from 'react'
-import { ColorPicker, InputProps } from '../components'
-import { wrapFieldsWithMeta } from './wrap-field-with-meta'
-import { parse } from './text-format'
+import * as React from 'react';
+import { ColorPicker, InputProps } from '../components';
+import { wrapFieldsWithMeta } from './wrap-field-with-meta';
+import { parse } from './text-format';
 
 export interface ColorFieldProps {
-  colorFormat: string
-  colors: string[]
-  widget?: 'sketch' | 'block'
+  colorFormat: string;
+  colors: string[];
+  widget?: 'sketch' | 'block';
 }
 export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
   ({ input, field }) => {
@@ -17,15 +17,15 @@ export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
         widget={(field as any).widget}
         input={input}
       />
-    )
+    );
   }
-)
+);
 
 export const ColorFieldPlugin = {
   name: 'color',
   Component: ColorField,
   parse,
   validate(value: any, values: any, meta: any, field: any) {
-    if (field.required && !value) return 'Required'
+    if (field.required && !value) return 'Required';
   },
-}
+};

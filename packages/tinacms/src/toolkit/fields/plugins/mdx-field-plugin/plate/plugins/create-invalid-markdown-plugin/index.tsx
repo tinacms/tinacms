@@ -1,9 +1,9 @@
-import React from 'react'
-import { createPluginFactory } from '@udecode/plate-common'
-import { useEditorContext } from '../../editor-context'
-import { buildErrorMessage } from '../../../monaco/error-message'
+import React from 'react';
+import { createPluginFactory } from '@udecode/plate-common';
+import { useEditorContext } from '../../editor-context';
+import { buildErrorMessage } from '../../../monaco/error-message';
 
-export const ELEMENT_INVALID_MARKDOWN = 'invalid_markdown'
+export const ELEMENT_INVALID_MARKDOWN = 'invalid_markdown';
 
 export const createInvalidMarkdownPlugin = createPluginFactory({
   key: ELEMENT_INVALID_MARKDOWN,
@@ -16,13 +16,13 @@ export const createInvalidMarkdownPlugin = createPluginFactory({
         <ErrorMessage error={element} />
         {children}
       </div>
-    )
+    );
   },
-})
+});
 
 export function ErrorMessage({ error }) {
-  const message = buildErrorMessage(error)
-  const { setRawMode } = useEditorContext()
+  const message = buildErrorMessage(error);
+  const { setRawMode } = useEditorContext();
   return (
     <div contentEditable={false} className='bg-red-50 sm:rounded-lg'>
       <div className='px-4 py-5 sm:p-6'>
@@ -42,5 +42,5 @@ export function ErrorMessage({ error }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

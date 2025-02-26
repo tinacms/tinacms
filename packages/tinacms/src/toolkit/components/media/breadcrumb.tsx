@@ -1,16 +1,16 @@
-import React from 'react'
-import { LeftArrowIcon } from '@toolkit/icons'
-import { IconButton } from '@toolkit/styles'
+import React from 'react';
+import { LeftArrowIcon } from '@toolkit/icons';
+import { IconButton } from '@toolkit/styles';
 
 // Fixed issue where dirname was being used in the frontend
 function dirname(path): string | undefined {
-  const pattern = new RegExp('(?<prevDir>.*)/')
-  return path.match(pattern)?.groups?.prevDir
+  const pattern = new RegExp('(?<prevDir>.*)/');
+  return path.match(pattern)?.groups?.prevDir;
 }
 
 interface BreadcrumbProps {
-  directory?: string
-  setDirectory: (_directory: string) => void
+  directory?: string;
+  setDirectory: (_directory: string) => void;
 }
 
 const BreadcrumbButton = ({ className = '', ...props }) => (
@@ -21,14 +21,14 @@ const BreadcrumbButton = ({ className = '', ...props }) => (
     }
     {...props}
   />
-)
+);
 
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
-  directory = directory.replace(/^\/|\/$/g, '')
+  directory = directory.replace(/^\/|\/$/g, '');
 
-  let prevDir: string = dirname(directory) || ''
+  let prevDir: string = dirname(directory) || '';
   if (prevDir === '.') {
-    prevDir = ''
+    prevDir = '';
   }
 
   return (
@@ -56,7 +56,7 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
       </BreadcrumbButton>
       {directory &&
         directory.split('/').map((part, index, parts) => {
-          const currentDir = parts.slice(0, index + 1).join('/')
+          const currentDir = parts.slice(0, index + 1).join('/');
           return (
             <BreadcrumbButton
               className={
@@ -67,13 +67,13 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
               }
               key={currentDir}
               onClick={() => {
-                setDirectory(currentDir)
+                setDirectory(currentDir);
               }}
             >
               {part}
             </BreadcrumbButton>
-          )
+          );
         })}
     </div>
-  )
+  );
 }

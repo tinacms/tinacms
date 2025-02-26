@@ -1,11 +1,11 @@
-import * as React from 'react'
-import { FieldProps } from './field-props'
-import { useEvent } from '@toolkit/react-core/use-cms-event'
-import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events'
-import { Form } from '@toolkit/forms'
+import * as React from 'react';
+import { FieldProps } from './field-props';
+import { useEvent } from '@toolkit/react-core/use-cms-event';
+import { FieldHoverEvent, FieldFocusEvent } from '@toolkit/fields/field-events';
+import { Form } from '@toolkit/forms';
 
 export type InputFieldType<ExtraFieldProps, InputProps> =
-  FieldProps<InputProps> & ExtraFieldProps
+  FieldProps<InputProps> & ExtraFieldProps;
 
 // Wraps the Field component in labels describing the field's meta state
 // Add any other fields that the Field component should expect onto the ExtraFieldProps generic type
@@ -26,8 +26,8 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
       >
         <Field {...props} />
       </FieldMeta>
-    )
-  }
+    );
+  };
 }
 
 /**
@@ -50,8 +50,8 @@ export function wrapFieldWithNoHeader<ExtraFieldProps = {}, InputProps = {}>(
       >
         <Field {...props} />
       </FieldMeta>
-    )
-  }
+    );
+  };
 }
 
 /**
@@ -75,19 +75,19 @@ export function wrapFieldWithError<ExtraFieldProps = {}, InputProps = {}>(
       >
         <Field {...props} />
       </FieldMeta>
-    )
-  }
+    );
+  };
 }
 
 interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
-  name: string
-  children: any
-  label?: string | boolean
-  description?: string
-  error?: string
-  margin?: boolean
-  index?: number
-  tinaForm: Form
+  name: string;
+  children: any;
+  label?: string | boolean;
+  description?: string;
+  error?: string;
+  margin?: boolean;
+  index?: number;
+  tinaForm: Form;
 }
 
 export const FieldMeta = ({
@@ -101,8 +101,10 @@ export const FieldMeta = ({
   tinaForm,
   ...props
 }: FieldMetaProps) => {
-  const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
-  const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
+  const { dispatch: setHoveredField } =
+    useEvent<FieldHoverEvent>('field:hover');
+  const { dispatch: setFocusedField } =
+    useEvent<FieldFocusEvent>('field:focus');
   return (
     <FieldWrapper
       margin={margin}
@@ -126,28 +128,28 @@ export const FieldMeta = ({
      */}
       {error && typeof error === 'string' && <FieldError>{error}</FieldError>}
     </FieldWrapper>
-  )
-}
+  );
+};
 
 export const FieldWrapper = ({
   margin,
   children,
   ...props
 }: {
-  margin: boolean
-  children: React.ReactNode
+  margin: boolean;
+  children: React.ReactNode;
 } & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
   return (
     <div className={`relative ${margin ? `mb-5 last:mb-0` : ``}`} {...props}>
       {children}
     </div>
-  )
-}
+  );
+};
 
 export interface FieldLabel extends React.HTMLAttributes<HTMLLabelElement> {
-  children?: any | any[]
-  className?: string
-  name?: string
+  children?: any | any[];
+  className?: string;
+  name?: string;
 }
 
 export const FieldLabel = ({
@@ -164,16 +166,16 @@ export const FieldLabel = ({
     >
       {children}
     </label>
-  )
-}
+  );
+};
 
 export const FieldDescription = ({
   children,
   className,
   ...props
 }: {
-  children?: any | any[]
-  className?: string
+  children?: any | any[];
+  className?: string;
 }) => {
   if (typeof children === 'string') {
     return (
@@ -182,7 +184,7 @@ export const FieldDescription = ({
         {...props}
         dangerouslySetInnerHTML={{ __html: children }}
       />
-    )
+    );
   }
   return (
     <span
@@ -191,16 +193,16 @@ export const FieldDescription = ({
     >
       {children}
     </span>
-  )
-}
+  );
+};
 
 export const FieldError = ({
   children,
   className,
   ...props
 }: {
-  children?: any | any[]
-  className?: string
+  children?: any | any[];
+  className?: string;
 }) => {
   return (
     <span
@@ -209,5 +211,5 @@ export const FieldError = ({
     >
       {children}
     </span>
-  )
-}
+  );
+};

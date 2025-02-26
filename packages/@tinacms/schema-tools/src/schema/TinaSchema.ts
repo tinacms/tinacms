@@ -1,4 +1,4 @@
-import picomatch from 'picomatch'
+import picomatch from 'picomatch';
 
 import type {
   Schema,
@@ -7,20 +7,20 @@ import type {
   Collectable,
   CollectionTemplateable,
   TinaField,
-} from '../types/index'
-import { lastItem, assertShape } from '../util'
-import { normalizePath } from '../util/normalizePath'
+} from '../types/index';
+import { lastItem, assertShape } from '../util';
+import { normalizePath } from '../util/normalizePath';
 
 type Version = {
-  fullVersion: string
-  major: string
-  minor: string
-  patch: string
-}
+  fullVersion: string;
+  major: string;
+  minor: string;
+  patch: string;
+};
 
 type Meta = {
-  flags?: string[]
-}
+  flags?: string[];
+};
 
 /**
  * TinaSchema is responsible for allowing you to look up certain
@@ -28,78 +28,78 @@ type Meta = {
  *
  */
 export class TinaSchema {
-  public schema: Schema<true>
+  public schema: Schema<true>;
   /**
    * Create a schema class from a user defined schema object
    */
   constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
-    this.schema = config
+    this.schema = config;
     this.walkFields(({ field, collection, path }) => {
       // set defaults for field searchability
       if (!('searchable' in field)) {
         if (field.type === 'image') {
-          field.searchable = false
+          field.searchable = false;
         } else {
-          field.searchable = true
+          field.searchable = true;
         }
       }
       if (field.type === 'rich-text') {
         if (field.parser) {
-          return
+          return;
         }
         if (collection.format === 'mdx') {
-          field.parser = { type: 'mdx' }
+          field.parser = { type: 'mdx' };
         } else {
-          field.parser = { type: 'markdown' }
+          field.parser = { type: 'markdown' };
         }
       }
-      field.uid = field.uid || false
-    })
+      field.uid = field.uid || false;
+    });
   }
   public getIsTitleFieldName = (collection: string) => {
-    const col = this.getCollection(collection)
-    const field = col?.fields?.find((x) => x.type === 'string' && x.isTitle)
-    return field?.name
-  }
+    const col = this.getCollection(collection);
+    const field = col?.fields?.find((x) => x.type === 'string' && x.isTitle);
+    return field?.name;
+  };
 
   public getCollectionsByName = (collectionNames: string[]) => {
     return this.schema.collections.filter((collection) =>
       collectionNames.includes(collection.name)
-    )
-  }
+    );
+  };
 
   public findReferences(name: string) {
-    const result: Record<string, { path: string[]; field: TinaField }[]> = {}
+    const result: Record<string, { path: string[]; field: TinaField }[]> = {};
     this.walkFields(({ field, collection: c, path }) => {
       if (field.type === 'reference') {
         if (field.collections.includes(name)) {
           if (result[c.name] === undefined) {
-            result[c.name] = []
+            result[c.name] = [];
           }
-          result[c.name].push({ path, field })
+          result[c.name].push({ path, field });
         }
       }
-    })
-    return result
+    });
+    return result;
   }
 
   public getCollection = (collectionName: string): Collection<true> => {
     const collection = this.schema.collections.find(
       (collection) => collection.name === collectionName
-    )
+    );
     if (!collection) {
-      throw new Error(`Expected to find collection named ${collectionName}`)
+      throw new Error(`Expected to find collection named ${collectionName}`);
     }
-    const extraFields: { [key: string]: object[] } = {}
-    const templateInfo = this.getTemplatesForCollectable(collection)
+    const extraFields: { [key: string]: object[] } = {};
+    const templateInfo = this.getTemplatesForCollectable(collection);
     switch (templateInfo.type) {
       case 'object':
-        extraFields.fields = templateInfo.template.fields
-        break
+        extraFields.fields = templateInfo.template.fields;
+        break;
       case 'union':
-        extraFields.templates = templateInfo.templates
-        break
+        extraFields.templates = templateInfo.templates;
+        break;
     }
     return {
       // @ts-ignore FIXME: backwards compatibility, using `slug` should probably be deprecated
@@ -107,18 +107,18 @@ export class TinaSchema {
       ...extraFields,
       ...collection,
       format: collection.format || 'md',
-    }
-  }
+    };
+  };
   public getCollections = () => {
     return (
       this.schema.collections.map((collection) =>
         this.getCollection(collection.name)
       ) || []
-    )
-  }
+    );
+  };
   public getCollectionByFullPath = (filepath: string) => {
-    const fileExtension = filepath.split('.').pop()
-    const normalizedPath = filepath.replace(/\\/g, '/')
+    const fileExtension = filepath.split('.').pop();
+    const normalizedPath = filepath.replace(/\\/g, '/');
 
     const possibleCollections = this.getCollections().filter((collection) => {
       // filter out file extensions that don't match the collection format
@@ -126,29 +126,29 @@ export class TinaSchema {
         !normalizedPath.endsWith(`.gitkeep.${collection.format || 'md'}`) &&
         fileExtension !== (collection.format || 'md')
       ) {
-        return false
+        return false;
       }
       if (collection?.match?.include || collection?.match?.exclude) {
         // if the collection has a match or exclude, we need to check if the file matches
-        const matches = this.getMatches({ collection })
-        const match = picomatch.isMatch(normalizedPath, matches)
+        const matches = this.getMatches({ collection });
+        const match = picomatch.isMatch(normalizedPath, matches);
 
         if (!match) {
-          return false
+          return false;
         }
       }
       // add / to the end of the path if it is not "''"
-      const path = collection.path ? collection.path.replace(/\/?$/, '/') : ''
-      return normalizedPath.startsWith(path)
-    })
+      const path = collection.path ? collection.path.replace(/\/?$/, '/') : '';
+      return normalizedPath.startsWith(path);
+    });
 
     // No matches
     if (possibleCollections.length === 0) {
-      throw new Error(`Unable to find collection for file at ${filepath}`)
+      throw new Error(`Unable to find collection for file at ${filepath}`);
     }
     // One match
     if (possibleCollections.length === 1) {
-      return possibleCollections[0]
+      return possibleCollections[0];
     }
     if (possibleCollections.length > 1) {
       /**
@@ -181,139 +181,139 @@ export class TinaSchema {
        */
       const longestMatch = possibleCollections.reduce((acc, collection) => {
         if (collection.path.length > acc.path.length) {
-          return collection
+          return collection;
         }
-        return acc
-      })
-      return longestMatch
+        return acc;
+      });
+      return longestMatch;
     }
-  }
+  };
 
   public getCollectionAndTemplateByFullPath = (
     filepath: string,
     templateName?: string
   ):
     | {
-        collection: Collection<true>
-        template: Template<true>
+        collection: Collection<true>;
+        template: Template<true>;
       }
     | undefined => {
-    const collection = this.getCollectionByFullPath(filepath)
+    const collection = this.getCollectionByFullPath(filepath);
 
     if (!collection) {
-      return undefined
+      return undefined;
     }
-    let template: Template<true>
+    let template: Template<true>;
 
-    const templates = this.getTemplatesForCollectable(collection)
+    const templates = this.getTemplatesForCollectable(collection);
     if (templates.type === 'union') {
       if (templateName) {
         template = templates.templates.find(
           (template) => lastItem(template.namespace) === templateName
-        )
+        );
         if (!template) {
           throw new Error(
             `Unable to determine template for item at ${filepath}`
-          )
+          );
         }
       } else {
         throw new Error(
           `Unable to determine template for item at ${filepath}, no template name provided for collection with multiple templates`
-        )
+        );
       }
     }
     if (templates.type === 'object') {
-      template = templates.template
+      template = templates.template;
     }
     if (!template) {
       throw new Error(
         `Something went wrong while trying to determine template for ${filepath}`
-      )
+      );
     }
 
-    return { collection: collection, template: template }
-  }
+    return { collection: collection, template: template };
+  };
 
   public getTemplateForData = ({
     data,
     collection,
   }: {
-    data?: unknown
-    collection: Collectable
+    data?: unknown;
+    collection: Collectable;
   }): Template<true> => {
-    const templateInfo = this.getTemplatesForCollectable(collection)
+    const templateInfo = this.getTemplatesForCollectable(collection);
     switch (templateInfo.type) {
       case 'object':
-        return templateInfo.template
+        return templateInfo.template;
       case 'union': {
         assertShape<{ _template: string }>(data, (yup) =>
           yup.object({ _template: yup.string().required() })
-        )
+        );
         const template = templateInfo.templates.find(
           (template) =>
             template.namespace[template.namespace.length - 1] === data._template
-        )
+        );
         if (!template) {
           // TODO: This should be a tina error
           throw new Error(
             `Expected to find template named '${
               data._template
             }' for collection '${lastItem(collection.namespace)}'`
-          )
+          );
         }
-        return template
+        return template;
       }
     }
-  }
+  };
 
   public transformPayload = (collectionName: string, payload: object) => {
-    const collection = this.getCollection(collectionName)
+    const collection = this.getCollection(collectionName);
     if (collection.templates) {
       const template = collection.templates.find((template) => {
         if (typeof template === 'string') {
-          throw new Error('Global templates not supported')
+          throw new Error('Global templates not supported');
         }
         // TECH DEBT: This is a hack - Refactor this later.
-        return (payload as any)?._template === template.name
-      })
+        return (payload as any)?._template === template.name;
+      });
       if (!template) {
-        console.error(payload)
-        throw new Error('Unable to find template for payload')
+        console.error(payload);
+        throw new Error('Unable to find template for payload');
       }
       if (typeof template === 'string') {
-        throw new Error('Global templates not supported')
+        throw new Error('Global templates not supported');
       }
       return {
         [collectionName]: {
           [template.name]: this.transformCollectablePayload(payload, template),
         },
-      }
+      };
     }
     return {
       [collectionName]: this.transformCollectablePayload(payload, collection),
-    }
-  }
+    };
+  };
   private transformCollectablePayload = (
     payload: object,
     collection: Collectable
   ) => {
-    const accumulator: { [key: string]: unknown } = {}
+    const accumulator: { [key: string]: unknown } = {};
     Object.entries(payload).forEach(([key, value]) => {
       if (typeof collection.fields === 'string') {
-        throw new Error('Global templates not supported')
+        throw new Error('Global templates not supported');
       }
       const field = collection?.fields?.find((field) => {
         if (typeof field === 'string') {
-          throw new Error('Global templates not supported')
+          throw new Error('Global templates not supported');
         }
-        return field.name === key
-      })
+        return field.name === key;
+      });
       if (field) {
-        accumulator[key] = this.transformField(field, value)
+        accumulator[key] = this.transformField(field, value);
       }
-    })
-    return accumulator
-  }
+    });
+    return accumulator;
+  };
 
   private transformField = (field: TinaField<true>, value: unknown) => {
     if (field.type === 'object')
@@ -321,61 +321,61 @@ export class TinaSchema {
         if (field.list) {
           assertShape<{ _template: string }[]>(value, (yup) =>
             yup.array(yup.object({ _template: yup.string().required() }))
-          )
+          );
           return value.map((item) => {
-            const { _template, ...rest } = item
+            const { _template, ...rest } = item;
             const template = field.templates.find((template) => {
               if (typeof template === 'string') {
-                return false
+                return false;
               }
-              return template.name === _template
-            })
+              return template.name === _template;
+            });
             if (typeof template === 'string') {
-              throw new Error('Global templates not supported')
+              throw new Error('Global templates not supported');
             }
 
             if (!template) {
-              throw new Error(`Expected to find template named '${_template}'`)
+              throw new Error(`Expected to find template named '${_template}'`);
             }
             return {
               [_template]: this.transformCollectablePayload(rest, template),
-            }
-          })
+            };
+          });
         } else {
           assertShape<{ _template: string }>(value, (yup) =>
             yup.object({ _template: yup.string().required() })
-          )
-          const { _template, ...rest } = value
-          return { [_template]: this.transformCollectablePayload(rest, field) }
+          );
+          const { _template, ...rest } = value;
+          return { [_template]: this.transformCollectablePayload(rest, field) };
         }
       } else {
         if (field.list) {
-          assertShape<object[]>(value, (yup) => yup.array(yup.object()))
+          assertShape<object[]>(value, (yup) => yup.array(yup.object()));
           return value.map((item) => {
-            return this.transformCollectablePayload(item, field)
-          })
+            return this.transformCollectablePayload(item, field);
+          });
         } else {
-          assertShape<object>(value, (yup) => yup.object())
-          return this.transformCollectablePayload(value, field)
+          assertShape<object>(value, (yup) => yup.object());
+          return this.transformCollectablePayload(value, field);
         }
       }
     else {
-      return value
+      return value;
     }
-  }
+  };
 
   public isMarkdownCollection = (collectionName: string) => {
-    const collection = this.getCollection(collectionName)
-    const format = collection.format
+    const collection = this.getCollection(collectionName);
+    const format = collection.format;
     // markdown by default
     if (!format) {
-      return true
+      return true;
     }
     if (['markdown', 'md'].includes(format)) {
-      return true
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   /**
    * Gets the template or templates from the item.
@@ -391,15 +391,15 @@ export class TinaSchema {
   public getTemplatesForCollectable = (
     collection: Collectable
   ): CollectionTemplateable => {
-    const extraFields: TinaField<true>[] = []
+    const extraFields: TinaField<true>[] = [];
     if (collection?.fields) {
-      const template = collection
+      const template = collection;
 
       if (
         typeof template.fields === 'string' ||
         typeof template.fields === 'undefined'
       ) {
-        throw new Error('Expected template to have fields but none were found')
+        throw new Error('Expected template to have fields but none were found');
       }
 
       return {
@@ -409,40 +409,40 @@ export class TinaSchema {
           ...template,
           fields: [...template.fields, ...extraFields],
         },
-      }
+      };
     } else {
       if (collection?.templates) {
         return {
           namespace: collection.namespace,
           type: 'union',
           templates: collection.templates.map((templateOrTemplateString) => {
-            const template = templateOrTemplateString
+            const template = templateOrTemplateString;
             return {
               ...template,
               fields: [...template.fields, ...extraFields],
-            }
+            };
           }),
-        }
+        };
       } else {
         throw new Error(
           `Expected either fields or templates array to be defined on collection ${collection.namespace.join(
             '_'
           )}`
-        )
+        );
       }
     }
-  }
+  };
   public walkFields = (
     cb: (args: {
-      field: TinaField
-      collection: Collection
-      path: string[]
+      field: TinaField;
+      collection: Collection;
+      path: string[];
     }) => void
   ) => {
     const walk = (
       collectionOrObject: {
-        templates?: Template[]
-        fields?: TinaField[]
+        templates?: Template[];
+        fields?: TinaField[];
       },
       collection: Collection,
       path: string[]
@@ -450,22 +450,22 @@ export class TinaSchema {
       if (collectionOrObject.templates) {
         collectionOrObject.templates.forEach((template) => {
           template.fields.forEach((field) => {
-            cb({ field, collection, path: [...path, template.name] })
-          })
-        })
+            cb({ field, collection, path: [...path, template.name] });
+          });
+        });
       }
       if (collectionOrObject.fields) {
         collectionOrObject.fields.forEach((field) => {
-          cb({ field, collection, path: [...path, field.name] })
+          cb({ field, collection, path: [...path, field.name] });
           if (field.type === 'rich-text' || field.type === 'object') {
-            walk(field, collection, [...path, field.name])
+            walk(field, collection, [...path, field.name]);
           }
-        })
+        });
       }
-    }
-    const collections = this.getCollections()
-    collections.forEach((collection) => walk(collection, collection, []))
-  }
+    };
+    const collections = this.getCollections();
+    collections.forEach((collection) => walk(collection, collection, []));
+  };
 
   /**
    * This function returns an array of glob matches for a given collection.
@@ -476,39 +476,39 @@ export class TinaSchema {
   public getMatches({
     collection: collectionOrString,
   }: {
-    collection: string | Collection
+    collection: string | Collection;
   }) {
     const collection =
       typeof collectionOrString === 'string'
         ? this.getCollection(collectionOrString)
-        : collectionOrString
-    const normalPath = normalizePath(collection.path)
+        : collectionOrString;
+    const normalPath = normalizePath(collection.path);
 
     // if normalPath is empty, we don't want to add a trailing slash
-    const pathSuffix = normalPath ? '/' : ''
-    const format = collection.format || 'md'
-    const matches: string[] = []
+    const pathSuffix = normalPath ? '/' : '';
+    const format = collection.format || 'md';
+    const matches: string[] = [];
     if (collection?.match?.include) {
-      const match = `${normalPath}${pathSuffix}${collection.match.include}.${format}`
-      matches.push(match)
+      const match = `${normalPath}${pathSuffix}${collection.match.include}.${format}`;
+      matches.push(match);
     }
     if (collection?.match?.exclude) {
-      const exclude = `!(${normalPath}${pathSuffix}${collection.match.exclude}.${format})`
-      matches.push(exclude)
+      const exclude = `!(${normalPath}${pathSuffix}${collection.match.exclude}.${format})`;
+      matches.push(exclude);
     }
-    return matches
+    return matches;
   }
 
   public matchFiles({
     collection,
     files,
   }: {
-    collection: string | Collection
-    files: string[]
+    collection: string | Collection;
+    files: string[];
   }) {
-    const matches = this.getMatches({ collection })
-    const matcher = picomatch(matches)
-    const matchedFiles = files.filter((file) => matcher(file))
-    return matchedFiles
+    const matches = this.getMatches({ collection });
+    const matcher = picomatch(matches);
+    const matchedFiles = files.filter((file) => matcher(file));
+    return matchedFiles;
   }
 }

@@ -1,6 +1,6 @@
-import React from 'react'
-import { OptionComponentProps } from '../model/option-component-props'
-import { CommandItem } from './command'
+import React from 'react';
+import { OptionComponentProps } from '../model/option-component-props';
+import { CommandItem } from './command';
 
 const OptionComponent: React.FC<OptionComponentProps> = ({
   id,
@@ -15,7 +15,7 @@ const OptionComponent: React.FC<OptionComponentProps> = ({
       key={`${id}-option`}
       value={id}
       onSelect={(currentValue) => {
-        onSelect(currentValue === value ? '' : currentValue)
+        onSelect(currentValue === value ? '' : currentValue);
       }}
     >
       <div className='flex flex-col w-full'>
@@ -26,7 +26,7 @@ const OptionComponent: React.FC<OptionComponentProps> = ({
         )}
       </div>
     </CommandItem>
-  )
-}
+  );
+};
 
-export default OptionComponent
+export default OptionComponent;

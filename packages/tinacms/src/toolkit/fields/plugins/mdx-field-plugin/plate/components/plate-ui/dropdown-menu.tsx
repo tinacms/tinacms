@@ -1,7 +1,7 @@
-'use client'
-import React, { useCallback, useState } from 'react'
+'use client';
+import React, { useCallback, useState } from 'react';
 
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import {
   cn,
   createPrimitiveElement,
@@ -9,27 +9,27 @@ import {
   withProps,
   withRef,
   withVariants,
-} from '@udecode/cn'
-import { cva } from 'class-variance-authority'
+} from '@udecode/cn';
+import { cva } from 'class-variance-authority';
 
-import { Icons } from './icons'
+import { Icons } from './icons';
 
-export const DropdownMenu = DropdownMenuPrimitive.Root
+export const DropdownMenu = DropdownMenuPrimitive.Root;
 
-export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
+export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
-export const DropdownMenuGroup = DropdownMenuPrimitive.Group
+export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
-export const DropdownMenuPortal = DropdownMenuPrimitive.Portal
+export const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
 
-export const DropdownMenuSub = DropdownMenuPrimitive.Sub
+export const DropdownMenuSub = DropdownMenuPrimitive.Sub;
 
-export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
+export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
 export const DropdownMenuSubTrigger = withRef<
   typeof DropdownMenuPrimitive.SubTrigger,
   {
-    inset?: boolean
+    inset?: boolean;
   }
 >(({ children, className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.SubTrigger
@@ -45,19 +45,19 @@ export const DropdownMenuSubTrigger = withRef<
     {children}
     <Icons.chevronRight className='ml-auto size-4' />
   </DropdownMenuPrimitive.SubTrigger>
-))
+));
 
 export const DropdownMenuSubContent = withCn(
   DropdownMenuPrimitive.SubContent,
   'z-[99999] min-w-32 overflow-hidden rounded-md border bg-white p-1 text-black shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2'
-)
+);
 
 const DropdownMenuContentVariants = withProps(DropdownMenuPrimitive.Content, {
   className: cn(
     'z-[99999] min-w-32 overflow-hidden rounded-md border bg-white p-1 text-black shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2'
   ),
   sideOffset: 4,
-})
+});
 
 export const DropdownMenuContent = withRef<
   typeof DropdownMenuPrimitive.Content
@@ -65,7 +65,7 @@ export const DropdownMenuContent = withRef<
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuContentVariants ref={ref} {...props} />
   </DropdownMenuPrimitive.Portal>
-))
+));
 
 const menuItemVariants = cva(
   cn(
@@ -79,13 +79,13 @@ const menuItemVariants = cva(
       },
     },
   }
-)
+);
 
 export const DropdownMenuItem = withVariants(
   DropdownMenuPrimitive.Item,
   menuItemVariants,
   ['inset']
-)
+);
 
 export const DropdownMenuCheckboxItem = withRef<
   typeof DropdownMenuPrimitive.CheckboxItem
@@ -106,12 +106,12 @@ export const DropdownMenuCheckboxItem = withRef<
     </span>
     {children}
   </DropdownMenuPrimitive.CheckboxItem>
-))
+));
 
 export const DropdownMenuRadioItem = withRef<
   typeof DropdownMenuPrimitive.RadioItem,
   {
-    hideIcon?: boolean
+    hideIcon?: boolean;
   }
 >(({ children, className, hideIcon, ...props }, ref) => (
   <DropdownMenuPrimitive.RadioItem
@@ -132,7 +132,7 @@ export const DropdownMenuRadioItem = withRef<
     )}
     {children}
   </DropdownMenuPrimitive.RadioItem>
-))
+));
 
 const dropdownMenuLabelVariants = cva(
   cn('select-none px-2 py-1.5 text-sm font-semibold'),
@@ -143,36 +143,36 @@ const dropdownMenuLabelVariants = cva(
       },
     },
   }
-)
+);
 
 export const DropdownMenuLabel = withVariants(
   DropdownMenuPrimitive.Label,
   dropdownMenuLabelVariants,
   ['inset']
-)
+);
 
 export const DropdownMenuSeparator = withCn(
   DropdownMenuPrimitive.Separator,
   '-mx-1 my-1 h-px bg-muted'
-)
+);
 
 export const DropdownMenuShortcut = withCn(
   createPrimitiveElement('span'),
   'ml-auto text-xs tracking-widest opacity-60'
-)
+);
 
 export const useOpenState = () => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   const onOpenChange = useCallback(
     (_value = !open) => {
-      setOpen(_value)
+      setOpen(_value);
     },
     [open]
-  )
+  );
 
   return {
     onOpenChange,
     open,
-  }
-}
+  };
+};

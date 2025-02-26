@@ -6,11 +6,11 @@ import {
   MARK_CODE,
   MARK_ITALIC,
   MARK_STRIKETHROUGH,
-} from '@udecode/plate'
-import { useEditorState } from '@udecode/plate-common'
-import React from 'react'
-import { useResize } from '../hooks/use-resize'
-import { helpers, unsupportedItemsInTable } from '../plugins/core/common'
+} from '@udecode/plate';
+import { useEditorState } from '@udecode/plate-common';
+import React from 'react';
+import { useResize } from '../hooks/use-resize';
+import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
 import {
   CONTAINER_MD_BREAKPOINT,
   EMBED_ICON_WIDTH,
@@ -20,28 +20,28 @@ import {
   HEADING_LABEL,
   STANDARD_ICON_WIDTH,
   type ToolbarOverrideType,
-} from '../toolbar/toolbar-overrides'
-import { useToolbarContext } from '../toolbar/toolbar-provider'
-import { HeadingsMenu } from './headings-dropdown'
-import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button'
-import { Icons } from './plate-ui/icons'
-import { ImageToolbarButton } from './plate-ui/image-toolbar-button'
-import { IndentListToolbarButton } from './plate-ui/indent-list-toolbar-button'
-import { LinkToolbarButton } from './plate-ui/link-toolbar-button'
-import { MarkToolbarButton } from './plate-ui/mark-toolbar-button'
-import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button'
-import OverflowMenu from './plate-ui/overflow-menu'
-import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button'
-import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button'
-import { TableDropdownMenu } from './plate-ui/table-dropdown-menu'
-import TemplatesToolbarButton from './plate-ui/templates-toolbar-button'
-import { ToolbarGroup } from './plate-ui/toolbar'
+} from '../toolbar/toolbar-overrides';
+import { useToolbarContext } from '../toolbar/toolbar-provider';
+import { HeadingsMenu } from './headings-dropdown';
+import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button';
+import { Icons } from './plate-ui/icons';
+import { ImageToolbarButton } from './plate-ui/image-toolbar-button';
+import { IndentListToolbarButton } from './plate-ui/indent-list-toolbar-button';
+import { LinkToolbarButton } from './plate-ui/link-toolbar-button';
+import { MarkToolbarButton } from './plate-ui/mark-toolbar-button';
+import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button';
+import OverflowMenu from './plate-ui/overflow-menu';
+import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button';
+import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button';
+import { TableDropdownMenu } from './plate-ui/table-dropdown-menu';
+import TemplatesToolbarButton from './plate-ui/templates-toolbar-button';
+import { ToolbarGroup } from './plate-ui/toolbar';
 
 type ToolbarItem = {
-  label: string
-  width: (paragraphIconExists?: boolean) => number // Use function to calculate width
-  Component: React.ReactNode
-}
+  label: string;
+  width: (paragraphIconExists?: boolean) => number; // Use function to calculate width
+  Component: React.ReactNode;
+};
 
 const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   heading: {
@@ -140,15 +140,15 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     width: () => EMBED_ICON_WIDTH,
     Component: <TemplatesToolbarButton />,
   },
-}
+};
 
 export default function FixedToolbarButtons() {
-  const toolbarRef = React.useRef(null)
-  const [itemsShown, setItemsShown] = React.useState(11)
-  const { overrides, templates } = useToolbarContext()
-  const showEmbedButton = templates.length > 0
+  const toolbarRef = React.useRef(null);
+  const [itemsShown, setItemsShown] = React.useState(11);
+  const { overrides, templates } = useToolbarContext();
+  const showEmbedButton = templates.length > 0;
 
-  let items = []
+  let items = [];
 
   if (Array.isArray(overrides)) {
     items =
@@ -156,35 +156,35 @@ export default function FixedToolbarButtons() {
         ? Object.values(toolbarItems)
         : overrides
             .map((item) => toolbarItems[item])
-            .filter((item) => item !== undefined)
+            .filter((item) => item !== undefined);
   } else {
     items =
       overrides?.toolbar === undefined
         ? Object.values(toolbarItems)
         : overrides.toolbar
             .map((item) => toolbarItems[item])
-            .filter((item) => item !== undefined)
+            .filter((item) => item !== undefined);
   }
 
   if (!showEmbedButton) {
-    items = items.filter((item) => item.label !== toolbarItems.embed.label)
+    items = items.filter((item) => item.label !== toolbarItems.embed.label);
   }
 
-  const editorState = useEditorState()
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
+  const editorState = useEditorState();
+  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE);
   if (userInTable) {
-    items = items.filter((item) => !unsupportedItemsInTable.has(item.label))
+    items = items.filter((item) => !unsupportedItemsInTable.has(item.label));
   }
 
   useResize(toolbarRef, (entry) => {
-    const width = entry.target.getBoundingClientRect().width
-    const headingButton = items.find((item) => item.label === HEADING_LABEL)
+    const width = entry.target.getBoundingClientRect().width;
+    const headingButton = items.find((item) => item.label === HEADING_LABEL);
     const headingWidth = headingButton
       ? headingButton.width(width > CONTAINER_MD_BREAKPOINT)
-      : 0
+      : 0;
 
     // Calculate the available width excluding the heading button and float button icon width
-    const availableWidth = width - headingWidth - FLOAT_BUTTON_WIDTH
+    const availableWidth = width - headingWidth - FLOAT_BUTTON_WIDTH;
 
     // Count numbers of buttons can fit into the available width
     const { itemFitCount } = items.reduce(
@@ -196,15 +196,15 @@ export default function FixedToolbarButtons() {
           return {
             totalItemsWidth: acc.totalItemsWidth + item.width(),
             itemFitCount: acc.itemFitCount + 1,
-          }
+          };
         }
-        return acc
+        return acc;
       },
       { totalItemsWidth: 0, itemFitCount: 1 }
-    ) // Initial values fit count set as 1 becasue heading is always exist
+    ); // Initial values fit count set as 1 becasue heading is always exist
 
-    setItemsShown(itemFitCount)
-  })
+    setItemsShown(itemFitCount);
+  });
 
   return (
     <div className='w-full overflow-hidden @container/toolbar' ref={toolbarRef}>
@@ -228,5 +228,5 @@ export default function FixedToolbarButtons() {
         </>
       </div>
     </div>
-  )
+  );
 }

@@ -2,32 +2,32 @@
 
 */
 
-import * as React from 'react'
-import * as dropzone from 'react-dropzone'
-import { IconButton } from '@toolkit/styles'
-import { TrashIcon } from '@toolkit/icons'
-import { LoadingDots } from '@toolkit/form-builder'
-import { useCMS } from '@toolkit/react-tinacms/use-cms'
+import * as React from 'react';
+import * as dropzone from 'react-dropzone';
+import { IconButton } from '@toolkit/styles';
+import { TrashIcon } from '@toolkit/icons';
+import { LoadingDots } from '@toolkit/form-builder';
+import { useCMS } from '@toolkit/react-tinacms/use-cms';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
   dropzoneAcceptFromString,
   isImage,
-} from '@toolkit/components/media/utils'
-import { BiFileBlank } from 'react-icons/bi'
+} from '@toolkit/components/media/utils';
+import { BiFileBlank } from 'react-icons/bi';
 
-const { useDropzone } = dropzone
+const { useDropzone } = dropzone;
 
 interface ImageUploadProps {
-  onDrop: (files: any, fileRejections: any) => Promise<void>
-  onClear?: () => void
-  onClick?: () => void
-  value?: string
-  src?: string
-  loading?: boolean
+  onDrop: (files: any, fileRejections: any) => Promise<void>;
+  onClear?: () => void;
+  onClick?: () => void;
+  value?: string;
+  src?: string;
+  loading?: boolean;
 }
 
 export const StyledImage = ({ src }) => {
-  const isSvg = /\.svg$/.test(src)
+  const isSvg = /\.svg$/.test(src);
 
   return (
     <img
@@ -36,8 +36,8 @@ export const StyledImage = ({ src }) => {
         isSvg ? 'min-w-[12rem]' : ''
       }`}
     />
-  )
-}
+  );
+};
 
 export const StyledFile = ({ src }) => {
   return (
@@ -49,21 +49,21 @@ export const StyledFile = ({ src }) => {
         {src}
       </span>
     </div>
-  )
-}
+  );
+};
 
 export const ImageUpload = React.forwardRef<
   HTMLButtonElement,
   ImageUploadProps
 >(({ onDrop, onClear, onClick, value, src, loading }, ref) => {
-  const cms = useCMS()
+  const cms = useCMS();
   const { getRootProps, getInputProps } = useDropzone({
     accept: dropzoneAcceptFromString(
       cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
     ),
     onDrop,
     noClick: !!onClick,
-  })
+  });
   return (
     <div className='w-full max-w-full' {...getRootProps()}>
       <input {...getInputProps()} />
@@ -90,8 +90,8 @@ export const ImageUpload = React.forwardRef<
             {onClear && (
               <DeleteImageButton
                 onClick={(e) => {
-                  e.stopPropagation()
-                  onClear()
+                  e.stopPropagation();
+                  onClear();
                 }}
               />
             )}
@@ -114,23 +114,23 @@ export const ImageUpload = React.forwardRef<
         </button>
       )}
     </div>
-  )
-})
+  );
+});
 
 export const DeleteImageButton = ({
   onClick,
 }: {
-  onClick: (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onClick: (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }) => {
   return (
     <IconButton variant='white' className='flex-none' onClick={onClick}>
       <TrashIcon className='w-7 h-auto' />
     </IconButton>
-  )
-}
+  );
+};
 
 const ImageLoadingIndicator = () => (
   <div className='p-4 w-full min-h-[96px] flex flex-col justify-center items-center'>
     <LoadingDots />
   </div>
-)
+);

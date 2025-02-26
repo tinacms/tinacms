@@ -3,45 +3,45 @@
 
 
 */
-import React from 'react'
-import { XCircleIcon } from '@heroicons/react/solid'
+import React from 'react';
+import { XCircleIcon } from '@heroicons/react/solid';
 import {
   Popover,
   PopoverButton,
   PopoverPanel,
   Transition,
-} from '@headlessui/react'
-import { Fragment } from 'react'
+} from '@headlessui/react';
+import { Fragment } from 'react';
 // import { InvalidMarkdownElement } from '@tinacms/mdx/src/parse/plate'
-export type EmptyTextElement = { type: 'text'; text: '' }
+export type EmptyTextElement = { type: 'text'; text: '' };
 export type PositionItem = {
-  line?: number | null
-  column?: number | null
-  offset?: number | null
-  _index?: number | null
-  _bufferIndex?: number | null
-}
+  line?: number | null;
+  column?: number | null;
+  offset?: number | null;
+  _index?: number | null;
+  _bufferIndex?: number | null;
+};
 export type Position = {
-  start: PositionItem
-  end: PositionItem
-}
+  start: PositionItem;
+  end: PositionItem;
+};
 export type InvalidMarkdownElement = {
-  type: 'invalid_markdown'
-  value: string
-  message: string
-  position?: Position
-  children: [EmptyTextElement]
-}
+  type: 'invalid_markdown';
+  value: string;
+  message: string;
+  position?: Position;
+  children: [EmptyTextElement];
+};
 
 type ErrorType = {
-  message: string
+  message: string;
   position?: {
-    startColumn: number
-    endColumn: number
-    startLineNumber: number
-    endLineNumber: number
-  }
-}
+    startColumn: number;
+    endColumn: number;
+    startLineNumber: number;
+    endLineNumber: number;
+  };
+};
 export const buildError = (element: InvalidMarkdownElement): ErrorType => {
   return {
     message: element.message,
@@ -51,25 +51,25 @@ export const buildError = (element: InvalidMarkdownElement): ErrorType => {
       startLineNumber: element.position.start.line,
       endLineNumber: element.position.end.line,
     },
-  }
-}
+  };
+};
 export const buildErrorMessage = (element: InvalidMarkdownElement): string => {
   if (!element) {
-    return ''
+    return '';
   }
-  const errorMessage = buildError(element)
+  const errorMessage = buildError(element);
   const message = errorMessage
     ? `${errorMessage.message}${
         errorMessage.position
           ? ` at line: ${errorMessage.position.startLineNumber}, column: ${errorMessage.position.startColumn}`
           : ''
       }`
-    : null
-  return message
-}
+    : null;
+  return message;
+};
 
 export function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
-  const message = buildErrorMessage(error)
+  const message = buildErrorMessage(error);
 
   return (
     <Popover className='relative'>
@@ -114,5 +114,5 @@ export function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
         </>
       )}
     </Popover>
-  )
+  );
 }

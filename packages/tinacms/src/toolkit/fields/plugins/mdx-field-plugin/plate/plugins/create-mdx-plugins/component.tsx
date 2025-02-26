@@ -1,23 +1,23 @@
-import React from 'react'
-import { Element } from 'slate'
-import { useSelected, ReactEditor } from 'slate-react'
+import React from 'react';
+import { Element } from 'slate';
+import { useSelected, ReactEditor } from 'slate-react';
 import {
   Transition,
   Popover,
   PopoverButton,
   PopoverPanel,
-} from '@headlessui/react'
-import { NestedForm } from '../../nested-form'
-import { classNames } from '../ui/helpers'
-import { ELEMENT_MDX_INLINE } from '.'
-import { EllipsisIcon } from '../ui/icons'
-import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks'
-import { useTemplates } from '../../editor-context'
-import { insertNodes } from '@udecode/plate-common'
-import { ELEMENT_PARAGRAPH } from '@udecode/plate'
+} from '@headlessui/react';
+import { NestedForm } from '../../nested-form';
+import { classNames } from '../ui/helpers';
+import { ELEMENT_MDX_INLINE } from '.';
+import { EllipsisIcon } from '../ui/icons';
+import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
+import { useTemplates } from '../../editor-context';
+import { insertNodes } from '@udecode/plate-common';
+import { ELEMENT_PARAGRAPH } from '@udecode/plate';
 
 const Wrapper = ({ inline, children }) => {
-  const Component = inline ? 'span' : 'div'
+  const Component = inline ? 'span' : 'div';
   return (
     <Component
       contentEditable={false}
@@ -26,8 +26,8 @@ const Wrapper = ({ inline, children }) => {
     >
       {children}
     </Component>
-  )
-}
+  );
+};
 
 export const InlineEmbed = ({
   attributes,
@@ -36,27 +36,29 @@ export const InlineEmbed = ({
   onChange,
   editor,
 }) => {
-  const selected = useSelected()
-  const { templates, fieldName } = useTemplates()
+  const selected = useSelected();
+  const { templates, fieldName } = useTemplates();
   const { handleClose, handleRemove, handleSelect, isExpanded } =
-    useEmbedHandles(editor, element, fieldName)
+    useEmbedHandles(editor, element, fieldName);
   useHotkey('enter', () => {
-    insertNodes(editor, [{ type: ELEMENT_PARAGRAPH, children: [{ text: '' }] }])
-  })
+    insertNodes(editor, [
+      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
+    ]);
+  });
   useHotkey('space', () => {
     insertNodes(editor, [{ text: ' ' }], {
       match: (n) => {
         if (Element.isElement(n) && n.type === ELEMENT_MDX_INLINE) {
-          return true
+          return true;
         }
       },
       select: true,
-    })
-  })
+    });
+  });
 
   const activeTemplate = templates.find(
     (template) => template.name === element.name
-  )
+  );
 
   const formProps = {
     activeTemplate,
@@ -64,13 +66,13 @@ export const InlineEmbed = ({
     editor,
     onChange,
     onClose: handleClose,
-  }
+  };
 
   if (!activeTemplate) {
-    return null
+    return null;
   }
 
-  const label = getLabel(activeTemplate, formProps)
+  const label = getLabel(activeTemplate, formProps);
   return (
     <span {...attributes}>
       {children}
@@ -96,8 +98,8 @@ export const InlineEmbed = ({
         {isExpanded && <EmbedNestedForm {...formProps} />}
       </Wrapper>
     </span>
-  )
-}
+  );
+};
 
 export const BlockEmbed = ({
   attributes,
@@ -106,18 +108,20 @@ export const BlockEmbed = ({
   editor,
   onChange,
 }) => {
-  const selected = useSelected()
-  const { templates, fieldName } = useTemplates()
+  const selected = useSelected();
+  const { templates, fieldName } = useTemplates();
   const { handleClose, handleRemove, handleSelect, isExpanded } =
-    useEmbedHandles(editor, element, fieldName)
+    useEmbedHandles(editor, element, fieldName);
 
   useHotkey('enter', () => {
-    insertNodes(editor, [{ type: ELEMENT_PARAGRAPH, children: [{ text: '' }] }])
-  })
+    insertNodes(editor, [
+      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
+    ]);
+  });
 
   const activeTemplate = templates.find(
     (template) => template.name === element.name
-  )
+  );
 
   const formProps = {
     activeTemplate,
@@ -125,13 +129,13 @@ export const BlockEmbed = ({
     editor,
     onChange,
     onClose: handleClose,
-  }
+  };
 
   if (!activeTemplate) {
-    return null
+    return null;
   }
 
-  const label = getLabel(activeTemplate, formProps)
+  const label = getLabel(activeTemplate, formProps);
   return (
     <div {...attributes} className='w-full my-2'>
       {children}
@@ -151,21 +155,21 @@ export const BlockEmbed = ({
         {isExpanded && <EmbedNestedForm {...formProps} />}
       </Wrapper>
     </div>
-  )
-}
+  );
+};
 
 const getLabel = (activeTemplate, formProps) => {
-  const titleField = activeTemplate.fields.find((field) => field.isTitle)
-  let label = activeTemplate.label || activeTemplate.name
+  const titleField = activeTemplate.fields.find((field) => field.isTitle);
+  let label = activeTemplate.label || activeTemplate.name;
   if (titleField) {
-    const titleValue = formProps.element.props[titleField.name]
+    const titleValue = formProps.element.props[titleField.name];
     if (titleValue) {
-      label = `${label}: ${titleValue}`
+      label = `${label}: ${titleValue}`;
     }
   }
 
-  return label
-}
+  return label;
+};
 
 const EmbedNestedForm = ({
   editor,
@@ -174,8 +178,8 @@ const EmbedNestedForm = ({
   onClose,
   onChange,
 }) => {
-  const path = ReactEditor.findPath(editor, element)
-  const id = [...path, activeTemplate.name].join('.')
+  const path = ReactEditor.findPath(editor, element);
+  const id = [...path, activeTemplate.name].join('.');
   return (
     <NestedForm
       id={id}
@@ -185,8 +189,8 @@ const EmbedNestedForm = ({
       onChange={onChange}
       onClose={onClose}
     />
-  )
-}
+  );
+};
 
 const DotMenu = ({ onOpen, onRemove }) => {
   return (
@@ -219,8 +223,8 @@ const DotMenu = ({ onOpen, onRemove }) => {
               <button
                 type='button'
                 onMouseDown={(e) => {
-                  e.preventDefault()
-                  onRemove()
+                  e.preventDefault();
+                  onRemove();
                 }}
                 className={classNames(
                   'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
@@ -233,5 +237,5 @@ const DotMenu = ({ onOpen, onRemove }) => {
         </PopoverPanel>
       </Transition>
     </Popover>
-  )
-}
+  );
+};

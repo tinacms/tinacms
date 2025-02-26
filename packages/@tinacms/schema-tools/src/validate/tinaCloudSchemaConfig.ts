@@ -2,9 +2,9 @@
 
 */
 
-import { Config } from '../types/index'
+import { Config } from '../types/index';
 
-import z from 'zod'
+import z from 'zod';
 const tinaConfigKey = z
   .object({
     publicFolder: z.string(),
@@ -12,7 +12,7 @@ const tinaConfigKey = z
     static: z.boolean().nullish(),
   })
   .strict()
-  .optional()
+  .optional();
 const tinaSearchKey = z
   .object({
     indexerToken: z.string().optional(),
@@ -20,7 +20,7 @@ const tinaSearchKey = z
     tokenSplitRegex: z.string().optional(),
   })
   .strict()
-  .optional()
+  .optional();
 export const tinaConfigZod = z.object({
   client: z.object({ referenceDepth: z.number().optional() }).optional(),
   media: z
@@ -37,9 +37,9 @@ export const tinaConfigZod = z.object({
       maxSearchIndexFieldLength: z.number().gte(1).optional(),
     })
     .optional(),
-})
+});
 
 export const validateTinaCloudSchemaConfig = (config: unknown): Config => {
-  const newConfig = tinaConfigZod.parse(config) as Config
-  return newConfig
-}
+  const newConfig = tinaConfigZod.parse(config) as Config;
+  return newConfig;
+};

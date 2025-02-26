@@ -2,11 +2,11 @@
 
 */
 
-import React from 'react'
-import type { TinaCMS } from '@tinacms/toolkit'
+import React from 'react';
+import type { TinaCMS } from '@tinacms/toolkit';
 
-import GetCMS from '../components/GetCMS'
-import { PageWrapper, PageHeader, PageBodyNarrow } from '../components/Page'
+import GetCMS from '../components/GetCMS';
+import { PageWrapper, PageHeader, PageBodyNarrow } from '../components/Page';
 
 const DashboardPage = () => {
   return (
@@ -27,7 +27,7 @@ const DashboardPage = () => {
         </PageWrapper>
       )}
     </GetCMS>
-  )
-}
+  );
+};
 
-export default DashboardPage
+export default DashboardPage;

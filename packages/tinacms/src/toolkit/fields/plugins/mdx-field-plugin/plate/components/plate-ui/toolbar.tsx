@@ -1,35 +1,35 @@
-'use client'
+'use client';
 
-import * as React from 'react'
+import * as React from 'react';
 
-import * as ToolbarPrimitive from '@radix-ui/react-toolbar'
-import { cn, withCn, withRef, withVariants } from '@udecode/cn'
-import { type VariantProps, cva } from 'class-variance-authority'
+import * as ToolbarPrimitive from '@radix-ui/react-toolbar';
+import { cn, withCn, withRef, withVariants } from '@udecode/cn';
+import { type VariantProps, cva } from 'class-variance-authority';
 
-import { Icons } from './icons'
+import { Icons } from './icons';
 
-import { Separator } from './separator'
-import { withTooltip } from './tooltip'
+import { Separator } from './separator';
+import { withTooltip } from './tooltip';
 
 export const Toolbar = withCn(
   ToolbarPrimitive.Root,
   'relative flex select-none items-center gap-1 bg-background'
-)
+);
 
 export const ToolbarToggleGroup = withCn(
   ToolbarPrimitive.ToolbarToggleGroup,
   'flex items-center'
-)
+);
 
 export const ToolbarLink = withCn(
   ToolbarPrimitive.Link,
   'font-medium underline underline-offset-4'
-)
+);
 
 export const ToolbarSeparator = withCn(
   ToolbarPrimitive.Separator,
   'my-1 w-px shrink-0 bg-border'
-)
+);
 
 const toolbarButtonVariants = cva(
   cn(
@@ -55,16 +55,16 @@ const toolbarButtonVariants = cva(
       },
     },
   }
-)
+);
 
 const ToolbarButton = withTooltip(
   // eslint-disable-next-line react/display-name
   React.forwardRef<
     React.ElementRef<typeof ToolbarToggleItem>,
     {
-      isDropdown?: boolean
-      pressed?: boolean
-      showArrow?: boolean
+      isDropdown?: boolean;
+      pressed?: boolean;
+      showArrow?: boolean;
     } & Omit<
       React.ComponentPropsWithoutRef<typeof ToolbarToggleItem>,
       'asChild' | 'value'
@@ -130,29 +130,29 @@ const ToolbarButton = withTooltip(
         >
           {children}
         </ToolbarPrimitive.Button>
-      )
+      );
     }
   )
-)
-ToolbarButton.displayName = 'ToolbarButton'
+);
+ToolbarButton.displayName = 'ToolbarButton';
 
-export { ToolbarButton }
+export { ToolbarButton };
 
 export const ToolbarToggleItem = withVariants(
   ToolbarPrimitive.ToggleItem,
   toolbarButtonVariants,
   ['variant', 'size']
-)
+);
 
 export const ToolbarGroup = withRef<
   'div',
   {
-    noSeparator?: boolean
+    noSeparator?: boolean;
   }
 >(({ children, className, noSeparator }, ref) => {
-  const childArr = React.Children.map(children, (c) => c)
+  const childArr = React.Children.map(children, (c) => c);
 
-  if (!childArr || childArr.length === 0) return null
+  if (!childArr || childArr.length === 0) return null;
 
   return (
     <div className={cn('flex', className)} ref={ref}>
@@ -164,5 +164,5 @@ export const ToolbarGroup = withRef<
 
       <div className='mx-1 flex items-center gap-1'>{children}</div>
     </div>
-  )
-})
+  );
+});

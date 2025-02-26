@@ -13,15 +13,15 @@ import {
   ELEMENT_H5,
   ELEMENT_H6,
   KEYS_HEADING,
-} from '@udecode/plate'
-import { createSoftBreakPlugin } from '../soft-break'
-import { autoformatRules } from './autoformat/autoformat-rules'
-import { withCorrectVoidBehavior } from './with-correct-void-behavior'
+} from '@udecode/plate';
+import { createSoftBreakPlugin } from '../soft-break';
+import { autoformatRules } from './autoformat/autoformat-rules';
+import { withCorrectVoidBehavior } from './with-correct-void-behavior';
 import {
   createPluginFactory,
   isBlockAboveEmpty,
   isSelectionAtBlockStart,
-} from '@udecode/plate-common'
+} from '@udecode/plate-common';
 
 export const HANDLES_MDX = [
   ELEMENT_H1,
@@ -32,7 +32,7 @@ export const HANDLES_MDX = [
   ELEMENT_H5,
   ELEMENT_H6,
   ELEMENT_PARAGRAPH,
-]
+];
 
 const resetBlockTypesCommonRule = {
   types: [
@@ -47,12 +47,12 @@ const resetBlockTypesCommonRule = {
     // NOTE: code blocks behave strangely when used here
   ],
   defaultType: ELEMENT_PARAGRAPH,
-}
+};
 
 const createCorrectNodeBehaviorPlugin = createPluginFactory({
   key: 'WITH_CORRECT_NODE_BEHAVIOR',
   withOverrides: withCorrectVoidBehavior,
-})
+});
 export const plugins = [
   createTrailingBlockPlugin(),
   createCorrectNodeBehaviorPlugin(),
@@ -115,4 +115,4 @@ export const plugins = [
       ],
     },
   }),
-]
+];

@@ -1,49 +1,49 @@
-import * as React from 'react'
-import { BiExit } from 'react-icons/bi'
-import { FiMoreVertical, FiInfo } from 'react-icons/fi'
-import { VscNewFile } from 'react-icons/vsc'
+import * as React from 'react';
+import { BiExit } from 'react-icons/bi';
+import { FiMoreVertical, FiInfo } from 'react-icons/fi';
+import { VscNewFile } from 'react-icons/vsc';
 import {
   Menu,
   MenuButton,
   MenuItem,
   MenuItems,
   Transition,
-} from '@headlessui/react'
-import { updateBodyDisplacement } from './sidebar'
-import { FormModal } from '@toolkit/react-forms'
-import type { ScreenPlugin } from '@toolkit/react-screens'
-import { SyncStatus, SyncErrorWidget, SyncStatusModal } from './sync-status'
-import { useCMS } from '@toolkit/react-core'
-import type { CloudConfigPlugin } from '@toolkit/react-cloud-config'
-import { version } from '../../../../package.json'
+} from '@headlessui/react';
+import { updateBodyDisplacement } from './sidebar';
+import { FormModal } from '@toolkit/react-forms';
+import type { ScreenPlugin } from '@toolkit/react-screens';
+import { SyncStatus, SyncErrorWidget, SyncStatusModal } from './sync-status';
+import { useCMS } from '@toolkit/react-core';
+import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
+import { version } from '../../../../package.json';
 
 interface NavCollection {
-  label?: string
-  name: string
-  isAuthCollection?: boolean
+  label?: string;
+  name: string;
+  isAuthCollection?: boolean;
 }
 
 interface NavProps {
-  isLocalMode: boolean
-  children?: any
-  className?: string
-  userName?: string
-  showCollections: boolean
+  isLocalMode: boolean;
+  children?: any;
+  className?: string;
+  userName?: string;
+  showCollections: boolean;
   collectionsInfo: {
-    collections: NavCollection[]
-  }
-  contentCreators?: any
-  screens?: ScreenPlugin[]
-  cloudConfigs?: CloudConfigPlugin[]
-  sidebarWidth?: number
-  RenderNavSite: React.ComponentType<{ view: ScreenPlugin }>
-  RenderNavCloud: React.ComponentType<{ config: CloudConfigPlugin }>
+    collections: NavCollection[];
+  };
+  contentCreators?: any;
+  screens?: ScreenPlugin[];
+  cloudConfigs?: CloudConfigPlugin[];
+  sidebarWidth?: number;
+  RenderNavSite: React.ComponentType<{ view: ScreenPlugin }>;
+  RenderNavCloud: React.ComponentType<{ config: CloudConfigPlugin }>;
   RenderNavCollection: React.ComponentType<{
-    collection: { label: string; name: string }
-  }>
+    collection: { label: string; name: string };
+  }>;
   AuthRenderNavCollection: React.ComponentType<{
-    collection: { label: string; name: string }
-  }>
+    collection: { label: string; name: string };
+  }>;
 }
 
 export const Nav = ({
@@ -62,47 +62,47 @@ export const Nav = ({
   AuthRenderNavCollection,
   ...props
 }: NavProps) => {
-  const cms = useCMS()
-  const [eventsOpen, setEventsOpen] = React.useState(false)
+  const cms = useCMS();
+  const [eventsOpen, setEventsOpen] = React.useState(false);
   const { contentCollections, authCollection } =
     collectionsInfo.collections.reduce(
       (
         acc: {
-          contentCollections: NavCollection[]
-          authCollection?: NavCollection
+          contentCollections: NavCollection[];
+          authCollection?: NavCollection;
         },
         collection: NavCollection
       ) => {
         if (collection.isAuthCollection) {
-          acc.authCollection = collection
+          acc.authCollection = collection;
         } else {
-          acc.contentCollections.push(collection)
+          acc.contentCollections.push(collection);
         }
-        return acc
+        return acc;
       },
       {
         contentCollections: [],
       }
-    )
+    );
 
   function closeEventsModal() {
-    setEventsOpen(false)
+    setEventsOpen(false);
   }
 
   const WrappedSyncStatus = React.forwardRef(
     (props: { cms; setEventsOpen }, ref) => <SyncStatus {...props} />
-  )
+  );
 
   // partition screens by navCategory prop
   const screenCategories = screens.reduce(
     (acc, screen) => {
-      const category = screen.navCategory || 'Site'
-      acc[category] = acc[category] || []
-      acc[category].push(screen)
-      return acc
+      const category = screen.navCategory || 'Site';
+      acc[category] = acc[category] || [];
+      acc[category].push(screen);
+      return acc;
     },
     { Site: [] }
-  )
+  );
 
   return (
     <div
@@ -158,24 +158,24 @@ export const Nav = ({
                             displayState: 'closed',
                             sidebarWidth: null,
                             resizingSidebar: false,
-                          })
+                          });
                           try {
                             if (cms?.api?.tina?.authProvider?.logout) {
-                              await cms.api.tina?.authProvider.logout()
+                              await cms.api.tina?.authProvider.logout();
                               if (cms?.api?.tina?.onLogout) {
-                                await cms?.api?.tina?.onLogout()
+                                await cms?.api?.tina?.onLogout();
                                 await new Promise((resolve) =>
                                   setTimeout(resolve, 500)
-                                )
+                                );
                               }
                               window.location.href = new URL(
                                 window.location.href
-                              ).pathname
+                              ).pathname;
                             }
                           } catch (e) {
-                            cms.alerts.error(`Error logging out: ${e}`)
-                            console.error('Unexpected error calling logout')
-                            console.error(e)
+                            cms.alerts.error(`Error logging out: ${e}`);
+                            console.error('Unexpected error calling logout');
+                            console.error(e);
                           }
                         }}
                       >
@@ -233,13 +233,13 @@ export const Nav = ({
                   <li key={`nav-site-${view.name}`}>
                     <RenderNavSite view={view} />
                   </li>
-                )
+                );
               })}
 
               {contentCreators.map((plugin, idx) => {
                 return (
                   <CreateContentNavItem key={`plugin-${idx}`} plugin={plugin} />
-                )
+                );
               })}
               {authCollection && (
                 <CollectionsList
@@ -263,11 +263,11 @@ export const Nav = ({
                       <li key={`nav-site-${view.name}`}>
                         <RenderNavSite view={view} />
                       </li>
-                    )
+                    );
                   })}
                 </ul>
               </div>
-            )
+            );
           }
         })}
         {!!cloudConfigs?.length && (
@@ -281,7 +281,7 @@ export const Nav = ({
                   <li key={`nav-site-${config.name}`}>
                     <RenderNavCloud config={config} />
                   </li>
-                )
+                );
               })}
             </ul>
           </>
@@ -292,20 +292,20 @@ export const Nav = ({
         </span>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const CollectionsList = ({
   collections,
   RenderNavCollection,
 }: {
-  collections: { label?: string; name: string }[]
+  collections: { label?: string; name: string }[];
   RenderNavCollection: React.ComponentType<{
-    collection: { label?: string; name: string }
-  }>
+    collection: { label?: string; name: string };
+  }>;
 }) => {
   if (collections.length === 0) {
-    return <div>No collections found</div>
+    return <div>No collections found</div>;
   }
 
   return (
@@ -315,26 +315,26 @@ const CollectionsList = ({
           <li key={`nav-collection-${collection.name}`}>
             <RenderNavCollection collection={collection} />
           </li>
-        )
+        );
       })}
     </ul>
-  )
-}
+  );
+};
 
 const CreateContentNavItem = ({ plugin }) => {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
 
   return (
     <li key={plugin.name}>
       <button
         className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
         onClick={() => {
-          setOpen(true)
+          setOpen(true);
         }}
       >
         <VscNewFile className='mr-3 h-6 opacity-80 w-auto' /> {plugin.name}
       </button>
       {open && <FormModal plugin={plugin} close={() => setOpen(false)} />}
     </li>
-  )
-}
+  );
+};

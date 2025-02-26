@@ -1,21 +1,21 @@
-import * as React from 'react'
-import { BiChevronDown, BiGitBranch, BiLockAlt } from 'react-icons/bi'
-import { useBranchData } from './branch-data'
-import { BranchModal } from './branch-modal'
-import { useCMS } from '@toolkit/react-tinacms'
+import * as React from 'react';
+import { BiChevronDown, BiGitBranch, BiLockAlt } from 'react-icons/bi';
+import { useBranchData } from './branch-data';
+import { BranchModal } from './branch-modal';
+import { useCMS } from '@toolkit/react-tinacms';
 
 // trim 'tina/' prefix from branch name
 const trimPrefix = (branchName: string) => {
-  return branchName.replace(/^tina\//, '')
-}
+  return branchName.replace(/^tina\//, '');
+};
 
 export const BranchButton = () => {
-  const [open, setOpen] = React.useState(false)
-  const openModal = () => setOpen(true)
-  const { currentBranch } = useBranchData()
+  const [open, setOpen] = React.useState(false);
+  const openModal = () => setOpen(true);
+  const { currentBranch } = useBranchData();
 
-  const cms = useCMS()
-  const isProtected = cms.api.tina.usingProtectedBranch()
+  const cms = useCMS();
+  const isProtected = cms.api.tina.usingProtectedBranch();
 
   return (
     <>
@@ -45,10 +45,10 @@ export const BranchButton = () => {
       {open && (
         <BranchModal
           close={() => {
-            setOpen(false)
+            setOpen(false);
           }}
         />
       )}
     </>
-  )
-}
+  );
+};

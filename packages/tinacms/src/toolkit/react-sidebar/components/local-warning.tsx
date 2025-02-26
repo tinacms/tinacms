@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { AiFillWarning } from 'react-icons/ai'
-import { BiError, BiRightArrowAlt } from 'react-icons/bi'
-import { useCMS } from '@toolkit/react-core'
+import * as React from 'react';
+import { AiFillWarning } from 'react-icons/ai';
+import { BiError, BiRightArrowAlt } from 'react-icons/bi';
+import { useCMS } from '@toolkit/react-core';
 
 export const LocalWarning = () => {
   return (
@@ -14,36 +14,36 @@ export const LocalWarning = () => {
       You are currently in
       <strong className='ml-1 font-bold text-yellow-700'>Local Mode</strong>
     </a>
-  )
-}
+  );
+};
 
 export const BillingWarning = () => {
-  const cms = useCMS()
-  const api = cms?.api?.tina
-  const isCustomContentApi: boolean = api?.isCustomContentApi || false
+  const cms = useCMS();
+  const api = cms?.api?.tina;
+  const isCustomContentApi: boolean = api?.isCustomContentApi || false;
 
   const [billingState, setBillingState] = React.useState(
     null as {
-      clientId: string
-      delinquencyDate: number
-      billingState: 'current' | 'late' | 'delinquent'
+      clientId: string;
+      delinquencyDate: number;
+      billingState: 'current' | 'late' | 'delinquent';
     } | null
-  )
+  );
   React.useEffect(() => {
     const fetchBillingState = async () => {
-      if (typeof api?.getBillingState !== 'function') return
-      const billingRes = await api?.getBillingState()
-      setBillingState(billingRes)
-    }
-    if (!isCustomContentApi) fetchBillingState()
-  }, [])
+      if (typeof api?.getBillingState !== 'function') return;
+      const billingRes = await api?.getBillingState();
+      setBillingState(billingRes);
+    };
+    if (!isCustomContentApi) fetchBillingState();
+  }, []);
 
   if (
     isCustomContentApi ||
     !billingState ||
     billingState.billingState === 'current'
   ) {
-    return <></>
+    return <></>;
   }
 
   return (
@@ -63,5 +63,5 @@ export const BillingWarning = () => {
         <BiRightArrowAlt className='w-5 h-full opacity-70' />
       </a>
     </div>
-  )
-}
+  );
+};

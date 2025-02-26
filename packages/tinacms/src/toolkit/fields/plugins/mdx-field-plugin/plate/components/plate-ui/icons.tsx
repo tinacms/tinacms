@@ -1,5 +1,5 @@
-import React from 'react'
-import { cva } from 'class-variance-authority'
+import React from 'react';
+import { cva } from 'class-variance-authority';
 import {
   AlignCenter,
   AlignJustify,
@@ -54,11 +54,11 @@ import {
   Ungroup,
   WrapText,
   X,
-} from 'lucide-react'
+} from 'lucide-react';
 
-import type { LucideIcon } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react';
 
-export type Icon = LucideIcon
+export type Icon = LucideIcon;
 
 const RawMarkdown = () => {
   return (
@@ -76,8 +76,8 @@ const RawMarkdown = () => {
       <title />
       <path d='M22.27 19.385H1.73A1.73 1.73 0 010 17.655V6.345a1.73 1.73 0 011.73-1.73h20.54A1.73 1.73 0 0124 6.345v11.308a1.73 1.73 0 01-1.73 1.731zM5.769 15.923v-4.5l2.308 2.885 2.307-2.885v4.5h2.308V8.078h-2.308l-2.307 2.885-2.308-2.885H3.46v7.847zM21.232 12h-2.309V8.077h-2.307V12h-2.308l3.461 4.039z' />
     </svg>
-  )
-}
+  );
+};
 const MermaidIcon = () => (
   <svg
     width='100%'
@@ -97,7 +97,7 @@ const MermaidIcon = () => (
       fillRule='nonzero'
     />
   </svg>
-)
+);
 
 const borderAll = (props: LucideProps) => (
   <svg
@@ -112,7 +112,7 @@ const borderAll = (props: LucideProps) => (
   >
     <path d='M3 6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6zm10 13h5a1 1 0 0 0 1-1v-5h-6v6zm-2-6H5v5a1 1 0 0 0 1 1h5v-6zm2-2h6V6a1 1 0 0 0-1-1h-5v6zm-2-6H6a1 1 0 0 0-1 1v5h6V5z' />
   </svg>
-)
+);
 
 const borderBottom = (props: LucideProps) => (
   <svg
@@ -127,7 +127,7 @@ const borderBottom = (props: LucideProps) => (
   >
     <path d='M13 5a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2h2zm-8 6a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2zm-2 7a1 1 0 1 1 2 0 1 1 0 0 0 1 1h12a1 1 0 0 0 1-1 1 1 0 1 1 2 0 3 3 0 0 1-3 3H6a3 3 0 0 1-3-3zm17-8a1 1 0 0 0-1 1v2a1 1 0 1 0 2 0v-2a1 1 0 0 0-1-1zM7 4a1 1 0 0 0-1-1 3 3 0 0 0-3 3 1 1 0 0 0 2 0 1 1 0 0 1 1-1 1 1 0 0 0 1-1zm11-1a1 1 0 1 0 0 2 1 1 0 0 1 1 1 1 1 0 1 0 2 0 3 3 0 0 0-3-3z' />
   </svg>
-)
+);
 
 const borderLeft = (props: LucideProps) => (
   <svg
@@ -142,7 +142,7 @@ const borderLeft = (props: LucideProps) => (
   >
     <path d='M6 21a1 1 0 1 0 0-2 1 1 0 0 1-1-1V6a1 1 0 0 1 1-1 1 1 0 0 0 0-2 3 3 0 0 0-3 3v12a3 3 0 0 0 3 3zm7-16a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2h2zm6 6a1 1 0 1 1 2 0v2a1 1 0 1 1-2 0v-2zm-5 9a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1zm4-17a1 1 0 1 0 0 2 1 1 0 0 1 1 1 1 1 0 1 0 2 0 3 3 0 0 0-3-3zm-1 17a1 1 0 0 0 1 1 3 3 0 0 0 3-3 1 1 0 1 0-2 0 1 1 0 0 1-1 1 1 1 0 0 0-1 1z' />
   </svg>
-)
+);
 
 const borderNone = (props: LucideProps) => (
   <svg
@@ -157,7 +157,7 @@ const borderNone = (props: LucideProps) => (
   >
     <path d='M14 4a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1zm-9 7a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2zm14 0a1 1 0 1 1 2 0v2a1 1 0 1 1-2 0v-2zm-6 10a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2h2zM7 4a1 1 0 0 0-1-1 3 3 0 0 0-3 3 1 1 0 0 0 2 0 1 1 0 0 1 1-1 1 1 0 0 0 1-1zm11-1a1 1 0 1 0 0 2 1 1 0 0 1 1 1 1 1 0 1 0 2 0 3 3 0 0 0-3-3zM7 20a1 1 0 0 1-1 1 3 3 0 0 1-3-3 1 1 0 1 1 2 0 1 1 0 0 0 1 1 1 1 0 0 1 1 1zm11 1a1 1 0 1 1 0-2 1 1 0 0 0 1-1 1 1 0 1 1 2 0 3 3 0 0 1-3 3z' />
   </svg>
-)
+);
 
 const borderRight = (props: LucideProps) => (
   <svg
@@ -172,7 +172,7 @@ const borderRight = (props: LucideProps) => (
   >
     <path d='M13 5a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2h2zm-8 6a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2zm9 9a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1zM6 3a1 1 0 0 1 0 2 1 1 0 0 0-1 1 1 1 0 0 1-2 0 3 3 0 0 1 3-3zm1 17a1 1 0 0 1-1 1 3 3 0 0 1-3-3 1 1 0 1 1 2 0 1 1 0 0 0 1 1 1 1 0 0 1 1 1zm11 1a1 1 0 1 1 0-2 1 1 0 0 0 1-1V6a1 1 0 0 0-1-1 1 1 0 1 1 0-2 3 3 0 0 1 3 3v12a3 3 0 0 1-3 3z' />
   </svg>
-)
+);
 
 const borderTop = (props: LucideProps) => (
   <svg
@@ -187,7 +187,7 @@ const borderTop = (props: LucideProps) => (
   >
     <path d='M3 6a1 1 0 0 0 2 0 1 1 0 0 1 1-1h12a1 1 0 0 1 1 1 1 1 0 1 0 2 0 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3zm2 5a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2zm14 0a1 1 0 1 1 2 0v2a1 1 0 1 1-2 0v-2zm-5 9a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1zm-8 1a1 1 0 1 0 0-2 1 1 0 0 1-1-1 1 1 0 1 0-2 0 3 3 0 0 0 3 3zm11-1a1 1 0 0 0 1 1 3 3 0 0 0 3-3 1 1 0 1 0-2 0 1 1 0 0 1-1 1 1 1 0 0 0-1 1z' />
   </svg>
-)
+);
 
 export const iconVariants = cva('', {
   variants: {
@@ -201,7 +201,7 @@ export const iconVariants = cva('', {
     },
   },
   defaultVariants: {},
-})
+});
 
 export const DoubleColumnOutlined = (props: LucideProps) => (
   <svg
@@ -219,7 +219,7 @@ export const DoubleColumnOutlined = (props: LucideProps) => (
       fillRule='evenodd'
     />
   </svg>
-)
+);
 
 export const ThreeColumnOutlined = (props: LucideProps) => (
   <svg
@@ -237,7 +237,7 @@ export const ThreeColumnOutlined = (props: LucideProps) => (
       fillRule='evenodd'
     />
   </svg>
-)
+);
 
 export const RightSideDoubleColumnOutlined = (props: LucideProps) => (
   <svg
@@ -255,7 +255,7 @@ export const RightSideDoubleColumnOutlined = (props: LucideProps) => (
       fillRule='evenodd'
     />
   </svg>
-)
+);
 
 export const LeftSideDoubleColumnOutlined = (props: LucideProps) => (
   <svg
@@ -273,7 +273,7 @@ export const LeftSideDoubleColumnOutlined = (props: LucideProps) => (
       fillRule='evenodd'
     />
   </svg>
-)
+);
 
 export const DoubleSideDoubleColumnOutlined = (props: LucideProps) => (
   <svg
@@ -291,7 +291,7 @@ export const DoubleSideDoubleColumnOutlined = (props: LucideProps) => (
       fillRule='evenodd'
     />
   </svg>
-)
+);
 
 export const Overflow = (props) => (
   <svg
@@ -309,7 +309,7 @@ export const Overflow = (props) => (
       d='M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z'
     />
   </svg>
-)
+);
 
 export const Icons = {
   add: Plus,
@@ -416,7 +416,7 @@ export const Icons = {
   moon: Moon,
   sun: SunMedium,
   twitter: Twitter,
-}
+};
 
 export const EllipsisIcon = ({ title }) => {
   return (
@@ -437,11 +437,11 @@ export const EllipsisIcon = ({ title }) => {
         />
       </svg>
     </>
-  )
-}
+  );
+};
 
 export function UnorderedListIcon(props) {
-  const title = props.title || 'format list bulleted'
+  const title = props.title || 'format list bulleted';
 
   return (
     <svg
@@ -468,11 +468,11 @@ export function UnorderedListIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function HeadingIcon(props) {
-  const title = props.title || 'format size'
+  const title = props.title || 'format size';
 
   return (
     <svg
@@ -490,11 +490,11 @@ export function HeadingIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function OrderedListIcon(props) {
-  const title = props.title || 'format list numbered'
+  const title = props.title || 'format list numbered';
 
   return (
     <svg
@@ -512,11 +512,11 @@ export function OrderedListIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function QuoteIcon(props) {
-  const title = props.title || 'format quote'
+  const title = props.title || 'format quote';
 
   return (
     <svg
@@ -534,11 +534,11 @@ export function QuoteIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function LinkIcon(props) {
-  const title = props.title || 'insert link'
+  const title = props.title || 'insert link';
 
   return (
     <svg
@@ -556,11 +556,11 @@ export function LinkIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function CodeIcon(props) {
-  const title = props.title || 'code'
+  const title = props.title || 'code';
 
   return (
     <svg
@@ -578,11 +578,11 @@ export function CodeIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function CodeBlockIcon(props) {
-  const title = props.title || 'code-block'
+  const title = props.title || 'code-block';
 
   return (
     <svg
@@ -599,11 +599,11 @@ export function CodeBlockIcon(props) {
       <path d='M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z' />
       <path d='M6.854 4.646a.5.5 0 0 1 0 .708L4.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0zm2.292 0a.5.5 0 0 0 0 .708L11.793 8l-2.647 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0z' />
     </svg>
-  )
+  );
 }
 
 export function ImageIcon(props) {
-  const title = props.title || 'image'
+  const title = props.title || 'image';
 
   return (
     <svg
@@ -621,11 +621,11 @@ export function ImageIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function BoldIcon(props) {
-  const title = props.title || 'format bold'
+  const title = props.title || 'format bold';
 
   return (
     <svg
@@ -643,11 +643,11 @@ export function BoldIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function ItalicIcon(props) {
-  const title = props.title || 'format italic'
+  const title = props.title || 'format italic';
 
   return (
     <svg
@@ -665,11 +665,11 @@ export function ItalicIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function UnderlineIcon(props) {
-  const title = props.title || 'format underlined'
+  const title = props.title || 'format underlined';
 
   return (
     <svg
@@ -686,11 +686,11 @@ export function UnderlineIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function StrikethroughIcon(props) {
-  const title = props.title || 'strikethrough s'
+  const title = props.title || 'strikethrough s';
 
   return (
     <svg
@@ -707,11 +707,11 @@ export function StrikethroughIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function LightningIcon(props) {
-  const title = props.title || 'lightning'
+  const title = props.title || 'lightning';
 
   return (
     <svg
@@ -737,11 +737,11 @@ export function LightningIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function ArrowDownIcon(props) {
-  const title = props.title || 'keyboard arrow down'
+  const title = props.title || 'keyboard arrow down';
 
   return (
     <svg
@@ -758,7 +758,7 @@ export function ArrowDownIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function PlusIcon({ className = '' }: { className?: string }) {
@@ -775,5 +775,5 @@ export function PlusIcon({ className = '' }: { className?: string }) {
         clipRule='evenodd'
       />
     </svg>
-  )
+  );
 }

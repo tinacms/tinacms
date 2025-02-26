@@ -1,26 +1,26 @@
-import * as React from 'react'
+import * as React from 'react';
 
 type Option = {
-  value: string
-  label?: string
-  icon?: React.ComponentType<any>
-}
+  value: string;
+  label?: string;
+  icon?: React.ComponentType<any>;
+};
 
 interface ButtonToggleFieldProps {
-  label?: string
-  name: string
-  component: string
-  options: (Option | string)[]
-  direction?: 'horizontal' | 'vertical'
+  label?: string;
+  name: string;
+  component: string;
+  options: (Option | string)[];
+  direction?: 'horizontal' | 'vertical';
 }
 
 export interface ButtonToggleProps {
-  name: string
-  input: any
-  field: ButtonToggleFieldProps
-  disabled?: boolean
-  options?: (Option | string)[]
-  direction?: 'horizontal' | 'vertical'
+  name: string;
+  input: any;
+  field: ButtonToggleFieldProps;
+  disabled?: boolean;
+  options?: (Option | string)[];
+  direction?: 'horizontal' | 'vertical';
 }
 
 export const ButtonToggle: React.FC<ButtonToggleProps> = ({
@@ -28,8 +28,8 @@ export const ButtonToggle: React.FC<ButtonToggleProps> = ({
   field,
   options,
 }) => {
-  const toggleOptions = options || field.options
-  const direction = field.direction || 'horizontal'
+  const toggleOptions = options || field.options;
+  const direction = field.direction || 'horizontal';
 
   return (
     <>
@@ -41,7 +41,7 @@ export const ButtonToggle: React.FC<ButtonToggleProps> = ({
       >
         {toggleOptions
           ? toggleOptions.map((toggleOption) => {
-              const option = toProps(toggleOption)
+              const option = toProps(toggleOption);
               if (option.icon) {
                 return (
                   <ButtonOption
@@ -50,7 +50,7 @@ export const ButtonToggle: React.FC<ButtonToggleProps> = ({
                     value={option.value}
                     icon={option.icon}
                   />
-                )
+                );
               } else {
                 return (
                   <ButtonOption
@@ -59,20 +59,20 @@ export const ButtonToggle: React.FC<ButtonToggleProps> = ({
                     value={option.value}
                     label={option.label}
                   />
-                )
+                );
               }
             })
           : input.value}
       </div>
     </>
-  )
-}
+  );
+};
 
 interface ButtonOptionProps {
-  input: any
-  value: string
-  label?: string
-  icon?: React.ComponentType<any>
+  input: any;
+  value: string;
+  label?: string;
+  icon?: React.ComponentType<any>;
 }
 
 const ButtonOption = ({
@@ -82,13 +82,13 @@ const ButtonOption = ({
   icon,
   ...props
 }: ButtonOptionProps) => {
-  const Icon = icon as React.ComponentType<any> | null
+  const Icon = icon as React.ComponentType<any> | null;
 
   return (
     <button
       className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-3 py-2 text-gray-400 transition-all ease-out duration-150`}
       onClick={() => {
-        input.onChange(value)
+        input.onChange(value);
       }}
       {...props}
     >
@@ -109,10 +109,10 @@ const ButtonOption = ({
         )}
       </span>
     </button>
-  )
-}
+  );
+};
 
 function toProps(option: Option | string): Option {
-  if (typeof option === 'object') return option
-  return { value: option, label: option }
+  if (typeof option === 'object') return option;
+  return { value: option, label: option };
 }

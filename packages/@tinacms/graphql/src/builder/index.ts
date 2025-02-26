@@ -2,10 +2,10 @@
 
 */
 
-import { LookupMapType } from '../database'
-import { astBuilder, NAMER, SysFieldDefinition } from '../ast-builder'
-import { sequential } from '../util'
-import { staticDefinitions } from './static-definitions'
+import { LookupMapType } from '../database';
+import { astBuilder, NAMER, SysFieldDefinition } from '../ast-builder';
+import { sequential } from '../util';
+import { staticDefinitions } from './static-definitions';
 
 import type {
   UnionTypeDefinitionNode,
@@ -17,7 +17,7 @@ import type {
   InlineFragmentNode,
   FieldDefinitionNode,
   NamedTypeNode,
-} from 'graphql'
+} from 'graphql';
 
 import type {
   Collection,
@@ -25,17 +25,17 @@ import type {
   CollectionTemplateable,
   Collectable,
   Template,
-} from '@tinacms/schema-tools'
-import { TinaSchema } from '@tinacms/schema-tools'
-import { mapUserFields } from '../auth/utils'
+} from '@tinacms/schema-tools';
+import { TinaSchema } from '@tinacms/schema-tools';
+import { mapUserFields } from '../auth/utils';
 
 export const createBuilder = async ({
   tinaSchema,
 }: {
-  tinaSchema: TinaSchema
+  tinaSchema: TinaSchema;
 }) => {
-  return new Builder({ tinaSchema: tinaSchema })
-}
+  return new Builder({ tinaSchema: tinaSchema });
+};
 
 /**
  * The builder class is responsible for creating GraphQL AST definitions
@@ -43,24 +43,24 @@ export const createBuilder = async ({
  * storing a reference to how we can resolve that type when we come across it.
  */
 export class Builder {
-  private maxDepth: number
-  public tinaSchema: TinaSchema
-  public lookupMap: Record<string, LookupMapType>
+  private maxDepth: number;
+  public tinaSchema: TinaSchema;
+  public lookupMap: Record<string, LookupMapType>;
   constructor(
     public config: {
-      tinaSchema: TinaSchema
+      tinaSchema: TinaSchema;
     }
   ) {
     this.maxDepth =
       // @ts-ignore
-      config?.tinaSchema.schema?.config?.client?.referenceDepth ?? 2
-    this.tinaSchema = config.tinaSchema
-    this.lookupMap = {}
+      config?.tinaSchema.schema?.config?.client?.referenceDepth ?? 2;
+    this.tinaSchema = config.tinaSchema;
+    this.lookupMap = {};
   }
 
   private addToLookupMap = (lookup: LookupMapType) => {
-    this.lookupMap[lookup.type] = lookup
-  }
+    this.lookupMap[lookup.type] = lookup;
+  };
 
   /**
    * ```graphql
@@ -78,14 +78,14 @@ export class Builder {
   public buildCollectionDefinition = async (
     collections: Collection<true>[]
   ) => {
-    const name = 'collection'
-    const typeName = 'Collection'
+    const name = 'collection';
+    const typeName = 'Collection';
     const args = [
       astBuilder.InputValueDefinition({
         name: 'collection',
         type: astBuilder.TYPES.String,
       }),
-    ]
+    ];
 
     const documentsType =
       await this._buildMultiCollectionDocumentListDefinition({
@@ -95,7 +95,7 @@ export class Builder {
         collections,
         connectionNamespace: ['document'],
         includeFolderFilter: true,
-      })
+      });
 
     const type = astBuilder.ObjectTypeDefinition({
       name: typeName,
@@ -142,14 +142,14 @@ export class Builder {
         }),
         documentsType,
       ],
-    })
+    });
     return astBuilder.FieldDefinition({
       type,
       name,
       args,
       required: true,
-    })
-  }
+    });
+  };
 
   /**
    * ```graphql
@@ -167,16 +167,16 @@ export class Builder {
   public buildMultiCollectionDefinition = async (
     collections: Collection<true>[]
   ) => {
-    const name = 'collections'
-    const typeName = 'Collection'
+    const name = 'collections';
+    const typeName = 'Collection';
 
     return astBuilder.FieldDefinition({
       type: typeName,
       name,
       list: true,
       required: true,
-    })
-  }
+    });
+  };
 
   /**
    * ```graphql
@@ -190,18 +190,18 @@ export class Builder {
    * ```
    */
   public multiNodeDocument = async () => {
-    const name = 'node'
+    const name = 'node';
     const args = [
       astBuilder.InputValueDefinition({
         name: 'id',
         type: astBuilder.TYPES.String,
       }),
-    ]
+    ];
 
     this.addToLookupMap({
       type: astBuilder.TYPES.Node,
       resolveType: 'nodeDocument',
-    })
+    });
 
     return astBuilder.FieldDefinition({
       name: name,
@@ -209,8 +209,8 @@ export class Builder {
       list: false,
       type: astBuilder.TYPES.Node,
       required: true,
-    })
-  }
+    });
+  };
 
   /**
    * ```graphql
@@ -226,7 +226,7 @@ export class Builder {
    * @param collections
    */
   public multiCollectionDocument = async (collections: Collection<true>[]) => {
-    const name = 'document'
+    const name = 'document';
     const args = [
       astBuilder.InputValueDefinition({
         name: 'collection',
@@ -236,13 +236,13 @@ export class Builder {
         name: 'relativePath',
         type: astBuilder.TYPES.String,
       }),
-    ]
+    ];
 
     const type = await this._buildMultiCollectionDocumentDefinition({
       fieldName: astBuilder.TYPES.MultiCollectionDocument,
       collections,
       includeFolderType: true,
-    })
+    });
 
     return astBuilder.FieldDefinition({
       name: name,
@@ -250,8 +250,8 @@ export class Builder {
       list: false,
       type: type,
       required: true,
-    })
-  }
+    });
+  };
 
   /**
    * ```graphql
@@ -288,8 +288,8 @@ export class Builder {
       ],
       required: true,
       type: astBuilder.TYPES.MultiCollectionDocument,
-    })
-  }
+    });
+  };
 
   /**
    * ```graphql
@@ -331,8 +331,8 @@ export class Builder {
       ],
       required: true,
       type: astBuilder.TYPES.MultiCollectionDocument,
-    })
-  }
+    });
+  };
 
   /**
    * ```graphql
@@ -374,8 +374,8 @@ export class Builder {
       ],
       required: true,
       type: astBuilder.TYPES.MultiCollectionDocument,
-    })
-  }
+    });
+  };
   /**
    * ```graphql
    * # ex.
@@ -408,8 +408,8 @@ export class Builder {
       ],
       required: true,
       type: astBuilder.TYPES.MultiCollectionDocument,
-    })
-  }
+    });
+  };
   /**
    * ```graphql
    * # ex.
@@ -440,8 +440,8 @@ export class Builder {
       ],
       required: true,
       type: astBuilder.TYPES.MultiCollectionDocument,
-    })
-  }
+    });
+  };
   /**
    * ```graphql
    * # ex.
@@ -456,34 +456,34 @@ export class Builder {
    * @param collection
    */
   public collectionDocument = async (collection: Collection<true>) => {
-    const name = NAMER.queryName([collection.name])
-    const type = await this._buildCollectionDocumentType(collection)
+    const name = NAMER.queryName([collection.name]);
+    const type = await this._buildCollectionDocumentType(collection);
     const args = [
       astBuilder.InputValueDefinition({
         name: 'relativePath',
         type: astBuilder.TYPES.String,
       }),
-    ]
+    ];
     this.addToLookupMap({
       type: type.name.value,
       resolveType: 'collectionDocument',
       collection: collection.name,
       [NAMER.createName([collection.name])]: 'create',
       [NAMER.updateName([collection.name])]: 'update',
-    })
+    });
     return astBuilder.FieldDefinition({
       type,
       name,
       args,
       required: true,
-    })
-  }
+    });
+  };
 
   public authenticationCollectionDocument = async (
     collection: Collection<true>
   ) => {
-    const name = 'authenticate'
-    const type = await this._buildAuthDocumentType(collection)
+    const name = 'authenticate';
+    const type = await this._buildAuthDocumentType(collection);
     const args = [
       astBuilder.InputValueDefinition({
         name: 'sub',
@@ -495,9 +495,9 @@ export class Builder {
         type: astBuilder.TYPES.String,
         required: true,
       }),
-    ]
-    return astBuilder.FieldDefinition({ type, name, args, required: false })
-  }
+    ];
+    return astBuilder.FieldDefinition({ type, name, args, required: false });
+  };
 
   public updatePasswordMutation = async (collection: Collection<true>) => {
     return astBuilder.FieldDefinition({
@@ -511,17 +511,17 @@ export class Builder {
           type: astBuilder.TYPES.String,
         }),
       ],
-    })
-  }
+    });
+  };
 
   public authorizationCollectionDocument = async (
     collection: Collection<true>
   ) => {
-    const name = 'authorize'
-    const type = await this._buildAuthDocumentType(collection)
-    const args = []
-    return astBuilder.FieldDefinition({ type, name, args, required: false })
-  }
+    const name = 'authorize';
+    const type = await this._buildAuthDocumentType(collection);
+    const args = [];
+    return astBuilder.FieldDefinition({ type, name, args, required: false });
+  };
 
   /**
    * Turns a collection into a fragment that gets updated on build. This fragment does not resolve references
@@ -538,19 +538,19 @@ export class Builder {
    * @param collection a Tina Cloud collection
    */
   public collectionFragment = async (collection: Collection<true>) => {
-    const name = NAMER.dataTypeName(collection.namespace)
-    const fragmentName = NAMER.fragmentName(collection.namespace)
+    const name = NAMER.dataTypeName(collection.namespace);
+    const fragmentName = NAMER.fragmentName(collection.namespace);
     const selections = await this._getCollectionFragmentSelections(
       collection,
       0
-    )
+    );
 
     return astBuilder.FragmentDefinition({
       name,
       fragmentName,
       selections: filterSelections(selections),
-    })
-  }
+    });
+  };
 
   /**
    * Given a collection this function returns its selections set. For example for Post this would return
@@ -570,26 +570,26 @@ export class Builder {
     collection: Collection<true>,
     depth: number
   ) => {
-    const selections = []
+    const selections = [];
     selections.push({
       name: { kind: 'Name', value: '__typename' },
       kind: 'Field',
-    })
+    });
     if (collection.fields?.length > 0) {
       await sequential(collection.fields, async (x) => {
-        const field = await this._buildFieldNodeForFragments(x, depth)
-        selections.push(field)
-      })
+        const field = await this._buildFieldNodeForFragments(x, depth);
+        selections.push(field);
+      });
     } else {
       await sequential(collection.templates, async (tem) => {
         if (typeof tem === 'object') {
           // TODO: Handle when template is a string
-          selections.push(await this.buildTemplateFragments(tem, depth))
+          selections.push(await this.buildTemplateFragments(tem, depth));
         }
-      })
+      });
     }
-    return selections
-  }
+    return selections;
+  };
 
   private _buildFieldNodeForFragments: (
     field: TinaField<true>,
@@ -602,7 +602,7 @@ export class Builder {
       case 'number':
       case 'boolean':
       case 'rich-text':
-        return astBuilder.FieldNodeDefinition(field)
+        return astBuilder.FieldNodeDefinition(field);
       case 'password':
         const passwordValue = await this._buildFieldNodeForFragments(
           {
@@ -612,7 +612,7 @@ export class Builder {
             required: true,
           } as TinaField<true>,
           depth
-        )
+        );
         const passwordChangeRequired = await this._buildFieldNodeForFragments(
           {
             name: 'passwordChangeRequired',
@@ -621,18 +621,18 @@ export class Builder {
             required: false,
           },
           depth
-        )
+        );
         return astBuilder.FieldWithSelectionSetDefinition({
           name: field.name,
           selections: filterSelections([passwordValue, passwordChangeRequired]),
-        })
+        });
       case 'object':
         if (field.fields?.length > 0) {
-          const selections = []
+          const selections = [];
           await sequential(field.fields, async (item) => {
-            const field = await this._buildFieldNodeForFragments(item, depth)
-            selections.push(field)
-          })
+            const field = await this._buildFieldNodeForFragments(item, depth);
+            selections.push(field);
+          });
 
           return astBuilder.FieldWithSelectionSetDefinition({
             name: field.name,
@@ -640,35 +640,35 @@ export class Builder {
               { kind: 'Field', name: { kind: 'Name', value: '__typename' } },
               ...filterSelections(selections),
             ],
-          })
+          });
         } else if (field.templates?.length > 0) {
-          const selections = []
+          const selections = [];
           await sequential(field.templates, async (tem) => {
             if (typeof tem === 'object') {
               // TODO: Handle when template is a string
-              selections.push(await this.buildTemplateFragments(tem, depth))
+              selections.push(await this.buildTemplateFragments(tem, depth));
             }
-          })
+          });
           return astBuilder.FieldWithSelectionSetDefinition({
             name: field.name,
             selections: [
               { kind: 'Field', name: { kind: 'Name', value: '__typename' } },
               ...filterSelections(selections),
             ],
-          })
+          });
         }
       // TODO: Should we throw here?
       case 'reference':
-        if (depth >= this.maxDepth) return false
+        if (depth >= this.maxDepth) return false;
 
         if (!('collections' in field)) {
           // todo add an error
-          return false
+          return false;
         }
-        const selections = []
+        const selections = [];
 
         await sequential(field.collections, async (col) => {
-          const collection = this.tinaSchema.getCollection(col)
+          const collection = this.tinaSchema.getCollection(col);
 
           selections.push({
             kind: 'InlineFragment',
@@ -689,8 +689,8 @@ export class Builder {
                 )
               ),
             },
-          })
-        })
+          });
+        });
 
         return astBuilder.FieldWithSelectionSetDefinition({
           name: field.name,
@@ -724,26 +724,26 @@ export class Builder {
               },
             },
           ],
-        })
+        });
     }
-  }
+  };
 
   public async buildTemplateFragments(
     template: Template<true>,
     depth: number
   ): Promise<InlineFragmentNode | boolean> {
-    const selections = []
+    const selections = [];
 
     await sequential(template.fields || [], async (item) => {
-      const field = await this._buildFieldNodeForFragments(item, depth)
-      selections.push(field)
-    })
-    const filteredSelections = filterSelections(selections)
-    if (!filteredSelections.length) return false
+      const field = await this._buildFieldNodeForFragments(item, depth);
+      selections.push(field);
+    });
+    const filteredSelections = filterSelections(selections);
+    if (!filteredSelections.length) return false;
     return astBuilder.InlineFragmentDefinition({
       selections: filteredSelections,
       name: NAMER.dataTypeName(template.namespace),
-    })
+    });
   }
 
   /**
@@ -778,8 +778,8 @@ export class Builder {
           type: await this._updateCollectionDocumentMutationType(collection),
         }),
       ],
-    })
-  }
+    });
+  };
 
   /**
    * ```graphql
@@ -813,8 +813,8 @@ export class Builder {
           type: await this._updateCollectionDocumentMutationType(collection),
         }),
       ],
-    })
-  }
+    });
+  };
 
   /**
    * ```graphql
@@ -833,27 +833,27 @@ export class Builder {
    * @param collection
    */
   public collectionDocumentList = async (collection: Collection<true>) => {
-    const connectionName = NAMER.referenceConnectionType(collection.namespace)
+    const connectionName = NAMER.referenceConnectionType(collection.namespace);
 
     this.addToLookupMap({
       type: connectionName,
       resolveType: 'collectionDocumentList' as const,
       collection: collection.name,
-    })
+    });
     return this._connectionFieldBuilder({
       fieldName: NAMER.generateQueryListName(collection.namespace),
       connectionName,
       nodeType: NAMER.documentTypeName(collection.namespace),
       namespace: collection.namespace,
       collection,
-    })
-  }
+    });
+  };
 
   /**
    * GraphQL type definitions which remain unchanged regardless
    * of the supplied Tina schema. Ex. "node" interface
    */
-  public buildStaticDefinitions = () => staticDefinitions
+  public buildStaticDefinitions = () => staticDefinitions;
 
   private _buildCollectionDocumentType = async (
     collection: Collection<true>,
@@ -861,9 +861,9 @@ export class Builder {
     extraFields: FieldDefinitionNode[] = [],
     extraInterfaces: NamedTypeNode[] = []
   ) => {
-    const documentTypeName = NAMER.documentTypeName(collection.namespace)
+    const documentTypeName = NAMER.documentTypeName(collection.namespace);
 
-    const templateInfo = this.tinaSchema.getTemplatesForCollectable(collection)
+    const templateInfo = this.tinaSchema.getTemplatesForCollectable(collection);
     if (templateInfo.type === 'union') {
       return this._buildObjectOrUnionData(
         {
@@ -893,12 +893,12 @@ export class Builder {
           ...extraInterfaces,
         ],
         collection
-      )
+      );
     }
-    const fields = templateInfo.template.fields
+    const fields = templateInfo.template.fields;
     const templateFields = await sequential(fields, async (field) => {
-      return this._buildDataField(field)
-    })
+      return this._buildDataField(field);
+    });
     return astBuilder.ObjectTypeDefinition({
       name: documentTypeName + suffix,
       interfaces: [
@@ -925,8 +925,8 @@ export class Builder {
           type: 'JSON',
         }),
       ],
-    })
-  }
+    });
+  };
 
   private _buildAuthDocumentType = async (
     collection: Collection<true>,
@@ -934,24 +934,24 @@ export class Builder {
     extraFields: FieldDefinitionNode[] = [],
     extraInterfaces: NamedTypeNode[] = []
   ) => {
-    const usersFields = mapUserFields(collection, [])
+    const usersFields = mapUserFields(collection, []);
     if (!usersFields.length) {
-      throw new Error('Auth collection must have a user field')
+      throw new Error('Auth collection must have a user field');
     }
     if (usersFields.length > 1) {
-      throw new Error('Auth collection cannot have more than one user field')
+      throw new Error('Auth collection cannot have more than one user field');
     }
-    const usersField = usersFields[0].collectable
-    const documentTypeName = NAMER.documentTypeName(usersField.namespace)
-    const templateInfo = this.tinaSchema.getTemplatesForCollectable(usersField)
+    const usersField = usersFields[0].collectable;
+    const documentTypeName = NAMER.documentTypeName(usersField.namespace);
+    const templateInfo = this.tinaSchema.getTemplatesForCollectable(usersField);
 
     if (templateInfo.type === 'union') {
-      throw new Error('Auth collection user field cannot be a union')
+      throw new Error('Auth collection user field cannot be a union');
     }
-    const fields = templateInfo.template.fields
+    const fields = templateInfo.template.fields;
     const templateFields = await sequential(fields, async (field) => {
-      return this._buildDataField(field)
-    })
+      return this._buildDataField(field);
+    });
     return astBuilder.ObjectTypeDefinition({
       name: documentTypeName + suffix,
       interfaces: [
@@ -960,13 +960,13 @@ export class Builder {
         ...extraInterfaces,
       ],
       fields: [...templateFields],
-    })
-  }
+    });
+  };
 
   private _filterCollectionDocumentType = async (
     collection: Collectable
   ): Promise<InputObjectTypeDefinitionNode> => {
-    const t = this.tinaSchema.getTemplatesForCollectable(collection)
+    const t = this.tinaSchema.getTemplatesForCollectable(collection);
     if (t.type === 'union') {
       return astBuilder.InputObjectTypeDefinition({
         name: NAMER.dataFilterTypeName(t.namespace),
@@ -974,33 +974,33 @@ export class Builder {
           return astBuilder.InputValueDefinition({
             name: template.namespace[template.namespace.length - 1],
             type: await this._buildTemplateFilter(template),
-          })
+          });
         }),
-      })
+      });
     }
 
-    return this._buildTemplateFilter(t.template)
-  }
+    return this._buildTemplateFilter(t.template);
+  };
 
   private _buildTemplateFilter = async (template: Template<true>) => {
-    const fields = []
+    const fields = [];
     await sequential(template.fields, async (field) => {
-      const f = await this._buildFieldFilter(field)
+      const f = await this._buildFieldFilter(field);
       if (f) {
-        fields.push(f)
+        fields.push(f);
       }
-      return true
-    })
+      return true;
+    });
     return astBuilder.InputObjectTypeDefinition({
       name: NAMER.dataFilterTypeName(template.namespace),
       fields: fields,
-    })
-  }
+    });
+  };
 
   private _updateCollectionDocumentMutationType = async (
     collection: Collectable
   ): Promise<InputObjectTypeDefinitionNode> => {
-    const t = this.tinaSchema.getTemplatesForCollectable(collection)
+    const t = this.tinaSchema.getTemplatesForCollectable(collection);
     if (t.type === 'union') {
       return astBuilder.InputObjectTypeDefinition({
         name: NAMER.dataMutationTypeName(t.namespace),
@@ -1008,61 +1008,61 @@ export class Builder {
           return astBuilder.InputValueDefinition({
             name: template.namespace[template.namespace.length - 1],
             type: await this._buildTemplateMutation(template),
-          })
+          });
         }),
-      })
+      });
     }
 
-    return this._buildTemplateMutation(t.template)
-  }
+    return this._buildTemplateMutation(t.template);
+  };
 
   private _buildTemplateMutation = async (template: Template<true>) => {
     return astBuilder.InputObjectTypeDefinition({
       name: NAMER.dataMutationTypeName(template.namespace),
       fields: await sequential(template.fields, (field) => {
-        return this._buildFieldMutation(field)
+        return this._buildFieldMutation(field);
       }),
-    })
-  }
+    });
+  };
 
   private _buildMultiCollectionDocumentDefinition = async ({
     fieldName,
     collections,
     includeFolderType,
   }: {
-    fieldName: string
-    collections: Collection<true>[]
-    includeFolderType?: boolean
+    fieldName: string;
+    collections: Collection<true>[];
+    includeFolderType?: boolean;
   }) => {
-    const types: string[] = []
+    const types: string[] = [];
     collections.forEach((collection) => {
       if (collection.fields) {
-        const typeName = NAMER.documentTypeName(collection.namespace)
-        types.push(typeName)
+        const typeName = NAMER.documentTypeName(collection.namespace);
+        types.push(typeName);
       }
       if (collection.templates) {
         collection.templates.forEach((template) => {
-          const typeName = NAMER.documentTypeName(template.namespace)
-          types.push(typeName)
-        })
+          const typeName = NAMER.documentTypeName(template.namespace);
+          types.push(typeName);
+        });
       }
-    })
+    });
     if (includeFolderType) {
-      types.push(astBuilder.TYPES.Folder)
+      types.push(astBuilder.TYPES.Folder);
     }
     const type = astBuilder.UnionTypeDefinition({
       name: fieldName,
       types,
-    })
+    });
 
     this.addToLookupMap({
       type: type.name.value,
       resolveType: 'multiCollectionDocument',
       createDocument: 'create',
       updateDocument: 'update',
-    })
-    return type
-  }
+    });
+    return type;
+  };
 
   private _buildMultiCollectionDocumentListDefinition = async ({
     fieldName,
@@ -1072,19 +1072,19 @@ export class Builder {
     connectionNamespace,
     includeFolderFilter,
   }: {
-    fieldName: string
-    namespace: string[]
-    nodeType: string | TypeDefinitionNode
-    collections: Collection<true>[]
-    connectionNamespace: string[]
-    includeFolderFilter?: boolean
+    fieldName: string;
+    namespace: string[];
+    nodeType: string | TypeDefinitionNode;
+    collections: Collection<true>[];
+    connectionNamespace: string[];
+    includeFolderFilter?: boolean;
   }) => {
-    const connectionName = NAMER.referenceConnectionType(namespace)
+    const connectionName = NAMER.referenceConnectionType(namespace);
     this.addToLookupMap({
       type: connectionName,
       resolveType: 'multiCollectionDocumentList' as const,
       collections: collections.map((collection) => collection.name),
-    })
+    });
 
     return this._connectionFieldBuilder({
       fieldName,
@@ -1093,8 +1093,8 @@ export class Builder {
       nodeType: nodeType,
       collections,
       includeFolderFilter,
-    })
-  }
+    });
+  };
 
   private _buildFieldFilter = async (field: TinaField<true>) => {
     switch (field.type) {
@@ -1114,7 +1114,7 @@ export class Builder {
               }),
             ],
           }),
-        })
+        });
       case 'number':
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1152,7 +1152,7 @@ export class Builder {
               }),
             ],
           }),
-        })
+        });
       case 'datetime':
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1182,7 +1182,7 @@ export class Builder {
               }),
             ],
           }),
-        })
+        });
       case 'image':
       case 'string':
         return astBuilder.InputValueDefinition({
@@ -1209,12 +1209,12 @@ export class Builder {
               }),
             ],
           }),
-        })
+        });
       case 'object':
         return astBuilder.InputValueDefinition({
           name: field.name,
           type: await this._filterCollectionDocumentType(field),
-        })
+        });
       case 'rich-text':
         if (!field.templates || field.templates.length === 0) {
           return astBuilder.InputValueDefinition({
@@ -1236,27 +1236,27 @@ export class Builder {
                 }),
               ],
             }),
-          })
+          });
         }
         return astBuilder.InputValueDefinition({
           name: field.name,
           type: await this._filterCollectionDocumentType(field),
-        })
+        });
       case 'reference':
         const filter = await this._connectionFilterBuilder({
           fieldName: field.name,
           namespace: field.namespace,
           collections: this.tinaSchema.getCollectionsByName(field.collections),
-        })
+        });
         return astBuilder.InputValueDefinition({
           name: field.name,
           type: astBuilder.InputObjectTypeDefinition({
             name: NAMER.dataFilterTypeName(field.namespace),
             fields: [filter],
           }),
-        })
+        });
     }
-  }
+  };
 
   private _buildFieldMutation = async (field: TinaField<true>) => {
     switch (field.type) {
@@ -1265,13 +1265,13 @@ export class Builder {
           name: field.name,
           list: field.list,
           type: astBuilder.TYPES.Boolean,
-        })
+        });
       case 'number':
         return astBuilder.InputValueDefinition({
           name: field.name,
           list: field.list,
           type: astBuilder.TYPES.Number,
-        })
+        });
       case 'datetime':
       case 'image':
       case 'string':
@@ -1279,37 +1279,37 @@ export class Builder {
           name: field.name,
           list: field.list,
           type: astBuilder.TYPES.String,
-        })
+        });
       case 'password':
-        return this._buildPasswordMutation(field)
+        return this._buildPasswordMutation(field);
       case 'object':
         return astBuilder.InputValueDefinition({
           name: field.name,
           list: field.list,
           type: await this._updateCollectionDocumentMutationType(field),
-        })
+        });
       case 'rich-text':
         return astBuilder.InputValueDefinition({
           name: field.name,
           list: field.list,
           type: astBuilder.TYPES.JSON,
-        })
+        });
       case 'reference':
         return astBuilder.InputValueDefinition({
           name: field.name,
           list: field.list,
           type: astBuilder.TYPES.String,
-        })
+        });
       // return astBuilder.InputValueDefinition({
       //   name: field.name,
       //   type: await this._buildReferenceMutation(field),
       // })
     }
-  }
+  };
 
   private _buildReferenceMutation = async (field: {
-    namespace: string[]
-    collections: string[]
+    namespace: string[];
+    collections: string[];
   }) => {
     return astBuilder.InputObjectTypeDefinition({
       name: NAMER.dataMutationTypeName(field.namespace),
@@ -1319,16 +1319,16 @@ export class Builder {
           return astBuilder.InputValueDefinition({
             name: collection.name,
             type: NAMER.dataMutationTypeName([collection.name]),
-          })
+          });
         }
       ),
-    })
-  }
+    });
+  };
 
   private _buildPasswordMutation = async (field: {
-    list?: boolean
-    name: string
-    namespace: string[]
+    list?: boolean;
+    name: string;
+    namespace: string[];
   }) => {
     return astBuilder.InputValueDefinition({
       name: field.name,
@@ -1348,12 +1348,12 @@ export class Builder {
           }),
         ],
       }),
-    })
-  }
+    });
+  };
 
   private _buildUpdateDocumentMutationParams = async (field: {
-    namespace: string[]
-    collections: string[]
+    namespace: string[];
+    collections: string[];
   }) => {
     const fields = await sequential(
       this.tinaSchema.getCollectionsByName(field.collections),
@@ -1361,20 +1361,20 @@ export class Builder {
         return astBuilder.InputValueDefinition({
           name: collection.name,
           type: NAMER.dataMutationTypeName([collection.name]),
-        })
+        });
       }
-    )
+    );
     fields.push(
       astBuilder.InputValueDefinition({
         name: 'relativePath',
         type: astBuilder.TYPES.String,
       })
-    )
+    );
     return astBuilder.InputObjectTypeDefinition({
       name: NAMER.dataMutationUpdateTypeName(field.namespace),
       fields,
-    })
-  }
+    });
+  };
 
   private _buildObjectOrUnionData = async (
     collectableTemplate: CollectionTemplateable,
@@ -1383,8 +1383,8 @@ export class Builder {
     collection?: Collection<true>
   ): Promise<UnionTypeDefinitionNode | ObjectTypeDefinitionNode> => {
     if (collectableTemplate.type === 'union') {
-      const name = NAMER.dataTypeName(collectableTemplate.namespace)
-      const typeMap: { [templateName: string]: string } = {}
+      const name = NAMER.dataTypeName(collectableTemplate.namespace);
+      const typeMap: { [templateName: string]: string } = {};
       const types = await sequential(
         collectableTemplate.templates,
         async (template) => {
@@ -1392,25 +1392,25 @@ export class Builder {
             template,
             extraFields,
             extraInterfaces
-          )
+          );
           typeMap[template.namespace[template.namespace.length - 1]] =
-            type.name.value
-          return type
+            type.name.value;
+          return type;
         }
-      )
+      );
 
       this.addToLookupMap({
         type: name,
         resolveType: 'unionData',
         collection: collection?.name,
         typeMap,
-      })
+      });
 
-      return astBuilder.UnionTypeDefinition({ name, types })
+      return astBuilder.UnionTypeDefinition({ name, types });
     }
 
-    return this._buildTemplateData(collectableTemplate.template)
-  }
+    return this._buildTemplateData(collectableTemplate.template);
+  };
 
   private _connectionFilterBuilder = async ({
     fieldName,
@@ -1418,12 +1418,12 @@ export class Builder {
     collection,
     collections,
   }: {
-    fieldName: string
-    namespace: string[]
-    collection?: Collectable
-    collections?: Collectable[]
+    fieldName: string;
+    namespace: string[];
+    collection?: Collectable;
+    collections?: Collectable[];
   }) => {
-    let filter
+    let filter;
     if (collections) {
       filter = astBuilder.InputValueDefinition({
         name: 'filter',
@@ -1434,22 +1434,22 @@ export class Builder {
               // @ts-ignore
               name: collection.name,
               type: NAMER.dataFilterTypeName(collection.namespace),
-            })
+            });
           }),
         }),
-      })
+      });
     } else if (collection) {
       filter = astBuilder.InputValueDefinition({
         name: 'filter',
         type: await this._filterCollectionDocumentType(collection),
-      })
+      });
     } else {
       throw new Error(
         `Must provide either collection or collections to filter field builder`
-      )
+      );
     }
-    return filter
-  }
+    return filter;
+  };
 
   private _connectionFieldBuilder = async ({
     fieldName,
@@ -1460,13 +1460,13 @@ export class Builder {
     collections,
     includeFolderFilter,
   }: {
-    fieldName: string
-    namespace: string[]
-    connectionName: string
-    nodeType: string | TypeDefinitionNode
-    collection?: Collectable
-    collections?: Collectable[]
-    includeFolderFilter?: boolean
+    fieldName: string;
+    namespace: string[];
+    connectionName: string;
+    nodeType: string | TypeDefinitionNode;
+    collection?: Collectable;
+    collections?: Collectable[];
+    includeFolderFilter?: boolean;
   }) => {
     const extra = [
       await this._connectionFilterBuilder({
@@ -1475,14 +1475,14 @@ export class Builder {
         collection,
         collections,
       }),
-    ]
+    ];
     if (includeFolderFilter) {
       extra.push(
         astBuilder.InputValueDefinition({
           name: 'folder',
           type: astBuilder.TYPES.String,
         })
-      )
+      );
     }
     return astBuilder.FieldDefinition({
       name: fieldName,
@@ -1521,22 +1521,22 @@ export class Builder {
           }),
         ],
       }),
-    })
-  }
+    });
+  };
 
   private _buildDataField = async (field: TinaField<true>) => {
     const listWarningMsg = `
 WARNING: The user interface for ${field.type} does not support \`list: true\`
 Visit https://tina.io/docs/errors/ui-not-supported/ for more information
 
-`
+`;
 
     switch (field.type) {
       case 'boolean':
       case 'datetime':
       case 'number':
         if (field.list) {
-          console.warn(listWarningMsg)
+          console.warn(listWarningMsg);
         }
       case 'image':
       case 'string':
@@ -1545,7 +1545,7 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
           list: field.list,
           required: field.required,
           type: astBuilder.TYPES.Scalar(field.type),
-        })
+        });
       case 'password':
         return astBuilder.FieldDefinition({
           name: field.name,
@@ -1568,7 +1568,7 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
               }),
             ],
           }),
-        })
+        });
       case 'object':
         return astBuilder.FieldDefinition({
           name: field.name,
@@ -1577,18 +1577,18 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
           type: await this._buildObjectOrUnionData(
             this.tinaSchema.getTemplatesForCollectable(field)
           ),
-        })
+        });
       case 'rich-text':
         return astBuilder.FieldDefinition({
           name: field.name,
           list: field.list,
           required: field.required,
           type: astBuilder.TYPES.JSON,
-        })
+        });
       case 'reference':
-        const name = NAMER.documentTypeName(field.namespace)
+        const name = NAMER.documentTypeName(field.namespace);
         if (field.list) {
-          console.warn(listWarningMsg)
+          console.warn(listWarningMsg);
           return this._buildMultiCollectionDocumentListDefinition({
             fieldName: field.name,
             namespace: field.namespace,
@@ -1602,24 +1602,24 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
               field.collections
             ),
             connectionNamespace: field.namespace,
-          })
+          });
         } else {
           const type = await this._buildMultiCollectionDocumentDefinition({
             fieldName: name,
             collections: this.tinaSchema.getCollectionsByName(
               field.collections
             ),
-          })
+          });
 
           return astBuilder.FieldDefinition({
             name: field.name,
             required: field.required,
             list: false,
             type: type,
-          })
+          });
         }
     }
-  }
+  };
 
   private _buildTemplateData = async (
     { namespace, fields }: Template<true>,
@@ -1631,12 +1631,12 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
       interfaces: extraInterfaces || [],
       fields: [
         ...(await sequential(fields, async (field) => {
-          return this._buildDataField(field)
+          return this._buildDataField(field);
         })),
         ...extraFields,
       ],
-    })
-  }
+    });
+  };
 }
 
 const listArgs = [
@@ -1660,8 +1660,8 @@ const listArgs = [
     name: 'sort',
     type: astBuilder.TYPES.String,
   }),
-]
+];
 
 const filterSelections = (arr: any[]) => {
-  return arr.filter(Boolean)
-}
+  return arr.filter(Boolean);
+};

@@ -1,42 +1,42 @@
-import * as React from 'react'
-import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi'
-import type { IconType } from 'react-icons/lib'
-import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens'
-import type { SidebarState, SidebarStateOptions } from '../sidebar'
-import { useCMS, useSubscribable } from '@toolkit/react-core'
-import { useState } from 'react'
-import { Button } from '@toolkit/styles'
-import { FormsView } from './sidebar-body'
-import { ImFilesEmpty, ImUsers } from 'react-icons/im'
-import { IoMdClose } from 'react-icons/io'
-import { BillingWarning, LocalWarning } from './local-warning'
-import { MdOutlineArrowBackIos } from 'react-icons/md'
-import { Nav } from './nav'
-import { ResizeHandle } from './resize-handle'
-import { Transition, TransitionChild } from '@headlessui/react'
-import { useWindowWidth } from '@react-hook/window-size'
-import type { CloudConfigPlugin } from '@toolkit/react-cloud-config'
-import { BranchButton } from '@toolkit/plugin-branch-switcher'
+import * as React from 'react';
+import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi';
+import type { IconType } from 'react-icons/lib';
+import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
+import type { SidebarState, SidebarStateOptions } from '../sidebar';
+import { useCMS, useSubscribable } from '@toolkit/react-core';
+import { useState } from 'react';
+import { Button } from '@toolkit/styles';
+import { FormsView } from './sidebar-body';
+import { ImFilesEmpty, ImUsers } from 'react-icons/im';
+import { IoMdClose } from 'react-icons/io';
+import { BillingWarning, LocalWarning } from './local-warning';
+import { MdOutlineArrowBackIos } from 'react-icons/md';
+import { Nav } from './nav';
+import { ResizeHandle } from './resize-handle';
+import { Transition, TransitionChild } from '@headlessui/react';
+import { useWindowWidth } from '@react-hook/window-size';
+import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
+import { BranchButton } from '@toolkit/plugin-branch-switcher';
 
-export const SidebarContext = React.createContext<any>(null)
-export const minPreviewWidth = 440
-export const minSidebarWidth = 360
-export const navBreakpoint = 1279
+export const SidebarContext = React.createContext<any>(null);
+export const minPreviewWidth = 440;
+export const minSidebarWidth = 360;
+export const navBreakpoint = 1279;
 
-const LOCALSTATEKEY = 'tina.sidebarState'
-const LOCALWIDTHKEY = 'tina.sidebarWidth'
+const LOCALSTATEKEY = 'tina.sidebarState';
+const LOCALWIDTHKEY = 'tina.sidebarWidth';
 
-const defaultSidebarWidth = 440
-const defaultSidebarPosition = 'displace'
-const defaultSidebarState = 'open'
+const defaultSidebarWidth = 440;
+const defaultSidebarPosition = 'displace';
+const defaultSidebarState = 'open';
 
 export interface SidebarProviderProps {
-  sidebar: SidebarState
-  resizingSidebar: boolean
-  setResizingSidebar: React.Dispatch<React.SetStateAction<boolean>>
-  defaultWidth?: SidebarStateOptions['defaultWidth']
-  position?: SidebarStateOptions['position']
-  defaultState?: SidebarStateOptions['defaultState']
+  sidebar: SidebarState;
+  resizingSidebar: boolean;
+  setResizingSidebar: React.Dispatch<React.SetStateAction<boolean>>;
+  defaultWidth?: SidebarStateOptions['defaultWidth'];
+  position?: SidebarStateOptions['position'];
+  defaultState?: SidebarStateOptions['defaultState'];
 }
 
 export function SidebarProvider({
@@ -46,9 +46,9 @@ export function SidebarProvider({
   defaultWidth = defaultSidebarWidth,
   sidebar,
 }: SidebarProviderProps) {
-  useSubscribable(sidebar)
-  const cms = useCMS()
-  if (!cms.enabled) return null
+  useSubscribable(sidebar);
+  const cms = useCMS();
+  if (!cms.enabled) return null;
 
   return (
     <Sidebar
@@ -67,22 +67,22 @@ export function SidebarProvider({
       }
       sidebar={sidebar}
     />
-  )
+  );
 }
 
 interface SidebarProps {
-  sidebar: SidebarState
-  resizingSidebar: boolean
-  setResizingSidebar: React.Dispatch<React.SetStateAction<boolean>>
-  defaultWidth?: SidebarStateOptions['defaultWidth']
-  defaultState?: SidebarStateOptions['defaultState']
-  position?: SidebarStateOptions['position']
-  renderNav?: boolean
+  sidebar: SidebarState;
+  resizingSidebar: boolean;
+  setResizingSidebar: React.Dispatch<React.SetStateAction<boolean>>;
+  defaultWidth?: SidebarStateOptions['defaultWidth'];
+  defaultState?: SidebarStateOptions['defaultState'];
+  position?: SidebarStateOptions['position'];
+  renderNav?: boolean;
 }
 
 const useFetchCollections = (cms) => {
-  return { collections: cms.api.admin.fetchCollections(), loading: false }
-}
+  return { collections: cms.api.admin.fetchCollections(), loading: false };
+};
 
 const Sidebar = ({
   sidebar,
@@ -93,139 +93,139 @@ const Sidebar = ({
   resizingSidebar,
   setResizingSidebar,
 }: SidebarProps) => {
-  const cms = useCMS()
-  const collectionsInfo = useFetchCollections(cms)
+  const cms = useCMS();
+  const collectionsInfo = useFetchCollections(cms);
 
   const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
     cms.flags.get('branch-switcher')
-  )
+  );
   React.useEffect(() => {
     cms.events.subscribe('flag:set', ({ key, value }) => {
       if (key === 'branch-switcher') {
-        setBranchingEnabled(value)
+        setBranchingEnabled(value);
       }
-    })
-  }, [cms.events])
+    });
+  }, [cms.events]);
 
-  const screens = cms.plugins.getType<ScreenPlugin>('screen')
-  const cloudConfigs = cms.plugins.getType<CloudConfigPlugin>('cloud-config')
+  const screens = cms.plugins.getType<ScreenPlugin>('screen');
+  const cloudConfigs = cms.plugins.getType<CloudConfigPlugin>('cloud-config');
 
-  useSubscribable(sidebar)
-  useSubscribable(screens)
-  const allScreens = screens.all()
-  const allConfigs = cloudConfigs.all()
+  useSubscribable(sidebar);
+  useSubscribable(screens);
+  const allScreens = screens.all();
+  const allConfigs = cloudConfigs.all();
 
-  const [menuIsOpen, setMenuIsOpen] = useState(false)
-  const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
-  const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
-  const [formIsPristine, setFormIsPristine] = React.useState(true)
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+  const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null);
+  const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth);
+  const [formIsPristine, setFormIsPristine] = React.useState(true);
   const activeScreens = allScreens.filter(
     (screen) =>
       screen.navCategory !== 'Account' ||
       cms.api.tina?.authProvider?.getLoginStrategy() === 'UsernamePassword'
-  )
+  );
 
   const setDisplayState = (value: 'closed' | 'fullscreen' | 'open') =>
-    cms.dispatch({ type: 'sidebar:set-display-state', value: value })
-  const displayState = cms.state.sidebarDisplayState
+    cms.dispatch({ type: 'sidebar:set-display-state', value: value });
+  const displayState = cms.state.sidebarDisplayState;
 
   /* Set sidebar open state and width to local values if available */
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY)
-      const localSidebarWidth = window.localStorage.getItem(LOCALWIDTHKEY)
+      const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY);
+      const localSidebarWidth = window.localStorage.getItem(LOCALWIDTHKEY);
 
       if (localSidebarState !== null) {
-        setDisplayState(JSON.parse(localSidebarState))
+        setDisplayState(JSON.parse(localSidebarState));
       }
 
       if (localSidebarWidth !== null) {
-        setSidebarWidth(JSON.parse(localSidebarWidth))
+        setSidebarWidth(JSON.parse(localSidebarWidth));
       }
     }
-  }, [])
+  }, []);
 
   /* If the default sidebar state changes, update current state if no local value is found */
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY)
+      const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY);
 
       if (localSidebarState === null) {
-        setDisplayState(defaultSidebarState)
+        setDisplayState(defaultSidebarState);
       }
     }
-  }, [defaultSidebarState])
+  }, [defaultSidebarState]);
 
   /* Update the local value of the sidebar state any time it updates, if the CMS is loaded */
   React.useEffect(() => {
     if (typeof window !== 'undefined' && cms.enabled) {
-      window.localStorage.setItem(LOCALSTATEKEY, JSON.stringify(displayState))
+      window.localStorage.setItem(LOCALSTATEKEY, JSON.stringify(displayState));
     }
-  }, [displayState, cms])
+  }, [displayState, cms]);
 
   /* Update the local value of the sidebar width any time the user drags to resize it */
   React.useEffect(() => {
     if (resizingSidebar) {
-      window.localStorage.setItem(LOCALWIDTHKEY, JSON.stringify(sidebarWidth))
+      window.localStorage.setItem(LOCALWIDTHKEY, JSON.stringify(sidebarWidth));
     }
-  }, [sidebarWidth, resizingSidebar])
+  }, [sidebarWidth, resizingSidebar]);
 
   const isTinaAdminEnabled =
-    cms.flags.get('tina-admin') === false ? false : true
+    cms.flags.get('tina-admin') === false ? false : true;
 
   /**
    * Only show ContentCreators when TinaAdmin is disabled
    */
   const contentCreators = isTinaAdminEnabled
     ? []
-    : cms.plugins.getType('content-creator').all()
+    : cms.plugins.getType('content-creator').all();
 
   const toggleFullscreen = () => {
     if (displayState === 'fullscreen') {
-      setDisplayState('open')
+      setDisplayState('open');
     } else {
-      setDisplayState('fullscreen')
+      setDisplayState('fullscreen');
     }
-  }
+  };
 
   const toggleSidebarOpen = () => {
-    cms.dispatch({ type: 'toggle-edit-state' })
-  }
+    cms.dispatch({ type: 'toggle-edit-state' });
+  };
 
   const toggleMenu = () => {
-    setMenuIsOpen((menuIsOpen) => !menuIsOpen)
-  }
+    setMenuIsOpen((menuIsOpen) => !menuIsOpen);
+  };
 
   React.useEffect(() => {
     const updateLayout = () => {
       if (displayState === 'fullscreen') {
-        return
+        return;
       }
       updateBodyDisplacement({
         position,
         displayState,
         sidebarWidth,
         resizingSidebar,
-      })
-    }
+      });
+    };
 
-    updateLayout()
+    updateLayout();
 
-    window.addEventListener('resize', updateLayout)
+    window.addEventListener('resize', updateLayout);
 
     return () => {
-      window.removeEventListener('resize', updateLayout)
-    }
-  }, [displayState, position, sidebarWidth, resizingSidebar])
+      window.removeEventListener('resize', updateLayout);
+    };
+  }, [displayState, position, sidebarWidth, resizingSidebar]);
 
-  const windowWidth = useWindowWidth()
+  const windowWidth = useWindowWidth();
   const displayNav =
     renderNav &&
     ((sidebarWidth > navBreakpoint && windowWidth > navBreakpoint) ||
-      (displayState === 'fullscreen' && windowWidth > navBreakpoint))
+      (displayState === 'fullscreen' && windowWidth > navBreakpoint));
   const renderMobileNav =
     renderNav &&
-    (sidebarWidth < navBreakpoint + 1 || windowWidth < navBreakpoint + 1)
+    (sidebarWidth < navBreakpoint + 1 || windowWidth < navBreakpoint + 1);
 
   return (
     <SidebarContext.Provider
@@ -263,8 +263,8 @@ const Sidebar = ({
                 <SidebarSiteLink
                   view={view}
                   onClick={() => {
-                    setActiveView(view)
-                    setMenuIsOpen(false)
+                    setActiveView(view);
+                    setMenuIsOpen(false);
                   }}
                 />
               )}
@@ -274,7 +274,7 @@ const Sidebar = ({
               RenderNavCollection={({ collection }) => (
                 <SidebarCollectionLink
                   onClick={() => {
-                    setMenuIsOpen(false)
+                    setMenuIsOpen(false);
                   }}
                   collection={collection}
                 />
@@ -282,7 +282,7 @@ const Sidebar = ({
               AuthRenderNavCollection={({ collection }) => (
                 <SidebarCollectionLink
                   onClick={() => {
-                    setMenuIsOpen(false)
+                    setMenuIsOpen(false);
                   }}
                   collection={collection}
                   Icon={ImUsers}
@@ -333,8 +333,8 @@ const Sidebar = ({
                     <SidebarSiteLink
                       view={view}
                       onClick={() => {
-                        setActiveView(view)
-                        setMenuIsOpen(false)
+                        setActiveView(view);
+                        setMenuIsOpen(false);
                       }}
                     />
                   )}
@@ -344,7 +344,7 @@ const Sidebar = ({
                   RenderNavCollection={({ collection }) => (
                     <SidebarCollectionLink
                       onClick={() => {
-                        setMenuIsOpen(false)
+                        setMenuIsOpen(false);
                       }}
                       collection={collection}
                     />
@@ -352,7 +352,7 @@ const Sidebar = ({
                   AuthRenderNavCollection={({ collection }) => (
                     <SidebarCollectionLink
                       onClick={() => {
-                        setMenuIsOpen(false)
+                        setMenuIsOpen(false);
                       }}
                       collection={collection}
                       Icon={ImUsers}
@@ -364,7 +364,7 @@ const Sidebar = ({
                       rounded='right'
                       variant='secondary'
                       onClick={() => {
-                        setMenuIsOpen(false)
+                        setMenuIsOpen(false);
                       }}
                       className={'transition-opacity duration-150 ease-out'}
                     >
@@ -385,7 +385,7 @@ const Sidebar = ({
             >
               <div
                 onClick={() => {
-                  setMenuIsOpen(false)
+                  setMenuIsOpen(false);
                 }}
                 className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
               />
@@ -394,8 +394,8 @@ const Sidebar = ({
         )}
       </>
     </SidebarContext.Provider>
-  )
-}
+  );
+};
 
 export const updateBodyDisplacement = ({
   position = 'overlay',
@@ -403,8 +403,8 @@ export const updateBodyDisplacement = ({
   sidebarWidth,
   resizingSidebar,
 }) => {
-  const body = document.getElementsByTagName('body')[0]
-  const windowWidth = window.innerWidth
+  const body = document.getElementsByTagName('body')[0];
+  const windowWidth = window.innerWidth;
 
   if (position === 'displace') {
     // Padding can't be animated smoothly, so we're using a delay to time the size change
@@ -414,22 +414,22 @@ export const updateBodyDisplacement = ({
         ? 'padding 0ms 150ms'
         : displayState === 'closed'
           ? 'padding 0ms 0ms'
-          : 'padding 0ms 300ms'
+          : 'padding 0ms 300ms';
 
     if (displayState === 'open') {
       const bodyDisplacement = Math.min(
         sidebarWidth,
         windowWidth - minPreviewWidth
-      )
-      body.style.paddingLeft = `${bodyDisplacement}px`
+      );
+      body.style.paddingLeft = `${bodyDisplacement}px`;
     } else {
-      body.style.paddingLeft = '0'
+      body.style.paddingLeft = '0';
     }
   } else {
-    body.style.transition = ''
-    body.style.paddingLeft = '0'
+    body.style.transition = '';
+    body.style.paddingLeft = '0';
   }
-}
+};
 
 const SidebarHeader = ({
   branchingEnabled,
@@ -438,17 +438,17 @@ const SidebarHeader = ({
   isLocalMode,
 }) => {
   const { toggleFullscreen, displayState, setMenuIsOpen, toggleSidebarOpen } =
-    React.useContext(SidebarContext)
+    React.useContext(SidebarContext);
 
-  const displayMenuButton = renderNav && !displayNav
+  const displayMenuButton = renderNav && !displayNav;
 
-  const cms = useCMS()
-  const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl
-  const branch = cms.api?.tina?.branch
+  const cms = useCMS();
+  const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl;
+  const branch = cms.api?.tina?.branch;
   const previewUrl =
     typeof previewFunction === 'function'
       ? previewFunction({ branch })?.url
-      : null
+      : null;
 
   return (
     <div className='flex-grow-0 w-full overflow-visible z-20'>
@@ -461,7 +461,7 @@ const SidebarHeader = ({
             rounded='right'
             variant='white'
             onClick={() => {
-              setMenuIsOpen(true)
+              setMenuIsOpen(true);
             }}
             className='pointer-events-auto -ml-px'
           >
@@ -474,7 +474,7 @@ const SidebarHeader = ({
             <button
               className='pointer-events-auto flex min-w-0	shrink gap-1 items-center justify-between form-select text-sm h-10 px-4 shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100 transition-color duration-150 ease-out rounded-full focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight min-w-[5rem]'
               onClick={() => {
-                window.open(previewUrl, '_blank')
+                window.open(previewUrl, '_blank');
               }}
             >
               <BiLinkExternal className='flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1' />
@@ -518,15 +518,15 @@ const SidebarHeader = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const SidebarSiteLink = ({
   view,
   onClick,
 }: {
-  view: ScreenPlugin
-  onClick: () => void
+  view: ScreenPlugin;
+  onClick: () => void;
 }) => {
   return (
     <button
@@ -536,8 +536,8 @@ const SidebarSiteLink = ({
     >
       <view.Icon className='mr-2 h-6 opacity-80 w-auto' /> {view.name}
     </button>
-  )
-}
+  );
+};
 
 const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
   if (config.text) {
@@ -552,7 +552,7 @@ const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
           {config.link.text}
         </a>
       </span>
-    )
+    );
   }
   return (
     <span className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'>
@@ -561,23 +561,23 @@ const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
         {config.link.text}
       </a>
     </span>
-  )
-}
+  );
+};
 
 const SidebarCollectionLink = ({
   Icon = ImFilesEmpty,
   collection,
   onClick,
 }: {
-  Icon?: IconType
+  Icon?: IconType;
   collection: {
-    label: string
-    name: string
-  }
-  onClick: () => void
+    label: string;
+    name: string;
+  };
+  onClick: () => void;
 }) => {
-  const cms = useCMS()
-  const tinaPreview = cms.flags.get('tina-preview') || false
+  const cms = useCMS();
+  const tinaPreview = cms.flags.get('tina-preview') || false;
   return (
     <a
       onClick={onClick}
@@ -589,11 +589,11 @@ const SidebarCollectionLink = ({
       <Icon className='mr-2 h-6 opacity-80 w-auto' />{' '}
       {collection.label ? collection.label : collection.name}
     </a>
-  )
-}
+  );
+};
 
 const EditButton = ({}) => {
-  const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext)
+  const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext);
 
   return (
     <Button
@@ -610,12 +610,12 @@ const EditButton = ({}) => {
     >
       <BiPencil className='h-6 w-auto' />
     </Button>
-  )
-}
+  );
+};
 
 const SidebarWrapper = ({ children }) => {
   const { displayState, sidebarWidth, resizingSidebar } =
-    React.useContext(SidebarContext)
+    React.useContext(SidebarContext);
 
   return (
     <div
@@ -645,8 +645,8 @@ const SidebarWrapper = ({ children }) => {
         {children}
       </div>
     </div>
-  )
-}
+  );
+};
 
 const SidebarBody = ({ children }) => {
   return (
@@ -657,5 +657,5 @@ const SidebarBody = ({ children }) => {
     >
       {children}
     </div>
-  )
-}
+  );
+};

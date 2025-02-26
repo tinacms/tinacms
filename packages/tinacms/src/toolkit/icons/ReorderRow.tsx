@@ -4,7 +4,7 @@
 
 */
 
-import * as React from 'react'
+import * as React from 'react';
 
 export const ReorderRowIcon = ({ ...props }) => (
   <svg
@@ -34,4 +34,4 @@ export const ReorderRowIcon = ({ ...props }) => (
       d='M17.6863 14.6569L27 14.6569L27 16.1569L17.6863 16.1569L17.6863 14.6569Z'
     />
   </svg>
-)
+);

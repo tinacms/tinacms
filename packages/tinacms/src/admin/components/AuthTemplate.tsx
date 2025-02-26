@@ -2,14 +2,14 @@
 
 */
 
-import React from 'react'
+import React from 'react';
 
 const AuthTemplate = ({
   message,
   children,
 }: {
-  message?: string
-  children: any
+  message?: string;
+  children: any;
 }) => {
   return (
     <div className='h-screen w-full bg-gradient-to-b from-blue-900 to-gray-900 flex items-center justify-center px-4 py-6'>
@@ -38,7 +38,7 @@ const AuthTemplate = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AuthTemplate
+export default AuthTemplate;

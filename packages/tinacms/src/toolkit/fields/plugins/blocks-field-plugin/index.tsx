@@ -1,35 +1,35 @@
-import * as React from 'react'
-import type { Field, Form } from '@toolkit/forms'
-import { Droppable, Draggable } from 'react-beautiful-dnd'
+import * as React from 'react';
+import type { Field, Form } from '@toolkit/forms';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
 import {
   GroupLabel,
   ItemDeleteButton,
   ItemHeader,
   DragHandle,
   ItemClickTarget,
-} from '../group-list-field-plugin'
-import { useCMS } from '@toolkit/react-core/use-cms'
-import { useEvent } from '@toolkit/react-core'
+} from '../group-list-field-plugin';
+import { useCMS } from '@toolkit/react-core/use-cms';
+import { useEvent } from '@toolkit/react-core';
 import type {
   FieldHoverEvent,
   FieldFocusEvent,
-} from '@toolkit/fields/field-events'
-import { BlockSelector } from './block-selector'
-import { BlockSelectorBig } from './block-selector-big'
-import { BiPencil } from 'react-icons/bi'
-import { EmptyList, ListFieldMeta, ListPanel } from '../list-field-meta'
+} from '@toolkit/fields/field-events';
+import { BlockSelector } from './block-selector';
+import { BlockSelectorBig } from './block-selector-big';
+import { BiPencil } from 'react-icons/bi';
+import { EmptyList, ListFieldMeta, ListPanel } from '../list-field-meta';
 
 export interface BlocksFieldDefinititon extends Field {
-  component: 'blocks'
+  component: 'blocks';
   templates: {
-    [key: string]: BlockTemplate
-  }
+    [key: string]: BlockTemplate;
+  };
 }
 
 export interface BlockTemplate {
-  label: string
-  defaultItem?: object | (() => object)
-  fields?: Field[]
+  label: string;
+  defaultItem?: object | (() => object);
+  fields?: Field[];
   /**
    * An optional function which generates `props` for
    * this items's `li`.
@@ -44,21 +44,21 @@ export interface BlockTemplate {
      * Reference:
      * * https://reactjs.org/docs/lists-and-keys.html
      */
-    key?: string
+    key?: string;
     /**
      * The label to be display on the list item.
      */
-    label?: string
-  }
+    label?: string;
+  };
 }
 
 interface BlockFieldProps {
-  input: any
-  meta: any
-  field: BlocksFieldDefinititon
-  form: any
-  tinaForm: Form
-  index?: number
+  input: any;
+  meta: any;
+  field: BlocksFieldDefinititon;
+  form: any;
+  tinaForm: Form;
+  index?: number;
 }
 
 const Blocks = ({
@@ -71,26 +71,26 @@ const Blocks = ({
 }: BlockFieldProps) => {
   const addItem = React.useCallback(
     (name: string, template: BlockTemplate) => {
-      let obj: any = {}
+      let obj: any = {};
       if (typeof template.defaultItem === 'function') {
-        obj = template.defaultItem()
+        obj = template.defaultItem();
       } else {
-        obj = template.defaultItem || {}
+        obj = template.defaultItem || {};
       }
-      obj._template = name
-      form.mutators.insert(field.name, 0, obj)
+      obj._template = name;
+      form.mutators.insert(field.name, 0, obj);
     },
     [field.name, form.mutators]
-  )
+  );
 
-  const items = input.value || []
+  const items = input.value || [];
 
   // @ts-ignore
-  const isMax = items.length >= (field.max || Infinity)
+  const isMax = items.length >= (field.max || Infinity);
   // @ts-ignore
-  const isMin = items.length <= (field.min || 0)
+  const isMin = items.length <= (field.min || 0);
   // @ts-ignore
-  const fixedLength = field.min === field.max
+  const fixedLength = field.min === field.max;
 
   return (
     <ListFieldMeta
@@ -121,7 +121,7 @@ const Blocks = ({
             <div ref={provider.innerRef} className='edit-page--list-parent'>
               {items.length === 0 && <EmptyList />}
               {items.map((block: any, index: any) => {
-                const template = field.templates[block._template]
+                const template = field.templates[block._template];
 
                 if (!template) {
                   return (
@@ -132,13 +132,13 @@ const Blocks = ({
                       field={field}
                       tinaForm={tinaForm}
                     />
-                  )
+                  );
                 }
 
                 const itemProps = (item: object) => {
-                  if (!template.itemProps) return {}
-                  return template.itemProps(item)
-                }
+                  if (!template.itemProps) return {};
+                  return template.itemProps(item);
+                };
                 return (
                   <BlockListItem
                     // NOTE: Supressing warnings, but not helping with render perf
@@ -152,7 +152,7 @@ const Blocks = ({
                     fixedLength={fixedLength}
                     {...itemProps(block)}
                   />
-                )
+                );
               })}
               {provider.placeholder}
             </div>
@@ -160,18 +160,18 @@ const Blocks = ({
         </Droppable>
       </ListPanel>
     </ListFieldMeta>
-  )
-}
+  );
+};
 
 interface BlockListItemProps {
-  tinaForm: Form
-  field: BlocksFieldDefinititon
-  index: number
-  block: any
-  template: BlockTemplate
-  label?: string
-  isMin?: boolean
-  fixedLength?: boolean
+  tinaForm: Form;
+  field: BlocksFieldDefinititon;
+  index: number;
+  block: any;
+  template: BlockTemplate;
+  label?: string;
+  isMin?: boolean;
+  fixedLength?: boolean;
 }
 
 const BlockListItem = ({
@@ -183,14 +183,16 @@ const BlockListItem = ({
   isMin,
   fixedLength,
 }: BlockListItemProps) => {
-  const cms = useCMS()
+  const cms = useCMS();
 
   const removeItem = React.useCallback(() => {
-    tinaForm.mutators.remove(field.name, index)
-  }, [tinaForm, field, index])
+    tinaForm.mutators.remove(field.name, index);
+  }, [tinaForm, field, index]);
 
-  const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
-  const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
+  const { dispatch: setHoveredField } =
+    useEvent<FieldHoverEvent>('field:hover');
+  const { dispatch: setFocusedField } =
+    useEvent<FieldFocusEvent>('field:focus');
 
   return (
     <Draggable key={index} draggableId={`${field.name}.${index}`} index={index}>
@@ -200,11 +202,13 @@ const BlockListItem = ({
             <DragHandle isDragging={snapshot.isDragging} />
             <ItemClickTarget
               onClick={() => {
-                const state = tinaForm.finalForm.getState()
+                const state = tinaForm.finalForm.getState();
                 if (state.invalid === true) {
                   // @ts-ignore
-                  cms.alerts.error('Cannot navigate away from an invalid form.')
-                  return
+                  cms.alerts.error(
+                    'Cannot navigate away from an invalid form.'
+                  );
+                  return;
                 }
 
                 cms.dispatch({
@@ -213,11 +217,11 @@ const BlockListItem = ({
                     formId: tinaForm.id,
                     fieldName: `${field.name}.${index}`,
                   },
-                })
+                });
                 setFocusedField({
                   id: tinaForm.id,
                   fieldName: `${field.name}.${index}`,
-                })
+                });
               }}
               onMouseOver={() =>
                 setHoveredField({
@@ -237,21 +241,21 @@ const BlockListItem = ({
         </>
       )}
     </Draggable>
-  )
-}
+  );
+};
 
 const InvalidBlockListItem = ({
   tinaForm,
   field,
   index,
 }: {
-  tinaForm: Form
-  field: Field
-  index: number
+  tinaForm: Form;
+  field: Field;
+  index: number;
 }) => {
   const removeItem = React.useCallback(() => {
-    tinaForm.mutators.remove(field.name, index)
-  }, [tinaForm, field, index])
+    tinaForm.mutators.remove(field.name, index);
+  }, [tinaForm, field, index]);
 
   return (
     <Draggable key={index} draggableId={`${field.name}.${index}`} index={index}>
@@ -265,12 +269,12 @@ const InvalidBlockListItem = ({
         </ItemHeader>
       )}
     </Draggable>
-  )
-}
+  );
+};
 
-export const BlocksField = Blocks
+export const BlocksField = Blocks;
 
 export const BlocksFieldPlugin = {
   name: 'blocks',
   Component: BlocksField,
-}
+};

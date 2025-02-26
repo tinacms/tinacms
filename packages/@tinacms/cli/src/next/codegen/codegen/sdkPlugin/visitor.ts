@@ -8,13 +8,13 @@ import {
   DocumentMode,
   indentMultiline,
   LoadedFragment,
-} from '@graphql-codegen/visitor-plugin-common'
-import autoBind from 'auto-bind'
-import { GraphQLSchema, Kind, OperationDefinitionNode, print } from 'graphql'
-import { RawGenericSdkPluginConfig } from './config'
+} from '@graphql-codegen/visitor-plugin-common';
+import autoBind from 'auto-bind';
+import { GraphQLSchema, Kind, OperationDefinitionNode, print } from 'graphql';
+import { RawGenericSdkPluginConfig } from './config';
 
 export interface GenericSdkPluginConfig extends ClientSideBasePluginConfig {
-  usingObservableFrom: string
+  usingObservableFrom: string;
 }
 
 export class GenericSdkVisitor extends ClientSideBaseVisitor<
@@ -22,12 +22,12 @@ export class GenericSdkVisitor extends ClientSideBaseVisitor<
   GenericSdkPluginConfig
 > {
   private _operationsToInclude: {
-    node: OperationDefinitionNode
-    documentVariableName: string
-    operationType: string
-    operationResultType: string
-    operationVariablesTypes: string
-  }[] = []
+    node: OperationDefinitionNode;
+    documentVariableName: string;
+    operationType: string;
+    operationResultType: string;
+    operationVariablesTypes: string;
+  }[] = [];
 
   constructor(
     schema: GraphQLSchema,
@@ -36,12 +36,12 @@ export class GenericSdkVisitor extends ClientSideBaseVisitor<
   ) {
     super(schema, fragments, rawConfig, {
       usingObservableFrom: rawConfig.usingObservableFrom,
-    })
+    });
 
-    autoBind(this)
+    autoBind(this);
 
     if (this.config.usingObservableFrom) {
-      this._additionalImports.push(this.config.usingObservableFrom)
+      this._additionalImports.push(this.config.usingObservableFrom);
     }
     if (this.config.documentMode !== DocumentMode.string) {
       // We may need this later but for now we do not
@@ -63,7 +63,7 @@ export class GenericSdkVisitor extends ClientSideBaseVisitor<
       throw new Error(
         "Plugin 'generic-sdk' cannot generate SDK for unnamed operation.\n\n" +
           print(node)
-      )
+      );
     } else {
       this._operationsToInclude.push({
         node,
@@ -72,14 +72,14 @@ export class GenericSdkVisitor extends ClientSideBaseVisitor<
         // This is the only line that is different
         operationResultType: `{data: ${operationResultType}, errors?: { message: string, locations: { line: number, column: number }[], path: string[] }[], variables: ${operationVariablesTypes}, query: string}`,
         operationVariablesTypes,
-      })
+      });
     }
 
-    return null
+    return null;
   }
 
   public get sdkContent(): string {
-    const usingObservable = !!this.config.usingObservableFrom
+    const usingObservable = !!this.config.usingObservableFrom;
     const allPossibleActions = this._operationsToInclude
       .map((o) => {
         const optionalVariables =
@@ -87,11 +87,11 @@ export class GenericSdkVisitor extends ClientSideBaseVisitor<
           o.node.variableDefinitions.length === 0 ||
           o.node.variableDefinitions.every(
             (v) => v.type.kind !== Kind.NON_NULL_TYPE || v.defaultValue
-          )
+          );
         const returnType =
           usingObservable && o.operationType === 'Subscription'
             ? 'Observable'
-            : 'Promise'
+            : 'Promise';
         return `${o.node.name.value}(variables${
           optionalVariables ? '?' : ''
         }: ${o.operationVariablesTypes}, options?: C): ${returnType}<${
@@ -100,9 +100,9 @@ export class GenericSdkVisitor extends ClientSideBaseVisitor<
     return requester<${o.operationResultType}, ${o.operationVariablesTypes}>(${
       o.documentVariableName
     }, variables, options);
-  }`
+  }`;
       })
-      .map((s) => indentMultiline(s, 2))
+      .map((s) => indentMultiline(s, 2));
 
     return `export type Requester<C= {}> = <R, V>(doc: ${
       this.config.documentMode === DocumentMode.string
@@ -116,6 +116,6 @@ export class GenericSdkVisitor extends ClientSideBaseVisitor<
   ${allPossibleActions.join(',\n')}
     };
   }
-  export type Sdk = ReturnType<typeof getSdk>;`
+  export type Sdk = ReturnType<typeof getSdk>;`;
   }
 }

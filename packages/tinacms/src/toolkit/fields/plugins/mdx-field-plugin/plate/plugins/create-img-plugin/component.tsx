@@ -1,16 +1,16 @@
-import React from 'react'
-import { useSelected } from 'slate-react'
-import { NestedForm } from '../../nested-form'
-import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks'
-import { useTemplates } from '../../editor-context'
+import React from 'react';
+import { useSelected } from 'slate-react';
+import { NestedForm } from '../../nested-form';
+import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
+import { useTemplates } from '../../editor-context';
 import {
   DeleteImageButton,
   StyledFile,
   StyledImage,
-} from '../../../../../components'
-import { isImage } from '@toolkit/components/media/utils'
-import { insertNodes } from '@udecode/plate-common'
-import { ELEMENT_PARAGRAPH } from '@udecode/plate'
+} from '../../../../../components';
+import { isImage } from '@toolkit/components/media/utils';
+import { insertNodes } from '@udecode/plate-common';
+import { ELEMENT_PARAGRAPH } from '@udecode/plate';
 
 export const ImgEmbed = ({
   attributes,
@@ -19,14 +19,16 @@ export const ImgEmbed = ({
   editor,
   onChange,
 }) => {
-  const selected = useSelected()
-  const { fieldName } = useTemplates()
+  const selected = useSelected();
+  const { fieldName } = useTemplates();
   const { handleClose, handleRemove, handleSelect, isExpanded } =
-    useEmbedHandles(editor, element, fieldName)
+    useEmbedHandles(editor, element, fieldName);
 
   useHotkey('enter', () => {
-    insertNodes(editor, [{ type: ELEMENT_PARAGRAPH, children: [{ text: '' }] }])
-  })
+    insertNodes(editor, [
+      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
+    ]);
+  });
 
   return (
     <span {...attributes} className=''>
@@ -52,8 +54,8 @@ export const ImgEmbed = ({
           </button>
           <DeleteImageButton
             onClick={(e) => {
-              e.stopPropagation()
-              handleRemove()
+              e.stopPropagation();
+              handleRemove();
             }}
           />
         </div>
@@ -77,8 +79,8 @@ export const ImgEmbed = ({
         />
       )}
     </span>
-  )
-}
+  );
+};
 
 export const ImageForm = (props) => {
   return (
@@ -100,5 +102,5 @@ export const ImageForm = (props) => {
       onChange={props.onChange}
       onClose={props.onClose}
     />
-  )
-}
+  );
+};

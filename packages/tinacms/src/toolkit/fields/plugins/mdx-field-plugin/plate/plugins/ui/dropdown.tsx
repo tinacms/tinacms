@@ -1,24 +1,24 @@
-import React from 'react'
+import React from 'react';
 import {
   Menu,
   MenuButton,
   MenuItem,
   MenuItems,
   Transition,
-} from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/solid'
-import { classNames } from './helpers'
+} from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/solid';
+import { classNames } from './helpers';
 
 export function Dropdown({
   label,
   items,
 }: {
-  label: string | JSX.Element
+  label: string | JSX.Element;
   items: {
-    key: string
-    onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-    render: string | JSX.Element
-  }[]
+    key: string;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    render: string | JSX.Element;
+  }[];
 }) {
   return (
     <Menu as='div' className='relative inline-block text-left z-20'>
@@ -58,5 +58,5 @@ export function Dropdown({
         </MenuItems>
       </Transition>
     </Menu>
-  )
+  );
 }

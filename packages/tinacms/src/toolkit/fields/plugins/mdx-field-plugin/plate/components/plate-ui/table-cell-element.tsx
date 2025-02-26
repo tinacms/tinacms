@@ -1,24 +1,24 @@
-import React from 'react'
+import React from 'react';
 
-import { cn, withProps, withRef } from '@udecode/cn'
-import { PlateElement } from '@udecode/plate-common'
+import { cn, withProps, withRef } from '@udecode/cn';
+import { PlateElement } from '@udecode/plate-common';
 import {
   useTableCellElement,
   useTableCellElementResizable,
   useTableCellElementResizableState,
   useTableCellElementState,
-} from '@udecode/plate-table'
+} from '@udecode/plate-table';
 
-import { ResizeHandle } from '@udecode/plate-resizable'
+import { ResizeHandle } from '@udecode/plate-resizable';
 
 export const TableCellElement = withRef<
   typeof PlateElement,
   {
-    hideBorder?: boolean
-    isHeader?: boolean
+    hideBorder?: boolean;
+    isHeader?: boolean;
   }
 >(({ children, className, hideBorder, isHeader, style, ...props }, ref) => {
-  const { element } = props
+  const { element } = props;
 
   const {
     borders,
@@ -31,18 +31,18 @@ export const TableCellElement = withRef<
     rowIndex,
     rowSize,
     selected,
-  } = useTableCellElementState()
-  const { props: cellProps } = useTableCellElement({ element: props.element })
+  } = useTableCellElementState();
+  const { props: cellProps } = useTableCellElement({ element: props.element });
   const resizableState = useTableCellElementResizableState({
     colIndex,
     colSpan,
     rowIndex,
-  })
+  });
 
   const { bottomProps, hiddenLeft, leftProps, rightProps } =
-    useTableCellElementResizable(resizableState)
+    useTableCellElementResizable(resizableState);
 
-  const Cell = isHeader ? 'th' : 'td'
+  const Cell = isHeader ? 'th' : 'td';
 
   return (
     <PlateElement
@@ -133,11 +133,11 @@ export const TableCellElement = withRef<
         )}
       </Cell>
     </PlateElement>
-  )
-})
+  );
+});
 
-TableCellElement.displayName = 'TableCellElement'
+TableCellElement.displayName = 'TableCellElement';
 
 export const TableCellHeaderElement = withProps(TableCellElement, {
   isHeader: true,
-})
+});

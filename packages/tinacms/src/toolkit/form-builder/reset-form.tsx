@@ -1,19 +1,19 @@
-import * as React from 'react'
-import { FC } from 'react'
-import { Button } from '@toolkit/styles'
+import * as React from 'react';
+import { FC } from 'react';
+import { Button } from '@toolkit/styles';
 import {
   Modal,
   ModalHeader,
   ModalBody,
   ModalActions,
   ModalPopup,
-} from '../react-modals'
+} from '../react-modals';
 
 interface ResetFormProps {
-  children: any
-  pristine: boolean
-  reset(): void
-  style?: React.CSSProperties
+  children: any;
+  pristine: boolean;
+  reset(): void;
+  style?: React.CSSProperties;
 }
 
 export const ResetForm: FC<ResetFormProps> = ({
@@ -22,12 +22,12 @@ export const ResetForm: FC<ResetFormProps> = ({
   children,
   ...props
 }: ResetFormProps) => {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
   return (
     <>
       <Button
         onClick={() => {
-          setOpen((p) => !p)
+          setOpen((p) => !p);
         }}
         disabled={pristine}
         {...props}
@@ -36,12 +36,12 @@ export const ResetForm: FC<ResetFormProps> = ({
       </Button>
       {open && <ResetModal reset={reset} close={() => setOpen(false)} />}
     </>
-  )
-}
+  );
+};
 
 interface ResetModalProps {
-  close(): void
-  reset(): void
+  close(): void;
+  reset(): void;
 }
 
 const ResetModal = ({ close, reset }: ResetModalProps) => {
@@ -60,8 +60,8 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
             style={{ flexGrow: 3 }}
             variant='primary'
             onClick={async () => {
-              await reset()
-              close()
+              await reset();
+              close();
             }}
           >
             Reset
@@ -69,5 +69,5 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
         </ModalActions>
       </ModalPopup>
     </Modal>
-  )
-}
+  );
+};

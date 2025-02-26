@@ -2,7 +2,7 @@
 
 */
 
-import React from 'react'
+import React from 'react';
 
 export default function ViewNavigation({
   onClickPrev,
@@ -29,5 +29,5 @@ export default function ViewNavigation({
         <span>›</span>
       </th>
     </tr>
-  )
+  );
 }

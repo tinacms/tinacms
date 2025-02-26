@@ -1,7 +1,7 @@
 /**
 
 */
-import sucraseRunner from '@sucrase/jest-plugin'
+import sucraseRunner from '@sucrase/jest-plugin';
 
 const config = {
   verbose: true,
@@ -19,9 +19,9 @@ const config = {
       '<rootDir>/../../__mocks__/fileMock.js',
     '\\.(css|less|scss|sass)$': '@tinacms/scripts/__mocks__/styleMock.js',
   },
-}
+};
 
 export default {
   process: sucraseRunner.process,
   config,
-}
+};

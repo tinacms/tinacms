@@ -1,22 +1,22 @@
-import React from 'react'
-import { Media } from '@toolkit/core'
-import { BiFolder, BiFile, BiMovie } from 'react-icons/bi'
-import { isImage, isVideo } from './utils'
+import React from 'react';
+import { Media } from '@toolkit/core';
+import { BiFolder, BiFile, BiMovie } from 'react-icons/bi';
+import { isImage, isVideo } from './utils';
 
 interface MediaItemProps {
-  item: Media & { new?: boolean }
-  onClick(_item: Media | false): void
-  active: boolean
+  item: Media & { new?: boolean };
+  onClick(_item: Media | false): void;
+  active: boolean;
 }
 
 export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
-  let FileIcon = BiFile
+  let FileIcon = BiFile;
   if (item.type === 'dir') {
-    FileIcon = BiFolder
+    FileIcon = BiFolder;
   } else if (isVideo(item.src)) {
-    FileIcon = BiMovie
+    FileIcon = BiMovie;
   }
-  const thumbnail = (item.thumbnails || {})['75x75']
+  const thumbnail = (item.thumbnails || {})['75x75'];
   return (
     <li
       className={`group relative flex shrink-0 items-center transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
@@ -26,9 +26,9 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
       }`}
       onClick={() => {
         if (!active) {
-          onClick(item)
+          onClick(item);
         } else {
-          onClick(false)
+          onClick(false);
         }
       }}
     >
@@ -54,17 +54,17 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
         {item.filename}
       </span>
     </li>
-  )
+  );
 }
 
 export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
-  let FileIcon = BiFile
+  let FileIcon = BiFile;
   if (item.type === 'dir') {
-    FileIcon = BiFolder
+    FileIcon = BiFolder;
   } else if (isVideo(item.src)) {
-    FileIcon = BiMovie
+    FileIcon = BiMovie;
   }
-  const thumbnail = (item.thumbnails || {})['400x400']
+  const thumbnail = (item.thumbnails || {})['400x400'];
   return (
     <li
       className={`relative pb-[100%] h-0 block border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out ${
@@ -82,9 +82,9 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
         className='absolute w-full h-full flex items-center justify-center bg-white'
         onClick={() => {
           if (!active) {
-            onClick(item)
+            onClick(item);
           } else {
-            onClick(false)
+            onClick(false);
           }
         }}
       >
@@ -104,5 +104,5 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
         )}
       </button>
     </li>
-  )
+  );
 }

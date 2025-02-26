@@ -1,18 +1,18 @@
-import prompts from 'prompts'
-import type { PromptObject } from 'prompts'
-import { linkText, logText } from '../../../utils/theme'
-import { Framework, InitEnvironment } from '../'
-import { Config, ImportStatement } from './types'
+import prompts from 'prompts';
+import type { PromptObject } from 'prompts';
+import { linkText, logText } from '../../../utils/theme';
+import { Framework, InitEnvironment } from '../';
+import { Config, ImportStatement } from './types';
 
-export * from './askTinaCloudSetup'
-export * from './types'
-export * from './gitProvider'
-export * from './databaseAdapter'
-export * from './authProvider'
+export * from './askTinaCloudSetup';
+export * from './types';
+export * from './gitProvider';
+export * from './databaseAdapter';
+export * from './authProvider';
 
 const forestryDisclaimer = logText(
   `Note: This migration will update some of your content to match tina.  Please save a backup of your content before doing this migration. (This can be done with git)`
-)
+);
 
 // Asks the user for the framework and package manager they are using
 export const askCommonSetUp = async () => {
@@ -41,24 +41,24 @@ export const askCommonSetUp = async () => {
         { title: 'NPM', value: 'npm' },
       ],
     },
-  ])
+  ]);
   if (
     typeof answers.framework === 'undefined' ||
     typeof answers.packageManager === 'undefined'
   ) {
-    throw new Error('Framework and package manager are required')
+    throw new Error('Framework and package manager are required');
   }
   return answers as {
-    framework: Framework
-    packageManager: 'pnpm' | 'yarn' | 'npm'
-  }
-}
+    framework: Framework;
+    packageManager: 'pnpm' | 'yarn' | 'npm';
+  };
+};
 export const askForestryMigrate = async ({
   framework,
   env,
 }: {
-  framework: Framework
-  env: InitEnvironment
+  framework: Framework;
+  env: InitEnvironment;
 }) => {
   const questions: PromptObject[] = [
     {
@@ -67,16 +67,16 @@ export const askForestryMigrate = async ({
       initial: true,
       message: `Would you like to migrate your Forestry templates?\n${forestryDisclaimer}`,
     },
-  ]
+  ];
   if (framework.name === 'hugo') {
     questions.push({
       name: 'frontMatterFormat',
       type: (_, answers) => {
         if (answers.forestryMigrate) {
           if (env.frontMatterFormat && env.frontMatterFormat[1]) {
-            return null
+            return null;
           }
-          return 'select'
+          return 'select';
         }
       },
       choices: [
@@ -85,18 +85,18 @@ export const askForestryMigrate = async ({
         { title: 'json', value: 'json' },
       ],
       message: `What format are you using in your frontmatter?`,
-    })
+    });
   }
-  const answers = await prompts(questions)
+  const answers = await prompts(questions);
   return answers as {
-    forestryMigrate: boolean
-    frontMatterFormat?: 'yaml' | 'toml' | 'json'
-  }
-}
+    forestryMigrate: boolean;
+    frontMatterFormat?: 'yaml' | 'toml' | 'json';
+  };
+};
 
 export const askTinaSetupPrompts = async (params: {
-  frameworkName: string
-  config: Config
+  frameworkName: string;
+  config: Config;
 }) => {
   const questions: PromptObject[] = [
     {
@@ -106,7 +106,7 @@ export const askTinaSetupPrompts = async (params: {
       message:
         'Would you like to use Typescript for your Tina Configuration (Recommended)?',
     },
-  ]
+  ];
   // if we don't know the public folder, ask for it
   if (!params.config.publicFolder) {
     questions.push({
@@ -120,14 +120,14 @@ export const askTinaSetupPrompts = async (params: {
             'https://tina.io/docs/integration/frameworks/#configuring-tina-with-each-framework'
           )}`
         ),
-    })
+    });
   }
-  const answers = await prompts(questions)
+  const answers = await prompts(questions);
   return answers as {
-    typescript: boolean
-    publicFolder?: string
-  }
-}
+    typescript: boolean;
+    publicFolder?: string;
+  };
+};
 
 export const askIfUsingSelfHosted = async () => {
   const answers = await prompts([
@@ -147,21 +147,21 @@ export const askIfUsingSelfHosted = async () => {
       message:
         'Do you want to host your project on Tina Cloud or self-host? (With self-hosting, the graphql api, auth and database will be hosted on your own server.)',
     },
-  ])
-  return answers as { hosting: 'tina-cloud' | 'self-host' }
-}
+  ]);
+  return answers as { hosting: 'tina-cloud' | 'self-host' };
+};
 
 export const makeImportString = (imports?: ImportStatement[]) => {
   if (!imports) {
-    return ''
+    return '';
   }
-  const filtered = imports.filter((x) => x.imported.length > 0)
+  const filtered = imports.filter((x) => x.imported.length > 0);
   if (filtered.length === 0) {
-    return ''
+    return '';
   }
   return filtered
     .map((x) => {
-      return `import { ${x.imported.join(',')} } from '${x.from}'`
+      return `import { ${x.imported.join(',')} } from '${x.from}'`;
     })
-    .join('\n')
-}
+    .join('\n');
+};

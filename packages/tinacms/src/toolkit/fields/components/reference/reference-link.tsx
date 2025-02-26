@@ -1,16 +1,16 @@
-import * as React from 'react'
-import type { TinaCMS } from '@toolkit/tina-cms'
-import { BiEdit } from 'react-icons/bi'
+import * as React from 'react';
+import type { TinaCMS } from '@toolkit/tina-cms';
+import { BiEdit } from 'react-icons/bi';
 import {
   ReferenceLinkProps,
   Document,
   Response,
-} from './model/reference-link-props'
+} from './model/reference-link-props';
 
 const useGetNode = (cms: TinaCMS, id: string) => {
   const [document, setDocument] = React.useState<Document | undefined>(
     undefined
-  )
+  );
 
   React.useEffect(() => {
     const fetchNode = async () => {
@@ -29,34 +29,34 @@ const useGetNode = (cms: TinaCMS, id: string) => {
           }
         }`,
         { variables: { id } }
-      )
+      );
 
-      setDocument(response.node)
-    }
+      setDocument(response.node);
+    };
     if (cms && id) {
-      fetchNode()
+      fetchNode();
     } else {
-      setDocument(undefined)
+      setDocument(undefined);
     }
-  }, [cms, id])
-  return document
-}
+  }, [cms, id]);
+  return document;
+};
 
 const GetReference = ({ cms, id, children }) => {
-  const document = useGetNode(cms, id)
+  const document = useGetNode(cms, id);
 
   if (!document) {
-    return null
+    return null;
   }
-  return <>{children(document)}</>
-}
+  return <>{children(document)}</>;
+};
 
 const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
-  const hasTinaAdmin = cms.flags.get('tina-admin') === false ? false : true
-  const tinaPreview = cms.flags.get('tina-preview') || false
+  const hasTinaAdmin = cms.flags.get('tina-admin') === false ? false : true;
+  const tinaPreview = cms.flags.get('tina-preview') || false;
 
   if (!hasTinaAdmin) {
-    return null
+    return null;
   }
 
   return (
@@ -69,7 +69,7 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
               cms.dispatch({
                 type: 'forms:set-active-form-id',
                 value: input.value,
-              })
+              });
             }}
             className='text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none'
           >
@@ -91,7 +91,7 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
         )
       }
     </GetReference>
-  )
-}
+  );
+};
 
-export default ReferenceLink
+export default ReferenceLink;

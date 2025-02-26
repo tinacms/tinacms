@@ -1,5 +1,5 @@
-import arrayMutators from 'final-form-arrays'
-import setFieldData from 'final-form-set-field-data'
+import arrayMutators from 'final-form-arrays';
+import setFieldData from 'final-form-set-field-data';
 import {
   FormApi,
   createForm,
@@ -7,58 +7,58 @@ import {
   FormState,
   FORM_ERROR,
   getIn,
-} from 'final-form'
-import type { FormSubscription } from 'final-form'
-import type { Plugin } from '@toolkit/core'
-import { Field, AnyField } from './field'
+} from 'final-form';
+import type { FormSubscription } from 'final-form';
+import type { Plugin } from '@toolkit/core';
+import { Field, AnyField } from './field';
 
-export type { FormApi }
+export type { FormApi };
 
 type GlobalOptions = {
-  global: true
-  icon?: any
-  layout?: 'fullscreen' | 'popup'
-}
+  global: true;
+  icon?: any;
+  layout?: 'fullscreen' | 'popup';
+};
 
 export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
-  id: any
-  label: string
-  fields?: F[]
-  __type?: string
-  reset?(): void
-  actions?: any[]
-  global?: GlobalOptions
+  id: any;
+  label: string;
+  fields?: F[];
+  __type?: string;
+  reset?(): void;
+  actions?: any[];
+  global?: GlobalOptions;
   buttons?: {
-    save: string
-    reset: string
-  }
-  loadInitialValues?: () => Promise<S>
-  onChange?(values: FormState<S>): void
-  extraSubscribeValues?: FormSubscription
-  queries?: string[]
-  crudType?: 'create' | 'update'
-  relativePath?: string
+    save: string;
+    reset: string;
+  };
+  loadInitialValues?: () => Promise<S>;
+  onChange?(values: FormState<S>): void;
+  extraSubscribeValues?: FormSubscription;
+  queries?: string[];
+  crudType?: 'create' | 'update';
+  relativePath?: string;
 }
 
 export class Form<S = any, F extends Field = AnyField> implements Plugin {
-  private _reset?(): void
+  private _reset?(): void;
 
-  __type: string
-  id: any
-  label: string
-  fields: F[]
-  finalForm: FormApi<S>
-  actions: any[]
+  __type: string;
+  id: any;
+  label: string;
+  fields: F[];
+  finalForm: FormApi<S>;
+  actions: any[];
   buttons: {
-    save: string
-    reset: string
-  }
-  queries: string[]
-  global: GlobalOptions | null = null
-  loading: boolean = false
-  relativePath: string
-  crudType?: 'create' | 'update'
-  beforeSubmit?: (values: S) => Promise<void | S>
+    save: string;
+    reset: string;
+  };
+  queries: string[];
+  global: GlobalOptions | null = null;
+  loading: boolean = false;
+  relativePath: string;
+  crudType?: 'create' | 'update';
+  beforeSubmit?: (values: S) => Promise<void | S>;
 
   constructor({
     id,
@@ -73,16 +73,16 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     queries,
     ...options
   }: FormOptions<S, F>) {
-    const initialValues = options.initialValues || ({} as S)
-    this.__type = options.__type || 'form'
-    this.id = id
-    this.label = label
-    this.global = global
-    this.fields = fields || []
-    this.onSubmit = options.onSubmit
-    this.queries = queries || []
-    this.crudType = options.crudType || 'update'
-    this.relativePath = options.relativePath || id
+    const initialValues = options.initialValues || ({} as S);
+    this.__type = options.__type || 'form';
+    this.id = id;
+    this.label = label;
+    this.global = global;
+    this.fields = fields || [];
+    this.onSubmit = options.onSubmit;
+    this.queries = queries || [];
+    this.crudType = options.crudType || 'update';
+    this.relativePath = options.relativePath || id;
     this.finalForm = createForm<S>({
       ...options,
       initialValues,
@@ -92,39 +92,39 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
         setFieldData,
         ...options.mutators,
       },
-    })
+    });
 
-    this._reset = reset
-    this.actions = actions || []
+    this._reset = reset;
+    this.actions = actions || [];
     this.buttons = buttons || {
       save: 'Save',
       reset: 'Reset',
-    }
-    this.updateFields(this.fields)
+    };
+    this.updateFields(this.fields);
 
     if (loadInitialValues) {
-      this.loading = true
+      this.loading = true;
       loadInitialValues()
         .then((initialValues) => {
-          this.updateInitialValues(initialValues)
+          this.updateInitialValues(initialValues);
         })
         .finally(() => {
-          this.loading = false
-        })
+          this.loading = false;
+        });
     }
 
     if (onChange) {
-      let firstUpdate = true
+      let firstUpdate = true;
       this.subscribe(
         (formState) => {
           if (firstUpdate) {
-            firstUpdate = false
+            firstUpdate = false;
           } else {
-            onChange(formState)
+            onChange(formState);
           }
         },
         { values: true, ...(options?.extraSubscribeValues || {}) }
-      )
+      );
     }
   }
 
@@ -134,7 +134,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    * @deprecated use id instead
    */
   get name() {
-    return undefined
+    return undefined;
   }
 
   /**
@@ -144,33 +144,33 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    */
   get values(): S | undefined {
     if (this.loading) {
-      return undefined
+      return undefined;
     }
     // @ts-ignore
-    return this.finalForm.getState().values || this.initialValues
+    return this.finalForm.getState().values || this.initialValues;
   }
 
   /**
    * The values the form was initialized with.
    */
   get initialValues() {
-    return this.finalForm.getState().initialValues
+    return this.finalForm.getState().initialValues;
   }
 
   get pristine() {
-    return this.finalForm.getState().pristine
+    return this.finalForm.getState().pristine;
   }
 
   get dirty() {
-    return this.finalForm.getState().dirty
+    return this.finalForm.getState().dirty;
   }
 
   get submitting() {
-    return this.finalForm.getState().submitting
+    return this.finalForm.getState().submitting;
   }
 
   get valid() {
-    return this.finalForm.getState().valid
+    return this.finalForm.getState().valid;
   }
 
   /**
@@ -179,16 +179,16 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    */
   async reset() {
     if (this._reset) {
-      await this._reset()
+      await this._reset();
     }
-    this.finalForm.reset()
+    this.finalForm.reset();
   }
 
   /**
    * @deprecated Unnecessary indirection
    */
   updateFields(fields: F[]) {
-    this.fields = fields
+    this.fields = fields;
   }
 
   /**
@@ -196,29 +196,29 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    * values specified in subscription change. A form can have many subscribers.
    */
   subscribe: FormApi<S>['subscribe'] = (cb, options) => {
-    return this.finalForm.subscribe(cb, options)
-  }
+    return this.finalForm.subscribe(cb, options);
+  };
 
-  onSubmit: Config<S>['onSubmit']
+  onSubmit: Config<S>['onSubmit'];
 
   private handleSubmit: Config<S>['onSubmit'] = async (values, form, cb) => {
     try {
-      const valOverride = await this.beforeSubmit?.(values)
+      const valOverride = await this.beforeSubmit?.(values);
 
       // Update the values on the frontend to reflect the changes made in the beforeSubmit hook
       if (valOverride) {
         for (const [key, value] of Object.entries(valOverride)) {
-          form.change(key as keyof S, value)
+          form.change(key as keyof S, value);
         }
       }
 
-      const response = await this.onSubmit(valOverride || values, form, cb)
-      form.initialize(values)
-      return response
+      const response = await this.onSubmit(valOverride || values, form, cb);
+      form.initialize(values);
+      return response;
     } catch (error) {
-      return { [FORM_ERROR]: error }
+      return { [FORM_ERROR]: error };
     }
-  }
+  };
 
   /**
    * Submits the form if there are currently no validation errors. It may
@@ -226,8 +226,8 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    * configuration value given to the form when it was created.
    */
   submit: FormApi<S>['submit'] = () => {
-    return this.finalForm.submit()
-  }
+    return this.finalForm.submit();
+  };
 
   /**
    * Changes the value of the given field.
@@ -236,18 +236,18 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    * @param value
    */
   change(name: keyof S, value?: any) {
-    return this.finalForm.change(name, value)
+    return this.finalForm.change(name, value);
   }
 
   get mutators() {
-    return this.finalForm.mutators
+    return this.finalForm.mutators;
   }
 
   addQuery(queryId: string) {
-    this.queries = [...this.queries.filter((id) => id !== queryId), queryId]
+    this.queries = [...this.queries.filter((id) => id !== queryId), queryId];
   }
   removeQuery(queryId: string) {
-    this.queries = this.queries.filter((id) => id !== queryId)
+    this.queries = this.queries.filter((id) => id !== queryId);
   }
 
   /**
@@ -263,14 +263,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    */
   updateValues(values: S) {
     this.finalForm.batch(() => {
-      const activePath = this.finalForm.getState().active
+      const activePath = this.finalForm.getState().active;
 
       if (!activePath) {
-        updateEverything<S>(this.finalForm, values)
+        updateEverything<S>(this.finalForm, values);
       } else {
-        updateSelectively<S>(this.finalForm, values)
+        updateSelectively<S>(this.finalForm, values);
       }
-    })
+    });
   }
 
   /**
@@ -282,16 +282,16 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    */
   updateInitialValues(initialValues: S) {
     this.finalForm.batch(() => {
-      const values = this.values || ({} as S)
-      this.finalForm.initialize(initialValues)
-      const activePath = this.finalForm.getState().active
+      const values = this.values || ({} as S);
+      this.finalForm.initialize(initialValues);
+      const activePath = this.finalForm.getState().active;
 
       if (!activePath) {
-        updateEverything<S>(this.finalForm, values)
+        updateEverything<S>(this.finalForm, values);
       } else {
-        updateSelectively<S>(this.finalForm, values)
+        updateSelectively<S>(this.finalForm, values);
       }
-    })
+    });
   }
 
   /**
@@ -307,20 +307,20 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    * activePath: ['blocks', '3']
    */
   getActiveField(fieldName: string | null): {
-    label?: string
-    name?: string
-    fields: Field[]
+    label?: string;
+    name?: string;
+    fields: Field[];
   } {
     if (!fieldName) {
-      return this
+      return this;
     }
     const result = this.getFieldGroup({
       formOrObjectField: this,
       values: this.finalForm.getState().values,
       namePathIndex: 0,
       namePath: fieldName.split('.'),
-    })
-    return result
+    });
+    return result;
   }
   private getFieldGroup({
     formOrObjectField,
@@ -328,15 +328,15 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     namePathIndex,
     namePath,
   }: {
-    formOrObjectField: any // Awkwardness due to differences in TinaField and Field types
-    values: FormState<any, any>['values']
-    namePathIndex: number
-    namePath: string[]
+    formOrObjectField: any; // Awkwardness due to differences in TinaField and Field types
+    values: FormState<any, any>['values'];
+    namePathIndex: number;
+    namePath: string[];
   }) {
-    const name = namePath[namePathIndex]
-    const field = formOrObjectField.fields.find((field) => field.name === name)
-    const value = values[name]
-    const isLastItem = namePathIndex === namePath.length - 1
+    const name = namePath[namePathIndex];
+    const field = formOrObjectField.fields.find((field) => field.name === name);
+    const value = values[name];
+    const isLastItem = namePathIndex === namePath.length - 1;
     if (!field) {
       return {
         ...formOrObjectField,
@@ -344,39 +344,39 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
           return {
             ...field,
             name: [...namePath, field.name].join('.'),
-          }
+          };
         }),
-      }
+      };
     } else {
       if (field.type === 'object') {
         if (field.templates) {
           if (field.list) {
             if (isLastItem) {
-              return formOrObjectField
+              return formOrObjectField;
             } else {
-              const namePathIndexForListItem = namePathIndex + 1
-              const index = namePath[namePathIndexForListItem]
-              const listItemValue = value[index]
-              const template = field.templates[listItemValue._template]
+              const namePathIndexForListItem = namePathIndex + 1;
+              const index = namePath[namePathIndexForListItem];
+              const listItemValue = value[index];
+              const template = field.templates[listItemValue._template];
               const templateName = [
                 ...namePath.slice(0, namePathIndexForListItem),
                 index,
-              ].join('.')
+              ].join('.');
               const isLastItem =
-                namePathIndexForListItem === namePath.length - 1
+                namePathIndexForListItem === namePath.length - 1;
               if (!isLastItem) {
                 return this.getFieldGroup({
                   formOrObjectField: template,
                   values: listItemValue,
                   namePath,
                   namePathIndex: namePathIndex + 2,
-                })
+                });
               }
               if (!template) {
-                console.error({ field, value })
+                console.error({ field, value });
                 throw new Error(
                   `Expected template value for field ${field.name}`
-                )
+                );
               }
               return {
                 ...template,
@@ -385,23 +385,23 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                   return {
                     ...field,
                     name: [templateName, field.name].join('.'),
-                  }
+                  };
                 }),
-              }
+              };
             }
           } else {
             // TODO
           }
         } else {
           if (field.list) {
-            const namePathIndexForListItem = namePathIndex + 1
-            const index = namePath[namePathIndexForListItem]
-            const listItemValue = value[index]
+            const namePathIndexForListItem = namePathIndex + 1;
+            const index = namePath[namePathIndexForListItem];
+            const listItemValue = value[index];
             const fieldName = [
               ...namePath.slice(0, namePathIndexForListItem),
               index,
-            ].join('.')
-            const isLastItem = namePathIndexForListItem === namePath.length - 1
+            ].join('.');
+            const isLastItem = namePathIndexForListItem === namePath.length - 1;
             if (!isLastItem) {
               if (field.fields) {
                 return this.getFieldGroup({
@@ -409,7 +409,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                   values: listItemValue,
                   namePath,
                   namePathIndex: namePathIndex + 2,
-                })
+                });
               }
             }
             return {
@@ -419,21 +419,21 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                 return {
                   ...field,
                   name: [fieldName, field.name].join('.'),
-                }
+                };
               }),
-            }
+            };
           } else {
             const fieldName = [...namePath.slice(0, namePathIndex + 1)].join(
               '.'
-            )
-            const isLastItem = namePathIndex === namePath.length - 1
+            );
+            const isLastItem = namePathIndex === namePath.length - 1;
             if (!isLastItem) {
               return this.getFieldGroup({
                 formOrObjectField: field,
                 values: value,
                 namePath,
                 namePathIndex: namePathIndex + 1,
-              })
+              });
             }
             return {
               ...field,
@@ -442,9 +442,9 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                 return {
                   ...field,
                   name: [fieldName, field.name].join('.'),
-                }
+                };
               }),
-            }
+            };
           }
         }
       } else if (field.type === 'rich-text') {
@@ -457,30 +457,32 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                 name: [...namePath.slice(0, namePathIndex), field.name].join(
                   '.'
                 ),
-              }
+              };
             }),
-          }
+          };
         } else {
           const childrenIndex = namePath.findIndex(
             (value) => value === 'children'
-          )
+          );
           // Find the props for the next item, ignoring parent 'props'
           const propsIndex =
             namePath
               .slice(childrenIndex)
-              .findIndex((value) => value === 'props') + childrenIndex
-          const itemName = namePath.slice(childrenIndex, propsIndex).join('.')
-          const item = getIn(value, itemName)
-          const props = item.props
-          const templateString = item.name
-          const currentPathIndex = namePathIndex + Math.max(propsIndex, 3)
-          const isLastItem = currentPathIndex + 1 === namePath.length
+              .findIndex((value) => value === 'props') + childrenIndex;
+          const itemName = namePath.slice(childrenIndex, propsIndex).join('.');
+          const item = getIn(value, itemName);
+          const props = item.props;
+          const templateString = item.name;
+          const currentPathIndex = namePathIndex + Math.max(propsIndex, 3);
+          const isLastItem = currentPathIndex + 1 === namePath.length;
           const template = field.templates.find(
             (t) => t.name === templateString
-          )
-          const templateName = namePath.slice(0, currentPathIndex + 2).join('.')
+          );
+          const templateName = namePath
+            .slice(0, currentPathIndex + 2)
+            .join('.');
           if (item?.type === 'img') {
-            const imageName = namePath.slice(0, currentPathIndex + 2).join('.')
+            const imageName = namePath.slice(0, currentPathIndex + 2).join('.');
             return {
               ...formOrObjectField,
               // name: [formOrObjectField.name, 'img'].join('.'),
@@ -507,7 +509,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                   component: 'text',
                 },
               ],
-            }
+            };
           }
           if (!isLastItem) {
             // The `propsIndex` is set to 0 when the namePath does NOT include 'props'
@@ -523,9 +525,9 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                       ...namePath.slice(0, namePathIndex),
                       field.name,
                     ].join('.'),
-                  }
+                  };
                 }),
-              }
+              };
             }
 
             return this.getFieldGroup({
@@ -534,10 +536,10 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
               namePath,
               namePathIndex:
                 namePathIndex + Math.max(4, childrenIndex + propsIndex),
-            })
+            });
           }
           if (!template) {
-            throw new Error(`Expected template value for field ${item.name}`)
+            throw new Error(`Expected template value for field ${item.name}`);
           }
           return {
             ...template,
@@ -546,14 +548,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
               return {
                 ...field,
                 name: [templateName, field.name].join('.'),
-              }
+              };
             }),
-          }
+          };
         }
       } else {
-        const fieldName = [...namePath.slice(0, namePathIndex)].join('.')
+        const fieldName = [...namePath.slice(0, namePathIndex)].join('.');
         if (!fieldName) {
-          return formOrObjectField
+          return formOrObjectField;
         }
         return {
           ...formOrObjectField,
@@ -562,9 +564,9 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             return {
               ...field,
               name: [fieldName, field.name].join('.'),
-            }
+            };
           }),
-        }
+        };
       }
     }
   }
@@ -572,24 +574,24 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
 
 function updateEverything<S>(form: FormApi<any>, values: S) {
   Object.entries(values).forEach(([path, value]) => {
-    form.change(path, value)
-  })
+    form.change(path, value);
+  });
 }
 
 function updateSelectively<S>(form: FormApi<any>, values: S, prefix?: string) {
-  const activePath = form.getState().active!
+  const activePath = form.getState().active!;
 
   Object.entries(values).forEach(([name, value]) => {
-    const path = prefix ? `${prefix}.${name}` : name
+    const path = prefix ? `${prefix}.${name}` : name;
 
     if (typeof value === 'object') {
       if (typeof activePath === 'string' && activePath.startsWith(path)) {
-        updateSelectively(form, value, path)
+        updateSelectively(form, value, path);
       } else {
-        form.change(path, value)
+        form.change(path, value);
       }
     } else if (path !== activePath) {
-      form.change(path, value)
+      form.change(path, value);
     }
-  })
+  });
 }

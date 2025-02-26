@@ -4,7 +4,7 @@
 
 */
 
-import * as React from 'react'
+import * as React from 'react';
 
 export const DuplicateIcon = ({ ...props }) => (
   <svg
@@ -22,4 +22,4 @@ export const DuplicateIcon = ({ ...props }) => (
       v10.14h1.99V19.89z'
     />
   </svg>
-)
+);

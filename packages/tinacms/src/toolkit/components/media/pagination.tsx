@@ -1,13 +1,13 @@
-import React from 'react'
-import { Button } from '@toolkit/styles'
-import { BiLeftArrowAlt, BiRightArrowAlt } from 'react-icons/bi'
+import React from 'react';
+import { Button } from '@toolkit/styles';
+import { BiLeftArrowAlt, BiRightArrowAlt } from 'react-icons/bi';
 
 export interface MediaPaginatorProps {
-  navigateNext: () => void
-  navigatePrev: () => void
-  hasNext: boolean
-  hasPrev: boolean
-  variant?: 'primary' | 'secondary' | 'white' | 'ghost'
+  navigateNext: () => void;
+  navigatePrev: () => void;
+  hasNext: boolean;
+  hasPrev: boolean;
+  variant?: 'primary' | 'secondary' | 'white' | 'ghost';
 }
 
 export function CursorPaginator({
@@ -26,5 +26,5 @@ export function CursorPaginator({
         Next <BiRightArrowAlt className='w-6 h-full ml-2 opacity-70' />
       </Button>
     </div>
-  )
+  );
 }

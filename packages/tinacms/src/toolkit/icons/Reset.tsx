@@ -4,7 +4,7 @@
 
 */
 
-import * as React from 'react'
+import * as React from 'react';
 
 export const ResetIcon = ({ ...props }) => (
   <svg
@@ -18,4 +18,4 @@ export const ResetIcon = ({ ...props }) => (
       fill='inherit'
     />
   </svg>
-)
+);

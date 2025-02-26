@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react';
 import {
   BiArrowBack,
   BiCopy,
@@ -10,22 +10,22 @@ import {
   BiRename,
   BiSearch,
   BiX,
-} from 'react-icons/bi'
-import { RiHome2Line } from 'react-icons/ri'
+} from 'react-icons/bi';
+import { RiHome2Line } from 'react-icons/ri';
 import {
   Link,
   type NavigateFunction,
   useLocation,
   useNavigate,
   useParams,
-} from 'react-router-dom'
+} from 'react-router-dom';
 import {
   Menu,
   MenuButton,
   MenuItem,
   MenuItems,
   Transition,
-} from '@headlessui/react'
+} from '@headlessui/react';
 import {
   BaseTextField,
   Button,
@@ -41,32 +41,32 @@ import {
   Select,
   type TinaCMS,
   CreateBranchModel,
-} from '@tinacms/toolkit'
+} from '@tinacms/toolkit';
 import type {
   CollectionResponse,
   DocumentSys,
   TemplateResponse,
-} from '../types'
-import GetCMS from '../components/GetCMS'
-import GetCollection from '../components/GetCollection'
-import type { RouteMappingPlugin } from '../plugins/route-mapping'
-import { PageBody, PageHeader, PageWrapper } from '../components/Page'
-import type { TinaAdminApi } from '../api'
-import type { Collection, TinaField } from '@tinacms/schema-tools'
-import { type CollectionFolder, useCollectionFolder } from './utils'
-import { FaFile, FaFolder } from 'react-icons/fa'
+} from '../types';
+import GetCMS from '../components/GetCMS';
+import GetCollection from '../components/GetCollection';
+import type { RouteMappingPlugin } from '../plugins/route-mapping';
+import { PageBody, PageHeader, PageWrapper } from '../components/Page';
+import type { TinaAdminApi } from '../api';
+import type { Collection, TinaField } from '@tinacms/schema-tools';
+import { type CollectionFolder, useCollectionFolder } from './utils';
+import { FaFile, FaFolder } from 'react-icons/fa';
 
-const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
-const isSSR = typeof window === 'undefined'
+const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page';
+const isSSR = typeof window === 'undefined';
 
 const TemplateMenu = ({
   templates,
   folder,
   collectionName,
 }: {
-  collectionName: string
-  templates: TemplateResponse[]
-  folder: CollectionFolder
+  collectionName: string;
+  templates: TemplateResponse[];
+  folder: CollectionFolder;
 }) => {
   return (
     <Menu as='div' className='relative inline-block text-left'>
@@ -127,8 +127,8 @@ const TemplateMenu = ({
         </div>
       )}
     </Menu>
-  )
-}
+  );
+};
 
 export const handleNavigate = async (
   navigate: NavigateFunction,
@@ -142,9 +142,9 @@ export const handleNavigate = async (
   /**
    * Retrieve the RouteMapping Plugin
    */
-  const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin')
-  const routeMapping = plugins.find(({ name }) => name === 'route-mapping')
-  const tinaPreview = cms.flags.get('tina-preview') || false
+  const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin');
+  const routeMapping = plugins.find(({ name }) => name === 'route-mapping');
+  const tinaPreview = cms.flags.get('tina-preview') || false;
 
   /**
    * Determine if the document has a route mapped
@@ -156,7 +156,7 @@ export const handleNavigate = async (
       })
     : routeMapping
       ? routeMapping.mapper(collection, document)
-      : undefined
+      : undefined;
 
   /**
    * Redirect the browser if 'yes', else navigate react-router.
@@ -164,43 +164,43 @@ export const handleNavigate = async (
   if (routeOverride) {
     // remove leading /
     if (routeOverride.startsWith('/')) {
-      routeOverride = routeOverride.slice(1)
+      routeOverride = routeOverride.slice(1);
     }
     tinaPreview
       ? navigate(`/~/${routeOverride}`)
-      : (window.location.href = routeOverride)
-    return null
+      : (window.location.href = routeOverride);
+    return null;
   } else {
-    const pathToDoc = document._sys.breadcrumbs
+    const pathToDoc = document._sys.breadcrumbs;
     navigate(
       `/${['collections', 'edit', collection.name, ...pathToDoc].join('/')}`,
       { replace: true }
-    )
+    );
   }
-}
+};
 
 function getUniqueTemplateFields(collection: Collection<true>): TinaField[] {
-  const fieldSet: TinaField[] = []
+  const fieldSet: TinaField[] = [];
 
   collection.templates.forEach((template) => {
     template.fields
       .filter((f) => {
-        return fieldSet.find((x) => x.name === f.name) === undefined
+        return fieldSet.find((x) => x.name === f.name) === undefined;
       })
       .forEach((field) => {
-        fieldSet.push(field as TinaField)
-      })
-  })
+        fieldSet.push(field as TinaField);
+      });
+  });
 
-  return [...fieldSet]
+  return [...fieldSet];
 }
 
 const CollectionListPage = () => {
-  const navigate = useNavigate()
-  const { collectionName } = useParams()
-  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
-  const [renameModalOpen, setRenameModalOpen] = React.useState(false)
-  const [folderModalOpen, setFolderModalOpen] = React.useState(false)
+  const navigate = useNavigate();
+  const { collectionName } = useParams();
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [renameModalOpen, setRenameModalOpen] = React.useState(false);
+  const [folderModalOpen, setFolderModalOpen] = React.useState(false);
   const [vars, setVars] = React.useState({
     collection: collectionName,
     relativePath: '',
@@ -213,9 +213,9 @@ const CollectionListPage = () => {
     before: '',
     after: '',
     booleanEquals: null,
-  })
-  const [endCursor, setEndCursor] = useState('')
-  const [prevCursors, setPrevCursors] = useState([])
+  });
+  const [endCursor, setEndCursor] = useState('');
+  const [prevCursors, setPrevCursors] = useState([]);
   const [sortKey, setSortKey] = useState(
     // set sort key to cached value if it exists
     isSSR
@@ -225,14 +225,14 @@ const CollectionListPage = () => {
             order: 'asc',
             name: '',
           })
-  )
-  const [search, setSearch] = useState('')
-  const [searchInput, setSearchInput] = useState('')
+  );
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
 
-  const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order)
-  const loc = useLocation()
-  const folder = useCollectionFolder()
+  const { order = 'asc', name: sortName } = JSON.parse(sortKey || '{}');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(order);
+  const loc = useLocation();
+  const folder = useCollectionFolder();
   useEffect(() => {
     // set sort key to cached value on route change
     setSortKey(
@@ -241,13 +241,13 @@ const CollectionListPage = () => {
           order: 'asc',
           name: '',
         })
-    )
+    );
     // reset state when the route is changed
-    setEndCursor('')
-    setPrevCursors([])
-    setSearch('')
-    setSearchInput('')
-  }, [loc])
+    setEndCursor('');
+    setPrevCursors([]);
+    setSearch('');
+    setSearchInput('');
+  }, [loc]);
 
   useEffect(() => {
     // reset filter when the route is changed
@@ -263,8 +263,8 @@ const CollectionListPage = () => {
       before: '',
       after: '',
       booleanEquals: null,
-    }))
-  }, [collectionName])
+    }));
+  }, [collectionName]);
 
   return (
     <GetCMS>
@@ -304,9 +304,9 @@ const CollectionListPage = () => {
                 reFetchCollection,
                 collectionExtra: Collection<true>
               ) => {
-                const documents = collection.documents.edges
-                const admin: TinaAdminApi = cms.api.admin
-                const pageInfo = collection.documents.pageInfo
+                const documents = collection.documents.edges;
+                const admin: TinaAdminApi = cms.api.admin;
+                const pageInfo = collection.documents.pageInfo;
 
                 // get unique fields from all templates
                 const fields = (
@@ -316,28 +316,28 @@ const CollectionListPage = () => {
                 ).filter((x) =>
                   // only allow sortable fields
                   ['string', 'number', 'datetime', 'boolean'].includes(x.type)
-                )
+                );
 
                 const sortField = fields?.find(
                   (field) => field.name === sortName
-                )
+                );
 
                 const searchEnabled =
-                  !!cms.api.tina.schema?.config?.config?.search
+                  !!cms.api.tina.schema?.config?.config?.search;
 
                 const collectionDefinition = cms.api.tina.schema.getCollection(
                   collection.name
-                )
+                );
 
                 const allowCreate =
-                  collectionDefinition?.ui?.allowedActions?.create ?? true
+                  collectionDefinition?.ui?.allowedActions?.create ?? true;
                 const allowDelete =
-                  collectionDefinition?.ui?.allowedActions?.delete ?? true
+                  collectionDefinition?.ui?.allowedActions?.delete ?? true;
                 const allowCreateNestedFolder =
                   collectionDefinition?.ui?.allowedActions
-                    ?.createNestedFolder ?? true
+                    ?.createNestedFolder ?? true;
 
-                const folderView = folder.fullyQualifiedName !== ''
+                const folderView = folder.fullyQualifiedName !== '';
 
                 return (
                   <>
@@ -352,35 +352,35 @@ const CollectionListPage = () => {
                                 collection.name,
                                 vars.relativePath,
                                 true
-                              )
-                              return doc?.document?._sys?.hasReferences
+                              );
+                              return doc?.document?._sys?.hasReferences;
                             } catch (error) {
                               cms.alerts.error(
                                 'Document was not found, ask a developer for help or check the console for an error message'
-                              )
-                              console.error(error)
-                              throw error
+                              );
+                              console.error(error);
+                              throw error;
                             }
                           }}
                           deleteFunc={async () => {
                             try {
-                              await admin.deleteDocument(vars)
+                              await admin.deleteDocument(vars);
                               cms.alerts.info(
                                 'Document was successfully deleted'
-                              )
-                              reFetchCollection()
+                              );
+                              reFetchCollection();
                             } catch (error) {
                               if (error.message.indexOf('has references')) {
                                 cms.alerts.error(
                                   error.message.split('\n\t').filter(Boolean)[1]
-                                )
-                                return
+                                );
+                                return;
                               }
                               cms.alerts.warn(
                                 'Document was not deleted, ask a developer for help or check the console for an error message'
-                              )
-                              console.error(error)
-                              throw error
+                              );
+                              console.error(error);
+                              throw error;
                             }
                           }}
                           close={() => setDeleteModalOpen(false)}
@@ -395,15 +395,17 @@ const CollectionListPage = () => {
                         close={() => setDeleteModalOpen(false)}
                         safeSubmit={async () => {
                           try {
-                            await admin.deleteDocument(vars)
-                            cms.alerts.info('Document was successfully deleted')
-                            reFetchCollection()
+                            await admin.deleteDocument(vars);
+                            cms.alerts.info(
+                              'Document was successfully deleted'
+                            );
+                            reFetchCollection();
                           } catch (error) {
                             cms.alerts.warn(
                               'Document was not deleted, ask a developer for help or check the console for an error message'
-                            )
-                            console.error(error)
-                            throw error
+                            );
+                            console.error(error);
+                            throw error;
                           }
                         }}
                       />
@@ -415,32 +417,34 @@ const CollectionListPage = () => {
                         newRelativePath={vars.newRelativePath}
                         setNewRelativePath={(newRelativePath) => {
                           setVars((vars) => {
-                            return { ...vars, newRelativePath }
-                          })
+                            return { ...vars, newRelativePath };
+                          });
                         }}
                         renameFunc={async () => {
                           // add the file extension
-                          const newRelativePath = `${vars.newRelativePath}.${collection.format}`
+                          const newRelativePath = `${vars.newRelativePath}.${collection.format}`;
                           try {
                             await admin.renameDocument({
                               collection: vars.collection,
                               relativePath: vars.relativePath,
                               newRelativePath,
-                            })
-                            cms.alerts.info('Document was successfully renamed')
-                            reFetchCollection()
+                            });
+                            cms.alerts.info(
+                              'Document was successfully renamed'
+                            );
+                            reFetchCollection();
                           } catch (error) {
                             if (error.message.indexOf('has references')) {
                               cms.alerts.error(
                                 error.message.split('\n\t').filter(Boolean)[1]
-                              )
-                              return
+                              );
+                              return;
                             }
                             cms.alerts.warn(
                               'Document was not renamed, ask a developer for help or check the console for an error message'
-                            )
-                            console.error(error)
-                            throw error
+                            );
+                            console.error(error);
+                            throw error;
                           }
                         }}
                         close={() => setRenameModalOpen(false)}
@@ -452,8 +456,8 @@ const CollectionListPage = () => {
                         folderName={vars.folderName}
                         setFolderName={(folderName) => {
                           setVars((vars) => {
-                            return { ...vars, folderName }
-                          })
+                            return { ...vars, folderName };
+                          });
                         }}
                         createFunc={async () => {
                           try {
@@ -465,7 +469,7 @@ const CollectionListPage = () => {
                                   : vars.folderName
                               )
                               .then(() => {
-                                reFetchCollection()
+                                reFetchCollection();
                                 navigate(
                                   `/${[
                                     'collections',
@@ -476,20 +480,20 @@ const CollectionListPage = () => {
                                       : [vars.folderName]),
                                   ].join('/')}`,
                                   { replace: true }
-                                )
+                                );
                                 cms.alerts.info(
                                   'Folder was successfully created'
-                                )
+                                );
                               })
                               .catch((error) => {
-                                throw error
-                              })
+                                throw error;
+                              });
                           } catch (error) {
                             cms.alerts.warn(
                               'Folder was not created, ask a developer for help or check the console for an error message'
-                            )
-                            console.error(error)
-                            throw error
+                            );
+                            console.error(error);
+                            throw error;
                           }
                         }}
                         close={() => setFolderModalOpen(false)}
@@ -555,15 +559,17 @@ const CollectionListPage = () => {
                                         name: 'sort',
                                         value: sortKey,
                                         onChange: (e) => {
-                                          const val = JSON.parse(e.target.value)
-                                          setEndCursor('')
-                                          setPrevCursors([])
+                                          const val = JSON.parse(
+                                            e.target.value
+                                          );
+                                          setEndCursor('');
+                                          setPrevCursors([]);
                                           window?.localStorage.setItem(
                                             `${LOCAL_STORAGE_KEY}.${collectionName}`,
                                             e.target.value
-                                          )
-                                          setSortKey(e.target.value)
-                                          setSortOrder(val.order)
+                                          );
+                                          setSortKey(e.target.value);
+                                          setSortOrder(val.order);
                                         },
                                       }}
                                     />
@@ -607,9 +613,9 @@ const CollectionListPage = () => {
                                         ...old,
                                         collection: collectionName,
                                         folderName: '',
-                                      }))
-                                      setFolderModalOpen(true)
-                                      evt.stopPropagation()
+                                      }));
+                                      setFolderModalOpen(true);
+                                      evt.stopPropagation();
                                     }}
                                     to='/collections/new-folder'
                                     className='icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4'
@@ -697,7 +703,7 @@ const CollectionListPage = () => {
                                                     document.node.path,
                                                   ].join('/')}`,
                                                   { replace: true }
-                                                )
+                                                );
                                               }}
                                             >
                                               <BiFolder className='inline-block h-6 w-auto flex-shrink-0 opacity-70' />
@@ -731,21 +737,21 @@ const CollectionListPage = () => {
                                                         {node}
                                                       </span>
                                                     </span>
-                                                  )
+                                                  );
                                                 })}
                                             </span>
                                           </td>
                                         </tr>
-                                      )
+                                      );
                                     }
 
                                     const hasTitle = Boolean(
                                       document.node._sys.title
-                                    )
+                                    );
                                     const subfolders =
                                       document.node._sys.breadcrumbs
                                         .slice(0, -1)
-                                        .join('/')
+                                        .join('/');
 
                                     return (
                                       <tr
@@ -764,7 +770,7 @@ const CollectionListPage = () => {
                                                 collection,
                                                 collectionDefinition,
                                                 document.node
-                                              )
+                                              );
                                             }}
                                           >
                                             <BiFile className='inline-block h-6 w-auto flex-shrink-0 opacity-70' />
@@ -838,11 +844,11 @@ const CollectionListPage = () => {
                                                 onMouseDown: () => {
                                                   const pathToDoc =
                                                     document.node._sys
-                                                      .breadcrumbs
+                                                      .breadcrumbs;
                                                   if (
                                                     folder.fullyQualifiedName
                                                   ) {
-                                                    pathToDoc.unshift('~')
+                                                    pathToDoc.unshift('~');
                                                   }
                                                   navigate(
                                                     `/${[
@@ -852,7 +858,7 @@ const CollectionListPage = () => {
                                                       ...pathToDoc,
                                                     ].join('/')}`,
                                                     { replace: true }
-                                                  )
+                                                  );
                                                 },
                                               },
                                               allowCreate && {
@@ -862,11 +868,11 @@ const CollectionListPage = () => {
                                                 onMouseDown: () => {
                                                   const pathToDoc =
                                                     document.node._sys
-                                                      .breadcrumbs
+                                                      .breadcrumbs;
                                                   if (
                                                     folder.fullyQualifiedName
                                                   ) {
-                                                    pathToDoc.unshift('~')
+                                                    pathToDoc.unshift('~');
                                                   }
                                                   navigate(
                                                     `/${[
@@ -876,7 +882,7 @@ const CollectionListPage = () => {
                                                       ...pathToDoc,
                                                     ].join('/')}`,
                                                     { replace: true }
-                                                  )
+                                                  );
                                                 },
                                               },
                                               allowDelete && {
@@ -903,8 +909,8 @@ const CollectionListPage = () => {
                                                       document.node._sys
                                                         .extension,
                                                     newRelativePath: '',
-                                                  }))
-                                                  setDeleteModalOpen(true)
+                                                  }));
+                                                  setDeleteModalOpen(true);
                                                 },
                                               },
                                               allowDelete && {
@@ -931,15 +937,15 @@ const CollectionListPage = () => {
                                                       document.node._sys
                                                         .extension,
                                                     newRelativePath: '',
-                                                  }))
-                                                  setRenameModalOpen(true)
+                                                  }));
+                                                  setRenameModalOpen(true);
                                                 },
                                               },
                                             ].filter(Boolean)}
                                           />
                                         </td>
                                       </tr>
-                                    )
+                                    );
                                   })}
                               </tbody>
                             </table>
@@ -955,17 +961,17 @@ const CollectionListPage = () => {
                                 : pageInfo.hasPreviousPage
                             }
                             navigateNext={() => {
-                              const newState = [...prevCursors, endCursor]
-                              setPrevCursors(newState)
-                              setEndCursor(pageInfo?.endCursor)
+                              const newState = [...prevCursors, endCursor];
+                              setPrevCursors(newState);
+                              setEndCursor(pageInfo?.endCursor);
                             }}
                             hasPrev={prevCursors.length > 0}
                             navigatePrev={() => {
-                              const prev = prevCursors[prevCursors.length - 1]
+                              const prev = prevCursors[prevCursors.length - 1];
                               if (typeof prev === 'string') {
-                                const newState = prevCursors.slice(0, -1)
-                                setPrevCursors(newState)
-                                setEndCursor(prev)
+                                const newState = prevCursors.slice(0, -1);
+                                setPrevCursors(newState);
+                                setEndCursor(prev);
                               }
                             }}
                           />
@@ -973,15 +979,15 @@ const CollectionListPage = () => {
                       </div>
                     </PageBody>
                   </>
-                )
+                );
               }}
             </GetCollection>
           </PageWrapper>
-        )
+        );
       }}
     </GetCMS>
-  )
-}
+  );
+};
 
 const SearchInput = ({
   loading,
@@ -990,14 +996,14 @@ const SearchInput = ({
   searchInput,
   setSearchInput,
 }) => {
-  const [searchLoaded, setSearchLoaded] = useState(false)
+  const [searchLoaded, setSearchLoaded] = useState(false);
   useEffect(() => {
     if (loading) {
-      setSearchLoaded(false)
+      setSearchLoaded(false);
     } else {
-      setSearchLoaded(true)
+      setSearchLoaded(true);
     }
-  }, [loading])
+  }, [loading]);
 
   return (
     <form className='flex flex-1 flex-col gap-2 items-start w-full'>
@@ -1015,16 +1021,16 @@ const SearchInput = ({
             placeholder='Search'
             value={searchInput}
             onChange={(e) => {
-              setSearchInput(e.target.value)
+              setSearchInput(e.target.value);
             }}
           />
         </div>
         <div className='flex w-full md:w-auto gap-3'>
           <Button
             onClick={(e) => {
-              e.preventDefault()
-              setSearch(searchInput)
-              setSearchLoaded(false)
+              e.preventDefault();
+              setSearch(searchInput);
+              setSearchLoaded(false);
             }}
             variant='primary'
             className='w-full md:w-auto'
@@ -1034,9 +1040,9 @@ const SearchInput = ({
           {search && searchLoaded && (
             <Button
               onClick={(e) => {
-                e.preventDefault()
-                setSearch('')
-                setSearchInput('')
+                e.preventDefault();
+                setSearch('');
+                setSearchInput('');
               }}
               variant='white'
             >
@@ -1046,17 +1052,17 @@ const SearchInput = ({
         </div>
       </div>
     </form>
-  )
-}
+  );
+};
 
 const Breadcrumb = ({ folder, navigate, collectionName }) => {
-  const folderArray = folder.name.split('/')
+  const folderArray = folder.name.split('/');
 
   return (
     <div className='w-full bg-gray-50/30 flex items-stretch'>
       <button
         onClick={() => {
-          const folders = folder.fullyQualifiedName.split('/')
+          const folders = folder.fullyQualifiedName.split('/');
           navigate(
             `/${[
               'collections',
@@ -1064,7 +1070,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
               ...folders.slice(0, folders.length - 1),
             ].join('/')}`,
             { replace: true }
-          )
+          );
         }}
         className='px-3 py-2 bg-white hover:bg-gray-50/50 transition ease-out duration-100 border-r border-gray-100 text-blue-500 hover:text-blue-600'
       >
@@ -1075,7 +1081,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
           onClick={() => {
             navigate(`/collections/${collectionName}/~`, {
               replace: true,
-            })
+            });
           }}
           className='shrink-0 bg-transparent p-0 border-0 text-blue-400 hover:text-blue-500 transition-all ease-out duration-100 opacity-70 hover:opacity-100'
         >
@@ -1089,7 +1095,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
                 <button
                   className='bg-transparent whitespace-nowrap truncate p-0 border-0 text-blue-500 hover:text-blue-600 transition-all ease-out duration-100 underline underline-offset-2 decoration-1	decoration-blue-200 hover:decoration-blue-400'
                   onClick={() => {
-                    const folders = folder.fullyQualifiedName.split('/')
+                    const folders = folder.fullyQualifiedName.split('/');
                     navigate(
                       `/${[
                         'collections',
@@ -1100,7 +1106,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
                         ),
                       ].join('/')}`,
                       { replace: true }
-                    )
+                    );
                   }}
                 >
                   {node}
@@ -1109,18 +1115,18 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
                 <span className='whitespace-nowrap truncate'>{node}</span>
               )}
             </>
-          )
+          );
         })}
       </span>
     </div>
-  )
-}
+  );
+};
 
 interface DeleteModalProps {
-  close(): void
-  deleteFunc(): void
-  checkRefsFunc(): Promise<true | false>
-  filename: string
+  close(): void;
+  deleteFunc(): void;
+  checkRefsFunc(): Promise<true | false>;
+  filename: string;
 }
 
 const NoDocumentsPlaceholder = () => {
@@ -1130,8 +1136,8 @@ const NoDocumentsPlaceholder = () => {
         No documents found.
       </p>
     </div>
-  )
-}
+  );
+};
 
 const DeleteModal = ({
   close,
@@ -1139,12 +1145,12 @@ const DeleteModal = ({
   checkRefsFunc,
   filename,
 }: DeleteModalProps) => {
-  const [hasRefs, setHasRefs] = React.useState<true | false | undefined>()
+  const [hasRefs, setHasRefs] = React.useState<true | false | undefined>();
   useEffect(() => {
     checkRefsFunc().then((result) => {
-      setHasRefs(result)
-    })
-  }, [filename, checkRefsFunc])
+      setHasRefs(result);
+    });
+  }, [filename, checkRefsFunc]);
   return (
     <Modal>
       <PopupModal>
@@ -1162,8 +1168,8 @@ const DeleteModal = ({
             style={{ flexGrow: 3 }}
             variant='danger'
             onClick={async () => {
-              await deleteFunc()
-              close()
+              await deleteFunc();
+              close();
             }}
           >
             Delete
@@ -1171,14 +1177,14 @@ const DeleteModal = ({
         </ModalActions>
       </PopupModal>
     </Modal>
-  )
-}
+  );
+};
 
 interface FolderModalProps {
-  close(): void
-  createFunc(): void
-  folderName: string
-  setFolderName(folderName: string): void
+  close(): void;
+  createFunc(): void;
+  folderName: string;
+  setFolderName(folderName: string): void;
 }
 
 const FolderModal = ({
@@ -1210,8 +1216,8 @@ const FolderModal = ({
             style={{ flexGrow: 3 }}
             variant='primary'
             onClick={async () => {
-              await createFunc()
-              close()
+              await createFunc();
+              close();
             }}
           >
             Create
@@ -1219,15 +1225,15 @@ const FolderModal = ({
         </ModalActions>
       </PopupModal>
     </Modal>
-  )
-}
+  );
+};
 
 interface ModalProps {
-  close(): void
-  renameFunc(): void
-  filename: string
-  setNewRelativePath(newRelativePath: string): void
-  newRelativePath: string
+  close(): void;
+  renameFunc(): void;
+  filename: string;
+  setNewRelativePath(newRelativePath: string): void;
+  newRelativePath: string;
 }
 
 const RenameModal = ({
@@ -1261,8 +1267,8 @@ const RenameModal = ({
             style={{ flexGrow: 3 }}
             variant='primary'
             onClick={async () => {
-              await renameFunc()
-              close()
+              await renameFunc();
+              close();
             }}
             disabled={!newRelativePath || newRelativePath === filename}
           >
@@ -1271,6 +1277,6 @@ const RenameModal = ({
         </ModalActions>
       </PopupModal>
     </Modal>
-  )
-}
-export default CollectionListPage
+  );
+};
+export default CollectionListPage;

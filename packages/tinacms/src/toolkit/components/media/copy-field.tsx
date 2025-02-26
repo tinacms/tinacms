@@ -1,15 +1,15 @@
-import React from 'react'
-import { BiCopyAlt } from 'react-icons/bi'
+import React from 'react';
+import { BiCopyAlt } from 'react-icons/bi';
 
 interface CopyFieldProps {
-  label?: string
-  description?: string
-  value: any
+  label?: string;
+  description?: string;
+  value: any;
 }
 
 export const CopyField = ({ label, description, value }: CopyFieldProps) => {
-  const [copied, setCopied] = React.useState(false)
-  const [fadeOut, setFadeOut] = React.useState(false)
+  const [copied, setCopied] = React.useState(false);
+  const [fadeOut, setFadeOut] = React.useState(false);
 
   return (
     <div className='w-full'>
@@ -20,17 +20,17 @@ export const CopyField = ({ label, description, value }: CopyFieldProps) => {
       )}
       <span
         onClick={() => {
-          if (copied === true) return
-          setCopied(true)
+          if (copied === true) return;
+          setCopied(true);
           setTimeout(() => {
-            setFadeOut(true)
-          }, 2500)
+            setFadeOut(true);
+          }, 2500);
           setTimeout(() => {
-            setCopied(false)
-            setFadeOut(false)
-          }, 3000)
+            setCopied(false);
+            setFadeOut(false);
+          }, 3000);
 
-          navigator.clipboard.writeText(value)
+          navigator.clipboard.writeText(value);
         }}
         className={`shadow-inner text-base leading-5 whitespace-normal break-all px-3 py-2 text-gray-600 w-full bg-gray-50 border border-gray-200 transition-all ease-out duration-150 rounded-md relative overflow-hidden appearance-none flex items-center w-full cursor-pointer hover:bg-white hover:text-blue-500  ${
           copied ? `pointer-events-none` : ``
@@ -52,5 +52,5 @@ export const CopyField = ({ label, description, value }: CopyFieldProps) => {
         <p className='mt-2 text-sm text-gray-500'>{description}</p>
       )}
     </div>
-  )
-}
+  );
+};

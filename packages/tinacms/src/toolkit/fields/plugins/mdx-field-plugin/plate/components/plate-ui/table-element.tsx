@@ -1,9 +1,9 @@
-import React from 'react'
+import React from 'react';
 
-import type * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
+import type * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 
-import { PopoverAnchor } from '@radix-ui/react-popover'
-import { cn, withRef } from '@udecode/cn'
+import { PopoverAnchor } from '@radix-ui/react-popover';
+import { cn, withRef } from '@udecode/cn';
 import {
   PlateElement,
   isSelectionExpanded,
@@ -12,7 +12,7 @@ import {
   useElement,
   useRemoveNodeButton,
   withHOC,
-} from '@udecode/plate-common'
+} from '@udecode/plate-common';
 import {
   type TTableElement,
   TableProvider,
@@ -22,21 +22,21 @@ import {
   useTableElement,
   useTableElementState,
   useTableMergeState,
-} from '@udecode/plate-table'
-import { useReadOnly, useSelected } from 'slate-react'
+} from '@udecode/plate-table';
+import { useReadOnly, useSelected } from 'slate-react';
 
-import { Icons, iconVariants } from './icons'
+import { Icons, iconVariants } from './icons';
 
-import { Button } from './button'
+import { Button } from './button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuPortal,
   DropdownMenuTrigger,
-} from './dropdown-menu'
-import { Popover, PopoverContent, popoverVariants } from './popover'
-import { Separator } from './separator'
+} from './dropdown-menu';
+import { Popover, PopoverContent, popoverVariants } from './popover';
+import { Separator } from './separator';
 
 export const TableBordersDropdownMenuContent = withRef<
   typeof DropdownMenuPrimitive.Content
@@ -49,7 +49,7 @@ export const TableBordersDropdownMenuContent = withRef<
     hasOuterBorders,
     hasRightBorder,
     hasTopBorder,
-  } = useTableBordersDropdownMenuContentState()
+  } = useTableBordersDropdownMenuContentState();
 
   return (
     <DropdownMenuContent
@@ -106,27 +106,27 @@ export const TableBordersDropdownMenuContent = withRef<
         <div>Outside Borders</div>
       </DropdownMenuCheckboxItem>
     </DropdownMenuContent>
-  )
-})
+  );
+});
 
 export const TableFloatingToolbar = withRef<typeof PopoverContent>(
   ({ children, ...props }, ref) => {
-    const element = useElement<TTableElement>()
-    const { props: buttonProps } = useRemoveNodeButton({ element })
+    const element = useElement<TTableElement>();
+    const { props: buttonProps } = useRemoveNodeButton({ element });
 
     const selectionCollapsed = useEditorSelector(
       (editor) => !isSelectionExpanded(editor),
       []
-    )
+    );
 
-    const readOnly = useReadOnly()
-    const selected = useSelected()
-    const editor = useEditorRef()
+    const readOnly = useReadOnly();
+    const selected = useSelected();
+    const editor = useEditorRef();
 
-    const collapsed = !readOnly && selected && selectionCollapsed
-    const open = !readOnly && selected
+    const collapsed = !readOnly && selected && selectionCollapsed;
+    const open = !readOnly && selected;
 
-    const { canMerge, canUnmerge } = useTableMergeState()
+    const { canMerge, canUnmerge } = useTableMergeState();
 
     const mergeContent = canMerge && (
       <Button
@@ -138,7 +138,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
         <Icons.combine className='mr-2 size-4' />
         Merge
       </Button>
-    )
+    );
 
     const unmergeButton = canUnmerge && (
       <Button
@@ -150,7 +150,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
         <Icons.ungroup className='mr-2 size-4' />
         Unmerge
       </Button>
-    )
+    );
 
     const bordersContent = collapsed && (
       <>
@@ -172,7 +172,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
           Delete
         </Button>
       </>
-    )
+    );
 
     return (
       <Popover modal={false} open={open}>
@@ -193,16 +193,16 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
           </PopoverContent>
         )}
       </Popover>
-    )
+    );
   }
-)
+);
 
 export const TableElement = withHOC(
   TableProvider,
   withRef<typeof PlateElement>(({ children, className, ...props }, ref) => {
     const { colSizes, isSelectingCell, marginLeft, minColumnWidth } =
-      useTableElementState()
-    const { colGroupProps, props: tableProps } = useTableElement()
+      useTableElementState();
+    const { colGroupProps, props: tableProps } = useTableElement();
 
     return (
       <TableFloatingToolbar>
@@ -236,6 +236,6 @@ export const TableElement = withHOC(
           </PlateElement>
         </div>
       </TableFloatingToolbar>
-    )
+    );
   })
-)
+);

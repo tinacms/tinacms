@@ -2,20 +2,20 @@
 
 */
 
-import { graphql, buildASTSchema, getNamedType, GraphQLError } from 'graphql'
-import type { TinaSchema } from '@tinacms/schema-tools'
-import type { GraphQLConfig } from './types'
-import { createSchema } from './schema/createSchema'
-import { createResolver } from './resolver'
-import { assertShape, get } from './util'
-import set from 'lodash.set'
+import { graphql, buildASTSchema, getNamedType, GraphQLError } from 'graphql';
+import type { TinaSchema } from '@tinacms/schema-tools';
+import type { GraphQLConfig } from './types';
+import { createSchema } from './schema/createSchema';
+import { createResolver } from './resolver';
+import { assertShape, get } from './util';
+import set from 'lodash.set';
 
-import type { GraphQLResolveInfo } from 'graphql'
-import type { Database } from './database'
-import { NAMER } from './ast-builder'
-import { handleFetchErrorError } from './resolver/error'
-import { checkPasswordHash, mapUserFields } from './auth/utils'
-import { NotFoundError } from './error'
+import type { GraphQLResolveInfo } from 'graphql';
+import type { Database } from './database';
+import { NAMER } from './ast-builder';
+import { handleFetchErrorError } from './resolver/error';
+import { checkPasswordHash, mapUserFields } from './auth/utils';
+import { NotFoundError } from './error';
 
 export const resolve = async ({
   config,
@@ -27,37 +27,37 @@ export const resolve = async ({
   isAudit,
   ctxUser,
 }: {
-  config?: GraphQLConfig
-  query: string
-  variables: object
-  database: Database
-  silenceErrors?: boolean
-  verbose?: boolean
-  isAudit?: boolean
-  ctxUser?: { sub: string }
+  config?: GraphQLConfig;
+  query: string;
+  variables: object;
+  database: Database;
+  silenceErrors?: boolean;
+  verbose?: boolean;
+  isAudit?: boolean;
+  ctxUser?: { sub: string };
 }) => {
   try {
-    const verboseValue = verbose ?? true
-    const graphQLSchemaAst = await database.getGraphQLSchema()
+    const verboseValue = verbose ?? true;
+    const graphQLSchemaAst = await database.getGraphQLSchema();
     if (!graphQLSchemaAst) {
-      throw new GraphQLError('GraphQL schema not found')
+      throw new GraphQLError('GraphQL schema not found');
     }
-    const graphQLSchema = buildASTSchema(graphQLSchemaAst)
+    const graphQLSchema = buildASTSchema(graphQLSchemaAst);
 
-    const tinaConfig = await database.getTinaSchema()
+    const tinaConfig = await database.getTinaSchema();
     const tinaSchema = (await createSchema({
       // TODO: please update all the types to import from @tinacms/schema-tools
       // @ts-ignore
       schema: tinaConfig,
       // @ts-ignore
       flags: tinaConfig?.meta?.flags,
-    })) as unknown as TinaSchema
+    })) as unknown as TinaSchema;
     const resolver = createResolver({
       config,
       database,
       tinaSchema,
       isAudit: isAudit || false,
-    })
+    });
 
     const res = await graphql({
       schema: graphQLSchema,
@@ -67,14 +67,14 @@ export const resolve = async ({
         database,
       },
       typeResolver: async (source, _args, info) => {
-        if (source.__typename) return source.__typename
+        if (source.__typename) return source.__typename;
 
-        const namedType = getNamedType(info.returnType).toString()
-        const lookup = await database.getLookup(namedType)
+        const namedType = getNamedType(info.returnType).toString();
+        const lookup = await database.getLookup(namedType);
         if (lookup.resolveType === 'unionData') {
-          return lookup.typeMap[source._template]
+          return lookup.typeMap[source._template];
         }
-        throw new Error(`Unable to find lookup key for ${namedType}`)
+        throw new Error(`Unable to find lookup key for ${namedType}`);
       },
       fieldResolver: async (
         source: { [key: string]: undefined | Record<string, unknown> } = {},
@@ -83,53 +83,53 @@ export const resolve = async ({
         info: GraphQLResolveInfo
       ) => {
         try {
-          const args = JSON.parse(JSON.stringify(_args))
-          const returnType = getNamedType(info.returnType).toString()
-          const lookup = await database.getLookup(returnType)
-          const isMutation = info.parentType.toString() === 'Mutation'
-          const value = source[info.fieldName]
+          const args = JSON.parse(JSON.stringify(_args));
+          const returnType = getNamedType(info.returnType).toString();
+          const lookup = await database.getLookup(returnType);
+          const isMutation = info.parentType.toString() === 'Mutation';
+          const value = source[info.fieldName];
 
           /**
            * `collection`
            */
           if (returnType === 'Collection') {
             if (value) {
-              return value
+              return value;
             }
             if (info.fieldName === 'collections') {
               const collectionNode = info.fieldNodes.find(
                 (x) => x.name.value === 'collections'
-              )
+              );
               const hasDocuments = collectionNode.selectionSet.selections.find(
                 (x) => {
                   // @ts-ignore
-                  return x?.name?.value === 'documents'
+                  return x?.name?.value === 'documents';
                 }
-              )
+              );
               return tinaSchema.getCollections().map((collection) => {
                 return resolver.resolveCollection(
                   args,
                   collection.name,
                   Boolean(hasDocuments)
-                )
-              })
+                );
+              });
             }
 
             // The field is `collection`
             const collectionNode = info.fieldNodes.find(
               (x) => x.name.value === 'collection'
-            )
+            );
             const hasDocuments = collectionNode.selectionSet.selections.find(
               (x) => {
                 // @ts-ignore
-                return x?.name?.value === 'documents'
+                return x?.name?.value === 'documents';
               }
-            )
+            );
             return resolver.resolveCollection(
               args,
               args.collection,
               Boolean(hasDocuments)
-            )
+            );
           }
 
           /**
@@ -162,11 +162,11 @@ export const resolve = async ({
           if (info.fieldName === 'getOptimizedQuery') {
             try {
               // Deprecated
-              return args.queryString
+              return args.queryString;
             } catch (e) {
               throw new Error(
                 `Invalid query provided, Error message: ${e.message}`
-              )
+              );
             }
           }
 
@@ -174,113 +174,113 @@ export const resolve = async ({
             info.fieldName === 'authenticate' ||
             info.fieldName === 'authorize'
           ) {
-            const sub = args.sub || ctxUser?.sub
+            const sub = args.sub || ctxUser?.sub;
             const collection = tinaSchema
               .getCollections()
-              .find((c) => c.isAuthCollection)
+              .find((c) => c.isAuthCollection);
             if (!collection) {
-              throw new Error('Auth collection not found')
+              throw new Error('Auth collection not found');
             }
 
-            const userFields = mapUserFields(collection, ['_rawData'])
+            const userFields = mapUserFields(collection, ['_rawData']);
             if (!userFields.length) {
               throw new Error(
                 `No user field found in collection ${collection.name}`
-              )
+              );
             }
             if (userFields.length > 1) {
               throw new Error(
                 `Multiple user fields found in collection ${collection.name}`
-              )
+              );
             }
-            const userField = userFields[0]
+            const userField = userFields[0];
 
-            const realPath = `${collection.path}/index.json`
-            const userDoc = await resolver.getDocument(realPath)
-            const users = get(userDoc, userField.path)
+            const realPath = `${collection.path}/index.json`;
+            const userDoc = await resolver.getDocument(realPath);
+            const users = get(userDoc, userField.path);
             if (!users) {
-              throw new Error('No users found')
+              throw new Error('No users found');
             }
-            const { idFieldName, passwordFieldName } = userField
+            const { idFieldName, passwordFieldName } = userField;
             if (!idFieldName) {
-              throw new Error('No uid field found on user field')
+              throw new Error('No uid field found on user field');
             }
-            const user = users.find((u) => u[idFieldName] === sub)
+            const user = users.find((u) => u[idFieldName] === sub);
             if (!user) {
-              return null
+              return null;
             }
 
             if (info.fieldName === 'authenticate') {
-              const saltedHash = get(user, [passwordFieldName || '', 'value'])
+              const saltedHash = get(user, [passwordFieldName || '', 'value']);
               if (!saltedHash) {
-                throw new Error('No password field found on user field')
+                throw new Error('No password field found on user field');
               }
 
               const matches = await checkPasswordHash({
                 saltedHash,
                 password: args.password,
-              })
+              });
 
               if (matches) {
-                return user
+                return user;
               }
-              return null
+              return null;
             }
-            return user
+            return user;
           }
 
           if (info.fieldName === 'updatePassword') {
             if (!ctxUser?.sub) {
-              throw new Error('Not authorized')
+              throw new Error('Not authorized');
             }
 
             if (!args.password) {
-              throw new Error('No password provided')
+              throw new Error('No password provided');
             }
 
             const collection = tinaSchema
               .getCollections()
-              .find((c) => c.isAuthCollection)
+              .find((c) => c.isAuthCollection);
             if (!collection) {
-              throw new Error('Auth collection not found')
+              throw new Error('Auth collection not found');
             }
 
-            const userFields = mapUserFields(collection, ['_rawData'])
+            const userFields = mapUserFields(collection, ['_rawData']);
             if (!userFields.length) {
               throw new Error(
                 `No user field found in collection ${collection.name}`
-              )
+              );
             }
             if (userFields.length > 1) {
               throw new Error(
                 `Multiple user fields found in collection ${collection.name}`
-              )
+              );
             }
-            const userField = userFields[0]
-            const realPath = `${collection.path}/index.json`
-            const userDoc = await resolver.getDocument(realPath)
-            const users = get(userDoc, userField.path)
+            const userField = userFields[0];
+            const realPath = `${collection.path}/index.json`;
+            const userDoc = await resolver.getDocument(realPath);
+            const users = get(userDoc, userField.path);
             if (!users) {
-              throw new Error('No users found')
+              throw new Error('No users found');
             }
-            const { idFieldName, passwordFieldName } = userField
-            const user = users.find((u) => u[idFieldName] === ctxUser.sub)
+            const { idFieldName, passwordFieldName } = userField;
+            const user = users.find((u) => u[idFieldName] === ctxUser.sub);
             if (!user) {
-              throw new Error('Not authorized')
+              throw new Error('Not authorized');
             }
 
             user[passwordFieldName] = {
               value: args.password,
               passwordChangeRequired: false,
-            }
+            };
 
-            const params = {}
+            const params = {};
             set(
               params,
               userField.path.slice(1), // remove _rawData from users path
               users.map((u) => {
                 if (user[idFieldName] === u[idFieldName]) {
-                  return user
+                  return user;
                 }
                 return {
                   // don't overwrite other users' passwords
@@ -289,9 +289,9 @@ export const resolve = async ({
                     ...u[passwordFieldName],
                     value: '',
                   },
-                }
+                };
               })
-            )
+            );
 
             await resolver.updateResolveDocument({
               collection,
@@ -299,17 +299,17 @@ export const resolve = async ({
               realPath,
               isCollectionSpecific: true,
               isAddPendingDocument: false,
-            })
+            });
 
-            return true
+            return true;
           }
 
           // We assume the value is already fully resolved
           if (!lookup) {
-            return value
+            return value;
           }
 
-          const isCreation = lookup[info.fieldName] === 'create'
+          const isCreation = lookup[info.fieldName] === 'create';
 
           /**
            * From here, we need more information on how to resolve this, aided
@@ -323,14 +323,14 @@ export const resolve = async ({
             case 'nodeDocument':
               assertShape<{ id: string }>(args, (yup) =>
                 yup.object({ id: yup.string().required() })
-              )
-              return resolver.getDocument(args.id)
+              );
+              return resolver.getDocument(args.id);
             case 'multiCollectionDocument':
               if (typeof value === 'string' && value !== '') {
                 /**
                  * This is a reference value (`director: /path/to/george.md`)
                  */
-                return resolver.getDocument(value)
+                return resolver.getDocument(value);
               }
               if (args?.collection && info.fieldName === 'addPendingDocument') {
                 /**
@@ -343,7 +343,7 @@ export const resolve = async ({
                   isMutation,
                   isCreation: true,
                   isAddPendingDocument: true,
-                })
+                });
               }
               if (
                 [
@@ -368,11 +368,11 @@ export const resolve = async ({
                   isUpdateName: Boolean(args?.params?.relativePath),
                   isAddPendingDocument: false,
                   isCollectionSpecific: false,
-                })
+                });
 
-                return result
+                return result;
               }
-              return value
+              return value;
             /**
              * eg `getMovieDocument.data.actors`
              */
@@ -381,16 +381,16 @@ export const resolve = async ({
                 return {
                   totalCount: value.length,
                   edges: value.map((document) => {
-                    return { node: document }
+                    return { node: document };
                   }),
-                }
+                };
               }
               if (
                 info.fieldName === 'documents' &&
                 value?.collection &&
                 value?.hasDocuments
               ) {
-                let filter = args.filter
+                let filter = args.filter;
 
                 // When querying for documents, filter has shape filter { [collectionName]: { ... }} but we need to pass the filter directly to the resolver
                 if (
@@ -409,7 +409,7 @@ export const resolve = async ({
                   // Since 1. 2. and 3. are true, we can safely assume that the filter exists and is not undefined
 
                   // @ts-ignore
-                  filter = args.filter[value.collection.name]
+                  filter = args.filter[value.collection.name];
                 }
                 // use the collection and hasDocuments to resolve the documents
                 return resolver.resolveCollectionConnection({
@@ -419,11 +419,11 @@ export const resolve = async ({
                   },
                   // @ts-ignore
                   collection: value.collection,
-                })
+                });
               }
               throw new Error(
                 `Expected an array for result of ${info.fieldName} at ${info.path}`
-              )
+              );
             /**
              * Collections-specific getter
              * eg. `getPostDocument`/`createPostDocument`/`updatePostDocument`
@@ -433,7 +433,7 @@ export const resolve = async ({
              */
             case 'collectionDocument': {
               if (value) {
-                return value
+                return value;
               }
               const result =
                 value ||
@@ -444,8 +444,8 @@ export const resolve = async ({
                   isCreation,
                   isAddPendingDocument: false,
                   isCollectionSpecific: true,
-                }))
-              return result
+                }));
+              return result;
             }
             /**
              * Collections-specific list getter
@@ -455,7 +455,7 @@ export const resolve = async ({
               return resolver.resolveCollectionConnection({
                 args,
                 collection: tinaSchema.getCollection(lookup.collection),
-              })
+              });
             /**
              * A polymorphic data set, it can be from a document's data
              * of any nested object which can be one of many shapes
@@ -487,20 +487,20 @@ export const resolve = async ({
                     isCreation,
                     isAddPendingDocument: false,
                     isCollectionSpecific: true,
-                  })
-                  return result
+                  });
+                  return result;
                 }
               }
-              return value
+              return value;
             default:
-              console.error(lookup)
-              throw new Error('Unexpected resolve type')
+              console.error(lookup);
+              throw new Error('Unexpected resolve type');
           }
         } catch (e) {
-          handleFetchErrorError(e, verboseValue)
+          handleFetchErrorError(e, verboseValue);
         }
       },
-    })
+    });
 
     if (res.errors) {
       if (!silenceErrors) {
@@ -508,27 +508,27 @@ export const resolve = async ({
           if (e instanceof NotFoundError) {
             // do nothing
           } else {
-            console.error(e.toString())
+            console.error(e.toString());
 
             if (verboseValue) {
-              console.error('More error context below')
-              console.error(e.message)
-              console.error(e)
+              console.error('More error context below');
+              console.error(e.message);
+              console.error(e);
             }
           }
-        })
+        });
       }
     }
-    return res
+    return res;
   } catch (e) {
     if (!silenceErrors) {
-      console.error(e)
+      console.error(e);
     }
     if (e instanceof GraphQLError) {
       return {
         errors: [e],
-      }
+      };
     }
-    throw e
+    throw e;
   }
-}
+};

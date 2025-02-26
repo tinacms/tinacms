@@ -1,14 +1,14 @@
-import React, { type ComponentType, type SVGProps } from 'react'
+import React, { type ComponentType, type SVGProps } from 'react';
 
-import { withRef } from '@udecode/cn'
+import { withRef } from '@udecode/cn';
 import {
   type PlateEditor,
   PlateElement,
   toggleNodeType,
-} from '@udecode/plate-common'
-import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading'
+} from '@udecode/plate-common';
+import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading';
 
-import { Icons } from './icons'
+import { Icons } from './icons';
 
 import {
   InlineCombobox,
@@ -16,35 +16,35 @@ import {
   InlineComboboxEmpty,
   InlineComboboxInput,
   InlineComboboxItem,
-} from './inline-combobox'
-import { ELEMENT_OL, ELEMENT_UL, toggleList } from '@udecode/plate'
+} from './inline-combobox';
+import { ELEMENT_OL, ELEMENT_UL, toggleList } from '@udecode/plate';
 
 interface SlashCommandRule {
-  icon: ComponentType<SVGProps<SVGSVGElement>>
-  onSelect: (editor: PlateEditor) => void
-  value: string
-  keywords?: string[]
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  onSelect: (editor: PlateEditor) => void;
+  value: string;
+  keywords?: string[];
 }
 
 const rules: SlashCommandRule[] = [
   {
     icon: Icons.h1,
     onSelect: (editor) => {
-      toggleNodeType(editor, { activeType: ELEMENT_H1 })
+      toggleNodeType(editor, { activeType: ELEMENT_H1 });
     },
     value: 'Heading 1',
   },
   {
     icon: Icons.h2,
     onSelect: (editor) => {
-      toggleNodeType(editor, { activeType: ELEMENT_H2 })
+      toggleNodeType(editor, { activeType: ELEMENT_H2 });
     },
     value: 'Heading 2',
   },
   {
     icon: Icons.h3,
     onSelect: (editor) => {
-      toggleNodeType(editor, { activeType: ELEMENT_H3 })
+      toggleNodeType(editor, { activeType: ELEMENT_H3 });
     },
     value: 'Heading 3',
   },
@@ -52,7 +52,7 @@ const rules: SlashCommandRule[] = [
     icon: Icons.ul,
     keywords: ['ul', 'unordered list'],
     onSelect: (editor) => {
-      toggleList(editor, { type: ELEMENT_UL })
+      toggleList(editor, { type: ELEMENT_UL });
     },
     value: 'Bulleted list',
   },
@@ -60,15 +60,15 @@ const rules: SlashCommandRule[] = [
     icon: Icons.ol,
     keywords: ['ol', 'ordered list'],
     onSelect: (editor) => {
-      toggleList(editor, { type: ELEMENT_OL })
+      toggleList(editor, { type: ELEMENT_OL });
     },
     value: 'Numbered list',
   },
-]
+];
 
 export const SlashInputElement = withRef<typeof PlateElement>(
   ({ className, ...props }, ref) => {
-    const { children, editor, element } = props
+    const { children, editor, element } = props;
 
     return (
       <PlateElement
@@ -101,6 +101,6 @@ export const SlashInputElement = withRef<typeof PlateElement>(
 
         {children}
       </PlateElement>
-    )
+    );
   }
-)
+);

@@ -4,7 +4,7 @@
 
 */
 
-import * as React from 'react'
+import * as React from 'react';
 
 export const HamburgerIcon = ({ ...props }) => (
   <svg
@@ -17,4 +17,4 @@ export const HamburgerIcon = ({ ...props }) => (
     <path d='M4 17H28V15H4V17Z' />
     <path d='M4 24H28V22H4V24Z' />
   </svg>
-)
+);

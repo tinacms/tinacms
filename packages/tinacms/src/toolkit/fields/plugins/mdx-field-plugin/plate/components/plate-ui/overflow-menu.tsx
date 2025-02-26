@@ -1,22 +1,22 @@
-import React from 'react'
+import React from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   useOpenState,
-} from '../plate-ui/dropdown-menu'
-import { ToolbarButton } from './toolbar'
-import { Icons } from './icons'
+} from '../plate-ui/dropdown-menu';
+import { ToolbarButton } from './toolbar';
+import { Icons } from './icons';
 
 type OverflowMenuProps = {
-  [key: string]: any
-  children: React.ReactNode[]
-}
+  [key: string]: any;
+  children: React.ReactNode[];
+};
 export default function OverflowMenu({
   children,
   ...props
 }: OverflowMenuProps) {
-  const openState = useOpenState()
+  const openState = useOpenState();
 
   return (
     <DropdownMenu modal={false} {...openState} {...props}>
@@ -37,5 +37,5 @@ export default function OverflowMenu({
         {children}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

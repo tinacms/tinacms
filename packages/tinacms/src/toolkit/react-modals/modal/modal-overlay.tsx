@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from 'react';
 
 export const ModalOverlay = ({ children }) => {
   return (
@@ -6,5 +6,5 @@ export const ModalOverlay = ({ children }) => {
       {children}
       <div className='fixed -z-1 inset-0 opacity-80 bg-gradient-to-br from-gray-800 via-gray-900 to-black'></div>
     </div>
-  )
-}
+  );
+};

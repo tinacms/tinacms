@@ -1,14 +1,14 @@
-import { Handlers, toMarkdown } from 'mdast-util-to-markdown'
-import { text } from 'mdast-util-to-markdown/lib/handle/text'
-import { mdxJsxToMarkdown } from '../shortcodes/mdast'
-import { gfmToMarkdown } from 'mdast-util-gfm'
-import type { RichTextField } from '@tinacms/schema-tools'
-import type * as Md from 'mdast'
-import { Pattern } from '../shortcodes'
-import { getFieldPatterns } from '../util'
+import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
+import { text } from 'mdast-util-to-markdown/lib/handle/text';
+import { mdxJsxToMarkdown } from '../shortcodes/mdast';
+import { gfmToMarkdown } from 'mdast-util-gfm';
+import type { RichTextField } from '@tinacms/schema-tools';
+import type * as Md from 'mdast';
+import { Pattern } from '../shortcodes';
+import { getFieldPatterns } from '../util';
 
 export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
-  const patterns = getFieldPatterns(field)
+  const patterns = getFieldPatterns(field);
   /**
    *
    * Escaping elements which we can't accound for (eg. `<`) is usually good. But when the rich-text other tooling
@@ -20,7 +20,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
    *
    */
   // @ts-ignore
-  const handlers: Handlers = {}
+  const handlers: Handlers = {};
   handlers['text'] = (node, parent, context, safeOptions) => {
     // Empty spaces before/after strings
     context.unsafe = context.unsafe.filter((unsafeItem) => {
@@ -28,30 +28,30 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
         unsafeItem.character === ' ' &&
         unsafeItem.inConstruct === 'phrasing'
       ) {
-        return false
+        return false;
       }
-      return true
-    })
+      return true;
+    });
     if (field.parser?.type === 'markdown') {
       if (field.parser.skipEscaping === 'all') {
-        return node.value
+        return node.value;
       }
       if (field.parser.skipEscaping === 'html') {
         // Remove this character from the unsafe list, and then
         // proceed with the original text handler
         context.unsafe = context.unsafe.filter((unsafeItem) => {
           if (unsafeItem.character === '<') {
-            return false
+            return false;
           }
-          return true
-        })
+          return true;
+        });
       }
     }
-    return text(node, parent, context, safeOptions)
-  }
+    return text(node, parent, context, safeOptions);
+  };
   return toMarkdown(tree, {
     extensions: [mdxJsxToMarkdown({ patterns }), gfmToMarkdown()],
     listItemIndent: 'one',
     handlers,
-  })
-}
+  });
+};

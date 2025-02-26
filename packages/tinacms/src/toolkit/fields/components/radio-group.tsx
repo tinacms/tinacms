@@ -1,29 +1,29 @@
-import * as React from 'react'
-import { BiCheck } from 'react-icons/bi'
+import * as React from 'react';
+import { BiCheck } from 'react-icons/bi';
 
 type Option = {
-  value: string
-  label: string
-}
+  value: string;
+  label: string;
+};
 
 interface RadioGroupFieldProps {
-  label?: string
-  name: string
-  component: string
-  options: (Option | string)[]
-  direction?: 'horizontal' | 'vertical'
+  label?: string;
+  name: string;
+  component: string;
+  options: (Option | string)[];
+  direction?: 'horizontal' | 'vertical';
 }
 
 interface RadioRefsInterface {
-  [key: string]: HTMLDivElement | null
+  [key: string]: HTMLDivElement | null;
 }
 
 export interface RadioGroupProps {
-  name: string
-  input: any
-  field: RadioGroupFieldProps
-  disabled?: boolean
-  options?: (Option | string)[]
+  name: string;
+  input: any;
+  field: RadioGroupFieldProps;
+  disabled?: boolean;
+  options?: (Option | string)[];
 }
 
 export const RadioGroup: React.FC<RadioGroupProps> = ({
@@ -31,23 +31,23 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   field,
   options,
 }) => {
-  const radioOptions = options || field.options
-  const radioRefs: RadioRefsInterface = {}
+  const radioOptions = options || field.options;
+  const radioRefs: RadioRefsInterface = {};
 
   const toProps = (option: Option | string): Option => {
-    if (typeof option === 'object') return option
-    return { value: option, label: option }
-  }
+    if (typeof option === 'object') return option;
+    return { value: option, label: option };
+  };
 
   const toComponent = (option: Option) => {
-    const optionId = `field-${field.name}-option-${option.value}`
-    const checked = option.value === input.value
+    const optionId = `field-${field.name}-option-${option.value}`;
+    const checked = option.value === input.value;
 
     return (
       <div
         key={option.value}
         ref={(ref) => {
-          radioRefs[`radio_${option.value}`] = ref
+          radioRefs[`radio_${option.value}`] = ref;
         }}
       >
         <input
@@ -58,7 +58,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
           value={option.value}
           // https://github.com/final-form/react-final-form/issues/392#issuecomment-543118944
           onChange={(event) => {
-            input.onChange(event.target.value)
+            input.onChange(event.target.value);
           }}
           checked={checked}
         />
@@ -66,15 +66,15 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
           {option.label}
         </RadioOption>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <RadioOptions id={input.name} direction={field.direction}>
       {radioOptions ? radioOptions.map(toProps).map(toComponent) : input.value}
     </RadioOptions>
-  )
-}
+  );
+};
 
 const RadioOptions = ({ direction, children, ...props }) => (
   <div
@@ -87,7 +87,7 @@ const RadioOptions = ({ direction, children, ...props }) => (
   >
     {children}
   </div>
-)
+);
 
 const RadioOption = ({ checked, htmlFor, children, ...props }) => (
   <label
@@ -120,4 +120,4 @@ const RadioOption = ({ checked, htmlFor, children, ...props }) => (
       {children}
     </span>
   </label>
-)
+);

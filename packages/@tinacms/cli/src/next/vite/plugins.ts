@@ -1,26 +1,26 @@
-import AsyncLock from 'async-lock'
-import type { Plugin } from 'vite'
-import { createFilter, FilterPattern } from '@rollup/pluginutils'
-import type { Config } from '@svgr/core'
-import fs from 'fs'
-import { transformWithEsbuild } from 'vite'
-import { transform as esbuildTransform } from 'esbuild'
-import path from 'path'
-import bodyParser from 'body-parser'
-import cors from 'cors'
-import { resolve as gqlResolve } from '@tinacms/graphql'
-import type { Database } from '@tinacms/graphql'
+import AsyncLock from 'async-lock';
+import type { Plugin } from 'vite';
+import { createFilter, FilterPattern } from '@rollup/pluginutils';
+import type { Config } from '@svgr/core';
+import fs from 'fs';
+import { transformWithEsbuild } from 'vite';
+import { transform as esbuildTransform } from 'esbuild';
+import path from 'path';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import { resolve as gqlResolve } from '@tinacms/graphql';
+import type { Database } from '@tinacms/graphql';
 import {
   parseMediaFolder,
   createMediaRouter,
-} from '../commands/dev-command/server/media'
-import type { ConfigManager } from '../config-manager'
-import { createSearchIndexRouter } from '../commands/dev-command/server/searchIndex'
+} from '../commands/dev-command/server/media';
+import type { ConfigManager } from '../config-manager';
+import { createSearchIndexRouter } from '../commands/dev-command/server/searchIndex';
 
 export const transformTsxPlugin = ({
   configManager: _configManager,
 }: {
-  configManager: ConfigManager
+  configManager: ConfigManager;
 }) => {
   const plug: Plugin = {
     name: 'transform-tsx',
@@ -33,18 +33,18 @@ export const transformTsxPlugin = ({
       // .tsx but seems to work ok for now.
       // TODO: other loaders needed (eg svg)?
       //   if (id.startsWith(configManager.rootPath)) {
-      const extName = path.extname(id)
+      const extName = path.extname(id);
       if (extName.startsWith('.tsx') || extName.startsWith('.ts')) {
-        const result = await esbuildTransform(code, { loader: 'tsx' })
+        const result = await esbuildTransform(code, { loader: 'tsx' });
         return {
           code: result.code,
-        }
+        };
         // }
       }
     },
-  }
-  return plug
-}
+  };
+  return plug;
+};
 
 export const devServerEndPointsPlugin = ({
   configManager,
@@ -53,43 +53,43 @@ export const devServerEndPointsPlugin = ({
   searchIndex,
   databaseLock,
 }: {
-  apiURL: string
-  database: Database
-  configManager: ConfigManager
-  searchIndex: any
-  databaseLock: (fn: () => Promise<void>) => Promise<void>
+  apiURL: string;
+  database: Database;
+  configManager: ConfigManager;
+  searchIndex: any;
+  databaseLock: (fn: () => Promise<void>) => Promise<void>;
 }) => {
   const plug: Plugin = {
     name: 'graphql-endpoints',
     configureServer(server) {
-      server.middlewares.use(cors())
-      server.middlewares.use(bodyParser.json({ limit: '5mb' }))
+      server.middlewares.use(cors());
+      server.middlewares.use(bodyParser.json({ limit: '5mb' }));
       server.middlewares.use(async (req, res, next: Function) => {
-        const mediaPaths = configManager.config.media?.tina
+        const mediaPaths = configManager.config.media?.tina;
         const mediaRouter = createMediaRouter({
           rootPath: configManager.rootPath,
           apiURL,
           publicFolder: parseMediaFolder(mediaPaths?.publicFolder || ''),
           mediaRoot: parseMediaFolder(mediaPaths?.mediaRoot || ''),
-        })
+        });
         const searchIndexRouter = createSearchIndexRouter({
           config: { apiURL, searchPath: 'searchIndex' },
           searchIndex,
-        })
+        });
 
         if (req.url.startsWith('/media/upload')) {
-          await mediaRouter.handlePost(req, res)
-          return
+          await mediaRouter.handlePost(req, res);
+          return;
         }
         if (req.url.startsWith('/media')) {
           if (req.method === 'DELETE') {
-            await mediaRouter.handleDelete(req, res)
-            return
+            await mediaRouter.handleDelete(req, res);
+            return;
           }
         }
         if (req.url.startsWith('/media/list')) {
-          await mediaRouter.handleList(req, res)
-          return
+          await mediaRouter.handleList(req, res);
+          return;
         }
         if (req.url === '/altair') {
           res.end(
@@ -97,13 +97,13 @@ export const devServerEndPointsPlugin = ({
               status:
                 'The GraphQL playground has moved to <your-dev-url>/index.html#/graphql',
             })
-          )
-          return
+          );
+          return;
         }
         if (req.url === '/graphql') {
           // @ts-ignore FIXME: req type doesn't match
-          const { query, variables } = req.body
-          let result: object
+          const { query, variables } = req.body;
+          let result: object;
           await databaseLock(async () => {
             result = await gqlResolve({
               config: {
@@ -113,29 +113,29 @@ export const devServerEndPointsPlugin = ({
               query,
               variables,
               verbose: false,
-            })
-          })
-          res.end(JSON.stringify(result))
-          return
+            });
+          });
+          res.end(JSON.stringify(result));
+          return;
         }
 
         if (req.url.startsWith('/searchIndex')) {
           if (req.method === 'POST') {
-            await searchIndexRouter.put(req, res)
+            await searchIndexRouter.put(req, res);
           } else if (req.method === 'GET') {
-            await searchIndexRouter.get(req, res)
+            await searchIndexRouter.get(req, res);
           } else if (req.method === 'DELETE') {
-            await searchIndexRouter.del(req, res)
+            await searchIndexRouter.del(req, res);
           }
-          return
+          return;
         }
 
-        next()
-      })
+        next();
+      });
     },
-  }
-  return plug
-}
+  };
+  return plug;
+};
 
 // Copied from https://github.com/pd4d10/vite-plugin-svgr/blob/main/src/index.ts and modified to suite our needs
 export interface ViteSvgrOptions {
@@ -145,11 +145,11 @@ export interface ViteSvgrOptions {
    *
    * @default false
    */
-  exportAsDefault?: boolean
-  svgrOptions?: Config
-  esbuildOptions?: Parameters<typeof transformWithEsbuild>[2]
-  exclude?: FilterPattern
-  include?: FilterPattern
+  exportAsDefault?: boolean;
+  svgrOptions?: Config;
+  esbuildOptions?: Parameters<typeof transformWithEsbuild>[2];
+  exclude?: FilterPattern;
+  include?: FilterPattern;
 }
 
 export function viteTransformExtension({
@@ -159,34 +159,34 @@ export function viteTransformExtension({
   include = '**/*.svg',
   exclude,
 }: ViteSvgrOptions = {}): Plugin {
-  const filter = createFilter(include, exclude)
+  const filter = createFilter(include, exclude);
   return {
     name: 'vite-plugin-svgr',
     async transform(code, id) {
       if (filter(id)) {
-        const { transform } = await import('@svgr/core')
+        const { transform } = await import('@svgr/core');
         const svgCode = await fs.promises.readFile(
           id.replace(/\?.*$/, ''),
           'utf8'
-        )
+        );
 
         const componentCode = await transform(svgCode, svgrOptions, {
           filePath: id,
           caller: {
             previousExport: exportAsDefault ? null : code,
           },
-        })
+        });
 
         const res = await transformWithEsbuild(componentCode, id, {
           loader: 'jsx',
           ...esbuildOptions,
-        })
+        });
 
         return {
           code: res.code,
           map: null, // TODO:
-        }
+        };
       }
     },
-  }
+  };
 }

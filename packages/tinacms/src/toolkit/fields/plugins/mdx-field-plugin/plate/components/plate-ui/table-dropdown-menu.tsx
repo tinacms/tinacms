@@ -1,6 +1,6 @@
-import React from 'react'
+import React from 'react';
 
-import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu'
+import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import {
   isElement,
@@ -9,7 +9,7 @@ import {
   findNode,
   useEditorRef,
   useEditorSelector,
-} from '@udecode/plate-common'
+} from '@udecode/plate-common';
 import {
   ELEMENT_TABLE,
   getTableColumnCount,
@@ -19,9 +19,9 @@ import {
   insertTable,
   insertTableColumn,
   insertTableRow,
-} from '@udecode/plate-table'
+} from '@udecode/plate-table';
 
-import { Icons, iconVariants } from './icons'
+import { Icons, iconVariants } from './icons';
 
 import {
   DropdownMenu,
@@ -32,29 +32,29 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   useOpenState,
-} from './dropdown-menu'
-import { ToolbarButton } from './toolbar'
+} from './dropdown-menu';
+import { ToolbarButton } from './toolbar';
 
 export function TableDropdownMenu(props: DropdownMenuProps) {
   const tableSelected = useEditorSelector(
     (editor) => someNode(editor, { match: { type: ELEMENT_TABLE } }),
     []
-  )
+  );
 
   const [enableDeleteColumn, enableDeleteRow] = useEditorSelector((editor) => {
-    const tableNodeEntry = findNode(editor, { match: { type: ELEMENT_TABLE } })
-    if (!tableNodeEntry) return [false, false]
+    const tableNodeEntry = findNode(editor, { match: { type: ELEMENT_TABLE } });
+    if (!tableNodeEntry) return [false, false];
 
-    const [tableNode] = tableNodeEntry
-    if (!isElement(tableNode)) return [false, false]
+    const [tableNode] = tableNodeEntry;
+    if (!isElement(tableNode)) return [false, false];
 
-    const columnCount = getTableColumnCount(tableNode)
-    const rowCount = tableNode.children.length
-    return [columnCount > 1, rowCount > 1]
-  }, [])
+    const columnCount = getTableColumnCount(tableNode);
+    const rowCount = tableNode.children.length;
+    return [columnCount > 1, rowCount > 1];
+  }, []);
 
-  const editor = useEditorRef()
-  const openState = useOpenState()
+  const editor = useEditorRef();
+  const openState = useOpenState();
 
   return (
     <DropdownMenu modal={false} {...openState} {...props}>
@@ -72,8 +72,8 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
           className='min-w-[180px]'
           disabled={tableSelected}
           onSelect={() => {
-            insertTable(editor)
-            focusEditor(editor)
+            insertTable(editor);
+            focusEditor(editor);
           }}
         >
           <Icons.add className={iconVariants({ variant: 'menuItem' })} />
@@ -83,8 +83,8 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
           className='min-w-[180px]'
           disabled={!tableSelected}
           onSelect={() => {
-            deleteTable(editor)
-            focusEditor(editor)
+            deleteTable(editor);
+            focusEditor(editor);
           }}
         >
           <Icons.minus className={iconVariants({ variant: 'menuItem' })} />
@@ -101,8 +101,8 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
               className='min-w-[180px]'
               disabled={!tableSelected}
               onSelect={() => {
-                insertTableColumn(editor)
-                focusEditor(editor)
+                insertTableColumn(editor);
+                focusEditor(editor);
               }}
             >
               <Icons.add className={iconVariants({ variant: 'menuItem' })} />
@@ -112,8 +112,8 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
               className='min-w-[180px]'
               disabled={!enableDeleteColumn}
               onSelect={() => {
-                deleteColumn(editor)
-                focusEditor(editor)
+                deleteColumn(editor);
+                focusEditor(editor);
               }}
             >
               <Icons.minus className={iconVariants({ variant: 'menuItem' })} />
@@ -132,8 +132,8 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
               className='min-w-[180px]'
               disabled={!tableSelected}
               onSelect={() => {
-                insertTableRow(editor)
-                focusEditor(editor)
+                insertTableRow(editor);
+                focusEditor(editor);
               }}
             >
               <Icons.add className={iconVariants({ variant: 'menuItem' })} />
@@ -143,8 +143,8 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
               className='min-w-[180px]'
               disabled={!enableDeleteRow}
               onSelect={() => {
-                deleteRow(editor)
-                focusEditor(editor)
+                deleteRow(editor);
+                focusEditor(editor);
               }}
             >
               <Icons.minus className={iconVariants({ variant: 'menuItem' })} />
@@ -154,5 +154,5 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
         </DropdownMenuSub>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

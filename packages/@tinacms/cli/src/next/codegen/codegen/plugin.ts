@@ -2,7 +2,7 @@
 
 */
 
-import type { PluginFunction } from '@graphql-codegen/plugin-helpers'
+import type { PluginFunction } from '@graphql-codegen/plugin-helpers';
 
 export const AddGeneratedClientFunc: (apiURL: string) => PluginFunction = (
   apiURL
@@ -64,10 +64,10 @@ export const queries = (
   const requester = generateRequester(client)
   return getSdk(requester)
 }
-`
-  }
-}
+`;
+  };
+};
 
 export const AddGeneratedClient = (apiURL: string) => ({
   plugin: AddGeneratedClientFunc(apiURL),
-})
+});

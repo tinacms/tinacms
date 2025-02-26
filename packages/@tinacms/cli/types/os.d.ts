@@ -2,4 +2,4 @@
 
 */
 
-declare module 'os'
+declare module 'os';

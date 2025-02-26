@@ -1,18 +1,18 @@
-import React from 'react'
-import type { Field, Form } from '@toolkit/forms'
-import { IconButton } from '@toolkit/styles'
-import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '@toolkit/icons'
-import { useEvent } from '@toolkit/react-core/use-cms-event'
-import type { FieldHoverEvent, FieldFocusEvent } from '../field-events'
-import { useCMS } from '@toolkit/react-core/use-cms'
-import { BiPencil } from 'react-icons/bi'
-import { EmptyList, ListFieldMeta, ListPanel } from './list-field-meta'
+import React from 'react';
+import type { Field, Form } from '@toolkit/forms';
+import { IconButton } from '@toolkit/styles';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '@toolkit/icons';
+import { useEvent } from '@toolkit/react-core/use-cms-event';
+import type { FieldHoverEvent, FieldFocusEvent } from '../field-events';
+import { useCMS } from '@toolkit/react-core/use-cms';
+import { BiPencil } from 'react-icons/bi';
+import { EmptyList, ListFieldMeta, ListPanel } from './list-field-meta';
 
 interface GroupFieldDefinititon extends Field {
-  component: 'group'
-  fields: Field[]
-  defaultItem?: object | (() => object)
+  component: 'group';
+  fields: Field[];
+  defaultItem?: object | (() => object);
   /**
    * An optional function which generates `props` for
    * this items's `li`.
@@ -27,49 +27,49 @@ interface GroupFieldDefinititon extends Field {
      * Reference:
      * * https://reactjs.org/docs/lists-and-keys.html
      */
-    key?: string
+    key?: string;
     /**
      * The label to be display on the list item.
      */
-    label?: string
-  }
+    label?: string;
+  };
 }
 
 interface GroupProps {
-  input: any
-  meta: any
-  field: GroupFieldDefinititon
-  form: any
-  tinaForm: Form
-  index?: number
+  input: any;
+  meta: any;
+  field: GroupFieldDefinititon;
+  form: any;
+  tinaForm: Form;
+  index?: number;
 }
 
 const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
   const addItem = React.useCallback(() => {
-    let obj = {}
+    let obj = {};
     if (typeof field.defaultItem === 'function') {
-      obj = field.defaultItem()
+      obj = field.defaultItem();
     } else {
-      obj = field.defaultItem || {}
+      obj = field.defaultItem || {};
     }
-    form.mutators.insert(field.name, 0, obj)
-  }, [form, field])
+    form.mutators.insert(field.name, 0, obj);
+  }, [form, field]);
 
-  const items = input.value || []
+  const items = input.value || [];
   const itemProps = React.useCallback(
     (item: object) => {
-      if (!field.itemProps) return {}
-      return field.itemProps(item)
+      if (!field.itemProps) return {};
+      return field.itemProps(item);
     },
     [field.itemProps]
-  )
+  );
 
   // @ts-ignore
-  const isMax = items.length >= (field.max || Number.POSITIVE_INFINITY)
+  const isMax = items.length >= (field.max || Number.POSITIVE_INFINITY);
   // @ts-ignore
-  const isMin = items.length <= (field.min || 0)
+  const isMin = items.length <= (field.min || 0);
   // @ts-ignore
-  const fixedLength = field.min === field.max
+  const fixedLength = field.min === field.max;
 
   return (
     <ListFieldMeta
@@ -119,17 +119,17 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
         </div>
       </ListPanel>
     </ListFieldMeta>
-  )
-}
+  );
+};
 
 interface ItemProps {
-  tinaForm: Form
-  field: GroupFieldDefinititon
-  index: number
-  item: any
-  label?: string
-  isMin: boolean
-  fixedLength: boolean
+  tinaForm: Form;
+  field: GroupFieldDefinititon;
+  index: number;
+  item: any;
+  label?: string;
+  isMin: boolean;
+  fixedLength: boolean;
 }
 
 const Item = ({
@@ -142,14 +142,16 @@ const Item = ({
   fixedLength,
   ...p
 }: ItemProps) => {
-  const cms = useCMS()
+  const cms = useCMS();
   const removeItem = React.useCallback(() => {
-    tinaForm.mutators.remove(field.name, index)
-  }, [tinaForm, field, index])
-  const title = label || `${field.label || field.name} Item`
+    tinaForm.mutators.remove(field.name, index);
+  }, [tinaForm, field, index]);
+  const title = label || `${field.label || field.name} Item`;
 
-  const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
-  const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
+  const { dispatch: setHoveredField } =
+    useEvent<FieldHoverEvent>('field:hover');
+  const { dispatch: setFocusedField } =
+    useEvent<FieldFocusEvent>('field:focus');
   return (
     <Draggable draggableId={`${field.name}.${index}`} index={index}>
       {(provider, snapshot) => (
@@ -169,11 +171,13 @@ const Item = ({
               }
               onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
               onClick={() => {
-                const state = tinaForm.finalForm.getState()
+                const state = tinaForm.finalForm.getState();
                 if (state.invalid === true) {
                   // @ts-ignore
-                  cms.alerts.error('Cannot navigate away from an invalid form.')
-                  return
+                  cms.alerts.error(
+                    'Cannot navigate away from an invalid form.'
+                  );
+                  return;
                 }
 
                 cms.dispatch({
@@ -182,11 +186,11 @@ const Item = ({
                     formId: tinaForm.id,
                     fieldName: `${field.name}.${index}`,
                   },
-                })
+                });
                 setFocusedField({
                   id: tinaForm.id,
                   fieldName: `${field.name}.${index}`,
-                })
+                });
               }}
             >
               <GroupLabel>{title}</GroupLabel>
@@ -199,8 +203,8 @@ const Item = ({
         </>
       )}
     </Draggable>
-  )
-}
+  );
+};
 
 export const ItemClickTarget = ({ children, ...props }) => {
   return (
@@ -210,15 +214,15 @@ export const ItemClickTarget = ({ children, ...props }) => {
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
 export const GroupLabel = ({
   error,
   children,
 }: {
-  children?: any
-  error?: boolean
+  children?: any;
+  error?: boolean;
 }) => {
   return (
     <span
@@ -228,8 +232,8 @@ export const GroupLabel = ({
     >
       {children}
     </span>
-  )
-}
+  );
+};
 
 export const ItemHeader = ({
   isDragging,
@@ -237,9 +241,9 @@ export const ItemHeader = ({
   provider,
   ...props
 }: {
-  isDragging: boolean
-  children: any | any[]
-  provider: any
+  isDragging: boolean;
+  children: any | any[];
+  provider: any;
 } & any) => {
   return (
     <div
@@ -260,8 +264,8 @@ export const ItemHeader = ({
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
 export const ItemDeleteButton = ({ onClick, disabled = false }) => {
   return (
@@ -274,8 +278,8 @@ export const ItemDeleteButton = ({ onClick, disabled = false }) => {
     >
       <TrashIcon className='h-5 w-auto fill-current text-red-500 transition-colors duration-150 ease-out' />
     </button>
-  )
-}
+  );
+};
 
 export const DragHandle = ({ isDragging }: { isDragging: boolean }) => {
   return (
@@ -293,22 +297,22 @@ export const DragHandle = ({ isDragging }: { isDragging: boolean }) => {
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
 interface PanelProps {
-  setExpanded(next: boolean): void
-  isExpanded: boolean
-  tinaForm: Form
-  index: number
-  field: GroupFieldDefinititon
-  itemTitle: string
-  zIndexShift: number
+  setExpanded(next: boolean): void;
+  isExpanded: boolean;
+  tinaForm: Form;
+  index: number;
+  field: GroupFieldDefinititon;
+  itemTitle: string;
+  zIndexShift: number;
 }
 
-export const GroupListField = Group
+export const GroupListField = Group;
 
 export const GroupListFieldPlugin = {
   name: 'group-list',
   Component: GroupListField,
-}
+};

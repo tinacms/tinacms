@@ -1,22 +1,22 @@
-import * as React from 'react'
+import * as React from 'react';
 import {
   Modal,
   ModalBody,
   ModalHeader,
   PopupModal,
-} from '@toolkit/react-modals'
-import { useCMS } from '@toolkit/react-tinacms'
-import { useBranchData } from './branch-data'
-import { BranchSwitcher } from './branch-switcher'
+} from '@toolkit/react-modals';
+import { useCMS } from '@toolkit/react-tinacms';
+import { useBranchData } from './branch-data';
+import { BranchSwitcher } from './branch-switcher';
 
 interface SubmitModalProps {
-  close(): void
+  close(): void;
 }
 
 export const BranchModal = ({ close }: SubmitModalProps) => {
-  const tinaApi = useCMS().api.tina
-  const { setCurrentBranch } = useBranchData()
-  const [modalTitle, setModalTitle] = React.useState<string>('Branch List')
+  const tinaApi = useCMS().api.tina;
+  const { setCurrentBranch } = useBranchData();
+  const [modalTitle, setModalTitle] = React.useState<string>('Branch List');
 
   return (
     <Modal>
@@ -26,7 +26,7 @@ export const BranchModal = ({ close }: SubmitModalProps) => {
           <BranchSwitcher
             listBranches={tinaApi.listBranches.bind(tinaApi)}
             createBranch={async (data) => {
-              return await tinaApi.createBranch(data)
+              return await tinaApi.createBranch(data);
             }}
             chooseBranch={setCurrentBranch}
             setModalTitle={setModalTitle}
@@ -34,5 +34,5 @@ export const BranchModal = ({ close }: SubmitModalProps) => {
         </ModalBody>
       </PopupModal>
     </Modal>
-  )
-}
+  );
+};

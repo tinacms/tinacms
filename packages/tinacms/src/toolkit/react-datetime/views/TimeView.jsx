@@ -2,7 +2,7 @@
 
 */
 
-import React from 'react'
+import React from 'react';
 
 const timeConstraints = {
   hours: {
@@ -25,36 +25,36 @@ const timeConstraints = {
     max: 999,
     step: 1,
   },
-}
+};
 
 function createConstraints(overrideTimeConstraints) {
-  const constraints = {}
+  const constraints = {};
 
   Object.keys(timeConstraints).forEach((type) => {
     constraints[type] = {
       ...timeConstraints[type],
       ...(overrideTimeConstraints[type] || {}),
-    }
-  })
+    };
+  });
 
-  return constraints
+  return constraints;
 }
 
 export default class TimeView extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
 
-    this.constraints = createConstraints(props.timeConstraints)
+    this.constraints = createConstraints(props.timeConstraints);
 
     // This component buffers the time part values in the state
     // while the user is pressing down the buttons
     // and call the prop `setTime` when the buttons are released
-    this.state = this.getTimeParts(props.selectedDate || props.viewDate)
+    this.state = this.getTimeParts(props.selectedDate || props.viewDate);
   }
 
   render() {
-    const items = []
-    const timeParts = this.state
+    const items = [];
+    const timeParts = this.state;
 
     this.getCounters().forEach((c, i) => {
       if (i && c !== 'ampm') {
@@ -62,11 +62,11 @@ export default class TimeView extends React.Component {
           <div key={`sep${i}`} className='rdtCounterSeparator'>
             :
           </div>
-        )
+        );
       }
 
-      items.push(this.renderCounter(c, timeParts[c]))
-    })
+      items.push(this.renderCounter(c, timeParts[c]));
+    });
 
     return (
       <div className='rdtTime'>
@@ -81,23 +81,23 @@ export default class TimeView extends React.Component {
           </tbody>
         </table>
       </div>
-    )
+    );
   }
 
   renderCounter(type, value) {
     if (type === 'hours' && this.isAMPM()) {
-      value = ((value - 1) % 12) + 1
+      value = ((value - 1) % 12) + 1;
 
       if (value === 0) {
-        value = 12
+        value = 12;
       }
     }
 
     if (type === 'ampm') {
       if (this.props.timeFormat.indexOf(' A') !== -1) {
-        value = this.props.viewDate.format('A')
+        value = this.props.viewDate.format('A');
       } else {
-        value = this.props.viewDate.format('a')
+        value = this.props.viewDate.format('a');
       }
     }
 
@@ -117,13 +117,13 @@ export default class TimeView extends React.Component {
           ▼
         </span>
       </div>
-    )
+    );
   }
 
   renderHeader() {
-    if (!this.props.dateFormat) return
+    if (!this.props.dateFormat) return;
 
-    const date = this.props.selectedDate || this.props.viewDate
+    const date = this.props.selectedDate || this.props.viewDate;
 
     return (
       <thead>
@@ -137,97 +137,97 @@ export default class TimeView extends React.Component {
           </td>
         </tr>
       </thead>
-    )
+    );
   }
 
   onStartClicking(e, action, type) {
     if (e && e.button && e.button !== 0) {
       // Only left clicks, thanks
-      return
+      return;
     }
 
-    if (type === 'ampm') return this.toggleDayPart()
+    if (type === 'ampm') return this.toggleDayPart();
 
-    const update = {}
-    const body = document.body
-    update[type] = this[action](type)
-    this.setState(update)
+    const update = {};
+    const body = document.body;
+    update[type] = this[action](type);
+    this.setState(update);
 
     this.timer = setTimeout(() => {
       this.increaseTimer = setInterval(() => {
-        update[type] = this[action](type)
-        this.setState(update)
-      }, 70)
-    }, 500)
+        update[type] = this[action](type);
+        this.setState(update);
+      }, 70);
+    }, 500);
 
     this.mouseUpListener = () => {
-      clearTimeout(this.timer)
-      clearInterval(this.increaseTimer)
-      this.props.setTime(type, parseInt(this.state[type], 10))
-      body.removeEventListener('mouseup', this.mouseUpListener)
-      body.removeEventListener('touchend', this.mouseUpListener)
-    }
+      clearTimeout(this.timer);
+      clearInterval(this.increaseTimer);
+      this.props.setTime(type, parseInt(this.state[type], 10));
+      body.removeEventListener('mouseup', this.mouseUpListener);
+      body.removeEventListener('touchend', this.mouseUpListener);
+    };
 
-    body.addEventListener('mouseup', this.mouseUpListener)
-    body.addEventListener('touchend', this.mouseUpListener)
+    body.addEventListener('mouseup', this.mouseUpListener);
+    body.addEventListener('touchend', this.mouseUpListener);
   }
 
   toggleDayPart() {
-    let hours = parseInt(this.state.hours, 10)
+    let hours = parseInt(this.state.hours, 10);
 
     if (hours >= 12) {
-      hours -= 12
+      hours -= 12;
     } else {
-      hours += 12
+      hours += 12;
     }
 
-    this.props.setTime('hours', hours)
+    this.props.setTime('hours', hours);
   }
 
   increase(type) {
-    const tc = this.constraints[type]
-    let value = parseInt(this.state[type], 10) + tc.step
-    if (value > tc.max) value = tc.min + (value - (tc.max + 1))
-    return pad(type, value)
+    const tc = this.constraints[type];
+    let value = parseInt(this.state[type], 10) + tc.step;
+    if (value > tc.max) value = tc.min + (value - (tc.max + 1));
+    return pad(type, value);
   }
 
   decrease(type) {
-    const tc = this.constraints[type]
-    let value = parseInt(this.state[type], 10) - tc.step
-    if (value < tc.min) value = tc.max + 1 - (tc.min - value)
-    return pad(type, value)
+    const tc = this.constraints[type];
+    let value = parseInt(this.state[type], 10) - tc.step;
+    if (value < tc.min) value = tc.max + 1 - (tc.min - value);
+    return pad(type, value);
   }
 
   getCounters() {
-    const counters = []
-    const format = this.props.timeFormat
+    const counters = [];
+    const format = this.props.timeFormat;
 
     if (format.toLowerCase().indexOf('h') !== -1) {
-      counters.push('hours')
+      counters.push('hours');
       if (format.indexOf('m') !== -1) {
-        counters.push('minutes')
+        counters.push('minutes');
         if (format.indexOf('s') !== -1) {
-          counters.push('seconds')
+          counters.push('seconds');
           if (format.indexOf('S') !== -1) {
-            counters.push('milliseconds')
+            counters.push('milliseconds');
           }
         }
       }
     }
 
     if (this.isAMPM()) {
-      counters.push('ampm')
+      counters.push('ampm');
     }
 
-    return counters
+    return counters;
   }
 
   isAMPM() {
-    return this.props.timeFormat.toLowerCase().indexOf(' a') !== -1
+    return this.props.timeFormat.toLowerCase().indexOf(' a') !== -1;
   }
 
   getTimeParts(date) {
-    const hours = date.hours()
+    const hours = date.hours();
 
     return {
       hours: pad('hours', hours),
@@ -235,16 +235,16 @@ export default class TimeView extends React.Component {
       seconds: pad('seconds', date.seconds()),
       milliseconds: pad('milliseconds', date.milliseconds()),
       ampm: hours < 12 ? 'am' : 'pm',
-    }
+    };
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.selectedDate) {
       if (this.props.selectedDate !== prevProps.selectedDate) {
-        this.setState(this.getTimeParts(this.props.selectedDate))
+        this.setState(this.getTimeParts(this.props.selectedDate));
       }
     } else if (prevProps.viewDate !== this.props.viewDate) {
-      this.setState(this.getTimeParts(this.props.viewDate))
+      this.setState(this.getTimeParts(this.props.viewDate));
     }
   }
 }
@@ -255,9 +255,9 @@ function pad(type, value) {
     minutes: 2,
     seconds: 2,
     milliseconds: 3,
-  }
+  };
 
-  let str = value + ''
-  while (str.length < padValues[type]) str = '0' + str
-  return str
+  let str = value + '';
+  while (str.length < padValues[type]) str = '0' + str;
+  return str;
 }

@@ -1,26 +1,26 @@
-import * as React from 'react'
-import { BiEdit } from 'react-icons/bi'
-import { Transition } from '@headlessui/react'
-import type { TinaState } from '@toolkit/tina-state'
-import { useCMS } from '@toolkit/react-tinacms'
+import * as React from 'react';
+import { BiEdit } from 'react-icons/bi';
+import { Transition } from '@headlessui/react';
+import type { TinaState } from '@toolkit/tina-state';
+import { useCMS } from '@toolkit/react-tinacms';
 
-type FormListItem = TinaState['formLists'][number]['items'][number]
+type FormListItem = TinaState['formLists'][number]['items'][number];
 
 const Item = ({
   item,
   depth,
   setActiveFormId,
 }: {
-  item: Extract<FormListItem, { type: 'document' }>
-  depth: number
-  setActiveFormId: (id: string) => void
+  item: Extract<FormListItem, { type: 'document' }>;
+  depth: number;
+  setActiveFormId: (id: string) => void;
 }) => {
-  const cms = useCMS()
-  const depths = ['pl-6', 'pl-10', 'pl-14']
+  const cms = useCMS();
+  const depths = ['pl-6', 'pl-10', 'pl-14'];
   const form = React.useMemo(
     () => cms.state.forms.find(({ tinaForm }) => item.formId === tinaForm.id),
     [item.formId]
-  )
+  );
 
   return (
     <button
@@ -41,13 +41,13 @@ const Item = ({
         </div>
       </div>
     </button>
-  )
-}
+  );
+};
 export interface FormsListProps {
-  formList: FormListItem[]
-  setActiveFormId(id: string): void
-  isEditing: boolean
-  hidden?: boolean
+  formList: FormListItem[];
+  setActiveFormId(id: string): void;
+  isEditing: boolean;
+  hidden?: boolean;
 }
 
 const FormListItem = ({
@@ -55,9 +55,9 @@ const FormListItem = ({
   depth,
   setActiveFormId,
 }: {
-  item: Extract<FormListItem, { type: 'document' }>
-  depth: number
-  setActiveFormId: (id: string) => void
+  item: Extract<FormListItem, { type: 'document' }>;
+  depth: number;
+  setActiveFormId: (id: string) => void;
 }) => {
   return (
     <div className={'divide-y divide-gray-200'}>
@@ -74,17 +74,17 @@ const FormListItem = ({
                     item={subItem}
                   />
                 </li>
-              )
+              );
             }
           })}
         </ul>
       )}
     </div>
-  )
-}
+  );
+};
 
 export const FormLists = (props: { isEditing: boolean }) => {
-  const cms = useCMS()
+  const cms = useCMS();
   return (
     <Transition
       appear={true}
@@ -104,52 +104,52 @@ export const FormLists = (props: { isEditing: boolean }) => {
           <FormList
             isEditing={props.isEditing}
             setActiveFormId={(id) => {
-              cms.dispatch({ type: 'forms:set-active-form-id', value: id })
+              cms.dispatch({ type: 'forms:set-active-form-id', value: id });
             }}
             formList={formList}
           />
         </div>
       ))}
     </Transition>
-  )
-}
+  );
+};
 
 export const FormList = (props: {
-  isEditing: boolean
-  setActiveFormId: (id: string) => void
-  formList: TinaState['formLists'][number]
+  isEditing: boolean;
+  setActiveFormId: (id: string) => void;
+  formList: TinaState['formLists'][number];
 }) => {
-  const cms = useCMS()
+  const cms = useCMS();
 
   const listItems: TinaState['formLists'][number]['items'] =
     React.useMemo(() => {
-      const orderedListItems: TinaState['formLists'][number]['items'] = []
-      const globalItems: TinaState['formLists'][number]['items'] = []
-      const topItems: TinaState['formLists'][number]['items'] = []
+      const orderedListItems: TinaState['formLists'][number]['items'] = [];
+      const globalItems: TinaState['formLists'][number]['items'] = [];
+      const topItems: TinaState['formLists'][number]['items'] = [];
       // Always put global forms at the end
       props.formList.items.forEach((item) => {
         if (item.type === 'document') {
           const form = cms.state.forms.find(
             ({ tinaForm }) => tinaForm.id === item.formId
-          )
+          );
           if (form.tinaForm.global) {
-            globalItems.push(item)
+            globalItems.push(item);
           } else {
-            orderedListItems.push(item)
+            orderedListItems.push(item);
           }
         } else {
-          orderedListItems.push(item)
+          orderedListItems.push(item);
         }
-      })
+      });
       if (orderedListItems[0]?.type === 'document') {
-        topItems.push({ type: 'list', label: 'Documents' })
+        topItems.push({ type: 'list', label: 'Documents' });
       }
-      let extra = []
+      let extra = [];
       if (globalItems.length) {
-        extra = [{ type: 'list', label: 'Global Documents' }, ...globalItems]
+        extra = [{ type: 'list', label: 'Global Documents' }, ...globalItems];
       }
-      return [...topItems, ...orderedListItems, ...extra]
-    }, [JSON.stringify(props.formList.items)])
+      return [...topItems, ...orderedListItems, ...extra];
+    }, [JSON.stringify(props.formList.items)]);
 
   return (
     <ul>
@@ -174,7 +174,7 @@ export const FormList = (props: {
                   {item.label}
                 </span>
               </div>
-            )
+            );
           }
           return (
             <FormListItem
@@ -183,9 +183,9 @@ export const FormList = (props: {
               item={item}
               depth={0}
             />
-          )
+          );
         })}
       </li>
     </ul>
-  )
-}
+  );
+};

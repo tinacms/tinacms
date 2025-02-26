@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { CloseIcon } from '@toolkit/icons'
+import * as React from 'react';
+import { CloseIcon } from '@toolkit/icons';
 
 export interface ModalHeaderProps {
-  children: React.ReactChild | React.ReactChild[]
-  close?(): void
+  children: React.ReactChild | React.ReactChild[];
+  close?(): void;
 }
 
 export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
@@ -19,13 +19,13 @@ export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 const ModalTitle = ({ children }) => {
   return (
     <h2 className='text-gray-600 font-sans font-medium text-base leading-none m-0 block truncate flex items-center'>
       {children}
     </h2>
-  )
-}
+  );
+};

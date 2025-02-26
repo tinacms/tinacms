@@ -1,30 +1,30 @@
-import * as React from 'react'
+import * as React from 'react';
 import {
   BiChevronDown,
   BiGitBranch,
   BiLinkExternal,
   BiLockAlt,
-} from 'react-icons/bi'
-import { useBranchData } from './branch-data'
-import { BranchModal } from './branch-modal'
-import { Button } from '@toolkit/styles'
-import { useCMS } from '@toolkit/react-tinacms/use-cms'
+} from 'react-icons/bi';
+import { useBranchData } from './branch-data';
+import { BranchModal } from './branch-modal';
+import { Button } from '@toolkit/styles';
+import { useCMS } from '@toolkit/react-tinacms/use-cms';
 
 // trim 'tina/' prefix from branch name
 const trimPrefix = (branchName: string) => {
-  return branchName.replace(/^tina\//, '')
-}
+  return branchName.replace(/^tina\//, '');
+};
 
 export const BranchBanner = () => {
-  const cms = useCMS()
-  const [open, setOpen] = React.useState(false)
-  const openModal = () => setOpen(true)
-  const { currentBranch } = useBranchData()
-  const isProtected = cms.api.tina.usingProtectedBranch()
+  const cms = useCMS();
+  const [open, setOpen] = React.useState(false);
+  const openModal = () => setOpen(true);
+  const { currentBranch } = useBranchData();
+  const isProtected = cms.api.tina.usingProtectedBranch();
 
-  const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl
-  const branch = decodeURIComponent(cms.api.tina.branch)
-  const previewUrl = previewFunction ? previewFunction({ branch })?.url : null
+  const previewFunction = cms.api.tina.schema?.config?.config?.ui?.previewUrl;
+  const branch = decodeURIComponent(cms.api.tina.branch);
+  const previewUrl = previewFunction ? previewFunction({ branch })?.url : null;
 
   return (
     <>
@@ -56,7 +56,7 @@ export const BranchBanner = () => {
             variant='white'
             size='small'
             onClick={() => {
-              window.open(previewUrl, '_blank')
+              window.open(previewUrl, '_blank');
             }}
           >
             <BiLinkExternal className='flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1' />
@@ -67,10 +67,10 @@ export const BranchBanner = () => {
       {open && (
         <BranchModal
           close={() => {
-            setOpen(false)
+            setOpen(false);
           }}
         />
       )}
     </>
-  )
-}
+  );
+};

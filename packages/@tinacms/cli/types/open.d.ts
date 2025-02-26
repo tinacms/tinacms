@@ -2,4 +2,4 @@
 
 */
 
-declare module 'open'
+declare module 'open';

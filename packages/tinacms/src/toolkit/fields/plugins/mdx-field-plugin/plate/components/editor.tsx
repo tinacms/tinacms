@@ -1,11 +1,11 @@
-import React from 'react'
+import React from 'react';
 
-import type { PlateContentProps } from '@udecode/plate-common'
-import type { VariantProps } from 'class-variance-authority'
+import type { PlateContentProps } from '@udecode/plate-common';
+import type { VariantProps } from 'class-variance-authority';
 
-import { cn } from '@udecode/cn'
-import { PlateContent } from '@udecode/plate-common'
-import { cva } from 'class-variance-authority'
+import { cn } from '@udecode/cn';
+import { PlateContent } from '@udecode/plate-common';
+import { cva } from 'class-variance-authority';
 
 const editorVariants = cva(
   cn(
@@ -42,10 +42,10 @@ const editorVariants = cva(
       },
     },
   }
-)
+);
 
 export type EditorProps = PlateContentProps &
-  VariantProps<typeof editorVariants>
+  VariantProps<typeof editorVariants>;
 
 const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
   (
@@ -80,9 +80,9 @@ const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
           {...props}
         />
       </div>
-    )
+    );
   }
-)
-Editor.displayName = 'Editor'
+);
+Editor.displayName = 'Editor';
 
-export { Editor }
+export { Editor };

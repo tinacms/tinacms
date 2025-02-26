@@ -1,28 +1,28 @@
-import * as React from 'react'
-import { BranchSwitcherProps, Branch } from './types'
-import { useBranchData } from './branch-data'
-import { BaseTextField, Input } from '@toolkit/fields'
-import { Button } from '@toolkit/styles'
-import { LoadingDots } from '@toolkit/form-builder'
+import * as React from 'react';
+import { BranchSwitcherProps, Branch } from './types';
+import { useBranchData } from './branch-data';
+import { BaseTextField, Input } from '@toolkit/fields';
+import { Button } from '@toolkit/styles';
+import { LoadingDots } from '@toolkit/form-builder';
 import {
   BiError,
   BiGitBranch,
   BiPlus,
   BiRefresh,
   BiSearch,
-} from 'react-icons/bi'
-import { GrCircleQuestion } from 'react-icons/gr'
-import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
-import { AiFillWarning } from 'react-icons/ai'
-import { FaSpinner } from 'react-icons/fa'
-import { useCMS } from '@toolkit/react-core'
+} from 'react-icons/bi';
+import { GrCircleQuestion } from 'react-icons/gr';
+import { MdArrowForward, MdOutlineClear } from 'react-icons/md';
+import { AiFillWarning } from 'react-icons/ai';
+import { FaSpinner } from 'react-icons/fa';
+import { useCMS } from '@toolkit/react-core';
 
-type ListState = 'loading' | 'ready' | 'error'
+type ListState = 'loading' | 'ready' | 'error';
 
 export function formatBranchName(str: string): string {
-  const pattern = /[^/\w-]+/g // regular expression pattern to match invalid special characters
-  const formattedStr = str.replace(pattern, '') // remove special characters
-  return formattedStr.toLowerCase()
+  const pattern = /[^/\w-]+/g; // regular expression pattern to match invalid special characters
+  const formattedStr = str.replace(pattern, ''); // remove special characters
+  return formattedStr.toLowerCase();
 }
 
 export const BranchSwitcherLegacy = ({
@@ -30,29 +30,29 @@ export const BranchSwitcherLegacy = ({
   createBranch,
   chooseBranch,
 }: BranchSwitcherProps) => {
-  const cms = useCMS()
-  const isLocalMode = cms.api?.tina?.isLocalMode
-  const [listState, setListState] = React.useState<ListState>('loading')
-  const [branchList, setBranchList] = React.useState([] as Branch[])
-  const { currentBranch } = useBranchData()
-  const initialBranch = React.useMemo(() => currentBranch, [])
+  const cms = useCMS();
+  const isLocalMode = cms.api?.tina?.isLocalMode;
+  const [listState, setListState] = React.useState<ListState>('loading');
+  const [branchList, setBranchList] = React.useState([] as Branch[]);
+  const { currentBranch } = useBranchData();
+  const initialBranch = React.useMemo(() => currentBranch, []);
   // when modal closes, refresh page is currentBranch has changed
   React.useEffect(() => {
     return () => {
       if (initialBranch != currentBranch) {
-        window.location.reload()
+        window.location.reload();
       }
-    }
-  }, [currentBranch])
+    };
+  }, [currentBranch]);
 
   const handleCreateBranch = React.useCallback((value) => {
-    setListState('loading')
+    setListState('loading');
     createBranch({
       branchName: formatBranchName(value),
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
       // @ts-ignore
-      cms.alerts.success('Branch created.')
+      cms.alerts.success('Branch created.');
       // add the newly created branch to the list
       setBranchList((oldBranchList) => {
         return [
@@ -61,31 +61,31 @@ export const BranchSwitcherLegacy = ({
             indexStatus: { status: 'unknown' },
             name: createdBranchName,
           },
-        ]
-      })
-      setListState('ready')
-    })
-  }, [])
+        ];
+      });
+      setListState('ready');
+    });
+  }, []);
 
   const refreshBranchList = React.useCallback(async () => {
-    setListState('loading')
+    setListState('loading');
     await listBranches()
       .then((data: Branch[]) => {
-        setBranchList(data)
-        setListState('ready')
+        setBranchList(data);
+        setListState('ready');
       })
-      .catch(() => setListState('error'))
-  }, [])
+      .catch(() => setListState('error'));
+  }, []);
 
   // load branch list
   React.useEffect(() => {
-    refreshBranchList()
-  }, [])
+    refreshBranchList();
+  }, []);
 
   // Keep branch list up to date
   React.useEffect(() => {
     if (listState === 'ready') {
-      const cancelFuncs = []
+      const cancelFuncs = [];
       // update all branches that have indexing status of 'inprogress' or 'unknown'
       branchList
         .filter(
@@ -101,31 +101,31 @@ export const BranchSwitcherLegacy = ({
             cancelWaitForIndexFunc,
           ] = cms.api.tina.waitForIndexStatus({
             ref: x.name,
-          })
-          cancelFuncs.push(cancelWaitForIndexFunc)
+          });
+          cancelFuncs.push(cancelWaitForIndexFunc);
           waitForIndexStatusPromise
             // @ts-ignore
             .then((indexStatus) => {
               setBranchList((previousBranchList) => {
                 // update the index status of the branch
-                const newBranchList = Array.from(previousBranchList)
-                const index = newBranchList.findIndex((y) => y.name === x.name)
-                newBranchList[index].indexStatus = indexStatus
-                return newBranchList
-              })
+                const newBranchList = Array.from(previousBranchList);
+                const index = newBranchList.findIndex((y) => y.name === x.name);
+                newBranchList[index].indexStatus = indexStatus;
+                return newBranchList;
+              });
             })
             .catch((e) => {
-              if (e.message === 'AsyncPoller: cancelled') return
-              console.error(e)
-            })
-        })
+              if (e.message === 'AsyncPoller: cancelled') return;
+              console.error(e);
+            });
+        });
       return () => {
         cancelFuncs.forEach((x) => {
-          x()
-        })
-      }
+          x();
+        });
+      };
     }
-  }, [listState, branchList.length])
+  }, [listState, branchList.length]);
 
   return (
     <div className='w-full flex justify-center p-5'>
@@ -167,10 +167,10 @@ export const BranchSwitcherLegacy = ({
                 currentBranch={currentBranch}
                 branchList={branchList}
                 onCreateBranch={(newBranch) => {
-                  handleCreateBranch(newBranch)
+                  handleCreateBranch(newBranch);
                 }}
                 onChange={(branchName) => {
-                  chooseBranch(branchName)
+                  chooseBranch(branchName);
                 }}
               />
             ) : (
@@ -187,8 +187,8 @@ export const BranchSwitcherLegacy = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export const getFilteredBranchList = (
   branchList: Branch[],
@@ -200,10 +200,10 @@ export const getFilteredBranchList = (
       !filter ||
       branch.name.includes(filter) ||
       branch.name === currentBranchName
-  )
+  );
   const currentBranchItem = branchList.find(
     (branch) => branch.name === currentBranchName
-  )
+  );
 
   // return list with current branch at top
   return [
@@ -213,8 +213,8 @@ export const getFilteredBranchList = (
         indexStatus: { status: 'failed' },
       } as Branch),
     ...filteredBranchList.filter((branch) => branch.name !== currentBranchName),
-  ]
-}
+  ];
+};
 
 const BranchSelector = ({
   branchList,
@@ -222,18 +222,18 @@ const BranchSelector = ({
   onCreateBranch,
   onChange,
 }: {
-  branchList: Branch[]
-  currentBranch: string
-  onCreateBranch: (branchName: string) => void
-  onChange: (branchName: string) => void
+  branchList: Branch[];
+  currentBranch: string;
+  onCreateBranch: (branchName: string) => void;
+  onChange: (branchName: string) => void;
 }) => {
-  const [newBranchName, setNewBranchName] = React.useState('')
-  const [filter, setFilter] = React.useState('')
+  const [newBranchName, setNewBranchName] = React.useState('');
+  const [filter, setFilter] = React.useState('');
   const filteredBranchList = getFilteredBranchList(
     branchList,
     filter,
     currentBranch
-  )
+  );
 
   return (
     <div className='flex flex-col gap-3'>
@@ -248,7 +248,7 @@ const BranchSelector = ({
         ) : (
           <button
             onClick={() => {
-              setFilter('')
+              setFilter('');
             }}
             className='outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150'
           >
@@ -264,9 +264,9 @@ const BranchSelector = ({
       {filteredBranchList.length > 0 && (
         <div className='min-w-[192px] max-h-[24rem] overflow-y-auto flex flex-col w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
           {filteredBranchList.map((branch) => {
-            const isCurrentBranch = branch.name === currentBranch
+            const isCurrentBranch = branch.name === currentBranch;
             // @ts-ignore
-            const indexingStatus = branch?.indexStatus?.status
+            const indexingStatus = branch?.indexStatus?.status;
             return (
               <div
                 className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
@@ -279,7 +279,7 @@ const BranchSelector = ({
                 key={branch.name}
                 onClick={() => {
                   if (indexingStatus === 'complete') {
-                    onChange(branch.name)
+                    onChange(branch.name);
                   }
                 }}
               >
@@ -315,7 +315,7 @@ const BranchSelector = ({
                   <span className='opacity-70 italic'>{` (current)`}</span>
                 )}
               </div>
-            )
+            );
           })}
         </div>
       )}
@@ -323,14 +323,14 @@ const BranchSelector = ({
         {...{ onCreateBranch, currentBranch, newBranchName, setNewBranchName }}
       />
     </div>
-  )
-}
+  );
+};
 
 export const CreateBranch: React.FC<{
-  setNewBranchName: (value: any) => void
-  onCreateBranch: (value: string) => void
-  currentBranch: string
-  newBranchName: string
+  setNewBranchName: (value: any) => void;
+  onCreateBranch: (value: string) => void;
+  currentBranch: string;
+  newBranchName: string;
 }> = ({ currentBranch, newBranchName, onCreateBranch, setNewBranchName }) => {
   return (
     <div className='border-t border-gray-150 pt-4 mt-3 flex flex-col gap-3'>
@@ -355,5 +355,5 @@ export const CreateBranch: React.FC<{
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};

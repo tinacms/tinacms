@@ -1,23 +1,23 @@
-import { FC } from 'react'
-import * as React from 'react'
-import { Field } from '@toolkit/forms'
+import { FC } from 'react';
+import * as React from 'react';
+import { Field } from '@toolkit/forms';
 
 export interface ToggleProps {
-  name: string
-  input: any
-  field: ToggleFieldDefinition
-  disabled?: boolean
-  onBlur?: <T>(_event?: React.FocusEvent<T>) => void
-  onChange?: <T>(_event: React.ChangeEvent<T> | any) => void
-  onFocus?: <T>(_event?: React.FocusEvent<T>) => void
+  name: string;
+  input: any;
+  field: ToggleFieldDefinition;
+  disabled?: boolean;
+  onBlur?: <T>(_event?: React.FocusEvent<T>) => void;
+  onChange?: <T>(_event: React.ChangeEvent<T> | any) => void;
+  onFocus?: <T>(_event?: React.FocusEvent<T>) => void;
 }
 
 interface ToggleFieldDefinition extends Field {
-  component: 'toggle'
-  toggleLabels?: boolean | FieldLabels
+  component: 'toggle';
+  toggleLabels?: boolean | FieldLabels;
 }
 
-type FieldLabels = { true: string; false: string }
+type FieldLabels = { true: string; false: string };
 
 export const Toggle: FC<ToggleProps> = ({
   input,
@@ -25,20 +25,20 @@ export const Toggle: FC<ToggleProps> = ({
   name,
   disabled = false,
 }) => {
-  const checked = !!(input.value || input.checked)
-  let labels: null | FieldLabels = null
+  const checked = !!(input.value || input.checked);
+  let labels: null | FieldLabels = null;
 
   if (field.toggleLabels) {
     const fieldLabels =
       typeof field.toggleLabels === 'object' &&
       'true' in field.toggleLabels &&
       'false' in field.toggleLabels &&
-      field.toggleLabels
+      field.toggleLabels;
 
     labels = {
       true: fieldLabels ? fieldLabels['true'] : 'Yes',
       false: fieldLabels ? fieldLabels['false'] : 'No',
-    }
+    };
   }
 
   return (
@@ -87,8 +87,8 @@ export const Toggle: FC<ToggleProps> = ({
         </span>
       )}
     </div>
-  )
-}
+  );
+};
 
 const ToggleInput = ({ disabled, ...props }) => {
   return (
@@ -100,5 +100,5 @@ const ToggleInput = ({ disabled, ...props }) => {
       }`}
       {...props}
     />
-  )
-}
+  );
+};

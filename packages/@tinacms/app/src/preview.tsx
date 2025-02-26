@@ -1,19 +1,19 @@
 /**
 
 */
-import React from 'react'
-import { defineConfig } from 'tinacms'
-import { useGraphQLReducer } from './lib/graphql-reducer'
+import React from 'react';
+import { defineConfig } from 'tinacms';
+import { useGraphQLReducer } from './lib/graphql-reducer';
 
-type Config = Parameters<typeof defineConfig>[0]
+type Config = Parameters<typeof defineConfig>[0];
 
 export const Preview = (
   props: Config & {
-    url: string
-    iframeRef: React.MutableRefObject<HTMLIFrameElement>
+    url: string;
+    iframeRef: React.MutableRefObject<HTMLIFrameElement>;
   }
 ) => {
-  useGraphQLReducer(props.iframeRef, props.url)
+  useGraphQLReducer(props.iframeRef, props.url);
 
   return (
     <iframe
@@ -23,5 +23,5 @@ export const Preview = (
       className='h-screen w-full bg-white'
       src={props.url}
     />
-  )
-}
+  );
+};

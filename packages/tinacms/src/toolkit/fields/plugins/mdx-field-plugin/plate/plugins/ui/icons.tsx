@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 const RawMarkdown = () => {
   return (
@@ -16,8 +16,8 @@ const RawMarkdown = () => {
       <title />
       <path d='M22.27 19.385H1.73A1.73 1.73 0 010 17.655V6.345a1.73 1.73 0 011.73-1.73h20.54A1.73 1.73 0 0124 6.345v11.308a1.73 1.73 0 01-1.73 1.731zM5.769 15.923v-4.5l2.308 2.885 2.307-2.885v4.5h2.308V8.078h-2.308l-2.307 2.885-2.308-2.885H3.46v7.847zM21.232 12h-2.309V8.077h-2.307V12h-2.308l3.461 4.039z' />
     </svg>
-  )
-}
+  );
+};
 
 const iconEl = {
   heading: <HeadingIcon />,
@@ -31,11 +31,11 @@ const iconEl = {
   bold: <BoldIcon />,
   italic: <ItalicIcon />,
   raw: <RawMarkdown />,
-}
+};
 
 export const ToolbarIcon = ({ name }: { name: string }) => {
-  return iconEl[name]
-}
+  return iconEl[name];
+};
 
 export const EllipsisIcon = ({ title }) => {
   return (
@@ -56,11 +56,11 @@ export const EllipsisIcon = ({ title }) => {
         />
       </svg>
     </>
-  )
-}
+  );
+};
 
 export function UnorderedListIcon(props) {
-  const title = props.title || 'format list bulleted'
+  const title = props.title || 'format list bulleted';
 
   return (
     <svg
@@ -87,11 +87,11 @@ export function UnorderedListIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function HeadingIcon(props) {
-  const title = props.title || 'format size'
+  const title = props.title || 'format size';
 
   return (
     <svg
@@ -109,11 +109,11 @@ export function HeadingIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function OrderedListIcon(props) {
-  const title = props.title || 'format list numbered'
+  const title = props.title || 'format list numbered';
 
   return (
     <svg
@@ -131,11 +131,11 @@ export function OrderedListIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function QuoteIcon(props) {
-  const title = props.title || 'format quote'
+  const title = props.title || 'format quote';
 
   return (
     <svg
@@ -153,11 +153,11 @@ export function QuoteIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function LinkIcon(props) {
-  const title = props.title || 'insert link'
+  const title = props.title || 'insert link';
 
   return (
     <svg
@@ -175,11 +175,11 @@ export function LinkIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function CodeIcon(props) {
-  const title = props.title || 'code'
+  const title = props.title || 'code';
 
   return (
     <svg
@@ -197,11 +197,11 @@ export function CodeIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function CodeBlockIcon(props) {
-  const title = props.title || 'code-block'
+  const title = props.title || 'code-block';
 
   return (
     <svg
@@ -218,11 +218,11 @@ export function CodeBlockIcon(props) {
       <path d='M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z' />
       <path d='M6.854 4.646a.5.5 0 0 1 0 .708L4.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0zm2.292 0a.5.5 0 0 0 0 .708L11.793 8l-2.647 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0z' />
     </svg>
-  )
+  );
 }
 
 export function ImageIcon(props) {
-  const title = props.title || 'image'
+  const title = props.title || 'image';
 
   return (
     <svg
@@ -240,11 +240,11 @@ export function ImageIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function BoldIcon(props) {
-  const title = props.title || 'format bold'
+  const title = props.title || 'format bold';
 
   return (
     <svg
@@ -262,11 +262,11 @@ export function BoldIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function ItalicIcon(props) {
-  const title = props.title || 'format italic'
+  const title = props.title || 'format italic';
 
   return (
     <svg
@@ -284,11 +284,11 @@ export function ItalicIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function UnderlineIcon(props) {
-  const title = props.title || 'format underlined'
+  const title = props.title || 'format underlined';
 
   return (
     <svg
@@ -305,11 +305,11 @@ export function UnderlineIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function StrikethroughIcon(props) {
-  const title = props.title || 'strikethrough s'
+  const title = props.title || 'strikethrough s';
 
   return (
     <svg
@@ -326,11 +326,11 @@ export function StrikethroughIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function LightningIcon(props) {
-  const title = props.title || 'lightning'
+  const title = props.title || 'lightning';
 
   return (
     <svg
@@ -356,11 +356,11 @@ export function LightningIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function ArrowDownIcon(props) {
-  const title = props.title || 'keyboard arrow down'
+  const title = props.title || 'keyboard arrow down';
 
   return (
     <svg
@@ -377,7 +377,7 @@ export function ArrowDownIcon(props) {
         />
       </g>
     </svg>
-  )
+  );
 }
 
 export function PlusIcon({ className = '' }: { className?: string }) {
@@ -394,5 +394,5 @@ export function PlusIcon({ className = '' }: { className?: string }) {
         clipRule='evenodd'
       />
     </svg>
-  )
+  );
 }

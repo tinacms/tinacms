@@ -4,7 +4,7 @@
 
 */
 
-import * as React from 'react'
+import * as React from 'react';
 
 export const AlignLeft = ({ ...props }) => (
   <svg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg' {...props}>
@@ -13,4 +13,4 @@ export const AlignLeft = ({ ...props }) => (
       fill='inherit'
     />
   </svg>
-)
+);

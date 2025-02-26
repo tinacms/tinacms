@@ -1,17 +1,17 @@
-import { isHotkey } from 'is-hotkey'
-import { KEY_SOFT_BREAK } from './create-soft-break-plugin'
-import { getBlockAbove, insertNodes, queryNode } from '@udecode/plate-common'
+import { isHotkey } from 'is-hotkey';
+import { KEY_SOFT_BREAK } from './create-soft-break-plugin';
+import { getBlockAbove, insertNodes, queryNode } from '@udecode/plate-common';
 
 export const onKeyDownSoftBreak =
   (editor, { options: { rules = [] } }) =>
   (event) => {
-    const entry = getBlockAbove(editor)
-    if (!entry) return
+    const entry = getBlockAbove(editor);
+    if (!entry) return;
 
     rules.forEach(({ hotkey, query }) => {
       if (isHotkey(hotkey, event as any) && queryNode(entry, query)) {
-        event.preventDefault()
-        event.stopPropagation()
+        event.preventDefault();
+        event.stopPropagation();
 
         insertNodes(
           editor,
@@ -20,7 +20,7 @@ export const onKeyDownSoftBreak =
             { type: 'text', text: '' },
           ],
           { select: true }
-        )
+        );
       }
-    })
-  }
+    });
+  };

@@ -1,10 +1,10 @@
-import React from 'react'
+import React from 'react';
 
 export function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
 
-import * as Popover from '@radix-ui/react-popover'
+import * as Popover from '@radix-ui/react-popover';
 
 export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
   return (
@@ -38,8 +38,8 @@ export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
                   data-test={`${toolbarItem.name}OverflowButton`}
                   key={toolbarItem.name}
                   onMouseDown={(event) => {
-                    event.preventDefault()
-                    toolbarItem.onMouseDown(event)
+                    event.preventDefault();
+                    toolbarItem.onMouseDown(event);
                   }}
                   className={classNames(
                     toolbarItem.active
@@ -51,11 +51,11 @@ export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
                   <div className='mr-2 opacity-80'>{toolbarItem.Icon}</div>{' '}
                   {toolbarItem.label}
                 </span>
-              )
+              );
             })}
           </div>
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
-  )
-}
+  );
+};

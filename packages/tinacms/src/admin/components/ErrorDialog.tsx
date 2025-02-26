@@ -1,9 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 export const ErrorDialog = (props: {
-  title: string
-  message: string
-  error: Error
+  title: string;
+  message: string;
+  error: Error;
 }) => {
   return (
     <div
@@ -54,5 +54,5 @@ export const ErrorDialog = (props: {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};

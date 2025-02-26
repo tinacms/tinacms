@@ -1,5 +1,5 @@
-import React from 'react'
-import { FieldMeta } from '@toolkit/fields'
+import React from 'react';
+import { FieldMeta } from '@toolkit/fields';
 
 export const MarkdownFieldPlaceholder = {
   __type: 'field',
@@ -8,7 +8,7 @@ export const MarkdownFieldPlaceholder = {
     'Markdown',
     'https://github.com/tinacms/tinacms/pull/1134'
   ),
-}
+};
 
 export const HtmlFieldPlaceholder = {
   __type: 'field',
@@ -17,7 +17,7 @@ export const HtmlFieldPlaceholder = {
     'HTML',
     'https://github.com/tinacms/tinacms/pull/1134'
   ),
-}
+};
 
 function createPlaceholder(name: string, _pr: string) {
   return (props: any) => {
@@ -43,6 +43,6 @@ function createPlaceholder(name: string, _pr: string) {
           </a>
         </p>
       </FieldMeta>
-    )
-  }
+    );
+  };
 }

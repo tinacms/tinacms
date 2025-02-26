@@ -1,30 +1,30 @@
-import React from 'react'
-import { useFormPortal, FormBuilder } from '@toolkit/form-builder'
-import { PanelHeader, GroupPanel } from '../../group-field-plugin'
-import { Form, type Field } from '@toolkit/forms'
-import { uuid } from './plugins/ui/helpers'
+import React from 'react';
+import { useFormPortal, FormBuilder } from '@toolkit/form-builder';
+import { PanelHeader, GroupPanel } from '../../group-field-plugin';
+import { Form, type Field } from '@toolkit/forms';
+import { uuid } from './plugins/ui/helpers';
 
 export const NestedForm = (props: {
-  onClose: () => void
-  id: string
-  label: string
-  fields: Field[]
-  initialValues: object
-  onChange: (values: object) => void
+  onClose: () => void;
+  id: string;
+  label: string;
+  fields: Field[];
+  initialValues: object;
+  onChange: (values: object) => void;
 }) => {
-  const FormPortal = useFormPortal()
-  const id = React.useMemo(() => uuid(), [props.id, props.initialValues])
+  const FormPortal = useFormPortal();
+  const id = React.useMemo(() => uuid(), [props.id, props.initialValues]);
   const form = React.useMemo(() => {
     return new Form({
       ...props,
       relativePath: props.id,
       id,
       onChange: ({ values }) => {
-        props.onChange(values)
+        props.onChange(values);
       },
       onSubmit: () => {},
-    })
-  }, [id, props.onChange])
+    });
+  }, [id, props.onChange]);
 
   return (
     <FormPortal>
@@ -35,5 +35,5 @@ export const NestedForm = (props: {
         </GroupPanel>
       )}
     </FormPortal>
-  )
-}
+  );
+};

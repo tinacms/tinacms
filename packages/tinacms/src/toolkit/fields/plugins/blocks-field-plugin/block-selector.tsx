@@ -1,35 +1,35 @@
-import * as React from 'react'
-import { AddIcon } from '@toolkit/icons'
-import { IconButton } from '@toolkit/styles'
+import * as React from 'react';
+import { AddIcon } from '@toolkit/icons';
+import { IconButton } from '@toolkit/styles';
 import {
   Popover,
   PopoverButton,
   PopoverPanel,
   Transition,
-} from '@headlessui/react'
-import type { BlockTemplate } from '.'
+} from '@headlessui/react';
+import type { BlockTemplate } from '.';
 
 export const BlockSelector = ({
   templates,
   addItem,
 }: {
   templates: {
-    [key: string]: BlockTemplate
-  }
-  addItem: any
+    [key: string]: BlockTemplate;
+  };
+  addItem: any;
 }) => {
   const showFilter = React.useMemo(() => {
-    return Object.entries(templates).length > 6
-  }, [templates])
-  const [filter, setFilter] = React.useState('')
+    return Object.entries(templates).length > 6;
+  }, [templates]);
+  const [filter, setFilter] = React.useState('');
   const filteredBlocks = React.useMemo(() => {
     return Object.entries(templates).filter(([name, template]) => {
       return template.label
         ? template.label.toLowerCase().includes(filter.toLowerCase()) ||
             name.toLowerCase().includes(filter.toLowerCase())
-        : name.toLowerCase().includes(filter.toLowerCase())
-    })
-  }, [filter])
+        : name.toLowerCase().includes(filter.toLowerCase());
+    });
+  }, [filter]);
 
   return (
     <Popover>
@@ -62,12 +62,12 @@ export const BlockSelector = ({
                           type='text'
                           className='bg-white text-xs rounded-sm border border-gray-100 shadow-inner py-1 px-2 w-full block placeholder-gray-200'
                           onClick={(event: any) => {
-                            event.stopPropagation()
-                            event.preventDefault()
+                            event.stopPropagation();
+                            event.preventDefault();
                           }}
                           value={filter}
                           onChange={(event: any) => {
-                            setFilter(event.target.value)
+                            setFilter(event.target.value);
                           }}
                           placeholder='Filter...'
                         />
@@ -84,9 +84,9 @@ export const BlockSelector = ({
                           className='relative text-center text-xs py-2 px-4 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
                           key={name}
                           onClick={() => {
-                            addItem(name, template)
-                            setFilter('')
-                            close()
+                            addItem(name, template);
+                            setFilter('');
+                            close();
                           }}
                         >
                           {template.label ? template.label : name}
@@ -100,5 +100,5 @@ export const BlockSelector = ({
         </>
       )}
     </Popover>
-  )
-}
+  );
+};

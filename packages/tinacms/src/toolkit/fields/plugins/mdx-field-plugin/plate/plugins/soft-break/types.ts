@@ -1,14 +1,14 @@
-import type { QueryNodeOptions } from '@udecode/plate-common'
+import type { QueryNodeOptions } from '@udecode/plate-common';
 
 export interface SoftBreakRule {
-  hotkey: string
+  hotkey: string;
 
   /**
    * Filter the block types where the rule applies.
    */
-  query?: QueryNodeOptions
+  query?: QueryNodeOptions;
 }
 
 export interface SoftBreakPlugin {
-  rules?: SoftBreakRule[]
+  rules?: SoftBreakRule[];
 }
