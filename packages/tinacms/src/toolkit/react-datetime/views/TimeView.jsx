@@ -59,7 +59,7 @@ export default class TimeView extends React.Component {
     this.getCounters().forEach((c, i) => {
       if (i && c !== 'ampm') {
         items.push(
-          <div key={`sep${i}`} className="rdtCounterSeparator">
+          <div key={`sep${i}`} className='rdtCounterSeparator'>
             :
           </div>
         )
@@ -69,13 +69,13 @@ export default class TimeView extends React.Component {
     })
 
     return (
-      <div className="rdtTime">
+      <div className='rdtTime'>
         <table>
           {this.renderHeader()}
           <tbody>
             <tr>
               <td>
-                <div className="rdtCounters">{items}</div>
+                <div className='rdtCounters'>{items}</div>
               </td>
             </tr>
           </tbody>
@@ -102,16 +102,16 @@ export default class TimeView extends React.Component {
     }
 
     return (
-      <div key={type} className="rdtCounter">
+      <div key={type} className='rdtCounter'>
         <span
-          className="rdtBtn"
+          className='rdtBtn'
           onMouseDown={(e) => this.onStartClicking(e, 'increase', type)}
         >
           ▲
         </span>
-        <div className="rdtCount">{value}</div>
+        <div className='rdtCount'>{value}</div>
         <span
-          className="rdtBtn"
+          className='rdtBtn'
           onMouseDown={(e) => this.onStartClicking(e, 'decrease', type)}
         >
           ▼
@@ -129,8 +129,8 @@ export default class TimeView extends React.Component {
       <thead>
         <tr>
           <td
-            className="rdtSwitch"
-            colSpan="4"
+            className='rdtSwitch'
+            colSpan='4'
             onClick={() => this.props.showView('days')}
           >
             {date.format(this.props.dateFormat)}

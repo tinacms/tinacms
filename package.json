@@ -25,8 +25,8 @@
 		"publish:beta": "pnpm publish -r --tag beta --no-git-checks --access public",
 		"publish:dev": "pnpm publish -r --tag dev --no-git-checks --access public",
 		"push-tags": "pnpm exec changeset tag && git pull && git push --follow-tags",
-		"lint": "biome lint ./packages/**/*{.ts,.tsx}",
-		"format": "biome format --write ./packages/**/*{.ts,.tsx}"
+        "lint": "biome lint ./packages",
+        "format": "biome format --write ./packages/"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",

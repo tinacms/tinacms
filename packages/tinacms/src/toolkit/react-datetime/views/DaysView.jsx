@@ -13,7 +13,7 @@ export default class DaysView extends React.Component {
 
   render() {
     return (
-      <div className="rdtDays">
+      <div className='rdtDays'>
         <table>
           <thead>
             {this.renderNavigation()}
@@ -44,7 +44,7 @@ export default class DaysView extends React.Component {
   renderDayHeaders() {
     const locale = this.props.viewDate.localeData()
     const dayItems = getDaysOfWeek(locale).map((day, index) => (
-      <th key={day + index} className="dow">
+      <th key={day + index} className='dow'>
         {day}
       </th>
     ))
@@ -124,7 +124,7 @@ export default class DaysView extends React.Component {
           <td
             onClick={() => this.props.showView('time')}
             colSpan={7}
-            className="rdtTimeToggle"
+            className='rdtTimeToggle'
           >
             {date.format(this.props.timeFormat)}
           </td>

@@ -12,7 +12,7 @@ export default class YearsView extends React.Component {
 
   render() {
     return (
-      <div className="rdtYears">
+      <div className='rdtYears'>
         <table>
           <thead>{this.renderNavigation()}</thead>
         </table>

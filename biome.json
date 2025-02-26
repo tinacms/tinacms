@@ -31,7 +31,7 @@
 			"identity/CHANGELOG.md",
 			"js/dashboard/CHANGELOG.md",
 			"js/content-api/CHANGELOG.md",
-			"**/dist/",
+			"**/dist/**",
 			"terraform/**/.terraform",
 			"**/*.tfstate",
 			"**/.next/**",
@@ -74,7 +74,7 @@
 				"useNamespaceKeyword": "error"
 			}
 		},
-		"ignore": ["packages/demo-*", "**/node_modules", "**/build", "**/*.d.ts"]
+		"ignore": ["packages/demo-*", "**/node_modules", "**/build", "**/*.d.ts", "**/dist/**"]
 	},
 	"javascript": {
 		"formatter": {

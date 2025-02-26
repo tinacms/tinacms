@@ -14,18 +14,18 @@ export default function ViewNavigation({
 }) {
   return (
     <tr>
-      <th className="rdtPrev" onClick={onClickPrev}>
+      <th className='rdtPrev' onClick={onClickPrev}>
         <span>‹</span>
       </th>
       <th
-        className="rdtSwitch"
+        className='rdtSwitch'
         colSpan={switchColSpan}
         onClick={onClickSwitch}
         {...switchProps}
       >
         {switchContent}
       </th>
-      <th className="rdtNext" onClick={onClickNext}>
+      <th className='rdtNext' onClick={onClickNext}>
         <span>›</span>
       </th>
     </tr>

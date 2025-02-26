@@ -105,7 +105,7 @@ export default class Datetime extends React.Component {
         onClickOut={this._handleClickOutside}
       >
         {this.renderInput()}
-        <div className="rdtPicker">{this.renderView()}</div>
+        <div className='rdtPicker'>{this.renderView()}</div>
       </ClickableWrapper>
     )
   }
@@ -490,7 +490,6 @@ export default class Datetime extends React.Component {
 
     let needsUpdate = false
     const thisProps = this.props
-
     ;['locale', 'utc', 'displayZone', 'dateFormat', 'timeFormat'].forEach(
       function (p) {
         prevProps[p] !== thisProps[p] && (needsUpdate = true)

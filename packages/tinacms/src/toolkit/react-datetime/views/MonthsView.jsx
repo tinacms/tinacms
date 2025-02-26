@@ -8,7 +8,7 @@ import ViewNavigation from '../parts/ViewNavigation'
 export default class MonthsView extends React.Component {
   render() {
     return (
-      <div className="rdtMonths">
+      <div className='rdtMonths'>
         <table>
           <thead>{this.renderNavigation()}</thead>
         </table>
@@ -28,7 +28,7 @@ export default class MonthsView extends React.Component {
         onClickSwitch={() => this.props.showView('years')}
         onClickNext={() => this.props.navigate(1, 'years')}
         switchContent={year}
-        switchColSpan="2"
+        switchColSpan='2'
       />
     )
   }
