@@ -10,7 +10,7 @@
     "export": "npm run build && next export",
     "lint": "eslint . --ext .ts,.tsx",
     "diff-tina-lock": "tinacms-scripts diff-tina-lock",
-		"update-tina-lock": "tinacms dev --no-server"
+    "update-tina-lock": "tinacms dev --no-server"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
