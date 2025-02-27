@@ -9,6 +9,7 @@ import path from 'node:path'
 import chokidar from 'chokidar'
 import { exec } from 'node:child_process'
 import chalk from 'chalk'
+import jsonDiff from 'json-diff'
 
 import * as commander from 'commander'
 
@@ -30,7 +31,12 @@ interface Option {
 
 const deepMerge = (target, source) => {
   for (const key in source) {
-    if (!source.hasOwnProperty(key) || key === '__proto__' || key === 'constructor') continue;
+    if (
+      !source.hasOwnProperty(key) ||
+      key === '__proto__' ||
+      key === 'constructor'
+    )
+      continue
     if (
       source[key] instanceof Object &&
       !Array.isArray(source[key]) &&
@@ -162,6 +168,76 @@ const watch = () => {
   })
 }
 
+const diffTinaLock = async () => {
+  // check if tina folder exists in the current directory
+  if (!fs.existsSync(`tina/tina-lock.json`)) {
+    console.error(
+      'No Tina lock found. Please run this command from the root of a Tina project ❌'
+    )
+    process.exit(1)
+  }
+
+  // read the lock file into an object
+  const tinaLock = JSON.parse(fs.readFileSync(`tina/tina-lock.json`).toString())
+
+  if (!tinaLock.schema) {
+    console.error('No schema found in the Tina lock ❌')
+    process.exit(1)
+  }
+  exec(
+    'pnpm exec tinacms dev --no-server',
+    { cwd: process.cwd() },
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error} ❌`)
+        return
+      }
+      if (stdout) {
+        console.log(
+          stdout
+            .split('\n')
+            .map((line) => `> ${line}`)
+            .join('\n')
+        )
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`)
+      }
+
+      const newTinaLock = JSON.parse(
+        fs.readFileSync(`tina/tina-lock.json`).toString()
+      )
+
+      if (!newTinaLock.schema) {
+        console.error('No schema found in the new Tina lock ❌')
+        process.exit(1)
+      }
+
+      const { version, ...schema } = tinaLock.schema
+      const { version: newVersion, ...newSchema } = newTinaLock.schema
+
+      const schemaDiff = jsonDiff.diffString(schema, newSchema)
+      if (schemaDiff) {
+        console.error('Unexpected change(s) to Tina schema ❌')
+        console.log(schemaDiff)
+        process.exit(1)
+      }
+
+      const graphqlDiff = jsonDiff.diffString(
+        tinaLock.graphql,
+        newTinaLock.graphql
+      )
+      if (graphqlDiff) {
+        console.error('Unexpected change(s) to Tina graphql schema ❌')
+        console.log(graphqlDiff)
+        process.exit(1)
+      }
+
+      console.log('No changes found in Tina lock ✅')
+    }
+  )
+}
+
 export async function init(args: any) {
   registerCommands([
     {
@@ -179,6 +255,12 @@ export async function init(args: any) {
       command: 'watch',
       description: 'Watch',
       action: () => watch(),
+    },
+    {
+      command: 'diff-tina-lock',
+      description:
+        'Compare the current schema for a tina project with newly generated schema',
+      action: () => diffTinaLock(),
     },
   ])
 

@@ -5,7 +5,9 @@
 		"dev": "tinacms dev -c \"next dev\"",
 		"build": "tinacms dev -c \"NODE_ENV=production next build\"",
 		"start": "tinacms dev -c \"next start\"",
-		"lint": "next lint"
+		"lint": "next lint",
+		"diff-tina-lock": "tinacms-scripts diff-tina-lock",
+		"update-tina-lock": "tinacms dev --no-server"
 	},
 	"dependencies": {
 		"next": "^14.2.24",
@@ -16,6 +18,7 @@
 	},
 	"devDependencies": {
 		"@tinacms/cli": "workspace:*",
+		"@tinacms/scripts": "workspace:*",
 		"eslint": "^9.20.1",
 		"eslint-config-next": "^14.2.24",
 		"typescript": "^5.7.3"

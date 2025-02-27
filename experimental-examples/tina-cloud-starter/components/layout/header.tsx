@@ -5,7 +5,7 @@ import { Container } from '../util/container'
 import { useTheme } from '.'
 import { Icon } from '../util/icon'
 import { tinaField } from 'tinacms/dist/react'
-import { GlobalHeader } from '../../.tina/__generated__/types'
+import { GlobalHeader } from '../../tina/__generated__/types'
 
 export const Header = ({ data }: { data: GlobalHeader }) => {
   const router = useRouter()
