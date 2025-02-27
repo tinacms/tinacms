@@ -2,4 +2,5 @@
 'tinacms': patch
 ---
 
-Fixed inconsistent tooltips in the MDX editor toolbar
+Rich text editor - fixed inconsistent tooltips in the MDX editor toolbar
+Breaking - `MarkToolbarButton` is no longer exported
