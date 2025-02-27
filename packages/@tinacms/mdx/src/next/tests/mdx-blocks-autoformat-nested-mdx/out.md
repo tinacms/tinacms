@@ -1,29 +1,3 @@
-<Test
-  leftColumn={<>
-    foo bar baz left
-  </>}
-  rightColumn={<>
-    foo bar baz right
-    
-    <Highlight
-    content={<>
-    Foo bar baz
-    </>}
-    />
-  </>}
-/>
+<Test leftColumn="_tinaEmbeds.trzars" rightColumn="_tinaEmbeds.humkpq" />
 
-<Test
-  leftColumn={<>
-    foo bar baz left
-  </>}
-  rightColumn={<>
-    foo bar baz right
-    
-    <Highlight
-    content={<>
-    Foo bar baz
-    </>}
-    />
-  </>}
-/>
+<Test leftColumn="_tinaEmbeds.lhcwkx" rightColumn="_tinaEmbeds.tpqmmo" />

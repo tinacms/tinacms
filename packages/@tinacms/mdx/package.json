@@ -77,6 +77,7 @@
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",
 		"@types/estree": "1.0.0",
+		"@types/js-yaml": "^4.0.9",
 		"@types/lodash.flatten": "^4.4.9",
 		"@types/mdast": "^3.0.15",
 		"@types/node": "^22.13.1",
@@ -85,10 +86,14 @@
 		"c8": "^7.14.0",
 		"concat-md": "^0.5.1",
 		"jest-file-snapshot": "^0.5.0",
+		"js-yaml": "^4.1.0",
+		"mdast-util-frontmatter": "1.0.1",
+		"micromark-extension-frontmatter": "1.1.0",
 		"ts-node": "^10.9.2",
 		"typedoc-plugin-markdown": "^3.17.1",
 		"typescript": "^5.7.3",
 		"vite": "^4.5.9",
-		"vitest": "^0.32.4"
+		"vitest": "^0.32.4",
+		"zod": "^3.23.8"
 	}
 }

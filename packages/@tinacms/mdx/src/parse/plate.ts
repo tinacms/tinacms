@@ -10,6 +10,7 @@
 export type RootElement = {
   type: 'root'
   children: BlockElement[]
+  embedCode?: string
 }
 
 /**
