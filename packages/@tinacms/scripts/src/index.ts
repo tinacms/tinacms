@@ -169,9 +169,8 @@ const watch = () => {
 }
 
 const diffTinaLock = async () => {
-  // check if .tina or tina folder exists in the current directory
-  const tinaFolder = fs.existsSync('.tina') ? '.tina' : 'tina'
-  if (!fs.existsSync(`${tinaFolder}/tina-lock.json`)) {
+  // check if tina folder exists in the current directory
+  if (!fs.existsSync(`tina/tina-lock.json`)) {
     console.error(
       'No Tina lock found. Please run this command from the root of a Tina project ❌'
     )
@@ -179,9 +178,7 @@ const diffTinaLock = async () => {
   }
 
   // read the lock file into an object
-  const tinaLock = JSON.parse(
-    fs.readFileSync(`${tinaFolder}/tina-lock.json`).toString()
-  )
+  const tinaLock = JSON.parse(fs.readFileSync(`tina/tina-lock.json`).toString())
 
   if (!tinaLock.schema) {
     console.error('No schema found in the Tina lock ❌')
@@ -208,7 +205,7 @@ const diffTinaLock = async () => {
       }
 
       const newTinaLock = JSON.parse(
-        fs.readFileSync(`${tinaFolder}/tina-lock.json`).toString()
+        fs.readFileSync(`tina/tina-lock.json`).toString()
       )
 
       if (!newTinaLock.schema) {
