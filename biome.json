@@ -6,7 +6,7 @@
 		"useIgnoreFile": false
 	},
 	"files": {
-		"ignoreUnknown": false,
+		"ignoreUnknown": true,
 		"ignore": [],
 		"maxSize": 3145728
 	},
@@ -54,7 +54,7 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": false,
+			"recommended": true,
 			"complexity": {
 				"noBannedTypes": "off",
 				"noUselessTypeConstraint": "error"
