@@ -11,10 +11,10 @@ import {
   INDEX_KEY_FIELD_SEPARATOR,
   Level,
   SUBLEVEL_OPTIONS,
-} from './level';
-import { Collection } from '@tinacms/schema-tools';
-import path from 'path';
-import { normalizePath } from './util';
+} from './level'
+import type { Collection } from '@tinacms/schema-tools'
+import path from 'path'
+import { normalizePath } from './util'
 
 export enum OP {
   EQ = 'eq',
@@ -65,8 +65,11 @@ export type FilterCondition = {
 };
 type StringEscaper = <T extends string | string[]>(input: T) => T;
 
-export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__';
-export const DEFAULT_NUMERIC_LPAD = 4;
+export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__'
+export const REFS_COLLECTIONS_SORT_KEY = '__refs__'
+export const REFS_REFERENCE_FIELD = '__tina_ref__'
+export const REFS_PATH_FIELD = '__tina_ref_path__'
+export const DEFAULT_NUMERIC_LPAD = 4
 
 const applyPadding = (input: any, pad?: PadDefinition) => {
   if (pad) {
@@ -801,6 +804,61 @@ export const makeIndexOpsForDocument = <T extends object>(
   }
   return result;
 };
+
+export const makeRefOpsForDocument = <T extends object>(
+  filepath: string,
+  collection: string | undefined,
+  references: Record<string, string[]> | undefined | null,
+  data: T,
+  opType: 'put' | 'del',
+  level: Level
+): BatchOp[] => {
+  const result: BatchOp[] = []
+
+  if (collection) {
+    for (const [c, referencePaths] of Object.entries(references || {})) {
+      if (!referencePaths.length) {
+        continue
+      }
+      const collectionSublevel = level.sublevel(c, SUBLEVEL_OPTIONS)
+      const refSublevel = collectionSublevel.sublevel(
+        REFS_COLLECTIONS_SORT_KEY,
+        SUBLEVEL_OPTIONS
+      )
+      const references: Record<string, string[]> = {}
+      for (const path of referencePaths) {
+        const ref = JSONPath({ path, json: data })
+        if (Array.isArray(ref)) {
+          for (const r of ref) {
+            if (references[r]) {
+              references[r].push(path)
+            } else {
+              references[r] = [path]
+            }
+          }
+        } else {
+          if (references[ref]) {
+            references[ref].push(path)
+          } else {
+            references[ref] = [path]
+          }
+        }
+      }
+
+      for (const ref of Object.keys(references)) {
+        for (const path of references[ref]) {
+          result.push({
+            type: opType,
+            key: `${ref}${INDEX_KEY_FIELD_SEPARATOR}${path}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`,
+            sublevel: refSublevel,
+            value: opType === 'put' ? ({} as T) : undefined,
+          })
+        }
+      }
+    }
+  }
+  return result
+}
 
 export const makeStringEscaper = (
   regex: RegExp,

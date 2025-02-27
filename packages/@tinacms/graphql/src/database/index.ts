@@ -39,6 +39,10 @@ import {
   makeFilterSuffixes,
   makeFolderOpsForCollection,
   makeIndexOpsForDocument,
+  makeRefOpsForDocument,
+  REFS_COLLECTIONS_SORT_KEY,
+  REFS_PATH_FIELD,
+  REFS_REFERENCE_FIELD,
   type TernaryFilter,
 } from './datalayer';
 import {
@@ -213,8 +217,11 @@ export class Database {
 
   private collectionIndexDefinitions:
     | Record<string, Record<string, IndexDefinition>>
-    | undefined;
-  private _lookup: { [returnType: string]: LookupMapType } | undefined;
+    | undefined
+  private collectionReferences:
+    | Record<string, Record<string, string[]>>
+    | undefined
+  private _lookup: { [returnType: string]: LookupMapType } | undefined
 
   constructor(public config: DatabaseArgs) {
     this.tinaDirectory = config.tinaDirectory || 'tina';
@@ -369,9 +376,12 @@ export class Database {
       collection
     );
 
-    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
-    const collectionIndexDefinitions = indexDefinitions?.[collection.name];
-    const normalizedPath = normalizePath(filepath);
+    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel)
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    const collectionReferences = (await this.getCollectionReferences())?.[
+      collection.name
+    ]
+    const normalizedPath = normalizePath(filepath)
     if (!collection?.isDetached) {
       if (this.bridge) {
         await this.bridge.put(normalizedPath, stringifiedFile);
@@ -402,6 +412,14 @@ export class Database {
     let delOps: BatchOp[] = [];
     if (!isGitKeep(normalizedPath, collection)) {
       putOps = [
+        ...makeRefOpsForDocument(
+          normalizedPath,
+          collection?.name,
+          collectionReferences,
+          dataFields,
+          'put',
+          level
+        ),
         ...makeIndexOpsForDocument(
           normalizedPath,
           collection?.name,
@@ -430,6 +448,14 @@ export class Database {
 
       delOps = existingItem
         ? [
+            ...makeRefOpsForDocument(
+              normalizedPath,
+              collection?.name,
+              collectionReferences,
+              existingItem,
+              'del',
+              level
+            ),
             ...makeIndexOpsForDocument(
               normalizedPath,
               collection?.name,
@@ -487,6 +513,9 @@ export class Database {
           );
           collectionIndexDefinitions = indexDefinitions?.[collectionName];
         }
+        const collectionReferences = (await this.getCollectionReferences())?.[
+          collectionName
+        ]
 
         const normalizedPath = normalizePath(filepath);
         const dataFields = await this.formatBodyOnPayload(filepath, data);
@@ -555,6 +584,14 @@ export class Database {
         let delOps: BatchOp[] = [];
         if (!isGitKeep(normalizedPath, collection)) {
           putOps = [
+            ...makeRefOpsForDocument(
+              normalizedPath,
+              collectionName,
+              collectionReferences,
+              dataFields,
+              'put',
+              level
+            ),
             ...makeIndexOpsForDocument(
               normalizedPath,
               collectionName,
@@ -583,6 +620,14 @@ export class Database {
 
           delOps = existingItem
             ? [
+                ...makeRefOpsForDocument(
+                  normalizedPath,
+                  collectionName,
+                  collectionReferences,
+                  existingItem,
+                  'del',
+                  level
+                ),
                 ...makeIndexOpsForDocument(
                   normalizedPath,
                   collectionName,
@@ -819,6 +864,25 @@ export class Database {
     return this.tinaSchema;
   };
 
+  public getCollectionReferences = async (
+    level?: Level
+  ): Promise<Record<string, Record<string, string[]>>> => {
+    if (this.collectionReferences) {
+      return this.collectionReferences
+    }
+    const result: Record<string, Record<string, string[]>> = {}
+    const schema = await this.getSchema(level || this.contentLevel)
+    const collections = schema.getCollections()
+    for (const collection of collections) {
+      const collectionReferences = this.tinaSchema.findReferencesFromCollection(
+        collection.name
+      )
+      result[collection.name] = collectionReferences
+    }
+    this.collectionReferences = result
+    return result
+  }
+
   public getIndexDefinitions = async (
     level?: Level
   ): Promise<Record<string, Record<string, IndexDefinition>>> => {
@@ -831,7 +895,22 @@ export class Database {
           for (const collection of collections) {
             const indexDefinitions = {
               [DEFAULT_COLLECTION_SORT_KEY]: { fields: [] }, // provide a default sort key which is the file sort
-            };
+              // pseudo-index for the collection's references
+              [REFS_COLLECTIONS_SORT_KEY]: {
+                fields: [
+                  {
+                    name: REFS_REFERENCE_FIELD,
+                    type: 'string',
+                    list: false,
+                  },
+                  {
+                    name: REFS_PATH_FIELD,
+                    type: 'string',
+                    list: false,
+                  },
+                ],
+              },
+            }
 
             if (collection.fields) {
               for (const field of collection.fields as TinaField<true>[]) {
@@ -983,11 +1062,12 @@ export class Database {
         : '\uFFFF';
     }
 
-    let edges: { cursor: string; path: string }[] = [];
-    let startKey: string = '';
-    let endKey: string = '';
-    let hasPreviousPage = false;
-    let hasNextPage = false;
+    let edges: { cursor: string; path: string; value?: Record<string, any> }[] =
+      []
+    let startKey: string = ''
+    let endKey: string = ''
+    let hasPreviousPage = false
+    let hasNextPage = false
 
     const fieldsPattern = indexDefinition?.fields?.length
       ? `${indexDefinition.fields
@@ -1047,37 +1127,49 @@ export class Database {
         break;
       }
 
-      startKey = startKey || key || '';
-      endKey = key || '';
-      edges = [...edges, { cursor: key, path: filepath }];
+      startKey = startKey || key || ''
+      endKey = key || ''
+      edges = [...edges, { cursor: key, path: filepath, value: itemRecord }]
     }
 
     return {
-      edges: await sequential(edges, async (edge) => {
-        try {
-          const node = await hydrator(edge.path);
-          return {
-            node,
-            cursor: btoa(edge.cursor),
-          };
-        } catch (error) {
-          console.log(error);
-          if (
-            error instanceof Error &&
-            (!edge.path.includes('.tina/__generated__/_graphql.json') ||
-              !edge.path.includes('tina/__generated__/_graphql.json'))
-          ) {
-            throw new TinaQueryError({
-              originalError: error,
-              file: edge.path,
-              collection: collection.name,
-              stack: error.stack,
-            });
+      edges: await sequential(
+        edges,
+        async ({
+          cursor,
+          path,
+          value,
+        }: {
+          cursor: string
+          path: string
+          value?: Record<string, any>
+        }) => {
+          try {
+            // pass the path to the matched item and the raw index value
+            const node = await hydrator(path, value)
+            return {
+              node,
+              cursor: btoa(cursor),
+            }
+          } catch (error) {
+            console.log(error)
+            if (
+              error instanceof Error &&
+              (!path.includes('.tina/__generated__/_graphql.json') ||
+                !path.includes('tina/__generated__/_graphql.json'))
+            ) {
+              throw new TinaQueryError({
+                originalError: error,
+                file: path,
+                collection: collection.name,
+                stack: error.stack,
+              })
+            }
+            // I dont think this should ever happen
+            throw error
           }
-          // I dont think this should ever happen
-          throw error;
         }
-      }),
+      ),
       pageInfo: {
         hasPreviousPage,
         hasNextPage,
@@ -1259,8 +1351,11 @@ export class Database {
     if (!collection) {
       throw new Error(`No collection found for path: ${filepath}`);
     }
-    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
-    const collectionIndexDefinitions = indexDefinitions?.[collection.name];
+    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel)
+    const collectionReferences = (await this.getCollectionReferences())?.[
+      collection.name
+    ]
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
 
     let level = this.contentLevel;
     if (collection?.isDetached) {
@@ -1279,6 +1374,14 @@ export class Database {
         collection.path || ''
       );
       await this.contentLevel.batch([
+        ...makeRefOpsForDocument(
+          normalizedPath,
+          collection.name,
+          collectionReferences,
+          item,
+          'del',
+          level
+        ),
         ...makeIndexOpsForDocument<Record<string, any>>(
           normalizedPath,
           collection.name,
@@ -1491,6 +1594,9 @@ const _indexContent = async (
     }
     collectionPath = collection.path;
   }
+  const collectionReferences = (await database.getCollectionReferences())?.[
+    collection?.name
+  ]
 
   const tinaSchema = await database.getSchema();
   let templateInfo: CollectionTemplateable | null = null;
@@ -1529,6 +1635,14 @@ const _indexContent = async (
       const item = await rootSublevel.get(normalizedPath);
       if (item) {
         await database.contentLevel.batch([
+          ...makeRefOpsForDocument(
+            normalizedPath,
+            collection?.name,
+            collectionReferences,
+            item,
+            'del',
+            level
+          ),
           ...makeIndexOpsForDocument<Record<string, any>>(
             normalizedPath,
             collection.name,
@@ -1556,6 +1670,14 @@ const _indexContent = async (
 
       if (!isGitKeep(filepath, collection)) {
         await enqueueOps([
+          ...makeRefOpsForDocument(
+            normalizedPath,
+            collection?.name,
+            collectionReferences,
+            aliasedData,
+            'put',
+            level
+          ),
           ...makeIndexOpsForDocument<Record<string, any>>(
             normalizedPath,
             collection?.name,
@@ -1628,8 +1750,12 @@ const _deleteIndexContent = async (
     }
   }
 
-  const tinaSchema = await database.getSchema();
-  let templateInfo: CollectionTemplateable | null = null;
+  const collectionReferences = (await database.getCollectionReferences())?.[
+    collection?.name
+  ]
+
+  const tinaSchema = await database.getSchema()
+  let templateInfo: CollectionTemplateable | null = null
   if (collection) {
     templateInfo = tinaSchema.getTemplatesForCollectable(collection);
   }
@@ -1655,6 +1781,14 @@ const _deleteIndexContent = async (
           )
         : item;
       await enqueueOps([
+        ...makeRefOpsForDocument(
+          itemKey,
+          collection?.name,
+          collectionReferences,
+          aliasedData,
+          'del',
+          database.contentLevel
+        ),
         ...makeIndexOpsForDocument(
           itemKey,
           collection.name,
