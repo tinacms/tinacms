@@ -15,7 +15,7 @@ export const LinkToolbarButton = withRef<typeof ToolbarButton>((rest, ref) => {
   const { props } = useLinkToolbarButton(state)
 
   return (
-    <ToolbarButton ref={ref} tooltip="Link" {...props} {...rest}>
+    <ToolbarButton ref={ref} {...props} {...rest} tooltip="Link">
       <Icons.link />
     </ToolbarButton>
   )

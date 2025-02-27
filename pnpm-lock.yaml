@@ -98,6 +98,9 @@ importers:
             '@tinacms/cli':
                 specifier: workspace:*
                 version: link:../../packages/@tinacms/cli
+            '@tinacms/scripts':
+                specifier: workspace:*
+                version: link:../../packages/@tinacms/scripts
             '@types/node':
                 specifier: ^22.13.1
                 version: 22.13.1
@@ -187,6 +190,9 @@ importers:
             '@tinacms/cli':
                 specifier: workspace:*
                 version: link:../../packages/@tinacms/cli
+            '@tinacms/scripts':
+                specifier: workspace:*
+                version: link:../../packages/@tinacms/scripts
             autoprefixer:
                 specifier: ^10.4.20
                 version: 10.4.20(postcss@8.5.2)
@@ -257,6 +263,9 @@ importers:
             '@tinacms/cli':
                 specifier: workspace:*
                 version: link:../../packages/@tinacms/cli
+            '@tinacms/scripts':
+                specifier: workspace:*
+                version: link:../../packages/@tinacms/scripts
             '@types/node':
                 specifier: ^22.13.1
                 version: 22.13.1
@@ -327,6 +336,9 @@ importers:
             '@tinacms/cli':
                 specifier: workspace:*
                 version: link:../../packages/@tinacms/cli
+            '@tinacms/scripts':
+                specifier: workspace:*
+                version: link:../../packages/@tinacms/scripts
             '@types/node':
                 specifier: ^22.13.1
                 version: 22.13.1
@@ -382,6 +394,9 @@ importers:
             '@tinacms/cli':
                 specifier: workspace:*
                 version: link:../../packages/@tinacms/cli
+            '@tinacms/scripts':
+                specifier: workspace:*
+                version: link:../../packages/@tinacms/scripts
             eslint:
                 specifier: ^9.20.1
                 version: 9.20.1(jiti@1.21.6)
@@ -440,6 +455,9 @@ importers:
             '@tinacms/cli':
                 specifier: workspace:*
                 version: link:../../packages/@tinacms/cli
+            '@tinacms/scripts':
+                specifier: workspace:*
+                version: link:../../packages/@tinacms/scripts
             '@types/js-cookie':
                 specifier: ^3.0.6
                 version: 3.0.6
@@ -1194,6 +1212,9 @@ importers:
             fs-extra:
                 specifier: ^11.3.0
                 version: 11.3.0
+            json-diff:
+                specifier: ^1.0.6
+                version: 1.0.6
             tsup:
                 specifier: ^8.3.6
                 version: 8.3.6(jiti@1.21.6)(postcss@8.5.2)(typescript@5.7.3)(yaml@2.6.0)
@@ -4831,6 +4852,12 @@ packages:
                 integrity: sha512-lB05FkqEdUg2AA0xEbUz0SnkXT1LcCTa438W4IWTUh4hdOnVbQyOJ81OrDXsJk/LSiJHubgGEFoR5EHq1NsH1A==,
             }
         engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
+
+    '@ewoudenberg/difflib@0.1.0':
+        resolution:
+            {
+                integrity: sha512-OU5P5mJyD3OoWYMWY+yIgwvgNS9cFAU10f+DDuvtogcWQOoJIsQ4Hy2McSfUfhKjq8L0FuWVb4Rt7kgA+XK86A==,
+            }
 
     '@floating-ui/core@1.6.8':
         resolution:
@@ -10733,6 +10760,13 @@ packages:
                 integrity: sha512-3tlv/dIP7FWvj3BsbHrGLJ6l/oKh1O3TcgBqMn+yyCagOxc23fyzDS6HypQbgxWbkpDnf52p1LuR4eWDQ/K9WQ==,
             }
 
+    colors@1.4.0:
+        resolution:
+            {
+                integrity: sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==,
+            }
+        engines: { node: '>=0.1.90' }
+
     combined-stream@1.0.8:
         resolution:
             {
@@ -11902,6 +11936,13 @@ packages:
             }
         peerDependencies:
             react: '>=16.12.0'
+
+    dreamopt@0.8.0:
+        resolution:
+            {
+                integrity: sha512-vyJTp8+mC+G+5dfgsY+r3ckxlz+QMX40VjPQsZc5gxVAxLmi64TBoVkP54A/pRAXMXsbu2GMMBrZPxNv23waMg==,
+            }
+        engines: { node: '>=0.4.0' }
 
     dset@3.1.4:
         resolution:
@@ -13460,6 +13501,12 @@ packages:
                 integrity: sha512-H/vuk5TEEVZwrR0lp2zed9OCo1uAILMlx0JEMgC26rzyJJ3N1v6XkwHHXJQdR2doSjcGPM6OKPYoJgf0plJ11Q==,
             }
 
+    heap@0.2.7:
+        resolution:
+            {
+                integrity: sha512-2bsegYkkHO+h/9MGbn6KWcE45cHZgPANo5LXF7EvWdT0yT2EguSVO1nDgU5c8+ZOPwp2vMNa7YFsJhVcDR9Sdg==,
+            }
+
     hey-listen@1.0.8:
         resolution:
             {
@@ -14737,6 +14784,13 @@ packages:
             {
                 integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==,
             }
+
+    json-diff@1.0.6:
+        resolution:
+            {
+                integrity: sha512-tcFIPRdlc35YkYdGxcamJjllUhXWv4n2rK9oJ2RsAzV4FBkuV4ojKEDgcZ+kpKxDmJKv+PFK65+1tVVOnSeEqA==,
+            }
+        hasBin: true
 
     json-parse-even-better-errors@2.3.1:
         resolution:
@@ -23869,6 +23923,10 @@ snapshots:
             '@eslint/core': 0.10.0
             levn: 0.4.1
 
+    '@ewoudenberg/difflib@0.1.0':
+        dependencies:
+            heap: 0.2.7
+
     '@floating-ui/core@1.6.8':
         dependencies:
             '@floating-ui/utils': 0.2.8
@@ -28417,6 +28475,8 @@ snapshots:
 
     colorette@2.0.19: {}
 
+    colors@1.4.0: {}
+
     combined-stream@1.0.8:
         dependencies:
             delayed-stream: 1.0.0
@@ -29071,6 +29131,10 @@ snapshots:
             react: 18.3.1
             react-is: 17.0.2
             tslib: 2.8.1
+
+    dreamopt@0.8.0:
+        dependencies:
+            wordwrap: 1.0.0
 
     dset@3.1.4: {}
 
@@ -30676,6 +30740,8 @@ snapshots:
             capital-case: 1.0.4
             tslib: 2.8.1
 
+    heap@0.2.7: {}
+
     hey-listen@1.0.8: {}
 
     history@5.3.0:
@@ -31577,6 +31643,12 @@ snapshots:
     jsesc@3.0.2: {}
 
     json-buffer@3.0.1: {}
+
+    json-diff@1.0.6:
+        dependencies:
+            '@ewoudenberg/difflib': 0.1.0
+            colors: 1.4.0
+            dreamopt: 0.8.0
 
     json-parse-even-better-errors@2.3.1: {}
 
