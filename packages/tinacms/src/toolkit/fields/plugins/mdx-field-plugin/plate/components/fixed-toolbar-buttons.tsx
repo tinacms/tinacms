@@ -1,16 +1,8 @@
-import {
-  ELEMENT_OL,
-  ELEMENT_TABLE,
-  ELEMENT_UL,
-  MARK_BOLD,
-  MARK_CODE,
-  MARK_ITALIC,
-  MARK_STRIKETHROUGH,
-} from '@udecode/plate';
-import { useEditorState } from '@udecode/plate-common';
-import React from 'react';
-import { useResize } from '../hooks/use-resize';
-import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
+import { ELEMENT_TABLE } from '@udecode/plate'
+import { useEditorState } from '@udecode/plate-common'
+import React from 'react'
+import { useResize } from '../hooks/use-resize'
+import { helpers, unsupportedItemsInTable } from '../plugins/core/common'
 import {
   CONTAINER_MD_BREAKPOINT,
   EMBED_ICON_WIDTH,
@@ -20,22 +12,29 @@ import {
   HEADING_LABEL,
   STANDARD_ICON_WIDTH,
   type ToolbarOverrideType,
-} from '../toolbar/toolbar-overrides';
-import { useToolbarContext } from '../toolbar/toolbar-provider';
-import { HeadingsMenu } from './headings-dropdown';
-import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button';
-import { Icons } from './plate-ui/icons';
-import { ImageToolbarButton } from './plate-ui/image-toolbar-button';
-import { IndentListToolbarButton } from './plate-ui/indent-list-toolbar-button';
-import { LinkToolbarButton } from './plate-ui/link-toolbar-button';
-import { MarkToolbarButton } from './plate-ui/mark-toolbar-button';
-import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button';
-import OverflowMenu from './plate-ui/overflow-menu';
-import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button';
-import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button';
-import { TableDropdownMenu } from './plate-ui/table-dropdown-menu';
-import TemplatesToolbarButton from './plate-ui/templates-toolbar-button';
-import { ToolbarGroup } from './plate-ui/toolbar';
+} from '../toolbar/toolbar-overrides'
+import { useToolbarContext } from '../toolbar/toolbar-provider'
+import { HeadingsMenu } from './headings-dropdown'
+import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button'
+import { ImageToolbarButton } from './plate-ui/image-toolbar-button'
+import {
+  OrderedListToolbarButton,
+  UnorderedListToolbarButton,
+} from './plate-ui/indent-list-toolbar-button'
+import { LinkToolbarButton } from './plate-ui/link-toolbar-button'
+import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button'
+import OverflowMenu from './plate-ui/overflow-menu'
+import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button'
+import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button'
+import { TableDropdownMenu } from './plate-ui/table-dropdown-menu'
+import TemplatesToolbarButton from './plate-ui/templates-toolbar-button'
+import { ToolbarGroup } from './plate-ui/toolbar'
+import {
+  BoldToolbarButton,
+  StrikethroughToolbarButton,
+  ItalicToolbarButton,
+  CodeToolbarButton,
+} from './plate-ui/mark-toolbar-button'
 
 type ToolbarItem = {
   label: string;
@@ -67,53 +66,37 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   quote: {
     label: 'Quote',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <QuoteToolbarButton tooltip='Quote Quote (⌘+⇧+.)' />,
+    Component: <QuoteToolbarButton />,
   },
   ul: {
     label: 'Unordered List',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <IndentListToolbarButton nodeType={ELEMENT_UL} />,
+    Component: <UnorderedListToolbarButton />,
   },
   ol: {
     label: 'Ordered List',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <IndentListToolbarButton nodeType={ELEMENT_OL} />,
+    Component: <OrderedListToolbarButton />,
   },
   bold: {
     label: 'Bold',
     width: () => STANDARD_ICON_WIDTH,
-    Component: (
-      <MarkToolbarButton tooltip='Bold (⌘+B)' nodeType={MARK_BOLD}>
-        <Icons.bold />
-      </MarkToolbarButton>
-    ),
+    Component: <BoldToolbarButton />,
   },
   strikethrough: {
     label: 'Strikethrough',
     width: () => STANDARD_ICON_WIDTH,
-    Component: (
-      <MarkToolbarButton tooltip='Strikethrough ' nodeType={MARK_STRIKETHROUGH}>
-        <Icons.strikethrough />
-      </MarkToolbarButton>
-    ),
+    Component: <StrikethroughToolbarButton />,
   },
   italic: {
     label: 'Italic',
     width: () => STANDARD_ICON_WIDTH,
-    Component: (
-      <MarkToolbarButton tooltip='Italic (⌘+I)' nodeType={MARK_ITALIC}>
-        <Icons.italic />
-      </MarkToolbarButton>
-    ),
+    Component: <ItalicToolbarButton />,
   },
   code: {
     label: 'Code',
     width: () => STANDARD_ICON_WIDTH,
-    Component: (
-      <MarkToolbarButton tooltip='Code (⌘+E)' nodeType={MARK_CODE}>
-        <Icons.code />
-      </MarkToolbarButton>
-    ),
+    Component: <CodeToolbarButton />,
   },
   codeBlock: {
     label: 'Code Block',

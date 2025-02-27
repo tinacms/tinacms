@@ -502,12 +502,12 @@ const SidebarHeader = ({
             {displayState === 'fullscreen' ? (
               // BiCollapseAlt
               <svg
-                className='h-5 w-auto -mx-1 text-blue-500'
-                stroke='currentColor'
-                fill='currentColor'
-                stroke-width='0'
-                viewBox='0 0 24 24'
-                xmlns='http://www.w3.org/2000/svg'
+                className="h-5 w-auto -mx-1 text-blue-500"
+                stroke="currentColor"
+                fill="currentColor"
+                strokeWidth="0"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
               >
                 <path d='M2 15h7v7h2v-9H2v2zM15 2h-2v9h9V9h-7V2z'></path>
               </svg>

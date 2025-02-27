@@ -54,7 +54,7 @@ export const ImageToolbarButton = withRef<
   const { props } = useImageToolbarButton(state);
 
   return (
-    <ToolbarButton ref={ref} tooltip='Link' {...rest} {...props}>
+    <ToolbarButton ref={ref} tooltip="Image" {...rest} {...props}>
       <Icons.image />
     </ToolbarButton>
   );

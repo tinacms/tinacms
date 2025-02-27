@@ -2,7 +2,7 @@ import React from 'react';
 import { withRef } from '@udecode/cn';
 import { Icons } from './icons';
 import {
-  type ELEMENT_OL,
+  ELEMENT_OL,
   ELEMENT_UL,
   toggleList,
   useListToolbarButton,
@@ -11,28 +11,48 @@ import {
 import { ToolbarButton } from './toolbar';
 import { useEditorState } from '@udecode/plate-common';
 
-export const IndentListToolbarButton = withRef<
-  typeof ToolbarButton,
-  {
-    nodeType?: typeof ELEMENT_UL | typeof ELEMENT_OL;
-  }
->(({ nodeType = ELEMENT_UL }, ref) => {
-  const editor = useEditorState();
-  const state = useListToolbarButtonState({ nodeType });
-  const { props } = useListToolbarButton(state);
+export const UnorderedListToolbarButton = withRef<typeof ToolbarButton>(
+  (props, ref) => {
+    const editor = useEditorState()
+    const state = useListToolbarButtonState({ nodeType: ELEMENT_UL })
+    const { props: buttonProps } = useListToolbarButton(state)
 
-  return (
-    <ToolbarButton
-      ref={ref}
-      tooltip={nodeType === ELEMENT_UL ? 'Bulleted List' : 'Numbered List'}
-      {...props}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleList(editor, { type: nodeType });
-      }}
-    >
-      {nodeType === ELEMENT_UL ? <Icons.ul /> : <Icons.ol />}
-    </ToolbarButton>
-  );
-});
+    return (
+      <ToolbarButton
+        ref={ref}
+        tooltip="Bulleted List"
+        {...buttonProps}
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          toggleList(editor, { type: ELEMENT_UL })
+        }}
+      >
+        <Icons.ul />
+      </ToolbarButton>
+    )
+  }
+)
+
+export const OrderedListToolbarButton = withRef<typeof ToolbarButton>(
+  (props, ref) => {
+    const editor = useEditorState()
+    const state = useListToolbarButtonState({ nodeType: ELEMENT_OL })
+    const { props: buttonProps } = useListToolbarButton(state)
+
+    return (
+      <ToolbarButton
+        ref={ref}
+        tooltip="Numbered List"
+        {...buttonProps}
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          toggleList(editor, { type: ELEMENT_OL })
+        }}
+      >
+        <Icons.ol />
+      </ToolbarButton>
+    )
+  }
+)

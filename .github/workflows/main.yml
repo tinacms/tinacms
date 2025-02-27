@@ -62,6 +62,9 @@ jobs:
       - name: Build Types
         run: pnpm types
 
+      - name: Check Tina lock changes
+        run: pnpm diff-tina-lock
+
       - name: Set NPMRC
         run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
         env:
