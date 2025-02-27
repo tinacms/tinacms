@@ -11,7 +11,7 @@
 	},
 	"dependencies": {
 		"axios": "1.7.5",
-		"next": "^14.2.24",
+		"next": "^14.2.21",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-is": "^18.3.1",
