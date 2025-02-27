@@ -3,7 +3,7 @@
 */
 
 export function hasDuplicates<T = any>(array: T[] = []) {
-  return new Set(array).size !== array.length
+  return new Set(array).size !== array.length;
 }
 
 /**
@@ -17,8 +17,8 @@ export function findDuplicates<T = any>(
   // get a list of unique duplicates in array
   const duplicates = [
     ...new Set(array.filter((item, index) => array.indexOf(item) !== index)),
-  ].map((x) => `"${x}"`)
+  ].map((x) => `"${x}"`);
   if (duplicates.length) {
-    return duplicates.join(', ')
-  } else return undefined
+    return duplicates.join(', ');
+  } else return undefined;
 }

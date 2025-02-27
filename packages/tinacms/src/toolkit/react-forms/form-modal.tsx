@@ -1,18 +1,18 @@
-import * as React from 'react'
+import * as React from 'react';
 import {
   Modal,
   ModalHeader,
   ModalBody,
   PopupModal,
-} from '@toolkit/react-modals'
-import { FormBuilder } from '@toolkit/form-builder'
-import { useMemo } from 'react'
-import { Form } from '@toolkit/forms'
-import { useCMS } from '@toolkit/react-core'
+} from '@toolkit/react-modals';
+import { FormBuilder } from '@toolkit/form-builder';
+import { useMemo } from 'react';
+import { Form } from '@toolkit/forms';
+import { useCMS } from '@toolkit/react-core';
 
 // Pretty sure this isn't used anymore
 export const FormModal = ({ plugin, close }: any) => {
-  const cms = useCMS()
+  const cms = useCMS();
   const form: Form = useMemo(
     () =>
       new Form({
@@ -26,15 +26,15 @@ export const FormModal = ({ plugin, close }: any) => {
         onChange: plugin.onChange,
         onSubmit: async (values) => {
           await plugin.onSubmit(values, cms).then(() => {
-            close()
-          })
+            close();
+          });
         },
       }),
     [close, cms, plugin]
-  )
+  );
 
   return (
-    <Modal id="content-creator-modal" onClick={(e) => e.stopPropagation()}>
+    <Modal id='content-creator-modal' onClick={(e) => e.stopPropagation()}>
       <PopupModal>
         <ModalHeader close={close}>{plugin.name}</ModalHeader>
         <ModalBody>
@@ -42,5 +42,5 @@ export const FormModal = ({ plugin, close }: any) => {
         </ModalBody>
       </PopupModal>
     </Modal>
-  )
-}
+  );
+};

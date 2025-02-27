@@ -1,5 +1,5 @@
-import React from 'react'
-import { Plugin } from '@toolkit/core'
+import React from 'react';
+import { Plugin } from '@toolkit/core';
 
 /**
  * Represents a Screen that should be accessible via the CMS.
@@ -14,30 +14,30 @@ import { Plugin } from '@toolkit/core'
  * * Layout Configuration e.g. Menus
  */
 export interface ScreenPlugin<ExtraProps = {}> extends Plugin {
-  __type: 'screen'
-  Component(props: ScreenComponentProps & ExtraProps): React.ReactElement
-  Icon: any
-  layout: 'fullscreen' | 'popup'
-  navCategory?: 'Account' | 'Site'
+  __type: 'screen';
+  Component(props: ScreenComponentProps & ExtraProps): React.ReactElement;
+  Icon: any;
+  layout: 'fullscreen' | 'popup';
+  navCategory?: 'Account' | 'Site';
 }
 
 /**
  * The set of props passed to all Screen Components.
  */
 export interface ScreenComponentProps {
-  close(): void
+  close(): void;
 }
 
 /**
  * An options object used to create Screen Plugins.
  */
 export interface ScreenOptions<ExtraProps = {}> {
-  name: string
-  Component: React.FC<ExtraProps & ScreenComponentProps>
-  Icon: any
-  layout?: ScreenPlugin['layout']
-  props?: ExtraProps
-  navCategory?: 'Account' | 'Site'
+  name: string;
+  Component: React.FC<ExtraProps & ScreenComponentProps>;
+  Icon: any;
+  layout?: ScreenPlugin['layout'];
+  props?: ExtraProps;
+  navCategory?: 'Account' | 'Site';
 }
 
 /**
@@ -55,7 +55,7 @@ export function createScreen<ExtraProps>({
     layout: 'popup',
     ...options,
     Component(screenProps) {
-      return <Component {...screenProps} {...props} />
+      return <Component {...screenProps} {...props} />;
     },
-  }
+  };
 }

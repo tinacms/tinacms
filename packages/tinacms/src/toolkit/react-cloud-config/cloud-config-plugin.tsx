@@ -1,7 +1,7 @@
-import { MdOutlineCloud } from 'react-icons/md'
+import { MdOutlineCloud } from 'react-icons/md';
 
-import { Plugin } from '@toolkit/core'
-import type { IconType } from 'react-icons'
+import { Plugin } from '@toolkit/core';
+import type { IconType } from 'react-icons';
 
 /**
  * Represents a Tina Cloud Config that should be accessible via the CMS.
@@ -14,26 +14,26 @@ import type { IconType } from 'react-icons'
  * * User Management
  */
 export interface CloudConfigPlugin extends Plugin {
-  __type: 'cloud-config'
-  text?: string
-  Icon: any
+  __type: 'cloud-config';
+  text?: string;
+  Icon: any;
   link: {
-    text: string
-    href: string
-  }
+    text: string;
+    href: string;
+  };
 }
 
 /**
  * An options object used to create Cloud Config Plugins.
  */
 export interface CloudConfigOptions {
-  name: string
-  text?: string
+  name: string;
+  text?: string;
   link: {
-    text: string
-    href: string
-  }
-  Icon?: IconType
+    text: string;
+    href: string;
+  };
+  Icon?: IconType;
 }
 
 /**
@@ -48,5 +48,5 @@ export function createCloudConfig({
     __type: 'cloud-config',
     Icon: MdOutlineCloud,
     ...options,
-  }
+  };
 }

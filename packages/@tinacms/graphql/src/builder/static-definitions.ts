@@ -2,7 +2,7 @@
 
 */
 
-import { astBuilder } from '../ast-builder'
+import { astBuilder } from '../ast-builder';
 
 /**
  * Definitions for static interfaces which are identical
@@ -78,7 +78,7 @@ const interfaceDefinitions = [
       }),
     ],
   }),
-]
+];
 
 /**
  * Definitions for additional scalars, ex. JSON
@@ -191,6 +191,6 @@ const scalarDefinitions = [
       }),
     ],
   }),
-]
+];
 
-export const staticDefinitions = [...scalarDefinitions, interfaceDefinitions]
+export const staticDefinitions = [...scalarDefinitions, interfaceDefinitions];

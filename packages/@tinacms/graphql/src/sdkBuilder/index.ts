@@ -2,13 +2,13 @@
 
 */
 
-import type { TinaSchema } from '@tinacms/schema-tools'
-import { NAMER } from '../ast-builder'
+import type { TinaSchema } from '@tinacms/schema-tools';
+import { NAMER } from '../ast-builder';
 
 export const buildSKD = (tinaSchema: TinaSchema) => {
   const methods = tinaSchema.getCollections().map((collection) => {
-    const queryName = NAMER.queryName(collection.namespace)
-    const listQueryName = NAMER.generateQueryListName(collection.namespace)
+    const queryName = NAMER.queryName(collection.namespace);
+    const listQueryName = NAMER.generateQueryListName(collection.namespace);
     return `public ${queryName}(args: { relativePath: string }) {
         // const name = 'getAuthorDocument'
         // this._usedFrags.push(name)
@@ -29,10 +29,10 @@ export const buildSKD = (tinaSchema: TinaSchema) => {
     // this._selections.push(currentFrag)
     return this
   }
-  `
-  })
+  `;
+  });
 
   return `export class TinaGQLClient {
   ${methods.join('\n')}
-}`
-}
+}`;
+};

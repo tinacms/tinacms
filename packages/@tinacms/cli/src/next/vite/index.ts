@@ -1,16 +1,16 @@
-import path from 'node:path'
-import type { Database } from '@tinacms/graphql'
-import react from '@vitejs/plugin-react'
-import fs from 'fs-extra'
-import normalizePath from 'normalize-path'
+import path from 'node:path';
+import type { Database } from '@tinacms/graphql';
+import react from '@vitejs/plugin-react';
+import fs from 'fs-extra';
+import normalizePath from 'normalize-path';
 import {
   type BuildOptions,
   type InlineConfig,
   type Plugin,
   splitVendorChunkPlugin,
-} from 'vite'
-import type { ConfigManager } from '../config-manager'
-import { tinaTailwind } from './tailwind'
+} from 'vite';
+import type { ConfigManager } from '../config-manager';
+import { tinaTailwind } from './tailwind';
 
 /**
  * This type is duplicated in he `TinaMediaStore`
@@ -18,20 +18,20 @@ import { tinaTailwind } from './tailwind'
  * and can be referenced in the media manager
  */
 interface StaticMediaItem {
-  id: string
-  filename: string
-  src: string
-  directory: string
+  id: string;
+  filename: string;
+  src: string;
+  directory: string;
   thumbnails: {
-    '75x75': string
-    '400x400': string
-    '1000x1000': string
-  }
-  type: 'file' | 'dir'
-  children?: StaticMedia
+    '75x75': string;
+    '400x400': string;
+    '1000x1000': string;
+  };
+  type: 'file' | 'dir';
+  children?: StaticMedia;
 }
 export interface StaticMedia {
-  [offset: string]: StaticMediaItem[]
+  [offset: string]: StaticMediaItem[];
 }
 
 async function listFilesRecursively({
@@ -39,26 +39,26 @@ async function listFilesRecursively({
   config,
   roothPath,
 }: {
-  directoryPath: string
-  config: { publicFolder: string; mediaRoot: string }
-  roothPath: string
+  directoryPath: string;
+  config: { publicFolder: string; mediaRoot: string };
+  roothPath: string;
 }): Promise<StaticMedia> {
   const fullDirectoryPath = path.join(
     roothPath,
     config.publicFolder,
     directoryPath
-  )
-  const exists = await fs.pathExists(fullDirectoryPath)
+  );
+  const exists = await fs.pathExists(fullDirectoryPath);
   if (!exists) {
-    return { '0': [] }
+    return { '0': [] };
   }
-  const items = await fs.readdir(fullDirectoryPath)
+  const items = await fs.readdir(fullDirectoryPath);
 
-  const staticMediaItems: StaticMediaItem[] = []
+  const staticMediaItems: StaticMediaItem[] = [];
 
   for (const item of items) {
-    const itemPath = path.join(fullDirectoryPath, item)
-    const stats = await fs.promises.lstat(itemPath)
+    const itemPath = path.join(fullDirectoryPath, item);
+    const stats = await fs.promises.lstat(itemPath);
 
     const staticMediaItem: StaticMediaItem = {
       id: item,
@@ -71,31 +71,31 @@ async function listFilesRecursively({
         '400x400': `/${path.join(directoryPath, item)}`,
         '1000x1000': `/${path.join(directoryPath, item)}`,
       },
-    }
+    };
 
     if (stats.isDirectory()) {
       staticMediaItem.children = await listFilesRecursively({
         directoryPath: path.join(directoryPath, item),
         config,
         roothPath,
-      })
+      });
     }
-    staticMediaItems.push(staticMediaItem)
+    staticMediaItems.push(staticMediaItem);
   }
   function chunkArrayIntoObject<T>(
     array: T[],
     chunkSize: number
   ): { [key: string]: T[] } {
-    const result: { [key: string]: T[] } = {}
+    const result: { [key: string]: T[] } = {};
 
     for (let i = 0; i < array.length; i += chunkSize) {
-      const chunkKey = `${(i / chunkSize) * 20}`
-      result[chunkKey] = array.slice(i, i + chunkSize)
+      const chunkKey = `${(i / chunkSize) * 20}`;
+      result[chunkKey] = array.slice(i, i + chunkSize);
     }
 
-    return result
+    return result;
   }
-  return chunkArrayIntoObject(staticMediaItems, 20)
+  return chunkArrayIntoObject(staticMediaItems, 20);
 }
 
 export const createConfig = async ({
@@ -105,15 +105,15 @@ export const createConfig = async ({
   noWatch,
   rollupOptions,
 }: {
-  configManager: ConfigManager
-  database: Database
-  apiURL: string
-  noWatch: boolean
-  plugins?: Plugin[]
-  rollupOptions?: BuildOptions['rollupOptions']
+  configManager: ConfigManager;
+  database: Database;
+  apiURL: string;
+  noWatch: boolean;
+  plugins?: Plugin[];
+  rollupOptions?: BuildOptions['rollupOptions'];
 }) => {
   // TODO: make this configurable
-  const publicEnv: Record<string, string> = {}
+  const publicEnv: Record<string, string> = {};
   Object.keys(process.env).forEach((key) => {
     if (
       key.startsWith('TINA_PUBLIC_') ||
@@ -124,34 +124,34 @@ export const createConfig = async ({
       try {
         // if the value is a string, we can just use it
         if (typeof process.env[key] === 'string') {
-          publicEnv[key] = process.env[key] as string
+          publicEnv[key] = process.env[key] as string;
         } else {
           // otherwise, we need to stringify it
-          publicEnv[key] = JSON.stringify(process.env[key])
+          publicEnv[key] = JSON.stringify(process.env[key]);
         }
       } catch (error) {
         // if we can't stringify it, we'll just warn the user
         console.warn(
           `Could not stringify public env process.env.${key} env variable`
-        )
-        console.warn(error)
+        );
+        console.warn(error);
       }
     }
-  })
+  });
 
   const staticMediaPath: string = path.join(
     configManager.generatedFolderPath,
     'static-media.json'
-  )
+  );
   if (configManager.config.media?.tina?.static) {
     const staticMedia = await listFilesRecursively({
       directoryPath: configManager.config.media.tina?.mediaRoot || '',
       config: configManager.config.media.tina,
       roothPath: configManager.rootPath,
-    })
-    await fs.outputFile(staticMediaPath, JSON.stringify(staticMedia, null, 2))
+    });
+    await fs.outputFile(staticMediaPath, JSON.stringify(staticMedia, null, 2));
   } else {
-    await fs.outputFile(staticMediaPath, `[]`)
+    await fs.outputFile(staticMediaPath, `[]`);
   }
 
   const alias = {
@@ -162,27 +162,27 @@ export const createConfig = async ({
     fs: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     os: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     path: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
-  }
+  };
 
   if (configManager.shouldSkipSDK()) {
     alias['CLIENT_IMPORT'] = path.join(
       configManager.spaRootPath,
       'src',
       'dummy-client.ts'
-    )
+    );
   } else {
     alias['CLIENT_IMPORT'] = configManager.isUsingTs()
       ? configManager.generatedTypesTSFilePath
-      : configManager.generatedTypesJSFilePath
+      : configManager.generatedTypesJSFilePath;
   }
 
-  let basePath
+  let basePath;
   if (configManager.config.build.basePath) {
-    basePath = configManager.config.build.basePath
+    basePath = configManager.config.build.basePath;
   }
 
-  const fullVersion = configManager.getTinaGraphQLVersion()
-  const version = `${fullVersion.major}.${fullVersion.minor}`
+  const fullVersion = configManager.getTinaGraphQLVersion();
+  const version = `${fullVersion.major}.${fullVersion.minor}`;
   const config: InlineConfig = {
     root: configManager.spaRootPath,
     base: `/${basePath ? `${normalizePath(basePath)}/` : ''}${normalizePath(
@@ -259,7 +259,7 @@ export const createConfig = async ({
       tinaTailwind(configManager.spaRootPath, configManager.prebuildFilePath),
       ...plugins,
     ],
-  }
+  };
 
-  return config
-}
+  return config;
+};

@@ -2,7 +2,7 @@
 
 */
 
-export * from './addNamespaceToSchema'
-export * from './TinaSchema'
-export * from './resolveField'
-export * from './resolveForm'
+export * from './addNamespaceToSchema';
+export * from './TinaSchema';
+export * from './resolveField';
+export * from './resolveForm';

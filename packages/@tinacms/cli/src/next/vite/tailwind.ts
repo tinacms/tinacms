@@ -1,10 +1,10 @@
-import path from 'node:path'
-import aspectRatio from '@tailwindcss/aspect-ratio'
-import containerQueries from '@tailwindcss/container-queries'
-import twTypography from '@tailwindcss/typography'
-import tailwind from 'tailwindcss'
-import defaultTheme from 'tailwindcss/defaultTheme.js'
-import type { Plugin } from 'vite'
+import path from 'node:path';
+import aspectRatio from '@tailwindcss/aspect-ratio';
+import containerQueries from '@tailwindcss/container-queries';
+import twTypography from '@tailwindcss/typography';
+import tailwind from 'tailwindcss';
+import defaultTheme from 'tailwindcss/defaultTheme.js';
+import type { Plugin } from 'vite';
 
 export const tinaTailwind = (
   spaPath: string,
@@ -14,12 +14,12 @@ export const tinaTailwind = (
     name: 'vite-plugin-tina',
     // @ts-ignore
     config: (viteConfig) => {
-      const plugins: Plugin[] = []
+      const plugins: Plugin[] = [];
       const content = [
         path.join(spaPath, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
         prebuildFilePath,
         require.resolve('tinacms'),
-      ]
+      ];
 
       const tw = tailwind({
         theme: {
@@ -259,8 +259,8 @@ export const tinaTailwind = (
           aspectRatio,
           containerQueries,
         ],
-      }) as unknown as Plugin
-      plugins.push(tw)
+      }) as unknown as Plugin;
+      plugins.push(tw);
 
       return {
         css: {
@@ -268,7 +268,7 @@ export const tinaTailwind = (
             plugins,
           },
         },
-      }
+      };
     },
-  }
-}
+  };
+};

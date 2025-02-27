@@ -20,10 +20,10 @@ import {
   visit,
   type Visitor,
   visitWithTypeInfo,
-} from 'graphql'
-import set from 'lodash.set'
+} from 'graphql';
+import set from 'lodash.set';
 
-type VisitorType = Visitor<ASTKindToNode, ASTNode>
+type VisitorType = Visitor<ASTKindToNode, ASTNode>;
 
 /**
  *
@@ -85,68 +85,68 @@ type VisitorType = Visitor<ASTKindToNode, ASTNode>
  * ```
  */
 export const formify = (query: DocumentNode, schema: GraphQLSchema) => {
-  const typeInfo = new TypeInfo(schema)
+  const typeInfo = new TypeInfo(schema);
 
   const pathsToPopulate: {
-    path: string
+    path: string;
     paths: {
-      path: string[]
-      ast: object
-    }[]
-  }[] = []
+      path: string[];
+      ast: object;
+    }[];
+  }[] = [];
 
   const visitor: VisitorType = {
     leave(node, key, parent, path, ancestors) {
-      const type = typeInfo.getType()
+      const type = typeInfo.getType();
       if (type) {
-        const namedType = getNamedType(type)
+        const namedType = getNamedType(type);
 
         if (namedType instanceof GraphQLObjectType) {
           const hasNodeInterface = !!namedType
             .getInterfaces()
-            .find((i) => i.name === 'Node')
+            .find((i) => i.name === 'Node');
           if (hasNodeInterface) {
             // Instead of this, there's probably a more fine-grained visitor key to use
             if (typeof path[path.length - 1] === 'number') {
-              assertIsObjectType(namedType)
+              assertIsObjectType(namedType);
 
-              const valuesNode = namedType.getFields().values
+              const valuesNode = namedType.getFields().values;
               const namedValuesNode = getNamedType(
                 valuesNode.type
-              ) as GraphQLNamedType
-              const pathForValues = [...path]
-              pathForValues.push('selectionSet')
-              pathForValues.push('selections')
-              const valuesAst = buildValuesForType(namedValuesNode)
+              ) as GraphQLNamedType;
+              const pathForValues = [...path];
+              pathForValues.push('selectionSet');
+              pathForValues.push('selections');
+              const valuesAst = buildValuesForType(namedValuesNode);
               // High number to make sure this index isn't taken
               // might be more performant for it to be a low number though
               // use setWith instead
-              pathForValues.push(100)
+              pathForValues.push(100);
 
-              const formNode = namedType.getFields().form
+              const formNode = namedType.getFields().form;
               const namedFormNode = getNamedType(
                 formNode.type
-              ) as GraphQLNamedType
+              ) as GraphQLNamedType;
 
-              const pathForForm = [...path]
+              const pathForForm = [...path];
 
-              pathForForm.push('selectionSet')
-              pathForForm.push('selections')
+              pathForForm.push('selectionSet');
+              pathForForm.push('selections');
               // High number to make sure this index isn't taken
               // might be more performant for it to be a low number though
               // use setWith instead
-              const formAst = buildFormForType(namedFormNode)
-              pathForForm.push(101)
+              const formAst = buildFormForType(namedFormNode);
+              pathForForm.push(101);
 
-              const sysNode = namedType.getFields().sys
+              const sysNode = namedType.getFields().sys;
               const namedSysNode = getNamedType(
                 sysNode.type
-              ) as GraphQLNamedType
-              const pathForSys = [...path]
-              pathForSys.push('selectionSet')
-              pathForSys.push('selections')
-              const sysAst = buildSysForType(namedSysNode)
-              pathForSys.push(102)
+              ) as GraphQLNamedType;
+              const pathForSys = [...path];
+              pathForSys.push('selectionSet');
+              pathForSys.push('selections');
+              const sysAst = buildSysForType(namedSysNode);
+              pathForSys.push(102);
 
               pathsToPopulate.push({
                 path: path.map((p) => p.toString()).join('-'),
@@ -164,41 +164,41 @@ export const formify = (query: DocumentNode, schema: GraphQLSchema) => {
                     ast: sysAst,
                   },
                 ],
-              })
+              });
             }
           }
         }
       }
     },
-  }
+  };
 
-  visit(query, visitWithTypeInfo(typeInfo, visitor))
+  visit(query, visitWithTypeInfo(typeInfo, visitor));
 
   // We don't want to build form/value fields for nested nodes (for now)
   // so filter out paths which aren't "top-level" ones
   const topLevelPaths = pathsToPopulate.filter((p, i) => {
-    const otherPaths = pathsToPopulate.filter((_, index) => index !== i)
+    const otherPaths = pathsToPopulate.filter((_, index) => index !== i);
     const isChildOfOtherPaths = otherPaths.some((op) => {
       if (p.path.startsWith(op.path)) {
-        return true
+        return true;
       } else {
-        return false
+        return false;
       }
-    })
+    });
     if (isChildOfOtherPaths) {
-      return false
+      return false;
     } else {
-      return true
+      return true;
     }
-  })
+  });
   topLevelPaths.map((p) => {
     p.paths.map((pathNode) => {
-      set(query, pathNode.path, pathNode.ast)
-    })
-  })
+      set(query, pathNode.path, pathNode.ast);
+    });
+  });
 
-  return query
-}
+  return query;
+};
 
 /**
  *
@@ -209,7 +209,7 @@ export const formify = (query: DocumentNode, schema: GraphQLSchema) => {
  *
  */
 const buildSysForType = (type: GraphQLNamedType): FieldNode => {
-  assertIsObjectType(type)
+  assertIsObjectType(type);
 
   return {
     kind: 'Field' as const,
@@ -232,16 +232,16 @@ const buildSysForType = (type: GraphQLNamedType): FieldNode => {
             filteredFields: fields.filter(
               (field) => field.name !== 'documents'
             ),
-          }
+          };
         }
       ),
     },
-  }
-}
+  };
+};
 
 const buildValuesForType = (type: GraphQLNamedType): FieldNode => {
   try {
-    assertIsUnionType(type)
+    assertIsUnionType(type);
 
     return {
       kind: 'Field' as const,
@@ -253,7 +253,7 @@ const buildValuesForType = (type: GraphQLNamedType): FieldNode => {
         kind: 'SelectionSet' as const,
         selections: buildSelectionInlineFragments(type.getTypes()),
       },
-    }
+    };
   } catch (e) {
     // FIXME: PRIMITIVE types
     return {
@@ -262,13 +262,13 @@ const buildValuesForType = (type: GraphQLNamedType): FieldNode => {
         kind: 'Name' as const,
         value: 'values',
       },
-    }
+    };
   }
-}
+};
 
 const buildFormForType = (type: GraphQLNamedType): FieldNode => {
   try {
-    assertIsUnionType(type)
+    assertIsUnionType(type);
 
     return {
       kind: 'Field' as const,
@@ -280,7 +280,7 @@ const buildFormForType = (type: GraphQLNamedType): FieldNode => {
         kind: 'SelectionSet' as const,
         selections: buildSelectionInlineFragments(type.getTypes()),
       },
-    }
+    };
   } catch (e) {
     // FIXME: PRIMITIVE types
     return {
@@ -289,15 +289,15 @@ const buildFormForType = (type: GraphQLNamedType): FieldNode => {
         kind: 'Name' as const,
         value: 'form',
       },
-    }
+    };
   }
-}
+};
 
 const buildSelectionInlineFragments = (
   types: GraphQLObjectType<any, any>[],
   callback?: (fields: GraphQLField<any, any>[]) => {
-    continue: boolean
-    filteredFields: GraphQLField<any, any>[]
+    continue: boolean;
+    filteredFields: GraphQLField<any, any>[];
   }
 ): InlineFragmentNode[] => {
   return types.map((type) => {
@@ -314,7 +314,7 @@ const buildSelectionInlineFragments = (
         kind: 'SelectionSet' as const,
         selections: [
           ...Object.values(type.getFields()).map((field): FieldNode => {
-            const namedType = getNamedType(field.type)
+            const namedType = getNamedType(field.type);
             if (isLeafType(namedType)) {
               return {
                 kind: 'Field' as const,
@@ -322,7 +322,7 @@ const buildSelectionInlineFragments = (
                   kind: 'Name' as const,
                   value: field.name,
                 },
-              }
+              };
             } else if (namedType instanceof GraphQLUnionType) {
               return {
                 kind: 'Field' as const,
@@ -339,7 +339,7 @@ const buildSelectionInlineFragments = (
                     ),
                   ],
                 },
-              }
+              };
             } else if (namedType instanceof GraphQLObjectType) {
               return {
                 kind: 'Field' as const,
@@ -356,33 +356,33 @@ const buildSelectionInlineFragments = (
                     ),
                   ],
                 },
-              }
+              };
             } else {
               throw new Error(
                 `Unexpected GraphQL type for field ${namedType.name}`
-              )
+              );
             }
           }),
         ],
       },
-    }
-  })
-}
+    };
+  });
+};
 
 export const buildSelectionsFields = (
   fields: GraphQLField<any, any>[],
   callback?: (fields: GraphQLField<any, any>[]) => {
-    continue: boolean
-    filteredFields: GraphQLField<any, any>[]
+    continue: boolean;
+    filteredFields: GraphQLField<any, any>[];
   }
 ): FieldNode[] => {
-  let filteredFields = fields
+  let filteredFields = fields;
   if (callback) {
-    const result = callback(fields)
+    const result = callback(fields);
     if (!result.continue) {
       if (
         fields.every((field) => {
-          return !isScalarType(getNamedType(field.type))
+          return !isScalarType(getNamedType(field.type));
         })
       ) {
         return [
@@ -393,23 +393,23 @@ export const buildSelectionsFields = (
               value: '__typename',
             },
           },
-        ]
+        ];
       }
       return buildSelectionsFields(
         result.filteredFields.filter((field) => {
           if (isScalarType(getNamedType(field.type))) {
-            return true
+            return true;
           }
-          return false
+          return false;
         })
-      )
+      );
     } else {
-      filteredFields = result.filteredFields
+      filteredFields = result.filteredFields;
     }
   }
 
   return filteredFields.map((field): FieldNode => {
-    const namedType = getNamedType(field.type)
+    const namedType = getNamedType(field.type);
     if (isLeafType(namedType)) {
       return {
         kind: 'Field' as const,
@@ -417,7 +417,7 @@ export const buildSelectionsFields = (
           kind: 'Name' as const,
           value: field.name,
         },
-      }
+      };
     } else if (namedType instanceof GraphQLUnionType) {
       return {
         kind: 'Field' as const,
@@ -431,7 +431,7 @@ export const buildSelectionsFields = (
             ...buildSelectionInlineFragments(namedType.getTypes(), callback),
           ],
         },
-      }
+      };
     } else if (namedType instanceof GraphQLObjectType) {
       return {
         kind: 'Field' as const,
@@ -448,7 +448,7 @@ export const buildSelectionsFields = (
             ),
           ],
         },
-      }
+      };
     } else {
       return {
         kind: 'Field' as const,
@@ -460,10 +460,10 @@ export const buildSelectionsFields = (
           kind: 'SelectionSet' as const,
           selections: [],
         },
-      }
+      };
     }
-  })
-}
+  });
+};
 
 function assertIsObjectType(
   type: GraphQLNamedType
@@ -473,7 +473,7 @@ function assertIsObjectType(
   } else {
     throw new Error(
       `Expected an instance of GraphQLObjectType for type ${type.name}`
-    )
+    );
   }
 }
 function assertIsUnionType(
@@ -484,6 +484,6 @@ function assertIsUnionType(
   } else {
     throw new Error(
       `Expected an instance of GraphQLUnionType for type ${type.name}`
-    )
+    );
   }
 }

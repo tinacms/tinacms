@@ -2,49 +2,49 @@
 
 */
 
-import fs from 'fs-extra'
-import { join } from 'path'
-import { parseMediaFolder } from '../../utils/'
+import fs from 'fs-extra';
+import { join } from 'path';
+import { parseMediaFolder } from '../../utils/';
 
 interface MediaArgs {
-  searchPath: string
-  cursor?: string
-  limit?: string
+  searchPath: string;
+  cursor?: string;
+  limit?: string;
 }
 
 interface File {
-  src: string
-  filename: string
-  size: number
+  src: string;
+  filename: string;
+  size: number;
 }
 
 interface FileRes {
-  src: string
-  filename: string
-  size: number
-  isFile: boolean
+  src: string;
+  filename: string;
+  size: number;
+  isFile: boolean;
 }
 interface ListMediaRes {
-  directories: string[]
-  files: File[]
-  cursor?: string
-  error?: string
+  directories: string[];
+  files: File[];
+  cursor?: string;
+  error?: string;
 }
 export interface PathConfig {
-  rootPath: string
-  publicFolder: string
-  mediaRoot: string
+  rootPath: string;
+  publicFolder: string;
+  mediaRoot: string;
 }
 
-type SuccessRecord = { ok: true } | { ok: false; message: string }
+type SuccessRecord = { ok: true } | { ok: false; message: string };
 export class MediaModel {
-  public readonly rootPath: string
-  public readonly publicFolder: string
-  public readonly mediaRoot: string
+  public readonly rootPath: string;
+  public readonly publicFolder: string;
+  public readonly mediaRoot: string;
   constructor({ rootPath, publicFolder, mediaRoot }: PathConfig) {
-    this.rootPath = rootPath
-    this.mediaRoot = mediaRoot
-    this.publicFolder = publicFolder
+    this.rootPath = rootPath;
+    this.mediaRoot = mediaRoot;
+    this.publicFolder = publicFolder;
   }
   async listMedia(args: MediaArgs): Promise<ListMediaRes> {
     try {
@@ -53,24 +53,24 @@ export class MediaModel {
         this.publicFolder,
         this.mediaRoot,
         args.searchPath
-      )
-      const searchPath = parseMediaFolder(args.searchPath)
-      let filesStr: string[] = []
+      );
+      const searchPath = parseMediaFolder(args.searchPath);
+      let filesStr: string[] = [];
       try {
-        filesStr = await fs.readdir(folderPath)
+        filesStr = await fs.readdir(folderPath);
       } catch (error) {
         return {
           files: [],
           directories: [],
-        }
+        };
       }
       const filesProm: Promise<FileRes>[] = filesStr.map(async (file) => {
-        const filePath = join(folderPath, file)
-        const stat = await fs.stat(filePath)
+        const filePath = join(folderPath, file);
+        const stat = await fs.stat(filePath);
 
-        let src = `/${file}`
+        let src = `/${file}`;
 
-        const isFile = stat.isFile()
+        const isFile = stat.isFile();
 
         // It seems like our media manager wants relative paths for dirs.
         if (!isFile) {
@@ -79,14 +79,14 @@ export class MediaModel {
             size: stat.size,
             src,
             filename: file,
-          }
+          };
         }
 
         if (searchPath) {
-          src = `/${searchPath}${src}`
+          src = `/${searchPath}${src}`;
         }
         if (this.mediaRoot) {
-          src = `/${this.mediaRoot}${src}`
+          src = `/${this.mediaRoot}${src}`;
         }
 
         return {
@@ -94,41 +94,41 @@ export class MediaModel {
           size: stat.size,
           src: src,
           filename: file,
-        }
-      })
+        };
+      });
 
-      const offset = Number(args.cursor) || 0
-      const limit = Number(args.limit) || 20
+      const offset = Number(args.cursor) || 0;
+      const limit = Number(args.limit) || 20;
 
-      const rawItems = await Promise.all(filesProm)
+      const rawItems = await Promise.all(filesProm);
       const sortedItems = rawItems.sort((a, b) => {
         if (a.isFile && !b.isFile) {
-          return 1
+          return 1;
         }
         if (!a.isFile && b.isFile) {
-          return -1
+          return -1;
         }
-        return 0
-      })
-      const limitItems = sortedItems.slice(offset, offset + limit)
-      const files = limitItems.filter((x) => x.isFile)
-      const directories = limitItems.filter((x) => !x.isFile).map((x) => x.src)
+        return 0;
+      });
+      const limitItems = sortedItems.slice(offset, offset + limit);
+      const files = limitItems.filter((x) => x.isFile);
+      const directories = limitItems.filter((x) => !x.isFile).map((x) => x.src);
 
       const cursor =
-        rawItems.length > offset + limit ? String(offset + limit) : null
+        rawItems.length > offset + limit ? String(offset + limit) : null;
 
       return {
         files,
         directories,
         cursor,
-      }
+      };
     } catch (error) {
-      console.error(error)
+      console.error(error);
       return {
         files: [],
         directories: [],
         error: error?.toString(),
-      }
+      };
     }
   }
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
@@ -138,14 +138,14 @@ export class MediaModel {
         this.publicFolder,
         this.mediaRoot,
         args.searchPath
-      )
+      );
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
-      await fs.stat(file)
-      await fs.remove(file)
-      return { ok: true }
+      await fs.stat(file);
+      await fs.remove(file);
+      return { ok: true };
     } catch (error) {
-      console.error(error)
-      return { ok: false, message: error?.toString() }
+      console.error(error);
+      return { ok: false, message: error?.toString() };
     }
   }
 }

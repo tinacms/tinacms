@@ -7,7 +7,7 @@
 /**
  * @ignore
  */
-export type Unsubscribe = () => void
+export type Unsubscribe = () => void;
 
 /**
  * A basic class that can be subscribed to.
@@ -16,7 +16,7 @@ export class Subscribable {
   /**
    * @ignore
    */
-  protected __subscribers: Function[] = []
+  protected __subscribers: Function[] = [];
 
   /**
    * Adds a listener to the Subscribable object.
@@ -36,8 +36,8 @@ export class Subscribable {
    * @returns A function that will unsubscribe the listener.
    */
   subscribe(listener: Function): Unsubscribe {
-    this.__subscribers.push(listener)
-    return () => this.unsubscribe(listener)
+    this.__subscribers.push(listener);
+    return () => this.unsubscribe(listener);
   }
 
   /**
@@ -46,8 +46,8 @@ export class Subscribable {
    * @param listener The functioni to be removed.
    */
   unsubscribe(listener: Function) {
-    const index = this.__subscribers.indexOf(listener)
-    this.__subscribers.splice(index, 1)
+    const index = this.__subscribers.indexOf(listener);
+    this.__subscribers.splice(index, 1);
   }
 
   /**
@@ -81,6 +81,6 @@ export class Subscribable {
    */
   protected notifiySubscribers() {
     // TODO: Catch and log errors.
-    this.__subscribers.forEach((cb) => cb())
+    this.__subscribers.forEach((cb) => cb());
   }
 }

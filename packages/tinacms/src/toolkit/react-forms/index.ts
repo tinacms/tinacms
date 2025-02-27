@@ -1,1 +1,1 @@
-export * from './form-modal'
+export * from './form-modal';

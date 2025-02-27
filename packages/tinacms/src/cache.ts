@@ -2,4 +2,4 @@
 
 */
 
-export * from './cache/index'
+export * from './cache/index';

@@ -2,13 +2,13 @@
 
 */
 
-import React from 'react'
-import ViewNavigation from '../parts/ViewNavigation'
+import React from 'react';
+import ViewNavigation from '../parts/ViewNavigation';
 
 export default class MonthsView extends React.Component {
   render() {
     return (
-      <div className="rdtMonths">
+      <div className='rdtMonths'>
         <table>
           <thead>{this.renderNavigation()}</thead>
         </table>
@@ -16,11 +16,11 @@ export default class MonthsView extends React.Component {
           <tbody>{this.renderMonths()}</tbody>
         </table>
       </div>
-    )
+    );
   }
 
   renderNavigation() {
-    let year = this.props.viewDate.year()
+    const year = this.props.viewDate.year();
 
     return (
       <ViewNavigation
@@ -28,33 +28,33 @@ export default class MonthsView extends React.Component {
         onClickSwitch={() => this.props.showView('years')}
         onClickNext={() => this.props.navigate(1, 'years')}
         switchContent={year}
-        switchColSpan="2"
+        switchColSpan='2'
       />
-    )
+    );
   }
 
   renderMonths() {
     // 12 months in 3 rows for every view
-    let rows = [[], [], []]
+    const rows = [[], [], []];
 
     for (let month = 0; month < 12; month++) {
-      let row = getRow(rows, month)
+      const row = getRow(rows, month);
 
-      row.push(this.renderMonth(month))
+      row.push(this.renderMonth(month));
     }
 
-    return rows.map((months, i) => <tr key={i}>{months}</tr>)
+    return rows.map((months, i) => <tr key={i}>{months}</tr>);
   }
 
   renderMonth(month) {
-    const selectedDate = this.props.selectedDate
-    let className = 'rdtMonth'
-    let onClick
+    const selectedDate = this.props.selectedDate;
+    let className = 'rdtMonth';
+    let onClick;
 
     if (this.isDisabledMonth(month)) {
-      className += ' rdtDisabled'
+      className += ' rdtDisabled';
     } else {
-      onClick = this._updateSelectedMonth
+      onClick = this._updateSelectedMonth;
     }
 
     if (
@@ -62,10 +62,10 @@ export default class MonthsView extends React.Component {
       selectedDate.year() === this.props.viewDate.year() &&
       selectedDate.month() === month
     ) {
-      className += ' rdtActive'
+      className += ' rdtActive';
     }
 
-    let props = { key: month, className, 'data-value': month, onClick }
+    const props = { key: month, className, 'data-value': month, onClick };
 
     if (this.props.renderMonth) {
       return this.props.renderMonth(
@@ -73,59 +73,59 @@ export default class MonthsView extends React.Component {
         month,
         this.props.viewDate.year(),
         this.props.selectedDate && this.props.selectedDate.clone()
-      )
+      );
     }
 
-    return <td {...props}>{this.getMonthText(month)}</td>
+    return <td {...props}>{this.getMonthText(month)}</td>;
   }
 
   isDisabledMonth(month) {
-    let isValidDate = this.props.isValidDate
+    const isValidDate = this.props.isValidDate;
 
     if (!isValidDate) {
       // If no validator is set, all days are valid
-      return false
+      return false;
     }
 
     // If one day in the month is valid, the year should be clickable
-    let date = this.props.viewDate.clone().set({ month })
-    let day = date.endOf('month').date() + 1
+    const date = this.props.viewDate.clone().set({ month });
+    let day = date.endOf('month').date() + 1;
 
     while (day-- > 1) {
       if (isValidDate(date.date(day))) {
-        return false
+        return false;
       }
     }
-    return true
+    return true;
   }
 
   getMonthText(month) {
-    const localMoment = this.props.viewDate
+    const localMoment = this.props.viewDate;
     const monthStr = localMoment
       .localeData()
-      .monthsShort(localMoment.month(month))
+      .monthsShort(localMoment.month(month));
 
     // Because some months are up to 5 characters long, we want to
     // use a fixed string length for consistency
-    return capitalize(monthStr.substring(0, 3))
+    return capitalize(monthStr.substring(0, 3));
   }
 
   _updateSelectedMonth = (event) => {
-    this.props.updateDate(event)
-  }
+    this.props.updateDate(event);
+  };
 }
 
 function getRow(rows, year) {
   if (year < 4) {
-    return rows[0]
+    return rows[0];
   }
   if (year < 8) {
-    return rows[1]
+    return rows[1];
   }
 
-  return rows[2]
+  return rows[2];
 }
 
 function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

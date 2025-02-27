@@ -2,8 +2,8 @@
 
 */
 
-import path from 'node:path'
-import { setupFixture, setupFixture2, print, type Fixture } from '../setup'
+import path from 'node:path';
+import { setupFixture, setupFixture2, print, type Fixture } from '../setup';
 import {
   describe,
   beforeEach,
@@ -12,10 +12,10 @@ import {
   it,
   vi,
   SpyInstance,
-} from 'vitest'
-import { tinaSchema } from './.tina/schema'
-import { MemoryLevel } from 'memory-level'
-const rootPath = path.join(__dirname, '/')
+} from 'vitest';
+import { tinaSchema } from './.tina/schema';
+import { MemoryLevel } from 'memory-level';
+const rootPath = path.join(__dirname, '/');
 
 const fixtures: Fixture[] = [
   {
@@ -37,7 +37,7 @@ const fixtures: Fixture[] = [
     name: 'getDirectorList',
     assert: 'output',
   },
-]
+];
 
 const mutationFixtures: Fixture[] = [
   {
@@ -63,26 +63,26 @@ const mutationFixtures: Fixture[] = [
     assert: 'output',
     expectError: true,
   },
-]
+];
 
-let consoleErrMock: SpyInstance
+let consoleErrMock: SpyInstance;
 beforeEach(() => {
   consoleErrMock = vi
     .spyOn(console, 'error')
-    .mockImplementation((message) => {})
-})
+    .mockImplementation((message) => {});
+});
 
 afterEach(() => {
-  consoleErrMock.mockRestore()
-})
+  consoleErrMock.mockRestore();
+});
 
 describe('A schema with indexing', () => {
-  let level
+  let level;
   beforeEach(() => {
     level = new MemoryLevel<string, Record<string, any>>({
       valueEncoding: 'json',
-    })
-  })
+    });
+  });
   fixtures.forEach((fixture) => {
     it(print(fixture), async () => {
       const { responses, expectedResponsePaths } = await setupFixture(
@@ -91,21 +91,21 @@ describe('A schema with indexing', () => {
         level,
         fixture,
         'movies-with-datalayer'
-      )
+      );
 
       if (fixture.expectError) {
-        expect(consoleErrMock).toHaveBeenCalled()
+        expect(consoleErrMock).toHaveBeenCalled();
       } else {
-        expect(consoleErrMock).not.toHaveBeenCalled()
+        expect(consoleErrMock).not.toHaveBeenCalled();
       }
 
       // await store.print()
       responses.forEach((expResponse, index) => {
-        const expectedResponsePath2 = expectedResponsePaths[index]
-        expect(expResponse).toMatchFile(expectedResponsePath2)
-      })
-    })
-  })
+        const expectedResponsePath2 = expectedResponsePaths[index];
+        expect(expResponse).toMatchFile(expectedResponsePath2);
+      });
+    });
+  });
 
   mutationFixtures.forEach((fixture) => {
     it(print(fixture), async () => {
@@ -117,18 +117,18 @@ describe('A schema with indexing', () => {
         'movies-with-datalayer',
         '_mutation',
         'mutations'
-      )
+      );
 
       if (fixture.expectError) {
-        expect(consoleErrMock).toHaveBeenCalled()
+        expect(consoleErrMock).toHaveBeenCalled();
       } else {
-        expect(consoleErrMock).not.toHaveBeenCalled()
+        expect(consoleErrMock).not.toHaveBeenCalled();
       }
 
       responses.forEach((expResponse, index) => {
-        const expectedResponsePath2 = expectedResponsePaths[index]
-        expect(expResponse).toMatchFile(expectedResponsePath2)
-      })
-    })
-  })
-})
+        const expectedResponsePath2 = expectedResponsePaths[index];
+        expect(expResponse).toMatchFile(expectedResponsePath2);
+      });
+    });
+  });
+});

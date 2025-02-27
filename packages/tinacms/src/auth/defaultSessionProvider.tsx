@@ -1,9 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 const DefaultSessionProvider: React.FC = ({
   children,
 }: {
-  children: React.ReactNode
-}) => <>{children}</>
+  children: React.ReactNode;
+}) => <>{children}</>;
 
-export default DefaultSessionProvider
+export default DefaultSessionProvider;

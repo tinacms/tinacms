@@ -2,7 +2,7 @@
 
 */
 
-import { Schema } from '../../../types'
+import { Schema } from '../../../types';
 
 const tinaSchema: Schema = {
   collections: [
@@ -169,6 +169,6 @@ const tinaSchema: Schema = {
       ],
     },
   ],
-}
+};
 
-export { tinaSchema }
+export { tinaSchema };

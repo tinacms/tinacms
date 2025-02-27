@@ -4,9 +4,9 @@ import {
   type CMSEvent,
   type MediaUploadOptions,
   type PluginType,
-} from '@toolkit/core'
-import type { FieldPlugin } from '@toolkit/form-builder'
-import type { ScreenPlugin } from '@toolkit/react-screens'
+} from '@toolkit/core';
+import type { FieldPlugin } from '@toolkit/form-builder';
+import type { ScreenPlugin } from '@toolkit/react-screens';
 import {
   TextFieldPlugin,
   TextareaFieldPlugin,
@@ -27,21 +27,21 @@ import {
   ButtonToggleFieldPlugin,
   HiddenFieldPlugin,
   PasswordFieldPlugin,
-} from '@toolkit/fields'
-import type { Form } from '@toolkit/forms'
-import { Alerts, type EventsToAlerts } from '@toolkit/alerts'
-import { SidebarState, type SidebarStateOptions } from '@toolkit/react-sidebar'
+} from '@toolkit/fields';
+import type { Form } from '@toolkit/forms';
+import { Alerts, type EventsToAlerts } from '@toolkit/alerts';
+import { SidebarState, type SidebarStateOptions } from '@toolkit/react-sidebar';
 import {
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
-} from '@toolkit/plugin-fields/markdown'
-import { MediaManagerScreenPlugin } from '@toolkit/plugin-screens/media-manager-screen'
-import { PasswordScreenPlugin } from '@toolkit/plugin-screens/password-screen'
-import { createCloudConfig } from '@toolkit/react-cloud-config'
-import type { TinaAction, TinaState } from './tina-state'
-import type { Client } from '../internalClient'
-import { MdOutlinePerson } from 'react-icons/md'
-import { MdOutlineHelpOutline } from 'react-icons/md'
+} from '@toolkit/plugin-fields/markdown';
+import { MediaManagerScreenPlugin } from '@toolkit/plugin-screens/media-manager-screen';
+import { PasswordScreenPlugin } from '@toolkit/plugin-screens/password-screen';
+import { createCloudConfig } from '@toolkit/react-cloud-config';
+import type { TinaAction, TinaState } from './tina-state';
+import type { Client } from '../internalClient';
+import { MdOutlinePerson } from 'react-icons/md';
+import { MdOutlineHelpOutline } from 'react-icons/md';
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
   TextareaFieldPlugin,
@@ -64,23 +64,23 @@ const DEFAULT_FIELDS = [
   ButtonToggleFieldPlugin,
   HiddenFieldPlugin,
   PasswordFieldPlugin,
-]
+];
 
 export interface TinaCMSConfig extends CMSConfig {
-  sidebar?: SidebarStateOptions | boolean
-  alerts?: EventsToAlerts
-  isLocalClient?: boolean
-  isSelfHosted?: boolean
-  clientId?: string
+  sidebar?: SidebarStateOptions | boolean;
+  alerts?: EventsToAlerts;
+  isLocalClient?: boolean;
+  isSelfHosted?: boolean;
+  clientId?: string;
 }
 
 export class TinaCMS extends CMS {
-  sidebar?: SidebarState
-  _alerts?: Alerts
-  state: TinaState
-  dispatch: React.Dispatch<TinaAction>
+  sidebar?: SidebarState;
+  _alerts?: Alerts;
+  state: TinaState;
+  dispatch: React.Dispatch<TinaAction>;
   // We always attach the tina client to the cms instance
-  api: { [key: string]: any; tina?: Client } = {}
+  api: { [key: string]: any; tina?: Client } = {};
 
   constructor({
     sidebar,
@@ -90,7 +90,7 @@ export class TinaCMS extends CMS {
     clientId,
     ...config
   }: TinaCMSConfig = {}) {
-    super(config)
+    super(config);
 
     this.alerts.setMap({
       'media:upload:failure': (
@@ -102,28 +102,28 @@ export class TinaCMS extends CMS {
           message: `Failed to upload file(s) ${event?.uploaded
             .map((x) => x.file.name)
             .join(', ')}. \n\n ${event?.error.toString()}`,
-        }
+        };
       },
       'media:delete:failure': () => ({
         level: 'error',
         message: 'Failed to delete file.',
       }),
       ...alerts,
-    })
+    });
 
     if (sidebar) {
-      const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined
-      this.sidebar = new SidebarState(this.events, sidebarConfig)
+      const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined;
+      this.sidebar = new SidebarState(this.events, sidebarConfig);
     }
 
     DEFAULT_FIELDS.forEach((field) => {
       if (!this.fields.find(field.name)) {
         //@ts-ignore //? Note - Not sure what this is doing
-        this.fields.add(field)
+        this.fields.add(field);
       }
-    })
-    this.plugins.add(MediaManagerScreenPlugin)
-    this.plugins.add(PasswordScreenPlugin)
+    });
+    this.plugins.add(MediaManagerScreenPlugin);
+    this.plugins.add(PasswordScreenPlugin);
     if (isLocalClient !== true) {
       if (clientId) {
         this.plugins.add(
@@ -134,7 +134,7 @@ export class TinaCMS extends CMS {
               href: `https://app.tina.io/projects/${clientId}/overview`,
             },
           })
-        )
+        );
         this.plugins.add(
           createCloudConfig({
             name: 'User Management',
@@ -144,7 +144,7 @@ export class TinaCMS extends CMS {
             },
             Icon: MdOutlinePerson,
           })
-        )
+        );
         this.plugins.add(
           createCloudConfig({
             name: 'Support',
@@ -154,7 +154,7 @@ export class TinaCMS extends CMS {
             },
             Icon: MdOutlineHelpOutline,
           })
-        )
+        );
       } else if (!isSelfHosted) {
         this.plugins.add(
           createCloudConfig({
@@ -165,40 +165,40 @@ export class TinaCMS extends CMS {
               href: 'https://app.tina.io',
             },
           })
-        )
+        );
       }
     }
   }
 
   get alerts() {
     if (!this._alerts) {
-      this._alerts = new Alerts(this.events)
+      this._alerts = new Alerts(this.events);
     }
-    return this._alerts
+    return this._alerts;
   }
 
   registerApi(name: string, api: any) {
     if (api.alerts) {
-      this.alerts.setMap(api.alerts)
+      this.alerts.setMap(api.alerts);
     }
-    super.registerApi(name, api)
+    super.registerApi(name, api);
   }
 
   get forms(): PluginType<Form> {
-    return this.plugins.findOrCreateMap<Form & { __type: string }>('form')
+    return this.plugins.findOrCreateMap<Form & { __type: string }>('form');
   }
 
   get fields(): PluginType<FieldPlugin> {
-    return this.plugins.findOrCreateMap('field')
+    return this.plugins.findOrCreateMap('field');
   }
 
   get screens(): PluginType<ScreenPlugin> {
-    return this.plugins.findOrCreateMap('screen')
+    return this.plugins.findOrCreateMap('screen');
   }
   removeAllForms() {
     this.forms.all().forEach((form) => {
-      this.forms.remove(form)
-    })
+      this.forms.remove(form);
+    });
   }
 
   /**
@@ -208,9 +208,9 @@ export class TinaCMS extends CMS {
   removeOrphanedForms() {
     const orphanedForms = this.forms
       .all()
-      .filter((form) => form.queries.length === 0)
+      .filter((form) => form.queries.length === 0);
     orphanedForms.forEach((form) => {
-      this.forms.remove(form)
-    })
+      this.forms.remove(form);
+    });
   }
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export const PopupModal = ({ className = '', style = {}, ...props }) => (
   <div
@@ -9,10 +9,10 @@ export const PopupModal = ({ className = '', style = {}, ...props }) => (
     }}
     {...props}
   />
-)
+);
 
 /**
  * @alias [PopupModal]
  * @deprecated
  */
-export const ModalPopup = PopupModal
+export const ModalPopup = PopupModal;

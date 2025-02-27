@@ -2,8 +2,8 @@
 
 */
 
-import { Schema } from '../../..'
-import { blocksCollection } from './blocks'
+import { Schema } from '../../..';
+import { blocksCollection } from './blocks';
 
 const tinaSchema: Schema = {
   collections: [
@@ -117,6 +117,6 @@ const tinaSchema: Schema = {
     },
     blocksCollection,
   ],
-}
+};
 
-export { tinaSchema }
+export { tinaSchema };

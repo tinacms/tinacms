@@ -12,8 +12,8 @@
  * and the poller will continue polling.
  */
 export interface AsyncData<T> {
-  done: boolean
-  data?: T
+  done: boolean;
+  data?: T;
 }
 
 /**
@@ -23,7 +23,7 @@ export interface AsyncData<T> {
  * you have what you need or we should continue polling.
  */
 export interface AsyncFunction<T> extends Function {
-  (): PromiseLike<AsyncData<T>>
+  (): PromiseLike<AsyncData<T>>;
 }
 
 /**
@@ -85,28 +85,28 @@ export function asyncPoll<T>(
    */
   pollTimeout: number = 30 * 1000
 ) {
-  const endTime = new Date().getTime() + pollTimeout
-  let stop = false
+  const endTime = new Date().getTime() + pollTimeout;
+  let stop = false;
   const cancel = () => {
-    stop = true
-  }
+    stop = true;
+  };
   const checkCondition = (resolve: Function, reject: Function): void => {
     Promise.resolve(fn())
       .then((result) => {
-        const now = new Date().getTime()
+        const now = new Date().getTime();
         if (stop) {
-          reject(new Error('AsyncPoller: cancelled'))
+          reject(new Error('AsyncPoller: cancelled'));
         } else if (result.done) {
-          resolve(result.data)
+          resolve(result.data);
         } else if (now < endTime) {
-          setTimeout(checkCondition, pollInterval, resolve, reject)
+          setTimeout(checkCondition, pollInterval, resolve, reject);
         } else {
-          reject(new Error('AsyncPoller: reached timeout'))
+          reject(new Error('AsyncPoller: reached timeout'));
         }
       })
       .catch((err) => {
-        reject(err)
-      })
-  }
-  return [new Promise(checkCondition) as Promise<T>, cancel]
+        reject(err);
+      });
+  };
+  return [new Promise(checkCondition) as Promise<T>, cancel];
 }

@@ -1,1 +1,1 @@
-declare module 'react-frame-component'
+declare module 'react-frame-component';

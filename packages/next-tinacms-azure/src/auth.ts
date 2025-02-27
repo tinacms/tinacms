@@ -1,13 +1,13 @@
-import type { TinaCloudUser } from '@tinacms/auth'
-import type { NextRequest } from 'next/server'
-import { headers } from 'next/headers'
+import type { TinaCloudUser } from '@tinacms/auth';
+import type { NextRequest } from 'next/server';
+import { headers } from 'next/headers';
 
 const isUserAuthorized = async (args: {
-  clientID: string
-  token: string
+  clientID: string;
+  token: string;
 }): Promise<TinaCloudUser | undefined> => {
-  const clientID = args.clientID
-  const token = args.token
+  const clientID = args.clientID;
+  const token = args.token;
   try {
     // fetch identity from content server
     const tinaCloudRes = await fetch(
@@ -19,33 +19,33 @@ const isUserAuthorized = async (args: {
         }),
         method: 'GET',
       }
-    )
+    );
     if (tinaCloudRes.ok) {
-      const user: TinaCloudUser = await tinaCloudRes.json()
-      return user
+      const user: TinaCloudUser = await tinaCloudRes.json();
+      return user;
     }
-    return
+    return;
   } catch (e) {
-    console.error(e)
-    throw e
+    console.error(e);
+    throw e;
   }
-}
+};
 
 export const isAuthorized = async (
   req: NextRequest
 ): Promise<TinaCloudUser | undefined> => {
-  const clientID = req.nextUrl.searchParams.get('clientID')
-  const token = (await headers()).get('authorization')
+  const clientID = req.nextUrl.searchParams.get('clientID');
+  const token = (await headers()).get('authorization');
   if (typeof clientID === 'string' && typeof token === 'string') {
-    return await isUserAuthorized({ clientID, token })
+    return await isUserAuthorized({ clientID, token });
   }
   const errorMessage = (queryParam: string) => {
-    return `An ${queryParam} query param is required for isAuthorized function but not found please use cms.api.tina.fetchWithToken('/api/something?clientID=YourClientID')`
-  }
-  if (!clientID) console.error(errorMessage('clientID'))
+    return `An ${queryParam} query param is required for isAuthorized function but not found please use cms.api.tina.fetchWithToken('/api/something?clientID=YourClientID')`;
+  };
+  if (!clientID) console.error(errorMessage('clientID'));
   if (!token)
     console.error(
       'A authorization header was not found. Please use the cms.api.tina.fetchWithToken function on the frontend'
-    )
-  return undefined
-}
+    );
+  return undefined;
+};

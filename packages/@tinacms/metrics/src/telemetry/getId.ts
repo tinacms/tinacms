@@ -2,7 +2,7 @@
 
 */
 
-import { execSync } from 'child_process'
+import { execSync } from 'child_process';
 
 function _getProjectIdByGit() {
   try {
@@ -12,14 +12,14 @@ function _getProjectIdByGit() {
         timeout: 1000,
         stdio: `pipe`,
       }
-    )
+    );
 
-    return String(originBuffer).trim()
+    return String(originBuffer).trim();
   } catch (_) {
-    return null
+    return null;
   }
 }
 
 export function getID(): string {
-  return _getProjectIdByGit() || process.env.REPOSITORY_URL || process.cwd()
+  return _getProjectIdByGit() || process.env.REPOSITORY_URL || process.cwd();
 }

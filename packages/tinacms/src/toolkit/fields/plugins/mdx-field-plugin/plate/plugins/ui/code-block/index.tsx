@@ -1,4 +1,4 @@
-import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
+import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
 import {
   ELEMENT_DEFAULT,
   type PlateEditor,
@@ -11,19 +11,19 @@ import {
   isCollapsed,
   isElement,
   setNodes,
-} from '@udecode/plate-common'
-import type * as monaco from 'monaco-editor'
-import React from 'react'
-import { useSelected } from 'slate-react'
-import { Autocomplete } from '../autocomplete'
-import { uuid } from '../helpers'
+} from '@udecode/plate-common';
+import type * as monaco from 'monaco-editor';
+import React from 'react';
+import { useSelected } from 'slate-react';
+import { Autocomplete } from '../autocomplete';
+import { uuid } from '../helpers';
 
-type Monaco = typeof monaco
+type Monaco = typeof monaco;
 
 // 0.33.0 has a bug https://github.com/microsoft/monaco-editor/issues/2947
 loader.config({
   paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs' },
-})
+});
 
 /**
  * Since monaco lazy-loads we may have a delay from when the block is inserted
@@ -31,21 +31,21 @@ loader.config({
  *
  * Will try for 3 seconds before moving on
  */
-let retryCount = 0
+let retryCount = 0;
 const retryFocus = (ref) => {
   if (ref.current) {
-    ref.current.focus()
+    ref.current.focus();
   } else {
     if (retryCount < 30) {
       setTimeout(() => {
-        retryCount = retryCount + 1
-        retryFocus(ref)
-      }, 100)
+        retryCount = retryCount + 1;
+        retryFocus(ref);
+      }, 100);
     }
   }
-}
+};
 
-const MINIMUM_HEIGHT = 75
+const MINIMUM_HEIGHT = 75;
 export const CodeBlock = ({
   attributes,
   editor,
@@ -55,61 +55,61 @@ export const CodeBlock = ({
   defaultValue,
   ...props
 }: {
-  attributes: Record<string, unknown>
-  element: TElement
-  editor: PlateEditor
-  language?: string
-  children: React.ReactNode
-  defaultValue?: unknown
-  onChangeCallback?: (value: string) => void
+  attributes: Record<string, unknown>;
+  element: TElement;
+  editor: PlateEditor;
+  language?: string;
+  children: React.ReactNode;
+  defaultValue?: unknown;
+  onChangeCallback?: (value: string) => void;
 }) => {
   const [navigateAway, setNavigateAway] = React.useState<
     'up' | 'down' | 'insertNext' | 'remove' | null
-  >(null)
-  const monaco = useMonaco() as Monaco
+  >(null);
+  const monaco = useMonaco() as Monaco;
   const monacoEditorRef =
-    React.useRef<monaco.editor.IStandaloneCodeEditor>(null)
-  const selected = useSelected()
-  const [height, setHeight] = React.useState(MINIMUM_HEIGHT)
+    React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
+  const selected = useSelected();
+  const [height, setHeight] = React.useState(MINIMUM_HEIGHT);
 
   React.useEffect(() => {
     if (selected && isCollapsed(editor.selection)) {
-      retryFocus(monacoEditorRef)
+      retryFocus(monacoEditorRef);
     }
-  }, [selected, monacoEditorRef.current])
+  }, [selected, monacoEditorRef.current]);
 
-  const value = element.value || ''
+  const value = element.value || '';
   if (typeof value !== 'string') {
-    throw new Error('Element must be of type string for code block')
+    throw new Error('Element must be of type string for code block');
   }
 
-  const language = restrictLanguage || element.lang
-  const id = React.useMemo(() => uuid(), [])
+  const language = restrictLanguage || element.lang;
+  const id = React.useMemo(() => uuid(), []);
   const languages = React.useMemo(() => {
-    const defaultLangSet = { '': 'plain text' }
-    if (!monaco) return defaultLangSet
+    const defaultLangSet = { '': 'plain text' };
+    if (!monaco) return defaultLangSet;
     return monaco.languages.getLanguages().reduce((ac, cv) => {
-      if (cv.id === 'plaintext') return ac
-      return { ...ac, [cv.id]: cv.id }
-    }, defaultLangSet)
-  }, [monaco])
+      if (cv.id === 'plaintext') return ac;
+      return { ...ac, [cv.id]: cv.id };
+    }, defaultLangSet);
+  }, [monaco]);
 
   React.useEffect(() => {
     if (monaco) {
-      monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true)
+      monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         // disable errors
         noSemanticValidation: true,
         noSyntaxValidation: true,
-      })
+      });
     }
-  }, [monaco])
+  }, [monaco]);
 
   const items = Object.entries(languages).map(([key, label]) => ({
     key,
     label,
     render: (item: { label: string }) => item.label,
-  }))
+  }));
 
   const currentItem = React.useMemo(() => {
     return (
@@ -117,16 +117,16 @@ export const CodeBlock = ({
         key: '',
         label: 'Plain Text',
       }
-    )
-  }, [items, language])
+    );
+  }, [items, language]);
 
   React.useEffect(() => {
     if (navigateAway) {
-      setNavigateAway(null)
+      setNavigateAway(null);
       switch (navigateAway) {
         case 'remove':
           {
-            focusEditor(editor)
+            focusEditor(editor);
             setNodes(
               editor,
               {
@@ -138,13 +138,13 @@ export const CodeBlock = ({
               {
                 match: (n) => {
                   if (isElement(n) && n.type === element.type) {
-                    return true
+                    return true;
                   }
                 },
               }
-            )
+            );
           }
-          break
+          break;
         case 'insertNext':
           {
             insertNodes(
@@ -158,19 +158,19 @@ export const CodeBlock = ({
                 },
               ],
               { select: true }
-            )
-            focusEditor(editor)
+            );
+            focusEditor(editor);
           }
-          break
+          break;
         case 'up':
           {
-            const path = findNodePath(editor, element)
+            const path = findNodePath(editor, element);
             if (!path) {
-              return // Not sure if/when this would happen
+              return; // Not sure if/when this would happen
             }
-            const previousNodePath = getPointBefore(editor, path)
+            const previousNodePath = getPointBefore(editor, path);
             if (!previousNodePath) {
-              focusEditor(editor)
+              focusEditor(editor);
               insertNodes(
                 editor,
                 [
@@ -184,20 +184,20 @@ export const CodeBlock = ({
                 // Insert a new node at the current path, resulting in the code_block
                 // moving down one block
                 { at: path, select: true }
-              )
-              return
+              );
+              return;
             }
 
-            focusEditor(editor, previousNodePath)
+            focusEditor(editor, previousNodePath);
           }
-          break
+          break;
         case 'down': {
-          const path = findNodePath(editor, element)
+          const path = findNodePath(editor, element);
           if (!path) {
-            return // Not sure if/when this would happen
+            return; // Not sure if/when this would happen
           }
 
-          const nextNodePath = getPointAfter(editor, path)
+          const nextNodePath = getPointAfter(editor, path);
           if (!nextNodePath) {
             // No next children, insert an empty block
             insertNodes(
@@ -211,57 +211,57 @@ export const CodeBlock = ({
                 },
               ],
               { select: true }
-            )
-            focusEditor(editor)
+            );
+            focusEditor(editor);
           } else {
-            focusEditor(editor, nextNodePath)
+            focusEditor(editor, nextNodePath);
           }
-          break
+          break;
         }
       }
     }
-  }, [navigateAway])
+  }, [navigateAway]);
 
   function handleEditorDidMount(
     monacoEditor: monaco.editor.IStandaloneCodeEditor,
     monaco: Monaco
   ) {
-    monacoEditorRef.current = monacoEditor
+    monacoEditorRef.current = monacoEditor;
     monacoEditor.onDidContentSizeChange(() => {
       setHeight(
         monacoEditor.getContentHeight() > MINIMUM_HEIGHT
           ? monacoEditor.getContentHeight()
           : MINIMUM_HEIGHT
-      )
-      monacoEditor.layout()
-    })
+      );
+      monacoEditor.layout();
+    });
     // Set Default
-    setNodes(editor, { value: defaultValue, lang: language })
+    setNodes(editor, { value: defaultValue, lang: language });
 
     monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       if (monacoEditor.hasTextFocus()) {
-        setNavigateAway('insertNext')
+        setNavigateAway('insertNext');
       }
-    })
+    });
     monacoEditor.onKeyDown((l) => {
       if (l.code === 'ArrowUp') {
-        const selection = monacoEditor.getSelection()
+        const selection = monacoEditor.getSelection();
         if (selection.endLineNumber === 1 && selection.startLineNumber === 1) {
-          setNavigateAway('up')
+          setNavigateAway('up');
         }
       }
       if (l.code === 'ArrowDown') {
-        const selection = monacoEditor.getSelection()
-        const totalLines = monacoEditor.getModel().getLineCount()
+        const selection = monacoEditor.getSelection();
+        const totalLines = monacoEditor.getModel().getLineCount();
         if (
           selection.endLineNumber === totalLines &&
           selection.startLineNumber === totalLines
         ) {
-          setNavigateAway('down')
+          setNavigateAway('down');
         }
       }
       if (l.code === 'Backspace') {
-        const selection = monacoEditor.getSelection()
+        const selection = monacoEditor.getSelection();
         if (
           selection.endColumn === 1 &&
           selection.endLineNumber === 1 &&
@@ -272,16 +272,16 @@ export const CodeBlock = ({
           selection.startColumn === 1 &&
           selection.startLineNumber === 1
         ) {
-          setNavigateAway('remove')
+          setNavigateAway('remove');
         }
       }
-    })
+    });
   }
 
   return (
     <div
       {...attributes}
-      className="relative mb-2 mt-0.5 rounded-lg shadow-md p-2 border-gray-200 border"
+      className='relative mb-2 mt-0.5 rounded-lg shadow-md p-2 border-gray-200 border'
     >
       <style>
         {/* Disable hints (not ideal but it conflicts with the toolbar and other floating elements) */}
@@ -293,7 +293,7 @@ export const CodeBlock = ({
       {props.children}
       <div contentEditable={false}>
         {!restrictLanguage && (
-          <div className="flex justify-between pb-2">
+          <div className='flex justify-between pb-2'>
             <div />
             <Autocomplete
               items={items}
@@ -342,12 +342,12 @@ export const CodeBlock = ({
             onChange={(value) => {
               // FIXME: if a void is focused first, onChange doesn't fire until
               // https://github.com/udecode/plate/issues/1519#issuecomment-1184933602
-              onChangeCallback?.(value)
-              setNodes(editor, { value, lang: language })
+              onChangeCallback?.(value);
+              setNodes(editor, { value, lang: language });
             }}
           />
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

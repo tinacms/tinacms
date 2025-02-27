@@ -1,26 +1,26 @@
-import * as React from 'react'
-import { BiCheck } from 'react-icons/bi'
+import * as React from 'react';
+import { BiCheck } from 'react-icons/bi';
 
 type Option = {
-  value: string
-  label: string
-}
+  value: string;
+  label: string;
+};
 
 export interface CheckboxGroupFieldProps {
-  name: string
-  label?: string
-  component: string
-  options: (Option | string)[]
-  direction?: 'horizontal' | 'vertical'
+  name: string;
+  label?: string;
+  component: string;
+  options: (Option | string)[];
+  direction?: 'horizontal' | 'vertical';
 }
 
 export interface CheckboxGroupProps {
-  name: string
-  input: any
-  field: CheckboxGroupFieldProps
-  disabled?: boolean
-  options?: (Option | string)[]
-  direction?: 'horizontal' | 'vertical'
+  name: string;
+  input: any;
+  field: CheckboxGroupFieldProps;
+  disabled?: boolean;
+  options?: (Option | string)[];
+  direction?: 'horizontal' | 'vertical';
 }
 
 export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
@@ -29,15 +29,15 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   options,
   disabled = false,
 }) => {
-  const checkboxOptions = options || field.options
+  const checkboxOptions = options || field.options;
 
   const toProps = (option: Option | string): Option => {
-    if (typeof option === 'object') return option
-    return { value: option, label: option }
-  }
+    if (typeof option === 'object') return option;
+    return { value: option, label: option };
+  };
 
   const toComponent = (option: Option) => {
-    const optionId = `field-${field.name}-option-${option.value}`
+    const optionId = `field-${field.name}-option-${option.value}`;
 
     /**
      * We made the decision that an `option` (specifically, a `value`) would
@@ -49,12 +49,12 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
      * options: ['Yes', 'Yes', 'No', 'Yes', 'Maybe']
      */
 
-    const checked = input.value ? input.value.includes(option.value) : false
+    const checked = input.value ? input.value.includes(option.value) : false;
     return (
       <div key={option.value}>
         <input
-          className="absolute w-0 h-0 opacity-0 cursor-pointer"
-          type="checkbox"
+          className='absolute w-0 h-0 opacity-0 cursor-pointer'
+          type='checkbox'
           name={input.name}
           id={optionId}
           value={option.value}
@@ -65,19 +65,19 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
               /**
                * Add `value` to `input.value[]`
                */
-              input.onChange([...input.value, event.target.value])
+              input.onChange([...input.value, event.target.value]);
             } else {
               /**
                * Remove `value` from `input.value[]`
                */
               input.onChange([
                 ...input.value.filter((v: string) => v !== event.target.value),
-              ])
+              ]);
             }
           }}
         />
         <label
-          className="cursor-pointer flex group items-center gap-2"
+          className='cursor-pointer flex group items-center gap-2'
           htmlFor={optionId}
         >
           <span
@@ -106,8 +106,8 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
           </span>
         </label>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div
@@ -120,5 +120,5 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
     >
       {checkboxOptions?.map(toProps).map(toComponent)}
     </div>
-  )
-}
+  );
+};

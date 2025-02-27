@@ -1,44 +1,44 @@
-import { AbstractAuthProvider } from 'tinacms'
+import { AbstractAuthProvider } from 'tinacms';
 
-import type Clerk from '@clerk/clerk-js'
+import type Clerk from '@clerk/clerk-js';
 
 export class ClerkAuthProvider extends AbstractAuthProvider {
-  clerk: Clerk
-  allowedList?: string[]
-  orgId?: string
+  clerk: Clerk;
+  allowedList?: string[];
+  orgId?: string;
   constructor({
     orgId,
     clerk,
     allowedList,
   }: {
-    clerk: Clerk
+    clerk: Clerk;
     /**
      * For premium Clerk users, you can use restrictions
      * https://clerk.com/docs/authentication/allowlist
      */
-    allowedList?: string[]
+    allowedList?: string[];
     // Ensure the user is a member of the provided orgId
-    orgId?: string
+    orgId?: string;
   }) {
-    super()
-    this.clerk = clerk
+    super();
+    this.clerk = clerk;
 
-    this.allowedList = allowedList
-    this.orgId = orgId
+    this.allowedList = allowedList;
+    this.orgId = orgId;
   }
   /**
    * Generates a short-lived token when Tina makes a request
    */
   async getToken() {
-    await this.clerk.load()
+    await this.clerk.load();
     if (this.clerk.session) {
-      return { id_token: await this.clerk.session.getToken() }
+      return { id_token: await this.clerk.session.getToken() };
     }
   }
 
   async logout() {
-    await this.clerk?.load()
-    await this.clerk?.session?.remove()
+    await this.clerk?.load();
+    await this.clerk?.session?.remove();
   }
   async authenticate() {
     this.clerk.openSignIn({
@@ -55,10 +55,10 @@ export class ClerkAuthProvider extends AbstractAuthProvider {
           dividerText: 'px-2',
         },
       },
-    })
+    });
   }
   async authorize(context?: any): Promise<any> {
-    await this.clerk.load()
+    await this.clerk.load();
     if (this.clerk.user) {
       if (
         this.allowedList &&
@@ -67,7 +67,7 @@ export class ClerkAuthProvider extends AbstractAuthProvider {
         )
       ) {
         // if there is an allowList, and the user is not in it, return false
-        return false
+        return false;
       }
 
       if (
@@ -77,18 +77,18 @@ export class ClerkAuthProvider extends AbstractAuthProvider {
         )
       ) {
         // if there is an orgId, and the user is not in it, return false
-        return false
+        return false;
       }
 
-      return true
+      return true;
     }
     // Handle when a user is logged in outside of the org
-    await this.clerk.session.end()
-    return false
+    await this.clerk.session.end();
+    return false;
   }
 
   async getUser(): Promise<any> {
-    await this.clerk.load()
-    return this.clerk.user
+    await this.clerk.load();
+    return this.clerk.user;
   }
 }

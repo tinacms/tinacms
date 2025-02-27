@@ -1,20 +1,20 @@
-import React, { Suspense } from 'react'
-import TinaCMS, { TinaAdmin, useCMS, MdxFieldPluginExtendible } from 'tinacms'
-import { Preview } from './preview'
-import Playground from './Playground'
+import React, { Suspense } from 'react';
+import TinaCMS, { TinaAdmin, useCMS, MdxFieldPluginExtendible } from 'tinacms';
+import { Preview } from './preview';
+import Playground from './Playground';
 
 // TODO: Resolve this to local file in tsconfig.json
 // @ts-expect-error
-import config from 'TINA_IMPORT'
+import config from 'TINA_IMPORT';
 // @ts-expect-error
-import schemaJson from 'SCHEMA_IMPORT'
+import schemaJson from 'SCHEMA_IMPORT';
 // @ts-expect-error
-import staticMedia from 'STATIC_MEDIA_IMPORT'
+import staticMedia from 'STATIC_MEDIA_IMPORT';
 
-const RawEditor = React.lazy(() => import('./fields/rich-text'))
+const RawEditor = React.lazy(() => import('./fields/rich-text'));
 
 const Editor = (props) => {
-  const [rawMode, setRawMode] = React.useState(false)
+  const [rawMode, setRawMode] = React.useState(false);
   return (
     <MdxFieldPluginExtendible.Component
       rawMode={rawMode}
@@ -26,32 +26,32 @@ const Editor = (props) => {
         </Suspense>
       }
     />
-  )
-}
+  );
+};
 
 const SetPreview = () => {
-  const cms = useCMS()
+  const cms = useCMS();
   React.useEffect(() => {
     // Override original 'rich-text' field with one that has raw mode support
     cms.fields.add({
       ...MdxFieldPluginExtendible,
       Component: Editor,
-    })
-    const basePath = __BASE_PATH__.replace(/^\/|\/$/g, '')
-    cms.flags.set('tina-basepath', basePath)
+    });
+    const basePath = __BASE_PATH__.replace(/^\/|\/$/g, '');
+    cms.flags.set('tina-basepath', basePath);
     cms.flags.set(
       'tina-preview',
       `${basePath ? `${basePath}/` : ''}${config.build.outputFolder.replace(
         /^\/|\/$/g,
         ''
       )}`
-    )
-  }, [])
-  return null
-}
+    );
+  }, []);
+  return null;
+};
 
 export const TinaAdminWrapper = () => {
-  const schema = { ...config?.schema, config }
+  const schema = { ...config?.schema, config };
   return (
     // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
     <TinaCMS
@@ -70,10 +70,10 @@ export const TinaAdminWrapper = () => {
         schemaJson={schemaJson}
       />
     </TinaCMS>
-  )
-}
+  );
+};
 
 function App() {
-  return <TinaAdminWrapper />
+  return <TinaAdminWrapper />;
 }
-export default App
+export default App;

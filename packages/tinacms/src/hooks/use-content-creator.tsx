@@ -2,31 +2,31 @@
 
 */
 
-import React from 'react'
-import { useCMS } from '@tinacms/toolkit'
-import { ContentCreatorPlugin, OnNewDocument } from './create-page-plugin'
-import { Template } from '@tinacms/schema-tools'
+import React from 'react';
+import { useCMS } from '@tinacms/toolkit';
+import { ContentCreatorPlugin, OnNewDocument } from './create-page-plugin';
+import { Template } from '@tinacms/schema-tools';
 
 export type FilterCollections = (
   options: {
-    label: string
-    value: string
+    label: string;
+    value: string;
   }[]
-) => { label: string; value: string }[]
+) => { label: string; value: string }[];
 
 export type DocumentCreatorArgs = {
-  onNewDocument?: OnNewDocument
-  filterCollections?: FilterCollections
-}
+  onNewDocument?: OnNewDocument;
+  filterCollections?: FilterCollections;
+};
 
 export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
-  const cms = useCMS()
+  const cms = useCMS();
   const [values, setValues] = React.useState<{
-    collection?: string
-    template?: string
-    relativePath?: string
-  }>({})
-  const [plugin, setPlugin] = React.useState(null)
+    collection?: string;
+    template?: string;
+    relativePath?: string;
+  }>({});
+  const [plugin, setPlugin] = React.useState(null);
 
   React.useEffect(() => {
     const run = async () => {
@@ -35,11 +35,11 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
        */
       const res: {
         collections: {
-          label?: string
-          slug: string
-          format: string
-          templates: Template[]
-        }[]
+          label?: string;
+          slug: string;
+          format: string;
+          templates: Template[];
+        }[];
       } = await cms.api.tina.request(
         (gql) => gql`
           {
@@ -52,34 +52,34 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
           }
         `,
         { variables: {} }
-      )
+      );
 
       /**
        * Build Collection Options
        */
-      const allCollectionOptions: { label: string; value: string }[] = []
+      const allCollectionOptions: { label: string; value: string }[] = [];
       res.collections.forEach((collection) => {
-        const value = collection.slug
-        const label = `${collection.label}`
-        allCollectionOptions.push({ value, label })
-      })
+        const value = collection.slug;
+        const label = `${collection.label}`;
+        allCollectionOptions.push({ value, label });
+      });
 
-      let collectionOptions
+      let collectionOptions;
       if (
         args &&
         args.filterCollections &&
         typeof args.filterCollections === 'function'
       ) {
-        const filtered = args.filterCollections(allCollectionOptions)
+        const filtered = args.filterCollections(allCollectionOptions);
         collectionOptions = [
           { value: '', label: 'Choose Collection' },
           ...filtered,
-        ]
+        ];
       } else {
         collectionOptions = [
           { value: '', label: 'Choose Collection' },
           ...allCollectionOptions,
-        ]
+        ];
       }
 
       /**
@@ -87,16 +87,16 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
        */
       const templateOptions: { label: string; value: string }[] = [
         { value: '', label: 'Choose Template' },
-      ]
+      ];
 
       if (values.collection) {
         const filteredCollection = res.collections.find(
           (c) => c.slug === values.collection
-        )
+        );
         filteredCollection?.templates?.forEach((template) => {
           // @ts-ignore
-          templateOptions.push({ value: template.name, label: template.label })
-        })
+          templateOptions.push({ value: template.name, label: template.label });
+        });
       }
 
       /**
@@ -109,7 +109,7 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
           // @ts-ignore
           collections: res.collections,
           onChange: async ({ values }) => {
-            setValues(values)
+            setValues(values);
           },
           initialValues: values,
           fields: [
@@ -121,7 +121,7 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
               options: collectionOptions,
               validate: async (value: any, allValues: any, meta: any) => {
                 if (!value) {
-                  return true
+                  return true;
                 }
               },
             },
@@ -135,9 +135,9 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
                 // If there are no templates, this isn't required
                 if (!value && templateOptions.length > 1) {
                   if (meta.dirty) {
-                    return 'Required'
+                    return 'Required';
                   }
-                  return true
+                  return true;
                 }
               },
             },
@@ -150,9 +150,9 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
               validate: (value: any, allValues: any, meta: any) => {
                 if (!value) {
                   if (meta.dirty) {
-                    return 'Required'
+                    return 'Required';
                   }
-                  return true
+                  return true;
                 }
 
                 /**
@@ -160,29 +160,29 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
                  * https://github.com/tinacms/tina-graphql-gateway/blob/682e2ed54c51520d1a87fac2887950839892f465/packages/tina-graphql-gateway-cli/src/cmds/compile/index.ts#L296
                  * */
 
-                const isValid = /^[_a-zA-Z0-9][\-_a-zA-Z0-9]*$/.test(value)
+                const isValid = /^[_a-zA-Z0-9][\-_a-zA-Z0-9]*$/.test(value);
                 if (value && !isValid) {
-                  return 'Must begin with a-z, A-Z, 0-9, or _ and contain only a-z, A-Z, 0-9, - or _'
+                  return 'Must begin with a-z, A-Z, 0-9, or _ and contain only a-z, A-Z, 0-9, - or _';
                 }
               },
             },
           ],
         })
-      )
-    }
+      );
+    };
 
-    run()
-  }, [cms])
+    run();
+  }, [cms]);
 
   React.useEffect(() => {
     if (plugin) {
-      cms.plugins.add(plugin)
+      cms.plugins.add(plugin);
     }
 
     return () => {
       if (plugin) {
-        cms.plugins.remove(plugin)
+        cms.plugins.remove(plugin);
       }
-    }
-  }, [plugin])
-}
+    };
+  }, [plugin]);
+};

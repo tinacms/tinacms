@@ -1,22 +1,22 @@
-import React from 'react'
-import { Media } from '@toolkit/core'
-import { BiFolder, BiFile, BiMovie } from 'react-icons/bi'
-import { isImage, isVideo } from './utils'
+import React from 'react';
+import { Media } from '@toolkit/core';
+import { BiFolder, BiFile, BiMovie } from 'react-icons/bi';
+import { isImage, isVideo } from './utils';
 
 interface MediaItemProps {
-  item: Media & { new?: boolean }
-  onClick(_item: Media | false): void
-  active: boolean
+  item: Media & { new?: boolean };
+  onClick(_item: Media | false): void;
+  active: boolean;
 }
 
 export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
-  let FileIcon = BiFile
+  let FileIcon = BiFile;
   if (item.type === 'dir') {
-    FileIcon = BiFolder
+    FileIcon = BiFolder;
   } else if (isVideo(item.src)) {
-    FileIcon = BiMovie
+    FileIcon = BiMovie;
   }
-  const thumbnail = (item.thumbnails || {})['75x75']
+  const thumbnail = (item.thumbnails || {})['75x75'];
   return (
     <li
       className={`group relative flex shrink-0 items-center transition duration-150 ease-out cursor-pointer border-b border-gray-150 ${
@@ -26,26 +26,26 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
       }`}
       onClick={() => {
         if (!active) {
-          onClick(item)
+          onClick(item);
         } else {
-          onClick(false)
+          onClick(false);
         }
       }}
     >
       {item.new && (
-        <span className="absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10">
+        <span className='absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
           NEW
         </span>
       )}
-      <div className="w-16 h-16 bg-gray-50 border-r border-gray-150 overflow-hidden flex justify-center flex-shrink-0">
+      <div className='w-16 h-16 bg-gray-50 border-r border-gray-150 overflow-hidden flex justify-center flex-shrink-0'>
         {isImage(thumbnail) ? (
           <img
-            className="object-contain object-center w-full h-full origin-center transition-all duration-150 ease-out group-hover:scale-110"
+            className='object-contain object-center w-full h-full origin-center transition-all duration-150 ease-out group-hover:scale-110'
             src={thumbnail}
             alt={item.filename}
           />
         ) : (
-          <FileIcon className="w-1/2 h-full fill-gray-300" />
+          <FileIcon className='w-1/2 h-full fill-gray-300' />
         )}
       </div>
       <span
@@ -54,17 +54,17 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
         {item.filename}
       </span>
     </li>
-  )
+  );
 }
 
 export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
-  let FileIcon = BiFile
+  let FileIcon = BiFile;
   if (item.type === 'dir') {
-    FileIcon = BiFolder
+    FileIcon = BiFolder;
   } else if (isVideo(item.src)) {
-    FileIcon = BiMovie
+    FileIcon = BiMovie;
   }
-  const thumbnail = (item.thumbnails || {})['400x400']
+  const thumbnail = (item.thumbnails || {})['400x400'];
   return (
     <li
       className={`relative pb-[100%] h-0 block border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out ${
@@ -74,35 +74,35 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
       } ${item.type === 'dir' ? 'cursor-pointer' : ''}`}
     >
       {item.new && (
-        <span className="absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10">
+        <span className='absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
           NEW
         </span>
       )}
       <button
-        className="absolute w-full h-full flex items-center justify-center bg-white"
+        className='absolute w-full h-full flex items-center justify-center bg-white'
         onClick={() => {
           if (!active) {
-            onClick(item)
+            onClick(item);
           } else {
-            onClick(false)
+            onClick(false);
           }
         }}
       >
         {isImage(thumbnail) ? (
           <img
-            className="object-contain object-center w-full h-full"
+            className='object-contain object-center w-full h-full'
             src={thumbnail}
             alt={item.filename}
           />
         ) : (
-          <div className="p-4 w-full flex flex-col gap-4 items-center justify-center">
-            <FileIcon className="w-[30%] h-auto fill-gray-300" />
-            <span className="block text-base text-gray-600 w-full break-words truncate">
+          <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>
+            <FileIcon className='w-[30%] h-auto fill-gray-300' />
+            <span className='block text-base text-gray-600 w-full break-words truncate'>
               {item.filename}
             </span>
           </div>
         )}
       </button>
     </li>
-  )
+  );
 }

@@ -15,7 +15,7 @@ body {
 
   ::before,
   ::after {
-    --tw-content: '';
+    --tw-content: "";
   }
 
   hr {
@@ -53,14 +53,14 @@ body {
   samp,
   pre {
     font-family: theme(
-      'fontFamily.mono',
+      "fontFamily.mono",
       ui-monospace,
       SFMono-Regular,
       Menlo,
       Monaco,
       Consolas,
-      'Liberation Mono',
-      'Courier New',
+      "Liberation Mono",
+      "Courier New",
       monospace
     ); /* 1 */
     font-size: 1em; /* 2 */
@@ -111,9 +111,9 @@ body {
   }
 
   button,
-  [type='button'],
-  [type='reset'],
-  [type='submit'] {
+  [type="button"],
+  [type="reset"],
+  [type="submit"] {
     -webkit-appearance: button; /* 1 */
     background-image: none; /* 2 */
   }
@@ -135,7 +135,7 @@ body {
     height: auto;
   }
 
-  [type='search'] {
+  [type="search"] {
     -webkit-appearance: textfield; /* 1 */
     outline-offset: -2px; /* 2 */
   }
@@ -197,11 +197,11 @@ body {
   input::placeholder,
   textarea::placeholder {
     opacity: 1; /* 1 */
-    color: theme('colors.gray.400', #9ca3af); /* 2 */
+    color: theme("colors.gray.400", #9ca3af); /* 2 */
   }
 
   button,
-  [role='button'] {
+  [role="button"] {
     cursor: pointer;
   }
 

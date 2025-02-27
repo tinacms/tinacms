@@ -1,6 +1,6 @@
-import { factoryTag } from './factory-tag'
-import type { Construct, Tokenizer } from 'micromark-util-types'
-import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression'
+import { factoryTag } from './factory-tag';
+import type { Construct, Tokenizer } from 'micromark-util-types';
+import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression';
 
 export const jsxText: (
   acorn: Acorn | undefined,
@@ -10,7 +10,7 @@ export const jsxText: (
 ) => Construct = function (acorn, acornOptions, addResult, pattern) {
   const tokenizeJsxText: Tokenizer = function (effects, ok, nok) {
     // eslint-disable-next-line
-    const self = this
+    const self = this;
     return factoryTag.call(
       self,
       effects,
@@ -46,7 +46,7 @@ export const jsxText: (
       'mdxJsxTextTagAttributeValueExpressionMarker',
       'mdxJsxTextTagAttributeValueExpressionValue',
       pattern
-    )
-  }
-  return { tokenize: tokenizeJsxText }
-}
+    );
+  };
+  return { tokenize: tokenizeJsxText };
+};

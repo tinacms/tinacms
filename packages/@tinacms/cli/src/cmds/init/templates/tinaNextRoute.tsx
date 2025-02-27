@@ -1,14 +1,14 @@
-import { InitEnvironment } from '..'
-import { Config, makeImportString } from '../prompts'
+import { InitEnvironment } from '..';
+import { Config, makeImportString } from '../prompts';
 
 export const nextApiRouteTemplate = ({
   config,
   env,
 }: {
-  config: Config
-  env: InitEnvironment
+  config: Config;
+  env: InitEnvironment;
 }) => {
-  const extraPath = env.usingSrc ? '../' : ''
+  const extraPath = env.usingSrc ? '../' : '';
   return `import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
   ${makeImportString(config.authProvider?.backendAuthProviderImports)}
  
@@ -28,5 +28,5 @@ export const nextApiRouteTemplate = ({
   export default (req, res) => {
     // Modify the request here if you need to
     return handler(req, res)
-  }`
-}
+  }`;
+};

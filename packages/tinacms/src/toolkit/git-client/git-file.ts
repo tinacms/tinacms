@@ -1,5 +1,5 @@
-import { CMS } from '@toolkit/core'
-import { GitClient } from './git-client'
+import { CMS } from '@toolkit/core';
+import { GitClient } from './git-client';
 
 export class GitFile {
   constructor(
@@ -14,30 +14,30 @@ export class GitFile {
    */
   show = () => {
     return this.git.show(this.relativePath).then((git: { content: string }) => {
-      return this.parse(git.content)
-    })
-  }
+      return this.parse(git.content);
+    });
+  };
 
   commit = () => {
     return this.git.commit!({
       files: [this.relativePath],
     }).then((response: Response) =>
       this.cms.events.dispatch({ type: 'git:commit', response })
-    )
-  }
+    );
+  };
 
   reset = () => {
-    this.cms.api.git.reset({ files: [this.relativePath] })
-  }
+    this.cms.api.git.reset({ files: [this.relativePath] });
+  };
 
   write = (values: any) => {
     this.git.writeToDisk!({
       fileRelativePath: this.relativePath,
       content: this.format(values),
-    })
-  }
+    });
+  };
 
   private get git(): GitClient {
-    return this.cms.api.git
+    return this.cms.api.git;
   }
 }

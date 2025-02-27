@@ -6,7 +6,7 @@ export type {
   OnDeleteCallback,
   Database,
   GitProvider,
-} from '@tinacms/graphql'
+} from '@tinacms/graphql';
 export {
   FilesystemBridge,
   AuditFileSystemBridge,
@@ -16,6 +16,6 @@ export {
   resolve,
   createDatabase,
   createLocalDatabase,
-} from '@tinacms/graphql'
+} from '@tinacms/graphql';
 
-export * from './backend'
+export * from './backend';

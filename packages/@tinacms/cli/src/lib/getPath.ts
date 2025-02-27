@@ -2,14 +2,14 @@
 
 */
 
-import path from 'path'
-import fs from 'fs-extra'
+import path from 'path';
+import fs from 'fs-extra';
 
 interface GetPathParams {
-  projectDir: string
-  filename: string
-  allowedTypes: string[]
-  errorMessage?: string
+  projectDir: string;
+  filename: string;
+  allowedTypes: string[];
+  errorMessage?: string;
 }
 
 export const fileExists = ({
@@ -18,25 +18,25 @@ export const fileExists = ({
   allowedTypes,
 }: Omit<GetPathParams, 'errorMessage'>) => {
   if (!fs.existsSync(projectDir)) {
-    return false
+    return false;
   }
   // Get file
   const filePaths = allowedTypes.map((ext) =>
     path.join(projectDir, `${filename}.${ext}`)
-  )
+  );
 
   // Find the file the user provided
-  let inputFile = undefined
+  let inputFile = undefined;
   filePaths.every((path) => {
     if (fs.existsSync(path)) {
-      inputFile = path
-      return false
+      inputFile = path;
+      return false;
     }
-    return true
-  })
+    return true;
+  });
 
-  return Boolean(inputFile)
-}
+  return Boolean(inputFile);
+};
 
 export const getPath = ({
   projectDir,
@@ -46,29 +46,29 @@ export const getPath = ({
 }: GetPathParams) => {
   if (!fs.existsSync(projectDir)) {
     if (errorMessage) {
-      throw new Error(errorMessage)
+      throw new Error(errorMessage);
     } else {
-      throw new Error(`Could not find ${projectDir}`)
+      throw new Error(`Could not find ${projectDir}`);
     }
   }
   // Get file
   const filePaths = allowedTypes.map((ext) =>
     path.join(projectDir, `${filename}.${ext}`)
-  )
+  );
 
   // Find the file the user provided
-  let inputFile = undefined
+  let inputFile = undefined;
   filePaths.every((path) => {
     if (fs.existsSync(path)) {
-      inputFile = path
-      return false
+      inputFile = path;
+      return false;
     }
-    return true
-  })
+    return true;
+  });
 
   if (!inputFile && errorMessage) {
-    throw new Error(errorMessage)
+    throw new Error(errorMessage);
   }
 
-  return inputFile
-}
+  return inputFile;
+};

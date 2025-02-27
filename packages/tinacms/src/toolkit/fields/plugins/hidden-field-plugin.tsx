@@ -1,12 +1,12 @@
-import * as React from 'react'
-import { parse } from './text-format'
+import * as React from 'react';
+import { parse } from './text-format';
 
 export const HiddenField = () => {
-  return <></>
-}
+  return <></>;
+};
 
 export const HiddenFieldPlugin = {
   name: 'hidden',
   Component: HiddenField,
   parse,
-}
+};

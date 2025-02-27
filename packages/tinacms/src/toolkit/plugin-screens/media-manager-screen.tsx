@@ -1,6 +1,6 @@
-import { MdOutlinePhotoLibrary } from 'react-icons/md'
-import { createScreen } from '@toolkit/react-screens'
-import { MediaPicker } from '@toolkit/components/media/media-manager'
+import { MdOutlinePhotoLibrary } from 'react-icons/md';
+import { createScreen } from '@toolkit/react-screens';
+import { MediaPicker } from '@toolkit/components/media/media-manager';
 
 export const MediaManagerScreenPlugin = createScreen({
   name: 'Media Manager',
@@ -10,4 +10,4 @@ export const MediaManagerScreenPlugin = createScreen({
   props: {
     allowDelete: true,
   },
-})
+});

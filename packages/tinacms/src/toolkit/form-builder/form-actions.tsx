@@ -1,16 +1,16 @@
-import * as React from 'react'
-import { EllipsisVerticalIcon } from '@toolkit/icons'
-import { useState, FC } from 'react'
-import { Dismissible } from '@toolkit/react-dismissible'
-import { Form } from '@toolkit/forms'
+import * as React from 'react';
+import { EllipsisVerticalIcon } from '@toolkit/icons';
+import { useState, FC } from 'react';
+import { Dismissible } from '@toolkit/react-dismissible';
+import { Form } from '@toolkit/forms';
 
 export interface FormActionMenuProps {
-  form: Form
-  actions: any[]
+  form: Form;
+  actions: any[];
 }
 
 export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
-  const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
+  const [actionMenuVisibility, setActionMenuVisibility] = useState(false);
 
   return (
     <>
@@ -21,7 +21,7 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
           escape
           disabled={!actionMenuVisibility}
           onDismiss={() => {
-            setActionMenuVisibility((p) => !p)
+            setActionMenuVisibility((p) => !p);
           }}
         >
           {actions.map((Action, i) => (
@@ -32,8 +32,8 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
         </Dismissible>
       </ActionsOverlay>
     </>
-  )
-}
+  );
+};
 
 const MoreActionsButton = ({ className = '', ...props }) => (
   <button
@@ -42,7 +42,7 @@ const MoreActionsButton = ({ className = '', ...props }) => (
   >
     <EllipsisVerticalIcon />
   </button>
-)
+);
 
 const ActionsOverlay = ({ open, className = '', style = {}, ...props }) => (
   <div
@@ -58,11 +58,11 @@ const ActionsOverlay = ({ open, className = '', style = {}, ...props }) => (
     }}
     {...props}
   />
-)
+);
 
 export const ActionButton = ({ className = '', ...props }) => (
   <button
     className={`relative text-center text-[13px] px-3 h-10 font-normal w-full bg-none cursor-pointer outline-none border-0 transition-all duration-[150ms] ease-out hover:text-blue-500 hover:bg-gray50 [&:not(:last-child)]: border-b-[1px] border-solid border-b-[#edecf3] ${className}`}
     {...props}
   />
-)
+);

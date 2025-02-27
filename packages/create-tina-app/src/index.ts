@@ -1,31 +1,31 @@
-import { Telemetry } from '@tinacms/metrics'
-import { Command } from 'commander'
-import prompts from 'prompts'
-import path from 'node:path'
-import { version, name } from '../package.json'
+import { Telemetry } from '@tinacms/metrics';
+import { Command } from 'commander';
+import prompts from 'prompts';
+import path from 'node:path';
+import { version, name } from '../package.json';
 import {
   isWriteable,
   setupProjectDirectory,
   updateProjectPackageName,
   updateProjectPackageVersion,
-} from './util/fileUtil'
-import { install } from './util/install'
-import { initializeGit, makeFirstCommit } from './util/git'
-import { TEMPLATES, downloadTemplate } from './templates'
-import { preRunChecks } from './util/preRunChecks'
-import { checkPackageExists } from './util/checkPkgManagers'
-import { log, TextStyles } from './util/logger'
-import { exit } from 'node:process'
-import validate from 'validate-npm-package-name'
+} from './util/fileUtil';
+import { install } from './util/install';
+import { initializeGit, makeFirstCommit } from './util/git';
+import { TEMPLATES, downloadTemplate } from './templates';
+import { preRunChecks } from './util/preRunChecks';
+import { checkPackageExists } from './util/checkPkgManagers';
+import { log, TextStyles } from './util/logger';
+import { exit } from 'node:process';
+import validate from 'validate-npm-package-name';
 
-export const PKG_MANAGERS = ['npm', 'yarn', 'pnpm']
+export const PKG_MANAGERS = ['npm', 'yarn', 'pnpm'];
 
 export async function run() {
-  preRunChecks()
+  preRunChecks();
 
-  let projectName = ''
+  let projectName = '';
 
-  const program = new Command(name)
+  const program = new Command(name);
   program
     .version(version)
     .option(
@@ -46,20 +46,20 @@ export async function run() {
     .arguments('[project-directory]')
     .usage(`${TextStyles.success('<project-directory>')} [options]`)
     .action((name) => {
-      projectName = name
-    })
+      projectName = name;
+    });
 
-  program.parse(process.argv)
-  const opts = program.opts()
+  program.parse(process.argv);
+  const opts = program.opts();
   if (opts.dir) {
-    process.chdir(opts.dir)
+    process.chdir(opts.dir);
   }
 
-  const telemetry = new Telemetry({ disabled: opts?.noTelemetry })
+  const telemetry = new Telemetry({ disabled: opts?.noTelemetry });
 
-  let template = opts.template
+  let template = opts.template;
   if (template) {
-    template = TEMPLATES.find((_template) => _template.value === template)
+    template = TEMPLATES.find((_template) => _template.value === template);
     if (!template) {
       log.err(
         `The provided template '${
@@ -67,34 +67,34 @@ export async function run() {
         }' is invalid. Please provide one of the following: ${TEMPLATES.map(
           (x) => x.value
         )}`
-      )
-      exit(1)
+      );
+      exit(1);
     }
   }
 
-  let pkgManager = opts.pkgManager
+  let pkgManager = opts.pkgManager;
   if (pkgManager) {
     if (!PKG_MANAGERS.find((_pkgManager) => _pkgManager === pkgManager)) {
       log.err(
         `The provided package manager '${opts.pkgManager}' is not supported. Please provide one of the following: ${PKG_MANAGERS}`
-      )
-      exit(1)
+      );
+      exit(1);
     }
   }
 
   if (!pkgManager) {
-    const installedPkgManagers = []
+    const installedPkgManagers = [];
     for (const pkg_manager of PKG_MANAGERS) {
       if (await checkPackageExists(pkg_manager)) {
-        installedPkgManagers.push(pkg_manager)
+        installedPkgManagers.push(pkg_manager);
       }
     }
 
     if (installedPkgManagers.length === 0) {
       log.err(
         `You have no supported package managers installed. Please install one of the following: ${PKG_MANAGERS}`
-      )
-      exit(1)
+      );
+      exit(1);
     }
 
     const res = await prompts({
@@ -102,11 +102,11 @@ export async function run() {
       name: 'packageManager',
       type: 'select',
       choices: installedPkgManagers.map((manager) => {
-        return { title: manager, value: manager }
+        return { title: manager, value: manager };
       }),
-    })
-    if (!Object.hasOwn(res, 'packageManager')) exit(1) // User most likely sent SIGINT.
-    pkgManager = res.packageManager
+    });
+    if (!Object.hasOwn(res, 'packageManager')) exit(1); // User most likely sent SIGINT.
+    pkgManager = res.packageManager;
   }
 
   if (!projectName) {
@@ -118,13 +118,13 @@ export async function run() {
       validate: (name) => {
         const { validForNewPackages, errors } = validate(
           path.basename(path.resolve(name))
-        )
-        if (validForNewPackages) return true
-        return `Invalid project name: ${errors[0]}`
+        );
+        if (validForNewPackages) return true;
+        return `Invalid project name: ${errors[0]}`;
       },
-    })
-    if (!Object.hasOwn(res, 'name')) exit(1) // User most likely sent SIGINT.
-    projectName = res.name
+    });
+    if (!Object.hasOwn(res, 'name')) exit(1); // User most likely sent SIGINT.
+    projectName = res.name;
   }
 
   if (!template) {
@@ -133,9 +133,9 @@ export async function run() {
       type: 'select',
       message: 'What starter code would you like to use?',
       choices: TEMPLATES,
-    })
-    if (!Object.hasOwn(res, 'template')) exit(1) // User most likely sent SIGINT.
-    template = TEMPLATES.find((_template) => _template.value === res.template)
+    });
+    if (!Object.hasOwn(res, 'template')) exit(1); // User most likely sent SIGINT.
+    template = TEMPLATES.find((_template) => _template.value === res.template);
   }
 
   await telemetry.submitRecord({
@@ -144,43 +144,43 @@ export async function run() {
       template: template,
       pkgManager: pkgManager,
     },
-  })
+  });
 
-  const rootDir = path.join(process.cwd(), projectName)
+  const rootDir = path.join(process.cwd(), projectName);
   if (!(await isWriteable(path.dirname(rootDir)))) {
     log.err(
       'The application path is not writable, please check folder permissions and try again. It is likely you do not have write permissions for this folder.'
-    )
-    process.exit(1)
+    );
+    process.exit(1);
   }
-  const appName = await setupProjectDirectory(rootDir)
+  const appName = await setupProjectDirectory(rootDir);
 
   try {
-    await downloadTemplate(template, rootDir)
-    updateProjectPackageName(rootDir, projectName)
-    updateProjectPackageVersion(rootDir, '0.0.1')
+    await downloadTemplate(template, rootDir);
+    updateProjectPackageName(rootDir, projectName);
+    updateProjectPackageVersion(rootDir, '0.0.1');
   } catch (err) {
-    log.err(`Failed to download template: ${(err as Error).message}`)
-    exit(1)
+    log.err(`Failed to download template: ${(err as Error).message}`);
+    exit(1);
   }
 
-  log.info('Installing packages.')
-  await install(rootDir, null, { packageManager: pkgManager, isOnline: true })
+  log.info('Installing packages.');
+  await install(rootDir, null, { packageManager: pkgManager, isOnline: true });
 
-  log.info('Initializing git repository.')
+  log.info('Initializing git repository.');
   try {
     if (initializeGit()) {
-      makeFirstCommit(rootDir)
-      log.info('Initialized git repository.')
+      makeFirstCommit(rootDir);
+      log.info('Initialized git repository.');
     }
   } catch (err) {
-    log.err('Failed to initialize Git repository, skipping.')
+    log.err('Failed to initialize Git repository, skipping.');
   }
 
-  log.success('Starter successfully created!')
+  log.success('Starter successfully created!');
 
-  log.log(TextStyles.bold('\nTo launch your app, run:\n'))
-  log.cmd(`cd ${appName}\n${pkgManager} run dev`)
+  log.log(TextStyles.bold('\nTo launch your app, run:\n'));
+  log.cmd(`cd ${appName}\n${pkgManager} run dev`);
   log.log(`\nNext steps:
     • 📝 Edit some content on ${TextStyles.link(
       'http://localhost:3000'
@@ -192,7 +192,7 @@ export async function run() {
     • 🚀 Deploy to Production: ${TextStyles.link(
       'https://tina.io/docs/tina-cloud/'
     )}
-  `)
+  `);
 }
 
-run()
+run();

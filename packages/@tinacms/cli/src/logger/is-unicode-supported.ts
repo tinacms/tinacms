@@ -1,6 +1,6 @@
 export default function isUnicodeSupported() {
   if (process.platform !== 'win32') {
-    return process.env.TERM !== 'linux' // Linux console (kernel)
+    return process.env.TERM !== 'linux'; // Linux console (kernel)
   }
 
   return (
@@ -13,5 +13,5 @@ export default function isUnicodeSupported() {
     process.env.TERM === 'xterm-256color' ||
     process.env.TERM === 'alacritty' ||
     process.env.TERMINAL_EMULATOR === 'JetBrains-JediTerm'
-  )
+  );
 }

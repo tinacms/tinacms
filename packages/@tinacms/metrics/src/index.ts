@@ -2,5 +2,5 @@
 
 */
 
-export * from './telemetry'
-export * from './interfaces'
+export * from './telemetry';
+export * from './interfaces';

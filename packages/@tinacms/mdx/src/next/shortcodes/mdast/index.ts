@@ -1,51 +1,51 @@
-import { ccount } from 'ccount'
-import { parseEntities } from 'parse-entities'
-import { stringifyPosition } from 'unist-util-stringify-position'
-import { VFileMessage } from 'vfile-message'
-import { stringifyEntitiesLight } from 'stringify-entities'
-import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow.js'
-import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing.js'
-import { indentLines } from 'mdast-util-to-markdown/lib/util/indent-lines.js'
-import { track } from 'mdast-util-to-markdown/lib/util/track.js'
-import { Pattern } from '../lib/syntax'
+import { ccount } from 'ccount';
+import { parseEntities } from 'parse-entities';
+import { stringifyPosition } from 'unist-util-stringify-position';
+import { VFileMessage } from 'vfile-message';
+import { stringifyEntitiesLight } from 'stringify-entities';
+import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow.js';
+import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing.js';
+import { indentLines } from 'mdast-util-to-markdown/lib/util/indent-lines.js';
+import { track } from 'mdast-util-to-markdown/lib/util/track.js';
+import { Pattern } from '../lib/syntax';
 import type {
   Handle as FromMarkdownHandle,
   Token,
   OnEnterError,
   OnExitError,
-} from 'mdast-util-from-markdown'
+} from 'mdast-util-from-markdown';
 import type {
   Handle as ToMarkdownHandle,
   Map as ToMarkdownMap,
   Options,
-} from 'mdast-util-to-markdown'
+} from 'mdast-util-to-markdown';
 import type {
   MdxJsxAttributeValueExpression,
   MdxJsxAttribute,
   MdxJsxExpressionAttribute,
   MdxJsxFlowElement,
   MdxJsxTextElement,
-} from 'mdast-util-mdx-jsx'
+} from 'mdast-util-mdx-jsx';
 
 type Tag = {
-  name: string | undefined
-  attributes: Array<MdxJsxAttribute | MdxJsxExpressionAttribute>
-  close: boolean
-  selfClosing: boolean
-  start: Token['start']
-  end: Token['end']
-  shouldFallback?: boolean
-}
+  name: string | undefined;
+  attributes: Array<MdxJsxAttribute | MdxJsxExpressionAttribute>;
+  close: boolean;
+  selfClosing: boolean;
+  start: Token['start'];
+  end: Token['end'];
+  shouldFallback?: boolean;
+};
 
 export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
   const buffer: FromMarkdownHandle = function () {
-    this.buffer()
-  }
+    this.buffer();
+  };
 
   const data: FromMarkdownHandle = function (token) {
-    this.config?.enter?.data?.call(this, token)
-    this.config?.exit?.data?.call(this, token)
-  }
+    this.config?.enter?.data?.call(this, token);
+    this.config?.exit?.data?.call(this, token);
+  };
 
   const enterMdxJsxTag: FromMarkdownHandle = function (token) {
     const tag: Tag = {
@@ -55,21 +55,21 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
       selfClosing: false,
       start: token.start,
       end: token.end,
-    }
-    if (!this.getData('mdxJsxTagStack')) this.setData('mdxJsxTagStack', [])
-    this.setData('mdxJsxTag', tag)
-    this.buffer()
-  }
+    };
+    if (!this.getData('mdxJsxTagStack')) this.setData('mdxJsxTagStack', []);
+    this.setData('mdxJsxTag', tag);
+    this.buffer();
+  };
 
   const enterMdxJsxTagClosingMarker: FromMarkdownHandle = function (token) {
-    const stack: Array<Tag> | undefined = this.getData('mdxJsxTagStack')
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const stack: Array<Tag> | undefined = this.getData('mdxJsxTagStack');
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
 
     if (stack?.length === 0) {
       // Indicate that when we're exiting this tag, we should transform
       // it into text node instead
       if (tag) {
-        tag.shouldFallback = true
+        tag.shouldFallback = true;
       }
       // throw new VFileMessage(
       //   'Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly',
@@ -77,10 +77,10 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
       //   'mdast-util-mdx-jsx:unexpected-closing-slash'
       // )
     }
-  }
+  };
 
   const enterMdxJsxTagAnyAttribute: FromMarkdownHandle = function (token) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
 
     // We're still treating this token as invalid, but instead
     // of erroring, we'll tokenize it as a text value
@@ -91,133 +91,135 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
     //     'mdast-util-mdx-jsx:unexpected-attribute'
     //   )
     // }
-  }
+  };
 
   const enterMdxJsxTagSelfClosingMarker: FromMarkdownHandle = function (token) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
 
     if (tag?.close) {
       throw new VFileMessage(
         'Unexpected self-closing slash `/` in closing tag, expected the end of the tag',
         { start: token.start, end: token.end },
         'mdast-util-mdx-jsx:unexpected-self-closing-slash'
-      )
+      );
     }
-  }
+  };
 
   const exitMdxJsxTagClosingMarker: FromMarkdownHandle = function () {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
     if (tag) {
-      tag.close = true
+      tag.close = true;
     }
-  }
+  };
 
   const exitMdxJsxTagNamePrimary: FromMarkdownHandle = function (token) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
     if (tag) {
-      tag.name = this.sliceSerialize(token)
+      tag.name = this.sliceSerialize(token);
     }
-  }
+  };
 
   const exitMdxJsxTagNameMember: FromMarkdownHandle = function (token) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
     if (tag) {
-      tag.name += '.' + this.sliceSerialize(token)
+      tag.name += '.' + this.sliceSerialize(token);
     }
-  }
+  };
 
   const exitMdxJsxTagNameLocal: FromMarkdownHandle = function (token) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
     if (tag) {
-      tag.name += ':' + this.sliceSerialize(token)
+      tag.name += ':' + this.sliceSerialize(token);
     }
-  }
+  };
 
   const enterMdxJsxTagAttribute: FromMarkdownHandle = function (token) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
-    enterMdxJsxTagAnyAttribute.call(this, token)
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
+    enterMdxJsxTagAnyAttribute.call(this, token);
     if (tag) {
-      tag.attributes.push({ type: 'mdxJsxAttribute', name: '', value: null })
+      tag.attributes.push({ type: 'mdxJsxAttribute', name: '', value: null });
     }
-  }
+  };
 
   const enterMdxJsxTagExpressionAttribute: FromMarkdownHandle = function (
     token
   ) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
-    enterMdxJsxTagAnyAttribute.call(this, token)
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
+    enterMdxJsxTagAnyAttribute.call(this, token);
     if (tag) {
-      tag.attributes.push({ type: 'mdxJsxExpressionAttribute', value: '' })
+      tag.attributes.push({ type: 'mdxJsxExpressionAttribute', value: '' });
     }
-    this.buffer()
-  }
+    this.buffer();
+  };
 
   const exitMdxJsxTagExpressionAttribute: FromMarkdownHandle = function (
     token
   ) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
     if (tag) {
       const tail: MdxJsxExpressionAttribute | MdxJsxAttribute | undefined =
-        tag.attributes[tag.attributes.length - 1]
+        tag.attributes[tag.attributes.length - 1];
 
       /** @type {Program | undefined} */
       // @ts-expect-error: custom.
-      const estree = token.estree
+      const estree = token.estree;
 
       if (tail) {
-        tail.value = this.resume()
+        tail.value = this.resume();
 
         if (estree) {
-          tail.data = { estree }
+          tail.data = { estree };
         }
       }
     }
-  }
+  };
 
   const exitMdxJsxTagAttributeNamePrimary: FromMarkdownHandle = function (
     token
   ) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
     if (tag) {
       const node:
         | (MdxJsxExpressionAttribute & { name?: string })
         | (MdxJsxAttribute & { name?: string })
-        | undefined = tag.attributes[tag.attributes.length - 1]
+        | undefined = tag.attributes[tag.attributes.length - 1];
       if (node) {
-        node.name = this.sliceSerialize(token)
+        node.name = this.sliceSerialize(token);
       }
     }
-  }
+  };
 
   const exitMdxJsxTagAttributeNameLocal: FromMarkdownHandle = function (token) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
     if (tag) {
       const node:
         | (MdxJsxExpressionAttribute & { name?: string })
         | (MdxJsxAttribute & { name?: string })
-        | undefined = tag.attributes[tag.attributes.length - 1]
+        | undefined = tag.attributes[tag.attributes.length - 1];
       if (node) {
-        node.name += ':' + this.sliceSerialize(token)
+        node.name += ':' + this.sliceSerialize(token);
       }
     }
-  }
+  };
 
   const exitMdxJsxTagAttributeValueLiteral: FromMarkdownHandle = function () {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
     if (tag) {
       const attribute:
         | (MdxJsxExpressionAttribute & { name?: string })
         | (MdxJsxAttribute & { name?: string })
-        | undefined = tag.attributes[tag.attributes.length - 1]
+        | undefined = tag.attributes[tag.attributes.length - 1];
       // Support for unkeyed attributes
       if (attribute) {
         if (attribute.name === '') {
-          attribute.name = '_value'
+          attribute.name = '_value';
         }
-        attribute.value = parseEntities(this.resume(), { nonTerminated: false })
+        attribute.value = parseEntities(this.resume(), {
+          nonTerminated: false,
+        });
       }
     }
-  }
+  };
 
   /**
    * @this {CompileContext}
@@ -226,49 +228,49 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
   const exitMdxJsxTagAttributeValueExpression: FromMarkdownHandle = function (
     token
   ) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
-    if (!tag) return
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
+    if (!tag) return;
     const tail:
       | (MdxJsxExpressionAttribute & { name?: string })
       | (MdxJsxAttribute & { name?: string })
-      | undefined = tag.attributes[tag.attributes.length - 1]
+      | undefined = tag.attributes[tag.attributes.length - 1];
 
     const node: MdxJsxAttributeValueExpression = {
       type: 'mdxJsxAttributeValueExpression',
       value: this.resume(),
-    }
+    };
     /** @type {Program | undefined} */
     // @ts-expect-error: custom.
-    const estree = token.estree
+    const estree = token.estree;
 
     if (estree) {
-      node.data = { estree }
+      node.data = { estree };
     }
 
     if (tail) {
-      tail.value = node
+      tail.value = node;
     }
-  }
+  };
 
   const exitMdxJsxTagSelfClosingMarker: FromMarkdownHandle = function () {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
 
     if (tag) {
-      tag.selfClosing = true
+      tag.selfClosing = true;
     }
-  }
+  };
 
   /**
    * @this {CompileContext}
    * @type {FromMarkdownHandle}
    */
   const exitMdxJsxTag: FromMarkdownHandle = function (token) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
-    const stack: Tag[] | undefined = this.getData('mdxJsxTagStack')
-    if (!stack) return
-    const tail = stack[stack.length - 1]
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
+    const stack: Tag[] | undefined = this.getData('mdxJsxTagStack');
+    if (!stack) return;
+    const tail = stack[stack.length - 1];
 
-    if (!tag) return
+    if (!tag) return;
 
     if (tail && tag.close && tail.name !== tag.name) {
       throw new VFileMessage(
@@ -281,17 +283,17 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
           ')',
         { start: token.start, end: token.end },
         'mdast-util-mdx-jsx:end-tag-mismatch'
-      )
+      );
     }
 
     // End of a tag, so drop the buffer.
-    this.resume()
+    this.resume();
 
     if (tag.close) {
-      stack.pop()
+      stack.pop();
     } else {
-      const pattern = patterns.find((pattern) => pattern.name === tag.name)
-      const tagName = pattern?.templateName || tag.name
+      const pattern = patterns.find((pattern) => pattern.name === tag.name);
+      const tagName = pattern?.templateName || tag.name;
       this.enter(
         {
           type:
@@ -308,9 +310,9 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
         // We didn't receive a closing tag, so close it now.
         // Without this, we would be calling onErrorRightIsTag
         (left, right) => {
-          this.exit(right)
+          this.exit(right);
         }
-      )
+      );
     }
 
     if (tag.selfClosing || tag.close) {
@@ -325,8 +327,8 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
               children: [{ type: 'text', value: this.sliceSerialize(token) }],
             },
             token
-          )
-          this.exit(token)
+          );
+          this.exit(token);
         } else {
           this.enter(
             {
@@ -334,24 +336,24 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
               value: this.sliceSerialize(token),
             },
             token
-          )
-          this.exit(token)
+          );
+          this.exit(token);
         }
       } else {
-        this.exit(token, onErrorLeftIsTag)
+        this.exit(token, onErrorLeftIsTag);
       }
     } else {
-      stack.push(tag)
+      stack.push(tag);
     }
-  }
+  };
 
   const onErrorRightIsTag: OnEnterError = function (closing, open) {
-    const tag: Tag | undefined = this.getData('mdxJsxTag')
-    if (!tag) return
-    const place = closing ? ' before the end of `' + closing.type + '`' : ''
+    const tag: Tag | undefined = this.getData('mdxJsxTag');
+    if (!tag) return;
+    const place = closing ? ' before the end of `' + closing.type + '`' : '';
     const position = closing
       ? { start: closing.start, end: closing.end }
-      : undefined
+      : undefined;
 
     throw new VFileMessage(
       'Expected a closing tag for `' +
@@ -362,11 +364,11 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
         place,
       position,
       'mdast-util-mdx-jsx:end-tag-mismatch'
-    )
-  }
+    );
+  };
 
   const onErrorLeftIsTag: OnExitError = function (this, a, b) {
-    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag');
     // this.enter(
     //   {
     //     type: 'text',
@@ -391,14 +393,14 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
     //   { start: a.start, end: a.end },
     //   'mdast-util-mdx-jsx:end-tag-mismatch'
     // )
-  }
+  };
 
   /**
    * Serialize a tag, excluding attributes.
    * `self-closing` is not supported, because we don’t need it yet.
    */
   function serializeAbbreviatedTag(tag: Tag) {
-    return '<' + (tag.close ? '/' : '') + (tag.name || '') + '>'
+    return '<' + (tag.close ? '/' : '') + (tag.name || '') + '>';
   }
 
   return {
@@ -453,7 +455,7 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
       mdxJsxTextTagSelfClosingMarker: exitMdxJsxTagSelfClosingMarker,
       mdxJsxTextTag: exitMdxJsxTag,
     },
-  }
+  };
 }
 
 /**
@@ -466,26 +468,26 @@ export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
  */
 export const mdxJsxToMarkdown = function (
   options: Options & {
-    printWidth?: number
-    quoteSmart?: boolean
-    tightSelfClosing?: boolean
-    patterns: Pattern[]
+    printWidth?: number;
+    quoteSmart?: boolean;
+    tightSelfClosing?: boolean;
+    patterns: Pattern[];
   }
 ) {
-  const patterns = options.patterns || []
-  const options_ = options || {}
-  const quote = options_.quote || '"'
-  const quoteSmart = options_.quoteSmart || false
-  const tightSelfClosing = options_.tightSelfClosing || false
-  const printWidth = options_.printWidth || Number.POSITIVE_INFINITY
-  const alternative = quote === '"' ? "'" : '"'
+  const patterns = options.patterns || [];
+  const options_ = options || {};
+  const quote = options_.quote || '"';
+  const quoteSmart = options_.quoteSmart || false;
+  const tightSelfClosing = options_.tightSelfClosing || false;
+  const printWidth = options_.printWidth || Number.POSITIVE_INFINITY;
+  const alternative = quote === '"' ? "'" : '"';
 
   if (quote !== '"' && quote !== "'") {
     throw new Error(
       'Cannot serialize attribute values with `' +
         quote +
         '` for `options.quote`, expected `"`, or `\'`'
-    )
+    );
   }
 
   const mdxElement: ToMarkdownHandle = function (
@@ -494,72 +496,72 @@ export const mdxJsxToMarkdown = function (
     context,
     safeOptions
   ) {
-    const pattern = patterns.find((p) => p.templateName === node.name)
+    const pattern = patterns.find((p) => p.templateName === node.name);
     if (!pattern) {
       // FIXME
-      return ''
+      return '';
     }
-    const patternName = pattern.name || pattern?.templateName
-    const tracker = track(safeOptions)
-    const selfClosing = pattern.leaf
-    const exit = context.enter(node.type)
-    let index = -1
+    const patternName = pattern.name || pattern?.templateName;
+    const tracker = track(safeOptions);
+    const selfClosing = pattern.leaf;
+    const exit = context.enter(node.type);
+    let index = -1;
     /** @type {Array<string>} */
-    const serializedAttributes = []
-    let value = tracker.move(pattern.start + ' ' + (patternName || ''))
+    const serializedAttributes = [];
+    let value = tracker.move(pattern.start + ' ' + (patternName || ''));
 
     // None.
     if (node.attributes && node.attributes.length > 0) {
       if (!node.name) {
-        throw new Error('Cannot serialize fragment w/ attributes')
+        throw new Error('Cannot serialize fragment w/ attributes');
       }
 
       while (++index < node.attributes.length) {
-        const attribute = node.attributes[index]
+        const attribute = node.attributes[index];
         /** @type {string} */
-        let result
+        let result;
 
         if (attribute?.type === 'mdxJsxExpressionAttribute') {
-          result = '{' + (attribute.value || '') + '}'
+          result = '{' + (attribute.value || '') + '}';
         } else {
           if (!attribute?.name) {
-            throw new Error('Cannot serialize attribute w/o name')
+            throw new Error('Cannot serialize attribute w/o name');
           }
 
-          const value = attribute.value
-          const left = attribute.name
+          const value = attribute.value;
+          const left = attribute.name;
           /** @type {string} */
-          let right = ''
+          let right = '';
 
           if (value === undefined || value === null) {
             // Empty.
           } else if (typeof value === 'object') {
-            right = '{' + (value.value || '') + '}'
+            right = '{' + (value.value || '') + '}';
           } else {
             // If the alternative is less common than `quote`, switch.
             const appliedQuote =
               quoteSmart && ccount(value, quote) > ccount(value, alternative)
                 ? alternative
-                : quote
+                : quote;
             right =
               appliedQuote +
               stringifyEntitiesLight(value, { subset: [appliedQuote] }) +
-              appliedQuote
+              appliedQuote;
           }
 
           if (left === '_value') {
-            result = right
+            result = right;
           } else {
-            result = left + (right ? '=' : '') + right
+            result = left + (right ? '=' : '') + right;
           }
         }
 
-        serializedAttributes.push(result)
+        serializedAttributes.push(result);
       }
     }
 
-    let attributesOnTheirOwnLine = false
-    const attributesOnOneLine = serializedAttributes.join(' ')
+    let attributesOnTheirOwnLine = false;
+    const attributesOnOneLine = serializedAttributes.join(' ');
 
     if (
       // Block:
@@ -575,28 +577,28 @@ export const mdxJsxToMarkdown = function (
           (selfClosing ? (tightSelfClosing ? 2 : 3) : 1) >
           printWidth)
     ) {
-      attributesOnTheirOwnLine = true
+      attributesOnTheirOwnLine = true;
     }
 
     if (attributesOnTheirOwnLine) {
       value += tracker.move(
         '\n' + indentLines(serializedAttributes.join('\n'), map)
-      )
+      );
     } else if (attributesOnOneLine) {
-      value += tracker.move(' ' + attributesOnOneLine)
+      value += tracker.move(' ' + attributesOnOneLine);
     }
 
     if (attributesOnTheirOwnLine) {
-      value += tracker.move('\n')
+      value += tracker.move('\n');
     }
 
     if (selfClosing) {
       value += tracker.move(
         tightSelfClosing || attributesOnTheirOwnLine ? '' : ''
-      )
+      );
     }
 
-    value += tracker.move(' ' + pattern.end)
+    value += tracker.move(' ' + pattern.end);
 
     if (node.children) {
       if (node.type === 'mdxJsxFlowElement') {
@@ -604,12 +606,14 @@ export const mdxJsxToMarkdown = function (
           node.children.length === 1 &&
           node.children[0]?.type === 'paragraph' &&
           node.children[0].children[0]?.type === 'text' &&
-          node.children[0].children[0].value === ''
+          node.children[0].children[0].value === '';
         if (!emptyChildren) {
-          tracker.shift(2)
-          value += tracker.move('\n')
-          value += tracker.move(containerFlow(node, context, tracker.current()))
-          value += tracker.move('\n')
+          tracker.shift(2);
+          value += tracker.move('\n');
+          value += tracker.move(
+            containerFlow(node, context, tracker.current())
+          );
+          value += tracker.move('\n');
         }
       } else {
         value += tracker.move(
@@ -618,30 +622,30 @@ export const mdxJsxToMarkdown = function (
             before: '<',
             after: '>',
           })
-        )
+        );
       }
     }
 
     if (!selfClosing) {
       const closingTag =
-        pattern.start + ' /' + (patternName || ' ') + ' ' + pattern.end
-      value += tracker.move(closingTag)
+        pattern.start + ' /' + (patternName || ' ') + ' ' + pattern.end;
+      value += tracker.move(closingTag);
     }
 
-    exit()
-    return value
-  }
+    exit();
+    return value;
+  };
 
   const map: ToMarkdownMap = function (line, _, blank) {
-    return (blank ? '' : '  ') + line
-  }
+    return (blank ? '' : '  ') + line;
+  };
 
   const peekElement: ToMarkdownHandle = function () {
-    return '<'
-  }
+    return '<';
+  };
 
   // @ts-ignore
-  mdxElement.peek = peekElement
+  mdxElement.peek = peekElement;
 
   return {
     ...options,
@@ -657,5 +661,5 @@ export const mdxJsxToMarkdown = function (
     fences: true,
     // Always generate links with resources (never autolinks).
     resourceLink: true,
-  }
-}
+  };
+};

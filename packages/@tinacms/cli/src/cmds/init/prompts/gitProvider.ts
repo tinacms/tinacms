@@ -1,11 +1,11 @@
-import prompts from 'prompts'
-import { linkText, logText } from '../../../utils/theme'
+import prompts from 'prompts';
+import { linkText, logText } from '../../../utils/theme';
 
-import type { Config, PromptGitProvider } from './types'
+import type { Config, PromptGitProvider } from './types';
 
 const supportedGitProviders: {
-  github: PromptGitProvider
-  other: PromptGitProvider
+  github: PromptGitProvider;
+  other: PromptGitProvider;
 } = {
   github: {
     imports: [
@@ -25,7 +25,7 @@ const supportedGitProviders: {
   other: {
     gitProviderClassText: '',
   },
-}
+};
 
 export const chooseGitProvider = async ({ config }: { config: Config }) => {
   // const answers = await prompts([
@@ -72,7 +72,7 @@ export const chooseGitProvider = async ({ config }: { config: Config }) => {
       type: 'text',
       message: `What is your GitHub Repo name? Ex: my-nextjs-app \n(Hit enter to skip and set up later)\n`,
     },
-  ])
+  ]);
   // Add the env vars to the config
   config.envVars.push(
     {
@@ -87,6 +87,6 @@ export const chooseGitProvider = async ({ config }: { config: Config }) => {
       key: 'GITHUB_REPO',
       value: result.githubRepo,
     }
-  )
-  return supportedGitProviders.github
-}
+  );
+  return supportedGitProviders.github;
+};

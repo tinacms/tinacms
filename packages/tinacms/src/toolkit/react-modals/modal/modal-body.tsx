@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export const ModalBody = ({ className = '', padded = false, ...props }) => (
   <div
@@ -7,4 +7,4 @@ export const ModalBody = ({ className = '', padded = false, ...props }) => (
     } m-0 overflow-hidden flex flex-col min-h-[160px] [&:last-child]:rounded-[0_0_5px_5px] ${className}`}
     {...props}
   />
-)
+);

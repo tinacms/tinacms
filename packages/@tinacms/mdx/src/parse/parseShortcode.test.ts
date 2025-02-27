@@ -3,8 +3,8 @@
 
 
 */
-import { it, expect, describe } from 'vitest'
-import { parseShortcode } from './parseShortcode'
+import { it, expect, describe } from 'vitest';
+import { parseShortcode } from './parseShortcode';
 
 describe('parseShortcode', () => {
   describe('with keyed field', () => {
@@ -23,10 +23,10 @@ describe('parseShortcode', () => {
             type: 'string',
           },
         ],
-      })
-      expect(result).toEqual('<signature foo="bar123">\n</signature>')
-    })
-  })
+      });
+      expect(result).toEqual('<signature foo="bar123">\n</signature>');
+    });
+  });
 
   describe('with unkeyed attributes', () => {
     it('parses attributes', () => {
@@ -44,10 +44,10 @@ describe('parseShortcode', () => {
             type: 'string',
           },
         ],
-      })
-      expect(result).toEqual('<signature _value="bar123">\n</signature>')
-    })
-  })
+      });
+      expect(result).toEqual('<signature _value="bar123">\n</signature>');
+    });
+  });
 
   describe('with children', () => {
     it('parses children field', () => {
@@ -68,8 +68,8 @@ describe('parseShortcode', () => {
             },
           ],
         }
-      )
-      expect(result).toEqual('<signature >\n# FOO\n##Bar\n</signature>')
-    })
-  })
-})
+      );
+      expect(result).toEqual('<signature >\n# FOO\n##Bar\n</signature>');
+    });
+  });
+});

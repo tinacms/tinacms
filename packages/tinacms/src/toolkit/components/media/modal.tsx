@@ -1,23 +1,23 @@
-import React from 'react'
-import { Input } from '@toolkit/fields'
+import React from 'react';
+import { Input } from '@toolkit/fields';
 import {
   Modal,
   ModalHeader,
   ModalBody,
   PopupModal,
   ModalActions,
-} from '@toolkit/react-modals'
-import { Button } from '@toolkit/styles'
-import { LoadingDots } from '@tinacms/toolkit'
+} from '@toolkit/react-modals';
+import { Button } from '@toolkit/styles';
+import { LoadingDots } from '@tinacms/toolkit';
 
 interface DeleteModalProps {
-  close(): void
-  deleteFunc(): Promise<void>
-  filename: string
+  close(): void;
+  deleteFunc(): Promise<void>;
+  filename: string;
 }
 interface NewFolderModalProps {
-  onSubmit(filename: string): void
-  close(): void
+  onSubmit(filename: string): void;
+  close(): void;
 }
 
 export const DeleteModal = ({
@@ -25,7 +25,7 @@ export const DeleteModal = ({
   deleteFunc,
   filename,
 }: DeleteModalProps) => {
-  const [processing, setProcessing] = React.useState(false)
+  const [processing, setProcessing] = React.useState(false);
   return (
     <Modal>
       <PopupModal>
@@ -42,44 +42,44 @@ export const DeleteModal = ({
           <Button
             style={{ flexGrow: 3 }}
             disabled={processing}
-            variant="danger"
+            variant='danger'
             onClick={async () => {
-              setProcessing(true)
+              setProcessing(true);
               try {
-                await deleteFunc()
+                await deleteFunc();
               } catch (e) {
-                console.error(e)
+                console.error(e);
               } finally {
-                close()
+                close();
               }
             }}
           >
-            <span className="mr-1">Delete</span>
+            <span className='mr-1'>Delete</span>
             {processing && <LoadingDots />}
           </Button>
         </ModalActions>
       </PopupModal>
     </Modal>
-  )
-}
+  );
+};
 
 export const NewFolderModal = ({ onSubmit, close }: NewFolderModalProps) => {
-  const [folderName, setFolderName] = React.useState('')
+  const [folderName, setFolderName] = React.useState('');
   return (
     <Modal>
       <PopupModal>
         <ModalHeader close={close}>New Folder</ModalHeader>
         <ModalBody padded={true}>
-          <p className="text-base text-gray-700 mb-2">
+          <p className='text-base text-gray-700 mb-2'>
             Please provide a name for your folder.
           </p>
-          <p className="text-sm text-gray-500 mb-4 italic">
-            <span className="font-bold">Note</span> &ndash; If you navigate away
+          <p className='text-sm text-gray-500 mb-4 italic'>
+            <span className='font-bold'>Note</span> &ndash; If you navigate away
             before uploading a media item, the folder will disappear.
           </p>
           <Input
             value={folderName}
-            placeholder="Folder Name"
+            placeholder='Folder Name'
             required
             onChange={(e) => setFolderName(e.target.value)}
           />
@@ -91,11 +91,11 @@ export const NewFolderModal = ({ onSubmit, close }: NewFolderModalProps) => {
           <Button
             disabled={!folderName}
             style={{ flexGrow: 3 }}
-            variant="primary"
+            variant='primary'
             onClick={() => {
-              if (!folderName) return
-              onSubmit(folderName)
-              close()
+              if (!folderName) return;
+              onSubmit(folderName);
+              close();
             }}
           >
             Create New Folder
@@ -103,5 +103,5 @@ export const NewFolderModal = ({ onSubmit, close }: NewFolderModalProps) => {
         </ModalActions>
       </PopupModal>
     </Modal>
-  )
-}
+  );
+};

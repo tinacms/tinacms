@@ -1,4 +1,4 @@
-import { ELEMENT_CODE_BLOCK } from '@udecode/plate'
+import { ELEMENT_CODE_BLOCK } from '@udecode/plate';
 import {
   getPluginType,
   insertNode,
@@ -7,18 +7,18 @@ import {
   setElements,
   someNode,
   type TElement,
-} from '@udecode/plate-common'
+} from '@udecode/plate-common';
 
 export const insertEmptyCodeBlock = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
-    node.type === getPluginType(editor, ELEMENT_CODE_BLOCK)
+    node.type === getPluginType(editor, ELEMENT_CODE_BLOCK);
 
   if (
     someNode(editor, {
       match: matchCodeElements,
     })
   ) {
-    return
+    return;
   }
 
   const node = {
@@ -27,11 +27,11 @@ export const insertEmptyCodeBlock = (editor: PlateEditor) => {
     // TODO: this can probably be a config option
     lang: 'javascript',
     children: [{ type: 'text', text: '' }],
-  }
+  };
 
   if (isSelectionAtBlockStart(editor)) {
-    setElements(editor, node)
+    setElements(editor, node);
   } else {
-    insertNode(editor, node)
+    insertNode(editor, node);
   }
-}
+};

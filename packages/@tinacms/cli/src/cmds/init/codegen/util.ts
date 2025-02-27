@@ -1,4 +1,4 @@
-import ts from 'typescript'
+import ts from 'typescript';
 
 export const makeTransformer =
   <T extends ts.Node>(
@@ -6,7 +6,7 @@ export const makeTransformer =
   ): ts.TransformerFactory<T> =>
   (ctx: ts.TransformationContext) =>
   (node: T) =>
-    ts.visitNode(node, makeVisitor(ctx)) as T
+    ts.visitNode(node, makeVisitor(ctx)) as T;
 
 export function parseExpression(
   expression: string
@@ -15,17 +15,17 @@ export function parseExpression(
     'temp.ts',
     expression,
     ts.ScriptTarget.Latest
-  )
+  );
   if (sourceFile.statements.length !== 1) {
-    throw new Error('Expected one statement')
+    throw new Error('Expected one statement');
   }
 
-  const statement = sourceFile.statements[0]
+  const statement = sourceFile.statements[0];
   if (!ts.isExpressionStatement(statement)) {
-    throw new Error('Expected an expression statement')
+    throw new Error('Expected an expression statement');
   }
 
-  return [sourceFile, statement.expression]
+  return [sourceFile, statement.expression];
 }
 
 export function parseVariableStatement(
@@ -35,15 +35,15 @@ export function parseVariableStatement(
     'temp.ts',
     stmt,
     ts.ScriptTarget.Latest
-  )
+  );
   if (sourceFile.statements.length !== 1) {
-    throw new Error('Expected one statement')
+    throw new Error('Expected one statement');
   }
 
-  const statement = sourceFile.statements[0]
+  const statement = sourceFile.statements[0];
   if (!ts.isVariableStatement(statement)) {
-    throw new Error('Expected a variable statement')
+    throw new Error('Expected a variable statement');
   }
 
-  return [sourceFile, statement]
+  return [sourceFile, statement];
 }

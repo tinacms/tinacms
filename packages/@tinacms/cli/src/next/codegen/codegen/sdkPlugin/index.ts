@@ -16,17 +16,22 @@ import type {
   PluginFunction,
   PluginValidateFn,
   Types,
-} from '@graphql-codegen/plugin-helpers'
-import { visit } from 'graphql'
+} from '@graphql-codegen/plugin-helpers';
+import { visit } from 'graphql';
 
 import {
   LoadedFragment,
   RawClientSideBasePluginConfig,
-} from '@graphql-codegen/visitor-plugin-common'
-import { concatAST, FragmentDefinitionNode, GraphQLSchema, Kind } from 'graphql'
-import { extname } from 'path'
-import { RawGenericSdkPluginConfig } from './config'
-import { GenericSdkVisitor } from './visitor'
+} from '@graphql-codegen/visitor-plugin-common';
+import {
+  concatAST,
+  FragmentDefinitionNode,
+  GraphQLSchema,
+  Kind,
+} from 'graphql';
+import { extname } from 'path';
+import { RawGenericSdkPluginConfig } from './config';
+import { GenericSdkVisitor } from './visitor';
 
 export const plugin: PluginFunction<RawGenericSdkPluginConfig> = (
   schema: GraphQLSchema,
@@ -35,9 +40,9 @@ export const plugin: PluginFunction<RawGenericSdkPluginConfig> = (
 ) => {
   const allAst = concatAST(
     documents.reduce((prev, v) => {
-      return [...prev, v.document]
+      return [...prev, v.document];
     }, [])
-  )
+  );
   const allFragments: LoadedFragment[] = [
     ...(
       allAst.definitions.filter(
@@ -50,9 +55,9 @@ export const plugin: PluginFunction<RawGenericSdkPluginConfig> = (
       isExternal: false,
     })),
     ...(config.externalFragments || []),
-  ]
-  const visitor = new GenericSdkVisitor(schema, allFragments, config)
-  const visitorResult = visit(allAst, { leave: visitor as any })
+  ];
+  const visitor = new GenericSdkVisitor(schema, allFragments, config);
+  const visitorResult = visit(allAst, { leave: visitor as any });
 
   return {
     // We will take care of imports
@@ -62,8 +67,8 @@ export const plugin: PluginFunction<RawGenericSdkPluginConfig> = (
       ...visitorResult.definitions.filter((t) => typeof t === 'string'),
       visitor.sdkContent,
     ].join('\n'),
-  }
-}
+  };
+};
 
 export const validate: PluginValidateFn<any> = async (
   schema: GraphQLSchema,
@@ -74,8 +79,8 @@ export const validate: PluginValidateFn<any> = async (
   if (extname(outputFile) !== '.ts') {
     throw new Error(
       `Plugin "typescript-generic-sdk" requires extension to be ".ts"!`
-    )
+    );
   }
-}
+};
 
-export { GenericSdkVisitor }
+export { GenericSdkVisitor };

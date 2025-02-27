@@ -1,15 +1,15 @@
-import React from 'react'
-import { withRef } from '@udecode/cn'
-import { Icons } from './icons'
+import React from 'react';
+import { withRef } from '@udecode/cn';
+import { Icons } from './icons';
 import {
   ELEMENT_OL,
   ELEMENT_UL,
   toggleList,
   useListToolbarButton,
   useListToolbarButtonState,
-} from '@udecode/plate'
-import { ToolbarButton } from './toolbar'
-import { useEditorState } from '@udecode/plate-common'
+} from '@udecode/plate';
+import { ToolbarButton } from './toolbar';
+import { useEditorState } from '@udecode/plate-common';
 
 export const UnorderedListToolbarButton = withRef<typeof ToolbarButton>(
   (props, ref) => {

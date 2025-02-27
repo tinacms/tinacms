@@ -1,7 +1,7 @@
-import { wrapFieldsWithMeta } from './wrap-field-with-meta'
-import { Toggle } from '../components'
+import { wrapFieldsWithMeta } from './wrap-field-with-meta';
+import { Toggle } from '../components';
 
-export const ToggleField = wrapFieldsWithMeta(Toggle)
+export const ToggleField = wrapFieldsWithMeta(Toggle);
 
 export const ToggleFieldPlugin = {
   name: 'toggle',
@@ -9,6 +9,6 @@ export const ToggleFieldPlugin = {
   Component: ToggleField,
   validate(value: any, values: any, meta: any, field: any) {
     if (field.required && (typeof value === 'undefined' || value === null))
-      return 'Required'
+      return 'Required';
   },
-}
+};

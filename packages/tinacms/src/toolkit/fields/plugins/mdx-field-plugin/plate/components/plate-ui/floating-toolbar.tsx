@@ -1,32 +1,32 @@
-'use client'
+'use client';
 
-import React from 'react'
+import React from 'react';
 
-import { cn, withRef } from '@udecode/cn'
+import { cn, withRef } from '@udecode/cn';
 import {
   PortalBody,
   useComposedRef,
   useEventEditorSelectors,
   usePlateSelectors,
-} from '@udecode/plate-common'
+} from '@udecode/plate-common';
 import {
   type FloatingToolbarState,
   flip,
   offset,
   useFloatingToolbar,
   useFloatingToolbarState,
-} from '@udecode/plate-floating'
+} from '@udecode/plate-floating';
 
-import { Toolbar } from './toolbar'
+import { Toolbar } from './toolbar';
 
 export const FloatingToolbar = withRef<
   typeof Toolbar,
   {
-    state?: FloatingToolbarState
+    state?: FloatingToolbarState;
   }
 >(({ children, state, ...props }, componentRef) => {
-  const editorId = usePlateSelectors().id()
-  const focusedEditorId = useEventEditorSelectors.focus()
+  const editorId = usePlateSelectors().id();
+  const focusedEditorId = useEventEditorSelectors.focus();
 
   const floatingToolbarState = useFloatingToolbarState({
     editorId,
@@ -48,17 +48,17 @@ export const FloatingToolbar = withRef<
       placement: 'top',
       ...state?.floatingOptions,
     },
-  })
+  });
 
   const {
     hidden,
     props: rootProps,
     ref: floatingRef,
-  } = useFloatingToolbar(floatingToolbarState)
+  } = useFloatingToolbar(floatingToolbarState);
 
-  const ref = useComposedRef<HTMLDivElement>(componentRef, floatingRef)
+  const ref = useComposedRef<HTMLDivElement>(componentRef, floatingRef);
 
-  if (hidden) return null
+  if (hidden) return null;
 
   return (
     <PortalBody>
@@ -73,5 +73,5 @@ export const FloatingToolbar = withRef<
         {children}
       </Toolbar>
     </PortalBody>
-  )
-})
+  );
+});

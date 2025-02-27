@@ -1,20 +1,20 @@
-import * as React from 'react'
-import { Form } from '@toolkit/forms'
-import { Form as FinalForm, FormRenderProps } from 'react-final-form'
-import { FC } from 'react'
+import * as React from 'react';
+import { Form } from '@toolkit/forms';
+import { Form as FinalForm, FormRenderProps } from 'react-final-form';
+import { FC } from 'react';
 
 export interface FormLegacyProps {
-  form: Form
-  children(props: FormRenderProps<string>): any
+  form: Form;
+  children(props: FormRenderProps<string>): any;
 }
 
-const FF: any = FinalForm
+const FF: any = FinalForm;
 
 export const FormLegacy: FC<FormLegacyProps> = ({ form, children }) => {
-  const [i, setI] = React.useState(0)
+  const [i, setI] = React.useState(0);
   React.useEffect(() => {
-    setI((i) => i + 1)
-  }, [form])
+    setI((i) => i + 1);
+  }, [form]);
   /**
    * > Why is a `key` being set when this isn't an array?
    *
@@ -31,5 +31,5 @@ export const FormLegacy: FC<FormLegacyProps> = ({ form, children }) => {
     <FF form={form.finalForm} key={`${i}: ${form.id}`}>
       {children}
     </FF>
-  )
-}
+  );
+};

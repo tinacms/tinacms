@@ -7,7 +7,7 @@ export class GitClient {
    * @deprecated
    */
   onSubmit(data: any): Promise<any> {
-    return this.commit(data)
+    return this.commit(data);
   }
   /**
    * An alias to `writeToDisk`
@@ -15,7 +15,7 @@ export class GitClient {
    * @deprecated
    */
   onChange(data: any): Promise<any> {
-    return this.writeToDisk(data)
+    return this.writeToDisk(data);
   }
   /**
    * An alias to `writeMediaToDisk`
@@ -23,7 +23,7 @@ export class GitClient {
    * @deprecated
    */
   onUploadMedia(data: any): Promise<any> {
-    return this.writeMediaToDisk(data)
+    return this.writeMediaToDisk(data);
   }
   /**
    * An alias to `deleteFromDisk`
@@ -31,20 +31,20 @@ export class GitClient {
    * @deprecated
    */
   onDelete(data: any): Promise<any> {
-    return this.deleteFromDisk(data)
+    return this.deleteFromDisk(data);
   }
   /**
    * @deprecated
    */
   isAuthenticated(): boolean {
-    return true
+    return true;
   }
 
   commit(data: {
-    files: string[]
-    message?: string
-    name?: string
-    email?: string
+    files: string[];
+    message?: string;
+    name?: string;
+    email?: string;
   }): Promise<Response> {
     return fetch(`${this.baseUrl}/commit`, {
       method: 'POST',
@@ -52,7 +52,7 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify(data),
-    })
+    });
   }
 
   /**
@@ -67,8 +67,8 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
     }).catch((e) => {
-      console.error(e)
-    })
+      console.error(e);
+    });
   }
 
   /**
@@ -77,8 +77,8 @@ export class GitClient {
    * TODO: Remove `catch`
    */
   writeToDisk(data: {
-    fileRelativePath: string
-    content: string
+    fileRelativePath: string;
+    content: string;
   }): Promise<any> {
     return fetch(
       `${this.baseUrl}/${encodeURIComponent(data.fileRelativePath)}`,
@@ -90,8 +90,8 @@ export class GitClient {
         body: JSON.stringify(data),
       }
     ).catch((e) => {
-      console.error(e)
-    })
+      console.error(e);
+    });
   }
 
   /**
@@ -99,15 +99,15 @@ export class GitClient {
    * TODO: Remove `catch`
    */
   writeMediaToDisk(data: { directory: string; content: File }): Promise<any> {
-    const formData = new FormData()
-    formData.append('file', data.content)
-    formData.append('directory', data.directory)
+    const formData = new FormData();
+    formData.append('file', data.content);
+    formData.append('directory', data.directory);
     return fetch(`${this.baseUrl}/upload`, {
       method: 'POST',
       body: formData,
     }).catch((e) => {
-      console.error(e)
-    })
+      console.error(e);
+    });
   }
 
   /**
@@ -123,8 +123,8 @@ export class GitClient {
       },
       body: JSON.stringify(data),
     }).catch((e) => {
-      console.error(e)
-    })
+      console.error(e);
+    });
   }
 
   /**
@@ -137,7 +137,7 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify(data),
-    })
+    });
   }
 
   /**
@@ -149,8 +149,8 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
     }).then((response) => {
-      return response.json()
-    })
+      return response.json();
+    });
   }
 
   /**
@@ -165,8 +165,8 @@ export class GitClient {
         },
       }
     ).then((response) => {
-      return response.json()
-    })
+      return response.json();
+    });
   }
 
   /**
@@ -179,8 +179,8 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
     }).then((response) => {
-      return response.json()
-    })
+      return response.json();
+    });
   }
 
   /**
@@ -192,7 +192,7 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
     }).then((response) => {
-      return response.json()
-    })
+      return response.json();
+    });
   }
 }

@@ -1,1 +1,1 @@
-export { withPlugins, withPlugin } from '@toolkit/react-core'
+export { withPlugins, withPlugin } from '@toolkit/react-core';

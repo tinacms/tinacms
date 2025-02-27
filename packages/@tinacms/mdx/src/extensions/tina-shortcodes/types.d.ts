@@ -1,17 +1,17 @@
-import type { BlockContent, DefinitionContent, PhrasingContent } from 'mdast'
+import type { BlockContent, DefinitionContent, PhrasingContent } from 'mdast';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface DirectiveFields {
   /**
    * Directive name.
    */
-  name: string
+  name: string;
 
   /**
    * Directive attributes.
    */
   // eslint-disable-next-line @typescript-eslint/ban-types
-  attributes?: Record<string, string | null | undefined> | null | undefined
+  attributes?: Record<string, string | null | undefined> | null | undefined;
 }
 
 /**
@@ -23,12 +23,12 @@ export interface ContainerDirective extends Parent, DirectiveFields {
   /**
    * Node type.
    */
-  type: 'containerDirective'
+  type: 'containerDirective';
 
   /**
    * Content.
    */
-  children: Array<BlockContent | DefinitionContent>
+  children: Array<BlockContent | DefinitionContent>;
 }
 
 /**
@@ -40,12 +40,12 @@ export interface LeafDirective extends Parent, DirectiveFields {
   /**
    * Node type.
    */
-  type: 'leafDirective'
+  type: 'leafDirective';
 
   /**
    * Content.
    */
-  children: PhrasingContent[]
+  children: PhrasingContent[];
 }
 
 /**
@@ -56,18 +56,18 @@ export interface TextDirective extends Parent, DirectiveFields {
   /**
    * Node type.
    */
-  type: 'textDirective'
+  type: 'textDirective';
 
   /**
    * Content.
    */
-  children: PhrasingContent[]
+  children: PhrasingContent[];
 }
 
 /**
  * The different directive nodes.
  */
-export type Directive = ContainerDirective | LeafDirective | TextDirective
+export type Directive = ContainerDirective | LeafDirective | TextDirective;
 
 // Add custom data tracked to turn markdown into a tree.
 declare module 'mdast-util-from-markdown' {
@@ -76,7 +76,7 @@ declare module 'mdast-util-from-markdown' {
     /**
      * Attributes for current directive.
      */
-    directiveAttributes?: Array<[string, string]> | undefined
+    directiveAttributes?: Array<[string, string]> | undefined;
   }
 }
 
@@ -94,7 +94,7 @@ declare module 'mdast-util-to-markdown' {
      *     ^^^
      * ```
      */
-    containerDirective: 'containerDirective'
+    containerDirective: 'containerDirective';
 
     /**
      * Label of a container directive.
@@ -105,7 +105,7 @@ declare module 'mdast-util-to-markdown' {
      *   | :::
      * ```
      */
-    containerDirectiveLabel: 'containerDirectiveLabel'
+    containerDirectiveLabel: 'containerDirectiveLabel';
 
     /**
      * Whole leaf directive.
@@ -115,7 +115,7 @@ declare module 'mdast-util-to-markdown' {
      *     ^^^
      * ```
      */
-    leafDirective: 'leafDirective'
+    leafDirective: 'leafDirective';
 
     /**
      * Label of a leaf directive.
@@ -125,7 +125,7 @@ declare module 'mdast-util-to-markdown' {
      *        ^^^
      * ```
      */
-    leafDirectiveLabel: 'leafDirectiveLabel'
+    leafDirectiveLabel: 'leafDirectiveLabel';
 
     /**
      * Whole text directive.
@@ -135,7 +135,7 @@ declare module 'mdast-util-to-markdown' {
      *     ^^
      * ```
      */
-    textDirective: 'textDirective'
+    textDirective: 'textDirective';
 
     /**
      * Label of a text directive.
@@ -145,7 +145,7 @@ declare module 'mdast-util-to-markdown' {
      *       ^^^
      * ```
      */
-    textDirectiveLabel: 'textDirectiveLabel'
+    textDirectiveLabel: 'textDirectiveLabel';
   }
 }
 
@@ -156,7 +156,7 @@ declare module 'mdast' {
     /**
      * Directive in phrasing content (such as in paragraphs, headings).
      */
-    textDirective: TextDirective
+    textDirective: TextDirective;
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -165,12 +165,12 @@ declare module 'mdast' {
      * Directive in flow content (such as in the root document, or block
      * quotes), which contains further flow content.
      */
-    containerDirective: ContainerDirective
+    containerDirective: ContainerDirective;
 
     /**
      * Directive in flow content (such as in the root document, or block
      * quotes), which contains nothing.
      */
-    leafDirective: LeafDirective
+    leafDirective: LeafDirective;
   }
 }

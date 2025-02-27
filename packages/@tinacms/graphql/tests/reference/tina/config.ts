@@ -1,4 +1,4 @@
-import { Schema } from '@tinacms/schema-tools'
+import { Schema } from '@tinacms/schema-tools';
 
 export const schema: Schema = {
   collections: [
@@ -24,6 +24,6 @@ export const schema: Schema = {
       ],
     },
   ],
-}
+};
 
-export default { schema }
+export default { schema };

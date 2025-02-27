@@ -1,6 +1,6 @@
-import { MdVpnKey } from 'react-icons/md'
-import { createScreen } from '@toolkit/react-screens'
-import { UpdatePassword } from '@toolkit/components/account/update-password'
+import { MdVpnKey } from 'react-icons/md';
+import { createScreen } from '@toolkit/react-screens';
+import { UpdatePassword } from '@toolkit/components/account/update-password';
 
 export const PasswordScreenPlugin = createScreen({
   name: 'Change Password',
@@ -8,4 +8,4 @@ export const PasswordScreenPlugin = createScreen({
   Icon: MdVpnKey,
   layout: 'fullscreen',
   navCategory: 'Account',
-})
+});

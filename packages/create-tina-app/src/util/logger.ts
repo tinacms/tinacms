@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import chalk from 'chalk';
 
 export const TextStyles = {
   link: chalk.bold.cyan,
@@ -8,36 +8,36 @@ export const TextStyles = {
   warn: chalk.yellow,
   err: chalk.red,
   bold: chalk.bold,
-}
+};
 
 export class Logger {
   log(message: string) {
-    console.info(message)
+    console.info(message);
   }
 
   debug(message: string) {
-    console.debug(TextStyles.info(`[DEBUG] ${message}`))
+    console.debug(TextStyles.info(`[DEBUG] ${message}`));
   }
 
   info(message: string) {
-    console.info(TextStyles.info(`[INFO] ${message}`))
+    console.info(TextStyles.info(`[INFO] ${message}`));
   }
 
   success(message: string) {
-    console.log(TextStyles.success(`[SUCCESS] ${message}`))
+    console.log(TextStyles.success(`[SUCCESS] ${message}`));
   }
 
   cmd(message: string) {
-    console.log(TextStyles.cmd(message))
+    console.log(TextStyles.cmd(message));
   }
 
   warn(message: string) {
-    console.warn(TextStyles.warn(`[WARNING] ${message}`))
+    console.warn(TextStyles.warn(`[WARNING] ${message}`));
   }
 
   err(message: string) {
-    console.error(TextStyles.err(`[ERROR] ${message}`))
+    console.error(TextStyles.err(`[ERROR] ${message}`));
   }
 }
 
-export const log = new Logger()
+export const log = new Logger();

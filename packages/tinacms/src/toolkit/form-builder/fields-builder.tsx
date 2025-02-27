@@ -1,14 +1,14 @@
-import * as React from 'react'
-import { Form, Field } from '@toolkit/forms'
-import { useCMS, useEventSubscription } from '@toolkit/react-core'
-import { Field as FinalField } from 'react-final-form'
-import { FieldPlugin } from './field-plugin'
+import * as React from 'react';
+import { Form, Field } from '@toolkit/forms';
+import { useCMS, useEventSubscription } from '@toolkit/react-core';
+import { Field as FinalField } from 'react-final-form';
+import { FieldPlugin } from './field-plugin';
 
 export interface FieldsBuilderProps {
-  form: Form
-  activeFieldName?: string
-  fields: Field[]
-  padding?: boolean
+  form: Form;
+  activeFieldName?: string;
+  fields: Field[];
+  padding?: boolean;
 }
 
 export function FieldsBuilder({
@@ -17,16 +17,16 @@ export function FieldsBuilder({
   activeFieldName,
   padding = false,
 }: FieldsBuilderProps) {
-  const cms = useCMS()
+  const cms = useCMS();
 
   // re-build fields when new field plugins are registered
-  const [fieldPlugins, setFieldPlugins] = React.useState<FieldPlugin[]>([])
+  const [fieldPlugins, setFieldPlugins] = React.useState<FieldPlugin[]>([]);
   const updateFieldPlugins = React.useCallback(() => {
-    const fieldPlugins = cms.plugins.getType<FieldPlugin>('field').all()
-    setFieldPlugins(fieldPlugins)
-  }, [setFieldPlugins])
-  React.useEffect(() => updateFieldPlugins(), [])
-  useEventSubscription('plugin:add:field', () => updateFieldPlugins(), [])
+    const fieldPlugins = cms.plugins.getType<FieldPlugin>('field').all();
+    setFieldPlugins(fieldPlugins);
+  }, [setFieldPlugins]);
+  React.useEffect(() => updateFieldPlugins(), []);
+  useEventSubscription('plugin:add:field', () => updateFieldPlugins(), []);
 
   return (
     <FieldsGroup padding={padding}>
@@ -40,10 +40,10 @@ export function FieldsBuilder({
             fieldPlugins={fieldPlugins}
             index={index}
           />
-        )
+        );
       })}
     </FieldsGroup>
-  )
+  );
 }
 
 const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
@@ -53,30 +53,30 @@ const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
   React.useEffect(() => {
     form.mutators.setFieldData(field.name, {
       tinaField: field,
-    })
-  }, [form, field])
+    });
+  }, [form, field]);
 
-  if (field.component === null) return null
+  if (field.component === null) return null;
 
   const plugin = fieldPlugins.find(
     (plugin: FieldPlugin) => plugin.name === field.component
-  )
+  );
 
-  let type: string | undefined
+  let type: string | undefined;
   if (plugin && plugin.type) {
-    type = plugin.type
+    type = plugin.type;
   }
 
-  const parse = getProp('parse', field, plugin)
-  const validate = getProp('validate', field, plugin)
+  const parse = getProp('parse', field, plugin);
+  const validate = getProp('validate', field, plugin);
 
-  let format = field.format
+  let format = field.format;
 
   if (!format && plugin && plugin.format) {
-    format = plugin.format
+    format = plugin.format;
   }
 
-  let isActiveField = field.name === activeFieldName
+  let isActiveField = field.name === activeFieldName;
   // TODO: this handles focusing on the tag element when one
   // of it's items is the activeField (categories.2) but not
   // for when the items are displayed with the ListFieldPlugin
@@ -84,12 +84,12 @@ const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
   // @ts-ignore field types don't know about list and type
   if (field.list && field.type === 'string') {
     if (activeFieldName) {
-      const activeFieldNameArray = activeFieldName.split('.')
+      const activeFieldNameArray = activeFieldName.split('.');
       const activeFieldNameWithoutIndex = activeFieldNameArray
         .slice(0, activeFieldNameArray.length - 1)
-        .join('.')
+        .join('.');
       if (field.name === activeFieldNameWithoutIndex) {
-        isActiveField = true
+        isActiveField = true;
       }
     }
   }
@@ -114,7 +114,7 @@ const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
       // defaultValue={defaultValue}
       validate={(value, values, meta) => {
         if (validate) {
-          return validate(value, values, meta, field)
+          return validate(value, values, meta, field);
         }
       }}
     >
@@ -127,7 +127,7 @@ const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
               tinaForm={form}
               field={{ ...field, experimental_focusIntent: isActiveField }}
             />
-          )
+          );
         }
 
         if (plugin) {
@@ -140,21 +140,21 @@ const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
               field={{ ...field, experimental_focusIntent: isActiveField }}
               index={index}
             />
-          )
+          );
         }
 
-        return <p>Unrecognized field type</p>
+        return <p>Unrecognized field type</p>;
       }}
     </FinalField>
-  )
-}
+  );
+};
 
 export const FieldsGroup = ({
   padding,
   children,
 }: {
-  padding?: boolean
-  children?: any | any[]
+  padding?: boolean;
+  children?: any | any[];
 }) => {
   return (
     <div
@@ -164,8 +164,8 @@ export const FieldsGroup = ({
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
 /**
  *
@@ -178,11 +178,11 @@ function getProp(
   field: Field,
   plugin?: FieldPlugin
 ): any {
-  let prop = field[name]
+  let prop = field[name];
   if (!prop && plugin && plugin[name]) {
-    prop = plugin[name]
+    prop = plugin[name];
   }
-  return prop
+  return prop;
 }
 
 /**
@@ -195,14 +195,14 @@ function getProp(
 const isEqual = (field, a, b) => {
   const replacer = (key, value) => {
     if (key === 'id') {
-      return undefined
+      return undefined;
     }
-    return value
-  }
+    return value;
+  };
 
   if (field.type === 'rich-text') {
-    return JSON.stringify(a, replacer) === JSON.stringify(b, replacer)
+    return JSON.stringify(a, replacer) === JSON.stringify(b, replacer);
   }
 
-  return a === b
-}
+  return a === b;
+};

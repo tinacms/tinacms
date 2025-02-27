@@ -1,1 +1,1 @@
-export * from './dismissible'
+export * from './dismissible';
