@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/mdx",
-	"version": "1.5.4",
+	"version": "1.6.0",
 	"typings": "dist/index.d.ts",
 	"main": "dist/index.js",
 	"browser": "dist/index.browser.mjs",
@@ -80,7 +80,7 @@
 		"@types/js-yaml": "^4.0.9",
 		"@types/lodash.flatten": "^4.4.9",
 		"@types/mdast": "^3.0.15",
-		"@types/node": "^22.9.0",
+		"@types/node": "^22.13.1",
 		"@types/prettier": "^2.7.3",
 		"@types/unist": "^2.0.11",
 		"c8": "^7.14.0",
@@ -91,8 +91,8 @@
 		"micromark-extension-frontmatter": "1.1.0",
 		"ts-node": "^10.9.2",
 		"typedoc-plugin-markdown": "^3.17.1",
-		"typescript": "^5.6.3",
-		"vite": "^4.5.5",
+		"typescript": "^5.7.3",
+		"vite": "^4.5.9",
 		"vitest": "^0.32.4",
 		"zod": "^3.23.8"
 	}

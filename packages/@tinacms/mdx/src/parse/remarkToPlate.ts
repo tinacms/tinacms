@@ -359,6 +359,8 @@ export const remarkToSlate = (
     switch (content.type) {
       case 'text':
         return text(content)
+      case 'delete':
+        return phrashingMark(content)
       case 'link':
         return link(content)
       case 'image':
@@ -401,7 +403,7 @@ export const remarkToSlate = (
 
   const phrashingMark = (
     node: Md.PhrasingContent,
-    marks: ('bold' | 'italic' | 'code')[] = []
+    marks: ('strikethrough' | 'bold' | 'italic' | 'code')[] = []
   ): Plate.InlineElement[] => {
     const accum: Plate.InlineElement[] = []
     switch (node.type) {
@@ -427,6 +429,18 @@ export const remarkToSlate = (
         })
         break
       }
+      case 'delete': {
+        const children = flatten(
+          node.children.map((child) =>
+            phrashingMark(child, [...marks, 'strikethrough'])
+          )
+        )
+        children.forEach((child) => {
+          accum.push(child)
+        })
+        break
+      }
+
       case 'strong': {
         const children = flatten(
           node.children.map((child) => phrashingMark(child, [...marks, 'bold']))

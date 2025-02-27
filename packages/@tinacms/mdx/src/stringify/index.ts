@@ -408,7 +408,7 @@ const blockContentElement = (
   }
 }
 
-export type Marks = 'strong' | 'emphasis' | 'inlineCode'
+export type Marks = 'strong' | 'emphasis' | 'inlineCode' | 'delete'
 
 export const getMarks = (content: Plate.InlineElement) => {
   const marks: Marks[] = []
@@ -423,6 +423,9 @@ export const getMarks = (content: Plate.InlineElement) => {
   }
   if (content.code) {
     marks.push('inlineCode')
+  }
+  if (content.strikethrough) {
+    marks.push('delete')
   }
   return marks
 }

@@ -495,6 +495,13 @@ export const useGraphQLReducer = (
 
   const handleMessage = React.useCallback(
     (event: MessageEvent<PostMessage>) => {
+      if (event.data.type === 'user-select-form') {
+        cms.dispatch({
+          type: 'forms:set-active-form-id',
+          value: event.data.formId,
+        })
+      }
+
       if (event?.data?.type === 'quick-edit') {
         cms.dispatch({
           type: 'set-quick-editing-supported',

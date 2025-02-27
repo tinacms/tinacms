@@ -1,5 +1,21 @@
 # tinacms-gitprovider-github
 
+## 2.0.13
+
+### Patch Changes
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
+- Updated dependencies [[`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571)]:
+  - @tinacms/datalayer@1.3.13
+
+## 2.0.12
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/datalayer@1.3.12
+
 ## 2.0.11
 
 ### Patch Changes

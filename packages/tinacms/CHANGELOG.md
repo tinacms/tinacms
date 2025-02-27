@@ -1,5 +1,55 @@
 # tinacms
 
+## 2.7.1
+
+### Patch Changes
+
+- [#5517](https://github.com/tinacms/tinacms/pull/5517) [`74513b3`](https://github.com/tinacms/tinacms/commit/74513b357aa27165aa86f7b3218c697c663539e8) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix bug when encoding media manager image urls with special characters
+
+- [#5509](https://github.com/tinacms/tinacms/pull/5509) [`06c1716`](https://github.com/tinacms/tinacms/commit/06c17163b558a96275b0ef66c746b005a6f90d13) Thanks [@Ben0189](https://github.com/Ben0189)! - add auto format for strikethrough
+
+## 2.7.0
+
+### Minor Changes
+
+- [#5504](https://github.com/tinacms/tinacms/pull/5504) [`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d) Thanks [@Ben0189](https://github.com/Ben0189)! - Rich text editor - Add strikethrough support
+
+  - Added a strikethrough button in the rich text editor, allowing users to apply strikethrough formatting.
+  - Strikethrough syntax (`~~word~~`) correctly applies in Markdown mode.
+  - **Known Issue:** In the rich text editor, typing `~~word~~` does not currently auto-convert to strikethrough. A fix will follow in an upcoming patch.
+
+- [#5503](https://github.com/tinacms/tinacms/pull/5503) [`99bb59f`](https://github.com/tinacms/tinacms/commit/99bb59ff7b9f3cf27a1382b91826eb81831ecb95) Thanks [@JackDevAU](https://github.com/JackDevAU)! - feat: add experimental user form select to the useTina hook
+
+### Patch Changes
+
+- [#5498](https://github.com/tinacms/tinacms/pull/5498) [`3974aa7`](https://github.com/tinacms/tinacms/commit/3974aa759192713140733b99ee0254a1a056e124) Thanks [@kldavis4](https://github.com/kldavis4)! - fix: correctly handle noop renames
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
+- Updated dependencies [[`7541614`](https://github.com/tinacms/tinacms/commit/7541614527a02268ea453b23ce84637f978dcf2d), [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571)]:
+  - @tinacms/mdx@1.6.0
+  - @tinacms/schema-tools@1.7.1
+  - @tinacms/search@1.0.40
+
+## 2.6.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tinacms/search@1.0.39
+
+## 2.6.3
+
+### Patch Changes
+
+- [#5475](https://github.com/tinacms/tinacms/pull/5475) [`05ba069`](https://github.com/tinacms/tinacms/commit/05ba0692a7e990fbb671177829562869d517e7c1) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Remove the console.log for failing to encode a url
+
+- [#5474](https://github.com/tinacms/tinacms/pull/5474) [`42daaf7`](https://github.com/tinacms/tinacms/commit/42daaf7af125da265d2c5998168e9c7345dc0a59) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Reference dropdown - make it consume all the width of the sidebar
+
+- [#5447](https://github.com/tinacms/tinacms/pull/5447) [`bc986dd`](https://github.com/tinacms/tinacms/commit/bc986dd48f9a7da264281b55926ec51ce1068bb7) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix issue where browser was being closed when adding an embed in the rich text editor
+
+- [#5448](https://github.com/tinacms/tinacms/pull/5448) [`3af2354`](https://github.com/tinacms/tinacms/commit/3af23542b984c10e138d0cf10a165d50b99bb0e9) Thanks [@kldavis4](https://github.com/kldavis4)! - Encode urls in media manager to prevent unsafe characters from breaking images
+
 ## 2.6.2
 
 ### Patch Changes

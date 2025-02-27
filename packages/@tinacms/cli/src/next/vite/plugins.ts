@@ -1,3 +1,4 @@
+import AsyncLock from 'async-lock'
 import type { Plugin } from 'vite'
 import { createFilter, FilterPattern } from '@rollup/pluginutils'
 import type { Config } from '@svgr/core'
@@ -50,11 +51,13 @@ export const devServerEndPointsPlugin = ({
   apiURL,
   database,
   searchIndex,
+  databaseLock,
 }: {
   apiURL: string
   database: Database
   configManager: ConfigManager
   searchIndex: any
+  databaseLock: (fn: () => Promise<void>) => Promise<void>
 }) => {
   const plug: Plugin = {
     name: 'graphql-endpoints',
@@ -100,14 +103,17 @@ export const devServerEndPointsPlugin = ({
         if (req.url === '/graphql') {
           // @ts-ignore FIXME: req type doesn't match
           const { query, variables } = req.body
-          const result = await gqlResolve({
-            config: {
-              useRelativeMedia: true,
-            },
-            database,
-            query,
-            variables,
-            verbose: false,
+          let result: object
+          await databaseLock(async () => {
+            result = await gqlResolve({
+              config: {
+                useRelativeMedia: true,
+              },
+              database,
+              query,
+              variables,
+              verbose: false,
+            })
           })
           res.end(JSON.stringify(result))
           return

@@ -16,7 +16,7 @@ import {
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { Media, MediaListOptions } from 'tinacms'
-import path from 'path'
+import path from 'node:path'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export interface S3Config {
@@ -65,7 +65,7 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
     }
     switch (req.method) {
       case 'GET':
-        if (req.url.startsWith('/api/s3/media/upload_url')) {
+        if (req.query.key) {
           const expiresIn: number =
             (req.query.expiresIn && Number(req.query.expiresIn)) || 3600
           const s3_key = req.query.key
@@ -87,9 +87,8 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
           )
 
           return res.json({ signedUrl, src: cdnUrl + s3_key })
-        } else {
-          return listMedia(req, res, client, bucket, mediaRoot, cdnUrl)
         }
+        return listMedia(req, res, client, bucket, mediaRoot, cdnUrl)
       case 'DELETE':
         return deleteAsset(req, res, client, bucket)
       default:

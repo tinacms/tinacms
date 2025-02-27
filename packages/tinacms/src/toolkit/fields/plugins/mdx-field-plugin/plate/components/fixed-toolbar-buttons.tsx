@@ -5,6 +5,7 @@ import {
   MARK_BOLD,
   MARK_CODE,
   MARK_ITALIC,
+  MARK_STRIKETHROUGH,
 } from '@udecode/plate'
 import { useEditorState } from '@udecode/plate-common'
 import React from 'react'
@@ -84,6 +85,15 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     Component: (
       <MarkToolbarButton tooltip="Bold (⌘+B)" nodeType={MARK_BOLD}>
         <Icons.bold />
+      </MarkToolbarButton>
+    ),
+  },
+  strikethrough: {
+    label: 'Strikethrough',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: (
+      <MarkToolbarButton tooltip="Strikethrough " nodeType={MARK_STRIKETHROUGH}>
+        <Icons.strikethrough />
       </MarkToolbarButton>
     ),
   },
