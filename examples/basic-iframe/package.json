@@ -7,7 +7,9 @@
 		"build:local": "tinacms build --local --skip-cloud-checks -c \"next build\"",
 		"start": "next start",
 		"lint": "next lint",
-		"searchindex": "tinacms search-index"
+		"searchindex": "tinacms search-index",
+		"diff-tina-lock": "tinacms-scripts diff-tina-lock",
+		"update-tina-lock": "tinacms dev --no-server"
 	},
 	"dependencies": {
 		"@octokit/rest": "^19.0.13",
@@ -23,6 +25,7 @@
 		"typescript": "^5.7.3"
 	},
 	"devDependencies": {
+		"@tinacms/scripts": "workspace:*",
 		"@tinacms/cli": "workspace:*",
 		"@types/node": "^22.13.1",
 		"eslint": "7"

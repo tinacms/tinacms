@@ -6,13 +6,10 @@ import {
   getListItemEntry,
   createBlockquotePlugin,
   createHeadingPlugin,
-  createBoldPlugin,
-  createStrikethroughPlugin,
-  createItalicPlugin,
   createUnderlinePlugin,
-  createCodePlugin,
   createIndentListPlugin,
   createTablePlugin,
+  createBasicMarksPlugin,
 } from '@udecode/plate'
 import { ReactEditor } from 'slate-react'
 import {
@@ -36,17 +33,14 @@ import { createSlashPlugin } from '@udecode/plate-slash-command'
 import { Transforms, Editor, Node } from 'slate'
 
 export const plugins = [
+  createBasicMarksPlugin(),
   createHeadingPlugin(),
   createParagraphPlugin(),
   createCodeBlockPlugin(),
   createHTMLBlockPlugin(),
   createHTMLInlinePlugin(),
   createBlockquotePlugin(),
-  createBoldPlugin(),
-  createStrikethroughPlugin(),
-  createItalicPlugin(),
   createUnderlinePlugin(),
-  createCodePlugin(),
   createListPlugin(),
   createIndentListPlugin(),
   createHorizontalRulePlugin(),

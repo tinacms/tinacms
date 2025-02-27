@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/starter",
-  "version": "0.1.58",
+  "version": "0.1.59",
   "private": true,
   "scripts": {
     "dev": "tinacms dev -c \"next dev\"",
@@ -8,7 +8,9 @@
     "build:local": "tinacms build --local --skip-cloud-checks -c \"next build\"",
     "start": "tinacms build && next start",
     "export": "npm run build && next export",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "eslint . --ext .ts,.tsx",
+    "diff-tina-lock": "tinacms-scripts diff-tina-lock",
+    "update-tina-lock": "tinacms dev --no-server"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
@@ -24,7 +26,8 @@
     "postcss": "^8.5.2",
     "postcss-import": "^14.1.0",
     "postcss-nesting": "^10.2.0",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "@tinacms/scripts": "workspace:*"
   },
   "dependencies": {
     "@headlessui/react": "2.1.8",

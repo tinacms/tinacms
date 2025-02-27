@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/self-hosted-starter",
-	"version": "0.1.77",
+	"version": "0.1.78",
 	"private": true,
 	"scripts": {
 		"dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -c \"next dev\"",
@@ -8,7 +8,9 @@
 		"build": "tinacms build && next build",
 		"start": "tinacms build && next start",
 		"export": "npm run build && next export",
-		"lint": "eslint . --ext .ts,.tsx"
+		"lint": "eslint . --ext .ts,.tsx",
+		"diff-tina-lock": "TINA_PUBLIC_IS_LOCAL=true tinacms-scripts diff-tina-lock",
+		"update-tina-lock": "TINA_PUBLIC_IS_LOCAL=true tinacms dev --no-server"
 	},
 	"dependencies": {
 		"@headlessui/react": "2.1.8",
@@ -29,6 +31,7 @@
 	"devDependencies": {
 		"@svgr/webpack": "^8.1.0",
 		"@tinacms/cli": "workspace:*",
+		"@tinacms/scripts": "workspace:*",
 		"@types/node": "^22.13.1",
 		"@types/react": "^18.3.18",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
