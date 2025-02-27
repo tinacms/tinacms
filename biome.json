@@ -1,7 +1,15 @@
 {
 	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-	"vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
-	"files": { "ignoreUnknown": false, "ignore": [], "maxSize": 3145728 },
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git",
+		"useIgnoreFile": false
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"ignore": [],
+		"maxSize": 3145728
+	},
 	"formatter": {
 		"enabled": true,
 		"useEditorconfig": true,
@@ -31,7 +39,6 @@
 			"identity/CHANGELOG.md",
 			"js/dashboard/CHANGELOG.md",
 			"js/content-api/CHANGELOG.md",
-			"**/dist/**",
 			"terraform/**/.terraform",
 			"**/*.tfstate",
 			"**/.next/**",
@@ -41,7 +48,9 @@
 			"**/_response.md"
 		]
 	},
-	"organizeImports": { "enabled": true },
+	"organizeImports": {
+		"enabled": true
+	},
 	"linter": {
 		"enabled": true,
 		"rules": {
@@ -74,7 +83,13 @@
 				"useNamespaceKeyword": "error"
 			}
 		},
-		"ignore": ["packages/demo-*", "**/node_modules", "**/build", "**/*.d.ts", "**/dist/**"]
+		"ignore": [
+			"packages/demo-*",
+			"**/node_modules",
+			"**/build",
+			"**/*.d.ts",
+			"**/dist/**"
+		]
 	},
 	"javascript": {
 		"formatter": {
@@ -91,7 +106,12 @@
 	},
 	"overrides": [
 		{
-			"include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
+			"include": [
+				"*.ts",
+				"*.tsx",
+				"*.mts",
+				"*.cts"
+			],
 			"linter": {
 				"rules": {
 					"correctness": {
