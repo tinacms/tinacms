@@ -191,7 +191,7 @@ export const createConfig = async ({
     appType: 'spa',
     resolve: {
       alias,
-      dedupe: ['graphql', 'tinacms', 'react', 'react-dom', 'react-router-dom'],
+      dedupe: ['graphql', 'tinacms'],
     },
     define: {
       /**
@@ -226,14 +226,14 @@ export const createConfig = async ({
       host: configManager.config?.build?.host ?? false,
       watch: noWatch
         ? {
-            ignored: ['**/*'],
-          }
+          ignored: ['**/*'],
+        }
         : {
-            // Ignore everything except for the alias fields we specified above
-            ignored: [
-              `${configManager.tinaFolderPath}/**/!(config.prebuild.jsx|_graphql.json)`,
-            ],
-          },
+          // Ignore everything except for the alias fields we specified above
+          ignored: [
+            `${configManager.tinaFolderPath}/**/!(config.prebuild.jsx|_graphql.json)`,
+          ],
+        },
       fs: {
         strict: false,
       },
@@ -242,7 +242,15 @@ export const createConfig = async ({
       sourcemap: false,
       outDir: configManager.outputFolderPath,
       emptyOutDir: true,
-      rollupOptions: rollupOptions,
+      rollupOptions: {
+        external: (id) => {
+          // EXCLUDE REACT FROM EXTERNAL DEPENDENCIES IN DEV MODE
+          if (process.env.NODE_ENV === 'development') {
+            return false; // Ensures React is bundled for TinaCMS dev environment
+          }
+          return ['react', 'react-dom', 'react-router-dom'].includes(id);
+        },
+      },
     },
     plugins: [
       /**
