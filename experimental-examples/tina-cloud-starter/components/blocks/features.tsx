@@ -5,7 +5,7 @@ import { iconSchema } from '../util/icon'
 import {
   PageBlocksFeatures,
   PageBlocksFeaturesItems,
-} from '../../.tina/__generated__/types'
+} from '../../tina/__generated__/types'
 import { tinaField } from 'tinacms/dist/react'
 
 export const Feature = ({

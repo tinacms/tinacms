@@ -355,6 +355,13 @@ const config = defineConfig({
             required: true,
           },
           {
+            type: 'string',
+            label: 'Title',
+            name: 'title2',
+            description:
+              'The title of the page. This is used to display the title in the CMS',
+          },
+          {
             type: 'object',
             list: true,
             name: 'blocks',
