@@ -54,7 +54,7 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true,
+			"recommended": false,
 			"complexity": {
 				"noBannedTypes": "off",
 				"noUselessTypeConstraint": "error"
