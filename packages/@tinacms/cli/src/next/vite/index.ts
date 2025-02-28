@@ -160,12 +160,8 @@ export const createConfig = async ({
     TINA_IMPORT: configManager.prebuildFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
     STATIC_MEDIA_IMPORT: staticMediaPath,
-    react: path.join(configManager.spaRootPath, 'node_modules', 'react'),
-    'react-dom': path.join(
-      configManager.spaRootPath,
-      'node_modules',
-      'react-dom'
-    ),
+    react: path.resolve(__dirname, 'node_modules/react'),
+    'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
     crypto: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     fs: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     os: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
@@ -199,7 +195,7 @@ export const createConfig = async ({
     appType: 'spa',
     resolve: {
       alias,
-      dedupe: ['graphql', 'tinacms'],
+      dedupe: ['graphql', 'tinacms', 'react', 'react-dom'],
     },
     define: {
       /**
@@ -250,12 +246,7 @@ export const createConfig = async ({
       sourcemap: false,
       outDir: configManager.outputFolderPath,
       emptyOutDir: true,
-      rollupOptions: {
-        external: (id) => {
-          console.log('I am rollup id', id)
-          return id.includes('react') || id.includes('react-dom') ? false : true
-        },
-      },
+      rollupOptions: rollupOptions,
     },
     plugins: [
       /**
