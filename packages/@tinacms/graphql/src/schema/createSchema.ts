@@ -1,24 +1,24 @@
 /**
 
 */
-import { TinaSchema, Schema } from '@tinacms/schema-tools'
+import { TinaSchema, Schema } from '@tinacms/schema-tools';
 
-import { validateSchema } from './validate'
+import { validateSchema } from './validate';
 // @ts-ignore File '...' is not under 'rootDir'
-import packageJSON from '../../package.json'
+import packageJSON from '../../package.json';
 
 export const createSchema = async ({
   schema,
   flags = [],
 }: {
-  schema: Schema
-  flags?: string[]
+  schema: Schema;
+  flags?: string[];
 }) => {
-  const validSchema = await validateSchema(schema)
-  const [major, minor, patch] = packageJSON.version.split('.')
-  const meta = {}
+  const validSchema = await validateSchema(schema);
+  const [major, minor, patch] = packageJSON.version.split('.');
+  const meta = {};
   if (flags && flags.length > 0) {
-    meta['flags'] = flags
+    meta['flags'] = flags;
   }
   return new TinaSchema({
     version: {
@@ -29,5 +29,5 @@ export const createSchema = async ({
     },
     meta,
     ...validSchema,
-  })
-}
+  });
+};

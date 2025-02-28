@@ -1,14 +1,14 @@
-import AsyncLock from 'async-lock'
-import { createServer as createViteServer } from 'vite'
-import type { Plugin } from 'vite'
-import type { Database } from '@tinacms/graphql'
-import { ConfigManager } from '../../../config-manager'
-import { createConfig } from '../../../vite'
+import AsyncLock from 'async-lock';
+import { createServer as createViteServer } from 'vite';
+import type { Plugin } from 'vite';
+import type { Database } from '@tinacms/graphql';
+import { ConfigManager } from '../../../config-manager';
+import { createConfig } from '../../../vite';
 import {
   devServerEndPointsPlugin,
   transformTsxPlugin,
   viteTransformExtension,
-} from '../../../vite/plugins'
+} from '../../../vite/plugins';
 
 export const createDevServer = async (
   configManager: ConfigManager,
@@ -28,7 +28,7 @@ export const createDevServer = async (
       databaseLock,
     }),
     viteTransformExtension(),
-  ]
+  ];
   return createViteServer(
     await createConfig({
       configManager,
@@ -48,11 +48,11 @@ export const createDevServer = async (
         input: configManager.spaMainPath,
         onwarn(warning, warn) {
           if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
-            return
+            return;
           }
-          warn(warning)
+          warn(warning);
         },
       },
     })
-  )
-}
+  );
+};

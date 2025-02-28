@@ -1,30 +1,30 @@
-import AsyncLock from 'async-lock'
-import { Command, Option } from 'clipanion'
-import fs from 'fs-extra'
-import path from 'path'
-import chokidar from 'chokidar'
-import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql'
-import { ConfigManager } from '../../config-manager'
-import { devHTML } from './html'
-import { logger, summary } from '../../../logger'
-import { dangerText, warnText } from '../../../utils/theme'
-import { createDevServer } from './server'
-import { Codegen } from '../../codegen'
-import { createAndInitializeDatabase, createDBServer } from '../../database'
-import { BaseCommand } from '../baseCommands'
-import { spin } from '../../../utils/spinner'
-import { SearchIndexer, LocalSearchIndexClient } from '@tinacms/search'
+import AsyncLock from 'async-lock';
+import { Command, Option } from 'clipanion';
+import fs from 'fs-extra';
+import path from 'path';
+import chokidar from 'chokidar';
+import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql';
+import { ConfigManager } from '../../config-manager';
+import { devHTML } from './html';
+import { logger, summary } from '../../../logger';
+import { dangerText, warnText } from '../../../utils/theme';
+import { createDevServer } from './server';
+import { Codegen } from '../../codegen';
+import { createAndInitializeDatabase, createDBServer } from '../../database';
+import { BaseCommand } from '../baseCommands';
+import { spin } from '../../../utils/spinner';
+import { SearchIndexer, LocalSearchIndexClient } from '@tinacms/search';
 
 export class DevCommand extends BaseCommand {
-  static paths = [['dev'], ['server:start']]
+  static paths = [['dev'], ['server:start']];
   // NOTE: camelCase commands for string options don't work if there's an `=` used https://github.com/arcanis/clipanion/issues/141
   watchFolders = Option.String('-w,--watchFolders', {
     description:
       'DEPRECATED - a list of folders (relative to where this is being run) that the cli will watch for changes',
-  })
+  });
   noWatch = Option.Boolean('--noWatch', false, {
     description: "Don't regenerate config on file changes",
-  })
+  });
   outputSearchIndexPath = Option.String('--outputSearchIndexPath', {
     description: 'Path to write the search index to',
   })
@@ -40,20 +40,20 @@ export class DevCommand extends BaseCommand {
       [`A basic example`, `$0 dev`],
       [`A second example`, `$0 dev --rootPath`],
     ],
-  })
+  });
 
   async catch(error: any): Promise<void> {
-    logger.error('Error occured during tinacms dev')
-    console.error(error)
-    process.exit(1)
+    logger.error('Error occured during tinacms dev');
+    console.error(error);
+    process.exit(1);
   }
 
   logDeprecationWarnings() {
-    super.logDeprecationWarnings()
+    super.logDeprecationWarnings();
     if (this.watchFolders) {
       logger.warn(
         '--watchFolders has been deprecated, imports from your Tina config file will be watched automatically. If you still need it please open a ticket at https://github.com/tinacms/tinacms/issues'
-      )
+      );
     }
   }
 
@@ -61,32 +61,32 @@ export class DevCommand extends BaseCommand {
     const configManager = new ConfigManager({
       rootPath: this.rootPath,
       legacyNoSDK: this.noSDK,
-    })
-    logger.info('🦙 TinaCMS Dev Server is initializing...')
-    this.logDeprecationWarnings()
+    });
+    logger.info('🦙 TinaCMS Dev Server is initializing...');
+    this.logDeprecationWarnings();
 
     // Initialize the host TCP server
-    createDBServer(Number(this.datalayerPort))
+    createDBServer(Number(this.datalayerPort));
 
-    let database: Database = null
+    let database: Database = null;
     const dbLock = async (fn: () => Promise<void>) => {
-      return this.indexingLock.acquire('Key', fn)
-    }
+      return this.indexingLock.acquire('Key', fn);
+    };
 
     const setup = async ({ firstTime }: { firstTime: boolean }) => {
       try {
-        await configManager.processConfig()
+        await configManager.processConfig();
         if (firstTime) {
           database = await createAndInitializeDatabase(
             configManager,
             Number(this.datalayerPort)
-          )
+          );
         } else {
-          database.clearCache()
+          database.clearCache();
         }
 
         const { tinaSchema, graphQLSchema, lookup, queryDoc, fragDoc } =
-          await buildSchema(configManager.config)
+          await buildSchema(configManager.config);
 
         const codegen = new Codegen({
           isLocal: true,
@@ -98,36 +98,38 @@ export class DevCommand extends BaseCommand {
           tinaSchema,
           lookup,
           noClientBuildCache: true,
-        })
-        const apiURL = await codegen.execute()
+        });
+        const apiURL = await codegen.execute();
 
         if (!configManager.isUsingLegacyFolder) {
-          delete require.cache[configManager.generatedSchemaJSONPath]
-          delete require.cache[configManager.generatedLookupJSONPath]
-          delete require.cache[configManager.generatedGraphQLJSONPath]
+          delete require.cache[configManager.generatedSchemaJSONPath];
+          delete require.cache[configManager.generatedLookupJSONPath];
+          delete require.cache[configManager.generatedGraphQLJSONPath];
 
-          const schemaObject = require(configManager.generatedSchemaJSONPath)
-          const lookupObject = require(configManager.generatedLookupJSONPath)
-          const graphqlSchemaObject = require(configManager.generatedGraphQLJSONPath)
+          const schemaObject = require(configManager.generatedSchemaJSONPath);
+          const lookupObject = require(configManager.generatedLookupJSONPath);
+          const graphqlSchemaObject = require(
+            configManager.generatedGraphQLJSONPath
+          );
 
-          const tinaLockFilename = 'tina-lock.json'
+          const tinaLockFilename = 'tina-lock.json';
           const tinaLockContent = JSON.stringify({
             schema: schemaObject,
             lookup: lookupObject,
             graphql: graphqlSchemaObject,
-          })
+          });
           fs.writeFileSync(
             path.join(configManager.tinaFolderPath, tinaLockFilename),
             tinaLockContent
-          )
+          );
 
           if (configManager.hasSeparateContentRoot()) {
             const rootPath = await configManager.getTinaFolderPath(
               configManager.contentRootPath
-            )
-            const filePath = path.join(rootPath, tinaLockFilename)
-            await fs.ensureFile(filePath)
-            await fs.outputFile(filePath, tinaLockContent)
+            );
+            const filePath = path.join(rootPath, tinaLockFilename);
+            await fs.ensureFile(filePath);
+            await fs.outputFile(filePath, tinaLockContent);
           }
         }
 
@@ -136,9 +138,9 @@ export class DevCommand extends BaseCommand {
           graphQLSchema,
           tinaSchema,
           configManager,
-        })
+        });
         if (!firstTime) {
-          logger.error('Re-index complete')
+          logger.error('Re-index complete');
         }
 
         if (!this.noWatch) {
@@ -146,42 +148,42 @@ export class DevCommand extends BaseCommand {
             configManager,
             dbLock,
             async () => await codegen.execute()
-          )
+          );
         }
 
-        return { apiURL, database, graphQLSchema, tinaSchema }
+        return { apiURL, database, graphQLSchema, tinaSchema };
       } catch (e) {
-        logger.error(`\n\n${dangerText(e.message)}\n`)
+        logger.error(`\n\n${dangerText(e.message)}\n`);
         if (this.verbose) {
-          console.error(e)
+          console.error(e);
         }
         if (firstTime) {
           logger.error(
             warnText(
               'Unable to start dev server, please fix your Tina config / resolve any errors above and try again'
             )
-          )
-          process.exit(1)
+          );
+          process.exit(1);
         } else {
-          logger.error(warnText('Dev server has not been restarted'))
+          logger.error(warnText('Dev server has not been restarted'));
         }
       }
-    }
+    };
     const { apiURL, graphQLSchema, tinaSchema } = await setup({
       firstTime: true,
-    })
+    });
 
-    await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port))
+    await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port));
     // Add the gitignore so the index.html and assets are committed to git
     await fs.outputFile(
       configManager.outputGitignorePath,
       'index.html\nassets/'
-    )
+    );
     const searchIndexClient = new LocalSearchIndexClient({
       stopwordLanguages: configManager.config.search?.tina?.stopwordLanguages,
       tokenSplitRegex: configManager.config.search?.tina?.tokenSplitRegex,
-    })
-    await searchIndexClient.onStartIndexing()
+    });
+    await searchIndexClient.onStartIndexing();
 
     const searchIndexer = new SearchIndexer({
       batchSize: configManager.config.search?.indexBatchSize || 100,
@@ -193,18 +195,18 @@ export class DevCommand extends BaseCommand {
       client: searchIndexClient,
       textIndexLength:
         configManager.config.search?.maxSearchIndexFieldLength || 100,
-    })
+    });
 
     if (configManager.config.search) {
       await spin({
         waitFor: async () => {
-          await searchIndexer.indexAllContent()
+          await searchIndexer.indexAllContent();
         },
         text: 'Building search index',
-      })
+      });
 
       if (this.outputSearchIndexPath) {
-        await searchIndexClient.export(this.outputSearchIndexPath)
+        await searchIndexClient.export(this.outputSearchIndexPath);
       }
     }
 
@@ -218,7 +220,7 @@ export class DevCommand extends BaseCommand {
         database,
         dbLock,
         configManager.config.search && searchIndexer
-      )
+      );
     }
 
     const server = await createDevServer(
@@ -228,29 +230,29 @@ export class DevCommand extends BaseCommand {
       apiURL,
       this.noWatch,
       dbLock
-    )
-    await server.listen(Number(this.port))
+    );
+    await server.listen(Number(this.port));
 
     if (!this.noWatch) {
       chokidar.watch(configManager.watchList).on('change', async () => {
         await dbLock(async () => {
-          logger.info(`Tina config change detected, rebuilding`)
-          await setup({ firstTime: false })
+          logger.info(`Tina config change detected, rebuilding`);
+          await setup({ firstTime: false });
           // The setup process results in an update to the prebuild file
           // But Vite doesn't reload when it's changed for some reason
           // So we're triggering the reload ourselves
-          server.ws.send({ type: 'full-reload', path: '*' })
-        })
-      })
+          server.ws.send({ type: 'full-reload', path: '*' });
+        });
+      });
     }
 
-    const subItems = []
+    const subItems = [];
 
     if (configManager.hasSeparateContentRoot()) {
       subItems.push({
         key: 'Content repo',
         value: configManager.contentRootPath,
-      })
+      });
     }
 
     const summaryItems = [
@@ -273,7 +275,7 @@ export class DevCommand extends BaseCommand {
           ...subItems,
         ],
       },
-    ]
+    ];
 
     if (!configManager.shouldSkipSDK()) {
       summaryItems.push({
@@ -289,7 +291,7 @@ export class DevCommand extends BaseCommand {
             value: configManager.printGeneratedTypesFilePath(),
           },
         ],
-      })
+      });
     }
 
     summary({
@@ -311,8 +313,8 @@ export class DevCommand extends BaseCommand {
         //   ],
         // },
       ],
-    })
-    await this.startSubCommand()
+    });
+    await this.startSubCommand();
   }
 
   watchContentFiles(
@@ -321,15 +323,15 @@ export class DevCommand extends BaseCommand {
     databaseLock: (fn: () => Promise<void>) => Promise<void>,
     searchIndexer?: SearchIndexer
   ) {
-    const collectionContentFiles = []
+    const collectionContentFiles = [];
     configManager.config.schema.collections.forEach((collection) => {
       const collectionGlob = `${path.join(
         configManager.contentRootPath,
         collection.path
-      )}/**/*.${collection.format || 'md'}`
-      collectionContentFiles.push(collectionGlob)
-    })
-    let ready = false
+      )}/**/*.${collection.format || 'md'}`;
+      collectionContentFiles.push(collectionGlob);
+    });
+    let ready = false;
     /**
      * This has no way of knowing whether the change to the file came from someone manually
      * editing in their IDE or Tina pushing the update via the Filesystem bridge. It's a simple
@@ -340,52 +342,55 @@ export class DevCommand extends BaseCommand {
     chokidar
       .watch(collectionContentFiles)
       .on('ready', () => {
-        ready = true
+        ready = true;
       })
       .on('add', async (addedFile) => {
         if (!ready) {
-          return
+          return;
         }
         await databaseLock(async () => {
-          const pathFromRoot = configManager.printContentRelativePath(addedFile)
+          const pathFromRoot =
+            configManager.printContentRelativePath(addedFile);
           await database
             .indexContentByPaths([pathFromRoot])
-            .catch(console.error)
+            .catch(console.error);
           if (searchIndexer) {
             await searchIndexer
               .indexContentByPaths([pathFromRoot])
-              .catch(console.error)
+              .catch(console.error);
           }
-        })
+        });
       })
       .on('change', async (changedFile) => {
-        const pathFromRoot = configManager.printContentRelativePath(changedFile)
+        const pathFromRoot =
+          configManager.printContentRelativePath(changedFile);
         // Optionally we can reload the page when this happens
         // server.ws.send({ type: 'full-reload', path: '*' })
         await databaseLock(async () => {
           await database
             .indexContentByPaths([pathFromRoot])
-            .catch(console.error)
+            .catch(console.error);
           if (searchIndexer) {
             await searchIndexer
               .indexContentByPaths([pathFromRoot])
-              .catch(console.error)
+              .catch(console.error);
           }
-        })
+        });
       })
       .on('unlink', async (removedFile) => {
-        const pathFromRoot = configManager.printContentRelativePath(removedFile)
+        const pathFromRoot =
+          configManager.printContentRelativePath(removedFile);
         await databaseLock(async () => {
           await database
             .deleteContentByPaths([pathFromRoot])
-            .catch(console.error)
+            .catch(console.error);
           if (searchIndexer) {
             await searchIndexer
               .deleteIndexContent([pathFromRoot])
-              .catch(console.error)
+              .catch(console.error);
           }
-        })
-      })
+        });
+      });
   }
 
   watchQueries(
@@ -396,9 +401,9 @@ export class DevCommand extends BaseCommand {
     // Locking prevents multiple near-simultaneous file changes from clobbering each other.
     const executeCallback = async (_: unknown) => {
       await databaseLock(async () => {
-        await callback()
-      })
-    }
+        await callback();
+      });
+    };
 
     /**
      * This has no way of knowing whether the change to the file came from someone manually
@@ -411,6 +416,6 @@ export class DevCommand extends BaseCommand {
       .watch(configManager.userQueriesAndFragmentsGlob)
       .on('add', executeCallback)
       .on('change', executeCallback)
-      .on('unlink', executeCallback)
+      .on('unlink', executeCallback);
   }
 }

@@ -1,43 +1,43 @@
-import { codes } from 'micromark-util-symbol/codes'
-import { values } from 'micromark-util-symbol/values'
+import { codes } from 'micromark-util-symbol/codes';
+import { values } from 'micromark-util-symbol/values';
 
 const findValue = (string: string): string | null => {
-  let lookupValue: string | null = null
+  let lookupValue: string | null = null;
   Object.entries(values).forEach(([key, value]) => {
     if (value === string) {
-      lookupValue = key
+      lookupValue = key;
     }
-  })
-  return lookupValue
-}
+  });
+  return lookupValue;
+};
 export const findCode = (string: string | undefined | null): number | null => {
   if (!string) {
-    return null
+    return null;
   }
-  const lookup = findValue(string)
-  let lookupValue: number | null = null
+  const lookup = findValue(string);
+  let lookupValue: number | null = null;
   if (lookup) {
     Object.entries(codes).forEach(([key, value]) => {
       if (key === lookup) {
-        lookupValue = value
+        lookupValue = value;
       }
-    })
+    });
   }
-  return lookupValue
-}
+  return lookupValue;
+};
 export const printCode = (num: number) => {
-  let lookupValue: string | null = null
+  let lookupValue: string | null = null;
   Object.entries(codes).forEach(([key, value]) => {
     if (value === num) {
-      lookupValue = key
+      lookupValue = key;
     }
-  })
-  console.log(lookupValue)
-}
+  });
+  console.log(lookupValue);
+};
 export const logSelf = (item: any) => {
   console.log(
     item.events.map((e: any) => {
-      return `${e[0]} - ${e[1].type} | ${item.sliceSerialize(e[1])}`
+      return `${e[0]} - ${e[1].type} | ${item.sliceSerialize(e[1])}`;
     })
-  )
-}
+  );
+};

@@ -2,11 +2,11 @@
 
 */
 
-import React from 'react'
-import type { TinaCMS } from '@tinacms/toolkit'
+import React from 'react';
+import type { TinaCMS } from '@tinacms/toolkit';
 
-import GetCMS from '../components/GetCMS'
-import { PageWrapper, PageHeader, PageBodyNarrow } from '../components/Page'
+import GetCMS from '../components/GetCMS';
+import { PageWrapper, PageHeader, PageBodyNarrow } from '../components/Page';
 
 const DashboardPage = () => {
   return (
@@ -15,7 +15,7 @@ const DashboardPage = () => {
         <PageWrapper>
           <>
             <PageHeader isLocalMode={cms.api?.tina?.isLocalMode}>
-              <h3 className="text-2xl font-sans text-gray-700">
+              <h3 className='text-2xl font-sans text-gray-700'>
                 Welcome to Tina!
               </h3>
             </PageHeader>
@@ -27,7 +27,7 @@ const DashboardPage = () => {
         </PageWrapper>
       )}
     </GetCMS>
-  )
-}
+  );
+};
 
-export default DashboardPage
+export default DashboardPage;

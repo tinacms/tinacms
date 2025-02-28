@@ -1,1 +1,1 @@
-export const normalizePath = (filepath: string) => filepath.replace(/\\/g, '/')
+export const normalizePath = (filepath: string) => filepath.replace(/\\/g, '/');

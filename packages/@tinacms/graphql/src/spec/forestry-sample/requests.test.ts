@@ -2,10 +2,10 @@
 
 */
 
-import path from 'node:path'
-import { setupFixture, setupFixture2, print, type Fixture } from '../setup'
-import { tinaSchema } from './.tina/schema'
-import { MemoryLevel } from 'memory-level'
+import path from 'node:path';
+import { setupFixture, setupFixture2, print, type Fixture } from '../setup';
+import { tinaSchema } from './.tina/schema';
+import { MemoryLevel } from 'memory-level';
 import {
   beforeEach,
   afterEach,
@@ -14,12 +14,12 @@ import {
   expect,
   vi,
   SpyInstance,
-} from 'vitest'
-const rootPath = path.join(__dirname, '/')
+} from 'vitest';
+const rootPath = path.join(__dirname, '/');
 
 const level = new MemoryLevel<string, Record<string, any>>({
   valueEncoding: 'json',
-})
+});
 
 const fixtures: Fixture[] = [
   {
@@ -34,7 +34,7 @@ const fixtures: Fixture[] = [
     name: 'getPostDocument',
     assert: 'output',
   },
-]
+];
 const mutationFixtures: Fixture[] = [
   {
     name: 'addPendingDocument',
@@ -60,19 +60,19 @@ const mutationFixtures: Fixture[] = [
     assert: 'file',
     filename: 'content/posts/hello-world.md',
   },
-]
+];
 
 beforeEach(async () => {
-  await level.clear()
-})
+  await level.clear();
+});
 
-let consoleErrMock: SpyInstance
+let consoleErrMock: SpyInstance;
 beforeEach(() => {
-  consoleErrMock = vi.spyOn(console, 'error').mockImplementation(() => {})
-})
+  consoleErrMock = vi.spyOn(console, 'error').mockImplementation(() => {});
+});
 afterEach(() => {
-  consoleErrMock.mockRestore()
-})
+  consoleErrMock.mockRestore();
+});
 
 describe('A schema with templates in collections and no indexing', () => {
   fixtures.forEach((fixture) => {
@@ -83,20 +83,20 @@ describe('A schema with templates in collections and no indexing', () => {
         level,
         fixture,
         'forestry'
-      )
+      );
 
       if (fixture.expectError) {
-        expect(consoleErrMock).toHaveBeenCalled()
+        expect(consoleErrMock).toHaveBeenCalled();
       } else {
-        expect(consoleErrMock).not.toHaveBeenCalled()
+        expect(consoleErrMock).not.toHaveBeenCalled();
       }
 
       responses.forEach((expResponse, index) => {
-        const expectedResponsePath2 = expectedResponsePaths[index]
-        expect(expResponse).toMatchFile(expectedResponsePath2)
-      })
-    })
-  })
+        const expectedResponsePath2 = expectedResponsePaths[index];
+        expect(expResponse).toMatchFile(expectedResponsePath2);
+      });
+    });
+  });
 
   mutationFixtures.forEach((fixture) => {
     it(print(fixture), async () => {
@@ -108,18 +108,18 @@ describe('A schema with templates in collections and no indexing', () => {
         'forestry',
         '_mutation',
         'mutations'
-      )
+      );
 
       if (fixture.expectError) {
-        expect(consoleErrMock).toHaveBeenCalled()
+        expect(consoleErrMock).toHaveBeenCalled();
       } else {
-        expect(consoleErrMock).not.toHaveBeenCalled()
+        expect(consoleErrMock).not.toHaveBeenCalled();
       }
 
       responses.forEach((expResponse, index) => {
-        const expectedResponsePath2 = expectedResponsePaths[index]
-        expect(expResponse).toMatchFile(expectedResponsePath2)
-      })
-    })
-  })
-})
+        const expectedResponsePath2 = expectedResponsePaths[index];
+        expect(expResponse).toMatchFile(expectedResponsePath2);
+      });
+    });
+  });
+});

@@ -2,18 +2,18 @@
 
 */
 
-import React from 'react'
-import ViewNavigation from '../parts/ViewNavigation'
+import React from 'react';
+import ViewNavigation from '../parts/ViewNavigation';
 
 export default class DaysView extends React.Component {
   static defaultProps = {
     isValidDate: () => true,
     renderDay: (props, date) => <td {...props}>{date.date()}</td>,
-  }
+  };
 
   render() {
     return (
-      <div className="rdtDays">
+      <div className='rdtDays'>
         <table>
           <thead>
             {this.renderNavigation()}
@@ -23,12 +23,12 @@ export default class DaysView extends React.Component {
           {this.renderFooter()}
         </table>
       </div>
-    )
+    );
   }
 
   renderNavigation() {
-    const date = this.props.viewDate
-    const locale = date.localeData()
+    const date = this.props.viewDate;
+    const locale = date.localeData();
     return (
       <ViewNavigation
         onClickPrev={() => this.props.navigate(-1, 'months')}
@@ -38,108 +38,108 @@ export default class DaysView extends React.Component {
         switchColSpan={5}
         switchProps={{ 'data-value': this.props.viewDate.month() }}
       />
-    )
+    );
   }
 
   renderDayHeaders() {
-    const locale = this.props.viewDate.localeData()
-    let dayItems = getDaysOfWeek(locale).map((day, index) => (
-      <th key={day + index} className="dow">
+    const locale = this.props.viewDate.localeData();
+    const dayItems = getDaysOfWeek(locale).map((day, index) => (
+      <th key={day + index} className='dow'>
         {day}
       </th>
-    ))
+    ));
 
-    return <tr>{dayItems}</tr>
+    return <tr>{dayItems}</tr>;
   }
 
   renderDays() {
-    const date = this.props.viewDate
-    const startOfMonth = date.clone().startOf('month')
-    const endOfMonth = date.clone().endOf('month')
+    const date = this.props.viewDate;
+    const startOfMonth = date.clone().startOf('month');
+    const endOfMonth = date.clone().endOf('month');
 
     // We need 42 days in 6 rows
     // starting in the last week of the previous month
-    let rows = [[], [], [], [], [], []]
+    const rows = [[], [], [], [], [], []];
 
-    let startDate = date.clone().subtract(1, 'months')
-    startDate.date(startDate.daysInMonth()).startOf('week')
+    const startDate = date.clone().subtract(1, 'months');
+    startDate.date(startDate.daysInMonth()).startOf('week');
 
-    let endDate = startDate.clone().add(42, 'd')
-    let i = 0
+    const endDate = startDate.clone().add(42, 'd');
+    let i = 0;
 
     while (startDate.isBefore(endDate)) {
-      let row = getRow(rows, i++)
-      row.push(this.renderDay(startDate, startOfMonth, endOfMonth))
-      startDate.add(1, 'd')
+      const row = getRow(rows, i++);
+      row.push(this.renderDay(startDate, startOfMonth, endOfMonth));
+      startDate.add(1, 'd');
     }
 
-    return rows.map((r, i) => <tr key={`${endDate.month()}_${i}`}>{r}</tr>)
+    return rows.map((r, i) => <tr key={`${endDate.month()}_${i}`}>{r}</tr>);
   }
 
   renderDay(date, startOfMonth, endOfMonth) {
-    let selectedDate = this.props.selectedDate
+    const selectedDate = this.props.selectedDate;
 
-    let dayProps = {
+    const dayProps = {
       key: date.format('M_D'),
       'data-value': date.date(),
       'data-month': date.month(),
       'data-year': date.year(),
-    }
+    };
 
-    let className = 'rdtDay'
+    let className = 'rdtDay';
     if (date.isBefore(startOfMonth)) {
-      className += ' rdtOld'
+      className += ' rdtOld';
     } else if (date.isAfter(endOfMonth)) {
-      className += ' rdtNew'
+      className += ' rdtNew';
     }
     if (selectedDate && date.isSame(selectedDate, 'day')) {
-      className += ' rdtActive'
+      className += ' rdtActive';
     }
     if (date.isSame(this.props.moment(), 'day')) {
-      className += ' rdtToday'
+      className += ' rdtToday';
     }
 
     if (this.props.isValidDate(date)) {
-      dayProps.onClick = this._setDate
+      dayProps.onClick = this._setDate;
     } else {
-      className += ' rdtDisabled'
+      className += ' rdtDisabled';
     }
 
-    dayProps.className = className
+    dayProps.className = className;
 
     return this.props.renderDay(
       dayProps,
       date.clone(),
       selectedDate && selectedDate.clone()
-    )
+    );
   }
 
   renderFooter() {
-    if (!this.props.timeFormat) return
+    if (!this.props.timeFormat) return;
 
-    const date = this.props.viewDate
+    const date = this.props.viewDate;
     return (
       <tfoot>
         <tr>
           <td
             onClick={() => this.props.showView('time')}
             colSpan={7}
-            className="rdtTimeToggle"
+            className='rdtTimeToggle'
           >
             {date.format(this.props.timeFormat)}
           </td>
         </tr>
       </tfoot>
-    )
+    );
   }
 
   _setDate = (e) => {
-    this.props.updateDate(e)
-  }
+    this.props.updateDate(e);
+  };
 }
 
 function getRow(rows, day) {
-  return rows[Math.floor(day / 7)]
+  return rows[Math.floor(day / 7)];
 }
 
 /**
@@ -148,13 +148,13 @@ function getRow(rows, day) {
  * @return {array} A list with the shortname of the days
  */
 function getDaysOfWeek(locale) {
-  const first = locale.firstDayOfWeek()
-  let dow = []
-  let i = 0
+  const first = locale.firstDayOfWeek();
+  const dow = [];
+  let i = 0;
 
   locale._weekdaysMin.forEach(function (day) {
-    dow[(7 + i++ - first) % 7] = day
-  })
+    dow[(7 + i++ - first) % 7] = day;
+  });
 
-  return dow
+  return dow;
 }

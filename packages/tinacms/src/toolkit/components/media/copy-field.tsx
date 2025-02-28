@@ -1,42 +1,42 @@
-import React from 'react'
-import { BiCopyAlt } from 'react-icons/bi'
+import React from 'react';
+import { BiCopyAlt } from 'react-icons/bi';
 
 interface CopyFieldProps {
-  label?: string
-  description?: string
-  value: any
+  label?: string;
+  description?: string;
+  value: any;
 }
 
 export const CopyField = ({ label, description, value }: CopyFieldProps) => {
-  const [copied, setCopied] = React.useState(false)
-  const [fadeOut, setFadeOut] = React.useState(false)
+  const [copied, setCopied] = React.useState(false);
+  const [fadeOut, setFadeOut] = React.useState(false);
 
   return (
-    <div className="w-full">
+    <div className='w-full'>
       {label && (
-        <label className="w-full mb-1 block flex-1  text-sm font-bold leading-5 text-gray-700">
+        <label className='w-full mb-1 block flex-1  text-sm font-bold leading-5 text-gray-700'>
           {label}
         </label>
       )}
       <span
         onClick={() => {
-          if (copied === true) return
-          setCopied(true)
+          if (copied === true) return;
+          setCopied(true);
           setTimeout(() => {
-            setFadeOut(true)
-          }, 2500)
+            setFadeOut(true);
+          }, 2500);
           setTimeout(() => {
-            setCopied(false)
-            setFadeOut(false)
-          }, 3000)
+            setCopied(false);
+            setFadeOut(false);
+          }, 3000);
 
-          navigator.clipboard.writeText(value)
+          navigator.clipboard.writeText(value);
         }}
         className={`shadow-inner text-base leading-5 whitespace-normal break-all px-3 py-2 text-gray-600 w-full bg-gray-50 border border-gray-200 transition-all ease-out duration-150 rounded-md relative overflow-hidden appearance-none flex items-center w-full cursor-pointer hover:bg-white hover:text-blue-500  ${
           copied ? `pointer-events-none` : ``
         }`}
       >
-        <BiCopyAlt className="relative text-blue-500 shrink-0 w-5 h-auto mr-1.5 -ml-0.5 z-20" />{' '}
+        <BiCopyAlt className='relative text-blue-500 shrink-0 w-5 h-auto mr-1.5 -ml-0.5 z-20' />{' '}
         {value}{' '}
         {copied && (
           <span
@@ -49,8 +49,8 @@ export const CopyField = ({ label, description, value }: CopyFieldProps) => {
         )}
       </span>
       {description && (
-        <p className="mt-2 text-sm text-gray-500">{description}</p>
+        <p className='mt-2 text-sm text-gray-500'>{description}</p>
       )}
     </div>
-  )
-}
+  );
+};

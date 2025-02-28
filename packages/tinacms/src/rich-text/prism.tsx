@@ -2,13 +2,13 @@
 
 */
 
-import React from 'react'
-import { Highlight, themes } from 'prism-react-renderer'
+import React from 'react';
+import { Highlight, themes } from 'prism-react-renderer';
 
 export const Prism = (props: {
-  value: string
-  lang?: string
-  theme?: keyof typeof themes
+  value: string;
+  lang?: string;
+  theme?: keyof typeof themes;
 }) => {
   return (
     <Highlight
@@ -28,5 +28,5 @@ export const Prism = (props: {
         </pre>
       )}
     </Highlight>
-  )
-}
+  );
+};

@@ -2,7 +2,7 @@
 
 */
 
-import { z } from 'zod'
+import { z } from 'zod';
 export const name = z
   .string({
     required_error: 'Name is required but not provided',
@@ -23,6 +23,6 @@ If you need to use this value in your content you can use the \`nameOverride\` p
   // ...
 }
 \`\`\``,
-      })
+      });
     }
-  })
+  });

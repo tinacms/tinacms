@@ -1,6 +1,6 @@
-import React from 'react'
-import { OptionComponentProps } from '../model/option-component-props'
-import { CommandItem } from './command'
+import React from 'react';
+import { OptionComponentProps } from '../model/option-component-props';
+import { CommandItem } from './command';
 
 const OptionComponent: React.FC<OptionComponentProps> = ({
   id,
@@ -15,18 +15,18 @@ const OptionComponent: React.FC<OptionComponentProps> = ({
       key={`${id}-option`}
       value={id}
       onSelect={(currentValue) => {
-        onSelect(currentValue === value ? '' : currentValue)
+        onSelect(currentValue === value ? '' : currentValue);
       }}
     >
-      <div className="flex flex-col w-full">
+      <div className='flex flex-col w-full'>
         {field?.optionComponent && _values ? (
           field.optionComponent(_values, node._internalSys)
         ) : (
-          <span className="text-x">{id}</span>
+          <span className='text-x'>{id}</span>
         )}
       </div>
     </CommandItem>
-  )
-}
+  );
+};
 
-export default OptionComponent
+export default OptionComponent;

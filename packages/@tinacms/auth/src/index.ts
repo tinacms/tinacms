@@ -1,24 +1,24 @@
 /**
 
 */
-import type { IncomingMessage, ServerResponse } from 'http'
-import type { NextApiRequest } from 'next'
+import type { IncomingMessage, ServerResponse } from 'http';
+import type { NextApiRequest } from 'next';
 
 export interface TinaCloudUser {
-  id: string
-  email: string
-  verified: boolean
-  role: 'admin' | 'user'
-  enabled: boolean
-  fullName: string
+  id: string;
+  email: string;
+  verified: boolean;
+  role: 'admin' | 'user';
+  enabled: boolean;
+  fullName: string;
 }
 
 export const isUserAuthorized = async (args: {
-  clientID: string
-  token: string
+  clientID: string;
+  token: string;
 }): Promise<TinaCloudUser | undefined> => {
-  const clientID = args.clientID
-  const token = args.token
+  const clientID = args.clientID;
+  const token = args.token;
   try {
     // fetch identity from content server
     const tinaCloudRes = await fetch(
@@ -30,17 +30,17 @@ export const isUserAuthorized = async (args: {
         }),
         method: 'GET',
       }
-    )
+    );
     if (tinaCloudRes.ok) {
-      const user: TinaCloudUser = await tinaCloudRes.json()
-      return user
+      const user: TinaCloudUser = await tinaCloudRes.json();
+      return user;
     }
-    return
+    return;
   } catch (e) {
-    console.error(e)
-    throw e
+    console.error(e);
+    throw e;
   }
-}
+};
 
 /**
  *
@@ -71,21 +71,21 @@ export const isUserAuthorized = async (args: {
 export const isAuthorized = async (
   req: NextApiRequest
 ): Promise<TinaCloudUser | undefined> => {
-  const clientID = req.query.clientID
-  const token = req.headers.authorization
+  const clientID = req.query.clientID;
+  const token = req.headers.authorization;
   if (typeof clientID === 'string' && typeof token === 'string') {
-    return await isUserAuthorized({ clientID, token })
+    return await isUserAuthorized({ clientID, token });
   }
   const errorMessage = (queryParam: string) => {
-    return `An ${queryParam} query param is required for isAuthorized function but not found please use cms.api.tina.fetchWithToken('/api/something?clientID=YourClientID')`
-  }
-  !clientID && console.error(errorMessage('clientID'))
+    return `An ${queryParam} query param is required for isAuthorized function but not found please use cms.api.tina.fetchWithToken('/api/something?clientID=YourClientID')`;
+  };
+  !clientID && console.error(errorMessage('clientID'));
   !token &&
     console.error(
       'A authorization header was not found. Please use the cms.api.tina.fetchWithToken function on the frontend'
-    )
-  return undefined
-}
+    );
+  return undefined;
+};
 
 /**
  *
@@ -113,23 +113,23 @@ export const isAuthorized = async (
  * @param {NextApiRequest} req - the request. It must contain a req.query.org, req.query.clientID and req.headers.authorization
  *
  */
-export const isAuthorizedNext = isAuthorized
+export const isAuthorizedNext = isAuthorized;
 
 export const TinaCloudBackendAuthProvider = () => {
   const backendAuthProvider = {
     isAuthorized: async (req: IncomingMessage, _res: ServerResponse) => {
-      const user = await isAuthorized(req as NextApiRequest)
+      const user = await isAuthorized(req as NextApiRequest);
       if (user && user.verified) {
         return {
           isAuthorized: true as const,
-        }
+        };
       }
       return {
         isAuthorized: false as const,
         errorCode: 401,
         errorMessage: 'Unauthorized',
-      }
+      };
     },
-  }
-  return backendAuthProvider
-}
+  };
+  return backendAuthProvider;
+};

@@ -1,1 +1,1 @@
-export const queries = false
+export const queries = false;

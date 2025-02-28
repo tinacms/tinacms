@@ -37,10 +37,10 @@ import {
 } from './plate-ui/mark-toolbar-button'
 
 type ToolbarItem = {
-  label: string
-  width: (paragraphIconExists?: boolean) => number // Use function to calculate width
-  Component: React.ReactNode
-}
+  label: string;
+  width: (paragraphIconExists?: boolean) => number; // Use function to calculate width
+  Component: React.ReactNode;
+};
 
 const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   heading: {
@@ -123,15 +123,15 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     width: () => EMBED_ICON_WIDTH,
     Component: <TemplatesToolbarButton />,
   },
-}
+};
 
 export default function FixedToolbarButtons() {
-  const toolbarRef = React.useRef(null)
-  const [itemsShown, setItemsShown] = React.useState(11)
-  const { overrides, templates } = useToolbarContext()
-  const showEmbedButton = templates.length > 0
+  const toolbarRef = React.useRef(null);
+  const [itemsShown, setItemsShown] = React.useState(11);
+  const { overrides, templates } = useToolbarContext();
+  const showEmbedButton = templates.length > 0;
 
-  let items = []
+  let items = [];
 
   if (Array.isArray(overrides)) {
     items =
@@ -139,35 +139,35 @@ export default function FixedToolbarButtons() {
         ? Object.values(toolbarItems)
         : overrides
             .map((item) => toolbarItems[item])
-            .filter((item) => item !== undefined)
+            .filter((item) => item !== undefined);
   } else {
     items =
       overrides?.toolbar === undefined
         ? Object.values(toolbarItems)
         : overrides.toolbar
             .map((item) => toolbarItems[item])
-            .filter((item) => item !== undefined)
+            .filter((item) => item !== undefined);
   }
 
   if (!showEmbedButton) {
-    items = items.filter((item) => item.label !== toolbarItems.embed.label)
+    items = items.filter((item) => item.label !== toolbarItems.embed.label);
   }
 
-  const editorState = useEditorState()
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
+  const editorState = useEditorState();
+  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE);
   if (userInTable) {
-    items = items.filter((item) => !unsupportedItemsInTable.has(item.label))
+    items = items.filter((item) => !unsupportedItemsInTable.has(item.label));
   }
 
   useResize(toolbarRef, (entry) => {
-    const width = entry.target.getBoundingClientRect().width
-    const headingButton = items.find((item) => item.label === HEADING_LABEL)
+    const width = entry.target.getBoundingClientRect().width;
+    const headingButton = items.find((item) => item.label === HEADING_LABEL);
     const headingWidth = headingButton
       ? headingButton.width(width > CONTAINER_MD_BREAKPOINT)
-      : 0
+      : 0;
 
     // Calculate the available width excluding the heading button and float button icon width
-    const availableWidth = width - headingWidth - FLOAT_BUTTON_WIDTH
+    const availableWidth = width - headingWidth - FLOAT_BUTTON_WIDTH;
 
     // Count numbers of buttons can fit into the available width
     const { itemFitCount } = items.reduce(
@@ -179,20 +179,20 @@ export default function FixedToolbarButtons() {
           return {
             totalItemsWidth: acc.totalItemsWidth + item.width(),
             itemFitCount: acc.itemFitCount + 1,
-          }
+          };
         }
-        return acc
+        return acc;
       },
       { totalItemsWidth: 0, itemFitCount: 1 }
-    ) // Initial values fit count set as 1 becasue heading is always exist
+    ); // Initial values fit count set as 1 becasue heading is always exist
 
-    setItemsShown(itemFitCount)
-  })
+    setItemsShown(itemFitCount);
+  });
 
   return (
-    <div className="w-full overflow-hidden @container/toolbar" ref={toolbarRef}>
+    <div className='w-full overflow-hidden @container/toolbar' ref={toolbarRef}>
       <div
-        className="flex"
+        className='flex'
         style={{
           transform: 'translateX(calc(-1px))',
         }}
@@ -211,5 +211,5 @@ export default function FixedToolbarButtons() {
         </>
       </div>
     </div>
-  )
+  );
 }

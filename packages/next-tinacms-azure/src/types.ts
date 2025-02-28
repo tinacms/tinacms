@@ -1,7 +1,7 @@
-import type { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server';
 
 export interface AzureBlobStorageConfig {
-  connectionString: string
-  containerName: string
-  authorized: (req: NextRequest) => Promise<boolean>
+  connectionString: string;
+  containerName: string;
+  authorized: (req: NextRequest) => Promise<boolean>;
 }

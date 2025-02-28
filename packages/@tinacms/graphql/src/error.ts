@@ -1,4 +1,4 @@
-import { ASTNode, GraphQLError, GraphQLErrorExtensions, Source } from 'graphql'
+import { ASTNode, GraphQLError, GraphQLErrorExtensions, Source } from 'graphql';
 
 export class NotFoundError extends GraphQLError {
   constructor(
@@ -10,7 +10,7 @@ export class NotFoundError extends GraphQLError {
     originalError?: Error,
     extensions?: GraphQLErrorExtensions
   ) {
-    super(message, nodes, source, positions, path, originalError, extensions)
-    this.name = 'NotFoundError'
+    super(message, nodes, source, positions, path, originalError, extensions);
+    this.name = 'NotFoundError';
   }
 }

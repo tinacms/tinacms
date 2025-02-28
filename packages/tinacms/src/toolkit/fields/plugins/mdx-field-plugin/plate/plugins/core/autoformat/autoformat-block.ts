@@ -1,6 +1,6 @@
-import { preFormat } from './autoformat-utils'
-import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block'
-import type { AutoformatRule } from '@udecode/plate-autoformat'
+import { preFormat } from './autoformat-utils';
+import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
+import type { AutoformatRule } from '@udecode/plate-autoformat';
 import {
   ELEMENT_BLOCKQUOTE,
   ELEMENT_CODE_BLOCK,
@@ -11,8 +11,8 @@ import {
   ELEMENT_H5,
   ELEMENT_H6,
   ELEMENT_HR,
-} from '@udecode/plate'
-import { ELEMENT_DEFAULT, insertNodes, setNodes } from '@udecode/plate-common'
+} from '@udecode/plate';
+import { ELEMENT_DEFAULT, insertNodes, setNodes } from '@udecode/plate-common';
 
 export const autoformatBlocks: AutoformatRule[] = [
   {
@@ -64,7 +64,7 @@ export const autoformatBlocks: AutoformatRule[] = [
     triggerAtBlockStart: false,
     preFormat,
     format: (editor) => {
-      insertEmptyCodeBlock(editor)
+      insertEmptyCodeBlock(editor);
     },
   },
   {
@@ -72,11 +72,11 @@ export const autoformatBlocks: AutoformatRule[] = [
     type: ELEMENT_HR,
     match: ['---', '—-', '___ '],
     format: (editor) => {
-      setNodes(editor, { type: ELEMENT_HR })
+      setNodes(editor, { type: ELEMENT_HR });
       insertNodes(editor, {
         type: ELEMENT_DEFAULT,
         children: [{ text: '' }],
-      })
+      });
     },
   },
-]
+];

@@ -1,8 +1,8 @@
-import prompts from 'prompts'
-import type { PromptObject } from 'prompts'
+import prompts from 'prompts';
+import type { PromptObject } from 'prompts';
 
-import { linkText, logText } from '../../../utils/theme'
-import { Config } from './types'
+import { linkText, logText } from '../../../utils/theme';
+import { Config } from './types';
 
 const tinaCloudSetupQuestions: PromptObject[] = [
   {
@@ -22,10 +22,10 @@ const tinaCloudSetupQuestions: PromptObject[] = [
       )}${linkText(`https://app.tina.io/projects/${prev || '[XXX]'}/tokens`)}`,
     initial: process.env.TINA_TOKEN,
   },
-]
+];
 
 export const askTinaCloudSetup = async ({ config }: { config: Config }) => {
-  const { clientId, token } = await prompts(tinaCloudSetupQuestions)
+  const { clientId, token } = await prompts(tinaCloudSetupQuestions);
   config.envVars.push(
     {
       key: 'NEXT_PUBLIC_TINA_CLIENT_ID',
@@ -35,5 +35,5 @@ export const askTinaCloudSetup = async ({ config }: { config: Config }) => {
       key: 'TINA_TOKEN',
       value: token,
     }
-  )
-}
+  );
+};
