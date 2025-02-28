@@ -154,10 +154,18 @@ export const createConfig = async ({
     await fs.outputFile(staticMediaPath, `[]`)
   }
 
+  console.log('ConfigManager', configManager.spaRootPath)
+
   const alias = {
     TINA_IMPORT: configManager.prebuildFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
     STATIC_MEDIA_IMPORT: staticMediaPath,
+    react: path.join(configManager.spaRootPath, 'node_modules', 'react'),
+    'react-dom': path.join(
+      configManager.spaRootPath,
+      'node_modules',
+      'react-dom'
+    ),
     crypto: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     fs: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     os: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
@@ -226,14 +234,14 @@ export const createConfig = async ({
       host: configManager.config?.build?.host ?? false,
       watch: noWatch
         ? {
-          ignored: ['**/*'],
-        }
+            ignored: ['**/*'],
+          }
         : {
-          // Ignore everything except for the alias fields we specified above
-          ignored: [
-            `${configManager.tinaFolderPath}/**/!(config.prebuild.jsx|_graphql.json)`,
-          ],
-        },
+            // Ignore everything except for the alias fields we specified above
+            ignored: [
+              `${configManager.tinaFolderPath}/**/!(config.prebuild.jsx|_graphql.json)`,
+            ],
+          },
       fs: {
         strict: false,
       },
@@ -244,11 +252,8 @@ export const createConfig = async ({
       emptyOutDir: true,
       rollupOptions: {
         external: (id) => {
-          // EXCLUDE REACT FROM EXTERNAL DEPENDENCIES IN DEV MODE
-          if (process.env.NODE_ENV === 'development') {
-            return false; // Ensures React is bundled for TinaCMS dev environment
-          }
-          return ['react', 'react-dom', 'react-router-dom'].includes(id);
+          console.log('I am rollup id', id)
+          return id.includes('react') || id.includes('react-dom') ? false : true
         },
       },
     },
