@@ -1,5 +1,14 @@
 # @tinacms/starter
 
+## 0.1.60
+
+### Patch Changes
+
+- Updated dependencies [[`619e601`](https://github.com/tinacms/tinacms/commit/619e6010d6f95d893e980952bef64f747808c956), [`602b4d0`](https://github.com/tinacms/tinacms/commit/602b4d07f94de4c10d5bb059a5edc49546a2031c)]:
+  - tinacms@2.7.2
+  - @tinacms/vercel-previews@0.0.60
+  - @tinacms/mdx@1.6.1
+
 ## 0.1.59
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # tinacms
 
+## 2.7.2
+
+### Patch Changes
+
+- [#5526](https://github.com/tinacms/tinacms/pull/5526) [`619e601`](https://github.com/tinacms/tinacms/commit/619e6010d6f95d893e980952bef64f747808c956) Thanks [@qwadrox](https://github.com/qwadrox)! - Rich text editor - fixed inconsistent tooltips in the MDX editor toolbar
+  Breaking - `MarkToolbarButton` is no longer exported
+
+- [#5497](https://github.com/tinacms/tinacms/pull/5497) [`602b4d0`](https://github.com/tinacms/tinacms/commit/602b4d07f94de4c10d5bb059a5edc49546a2031c) Thanks [@kldavis4](https://github.com/kldavis4)! - This reimplements references to more thoroughly find deeply nested references and add a reference index to the collection in order to query these deep references. The rename modal is updated to remove the warning about breaking references as well.
+
+- Updated dependencies [[`602b4d0`](https://github.com/tinacms/tinacms/commit/602b4d07f94de4c10d5bb059a5edc49546a2031c)]:
+  - @tinacms/schema-tools@1.7.2
+  - @tinacms/search@1.0.41
+  - @tinacms/mdx@1.6.1
+
 ## 2.7.1
 
 ### Patch Changes
