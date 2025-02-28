@@ -1,10 +1,10 @@
-import React from 'react'
-import { Container } from '../util/container'
-import { Section } from '../util/section'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
-import type { Template } from 'tinacms'
-import { PageBlocksContent } from '../../tina/__generated__/types'
-import { tinaField } from 'tinacms/dist/react'
+import React from 'react';
+import { Container } from '../util/container';
+import { Section } from '../util/section';
+import { TinaMarkdown } from 'tinacms/dist/rich-text';
+import type { Template } from 'tinacms';
+import { PageBlocksContent } from '../../tina/__generated__/types';
+import { tinaField } from 'tinacms/dist/react';
 
 export const Content = ({ data }: { data: PageBlocksContent }) => {
   return (
@@ -14,14 +14,14 @@ export const Content = ({ data }: { data: PageBlocksContent }) => {
           data.color === 'primary' ? `prose-primary` : `dark:prose-dark`
         }`}
         data-tina-field={tinaField(data, 'body')}
-        size="large"
-        width="medium"
+        size='large'
+        width='medium'
       >
         <TinaMarkdown content={data.body} />
       </Container>
     </Section>
-  )
-}
+  );
+};
 
 export const contentBlockSchema: Template = {
   name: 'content',
@@ -49,4 +49,4 @@ export const contentBlockSchema: Template = {
       ],
     },
   ],
-}
+};

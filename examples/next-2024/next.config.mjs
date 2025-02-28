@@ -6,6 +6,6 @@ const nextConfig = {
       destination: '/admin/index.html',
     },
   ],
-}
+};
 
-export default nextConfig
+export default nextConfig;

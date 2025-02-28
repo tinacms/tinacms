@@ -1,5 +1,5 @@
-const colors = require('tailwindcss/colors')
-const defaultTheme = require('tailwindcss/defaultTheme')
+const colors = require('tailwindcss/colors');
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
   mode: 'jit',
@@ -229,4 +229,4 @@ module.exports = {
     extend: { typography: ['tint', 'dark', 'primary'] },
   },
   plugins: [require('@tailwindcss/typography')],
-}
+};

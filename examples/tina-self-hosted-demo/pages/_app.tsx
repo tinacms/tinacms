@@ -1,17 +1,17 @@
-import '../styles.css'
-import { useEffect, useState } from 'react'
+import '../styles.css';
+import { useEffect, useState } from 'react';
 
 const App = ({ Component, pageProps }) => {
-  const [isClient, setIsClient] = useState(false)
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
+    setIsClient(true);
+  }, []);
 
   // hack around hydration issues
   if (isClient) {
-    return <Component {...pageProps} />
+    return <Component {...pageProps} />;
   }
-}
+};
 
-export default App
+export default App;

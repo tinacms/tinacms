@@ -1,38 +1,38 @@
-import React from 'react'
-import type { TinaMarkdownContent } from 'tinacms/dist/rich-text'
-import { tinaField } from 'tinacms/dist/react'
+import React from 'react';
+import type { TinaMarkdownContent } from 'tinacms/dist/rich-text';
+import { tinaField } from 'tinacms/dist/react';
 
 type RenderValue = (args: {
-  value: unknown
-  keyName: string
-  parentValue: object | object[]
-  parentKeyName: string
-}) => JSX.Element
-type RenderRichText = (args: { value: TinaMarkdownContent }) => JSX.Element
+  value: unknown;
+  keyName: string;
+  parentValue: object | object[];
+  parentKeyName: string;
+}) => JSX.Element;
+type RenderRichText = (args: { value: TinaMarkdownContent }) => JSX.Element;
 
 export const Explorer2 = (props: {
-  value: object
-  renderValue: RenderValue
-  renderRichText: RenderRichText
+  value: object;
+  renderValue: RenderValue;
+  renderRichText: RenderRichText;
 }) => {
   return (
-    <div className="font-mono">
+    <div className='font-mono'>
       {/* @ts-ignore */}
       <ObjectValueRenderer {...props} />
     </div>
-  )
-}
+  );
+};
 const ObjectValueRenderer = (props: {
-  value: object
-  parentValue: object | object[]
-  parentKeyName: string
-  renderValue: RenderValue
-  renderRichText: RenderRichText
-  showMetaFields?: boolean
+  value: object;
+  parentValue: object | object[];
+  parentKeyName: string;
+  renderValue: RenderValue;
+  renderRichText: RenderRichText;
+  showMetaFields?: boolean;
 }) => {
   const subEntries = Object.entries(props.value).map(([keyName, subValue]) => {
     return (
-      <div key={keyName} className="gap-2">
+      <div key={keyName} className='gap-2'>
         <UnknownRenderer
           keyName={keyName}
           value={subValue}
@@ -43,10 +43,10 @@ const ObjectValueRenderer = (props: {
           showMetaFields={props.showMetaFields}
         />
       </div>
-    )
-  })
-  return <div>{subEntries}</div>
-}
+    );
+  });
+  return <div>{subEntries}</div>;
+};
 
 const UnknownRenderer = ({
   keyName,
@@ -57,19 +57,19 @@ const UnknownRenderer = ({
   renderRichText,
   showMetaFields,
 }: {
-  keyName: string
-  value: unknown
-  parentValue: object | object[]
-  parentKeyName: string
-  renderValue: RenderValue
-  renderRichText: RenderRichText
-  showMetaFields?: boolean
+  keyName: string;
+  value: unknown;
+  parentValue: object | object[];
+  parentKeyName: string;
+  renderValue: RenderValue;
+  renderRichText: RenderRichText;
+  showMetaFields?: boolean;
 }) => {
-  const typeOfValue = typeof value
+  const typeOfValue = typeof value;
   const [expanded, setExpanded] = React.useState(
     /* @ts-ignore */
     value?.type === 'root' ? false : true
-  )
+  );
 
   if (!showMetaFields) {
     if (
@@ -82,7 +82,7 @@ const UnknownRenderer = ({
         '_internalSys',
       ].includes(keyName)
     ) {
-      return
+      return;
     }
   }
   if (Array.isArray(value)) {
@@ -90,13 +90,13 @@ const UnknownRenderer = ({
       <div>
         <button
           onClick={() => setExpanded((exp) => !exp)}
-          className="min-w-[48px] flex justify-start gap-2"
+          className='min-w-[48px] flex justify-start gap-2'
         >
           {keyName}: {'['}
           {!expanded && `...]`}
         </button>
         {expanded && (
-          <div className="pl-4">
+          <div className='pl-4'>
             {value.map((item, index) => (
               <UnknownRenderer
                 key={String(index)}
@@ -112,16 +112,16 @@ const UnknownRenderer = ({
         )}
         {expanded && <div>{']'}</div>}
       </div>
-    )
+    );
   }
   if (typeOfValue === 'object') {
     /* @ts-ignore */
     if (value?.type === 'root' && renderRichText) {
       return (
-        <div className="flex gap-2">
+        <div className='flex gap-2'>
           <button
             onClick={() => setExpanded((exp) => !exp)}
-            className="min-w-[48px] flex justify-start gap-2"
+            className='min-w-[48px] flex justify-start gap-2'
           >
             {keyName}: {!expanded && '{...}'}
           </button>
@@ -131,7 +131,7 @@ const UnknownRenderer = ({
               renderRichText({ value, keyName, parentValue, parentKeyName })}
           </div>
         </div>
-      )
+      );
     }
     return (
       <ObjectRenderer
@@ -142,7 +142,7 @@ const UnknownRenderer = ({
         renderValue={renderValue}
         renderRichText={renderRichText}
       />
-    )
+    );
   }
   return (
     <Value
@@ -152,8 +152,8 @@ const UnknownRenderer = ({
       parentKeyName={parentKeyName}
       renderValue={renderValue}
     />
-  )
-}
+  );
+};
 
 const Value = ({
   keyName,
@@ -162,20 +162,20 @@ const Value = ({
   parentKeyName,
   renderValue,
 }: {
-  keyName: string
-  value: unknown
-  renderValue: RenderValue
-  parentKeyName: string
-  parentValue: object | object[]
+  keyName: string;
+  value: unknown;
+  renderValue: RenderValue;
+  parentKeyName: string;
+  parentValue: object | object[];
 }) => {
-  const keyDisplay = isNaN(Number(keyName)) ? `${keyName}: ` : ``
+  const keyDisplay = isNaN(Number(keyName)) ? `${keyName}: ` : ``;
   return (
-    <div className="flex gap-2">
+    <div className='flex gap-2'>
       <div>{keyDisplay}</div>
       <div>{renderValue({ value, keyName, parentValue, parentKeyName })}</div>
     </div>
-  )
-}
+  );
+};
 
 const ObjectRenderer = ({
   keyName,
@@ -185,31 +185,31 @@ const ObjectRenderer = ({
   renderValue,
   renderRichText,
 }) => {
-  const [showMetaFields, setShowMetaFields] = React.useState(false)
-  const [expanded, setExpanded] = React.useState(true)
-  const v = value as object
-  const keyDisplay = isNaN(Number(keyName)) ? `${keyName}: ` : ``
+  const [showMetaFields, setShowMetaFields] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(true);
+  const v = value as object;
+  const keyDisplay = isNaN(Number(keyName)) ? `${keyName}: ` : ``;
   if (value === null) {
     return (
       <div>
-        <div className="flex gap-2">
-          <div className="">{keyDisplay}</div>
-          <div className="text-gray-400">null</div>
+        <div className='flex gap-2'>
+          <div className=''>{keyDisplay}</div>
+          <div className='text-gray-400'>null</div>
         </div>
       </div>
-    )
+    );
   } else {
-    const fieldName = tinaField(v)
-    const extraProps = {}
+    const fieldName = tinaField(v);
+    const extraProps = {};
     if (fieldName !== 'undefined#undefined') {
-      extraProps['data-tina-field'] = fieldName
+      extraProps['data-tina-field'] = fieldName;
     }
     return (
       <div>
-        <div className="flex justify-between">
+        <div className='flex justify-between'>
           <button
             onClick={() => setExpanded((exp) => !exp)}
-            className="min-w-[48px] flex justify-start gap-2"
+            className='min-w-[48px] flex justify-start gap-2'
           >
             {keyDisplay}
             {'{'}
@@ -218,16 +218,16 @@ const ObjectRenderer = ({
           {expanded && (
             <button
               onClick={() => {
-                setShowMetaFields((show) => !show)
+                setShowMetaFields((show) => !show);
               }}
-              className="min-w-[48px] text-sm text-gray-400"
+              className='min-w-[48px] text-sm text-gray-400'
             >
               {showMetaFields ? 'Hide meta fields' : 'Show meta fields'}
             </button>
           )}
         </div>
         {expanded && (
-          <div className="pl-4" {...extraProps}>
+          <div className='pl-4' {...extraProps}>
             <ObjectValueRenderer
               value={v}
               parentValue={parentValue}
@@ -240,6 +240,6 @@ const ObjectRenderer = ({
         )}
         {expanded && <div>{'}'}</div>}
       </div>
-    )
+    );
   }
-}
+};

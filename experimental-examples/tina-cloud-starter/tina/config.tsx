@@ -1,12 +1,12 @@
-import { defineConfig, tinaTableTemplate } from 'tinacms'
-import { contentBlockSchema } from '../components/blocks/content'
-import { featureBlockSchema } from '../components/blocks/features'
-import { heroBlockSchema } from '../components/blocks/hero'
-import { testimonialBlockSchema } from '../components/blocks/testimonial'
-import { ColorPickerInput } from '../components/fields/color'
-import { iconSchema } from '../components/util/icon'
+import { defineConfig, tinaTableTemplate } from 'tinacms';
+import { contentBlockSchema } from '../components/blocks/content';
+import { featureBlockSchema } from '../components/blocks/features';
+import { heroBlockSchema } from '../components/blocks/hero';
+import { testimonialBlockSchema } from '../components/blocks/testimonial';
+import { ColorPickerInput } from '../components/fields/color';
+import { iconSchema } from '../components/util/icon';
 
-export const shouldEncode = (path: string, value: string) => {}
+export const shouldEncode = (path: string, value: string) => {};
 
 const config = defineConfig({
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
@@ -44,7 +44,7 @@ const config = defineConfig({
         format: 'mdx',
         ui: {
           router: ({ document }) => {
-            return `/posts/${document._sys.filename}`
+            return `/posts/${document._sys.filename}`;
           },
         },
         fields: [
@@ -188,7 +188,7 @@ const config = defineConfig({
                 list: true,
                 ui: {
                   itemProps: (item) => {
-                    return { label: item?.label }
+                    return { label: item?.label };
                   },
                   defaultItem: {
                     href: 'home',
@@ -336,12 +336,12 @@ const config = defineConfig({
         ui: {
           router: ({ document }) => {
             if (document._sys.filename === 'home') {
-              return `/`
+              return `/`;
             }
             if (document._sys.filename === 'about') {
-              return `/about`
+              return `/about`;
             }
-            return undefined
+            return undefined;
           },
         },
         fields: [
@@ -374,6 +374,6 @@ const config = defineConfig({
       },
     ],
   },
-})
+});
 
-export default config
+export default config;

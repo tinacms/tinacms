@@ -1,5 +1,5 @@
-import '../styles/global.css'
-import Slideover from '../components/slideover'
+import '../styles/global.css';
+import Slideover from '../components/slideover';
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -7,6 +7,6 @@ function MyApp({ Component, pageProps }) {
       <Slideover />
       <Component {...pageProps} />
     </>
-  )
+  );
 }
-export default MyApp
+export default MyApp;

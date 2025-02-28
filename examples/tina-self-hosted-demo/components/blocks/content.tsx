@@ -1,8 +1,8 @@
-import React from 'react'
-import { Container } from '../util/container'
-import { Section } from '../util/section'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
-import type { Template } from 'tinacms'
+import React from 'react';
+import { Container } from '../util/container';
+import { Section } from '../util/section';
+import { TinaMarkdown } from 'tinacms/dist/rich-text';
+import type { Template } from 'tinacms';
 
 export const Content = ({ data, parentField = '' }) => {
   return (
@@ -12,14 +12,14 @@ export const Content = ({ data, parentField = '' }) => {
           data.color === 'primary' ? `prose-primary` : `dark:prose-dark`
         }`}
         data-tinafield={`${parentField}.body`}
-        size="large"
-        width="medium"
+        size='large'
+        width='medium'
       >
         <TinaMarkdown content={data.body} />
       </Container>
     </Section>
-  )
-}
+  );
+};
 
 export const contentBlockSchema: Template = {
   name: 'content',
@@ -47,4 +47,4 @@ export const contentBlockSchema: Template = {
       ],
     },
   ],
-}
+};

@@ -1,5 +1,5 @@
 // deleteBlogPost.ts
-import axios from "axios";
+import axios from 'axios';
 
 interface DeleteBlogPostResponse {
   data: {
@@ -22,14 +22,14 @@ const deleteBlogPost = async (
   `;
 
   const response = await axios.post<DeleteBlogPostResponse>(
-    "http://localhost:4001/graphql",
+    'http://localhost:4001/graphql',
     {
       query: DELETE_BLOGPOST,
       variables: { collection, relativePath },
     },
     {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     }
   );

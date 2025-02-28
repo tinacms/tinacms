@@ -1,12 +1,12 @@
-import React from 'react'
-import { Container } from '../util/container'
-import { Section } from '../util/section'
-import type { Template } from 'tinacms'
+import React from 'react';
+import { Container } from '../util/container';
+import { Section } from '../util/section';
+import type { Template } from 'tinacms';
 
 export const Testimonial = ({ data, parentField = '' }) => {
   return (
     <Section color={data.color}>
-      <Container size="large">
+      <Container size='large'>
         <blockquote>
           <div
             className={`relative z-10 max-w-3xl mx-auto text-4xl lg:text-5xl font-bold tracking-normal text-center title-font ${
@@ -22,7 +22,7 @@ export const Testimonial = ({ data, parentField = '' }) => {
             </span>
             <p
               data-tinafield={`${parentField}.quote`}
-              className="relative opacity-95"
+              className='relative opacity-95'
             >
               {data.quote}
             </p>
@@ -41,7 +41,7 @@ export const Testimonial = ({ data, parentField = '' }) => {
               }`}
             ></span>
           </div>
-          <footer className="text-center">
+          <footer className='text-center'>
             <p
               data-tinafield={`${parentField}.author`}
               className={`tracking-wide title-font font-bold text-lg ${
@@ -56,8 +56,8 @@ export const Testimonial = ({ data, parentField = '' }) => {
         </blockquote>
       </Container>
     </Section>
-  )
-}
+  );
+};
 
 export const testimonialBlockSchema: Template = {
   name: 'testimonial',
@@ -96,4 +96,4 @@ export const testimonialBlockSchema: Template = {
       ],
     },
   ],
-}
+};

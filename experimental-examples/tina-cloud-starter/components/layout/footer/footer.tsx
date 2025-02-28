@@ -1,15 +1,15 @@
-import React from 'react'
-import Link from 'next/link'
-import { FaFacebookF, FaGithub, FaTwitter } from 'react-icons/fa'
-import { AiFillInstagram } from 'react-icons/ai'
-import { Container } from '../../util/container'
-import { RawRenderer } from './rawRenderer'
-import { useTheme } from '..'
-import { Icon } from '../../util/icon'
+import React from 'react';
+import Link from 'next/link';
+import { FaFacebookF, FaGithub, FaTwitter } from 'react-icons/fa';
+import { AiFillInstagram } from 'react-icons/ai';
+import { Container } from '../../util/container';
+import { RawRenderer } from './rawRenderer';
+import { useTheme } from '..';
+import { Icon } from '../../util/icon';
 
 export const Footer = ({ data, icon, rawData }) => {
-  const theme = useTheme()
-  const socialIconClasses = 'h-7 w-auto'
+  const theme = useTheme();
+  const socialIconClasses = 'h-7 w-auto';
   const socialIconColorClasses = {
     blue: 'text-blue-500 dark:text-blue-400 hover:text-blue-300',
     teal: 'text-teal-500 dark:text-teal-400 hover:text-teal-300',
@@ -20,7 +20,7 @@ export const Footer = ({ data, icon, rawData }) => {
     orange: 'text-orange-500 dark:text-orange-400 hover:text-orange-300',
     yellow: 'text-yellow-500 dark:text-yellow-400 hover:text-yellow-300',
     primary: 'text-white opacity-80 hover:opacity-100',
-  }
+  };
 
   const footerColor = {
     default:
@@ -35,20 +35,20 @@ export const Footer = ({ data, icon, rawData }) => {
       orange: 'text-white from-orange-500 to-orange-600',
       yellow: 'text-white from-yellow-500 to-yellow-600',
     },
-  }
+  };
 
   const footerColorCss =
     data.color === 'primary'
       ? footerColor.primary[theme.color]
-      : footerColor.default
+      : footerColor.default;
 
   return (
     <footer className={`bg-gradient-to-br ${footerColorCss}`}>
-      <Container className="relative" size="small">
-        <div className="flex justify-between items-center gap-6 flex-wrap">
+      <Container className='relative' size='small'>
+        <div className='flex justify-between items-center gap-6 flex-wrap'>
           <Link
-            href="/"
-            className="group mx-2 flex items-center font-bold tracking-tight text-gray-400 dark:text-gray-300 opacity-50 hover:opacity-100 transition duration-150 ease-out whitespace-nowrap"
+            href='/'
+            className='group mx-2 flex items-center font-bold tracking-tight text-gray-400 dark:text-gray-300 opacity-50 hover:opacity-100 transition duration-150 ease-out whitespace-nowrap'
           >
             <Icon
               parentColor={data.color}
@@ -57,15 +57,15 @@ export const Footer = ({ data, icon, rawData }) => {
                 color: data.color === 'primary' ? 'primary' : icon.color,
                 style: icon.style,
               }}
-              className="inline-block h-10 w-auto group-hover:text-orange-500"
+              className='inline-block h-10 w-auto group-hover:text-orange-500'
             />
           </Link>
-          <div className="flex gap-4">
+          <div className='flex gap-4'>
             {data.social && data.social.facebook && (
               <a
-                className="inline-block opacity-80 hover:opacity-100 transition ease-out duration-150"
+                className='inline-block opacity-80 hover:opacity-100 transition ease-out duration-150'
                 href={data.social.facebook}
-                target="_blank"
+                target='_blank'
               >
                 <FaFacebookF
                   className={`${socialIconClasses} ${
@@ -78,9 +78,9 @@ export const Footer = ({ data, icon, rawData }) => {
             )}
             {data.social && data.social.twitter && (
               <a
-                className="inline-block opacity-80 hover:opacity-100 transition ease-out duration-150"
+                className='inline-block opacity-80 hover:opacity-100 transition ease-out duration-150'
                 href={data.social.twitter}
-                target="_blank"
+                target='_blank'
               >
                 <FaTwitter
                   className={`${socialIconClasses} ${
@@ -93,9 +93,9 @@ export const Footer = ({ data, icon, rawData }) => {
             )}
             {data.social && data.social.instagram && (
               <a
-                className="inline-block opacity-80 hover:opacity-100 transition ease-out duration-150"
+                className='inline-block opacity-80 hover:opacity-100 transition ease-out duration-150'
                 href={data.social.instagram}
-                target="_blank"
+                target='_blank'
               >
                 <AiFillInstagram
                   className={`${socialIconClasses} ${
@@ -108,9 +108,9 @@ export const Footer = ({ data, icon, rawData }) => {
             )}
             {data.social && data.social.github && (
               <a
-                className="inline-block opacity-80 hover:opacity-100 transition ease-out duration-150"
+                className='inline-block opacity-80 hover:opacity-100 transition ease-out duration-150'
                 href={data.social.github}
-                target="_blank"
+                target='_blank'
               >
                 <FaGithub
                   className={`${socialIconClasses} ${
@@ -131,5 +131,5 @@ export const Footer = ({ data, icon, rawData }) => {
         ></div>
       </Container>
     </footer>
-  )
-}
+  );
+};

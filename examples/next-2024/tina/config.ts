@@ -1,11 +1,11 @@
-import { defineConfig } from 'tinacms'
+import { defineConfig } from 'tinacms';
 
 // Your hosting provider likely exposes this as an environment variable
 const branch =
   process.env.GITHUB_BRANCH ||
   process.env.VERCEL_GIT_COMMIT_REF ||
   process.env.HEAD ||
-  'main'
+  'main';
 
 export default defineConfig({
   branch,
@@ -35,7 +35,7 @@ export default defineConfig({
         format: 'mdx',
         ui: {
           router({ document }) {
-            return `/posts/${document._sys.filename}`
+            return `/posts/${document._sys.filename}`;
           },
         },
         fields: [
@@ -89,4 +89,4 @@ export default defineConfig({
       },
     ],
   },
-})
+});

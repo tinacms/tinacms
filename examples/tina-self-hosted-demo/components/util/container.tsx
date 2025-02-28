@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export const Container = ({
   children,
@@ -13,13 +13,13 @@ export const Container = ({
     medium: 'py-12',
     large: 'py-24',
     default: 'py-12',
-  }
+  };
   const widthClass = {
     small: 'max-w-4xl',
     medium: 'max-w-5xl',
     large: 'max-w-7xl',
     custom: '',
-  }
+  };
 
   return (
     <div
@@ -28,5 +28,5 @@ export const Container = ({
     >
       {children}
     </div>
-  )
-}
+  );
+};

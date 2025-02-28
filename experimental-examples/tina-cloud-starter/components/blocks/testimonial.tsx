@@ -1,14 +1,14 @@
-import React from 'react'
-import { Container } from '../util/container'
-import { Section } from '../util/section'
-import type { Template } from 'tinacms'
-import { PageBlocksTestimonial } from '../../tina/__generated__/types'
-import { tinaField } from 'tinacms/dist/react'
+import React from 'react';
+import { Container } from '../util/container';
+import { Section } from '../util/section';
+import type { Template } from 'tinacms';
+import { PageBlocksTestimonial } from '../../tina/__generated__/types';
+import { tinaField } from 'tinacms/dist/react';
 
 export const Testimonial = ({ data }: { data: PageBlocksTestimonial }) => {
   return (
     <Section color={data.color}>
-      <Container size="large">
+      <Container size='large'>
         <blockquote>
           <div
             className={`relative z-10 max-w-3xl mx-auto text-4xl lg:text-5xl font-bold tracking-normal text-center title-font ${
@@ -24,7 +24,7 @@ export const Testimonial = ({ data }: { data: PageBlocksTestimonial }) => {
             </span>
             <p
               data-tina-field={tinaField(data, `quote`)}
-              className="relative opacity-95"
+              className='relative opacity-95'
             >
               {data.quote}
             </p>
@@ -43,7 +43,7 @@ export const Testimonial = ({ data }: { data: PageBlocksTestimonial }) => {
               }`}
             ></span>
           </div>
-          <footer className="text-center">
+          <footer className='text-center'>
             <p
               data-tina-field={tinaField(data, `author`)}
               className={`tracking-wide title-font font-bold text-lg ${
@@ -58,8 +58,8 @@ export const Testimonial = ({ data }: { data: PageBlocksTestimonial }) => {
         </blockquote>
       </Container>
     </Section>
-  )
-}
+  );
+};
 
 export const testimonialBlockSchema: Template = {
   name: 'testimonial',
@@ -98,4 +98,4 @@ export const testimonialBlockSchema: Template = {
       ],
     },
   ],
-}
+};

@@ -2,14 +2,14 @@
  * @type {import('tinacms').Collection}
  */
 export default {
-  label: "Author",
-  name: "author",
-  path: "content/author",
-  format: "mdx",
+  label: 'Author',
+  name: 'author',
+  path: 'content/author',
+  format: 'mdx',
   fields: [
     {
-      name: "Title",
-      type: "string",
+      name: 'Title',
+      type: 'string',
     },
   ],
 };

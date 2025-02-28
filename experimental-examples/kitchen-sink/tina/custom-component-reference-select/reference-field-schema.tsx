@@ -1,8 +1,8 @@
-import React from 'react'
-import AuthorCollectionCustomReference from '../../component/custom-reference-select-author'
-import PostCollectionCustomReference from '../../component/custom-reference-select-post'
-import { type CollectionProps, COLLECTIONS, type InternalSys } from './model'
-import { LocationEnum } from '../model/location-enum'
+import React from 'react';
+import AuthorCollectionCustomReference from '../../component/custom-reference-select-author';
+import PostCollectionCustomReference from '../../component/custom-reference-select-post';
+import { type CollectionProps, COLLECTIONS, type InternalSys } from './model';
+import { LocationEnum } from '../model/location-enum';
 
 const referenceField = {
   label: 'Author',
@@ -17,13 +17,13 @@ const referenceField = {
               name={values.name}
               description={values.description}
             />
-          )
+          );
 
         case COLLECTIONS.POST:
-          return <PostCollectionCustomReference title={values.title} />
+          return <PostCollectionCustomReference title={values.title} />;
 
         default:
-          return s.path
+          return s.path;
       }
     },
     //Static example - user can define which field and value they want to filter
@@ -61,6 +61,6 @@ const referenceField = {
     // },
   },
   collections: ['author', 'post'],
-}
+};
 
-export default referenceField
+export default referenceField;

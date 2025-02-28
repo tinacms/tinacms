@@ -9,6 +9,6 @@ const nextConfig = {
       destination: '/admin/index.html',
     },
   ],
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

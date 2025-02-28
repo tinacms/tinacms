@@ -1,7 +1,7 @@
-import { staticRequest } from 'tinacms'
+import { staticRequest } from 'tinacms';
 
-import Link from 'next/link'
-import { useTina } from 'tinacms/dist/react'
+import Link from 'next/link';
+import { useTina } from 'tinacms/dist/react';
 
 const query = `{
   getPostList{
@@ -14,16 +14,16 @@ const query = `{
       }
     }
   }
-}`
+}`;
 
 export default function Home(props) {
   const { data } = useTina({
     query,
     variables: {},
     data: props.data,
-  })
+  });
 
-  const postsList = data?.getPostList?.edges
+  const postsList = data?.getPostList?.edges;
   return (
     <>
       <h1>Posts</h1>
@@ -37,17 +37,17 @@ export default function Home(props) {
         ))}
       </div>
     </>
-  )
+  );
 }
 
 export const getStaticProps = async () => {
-  let data = {}
-  const variables = {}
+  let data = {};
+  const variables = {};
   try {
     data = await staticRequest({
       query,
       variables,
-    })
+    });
   } catch {
     // swallow errors related to document creation
   }
@@ -59,5 +59,5 @@ export const getStaticProps = async () => {
       data,
       //myOtherProp: 'some-other-data',
     },
-  }
-}
+  };
+};

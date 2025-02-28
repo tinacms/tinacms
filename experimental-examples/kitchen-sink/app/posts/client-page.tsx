@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from 'next/link';
 
 export default function PostList(props) {
   return (
@@ -14,5 +14,5 @@ export default function PostList(props) {
         ))}
       </div>
     </>
-  )
+  );
 }

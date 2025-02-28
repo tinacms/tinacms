@@ -1,16 +1,16 @@
-import * as React from 'react'
-import { Actions } from '../util/actions'
-import { Container } from '../util/container'
-import { Section } from '../util/section'
-import { useTheme } from '../layout'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
-import type { Template } from 'tinacms'
-import { PageBlocksHero } from '../../tina/__generated__/types'
-import { tinaField } from 'tinacms/dist/react'
-import { vercelEditInfo } from '@tinacms/vercel-previews'
+import * as React from 'react';
+import { Actions } from '../util/actions';
+import { Container } from '../util/container';
+import { Section } from '../util/section';
+import { useTheme } from '../layout';
+import { TinaMarkdown } from 'tinacms/dist/rich-text';
+import type { Template } from 'tinacms';
+import { PageBlocksHero } from '../../tina/__generated__/types';
+import { tinaField } from 'tinacms/dist/react';
+import { vercelEditInfo } from '@tinacms/vercel-previews';
 
 export const Hero = ({ data }: { data: PageBlocksHero }) => {
-  const theme = useTheme()
+  const theme = useTheme();
   const headlineColorClasses = {
     blue: 'from-blue-400 to-blue-600',
     teal: 'from-teal-400 to-teal-600',
@@ -20,23 +20,23 @@ export const Hero = ({ data }: { data: PageBlocksHero }) => {
     purple: 'from-purple-400 to-purple-600',
     orange: 'from-orange-300 to-orange-600',
     yellow: 'from-yellow-400 to-yellow-600',
-  }
+  };
 
   return (
     <Section color={data.color}>
       <Container
-        size="large"
-        className="grid grid-cols-1 lg:grid-cols-5 gap-14 items-center justify-center"
+        size='large'
+        className='grid grid-cols-1 lg:grid-cols-5 gap-14 items-center justify-center'
       >
-        <div className="row-start-2 lg:row-start-1 lg:col-span-3 text-center lg:text-left">
+        <div className='row-start-2 lg:row-start-1 lg:col-span-3 text-center lg:text-left'>
           {data.tagline && (
             <h2
               // data-tina-field={vercelEditInfo(data, 'tagline')}
               data-vercel-edit-info={vercelEditInfo(data, 'tagline')}
-              className="relative inline-block px-3 py-1 mb-8 text-md font-bold tracking-wide title-font z-20"
+              className='relative inline-block px-3 py-1 mb-8 text-md font-bold tracking-wide title-font z-20'
             >
               {data.tagline}
-              <span className="absolute w-full h-full left-0 top-0 rounded-full -z-1 bg-current opacity-7"></span>
+              <span className='absolute w-full h-full left-0 top-0 rounded-full -z-1 bg-current opacity-7'></span>
             </h2>
           )}
           {data.headline && (
@@ -68,22 +68,22 @@ export const Hero = ({ data }: { data: PageBlocksHero }) => {
           )}
           {data.actions && (
             <Actions
-              className="justify-center lg:justify-start py-2"
+              className='justify-center lg:justify-start py-2'
               parentColor={data.color}
               actions={data.actions}
             />
           )}
         </div>
         {data.image && (
-          <div className="relative row-start-1 lg:col-span-2 flex justify-center">
+          <div className='relative row-start-1 lg:col-span-2 flex justify-center'>
             <div data-tina-field-overlay={tinaField(data.image, 'src')}>
               <img
-                className="absolute w-full rounded-lg max-w-xs lg:max-w-none h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light"
+                className='absolute w-full rounded-lg max-w-xs lg:max-w-none h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light'
                 src={data.image.src}
-                aria-hidden="true"
+                aria-hidden='true'
               />
               <img
-                className="relative z-10 w-full max-w-xs rounded-lg lg:max-w-none h-auto"
+                className='relative z-10 w-full max-w-xs rounded-lg lg:max-w-none h-auto'
                 alt={data.image.alt}
                 src={data.image.src}
               />
@@ -92,8 +92,8 @@ export const Hero = ({ data }: { data: PageBlocksHero }) => {
         )}
       </Container>
     </Section>
-  )
-}
+  );
+};
 
 export const heroBlockSchema: Template = {
   name: 'hero',
@@ -191,4 +191,4 @@ export const heroBlockSchema: Template = {
       ],
     },
   ],
-}
+};

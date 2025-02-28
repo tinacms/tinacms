@@ -1,7 +1,7 @@
-import { Layout } from "../../components/Layout";
-import Link from "next/link";
-import { useTina } from "tinacms/dist/react";
-import { client } from "../../tina/__generated__/client";
+import { Layout } from '../../components/Layout';
+import Link from 'next/link';
+import { useTina } from 'tinacms/dist/react';
+import { client } from '../../tina/__generated__/client';
 
 export default function PostList(props) {
   // data passes though in production mode and data is updated to the sidebar data in edit-mode

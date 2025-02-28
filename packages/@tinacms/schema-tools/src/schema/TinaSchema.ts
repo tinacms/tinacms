@@ -34,7 +34,7 @@ export class TinaSchema {
    */
   constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
-    this.schema = config
+    this.schema = config;
     // NOTE: Any changes to the logic below or the legacyWalkFields
     // function can impact the generated schema. This will result
     // in schema mismatch errors when building with TinaCloud if the
@@ -74,18 +74,18 @@ export class TinaSchema {
   };
 
   public findReferencesFromCollection(name: string) {
-    const result: Record<string, string[]> = {}
+    const result: Record<string, string[]> = {};
     this.walkFields(({ field, collection: c, path }) => {
       if (c.name !== name) {
-        return
+        return;
       }
       if (field.type === 'reference') {
         field.collections.forEach((name) => {
           if (result[name] === undefined) {
-            result[name] = []
+            result[name] = [];
           }
-          result[name].push(path)
-        })
+          result[name].push(path);
+        });
       }
     });
     return result;
@@ -438,7 +438,7 @@ export class TinaSchema {
         );
       }
     }
-  }
+  };
 
   /**
    * Walk all fields in tina schema
@@ -447,10 +447,10 @@ export class TinaSchema {
    */
   public walkFields(
     cb: (args: {
-      field: any
-      collection: any
-      path: string
-      isListItem?: boolean
+      field: any;
+      collection: any;
+      path: string;
+      isListItem?: boolean;
     }) => void
   ) {
     const walk = (
@@ -460,47 +460,47 @@ export class TinaSchema {
     ) => {
       if (collectionOrObject.templates) {
         collectionOrObject.templates.forEach((template: any) => {
-          const templatePath = `${path}.${template.name}`
+          const templatePath = `${path}.${template.name}`;
           template.fields.forEach((field: any) => {
             const fieldPath = field.list
               ? `${templatePath}[*].${field.name}`
-              : `${templatePath}.${field.name}`
-            cb({ field, collection, path: fieldPath })
+              : `${templatePath}.${field.name}`;
+            cb({ field, collection, path: fieldPath });
             if (field.type === 'object') {
-              walk(field, collection, fieldPath)
+              walk(field, collection, fieldPath);
             }
-          })
-        })
+          });
+        });
       }
       if (collectionOrObject.fields) {
         collectionOrObject.fields.forEach((field: any) => {
           const fieldPath = field.list
             ? `${path}.${field.name}[*]`
-            : `${path}.${field.name}`
-          cb({ field, collection, path: fieldPath })
+            : `${path}.${field.name}`;
+          cb({ field, collection, path: fieldPath });
           if (field.type === 'object' && field.fields) {
-            walk(field, collection, fieldPath)
+            walk(field, collection, fieldPath);
           } else if (field.templates) {
             field.templates.forEach((template: any) => {
-              const templatePath = `${fieldPath}.${template.name}`
+              const templatePath = `${fieldPath}.${template.name}`;
               template.fields.forEach((field: any) => {
                 const fieldPath = field.list
                   ? `${templatePath}[*].${field.name}`
-                  : `${templatePath}.${field.name}`
-                cb({ field, collection, path: fieldPath })
+                  : `${templatePath}.${field.name}`;
+                cb({ field, collection, path: fieldPath });
                 if (field.type === 'object') {
-                  walk(field, collection, fieldPath)
+                  walk(field, collection, fieldPath);
                 }
-              })
-            })
+              });
+            });
           }
-        })
+        });
       }
-    }
+    };
 
     this.getCollections().forEach((collection) => {
-      walk(collection, collection)
-    })
+      walk(collection, collection);
+    });
   }
 
   /**

@@ -5,8 +5,8 @@
 */
 
 module.exports = (packageJson) => {
-  const gitRevision = `${packageJson.name}@${packageJson.version}`
-  const outDir = `${__dirname}/docs/${gitRevision}`
+  const gitRevision = `${packageJson.name}@${packageJson.version}`;
+  const outDir = `${__dirname}/docs/${gitRevision}`;
 
   // TODO: If current branch is not `master` or `latest` then gitRevision is the current branch
 
@@ -19,5 +19,5 @@ module.exports = (packageJson) => {
     out: outDir,
     excludeNotExported: false,
     gitRevision,
-  }
-}
+  };
+};

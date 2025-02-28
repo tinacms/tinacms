@@ -1,13 +1,13 @@
-import React from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { Container } from '../util/container'
-import { useTheme } from '.'
-import { Icon } from '../util/icon'
+import React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { Container } from '../util/container';
+import { useTheme } from '.';
+import { Icon } from '../util/icon';
 
 export const Header = ({ data }) => {
-  const router = useRouter()
-  const theme = useTheme()
+  const router = useRouter();
+  const theme = useTheme();
 
   const headerColor = {
     default:
@@ -22,12 +22,12 @@ export const Header = ({ data }) => {
       orange: 'text-white from-orange-400 to-orange-500',
       yellow: 'text-white from-yellow-400 to-yellow-500',
     },
-  }
+  };
 
   const headerColorCss =
     data.color === 'primary'
       ? headerColor.primary[theme.color]
-      : headerColor.default
+      : headerColor.default;
 
   const activeItemClasses = {
     blue: 'border-b-3 border-blue-200 text-blue-700 dark:text-blue-300 font-medium dark:border-blue-700',
@@ -42,7 +42,7 @@ export const Header = ({ data }) => {
       'border-b-3 border-orange-200 text-orange-700 dark:text-orange-300 font-medium dark:border-orange-700',
     yellow:
       'border-b-3 border-yellow-300 text-yellow-700 dark:text-yellow-300 font-medium dark:border-yellow-600',
-  }
+  };
 
   const activeBackgroundClasses = {
     blue: 'text-blue-500',
@@ -53,26 +53,26 @@ export const Header = ({ data }) => {
     purple: 'text-purple-500',
     orange: 'text-orange-500',
     yellow: 'text-yellow-500',
-  }
+  };
 
   // If we're on an admin path, other links should also link to their admin paths
-  const [prefix, setPrefix] = React.useState('')
+  const [prefix, setPrefix] = React.useState('');
 
   React.useEffect(() => {
     if (window && window.location.pathname.startsWith('/admin')) {
-      setPrefix('/admin')
+      setPrefix('/admin');
     }
-  }, [])
+  }, []);
 
   return (
     <div
       className={`relative overflow-hidden bg-gradient-to-b ${headerColorCss}`}
     >
-      <Container size="custom" className="py-0 relative z-10 max-w-8xl">
-        <div className="flex items-center justify-between gap-6">
-          <h4 className="select-none text-lg font-bold tracking-tight my-4 transition duration-150 ease-out transform">
-            <Link legacyBehavior href="/" passHref>
-              <a className="flex gap-1 items-center whitespace-nowrap tracking-[.002em]">
+      <Container size='custom' className='py-0 relative z-10 max-w-8xl'>
+        <div className='flex items-center justify-between gap-6'>
+          <h4 className='select-none text-lg font-bold tracking-tight my-4 transition duration-150 ease-out transform'>
+            <Link legacyBehavior href='/' passHref>
+              <a className='flex gap-1 items-center whitespace-nowrap tracking-[.002em]'>
                 <Icon
                   parentColor={data.color}
                   data={{
@@ -85,13 +85,13 @@ export const Header = ({ data }) => {
               </a>
             </Link>
           </h4>
-          <ul className="flex gap-6 sm:gap-8 lg:gap-10 tracking-[.002em] -mx-4">
+          <ul className='flex gap-6 sm:gap-8 lg:gap-10 tracking-[.002em] -mx-4'>
             {data.nav &&
               data.nav.map((item, i) => {
                 const activeItem =
                   item?.href === ''
                     ? router?.asPath === '/'
-                    : router?.asPath.includes(item.href)
+                    : router?.asPath.includes(item.href);
                 return (
                   <li
                     key={`${item.label}-${i}`}
@@ -115,33 +115,33 @@ export const Header = ({ data }) => {
                             className={`absolute bottom-0 left-1/2 w-[180%] h-full -translate-x-1/2 -z-1 opacity-10 dark:opacity-15 ${
                               activeBackgroundClasses[theme.color]
                             }`}
-                            preserveAspectRatio="none"
-                            viewBox="0 0 230 230"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                            preserveAspectRatio='none'
+                            viewBox='0 0 230 230'
+                            fill='none'
+                            xmlns='http://www.w3.org/2000/svg'
                           >
                             <rect
-                              x="230"
-                              y="230"
-                              width="230"
-                              height="230"
-                              transform="rotate(-180 230 230)"
-                              fill="url(#paint0_radial_1_33)"
+                              x='230'
+                              y='230'
+                              width='230'
+                              height='230'
+                              transform='rotate(-180 230 230)'
+                              fill='url(#paint0_radial_1_33)'
                             />
                             <defs>
                               <radialGradient
-                                id="paint0_radial_1_33"
-                                cx="0"
-                                cy="0"
-                                r="1"
-                                gradientUnits="userSpaceOnUse"
-                                gradientTransform="translate(345 230) rotate(90) scale(230 115)"
+                                id='paint0_radial_1_33'
+                                cx='0'
+                                cy='0'
+                                r='1'
+                                gradientUnits='userSpaceOnUse'
+                                gradientTransform='translate(345 230) rotate(90) scale(230 115)'
                               >
-                                <stop stopColor="currentColor" />
+                                <stop stopColor='currentColor' />
                                 <stop
-                                  offset="1"
-                                  stopColor="currentColor"
-                                  stopOpacity="0"
+                                  offset='1'
+                                  stopColor='currentColor'
+                                  stopOpacity='0'
                                 />
                               </radialGradient>
                             </defs>
@@ -150,7 +150,7 @@ export const Header = ({ data }) => {
                       </a>
                     </Link>
                   </li>
-                )
+                );
               })}
           </ul>
         </div>
@@ -161,5 +161,5 @@ export const Header = ({ data }) => {
         />
       </Container>
     </div>
-  )
-}
+  );
+};

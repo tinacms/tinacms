@@ -4,4 +4,4 @@
 
 */
 
-module.exports = 'file-mock-name'
+module.exports = 'file-mock-name';

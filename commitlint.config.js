@@ -13,4 +13,4 @@ module.exports = {
     'subject-case': [0],
     'header-max-length': [0],
   },
-}
+};
