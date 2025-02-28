@@ -1,5 +1,17 @@
 # tina-graphql
 
+## 1.5.14
+
+### Patch Changes
+
+- [#5538](https://github.com/tinacms/tinacms/pull/5538) [`22669e8`](https://github.com/tinacms/tinacms/commit/22669e8e226d14a73387407b3af134925ac356d6) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix bugs in reference logic related to using the wrong correction when updating documents with references
+
+- [#5497](https://github.com/tinacms/tinacms/pull/5497) [`602b4d0`](https://github.com/tinacms/tinacms/commit/602b4d07f94de4c10d5bb059a5edc49546a2031c) Thanks [@kldavis4](https://github.com/kldavis4)! - This reimplements references to more thoroughly find deeply nested references and add a reference index to the collection in order to query these deep references. The rename modal is updated to remove the warning about breaking references as well.
+
+- Updated dependencies [[`602b4d0`](https://github.com/tinacms/tinacms/commit/602b4d07f94de4c10d5bb059a5edc49546a2031c)]:
+  - @tinacms/schema-tools@1.7.2
+  - @tinacms/mdx@1.6.1
+
 ## 1.5.13
 
 ### Patch Changes
