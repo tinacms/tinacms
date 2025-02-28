@@ -11,7 +11,8 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({ a: newValue })
+      expect(result.object).toEqual({ a: newValue })
+      expect(result.updated).toBe(true)
     })
 
     it('should update nested property in array', () => {
@@ -22,9 +23,10 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({
+      expect(result.object).toEqual({
         a: { b: [{ c: 1 }, { c: newValue }, { c: 3 }] },
       })
+      expect(result.updated).toBe(true)
     })
 
     it('should update multiple matches in array', () => {
@@ -35,9 +37,10 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({
+      expect(result.object).toEqual({
         a: { b: [{ c: newValue }, { c: newValue }, { c: 3 }] },
       })
+      expect(result.updated).toBe(true)
     })
 
     it('should not update if oldValue does not match', () => {
@@ -48,7 +51,8 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({ a: { b: { c: 3 } } })
+      expect(result.object).toEqual({ a: { b: { c: 3 } } })
+      expect(result.updated).toBe(false)
     })
 
     it('should update nested array in array', () => {
@@ -63,11 +67,12 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({
+      expect(result.object).toEqual({
         a: {
           b: [{ c: [{ d: 1 }, { d: newValue }] }, { c: [{ d: 3 }] }],
         },
       })
+      expect(result.updated).toBe(true)
     })
 
     it('should update property in array of objects', () => {
@@ -78,9 +83,10 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({
+      expect(result.object).toEqual({
         a: [{ b: newValue }, { b: 'other' }, { b: newValue }],
       })
+      expect(result.updated).toBe(true)
     })
 
     it('should update property in nested arrays', () => {
@@ -91,9 +97,10 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({
+      expect(result.object).toEqual({
         a: [{ b: [{ c: newValue }, { c: 3 }] }, { b: [{ c: 4 }] }],
       })
+      expect(result.updated).toBe(true)
     })
 
     it('should update property in deeply nested object', () => {
@@ -104,7 +111,8 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({ a: { b: { c: { d: { e: newValue } } } } })
+      expect(result.object).toEqual({ a: { b: { c: { d: { e: newValue } } } } })
+      expect(result.updated).toBe(true)
     })
 
     it('should not update if no matches in array', () => {
@@ -115,7 +123,8 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({ a: [{ b: 1 }, { b: 2 }, { b: 3 }] }) // No change
+      expect(result.object).toEqual({ a: [{ b: 1 }, { b: 2 }, { b: 3 }] }) // No change
+      expect(result.updated).toBe(false)
     })
 
     it('should update property in array with mixed types', () => {
@@ -126,9 +135,10 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({
+      expect(result.object).toEqual({
         a: [{ b: newValue }, { b: 'string' }, { b: newValue }],
       })
+      expect(result.updated).toBe(true)
     })
 
     it('should update property in array with null values', () => {
@@ -139,9 +149,10 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({
+      expect(result.object).toEqual({
         a: [{ b: newValue }, { b: 2 }, { b: newValue }],
       })
+      expect(result.updated).toBe(true)
     })
 
     it('should update property in array with undefined values', () => {
@@ -152,9 +163,10 @@ describe('index', () => {
 
       const result = updateObjectWithJsonPath(obj, path, oldValue, newValue)
 
-      expect(result).toEqual({
+      expect(result.object).toEqual({
         a: [{ b: newValue }, { b: 2 }, { b: newValue }],
       })
+      expect(result.updated).toBe(true)
     })
   })
 })
