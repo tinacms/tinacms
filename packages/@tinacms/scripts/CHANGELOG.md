@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.3
+
+### Patch Changes
+
+- [#5515](https://github.com/tinacms/tinacms/pull/5515) [`98df118`](https://github.com/tinacms/tinacms/commit/98df11889d39af2ad7b4cde033fa26f8046a8852) Thanks [@kldavis4](https://github.com/kldavis4)! - Add diff-tina-lock script for verifying changes to schema in CI and update-tina-lock script for updating tina locks. Update CI to call this script on example projects.
+
 ## 1.3.2
 
 ### Patch Changes

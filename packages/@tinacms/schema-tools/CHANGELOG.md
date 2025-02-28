@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.7.2
+
+### Patch Changes
+
+- [#5497](https://github.com/tinacms/tinacms/pull/5497) [`602b4d0`](https://github.com/tinacms/tinacms/commit/602b4d07f94de4c10d5bb059a5edc49546a2031c) Thanks [@kldavis4](https://github.com/kldavis4)! - This reimplements references to more thoroughly find deeply nested references and add a reference index to the collection in order to query these deep references. The rename modal is updated to remove the warning about breaking references as well.
+
 ## 1.7.1
 
 ### Patch Changes
