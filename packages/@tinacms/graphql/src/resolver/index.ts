@@ -295,12 +295,14 @@ export const updateObjectWithJsonPath = (
   oldValue: any,
   newValue: any
 ) => {
+  let updated = false
   // Handle the case where path is a simple top-level property
   if (!path.includes('.') && !path.includes('[')) {
     if (path in obj && obj[path] === oldValue) {
       obj[path] = newValue
+      updated = true
     }
-    return obj
+    return { object: obj, updated }
   }
 
   // Extract the parent path (everything except the last segment)
@@ -317,12 +319,13 @@ export const updateObjectWithJsonPath = (
         if (parent[keyToUpdate] === oldValue) {
           // Update the property with the new value
           parent[keyToUpdate] = newValue
+          updated = true
         }
       }
     })
   }
 
-  return obj
+  return { object: obj, updated }
 }
 
 /**
@@ -835,13 +838,34 @@ export class Resolver {
               // load the doc with the references
               let refDoc = await this.getRaw(pathToDocWithRef)
 
+              let hasUpdate = false
               // Update each reference to the deleted document
               for (const path of referencePaths) {
-                refDoc = updateObjectWithJsonPath(refDoc, path, realPath, null)
+                const { object, updated } = updateObjectWithJsonPath(
+                  refDoc,
+                  path,
+                  realPath,
+                  null
+                )
+                refDoc = object
+                hasUpdate = updated || hasUpdate
               }
 
-              // save the updated doc
-              await this.database.put(pathToDocWithRef, refDoc, collection)
+              if (hasUpdate) {
+                const collectionWithRef =
+                  this.tinaSchema.getCollectionByFullPath(pathToDocWithRef)
+                if (!collectionWithRef) {
+                  throw new Error(
+                    `Unable to find collection for ${pathToDocWithRef}`
+                  )
+                }
+                // save the updated doc
+                await this.database.put(
+                  pathToDocWithRef,
+                  refDoc,
+                  collectionWithRef.name
+                )
+              }
             }
           }
         }
@@ -881,18 +905,36 @@ export class Resolver {
             // load the document with the references
             let docWithRef = await this.getRaw(pathToDocWithRef)
 
+            let hasUpdate = false
             // update each reference to the updated document
             for (const path of referencePaths) {
-              docWithRef = updateObjectWithJsonPath(
+              const { object, updated } = updateObjectWithJsonPath(
                 docWithRef,
                 path,
                 realPath,
                 newRealPath
               )
+              docWithRef = object
+              hasUpdate = updated || hasUpdate
             }
 
             // save the updated document
-            await this.database.put(pathToDocWithRef, docWithRef, collection)
+            if (hasUpdate) {
+              // lookup collection for the document with the references
+              const collectionWithRef =
+                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef)
+              if (!collectionWithRef) {
+                throw new Error(
+                  `Unable to find collection for ${pathToDocWithRef}`
+                )
+              }
+
+              await this.database.put(
+                pathToDocWithRef,
+                docWithRef,
+                collectionWithRef.name
+              )
+            }
           }
         }
         return this.getDocument(newRealPath)
