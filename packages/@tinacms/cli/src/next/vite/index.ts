@@ -154,10 +154,14 @@ export const createConfig = async ({
     await fs.outputFile(staticMediaPath, `[]`)
   }
 
+  console.log('ConfigManager', configManager.spaRootPath)
+
   const alias = {
     TINA_IMPORT: configManager.prebuildFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
     STATIC_MEDIA_IMPORT: staticMediaPath,
+    react: path.resolve(__dirname, 'node_modules/react'),
+    'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
     crypto: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     fs: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
     os: path.join(configManager.spaRootPath, 'src', 'dummy-client.ts'),
@@ -191,7 +195,7 @@ export const createConfig = async ({
     appType: 'spa',
     resolve: {
       alias,
-      dedupe: ['graphql', 'tinacms', 'react', 'react-dom', 'react-router-dom'],
+      dedupe: ['graphql', 'tinacms', 'react', 'react-dom'],
     },
     define: {
       /**
