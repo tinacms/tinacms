@@ -7,17 +7,18 @@ Here are the steps to complete your journey:
 1. Join [Tina's Discord channel](https://discord.com/invite/zumN63Ybpf) - You can leave a message on the `#introductions`, i.e.:
 
    > Hi, I am trying out TinaCMS with {{ TECH eg. NextJS }}
-     After I have evaluated TinaCMS, I plan to use it to build {{ BLOG, PORTFOLIO, DOCUMENTATION SITE, ETC }}  
-     Previous CMSs I have used include {{ FILL IN }}
+   > After I have evaluated TinaCMS, I plan to use it to build {{ BLOG, PORTFOLIO, DOCUMENTATION SITE, ETC }}  
+   >  Previous CMSs I have used include {{ FILL IN }}
 
 2. Get TinaCMS running and deploy a site using [tina.io](https://tina.io) and [TinaCloud](https://app.tina.io/signin)
-   
+
    Feel free to start with one of the starter templates
    This can be a personal site or one you’ve built for work
 
 3. Record a [Done Video](https://www.ssw.com.au/rules/record-a-quick-and-dirty-done-video/) explaining how Tina works
 
    Here's what we're looking for:
+
    - Who you are
    - Why you are using TinaCMS
    - Something you like about TinaCMS
@@ -30,6 +31,7 @@ Here are the steps to complete your journey:
 6. Let us know about it! Email us at badge@tina.io
 
    Include links to:
+
    - Your video
    - Your social media posts (if applicable)
 

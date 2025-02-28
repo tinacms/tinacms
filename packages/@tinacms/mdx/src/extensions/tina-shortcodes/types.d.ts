@@ -1,4 +1,9 @@
-import type { BlockContent, DefinitionContent, PhrasingContent } from 'mdast'
+import type {
+  Root as MdastRoot,
+  BlockContent,
+  DefinitionContent,
+  PhrasingContent,
+} from 'mdast'
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 interface DirectiveFields {
@@ -151,6 +156,11 @@ declare module 'mdast-util-to-markdown' {
 
 // Add nodes to content.
 declare module 'mdast' {
+  // We populate the `_tinaEmbeds` field with the _tinaEmbeds found in any rich-text nodes.
+  // More info here: https://github.com/tinacms/tinacms/pull/4700
+  interface Root extends MdastRoot {
+    embedCode?: string
+  }
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface StaticPhrasingContentMap {
     /**

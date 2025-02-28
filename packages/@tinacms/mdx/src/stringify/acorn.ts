@@ -18,18 +18,35 @@ import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
 import { rootElement, stringifyMDX } from '.'
 
+function generateRandom6LetterString() {
+  const characters = 'abcdefghijklmnopqrstuvwxyz'
+  let result = ''
+  for (let i = 0; i < 6; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length)
+    result += characters[randomIndex]
+  }
+  return result
+}
+
+function isMultiline(input: string): boolean {
+  // Check if the string contains a newline character
+  return input.includes('\n') || input.includes('\r')
+}
+
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
   field: RichTextField,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context?: Record<string, any>
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] } => {
-  return stringifyProps(element, field, true, imageCallback)
+  return stringifyProps(element, field, true, imageCallback, context || {})
 }
 export function stringifyProps(
   element: Plate.MdxInlineElement,
   parentField: RichTextField,
   flatten: boolean,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context: Record<string, any>
 ): {
   attributes: MdxJsxAttribute[]
   children: Md.PhrasingContent[]
@@ -40,7 +57,8 @@ export function stringifyProps(
   element: Plate.MdxBlockElement,
   parentField: RichTextField,
   flatten: boolean,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context: Record<string, any>
 ): {
   attributes: MdxJsxAttribute[]
   children: Md.BlockContent[]
@@ -51,7 +69,8 @@ export function stringifyProps(
   element: Plate.MdxBlockElement | Plate.MdxInlineElement,
   parentField: RichTextField,
   flatten: boolean,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  context: Record<string, any>
 ): {
   attributes: MdxJsxAttribute[]
   children: Md.BlockContent[] | Md.PhrasingContent[]
@@ -81,6 +100,21 @@ export function stringifyProps(
   if (template.fields.find((f) => f.name === 'children')) {
     directiveType = 'block'
   }
+
+  // gather embed codes
+  const embedCodes: Record<string, string> = {}
+  for (const [embedKey, value] of Object.entries(element.props)) {
+    if (embedKey.startsWith('_tinaEmbeds')) {
+      const key = embedKey.replace('_tinaEmbeds.', '')
+      embedCodes[key] = value as string
+    }
+  }
+
+  // delete the embed code props
+  for (const key of Object.keys(embedCodes)) {
+    delete element.props[`_tinaEmbeds.${key}`]
+  }
+
   useDirective = !!template.match
   Object.entries(element.props).forEach(([name, value]) => {
     if (typeof template === 'string') {
@@ -132,11 +166,22 @@ export function stringifyProps(
           }
         } else {
           if (typeof value === 'string') {
-            attributes.push({
-              type: 'mdxJsxAttribute',
-              name,
-              value: value,
-            })
+            if (isMultiline(value)) {
+              const code = embedCodes[name] || generateRandom6LetterString()
+              context._tinaEmbeds = context._tinaEmbeds || {}
+              context._tinaEmbeds[code] = value
+              attributes.push({
+                type: 'mdxJsxAttribute',
+                name,
+                value: `_tinaEmbeds.${code}`,
+              })
+            } else {
+              attributes.push({
+                type: 'mdxJsxAttribute',
+                name,
+                value: value,
+              })
+            }
           } else {
             throw new Error(
               `Expected string for attribute on field ${field.name}`
@@ -229,41 +274,23 @@ export function stringifyProps(
             (value) => value.type === 'root' && Array.isArray(value.children),
             `Nested rich-text element is not a valid shape for field ${field.name}`
           )
+          const code = value.embedCode || generateRandom6LetterString()
           if (field.name === 'children') {
-            const root = rootElement(value, field, imageCallback)
+            const root = rootElement(value, field, imageCallback, context)
             root.children.forEach((child) => {
               children.push(child)
             })
             return
           } else {
             const stringValue = stringifyMDX(value, field, imageCallback)
-            if (stringValue) {
-              val = stringValue
-                .trim()
-                .split('\n')
-                .map((str) => `  ${str.trim()}`)
-                .join(joiner)
-            }
+            context._tinaEmbeds = context._tinaEmbeds || {}
+            context._tinaEmbeds[code] = stringValue
           }
-          if (flatten) {
-            attributes.push({
-              type: 'mdxJsxAttribute',
-              name,
-              value: {
-                type: 'mdxJsxAttributeValueExpression',
-                value: `<>${val.trim()}</>`,
-              },
-            })
-          } else {
-            attributes.push({
-              type: 'mdxJsxAttribute',
-              name,
-              value: {
-                type: 'mdxJsxAttributeValueExpression',
-                value: `<>\n${val}\n</>`,
-              },
-            })
-          }
+          attributes.push({
+            type: 'mdxJsxAttribute',
+            name,
+            value: `_tinaEmbeds.${code}`,
+          })
         }
         break
       default:
