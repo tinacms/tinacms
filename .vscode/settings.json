@@ -1,5 +1,9 @@
 {
     "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports.biome": "explicit"
+    },
+    "editor.defaultFormatter": "biomejs.biome",
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
