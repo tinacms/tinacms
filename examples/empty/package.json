@@ -9,7 +9,7 @@
 	},
 	"dependencies": {
 		"@tinacms/cli": "workspace:*",
-		"next": "^14.2.24",
+		"next": "^14.2.21",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-is": "^17.0.2",
