@@ -217,11 +217,11 @@ export class Database {
 
   private collectionIndexDefinitions:
     | Record<string, Record<string, IndexDefinition>>
-    | undefined
+    | undefined;
   private collectionReferences:
     | Record<string, Record<string, string[]>>
-    | undefined
-  private _lookup: { [returnType: string]: LookupMapType } | undefined
+    | undefined;
+  private _lookup: { [returnType: string]: LookupMapType } | undefined;
 
   constructor(public config: DatabaseArgs) {
     this.tinaDirectory = config.tinaDirectory || 'tina';
@@ -376,12 +376,12 @@ export class Database {
       collection
     );
 
-    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel)
-    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name];
     const collectionReferences = (await this.getCollectionReferences())?.[
       collection.name
-    ]
-    const normalizedPath = normalizePath(filepath)
+    ];
+    const normalizedPath = normalizePath(filepath);
     if (!collection?.isDetached) {
       if (this.bridge) {
         await this.bridge.put(normalizedPath, stringifiedFile);
@@ -515,7 +515,7 @@ export class Database {
         }
         const collectionReferences = (await this.getCollectionReferences())?.[
           collectionName
-        ]
+        ];
 
         const normalizedPath = normalizePath(filepath);
         const dataFields = await this.formatBodyOnPayload(filepath, data);
@@ -868,20 +868,20 @@ export class Database {
     level?: Level
   ): Promise<Record<string, Record<string, string[]>>> => {
     if (this.collectionReferences) {
-      return this.collectionReferences
+      return this.collectionReferences;
     }
-    const result: Record<string, Record<string, string[]>> = {}
-    const schema = await this.getSchema(level || this.contentLevel)
-    const collections = schema.getCollections()
+    const result: Record<string, Record<string, string[]>> = {};
+    const schema = await this.getSchema(level || this.contentLevel);
+    const collections = schema.getCollections();
     for (const collection of collections) {
       const collectionReferences = this.tinaSchema.findReferencesFromCollection(
         collection.name
-      )
-      result[collection.name] = collectionReferences
+      );
+      result[collection.name] = collectionReferences;
     }
-    this.collectionReferences = result
-    return result
-  }
+    this.collectionReferences = result;
+    return result;
+  };
 
   public getIndexDefinitions = async (
     level?: Level
@@ -910,7 +910,7 @@ export class Database {
                   },
                 ],
               },
-            }
+            };
 
             if (collection.fields) {
               for (const field of collection.fields as TinaField<true>[]) {
@@ -1063,11 +1063,11 @@ export class Database {
     }
 
     let edges: { cursor: string; path: string; value?: Record<string, any> }[] =
-      []
-    let startKey: string = ''
-    let endKey: string = ''
-    let hasPreviousPage = false
-    let hasNextPage = false
+      [];
+    let startKey: string = '';
+    let endKey: string = '';
+    let hasPreviousPage = false;
+    let hasNextPage = false;
 
     const fieldsPattern = indexDefinition?.fields?.length
       ? `${indexDefinition.fields
@@ -1127,9 +1127,9 @@ export class Database {
         break;
       }
 
-      startKey = startKey || key || ''
-      endKey = key || ''
-      edges = [...edges, { cursor: key, path: filepath, value: itemRecord }]
+      startKey = startKey || key || '';
+      endKey = key || '';
+      edges = [...edges, { cursor: key, path: filepath, value: itemRecord }];
     }
 
     return {
@@ -1140,19 +1140,19 @@ export class Database {
           path,
           value,
         }: {
-          cursor: string
-          path: string
-          value?: Record<string, any>
+          cursor: string;
+          path: string;
+          value?: Record<string, any>;
         }) => {
           try {
             // pass the path to the matched item and the raw index value
-            const node = await hydrator(path, value)
+            const node = await hydrator(path, value);
             return {
               node,
               cursor: btoa(cursor),
-            }
+            };
           } catch (error) {
-            console.log(error)
+            console.log(error);
             if (
               error instanceof Error &&
               (!path.includes('.tina/__generated__/_graphql.json') ||
@@ -1163,10 +1163,10 @@ export class Database {
                 file: path,
                 collection: collection.name,
                 stack: error.stack,
-              })
+              });
             }
             // I dont think this should ever happen
-            throw error
+            throw error;
           }
         }
       ),
@@ -1351,11 +1351,11 @@ export class Database {
     if (!collection) {
       throw new Error(`No collection found for path: ${filepath}`);
     }
-    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel)
+    const indexDefinitions = await this.getIndexDefinitions(this.contentLevel);
     const collectionReferences = (await this.getCollectionReferences())?.[
       collection.name
-    ]
-    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    ];
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name];
 
     let level = this.contentLevel;
     if (collection?.isDetached) {
@@ -1596,7 +1596,7 @@ const _indexContent = async (
   }
   const collectionReferences = (await database.getCollectionReferences())?.[
     collection?.name
-  ]
+  ];
 
   const tinaSchema = await database.getSchema();
   let templateInfo: CollectionTemplateable | null = null;
@@ -1752,10 +1752,10 @@ const _deleteIndexContent = async (
 
   const collectionReferences = (await database.getCollectionReferences())?.[
     collection?.name
-  ]
+  ];
 
-  const tinaSchema = await database.getSchema()
-  let templateInfo: CollectionTemplateable | null = null
+  const tinaSchema = await database.getSchema();
+  let templateInfo: CollectionTemplateable | null = null;
   if (collection) {
     templateInfo = tinaSchema.getTemplatesForCollectable(collection);
   }

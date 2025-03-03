@@ -1,63 +1,63 @@
-import * as React from 'react'
-import GlobalData from '../../content/global/index.json'
+import * as React from 'react';
+import GlobalData from '../../content/global/index.json';
 
-const ThemeContext = React.createContext(GlobalData.theme)
+const ThemeContext = React.createContext(GlobalData.theme);
 
-export const useTheme = () => React.useContext(ThemeContext)
+export const useTheme = () => React.useContext(ThemeContext);
 
 const updateRenderColorMode = (themeMode: 'dark' | 'light') => {
   if (typeof window !== 'undefined') {
-    const root = window.document.documentElement
-    root.classList.remove('dark')
-    root.classList.remove('light')
-    root.classList.add(themeMode)
+    const root = window.document.documentElement;
+    root.classList.remove('dark');
+    root.classList.remove('light');
+    root.classList.add(themeMode);
   }
-}
+};
 
 const getUserSystemDarkMode = () => {
   if (typeof window !== 'undefined') {
-    const userMedia = window.matchMedia('(prefers-color-scheme: dark)')
+    const userMedia = window.matchMedia('(prefers-color-scheme: dark)');
 
     if (userMedia.matches) {
-      return 'dark'
+      return 'dark';
     }
   }
 
-  return 'light'
-}
+  return 'light';
+};
 
 export const Theme = ({ data, children }) => {
   const [systemDarkMode, setSystemDarkMode] = React.useState(
     getUserSystemDarkMode()
-  )
+  );
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const userMedia = window.matchMedia('(prefers-color-scheme: dark)')
+      const userMedia = window.matchMedia('(prefers-color-scheme: dark)');
 
       const updateSystemMediaPreference = (event) => {
-        setSystemDarkMode(event.matches ? 'dark' : 'light')
-      }
+        setSystemDarkMode(event.matches ? 'dark' : 'light');
+      };
 
-      userMedia.addEventListener('change', updateSystemMediaPreference)
+      userMedia.addEventListener('change', updateSystemMediaPreference);
 
       return () =>
-        userMedia.removeEventListener('change', updateSystemMediaPreference)
+        userMedia.removeEventListener('change', updateSystemMediaPreference);
     }
-    return
-  }, [setSystemDarkMode])
+    return;
+  }, [setSystemDarkMode]);
 
-  const { color = 'blue', font = 'sans', darkMode = 'system' } = data
+  const { color = 'blue', font = 'sans', darkMode = 'system' } = data;
 
   React.useEffect(() => {
     updateRenderColorMode(
       darkMode === 'system'
         ? systemDarkMode
         : darkMode !== ''
-        ? darkMode
-        : 'light'
-    )
-  }, [systemDarkMode, darkMode])
+          ? darkMode
+          : 'light'
+    );
+  }, [systemDarkMode, darkMode]);
 
   return (
     <ThemeContext.Provider
@@ -69,5 +69,5 @@ export const Theme = ({ data, children }) => {
     >
       {children}
     </ThemeContext.Provider>
-  )
-}
+  );
+};

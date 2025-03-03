@@ -27,11 +27,11 @@ export class DevCommand extends BaseCommand {
   });
   outputSearchIndexPath = Option.String('--outputSearchIndexPath', {
     description: 'Path to write the search index to',
-  })
+  });
   noServer = Option.Boolean('--no-server', false, {
     description: 'Do not start the dev server',
-  })
-  indexingLock: AsyncLock = new AsyncLock() // Prevent indexes and reads occurring at once
+  });
+  indexingLock: AsyncLock = new AsyncLock(); // Prevent indexes and reads occurring at once
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -211,8 +211,8 @@ export class DevCommand extends BaseCommand {
     }
 
     if (this.noServer) {
-      logger.info('--no-server option specified - Dev server not started')
-      process.exit(0)
+      logger.info('--no-server option specified - Dev server not started');
+      process.exit(0);
     }
     if (!this.noWatch) {
       this.watchContentFiles(

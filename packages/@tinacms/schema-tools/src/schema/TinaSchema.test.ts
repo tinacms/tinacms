@@ -1,4 +1,4 @@
-import { TinaSchema } from './TinaSchema'
+import { TinaSchema } from './TinaSchema';
 
 describe('TinaSchema', () => {
   describe('findReferencesFromCollection', () => {
@@ -17,13 +17,13 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
+      });
 
-      const references = schema.findReferencesFromCollection('post')
+      const references = schema.findReferencesFromCollection('post');
       expect(references).toEqual({
         author: ['$.author'],
-      })
-    })
+      });
+    });
 
     it('should find multiple reference fields', () => {
       const schema = new TinaSchema({
@@ -45,14 +45,14 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
+      });
 
-      const references = schema.findReferencesFromCollection('post')
+      const references = schema.findReferencesFromCollection('post');
       expect(references).toEqual({
         author: ['$.author'],
         category: ['$.category'],
-      })
-    })
+      });
+    });
 
     it('should find references in a list of objects', () => {
       const schema = new TinaSchema({
@@ -76,13 +76,13 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
+      });
 
-      const references = schema.findReferencesFromCollection('post')
+      const references = schema.findReferencesFromCollection('post');
       expect(references).toEqual({
         author: ['$.authors[*].author'],
-      })
-    })
+      });
+    });
 
     it('should find nested reference fields', () => {
       const schema = new TinaSchema({
@@ -110,14 +110,14 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
+      });
 
-      const references = schema.findReferencesFromCollection('post')
+      const references = schema.findReferencesFromCollection('post');
       expect(references).toEqual({
         author: ['$.metadata.author'],
         editor: ['$.metadata.editor'],
-      })
-    })
+      });
+    });
 
     it('should find references across multiple collections', () => {
       const schema = new TinaSchema({
@@ -145,18 +145,18 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
+      });
 
-      const postReferences = schema.findReferencesFromCollection('post')
+      const postReferences = schema.findReferencesFromCollection('post');
       expect(postReferences).toEqual({
         author: ['$.author'],
-      })
+      });
 
-      const authorReferences = schema.findReferencesFromCollection('author')
+      const authorReferences = schema.findReferencesFromCollection('author');
       expect(authorReferences).toEqual({
         publisher: ['$.publisher'],
-      })
-    })
+      });
+    });
 
     it('should return an empty object if no references exist', () => {
       const schema = new TinaSchema({
@@ -172,11 +172,11 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
+      });
 
-      const references = schema.findReferencesFromCollection('post')
-      expect(references).toEqual({})
-    })
+      const references = schema.findReferencesFromCollection('post');
+      expect(references).toEqual({});
+    });
 
     it('should return an empty object if no references exist', () => {
       const schema = new TinaSchema({
@@ -192,11 +192,11 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
+      });
 
-      const references = schema.findReferencesFromCollection('post')
-      expect(references).toEqual({})
-    })
+      const references = schema.findReferencesFromCollection('post');
+      expect(references).toEqual({});
+    });
 
     it('should find references in templates', () => {
       const schema = new TinaSchema({
@@ -218,13 +218,13 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
+      });
 
-      const references = schema.findReferencesFromCollection('post')
+      const references = schema.findReferencesFromCollection('post');
       expect(references).toEqual({
         author: ['$.article.author'],
-      })
-    })
+      });
+    });
 
     it('should find references in nested templates', () => {
       const schema = new TinaSchema({
@@ -252,14 +252,14 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
+      });
 
-      const references = schema.findReferencesFromCollection('post')
+      const references = schema.findReferencesFromCollection('post');
       expect(references).toEqual({
         author: ['$.article.metadata.author'],
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('walkFields', () => {
     it('should walk a single non-list, non-nested field', () => {
@@ -276,11 +276,11 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
-      const mockCb = jest.fn()
-      schema.walkFields(mockCb)
+      });
+      const mockCb = jest.fn();
+      schema.walkFields(mockCb);
 
-      expect(mockCb).toHaveBeenCalledTimes(1)
+      expect(mockCb).toHaveBeenCalledTimes(1);
       expect(mockCb).toHaveBeenCalledWith({
         collection: {
           name: 'simpleCollection',
@@ -303,8 +303,8 @@ describe('TinaSchema', () => {
           uid: false,
         },
         path: '$.title',
-      })
-    })
+      });
+    });
 
     it('should walk all fields with list of objects', () => {
       const schema = new TinaSchema({
@@ -329,11 +329,11 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
-      const mockCb = jest.fn()
-      schema.walkFields(mockCb)
+      });
+      const mockCb = jest.fn();
+      schema.walkFields(mockCb);
 
-      expect(mockCb).toHaveBeenCalledTimes(2)
+      expect(mockCb).toHaveBeenCalledTimes(2);
       expect(mockCb).toHaveBeenCalledWith({
         collection: {
           name: 'simpleCollection',
@@ -378,7 +378,7 @@ describe('TinaSchema', () => {
           ],
         },
         path: '$.authorRefList[*]',
-      })
+      });
       expect(mockCb).toHaveBeenCalledWith({
         collection: {
           name: 'simpleCollection',
@@ -414,8 +414,8 @@ describe('TinaSchema', () => {
           uid: false,
         },
         path: '$.authorRefList[*].author',
-      })
-    })
+      });
+    });
     it('should walk nested fields within an object', () => {
       const schema = new TinaSchema({
         collections: [
@@ -440,11 +440,11 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
-      const mockCb = jest.fn()
-      schema.walkFields(mockCb)
+      });
+      const mockCb = jest.fn();
+      schema.walkFields(mockCb);
 
-      expect(mockCb).toHaveBeenCalledTimes(3)
+      expect(mockCb).toHaveBeenCalledTimes(3);
       expect(mockCb).toHaveBeenCalledWith({
         collection: {
           name: 'nestedCollection',
@@ -495,7 +495,7 @@ describe('TinaSchema', () => {
           ],
         },
         path: '$.metadata',
-      })
+      });
       expect(mockCb).toHaveBeenCalledWith({
         collection: {
           name: 'nestedCollection',
@@ -532,7 +532,7 @@ describe('TinaSchema', () => {
           uid: false,
         },
         path: '$.metadata.description',
-      })
+      });
       expect(mockCb).toHaveBeenCalledWith({
         collection: {
           name: 'nestedCollection',
@@ -569,8 +569,8 @@ describe('TinaSchema', () => {
           uid: false,
         },
         path: '$.metadata.priority',
-      })
-    })
+      });
+    });
     it('should walk a list of primitive fields', () => {
       const schema = new TinaSchema({
         collections: [
@@ -586,11 +586,11 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
-      const mockCb = jest.fn()
-      schema.walkFields(mockCb)
+      });
+      const mockCb = jest.fn();
+      schema.walkFields(mockCb);
 
-      expect(mockCb).toHaveBeenCalledTimes(1)
+      expect(mockCb).toHaveBeenCalledTimes(1);
       expect(mockCb).toHaveBeenCalledWith({
         collection: {
           name: 'listCollection',
@@ -615,8 +615,8 @@ describe('TinaSchema', () => {
           list: true,
         },
         path: '$.tags[*]',
-      })
-    })
+      });
+    });
 
     it('should walk body with templates', () => {
       const schema = new TinaSchema({
@@ -651,11 +651,11 @@ describe('TinaSchema', () => {
             ],
           },
         ],
-      })
-      const mockCb = jest.fn()
-      schema.walkFields(mockCb)
+      });
+      const mockCb = jest.fn();
+      schema.walkFields(mockCb);
 
-      expect(mockCb).toHaveBeenCalledTimes(2)
+      expect(mockCb).toHaveBeenCalledTimes(2);
       expect(mockCb).toHaveBeenCalledWith({
         collection: {
           name: 'post',
@@ -726,7 +726,7 @@ describe('TinaSchema', () => {
           ],
         },
         path: '$.body',
-      })
+      });
 
       expect(mockCb).toHaveBeenCalledWith({
         collection: {
@@ -776,18 +776,18 @@ describe('TinaSchema', () => {
           uid: false,
         },
         path: '$.body.WarningCallout.text',
-      })
-    })
+      });
+    });
 
     it('should handle an empty collection', () => {
       const schema = new TinaSchema({
         collections: [],
-      })
-      const mockCb = jest.fn()
-      schema.walkFields(mockCb)
+      });
+      const mockCb = jest.fn();
+      schema.walkFields(mockCb);
 
-      expect(mockCb).not.toHaveBeenCalled()
-    })
+      expect(mockCb).not.toHaveBeenCalled();
+    });
 
     it('should handle a collection with no fields', () => {
       const schema = new TinaSchema({
@@ -798,11 +798,11 @@ describe('TinaSchema', () => {
             fields: [],
           },
         ],
-      })
-      const mockCb = jest.fn()
-      schema.walkFields(mockCb)
+      });
+      const mockCb = jest.fn();
+      schema.walkFields(mockCb);
 
-      expect(mockCb).not.toHaveBeenCalled()
-    })
-  })
-})
+      expect(mockCb).not.toHaveBeenCalled();
+    });
+  });
+});

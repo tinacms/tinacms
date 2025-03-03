@@ -1,16 +1,16 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from '@playwright/test';
 
 //TODO: Test is skipped because the implementation for local storage retain edit is not ready yet
-test.skip("Local storage retain edit test", () => {
+test.skip('Local storage retain edit test', () => {
   const inputSelector = 'input[name="Title"]';
-  const newValue = "Updated Author Name";
+  const newValue = 'Updated Author Name';
 
-  test("Input value retain when page reload without saving", async ({
+  test('Input value retain when page reload without saving', async ({
     page,
   }) => {
     await page.goto(
-      "http://localhost:3000/admin/index.html#/collections/edit/author/first_author",
-      { waitUntil: "domcontentloaded" }
+      'http://localhost:3000/admin/index.html#/collections/edit/author/first_author',
+      { waitUntil: 'domcontentloaded' }
     );
 
     //Need to dismiss the popup dialog to enter edit mode
@@ -27,15 +27,15 @@ test.skip("Local storage retain edit test", () => {
     expect(inputValue).toBe(newValue);
   });
 
-  test("Rich text editor retains value when page reload without saving", async ({
+  test('Rich text editor retains value when page reload without saving', async ({
     page,
   }) => {
     const richTextEditorSelector = 'div[contenteditable="true"]';
-    const richTextNewValue = "Updated Rich Text Content";
+    const richTextNewValue = 'Updated Rich Text Content';
 
     await page.goto(
-      "http://localhost:3000/admin/index.html#/collections/edit/page/Test-rich_text_editor_local_storage",
-      { waitUntil: "domcontentloaded" }
+      'http://localhost:3000/admin/index.html#/collections/edit/page/Test-rich_text_editor_local_storage',
+      { waitUntil: 'domcontentloaded' }
     );
 
     // Need to dismiss the popup dialog to enter edit mode
@@ -51,7 +51,7 @@ test.skip("Local storage retain edit test", () => {
     // Verify that the rich text editor retains the new value
     const richTextValue = await page.evaluate(() => {
       const span = document.querySelector('span[data-slate-string="true"]');
-      return span ? span.innerHTML : "";
+      return span ? span.innerHTML : '';
     });
 
     expect(richTextValue).toBe(richTextNewValue);

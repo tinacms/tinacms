@@ -52,7 +52,7 @@ export const QuoteToolbarButton = withRef<
   const { props } = useBlockQuoteToolbarButton(state);
 
   return (
-    <ToolbarButton ref={ref} tooltip="Quote (⌘+⇧+.)" {...rest} {...props}>
+    <ToolbarButton ref={ref} tooltip='Quote (⌘+⇧+.)' {...rest} {...props}>
       <Icons.quote />
     </ToolbarButton>
   );

@@ -88,7 +88,7 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
 
           return res.json({ signedUrl, src: cdnUrl + s3_key });
         }
-        return listMedia(req, res, client, bucket, mediaRoot, cdnUrl)
+        return listMedia(req, res, client, bucket, mediaRoot, cdnUrl);
       case 'DELETE':
         return deleteAsset(req, res, client, bucket);
       default:

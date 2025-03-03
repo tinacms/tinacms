@@ -9,8 +9,8 @@ const config = {
         source: '/admin',
         destination: '/admin/index.html',
       },
-    ]
+    ];
   },
-}
+};
 
-module.exports = config
+module.exports = config;

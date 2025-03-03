@@ -1,6 +1,6 @@
-import { staticRequest } from 'tinacms'
-import { Layout } from '../../components/Layout'
-import { useTina } from 'tinacms/dist/react'
+import { staticRequest } from 'tinacms';
+import { Layout } from '../../components/Layout';
+import { useTina } from 'tinacms/dist/react';
 
 const query = `query getPost($relativePath: String!) {
   getPostDocument(relativePath: $relativePath) {
@@ -24,14 +24,14 @@ const query = `query getPost($relativePath: String!) {
     }
   }
 }
-`
+`;
 
 export default function Home(props) {
   const { data } = useTina({
     query,
     variables: props.variables,
     data: props.data,
-  })
+  });
 
   return (
     <Layout>
@@ -45,7 +45,7 @@ export default function Home(props) {
         </pre>
       </code>
     </Layout>
-  )
+  );
 }
 
 export const getStaticPaths = async () => {
@@ -62,26 +62,26 @@ export const getStaticPaths = async () => {
         }
       }`,
     variables: {},
-  })
+  });
   const paths = tinaProps.getPostList.edges.map((x) => {
-    return { params: { slug: x.node.sys.filename } }
-  })
+    return { params: { slug: x.node.sys.filename } };
+  });
 
   return {
     paths,
     fallback: 'blocking',
-  }
-}
+  };
+};
 export const getStaticProps = async (ctx) => {
   const variables = {
     relativePath: ctx.params.slug + '.md',
-  }
-  let data = {}
+  };
+  let data = {};
   try {
     data = await staticRequest({
       query,
       variables,
-    })
+    });
   } catch (error) {
     // swallow errors related to document creation
   }
@@ -92,5 +92,5 @@ export const getStaticProps = async (ctx) => {
       query,
       variables,
     },
-  }
-}
+  };
+};

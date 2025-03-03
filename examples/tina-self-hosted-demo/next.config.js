@@ -1,4 +1,4 @@
-const path = require('path')
+const path = require('path');
 
 module.exports = {
   eslint: {
@@ -20,14 +20,14 @@ module.exports = {
       '.',
       'node_modules',
       'react'
-    )
+    );
     config.module.rules.push({
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
       use: ['@svgr/webpack'],
-    })
+    });
 
-    return config
+    return config;
   },
   async rewrites() {
     return [
@@ -39,6 +39,6 @@ module.exports = {
         source: '/admin',
         destination: '/admin/index.html',
       },
-    ]
+    ];
   },
-}
+};

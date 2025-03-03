@@ -26,16 +26,16 @@ import { collectConditionsForField, resolveReferences } from './filter-utils';
 import {
   resolveMediaRelativeToCloud,
   resolveMediaCloudToRelative,
-} from './media-utils'
-import { GraphQLError } from 'graphql'
+} from './media-utils';
+import { GraphQLError } from 'graphql';
 import {
   FilterCondition,
   makeFilterChain,
   REFS_COLLECTIONS_SORT_KEY,
   REFS_PATH_FIELD,
   REFS_REFERENCE_FIELD,
-} from '../database/datalayer'
-import { generatePasswordHash } from '../auth/utils'
+} from '../database/datalayer';
+import { generatePasswordHash } from '../auth/utils';
 
 interface ResolverConfig {
   config?: GraphQLConfig;
@@ -102,9 +102,10 @@ const resolveFieldData = async (
         if (isAudit) {
           const invalidNode = tree?.children[0];
           throw new GraphQLError(
-            `${invalidNode?.message}${invalidNode.position
-              ? ` at line ${invalidNode.position.start.line}, column ${invalidNode.position.start.column}`
-              : ''
+            `${invalidNode?.message}${
+              invalidNode.position
+                ? ` at line ${invalidNode.position.start.line}, column ${invalidNode.position.start.column}`
+                : ''
             }`
           );
         }
@@ -142,9 +143,9 @@ const resolveFieldData = async (
           const isUnion = !!field.templates;
           return isUnion
             ? {
-              _template: lastItem(template.namespace),
-              ...payload,
-            }
+                _template: lastItem(template.namespace),
+                ...payload,
+              }
             : payload;
         });
       } else {
@@ -173,9 +174,9 @@ const resolveFieldData = async (
         const isUnion = !!field.templates;
         accumulator[field.name] = isUnion
           ? {
-            _template: lastItem(template.namespace),
-            ...payload,
-          }
+              _template: lastItem(template.namespace),
+              ...payload,
+            }
           : payload;
       }
 
@@ -294,22 +295,26 @@ export const updateObjectWithJsonPath = (
   oldValue: any,
   newValue: any
 ) => {
-  let updated = false
+  let updated = false;
   // Handle the case where path is a simple top-level property
   if (!path.includes('.') && !path.includes('[')) {
     if (path in obj && obj[path] === oldValue) {
-      obj[path] = newValue
-      updated = true
+      obj[path] = newValue;
+      updated = true;
     }
-    return { object: obj, updated }
+    return { object: obj, updated };
   }
 
   // Extract the parent path (everything except the last segment)
-  const parentPath = path.replace(/\.[^.\[\]]+$/, '')
-  const keyToUpdate = path.match(/[^.\[\]]+$/)[0]
+  const parentPath = path.replace(/\.[^.\[\]]+$/, '');
+  const keyToUpdate = path.match(/[^.\[\]]+$/)[0];
 
   // Use JSONPath to locate all parent objects
-  const parents = JSONPath({ path: parentPath, json: obj, resultType: 'value' })
+  const parents = JSONPath({
+    path: parentPath,
+    json: obj,
+    resultType: 'value',
+  });
 
   if (parents.length > 0) {
     parents.forEach((parent) => {
@@ -317,15 +322,15 @@ export const updateObjectWithJsonPath = (
         // Check if the current value matches the oldValue
         if (parent[keyToUpdate] === oldValue) {
           // Update the property with the new value
-          parent[keyToUpdate] = newValue
-          updated = true
+          parent[keyToUpdate] = newValue;
+          updated = true;
         }
       }
     });
   }
 
-  return { object: obj, updated }
-}
+  return { object: obj, updated };
+};
 
 /**
  * The resolver provides functions for all possible types of lookup
@@ -460,18 +465,18 @@ export class Resolver {
         }
         return Promise.all(
           fieldValue.map(async (item) =>
-          // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
-          {
-            return this.buildFieldMutations(
-              item,
-              objectTemplate as any,
-              idField &&
-              existingData &&
-              existingData?.find(
-                (d) => d[idField.name] === item[idField.name]
-              )
-            );
-          }
+            // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
+            {
+              return this.buildFieldMutations(
+                item,
+                objectTemplate as any,
+                idField &&
+                  existingData &&
+                  existingData?.find(
+                    (d) => d[idField.name] === item[idField.name]
+                  )
+              );
+            }
           )
         );
       } else {
@@ -586,7 +591,8 @@ export class Resolver {
           // @ts-ignore
           if (!template) {
             throw new Error(
-              `Expected to find template named ${templateString} in collection "${collection.name
+              `Expected to find template named ${templateString} in collection "${
+                collection.name
               }" but none was found. Possible templates are: ${templateInfo.templates
                 .map((t) => lastItem(t.namespace))
                 .join(' ')}`
@@ -838,15 +844,15 @@ export class Resolver {
         const doc = await this.getDocument(realPath);
         await this.deleteDocument(realPath);
         if (await this.hasReferences(realPath, collection)) {
-          const collRefs = await this.findReferences(realPath, collection)
+          const collRefs = await this.findReferences(realPath, collection);
           for (const [collection, docsWithRefs] of Object.entries(collRefs)) {
             for (const [pathToDocWithRef, referencePaths] of Object.entries(
               docsWithRefs
             )) {
               // load the doc with the references
-              let refDoc = await this.getRaw(pathToDocWithRef)
+              let refDoc = await this.getRaw(pathToDocWithRef);
 
-              let hasUpdate = false
+              let hasUpdate = false;
               // Update each reference to the deleted document
               for (const path of referencePaths) {
                 const { object, updated } = updateObjectWithJsonPath(
@@ -854,25 +860,25 @@ export class Resolver {
                   path,
                   realPath,
                   null
-                )
-                refDoc = object
-                hasUpdate = updated || hasUpdate
+                );
+                refDoc = object;
+                hasUpdate = updated || hasUpdate;
               }
 
               if (hasUpdate) {
                 const collectionWithRef =
-                  this.tinaSchema.getCollectionByFullPath(pathToDocWithRef)
+                  this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
                 if (!collectionWithRef) {
                   throw new Error(
                     `Unable to find collection for ${pathToDocWithRef}`
-                  )
+                  );
                 }
                 // save the updated doc
                 await this.database.put(
                   pathToDocWithRef,
                   refDoc,
                   collectionWithRef.name
-                )
+                );
               }
             }
           }
@@ -905,15 +911,15 @@ export class Resolver {
         // Delete the old document
         await this.deleteDocument(realPath);
         // Update references to the document
-        const collRefs = await this.findReferences(realPath, collection)
+        const collRefs = await this.findReferences(realPath, collection);
         for (const [collection, docsWithRefs] of Object.entries(collRefs)) {
           for (const [pathToDocWithRef, referencePaths] of Object.entries(
             docsWithRefs
           )) {
             // load the document with the references
-            let docWithRef = await this.getRaw(pathToDocWithRef)
+            let docWithRef = await this.getRaw(pathToDocWithRef);
 
-            let hasUpdate = false
+            let hasUpdate = false;
             // update each reference to the updated document
             for (const path of referencePaths) {
               const { object, updated } = updateObjectWithJsonPath(
@@ -921,27 +927,27 @@ export class Resolver {
                 path,
                 realPath,
                 newRealPath
-              )
-              docWithRef = object
-              hasUpdate = updated || hasUpdate
+              );
+              docWithRef = object;
+              hasUpdate = updated || hasUpdate;
             }
 
             // save the updated document
             if (hasUpdate) {
               // lookup collection for the document with the references
               const collectionWithRef =
-                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef)
+                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
               if (!collectionWithRef) {
                 throw new Error(
                   `Unable to find collection for ${pathToDocWithRef}`
-                )
+                );
               }
 
               await this.database.put(
                 pathToDocWithRef,
                 docWithRef,
                 collectionWithRef.name
-              )
+              );
             }
           }
         }
@@ -1138,7 +1144,7 @@ export class Resolver {
    * @returns true if the document has references, false otherwise
    */
   private hasReferences = async (id: string, c: Collection) => {
-    let count = 0
+    let count = 0;
     await this.database.query(
       {
         collection: c.name,
@@ -1157,12 +1163,12 @@ export class Resolver {
         sort: REFS_COLLECTIONS_SORT_KEY,
       },
       (refId: string) => {
-        count++
-        return refId
+        count++;
+        return refId;
       }
-    )
+    );
     if (count) {
-      return true
+      return true;
     }
 
     return false;
@@ -1175,7 +1181,7 @@ export class Resolver {
    * @returns a map of references to the document
    */
   private findReferences = async (id: string, c: Collection) => {
-    const references: Record<string, Record<string, string[]>> = {}
+    const references: Record<string, Record<string, string[]>> = {};
     await this.database.query(
       {
         collection: c.name,
@@ -1195,20 +1201,20 @@ export class Resolver {
       },
       (refId: string, rawItem: Record<string, any>) => {
         if (!references[c.name]) {
-          references[c.name] = {}
+          references[c.name] = {};
         }
         if (!references[c.name][refId]) {
-          references[c.name][refId] = []
+          references[c.name][refId] = [];
         }
-        const referencePath = rawItem?.[REFS_PATH_FIELD]
+        const referencePath = rawItem?.[REFS_PATH_FIELD];
         if (referencePath) {
-          references[c.name][refId].push(referencePath)
+          references[c.name][refId].push(referencePath);
         }
-        return refId
+        return refId;
       }
-    )
-    return references
-  }
+    );
+    return references;
+  };
 
   private buildFieldMutations = async (
     fieldParams: FieldParams,
@@ -1266,7 +1272,7 @@ export class Resolver {
           if (typeof fieldValue !== 'object') {
             throw new Error(
               `Expected to find object for password field ${fieldName}. Found ${typeof accum[
-              fieldName
+                fieldName
               ]}`
             );
           }

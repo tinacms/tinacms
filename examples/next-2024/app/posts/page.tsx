@@ -1,8 +1,8 @@
-import client from '@/tina/__generated__/client'
-import Link from 'next/link'
+import client from '@/tina/__generated__/client';
+import Link from 'next/link';
 
 export default async function Page() {
-  const { data } = await client.queries.postConnection()
+  const { data } = await client.queries.postConnection();
 
   return (
     <>
@@ -17,5 +17,5 @@ export default async function Page() {
         ))}
       </div>
     </>
-  )
+  );
 }
