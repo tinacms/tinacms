@@ -1,10 +1,8 @@
+import { AutoformatBlockRule } from '@udecode/plate-autoformat';
 import {
-  type AutoformatBlockRule,
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
-  toggleList,
-  unwrapList,
-} from '@udecode/plate';
+} from '@udecode/plate-code-block';
 import {
   getParentNode,
   isElement,
@@ -12,9 +10,10 @@ import {
   type PlateEditor,
   type TEditor,
 } from '@udecode/plate-common';
+import { toggleList, unwrapList } from '@udecode/plate-list';
 
 export const preFormat: AutoformatBlockRule['preFormat'] = (editor) =>
-  unwrapList(editor as PlateEditor);
+  unwrapList(editor);
 
 export const format = (editor: TEditor, customFormatting: any) => {
   if (editor.selection) {
