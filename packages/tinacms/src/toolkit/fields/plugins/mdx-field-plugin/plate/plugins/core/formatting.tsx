@@ -1,19 +1,9 @@
 import {
-  createAutoformatPlugin,
-  createResetNodePlugin,
-  createTrailingBlockPlugin,
-  createExitBreakPlugin,
-  ELEMENT_PARAGRAPH,
-  ELEMENT_CODE_BLOCK,
-  ELEMENT_BLOCKQUOTE,
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
   ELEMENT_H4,
-  ELEMENT_H5,
-  ELEMENT_H6,
-  KEYS_HEADING,
-} from '@udecode/plate';
+} from '@udecode/plate-heading';
 import { createSoftBreakPlugin } from '../soft-break';
 import { autoformatRules } from './autoformat/autoformat-rules';
 import { withCorrectVoidBehavior } from './with-correct-void-behavior';
@@ -26,7 +16,6 @@ import {
 export const HANDLES_MDX = [
   ELEMENT_H1,
   ELEMENT_H2,
-  ELEMENT_H3,
   ELEMENT_H3,
   ELEMENT_H4,
   ELEMENT_H5,
