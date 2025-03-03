@@ -1,7 +1,5 @@
-import { preFormat } from './autoformat-utils';
-import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
-import type { AutoformatRule } from '@udecode/plate-autoformat';
 import {
+  AutoformatRule,
   ELEMENT_BLOCKQUOTE,
   ELEMENT_CODE_BLOCK,
   ELEMENT_H1,
@@ -13,6 +11,8 @@ import {
   ELEMENT_HR,
 } from '@udecode/plate';
 import { ELEMENT_DEFAULT, insertNodes, setNodes } from '@udecode/plate-common';
+import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
+import { preFormat } from './autoformat-utils';
 
 export const autoformatBlocks: AutoformatRule[] = [
   {
