@@ -97,7 +97,7 @@
 		"@udecode/plate-floating": "44.0.0",
 		"@udecode/plate-heading": "44.0.0",
 		"@udecode/plate-indent-list": "44.0.5",
-		"@udecode/plate-link": "^36.5.9",
+		"@udecode/plate-link": "44.0.4",
 		"@udecode/plate-list": "44.0.5",
 		"@udecode/plate-paragraph": "^36.0.0",
 		"@udecode/plate-reset-node": "44.0.0",
