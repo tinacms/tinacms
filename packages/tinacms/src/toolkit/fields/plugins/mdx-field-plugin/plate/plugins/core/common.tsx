@@ -1,16 +1,3 @@
-import {
-  createParagraphPlugin,
-  createHorizontalRulePlugin,
-  createNodeIdPlugin,
-  createListPlugin,
-  getListItemEntry,
-  createBlockquotePlugin,
-  createHeadingPlugin,
-  createUnderlinePlugin,
-  createIndentListPlugin,
-  createTablePlugin,
-  createBasicMarksPlugin,
-} from '@udecode/plate';
 import { ReactEditor } from 'slate-react';
 import {
   createCodeBlockPlugin,
@@ -31,10 +18,12 @@ import {
 } from '@udecode/plate-common';
 import { createSlashPlugin } from '@udecode/plate-slash-command';
 import { Transforms, Editor, Node } from 'slate';
+import { BasicMarksPlugin } from '@udecode/plate-basic-marks/react';
+import { HeadingPlugin } from '@udecode/plate-heading/react';
 
 export const plugins = [
-  createBasicMarksPlugin(),
-  createHeadingPlugin(),
+  BasicMarksPlugin,
+  HeadingPlugin,
   createParagraphPlugin(),
   createCodeBlockPlugin(),
   createHTMLBlockPlugin(),
