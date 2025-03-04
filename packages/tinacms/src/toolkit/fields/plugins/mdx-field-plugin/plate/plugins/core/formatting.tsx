@@ -15,7 +15,6 @@ import {
   isBlockAboveEmpty,
   isSelectionAtBlockStart,
 } from '@udecode/plate/react';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
 import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';

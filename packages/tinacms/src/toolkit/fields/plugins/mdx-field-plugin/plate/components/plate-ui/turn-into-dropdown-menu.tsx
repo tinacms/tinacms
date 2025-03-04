@@ -20,7 +20,7 @@ import {
   ELEMENT_H5,
   ELEMENT_H6,
 } from '@udecode/plate-heading';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
+import { ParagraphElement } from '@/components/plate-ui/paragraph-element';
 
 import { Icons } from './icons';
 

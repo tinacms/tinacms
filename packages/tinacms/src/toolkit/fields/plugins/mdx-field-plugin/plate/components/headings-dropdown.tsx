@@ -9,7 +9,6 @@ import {
   ELEMENT_H5,
   ELEMENT_H6,
 } from '@udecode/plate-heading';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
 import { ToolbarButton } from './plate-ui/toolbar';
 import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
 
