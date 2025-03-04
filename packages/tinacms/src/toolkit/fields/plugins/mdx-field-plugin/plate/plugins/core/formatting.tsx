@@ -20,6 +20,7 @@ import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
 import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
+import { ExitBreakPlugin } from '@udecode/plate-break/react';
 
 export const HANDLES_MDX = [
   ELEMENT_H1,
@@ -58,7 +59,7 @@ export const plugins = [
       rules: autoformatRules,
     },
   }),
-  createExitBreakPlugin({
+  ExitBreakPlugin({
     options: {
       rules: [
         // Break out of a block entirely, eg. get out of a blockquote
