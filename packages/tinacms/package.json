@@ -91,7 +91,7 @@
 		"@udecode/plate-basic-marks": "45.0.0",
 		"@udecode/plate-block-quote": "^36.0.0",
 		"@udecode/plate-break": "44.0.0",
-		"@udecode/plate-code-block": "^36.5.6",
+		"@udecode/plate-code-block": "44.0.0",
 		"@udecode/plate-combobox": "^36.0.0",
 		"@udecode/plate-common": "^36.5.9",
 		"@udecode/plate-floating": "^36.3.8",

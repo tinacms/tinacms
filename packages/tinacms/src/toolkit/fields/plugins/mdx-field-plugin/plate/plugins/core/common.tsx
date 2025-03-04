@@ -20,12 +20,14 @@ import { createSlashPlugin } from '@udecode/plate-slash-command';
 import { Transforms, Editor, Node } from 'slate';
 import { BasicMarksPlugin } from '@udecode/plate-basic-marks/react';
 import { HeadingPlugin } from '@udecode/plate-heading/react';
+import { ParagraphPlugin } from '@udecode/plate/react';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 
 export const plugins = [
   BasicMarksPlugin,
   HeadingPlugin,
-  createParagraphPlugin(),
-  createCodeBlockPlugin(),
+  ParagraphPlugin,
+  CodeBlockPlugin,
   createHTMLBlockPlugin(),
   createHTMLInlinePlugin(),
   createBlockquotePlugin(),
