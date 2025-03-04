@@ -21,6 +21,7 @@ import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
 import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 import { ExitBreakPlugin } from '@udecode/plate-break/react';
+import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block';
 
 export const HANDLES_MDX = [
   ELEMENT_H1,
