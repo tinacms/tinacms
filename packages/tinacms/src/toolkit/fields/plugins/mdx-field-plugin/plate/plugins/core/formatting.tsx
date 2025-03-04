@@ -3,6 +3,9 @@ import {
   ELEMENT_H2,
   ELEMENT_H3,
   ELEMENT_H4,
+  ELEMENT_H5,
+  ELEMENT_H6,
+  KEYS_HEADING,
 } from '@udecode/plate-heading';
 import { createSoftBreakPlugin } from '../soft-break';
 import { autoformatRules } from './autoformat/autoformat-rules';
@@ -12,6 +15,11 @@ import {
   isBlockAboveEmpty,
   isSelectionAtBlockStart,
 } from '@udecode/plate-common';
+import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
+import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote';
+import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
+import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
+import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 
 export const HANDLES_MDX = [
   ELEMENT_H1,
@@ -43,9 +51,9 @@ const createCorrectNodeBehaviorPlugin = createPluginFactory({
   withOverrides: withCorrectVoidBehavior,
 });
 export const plugins = [
-  createTrailingBlockPlugin(),
+  TrailingBlockPlugin,
   createCorrectNodeBehaviorPlugin(),
-  createAutoformatPlugin({
+  AutoformatPlugin({
     options: {
       rules: autoformatRules,
     },
@@ -75,7 +83,7 @@ export const plugins = [
       ],
     },
   }),
-  createResetNodePlugin({
+  ResetNodePlugin({
     options: {
       rules: [
         {

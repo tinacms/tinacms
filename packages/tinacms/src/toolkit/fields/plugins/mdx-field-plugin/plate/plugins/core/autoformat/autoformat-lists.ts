@@ -1,12 +1,12 @@
 import {
-  type AutoformatRule,
   ELEMENT_LI,
   ELEMENT_OL,
   ELEMENT_TODO_LI,
   ELEMENT_UL,
-} from '@udecode/plate';
+} from '@udecode/plate-list';
 import { formatList, preFormat } from './autoformat-utils';
 import { isBlock, setNodes } from '@udecode/plate-common';
+import { AutoformatRule } from '@udecode/plate-autoformat';
 
 export const autoformatLists: AutoformatRule[] = [
   {

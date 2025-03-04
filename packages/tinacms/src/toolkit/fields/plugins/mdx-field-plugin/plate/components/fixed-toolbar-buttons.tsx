@@ -1,8 +1,7 @@
-import { ELEMENT_TABLE } from '@udecode/plate'
-import { useEditorState } from '@udecode/plate-common'
-import React from 'react'
-import { useResize } from '../hooks/use-resize'
-import { helpers, unsupportedItemsInTable } from '../plugins/core/common'
+import { useEditorState } from '@udecode/plate-common';
+import React from 'react';
+import { useResize } from '../hooks/use-resize';
+import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
 import {
   CONTAINER_MD_BREAKPOINT,
   EMBED_ICON_WIDTH,
@@ -12,29 +11,30 @@ import {
   HEADING_LABEL,
   STANDARD_ICON_WIDTH,
   type ToolbarOverrideType,
-} from '../toolbar/toolbar-overrides'
-import { useToolbarContext } from '../toolbar/toolbar-provider'
-import { HeadingsMenu } from './headings-dropdown'
-import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button'
-import { ImageToolbarButton } from './plate-ui/image-toolbar-button'
+} from '../toolbar/toolbar-overrides';
+import { useToolbarContext } from '../toolbar/toolbar-provider';
+import { HeadingsMenu } from './headings-dropdown';
+import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button';
+import { ImageToolbarButton } from './plate-ui/image-toolbar-button';
 import {
   OrderedListToolbarButton,
   UnorderedListToolbarButton,
-} from './plate-ui/indent-list-toolbar-button'
-import { LinkToolbarButton } from './plate-ui/link-toolbar-button'
-import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button'
-import OverflowMenu from './plate-ui/overflow-menu'
-import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button'
-import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button'
-import { TableDropdownMenu } from './plate-ui/table-dropdown-menu'
-import TemplatesToolbarButton from './plate-ui/templates-toolbar-button'
-import { ToolbarGroup } from './plate-ui/toolbar'
+} from './plate-ui/indent-list-toolbar-button';
+import { LinkToolbarButton } from './plate-ui/link-toolbar-button';
+import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button';
+import OverflowMenu from './plate-ui/overflow-menu';
+import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button';
+import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button';
+import { TableDropdownMenu } from './plate-ui/table-dropdown-menu';
+import TemplatesToolbarButton from './plate-ui/templates-toolbar-button';
+import { ToolbarGroup } from './plate-ui/toolbar';
 import {
   BoldToolbarButton,
   StrikethroughToolbarButton,
   ItalicToolbarButton,
   CodeToolbarButton,
-} from './plate-ui/mark-toolbar-button'
+} from './plate-ui/mark-toolbar-button';
+import { ELEMENT_TABLE } from '@udecode/plate-table';
 
 type ToolbarItem = {
   label: string;
