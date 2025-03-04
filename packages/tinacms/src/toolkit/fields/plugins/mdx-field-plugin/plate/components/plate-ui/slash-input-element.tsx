@@ -5,7 +5,7 @@ import {
   type PlateEditor,
   PlateElement,
   toggleNodeType,
-} from '@udecode/plate-common';
+} from '@udecode/plate/react';
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading';
 
 import { Icons } from './icons';

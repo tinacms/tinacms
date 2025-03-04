@@ -11,16 +11,6 @@ import {
 import { NestedForm } from '../../nested-form';
 import { Button } from '@tinacms/toolkit';
 import { createLinkPlugin, ELEMENT_LINK } from '@udecode/plate-link';
-import {
-  type ENode,
-  getAboveNode,
-  getNodeEntries,
-  getPluginType,
-  isCollapsed,
-  type PlateEditor,
-  useEditorState,
-  type Value,
-} from '@udecode/plate-common';
 
 export { createLinkPlugin };
 

@@ -1,5 +1,3 @@
-import { createPluginFactory } from '@udecode/plate-common';
-
 export const createCodeBlockPlugin = createPluginFactory({
   key: 'code_block',
   isElement: true,

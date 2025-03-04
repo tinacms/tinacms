@@ -1,4 +1,4 @@
-import { useEditorState } from '@udecode/plate-common';
+import { useEditorState } from '@udecode/plate/react';
 import React from 'react';
 import { useResize } from '../hooks/use-resize';
 import { helpers, unsupportedItemsInTable } from '../plugins/core/common';

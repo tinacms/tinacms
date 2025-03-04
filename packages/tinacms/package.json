@@ -93,7 +93,6 @@
 		"@udecode/plate-break": "44.0.0",
 		"@udecode/plate-code-block": "44.0.0",
 		"@udecode/plate-combobox": "44.0.0",
-		"@udecode/plate-common": "^36.5.9",
 		"@udecode/plate-floating": "44.0.0",
 		"@udecode/plate-heading": "44.0.0",
 		"@udecode/plate-indent-list": "44.0.5",

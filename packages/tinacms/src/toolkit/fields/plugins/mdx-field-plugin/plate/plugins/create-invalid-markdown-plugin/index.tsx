@@ -1,5 +1,4 @@
 import React from 'react';
-import { createPluginFactory } from '@udecode/plate-common';
 import { useEditorContext } from '../../editor-context';
 import { buildErrorMessage } from '../../../monaco/error-message';
 

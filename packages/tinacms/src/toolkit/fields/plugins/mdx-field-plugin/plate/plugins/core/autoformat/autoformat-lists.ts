@@ -5,7 +5,7 @@ import {
   ELEMENT_UL,
 } from '@udecode/plate-list';
 import { formatList, preFormat } from './autoformat-utils';
-import { isBlock, setNodes } from '@udecode/plate-common';
+import { isBlock, setNodes } from '@udecode/plate/react';
 import { AutoformatRule } from '@udecode/plate-autoformat';
 
 export const autoformatLists: AutoformatRule[] = [

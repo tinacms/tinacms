@@ -9,7 +9,7 @@ import {
   setElements,
   someNode,
   useEditorState,
-} from '@udecode/plate-common';
+} from '@udecode/plate/react';
 import React from 'react';
 import { helpers } from '../../plugins/core/common';
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin';

@@ -10,7 +10,6 @@ import {
   ELEMENT_H6,
   ELEMENT_HR,
 } from '@udecode/plate';
-import { ELEMENT_DEFAULT, insertNodes, setNodes } from '@udecode/plate-common';
 import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
 import { preFormat } from './autoformat-utils';
 

@@ -11,7 +11,7 @@ import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-p
 import { createLinkPlugin } from './plugins/create-link-plugin';
 import { uuid } from './plugins/ui/helpers';
 import type { RichTextType } from '..';
-import { createPlugins, Plate } from '@udecode/plate-common';
+import { createPlugins, Plate } from '@udecode/plate';
 import { Editor } from './components/editor';
 import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
 import { TooltipProvider } from './components/plate-ui/tooltip';

@@ -9,8 +9,6 @@ import {
   StyledImage,
 } from '../../../../../components';
 import { isImage } from '@toolkit/components/media/utils';
-import { insertNodes } from '@udecode/plate-common';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate';
 
 export const ImgEmbed = ({
   attributes,

@@ -11,7 +11,7 @@ import {
   useEditorRef,
   useEditorState,
   useEditorSelector,
-} from '@udecode/plate-common';
+} from '@udecode/plate/react';
 import {
   ELEMENT_H1,
   ELEMENT_H2,

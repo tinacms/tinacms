@@ -5,7 +5,7 @@ import { withRef } from '@udecode/cn';
 import { Icons } from './icons';
 
 import { ToolbarButton } from './toolbar';
-import { toggleNodeType, useEditorState } from '@udecode/plate-common';
+import { toggleNodeType, useEditorState } from '@udecode/plate/react';
 import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote';
 import { helpers } from '../../plugins/core/common';
 
@@ -52,7 +52,7 @@ export const QuoteToolbarButton = withRef<
   const { props } = useBlockQuoteToolbarButton(state);
 
   return (
-    <ToolbarButton ref={ref} tooltip="Quote (⌘+⇧+.)" {...rest} {...props}>
+    <ToolbarButton ref={ref} tooltip='Quote (⌘+⇧+.)' {...rest} {...props}>
       <Icons.quote />
     </ToolbarButton>
   );

@@ -7,12 +7,6 @@ import {
   helpers,
 } from '../core/common';
 import type { MdxTemplate } from '../../types';
-import {
-  createPluginFactory,
-  normalizeEditor,
-  type PlateEditor,
-  setNodes,
-} from '@udecode/plate-common';
 
 export const ELEMENT_MDX_INLINE = 'mdxJsxTextElement';
 export const ELEMENT_MDX_BLOCK = 'mdxJsxFlowElement';

@@ -4,12 +4,6 @@ import { ReactEditor } from 'slate-react';
 import { insertInlineElement } from '../core/common';
 import type { Media } from '../../../../../../core/media';
 import { isImage } from '@toolkit/components/media/utils';
-import {
-  createPluginFactory,
-  normalizeEditor,
-  type PlateEditor,
-  setNodes,
-} from '@udecode/plate-common';
 
 export const ELEMENT_IMG = 'img';
 

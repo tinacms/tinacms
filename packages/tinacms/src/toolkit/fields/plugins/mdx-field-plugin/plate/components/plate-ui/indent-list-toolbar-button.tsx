@@ -2,7 +2,7 @@ import React from 'react';
 import { withRef } from '@udecode/cn';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
-import { useEditorState } from '@udecode/plate-common';
+import { useEditorState } from '@udecode/plate/react';
 import {
   ELEMENT_OL,
   ELEMENT_UL,

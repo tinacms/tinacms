@@ -1,17 +1,5 @@
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
-import {
-  ELEMENT_DEFAULT,
-  type PlateEditor,
-  type TElement,
-  findNodePath,
-  focusEditor,
-  getPointAfter,
-  getPointBefore,
-  insertNodes,
-  isCollapsed,
-  isElement,
-  setNodes,
-} from '@udecode/plate-common';
+
 import type * as monaco from 'monaco-editor';
 import React from 'react';
 import { useSelected } from 'slate-react';

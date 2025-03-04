@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { withRef } from '@udecode/cn';
-import { useEditorState } from '@udecode/plate-common';
+import { useEditorState } from '@udecode/plate/react';
 import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block';
 
 import { Icons } from './icons';
@@ -51,7 +51,7 @@ export const CodeBlockToolbarButton = withRef<
   const { props } = useCodeBlockToolbarButton(state);
 
   return (
-    <ToolbarButton ref={ref} tooltip="Code Block" {...rest} {...props}>
+    <ToolbarButton ref={ref} tooltip='Code Block' {...rest} {...props}>
       <Icons.codeBlock />
     </ToolbarButton>
   );

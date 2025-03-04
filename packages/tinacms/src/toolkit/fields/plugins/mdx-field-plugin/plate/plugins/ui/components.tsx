@@ -26,7 +26,6 @@ import {
   MARK_STRIKETHROUGH,
   MARK_UNDERLINE,
 } from '@udecode/plate';
-import { PlateElement, PlateLeaf } from '@udecode/plate-common';
 import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command';
 import React from 'react';
 import { useSelected } from 'slate-react';

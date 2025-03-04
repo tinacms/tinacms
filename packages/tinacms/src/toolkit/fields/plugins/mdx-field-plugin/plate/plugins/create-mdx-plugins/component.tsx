@@ -13,8 +13,6 @@ import { ELEMENT_MDX_INLINE } from '.';
 import { EllipsisIcon } from '../ui/icons';
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { useTemplates } from '../../editor-context';
-import { insertNodes } from '@udecode/plate-common';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate';
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div';

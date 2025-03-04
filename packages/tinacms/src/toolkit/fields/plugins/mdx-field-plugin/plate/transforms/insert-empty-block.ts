@@ -1,14 +1,3 @@
-import { ELEMENT_CODE_BLOCK } from '@udecode/plate';
-import {
-  getPluginType,
-  insertNode,
-  isSelectionAtBlockStart,
-  type PlateEditor,
-  setElements,
-  someNode,
-  type TElement,
-} from '@udecode/plate-common';
-
 export const insertEmptyCodeBlock = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
     node.type === getPluginType(editor, ELEMENT_CODE_BLOCK);

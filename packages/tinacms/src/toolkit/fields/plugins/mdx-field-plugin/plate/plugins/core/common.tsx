@@ -15,10 +15,13 @@ import {
   type PlateEditor,
   setNodes,
   someNode,
-} from '@udecode/plate-common';
+} from '@udecode/plate/react';
 import { createSlashPlugin } from '@udecode/plate-slash-command';
 import { Transforms, Editor, Node } from 'slate';
-import { BasicMarksPlugin } from '@udecode/plate-basic-marks/react';
+import {
+  BasicMarksPlugin,
+  UnderlinePlugin,
+} from '@udecode/plate-basic-marks/react';
 import { HeadingPlugin } from '@udecode/plate-heading/react';
 import { ParagraphPlugin } from '@udecode/plate/react';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
@@ -30,15 +33,15 @@ export const plugins = [
   CodeBlockPlugin,
   createHTMLBlockPlugin(),
   createHTMLInlinePlugin(),
-  createBlockquotePlugin(),
-  createUnderlinePlugin(),
-  createListPlugin(),
-  createIndentListPlugin(),
-  createHorizontalRulePlugin(),
+  BlockquotePlugin,
+  UnderlinePlugin,
+  ListPlugin,
+  IndentListPlugin,
+  HorizontalRulePlugin,
   // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
-  createNodeIdPlugin(),
-  createSlashPlugin(),
-  createTablePlugin(),
+  NodeIdPlugin,
+  SlashPlugin,
+  TablePlugin,
 ];
 
 export const unsupportedItemsInTable = new Set([

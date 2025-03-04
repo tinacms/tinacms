@@ -1,7 +1,6 @@
 import React from 'react';
 import { onKeyDownSoftBreak } from './on-key-down-soft-break';
 import type { SoftBreakPlugin } from './types';
-import { createPluginFactory } from '@udecode/plate-common';
 
 export const KEY_SOFT_BREAK = 'break';
 

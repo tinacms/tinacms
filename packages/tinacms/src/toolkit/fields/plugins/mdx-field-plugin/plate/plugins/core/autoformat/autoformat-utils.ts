@@ -3,14 +3,8 @@ import {
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
 } from '@udecode/plate-code-block';
-import {
-  getParentNode,
-  isElement,
-  isType,
-  type PlateEditor,
-  type TEditor,
-} from '@udecode/plate-common';
 import { toggleList, unwrapList } from '@udecode/plate-list';
+import { PlateEditor } from '@udecode/plate/react';
 
 export const preFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor);

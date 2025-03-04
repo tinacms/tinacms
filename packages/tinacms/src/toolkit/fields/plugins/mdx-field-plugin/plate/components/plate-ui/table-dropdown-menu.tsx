@@ -9,7 +9,7 @@ import {
   findNode,
   useEditorRef,
   useEditorSelector,
-} from '@udecode/plate-common';
+} from '@udecode/plate/react';
 import {
   ELEMENT_TABLE,
   getTableColumnCount,

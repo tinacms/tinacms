@@ -2,16 +2,6 @@ import React from 'react';
 
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 import {
-  collapseSelection,
-  focusEditor,
-  getNodeEntries,
-  isBlock,
-  toggleNodeType,
-  useEditorRef,
-  useEditorState,
-  useEditorSelector,
-} from '@udecode/plate-common';
-import {
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
@@ -33,6 +23,16 @@ import {
 } from './plate-ui/dropdown-menu';
 import { Icons } from './plate-ui/icons';
 import { ELEMENT_TABLE } from '@udecode/plate-table';
+import {
+  collapseSelection,
+  focusEditor,
+  getNodeEntries,
+  isBlock,
+  toggleNodeType,
+  useEditorRef,
+  useEditorSelector,
+  useEditorState,
+} from '@udecode/plate';
 
 const items = [
   {

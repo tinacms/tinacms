@@ -40,7 +40,7 @@ import {
   moveSelection,
   useComposedRef,
   useEditorRef,
-} from '@udecode/plate-common';
+} from '@udecode/plate/react';
 import { cva } from 'class-variance-authority';
 
 type FilterFn = (

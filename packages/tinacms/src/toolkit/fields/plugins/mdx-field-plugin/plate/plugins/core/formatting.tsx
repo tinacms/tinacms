@@ -14,7 +14,7 @@ import {
   createPluginFactory,
   isBlockAboveEmpty,
   isSelectionAtBlockStart,
-} from '@udecode/plate-common';
+} from '@udecode/plate/react';
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
 import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';

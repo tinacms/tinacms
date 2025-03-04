@@ -1,4 +1,4 @@
-import { isElement } from '@udecode/plate-common';
+import { isElement } from '@udecode/plate/react';
 import { Editor, Node, Path, Range, Transforms } from 'slate';
 
 /**
