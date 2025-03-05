@@ -32,31 +32,22 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
     []
   );
 
-  const plugins = React.useMemo(
-    () =>
-      createPlugins(
-        [
-          ...formattingPlugins,
-          ...commonPlugins,
-          createMdxBlockPlugin(),
-          createMdxInlinePlugin(),
-          createImgPlugin(),
-          createMermaidPlugin(),
-          createInvalidMarkdownPlugin(),
-          createLinkPlugin({
-            options: {
-              //? NOTE: This is a custom validation function that allows for relative links i.e. /about
-              isUrl: (url: string) => isUrl(url),
-            },
-            renderAfterEditable: LinkFloatingToolbar,
-          }),
-        ],
-        {
-          components: Components(),
-        }
-      ),
-    []
-  );
+  const plugins = [
+    ...formattingPlugins,
+    ...commonPlugins,
+    createMdxBlockPlugin(),
+    createMdxInlinePlugin(),
+    createImgPlugin(),
+    createMermaidPlugin(),
+    createInvalidMarkdownPlugin(),
+    createLinkPlugin({
+      options: {
+        // Custom validation function to allow relative links, e.g., /about
+        isUrl: (url: string) => isUrl(url),
+      },
+      renderAfterEditable: LinkFloatingToolbar,
+    }),
+  ];
 
   // This should be a plugin customization
   const tempId = [tinaForm.id, input.name].join('.');
