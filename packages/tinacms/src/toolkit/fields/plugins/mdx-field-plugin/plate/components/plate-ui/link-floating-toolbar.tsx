@@ -9,22 +9,21 @@ import {
   flip,
   offset,
 } from '@udecode/plate-floating';
-import {
-  FloatingLinkUrlInput,
-  type LinkFloatingToolbarState,
-  LinkOpenButton,
-  useFloatingLinkEdit,
-  useFloatingLinkEditState,
-  useFloatingLinkInsert,
-  useFloatingLinkInsertState,
-} from '@udecode/plate-link';
-
 import { Icons } from './icons';
 
 import { buttonVariants } from './button';
 import { inputVariants } from './input';
 import { popoverVariants } from './popover';
 import { Separator } from './separator';
+import {
+  FloatingLinkUrlInput,
+  LinkFloatingToolbarState,
+  LinkOpenButton,
+  useFloatingLinkEdit,
+  useFloatingLinkEditState,
+  useFloatingLinkInsert,
+  useFloatingLinkInsertState,
+} from '@udecode/plate-link/react';
 
 const floatingOptions: UseVirtualFloatingOptions = {
   middleware: [
