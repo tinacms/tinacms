@@ -7,7 +7,6 @@ import {
   focusEditor,
   getNodeEntries,
   isBlock,
-  toggleNodeType,
   useEditorRef,
   useEditorState,
   useEditorSelector,
@@ -142,7 +141,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
               toggleList(editor, { type });
             } else {
               unwrapList(editor);
-              toggleNodeType(editor, { activeType: type });
+              editor.tf.toggleBlock(type);
             }
 
             collapseSelection(editor);

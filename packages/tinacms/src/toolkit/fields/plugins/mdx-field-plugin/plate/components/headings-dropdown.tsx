@@ -27,7 +27,6 @@ import {
   focusEditor,
   getNodeEntries,
   isBlock,
-  toggleNodeType,
   useEditorRef,
   useEditorSelector,
   useEditorState,
@@ -131,7 +130,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
         <DropdownMenuRadioGroup
           className='flex flex-col gap-0.5'
           onValueChange={(type) => {
-            toggleNodeType(editor, { activeType: type });
+            editor.tf.toggleBlock(type);
             collapseSelection(editor);
             focusEditor(editor);
           }}

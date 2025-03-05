@@ -1,12 +1,8 @@
 import React, { type ComponentType, type SVGProps } from 'react';
 
 import { withRef } from '@udecode/cn';
-import {
-  type PlateEditor,
-  PlateElement,
-  toggleNodeType,
-} from '@udecode/plate/react';
-import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from '@udecode/plate-heading';
+import { type PlateEditor, PlateElement } from '@udecode/plate/react';
+import { HEADING_KEYS } from '@udecode/plate-heading';
 
 import { Icons } from './icons';
 
@@ -30,21 +26,21 @@ const rules: SlashCommandRule[] = [
   {
     icon: Icons.h1,
     onSelect: (editor) => {
-      toggleNodeType(editor, { activeType: ELEMENT_H1 });
+      editor.tf.toggleBlock(HEADING_KEYS.h1);
     },
     value: 'Heading 1',
   },
   {
     icon: Icons.h2,
     onSelect: (editor) => {
-      toggleNodeType(editor, { activeType: ELEMENT_H2 });
+      editor.tf.toggleBlock(HEADING_KEYS.h2);
     },
     value: 'Heading 2',
   },
   {
     icon: Icons.h3,
     onSelect: (editor) => {
-      toggleNodeType(editor, { activeType: ELEMENT_H3 });
+      editor.tf.toggleBlock(HEADING_KEYS.h3);
     },
     value: 'Heading 3',
   },
