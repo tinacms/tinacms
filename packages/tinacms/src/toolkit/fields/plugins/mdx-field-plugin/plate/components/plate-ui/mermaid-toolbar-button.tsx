@@ -1,27 +1,18 @@
 import { withRef } from '@udecode/cn';
-import {
-  type PlateEditor,
-  type TElement,
-  getPluginType,
-  insertEmptyElement,
-  insertNode,
-  isSelectionAtBlockStart,
-  setElements,
-  someNode,
-  useEditorState,
-} from '@udecode/plate/react';
+import { type PlateEditor, useEditorState } from '@udecode/plate/react';
 import React from 'react';
 import { helpers } from '../../plugins/core/common';
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
+import { getPluginType, TElement } from '@udecode/plate';
 
 export const insertEmptyMermaid = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
     node.type === getPluginType(editor, ELEMENT_MERMAID);
 
   if (
-    someNode(editor, {
+    editor.api.some({
       match: matchCodeElements,
     })
   ) {
@@ -34,10 +25,10 @@ export const insertEmptyMermaid = (editor: PlateEditor) => {
     children: [{ type: 'text', text: '' }],
   };
 
-  if (isSelectionAtBlockStart(editor)) {
-    setElements(editor, node);
+  if (editor.api.isAt({ start: true })) {
+    editor.tf.setNodes(node);
   } else {
-    insertNode(editor, node);
+    editor.tf.insertNode(node);
   }
 };
 
@@ -55,7 +46,7 @@ const useMermaidToolbarButton = (state) => {
   const editor = useEditorState();
 
   const onClick = () => {
-    insertEmptyElement(editor, ELEMENT_MERMAID, {
+    editor.tf.insertNodes(editor.api.create.block({ type: 'mermaid' }), {
       nextBlock: true,
       select: true,
     });
