@@ -1,6 +1,5 @@
 import { withProps } from '@udecode/cn';
 import {
-  ELEMENT_BLOCKQUOTE,
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
   ELEMENT_CODE_SYNTAX,
@@ -40,6 +39,7 @@ import { classNames } from './helpers';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { ParagraphPlugin } from '@udecode/plate/react';
+import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -182,7 +182,7 @@ export const Components = () => {
       />
     ),
     [ELEMENT_MERMAID]: MermaidElement,
-    [ELEMENT_BLOCKQUOTE]: BlockquoteElement,
+    [BlockquotePlugin.key]: BlockquoteElement,
     [ELEMENT_CODE_BLOCK]: CodeBlockElement,
     [ELEMENT_CODE_LINE]: CodeLineElement,
     [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,

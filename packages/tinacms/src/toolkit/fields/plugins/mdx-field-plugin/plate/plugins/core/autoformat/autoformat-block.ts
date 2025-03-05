@@ -1,12 +1,8 @@
-import {
-  AutoformatRule,
-  ELEMENT_BLOCKQUOTE,
-  ELEMENT_CODE_BLOCK,
-  ELEMENT_HR,
-} from '@udecode/plate';
+import { AutoformatRule, ELEMENT_CODE_BLOCK, ELEMENT_HR } from '@udecode/plate';
 import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
 import { preFormat } from './autoformat-utils';
 import { HEADING_KEYS } from '@udecode/plate-heading';
+import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 
 export const autoformatBlocks: AutoformatRule[] = [
   {
@@ -47,7 +43,7 @@ export const autoformatBlocks: AutoformatRule[] = [
   },
   {
     mode: 'block',
-    type: ELEMENT_BLOCKQUOTE,
+    type: BlockquotePlugin.key,
     match: '> ',
     preFormat,
   },

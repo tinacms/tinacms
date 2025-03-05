@@ -7,7 +7,8 @@ import {
   isSelectionAtBlockStart,
   ParagraphPlugin,
 } from '@udecode/plate/react';
-import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote';
+import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
 import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
@@ -27,7 +28,7 @@ export const HANDLES_MDX = [
 
 const resetBlockTypesCommonRule = {
   types: [
-    ELEMENT_BLOCKQUOTE,
+    BlockquotePlugin.key,
     HEADING_KEYS.h1,
     HEADING_KEYS.h2,
     HEADING_KEYS.h3,
@@ -99,7 +100,7 @@ export const plugins = [
         {
           hotkey: 'enter',
           query: {
-            allow: [ELEMENT_CODE_BLOCK, ELEMENT_BLOCKQUOTE],
+            allow: [ELEMENT_CODE_BLOCK, BlockquotePlugin.key],
           },
         },
       ],
