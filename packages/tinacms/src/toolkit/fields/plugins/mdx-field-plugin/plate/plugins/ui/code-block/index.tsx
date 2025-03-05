@@ -5,6 +5,8 @@ import React from 'react';
 import { useSelected } from 'slate-react';
 import { Autocomplete } from '../autocomplete';
 import { uuid } from '../helpers';
+import { TElement } from '@udecode/plate';
+import { PlateEditor } from '@udecode/plate/react';
 
 type Monaco = typeof monaco;
 
@@ -61,7 +63,7 @@ export const CodeBlock = ({
   const [height, setHeight] = React.useState(MINIMUM_HEIGHT);
 
   React.useEffect(() => {
-    if (selected && isCollapsed(editor.selection)) {
+    if (selected && editor.api.isCollapsed()) {
       retryFocus(monacoEditorRef);
     }
   }, [selected, monacoEditorRef.current]);
@@ -114,9 +116,8 @@ export const CodeBlock = ({
       switch (navigateAway) {
         case 'remove':
           {
-            focusEditor(editor);
-            setNodes(
-              editor,
+            editor.tf.focus();
+            editor.tf.setNodes(
               {
                 type: 'p',
                 children: [{ text: '' }],
@@ -135,8 +136,7 @@ export const CodeBlock = ({
           break;
         case 'insertNext':
           {
-            insertNodes(
-              editor,
+            editor.tf.insertNodes(
               [
                 {
                   type: ELEMENT_DEFAULT,
@@ -147,18 +147,18 @@ export const CodeBlock = ({
               ],
               { select: true }
             );
-            focusEditor(editor);
+            editor.tf.focus();
           }
           break;
         case 'up':
           {
-            const path = findNodePath(editor, element);
+            const path = editor.api.findPath(element);
             if (!path) {
               return; // Not sure if/when this would happen
             }
-            const previousNodePath = getPointBefore(editor, path);
+            const previousNodePath = editor.api.before(path);
             if (!previousNodePath) {
-              focusEditor(editor);
+              editor.tf.focus();
               insertNodes(
                 editor,
                 [
