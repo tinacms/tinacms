@@ -13,8 +13,8 @@ import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
 import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 import { ExitBreakPlugin } from '@udecode/plate-break/react';
-import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block';
 import { HEADING_KEYS } from '@udecode/plate-heading';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 
 export const HANDLES_MDX = [
   HEADING_KEYS.h1,
@@ -100,7 +100,7 @@ export const plugins = [
         {
           hotkey: 'enter',
           query: {
-            allow: [ELEMENT_CODE_BLOCK, BlockquotePlugin.key],
+            allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
           },
         },
       ],

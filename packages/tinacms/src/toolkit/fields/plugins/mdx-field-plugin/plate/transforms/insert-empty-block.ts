@@ -1,9 +1,10 @@
 import { getPluginType, TElement } from '@udecode/plate';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { PlateEditor } from '@udecode/plate/react';
 
 export const insertEmptyCodeBlock = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
-    node.type === getPluginType(editor, ELEMENT_CODE_BLOCK);
+    node.type === getPluginType(editor, CodeBlockPlugin.key);
 
   if (
     editor.api.some({
@@ -14,7 +15,7 @@ export const insertEmptyCodeBlock = (editor: PlateEditor) => {
   }
 
   const node = {
-    type: ELEMENT_CODE_BLOCK,
+    type: CodeBlockPlugin.key,
     value: '',
     // TODO: this can probably be a config option
     lang: 'javascript',
