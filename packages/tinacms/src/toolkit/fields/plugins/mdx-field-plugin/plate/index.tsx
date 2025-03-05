@@ -11,7 +11,6 @@ import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-p
 import { createLinkPlugin } from './plugins/create-link-plugin';
 import { uuid } from './plugins/ui/helpers';
 import type { RichTextType } from '..';
-import { createPlugins, Plate } from '@udecode/plate';
 import { Editor } from './components/editor';
 import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
 import { TooltipProvider } from './components/plate-ui/tooltip';
@@ -22,6 +21,7 @@ import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar
 import { isUrl } from './transforms/is-url';
 import { ToolbarProvider } from './toolbar/toolbar-provider';
 import { createMermaidPlugin } from './plugins/custom/mermaid-plugin';
+import { Plate, usePlateEditor } from '@udecode/plate/react';
 
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(
@@ -63,6 +63,12 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const id = React.useMemo(() => uuid() + tempId, [tempId]);
   const ref = React.useRef<HTMLDivElement>(null);
 
+  const editor = usePlateEditor({
+    id: id,
+    value: initialValue,
+    plugins: plugins,
+  });
+
   React.useEffect(() => {
     if (ref.current) {
       setTimeout(() => {
@@ -82,9 +88,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   return (
     <div ref={ref}>
       <Plate
-        id={id}
-        initialValue={initialValue}
-        plugins={plugins}
+        editor={editor}
         onChange={(value) => {
           input.onChange({
             type: 'root',
