@@ -7,6 +7,7 @@ import {
   helpers,
 } from '../core/common';
 import type { MdxTemplate } from '../../types';
+import { PlateEditor } from '@udecode/plate/react';
 
 export const ELEMENT_MDX_INLINE = 'mdxJsxTextElement';
 export const ELEMENT_MDX_BLOCK = 'mdxJsxFlowElement';
@@ -14,7 +15,7 @@ export const ELEMENT_MDX_BLOCK = 'mdxJsxFlowElement';
 const Embed = (props) => {
   const handleChange = (values) => {
     const path = ReactEditor.findPath(props.editor, props.element);
-    setNodes(props.editor, { props: values }, { at: path });
+    props.editor.tf.setNodes({ props: values }, { at: path });
   };
 
   if (props.inline) {
@@ -53,7 +54,7 @@ export const insertMDX = (editor: PlateEditor, value: MdxTemplate) => {
       props: value.defaultItem ? value.defaultItem : {},
     });
 
-    normalizeEditor(editor, { force: true });
+    editor.tf.normalize({ force: true });
   } else {
     insertInlineElement(editor, {
       type: ELEMENT_MDX_INLINE,
