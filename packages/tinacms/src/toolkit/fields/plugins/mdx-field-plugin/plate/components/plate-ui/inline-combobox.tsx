@@ -31,14 +31,7 @@ import {
 } from '@ariakit/react';
 import { cn } from '@udecode/cn';
 import { filterWords } from '@udecode/plate-combobox';
-import {
-  findNodePath,
-  getPointBefore,
-  insertText,
-  moveSelection,
-  useComposedRef,
-  useEditorRef,
-} from '@udecode/plate/react';
+import { useComposedRef, useEditorRef } from '@udecode/plate/react';
 import { cva } from 'class-variance-authority';
 import { TElement } from '@udecode/plate';
 
@@ -111,11 +104,11 @@ const InlineCombobox = ({
   const [insertPoint, setInsertPoint] = useState<PointRef | null>(null);
 
   useEffect(() => {
-    const path = findNodePath(editor, element);
+    const path = editor.api.findPath(element);
 
     if (!path) return;
 
-    const point = getPointBefore(editor, path);
+    const point = editor.api.before(path);
 
     if (!point) return;
 
@@ -132,12 +125,12 @@ const InlineCombobox = ({
     cursorState,
     onCancelInput: (cause) => {
       if (cause !== 'backspace') {
-        insertText(editor, trigger + value, {
+        editor.tf.insertText(trigger + value, {
           at: insertPoint?.current ?? undefined,
         });
       }
       if (cause === 'arrowLeft' || cause === 'arrowRight') {
-        moveSelection(editor, {
+        editor.tf.move({
           distance: 1,
           reverse: cause === 'arrowLeft',
         });
