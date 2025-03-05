@@ -13,6 +13,7 @@ import { ELEMENT_MDX_INLINE } from '.';
 import { EllipsisIcon } from '../ui/icons';
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { useTemplates } from '../../editor-context';
+import { PlateEditor } from '@udecode/plate/react';
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div';
@@ -27,24 +28,33 @@ const Wrapper = ({ inline, children }) => {
   );
 };
 
+//TODO : remove the any type
+interface InlineEmbedProps {
+  attributes: any;
+  children: any;
+  element: any;
+  onChange?: (value: any) => void;
+  editor: PlateEditor;
+}
+
 export const InlineEmbed = ({
   attributes,
   children,
   element,
   onChange,
   editor,
-}) => {
+}: InlineEmbedProps) => {
   const selected = useSelected();
   const { templates, fieldName } = useTemplates();
   const { handleClose, handleRemove, handleSelect, isExpanded } =
     useEmbedHandles(editor, element, fieldName);
   useHotkey('enter', () => {
-    insertNodes(editor, [
+    editor.tf.insertNodes([
       { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
     ]);
   });
   useHotkey('space', () => {
-    insertNodes(editor, [{ text: ' ' }], {
+    editor.tf.insertNodes([{ text: ' ' }], {
       match: (n) => {
         if (Element.isElement(n) && n.type === ELEMENT_MDX_INLINE) {
           return true;
@@ -112,7 +122,7 @@ export const BlockEmbed = ({
     useEmbedHandles(editor, element, fieldName);
 
   useHotkey('enter', () => {
-    insertNodes(editor, [
+    editor.tf.insertNodes([
       { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
     ]);
   });
