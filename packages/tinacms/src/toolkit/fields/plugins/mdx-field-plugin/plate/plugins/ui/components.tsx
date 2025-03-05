@@ -1,6 +1,5 @@
 import { withProps } from '@udecode/cn';
 import {
-  ELEMENT_CODE_SYNTAX,
   ELEMENT_HR,
   ELEMENT_LI,
   ELEMENT_LINK,
@@ -41,6 +40,7 @@ import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import {
   CodeBlockPlugin,
   CodeLinePlugin,
+  CodeSyntaxPlugin,
 } from '@udecode/plate-code-block/react';
 
 /**
@@ -187,7 +187,7 @@ export const Components = () => {
     [BlockquotePlugin.key]: BlockquoteElement,
     [CodeBlockPlugin.key]: CodeBlockElement,
     [CodeLinePlugin.key]: CodeLineElement,
-    [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,
+    [CodeSyntaxPlugin.key]: CodeSyntaxLeaf,
     html: ({ attributes, editor, element, children, className }) => {
       return (
         <div
