@@ -1,6 +1,7 @@
 import React from 'react';
 
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
+import { TablePlugin } from '@udecode/plate-table/react';
 
 import {
   isElement,
@@ -11,7 +12,6 @@ import {
   useEditorSelector,
 } from '@udecode/plate/react';
 import {
-  ELEMENT_TABLE,
   getTableColumnCount,
   deleteColumn,
   deleteRow,
@@ -37,12 +37,14 @@ import { ToolbarButton } from './toolbar';
 
 export function TableDropdownMenu(props: DropdownMenuProps) {
   const tableSelected = useEditorSelector(
-    (editor) => someNode(editor, { match: { type: ELEMENT_TABLE } }),
+    (editor) => someNode(editor, { match: { type: TablePlugin.key } }),
     []
   );
 
   const [enableDeleteColumn, enableDeleteRow] = useEditorSelector((editor) => {
-    const tableNodeEntry = findNode(editor, { match: { type: ELEMENT_TABLE } });
+    const tableNodeEntry = findNode(editor, {
+      match: { type: TablePlugin.key },
+    });
     if (!tableNodeEntry) return [false, false];
 
     const [tableNode] = tableNodeEntry;

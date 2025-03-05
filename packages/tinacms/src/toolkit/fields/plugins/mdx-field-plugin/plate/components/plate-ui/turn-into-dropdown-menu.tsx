@@ -27,8 +27,8 @@ import {
 import { ToolbarButton } from './toolbar';
 import { toggleList, unwrapList } from '@udecode/plate';
 import { helpers } from '@toolkit/fields/plugins/mdx-field-plugin/plate/plugins/core/common';
-import { ELEMENT_TABLE } from '@udecode/plate-table';
 import { HEADING_KEYS } from '@udecode/plate-heading';
+import { TablePlugin } from '@udecode/plate-table/react';
 
 const items = [
   {
@@ -107,7 +107,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem;
 
   const editorState = useEditorState();
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE);
+  const userInTable = helpers.isNodeActive(editorState, TablePlugin.key);
   if (userInTable) return null;
 
   return (

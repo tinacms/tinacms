@@ -13,7 +13,6 @@ import {
   useOpenState,
 } from './plate-ui/dropdown-menu';
 import { Icons } from './plate-ui/icons';
-import { ELEMENT_TABLE } from '@udecode/plate-table';
 import {
   collapseSelection,
   focusEditor,
@@ -24,6 +23,7 @@ import {
   useEditorState,
 } from '@udecode/plate';
 import { HEADING_KEYS } from '@udecode/plate-heading';
+import { TablePlugin } from '@udecode/plate-table/react';
 
 const items = [
   {
@@ -99,7 +99,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
   const editorState = useEditorState();
   const openState = useOpenState();
 
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE);
+  const userInTable = helpers.isNodeActive(editorState, TablePlugin.key);
 
   const selectedItem =
     items.find((item) => item.value === value) ?? defaultItem;

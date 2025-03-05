@@ -34,7 +34,7 @@ import {
   ItalicToolbarButton,
   CodeToolbarButton,
 } from './plate-ui/mark-toolbar-button';
-import { ELEMENT_TABLE } from '@udecode/plate-table';
+import { TablePlugin } from '@udecode/plate-table/react';
 
 type ToolbarItem = {
   label: string;
@@ -154,7 +154,7 @@ export default function FixedToolbarButtons() {
   }
 
   const editorState = useEditorState();
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE);
+  const userInTable = helpers.isNodeActive(editorState, TablePlugin.key);
   if (userInTable) {
     items = items.filter((item) => !unsupportedItemsInTable.has(item.label));
   }
