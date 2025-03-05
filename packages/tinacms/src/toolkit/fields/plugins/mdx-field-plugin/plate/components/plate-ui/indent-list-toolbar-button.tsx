@@ -3,15 +3,19 @@ import { withRef } from '@udecode/cn';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { useEditorState } from '@udecode/plate/react';
-import { ELEMENT_OL, ELEMENT_UL, toggleList } from '@udecode/plate-list';
+import { toggleList } from '@udecode/plate-list';
 import {
+  BulletedListPlugin,
+  NumberedListPlugin,
   useListToolbarButton,
   useListToolbarButtonState,
 } from '@udecode/plate-list/react';
 export const UnorderedListToolbarButton = withRef<typeof ToolbarButton>(
   (props, ref) => {
     const editor = useEditorState();
-    const state = useListToolbarButtonState({ nodeType: ELEMENT_UL });
+    const state = useListToolbarButtonState({
+      nodeType: BulletedListPlugin.key,
+    });
     const { props: buttonProps } = useListToolbarButton(state);
 
     return (
@@ -22,7 +26,7 @@ export const UnorderedListToolbarButton = withRef<typeof ToolbarButton>(
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          toggleList(editor, { type: ELEMENT_UL });
+          toggleList(editor, { type: BulletedListPlugin.key });
         }}
       >
         <Icons.ul />
@@ -34,7 +38,9 @@ export const UnorderedListToolbarButton = withRef<typeof ToolbarButton>(
 export const OrderedListToolbarButton = withRef<typeof ToolbarButton>(
   (props, ref) => {
     const editor = useEditorState();
-    const state = useListToolbarButtonState({ nodeType: ELEMENT_OL });
+    const state = useListToolbarButtonState({
+      nodeType: NumberedListPlugin.key,
+    });
     const { props: buttonProps } = useListToolbarButton(state);
 
     return (
@@ -45,7 +51,7 @@ export const OrderedListToolbarButton = withRef<typeof ToolbarButton>(
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          toggleList(editor, { type: ELEMENT_OL });
+          toggleList(editor, { type: NumberedListPlugin.key });
         }}
       >
         <Icons.ol />
