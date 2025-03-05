@@ -13,6 +13,11 @@ import React, {
 } from 'react';
 
 import type { PointRef } from 'slate';
+import {
+  useComboboxInput,
+  UseComboboxInputResult,
+  useHTMLInputCursorState,
+} from '@udecode/plate-combobox/react';
 
 import {
   Combobox,
@@ -25,15 +30,8 @@ import {
   useComboboxStore,
 } from '@ariakit/react';
 import { cn } from '@udecode/cn';
+import { filterWords } from '@udecode/plate-combobox';
 import {
-  type UseComboboxInputResult,
-  filterWords,
-  useComboboxInput,
-  useHTMLInputCursorState,
-} from '@udecode/plate-combobox';
-import {
-  type TElement,
-  createPointRef,
   findNodePath,
   getPointBefore,
   insertText,
@@ -42,6 +40,7 @@ import {
   useEditorRef,
 } from '@udecode/plate/react';
 import { cva } from 'class-variance-authority';
+import { TElement } from '@udecode/plate';
 
 type FilterFn = (
   item: { keywords?: string[]; value: string },
@@ -120,7 +119,7 @@ const InlineCombobox = ({
 
     if (!point) return;
 
-    const pointRef = createPointRef(editor, point);
+    const pointRef = editor.api.pointRef(point);
     setInsertPoint(pointRef);
 
     return () => {
