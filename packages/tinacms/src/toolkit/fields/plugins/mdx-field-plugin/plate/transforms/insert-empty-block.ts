@@ -1,9 +1,12 @@
+import { getPluginType, TElement } from '@udecode/plate';
+import { PlateEditor } from '@udecode/plate/react';
+
 export const insertEmptyCodeBlock = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
     node.type === getPluginType(editor, ELEMENT_CODE_BLOCK);
 
   if (
-    someNode(editor, {
+    editor.api.some({
       match: matchCodeElements,
     })
   ) {
@@ -18,9 +21,9 @@ export const insertEmptyCodeBlock = (editor: PlateEditor) => {
     children: [{ type: 'text', text: '' }],
   };
 
-  if (isSelectionAtBlockStart(editor)) {
-    setElements(editor, node);
+  if (editor.api.isAt({ start: true })) {
+    editor.tf.setNodes(node);
   } else {
-    insertNode(editor, node);
+    editor.tf.insertNode(node);
   }
 };
