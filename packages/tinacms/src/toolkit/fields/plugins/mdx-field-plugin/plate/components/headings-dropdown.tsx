@@ -24,13 +24,14 @@ import {
 } from '@udecode/plate';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { TablePlugin } from '@udecode/plate-table/react';
+import { ParagraphPlugin } from '@udecode/plate/react';
 
 const items = [
   {
     description: 'Paragraph',
     icon: Icons.heading,
     label: 'Paragraph',
-    value: ELEMENT_PARAGRAPH,
+    value: ParagraphPlugin.key,
   },
   {
     description: 'Heading 1',

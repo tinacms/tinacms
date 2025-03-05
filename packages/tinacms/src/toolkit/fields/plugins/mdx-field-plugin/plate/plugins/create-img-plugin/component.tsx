@@ -9,6 +9,7 @@ import {
   StyledImage,
 } from '../../../../../components';
 import { isImage } from '@toolkit/components/media/utils';
+import { ParagraphPlugin } from '@udecode/plate/react';
 
 export const ImgEmbed = ({
   attributes,
@@ -24,7 +25,7 @@ export const ImgEmbed = ({
 
   useHotkey('enter', () => {
     insertNodes(editor, [
-      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
+      { type: ParagraphPlugin.key, children: [{ text: '' }] },
     ]);
   });
 

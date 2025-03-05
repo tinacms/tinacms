@@ -13,7 +13,7 @@ import { ELEMENT_MDX_INLINE } from '.';
 import { EllipsisIcon } from '../ui/icons';
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { useTemplates } from '../../editor-context';
-import { PlateEditor } from '@udecode/plate/react';
+import { ParagraphPlugin, PlateEditor } from '@udecode/plate/react';
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div';
@@ -50,7 +50,7 @@ export const InlineEmbed = ({
     useEmbedHandles(editor, element, fieldName);
   useHotkey('enter', () => {
     editor.tf.insertNodes([
-      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
+      { type: ParagraphPlugin.key, children: [{ text: '' }] },
     ]);
   });
   useHotkey('space', () => {
@@ -123,7 +123,7 @@ export const BlockEmbed = ({
 
   useHotkey('enter', () => {
     editor.tf.insertNodes([
-      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
+      { type: ParagraphPlugin.key, children: [{ text: '' }] },
     ]);
   });
 

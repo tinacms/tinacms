@@ -8,7 +8,6 @@ import {
   ELEMENT_LI,
   ELEMENT_LINK,
   ELEMENT_OL,
-  ELEMENT_PARAGRAPH,
   ELEMENT_TD,
   ELEMENT_TH,
   ELEMENT_TR,
@@ -40,6 +39,7 @@ import { ELEMENT_MERMAID } from '../custom/mermaid-plugin';
 import { classNames } from './helpers';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { TablePlugin } from '@udecode/plate-table/react';
+import { ParagraphPlugin } from '@udecode/plate/react';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -163,7 +163,7 @@ export const Components = () => {
         {...props}
       />
     ),
-    [ELEMENT_PARAGRAPH]: ({
+    [ParagraphPlugin.key]: ({
       attributes,
       className,
       editor,

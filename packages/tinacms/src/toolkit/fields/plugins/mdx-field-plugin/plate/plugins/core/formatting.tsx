@@ -5,6 +5,7 @@ import {
   createPluginFactory,
   isBlockAboveEmpty,
   isSelectionAtBlockStart,
+  ParagraphPlugin,
 } from '@udecode/plate/react';
 import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
@@ -21,7 +22,7 @@ export const HANDLES_MDX = [
   HEADING_KEYS.h4,
   HEADING_KEYS.h5,
   HEADING_KEYS.h6,
-  ELEMENT_PARAGRAPH,
+  ParagraphPlugin.key,
 ];
 
 const resetBlockTypesCommonRule = {
@@ -35,7 +36,7 @@ const resetBlockTypesCommonRule = {
     HEADING_KEYS.h6,
     // NOTE: code blocks behave strangely when used here
   ],
-  defaultType: ELEMENT_PARAGRAPH,
+  defaultType: ParagraphPlugin.key,
 };
 
 const createCorrectNodeBehaviorPlugin = createPluginFactory({

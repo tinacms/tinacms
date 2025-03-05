@@ -10,6 +10,7 @@ import {
   useEditorRef,
   useEditorState,
   useEditorSelector,
+  ParagraphPlugin,
 } from '@udecode/plate/react';
 import { ParagraphElement } from '@/components/plate-ui/paragraph-element';
 
@@ -35,7 +36,7 @@ const items = [
     description: 'Paragraph',
     icon: Icons.paragraph,
     label: 'Paragraph',
-    value: ELEMENT_PARAGRAPH,
+    value: ParagraphPlugin.key,
   },
   {
     description: 'Heading 1',
@@ -75,11 +76,11 @@ const items = [
   },
 ];
 
-const defaultItem = items.find((item) => item.value === ELEMENT_PARAGRAPH);
+const defaultItem = items.find((item) => item.value === ParagraphPlugin.key);
 
 export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const value: string = useEditorSelector((editor) => {
-    let initialNodeType: string = ELEMENT_PARAGRAPH;
+    let initialNodeType: string = ParagraphPlugin.key;
     let allNodesMatchInitialNodeType = false;
     const codeBlockEntries = getNodeEntries(editor, {
       match: (n) => isBlock(editor, n),
@@ -90,13 +91,13 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
     if (nodes.length > 0) {
       initialNodeType = nodes[0][0].type as string;
       allNodesMatchInitialNodeType = nodes.every(([node]) => {
-        const type: string = (node?.type as string) || ELEMENT_PARAGRAPH;
+        const type: string = (node?.type as string) || ParagraphPlugin.key;
 
         return type === initialNodeType;
       });
     }
 
-    return allNodesMatchInitialNodeType ? initialNodeType : ELEMENT_PARAGRAPH;
+    return allNodesMatchInitialNodeType ? initialNodeType : ParagraphPlugin.key;
   }, []);
 
   const editor = useEditorRef();
