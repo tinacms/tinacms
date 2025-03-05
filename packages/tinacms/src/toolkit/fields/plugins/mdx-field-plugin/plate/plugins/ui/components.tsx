@@ -4,12 +4,6 @@ import {
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
   ELEMENT_CODE_SYNTAX,
-  ELEMENT_H1,
-  ELEMENT_H2,
-  ELEMENT_H3,
-  ELEMENT_H4,
-  ELEMENT_H5,
-  ELEMENT_H6,
   ELEMENT_HR,
   ELEMENT_LI,
   ELEMENT_LINK,
@@ -45,6 +39,7 @@ import { TableElement } from '../../components/plate-ui/table-element';
 import { TableRowElement } from '../../components/plate-ui/table-row-element';
 import { ELEMENT_MERMAID } from '../custom/mermaid-plugin';
 import { classNames } from './helpers';
+import { HEADING_KEYS } from '@udecode/plate-heading';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -59,7 +54,13 @@ const headerClasses = 'font-normal';
 export const Components = () => {
   return {
     [ELEMENT_SLASH_INPUT]: SlashInputElement,
-    [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (
+    [HEADING_KEYS.h1]: ({
+      attributes,
+      editor,
+      element,
+      className,
+      ...props
+    }) => (
       <h1
         className={classNames(
           headerClasses,
@@ -71,7 +72,13 @@ export const Components = () => {
         {...props}
       />
     ),
-    [ELEMENT_H2]: ({ attributes, editor, element, className, ...props }) => (
+    [HEADING_KEYS.h2]: ({
+      attributes,
+      editor,
+      element,
+      className,
+      ...props
+    }) => (
       <h2
         className={classNames(
           headerClasses,
@@ -83,7 +90,13 @@ export const Components = () => {
         {...props}
       />
     ),
-    [ELEMENT_H3]: ({ attributes, editor, element, className, ...props }) => (
+    [HEADING_KEYS.h3]: ({
+      attributes,
+      editor,
+      element,
+      className,
+      ...props
+    }) => (
       <h3
         className={classNames(
           headerClasses,
@@ -95,7 +108,13 @@ export const Components = () => {
         {...props}
       />
     ),
-    [ELEMENT_H4]: ({ attributes, editor, element, className, ...props }) => (
+    [HEADING_KEYS.h4]: ({
+      attributes,
+      editor,
+      element,
+      className,
+      ...props
+    }) => (
       <h4
         className={classNames(
           headerClasses,
@@ -108,7 +127,13 @@ export const Components = () => {
       />
     ),
     /** Tailwind prose doesn't style h5 and h6 elements */
-    [ELEMENT_H5]: ({ attributes, editor, element, className, ...props }) => (
+    [HEADING_KEYS.h5]: ({
+      attributes,
+      editor,
+      element,
+      className,
+      ...props
+    }) => (
       <h5
         className={classNames(
           headerClasses,
@@ -120,7 +145,13 @@ export const Components = () => {
         {...props}
       />
     ),
-    [ELEMENT_H6]: ({ attributes, editor, element, className, ...props }) => (
+    [HEADING_KEYS.h6]: ({
+      attributes,
+      editor,
+      element,
+      className,
+      ...props
+    }) => (
       <h6
         className={classNames(
           headerClasses,
