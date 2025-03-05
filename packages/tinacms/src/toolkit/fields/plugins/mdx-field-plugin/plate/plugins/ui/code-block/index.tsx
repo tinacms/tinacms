@@ -159,8 +159,7 @@ export const CodeBlock = ({
             const previousNodePath = editor.api.before(path);
             if (!previousNodePath) {
               editor.tf.focus();
-              insertNodes(
-                editor,
+              editor.tf.insertNodes(
                 [
                   {
                     type: ELEMENT_DEFAULT,
@@ -176,20 +175,19 @@ export const CodeBlock = ({
               return;
             }
 
-            focusEditor(editor, previousNodePath);
+            editor.tf.focus({ at: previousNodePath });
           }
           break;
         case 'down': {
-          const path = findNodePath(editor, element);
+          const path = editor.api.findPath(element);
           if (!path) {
             return; // Not sure if/when this would happen
           }
 
-          const nextNodePath = getPointAfter(editor, path);
+          const nextNodePath = editor.api.after(path);
           if (!nextNodePath) {
             // No next children, insert an empty block
-            insertNodes(
-              editor,
+            editor.tf.insertNodes(
               [
                 {
                   type: ELEMENT_DEFAULT,
@@ -200,9 +198,9 @@ export const CodeBlock = ({
               ],
               { select: true }
             );
-            focusEditor(editor);
+            editor.tf.focus();
           } else {
-            focusEditor(editor, nextNodePath);
+            editor.tf.focus({ at: nextNodePath });
           }
           break;
         }
@@ -224,7 +222,7 @@ export const CodeBlock = ({
       monacoEditor.layout();
     });
     // Set Default
-    setNodes(editor, { value: defaultValue, lang: language });
+    editor.tf.setNodes({ value: defaultValue, lang: language });
 
     monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       if (monacoEditor.hasTextFocus()) {
@@ -287,7 +285,7 @@ export const CodeBlock = ({
               items={items}
               value={currentItem}
               defaultQuery={'plaintext'}
-              onChange={(item) => setNodes(editor, { lang: item.key })}
+              onChange={(item) => editor.tf.setNodes({ lang: item.key })}
             />
           </div>
         )}
@@ -331,7 +329,7 @@ export const CodeBlock = ({
               // FIXME: if a void is focused first, onChange doesn't fire until
               // https://github.com/udecode/plate/issues/1519#issuecomment-1184933602
               onChangeCallback?.(value);
-              setNodes(editor, { value, lang: language });
+              editor.tf.setNodes({ value, lang: language });
             }}
           />
         </div>
