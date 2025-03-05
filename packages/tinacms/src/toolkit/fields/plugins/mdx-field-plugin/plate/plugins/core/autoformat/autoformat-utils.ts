@@ -1,6 +1,8 @@
 import { AutoformatBlockRule } from '@udecode/plate-autoformat';
-import { ELEMENT_CODE_LINE } from '@udecode/plate-code-block';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import {
+  CodeBlockPlugin,
+  CodeLinePlugin,
+} from '@udecode/plate-code-block/react';
 import { toggleList, unwrapList } from '@udecode/plate-list';
 import { PlateEditor } from '@udecode/plate/react';
 
@@ -15,7 +17,7 @@ export const format = (editor: TEditor, customFormatting: any) => {
     if (
       isElement(node) &&
       !isType(editor as PlateEditor, node, CodeBlockPlugin.key) &&
-      !isType(editor as PlateEditor, node, ELEMENT_CODE_LINE)
+      !isType(editor as PlateEditor, node, CodeLinePlugin.key)
     ) {
       customFormatting();
     }
