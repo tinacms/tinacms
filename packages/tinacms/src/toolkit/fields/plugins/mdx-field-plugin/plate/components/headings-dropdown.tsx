@@ -14,7 +14,6 @@ import {
 } from './plate-ui/dropdown-menu';
 import { Icons } from './plate-ui/icons';
 import {
-  isBlock,
   useEditorRef,
   useEditorSelector,
   useEditorState,
@@ -76,7 +75,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
     let initialNodeType: string = ParagraphPlugin.key;
     let allNodesMatchInitialNodeType = false;
     const codeBlockEntries = editor.api.nodes({
-      match: (n) => isBlock(editor, n),
+      match: (n) => editor.api.isBlock(n),
       mode: 'highest',
     });
     const nodes = Array.from(codeBlockEntries);

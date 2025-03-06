@@ -1,6 +1,6 @@
 import { ELEMENT_TODO_LI } from '@udecode/plate-list';
 import { formatList, preFormat } from './autoformat-utils';
-import { isBlock, setNodes } from '@udecode/plate/react';
+import { setNodes } from '@udecode/plate/react';
 import { AutoformatRule } from '@udecode/plate-autoformat';
 import {
   BulletedListPlugin,
@@ -37,7 +37,7 @@ export const autoformatLists: AutoformatRule[] = [
         editor,
         { type: ELEMENT_TODO_LI, checked: true },
         {
-          match: (n) => isBlock(editor, n),
+          match: (n) => editor.api.isBlock(n),
         }
       ),
   },
