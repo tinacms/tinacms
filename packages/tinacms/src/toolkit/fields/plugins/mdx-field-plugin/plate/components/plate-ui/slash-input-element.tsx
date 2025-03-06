@@ -13,8 +13,11 @@ import {
   InlineComboboxInput,
   InlineComboboxItem,
 } from './inline-combobox';
-import { ELEMENT_UL, toggleList } from '@udecode/plate';
-import { NumberedListPlugin } from '@udecode/plate-list/react';
+import { toggleList } from '@udecode/plate';
+import {
+  BulletedListPlugin,
+  NumberedListPlugin,
+} from '@udecode/plate-list/react';
 
 interface SlashCommandRule {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
@@ -49,7 +52,7 @@ const rules: SlashCommandRule[] = [
     icon: Icons.ul,
     keywords: ['ul', 'unordered list'],
     onSelect: (editor) => {
-      toggleList(editor, { type: ELEMENT_UL });
+      toggleList(editor, { type: BulletedListPlugin.key });
     },
     value: 'Bulleted list',
   },

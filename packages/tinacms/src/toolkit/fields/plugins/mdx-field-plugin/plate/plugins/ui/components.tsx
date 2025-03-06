@@ -4,7 +4,6 @@ import {
   ELEMENT_TD,
   ELEMENT_TH,
   ELEMENT_TR,
-  ELEMENT_UL,
 } from '@udecode/plate';
 import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command';
 import React from 'react';
@@ -42,7 +41,7 @@ import {
   StrikethroughPlugin,
   UnderlinePlugin,
 } from '@udecode/plate-basic-marks/react';
-import { ListItemPlugin, NumberedListPlugin } from '@udecode/plate-list/react';
+import { BulletedListPlugin, ListItemPlugin, NumberedListPlugin } from '@udecode/plate-list/react';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -217,7 +216,7 @@ export const Components = () => {
         </span>
       );
     },
-    [ELEMENT_UL]: withProps(ListElement, { variant: 'ul' }),
+    [BulletedListPlugin.key]: withProps(ListElement, { variant: 'ul' }),
     [NumberedListPlugin.key]: withProps(ListElement, { variant: 'ol' }),
     [ListItemPlugin.key]: withProps(PlateElement, { as: 'li' }),
     [ELEMENT_LINK]: ({
