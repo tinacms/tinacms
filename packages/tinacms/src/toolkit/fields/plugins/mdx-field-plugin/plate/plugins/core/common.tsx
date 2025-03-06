@@ -15,6 +15,14 @@ import {
 import { HeadingPlugin } from '@udecode/plate-heading/react';
 import { ParagraphPlugin } from '@udecode/plate/react';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { getListItemEntry } from '@udecode/plate-list';
+import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+import { ListPlugin } from '@udecode/plate-list/react';
+import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
+import { IndentListPlugin } from '@udecode/plate-indent-list/react';
+import { NodeIdPlugin } from '@udecode/plate-node-id';
+import { TablePlugin } from '@udecode/plate-table/react';
+import { SlashPlugin } from '@udecode/plate-slash-command/react';
 
 export const plugins = [
   BasicMarksPlugin,

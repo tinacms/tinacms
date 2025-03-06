@@ -1563,7 +1563,7 @@ importers:
         specifier: 44.0.0
         version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.103.0))(slate@0.103.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-horizontal-rule':
-        specifier: ^44.0.0
+        specifier: 44.0.0
         version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.103.0))(slate@0.103.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-indent-list':
         specifier: 44.0.5
@@ -1574,6 +1574,9 @@ importers:
       '@udecode/plate-list':
         specifier: 44.0.5
         version: 44.0.5(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.103.0))(slate@0.103.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/plate-node-id':
+        specifier: ^44.0.0
+        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.103.0))(slate@0.103.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-reset-node':
         specifier: 44.0.0
         version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.103.0))(slate@0.103.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

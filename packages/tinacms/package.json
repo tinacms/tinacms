@@ -99,6 +99,7 @@
 		"@udecode/plate-indent-list": "44.0.5",
 		"@udecode/plate-link": "44.0.4",
 		"@udecode/plate-list": "44.0.5",
+		"@udecode/plate-node-id": "^44.0.0",
 		"@udecode/plate-reset-node": "44.0.0",
 		"@udecode/plate-resizable": "44.0.0",
 		"@udecode/plate-slash-command": "44.0.0",
