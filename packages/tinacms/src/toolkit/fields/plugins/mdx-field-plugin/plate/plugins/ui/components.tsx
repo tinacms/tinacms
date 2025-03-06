@@ -7,11 +7,6 @@ import {
   ELEMENT_TH,
   ELEMENT_TR,
   ELEMENT_UL,
-  MARK_BOLD,
-  MARK_CODE,
-  MARK_ITALIC,
-  MARK_STRIKETHROUGH,
-  MARK_UNDERLINE,
 } from '@udecode/plate';
 import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command';
 import React from 'react';
@@ -34,7 +29,7 @@ import { ELEMENT_MERMAID } from '../custom/mermaid-plugin';
 import { classNames } from './helpers';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { TablePlugin } from '@udecode/plate-table/react';
-import { ParagraphPlugin } from '@udecode/plate/react';
+import { ParagraphPlugin, PlateElement, PlateLeaf } from '@udecode/plate/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import {
   CodeBlockPlugin,
@@ -42,6 +37,13 @@ import {
   CodeSyntaxPlugin,
 } from '@udecode/plate-code-block/react';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
+import {
+  BoldPlugin,
+  CodePlugin,
+  ItalicPlugin,
+  StrikethroughPlugin,
+  UnderlinePlugin,
+} from '@udecode/plate-basic-marks/react';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -236,13 +238,13 @@ export const Components = () => {
         {...props}
       />
     ),
-    [MARK_CODE]: CodeLeaf,
-    [MARK_UNDERLINE]: withProps(PlateLeaf, { as: 'u' }),
-    [MARK_STRIKETHROUGH]: ({ editor, leaf, text, ...props }) => (
+    [CodePlugin.key]: CodeLeaf,
+    [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
+    [StrikethroughPlugin.key]: ({ editor, leaf, text, ...props }) => (
       <s {...props.attributes} {...props} />
     ),
-    [MARK_ITALIC]: withProps(PlateLeaf, { as: 'em' }),
-    [MARK_BOLD]: ({ editor, leaf, text, ...props }) => (
+    [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),
+    [BoldPlugin.key]: ({ editor, leaf, text, ...props }) => (
       <strong {...props.attributes} {...props} />
     ),
     [HorizontalRulePlugin.key]: ({
