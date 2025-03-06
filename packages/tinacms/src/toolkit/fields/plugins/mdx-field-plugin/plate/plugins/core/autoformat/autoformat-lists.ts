@@ -1,27 +1,23 @@
-import {
-  ELEMENT_LI,
-  ELEMENT_OL,
-  ELEMENT_TODO_LI,
-  ELEMENT_UL,
-} from '@udecode/plate-list';
+import { ELEMENT_TODO_LI, ELEMENT_UL } from '@udecode/plate-list';
 import { formatList, preFormat } from './autoformat-utils';
 import { isBlock, setNodes } from '@udecode/plate/react';
 import { AutoformatRule } from '@udecode/plate-autoformat';
+import { ListItemPlugin, NumberedListPlugin } from '@udecode/plate-list/react';
 
 export const autoformatLists: AutoformatRule[] = [
   {
     mode: 'block',
-    type: ELEMENT_LI,
+    type: ListItemPlugin.key,
     match: ['* ', '- '],
     preFormat,
     format: (editor) => formatList(editor, ELEMENT_UL),
   },
   {
     mode: 'block',
-    type: ELEMENT_LI,
+    type: ListItemPlugin.key,
     match: ['1. ', '1) '],
     preFormat,
-    format: (editor) => formatList(editor, ELEMENT_OL),
+    format: (editor) => formatList(editor, NumberedListPlugin.key),
   },
   {
     mode: 'block',

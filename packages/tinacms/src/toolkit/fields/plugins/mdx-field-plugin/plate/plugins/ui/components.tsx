@@ -1,8 +1,6 @@
 import { withProps } from '@udecode/cn';
 import {
-  ELEMENT_LI,
-  ELEMENT_LINK,
-  ELEMENT_OL,
+  NumberedListPlugin.keyNK,
   ELEMENT_TD,
   ELEMENT_TH,
   ELEMENT_TR,
@@ -44,6 +42,7 @@ import {
   StrikethroughPlugin,
   UnderlinePlugin,
 } from '@udecode/plate-basic-marks/react';
+import { ListItemPlugin, NumberedListPlugin } from '@udecode/plate-list/react';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -219,8 +218,8 @@ export const Components = () => {
       );
     },
     [ELEMENT_UL]: withProps(ListElement, { variant: 'ul' }),
-    [ELEMENT_OL]: withProps(ListElement, { variant: 'ol' }),
-    [ELEMENT_LI]: withProps(PlateElement, { as: 'li' }),
+    [NumberedListPlugin.key]: withProps(ListElement, { variant: 'ol' }),
+    [ListItemPlugin.key]: withProps(PlateElement, { as: 'li' }),
     [ELEMENT_LINK]: ({
       attributes,
       editor,
