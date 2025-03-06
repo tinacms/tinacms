@@ -7,7 +7,6 @@ import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';
 import {
-  findNode,
   getBlockAbove,
   insertNodes,
   type PlateEditor,
@@ -156,7 +155,7 @@ const isCurrentBlockEmpty = (editor) => {
  * allow for that, at the moment blockquotes are strict
  */
 const currentNodeSupportsMDX = (editor: PlateEditor) =>
-  findNode(editor, {
+  editor.api.node({
     match: { type: HANDLES_MDX },
   });
 

@@ -6,7 +6,6 @@ import { TablePlugin } from '@udecode/plate-table/react';
 import {
   isElement,
   someNode,
-  findNode,
   useEditorRef,
   useEditorSelector,
 } from '@udecode/plate/react';
@@ -41,7 +40,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
   );
 
   const [enableDeleteColumn, enableDeleteRow] = useEditorSelector((editor) => {
-    const tableNodeEntry = findNode(editor, {
+    const tableNodeEntry = editor.api.node({
       match: { type: TablePlugin.key },
     });
     if (!tableNodeEntry) return [false, false];
