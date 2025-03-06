@@ -1,4 +1,4 @@
-import { ElementApi } from '@udecode/plate';
+import { Editor, ElementApi, isType } from '@udecode/plate';
 import { AutoformatBlockRule } from '@udecode/plate-autoformat';
 import {
   CodeBlockPlugin,
@@ -10,9 +10,9 @@ import { PlateEditor } from '@udecode/plate/react';
 export const preFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor);
 
-export const format = (editor: TEditor, customFormatting: any) => {
+export const format = (editor: Editor, customFormatting: any) => {
   if (editor.selection) {
-    const parentEntry = getParentNode(editor, editor.selection);
+    const parentEntry = editor.api.parent(editor.selection);
     if (!parentEntry) return;
     const [node] = parentEntry;
     if (
@@ -25,7 +25,7 @@ export const format = (editor: TEditor, customFormatting: any) => {
   }
 };
 
-export const formatList = (editor: TEditor, elementType: string) => {
+export const formatList = (editor: Editor, elementType: string) => {
   format(editor, () =>
     toggleList(editor as PlateEditor, {
       type: elementType,
@@ -33,6 +33,6 @@ export const formatList = (editor: TEditor, elementType: string) => {
   );
 };
 
-export const formatText = (editor: TEditor, text: string) => {
-  format(editor, () => editor.insertText(text));
+export const formatText = (editor: Editor, text: string) => {
+  format(editor, () => editor.tf.insertText(text));
 };
