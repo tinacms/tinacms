@@ -24,7 +24,7 @@ export const ImgEmbed = ({
     useEmbedHandles(editor, element, fieldName);
 
   useHotkey('enter', () => {
-    insertNodes(editor, [
+    editor.tf.insertNodes([
       { type: ParagraphPlugin.key, children: [{ text: '' }] },
     ]);
   });

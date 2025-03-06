@@ -8,7 +8,6 @@ import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';
 import {
   getBlockAbove,
-  insertNodes,
   type PlateEditor,
   someNode,
 } from '@udecode/plate/react';
@@ -94,7 +93,7 @@ const normalize = (node: any) => {
 };
 
 export const insertInlineElement = (editor, inlineElement) => {
-  insertNodes(editor, [inlineElement]);
+  editor.tf.insertNodes([inlineElement]);
   /**
    * FIXME mdx-setTimeout: setTimeout seems to work, but not sure why it's necessary
    * Without this, the move occurs on the element that was selected
@@ -125,7 +124,7 @@ export const insertBlockElement = (editor, blockElement) => {
       if (isCurrentBlockEmpty(editor)) {
         editor.tf.setNodes(blockElement);
       } else {
-        insertNodes(editor, [blockElement]);
+        editor.tf.insertNodes([blockElement]);
       }
     }, 1);
   }
