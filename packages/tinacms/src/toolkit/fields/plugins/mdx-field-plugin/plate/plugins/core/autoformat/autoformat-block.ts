@@ -5,6 +5,7 @@ import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { AutoformatRule } from '@udecode/plate-autoformat';
+import { ParagraphPlugin } from '@udecode/plate/react';
 
 export const autoformatBlocks: AutoformatRule[] = [
   {
@@ -66,7 +67,7 @@ export const autoformatBlocks: AutoformatRule[] = [
     format: (editor) => {
       editor.tf.setNodes({ type: HorizontalRulePlugin.key });
       insertNodes(editor, {
-        type: ELEMENT_DEFAULT,
+        type: ParagraphPlugin.key,
         children: [{ text: '' }],
       });
     },

@@ -6,7 +6,7 @@ import { useSelected } from 'slate-react';
 import { Autocomplete } from '../autocomplete';
 import { uuid } from '../helpers';
 import { ElementApi, TElement } from '@udecode/plate';
-import { PlateEditor } from '@udecode/plate/react';
+import { ParagraphPlugin, PlateEditor } from '@udecode/plate/react';
 
 type Monaco = typeof monaco;
 
@@ -139,7 +139,7 @@ export const CodeBlock = ({
             editor.tf.insertNodes(
               [
                 {
-                  type: ELEMENT_DEFAULT,
+                  type: ParagraphPlugin.key,
                   children: [{ text: '' }],
                   lang: undefined,
                   value: undefined,
@@ -162,7 +162,7 @@ export const CodeBlock = ({
               editor.tf.insertNodes(
                 [
                   {
-                    type: ELEMENT_DEFAULT,
+                    type: ParagraphPlugin.key,
                     children: [{ text: '' }],
                     lang: undefined,
                     value: undefined,
@@ -190,7 +190,7 @@ export const CodeBlock = ({
             editor.tf.insertNodes(
               [
                 {
-                  type: ELEMENT_DEFAULT,
+                  type: ParagraphPlugin.key,
                   children: [{ text: '' }],
                   lang: undefined,
                   value: undefined,
