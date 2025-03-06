@@ -13,14 +13,14 @@ import {
   useOpenState,
 } from './plate-ui/dropdown-menu';
 import { Icons } from './plate-ui/icons';
+import { HEADING_KEYS } from '@udecode/plate-heading';
+import { TablePlugin } from '@udecode/plate-table/react';
 import {
+  ParagraphPlugin,
   useEditorRef,
   useEditorSelector,
   useEditorState,
-} from '@udecode/plate';
-import { HEADING_KEYS } from '@udecode/plate-heading';
-import { TablePlugin } from '@udecode/plate-table/react';
-import { ParagraphPlugin } from '@udecode/plate/react';
+} from '@udecode/plate/react';
 
 const items = [
   {

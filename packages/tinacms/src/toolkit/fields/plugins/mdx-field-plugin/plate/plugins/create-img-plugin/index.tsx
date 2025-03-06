@@ -4,6 +4,7 @@ import { ReactEditor } from 'slate-react';
 import { insertInlineElement } from '../core/common';
 import type { Media } from '../../../../../../core/media';
 import { isImage } from '@toolkit/components/media/utils';
+import { PlateEditor } from '@udecode/plate/react';
 
 export const ELEMENT_IMG = 'img';
 
@@ -40,7 +41,7 @@ export const insertImg = (editor: PlateEditor, media: Media) => {
   }
 
   // Normalizing the editor after insertion
-  normalizeEditor(editor, { force: true });
+  editor.tf.normalize({ force: true });
 };
 
 export default createImgPlugin;
