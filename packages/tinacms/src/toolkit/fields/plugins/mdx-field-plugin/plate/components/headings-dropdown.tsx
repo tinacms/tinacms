@@ -14,7 +14,6 @@ import {
 } from './plate-ui/dropdown-menu';
 import { Icons } from './plate-ui/icons';
 import {
-  focusEditor,
   getNodeEntries,
   isBlock,
   useEditorRef,
@@ -125,7 +124,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
           onValueChange={(type) => {
             editor.tf.toggleBlock(type);
             editor.tf.collapse();
-            focusEditor(editor);
+            editor.tf.focus();
           }}
           value={value}
         >

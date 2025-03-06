@@ -3,7 +3,6 @@ import React from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import {
-  focusEditor,
   getNodeEntries,
   isBlock,
   useEditorRef,
@@ -137,7 +136,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
             }
 
             editor.tf.collapse();
-            focusEditor(editor);
+            editor.tf.focus();
           }}
           value={value}
         >

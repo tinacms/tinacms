@@ -5,7 +5,6 @@ import { TablePlugin } from '@udecode/plate-table/react';
 
 import {
   isElement,
-  focusEditor,
   someNode,
   findNode,
   useEditorRef,
@@ -75,7 +74,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
           disabled={tableSelected}
           onSelect={() => {
             insertTable(editor);
-            focusEditor(editor);
+            editor.tf.focus();
           }}
         >
           <Icons.add className={iconVariants({ variant: 'menuItem' })} />
@@ -86,7 +85,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
           disabled={!tableSelected}
           onSelect={() => {
             deleteTable(editor);
-            focusEditor(editor);
+            editor.tf.focus();
           }}
         >
           <Icons.minus className={iconVariants({ variant: 'menuItem' })} />
@@ -104,7 +103,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
               disabled={!tableSelected}
               onSelect={() => {
                 insertTableColumn(editor);
-                focusEditor(editor);
+                editor.tf.focus();
               }}
             >
               <Icons.add className={iconVariants({ variant: 'menuItem' })} />
@@ -115,7 +114,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
               disabled={!enableDeleteColumn}
               onSelect={() => {
                 deleteColumn(editor);
-                focusEditor(editor);
+                editor.tf.focus();
               }}
             >
               <Icons.minus className={iconVariants({ variant: 'menuItem' })} />
@@ -135,7 +134,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
               disabled={!tableSelected}
               onSelect={() => {
                 insertTableRow(editor);
-                focusEditor(editor);
+                editor.tf.focus();
               }}
             >
               <Icons.add className={iconVariants({ variant: 'menuItem' })} />
@@ -146,7 +145,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
               disabled={!enableDeleteRow}
               onSelect={() => {
                 deleteRow(editor);
-                focusEditor(editor);
+                editor.tf.focus();
               }}
             >
               <Icons.minus className={iconVariants({ variant: 'menuItem' })} />
