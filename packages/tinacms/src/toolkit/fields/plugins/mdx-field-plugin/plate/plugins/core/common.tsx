@@ -6,11 +6,7 @@ import {
 import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';
-import {
-  getBlockAbove,
-  type PlateEditor,
-  someNode,
-} from '@udecode/plate/react';
+import { type PlateEditor, someNode } from '@udecode/plate/react';
 import { Transforms, Editor, Node } from 'slate';
 import {
   BasicMarksPlugin,
@@ -136,7 +132,7 @@ const isCurrentBlockEmpty = (editor) => {
   }
   const [node] = Editor.node(editor, editor.selection);
   const cursor = editor.selection.focus;
-  const blockAbove = getBlockAbove(editor);
+  const blockAbove = editor.api.block();
   const isEmpty =
     !Node.string(node) &&
     // @ts-ignore bad type from slate

@@ -4,7 +4,7 @@ import { PlateEditor } from '@udecode/plate/react';
 
 export const insertEmptyCodeBlock = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
-    node.type === editor.getType(CodeBlockPlugin.key);
+    node.type === editor.getType(CodeBlockPlugin);
 
   if (
     editor.api.some({
