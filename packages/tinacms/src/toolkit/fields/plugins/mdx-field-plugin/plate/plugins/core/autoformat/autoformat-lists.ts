@@ -1,4 +1,3 @@
-import { ELEMENT_TODO_LI } from '@udecode/plate-list';
 import { formatList, preFormat } from './autoformat-utils';
 import { setNodes } from '@udecode/plate/react';
 import { AutoformatRule } from '@udecode/plate-autoformat';
@@ -6,6 +5,7 @@ import {
   BulletedListPlugin,
   ListItemPlugin,
   NumberedListPlugin,
+  TodoListPlugin,
 } from '@udecode/plate-list/react';
 
 export const autoformatLists: AutoformatRule[] = [
@@ -25,17 +25,17 @@ export const autoformatLists: AutoformatRule[] = [
   },
   {
     mode: 'block',
-    type: ELEMENT_TODO_LI,
+    type: TodoListPlugin.key,
     match: '[] ',
   },
   {
     mode: 'block',
-    type: ELEMENT_TODO_LI,
+    type: TodoListPlugin.key,
     match: '[x] ',
     format: (editor) =>
       setNodes(
         editor,
-        { type: ELEMENT_TODO_LI, checked: true },
+        { type: TodoListPlugin.key, checked: true },
         {
           match: (n) => editor.api.isBlock(n),
         }
