@@ -1,5 +1,4 @@
 import { createSoftBreakPlugin } from '../soft-break';
-import { autoformatRules } from './autoformat/autoformat-rules';
 import { withCorrectVoidBehavior } from './with-correct-void-behavior';
 import {
   createPluginFactory,
@@ -15,6 +14,7 @@ import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 import { ExitBreakPlugin } from '@udecode/plate-break/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { autoformatRules } from './autoformat/autoformat-rules';
 
 export const HANDLES_MDX = [
   HEADING_KEYS.h1,

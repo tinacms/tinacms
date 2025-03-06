@@ -1,10 +1,10 @@
 import {
-  type AutoformatRule,
   MARK_BOLD,
   MARK_CODE,
   MARK_ITALIC,
   MARK_STRIKETHROUGH,
 } from '@udecode/plate';
+import { AutoformatRule } from '@udecode/plate-autoformat';
 
 export const autoformatMarks: AutoformatRule[] = [
   {
