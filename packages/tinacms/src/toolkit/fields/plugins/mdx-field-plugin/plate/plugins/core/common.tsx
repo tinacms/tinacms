@@ -1,6 +1,5 @@
 import { ReactEditor } from 'slate-react';
 import {
-  createCodeBlockPlugin,
   createHTMLBlockPlugin,
   createHTMLInlinePlugin,
 } from '../create-code-block';
@@ -13,10 +12,8 @@ import {
   getPluginType,
   insertNodes,
   type PlateEditor,
-  setNodes,
   someNode,
 } from '@udecode/plate/react';
-import { createSlashPlugin } from '@udecode/plate-slash-command';
 import { Transforms, Editor, Node } from 'slate';
 import {
   BasicMarksPlugin,
@@ -128,7 +125,7 @@ export const insertBlockElement = (editor, blockElement) => {
     setTimeout(() => {
       // If empty, replace the current block
       if (isCurrentBlockEmpty(editor)) {
-        setNodes(editor, blockElement);
+        editor.tf.setNodes(blockElement);
       } else {
         insertNodes(editor, [blockElement]);
       }

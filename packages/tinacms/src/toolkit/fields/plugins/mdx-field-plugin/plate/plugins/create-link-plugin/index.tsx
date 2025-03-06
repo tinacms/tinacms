@@ -79,7 +79,7 @@ export const LinkForm = (props) => {
     });
     if (linksInSelection) {
       for (const [, location] of linksInSelection) {
-        setNodes(editor, formValues, {
+        editor.tf.setNodes(formValues, {
           match: matchLink,
           at: location,
         });

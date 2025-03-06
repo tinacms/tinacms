@@ -64,7 +64,7 @@ export const autoformatBlocks: AutoformatRule[] = [
     type: HorizontalRulePlugin.key,
     match: ['---', '—-', '___ '],
     format: (editor) => {
-      setNodes(editor, { type: HorizontalRulePlugin.key });
+      editor.tf.setNodes({ type: HorizontalRulePlugin.key });
       insertNodes(editor, {
         type: ELEMENT_DEFAULT,
         children: [{ text: '' }],

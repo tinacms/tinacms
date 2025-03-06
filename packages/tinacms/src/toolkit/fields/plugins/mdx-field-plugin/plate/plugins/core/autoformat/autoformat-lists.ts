@@ -1,5 +1,4 @@
 import { formatList, preFormat } from './autoformat-utils';
-import { setNodes } from '@udecode/plate/react';
 import { AutoformatRule } from '@udecode/plate-autoformat';
 import {
   BulletedListPlugin,
@@ -33,8 +32,7 @@ export const autoformatLists: AutoformatRule[] = [
     type: TodoListPlugin.key,
     match: '[x] ',
     format: (editor) =>
-      setNodes(
-        editor,
+      editor.tf.setNodes(
         { type: TodoListPlugin.key, checked: true },
         {
           match: (n) => editor.api.isBlock(n),
