@@ -6,7 +6,7 @@ import {
 import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';
-import { type PlateEditor, someNode } from '@udecode/plate/react';
+import { type PlateEditor } from '@udecode/plate/react';
 import { Transforms, Editor, Node } from 'slate';
 import {
   BasicMarksPlugin,
@@ -51,7 +51,7 @@ export const unsupportedItemsInTable = new Set([
 const isNodeActive = (editor, type) => {
   const pluginType = editor.getType(type);
   return (
-    !!editor?.selection && someNode(editor, { match: { type: pluginType } })
+    !!editor?.selection && editor.api.some({ match: { type: pluginType } })
   );
 };
 

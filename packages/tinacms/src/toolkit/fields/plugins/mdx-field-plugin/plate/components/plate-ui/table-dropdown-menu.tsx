@@ -3,11 +3,7 @@ import React from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 import { TablePlugin } from '@udecode/plate-table/react';
 
-import {
-  someNode,
-  useEditorRef,
-  useEditorSelector,
-} from '@udecode/plate/react';
+import { useEditorRef, useEditorSelector } from '@udecode/plate/react';
 import {
   getTableColumnCount,
   deleteColumn,
@@ -35,7 +31,7 @@ import { ElementApi } from '@udecode/plate';
 
 export function TableDropdownMenu(props: DropdownMenuProps) {
   const tableSelected = useEditorSelector(
-    (editor) => someNode(editor, { match: { type: TablePlugin.key } }),
+    (editor) => editor.api.some({ match: { type: TablePlugin.key } }),
     []
   );
 
