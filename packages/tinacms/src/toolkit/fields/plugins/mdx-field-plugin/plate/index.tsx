@@ -8,7 +8,6 @@ import {
 } from './plugins/create-mdx-plugins';
 import createImgPlugin from './plugins/create-img-plugin';
 import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin';
-import { createLinkPlugin } from './plugins/create-link-plugin';
 import { uuid } from './plugins/ui/helpers';
 import type { RichTextType } from '..';
 import { Editor } from './components/editor';
@@ -22,6 +21,7 @@ import { isUrl } from './transforms/is-url';
 import { ToolbarProvider } from './toolbar/toolbar-provider';
 import { createMermaidPlugin } from './plugins/custom/mermaid-plugin';
 import { Plate, usePlateEditor } from '@udecode/plate/react';
+import { LinkPlugin } from '@udecode/plate-link/react';
 
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(
@@ -40,12 +40,12 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
     createImgPlugin(),
     createMermaidPlugin(),
     createInvalidMarkdownPlugin(),
-    createLinkPlugin({
+    LinkPlugin.configure({
       options: {
         // Custom validation function to allow relative links, e.g., /about
-        isUrl: (url: string) => isUrl(url),
+        isUrl: (url) => isUrl(url),
       },
-      renderAfterEditable: LinkFloatingToolbar,
+      render: { afterEditable: () => <LinkFloatingToolbar /> },
     }),
   ];
 

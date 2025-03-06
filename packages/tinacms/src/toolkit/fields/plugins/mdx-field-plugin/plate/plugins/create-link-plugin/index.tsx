@@ -4,18 +4,14 @@ import {
   Element,
   type BaseRange,
   Transforms,
-  setNodes,
   unwrapNodes,
   wrapNodes,
 } from 'slate';
 import { NestedForm } from '../../nested-form';
 import { Button } from '@tinacms/toolkit';
-import { createLinkPlugin } from '@udecode/plate-link';
 import { LinkPlugin } from '@udecode/plate-link/react';
 import { PlateEditor } from '@udecode/plate/react';
 import { Value } from '@udecode/plate';
-
-export { createLinkPlugin };
 
 type LinkElement = {
   url?: string;
