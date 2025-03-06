@@ -1,10 +1,10 @@
-import { getPluginType, TElement } from '@udecode/plate';
+import { TElement } from '@udecode/plate';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { PlateEditor } from '@udecode/plate/react';
 
 export const insertEmptyCodeBlock = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
-    node.type === getPluginType(editor, CodeBlockPlugin.key);
+    node.type === editor.getType(CodeBlockPlugin.key);
 
   if (
     editor.api.some({

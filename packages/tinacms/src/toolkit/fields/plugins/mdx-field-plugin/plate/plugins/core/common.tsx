@@ -9,7 +9,6 @@ import { HANDLES_MDX } from './formatting';
 import {
   findNode,
   getBlockAbove,
-  getPluginType,
   insertNodes,
   type PlateEditor,
   someNode,
@@ -56,7 +55,7 @@ export const unsupportedItemsInTable = new Set([
 ]);
 
 const isNodeActive = (editor, type) => {
-  const pluginType = getPluginType(editor, type);
+  const pluginType = editor.getType(type);
   return (
     !!editor?.selection && someNode(editor, { match: { type: pluginType } })
   );

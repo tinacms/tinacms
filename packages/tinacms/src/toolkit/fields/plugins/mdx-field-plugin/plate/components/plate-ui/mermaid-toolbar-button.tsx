@@ -5,11 +5,11 @@ import { helpers } from '../../plugins/core/common';
 import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
-import { getPluginType, TElement } from '@udecode/plate';
+import { TElement } from '@udecode/plate';
 
 export const insertEmptyMermaid = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
-    node.type === getPluginType(editor, ELEMENT_MERMAID);
+    node.type === editor.getType(ELEMENT_MERMAID);
 
   if (
     editor.api.some({

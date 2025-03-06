@@ -33,7 +33,7 @@ export const wrapOrRewrapLink = (editor) => {
       match: (n) =>
         !Editor.isEditor(n) &&
         Element.isElement(n) &&
-        getPluginType(editor, LinkPlugin.key),
+        editor.getType(LinkPlugin.key),
     });
     Transforms.select(editor, path);
   }
