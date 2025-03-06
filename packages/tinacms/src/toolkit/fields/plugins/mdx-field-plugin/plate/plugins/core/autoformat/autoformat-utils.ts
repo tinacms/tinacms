@@ -1,3 +1,4 @@
+import { ElementApi } from '@udecode/plate';
 import { AutoformatBlockRule } from '@udecode/plate-autoformat';
 import {
   CodeBlockPlugin,
@@ -15,7 +16,7 @@ export const format = (editor: TEditor, customFormatting: any) => {
     if (!parentEntry) return;
     const [node] = parentEntry;
     if (
-      isElement(node) &&
+      ElementApi.isElement(node) &&
       !isType(editor as PlateEditor, node, CodeBlockPlugin.key) &&
       !isType(editor as PlateEditor, node, CodeLinePlugin.key)
     ) {

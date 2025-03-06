@@ -4,7 +4,6 @@ import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 import { TablePlugin } from '@udecode/plate-table/react';
 
 import {
-  isElement,
   someNode,
   useEditorRef,
   useEditorSelector,
@@ -32,6 +31,7 @@ import {
   useOpenState,
 } from './dropdown-menu';
 import { ToolbarButton } from './toolbar';
+import { ElementApi } from '@udecode/plate';
 
 export function TableDropdownMenu(props: DropdownMenuProps) {
   const tableSelected = useEditorSelector(
@@ -46,7 +46,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
     if (!tableNodeEntry) return [false, false];
 
     const [tableNode] = tableNodeEntry;
-    if (!isElement(tableNode)) return [false, false];
+    if (!ElementApi.isElement(tableNode)) return [false, false];
 
     const columnCount = getTableColumnCount(tableNode);
     const rowCount = tableNode.children.length;

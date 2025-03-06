@@ -5,7 +5,7 @@ import React from 'react';
 import { useSelected } from 'slate-react';
 import { Autocomplete } from '../autocomplete';
 import { uuid } from '../helpers';
-import { TElement } from '@udecode/plate';
+import { ElementApi, TElement } from '@udecode/plate';
 import { PlateEditor } from '@udecode/plate/react';
 
 type Monaco = typeof monaco;
@@ -126,7 +126,7 @@ export const CodeBlock = ({
               },
               {
                 match: (n) => {
-                  if (isElement(n) && n.type === element.type) {
+                  if (ElementApi.isElement(n) && n.type === element.type) {
                     return true;
                   }
                 },

@@ -1,4 +1,4 @@
-import { isElement } from '@udecode/plate/react';
+import { ElementApi } from '@udecode/plate';
 import { Editor, Node, Path, Range, Transforms } from 'slate';
 
 /**
@@ -19,7 +19,7 @@ export const withCorrectVoidBehavior = (editor) => {
 
     const selectedNodePath = Path.parent(editor.selection.anchor.path);
     const selectedNode = Node.get(editor, selectedNodePath);
-    if (isElement(selectedNode)) {
+    if (ElementApi.isElement(selectedNode)) {
       if (Editor.isVoid(editor, selectedNode)) {
         Editor.insertNode(editor, {
           // @ts-ignore bad type from slate
@@ -50,7 +50,7 @@ export const withCorrectVoidBehavior = (editor) => {
     if (parentIsEmpty && Path.hasPrevious(parentPath)) {
       const prevNodePath = Path.previous(parentPath);
       const prevNode = Node.get(editor, prevNodePath);
-      if (isElement(prevNode)) {
+      if (ElementApi.isElement(prevNode)) {
         if (Editor.isVoid(editor, prevNode)) {
           Transforms.removeNodes(editor);
           // Deleting a top-level void node results in an empty array for the value
