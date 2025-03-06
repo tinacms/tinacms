@@ -73,7 +73,7 @@ export const LinkForm = (props) => {
   }, [editor, setInitialValues]);
 
   const handleUpdate = React.useCallback(() => {
-    const linksInSelection = getNodeEntries<LinkElement>(editor, {
+    const linksInSelection = editor.api.nodes<LinkElement>({
       match: matchLink,
       at: selection,
     });
@@ -126,8 +126,8 @@ export const unwrapLink = (editor: PlateEditor, selection?: BaseRange) => {
   });
 };
 
-export const getLinks = (editor) => {
-  return getNodeEntries<LinkElement>(editor, {
+export const getLinks = (editor): LinkElement[] => {
+  return editor.api.nodes({
     match: matchLink,
   });
 };

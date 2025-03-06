@@ -3,7 +3,6 @@ import React from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import {
-  getNodeEntries,
   isBlock,
   useEditorRef,
   useEditorState,
@@ -79,7 +78,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const value: string = useEditorSelector((editor) => {
     let initialNodeType: string = ParagraphPlugin.key;
     let allNodesMatchInitialNodeType = false;
-    const codeBlockEntries = getNodeEntries(editor, {
+    const codeBlockEntries = editor.api.nodes({
       match: (n) => isBlock(editor, n),
       mode: 'highest',
     });
