@@ -1,12 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  Editor,
-  Element,
-  type BaseRange,
-  Transforms,
-  unwrapNodes,
-  wrapNodes,
-} from 'slate';
+import { Editor, Element, type BaseRange, Transforms, wrapNodes } from 'slate';
 import { NestedForm } from '../../nested-form';
 import { Button } from '@tinacms/toolkit';
 import { LinkPlugin } from '@udecode/plate-link/react';
@@ -116,7 +109,7 @@ export const LinkForm = (props) => {
 };
 
 export const unwrapLink = (editor: PlateEditor, selection?: BaseRange) => {
-  unwrapNodes(editor, {
+  editor.tf.unwrapNodes({
     match: matchLink,
     at: selection || undefined,
   });

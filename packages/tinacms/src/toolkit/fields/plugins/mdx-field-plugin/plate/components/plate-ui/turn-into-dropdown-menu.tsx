@@ -21,10 +21,10 @@ import {
   useOpenState,
 } from './dropdown-menu';
 import { ToolbarButton } from './toolbar';
-import { toggleList, unwrapList } from '@udecode/plate';
 import { helpers } from '@toolkit/fields/plugins/mdx-field-plugin/plate/plugins/core/common';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { TablePlugin } from '@udecode/plate-table/react';
+import { toggleList, unwrapList } from '@udecode/plate-list';
 
 const items = [
   {

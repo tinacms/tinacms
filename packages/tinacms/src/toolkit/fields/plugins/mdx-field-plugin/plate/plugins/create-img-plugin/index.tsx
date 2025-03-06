@@ -8,7 +8,7 @@ import { PlateEditor } from '@udecode/plate/react';
 
 export const ELEMENT_IMG = 'img';
 
-const createImgPlugin = createPluginFactory({
+const createImgPlugin = {
   key: ELEMENT_IMG,
   isVoid: true,
   isInline: true,
@@ -20,7 +20,7 @@ const createImgPlugin = createPluginFactory({
     };
     return <ImgEmbed {...props} onChange={handleChange} />;
   },
-});
+};
 
 export const insertImg = (editor: PlateEditor, media: Media) => {
   if (isImage(media.src)) {

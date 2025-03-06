@@ -1,20 +1,14 @@
 import { createSoftBreakPlugin } from '../soft-break';
 import { withCorrectVoidBehavior } from './with-correct-void-behavior';
-import {
-  createPluginFactory,
-  isBlockAboveEmpty,
-  isSelectionAtBlockStart,
-  ParagraphPlugin,
-} from '@udecode/plate/react';
+import { createPlatePlugin, ParagraphPlugin } from '@udecode/plate/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
-import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 import { ExitBreakPlugin } from '@udecode/plate-break/react';
-import { HEADING_KEYS } from '@udecode/plate-heading';
+import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { autoformatRules } from './autoformat/autoformat-rules';
+import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 
 export const HANDLES_MDX = [
   HEADING_KEYS.h1,
@@ -40,19 +34,22 @@ const resetBlockTypesCommonRule = {
   defaultType: ParagraphPlugin.key,
 };
 
-const createCorrectNodeBehaviorPlugin = createPluginFactory({
+const CorrectNodeBehaviorPlugin = createPlatePlugin({
   key: 'WITH_CORRECT_NODE_BEHAVIOR',
-  withOverrides: withCorrectVoidBehavior,
+  options: {
+    withOverrides: withCorrectVoidBehavior,
+  },
 });
+
 export const plugins = [
   TrailingBlockPlugin,
-  createCorrectNodeBehaviorPlugin(),
-  AutoformatPlugin({
+  CorrectNodeBehaviorPlugin,
+  AutoformatPlugin.configure({
     options: {
       rules: autoformatRules,
     },
   }),
-  ExitBreakPlugin({
+  ExitBreakPlugin.configure({
     options: {
       rules: [
         // Break out of a block entirely, eg. get out of a blockquote
@@ -71,13 +68,13 @@ export const plugins = [
           query: {
             start: true,
             end: true,
-            allow: KEYS_HEADING,
+            allow: HEADING_LEVELS,
           },
         },
       ],
     },
   }),
-  ResetNodePlugin({
+  ResetNodePlugin.configure({
     options: {
       rules: [
         {
