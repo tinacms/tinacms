@@ -3,7 +3,6 @@ import React from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import {
-  collapseSelection,
   focusEditor,
   getNodeEntries,
   isBlock,
@@ -12,7 +11,6 @@ import {
   useEditorSelector,
   ParagraphPlugin,
 } from '@udecode/plate/react';
-import { ParagraphElement } from '@/components/plate-ui/paragraph-element';
 
 import { Icons } from './icons';
 
@@ -138,7 +136,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
               editor.tf.toggleBlock(type);
             }
 
-            collapseSelection(editor);
+            editor.tf.collapse();
             focusEditor(editor);
           }}
           value={value}

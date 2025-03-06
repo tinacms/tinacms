@@ -14,7 +14,6 @@ import {
 } from './plate-ui/dropdown-menu';
 import { Icons } from './plate-ui/icons';
 import {
-  collapseSelection,
   focusEditor,
   getNodeEntries,
   isBlock,
@@ -125,7 +124,7 @@ export function HeadingsMenu(props: DropdownMenuProps) {
           className='flex flex-col gap-0.5'
           onValueChange={(type) => {
             editor.tf.toggleBlock(type);
-            collapseSelection(editor);
+            editor.tf.collapse();
             focusEditor(editor);
           }}
           value={value}
