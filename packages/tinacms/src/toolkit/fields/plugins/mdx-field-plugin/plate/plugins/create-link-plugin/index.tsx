@@ -28,7 +28,7 @@ export const wrapOrRewrapLink = (editor) => {
   };
 
   // if our cursor is inside an existing link, but don't have the text selected, select it now
-  if (isCollapsed(editor.selection)) {
+  if (editor.api.isCollapsed()) {
     const [, path] = getAboveNode(editor, {
       match: (n) =>
         !Editor.isEditor(n) &&
