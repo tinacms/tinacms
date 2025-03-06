@@ -1,6 +1,5 @@
 import { withProps } from '@udecode/cn';
 import {
-  ELEMENT_HR,
   ELEMENT_LI,
   ELEMENT_LINK,
   ELEMENT_OL,
@@ -42,6 +41,7 @@ import {
   CodeLinePlugin,
   CodeSyntaxPlugin,
 } from '@udecode/plate-code-block/react';
+import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -245,7 +245,7 @@ export const Components = () => {
     [MARK_BOLD]: ({ editor, leaf, text, ...props }) => (
       <strong {...props.attributes} {...props} />
     ),
-    [ELEMENT_HR]: ({
+    [HorizontalRulePlugin.key]: ({
       attributes,
       className,
       editor,

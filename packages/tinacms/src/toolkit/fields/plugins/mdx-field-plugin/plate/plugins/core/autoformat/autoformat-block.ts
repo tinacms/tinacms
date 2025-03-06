@@ -1,9 +1,10 @@
-import { AutoformatRule, ELEMENT_HR } from '@udecode/plate';
+import { AutoformatRule } from '@udecode/plate';
 import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
 import { preFormat } from './autoformat-utils';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 
 export const autoformatBlocks: AutoformatRule[] = [
   {
@@ -60,10 +61,10 @@ export const autoformatBlocks: AutoformatRule[] = [
   },
   {
     mode: 'block',
-    type: ELEMENT_HR,
+    type: HorizontalRulePlugin.key,
     match: ['---', '—-', '___ '],
     format: (editor) => {
-      setNodes(editor, { type: ELEMENT_HR });
+      setNodes(editor, { type: HorizontalRulePlugin.key });
       insertNodes(editor, {
         type: ELEMENT_DEFAULT,
         children: [{ text: '' }],
