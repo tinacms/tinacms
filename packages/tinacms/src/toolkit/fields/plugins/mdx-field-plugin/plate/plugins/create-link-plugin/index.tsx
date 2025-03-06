@@ -10,7 +10,10 @@ import {
 } from 'slate';
 import { NestedForm } from '../../nested-form';
 import { Button } from '@tinacms/toolkit';
-import { createLinkPlugin, ELEMENT_LINK } from '@udecode/plate-link';
+import { createLinkPlugin } from '@udecode/plate-link';
+import { LinkPlugin } from '@udecode/plate-link/react';
+import { PlateEditor } from '@udecode/plate/react';
+import { Value } from '@udecode/plate';
 
 export { createLinkPlugin };
 
@@ -34,7 +37,7 @@ export const wrapOrRewrapLink = (editor) => {
       match: (n) =>
         !Editor.isEditor(n) &&
         Element.isElement(n) &&
-        getPluginType(editor, ELEMENT_LINK),
+        getPluginType(editor, LinkPlugin.key),
     });
     Transforms.select(editor, path);
   }
@@ -50,7 +53,7 @@ export const wrapOrRewrapLink = (editor) => {
 };
 
 const matchLink = (n: ENode<Value>) =>
-  !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK;
+  !Editor.isEditor(n) && Element.isElement(n) && n.type === LinkPlugin.key;
 
 export const LinkForm = (props) => {
   const [initialValues, setInitialValues] = React.useState<{
