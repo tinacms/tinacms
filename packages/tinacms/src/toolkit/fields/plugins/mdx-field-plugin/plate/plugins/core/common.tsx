@@ -29,8 +29,9 @@ export const plugins = [
   HeadingPlugin,
   ParagraphPlugin,
   CodeBlockPlugin,
-  createHTMLBlockPlugin(),
-  createHTMLInlinePlugin(),
+  //TODO : Readd these plugins and make sure they work
+  // createHTMLBlockPlugin(),
+  // createHTMLInlinePlugin(),
   BlockquotePlugin,
   UnderlinePlugin,
   ListPlugin,

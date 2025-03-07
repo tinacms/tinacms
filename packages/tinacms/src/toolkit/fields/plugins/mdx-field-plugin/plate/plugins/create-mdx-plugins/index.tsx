@@ -1,5 +1,4 @@
 import React from 'react';
-import { ReactEditor } from 'slate-react';
 import { BlockEmbed, InlineEmbed } from './component';
 import {
   insertBlockElement,
@@ -12,17 +11,17 @@ import { createPlatePlugin, PlateEditor } from '@udecode/plate/react';
 export const ELEMENT_MDX_INLINE = 'mdxJsxTextElement';
 export const ELEMENT_MDX_BLOCK = 'mdxJsxFlowElement';
 
-const Embed = (props) => {
-  const handleChange = (values) => {
-    const path = ReactEditor.findPath(props.editor, props.element);
-    props.editor.tf.setNodes({ props: values }, { at: path });
-  };
+// const Embed = (props) => {
+//   const handleChange = (values) => {
+//     const path = ReactEditor.findPath(props.editor, props.element);
+//     props.editor.tf.setNodes({ props: values }, { at: path });
+//   };
 
-  if (props.inline) {
-    return <InlineEmbed {...props} onChange={handleChange} />;
-  }
-  return <BlockEmbed {...props} onChange={handleChange} />;
-};
+//   if (props.inline) {
+//     return <InlineEmbed {...props} onChange={handleChange} />;
+//   }
+//   return <BlockEmbed {...props} onChange={handleChange} />;
+// };
 
 //TODO - Fix this commented code (need to find replacement, there are some config havent figure out the replacement yet)
 // export const createMdxInlinePlugin = createPluginFactory<{

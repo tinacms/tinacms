@@ -4,7 +4,7 @@ import { createPlatePlugin, ParagraphPlugin } from '@udecode/plate/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
-import { ExitBreakPlugin } from '@udecode/plate-break/react';
+import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
 import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { autoformatRules } from './autoformat/autoformat-rules';
@@ -74,23 +74,25 @@ export const plugins = [
       ],
     },
   }),
+  //TODO : I think the docs is outdate and below is the copy and paste from the docs
+  //See the usage code example from https://platejs.org/docs/reset-node
   ResetNodePlugin.configure({
-    options: {
-      rules: [
-        {
-          ...resetBlockTypesCommonRule,
-          hotkey: 'Enter',
-          predicate: isBlockAboveEmpty,
-        },
-        {
-          ...resetBlockTypesCommonRule,
-          hotkey: 'Backspace',
-          predicate: isSelectionAtBlockStart,
-        },
-      ],
-    },
+    // options: {
+    //   rules: [
+    //     {
+    //       ...resetBlockTypesCommonRule,
+    //       hotkey: 'Enter',
+    //       predicate: editor.api.isEmpty(editor.selection, { block: true }),
+    //     },
+    //     {
+    //       ...resetBlockTypesCommonRule,
+    //       hotkey: 'Backspace',
+    //       predicate: isSelectionAtBlockStart,
+    //     },
+    //   ],
+    // },
   }),
-  createSoftBreakPlugin({
+  SoftBreakPlugin.configure({
     options: {
       rules: [
         { hotkey: 'shift+enter' },
