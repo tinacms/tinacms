@@ -1,13 +1,11 @@
-'use client';
-
 import React from 'react';
 
 import { cn, withRef } from '@udecode/cn';
 import {
   PortalBody,
   useComposedRef,
-  useEventEditorSelectors,
-  usePlateSelectors,
+  useEditorRef,
+  useEventEditorValue,
 } from '@udecode/plate/react';
 import {
   type FloatingToolbarState,
@@ -25,8 +23,8 @@ export const FloatingToolbar = withRef<
     state?: FloatingToolbarState;
   }
 >(({ children, state, ...props }, componentRef) => {
-  const editorId = usePlateSelectors().id();
-  const focusedEditorId = useEventEditorSelectors.focus();
+  const editorId = useEditorRef().id;
+  const focusedEditorId = useEventEditorValue('focus');
 
   const floatingToolbarState = useFloatingToolbarState({
     editorId,
