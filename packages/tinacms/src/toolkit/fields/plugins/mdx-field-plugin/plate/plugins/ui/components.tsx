@@ -1,8 +1,5 @@
 import { withProps } from '@udecode/cn';
-import { ELEMENT_TD, ELEMENT_TH, ELEMENT_TR } from '@udecode/plate';
-import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command';
 import React from 'react';
-import { useSelected } from 'slate-react';
 import { BlockquoteElement } from '../../components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '../../components/plate-ui/code-block-element';
 import { CodeLeaf } from '../../components/plate-ui/code-leaf';
@@ -20,8 +17,18 @@ import { TableRowElement } from '../../components/plate-ui/table-row-element';
 import { ELEMENT_MERMAID } from '../custom/mermaid-plugin';
 import { classNames } from './helpers';
 import { HEADING_KEYS } from '@udecode/plate-heading';
-import { TablePlugin } from '@udecode/plate-table/react';
-import { ParagraphPlugin, PlateElement, PlateLeaf } from '@udecode/plate/react';
+import {
+  TableCellHeaderPlugin,
+  TableCellPlugin,
+  TablePlugin,
+  TableRowPlugin,
+} from '@udecode/plate-table/react';
+import {
+  ParagraphPlugin,
+  PlateElement,
+  PlateLeaf,
+  useSelected,
+} from '@udecode/plate/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import {
   CodeBlockPlugin,
@@ -42,6 +49,7 @@ import {
   NumberedListPlugin,
 } from '@udecode/plate-list/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
+import { SlashInputPlugin } from '@udecode/plate-slash-command/react';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -55,7 +63,7 @@ const headerClasses = 'font-normal';
 
 export const Components = () => {
   return {
-    [ELEMENT_SLASH_INPUT]: SlashInputElement,
+    [SlashInputPlugin.key]: SlashInputElement,
     [HEADING_KEYS.h1]: ({
       attributes,
       editor,
@@ -271,8 +279,8 @@ export const Components = () => {
       );
     },
     [TablePlugin.key]: TableElement,
-    [ELEMENT_TR]: TableRowElement,
-    [ELEMENT_TD]: TableCellElement,
-    [ELEMENT_TH]: TableCellHeaderElement,
+    [TableRowPlugin.key]: TableRowElement,
+    [TableCellPlugin.key]: TableCellElement,
+    [TableCellHeaderPlugin.key]: TableCellHeaderElement,
   };
 };
