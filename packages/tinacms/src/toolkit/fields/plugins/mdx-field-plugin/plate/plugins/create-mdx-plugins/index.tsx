@@ -7,7 +7,7 @@ import {
   helpers,
 } from '../core/common';
 import type { MdxTemplate } from '../../types';
-import { PlateEditor } from '@udecode/plate/react';
+import { createPlatePlugin, PlateEditor } from '@udecode/plate/react';
 
 export const ELEMENT_MDX_INLINE = 'mdxJsxTextElement';
 export const ELEMENT_MDX_BLOCK = 'mdxJsxFlowElement';
@@ -24,23 +24,38 @@ const Embed = (props) => {
   return <BlockEmbed {...props} onChange={handleChange} />;
 };
 
-export const createMdxInlinePlugin = createPluginFactory<{
-  templates: MdxTemplate[];
-}>({
+//TODO - Fix this commented code (need to find replacement, there are some config havent figure out the replacement yet)
+// export const createMdxInlinePlugin = createPluginFactory<{
+//   templates: MdxTemplate[];
+// }>({
+//   key: ELEMENT_MDX_INLINE,
+//   isInline: true,
+//   isVoid: true,
+//   isElement: true,
+//   component: (props) => <Embed {...props} inline={true} />,
+// });
+
+//TODO - This is the replacement for the above commented code
+export const createMdxInlinePlugin = createPlatePlugin({
   key: ELEMENT_MDX_INLINE,
-  isInline: true,
-  isVoid: true,
-  isElement: true,
-  component: (props) => <Embed {...props} inline={true} />,
+  options: {
+    isElement: true,
+    isVoid: true,
+    isInline: true,
+  },
+  // component: (props) => <Embed {...props} inline={true} />,
 });
 
-export const createMdxBlockPlugin = createPluginFactory({
+export const createMdxBlockPlugin = createPlatePlugin({
   key: ELEMENT_MDX_BLOCK,
-  isVoid: true,
-  isElement: true,
-  component: (props) => <Embed {...props} inline={false} />,
+  options: {
+    isElement: true,
+    isVoid: true,
+  },
+  // component: (props) => <Embed {...props} inline={false} />,
 });
 
+//TODO - Fix this commented code (need to find replacement )
 export const insertMDX = (editor: PlateEditor, value: MdxTemplate) => {
   const flow = !value.inline;
   if (!helpers.currentNodeSupportsMDX(editor)) {
