@@ -2,15 +2,46 @@
 
 */
 
-import React, { useEffect, useState } from 'react';
+import type { Collection, TinaField, TinaSchema } from '@tinacms/schema-tools';
 import type { TinaCMS } from '@tinacms/toolkit';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Collection, TinaSchema } from '@tinacms/schema-tools';
 import { FilterArgs, TinaAdminApi } from '../api';
 import LoadingPage from '../components/LoadingPage';
+import { handleNavigate } from '../pages/CollectionListPage';
 import type { CollectionResponse, DocumentForm } from '../types';
 import { FullscreenError } from './FullscreenError';
-import { handleNavigate } from '../pages/CollectionListPage';
+
+const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
+  if (collection.fields) {
+    const sortKeys = collection.fields.map((x) => x.name);
+    return sortKeys.includes(sortKey);
+  } else if (collection.templates) {
+    const collectionMap: Record<string, TinaField> = {};
+    const conflictedFields: Record<string, boolean> = {};
+    for (const template of collection.templates) {
+      for (const field of template.fields) {
+        if (collectionMap[field.name]) {
+          if (collectionMap[field.name].type !== field.type) {
+            conflictedFields[field.name] = true;
+          }
+        } else {
+          collectionMap[field.name] = field;
+        }
+      }
+    }
+    for (const key in conflictedFields) {
+      delete collectionMap[key];
+    }
+    for (const key in collectionMap) {
+      if (key === sortKey) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+};
 
 export const useGetCollection = (
   cms: TinaCMS,
@@ -37,9 +68,7 @@ export const useGetCollection = (
     const fetchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
         const { name, order } = JSON.parse(sortKey || '{}');
-        const validSortKey = collectionExtra.fields
-          ?.map((x) => x.name)
-          .includes(name)
+        const validSortKey = isValidSortKey(name, collectionExtra)
           ? name
           : undefined;
         try {
