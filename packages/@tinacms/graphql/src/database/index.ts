@@ -1011,7 +1011,6 @@ export class Database {
   };
 
   public query = async (queryOptions: QueryOptions, hydrator) => {
-    console.log('queryOptions', queryOptions);
     await this.initLevel();
     const {
       first,
@@ -1062,7 +1061,6 @@ export class Database {
       | undefined;
     const filterSuffixes =
       indexDefinition && makeFilterSuffixes(filterChain, indexDefinition);
-    console.log({ indexDefinition, filterSuffixes, filterChain, sort });
     const level = collection?.isDetached
       ? this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
       : this.contentLevel;
