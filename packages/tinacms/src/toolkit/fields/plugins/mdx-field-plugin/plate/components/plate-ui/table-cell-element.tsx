@@ -2,15 +2,13 @@ import React from 'react';
 
 import { cn, withProps, withRef } from '@udecode/cn';
 import { PlateElement } from '@udecode/plate/react';
+import { ResizeHandle } from '@udecode/plate-resizable';
 import {
   useTableCellElement,
   useTableCellElementResizable,
-  useTableCellElementResizableState,
-  useTableCellElementState,
-} from '@udecode/plate-table';
+} from '@udecode/plate-table/react';
 
-import { ResizeHandle } from '@udecode/plate-resizable';
-
+//TODO: Test and makesure table cell still working
 export const TableCellElement = withRef<
   typeof PlateElement,
   {
@@ -24,23 +22,19 @@ export const TableCellElement = withRef<
     borders,
     colIndex,
     colSpan,
-    hovered,
-    hoveredLeft,
     isSelectingCell,
-    readOnly,
     rowIndex,
-    rowSize,
+    minHeight,
     selected,
-  } = useTableCellElementState();
-  const { props: cellProps } = useTableCellElement({ element: props.element });
-  const resizableState = useTableCellElementResizableState({
-    colIndex,
-    colSpan,
-    rowIndex,
-  });
+    ...cellProps
+  } = useTableCellElement();
 
   const { bottomProps, hiddenLeft, leftProps, rightProps } =
-    useTableCellElementResizable(resizableState);
+    useTableCellElementResizable({
+      colIndex,
+      colSpan,
+      rowIndex,
+    });
 
   const Cell = isHeader ? 'th' : 'td';
 
@@ -82,7 +76,7 @@ export const TableCellElement = withRef<
         <div
           className='relative z-20 box-border h-full px-3 py-2'
           style={{
-            minHeight: rowSize,
+            minHeight,
           }}
         >
           {children}
@@ -94,7 +88,8 @@ export const TableCellElement = withRef<
             contentEditable={false}
             suppressContentEditableWarning={true}
           >
-            {!readOnly && (
+            {/* TODO: Re-enable this hovered is removed in latest version */}
+            {/* {!readOnly && (
               <>
                 <ResizeHandle
                   {...rightProps}
@@ -110,7 +105,6 @@ export const TableCellElement = withRef<
                     className='-top-3 left-[-5px] w-[10px]'
                   />
                 )}
-
                 {hovered && (
                   <div
                     className={cn(
@@ -126,9 +120,9 @@ export const TableCellElement = withRef<
                       'left-[-1.5px]'
                     )}
                   />
-                )}
+                )} 
               </>
-            )}
+            )} */}
           </div>
         )}
       </Cell>
