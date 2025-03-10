@@ -2,11 +2,14 @@ import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
 
 import type * as monaco from 'monaco-editor';
 import React from 'react';
-import { useSelected } from 'slate-react';
 import { Autocomplete } from '../autocomplete';
 import { uuid } from '../helpers';
 import { ElementApi, TElement } from '@udecode/plate';
-import { ParagraphPlugin, PlateEditor } from '@udecode/plate/react';
+import {
+  ParagraphPlugin,
+  PlateEditor,
+  useSelected,
+} from '@udecode/plate/react';
 
 type Monaco = typeof monaco;
 

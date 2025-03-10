@@ -1,6 +1,5 @@
 import React from 'react';
 import { ImgEmbed } from './component';
-import { ReactEditor } from 'slate-react';
 import { insertInlineElement } from '../core/common';
 import type { Media } from '../../../../../../core/media';
 import { isImage } from '@toolkit/components/media/utils';
@@ -15,7 +14,7 @@ const createImgPlugin = {
   isElement: true,
   component: (props) => {
     const handleChange = (values) => {
-      const path = ReactEditor.findPath(props.editor, props.element);
+      const path = props.editor.api.findPath(props.element);
       props.editor.tf.setNodes(values, { at: path });
     };
     return <ImgEmbed {...props} onChange={handleChange} />;

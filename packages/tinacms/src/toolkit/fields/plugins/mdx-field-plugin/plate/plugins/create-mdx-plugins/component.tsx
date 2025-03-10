@@ -1,6 +1,4 @@
 import React from 'react';
-import { Element } from 'slate';
-import { useSelected, ReactEditor } from 'slate-react';
 import {
   Transition,
   Popover,
@@ -13,7 +11,12 @@ import { ELEMENT_MDX_INLINE } from '.';
 import { EllipsisIcon } from '../ui/icons';
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { useTemplates } from '../../editor-context';
-import { ParagraphPlugin, PlateEditor } from '@udecode/plate/react';
+import {
+  ParagraphPlugin,
+  PlateEditor,
+  useSelected,
+} from '@udecode/plate/react';
+import { ElementApi } from '@udecode/plate';
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div';
@@ -56,7 +59,7 @@ export const InlineEmbed = ({
   useHotkey('space', () => {
     editor.tf.insertNodes([{ text: ' ' }], {
       match: (n) => {
-        if (Element.isElement(n) && n.type === ELEMENT_MDX_INLINE) {
+        if (ElementApi.isElement(n) && n.type === ELEMENT_MDX_INLINE) {
           return true;
         }
       },
@@ -178,7 +181,7 @@ const getLabel = (activeTemplate, formProps) => {
 
   return label;
 };
-
+//TODO : test this
 const EmbedNestedForm = ({
   editor,
   element,
@@ -186,7 +189,7 @@ const EmbedNestedForm = ({
   onClose,
   onChange,
 }) => {
-  const path = ReactEditor.findPath(editor, element);
+  const path = editor.findPath(element);
   const id = [...path, activeTemplate.name].join('.');
   return (
     <NestedForm

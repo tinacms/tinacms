@@ -1,5 +1,4 @@
 import React from 'react';
-import { Transforms } from 'slate';
 import { useSelected, ReactEditor } from 'slate-react';
 import { isHotkey } from 'is-hotkey';
 import { useCMS, useEvent } from '@toolkit/react-core';
@@ -22,14 +21,14 @@ const handleCloseBase = (editor, element) => {
      */
     editorEl.focus();
     setTimeout(() => {
-      Transforms.select(editor, path);
+      editor.tf.select(path);
     }, 1);
   }
 };
 
 const handleRemoveBase = (editor, element) => {
   const path = ReactEditor.findPath(editor, element);
-  Transforms.removeNodes(editor, {
+  editor.tf.removeNodes({
     at: path,
   });
 };

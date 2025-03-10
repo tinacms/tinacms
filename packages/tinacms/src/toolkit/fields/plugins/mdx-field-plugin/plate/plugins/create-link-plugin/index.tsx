@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
-import { Editor, Element, type BaseRange, Transforms, wrapNodes } from 'slate';
 import { NestedForm } from '../../nested-form';
 import { Button } from '@tinacms/toolkit';
 import { LinkPlugin } from '@udecode/plate-link/react';
 import { PlateEditor, useEditorState } from '@udecode/plate/react';
-import { Node } from '@udecode/plate';
+import { ElementApi, Node, NodeApi } from '@udecode/plate';
 
 type LinkElement = {
   url?: string;
@@ -24,11 +23,11 @@ export const wrapOrRewrapLink = (editor) => {
   if (editor.api.isCollapsed()) {
     const [, path] = editor.api.above({
       match: (n) =>
-        !Editor.isEditor(n) &&
-        Element.isElement(n) &&
+        !NodeApi.isEditor(n) &&
+        ElementApi.isElement(n) &&
         editor.getType(LinkPlugin.key),
     });
-    Transforms.select(editor, path);
+    editor.tf.select(path); //TODO test if this works
   }
   if (isLinkActive(editor)) {
     const [link] = getLinks(editor);
@@ -38,11 +37,11 @@ export const wrapOrRewrapLink = (editor) => {
     unwrapLink(editor);
   }
 
-  wrapNodes(editor, baseLink, { split: true });
+  editor.tf.wrapNodes(baseLink, { split: true });
 };
 
 const matchLink = (n: Node) =>
-  !Editor.isEditor(n) && Element.isElement(n) && n.type === LinkPlugin.key;
+  !NodeApi.isEditor(n) && ElementApi.isElement(n) && n.type === LinkPlugin.key;
 
 export const LinkForm = (props) => {
   const [initialValues, setInitialValues] = React.useState<{
@@ -108,7 +107,8 @@ export const LinkForm = (props) => {
   );
 };
 
-export const unwrapLink = (editor: PlateEditor, selection?: BaseRange) => {
+//TODO - Fix the selection type was BaseRange from slate before (need to find what the actual type is)
+export const unwrapLink = (editor: PlateEditor, selection?: any) => {
   editor.tf.unwrapNodes({
     match: matchLink,
     at: selection || undefined,

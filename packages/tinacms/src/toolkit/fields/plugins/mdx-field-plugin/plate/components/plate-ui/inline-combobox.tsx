@@ -12,7 +12,6 @@ import React, {
   useState,
 } from 'react';
 
-import type { PointRef } from 'slate';
 import {
   useComboboxInput,
   UseComboboxInputResult,
@@ -33,7 +32,7 @@ import { cn } from '@udecode/cn';
 import { filterWords } from '@udecode/plate-combobox';
 import { useComposedRef, useEditorRef } from '@udecode/plate/react';
 import { cva } from 'class-variance-authority';
-import { TElement } from '@udecode/plate';
+import { PointRef, TElement } from '@udecode/plate';
 
 type FilterFn = (
   item: { keywords?: string[]; value: string },

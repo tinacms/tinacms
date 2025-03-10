@@ -1,5 +1,4 @@
 import React from 'react';
-import { useSelected } from 'slate-react';
 import { NestedForm } from '../../nested-form';
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { useTemplates } from '../../editor-context';
@@ -9,7 +8,7 @@ import {
   StyledImage,
 } from '../../../../../components';
 import { isImage } from '@toolkit/components/media/utils';
-import { ParagraphPlugin } from '@udecode/plate/react';
+import { ParagraphPlugin, useSelected } from '@udecode/plate/react';
 
 export const ImgEmbed = ({
   attributes,
