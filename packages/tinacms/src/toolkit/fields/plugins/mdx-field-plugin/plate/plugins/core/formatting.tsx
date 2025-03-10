@@ -1,5 +1,5 @@
 import { createSoftBreakPlugin } from '../soft-break';
-import { withCorrectVoidBehavior } from './with-correct-void-behavior';
+// import { withCorrectVoidBehavior } from './with-correct-void-behavior';
 import { createPlatePlugin, ParagraphPlugin } from '@udecode/plate/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
@@ -34,16 +34,17 @@ const resetBlockTypesCommonRule = {
   defaultType: ParagraphPlugin.key,
 };
 
-const CorrectNodeBehaviorPlugin = createPlatePlugin({
-  key: 'WITH_CORRECT_NODE_BEHAVIOR',
-  options: {
-    withOverrides: withCorrectVoidBehavior,
-  },
-});
+//TODO : Renable this plugin later, comment out for now to test initial plate upgrade (will come back to this before we release plate upgrade)
+// const CorrectNodeBehaviorPlugin = createPlatePlugin({
+//   key: 'WITH_CORRECT_NODE_BEHAVIOR',
+//   options: {
+//     withOverrides: withCorrectVoidBehavior,
+//   },
+// });
 
 export const plugins = [
   TrailingBlockPlugin,
-  CorrectNodeBehaviorPlugin,
+  // CorrectNodeBehaviorPlugin,
   AutoformatPlugin.configure({
     options: {
       rules: autoformatRules,

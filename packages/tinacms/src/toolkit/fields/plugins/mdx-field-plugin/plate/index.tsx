@@ -35,11 +35,12 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const plugins = [
     ...formattingPlugins,
     ...commonPlugins,
-    createMdxBlockPlugin(),
-    createMdxInlinePlugin(),
-    createImgPlugin(),
-    createMermaidPlugin(),
-    createInvalidMarkdownPlugin(),
+    //TODO : Enable these plugins, they are temporary disable due to plate upgrade (giving some error, we need to deal with it later before plate upgrade can be released)
+    // createMdxBlockPlugin(),
+    // createMdxInlinePlugin(),
+    // createImgPlugin(),
+    // createMermaidPlugin(),
+    // createInvalidMarkdownPlugin(),
     LinkPlugin.configure({
       options: {
         // Custom validation function to allow relative links, e.g., /about

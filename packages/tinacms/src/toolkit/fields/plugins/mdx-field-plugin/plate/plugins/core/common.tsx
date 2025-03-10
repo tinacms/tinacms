@@ -1,13 +1,8 @@
 import { ReactEditor } from 'slate-react';
-import {
-  createHTMLBlockPlugin,
-  createHTMLInlinePlugin,
-} from '../create-code-block';
 import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';
 import { type PlateEditor } from '@udecode/plate/react';
-import { Transforms, Editor, Node } from 'slate';
 import {
   BasicMarksPlugin,
   UnderlinePlugin,
@@ -23,6 +18,7 @@ import { IndentListPlugin } from '@udecode/plate-indent-list/react';
 import { NodeIdPlugin } from '@udecode/plate-node-id';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { SlashPlugin } from '@udecode/plate-slash-command/react';
+import { NodeApi } from '@udecode/plate';
 
 export const plugins = [
   BasicMarksPlugin,
@@ -106,7 +102,7 @@ export const insertInlineElement = (editor, inlineElement) => {
    */
   // Move selection to the space after the embedded line
   setTimeout(() => {
-    Transforms.move(editor);
+    editor.tf.move(); //TODO : Test this
   }, 1);
 };
 export const insertBlockElement = (editor, blockElement) => {
@@ -135,19 +131,20 @@ export const insertBlockElement = (editor, blockElement) => {
   }
 };
 
+//TODO : Test this
 const isCurrentBlockEmpty = (editor) => {
   if (!editor.selection) {
     return false;
   }
-  const [node] = Editor.node(editor, editor.selection);
+  const [node] = editor.api.node(editor.selection);
   const cursor = editor.selection.focus;
   const blockAbove = editor.api.block();
   const isEmpty =
-    !Node.string(node) &&
+    !NodeApi.string(node) && //TODO : Test this
     // @ts-ignore bad type from slate
     !node.children?.some((n) => Editor.isInline(editor, n)) &&
     // Only do this if we're at the start of a block
-    Editor.isStart(editor, cursor, blockAbove[1]);
+    editor.api.isStart(cursor, blockAbove[1]);
 
   return isEmpty;
 };
