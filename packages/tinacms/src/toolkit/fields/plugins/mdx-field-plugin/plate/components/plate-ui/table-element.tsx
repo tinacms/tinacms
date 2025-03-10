@@ -6,7 +6,6 @@ import { PopoverAnchor } from '@radix-ui/react-popover';
 import { cn, withRef } from '@udecode/cn';
 import {
   PlateElement,
-  isSelectionExpanded,
   useEditorRef,
   useEditorSelector,
   useElement,
@@ -15,13 +14,8 @@ import {
 } from '@udecode/plate/react';
 import {
   type TTableElement,
-  TableProvider,
   mergeTableCells,
-  unmergeTableCells,
-  useTableBordersDropdownMenuContentState,
-  useTableElement,
-  useTableElementState,
-  useTableMergeState,
+  splitTableCell,
 } from '@udecode/plate-table';
 import { useReadOnly, useSelected } from 'slate-react';
 
@@ -37,6 +31,12 @@ import {
 } from './dropdown-menu';
 import { Popover, PopoverContent, popoverVariants } from './popover';
 import { Separator } from './separator';
+import {
+  TableProvider,
+  useTableBordersDropdownMenuContentState,
+  useTableElement,
+  useTableMergeState,
+} from '@udecode/plate-table/react';
 
 export const TableBordersDropdownMenuContent = withRef<
   typeof DropdownMenuPrimitive.Content
@@ -115,7 +115,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
     const { props: buttonProps } = useRemoveNodeButton({ element });
 
     const selectionCollapsed = useEditorSelector(
-      (editor) => !isSelectionExpanded(editor),
+      (editor) => !editor.api.isExpanded(),
       []
     );
 
@@ -126,7 +126,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
     const collapsed = !readOnly && selected && selectionCollapsed;
     const open = !readOnly && selected;
 
-    const { canMerge, canUnmerge } = useTableMergeState();
+    const { canMerge, canSplit } = useTableMergeState();
 
     const mergeContent = canMerge && (
       <Button
@@ -140,11 +140,11 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
       </Button>
     );
 
-    const unmergeButton = canUnmerge && (
+    const unmergeButton = canSplit && (
       <Button
         contentEditable={false}
         isMenu
-        onClick={() => unmergeTableCells(editor)}
+        onClick={() => splitTableCell(editor)}
         variant='ghost'
       >
         <Icons.ungroup className='mr-2 size-4' />
@@ -177,7 +177,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
     return (
       <Popover modal={false} open={open}>
         <PopoverAnchor asChild>{children}</PopoverAnchor>
-        {(canMerge || canUnmerge || collapsed) && (
+        {(canMerge || canSplit || collapsed) && (
           <PopoverContent
             className={cn(
               popoverVariants(),
@@ -200,9 +200,8 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
 export const TableElement = withHOC(
   TableProvider,
   withRef<typeof PlateElement>(({ children, className, ...props }, ref) => {
-    const { colSizes, isSelectingCell, marginLeft, minColumnWidth } =
-      useTableElementState();
-    const { colGroupProps, props: tableProps } = useTableElement();
+    const { isSelectingCell, marginLeft } = useTableElement();
+    const { props: tableProps } = useTableElement();
 
     return (
       <TableFloatingToolbar>
@@ -219,7 +218,8 @@ export const TableElement = withHOC(
             {...props}
           >
             <table>
-              <colgroup {...colGroupProps}>
+              {/* TODO: need to find a way to add colgroup, this property is removed from the latest plate and slate(using css) */}
+              {/* <colgroup {...colGroupProps}>
                 {colSizes.map((width, index) => (
                   <col
                     key={index}
@@ -229,7 +229,7 @@ export const TableElement = withHOC(
                     }}
                   />
                 ))}
-              </colgroup>
+              </colgroup> */}
 
               <tbody className='min-w-full'>{children}</tbody>
             </table>
