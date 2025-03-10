@@ -102,7 +102,7 @@ export const insertInlineElement = (editor, inlineElement) => {
    */
   // Move selection to the space after the embedded line
   setTimeout(() => {
-    editor.tf.move(); //TODO : Test this
+    editor.tf.move(); //TODO : Test this function in UI, not sure if it works after replace with latest api  function in UI, not sure if it works after replace with latest api
   }, 1);
 };
 export const insertBlockElement = (editor, blockElement) => {
@@ -131,7 +131,7 @@ export const insertBlockElement = (editor, blockElement) => {
   }
 };
 
-//TODO : Test this
+//TODO : Test this function in UI, not sure if it works after replace with latest api
 const isCurrentBlockEmpty = (editor) => {
   if (!editor.selection) {
     return false;
@@ -140,7 +140,7 @@ const isCurrentBlockEmpty = (editor) => {
   const cursor = editor.selection.focus;
   const blockAbove = editor.api.block();
   const isEmpty =
-    !NodeApi.string(node) && //TODO : Test this
+    !NodeApi.string(node) && //TODO : Test this function in UI, not sure if it works after replace with latest api
     // @ts-ignore bad type from slate
     !node.children?.some((n) => Editor.isInline(editor, n)) &&
     // Only do this if we're at the start of a block

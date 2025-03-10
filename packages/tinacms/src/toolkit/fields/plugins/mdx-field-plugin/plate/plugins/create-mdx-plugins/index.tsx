@@ -54,7 +54,6 @@ export const createMdxBlockPlugin = createPlatePlugin({
   // component: (props) => <Embed {...props} inline={false} />,
 });
 
-//TODO - Fix this commented code (need to find replacement )
 export const insertMDX = (editor: PlateEditor, value: MdxTemplate) => {
   const flow = !value.inline;
   if (!helpers.currentNodeSupportsMDX(editor)) {

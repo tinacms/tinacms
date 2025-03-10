@@ -6,7 +6,7 @@
 //  *
 //  * https://github.com/ianstormtaylor/slate/issues/3991#issuecomment-832160304
 //  */
-// //TODO : test this
+// //TODO : Test this function in UI, not sure if it works after replace with latest api
 // export const withCorrectVoidBehavior = (editor: Editor) => {
 //   const { deleteBackward, insertBreak } = editor;
 

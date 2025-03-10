@@ -27,7 +27,7 @@ export const wrapOrRewrapLink = (editor) => {
         ElementApi.isElement(n) &&
         editor.getType(LinkPlugin.key),
     });
-    editor.tf.select(path); //TODO test if this works
+    editor.tf.select(path); //TODO : Test this function in UI, not sure if it works after replace with latest api
   }
   if (isLinkActive(editor)) {
     const [link] = getLinks(editor);

@@ -181,7 +181,7 @@ const getLabel = (activeTemplate, formProps) => {
 
   return label;
 };
-//TODO : test this
+//TODO : Test this function in UI, not sure if it works after replace with latest api
 const EmbedNestedForm = ({
   editor,
   element,

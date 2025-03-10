@@ -5,7 +5,7 @@ import { createPlatePlugin } from '@udecode/plate/react';
 
 export const ELEMENT_INVALID_MARKDOWN = 'invalid_markdown';
 
-//TODO - createPluginFactory is not defined
+//TODO : Find out how to render component for custom plugin in plate using create Plate Plugin
 export const createInvalidMarkdownPlugin = createPlatePlugin({
   key: ELEMENT_INVALID_MARKDOWN,
   options: {
