@@ -9,7 +9,7 @@ import { TElement } from '@udecode/plate';
 
 export const insertEmptyMermaid = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
-    node.type === editor.getType(ELEMENT_MERMAID);
+    node.type === editor.getType({ key: ELEMENT_MERMAID });
 
   if (
     editor.api.some({

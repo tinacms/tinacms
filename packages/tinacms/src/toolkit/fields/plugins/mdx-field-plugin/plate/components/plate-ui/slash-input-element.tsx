@@ -13,11 +13,11 @@ import {
   InlineComboboxInput,
   InlineComboboxItem,
 } from './inline-combobox';
-import { toggleList } from '@udecode/plate';
 import {
   BulletedListPlugin,
   NumberedListPlugin,
 } from '@udecode/plate-list/react';
+import { toggleList } from '@udecode/plate-list';
 
 interface SlashCommandRule {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
