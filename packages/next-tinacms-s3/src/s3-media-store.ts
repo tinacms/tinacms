@@ -16,19 +16,19 @@ import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors';
 
 export class S3MediaStore implements MediaStore {
   fetchFunction = (input: RequestInfo, init?: RequestInit) => {
-    return fetch(input, init)
-  }
-  accept = DEFAULT_MEDIA_UPLOAD_TYPES
-  basePath = ''
+    return fetch(input, init);
+  };
+  accept = DEFAULT_MEDIA_UPLOAD_TYPES;
+  basePath = '';
 
   protected fetchWithBasePath(path: string, init?: RequestInit) {
-    const fullPath = this.getFullPath(path)
-    const normalizedPath = fullPath.startsWith('/') ? fullPath : `/${fullPath}`
-    return this.fetchFunction(normalizedPath, init)
+    const fullPath = this.getFullPath(path);
+    const normalizedPath = fullPath.startsWith('/') ? fullPath : `/${fullPath}`;
+    return this.fetchFunction(normalizedPath, init);
   }
 
   protected getFullPath(path: string): string {
-    return `${this.basePath}${path}`
+    return `${this.basePath}${path}`;
   }
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
@@ -114,11 +114,11 @@ export class S3MediaStore implements MediaStore {
       {
         method: 'DELETE',
       }
-    )
+    );
   }
   async list(options: MediaListOptions): Promise<MediaList> {
-    const query = this.buildQuery(options)
-    const response = await this.fetchWithBasePath('/api/s3/media' + query)
+    const query = this.buildQuery(options);
+    const response = await this.fetchWithBasePath('/api/s3/media' + query);
 
     if (response.status == 401) {
       throw E_UNAUTHORIZED;
