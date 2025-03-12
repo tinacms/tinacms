@@ -9,6 +9,7 @@ import {
   indentText,
   linkText,
   logText,
+  neutralText,
   titleText,
 } from '../../utils/theme';
 import { Telemetry } from '@tinacms/metrics';
@@ -553,6 +554,14 @@ const logNextSteps = ({
       'To get started run: ' +
         cmdText(frameworkDevCmds[framework.name]({ packageManager }))
     );
+    if (framework.name === 'hugo') {
+      logger.info(
+        focusText('Hugo is required. '),
+        "Don't have Hugo installed? Follow this guide to set it up: ",
+        linkText('https://gohugo.io/installation/')
+      );
+    }
+
     logger.info(
       'To get your site production ready, run: ' +
         cmdText(`tinacms init backend`)
