@@ -1605,8 +1605,10 @@ const _indexContent = async (
   }
 
   const folderTreeBuilder = new FolderTreeBuilder();
-  await sequential(documentPaths, async (filepath) => {
+
+  async function processFile(filepath: string) {
     try {
+      console.log(`Preloading ${filepath}`);
       const aliasedData = await loadAndParseWithAliases(
         database.bridge,
         filepath,
@@ -1633,7 +1635,10 @@ const _indexContent = async (
         collectionPath || ''
       );
       const item = await rootSublevel.get(normalizedPath);
+      await new Promise(res => setTimeout(res, 5000));
+      console.log("Ceasing preload")
       if (item) {
+        console.log("Running deletion operations");
         await database.contentLevel.batch([
           ...makeRefOpsForDocument(
             normalizedPath,
@@ -1714,7 +1719,14 @@ const _indexContent = async (
         stack: error.stack,
       });
     }
-  });
+  };
+
+  const filePromises = documentPaths.map(processFile);
+  await Promise.all(filePromises);
+
+  // for (const docPath of documentPaths) {
+  //   await processFile(docPath);
+  // }
 
   if (collection) {
     await enqueueOps(
