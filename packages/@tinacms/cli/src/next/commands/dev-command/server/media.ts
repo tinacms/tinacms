@@ -1,8 +1,8 @@
-import fs from "fs-extra";
-import path, { join } from "path";
-import busboy from "busboy";
-import type { Connect } from "vite";
-import type { ServerResponse } from "http";
+import fs from 'fs-extra';
+import path, { join } from 'path';
+import busboy from 'busboy';
+import type { Connect } from 'vite';
+import type { ServerResponse } from 'http';
 
 export const createMediaRouter = (config: PathConfig) => {
   const mediaFolder = path.join(
@@ -15,9 +15,9 @@ export const createMediaRouter = (config: PathConfig) => {
 
   const handleList = async (req, res) => {
     const requestURL = new URL(req.url, config.apiURL);
-    const folder = requestURL.pathname.replace("/media/list/", "");
-    const limit = requestURL.searchParams.get("limit");
-    const cursor = requestURL.searchParams.get("cursor");
+    const folder = requestURL.pathname.replace('/media/list/', '');
+    const limit = requestURL.searchParams.get('limit');
+    const cursor = requestURL.searchParams.get('cursor');
     const media = await mediaModel.listMedia({
       searchPath: folder,
       cursor,
@@ -27,7 +27,7 @@ export const createMediaRouter = (config: PathConfig) => {
   };
 
   const handleDelete = async (req: Connect.IncomingMessage, res) => {
-    const file = decodeURIComponent(req.url.slice("/media/".length));
+    const file = decodeURIComponent(req.url.slice('/media/'.length));
     const didDelete = await mediaModel.deleteMedia({ searchPath: file });
     res.end(JSON.stringify(didDelete));
   };
@@ -38,22 +38,22 @@ export const createMediaRouter = (config: PathConfig) => {
   ) {
     const bb = busboy({ headers: req.headers });
 
-    bb.on("file", async (_name, file, _info) => {
-      const fullPath = decodeURI(req.url?.slice("/media/upload/".length));
-      const saveTo = path.join(mediaFolder, ...fullPath.split("/"));
+    bb.on('file', async (_name, file, _info) => {
+      const fullPath = decodeURI(req.url?.slice('/media/upload/'.length));
+      const saveTo = path.join(mediaFolder, ...fullPath.split('/'));
       // make sure the directory exists before writing the file. This is needed for creating new folders
       await fs.ensureDir(path.dirname(saveTo));
       file.pipe(fs.createWriteStream(saveTo));
     });
-    bb.on("error", (error) => {
+    bb.on('error', (error) => {
       res.statusCode = 500;
       if (error instanceof Error) {
         res.end(JSON.stringify({ message: error }));
       } else {
-        res.end(JSON.stringify({ message: "Unknown error while uploading" }));
+        res.end(JSON.stringify({ message: 'Unknown error while uploading' }));
       }
     });
-    bb.on("close", () => {
+    bb.on('close', () => {
       res.statusCode = 200;
       res.end(JSON.stringify({ success: true }));
     });
@@ -65,9 +65,9 @@ export const createMediaRouter = (config: PathConfig) => {
 
 export const parseMediaFolder = (str: string) => {
   let returnString = str;
-  if (returnString.startsWith("/")) returnString = returnString.substr(1);
+  if (returnString.startsWith('/')) returnString = returnString.substr(1);
 
-  if (returnString.endsWith("/"))
+  if (returnString.endsWith('/'))
     returnString = returnString.substr(0, returnString.length - 1);
 
   return returnString;
