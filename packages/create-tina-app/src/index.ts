@@ -179,6 +179,11 @@ export async function run() {
 
   log.success('Starter successfully created!');
 
+  if (template.value === 'tina-hugo-starter')
+    log.warn(
+      'Hugo is required for this starter. Install it: https://gohugo.io/installation/'
+    );
+
   log.log(TextStyles.bold('\nTo launch your app, run:\n'));
   log.cmd(`cd ${appName}\n${pkgManager} run dev`);
   log.log(`\nNext steps:
