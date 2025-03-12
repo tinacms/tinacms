@@ -120,7 +120,7 @@ export class MediaModel {
         this.rootPath,
         this.publicFolder,
         this.mediaRoot,
-        args.searchPath
+        decodeURIComponent(args.searchPath)
       );
       const searchPath = parseMediaFolder(args.searchPath);
       // if the path does not exist, return an empty array
@@ -204,7 +204,7 @@ export class MediaModel {
         this.rootPath,
         this.publicFolder,
         this.mediaRoot,
-        args.searchPath
+        decodeURIComponent(args.searchPath)
       );
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
       await fs.stat(file);
