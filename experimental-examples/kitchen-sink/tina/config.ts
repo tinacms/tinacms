@@ -1,5 +1,5 @@
-import { defineConfig } from 'tinacms'
-import schema from './schema'
+import { defineConfig } from 'tinacms';
+import schema from './schema';
 
 export default defineConfig({
   schema,
@@ -7,4 +7,4 @@ export default defineConfig({
   build: { outputFolder: 'admin', publicFolder: 'public' },
   clientId: '***',
   token: '***',
-})
+});
