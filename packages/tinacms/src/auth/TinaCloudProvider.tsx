@@ -323,7 +323,6 @@ export const TinaCloudProvider = (
     'tinacms-current-branch',
     baseBranch
   );
-  console.log({ currentBranch });
   useTinaAuthRedirect();
   const cms = React.useMemo(
     () =>
@@ -473,12 +472,9 @@ export const TinaCloudProvider = (
           client.usingEditorialWorkflow = true;
           client.protectedBranches = project.protectedBranches;
 
-          console.log('currentBranch', currentBranch);
-          console.log(project.metadata[currentBranch]);
           // if the current branch is not in the metadata,
           // switch to the default branch
           if (!project.metadata[currentBranch]) {
-            console.log('resetting to default branch', project.defaultBranch);
             setCurrentBranch(project.defaultBranch || 'main');
           }
         }
