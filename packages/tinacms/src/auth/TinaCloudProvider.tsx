@@ -494,7 +494,7 @@ export const TinaCloudProvider = (
       }
     });
     return unsubscribe;
-  }, [isTinaCloud, cms]);
+  }, [currentBranch, isTinaCloud, cms]);
 
   return (
     <SessionProvider basePath='/api/tina/auth'>
