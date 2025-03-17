@@ -1,5 +1,12 @@
 # @tinacms/app
 
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`991db1f`](https://github.com/tinacms/tinacms/commit/991db1f10c1f9cf9211d7e82bd56658cdcce24c7)]:
+  - tinacms@2.7.3
+
 ## 2.2.2
 
 ### Patch Changes
@@ -777,7 +784,7 @@
   > NOTE: Relative paths are fine to use here, but make sure it's relative to the `.tina/config` file
 
   ```ts
-  localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+  localContentPath: process.env.REMOTE_ROOT_PATH; // eg. '../../my-content-repo'
   ```
 
   ### Production workflow
@@ -821,18 +828,18 @@
   EX:
 
   ```ts
-  import { defineConfig } from 'tinacms'
+  import { defineConfig } from "tinacms";
 
   export default defineConfig({
     admin: {
       auth: {
         onLogin: () => {
-          console.log('On Log in!')
+          console.log("On Log in!");
         },
       },
     },
     /// ...
-  })
+  });
   ```
 
 - 9d4943a82: Fix issue resolving alias fields when passing through the `useTina` hook
@@ -1055,13 +1062,13 @@
 
   ```ts
   // .tina/config.ts
-  import schema from './schema'
+  import schema from "./schema";
 
   export default defineConfig({
     schema: schema,
     //.. Everything from define config in `schema.ts`
     //.. Everything from `schema.config`
-  })
+  });
   ```
 
   2. Add Build config
