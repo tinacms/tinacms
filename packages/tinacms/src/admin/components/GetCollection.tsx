@@ -2,15 +2,15 @@
 
 */
 
-import type { Collection, TinaField, TinaSchema } from '@tinacms/schema-tools';
-import type { TinaCMS } from '@tinacms/toolkit';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FilterArgs, TinaAdminApi } from '../api';
-import LoadingPage from '../components/LoadingPage';
-import { handleNavigate } from '../pages/CollectionListPage';
-import type { CollectionResponse, DocumentForm } from '../types';
-import { FullscreenError } from './FullscreenError';
+import type { Collection, TinaField, TinaSchema } from "@tinacms/schema-tools";
+import type { TinaCMS } from "@tinacms/toolkit";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FilterArgs, TinaAdminApi } from "../api";
+import LoadingPage from "../components/LoadingPage";
+import { handleNavigate } from "../pages/CollectionListPage";
+import type { CollectionResponse, DocumentForm } from "../types";
+import { FullscreenError } from "./FullscreenError";
 
 const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
   if (collection.fields) {
@@ -18,12 +18,12 @@ const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
     return sortKeys.includes(sortKey);
   } else if (collection.templates) {
     const collectionMap: Record<string, TinaField> = {};
-    const conflictedFields: Record<string, boolean> = {};
+    const conflictedFields: Set<string> = new Set();
     for (const template of collection.templates) {
       for (const field of template.fields) {
         if (collectionMap[field.name]) {
           if (collectionMap[field.name].type !== field.type) {
-            conflictedFields[field.name] = true;
+            conflictedFields.add(field.name);
           }
         } else {
           collectionMap[field.name] = field;
@@ -48,7 +48,7 @@ export const useGetCollection = (
   collectionName: string,
   includeDocuments: boolean = true,
   folder: { loading: boolean; fullyQualifiedName: string },
-  after: string = '',
+  after: string = "",
   sortKey?: string,
   filterArgs?: FilterArgs
 ) => {
@@ -67,7 +67,7 @@ export const useGetCollection = (
 
     const fetchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
-        const { name, order } = JSON.parse(sortKey || '{}');
+        const { name, order } = JSON.parse(sortKey || "{}");
         const validSortKey = isValidSortKey(name, collectionExtra)
           ? name
           : undefined;
@@ -75,7 +75,7 @@ export const useGetCollection = (
           const collection = await api.fetchCollection(
             collectionName,
             includeDocuments,
-            filterArgs?.filterField ? '' : folder.fullyQualifiedName,
+            filterArgs?.filterField ? "" : folder.fullyQualifiedName,
             after,
             validSortKey,
             order,
@@ -124,7 +124,7 @@ export const useSearchCollection = (
   collectionName: string,
   includeDocuments: boolean = true,
   folder: { loading: boolean; fullyQualifiedName: string },
-  after: string = '',
+  after: string = "",
   search?: string
 ) => {
   const api = new TinaAdminApi(cms);
@@ -158,17 +158,17 @@ export const useSearchCollection = (
             Promise<{ document: DocumentForm }>
           >(
             response.results.map((result) => {
-              const [collection, relativePath] = result._id.split(':');
+              const [collection, relativePath] = result._id.split(":");
               return api.fetchDocument(collection, relativePath, false);
             })
           )) as {
-            status: 'fulfilled' | 'rejected';
+            status: "fulfilled" | "rejected";
             value: { document: DocumentForm };
           }[];
           const edges = docs
-            .filter((p) => p.status === 'fulfilled' && !!p.value?.document)
+            .filter((p) => p.status === "fulfilled" && !!p.value?.document)
             .map((result) => ({ node: result.value.document })) as any[];
-          const c = await api.fetchCollection(collectionName, false, '');
+          const c = await api.fetchCollection(collectionName, false, "");
           setCollection({
             format: collection.format,
             label: collection.label,
@@ -178,8 +178,8 @@ export const useSearchCollection = (
               pageInfo: {
                 hasNextPage: !!response.nextCursor,
                 hasPreviousPage: !!response.prevCursor,
-                startCursor: '',
-                endCursor: response.nextCursor || '',
+                startCursor: "",
+                endCursor: response.nextCursor || "",
               },
               edges,
             },
@@ -250,7 +250,7 @@ const GetCollection = ({
           collectionName,
           includeDocuments,
           folder,
-          startCursor || '',
+          startCursor || "",
           search
         )
       : useGetCollection(
@@ -258,7 +258,7 @@ const GetCollection = ({
           collectionName,
           includeDocuments,
           folder,
-          startCursor || '',
+          startCursor || "",
           sortKey,
           filterArgs
         ) || {};
@@ -283,7 +283,7 @@ const GetCollection = ({
       // Check there is only one document
       collectionResponse.documents?.edges?.length === 1 &&
       // Check to make sure the file is not a folder
-      collectionResponse.documents?.edges[0]?.node?.__typename !== 'Folder'
+      collectionResponse.documents?.edges[0]?.node?.__typename !== "Folder"
     ) {
       const doc = collectionResponse.documents.edges[0].node;
       handleNavigate(
@@ -294,7 +294,7 @@ const GetCollection = ({
         doc
       );
     }
-  }, [collection?.name || '', loading]);
+  }, [collection?.name || "", loading]);
 
   if (error) {
     return <FullscreenError />;
