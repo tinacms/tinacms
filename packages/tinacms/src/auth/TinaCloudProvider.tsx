@@ -1,28 +1,28 @@
-import { ModalBuilder } from './AuthModal';
-import React, { useEffect, useState } from 'react';
 import {
   BaseTextField,
-  TinaCMS,
-  TinaProvider,
-  MediaStore,
-  BranchSwitcherPlugin,
   Branch,
   BranchDataProvider,
-  useLocalStorage,
+  BranchSwitcherPlugin,
   DummyMediaStore,
-  TinaMediaStore,
+  MediaStore,
   StaticMedia,
+  TinaCMS,
+  TinaMediaStore,
+  TinaProvider,
+  useLocalStorage,
 } from '@tinacms/toolkit';
+import React, { useEffect, useState } from 'react';
+import { ModalBuilder } from './AuthModal';
 
+import { TinaAdminApi } from '../admin/api';
 import {
   Client,
   LocalSearchClient,
   TinaCMSSearchClient,
   TinaIOConfig,
 } from '../internalClient';
-import { useTinaAuthRedirect } from './useTinaAuthRedirect';
 import { CreateClientProps, createClient } from '../utils';
-import { TinaAdminApi } from '../admin/api';
+import { useTinaAuthRedirect } from './useTinaAuthRedirect';
 
 type ModalNames = null | 'authenticate' | 'error';
 
@@ -471,6 +471,12 @@ export const TinaCloudProvider = (
           cms.flags.set('branch-switcher', true);
           client.usingEditorialWorkflow = true;
           client.protectedBranches = project.protectedBranches;
+
+          // if the current branch is not in the metadata,
+          // switch to the default branch
+          if (!project.metadata[currentBranch]) {
+            setCurrentBranch(project.defaultBranch || 'main');
+          }
         }
       });
     };
@@ -484,7 +490,7 @@ export const TinaCloudProvider = (
       }
     });
     return unsubscribe;
-  }, [isTinaCloud, cms]);
+  }, [currentBranch, isTinaCloud, cms]);
 
   return (
     <SessionProvider basePath='/api/tina/auth'>

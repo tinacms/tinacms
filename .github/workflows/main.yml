@@ -1,4 +1,4 @@
-name: Build, Test, Lint for Main
+name: Build, Test, Lint, Format for Main
 
 on:
   push:
@@ -62,6 +62,19 @@ jobs:
       - name: Build Types
         run: pnpm types
 
+      - name: Test
+        run: pnpm test
+
+      - name: Lint
+        if: matrix.os == 'ubuntu-latest'
+        run: pnpm lint
+
+      - name: Format
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          pnpm format
+          git diff --exit-code
+
       - name: Check Tina lock changes
         run: pnpm diff-tina-lock
 
@@ -85,9 +98,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
-      - name: Test
-        run: pnpm test
-
-      - name: Lint
-        if: matrix.os == 'ubuntu-latest'
-        run: pnpm lint

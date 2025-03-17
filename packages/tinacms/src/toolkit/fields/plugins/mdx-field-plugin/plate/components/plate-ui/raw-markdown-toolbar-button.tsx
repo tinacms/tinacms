@@ -29,7 +29,7 @@ export const RawMarkdownToolbarButton = withRef<
   return (
     <ToolbarButton
       ref={ref}
-      tooltip="Raw Markdown"
+      tooltip='Raw Markdown'
       {...rest}
       {...props}
       data-testid='markdown-button'
