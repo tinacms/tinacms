@@ -406,7 +406,6 @@ export const CreateBranchModel = ({
 }) => {
   const cms = useCMS();
   const tinaApi = cms.api.tina;
-  const currentBranch = tinaApi.branch;
   const [disabled, setDisabled] = React.useState(false);
   const [newBranchName, setNewBranchName] = React.useState('');
   const [error, setError] = React.useState('');
@@ -443,12 +442,14 @@ export const CreateBranchModel = ({
           Create Branch
         </ModalHeader>
         <ModalBody padded={true}>
-          <p className='text-base text-gray-700 mb-2'>
-            This branch is <strong>protected</strong>. Create a new branch to
-            save your changes.
+          <p className='text-lg text-gray-700 font-bold mb-2'>
+            This content is protected 🚧
+          </p>
+          <p className='text-sm text-gray-700 mb-4'>
+            To make changes, you need to create a copy then get it approved and merged for it to go live.
           </p>
           <PrefixedTextField
-            placeholder='Branch Name'
+            placeholder='e.g. {{PAGE-NAME}}-updates'
             value={newBranchName}
             onChange={(e) => {
               // reset error state on change
