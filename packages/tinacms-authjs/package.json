@@ -28,7 +28,7 @@
 	"devDependencies": {
 		"@tinacms/datalayer": "workspace:*",
 		"@tinacms/scripts": "workspace:*",
-		"next": "14.2.10",
+		"next": "14.2.21",
 		"next-auth": "4.24.7",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
