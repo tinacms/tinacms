@@ -4,19 +4,6 @@ import type { DocumentNode } from 'graphql';
 import { GraphQLError } from 'graphql';
 import micromatch from 'micromatch';
 
-import { createSchema } from '../schema/createSchema';
-import { atob, btoa, get, lastItem, sequential } from '../util';
-import {
-  getTemplateForFile,
-  hasOwnProperty,
-  loadAndParseWithAliases,
-  normalizePath,
-  partitionPathsByCollection,
-  scanAllContent,
-  scanContentByPaths,
-  stringifyFile,
-  transformDocument,
-} from './util';
 import type {
   Collection,
   CollectionTemplateable,
@@ -25,25 +12,33 @@ import type {
   TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools';
-import type { Bridge } from './bridge';
+import sha from 'js-sha1';
+import set from 'lodash.set';
+import { FilesystemBridge, TinaLevelClient } from '..';
+import { generatePasswordHash, mapUserFields } from '../auth/utils';
+import { NotFoundError } from '../error';
 import { TinaFetchError, TinaQueryError } from '../resolver/error';
+import { createSchema } from '../schema/createSchema';
+import { atob, btoa, get, lastItem, sequential } from '../util';
+import { applyNameOverrides, replaceNameOverrides } from './alias-utils';
+import type { Bridge } from './bridge';
 import {
   type BinaryFilter,
-  coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
   FOLDER_ROOT,
   FolderTreeBuilder,
   type IndexDefinition,
+  REFS_COLLECTIONS_SORT_KEY,
+  REFS_PATH_FIELD,
+  REFS_REFERENCE_FIELD,
+  type TernaryFilter,
+  coerceFilterChainOperands,
   makeFilter,
   makeFilterSuffixes,
   makeFolderOpsForCollection,
   makeIndexOpsForDocument,
   makeRefOpsForDocument,
-  REFS_COLLECTIONS_SORT_KEY,
-  REFS_PATH_FIELD,
-  REFS_REFERENCE_FIELD,
-  type TernaryFilter,
 } from './datalayer';
 import {
   ARRAY_ITEM_VALUE_SEPARATOR,
@@ -56,12 +51,17 @@ import {
   type PutOp,
   SUBLEVEL_OPTIONS,
 } from './level';
-import { applyNameOverrides, replaceNameOverrides } from './alias-utils';
-import sha from 'js-sha1';
-import { FilesystemBridge, TinaLevelClient } from '..';
-import { generatePasswordHash, mapUserFields } from '../auth/utils';
-import { NotFoundError } from '../error';
-import set from 'lodash.set';
+import {
+  getTemplateForFile,
+  hasOwnProperty,
+  loadAndParseWithAliases,
+  normalizePath,
+  partitionPathsByCollection,
+  scanAllContent,
+  scanContentByPaths,
+  stringifyFile,
+  transformDocument,
+} from './util';
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed';
@@ -912,8 +912,37 @@ export class Database {
               },
             };
 
-            if (collection.fields) {
-              for (const field of collection.fields as TinaField<true>[]) {
+            let fields: TinaField<true>[] = [];
+            if (collection.templates) {
+              // Aggregate all fields from all templates
+              const templateFieldMap: Record<string, TinaField<true>> = {};
+              const conflictedFields: Set<string> = new Set();
+              for (const template of collection.templates) {
+                for (const field of template.fields) {
+                  if (!templateFieldMap[field.name]) {
+                    templateFieldMap[field.name] = field;
+                  } else {
+                    if (templateFieldMap[field.name].type !== field.type) {
+                      console.warn(
+                        `Field ${field.name} has conflicting types in templates - skipping index`
+                      );
+                      conflictedFields.add(field.name);
+                    }
+                  }
+                }
+              }
+              for (const conflictedField in conflictedFields) {
+                delete templateFieldMap[conflictedField];
+              }
+              for (const field of Object.values(templateFieldMap)) {
+                fields.push(field);
+              }
+            } else if (collection.fields) {
+              fields = collection.fields;
+            }
+
+            if (fields) {
+              for (const field of fields) {
                 if (
                   (field.indexed !== undefined && field.indexed === false) ||
                   field.type ===
