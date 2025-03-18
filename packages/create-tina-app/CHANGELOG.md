@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 1.3.3
+
+### Patch Changes
+
+- [#5565](https://github.com/tinacms/tinacms/pull/5565) [`b4450e7`](https://github.com/tinacms/tinacms/commit/b4450e7ed610eec217429cd85900c5b7956b952f) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Add a message to indicate that the user needs to install Hugo before running “yarn dev”
+
 ## 1.3.2
 
 ### Patch Changes
