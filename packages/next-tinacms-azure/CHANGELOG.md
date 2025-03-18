@@ -1,5 +1,12 @@
 # next-tinacms-azure
 
+## 1.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`991db1f`](https://github.com/tinacms/tinacms/commit/991db1f10c1f9cf9211d7e82bd56658cdcce24c7)]:
+  - tinacms@2.7.3
+
 ## 1.0.2
 
 ### Patch Changes
