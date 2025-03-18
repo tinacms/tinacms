@@ -591,7 +591,7 @@ export class BuildCommand extends BaseCommand {
     const localSchemaDocument = await database.getGraphQLSchemaFromBridge();
     const localGraphqlSchema = buildASTSchema(localSchemaDocument);
     try {
-      const diffResult = await diff(localGraphqlSchema, remoteGqlSchema);
+      const diffResult = await diff(remoteGqlSchema, localGraphqlSchema);
 
       if (diffResult.length === 0) {
         bar.tick({
