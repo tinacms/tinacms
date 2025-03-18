@@ -1,6 +1,6 @@
-import { Layout } from "../../components/Layout";
-import { useTina } from "tinacms/dist/react";
-import { client } from "../../tina/__generated__/client";
+import { Layout } from '../../components/Layout';
+import { useTina } from 'tinacms/dist/react';
+import { client } from '../../tina/__generated__/client';
 
 export default function Home(props) {
   // data passes though in production mode and data is updated to the sidebar data in edit-mode
@@ -15,7 +15,7 @@ export default function Home(props) {
       <code>
         <pre
           style={{
-            backgroundColor: "lightgray",
+            backgroundColor: 'lightgray',
           }}
         >
           {JSON.stringify(data.post, null, 2)}
@@ -33,7 +33,7 @@ export const getStaticPaths = async () => {
 
   return {
     paths,
-    fallback: "blocking",
+    fallback: 'blocking',
   };
 };
 

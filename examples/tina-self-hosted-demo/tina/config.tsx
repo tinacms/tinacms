@@ -1,17 +1,17 @@
-import { defineStaticConfig, LocalAuthProvider } from 'tinacms'
+import { defineStaticConfig, LocalAuthProvider } from 'tinacms';
 
 import {
   TinaUserCollection,
   UsernamePasswordAuthJSProvider,
-} from 'tinacms-authjs/dist/tinacms'
-import { iconSchema } from '@/components/util/icon'
-import { featureBlockSchema } from '@/components/blocks/features'
-import { ColorPickerInput } from '@/components/fields/color'
-import { testimonialBlockSchema } from '@/components/blocks/testimonial'
-import { contentBlockSchema } from '@/components/blocks/content'
-import { heroBlockSchema } from '@/components/blocks/hero'
+} from 'tinacms-authjs/dist/tinacms';
+import { iconSchema } from '@/components/util/icon';
+import { featureBlockSchema } from '@/components/blocks/features';
+import { ColorPickerInput } from '@/components/fields/color';
+import { testimonialBlockSchema } from '@/components/blocks/testimonial';
+import { contentBlockSchema } from '@/components/blocks/content';
+import { heroBlockSchema } from '@/components/blocks/hero';
 
-const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true';
 const config = defineStaticConfig({
   contentApiUrlOverride: '/api/tina/gql',
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
@@ -50,7 +50,7 @@ const config = defineStaticConfig({
         format: 'mdx',
         ui: {
           router: ({ document }) => {
-            return `/posts/${document._sys.filename}`
+            return `/posts/${document._sys.filename}`;
           },
         },
         fields: [
@@ -193,7 +193,7 @@ const config = defineStaticConfig({
                 list: true,
                 ui: {
                   itemProps: (item) => {
-                    return { label: item?.label }
+                    return { label: item?.label };
                   },
                   defaultItem: {
                     href: 'home',
@@ -341,12 +341,12 @@ const config = defineStaticConfig({
         ui: {
           router: ({ document }) => {
             if (document._sys.filename === 'home') {
-              return `/`
+              return `/`;
             }
             if (document._sys.filename === 'about') {
-              return `/about`
+              return `/about`;
             }
-            return undefined
+            return undefined;
           },
         },
         fields: [
@@ -379,6 +379,6 @@ const config = defineStaticConfig({
       },
     ],
   },
-})
+});
 
-export default config
+export default config;

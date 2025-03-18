@@ -1,7 +1,7 @@
-import React from 'react'
-import { staticRequest } from 'tinacms'
-import { Layout } from '../../components/Layout'
-import { useEditState, useTina } from 'tinacms/dist/react'
+import React from 'react';
+import { staticRequest } from 'tinacms';
+import { Layout } from '../../components/Layout';
+import { useEditState, useTina } from 'tinacms/dist/react';
 
 const query = `query getPost($relativePath: String!) {
   post(relativePath: $relativePath) {
@@ -21,26 +21,26 @@ const query = `query getPost($relativePath: String!) {
     }
   }
 }
-`
+`;
 
 export default function Home(props) {
   const { data } = useTina({
     query,
     variables: props.variables,
     data: props.data,
-  })
-  const { edit } = useEditState()
-  console.log('edit', edit)
+  });
+  const { edit } = useEditState();
+  console.log('edit', edit);
 
   const cleanedObject = React.useMemo(() => {
-    const obj = {}
+    const obj = {};
     Object.entries(data.post).forEach(([key, value]) => {
       if (!['_internalValues', '_internalSys'].includes(key)) {
-        obj[key] = value
+        obj[key] = value;
       }
-    })
-    return obj
-  }, [JSON.stringify(data)])
+    });
+    return obj;
+  }, [JSON.stringify(data)]);
 
   return (
     <Layout>
@@ -54,7 +54,7 @@ export default function Home(props) {
         </pre>
       </code>
     </Layout>
-  )
+  );
 }
 
 export const getStaticPaths = async () => {
@@ -71,26 +71,26 @@ export const getStaticPaths = async () => {
         }
       }`,
     variables: {},
-  })
+  });
   const paths = tinaProps.postConnection.edges.map((x) => {
-    return { params: { slug: x.node._sys.filename } }
-  })
+    return { params: { slug: x.node._sys.filename } };
+  });
 
   return {
     paths,
     fallback: 'blocking',
-  }
-}
+  };
+};
 export const getStaticProps = async (ctx) => {
   const variables = {
     relativePath: ctx.params.slug + '.md',
-  }
-  let data = {}
+  };
+  let data = {};
   try {
     data = await staticRequest({
       query,
       variables,
-    })
+    });
   } catch (error) {
     // swallow errors related to document creation
   }
@@ -101,5 +101,5 @@ export const getStaticProps = async (ctx) => {
       query,
       variables,
     },
-  }
-}
+  };
+};
