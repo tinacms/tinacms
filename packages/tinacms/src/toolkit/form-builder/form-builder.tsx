@@ -446,7 +446,8 @@ export const CreateBranchModel = ({
             This content is protected 🚧
           </p>
           <p className='text-sm text-gray-700 mb-4'>
-            To make changes, you need to create a copy then get it approved and merged for it to go live.
+            To make changes, you need to create a copy then get it approved and
+            merged for it to go live.
           </p>
           <PrefixedTextField
             placeholder='e.g. {{PAGE-NAME}}-updates'
