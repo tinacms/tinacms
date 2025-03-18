@@ -1,5 +1,15 @@
 # tinacms-cli
 
+## 1.9.4
+
+### Patch Changes
+
+- Updated dependencies [[`b551232`](https://github.com/tinacms/tinacms/commit/b5512326ad0ad9855bc75e2073a3ab2a8ec4c064), [`ea204c9`](https://github.com/tinacms/tinacms/commit/ea204c9045451f3ebea04f503e6158d2016613e4)]:
+  - tinacms@2.7.4
+  - @tinacms/graphql@1.5.15
+  - @tinacms/app@2.2.4
+  - @tinacms/search@1.0.42
+
 ## 1.9.3
 
 ### Patch Changes
