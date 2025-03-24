@@ -1,17 +1,22 @@
-import React, { Suspense } from 'react';
-import TinaCMS, { TinaAdmin, useCMS, MdxFieldPluginExtendible } from 'tinacms';
-import { Preview } from './preview';
-import Playground from './Playground';
+import React, { Suspense } from "react";
+import TinaCMS, {
+  TinaAdmin,
+  useCMS,
+  MdxFieldPluginExtendible,
+  useLocalStorage,
+} from "tinacms";
+import Playground from "./Playground";
+import { Preview } from "./preview";
 
+// @ts-expect-error
+import schemaJson from "SCHEMA_IMPORT";
+// @ts-expect-error
+import staticMedia from "STATIC_MEDIA_IMPORT";
 // TODO: Resolve this to local file in tsconfig.json
 // @ts-expect-error
-import config from 'TINA_IMPORT';
-// @ts-expect-error
-import schemaJson from 'SCHEMA_IMPORT';
-// @ts-expect-error
-import staticMedia from 'STATIC_MEDIA_IMPORT';
+import config from "TINA_IMPORT";
 
-const RawEditor = React.lazy(() => import('./fields/rich-text'));
+const RawEditor = React.lazy(() => import("./fields/rich-text"));
 
 const Editor = (props) => {
   const [rawMode, setRawMode] = React.useState(false);
@@ -37,13 +42,13 @@ const SetPreview = () => {
       ...MdxFieldPluginExtendible,
       Component: Editor,
     });
-    const basePath = __BASE_PATH__.replace(/^\/|\/$/g, '');
-    cms.flags.set('tina-basepath', basePath);
+    const basePath = __BASE_PATH__.replace(/^\/|\/$/g, "");
+    cms.flags.set("tina-basepath", basePath);
     cms.flags.set(
-      'tina-preview',
-      `${basePath ? `${basePath}/` : ''}${config.build.outputFolder.replace(
+      "tina-preview",
+      `${basePath ? `${basePath}/` : ""}${config.build.outputFolder.replace(
         /^\/|\/$/g,
-        ''
+        ""
       )}`
     );
   }, []);
@@ -57,9 +62,10 @@ export const TinaAdminWrapper = () => {
     <TinaCMS
       {...config}
       schema={schema}
+      // TODO: This is being used when called on the server. This uses the at buildtime content api url. Which won't work when in a different branch
       client={{ apiUrl: __API_URL__ }}
       staticMedia={staticMedia}
-      // THis will be replaced by the version of the graphql package or --garphql-version flag. It is replaced by vite at compile time
+      // THis will be replaced by the version of the graphql ackage or --garphql-version flag. It is replaced by vite at compile time
       tinaGraphQLVersion={__TINA_GRAPHQL_VERSION__}
     >
       <SetPreview />
