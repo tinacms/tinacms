@@ -1,40 +1,73 @@
-import * as React from 'react';
-
-import type { Form } from '@toolkit/forms';
-import { FormLists } from './form-list';
-import { useCMS } from '@toolkit/react-core';
 import { FormBuilder, FormStatus } from '@toolkit/form-builder';
+import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
-import { SidebarContext } from './sidebar';
+import { useCMS } from '@toolkit/react-core';
+import * as React from 'react';
 import { BiDotsVertical, BiHomeAlt } from 'react-icons/bi';
+import { FormLists } from './form-list';
+import { SidebarContext } from './sidebar';
+import { SidebarLoadingPlaceholder } from './sidebar-loading-placeholder';
+import { SidebarNoFormsPlaceholder } from './sidebar-no-forms-placeholder';
 
-export const FormsView = ({
-  children,
-}: {
-  children?: React.ReactChild | React.ReactChild[];
-}) => {
+// this is the minimum time to show the loading indicator (in milliseconds)
+// this is to prevent the loading indicator from flashing or the 'no forms' placeholder from showing pre-maturely
+const minimumTimeToShowLoadingIndicator = 1000;
+
+export interface FormsViewProps {
+  loadingPlaceholder?: React.FC;
+}
+
+export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   const cms = useCMS();
   const { setFormIsPristine } = React.useContext(SidebarContext);
+  const [isShowingLoading, setIsShowingLoading] = React.useState(true); // Default to showing loading
+  const [initialLoadComplete, setInitialLoadComplete] = React.useState(false);
 
+  // Handle loading state with minimum display time
+  React.useEffect(() => {
+    // Always start with loading state
+    if (cms.state.isLoadingContent) {
+      setIsShowingLoading(true);
+
+      // Even if loading completes quickly, show the placeholder for a minimum time
+      const timer = setTimeout(() => {
+        if (!cms.state.isLoadingContent) {
+          setIsShowingLoading(false);
+          setInitialLoadComplete(true);
+        }
+      }, minimumTimeToShowLoadingIndicator);
+
+      return () => clearTimeout(timer);
+    } else {
+      // If not loading anymore, check if we need to maintain the placeholder
+      const timer = setTimeout(() => {
+        setIsShowingLoading(false);
+        setInitialLoadComplete(true);
+      }, minimumTimeToShowLoadingIndicator);
+
+      return () => clearTimeout(timer);
+    }
+  }, [cms.state.isLoadingContent]);
+
+  if (isShowingLoading || !initialLoadComplete) {
+    // Loading - show when explicitly loading or during initial render
+    const LoadingPlaceholder = loadingPlaceholder || SidebarLoadingPlaceholder;
+    return <LoadingPlaceholder />;
+  }
+
+  if (!cms.state.formLists.length) {
+    // No Forms
+    return <SidebarNoFormsPlaceholder />;
+  }
   const isMultiform = cms.state.forms.length > 1;
   const activeForm = cms.state.forms.find(
     ({ tinaForm }) => tinaForm.id === cms.state.activeFormId
   );
   const isEditing = !!activeForm;
-
-  /**
-   * No Forms
-   */
-  if (!cms.state.formLists.length) {
-    return <> {children} </>;
-  }
-
   if (isMultiform && !activeForm) {
     return <FormLists isEditing={isEditing} />;
   }
-
   const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
-
   return (
     <>
       {activeForm && (
@@ -66,16 +99,16 @@ const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
       style={
         isEditing
           ? {
-              transform: 'none',
-              animationName: 'fly-in-left',
-              animationDuration: '150ms',
-              animationDelay: '0',
-              animationIterationCount: 1,
-              animationTimingFunction: 'ease-out',
-            }
+            transform: 'none',
+            animationName: 'fly-in-left',
+            animationDuration: '150ms',
+            animationDelay: '0',
+            animationIterationCount: 1,
+            animationTimingFunction: 'ease-out',
+          }
           : {
-              transform: 'translate3d(100%, 0, 0)',
-            }
+            transform: 'translate3d(100%, 0, 0)',
+          }
       }
     >
       {children}
@@ -122,9 +155,8 @@ export const MultiformFormHeader = ({
               cms.state.activeFormId
             ).name;
 
-            window.location.href = `${
-              new URL(window.location.href).pathname
-            }#/collections/${collectionName}/~`;
+            window.location.href = `${new URL(window.location.href).pathname
+              }#/collections/${collectionName}/~`;
           }}
         >
           <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
@@ -168,9 +200,8 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
             const collectionName = cms.api.tina.schema.getCollectionByFullPath(
               cms.state.activeFormId
             ).name;
-            window.location.href = `${
-              new URL(window.location.href).pathname
-            }#/collections/${collectionName}/~`;
+            window.location.href = `${new URL(window.location.href).pathname
+              }#/collections/${collectionName}/~`;
           }}
         >
           <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />

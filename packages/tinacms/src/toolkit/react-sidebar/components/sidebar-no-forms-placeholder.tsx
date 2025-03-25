@@ -1,8 +1,7 @@
-import { LoadingDots } from '@toolkit/form-builder';
 import { Button } from '@toolkit/styles';
 import * as React from 'react';
 
-export const SidebarLoading = () => (
+export const SidebarNoFormsPlaceholder = () => (
   <div
     className='relative flex flex-col items-center justify-center text-center p-5 pb-16 w-full h-full overflow-y-auto'
     style={{
@@ -15,11 +14,10 @@ export const SidebarLoading = () => (
     }}
   >
     <p className='block pb-5'>
-      Please wait while TinaCMS
-      <br />
-      loads your content
+      Looks like there's <br />
+      nothing to edit on <br />
+      this page.
     </p>
-    <LoadingDots color={'var(--tina-color-primary)'} />
     <p className='block pt-5'>
       <Button
         href='https://tina.io/docs/contextual-editing/overview'

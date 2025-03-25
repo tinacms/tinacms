@@ -22,6 +22,9 @@ export function useTina<T extends object>(props: {
   React.useEffect(() => {
     setIsClient(true);
     setData(props.data);
+    parent.postMessage({
+      type: 'url-changed',
+    });
   }, [id]);
 
   React.useEffect(() => {
@@ -185,14 +188,14 @@ export function useEditState(): { edit: boolean } {
  */
 export const tinaField = <
   T extends
-    | (object & {
-        _content_source?: {
-          queryId: string;
-          path: (number | string)[];
-        };
-      })
-    | undefined
-    | null,
+  | (object & {
+    _content_source?: {
+      queryId: string;
+      path: (number | string)[];
+    };
+  })
+  | undefined
+  | null,
 >(
   object: T,
   property?: keyof Omit<NonNullable<T>, '__typename' | '_sys'>,

@@ -6,7 +6,8 @@ export type PostMessage =
     }
   | { type: 'field:selected'; fieldName: string }
   | { type: 'quick-edit'; value: boolean }
-  | { type: 'user-select-form'; formId: string };
+  | { type: 'user-select-form'; formId: string }
+  | { type: 'url-changed' };
 
 export type Payload = {
   id: string;

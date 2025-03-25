@@ -1,22 +1,22 @@
-import * as React from 'react';
-import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi';
-import type { IconType } from 'react-icons/lib';
-import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
-import type { SidebarState, SidebarStateOptions } from '../sidebar';
-import { useCMS, useSubscribable } from '@toolkit/react-core';
-import { useState } from 'react';
-import { Button } from '@toolkit/styles';
-import { FormsView } from './sidebar-body';
-import { ImFilesEmpty, ImUsers } from 'react-icons/im';
-import { IoMdClose } from 'react-icons/io';
-import { BillingWarning, LocalWarning } from './local-warning';
-import { MdOutlineArrowBackIos } from 'react-icons/md';
-import { Nav } from './nav';
-import { ResizeHandle } from './resize-handle';
 import { Transition, TransitionChild } from '@headlessui/react';
 import { useWindowWidth } from '@react-hook/window-size';
-import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
 import { BranchButton } from '@toolkit/plugin-branch-switcher';
+import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
+import { useCMS, useSubscribable } from '@toolkit/react-core';
+import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
+import { Button } from '@toolkit/styles';
+import * as React from 'react';
+import { useState } from 'react';
+import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi';
+import { ImFilesEmpty, ImUsers } from 'react-icons/im';
+import { IoMdClose } from 'react-icons/io';
+import type { IconType } from 'react-icons/lib';
+import { MdOutlineArrowBackIos } from 'react-icons/md';
+import type { SidebarState, SidebarStateOptions } from '../sidebar';
+import { BillingWarning, LocalWarning } from './local-warning';
+import { Nav } from './nav';
+import { ResizeHandle } from './resize-handle';
+import { FormsView } from './sidebar-body';
 
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
@@ -62,7 +62,7 @@ export function SidebarProvider({
         // @ts-ignore
         typeof cms?.sidebar?.renderNav !== 'undefined'
           ? // @ts-ignore
-            cms.sidebar.renderNav
+          cms.sidebar.renderNav
           : true
       }
       sidebar={sidebar}
@@ -297,9 +297,7 @@ const Sidebar = ({
               isLocalMode={cms.api?.tina?.isLocalMode}
               branchingEnabled={branchingEnabled}
             />
-            <FormsView>
-              <sidebar.placeholder />
-            </FormsView>
+            <FormsView loadingPlaceholder={sidebar.loadingPlaceholder} />
             {activeScreen && (
               <ScreenPluginModal
                 screen={activeScreen}
@@ -581,9 +579,8 @@ const SidebarCollectionLink = ({
   return (
     <a
       onClick={onClick}
-      href={`${
-        tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
-      }/collections/${collection.name}/~`}
+      href={`${tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+        }/collections/${collection.name}/~`}
       className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
     >
       <Icon className='mr-2 h-6 opacity-80 w-auto' />{' '}
@@ -592,7 +589,7 @@ const SidebarCollectionLink = ({
   );
 };
 
-const EditButton = ({}) => {
+const EditButton = ({ }) => {
   const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext);
 
   return (
@@ -601,11 +598,10 @@ const EditButton = ({}) => {
       variant='primary'
       size='custom'
       onClick={toggleSidebarOpen}
-      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${
-        displayState !== 'closed'
-          ? 'opacity-0 ease-in pointer-events-none'
-          : 'ease-out pointer-events-auto'
-      }`}
+      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${displayState !== 'closed'
+        ? 'opacity-0 ease-in pointer-events-none'
+        : 'ease-out pointer-events-auto'
+        }`}
       aria-label='opens cms sidebar'
     >
       <BiPencil className='h-6 w-auto' />
@@ -619,22 +615,19 @@ const SidebarWrapper = ({ children }) => {
 
   return (
     <div
-      className={`fixed top-0 left-0 h-dvh z-base ${
-        displayState === 'closed' ? 'pointer-events-none' : ''
-      }`}
+      className={`fixed top-0 left-0 h-dvh z-base ${displayState === 'closed' ? 'pointer-events-none' : ''
+        }`}
     >
       <div
-        className={`relative h-dvh transform flex ${
-          displayState !== 'closed' ? '' : '-translate-x-full'
-        } ${
-          resizingSidebar
+        className={`relative h-dvh transform flex ${displayState !== 'closed' ? '' : '-translate-x-full'
+          } ${resizingSidebar
             ? 'transition-none'
             : displayState === 'closed'
               ? 'transition-all duration-300 ease-in'
               : displayState === 'fullscreen'
                 ? 'transition-all duration-150 ease-out'
                 : 'transition-all duration-300 ease-out'
-        }`}
+          }`}
         style={{
           width: displayState === 'fullscreen' ? '100vw' : `${sidebarWidth}px`,
           maxWidth:
