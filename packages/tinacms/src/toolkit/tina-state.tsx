@@ -3,11 +3,11 @@ import { TinaCMS } from './tina-cms';
 
 type FormListItem =
   | {
-    type: 'document';
-    path: string;
-    formId: string;
-    subItems: FormListItem[];
-  }
+      type: 'document';
+      path: string;
+      formId: string;
+      subItems: FormListItem[];
+    }
   | { type: 'list'; label: string };
 
 type FormList = {
@@ -21,64 +21,64 @@ type FormList = {
 
 export type TinaAction =
   | {
-    type: 'forms:add';
-    value: Form;
-  }
+      type: 'forms:add';
+      value: Form;
+    }
   | {
-    type: 'forms:remove';
-    value: string;
-  }
+      type: 'forms:remove';
+      value: string;
+    }
   | {
-    type: 'forms:clear';
-  }
+      type: 'forms:clear';
+    }
   | {
-    type: 'form-lists:add';
-    value: FormList;
-  }
+      type: 'form-lists:add';
+      value: FormList;
+    }
   | {
-    type: 'form-lists:remove';
-    value: string;
-  }
+      type: 'form-lists:remove';
+      value: string;
+    }
   | {
-    type: 'forms:set-active-form-id';
-    value: string;
-  }
+      type: 'forms:set-active-form-id';
+      value: string;
+    }
   | {
-    type: 'forms:set-active-field-name';
-    value: { formId: string; fieldName: string };
-  }
+      type: 'forms:set-active-field-name';
+      value: { formId: string; fieldName: string };
+    }
   | {
-    type: 'form-lists:clear';
-  }
+      type: 'form-lists:clear';
+    }
   | {
-    type: 'set-edit-mode';
-    value: 'visual' | 'basic';
-  }
+      type: 'set-edit-mode';
+      value: 'visual' | 'basic';
+    }
   | {
-    type: 'increment-operation-index';
-  }
+      type: 'increment-operation-index';
+    }
   | {
-    type: 'set-quick-editing-supported';
-    value: boolean;
-  }
+      type: 'set-quick-editing-supported';
+      value: boolean;
+    }
   | {
-    type: 'set-quick-editing-enabled';
-    value?: boolean;
-  }
+      type: 'set-quick-editing-enabled';
+      value?: boolean;
+    }
   | {
-    type: 'toggle-quick-editing-enabled';
-  }
+      type: 'toggle-quick-editing-enabled';
+    }
   | {
-    type: 'toggle-edit-state';
-  }
+      type: 'toggle-edit-state';
+    }
   | {
-    type: 'sidebar:set-display-state';
-    value: TinaState['sidebarDisplayState'] | 'openOrFull';
-  }
+      type: 'sidebar:set-display-state';
+      value: TinaState['sidebarDisplayState'] | 'openOrFull';
+    }
   | {
-    type: 'sidebar:set-loading-state';
-    value: boolean;
-  };
+      type: 'sidebar:set-loading-state';
+      value: boolean;
+    };
 
 export interface TinaState {
   activeFormId: string | null;
@@ -170,7 +170,12 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         });
       }
 
-      return { ...state, activeFormId, formLists: nextFormLists, isLoadingContent: false };
+      return {
+        ...state,
+        activeFormId,
+        formLists: nextFormLists,
+        isLoadingContent: false,
+      };
     }
     case 'form-lists:remove': {
       const nextFormLists = state.formLists.filter(
@@ -222,9 +227,9 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       return state.sidebarDisplayState === 'closed'
         ? { ...state, sidebarDisplayState: 'open' }
         : {
-          ...state,
-          sidebarDisplayState: 'closed',
-        };
+            ...state,
+            sidebarDisplayState: 'closed',
+          };
     }
     case 'sidebar:set-display-state': {
       // In some cases, you may only care that the sidebar is open, regardless

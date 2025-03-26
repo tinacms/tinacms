@@ -62,7 +62,7 @@ export function SidebarProvider({
         // @ts-ignore
         typeof cms?.sidebar?.renderNav !== 'undefined'
           ? // @ts-ignore
-          cms.sidebar.renderNav
+            cms.sidebar.renderNav
           : true
       }
       sidebar={sidebar}
@@ -579,8 +579,9 @@ const SidebarCollectionLink = ({
   return (
     <a
       onClick={onClick}
-      href={`${tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
-        }/collections/${collection.name}/~`}
+      href={`${
+        tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+      }/collections/${collection.name}/~`}
       className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
     >
       <Icon className='mr-2 h-6 opacity-80 w-auto' />{' '}
@@ -589,7 +590,7 @@ const SidebarCollectionLink = ({
   );
 };
 
-const EditButton = ({ }) => {
+const EditButton = ({}) => {
   const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext);
 
   return (
@@ -598,10 +599,11 @@ const EditButton = ({ }) => {
       variant='primary'
       size='custom'
       onClick={toggleSidebarOpen}
-      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${displayState !== 'closed'
-        ? 'opacity-0 ease-in pointer-events-none'
-        : 'ease-out pointer-events-auto'
-        }`}
+      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${
+        displayState !== 'closed'
+          ? 'opacity-0 ease-in pointer-events-none'
+          : 'ease-out pointer-events-auto'
+      }`}
       aria-label='opens cms sidebar'
     >
       <BiPencil className='h-6 w-auto' />
@@ -615,19 +617,22 @@ const SidebarWrapper = ({ children }) => {
 
   return (
     <div
-      className={`fixed top-0 left-0 h-dvh z-base ${displayState === 'closed' ? 'pointer-events-none' : ''
-        }`}
+      className={`fixed top-0 left-0 h-dvh z-base ${
+        displayState === 'closed' ? 'pointer-events-none' : ''
+      }`}
     >
       <div
-        className={`relative h-dvh transform flex ${displayState !== 'closed' ? '' : '-translate-x-full'
-          } ${resizingSidebar
+        className={`relative h-dvh transform flex ${
+          displayState !== 'closed' ? '' : '-translate-x-full'
+        } ${
+          resizingSidebar
             ? 'transition-none'
             : displayState === 'closed'
               ? 'transition-all duration-300 ease-in'
               : displayState === 'fullscreen'
                 ? 'transition-all duration-150 ease-out'
                 : 'transition-all duration-300 ease-out'
-          }`}
+        }`}
         style={{
           width: displayState === 'fullscreen' ? '100vw' : `${sidebarWidth}px`,
           maxWidth:
