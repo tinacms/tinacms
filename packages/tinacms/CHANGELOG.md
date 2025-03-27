@@ -1,5 +1,18 @@
 # tinacms
 
+## 2.7.5
+
+### Patch Changes
+
+- [#5587](https://github.com/tinacms/tinacms/pull/5587) [`921f235`](https://github.com/tinacms/tinacms/commit/921f2356e4615d532d02eefa7103fdb70f83b97a) Thanks [@wicksipedia](https://github.com/wicksipedia)! - TinaCMS sidebar now has a loading indicator when loading content. Also fixed the link for contextual editing that was 404'ing
+
+- [#5580](https://github.com/tinacms/tinacms/pull/5580) [`b551232`](https://github.com/tinacms/tinacms/commit/b5512326ad0ad9855bc75e2073a3ab2a8ec4c064) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Editorial Workflow - improved create branch modal for non-devs
+
+- [#5560](https://github.com/tinacms/tinacms/pull/5560) [`ea204c9`](https://github.com/tinacms/tinacms/commit/ea204c9045451f3ebea04f503e6158d2016613e4) Thanks [@kldavis4](https://github.com/kldavis4)! - Sorting on fields within templates
+
+- Updated dependencies []:
+  - @tinacms/search@1.0.43
+
 ## 2.7.3
 
 ### Patch Changes
