@@ -18,7 +18,8 @@ import { log, TextStyles } from './util/logger';
 import { exit } from 'node:process';
 import validate from 'validate-npm-package-name';
 
-export const PKG_MANAGERS = ['npm', 'yarn', 'pnpm'];
+const PKG_MANAGERS = ['npm', 'yarn', 'pnpm', 'bun'] as const;
+export type PackageManager = (typeof PKG_MANAGERS)[number];
 
 export async function run() {
   preRunChecks();
@@ -165,7 +166,7 @@ export async function run() {
   }
 
   log.info('Installing packages.');
-  await install(rootDir, null, { packageManager: pkgManager, isOnline: true });
+  await install(pkgManager as PackageManager);
 
   log.info('Initializing git repository.');
   try {

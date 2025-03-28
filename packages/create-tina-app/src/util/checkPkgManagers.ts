@@ -1,7 +1,7 @@
 import { exec } from 'child_process';
-import { PKG_MANAGERS } from '..';
+import { PackageManager } from '..';
 
-export async function checkPackageExists(name: (typeof PKG_MANAGERS)[number]) {
+export async function checkPackageExists(name: PackageManager) {
   try {
     await new Promise((resolve, reject) => {
       exec(`${name} -v`, (error, stdout, stderr) => {
