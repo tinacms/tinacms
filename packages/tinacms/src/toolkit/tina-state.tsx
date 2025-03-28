@@ -74,6 +74,10 @@ export type TinaAction =
   | {
       type: 'sidebar:set-display-state';
       value: TinaState['sidebarDisplayState'] | 'openOrFull';
+    }
+  | {
+      type: 'sidebar:set-loading-state';
+      value: boolean;
     };
 
 export interface TinaState {
@@ -90,6 +94,7 @@ export interface TinaState {
   forms: { activeFieldName?: string | null; tinaForm: Form }[];
   formLists: FormList[];
   editingMode: 'visual' | 'basic';
+  isLoadingContent: boolean;
   quickEditSupported: boolean;
   sidebarDisplayState: 'closed' | 'open' | 'fullscreen';
 }
@@ -100,6 +105,7 @@ export const initialState = (cms: TinaCMS): TinaState => {
     forms: [],
     formLists: [],
     editingMode: 'basic',
+    isLoadingContent: false,
     quickEditSupported: false,
     sidebarDisplayState: cms?.sidebar?.defaultState || 'open',
   };
@@ -164,7 +170,12 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         });
       }
 
-      return { ...state, activeFormId, formLists: nextFormLists };
+      return {
+        ...state,
+        activeFormId,
+        formLists: nextFormLists,
+        isLoadingContent: false,
+      };
     }
     case 'form-lists:remove': {
       const nextFormLists = state.formLists.filter(
@@ -239,6 +250,9 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         };
       }
       return { ...state, sidebarDisplayState: action.value };
+    }
+    case 'sidebar:set-loading-state': {
+      return { ...state, isLoadingContent: action.value };
     }
     default:
       throw new Error(`Unhandled action ${action.type}`);

@@ -1,22 +1,22 @@
-import * as React from 'react';
-import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi';
-import type { IconType } from 'react-icons/lib';
-import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
-import type { SidebarState, SidebarStateOptions } from '../sidebar';
-import { useCMS, useSubscribable } from '@toolkit/react-core';
-import { useState } from 'react';
-import { Button } from '@toolkit/styles';
-import { FormsView } from './sidebar-body';
-import { ImFilesEmpty, ImUsers } from 'react-icons/im';
-import { IoMdClose } from 'react-icons/io';
-import { BillingWarning, LocalWarning } from './local-warning';
-import { MdOutlineArrowBackIos } from 'react-icons/md';
-import { Nav } from './nav';
-import { ResizeHandle } from './resize-handle';
 import { Transition, TransitionChild } from '@headlessui/react';
 import { useWindowWidth } from '@react-hook/window-size';
-import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
 import { BranchButton } from '@toolkit/plugin-branch-switcher';
+import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
+import { useCMS, useSubscribable } from '@toolkit/react-core';
+import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
+import { Button } from '@toolkit/styles';
+import * as React from 'react';
+import { useState } from 'react';
+import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi';
+import { ImFilesEmpty, ImUsers } from 'react-icons/im';
+import { IoMdClose } from 'react-icons/io';
+import type { IconType } from 'react-icons/lib';
+import { MdOutlineArrowBackIos } from 'react-icons/md';
+import type { SidebarState, SidebarStateOptions } from '../sidebar';
+import { BillingWarning, LocalWarning } from './local-warning';
+import { Nav } from './nav';
+import { ResizeHandle } from './resize-handle';
+import { FormsView } from './sidebar-body';
 
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
@@ -297,9 +297,7 @@ const Sidebar = ({
               isLocalMode={cms.api?.tina?.isLocalMode}
               branchingEnabled={branchingEnabled}
             />
-            <FormsView>
-              <sidebar.placeholder />
-            </FormsView>
+            <FormsView loadingPlaceholder={sidebar.loadingPlaceholder} />
             {activeScreen && (
               <ScreenPluginModal
                 screen={activeScreen}

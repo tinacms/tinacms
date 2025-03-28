@@ -1,6 +1,6 @@
-import { EventBus, Callback } from '../core';
-import { NoFormsPlaceholder } from './components/no-forms-placeholder';
 import * as React from 'react';
+import { Callback, EventBus } from '../core';
+import { SidebarLoadingPlaceholder } from './components/sidebar-loading-placeholder';
 
 export interface SidebarStateOptions {
   position?: SidebarPosition;
@@ -26,7 +26,7 @@ export declare type DefaultSidebarState = 'open' | 'closed';
 
 export class SidebarState {
   private _isOpen: boolean = false;
-  placeholder: React.FC;
+  loadingPlaceholder: React.FC;
   defaultState: DefaultSidebarState;
 
   position: SidebarPosition = 'displace';
@@ -43,7 +43,7 @@ export class SidebarState {
     // @ts-ignore FIXME twind
     this.position = options.position || 'displace';
     this.renderNav = options.renderNav || true;
-    this.placeholder = options.placeholder || NoFormsPlaceholder;
+    this.loadingPlaceholder = options.placeholder || SidebarLoadingPlaceholder;
 
     if (options.buttons?.save) {
       this.buttons.save = options.buttons.save;
