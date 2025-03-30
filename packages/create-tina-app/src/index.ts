@@ -68,8 +68,7 @@ export async function run() {
     template = TEMPLATES.find((_template) => _template.value === template);
     if (!template) {
       log.err(
-        `The provided template '${
-          opts.template
+        `The provided template '${opts.template
         }' is invalid. Please provide one of the following: ${TEMPLATES.map(
           (x) => x.value
         )}`
@@ -187,22 +186,22 @@ export async function run() {
 
   if (template.value === 'tina-hugo-starter')
     log.warn(
-      'Hugo is required for this starter. Install it: https://gohugo.io/installation/'
+      `Hugo is required for this starter. Install it via ${TextStyles.link('https://gohugo.io/installation/')}.`
     );
 
   log.log(TextStyles.bold('\nTo launch your app, run:\n'));
   log.cmd(`cd ${appName}\n${pkgManager} run dev`);
   log.log(`\nNext steps:
     • 📝 Edit some content on ${TextStyles.link(
-      'http://localhost:3000'
-    )} (See ${TextStyles.link('https://tina.io/docs/using-tina-editor')})
+    'http://localhost:3000'
+  )} (See ${TextStyles.link('https://tina.io/docs/using-tina-editor')})
     • 📖 Learn the basics: ${TextStyles.link('https://tina.io/docs/schema/')}
     • 🖌️ Extend Tina with custom field components: ${TextStyles.link(
-      'https://tina.io/docs/advanced/extending-tina/'
-    )}
+    'https://tina.io/docs/advanced/extending-tina/'
+  )}
     • 🚀 Deploy to Production: ${TextStyles.link(
-      'https://tina.io/docs/tina-cloud/'
-    )}
+    'https://tina.io/docs/tina-cloud/'
+  )}
   `);
 }
 
