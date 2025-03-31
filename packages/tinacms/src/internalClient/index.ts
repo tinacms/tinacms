@@ -168,8 +168,8 @@ export class Client {
       `https://content.tinajs.io`;
 
     this.contentApiUrl =
-      `${this.contentApiBase}/${this.tinaGraphQLVersion}/content/${this.options.clientId}/github/${encodedBranch}` ||
-      this.options.customContentApiUrl;
+      this.options.customContentApiUrl ||
+      `${this.contentApiBase}/${this.tinaGraphQLVersion}/content/${this.options.clientId}/github/${encodedBranch}`;
     if (this.authProvider instanceof TinaCloudAuthProvider) {
       this.authProvider.identityApiUrl = this.identityApiUrl;
       this.authProvider.frontendUrl = this.frontendUrl;
