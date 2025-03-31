@@ -661,7 +661,7 @@
 
 ### Patch Changes
 
-- ae3abe927: handle image array in Tina Cloud media transformation
+- ae3abe927: handle image array in TinaCloud media transformation
 
 ## 1.4.3
 
@@ -773,7 +773,7 @@
 
 ### Patch Changes
 
-- a8457798a: Fix LevelDB initialization to throw a GraphQL error that can be handled correctly in Tina Cloud
+- a8457798a: Fix LevelDB initialization to throw a GraphQL error that can be handled correctly in TinaCloud
 - 94b8bb6e0: Fix update Database.get to properly handle LEVEL_NOT_FOUND errors
 - e732906b6: Support .yml file extension for yaml files
 - Updated dependencies [169147490]
@@ -1311,7 +1311,7 @@
 
 ### Patch Changes
 
-- f6cb634c2: Added an optional config key to the schema that will be used for tina cloud media store
+- f6cb634c2: Added an optional config key to the schema that will be used for TinaCloud media store
 - b1a4290e6: Use media config from the schema in the local media server
 - 1955b8842: Uses new `schema.config` when resolving media/asset urls
 - 8b81c3cf3: Added more context to error messages to help to user debug issues
@@ -1665,7 +1665,7 @@
 
 ### Patch Changes
 
-- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with Tina Cloud
+- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with TinaCloud
 
 ## 0.58.2
 

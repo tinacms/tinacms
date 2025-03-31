@@ -31,7 +31,7 @@ function sleep(ms) {
 }
 
 export interface TinaCloudMediaStoreClass {
-  new (client: Client): MediaStore;
+  new(client: Client): MediaStore;
 }
 export interface TinaCloudAuthWallProps {
   cms?: TinaCMS;
@@ -41,8 +41,8 @@ export interface TinaCloudAuthWallProps {
     closeModal: () => void;
   }) => { name: string; action: () => Promise<void>; primary: boolean }[];
   mediaStore?:
-    | TinaCloudMediaStoreClass
-    | (() => Promise<TinaCloudMediaStoreClass>);
+  | TinaCloudMediaStoreClass
+  | (() => Promise<TinaCloudMediaStoreClass>);
 }
 
 export const AuthWallInner = ({
@@ -51,7 +51,7 @@ export const AuthWallInner = ({
   getModalActions,
 }: TinaCloudAuthWallProps) => {
   const client: Client = cms.api.tina;
-  // Whether we are using Tina Cloud for auth
+  // Whether we are using TinaCloud for auth
   const isTinaCloud =
     !client.isLocalMode &&
     !client.schema?.config?.config?.contentApiUrlOverride;
@@ -132,10 +132,10 @@ export const AuthWallInner = ({
 
   const otherModalActions = getModalActions
     ? getModalActions({
-        closeModal: () => {
-          setActiveModal(null);
-        },
-      })
+      closeModal: () => {
+        setActiveModal(null);
+      },
+    })
     : [];
 
   const handleAuthenticate = async (
@@ -160,7 +160,7 @@ export const AuthWallInner = ({
     }
   };
 
-  let modalTitle = 'Tina Cloud';
+  let modalTitle = 'TinaCloud';
   if (
     activeModal === 'authenticate' &&
     loginStrategy === 'Redirect' &&
@@ -187,7 +187,7 @@ export const AuthWallInner = ({
           title={modalTitle}
           message={
             isTinaCloud
-              ? 'Your site uses Tina Cloud to track changes. To make edits, you must log in.'
+              ? 'Your site uses TinaCloud to track changes. To make edits, you must log in.'
               : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
           }
           close={close}
@@ -296,11 +296,11 @@ export const AuthWallInner = ({
       {showChildren
         ? children
         : client.authProvider?.getLoginStrategy() === 'LoginScreen' &&
-            loginScreen
+          loginScreen
           ? loginScreen({
-              handleAuthenticate: async (props: Record<string, string>) =>
-                handleAuthenticate(props),
-            })
+            handleAuthenticate: async (props: Record<string, string>) =>
+              handleAuthenticate(props),
+          })
           : null}
     </>
   );
@@ -403,7 +403,7 @@ export const TinaCloudProvider = (
     }
   };
   const client: Client = cms.api.tina;
-  // Weather or not we are using Tina Cloud for auth
+  // Weather or not we are using TinaCloud for auth
   const isTinaCloud =
     !client.isLocalMode &&
     !client.schema?.config?.config?.contentApiUrlOverride;

@@ -1,4 +1,4 @@
-The _Tina Cloud CLI_ can be used to set up your project with Tina Cloud configuration, and run a local version of the Tina Cloud content-api (using your file system's content). For a real-world example of how this is being used checkout the [Tina Cloud Starter](https://github.com/tinacms/tina-cloud-starter).
+The _TinaCloud CLI_ can be used to set up your project with TinaCloud configuration, and run a local version of the TinaCloud content-api (using your file system's content). For a real-world example of how this is being used checkout the [TinaCloud Starter](https://github.com/tinacms/tina-cloud-starter).
 
 ## Installation
 
@@ -30,7 +30,7 @@ Commands:
   server:start [options]    Start Filesystem Graphql Server
   schema:compile [options]  Compile schema into static files for the server
   schema:types [options]    Generate a GraphQL query for your site's schema, (and optionally Typescript types)
-  init [options]            Add Tina Cloud to an existing project
+  init [options]            Add TinaCloud to an existing project
   audit [options]           Audit your schema and the files to check for errors
   help [command]            display help for command
 ```

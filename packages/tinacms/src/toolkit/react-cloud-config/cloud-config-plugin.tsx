@@ -4,13 +4,13 @@ import { Plugin } from '@toolkit/core';
 import type { IconType } from 'react-icons';
 
 /**
- * Represents a Tina Cloud Config that should be accessible via the CMS.
+ * Represents a TinaCloud Config that should be accessible via the CMS.
  *
  * The purpose of these configs is to give a way to display & edit information
- * about TIna Cloud Configuration
+ * about TinaCloud Configuration
  * cases may include:
  *
- * * Tina Cloud Project Configuration
+ * * TinaCloud Project Configuration
  * * User Management
  */
 export interface CloudConfigPlugin extends Plugin {

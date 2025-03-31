@@ -1,10 +1,10 @@
-import Progress from 'progress';
 import { type Config, parseURL } from '@tinacms/schema-tools';
+import Progress from 'progress';
 
 import { logger } from '../../../logger';
+import { sleepAndCallFunc } from '../../../utils/sleep';
 import { spin } from '../../../utils/spinner';
 import { logText } from '../../../utils/theme';
-import { sleepAndCallFunc } from '../../../utils/sleep';
 
 const POLLING_INTERVAL = 5000;
 
@@ -34,16 +34,16 @@ export const waitForDB = async (
   const token = config.token;
   const { clientId, branch, isLocalClient, host } = parseURL(apiUrl);
 
-  // Can't check status if we're not using Tina Cloud
+  // Can't check status if we're not using TinaCloud
   if (isLocalClient || !host || !clientId || !branch) {
     if (verbose) {
-      logger.info(logText('Not using Tina Cloud, skipping DB check'));
+      logger.info(logText('Not using TinaCloud, skipping DB check'));
     }
     return;
   }
 
   const bar = new Progress(
-    'Checking indexing process in Tina Cloud... :prog',
+    'Checking indexing process in TinaCloud... :prog',
     1
   );
 
@@ -89,7 +89,7 @@ export const waitForDB = async (
         throw new IndexFailedError(
           `Attempting to index but responded with status 'failed'. To retry the indexing process, click the "Reindex" button for '${
             previewName || branch
-          }' in the Tina Cloud configuration for this project.  ${error}`
+          }' in the TinaCloud configuration for this project.  ${error}`
         );
 
         // Index Unknown
@@ -97,7 +97,7 @@ export const waitForDB = async (
         throw new IndexFailedError(
           `Attempting to index but responded with status 'unknown'. To retry the indexing process, click the "Reindex" button for '${
             previewName || branch
-          }' in the Tina Cloud configuration for this project.  ${error}`
+          }' in the TinaCloud configuration for this project.  ${error}`
         );
       }
     } catch (e) {
@@ -115,7 +115,7 @@ export const waitForDB = async (
   };
 
   await spin({
-    text: 'Checking indexing process in Tina Cloud...',
+    text: 'Checking indexing process in TinaCloud...',
     waitFor: pollForStatus,
   });
 };
