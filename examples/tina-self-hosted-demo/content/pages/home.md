@@ -1,5 +1,5 @@
 ---
-title: Tina Cloud Starter
+title: TinaCloud Starter
 blocks:
   - items:
       - icon:

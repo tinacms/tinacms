@@ -26,7 +26,7 @@ import { useTinaAuthRedirect } from './useTinaAuthRedirect';
 
 type ModalNames = null | 'authenticate' | 'error';
 
-function sleep(ms) {
+function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -51,7 +51,7 @@ export const AuthWallInner = ({
   getModalActions,
 }: TinaCloudAuthWallProps) => {
   const client: Client = cms.api.tina;
-  // Whether we are using Tina Cloud for auth
+  // Whether we are using TinaCloud for auth
   const isTinaCloud =
     !client.isLocalMode &&
     !client.schema?.config?.config?.contentApiUrlOverride;
@@ -160,7 +160,7 @@ export const AuthWallInner = ({
     }
   };
 
-  let modalTitle = 'Tina Cloud';
+  let modalTitle = 'TinaCloud';
   if (
     activeModal === 'authenticate' &&
     loginStrategy === 'Redirect' &&
@@ -187,7 +187,7 @@ export const AuthWallInner = ({
           title={modalTitle}
           message={
             isTinaCloud
-              ? 'Your site uses Tina Cloud to track changes. To make edits, you must log in.'
+              ? 'Your site uses TinaCloud to track changes. To make edits, you must log in.'
               : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
           }
           close={close}
@@ -403,7 +403,7 @@ export const TinaCloudProvider = (
     }
   };
   const client: Client = cms.api.tina;
-  // Weather or not we are using Tina Cloud for auth
+  // Weather or not we are using TinaCloud for auth
   const isTinaCloud =
     !client.isLocalMode &&
     !client.schema?.config?.config?.contentApiUrlOverride;

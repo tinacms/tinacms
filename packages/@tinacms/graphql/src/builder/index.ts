@@ -2,29 +2,29 @@
 
 */
 
+import { NAMER, SysFieldDefinition, astBuilder } from '../ast-builder';
 import { LookupMapType } from '../database';
-import { astBuilder, NAMER, SysFieldDefinition } from '../ast-builder';
 import { sequential } from '../util';
 import { staticDefinitions } from './static-definitions';
 
 import type {
-  UnionTypeDefinitionNode,
-  ObjectTypeDefinitionNode,
-  TypeDefinitionNode,
-  InputObjectTypeDefinitionNode,
-  FieldNode,
-  SelectionSetNode,
-  InlineFragmentNode,
   FieldDefinitionNode,
+  FieldNode,
+  InlineFragmentNode,
+  InputObjectTypeDefinitionNode,
   NamedTypeNode,
+  ObjectTypeDefinitionNode,
+  SelectionSetNode,
+  TypeDefinitionNode,
+  UnionTypeDefinitionNode,
 } from 'graphql';
 
 import type {
-  Collection,
-  TinaField,
-  CollectionTemplateable,
   Collectable,
+  Collection,
+  CollectionTemplateable,
   Template,
+  TinaField,
 } from '@tinacms/schema-tools';
 import { TinaSchema } from '@tinacms/schema-tools';
 import { mapUserFields } from '../auth/utils';
@@ -535,7 +535,7 @@ export class Builder {
    * ```
    *
    * @public
-   * @param collection a Tina Cloud collection
+   * @param collection a TinaCloud collection
    */
   public collectionFragment = async (collection: Collection<true>) => {
     const name = NAMER.dataTypeName(collection.namespace);

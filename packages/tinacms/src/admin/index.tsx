@@ -1,11 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import {
-  HashRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
 import {
   Button,
   Modal,
@@ -16,16 +8,24 @@ import {
   TinaCMS,
   useCMS,
 } from '@tinacms/toolkit';
+import React, { useState, useEffect } from 'react';
+import {
+  Route,
+  HashRouter as Router,
+  Routes,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 
+import GetCMS from './components/GetCMS';
 import Layout from './components/Layout';
 import Sidebar from './components/Sidebar';
-import GetCMS from './components/GetCMS';
 
-import DashboardPage from './pages/DashboardPage';
-import CollectionListPage from './pages/CollectionListPage';
 import CollectionCreatePage from './pages/CollectionCreatePage';
 import CollectionDuplicatePage from './pages/CollectionDuplicatePage';
+import CollectionListPage from './pages/CollectionListPage';
 import CollectionUpdatePage from './pages/CollectionUpdatePage';
+import DashboardPage from './pages/DashboardPage';
 import ScreenPage from './pages/ScreenPage';
 
 import { Client } from '../internalClient';
@@ -139,7 +139,7 @@ const CheckSchema = ({
         })
         .catch((e) => {
           // TODO: HACK- Check on an error id, rather than message string
-          if (e.message.includes('has not been indexed by Tina Cloud')) {
+          if (e.message.includes('has not been indexed by TinaCloud')) {
             setSchemaMissingError(true);
           } else {
             cms.alerts.error(`Unexpected error checking schema: ${e}`);

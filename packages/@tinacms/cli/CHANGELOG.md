@@ -862,7 +862,7 @@
 
   fix: Use clean page-sizes on media manager (to make pagination more obvious)
 
-  Fix issue with uploading media in a folder with tina cloud
+  Fix issue with uploading media in a folder with TinaCloud
 
 - Updated dependencies [9c27087fb]
 - Updated dependencies [65d0a701f]
