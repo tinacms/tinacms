@@ -1,25 +1,25 @@
-import * as React from 'react';
-import { BranchSwitcherProps, Branch } from './types';
-import { useBranchData } from './branch-data';
 import { BaseTextField, FieldLabel, Select } from '@toolkit/fields';
-import { Button, OverflowMenu } from '@toolkit/styles';
 import { LoadingDots, PrefixedTextField } from '@toolkit/form-builder';
+import { useCMS } from '@toolkit/react-core';
+import { Button, OverflowMenu } from '@toolkit/styles';
+import { formatDistanceToNow } from 'date-fns';
+import * as React from 'react';
+import { AiFillWarning } from 'react-icons/ai';
 import {
   BiError,
   BiGitBranch,
-  BiRefresh,
-  BiSearch,
+  BiLinkExternal,
   BiLock,
   BiPencil,
-  BiLinkExternal,
+  BiRefresh,
+  BiSearch,
 } from 'react-icons/bi';
+import { FaSpinner } from 'react-icons/fa';
 import { GrCircleQuestion } from 'react-icons/gr';
 import { MdArrowForward, MdOutlineClear } from 'react-icons/md';
-import { AiFillWarning } from 'react-icons/ai';
-import { FaSpinner } from 'react-icons/fa';
-import { useCMS } from '@toolkit/react-core';
+import { useBranchData } from './branch-data';
 import { BranchSwitcherLegacy } from './branch-switcher-legacy';
-import { formatDistanceToNow } from 'date-fns';
+import { Branch, BranchSwitcherProps } from './types';
 
 type ListState = 'loading' | 'ready' | 'error';
 
@@ -165,7 +165,7 @@ export const EditoralBranchSwitcher = ({
                 className='transition-all duration-150 ease-out text-blue-600 hover:text-blue-400 hover:underline no-underline'
                 href='https://tina.io/docs/tina-cloud/'
               >
-                Learn more about moving to production with Tina Cloud.
+                Learn more about moving to production with TinaCloud.
               </a>
             </p>
             <p>

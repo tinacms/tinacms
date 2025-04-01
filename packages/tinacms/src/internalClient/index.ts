@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-import { TokenObject } from '../auth/authenticate';
 //@ts-ignore can't locate BranchChangeEvent
 import { BranchChangeEvent, BranchData, EventBus } from '@tinacms/toolkit';
 import {
@@ -8,26 +7,27 @@ import {
   GraphQLSchema,
   buildClientSchema,
   getIntrospectionQuery,
-  print,
   parse,
+  print,
 } from 'graphql';
+import { TokenObject } from '../auth/authenticate';
 
-import gql from 'graphql-tag';
 import {
+  AuthProvider,
+  Schema,
   TinaSchema,
   addNamespaceToSchema,
-  Schema,
-  AuthProvider,
 } from '@tinacms/schema-tools';
-import { TinaCloudProject } from './types';
 import {
+  SearchClient,
   optionsToSearchIndexOptions,
   parseSearchIndexResponse,
   queryToSearchIndexQuery,
-  SearchClient,
 } from '@tinacms/search/dist/index-client';
+import gql from 'graphql-tag';
 import { AsyncData, asyncPoll } from './asyncPoll';
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
+import { TinaCloudProject } from './types';
 
 export * from './authProvider';
 
@@ -288,7 +288,7 @@ mutation addPendingDocumentMutation(
       if (!this.isCustomContentApi) {
         errorMessage = `${errorMessage}, Please check that the following information is correct: \n\tclientId: ${this.options.clientId}\n\tbranch: ${this.branch}.`;
         if (this.branch !== 'main') {
-          errorMessage = `${errorMessage}\n\tNote: This error can occur if the branch does not exist on GitHub or on Tina Cloud`;
+          errorMessage = `${errorMessage}\n\tNote: This error can occur if the branch does not exist on GitHub or on TinaCloud`;
         }
       }
 
@@ -470,7 +470,7 @@ mutation addPendingDocumentMutation(
                 unknownCount++;
                 if (unknownCount > 5) {
                   throw new Error(
-                    'AsyncPoller: status unknown for too long, please check indexing progress the Tina Cloud dashboard'
+                    'AsyncPoller: status unknown for too long, please check indexing progress the TinaCloud dashboard'
                   );
                 }
               }
