@@ -18,7 +18,13 @@ import { log, TextStyles } from './util/logger';
 import { exit } from 'node:process';
 import validate from 'validate-npm-package-name';
 
-export const PKG_MANAGERS = ['npm', 'yarn', 'pnpm'];
+/**
+ * The available package managers a user can use.
+ * To add a new supported package manager, add the usage command to this list.
+ * The `PackageManager` type will be automatically updated as a result.
+ */
+const PKG_MANAGERS = ['npm', 'yarn', 'pnpm', 'bun'] as const;
+export type PackageManager = (typeof PKG_MANAGERS)[number];
 
 export async function run() {
   preRunChecks();
@@ -165,7 +171,7 @@ export async function run() {
   }
 
   log.info('Installing packages.');
-  await install(rootDir, null, { packageManager: pkgManager, isOnline: true });
+  await install(pkgManager as PackageManager);
 
   log.info('Initializing git repository.');
   try {
@@ -181,7 +187,7 @@ export async function run() {
 
   if (template.value === 'tina-hugo-starter')
     log.warn(
-      'Hugo is required for this starter. Install it: https://gohugo.io/installation/'
+      `Hugo is required for this starter. Install it via ${TextStyles.link('https://gohugo.io/installation/')}.`
     );
 
   log.log(TextStyles.bold('\nTo launch your app, run:\n'));
