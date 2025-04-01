@@ -208,10 +208,10 @@ export const getFilteredBranchList = (
   // return list with current branch at top
   return [
     currentBranchItem ||
-    ({
-      name: currentBranchName,
-      indexStatus: { status: 'failed' },
-    } as Branch),
+      ({
+        name: currentBranchName,
+        indexStatus: { status: 'failed' },
+      } as Branch),
     ...filteredBranchList.filter((branch) => branch.name !== currentBranchName),
   ];
 };
@@ -269,12 +269,13 @@ const BranchSelector = ({
             const indexingStatus = branch?.indexStatus?.status;
             return (
               <div
-                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 ${indexingStatus !== 'complete'
+                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
+                  indexingStatus !== 'complete'
                     ? 'bg-gray-50 text-gray-400 pointer-events-none'
                     : isCurrentBranch
                       ? 'cursor-pointer bg-blue-50 text-blue-800 pointer-events-none hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
                       : 'cursor-pointer hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
-                  }`}
+                }`}
                 key={branch.name}
                 onClick={() => {
                   if (indexingStatus === 'complete') {

@@ -466,13 +466,15 @@ export function MediaPicker({
             <div className='flex w-full flex-col h-full @container'>
               <ul
                 {...rootProps}
-                className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${list.items.length === 0 ||
+                className={`h-full grow overflow-y-auto transition duration-150 ease-out bg-gradient-to-b from-gray-50/50 to-gray-50 ${
+                  list.items.length === 0 ||
                   (viewMode === 'list' &&
                     'w-full flex flex-1 flex-col justify-start -mb-px')
-                  } ${list.items.length > 0 &&
+                } ${
+                  list.items.length > 0 &&
                   viewMode === 'grid' &&
                   'w-full p-4 gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 4xl:grid-cols-6 6xl:grid-cols-9 auto-rows-auto content-start justify-start'
-                  } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
+                } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
               >
                 <input {...getInputProps()} />
 
@@ -532,10 +534,11 @@ const ActiveItemPreview = ({
     : '';
   return (
     <div
-      className={`shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto bg-white border-l border-gray-100 bg-white shadow-md transition ease-out duration-150 ${activeItem
+      className={`shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto bg-white border-l border-gray-100 bg-white shadow-md transition ease-out duration-150 ${
+        activeItem
           ? `p-4 opacity-100 w-[35%] max-w-[560px] min-w-[240px]`
           : `translate-x-8 opacity-0 w-[0px]`
-        }`}
+      }`}
     >
       {activeItem && (
         <>
@@ -757,8 +760,9 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
       className={`grow-0 flex justify-between rounded-md border border-gray-100`}
     >
       <button
-        className={`${toggleClasses.base} px-2.5 rounded-l-md ${viewMode === 'grid' ? toggleClasses.active : toggleClasses.inactive
-          }`}
+        className={`${toggleClasses.base} px-2.5 rounded-l-md ${
+          viewMode === 'grid' ? toggleClasses.active : toggleClasses.inactive
+        }`}
         onClick={() => {
           setViewMode('grid');
         }}
@@ -766,8 +770,9 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
         <BiGridAlt className='w-6 h-full opacity-70' />
       </button>
       <button
-        className={`${toggleClasses.base} px-2 rounded-r-md ${viewMode === 'list' ? toggleClasses.active : toggleClasses.inactive
-          }`}
+        className={`${toggleClasses.base} px-2 rounded-r-md ${
+          viewMode === 'list' ? toggleClasses.active : toggleClasses.inactive
+        }`}
         onClick={() => {
           setViewMode('list');
         }}

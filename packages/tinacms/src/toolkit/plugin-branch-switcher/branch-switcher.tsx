@@ -247,10 +247,10 @@ export const getFilteredBranchList = (
   // return list with current branch at top
   return [
     currentBranchItem ||
-    ({
-      name: currentBranchName,
-      indexStatus: { status: 'failed' },
-    } as Branch),
+      ({
+        name: currentBranchName,
+        indexStatus: { status: 'failed' },
+      } as Branch),
     ...filteredBranchList.filter((branch) => branch.name !== currentBranchName),
   ];
 };
@@ -431,12 +431,13 @@ const BranchSelector = ({
             const indexingStatus = branch?.indexStatus?.status;
             return (
               <div
-                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${indexingStatus !== 'complete'
+                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
+                  indexingStatus !== 'complete'
                     ? 'bg-gray-50 text-gray-400'
                     : isCurrentBranch
                       ? 'border-blue-500 border-l-5 bg-blue-50 text-blue-800 border-b-0'
                       : 'border-b-2'
-                  }`}
+                }`}
                 key={branch.name}
               >
                 <div className='w-1/2'>
@@ -481,23 +482,23 @@ const BranchSelector = ({
                   )}
                   {(branch.githubPullRequestUrl ||
                     typeof previewFunction === 'function') && (
-                      <div className='ml-auto'>
-                        <OverflowMenu
-                          toolbarItems={[
-                            branch.githubPullRequestUrl && {
-                              name: 'github-pr',
-                              label: 'View in GitHub',
-                              Icon: (
-                                <BiLinkExternal className='w-5 h-auto text-blue-500 opacity-70' />
-                              ),
-                              onMouseDown: () => {
-                                window.open(
-                                  branch.githubPullRequestUrl,
-                                  '_blank'
-                                );
-                              },
+                    <div className='ml-auto'>
+                      <OverflowMenu
+                        toolbarItems={[
+                          branch.githubPullRequestUrl && {
+                            name: 'github-pr',
+                            label: 'View in GitHub',
+                            Icon: (
+                              <BiLinkExternal className='w-5 h-auto text-blue-500 opacity-70' />
+                            ),
+                            onMouseDown: () => {
+                              window.open(
+                                branch.githubPullRequestUrl,
+                                '_blank'
+                              );
                             },
-                            typeof previewFunction === 'function' &&
+                          },
+                          typeof previewFunction === 'function' &&
                             previewFunction({ branch: branch.name })?.url && {
                               name: 'preview',
                               label: 'Preview',
@@ -508,10 +509,10 @@ const BranchSelector = ({
                                 window.open(previewUrl, '_blank');
                               },
                             },
-                          ].filter(Boolean)}
-                        />
-                      </div>
-                    )}
+                        ].filter(Boolean)}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             );
