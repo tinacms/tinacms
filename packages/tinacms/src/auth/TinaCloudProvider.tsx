@@ -31,7 +31,7 @@ function sleep(ms: number) {
 }
 
 export interface TinaCloudMediaStoreClass {
-  new(client: Client): MediaStore;
+  new (client: Client): MediaStore;
 }
 export interface TinaCloudAuthWallProps {
   cms?: TinaCMS;
@@ -41,8 +41,8 @@ export interface TinaCloudAuthWallProps {
     closeModal: () => void;
   }) => { name: string; action: () => Promise<void>; primary: boolean }[];
   mediaStore?:
-  | TinaCloudMediaStoreClass
-  | (() => Promise<TinaCloudMediaStoreClass>);
+    | TinaCloudMediaStoreClass
+    | (() => Promise<TinaCloudMediaStoreClass>);
 }
 
 export const AuthWallInner = ({
@@ -132,10 +132,10 @@ export const AuthWallInner = ({
 
   const otherModalActions = getModalActions
     ? getModalActions({
-      closeModal: () => {
-        setActiveModal(null);
-      },
-    })
+        closeModal: () => {
+          setActiveModal(null);
+        },
+      })
     : [];
 
   const handleAuthenticate = async (
@@ -296,11 +296,11 @@ export const AuthWallInner = ({
       {showChildren
         ? children
         : client.authProvider?.getLoginStrategy() === 'LoginScreen' &&
-          loginScreen
+            loginScreen
           ? loginScreen({
-            handleAuthenticate: async (props: Record<string, string>) =>
-              handleAuthenticate(props),
-          })
+              handleAuthenticate: async (props: Record<string, string>) =>
+                handleAuthenticate(props),
+            })
           : null}
     </>
   );
