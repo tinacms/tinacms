@@ -261,7 +261,8 @@ const GetCollection = ({
     sortKey,
     filterArgs
   );
-  const { collection, loading, error, reFetchCollection, collectionExtra } = search ? searchCollectionResult : getCollectionResult;
+  const { collection, loading, error, reFetchCollection, collectionExtra } =
+    search ? searchCollectionResult : getCollectionResult;
 
   useEffect(() => {
     if (loading) return;
