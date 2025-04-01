@@ -2,13 +2,12 @@ import { EventBus } from '@toolkit/core';
 import { describe, it, vi } from 'vitest';
 import { Alerts } from './alerts';
 
+// biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
+vi.useFakeTimers();
+
 const events = new EventBus();
 
 describe('Alerts', () => {
-  beforeAll(() => {
-    vi.useFakeTimers();
-  });
-
   it('is empty by default', () => {
     const alerts = new Alerts(events);
 
