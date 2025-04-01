@@ -256,26 +256,25 @@ const GetCollection = ({
 
   const { collection, loading, error, reFetchCollection, collectionExtra } =
     search
-      // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
-      ? useSearchCollection(
-        cms,
-        collectionName,
-        includeDocuments,
-        folder,
-        startCursor || '',
-        search
-      )
-
-      // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
-      : useGetCollection(
-        cms,
-        collectionName,
-        includeDocuments,
-        folder,
-        startCursor || '',
-        sortKey,
-        filterArgs
-      ) || {};
+      ? // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
+        useSearchCollection(
+          cms,
+          collectionName,
+          includeDocuments,
+          folder,
+          startCursor || '',
+          search
+        )
+      : // biome-ignore lint/correctness/useHookAtTopLevel: not ready to fix these yet
+        useGetCollection(
+          cms,
+          collectionName,
+          includeDocuments,
+          folder,
+          startCursor || '',
+          sortKey,
+          filterArgs
+        ) || {};
 
   useEffect(() => {
     if (loading) return;
