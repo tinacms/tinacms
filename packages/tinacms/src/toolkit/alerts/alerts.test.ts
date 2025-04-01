@@ -1,12 +1,14 @@
-import { Alerts } from './alerts';
 import { EventBus } from '@toolkit/core';
 import { describe, it, vi } from 'vitest';
-
-vi.useFakeTimers();
+import { Alerts } from './alerts';
 
 const events = new EventBus();
 
 describe('Alerts', () => {
+  beforeAll(() => {
+    vi.useFakeTimers();
+  });
+
   it('is empty by default', () => {
     const alerts = new Alerts(events);
 

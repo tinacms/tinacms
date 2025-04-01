@@ -243,25 +243,26 @@ const GetCollection = ({
   search?: string;
 }) => {
   const navigate = useNavigate();
-  const { collection, loading, error, reFetchCollection, collectionExtra } =
+
+  const searchCollectionResult = useSearchCollection(
+    cms,
+    collectionName,
+    includeDocuments,
+    folder,
+    startCursor || '',
     search
-      ? useSearchCollection(
-          cms,
-          collectionName,
-          includeDocuments,
-          folder,
-          startCursor || '',
-          search
-        )
-      : useGetCollection(
-          cms,
-          collectionName,
-          includeDocuments,
-          folder,
-          startCursor || '',
-          sortKey,
-          filterArgs
-        ) || {};
+  );
+  const getCollectionResult = useGetCollection(
+    cms,
+    collectionName,
+    includeDocuments,
+    folder,
+    startCursor || '',
+    sortKey,
+    filterArgs
+  );
+  const { collection, loading, error, reFetchCollection, collectionExtra } = search ? searchCollectionResult : getCollectionResult;
+
   useEffect(() => {
     if (loading) return;
 
