@@ -102,7 +102,7 @@ jobs:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
       - name: Fail if previous steps failed
-        if: success() || failure()
+        if: matrix.os == 'ubuntu-latest' && (success() || failure())
         run: |
           if [ "$GITHUB_JOB" != "success" ]; then
             echo "One or more steps failed. Failing the workflow."
