@@ -1,10 +1,10 @@
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
+import { FolderIcon } from '@heroicons/react/outline';
+import { queries } from 'CLIENT_IMPORT';
 import { GraphiQL } from 'graphiql';
 import { parse, print } from 'graphql';
 import React from 'react';
 import { useCMS } from 'tinacms';
-import { FolderIcon } from '@heroicons/react/outline';
-import { queries } from 'CLIENT_IMPORT';
 
 import 'graphiql/graphiql.min.css';
 
@@ -134,7 +134,7 @@ const Playground = () => {
       <GraphiQL
         fetcher={async (params, options) => {
           const fetcher = createGraphiQLFetcher({
-            url: __API_URL__,
+            url: cms.api.tina.contentApiUrl || __API_URL__,
             headers: { Authorization: `Bearer ${getToken()}` },
           });
           return fetcher(params, options);

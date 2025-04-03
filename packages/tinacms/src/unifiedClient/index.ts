@@ -1,6 +1,6 @@
+import type { Config } from '@tinacms/schema-tools';
 import AsyncLock from 'async-lock';
 import type { GraphQLError } from 'graphql';
-import type { Config } from '@tinacms/schema-tools';
 import type { Cache } from '../cache/index';
 
 export const TINA_HOST = 'content.tinajs.io';
@@ -23,6 +23,22 @@ export type TinaClientURLParts = {
   branch: string;
   isLocalClient: boolean;
 };
+
+/**
+ * Replaces the part of a URL after 'github/' with a specified replacement string.
+ *
+ * @param {string} url The original URL.
+ * @param {string} replacement The string to replace the part after 'github/'.
+ * @returns {string} The modified URL, or the original URL if 'github/' is not found.
+ */
+function replaceGithubPathSplit(url: string, replacement: string) {
+  const parts = url.split('github/');
+  if (parts.length > 1 && replacement) {
+    return parts[0] + 'github/' + replacement;
+  } else {
+    return url;
+  }
+}
 
 export class TinaClient<GenQueries> {
   public apiUrl: string;
@@ -92,7 +108,6 @@ export class TinaClient<GenQueries> {
       query: args.query,
       variables: args?.variables || {},
     });
-    const url = args?.url || this.apiUrl;
 
     const optionsObject: Parameters<typeof fetch>[1] = {
       method: 'POST',
@@ -101,6 +116,18 @@ export class TinaClient<GenQueries> {
       redirect: 'follow',
       ...providedFetchOptions,
     };
+
+    //? Look for the header and change to use this branch instead of the build time generated branch.
+    //? This comes from the clients fetch options:
+    //client.queries.collection({},   {
+    //  fetchOptions: {
+    //    headers: {
+    //      'x-branch': cookieStore.get('x-branch')?.value,
+    //    },
+    //  },
+    //})
+    const draftBranch = headers.get('x-branch');
+    const url = replaceGithubPathSplit(args?.url || this.apiUrl, draftBranch);
 
     let key = '';
     let result: {
