@@ -1,7 +1,7 @@
 import prompts from 'prompts';
 import type { PromptObject } from 'prompts';
-import { linkText, logText } from '../../../utils/theme';
 import { Framework, InitEnvironment } from '../';
+import { linkText, logText } from '../../../utils/theme';
 import { Config, ImportStatement } from './types';
 
 export * from './askTinaCloudSetup';
@@ -136,7 +136,7 @@ export const askIfUsingSelfHosted = async () => {
       type: 'select',
       choices: [
         {
-          title: 'Tina Cloud',
+          title: 'TinaCloud',
           value: 'tina-cloud',
         },
         {
@@ -145,7 +145,7 @@ export const askIfUsingSelfHosted = async () => {
         },
       ],
       message:
-        'Do you want to host your project on Tina Cloud or self-host? (With self-hosting, the graphql api, auth and database will be hosted on your own server.)',
+        'Do you want to host your project on TinaCloud or self-host? (With self-hosting, the graphql api, auth and database will be hosted on your own server.)',
     },
   ]);
   return answers as { hosting: 'tina-cloud' | 'self-host' };

@@ -1,9 +1,9 @@
-import prompts from 'prompts';
 import crypto from 'crypto-js';
+import prompts from 'prompts';
 
-import type { PromptAuthProvider, Config } from './types';
 import type { Framework } from '../';
 import { askTinaCloudSetup } from './askTinaCloudSetup';
+import type { Config, PromptAuthProvider } from './types';
 const supportedAuthProviders: {
   'tina-cloud': PromptAuthProvider;
   'next-auth': PromptAuthProvider;
@@ -87,7 +87,7 @@ export const chooseAuthProvider = async ({
 }) => {
   // Could add this back in later if we want to support things other then next-auth in the init
   // {
-  //   title: 'Tina Cloud for Auth',
+  //   title: 'TinaCloud for Auth',
   //   value: 'tina-cloud',
   // },
   // const choices = []

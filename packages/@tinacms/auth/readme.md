@@ -1,9 +1,9 @@
 # @tinacms/auth
-This package contains all the [Next.js](https://nextjs.org/) specific code for Tina Cloud
+This package contains all the [Next.js](https://nextjs.org/) specific code for TinaCloud
 
 ## Authorize user function
 
-The authorize user function Reaches out to [Tina Cloud](https://tina.io/cloud/) and returns the current user if one exists. The reason for this is to allow one to work with external services and only let those with a Tina CLoud account access the backend code.
+The authorize user function Reaches out to [TinaCloud](https://tina.io/cloud/) and returns the current user if one exists. The reason for this is to allow one to work with external services and only let those with a TinaCloud account access the backend code.
 
 An example use case might be allowing logged-in users to upload images to cloudinary or S3.
 

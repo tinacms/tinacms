@@ -290,7 +290,7 @@ mutation addPendingDocumentMutation(
       if (!this.isCustomContentApi) {
         errorMessage = `${errorMessage}, Please check that the following information is correct: \n\tclientId: ${this.options.clientId}\n\tbranch: ${this.branch}.`;
         if (this.branch !== 'main') {
-          errorMessage = `${errorMessage}\n\tNote: This error can occur if the branch does not exist on GitHub or on Tina Cloud`;
+          errorMessage = `${errorMessage}\n\tNote: This error can occur if the branch does not exist on GitHub or on TinaCloud`;
         }
       }
 
@@ -472,7 +472,7 @@ mutation addPendingDocumentMutation(
                 unknownCount++;
                 if (unknownCount > 5) {
                   throw new Error(
-                    'AsyncPoller: status unknown for too long, please check indexing progress the Tina Cloud dashboard'
+                    'AsyncPoller: status unknown for too long, please check indexing progress the TinaCloud dashboard'
                   );
                 }
               }

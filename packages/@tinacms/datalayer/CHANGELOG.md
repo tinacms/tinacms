@@ -835,7 +835,7 @@
 
 ### Patch Changes
 
-- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with Tina Cloud
+- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with TinaCloud
 
 ## 0.58.2
 
