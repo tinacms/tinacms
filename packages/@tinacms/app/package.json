@@ -8,6 +8,10 @@
 		"@types/react-dom": "^18.3.5",
 		"typescript": "^5.7.3"
 	},
+    "peerDependencies": {
+		"react": ">=18.3.1 <20.0.0",
+		"react-dom": ">=18.3.1 <20.0.0"
+    },
 	"dependencies": {
 		"@graphiql/toolkit": "0.8.4",
 		"@headlessui/react": "2.1.8",
@@ -18,8 +22,6 @@
 		"graphiql": "3.0.0-alpha.1",
 		"graphql": "15.8.0",
 		"monaco-editor": "0.31.0",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1",
 		"react-router-dom": "6.3.0",
 		"tinacms": "workspace:*",
 		"typescript": "^5.7.3",
