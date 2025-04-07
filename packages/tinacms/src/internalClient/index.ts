@@ -151,8 +151,8 @@ export class Client {
 
   setBranch(branchName: string) {
     const encodedBranch = encodeURIComponent(branchName);
-    //? When we change our branch, we add the 'x-branch' cookie. This is used when you change branches and want to use content from the new branch.
-    //? This is then used in the TinaClient to fetch the correct content from the correct branch. Instead of defaulting to the 'main' branch which is generated at build time.
+    // When we change our branch, we add the 'x-branch' cookie. This is used when you change branches and want to use content from the new branch.
+    // This is then used in the TinaClient to fetch the correct content from the correct branch. Instead of defaulting to the 'main' branch which is generated at build time.
     document.cookie = `x-branch=${encodedBranch}; path=/; max-age=3600`;
     this.branch = encodedBranch;
     this.assetsApiUrl =

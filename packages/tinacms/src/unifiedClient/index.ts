@@ -117,8 +117,8 @@ export class TinaClient<GenQueries> {
       ...providedFetchOptions,
     };
 
-    //? Look for the header and change to use this branch instead of the build time generated branch.
-    //? This comes from the clients fetch options:
+    // Look for the header and change to use this branch instead of the build time generated branch.
+    // This comes from the clients fetch options:
     //client.queries.collection({},   {
     //  fetchOptions: {
     //    headers: {
