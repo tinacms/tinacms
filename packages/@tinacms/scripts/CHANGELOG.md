@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.4
+
+### Patch Changes
+
+- [#5602](https://github.com/tinacms/tinacms/pull/5602) [`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd) Thanks [@wicksipedia](https://github.com/wicksipedia)! - fix naming of TinaCloud
+
 ## 1.3.3
 
 ### Patch Changes
@@ -93,11 +99,11 @@
   #### Updated `database.ts` Example
 
   ```typescript
-  import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
-  import { MongodbLevel } from 'mongodb-level'
-  import { GitHubProvider } from 'tinacms-gitprovider-github'
+  import { createDatabase, createLocalDatabase } from "@tinacms/datalayer";
+  import { MongodbLevel } from "mongodb-level";
+  import { GitHubProvider } from "tinacms-gitprovider-github";
 
-  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
 
   export default isLocal
     ? createLocalDatabase()
@@ -109,12 +115,12 @@
           token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         }),
         databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: "tinacms",
+          dbName: "tinacms",
           mongoUri: process.env.MONGODB_URI,
         }),
         namespace: process.env.GITHUB_BRANCH,
-      })
+      });
   ```
 
   ### Migrating `database.ts`
@@ -129,7 +135,7 @@
     owner: process.env.GITHUB_OWNER,
     repo: process.env.GITHUB_REPO,
     token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-  })
+  });
   ```
 
   - **Custom Git Provider**: Implement the `GitProvider` interface for different git providers.
@@ -164,8 +170,8 @@
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
-  import { createLocalDatabase } from '@tinacms/datalayer'
-  createLocalDatabase(port)
+  import { createLocalDatabase } from "@tinacms/datalayer";
+  createLocalDatabase(port);
   ```
 
   #### d. Consolidated Example
@@ -212,13 +218,13 @@
       },
     },
     //...
-  })
+  });
   ```
 
   - **New API**:
 
   ```javascript
-  import { AbstractAuthProvider } from 'tinacms'
+  import { AbstractAuthProvider } from "tinacms";
   class CustomAuthProvider extends AbstractAuthProvider {
     login() {}
     logout() {}
@@ -227,7 +233,7 @@
   defineConfig({
     authProvider: new CustomAuthProvider(),
     //...
-  })
+  });
   ```
 
   ### TinaCMS Self Hosted backend updates
@@ -244,13 +250,16 @@
   `/api/tina/[...routes].{ts,js}`
 
   ```typescript
-  import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  import {
+    TinaNodeBackend,
+    LocalBackendAuthProvider,
+  } from "@tinacms/datalayer";
 
-  import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
+  import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from "tinacms-authjs";
 
-  import databaseClient from '../../../tina/__generated__/databaseClient'
+  import databaseClient from "../../../tina/__generated__/databaseClient";
 
-  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
 
   const handler = TinaNodeBackend({
     authProvider: isLocal
@@ -262,12 +271,12 @@
           }),
         }),
     databaseClient,
-  })
+  });
 
   export default (req, res) => {
     // Modify the request here if you need to
-    return handler(req, res)
-  }
+    return handler(req, res);
+  };
   ```
 
   These changes are put in place to make self hosted TinaCMS easier to use and more flexible.
@@ -380,13 +389,13 @@
 
   ```ts
   // .tina/config.ts
-  import schema from './schema'
+  import schema from "./schema";
 
   export default defineConfig({
     schema: schema,
     //.. Everything from define config in `schema.ts`
     //.. Everything from `schema.config`
-  })
+  });
   ```
 
   2. Add Build config
