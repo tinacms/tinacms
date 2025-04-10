@@ -16,7 +16,7 @@
 		"@graphiql/toolkit": "0.8.4",
 		"@headlessui/react": "2.1.8",
 		"@heroicons/react": "^1.0.6",
-		"@monaco-editor/react": "4.4.5",
+		"@monaco-editor/react": "4.7.0-rc.0",
 		"@tinacms/mdx": "workspace:*",
 		"final-form": "4.20.10",
 		"graphiql": "3.0.0-alpha.1",
