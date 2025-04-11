@@ -1,4 +1,4 @@
-import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
+import MonacoEditor, { useMonaco, loader } from "@monaco-editor/react";
 import {
   ELEMENT_DEFAULT,
   type PlateEditor,
@@ -11,18 +11,19 @@ import {
   isCollapsed,
   isElement,
   setNodes,
-} from '@udecode/plate-common';
-import type * as monaco from 'monaco-editor';
-import React from 'react';
-import { useSelected } from 'slate-react';
-import { Autocomplete } from '../autocomplete';
-import { uuid } from '../helpers';
+} from "@udecode/plate-common";
+import type * as monaco from "monaco-editor";
+import React from "react";
+import { useSelected } from "slate-react";
+import { Autocomplete } from "../autocomplete";
+import { uuid } from "../helpers";
+import useCustomMonaco from "./use-custom-monaco";
 
 type Monaco = typeof monaco;
 
 // 0.33.0 has a bug https://github.com/microsoft/monaco-editor/issues/2947
 loader.config({
-  paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs' },
+  paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs" },
 });
 
 /**
@@ -64,9 +65,9 @@ export const CodeBlock = ({
   onChangeCallback?: (value: string) => void;
 }) => {
   const [navigateAway, setNavigateAway] = React.useState<
-    'up' | 'down' | 'insertNext' | 'remove' | null
+    "up" | "down" | "insertNext" | "remove" | null
   >(null);
-  const monaco = useMonaco() as Monaco;
+  const monaco = useCustomMonaco() as Monaco;
   const monacoEditorRef =
     React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const selected = useSelected();
@@ -78,18 +79,18 @@ export const CodeBlock = ({
     }
   }, [selected, monacoEditorRef.current]);
 
-  const value = element.value || '';
-  if (typeof value !== 'string') {
-    throw new Error('Element must be of type string for code block');
+  const value = element.value || "";
+  if (typeof value !== "string") {
+    throw new Error("Element must be of type string for code block");
   }
 
   const language = restrictLanguage || element.lang;
   const id = React.useMemo(() => uuid(), []);
   const languages = React.useMemo(() => {
-    const defaultLangSet = { '': 'plain text' };
+    const defaultLangSet = { "": "plain text" };
     if (!monaco) return defaultLangSet;
     return monaco.languages.getLanguages().reduce((ac, cv) => {
-      if (cv.id === 'plaintext') return ac;
+      if (cv.id === "plaintext") return ac;
       return { ...ac, [cv.id]: cv.id };
     }, defaultLangSet);
   }, [monaco]);
@@ -114,8 +115,8 @@ export const CodeBlock = ({
   const currentItem = React.useMemo(() => {
     return (
       items.find((item) => item.key === language) ?? {
-        key: '',
-        label: 'Plain Text',
+        key: "",
+        label: "Plain Text",
       }
     );
   }, [items, language]);
@@ -124,14 +125,14 @@ export const CodeBlock = ({
     if (navigateAway) {
       setNavigateAway(null);
       switch (navigateAway) {
-        case 'remove':
+        case "remove":
           {
             focusEditor(editor);
             setNodes(
               editor,
               {
-                type: 'p',
-                children: [{ text: '' }],
+                type: "p",
+                children: [{ text: "" }],
                 lang: undefined,
                 value: undefined,
               },
@@ -145,14 +146,14 @@ export const CodeBlock = ({
             );
           }
           break;
-        case 'insertNext':
+        case "insertNext":
           {
             insertNodes(
               editor,
               [
                 {
                   type: ELEMENT_DEFAULT,
-                  children: [{ text: '' }],
+                  children: [{ text: "" }],
                   lang: undefined,
                   value: undefined,
                 },
@@ -162,7 +163,7 @@ export const CodeBlock = ({
             focusEditor(editor);
           }
           break;
-        case 'up':
+        case "up":
           {
             const path = findNodePath(editor, element);
             if (!path) {
@@ -176,7 +177,7 @@ export const CodeBlock = ({
                 [
                   {
                     type: ELEMENT_DEFAULT,
-                    children: [{ text: '' }],
+                    children: [{ text: "" }],
                     lang: undefined,
                     value: undefined,
                   },
@@ -191,7 +192,7 @@ export const CodeBlock = ({
             focusEditor(editor, previousNodePath);
           }
           break;
-        case 'down': {
+        case "down": {
           const path = findNodePath(editor, element);
           if (!path) {
             return; // Not sure if/when this would happen
@@ -205,7 +206,7 @@ export const CodeBlock = ({
               [
                 {
                   type: ELEMENT_DEFAULT,
-                  children: [{ text: '' }],
+                  children: [{ text: "" }],
                   lang: undefined,
                   value: undefined,
                 },
@@ -240,27 +241,27 @@ export const CodeBlock = ({
 
     monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       if (monacoEditor.hasTextFocus()) {
-        setNavigateAway('insertNext');
+        setNavigateAway("insertNext");
       }
     });
     monacoEditor.onKeyDown((l) => {
-      if (l.code === 'ArrowUp') {
+      if (l.code === "ArrowUp") {
         const selection = monacoEditor.getSelection();
         if (selection.endLineNumber === 1 && selection.startLineNumber === 1) {
-          setNavigateAway('up');
+          setNavigateAway("up");
         }
       }
-      if (l.code === 'ArrowDown') {
+      if (l.code === "ArrowDown") {
         const selection = monacoEditor.getSelection();
         const totalLines = monacoEditor.getModel().getLineCount();
         if (
           selection.endLineNumber === totalLines &&
           selection.startLineNumber === totalLines
         ) {
-          setNavigateAway('down');
+          setNavigateAway("down");
         }
       }
-      if (l.code === 'Backspace') {
+      if (l.code === "Backspace") {
         const selection = monacoEditor.getSelection();
         if (
           selection.endColumn === 1 &&
@@ -272,7 +273,7 @@ export const CodeBlock = ({
           selection.startColumn === 1 &&
           selection.startLineNumber === 1
         ) {
-          setNavigateAway('remove');
+          setNavigateAway("remove");
         }
       }
     });
@@ -281,7 +282,7 @@ export const CodeBlock = ({
   return (
     <div
       {...attributes}
-      className='relative mb-2 mt-0.5 rounded-lg shadow-md p-2 border-gray-200 border'
+      className="relative mb-2 mt-0.5 rounded-lg shadow-md p-2 border-gray-200 border"
     >
       <style>
         {/* Disable hints (not ideal but it conflicts with the toolbar and other floating elements) */}
@@ -293,12 +294,12 @@ export const CodeBlock = ({
       {props.children}
       <div contentEditable={false}>
         {!restrictLanguage && (
-          <div className='flex justify-between pb-2'>
+          <div className="flex justify-between pb-2">
             <div />
             <Autocomplete
               items={items}
               value={currentItem}
-              defaultQuery={'plaintext'}
+              defaultQuery={"plaintext"}
               onChange={(item) => setNodes(editor, { lang: item.key })}
             />
           </div>
@@ -315,21 +316,21 @@ export const CodeBlock = ({
               // automaticLayout: true,
               tabSize: 2,
               disableLayerHinting: true,
-              accessibilitySupport: 'off',
+              accessibilitySupport: "off",
               codeLens: false,
-              wordWrap: 'on',
+              wordWrap: "on",
               minimap: {
                 enabled: false,
               },
               fontSize: 14,
               lineHeight: 2,
               formatOnPaste: true,
-              lineNumbers: 'off',
+              lineNumbers: "off",
               formatOnType: true,
               fixedOverflowWidgets: true,
               // Takes too much horizontal space for iframe
               folding: false,
-              renderLineHighlight: 'none',
+              renderLineHighlight: "none",
               scrollbar: {
                 verticalScrollbarSize: 1,
                 horizontalScrollbarSize: 1,
