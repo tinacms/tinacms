@@ -1,10 +1,12 @@
 // hooks/useCustomMonaco.ts
-import { useState, useRef, useEffect } from "react";
-import * as monaco from "monaco-editor";
-import { loader } from "@monaco-editor/react";
+import { useState, useRef, useEffect } from 'react';
+import * as monaco from 'monaco-editor';
+import { loader } from '@monaco-editor/react';
 
 export function useCustomMonaco() {
-  const [monacoInstance, setMonacoInstance] = useState<typeof monaco | null>(null);
+  const [monacoInstance, setMonacoInstance] = useState<typeof monaco | null>(
+    null
+  );
   const mountedRef = useRef(true);
   const loaderRef = useRef<any>(null);
 
@@ -18,7 +20,7 @@ export function useCustomMonaco() {
 
     if (!loaderRef.current) {
       loader.config({
-        "vs/nls": { availableLanguages: {} },
+        'vs/nls': { availableLanguages: {} },
       });
 
       try {
@@ -31,12 +33,12 @@ export function useCustomMonaco() {
             }
           })
           .catch((error: any) => {
-            if (mountedRef.current && error.type !== "cancelation") {
-              console.error("Monaco initialization error:", error);
+            if (mountedRef.current && error.type !== 'cancelation') {
+              console.error('Monaco initialization error:', error);
             }
           });
       } catch (err) {
-        console.error("Failed to initialize Monaco:", err);
+        console.error('Failed to initialize Monaco:', err);
       }
     }
 

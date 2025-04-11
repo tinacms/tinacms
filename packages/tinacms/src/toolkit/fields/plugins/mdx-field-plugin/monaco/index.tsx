@@ -1,25 +1,25 @@
-import React from "react";
-import { uuid } from "../plate/plugins/ui/helpers";
-import MonacoEditor, { useMonaco, loader } from "@monaco-editor/react";
-import { useEditorContext } from "../plate/editor-context";
-import { useDebounce } from "./use-debounce";
-import type * as monaco from "monaco-editor";
+import React from 'react';
+import { uuid } from '../plate/plugins/ui/helpers';
+import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
+import { useEditorContext } from '../plate/editor-context';
+import { useDebounce } from './use-debounce';
+import type * as monaco from 'monaco-editor';
 import {
   buildError,
   ErrorMessage,
   type InvalidMarkdownElement,
-} from "./error-message";
-import type { RichTextType } from "..";
-import useCustomMonaco from "../plate/plugins/ui/code-block/use-custom-monaco";
+} from './error-message';
+import type { RichTextType } from '..';
+import useCustomMonaco from '../plate/plugins/ui/code-block/use-custom-monaco';
 
-const parseMDX = (value: string) => ({ type: "root", children: [] });
-const stringifyMDX = (value: any) => "";
+const parseMDX = (value: string) => ({ type: 'root', children: [] });
+const stringifyMDX = (value: any) => '';
 
 type Monaco = typeof monaco;
 
 // 0.33.0 has a bug https://github.com/microsoft/monaco-editor/issues/2947
 loader.config({
-  paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs" },
+  paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs' },
 });
 
 /**
@@ -53,7 +53,7 @@ const RawEditor = (props: RichTextType) => {
   const inputValue = React.useMemo(() => {
     // @ts-ignore no access to the rich-text type from this package
     const res = stringifyMDX(props.input.value, field, (value) => value);
-    return typeof props.input.value === "string" ? props.input.value : res;
+    return typeof props.input.value === 'string' ? props.input.value : res;
   }, []);
   const [value, setValue] = React.useState(inputValue);
   const [error, setError] = React.useState<InvalidMarkdownElement>(null);
@@ -64,7 +64,7 @@ const RawEditor = (props: RichTextType) => {
     // @ts-ignore no access to the rich-text type from this package
     const parsedValue = parseMDX(value, field, (value) => value);
     if (parsedValue.children[0]) {
-      if (parsedValue.children[0].type === "invalid_markdown") {
+      if (parsedValue.children[0].type === 'invalid_markdown') {
         const invalidMarkdown = parsedValue.children[0];
         setError(invalidMarkdown);
         return;
@@ -142,8 +142,8 @@ const RawEditor = (props: RichTextType) => {
   }
 
   return (
-    <div className="relative">
-      <div className="sticky top-1 w-full flex justify-between mb-2 z-50 max-w-full">
+    <div className='relative'>
+      <div className='sticky top-1 w-full flex justify-between mb-2 z-50 max-w-full'>
         <Button onClick={() => setRawMode(false)}>
           View in rich-text editor
         </Button>
@@ -160,21 +160,21 @@ const RawEditor = (props: RichTextType) => {
             scrollBeyondLastLine: false,
             tabSize: 2,
             disableLayerHinting: true,
-            accessibilitySupport: "off",
+            accessibilitySupport: 'off',
             codeLens: false,
-            wordWrap: "on",
+            wordWrap: 'on',
             minimap: {
               enabled: false,
             },
             fontSize: 14,
             lineHeight: 2,
             formatOnPaste: true,
-            lineNumbers: "off",
+            lineNumbers: 'off',
             formatOnType: true,
             fixedOverflowWidgets: true,
             // Takes too much horizontal space for iframe
             folding: false,
-            renderLineHighlight: "none",
+            renderLineHighlight: 'none',
             scrollbar: {
               verticalScrollbarSize: 1,
               horizontalScrollbarSize: 1,
@@ -182,13 +182,13 @@ const RawEditor = (props: RichTextType) => {
               alwaysConsumeMouseWheel: false,
             },
           }}
-          language={"markdown"}
+          language={'markdown'}
           value={value}
           onChange={(value) => {
             try {
               setValue(value);
             } catch (e) {
-              console.log("error", e);
+              console.log('error', e);
             }
           }}
         />
@@ -201,14 +201,14 @@ const Button = (props) => {
   return (
     <button
       className={`${
-        props.align === "left"
-          ? "rounded-l-md border-r-0"
-          : "rounded-r-md border-l-0"
+        props.align === 'left'
+          ? 'rounded-l-md border-r-0'
+          : 'rounded-r-md border-l-0'
       } shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
-      type="button"
+      type='button'
       onClick={props.onClick}
     >
-      <span className="text-sm font-semibold tracking-wide align-baseline mr-1">
+      <span className='text-sm font-semibold tracking-wide align-baseline mr-1'>
         {props.children}
       </span>
     </button>
