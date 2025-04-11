@@ -21,6 +21,7 @@ import {
   InvalidMarkdownElement,
 } from './error-message';
 import { RichTextType } from 'tinacms';
+import useCustomMonaco from './use-custom-monaco';
 
 export const uuid = () => {
   // @ts-ignore
@@ -60,7 +61,7 @@ const retryFocus = (ref) => {
 };
 
 export const RawEditor = (props: RichTextType) => {
-  const monaco = useMonaco() as Monaco;
+  const monaco = useCustomMonaco() as Monaco;
   const monacoEditorRef =
     React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const [height, setHeight] = React.useState(100);
