@@ -10,6 +10,7 @@ import {
   type InvalidMarkdownElement,
 } from './error-message';
 import type { RichTextType } from '..';
+import useCustomMonaco from '../plate/plugins/ui/code-block/use-custom-monaco';
 
 const parseMDX = (value: string) => ({ type: 'root', children: [] });
 const stringifyMDX = (value: any) => '';
@@ -42,7 +43,7 @@ const retryFocus = (ref) => {
 };
 
 const RawEditor = (props: RichTextType) => {
-  const monaco = useMonaco() as Monaco;
+  const monaco = useCustomMonaco() as Monaco;
   const { setRawMode } = useEditorContext();
   const monacoEditorRef =
     React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
@@ -199,11 +200,10 @@ const RawEditor = (props: RichTextType) => {
 const Button = (props) => {
   return (
     <button
-      className={`${
-        props.align === 'left'
+      className={`${props.align === 'left'
           ? 'rounded-l-md border-r-0'
           : 'rounded-r-md border-l-0'
-      } shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+        } shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
       type='button'
       onClick={props.onClick}
     >

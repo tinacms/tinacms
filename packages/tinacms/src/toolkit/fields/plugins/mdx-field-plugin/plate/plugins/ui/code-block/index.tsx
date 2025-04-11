@@ -17,6 +17,7 @@ import React from 'react';
 import { useSelected } from 'slate-react';
 import { Autocomplete } from '../autocomplete';
 import { uuid } from '../helpers';
+import useCustomMonaco from './use-custom-monaco';
 
 type Monaco = typeof monaco;
 
@@ -66,7 +67,7 @@ export const CodeBlock = ({
   const [navigateAway, setNavigateAway] = React.useState<
     'up' | 'down' | 'insertNext' | 'remove' | null
   >(null);
-  const monaco = useMonaco() as Monaco;
+  const monaco = useCustomMonaco() as Monaco;
   const monacoEditorRef =
     React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const selected = useSelected();
