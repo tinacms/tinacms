@@ -14,7 +14,7 @@ import MonacoEditor, { loader } from "@monaco-editor/react";
  */
 import { parseMDX, stringifyMDX } from "@tinacms/mdx";
 import { useDebounce } from "./use-debounce";
-import type * as monaco from "monaco-editor";
+import * as monaco from "monaco-editor";
 import {
   buildError,
   ErrorMessage,
