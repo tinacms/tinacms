@@ -1,6 +1,8 @@
 ---
-"@tinacms/app": patch
-"@tinacms/cli": patch
+"@tinacms/app": minor
+"@tinacms/cli": minor
+"tinacms": minor
 ---
 
-Specify react and react-dom as peer deps
+- Specify react and react-dom as peer deps
+- add useCustomMonaco hook
