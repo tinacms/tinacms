@@ -22,20 +22,14 @@ export const uuid = () => {
 
 /**
  * Since monaco lazy-loads we may have a delay from when the block is inserted
- * to when monaco has intantiated, keep trying to focus on it.
- *
- * Will try for 3 seconds before moving on
+ * to when monaco has instantiated.
  */
-let retryCount = 0;
-const retryFocus = (ref) => {
-  if (ref.current) {
-    ref.current.focus();
-  } else {
-    if (retryCount < 30) {
-      setTimeout(() => {
-        retryCount = retryCount + 1;
-        retryFocus(ref);
-      }, 100);
+const retryFocus = (editor) => {
+  if (editor && editor.focus) {
+    try {
+      editor.focus();
+    } catch (err) {
+      console.warn('Error focusing editor:', err);
     }
   }
 };
@@ -49,11 +43,17 @@ export const RawEditor = (props: RichTextType) => {
   const id = React.useMemo(() => uuid(), []);
   const field = props.field;
 
+  // Get initial value safely
   const inputValue = React.useMemo(() => {
-    // @ts-ignore no access to the rich-text type from this package
-    const res = stringifyMDX(props.input.value, field, (value) => value);
-    return typeof props.input.value === 'string' ? props.input.value : res;
-  }, [props.input.value, field]);
+    try {
+      // @ts-ignore no access to the rich-text type from this package
+      const res = stringifyMDX(props.input.value, field, (value) => value);
+      return typeof props.input.value === 'string' ? props.input.value : res;
+    } catch (err) {
+      console.error('Error stringifying MDX:', err);
+      return '';
+    }
+  }, []); // Empty dependency array to only run once
 
   const [value, setValue] = React.useState(inputValue);
   const [error, setError] = React.useState<InvalidMarkdownElement>(null);
@@ -62,23 +62,31 @@ export const RawEditor = (props: RichTextType) => {
 
   // Update parsed MDX when value changes
   React.useEffect(() => {
+    let isMounted = true;
+
     try {
       // @ts-ignore no access to the rich-text type from this package
       const parsedValue = parseMDX(debouncedValue, field, (value) => value);
+
+      if (!isMounted) return;
+
       if (
         parsedValue.children[0] &&
         parsedValue.children[0].type === 'invalid_markdown'
       ) {
-        const invalidMarkdown = parsedValue.children[0];
-        setError(invalidMarkdown);
+        setError(parsedValue.children[0]);
       } else {
         setError(null);
+        props.input.onChange(parsedValue);
       }
-      props.input.onChange(parsedValue);
     } catch (err) {
       console.error('Error parsing MDX:', err);
     }
-  }, [debouncedValue, field, props.input]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [debouncedValue, field]); // Only dependency should be the debounced value and field
 
   // Handle error markers in editor
   React.useEffect(() => {
@@ -90,13 +98,18 @@ export const RawEditor = (props: RichTextType) => {
 
       if (error) {
         const errorMessage = buildError(error);
-        monacoInstance.editor.setModelMarkers(model, id, [
-          {
-            ...errorMessage.position,
-            message: errorMessage.message,
-            severity: monacoInstance.MarkerSeverity.Error,
-          },
-        ]);
+
+        // Make sure all position properties are numbers (not undefined)
+        const markerData = {
+          message: errorMessage.message,
+          severity: monacoInstance.MarkerSeverity?.Error || 8,
+          startLineNumber: errorMessage.position?.startLineNumber || 1,
+          endLineNumber: errorMessage.position?.endLineNumber || 1,
+          startColumn: errorMessage.position?.startColumn || 1,
+          endColumn: errorMessage.position?.endColumn || 1,
+        };
+
+        monacoInstance.editor.setModelMarkers(model, id, [markerData]);
       } else {
         monacoInstance.editor.setModelMarkers(model, id, []);
       }
@@ -105,7 +118,7 @@ export const RawEditor = (props: RichTextType) => {
     }
   }, [error, monacoInstance, id]);
 
-  // Configure Monaco TypeScript settings
+  // Configure TypeScript settings once when Monaco loads
   React.useEffect(() => {
     if (!monacoInstance) return;
 
@@ -128,22 +141,23 @@ export const RawEditor = (props: RichTextType) => {
     editor: monaco.editor.IStandaloneCodeEditor,
     monaco: Monaco
   ) {
-    editorRef.current = editor;
+    if (!editor) return;
 
-    // Focus the editor when mounted
-    if (editor) {
-      editor.focus();
-      retryCount = 0;
-      retryFocus({ current: editor });
+    try {
+      editorRef.current = editor;
+
+      // Focus the editor once when mounted
+      setTimeout(() => editor.focus(), 100);
+
+      // Set up content size listener
+      editor.onDidContentSizeChange(() => {
+        const contentHeight = editor.getContentHeight();
+        setHeight(Math.min(Math.max(100, contentHeight), 1000));
+        editor.layout();
+      });
+    } catch (err) {
+      console.error('Error in editor mount handler:', err);
     }
-
-    // Set up content size listener for dynamic height
-    editor.onDidContentSizeChange(() => {
-      const contentHeight = editor.getContentHeight();
-      const newHeight = Math.min(Math.max(100, contentHeight), 1000);
-      setHeight(newHeight);
-      editor.layout();
-    });
   }
 
   return (
