@@ -4,8 +4,7 @@
 
 */
 
-import React from 'react';
-import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
+import MonacoEditor, { loader } from '@monaco-editor/react';
 /**
  * MDX is built directly to the app because of how we load dependencies.
  * Since we drop the package.json in to the end users folder, we can't
@@ -13,14 +12,16 @@ import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
  * (when we're working in the monorepo, or working with a tagged npm version)
  */
 import { parseMDX, stringifyMDX } from '@tinacms/mdx';
-import { useDebounce } from './use-debounce';
 import type * as monaco from 'monaco-editor';
+import React from 'react';
+import { RichTextType } from 'tinacms';
 import {
-  buildError,
   ErrorMessage,
   InvalidMarkdownElement,
+  buildError,
 } from './error-message';
-import { RichTextType } from 'tinacms';
+import { useDebounce } from './use-debounce';
+import useCustomMonaco from './use-monaco';
 
 export const uuid = () => {
   // @ts-ignore
@@ -60,7 +61,7 @@ const retryFocus = (ref) => {
 };
 
 export const RawEditor = (props: RichTextType) => {
-  const monaco = useMonaco() as Monaco;
+  const monaco = useCustomMonaco() as Monaco;
   const monacoEditorRef =
     React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const [height, setHeight] = React.useState(100);

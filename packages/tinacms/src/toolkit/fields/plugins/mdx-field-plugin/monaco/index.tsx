@@ -10,6 +10,7 @@ import {
   type InvalidMarkdownElement,
 } from './error-message';
 import type { RichTextType } from '..';
+import useCustomMonaco from '../plate/plugins/ui/code-block/use-monaco';
 
 const parseMDX = (value: string) => ({ type: 'root', children: [] });
 const stringifyMDX = (value: any) => '';
@@ -42,7 +43,7 @@ const retryFocus = (ref) => {
 };
 
 const RawEditor = (props: RichTextType) => {
-  const monaco = useMonaco() as Monaco;
+  const monaco = useCustomMonaco() as Monaco;
   const { setRawMode } = useEditorContext();
   const monacoEditorRef =
     React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
