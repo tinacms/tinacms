@@ -72,7 +72,7 @@
 		"@graphql-inspector/core": "^6.2.1",
 		"@headlessui/react": "2.1.8",
 		"@heroicons/react": "^1.0.6",
-		"@monaco-editor/react": "4.4.5",
+        "@monaco-editor/react": "4.7.0-rc.0",
 		"@radix-ui/react-checkbox": "^1.1.4",
 		"@radix-ui/react-dialog": "^1.1.6",
 		"@radix-ui/react-dropdown-menu": "^2.1.6",
