@@ -83,7 +83,7 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
         extraImports +
         makeImportString(args.config.authProvider?.configImports);
     }
-    // if wer are not using tina cloud, we need to import the local auth provider
+    // if wer are not using TinaCloud, we need to import the local auth provider
     if (!isUsingTinaCloud) {
       extraImports =
         extraImports + `\nimport { LocalAuthProvider } from "tinacms";`;

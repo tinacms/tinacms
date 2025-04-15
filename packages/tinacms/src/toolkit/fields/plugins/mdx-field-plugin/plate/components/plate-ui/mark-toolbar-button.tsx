@@ -1,11 +1,13 @@
+'use client';
+
 import React from 'react';
 import { withRef } from '@udecode/cn';
+import { Icons } from './icons';
+import { ToolbarButton } from './toolbar';
 import {
   useMarkToolbarButton,
   useMarkToolbarButtonState,
 } from '@udecode/plate/react';
-import { Icons } from './icons';
-import { ToolbarButton } from './toolbar';
 import {
   BoldPlugin,
   CodePlugin,

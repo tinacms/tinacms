@@ -277,6 +277,6 @@ export const E_BAD_ROUTE = new MediaListError({
 
 export const E_DEFAULT = new MediaListError({
   title: 'An Error Occurred',
-  message: 'Something went wrong accessing your media from Tina Cloud.',
+  message: 'Something went wrong accessing your media from TinaCloud.',
   docsLink: '', // TODO
 });

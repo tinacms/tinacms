@@ -1,5 +1,30 @@
 # tinacms
 
+## 2.7.5
+
+### Patch Changes
+
+- [#5587](https://github.com/tinacms/tinacms/pull/5587) [`921f235`](https://github.com/tinacms/tinacms/commit/921f2356e4615d532d02eefa7103fdb70f83b97a) Thanks [@wicksipedia](https://github.com/wicksipedia)! - TinaCMS sidebar now has a loading indicator when loading content. Also fixed the link for contextual editing that was 404'ing
+
+- [#5602](https://github.com/tinacms/tinacms/pull/5602) [`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd) Thanks [@wicksipedia](https://github.com/wicksipedia)! - fix naming of TinaCloud
+
+- [#5580](https://github.com/tinacms/tinacms/pull/5580) [`b551232`](https://github.com/tinacms/tinacms/commit/b5512326ad0ad9855bc75e2073a3ab2a8ec4c064) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Editorial Workflow - improved create branch modal for non-devs
+
+- [#5560](https://github.com/tinacms/tinacms/pull/5560) [`ea204c9`](https://github.com/tinacms/tinacms/commit/ea204c9045451f3ebea04f503e6158d2016613e4) Thanks [@kldavis4](https://github.com/kldavis4)! - Sorting on fields within templates
+
+- [#5588](https://github.com/tinacms/tinacms/pull/5588) [`fd664d8`](https://github.com/tinacms/tinacms/commit/fd664d8f4e83941ed1b1f234668ab6341a6178f8) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - Fix server-side branch queries by storing the active branch in a cookie and passing it via the x-branch header.
+  - Ensure GraphQL playground correctly updates when switching branches.
+- Updated dependencies [[`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd)]:
+  - @tinacms/schema-tools@1.7.3
+  - @tinacms/mdx@1.6.2
+  - @tinacms/search@1.0.43
+
+## 2.7.3
+
+### Patch Changes
+
+- [#5572](https://github.com/tinacms/tinacms/pull/5572) [`991db1f`](https://github.com/tinacms/tinacms/commit/991db1f10c1f9cf9211d7e82bd56658cdcce24c7) Thanks [@kldavis4](https://github.com/kldavis4)! - Fix issue with editorial workflow when last branch does not exist resulting in an error
+
 ## 2.7.2
 
 ### Patch Changes
@@ -481,11 +506,11 @@
   #### Updated `database.ts` Example
 
   ```typescript
-  import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
-  import { MongodbLevel } from 'mongodb-level'
-  import { GitHubProvider } from 'tinacms-gitprovider-github'
+  import { createDatabase, createLocalDatabase } from "@tinacms/datalayer";
+  import { MongodbLevel } from "mongodb-level";
+  import { GitHubProvider } from "tinacms-gitprovider-github";
 
-  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
 
   export default isLocal
     ? createLocalDatabase()
@@ -497,12 +522,12 @@
           token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         }),
         databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: "tinacms",
+          dbName: "tinacms",
           mongoUri: process.env.MONGODB_URI,
         }),
         namespace: process.env.GITHUB_BRANCH,
-      })
+      });
   ```
 
   ### Migrating `database.ts`
@@ -517,7 +542,7 @@
     owner: process.env.GITHUB_OWNER,
     repo: process.env.GITHUB_REPO,
     token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-  })
+  });
   ```
 
   - **Custom Git Provider**: Implement the `GitProvider` interface for different git providers.
@@ -552,8 +577,8 @@
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
-  import { createLocalDatabase } from '@tinacms/datalayer'
-  createLocalDatabase(port)
+  import { createLocalDatabase } from "@tinacms/datalayer";
+  createLocalDatabase(port);
   ```
 
   #### d. Consolidated Example
@@ -600,13 +625,13 @@
       },
     },
     //...
-  })
+  });
   ```
 
   - **New API**:
 
   ```javascript
-  import { AbstractAuthProvider } from 'tinacms'
+  import { AbstractAuthProvider } from "tinacms";
   class CustomAuthProvider extends AbstractAuthProvider {
     login() {}
     logout() {}
@@ -615,7 +640,7 @@
   defineConfig({
     authProvider: new CustomAuthProvider(),
     //...
-  })
+  });
   ```
 
   ### TinaCMS Self Hosted backend updates
@@ -632,13 +657,16 @@
   `/api/tina/[...routes].{ts,js}`
 
   ```typescript
-  import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  import {
+    TinaNodeBackend,
+    LocalBackendAuthProvider,
+  } from "@tinacms/datalayer";
 
-  import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
+  import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from "tinacms-authjs";
 
-  import databaseClient from '../../../tina/__generated__/databaseClient'
+  import databaseClient from "../../../tina/__generated__/databaseClient";
 
-  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
 
   const handler = TinaNodeBackend({
     authProvider: isLocal
@@ -650,12 +678,12 @@
           }),
         }),
     databaseClient,
-  })
+  });
 
   export default (req, res) => {
     // Modify the request here if you need to
-    return handler(req, res)
-  }
+    return handler(req, res);
+  };
   ```
 
   These changes are put in place to make self hosted TinaCMS easier to use and more flexible.
@@ -813,7 +841,7 @@
               return {
                 ...values,
                 lastUpdated: new Date().toISOString(),
-              }
+              };
             },
             //...
           },
@@ -823,15 +851,15 @@
       ],
     },
     //...
-  })
+  });
   ```
 
-- 30c7eac58: Do not show tina cloud link when self hosting
+- 30c7eac58: Do not show TinaCloud link when self hosting
 - 121bd9fc4: Absorb @tinacms/toolkit into tinacms
 
   fix: Use clean page-sizes on media manager (to make pagination more obvious)
 
-  Fix issue with uploading media in a folder with tina cloud
+  Fix issue with uploading media in a folder with TinaCloud
 
 - Updated dependencies [133e97d5b]
 - Updated dependencies [f02b4368b]
@@ -886,7 +914,7 @@
 
 ### Patch Changes
 
-- 495108725: Disable tina cloud specific calls when using custom content api
+- 495108725: Disable TinaCloud specific calls when using custom content api
 - b0eba5d49: Upgrade prism react renderer, allow for theming
 - Updated dependencies [d73d03f8f]
 - Updated dependencies [745e30708]
@@ -1288,18 +1316,18 @@
   EX:
 
   ```ts
-  import { defineConfig } from 'tinacms'
+  import { defineConfig } from "tinacms";
 
   export default defineConfig({
     admin: {
       auth: {
         onLogin: () => {
-          console.log('On Log in!')
+          console.log("On Log in!");
         },
       },
     },
     /// ...
-  })
+  });
   ```
 
 - Updated dependencies [5a1e6faaf]
@@ -1349,9 +1377,9 @@
   export default defineConfig({
     collections: [
       {
-        label: 'Global',
-        name: 'global',
-        path: 'content/global',
+        label: "Global",
+        name: "global",
+        path: "content/global",
         ui: {
           global: true,
           allowedActions: {
@@ -1359,13 +1387,13 @@
             delete: false,
           },
         },
-        format: 'json',
+        format: "json",
         fields: [
           //...
         ],
       },
     ],
-  })
+  });
   ```
 
 - Updated dependencies [a5d6722c7]
@@ -1563,7 +1591,7 @@
 - f3439ea35: Replace loading message and hide forms while loading.
 - 48032e2ba: Use tinaio url config override in the client
 - 112b7271d: fix vulnerabilities
-- 8688dbff9: Add links to Tina Cloud project setting from sidebar
+- 8688dbff9: Add links to TinaCloud project setting from sidebar
 - Updated dependencies [4b9a2252f]
 - Updated dependencies [f581f263d]
 - Updated dependencies [4e0a609cd]
@@ -1702,13 +1730,13 @@
 
   ```ts
   // .tina/config.ts
-  import schema from './schema'
+  import schema from "./schema";
 
   export default defineConfig({
     schema: schema,
     //.. Everything from define config in `schema.ts`
     //.. Everything from `schema.config`
-  })
+  });
   ```
 
   2. Add Build config
@@ -2141,8 +2169,8 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
   If you gone though the `tinacms init` process there should be a file called `.tina/components/TinaProvider`. In that file you can import the schema from `schema.ts` and add it to the TinaCMS wrapper component.
 
   ```tsx
-  import TinaCMS from 'tinacms'
-  import schema, { tinaConfig } from '../schema.ts'
+  import TinaCMS from "tinacms";
+  import schema, { tinaConfig } from "../schema.ts";
 
   // Importing the TinaProvider directly into your page will cause Tina to be added to the production bundle.
   // Instead, import the tina/provider/index default export to have it dynamially imported in edit-moode
@@ -2155,10 +2183,10 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
       <TinaCMS {...tinaConfig} schema={schema}>
         {children}
       </TinaCMS>
-    )
-  }
+    );
+  };
 
-  export default TinaProvider
+  export default TinaProvider;
   ```
 
 - 591640db0: Fixes a bug with `breadcrumbs` to account for subfolders (instead of just the `filename`) and allows Documents to be created and updated within subfolders.
@@ -2362,7 +2390,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
     {
       useHttps: false,
     }
-  )
+  );
   ```
 
   The default for `useHttps` is `true`
@@ -2371,7 +2399,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 
 ### Minor Changes
 
-- 3897ec5d9: Replace `branch`, `clientId`, `isLocalClient` props with single `apiURL`. When working locally, this should be `http://localhost:4001/graphql`. For Tina Cloud, use `https://content.tinajs.io/content/<my-client-id>/github/<my-branch>`
+- 3897ec5d9: Replace `branch`, `clientId`, `isLocalClient` props with single `apiURL`. When working locally, this should be `http://localhost:4001/graphql`. For TinaCloud, use `https://content.tinajs.io/content/<my-client-id>/github/<my-branch>`
 
   ```tsx
   // _app.tsx
@@ -2447,11 +2475,11 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 
 ### Minor Changes
 
-- 75974d0a4: Updates the tina cloud client to do id_token & access_token refreshes when needed
+- 75974d0a4: Updates the TinaCloud client to do id_token & access_token refreshes when needed
 
 ### Patch Changes
 
-- 88c209b45: Throw when Tina Cloud responds with non 200 code
+- 88c209b45: Throw when TinaCloud responds with non 200 code
 - dcdf1ecf0: Updates `react-router` to `v6` for `TinaAdmin`
 - 47d126029: Fix support of objects in a list for MDX templates
 - Updated dependencies [bc4699d2b]
@@ -2637,7 +2665,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 ### Minor Changes
 
 - d0e896561: Provide better error boundary message and visual affordances to user in <ErrorBoundary />.
-- 27c1fd382: Adds a close button to the Tina Cloud auth model so a user is not suck in edit mode.
+- 27c1fd382: Adds a close button to the TinaCloud auth model so a user is not suck in edit mode.
 
 ## 0.54.4
 
@@ -2767,7 +2795,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 
   ```jsx
   // pages/_app.js
-  import TinaCMS from 'tinacms'
+  import TinaCMS from "tinacms";
 
   const App = ({ Component, pageProps }) => {
     return (
@@ -2780,9 +2808,9 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
         data={pageProps.data}
         // Optional: Set to true when working with the local API
         isLocalClient={true}
-        // Optional: When using Tina Cloud, specify the git branch
+        // Optional: When using TinaCloud, specify the git branch
         branch="main"
-        // Optional: Your identifier when connecting to Tina Cloud
+        // Optional: Your identifier when connecting to TinaCloud
         clientId="<some-id-from-tina-cloud>"
         // Optional: A callback for altering the CMS object if needed
         cmsCallback={(cms) => {}}
@@ -2793,10 +2821,10 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
       >
         {(livePageProps) => <Component {...livePageProps} />}
       </TinaCMS>
-    )
-  }
+    );
+  };
 
-  export default App
+  export default App;
   ```
 
   To load TinaCMS dynamically, use the EditState context:
@@ -2846,19 +2874,19 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
   {
     collections: [
       {
-        name: 'post',
-        label: 'Post',
-        path: 'content/posts',
+        name: "post",
+        label: "Post",
+        path: "content/posts",
         fields: [
           {
-            name: 'title',
-            label: 'Title',
-            type: 'string', // read on below to learn more about _type_ changes
+            name: "title",
+            label: "Title",
+            type: "string", // read on below to learn more about _type_ changes
           },
         ],
         // defining `fields` and `templates` would result in a compilation error
       },
-    ]
+    ];
   }
   ```
 
@@ -2929,9 +2957,9 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 
   ```js
   cms.fields.add({
-    name: 'myMapField',
+    name: "myMapField",
     Component: MapPicker,
-  })
+  });
   ```
 
   ### One important gotcha
@@ -2952,17 +2980,17 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
   And then when you register the plugin, provide your custom logic here:
 
   ```js
-  import { TextFieldPlugin } from 'tinacms'
+  import { TextFieldPlugin } from "tinacms";
 
   // ...
 
   cms.fields.add({
     ...TextFieldPlugin, // spread existing text plugin
-    name: 'myText',
+    name: "myText",
     validate: (value) => {
-      someValidationLogic(value)
+      someValidationLogic(value);
     },
-  })
+  });
   ```
 
   **Why?**
@@ -2984,8 +3012,8 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
           {props.getPostDocument.data?.category}
         </MyCategoryComponent>
       </>
-    )
-  }
+    );
+  };
   ```
 
   2. The query did not ask for that field:
@@ -3008,7 +3036,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 
   ```md
   ---
-  title: 'Hello, World'
+  title: "Hello, World"
   categories:
     - sports
     - movies
@@ -3019,7 +3047,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 
   ```md
   ---
-  title: 'Hello, World'
+  title: "Hello, World"
   categories: []
   ---
   ```
@@ -3028,7 +3056,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 
   ```md
   ---
-  title: 'Hello, World'
+  title: "Hello, World"
   ---
   ```
 
@@ -3045,11 +3073,11 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
     return props.blocks.map((block) => {
       return (
         <>
-          <h2>{block.categories.split(',')}</h2>
+          <h2>{block.categories.split(",")}</h2>
         </>
-      )
-    })
-  }
+      );
+    });
+  };
   ```
 
   For a new item, `categories` will be null, so we'll get an error. This only happens when you're editing your page with Tina, so it's not a production-facing issue.

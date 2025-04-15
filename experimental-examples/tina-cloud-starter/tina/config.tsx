@@ -6,7 +6,7 @@ import { testimonialBlockSchema } from '../components/blocks/testimonial'
 import { ColorPickerInput } from '../components/fields/color'
 import { iconSchema } from '../components/util/icon'
 
-export const shouldEncode = (path: string, value: string) => {}
+export const shouldEncode = (path: string, value: string) => { }
 
 const config = defineConfig({
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
@@ -25,7 +25,7 @@ const config = defineConfig({
     //   const pack = await import("next-tinacms-cloudinary");
     //   return pack.TinaCloudCloudinaryMediaStore;
     // },
-    // this is the config for the tina cloud media store
+    // this is the config for the TinaCloud media store
     tina: {
       publicFolder: 'public',
       mediaRoot: 'uploads',

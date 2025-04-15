@@ -1,36 +1,36 @@
-import React from 'react';
-import * as G from 'graphql';
-import { getIn } from 'final-form';
-import { z } from 'zod';
 // @ts-expect-error
 import schemaJson from 'SCHEMA_IMPORT';
-import { expandQuery, isConnectionType, isNodeType } from './expand-query';
+import { getIn } from 'final-form';
+import * as G from 'graphql';
+import React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
-  Form,
-  TinaCMS,
-  NAMER,
-  TinaSchema,
-  useCMS,
-  resolveField,
-  Collection,
-  Template,
-  TinaField,
   Client,
+  Collection,
+  ErrorDialog,
+  Form,
   FormOptions,
   GlobalFormPlugin,
+  NAMER,
+  Template,
+  TinaCMS,
+  TinaField,
+  TinaSchema,
   TinaState,
-  ErrorDialog,
+  resolveField,
+  useCMS,
 } from 'tinacms';
-import { createForm, createGlobalForm, FormifyCallback } from './build-form';
+import { z } from 'zod';
+import { FormifyCallback, createForm, createGlobalForm } from './build-form';
+import { showErrorModal } from './errors';
+import { expandQuery, isConnectionType, isNodeType } from './expand-query';
 import type {
-  PostMessage,
   Payload,
-  SystemInfo,
+  PostMessage,
   ResolvedDocument,
+  SystemInfo,
 } from './types';
 import { getFormAndFieldNameFromMetadata } from './util';
-import { useSearchParams } from 'react-router-dom';
-import { showErrorModal } from './errors';
 
 const sysSchema = z.object({
   breadcrumbs: z.array(z.string()),
@@ -558,6 +558,12 @@ export const useGraphQLReducer = (
           ...payloads.filter(({ id }) => id !== payload.id),
           payload,
         ]);
+      }
+      if (event.data.type === 'url-changed') {
+        cms.dispatch({
+          type: 'sidebar:set-loading-state',
+          value: true,
+        });
       }
     },
     [cms, JSON.stringify(results)]

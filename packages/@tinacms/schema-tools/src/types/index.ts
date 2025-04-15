@@ -584,7 +584,7 @@ export interface Config<
   token?: string | null;
   ui?: {
     /**
-     * When using Tina Cloud's branching feature, provide the URL for your given branch
+     * When using TinaCloud's branching feature, provide the URL for your given branch
      *
      * Eg. If you're deplying to Vercel, and your repo name is 'my-app',
      * Vercel's preview URL would be based on the branch:
@@ -711,7 +711,7 @@ export interface Config<
     | {
         searchClient?: never;
         /**
-         * Use the Tina Cloud search index
+         * Use the TinaCloud search index
          */
         tina: {
           /**
@@ -739,7 +739,7 @@ export interface Config<
     maxSearchIndexFieldLength?: number;
   };
   /**
-   * Used to override the default Tina Cloud API URL
+   * Used to override the default TinaCloud API URL
    *
    * [mostly for internal use only]
    */

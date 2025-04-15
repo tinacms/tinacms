@@ -61,7 +61,7 @@ Call `createMediaHandler` to set up routes and connect your instance of the Medi
 
 Import `isAuthorized` from `next-tinacms-azure`.
 
-The `authorized` key will make it so only authorized users within Tina Cloud can upload and make media edits.
+The `authorized` key will make it so only authorized users within TinaCloud can upload and make media edits.
 
 ```ts
 // route.ts

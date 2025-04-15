@@ -1,5 +1,20 @@
 # create-tina-app
 
+## 1.3.4
+
+### Patch Changes
+
+- [#5594](https://github.com/tinacms/tinacms/pull/5594) [`95a293c`](https://github.com/tinacms/tinacms/commit/95a293cffab73635dc0677ad5277fc84cbf2c507) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: Added `bun` package manager.
+  fix: Removed dead code from `install` method.
+- Updated dependencies []:
+  - @tinacms/metrics@1.0.9
+
+## 1.3.3
+
+### Patch Changes
+
+- [#5565](https://github.com/tinacms/tinacms/pull/5565) [`b4450e7`](https://github.com/tinacms/tinacms/commit/b4450e7ed610eec217429cd85900c5b7956b952f) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Add a message to indicate that the user needs to install Hugo before running “yarn dev”
+
 ## 1.3.2
 
 ### Patch Changes

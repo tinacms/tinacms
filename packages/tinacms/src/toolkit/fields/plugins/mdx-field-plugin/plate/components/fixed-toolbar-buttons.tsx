@@ -30,9 +30,9 @@ import TemplatesToolbarButton from './plate-ui/templates-toolbar-button';
 import { ToolbarGroup } from './plate-ui/toolbar';
 import {
   BoldToolbarButton,
-  StrikethroughToolbarButton,
-  ItalicToolbarButton,
   CodeToolbarButton,
+  ItalicToolbarButton,
+  StrikethroughToolbarButton,
 } from './plate-ui/mark-toolbar-button';
 import { TablePlugin } from '@udecode/plate-table/react';
 

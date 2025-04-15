@@ -1,32 +1,32 @@
-import { ModalBuilder } from './AuthModal';
-import React, { useEffect, useState } from 'react';
 import {
   BaseTextField,
-  TinaCMS,
-  TinaProvider,
-  MediaStore,
-  BranchSwitcherPlugin,
   Branch,
   BranchDataProvider,
-  useLocalStorage,
+  BranchSwitcherPlugin,
   DummyMediaStore,
-  TinaMediaStore,
+  MediaStore,
   StaticMedia,
+  TinaCMS,
+  TinaMediaStore,
+  TinaProvider,
+  useLocalStorage,
 } from '@tinacms/toolkit';
+import React, { useEffect, useState } from 'react';
+import { ModalBuilder } from './AuthModal';
 
+import { TinaAdminApi } from '../admin/api';
 import {
   Client,
   LocalSearchClient,
   TinaCMSSearchClient,
   TinaIOConfig,
 } from '../internalClient';
-import { useTinaAuthRedirect } from './useTinaAuthRedirect';
 import { CreateClientProps, createClient } from '../utils';
-import { TinaAdminApi } from '../admin/api';
+import { useTinaAuthRedirect } from './useTinaAuthRedirect';
 
 type ModalNames = null | 'authenticate' | 'error';
 
-function sleep(ms) {
+function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -51,7 +51,7 @@ export const AuthWallInner = ({
   getModalActions,
 }: TinaCloudAuthWallProps) => {
   const client: Client = cms.api.tina;
-  // Whether we are using Tina Cloud for auth
+  // Whether we are using TinaCloud for auth
   const isTinaCloud =
     !client.isLocalMode &&
     !client.schema?.config?.config?.contentApiUrlOverride;
@@ -160,7 +160,7 @@ export const AuthWallInner = ({
     }
   };
 
-  let modalTitle = 'Tina Cloud';
+  let modalTitle = 'TinaCloud';
   if (
     activeModal === 'authenticate' &&
     loginStrategy === 'Redirect' &&
@@ -187,7 +187,7 @@ export const AuthWallInner = ({
           title={modalTitle}
           message={
             isTinaCloud
-              ? 'Your site uses Tina Cloud to track changes. To make edits, you must log in.'
+              ? 'Your site uses TinaCloud to track changes. To make edits, you must log in.'
               : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
           }
           close={close}
@@ -403,7 +403,7 @@ export const TinaCloudProvider = (
     }
   };
   const client: Client = cms.api.tina;
-  // Weather or not we are using Tina Cloud for auth
+  // Weather or not we are using TinaCloud for auth
   const isTinaCloud =
     !client.isLocalMode &&
     !client.schema?.config?.config?.contentApiUrlOverride;
@@ -471,6 +471,12 @@ export const TinaCloudProvider = (
           cms.flags.set('branch-switcher', true);
           client.usingEditorialWorkflow = true;
           client.protectedBranches = project.protectedBranches;
+
+          // if the current branch is not in the metadata,
+          // switch to the default branch
+          if (!project.metadata[currentBranch]) {
+            setCurrentBranch(project.defaultBranch || 'main');
+          }
         }
       });
     };
@@ -484,7 +490,7 @@ export const TinaCloudProvider = (
       }
     });
     return unsubscribe;
-  }, [isTinaCloud, cms]);
+  }, [currentBranch, isTinaCloud, cms]);
 
   return (
     <SessionProvider basePath='/api/tina/auth'>

@@ -22,6 +22,9 @@ export function useTina<T extends object>(props: {
   React.useEffect(() => {
     setIsClient(true);
     setData(props.data);
+    parent.postMessage({
+      type: 'url-changed',
+    });
   }, [id]);
 
   React.useEffect(() => {

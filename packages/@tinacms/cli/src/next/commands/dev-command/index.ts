@@ -1,19 +1,19 @@
+import path from 'path';
+import { Database, FilesystemBridge, buildSchema } from '@tinacms/graphql';
+import { LocalSearchIndexClient, SearchIndexer } from '@tinacms/search';
 import AsyncLock from 'async-lock';
+import chokidar from 'chokidar';
 import { Command, Option } from 'clipanion';
 import fs from 'fs-extra';
-import path from 'path';
-import chokidar from 'chokidar';
-import { buildSchema, Database, FilesystemBridge } from '@tinacms/graphql';
-import { ConfigManager } from '../../config-manager';
-import { devHTML } from './html';
 import { logger, summary } from '../../../logger';
+import { spin } from '../../../utils/spinner';
 import { dangerText, warnText } from '../../../utils/theme';
-import { createDevServer } from './server';
 import { Codegen } from '../../codegen';
+import { ConfigManager } from '../../config-manager';
 import { createAndInitializeDatabase, createDBServer } from '../../database';
 import { BaseCommand } from '../baseCommands';
-import { spin } from '../../../utils/spinner';
-import { SearchIndexer, LocalSearchIndexClient } from '@tinacms/search';
+import { devHTML } from './html';
+import { createDevServer } from './server';
 
 export class DevCommand extends BaseCommand {
   static paths = [['dev'], ['server:start']];
@@ -27,11 +27,11 @@ export class DevCommand extends BaseCommand {
   });
   outputSearchIndexPath = Option.String('--outputSearchIndexPath', {
     description: 'Path to write the search index to',
-  })
+  });
   noServer = Option.Boolean('--no-server', false, {
     description: 'Do not start the dev server',
-  })
-  indexingLock: AsyncLock = new AsyncLock() // Prevent indexes and reads occurring at once
+  });
+  indexingLock: AsyncLock = new AsyncLock(); // Prevent indexes and reads occurring at once
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -211,8 +211,8 @@ export class DevCommand extends BaseCommand {
     }
 
     if (this.noServer) {
-      logger.info('--no-server option specified - Dev server not started')
-      process.exit(0)
+      logger.info('--no-server option specified - Dev server not started');
+      process.exit(0);
     }
     if (!this.noWatch) {
       this.watchContentFiles(
@@ -336,7 +336,7 @@ export class DevCommand extends BaseCommand {
      * This has no way of knowing whether the change to the file came from someone manually
      * editing in their IDE or Tina pushing the update via the Filesystem bridge. It's a simple
      * enough update that it's fine that when Tina pushes a change, we go and push that same
-     * thing back through the database, and Tina Cloud does the same thing when it receives
+     * thing back through the database, and TinaCloud does the same thing when it receives
      * a push from GitHub.
      */
     chokidar
