@@ -105,6 +105,7 @@
 		"@udecode/plate-slash-command": "44.0.0",
 		"@udecode/plate-table": "44.0.0",
 		"@udecode/plate-trailing-block": "44.0.0",
+		"@udecode/slate": "44.0.0",
 		"async-lock": "^1.4.1",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
