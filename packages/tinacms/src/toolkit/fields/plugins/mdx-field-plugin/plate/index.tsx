@@ -100,9 +100,11 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
               <FixedToolbarButtons />
             </FixedToolbar>
             {field?.overrides?.showFloatingToolbar !== false ? (
-              <FloatingToolbar>
-                <FloatingToolbarButtons />
-              </FloatingToolbar>
+              //TODO: Are we actually using this?
+              // <FloatingToolbar>
+              //   <FloatingToolbarButtons />
+              // </FloatingToolbar>
+              <></>
             ) : null}
           </ToolbarProvider>
           <Editor />
