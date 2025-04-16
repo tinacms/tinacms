@@ -1,6 +1,6 @@
 import { createSoftBreakPlugin } from '../soft-break';
 // import { withCorrectVoidBehavior } from './with-correct-void-behavior';
-import { createPlatePlugin, ParagraphPlugin } from '@udecode/plate/react';
+import { ParagraphPlugin } from '@udecode/plate/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';

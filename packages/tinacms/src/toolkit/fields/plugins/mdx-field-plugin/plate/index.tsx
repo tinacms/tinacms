@@ -35,7 +35,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const plugins = [
     ...formattingPlugins,
     ...commonPlugins,
-    //TODO : Enable these plugins, they are temporary disable due to plate upgrade (giving some error, we need to deal with it later before plate upgrade can be released)
+    //TODO(Plate Upgrade) : Enable these plugins, they are temporary disable due to plate upgrade (giving some error, we need to deal with it later before plate upgrade can be released)
     // createMdxBlockPlugin(),
     // createMdxInlinePlugin(),
     // createImgPlugin(),
@@ -100,7 +100,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
               <FixedToolbarButtons />
             </FixedToolbar>
             {field?.overrides?.showFloatingToolbar !== false ? (
-              //TODO: Are we actually using this?
+              //TODO(Plate Upgrade) : Are we actually using this?
               // <FloatingToolbar>
               //   <FloatingToolbarButtons />
               // </FloatingToolbar>

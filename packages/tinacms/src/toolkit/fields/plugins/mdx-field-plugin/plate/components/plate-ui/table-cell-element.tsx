@@ -8,7 +8,7 @@ import {
   useTableCellElementResizable,
 } from '@udecode/plate-table/react';
 
-//TODO: Test and makesure table cell still working
+//TODO(Plate Upgrade) : Test and makesure table cell still working
 export const TableCellElement = withRef<
   typeof PlateElement,
   {
@@ -88,7 +88,7 @@ export const TableCellElement = withRef<
             contentEditable={false}
             suppressContentEditableWarning={true}
           >
-            {/* TODO: Re-enable this hovered is removed in latest version */}
+            {/* TODO(Plate Upgrade) : Re-enable this hovered is removed in latest version */}
             {/* {!readOnly && (
               <>
                 <ResizeHandle

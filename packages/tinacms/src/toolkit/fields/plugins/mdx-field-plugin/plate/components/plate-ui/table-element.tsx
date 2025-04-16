@@ -219,7 +219,7 @@ export const TableElement = withHOC(
             {...props}
           >
             <table>
-              {/* TODO: need to find a way to add colgroup, this property is removed from the latest plate and slate(using css) */}
+              {/* TODO(Plate Upgrade) : need to find a way to add colgroup, this property is removed from the latest plate and slate(using css) */}
               {/* <colgroup {...colGroupProps}>
                 {colSizes.map((width, index) => (
                   <col
