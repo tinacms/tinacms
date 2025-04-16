@@ -9,7 +9,9 @@ import {
   useEditorRef,
   useEditorSelector,
   useElement,
+  useReadOnly,
   useRemoveNodeButton,
+  useSelected,
   withHOC,
 } from '@udecode/plate/react';
 import {
@@ -17,7 +19,6 @@ import {
   mergeTableCells,
   splitTableCell,
 } from '@udecode/plate-table';
-import { useReadOnly, useSelected } from 'slate-react';
 
 import { Icons, iconVariants } from './icons';
 

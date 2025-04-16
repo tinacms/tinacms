@@ -1,4 +1,3 @@
-import { ReactEditor } from 'slate-react';
 import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';
@@ -106,7 +105,7 @@ export const insertInlineElement = (editor, inlineElement) => {
   }, 1);
 };
 export const insertBlockElement = (editor, blockElement) => {
-  const editorEl = ReactEditor.toDOMNode(editor, editor);
+  const editorEl = editor.toDOMNode(editor, editor);
   if (editorEl) {
     /**
      * FIXME mdx-setTimeout: there must be a better way to do this. When jumping
