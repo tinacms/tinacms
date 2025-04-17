@@ -55,6 +55,7 @@
 	"dependencies": {
 		"picomatch-browser": "2.2.6",
 		"url-pattern": "^1.0.3",
+        "@tinacms/common": "workspace:*",
 		"zod": "^3.24.2"
 	}
 }

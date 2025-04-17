@@ -65,6 +65,7 @@
 		"@tinacms/graphql": "workspace:*",
 		"@tinacms/metrics": "workspace:*",
 		"@tinacms/schema-tools": "workspace:*",
+        "@tinacms/common": "workspace:*",
 		"@tinacms/search": "workspace:*",
 		"@vitejs/plugin-react": "3.1.0",
 		"altair-express-middleware": "^7.3.6",

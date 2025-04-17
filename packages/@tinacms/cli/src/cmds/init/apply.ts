@@ -31,6 +31,7 @@ import {
 } from './index';
 import { Config } from './prompts';
 import { addSelfHostedTinaAuthToConfig } from './codegen';
+import { ContentFrontmatterFormat } from '@tinacms/common';
 
 async function apply({
   env,
@@ -219,7 +220,7 @@ const forestryMigrate = async ({
 }: {
   usingTypescript: boolean;
   pathToForestryConfig: string;
-  frontMatterFormat: 'yaml' | 'toml' | 'json';
+  frontMatterFormat: ContentFrontmatterFormat;
 }) => {
   const { collections, importStatements, templateCode } =
     await generateCollections({
