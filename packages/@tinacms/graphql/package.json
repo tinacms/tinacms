@@ -34,6 +34,7 @@
 		"@iarna/toml": "^2.2.5",
 		"@tinacms/mdx": "workspace:*",
 		"@tinacms/schema-tools": "workspace:*",
+        "@tinacms/common": "workspace:*",
 		"abstract-level": "^1.0.4",
 		"date-fns": "^2.30.0",
 		"fast-glob": "^3.3.3",
