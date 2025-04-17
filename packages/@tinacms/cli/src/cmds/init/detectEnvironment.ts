@@ -1,7 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { logger } from '../../logger';
-import { FrontmatterFormat, GeneratedFile, InitEnvironment } from './index';
+import { GeneratedFile, InitEnvironment } from './index';
+import { ContentFrontmatterFormat } from '@tinacms/common';
 
 const checkGitignoreForItem = async ({
   baseDir,
@@ -168,7 +169,7 @@ const detectEnvironment = async ({
     (await checkGitignoreForItem({ baseDir, line: '.env.tina' }));
   const hasGitIgnoreEnv =
     hasGitIgnore && (await checkGitignoreForItem({ baseDir, line: '.env' }));
-  let frontMatterFormat: FrontmatterFormat;
+  let frontMatterFormat: ContentFrontmatterFormat;
   if (hasForestryConfig) {
     const hugoConfigPath = path.join(rootPath, 'config.toml');
     if (await fs.pathExists(hugoConfigPath)) {
