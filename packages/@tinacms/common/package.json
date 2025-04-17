@@ -9,15 +9,15 @@
   "scripts": {
     "build": "tsc"
   },
-  "main": "dist/index.ts",
-  "module": "./dist/index.mjs",
-  "exports": {
-  	".": {
-  		"types": "./dist/index.d.ts",
-  		"import": "./dist/index.mjs",
-  		"require": "./dist/index.js"
-  	}
+  "typings": "dist/index.d.ts",
+  "buildConfig": {
+  	"entryPoints": [
+  	  {
+  	    "name": "src/index.ts"
+  	  }
+  	]
   },
+  "main": "dist/index.js",
   "devDependencies": {
     "typescript": "^4.7.4"
   },

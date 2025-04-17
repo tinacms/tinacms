@@ -1,37 +1,9 @@
 {
+  "extends": "../../../base.tsconfig.json",
   "compilerOptions": {
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "alwaysStrict": true,
-    "declaration": true,
-    "emitDecoratorMetadata": false,
-    "esModuleInterop": true,
-    "experimentalDecorators": false,
-    "importHelpers": true,
-    "jsx": "preserve",
-    "lib": ["esnext"],
-    "moduleResolution": "node",
-    "module": "esnext",
-    "noFallthroughCasesInSwitch": false,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
     "outDir": "dist",
-    "pretty": true,
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "strict": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
-    "stripInternal": true,
-    "target": "ES2017",
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true
+    "rootDir": "src"
   },
-  "exclude": ["node_modules", "dist"],
-  "include": ["**/*.ts"]
+  "exclude": ["node_modules", "dist", "src/**/*.test.tsx", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.spec.tsx"],
+  "include": ["src"]
 }
