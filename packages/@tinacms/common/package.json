@@ -30,9 +30,10 @@
     "directory": "packages/@tinacms/common"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tinacms-scripts build"
   },
   "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
     "typescript": "^5.7.3"
   }
 }
