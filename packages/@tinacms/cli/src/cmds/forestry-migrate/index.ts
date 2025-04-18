@@ -11,7 +11,11 @@ import {
   makeTemplateFile,
   makeFieldsWithInternalCode,
 } from './util/codeTransformer';
-import { ContentFormat, CONTENT_FORMATS, ContentFrontmatterFormat } from '@tinacms/common'
+import {
+  ContentFormat,
+  CONTENT_FORMATS,
+  ContentFrontmatterFormat,
+} from '@tinacms/common';
 
 const BODY_FIELD = {
   // This is the body field
