@@ -1,8 +1,8 @@
 import { AuthProvider, LoginStrategy } from '@tinacms/schema-tools';
 import {
-  authenticate,
   AUTH_TOKEN_KEY,
   TokenObject,
+  authenticate,
 } from '../auth/authenticate';
 import DefaultSessionProvider from '../auth/defaultSessionProvider';
 
@@ -70,6 +70,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
   clientId: string;
   identityApiUrl: string;
   frontendUrl: string;
+  oauth2: boolean;
   token: string; // used with memory storage
   setToken: (_token: TokenObject) => void;
   getToken: () => Promise<TokenObject>;
@@ -86,11 +87,13 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM';
     getTokenFn?: () => Promise<TokenObject>;
     frontendUrl: string;
+    oauth2?: boolean;
   }) {
     super();
     this.frontendUrl = frontendUrl;
     this.clientId = clientId;
     this.identityApiUrl = identityApiUrl;
+    this.oauth2 = options.oauth2 || false;
     switch (tokenStorage) {
       case 'LOCAL_STORAGE':
         this.getToken = async function () {
@@ -136,7 +139,11 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     }
   }
   async authenticate() {
-    const token = await authenticate(this.clientId, this.frontendUrl);
+    const token = await authenticate(
+      this.clientId,
+      this.frontendUrl,
+      this.oauth2
+    );
     this.setToken(token);
     return token;
   }
