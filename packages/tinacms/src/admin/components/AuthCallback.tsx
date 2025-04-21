@@ -10,6 +10,7 @@ export default function AuthCallback({
   clientId: string;
   identityApiUrl: string;
 }) {
+  console.log('AuthCallback', clientId, identityApiUrl);
   const [code, setCode] = React.useState<string | null>(null);
   const [state, setState] = React.useState<string | null>(null);
   const [tokenResponse, setTokenResponse] = React.useState<any>(null);
@@ -27,7 +28,9 @@ export default function AuthCallback({
     if (code && state) {
       if (localStorage.getItem('code_verifier')) {
         const origin = `${window.location.protocol}//${window.location.host}`;
-        const redirectUri = encodeURIComponent(`${origin}/admin/auth/callback`);
+        const redirectUri = encodeURIComponent(
+          `${origin}/admin#/auth/callback`
+        );
         // Send the code and code verifier to your backend for token exchange
         fetch(`${identityApiUrl}/oauth2/${clientId}/token`, {
           method: 'POST',
