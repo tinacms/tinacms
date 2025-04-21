@@ -2,17 +2,17 @@
 
 */
 
-import popupWindow from "./popupWindow";
+import popupWindow from './popupWindow';
 
-const TINA_LOGIN_EVENT = "tinaCloudLogin";
-export const AUTH_TOKEN_KEY = "tinacms-auth";
+const TINA_LOGIN_EVENT = 'tinaCloudLogin';
+export const AUTH_TOKEN_KEY = 'tinacms-auth';
 
 // Helper function to generate a random string
 const generateRandomString = (length) => {
   const array = new Uint32Array(length);
   window.crypto.getRandomValues(array);
-  return Array.from(array, (dec) => ("0" + dec.toString(16)).slice(-2)).join(
-    ""
+  return Array.from(array, (dec) => ('0' + dec.toString(16)).slice(-2)).join(
+    ''
   );
 };
 
@@ -20,11 +20,11 @@ const generateRandomString = (length) => {
 const generateCodeChallenge = async (codeVerifier) => {
   const encoder = new TextEncoder();
   const data = encoder.encode(codeVerifier);
-  const digest = await window.crypto.subtle.digest("SHA-256", data);
+  const digest = await window.crypto.subtle.digest('SHA-256', data);
   return btoa(String.fromCharCode(...new Uint8Array(digest)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 };
 
 export type TokenObject = {
@@ -45,7 +45,7 @@ export const authenticate = (
       const codeChallenge = await generateCodeChallenge(codeVerifier);
 
       // Save the code verifier in localStorage
-      localStorage.setItem("code_verifier", codeVerifier);
+      localStorage.setItem('code_verifier', codeVerifier);
 
       const redirectUri = encodeURIComponent(`${origin}/admin/auth/callback`);
       window.location.href = `${frontendUrl}/oauth-signin?redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&client_id=${clientId}`;
@@ -53,14 +53,14 @@ export const authenticate = (
     }
     const authTab = popupWindow(
       `${frontendUrl}/signin?clientId=${clientId}&origin=${origin}`,
-      "_blank",
+      '_blank',
       window,
       1000,
       700
     );
 
     // TODO - Grab this from the URL instead of passing through localstorage
-    window.addEventListener("message", function (e: MessageEvent) {
+    window.addEventListener('message', function (e: MessageEvent) {
       if (e.data.source === TINA_LOGIN_EVENT) {
         if (authTab) {
           authTab.close();
