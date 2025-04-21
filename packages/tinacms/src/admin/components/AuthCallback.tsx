@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { AUTH_TOKEN_KEY } from 'src/auth/authenticate';
+import { AUTH_TOKEN_KEY } from '../../auth/authenticate';
 
 export default function AuthCallback({
   clientId,
