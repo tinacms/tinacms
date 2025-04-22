@@ -10,10 +10,10 @@ export type ToolbarOverrideType =
   | 'bold'
   | 'strikethrough'
   | 'italic'
-  | 'mermaid'
+  // | 'mermaid' //TODO(Plate Upgrade): Renable this after plugin rewrite in latest plate version
   | 'raw'
-  | 'embed'
-  | 'table';
+  | 'embed';
+// | 'table';  //TODO(Plate Upgrade): Renable this after plugin rewrite in latest plate version
 
 export const STANDARD_ICON_WIDTH = 32;
 export const HEADING_ICON_WITH_TEXT = 127;

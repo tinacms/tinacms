@@ -103,16 +103,18 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     width: () => STANDARD_ICON_WIDTH,
     Component: <CodeBlockToolbarButton />,
   },
-  mermaid: {
-    label: 'Mermaid',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <MermaidToolbarButton />,
-  },
-  table: {
-    label: 'Table',
-    width: () => STANDARD_ICON_WIDTH,
-    Component: <TableDropdownMenu />,
-  },
+  //TODO(Plate Upgrade): Renable this after plugin rewrite in latest plate version
+  // mermaid: {
+  //   label: 'Mermaid',
+  //   width: () => STANDARD_ICON_WIDTH,
+  //   Component: <MermaidToolbarButton />,
+  // },
+  //TODO(Plate Upgrade): Renable this after plugin rewrite in latest plate version
+  // table: {
+  //   label: 'Table',
+  //   width: () => STANDARD_ICON_WIDTH,
+  //   Component: <TableDropdownMenu />,
+  // },
   raw: {
     label: 'Raw Markdown',
     width: () => STANDARD_ICON_WIDTH,
