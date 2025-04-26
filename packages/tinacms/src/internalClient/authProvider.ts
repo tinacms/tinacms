@@ -181,12 +181,16 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
           console.error('Error during token exchange:', error);
         });
     } else {
+      console.log('calling authenticate');
       const token = await authenticate(
         this.clientId,
         this.frontendUrl,
         this.oauth2
       );
-      this.setToken(token);
+      console.log('Token:', token);
+      if (token) {
+        this.setToken(token);
+      }
     }
 
     return this.getToken();

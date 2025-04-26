@@ -49,6 +49,7 @@ export const authenticate = (
 
       const redirectUri = encodeURIComponent(`${origin}/admin`);
       window.location.href = `${frontendUrl}/oauth-signin?redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&client_id=${clientId}`;
+      resolve(undefined);
       return;
     }
     const authTab = popupWindow(
