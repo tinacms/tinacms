@@ -1614,7 +1614,7 @@ const _indexContent = async (
   enqueueOps: (ops: BatchOp[]) => Promise<void>,
   collection?: Collection<true>,
   passwordFields?: string[][],
-  deleteExisting?: boolean
+  isPartialReindex?: boolean
 ) => {
   let collectionIndexDefinitions: Record<string, IndexDefinition>;
   let collectionPath: string | undefined;
@@ -1664,7 +1664,7 @@ const _indexContent = async (
         normalizedPath,
         collectionPath || ''
       );
-      if (deleteExisting) {
+      if (isPartialReindex) {
         const item = await rootSublevel.get(normalizedPath);
         if (item) {
           await database.contentLevel.batch([
