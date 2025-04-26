@@ -1363,7 +1363,9 @@ export class Database {
               this.contentLevel,
               documentPaths,
               enqueueOps,
-              collection
+              collection,
+              undefined,
+              true
             );
           }
         }
@@ -1611,7 +1613,8 @@ const _indexContent = async (
   documentPaths: string[],
   enqueueOps: (ops: BatchOp[]) => Promise<void>,
   collection?: Collection<true>,
-  passwordFields?: string[][]
+  passwordFields?: string[][],
+  deleteExisting?: boolean
 ) => {
   let collectionIndexDefinitions: Record<string, IndexDefinition>;
   let collectionPath: string | undefined;
@@ -1661,40 +1664,42 @@ const _indexContent = async (
         normalizedPath,
         collectionPath || ''
       );
-      const item = await rootSublevel.get(normalizedPath);
-      if (item) {
-        await database.contentLevel.batch([
-          ...makeRefOpsForDocument(
-            normalizedPath,
-            collection?.name,
-            collectionReferences,
-            item,
-            'del',
-            level
-          ),
-          ...makeIndexOpsForDocument<Record<string, any>>(
-            normalizedPath,
-            collection.name,
-            collectionIndexDefinitions,
-            item,
-            'del',
-            level
-          ),
-          // folder indices
-          ...makeIndexOpsForDocument(
-            normalizedPath,
-            `${collection.name}_${folderKey}`,
-            collectionIndexDefinitions,
-            item,
-            'del',
-            level
-          ),
-          {
-            type: 'del',
-            key: normalizedPath,
-            sublevel: rootSublevel,
-          },
-        ]);
+      if (deleteExisting) {
+        const item = await rootSublevel.get(normalizedPath);
+        if (item) {
+          await database.contentLevel.batch([
+            ...makeRefOpsForDocument(
+              normalizedPath,
+              collection?.name,
+              collectionReferences,
+              item,
+              'del',
+              level
+            ),
+            ...makeIndexOpsForDocument<Record<string, any>>(
+              normalizedPath,
+              collection.name,
+              collectionIndexDefinitions,
+              item,
+              'del',
+              level
+            ),
+            // folder indices
+            ...makeIndexOpsForDocument(
+              normalizedPath,
+              `${collection.name}_${folderKey}`,
+              collectionIndexDefinitions,
+              item,
+              'del',
+              level
+            ),
+            {
+              type: 'del',
+              key: normalizedPath,
+              sublevel: rootSublevel,
+            },
+          ]);
+        }
       }
 
       if (!isGitKeep(filepath, collection)) {
