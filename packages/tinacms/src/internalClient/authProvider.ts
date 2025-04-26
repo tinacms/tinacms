@@ -139,14 +139,51 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     }
   }
   async authenticate() {
-    const token = await authenticate(
-      this.clientId,
-      this.frontendUrl,
-      this.oauth2
-    );
-    this.setToken(token);
-    return token;
+    // get query parameters
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+    // const error = params.get("error");
+    // const scope = params.get("scope");
+    const codeVerifier = localStorage.getItem('code_verifier');
+    // implement state check
+
+    if (code && state && codeVerifier) {
+      const origin = `${window.location.protocol}//${window.location.host}`;
+      const redirectUri = encodeURIComponent(`${origin}/admin`);
+      await fetch(`${this.identityApiUrl}/oauth2/${this.clientId}/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: redirectUri,
+          client_id: this.clientId,
+          code_verifier: localStorage.getItem('code_verifier'),
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('Token exchange response:', data);
+          this.setToken(data);
+        })
+        .catch((error) => {
+          console.error('Error during token exchange:', error);
+        });
+    } else {
+      const token = await authenticate(
+        this.clientId,
+        this.frontendUrl,
+        this.oauth2
+      );
+      this.setToken(token);
+    }
+
+    return this.getToken();
   }
+
   async getUser() {
     if (!this.clientId) {
       return null;
