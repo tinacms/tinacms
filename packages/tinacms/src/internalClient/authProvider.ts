@@ -1,14 +1,14 @@
-import { AuthProvider, LoginStrategy } from "@tinacms/schema-tools";
+import { AuthProvider, LoginStrategy } from '@tinacms/schema-tools';
 import {
   AUTH_TOKEN_KEY,
   TokenObject,
   authenticate,
-} from "../auth/authenticate";
-import DefaultSessionProvider from "../auth/defaultSessionProvider";
+} from '../auth/authenticate';
+import DefaultSessionProvider from '../auth/defaultSessionProvider';
 
-type Input = Parameters<AuthProvider["fetchWithToken"]>[0];
-type Init = Parameters<AuthProvider["fetchWithToken"]>[1];
-type FetchReturn = ReturnType<AuthProvider["fetchWithToken"]>;
+type Input = Parameters<AuthProvider['fetchWithToken']>[0];
+type Init = Parameters<AuthProvider['fetchWithToken']>[1];
+type FetchReturn = ReturnType<AuthProvider['fetchWithToken']>;
 
 export abstract class AbstractAuthProvider implements AuthProvider {
   /**
@@ -24,7 +24,7 @@ export abstract class AbstractAuthProvider implements AuthProvider {
     const headers = init?.headers || {};
     const token = await this.getToken();
     if (token?.id_token) {
-      headers["Authorization"] = "Bearer " + token?.id_token;
+      headers['Authorization'] = 'Bearer ' + token?.id_token;
     }
     return await fetch(input, {
       ...(init || {}),
@@ -45,7 +45,7 @@ export abstract class AbstractAuthProvider implements AuthProvider {
   }
 
   getLoginStrategy(): LoginStrategy {
-    return "Redirect";
+    return 'Redirect';
   }
 
   /**
@@ -78,13 +78,13 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
   constructor({
     clientId,
     identityApiUrl,
-    tokenStorage = "MEMORY",
+    tokenStorage = 'MEMORY',
     frontendUrl,
     ...options
   }: {
     clientId: string;
     identityApiUrl: string;
-    tokenStorage?: "MEMORY" | "LOCAL_STORAGE" | "CUSTOM";
+    tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM';
     getTokenFn?: () => Promise<TokenObject>;
     frontendUrl: string;
     oauth2?: boolean;
@@ -95,7 +95,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     this.identityApiUrl = identityApiUrl;
     this.oauth2 = options.oauth2 || false;
     switch (tokenStorage) {
-      case "LOCAL_STORAGE":
+      case 'LOCAL_STORAGE':
         this.getToken = async function () {
           const tokens = localStorage.getItem(AUTH_TOKEN_KEY) || null;
           if (tokens) {
@@ -112,7 +112,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
           localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(token, null, 2));
         };
         break;
-      case "MEMORY":
+      case 'MEMORY':
         this.getToken = async () => {
           if (this.token) {
             return await this.getRefreshedToken(this.token);
@@ -128,10 +128,10 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
           this.token = JSON.stringify(token, null, 2);
         };
         break;
-      case "CUSTOM":
+      case 'CUSTOM':
         if (!options.getTokenFn) {
           throw new Error(
-            "When CUSTOM token storage is selected, a getTokenFn must be provided"
+            'When CUSTOM token storage is selected, a getTokenFn must be provided'
           );
         }
         this.getToken = options.getTokenFn;
@@ -142,11 +142,11 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     // get query parameters
     const params = new URLSearchParams(window.location.search);
     console.log({ params });
-    const code = params.get("code");
-    const state = params.get("state");
+    const code = params.get('code');
+    const state = params.get('state');
     // const error = params.get("error");
     // const scope = params.get("scope");
-    const codeVerifier = localStorage.getItem("code_verifier");
+    const codeVerifier = localStorage.getItem('code_verifier');
     // implement state check
     console.log({
       code,
@@ -158,27 +158,27 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
       const origin = `${window.location.protocol}//${window.location.host}`;
       const redirectUri = encodeURIComponent(`${origin}/admin`);
       const tokenUrl = `${this.identityApiUrl}/oauth2/${this.clientId}/token`;
-      console.log("Token URL:", tokenUrl);
+      console.log('Token URL:', tokenUrl);
       await fetch(tokenUrl, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          grant_type: "authorization_code",
+          grant_type: 'authorization_code',
           code: code,
           redirect_uri: redirectUri,
           client_id: this.clientId,
-          code_verifier: localStorage.getItem("code_verifier"),
+          code_verifier: localStorage.getItem('code_verifier'),
         }),
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("Token exchange response:", data);
+          console.log('Token exchange response:', data);
           this.setToken(data);
         })
         .catch((error) => {
-          console.error("Error during token exchange:", error);
+          console.error('Error during token exchange:', error);
         });
     } else {
       const token = await authenticate(
@@ -201,10 +201,10 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
 
     try {
       const res = await this.fetchWithToken(url, {
-        method: "GET",
+        method: 'GET',
       });
       const val = await res.json();
-      if (!res.status.toString().startsWith("2")) {
+      if (!res.status.toString().startsWith('2')) {
         console.error(val.error);
         return null;
       }
@@ -225,14 +225,14 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     // if the token is going to expire within the next two minutes, refresh it now
     if (Date.now() / 1000 >= exp - 120) {
       const refreshResponse = await fetch(iss, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/x-amz-json-1.1",
-          "x-amz-target": "AWSCognitoIdentityProviderService.InitiateAuth",
+          'Content-Type': 'application/x-amz-json-1.1',
+          'x-amz-target': 'AWSCognitoIdentityProviderService.InitiateAuth',
         },
         body: JSON.stringify({
           ClientId: client_id,
-          AuthFlow: "REFRESH_TOKEN_AUTH",
+          AuthFlow: 'REFRESH_TOKEN_AUTH',
           AuthParameters: {
             REFRESH_TOKEN: refresh_token,
             DEVICE_KEY: null,
@@ -241,7 +241,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
       });
 
       if (refreshResponse.status !== 200) {
-        throw new Error("Unable to refresh auth tokens");
+        throw new Error('Unable to refresh auth tokens');
       }
 
       const responseJson = await refreshResponse.json();
@@ -258,21 +258,21 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     return Promise.resolve({ access_token, id_token, refresh_token });
   }
   parseJwt(token) {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
-        .split("")
+        .split('')
         .map(function (c) {
-          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         })
-        .join("")
+        .join('')
     );
     return JSON.parse(jsonPayload);
   }
 }
 
-const LOCAL_CLIENT_KEY = "tina.local.isLogedIn";
+const LOCAL_CLIENT_KEY = 'tina.local.isLogedIn';
 
 export class LocalAuthProvider extends AbstractAuthProvider {
   constructor() {
@@ -280,15 +280,15 @@ export class LocalAuthProvider extends AbstractAuthProvider {
   }
 
   async authenticate() {
-    localStorage.setItem(LOCAL_CLIENT_KEY, "true");
-    return { access_token: "LOCAL", id_token: "LOCAL", refresh_token: "LOCAL" };
+    localStorage.setItem(LOCAL_CLIENT_KEY, 'true');
+    return { access_token: 'LOCAL', id_token: 'LOCAL', refresh_token: 'LOCAL' };
   }
 
   async getUser(): Promise<boolean> {
-    return localStorage.getItem(LOCAL_CLIENT_KEY) === "true";
+    return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true';
   }
   async getToken() {
-    return Promise.resolve({ id_token: "" });
+    return Promise.resolve({ id_token: '' });
   }
   async logout() {
     localStorage.removeItem(LOCAL_CLIENT_KEY);
