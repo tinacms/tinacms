@@ -47,7 +47,7 @@ export const authenticate = (
       // Save the code verifier in localStorage
       localStorage.setItem('code_verifier', codeVerifier);
 
-      const redirectUri = encodeURIComponent(`${origin}/admin#/auth/callback`);
+      const redirectUri = encodeURIComponent(`${origin}/admin`);
       window.location.href = `${frontendUrl}/oauth-signin?redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&client_id=${clientId}`;
       return;
     }
