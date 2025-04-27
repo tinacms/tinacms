@@ -156,7 +156,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
 
     if (code && state && codeVerifier) {
       const origin = `${window.location.protocol}//${window.location.host}`;
-      const redirectUri = encodeURIComponent(`${origin}/admin`);
+      const redirectUri = `${origin}/admin`;
       const tokenUrl = `${this.identityApiUrl}/oauth2/${this.clientId}/token`;
       console.log('Token URL:', tokenUrl);
       await fetch(tokenUrl, {

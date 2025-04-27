@@ -91,7 +91,7 @@ export const AuthWallInner = ({
     if (codeVerifier && code && state) {
       setRetrievingToken(true);
       const origin = `${window.location.protocol}//${window.location.host}`;
-      const redirectUri = encodeURIComponent(`${origin}/admin`);
+      const redirectUri = `${origin}/admin`;
       const tokenUrl = `${client.identityApiUrl}/oauth2/${client.clientId}/token`;
       console.log('Token URL:', tokenUrl);
       fetch(tokenUrl, {
@@ -111,9 +111,18 @@ export const AuthWallInner = ({
         .then((data) => {
           console.log('Token exchange response:', data);
           // this.setToken(data);
-          setRetrievingToken(false);
+          if (data.error) {
+            console.error(
+              'Error during token exchange:',
+              data.error,
+              data.error_description
+            );
+            setRetrievingToken(false);
+            return;
+          }
           localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(data));
           setAuthenticated(true);
+          setRetrievingToken(false);
         })
         .catch((error) => {
           console.error('Error during token exchange:', error);
