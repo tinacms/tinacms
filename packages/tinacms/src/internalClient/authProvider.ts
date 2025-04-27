@@ -224,6 +224,14 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
 
   async getRefreshedToken(tokens: string): Promise<TokenObject> {
     const { access_token, id_token, refresh_token } = JSON.parse(tokens);
+    // FIXME this is a hack around lack of refresh token -
+    if (access_token && !id_token && !refresh_token) {
+      return Promise.resolve({
+        access_token,
+        id_token: access_token,
+        refresh_token: access_token,
+      });
+    }
     const { exp, iss, client_id } = this.parseJwt(access_token);
 
     // if the token is going to expire within the next two minutes, refresh it now
