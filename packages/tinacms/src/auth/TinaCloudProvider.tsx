@@ -22,6 +22,7 @@ import {
   TinaIOConfig,
 } from '../internalClient';
 import { CreateClientProps, createClient } from '../utils';
+import { AUTH_TOKEN_KEY } from './authenticate';
 import { useTinaAuthRedirect } from './useTinaAuthRedirect';
 
 type ModalNames = null | 'authenticate' | 'error';
@@ -73,8 +74,59 @@ export const AuthWallInner = ({
     password: string;
   }>({ username: '', password: '' });
   const [authenticated, setAuthenticated] = useState<boolean>(false);
+  const [code, setCode] = useState<string | null>(null);
+  const [state, setState] = useState<string | null>(null);
+  const [retrievingToken, setRetrievingToken] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const queryParams = new URLSearchParams(window.location.search);
+      setCode(queryParams.get('code'));
+      setState(queryParams.get('state'));
+    }
+  }, []);
+
+  useEffect(() => {
+    const codeVerifier = localStorage.getItem('code_verifier');
+    if (codeVerifier && code && state) {
+      setRetrievingToken(true);
+      const origin = `${window.location.protocol}//${window.location.host}`;
+      const redirectUri = encodeURIComponent(`${origin}/admin`);
+      const tokenUrl = `${client.identityApiUrl}/oauth2/${client.clientId}/token`;
+      console.log('Token URL:', tokenUrl);
+      fetch(tokenUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: redirectUri,
+          client_id: client.clientId,
+          code_verifier: localStorage.getItem('code_verifier'),
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('Token exchange response:', data);
+          // this.setToken(data);
+          setRetrievingToken(false);
+          localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(data));
+          setAuthenticated(true);
+        })
+        .catch((error) => {
+          console.error('Error during token exchange:', error);
+          setRetrievingToken(false);
+        });
+    }
+  }, [code, state]);
 
   React.useEffect(() => {
+    if (retrievingToken) {
+      console.log('Retrieving token...');
+      return;
+    }
     let mounted = true;
     client.authProvider
       .isAuthenticated()
@@ -122,7 +174,7 @@ export const AuthWallInner = ({
     return () => {
       mounted = false;
     };
-  }, [authenticated]);
+  }, [authenticated, retrievingToken]);
 
   const onAuthenticated = async () => {
     setAuthenticated(true);
