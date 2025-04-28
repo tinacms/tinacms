@@ -58,7 +58,7 @@ const blockClasses = 'mt-0.5';
 const headerClasses = 'font-normal';
 
 export const Components = () => {
-  const selected = useSelected();
+  // const selected = useSelected();
   return {
     [ELEMENT_SLASH_INPUT]: SlashInputElement,
     [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (
