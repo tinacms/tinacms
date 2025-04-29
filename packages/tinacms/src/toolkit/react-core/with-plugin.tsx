@@ -1,6 +1,6 @@
-import { Plugin } from '@toolkit/core'
-import { usePlugin } from './use-plugin'
-import * as React from 'react'
+import { Plugin } from '@toolkit/core';
+import { usePlugin } from './use-plugin';
+import * as React from 'react';
 
 /**
  * A Higher-Order-Component for adding Plugins to the CMS.
@@ -11,9 +11,9 @@ import * as React from 'react'
  */
 export function withPlugins(Component: any, plugins: Plugin | Plugin[]) {
   return (props: any) => {
-    usePlugin(plugins)
-    return <Component {...props} />
-  }
+    usePlugin(plugins);
+    return <Component {...props} />;
+  };
 }
 
 /**
@@ -23,4 +23,4 @@ export function withPlugins(Component: any, plugins: Plugin | Plugin[]) {
  * @param plugin Plugin
  * @alias withPlugins
  */
-export const withPlugin = withPlugins
+export const withPlugin = withPlugins;

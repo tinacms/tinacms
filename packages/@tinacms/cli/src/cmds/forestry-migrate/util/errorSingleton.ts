@@ -2,13 +2,13 @@
 
 */
 
-import { logger } from '../../../logger'
-import { dangerText, linkText } from '../../../utils/theme'
+import { logger } from '../../../logger';
+import { dangerText, linkText } from '../../../utils/theme';
 
 interface NameError {
-  name: string
-  template: string
-  newName: string
+  name: string;
+  template: string;
+  newName: string;
 }
 
 /**
@@ -16,7 +16,7 @@ interface NameError {
  * the unique singleton instance.
  */
 export class ErrorSingleton {
-  private static instance: ErrorSingleton
+  private static instance: ErrorSingleton;
 
   /**
    * The Singleton's constructor should always be private to prevent direct
@@ -32,32 +32,32 @@ export class ErrorSingleton {
    */
   public static getInstance(): ErrorSingleton {
     if (!ErrorSingleton.instance) {
-      ErrorSingleton.instance = new ErrorSingleton()
-      ErrorSingleton.instance.collectionNameErrors = []
+      ErrorSingleton.instance = new ErrorSingleton();
+      ErrorSingleton.instance.collectionNameErrors = [];
     }
 
-    return ErrorSingleton.instance
+    return ErrorSingleton.instance;
   }
 
-  private collectionNameErrors: NameError[]
+  private collectionNameErrors: NameError[];
 
   public addErrorName(error: NameError) {
-    this.collectionNameErrors.push(error)
+    this.collectionNameErrors.push(error);
   }
   public printCollectionNameErrors() {
     if (this.collectionNameErrors?.length) {
       logger.error(
         dangerText('ERROR: TinaCMS only supports alphanumeric template names')
-      )
-      logger.error('The following templates have been renamed:')
+      );
+      logger.error('The following templates have been renamed:');
       this.collectionNameErrors.forEach((error) => {
-        logger.error(`- ${error.template}.yaml -> ${error.newName}`)
-      })
+        logger.error(`- ${error.template}.yaml -> ${error.newName}`);
+      });
       logger.error(
         `If you wish to edit any of the following templates, you will have to update your content and code to use the new name. See ${linkText(
           'https://tina.io/docs/forestry/common-errors/#migrating-fields-with-non-alphanumeric-characters'
         )} for more information.`
-      )
+      );
     }
   }
 }

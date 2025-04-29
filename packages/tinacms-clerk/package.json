@@ -1,6 +1,6 @@
 {
 	"name": "tinacms-clerk",
-	"version": "7.0.0",
+	"version": "10.0.5",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"files": [
@@ -25,9 +25,9 @@
 		"@clerk/backend": "0.31.3",
 		"@clerk/clerk-js": "4.56.2",
 		"@tinacms/scripts": "workspace:*",
-		"@types/node": "^22.7.4",
+		"@types/node": "^22.13.1",
 		"tinacms": "workspace:*",
-		"typescript": "^5.6.2"
+		"typescript": "^5.7.3"
 	},
 	"peerDependencies": {
 		"@clerk/backend": "0.x",

@@ -1,48 +1,61 @@
-import { EventBus } from './event'
-import { DummyMediaStore } from './media-store.default'
+import { EventBus } from './event';
+import { DummyMediaStore } from './media-store.default';
+
+const encodeUrlIfNeeded = (url: string) => {
+  if (url) {
+    try {
+      return new URL(url).toString();
+    } catch (e) {
+      // If URL parsing fails, return the original URL
+      return url;
+    }
+  } else {
+    return url;
+  }
+};
 
 /**
  * Represents an individual file in the MediaStore
  */
 export interface Media {
-  type: 'file' | 'dir'
+  type: 'file' | 'dir';
 
   /**
    * A unique identifier for this file.
    */
-  id: string
+  id: string;
 
   /**
    * The name of the file.
    */
-  filename: string
+  filename: string;
 
   /**
    * The directory where the file is stored.
    */
 
-  directory: string
+  directory: string;
 
   /**
    * A url that provides an image of the media file
    */
-  src?: string
+  src?: string;
 
   /**
    * A url that provides a smaller image of the media file
    */
-  thumbnails?: { [name: string]: string }
+  thumbnails?: { [name: string]: string };
 }
 
 export interface MediaUploadOptions {
   /**
    * The directory where the file should be stored.
    */
-  directory: string
+  directory: string;
   /**
    * The File to be uploaded.
    */
-  file: File
+  file: File;
 }
 
 /**
@@ -54,56 +67,56 @@ export interface MediaStore {
    * The [input accept string](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept)
    * that describes what kind of files the Media Store will accept.
    */
-  accept: string
+  accept: string;
 
   /**
    * The maximum size of a file that can be uploaded.
    */
-  maxSize?: number
+  maxSize?: number;
 
   /**
    * Uploads a set of files to the Media Store and
    * returns a Promise containing the Media objects
    * for those files.
    */
-  persist(files: MediaUploadOptions[]): Promise<Media[]>
+  persist(files: MediaUploadOptions[]): Promise<Media[]>;
 
   /**
    * Delete a media object from the store.
    */
-  delete(media: Media): Promise<void>
+  delete(media: Media): Promise<void>;
 
   /**
    * Lists all media in a specific directory.
    */
-  list(options?: MediaListOptions): Promise<MediaList>
+  list(options?: MediaListOptions): Promise<MediaList>;
 
   /**
    * Indicates that uploads and deletions are not supported
    *
    * @default false
    */
-  isStatic?: boolean
+  isStatic?: boolean;
 }
 
-export declare type MediaListOffset = string | number
+export declare type MediaListOffset = string | number;
 /**
  * The options available when listing media.
  */
 export interface MediaListOptions {
-  directory?: string
-  limit?: number
-  offset?: MediaListOffset
-  thumbnailSizes?: { w: number; h: number }[]
-  filesOnly?: boolean
+  directory?: string;
+  limit?: number;
+  offset?: MediaListOffset;
+  thumbnailSizes?: { w: number; h: number }[];
+  filesOnly?: boolean;
 }
 
 /**
  * The response returned from listing media.
  */
 export interface MediaList {
-  items: Media[]
-  nextOffset?: MediaListOffset
+  items: Media[];
+  nextOffset?: MediaListOffset;
 }
 
 /**
@@ -121,114 +134,132 @@ export interface MediaList {
  * ```
  */
 export class MediaManager implements MediaStore {
-  private _pageSize: number = 36
+  private _pageSize: number = 36;
 
-  constructor(public store: MediaStore, private events: EventBus) {}
+  constructor(
+    public store: MediaStore,
+    private events: EventBus
+  ) {}
 
   get isConfigured() {
-    return !(this.store instanceof DummyMediaStore)
+    return !(this.store instanceof DummyMediaStore);
   }
 
   get pageSize() {
-    return this._pageSize
+    return this._pageSize;
   }
 
   set pageSize(pageSize) {
-    this._pageSize = pageSize
+    this._pageSize = pageSize;
     this.events.dispatch({
       type: 'media:pageSize',
       pageSize: pageSize,
-    })
+    });
   }
 
   open(options: SelectMediaOptions = {}) {
     this.events.dispatch({
       type: 'media:open',
       ...options,
-    })
+    });
   }
 
   get accept() {
-    return this.store.accept
+    return this.store.accept;
   }
 
   get maxSize() {
-    return this.store.maxSize || undefined
+    return this.store.maxSize || undefined;
   }
 
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
     try {
-      this.events.dispatch({ type: 'media:upload:start', uploaded: files })
-      const media = await this.store.persist(files)
+      this.events.dispatch({ type: 'media:upload:start', uploaded: files });
+      const media = await this.store.persist(files);
       this.events.dispatch({
         type: 'media:upload:success',
         uploaded: files,
         media,
-      })
-      return media
+      });
+      return media;
     } catch (error) {
-      console.error(error)
+      console.error(error);
       this.events.dispatch({
         type: 'media:upload:failure',
         uploaded: files,
         error,
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   async delete(media: Media): Promise<void> {
     try {
-      this.events.dispatch({ type: 'media:delete:start', media })
-      await this.store.delete(media)
+      this.events.dispatch({ type: 'media:delete:start', media });
+      await this.store.delete(media);
       this.events.dispatch({
         type: 'media:delete:success',
         media,
-      })
+      });
     } catch (error) {
       this.events.dispatch({
         type: 'media:delete:failure',
         media,
         error,
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   async list(options: MediaListOptions): Promise<MediaList> {
     try {
-      this.events.dispatch({ type: 'media:list:start', ...options })
-      const media = await this.store.list(options)
-      this.events.dispatch({ type: 'media:list:success', ...options, media })
-      return media
+      this.events.dispatch({ type: 'media:list:start', ...options });
+      const media = await this.store.list(options);
+      media.items = media.items.map((item) => {
+        if (item.type === 'dir') {
+          return item;
+        }
+        if (item.thumbnails) {
+          for (const [size, src] of Object.entries(item.thumbnails)) {
+            item.thumbnails[size] = encodeUrlIfNeeded(src);
+          }
+        }
+        return {
+          ...item,
+          src: encodeUrlIfNeeded(item.src),
+        };
+      });
+
+      this.events.dispatch({ type: 'media:list:success', ...options, media });
+      return media;
     } catch (error) {
-      this.events.dispatch({ type: 'media:list:failure', ...options, error })
-      throw error
+      this.events.dispatch({ type: 'media:list:failure', ...options, error });
+      throw error;
     }
   }
 }
 
 export interface SelectMediaOptions {
-  allowDelete?: boolean
-  directory?: string
-  onSelect?(media: Media): void
+  allowDelete?: boolean;
+  directory?: string;
+  onSelect?(media: Media): void;
 }
 
 interface MediaListErrorConfig {
-  title: string
-  message: string
-  docsLink: string
+  title: string;
+  message: string;
+  docsLink: string;
 }
 
 export class MediaListError extends Error {
-  public ERR_TYPE = 'MediaListError'
-  public title: string
-  public docsLink: string
+  public ERR_TYPE = 'MediaListError';
+  public title: string;
+  public docsLink: string;
 
   constructor(config: MediaListErrorConfig) {
-    super(config.message)
-    this.title = config.title
-    this.docsLink = config.docsLink
+    super(config.message);
+    this.title = config.title;
+    this.docsLink = config.docsLink;
   }
 }
 
@@ -236,16 +267,16 @@ export const E_UNAUTHORIZED = new MediaListError({
   title: 'Unauthorized',
   message: "You don't have access to this resource.",
   docsLink: 'https://tina.io/docs/reference/media/overview',
-})
+});
 
 export const E_BAD_ROUTE = new MediaListError({
   title: 'Bad Route',
   message: 'The Cloudinary API route is missing or misconfigured.',
   docsLink: 'https://tina.io/docs/reference/media/external/authentication/',
-})
+});
 
 export const E_DEFAULT = new MediaListError({
   title: 'An Error Occurred',
-  message: 'Something went wrong accessing your media from Tina Cloud.',
+  message: 'Something went wrong accessing your media from TinaCloud.',
   docsLink: '', // TODO
-})
+});

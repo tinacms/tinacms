@@ -1,63 +1,64 @@
-import type { TinaCMS } from '@tinacms/toolkit'
-import { print, buildSchema } from 'graphql'
+import type { TinaCMS } from '@tinacms/toolkit';
+import { print, buildSchema } from 'graphql';
 
-import { diff } from '@graphql-inspector/core'
+import { diff } from '@graphql-inspector/core';
 
-import type { Collection, TinaSchema } from '@tinacms/schema-tools'
-import type { Client } from '../internalClient'
-import type { CollectionResponse, DocumentForm } from './types'
+import type { Collection, TinaSchema } from '@tinacms/schema-tools';
+import type { Client } from '../internalClient';
+import type { CollectionResponse, DocumentForm } from './types';
 
 import {
   SearchClient,
   processDocumentForIndexing,
-} from '@tinacms/search/dist/index-client'
+} from '@tinacms/search/dist/index-client';
 
 export interface FilterArgs {
-  filterField: string
-  collection?: string
-  relativePath?: string
-  newRelativePath?: string
-  startsWith?: string
-  endsWith?: string
-  before?: string
-  after?: string
-  booleanEquals?: boolean
+  filterField: string;
+  collection?: string;
+  relativePath?: string;
+  relativePathWithoutExtension?: string;
+  newRelativePath?: string;
+  startsWith?: string;
+  endsWith?: string;
+  before?: string;
+  after?: string;
+  booleanEquals?: boolean;
 }
 
 export class TinaAdminApi {
-  api: Client
-  useDataLayer: boolean
-  schema: TinaSchema
-  searchClient?: SearchClient
-  maxSearchIndexFieldLength: number = 100
+  api: Client;
+  useDataLayer: boolean;
+  schema: TinaSchema;
+  searchClient?: SearchClient;
+  maxSearchIndexFieldLength: number = 100;
   constructor(cms: TinaCMS) {
-    this.api = cms.api.tina
-    this.schema = cms.api.tina.schema
+    this.api = cms.api.tina;
+    this.schema = cms.api.tina.schema;
     if (cms.api.search && cms.api.search?.supportsClientSideIndexing()) {
-      this.searchClient = cms.api.searchClient
+      this.searchClient = cms.api.searchClient;
       this.maxSearchIndexFieldLength =
-        this.schema.config?.config?.search?.maxSearchIndexFieldLength || 100
+        this.schema.config?.config?.search?.maxSearchIndexFieldLength || 100;
     }
   }
 
   async isAuthenticated() {
-    return await this.api.authProvider.isAuthenticated()
+    return await this.api.authProvider.isAuthenticated();
   }
 
   async checkGraphqlSchema({ localSchema }: { localSchema: any }) {
-    const schemaFromCloud = await this.api.getSchema()
-    const schema1 = schemaFromCloud
-    const schema2 = buildSchema(print(localSchema))
-    const diffOutput = await diff(schema1, schema2)
+    const schemaFromCloud = await this.api.getSchema();
+    const schema1 = schemaFromCloud;
+    const schema2 = buildSchema(print(localSchema));
+    const diffOutput = await diff(schema1, schema2);
     if (diffOutput.length > 0) {
-      return false
+      return false;
     } else {
-      return true
+      return true;
     }
   }
 
   fetchCollections() {
-    return this.schema.getCollections()
+    return this.schema.getCollections();
   }
   async renameDocument({ collection, relativePath, newRelativePath }) {
     await this.api.request(
@@ -69,21 +70,21 @@ export class TinaAdminApi {
               }
             `,
       { variables: { collection, relativePath, newRelativePath } }
-    )
+    );
 
     if (this.searchClient) {
       const { document: doc } = await this.fetchDocument(
         collection.name,
         newRelativePath
-      )
+      );
       const processed = processDocumentForIndexing(
         doc['_values'],
         `${collection.path}/${newRelativePath}`,
         collection,
         this.maxSearchIndexFieldLength
-      )
-      await this.searchClient.put([processed])
-      await this.searchClient.del([`${collection.name}:${relativePath}`])
+      );
+      await this.searchClient.put([processed]);
+      await this.searchClient.del([`${collection.name}:${relativePath}`]);
     }
   }
 
@@ -91,8 +92,8 @@ export class TinaAdminApi {
     collection,
     relativePath,
   }: {
-    collection: string
-    relativePath: string
+    collection: string;
+    relativePath: string;
   }) {
     await this.api.request(
       `#graphql
@@ -102,8 +103,8 @@ export class TinaAdminApi {
   }
 }`,
       { variables: { collection, relativePath } }
-    )
-    await this.searchClient?.del([`${collection}:${relativePath}`])
+    );
+    await this.searchClient?.del([`${collection}:${relativePath}`]);
   }
   async fetchCollection(
     collectionName: string,
@@ -114,34 +115,34 @@ export class TinaAdminApi {
     order?: 'asc' | 'desc',
     filterArgs?: FilterArgs
   ) {
-    let filter = null
-    const filterField = filterArgs?.filterField
+    let filter = null;
+    const filterField = filterArgs?.filterField;
     if (filterField) {
       // if we have a filterField, we'll create an empty filter object
       filter = {
         [collectionName]: {
           [filterField]: {},
         },
-      }
+      };
     }
     // If we have a filterField and a startsWith value, we'll add a filter
     if (filterField && filterArgs?.startsWith) {
       filter[collectionName][filterField] = {
         ...(filter[collectionName][filterField] || {}),
         startsWith: filterArgs.startsWith,
-      }
+      };
     }
     if (filterField && filterArgs?.before) {
       filter[collectionName][filterField] = {
         ...(filter[collectionName][filterField] || {}),
         before: filterArgs.before,
-      }
+      };
     }
     if (filterField && filterArgs?.after) {
       filter[collectionName][filterField] = {
         ...(filter[collectionName][filterField] || {}),
         after: filterArgs.after,
-      }
+      };
     }
     if (
       filterField &&
@@ -151,11 +152,11 @@ export class TinaAdminApi {
       filter[collectionName][filterField] = {
         ...(filter[collectionName][filterField] || {}),
         eq: filterArgs.booleanEquals,
-      }
+      };
     }
 
     if (includeDocuments === true) {
-      const sort = sortKey || this.schema.getIsTitleFieldName(collectionName)
+      const sort = sortKey || this.schema.getIsTitleFieldName(collectionName);
       const response: { collection: CollectionResponse } =
         order === 'asc'
           ? await this.api.request(
@@ -262,20 +263,21 @@ export class TinaAdminApi {
                   filter,
                 },
               }
-            )
+            );
 
-      return response.collection
+      return response.collection;
     } else {
       try {
         // TODO: fix this type
         // @ts-ignore
-        const collection: Collection = this.schema.getCollection(collectionName)
-        return collection
+        const collection: Collection =
+          this.schema.getCollection(collectionName);
+        return collection;
       } catch (e) {
         console.error(
           `[TinaAdminAPI] Unable to fetchCollection(): ${e.message}`
-        )
-        return undefined
+        );
+        return undefined;
       }
     }
   }
@@ -285,7 +287,7 @@ export class TinaAdminApi {
     relativePath: string,
     values: boolean = true
   ) {
-    let query
+    let query;
     if (values) {
       query = `#graphql
         query($collection: String!, $relativePath: String!) {
@@ -297,7 +299,7 @@ export class TinaAdminApi {
               }
             }
           }
-        }`
+        }`;
     } else {
       query = `#graphql
         query($collection: String!, $relativePath: String!) {
@@ -316,13 +318,13 @@ export class TinaAdminApi {
               }
             }
           }
-        }`
+        }`;
     }
     const response: { document: DocumentForm } = await this.api.request(query, {
       variables: { collection: collectionName, relativePath },
-    })
+    });
 
-    return response
+    return response;
   }
 
   async createDocument(
@@ -346,23 +348,23 @@ export class TinaAdminApi {
           params,
         },
       }
-    )
+    );
 
     if (this.searchClient) {
       const { document: doc } = await this.fetchDocument(
         collection.name,
         relativePath
-      )
+      );
       const processed = processDocumentForIndexing(
         doc['_values'],
         `${collection.path}/${relativePath}`,
         collection,
         this.maxSearchIndexFieldLength
-      )
-      await this.searchClient.put([processed])
+      );
+      await this.searchClient.put([processed]);
     }
 
-    return response
+    return response;
   }
 
   async updateDocument(
@@ -386,23 +388,23 @@ export class TinaAdminApi {
           params,
         },
       }
-    )
+    );
 
     if (this.searchClient) {
       const { document: doc } = await this.fetchDocument(
         collection.name,
         relativePath
-      )
+      );
       const processed = processDocumentForIndexing(
         doc['_values'],
         `${collection.path}/${relativePath}`,
         collection,
         this.maxSearchIndexFieldLength
-      )
-      await this.searchClient.put([processed])
+      );
+      await this.searchClient.put([processed]);
     }
 
-    return response
+    return response;
   }
 
   async createFolder(collection, folderName) {
@@ -420,6 +422,6 @@ export class TinaAdminApi {
           folderName,
         },
       }
-    )
+    );
   }
 }

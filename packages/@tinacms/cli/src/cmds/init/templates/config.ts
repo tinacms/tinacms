@@ -1,21 +1,21 @@
-import { Config, makeImportString } from '../prompts'
+import { Config, makeImportString } from '../prompts';
 
 export type ConfigTemplateArgs = {
-  extraText?: string
-  publicFolder: string
-  collections?: string
-  isLocalEnvVarName?: string
-  config: Config
-  isForestryMigration?: boolean
-  selfHosted?: boolean
-}
+  extraText?: string;
+  publicFolder: string;
+  collections?: string;
+  isLocalEnvVarName?: string;
+  config: Config;
+  isForestryMigration?: boolean;
+  selfHosted?: boolean;
+};
 
 const clientConfig = (isForestryMigration?: boolean) => {
   if (isForestryMigration) {
-    return 'client: {skip: true},'
+    return 'client: {skip: true},';
   }
-  return ''
-}
+  return '';
+};
 const baseFields = `[
   {
     type: 'string',
@@ -30,17 +30,17 @@ const baseFields = `[
     label: 'Body',
     isBody: true,
   },
-]`
+]`;
 
 const generateCollectionString = (args: ConfigTemplateArgs) => {
   if (args.collections) {
-    return args.collections
+    return args.collections;
   }
   let extraTinaCollections =
-    args.config.authProvider?.extraTinaCollections?.join(',\n')
+    args.config.authProvider?.extraTinaCollections?.join(',\n');
 
   if (extraTinaCollections) {
-    extraTinaCollections = extraTinaCollections + ','
+    extraTinaCollections = extraTinaCollections + ',';
   }
 
   const baseCollections = `[
@@ -51,7 +51,7 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
       path: 'content/posts',
       fields: ${baseFields},
     },
-  ]`
+  ]`;
   const nextExampleCollection = `[
     ${extraTinaCollections || ''}
     {
@@ -64,28 +64,29 @@ const generateCollectionString = (args: ConfigTemplateArgs) => {
         router: ({ document }) => \`/demo/blog/\${document._sys.filename}\`,
       },
     },
-  ]`
+  ]`;
   if (args.config?.framework?.name === 'next') {
-    return nextExampleCollection
+    return nextExampleCollection;
   }
-  return baseCollections
-}
+  return baseCollections;
+};
 
 export const generateConfig = (args: ConfigTemplateArgs) => {
   const isUsingTinaCloud =
-    !args.selfHosted || args.config.authProvider?.name === 'tina-cloud'
+    !args.selfHosted || args.config.authProvider?.name === 'tina-cloud';
 
-  let extraImports = ''
+  let extraImports = '';
   if (args.selfHosted) {
     // add imports for auth provider
     if (args.config.authProvider) {
       extraImports =
-        extraImports + makeImportString(args.config.authProvider?.configImports)
+        extraImports +
+        makeImportString(args.config.authProvider?.configImports);
     }
-    // if wer are not using tina cloud, we need to import the local auth provider
+    // if wer are not using TinaCloud, we need to import the local auth provider
     if (!isUsingTinaCloud) {
       extraImports =
-        extraImports + `\nimport { LocalAuthProvider } from "tinacms";`
+        extraImports + `\nimport { LocalAuthProvider } from "tinacms";`;
     }
   }
 
@@ -148,5 +149,5 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
       collections: ${generateCollectionString(args)},
     },
   });  
-`
-}
+`;
+};

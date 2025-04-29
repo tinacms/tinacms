@@ -2,15 +2,46 @@
 
 */
 
-import React, { useEffect, useState } from 'react'
-import type { TinaCMS } from '@tinacms/toolkit'
-import { useNavigate } from 'react-router-dom'
-import type { Collection, TinaSchema } from '@tinacms/schema-tools'
-import { FilterArgs, TinaAdminApi } from '../api'
-import LoadingPage from '../components/LoadingPage'
-import type { CollectionResponse, DocumentForm } from '../types'
-import { FullscreenError } from './FullscreenError'
-import { handleNavigate } from '../pages/CollectionListPage'
+import type { Collection, TinaField, TinaSchema } from '@tinacms/schema-tools';
+import type { TinaCMS } from '@tinacms/toolkit';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FilterArgs, TinaAdminApi } from '../api';
+import LoadingPage from '../components/LoadingPage';
+import { handleNavigate } from '../pages/CollectionListPage';
+import type { CollectionResponse, DocumentForm } from '../types';
+import { FullscreenError } from './FullscreenError';
+
+const isValidSortKey = (sortKey: string, collection: Collection<true>) => {
+  if (collection.fields) {
+    const sortKeys = collection.fields.map((x) => x.name);
+    return sortKeys.includes(sortKey);
+  } else if (collection.templates) {
+    const collectionMap: Record<string, TinaField> = {};
+    const conflictedFields: Set<string> = new Set();
+    for (const template of collection.templates) {
+      for (const field of template.fields) {
+        if (collectionMap[field.name]) {
+          if (collectionMap[field.name].type !== field.type) {
+            conflictedFields.add(field.name);
+          }
+        } else {
+          collectionMap[field.name] = field;
+        }
+      }
+    }
+    for (const key in conflictedFields) {
+      delete collectionMap[key];
+    }
+    for (const key in collectionMap) {
+      if (key === sortKey) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+};
 
 export const useGetCollection = (
   cms: TinaCMS,
@@ -21,27 +52,25 @@ export const useGetCollection = (
   sortKey?: string,
   filterArgs?: FilterArgs
 ) => {
-  const api = new TinaAdminApi(cms)
-  const schema = cms.api.tina.schema as TinaSchema
-  const collectionExtra = schema.getCollection(collectionName)
+  const api = new TinaAdminApi(cms);
+  const schema = cms.api.tina.schema as TinaSchema;
+  const collectionExtra = schema.getCollection(collectionName);
   const [collection, setCollection] = useState<
     CollectionResponse | Collection | undefined
-  >(undefined)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<Error | undefined>(undefined)
-  const [resetState, setResetSate] = useState(0)
+  >(undefined);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | undefined>(undefined);
+  const [resetState, setResetSate] = useState(0);
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
 
     const fetchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
-        const { name, order } = JSON.parse(sortKey || '{}')
-        const validSortKey = collectionExtra.fields
-          ?.map((x) => x.name)
-          .includes(name)
+        const { name, order } = JSON.parse(sortKey || '{}');
+        const validSortKey = isValidSortKey(name, collectionExtra)
           ? name
-          : undefined
+          : undefined;
         try {
           const collection = await api.fetchCollection(
             collectionName,
@@ -51,30 +80,30 @@ export const useGetCollection = (
             validSortKey,
             order,
             filterArgs
-          )
-          setCollection(collection)
+          );
+          setCollection(collection);
         } catch (error) {
           cms.alerts.error(
             `[${error.name}] GetCollection failed: ${error.message}`
-          )
-          console.error(error)
-          setCollection(undefined)
-          setError(error)
+          );
+          console.error(error);
+          setCollection(undefined);
+          setError(error);
         }
 
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    if (cancelled) return
+    if (cancelled) return;
 
-    setLoading(true)
-    fetchCollection()
+    setLoading(true);
+    fetchCollection();
 
     // TODO: useDebounce
     return () => {
-      cancelled = true
-    }
+      cancelled = true;
+    };
   }, [
     cms,
     collectionName,
@@ -83,12 +112,12 @@ export const useGetCollection = (
     resetState,
     after,
     sortKey,
-  ])
+  ]);
 
-  const reFetchCollection = () => setResetSate((x) => x + 1)
+  const reFetchCollection = () => setResetSate((x) => x + 1);
 
-  return { collection, loading, error, reFetchCollection, collectionExtra }
-}
+  return { collection, loading, error, reFetchCollection, collectionExtra };
+};
 
 export const useSearchCollection = (
   cms: TinaCMS,
@@ -98,18 +127,18 @@ export const useSearchCollection = (
   after: string = '',
   search?: string
 ) => {
-  const api = new TinaAdminApi(cms)
-  const schema = cms.api.tina.schema as TinaSchema
-  const collectionExtra = schema.getCollection(collectionName)
+  const api = new TinaAdminApi(cms);
+  const schema = cms.api.tina.schema as TinaSchema;
+  const collectionExtra = schema.getCollection(collectionName);
   const [collection, setCollection] = useState<
     CollectionResponse | Collection | undefined
-  >(undefined)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<Error | undefined>(undefined)
-  const [resetState, setResetSate] = useState(0)
+  >(undefined);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | undefined>(undefined);
+  const [resetState, setResetSate] = useState(0);
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
 
     const searchCollection = async () => {
       if ((await api.isAuthenticated()) && !folder.loading && !cancelled) {
@@ -121,25 +150,25 @@ export const useSearchCollection = (
               cursor: after,
             }
           )) as {
-            results: { _id: string }[]
-            nextCursor: string
-            prevCursor: string
-          }
+            results: { _id: string }[];
+            nextCursor: string;
+            prevCursor: string;
+          };
           const docs = (await Promise.allSettled<
             Promise<{ document: DocumentForm }>
           >(
             response.results.map((result) => {
-              const [collection, relativePath] = result._id.split(':')
-              return api.fetchDocument(collection, relativePath, false)
+              const [collection, relativePath] = result._id.split(':');
+              return api.fetchDocument(collection, relativePath, false);
             })
           )) as {
-            status: 'fulfilled' | 'rejected'
-            value: { document: DocumentForm }
-          }[]
+            status: 'fulfilled' | 'rejected';
+            value: { document: DocumentForm };
+          }[];
           const edges = docs
             .filter((p) => p.status === 'fulfilled' && !!p.value?.document)
-            .map((result) => ({ node: result.value.document })) as any[]
-          const c = await api.fetchCollection(collectionName, false, '')
+            .map((result) => ({ node: result.value.document })) as any[];
+          const c = await api.fetchCollection(collectionName, false, '');
           setCollection({
             format: collection.format,
             label: collection.label,
@@ -154,29 +183,29 @@ export const useSearchCollection = (
               },
               edges,
             },
-          })
+          });
         } catch (error) {
           cms.alerts.error(
             `[${error.name}] GetCollection failed: ${error.message}`
-          )
-          console.error(error)
-          setCollection(undefined)
-          setError(error)
+          );
+          console.error(error);
+          setCollection(undefined);
+          setError(error);
         }
 
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    if (cancelled) return
+    if (cancelled) return;
 
-    setLoading(true)
-    searchCollection()
+    setLoading(true);
+    searchCollection();
 
     // TODO: useDebounce
     return () => {
-      cancelled = true
-    }
+      cancelled = true;
+    };
   }, [
     cms,
     collectionName,
@@ -185,12 +214,12 @@ export const useSearchCollection = (
     resetState,
     after,
     search,
-  ])
+  ]);
 
-  const reFetchCollection = () => setResetSate((x) => x + 1)
+  const reFetchCollection = () => setResetSate((x) => x + 1);
 
-  return { collection, loading, error, reFetchCollection, collectionExtra }
-}
+  return { collection, loading, error, reFetchCollection, collectionExtra };
+};
 
 const GetCollection = ({
   cms,
@@ -203,17 +232,17 @@ const GetCollection = ({
   filterArgs,
   search,
 }: {
-  cms: TinaCMS
-  collectionName: string
-  folder: { loading: boolean; fullyQualifiedName: string }
-  includeDocuments?: boolean
-  startCursor?: string
-  sortKey?: string
-  children: any
-  filterArgs?: FilterArgs
-  search?: string
+  cms: TinaCMS;
+  collectionName: string;
+  folder: { loading: boolean; fullyQualifiedName: string };
+  includeDocuments?: boolean;
+  startCursor?: string;
+  sortKey?: string;
+  children: any;
+  filterArgs?: FilterArgs;
+  search?: string;
 }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { collection, loading, error, reFetchCollection, collectionExtra } =
     search
       ? useSearchCollection(
@@ -232,20 +261,22 @@ const GetCollection = ({
           startCursor || '',
           sortKey,
           filterArgs
-        ) || {}
+        ) || {};
   useEffect(() => {
-    if (loading) return
+    if (loading) return;
 
     // get the collection definition
     const collectionDefinition = cms.api.tina.schema.getCollection(
       collection.name
-    )
+    );
 
     // check if the collection allows create or delete
-    const allowCreate = collectionDefinition?.ui?.allowedActions?.create ?? true
-    const allowDelete = collectionDefinition?.ui?.allowedActions?.delete ?? true
+    const allowCreate =
+      collectionDefinition?.ui?.allowedActions?.create ?? true;
+    const allowDelete =
+      collectionDefinition?.ui?.allowedActions?.delete ?? true;
 
-    const collectionResponse = collection as CollectionResponse
+    const collectionResponse = collection as CollectionResponse;
     if (
       !allowCreate &&
       !allowDelete &&
@@ -254,28 +285,28 @@ const GetCollection = ({
       // Check to make sure the file is not a folder
       collectionResponse.documents?.edges[0]?.node?.__typename !== 'Folder'
     ) {
-      const doc = collectionResponse.documents.edges[0].node
+      const doc = collectionResponse.documents.edges[0].node;
       handleNavigate(
         navigate,
         cms,
         collectionResponse,
         collectionDefinition,
         doc
-      )
+      );
     }
-  }, [collection?.name || '', loading])
+  }, [collection?.name || '', loading]);
 
   if (error) {
-    return <FullscreenError />
+    return <FullscreenError />;
   }
 
   if (loading) {
-    return <LoadingPage />
+    return <LoadingPage />;
   }
 
   return (
     <>{children(collection, loading, reFetchCollection, collectionExtra)}</>
-  )
-}
+  );
+};
 
-export default GetCollection
+export default GetCollection;

@@ -1,1 +1,1 @@
-export * from './alerts'
+export * from './alerts';

@@ -2,8 +2,8 @@
 
 */
 
-import { Schema } from '@tinacms/schema-tools'
-import { richBody } from './body'
+import { Schema } from '@tinacms/schema-tools';
+import { richBody } from './body';
 
 const tinaSchema: Schema = {
   collections: [
@@ -78,6 +78,6 @@ const tinaSchema: Schema = {
       ],
     },
   ],
-}
+};
 
-export { tinaSchema }
+export { tinaSchema };

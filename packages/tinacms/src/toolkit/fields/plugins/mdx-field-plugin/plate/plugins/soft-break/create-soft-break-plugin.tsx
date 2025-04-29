@@ -1,9 +1,9 @@
-import React from 'react'
-import { onKeyDownSoftBreak } from './on-key-down-soft-break'
-import type { SoftBreakPlugin } from './types'
-import { createPluginFactory } from '@udecode/plate-common'
+import React from 'react';
+import { onKeyDownSoftBreak } from './on-key-down-soft-break';
+import type { SoftBreakPlugin } from './types';
+import { createPluginFactory } from '@udecode/plate-common';
 
-export const KEY_SOFT_BREAK = 'break'
+export const KEY_SOFT_BREAK = 'break';
 
 /**
  * This code is mostly copied from the plate soft-break plugin
@@ -20,7 +20,7 @@ export const createSoftBreakPlugin = createPluginFactory<SoftBreakPlugin>({
         <br className={props.className} {...props.attributes} />
         {props.children}
       </>
-    )
+    );
   },
   handlers: {
     onKeyDown: onKeyDownSoftBreak,
@@ -28,4 +28,4 @@ export const createSoftBreakPlugin = createPluginFactory<SoftBreakPlugin>({
   options: {
     rules: [{ hotkey: 'shift+enter' }],
   },
-})
+});

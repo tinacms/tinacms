@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
-const folderRegex = /^.*\/~\/*(.*)$/
+const folderRegex = /^.*\/~\/*(.*)$/;
 export type CollectionFolder = {
-  loading: boolean
-  name: string
-  fullyQualifiedName: string
-  parentName: string
-}
+  loading: boolean;
+  name: string;
+  fullyQualifiedName: string;
+  parentName: string;
+};
 
 export const parentFolder = (folder: CollectionFolder) => {
   return {
@@ -18,40 +18,40 @@ export const parentFolder = (folder: CollectionFolder) => {
       .slice(0, -1)
       .join('/'),
     parentName: folder.parentName.split('/').slice(0, -1).join('/'),
-  }
-}
+  };
+};
 export const useCollectionFolder = () => {
   const [folder, setFolder] = useState<CollectionFolder>({
     loading: true,
     name: '',
     fullyQualifiedName: '',
     parentName: '',
-  })
+  });
 
-  const loc = useLocation()
+  const loc = useLocation();
   useEffect(() => {
     // set folder using the pathname
-    const match = loc.pathname.match(folderRegex)
-    const folderName = match ? decodeURIComponent(match[1]) : ''
+    const match = loc.pathname.match(folderRegex);
+    const folderName = match ? decodeURIComponent(match[1]) : '';
     const update = {
       name: folderName,
       fullyQualifiedName: match ? (folderName ? `~/${folderName}` : '~') : '',
       loading: false,
       parentName: '',
-    }
+    };
 
     if (update.fullyQualifiedName) {
-      const pathParts = update.fullyQualifiedName.split('/')
+      const pathParts = update.fullyQualifiedName.split('/');
       update.parentName = `/${pathParts
         .slice(0, pathParts.length - 1)
-        .join('/')}`
+        .join('/')}`;
     }
 
     setFolder({
       ...folder,
       ...update,
-    })
-  }, [loc])
+    });
+  }, [loc]);
 
-  return folder
-}
+  return folder;
+};

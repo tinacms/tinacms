@@ -1,8 +1,8 @@
-import React from 'react'
-import { TinaCMS } from 'tinacms'
+import React from 'react';
+import { TinaCMS } from 'tinacms';
 
 const ErrorModalContent = (props: { title: string; errors: string[] }) => {
-  const { title, errors } = props
+  const { title, errors } = props;
   return (
     <>
       <div>{title}</div>
@@ -12,13 +12,13 @@ const ErrorModalContent = (props: { title: string; errors: string[] }) => {
         ))}
       </ul>
     </>
-  )
-}
+  );
+};
 
 export const showErrorModal = (
   title: string,
   errors: string[],
   cms: TinaCMS
 ) => {
-  cms.alerts.error(() => <ErrorModalContent title={title} errors={errors} />)
-}
+  cms.alerts.error(() => <ErrorModalContent title={title} errors={errors} />);
+};

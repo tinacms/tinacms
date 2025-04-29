@@ -3,62 +3,62 @@
 */
 
 export interface TemplateResponse {
-  name: string
-  label?: string | boolean
-  fields: any[]
+  name: string;
+  label?: string | boolean;
+  fields: any[];
 }
 
 export interface DocumentNode {
   node: {
-    __typename: string
-    name?: string
-    path?: string
+    __typename: string;
+    name?: string;
+    path?: string;
     _sys: {
-      template: string
-      breadcrumbs: string[]
-      path: string
-      basename: string
-      relativePath: string
-      filename: string
-      extension: string
-      title?: string
-    }
-  }
+      template: string;
+      breadcrumbs: string[];
+      path: string;
+      basename: string;
+      relativePath: string;
+      filename: string;
+      extension: string;
+      title?: string;
+    };
+  };
 }
 
 export interface DocumentForm {
-  _values: Object
+  _values: Object;
   _sys?: {
-    hasReferences?: boolean
-  }
+    hasReferences?: boolean;
+  };
 }
 
 export interface DocumentSys {
   _sys: {
-    template: string
-    breadcrumbs: string[]
-    path: string
-    basename: string
-    relativePath: string
-    filename: string
-    extension: string
-  }
+    template: string;
+    breadcrumbs: string[];
+    path: string;
+    basename: string;
+    relativePath: string;
+    filename: string;
+    extension: string;
+  };
 }
 
 export interface CollectionResponse {
-  label: string
-  name: string
-  slug?: string
-  format?: string
-  templates?: TemplateResponse[]
+  label: string;
+  name: string;
+  slug?: string;
+  format?: string;
+  templates?: TemplateResponse[];
   documents?: {
-    totalCount?: number
+    totalCount?: number;
     pageInfo: {
-      hasPreviousPage: boolean
-      hasNextPage: boolean
-      startCursor?: string
-      endCursor?: string
-    }
-    edges?: DocumentNode[]
-  }
+      hasPreviousPage: boolean;
+      hasNextPage: boolean;
+      startCursor?: string;
+      endCursor?: string;
+    };
+    edges?: DocumentNode[];
+  };
 }

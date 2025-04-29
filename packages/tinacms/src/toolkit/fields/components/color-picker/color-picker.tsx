@@ -1,17 +1,17 @@
-import * as React from 'react'
-import { useState } from 'react'
-import { Dismissible } from '@toolkit/react-dismissible'
-import * as pkg from 'react-color'
-const { SketchPicker, BlockPicker } = pkg
-import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
-import { useFormPortal } from '@toolkit/form-builder'
+import * as React from 'react';
+import { useState } from 'react';
+import { Dismissible } from '@toolkit/react-dismissible';
+import * as pkg from 'react-color';
+const { SketchPicker, BlockPicker } = pkg;
+import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter';
+import { useFormPortal } from '@toolkit/form-builder';
 
-type DivProps = any
-type WrappedFieldProps = any
+type DivProps = any;
+type WrappedFieldProps = any;
 interface SwatchProps extends DivProps {
-  colorRGBA?: ColorRGBA
-  onClick: (_event: React.SyntheticEvent) => void
-  colorFormat: ColorFormat
+  colorRGBA?: ColorRGBA;
+  onClick: (_event: React.SyntheticEvent) => void;
+  colorFormat: ColorFormat;
 }
 
 const GetTextColorForBackground = function (backgroundColor?: ColorRGBA) {
@@ -22,8 +22,8 @@ const GetTextColorForBackground = function (backgroundColor?: ColorRGBA) {
       backgroundColor.b * 0.114 >
       186
     ? '#000000'
-    : '#ffffff'
-}
+    : '#ffffff';
+};
 
 const Swatch = ({
   colorRGBA,
@@ -32,11 +32,11 @@ const Swatch = ({
   ...props
 }: SwatchProps) => (
   <div
-    className="bg-gray-100 rounded-3xl shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer w-full m-0"
+    className='bg-gray-100 rounded-3xl shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer w-full m-0'
     {...props}
   >
     <div
-      className="swatch-inner flex items-center justify-center text-[13px] font-bold w-full h-10 rounded-3xl hover:opacity-[.6]"
+      className='swatch-inner flex items-center justify-center text-[13px] font-bold w-full h-10 rounded-3xl hover:opacity-[.6]'
       style={{
         background: colorRGBA
           ? `rgba(${colorRGBA.r}, ${colorRGBA.g}, ${colorRGBA.b}, ${colorRGBA.a})`
@@ -50,7 +50,7 @@ const Swatch = ({
         : ColorFormatter[colorFormat].getLabel(colorRGBA)}
     </div>
   </div>
-)
+);
 
 const Popover = ({
   triggerBoundingBox,
@@ -85,16 +85,16 @@ const Popover = ({
     }}
     {...props}
   />
-)
+);
 
 interface Props {
-  colorFormat: ColorFormat
-  userColors: string[]
-  widget?: 'sketch' | 'block'
-  input: WrappedFieldProps['input']
+  colorFormat: ColorFormat;
+  userColors: string[];
+  widget?: 'sketch' | 'block';
+  input: WrappedFieldProps['input'];
 }
 
-const nullColor = 'transparent'
+const nullColor = 'transparent';
 
 const presetColors = [
   '#D0021B',
@@ -112,14 +112,14 @@ const presetColors = [
   '#4A4A4A',
   '#9B9B9B',
   '#FFFFFF',
-]
+];
 
 interface WidgetProps {
-  presetColors: string[]
-  color: ColorRGBA
-  onChange: (_pickerColor: any) => void
-  disableAlpha?: boolean
-  width: string
+  presetColors: string[];
+  color: ColorRGBA;
+  onChange: (_pickerColor: any) => void;
+  disableAlpha?: boolean;
+  width: string;
 }
 
 const SketchWidget: React.FC<WidgetProps> = (props) => (
@@ -130,7 +130,7 @@ const SketchWidget: React.FC<WidgetProps> = (props) => (
     disableAlpha={props.disableAlpha}
     width={props.width}
   />
-)
+);
 const BlockWidget: React.FC<WidgetProps> = (props) => (
   <BlockPicker
     colors={props.presetColors}
@@ -138,9 +138,9 @@ const BlockWidget: React.FC<WidgetProps> = (props) => (
     onChange={props.onChange}
     width={props.width}
   />
-)
+);
 
-const WIDGETS = { sketch: SketchWidget, block: BlockWidget }
+const WIDGETS = { sketch: SketchWidget, block: BlockWidget };
 
 export const ColorPicker: React.FC<Props> = ({
   colorFormat,
@@ -148,82 +148,82 @@ export const ColorPicker: React.FC<Props> = ({
   widget = 'sketch',
   input,
 }) => {
-  const FormPortal = useFormPortal()
-  const triggerRef = React.useRef<HTMLDivElement | null>(null)
-  const [triggerBoundingBox, setTriggerBoundingBox] = useState<any>(null)
-  const [openTop, setOpenTop] = useState<boolean>(false)
+  const FormPortal = useFormPortal();
+  const triggerRef = React.useRef<HTMLDivElement | null>(null);
+  const [triggerBoundingBox, setTriggerBoundingBox] = useState<any>(null);
+  const [openTop, setOpenTop] = useState<boolean>(false);
 
   const updateTriggerBoundingBox = () => {
     if (triggerRef.current) {
-      setTriggerBoundingBox(triggerRef.current.getBoundingClientRect())
+      setTriggerBoundingBox(triggerRef.current.getBoundingClientRect());
     }
-  }
+  };
 
   React.useEffect(() => {
     if (triggerBoundingBox) {
       const triggerOffsetTop =
-        triggerBoundingBox.top + triggerBoundingBox.height / 2
-      const windowHeight = window.innerHeight
+        triggerBoundingBox.top + triggerBoundingBox.height / 2;
+      const windowHeight = window.innerHeight;
       if (triggerOffsetTop > windowHeight / 2) {
-        setOpenTop(true)
+        setOpenTop(true);
       } else {
-        setOpenTop(false)
+        setOpenTop(false);
       }
     }
-  }, [triggerBoundingBox])
+  }, [triggerBoundingBox]);
 
   React.useEffect(() => {
-    const delay = 100
-    let timeout: any = false
+    const delay = 100;
+    let timeout: any = false;
 
     setTimeout(() => {
-      updateTriggerBoundingBox()
-    }, delay)
+      updateTriggerBoundingBox();
+    }, delay);
 
     const handleResize = () => {
-      clearTimeout(timeout)
-      timeout = setTimeout(updateTriggerBoundingBox, delay)
-    }
+      clearTimeout(timeout);
+      timeout = setTimeout(updateTriggerBoundingBox, delay);
+    };
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [triggerRef.current])
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [triggerRef.current]);
 
-  const Widget = WIDGETS[widget]
-  if (!Widget) throw new Error('You must specify a widget type.')
+  const Widget = WIDGETS[widget];
+  if (!Widget) throw new Error('You must specify a widget type.');
 
-  const [displayColorPicker, setDisplayColorPicker] = useState(false)
+  const [displayColorPicker, setDisplayColorPicker] = useState(false);
 
   const getColorFormat = (
     colorFormat || ColorFormat.Hex
-  ).toLowerCase() as ColorFormat
+  ).toLowerCase() as ColorFormat;
   const getColorRGBA = input.value
     ? ColorFormatter[getColorFormat].parse(input.value)
-    : null
+    : null;
 
   const handleChange = (pickerColor: any) => {
     const color = (
       pickerColor.hex === nullColor ? null : { ...pickerColor.rgb, a: 1 }
-    ) as ColorRGBA | null
+    ) as ColorRGBA | null;
     input.onChange(
       color ? ColorFormatter[getColorFormat].getValue(color) : null
-    )
-  }
+    );
+  };
 
   const toggleColorPicker = (event: React.SyntheticEvent) => {
-    event.stopPropagation()
-    const display = !displayColorPicker
-    setDisplayColorPicker(display)
+    event.stopPropagation();
+    const display = !displayColorPicker;
+    setDisplayColorPicker(display);
     if (display) {
-      updateTriggerBoundingBox()
+      updateTriggerBoundingBox();
     }
-  }
+  };
 
   return (
-    <div className="relative" ref={triggerRef}>
+    <div className='relative' ref={triggerRef}>
       <Swatch
         onClick={toggleColorPicker}
         colorRGBA={getColorRGBA}
@@ -256,5 +256,5 @@ export const ColorPicker: React.FC<Props> = ({
         </FormPortal>
       )}
     </div>
-  )
-}
+  );
+};

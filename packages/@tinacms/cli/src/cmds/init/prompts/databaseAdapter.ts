@@ -1,12 +1,12 @@
-import prompts from 'prompts'
+import prompts from 'prompts';
 
-import type { Config, PromptDatabaseAdapter } from './types'
-import type { Framework } from '../'
+import type { Config, PromptDatabaseAdapter } from './types';
+import type { Framework } from '../';
 
 const supportedDatabaseAdapters: {
-  'upstash-redis': PromptDatabaseAdapter
-  mongodb: PromptDatabaseAdapter
-  other: PromptDatabaseAdapter
+  'upstash-redis': PromptDatabaseAdapter;
+  mongodb: PromptDatabaseAdapter;
+  other: PromptDatabaseAdapter;
 } = {
   ['upstash-redis']: {
     databaseAdapterClassText: `new RedisLevel({
@@ -46,14 +46,14 @@ const supportedDatabaseAdapters: {
   other: {
     databaseAdapterClassText: '',
   },
-}
+};
 
 const databaseAdapterUpdateConfig: {
   [key in keyof typeof supportedDatabaseAdapters]: ({
     config,
   }: {
-    config: Config
-  }) => Promise<void>
+    config: Config;
+  }) => Promise<void>;
 } = {
   other: async (_args) => {},
   mongodb: async ({ config }) => {
@@ -64,11 +64,11 @@ const databaseAdapterUpdateConfig: {
         message: `What is the MongoDB URI, Ex: mongodb+srv://<username>:<password>@cluster0.yoeujeh.mongodb.net/?retryWrites=true&w=majority\n(Hit enter to skip and set up yourself later)`,
         initial: process.env.MONGODB_URI,
       },
-    ])
+    ]);
     config.envVars.push({
       key: 'MONGODB_URI',
       value: result.mongoDBUri,
-    })
+    });
   },
   'upstash-redis': async ({ config }) => {
     const result = await prompts([
@@ -84,7 +84,7 @@ const databaseAdapterUpdateConfig: {
         message: `What is the KV (Redis) Rest API Token? (Hit enter to skip and set up yourself later)`,
         initial: process.env.KV_REST_API_TOKEN,
       },
-    ])
+    ]);
     config.envVars.push(
       {
         key: 'KV_REST_API_URL',
@@ -94,16 +94,16 @@ const databaseAdapterUpdateConfig: {
         key: 'KV_REST_API_TOKEN',
         value: result.kvRestApiToken,
       }
-    )
+    );
   },
-}
+};
 
 export const chooseDatabaseAdapter = async ({
   framework,
   config,
 }: {
-  config: Config
-  framework: Framework
+  config: Config;
+  framework: Framework;
 }) => {
   const answers = await prompts([
     {
@@ -125,16 +125,16 @@ export const chooseDatabaseAdapter = async ({
         // },
       ],
     },
-  ])
+  ]);
   if (typeof answers.dataLayerAdapter === 'undefined') {
-    throw new Error('Database adapter is required')
+    throw new Error('Database adapter is required');
   }
   const chosen = answers.dataLayerAdapter as
     | 'upstash-redis'
     | 'mongodb'
-    | 'other'
+    | 'other';
 
-  await databaseAdapterUpdateConfig[chosen]({ config })
+  await databaseAdapterUpdateConfig[chosen]({ config });
 
-  return supportedDatabaseAdapters[chosen]
-}
+  return supportedDatabaseAdapters[chosen];
+};

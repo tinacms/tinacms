@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/mdx",
-	"version": "1.5.1",
+	"version": "1.6.2",
 	"typings": "dist/index.d.ts",
 	"main": "dist/index.js",
 	"browser": "dist/index.browser.mjs",
@@ -11,9 +11,9 @@
 	],
 	"exports": {
 		".": {
+			"browser": "./dist/index.browser.mjs",
 			"import": "./dist/index.mjs",
-			"require": "./dist/index.js",
-			"browser": "./dist/index.browser.mjs"
+			"require": "./dist/index.js"
 		}
 	},
 	"license": "Apache-2.0",
@@ -31,9 +31,9 @@
 		"build": "tinacms-scripts build",
 		"docs": "typedoc --plugin typedoc-plugin-markdown src/parse/plate.ts --theme markdown && concat-md --decrease-title-levels --dir-name-as-title docs > spec.md",
 		"serve": "nodemon dist/server.js",
-		"test": "vitest",
+		"test": "vitest run",
 		"coverage": "vitest run --coverage",
-		"test-watch": "jest --watch"
+		"test-watch": "vitest"
 	},
 	"dependencies": {
 		"@tinacms/schema-tools": "workspace:*",
@@ -60,7 +60,7 @@
 		"remark-gfm": "^2.0.0",
 		"remark-mdx": "2.3.0",
 		"stringify-entities": "4.0.3",
-		"typedoc": "^0.26.7",
+		"typedoc": "^0.26.11",
 		"unist-util-source": "4.0.2",
 		"unist-util-stringify-position": "3.0.3",
 		"unist-util-visit": "4.1.2",
@@ -79,7 +79,7 @@
 		"@types/estree": "1.0.0",
 		"@types/lodash.flatten": "^4.4.9",
 		"@types/mdast": "^3.0.15",
-		"@types/node": "^22.7.4",
+		"@types/node": "^22.13.1",
 		"@types/prettier": "^2.7.3",
 		"@types/unist": "^2.0.11",
 		"c8": "^7.14.0",
@@ -87,8 +87,8 @@
 		"jest-file-snapshot": "^0.5.0",
 		"ts-node": "^10.9.2",
 		"typedoc-plugin-markdown": "^3.17.1",
-		"typescript": "^5.6.2",
-		"vite": "^4.5.5",
+		"typescript": "^5.7.3",
+		"vite": "^4.5.9",
 		"vitest": "^0.32.4"
 	}
 }

@@ -1,5 +1,60 @@
 # create-tina-app
 
+## 1.3.4
+
+### Patch Changes
+
+- [#5594](https://github.com/tinacms/tinacms/pull/5594) [`95a293c`](https://github.com/tinacms/tinacms/commit/95a293cffab73635dc0677ad5277fc84cbf2c507) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: Added `bun` package manager.
+  fix: Removed dead code from `install` method.
+- Updated dependencies []:
+  - @tinacms/metrics@1.0.9
+
+## 1.3.3
+
+### Patch Changes
+
+- [#5565](https://github.com/tinacms/tinacms/pull/5565) [`b4450e7`](https://github.com/tinacms/tinacms/commit/b4450e7ed610eec217429cd85900c5b7956b952f) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Add a message to indicate that the user needs to install Hugo before running “yarn dev”
+
+## 1.3.2
+
+### Patch Changes
+
+- [#5486](https://github.com/tinacms/tinacms/pull/5486) [`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update dependencies across packages
+
+- Updated dependencies [[`d7c5ec1`](https://github.com/tinacms/tinacms/commit/d7c5ec1b174419dcc6ddba3cfb3684dd469da571)]:
+  - @tinacms/metrics@1.0.9
+
+## 1.3.1
+
+### Patch Changes
+
+- [#5457](https://github.com/tinacms/tinacms/pull/5457) [`4b04107`](https://github.com/tinacms/tinacms/commit/4b04107f9799748f93205a743c393ed22fc5f424) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Update template title for Astro Starter
+
+## 1.3.0
+
+### Minor Changes
+
+- [#5433](https://github.com/tinacms/tinacms/pull/5433) [`ba036d7`](https://github.com/tinacms/tinacms/commit/ba036d71bacbcb98f3c7c63eaa4db26f754d8642) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Add Tina Astro Starter template to create-tina-app
+
+### Patch Changes
+
+- [#5411](https://github.com/tinacms/tinacms/pull/5411) [`fe34947`](https://github.com/tinacms/tinacms/commit/fe34947bd9ef0c510f4bf5a4933a375c956d7a92) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - refactor: support a range of node versions instead of specific versions.
+
+## 1.2.5
+
+### Patch Changes
+
+- [#5341](https://github.com/tinacms/tinacms/pull/5341) [`d80714b`](https://github.com/tinacms/tinacms/commit/d80714bd1065f59fe1bb2c7da9dcf114faee5faf) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Remove `got` package
+
+## 1.2.4
+
+### Patch Changes
+
+- [#5276](https://github.com/tinacms/tinacms/pull/5276) [`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6) Thanks [@Ben0189](https://github.com/Ben0189)! - Updates minor and patch dependencies
+
+- Updated dependencies [[`f90ef4d`](https://github.com/tinacms/tinacms/commit/f90ef4d92ae7b21c8c610d14af9510354a3969c6)]:
+  - @tinacms/metrics@1.0.8
+
 ## 1.2.3
 
 ### Patch Changes

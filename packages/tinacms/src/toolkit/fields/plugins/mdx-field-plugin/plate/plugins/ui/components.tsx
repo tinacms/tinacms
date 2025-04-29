@@ -1,4 +1,4 @@
-import { withProps } from '@udecode/cn'
+import { withProps } from '@udecode/cn';
 import {
   ELEMENT_BLOCKQUOTE,
   ELEMENT_CODE_BLOCK,
@@ -25,27 +25,27 @@ import {
   MARK_ITALIC,
   MARK_STRIKETHROUGH,
   MARK_UNDERLINE,
-} from '@udecode/plate'
-import { PlateElement, PlateLeaf } from '@udecode/plate-common'
-import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command'
-import React from 'react'
-import { useSelected } from 'slate-react'
-import { BlockquoteElement } from '../../components/plate-ui/blockquote-element'
-import { CodeBlockElement } from '../../components/plate-ui/code-block-element'
-import { CodeLeaf } from '../../components/plate-ui/code-leaf'
-import { CodeLineElement } from '../../components/plate-ui/code-line-element'
-import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf'
-import { ListElement } from '../../components/plate-ui/list-element'
-import { MermaidElement } from '../../components/plate-ui/mermaid-element'
-import { SlashInputElement } from '../../components/plate-ui/slash-input-element'
+} from '@udecode/plate';
+import { PlateElement, PlateLeaf } from '@udecode/plate-common';
+import { ELEMENT_SLASH_INPUT } from '@udecode/plate-slash-command';
+import React from 'react';
+import { useSelected } from 'slate-react';
+import { BlockquoteElement } from '../../components/plate-ui/blockquote-element';
+import { CodeBlockElement } from '../../components/plate-ui/code-block-element';
+import { CodeLeaf } from '../../components/plate-ui/code-leaf';
+import { CodeLineElement } from '../../components/plate-ui/code-line-element';
+import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf';
+import { ListElement } from '../../components/plate-ui/list-element';
+import { MermaidElement } from '../../components/plate-ui/mermaid-element';
+import { SlashInputElement } from '../../components/plate-ui/slash-input-element';
 import {
   TableCellElement,
   TableCellHeaderElement,
-} from '../../components/plate-ui/table-cell-element'
-import { TableElement } from '../../components/plate-ui/table-element'
-import { TableRowElement } from '../../components/plate-ui/table-row-element'
-import { ELEMENT_MERMAID } from '../custom/mermaid-plugin'
-import { classNames } from './helpers'
+} from '../../components/plate-ui/table-cell-element';
+import { TableElement } from '../../components/plate-ui/table-element';
+import { TableRowElement } from '../../components/plate-ui/table-row-element';
+import { ELEMENT_MERMAID } from '../custom/mermaid-plugin';
+import { classNames } from './helpers';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -53,9 +53,9 @@ import { classNames } from './helpers'
  * based on .prose styles. These classes aim to normalize
  * blocks behavior so they take up the same space
  */
-const blockClasses = 'mt-0.5'
+const blockClasses = 'mt-0.5';
 /** prose sets a bold font, making bold marks impossible to see */
-const headerClasses = 'font-normal'
+const headerClasses = 'font-normal';
 
 export const Components = () => {
   return {
@@ -168,7 +168,7 @@ export const Components = () => {
           {children}
           {element.value}
         </div>
-      )
+      );
     },
     html_inline: ({ attributes, editor, element, children, className }) => {
       return (
@@ -182,7 +182,7 @@ export const Components = () => {
           {children}
           {element.value}
         </span>
-      )
+      );
     },
     [ELEMENT_UL]: withProps(ListElement, { variant: 'ul' }),
     [ELEMENT_OL]: withProps(ListElement, { variant: 'ol' }),
@@ -206,7 +206,9 @@ export const Components = () => {
     ),
     [MARK_CODE]: CodeLeaf,
     [MARK_UNDERLINE]: withProps(PlateLeaf, { as: 'u' }),
-    [MARK_STRIKETHROUGH]: withProps(PlateLeaf, { as: 's' }),
+    [MARK_STRIKETHROUGH]: ({ editor, leaf, text, ...props }) => (
+      <s {...props.attributes} {...props} />
+    ),
     [MARK_ITALIC]: withProps(PlateLeaf, { as: 'em' }),
     [MARK_BOLD]: ({ editor, leaf, text, ...props }) => (
       <strong {...props.attributes} {...props} />
@@ -219,7 +221,7 @@ export const Components = () => {
       children,
       ...props
     }) => {
-      const selected = useSelected()
+      const selected = useSelected();
       return (
         <div
           className={classNames(
@@ -231,14 +233,14 @@ export const Components = () => {
         >
           {children}
           {selected && (
-            <span className="absolute h-4 -top-2 inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none" />
+            <span className='absolute h-4 -top-2 inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none' />
           )}
         </div>
-      )
+      );
     },
     [ELEMENT_TABLE]: TableElement,
     [ELEMENT_TR]: TableRowElement,
     [ELEMENT_TD]: TableCellElement,
     [ELEMENT_TH]: TableCellHeaderElement,
-  }
-}
+  };
+};

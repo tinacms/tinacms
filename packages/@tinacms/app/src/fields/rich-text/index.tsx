@@ -1,6 +1,6 @@
 /**
 
 */
-import RawEditor from './monaco'
+import RawEditor from './monaco';
 
-export default RawEditor
+export default RawEditor;

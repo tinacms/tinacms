@@ -3,46 +3,51 @@
  * of REs to avoid REDOS.
  */
 
-const protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/
-const emailLintRE = /mailto:([^?\\]+)/
-const localhostDomainRE = /^localhost[\d:?]*(?:[^\d:?]\S*)?$/
-const nonLocalhostDomainRE = /^[^\s.]+\.\S{2,}$/
-const localUrlRE = /^\/\S+/ // Regular expression for local URLs
+const protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
+const emailLintRE = /mailto:([^?\\]+)/;
+const localhostDomainRE = /^localhost[\d:?]*(?:[^\d:?]\S*)?$/;
+const nonLocalhostDomainRE = /^[^\s.]+\.\S{2,}$/;
+const localUrlRE = /^\/\S+/; // Regular expression for local URLs
 
 /** Loosely validate a URL `string`. */
 export const isUrl = (string: any) => {
   if (typeof string !== 'string') {
-    return false
+    return false;
   }
 
-  const generalMatch = string.match(protocolAndDomainRE)
-  const emailLinkMatch = string.match(emailLintRE)
-  const localUrlMatch = string.match(localUrlRE) // Check for local URL match
+  // Check if the string is a bare hash link
+  if (string.startsWith('#')) {
+    return true;
+  }
 
-  const match = generalMatch || emailLinkMatch || localUrlMatch
+  const generalMatch = string.match(protocolAndDomainRE);
+  const emailLinkMatch = string.match(emailLintRE);
+  const localUrlMatch = string.match(localUrlRE); // Check for local URL match
+
+  const match = generalMatch || emailLinkMatch || localUrlMatch;
 
   if (!match) {
-    return false
+    return false;
   }
 
   if (localUrlMatch) {
-    return true // If it's a local URL, we can return true directly
+    return true; // If it's a local URL, we can return true directly
   }
 
-  const everythingAfterProtocol = match[1]
+  const everythingAfterProtocol = match[1];
 
   if (!everythingAfterProtocol) {
-    return false
+    return false;
   }
 
   try {
-    new URL(string)
+    new URL(string);
   } catch {
-    return false
+    return false;
   }
 
   return (
     localhostDomainRE.test(everythingAfterProtocol) ||
     nonLocalhostDomainRE.test(everythingAfterProtocol)
-  )
-}
+  );
+};

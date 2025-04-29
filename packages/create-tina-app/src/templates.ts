@@ -1,22 +1,22 @@
-import { downloadAndExtractRepo, getRepoInfo } from './util/examples'
-import { copy } from 'fs-extra'
-import path from 'path'
-import { log, TextStyles } from './util/logger'
+import { downloadAndExtractRepo, getRepoInfo } from './util/examples';
+import { copy } from 'fs-extra';
+import path from 'path';
+import { log, TextStyles } from './util/logger';
 
 type BaseExample = {
-  title: string
-  description?: string
-  value: string
-}
+  title: string;
+  description?: string;
+  value: string;
+};
 
 export type InternalTemplate = BaseExample & {
-  isInternal: true
-}
+  isInternal: true;
+};
 export type ExternalTemplate = BaseExample & {
-  isInternal: false
-  gitURL: string
-}
-export type Template = InternalTemplate | ExternalTemplate
+  isInternal: false;
+  gitURL: string;
+};
+export type Template = InternalTemplate | ExternalTemplate;
 
 export const TEMPLATES: Template[] = [
   {
@@ -26,6 +26,14 @@ export const TEMPLATES: Template[] = [
     value: 'tina-cloud-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-cloud-starter',
+  },
+  {
+    title: 'Astro Starter',
+    description:
+      'Get started with Astro - a modern static site generator designed for fast, lightweight, and flexible web projects.',
+    value: 'tina-astro-starter',
+    isInternal: false,
+    gitURL: 'https://github.com/tinacms/tina-astro-starter',
   },
   {
     title: 'Hugo Starter',
@@ -59,25 +67,25 @@ export const TEMPLATES: Template[] = [
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-barebones-starter',
   },
-]
+];
 
 export async function downloadTemplate(template: Template, root: string) {
   if (template.isInternal === false) {
-    const repoURL = new URL(template.gitURL)
-    const repoInfo = await getRepoInfo(repoURL)
+    const repoURL = new URL(template.gitURL);
+    const repoInfo = await getRepoInfo(repoURL);
     if (!repoInfo) {
-      throw new Error('Repository information not found.')
+      throw new Error('Repository information not found.');
     }
 
     log.info(
       `Downloading files from repo ${TextStyles.link(
         `${repoInfo?.username}/${repoInfo?.name}`
       )}.`
-    )
-    await downloadAndExtractRepo(root, repoInfo)
+    );
+    await downloadAndExtractRepo(root, repoInfo);
   } else {
     // Copy the template from the local file system.
-    const templateFile = path.join(__dirname, '..', 'examples', template.value)
-    await copy(`${templateFile}/`, './')
+    const templateFile = path.join(__dirname, '..', 'examples', template.value);
+    await copy(`${templateFile}/`, './');
   }
 }

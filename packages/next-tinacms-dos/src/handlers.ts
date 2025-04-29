@@ -12,69 +12,69 @@ import {
   PutObjectCommandInput,
   DeleteObjectCommand,
   DeleteObjectCommandInput,
-} from '@aws-sdk/client-s3'
-import type { Media, MediaListOptions } from 'tinacms'
-import path from 'path'
-import fs from 'fs'
-import { NextApiRequest, NextApiResponse } from 'next'
-import multer from 'multer'
-import { promisify } from 'util'
+} from '@aws-sdk/client-s3';
+import type { Media, MediaListOptions } from 'tinacms';
+import path from 'path';
+import fs from 'fs';
+import { NextApiRequest, NextApiResponse } from 'next';
+import multer from 'multer';
+import { promisify } from 'util';
 
 export interface DOSConfig {
-  config: S3ClientConfig
-  bucket: string
-  mediaRoot?: string
-  authorized: (_req: NextApiRequest, _res: NextApiResponse) => Promise<boolean>
+  config: S3ClientConfig;
+  bucket: string;
+  mediaRoot?: string;
+  authorized: (_req: NextApiRequest, _res: NextApiResponse) => Promise<boolean>;
 }
 
 export interface DOSOptions {
-  cdnUrl?: string
+  cdnUrl?: string;
 }
 
 export const mediaHandlerConfig = {
   api: {
     bodyParser: false,
   },
-}
+};
 
 export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
-  const client = new S3Client(config.config)
-  const bucket = config.bucket
-  let mediaRoot = config.mediaRoot || ''
+  const client = new S3Client(config.config);
+  const bucket = config.bucket;
+  let mediaRoot = config.mediaRoot || '';
   if (mediaRoot) {
     if (!mediaRoot.endsWith('/')) {
-      mediaRoot = mediaRoot + '/'
+      mediaRoot = mediaRoot + '/';
     }
     if (mediaRoot.startsWith('/')) {
-      mediaRoot = mediaRoot.substr(1)
+      mediaRoot = mediaRoot.substr(1);
     }
   }
   let cdnUrl =
     options?.cdnUrl ||
     config.config.endpoint
       .toString()
-      .replace(/http(s|):\/\//i, `https://${bucket}.`)
-  cdnUrl = cdnUrl + (cdnUrl.endsWith('/') ? '' : '/')
+      .replace(/http(s|):\/\//i, `https://${bucket}.`);
+  cdnUrl = cdnUrl + (cdnUrl.endsWith('/') ? '' : '/');
 
   return async (req: NextApiRequest, res: NextApiResponse) => {
-    const isAuthorized = await config.authorized(req, res)
+    const isAuthorized = await config.authorized(req, res);
     // make sure the user is authorized to upload
     if (!isAuthorized) {
-      res.status(401).json({ message: 'sorry this user is unauthorized' })
-      return
+      res.status(401).json({ message: 'sorry this user is unauthorized' });
+      return;
     }
     switch (req.method) {
       case 'GET':
-        return listMedia(req, res, client, bucket, mediaRoot, cdnUrl)
+        return listMedia(req, res, client, bucket, mediaRoot, cdnUrl);
       case 'POST':
-        return uploadMedia(req, res, client, bucket, mediaRoot, cdnUrl)
+        return uploadMedia(req, res, client, bucket, mediaRoot, cdnUrl);
       case 'DELETE':
-        return deleteAsset(req, res, client, bucket)
+        return deleteAsset(req, res, client, bucket);
       default:
-        res.end(404)
+        res.end(404);
     }
-  }
-}
+  };
+};
 
 async function uploadMedia(
   req: NextApiRequest,
@@ -90,30 +90,30 @@ async function uploadMedia(
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         directory: (req, file, cb) => {
-          cb(null, '/tmp')
+          cb(null, '/tmp');
         },
         filename: (req, file, cb) => {
-          cb(null, file.originalname)
+          cb(null, file.originalname);
         },
       }),
     }).single('file')
-  )
+  );
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  await upload(req, res)
+  await upload(req, res);
 
-  const { directory } = req.body
-  let prefix = directory.replace(/^\//, '').replace(/\/$/, '')
-  if (prefix) prefix = prefix + '/'
+  const { directory } = req.body;
+  let prefix = directory.replace(/^\//, '').replace(/\/$/, '');
+  if (prefix) prefix = prefix + '/';
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const filePath = req.file.path
+  const filePath = req.file.path;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const fileType = req.file?.mimetype
-  const blob = fs.readFileSync(filePath)
-  const filename = path.basename(filePath)
+  const fileType = req.file?.mimetype;
+  const blob = fs.readFileSync(filePath);
+  const filename = path.basename(filePath);
   const params: PutObjectCommandInput = {
     Bucket: bucket,
     Key: mediaRoot
@@ -122,12 +122,12 @@ async function uploadMedia(
     Body: blob,
     ACL: 'public-read',
     ContentType: fileType || 'application/octet-stream',
-  }
-  const command = new PutObjectCommand(params)
+  };
+  const command = new PutObjectCommand(params);
 
   try {
-    const src = cdnUrl + prefix + filename
-    await client.send(command)
+    const src = cdnUrl + prefix + filename;
+    await client.send(command);
     res.json({
       type: 'file',
       id: prefix + filename,
@@ -143,30 +143,30 @@ async function uploadMedia(
         (mediaRoot
           ? path.join(mediaRoot, prefix + filename)
           : prefix + filename),
-    })
+    });
   } catch (e) {
-    console.error('Error uploading media')
-    console.error(e)
-    res.status(500).send(findErrorMessage(e))
+    console.error('Error uploading media');
+    console.error(e);
+    res.status(500).send(findErrorMessage(e));
   }
 }
 
 function stripMediaRoot(mediaRoot: string, key: string) {
   if (!mediaRoot) {
-    return key
+    return key;
   }
-  const mediaRootParts = mediaRoot.split('/').filter((part) => part)
+  const mediaRootParts = mediaRoot.split('/').filter((part) => part);
   if (!mediaRootParts || !mediaRootParts[0]) {
-    return key
+    return key;
   }
-  const keyParts = key.split('/').filter((part) => part)
+  const keyParts = key.split('/').filter((part) => part);
   // remove each part of the key that matches the mediaRoot parts
   for (let i = 0; i < mediaRootParts.length; i++) {
     if (keyParts[0] === mediaRootParts[i]) {
-      keyParts.shift()
+      keyParts.shift();
     }
   }
-  return keyParts.join('/')
+  return keyParts.join('/');
 }
 
 async function listMedia(
@@ -182,9 +182,9 @@ async function listMedia(
       directory = '',
       limit = 500,
       offset,
-    } = req.query as MediaListOptions
-    let prefix = directory.replace(/^\//, '').replace(/\/$/, '')
-    if (prefix) prefix = prefix + '/'
+    } = req.query as MediaListOptions;
+    let prefix = directory.replace(/^\//, '').replace(/\/$/, '');
+    if (prefix) prefix = prefix + '/';
 
     const params: ListObjectsCommandInput = {
       Bucket: bucket,
@@ -192,44 +192,44 @@ async function listMedia(
       Prefix: mediaRoot ? path.join(mediaRoot, prefix) : prefix,
       Marker: offset?.toString(),
       MaxKeys: directory && !offset ? +limit + 1 : +limit,
-    }
+    };
 
-    const response = await client.send(new ListObjectsCommand(params))
-    const items = []
+    const response = await client.send(new ListObjectsCommand(params));
+    const items = [];
 
     response.CommonPrefixes?.forEach(({ Prefix }) => {
-      const strippedPrefix = stripMediaRoot(mediaRoot, Prefix)
+      const strippedPrefix = stripMediaRoot(mediaRoot, Prefix);
       if (!strippedPrefix) {
-        return
+        return;
       }
       items.push({
         id: Prefix,
         type: 'dir',
         filename: path.basename(strippedPrefix),
         directory: path.dirname(strippedPrefix),
-      })
-    })
+      });
+    });
 
     items.push(
       ...(response.Contents || [])
         .filter((file) => {
-          const strippedKey = stripMediaRoot(mediaRoot, file.Key)
-          return strippedKey !== prefix
+          const strippedKey = stripMediaRoot(mediaRoot, file.Key);
+          return strippedKey !== prefix;
         })
         .map(getDOSToTinaFunc(cdnUrl, mediaRoot))
-    )
+    );
 
     res.json({
       items,
       offset: response.NextMarker,
-    })
+    });
   } catch (e) {
     // Show the error to the user
-    console.error('Error listing media')
-    console.error(e)
-    res.status(500)
-    const message = findErrorMessage(e)
-    res.json({ e: message })
+    console.error('Error listing media');
+    console.error(e);
+    res.status(500);
+    const message = findErrorMessage(e);
+    res.json({ e: message });
   }
 }
 
@@ -240,11 +240,11 @@ async function listMedia(
  * normalize it into a string here.
  */
 const findErrorMessage = (e: any) => {
-  if (typeof e == 'string') return e
-  if (e.message) return e.message
-  if (e.error && e.error.message) return e.error.message
-  return 'an error occurred'
-}
+  if (typeof e == 'string') return e;
+  if (e.message) return e.message;
+  if (e.error && e.error.message) return e.error.message;
+  return 'an error occurred';
+};
 
 async function deleteAsset(
   req: NextApiRequest,
@@ -252,38 +252,38 @@ async function deleteAsset(
   client: S3Client,
   bucket: string
 ) {
-  const { media } = req.query
-  let [, objectKey] = media as string[]
+  const { media } = req.query;
+  let [, objectKey] = media as string[];
   const objectKeyIsSplit =
-    media && media.length > 2 && typeof media !== 'string'
+    media && media.length > 2 && typeof media !== 'string';
 
   if (objectKeyIsSplit) {
-    objectKey = media.slice(1).join('/')
+    objectKey = media.slice(1).join('/');
   }
 
   const params: DeleteObjectCommandInput = {
     Bucket: bucket,
     Key: objectKey,
-  }
+  };
   try {
-    const data = await client.send(new DeleteObjectCommand(params))
-    res.json(data)
+    const data = await client.send(new DeleteObjectCommand(params));
+    res.json(data);
   } catch (err) {
-    console.error('Error deleting media')
-    console.error(err)
+    console.error('Error deleting media');
+    console.error(err);
     res.status(500).json({
       message: err.message || 'Something went wrong',
-    })
+    });
   }
 }
 
 function getDOSToTinaFunc(cdnUrl: string, mediaRoot: string) {
   return function dosToTina(file: _Object): Media {
-    const strippedKey = stripMediaRoot(mediaRoot, file.Key)
-    const filename = path.basename(strippedKey)
-    const directory = path.dirname(strippedKey) + '/'
+    const strippedKey = stripMediaRoot(mediaRoot, file.Key);
+    const filename = path.basename(strippedKey);
+    const directory = path.dirname(strippedKey) + '/';
 
-    const src = cdnUrl + file.Key
+    const src = cdnUrl + file.Key;
     return {
       id: file.Key,
       filename,
@@ -295,6 +295,6 @@ function getDOSToTinaFunc(cdnUrl: string, mediaRoot: string) {
         '1000x1000': src,
       },
       type: 'file',
-    }
-  }
+    };
+  };
 }

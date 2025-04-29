@@ -1,6 +1,6 @@
-import React from 'react'
+import React from 'react';
 
-import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu'
+import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 import {
   collapseSelection,
   focusEditor,
@@ -10,7 +10,7 @@ import {
   useEditorRef,
   useEditorState,
   useEditorSelector,
-} from '@udecode/plate-common'
+} from '@udecode/plate-common';
 import {
   ELEMENT_H1,
   ELEMENT_H2,
@@ -18,10 +18,10 @@ import {
   ELEMENT_H4,
   ELEMENT_H5,
   ELEMENT_H6,
-} from '@udecode/plate-heading'
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
-import { ToolbarButton } from './plate-ui/toolbar'
-import { helpers, unsupportedItemsInTable } from '../plugins/core/common'
+} from '@udecode/plate-heading';
+import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
+import { ToolbarButton } from './plate-ui/toolbar';
+import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
 
 import {
   DropdownMenu,
@@ -30,9 +30,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   useOpenState,
-} from './plate-ui/dropdown-menu'
-import { Icons } from './plate-ui/icons'
-import { ELEMENT_TABLE } from '@udecode/plate-table'
+} from './plate-ui/dropdown-menu';
+import { Icons } from './plate-ui/icons';
+import { ELEMENT_TABLE } from '@udecode/plate-table';
 
 const items = [
   {
@@ -77,41 +77,42 @@ const items = [
     label: 'Heading 6',
     value: ELEMENT_H6,
   },
-]
+];
 
 const defaultItem =
-  items.find((item) => item.value === ELEMENT_PARAGRAPH) || items[0]
+  items.find((item) => item.value === ELEMENT_PARAGRAPH) || items[0];
 
 export function HeadingsMenu(props: DropdownMenuProps) {
   const value: string = useEditorSelector((editor) => {
-    let initialNodeType: string = ELEMENT_PARAGRAPH
-    let allNodesMatchInitialNodeType = false
+    let initialNodeType: string = ELEMENT_PARAGRAPH;
+    let allNodesMatchInitialNodeType = false;
     const codeBlockEntries = getNodeEntries(editor, {
       match: (n) => isBlock(editor, n),
       mode: 'highest',
-    })
-    const nodes = Array.from(codeBlockEntries)
+    });
+    const nodes = Array.from(codeBlockEntries);
 
     if (nodes.length > 0) {
-      initialNodeType = nodes[0][0].type as string
+      initialNodeType = nodes[0][0].type as string;
       allNodesMatchInitialNodeType = nodes.every(([node]) => {
-        const type: string = (node?.type as string) || ELEMENT_PARAGRAPH
+        const type: string = (node?.type as string) || ELEMENT_PARAGRAPH;
 
-        return type === initialNodeType
-      })
+        return type === initialNodeType;
+      });
     }
 
-    return allNodesMatchInitialNodeType ? initialNodeType : ELEMENT_PARAGRAPH
-  }, [])
+    return allNodesMatchInitialNodeType ? initialNodeType : ELEMENT_PARAGRAPH;
+  }, []);
 
-  const editor = useEditorRef()
-  const editorState = useEditorState()
-  const openState = useOpenState()
+  const editor = useEditorRef();
+  const editorState = useEditorState();
+  const openState = useOpenState();
 
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE)
+  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE);
 
-  const selectedItem = items.find((item) => item.value === value) ?? defaultItem
-  const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem
+  const selectedItem =
+    items.find((item) => item.value === value) ?? defaultItem;
+  const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem;
 
   return (
     <DropdownMenu modal={false} {...openState} {...props}>
@@ -120,42 +121,42 @@ export function HeadingsMenu(props: DropdownMenuProps) {
           showArrow
           isDropdown
           pressed={openState.open}
-          tooltip="Headings"
+          tooltip='Headings'
         >
-          <SelectedItemIcon className="size-5" />
-          <span className="@md/toolbar:flex hidden">{selectedItemLabel}</span>
+          <SelectedItemIcon className='size-5' />
+          <span className='@md/toolbar:flex hidden'>{selectedItemLabel}</span>
         </ToolbarButton>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="min-w-0">
+      <DropdownMenuContent align='start' className='min-w-0'>
         <DropdownMenuRadioGroup
-          className="flex flex-col gap-0.5"
+          className='flex flex-col gap-0.5'
           onValueChange={(type) => {
-            toggleNodeType(editor, { activeType: type })
-            collapseSelection(editor)
-            focusEditor(editor)
+            toggleNodeType(editor, { activeType: type });
+            collapseSelection(editor);
+            focusEditor(editor);
           }}
           value={value}
         >
           {items
             .filter((item) => {
               if (userInTable) {
-                return !unsupportedItemsInTable.has(item.label)
+                return !unsupportedItemsInTable.has(item.label);
               }
-              return true
+              return true;
             })
             .map(({ icon: Icon, label, value: itemValue }) => (
               <DropdownMenuRadioItem
-                className="min-w-[180px]"
+                className='min-w-[180px]'
                 key={itemValue}
                 value={itemValue}
               >
-                <Icon className="mr-2 size-5" />
+                <Icon className='mr-2 size-5' />
                 {label}
               </DropdownMenuRadioItem>
             ))}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

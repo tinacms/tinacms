@@ -4,36 +4,36 @@
 
 */
 
-import { Handlers, toMarkdown } from 'mdast-util-to-markdown'
-import { text } from 'mdast-util-to-markdown/lib/handle/text'
-import { gfmToMarkdown } from 'mdast-util-gfm'
+import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
+import { text } from 'mdast-util-to-markdown/lib/handle/text';
+import { gfmToMarkdown } from 'mdast-util-gfm';
 import {
   mdxJsxToMarkdown,
   MdxJsxTextElement,
   MdxJsxFlowElement,
-} from 'mdast-util-mdx-jsx'
-import { stringifyMDX as stringifyMDXNext } from '../next'
-import type { RichTextType } from '@tinacms/schema-tools'
-import type * as Md from 'mdast'
-import type * as Plate from '../parse/plate'
-import { eat } from './marks'
-import { stringifyProps } from './acorn'
-import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
-import { stringifyShortcode } from './stringifyShortcode'
+} from 'mdast-util-mdx-jsx';
+import { stringifyMDX as stringifyMDXNext } from '../next';
+import type { RichTextType } from '@tinacms/schema-tools';
+import type * as Md from 'mdast';
+import type * as Plate from '../parse/plate';
+import { eat } from './marks';
+import { stringifyProps } from './acorn';
+import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown';
+import { stringifyShortcode } from './stringifyShortcode';
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
-    mdxJsxTextElement: MdxJsxTextElement
+    mdxJsxTextElement: MdxJsxTextElement;
   }
   interface PhrasingContentMap {
-    mdxJsxTextElement: MdxJsxTextElement
+    mdxJsxTextElement: MdxJsxTextElement;
   }
 
   interface BlockContentMap {
-    mdxJsxFlowElement: MdxJsxFlowElement
+    mdxJsxFlowElement: MdxJsxFlowElement;
   }
   interface ContentMap {
-    mdxJsxFlowElement: MdxJsxFlowElement
+    mdxJsxFlowElement: MdxJsxFlowElement;
   }
 }
 
@@ -43,56 +43,56 @@ export const stringifyMDX = (
   imageCallback: (url: string) => string
 ) => {
   if (field.parser?.type === 'markdown') {
-    return stringifyMDXNext(value, field, imageCallback)
+    return stringifyMDXNext(value, field, imageCallback);
   }
   if (!value) {
-    return
+    return;
   }
   if (typeof value === 'string') {
-    throw new Error('Expected an object to stringify, but received a string')
+    throw new Error('Expected an object to stringify, but received a string');
   }
   if (value?.children[0]) {
     if (value?.children[0].type === 'invalid_markdown') {
-      return value.children[0].value
+      return value.children[0].value;
     }
   }
-  const tree = rootElement(value, field, imageCallback)
-  const res = toTinaMarkdown(tree, field)
+  const tree = rootElement(value, field, imageCallback);
+  const res = toTinaMarkdown(tree, field);
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
-  )
-  let preprocessedString = res
+  );
+  let preprocessedString = res;
   templatesWithMatchers?.forEach((template) => {
     if (typeof template === 'string') {
-      throw new Error('Global templates are not supported')
+      throw new Error('Global templates are not supported');
     }
     if (template.match) {
-      preprocessedString = stringifyShortcode(preprocessedString, template)
+      preprocessedString = stringifyShortcode(preprocessedString, template);
     }
-  })
-  return preprocessedString
-}
+  });
+  return preprocessedString;
+};
 
 export type Pattern = {
-  start: string
-  end: string
-  name: string
-  templateName: string
-  type: 'block' | 'leaf'
-}
+  start: string;
+  end: string;
+  name: string;
+  templateName: string;
+  type: 'block' | 'leaf';
+};
 
 export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
-  const patterns: Pattern[] = []
+  const patterns: Pattern[] = [];
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
-      return
+      return;
     }
     if (template && template.match) {
-      const pattern = template.match as Pattern
-      pattern.templateName = template.name
-      patterns.push(pattern)
+      const pattern = template.match as Pattern;
+      pattern.templateName = template.name;
+      patterns.push(pattern);
     }
-  })
+  });
   /**
    *
    * Escaping elements which we can't accound for (eg. `<`) is usually good. But when the rich-text other tooling
@@ -104,7 +104,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
    *
    */
   // @ts-ignore
-  const handlers: Handlers = {}
+  const handlers: Handlers = {};
   handlers['text'] = (node, parent, context, safeOptions) => {
     // Empty spaces before/after strings
     context.unsafe = context.unsafe.filter((unsafeItem) => {
@@ -112,27 +112,27 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
         unsafeItem.character === ' ' &&
         unsafeItem.inConstruct === 'phrasing'
       ) {
-        return false
+        return false;
       }
-      return true
-    })
+      return true;
+    });
     if (field.parser?.type === 'markdown') {
       if (field.parser.skipEscaping === 'all') {
-        return node.value
+        return node.value;
       }
       if (field.parser.skipEscaping === 'html') {
         // Remove this character from the unsafe list, and then
         // proceed with the original text handler
         context.unsafe = context.unsafe.filter((unsafeItem) => {
           if (unsafeItem.character === '<') {
-            return false
+            return false;
           }
-          return true
-        })
+          return true;
+        });
       }
     }
-    return text(node, parent, context, safeOptions)
-  }
+    return text(node, parent, context, safeOptions);
+  };
   return toMarkdown(tree, {
     extensions: [
       directiveToMarkdown(patterns),
@@ -141,27 +141,27 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
     ],
     listItemIndent: 'one',
     handlers,
-  })
-}
+  });
+};
 
 export const rootElement = (
   content: Plate.RootElement,
   field: RichTextType,
   imageCallback: (url: string) => string
 ): Md.Root => {
-  const children: Md.Content[] = []
+  const children: Md.Content[] = [];
   content.children?.forEach((child) => {
-    const value = blockElement(child, field, imageCallback)
+    const value = blockElement(child, field, imageCallback);
 
     if (value) {
-      children.push(value)
+      children.push(value);
     }
-  })
+  });
   return {
     type: 'root',
     children,
-  }
-}
+  };
+};
 
 export const blockElement = (
   content: Plate.BlockElement,
@@ -180,42 +180,42 @@ export const blockElement = (
         // @ts-ignore Type 'number' is not assignable to type '1 | 2 | 3 | 4 | 5 | 6'
         depth: { h1: 1, h2: 2, h3: 3, h4: 4, h5: 5, h6: 6 }[content.type],
         children: eat(content.children, field, imageCallback),
-      }
+      };
     case 'p':
       // Ignore empty blocks
       if (content.children.length === 1) {
-        const onlyChild = content.children[0]
+        const onlyChild = content.children[0];
         if (
           onlyChild &&
           // Slate text nodes don't get a `type` property for text nodes
           (onlyChild.type === 'text' || !onlyChild.type) &&
           onlyChild.text === ''
         ) {
-          return null
+          return null;
         }
       }
       return {
         type: 'paragraph',
         children: eat(content.children, field, imageCallback),
-      }
+      };
     case 'mermaid':
       return {
         type: 'code',
         lang: 'mermaid',
         value: content.value,
-      }
+      };
     case 'code_block':
       return {
         type: 'code',
         lang: content.lang,
         value: content.value,
-      }
+      };
     case 'mdxJsxFlowElement':
       if (content.name === 'table') {
         const table = content.props as {
-          align: Md.AlignType[] | undefined
-          tableRows: { tableCells: { value: any }[] }[]
-        }
+          align: Md.AlignType[] | undefined;
+          tableRows: { tableCells: { value: any }[] }[];
+        };
         return {
           type: 'table',
           align: table.align,
@@ -230,42 +230,42 @@ export const blockElement = (
                     field,
                     imageCallback
                   ),
-                }
+                };
               }),
-            }
-            return tr
+            };
+            return tr;
           }),
-        }
+        };
       }
       const { children, attributes, useDirective, directiveType } =
-        stringifyProps(content, field, false, imageCallback)
+        stringifyProps(content, field, false, imageCallback);
       if (useDirective) {
-        const name = content.name
+        const name = content.name;
         if (!name) {
           throw new Error(
             `Expective shortcode to have a name but it was not defined`
-          )
+          );
         }
-        const directiveAttributes: Record<string, string> = {}
+        const directiveAttributes: Record<string, string> = {};
         attributes?.forEach((att) => {
           if (att.value && typeof att.value === 'string') {
-            directiveAttributes[att.name] = att.value
+            directiveAttributes[att.name] = att.value;
           }
-        })
+        });
         if (directiveType === 'leaf') {
           return {
             type: 'leafDirective',
             name,
             attributes: directiveAttributes,
             children: [],
-          }
+          };
         } else {
           return {
             type: 'containerDirective',
             name,
             attributes: directiveAttributes,
             children: children,
-          }
+          };
         }
       }
       return {
@@ -273,7 +273,7 @@ export const blockElement = (
         name: content.name,
         attributes,
         children,
-      }
+      };
     case 'blockquote':
       return {
         type: 'blockquote',
@@ -283,11 +283,11 @@ export const blockElement = (
             children: eat(content.children, field, imageCallback),
           },
         ],
-      }
+      };
     case 'hr':
       return {
         type: 'thematicBreak',
-      }
+      };
     case 'ol':
     case 'ul':
       return {
@@ -297,12 +297,12 @@ export const blockElement = (
         children: content.children.map((child) =>
           listItemElement(child, field, imageCallback)
         ),
-      }
+      };
     case 'html': {
       return {
         type: 'html',
         value: content.value,
-      }
+      };
     }
     case 'img':
       return {
@@ -317,13 +317,13 @@ export const blockElement = (
             title: content.caption,
           },
         ],
-      }
+      };
     case 'table':
       const table = content.props as
         | {
-            align: Md.AlignType[] | undefined
+            align: Md.AlignType[] | undefined;
           }
-        | undefined
+        | undefined;
       return {
         type: 'table',
         align: table?.align,
@@ -338,15 +338,15 @@ export const blockElement = (
                   field,
                   imageCallback
                 ),
-              }
+              };
             }),
-          }
+          };
         }),
-      }
+      };
     default:
-      throw new Error(`BlockElement: ${content.type} is not yet supported`)
+      throw new Error(`BlockElement: ${content.type} is not yet supported`);
   }
-}
+};
 const listItemElement = (
   content: Plate.ListItemElement,
   field: RichTextType,
@@ -362,12 +362,12 @@ const listItemElement = (
         return {
           type: 'paragraph',
           children: eat(child.children, field, imageCallback),
-        }
+        };
       }
-      return blockContentElement(child, field, imageCallback)
+      return blockContentElement(child, field, imageCallback);
     }),
-  }
-}
+  };
+};
 const blockContentElement = (
   content: Plate.BlockElement,
   field: RichTextType,
@@ -382,12 +382,12 @@ const blockContentElement = (
           // @ts-ignore
           blockContentElement(child, field, imageCallback)
         ),
-      }
+      };
     case 'p':
       return {
         type: 'paragraph',
         children: eat(content.children, field, imageCallback),
-      }
+      };
     case 'ol':
     case 'ul':
       return {
@@ -397,29 +397,32 @@ const blockContentElement = (
         children: content.children.map((child) =>
           listItemElement(child, field, imageCallback)
         ),
-      }
+      };
     default:
       throw new Error(
         `BlockContentElement: ${content.type} is not yet supported`
-      )
+      );
   }
-}
+};
 
-export type Marks = 'strong' | 'emphasis' | 'inlineCode'
+export type Marks = 'strong' | 'emphasis' | 'inlineCode' | 'delete';
 
 export const getMarks = (content: Plate.InlineElement) => {
-  const marks: Marks[] = []
+  const marks: Marks[] = [];
   if (content.type !== 'text') {
-    return []
+    return [];
   }
   if (content.bold) {
-    marks.push('strong')
+    marks.push('strong');
   }
   if (content.italic) {
-    marks.push('emphasis')
+    marks.push('emphasis');
   }
   if (content.code) {
-    marks.push('inlineCode')
+    marks.push('inlineCode');
   }
-  return marks
-}
+  if (content.strikethrough) {
+    marks.push('delete');
+  }
+  return marks;
+};

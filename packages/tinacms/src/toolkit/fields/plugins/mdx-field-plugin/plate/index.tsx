@@ -1,36 +1,36 @@
-import React from 'react'
-import { Components } from './plugins/ui/components'
-import { formattingPlugins, commonPlugins } from './plugins/core'
-import { helpers } from './plugins/core/common'
+import React from 'react';
+import { Components } from './plugins/ui/components';
+import { formattingPlugins, commonPlugins } from './plugins/core';
+import { helpers } from './plugins/core/common';
 import {
   createMdxBlockPlugin,
   createMdxInlinePlugin,
-} from './plugins/create-mdx-plugins'
-import createImgPlugin from './plugins/create-img-plugin'
-import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin'
-import { createLinkPlugin } from './plugins/create-link-plugin'
-import { uuid } from './plugins/ui/helpers'
-import type { RichTextType } from '..'
-import { createPlugins, Plate } from '@udecode/plate-common'
-import { Editor } from './components/editor'
-import { FixedToolbar } from './components/plate-ui/fixed-toolbar'
-import { TooltipProvider } from './components/plate-ui/tooltip'
-import FixedToolbarButtons from './components/fixed-toolbar-buttons'
-import { FloatingToolbar } from './components/plate-ui/floating-toolbar'
-import FloatingToolbarButtons from './components/floating-toolbar-buttons'
-import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar'
-import { isUrl } from './transforms/is-url'
-import { ToolbarProvider } from './toolbar/toolbar-provider'
-import { createMermaidPlugin } from './plugins/custom/mermaid-plugin'
+} from './plugins/create-mdx-plugins';
+import createImgPlugin from './plugins/create-img-plugin';
+import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin';
+import { createLinkPlugin } from './plugins/create-link-plugin';
+import { uuid } from './plugins/ui/helpers';
+import type { RichTextType } from '..';
+import { createPlugins, Plate } from '@udecode/plate-common';
+import { Editor } from './components/editor';
+import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
+import { TooltipProvider } from './components/plate-ui/tooltip';
+import FixedToolbarButtons from './components/fixed-toolbar-buttons';
+import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
+import FloatingToolbarButtons from './components/floating-toolbar-buttons';
+import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar';
+import { isUrl } from './transforms/is-url';
+import { ToolbarProvider } from './toolbar/toolbar-provider';
+import { createMermaidPlugin } from './plugins/custom/mermaid-plugin';
 
-export const RichEditor = (props: RichTextType) => {
+export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(
     () =>
-      props.input.value?.children?.length
-        ? props.input.value.children.map(helpers.normalize)
+      input.value?.children?.length
+        ? input.value.children.map(helpers.normalize)
         : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
     []
-  )
+  );
 
   const plugins = React.useMemo(
     () =>
@@ -56,13 +56,12 @@ export const RichEditor = (props: RichTextType) => {
         }
       ),
     []
-  )
+  );
 
   // This should be a plugin customization
-  const withToolbar = true
-  const tempId = [props.tinaForm.id, props.input.name].join('.')
-  const id = React.useMemo(() => uuid() + tempId, [tempId])
-  const ref = React.useRef<HTMLDivElement>(null)
+  const tempId = [tinaForm.id, input.name].join('.');
+  const id = React.useMemo(() => uuid() + tempId, [tempId]);
+  const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     if (ref.current) {
@@ -71,14 +70,14 @@ export const RichEditor = (props: RichTextType) => {
         // as a ref, so we need to query for it ourselves
         const plateElement = ref.current?.querySelector(
           '[role="textbox"]'
-        ) as HTMLElement
-        if (props.field.experimental_focusIntent && plateElement) {
-          if (plateElement) plateElement.focus()
+        ) as HTMLElement;
+        if (field.experimental_focusIntent && plateElement) {
+          if (plateElement) plateElement.focus();
         }
         // Slate takes a second to mount
-      }, 100)
+      }, 100);
     }
-  }, [props.field.experimental_focusIntent, ref])
+  }, [field.experimental_focusIntent, ref]);
 
   return (
     <div ref={ref}>
@@ -87,28 +86,32 @@ export const RichEditor = (props: RichTextType) => {
         initialValue={initialValue}
         plugins={plugins}
         onChange={(value) => {
-          props.input.onChange({
+          input.onChange({
             type: 'root',
             children: value,
-          })
+          });
         }}
       >
         <TooltipProvider>
           <ToolbarProvider
-            tinaForm={props.tinaForm}
-            templates={props.field.templates}
-            overrides={props.field?.toolbarOverride}
+            tinaForm={tinaForm}
+            templates={field.templates}
+            overrides={
+              field?.toolbarOverride ? field.toolbarOverride : field.overrides
+            }
           >
             <FixedToolbar>
               <FixedToolbarButtons />
             </FixedToolbar>
-            <FloatingToolbar>
-              <FloatingToolbarButtons />
-            </FloatingToolbar>
+            {field?.overrides?.showFloatingToolbar !== false ? (
+              <FloatingToolbar>
+                <FloatingToolbarButtons />
+              </FloatingToolbar>
+            ) : null}
           </ToolbarProvider>
           <Editor />
         </TooltipProvider>
       </Plate>
     </div>
-  )
-}
+  );
+};

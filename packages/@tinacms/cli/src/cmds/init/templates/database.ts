@@ -1,11 +1,11 @@
-import type { Config } from '../prompts'
-import { makeImportString } from '../prompts'
+import type { Config } from '../prompts';
+import { makeImportString } from '../prompts';
 
 export type Variables = {
-  isLocalEnvVarName: string
-}
+  isLocalEnvVarName: string;
+};
 
-export type DatabaseAdapterTypes = 'upstash-redis'
+export type DatabaseAdapterTypes = 'upstash-redis';
 
 export const databaseTemplate = ({ config }: { config: Config }) => {
   return `
@@ -27,5 +27,5 @@ export default isLocal
       databaseAdapter: ${config.databaseAdapter?.databaseAdapterClassText},
       namespace: branch,
     })
-`
-}
+`;
+};

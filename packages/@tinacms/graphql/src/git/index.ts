@@ -1,34 +1,34 @@
-import git, { CallbackFsClient, PromiseFsClient } from 'isomorphic-git'
-import fs from 'fs-extra'
-import path from 'path'
-import micromatch from 'micromatch'
-import { normalizePath } from '../database/util'
+import git, { CallbackFsClient, PromiseFsClient } from 'isomorphic-git';
+import fs from 'fs-extra';
+import path from 'path';
+import micromatch from 'micromatch';
+import { normalizePath } from '../database/util';
 
 const findGitRoot = async (dir: string): Promise<string> => {
   if (await fs.pathExists(path.join(dir, '.git'))) {
-    return dir
+    return dir;
   }
-  const parentDir = path.dirname(dir)
+  const parentDir = path.dirname(dir);
   if (parentDir === dir) {
-    throw new Error('Could not find .git directory')
+    throw new Error('Could not find .git directory');
   }
-  return findGitRoot(parentDir)
-}
+  return findGitRoot(parentDir);
+};
 
 export const getSha = async ({
   fs,
   dir,
 }: {
-  fs: CallbackFsClient | PromiseFsClient
-  dir: string
+  fs: CallbackFsClient | PromiseFsClient;
+  dir: string;
 }) => {
-  dir = await findGitRoot(dir)
+  dir = await findGitRoot(dir);
   return git.resolveRef({
     fs,
     dir,
     ref: 'HEAD',
-  })
-}
+  });
+};
 
 export const getChangedFiles = async ({
   fs,
@@ -37,74 +37,74 @@ export const getChangedFiles = async ({
   to,
   pathFilter,
 }: {
-  fs: CallbackFsClient | PromiseFsClient
-  dir: string
-  from: string
-  to: string
-  pathFilter: Record<string, { matches?: string[] }>
+  fs: CallbackFsClient | PromiseFsClient;
+  dir: string;
+  from: string;
+  to: string;
+  pathFilter: Record<string, { matches?: string[] }>;
 }) => {
   const results = {
     added: [],
     modified: [],
     deleted: [],
-  }
+  };
 
-  const rootDir = await findGitRoot(dir)
-  let pathPrefix = ''
+  const rootDir = await findGitRoot(dir);
+  let pathPrefix = '';
   if (rootDir !== dir) {
-    pathPrefix = normalizePath(dir.substring(rootDir.length + 1))
+    pathPrefix = normalizePath(dir.substring(rootDir.length + 1));
   }
   await git.walk({
     fs,
     dir: rootDir,
     trees: [git.TREE({ ref: from }), git.TREE({ ref: to })],
     map: async function (filename, [A, B]) {
-      const relativePath = normalizePath(filename).substring(pathPrefix.length)
-      let matches = false
+      const relativePath = normalizePath(filename).substring(pathPrefix.length);
+      let matches = false;
       for (const [key, matcher] of Object.entries(pathFilter)) {
         if (relativePath.startsWith(key)) {
           if (!matcher.matches) {
-            matches = true
+            matches = true;
           } else {
             if (micromatch.isMatch(relativePath, matcher.matches)) {
-              matches = true
-              break
+              matches = true;
+              break;
             }
           }
         }
       }
       if ((await B?.type()) === 'tree') {
         // skip directory matches
-        return
+        return;
       }
       if (matches) {
-        const oidA = await A?.oid()
-        const oidB = await B?.oid()
+        const oidA = await A?.oid();
+        const oidB = await B?.oid();
         if (oidA !== oidB) {
           if (oidA === undefined) {
-            results.added.push(relativePath)
+            results.added.push(relativePath);
           } else if (oidB === undefined) {
-            results.deleted.push(relativePath)
+            results.deleted.push(relativePath);
           } else {
-            results.modified.push(relativePath)
+            results.modified.push(relativePath);
           }
         }
       }
     },
-  })
-  return results
-}
+  });
+  return results;
+};
 
 export const shaExists = async ({
   fs,
   dir,
   sha,
 }: {
-  fs: CallbackFsClient | PromiseFsClient
-  dir: string
-  sha: string
+  fs: CallbackFsClient | PromiseFsClient;
+  dir: string;
+  sha: string;
 }): Promise<boolean> =>
   git
     .readCommit({ fs, dir, oid: sha })
     .then(() => true)
-    .catch(() => false)
+    .catch(() => false);

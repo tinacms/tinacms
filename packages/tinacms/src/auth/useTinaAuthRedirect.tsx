@@ -2,23 +2,23 @@
 
 */
 
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
-const TINA_AUTH_CONFIG = 'tina_auth_config'
+const TINA_AUTH_CONFIG = 'tina_auth_config';
 export const useTinaAuthRedirect = () => {
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
+    const urlParams = new URLSearchParams(window.location.search);
 
     const config = {
       code: urlParams.get('code') || '',
       scope: urlParams.get('scope') || 'email',
       state: urlParams.get('state'),
-    }
+    };
 
     if (!config.code) {
-      return
+      return;
     }
 
-    localStorage[TINA_AUTH_CONFIG] = JSON.stringify(config)
-  }, [])
-}
+    localStorage[TINA_AUTH_CONFIG] = JSON.stringify(config);
+  }, []);
+};

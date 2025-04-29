@@ -1,4 +1,4 @@
-import { GeneratedFile, InitEnvironment } from '.'
+import { GeneratedFile, InitEnvironment } from '.';
 import {
   askCommonSetUp,
   askForestryMigrate,
@@ -9,28 +9,28 @@ import {
   chooseDatabaseAdapter,
   chooseGitProvider,
   Config,
-} from './prompts'
-import { logger } from '../../logger'
-import { askOverwriteGenerateFiles } from './prompts/generatedFiles'
+} from './prompts';
+import { logger } from '../../logger';
+import { askOverwriteGenerateFiles } from './prompts/generatedFiles';
 
 async function configure(
   env: InitEnvironment,
   opts: { debug?: boolean; isBackend?: boolean }
 ) {
   if (opts.isBackend && !env.tinaConfigExists) {
-    logger.info('Looks like Tina has not been setup, setting up now...')
+    logger.info('Looks like Tina has not been setup, setting up now...');
   }
 
   if (env.tinaConfigExists && !opts.isBackend) {
     logger.info(
       `Tina config already exists, skipping setup. (If you want to init tina from scratch, delete your tina config file and run this command again)`
-    )
-    process.exit(0)
+    );
+    process.exit(0);
   }
 
-  const skipTinaSetupCommands = env.tinaConfigExists
+  const skipTinaSetupCommands = env.tinaConfigExists;
 
-  const { framework, packageManager } = await askCommonSetUp()
+  const { framework, packageManager } = await askCommonSetUp();
   const config: Config = {
     envVars: [],
     framework,
@@ -39,25 +39,25 @@ async function configure(
     isLocalEnvVarName: 'TINA_PUBLIC_IS_LOCAL',
     // TODO: give this a better default
     typescript: false,
-  }
+  };
   if (config.framework.name === 'next') {
-    config.publicFolder = 'public'
+    config.publicFolder = 'public';
   } else if (config.framework.name === 'hugo') {
-    config.publicFolder = 'static'
+    config.publicFolder = 'static';
   }
 
   if (skipTinaSetupCommands) {
     // We didn't ask if they wanted to use Typescript, but we can infer
     // from their existing config file
-    config.typescript = env.generatedFiles.config.typescriptExists
+    config.typescript = env.generatedFiles.config.typescriptExists;
   } else {
     const { typescript, publicFolder } = await askTinaSetupPrompts({
       frameworkName: framework.name,
       config: config,
-    })
-    config.typescript = typescript
+    });
+    config.typescript = typescript;
     if (publicFolder) {
-      config.publicFolder = publicFolder
+      config.publicFolder = publicFolder;
     }
   }
 
@@ -65,27 +65,27 @@ async function configure(
     const { forestryMigrate, frontMatterFormat } = await askForestryMigrate({
       env,
       framework,
-    })
-    config.forestryMigrate = forestryMigrate
-    config.frontMatterFormat = frontMatterFormat
+    });
+    config.forestryMigrate = forestryMigrate;
+    config.frontMatterFormat = frontMatterFormat;
   }
 
   // This means we are running `tinacms init backend`
   if (opts.isBackend) {
-    const result = await askIfUsingSelfHosted()
-    config.hosting = result.hosting
+    const result = await askIfUsingSelfHosted();
+    config.hosting = result.hosting;
     if (result.hosting === 'tina-cloud') {
-      await askTinaCloudSetup({ config })
+      await askTinaCloudSetup({ config });
     } else if (result.hosting === 'self-host') {
-      config.gitProvider = await chooseGitProvider({ config })
+      config.gitProvider = await chooseGitProvider({ config });
       config.databaseAdapter = await chooseDatabaseAdapter({
         framework,
         config,
-      })
+      });
       config.authProvider = await chooseAuthProvider({
         framework,
         config,
-      })
+      });
     }
   }
   // If we are doing a backend init we can set the vercelKVNextAuthCredentialsKey default
@@ -94,41 +94,41 @@ async function configure(
   //     process.env.NEXTAUTH_CREDENTIALS_KEY || 'tinacms_users'
   // }
 
-  config.nextAuthCredentialsProviderName = 'VercelKVCredentialsProvider'
+  config.nextAuthCredentialsProviderName = 'VercelKVCredentialsProvider';
 
   if (opts.debug) {
-    console.log('Configuration:')
-    console.log(JSON.stringify(config, null, 2))
+    console.log('Configuration:');
+    console.log(JSON.stringify(config, null, 2));
   }
 
-  const firstTimeSetup = !env.tinaConfigExists
+  const firstTimeSetup = !env.tinaConfigExists;
 
   // ask about generated files
   // TODO: We directly repeat this logic in the apply function we are writing the files. Might be good to refactor this
-  const generatedFilesInUse: GeneratedFile[] = []
+  const generatedFilesInUse: GeneratedFile[] = [];
 
   // overwrite the config file if it exists and we are not doing backend init. (ie we are doing tinacms init)
   if (env.tinaConfigExists && !opts.isBackend) {
-    generatedFilesInUse.push(env.generatedFiles.config)
+    generatedFilesInUse.push(env.generatedFiles.config);
   }
   if (config.hosting === 'self-host') {
-    generatedFilesInUse.push(env.generatedFiles.database)
-    generatedFilesInUse.push(env.generatedFiles['next-api-handler'])
-    generatedFilesInUse.push(env.generatedFiles['users-json'])
+    generatedFilesInUse.push(env.generatedFiles.database);
+    generatedFilesInUse.push(env.generatedFiles['next-api-handler']);
+    generatedFilesInUse.push(env.generatedFiles['users-json']);
   }
   if (config.framework.reactive && firstTimeSetup) {
-    generatedFilesInUse.push(env.generatedFiles['reactive-example'])
+    generatedFilesInUse.push(env.generatedFiles['reactive-example']);
   }
   if (env.sampleContentExists && firstTimeSetup) {
-    generatedFilesInUse.push(env.generatedFiles['sample-content'])
+    generatedFilesInUse.push(env.generatedFiles['sample-content']);
   }
 
   config.overwriteList = await askOverwriteGenerateFiles({
     generatedFiles: generatedFilesInUse,
     config,
-  })
+  });
 
-  return config
+  return config;
 }
 
-export default configure
+export default configure;

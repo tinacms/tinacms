@@ -1,8 +1,8 @@
-import { wrapFieldsWithMeta } from './wrap-field-with-meta'
-import { Reference } from '../components/reference'
-import { parse } from './text-format'
+import { wrapFieldsWithMeta } from './wrap-field-with-meta';
+import { Reference } from '../components/reference';
+import { parse } from './text-format';
 
-export const ReferenceField = wrapFieldsWithMeta(Reference)
+export const ReferenceField = wrapFieldsWithMeta(Reference);
 
 export const ReferenceFieldPlugin = {
   name: 'reference',
@@ -10,6 +10,6 @@ export const ReferenceFieldPlugin = {
   Component: ReferenceField,
   parse,
   validate(value: any, values: any, meta: any, field: any) {
-    if (field.required && !value) return 'Required'
+    if (field.required && !value) return 'Required';
   },
-}
+};

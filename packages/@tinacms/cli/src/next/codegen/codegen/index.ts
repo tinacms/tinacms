@@ -2,17 +2,17 @@
 
 */
 
-import { GraphQLSchema, parse, printSchema } from 'graphql'
+import { GraphQLSchema, parse, printSchema } from 'graphql';
 
-import { AddGeneratedClient } from './plugin'
-import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
-import { codegen } from '@graphql-codegen/core'
+import { AddGeneratedClient } from './plugin';
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
+import { codegen } from '@graphql-codegen/core';
 // See https://www.graphql-tools.com/docs/documents-loading for more examples of the `load documents function`
-import { loadDocuments } from '@graphql-tools/load'
-import { plugin as typescriptOperationsPlugin } from '@graphql-codegen/typescript-operations'
-import { plugin as typescriptPlugin } from '@graphql-codegen/typescript'
+import { loadDocuments } from '@graphql-tools/load';
+import { plugin as typescriptOperationsPlugin } from '@graphql-codegen/typescript-operations';
+import { plugin as typescriptPlugin } from '@graphql-codegen/typescript';
 // Docs: https://www.graphql-code-generator.com/docs/plugins/typescript-generic-sdk
-import { plugin as typescriptSdkPlugin } from './sdkPlugin'
+import { plugin as typescriptSdkPlugin } from './sdkPlugin';
 
 export const generateTypes = async (
   schema: GraphQLSchema,
@@ -20,11 +20,11 @@ export const generateTypes = async (
   fragDocPath = process.cwd(),
   apiURL: string
 ) => {
-  let docs = []
-  let fragDocs = []
+  let docs = [];
+  let fragDocs = [];
 
-  docs = await loadGraphQLDocuments(queryPathGlob)
-  fragDocs = await loadGraphQLDocuments(fragDocPath)
+  docs = await loadGraphQLDocuments(queryPathGlob);
+  fragDocs = await loadGraphQLDocuments(fragDocPath);
 
   // See https://www.graphql-code-generator.com/docs/getting-started/programmatic-usage for more details
   const res = await codegen({
@@ -53,16 +53,16 @@ export const generateTypes = async (
       },
       AddGeneratedClient: AddGeneratedClient(apiURL),
     },
-  })
-  return res
-}
+  });
+  return res;
+};
 
 const loadGraphQLDocuments = async (globPath: string) => {
-  let result = []
+  let result = [];
   try {
     result = await loadDocuments(globPath, {
       loaders: [new GraphQLFileLoader()],
-    })
+    });
   } catch (e) {
     if (
       // https://www.graphql-tools.com/docs/documents-loading#no-files-found
@@ -72,8 +72,8 @@ const loadGraphQLDocuments = async (globPath: string) => {
     ) {
       // don't blow up if folder doesn't exist
     } else {
-      throw e
+      throw e;
     }
   }
-  return result
-}
+  return result;
+};

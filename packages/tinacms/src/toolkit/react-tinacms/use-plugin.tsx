@@ -1,1 +1,1 @@
-export { usePlugins, usePlugin } from '@toolkit/react-core'
+export { usePlugins, usePlugin } from '@toolkit/react-core';

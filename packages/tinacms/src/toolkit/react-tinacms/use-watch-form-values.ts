@@ -1,1 +1,1 @@
-export { useWatchFormValues } from '@toolkit/react-core'
+export { useWatchFormValues } from '@toolkit/react-core';

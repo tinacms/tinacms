@@ -4,9 +4,9 @@ import {
   ELEMENT_OL,
   ELEMENT_TODO_LI,
   ELEMENT_UL,
-} from '@udecode/plate'
-import { formatList, preFormat } from './autoformat-utils'
-import { isBlock, setNodes } from '@udecode/plate-common'
+} from '@udecode/plate';
+import { formatList, preFormat } from './autoformat-utils';
+import { isBlock, setNodes } from '@udecode/plate-common';
 
 export const autoformatLists: AutoformatRule[] = [
   {
@@ -41,4 +41,4 @@ export const autoformatLists: AutoformatRule[] = [
         }
       ),
   },
-]
+];

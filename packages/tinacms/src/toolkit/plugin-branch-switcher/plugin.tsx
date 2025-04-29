@@ -1,23 +1,23 @@
-import * as React from 'react'
-import { BiGitRepoForked } from 'react-icons/bi'
-import { ScreenPlugin } from '@toolkit/react-screens'
-import { BranchSwitcher } from './branch-switcher'
-import { BranchSwitcherProps } from './types'
+import * as React from 'react';
+import { BiGitRepoForked } from 'react-icons/bi';
+import { ScreenPlugin } from '@toolkit/react-screens';
+import { BranchSwitcher } from './branch-switcher';
+import { BranchSwitcherProps } from './types';
 
 export class BranchSwitcherPlugin implements ScreenPlugin {
-  __type = 'screen' as const
-  Icon = BiGitRepoForked
-  name = 'Select Branch'
-  layout = 'popup' as const
+  __type = 'screen' as const;
+  Icon = BiGitRepoForked;
+  name = 'Select Branch';
+  layout = 'popup' as const;
 
-  listBranches: BranchSwitcherProps['listBranches']
-  createBranch: BranchSwitcherProps['createBranch']
-  chooseBranch: BranchSwitcherProps['chooseBranch']
+  listBranches: BranchSwitcherProps['listBranches'];
+  createBranch: BranchSwitcherProps['createBranch'];
+  chooseBranch: BranchSwitcherProps['chooseBranch'];
 
   constructor(options: BranchSwitcherProps) {
-    this.listBranches = options.listBranches
-    this.createBranch = options.createBranch
-    this.chooseBranch = options.chooseBranch
+    this.listBranches = options.listBranches;
+    this.createBranch = options.createBranch;
+    this.chooseBranch = options.chooseBranch;
   }
 
   Component = () => {
@@ -27,6 +27,6 @@ export class BranchSwitcherPlugin implements ScreenPlugin {
         createBranch={this.createBranch}
         chooseBranch={this.chooseBranch}
       />
-    )
-  }
+    );
+  };
 }

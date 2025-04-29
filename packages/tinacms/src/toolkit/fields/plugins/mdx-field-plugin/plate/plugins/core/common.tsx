@@ -6,22 +6,20 @@ import {
   getListItemEntry,
   createBlockquotePlugin,
   createHeadingPlugin,
-  createBoldPlugin,
-  createItalicPlugin,
   createUnderlinePlugin,
-  createCodePlugin,
   createIndentListPlugin,
   createTablePlugin,
-} from '@udecode/plate'
-import { ReactEditor } from 'slate-react'
+  createBasicMarksPlugin,
+} from '@udecode/plate';
+import { ReactEditor } from 'slate-react';
 import {
   createCodeBlockPlugin,
   createHTMLBlockPlugin,
   createHTMLInlinePlugin,
-} from '../create-code-block'
-import { ELEMENT_IMG } from '../create-img-plugin'
-import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins'
-import { HANDLES_MDX } from './formatting'
+} from '../create-code-block';
+import { ELEMENT_IMG } from '../create-img-plugin';
+import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
+import { HANDLES_MDX } from './formatting';
 import {
   findNode,
   getBlockAbove,
@@ -30,21 +28,19 @@ import {
   type PlateEditor,
   setNodes,
   someNode,
-} from '@udecode/plate-common'
-import { createSlashPlugin } from '@udecode/plate-slash-command'
-import { Transforms, Editor, Node } from 'slate'
+} from '@udecode/plate-common';
+import { createSlashPlugin } from '@udecode/plate-slash-command';
+import { Transforms, Editor, Node } from 'slate';
 
 export const plugins = [
+  createBasicMarksPlugin(),
   createHeadingPlugin(),
   createParagraphPlugin(),
   createCodeBlockPlugin(),
   createHTMLBlockPlugin(),
   createHTMLInlinePlugin(),
   createBlockquotePlugin(),
-  createBoldPlugin(),
-  createItalicPlugin(),
   createUnderlinePlugin(),
-  createCodePlugin(),
   createListPlugin(),
   createIndentListPlugin(),
   createHorizontalRulePlugin(),
@@ -52,7 +48,7 @@ export const plugins = [
   createNodeIdPlugin(),
   createSlashPlugin(),
   createTablePlugin(),
-]
+];
 
 export const unsupportedItemsInTable = new Set([
   'Code Block',
@@ -66,19 +62,19 @@ export const unsupportedItemsInTable = new Set([
   'Heading 4',
   'Heading 5',
   'Heading 6',
-])
+]);
 
 const isNodeActive = (editor, type) => {
-  const pluginType = getPluginType(editor, type)
+  const pluginType = getPluginType(editor, type);
   return (
     !!editor?.selection && someNode(editor, { match: { type: pluginType } })
-  )
-}
+  );
+};
 
 const isListActive = (editor, type) => {
-  const res = !!editor?.selection && getListItemEntry(editor)
-  return !!res && res.list[0].type === type
-}
+  const res = !!editor?.selection && getListItemEntry(editor);
+  return !!res && res.list[0].type === type;
+};
 
 const normalize = (node: any) => {
   if (
@@ -88,7 +84,7 @@ const normalize = (node: any) => {
       ...node,
       children: [{ type: 'text', text: '' }],
       id: Date.now(),
-    }
+    };
   }
   if (node.children) {
     if (node.children.length) {
@@ -96,20 +92,20 @@ const normalize = (node: any) => {
         ...node,
         children: node.children.map(normalize),
         id: Date.now(),
-      }
+      };
     }
     // Always supply an empty text leaf
     return {
       ...node,
       children: [{ text: '' }],
       id: Date.now(),
-    }
+    };
   }
-  return node
-}
+  return node;
+};
 
 export const insertInlineElement = (editor, inlineElement) => {
-  insertNodes(editor, [inlineElement])
+  insertNodes(editor, [inlineElement]);
   /**
    * FIXME mdx-setTimeout: setTimeout seems to work, but not sure why it's necessary
    * Without this, the move occurs on the element that was selected
@@ -117,11 +113,11 @@ export const insertInlineElement = (editor, inlineElement) => {
    */
   // Move selection to the space after the embedded line
   setTimeout(() => {
-    Transforms.move(editor)
-  }, 1)
-}
+    Transforms.move(editor);
+  }, 1);
+};
 export const insertBlockElement = (editor, blockElement) => {
-  const editorEl = ReactEditor.toDOMNode(editor, editor)
+  const editorEl = ReactEditor.toDOMNode(editor, editor);
   if (editorEl) {
     /**
      * FIXME mdx-setTimeout: there must be a better way to do this. When jumping
@@ -134,34 +130,34 @@ export const insertBlockElement = (editor, blockElement) => {
      * ms timeout is irrelevant, but might be worth checking on
      * devices with lower CPUs
      */
-    editorEl.focus()
+    editorEl.focus();
     setTimeout(() => {
       // If empty, replace the current block
       if (isCurrentBlockEmpty(editor)) {
-        setNodes(editor, blockElement)
+        setNodes(editor, blockElement);
       } else {
-        insertNodes(editor, [blockElement])
+        insertNodes(editor, [blockElement]);
       }
-    }, 1)
+    }, 1);
   }
-}
+};
 
 const isCurrentBlockEmpty = (editor) => {
   if (!editor.selection) {
-    return false
+    return false;
   }
-  const [node] = Editor.node(editor, editor.selection)
-  const cursor = editor.selection.focus
-  const blockAbove = getBlockAbove(editor)
+  const [node] = Editor.node(editor, editor.selection);
+  const cursor = editor.selection.focus;
+  const blockAbove = getBlockAbove(editor);
   const isEmpty =
     !Node.string(node) &&
     // @ts-ignore bad type from slate
     !node.children?.some((n) => Editor.isInline(editor, n)) &&
     // Only do this if we're at the start of a block
-    Editor.isStart(editor, cursor, blockAbove[1])
+    Editor.isStart(editor, cursor, blockAbove[1]);
 
-  return isEmpty
-}
+  return isEmpty;
+};
 
 /** Specifies node types which mdx can be embedded.
  * This prevents nodes like code blocks from having
@@ -172,11 +168,11 @@ const isCurrentBlockEmpty = (editor) => {
 const currentNodeSupportsMDX = (editor: PlateEditor) =>
   findNode(editor, {
     match: { type: HANDLES_MDX },
-  })
+  });
 
 export const helpers = {
   isNodeActive,
   isListActive,
   currentNodeSupportsMDX,
   normalize,
-}
+};

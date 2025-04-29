@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/graphql",
-	"version": "1.5.7",
+	"version": "1.5.16",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
@@ -27,8 +27,8 @@
 		"build": "tinacms-scripts build",
 		"docs": "pnpm typedoc",
 		"serve": "pnpm nodemon dist/server.js",
-		"test": "jest",
-		"test-watch": "jest --watch"
+		"test": "vitest run",
+		"test-watch": "vitest"
 	},
 	"dependencies": {
 		"@iarna/toml": "^2.2.5",
@@ -36,12 +36,12 @@
 		"@tinacms/schema-tools": "workspace:*",
 		"abstract-level": "^1.0.4",
 		"date-fns": "^2.30.0",
-		"fast-glob": "^3.3.2",
-		"fs-extra": "^11.2.0",
+		"fast-glob": "^3.3.3",
+		"fs-extra": "^11.3.0",
 		"glob-parent": "^6.0.2",
 		"graphql": "15.8.0",
 		"gray-matter": "^4.0.3",
-		"isomorphic-git": "^1.27.1",
+		"isomorphic-git": "^1.29.0",
 		"js-sha1": "^0.6.0",
 		"js-yaml": "^3.14.1",
 		"jsonpath-plus": "10.1.0",
@@ -51,7 +51,7 @@
 		"many-level": "^2.0.0",
 		"micromatch": "4.0.8",
 		"normalize-path": "^3.0.0",
-		"readable-stream": "^4.5.2",
+		"readable-stream": "^4.7.0",
 		"scmp": "^2.1.0",
 		"yup": "^0.32.11"
 	},
@@ -69,23 +69,22 @@
 		"@types/estree": "^0.0.50",
 		"@types/express": "^4.17.21",
 		"@types/fs-extra": "^9.0.13",
-		"@types/jest": "^26.0.24",
 		"@types/js-yaml": "^3.12.10",
 		"@types/lodash.camelcase": "^4.3.9",
 		"@types/lodash.upperfirst": "^4.3.9",
 		"@types/lru-cache": "^5.1.1",
 		"@types/mdast": "^3.0.15",
 		"@types/micromatch": "^4.0.9",
-		"@types/node": "^22.7.4",
+		"@types/node": "^22.13.1",
 		"@types/normalize-path": "^3.0.2",
 		"@types/ws": "^7.4.7",
 		"@types/yup": "^0.29.14",
-		"jest": "^29.7.0",
-		"jest-diff": "^29.7.0",
 		"jest-file-snapshot": "^0.5.0",
-		"jest-matcher-utils": "^29.7.0",
 		"memory-level": "^1.0.0",
 		"nodemon": "3.1.4",
-		"typescript": "^5.6.2"
+		"typescript": "^5.7.3",
+		"vite": "^4.5.9",
+		"vitest": "^0.32.4",
+		"zod": "^3.24.2"
 	}
 }

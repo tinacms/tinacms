@@ -1,4 +1,4 @@
-import { TinaCMS, defineConfig } from 'tinacms'
+import { TinaCMS, defineConfig } from 'tinacms';
 
 export default defineConfig({
   // Example of how you can override the frontend url
@@ -9,43 +9,43 @@ export default defineConfig({
       getToken: async () => {
         return {
           id_token: 'Foo',
-        }
+        };
       },
       // This is called when they want to authenticate a user. For a lot of implementations it just may be redirecting to the login page
       async authenticate() {
-        console.log('Authenticating...')
+        console.log('Authenticating...');
         localStorage.setItem(
           'logan',
           JSON.stringify({ name: 'Logan', role: 'admin' })
-        )
-        return {}
+        );
+        return {};
       },
       async logOut() {
-        console.log('logOut...')
-        localStorage.removeItem('logan')
-        window.location.href = '/'
+        console.log('logOut...');
+        localStorage.removeItem('logan');
+        window.location.href = '/';
       },
       async getUser() {
-        console.log('getUser...')
-        const userStr = localStorage.getItem('logan')
+        console.log('getUser...');
+        const userStr = localStorage.getItem('logan');
         if (!userStr) {
-          return undefined
+          return undefined;
         } else {
           try {
-            return JSON.parse(userStr)
+            return JSON.parse(userStr);
           } catch {
-            return null
+            return null;
           }
         }
       },
 
       // Other methods
       onLogin: () => {
-        console.log('Logged in!')
+        console.log('Logged in!');
         // hook function to be called when the user logs in
       },
       onLogout: () => {
-        console.log('Logged out!')
+        console.log('Logged out!');
         // hook function to be called when the user logs out
       },
     },
@@ -73,10 +73,10 @@ export default defineConfig({
           filename: {
             slugify: (values, meta) => {
               if (meta.template.name === 'tem1') {
-                return 'tem1/' + (values?.foo || '')
+                return 'tem1/' + (values?.foo || '');
               }
               if (meta.template.name === 'tem2') {
-                return 'tem2/' + (values?.bar || '')
+                return 'tem2/' + (values?.bar || '');
               }
             },
           },
@@ -110,12 +110,18 @@ export default defineConfig({
               'The name of the <span style="text-decoration:underline;font-weight:bold">file</span>',
             showFirst: true,
           },
+          router: ({ document }) => {
+            if (document._sys.breadcrumbs[0] === 'home') {
+              return '/';
+            }
+            return `/${document._sys.filename}`;
+          },
           // Example of beforeSubmit
           beforeSubmit: async ({ values, cms, form, tinaForm }) => {
             return {
               ...values,
               lastUpdated: new Date().toISOString(),
-            }
+            };
           },
         },
         fields: [
@@ -201,7 +207,7 @@ export default defineConfig({
         format: 'md',
         ui: {
           router: ({ document }) => {
-            return `/posts/${document._sys.filename}`
+            return `/posts/${document._sys.filename}`;
           },
         },
         fields: [
@@ -226,7 +232,7 @@ export default defineConfig({
               'This is a list of <span style="text-decoration:underline;font-weight:bold">related posts</span>',
             ui: {
               itemProps: (item) => {
-                return { label: item?.label }
+                return { label: item?.label };
               },
             },
             fields: [
@@ -318,4 +324,4 @@ export default defineConfig({
       },
     ],
   },
-})
+});

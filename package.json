@@ -12,6 +12,8 @@
 		"dev": "pnpm watch",
 		"watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
 		"build": "turbo run build --filter=\"./packages/**\"",
+		"diff-tina-lock": "pnpm -r --filter='{./**}' --workspace-concurrency=1 run --if-present diff-tina-lock",
+		"update-tina-lock": "pnpm -r --filter='{./**}' --workspace-concurrency=1 run --if-present update-tina-lock",
 		"test": "turbo run test --filter=\"./packages/**\" -- --silent",
 		"types": "turbo run types --filter=\"./packages/**\"",
 		"build:e2e": "pnpm run build && pnpm --filter=kitchen-sink-starter run build",
@@ -25,28 +27,20 @@
 		"publish:beta": "pnpm publish -r --tag beta --no-git-checks --access public",
 		"publish:dev": "pnpm publish -r --tag dev --no-git-checks --access public",
 		"push-tags": "pnpm exec changeset tag && git pull && git push --follow-tags",
-		"lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
-		"format": "prettier --write .",
-		"postinstall": "husky install"
+        "lint": "biome lint ./packages",
+        "format": "biome format --write ./packages/"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
 		"@changesets/changelog-github": "^0.5.0",
 		"@changesets/cli": "2.27.8",
-		"@types/jest": "^29.5.13",
-		"@types/picomatch": "^3.0.1",
-		"@typescript-eslint/eslint-plugin": "^5.62.0",
-		"@typescript-eslint/parser": "^5.62.0",
-		"eslint": "^8.57.1",
-		"eslint-config-prettier": "^8.10.0",
-		"eslint-plugin-react": "^7.37.0",
-		"eslint-plugin-react-hooks": "^4.6.2",
-		"husky": "^7.0.4",
+		"@types/jest": "^29.5.14",
+		"@types/picomatch": "^3.0.2",
 		"picomatch": "^4.0.2",
-		"prettier": "^2.8.8",
 		"pretty-quick": "^3.3.1",
 		"turbo": "^1.13.4",
-		"typescript": "^5.6.2",
-		"vite": "^4.5.5"
+		"typescript": "^5.7.3",
+		"vite": "^4.5.9"
 	},
-	"packageManager": "pnpm@9.11.0"
+	"packageManager": "pnpm@9.15.5"
 }

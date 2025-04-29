@@ -152,7 +152,7 @@ Call `createMediaHandler` to set up routes and connect your instance of the Medi
 
 Import `isAuthorized` from [`@tinacms/auth`](https://github.com/tinacms/tinacms/tree/main/packages/%40tinacms/auth).
 
-The `authorized` key will make it so only authorized users within Tina Cloud can upload and make media edits.
+The `authorized` key will make it so only authorized users within TinaCloud can upload and make media edits.
 
 ```
 // pages/api/s3/[...media].ts

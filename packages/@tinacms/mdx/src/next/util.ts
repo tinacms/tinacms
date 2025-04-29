@@ -1,13 +1,13 @@
-import type { RichTextField, RichTextTemplate } from '@tinacms/schema-tools'
-import type { Pattern } from './shortcodes'
+import type { RichTextField, RichTextTemplate } from '@tinacms/schema-tools';
+import type { Pattern } from './shortcodes';
 
 export const getFieldPatterns = (field: RichTextField) => {
-  const patterns: Pattern[] = []
-  const templates: RichTextTemplate[] = []
-  hoistAllTemplates(field, templates)
+  const patterns: Pattern[] = [];
+  const templates: RichTextTemplate[] = [];
+  hoistAllTemplates(field, templates);
   templates?.forEach((template) => {
     if (typeof template === 'string') {
-      throw new Error('Global templates not supported')
+      throw new Error('Global templates not supported');
     }
     if (template.match) {
       patterns.push({
@@ -17,11 +17,11 @@ export const getFieldPatterns = (field: RichTextField) => {
         templateName: template.name,
         type: template.inline ? 'inline' : 'flow',
         leaf: !template.fields.some((f) => f.name === 'children'),
-      })
+      });
     }
-  })
-  return patterns
-}
+  });
+  return patterns;
+};
 
 // Since the markdown parser doesn't care where in the string
 // of markdown we are, it's not possible (or at least, not easy)
@@ -34,14 +34,14 @@ const hoistAllTemplates = (
 ) => {
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
-      throw new Error('Global templates not supported')
+      throw new Error('Global templates not supported');
     }
-    templates.push(template)
+    templates.push(template);
     template.fields.forEach((field) => {
       if (field.type === 'rich-text') {
-        hoistAllTemplates(field, templates)
+        hoistAllTemplates(field, templates);
       }
-    })
-  })
-  return templates
-}
+    });
+  });
+  return templates;
+};

@@ -2,55 +2,55 @@
 
 */
 
-import { v2 as cloudinary } from 'cloudinary'
-import type { Media, MediaListOptions } from 'tinacms'
-import path from 'path'
-import { NextApiRequest, NextApiResponse } from 'next'
-import multer from 'multer'
-import { promisify } from 'util'
+import { v2 as cloudinary } from 'cloudinary';
+import type { Media, MediaListOptions } from 'tinacms';
+import path from 'path';
+import { NextApiRequest, NextApiResponse } from 'next';
+import multer from 'multer';
+import { promisify } from 'util';
 
 export interface CloudinaryConfig {
-  cloud_name: string
-  api_key: string
-  api_secret: string
-  authorized: (req: NextApiRequest, res: NextApiResponse) => Promise<boolean>
+  cloud_name: string;
+  api_key: string;
+  api_secret: string;
+  authorized: (req: NextApiRequest, res: NextApiResponse) => Promise<boolean>;
 }
 
 export interface CloudinaryOptions {
-  useHttps?: boolean
+  useHttps?: boolean;
 }
 
 export const mediaHandlerConfig = {
   api: {
     bodyParser: false,
   },
-}
+};
 
 export const createMediaHandler = (
   config: CloudinaryConfig,
   options?: CloudinaryOptions
 ) => {
-  cloudinary.config(Object.assign({ secure: true }, config))
+  cloudinary.config(Object.assign({ secure: true }, config));
 
   return async (req: NextApiRequest, res: NextApiResponse) => {
-    const isAuthorized = await config.authorized(req, res)
+    const isAuthorized = await config.authorized(req, res);
     // make sure the user is authorized to upload
     if (!isAuthorized) {
-      res.status(401).json({ message: 'sorry this user is unauthorized' })
-      return
+      res.status(401).json({ message: 'sorry this user is unauthorized' });
+      return;
     }
     switch (req.method) {
       case 'GET':
-        return listMedia(req, res, options)
+        return listMedia(req, res, options);
       case 'POST':
-        return uploadMedia(req, res)
+        return uploadMedia(req, res);
       case 'DELETE':
-        return deleteAsset(req, res)
+        return deleteAsset(req, res);
       default:
-        res.end(404)
+        res.end(404);
     }
-  }
-}
+  };
+};
 
 async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   const upload = promisify(
@@ -58,19 +58,19 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
       storage: multer.diskStorage({
         // @ts-ignore
         directory: (req, file, cb) => {
-          cb(null, '/tmp')
+          cb(null, '/tmp');
         },
         filename: (req, file, cb) => {
-          cb(null, file.originalname)
+          cb(null, file.originalname);
         },
       }),
     }).single('file')
-  )
+  );
 
   // @ts-ignore
-  await upload(req, res)
+  await upload(req, res);
 
-  const { directory } = req.body
+  const { directory } = req.body;
 
   try {
     //@ts-ignore
@@ -79,11 +79,11 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
       use_filename: true,
       overwrite: false,
       resource_type: 'auto',
-    })
+    });
 
-    res.json(result)
+    res.json(result);
   } catch (error) {
-    res.status(error.http_code).json({ message: error.message })
+    res.status(error.http_code).json({ message: error.message });
   }
 }
 
@@ -98,82 +98,82 @@ async function listMedia(
       limit: parseInt(req.query.limit as string, 10) || 500,
       offset: req.query.offset as string,
       filesOnly: req.query.filesOnly === 'true' || false,
-    }
+    };
 
     const useRootDirectory =
       !mediaListOptions.directory ||
       mediaListOptions.directory === '/' ||
-      mediaListOptions.directory === '""'
+      mediaListOptions.directory === '""';
 
     const query = useRootDirectory
       ? 'folder=""'
-      : `folder="${mediaListOptions.directory}"`
+      : `folder="${mediaListOptions.directory}"`;
 
     const response = await cloudinary.search
       .expression(query)
       .max_results(mediaListOptions.limit)
       .next_cursor(mediaListOptions.offset as string)
-      .execute()
+      .execute();
 
-    const files = response.resources.map(getCloudinaryToTinaFunc(opts))
+    const files = response.resources.map(getCloudinaryToTinaFunc(opts));
 
     //@ts-ignore TODO: Open PR to cloudinary-core
     cloudinary.api.folders = (directory: string = '""') => {
       if (useRootDirectory) {
-        return cloudinary.api.root_folders()
+        return cloudinary.api.root_folders();
       } else {
-        return cloudinary.api.sub_folders(directory)
+        return cloudinary.api.sub_folders(directory);
       }
-    }
-    let folders: string[] = []
-    let folderRes = null
+    };
+    let folders: string[] = [];
+    let folderRes = null;
 
     if (mediaListOptions.filesOnly) {
       res.json({
         items: [...files],
         offset: response.next_cursor,
-      })
-      return
+      });
+      return;
     }
 
     try {
       // @ts-ignore
-      folderRes = await cloudinary.api.folders(mediaListOptions.directory)
+      folderRes = await cloudinary.api.folders(mediaListOptions.directory);
     } catch (e) {
       // If the folder doesn't exist, just return an empty array
       if (e.error?.message.startsWith("Can't find folder with path")) {
         // ignore
       } else {
-        console.error('Error getting folders')
-        console.error(e)
-        throw e
+        console.error('Error getting folders');
+        console.error(e);
+        throw e;
       }
     }
 
     if (folderRes?.folders) {
       folders = folderRes.folders.map(function (folder: {
-        name: string
-        path: string
+        name: string;
+        path: string;
       }): Media {
-        'empty-repo/004'
+        'empty-repo/004';
         return {
           id: folder.path,
           type: 'dir',
           filename: path.basename(folder.path),
           directory: path.dirname(folder.path),
-        }
-      })
+        };
+      });
     }
 
     res.json({
       items: [...folders, ...files],
       offset: response.next_cursor,
-    })
+    });
   } catch (e) {
-    console.log(e)
-    res.status(500)
-    const message = findErrorMessage(e)
-    res.json({ e: message })
+    console.log(e);
+    res.status(500);
+    const message = findErrorMessage(e);
+    res.json({ e: message });
   }
 }
 
@@ -184,23 +184,23 @@ async function listMedia(
  * normalize it into a string here.
  */
 const findErrorMessage = (e: any) => {
-  if (typeof e == 'string') return e
-  if (e.message) return e.message
-  if (e.error && e.error.message) return e.error.message
-  return 'an error occurred'
-}
+  if (typeof e == 'string') return e;
+  if (e.message) return e.message;
+  if (e.error && e.error.message) return e.error.message;
+  return 'an error occurred';
+};
 
 async function deleteAsset(req: NextApiRequest, res: NextApiResponse) {
-  const { media } = req.query
-  const [, public_id] = media as string[]
+  const { media } = req.query;
+  const [, public_id] = media as string[];
 
   cloudinary.uploader.destroy(public_id as string, {}, (err) => {
-    if (err) res.status(500)
+    if (err) res.status(500);
     res.json({
       err,
       public_id,
-    })
-  })
+    });
+  });
 }
 function getCloudinaryToTinaFunc(opts: CloudinaryOptions) {
   return function cloudinaryToTina(file: any): Media {
@@ -208,15 +208,15 @@ function getCloudinaryToTinaFunc(opts: CloudinaryOptions) {
     // const useHttps = opts?.useHttps ?? true
 
     // Default to true
-    let useHttps = true
+    let useHttps = true;
     if (typeof opts !== 'undefined' && typeof opts.useHttps !== 'undefined') {
-      useHttps = opts.useHttps
+      useHttps = opts.useHttps;
     }
 
-    const sel = useHttps ? ('secure_url' as const) : ('url' as const)
+    const sel = useHttps ? ('secure_url' as const) : ('url' as const);
 
-    const filename = path.basename(file.public_id)
-    const directory = path.dirname(file.public_id)
+    const filename = path.basename(file.public_id);
+    const directory = path.dirname(file.public_id);
 
     return {
       id: file.public_id,
@@ -235,19 +235,19 @@ function getCloudinaryToTinaFunc(opts: CloudinaryOptions) {
         ),
       },
       type: 'file',
-    }
-  }
+    };
+  };
 }
 
 function transformCloudinaryImage(
   url: string,
   transformations: string
 ): string {
-  const parts = url.split('/image/upload/')
+  const parts = url.split('/image/upload/');
 
   if (parts.length === 2) {
-    return parts[0] + '/image/upload/' + transformations + '/' + parts[1]
+    return parts[0] + '/image/upload/' + transformations + '/' + parts[1];
   }
 
-  return url
+  return url;
 }

@@ -1,0 +1,14 @@
+{
+  "data": {
+    "document": {
+      "_values": {
+        "_collection": "post",
+        "_template": "post",
+        "title": "Hello\n"
+      },
+      "_sys": {
+        "title": ""
+      }
+    }
+  }
+}

@@ -1,36 +1,36 @@
-import React from 'react'
-import * as G from 'graphql'
-import { getIn } from 'final-form'
-import { z } from 'zod'
 // @ts-expect-error
-import schemaJson from 'SCHEMA_IMPORT'
-import { expandQuery, isConnectionType, isNodeType } from './expand-query'
+import schemaJson from 'SCHEMA_IMPORT';
+import { getIn } from 'final-form';
+import * as G from 'graphql';
+import React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
-  Form,
-  TinaCMS,
-  NAMER,
-  TinaSchema,
-  useCMS,
-  resolveField,
-  Collection,
-  Template,
-  TinaField,
   Client,
+  Collection,
+  ErrorDialog,
+  Form,
   FormOptions,
   GlobalFormPlugin,
+  NAMER,
+  Template,
+  TinaCMS,
+  TinaField,
+  TinaSchema,
   TinaState,
-  ErrorDialog,
-} from 'tinacms'
-import { createForm, createGlobalForm, FormifyCallback } from './build-form'
+  resolveField,
+  useCMS,
+} from 'tinacms';
+import { z } from 'zod';
+import { FormifyCallback, createForm, createGlobalForm } from './build-form';
+import { showErrorModal } from './errors';
+import { expandQuery, isConnectionType, isNodeType } from './expand-query';
 import type {
-  PostMessage,
   Payload,
-  SystemInfo,
+  PostMessage,
   ResolvedDocument,
-} from './types'
-import { getFormAndFieldNameFromMetadata } from './util'
-import { useSearchParams } from 'react-router-dom'
-import { showErrorModal } from './errors'
+  SystemInfo,
+} from './types';
+import { getFormAndFieldNameFromMetadata } from './util';
 
 const sysSchema = z.object({
   breadcrumbs: z.array(z.string()),
@@ -50,14 +50,14 @@ const sysSchema = z.object({
     format: z.string().optional().nullable(),
     matches: z.string().optional().nullable(),
   }),
-})
+});
 
 const documentSchema: z.ZodType<ResolvedDocument> = z.object({
   _internalValues: z.record(z.unknown()),
   _internalSys: sysSchema,
-})
+});
 
-const astNode = schemaJson as G.DocumentNode
+const astNode = schemaJson as G.DocumentNode;
 const astNodeWithMeta: G.DocumentNode = {
   ...astNode,
   definitions: astNode.definitions.map((def) => {
@@ -103,7 +103,7 @@ const astNodeWithMeta: G.DocumentNode = {
             },
           },
         ],
-      }
+      };
     }
     if (def.kind === 'ObjectTypeDefinition') {
       return {
@@ -147,68 +147,68 @@ const astNodeWithMeta: G.DocumentNode = {
             },
           },
         ],
-      }
+      };
     }
-    return def
+    return def;
   }),
-}
-const schema = G.buildASTSchema(astNode)
-const schemaForResolver = G.buildASTSchema(astNodeWithMeta)
+};
+const schema = G.buildASTSchema(astNode);
+const schemaForResolver = G.buildASTSchema(astNodeWithMeta);
 
 const isRejected = (
   input: PromiseSettledResult<unknown>
-): input is PromiseRejectedResult => input.status === 'rejected'
+): input is PromiseRejectedResult => input.status === 'rejected';
 
 const isFulfilled = <T>(
   input: PromiseSettledResult<T>
-): input is PromiseFulfilledResult<T> => input.status === 'fulfilled'
+): input is PromiseFulfilledResult<T> => input.status === 'fulfilled';
 
 export const useGraphQLReducer = (
   iframe: React.MutableRefObject<HTMLIFrameElement>,
   url: string
 ) => {
-  const cms = useCMS()
-  const tinaSchema = cms.api.tina.schema as TinaSchema
-  const [payloads, setPayloads] = React.useState<Payload[]>([])
-  const [requestErrors, setRequestErrors] = React.useState<string[]>([])
-  const [searchParams, setSearchParams] = useSearchParams()
+  const cms = useCMS();
+  const tinaSchema = cms.api.tina.schema as TinaSchema;
+  const [payloads, setPayloads] = React.useState<Payload[]>([]);
+  const [requestErrors, setRequestErrors] = React.useState<string[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [results, setResults] = React.useState<
     {
-      id: string
+      id: string;
       data:
         | {
-            [key: string]: any
+            [key: string]: any;
           }
         | null
-        | undefined
+        | undefined;
     }[]
-  >([])
+  >([]);
   const [documentsToResolve, setDocumentsToResolve] = React.useState<string[]>(
     []
-  )
+  );
   const [resolvedDocuments, setResolvedDocuments] = React.useState<
     ResolvedDocument[]
-  >([])
-  const [operationIndex, setOperationIndex] = React.useState(0)
+  >([]);
+  const [operationIndex, setOperationIndex] = React.useState(0);
 
-  const activeField = searchParams.get('active-field')
+  const activeField = searchParams.get('active-field');
 
   React.useEffect(() => {
     const run = async () => {
       return Promise.all(
         documentsToResolve.map(async (documentId) => {
-          return await getDocument(documentId, cms.api.tina)
+          return await getDocument(documentId, cms.api.tina);
         })
-      )
-    }
+      );
+    };
     if (documentsToResolve.length) {
       run().then((docs) => {
-        setResolvedDocuments((resolvedDocs) => [...resolvedDocs, ...docs])
-        setDocumentsToResolve([])
-        setOperationIndex((i) => i + 1)
-      })
+        setResolvedDocuments((resolvedDocs) => [...resolvedDocs, ...docs]);
+        setDocumentsToResolve([]);
+        setOperationIndex((i) => i + 1);
+      });
     }
-  }, [documentsToResolve.join('.')])
+  }, [documentsToResolve.join('.')]);
 
   /**
    * Note: since React runs effects twice in development this will run twice for a given query
@@ -216,39 +216,41 @@ export const useGraphQLReducer = (
    */
   React.useEffect(() => {
     const run = async () => {
-      setRequestErrors([])
+      setRequestErrors([]);
       // gather the errors and display an error message containing each error unique message
       return Promise.allSettled(
         payloads.map(async (payload) => {
           // This payload has already been expanded, skip it.
           if (payload.expandedQuery) {
-            return payload
+            return payload;
           } else {
-            const expandedPayload = await expandPayload(payload, cms)
-            processPayload(expandedPayload)
-            return expandedPayload
+            const expandedPayload = await expandPayload(payload, cms);
+            processPayload(expandedPayload);
+            return expandedPayload;
           }
         })
-      )
-    }
+      );
+    };
     if (payloads.length) {
       run().then((updatedPayloads) => {
-        setPayloads(updatedPayloads.filter(isFulfilled).map((p) => p.value))
+        setPayloads(updatedPayloads.filter(isFulfilled).map((p) => p.value));
         setRequestErrors(
           updatedPayloads.filter(isRejected).map((p) => String(p.reason))
-        )
-      })
+        );
+      });
     }
-  }, [JSON.stringify(payloads), cms])
+  }, [JSON.stringify(payloads), cms]);
 
   const processPayload = React.useCallback(
     (payload: Payload) => {
-      const { expandedQueryForResolver, variables, expandedData } = payload
+      const { expandedQueryForResolver, variables, expandedData } = payload;
       if (!expandedQueryForResolver || !expandedData) {
-        throw new Error(`Unable to process payload which has not been expanded`)
+        throw new Error(
+          `Unable to process payload which has not been expanded`
+        );
       }
-      const formListItems: TinaState['formLists'][number]['items'] = []
-      const formIds: string[] = []
+      const formListItems: TinaState['formLists'][number]['items'] = [];
+      const formIds: string[] = [];
 
       const result = G.graphqlSync({
         schema: schemaForResolver,
@@ -256,7 +258,7 @@ export const useGraphQLReducer = (
         variableValues: variables,
         rootValue: expandedData,
         fieldResolver: (source, args, context, info) => {
-          const fieldName = info.fieldName
+          const fieldName = info.fieldName;
           /**
            * Since the `source` for this resolver is the query that
            * ran before passing it into `useTina`, we need to take aliases
@@ -265,35 +267,35 @@ export const useGraphQLReducer = (
            * solution as the `value` gets overwritten depending on the alias
            * query.
            */
-          const aliases: string[] = []
+          const aliases: string[] = [];
           info.fieldNodes.forEach((fieldNode) => {
             if (fieldNode.alias) {
-              aliases.push(fieldNode.alias.value)
+              aliases.push(fieldNode.alias.value);
             }
-          })
-          let value = source[fieldName] as unknown
+          });
+          let value = source[fieldName] as unknown;
           aliases.forEach((alias) => {
-            const aliasValue = source[alias]
+            const aliasValue = source[alias];
             if (aliasValue) {
-              value = aliasValue
+              value = aliasValue;
             }
-          })
+          });
           if (fieldName === '_sys') {
-            return source._internalSys
+            return source._internalSys;
           }
           if (fieldName === '_values') {
-            return source._internalValues
+            return source._internalValues;
           }
           if (info.fieldName === '_content_source') {
-            const pathArray = G.responsePathAsArray(info.path)
+            const pathArray = G.responsePathAsArray(info.path);
             return {
               queryId: payload.id,
               path: pathArray.slice(0, pathArray.length - 1),
-            }
+            };
           }
           if (info.fieldName === '_tina_metadata') {
             if (value) {
-              return value
+              return value;
             }
             // TODO: ensure all fields that have _tina_metadata
             // actually need it
@@ -301,77 +303,77 @@ export const useGraphQLReducer = (
               id: null,
               fields: [],
               prefix: '',
-            }
+            };
           }
           if (isConnectionType(info.returnType)) {
-            const name = G.getNamedType(info.returnType).name
+            const name = G.getNamedType(info.returnType).name;
             const connectionCollection = tinaSchema
               .getCollections()
               .find((collection) => {
                 const collectionName = NAMER.referenceConnectionType(
                   collection.namespace
-                )
+                );
                 if (collectionName === name) {
-                  return true
+                  return true;
                 }
-                return false
-              })
+                return false;
+              });
             if (connectionCollection) {
               formListItems.push({
                 type: 'list',
                 label: connectionCollection.label || connectionCollection.name,
-              })
+              });
             }
           }
           if (isNodeType(info.returnType)) {
             if (!value) {
-              return
+              return;
             }
-            let resolvedDocument: ResolvedDocument
+            let resolvedDocument: ResolvedDocument;
             // This is a reference from another form
             if (typeof value === 'string') {
               const valueFromSetup = getIn(
                 expandedData,
                 G.responsePathAsArray(info.path).join('.')
-              )
+              );
               const maybeResolvedDocument = resolvedDocuments.find(
                 (doc) => doc._internalSys.path === value
-              )
+              );
               // If we already have this document, use it.
               if (maybeResolvedDocument) {
-                resolvedDocument = maybeResolvedDocument
+                resolvedDocument = maybeResolvedDocument;
               } else if (valueFromSetup) {
                 // Else, even though in this context the value is a string because it's
                 // resolved from a parent form, if the reference hasn't changed
                 // from when we ran the setup query, we can avoid a data fetch
                 // here and just grab it from the response
                 const maybeResolvedDocument =
-                  documentSchema.parse(valueFromSetup)
+                  documentSchema.parse(valueFromSetup);
                 if (maybeResolvedDocument._internalSys.path === value) {
-                  resolvedDocument = maybeResolvedDocument
+                  resolvedDocument = maybeResolvedDocument;
                 } else {
-                  throw new NoFormError(`No form found`, value)
+                  throw new NoFormError(`No form found`, value);
                 }
               } else {
-                throw new NoFormError(`No form found`, value)
+                throw new NoFormError(`No form found`, value);
               }
             } else {
-              resolvedDocument = documentSchema.parse(value)
+              resolvedDocument = documentSchema.parse(value);
             }
-            const id = resolvedDocument._internalSys.path
-            formIds.push(id)
+            const id = resolvedDocument._internalSys.path;
+            formIds.push(id);
             const existingForm = cms.state.forms.find(
               (f) => f.tinaForm.id === id
-            )
+            );
 
-            const pathArray = G.responsePathAsArray(info.path)
-            const pathString = pathArray.join('.')
+            const pathArray = G.responsePathAsArray(info.path);
+            const pathString = pathArray.join('.');
             const ancestors = formListItems.filter((item) => {
               if (item.type === 'document') {
-                return pathString.startsWith(item.path)
+                return pathString.startsWith(item.path);
               }
-            })
-            const parent = ancestors[ancestors.length - 1]
+            });
+            const parent = ancestors[ancestors.length - 1];
             if (parent) {
               if (parent.type === 'document') {
                 parent.subItems.push({
@@ -379,7 +381,7 @@ export const useGraphQLReducer = (
                   path: pathString,
                   formId: id,
                   subItems: [],
-                })
+                });
               }
             } else {
               formListItems.push({
@@ -387,7 +389,7 @@ export const useGraphQLReducer = (
                 path: pathString,
                 formId: id,
                 subItems: [],
-              })
+              });
             }
 
             if (!existingForm) {
@@ -396,65 +398,65 @@ export const useGraphQLReducer = (
                 tinaSchema,
                 payloadId: payload.id,
                 cms,
-              })
+              });
               form.subscribe(
                 () => {
-                  setOperationIndex((i) => i + 1)
+                  setOperationIndex((i) => i + 1);
                 },
                 { values: true }
-              )
+              );
               return resolveDocument(
                 resolvedDocument,
                 template,
                 form,
                 pathString
-              )
+              );
             } else {
-              existingForm.tinaForm.addQuery(payload.id)
+              existingForm.tinaForm.addQuery(payload.id);
               const { template } = getTemplateForDocument(
                 resolvedDocument,
                 tinaSchema
-              )
-              existingForm.tinaForm.addQuery(payload.id)
+              );
+              existingForm.tinaForm.addQuery(payload.id);
               return resolveDocument(
                 resolvedDocument,
                 template,
                 existingForm.tinaForm,
                 pathString
-              )
+              );
             }
           }
-          return value
+          return value;
         },
-      })
+      });
       if (result.errors) {
         result.errors.forEach((error) => {
           if (
             error instanceof G.GraphQLError &&
             error.originalError instanceof NoFormError
           ) {
-            const id = error.originalError.id
+            const id = error.originalError.id;
             setDocumentsToResolve((docs) => [
               ...docs.filter((doc) => doc !== id),
               id,
-            ])
+            ]);
           } else {
-            console.log(error)
+            console.log(error);
             // throw new Error(
             //   `Error processing value change, please contact support`
             // )
           }
-        })
+        });
       } else {
         if (result.data) {
           setResults((results) => [
             ...results.filter((result) => result.id !== payload.id),
             { id: payload.id, data: result.data },
-          ])
+          ]);
         }
         if (activeField) {
-          setSearchParams({})
-          const [queryId, eventFieldName] = activeField.split('---')
+          setSearchParams({});
+          const [queryId, eventFieldName] = activeField.split('---');
           if (queryId === payload.id) {
             if (result?.data) {
               cms.dispatch({
@@ -463,19 +465,19 @@ export const useGraphQLReducer = (
                   result.data,
                   eventFieldName
                 ),
-              })
+              });
             }
             cms.dispatch({
               type: 'sidebar:set-display-state',
               value: 'openOrFull',
-            })
+            });
           }
         }
         iframe.current?.contentWindow?.postMessage({
           type: 'updateData',
           id: payload.id,
           data: result.data,
-        })
+        });
       }
       cms.dispatch({
         type: 'form-lists:add',
@@ -485,57 +487,64 @@ export const useGraphQLReducer = (
           items: formListItems,
           formIds,
         },
-      })
+      });
     },
     [
       resolvedDocuments.map((doc) => doc._internalSys.path).join('.'),
       activeField,
     ]
-  )
+  );
 
   const handleMessage = React.useCallback(
     (event: MessageEvent<PostMessage>) => {
+      if (event.data.type === 'user-select-form') {
+        cms.dispatch({
+          type: 'forms:set-active-form-id',
+          value: event.data.formId,
+        });
+      }
+
       if (event?.data?.type === 'quick-edit') {
         cms.dispatch({
           type: 'set-quick-editing-supported',
           value: event.data.value,
-        })
+        });
         iframe.current?.contentWindow?.postMessage({
           type: 'quickEditEnabled',
           value: cms.state.sidebarDisplayState === 'open',
-        })
+        });
       }
       if (event?.data?.type === 'isEditMode') {
         iframe?.current?.contentWindow?.postMessage({
           type: 'tina:editMode',
-        })
+        });
       }
       if (event.data.type === 'field:selected') {
-        const [queryId, eventFieldName] = event.data.fieldName.split('---')
-        const result = results.find((res) => res.id === queryId)
+        const [queryId, eventFieldName] = event.data.fieldName.split('---');
+        const result = results.find((res) => res.id === queryId);
         if (result?.data) {
           cms.dispatch({
             type: 'forms:set-active-field-name',
             value: getFormAndFieldNameFromMetadata(result.data, eventFieldName),
-          })
+          });
         }
         cms.dispatch({
           type: 'sidebar:set-display-state',
           value: 'openOrFull',
-        })
+        });
       }
       if (event.data.type === 'close') {
-        const payloadSchema = z.object({ id: z.string() })
-        const { id } = payloadSchema.parse(event.data)
+        const payloadSchema = z.object({ id: z.string() });
+        const { id } = payloadSchema.parse(event.data);
         setPayloads((previous) =>
           previous.filter((payload) => payload.id !== id)
-        )
-        setResults((previous) => previous.filter((result) => result.id !== id))
+        );
+        setResults((previous) => previous.filter((result) => result.id !== id));
         cms.forms.all().map((form) => {
-          form.removeQuery(id)
-        })
-        cms.removeOrphanedForms()
-        cms.dispatch({ type: 'form-lists:remove', value: id })
+          form.removeQuery(id);
+        });
+        cms.removeOrphanedForms();
+        cms.dispatch({ type: 'form-lists:remove', value: id });
       }
       if (event.data.type === 'open') {
         const payloadSchema = z.object({
@@ -543,60 +552,66 @@ export const useGraphQLReducer = (
           query: z.string(),
           variables: z.record(z.unknown()),
           data: z.record(z.unknown()),
-        })
-        const payload = payloadSchema.parse(event.data)
+        });
+        const payload = payloadSchema.parse(event.data);
         setPayloads((payloads) => [
           ...payloads.filter(({ id }) => id !== payload.id),
           payload,
-        ])
+        ]);
+      }
+      if (event.data.type === 'url-changed') {
+        cms.dispatch({
+          type: 'sidebar:set-loading-state',
+          value: true,
+        });
       }
     },
     [cms, JSON.stringify(results)]
-  )
+  );
 
   React.useEffect(() => {
     payloads.forEach((payload) => {
       if (payload.expandedData) {
-        processPayload(payload)
+        processPayload(payload);
       }
-    })
-  }, [operationIndex])
+    });
+  }, [operationIndex]);
 
   React.useEffect(() => {
     return () => {
-      setPayloads([])
-      setResults([])
-      cms.removeAllForms()
-      cms.dispatch({ type: 'form-lists:clear' })
-    }
-  }, [url])
+      setPayloads([]);
+      setResults([]);
+      cms.removeAllForms();
+      cms.dispatch({ type: 'form-lists:clear' });
+    };
+  }, [url]);
 
   React.useEffect(() => {
     iframe.current?.contentWindow?.postMessage({
       type: 'quickEditEnabled',
       value: cms.state.sidebarDisplayState === 'open',
-    })
-  }, [cms.state.sidebarDisplayState])
+    });
+  }, [cms.state.sidebarDisplayState]);
 
   React.useEffect(() => {
-    cms.dispatch({ type: 'set-edit-mode', value: 'visual' })
+    cms.dispatch({ type: 'set-edit-mode', value: 'visual' });
     if (iframe) {
-      window.addEventListener('message', handleMessage)
+      window.addEventListener('message', handleMessage);
     }
 
     return () => {
-      window.removeEventListener('message', handleMessage)
-      cms.removeAllForms()
-      cms.dispatch({ type: 'set-edit-mode', value: 'basic' })
-    }
-  }, [iframe.current, JSON.stringify(results)])
+      window.removeEventListener('message', handleMessage);
+      cms.removeAllForms();
+      cms.dispatch({ type: 'set-edit-mode', value: 'basic' });
+    };
+  }, [iframe.current, JSON.stringify(results)]);
 
   React.useEffect(() => {
     if (requestErrors.length) {
-      showErrorModal('Unexpected error querying content', requestErrors, cms)
+      showErrorModal('Unexpected error querying content', requestErrors, cms);
     }
-  }, [requestErrors])
-}
+  }, [requestErrors]);
+};
 
 const onSubmit = async (
   collection: Collection<true>,
@@ -604,7 +619,7 @@ const onSubmit = async (
   payload: Record<string, unknown>,
   cms: TinaCMS
 ) => {
-  const tinaSchema = cms.api.tina.schema
+  const tinaSchema = cms.api.tina.schema;
   try {
     const mutationString = `#graphql
       mutation UpdateDocument($collection: String!, $relativePath: String!, $params: DocumentUpdateMutation!) {
@@ -612,7 +627,7 @@ const onSubmit = async (
           __typename
         }
       }
-    `
+    `;
 
     await cms.api.tina.request(mutationString, {
       variables: {
@@ -620,8 +635,8 @@ const onSubmit = async (
         relativePath: relativePath,
         params: tinaSchema.transformPayload(collection.name, payload),
       },
-    })
-    cms.alerts.success('Document saved!')
+    });
+    cms.alerts.success('Document saved!');
   } catch (e) {
     cms.alerts.error(() =>
       ErrorDialog({
@@ -629,12 +644,12 @@ const onSubmit = async (
         message: 'Tina caught an error while updating the page',
         error: e,
       })
-    )
-    console.error(e)
+    );
+    console.error(e);
   }
-}
+};
 
-type Path = (string | number)[]
+type Path = (string | number)[];
 
 const resolveDocument = (
   doc: ResolvedDocument,
@@ -643,20 +658,20 @@ const resolveDocument = (
   pathToDocument: string
 ): ResolvedDocument => {
   // @ts-ignore AnyField and TinaField don't mix
-  const fields = form.fields as TinaField<true>[]
-  const id = doc._internalSys.path
-  const path: Path = []
+  const fields = form.fields as TinaField<true>[];
+  const id = doc._internalSys.path;
+  const path: Path = [];
   const formValues = resolveFormValue({
     fields: fields,
     values: form.values,
     path,
     id,
     pathToDocument,
-  })
-  const metadataFields: Record<string, string> = {}
+  });
+  const metadataFields: Record<string, string> = {};
   Object.keys(formValues).forEach((key) => {
-    metadataFields[key] = [...path, key].join('.')
-  })
+    metadataFields[key] = [...path, key].join('.');
+  });
 
   return {
     ...formValues,
@@ -672,8 +687,8 @@ const resolveDocument = (
     _internalSys: doc._internalSys,
     _internalValues: doc._internalValues,
     __typename: NAMER.dataTypeName(template.namespace),
-  }
-}
+  };
+};
 
 const resolveFormValue = <T extends Record<string, unknown>>({
   fields,
@@ -683,21 +698,21 @@ const resolveFormValue = <T extends Record<string, unknown>>({
   pathToDocument,
 }: // tinaSchema,
 {
-  fields: TinaField<true>[]
-  values: T
-  path: Path
-  id: string
-  pathToDocument: string
+  fields: TinaField<true>[];
+  values: T;
+  path: Path;
+  id: string;
+  pathToDocument: string;
   // tinaSchema: TinaSchema
 }): T & { __typename?: string } => {
-  const accum: Record<string, unknown> = {}
+  const accum: Record<string, unknown> = {};
   fields.forEach((field) => {
-    const v = values[field.name]
+    const v = values[field.name];
     if (typeof v === 'undefined') {
-      return
+      return;
     }
     if (v === null) {
-      return
+      return;
     }
     accum[field.name] = resolveFieldValue({
       field,
@@ -705,10 +720,10 @@ const resolveFormValue = <T extends Record<string, unknown>>({
       path,
       id,
       pathToDocument,
-    })
-  })
-  return accum as T & { __typename?: string }
-}
+    });
+  });
+  return accum as T & { __typename?: string };
+};
 const resolveFieldValue = ({
   field,
   value,
@@ -716,11 +731,11 @@ const resolveFieldValue = ({
   id,
   pathToDocument,
 }: {
-  field: TinaField<true>
-  value: unknown
-  path: Path
-  id: string
-  pathToDocument: string
+  field: TinaField<true>;
+  value: unknown;
+  path: Path;
+  id: string;
+  pathToDocument: string;
 }) => {
   switch (field.type) {
     case 'object': {
@@ -728,15 +743,17 @@ const resolveFieldValue = ({
         if (field.list) {
           if (Array.isArray(value)) {
             return value.map((item, index) => {
-              const template = field.templates[item._template]
+              const template = field.templates[item._template];
               if (typeof template === 'string') {
-                throw new Error('Global templates not supported')
+                throw new Error('Global templates not supported');
               }
-              const nextPath = [...path, field.name, index]
-              const metadataFields: Record<string, string> = {}
+              const nextPath = [...path, field.name, index];
+              const metadataFields: Record<string, string> = {};
               template.fields.forEach((field) => {
-                metadataFields[field.name] = [...nextPath, field.name].join('.')
-              })
+                metadataFields[field.name] = [...nextPath, field.name].join(
+                  '.'
+                );
+              });
               return {
                 __typename: NAMER.dataTypeName(template.namespace),
                 _tina_metadata: {
@@ -752,29 +769,29 @@ const resolveFieldValue = ({
                   id,
                   pathToDocument,
                 }),
-              }
-            })
+              };
+            });
           }
         } else {
           // not implemented
         }
       }
 
-      const templateFields = field.fields
+      const templateFields = field.fields;
       if (typeof templateFields === 'string') {
-        throw new Error('Global templates not supported')
+        throw new Error('Global templates not supported');
       }
       if (!templateFields) {
-        throw new Error(`Expected to find sub-fields on field ${field.name}`)
+        throw new Error(`Expected to find sub-fields on field ${field.name}`);
       }
       if (field.list) {
         if (Array.isArray(value)) {
           return value.map((item, index) => {
-            const nextPath = [...path, field.name, index]
-            const metadataFields: Record<string, string> = {}
+            const nextPath = [...path, field.name, index];
+            const metadataFields: Record<string, string> = {};
             templateFields.forEach((field) => {
-              metadataFields[field.name] = [...nextPath, field.name].join('.')
-            })
+              metadataFields[field.name] = [...nextPath, field.name].join('.');
+            });
             return {
               __typename: NAMER.dataTypeName(field.namespace),
               _tina_metadata: {
@@ -790,15 +807,15 @@ const resolveFieldValue = ({
                 id,
                 pathToDocument,
               }),
-            }
-          })
+            };
+          });
         }
       } else {
-        const nextPath = [...path, field.name]
-        const metadataFields: Record<string, string> = {}
+        const nextPath = [...path, field.name];
+        const metadataFields: Record<string, string> = {};
         templateFields.forEach((field) => {
-          metadataFields[field.name] = [...nextPath, field.name].join('.')
-        })
+          metadataFields[field.name] = [...nextPath, field.name].join('.');
+        });
         return {
           __typename: NAMER.dataTypeName(field.namespace),
           _tina_metadata: {
@@ -814,18 +831,21 @@ const resolveFieldValue = ({
             id,
             pathToDocument,
           }),
-        }
+        };
       }
     }
     default: {
-      return value
+      return value;
     }
   }
-}
+};
 
 const getDocument = async (id: string, tina: Client) => {
   const response = await tina.request<{
-    node: { _internalSys: SystemInfo; _internalValues: Record<string, unknown> }
+    node: {
+      _internalSys: SystemInfo;
+      _internalValues: Record<string, unknown>;
+    };
   }>(
     `query GetNode($id: String!) {
 node(id: $id) {
@@ -858,29 +878,29 @@ _internalSys: _sys {
 }
 }`,
     { variables: { id: id } }
-  )
-  return response.node
-}
+  );
+  return response.node;
+};
 
 const expandPayload = async (
   payload: Payload,
   cms: TinaCMS
 ): Promise<Payload> => {
-  const { query, variables } = payload
-  const documentNode = G.parse(query)
-  const expandedDocumentNode = expandQuery({ schema, documentNode })
-  const expandedQuery = G.print(expandedDocumentNode)
+  const { query, variables } = payload;
+  const documentNode = G.parse(query);
+  const expandedDocumentNode = expandQuery({ schema, documentNode });
+  const expandedQuery = G.print(expandedDocumentNode);
   const expandedData = await cms.api.tina.request<object>(expandedQuery, {
     variables,
-  })
+  });
 
   const expandedDocumentNodeForResolver = expandQuery({
     schema: schemaForResolver,
     documentNode,
-  })
-  const expandedQueryForResolver = G.print(expandedDocumentNodeForResolver)
-  return { ...payload, expandedQuery, expandedData, expandedQueryForResolver }
-}
+  });
+  const expandedQueryForResolver = G.print(expandedDocumentNodeForResolver);
+  return { ...payload, expandedQuery, expandedData, expandedQueryForResolver };
+};
 
 /**
  * When we resolve the graphql data we check for these errors,
@@ -888,11 +908,11 @@ const expandPayload = async (
  * process it once we have that document
  */
 class NoFormError extends Error {
-  id: string
+  id: string;
   constructor(msg: string, id: string) {
-    super(msg)
-    this.id = id
-    Object.setPrototypeOf(this, NoFormError.prototype)
+    super(msg);
+    this.id = id;
+    Object.setPrototypeOf(this, NoFormError.prototype);
   }
 }
 
@@ -900,22 +920,22 @@ const getTemplateForDocument = (
   resolvedDocument: ResolvedDocument,
   tinaSchema: TinaSchema
 ) => {
-  const id = resolvedDocument._internalSys.path
-  let collection: Collection<true> | undefined
+  const id = resolvedDocument._internalSys.path;
+  let collection: Collection<true> | undefined;
   try {
-    collection = tinaSchema.getCollectionByFullPath(id)
+    collection = tinaSchema.getCollectionByFullPath(id);
   } catch (e) {}
 
   if (!collection) {
-    throw new Error(`Unable to determine collection for path ${id}`)
+    throw new Error(`Unable to determine collection for path ${id}`);
   }
 
   const template = tinaSchema.getTemplateForData({
     data: resolvedDocument._internalValues,
     collection,
-  })
-  return { template, collection }
-}
+  });
+  return { template, collection };
+};
 
 const buildForm = ({
   resolvedDocument,
@@ -923,18 +943,18 @@ const buildForm = ({
   payloadId,
   cms,
 }: {
-  resolvedDocument: ResolvedDocument
-  tinaSchema: TinaSchema
-  payloadId: string
-  cms: TinaCMS
+  resolvedDocument: ResolvedDocument;
+  tinaSchema: TinaSchema;
+  payloadId: string;
+  cms: TinaCMS;
 }) => {
   const { template, collection } = getTemplateForDocument(
     resolvedDocument,
     tinaSchema
-  )
-  const id = resolvedDocument._internalSys.path
-  let form: Form | undefined
-  let shouldRegisterForm = true
+  );
+  const id = resolvedDocument._internalSys.path;
+  let form: Form | undefined;
+  let shouldRegisterForm = true;
   const formConfig: FormOptions<any> = {
     id,
     initialValues: resolvedDocument._internalValues,
@@ -947,10 +967,10 @@ const buildForm = ({
         cms
       ),
     label: collection.label || collection.name,
-  }
+  };
   if (tinaSchema.config.config?.formifyCallback) {
     const callback = tinaSchema.config.config
-      ?.formifyCallback as FormifyCallback
+      ?.formifyCallback as FormifyCallback;
     form =
       callback(
         {
@@ -960,30 +980,30 @@ const buildForm = ({
           formConfig,
         },
         cms
-      ) || undefined
+      ) || undefined;
     if (!form) {
       // If the form isn't created from formify, we still
       // need it, just don't show it to the user.
-      shouldRegisterForm = false
-      form = new Form(formConfig)
+      shouldRegisterForm = false;
+      form = new Form(formConfig);
     }
   } else {
     if (collection.ui?.global) {
-      form = createGlobalForm(formConfig)
+      form = createGlobalForm(formConfig);
     } else {
-      form = createForm(formConfig)
+      form = createForm(formConfig);
     }
   }
   if (form) {
     if (shouldRegisterForm) {
       if (collection.ui?.global) {
-        cms.plugins.add(new GlobalFormPlugin(form))
+        cms.plugins.add(new GlobalFormPlugin(form));
       }
-      cms.dispatch({ type: 'forms:add', value: form })
+      cms.dispatch({ type: 'forms:add', value: form });
     }
   }
   if (!form) {
-    throw new Error(`No form registered for ${id}.`)
+    throw new Error(`No form registered for ${id}.`);
   }
-  return { template, form }
-}
+  return { template, form };
+};
