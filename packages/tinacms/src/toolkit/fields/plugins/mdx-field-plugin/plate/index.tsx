@@ -52,7 +52,6 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       components: Components(), // if this uses hooks, it's now safe at top level
     }
   );
-  
 
   // This should be a plugin customization
   const tempId = [tinaForm.id, input.name].join('.');
