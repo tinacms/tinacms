@@ -231,7 +231,7 @@ export const Components = () => {
           {...props}
         >
           {children}
-         </div>
+        </div>
       );
     },
     [ELEMENT_TABLE]: TableElement,
