@@ -1,3 +1,4 @@
+import { Alerts, type EventsToAlerts } from '@toolkit/alerts';
 import {
   CMS,
   type CMSConfig,
@@ -5,43 +6,42 @@ import {
   type MediaUploadOptions,
   type PluginType,
 } from '@toolkit/core';
-import type { FieldPlugin } from '@toolkit/form-builder';
-import type { ScreenPlugin } from '@toolkit/react-screens';
 import {
-  TextFieldPlugin,
-  TextareaFieldPlugin,
-  ImageFieldPlugin,
+  BlocksFieldPlugin,
+  ButtonToggleFieldPlugin,
+  CheckboxGroupFieldPlugin,
   ColorFieldPlugin,
-  NumberFieldPlugin,
-  ToggleFieldPlugin,
-  SelectFieldPlugin,
-  RadioGroupFieldPlugin,
+  DateFieldPlugin,
   GroupFieldPlugin,
   GroupListFieldPlugin,
-  ListFieldPlugin,
-  BlocksFieldPlugin,
-  TagsFieldPlugin,
-  DateFieldPlugin,
-  CheckboxGroupFieldPlugin,
-  ReferenceFieldPlugin,
-  ButtonToggleFieldPlugin,
   HiddenFieldPlugin,
+  ImageFieldPlugin,
+  ListFieldPlugin,
+  NumberFieldPlugin,
   PasswordFieldPlugin,
+  RadioGroupFieldPlugin,
+  ReferenceFieldPlugin,
+  SelectFieldPlugin,
+  TagsFieldPlugin,
+  TextFieldPlugin,
+  TextareaFieldPlugin,
+  ToggleFieldPlugin,
 } from '@toolkit/fields';
+import type { FieldPlugin } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
-import { Alerts, type EventsToAlerts } from '@toolkit/alerts';
-import { SidebarState, type SidebarStateOptions } from '@toolkit/react-sidebar';
 import {
-  MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
+  MarkdownFieldPlaceholder,
 } from '@toolkit/plugin-fields/markdown';
 import { MediaManagerScreenPlugin } from '@toolkit/plugin-screens/media-manager-screen';
 import { PasswordScreenPlugin } from '@toolkit/plugin-screens/password-screen';
 import { createCloudConfig } from '@toolkit/react-cloud-config';
-import type { TinaAction, TinaState } from './tina-state';
-import type { Client } from '../internalClient';
+import type { ScreenPlugin } from '@toolkit/react-screens';
+import { SidebarState, type SidebarStateOptions } from '@toolkit/react-sidebar';
 import { MdOutlinePerson } from 'react-icons/md';
 import { MdOutlineHelpOutline } from 'react-icons/md';
+import type { Client } from '../internalClient';
+import type { TinaAction, TinaState } from './tina-state';
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
   TextareaFieldPlugin,
