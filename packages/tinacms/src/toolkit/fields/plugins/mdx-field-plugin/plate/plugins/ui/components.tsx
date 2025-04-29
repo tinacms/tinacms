@@ -58,7 +58,7 @@ const blockClasses = 'mt-0.5';
 const headerClasses = 'font-normal';
 
 export const Components = () => {
-  // const selected = useSelected();
+  const selected = useSelected();
   return {
     [ELEMENT_SLASH_INPUT]: SlashInputElement,
     [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (
@@ -232,9 +232,10 @@ export const Components = () => {
           {...props}
         >
           {children}
-          {selected && (
+          {/* {selected && (
             <span className='absolute h-4 -top-2 inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none' />
-          )}
+          )} */}
+            {/* <span className='absolute h-4 -top-2 inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none' /> */}
         </div>
       );
     },
