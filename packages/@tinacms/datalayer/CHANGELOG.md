@@ -1,5 +1,14 @@
 # tina-graphql
 
+## 1.3.16
+
+### Patch Changes
+
+- [#5602](https://github.com/tinacms/tinacms/pull/5602) [`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd) Thanks [@wicksipedia](https://github.com/wicksipedia)! - fix naming of TinaCloud
+
+- Updated dependencies [[`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd), [`ea204c9`](https://github.com/tinacms/tinacms/commit/ea204c9045451f3ebea04f503e6158d2016613e4)]:
+  - @tinacms/graphql@1.5.16
+
 ## 1.3.14
 
 ### Patch Changes
@@ -226,11 +235,11 @@
   #### Updated `database.ts` Example
 
   ```typescript
-  import { createDatabase, createLocalDatabase } from '@tinacms/datalayer'
-  import { MongodbLevel } from 'mongodb-level'
-  import { GitHubProvider } from 'tinacms-gitprovider-github'
+  import { createDatabase, createLocalDatabase } from "@tinacms/datalayer";
+  import { MongodbLevel } from "mongodb-level";
+  import { GitHubProvider } from "tinacms-gitprovider-github";
 
-  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
 
   export default isLocal
     ? createLocalDatabase()
@@ -242,12 +251,12 @@
           token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         }),
         databaseAdapter: new MongodbLevel<string, Record<string, any>>({
-          collectionName: 'tinacms',
-          dbName: 'tinacms',
+          collectionName: "tinacms",
+          dbName: "tinacms",
           mongoUri: process.env.MONGODB_URI,
         }),
         namespace: process.env.GITHUB_BRANCH,
-      })
+      });
   ```
 
   ### Migrating `database.ts`
@@ -262,7 +271,7 @@
     owner: process.env.GITHUB_OWNER,
     repo: process.env.GITHUB_REPO,
     token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-  })
+  });
   ```
 
   - **Custom Git Provider**: Implement the `GitProvider` interface for different git providers.
@@ -297,8 +306,8 @@
   - **Usage**: Implement a local database with the `createLocalDatabase` function.
 
   ```typescript
-  import { createLocalDatabase } from '@tinacms/datalayer'
-  createLocalDatabase(port)
+  import { createLocalDatabase } from "@tinacms/datalayer";
+  createLocalDatabase(port);
   ```
 
   #### d. Consolidated Example
@@ -345,13 +354,13 @@
       },
     },
     //...
-  })
+  });
   ```
 
   - **New API**:
 
   ```javascript
-  import { AbstractAuthProvider } from 'tinacms'
+  import { AbstractAuthProvider } from "tinacms";
   class CustomAuthProvider extends AbstractAuthProvider {
     login() {}
     logout() {}
@@ -360,7 +369,7 @@
   defineConfig({
     authProvider: new CustomAuthProvider(),
     //...
-  })
+  });
   ```
 
   ### TinaCMS Self Hosted backend updates
@@ -377,13 +386,16 @@
   `/api/tina/[...routes].{ts,js}`
 
   ```typescript
-  import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
+  import {
+    TinaNodeBackend,
+    LocalBackendAuthProvider,
+  } from "@tinacms/datalayer";
 
-  import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from 'tinacms-authjs'
+  import { TinaAuthJSOptions, AuthJsBackendAuthProvider } from "tinacms-authjs";
 
-  import databaseClient from '../../../tina/__generated__/databaseClient'
+  import databaseClient from "../../../tina/__generated__/databaseClient";
 
-  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
+  const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === "true";
 
   const handler = TinaNodeBackend({
     authProvider: isLocal
@@ -395,12 +407,12 @@
           }),
         }),
     databaseClient,
-  })
+  });
 
   export default (req, res) => {
     // Modify the request here if you need to
-    return handler(req, res)
-  }
+    return handler(req, res);
+  };
   ```
 
   These changes are put in place to make self hosted TinaCMS easier to use and more flexible.
@@ -715,7 +727,7 @@
   > NOTE: Relative paths are fine to use here, but make sure it's relative to the `.tina/config` file
 
   ```ts
-  localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+  localContentPath: process.env.REMOTE_ROOT_PATH; // eg. '../../my-content-repo'
   ```
 
   ### Production workflow
@@ -766,25 +778,25 @@
   ```ts
   // .tina/schema.ts
 
-  import { defineSchema } from 'tinacms'
+  import { defineSchema } from "tinacms";
 
   const schema = defineSchema({
     collections: [
       {
-        name: 'page',
-        path: 'content/page',
-        label: 'Page',
+        name: "page",
+        path: "content/page",
+        label: "Page",
         // Need to provide the format if the file being used (default is `.md`)
-        format: 'mdx',
+        format: "mdx",
         fields: [
           //...
         ],
       },
     ],
-  })
+  });
   //...
 
-  export default schema
+  export default schema;
   ```
 
 ### Patch Changes
@@ -835,7 +847,7 @@
 
 ### Patch Changes
 
-- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with Tina Cloud
+- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with TinaCloud
 
 ## 0.58.2
 
@@ -1060,19 +1072,19 @@
   {
     collections: [
       {
-        name: 'post',
-        label: 'Post',
-        path: 'content/posts',
+        name: "post",
+        label: "Post",
+        path: "content/posts",
         fields: [
           {
-            name: 'title',
-            label: 'Title',
-            type: 'string', // read on below to learn more about _type_ changes
+            name: "title",
+            label: "Title",
+            type: "string", // read on below to learn more about _type_ changes
           },
         ],
         // defining `fields` and `templates` would result in a compilation error
       },
-    ]
+    ];
   }
   ```
 
@@ -1143,9 +1155,9 @@
 
   ```js
   cms.fields.add({
-    name: 'myMapField',
+    name: "myMapField",
     Component: MapPicker,
-  })
+  });
   ```
 
   ### One important gotcha
@@ -1166,17 +1178,17 @@
   And then when you register the plugin, provide your custom logic here:
 
   ```js
-  import { TextFieldPlugin } from 'tinacms'
+  import { TextFieldPlugin } from "tinacms";
 
   // ...
 
   cms.fields.add({
     ...TextFieldPlugin, // spread existing text plugin
-    name: 'myText',
+    name: "myText",
     validate: (value) => {
-      someValidationLogic(value)
+      someValidationLogic(value);
     },
-  })
+  });
   ```
 
   **Why?**
@@ -1198,8 +1210,8 @@
           {props.getPostDocument.data?.category}
         </MyCategoryComponent>
       </>
-    )
-  }
+    );
+  };
   ```
 
   2. The query did not ask for that field:
@@ -1222,7 +1234,7 @@
 
   ```md
   ---
-  title: 'Hello, World'
+  title: "Hello, World"
   categories:
     - sports
     - movies
@@ -1233,7 +1245,7 @@
 
   ```md
   ---
-  title: 'Hello, World'
+  title: "Hello, World"
   categories: []
   ---
   ```
@@ -1242,7 +1254,7 @@
 
   ```md
   ---
-  title: 'Hello, World'
+  title: "Hello, World"
   ---
   ```
 
@@ -1259,11 +1271,11 @@
     return props.blocks.map((block) => {
       return (
         <>
-          <h2>{block.categories.split(',')}</h2>
+          <h2>{block.categories.split(",")}</h2>
         </>
-      )
-    })
-  }
+      );
+    });
+  };
   ```
 
   For a new item, `categories` will be null, so we'll get an error. This only happens when you're editing your page with Tina, so it's not a production-facing issue.

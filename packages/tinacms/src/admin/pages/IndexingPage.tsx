@@ -1,9 +1,9 @@
+import { formatBranchName, useBranchData, useCMS } from '@tinacms/toolkit';
 import React, { FC, useEffect } from 'react';
-import { useCMS, useBranchData, formatBranchName } from '@tinacms/toolkit';
+import { BiError, BiLoaderAlt } from 'react-icons/bi';
 import { useSearchParams } from 'react-router-dom';
 import { Client } from '../../internalClient';
 import { TinaAdminApi } from '../api';
-import { BiError, BiLoaderAlt } from 'react-icons/bi';
 
 // TODO: Scott B styles
 type IndexingState =
@@ -87,7 +87,7 @@ export const IndexingPage: FC = () => {
         } catch {
           cms.alerts.error('Branch indexing failed.');
           setErrorMessage(
-            'Branch indexing failed, please check the Tina Cloud dashboard for more information. To try again chick "re-index" on the branch in the dashboard.'
+            'Branch indexing failed, please check the TinaCloud dashboard for more information. To try again chick "re-index" on the branch in the dashboard.'
           );
           setState('error');
         }

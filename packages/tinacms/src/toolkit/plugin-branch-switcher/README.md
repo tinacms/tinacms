@@ -2,9 +2,9 @@
 
 This plugin adds an item to the global menu that allows you to switch between branches of your repository via a dropdown menu.
 
-## Usage with Tina Cloud
+## Usage with TinaCloud
 
-To use with Tina Cloud, all you need to do is set the `branch-switcher` feature flag in your `cmsCallback`:
+To use with TinaCloud, all you need to do is set the `branch-switcher` feature flag in your `cmsCallback`:
 
 ```tsx
 export default defineConfig({

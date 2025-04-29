@@ -1,5 +1,24 @@
 # tinacms
 
+## 2.7.5
+
+### Patch Changes
+
+- [#5587](https://github.com/tinacms/tinacms/pull/5587) [`921f235`](https://github.com/tinacms/tinacms/commit/921f2356e4615d532d02eefa7103fdb70f83b97a) Thanks [@wicksipedia](https://github.com/wicksipedia)! - TinaCMS sidebar now has a loading indicator when loading content. Also fixed the link for contextual editing that was 404'ing
+
+- [#5602](https://github.com/tinacms/tinacms/pull/5602) [`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd) Thanks [@wicksipedia](https://github.com/wicksipedia)! - fix naming of TinaCloud
+
+- [#5580](https://github.com/tinacms/tinacms/pull/5580) [`b551232`](https://github.com/tinacms/tinacms/commit/b5512326ad0ad9855bc75e2073a3ab2a8ec4c064) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Editorial Workflow - improved create branch modal for non-devs
+
+- [#5560](https://github.com/tinacms/tinacms/pull/5560) [`ea204c9`](https://github.com/tinacms/tinacms/commit/ea204c9045451f3ebea04f503e6158d2016613e4) Thanks [@kldavis4](https://github.com/kldavis4)! - Sorting on fields within templates
+
+- [#5588](https://github.com/tinacms/tinacms/pull/5588) [`fd664d8`](https://github.com/tinacms/tinacms/commit/fd664d8f4e83941ed1b1f234668ab6341a6178f8) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - Fix server-side branch queries by storing the active branch in a cookie and passing it via the x-branch header.
+  - Ensure GraphQL playground correctly updates when switching branches.
+- Updated dependencies [[`ab43169`](https://github.com/tinacms/tinacms/commit/ab43169af5a95f31fa27bb0236623a031883a1fd)]:
+  - @tinacms/schema-tools@1.7.3
+  - @tinacms/mdx@1.6.2
+  - @tinacms/search@1.0.43
+
 ## 2.7.3
 
 ### Patch Changes
@@ -835,12 +854,12 @@
   });
   ```
 
-- 30c7eac58: Do not show tina cloud link when self hosting
+- 30c7eac58: Do not show TinaCloud link when self hosting
 - 121bd9fc4: Absorb @tinacms/toolkit into tinacms
 
   fix: Use clean page-sizes on media manager (to make pagination more obvious)
 
-  Fix issue with uploading media in a folder with tina cloud
+  Fix issue with uploading media in a folder with TinaCloud
 
 - Updated dependencies [133e97d5b]
 - Updated dependencies [f02b4368b]
@@ -895,7 +914,7 @@
 
 ### Patch Changes
 
-- 495108725: Disable tina cloud specific calls when using custom content api
+- 495108725: Disable TinaCloud specific calls when using custom content api
 - b0eba5d49: Upgrade prism react renderer, allow for theming
 - Updated dependencies [d73d03f8f]
 - Updated dependencies [745e30708]
@@ -1572,7 +1591,7 @@
 - f3439ea35: Replace loading message and hide forms while loading.
 - 48032e2ba: Use tinaio url config override in the client
 - 112b7271d: fix vulnerabilities
-- 8688dbff9: Add links to Tina Cloud project setting from sidebar
+- 8688dbff9: Add links to TinaCloud project setting from sidebar
 - Updated dependencies [4b9a2252f]
 - Updated dependencies [f581f263d]
 - Updated dependencies [4e0a609cd]
@@ -2380,7 +2399,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 
 ### Minor Changes
 
-- 3897ec5d9: Replace `branch`, `clientId`, `isLocalClient` props with single `apiURL`. When working locally, this should be `http://localhost:4001/graphql`. For Tina Cloud, use `https://content.tinajs.io/content/<my-client-id>/github/<my-branch>`
+- 3897ec5d9: Replace `branch`, `clientId`, `isLocalClient` props with single `apiURL`. When working locally, this should be `http://localhost:4001/graphql`. For TinaCloud, use `https://content.tinajs.io/content/<my-client-id>/github/<my-branch>`
 
   ```tsx
   // _app.tsx
@@ -2456,11 +2475,11 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 
 ### Minor Changes
 
-- 75974d0a4: Updates the tina cloud client to do id_token & access_token refreshes when needed
+- 75974d0a4: Updates the TinaCloud client to do id_token & access_token refreshes when needed
 
 ### Patch Changes
 
-- 88c209b45: Throw when Tina Cloud responds with non 200 code
+- 88c209b45: Throw when TinaCloud responds with non 200 code
 - dcdf1ecf0: Updates `react-router` to `v6` for `TinaAdmin`
 - 47d126029: Fix support of objects in a list for MDX templates
 - Updated dependencies [bc4699d2b]
@@ -2646,7 +2665,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
 ### Minor Changes
 
 - d0e896561: Provide better error boundary message and visual affordances to user in <ErrorBoundary />.
-- 27c1fd382: Adds a close button to the Tina Cloud auth model so a user is not suck in edit mode.
+- 27c1fd382: Adds a close button to the TinaCloud auth model so a user is not suck in edit mode.
 
 ## 0.54.4
 
@@ -2789,9 +2808,9 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
         data={pageProps.data}
         // Optional: Set to true when working with the local API
         isLocalClient={true}
-        // Optional: When using Tina Cloud, specify the git branch
+        // Optional: When using TinaCloud, specify the git branch
         branch="main"
-        // Optional: Your identifier when connecting to Tina Cloud
+        // Optional: Your identifier when connecting to TinaCloud
         clientId="<some-id-from-tina-cloud>"
         // Optional: A callback for altering the CMS object if needed
         cmsCallback={(cms) => {}}

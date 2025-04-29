@@ -2,11 +2,11 @@
 
 */
 
-import type { GraphQLConfig } from '../types';
 import type { Schema } from '@tinacms/schema-tools';
+import type { GraphQLConfig } from '../types';
 
 /**
- * Strips away the Tina Cloud Asset URL from an `image` value
+ * Strips away the TinaCloud Asset URL from an `image` value
  *
  * @param {string | string[]} value
  * @param {GraphQLConfig} config
@@ -54,7 +54,7 @@ export const resolveMediaCloudToRelative = (
 };
 
 /**
- * Adds Tina Cloud Asset URL to an `image` value
+ * Adds TinaCloud Asset URL to an `image` value
  *
  * @param {string | string[]} value
  * @param {GraphQLConfig} config

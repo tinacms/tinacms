@@ -1,5 +1,18 @@
-import React, { useEffect, useState, forwardRef, useRef } from 'react';
+import {
+  Media,
+  MediaList,
+  MediaListError,
+  MediaListOffset,
+} from '@toolkit/core';
+import { LoadingDots } from '@toolkit/form-builder';
+import { CloseIcon, TrashIcon } from '@toolkit/icons';
+import { FullscreenModal, Modal, ModalBody } from '@toolkit/react-modals';
 import { useCMS } from '@toolkit/react-tinacms';
+import { Button, IconButton } from '@toolkit/styles';
+import React, { useEffect, useState, forwardRef, useRef } from 'react';
+import { createContext, useContext } from 'react';
+import * as dropzone from 'react-dropzone';
+import type { FileError } from 'react-dropzone';
 import {
   BiArrowToBottom,
   BiCloudUpload,
@@ -10,31 +23,18 @@ import {
   BiListUl,
   BiX,
 } from 'react-icons/bi';
-import { Modal, ModalBody, FullscreenModal } from '@toolkit/react-modals';
 import { BiFile } from 'react-icons/bi';
-import {
-  MediaList,
-  Media,
-  MediaListOffset,
-  MediaListError,
-} from '@toolkit/core';
-import { Button, IconButton } from '@toolkit/styles';
-import * as dropzone from 'react-dropzone';
-import type { FileError } from 'react-dropzone';
-import { ListMediaItem, GridMediaItem } from './media-item';
-import { Breadcrumb } from './breadcrumb';
-import { LoadingDots } from '@toolkit/form-builder';
 import { IoMdRefresh } from 'react-icons/io';
-import { CloseIcon, TrashIcon } from '@toolkit/icons';
+import { Breadcrumb } from './breadcrumb';
+import { CopyField } from './copy-field';
+import { GridMediaItem, ListMediaItem } from './media-item';
+import { DeleteModal, NewFolderModal } from './modal';
 import {
-  absoluteImgURL,
   DEFAULT_MEDIA_UPLOAD_TYPES,
+  absoluteImgURL,
   dropzoneAcceptFromString,
   isImage,
 } from './utils';
-import { DeleteModal, NewFolderModal } from './modal';
-import { CopyField } from './copy-field';
-import { createContext, useContext } from 'react';
 const { useDropzone } = dropzone;
 // Can not use path.join on the frontend
 const join = function (...parts) {
@@ -699,7 +699,7 @@ const SyncStatusContainer = ({ children }) => {
               target='_blank'
               href={`${cms.api.tina.appDashboardLink}/media`}
             >
-              Sync Your Media In Tina Cloud.
+              Sync Your Media In TinaCloud.
               <BiLinkExternal className={`w-5 h-auto flex-shrink-0`} />
             </a>
           </div>
