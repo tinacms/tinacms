@@ -47,7 +47,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
         isUrl: (url) => isUrl(url),
       },
       render: { afterEditable: () => <LinkFloatingToolbar /> },
-    }),
+    })
   ];
 
   // This should be a plugin customization
@@ -59,6 +59,9 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
     id: id,
     value: initialValue,
     plugins: plugins,
+    override: {
+      components: Components(),
+    },
   });
 
   React.useEffect(() => {
