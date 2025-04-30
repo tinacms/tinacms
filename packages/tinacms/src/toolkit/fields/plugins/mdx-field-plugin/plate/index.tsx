@@ -32,25 +32,30 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
     []
   );
 
-  const plugins = createPlugins(
-    [
-      ...formattingPlugins,
-      ...commonPlugins,
-      createMdxBlockPlugin(),
-      createMdxInlinePlugin(),
-      createImgPlugin(),
-      createMermaidPlugin(),
-      createInvalidMarkdownPlugin(),
-      createLinkPlugin({
-        options: {
-          isUrl: (url: string) => isUrl(url),
-        },
-        renderAfterEditable: LinkFloatingToolbar,
-      }),
-    ],
-    {
-      components: Components(), // if this uses hooks, it's now safe at top level
-    }
+  const plugins = React.useMemo(
+    () =>
+      createPlugins(
+        [
+          ...formattingPlugins,
+          ...commonPlugins,
+          createMdxBlockPlugin(),
+          createMdxInlinePlugin(),
+          createImgPlugin(),
+          createMermaidPlugin(),
+          createInvalidMarkdownPlugin(),
+          createLinkPlugin({
+            options: {
+              //? NOTE: This is a custom validation function that allows for relative links i.e. /about
+              isUrl: (url: string) => isUrl(url),
+            },
+            renderAfterEditable: LinkFloatingToolbar,
+          }),
+        ],
+        {
+          components: Components(),
+        }
+      ),
+    []
   );
 
   // This should be a plugin customization
