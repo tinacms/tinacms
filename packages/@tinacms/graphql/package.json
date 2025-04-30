@@ -1,88 +1,88 @@
 {
-    "name": "@tinacms/graphql",
-    "version": "1.5.16",
-    "main": "dist/index.js",
-    "module": "dist/index.mjs",
-    "typings": "dist/index.d.ts",
-    "files": [
-        "package.json",
-        "dist"
-    ],
-    "exports": {
-        "import": "./dist/index.mjs",
-        "require": "./dist/index.js"
-    },
-    "license": "SEE LICENSE IN LICENSE",
-    "buildConfig": {
-        "entryPoints": [
-            {
-                "name": "src/index.ts",
-                "target": "node",
-                "bundle": []
-            }
-        ]
-    },
-    "scripts": {
-        "types": "pnpm tsc",
-        "build": "tinacms-scripts build",
-        "docs": "pnpm typedoc",
-        "test": "vitest run",
-        "test-watch": "vitest"
-    },
-    "dependencies": {
-        "@iarna/toml": "^2.2.5",
-        "@tinacms/mdx": "workspace:*",
-        "@tinacms/schema-tools": "workspace:*",
-        "abstract-level": "^1.0.4",
-        "date-fns": "^2.30.0",
-        "fast-glob": "^3.3.3",
-        "fs-extra": "^11.3.0",
-        "glob-parent": "^6.0.2",
-        "graphql": "15.8.0",
-        "gray-matter": "^4.0.3",
-        "isomorphic-git": "^1.29.0",
-        "js-sha1": "^0.6.0",
-        "js-yaml": "^3.14.1",
-        "jsonpath-plus": "10.1.0",
-        "lodash.clonedeep": "^4.5.0",
-        "lodash.set": "^4.3.2",
-        "lodash.uniqby": "^4.7.0",
-        "many-level": "^2.0.0",
-        "micromatch": "4.0.8",
-        "normalize-path": "^3.0.0",
-        "readable-stream": "^4.7.0",
-        "scmp": "^2.1.0",
-        "yup": "^0.32.11"
-    },
-    "publishConfig": {
-        "registry": "https://registry.npmjs.org"
-    },
-    "repository": {
-        "url": "https://github.com/tinacms/tinacms.git",
-        "directory": "packages/tina-graphql"
-    },
-    "devDependencies": {
-        "@tinacms/schema-tools": "workspace:*",
-        "@tinacms/scripts": "workspace:*",
-        "@types/cors": "^2.8.17",
-        "@types/estree": "^0.0.50",
-        "@types/express": "^4.17.21",
-        "@types/fs-extra": "^9.0.13",
-        "@types/js-yaml": "^3.12.10",
-        "@types/lodash.camelcase": "^4.3.9",
-        "@types/lodash.upperfirst": "^4.3.9",
-        "@types/lru-cache": "^5.1.1",
-        "@types/mdast": "^3.0.15",
-        "@types/micromatch": "^4.0.9",
-        "@types/node": "^22.13.1",
-        "@types/normalize-path": "^3.0.2",
-        "@types/ws": "^7.4.7",
-        "@types/yup": "^0.29.14",
-        "jest-file-snapshot": "^0.5.0",
-        "memory-level": "^1.0.0",
-        "typescript": "^5.7.3",
-        "vite": "^4.5.9",
-        "vitest": "^0.32.4",
-        "zod": "^3.24.2"
-    }
+	"name": "@tinacms/graphql",
+	"version": "1.5.16",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"typings": "dist/index.d.ts",
+	"files": [
+		"package.json",
+		"dist"
+	],
+	"exports": {
+		"import": "./dist/index.mjs",
+		"require": "./dist/index.js"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"buildConfig": {
+		"entryPoints": [
+			{
+				"name": "src/index.ts",
+				"target": "node",
+				"bundle": []
+			}
+		]
+	},
+	"scripts": {
+		"types": "pnpm tsc",
+		"build": "tinacms-scripts build",
+		"docs": "pnpm typedoc",
+		"test": "vitest run",
+		"test-watch": "vitest"
+	},
+	"dependencies": {
+		"@iarna/toml": "^2.2.5",
+		"@tinacms/mdx": "workspace:*",
+		"@tinacms/schema-tools": "workspace:*",
+		"abstract-level": "^1.0.4",
+		"date-fns": "^2.30.0",
+		"fast-glob": "^3.3.3",
+		"fs-extra": "^11.3.0",
+		"glob-parent": "^6.0.2",
+		"graphql": "15.8.0",
+		"gray-matter": "^4.0.3",
+		"isomorphic-git": "^1.29.0",
+		"js-sha1": "^0.6.0",
+		"js-yaml": "^3.14.1",
+		"jsonpath-plus": "10.1.0",
+		"lodash.clonedeep": "^4.5.0",
+		"lodash.set": "^4.3.2",
+		"lodash.uniqby": "^4.7.0",
+		"many-level": "^2.0.0",
+		"micromatch": "4.0.8",
+		"normalize-path": "^3.0.0",
+		"readable-stream": "^4.7.0",
+		"scmp": "^2.1.0",
+		"yup": "^0.32.11"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org"
+	},
+	"repository": {
+		"url": "https://github.com/tinacms/tinacms.git",
+		"directory": "packages/tina-graphql"
+	},
+	"devDependencies": {
+		"@tinacms/schema-tools": "workspace:*",
+		"@tinacms/scripts": "workspace:*",
+		"@types/cors": "^2.8.17",
+		"@types/estree": "^0.0.50",
+		"@types/express": "^4.17.21",
+		"@types/fs-extra": "^9.0.13",
+		"@types/js-yaml": "^3.12.10",
+		"@types/lodash.camelcase": "^4.3.9",
+		"@types/lodash.upperfirst": "^4.3.9",
+		"@types/lru-cache": "^5.1.1",
+		"@types/mdast": "^3.0.15",
+		"@types/micromatch": "^4.0.9",
+		"@types/node": "^22.13.1",
+		"@types/normalize-path": "^3.0.2",
+		"@types/ws": "^7.4.7",
+		"@types/yup": "^0.29.14",
+		"jest-file-snapshot": "^0.5.0",
+		"memory-level": "^1.0.0",
+		"typescript": "^5.7.3",
+		"vite": "^4.5.9",
+		"vitest": "^0.32.4",
+		"zod": "^3.24.2"
+	}
 }
