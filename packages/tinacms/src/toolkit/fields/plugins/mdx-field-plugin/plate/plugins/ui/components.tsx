@@ -234,9 +234,7 @@ export const Components = () => {
       <s {...props.attributes} {...props} />
     ),
     [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),
-    [BoldPlugin.key]: ({ editor, leaf, text, ...props }) => (
-      <strong {...props.attributes} {...props} />
-    ),
+    [BoldPlugin.key]: withProps(PlateLeaf, { as: 'strong' }),
     [HorizontalRulePlugin.key]: ({
       attributes,
       className,
