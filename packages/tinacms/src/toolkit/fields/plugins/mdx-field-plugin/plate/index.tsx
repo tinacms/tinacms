@@ -82,6 +82,8 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       <Plate
         editor={editor}
         onChange={(value) => {
+
+          console.log("changes 🎯",value.value)
           input.onChange({
             type: 'root',
             //TODO(Plate upgrade) : Check with Jeff, value.value is used because the new Plate seperate the editor instance and causing the editor to passed as well int he value change, so value.value is a quick work around to extract the value of the editor (if not we will have error down the track to the final form, circular dependency error)
