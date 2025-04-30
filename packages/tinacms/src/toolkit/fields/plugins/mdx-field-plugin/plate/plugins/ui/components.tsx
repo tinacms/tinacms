@@ -50,6 +50,7 @@ import {
 } from '@udecode/plate-list/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
 import { SlashInputPlugin } from '@udecode/plate-slash-command/react';
+import { ParagraphElement } from '../../components/plate-ui/paragraph-element';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -173,24 +174,7 @@ export const Components = () => {
         {...props}
       />
     ),
-    [ParagraphPlugin.key]: ({
-      attributes,
-      className,
-      editor,
-      element,
-      ...props
-    }) => (
-      // Descendants in the rich-text editor can be `<div>` elements, so we get a console error for divs in paragraphs
-      <div
-        className={classNames(
-          blockClasses,
-          className,
-          'text-base font-normal mb-4 last:mb-0'
-        )}
-        {...attributes}
-        {...props}
-      />
-    ),
+    [ParagraphPlugin.key]: ParagraphElement,
     [ELEMENT_MERMAID]: MermaidElement,
     [BlockquotePlugin.key]: BlockquoteElement,
     [CodeBlockPlugin.key]: CodeBlockElement,
