@@ -4,36 +4,750 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@ariakit/react':
+      specifier: ^0.4.15
+      version: 0.4.15
+    '@aws-sdk/client-s3':
+      specifier: ^3.744.0
+      version: 3.758.0
+    '@aws-sdk/s3-request-presigner':
+      specifier: ^3.744.0
+      version: 3.758.0
+    '@azure/storage-blob':
+      specifier: ^12.26.0
+      version: 12.26.0
+    '@biomejs/biome':
+      specifier: ^1.9.4
+      version: 1.9.4
+    '@changesets/changelog-github':
+      specifier: ^0.5.0
+      version: 0.5.1
+    '@changesets/cli':
+      specifier: 2.27.8
+      version: 2.27.8
+    '@clerk/backend':
+      specifier: 0.31.3
+      version: 0.31.3
+    '@clerk/clerk-js':
+      specifier: 4.56.2
+      version: 4.56.2
+    '@floating-ui/dom':
+      specifier: ^1.6.13
+      version: 1.6.13
+    '@floating-ui/react-dom':
+      specifier: ^2.1.2
+      version: 2.1.2
+    '@graphiql/toolkit':
+      specifier: 0.8.4
+      version: 0.8.4
+    '@graphql-codegen/core':
+      specifier: ^2.6.8
+      version: 2.6.8
+    '@graphql-codegen/typescript':
+      specifier: ^4.1.3
+      version: 4.1.5
+    '@graphql-codegen/typescript-operations':
+      specifier: ^4.4.1
+      version: 4.5.1
+    '@graphql-codegen/visitor-plugin-common':
+      specifier: ^4.1.2
+      version: 4.1.2
+    '@graphql-tools/graphql-file-loader':
+      specifier: ^7.5.17
+      version: 7.5.17
+    '@graphql-tools/load':
+      specifier: ^7.8.14
+      version: 7.8.14
+    '@graphql-tools/utils':
+      specifier: ^10.8.1
+      version: 10.8.3
+    '@iarna/toml':
+      specifier: ^2.2.5
+      version: 2.2.5
+    '@monaco-editor/react':
+      specifier: 4.7.0-rc.0
+      version: 4.7.0-rc.0
+    '@octokit/rest':
+      specifier: ^19.0.13
+      version: 19.0.13
+    '@playwright/test':
+      specifier: ^1.50.1
+      version: 1.50.1
+    '@puppeteer/replay':
+      specifier: ^1.3.2
+      version: 1.3.2
+    '@radix-ui/react-checkbox':
+      specifier: ^1.1.4
+      version: 1.1.4
+    '@radix-ui/react-dialog':
+      specifier: ^1.1.6
+      version: 1.1.6
+    '@radix-ui/react-dropdown-menu':
+      specifier: ^2.1.6
+      version: 2.1.6
+    '@radix-ui/react-icons':
+      specifier: ^1.3.2
+      version: 1.3.2
+    '@radix-ui/react-popover':
+      specifier: ^1.1.6
+      version: 1.1.6
+    '@radix-ui/react-separator':
+      specifier: ^1.1.2
+      version: 1.1.2
+    '@radix-ui/react-slot':
+      specifier: ^1.1.2
+      version: 1.1.2
+    '@radix-ui/react-toolbar':
+      specifier: ^1.1.2
+      version: 1.1.2
+    '@radix-ui/react-tooltip':
+      specifier: ^1.1.8
+      version: 1.1.8
+    '@react-hook/window-size':
+      specifier: ^3.1.1
+      version: 3.1.1
+    '@rollup/pluginutils':
+      specifier: ^5.1.4
+      version: 5.1.4
+    '@sucrase/jest-plugin':
+      specifier: ^3.0.0
+      version: 3.0.0
+    '@svgr/core':
+      specifier: 8.1.0
+      version: 8.1.0
+    '@svgr/webpack':
+      specifier: ^8.1.0
+      version: 8.1.0
+    '@tailwindcss/aspect-ratio':
+      specifier: ^0.4.2
+      version: 0.4.2
+    '@tailwindcss/container-queries':
+      specifier: ^0.1.1
+      version: 0.1.1
+    '@tailwindcss/typography':
+      specifier: ^0.5.16
+      version: 0.5.16
+    '@testing-library/dom':
+      specifier: ^10.4.0
+      version: 10.4.0
+    '@testing-library/jest-dom':
+      specifier: ^6.6.3
+      version: 6.6.3
+    '@testing-library/react':
+      specifier: ^16.2.0
+      version: 16.2.0
+    '@testing-library/user-event':
+      specifier: ^14.6.1
+      version: 14.6.1
+    '@types/atob':
+      specifier: ^2.1.4
+      version: 2.1.4
+    '@types/clear':
+      specifier: 0.1.0
+      version: 0.1.0
+    '@types/cli-spinner':
+      specifier: ^0.2.3
+      version: 0.2.3
+    '@types/codemirror':
+      specifier: ^5.60.15
+      version: 5.60.15
+    '@types/color-string':
+      specifier: ^1.5.5
+      version: 1.5.5
+    '@types/cross-spawn':
+      specifier: ^6.0.6
+      version: 6.0.6
+    '@types/express':
+      specifier: ^4.17.21
+      version: 4.17.21
+    '@types/figlet':
+      specifier: 1.2.0
+      version: 1.2.0
+    '@types/isomorphic-fetch':
+      specifier: ^0.0.35
+      version: 0.0.35
+    '@types/level':
+      specifier: ^6.0.3
+      version: 6.0.3
+    '@types/listr':
+      specifier: 0.14.2
+      version: 0.14.2
+    '@types/lodash.camelcase':
+      specifier: ^4.3.9
+      version: 4.3.9
+    '@types/lodash.debounce':
+      specifier: ^4.0.9
+      version: 4.0.9
+    '@types/lodash.flatten':
+      specifier: ^4.4.9
+      version: 4.4.9
+    '@types/lodash.get':
+      specifier: ^4.4.9
+      version: 4.4.9
+    '@types/lodash.upperfirst':
+      specifier: ^4.3.9
+      version: 4.3.9
+    '@types/log4js':
+      specifier: ^2.3.5
+      version: 2.3.5
+    '@types/lru-cache':
+      specifier: ^5.1.1
+      version: 5.1.1
+    '@types/mdast':
+      specifier: ^3.0.15
+      version: 3.0.15
+    '@types/micromatch':
+      specifier: ^4.0.9
+      version: 4.0.9
+    '@types/multer':
+      specifier: ^1.4.12
+      version: 1.4.12
+    '@types/node':
+      specifier: ^22.13.1
+      version: 22.13.5
+    '@types/normalize-path':
+      specifier: ^3.0.2
+      version: 3.0.2
+    '@types/picomatch':
+      specifier: ^3.0.2
+      version: 3.0.2
+    '@types/prettier':
+      specifier: ^2.7.3
+      version: 2.7.3
+    '@types/progress':
+      specifier: ^2.0.7
+      version: 2.0.7
+    '@types/prompts':
+      specifier: ^2.4.9
+      version: 2.4.9
+    '@types/prop-types':
+      specifier: ^15.7.14
+      version: 15.7.14
+    '@types/react':
+      specifier: ^18.3.18
+      version: 18.3.18
+    '@types/react-beautiful-dnd':
+      specifier: ^13.1.8
+      version: 13.1.8
+    '@types/react-color':
+      specifier: ^3.0.13
+      version: 3.0.13
+    '@types/react-dom':
+      specifier: ^18.3.5
+      version: 18.3.5
+    '@types/search-index':
+      specifier: ^3.2.4
+      version: 3.2.4
+    '@types/styled-components':
+      specifier: ^5.1.34
+      version: 5.1.34
+    '@types/tar':
+      specifier: 6.1.13
+      version: 6.1.13
+    '@types/unist':
+      specifier: ^2.0.11
+      version: 2.0.11
+    '@types/ws':
+      specifier: ^7.4.7
+      version: 7.4.7
+    '@typescript-eslint/eslint-plugin':
+      specifier: ^5.62.0
+      version: 5.62.0
+    '@typescript-eslint/parser':
+      specifier: ^5.62.0
+      version: 5.62.0
+    '@udecode/cn':
+      specifier: ^33.0.0
+      version: 33.0.0
+    '@udecode/plate':
+      specifier: ^36.5.9
+      version: 36.5.9
+    '@udecode/plate-autoformat':
+      specifier: ^36.5.6
+      version: 36.5.6
+    '@udecode/plate-block-quote':
+      specifier: ^36.0.0
+      version: 36.0.0
+    '@udecode/plate-code-block':
+      specifier: ^36.5.6
+      version: 36.5.6
+    '@udecode/plate-combobox':
+      specifier: ^36.0.0
+      version: 36.0.0
+    '@udecode/plate-common':
+      specifier: ^36.5.9
+      version: 36.5.9
+    '@udecode/plate-floating':
+      specifier: ^36.3.8
+      version: 36.3.8
+    '@udecode/plate-heading':
+      specifier: ^36.0.12
+      version: 36.0.12
+    '@udecode/plate-indent-list':
+      specifier: ^36.5.2
+      version: 36.5.2
+    '@udecode/plate-link':
+      specifier: ^36.5.9
+      version: 36.5.9
+    '@udecode/plate-list':
+      specifier: ^36.5.2
+      version: 36.5.2
+    '@udecode/plate-paragraph':
+      specifier: ^36.0.0
+      version: 36.0.0
+    '@udecode/plate-resizable':
+      specifier: 36.0.0
+      version: 36.0.0
+    '@udecode/plate-slash-command':
+      specifier: ^36.0.0
+      version: 36.0.0
+    '@udecode/plate-table':
+      specifier: 36.5.8
+      version: 36.5.8
+    '@vercel/stega':
+      specifier: ^0.0.5
+      version: 0.0.5
+    '@vitejs/plugin-react':
+      specifier: 3.1.0
+      version: 3.1.0
+    abstract-level:
+      specifier: ^1.0.4
+      version: 1.0.4
+    acorn:
+      specifier: 8.8.2
+      version: 8.8.2
+    altair-express-middleware:
+      specifier: ^7.3.6
+      version: 7.3.6
+    async-lock:
+      specifier: ^1.4.1
+      version: 1.4.1
+    auto-bind:
+      specifier: ^4.0.0
+      version: 4.0.0
+    autoprefixer:
+      specifier: ^10.4.20
+      version: 10.4.20
+    axios:
+      specifier: 1.7.5
+      version: 1.7.5
+    body-parser:
+      specifier: ^1.20.3
+      version: 1.20.3
+    busboy:
+      specifier: ^1.6.0
+      version: 1.6.0
+    c8:
+      specifier: ^7.14.0
+      version: 7.14.0
+    ccount:
+      specifier: 2.0.1
+      version: 2.0.1
+    chokidar:
+      specifier: ^3.6.0
+      version: 3.6.0
+    class-variance-authority:
+      specifier: ^0.7.1
+      version: 0.7.1
+    cli-spinner:
+      specifier: ^0.2.10
+      version: 0.2.10
+    clipanion:
+      specifier: ^3.2.1
+      version: 3.2.1
+    cloudinary:
+      specifier: ^1.41.3
+      version: 1.41.3
+    clsx:
+      specifier: ^2.1.1
+      version: 2.1.1
+    cmdk:
+      specifier: ^1.0.4
+      version: 1.0.4
+    color-string:
+      specifier: ^1.9.1
+      version: 1.9.1
+    concat-md:
+      specifier: ^0.5.1
+      version: 0.5.1
+    cors:
+      specifier: ^2.8.5
+      version: 2.8.5
+    cross-spawn:
+      specifier: ^7.0.6
+      version: 7.0.6
+    crypto-js:
+      specifier: ^4.2.0
+      version: 4.2.0
+    dotenv:
+      specifier: ^16.4.7
+      version: 16.4.7
+    esbuild:
+      specifier: ^0.24.2
+      version: 0.24.2
+    estree-util-is-identifier-name:
+      specifier: 2.1.0
+      version: 2.1.0
+    fast-glob:
+      specifier: ^3.3.3
+      version: 3.3.3
+    final-form:
+      specifier: 4.20.10
+      version: 4.20.10
+    final-form-arrays:
+      specifier: ^3.1.0
+      version: 3.1.0
+    final-form-set-field-data:
+      specifier: ^1.0.2
+      version: 1.0.2
+    fs-extra:
+      specifier: ^11.3.0
+      version: 11.3.0
+    glob-parent:
+      specifier: ^6.0.2
+      version: 6.0.2
+    graphiql:
+      specifier: 3.0.0-alpha.1
+      version: 3.0.0-alpha.1
+    graphql-tag:
+      specifier: ^2.12.6
+      version: 2.12.6
+    gray-matter:
+      specifier: ^4.0.3
+      version: 4.0.3
+    happy-dom:
+      specifier: 15.10.2
+      version: 15.10.2
+    identity-obj-proxy:
+      specifier: ^3.0.0
+      version: 3.0.0
+    is-hotkey:
+      specifier: ^0.2.0
+      version: 0.2.0
+    isomorphic-fetch:
+      specifier: ^3.0.0
+      version: 3.0.0
+    isomorphic-git:
+      specifier: ^1.29.0
+      version: 1.29.0
+    jest:
+      specifier: ^29.7.0
+      version: 29.7.0
+    jest-diff:
+      specifier: ^29.7.0
+      version: 29.7.0
+    jest-matcher-utils:
+      specifier: ^29.7.0
+      version: 29.7.0
+    js-base64:
+      specifier: ^3.7.7
+      version: 3.7.7
+    js-sha1:
+      specifier: ^0.6.0
+      version: 0.6.0
+    json-diff:
+      specifier: ^1.0.6
+      version: 1.0.6
+    jsonpath-plus:
+      specifier: 10.1.0
+      version: 10.1.0
+    lodash.clonedeep:
+      specifier: ^4.5.0
+      version: 4.5.0
+    lodash.flatten:
+      specifier: 4.4.0
+      version: 4.4.0
+    lodash.get:
+      specifier: ^4.4.2
+      version: 4.4.2
+    lodash.set:
+      specifier: ^4.3.2
+      version: 4.3.2
+    lodash.uniqby:
+      specifier: ^4.7.0
+      version: 4.7.0
+    log4js:
+      specifier: ^6.9.1
+      version: 6.9.1
+    lucide-react:
+      specifier: ^0.424.0
+      version: 0.424.0
+    many-level:
+      specifier: ^2.0.0
+      version: 2.0.0
+    mdast-util-compact:
+      specifier: 4.1.1
+      version: 4.1.1
+    mdast-util-directive:
+      specifier: 2.2.4
+      version: 2.2.4
+    mdast-util-from-markdown:
+      specifier: 1.3.0
+      version: 1.3.0
+    mdast-util-gfm:
+      specifier: 2.0.2
+      version: 2.0.2
+    mdast-util-mdx-jsx:
+      specifier: 2.1.2
+      version: 2.1.2
+    mdast-util-to-markdown:
+      specifier: 1.5.0
+      version: 1.5.0
+    memory-level:
+      specifier: ^1.0.0
+      version: 1.0.0
+    micromark-extension-gfm:
+      specifier: 2.0.3
+      version: 2.0.3
+    micromark-factory-mdx-expression:
+      specifier: 1.0.7
+      version: 1.0.7
+    micromark-factory-space:
+      specifier: 1.0.0
+      version: 1.0.0
+    micromark-factory-whitespace:
+      specifier: 1.0.0
+      version: 1.0.0
+    micromark-util-character:
+      specifier: 1.1.0
+      version: 1.1.0
+    micromark-util-symbol:
+      specifier: 1.0.1
+      version: 1.0.1
+    micromark-util-types:
+      specifier: 1.0.2
+      version: 1.0.2
+    micromatch:
+      specifier: 4.0.8
+      version: 4.0.8
+    minimatch:
+      specifier: ^5.1.6
+      version: 5.1.6
+    moment:
+      specifier: 2.29.4
+      version: 2.29.4
+    monaco-editor:
+      specifier: 0.31.0
+      version: 0.31.0
+    multer:
+      specifier: 1.4.5-lts.1
+      version: 1.4.5-lts.1
+    next-themes:
+      specifier: ^0.3.0
+      version: 0.3.0
+    nodemon:
+      specifier: 3.1.4
+      version: 3.1.4
+    normalize-path:
+      specifier: ^3.0.0
+      version: 3.0.0
+    parse-entities:
+      specifier: 4.0.1
+      version: 4.0.1
+    picomatch:
+      specifier: ^4.0.2
+      version: 4.0.2
+    picomatch-browser:
+      specifier: 2.2.6
+      version: 2.2.6
+    postcss:
+      specifier: ^8.5.2
+      version: 8.5.3
+    postcss-import:
+      specifier: ^14.1.0
+      version: 14.1.0
+    postcss-nesting:
+      specifier: ^10.2.0
+      version: 10.2.0
+    prettier:
+      specifier: ^2.8.8
+      version: 2.8.8
+    pretty-quick:
+      specifier: ^3.3.1
+      version: 3.3.1
+    prism-react-renderer:
+      specifier: ^2.4.1
+      version: 2.4.1
+    progress:
+      specifier: ^2.0.3
+      version: 2.0.3
+    prompts:
+      specifier: ^2.4.2
+      version: 2.4.2
+    prop-types:
+      specifier: 15.7.2
+      version: 15.7.2
+    puppeteer:
+      specifier: ^23.11.1
+      version: 23.11.1
+    react-beautiful-dnd:
+      specifier: ^13.1.1
+      version: 13.1.1
+    react-color:
+      specifier: ^2.19.3
+      version: 2.19.3
+    react-datetime:
+      specifier: ^3.3.1
+      version: 3.3.1
+    react-dropzone:
+      specifier: 14.2.3
+      version: 14.2.3
+    react-final-form:
+      specifier: ^6.5.9
+      version: 6.5.9
+    react-router-dom:
+      specifier: 6.3.0
+      version: 6.3.0
+    react-use:
+      specifier: ^17.6.0
+      version: 17.6.0
+    readable-stream:
+      specifier: ^4.7.0
+      version: 4.7.0
+    remark:
+      specifier: 14.0.2
+      version: 14.0.2
+    remark-gfm:
+      specifier: ^2.0.0
+      version: 2.0.0
+    remark-mdx:
+      specifier: 2.3.0
+      version: 2.3.0
+    remove:
+      specifier: ^0.1.5
+      version: 0.1.5
+    scmp:
+      specifier: ^2.1.0
+      version: 2.1.0
+    search-index:
+      specifier: 4.0.0
+      version: 4.0.0
+    sharp:
+      specifier: ^0.33.5
+      version: 0.33.5
+    slate:
+      specifier: ^0.103.0
+      version: 0.103.0
+    slate-history:
+      specifier: ^0.100.0
+      version: 0.100.0
+    slate-hyperscript:
+      specifier: ^0.100.0
+      version: 0.100.0
+    slate-react:
+      specifier: ^0.107.1
+      version: 0.107.1
+    sqlite-level:
+      specifier: ^1.2.1
+      version: 1.2.1
+    stopword:
+      specifier: ^3.1.4
+      version: 3.1.4
+    stringify-entities:
+      specifier: 4.0.3
+      version: 4.0.3
+    tailwind-merge:
+      specifier: ^2.6.0
+      version: 2.6.0
+    tailwindcss:
+      specifier: ^3.4.17
+      version: 3.4.17
+    tailwindcss-animate:
+      specifier: ^1.0.7
+      version: 1.0.7
+    tar:
+      specifier: 7.4.0
+      version: 7.4.0
+    ts-jest:
+      specifier: ^29.2.5
+      version: 29.2.6
+    ts-node:
+      specifier: ^10.9.2
+      version: 10.9.2
+    tsc-alias:
+      specifier: ^1.8.10
+      version: 1.8.11
+    tslib:
+      specifier: ^2.8.1
+      version: 2.8.1
+    tsup:
+      specifier: ^8.3.6
+      version: 8.4.0
+    turbo:
+      specifier: 2.4.4
+      version: 2.4.4
+    typanion:
+      specifier: 3.13.0
+      version: 3.13.0
+    typedoc:
+      specifier: ^0.26.11
+      version: 0.26.11
+    typedoc-plugin-markdown:
+      specifier: ^3.17.1
+      version: 3.17.1
+    typescript:
+      specifier: ^5.7.3
+      version: 5.7.3
+    unist-util-source:
+      specifier: 4.0.2
+      version: 4.0.2
+    unist-util-stringify-position:
+      specifier: 3.0.3
+      version: 3.0.3
+    unist-util-visit:
+      specifier: 4.1.2
+      version: 4.1.2
+    url-pattern:
+      specifier: ^1.0.3
+      version: 1.0.3
+    uvu:
+      specifier: 0.5.6
+      version: 0.5.6
+    validate-npm-package-name:
+      specifier: ^5.0.1
+      version: 5.0.1
+    vfile-message:
+      specifier: 3.1.4
+      version: 3.1.4
+    webfontloader:
+      specifier: 1.6.28
+      version: 1.6.28
+    zod:
+      specifier: ^3.24.2
+      version: 3.24.2
+
 importers:
 
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: ^1.9.4
+        specifier: 'catalog:'
         version: 1.9.4
       '@changesets/changelog-github':
-        specifier: ^0.5.0
+        specifier: 'catalog:'
         version: 0.5.1
       '@changesets/cli':
-        specifier: 2.27.8
+        specifier: 'catalog:'
         version: 2.27.8
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
       '@types/picomatch':
-        specifier: ^3.0.2
+        specifier: 'catalog:'
         version: 3.0.2
       picomatch:
-        specifier: ^4.0.2
+        specifier: 'catalog:'
         version: 4.0.2
       pretty-quick:
-        specifier: ^3.3.1
+        specifier: 'catalog:'
         version: 3.3.1(prettier@2.8.8)
       turbo:
-        specifier: 2.4.4
+        specifier: 'catalog:'
         version: 2.4.4
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
@@ -42,7 +756,7 @@ importers:
   examples/basic-iframe:
     dependencies:
       '@octokit/rest':
-        specifier: ^19.0.13
+        specifier: 'catalog:'
         version: 19.0.13
       '@tinacms/datalayer':
         specifier: workspace:*
@@ -51,10 +765,10 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/graphql
       dotenv:
-        specifier: ^16.4.7
+        specifier: 'catalog:'
         version: 16.4.7
       js-base64:
-        specifier: ^3.7.7
+        specifier: 'catalog:'
         version: 3.7.7
       next:
         specifier: ^14.2.24
@@ -72,7 +786,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
     devDependencies:
       '@tinacms/cli':
@@ -82,7 +796,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/scripts
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       eslint:
         specifier: '7'
@@ -109,11 +823,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
     devDependencies:
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       eslint:
         specifier: '7'
@@ -128,7 +842,7 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0(react@18.3.1)
       '@tailwindcss/typography':
-        specifier: ^0.5.16
+        specifier: 'catalog:'
         version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))
       '@tinacms/datalayer':
         specifier: workspace:*
@@ -155,14 +869,14 @@ importers:
         specifier: ^4.12.0
         version: 4.12.0(react@18.3.1)
       remove:
-        specifier: ^0.1.5
+        specifier: 'catalog:'
         version: 0.1.5
       tinacms:
         specifier: workspace:*
         version: link:../../packages/tinacms
     devDependencies:
       '@puppeteer/replay':
-        specifier: ^1.3.2
+        specifier: 'catalog:'
         version: 1.3.2(puppeteer@23.11.1(typescript@5.7.3))
       '@tinacms/app':
         specifier: workspace:*
@@ -174,7 +888,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/scripts
       autoprefixer:
-        specifier: ^10.4.20
+        specifier: 'catalog:'
         version: 10.4.20(postcss@8.5.3)
       eslint:
         specifier: 8.24.0
@@ -183,16 +897,16 @@ importers:
         specifier: ^13.5.8
         version: 13.5.8(eslint@8.24.0)(typescript@5.7.3)
       postcss:
-        specifier: ^8.5.2
+        specifier: 'catalog:'
         version: 8.5.3
       puppeteer:
-        specifier: ^23.11.1
+        specifier: 'catalog:'
         version: 23.11.1(typescript@5.7.3)
       tailwindcss:
-        specifier: ^3.4.17
+        specifier: 'catalog:'
         version: 3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
@@ -204,13 +918,13 @@ importers:
   examples/next-2024:
     dependencies:
       '@radix-ui/react-icons':
-        specifier: ^1.3.2
+        specifier: 'catalog:'
         version: 1.3.2(react@18.3.1)
       class-variance-authority:
-        specifier: ^0.7.1
+        specifier: 'catalog:'
         version: 0.7.1
       clsx:
-        specifier: ^2.1.1
+        specifier: 'catalog:'
         version: 2.1.1
       mermaid:
         specifier: ^10.9.3
@@ -219,7 +933,7 @@ importers:
         specifier: 14.2.10
         version: 14.2.10(@babel/core@7.26.9)(@playwright/test@1.50.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-themes:
-        specifier: ^0.3.0
+        specifier: 'catalog:'
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.3.1
@@ -228,17 +942,17 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       tailwind-merge:
-        specifier: ^2.6.0
+        specifier: 'catalog:'
         version: 2.6.0
       tailwindcss-animate:
-        specifier: ^1.0.7
+        specifier: 'catalog:'
         version: 1.0.7(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))
       tinacms:
         specifier: workspace:*
         version: link:../../packages/tinacms
     devDependencies:
       '@biomejs/biome':
-        specifier: ^1.9.4
+        specifier: 'catalog:'
         version: 1.9.4
       '@tinacms/cli':
         specifier: workspace:*
@@ -247,22 +961,22 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/scripts
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/react-dom':
-        specifier: ^18.3.5
+        specifier: 'catalog:'
         version: 18.3.5(@types/react@18.3.18)
       postcss:
-        specifier: ^8.5.2
+        specifier: 'catalog:'
         version: 8.5.3
       tailwindcss:
-        specifier: ^3.4.17
+        specifier: 'catalog:'
         version: 3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   examples/tina-self-hosted-demo:
@@ -271,10 +985,10 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@octokit/rest':
-        specifier: ^19.0.13
+        specifier: 'catalog:'
         version: 19.0.13
       '@tailwindcss/typography':
-        specifier: ^0.5.16
+        specifier: 'catalog:'
         version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))
       '@tinacms/datalayer':
         specifier: workspace:*
@@ -311,7 +1025,7 @@ importers:
         version: link:../../packages/tinacms-gitprovider-github
     devDependencies:
       '@svgr/webpack':
-        specifier: ^8.1.0
+        specifier: 'catalog:'
         version: 8.1.0(typescript@5.7.3)
       '@tinacms/cli':
         specifier: workspace:*
@@ -320,37 +1034,37 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/scripts
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@typescript-eslint/eslint-plugin':
-        specifier: ^5.62.0
+        specifier: 'catalog:'
         version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.7.3))(eslint@8.57.1)(typescript@5.7.3)
       '@typescript-eslint/parser':
-        specifier: ^5.62.0
+        specifier: 'catalog:'
         version: 5.62.0(eslint@8.57.1)(typescript@5.7.3)
       autoprefixer:
-        specifier: ^10.4.20
+        specifier: 'catalog:'
         version: 10.4.20(postcss@8.5.3)
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
       postcss:
-        specifier: ^8.5.2
+        specifier: 'catalog:'
         version: 8.5.3
       postcss-import:
-        specifier: ^14.1.0
+        specifier: 'catalog:'
         version: 14.1.0(postcss@8.5.3)
       postcss-nesting:
-        specifier: ^10.2.0
+        specifier: 'catalog:'
         version: 10.2.0(postcss@8.5.3)
       tailwindcss:
-        specifier: ^3.4.17
+        specifier: 'catalog:'
         version: 3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   experimental-examples/kitchen-sink:
@@ -384,7 +1098,7 @@ importers:
         specifier: ^14.2.24
         version: 14.2.24(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3)
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   experimental-examples/tina-cloud-starter:
@@ -393,7 +1107,7 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tailwindcss/typography':
-        specifier: ^0.5.16
+        specifier: 'catalog:'
         version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))
       '@tinacms/mdx':
         specifier: workspace:*
@@ -426,11 +1140,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
     devDependencies:
       '@svgr/webpack':
-        specifier: ^8.1.0
+        specifier: 'catalog:'
         version: 8.1.0(typescript@5.7.3)
       '@tinacms/cli':
         specifier: workspace:*
@@ -442,43 +1156,43 @@ importers:
         specifier: ^3.0.6
         version: 3.0.6
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/styled-components':
-        specifier: ^5.1.34
+        specifier: 'catalog:'
         version: 5.1.34
       '@typescript-eslint/eslint-plugin':
-        specifier: ^5.62.0
+        specifier: 'catalog:'
         version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.7.3))(eslint@8.57.1)(typescript@5.7.3)
       '@typescript-eslint/parser':
-        specifier: ^5.62.0
+        specifier: 'catalog:'
         version: 5.62.0(eslint@8.57.1)(typescript@5.7.3)
       autoprefixer:
-        specifier: ^10.4.20
+        specifier: 'catalog:'
         version: 10.4.20(postcss@8.5.3)
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
       postcss:
-        specifier: ^8.5.2
+        specifier: 'catalog:'
         version: 8.5.3
       postcss-import:
-        specifier: ^14.1.0
+        specifier: 'catalog:'
         version: 14.1.0(postcss@8.5.3)
       postcss-nesting:
-        specifier: ^10.2.0
+        specifier: 'catalog:'
         version: 10.2.0(postcss@8.5.3)
       tailwindcss:
-        specifier: ^3.4.17
+        specifier: 'catalog:'
         version: 3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
 
   packages/@tinacms/app:
     dependencies:
       '@graphiql/toolkit':
-        specifier: 0.8.4
+        specifier: 'catalog:'
         version: 0.8.4(@types/node@22.13.5)(graphql@15.8.0)
       '@headlessui/react':
         specifier: 2.1.8
@@ -487,22 +1201,22 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
       '@monaco-editor/react':
-        specifier: 4.7.0-rc.0
+        specifier: 'catalog:'
         version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tinacms/mdx':
         specifier: workspace:*
         version: link:../mdx
       final-form:
-        specifier: 4.20.10
+        specifier: 'catalog:'
         version: 4.20.10
       graphiql:
-        specifier: 3.0.0-alpha.1
+        specifier: 'catalog:'
         version: 3.0.0-alpha.1(@codemirror/language@6.0.0)(@types/node@22.13.5)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(graphql@15.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       graphql:
         specifier: 15.8.0
         version: 15.8.0
       monaco-editor:
-        specifier: 0.31.0
+        specifier: 'catalog:'
         version: 0.31.0
       react:
         specifier: '>=18.3.1 <20.0.0'
@@ -511,23 +1225,23 @@ importers:
         specifier: '>=18.3.1 <20.0.0'
         version: 18.3.1(react@18.3.1)
       react-router-dom:
-        specifier: 6.3.0
+        specifier: 'catalog:'
         version: 6.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tinacms:
         specifier: workspace:*
         version: link:../../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       zod:
-        specifier: ^3.24.2
+        specifier: 'catalog:'
         version: 3.24.2
     devDependencies:
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/react-dom':
-        specifier: ^18.3.5
+        specifier: 'catalog:'
         version: 18.3.5(@types/react@18.3.18)
 
   packages/@tinacms/auth:
@@ -536,7 +1250,7 @@ importers:
         specifier: workspace:*
         version: link:../scripts
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
       next:
         specifier: 14.2.10
@@ -548,49 +1262,49 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/@tinacms/cli:
     dependencies:
       '@graphql-codegen/core':
-        specifier: ^2.6.8
+        specifier: 'catalog:'
         version: 2.6.8(graphql@15.8.0)
       '@graphql-codegen/plugin-helpers':
         specifier: latest
         version: 5.1.0(graphql@15.8.0)
       '@graphql-codegen/typescript':
-        specifier: ^4.1.3
+        specifier: 'catalog:'
         version: 4.1.5(graphql@15.8.0)
       '@graphql-codegen/typescript-operations':
-        specifier: ^4.4.1
+        specifier: 'catalog:'
         version: 4.5.1(graphql@15.8.0)
       '@graphql-codegen/visitor-plugin-common':
-        specifier: ^4.1.2
+        specifier: 'catalog:'
         version: 4.1.2(graphql@15.8.0)
       '@graphql-inspector/core':
         specifier: ^4.2.2
         version: 4.2.2(graphql@15.8.0)
       '@graphql-tools/graphql-file-loader':
-        specifier: ^7.5.17
+        specifier: 'catalog:'
         version: 7.5.17(graphql@15.8.0)
       '@graphql-tools/load':
-        specifier: ^7.8.14
+        specifier: 'catalog:'
         version: 7.8.14(graphql@15.8.0)
       '@rollup/pluginutils':
-        specifier: ^5.1.4
+        specifier: 'catalog:'
         version: 5.1.4(rollup@4.34.8)
       '@svgr/core':
-        specifier: 8.1.0
+        specifier: 'catalog:'
         version: 8.1.0(typescript@5.7.3)
       '@tailwindcss/aspect-ratio':
-        specifier: ^0.4.2
+        specifier: 'catalog:'
         version: 0.4.2(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))
       '@tailwindcss/container-queries':
-        specifier: ^0.1.1
+        specifier: 'catalog:'
         version: 0.1.1(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))
       '@tailwindcss/typography':
-        specifier: ^0.5.16
+        specifier: 'catalog:'
         version: 0.5.16(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))
       '@tinacms/app':
         specifier: workspace:*
@@ -608,49 +1322,49 @@ importers:
         specifier: workspace:*
         version: link:../search
       '@vitejs/plugin-react':
-        specifier: 3.1.0
+        specifier: 'catalog:'
         version: 3.1.0(vite@4.5.9(@types/node@22.13.5))
       altair-express-middleware:
-        specifier: ^7.3.6
+        specifier: 'catalog:'
         version: 7.3.6
       async-lock:
-        specifier: ^1.4.1
+        specifier: 'catalog:'
         version: 1.4.1
       auto-bind:
-        specifier: ^4.0.0
+        specifier: 'catalog:'
         version: 4.0.0
       body-parser:
-        specifier: ^1.20.3
+        specifier: 'catalog:'
         version: 1.20.3
       busboy:
-        specifier: ^1.6.0
+        specifier: 'catalog:'
         version: 1.6.0
       chalk:
         specifier: ^2.4.2
         version: 2.4.2
       chokidar:
-        specifier: ^3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
       cli-spinner:
-        specifier: ^0.2.10
+        specifier: 'catalog:'
         version: 0.2.10
       clipanion:
-        specifier: ^3.2.1
+        specifier: 'catalog:'
         version: 3.2.1(typanion@3.13.0)
       cors:
-        specifier: ^2.8.5
+        specifier: 'catalog:'
         version: 2.8.5
       crypto-js:
-        specifier: ^4.2.0
+        specifier: 'catalog:'
         version: 4.2.0
       dotenv:
-        specifier: ^16.4.7
+        specifier: 'catalog:'
         version: 16.4.7
       esbuild:
-        specifier: ^0.24.2
+        specifier: 'catalog:'
         version: 0.24.2
       fs-extra:
-        specifier: ^11.3.0
+        specifier: 'catalog:'
         version: 11.3.0
       graphql:
         specifier: 15.8.0
@@ -659,28 +1373,28 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       log4js:
-        specifier: ^6.9.1
+        specifier: 'catalog:'
         version: 6.9.1
       many-level:
-        specifier: ^2.0.0
+        specifier: 'catalog:'
         version: 2.0.0
       memory-level:
-        specifier: ^1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       minimatch:
-        specifier: ^5.1.6
+        specifier: 'catalog:'
         version: 5.1.6
       normalize-path:
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
       prettier:
-        specifier: ^2.8.8
+        specifier: 'catalog:'
         version: 2.8.8
       progress:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       prompts:
-        specifier: ^2.4.2
+        specifier: 'catalog:'
         version: 2.4.2
       react:
         specifier: '>=18.3.1 <20.0.0'
@@ -689,19 +1403,19 @@ importers:
         specifier: '>=18.3.1 <20.0.0'
         version: 18.3.1(react@18.3.1)
       readable-stream:
-        specifier: ^4.7.0
+        specifier: 'catalog:'
         version: 4.7.0
       tailwindcss:
-        specifier: ^3.4.17
+        specifier: 'catalog:'
         version: 3.4.17(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
       tinacms:
         specifier: workspace:*
         version: link:../../tinacms
       typanion:
-        specifier: 3.13.0
+        specifier: 'catalog:'
         version: 3.13.0
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
@@ -710,17 +1424,17 @@ importers:
         specifier: ^1.6.1
         version: 1.6.1
       zod:
-        specifier: ^3.24.2
+        specifier: 'catalog:'
         version: 3.24.2
     devDependencies:
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../scripts
       '@types/clear':
-        specifier: 0.1.0
+        specifier: 'catalog:'
         version: 0.1.0
       '@types/cli-spinner':
-        specifier: ^0.2.3
+        specifier: 'catalog:'
         version: 0.2.3
       '@types/cors':
         specifier: 2.8.5
@@ -729,10 +1443,10 @@ importers:
         specifier: ^4.2.2
         version: 4.2.2
       '@types/express':
-        specifier: ^4.17.21
+        specifier: 'catalog:'
         version: 4.17.21
       '@types/figlet':
-        specifier: 1.2.0
+        specifier: 'catalog:'
         version: 1.2.0
       '@types/fs-extra':
         specifier: ^11.0.4
@@ -744,25 +1458,25 @@ importers:
         specifier: ^4.0.9
         version: 4.0.9
       '@types/listr':
-        specifier: 0.14.2
+        specifier: 'catalog:'
         version: 0.14.2
       '@types/log4js':
-        specifier: ^2.3.5
+        specifier: 'catalog:'
         version: 2.3.5
       '@types/multer':
-        specifier: ^1.4.12
+        specifier: 'catalog:'
         version: 1.4.12
       '@types/progress':
-        specifier: ^2.0.7
+        specifier: 'catalog:'
         version: 2.0.7
       '@types/prompts':
-        specifier: ^2.4.9
+        specifier: 'catalog:'
         version: 2.4.9
       '@types/yup':
         specifier: ^0.32.0
         version: 0.32.0
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
 
   packages/@tinacms/datalayer:
@@ -784,43 +1498,43 @@ importers:
         specifier: ^3.12.10
         version: 3.12.10
       '@types/level':
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       '@types/lodash.camelcase':
-        specifier: ^4.3.9
+        specifier: 'catalog:'
         version: 4.3.9
       '@types/lodash.upperfirst':
-        specifier: ^4.3.9
+        specifier: 'catalog:'
         version: 4.3.9
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       '@types/normalize-path':
-        specifier: ^3.0.2
+        specifier: 'catalog:'
         version: 3.0.2
       '@types/yup':
         specifier: ^0.29.14
         version: 0.29.14
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
       jest-diff:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0
       jest-file-snapshot:
         specifier: ^0.5.0
         version: 0.5.0
       jest-matcher-utils:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/@tinacms/graphql:
     dependencies:
       '@iarna/toml':
-        specifier: ^2.2.5
+        specifier: 'catalog:'
         version: 2.2.5
       '@tinacms/mdx':
         specifier: workspace:*
@@ -829,61 +1543,61 @@ importers:
         specifier: workspace:*
         version: link:../schema-tools
       abstract-level:
-        specifier: ^1.0.4
+        specifier: 'catalog:'
         version: 1.0.4
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
       fast-glob:
-        specifier: ^3.3.3
+        specifier: 'catalog:'
         version: 3.3.3
       fs-extra:
-        specifier: ^11.3.0
+        specifier: 'catalog:'
         version: 11.3.0
       glob-parent:
-        specifier: ^6.0.2
+        specifier: 'catalog:'
         version: 6.0.2
       graphql:
         specifier: 15.8.0
         version: 15.8.0
       gray-matter:
-        specifier: ^4.0.3
+        specifier: 'catalog:'
         version: 4.0.3
       isomorphic-git:
-        specifier: ^1.29.0
+        specifier: 'catalog:'
         version: 1.29.0
       js-sha1:
-        specifier: ^0.6.0
+        specifier: 'catalog:'
         version: 0.6.0
       js-yaml:
         specifier: ^3.14.1
         version: 3.14.1
       jsonpath-plus:
-        specifier: 10.1.0
+        specifier: 'catalog:'
         version: 10.1.0
       lodash.clonedeep:
-        specifier: ^4.5.0
+        specifier: 'catalog:'
         version: 4.5.0
       lodash.set:
-        specifier: ^4.3.2
+        specifier: 'catalog:'
         version: 4.3.2
       lodash.uniqby:
-        specifier: ^4.7.0
+        specifier: 'catalog:'
         version: 4.7.0
       many-level:
-        specifier: ^2.0.0
+        specifier: 'catalog:'
         version: 2.0.0
       micromatch:
-        specifier: 4.0.8
+        specifier: 'catalog:'
         version: 4.0.8
       normalize-path:
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
       readable-stream:
-        specifier: ^4.7.0
+        specifier: 'catalog:'
         version: 4.7.0
       scmp:
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       yup:
         specifier: ^0.32.11
@@ -899,7 +1613,7 @@ importers:
         specifier: ^0.0.50
         version: 0.0.50
       '@types/express':
-        specifier: ^4.17.21
+        specifier: 'catalog:'
         version: 4.17.21
       '@types/fs-extra':
         specifier: ^9.0.13
@@ -908,28 +1622,28 @@ importers:
         specifier: ^3.12.10
         version: 3.12.10
       '@types/lodash.camelcase':
-        specifier: ^4.3.9
+        specifier: 'catalog:'
         version: 4.3.9
       '@types/lodash.upperfirst':
-        specifier: ^4.3.9
+        specifier: 'catalog:'
         version: 4.3.9
       '@types/lru-cache':
-        specifier: ^5.1.1
+        specifier: 'catalog:'
         version: 5.1.1
       '@types/mdast':
-        specifier: ^3.0.15
+        specifier: 'catalog:'
         version: 3.0.15
       '@types/micromatch':
-        specifier: ^4.0.9
+        specifier: 'catalog:'
         version: 4.0.9
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       '@types/normalize-path':
-        specifier: ^3.0.2
+        specifier: 'catalog:'
         version: 3.0.2
       '@types/ws':
-        specifier: ^7.4.7
+        specifier: 'catalog:'
         version: 7.4.7
       '@types/yup':
         specifier: ^0.29.14
@@ -938,13 +1652,13 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       memory-level:
-        specifier: ^1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       nodemon:
-        specifier: 3.1.4
+        specifier: 'catalog:'
         version: 3.1.4
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
@@ -953,7 +1667,7 @@ importers:
         specifier: ^0.32.4
         version: 0.32.4(happy-dom@15.10.2)(playwright@1.50.1)
       zod:
-        specifier: ^3.24.2
+        specifier: 'catalog:'
         version: 3.24.2
 
   packages/@tinacms/mdx:
@@ -962,91 +1676,91 @@ importers:
         specifier: workspace:*
         version: link:../schema-tools
       acorn:
-        specifier: 8.8.2
+        specifier: 'catalog:'
         version: 8.8.2
       ccount:
-        specifier: 2.0.1
+        specifier: 'catalog:'
         version: 2.0.1
       estree-util-is-identifier-name:
-        specifier: 2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       lodash.flatten:
-        specifier: 4.4.0
+        specifier: 'catalog:'
         version: 4.4.0
       mdast-util-compact:
-        specifier: 4.1.1
+        specifier: 'catalog:'
         version: 4.1.1
       mdast-util-directive:
-        specifier: 2.2.4
+        specifier: 'catalog:'
         version: 2.2.4
       mdast-util-from-markdown:
-        specifier: 1.3.0
+        specifier: 'catalog:'
         version: 1.3.0
       mdast-util-gfm:
-        specifier: 2.0.2
+        specifier: 'catalog:'
         version: 2.0.2
       mdast-util-mdx-jsx:
-        specifier: 2.1.2
+        specifier: 'catalog:'
         version: 2.1.2
       mdast-util-to-markdown:
-        specifier: 1.5.0
+        specifier: 'catalog:'
         version: 1.5.0
       micromark-extension-gfm:
-        specifier: 2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       micromark-factory-mdx-expression:
-        specifier: 1.0.7
+        specifier: 'catalog:'
         version: 1.0.7
       micromark-factory-space:
-        specifier: 1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       micromark-factory-whitespace:
-        specifier: 1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       micromark-util-character:
-        specifier: 1.1.0
+        specifier: 'catalog:'
         version: 1.1.0
       micromark-util-symbol:
-        specifier: 1.0.1
+        specifier: 'catalog:'
         version: 1.0.1
       micromark-util-types:
-        specifier: 1.0.2
+        specifier: 'catalog:'
         version: 1.0.2
       parse-entities:
-        specifier: 4.0.1
+        specifier: 'catalog:'
         version: 4.0.1
       prettier:
-        specifier: ^2.8.8
+        specifier: 'catalog:'
         version: 2.8.8
       remark:
-        specifier: 14.0.2
+        specifier: 'catalog:'
         version: 14.0.2
       remark-gfm:
-        specifier: ^2.0.0
+        specifier: 'catalog:'
         version: 2.0.0
       remark-mdx:
-        specifier: 2.3.0
+        specifier: 'catalog:'
         version: 2.3.0
       stringify-entities:
-        specifier: 4.0.3
+        specifier: 'catalog:'
         version: 4.0.3
       typedoc:
-        specifier: ^0.26.11
+        specifier: 'catalog:'
         version: 0.26.11(typescript@5.7.3)
       unist-util-source:
-        specifier: 4.0.2
+        specifier: 'catalog:'
         version: 4.0.2
       unist-util-stringify-position:
-        specifier: 3.0.3
+        specifier: 'catalog:'
         version: 3.0.3
       unist-util-visit:
-        specifier: 4.1.2
+        specifier: 'catalog:'
         version: 4.1.2
       uvu:
-        specifier: 0.5.6
+        specifier: 'catalog:'
         version: 0.5.6
       vfile-message:
-        specifier: 3.1.4
+        specifier: 'catalog:'
         version: 3.1.4
     devDependencies:
       '@tinacms/scripts':
@@ -1056,37 +1770,37 @@ importers:
         specifier: 1.0.0
         version: 1.0.0
       '@types/lodash.flatten':
-        specifier: ^4.4.9
+        specifier: 'catalog:'
         version: 4.4.9
       '@types/mdast':
-        specifier: ^3.0.15
+        specifier: 'catalog:'
         version: 3.0.15
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       '@types/prettier':
-        specifier: ^2.7.3
+        specifier: 'catalog:'
         version: 2.7.3
       '@types/unist':
-        specifier: ^2.0.11
+        specifier: 'catalog:'
         version: 2.0.11
       c8:
-        specifier: ^7.14.0
+        specifier: 'catalog:'
         version: 7.14.0
       concat-md:
-        specifier: ^0.5.1
+        specifier: 'catalog:'
         version: 0.5.1
       jest-file-snapshot:
         specifier: ^0.5.0
         version: 0.5.0
       ts-node:
-        specifier: ^10.9.2
+        specifier: 'catalog:'
         version: 10.9.2(@types/node@22.13.5)(typescript@5.7.3)
       typedoc-plugin-markdown:
-        specifier: ^3.17.1
+        specifier: 'catalog:'
         version: 3.17.1(typedoc@0.26.11(typescript@5.7.3))
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
@@ -1098,7 +1812,7 @@ importers:
   packages/@tinacms/metrics:
     dependencies:
       isomorphic-fetch:
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
     devDependencies:
       '@tinacms/scripts':
@@ -1108,28 +1822,28 @@ importers:
         specifier: ^9.0.13
         version: 9.0.13
       '@types/isomorphic-fetch':
-        specifier: ^0.0.35
+        specifier: 'catalog:'
         version: 0.0.35
       fs-extra:
-        specifier: ^11.3.0
+        specifier: 'catalog:'
         version: 11.3.0
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/@tinacms/schema-tools:
     dependencies:
       picomatch-browser:
-        specifier: 2.2.6
+        specifier: 'catalog:'
         version: 2.2.6
       url-pattern:
-        specifier: ^1.0.3
+        specifier: 'catalog:'
         version: 1.0.3
       zod:
-        specifier: ^3.24.2
+        specifier: 'catalog:'
         version: 3.24.2
     devDependencies:
       '@tinacms/scripts':
@@ -1139,25 +1853,25 @@ importers:
         specifier: ^29.5.14
         version: 29.5.14
       '@types/micromatch':
-        specifier: ^4.0.9
+        specifier: 'catalog:'
         version: 4.0.9
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/yup':
         specifier: ^0.29.14
         version: 0.29.14
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
       react:
         specifier: ^18.3.1
         version: 18.3.1
       ts-jest:
-        specifier: ^29.2.5
+        specifier: 'catalog:'
         version: 29.2.6(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(jest@29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))(typescript@5.7.3)
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       yup:
         specifier: ^0.32.11
@@ -1166,31 +1880,31 @@ importers:
   packages/@tinacms/scripts:
     dependencies:
       '@sucrase/jest-plugin':
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0(jest@29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3)))(sucrase@3.35.0)
       chalk:
         specifier: ^4.1.2
         version: 4.1.2
       chokidar:
-        specifier: ^3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
       commander:
         specifier: ^7.2.0
         version: 7.2.0
       esbuild:
-        specifier: ^0.24.2
+        specifier: 'catalog:'
         version: 0.24.2
       fs-extra:
-        specifier: ^11.3.0
+        specifier: 'catalog:'
         version: 11.3.0
       json-diff:
-        specifier: ^1.0.6
+        specifier: 'catalog:'
         version: 1.0.6
       tsup:
-        specifier: ^8.3.6
+        specifier: 'catalog:'
         version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.7.3)(yaml@2.7.0)
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^4.5.9
@@ -1205,16 +1919,16 @@ importers:
         specifier: workspace:*
         version: link:../schema-tools
       memory-level:
-        specifier: ^1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       search-index:
-        specifier: 4.0.0
+        specifier: 'catalog:'
         version: 4.0.0(abstract-level@1.0.4)
       sqlite-level:
-        specifier: ^1.2.1
+        specifier: 'catalog:'
         version: 1.2.1(sucrase@3.35.0)
       stopword:
-        specifier: ^3.1.4
+        specifier: 'catalog:'
         version: 3.1.4
     devDependencies:
       '@tinacms/scripts':
@@ -1224,34 +1938,34 @@ importers:
         specifier: ^29.5.14
         version: 29.5.14
       '@types/micromatch':
-        specifier: ^4.0.9
+        specifier: 'catalog:'
         version: 4.0.9
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       '@types/search-index':
-        specifier: ^3.2.4
+        specifier: 'catalog:'
         version: 3.2.4
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3))
       jest-diff:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0
       jest-file-snapshot:
         specifier: ^0.7.0
         version: 0.7.0
       jest-matcher-utils:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/@tinacms/vercel-previews:
     dependencies:
       '@vercel/stega':
-        specifier: ^0.0.5
+        specifier: 'catalog:'
         version: 0.0.5
       tinacms:
         specifier: workspace:*
@@ -1261,19 +1975,19 @@ importers:
         specifier: workspace:*
         version: link:../scripts
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       react:
         specifier: ^18.3.1
         version: 18.3.1
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/@tinacms/webpack-helpers:
     dependencies:
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/create-tina-app:
@@ -1288,53 +2002,53 @@ importers:
         specifier: ^12.1.0
         version: 12.1.0
       cross-spawn:
-        specifier: ^7.0.6
+        specifier: 'catalog:'
         version: 7.0.6
       fs-extra:
-        specifier: ^11.3.0
+        specifier: 'catalog:'
         version: 11.3.0
       prompts:
-        specifier: ^2.4.2
+        specifier: 'catalog:'
         version: 2.4.2
       tar:
-        specifier: 7.4.0
+        specifier: 'catalog:'
         version: 7.4.0
       validate-npm-package-name:
-        specifier: ^5.0.1
+        specifier: 'catalog:'
         version: 5.0.1
     devDependencies:
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
       '@types/cross-spawn':
-        specifier: ^6.0.6
+        specifier: 'catalog:'
         version: 6.0.6
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       '@types/prompts':
-        specifier: ^2.4.9
+        specifier: 'catalog:'
         version: 2.4.9
       '@types/tar':
-        specifier: 6.1.13
+        specifier: 'catalog:'
         version: 6.1.13
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/next-tinacms-azure:
     dependencies:
       '@azure/storage-blob':
-        specifier: ^12.26.0
+        specifier: 'catalog:'
         version: 12.26.0
       '@tinacms/auth':
         specifier: workspace:*
         version: link:../@tinacms/auth
       sharp:
-        specifier: ^0.33.5
+        specifier: 'catalog:'
         version: 0.33.5
     devDependencies:
       '@tinacms/scripts':
@@ -1347,7 +2061,7 @@ importers:
         specifier: ^2.2.7
         version: 2.2.7
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       next:
         specifier: 14.2.10
@@ -1362,16 +2076,16 @@ importers:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/next-tinacms-cloudinary:
     dependencies:
       cloudinary:
-        specifier: ^1.41.3
+        specifier: 'catalog:'
         version: 1.41.3
       multer:
-        specifier: 1.4.5-lts.1
+        specifier: 'catalog:'
         version: 1.4.5-lts.1
     devDependencies:
       '@tinacms/scripts':
@@ -1384,7 +2098,7 @@ importers:
         specifier: ^2.2.7
         version: 2.2.7
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       next:
         specifier: 14.2.10
@@ -1399,16 +2113,16 @@ importers:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/next-tinacms-dos:
     dependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.744.0
+        specifier: 'catalog:'
         version: 3.758.0
       multer:
-        specifier: 1.4.5-lts.1
+        specifier: 'catalog:'
         version: 1.4.5-lts.1
     devDependencies:
       '@tinacms/scripts':
@@ -1421,7 +2135,7 @@ importers:
         specifier: ^2.2.7
         version: 2.2.7
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       next:
         specifier: 14.2.10
@@ -1436,16 +2150,16 @@ importers:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/next-tinacms-s3:
     dependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.744.0
+        specifier: 'catalog:'
         version: 3.758.0
       '@aws-sdk/s3-request-presigner':
-        specifier: ^3.744.0
+        specifier: 'catalog:'
         version: 3.758.0
     devDependencies:
       '@tinacms/scripts':
@@ -1458,10 +2172,10 @@ importers:
         specifier: ^2.2.7
         version: 2.2.7
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       next:
         specifier: 14.2.10
@@ -1476,19 +2190,19 @@ importers:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/tinacms:
     dependencies:
       '@ariakit/react':
-        specifier: ^0.4.15
+        specifier: 'catalog:'
         version: 0.4.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@floating-ui/dom':
-        specifier: ^1.6.13
+        specifier: 'catalog:'
         version: 1.6.13
       '@floating-ui/react-dom':
-        specifier: ^2.1.2
+        specifier: 'catalog:'
         version: 2.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@graphql-inspector/core':
         specifier: ^6.2.1
@@ -1500,34 +2214,34 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
       '@monaco-editor/react':
-        specifier: 4.7.0-rc.0
+        specifier: 'catalog:'
         version: 4.7.0-rc.0(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-checkbox':
-        specifier: ^1.1.4
+        specifier: 'catalog:'
         version: 1.1.4(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog':
-        specifier: ^1.1.6
+        specifier: 'catalog:'
         version: 1.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dropdown-menu':
-        specifier: ^2.1.6
+        specifier: 'catalog:'
         version: 2.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-popover':
-        specifier: ^1.1.6
+        specifier: 'catalog:'
         version: 1.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-separator':
-        specifier: ^1.1.2
+        specifier: 'catalog:'
         version: 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot':
-        specifier: ^1.1.2
+        specifier: 'catalog:'
         version: 1.1.2(@types/react@18.3.18)(react@18.3.1)
       '@radix-ui/react-toolbar':
-        specifier: ^1.1.2
+        specifier: 'catalog:'
         version: 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-tooltip':
-        specifier: ^1.1.8
+        specifier: 'catalog:'
         version: 1.1.8(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-hook/window-size':
-        specifier: ^3.1.1
+        specifier: 'catalog:'
         version: 3.1.1(react@18.3.1)
       '@tinacms/mdx':
         specifier: workspace:*
@@ -1539,227 +2253,227 @@ importers:
         specifier: workspace:*
         version: link:../@tinacms/search
       '@udecode/cn':
-        specifier: ^33.0.0
+        specifier: 'catalog:'
         version: 33.0.0(@types/react@18.3.18)(class-variance-authority@0.7.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@2.6.0)
       '@udecode/plate':
-        specifier: ^36.5.9
+        specifier: 'catalog:'
         version: 36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-autoformat':
-        specifier: ^36.5.6
+        specifier: 'catalog:'
         version: 36.5.6(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-block-quote':
-        specifier: ^36.0.0
+        specifier: 'catalog:'
         version: 36.0.0(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-code-block':
-        specifier: ^36.5.6
+        specifier: 'catalog:'
         version: 36.5.6(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-combobox':
-        specifier: ^36.0.0
+        specifier: 'catalog:'
         version: 36.0.0(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-common':
-        specifier: ^36.5.9
+        specifier: 'catalog:'
         version: 36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-floating':
-        specifier: ^36.3.8
+        specifier: 'catalog:'
         version: 36.3.8(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-heading':
-        specifier: ^36.0.12
+        specifier: 'catalog:'
         version: 36.0.12(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-indent-list':
-        specifier: ^36.5.2
+        specifier: 'catalog:'
         version: 36.5.2(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-link':
-        specifier: ^36.5.9
+        specifier: 'catalog:'
         version: 36.5.9(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-list':
-        specifier: ^36.5.2
+        specifier: 'catalog:'
         version: 36.5.2(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-paragraph':
-        specifier: ^36.0.0
+        specifier: 'catalog:'
         version: 36.0.0(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-resizable':
-        specifier: 36.0.0
+        specifier: 'catalog:'
         version: 36.0.0(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-slash-command':
-        specifier: ^36.0.0
+        specifier: 'catalog:'
         version: 36.0.0(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       '@udecode/plate-table':
-        specifier: 36.5.8
+        specifier: 'catalog:'
         version: 36.5.8(@udecode/plate-common@36.5.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-history@0.100.0(slate@0.103.0))(slate-hyperscript@0.100.0(slate@0.103.0))(slate-react@0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0))(slate@0.103.0)
       async-lock:
-        specifier: ^1.4.1
+        specifier: 'catalog:'
         version: 1.4.1
       class-variance-authority:
-        specifier: ^0.7.1
+        specifier: 'catalog:'
         version: 0.7.1
       clsx:
-        specifier: ^2.1.1
+        specifier: 'catalog:'
         version: 2.1.1
       cmdk:
-        specifier: ^1.0.4
+        specifier: 'catalog:'
         version: 1.0.4(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       color-string:
-        specifier: ^1.9.1
+        specifier: 'catalog:'
         version: 1.9.1
       crypto-js:
-        specifier: ^4.2.0
+        specifier: 'catalog:'
         version: 4.2.0
       date-fns:
         specifier: 2.30.0
         version: 2.30.0
       final-form:
-        specifier: 4.20.10
+        specifier: 'catalog:'
         version: 4.20.10
       final-form-arrays:
-        specifier: ^3.1.0
+        specifier: 'catalog:'
         version: 3.1.0(final-form@4.20.10)
       final-form-set-field-data:
-        specifier: ^1.0.2
+        specifier: 'catalog:'
         version: 1.0.2(final-form@4.20.10)
       graphql:
         specifier: 15.8.0
         version: 15.8.0
       graphql-tag:
-        specifier: ^2.12.6
+        specifier: 'catalog:'
         version: 2.12.6(graphql@15.8.0)
       is-hotkey:
-        specifier: ^0.2.0
+        specifier: 'catalog:'
         version: 0.2.0
       lodash.get:
-        specifier: ^4.4.2
+        specifier: 'catalog:'
         version: 4.4.2
       lodash.set:
-        specifier: ^4.3.2
+        specifier: 'catalog:'
         version: 4.3.2
       lucide-react:
-        specifier: ^0.424.0
+        specifier: 'catalog:'
         version: 0.424.0(react@18.3.1)
       mermaid:
         specifier: 9.3.0
         version: 9.3.0
       moment:
-        specifier: 2.29.4
+        specifier: 'catalog:'
         version: 2.29.4
       monaco-editor:
-        specifier: 0.31.0
+        specifier: 'catalog:'
         version: 0.31.0
       prism-react-renderer:
-        specifier: ^2.4.1
+        specifier: 'catalog:'
         version: 2.4.1(react@18.3.1)
       prop-types:
-        specifier: 15.7.2
+        specifier: 'catalog:'
         version: 15.7.2
       react-beautiful-dnd:
-        specifier: ^13.1.1
+        specifier: 'catalog:'
         version: 13.1.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-color:
-        specifier: ^2.19.3
+        specifier: 'catalog:'
         version: 2.19.3(react@18.3.1)
       react-datetime:
-        specifier: ^3.3.1
+        specifier: 'catalog:'
         version: 3.3.1(moment@2.29.4)(react@18.3.1)
       react-dropzone:
-        specifier: 14.2.3
+        specifier: 'catalog:'
         version: 14.2.3(react@18.3.1)
       react-final-form:
-        specifier: ^6.5.9
+        specifier: 'catalog:'
         version: 6.5.9(final-form@4.20.10)(react@18.3.1)
       react-icons:
         specifier: ^5.4.0
         version: 5.5.0(react@18.3.1)
       react-router-dom:
-        specifier: 6.3.0
+        specifier: 'catalog:'
         version: 6.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-use:
-        specifier: ^17.6.0
+        specifier: 'catalog:'
         version: 17.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       slate:
-        specifier: ^0.103.0
+        specifier: 'catalog:'
         version: 0.103.0
       slate-history:
-        specifier: ^0.100.0
+        specifier: 'catalog:'
         version: 0.100.0(slate@0.103.0)
       slate-hyperscript:
-        specifier: ^0.100.0
+        specifier: 'catalog:'
         version: 0.100.0(slate@0.103.0)
       slate-react:
-        specifier: ^0.107.1
+        specifier: 'catalog:'
         version: 0.107.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate@0.103.0)
       tailwind-merge:
-        specifier: ^2.6.0
+        specifier: 'catalog:'
         version: 2.6.0
       webfontloader:
-        specifier: 1.6.28
+        specifier: 'catalog:'
         version: 1.6.28
       yup:
         specifier: ^1.6.1
         version: 1.6.1
       zod:
-        specifier: ^3.24.2
+        specifier: 'catalog:'
         version: 3.24.2
     devDependencies:
       '@graphql-tools/utils':
-        specifier: ^10.8.1
+        specifier: 'catalog:'
         version: 10.8.3(graphql@15.8.0)
       '@testing-library/dom':
-        specifier: ^10.4.0
+        specifier: 'catalog:'
         version: 10.4.0
       '@testing-library/jest-dom':
-        specifier: ^6.6.3
+        specifier: 'catalog:'
         version: 6.6.3
       '@testing-library/react':
-        specifier: ^16.2.0
+        specifier: 'catalog:'
         version: 16.2.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@testing-library/user-event':
-        specifier: ^14.6.1
+        specifier: 'catalog:'
         version: 14.6.1(@testing-library/dom@10.4.0)
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
       '@types/atob':
-        specifier: ^2.1.4
+        specifier: 'catalog:'
         version: 2.1.4
       '@types/codemirror':
-        specifier: ^5.60.15
+        specifier: 'catalog:'
         version: 5.60.15
       '@types/color-string':
-        specifier: ^1.5.5
+        specifier: 'catalog:'
         version: 1.5.5
       '@types/lodash.debounce':
-        specifier: ^4.0.9
+        specifier: 'catalog:'
         version: 4.0.9
       '@types/lodash.get':
-        specifier: ^4.4.9
+        specifier: 'catalog:'
         version: 4.4.9
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       '@types/prop-types':
-        specifier: ^15.7.14
+        specifier: 'catalog:'
         version: 15.7.14
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.18
       '@types/react-beautiful-dnd':
-        specifier: ^13.1.8
+        specifier: 'catalog:'
         version: 13.1.8
       '@types/react-color':
-        specifier: ^3.0.13
+        specifier: 'catalog:'
         version: 3.0.13(@types/react@18.3.18)
       '@types/react-dom':
-        specifier: ^18.3.5
+        specifier: 'catalog:'
         version: 18.3.5(@types/react@18.3.18)
       '@types/yup':
         specifier: ^0.32.0
         version: 0.32.0
       happy-dom:
-        specifier: 15.10.2
+        specifier: 'catalog:'
         version: 15.10.2
       identity-obj-proxy:
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
       isomorphic-fetch:
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
       jest-file-snapshot:
         specifier: ^0.7.0
@@ -1777,13 +2491,13 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1
       tsc-alias:
-        specifier: ^1.8.10
+        specifier: 'catalog:'
         version: 1.8.11
       tslib:
-        specifier: ^2.8.1
+        specifier: 'catalog:'
         version: 2.8.1
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
       vite:
         specifier: ^5.4.14
@@ -1820,40 +2534,40 @@ importers:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/tinacms-clerk:
     devDependencies:
       '@clerk/backend':
-        specifier: 0.31.3
+        specifier: 'catalog:'
         version: 0.31.3(react@18.3.1)
       '@clerk/clerk-js':
-        specifier: 4.56.2
+        specifier: 'catalog:'
         version: 4.56.2(@babel/core@7.26.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       tinacms:
         specifier: workspace:*
         version: link:../tinacms
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
 
   packages/tinacms-gitprovider-github:
     dependencies:
       '@octokit/rest':
-        specifier: ^19.0.13
+        specifier: 'catalog:'
         version: 19.0.13
       js-base64:
-        specifier: ^3.7.7
+        specifier: 'catalog:'
         version: 3.7.7
       typescript:
-        specifier: ^5.7.3
+        specifier: 'catalog:'
         version: 5.7.3
     devDependencies:
       '@tinacms/datalayer':
@@ -1863,13 +2577,13 @@ importers:
         specifier: workspace:*
         version: link:../@tinacms/scripts
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
 
   playwright/tina-playwright:
     dependencies:
       axios:
-        specifier: 1.7.5
+        specifier: 'catalog:'
         version: 1.7.5
       next:
         specifier: ^14.2.24
@@ -1888,13 +2602,13 @@ importers:
         version: link:../../packages/tinacms
     devDependencies:
       '@playwright/test':
-        specifier: ^1.50.1
+        specifier: 'catalog:'
         version: 1.50.1
       '@tinacms/cli':
         specifier: workspace:*
         version: link:../../packages/@tinacms/cli
       '@types/node':
-        specifier: ^22.13.1
+        specifier: 'catalog:'
         version: 22.13.5
       eslint:
         specifier: '7'
@@ -16893,7 +17607,7 @@ snapshots:
 
   '@types/acorn@4.0.6':
     dependencies:
-      '@types/estree': 1.0.0
+      '@types/estree': 0.0.50
 
   '@types/aria-query@5.0.4': {}
 
@@ -16988,7 +17702,7 @@ snapshots:
 
   '@types/estree-jsx@1.0.5':
     dependencies:
-      '@types/estree': 1.0.0
+      '@types/estree': 0.0.50
 
   '@types/estree@0.0.50': {}
 
@@ -17031,7 +17745,7 @@ snapshots:
 
   '@types/hast@3.0.4':
     dependencies:
-      '@types/unist': 2.0.11
+      '@types/unist': 3.0.3
 
   '@types/hoist-non-react-statics@3.3.6':
     dependencies:
@@ -17147,7 +17861,7 @@ snapshots:
 
   '@types/mdast@4.0.4':
     dependencies:
-      '@types/unist': 2.0.11
+      '@types/unist': 3.0.3
 
   '@types/micromatch@4.0.9':
     dependencies:
@@ -17259,7 +17973,7 @@ snapshots:
 
   '@types/tern@0.23.9':
     dependencies:
-      '@types/estree': 1.0.0
+      '@types/estree': 0.0.50
 
   '@types/unist@2.0.11': {}
 
@@ -18265,10 +18979,6 @@ snapshots:
   acorn-jsx@5.3.2(acorn@8.14.0):
     dependencies:
       acorn: 8.14.0
-
-  acorn-jsx@5.3.2(acorn@8.8.2):
-    dependencies:
-      acorn: 8.8.2
 
   acorn-walk@8.3.4:
     dependencies:
@@ -19634,7 +20344,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.26.9
       compute-scroll-into-view: 1.0.20
-      prop-types: 15.7.2
+      prop-types: 15.8.1
       react: 18.3.1
       react-is: 17.0.2
       tslib: 2.8.1
@@ -19982,8 +20692,8 @@ snapshots:
       '@typescript-eslint/parser': 5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3)
       eslint: 9.21.0(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7))
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7))
+      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0)(eslint@9.21.0(jiti@1.21.7))
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3)(eslint@9.21.0(jiti@1.21.7))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.21.0(jiti@1.21.7))
       eslint-plugin-react: 7.37.4(eslint@9.21.0(jiti@1.21.7))
       eslint-plugin-react-hooks: 4.6.2(eslint@9.21.0(jiti@1.21.7))
@@ -20014,21 +20724,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7)):
-    dependencies:
-      '@nolyfill/is-core-module': 1.0.39
-      debug: 4.4.0(supports-color@5.5.0)
-      enhanced-resolve: 5.18.1
-      eslint: 9.21.0(jiti@1.21.7)
-      get-tsconfig: 4.10.0
-      is-bun-module: 1.3.0
-      stable-hash: 0.0.4
-      tinyglobby: 0.2.12
-    optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7))
-    transitivePeerDependencies:
-      - supports-color
-
   eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
@@ -20041,6 +20736,21 @@ snapshots:
       tinyglobby: 0.2.12
     optionalDependencies:
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.24.0)(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0))(eslint@8.24.0)
+    transitivePeerDependencies:
+      - supports-color
+
+  eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0)(eslint@9.21.0(jiti@1.21.7)):
+    dependencies:
+      '@nolyfill/is-core-module': 1.0.39
+      debug: 4.4.0(supports-color@5.5.0)
+      enhanced-resolve: 5.18.1
+      eslint: 9.21.0(jiti@1.21.7)
+      get-tsconfig: 4.10.0
+      is-bun-module: 1.3.0
+      stable-hash: 0.0.4
+      tinyglobby: 0.2.12
+    optionalDependencies:
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3)(eslint@9.21.0(jiti@1.21.7))
     transitivePeerDependencies:
       - supports-color
 
@@ -20066,14 +20776,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7)):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3)(eslint@9.21.0(jiti@1.21.7)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3)
       eslint: 9.21.0(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7))
+      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0)(eslint@9.21.0(jiti@1.21.7))
     transitivePeerDependencies:
       - supports-color
 
@@ -20135,7 +20845,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7)):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-typescript@3.8.3)(eslint@9.21.0(jiti@1.21.7)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -20146,7 +20856,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.21.0(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7)))(eslint@9.21.0(jiti@1.21.7))
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@5.62.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3)(eslint@9.21.0(jiti@1.21.7))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -22759,8 +23469,8 @@ snapshots:
 
   micromark-extension-mdxjs@1.0.1:
     dependencies:
-      acorn: 8.8.2
-      acorn-jsx: 5.3.2(acorn@8.8.2)
+      acorn: 8.14.0
+      acorn-jsx: 5.3.2(acorn@8.14.0)
       micromark-extension-mdx-expression: 1.0.8
       micromark-extension-mdx-jsx: 1.0.5
       micromark-extension-mdx-md: 1.0.1
@@ -23849,7 +24559,7 @@ snapshots:
       lodash: 4.17.21
       lodash-es: 4.17.21
       material-colors: 1.2.6
-      prop-types: 15.7.2
+      prop-types: 15.8.1
       react: 18.3.1
       reactcss: 1.2.3(react@18.3.1)
       tinycolor2: 1.6.0
@@ -23857,7 +24567,7 @@ snapshots:
   react-datetime@3.3.1(moment@2.29.4)(react@18.3.1):
     dependencies:
       moment: 2.29.4
-      prop-types: 15.7.2
+      prop-types: 15.8.1
       react: 18.3.1
 
   react-dom@18.3.1(react@18.3.1):
@@ -23904,7 +24614,7 @@ snapshots:
       '@types/react-redux': 7.1.34
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
-      prop-types: 15.7.2
+      prop-types: 15.8.1
       react: 18.3.1
       react-is: 17.0.2
     optionalDependencies:
@@ -24516,7 +25226,7 @@ snapshots:
 
   signed-varint@2.0.1:
     dependencies:
-      varint: 5.0.0
+      varint: 5.0.2
 
   signedsource@1.0.0: {}
 
@@ -25129,7 +25839,7 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 22.13.5
-      acorn: 8.8.2
+      acorn: 8.14.0
       acorn-walk: 8.3.4
       arg: 4.1.3
       create-require: 1.1.1

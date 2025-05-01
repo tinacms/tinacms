@@ -31,19 +31,19 @@
 		"build": "tinacms-scripts build"
 	},
 	"dependencies": {
-		"@azure/storage-blob": "^12.26.0",
-		"sharp": "^0.33.5"
+		"@azure/storage-blob": "catalog:",
+		"sharp": "catalog:"
 	},
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",
 		"@types/crypto-js": "^3.1.47",
 		"@types/js-cookie": "^2.2.7",
-		"@types/node": "^22.13.1",
+		"@types/node": "catalog:",
 		"next": "14.2.10",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"tinacms": "workspace:*",
-		"typescript": "^5.7.3"
+		"typescript": "catalog:"
 	},
 	"peerDependencies": {
 		"tinacms": "workspace:*",

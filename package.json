@@ -31,15 +31,15 @@
         "format": "biome format --write ./packages/"
     },
     "devDependencies": {
-        "@biomejs/biome": "^1.9.4",
-        "@changesets/changelog-github": "^0.5.0",
-        "@changesets/cli": "2.27.8",
+        "@biomejs/biome": "catalog:",
+        "@changesets/changelog-github": "catalog:",
+        "@changesets/cli": "catalog:",
         "@types/jest": "^29.5.14",
-        "@types/picomatch": "^3.0.2",
-        "picomatch": "^4.0.2",
-        "pretty-quick": "^3.3.1",
-        "turbo": "2.4.4",
-        "typescript": "^5.7.3",
+        "@types/picomatch": "catalog:",
+        "picomatch": "catalog:",
+        "pretty-quick": "catalog:",
+        "turbo": "catalog:",
+        "typescript": "catalog:",
         "vite": "^4.5.9"
     },
     "packageManager": "pnpm@9.15.5"

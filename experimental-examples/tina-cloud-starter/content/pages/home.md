@@ -4,7 +4,16 @@ blocks:
   - headline: Welcome to the Tina Starter
     text: >
       This project is set up to show you the basics of working with Tina. You're
-      looking at the landing page, which pulls content from
+      looking at the landing page, which pulls content from 
+
+
+      ```javascript
+
+      a = 'b'
+
+      ```
+
+
       ![alt](/uploads/tina-cloud-starter-preview.png
       "caption")`content/pages/home.md`, components from components/blocks, and
       puts them all together in `pages/[filename].tsx`, all based on a config
@@ -57,3 +66,4 @@ blocks:
     color: primary
     _template: testimonial
 ---
+
