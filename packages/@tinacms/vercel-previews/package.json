@@ -40,12 +40,12 @@
 	},
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",
-		"@types/react": "^18.3.18",
+		"@types/react": "catalog:",
 		"react": "^18.3.1",
-		"typescript": "^5.7.3"
+		"typescript": "catalog:"
 	},
 	"dependencies": {
-		"@vercel/stega": "^0.0.5",
+		"@vercel/stega": "catalog:",
 		"tinacms": "workspace:*"
 	},
 	"peerDependencies": {

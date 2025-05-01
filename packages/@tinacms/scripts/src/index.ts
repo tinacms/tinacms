@@ -439,7 +439,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
       },
       outDir: outInfo.outdir,
       emptyOutDir: false, // we build multiple files in to the dir
-      sourcemap: false, // true | 'inline' (note: inline will go straight into your bundle size)
+      sourcemap: true, // true | 'inline' (note: inline will go straight into your bundle size)
       rollupOptions: {
         onwarn(warning, warn) {
           if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
