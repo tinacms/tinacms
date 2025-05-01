@@ -27,9 +27,9 @@ pnpm add @tinacms/graphql
 
 ### Build your program
 
-The following example demonstrates how to use this package. Note that this example also requires the package 'memory-level' to be separately included.
+The following example demonstrates how to use this package.
 
-```
+```ts
 import { MemoryLevel } from 'memory-level';
 import {
   Database,
@@ -41,7 +41,7 @@ import {
   Schema
 } from '@tinacms/schema-tools';
 
-const dir = ".";
+const dir = 'content';
 
 // Where to source content from
 const bridge = new FilesystemBridge(dir);
@@ -65,7 +65,13 @@ const rawSchema: Schema = {
     }
   ]
 };
-const schema = await buildSchema(rawSchema);
+const schema = await buildSchema({
+  schema: rawSchema,
+  build: {
+    publicFolder: '',
+    outputFolder: ''
+  }
+});
 
 // Create the object for editing and querying your repository
 const database = new Database({
@@ -78,26 +84,20 @@ const database = new Database({
 await database.indexContent(schema)
 
 // Query the database and output the result
-// In this case, it will look for any post with the title "Hello"
-const graphQLQuery = JSON.stringify(
-  {
-    data: {
-      document: {
-        _values: {
-          _collection: "post",
-          _template: "post",
-          title: "Hello"
-        },
-        _sys: {
-          title: ""
-        }
-      }
+// In this case, it will retrieve the title of the post 'in.md'
+const graphQLQuery = `
+query {
+  document(collection: "post", relativePath: "in.md") {
+    ...on Document {
+      _values,
+      _sys { title }
     }
   }
-);
+}
+`
 const result = await resolve({
   database,
-  graphQLQuery,
+  query: graphQLQuery,
   variables: {}
 });
 
@@ -105,14 +105,28 @@ const result = await resolve({
 console.log(JSON.stringify(result))
 ```
 
+For the program to work:
+
+1. Install packages:
+    - [`@tinacms/schema-tools`](https://www.npmjs.com/package/@tinacms/schema-tools) 
+    - [`memory-level`](https://www.npmjs.com/package/memory-level)
+2. Add a file `content/in.md` of the following form:
+
+```md
+---
+title: Hello
+---
+```
+
+The output should be:
+
+```json
+{"data":{"document":{"_values":{"_collection":"post","_template":"post","title":"Hello"},"_sys":{"title":"Hello"}}}}
+```
+
 ## Development
 
-To build this package:
-
-```
-pnpm install
-pnpm build
-```
+The package is part of the [TinaCMS repository](https://github.com/tinacms/tinacms/).
 
 ## Documentation
 
