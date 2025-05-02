@@ -28,10 +28,7 @@ export class FilesystemBridge implements Bridge {
       }
     );
     const posixRootPath = normalize(this.outputPath);
-    return items.map((item) => {
-      const replacedValue = item.substring(posixRootPath.length).replace(/^\/|\/$/g, '');
-      return replacedValue;
-    });
+    return items.map((item) => item.substring(posixRootPath.length).replace(/^\/|\/$/g, ''));
   }
 
   public async delete(filepath: string) {
