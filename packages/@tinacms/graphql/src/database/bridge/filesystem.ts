@@ -20,7 +20,6 @@ export class FilesystemBridge implements Bridge {
 
   public async glob(pattern: string, extension: string) {
     const basePath = path.join(this.outputPath, ...pattern.split('/'));
-    console.log(`basePath is ${basePath} from outputPath '${this.outputPath}'`)
     const items = await fg(
       path.join(basePath, '**', `/*\.${extension}`).replace(/\\/g, '/'),
       {
@@ -29,10 +28,8 @@ export class FilesystemBridge implements Bridge {
       }
     );
     const posixRootPath = normalize(this.outputPath);
-    console.log(`posixRootPath = ${posixRootPath}`)
     return items.map((item) => {
-      const replacedValue = item.replace(posixRootPath, '').replace(/^\/|\/$/g, '');
-      console.log(`replacedValue = '${replacedValue}' for '${item}'`)
+      const replacedValue = item.substring(posixRootPath.length).replace(/^\/|\/$/g, '');
       return replacedValue;
     });
   }
