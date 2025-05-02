@@ -16,7 +16,7 @@ describe('filesystem bridge', () => {
     })
   })
 
-  test('can get file content based on name', async () => {
+  test('can get file content based on filename', async () => {
     const bridge = new FilesystemBridge(ABSOLUTE_CONTENT_PATH);
     const itemContent = await bridge.get('file1.md');
     expect(file1).equals(itemContent);
