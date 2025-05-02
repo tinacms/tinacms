@@ -23,6 +23,7 @@ export const extractAttributes = (
   attributes?.forEach((attribute) => {
     assertType(attribute, 'mdxJsxAttribute')
     const field = fields.find((field) => field.name === attribute.name)
+    console.log('[INFO] @field: ', field);
     if (!field) {
       throw new Error(
         `Unable to find field definition for property "${attribute.name}"`
@@ -90,13 +91,18 @@ const extractAttribute = (
     case 'rich-text':
       if (attribute.type === 'mdxJsxAttribute') {
         if (typeof attribute.value === 'string') {
+          console.log('[INFO] @attribute.value: ', attribute.value)
           if (attribute.value.startsWith('_tinaEmbeds')) {
+            console.log('[INFO] Found _tinaEmbed: ', attribute.value)
             const embedValue = context?._tinaEmbeds as Record<string, unknown>
             const key = attribute.value.split('.')[1]
+            console.log('[INFO] _tinaEmbed KEY: ', key)
             if (typeof key !== 'string') {
               throw new Error(`Unable to extract key from embed value`)
             }
             const value = embedValue[key]
+            console.log('[INFO] @embed value: ', value)
+            console.log('[INFO] embed TYPE: ', typeof value)
             if (typeof value === 'string') {
               const ast = parseMDX(value, field, imageCallback, context)
               ast.embedCode = attribute.value.split('.')[1]
@@ -259,6 +265,7 @@ const extractString = (
   context: Record<string, unknown> | undefined,
   addProperty: (name: string, value: unknown) => void | undefined
 ) => {
+  console.log('[EXTRACT_STRING] extracting string: ', field, attribute)
   if (attribute.type === 'mdxJsxAttribute') {
     if (typeof attribute.value === 'string') {
       if (attribute.value.startsWith('_tinaEmbeds')) {

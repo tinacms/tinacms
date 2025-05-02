@@ -88,18 +88,22 @@ export function stringifyProps(
     }
     return template.name === element.name
   })
+
   if (!template) {
     template = parentField.templates?.find((template) => {
       const templateName = template?.match?.name
       return templateName === element.name
     })
   }
+
   if (!template || typeof template === 'string') {
     throw new Error(`Unable to find template for JSX element ${element.name}`)
   }
+
   if (template.fields.find((f) => f.name === 'children')) {
     directiveType = 'block'
   }
+
 
   // gather embed codes
   const embedCodes: Record<string, string> = {}
@@ -109,6 +113,7 @@ export function stringifyProps(
       embedCodes[key] = value as string
     }
   }
+  console.log('Found embedCodes: ', embedCodes);
 
   // delete the embed code props
   for (const key of Object.keys(embedCodes)) {
@@ -121,6 +126,7 @@ export function stringifyProps(
       throw new Error(`Unable to find template for JSX element ${name}`)
     }
     const field = template?.fields?.find((field) => field.name === name)
+
     if (!field) {
       if (name === 'children') {
         return
@@ -170,6 +176,7 @@ export function stringifyProps(
               const code = embedCodes[name] || generateRandom6LetterString()
               context._tinaEmbeds = context._tinaEmbeds || {}
               context._tinaEmbeds[code] = value
+              console.log('[INFO] Pushing _tinaEmbeds: ', code, value)
               attributes.push({
                 type: 'mdxJsxAttribute',
                 name,
@@ -274,7 +281,10 @@ export function stringifyProps(
             (value) => value.type === 'root' && Array.isArray(value.children),
             `Nested rich-text element is not a valid shape for field ${field.name}`
           )
-          const code = value.embedCode || generateRandom6LetterString()
+          const randomCode = generateRandom6LetterString()
+          console.log('[INFO | stringify -> @Acorn] ', value, randomCode)
+          const code = value.embedCode || randomCode;
+          console.log('[INFO] @Acorn | Rich-text embedCode: ', code);
           if (field.name === 'children') {
             const root = rootElement(value, field, imageCallback, context)
             root.children.forEach((child) => {
@@ -282,6 +292,7 @@ export function stringifyProps(
             })
             return
           } else {
+            console.log('Field.name != children ', field);
             const stringValue = stringifyMDX(value, field, imageCallback)
             context._tinaEmbeds = context._tinaEmbeds || {}
             context._tinaEmbeds[code] = stringValue
@@ -307,16 +318,16 @@ export function stringifyProps(
         children && children.length
           ? (children as any)
           : [
-              {
-                type: 'paragraph',
-                children: [
-                  {
-                    type: 'text',
-                    value: '',
-                  },
-                ],
-              },
-            ],
+            {
+              type: 'paragraph',
+              children: [
+                {
+                  type: 'text',
+                  value: '',
+                },
+              ],
+            },
+          ],
     }
   }
 

@@ -293,6 +293,7 @@ export const resolve = async ({
               })
             )
 
+            console.log('[INFO] Updating Doc ', collection, args, realPath)
             await resolver.updateResolveDocument({
               collection,
               args: { params },

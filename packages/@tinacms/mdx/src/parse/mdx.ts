@@ -56,7 +56,7 @@ export function mdxJsxElement(
         children: [{ type: 'text', text: '' }],
       }
     }
-
+    console.log('[INFO] @context: ', context)
     // FIXME: these should be passed through to the field resolver in @tinacms/graphql (via dependency injection)
     const props = extractAttributes(
       node.attributes,

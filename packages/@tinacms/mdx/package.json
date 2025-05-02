@@ -39,6 +39,7 @@
 		"@tinacms/schema-tools": "workspace:*",
 		"acorn": "8.8.2",
 		"ccount": "2.0.1",
+		"es-toolkit": "^1.34.1",
 		"estree-util-is-identifier-name": "2.1.0",
 		"lodash.flatten": "4.4.0",
 		"mdast-util-compact": "4.1.1",

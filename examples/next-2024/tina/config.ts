@@ -71,6 +71,30 @@ export default defineConfig({
             },
             templates: [
               {
+                name: 'nestedField',
+                label: 'Nested Field',
+                fields: [
+                  {
+                    type: 'rich-text',
+                    name: 'body',
+                    label: 'Body',
+                    templates: [
+                      {
+                        name: 'body',
+                        label: 'Body',
+                        fields: [
+                          {
+                            type: 'rich-text',
+                            name: 'body',
+                            label: 'Body',
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
                 name: 'DateTime',
                 label: 'Date & Time',
                 inline: true,

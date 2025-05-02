@@ -337,6 +337,10 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     const field = formOrObjectField.fields.find((field) => field.name === name)
     const value = values[name]
     const isLastItem = namePathIndex === namePath.length - 1
+
+    console.log('Field:', field);
+    console.log('Value:', value);
+
     if (!field) {
       return {
         ...formOrObjectField,
@@ -364,6 +368,9 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
               ].join('.')
               const isLastItem =
                 namePathIndexForListItem === namePath.length - 1
+
+              console.log('List Item Value:', listItemValue);
+
               if (!isLastItem) {
                 return this.getFieldGroup({
                   formOrObjectField: template,
@@ -461,6 +468,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             }),
           }
         } else {
+          console.log('Field: ', field, namePath)
           const childrenIndex = namePath.findIndex(
             (value) => value === 'children'
           )
@@ -470,9 +478,25 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
               .slice(childrenIndex)
               .findIndex((value) => value === 'props') + childrenIndex
           const itemName = namePath.slice(childrenIndex, propsIndex).join('.')
+          console.log(itemName)
+          console.log(childrenIndex)
+          console.log(propsIndex)
           const item = getIn(value, itemName)
-          const props = item.props
-          const templateString = item.name
+          if (!item) {
+            console.log('⚠️ NO ITEM FOUND', item)
+          } else {
+            console.log('✅ ITEM FOUND: ', item)
+          }
+
+          // Guard clause for undefined item
+          if (!item) {
+            console.warn(`No item found at path: ${itemName}`);
+            return formOrObjectField;
+          }
+
+
+          const props = item?.props || undefined
+          const templateString = item?.name || undefined
           const currentPathIndex = namePathIndex + Math.max(propsIndex, 3)
           const isLastItem = currentPathIndex + 1 === namePath.length
           const template = field.templates.find(
@@ -536,7 +560,11 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
                 namePathIndex + Math.max(4, childrenIndex + propsIndex),
             })
           }
+          if (item.type) {
+            console.log('THIS IS A TEMPLATE WE ARE LOOKING FOR ', item)
+          }
           if (!template) {
+            console.error({ field, value })
             throw new Error(`Expected template value for field ${item.name}`)
           }
           return {

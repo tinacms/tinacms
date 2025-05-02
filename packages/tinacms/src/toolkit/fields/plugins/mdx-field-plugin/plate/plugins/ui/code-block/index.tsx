@@ -22,7 +22,7 @@ type Monaco = typeof monaco
 
 // 0.33.0 has a bug https://github.com/microsoft/monaco-editor/issues/2947
 loader.config({
-  paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs' },
+  paths: { vs: 'https://cdn.jsdelivr.net/npmy/monaco-editor@0.31.1/min/vs' },
 })
 
 /**

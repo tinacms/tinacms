@@ -702,6 +702,7 @@ export class Resolver {
     const _tinaEmbeds = this.context?._tinaEmbeds
       ? { _tinaEmbeds: this.context._tinaEmbeds }
       : {}
+    console.log('[GRAPHQL INFO] Embed: ', _tinaEmbeds)
     await this.database.put(
       realPath,
       { ...values, ..._tinaEmbeds },
@@ -933,6 +934,13 @@ export class Resolver {
       if (alreadyExists === false) {
         throw new Error(`Unable to update document, ${realPath} does not exist`)
       }
+
+      console.log(
+        '[GRAPHQL_RESOLVER] Updating Document: ',
+        collection,
+        realPath,
+        args
+      )
       return this.updateResolveDocument({
         collection,
         realPath,
