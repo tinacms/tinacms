@@ -82,7 +82,7 @@ describe('The schema validation', () => {
       })
     ).rejects.toThrowErrorMatchingInlineSnapshot(`"path is a required field"`);
   });
-  
+
   it(`Trims the "collection.path" configuration automatically`, async () => {
     const validSchema = await validateSchema({
       collections: [
