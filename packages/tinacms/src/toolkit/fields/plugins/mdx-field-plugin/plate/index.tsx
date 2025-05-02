@@ -32,6 +32,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
     []
   );
 
+  console.log("♻️ Initial Value", initialValue)
   const plugins = [
     ...formattingPlugins,
     ...commonPlugins,
