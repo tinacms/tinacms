@@ -14,7 +14,7 @@ export class FilesystemBridge implements Bridge {
   public outputPath: string;
 
   constructor(rootPath: string, outputPath?: string) {
-    this.rootPath = path.resolve(rootPath || '');
+    this.rootPath = path.resolve(rootPath);
     this.outputPath = outputPath ? path.resolve(outputPath) : this.rootPath;
   }
 
