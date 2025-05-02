@@ -2,6 +2,7 @@ import { TElement } from '@udecode/plate';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { PlateEditor } from '@udecode/plate/react';
 
+//TODO (Plate Upgrade): Do we need this? what is the different between this and "import { insertEmptyCodeBlock } from '@udecode/plate-code-block';"
 export const insertEmptyCodeBlock = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
     node.type === editor.getType(CodeBlockPlugin);

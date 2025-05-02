@@ -1,4 +1,4 @@
-import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
+// import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
 import { preFormat } from './autoformat-utils';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
@@ -6,6 +6,7 @@ import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { AutoformatRule } from '@udecode/plate-autoformat';
 import { ParagraphPlugin } from '@udecode/plate/react';
+import { insertEmptyCodeBlock } from '@udecode/plate-code-block';
 
 export const autoformatBlocks: AutoformatRule[] = [
   {
@@ -57,7 +58,10 @@ export const autoformatBlocks: AutoformatRule[] = [
     triggerAtBlockStart: false,
     preFormat,
     format: (editor) => {
-      insertEmptyCodeBlock(editor);
+      insertEmptyCodeBlock(editor, {
+        defaultType: ParagraphPlugin.key,
+        insertNodesOptions: { select: true },
+      });
     },
   },
   {

@@ -12,7 +12,7 @@ export type ToolbarOverrideType =
   | 'italic'
   // | 'mermaid' //TODO(Plate Upgrade): Renable this after plugin rewrite in latest plate version
   | 'raw'
-  | 'embed';
+  // | 'embed'; //TODO(Plate Upgrade): Renable this after plugin rewrite in latest plate version
 // | 'table';  //TODO(Plate Upgrade): Renable this after plugin rewrite in latest plate version
 
 export const STANDARD_ICON_WIDTH = 32;
