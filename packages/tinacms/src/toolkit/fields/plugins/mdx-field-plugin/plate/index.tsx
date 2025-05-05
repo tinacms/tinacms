@@ -34,24 +34,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   );
 
   console.log("♻️ Initial Value", initialValue)
-  // const plugins = [
-  //   ...formattingPlugins,
-  //   ...commonPlugins,
-  //   //TODO(Plate Upgrade) : Enable these plugins, they are temporary disable due to plate upgrade (giving some error, we need to deal with it later before plate upgrade can be released)
-  //   // createMdxBlockPlugin(),
-  //   // createMdxInlinePlugin(),
-  //   // createImgPlugin(),
-  //   // createMermaidPlugin(),
-  //   // createInvalidMarkdownPlugin(),
-  //   LinkPlugin.configure({
-  //     options: {
-  //       // Custom validation function to allow relative links, e.g., /about
-  //       isUrl: (url) => isUrl(url),
-  //     },
-  //     render: { afterEditable: () => <LinkFloatingToolbar /> },
-  //   })
-  // ];
-
+  
   // This should be a plugin customization
   const tempId = [tinaForm.id, input.name].join('.');
   const id = React.useMemo(() => uuid() + tempId, [tempId]);
@@ -60,9 +43,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const editor = useCreateEditor({
     plugins: [...editorPlugins],
     value: initialValue,
-    // override: {
-    //   // components: Components()
-    // }
+    components: Components()
   });
 
   React.useEffect(() => {
