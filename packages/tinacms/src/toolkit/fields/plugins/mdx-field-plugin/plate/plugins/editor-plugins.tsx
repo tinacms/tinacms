@@ -1,3 +1,5 @@
+'use client';
+
 import { BasicMarksPlugin, UnderlinePlugin } from '@udecode/plate-basic-marks/react';
 import { HeadingPlugin } from '@udecode/plate-heading/react';
 import { ParagraphPlugin } from '@udecode/plate/react';
@@ -9,21 +11,64 @@ import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { NodeIdPlugin } from '@udecode/plate-node-id';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { SlashPlugin } from '@udecode/plate-slash-command/react';
+import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
+import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
+import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
+import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
+import { autoformatRules } from './core/autoformat/autoformat-rules';
+import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
 
+// Define block types that support MDX embedding
+export const HANDLES_MDX = [
+  HEADING_KEYS.h1,
+  HEADING_KEYS.h2,
+  HEADING_KEYS.h3,
+  HEADING_KEYS.h4,
+  HEADING_KEYS.h5,
+  HEADING_KEYS.h6,
+  ParagraphPlugin.key,
+];
 
+// Common rule for resetting block types
+const resetBlockTypesCommonRule = {
+  types: [
+    BlockquotePlugin.key,
+    HEADING_KEYS.h1,
+    HEADING_KEYS.h2,
+    HEADING_KEYS.h3,
+    HEADING_KEYS.h4,
+    HEADING_KEYS.h5,
+    HEADING_KEYS.h6,
+  ],
+  defaultType: ParagraphPlugin.key,
+};
+
+// View Plugins: Basic nodes and marks
 export const viewPlugins = [
   BasicMarksPlugin,
-  HeadingPlugin.configure({ options: { levels: 3 } }),
+  UnderlinePlugin,
+  HeadingPlugin.configure({ options: { levels: 6 } }),
   ParagraphPlugin,
   CodeBlockPlugin,
   BlockquotePlugin,
-  UnderlinePlugin,
 ] as const;
 
-//
-// 👉 Editor Plugins (includes functionality-specific plugins)
-//
+// Editor Plugins: Functional and formatting plugins
 export const editorPlugins = [
+  //   //TODO(Plate Upgrade) : Enable these plugins, they are temporary disable due to plate upgrade (giving some error, we need to deal with it later before plate upgrade can be released)
+  //   // createMdxBlockPlugin(),
+  //   // createMdxInlinePlugin(),
+  //   // createImgPlugin(),
+  //   // createMermaidPlugin(),
+  //   // createInvalidMarkdownPlugin(),
+  //   LinkPlugin.configure({
+  //     options: {
+  //       // Custom validation function to allow relative links, e.g., /about
+  //       isUrl: (url) => isUrl(url),
+  //     },
+  //     render: { afterEditable: () => <LinkFloatingToolbar /> },
+  //   })
+
   ...viewPlugins,
   ListPlugin,
   IndentListPlugin,
@@ -31,4 +76,61 @@ export const editorPlugins = [
   NodeIdPlugin,
   TablePlugin,
   SlashPlugin,
+  TrailingBlockPlugin,
+  AutoformatPlugin.configure({
+    options: {
+      rules: autoformatRules,
+    },
+  }),
+  ExitBreakPlugin.configure({
+    options: {
+      rules: [
+        {
+          hotkey: 'mod+enter',
+        },
+        {
+          hotkey: 'mod+shift+enter',
+          before: true,
+        },
+        {
+          hotkey: 'enter',
+          query: {
+            start: true,
+            end: true,
+            allow: HEADING_LEVELS,
+          },
+        },
+      ],
+    },
+  }),
+  // TODO: Renable later
+  // ResetNodePlugin.configure({
+  //   options: {
+  //     rules: [
+  //       {
+  //         ...resetBlockTypesCommonRule,
+  //         hotkey: 'Enter',
+  //         predicate: (editor) => editor.api.isBlockEmpty(),
+  //       },
+  //       {
+  //         ...resetBlockTypesCommonRule,
+  //         hotkey: 'Backspace',
+  //         predicate: (editor) => editor.api.isSelectionAtBlockStart(),
+  //       },
+  //     ],
+  //   },
+  // }),
+  SoftBreakPlugin.configure({
+    options: {
+      rules: [
+        { hotkey: 'shift+enter' },
+        {
+          hotkey: 'enter',
+          query: {
+            allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
+          },
+        },
+      ],
+    },
+  }),
 ] as const;
