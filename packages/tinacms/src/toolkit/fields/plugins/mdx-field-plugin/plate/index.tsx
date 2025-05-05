@@ -1,6 +1,5 @@
 import React from 'react';
 import { Components } from './plugins/ui/components';
-import { formattingPlugins, commonPlugins } from './plugins/core';
 import { helpers } from './plugins/core/common';
 import {
   createMdxBlockPlugin,
@@ -22,6 +21,8 @@ import { ToolbarProvider } from './toolbar/toolbar-provider';
 import { createMermaidPlugin } from './plugins/custom/mermaid-plugin';
 import { Plate, usePlateEditor } from '@udecode/plate/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
+import { useCreateEditor } from './hooks/use-create-editor';
+import { editorPlugins } from './plugins/editor-plugins';
 
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(
@@ -33,36 +34,35 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   );
 
   console.log("♻️ Initial Value", initialValue)
-  const plugins = [
-    ...formattingPlugins,
-    ...commonPlugins,
-    //TODO(Plate Upgrade) : Enable these plugins, they are temporary disable due to plate upgrade (giving some error, we need to deal with it later before plate upgrade can be released)
-    // createMdxBlockPlugin(),
-    // createMdxInlinePlugin(),
-    // createImgPlugin(),
-    // createMermaidPlugin(),
-    // createInvalidMarkdownPlugin(),
-    LinkPlugin.configure({
-      options: {
-        // Custom validation function to allow relative links, e.g., /about
-        isUrl: (url) => isUrl(url),
-      },
-      render: { afterEditable: () => <LinkFloatingToolbar /> },
-    })
-  ];
+  // const plugins = [
+  //   ...formattingPlugins,
+  //   ...commonPlugins,
+  //   //TODO(Plate Upgrade) : Enable these plugins, they are temporary disable due to plate upgrade (giving some error, we need to deal with it later before plate upgrade can be released)
+  //   // createMdxBlockPlugin(),
+  //   // createMdxInlinePlugin(),
+  //   // createImgPlugin(),
+  //   // createMermaidPlugin(),
+  //   // createInvalidMarkdownPlugin(),
+  //   LinkPlugin.configure({
+  //     options: {
+  //       // Custom validation function to allow relative links, e.g., /about
+  //       isUrl: (url) => isUrl(url),
+  //     },
+  //     render: { afterEditable: () => <LinkFloatingToolbar /> },
+  //   })
+  // ];
 
   // This should be a plugin customization
   const tempId = [tinaForm.id, input.name].join('.');
   const id = React.useMemo(() => uuid() + tempId, [tempId]);
   const ref = React.useRef<HTMLDivElement>(null);
 
-  const editor = usePlateEditor({
-    id: id,
+  const editor = useCreateEditor({
+    plugins: [...editorPlugins],
     value: initialValue,
-    plugins: plugins,
-    override: {
-      components: Components(),
-    },
+    // override: {
+    //   // components: Components()
+    // }
   });
 
   React.useEffect(() => {
