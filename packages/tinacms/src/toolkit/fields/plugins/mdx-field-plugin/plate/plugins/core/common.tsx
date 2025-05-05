@@ -19,23 +19,23 @@ import { TablePlugin } from '@udecode/plate-table/react';
 import { SlashPlugin } from '@udecode/plate-slash-command/react';
 import { NodeApi } from '@udecode/plate';
 
+//TODO: Remove this plugins once it is fully migrated to the editor plugin files
 export const plugins = [
-  BasicMarksPlugin,
-  HeadingPlugin,
-  ParagraphPlugin,
-  CodeBlockPlugin,
-  //TODO : Readd these plugins and make sure they work
+  // BasicMarksPlugin,
+  // HeadingPlugin,
+  // ParagraphPlugin,
+  // CodeBlockPlugin,
   // createHTMLBlockPlugin(),
   // createHTMLInlinePlugin(),
-  BlockquotePlugin,
-  UnderlinePlugin,
-  ListPlugin,
-  IndentListPlugin,
-  HorizontalRulePlugin,
+  // BlockquotePlugin,
+  // UnderlinePlugin,
+  // ListPlugin,
+  // IndentListPlugin,
+  // HorizontalRulePlugin,
   // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
-  NodeIdPlugin,
-  SlashPlugin,
-  TablePlugin,
+  // NodeIdPlugin,
+  // SlashPlugin,
+  // TablePlugin,
 ];
 
 export const unsupportedItemsInTable = new Set([
