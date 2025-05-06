@@ -34,7 +34,6 @@
 		"@iarna/toml": "^2.2.5",
 		"@tinacms/mdx": "workspace:*",
 		"@tinacms/schema-tools": "workspace:*",
-        "@tinacms/common": "workspace:*",
 		"abstract-level": "^1.0.4",
 		"date-fns": "^2.30.0",
 		"fast-glob": "^3.3.3",
@@ -55,6 +54,9 @@
 		"readable-stream": "^4.7.0",
 		"scmp": "^2.1.0",
 		"yup": "^0.32.11"
+	},
+	"peerDependencies": {
+		"@tinacms/common": "workspace:*"
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"

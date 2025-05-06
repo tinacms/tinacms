@@ -36,7 +36,8 @@
 	},
 	"peerDependencies": {
 		"react": ">=16.14.0",
-		"yup": "^0.32.0"
+		"yup": "^0.32.0",
+		"@tinacms/common": "workspace:*"
 	},
 	"scripts": {
 		"build": "tinacms-scripts build",
@@ -55,7 +56,6 @@
 	"dependencies": {
 		"picomatch-browser": "2.2.6",
 		"url-pattern": "^1.0.3",
-        "@tinacms/common": "workspace:*",
 		"zod": "^3.24.2"
 	}
 }

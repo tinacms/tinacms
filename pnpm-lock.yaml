@@ -711,7 +711,7 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       dotenv:
-        specifier: ^16.4.7
+        specifier: ^16.4.5
         version: 16.4.7
       esbuild:
         specifier: ^0.24.2
@@ -723,23 +723,35 @@ importers:
         specifier: 15.8.0
         version: 15.8.0
       js-yaml:
-        specifier: ^4.1.0
-        version: 4.1.0
-      log4js:
-        specifier: ^6.9.1
-        version: 6.9.1
+        specifier: ^3.14.1
+        version: 3.14.1
+      lodash.camelcase:
+        specifier: ^4.3.0
+        version: 4.3.0
+      lodash.upperfirst:
+        specifier: ^4.3.1
+        version: 4.3.1
+      lru-cache:
+        specifier: ^10.2.0
+        version: 10.4.3
       many-level:
         specifier: ^2.0.0
         version: 2.0.0
       memory-level:
         specifier: ^1.0.0
         version: 1.0.0
+      micromatch:
+        specifier: 4.0.8
+        version: 4.0.8
       minimatch:
         specifier: ^5.1.6
         version: 5.1.6
       normalize-path:
         specifier: ^3.0.0
         version: 3.0.0
+      picomatch:
+        specifier: ^3.0.0
+        version: 3.0.1
       prettier:
         specifier: ^2.8.8
         version: 2.8.8
@@ -764,12 +776,18 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.7.3
+      url-pattern:
+        specifier: ^1.0.3
+        version: 1.0.3
       vite:
         specifier: ^4.5.9
         version: 4.5.9(@types/node@22.14.1)(terser@5.39.0)
+      ws:
+        specifier: ^8.16.0
+        version: 8.18.1
       yup:
-        specifier: ^1.6.1
-        version: 1.6.1
+        specifier: ^0.32.11
+        version: 0.32.11
       zod:
         specifier: ^3.24.2
         version: 3.24.2
@@ -9592,6 +9610,9 @@ packages:
   lodash-es@4.17.21:
     resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
 
+  lodash.camelcase@4.3.0:
+    resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
+
   lodash.castarray@4.4.0:
     resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
 
@@ -9634,6 +9655,9 @@ packages:
 
   lodash.uniqby@4.7.0:
     resolution: {integrity: sha512-e/zcLx6CSbmaEgFHCA7BnoQKyCtKMxnuWrJygbwPs/AIn+IMKl66L8/s+wBUn5LRw2pZx3bUHibiV1b6aTWIww==}
+
+  lodash.upperfirst@4.3.1:
+    resolution: {integrity: sha512-sReKOYJIJf74dhJONhU4e0/shzi1trVbSWDOhKYE5XV2O+H7Sb2Dihwuc7xWxVl+DgFPyTqIN3zMfT9cq5iWDg==}
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
@@ -22643,6 +22667,8 @@ snapshots:
 
   lodash-es@4.17.21: {}
 
+  lodash.camelcase@4.3.0: {}
+
   lodash.castarray@4.4.0: {}
 
   lodash.clonedeep@4.5.0: {}
@@ -22670,6 +22696,8 @@ snapshots:
   lodash.truncate@4.4.2: {}
 
   lodash.uniqby@4.7.0: {}
+
+  lodash.upperfirst@4.3.1: {}
 
   lodash@4.17.21: {}
 
