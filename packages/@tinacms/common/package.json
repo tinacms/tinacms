@@ -20,9 +20,7 @@
   "buildConfig": {
     "entryPoints": [
       {
-        "name": "src/index.ts",
-        "target": "node",
-        "bundle": []
+        "name": "src/index.ts"
       }
     ]
   },
