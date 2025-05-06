@@ -2,7 +2,7 @@
 
 */
 
-import React from "react";
+import React from 'react';
 
 type BaseComponents = {
   h1?: { children: JSX.Element };
@@ -36,7 +36,7 @@ type BaseComponents = {
   // td?: { children: JSX.Element }
   // tr?: { children: JSX.Element }
   table?: {
-    align?: ("left" | "right" | "center")[];
+    align?: ('left' | 'right' | 'center')[];
     tableRows: { tableCells: { value: TinaMarkdownContent }[] }[];
   };
   // Provide a fallback when a JSX component wasn't provided
@@ -86,7 +86,7 @@ export type TinaMarkdownContent = {
 };
 
 export const TinaMarkdown = <
-  CustomComponents extends { [key: string]: object } = any
+  CustomComponents extends { [key: string]: object } = any,
 >({
   content,
   components = {},
@@ -117,7 +117,7 @@ export const TinaMarkdown = <
 };
 
 const Leaf = (props: {
-  type: "text";
+  type: 'text';
   text: string;
   bold?: boolean;
   italic?: boolean;
@@ -126,7 +126,7 @@ const Leaf = (props: {
   code?: boolean;
   components: Pick<
     BaseComponentSignature,
-    "bold" | "italic" | "underline" | "strikethrough" | "code" | "text"
+    'bold' | 'italic' | 'underline' | 'strikethrough' | 'code' | 'text'
   >;
 }) => {
   if (props.bold) {
@@ -233,17 +233,17 @@ const MemoNode = (props) => {
 const Node = ({ components, child }) => {
   const { children, ...props } = child;
   switch (child.type) {
-    case "h1":
-    case "h2":
-    case "h3":
-    case "h4":
-    case "h5":
-    case "h6":
-    case "p":
-    case "blockquote":
-    case "ol":
-    case "ul":
-    case "li":
+    case 'h1':
+    case 'h2':
+    case 'h3':
+    case 'h4':
+    case 'h5':
+    case 'h6':
+    case 'p':
+    case 'blockquote':
+    case 'ol':
+    case 'ul':
+    case 'li':
       if (components[child.type]) {
         const Component = components[child.type];
         return (
@@ -255,7 +255,7 @@ const Node = ({ components, child }) => {
       return React.createElement(child.type, {
         children: <TinaMarkdown components={components} content={children} />,
       });
-    case "lic": // List Item Content
+    case 'lic': // List Item Content
       if (components.lic) {
         const Component = components.lic;
         return (
@@ -269,7 +269,7 @@ const Node = ({ components, child }) => {
           <TinaMarkdown components={components} content={child.children} />
         </div>
       );
-    case "img":
+    case 'img':
       if (components[child.type]) {
         const Component = components[child.type];
         // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
@@ -277,7 +277,7 @@ const Node = ({ components, child }) => {
       }
       // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
       return <img src={child.url} alt={child.alt} />;
-    case "a":
+    case 'a':
       if (components[child.type]) {
         const Component = components[child.type];
         return (
@@ -293,8 +293,8 @@ const Node = ({ components, child }) => {
           <TinaMarkdown components={components} content={children} />
         </a>
       );
-    case "mermaid":
-    case "code_block": {
+    case 'mermaid':
+    case 'code_block': {
       const value = child.value;
       if (components[child.type]) {
         const Component = components[child.type];
@@ -309,24 +309,24 @@ const Node = ({ components, child }) => {
         </pre>
       );
     }
-    case "hr":
+    case 'hr':
       if (components[child.type]) {
         const Component = components[child.type];
         // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
         return <Component {...props} />;
       }
       return <hr />;
-    case "break":
+    case 'break':
       if (components[child.type]) {
         const Component = components[child.type];
         return <Component {...props} />;
       }
       return <br />;
-    case "text":
+    case 'text':
       // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
       return <Leaf components={components} {...child} />;
-    case "mdxJsxTextElement":
-    case "mdxJsxFlowElement":
+    case 'mdxJsxTextElement':
+    case 'mdxJsxFlowElement':
       // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
       const Component = components[child.name];
       if (Component) {
@@ -334,7 +334,7 @@ const Node = ({ components, child }) => {
         const props = child.props ? child.props : {};
         return <Component {...props} />;
       } else {
-        if (child.name === "table") {
+        if (child.name === 'table') {
           const firstRowHeader = child.props?.firstRowHeader;
           const rows =
             (firstRowHeader
@@ -342,18 +342,18 @@ const Node = ({ components, child }) => {
               : child.props?.tableRows) || [];
           const header = child.props?.tableRows?.at(0);
           const TableComponent =
-            components["table"] || ((props) => <table {...props} />);
+            components['table'] || ((props) => <table {...props} />);
           const TrComponent =
-            components["tr"] || ((props) => <tr {...props} />);
+            components['tr'] || ((props) => <tr {...props} />);
           const ThComponent =
-            components["th"] ||
+            components['th'] ||
             ((props) => (
-              <th style={{ textAlign: props?.align || "auto" }} {...props} />
+              <th style={{ textAlign: props?.align || 'auto' }} {...props} />
             ));
           const TdComponent =
-            components["td"] ||
+            components['td'] ||
             ((props) => (
-              <td style={{ textAlign: props?.align || "auto" }} {...props} />
+              <td style={{ textAlign: props?.align || 'auto' }} {...props} />
             ));
           const align = child.props?.align || [];
           return (
@@ -401,7 +401,7 @@ const Node = ({ components, child }) => {
             </TableComponent>
           );
         }
-        const ComponentMissing = components["component_missing"];
+        const ComponentMissing = components['component_missing'];
         if (ComponentMissing) {
           // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
           return <ComponentMissing name={child.name} />;
@@ -409,22 +409,22 @@ const Node = ({ components, child }) => {
           return <span>{`No component provided for ${child.name}`}</span>;
         }
       }
-    case "table":
+    case 'table':
       const rows = child.children || [];
       const TableComponent =
-        components["table"] ||
+        components['table'] ||
         ((props) => (
-          <table style={{ border: "1px solid #EDECF3" }} {...props} />
+          <table style={{ border: '1px solid #EDECF3' }} {...props} />
         ));
-      const TrComponent = components["tr"] || ((props) => <tr {...props} />);
+      const TrComponent = components['tr'] || ((props) => <tr {...props} />);
       const TdComponent =
-        components["td"] ||
+        components['td'] ||
         ((props) => (
           <td
             style={{
-              textAlign: props?.align || "auto",
-              border: "1px solid #EDECF3",
-              padding: "0.25rem",
+              textAlign: props?.align || 'auto',
+              border: '1px solid #EDECF3',
+              padding: '0.25rem',
             }}
             {...props}
           />
@@ -455,24 +455,24 @@ const Node = ({ components, child }) => {
           </tbody>
         </TableComponent>
       );
-    case "maybe_mdx":
+    case 'maybe_mdx':
       /**
        * We don't want to render this as it's only displayed while editing an mdx node and should
        * be transformed before form submission
        */
       return null;
-    case "html":
-    case "html_inline":
+    case 'html':
+    case 'html_inline':
       if (components[child.type]) {
         const Component = components[child.type];
         return <Component {...props} />;
       }
       return child.value;
-    case "invalid_markdown":
+    case 'invalid_markdown':
       return <pre>{child.value}</pre>;
     default:
       // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-      if (typeof child.text === "string") {
+      if (typeof child.text === 'string') {
         // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
         return <Leaf components={components} {...child} />;
       }
