@@ -88,7 +88,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
               <FixedToolbarButtons />
             </FixedToolbar>
             {field?.overrides?.showFloatingToolbar !== false ? (
-              //TODO(Plate Upgrade) : Are we actually using this?
+              //TODO(Plate Upgrade) : Floating toolbar causing error, i think they have new way of writing floating toolbar (seems like they had replace with plugin), do we still want floating toolbar plugin
               // <FloatingToolbar>
               //   <FloatingToolbarButtons />
               // </FloatingToolbar>
