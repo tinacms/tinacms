@@ -731,6 +731,9 @@ importers:
       lodash.upperfirst:
         specifier: ^4.3.1
         version: 4.3.1
+      log4js:
+        specifier: ^6.9.1
+        version: 6.9.1
       lru-cache:
         specifier: ^10.2.0
         version: 10.4.3
