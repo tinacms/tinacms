@@ -120,7 +120,6 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     width: () => STANDARD_ICON_WIDTH,
     Component: <RawMarkdownToolbarButton />,
   },
-//TODO(Plate Upgrade): Disable due to error after plate upgrade (when focus on RTE and click one of the mark on the toolsbar)
   embed: {
     label: 'Templates',
     width: () => EMBED_ICON_WIDTH,
