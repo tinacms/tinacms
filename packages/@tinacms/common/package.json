@@ -29,12 +29,15 @@
     "types": "tsc",
     "build": "tinacms-scripts build"
   },
-  "dependencies": {},
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
     "directory": "packages/@tinacms/common"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "typescript": "^5.7.3"
   }
 }
