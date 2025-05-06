@@ -121,18 +121,18 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     Component: <RawMarkdownToolbarButton />,
   },
 //TODO(Plate Upgrade): Disable due to error after plate upgrade (when focus on RTE and click one of the mark on the toolsbar)
-  // embed: {
-  //   label: 'Templates',
-  //   width: () => EMBED_ICON_WIDTH,
-  //   Component: <TemplatesToolbarButton />,
-  // },
+  embed: {
+    label: 'Templates',
+    width: () => EMBED_ICON_WIDTH,
+    Component: <TemplatesToolbarButton />,
+  },
 };
 
 export default function FixedToolbarButtons() {
   const toolbarRef = React.useRef(null);
   const [itemsShown, setItemsShown] = React.useState(11);
   const { overrides, templates } = useToolbarContext();
-  // const showEmbedButton = templates.length > 0; 
+  const showEmbedButton = templates.length > 0; 
 
   let items = [];
 
@@ -152,9 +152,9 @@ export default function FixedToolbarButtons() {
             .filter((item) => item !== undefined);
   }
 
-  // if (!showEmbedButton) {
-  //   items = items.filter((item) => item.label !== toolbarItems.embed.label);
-  // }
+  if (!showEmbedButton) {
+    items = items.filter((item) => item.label !== toolbarItems.embed.label);
+  }
 
   const editorState = useEditorState();
   const userInTable = helpers.isNodeActive(editorState, TablePlugin.key);
