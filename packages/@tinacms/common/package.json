@@ -4,37 +4,37 @@
   "description": "Common types needed for tinacms packages.",
   "license": "Apache-2.0",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "module": "./dist/index.mjs",
   "files": [
-  	"package.json",
-  	"dist"
+    "package.json",
+    "dist"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     }
   },
   "buildConfig": {
     "entryPoints": [
-      "src/index.ts"
+      {
+        "name": "src/index.ts",
+        "target": "node",
+        "bundle": []
+      }
     ]
   },
+  "scripts": {
+    "types": "tsc",
+    "build": "tinacms-scripts build"
+  },
+  "dependencies": {},
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
     "directory": "packages/@tinacms/common"
-  },
-  "scripts": {
-    "types": "tsc",
-    "build": "tinacms-scripts build"
-  },
-  "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
-    "typescript": "^5.7.3"
   }
 }
