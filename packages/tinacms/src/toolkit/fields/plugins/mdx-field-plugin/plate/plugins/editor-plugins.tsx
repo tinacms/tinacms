@@ -17,6 +17,10 @@ import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
 import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 import { autoformatRules } from './core/autoformat/autoformat-rules';
 import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
+import { LinkPlugin } from '@udecode/plate-link/react';
+import { isUrl } from '../transforms/is-url';
+import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
+import React from 'react';
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -61,13 +65,13 @@ export const editorPlugins = [
   //   // createImgPlugin(),
   //   // createMermaidPlugin(),
   //   // createInvalidMarkdownPlugin(),
-  //   LinkPlugin.configure({
-  //     options: {
-  //       // Custom validation function to allow relative links, e.g., /about
-  //       isUrl: (url) => isUrl(url),
-  //     },
-  //     render: { afterEditable: () => <LinkFloatingToolbar /> },
-  //   })
+  LinkPlugin.configure({
+    options: {
+      // Custom validation function to allow relative links, e.g., /about
+      isUrl: (url) => isUrl(url),
+    },
+    render: { afterEditable: () => <LinkFloatingToolbar /> },
+  }),
 
   ...viewPlugins,
   ListPlugin,
