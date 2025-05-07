@@ -14,7 +14,6 @@ import { SlashPlugin } from '@udecode/plate-slash-command/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
 import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
-import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 import { autoformatRules } from './core/autoformat/autoformat-rules';
 import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
 import { LinkPlugin } from '@udecode/plate-link/react';
