@@ -20,24 +20,17 @@ import {
   splitTableCell,
 } from '@udecode/plate-table';
 
-import { Icons, iconVariants } from './icons';
-
-import { Button } from './button';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuPortal,
-  DropdownMenuTrigger,
-} from './dropdown-menu';
-import { Popover, PopoverContent, popoverVariants } from './popover';
-import { Separator } from './separator';
 import {
   TableProvider,
   useTableBordersDropdownMenuContentState,
   useTableElement,
   useTableMergeState,
 } from '@udecode/plate-table/react';
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuPortal, DropdownMenuTrigger } from '../dropdown-menu';
+import { Icons, iconVariants } from '../icons';
+import { Separator } from '../separator';
+import { Popover, PopoverContent, popoverVariants } from '../popover';
+import { Button } from '../button';
 
 export const TableBordersDropdownMenuContent = withRef<
   typeof DropdownMenuPrimitive.Content
