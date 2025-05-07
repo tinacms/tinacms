@@ -16,10 +16,6 @@ import { useToolbarContext } from '../toolbar/toolbar-provider';
 import { HeadingsMenu } from './headings-dropdown';
 import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button';
 import { ImageToolbarButton } from './plate-ui/image-toolbar-button';
-import {
-  OrderedListToolbarButton,
-  UnorderedListToolbarButton,
-} from './plate-ui/indent-list-toolbar-button';
 import { LinkToolbarButton } from './plate-ui/link-toolbar-button';
 import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button';
 import OverflowMenu from './plate-ui/overflow-menu';
@@ -35,6 +31,8 @@ import {
   StrikethroughToolbarButton,
 } from './plate-ui/mark-toolbar-button';
 import { TablePlugin } from '@udecode/plate-table/react';
+import { BulletedListPlugin, NumberedListPlugin } from '@udecode/plate-list/react';
+import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
 
 type ToolbarItem = {
   label: string;
@@ -71,12 +69,12 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   ul: {
     label: 'Unordered List',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <UnorderedListToolbarButton />,
+    Component: <ListToolbarButton nodeType={BulletedListPlugin.key} />,
   },
   ol: {
     label: 'Ordered List',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <OrderedListToolbarButton />,
+    Component: <ListToolbarButton nodeType={NumberedListPlugin.key} />,
   },
   bold: {
     label: 'Bold',

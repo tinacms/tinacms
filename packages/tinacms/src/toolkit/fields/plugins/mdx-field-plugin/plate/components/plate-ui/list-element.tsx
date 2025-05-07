@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 
 import { withRef, withVariants } from '@udecode/cn';
@@ -19,11 +21,9 @@ const ListElementVariants = withVariants(PlateElement, listVariants, [
 
 export const ListElement = withRef<typeof ListElementVariants>(
   ({ children, variant = 'ul', ...props }, ref) => {
-    const Component = variant!;
-
     return (
-      <ListElementVariants asChild ref={ref} variant={variant} {...props}>
-        <Component>{children}</Component>
+      <ListElementVariants ref={ref} as={variant!} variant={variant} {...props}>
+        {children}
       </ListElementVariants>
     );
   }
