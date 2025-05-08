@@ -92,44 +92,20 @@ const normalize = (node: any) => {
   return node;
 };
 
-export const insertInlineElement = (editor, inlineElement) => {
+export const insertInlineElement = (editor: PlateEditor, inlineElement) => {
   editor.tf.insertNodes([inlineElement]);
-  /**
-   * FIXME mdx-setTimeout: setTimeout seems to work, but not sure why it's necessary
-   * Without this, the move occurs on the element that was selected
-   * _before_ we inserted the node
-   */
-  // Move selection to the space after the embedded line
-  setTimeout(() => {
-    editor.tf.move(); //TODO : Test this function in UI, not sure if it works after replace with latest api  function in UI, not sure if it works after replace with latest api
-  }, 1);
 };
-export const insertBlockElement = (editor, blockElement) => {
-  const editorEl = editor.toDOMNode(editor);
-console.log(editor)
-  console.log(editorEl)
-  if (editorEl) {
-    /**
-     * FIXME mdx-setTimeout: there must be a better way to do this. When jumping
-     * back from a nested form, the entire editor doesn't receive
-     * focus, so enable that, but what we also want is to ensure
-     * that this node is selected - so do that, too. But there
-     * seems to be a race condition where the `editorEl.focus` doesn't
-     * happen in time for the Transform to take effect, hence the
-     * setTimeout. I _think_ it just needs to queue and the actual
-     * ms timeout is irrelevant, but might be worth checking on
-     * devices with lower CPUs
-     */
-    editorEl.focus();
-    setTimeout(() => {
-      // If empty, replace the current block
-      if (isCurrentBlockEmpty(editor)) {
-        editor.tf.setNodes(blockElement);
-      } else {
-        editor.tf.insertNodes([blockElement]);
-      }
-    }, 1);
-  }
+
+export const insertBlockElement = (editor: PlateEditor, blockElement) => {
+  editor.tf.withoutNormalizing(() => {
+    const block = editor.api.block();
+    if (!block) return;
+    if (isCurrentBlockEmpty(editor)) {
+      editor.tf.setNodes(blockElement);
+    } else {
+      editor.tf.insertNodes([blockElement]);
+    }
+  });
 };
 
 //TODO : Test this function in UI, not sure if it works after replace with latest api

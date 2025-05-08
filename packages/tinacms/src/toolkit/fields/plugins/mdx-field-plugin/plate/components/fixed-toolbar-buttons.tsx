@@ -30,7 +30,10 @@ import {
   StrikethroughToolbarButton,
 } from './plate-ui/mark-toolbar-button';
 import { TablePlugin } from '@udecode/plate-table/react';
-import { BulletedListPlugin, NumberedListPlugin } from '@udecode/plate-list/react';
+import {
+  BulletedListPlugin,
+  NumberedListPlugin,
+} from '@udecode/plate-list/react';
 import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
 import { TableDropdownMenu } from './plate-ui/table/table-dropdown-menu';
 
@@ -128,7 +131,7 @@ export default function FixedToolbarButtons() {
   const toolbarRef = React.useRef(null);
   const [itemsShown, setItemsShown] = React.useState(11);
   const { overrides, templates } = useToolbarContext();
-  const showEmbedButton = templates.length > 0; 
+  const showEmbedButton = templates.length > 0;
 
   let items = [];
 

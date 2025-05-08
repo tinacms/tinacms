@@ -1,4 +1,5 @@
-import { Editor, ElementApi, isType } from '@udecode/plate';
+import { ElementApi, SlateEditor } from '@udecode/plate';
+import { isType } from '@udecode/plate';
 import { AutoformatBlockRule } from '@udecode/plate-autoformat';
 import {
   CodeBlockPlugin,
@@ -10,29 +11,29 @@ import { PlateEditor } from '@udecode/plate/react';
 export const preFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor);
 
-export const format = (editor: Editor, customFormatting: any) => {
+export const format = (editor: SlateEditor, customFormatting: any) => {
   if (editor.selection) {
     const parentEntry = editor.api.parent(editor.selection);
     if (!parentEntry) return;
     const [node] = parentEntry;
     if (
       ElementApi.isElement(node) &&
-      !isType(editor as PlateEditor, node, CodeBlockPlugin.key) &&
-      !isType(editor as PlateEditor, node, CodeLinePlugin.key)
+      !isType(editor, node, CodeBlockPlugin.key) &&
+      !isType(editor, node, CodeLinePlugin.key)
     ) {
       customFormatting();
     }
   }
 };
 
-export const formatList = (editor: Editor, elementType: string) => {
+export const formatList = (editor: SlateEditor, elementType: string) => {
   format(editor, () =>
-    toggleList(editor as PlateEditor, {
+    toggleList(editor, {
       type: elementType,
     })
   );
 };
 
-export const formatText = (editor: Editor, text: string) => {
+export const formatText = (editor: SlateEditor, text: string) => {
   format(editor, () => editor.tf.insertText(text));
 };
