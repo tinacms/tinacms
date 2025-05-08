@@ -1,5 +1,13 @@
 # starter-empty
 
+## 0.0.31
+
+### Patch Changes
+
+- Updated dependencies [[`65cee5d`](https://github.com/tinacms/tinacms/commit/65cee5d6ae16c7320a4a14f0d9a82dc5f9103e34)]:
+  - tinacms@2.7.6
+  - @tinacms/cli@1.9.6
+
 ## 0.0.30
 
 ### Patch Changes

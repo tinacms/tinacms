@@ -1,5 +1,13 @@
 # tina-graphql
 
+## 1.5.17
+
+### Patch Changes
+
+- [#5640](https://github.com/tinacms/tinacms/pull/5640) [`450d5cd`](https://github.com/tinacms/tinacms/commit/450d5cda6b200c03de0a91fa58d48177531d44fe) Thanks [@kldavis4](https://github.com/kldavis4)! - Only delete existing items when partial indexing
+
+- [#5652](https://github.com/tinacms/tinacms/pull/5652) [`515f2a4`](https://github.com/tinacms/tinacms/commit/515f2a427cb51b050af25910eeae5ca97ce04e92) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - 📝 Docs - Improve @tinacms/graphql README
+
 ## 1.5.16
 
 ### Patch Changes

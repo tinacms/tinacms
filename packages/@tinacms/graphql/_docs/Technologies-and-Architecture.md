@@ -1,37 +1,3 @@
-## Getting started
-
-There's a serve and watch command, which are separate for now:
-
-```sh
-// terminal 1
-cd packages/tina-graphql
-yarn watch
-
-// terminal 2
-cd packages/tina-graphql
-yarn serve
-```
-
-You can consume this from the `graphiql` app:
-
-```sh
-// terminal 3
-cd apps/graphiql
-yarn start
-```
-
-Note that this app doesn't use anything from the `client` package right now, it's just an interactive tool to see how things move from the graphql server into tina. That process has been improved in this package but will need to be merged back into the `client` package before this is usable.
-
-### Running queries
-
-By default the app will redirect to `project1` and display the default query generated from the `graphql-helpers` library - which consumes the fixtures from the `project1` folder the the `gql` package, any number of fixtures can be used if you want to add your own, just ensure the `server.ts` file knows about them.
-
-When you run the initial query, you should see the result along with the Tina sidebar toggle, this indicates that the Tina form has now been populated with the query values. If you change some values around and hit submit, the `onSubmit` function will populate the GraphiQL editor instead of sending it off to the server, you can play around with the mutation before sending it off if you'd like.
-
-### Tests
-
-The most valuable test right now is the `builder.spec.ts`, it's sort of an integration of all the field-level builders. There are also field-level build tests, but not resolvers ones just yet. If you're making changes to the builder just run `yarn test-watch` and hit `p` to provide a pattern, then type "builder", this will isolate that test and if it's passing you probably didn't break anything.
-
 ## Architecture
 
 ### Builder
