@@ -6,35 +6,25 @@ import {
   helpers,
 } from '../core/common';
 import type { MdxTemplate } from '../../types';
-import { createPlatePlugin, PlateEditor } from '@udecode/plate/react';
+import { createPlatePlugin, PlateEditor, useEditorRef } from '@udecode/plate/react';
 
 export const ELEMENT_MDX_INLINE = 'mdxJsxTextElement';
 export const ELEMENT_MDX_BLOCK = 'mdxJsxFlowElement';
 
-// const Embed = (props) => {
-//   const handleChange = (values) => {
-//     const path = ReactEditor.findPath(props.editor, props.element);
-//     props.editor.tf.setNodes({ props: values }, { at: path });
-//   };
+const Embed = (props) => {
+  const editor = useEditorRef();
+console.log("embed")
+  const handleChange = (values) => {
+    const path = editor.api.findPath(props.element);
+    props.editor.tf.setNodes({ props: values }, { at: path });
+  };
 
-//   if (props.inline) {
-//     return <InlineEmbed {...props} onChange={handleChange} />;
-//   }
-//   return <BlockEmbed {...props} onChange={handleChange} />;
-// };
+  if (props.inline) {
+    return <InlineEmbed {...props} onChange={handleChange} />;
+  }
+  return <BlockEmbed {...props} onChange={handleChange} />;
+};
 
-//TODO - Fix this commented code (need to find replacement, there are some config havent figure out the replacement yet)
-// export const createMdxInlinePlugin = createPluginFactory<{
-//   templates: MdxTemplate[];
-// }>({
-//   key: ELEMENT_MDX_INLINE,
-//   isInline: true,
-//   isVoid: true,
-//   isElement: true,
-//   component: (props) => <Embed {...props} inline={true} />,
-// });
-
-//TODO - This is the replacement for the above commented code
 export const createMdxInlinePlugin = createPlatePlugin({
   key: ELEMENT_MDX_INLINE,
   options: {
@@ -42,7 +32,9 @@ export const createMdxInlinePlugin = createPlatePlugin({
     isVoid: true,
     isInline: true,
   },
-  // component: (props) => <Embed {...props} inline={true} />,
+  node: {
+    component: (props) => <Embed {...props} inline={true} />,
+  }
 });
 
 export const createMdxBlockPlugin = createPlatePlugin({
@@ -51,7 +43,9 @@ export const createMdxBlockPlugin = createPlatePlugin({
     isElement: true,
     isVoid: true,
   },
-  // component: (props) => <Embed {...props} inline={false} />,
+  node: {
+    component: (props) => <Embed {...props} inline={false} />,
+  }
 });
 
 export const insertMDX = (editor: PlateEditor, value: MdxTemplate) => {
@@ -60,6 +54,8 @@ export const insertMDX = (editor: PlateEditor, value: MdxTemplate) => {
     return;
   }
   if (flow) {
+    console.log("insert block")
+
     insertBlockElement(editor, {
       type: ELEMENT_MDX_BLOCK,
       name: value.name,
@@ -69,11 +65,15 @@ export const insertMDX = (editor: PlateEditor, value: MdxTemplate) => {
 
     editor.tf.normalize({ force: true });
   } else {
+    console.log("insert inline")
+
     insertInlineElement(editor, {
       type: ELEMENT_MDX_INLINE,
       name: value.name,
       children: [{ text: '' }],
       props: value.defaultItem ? value.defaultItem : {},
     });
+
+
   }
 };

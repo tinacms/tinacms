@@ -105,7 +105,9 @@ export const insertInlineElement = (editor, inlineElement) => {
   }, 1);
 };
 export const insertBlockElement = (editor, blockElement) => {
-  const editorEl = editor.toDOMNode(editor, editor);
+  const editorEl = editor.toDOMNode(editor);
+console.log(editor)
+  console.log(editorEl)
   if (editorEl) {
     /**
      * FIXME mdx-setTimeout: there must be a better way to do this. When jumping
