@@ -74,11 +74,9 @@ type BaseComponentSignature = {
  * }
  * ```
  */
-export type Components<ComponentAndProps extends object> = {
-  [K in keyof ComponentAndProps]: (
-    props: React.ComponentProps<ComponentAndProps[K]>
-  ) => JSX.Element;
-} & BaseComponentSignature;
+export type Components<PropsMap extends Record<string, object>> = {
+  [K in keyof PropsMap]: React.ComponentType<PropsMap[K]>;
+};
 
 export type TinaMarkdownContent = {
   type: string;
