@@ -20,6 +20,7 @@ import { LinkPlugin } from '@udecode/plate-link/react';
 import { isUrl } from '../transforms/is-url';
 import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
 import React from 'react';
+import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -106,23 +107,23 @@ export const editorPlugins = [
       ],
     },
   }),
-  // TODO: Renable later
-  // ResetNodePlugin.configure({
-  //   options: {
-  //     rules: [
-  //       {
-  //         ...resetBlockTypesCommonRule,
-  //         hotkey: 'Enter',
-  //         predicate: (editor) => editor.api.isBlockEmpty(),
-  //       },
-  //       {
-  //         ...resetBlockTypesCommonRule,
-  //         hotkey: 'Backspace',
-  //         predicate: (editor) => editor.api.isSelectionAtBlockStart(),
-  //       },
-  //     ],
-  //   },
-  // }),
+  ResetNodePlugin.configure({
+    options: {
+      rules: [
+        {
+          ...resetBlockTypesCommonRule,
+          hotkey: 'Enter',
+          predicate: (editor) => 
+            editor.api.isEmpty(editor.selection, { block: true }),
+        },
+        {
+          ...resetBlockTypesCommonRule,
+          hotkey: 'Backspace',
+          predicate: (editor) => editor.api.isAt({ start: true }),
+        },
+      ],
+    },
+  }),
   SoftBreakPlugin.configure({
     options: {
       rules: [
