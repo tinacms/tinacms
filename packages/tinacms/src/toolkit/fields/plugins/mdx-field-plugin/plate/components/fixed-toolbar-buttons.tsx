@@ -21,7 +21,6 @@ import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button';
 import OverflowMenu from './plate-ui/overflow-menu';
 import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button';
 import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button';
-import { TableDropdownMenu } from './plate-ui/table-dropdown-menu';
 import TemplatesToolbarButton from './plate-ui/templates-toolbar-button';
 import { ToolbarGroup } from './plate-ui/toolbar';
 import {
@@ -33,6 +32,7 @@ import {
 import { TablePlugin } from '@udecode/plate-table/react';
 import { BulletedListPlugin, NumberedListPlugin } from '@udecode/plate-list/react';
 import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
+import { TableDropdownMenu } from './plate-ui/table/table-dropdown-menu';
 
 type ToolbarItem = {
   label: string;
@@ -107,12 +107,11 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   //   width: () => STANDARD_ICON_WIDTH,
   //   Component: <MermaidToolbarButton />,
   // },
-  //TODO(Plate Upgrade): Renable this after plugin rewrite in latest plate version
-  // table: {
-  //   label: 'Table',
-  //   width: () => STANDARD_ICON_WIDTH,
-  //   Component: <TableDropdownMenu />,
-  // },
+  table: {
+    label: 'Table',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <TableDropdownMenu />,
+  },
   raw: {
     label: 'Raw Markdown',
     width: () => STANDARD_ICON_WIDTH,

@@ -1,11 +1,10 @@
 import React from 'react';
 import { useEditorContext } from '../../editor-context';
 import { buildErrorMessage } from '../../../monaco/error-message';
-import { createPlatePlugin } from '@udecode/plate/react';
+import { createPlatePlugin, PlateRenderElementProps } from '@udecode/plate/react';
 
 export const ELEMENT_INVALID_MARKDOWN = 'invalid_markdown';
 
-//TODO : Find out how to render component for custom plugin in plate using create Plate Plugin
 export const createInvalidMarkdownPlugin = createPlatePlugin({
   key: ELEMENT_INVALID_MARKDOWN,
   options: {
@@ -13,17 +12,26 @@ export const createInvalidMarkdownPlugin = createPlatePlugin({
     isVoid: true,
     isInline: false,
   },
-  // component: ({ attributes, element, children }) => {
-  //   return (
-  //     <div {...attributes}>
-  //       <ErrorMessage error={element} />
-  //       {children}
-  //     </div>
-  //   );
-  // },
+  node:{
+    component : InvalidMarkdownElement
+  }
 });
 
-export function ErrorMessage({ error }) {
+function InvalidMarkdownElement({
+  attributes,
+  element,
+  children,
+}: PlateRenderElementProps) {
+  return (
+    <div {...attributes}>
+      <ErrorMessage error={element} />
+      {children}
+    </div>
+  );
+}
+
+
+function ErrorMessage({ error }) {
   const message = buildErrorMessage(error);
   const { setRawMode } = useEditorContext();
   return (
