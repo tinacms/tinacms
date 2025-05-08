@@ -17,7 +17,6 @@ export const createInvalidMarkdownPlugin = createPlatePlugin({
   }
 });
 
-// Plugin render component
 function InvalidMarkdownElement({
   attributes,
   element,
