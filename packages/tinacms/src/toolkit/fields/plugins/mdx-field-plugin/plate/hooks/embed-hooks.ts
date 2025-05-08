@@ -5,7 +5,7 @@ import { FieldFocusEvent } from '@toolkit/fields/field-events';
 import { useSelected } from '@udecode/plate/react';
 
 const handleCloseBase = (editor, element) => {
-  const path = editor.findPath(editor, element);
+  const path = editor.findPath(element);
   const editorEl = editor.toDOMNode(editor, editor);
   if (editorEl) {
     /**
@@ -27,7 +27,7 @@ const handleCloseBase = (editor, element) => {
 };
 
 const handleRemoveBase = (editor, element) => {
-  const path = editor.findPath(editor, element);
+  const path = editor.findPath(element);
   editor.tf.removeNodes({
     at: path,
   });
@@ -61,8 +61,9 @@ export const useEmbedHandles = (editor, element, baseFieldName: string) => {
     setIsExpanded(false);
     handleCloseBase(editor, element);
   };
-
-  const path = editor.findPath(editor, element);
+  // console.log(editor, element);
+  const path = editor.findPath(element);
+  // console.log(path);
   const fieldName = `${baseFieldName}.children.${path.join('.children.')}.props`;
   const handleSelect = () => {
     cms.dispatch({

@@ -1,25 +1,29 @@
-'use client';
+"use client";
 
-import { BasicMarksPlugin, UnderlinePlugin } from '@udecode/plate-basic-marks/react';
-import { HeadingPlugin } from '@udecode/plate-heading/react';
-import { ParagraphPlugin } from '@udecode/plate/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
-import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { ListPlugin } from '@udecode/plate-list/react';
-import { IndentListPlugin } from '@udecode/plate-indent-list/react';
-import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
-import { NodeIdPlugin } from '@udecode/plate-node-id';
-import { TablePlugin } from '@udecode/plate-table/react';
-import { SlashPlugin } from '@udecode/plate-slash-command/react';
-import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
-import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
-import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
-import { autoformatRules } from './core/autoformat/autoformat-rules';
-import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
-import { LinkPlugin } from '@udecode/plate-link/react';
-import { isUrl } from '../transforms/is-url';
-import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
-import React from 'react';
+import {
+  BasicMarksPlugin,
+  UnderlinePlugin,
+} from "@udecode/plate-basic-marks/react";
+import { HeadingPlugin } from "@udecode/plate-heading/react";
+import { ParagraphPlugin } from "@udecode/plate/react";
+import { CodeBlockPlugin } from "@udecode/plate-code-block/react";
+import { BlockquotePlugin } from "@udecode/plate-block-quote/react";
+import { ListPlugin } from "@udecode/plate-list/react";
+import { IndentListPlugin } from "@udecode/plate-indent-list/react";
+import { HorizontalRulePlugin } from "@udecode/plate-horizontal-rule/react";
+import { NodeIdPlugin } from "@udecode/plate-node-id";
+import { TablePlugin } from "@udecode/plate-table/react";
+import { SlashPlugin } from "@udecode/plate-slash-command/react";
+import { TrailingBlockPlugin } from "@udecode/plate-trailing-block";
+import { AutoformatPlugin } from "@udecode/plate-autoformat/react";
+import { ExitBreakPlugin, SoftBreakPlugin } from "@udecode/plate-break/react";
+import { autoformatRules } from "./core/autoformat/autoformat-rules";
+import { HEADING_KEYS, HEADING_LEVELS } from "@udecode/plate-heading";
+import { LinkPlugin } from "@udecode/plate-link/react";
+import { isUrl } from "../transforms/is-url";
+import { LinkFloatingToolbar } from "../components/plate-ui/link-floating-toolbar";
+import React from "react";
+import createImgPlugin from "./create-img-plugin";
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -61,7 +65,7 @@ export const editorPlugins = [
   //   //TODO(Plate Upgrade) : Enable these plugins, they are temporary disable due to plate upgrade (giving some error, we need to deal with it later before plate upgrade can be released)
   //   // createMdxBlockPlugin(),
   //   // createMdxInlinePlugin(),
-  //   // createImgPlugin(),
+  createImgPlugin,
   //   // createMermaidPlugin(),
   //   // createInvalidMarkdownPlugin(),
   LinkPlugin.configure({
@@ -89,14 +93,14 @@ export const editorPlugins = [
     options: {
       rules: [
         {
-          hotkey: 'mod+enter',
+          hotkey: "mod+enter",
         },
         {
-          hotkey: 'mod+shift+enter',
+          hotkey: "mod+shift+enter",
           before: true,
         },
         {
-          hotkey: 'enter',
+          hotkey: "enter",
           query: {
             start: true,
             end: true,
@@ -126,9 +130,9 @@ export const editorPlugins = [
   SoftBreakPlugin.configure({
     options: {
       rules: [
-        { hotkey: 'shift+enter' },
+        { hotkey: "shift+enter" },
         {
-          hotkey: 'enter',
+          hotkey: "enter",
           query: {
             allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
           },
