@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/graphql",
-	"version": "1.5.16",
+	"version": "1.5.17",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"typings": "dist/index.d.ts",
@@ -26,7 +26,6 @@
 		"types": "pnpm tsc",
 		"build": "tinacms-scripts build",
 		"docs": "pnpm typedoc",
-		"serve": "pnpm nodemon dist/server.js",
 		"test": "vitest run",
 		"test-watch": "vitest"
 	},
@@ -84,7 +83,6 @@
 		"@types/yup": "^0.29.14",
 		"jest-file-snapshot": "^0.5.0",
 		"memory-level": "^1.0.0",
-		"nodemon": "3.1.4",
 		"typescript": "^5.7.3",
 		"vite": "^4.5.9",
 		"vitest": "^0.32.4",
