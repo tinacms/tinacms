@@ -21,6 +21,7 @@ import { isUrl } from '../transforms/is-url';
 import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
 import React from 'react';
 import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
+import { createInvalidMarkdownPlugin } from './create-invalid-markdown-plugin';
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -64,7 +65,7 @@ export const editorPlugins = [
   //   // createMdxInlinePlugin(),
   //   // createImgPlugin(),
   //   // createMermaidPlugin(),
-  //   // createInvalidMarkdownPlugin(),
+  createInvalidMarkdownPlugin,
   LinkPlugin.configure({
     options: {
       // Custom validation function to allow relative links, e.g., /about
