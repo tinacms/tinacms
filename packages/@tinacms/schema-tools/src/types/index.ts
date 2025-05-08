@@ -1,3 +1,4 @@
+import { ContentFormat, ContentFrontmatterFormat } from '@tinacms/common';
 import type { FC, ReactNode } from 'react';
 import type React from 'react';
 
@@ -782,7 +783,7 @@ interface BaseCollection {
   name: string;
   path: string;
   indexes?: IndexType[];
-  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml';
+  format?: ContentFormat;
   ui?: UICollection;
   /**
    * @deprecated - use `ui.defaultItem` on the each `template` instead
@@ -791,7 +792,7 @@ interface BaseCollection {
   /**
    * This format will be used to parse the markdown frontmatter
    */
-  frontmatterFormat?: 'yaml' | 'toml' | 'json';
+  frontmatterFormat?: ContentFrontmatterFormat;
   /**
    * The delimiters used to parse the frontmatter.
    */

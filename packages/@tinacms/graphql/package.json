@@ -54,6 +54,9 @@
 		"scmp": "^2.1.0",
 		"yup": "^0.32.11"
 	},
+	"peerDependencies": {
+		"@tinacms/common": "workspace:*"
+	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
 	},

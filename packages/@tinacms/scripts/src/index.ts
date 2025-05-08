@@ -2,14 +2,14 @@
 
 */
 
-import { build } from 'vite';
+import { exec } from 'node:child_process';
+import path from 'node:path';
+import chalk from 'chalk';
+import chokidar from 'chokidar';
 import { build as esbuild } from 'esbuild';
 import fs from 'fs-extra';
-import path from 'node:path';
-import chokidar from 'chokidar';
-import { exec } from 'node:child_process';
-import chalk from 'chalk';
 import jsonDiff from 'json-diff';
+import { build } from 'vite';
 
 import * as commander from 'commander';
 
