@@ -1358,13 +1358,14 @@ export class Database {
         documentPaths,
         async (collection, documentPaths) => {
           if (collection && !collection.isDetached) {
-            await _indexContent(
-              this,
-              this.contentLevel,
+            await _indexContent({
+              database: this,
+              level: this.contentLevel,
               documentPaths,
               enqueueOps,
-              collection
-            );
+              collection,
+              isPartialReindex: true,
+            });
           }
         }
       );
@@ -1479,26 +1480,26 @@ export class Database {
           const doc = await level.keys({ limit: 1 }).next();
           if (!doc) {
             // initialize app data with content from filesystem
-            await _indexContent(
-              this,
-              level,
-              contentPaths,
+            await _indexContent({
+              database: this,
+              level: level,
+              documentPaths: contentPaths,
               enqueueOps,
               collection,
-              userFields.map((field) => [
+              passwordFields: userFields.map((field) => [
                 ...field.path,
                 field.passwordFieldName,
-              ])
-            );
+              ]),
+            });
           }
         } else {
-          await _indexContent(
-            this,
+          await _indexContent({
+            database: this,
             level,
-            contentPaths,
+            documentPaths: contentPaths,
             enqueueOps,
-            collection
-          );
+            collection,
+          });
         }
       }
     );
@@ -1605,14 +1606,23 @@ const hashPasswordValues = async (
 const isGitKeep = (filepath: string, collection?: Collection<true>) =>
   filepath.endsWith(`.gitkeep.${collection?.format || 'md'}`);
 
-const _indexContent = async (
-  database: Database,
-  level: Level,
-  documentPaths: string[],
-  enqueueOps: (ops: BatchOp[]) => Promise<void>,
-  collection?: Collection<true>,
-  passwordFields?: string[][]
-) => {
+const _indexContent = async ({
+  database,
+  level,
+  documentPaths,
+  enqueueOps,
+  collection,
+  passwordFields,
+  isPartialReindex,
+}: {
+  database: Database;
+  level: Level;
+  documentPaths: string[];
+  enqueueOps: (ops: BatchOp[]) => Promise<void>;
+  collection?: Collection<true>;
+  passwordFields?: string[][];
+  isPartialReindex?: boolean;
+}) => {
   let collectionIndexDefinitions: Record<string, IndexDefinition>;
   let collectionPath: string | undefined;
   if (collection) {
@@ -1661,40 +1671,42 @@ const _indexContent = async (
         normalizedPath,
         collectionPath || ''
       );
-      const item = await rootSublevel.get(normalizedPath);
-      if (item) {
-        await database.contentLevel.batch([
-          ...makeRefOpsForDocument(
-            normalizedPath,
-            collection?.name,
-            collectionReferences,
-            item,
-            'del',
-            level
-          ),
-          ...makeIndexOpsForDocument<Record<string, any>>(
-            normalizedPath,
-            collection.name,
-            collectionIndexDefinitions,
-            item,
-            'del',
-            level
-          ),
-          // folder indices
-          ...makeIndexOpsForDocument(
-            normalizedPath,
-            `${collection.name}_${folderKey}`,
-            collectionIndexDefinitions,
-            item,
-            'del',
-            level
-          ),
-          {
-            type: 'del',
-            key: normalizedPath,
-            sublevel: rootSublevel,
-          },
-        ]);
+      if (isPartialReindex) {
+        const item = await rootSublevel.get(normalizedPath);
+        if (item) {
+          await database.contentLevel.batch([
+            ...makeRefOpsForDocument(
+              normalizedPath,
+              collection?.name,
+              collectionReferences,
+              item,
+              'del',
+              level
+            ),
+            ...makeIndexOpsForDocument<Record<string, any>>(
+              normalizedPath,
+              collection.name,
+              collectionIndexDefinitions,
+              item,
+              'del',
+              level
+            ),
+            // folder indices
+            ...makeIndexOpsForDocument(
+              normalizedPath,
+              `${collection.name}_${folderKey}`,
+              collectionIndexDefinitions,
+              item,
+              'del',
+              level
+            ),
+            {
+              type: 'del',
+              key: normalizedPath,
+              sublevel: rootSublevel,
+            },
+          ]);
+        }
       }
 
       if (!isGitKeep(filepath, collection)) {
