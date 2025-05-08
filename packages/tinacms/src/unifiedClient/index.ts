@@ -74,7 +74,7 @@ export class TinaClient<GenQueries> {
         typeof window === 'undefined' &&
         typeof require !== 'undefined'
       ) {
-        const { NodeCache } = await import('../cache/node-cache');
+        const { NodeCache } = await import('../cache/node-cache.js');
         this.cache = await NodeCache(this.cacheDir);
         this.cacheLock = new AsyncLock();
       }
