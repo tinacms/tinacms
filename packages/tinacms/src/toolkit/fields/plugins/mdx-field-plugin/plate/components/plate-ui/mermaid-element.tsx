@@ -1,5 +1,5 @@
 import { withRef } from '@udecode/cn';
-import { PlateElement } from '@udecode/plate-common';
+import { PlateElement } from '@udecode/plate/react';
 import { Eye, SquarePen } from 'lucide-react';
 import mermaid from 'mermaid';
 import React, { useEffect, useRef, useState } from 'react';

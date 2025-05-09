@@ -4,7 +4,7 @@ import { withRef } from '@udecode/cn';
 import { Icons } from './icons';
 
 import { ToolbarButton } from './toolbar';
-import { useEditorState } from '@udecode/plate-common';
+import { useEditorState } from '@udecode/plate/react';
 import { helpers } from '../../plugins/core/common';
 import { ELEMENT_IMG, insertImg } from '../../plugins/create-img-plugin';
 import { useCMS } from '@toolkit/react-core';

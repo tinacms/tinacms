@@ -1,43 +1,41 @@
-import {
-  type AutoformatRule,
-  ELEMENT_LI,
-  ELEMENT_OL,
-  ELEMENT_TODO_LI,
-  ELEMENT_UL,
-} from '@udecode/plate';
 import { formatList, preFormat } from './autoformat-utils';
-import { isBlock, setNodes } from '@udecode/plate-common';
+import { AutoformatRule } from '@udecode/plate-autoformat';
+import {
+  BulletedListPlugin,
+  ListItemPlugin,
+  NumberedListPlugin,
+  TodoListPlugin,
+} from '@udecode/plate-list/react';
 
 export const autoformatLists: AutoformatRule[] = [
   {
     mode: 'block',
-    type: ELEMENT_LI,
+    type: ListItemPlugin.key,
     match: ['* ', '- '],
     preFormat,
-    format: (editor) => formatList(editor, ELEMENT_UL),
+    format: (editor) => formatList(editor, BulletedListPlugin.key),
   },
   {
     mode: 'block',
-    type: ELEMENT_LI,
+    type: ListItemPlugin.key,
     match: ['1. ', '1) '],
     preFormat,
-    format: (editor) => formatList(editor, ELEMENT_OL),
+    format: (editor) => formatList(editor, NumberedListPlugin.key),
   },
   {
     mode: 'block',
-    type: ELEMENT_TODO_LI,
+    type: TodoListPlugin.key,
     match: '[] ',
   },
   {
     mode: 'block',
-    type: ELEMENT_TODO_LI,
+    type: TodoListPlugin.key,
     match: '[x] ',
     format: (editor) =>
-      setNodes(
-        editor,
-        { type: ELEMENT_TODO_LI, checked: true },
+      editor.tf.setNodes(
+        { type: TodoListPlugin.key, checked: true },
         {
-          match: (n) => isBlock(editor, n),
+          match: (n) => editor.api.isBlock(n),
         }
       ),
   },

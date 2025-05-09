@@ -1,20 +1,14 @@
-import { ELEMENT_CODE_BLOCK } from '@udecode/plate';
-import {
-  getPluginType,
-  insertNode,
-  isSelectionAtBlockStart,
-  type PlateEditor,
-  setElements,
-  someNode,
-  type TElement,
-} from '@udecode/plate-common';
+import { TElement } from '@udecode/plate';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { PlateEditor } from '@udecode/plate/react';
 
+//TODO (Plate Upgrade): Do we need this? what is the different between this and "import { insertEmptyCodeBlock } from '@udecode/plate-code-block';"
 export const insertEmptyCodeBlock = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
-    node.type === getPluginType(editor, ELEMENT_CODE_BLOCK);
+    node.type === editor.getType(CodeBlockPlugin);
 
   if (
-    someNode(editor, {
+    editor.api.some({
       match: matchCodeElements,
     })
   ) {
@@ -22,16 +16,16 @@ export const insertEmptyCodeBlock = (editor: PlateEditor) => {
   }
 
   const node = {
-    type: ELEMENT_CODE_BLOCK,
+    type: CodeBlockPlugin.key,
     value: '',
     // TODO: this can probably be a config option
     lang: 'javascript',
     children: [{ type: 'text', text: '' }],
   };
 
-  if (isSelectionAtBlockStart(editor)) {
-    setElements(editor, node);
+  if (editor.api.isAt({ start: true })) {
+    editor.tf.setNodes(node);
   } else {
-    insertNode(editor, node);
+    editor.tf.insertNode(node);
   }
 };

@@ -1,5 +1,4 @@
-import { ELEMENT_TABLE } from '@udecode/plate';
-import { useEditorState } from '@udecode/plate-common';
+import { useEditorState } from '@udecode/plate/react';
 import React from 'react';
 import { useResize } from '../hooks/use-resize';
 import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
@@ -17,24 +16,26 @@ import { useToolbarContext } from '../toolbar/toolbar-provider';
 import { HeadingsMenu } from './headings-dropdown';
 import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button';
 import { ImageToolbarButton } from './plate-ui/image-toolbar-button';
-import {
-  OrderedListToolbarButton,
-  UnorderedListToolbarButton,
-} from './plate-ui/indent-list-toolbar-button';
 import { LinkToolbarButton } from './plate-ui/link-toolbar-button';
 import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button';
 import OverflowMenu from './plate-ui/overflow-menu';
 import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button';
 import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button';
-import { TableDropdownMenu } from './plate-ui/table-dropdown-menu';
 import TemplatesToolbarButton from './plate-ui/templates-toolbar-button';
 import { ToolbarGroup } from './plate-ui/toolbar';
 import {
   BoldToolbarButton,
-  StrikethroughToolbarButton,
-  ItalicToolbarButton,
   CodeToolbarButton,
+  ItalicToolbarButton,
+  StrikethroughToolbarButton,
 } from './plate-ui/mark-toolbar-button';
+import { TablePlugin } from '@udecode/plate-table/react';
+import {
+  BulletedListPlugin,
+  NumberedListPlugin,
+} from '@udecode/plate-list/react';
+import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
+import { TableDropdownMenu } from './plate-ui/table/table-dropdown-menu';
 
 type ToolbarItem = {
   label: string;
@@ -71,12 +72,12 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
   ul: {
     label: 'Unordered List',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <UnorderedListToolbarButton />,
+    Component: <ListToolbarButton nodeType={BulletedListPlugin.key} />,
   },
   ol: {
     label: 'Ordered List',
     width: () => STANDARD_ICON_WIDTH,
-    Component: <OrderedListToolbarButton />,
+    Component: <ListToolbarButton nodeType={NumberedListPlugin.key} />,
   },
   bold: {
     label: 'Bold',
@@ -154,7 +155,7 @@ export default function FixedToolbarButtons() {
   }
 
   const editorState = useEditorState();
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE);
+  const userInTable = helpers.isNodeActive(editorState, TablePlugin.key);
   if (userInTable) {
     items = items.filter((item) => !unsupportedItemsInTable.has(item.label));
   }

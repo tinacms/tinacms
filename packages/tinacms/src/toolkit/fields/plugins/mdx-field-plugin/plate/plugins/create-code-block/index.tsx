@@ -1,22 +1,31 @@
-import { createPluginFactory } from '@udecode/plate-common';
+import { createPlatePlugin } from '@udecode/plate/react';
 
-export const createCodeBlockPlugin = createPluginFactory({
+//TODO : Test this function in UI, not sure if it works after replace with latest api
+export const createCodeBlockPlugin = createPlatePlugin({
   key: 'code_block',
-  isElement: true,
-  isVoid: true,
-  isInline: false,
+  options: {
+    isElement: true,
+    isVoid: true,
+    isInline: false,
+  },
 });
 
-export const createHTMLBlockPlugin = createPluginFactory({
+//TODO : Test this function in UI, not sure if it works after replace with latest api
+export const createHTMLBlockPlugin = createPlatePlugin({
   key: 'html',
-  isElement: true,
-  isVoid: true,
-  isInline: false,
+  options: {
+    isElement: true,
+    isVoid: true,
+    isInline: false,
+  },
 });
 
-export const createHTMLInlinePlugin = createPluginFactory({
+//TODO : Test this function in UI, not sure if it works after replace with latest api
+export const createHTMLInlinePlugin = createPlatePlugin({
   key: 'html_inline',
-  isElement: true,
-  isVoid: true,
-  isInline: true,
+  options: {
+    isElement: true,
+    isVoid: true,
+    isInline: true,
+  },
 });

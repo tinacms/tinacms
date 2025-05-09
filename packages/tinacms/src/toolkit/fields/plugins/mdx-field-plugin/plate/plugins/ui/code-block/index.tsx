@@ -1,22 +1,15 @@
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
-import {
-  ELEMENT_DEFAULT,
-  type PlateEditor,
-  type TElement,
-  findNodePath,
-  focusEditor,
-  getPointAfter,
-  getPointBefore,
-  insertNodes,
-  isCollapsed,
-  isElement,
-  setNodes,
-} from '@udecode/plate-common';
+
 import type * as monaco from 'monaco-editor';
 import React from 'react';
-import { useSelected } from 'slate-react';
 import { Autocomplete } from '../autocomplete';
 import { uuid } from '../helpers';
+import { ElementApi, TElement } from '@udecode/plate';
+import {
+  ParagraphPlugin,
+  PlateEditor,
+  useSelected,
+} from '@udecode/plate/react';
 
 type Monaco = typeof monaco;
 
@@ -73,7 +66,7 @@ export const CodeBlock = ({
   const [height, setHeight] = React.useState(MINIMUM_HEIGHT);
 
   React.useEffect(() => {
-    if (selected && isCollapsed(editor.selection)) {
+    if (selected && editor.api.isCollapsed()) {
       retryFocus(monacoEditorRef);
     }
   }, [selected, monacoEditorRef.current]);
@@ -126,9 +119,8 @@ export const CodeBlock = ({
       switch (navigateAway) {
         case 'remove':
           {
-            focusEditor(editor);
-            setNodes(
-              editor,
+            editor.tf.focus();
+            editor.tf.setNodes(
               {
                 type: 'p',
                 children: [{ text: '' }],
@@ -137,7 +129,7 @@ export const CodeBlock = ({
               },
               {
                 match: (n) => {
-                  if (isElement(n) && n.type === element.type) {
+                  if (ElementApi.isElement(n) && n.type === element.type) {
                     return true;
                   }
                 },
@@ -147,11 +139,10 @@ export const CodeBlock = ({
           break;
         case 'insertNext':
           {
-            insertNodes(
-              editor,
+            editor.tf.insertNodes(
               [
                 {
-                  type: ELEMENT_DEFAULT,
+                  type: ParagraphPlugin.key,
                   children: [{ text: '' }],
                   lang: undefined,
                   value: undefined,
@@ -159,23 +150,22 @@ export const CodeBlock = ({
               ],
               { select: true }
             );
-            focusEditor(editor);
+            editor.tf.focus();
           }
           break;
         case 'up':
           {
-            const path = findNodePath(editor, element);
+            const path = editor.api.findPath(element);
             if (!path) {
               return; // Not sure if/when this would happen
             }
-            const previousNodePath = getPointBefore(editor, path);
+            const previousNodePath = editor.api.before(path);
             if (!previousNodePath) {
-              focusEditor(editor);
-              insertNodes(
-                editor,
+              editor.tf.focus();
+              editor.tf.insertNodes(
                 [
                   {
-                    type: ELEMENT_DEFAULT,
+                    type: ParagraphPlugin.key,
                     children: [{ text: '' }],
                     lang: undefined,
                     value: undefined,
@@ -188,23 +178,22 @@ export const CodeBlock = ({
               return;
             }
 
-            focusEditor(editor, previousNodePath);
+            editor.tf.focus({ at: previousNodePath });
           }
           break;
         case 'down': {
-          const path = findNodePath(editor, element);
+          const path = editor.api.findPath(element);
           if (!path) {
             return; // Not sure if/when this would happen
           }
 
-          const nextNodePath = getPointAfter(editor, path);
+          const nextNodePath = editor.api.after(path);
           if (!nextNodePath) {
             // No next children, insert an empty block
-            insertNodes(
-              editor,
+            editor.tf.insertNodes(
               [
                 {
-                  type: ELEMENT_DEFAULT,
+                  type: ParagraphPlugin.key,
                   children: [{ text: '' }],
                   lang: undefined,
                   value: undefined,
@@ -212,9 +201,9 @@ export const CodeBlock = ({
               ],
               { select: true }
             );
-            focusEditor(editor);
+            editor.tf.focus();
           } else {
-            focusEditor(editor, nextNodePath);
+            editor.tf.focus({ at: nextNodePath });
           }
           break;
         }
@@ -236,7 +225,7 @@ export const CodeBlock = ({
       monacoEditor.layout();
     });
     // Set Default
-    setNodes(editor, { value: defaultValue, lang: language });
+    editor.tf.setNodes({ value: defaultValue, lang: language });
 
     monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       if (monacoEditor.hasTextFocus()) {
@@ -299,7 +288,7 @@ export const CodeBlock = ({
               items={items}
               value={currentItem}
               defaultQuery={'plaintext'}
-              onChange={(item) => setNodes(editor, { lang: item.key })}
+              onChange={(item) => editor.tf.setNodes({ lang: item.key })}
             />
           </div>
         )}
@@ -343,7 +332,7 @@ export const CodeBlock = ({
               // FIXME: if a void is focused first, onChange doesn't fire until
               // https://github.com/udecode/plate/issues/1519#issuecomment-1184933602
               onChangeCallback?.(value);
-              setNodes(editor, { value, lang: language });
+              editor.tf.setNodes({ value, lang: language });
             }}
           />
         </div>
