@@ -29,7 +29,7 @@ export const TEMPLATES: Template[] = [
   },
   {
     title: '⭐️ TinaDocs',
-    description: 'Get your documentation site up and running with TinaCMS and Next.JS in minutes',
+    description: 'Get your documentation site up and running with TinaCMS and Next.JS in minutes. TEST TEST TEST',
     value: 'tina-docs',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-docs',
