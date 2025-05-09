@@ -3,7 +3,7 @@ import { copy } from 'fs-extra';
 import path from 'path';
 import { log, TextStyles } from './util/logger';
 
-type BaseExample = {
+export type BaseExample = {
   title: string;
   description?: string;
   value: string;
