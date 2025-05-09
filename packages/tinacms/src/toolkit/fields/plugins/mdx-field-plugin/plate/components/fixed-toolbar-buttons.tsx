@@ -104,12 +104,11 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     width: () => STANDARD_ICON_WIDTH,
     Component: <CodeBlockToolbarButton />,
   },
-  //TODO(Plate Upgrade): Renable this after plugin rewrite in latest plate version
-  // mermaid: {
-  //   label: 'Mermaid',
-  //   width: () => STANDARD_ICON_WIDTH,
-  //   Component: <MermaidToolbarButton />,
-  // },
+  mermaid: {
+    label: 'Mermaid',
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <MermaidToolbarButton />,
+  },
   table: {
     label: 'Table',
     width: () => STANDARD_ICON_WIDTH,

@@ -18,7 +18,6 @@ import FloatingToolbarButtons from './components/floating-toolbar-buttons';
 import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar';
 import { isUrl } from './transforms/is-url';
 import { ToolbarProvider } from './toolbar/toolbar-provider';
-import { createMermaidPlugin } from './plugins/custom/mermaid-plugin';
 import { Plate, usePlateEditor } from '@udecode/plate/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
 import { useCreateEditor } from './hooks/use-create-editor';

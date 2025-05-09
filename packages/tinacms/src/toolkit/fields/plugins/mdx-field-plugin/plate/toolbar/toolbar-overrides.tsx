@@ -10,7 +10,7 @@ export type ToolbarOverrideType =
   | 'bold'
   | 'strikethrough'
   | 'italic'
-  // | 'mermaid' //TODO(Plate Upgrade): Renable this after plugin rewrite in latest plate version
+  | 'mermaid'
   | 'raw'
   | 'embed'
   | 'table';

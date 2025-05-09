@@ -3,7 +3,7 @@ import { createPlatePlugin } from '@udecode/plate/react';
 export const ELEMENT_MERMAID = 'mermaid';
 
 export const createMermaidPlugin = createPlatePlugin({
-  options: {
+  node: {
     isElement: true,
     isVoid: true,
     isInline: false,

@@ -1,42 +1,9 @@
+import { NodeApi } from '@udecode/plate';
+import { getListItemEntry } from '@udecode/plate-list';
+import { type PlateEditor } from '@udecode/plate/react';
 import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
 import { HANDLES_MDX } from './formatting';
-import { type PlateEditor } from '@udecode/plate/react';
-import {
-  BasicMarksPlugin,
-  UnderlinePlugin,
-} from '@udecode/plate-basic-marks/react';
-import { HeadingPlugin } from '@udecode/plate-heading/react';
-import { ParagraphPlugin } from '@udecode/plate/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
-import { getListItemEntry } from '@udecode/plate-list';
-import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { ListPlugin } from '@udecode/plate-list/react';
-import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
-import { IndentListPlugin } from '@udecode/plate-indent-list/react';
-import { NodeIdPlugin } from '@udecode/plate-node-id';
-import { TablePlugin } from '@udecode/plate-table/react';
-import { SlashPlugin } from '@udecode/plate-slash-command/react';
-import { NodeApi } from '@udecode/plate';
-
-//TODO: Remove this plugins once it is fully migrated to the editor plugin files
-export const plugins = [
-  // BasicMarksPlugin,
-  // HeadingPlugin,
-  // ParagraphPlugin,
-  // CodeBlockPlugin,
-  // createHTMLBlockPlugin(),
-  // createHTMLInlinePlugin(),
-  // BlockquotePlugin,
-  // UnderlinePlugin,
-  // ListPlugin,
-  // IndentListPlugin,
-  // HorizontalRulePlugin,
-  // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
-  // NodeIdPlugin,
-  // SlashPlugin,
-  // TablePlugin,
-];
 
 export const unsupportedItemsInTable = new Set([
   'Code Block',

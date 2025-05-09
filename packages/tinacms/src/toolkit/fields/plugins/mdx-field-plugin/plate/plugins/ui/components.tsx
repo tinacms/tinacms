@@ -10,7 +10,6 @@ import { MermaidElement } from '../../components/plate-ui/mermaid-element';
 import { SlashInputElement } from '../../components/plate-ui/slash-input-element';
 import { ELEMENT_MERMAID } from '../custom/mermaid-plugin';
 import { classNames } from './helpers';
-import { HEADING_KEYS } from '@udecode/plate-heading';
 import {
   TableCellHeaderPlugin,
   TableCellPlugin,
@@ -48,6 +47,7 @@ import { ParagraphElement } from '../../components/plate-ui/paragraph-element';
 import { TableCellElement, TableCellHeaderElement } from '../../components/plate-ui/table/table-cell-element';
 import { TableElement } from '../../components/plate-ui/table/table-element';
 import { TableRowElement } from '../../components/plate-ui/table/table-row-element';
+import { HEADING_KEYS } from '@udecode/plate-heading';
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it

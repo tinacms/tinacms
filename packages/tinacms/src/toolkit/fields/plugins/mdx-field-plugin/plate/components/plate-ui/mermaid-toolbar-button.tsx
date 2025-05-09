@@ -7,6 +7,7 @@ import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { TElement } from '@udecode/plate';
 
+//TODO : Could not find any reference , do we need this ?
 export const insertEmptyMermaid = (editor: PlateEditor) => {
   const matchCodeElements = (node: TElement) =>
     node.type === editor.getType({ key: ELEMENT_MERMAID });
@@ -46,7 +47,7 @@ const useMermaidToolbarButton = (state) => {
   const editor = useEditorState();
 
   const onClick = () => {
-    editor.tf.insertNodes(editor.api.create.block({ type: 'mermaid' }), {
+    editor.tf.insertNodes(editor.api.create.block({ type: ELEMENT_MERMAID }), {
       nextBlock: true,
       select: true,
     });

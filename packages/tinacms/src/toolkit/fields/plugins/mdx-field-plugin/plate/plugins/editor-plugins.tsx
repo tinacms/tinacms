@@ -27,6 +27,7 @@ import { ResetNodePlugin } from "@udecode/plate-reset-node/react";
 import { createInvalidMarkdownPlugin } from "./create-invalid-markdown-plugin";
 import createImgPlugin from "./create-img-plugin";
 import { createMdxBlockPlugin, createMdxInlinePlugin } from "./create-mdx-plugins";
+import { createMermaidPlugin } from "./custom/mermaid-plugin";
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -65,11 +66,10 @@ export const viewPlugins = [
 
 // Editor Plugins: Functional and formatting plugins
 export const editorPlugins = [
-  //   //TODO(Plate Upgrade) : Enable these plugins, they are temporary disable due to plate upgrade (giving some error, we need to deal with it later before plate upgrade can be released)
   createMdxBlockPlugin,
   createMdxInlinePlugin,
   createImgPlugin,
-  //   // createMermaidPlugin(),
+  createMermaidPlugin,
   createInvalidMarkdownPlugin,
   LinkPlugin.configure({
     options: {
