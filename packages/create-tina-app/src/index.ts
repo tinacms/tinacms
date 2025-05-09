@@ -178,9 +178,8 @@ export async function run() {
     await downloadTemplate(template, rootDir);
 
     if (themeChoice) {
-      await writeFile(path.join(rootDir, '.theme.json'), JSON.stringify({
-        theme: themeChoice,
-      }), 'utf-8');
+      // usually dangerous to write to .env, but we're in a fresh project
+      await writeFile(path.join(rootDir, '.env'), `THEME=${themeChoice}`, 'utf-8');
     }
 
     updateProjectPackageName(rootDir, projectName);
