@@ -18,6 +18,7 @@ import { log, TextStyles } from './util/logger';
 import { exit } from 'node:process';
 import validate from 'validate-npm-package-name';
 import { THEMES } from './themes';
+import { writeFile } from 'fs/promises';
 
 /**
  * The available package managers a user can use.
@@ -175,6 +176,13 @@ export async function run() {
 
   try {
     await downloadTemplate(template, rootDir);
+
+    if (themeChoice) {
+      await writeFile(path.join(rootDir, '.theme.json'), JSON.stringify({
+        theme: themeChoice,
+      }), 'utf-8');
+    }
+
     updateProjectPackageName(rootDir, projectName);
     updateProjectPackageVersion(rootDir, '0.0.1');
   } catch (err) {
