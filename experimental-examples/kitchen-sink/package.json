@@ -23,5 +23,5 @@
 		"eslint-config-next": "^14.2.24",
 		"typescript": "^5.7.3"
 	},
-	"version": "0.1"
+	"version": null
 }

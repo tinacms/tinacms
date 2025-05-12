@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/cli",
-	"version": "1.9.6",
+	"version": "1.9.7",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
 	"files": [
@@ -20,10 +20,10 @@
 			}
 		]
 	},
-    "peerDependencies": {
+	"peerDependencies": {
 		"react": ">=18.3.1 <20.0.0",
 		"react-dom": ">=18.3.1 <20.0.0"
-    },
+	},
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",
 		"@types/clear": "0.1.0",
