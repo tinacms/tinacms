@@ -6,8 +6,7 @@ import { Editor, ElementApi, NodeApi, PathApi, RangeApi } from '@udecode/plate';
  *
  * https://github.com/ianstormtaylor/slate/issues/3991#issuecomment-832160304
  */
-//TODO : Test this function in UI, not sure if it works after replace with latest api
-export const withCorrectVoidBehavior = (editor: Editor) => {
+export const withCorrectVoidBehavior = (editor) => {
   const { deleteBackward, insertBreak } = editor;
 
   // if current selection is void node, insert a default node below
