@@ -1,6 +1,6 @@
 {
 	"name": "next-tinacms-s3",
-	"version": "10.0.5",
+	"version": "10.0.6",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"files": [

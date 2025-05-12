@@ -1,6 +1,3 @@
-/**
-
-*/
 import { TinaSchema, Schema } from '@tinacms/schema-tools';
 
 import { validateSchema } from './validate';
