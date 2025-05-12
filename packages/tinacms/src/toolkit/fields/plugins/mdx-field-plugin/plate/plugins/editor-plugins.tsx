@@ -28,6 +28,8 @@ import { createInvalidMarkdownPlugin } from "./create-invalid-markdown-plugin";
 import createImgPlugin from "./create-img-plugin";
 import { createMdxBlockPlugin, createMdxInlinePlugin } from "./create-mdx-plugins";
 import { createMermaidPlugin } from "./custom/mermaid-plugin";
+import { createSlatePlugin } from "@udecode/plate";
+import { withCorrectVoidBehavior } from "./core/with-correct-void-behavior";
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -64,6 +66,10 @@ export const viewPlugins = [
   BlockquotePlugin,
 ] as const;
 
+const CorrectNodeBehaviorPlugin = createSlatePlugin({
+  key: 'WITH_CORRECT_NODE_BEHAVIOR',
+}).overrideEditor(withCorrectVoidBehavior);
+
 // Editor Plugins: Functional and formatting plugins
 export const editorPlugins = [
   createMdxBlockPlugin,
@@ -71,6 +77,7 @@ export const editorPlugins = [
   createImgPlugin,
   createMermaidPlugin,
   createInvalidMarkdownPlugin,
+  CorrectNodeBehaviorPlugin,
   LinkPlugin.configure({
     options: {
       // Custom validation function to allow relative links, e.g., /about
