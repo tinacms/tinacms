@@ -1,5 +1,5 @@
 {
-	"name": "kitchen-sink-starter",
+	"name": "@experimental-examples/kitchen-sink-starter",
 	"private": true,
 	"scripts": {
 		"dev": "tinacms dev -c \"next dev\"",
