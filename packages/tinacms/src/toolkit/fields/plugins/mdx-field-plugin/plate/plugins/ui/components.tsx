@@ -44,7 +44,10 @@ import {
 import { LinkPlugin } from '@udecode/plate-link/react';
 import { SlashInputPlugin } from '@udecode/plate-slash-command/react';
 import { ParagraphElement } from '../../components/plate-ui/paragraph-element';
-import { TableCellElement, TableCellHeaderElement } from '../../components/plate-ui/table/table-cell-element';
+import {
+  TableCellElement,
+  TableCellHeaderElement,
+} from '../../components/plate-ui/table/table-cell-element';
 import { TableElement } from '../../components/plate-ui/table/table-element';
 import { TableRowElement } from '../../components/plate-ui/table/table-row-element';
 import { HEADING_KEYS } from '@udecode/plate-heading';
@@ -227,9 +230,7 @@ export const Components = () => {
     ),
     [CodePlugin.key]: CodeLeaf,
     [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
-    [StrikethroughPlugin.key]: ({ editor, leaf, text, ...props }) => (
-      <s {...props.attributes} {...props} />
-    ),
+    [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
     [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),
     [BoldPlugin.key]: withProps(PlateLeaf, { as: 'strong' }),
     [HorizontalRulePlugin.key]: ({
@@ -256,6 +257,6 @@ export const Components = () => {
     [TableCellHeaderPlugin.key]: TableCellHeaderElement,
     [TableCellPlugin.key]: TableCellElement,
     [TablePlugin.key]: TableElement,
-    [TableRowPlugin.key]: TableRowElement,  
+    [TableRowPlugin.key]: TableRowElement,
   };
 };

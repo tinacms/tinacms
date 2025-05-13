@@ -2,9 +2,7 @@
 
 import type { Value } from '@udecode/plate';
 
-import {
-  usePlateEditor
-} from '@udecode/plate/react';
+import { usePlateEditor } from '@udecode/plate/react';
 
 export const useCreateEditor = ({
   plugins,
@@ -13,16 +11,11 @@ export const useCreateEditor = ({
 }: {
   plugins: any[];
   value: Value;
-  components?:  Record<string, any>;
+  components?: Record<string, any>;
 }) => {
-  return usePlateEditor<Value, typeof plugins[number]>(
-    {
-      plugins,
-      value,
-      override: {
-        components,
-      },
-    },
-    []
-  );
+  return usePlateEditor<Value, (typeof plugins)[number]>({
+    plugins,
+    value,
+    components,
+  });
 };

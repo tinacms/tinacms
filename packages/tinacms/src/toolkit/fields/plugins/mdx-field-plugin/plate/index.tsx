@@ -1,27 +1,18 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Components } from './plugins/ui/components';
 import { helpers } from './plugins/core/common';
-import {
-  createMdxBlockPlugin,
-  createMdxInlinePlugin,
-} from './plugins/create-mdx-plugins';
-import createImgPlugin from './plugins/create-img-plugin';
-import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin';
 import { uuid } from './plugins/ui/helpers';
 import type { RichTextType } from '..';
-import { Editor } from './components/editor';
+import { Editor, EditorContainer } from './components/editor';
 import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
 import { TooltipProvider } from './components/plate-ui/tooltip';
 import FixedToolbarButtons from './components/fixed-toolbar-buttons';
-import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
-import FloatingToolbarButtons from './components/floating-toolbar-buttons';
-import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar';
-import { isUrl } from './transforms/is-url';
 import { ToolbarProvider } from './toolbar/toolbar-provider';
 import { Plate, usePlateEditor } from '@udecode/plate/react';
-import { LinkPlugin } from '@udecode/plate-link/react';
 import { useCreateEditor } from './hooks/use-create-editor';
 import { editorPlugins } from './plugins/editor-plugins';
+import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
+import FloatingToolbarButtons from './components/floating-toolbar-buttons';
 
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(
@@ -32,70 +23,69 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
     []
   );
 
-  console.log("♻️ Initial Value", initialValue)
-  
+  console.log('♻️ Initial Value', initialValue);
+
   // This should be a plugin customization
-  const tempId = [tinaForm.id, input.name].join('.');
-  const id = React.useMemo(() => uuid() + tempId, [tempId]);
   const ref = React.useRef<HTMLDivElement>(null);
 
   const editor = useCreateEditor({
     plugins: [...editorPlugins],
     value: initialValue,
-    components: Components()
+    components: Components(),
   });
 
-  React.useEffect(() => {
-    if (ref.current) {
-      setTimeout(() => {
-        // Slate/Plate doesn't expose it's underlying element
-        // as a ref, so we need to query for it ourselves
-        const plateElement = ref.current?.querySelector(
-          '[role="textbox"]'
-        ) as HTMLElement;
-        if (field.experimental_focusIntent && plateElement) {
-          if (plateElement) plateElement.focus();
-        }
-        // Slate takes a second to mount
-      }, 100);
-    }
-  }, [field.experimental_focusIntent, ref]);
-
+  // React.useEffect(() => {
+  //   if (ref.current) {
+  //     setTimeout(() => {
+  //       // Slate/Plate doesn't expose it's underlying element
+  //       // as a ref, so we need to query for it ourselves
+  //       const plateElement = ref.current?.querySelector(
+  //         '[role="textbox"]'
+  //       ) as HTMLElement;
+  //       if (field.experimental_focusIntent && plateElement) {
+  //         if (plateElement) plateElement.focus();
+  //       }
+  //       // Slate takes a second to mount
+  //     }, 100);
+  //   }
+  // }, [field.experimental_focusIntent, ref]);
+  //
   return (
     <div ref={ref}>
       <Plate
         editor={editor}
         onChange={(value) => {
-
-          console.log("changes 🎯",value.value)
+          console.log('changes 🎯', value.value);
           input.onChange({
             type: 'root',
             //TODO(Plate upgrade) : Check with Jeff, value.value is used because the new Plate seperate the editor instance and causing the editor to passed as well int he value change, so value.value is a quick work around to extract the value of the editor (if not we will have error down the track to the final form, circular dependency error)
-            children: value.value, 
+            children: value.value,
           });
         }}
       >
-        <TooltipProvider>
-          <ToolbarProvider
-            tinaForm={tinaForm}
-            templates={field.templates}
-            overrides={
-              field?.toolbarOverride ? field.toolbarOverride : field.overrides
-            }
-          >
-            <FixedToolbar>
-              <FixedToolbarButtons />
-            </FixedToolbar>
-            {field?.overrides?.showFloatingToolbar !== false ? (
-              //TODO(Plate Upgrade) : Floating toolbar causing error, i think they have new way of writing floating toolbar (seems like they had replace with plugin), do we still want floating toolbar plugin
-              // <FloatingToolbar>
-              //   <FloatingToolbarButtons />
-              // </FloatingToolbar>
+        <EditorContainer>
+          <TooltipProvider>
+            <ToolbarProvider
+              tinaForm={tinaForm}
+              templates={field.templates}
+              overrides={
+                field?.toolbarOverride ? field.toolbarOverride : field.overrides
+              }
+            >
               <></>
-            ) : null}
-          </ToolbarProvider>
-          <Editor />
-        </TooltipProvider>
+              <FixedToolbar>
+                <FixedToolbarButtons />
+              </FixedToolbar>
+              {/* {field?.overrides?.showFloatingToolbar !== false ? (
+              {/*   //TODO(Plate Upgrade) : Floating toolbar causing error, i think they have new way of writing floating toolbar (seems like they had replace with plugin), do we still want floating toolbar plugin */}
+              <FloatingToolbar>
+                <FloatingToolbarButtons />
+              </FloatingToolbar>
+              {/* ) : null} */}
+            </ToolbarProvider>
+            <Editor />
+          </TooltipProvider>
+        </EditorContainer>
       </Plate>
     </div>
   );
