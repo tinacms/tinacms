@@ -13,7 +13,7 @@ export const Prism = (props: {
   return (
     <Highlight
       theme={themes[props.theme || 'github']}
-      code={props.value}
+      code={props.value || ''}
       language={props.lang || ''}
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
