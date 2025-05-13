@@ -1,5 +1,5 @@
 {
-	"name": "starter-empty",
+	"name": "@examples/starter-empty",
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
