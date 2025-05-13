@@ -30,6 +30,7 @@ import ScreenPage from './pages/ScreenPage';
 
 import { Client } from '../internalClient';
 import { TinaAdminApi } from './api';
+import AuthCallback from './components/AuthCallback';
 import { IndexingPage } from './pages/IndexingPage';
 
 const Redirect = () => {
@@ -312,6 +313,17 @@ export const TinaAdmin = ({
                       element={
                         <DefaultWrapper cms={cms}>
                           <ScreenPage />
+                        </DefaultWrapper>
+                      }
+                    />
+                    <Route
+                      path='auth/callback'
+                      element={
+                        <DefaultWrapper cms={cms}>
+                          <AuthCallback
+                            clientId={tinaClient.clientId}
+                            identityApiUrl={tinaClient.identityApiUrl}
+                          />
                         </DefaultWrapper>
                       }
                     />
