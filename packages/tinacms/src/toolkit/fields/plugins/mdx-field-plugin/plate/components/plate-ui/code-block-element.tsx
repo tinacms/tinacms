@@ -1,25 +1,22 @@
 'use client';
-
-import React from 'react';
-
-import { cn, withRef } from '@udecode/cn';
-import { PlateElement } from '@udecode/plate/react';
+import * as React from 'react';
+import { NodeApi } from '@udecode/plate';
+import {
+  type TCodeBlockElement,
+  formatCodeBlock,
+  isLangSupported,
+} from '@udecode/plate-code-block';
+import { type PlateElementProps, PlateElement } from '@udecode/plate/react';
+import { BracesIcon, CheckIcon, CopyIcon } from 'lucide-react';
+import { Button } from './button';
 import { CodeBlock } from '../../plugins/ui/code-block';
-import { useCodeBlockElementState } from '@udecode/plate-code-block/react';
 
-export const CodeBlockElement = withRef<typeof PlateElement>(
-  ({ className, ...props }, ref) => {
-    const { element } = props;
-    const state = useCodeBlockElementState({ element });
+export function CodeBlockElement(props: PlateElementProps<TCodeBlockElement>) {
+  const { editor, element } = props;
 
-    return (
-      <PlateElement
-        className={cn('relative py-1', state.className, className)}
-        ref={ref}
-        {...props}
-      >
-        <CodeBlock {...props} />
-      </PlateElement>
-    );
-  }
-);
+  return (
+    <PlateElement className='relative py-1' {...props}>
+      <CodeBlock {...props} />
+    </PlateElement>
+  );
+}

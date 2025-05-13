@@ -13,21 +13,21 @@
     "update-tina-lock": "tinacms dev --no-server"
   },
   "devDependencies": {
-    "@svgr/webpack": "^8.1.0",
+    "@svgr/webpack": "catalog:",
     "@tinacms/cli": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.13.1",
     "@types/react": "^18.3.18",
-    "@types/styled-components": "^5.1.34",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
-    "autoprefixer": "^10.4.20",
+    "@types/styled-components": "catalog:",
+    "@typescript-eslint/eslint-plugin": "catalog:",
+    "@typescript-eslint/parser": "catalog:",
+    "autoprefixer": "catalog:",
     "eslint": "^8.57.1",
     "postcss": "^8.5.2",
-    "postcss-import": "^14.1.0",
-    "postcss-nesting": "^10.2.0",
-    "tailwindcss": "^3.4.17",
-    "@tinacms/scripts": "workspace:*"
+    "postcss-import": "catalog:",
+    "postcss-nesting": "catalog:",
+    "tailwindcss": "^3.4.17"
   },
   "dependencies": {
     "@headlessui/react": "2.1.8",
