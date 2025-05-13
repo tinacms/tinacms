@@ -4,33 +4,729 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@ariakit/react':
+      specifier: ^0.4.15
+      version: 0.4.15
+    '@aws-sdk/client-s3':
+      specifier: ^3.744.0
+      version: 3.758.0
+    '@aws-sdk/s3-request-presigner':
+      specifier: ^3.744.0
+      version: 3.758.0
+    '@azure/storage-blob':
+      specifier: ^12.26.0
+      version: 12.26.0
+    '@biomejs/biome':
+      specifier: ^1.9.4
+      version: 1.9.4
+    '@changesets/changelog-github':
+      specifier: ^0.5.0
+      version: 0.5.1
+    '@changesets/cli':
+      specifier: 2.27.8
+      version: 2.27.8
+    '@clerk/backend':
+      specifier: 0.31.3
+      version: 0.31.3
+    '@clerk/clerk-js':
+      specifier: 4.56.2
+      version: 4.56.2
+    '@floating-ui/dom':
+      specifier: ^1.6.13
+      version: 1.6.13
+    '@floating-ui/react-dom':
+      specifier: ^2.1.2
+      version: 2.1.2
+    '@graphiql/toolkit':
+      specifier: 0.8.4
+      version: 0.8.4
+    '@graphql-codegen/core':
+      specifier: ^2.6.8
+      version: 2.6.8
+    '@graphql-codegen/typescript':
+      specifier: ^4.1.3
+      version: 4.1.5
+    '@graphql-codegen/typescript-operations':
+      specifier: ^4.4.1
+      version: 4.5.1
+    '@graphql-codegen/visitor-plugin-common':
+      specifier: ^4.1.2
+      version: 4.1.2
+    '@graphql-tools/graphql-file-loader':
+      specifier: ^7.5.17
+      version: 7.5.17
+    '@graphql-tools/load':
+      specifier: ^7.8.14
+      version: 7.8.14
+    '@graphql-tools/utils':
+      specifier: ^10.8.1
+      version: 10.8.4
+    '@iarna/toml':
+      specifier: ^2.2.5
+      version: 2.2.5
+    '@monaco-editor/react':
+      specifier: 4.4.5
+      version: 4.4.5
+    '@octokit/rest':
+      specifier: ^19.0.13
+      version: 19.0.13
+    '@playwright/test':
+      specifier: ^1.50.1
+      version: 1.51.0
+    '@puppeteer/replay':
+      specifier: ^1.3.2
+      version: 1.3.2
+    '@radix-ui/react-checkbox':
+      specifier: ^1.1.4
+      version: 1.1.4
+    '@radix-ui/react-dialog':
+      specifier: ^1.1.6
+      version: 1.1.6
+    '@radix-ui/react-dropdown-menu':
+      specifier: ^2.1.6
+      version: 2.1.6
+    '@radix-ui/react-icons':
+      specifier: ^1.3.2
+      version: 1.3.2
+    '@radix-ui/react-popover':
+      specifier: ^1.1.6
+      version: 1.1.6
+    '@radix-ui/react-separator':
+      specifier: ^1.1.2
+      version: 1.1.2
+    '@radix-ui/react-slot':
+      specifier: ^1.1.2
+      version: 1.2.2
+    '@radix-ui/react-toolbar':
+      specifier: ^1.1.2
+      version: 1.1.2
+    '@radix-ui/react-tooltip':
+      specifier: ^1.1.8
+      version: 1.1.8
+    '@react-hook/window-size':
+      specifier: ^3.1.1
+      version: 3.1.1
+    '@rollup/pluginutils':
+      specifier: ^5.1.4
+      version: 5.1.4
+    '@sucrase/jest-plugin':
+      specifier: ^3.0.0
+      version: 3.0.0
+    '@svgr/core':
+      specifier: 8.1.0
+      version: 8.1.0
+    '@svgr/webpack':
+      specifier: ^8.1.0
+      version: 8.1.0
+    '@tailwindcss/aspect-ratio':
+      specifier: ^0.4.2
+      version: 0.4.2
+    '@tailwindcss/container-queries':
+      specifier: ^0.1.1
+      version: 0.1.1
+    '@testing-library/dom':
+      specifier: ^10.4.0
+      version: 10.4.0
+    '@testing-library/jest-dom':
+      specifier: ^6.6.3
+      version: 6.6.3
+    '@testing-library/react':
+      specifier: ^16.2.0
+      version: 16.2.0
+    '@testing-library/user-event':
+      specifier: ^14.6.1
+      version: 14.6.1
+    '@types/atob':
+      specifier: ^2.1.4
+      version: 2.1.4
+    '@types/clear':
+      specifier: 0.1.0
+      version: 0.1.0
+    '@types/cli-spinner':
+      specifier: ^0.2.3
+      version: 0.2.3
+    '@types/codemirror':
+      specifier: ^5.60.15
+      version: 5.60.15
+    '@types/color-string':
+      specifier: ^1.5.5
+      version: 1.5.5
+    '@types/cross-spawn':
+      specifier: ^6.0.6
+      version: 6.0.6
+    '@types/express':
+      specifier: ^4.17.21
+      version: 4.17.21
+    '@types/figlet':
+      specifier: 1.2.0
+      version: 1.2.0
+    '@types/isomorphic-fetch':
+      specifier: ^0.0.35
+      version: 0.0.35
+    '@types/level':
+      specifier: ^6.0.3
+      version: 6.0.3
+    '@types/listr':
+      specifier: 0.14.2
+      version: 0.14.2
+    '@types/lodash.camelcase':
+      specifier: ^4.3.9
+      version: 4.3.9
+    '@types/lodash.debounce':
+      specifier: ^4.0.9
+      version: 4.0.9
+    '@types/lodash.flatten':
+      specifier: ^4.4.9
+      version: 4.4.9
+    '@types/lodash.get':
+      specifier: ^4.4.9
+      version: 4.4.9
+    '@types/lodash.upperfirst':
+      specifier: ^4.3.9
+      version: 4.3.9
+    '@types/log4js':
+      specifier: ^2.3.5
+      version: 2.3.5
+    '@types/lru-cache':
+      specifier: ^5.1.1
+      version: 5.1.1
+    '@types/mdast':
+      specifier: ^3.0.15
+      version: 3.0.15
+    '@types/micromatch':
+      specifier: ^4.0.9
+      version: 4.0.9
+    '@types/multer':
+      specifier: ^1.4.12
+      version: 1.4.12
+    '@types/normalize-path':
+      specifier: ^3.0.2
+      version: 3.0.2
+    '@types/picomatch':
+      specifier: ^3.0.2
+      version: 3.0.2
+    '@types/prettier':
+      specifier: ^2.7.3
+      version: 2.7.3
+    '@types/progress':
+      specifier: ^2.0.7
+      version: 2.0.7
+    '@types/prompts':
+      specifier: ^2.4.9
+      version: 2.4.9
+    '@types/prop-types':
+      specifier: ^15.7.14
+      version: 15.7.14
+    '@types/react-beautiful-dnd':
+      specifier: ^13.1.8
+      version: 13.1.8
+    '@types/react-color':
+      specifier: ^3.0.13
+      version: 3.0.13
+    '@types/search-index':
+      specifier: ^3.2.4
+      version: 3.2.4
+    '@types/styled-components':
+      specifier: ^5.1.34
+      version: 5.1.34
+    '@types/tar':
+      specifier: 6.1.13
+      version: 6.1.13
+    '@types/unist':
+      specifier: ^2.0.11
+      version: 2.0.11
+    '@types/ws':
+      specifier: ^7.4.7
+      version: 7.4.7
+    '@typescript-eslint/eslint-plugin':
+      specifier: ^5.62.0
+      version: 5.62.0
+    '@typescript-eslint/parser':
+      specifier: ^5.62.0
+      version: 5.62.0
+    '@udecode/cn':
+      specifier: ^48.0.3
+      version: 48.0.3
+    '@udecode/plate':
+      specifier: ^48.0.3
+      version: 48.0.3
+    '@udecode/plate-autoformat':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-basic-marks':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-block-quote':
+      specifier: ^48
+      version: 48.0.0
+    '@udecode/plate-break':
+      specifier: ^48
+      version: 48.0.0
+    '@udecode/plate-code-block':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-combobox':
+      specifier: ^48
+      version: 48.0.0
+    '@udecode/plate-dnd':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-floating':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-heading':
+      specifier: ^48
+      version: 48.0.0
+    '@udecode/plate-horizontal-rule':
+      specifier: ^48
+      version: 48.0.0
+    '@udecode/plate-indent-list':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-link':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-list':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-node-id':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-reset-node':
+      specifier: ^48
+      version: 48.0.0
+    '@udecode/plate-resizable':
+      specifier: ^48
+      version: 48.0.0
+    '@udecode/plate-selection':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-slash-command':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-table':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/plate-trailing-block':
+      specifier: ^48.0.0
+      version: 48.0.0
+    '@udecode/slate':
+      specifier: ^48.0.1
+      version: 48.0.1
+    '@vercel/stega':
+      specifier: ^0.0.5
+      version: 0.0.5
+    '@vitejs/plugin-react':
+      specifier: 3.1.0
+      version: 3.1.0
+    abstract-level:
+      specifier: ^1.0.4
+      version: 1.0.4
+    acorn:
+      specifier: 8.8.2
+      version: 8.8.2
+    altair-express-middleware:
+      specifier: ^7.3.6
+      version: 7.3.6
+    async-lock:
+      specifier: ^1.4.1
+      version: 1.4.1
+    auto-bind:
+      specifier: ^4.0.0
+      version: 4.0.0
+    autoprefixer:
+      specifier: ^10.4.20
+      version: 10.4.21
+    axios:
+      specifier: 1.7.5
+      version: 1.7.5
+    body-parser:
+      specifier: ^1.20.3
+      version: 1.20.3
+    busboy:
+      specifier: ^1.6.0
+      version: 1.6.0
+    c8:
+      specifier: ^7.14.0
+      version: 7.14.0
+    ccount:
+      specifier: 2.0.1
+      version: 2.0.1
+    chokidar:
+      specifier: ^3.6.0
+      version: 3.6.0
+    class-variance-authority:
+      specifier: ^0.7.1
+      version: 0.7.1
+    cli-spinner:
+      specifier: ^0.2.10
+      version: 0.2.10
+    clipanion:
+      specifier: ^3.2.1
+      version: 3.2.1
+    cloudinary:
+      specifier: ^1.41.3
+      version: 1.41.3
+    clsx:
+      specifier: ^2.1.1
+      version: 2.1.1
+    cmdk:
+      specifier: ^1.0.4
+      version: 1.0.4
+    color-string:
+      specifier: ^1.9.1
+      version: 1.9.1
+    concat-md:
+      specifier: ^0.5.1
+      version: 0.5.1
+    cors:
+      specifier: ^2.8.5
+      version: 2.8.5
+    cross-spawn:
+      specifier: ^7.0.6
+      version: 7.0.6
+    crypto-js:
+      specifier: ^4.2.0
+      version: 4.2.0
+    dotenv:
+      specifier: ^16.4.7
+      version: 16.4.7
+    esbuild:
+      specifier: ^0.24.2
+      version: 0.24.2
+    estree-util-is-identifier-name:
+      specifier: 2.1.0
+      version: 2.1.0
+    fast-glob:
+      specifier: ^3.3.3
+      version: 3.3.3
+    final-form:
+      specifier: 4.20.10
+      version: 4.20.10
+    final-form-arrays:
+      specifier: ^3.1.0
+      version: 3.1.0
+    final-form-set-field-data:
+      specifier: ^1.0.2
+      version: 1.0.2
+    fs-extra:
+      specifier: ^11.3.0
+      version: 11.3.0
+    glob-parent:
+      specifier: ^6.0.2
+      version: 6.0.2
+    graphiql:
+      specifier: 3.0.0-alpha.1
+      version: 3.0.0-alpha.1
+    graphql-tag:
+      specifier: ^2.12.6
+      version: 2.12.6
+    gray-matter:
+      specifier: ^4.0.3
+      version: 4.0.3
+    happy-dom:
+      specifier: 15.10.2
+      version: 15.10.2
+    identity-obj-proxy:
+      specifier: ^3.0.0
+      version: 3.0.0
+    is-hotkey:
+      specifier: ^0.2.0
+      version: 0.2.0
+    isomorphic-fetch:
+      specifier: ^3.0.0
+      version: 3.0.0
+    isomorphic-git:
+      specifier: ^1.29.0
+      version: 1.29.0
+    jest:
+      specifier: ^29.7.0
+      version: 29.7.0
+    jest-diff:
+      specifier: ^29.7.0
+      version: 29.7.0
+    jest-matcher-utils:
+      specifier: ^29.7.0
+      version: 29.7.0
+    js-base64:
+      specifier: ^3.7.7
+      version: 3.7.7
+    js-sha1:
+      specifier: ^0.6.0
+      version: 0.6.0
+    json-diff:
+      specifier: ^1.0.6
+      version: 1.0.6
+    jsonpath-plus:
+      specifier: 10.1.0
+      version: 10.1.0
+    lodash.clonedeep:
+      specifier: ^4.5.0
+      version: 4.5.0
+    lodash.flatten:
+      specifier: 4.4.0
+      version: 4.4.0
+    lodash.get:
+      specifier: ^4.4.2
+      version: 4.4.2
+    lodash.set:
+      specifier: ^4.3.2
+      version: 4.3.2
+    lodash.uniqby:
+      specifier: ^4.7.0
+      version: 4.7.0
+    log4js:
+      specifier: ^6.9.1
+      version: 6.9.1
+    lucide-react:
+      specifier: ^0.424.0
+      version: 0.424.0
+    many-level:
+      specifier: ^2.0.0
+      version: 2.0.0
+    mdast-util-compact:
+      specifier: 4.1.1
+      version: 4.1.1
+    mdast-util-directive:
+      specifier: 2.2.4
+      version: 2.2.4
+    mdast-util-from-markdown:
+      specifier: 1.3.0
+      version: 1.3.0
+    mdast-util-gfm:
+      specifier: 2.0.2
+      version: 2.0.2
+    mdast-util-mdx-jsx:
+      specifier: 2.1.2
+      version: 2.1.2
+    mdast-util-to-markdown:
+      specifier: 1.5.0
+      version: 1.5.0
+    memory-level:
+      specifier: ^1.0.0
+      version: 1.0.0
+    micromark-extension-gfm:
+      specifier: 2.0.3
+      version: 2.0.3
+    micromark-factory-mdx-expression:
+      specifier: 1.0.7
+      version: 1.0.7
+    micromark-factory-space:
+      specifier: 1.0.0
+      version: 1.0.0
+    micromark-factory-whitespace:
+      specifier: 1.0.0
+      version: 1.0.0
+    micromark-util-character:
+      specifier: 1.1.0
+      version: 1.1.0
+    micromark-util-symbol:
+      specifier: 1.0.1
+      version: 1.0.1
+    micromark-util-types:
+      specifier: 1.0.2
+      version: 1.0.2
+    micromatch:
+      specifier: 4.0.8
+      version: 4.0.8
+    minimatch:
+      specifier: ^5.1.6
+      version: 5.1.6
+    moment:
+      specifier: 2.29.4
+      version: 2.29.4
+    monaco-editor:
+      specifier: 0.31.0
+      version: 0.31.0
+    multer:
+      specifier: 1.4.5-lts.1
+      version: 1.4.5-lts.1
+    next-themes:
+      specifier: ^0.3.0
+      version: 0.3.0
+    normalize-path:
+      specifier: ^3.0.0
+      version: 3.0.0
+    parse-entities:
+      specifier: 4.0.1
+      version: 4.0.1
+    picomatch:
+      specifier: ^4.0.2
+      version: 4.0.2
+    picomatch-browser:
+      specifier: 2.2.6
+      version: 2.2.6
+    postcss-import:
+      specifier: ^14.1.0
+      version: 14.1.0
+    postcss-nesting:
+      specifier: ^10.2.0
+      version: 10.2.0
+    prettier:
+      specifier: ^2.8.8
+      version: 2.8.8
+    pretty-quick:
+      specifier: ^3.3.1
+      version: 3.3.1
+    prism-react-renderer:
+      specifier: ^2.4.1
+      version: 2.4.1
+    progress:
+      specifier: ^2.0.3
+      version: 2.0.3
+    prompts:
+      specifier: ^2.4.2
+      version: 2.4.2
+    prop-types:
+      specifier: 15.7.2
+      version: 15.7.2
+    puppeteer:
+      specifier: ^23.11.1
+      version: 23.11.1
+    query-string:
+      specifier: ^9.0.0
+      version: 9.1.2
+    react-beautiful-dnd:
+      specifier: ^13.1.1
+      version: 13.1.1
+    react-color:
+      specifier: ^2.19.3
+      version: 2.19.3
+    react-datetime:
+      specifier: ^3.3.1
+      version: 3.3.1
+    react-dropzone:
+      specifier: 14.2.3
+      version: 14.2.3
+    react-final-form:
+      specifier: ^6.5.9
+      version: 6.5.9
+    react-router-dom:
+      specifier: 6.3.0
+      version: 6.3.0
+    react-use:
+      specifier: ^17.6.0
+      version: 17.6.0
+    readable-stream:
+      specifier: ^4.7.0
+      version: 4.7.0
+    remark:
+      specifier: 14.0.2
+      version: 14.0.2
+    remark-gfm:
+      specifier: ^2.0.0
+      version: 2.0.0
+    remark-mdx:
+      specifier: 2.3.0
+      version: 2.3.0
+    remove:
+      specifier: ^0.1.5
+      version: 0.1.5
+    scmp:
+      specifier: ^2.1.0
+      version: 2.1.0
+    search-index:
+      specifier: 4.0.0
+      version: 4.0.0
+    sharp:
+      specifier: ^0.33.5
+      version: 0.33.5
+    sqlite-level:
+      specifier: ^1.2.1
+      version: 1.2.1
+    stopword:
+      specifier: ^3.1.4
+      version: 3.1.4
+    stringify-entities:
+      specifier: 4.0.3
+      version: 4.0.3
+    tailwindcss-animate:
+      specifier: ^1.0.7
+      version: 1.0.7
+    tar:
+      specifier: 7.4.0
+      version: 7.4.0
+    ts-jest:
+      specifier: ^29.2.5
+      version: 29.2.6
+    ts-node:
+      specifier: ^10.9.2
+      version: 10.9.2
+    tsc-alias:
+      specifier: ^1.8.10
+      version: 1.8.11
+    tslib:
+      specifier: ^2.8.1
+      version: 2.8.1
+    tsup:
+      specifier: ^8.3.6
+      version: 8.4.0
+    turbo:
+      specifier: ^1.13.4
+      version: 1.13.4
+    typanion:
+      specifier: 3.13.0
+      version: 3.13.0
+    typedoc:
+      specifier: ^0.26.11
+      version: 0.26.11
+    typedoc-plugin-markdown:
+      specifier: ^3.17.1
+      version: 3.17.1
+    unist-util-source:
+      specifier: 4.0.2
+      version: 4.0.2
+    unist-util-stringify-position:
+      specifier: 3.0.3
+      version: 3.0.3
+    unist-util-visit:
+      specifier: 4.1.2
+      version: 4.1.2
+    url-pattern:
+      specifier: ^1.0.3
+      version: 1.0.3
+    uvu:
+      specifier: 0.5.6
+      version: 0.5.6
+    validate-npm-package-name:
+      specifier: ^5.0.1
+      version: 5.0.1
+    vfile-message:
+      specifier: 3.1.4
+      version: 3.1.4
+    webfontloader:
+      specifier: 1.6.28
+      version: 1.6.28
+
 importers:
 
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: ^1.9.4
+        specifier: 'catalog:'
         version: 1.9.4
       '@changesets/changelog-github':
-        specifier: ^0.5.0
+        specifier: 'catalog:'
         version: 0.5.1
       '@changesets/cli':
-        specifier: 2.27.8
+        specifier: 'catalog:'
         version: 2.27.8
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
       '@types/picomatch':
-        specifier: ^3.0.2
+        specifier: 'catalog:'
         version: 3.0.2
       picomatch:
-        specifier: ^4.0.2
+        specifier: 'catalog:'
         version: 4.0.2
       pretty-quick:
-        specifier: ^3.3.1
+        specifier: 'catalog:'
         version: 3.3.1(prettier@2.8.8)
       turbo:
-        specifier: ^1.13.4
+        specifier: 'catalog:'
         version: 1.13.4
       typescript:
         specifier: ^5.7.3
@@ -42,7 +738,7 @@ importers:
   examples/basic-iframe:
     dependencies:
       '@octokit/rest':
-        specifier: ^19.0.13
+        specifier: 'catalog:'
         version: 19.0.13
       '@tinacms/datalayer':
         specifier: workspace:*
@@ -51,10 +747,10 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/graphql
       dotenv:
-        specifier: ^16.4.7
+        specifier: 'catalog:'
         version: 16.4.7
       js-base64:
-        specifier: ^3.7.7
+        specifier: 'catalog:'
         version: 3.7.7
       next:
         specifier: ^14.2.24
@@ -155,14 +851,14 @@ importers:
         specifier: ^4.12.0
         version: 4.12.0(react@18.3.1)
       remove:
-        specifier: ^0.1.5
+        specifier: 'catalog:'
         version: 0.1.5
       tinacms:
         specifier: workspace:*
         version: link:../../packages/tinacms
     devDependencies:
       '@puppeteer/replay':
-        specifier: ^1.3.2
+        specifier: 'catalog:'
         version: 1.3.2(puppeteer@23.11.1(typescript@5.8.2))
       '@tinacms/app':
         specifier: workspace:*
@@ -174,7 +870,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/scripts
       autoprefixer:
-        specifier: ^10.4.20
+        specifier: 'catalog:'
         version: 10.4.21(postcss@8.5.3)
       eslint:
         specifier: 8.24.0
@@ -186,7 +882,7 @@ importers:
         specifier: ^8.5.2
         version: 8.5.3
       puppeteer:
-        specifier: ^23.11.1
+        specifier: 'catalog:'
         version: 23.11.1(typescript@5.8.2)
       tailwindcss:
         specifier: ^3.4.17
@@ -204,13 +900,13 @@ importers:
   examples/next-2024:
     dependencies:
       '@radix-ui/react-icons':
-        specifier: ^1.3.2
+        specifier: 'catalog:'
         version: 1.3.2(react@18.3.1)
       class-variance-authority:
-        specifier: ^0.7.1
+        specifier: 'catalog:'
         version: 0.7.1
       clsx:
-        specifier: ^2.1.1
+        specifier: 'catalog:'
         version: 2.1.1
       mermaid:
         specifier: ^10.9.3
@@ -219,7 +915,7 @@ importers:
         specifier: 14.2.10
         version: 14.2.10(@babel/core@7.26.9)(@playwright/test@1.51.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-themes:
-        specifier: ^0.3.0
+        specifier: 'catalog:'
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.3.1
@@ -231,14 +927,14 @@ importers:
         specifier: ^2.6.0
         version: 2.6.0
       tailwindcss-animate:
-        specifier: ^1.0.7
+        specifier: 'catalog:'
         version: 1.0.7(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2)))
       tinacms:
         specifier: workspace:*
         version: link:../../packages/tinacms
     devDependencies:
       '@biomejs/biome':
-        specifier: ^1.9.4
+        specifier: 'catalog:'
         version: 1.9.4
       '@tinacms/cli':
         specifier: workspace:*
@@ -271,13 +967,13 @@ importers:
         specifier: workspace:*
         version: link:../../packages/@tinacms/auth
       clsx:
-        specifier: ^2.1.1
+        specifier: 'catalog:'
         version: 2.1.1
       next:
         specifier: 14.2.3
         version: 14.2.3(@playwright/test@1.51.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       query-string:
-        specifier: ^9.0.0
+        specifier: 'catalog:'
         version: 9.1.2
       react:
         specifier: ^18
@@ -335,7 +1031,7 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@octokit/rest':
-        specifier: ^19.0.13
+        specifier: 'catalog:'
         version: 19.0.13
       '@tailwindcss/typography':
         specifier: ^0.5.16
@@ -354,7 +1050,7 @@ importers:
         version: 14.2.24(@babel/core@7.26.9)(@playwright/test@1.51.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: ^4.24.11
-        version: 4.24.11(next@14.2.24(@playwright/test@1.51.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 4.24.11(next@14.2.24(@babel/core@7.26.9)(@playwright/test@1.51.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -375,7 +1071,7 @@ importers:
         version: link:../../packages/tinacms-gitprovider-github
     devDependencies:
       '@svgr/webpack':
-        specifier: ^8.1.0
+        specifier: 'catalog:'
         version: 8.1.0(typescript@5.8.2)
       '@tinacms/cli':
         specifier: workspace:*
@@ -390,13 +1086,13 @@ importers:
         specifier: ^18.3.18
         version: 18.3.18
       '@typescript-eslint/eslint-plugin':
-        specifier: ^5.62.0
+        specifier: 'catalog:'
         version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)(typescript@5.8.2)
       '@typescript-eslint/parser':
-        specifier: ^5.62.0
+        specifier: 'catalog:'
         version: 5.62.0(eslint@8.57.1)(typescript@5.8.2)
       autoprefixer:
-        specifier: ^10.4.20
+        specifier: 'catalog:'
         version: 10.4.21(postcss@8.5.3)
       eslint:
         specifier: ^8.57.1
@@ -405,10 +1101,10 @@ importers:
         specifier: ^8.5.2
         version: 8.5.3
       postcss-import:
-        specifier: ^14.1.0
+        specifier: 'catalog:'
         version: 14.1.0(postcss@8.5.3)
       postcss-nesting:
-        specifier: ^10.2.0
+        specifier: 'catalog:'
         version: 10.2.0(postcss@8.5.3)
       tailwindcss:
         specifier: ^3.4.17
@@ -494,7 +1190,7 @@ importers:
         version: 5.8.2
     devDependencies:
       '@svgr/webpack':
-        specifier: ^8.1.0
+        specifier: 'catalog:'
         version: 8.1.0(typescript@5.8.2)
       '@tinacms/cli':
         specifier: workspace:*
@@ -512,16 +1208,16 @@ importers:
         specifier: ^18.3.18
         version: 18.3.18
       '@types/styled-components':
-        specifier: ^5.1.34
+        specifier: 'catalog:'
         version: 5.1.34
       '@typescript-eslint/eslint-plugin':
-        specifier: ^5.62.0
+        specifier: 'catalog:'
         version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)(typescript@5.8.2)
       '@typescript-eslint/parser':
-        specifier: ^5.62.0
+        specifier: 'catalog:'
         version: 5.62.0(eslint@8.57.1)(typescript@5.8.2)
       autoprefixer:
-        specifier: ^10.4.20
+        specifier: 'catalog:'
         version: 10.4.21(postcss@8.5.3)
       eslint:
         specifier: ^8.57.1
@@ -530,10 +1226,10 @@ importers:
         specifier: ^8.5.2
         version: 8.5.3
       postcss-import:
-        specifier: ^14.1.0
+        specifier: 'catalog:'
         version: 14.1.0(postcss@8.5.3)
       postcss-nesting:
-        specifier: ^10.2.0
+        specifier: 'catalog:'
         version: 10.2.0(postcss@8.5.3)
       tailwindcss:
         specifier: ^3.4.17
@@ -542,7 +1238,7 @@ importers:
   packages/@tinacms/app:
     dependencies:
       '@graphiql/toolkit':
-        specifier: 0.8.4
+        specifier: 'catalog:'
         version: 0.8.4(@types/node@22.13.10)(graphql@15.8.0)
       '@headlessui/react':
         specifier: 2.1.8
@@ -551,22 +1247,22 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
       '@monaco-editor/react':
-        specifier: 4.4.5
+        specifier: 'catalog:'
         version: 4.4.5(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tinacms/mdx':
         specifier: workspace:*
         version: link:../mdx
       final-form:
-        specifier: 4.20.10
+        specifier: 'catalog:'
         version: 4.20.10
       graphiql:
-        specifier: 3.0.0-alpha.1
+        specifier: 'catalog:'
         version: 3.0.0-alpha.1(@codemirror/language@6.0.0)(@types/node@22.13.10)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(graphql@15.8.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       graphql:
         specifier: 15.8.0
         version: 15.8.0
       monaco-editor:
-        specifier: 0.31.0
+        specifier: 'catalog:'
         version: 0.31.0
       react:
         specifier: ^18.3.1
@@ -575,7 +1271,7 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       react-router-dom:
-        specifier: 6.3.0
+        specifier: 'catalog:'
         version: 6.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tinacms:
         specifier: workspace:*
@@ -600,7 +1296,7 @@ importers:
         specifier: workspace:*
         version: link:../scripts
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.10)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2))
       next:
         specifier: 14.2.10
@@ -618,40 +1314,40 @@ importers:
   packages/@tinacms/cli:
     dependencies:
       '@graphql-codegen/core':
-        specifier: ^2.6.8
+        specifier: 'catalog:'
         version: 2.6.8(graphql@15.8.0)
       '@graphql-codegen/plugin-helpers':
         specifier: latest
         version: 5.1.0(graphql@15.8.0)
       '@graphql-codegen/typescript':
-        specifier: ^4.1.3
+        specifier: 'catalog:'
         version: 4.1.5(graphql@15.8.0)
       '@graphql-codegen/typescript-operations':
-        specifier: ^4.4.1
+        specifier: 'catalog:'
         version: 4.5.1(graphql@15.8.0)
       '@graphql-codegen/visitor-plugin-common':
-        specifier: ^4.1.2
+        specifier: 'catalog:'
         version: 4.1.2(graphql@15.8.0)
       '@graphql-inspector/core':
         specifier: ^4.2.2
         version: 4.2.2(graphql@15.8.0)
       '@graphql-tools/graphql-file-loader':
-        specifier: ^7.5.17
+        specifier: 'catalog:'
         version: 7.5.17(graphql@15.8.0)
       '@graphql-tools/load':
-        specifier: ^7.8.14
+        specifier: 'catalog:'
         version: 7.8.14(graphql@15.8.0)
       '@rollup/pluginutils':
-        specifier: ^5.1.4
+        specifier: 'catalog:'
         version: 5.1.4(rollup@4.35.0)
       '@svgr/core':
-        specifier: 8.1.0
+        specifier: 'catalog:'
         version: 8.1.0(typescript@5.8.2)
       '@tailwindcss/aspect-ratio':
-        specifier: ^0.4.2
+        specifier: 'catalog:'
         version: 0.4.2(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2)))
       '@tailwindcss/container-queries':
-        specifier: ^0.1.1
+        specifier: 'catalog:'
         version: 0.1.1(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2)))
       '@tailwindcss/typography':
         specifier: ^0.5.16
@@ -672,49 +1368,49 @@ importers:
         specifier: workspace:*
         version: link:../search
       '@vitejs/plugin-react':
-        specifier: 3.1.0
+        specifier: 'catalog:'
         version: 3.1.0(vite@4.5.9(@types/node@22.13.10))
       altair-express-middleware:
-        specifier: ^7.3.6
+        specifier: 'catalog:'
         version: 7.3.6
       async-lock:
-        specifier: ^1.4.1
+        specifier: 'catalog:'
         version: 1.4.1
       auto-bind:
-        specifier: ^4.0.0
+        specifier: 'catalog:'
         version: 4.0.0
       body-parser:
-        specifier: ^1.20.3
+        specifier: 'catalog:'
         version: 1.20.3
       busboy:
-        specifier: ^1.6.0
+        specifier: 'catalog:'
         version: 1.6.0
       chalk:
         specifier: ^2.4.2
         version: 2.4.2
       chokidar:
-        specifier: ^3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
       cli-spinner:
-        specifier: ^0.2.10
+        specifier: 'catalog:'
         version: 0.2.10
       clipanion:
-        specifier: ^3.2.1
+        specifier: 'catalog:'
         version: 3.2.1(typanion@3.13.0)
       cors:
-        specifier: ^2.8.5
+        specifier: 'catalog:'
         version: 2.8.5
       crypto-js:
-        specifier: ^4.2.0
+        specifier: 'catalog:'
         version: 4.2.0
       dotenv:
-        specifier: ^16.4.7
+        specifier: 'catalog:'
         version: 16.4.7
       esbuild:
-        specifier: ^0.24.2
+        specifier: 'catalog:'
         version: 0.24.2
       fs-extra:
-        specifier: ^11.3.0
+        specifier: 'catalog:'
         version: 11.3.0
       graphql:
         specifier: 15.8.0
@@ -723,31 +1419,31 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       log4js:
-        specifier: ^6.9.1
+        specifier: 'catalog:'
         version: 6.9.1
       many-level:
-        specifier: ^2.0.0
+        specifier: 'catalog:'
         version: 2.0.0
       memory-level:
-        specifier: ^1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       minimatch:
-        specifier: ^5.1.6
+        specifier: 'catalog:'
         version: 5.1.6
       normalize-path:
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
       prettier:
-        specifier: ^2.8.8
+        specifier: 'catalog:'
         version: 2.8.8
       progress:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       prompts:
-        specifier: ^2.4.2
+        specifier: 'catalog:'
         version: 2.4.2
       readable-stream:
-        specifier: ^4.7.0
+        specifier: 'catalog:'
         version: 4.7.0
       tailwindcss:
         specifier: ^3.4.17
@@ -756,7 +1452,7 @@ importers:
         specifier: workspace:*
         version: link:../../tinacms
       typanion:
-        specifier: 3.13.0
+        specifier: 'catalog:'
         version: 3.13.0
       typescript:
         specifier: ^5.7.3
@@ -775,10 +1471,10 @@ importers:
         specifier: workspace:*
         version: link:../scripts
       '@types/clear':
-        specifier: 0.1.0
+        specifier: 'catalog:'
         version: 0.1.0
       '@types/cli-spinner':
-        specifier: ^0.2.3
+        specifier: 'catalog:'
         version: 0.2.3
       '@types/cors':
         specifier: 2.8.5
@@ -787,10 +1483,10 @@ importers:
         specifier: ^4.2.2
         version: 4.2.2
       '@types/express':
-        specifier: ^4.17.21
+        specifier: 'catalog:'
         version: 4.17.21
       '@types/figlet':
-        specifier: 1.2.0
+        specifier: 'catalog:'
         version: 1.2.0
       '@types/fs-extra':
         specifier: ^11.0.4
@@ -802,25 +1498,25 @@ importers:
         specifier: ^4.0.9
         version: 4.0.9
       '@types/listr':
-        specifier: 0.14.2
+        specifier: 'catalog:'
         version: 0.14.2
       '@types/log4js':
-        specifier: ^2.3.5
+        specifier: 'catalog:'
         version: 2.3.5
       '@types/multer':
-        specifier: ^1.4.12
+        specifier: 'catalog:'
         version: 1.4.12
       '@types/progress':
-        specifier: ^2.0.7
+        specifier: 'catalog:'
         version: 2.0.7
       '@types/prompts':
-        specifier: ^2.4.9
+        specifier: 'catalog:'
         version: 2.4.9
       '@types/yup':
         specifier: ^0.32.0
         version: 0.32.0
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.10)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2))
 
   packages/@tinacms/datalayer:
@@ -842,34 +1538,34 @@ importers:
         specifier: ^3.12.10
         version: 3.12.10
       '@types/level':
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       '@types/lodash.camelcase':
-        specifier: ^4.3.9
+        specifier: 'catalog:'
         version: 4.3.9
       '@types/lodash.upperfirst':
-        specifier: ^4.3.9
+        specifier: 'catalog:'
         version: 4.3.9
       '@types/node':
         specifier: ^22.13.1
         version: 22.13.10
       '@types/normalize-path':
-        specifier: ^3.0.2
+        specifier: 'catalog:'
         version: 3.0.2
       '@types/yup':
         specifier: ^0.29.14
         version: 0.29.14
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.10)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2))
       jest-diff:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0
       jest-file-snapshot:
         specifier: ^0.5.0
         version: 0.5.0
       jest-matcher-utils:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0
       typescript:
         specifier: ^5.7.3
@@ -878,7 +1574,7 @@ importers:
   packages/@tinacms/graphql:
     dependencies:
       '@iarna/toml':
-        specifier: ^2.2.5
+        specifier: 'catalog:'
         version: 2.2.5
       '@tinacms/mdx':
         specifier: workspace:*
@@ -887,61 +1583,61 @@ importers:
         specifier: workspace:*
         version: link:../schema-tools
       abstract-level:
-        specifier: ^1.0.4
+        specifier: 'catalog:'
         version: 1.0.4
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
       fast-glob:
-        specifier: ^3.3.3
+        specifier: 'catalog:'
         version: 3.3.3
       fs-extra:
-        specifier: ^11.3.0
+        specifier: 'catalog:'
         version: 11.3.0
       glob-parent:
-        specifier: ^6.0.2
+        specifier: 'catalog:'
         version: 6.0.2
       graphql:
         specifier: 15.8.0
         version: 15.8.0
       gray-matter:
-        specifier: ^4.0.3
+        specifier: 'catalog:'
         version: 4.0.3
       isomorphic-git:
-        specifier: ^1.29.0
+        specifier: 'catalog:'
         version: 1.29.0
       js-sha1:
-        specifier: ^0.6.0
+        specifier: 'catalog:'
         version: 0.6.0
       js-yaml:
         specifier: ^3.14.1
         version: 3.14.1
       jsonpath-plus:
-        specifier: 10.1.0
+        specifier: 'catalog:'
         version: 10.1.0
       lodash.clonedeep:
-        specifier: ^4.5.0
+        specifier: 'catalog:'
         version: 4.5.0
       lodash.set:
-        specifier: ^4.3.2
+        specifier: 'catalog:'
         version: 4.3.2
       lodash.uniqby:
-        specifier: ^4.7.0
+        specifier: 'catalog:'
         version: 4.7.0
       many-level:
-        specifier: ^2.0.0
+        specifier: 'catalog:'
         version: 2.0.0
       micromatch:
-        specifier: 4.0.8
+        specifier: 'catalog:'
         version: 4.0.8
       normalize-path:
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
       readable-stream:
-        specifier: ^4.7.0
+        specifier: 'catalog:'
         version: 4.7.0
       scmp:
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       yup:
         specifier: ^0.32.11
@@ -957,7 +1653,7 @@ importers:
         specifier: ^0.0.50
         version: 0.0.50
       '@types/express':
-        specifier: ^4.17.21
+        specifier: 'catalog:'
         version: 4.17.21
       '@types/fs-extra':
         specifier: ^9.0.13
@@ -966,28 +1662,28 @@ importers:
         specifier: ^3.12.10
         version: 3.12.10
       '@types/lodash.camelcase':
-        specifier: ^4.3.9
+        specifier: 'catalog:'
         version: 4.3.9
       '@types/lodash.upperfirst':
-        specifier: ^4.3.9
+        specifier: 'catalog:'
         version: 4.3.9
       '@types/lru-cache':
-        specifier: ^5.1.1
+        specifier: 'catalog:'
         version: 5.1.1
       '@types/mdast':
-        specifier: ^3.0.15
+        specifier: 'catalog:'
         version: 3.0.15
       '@types/micromatch':
-        specifier: ^4.0.9
+        specifier: 'catalog:'
         version: 4.0.9
       '@types/node':
         specifier: ^22.13.1
         version: 22.13.10
       '@types/normalize-path':
-        specifier: ^3.0.2
+        specifier: 'catalog:'
         version: 3.0.2
       '@types/ws':
-        specifier: ^7.4.7
+        specifier: 'catalog:'
         version: 7.4.7
       '@types/yup':
         specifier: ^0.29.14
@@ -996,7 +1692,7 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       memory-level:
-        specifier: ^1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       typescript:
         specifier: ^5.7.3
@@ -1017,91 +1713,91 @@ importers:
         specifier: workspace:*
         version: link:../schema-tools
       acorn:
-        specifier: 8.8.2
+        specifier: 'catalog:'
         version: 8.8.2
       ccount:
-        specifier: 2.0.1
+        specifier: 'catalog:'
         version: 2.0.1
       estree-util-is-identifier-name:
-        specifier: 2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       lodash.flatten:
-        specifier: 4.4.0
+        specifier: 'catalog:'
         version: 4.4.0
       mdast-util-compact:
-        specifier: 4.1.1
+        specifier: 'catalog:'
         version: 4.1.1
       mdast-util-directive:
-        specifier: 2.2.4
+        specifier: 'catalog:'
         version: 2.2.4
       mdast-util-from-markdown:
-        specifier: 1.3.0
+        specifier: 'catalog:'
         version: 1.3.0
       mdast-util-gfm:
-        specifier: 2.0.2
+        specifier: 'catalog:'
         version: 2.0.2
       mdast-util-mdx-jsx:
-        specifier: 2.1.2
+        specifier: 'catalog:'
         version: 2.1.2
       mdast-util-to-markdown:
-        specifier: 1.5.0
+        specifier: 'catalog:'
         version: 1.5.0
       micromark-extension-gfm:
-        specifier: 2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       micromark-factory-mdx-expression:
-        specifier: 1.0.7
+        specifier: 'catalog:'
         version: 1.0.7
       micromark-factory-space:
-        specifier: 1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       micromark-factory-whitespace:
-        specifier: 1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       micromark-util-character:
-        specifier: 1.1.0
+        specifier: 'catalog:'
         version: 1.1.0
       micromark-util-symbol:
-        specifier: 1.0.1
+        specifier: 'catalog:'
         version: 1.0.1
       micromark-util-types:
-        specifier: 1.0.2
+        specifier: 'catalog:'
         version: 1.0.2
       parse-entities:
-        specifier: 4.0.1
+        specifier: 'catalog:'
         version: 4.0.1
       prettier:
-        specifier: ^2.8.8
+        specifier: 'catalog:'
         version: 2.8.8
       remark:
-        specifier: 14.0.2
+        specifier: 'catalog:'
         version: 14.0.2
       remark-gfm:
-        specifier: ^2.0.0
+        specifier: 'catalog:'
         version: 2.0.0
       remark-mdx:
-        specifier: 2.3.0
+        specifier: 'catalog:'
         version: 2.3.0
       stringify-entities:
-        specifier: 4.0.3
+        specifier: 'catalog:'
         version: 4.0.3
       typedoc:
-        specifier: ^0.26.11
+        specifier: 'catalog:'
         version: 0.26.11(typescript@5.8.2)
       unist-util-source:
-        specifier: 4.0.2
+        specifier: 'catalog:'
         version: 4.0.2
       unist-util-stringify-position:
-        specifier: 3.0.3
+        specifier: 'catalog:'
         version: 3.0.3
       unist-util-visit:
-        specifier: 4.1.2
+        specifier: 'catalog:'
         version: 4.1.2
       uvu:
-        specifier: 0.5.6
+        specifier: 'catalog:'
         version: 0.5.6
       vfile-message:
-        specifier: 3.1.4
+        specifier: 'catalog:'
         version: 3.1.4
     devDependencies:
       '@tinacms/scripts':
@@ -1111,34 +1807,34 @@ importers:
         specifier: 1.0.0
         version: 1.0.0
       '@types/lodash.flatten':
-        specifier: ^4.4.9
+        specifier: 'catalog:'
         version: 4.4.9
       '@types/mdast':
-        specifier: ^3.0.15
+        specifier: 'catalog:'
         version: 3.0.15
       '@types/node':
         specifier: ^22.13.1
         version: 22.13.10
       '@types/prettier':
-        specifier: ^2.7.3
+        specifier: 'catalog:'
         version: 2.7.3
       '@types/unist':
-        specifier: ^2.0.11
+        specifier: 'catalog:'
         version: 2.0.11
       c8:
-        specifier: ^7.14.0
+        specifier: 'catalog:'
         version: 7.14.0
       concat-md:
-        specifier: ^0.5.1
+        specifier: 'catalog:'
         version: 0.5.1
       jest-file-snapshot:
         specifier: ^0.5.0
         version: 0.5.0
       ts-node:
-        specifier: ^10.9.2
+        specifier: 'catalog:'
         version: 10.9.2(@types/node@22.13.10)(typescript@5.8.2)
       typedoc-plugin-markdown:
-        specifier: ^3.17.1
+        specifier: 'catalog:'
         version: 3.17.1(typedoc@0.26.11(typescript@5.8.2))
       typescript:
         specifier: ^5.7.3
@@ -1153,7 +1849,7 @@ importers:
   packages/@tinacms/metrics:
     dependencies:
       isomorphic-fetch:
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
     devDependencies:
       '@tinacms/scripts':
@@ -1163,13 +1859,13 @@ importers:
         specifier: ^9.0.13
         version: 9.0.13
       '@types/isomorphic-fetch':
-        specifier: ^0.0.35
+        specifier: 'catalog:'
         version: 0.0.35
       fs-extra:
-        specifier: ^11.3.0
+        specifier: 'catalog:'
         version: 11.3.0
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.10)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2))
       typescript:
         specifier: ^5.7.3
@@ -1178,10 +1874,10 @@ importers:
   packages/@tinacms/schema-tools:
     dependencies:
       picomatch-browser:
-        specifier: 2.2.6
+        specifier: 'catalog:'
         version: 2.2.6
       url-pattern:
-        specifier: ^1.0.3
+        specifier: 'catalog:'
         version: 1.0.3
       zod:
         specifier: ^3.24.2
@@ -1194,7 +1890,7 @@ importers:
         specifier: ^29.5.14
         version: 29.5.14
       '@types/micromatch':
-        specifier: ^4.0.9
+        specifier: 'catalog:'
         version: 4.0.9
       '@types/react':
         specifier: ^18.3.18
@@ -1203,13 +1899,13 @@ importers:
         specifier: ^0.29.14
         version: 0.29.14
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.10)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2))
       react:
         specifier: ^18.3.1
         version: 18.3.1
       ts-jest:
-        specifier: ^29.2.5
+        specifier: 'catalog:'
         version: 29.2.6(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(jest@29.7.0(@types/node@22.13.10)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2)))(typescript@5.8.2)
       typescript:
         specifier: ^5.7.3
@@ -1221,28 +1917,28 @@ importers:
   packages/@tinacms/scripts:
     dependencies:
       '@sucrase/jest-plugin':
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0(jest@29.7.0(@types/node@22.13.10)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2)))(sucrase@3.35.0)
       chalk:
         specifier: ^4.1.2
         version: 4.1.2
       chokidar:
-        specifier: ^3.6.0
+        specifier: 'catalog:'
         version: 3.6.0
       commander:
         specifier: ^7.2.0
         version: 7.2.0
       esbuild:
-        specifier: ^0.24.2
+        specifier: 'catalog:'
         version: 0.24.2
       fs-extra:
-        specifier: ^11.3.0
+        specifier: 'catalog:'
         version: 11.3.0
       json-diff:
-        specifier: ^1.0.6
+        specifier: 'catalog:'
         version: 1.0.6
       tsup:
-        specifier: ^8.3.6
+        specifier: 'catalog:'
         version: 8.4.0(jiti@1.21.7)(postcss@8.5.3)(typescript@5.8.2)(yaml@2.7.0)
       typescript:
         specifier: ^5.7.3
@@ -1260,16 +1956,16 @@ importers:
         specifier: workspace:*
         version: link:../schema-tools
       memory-level:
-        specifier: ^1.0.0
+        specifier: 'catalog:'
         version: 1.0.0
       search-index:
-        specifier: 4.0.0
+        specifier: 'catalog:'
         version: 4.0.0(abstract-level@1.0.4)
       sqlite-level:
-        specifier: ^1.2.1
+        specifier: 'catalog:'
         version: 1.2.1(sucrase@3.35.0)
       stopword:
-        specifier: ^3.1.4
+        specifier: 'catalog:'
         version: 3.1.4
     devDependencies:
       '@tinacms/scripts':
@@ -1279,25 +1975,25 @@ importers:
         specifier: ^29.5.14
         version: 29.5.14
       '@types/micromatch':
-        specifier: ^4.0.9
+        specifier: 'catalog:'
         version: 4.0.9
       '@types/node':
         specifier: ^22.13.1
         version: 22.13.10
       '@types/search-index':
-        specifier: ^3.2.4
+        specifier: 'catalog:'
         version: 3.2.4
       jest:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0(@types/node@22.13.10)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2))
       jest-diff:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0
       jest-file-snapshot:
         specifier: ^0.7.0
         version: 0.7.0
       jest-matcher-utils:
-        specifier: ^29.7.0
+        specifier: 'catalog:'
         version: 29.7.0
       typescript:
         specifier: ^5.7.3
@@ -1306,7 +2002,7 @@ importers:
   packages/@tinacms/vercel-previews:
     dependencies:
       '@vercel/stega':
-        specifier: ^0.0.5
+        specifier: 'catalog:'
         version: 0.0.5
       tinacms:
         specifier: workspace:*
@@ -1343,26 +2039,26 @@ importers:
         specifier: ^12.1.0
         version: 12.1.0
       cross-spawn:
-        specifier: ^7.0.6
+        specifier: 'catalog:'
         version: 7.0.6
       fs-extra:
-        specifier: ^11.3.0
+        specifier: 'catalog:'
         version: 11.3.0
       prompts:
-        specifier: ^2.4.2
+        specifier: 'catalog:'
         version: 2.4.2
       tar:
-        specifier: 7.4.0
+        specifier: 'catalog:'
         version: 7.4.0
       validate-npm-package-name:
-        specifier: ^5.0.1
+        specifier: 'catalog:'
         version: 5.0.1
     devDependencies:
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
       '@types/cross-spawn':
-        specifier: ^6.0.6
+        specifier: 'catalog:'
         version: 6.0.6
       '@types/fs-extra':
         specifier: ^11.0.4
@@ -1371,10 +2067,10 @@ importers:
         specifier: ^22.13.1
         version: 22.13.10
       '@types/prompts':
-        specifier: ^2.4.9
+        specifier: 'catalog:'
         version: 2.4.9
       '@types/tar':
-        specifier: 6.1.13
+        specifier: 'catalog:'
         version: 6.1.13
       typescript:
         specifier: ^5.7.3
@@ -1383,13 +2079,13 @@ importers:
   packages/next-tinacms-azure:
     dependencies:
       '@azure/storage-blob':
-        specifier: ^12.26.0
+        specifier: 'catalog:'
         version: 12.26.0
       '@tinacms/auth':
         specifier: workspace:*
         version: link:../@tinacms/auth
       sharp:
-        specifier: ^0.33.5
+        specifier: 'catalog:'
         version: 0.33.5
     devDependencies:
       '@tinacms/scripts':
@@ -1423,10 +2119,10 @@ importers:
   packages/next-tinacms-cloudinary:
     dependencies:
       cloudinary:
-        specifier: ^1.41.3
+        specifier: 'catalog:'
         version: 1.41.3
       multer:
-        specifier: 1.4.5-lts.1
+        specifier: 'catalog:'
         version: 1.4.5-lts.1
     devDependencies:
       '@tinacms/scripts':
@@ -1460,10 +2156,10 @@ importers:
   packages/next-tinacms-dos:
     dependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.744.0
+        specifier: 'catalog:'
         version: 3.758.0
       multer:
-        specifier: 1.4.5-lts.1
+        specifier: 'catalog:'
         version: 1.4.5-lts.1
     devDependencies:
       '@tinacms/scripts':
@@ -1497,10 +2193,10 @@ importers:
   packages/next-tinacms-s3:
     dependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.744.0
+        specifier: 'catalog:'
         version: 3.758.0
       '@aws-sdk/s3-request-presigner':
-        specifier: ^3.744.0
+        specifier: 'catalog:'
         version: 3.758.0
     devDependencies:
       '@tinacms/scripts':
@@ -1537,13 +2233,13 @@ importers:
   packages/tinacms:
     dependencies:
       '@ariakit/react':
-        specifier: ^0.4.15
+        specifier: 'catalog:'
         version: 0.4.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@floating-ui/dom':
-        specifier: ^1.6.13
+        specifier: 'catalog:'
         version: 1.6.13
       '@floating-ui/react-dom':
-        specifier: ^2.1.2
+        specifier: 'catalog:'
         version: 2.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@graphql-inspector/core':
         specifier: ^6.2.1
@@ -1555,34 +2251,34 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
       '@monaco-editor/react':
-        specifier: 4.4.5
+        specifier: 'catalog:'
         version: 4.4.5(monaco-editor@0.31.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-checkbox':
-        specifier: ^1.1.4
+        specifier: 'catalog:'
         version: 1.1.4(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog':
-        specifier: ^1.1.6
+        specifier: 'catalog:'
         version: 1.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dropdown-menu':
-        specifier: ^2.1.6
+        specifier: 'catalog:'
         version: 2.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-popover':
-        specifier: ^1.1.6
+        specifier: 'catalog:'
         version: 1.1.6(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-separator':
-        specifier: ^1.1.2
+        specifier: 'catalog:'
         version: 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot':
-        specifier: ^1.1.2
-        version: 1.1.2(@types/react@18.3.18)(react@18.3.1)
+        specifier: 'catalog:'
+        version: 1.2.2(@types/react@18.3.18)(react@18.3.1)
       '@radix-ui/react-toolbar':
-        specifier: ^1.1.2
+        specifier: 'catalog:'
         version: 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-tooltip':
-        specifier: ^1.1.8
+        specifier: 'catalog:'
         version: 1.1.8(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-hook/window-size':
-        specifier: ^3.1.1
+        specifier: 'catalog:'
         version: 3.1.1(react@18.3.1)
       '@tinacms/mdx':
         specifier: workspace:*
@@ -1594,166 +2290,166 @@ importers:
         specifier: workspace:*
         version: link:../@tinacms/search
       '@udecode/cn':
-        specifier: 44.0.1
-        version: 44.0.1(@types/react@18.3.18)(class-variance-authority@0.7.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@2.6.0)
+        specifier: 'catalog:'
+        version: 48.0.3(@types/react@18.3.18)(class-variance-authority@0.7.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@2.6.0)
       '@udecode/plate':
-        specifier: 46.0.2
-        version: 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+        specifier: 'catalog:'
+        version: 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       '@udecode/plate-autoformat':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-basic-marks':
-        specifier: 45.0.0
-        version: 45.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-block-quote':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-break':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-code-block':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-combobox':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-dnd':
-        specifier: ^48.0.0
-        version: 48.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.10)(@types/react@18.3.18)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.10)(@types/react@18.3.18)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-floating':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-heading':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-horizontal-rule':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-indent-list':
-        specifier: 44.0.5
-        version: 44.0.5(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-link':
-        specifier: 44.0.4
-        version: 44.0.4(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-list':
-        specifier: 44.0.5
-        version: 44.0.5(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-node-id':
-        specifier: ^44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-reset-node':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-resizable':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-selection':
-        specifier: ^48.0.0
-        version: 48.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-slash-command':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-table':
-        specifier: ^48.0.0
-        version: 48.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/plate-trailing-block':
-        specifier: 44.0.0
-        version: 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@udecode/slate':
-        specifier: 44.0.0
-        version: 44.0.0
+        specifier: 'catalog:'
+        version: 48.0.1
       async-lock:
-        specifier: ^1.4.1
+        specifier: 'catalog:'
         version: 1.4.1
       class-variance-authority:
-        specifier: ^0.7.1
+        specifier: 'catalog:'
         version: 0.7.1
       clsx:
-        specifier: ^2.1.1
+        specifier: 'catalog:'
         version: 2.1.1
       cmdk:
-        specifier: ^1.0.4
+        specifier: 'catalog:'
         version: 1.0.4(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       color-string:
-        specifier: ^1.9.1
+        specifier: 'catalog:'
         version: 1.9.1
       crypto-js:
-        specifier: ^4.2.0
+        specifier: 'catalog:'
         version: 4.2.0
       date-fns:
         specifier: 2.30.0
         version: 2.30.0
       final-form:
-        specifier: 4.20.10
+        specifier: 'catalog:'
         version: 4.20.10
       final-form-arrays:
-        specifier: ^3.1.0
+        specifier: 'catalog:'
         version: 3.1.0(final-form@4.20.10)
       final-form-set-field-data:
-        specifier: ^1.0.2
+        specifier: 'catalog:'
         version: 1.0.2(final-form@4.20.10)
       graphql:
         specifier: 15.8.0
         version: 15.8.0
       graphql-tag:
-        specifier: ^2.12.6
+        specifier: 'catalog:'
         version: 2.12.6(graphql@15.8.0)
       is-hotkey:
-        specifier: ^0.2.0
+        specifier: 'catalog:'
         version: 0.2.0
       lodash.get:
-        specifier: ^4.4.2
+        specifier: 'catalog:'
         version: 4.4.2
       lodash.set:
-        specifier: ^4.3.2
+        specifier: 'catalog:'
         version: 4.3.2
       lucide-react:
-        specifier: ^0.424.0
+        specifier: 'catalog:'
         version: 0.424.0(react@18.3.1)
       mermaid:
         specifier: 9.3.0
         version: 9.3.0
       moment:
-        specifier: 2.29.4
+        specifier: 'catalog:'
         version: 2.29.4
       monaco-editor:
-        specifier: 0.31.0
+        specifier: 'catalog:'
         version: 0.31.0
       prism-react-renderer:
-        specifier: ^2.4.1
+        specifier: 'catalog:'
         version: 2.4.1(react@18.3.1)
       prop-types:
-        specifier: 15.7.2
+        specifier: 'catalog:'
         version: 15.7.2
       react-beautiful-dnd:
-        specifier: ^13.1.1
+        specifier: 'catalog:'
         version: 13.1.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-color:
-        specifier: ^2.19.3
+        specifier: 'catalog:'
         version: 2.19.3(react@18.3.1)
       react-datetime:
-        specifier: ^3.3.1
+        specifier: 'catalog:'
         version: 3.3.1(moment@2.29.4)(react@18.3.1)
       react-dropzone:
-        specifier: 14.2.3
+        specifier: 'catalog:'
         version: 14.2.3(react@18.3.1)
       react-final-form:
-        specifier: ^6.5.9
+        specifier: 'catalog:'
         version: 6.5.9(final-form@4.20.10)(react@18.3.1)
       react-icons:
         specifier: ^5.4.0
         version: 5.5.0(react@18.3.1)
       react-router-dom:
-        specifier: 6.3.0
+        specifier: 'catalog:'
         version: 6.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-use:
-        specifier: ^17.6.0
+        specifier: 'catalog:'
         version: 17.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.0
       webfontloader:
-        specifier: 1.6.28
+        specifier: 'catalog:'
         version: 1.6.28
       yup:
         specifier: ^1.6.1
@@ -1763,52 +2459,52 @@ importers:
         version: 3.24.2
     devDependencies:
       '@graphql-tools/utils':
-        specifier: ^10.8.1
+        specifier: 'catalog:'
         version: 10.8.4(graphql@15.8.0)
       '@testing-library/dom':
-        specifier: ^10.4.0
+        specifier: 'catalog:'
         version: 10.4.0
       '@testing-library/jest-dom':
-        specifier: ^6.6.3
+        specifier: 'catalog:'
         version: 6.6.3
       '@testing-library/react':
-        specifier: ^16.2.0
+        specifier: 'catalog:'
         version: 16.2.0(@testing-library/dom@10.4.0)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@testing-library/user-event':
-        specifier: ^14.6.1
+        specifier: 'catalog:'
         version: 14.6.1(@testing-library/dom@10.4.0)
       '@tinacms/scripts':
         specifier: workspace:*
         version: link:../@tinacms/scripts
       '@types/atob':
-        specifier: ^2.1.4
+        specifier: 'catalog:'
         version: 2.1.4
       '@types/codemirror':
-        specifier: ^5.60.15
+        specifier: 'catalog:'
         version: 5.60.15
       '@types/color-string':
-        specifier: ^1.5.5
+        specifier: 'catalog:'
         version: 1.5.5
       '@types/lodash.debounce':
-        specifier: ^4.0.9
+        specifier: 'catalog:'
         version: 4.0.9
       '@types/lodash.get':
-        specifier: ^4.4.9
+        specifier: 'catalog:'
         version: 4.4.9
       '@types/node':
         specifier: ^22.13.1
         version: 22.13.10
       '@types/prop-types':
-        specifier: ^15.7.14
+        specifier: 'catalog:'
         version: 15.7.14
       '@types/react':
         specifier: ^18.3.18
         version: 18.3.18
       '@types/react-beautiful-dnd':
-        specifier: ^13.1.8
+        specifier: 'catalog:'
         version: 13.1.8
       '@types/react-color':
-        specifier: ^3.0.13
+        specifier: 'catalog:'
         version: 3.0.13(@types/react@18.3.18)
       '@types/react-dom':
         specifier: ^18.3.5
@@ -1817,13 +2513,13 @@ importers:
         specifier: ^0.32.0
         version: 0.32.0
       happy-dom:
-        specifier: 15.10.2
+        specifier: 'catalog:'
         version: 15.10.2
       identity-obj-proxy:
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
       isomorphic-fetch:
-        specifier: ^3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
       jest-file-snapshot:
         specifier: ^0.7.0
@@ -1841,10 +2537,10 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1
       tsc-alias:
-        specifier: ^1.8.10
+        specifier: 'catalog:'
         version: 1.8.11
       tslib:
-        specifier: ^2.8.1
+        specifier: 'catalog:'
         version: 2.8.1
       typescript:
         specifier: ^5.7.3
@@ -1890,10 +2586,10 @@ importers:
   packages/tinacms-clerk:
     devDependencies:
       '@clerk/backend':
-        specifier: 0.31.3
+        specifier: 'catalog:'
         version: 0.31.3(react@18.3.1)
       '@clerk/clerk-js':
-        specifier: 4.56.2
+        specifier: 'catalog:'
         version: 4.56.2(@babel/core@7.26.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tinacms/scripts':
         specifier: workspace:*
@@ -1911,10 +2607,10 @@ importers:
   packages/tinacms-gitprovider-github:
     dependencies:
       '@octokit/rest':
-        specifier: ^19.0.13
+        specifier: 'catalog:'
         version: 19.0.13
       js-base64:
-        specifier: ^3.7.7
+        specifier: 'catalog:'
         version: 3.7.7
       typescript:
         specifier: ^5.7.3
@@ -1933,7 +2629,7 @@ importers:
   playwright/tina-playwright:
     dependencies:
       axios:
-        specifier: 1.7.5
+        specifier: 'catalog:'
         version: 1.7.5
       next:
         specifier: ^14.2.24
@@ -1952,7 +2648,7 @@ importers:
         version: link:../../packages/tinacms
     devDependencies:
       '@playwright/test':
-        specifier: ^1.50.1
+        specifier: 'catalog:'
         version: 1.51.0
       '@tinacms/cli':
         specifier: workspace:*
@@ -3749,8 +4445,8 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  '@floating-ui/react@0.27.5':
-    resolution: {integrity: sha512-BX3jKxo39Ba05pflcQmqPPwc0qdNsdNi/eweAFtoIdrJWNen2sVEWMEac3i6jU55Qfx+lOcdMNKYn2CtWmlnOQ==}
+  '@floating-ui/react@0.27.8':
+    resolution: {integrity: sha512-EQJ4Th328y2wyHR3KzOUOoTW2UKjFk53fmyahfwExnFQ8vnsMYqKc+fFPOkeYtj5tcp1DUMiNJ7BFhed7e9ONw==}
     peerDependencies:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
@@ -4596,6 +5292,15 @@ packages:
       '@types/react':
         optional: true
 
+  '@radix-ui/react-compose-refs@1.1.2':
+    resolution: {integrity: sha512-z4eqJvfiNnFMHIIvXP3CY57y2WJs5g2v3X0zm9mEJkrkNv4rDxu+sg9Jh8EkXyeqBkB7SOcboo9dMVqhyrACIg==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   '@radix-ui/react-context@1.1.1':
     resolution: {integrity: sha512-UASk9zi+crv9WteK/NU4PLvOoL3OuE6BWVKNF6hPRBtYBDXQ2u5iu3O59zUlJiTVvkyuycnqrztsHVJwcK9K+Q==}
     peerDependencies:
@@ -4795,6 +5500,15 @@ packages:
 
   '@radix-ui/react-slot@1.1.2':
     resolution: {integrity: sha512-YAKxaiGsSQJ38VzKH86/BPRC4rh+b1Jpa+JneA5LRE7skmLPNAyeG8kPJj/oo4STLvlrs8vkf/iYyc3A5stYCQ==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@radix-ui/react-slot@1.2.2':
+    resolution: {integrity: sha512-y7TBO4xN4Y94FvcWIOIh18fM4R1A8S4q1jhoz4PNzOoHsFcN8pogcFmZrTYAm4F9VRUrWP/Mw7xSKybIeRI+CQ==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
@@ -5977,58 +6691,58 @@ packages:
     resolution: {integrity: sha512-07ny+LHRzQXepkGg6w0mFY41fVUNBrL2Roj/++7V1txKugfjm/Ci/qSND03r2RhlJhJYMcTn9AhhSSqQp0Ysyw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@udecode/cn@44.0.1':
-    resolution: {integrity: sha512-uiykstK3mgWC0SHWXgPiHnOU6XlbSvyJe7KRaatzdkyc/czxDGAcZ3VMFlJvQ9A8siDkDlLKYNnzy+XCxzClkA==}
+  '@udecode/cn@48.0.3':
+    resolution: {integrity: sha512-kfkXrM4buT6eDllWMd3c2mIxEKKyOTWxdigJ/3UWJ+ZDwHMIyVkcF7O5shfW+iq/p9ZIkBWGdcf7nO1UGwk8lw==}
     peerDependencies:
       class-variance-authority: '>=0.7.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
       tailwind-merge: '>=2.2.0'
 
-  '@udecode/plate-autoformat@44.0.0':
-    resolution: {integrity: sha512-mw0/in4XEex+A0y0q6w67F0i5OwKhysM/GiCHAPMKsPh79psR5AIoR+ZRy/pJT4t6q0Zvy9W17Nx13zijJCfjA==}
+  '@udecode/plate-autoformat@48.0.0':
+    resolution: {integrity: sha512-HX+G7AmJnKkk5Gsgpn17BCsg4jlgWXmfV0N2vWc0F7QN4U73o756H5u3FhDccifZ8CiRqbXchSlcJBWebtKa5Q==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-basic-marks@45.0.0':
-    resolution: {integrity: sha512-lXSntQWvPEeoeMTXy0hv5tvn18yZEMfDHqWgm7+ksp+OocxssM3FYPvYFx/3ZyIdWBix0c01gKGHfN6Rkg6Tbw==}
+  '@udecode/plate-basic-marks@48.0.0':
+    resolution: {integrity: sha512-I7Xw2ZRUQgTc5h3niFLAIYZ0A0udlmHfg19+W6msjZrHSpCTcAhhD4DVryTI1bePMP+K1u6wZbRoTlZPZ/DULQ==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.7'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-block-quote@44.0.0':
-    resolution: {integrity: sha512-tH87yphj/H72SHHaaWge2PEkX37CLX/VUIoINHVHVx6ZEcywVN3XXvQBuwvcZmDlHynZmHHbUT9tJ6KSiGOCog==}
+  '@udecode/plate-block-quote@48.0.0':
+    resolution: {integrity: sha512-sr5k3Lx2yuyvTIFPn9x5+hxvvAObrct32pR/m0d4h4Ueq/mkQBkfmORSodjObiFhJe7UlLhvWCdEhfIPK7h9Hw==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-break@44.0.0':
-    resolution: {integrity: sha512-Vx5Iuizus2LYKfKe99tnQ246LiqUU4cfWnso5N+npEM9XNPQFkBjOe2FrSf7Omz30x/fYZcCh7bfMgFrOzVEaw==}
+  '@udecode/plate-break@48.0.0':
+    resolution: {integrity: sha512-YhZzI7XlCGKIr9nhG7W4how1bYie+vLDRcJ25gZaoHtz2BpmmS1DU1N0FCgka9ztwC4/lC23gbMT2YL6fLZOwQ==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-code-block@44.0.0':
-    resolution: {integrity: sha512-8Y/n1OEi3UsRx/dQ7taZ1fhvfpDi0oVjpSn8cf9nzE2xpZCXPEhlYZkAew8Z73Wg+u5Q0eqv+DNm4z78YYoPIw==}
+  '@udecode/plate-code-block@48.0.0':
+    resolution: {integrity: sha512-M1heyAxI5KB4l/ZpeRA/m+4zPcnBDn/oxCHbKntFp60rz1qvbYWHcCcHqygRbjmldkCpdHjBiWAFOVsC1IYwMA==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-combobox@44.0.0':
-    resolution: {integrity: sha512-vvT7cly/pkl9Bh14F20eLlsX5inmB8D9qfrS/QzcD29Mlg0yYU7CDe4+ts3SjMWH4U6fLHtJjAUMEk6+C6/6JA==}
+  '@udecode/plate-combobox@48.0.0':
+    resolution: {integrity: sha512-bznkzu6dSjIOj9121JWNJ0ohiUFatKWbl25Wc7riyoAxy0hiHSpzpPmoE4fX1r3IaThCy643YpHwLSt133WMlQ==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-core@46.0.2':
-    resolution: {integrity: sha512-PhSDyOMVBjSpdrTsEAWGC8io1VzQIPcwDkoXm/md5g+AUwjZwdBxRX25qMmBMzofgx/Oek7gqg8T2uueT6TqaQ==}
+  '@udecode/plate-core@48.0.3':
+    resolution: {integrity: sha512-c8y3eHWkbOeEFDeHtjmy4mPLHSKc2XxUr/rLysMPm/XFwKIZiAao+/UPhls/VHvD1872pLLWMywtwkkwtSHKEg==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -6042,59 +6756,52 @@ packages:
       react-dnd-html5-backend: '>=14.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-floating@44.0.0':
-    resolution: {integrity: sha512-BRmDOS8o6FPC6SdxHuYcHUn4Y2cfhdehjg+BfeTlfXvkaqbPCivZz0gghzIdbW+xKdmHVihZu+IlSvMuB+8g2g==}
+  '@udecode/plate-floating@48.0.0':
+    resolution: {integrity: sha512-y+lkFqMpsmV0cBOFUNd2gmRRpUNvvCtgSv29pgwH/e2xJNYUtdAvlk42lYPJoCAnw9tLrPAosbbmGL7XOhUaEw==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-heading@44.0.0':
-    resolution: {integrity: sha512-6xiXBHSX6V09tkFQGQQG+D+VhHVYBHOocnkdFmx2+OyAep5voUfcO8sru/egNGKvOTyoGZ/ilnMq9iC322J0Tw==}
+  '@udecode/plate-heading@48.0.0':
+    resolution: {integrity: sha512-7Mn9RdphTaBHBe2BDZcye0YsTVQ6kh9acTLthw017gtvdK7i6DjIpjfB/o+Yavj3MuL+9ytknugRTOKeKN9r8Q==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-horizontal-rule@44.0.0':
-    resolution: {integrity: sha512-4vL9t9CTd2SJp8jnBSwxnHxEgThTNBt1tHJ/bdaAzYw+SLv8L4FxWQ4YHyGQi+qB/cAogBWvDDGc2ysqcKcGeg==}
+  '@udecode/plate-horizontal-rule@48.0.0':
+    resolution: {integrity: sha512-riBm7qDJzx+fpQGPXT6iFE8RTTTujCpMkbQ8KIR625+kFjJyTMD7FtWhrkw8fu5rDTtiz7vg30yMbrMKUpDCtw==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-indent-list@44.0.5':
-    resolution: {integrity: sha512-jFBVHzOS4IU7x/VnAuL0r1s8u6vMKQTQmfiql3/iz6Ai7ctkbFsBMvb3tVIc5MmtObADQ64hVuh9YUfaV0aZfA==}
+  '@udecode/plate-indent-list@48.0.0':
+    resolution: {integrity: sha512-NsyGums0ugCdmkQ45jW09MM0fA2SlS0dTNm6TCarC48CEvtfRJTnK5wfZyp9r5l7yn7PX3kyyqTokXpPdCRAKA==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.1'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-indent@44.0.0':
-    resolution: {integrity: sha512-kKF96hDkx7eUxr0aAp9vNAoOZBd8GdZb6YvlpwPrbLfN60KK29DEKmcCe4jKabvyxedlX6S7mTn4RvlH1zzcJg==}
+  '@udecode/plate-indent@48.0.0':
+    resolution: {integrity: sha512-b4N1SaOKsG/YeNnyr2DOqlDzf5KkWxw9Jc0UN1Ej367dChDk83kL5T1GlQze5DDUp5gdb3n0Chzy56KLIH3RXQ==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-link@44.0.4':
-    resolution: {integrity: sha512-THOa348K6YFPIgxFQQ9YRNvndindBMLpQ9LJkMOP6u8WTkB8z/J5x4ifqqBPpDH4I/0i6I8d0v/xx4kXhRJY0A==}
+  '@udecode/plate-link@48.0.0':
+    resolution: {integrity: sha512-YTgrn+BrNh6rFIaoDnW6RWS80U4hOUdVocbhpbLsXmI/ikEjSIjrUsAWfJetF2aCX+5vfQ6axrzL6ZkWnQmYtg==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.1'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-list@44.0.5':
-    resolution: {integrity: sha512-mcm+jNRhrnCJ+Q85pWadDRnQ/LMeWN7LWeG64miz4Hg32Hqyd9hh4/jf+0OD5+vuNjWtgJpN2R99rHjs/8QUkQ==}
+  '@udecode/plate-list@48.0.0':
+    resolution: {integrity: sha512-plHiMNDh6+6wDIg5e3ObNvsO3e70NvqKdUkusppPxW8hsxQOkSYUrByjcqJa7ROKJFXupzJ4yFWG8n8zQwOUrg==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.1'
-      react: '>=18.0.0'
-      react-dom: '>=18.0.0'
-
-  '@udecode/plate-node-id@44.0.0':
-    resolution: {integrity: sha512-fnFxr2H50oSVN6dN3/2Rk/D1X0ADpoSQGoPJmEE95VrNndI9DI2fzqCEpULtjU/Nc9NOE4WMZrT0FcqMZZKt+g==}
-    peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
@@ -6105,24 +6812,17 @@ packages:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-normalizers@44.0.0':
-    resolution: {integrity: sha512-nL5dioufXI7KtYR/FzTzQXo6SpsJvU2AyjOmmDRHNBrajG/g+s3DD0ipjK6Uegu+57m7TKi7m35o3VoFnB5QWw==}
+  '@udecode/plate-normalizers@48.0.0':
+    resolution: {integrity: sha512-EWFL516nP4JAyBtFuJ9B899jT1i49njNbCch3zhpDRcV0dQjA1vgPkKLZWQVyJF8LGVX2avu0z7H6aT6cU7ZdA==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-reset-node@44.0.0':
-    resolution: {integrity: sha512-rFC6znbQ0m0kxAfY3L8Fu7QL3/ywI3kIX1mEDH+t8e5o/2PFwwpoVSX1TWUM7h2ZpyGcX1BWxbDUZ/Evly6yrQ==}
+  '@udecode/plate-reset-node@48.0.0':
+    resolution: {integrity: sha512-YAXAX2GlOTBotfHksJNretmIpWNie9wPCfCov/+sGO30yGTvq/Xr+OXhDE2o2TAwd3UGHl5ckLi9GnSifnldDA==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
-      react: '>=18.0.0'
-      react-dom: '>=18.0.0'
-
-  '@udecode/plate-resizable@44.0.0':
-    resolution: {integrity: sha512-lIWicgtS0P4RzeroFzjB1WvHaq3AXlfy8HDKu2c6TP76tZNsiYW1s1Z1c4DsBgJzoF3rgup9GCwxhpg/yEI0cw==}
-    peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
@@ -6140,10 +6840,10 @@ packages:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-slash-command@44.0.0':
-    resolution: {integrity: sha512-/mxtC9vVhWfZRZ7WmRuRXzrPoYGOCtPrq1uixnqMo41Qxd/n1GXC956AYWuZMjbRAy64Yys894zFvJPdrb2KrQ==}
+  '@udecode/plate-slash-command@48.0.0':
+    resolution: {integrity: sha512-s1OmorQNaRHmGR58JGP6HcnR9C4YB7JSVOaazp4vl24Va376MNPNuxV5E7wG9xdhAca+862uOFCJNSBjNvgD1w==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
@@ -6154,21 +6854,21 @@ packages:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-trailing-block@44.0.0':
-    resolution: {integrity: sha512-gVTWwUqfufq54ISLHaXUxkCLGbBgZ3MXGfcuV/Nu/IelkNchRUA46nMxqcTK9DoOFHC6i6QM/G5ESlOAv9syRw==}
+  '@udecode/plate-trailing-block@48.0.0':
+    resolution: {integrity: sha512-cjgWNriVhA2BSp3haMB+lrJ+DEszVx1xRg/Vhei2rW/yVa2DYQT8tg2hQqlgnolgZ/yQpWu8eLfWZOH2pUSkuA==}
     peerDependencies:
-      '@udecode/plate': '>=44.0.0'
+      '@udecode/plate': '>=48.0.0'
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate-utils@46.0.2':
-    resolution: {integrity: sha512-k7/cHajz1cU1H8swtAY9WHS0QDODKhPtEMGpclsiSYKAtiQhvSkJEW+beR7THCcb5RCH3qbJ309e7dBGKbhjug==}
+  '@udecode/plate-utils@48.0.3':
+    resolution: {integrity: sha512-Wi882ZIi4TAeUH5sAcQfs59poyk/RCsNrRRdbwCv8gWkeSj5OP2tJzg8Ve5oG5FCw5Y4xYTDFKDTBTeNGT1gFQ==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/plate@46.0.2':
-    resolution: {integrity: sha512-DRy8amAfjqqG99JVQYIBto69WPN6/iwsmPQ2T2Id0Z+Z7Y0Fzh2195INB7uUeXk7QOLXD1nEW4u4hk0iPSkHtw==}
+  '@udecode/plate@48.0.3':
+    resolution: {integrity: sha512-AAA0hzeF1GlB6ilGn9AAYtucvnjsXQsnj8/z41tNB+nH8ShxmwGr7F8Q2oUz2KRNMxhPfbHZJppu53K6yuhLQg==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -6179,20 +6879,17 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  '@udecode/react-utils@44.0.1':
-    resolution: {integrity: sha512-UKzmuwOWrxfleNOXVsoTNk694WLmyKFaQ4v+QcxfEYmG+VcFQE3vuFXC8EtGK+azADOXgz9Ww3z/Deg+DBnZxg==}
+  '@udecode/react-utils@47.3.1':
+    resolution: {integrity: sha512-fHnY0RGOeKKPnFW8xx8VWlLI0yscHd/kIU5t0bZ5bJ7Vanlhk1CUnPGDNa5HCIMVQrLARngGut/lIyGtoF65EQ==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@udecode/slate@44.0.0':
-    resolution: {integrity: sha512-OwH2+qGNpfDr5kdmqnIRKyxQi+ZAoo+532SdNerWnj8bgsFTShLjgERMSP6UJUYVsv4EXZHe1FXKe4tT8GeFfQ==}
+  '@udecode/slate@48.0.1':
+    resolution: {integrity: sha512-3so9oEvT5hisF9ZPFOmdeV8HDHC36uEDNYDq54cbExlIyQ1LG48ZRu/qbDMA/42aXmB2BJPIqa0PuQd2UYS3ig==}
 
-  '@udecode/slate@45.0.6':
-    resolution: {integrity: sha512-MqcEUmUfA3QzFHgM+fhMaoJje220pCxvKCerjYhsPjNFVnoyFc9H4iB3G0UHfonkgyjEUueyuCa+uHQHGMIhBQ==}
-
-  '@udecode/utils@42.0.0':
-    resolution: {integrity: sha512-g7SRp639DMFG5NAqAlkDMYFPiegMvG11OUhzk4bIHpTAddFAaqlSVflzItaiDFx/yhw5QckMb+nEX1N5hiPirg==}
+  '@udecode/utils@47.2.7':
+    resolution: {integrity: sha512-tQ8tIcdW+ZqWWrDgyf/moTLWtcErcHxaOfuCD/6qIL5hCq+jZm67nGHQToOT4Czti5Jr7CDPMgr8lYpdTEZcew==}
 
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
@@ -8473,8 +9170,8 @@ packages:
     resolution: {integrity: sha512-kyCuEOWjJqZuDbRHzL8V93NzQhwIB71oFWSyzVo+KPZI+pnQPPxucdkrOZvkLRnrf5URsQM+IJ09Dw29cRALIA==}
     engines: {node: '>=10'}
 
-  html-entities@2.5.2:
-    resolution: {integrity: sha512-K//PSRMQk4FZ78Kyau+mZurHn3FH0Vwr+H36eE0rPbeYkRRi9YxceYPhuN60UwWorxyKHhqoAJl2OFKa4BVtaA==}
+  html-entities@2.6.0:
+    resolution: {integrity: sha512-kig+rMn/QOVRvr7c86gQ8lWXq+Hkv6CbAH1hLu+RG338StTpE8Z0b44SDVaqVu7HGKf27frdmUYEs9hTUX/cLQ==}
 
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
@@ -9870,8 +10567,8 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@5.1.3:
-    resolution: {integrity: sha512-zAbEOEr7u2CbxwoMRlz/pNSpRP0FdAU4pRaYunCdEezWohXFs+a0Xw7RfkKaezMsmSM1vttcLthJtwRnVtOfHQ==}
+  nanoid@5.1.5:
+    resolution: {integrity: sha512-Ir/+ZpE9fDsNH0hQ3C68uyThDXzYcim2EqcZ8zn8Chtt1iylPT9xXJB0kPCnqzgcEGikO9RxSrh63MsmVCU7Fw==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -11151,8 +11848,8 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
 
-  slate-dom@0.112.2:
-    resolution: {integrity: sha512-cozITMlpcBxrov854reM6+TooiHiqpfM/nZPrnjpN1wSiDsAQmYbWUyftC+jlwcpFj80vywfDHzlG6hXIc5h6A==}
+  slate-dom@0.114.0:
+    resolution: {integrity: sha512-3LWIfiDPNQSY+SCPsvMTErCkx2gXTViLoWISisw6uM+unwiOkEF9ZmpHp88/SSmcq6k3P4aIquehUNeNUlkdiA==}
     peerDependencies:
       slate: '>=0.99.0'
 
@@ -11161,16 +11858,16 @@ packages:
     peerDependencies:
       slate: '>=0.65.3'
 
-  slate-react@0.112.1:
-    resolution: {integrity: sha512-V9b+waxPweXqAkSQmKQ1afG4Me6nVQACPpxQtHPIX02N7MXa5f5WilYv+bKt7vKKw+IZC2F0Gjzhv5BekVgP/A==}
+  slate-react@0.114.2:
+    resolution: {integrity: sha512-yqJnX1/7A30szl9BxW3qX99MZy6mM6VtUi1rXTy0JpRMTKv3rduo0WOxqcX90tpt0ke2pzHGbrLLr1buIN4vrw==}
     peerDependencies:
       react: '>=18.2.0'
       react-dom: '>=18.2.0'
-      slate: '>=0.99.0'
+      slate: '>=0.114.0'
       slate-dom: '>=0.110.2'
 
-  slate@0.112.0:
-    resolution: {integrity: sha512-PRnfFgDA3tSop4OH47zu4M1R4Uuhm/AmASu29Qp7sGghVFb713kPBKEnSf1op7Lx/nCHkRlCa3ThfHtCBy+5Yw==}
+  slate@0.114.0:
+    resolution: {integrity: sha512-r3KHl22433DlN5BpLAlL4b3D8ItoGKAkj91YT6GhP39XuLoBT+YFd9ObKuL/okgiPb5lbwnW+71fM45hHceN9w==}
 
   slice-ansi@4.0.0:
     resolution: {integrity: sha512-qMCMfhY040cVHT43K9BFygqYbUPFZKHOg7K73mtTWJRb8pyP3fzf4Ixd5SzdEJQ6MRUg/WBnOLxghZtKKurENQ==}
@@ -14767,7 +15464,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       tabbable: 6.2.0
 
-  '@floating-ui/react@0.27.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@floating-ui/react@0.27.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@floating-ui/react-dom': 2.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@floating-ui/utils': 0.2.9
@@ -15411,7 +16108,7 @@ snapshots:
     dependencies:
       '@monaco-editor/loader': 1.5.0
       monaco-editor: 0.31.0
-      prop-types: 15.7.2
+      prop-types: 15.8.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -15749,6 +16446,12 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.18
 
+  '@radix-ui/react-compose-refs@1.1.2(@types/react@18.3.18)(react@18.3.1)':
+    dependencies:
+      react: 18.3.1
+    optionalDependencies:
+      '@types/react': 18.3.18
+
   '@radix-ui/react-context@1.1.1(@types/react@18.3.18)(react@18.3.1)':
     dependencies:
       react: 18.3.1
@@ -15964,6 +16667,13 @@ snapshots:
   '@radix-ui/react-slot@1.1.2(@types/react@18.3.18)(react@18.3.1)':
     dependencies:
       '@radix-ui/react-compose-refs': 1.1.1(@types/react@18.3.18)(react@18.3.1)
+      react: 18.3.1
+    optionalDependencies:
+      '@types/react': 18.3.18
+
+  '@radix-ui/react-slot@1.2.2(@types/react@18.3.18)(react@18.3.1)':
+    dependencies:
+      '@radix-ui/react-compose-refs': 1.1.2(@types/react@18.3.18)(react@18.3.1)
       react: 18.3.1
     optionalDependencies:
       '@types/react': 18.3.18
@@ -16819,7 +17529,7 @@ snapshots:
 
   '@types/acorn@4.0.6':
     dependencies:
-      '@types/estree': 1.0.0
+      '@types/estree': 0.0.50
 
   '@types/aria-query@5.0.4': {}
 
@@ -16914,7 +17624,7 @@ snapshots:
 
   '@types/estree-jsx@1.0.5':
     dependencies:
-      '@types/estree': 1.0.0
+      '@types/estree': 0.0.50
 
   '@types/estree@0.0.50': {}
 
@@ -16957,7 +17667,7 @@ snapshots:
 
   '@types/hast@3.0.4':
     dependencies:
-      '@types/unist': 2.0.11
+      '@types/unist': 3.0.3
 
   '@types/hoist-non-react-statics@3.3.6':
     dependencies:
@@ -17071,7 +17781,7 @@ snapshots:
 
   '@types/mdast@4.0.4':
     dependencies:
-      '@types/unist': 2.0.11
+      '@types/unist': 3.0.3
 
   '@types/micromatch@4.0.9':
     dependencies:
@@ -17187,7 +17897,7 @@ snapshots:
 
   '@types/tern@0.23.9':
     dependencies:
-      '@types/estree': 1.0.0
+      '@types/estree': 0.0.50
 
   '@types/unist@2.0.11': {}
 
@@ -17417,9 +18127,9 @@ snapshots:
       '@typescript-eslint/types': 5.62.0
       eslint-visitor-keys: 3.4.3
 
-  '@udecode/cn@44.0.1(@types/react@18.3.18)(class-variance-authority@0.7.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@2.6.0)':
+  '@udecode/cn@48.0.3(@types/react@18.3.18)(class-variance-authority@0.7.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@2.6.0)':
     dependencies:
-      '@udecode/react-utils': 44.0.1(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/react-utils': 47.3.1(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       class-variance-authority: 0.7.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -17427,62 +18137,62 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
-  '@udecode/plate-autoformat@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-autoformat@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       lodash: 4.17.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-basic-marks@45.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-basic-marks@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-block-quote@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-block-quote@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-break@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-break@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-code-block@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-code-block@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-combobox@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-combobox@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-core@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))':
+  '@udecode/plate-core@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))':
     dependencies:
       '@udecode/react-hotkeys': 37.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@udecode/react-utils': 44.0.1(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@udecode/slate': 45.0.6
-      '@udecode/utils': 42.0.0
+      '@udecode/react-utils': 47.3.1(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/slate': 48.0.1
+      '@udecode/utils': 47.2.7
       clsx: 2.1.1
-      html-entities: 2.5.2
+      html-entities: 2.6.0
       is-hotkey: 0.2.0
       jotai: 2.8.4(@types/react@18.3.18)(react@18.3.1)
       jotai-optics: 0.4.0(jotai@2.8.4(@types/react@18.3.18)(react@18.3.1))(optics-ts@2.4.1)
       jotai-x: 2.3.2(@types/react@18.3.18)(jotai@2.8.4(@types/react@18.3.18)(react@18.3.1))(react@18.3.1)
       lodash: 4.17.21
-      nanoid: 5.1.3
+      nanoid: 5.1.5
       optics-ts: 2.4.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      slate-hyperscript: 0.100.0(slate@0.112.0)
-      slate-react: 0.112.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)
+      slate-hyperscript: 0.100.0(slate@0.114.0)
+      slate-react: 0.114.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)
       use-deep-compare: 1.3.0(react@18.3.1)
       zustand: 5.0.3(@types/react@18.3.18)(immer@10.1.1)(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1))
       zustand-x: 6.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(zustand@5.0.3(@types/react@18.3.18)(immer@10.1.1)(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1)))
@@ -17495,9 +18205,9 @@ snapshots:
       - slate-dom
       - use-sync-external-store
 
-  '@udecode/plate-dnd@48.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.10)(@types/react@18.3.18)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-dnd@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.6)(@types/node@22.13.10)(@types/react@18.3.18)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       lodash: 4.17.21
       raf: 3.4.1
       react: 18.3.1
@@ -17505,131 +18215,118 @@ snapshots:
       react-dnd-html5-backend: 16.0.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-floating@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-floating@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@floating-ui/core': 1.6.9
-      '@floating-ui/react': 0.27.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@floating-ui/react': 0.27.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-heading@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-heading@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-horizontal-rule@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-horizontal-rule@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-indent-list@44.0.5(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-indent-list@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
-      '@udecode/plate-indent': 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@udecode/plate-list': 44.0.5(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate-indent': 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/plate-list': 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       clsx: 2.1.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-indent@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-indent@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-link@44.0.4(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-link@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
-      '@udecode/plate-floating': 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@udecode/plate-normalizers': 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate-floating': 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/plate-normalizers': 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-list@44.0.5(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-list@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
-      '@udecode/plate-reset-node': 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate-reset-node': 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       lodash: 4.17.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-node-id@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-node-id@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       lodash: 4.17.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-node-id@48.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-normalizers@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       lodash: 4.17.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-normalizers@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-reset-node@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
-      lodash: 4.17.21
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-reset-node@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-resizable@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-resizable@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-selection@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
-  '@udecode/plate-resizable@48.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
-  '@udecode/plate-selection@48.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       copy-to-clipboard: 3.3.3
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-slash-command@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-slash-command@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
-      '@udecode/plate-combobox': 44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate-combobox': 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-table@48.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-table@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
-      '@udecode/plate-node-id': 48.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@udecode/plate-resizable': 48.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate-node-id': 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/plate-resizable': 48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       lodash: 4.17.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-trailing-block@44.0.0(@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/plate-trailing-block@48.0.0(@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@udecode/plate': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/plate-utils@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))':
+  '@udecode/plate-utils@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))':
     dependencies:
-      '@udecode/plate-core': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
-      '@udecode/react-utils': 44.0.1(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@udecode/slate': 45.0.6
-      '@udecode/utils': 42.0.0
+      '@udecode/plate-core': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/react-utils': 47.3.1(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/slate': 48.0.1
+      '@udecode/utils': 47.2.7
       clsx: 2.1.1
       lodash: 4.17.21
       react: 18.3.1
@@ -17643,14 +18340,14 @@ snapshots:
       - slate-dom
       - use-sync-external-store
 
-  '@udecode/plate@46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))':
+  '@udecode/plate@48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))':
     dependencies:
-      '@udecode/plate-core': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
-      '@udecode/plate-utils': 46.0.2(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate-core': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
+      '@udecode/plate-utils': 48.0.3(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0)(use-sync-external-store@1.4.0(react@18.3.1))
       '@udecode/react-hotkeys': 37.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@udecode/react-utils': 44.0.1(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@udecode/slate': 45.0.6
-      '@udecode/utils': 42.0.0
+      '@udecode/react-utils': 47.3.1(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@udecode/slate': 48.0.1
+      '@udecode/utils': 47.2.7
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     transitivePeerDependencies:
@@ -17667,33 +18364,25 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@udecode/react-utils@44.0.1(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@udecode/react-utils@47.3.1(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@radix-ui/react-slot': 1.1.2(@types/react@18.3.18)(react@18.3.1)
-      '@udecode/utils': 42.0.0
+      '@radix-ui/react-slot': 1.2.2(@types/react@18.3.18)(react@18.3.1)
+      '@udecode/utils': 47.2.7
       clsx: 2.1.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
 
-  '@udecode/slate@44.0.0':
+  '@udecode/slate@48.0.1':
     dependencies:
-      '@udecode/utils': 42.0.0
+      '@udecode/utils': 47.2.7
       is-plain-object: 5.0.0
       lodash: 4.17.21
-      slate: 0.112.0
-      slate-dom: 0.112.2(slate@0.112.0)
+      slate: 0.114.0
+      slate-dom: 0.114.0(slate@0.114.0)
 
-  '@udecode/slate@45.0.6':
-    dependencies:
-      '@udecode/utils': 42.0.0
-      is-plain-object: 5.0.0
-      lodash: 4.17.21
-      slate: 0.112.0
-      slate-dom: 0.112.2(slate@0.112.0)
-
-  '@udecode/utils@42.0.0': {}
+  '@udecode/utils@47.2.7': {}
 
   '@ungap/structured-clone@1.3.0': {}
 
@@ -17822,10 +18511,6 @@ snapshots:
   acorn-jsx@5.3.2(acorn@8.14.1):
     dependencies:
       acorn: 8.14.1
-
-  acorn-jsx@5.3.2(acorn@8.8.2):
-    dependencies:
-      acorn: 8.8.2
 
   acorn-walk@8.3.4:
     dependencies:
@@ -19532,8 +20217,8 @@ snapshots:
       '@typescript-eslint/parser': 5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2)
       eslint: 9.22.0(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7))
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7))
+      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0)(eslint@9.22.0(jiti@1.21.7))
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3)(eslint@9.22.0(jiti@1.21.7))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.22.0(jiti@1.21.7))
       eslint-plugin-react: 7.37.4(eslint@9.22.0(jiti@1.21.7))
       eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@9.22.0(jiti@1.21.7))
@@ -19552,7 +20237,7 @@ snapshots:
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1)
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.4(eslint@8.57.1)
       eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@8.57.1)
@@ -19583,21 +20268,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7)):
-    dependencies:
-      '@nolyfill/is-core-module': 1.0.39
-      debug: 4.4.0
-      enhanced-resolve: 5.18.1
-      eslint: 9.22.0(jiti@1.21.7)
-      get-tsconfig: 4.10.0
-      is-bun-module: 1.3.0
-      stable-hash: 0.0.4
-      tinyglobby: 0.2.12
-    optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7))
-    transitivePeerDependencies:
-      - supports-color
-
   eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.24.0))(eslint@8.24.0):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
@@ -19624,7 +20294,22 @@ snapshots:
       stable-hash: 0.0.4
       tinyglobby: 0.2.12
     optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+    transitivePeerDependencies:
+      - supports-color
+
+  eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0)(eslint@9.22.0(jiti@1.21.7)):
+    dependencies:
+      '@nolyfill/is-core-module': 1.0.39
+      debug: 4.4.0
+      enhanced-resolve: 5.18.1
+      eslint: 9.22.0(jiti@1.21.7)
+      get-tsconfig: 4.10.0
+      is-bun-module: 1.3.0
+      stable-hash: 0.0.4
+      tinyglobby: 0.2.12
+    optionalDependencies:
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3)(eslint@9.22.0(jiti@1.21.7))
     transitivePeerDependencies:
       - supports-color
 
@@ -19661,14 +20346,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7)):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3)(eslint@9.22.0(jiti@1.21.7)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2)
       eslint: 9.22.0(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7))
+      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.31.0)(eslint@9.22.0(jiti@1.21.7))
     transitivePeerDependencies:
       - supports-color
 
@@ -19730,7 +20415,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3)(eslint@8.57.1):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -19759,7 +20444,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7)):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3)(eslint@9.22.0(jiti@1.21.7)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -19770,7 +20455,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.22.0(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7)))(eslint@9.22.0(jiti@1.21.7))
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@5.62.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3)(eslint@9.22.0(jiti@1.21.7))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -20835,7 +21520,7 @@ snapshots:
     dependencies:
       lru-cache: 6.0.0
 
-  html-entities@2.5.2: {}
+  html-entities@2.6.0: {}
 
   html-escaper@2.0.2: {}
 
@@ -22427,8 +23112,8 @@ snapshots:
 
   micromark-extension-mdxjs@1.0.1:
     dependencies:
-      acorn: 8.8.2
-      acorn-jsx: 5.3.2(acorn@8.8.2)
+      acorn: 8.14.1
+      acorn-jsx: 5.3.2(acorn@8.14.1)
       micromark-extension-mdx-expression: 1.0.8
       micromark-extension-mdx-jsx: 1.0.5
       micromark-extension-mdx-md: 1.0.1
@@ -22748,7 +23433,7 @@ snapshots:
 
   nanoid@3.3.9: {}
 
-  nanoid@5.1.3: {}
+  nanoid@5.1.5: {}
 
   napi-build-utils@2.0.0: {}
 
@@ -22762,7 +23447,7 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  next-auth@4.24.11(next@14.2.24(@playwright/test@1.51.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next-auth@4.24.11(next@14.2.24(@babel/core@7.26.9)(@playwright/test@1.51.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.26.9
       '@panva/hkdf': 1.2.1
@@ -23554,7 +24239,7 @@ snapshots:
       lodash: 4.17.21
       lodash-es: 4.17.21
       material-colors: 1.2.6
-      prop-types: 15.7.2
+      prop-types: 15.8.1
       react: 18.3.1
       reactcss: 1.2.3(react@18.3.1)
       tinycolor2: 1.6.0
@@ -23562,7 +24247,7 @@ snapshots:
   react-datetime@3.3.1(moment@2.29.4)(react@18.3.1):
     dependencies:
       moment: 2.29.4
-      prop-types: 15.7.2
+      prop-types: 15.8.1
       react: 18.3.1
 
   react-dnd-html5-backend@16.0.1:
@@ -23621,7 +24306,7 @@ snapshots:
       '@types/react-redux': 7.1.34
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
-      prop-types: 15.7.2
+      prop-types: 15.8.1
       react: 18.3.1
       react-is: 17.0.2
     optionalDependencies:
@@ -24233,7 +24918,7 @@ snapshots:
 
   signed-varint@2.0.1:
     dependencies:
-      varint: 5.0.0
+      varint: 5.0.2
 
   signedsource@1.0.0: {}
 
@@ -24253,7 +24938,7 @@ snapshots:
 
   slash@3.0.0: {}
 
-  slate-dom@0.112.2(slate@0.112.0):
+  slate-dom@0.114.0(slate@0.114.0):
     dependencies:
       '@juggle/resize-observer': 3.4.0
       direction: 1.0.4
@@ -24261,15 +24946,15 @@ snapshots:
       is-plain-object: 5.0.0
       lodash: 4.17.21
       scroll-into-view-if-needed: 3.1.0
-      slate: 0.112.0
+      slate: 0.114.0
       tiny-invariant: 1.3.1
 
-  slate-hyperscript@0.100.0(slate@0.112.0):
+  slate-hyperscript@0.100.0(slate@0.114.0):
     dependencies:
       is-plain-object: 5.0.0
-      slate: 0.112.0
+      slate: 0.114.0
 
-  slate-react@0.112.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-dom@0.112.2(slate@0.112.0))(slate@0.112.0):
+  slate-react@0.114.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(slate-dom@0.114.0(slate@0.114.0))(slate@0.114.0):
     dependencies:
       '@juggle/resize-observer': 3.4.0
       direction: 1.0.4
@@ -24279,11 +24964,11 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       scroll-into-view-if-needed: 3.1.0
-      slate: 0.112.0
-      slate-dom: 0.112.2(slate@0.112.0)
+      slate: 0.114.0
+      slate-dom: 0.114.0(slate@0.114.0)
       tiny-invariant: 1.3.1
 
-  slate@0.112.0:
+  slate@0.114.0:
     dependencies:
       immer: 10.1.1
       is-plain-object: 5.0.0
@@ -24876,7 +25561,7 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 20.17.45
-      acorn: 8.8.2
+      acorn: 8.14.1
       acorn-walk: 8.3.4
       arg: 4.1.3
       create-require: 1.1.1
@@ -24895,7 +25580,7 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 22.13.10
-      acorn: 8.8.2
+      acorn: 8.14.1
       acorn-walk: 8.3.4
       arg: 4.1.3
       create-require: 1.1.1

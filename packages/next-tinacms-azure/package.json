@@ -31,8 +31,8 @@
 		"build": "tinacms-scripts build"
 	},
 	"dependencies": {
-		"@azure/storage-blob": "^12.26.0",
-		"sharp": "^0.33.5"
+		"@azure/storage-blob": "catalog:",
+		"sharp": "catalog:"
 	},
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",
