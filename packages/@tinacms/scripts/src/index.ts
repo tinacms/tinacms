@@ -341,20 +341,23 @@ export class BuildTina {
   ): Promise<boolean> {
     const entry = entryPoint.name;
     const target = entryPoint.target;
-
+    const extension = path.extname(entry);
     const deps = packageJSON.dependencies;
     const peerDeps = packageJSON.peerDependencies;
     const external = Object.keys({ ...deps, ...peerDeps });
+    const outInfo = this.getOutputPaths(entry);
     const globals = {};
 
-    const outInfo = this.getOutputPaths(entry);
-
+    // TODO: Why skip this?
     if (['@tinacms/app'].includes(packageJSON.name)) {
       console.log('skipping @tinacms/app');
       return;
     }
 
+    // Rollup requires globals for UMD externals — using 'NOOP' as a dummy to silence warnings.
+    // This has no effect unless UMD is run in a browser.
     external.forEach((ext) => (globals[ext] = 'NOOP'));
+
     if (target === 'node') {
       if (
         ['@tinacms/graphql', '@tinacms/datalayer'].includes(packageJSON.name)
@@ -363,29 +366,30 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
-          // FIXME: no idea why but even though I'm on node14 it doesn't like
-          // the syntax for optional chaining, should be supported on 14
-          // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
-          target: 'node12',
-          // Use the outfile if it is provided
-          outfile: outInfo.outfile
-            ? path.join(process.cwd(), 'dist', `${outInfo.outfile}.js`)
-            : path.join(process.cwd(), 'dist', 'index.js'),
+          target: 'node20',
+          outfile: path.join(
+            process.cwd(),
+            'dist',
+            `${outInfo.outfile ? outInfo.outfile : 'index'}.js`
+          ),
           external: external.filter((item) => {
             const entryPoint = packageJSON.buildConfig.entryPoints[0];
             if (typeof entryPoint === 'string') return false;
             return !entryPoint.bundle.includes(item);
           }),
         });
+
         await esbuild({
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
           target: 'es2020',
           format: 'esm',
-          outfile: outInfo.outfile
-            ? path.join(process.cwd(), 'dist', `${outInfo.outfile}.mjs`)
-            : path.join(process.cwd(), 'dist', 'index.mjs'),
+          outfile: path.join(
+            process.cwd(),
+            'dist',
+            `${outInfo.outfile ? outInfo.outfile : 'index'}.mjs`
+          ),
           external,
         });
       } else if (['@tinacms/mdx'].includes(packageJSON.name)) {
@@ -394,14 +398,12 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
-          // FIXME: no idea why but even though I'm on node14 it doesn't like
-          // the syntax for optional chaining, should be supported on 14
-          // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
-          target: 'node12',
+          target: 'node20',
           format: 'cjs',
           outfile: path.join(process.cwd(), 'dist', 'index.js'),
           external: Object.keys({ ...peerDeps }),
         });
+
         await esbuild({
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
@@ -414,7 +416,8 @@ export class BuildTina {
           // development, which we don't want to expose our users to.
           external: Object.keys({ ...peerDeps }),
         });
-        // The ES version is targeting the browser, this is used by the rich-text's raw mode
+
+        // The ES version is targeting the browser. This is used by the rich-text's raw mode
         await esbuild({
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
@@ -432,15 +435,13 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
+          target: 'node20',
           outfile: path.join(process.cwd(), 'dist', `${outInfo.outfile}.js`),
           external,
-          target: 'node12',
         });
       }
 
-      const extension = path.extname(entry);
-
-      // TODO: When we're building for real, swap this out
+      // TODO: Replace with proper type generation in final build pipeline.
       fs.writeFileSync(
         path.join(
           process.cwd(),
@@ -476,8 +477,8 @@ export class BuildTina {
           },
         },
         outDir: outInfo.outdir,
-        emptyOutDir: false, // we build multiple files in to the dir
-        sourcemap: true, // true | 'inline' (note: inline will go straight into your bundle size)
+        emptyOutDir: false, // We build multiple files in to the dir.
+        sourcemap: true,
         rollupOptions: {
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
@@ -485,9 +486,6 @@ export class BuildTina {
             }
             warn(warning);
           },
-          // /**
-          //  * FIXME: rollup-plugin-node-polyfills is only needed for node targets
-          //  */
           plugins: [],
           /**
            * For some reason Rollup thinks it needs a global, though
