@@ -9,5 +9,8 @@
     "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
       "onlyUpdatePeerDependentsWhenOutOfRange": true
     },
-    "ignore": ["basic-iframe", "empty", "hugo-quickstart", "kitchen-sink", "next-2024", "tina-self-hosted-demo", "tina-cloud-starter"]
+    "ignore": [
+      "@examples/*",
+      "@experimental-examples/*"
+    ]
   }

@@ -1,5 +1,5 @@
 {
-	"name": "@tinacms/self-hosted-starter",
+	"name": "@examples/self-hosted-starter",
 	"version": "0.1.83",
 	"private": true,
 	"scripts": {

@@ -1,6 +1,6 @@
 {
 	"name": "@tinacms/app",
-	"version": "2.2.6",
+	"version": "2.2.7",
 	"main": "src/main.tsx",
 	"license": "Apache-2.0",
 	"devDependencies": {
@@ -8,10 +8,10 @@
 		"@types/react-dom": "^18.3.5",
 		"typescript": "^5.7.3"
 	},
-    "peerDependencies": {
+	"peerDependencies": {
 		"react": ">=18.3.1 <20.0.0",
 		"react-dom": ">=18.3.1 <20.0.0"
-    },
+	},
 	"dependencies": {
 		"@graphiql/toolkit": "0.8.4",
 		"@headlessui/react": "2.1.8",
