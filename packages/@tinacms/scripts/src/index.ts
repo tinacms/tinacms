@@ -299,14 +299,14 @@ export class BuildTina {
     this.program.usage('command [options]');
 
     // Error on unknown commands
-    this.program.on('command:*', function() {
+    this.program.on('command:*', function () {
       console.error(
         `Invalid command: ${args.join(' ')}\nSee --help for a list of available commands.`
       );
       process.exit(1);
     });
 
-    this.program.on('--help', function() {
+    this.program.on('--help', function () {
       console.log(
         'You can get help on any command with "-h" or "--help".\ne.g: "forestry types:gen --help"'
       );
