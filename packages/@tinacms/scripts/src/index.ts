@@ -1,17 +1,14 @@
-/**
-
-*/
-
-import { build } from 'vite';
-import { build as esbuild } from 'esbuild';
-import fs from 'fs-extra';
-import path from 'node:path';
-import chokidar from 'chokidar';
+import * as fs from 'fs';
 import { exec } from 'node:child_process';
+import path from 'node:path';
 import chalk from 'chalk';
+import chokidar from 'chokidar';
+import commander from 'commander';
+import { build as esbuild } from 'esbuild';
+import { outputFileSync } from 'fs-extra';
 import jsonDiff from 'json-diff';
-
-import * as commander from 'commander';
+import { build } from 'vite';
+import { deepMerge, sequential } from './utils';
 
 export interface Command {
   resource?: string;
