@@ -1,22 +1,22 @@
-import { NodeApi } from '@udecode/plate';
-import { getListItemEntry } from '@udecode/plate-list';
-import { type PlateEditor } from '@udecode/plate/react';
-import { ELEMENT_IMG } from '../create-img-plugin';
-import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
-import { HANDLES_MDX } from './formatting';
+import { NodeApi } from "@udecode/plate";
+import { getListItemEntry } from "@udecode/plate-list";
+import { type PlateEditor } from "@udecode/plate/react";
+import { ELEMENT_IMG } from "../create-img-plugin";
+import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from "../create-mdx-plugins";
+import { HANDLES_MDX } from "./formatting";
 
 export const unsupportedItemsInTable = new Set([
-  'Code Block',
-  'Unordered List',
-  'Ordered List',
-  'Quote',
-  'Mermaid',
-  'Heading 1',
-  'Heading 2',
-  'Heading 3',
-  'Heading 4',
-  'Heading 5',
-  'Heading 6',
+  "Code Block",
+  "Unordered List",
+  "Ordered List",
+  "Quote",
+  "Mermaid",
+  "Heading 1",
+  "Heading 2",
+  "Heading 3",
+  "Heading 4",
+  "Heading 5",
+  "Heading 6",
 ]);
 
 const isNodeActive = (editor, type) => {
@@ -37,7 +37,7 @@ const normalize = (node: any) => {
   ) {
     return {
       ...node,
-      children: [{ type: 'text', text: '' }],
+      children: [{ type: "text", text: "" }],
       id: Date.now(),
     };
   }
@@ -52,7 +52,7 @@ const normalize = (node: any) => {
     // Always supply an empty text leaf
     return {
       ...node,
-      children: [{ text: '' }],
+      children: [{ text: "" }],
       id: Date.now(),
     };
   }

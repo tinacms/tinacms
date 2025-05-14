@@ -1,16 +1,16 @@
-import { mergeProps } from '@udecode/plate';
+import { mergeProps } from "@udecode/plate";
 import {
   FloatingToolbarState,
   getSelectionBoundingClientRect,
   useVirtualFloating,
-} from '@udecode/plate-floating';
+} from "@udecode/plate-floating";
 import {
   useEditorReadOnly,
   useEditorRef,
   useEditorSelector,
   useFocused,
-} from '@udecode/plate/react';
-import React from 'react';
+} from "@udecode/plate/react";
+import React from "react";
 
 export const useCustomFloatingToolbarState = ({
   editorId,
@@ -23,13 +23,11 @@ export const useCustomFloatingToolbarState = ({
   focusedEditorId: string | null;
 } & FloatingToolbarState) => {
   const editor = useEditorRef();
-  console.log('[iseCuSTOM] ', editor);
   const selectionExpanded = useEditorSelector(
     () => editor.api.isExpanded(),
     []
   );
 
-  console.log('[BREAK?] ', editor, selectionExpanded);
   const selectionText = useEditorSelector(() => editor.api.string(), []);
   const readOnly = useEditorReadOnly();
 

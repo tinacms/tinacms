@@ -1,15 +1,14 @@
-import { createSoftBreakPlugin } from '../soft-break';
-import { withCorrectVoidBehavior } from './with-correct-void-behavior';
-import { createPlatePlugin, ParagraphPlugin } from '@udecode/plate/react';
-import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
-import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
-import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
-import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
-import { autoformatRules } from './autoformat/autoformat-rules';
-import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
-import { createSlatePlugin } from '@udecode/plate';
+import { createSoftBreakPlugin } from "../soft-break";
+import { createPlatePlugin, ParagraphPlugin } from "@udecode/plate/react";
+import { BlockquotePlugin } from "@udecode/plate-block-quote/react";
+import { TrailingBlockPlugin } from "@udecode/plate-trailing-block";
+import { AutoformatPlugin } from "@udecode/plate-autoformat/react";
+import { ExitBreakPlugin, SoftBreakPlugin } from "@udecode/plate-break/react";
+import { HEADING_KEYS, HEADING_LEVELS } from "@udecode/plate-heading";
+import { CodeBlockPlugin } from "@udecode/plate-code-block/react";
+import { autoformatRules } from "./autoformat/autoformat-rules";
+import { ResetNodePlugin } from "@udecode/plate-reset-node/react";
+import { createSlatePlugin } from "@udecode/plate";
 
 export const HANDLES_MDX = [
   HEADING_KEYS.h1,
@@ -35,14 +34,8 @@ const resetBlockTypesCommonRule = {
   defaultType: ParagraphPlugin.key,
 };
 
-//TODO : Renable this plugin later, comment out for now to test initial plate upgrade (will come back to this before we release plate upgrade)
-const CorrectNodeBehaviorPlugin = createSlatePlugin({
-  key: 'WITH_CORRECT_NODE_BEHAVIOR',
-}).overrideEditor(withCorrectVoidBehavior);
-
 export const plugins = [
   TrailingBlockPlugin,
-  CorrectNodeBehaviorPlugin,
   AutoformatPlugin.configure({
     options: {
       rules: autoformatRules,
@@ -55,15 +48,15 @@ export const plugins = [
         // TOOD: maybe this should be shift+enter, but that's a soft break
         // for other things like list items (see below)
         {
-          hotkey: 'mod+enter',
+          hotkey: "mod+enter",
         },
         // Same as above but drops you at the top of a block
         {
-          hotkey: 'mod+shift+enter',
+          hotkey: "mod+shift+enter",
           before: true,
         },
         {
-          hotkey: 'enter',
+          hotkey: "enter",
           query: {
             start: true,
             end: true,
@@ -94,9 +87,9 @@ export const plugins = [
   SoftBreakPlugin.configure({
     options: {
       rules: [
-        { hotkey: 'shift+enter' },
+        { hotkey: "shift+enter" },
         {
-          hotkey: 'enter',
+          hotkey: "enter",
           query: {
             allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
           },
