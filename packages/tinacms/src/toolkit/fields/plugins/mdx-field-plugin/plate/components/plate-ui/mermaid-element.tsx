@@ -1,10 +1,10 @@
-import { withRef } from '@udecode/cn';
-import { PlateElement } from '@udecode/plate/react';
-import { Eye, SquarePen } from 'lucide-react';
-import mermaid from 'mermaid';
-import React, { useEffect, useRef, useState } from 'react';
-import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin';
-import { CodeBlock } from '../../plugins/ui/code-block';
+import { withRef } from "@udecode/cn";
+import { PlateElement } from "@udecode/plate/react";
+import { Eye, SquarePen } from "lucide-react";
+import mermaid from "mermaid";
+import React, { useEffect, useRef, useState } from "react";
+import { ELEMENT_MERMAID } from "../../plugins/custom/mermaid-plugin";
+import { CodeBlockElement } from "./code-block-element";
 
 const MermaidElementWithRef = ({ config }) => {
   const mermaidRef = useRef<HTMLDivElement>(null);
@@ -17,9 +17,9 @@ const MermaidElementWithRef = ({ config }) => {
   }, [config]);
 
   return (
-    <div contentEditable={false} className='border-border border-b'>
+    <div contentEditable={false} className="border-border border-b">
       <div ref={mermaidRef}>
-        <pre className='mermaid not-tina-prose'>{config}</pre>
+        <pre className="mermaid not-tina-prose">{config}</pre>
       </div>
     </div>
   );
@@ -27,7 +27,7 @@ const MermaidElementWithRef = ({ config }) => {
 
 const Bubble = ({ children }) => {
   return (
-    <div className='bg-blue-600 rounded-full p-2 transition-transform duration-200 ease-in-out hover:scale-110'>
+    <div className="bg-blue-600 rounded-full p-2 transition-transform duration-200 ease-in-out hover:scale-110">
       {children}
     </div>
   );
@@ -38,7 +38,7 @@ const ErrorMsg = ({ error }) => {
     return (
       <div
         contentEditable={false}
-        className='font-mono bg-red-600 text-white p-2 rounded-md cursor-default'
+        className="font-mono bg-red-600 text-white p-2 rounded-md cursor-default"
       >
         {error}
       </div>
@@ -49,9 +49,9 @@ const ErrorMsg = ({ error }) => {
 
 const DEFAULT_MERMAID_CONFIG = `%% This won't render without implementing a rendering engine (e.g. mermaid on npm)
 flowchart TD
-    id1(this is an example flow diagram) 
+    id1(this is an example flow diagram)
     --> id2(modify me to see changes!)
-    id2 
+    id2
     --> id3(Click the top button to preview the changes)
     --> id4(Learn about mermaid diagrams - mermaid.js.org)`;
 
@@ -69,7 +69,7 @@ export const MermaidElement = withRef<typeof PlateElement>(
     const node = {
       type: ELEMENT_MERMAID,
       value: mermaidConfig,
-      children: [{ type: 'text', text: '' }],
+      children: [{ type: "text", text: "" }],
     };
 
     useEffect(() => {
@@ -80,25 +80,25 @@ export const MermaidElement = withRef<typeof PlateElement>(
 
     mermaid.parseError = (err: any) => {
       setMermaidError(
-        String(err.message) || 'An error occurred while parsing the diagram.'
+        String(err.message) || "An error occurred while parsing the diagram."
       );
     };
 
     return (
       <PlateElement element={element} ref={ref} {...props}>
-        <div className='relative group'>
-          <div className='absolute top-2 right-2 z-10 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out'>
+        <div className="relative group">
+          <div className="absolute top-2 right-2 z-10 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out">
             <Bubble>
               {isEditing ? (
                 <Eye
-                  className='w-5 h-5 fill-white cursor-pointer'
+                  className="w-5 h-5 fill-white cursor-pointer"
                   onClick={() => {
                     setIsEditing(!isEditing);
                   }}
                 />
               ) : (
                 <SquarePen
-                  className='w-5 h-5 fill-white cursor-pointer'
+                  className="w-5 h-5 fill-white cursor-pointer"
                   onClick={() => {
                     setIsEditing(!isEditing);
                   }}
@@ -108,13 +108,13 @@ export const MermaidElement = withRef<typeof PlateElement>(
           </div>
 
           {isEditing ? (
-            <CodeBlock
-              children={''}
-              language='yaml'
+            <CodeBlockElement
+              children={""}
+              // language='yaml'
               {...props}
               element={node}
-              defaultValue={mermaidConfig}
-              onChangeCallback={(value) => setMermaidConfig(value)}
+              // defaultValue={mermaidConfig}
+              // onChangeCallback={(value) => setMermaidConfig(value)}
             />
           ) : (
             <MermaidElementWithRef config={mermaidConfig} />
