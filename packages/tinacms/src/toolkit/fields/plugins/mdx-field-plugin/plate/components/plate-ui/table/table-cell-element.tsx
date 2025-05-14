@@ -5,18 +5,16 @@ import React from 'react';
 import type { TTableCellElement } from '@udecode/plate-table';
 
 import { cn, withProps, withRef } from '@udecode/cn';
-import {
-  useBlockSelected
-} from '@udecode/plate-selection/react';
+import { useBlockSelected } from '@udecode/plate-selection/react';
 import {
   TablePlugin,
   TableRowPlugin,
-  useTableCellElement
+  useTableCellElement,
 } from '@udecode/plate-table/react';
 import {
   PlateElement,
   useEditorPlugin,
-  useElementSelector
+  useElementSelector,
 } from '@udecode/plate/react';
 
 import { blockSelectionVariants } from './block-selection';
@@ -34,8 +32,7 @@ export const TableCellElement = withRef<
     key: TableRowPlugin.key,
   });
   const isSelectingRow = useBlockSelected(rowId);
-  const { borders, minHeight, selected, width } =
-    useTableCellElement();
+  const { borders, minHeight, selected, width } = useTableCellElement();
 
   return (
     <PlateElement
@@ -68,11 +65,11 @@ export const TableCellElement = withRef<
       }
       {...props}
       attributes={{
-        ...props.attributes
+        ...props.attributes,
       }}
     >
       <div
-        className="relative z-20 box-border h-full px-3 py-2"
+        className='relative z-20 box-border h-full px-3 py-2'
         style={{ minHeight }}
       >
         {children}

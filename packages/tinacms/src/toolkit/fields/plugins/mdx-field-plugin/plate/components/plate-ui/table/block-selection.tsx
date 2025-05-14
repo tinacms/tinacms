@@ -41,7 +41,7 @@ export function BlockSelection({
         }),
         className
       )}
-      data-slot="block-selection"
+      data-slot='block-selection'
       {...props}
     />
   );

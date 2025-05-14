@@ -80,7 +80,7 @@ export const TableElement = withHOC(
         style={{ paddingLeft: marginLeft }}
         {...props}
       >
-        <div className="group/table relative w-fit">
+        <div className='group/table relative w-fit'>
           <table
             className={cn(
               'mr-0 ml-px table h-px table-fixed border-collapse',
@@ -88,7 +88,7 @@ export const TableElement = withHOC(
             )}
             {...tableProps}
           >
-            <tbody className="min-w-full">{children}</tbody>
+            <tbody className='min-w-full'>{children}</tbody>
           </table>
         </div>
       </PlateElement>
@@ -125,18 +125,18 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
           {...props}
         >
           <Toolbar
-            className="scrollbar-hide flex w-auto max-w-[80vw] flex-row overflow-x-auto rounded-md border bg-popover p-1 shadow-md print:hidden"
+            className='scrollbar-hide flex w-auto max-w-[80vw] flex-row overflow-x-auto rounded-md border bg-popover p-1 shadow-md print:hidden'
             contentEditable={false}
           >
             <ToolbarGroup>
-              <ColorDropdownMenu tooltip="Background color">
+              <ColorDropdownMenu tooltip='Background color'>
                 <PaintBucketIcon />
               </ColorDropdownMenu>
               {canMerge && (
                 <ToolbarButton
                   onClick={() => tf.table.merge()}
                   onMouseDown={(e) => e.preventDefault()}
-                  tooltip="Merge cells"
+                  tooltip='Merge cells'
                 >
                   <CombineIcon />
                 </ToolbarButton>
@@ -145,7 +145,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
                 <ToolbarButton
                   onClick={() => tf.table.split()}
                   onMouseDown={(e) => e.preventDefault()}
-                  tooltip="Split cell"
+                  tooltip='Split cell'
                 >
                   <SquareSplitHorizontalIcon />
                 </ToolbarButton>
@@ -153,7 +153,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
 
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <ToolbarButton tooltip="Cell borders">
+                  <ToolbarButton tooltip='Cell borders'>
                     <Grid2X2Icon />
                   </ToolbarButton>
                 </DropdownMenuTrigger>
@@ -165,7 +165,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
 
               {collapsed && (
                 <ToolbarGroup>
-                  <ToolbarButton tooltip="Delete table" {...buttonProps}>
+                  <ToolbarButton tooltip='Delete table' {...buttonProps}>
                     <Trash2Icon />
                   </ToolbarButton>
                 </ToolbarGroup>
@@ -179,7 +179,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
                     tf.insert.tableRow({ before: true });
                   }}
                   onMouseDown={(e) => e.preventDefault()}
-                  tooltip="Insert row before"
+                  tooltip='Insert row before'
                 >
                   <ArrowUp />
                 </ToolbarButton>
@@ -188,7 +188,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
                     tf.insert.tableRow();
                   }}
                   onMouseDown={(e) => e.preventDefault()}
-                  tooltip="Insert row after"
+                  tooltip='Insert row after'
                 >
                   <ArrowDown />
                 </ToolbarButton>
@@ -197,7 +197,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
                     tf.remove.tableRow();
                   }}
                   onMouseDown={(e) => e.preventDefault()}
-                  tooltip="Delete row"
+                  tooltip='Delete row'
                 >
                   <XIcon />
                 </ToolbarButton>
@@ -211,7 +211,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
                     tf.insert.tableColumn({ before: true });
                   }}
                   onMouseDown={(e) => e.preventDefault()}
-                  tooltip="Insert column before"
+                  tooltip='Insert column before'
                 >
                   <ArrowLeft />
                 </ToolbarButton>
@@ -220,7 +220,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
                     tf.insert.tableColumn();
                   }}
                   onMouseDown={(e) => e.preventDefault()}
-                  tooltip="Insert column after"
+                  tooltip='Insert column after'
                 >
                   <ArrowRight />
                 </ToolbarButton>
@@ -229,7 +229,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
                     tf.remove.tableColumn();
                   }}
                   onMouseDown={(e) => e.preventDefault()}
-                  tooltip="Delete column"
+                  tooltip='Delete column'
                 >
                   <XIcon />
                 </ToolbarButton>
@@ -264,8 +264,8 @@ export const TableBordersDropdownMenuContent = withRef<
         e.preventDefault();
         editor.tf.focus();
       }}
-      align="start"
-      side="right"
+      align='start'
+      side='right'
       sideOffset={0}
       {...props}
     >
@@ -347,7 +347,7 @@ function ColorDropdownMenu({ children, tooltip }: ColorDropdownMenuProps) {
         <ToolbarButton tooltip={tooltip}>{children}</ToolbarButton>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent align='start'>
         {/* <DropdownMenuGroup label="Colors">
           <ColorDropdownMenuItems
             className="px-2"
@@ -356,7 +356,7 @@ function ColorDropdownMenu({ children, tooltip }: ColorDropdownMenuProps) {
           />
         </DropdownMenuGroup> */}
         <DropdownMenuGroup>
-          <DropdownMenuItem className="p-2" onClick={onClearColor}>
+          <DropdownMenuItem className='p-2' onClick={onClearColor}>
             <EraserIcon />
             <span>Clear</span>
           </DropdownMenuItem>
