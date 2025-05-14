@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/starter",
+  "name": "@experimental-examples/starter",
   "version": "0.1.64",
   "private": true,
   "scripts": {

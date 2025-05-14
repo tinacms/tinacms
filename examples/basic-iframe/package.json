@@ -1,5 +1,5 @@
 {
-	"name": "starter-basic-iframe",
+	"name": "@examples/starter-basic-iframe",
 	"private": true,
 	"scripts": {
 		"dev": "tinacms dev --noTelemetry -c \"next dev\"",
