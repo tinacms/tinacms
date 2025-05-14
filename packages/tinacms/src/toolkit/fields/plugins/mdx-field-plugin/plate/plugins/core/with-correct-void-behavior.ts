@@ -59,7 +59,7 @@ export const withCorrectVoidBehavior = (editor) => {
         }
       }
     }
-    editor.tf.deleteBackward(unit)
+    editor.tf.deleteBackward(unit);
   };
 
   return editor;

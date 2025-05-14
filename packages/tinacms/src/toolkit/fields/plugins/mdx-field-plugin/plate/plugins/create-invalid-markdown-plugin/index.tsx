@@ -1,7 +1,10 @@
 import React from 'react';
 import { useEditorContext } from '../../editor-context';
 import { buildErrorMessage } from '../../../monaco/error-message';
-import { createPlatePlugin, PlateRenderElementProps } from '@udecode/plate/react';
+import {
+  createPlatePlugin,
+  PlateRenderElementProps,
+} from '@udecode/plate/react';
 
 export const ELEMENT_INVALID_MARKDOWN = 'invalid_markdown';
 
@@ -12,9 +15,9 @@ export const createInvalidMarkdownPlugin = createPlatePlugin({
     isVoid: true,
     isInline: false,
   },
-  node:{
-    component : InvalidMarkdownElement
-  }
+  node: {
+    component: InvalidMarkdownElement,
+  },
 });
 
 function InvalidMarkdownElement({
@@ -29,7 +32,6 @@ function InvalidMarkdownElement({
     </div>
   );
 }
-
 
 function ErrorMessage({ error }) {
   const message = buildErrorMessage(error);

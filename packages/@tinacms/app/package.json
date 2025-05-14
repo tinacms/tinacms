@@ -8,10 +8,10 @@
 		"@types/react-dom": "^18.3.5",
 		"typescript": "^5.7.3"
 	},
-    "peerDependencies": {
+	"peerDependencies": {
 		"react": ">=18.3.1 <20.0.0",
 		"react-dom": ">=18.3.1 <20.0.0"
-    },
+	},
 	"dependencies": {
 		"@graphiql/toolkit": "catalog:",
 		"@headlessui/react": "2.1.8",
