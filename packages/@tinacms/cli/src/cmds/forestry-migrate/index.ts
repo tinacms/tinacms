@@ -3,7 +3,13 @@ import path from 'path';
 import yaml from 'js-yaml';
 import minimatch from 'minimatch';
 import { parseFile, stringifyFile } from '@tinacms/graphql';
-import type { Collection, TinaField, UITemplate } from '@tinacms/schema-tools';
+import type {
+  Collection,
+  TinaField,
+  ContentFormat,
+  ContentFrontmatterFormat,
+} from '@tinacms/schema-tools';
+import { CONTENT_FORMATS } from '@tinacms/schema-tools';
 import { getFieldsFromTemplates, parseSections } from './util';
 import { logger } from '../../logger';
 import { dangerText, linkText, warnText } from '../../utils/theme';
@@ -49,12 +55,11 @@ const transformForestryMatchToTinaMatch = (match: string) => {
 
   return newMatch;
 };
-type Ext = 'mdx' | 'md' | 'json' | 'yaml' | 'yml' | 'toml';
 
-function checkExt(ext: string): Ext | false {
-  const extReal = ext.replace('.', '');
-  if (['mdx', 'md', 'json', 'yaml', 'yml', 'toml'].includes(extReal)) {
-    return extReal as Ext;
+function checkExt(ext: string): ContentFormat | false {
+  const extReal = ext.replace('.', '') as ContentFormat;
+  if (CONTENT_FORMATS.includes(extReal)) {
+    return extReal;
   } else {
     return false;
   }
@@ -92,7 +97,7 @@ export const generateAllTemplates = async ({
 };
 
 const generateCollectionFromForestrySection = (args: {
-  frontMatterFormat?: 'yaml' | 'toml' | 'json';
+  frontMatterFormat?: ContentFrontmatterFormat;
   section: {
     templates?: string[];
     label?: string;
@@ -122,7 +127,7 @@ const generateCollectionFromForestrySection = (args: {
   if (section.read_only) return;
 
   // find the document format
-  let format: Ext = 'md';
+  let format: ContentFormat = 'md';
   if (section.new_doc_ext) {
     const ext = checkExt(section.new_doc_ext);
     if (ext) {
@@ -345,7 +350,7 @@ export const generateCollections = async ({
   usingTypescript,
   frontMatterFormat,
 }: {
-  frontMatterFormat?: 'toml' | 'yaml' | 'json';
+  frontMatterFormat?: ContentFrontmatterFormat;
   pathToForestryConfig: string;
   usingTypescript: boolean;
 }) => {
@@ -395,7 +400,7 @@ const rewriteTemplateKeysInDocs = (args: {
     }
   >;
   markdownParseConfig?: {
-    frontmatterFormat?: 'toml' | 'yaml' | 'json';
+    frontmatterFormat?: ContentFrontmatterFormat;
     frontmatterDelimiters?: [string, string] | string;
   };
 }) => {

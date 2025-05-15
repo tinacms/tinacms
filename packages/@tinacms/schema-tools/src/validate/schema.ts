@@ -7,15 +7,7 @@ import {
   duplicateCollectionErrorMessage,
   duplicateFieldErrorMessage,
 } from './util';
-const FORMATS = [
-  'json',
-  'md',
-  'markdown',
-  'mdx',
-  'toml',
-  'yaml',
-  'yml',
-] as const;
+import { CONTENT_FORMATS } from '../types/index';
 
 const Template = z
   .object({
@@ -60,7 +52,7 @@ export const CollectionBaseSchema = z.object({
         });
       }
     }),
-  format: z.enum(FORMATS).optional(),
+  format: z.enum(CONTENT_FORMATS).optional(),
   isAuthCollection: z.boolean().optional(),
   isDetached: z.boolean().optional(),
 });
