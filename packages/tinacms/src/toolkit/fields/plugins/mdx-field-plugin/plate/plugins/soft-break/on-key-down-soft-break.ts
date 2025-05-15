@@ -1,11 +1,12 @@
 import { isHotkey } from 'is-hotkey';
 import { KEY_SOFT_BREAK } from './create-soft-break-plugin';
-import { getBlockAbove, insertNodes, queryNode } from '@udecode/plate-common';
+import { queryNode } from '@udecode/plate';
+import { PlateEditor } from '@udecode/plate/react';
 
 export const onKeyDownSoftBreak =
-  (editor, { options: { rules = [] } }) =>
+  (editor: PlateEditor, { options: { rules = [] } }) =>
   (event) => {
-    const entry = getBlockAbove(editor);
+    const entry = editor.api.block();
     if (!entry) return;
 
     rules.forEach(({ hotkey, query }) => {
@@ -13,8 +14,7 @@ export const onKeyDownSoftBreak =
         event.preventDefault();
         event.stopPropagation();
 
-        insertNodes(
-          editor,
+        editor.tf.insertNodes(
           [
             { type: KEY_SOFT_BREAK, children: [{ text: '' }] },
             { type: 'text', text: '' },

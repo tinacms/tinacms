@@ -254,6 +254,7 @@ export const createConfig = async ({
           // Supresses the warning [NOTE] babel The code generator has deoptimised the styling of
           compact: true,
         },
+        fastRefresh: false,
       }),
       splitVendorChunkPlugin(),
       tinaTailwind(configManager.spaRootPath, configManager.prebuildFilePath),

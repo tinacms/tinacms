@@ -10,7 +10,7 @@
 		"test:e2e": "playwright test"
 	},
 	"dependencies": {
-		"axios": "1.7.5",
+		"axios": "catalog:",
 		"next": "^14.2.24",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
@@ -18,7 +18,7 @@
 		"tinacms": "workspace:*"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.50.1",
+		"@playwright/test": "catalog:",
 		"@tinacms/cli": "workspace:*",
 		"@types/node": "^22.13.1",
 		"eslint": "7",

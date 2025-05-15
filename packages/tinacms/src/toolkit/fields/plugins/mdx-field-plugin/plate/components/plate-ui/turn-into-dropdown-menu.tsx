@@ -3,24 +3,11 @@ import React from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import {
-  collapseSelection,
-  focusEditor,
-  getNodeEntries,
-  isBlock,
-  toggleNodeType,
   useEditorRef,
   useEditorState,
   useEditorSelector,
-} from '@udecode/plate-common';
-import {
-  ELEMENT_H1,
-  ELEMENT_H2,
-  ELEMENT_H3,
-  ELEMENT_H4,
-  ELEMENT_H5,
-  ELEMENT_H6,
-} from '@udecode/plate-heading';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
+  ParagraphPlugin,
+} from '@udecode/plate/react';
 
 import { Icons } from './icons';
 
@@ -34,63 +21,64 @@ import {
   useOpenState,
 } from './dropdown-menu';
 import { ToolbarButton } from './toolbar';
-import { toggleList, unwrapList } from '@udecode/plate';
 import { helpers } from '@toolkit/fields/plugins/mdx-field-plugin/plate/plugins/core/common';
-import { ELEMENT_TABLE } from '@udecode/plate-table';
+import { HEADING_KEYS } from '@udecode/plate-heading';
+import { TablePlugin } from '@udecode/plate-table/react';
+import { toggleList, unwrapList } from '@udecode/plate-list';
 
 const items = [
   {
     description: 'Paragraph',
     icon: Icons.paragraph,
     label: 'Paragraph',
-    value: ELEMENT_PARAGRAPH,
+    value: ParagraphPlugin.key,
   },
   {
     description: 'Heading 1',
     icon: Icons.h1,
     label: 'Heading 1',
-    value: ELEMENT_H1,
+    value: HEADING_KEYS.h1,
   },
   {
     description: 'Heading 2',
     icon: Icons.h2,
     label: 'Heading 2',
-    value: ELEMENT_H2,
+    value: HEADING_KEYS.h2,
   },
   {
     description: 'Heading 3',
     icon: Icons.h3,
     label: 'Heading 3',
-    value: ELEMENT_H3,
+    value: HEADING_KEYS.h3,
   },
   {
     description: 'Heading 4',
     icon: Icons.h4,
     label: 'Heading 4',
-    value: ELEMENT_H4,
+    value: HEADING_KEYS.h4,
   },
   {
     description: 'Heading 5',
     icon: Icons.h5,
     label: 'Heading 5',
-    value: ELEMENT_H5,
+    value: HEADING_KEYS.h5,
   },
   {
     description: 'Heading 6',
     icon: Icons.h6,
     label: 'Heading 6',
-    value: ELEMENT_H6,
+    value: HEADING_KEYS.h6,
   },
 ];
 
-const defaultItem = items.find((item) => item.value === ELEMENT_PARAGRAPH);
+const defaultItem = items.find((item) => item.value === ParagraphPlugin.key);
 
 export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const value: string = useEditorSelector((editor) => {
-    let initialNodeType: string = ELEMENT_PARAGRAPH;
+    let initialNodeType: string = ParagraphPlugin.key;
     let allNodesMatchInitialNodeType = false;
-    const codeBlockEntries = getNodeEntries(editor, {
-      match: (n) => isBlock(editor, n),
+    const codeBlockEntries = editor.api.nodes({
+      match: (n) => editor.api.isBlock(n),
       mode: 'highest',
     });
     const nodes = Array.from(codeBlockEntries);
@@ -98,13 +86,13 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
     if (nodes.length > 0) {
       initialNodeType = nodes[0][0].type as string;
       allNodesMatchInitialNodeType = nodes.every(([node]) => {
-        const type: string = (node?.type as string) || ELEMENT_PARAGRAPH;
+        const type: string = (node?.type as string) || ParagraphPlugin.key;
 
         return type === initialNodeType;
       });
     }
 
-    return allNodesMatchInitialNodeType ? initialNodeType : ELEMENT_PARAGRAPH;
+    return allNodesMatchInitialNodeType ? initialNodeType : ParagraphPlugin.key;
   }, []);
 
   const editor = useEditorRef();
@@ -115,7 +103,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem;
 
   const editorState = useEditorState();
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE);
+  const userInTable = helpers.isNodeActive(editorState, TablePlugin.key);
   if (userInTable) return null;
 
   return (
@@ -142,11 +130,11 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
               toggleList(editor, { type });
             } else {
               unwrapList(editor);
-              toggleNodeType(editor, { activeType: type });
+              editor.tf.toggleBlock(type);
             }
 
-            collapseSelection(editor);
-            focusEditor(editor);
+            editor.tf.collapse();
+            editor.tf.focus();
           }}
           value={value}
         >

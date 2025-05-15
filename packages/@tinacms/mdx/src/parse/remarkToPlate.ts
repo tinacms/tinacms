@@ -86,6 +86,7 @@ export const remarkToSlate = (
       case 'heading':
         return heading(content);
       case 'code':
+        console.log('[INFO code] ', field, root);
         return parseCode(content);
       case 'paragraph':
         return paragraph(content);
@@ -291,6 +292,7 @@ export const remarkToSlate = (
     if (content.lang === 'mermaid') {
       return mermaid(content);
     }
+    console.log('[INFO] Content: ', content);
     return code(content);
   };
 
@@ -302,16 +304,30 @@ export const remarkToSlate = (
     };
   };
 
+  function makeCodeLine(text: string): Plate.CodeLineElement {
+    return {
+      type: 'code_line',
+      children: [{ text }],
+    };
+  }
   const code = (content: Md.Code): Plate.CodeBlockElement => {
     const extra: Record<string, string> = {};
     if (content.lang) extra['lang'] = content.lang;
+
+    const value = content.value ?? '';
+    const children =
+      value.length > 0
+        ? value.split('\n').map(makeCodeLine)
+        : [makeCodeLine('')];
+
     return {
       type: 'code_block',
       ...extra,
-      value: content.value,
-      children: [{ type: 'text', text: '' }],
+      value,
+      children,
     };
   };
+
   const link = (content: Md.Link): Plate.LinkElement => {
     return {
       type: 'a',
