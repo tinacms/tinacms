@@ -174,7 +174,9 @@ const detectEnvironment = async ({
     const hugoConfigPath = path.join(rootPath, 'config.toml');
     if (await fs.pathExists(hugoConfigPath)) {
       const hugoConfig = await fs.readFile(hugoConfigPath, 'utf8');
-      const metaDataFormat = hugoConfig.toString().match(/metaDataFormat = "(.*)"/)?.[1];
+      const metaDataFormat = hugoConfig
+        .toString()
+        .match(/metaDataFormat = "(.*)"/)?.[1];
       if (
         metaDataFormat &&
         (metaDataFormat === 'yaml' ||

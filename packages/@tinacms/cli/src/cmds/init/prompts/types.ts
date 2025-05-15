@@ -7,7 +7,7 @@ export type Config = {
   framework: Framework;
   packageManager: 'pnpm' | 'yarn' | 'npm';
   forestryMigrate: boolean;
-  frontMatterFormat?: ContentFrontmatterFormat
+  frontMatterFormat?: ContentFrontmatterFormat;
   hosting?: 'tina-cloud' | 'self-host';
   gitProvider?: PromptGitProvider;
   databaseAdapter?: PromptDatabaseAdapter;

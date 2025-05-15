@@ -3,7 +3,12 @@ import path from 'path';
 import yaml from 'js-yaml';
 import minimatch from 'minimatch';
 import { parseFile, stringifyFile } from '@tinacms/graphql';
-import type { Collection, TinaField, ContentFormat, ContentFrontmatterFormat } from '@tinacms/schema-tools';
+import type {
+  Collection,
+  TinaField,
+  ContentFormat,
+  ContentFrontmatterFormat,
+} from '@tinacms/schema-tools';
 import { CONTENT_FORMATS } from '@tinacms/schema-tools';
 import { getFieldsFromTemplates, parseSections } from './util';
 import { logger } from '../../logger';
