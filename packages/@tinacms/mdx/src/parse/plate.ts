@@ -19,15 +19,20 @@ export type BlockquoteElement = {
   type: 'blockquote';
   children: InlineElement[];
 };
-/**
- * @group BlockElement
- */
+export type CodeLineElement = {
+  type: 'code_line';
+  id?: string;
+  children: { text: string }[];
+};
+
 export type CodeBlockElement = {
   type: 'code_block';
+  id?: string;
   lang?: string;
-  value: string;
-  children: [EmptyTextElement];
+  value?: string; // optional, not used by Plate
+  children: CodeLineElement[];
 };
+
 /**
  * @group BlockElement
  */

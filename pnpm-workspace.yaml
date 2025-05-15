@@ -86,6 +86,7 @@ catalog:
   "@types/ws": ^7.4.7
   "@typescript-eslint/eslint-plugin": ^5.62.0
   "@typescript-eslint/parser": ^5.62.0
+  "@udecode/cmdk": ^0.2.1
   "@udecode/cn": ^48.0.3
   "@udecode/plate": ^48.0.3
   "@udecode/plate-autoformat": ^48.0.0
@@ -113,6 +114,7 @@ catalog:
   "@vitejs/plugin-react": 3.1.0
   abstract-level: ^1.0.4
   acorn: 8.8.2
+  add: ^2.0.6
   altair-express-middleware: ^7.3.6
   async-lock: ^1.4.1
   auto-bind: ^4.0.0

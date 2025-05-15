@@ -74,10 +74,19 @@ export const blockElement = (
         value: content.value,
       };
     case 'code_block':
+      console.log(content);
+
+      const lines = (content.children ?? []).map((line: any) =>
+        Array.isArray(line.children) && line.children.length > 0
+          ? line.children
+              .map((t: any) => t.text)
+              .join('') // join in case of multiple text nodes
+          : ''
+      );
       return {
         type: 'code',
         lang: content.lang,
-        value: content.value,
+        value: lines.join('\n'),
       };
     case 'mdxJsxFlowElement':
       if (content.name === 'table') {

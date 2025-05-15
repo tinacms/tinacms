@@ -1,10 +1,9 @@
 'use client';
 
 import * as React from 'react';
-
+import { Command as CommandPrimitive } from 'cmdk';
 import type { DialogProps } from '@radix-ui/react-dialog';
 
-import { Command as CommandPrimitive } from '@udecode/cmdk';
 import {
   cn,
   createPrimitiveElement,
@@ -45,12 +44,12 @@ export const Command = withVariants(CommandPrimitive, commandVariants, [
 export function CommandDialog({ children, ...props }: DialogProps) {
   return (
     <Dialog {...props}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg">
-        <DialogTitle className="sr-only">Command Dialog</DialogTitle>
-        <DialogDescription className="sr-only">
+      <DialogContent className='overflow-hidden p-0 shadow-lg'>
+        <DialogTitle className='sr-only'>Command Dialog</DialogTitle>
+        <DialogDescription className='sr-only'>
           Search through commands and documentation using the command menu
         </DialogDescription>
-        <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:size-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:size-5">
+        <Command className='[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:size-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:size-5'>
           {children}
         </Command>
       </DialogContent>
@@ -60,8 +59,8 @@ export function CommandDialog({ children, ...props }: DialogProps) {
 
 export const CommandInput = withRef<typeof CommandPrimitive.Input>(
   ({ className, ...props }, ref) => (
-    <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-      <Search className="mr-2 size-4 shrink-0 opacity-50" />
+    <div className='flex items-center border-b px-3' cmdk-input-wrapper=''>
+      <Search className='mr-2 size-4 shrink-0 opacity-50' />
       <CommandPrimitive.Input
         ref={ref}
         className={cn(

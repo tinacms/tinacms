@@ -6,8 +6,9 @@ import { useEditorState } from '@udecode/plate/react';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { helpers } from '../../plugins/core/common';
-import { insertEmptyCodeBlock } from '../../transforms/insert-empty-block';
+// import { insertEmptyCodeBlock } from '../../transforms/insert-empty-block';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { insertEmptyCodeBlock } from '@udecode/plate-code-block';
 
 const useCodeBlockToolbarButtonState = () => {
   const editor = useEditorState();
@@ -24,6 +25,7 @@ const useCodeBlockToolbarButton = (state) => {
 
   const onClick = () => {
     insertEmptyCodeBlock(editor);
+    // insertEmptyCodeBlock(editor);
   };
 
   const onMouseDown = (e) => {

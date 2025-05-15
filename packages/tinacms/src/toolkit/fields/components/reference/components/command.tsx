@@ -1,4 +1,4 @@
-import { Command as CommandPrimitive } from 'cmdk';
+import { Command as CommandPrimitive } from '@udecode/cmdk';
 import { Search } from 'lucide-react';
 import * as React from 'react';
 import { cn } from '../../../../../lib/utils'; //TODO : improve this import path (breaking vite build without ../../../../../)
