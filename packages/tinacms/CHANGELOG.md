@@ -1,5 +1,12 @@
 # tinacms
 
+## 2.7.8
+
+### Patch Changes
+
+- [#5680](https://github.com/tinacms/tinacms/pull/5680) [`5e36123`](https://github.com/tinacms/tinacms/commit/5e361239a372e21dda624d17b4ff274bab23ce90) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collections - Add folder button is now always visible
+  When the collection is using templates, the button will be disabled and a tooltip as to why
+
 ## 2.7.7
 
 ### Patch Changes
