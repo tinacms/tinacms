@@ -2,7 +2,7 @@ name: Publish
 on:
   push:
     branches:
-      - 'snz'
+      - 'snz-main'
   pull_request:
     types: [opened, synchronize, reopened, labeled]
   workflow_dispatch: # Manual trigger
@@ -40,6 +40,7 @@ jobs:
         run: |
           git config --global user.email "ci@streamliners.co.nz"
           git config --global user.name "Streamliners CI"
+
       # Configure AWS credentials step
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -54,32 +55,38 @@ jobs:
         run: |
           TOKEN=$(aws codeartifact get-authorization-token --domain streamliners-npm --domain-owner 368438108069 --query authorizationToken --output text)
           echo "CODEARTIFACT_TOKEN=$TOKEN" >> $GITHUB_ENV
+
       - name: Configure .npmrc for AWS CodeArtifact
         run: |
           echo "registry=https://streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/" > ~/.npmrc
           echo "//streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/:_authToken=${CODEARTIFACT_TOKEN}" >> ~/.npmrc
+
       - name: Clean workspace and prepare
         run: |
           # Clean node_modules to ensure clean install
           find . -name "node_modules" -type d -exec rm -rf {} +
           find . -name ".turbo" -type d -exec rm -rf {} +
+
           # Create a docker-like isolated environment
-          cd packages/tinacms
+
           # Configure .npmrc for AWS CodeArtifact in the tinacms directory too
           echo "registry=https://streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/" > .npmrc
           echo "//streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/:_authToken=${CODEARTIFACT_TOKEN}" >> .npmrc
+
           # Install with scripts enabled (removed --ignore-scripts)
           pnpm install --no-frozen-lockfile
+
           # Build @tinacms/scripts first
           cd packages/@tinacms/scripts
           pnpm build
           cd ../..
+
           # Then build the rest
           pnpm build
           pnpm types
+
       - name: Publish to CodeArtifact
         run: |
-          cd packages/tinacms
           # Stable publish for snz-main
           if [[ "$GITHUB_REF" == "refs/heads/snz-main" ]]; then
             echo "Publishing stable version"
