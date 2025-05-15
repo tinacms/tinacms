@@ -1,5 +1,10 @@
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import type React from 'react';
+
+export const CONTENT_FORMATS = ['mdx', 'md', 'markdown', 'json', 'yaml', 'yml', 'toml'] as const;
+export type ContentFormat = (typeof CONTENT_FORMATS)[number];
+
+export type ContentFrontmatterFormat = 'yaml' | 'toml' | 'json';
 
 type Meta = {
   active?: boolean;
@@ -782,7 +787,7 @@ interface BaseCollection {
   name: string;
   path: string;
   indexes?: IndexType[];
-  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml';
+  format?: ContentFormat;
   ui?: UICollection;
   /**
    * @deprecated - use `ui.defaultItem` on the each `template` instead
@@ -791,7 +796,7 @@ interface BaseCollection {
   /**
    * This format will be used to parse the markdown frontmatter
    */
-  frontmatterFormat?: 'yaml' | 'toml' | 'json';
+  frontmatterFormat?: ContentFrontmatterFormat;
   /**
    * The delimiters used to parse the frontmatter.
    */
