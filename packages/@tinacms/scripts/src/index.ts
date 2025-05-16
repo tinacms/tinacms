@@ -348,7 +348,7 @@ export class BuildTina {
     const outInfo = this.getOutputPaths(entry);
     const globals = {};
 
-    // TODO: Why skip this?
+    // @tinacms/app is built via @tinacms/cli (vite), no need to build it here.
     if (['@tinacms/app'].includes(packageJSON.name)) {
       console.log('skipping @tinacms/app');
       return;
@@ -441,7 +441,8 @@ export class BuildTina {
         });
       }
 
-      // TODO: Replace with proper type generation in final build pipeline.
+      // This allows us to skip Typescript running on all packages during
+      // dev mode.
       fs.writeFileSync(
         path.join(
           process.cwd(),
