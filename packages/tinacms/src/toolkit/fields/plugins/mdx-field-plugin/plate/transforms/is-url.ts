@@ -1,10 +1,10 @@
 /**
- * RegExps. A URL must match #1 and then at least one of #2/#3. Use two levels
- * of REs to avoid REDOS.
+ * RegExps. A URL must match #1 or #2 or #3 or #4.
  */
 
 const protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
 const emailLintRE = /mailto:([^?\\]+)/;
+const telLintRE = /tel:([\d-]+)/; // Added regex for tel: links
 const localhostDomainRE = /^localhost[\d:?]*(?:[^\d:?]\S*)?$/;
 const nonLocalhostDomainRE = /^[^\s.]+\.\S{2,}$/;
 const localUrlRE = /^\/\S+/; // Regular expression for local URLs
@@ -22,32 +22,36 @@ export const isUrl = (string: any) => {
 
   const generalMatch = string.match(protocolAndDomainRE);
   const emailLinkMatch = string.match(emailLintRE);
+  const telLinkMatch = string.match(telLintRE); // Check for tel: link match
   const localUrlMatch = string.match(localUrlRE); // Check for local URL match
 
-  const match = generalMatch || emailLinkMatch || localUrlMatch;
-
-  if (!match) {
-    return false;
+  // Check if any of the specific link types or the general pattern match
+  if (emailLinkMatch || telLinkMatch || localUrlMatch) {
+    // For tel and mailto, we can consider them valid if they match the specific regex.
+    // For local URLs, the regex already covers it.
+    return true;
   }
 
-  if (localUrlMatch) {
-    return true; // If it's a local URL, we can return true directly
+  // If none of the specific types matched, check the general URL pattern
+  if (generalMatch) {
+    const everythingAfterProtocol = generalMatch[1];
+    if (!everythingAfterProtocol) {
+      return false;
+    }
+
+    // Fallback to URL constructor for stricter validation of complex URLs
+    try {
+      new URL(string);
+    } catch {
+      return false;
+    }
+
+    // Validate the domain part for general URLs
+    return (
+      localhostDomainRE.test(everythingAfterProtocol) ||
+      nonLocalhostDomainRE.test(everythingAfterProtocol)
+    );
   }
 
-  const everythingAfterProtocol = match[1];
-
-  if (!everythingAfterProtocol) {
-    return false;
-  }
-
-  try {
-    new URL(string);
-  } catch {
-    return false;
-  }
-
-  return (
-    localhostDomainRE.test(everythingAfterProtocol) ||
-    nonLocalhostDomainRE.test(everythingAfterProtocol)
-  );
+  return false;
 };

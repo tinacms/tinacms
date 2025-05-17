@@ -45,4 +45,9 @@ describe('isUrl', () => {
     expect(isUrl('#foo')).toBe(true);
     expect(isUrl('#section1')).toBe(true);
   });
+
+  test('validates tel links', () => {
+    expect(isUrl('tel:123')).toBe(true);
+    expect(isUrl('tel:1234567')).toBe(true);
+  });
 });
