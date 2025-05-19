@@ -1,5 +1,5 @@
 {
-	"name": "starter-basic-iframe",
+	"name": "@examples/starter-basic-iframe",
 	"private": true,
 	"scripts": {
 		"dev": "tinacms dev --noTelemetry -c \"next dev\"",
@@ -30,5 +30,5 @@
 		"@types/node": "^22.13.1",
 		"eslint": "7"
 	},
-	"version": null
+	"version": "0.1"
 }

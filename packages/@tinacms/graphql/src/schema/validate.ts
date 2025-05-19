@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import { addNamespaceToSchema } from '@tinacms/schema-tools';
 import deepClone from 'lodash.clonedeep';
 import { sequential } from '../util';
