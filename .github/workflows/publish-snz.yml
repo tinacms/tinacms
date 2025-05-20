@@ -1,4 +1,4 @@
-name: Publish
+name: Publish SNZ
 on:
   push:
     branches:
