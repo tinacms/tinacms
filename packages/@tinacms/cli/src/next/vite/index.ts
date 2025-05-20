@@ -226,14 +226,14 @@ export const createConfig = async ({
       host: configManager.config?.build?.host ?? false,
       watch: noWatch
         ? {
-          ignored: ['**/*'],
-        }
+            ignored: ['**/*'],
+          }
         : {
-          // Ignore everything except for the alias fields we specified above
-          ignored: [
-            `${configManager.tinaFolderPath}/**/!(config.prebuild.jsx|_graphql.json)`,
-          ],
-        },
+            // Ignore everything except for the alias fields we specified above
+            ignored: [
+              `${configManager.tinaFolderPath}/**/!(config.prebuild.jsx|_graphql.json)`,
+            ],
+          },
       fs: {
         strict: false,
       },

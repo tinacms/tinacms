@@ -80,8 +80,9 @@ const registerCommands = (commands: Command[], noHelp = false) => {
         console.log('\nCommands:');
         const optionTag = ' [options]';
         command.subCommands.forEach((subcommand, i) => {
-          const commandStr = `${subcommand.command}${(subcommand.options || []).length ? optionTag : ''
-            }`;
+          const commandStr = `${subcommand.command}${
+            (subcommand.options || []).length ? optionTag : ''
+          }`;
 
           const padLength =
             Math.max(...command.subCommands.map((sub) => sub.command.length)) +
@@ -267,7 +268,7 @@ export async function init(args: any) {
 
   program.usage('command [options]');
   // error on unknown commands
-  program.on('command:*', function() {
+  program.on('command:*', function () {
     console.error(
       'Invalid command: %s\nSee --help for a list of available commands.',
       args.join(' ')
@@ -275,7 +276,7 @@ export async function init(args: any) {
     process.exit(1);
   });
 
-  program.on('--help', function() {
+  program.on('--help', function () {
     console.log(`
 You can get help on any command with "-h" or "--help".
 e.g: "forestry types:gen --help"
