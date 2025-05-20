@@ -2,7 +2,7 @@ name: Publish
 on:
   push:
     branches:
-      - 'snz-main'
+      - 'main'
   pull_request:
     types: [opened, synchronize, reopened, labeled]
   workflow_dispatch: # Manual trigger
@@ -87,8 +87,8 @@ jobs:
 
       - name: Publish to CodeArtifact
         run: |
-          # Stable publish for snz-main
-          if [[ "$GITHUB_REF" == "refs/heads/snz-main" ]]; then
+          # Stable publish for main
+          if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
             echo "Publishing stable version"
             pnpm run version
             pnpm publish -r --no-git-checks --access public
