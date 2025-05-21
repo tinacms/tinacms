@@ -479,7 +479,7 @@ export class BuildTina {
         },
         outDir: outInfo.outdir,
         emptyOutDir: false, // We build multiple files in to the dir.
-        sourcemap: true,
+        sourcemap: false,
         rollupOptions: {
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
