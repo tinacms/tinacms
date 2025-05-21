@@ -4,9 +4,9 @@ import type {
   MediaListOptions,
   MediaStore,
   MediaUploadOptions,
-} from "tinacms";
-import { DEFAULT_MEDIA_UPLOAD_TYPES } from "tinacms";
-import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from "./errors";
+} from 'tinacms';
+import { DEFAULT_MEDIA_UPLOAD_TYPES } from 'tinacms';
+import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors';
 
 export type AzureMediaStoreOptions = {
   baseUrl?: string;
@@ -15,7 +15,7 @@ export type AzureMediaStoreOptions = {
 export class AzureMediaStore implements MediaStore {
   baseUrl: string;
   constructor(options?: AzureMediaStoreOptions) {
-    this.baseUrl = options?.baseUrl || "/api/azure/media";
+    this.baseUrl = options?.baseUrl || '/api/azure/media';
   }
   fetchFunction = (input: RequestInfo, init?: RequestInit) =>
     fetch(input, init);
@@ -28,12 +28,12 @@ export class AzureMediaStore implements MediaStore {
     for (const item of media) {
       const { file, directory } = item;
       const formData = new FormData();
-      formData.append("file", file);
-      formData.append("directory", directory);
-      formData.append("filename", file.name);
+      formData.append('file', file);
+      formData.append('directory', directory);
+      formData.append('filename', file.name);
 
       const res = await this.fetchFunction(this.baseUrl, {
-        method: "POST",
+        method: 'POST',
         body: formData,
       });
 
@@ -44,14 +44,14 @@ export class AzureMediaStore implements MediaStore {
       const fileRes = await res.json();
 
       const parsedRes: Media = {
-        type: "file",
+        type: 'file',
         id: fileRes.name,
         filename: fileRes.filename,
-        directory: "/",
+        directory: '/',
         thumbnails: {
-          "75x75": fileRes.url,
-          "400x400": fileRes.url,
-          "1000x1000": fileRes.url,
+          '75x75': fileRes.url,
+          '400x400': fileRes.url,
+          '1000x1000': fileRes.url,
         },
         src: fileRes.url,
       };
@@ -64,7 +64,7 @@ export class AzureMediaStore implements MediaStore {
     await this.fetchFunction(
       `${this.baseUrl}/${encodeURIComponent(media.id)}`,
       {
-        method: "DELETE",
+        method: 'DELETE',
       }
     );
   }
@@ -96,13 +96,13 @@ export class AzureMediaStore implements MediaStore {
 
   buildQuery(options: MediaListOptions): string {
     const params = Object.entries(options)
-      .filter(([_, value]) => value !== "" && value !== undefined)
+      .filter(([_, value]) => value !== '' && value !== undefined)
       .map(([key, value]) => {
-        return typeof value === "object"
+        return typeof value === 'object'
           ? `${key}=${encodeURIComponent(JSON.stringify(value))}`
           : `${key}=${encodeURIComponent(String(value))}`;
       })
-      .join("&");
+      .join('&');
 
     return `?${params}`;
   }
