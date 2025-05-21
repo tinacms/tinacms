@@ -1,8 +1,8 @@
 import { AuthProvider, LoginStrategy } from '@tinacms/schema-tools';
 import {
-  authenticate,
   AUTH_TOKEN_KEY,
   TokenObject,
+  authenticate,
 } from '../auth/authenticate';
 import DefaultSessionProvider from '../auth/defaultSessionProvider';
 
@@ -70,6 +70,7 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
   clientId: string;
   identityApiUrl: string;
   frontendUrl: string;
+  oauth2: boolean;
   token: string; // used with memory storage
   setToken: (_token: TokenObject) => void;
   getToken: () => Promise<TokenObject>;
@@ -86,11 +87,13 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM';
     getTokenFn?: () => Promise<TokenObject>;
     frontendUrl: string;
+    oauth2?: boolean;
   }) {
     super();
     this.frontendUrl = frontendUrl;
     this.clientId = clientId;
     this.identityApiUrl = identityApiUrl;
+    this.oauth2 = options.oauth2 || false;
     switch (tokenStorage) {
       case 'LOCAL_STORAGE':
         this.getToken = async function () {
@@ -136,10 +139,63 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
     }
   }
   async authenticate() {
-    const token = await authenticate(this.clientId, this.frontendUrl);
-    this.setToken(token);
-    return token;
+    // get query parameters
+    const params = new URLSearchParams(window.location.search);
+    console.log({ params });
+    const code = params.get('code');
+    const state = params.get('state');
+    // const error = params.get("error");
+    // const scope = params.get("scope");
+    const codeVerifier = localStorage.getItem('code_verifier');
+    // implement state check
+    console.log({
+      code,
+      state,
+      codeVerifier,
+    });
+
+    if (code && state && codeVerifier) {
+      const origin = `${window.location.protocol}//${window.location.host}`;
+      const redirectUri = `${origin}/admin`;
+      const tokenUrl = `${this.identityApiUrl}/oauth2/${this.clientId}/token`;
+      console.log('Token URL:', tokenUrl);
+      await fetch(tokenUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: redirectUri,
+          client_id: this.clientId,
+          code_verifier: localStorage.getItem('code_verifier'),
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('Token exchange response:', data);
+          this.setToken(data);
+        })
+        .catch((error) => {
+          console.error('Error during token exchange:', error);
+        });
+    } else {
+      console.log('calling authenticate');
+      const token = await authenticate(
+        this.clientId,
+        this.frontendUrl,
+        this.oauth2
+      );
+      console.log('Token:', token);
+      if (token) {
+        this.setToken(token);
+      }
+    }
+
+    return this.getToken();
   }
+
   async getUser() {
     if (!this.clientId) {
       return null;
@@ -168,6 +224,14 @@ export class TinaCloudAuthProvider extends AbstractAuthProvider {
 
   async getRefreshedToken(tokens: string): Promise<TokenObject> {
     const { access_token, id_token, refresh_token } = JSON.parse(tokens);
+    // FIXME this is a hack around lack of refresh token -
+    if (access_token && !id_token && !refresh_token) {
+      return Promise.resolve({
+        access_token,
+        id_token: access_token,
+        refresh_token: access_token,
+      });
+    }
     const { exp, iss, client_id } = this.parseJwt(access_token);
 
     // if the token is going to expire within the next two minutes, refresh it now
