@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
-import { cn, PortalBody, useComposedRef, withRef } from '@udecode/cn';
+import { cn, PortalBody, useComposedRef, withRef } from "@udecode/cn";
 
 import {
   type FloatingToolbarState,
   flip,
   offset,
-} from '@udecode/plate-floating';
+} from "@udecode/plate-floating";
 
-import { Toolbar } from './toolbar';
-import { useEditorRef, useEventEditorValue } from '@udecode/plate/react';
-import { useCustomFloatingToolbarState } from './use-floating-toolbar-state';
-import { useCustomFloatingToolbar } from './use-floating-toolbar-hook';
+import { Toolbar } from "./toolbar";
+import { useEditorRef, useEventEditorValue } from "@udecode/plate/react";
+import { useCustomFloatingToolbarState } from "./use-floating-toolbar-state";
+import { useCustomFloatingToolbar } from "./use-floating-toolbar-hook";
 
 export const FloatingToolbar = withRef<
   typeof Toolbar,
@@ -22,7 +22,7 @@ export const FloatingToolbar = withRef<
   }
 >(({ children, state, ...props }) => {
   const editorId = useEditorRef();
-  const focusedEditorId = useEventEditorValue('focus');
+  const focusedEditorId = useEventEditorValue("focus");
 
   const test = useCustomFloatingToolbarState({
     editorId: editorId.id,
@@ -33,15 +33,15 @@ export const FloatingToolbar = withRef<
         offset(12),
         flip({
           fallbackPlacements: [
-            'top-start',
-            'top-end',
-            'bottom-start',
-            'bottom-end',
+            "top-start",
+            "top-end",
+            "bottom-start",
+            "bottom-end",
           ],
           padding: 12,
         }),
       ],
-      placement: 'top',
+      placement: "top",
       ...state?.floatingOptions,
     },
   });
@@ -60,7 +60,7 @@ export const FloatingToolbar = withRef<
     <PortalBody>
       <Toolbar
         className={cn(
-          'absolute z-[999999] whitespace-nowrap border bg-popover px-1 opacity-100 shadow-md print:hidden'
+          "absolute z-[999999] whitespace-nowrap border bg-popover px-1 opacity-100 shadow-md print:hidden rounded-md"
         )}
         {...props}
         {...rootProps}

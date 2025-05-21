@@ -1,57 +1,57 @@
-import { withProps } from '@udecode/cn';
-import React from 'react';
-import { BlockquoteElement } from '../../components/plate-ui/blockquote-element';
-import { CodeBlockElement } from '../../components/plate-ui/code-block-element';
-import { CodeLeaf } from '../../components/plate-ui/code-leaf';
-import { CodeLineElement } from '../../components/plate-ui/code-line-element';
-import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf';
-import { ListElement } from '../../components/plate-ui/list-element';
-import { MermaidElement } from '../../components/plate-ui/mermaid-element';
-import { SlashInputElement } from '../../components/plate-ui/slash-input-element';
-import { ELEMENT_MERMAID } from '../custom/mermaid-plugin';
-import { classNames } from './helpers';
+import { withProps } from "@udecode/cn";
+import React from "react";
+import { BlockquoteElement } from "../../components/plate-ui/blockquote-element";
+import { CodeBlockElement } from "../../components/plate-ui/code-block-element";
+import { CodeLeaf } from "../../components/plate-ui/code-leaf";
+import { CodeLineElement } from "../../components/plate-ui/code-line-element";
+import { CodeSyntaxLeaf } from "../../components/plate-ui/code-syntax-leaf";
+import { ListElement } from "../../components/plate-ui/list-element";
+import { MermaidElement } from "../../components/plate-ui/mermaid-element";
+import { SlashInputElement } from "../../components/plate-ui/slash-input-element";
+import { ELEMENT_MERMAID } from "../custom/mermaid-plugin";
+import { classNames } from "./helpers";
 import {
   TableCellHeaderPlugin,
   TableCellPlugin,
   TablePlugin,
   TableRowPlugin,
-} from '@udecode/plate-table/react';
+} from "@udecode/plate-table/react";
 import {
   ParagraphPlugin,
   PlateElement,
   PlateLeaf,
   useSelected,
-} from '@udecode/plate/react';
-import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+} from "@udecode/plate/react";
+import { BlockquotePlugin } from "@udecode/plate-block-quote/react";
 import {
   CodeBlockPlugin,
   CodeLinePlugin,
   CodeSyntaxPlugin,
-} from '@udecode/plate-code-block/react';
-import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
+} from "@udecode/plate-code-block/react";
+import { HorizontalRulePlugin } from "@udecode/plate-horizontal-rule/react";
 import {
   BoldPlugin,
   CodePlugin,
   ItalicPlugin,
   StrikethroughPlugin,
   UnderlinePlugin,
-} from '@udecode/plate-basic-marks/react';
+} from "@udecode/plate-basic-marks/react";
 import {
   BulletedListPlugin,
   ListItemPlugin,
   NumberedListPlugin,
-} from '@udecode/plate-list/react';
-import { LinkPlugin } from '@udecode/plate-link/react';
-import { SlashInputPlugin } from '@udecode/plate-slash-command/react';
-import { ParagraphElement } from '../../components/plate-ui/paragraph-element';
+} from "@udecode/plate-list/react";
+import { LinkPlugin } from "@udecode/plate-link/react";
+import { SlashInputPlugin } from "@udecode/plate-slash-command/react";
+import { ParagraphElement } from "../../components/plate-ui/paragraph-element";
 import {
   TableCellElement,
   TableCellHeaderElement,
-} from '../../components/plate-ui/table/table-cell-element';
-import { TableElement } from '../../components/plate-ui/table/table-element';
-import { TableRowElement } from '../../components/plate-ui/table/table-row-element';
-import { HEADING_KEYS } from '@udecode/plate-heading';
-import { insertCodeBlock } from '@udecode/plate-code-block';
+} from "../../components/plate-ui/table/table-cell-element";
+import { TableElement } from "../../components/plate-ui/table/table-element";
+import { TableRowElement } from "../../components/plate-ui/table/table-row-element";
+import { HEADING_KEYS } from "@udecode/plate-heading";
+import { insertCodeBlock } from "@udecode/plate-code-block";
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -59,9 +59,9 @@ import { insertCodeBlock } from '@udecode/plate-code-block';
  * based on .prose styles. These classes aim to normalize
  * blocks behavior so they take up the same space
  */
-const blockClasses = 'mt-0.5';
+const blockClasses = "mt-0.5";
 /** prose sets a bold font, making bold marks impossible to see */
-const headerClasses = 'font-normal';
+const headerClasses = "font-normal";
 
 export const Components = () => {
   return {
@@ -74,14 +74,14 @@ export const Components = () => {
       ...props
     }) => (
       <h1
+        {...attributes}
+        {...props}
         className={classNames(
           headerClasses,
           blockClasses,
           className,
-          'text-4xl font-medium mb-4 last:mb-0 mt-6 first:mt-0'
+          "text-5xl font-normal mb-4 last:mb-0 mt-6 first:mt-0"
         )}
-        {...attributes}
-        {...props}
       />
     ),
     [HEADING_KEYS.h2]: ({
@@ -92,14 +92,14 @@ export const Components = () => {
       ...props
     }) => (
       <h2
+        {...attributes}
+        {...props}
         className={classNames(
           headerClasses,
           blockClasses,
           className,
-          'text-3xl font-medium mb-4 last:mb-0 mt-6 first:mt-0'
+          "text-4xl font-medium mb-4 last:mb-0 mt-6 first:mt-0"
         )}
-        {...attributes}
-        {...props}
       />
     ),
     [HEADING_KEYS.h3]: ({
@@ -110,14 +110,14 @@ export const Components = () => {
       ...props
     }) => (
       <h3
+        {...attributes}
+        {...props}
         className={classNames(
           headerClasses,
           blockClasses,
           className,
-          'text-2xl font-semibold mb-4 last:mb-0 mt-6 first:mt-0'
+          "text-3xl font-normal mb-4 last:mb-0 mt-6 first:mt-0"
         )}
-        {...attributes}
-        {...props}
       />
     ),
     [HEADING_KEYS.h4]: ({
@@ -128,14 +128,14 @@ export const Components = () => {
       ...props
     }) => (
       <h4
+        {...attributes}
+        {...props}
         className={classNames(
           headerClasses,
           blockClasses,
           className,
-          'text-xl font-bold mb-4 last:mb-0 mt-6 first:mt-0'
+          "text-2xl font-bold mb-4 last:mb-0 mt-6 first:mt-0"
         )}
-        {...attributes}
-        {...props}
       />
     ),
     /** Tailwind prose doesn't style h5 and h6 elements */
@@ -147,14 +147,14 @@ export const Components = () => {
       ...props
     }) => (
       <h5
+        {...attributes}
+        {...props}
         className={classNames(
           headerClasses,
           blockClasses,
           className,
-          'text-lg font-bold mb-4 last:mb-0 mt-6 first:mt-0'
+          "text-xl font-bold mb-4 last:mb-0 mt-6 first:mt-0"
         )}
-        {...attributes}
-        {...props}
       />
     ),
     [HEADING_KEYS.h6]: ({
@@ -165,14 +165,14 @@ export const Components = () => {
       ...props
     }) => (
       <h6
+        {...attributes}
+        {...props}
         className={classNames(
           headerClasses,
           blockClasses,
           className,
-          'text-base font-bold mb-4 last:mb-0 mt-6 first:mt-0'
+          "text-lg font-bold mb-4 last:mb-0 mt-6 first:mt-0"
         )}
-        {...attributes}
-        {...props}
       />
     ),
     [ParagraphPlugin.key]: ParagraphElement,
@@ -188,7 +188,7 @@ export const Components = () => {
         <div
           {...attributes}
           className={classNames(
-            'font-mono text-sm bg-green-100 cursor-not-allowed mb-4',
+            "font-mono text-sm bg-green-100 cursor-not-allowed mb-4",
             className
           )}
         >
@@ -202,7 +202,7 @@ export const Components = () => {
         <span
           {...attributes}
           className={classNames(
-            'font-mono bg-green-100 cursor-not-allowed',
+            "font-mono bg-green-100 cursor-not-allowed",
             className
           )}
         >
@@ -211,9 +211,9 @@ export const Components = () => {
         </span>
       );
     },
-    [BulletedListPlugin.key]: withProps(ListElement, { variant: 'ul' }),
-    [NumberedListPlugin.key]: withProps(ListElement, { variant: 'ol' }),
-    [ListItemPlugin.key]: withProps(PlateElement, { as: 'li' }),
+    [BulletedListPlugin.key]: withProps(ListElement, { variant: "ul" }),
+    [NumberedListPlugin.key]: withProps(ListElement, { variant: "ol" }),
+    [ListItemPlugin.key]: withProps(PlateElement, { as: "li" }),
     [LinkPlugin.key]: ({
       attributes,
       editor,
@@ -225,17 +225,17 @@ export const Components = () => {
       <a
         className={classNames(
           className,
-          'text-blue-500 hover:text-blue-600 transition-color ease-out duration-150 underline'
+          "text-blue-500 hover:text-blue-600 transition-color ease-out duration-150 underline"
         )}
         {...attributes}
         {...props}
       />
     ),
     [CodePlugin.key]: CodeLeaf,
-    [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
-    [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: 's' }),
-    [ItalicPlugin.key]: withProps(PlateLeaf, { as: 'em' }),
-    [BoldPlugin.key]: withProps(PlateLeaf, { as: 'strong' }),
+    [UnderlinePlugin.key]: withProps(PlateLeaf, { as: "u" }),
+    [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: "s" }),
+    [ItalicPlugin.key]: withProps(PlateLeaf, { as: "em" }),
+    [BoldPlugin.key]: withProps(PlateLeaf, { as: "strong" }),
     [HorizontalRulePlugin.key]: ({
       attributes,
       className,
@@ -248,7 +248,7 @@ export const Components = () => {
         <div
           className={classNames(
             className,
-            'cursor-pointer relative border bg-gray-200 my-4 first:mt-0 last:mb-0'
+            "cursor-pointer relative border bg-gray-200 my-4 first:mt-0 last:mb-0"
           )}
           {...attributes}
           {...props}
