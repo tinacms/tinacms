@@ -79,8 +79,8 @@ const editorVariants = cva(
           "max-h-[min(70vh,320px)] w-full max-w-[700px] overflow-y-auto px-3 py-2 text-base md:text-sm",
         comment: cn("rounded-none border-none bg-transparent text-sm"),
         default:
-          "size-full px-16 pt-4 text-base sm:px-[max(24px,calc(50%-350px))]",
-        demo: "size-full px-16 pt-4 text-base sm:px-[max(24px,calc(50%-350px))]",
+          "size-full px-16 pt-2 text-base sm:px-[max(24px,calc(50%-350px))]",
+        demo: "size-full px-16 pt-2 text-base sm:px-[max(24px,calc(50%-350px))]",
         fullWidth: "size-full px-16 pt-4 pb-72 text-base sm:px-12",
         none: "",
         select: "px-3 py-2 text-base data-readonly:w-fit",

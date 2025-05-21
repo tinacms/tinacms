@@ -33,6 +33,7 @@ import {
 import { createMermaidPlugin } from "./custom/mermaid-plugin";
 import { FloatingToolbarPlugin } from "./ui/floating-toolbar-plugin";
 import { createSlatePlugin } from "@udecode/plate";
+import lowlight from "lowlight";
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -65,7 +66,7 @@ export const viewPlugins = [
   UnderlinePlugin,
   HeadingPlugin.configure({ options: { levels: 6 } }),
   ParagraphPlugin,
-  CodeBlockPlugin,
+  CodeBlockPlugin.configure({ options: { lowlight } }),
   BlockquotePlugin,
 ] as const;
 

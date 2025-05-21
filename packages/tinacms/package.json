@@ -124,6 +124,7 @@
 		"is-hotkey": "catalog:",
 		"lodash.get": "catalog:",
 		"lodash.set": "catalog:",
+        "lowlight": "1.2.0",
 		"lucide-react": "catalog:",
 		"mermaid": "9.3.0",
 		"moment": "catalog:",

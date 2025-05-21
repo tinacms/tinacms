@@ -23,16 +23,17 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
     []
   );
 
-  console.log("♻️ Initial Value", initialValue);
-
-  // This should be a plugin customization
-  const ref = React.useRef<HTMLDivElement>(null);
-
+  //TODO try with a wrapper?
   const editor = useCreateEditor({
     plugins: [...editorPlugins],
     value: initialValue,
     components: Components(),
   });
+
+  console.log("♻️ Initial Value", initialValue);
+
+  // This should be a plugin customization
+  const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     if (ref.current) {
