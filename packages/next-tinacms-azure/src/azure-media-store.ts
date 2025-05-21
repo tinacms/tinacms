@@ -94,14 +94,14 @@ export class AzureMediaStore implements MediaStore {
     return img.src;
   };
 
-  buildQuery(options: MediaListOptions) {
-    const params = Object.keys(options)
-      .filter(
-        (key) =>
-          options[key as keyof MediaListOptions] !== '' &&
-          options[key as keyof MediaListOptions] !== undefined
-      )
-      .map((key) => `${key}=${options[key as keyof MediaListOptions]}`)
+  buildQuery(options: MediaListOptions): string {
+    const params = Object.entries(options)
+      .filter(([_, value]) => value !== '' && value !== undefined)
+      .map(([key, value]) => {
+        return typeof value === 'object'
+          ? `${key}=${encodeURIComponent(JSON.stringify(value))}`
+          : `${key}=${encodeURIComponent(String(value))}`;
+      })
       .join('&');
 
     return `?${params}`;
