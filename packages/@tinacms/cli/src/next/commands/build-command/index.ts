@@ -9,7 +9,6 @@ import {
   TinaCMSSearchIndexClient,
 } from '@tinacms/search';
 import { Command, Option } from 'clipanion';
-import { ca } from 'date-fns/locale';
 import fs from 'fs-extra';
 import {
   buildASTSchema,
