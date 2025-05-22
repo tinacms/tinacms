@@ -208,6 +208,6 @@ const pathRelativeToCollection = (collectionPath: string, fullPath: string): str
 
 const simplifyPathParts = (path: string): string => {
   return path.split('/')
-             .filter((name: string) => name != '')
+             .filter((name: string) => name !== '')
              .join('/');
 }
