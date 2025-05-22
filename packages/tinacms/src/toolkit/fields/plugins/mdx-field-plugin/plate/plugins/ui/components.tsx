@@ -80,7 +80,7 @@ export const Components = () => {
           headerClasses,
           blockClasses,
           className,
-          "text-5xl font-normal mb-4 last:mb-0 mt-6 first:mt-0"
+          "text-4xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville"
         )}
       />
     ),
@@ -98,7 +98,7 @@ export const Components = () => {
           headerClasses,
           blockClasses,
           className,
-          "text-4xl font-medium mb-4 last:mb-0 mt-6 first:mt-0"
+          "text-3xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville"
         )}
       />
     ),
@@ -116,7 +116,7 @@ export const Components = () => {
           headerClasses,
           blockClasses,
           className,
-          "text-3xl font-normal mb-4 last:mb-0 mt-6 first:mt-0"
+          "text-2xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville"
         )}
       />
     ),
@@ -134,7 +134,7 @@ export const Components = () => {
           headerClasses,
           blockClasses,
           className,
-          "text-2xl font-bold mb-4 last:mb-0 mt-6 first:mt-0"
+          "text-xl mb-4 last:mb-0 mt-6 first:mt-0 font-libre-baskerville"
         )}
       />
     ),
@@ -153,8 +153,9 @@ export const Components = () => {
           headerClasses,
           blockClasses,
           className,
-          "text-xl font-bold mb-4 last:mb-0 mt-6 first:mt-0"
+          "text-lg mb-4 last:mb-0 mt-6 first:mt-0"
         )}
+        style={{ fontFamily: "'Libre Baskerville', serif", fontWeight: "400" }}
       />
     ),
     [HEADING_KEYS.h6]: ({
@@ -171,8 +172,9 @@ export const Components = () => {
           headerClasses,
           blockClasses,
           className,
-          "text-lg font-bold mb-4 last:mb-0 mt-6 first:mt-0"
+          "text-base mb-4 last:mb-0 mt-6 first:mt-0"
         )}
+        style={{ fontFamily: "'Libre Baskerville', serif", fontWeight: "400" }}
       />
     ),
     [ParagraphPlugin.key]: ParagraphElement,

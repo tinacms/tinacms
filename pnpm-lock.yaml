@@ -2352,9 +2352,6 @@ importers:
       lodash.set:
         specifier: 'catalog:'
         version: 4.3.2
-      lowlight:
-        specifier: 1.2.0
-        version: 1.2.0
       lucide-react:
         specifier: 'catalog:'
         version: 0.424.0(react@18.3.1)
@@ -2476,6 +2473,9 @@ importers:
       jest-file-snapshot:
         specifier: ^0.7.0
         version: 0.7.0
+      lowlight:
+        specifier: ^3.3.0
+        version: 3.3.0
       next:
         specifier: 14.2.10
         version: 14.2.10(@babel/core@7.26.9)(@playwright/test@1.51.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -9195,10 +9195,6 @@ packages:
     resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
     engines: {node: '>=12.0.0'}
 
-  highlight.js@9.4.0:
-    resolution: {integrity: sha512-JjtXUc2JKmvY6qEhZD7p05CQDUjwlMX1a8nVQiXpZ4a/uNFHdTjpEnl3/Fs2dka/kjjBFg2CnqY5czBRjlD+Dw==}
-    deprecated: Version no longer supported. Upgrade to @latest
-
   history@5.3.0:
     resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
 
@@ -10068,8 +10064,8 @@ packages:
   lower-case@2.0.2:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
 
-  lowlight@1.2.0:
-    resolution: {integrity: sha512-NEgLEanxoWKjVQ+QrxTCV+lYGRq/Ytg9FTRvWXQUBanhQ2FEZTxTBEeV3ya/fyIEQ2w5WWmOPtpWUuN98ROsVQ==}
+  lowlight@3.3.0:
+    resolution: {integrity: sha512-0JNhgFoPvP6U6lE/UdVsSq99tn6DhjjpAj5MxG49ewd2mOBVtwWYIT8ClyABhq198aXXODMU6Ox8DrGy/CpTZQ==}
 
   lru-cache@10.0.0:
     resolution: {integrity: sha512-svTf/fzsKHffP42sujkO/Rjs37BCIsQVRCeNYIm9WN8rgT7ffoUnRtZCqU+6BqcSBdv8gwJeTz8knJpgACeQMw==}
@@ -21505,8 +21501,6 @@ snapshots:
 
   highlight.js@11.11.1: {}
 
-  highlight.js@9.4.0: {}
-
   history@5.3.0:
     dependencies:
       '@babel/runtime': 7.26.9
@@ -22521,9 +22515,11 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  lowlight@1.2.0:
+  lowlight@3.3.0:
     dependencies:
-      highlight.js: 9.4.0
+      '@types/hast': 3.0.4
+      devlop: 1.1.0
+      highlight.js: 11.11.1
 
   lru-cache@10.0.0: {}
 
