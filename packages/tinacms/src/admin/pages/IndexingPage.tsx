@@ -103,7 +103,10 @@ export const IndexingPage: FC = () => {
 
           const api = new TinaAdminApi(cms);
           const params = api.schema.transformPayload(collection.name, values);
-          const relativePath = pathRelativeToCollection(collection.path, fullPath)
+          const relativePath = pathRelativeToCollection(
+            collection.path,
+            fullPath
+          );
 
           if (await api.isAuthenticated()) {
             if (kind === 'delete') {
@@ -197,17 +200,23 @@ const Wrapper = ({ children }: any) => (
   </div>
 );
 
-const pathRelativeToCollection = (collectionPath: string, fullPath: string): string => {
+const pathRelativeToCollection = (
+  collectionPath: string,
+  fullPath: string
+): string => {
   const cleanCollectionPath = simplifyPathParts(collectionPath) + '/';
   const cleanFullPath = simplifyPathParts(fullPath);
   if (cleanFullPath.startsWith(cleanCollectionPath)) {
     return cleanFullPath.substring(cleanCollectionPath.length);
   }
-  throw new Error(`Path ${fullPath} not within collection path ${collectionPath}`)
-}
+  throw new Error(
+    `Path ${fullPath} not within collection path ${collectionPath}`
+  );
+};
 
 const simplifyPathParts = (path: string): string => {
-  return path.split('/')
-             .filter((name: string) => name !== '')
-             .join('/');
-}
+  return path
+    .split('/')
+    .filter((name: string) => name !== '')
+    .join('/');
+};
