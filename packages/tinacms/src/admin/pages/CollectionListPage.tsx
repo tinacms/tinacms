@@ -397,7 +397,7 @@ const CollectionListPage = () => {
                     {deleteModalOpen && cms.api.tina.usingProtectedBranch() && (
                       <CreateBranchModal
                         crudType='delete'
-                        relativePath={`${collectionExtra.path}/${vars.relativePath}`}
+                        path={`${collectionExtra.path}/${vars.relativePath}`}
                         values={vars}
                         close={() => setDeleteModalOpen(false)}
                         safeSubmit={async () => {

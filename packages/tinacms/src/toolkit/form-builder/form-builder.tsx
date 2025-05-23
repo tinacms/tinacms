@@ -209,7 +209,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
               <CreateBranchModal
                 safeSubmit={safeSubmit}
                 crudType={tinaForm.crudType}
-                relativePath={tinaForm.relativePath}
+                path={tinaForm.relativePath}
                 values={tinaForm.values}
                 close={() => setCreateBranchModalOpen(false)}
               />
