@@ -9,7 +9,6 @@ import {
   indentText,
   linkText,
   logText,
-  neutralText,
   titleText,
 } from '../../utils/theme';
 import { Telemetry } from '@tinacms/metrics';
@@ -31,6 +30,7 @@ import {
 } from './index';
 import { Config } from './prompts';
 import { addSelfHostedTinaAuthToConfig } from './codegen';
+import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 async function apply({
   env,
@@ -219,7 +219,7 @@ const forestryMigrate = async ({
 }: {
   usingTypescript: boolean;
   pathToForestryConfig: string;
-  frontMatterFormat: 'yaml' | 'toml' | 'json';
+  frontMatterFormat: ContentFrontmatterFormat;
 }) => {
   const { collections, importStatements, templateCode } =
     await generateCollections({
