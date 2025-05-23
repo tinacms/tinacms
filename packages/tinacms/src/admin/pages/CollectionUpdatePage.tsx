@@ -200,11 +200,15 @@ const resolvePathInCollection = (
   collectionPath: string,
   relativePath: string
 ): string => {
-  return collectionPath
+  let cleanPath = collectionPath
     .split('/')
     .concat(relativePath.split('/'))
     .filter((name: string) => name !== '')
     .join('/');
+  if (collectionPath.startsWith('/')) {
+    return `/${cleanPath}`;
+  }
+  return cleanPath;
 };
 
 export default CollectionUpdatePage;
