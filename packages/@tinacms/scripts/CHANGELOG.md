@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.3.5
+
+### Patch Changes
+
+- [#5677](https://github.com/tinacms/tinacms/pull/5677) [`26e1fb0`](https://github.com/tinacms/tinacms/commit/26e1fb052162d90632fa72cc41e2e8cf863865aa) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - refactor: build script
+
+- [#5690](https://github.com/tinacms/tinacms/pull/5690) [`f0adfbf`](https://github.com/tinacms/tinacms/commit/f0adfbfda3839823b75518914874c2142c0d47b4) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Disable sourcemap generation (reduce HEAP consumption on build)
+
 ## 1.3.4
 
 ### Patch Changes

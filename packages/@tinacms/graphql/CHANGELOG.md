@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 1.5.18
+
+### Patch Changes
+
+- [#5653](https://github.com/tinacms/tinacms/pull/5653) [`4c2c724`](https://github.com/tinacms/tinacms/commit/4c2c7240fdc1d0f177cc71eddd006e73389fe7c8) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - fix: spurious error messages by FilesystemBridge on some relative paths
+
+- Updated dependencies []:
+  - @tinacms/mdx@1.6.2
+  - @tinacms/schema-tools@1.7.3
+
 ## 1.5.17
 
 ### Patch Changes
