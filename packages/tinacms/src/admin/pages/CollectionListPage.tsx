@@ -9,7 +9,7 @@ import type { Collection, TinaField } from '@tinacms/schema-tools';
 import {
   BaseTextField,
   Button,
-  CreateBranchModel,
+  CreateBranchModal,
   CursorPaginator,
   Input,
   Message,
@@ -395,9 +395,9 @@ const CollectionListPage = () => {
                       )}
                     {/* Editorial workflow  */}
                     {deleteModalOpen && cms.api.tina.usingProtectedBranch() && (
-                      <CreateBranchModel
+                      <CreateBranchModal
                         crudType='delete'
-                        relativePath={`${collectionExtra.path}/${vars.relativePath}`}
+                        path={`${collectionExtra.path}/${vars.relativePath}`}
                         values={vars}
                         close={() => setDeleteModalOpen(false)}
                         safeSubmit={async () => {
