@@ -196,11 +196,15 @@ const RenderForm = ({
   );
 };
 
-const resolvePathInCollection = (collectionPath: string, relativePath: string): string => {
-  return collectionPath.split('/')
-                       .concat(relativePath.split('/'))
-                       .filter((name: string) => name !== '')
-                       .join('/');
-}
+const resolvePathInCollection = (
+  collectionPath: string,
+  relativePath: string
+): string => {
+  return collectionPath
+    .split('/')
+    .concat(relativePath.split('/'))
+    .filter((name: string) => name !== '')
+    .join('/');
+};
 
 export default CollectionUpdatePage;
