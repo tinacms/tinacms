@@ -200,7 +200,7 @@ const resolvePathInCollection = (
   collectionPath: string,
   relativePath: string
 ): string => {
-  let cleanPath = collectionPath
+  const cleanPath = collectionPath
     .split('/')
     .concat(relativePath.split('/'))
     .filter((name: string) => name !== '')
