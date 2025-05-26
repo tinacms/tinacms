@@ -1,5 +1,29 @@
 # tinacms-cli
 
+## 1.9.8
+
+### Patch Changes
+
+- [#5677](https://github.com/tinacms/tinacms/pull/5677) [`26e1fb0`](https://github.com/tinacms/tinacms/commit/26e1fb052162d90632fa72cc41e2e8cf863865aa) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - refactor: build script
+
+- [#5693](https://github.com/tinacms/tinacms/pull/5693) [`d6f7570`](https://github.com/tinacms/tinacms/commit/d6f7570e4bcfcdf00703fd9288410b8d0b43651b) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Build command - Now reports branch information in output
+  Reports which branch is being used during a build.
+  If that branch is a "bot" branch e.g. dependabot updating packages, the project's default branch will be reported as being used
+  This also improves error handling in the build command
+  Full error information is available with the `--verbose` flag and not outputted by default
+
+- [#5679](https://github.com/tinacms/tinacms/pull/5679) [`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: dedupe format types by moving them into schema-tools
+
+- [#5690](https://github.com/tinacms/tinacms/pull/5690) [`f0adfbf`](https://github.com/tinacms/tinacms/commit/f0adfbfda3839823b75518914874c2142c0d47b4) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Disable sourcemap generation (reduce HEAP consumption on build)
+
+- Updated dependencies [[`5e36123`](https://github.com/tinacms/tinacms/commit/5e361239a372e21dda624d17b4ff274bab23ce90), [`856e07a`](https://github.com/tinacms/tinacms/commit/856e07a0b8d742ee78d5eba565623cf081a61534), [`4d9c8ab`](https://github.com/tinacms/tinacms/commit/4d9c8abf6badd1bcc833bda432ab22dace4925ae), [`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734), [`7346dc9`](https://github.com/tinacms/tinacms/commit/7346dc996fd81ecb395b62f373976512e8224c21), [`4c2c724`](https://github.com/tinacms/tinacms/commit/4c2c7240fdc1d0f177cc71eddd006e73389fe7c8)]:
+  - tinacms@2.7.8
+  - @tinacms/graphql@1.5.18
+  - @tinacms/schema-tools@1.7.4
+  - @tinacms/app@2.2.8
+  - @tinacms/metrics@1.0.9
+  - @tinacms/search@1.0.45
+
 ## 1.9.7
 
 ### Patch Changes

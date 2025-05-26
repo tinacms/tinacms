@@ -1,5 +1,17 @@
 # tina-graphql
 
+## 1.5.18
+
+### Patch Changes
+
+- [#5679](https://github.com/tinacms/tinacms/pull/5679) [`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: dedupe format types by moving them into schema-tools
+
+- [#5653](https://github.com/tinacms/tinacms/pull/5653) [`4c2c724`](https://github.com/tinacms/tinacms/commit/4c2c7240fdc1d0f177cc71eddd006e73389fe7c8) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - fix: spurious error messages by FilesystemBridge on some relative paths
+
+- Updated dependencies [[`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734)]:
+  - @tinacms/schema-tools@1.7.4
+  - @tinacms/mdx@1.6.3
+
 ## 1.5.17
 
 ### Patch Changes
