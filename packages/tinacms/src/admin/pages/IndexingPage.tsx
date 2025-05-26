@@ -1,3 +1,4 @@
+import { canonicalPath } from '@tinacms/schema-tools';
 import { formatBranchName, useBranchData, useCMS } from '@tinacms/toolkit';
 import React, { FC, useEffect } from 'react';
 import { BiError, BiLoaderAlt } from 'react-icons/bi';
@@ -204,19 +205,12 @@ const pathRelativeToCollection = (
   collectionPath: string,
   fullPath: string
 ): string => {
-  const cleanCollectionPath = simplifyPathParts(collectionPath) + '/';
-  const cleanFullPath = simplifyPathParts(fullPath);
+  const cleanCollectionPath = canonicalPath(collectionPath) + '/';
+  const cleanFullPath = canonicalPath(fullPath);
   if (cleanFullPath.startsWith(cleanCollectionPath)) {
     return cleanFullPath.substring(cleanCollectionPath.length);
   }
   throw new Error(
     `Path ${fullPath} not within collection path ${collectionPath}`
   );
-};
-
-const simplifyPathParts = (path: string): string => {
-  return path
-    .split('/')
-    .filter((name: string) => name !== '')
-    .join('/');
 };
