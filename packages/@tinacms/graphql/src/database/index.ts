@@ -576,6 +576,7 @@ export class Database {
           filepath,
           collection.path || ''
         );
+        // console.log("folderKey", folderKey);
         const level = collection?.isDetached
           ? this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
           : this.contentLevel;
@@ -649,9 +650,22 @@ export class Database {
             : [];
         }
 
+        // TODO do we need to handle deletes
+        let folderOps: BatchOp[];
+        if (collection) {
+          folderOps = makeFolderOpsForCollection(
+            folderTreeBuilder.tree,
+            collection,
+            collectionIndexDefinitions,
+            'put',
+            level
+          );
+        }
+
         const ops: BatchOp[] = [
           ...delOps,
           ...putOps,
+          ...folderOps,
           {
             type: 'put',
             key: normalizedPath,
@@ -1021,6 +1035,13 @@ export class Database {
       filterChain: rawFilterChain,
       folder,
     } = queryOptions;
+    // console.log({ folder });
+    const keys = [];
+    for await (const [key, value] of this.contentLevel.iterator({})) {
+      // console.log("key", key);
+      keys.push(key);
+    }
+    // console.log({ keys });
     let limit = 50;
     if (first) {
       limit = first;
@@ -1160,6 +1181,7 @@ export class Database {
       endKey = key || '';
       edges = [...edges, { cursor: key, path: filepath, value: itemRecord }];
     }
+    // console.log({ edges });
 
     return {
       edges: await sequential(
