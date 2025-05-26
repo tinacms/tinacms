@@ -1,50 +1,114 @@
+import { Collection } from '../types';
 import { TinaSchema } from './TinaSchema';
 
 describe('TinaSchema', () => {
   describe('getCollectionByFullPath', () => {
-    it('fetches correct collection with getCollectionByFullPath', async () => {
-      const schema = new TinaSchema({
-        version: { fullVersion: '', major: '', minor: '', patch: '' },
-        meta: { flags: [] },
-        collections: [
+    const testCollection = (
+      name: string,
+      path: string,
+      format: 'mdx' | 'json'
+    ): Collection => {
+      return {
+        label: name,
+        name,
+        path,
+        format,
+        fields: [
           {
-            label: 'Test',
-            name: 'test',
-            path: 'content/test',
-            format: 'mdx',
-            fields: [
-              {
-                label: 'field',
-                type: 'string',
-                name: 'field',
-              },
-            ],
-          },
-          {
-            label: 'Test2',
-            name: 'test2',
-            path: 'content/test2',
-            format: 'mdx',
-            fields: [
-              {
-                label: 'field',
-                type: 'string',
-                name: 'field',
-              },
-            ],
+            label: 'field',
+            type: 'string',
+            name: 'field',
           },
         ],
-      });
+      };
+    };
+    const schemaWithoutRoot = new TinaSchema({
+      collections: [
+        testCollection('test', 'content/test', 'mdx'),
+        testCollection('test2', 'content/test2', 'mdx'),
+        testCollection('test3', '/content/test3', 'mdx'),
+        testCollection('test4', '/content/test4/', 'mdx'),
+        testCollection('test5', 'content/test', 'json'),
+      ],
+    });
+    const schemaWithRoot = new TinaSchema({
+      collections: [
+        testCollection('test', '', 'mdx'),
+        testCollection('test2', 'content', 'mdx'),
+        testCollection('test3', 'content', 'json'),
+      ],
+    });
 
-      const collection1 = schema.getCollectionByFullPath(
-        'content/test/foobar.mdx'
-      );
-      expect(collection1?.name).toEqual('test');
+    const expectCollectionFound = (
+      schema: TinaSchema,
+      path: string,
+      collectionName: string
+    ) => {
+      const collection = schema.getCollectionByFullPath(path);
+      expect(collection?.name).toEqual(collectionName);
+    };
+    const expectNoCollectionFound = (schema: TinaSchema, path: string) => {
+      expect(() => schema.getCollectionByFullPath(path)).toThrow();
+    };
 
-      const collection2 = schema.getCollectionByFullPath(
-        'content/test2/foobar.mdx'
+    it('fetches correct collection with getCollectionByFullPath in schema without root', async () => {
+      expectCollectionFound(
+        schemaWithoutRoot,
+        'content/test/foobar.mdx',
+        'test'
       );
-      expect(collection2?.name).toEqual('test2');
+      expectCollectionFound(
+        schemaWithoutRoot,
+        'content/test2/foobar.mdx',
+        'test2'
+      );
+      expectCollectionFound(
+        schemaWithoutRoot,
+        'content/test3/foobar.mdx',
+        'test3'
+      );
+      expectCollectionFound(
+        schemaWithoutRoot,
+        'content/test4/foobar.mdx',
+        'test4'
+      );
+      expectCollectionFound(
+        schemaWithoutRoot,
+        '/content/test/foobar.mdx',
+        'test'
+      );
+      expectCollectionFound(
+        schemaWithoutRoot,
+        'content/test/foobar.json',
+        'test5'
+      );
+    });
+
+    it('getCollectionByPath throws exception if path not in known collection in schema without root', async () => {
+      expectNoCollectionFound(
+        schemaWithoutRoot,
+        'content/no-matching-collection/foobar.mdx'
+      );
+      expectNoCollectionFound(schemaWithoutRoot, 'content/test2/foobar.json');
+    });
+
+    it('fetches correct collection with getCollectionByFullPath in schema with root', async () => {
+      expectCollectionFound(schemaWithRoot, 'foobar.mdx', 'test');
+      expectCollectionFound(schemaWithRoot, 'content.mdx', 'test');
+      expectCollectionFound(schemaWithRoot, '/foobar.mdx', 'test');
+      expectCollectionFound(schemaWithRoot, '/content.mdx', 'test');
+      expectCollectionFound(schemaWithRoot, 'content/foobar.mdx', 'test2');
+      expectCollectionFound(schemaWithRoot, 'content/foobar.json', 'test3');
+      expectCollectionFound(schemaWithRoot, '/content/foobar.mdx', 'test2');
+      expectCollectionFound(
+        schemaWithRoot,
+        'content/sub-dir/foobar.mdx',
+        'test2'
+      );
+    });
+
+    it('getCollectionByPath throws exception if path not in known collection in schema with root', async () => {
+      expectNoCollectionFound(schemaWithRoot, 'foobar.json');
     });
   });
 
