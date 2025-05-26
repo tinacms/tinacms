@@ -148,7 +148,7 @@ export class TinaSchema {
       }
       const collectionPath = canonicalPath(collection.path);
       return (
-        collectionPath == '' ||
+        collectionPath === '' ||
         canonicalFilepath.startsWith(`${collectionPath}/`)
       );
     });
