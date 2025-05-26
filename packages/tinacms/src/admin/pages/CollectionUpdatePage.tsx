@@ -8,7 +8,12 @@ import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
 import GetDocument from '../components/GetDocument';
 import React, { useMemo, useState } from 'react';
-import { TinaSchema, resolveForm, Collection } from '@tinacms/schema-tools';
+import {
+  TinaSchema,
+  resolveForm,
+  Collection,
+  canonicalPath,
+} from '@tinacms/schema-tools';
 import { Link, useParams } from 'react-router-dom';
 import { LocalWarning } from '@tinacms/toolkit';
 import { PageWrapper } from '../components/Page';
@@ -121,7 +126,7 @@ const RenderForm = ({
   const form = useMemo(() => {
     return new Form({
       // id is the full document path
-      id: `${schemaCollection.path}/${relativePath}`,
+      id: canonicalPath(`${schemaCollection.path}/${relativePath}`),
       label: 'form',
       fields: formInfo.fields as any,
       initialValues: document._values,
