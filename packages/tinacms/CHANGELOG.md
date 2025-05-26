@@ -1,5 +1,20 @@
 # tinacms
 
+## 2.7.7
+
+### Patch Changes
+
+- [#5607](https://github.com/tinacms/tinacms/pull/5607) [`1965236`](https://github.com/tinacms/tinacms/commit/19652363784e48b065ec1924a9cd9611c8e79cae) Thanks [@jeffsee55](https://github.com/jeffsee55)! - Specify react and react-dom as peer deps
+
+## 2.7.6
+
+### Patch Changes
+
+- [#5646](https://github.com/tinacms/tinacms/pull/5646) [`65cee5d`](https://github.com/tinacms/tinacms/commit/65cee5d6ae16c7320a4a14f0d9a82dc5f9103e34) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Sidebar | Support link - fixed malformed URL
+
+- Updated dependencies []:
+  - @tinacms/search@1.0.44
+
 ## 2.7.5
 
 ### Patch Changes

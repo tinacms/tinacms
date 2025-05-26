@@ -1,5 +1,25 @@
 # tinacms-cli
 
+## 1.9.7
+
+### Patch Changes
+
+- [#5607](https://github.com/tinacms/tinacms/pull/5607) [`1965236`](https://github.com/tinacms/tinacms/commit/19652363784e48b065ec1924a9cd9611c8e79cae) Thanks [@jeffsee55](https://github.com/jeffsee55)! - Specify react and react-dom as peer deps
+
+- Updated dependencies [[`1965236`](https://github.com/tinacms/tinacms/commit/19652363784e48b065ec1924a9cd9611c8e79cae)]:
+  - @tinacms/app@2.2.7
+  - tinacms@2.7.7
+
+## 1.9.6
+
+### Patch Changes
+
+- Updated dependencies [[`65cee5d`](https://github.com/tinacms/tinacms/commit/65cee5d6ae16c7320a4a14f0d9a82dc5f9103e34), [`450d5cd`](https://github.com/tinacms/tinacms/commit/450d5cda6b200c03de0a91fa58d48177531d44fe), [`515f2a4`](https://github.com/tinacms/tinacms/commit/515f2a427cb51b050af25910eeae5ca97ce04e92)]:
+  - tinacms@2.7.6
+  - @tinacms/graphql@1.5.17
+  - @tinacms/app@2.2.6
+  - @tinacms/search@1.0.44
+
 ## 1.9.5
 
 ### Patch Changes
