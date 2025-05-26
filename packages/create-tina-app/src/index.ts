@@ -179,7 +179,11 @@ export async function run() {
 
     if (themeChoice) {
       // usually dangerous to write to .env, but we're in a fresh project
-      await writeFile(path.join(rootDir, '.env'), `THEME=${themeChoice}`, 'utf-8');
+      await writeFile(
+        path.join(rootDir, '.env'),
+        `THEME=${themeChoice}`,
+        'utf-8'
+      );
     }
 
     updateProjectPackageName(rootDir, projectName);

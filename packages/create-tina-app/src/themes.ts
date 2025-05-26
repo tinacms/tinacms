@@ -1,4 +1,4 @@
-import { BaseExample } from "./templates";
+import { BaseExample } from './templates';
 
 export const THEMES: BaseExample[] = [
   {
