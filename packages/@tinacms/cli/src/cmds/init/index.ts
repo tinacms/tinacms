@@ -9,6 +9,7 @@ import configure from './configure';
 import { CLICommand } from '../index';
 import apply from './apply';
 import { Config } from './prompts';
+import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other';
@@ -42,12 +43,10 @@ export type GeneratedFile = {
   };
 };
 
-export type FrontmatterFormat = 'yaml' | 'toml' | 'json';
-
 export type InitEnvironment = {
   hasTinaDeps: boolean;
   forestryConfigExists: boolean;
-  frontMatterFormat: FrontmatterFormat;
+  frontMatterFormat: ContentFrontmatterFormat;
   gitIgnoreExists: boolean;
   gitIgnoreNodeModulesExists: boolean;
   gitIgnoreTinaEnvExists: boolean;
