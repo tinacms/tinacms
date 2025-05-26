@@ -178,10 +178,10 @@ export async function run() {
     await downloadTemplate(template, rootDir);
 
     if (themeChoice) {
-      // usually dangerous to write to .env, but we're in a fresh project
+      // usually dangerous to write to .env, but we're in a fresh project so there is never a .env existing
       await writeFile(
         path.join(rootDir, '.env'),
-        `THEME=${themeChoice}`,
+        `NEXT_PUBLIC_TINA_THEME=${themeChoice}`,
         'utf-8'
       );
     }
