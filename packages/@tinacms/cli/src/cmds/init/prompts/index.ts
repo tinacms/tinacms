@@ -3,6 +3,7 @@ import type { PromptObject } from 'prompts';
 import { Framework, InitEnvironment } from '../';
 import { linkText, logText } from '../../../utils/theme';
 import { Config, ImportStatement } from './types';
+import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 
 export * from './askTinaCloudSetup';
 export * from './types';
@@ -90,7 +91,7 @@ export const askForestryMigrate = async ({
   const answers = await prompts(questions);
   return answers as {
     forestryMigrate: boolean;
-    frontMatterFormat?: 'yaml' | 'toml' | 'json';
+    frontMatterFormat?: ContentFrontmatterFormat;
   };
 };
 

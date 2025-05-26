@@ -1,5 +1,5 @@
 {
-	"name": "e2e-next",
+	"name": "@examples/e2e-next",
 	"version": "0.1.99",
 	"private": true,
 	"scripts": {

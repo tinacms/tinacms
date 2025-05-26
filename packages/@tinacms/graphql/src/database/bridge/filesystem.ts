@@ -11,11 +11,13 @@ import type { Bridge } from './index';
  */
 export class FilesystemBridge implements Bridge {
   public rootPath: string;
-  public outputPath?: string;
+  public outputPath: string;
+
   constructor(rootPath: string, outputPath?: string) {
-    this.rootPath = rootPath || '';
-    this.outputPath = outputPath || rootPath;
+    this.rootPath = path.resolve(rootPath);
+    this.outputPath = outputPath ? path.resolve(outputPath) : this.rootPath;
   }
+
   public async glob(pattern: string, extension: string) {
     const basePath = path.join(this.outputPath, ...pattern.split('/'));
     const items = await fg(
@@ -26,19 +28,22 @@ export class FilesystemBridge implements Bridge {
       }
     );
     const posixRootPath = normalize(this.outputPath);
-    return items.map((item) => {
-      return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '');
-    });
+    return items.map((item) =>
+      item.substring(posixRootPath.length).replace(/^\/|\/$/g, '')
+    );
   }
+
   public async delete(filepath: string) {
     await fs.remove(path.join(this.outputPath, filepath));
   }
+
   public async get(filepath: string) {
-    return fs.readFileSync(path.join(this.outputPath, filepath)).toString();
+    return (await fs.readFile(path.join(this.outputPath, filepath))).toString();
   }
+
   public async put(filepath: string, data: string, basePathOverride?: string) {
     const basePath = basePathOverride || this.outputPath;
-    await fs.outputFileSync(path.join(basePath, filepath), data);
+    await fs.outputFile(path.join(basePath, filepath), data);
   }
 }
 

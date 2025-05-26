@@ -1,3 +1,5 @@
 #!/usr/bin/env node
 
-require('../dist/index.js').init(process.argv)
+const { BuildTina}  = require('../dist/index.js')
+const tinaBuild = new BuildTina()
+tinaBuild.init(process.argv)

@@ -239,7 +239,7 @@ export const createConfig = async ({
       },
     },
     build: {
-      sourcemap: true,
+      sourcemap: false,
       outDir: configManager.outputFolderPath,
       emptyOutDir: true,
       rollupOptions: rollupOptions,
