@@ -206,10 +206,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         return (
           <>
             {createBranchModalOpen && (
-              <CreateBranchModel
+              <CreateBranchModal
                 safeSubmit={safeSubmit}
                 crudType={tinaForm.crudType}
-                relativePath={tinaForm.relativePath}
+                path={tinaForm.relativePath}
                 values={tinaForm.values}
                 close={() => setCreateBranchModalOpen(false)}
               />
@@ -391,6 +391,10 @@ const getAnimationProps = (animateStatus) => {
       : {};
 };
 
+/**
+ * @deprecated
+ * Original misspelt version of CreateBranchModal
+ */
 export const CreateBranchModel = ({
   close,
   safeSubmit,
@@ -403,6 +407,28 @@ export const CreateBranchModel = ({
   relativePath: string;
   values: Record<string, unknown>;
   crudType: string;
+}) => (
+  <CreateBranchModal
+    close={close}
+    safeSubmit={safeSubmit}
+    path={relativePath}
+    values={values}
+    crudType={crudType}
+  />
+);
+
+export const CreateBranchModal = ({
+  close,
+  safeSubmit,
+  path,
+  values,
+  crudType,
+}: {
+  safeSubmit: () => Promise<void>;
+  close: () => void;
+  path: string;
+  values: Record<string, unknown>;
+  crudType: string;
 }) => {
   const cms = useCMS();
   const tinaApi = cms.api.tina;
@@ -412,7 +438,7 @@ export const CreateBranchModel = ({
 
   const onCreateBranch = (newBranchName) => {
     localStorage.setItem('tina.createBranchState', 'starting');
-    localStorage.setItem('tina.createBranchState.fullPath', relativePath);
+    localStorage.setItem('tina.createBranchState.fullPath', path);
     localStorage.setItem(
       'tina.createBranchState.values',
       JSON.stringify(values)
