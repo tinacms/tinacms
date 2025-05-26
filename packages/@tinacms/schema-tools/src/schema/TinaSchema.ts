@@ -116,6 +116,7 @@ export class TinaSchema {
       format: collection.format || 'md',
     };
   };
+
   public getCollections = () => {
     return (
       this.schema.collections.map((collection) =>
@@ -123,6 +124,7 @@ export class TinaSchema {
       ) || []
     );
   };
+
   public getCollectionByFullPath = (filepath: string) => {
     const fileExtension = filepath.split('.').pop();
     const normalizedPath = filepath.replace(/\\/g, '/');
@@ -300,6 +302,7 @@ export class TinaSchema {
       [collectionName]: this.transformCollectablePayload(payload, collection),
     };
   };
+
   private transformCollectablePayload = (
     payload: object,
     collection: Collectable
