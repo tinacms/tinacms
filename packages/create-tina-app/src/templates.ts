@@ -1,7 +1,7 @@
-import { downloadAndExtractRepo, getRepoInfo } from './util/examples';
-import { copy } from 'fs-extra';
-import path from 'path';
-import { log, TextStyles } from './util/logger';
+import { downloadAndExtractRepo, getRepoInfo } from "./util/examples";
+import { copy } from "fs-extra";
+import path from "path";
+import { log, TextStyles } from "./util/logger";
 
 export type BaseExample = {
   title: string;
@@ -20,59 +20,60 @@ export type Template = InternalTemplate | ExternalTemplate;
 
 export const TEMPLATES: Template[] = [
   {
-    title: '⭐ NextJS starter',
+    title: "⭐ NextJS starter",
     description:
-      'Kickstart your project with NextJS – our top recommendation for a seamless, performant, and versatile web experience.',
-    value: 'tina-cloud-starter',
+      "Kickstart your project with NextJS – our top recommendation for a seamless, performant, and versatile web experience.",
+    value: "tina-cloud-starter",
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/tina-cloud-starter',
+    gitURL: "https://github.com/tinacms/tina-cloud-starter",
   },
   {
-    title: '⭐️ TinaDocs',
-    description: 'Get your documentation site up and running with TinaCMS and Next.JS in minutes.',
-    value: 'tina-docs',
+    title: "⭐️ TinaDocs",
+    description:
+      "Get your documentation site up and running with TinaCMS and Next.JS in minutes.",
+    value: "tina-docs",
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/tina-docs',
+    gitURL: "https://github.com/tinacms/tina-docs",
   },
   {
-    title: 'Astro Starter',
+    title: "Astro Starter",
     description:
-      'Get started with Astro - a modern static site generator designed for fast, lightweight, and flexible web projects.',
-    value: 'tina-astro-starter',
+      "Get started with Astro - a modern static site generator designed for fast, lightweight, and flexible web projects.",
+    value: "tina-astro-starter",
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/tina-astro-starter',
+    gitURL: "https://github.com/tinacms/tina-astro-starter",
   },
   {
-    title: 'Hugo Starter',
+    title: "Hugo Starter",
     description:
-      'With Hugo, you wield the power of lightning-fast site generation, crafting web experiences at the speed of thought.',
-    value: 'tina-hugo-starter',
+      "With Hugo, you wield the power of lightning-fast site generation, crafting web experiences at the speed of thought.",
+    value: "tina-hugo-starter",
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/tina-hugo-starter',
+    gitURL: "https://github.com/tinacms/tina-hugo-starter",
   },
   {
-    title: 'Remix Starter',
+    title: "Remix Starter",
     description:
-      'Dive into Remix to orchestrate seamless, interactive user journeys like a maestro of the web.',
-    value: 'tina-remix-starter',
+      "Dive into Remix to orchestrate seamless, interactive user journeys like a maestro of the web.",
+    value: "tina-remix-starter",
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/tina-remix-starter',
+    gitURL: "https://github.com/tinacms/tina-remix-starter",
   },
   {
-    title: 'Docusaurus Starter',
+    title: "Docusaurus Starter",
     description:
-      'Docusaurus empowers you to build and evolve documentation like crafting a living, breathing knowledge repository.',
-    value: 'tinasaurus',
+      "Docusaurus empowers you to build and evolve documentation like crafting a living, breathing knowledge repository.",
+    value: "tinasaurus",
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/tinasaurus',
+    gitURL: "https://github.com/tinacms/tinasaurus",
   },
   {
-    title: 'Bare bones starter',
+    title: "Bare bones starter",
     description:
-      'Stripped down to essentials, this starter is the canvas for pure, unadulterated code creativity.',
-    value: 'basic',
+      "Stripped down to essentials, this starter is the canvas for pure, unadulterated code creativity.",
+    value: "basic",
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/tina-barebones-starter',
+    gitURL: "https://github.com/tinacms/tina-barebones-starter",
   },
 ];
 
@@ -81,7 +82,7 @@ export async function downloadTemplate(template: Template, root: string) {
     const repoURL = new URL(template.gitURL);
     const repoInfo = await getRepoInfo(repoURL);
     if (!repoInfo) {
-      throw new Error('Repository information not found.');
+      throw new Error("Repository information not found.");
     }
 
     log.info(
@@ -92,7 +93,7 @@ export async function downloadTemplate(template: Template, root: string) {
     await downloadAndExtractRepo(root, repoInfo);
   } else {
     // Copy the template from the local file system.
-    const templateFile = path.join(__dirname, '..', 'examples', template.value);
-    await copy(`${templateFile}/`, './');
+    const templateFile = path.join(__dirname, "..", "examples", template.value);
+    await copy(`${templateFile}/`, "./");
   }
 }
