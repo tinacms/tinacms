@@ -7,18 +7,9 @@ export const THEMES: BaseExample[] = [
     value: 'default',
   },
   {
-    title: 'Clean',
-    description: 'A clean theme for your project',
-    value: 'clean',
+    title: 'Monochrome',
+    description: 'A monochrome theme for your project',
+    value: 'monochrome',
   },
-  {
-    title: 'Muted',
-    description: 'A muted theme for your project',
-    value: 'muted',
-  },
-  {
-    title: 'Bold',
-    description: 'A bold theme for your project',
-    value: 'bold',
-  },
+  
 ];
