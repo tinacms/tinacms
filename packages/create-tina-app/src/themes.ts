@@ -11,5 +11,4 @@ export const THEMES: BaseExample[] = [
     description: 'A monochrome theme for your project',
     value: 'monochrome',
   },
-  
 ];
