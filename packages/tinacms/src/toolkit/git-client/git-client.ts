@@ -1,3 +1,6 @@
+/**
+ * @deprecated
+ */
 export class GitClient {
   constructor(private baseUrl: string) {}
 

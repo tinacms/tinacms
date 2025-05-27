@@ -7,6 +7,9 @@ import {
 } from '@toolkit/core';
 import { GitClient } from './git-client';
 
+/**
+ * @deprecated
+ */
 export class GitMediaStore implements MediaStore {
   accept = '*';
 
@@ -54,6 +57,9 @@ export class GitMediaStore implements MediaStore {
   }
 }
 
+/**
+ * @deprecated
+ */
 export const nextOffset = (offset: number, limit: number, count: number) => {
   if (offset + limit < count) return offset + limit;
   return undefined;

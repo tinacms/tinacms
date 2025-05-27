@@ -2,6 +2,9 @@ import { useMemo } from 'react';
 import { useCMS } from '@toolkit/react-core';
 import { GitFile } from './git-file';
 
+/**
+ * @deprecated
+ */
 export function useGitFile(
   relativePath: string,
   format: (file: any) => string,
