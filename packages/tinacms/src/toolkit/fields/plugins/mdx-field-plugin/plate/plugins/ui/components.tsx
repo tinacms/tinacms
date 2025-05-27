@@ -52,6 +52,7 @@ import { TableElement } from "../../components/plate-ui/table/table-element";
 import { TableRowElement } from "../../components/plate-ui/table/table-row-element";
 import { HEADING_KEYS } from "@udecode/plate-heading";
 import { insertCodeBlock } from "@udecode/plate-code-block";
+import { LinkElement } from "../../components/plate-ui/link-element";
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -216,23 +217,7 @@ export const Components = () => {
     [BulletedListPlugin.key]: withProps(ListElement, { variant: "ul" }),
     [NumberedListPlugin.key]: withProps(ListElement, { variant: "ol" }),
     [ListItemPlugin.key]: withProps(PlateElement, { as: "li" }),
-    [LinkPlugin.key]: ({
-      attributes,
-      editor,
-      element,
-      nodeProps,
-      className,
-      ...props
-    }) => (
-      <a
-        className={classNames(
-          className,
-          "text-blue-500 hover:text-blue-600 transition-color ease-out duration-150 underline"
-        )}
-        {...attributes}
-        {...props}
-      />
-    ),
+    [LinkPlugin.key]: LinkElement,
     [CodePlugin.key]: CodeLeaf,
     [UnderlinePlugin.key]: withProps(PlateLeaf, { as: "u" }),
     [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: "s" }),
