@@ -33,7 +33,8 @@ import {
 import { createMermaidPlugin } from "./custom/mermaid-plugin";
 import { FloatingToolbarPlugin } from "./ui/floating-toolbar-plugin";
 import { createSlatePlugin } from "@udecode/plate";
-import { all, createLowlight } from "lowlight";
+// NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
+import { all, createLowlight } from "lowlight"; 
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
