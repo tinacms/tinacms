@@ -8,7 +8,6 @@ import {
   SearchIndexer,
   TinaCMSSearchIndexClient,
 } from '@tinacms/search';
-import AsyncLock from 'async-lock';
 import { Command, Option } from 'clipanion';
 import fs from 'fs-extra';
 import {
@@ -20,7 +19,7 @@ import Progress from 'progress';
 import type { ViteDevServer } from 'vite';
 import { logger, summary } from '../../../logger';
 import { getFaqLink } from '../../../utils';
-import { sleepAndCallFunc } from '../../../utils/sleep';
+import { timeout } from '../../../utils/sleep';
 import { spin } from '../../../utils/spinner';
 import { dangerText, linkText, warnText } from '../../../utils/theme';
 import { logText } from '../../../utils/theme';
@@ -30,7 +29,7 @@ import { createAndInitializeDatabase, createDBServer } from '../../database';
 import { BaseCommand } from '../baseCommands';
 import { createDevServer } from '../dev-command/server';
 import { buildProductionSpa } from './server';
-import { type IndexStatusResponse, waitForDB } from './waitForDB';
+import { waitForDB } from './waitForDB';
 
 export class BuildCommand extends BaseCommand {
   static paths = [['build']];
@@ -188,45 +187,63 @@ export class BuildCommand extends BaseCommand {
       this.skipCloudChecks || configManager.hasSelfHostedConfig();
 
     if (!skipCloudChecks) {
-      const { hasUpstream, timestamp } = await this.checkClientInfo(
-        configManager,
-        codegen.productionUrl,
-        this.previewBaseBranch
-      );
-      if (!hasUpstream && this.upstreamBranch) {
-        logger.warn(
-          `${dangerText(
-            `WARN: Upstream branch '${this.upstreamBranch}' specified but no upstream project was found.`
-          )}`
+      try {
+        const clientInfo = await this.checkClientInfo(
+          configManager,
+          codegen.productionUrl,
+          this.previewBaseBranch
         );
+        if (clientInfo.detectedBotBranch) {
+          logger.warn(
+            `${warnText(
+              `WARN: Detected bot branch. Using schema/content from default branch '${clientInfo.defaultBranch}' instead of '${configManager.config.branch}'.`
+            )}`
+          );
+        }
+        if (!clientInfo.hasUpstream && this.upstreamBranch) {
+          logger.warn(
+            `${dangerText(
+              `WARN: Upstream branch '${this.upstreamBranch}' specified but no upstream project was found.`
+            )}`
+          );
+        }
+        if (
+          clientInfo.hasUpstream ||
+          (this.previewBaseBranch && this.previewName)
+        ) {
+          await this.syncProject(configManager, codegen.productionUrl, {
+            upstreamBranch: this.upstreamBranch,
+            previewBaseBranch: this.previewBaseBranch,
+            previewName: this.previewName,
+          });
+        }
+        await waitForDB(
+          configManager.config,
+          codegen.productionUrl,
+          this.previewName,
+          false
+        );
+        await this.checkGraphqlSchema(
+          configManager,
+          database,
+          codegen.productionUrl,
+          clientInfo.timestamp
+        );
+        await this.checkTinaSchema(
+          configManager,
+          database,
+          codegen.productionUrl,
+          this.previewName,
+          this.verbose,
+          clientInfo.timestamp
+        );
+      } catch (e) {
+        logger.error(`\n\n${dangerText(e.message)}\n`);
+        if (this.verbose) {
+          console.error(e);
+        }
+        process.exit(1);
       }
-      if (hasUpstream || (this.previewBaseBranch && this.previewName)) {
-        await this.syncProject(configManager, codegen.productionUrl, {
-          upstreamBranch: this.upstreamBranch,
-          previewBaseBranch: this.previewBaseBranch,
-          previewName: this.previewName,
-        });
-      }
-      await waitForDB(
-        configManager.config,
-        codegen.productionUrl,
-        this.previewName,
-        false
-      );
-      await this.checkGraphqlSchema(
-        configManager,
-        database,
-        codegen.productionUrl,
-        timestamp
-      );
-      await this.checkTinaSchema(
-        configManager,
-        database,
-        codegen.productionUrl,
-        this.previewName,
-        this.verbose,
-        timestamp
-      );
     }
 
     await buildProductionSpa(configManager, database, codegen.productionUrl);
@@ -358,129 +375,131 @@ export class BuildCommand extends BaseCommand {
     configManager: ConfigManager,
     apiURL: string,
     previewBaseBranch?: string
-  ): Promise<{ hasUpstream: boolean; timestamp: number }> {
+  ): Promise<{
+    branchKnown: boolean;
+    hasUpstream: boolean;
+    timestamp: number;
+    detectedBotBranch: boolean;
+    defaultBranch: string | undefined;
+  }> {
+    const MAX_RETRIES = 5;
     const { config } = configManager;
     const token = config.token;
     const { clientId, branch, host } = parseURL(apiURL);
 
-    const url = `https://${host}/db/${clientId}/status/${
-      previewBaseBranch || branch
-    }`;
     const bar = new Progress('Checking clientId and token. :prog', 1);
 
-    // Check the client information
-    let branchKnown = false;
-    let hasUpstream = false;
-    let timestamp: number;
-    try {
-      const res = await request({
-        token,
-        url,
-      });
-      timestamp = res.timestamp || 0;
-      bar.tick({
-        prog: '✅',
-      });
-      if (!(res.status === 'unknown')) {
-        branchKnown = true;
-      }
-      if (res.hasUpstream) {
-        hasUpstream = true;
-      }
-    } catch (e) {
-      summary({
-        heading: 'Error when checking client information',
-        items: [
-          {
-            emoji: '❌',
-            heading: 'You provided',
-            subItems: [
-              {
-                key: 'clientId',
-                value: config.clientId,
-              },
-              {
-                key: 'branch',
-                value: config.branch,
-              },
-              {
-                key: 'token',
-                value: config.token,
-              },
-            ],
-          },
-        ],
-      });
-      throw e;
-    }
+    const getBranchInfo = async (): Promise<{
+      status: string;
+      branchKnown: boolean;
+      hasUpstream: boolean;
+      timestamp: number;
+      detectedBotBranch: boolean;
+      defaultBranch: string | undefined;
+    }> => {
+      const url = `https://${host}/db/${clientId}/status/${previewBaseBranch || branch}`;
 
-    const branchBar = new Progress('Checking branch is on TinaCloud. :prog', 1);
+      const branchInfo: {
+        status: string;
+        branchKnown: boolean;
+        hasUpstream: boolean;
+        timestamp: number;
+        detectedBotBranch: boolean;
+        defaultBranch: string | undefined;
+      } = {
+        status: 'unknown',
+        branchKnown: false,
+        hasUpstream: false,
+        timestamp: 0,
+        detectedBotBranch: false,
+        defaultBranch: undefined,
+      };
+
+      try {
+        const res = await request({
+          token,
+          url,
+        });
+        branchInfo.status = res.status;
+        branchInfo.branchKnown = res.status !== 'unknown';
+        branchInfo.timestamp = res.timestamp || 0;
+        branchInfo.hasUpstream = res.hasUpstream;
+        branchInfo.detectedBotBranch = res.json.detectedBotBranch;
+        branchInfo.defaultBranch = res.json.defaultBranch;
+      } catch (e) {
+        summary({
+          heading: 'Error when checking client information',
+          items: [
+            {
+              emoji: '❌',
+              heading: 'You provided',
+              subItems: [
+                {
+                  key: 'clientId',
+                  value: config.clientId,
+                },
+                {
+                  key: 'branch',
+                  value: config.branch,
+                },
+                {
+                  key: 'token',
+                  value: config.token,
+                },
+              ],
+            },
+          ],
+        });
+        throw e;
+      }
+
+      return branchInfo;
+    };
+
+    const branchInfo = await getBranchInfo();
+    bar.tick({
+      prog: '✅',
+    });
+
+    const branchBar = new Progress(
+      `Checking branch '${config.branch}' is on TinaCloud. :prog`,
+      1
+    );
 
     // We know the branch is known (could be status: 'failed', 'inprogress' or 'success')
-    if (branchKnown) {
+    if (branchInfo.branchKnown) {
       branchBar.tick({
         prog: '✅',
       });
-      return {
-        hasUpstream,
-        timestamp,
-      };
+      return branchInfo;
     }
 
     // We know the branch is status: 'unknown'
 
-    // Check for a max of 6 times
-    for (let i = 0; i <= 5; i++) {
-      await sleepAndCallFunc({
-        fn: async () => {
-          const res = await request({
-            token,
-            url,
-          });
-          if (this.verbose) {
-            logger.info(
-              `Branch status: ${res.status}. Attempt: ${
-                i + 1
-              }. Trying again in 5 seconds.`
-            );
-          }
-          if (!(res.status === 'unknown')) {
-            branchBar.tick({
-              prog: '✅',
-            });
-            return;
-          }
-        },
-        ms: 5000,
-      });
+    for (let i = 1; i <= MAX_RETRIES; i++) {
+      await timeout(5000);
+      const branchInfo = await getBranchInfo();
+      if (this.verbose) {
+        logger.info(
+          `Branch status: ${branchInfo.status}. Attempt: ${i}. Trying again in 5 seconds.`
+        );
+      }
+      if (branchInfo.branchKnown) {
+        branchBar.tick({
+          prog: '✅',
+        });
+        return branchInfo;
+      }
     }
 
     branchBar.tick({
       prog: '❌',
     });
 
-    // I wanted to use the summary function here but I was getting the following error:
-    // RangeError: Invalid count value
-    // at String.repeat (<anonymous>)
-    // summary({
-    //   heading: `ERROR: Branch '${branch}' is not on TinaCloud. Please make sure that branch '${branch}' exists in your repository and that you have pushed your all changes to the remote. View all all branches and there current status here: https://app.tina.io/projects/${clientId}/configuration`,
-    //   items: [
-    //     {
-    //       emoji: '❌',
-    //       heading: 'You provided',
-    //       subItems: [
-    //         {
-    //           key: 'branch',
-    //           value: config.branch,
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // })
     logger.error(
       `${dangerText(
         `ERROR: Branch '${branch}' is not on TinaCloud.`
-      )} Please make sure that branch '${branch}' exists in your repository and that you have pushed your all changes to the remote. View all all branches and there current status here: ${linkText(
+      )} Please make sure that branch '${branch}' exists in your repository and that you have pushed your all changes to the remote. View all branches and their current status here: ${linkText(
         `https://app.tina.io/projects/${clientId}/configuration`
       )}`
     );
@@ -717,7 +736,12 @@ async function request(args: {
   url: string;
   token: string;
   method?: string;
-}): Promise<{ status: string; timestamp: number; hasUpstream: boolean }> {
+}): Promise<{
+  status: string;
+  timestamp: number;
+  hasUpstream: boolean;
+  json: any;
+}> {
   const headers = new Headers();
   if (args.token) {
     headers.append('X-API-KEY', args.token);
@@ -758,10 +782,7 @@ async function request(args: {
     status: json?.status,
     timestamp: json?.timestamp,
     hasUpstream: json?.hasUpstream || false,
-  } as {
-    status: IndexStatusResponse['status'];
-    timestamp: number;
-    hasUpstream: boolean;
+    json,
   };
 }
 
