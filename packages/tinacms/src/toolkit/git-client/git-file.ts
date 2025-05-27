@@ -1,6 +1,9 @@
 import { CMS } from '@toolkit/core';
 import { GitClient } from './git-client';
 
+/**
+ * @deprecated
+ */
 export class GitFile {
   constructor(
     private cms: CMS,
