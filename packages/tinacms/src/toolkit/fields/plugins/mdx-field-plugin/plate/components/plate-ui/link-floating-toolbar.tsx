@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
+import * as React from 'react';
 
-import { cn } from '@udecode/cn';
 import {
   type UseVirtualFloatingOptions,
   flip,
@@ -24,18 +23,24 @@ import {
   useFormInputProps,
   usePluginOption,
 } from '@udecode/plate/react';
+import { cva } from 'class-variance-authority';
 import { ExternalLink, Link, Text, Unlink } from 'lucide-react';
-
-import { buttonVariants } from './button';
-import { inputVariants } from './input';
-import { popoverVariants } from './popover';
 import { Separator } from './separator';
+import { buttonVariants } from './button';
 
-export interface LinkFloatingToolbarProps {
+const popoverVariants = cva(
+  'z-50 w-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden'
+);
+
+const inputVariants = cva(
+  'flex h-[28px] w-full rounded-md border-none bg-transparent px-1.5 py-1 text-base placeholder:text-muted-foreground focus-visible:ring-transparent focus-visible:outline-none md:text-sm'
+);
+
+export function LinkFloatingToolbar({
+  state,
+}: {
   state?: LinkFloatingToolbarState;
-}
-
-export function LinkFloatingToolbar({ state }: LinkFloatingToolbarProps) {
+}) {
   const activeCommentId = usePluginOption({ key: 'comment' }, 'activeId');
   const activeSuggestionId = usePluginOption({ key: 'suggestion' }, 'activeId');
 
@@ -87,26 +92,26 @@ export function LinkFloatingToolbar({ state }: LinkFloatingToolbarProps) {
   if (hidden) return null;
 
   const input = (
-    <div className='flex w-[330px] flex-col' {...inputProps}>
-      <div className='flex items-center'>
-        <div className='flex items-center pr-1 pl-2 text-muted-foreground'>
-          <Link className='size-4' />
+    <div className="flex w-[330px] flex-col" {...inputProps}>
+      <div className="flex items-center">
+        <div className="flex items-center pr-1 pl-2 text-muted-foreground">
+          <Link className="size-4" />
         </div>
 
         <FloatingLinkUrlInput
-          className={inputVariants({ h: 'sm', variant: 'ghost' })}
-          placeholder='Paste link'
+          className={inputVariants()}
+          placeholder="Paste link"
           data-plate-focus
         />
       </div>
-      <Separator className='my-1' />
-      <div className='flex items-center'>
-        <div className='flex items-center pr-1 pl-2 text-muted-foreground'>
-          <Text className='size-4' />
+      <Separator className="my-1" />
+      <div className="flex items-center">
+        <div className="flex items-center pr-1 pl-2 text-muted-foreground">
+          <Text className="size-4" />
         </div>
         <input
-          className={inputVariants({ h: 'sm', variant: 'ghost' })}
-          placeholder='Text to display'
+          className={inputVariants()}
+          placeholder="Text to display"
           data-plate-focus
           {...textInputProps}
         />
@@ -117,27 +122,27 @@ export function LinkFloatingToolbar({ state }: LinkFloatingToolbarProps) {
   const editContent = editState.isEditing ? (
     input
   ) : (
-    <div className='box-content flex items-center'>
+    <div className="box-content flex items-center">
       <button
         className={buttonVariants({ size: 'sm', variant: 'ghost' })}
-        type='button'
+        type="button"
         {...editButtonProps}
       >
         Edit link
       </button>
 
-      <Separator orientation='vertical' />
+      <Separator orientation="vertical" />
 
       <LinkOpenButton />
 
-      <Separator orientation='vertical' />
+      <Separator orientation="vertical" />
 
       <button
         className={buttonVariants({
           size: 'icon',
           variant: 'ghost',
         })}
-        type='button'
+        type="button"
         {...unlinkButtonProps}
       >
         <Unlink width={18} />
@@ -147,19 +152,11 @@ export function LinkFloatingToolbar({ state }: LinkFloatingToolbarProps) {
 
   return (
     <>
-      <div
-        ref={insertRef}
-        className={cn(popoverVariants(), 'w-auto p-1')}
-        {...insertProps}
-      >
+      <div ref={insertRef} className={popoverVariants()} {...insertProps}>
         {input}
       </div>
 
-      <div
-        ref={editRef}
-        className={cn(popoverVariants(), 'w-auto p-1')}
-        {...editProps}
-      >
+      <div ref={editRef} className={popoverVariants()} {...editProps}>
         {editContent}
       </div>
     </>
@@ -195,8 +192,8 @@ function LinkOpenButton() {
       onMouseOver={(e) => {
         e.stopPropagation();
       }}
-      aria-label='Open link in a new tab'
-      target='_blank'
+      aria-label="Open link in a new tab"
+      target="_blank"
     >
       <ExternalLink width={18} />
     </a>
