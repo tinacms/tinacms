@@ -53,6 +53,7 @@ import { TableRowElement } from "../../components/plate-ui/table/table-row-eleme
 import { HEADING_KEYS } from "@udecode/plate-heading";
 import { insertCodeBlock } from "@udecode/plate-code-block";
 import { LinkElement } from "../../components/plate-ui/link-element";
+import { HrElement } from "../../components/plate-ui/hr-element";
 
 /**
  * For blocks elements (p, blockquote, ul, ...etc), it
@@ -223,27 +224,7 @@ export const Components = () => {
     [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: "s" }),
     [ItalicPlugin.key]: withProps(PlateLeaf, { as: "em" }),
     [BoldPlugin.key]: withProps(PlateLeaf, { as: "strong" }),
-    [HorizontalRulePlugin.key]: ({
-      attributes,
-      className,
-      editor,
-      element,
-      children,
-      ...props
-    }) => {
-      return (
-        <div
-          className={classNames(
-            className,
-            "cursor-pointer relative border bg-gray-200 my-4 first:mt-0 last:mb-0"
-          )}
-          {...attributes}
-          {...props}
-        >
-          {children}
-        </div>
-      );
-    },
+    [HorizontalRulePlugin.key]: HrElement,
     [TableCellHeaderPlugin.key]: TableCellHeaderElement,
     [TableCellPlugin.key]: TableCellElement,
     [TablePlugin.key]: TableElement,

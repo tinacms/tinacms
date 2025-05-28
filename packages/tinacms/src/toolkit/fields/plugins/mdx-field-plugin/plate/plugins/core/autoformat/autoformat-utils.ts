@@ -6,12 +6,11 @@ import {
   CodeLinePlugin,
 } from '@udecode/plate-code-block/react';
 import { toggleList, unwrapList } from '@udecode/plate-list';
-import { PlateEditor } from '@udecode/plate/react';
 
 export const preFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor);
 
-export const format = (editor: SlateEditor, customFormatting: any) => {
+const format = (editor: SlateEditor, customFormatting: any) => {
   if (editor.selection) {
     const parentEntry = editor.api.parent(editor.selection);
     if (!parentEntry) return;
@@ -34,6 +33,8 @@ export const formatList = (editor: SlateEditor, elementType: string) => {
   );
 };
 
+// TODO [2025-05-28] (dev:alex): Potentially unused. Searched usage but found none.
+// Consider removing after verifying with the team
 export const formatText = (editor: SlateEditor, text: string) => {
   format(editor, () => editor.tf.insertText(text));
 };
