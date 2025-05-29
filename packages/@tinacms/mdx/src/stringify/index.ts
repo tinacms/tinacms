@@ -4,24 +4,24 @@
 
 */
 
-import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
-import { text } from 'mdast-util-to-markdown/lib/handle/text';
-import { gfmToMarkdown } from 'mdast-util-gfm';
+import { Handlers, toMarkdown } from "mdast-util-to-markdown";
+import { text } from "mdast-util-to-markdown/lib/handle/text";
+import { gfmToMarkdown } from "mdast-util-gfm";
 import {
   mdxJsxToMarkdown,
   MdxJsxTextElement,
   MdxJsxFlowElement,
-} from 'mdast-util-mdx-jsx';
-import { stringifyMDX as stringifyMDXNext } from '../next';
-import type { RichTextType } from '@tinacms/schema-tools';
-import type * as Md from 'mdast';
-import type * as Plate from '../parse/plate';
-import { eat } from './marks';
-import { stringifyProps } from './acorn';
-import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown';
-import { stringifyShortcode } from './stringifyShortcode';
+} from "mdast-util-mdx-jsx";
+import { stringifyMDX as stringifyMDXNext } from "../next";
+import type { RichTextType } from "@tinacms/schema-tools";
+import type * as Md from "mdast";
+import type * as Plate from "../parse/plate";
+import { eat } from "./marks";
+import { stringifyProps } from "./acorn";
+import { directiveToMarkdown } from "../extensions/tina-shortcodes/to-markdown";
+import { stringifyShortcode } from "./stringifyShortcode";
 
-declare module 'mdast' {
+declare module "mdast" {
   interface StaticPhrasingContentMap {
     mdxJsxTextElement: MdxJsxTextElement;
   }
@@ -42,17 +42,17 @@ export const stringifyMDX = (
   field: RichTextType,
   imageCallback: (url: string) => string
 ) => {
-  if (field.parser?.type === 'markdown') {
+  if (field.parser?.type === "markdown") {
     return stringifyMDXNext(value, field, imageCallback);
   }
   if (!value) {
     return;
   }
-  if (typeof value === 'string') {
-    throw new Error('Expected an object to stringify, but received a string');
+  if (typeof value === "string") {
+    throw new Error("Expected an object to stringify, but received a string");
   }
   if (value?.children[0]) {
-    if (value?.children[0].type === 'invalid_markdown') {
+    if (value?.children[0].type === "invalid_markdown") {
       return value.children[0].value;
     }
   }
@@ -63,8 +63,8 @@ export const stringifyMDX = (
   );
   let preprocessedString = res;
   templatesWithMatchers?.forEach((template) => {
-    if (typeof template === 'string') {
-      throw new Error('Global templates are not supported');
+    if (typeof template === "string") {
+      throw new Error("Global templates are not supported");
     }
     if (template.match) {
       preprocessedString = stringifyShortcode(preprocessedString, template);
@@ -78,13 +78,13 @@ export type Pattern = {
   end: string;
   name: string;
   templateName: string;
-  type: 'block' | 'leaf';
+  type: "block" | "leaf";
 };
 
 export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
   const patterns: Pattern[] = [];
   field.templates?.forEach((template) => {
-    if (typeof template === 'string') {
+    if (typeof template === "string") {
       return;
     }
     if (template && template.match) {
@@ -105,26 +105,26 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
    */
   // @ts-ignore
   const handlers: Handlers = {};
-  handlers['text'] = (node, parent, context, safeOptions) => {
+  handlers["text"] = (node, parent, context, safeOptions) => {
     // Empty spaces before/after strings
     context.unsafe = context.unsafe.filter((unsafeItem) => {
       if (
-        unsafeItem.character === ' ' &&
-        unsafeItem.inConstruct === 'phrasing'
+        unsafeItem.character === " " &&
+        unsafeItem.inConstruct === "phrasing"
       ) {
         return false;
       }
       return true;
     });
-    if (field.parser?.type === 'markdown') {
-      if (field.parser.skipEscaping === 'all') {
+    if (field.parser?.type === "markdown") {
+      if (field.parser.skipEscaping === "all") {
         return node.value;
       }
-      if (field.parser.skipEscaping === 'html') {
+      if (field.parser.skipEscaping === "html") {
         // Remove this character from the unsafe list, and then
         // proceed with the original text handler
         context.unsafe = context.unsafe.filter((unsafeItem) => {
-          if (unsafeItem.character === '<') {
+          if (unsafeItem.character === "<") {
             return false;
           }
           return true;
@@ -139,7 +139,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
       mdxJsxToMarkdown(),
       gfmToMarkdown(),
     ],
-    listItemIndent: 'one',
+    listItemIndent: "one",
     handlers,
   });
 };
@@ -158,10 +158,20 @@ export const rootElement = (
     }
   });
   return {
-    type: 'root',
+    type: "root",
     children,
   };
 };
+
+export function codeLinesToString(content: Plate.CodeBlockElement): string {
+  return (content.children || [])
+    .map((line: Plate.CodeLineElement) =>
+      (line.children || [])
+        .map((textNode: { text: string }) => textNode.text)
+        .join("")
+    )
+    .join("\n");
+}
 
 export const blockElement = (
   content: Plate.BlockElement,
@@ -169,62 +179,56 @@ export const blockElement = (
   imageCallback: (url: string) => string
 ): Md.Content | null => {
   switch (content.type) {
-    case 'h1':
-    case 'h2':
-    case 'h3':
-    case 'h4':
-    case 'h5':
-    case 'h6':
+    case "h1":
+    case "h2":
+    case "h3":
+    case "h4":
+    case "h5":
+    case "h6":
       return {
-        type: 'heading',
+        type: "heading",
         // @ts-ignore Type 'number' is not assignable to type '1 | 2 | 3 | 4 | 5 | 6'
         depth: { h1: 1, h2: 2, h3: 3, h4: 4, h5: 5, h6: 6 }[content.type],
         children: eat(content.children, field, imageCallback),
       };
-    case 'p':
+    case "p":
       // Ignore empty blocks
       if (content.children.length === 1) {
         const onlyChild = content.children[0];
         if (
           onlyChild &&
           // Slate text nodes don't get a `type` property for text nodes
-          (onlyChild.type === 'text' || !onlyChild.type) &&
-          onlyChild.text === ''
+          (onlyChild.type === "text" || !onlyChild.type) &&
+          onlyChild.text === ""
         ) {
           return null;
         }
       }
       return {
-        type: 'paragraph',
+        type: "paragraph",
         children: eat(content.children, field, imageCallback),
       };
-    case 'mermaid':
+    case "code_block":
       return {
-        type: 'code',
-        lang: 'mermaid',
-        value: content.value,
-      };
-    case 'code_block':
-      return {
-        type: 'code',
+        type: "code",
         lang: content.lang,
-        value: content.value,
+        value: codeLinesToString(content),
       };
-    case 'mdxJsxFlowElement':
-      if (content.name === 'table') {
+    case "mdxJsxFlowElement":
+      if (content.name === "table") {
         const table = content.props as {
           align: Md.AlignType[] | undefined;
           tableRows: { tableCells: { value: any }[] }[];
         };
         return {
-          type: 'table',
+          type: "table",
           align: table.align,
           children: table.tableRows.map((tableRow) => {
             const tr: Md.TableRow = {
-              type: 'tableRow',
+              type: "tableRow",
               children: tableRow.tableCells.map(({ value }) => {
                 return {
-                  type: 'tableCell',
+                  type: "tableCell",
                   children: eat(
                     value?.children?.at(0)?.children || [],
                     field,
@@ -248,20 +252,20 @@ export const blockElement = (
         }
         const directiveAttributes: Record<string, string> = {};
         attributes?.forEach((att) => {
-          if (att.value && typeof att.value === 'string') {
+          if (att.value && typeof att.value === "string") {
             directiveAttributes[att.name] = att.value;
           }
         });
-        if (directiveType === 'leaf') {
+        if (directiveType === "leaf") {
           return {
-            type: 'leafDirective',
+            type: "leafDirective",
             name,
             attributes: directiveAttributes,
             children: [],
           };
         } else {
           return {
-            type: 'containerDirective',
+            type: "containerDirective",
             name,
             attributes: directiveAttributes,
             children: children,
@@ -269,70 +273,70 @@ export const blockElement = (
         }
       }
       return {
-        type: 'mdxJsxFlowElement',
+        type: "mdxJsxFlowElement",
         name: content.name,
         attributes,
         children,
       };
-    case 'blockquote':
+    case "blockquote":
       return {
-        type: 'blockquote',
+        type: "blockquote",
         children: [
           {
-            type: 'paragraph',
+            type: "paragraph",
             children: eat(content.children, field, imageCallback),
           },
         ],
       };
-    case 'hr':
+    case "hr":
       return {
-        type: 'thematicBreak',
+        type: "thematicBreak",
       };
-    case 'ol':
-    case 'ul':
+    case "ol":
+    case "ul":
       return {
-        type: 'list',
-        ordered: content.type === 'ol',
+        type: "list",
+        ordered: content.type === "ol",
         spread: false,
         children: content.children.map((child) =>
           listItemElement(child, field, imageCallback)
         ),
       };
-    case 'html': {
+    case "html": {
       return {
-        type: 'html',
+        type: "html",
         value: content.value,
       };
     }
-    case 'img':
+    case "img":
       return {
         // Slate editor treats `img` as a block-level element, wrap
         // it in an empty paragraph
-        type: 'paragraph',
+        type: "paragraph",
         children: [
           {
-            type: 'image',
+            type: "image",
             url: imageCallback(content.url),
             alt: content.alt,
             title: content.caption,
           },
         ],
       };
-    case 'table':
+    case "table":
       const table = content.props as
         | {
             align: Md.AlignType[] | undefined;
           }
         | undefined;
       return {
-        type: 'table',
+        type: "table",
         align: table?.align,
         children: content.children.map((tableRow) => {
           return {
-            type: 'tableRow',
+            type: "tableRow",
             children: tableRow.children.map((tableCell) => {
               return {
-                type: 'tableCell',
+                type: "tableCell",
                 children: eat(
                   tableCell.children?.at(0)?.children || [],
                   field,
@@ -353,14 +357,14 @@ const listItemElement = (
   imageCallback: (url: string) => string
 ): Md.ListItem => {
   return {
-    type: 'listItem',
+    type: "listItem",
     // spread is always false since we don't support block elements in list items
     // good explanation of the difference: https://stackoverflow.com/questions/43503528/extra-lines-appearing-between-list-items-in-github-markdown
     spread: false,
     children: content.children.map((child) => {
-      if (child.type === 'lic') {
+      if (child.type === "lic") {
         return {
-          type: 'paragraph',
+          type: "paragraph",
           children: eat(child.children, field, imageCallback),
         };
       }
@@ -374,25 +378,25 @@ const blockContentElement = (
   imageCallback: (url: string) => string
 ): Md.BlockContent => {
   switch (content.type) {
-    case 'blockquote':
+    case "blockquote":
       return {
-        type: 'blockquote',
+        type: "blockquote",
         children: content.children.map((child) =>
           // FIXME: text nodes are probably passed in here by the rich text editor
           // @ts-ignore
           blockContentElement(child, field, imageCallback)
         ),
       };
-    case 'p':
+    case "p":
       return {
-        type: 'paragraph',
+        type: "paragraph",
         children: eat(content.children, field, imageCallback),
       };
-    case 'ol':
-    case 'ul':
+    case "ol":
+    case "ul":
       return {
-        type: 'list',
-        ordered: content.type === 'ol',
+        type: "list",
+        ordered: content.type === "ol",
         spread: false,
         children: content.children.map((child) =>
           listItemElement(child, field, imageCallback)
@@ -405,24 +409,24 @@ const blockContentElement = (
   }
 };
 
-export type Marks = 'strong' | 'emphasis' | 'inlineCode' | 'delete';
+export type Marks = "strong" | "emphasis" | "inlineCode" | "delete";
 
 export const getMarks = (content: Plate.InlineElement) => {
   const marks: Marks[] = [];
-  if (content.type !== 'text') {
+  if (content.type !== "text") {
     return [];
   }
   if (content.bold) {
-    marks.push('strong');
+    marks.push("strong");
   }
   if (content.italic) {
-    marks.push('emphasis');
+    marks.push("emphasis");
   }
   if (content.code) {
-    marks.push('inlineCode');
+    marks.push("inlineCode");
   }
   if (content.strikethrough) {
-    marks.push('delete');
+    marks.push("delete");
   }
   return marks;
 };

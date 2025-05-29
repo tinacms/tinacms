@@ -286,22 +286,8 @@ export const remarkToSlate = (
     }
   };
 
-  const parseCode = (
-    content: Md.Code
-  ): Plate.CodeBlockElement | Plate.MermaidElement => {
-    if (content.lang === 'mermaid') {
-      return mermaid(content);
-    }
-    console.log('[INFO] Content: ', content);
+  const parseCode = (content: Md.Code): Plate.CodeBlockElement => {
     return code(content);
-  };
-
-  const mermaid = (content: Md.Code): Plate.MermaidElement => {
-    return {
-      type: 'mermaid',
-      value: content.value,
-      children: [{ type: 'text', text: '' }],
-    };
   };
 
   function makeCodeLine(text: string): Plate.CodeLineElement {

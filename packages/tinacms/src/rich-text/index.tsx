@@ -291,7 +291,6 @@ const Node = ({ components, child }) => {
           <TinaMarkdown components={components} content={children} />
         </a>
       );
-    case 'mermaid':
     case 'code_block': {
       // Extract code string from children if present, else fallback to value
       let codeString = '';

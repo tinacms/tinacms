@@ -6,9 +6,7 @@ import { CodeLeaf } from "../../components/plate-ui/code-leaf";
 import { CodeLineElement } from "../../components/plate-ui/code-line-element";
 import { CodeSyntaxLeaf } from "../../components/plate-ui/code-syntax-leaf";
 import { ListElement } from "../../components/plate-ui/list-element";
-import { MermaidElement } from "../../components/plate-ui/mermaid-element";
 import { SlashInputElement } from "../../components/plate-ui/slash-input-element";
-import { ELEMENT_MERMAID } from "../custom/mermaid-plugin";
 import { classNames } from "./helpers";
 import {
   TableCellHeaderPlugin,
@@ -180,7 +178,6 @@ export const Components = () => {
       />
     ),
     [ParagraphPlugin.key]: ParagraphElement,
-    [ELEMENT_MERMAID]: MermaidElement,
     [BlockquotePlugin.key]: BlockquoteElement,
     // [CodeBlockPlugin.key]: (editor) =>
     //   insertCodeBlock(editor, { select: true }),
