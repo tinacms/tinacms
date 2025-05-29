@@ -7,7 +7,7 @@ import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { helpers } from '../../plugins/core/common';
-import { insertEmptyCodeBlock } from '../../transforms/insert-empty-block';
+// import { insertEmptyCodeBlock } from '../../transforms/insert-empty-block';
 
 const useCodeBlockToolbarButtonState = () => {
   const editor = useEditorState();
@@ -22,9 +22,9 @@ const useCodeBlockToolbarButtonState = () => {
 const useCodeBlockToolbarButton = (state) => {
   const editor = useEditorState();
 
-  const onClick = () => {
-    insertEmptyCodeBlock(editor);
-  };
+  // const onClick = () => {
+  //   insertEmptyCodeBlock(editor);
+  // };
 
   const onMouseDown = (e) => {
     e.preventDefault();
@@ -33,7 +33,7 @@ const useCodeBlockToolbarButton = (state) => {
 
   return {
     props: {
-      onClick,
+      // onClick,
       onMouseDown,
       pressed: state.pressed,
     },
@@ -51,7 +51,7 @@ export const CodeBlockToolbarButton = withRef<
   const { props } = useCodeBlockToolbarButton(state);
 
   return (
-    <ToolbarButton ref={ref} tooltip='Code Block' {...rest} {...props}>
+    <ToolbarButton ref={ref} tooltip="Code Block" {...rest} {...props}>
       <Icons.codeBlock />
     </ToolbarButton>
   );

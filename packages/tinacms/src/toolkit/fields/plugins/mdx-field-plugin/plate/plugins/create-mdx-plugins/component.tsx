@@ -1,12 +1,7 @@
 import React from 'react';
 import { Element } from 'slate';
 import { useSelected, ReactEditor } from 'slate-react';
-import {
-  Transition,
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-} from '@headlessui/react';
+import { Transition, Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import { NestedForm } from '../../nested-form';
 import { classNames } from '../ui/helpers';
 import { ELEMENT_MDX_INLINE } from '.';
@@ -14,37 +9,28 @@ import { EllipsisIcon } from '../ui/icons';
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { useTemplates } from '../../editor-context';
 import { insertNodes } from '@udecode/plate-common';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate';
+// import { ELEMENT_PARAGRAPH } from '@udecode/plate';
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div';
   return (
-    <Component
-      contentEditable={false}
-      style={{ userSelect: 'none' }}
-      className='relative'
-    >
+    <Component contentEditable={false} style={{ userSelect: 'none' }} className="relative">
       {children}
     </Component>
   );
 };
 
-export const InlineEmbed = ({
-  attributes,
-  children,
-  element,
-  onChange,
-  editor,
-}) => {
+export const InlineEmbed = ({ attributes, children, element, onChange, editor }) => {
   const selected = useSelected();
   const { templates, fieldName } = useTemplates();
-  const { handleClose, handleRemove, handleSelect, isExpanded } =
-    useEmbedHandles(editor, element, fieldName);
-  useHotkey('enter', () => {
-    insertNodes(editor, [
-      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
-    ]);
-  });
+  const { handleClose, handleRemove, handleSelect, isExpanded } = useEmbedHandles(
+    editor,
+    element,
+    fieldName
+  );
+  // useHotkey('enter', () => {
+  //   insertNodes(editor, [{ type: ELEMENT_PARAGRAPH, children: [{ text: '' }] }]);
+  // });
   useHotkey('space', () => {
     insertNodes(editor, [{ text: ' ' }], {
       match: (n) => {
@@ -56,9 +42,7 @@ export const InlineEmbed = ({
     });
   });
 
-  const activeTemplate = templates.find(
-    (template) => template.name === element.name
-  );
+  const activeTemplate = templates.find((template) => template.name === element.name);
 
   const formProps = {
     activeTemplate,
@@ -80,15 +64,15 @@ export const InlineEmbed = ({
         <span
           // give just enough margin so that the cursor is visible when adjacent to this node.
           style={{ margin: '0 0.5px' }}
-          className='relative inline-flex shadow-sm rounded-md leading-none'
+          className="relative inline-flex shadow-sm rounded-md leading-none"
         >
           {selected && (
-            <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none' />
+            <span className="absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none" />
           )}
           <span
             style={{ fontWeight: 'inherit', maxWidth: '275px' }}
             // Tailwind reset puts styles on buttons
-            className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l-md border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            className="truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l-md border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             onMouseDown={handleSelect}
           >
             {label}
@@ -101,27 +85,20 @@ export const InlineEmbed = ({
   );
 };
 
-export const BlockEmbed = ({
-  attributes,
-  children,
-  element,
-  editor,
-  onChange,
-}) => {
+export const BlockEmbed = ({ attributes, children, element, editor, onChange }) => {
   const selected = useSelected();
   const { templates, fieldName } = useTemplates();
-  const { handleClose, handleRemove, handleSelect, isExpanded } =
-    useEmbedHandles(editor, element, fieldName);
-
-  useHotkey('enter', () => {
-    insertNodes(editor, [
-      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
-    ]);
-  });
-
-  const activeTemplate = templates.find(
-    (template) => template.name === element.name
+  const { handleClose, handleRemove, handleSelect, isExpanded } = useEmbedHandles(
+    editor,
+    element,
+    fieldName
   );
+
+  // useHotkey('enter', () => {
+  //   insertNodes(editor, [{ type: ELEMENT_PARAGRAPH, children: [{ text: '' }] }]);
+  // });
+
+  const activeTemplate = templates.find((template) => template.name === element.name);
 
   const formProps = {
     activeTemplate,
@@ -137,16 +114,16 @@ export const BlockEmbed = ({
 
   const label = getLabel(activeTemplate, formProps);
   return (
-    <div {...attributes} className='w-full my-2'>
+    <div {...attributes} className="w-full my-2">
       {children}
       <Wrapper inline={false}>
-        <span className='relative w-full inline-flex shadow-sm rounded-md'>
+        <span className="relative w-full inline-flex shadow-sm rounded-md">
           {selected && (
-            <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none' />
+            <span className="absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none" />
           )}
           <span
             onMouseDown={handleSelect}
-            className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l-md border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            className="truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l-md border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           >
             {label}
           </span>
@@ -171,13 +148,7 @@ const getLabel = (activeTemplate, formProps) => {
   return label;
 };
 
-const EmbedNestedForm = ({
-  editor,
-  element,
-  activeTemplate,
-  onClose,
-  onChange,
-}) => {
+const EmbedNestedForm = ({ editor, element, activeTemplate, onClose, onChange }) => {
   const path = ReactEditor.findPath(editor, element);
   const id = [...path, activeTemplate.name].join('.');
   return (
@@ -194,24 +165,24 @@ const EmbedNestedForm = ({
 
 const DotMenu = ({ onOpen, onRemove }) => {
   return (
-    <Popover as='span' className='-ml-px relative block'>
+    <Popover as="span" className="-ml-px relative block">
       <PopoverButton
-        as='span'
-        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r-md border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+        as="span"
+        className="cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r-md border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
       >
-        <EllipsisIcon title='Open options' />
+        <EllipsisIcon title="Open options" />
       </PopoverButton>
       <Transition
-        enter='transition ease-out duration-100'
-        enterFrom='transform opacity-0 scale-95'
-        enterTo='transform opacity-100 scale-100'
-        leave='transition ease-in duration-75'
-        leaveFrom='transform opacity-100 scale-100'
-        leaveTo='transform opacity-0 scale-95'
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
       >
-        <PopoverPanel className='z-30 absolute origin-top-right right-0'>
-          <div className='mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
-            <div className='py-1'>
+        <PopoverPanel className="z-30 absolute origin-top-right right-0">
+          <div className="mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="py-1">
               <span
                 onClick={onOpen}
                 className={classNames(
@@ -221,7 +192,7 @@ const DotMenu = ({ onOpen, onRemove }) => {
                 Edit
               </span>
               <button
-                type='button'
+                type="button"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   onRemove();

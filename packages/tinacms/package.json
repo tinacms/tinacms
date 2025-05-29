@@ -86,7 +86,6 @@
 		"@tinacms/schema-tools": "workspace:*",
 		"@tinacms/search": "workspace:*",
 		"@udecode/cn": "^33.0.0",
-		"@udecode/plate": "^36.5.9",
 		"@udecode/plate-autoformat": "^36.5.6",
 		"@udecode/plate-block-quote": "^36.0.0",
 		"@udecode/plate-code-block": "^36.5.6",

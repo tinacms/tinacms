@@ -1,16 +1,16 @@
-import {
-  createParagraphPlugin,
-  createHorizontalRulePlugin,
-  createNodeIdPlugin,
-  createListPlugin,
-  getListItemEntry,
-  createBlockquotePlugin,
-  createHeadingPlugin,
-  createUnderlinePlugin,
-  createIndentListPlugin,
-  createTablePlugin,
-  createBasicMarksPlugin,
-} from '@udecode/plate';
+// import {
+//   createParagraphPlugin,
+//   createHorizontalRulePlugin,
+//   createNodeIdPlugin,
+//   createListPlugin,
+//   getListItemEntry,
+//   createBlockquotePlugin,
+//   createHeadingPlugin,
+//   createUnderlinePlugin,
+//   createIndentListPlugin,
+//   createTablePlugin,
+//   createBasicMarksPlugin,
+// } from '@udecode/plate';
 import { ReactEditor } from 'slate-react';
 import {
   createCodeBlockPlugin,
@@ -19,7 +19,7 @@ import {
 } from '../create-code-block';
 import { ELEMENT_IMG } from '../create-img-plugin';
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins';
-import { HANDLES_MDX } from './formatting';
+// import { HANDLES_MDX } from './formatting';
 import {
   findNode,
   getBlockAbove,
@@ -33,21 +33,21 @@ import { createSlashPlugin } from '@udecode/plate-slash-command';
 import { Transforms, Editor, Node } from 'slate';
 
 export const plugins = [
-  createBasicMarksPlugin(),
-  createHeadingPlugin(),
-  createParagraphPlugin(),
+  // createBasicMarksPlugin(),
+  // createHeadingPlugin(),
+  // createParagraphPlugin(),
   createCodeBlockPlugin(),
   createHTMLBlockPlugin(),
   createHTMLInlinePlugin(),
-  createBlockquotePlugin(),
-  createUnderlinePlugin(),
-  createListPlugin(),
-  createIndentListPlugin(),
-  createHorizontalRulePlugin(),
+  // createBlockquotePlugin(),
+  // createUnderlinePlugin(),
+  // createListPlugin(),
+  // createIndentListPlugin(),
+  // createHorizontalRulePlugin(),
   // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
-  createNodeIdPlugin(),
+  // createNodeIdPlugin(),
   createSlashPlugin(),
-  createTablePlugin(),
+  // createTablePlugin(),
 ];
 
 export const unsupportedItemsInTable = new Set([
@@ -66,20 +66,16 @@ export const unsupportedItemsInTable = new Set([
 
 const isNodeActive = (editor, type) => {
   const pluginType = getPluginType(editor, type);
-  return (
-    !!editor?.selection && someNode(editor, { match: { type: pluginType } })
-  );
+  return !!editor?.selection && someNode(editor, { match: { type: pluginType } });
 };
 
-const isListActive = (editor, type) => {
-  const res = !!editor?.selection && getListItemEntry(editor);
-  return !!res && res.list[0].type === type;
-};
+// const isListActive = (editor, type) => {
+//   const res = !!editor?.selection && getListItemEntry(editor);
+//   return !!res && res.list[0].type === type;
+// };
 
 const normalize = (node: any) => {
-  if (
-    [ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE, ELEMENT_IMG].includes(node.type)
-  ) {
+  if ([ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE, ELEMENT_IMG].includes(node.type)) {
     return {
       ...node,
       children: [{ type: 'text', text: '' }],
@@ -167,12 +163,12 @@ const isCurrentBlockEmpty = (editor) => {
  */
 const currentNodeSupportsMDX = (editor: PlateEditor) =>
   findNode(editor, {
-    match: { type: HANDLES_MDX },
+    // match: { type: HANDLES_MDX },
   });
 
 export const helpers = {
   isNodeActive,
-  isListActive,
+  // isListActive,
   currentNodeSupportsMDX,
   normalize,
 };

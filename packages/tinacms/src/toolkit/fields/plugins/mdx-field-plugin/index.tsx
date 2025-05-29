@@ -1,17 +1,11 @@
 import React from 'react';
-import {
-  type InputFieldType,
-  wrapFieldsWithMeta,
-} from '../wrap-field-with-meta';
+import { type InputFieldType, wrapFieldsWithMeta } from '../wrap-field-with-meta';
 import { EditorContext } from './plate/editor-context';
 
 import type { MdxTemplate } from './plate/types';
 import { RichEditor } from './plate';
 import type { InputProps } from '@toolkit/fields/components';
-import type {
-  ToolbarOverrides,
-  ToolbarOverrideType,
-} from './plate/toolbar/toolbar-overrides';
+import type { ToolbarOverrides, ToolbarOverrideType } from './plate/toolbar/toolbar-overrides';
 
 export type RichTextType = React.PropsWithChildren<
   InputFieldType<

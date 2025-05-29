@@ -34,7 +34,7 @@ import {
   useOpenState,
 } from './dropdown-menu';
 import { ToolbarButton } from './toolbar';
-import { toggleList, unwrapList } from '@udecode/plate';
+// import { toggleList, unwrapList } from '@udecode/plate';
 import { helpers } from '@toolkit/fields/plugins/mdx-field-plugin/plate/plugins/core/common';
 import { ELEMENT_TABLE } from '@udecode/plate-table';
 
@@ -110,8 +110,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const editor = useEditorRef();
   const openState = useOpenState();
 
-  const selectedItem =
-    items.find((item) => item.value === value) ?? defaultItem;
+  const selectedItem = items.find((item) => item.value === value) ?? defaultItem;
   const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem;
 
   const editorState = useEditorState();
@@ -122,28 +121,28 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
     <DropdownMenu modal={false} {...openState} {...props}>
       <DropdownMenuTrigger asChild>
         <ToolbarButton
-          className='lg:min-w-[130px]'
+          className="lg:min-w-[130px]"
           isDropdown
           showArrow
           pressed={openState.open}
-          tooltip='Turn into'
+          tooltip="Turn into"
         >
-          <span className=''>{selectedItemLabel}</span>
+          <span className="">{selectedItemLabel}</span>
         </ToolbarButton>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align='start' className='min-w-0'>
+      <DropdownMenuContent align="start" className="min-w-0">
         <DropdownMenuLabel>Turn into</DropdownMenuLabel>
 
         <DropdownMenuRadioGroup
-          className='flex flex-col gap-0.5'
+          className="flex flex-col gap-0.5"
           onValueChange={(type) => {
-            if (type === 'ul' || type === 'ol') {
-              toggleList(editor, { type });
-            } else {
-              unwrapList(editor);
-              toggleNodeType(editor, { activeType: type });
-            }
+            // if (type === 'ul' || type === 'ol') {
+            //   toggleList(editor, { type });
+            // } else {
+            //   unwrapList(editor);
+            //   toggleNodeType(editor, { activeType: type });
+            // }
 
             collapseSelection(editor);
             focusEditor(editor);
@@ -151,12 +150,8 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
           value={value}
         >
           {items.map(({ icon: Icon, label, value: itemValue }) => (
-            <DropdownMenuRadioItem
-              className='min-w-[180px]'
-              key={itemValue}
-              value={itemValue}
-            >
-              <Icon className='mr-2 size-5' />
+            <DropdownMenuRadioItem className="min-w-[180px]" key={itemValue} value={itemValue}>
+              <Icon className="mr-2 size-5" />
               {label}
             </DropdownMenuRadioItem>
           ))}
