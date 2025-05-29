@@ -100,6 +100,10 @@ export const editorPlugins = [
   NodeIdPlugin,
   TablePlugin,
   SlashPlugin,
+
+  // TrailingBlockPlugin makes sure there's always a blank paragraph at the end of the editor.
+  // This lets users keep typing after end of marks like headings or quotes
+
   TrailingBlockPlugin,
   FloatingToolbarPlugin,
   AutoformatPlugin.configure({

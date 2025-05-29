@@ -35,8 +35,7 @@ const resetBlockTypesCommonRule = {
 };
 
 export const plugins = [
-  // TrailingBlockPlugin makes sure there's always a blank paragraph at the end of the editor.
-  // This lets users keep typing after end of marks like headings or quotes
+  TrailingBlockPlugin,
   AutoformatPlugin.configure({
     options: {
       rules: autoformatRules,
