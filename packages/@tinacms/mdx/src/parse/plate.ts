@@ -19,17 +19,16 @@ export type BlockquoteElement = {
   type: 'blockquote';
   children: InlineElement[];
 };
+
 export type CodeLineElement = {
   type: 'code_line';
-  id?: string;
   children: { text: string }[];
 };
 
 export type CodeBlockElement = {
   type: 'code_block';
-  id?: string;
   lang?: string;
-  value?: string; // optional, not used by Plate
+  value?: string; // this is needed for mdast, it is not used by Plate as the 'value' (platev48) now stores this in the children as CodeLineElements
   children: CodeLineElement[];
 };
 
@@ -154,15 +153,6 @@ export type TableElement = {
 };
 
 /**
- * @group MermaidElement
- */
-export type MermaidElement = {
-  type: 'mermaid';
-  value: string;
-  children: [EmptyTextElement];
-};
-
-/**
  * @group BlockElement
  */
 export type BlockElement =
@@ -176,7 +166,6 @@ export type BlockElement =
   | ListItemElement
   | MdxBlockElement
   | ParagraphElement
-  | MermaidElement
   | OrderedListElement
   | UnorderedListElement
   | TableCellElement

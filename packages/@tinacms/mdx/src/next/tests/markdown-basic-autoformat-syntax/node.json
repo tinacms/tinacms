@@ -203,8 +203,20 @@
       "value": "Indentation is ignored\n========",
       "children": [
         {
-          "type": "text",
-          "text": ""
+          "type": "code_line",
+          "children": [
+            {
+              "text": "Indentation is ignored"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "========"
+            }
+          ]
         }
       ]
     }

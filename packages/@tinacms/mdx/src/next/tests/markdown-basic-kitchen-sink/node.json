@@ -126,8 +126,28 @@
       "value": "- Red\n- Green\n- Blue",
       "children": [
         {
-          "type": "text",
-          "text": ""
+          "type": "code_line",
+          "children": [
+            {
+              "text": "- Red"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "- Green"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "- Blue"
+            }
+          ]
         }
       ]
     },

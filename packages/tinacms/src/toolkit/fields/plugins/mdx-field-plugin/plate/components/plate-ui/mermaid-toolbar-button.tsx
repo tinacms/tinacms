@@ -6,48 +6,46 @@ import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin';
 import { Icons } from './icons';
 import { ToolbarButton } from './toolbar';
 import { TElement } from '@udecode/plate';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { CodeLineElement } from '@tinacms/mdx';
 
-//TODO : Could not find any reference , do we need this ?
-export const insertEmptyMermaid = (editor: PlateEditor) => {
-  const matchCodeElements = (node: TElement) =>
-    node.type === editor.getType({ key: ELEMENT_MERMAID });
-
-  if (
-    editor.api.some({
-      match: matchCodeElements,
-    })
-  ) {
-    return;
-  }
-
-  const node = {
-    type: ELEMENT_MERMAID,
-    value: '',
-    children: [{ type: 'text', text: '' }],
-  };
-
-  if (editor.api.isAt({ start: true })) {
-    editor.tf.setNodes(node);
-  } else {
-    editor.tf.insertNode(node);
-  }
-};
+const DEFAULT_MERMAID_CONFIG = `%% This won't render without implementing a rendering engine (e.g. mermaid on npm)
+flowchart TD
+    id1(this is an example flow diagram)
+    --> id2(modify me to see changes!)
+    id2
+    --> id3(Click the top button to preview the changes)
+    --> id4(Learn about mermaid diagrams - mermaid.js.org)`;
 
 const useMermaidToolbarButtonState = () => {
   const editor = useEditorState();
 
-  const isBlockActive = () => helpers.isNodeActive(editor, ELEMENT_MERMAID);
+  const isBlockActive = () => helpers.isNodeActive(editor, CodeBlockPlugin.key);
 
   return {
     pressed: isBlockActive(),
   };
 };
 
+function makeCodeLine(text: string): CodeLineElement {
+  return {
+    type: 'code_line',
+    children: [{ text }],
+  };
+}
+
 const useMermaidToolbarButton = (state) => {
   const editor = useEditorState();
 
   const onClick = () => {
-    editor.tf.insertNodes(editor.api.create.block({ type: ELEMENT_MERMAID }), {
+    const newMermaidCodeBlockNode: TElement = {
+      type: CodeBlockPlugin.key,
+      lang: 'mermaid',
+      children: DEFAULT_MERMAID_CONFIG.split('\n').map(makeCodeLine),
+      value: DEFAULT_MERMAID_CONFIG,
+    };
+
+    editor.tf.insertNodes(newMermaidCodeBlockNode, {
       nextBlock: true,
       select: true,
     });
