@@ -111,6 +111,7 @@ export const editorPlugins = [
       rules: autoformatRules,
     },
   }),
+  // ExitBreakPlugin lets users “break out” of a block (like a heading)
   ExitBreakPlugin.configure({
     options: {
       rules: [
@@ -132,6 +133,7 @@ export const editorPlugins = [
       ],
     },
   }),
+// ResetNodePlugin lets users turn a heading back into a paragraph by pressing Enter (when empty) or Backspace (at the start).
   ResetNodePlugin.configure({
     options: {
       rules: [
