@@ -55,7 +55,6 @@ export const autoformatBlocks: AutoformatRule[] = [
     mode: 'block',
     type: CodeBlockPlugin.key,
     match: '```',
-    triggerAtBlockStart: false,
     preFormat,
     format: (editor) => {
       insertEmptyCodeBlock(editor, {
