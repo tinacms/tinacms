@@ -12,6 +12,7 @@ export const parseMDX = (
   const backup = (v: string) => v;
   const callback = imageCallback || backup;
   const tree = fromMarkdown(value, field);
+  console.log('[INFO] TREE: ', tree);
   return postProcess(tree, field, callback);
 };
 

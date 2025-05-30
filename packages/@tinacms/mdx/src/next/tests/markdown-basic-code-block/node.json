@@ -7,8 +7,12 @@
       "value": "const test = 123",
       "children": [
         {
-          "type": "text",
-          "text": ""
+          "type": "code_line",
+          "children": [
+            {
+              "text": "const test = 123"
+            }
+          ]
         }
       ]
     },
@@ -17,8 +21,12 @@
       "value": "some random code",
       "children": [
         {
-          "type": "text",
-          "text": ""
+          "type": "code_line",
+          "children": [
+            {
+              "text": "some random code"
+            }
+          ]
         }
       ]
     }

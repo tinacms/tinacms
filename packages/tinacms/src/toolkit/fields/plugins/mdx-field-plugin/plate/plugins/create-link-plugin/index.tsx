@@ -1,28 +1,9 @@
 import React, { useEffect } from 'react';
-import {
-  Editor,
-  Element,
-  type BaseRange,
-  Transforms,
-  setNodes,
-  unwrapNodes,
-  wrapNodes,
-} from 'slate';
 import { NestedForm } from '../../nested-form';
 import { Button } from '@tinacms/toolkit';
-import { createLinkPlugin, ELEMENT_LINK } from '@udecode/plate-link';
-import {
-  type ENode,
-  getAboveNode,
-  getNodeEntries,
-  getPluginType,
-  isCollapsed,
-  type PlateEditor,
-  useEditorState,
-  type Value,
-} from '@udecode/plate-common';
-
-export { createLinkPlugin };
+import { LinkPlugin } from '@udecode/plate-link/react';
+import { PlateEditor, useEditorState } from '@udecode/plate/react';
+import { ElementApi, Node, NodeApi } from '@udecode/plate';
 
 type LinkElement = {
   url?: string;
@@ -39,14 +20,14 @@ export const wrapOrRewrapLink = (editor) => {
   };
 
   // if our cursor is inside an existing link, but don't have the text selected, select it now
-  if (isCollapsed(editor.selection)) {
-    const [, path] = getAboveNode(editor, {
+  if (editor.api.isCollapsed()) {
+    const [, path] = editor.api.above({
       match: (n) =>
-        !Editor.isEditor(n) &&
-        Element.isElement(n) &&
-        getPluginType(editor, ELEMENT_LINK),
+        !NodeApi.isEditor(n) &&
+        ElementApi.isElement(n) &&
+        editor.getType(LinkPlugin.key),
     });
-    Transforms.select(editor, path);
+    editor.tf.select(path); //TODO : Test this function in UI, not sure if it works after replace with latest api
   }
   if (isLinkActive(editor)) {
     const [link] = getLinks(editor);
@@ -56,11 +37,11 @@ export const wrapOrRewrapLink = (editor) => {
     unwrapLink(editor);
   }
 
-  wrapNodes(editor, baseLink, { split: true });
+  editor.tf.wrapNodes(baseLink, { split: true });
 };
 
-const matchLink = (n: ENode<Value>) =>
-  !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK;
+const matchLink = (n: Node) =>
+  !NodeApi.isEditor(n) && ElementApi.isElement(n) && n.type === LinkPlugin.key;
 
 export const LinkForm = (props) => {
   const [initialValues, setInitialValues] = React.useState<{
@@ -80,13 +61,13 @@ export const LinkForm = (props) => {
   }, [editor, setInitialValues]);
 
   const handleUpdate = React.useCallback(() => {
-    const linksInSelection = getNodeEntries<LinkElement>(editor, {
+    const linksInSelection = editor.api.nodes<LinkElement>({
       match: matchLink,
       at: selection,
     });
     if (linksInSelection) {
       for (const [, location] of linksInSelection) {
-        setNodes(editor, formValues, {
+        editor.tf.setNodes(formValues, {
           match: matchLink,
           at: location,
         });
@@ -126,15 +107,16 @@ export const LinkForm = (props) => {
   );
 };
 
-export const unwrapLink = (editor: PlateEditor, selection?: BaseRange) => {
-  unwrapNodes(editor, {
+//TODO - Fix the selection type was BaseRange from slate before (need to find what the actual type is)
+export const unwrapLink = (editor: PlateEditor, selection?: any) => {
+  editor.tf.unwrapNodes({
     match: matchLink,
     at: selection || undefined,
   });
 };
 
-export const getLinks = (editor) => {
-  return getNodeEntries<LinkElement>(editor, {
+export const getLinks = (editor): LinkElement[] => {
+  return editor.api.nodes({
     match: matchLink,
   });
 };
