@@ -24,7 +24,6 @@ import { ParagraphPlugin } from "@udecode/plate/react";
 import React from "react";
 import { LinkFloatingToolbar } from "../components/plate-ui/link-floating-toolbar";
 import { isUrl } from "../transforms/is-url";
-import { autoformatRules } from "./core/autoformat/autoformat-rules";
 import createImgPlugin from "./create-img-plugin";
 import { createInvalidMarkdownPlugin } from "./create-invalid-markdown-plugin";
 import {
@@ -35,6 +34,14 @@ import { FloatingToolbarPlugin } from "./ui/floating-toolbar-plugin";
 // NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
 import { isCodeBlockEmpty, isSelectionAtCodeBlockStart, unwrapCodeBlock } from "@udecode/plate-code-block";
 import { all, createLowlight } from "lowlight";
+import { AutoformatRule } from "@udecode/plate-autoformat";
+import { autoformatArrow, autoformatMath } from "@udecode/plate-autoformat";
+import { autoformatLegal, autoformatPunctuation } from "@udecode/plate-autoformat";
+import { autoformatMarks } from "./core/autoformat/autoformat-marks";
+import { autoformatBlocks } from "./core/autoformat/autoformat-block";
+import { autoformatSmartQuotes } from "@udecode/plate-autoformat";
+import { autoformatLists } from "./core/autoformat/autoformat-lists";
+import { INDENT_LIST_KEYS, ListStyleType } from '@udecode/plate-indent-list';
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -49,16 +56,13 @@ export const HANDLES_MDX = [
 
 // Common rule for resetting block types
 const resetBlockTypesCommonRule = {
-  types: [
-    BlockquotePlugin.key,
-    HEADING_KEYS.h1,
-    HEADING_KEYS.h2,
-    HEADING_KEYS.h3,
-    HEADING_KEYS.h4,
-    HEADING_KEYS.h5,
-    HEADING_KEYS.h6,
-  ],
   defaultType: ParagraphPlugin.key,
+  types: [
+    ...HEADING_LEVELS,
+    BlockquotePlugin.key,
+    ListStyleType.Disc,
+    ListStyleType.Decimal,
+  ],
 };
 
 const resetBlockTypesCodeBlockRule = {
@@ -111,11 +115,31 @@ export const editorPlugins = [
 
   TrailingBlockPlugin,
   FloatingToolbarPlugin,
+
   AutoformatPlugin.configure({
     options: {
-      rules: autoformatRules,
+      enableUndoOnDelete: true,
+      rules: [
+        ...autoformatMarks,
+        ...autoformatBlocks,
+        ...autoformatLists,
+        ...autoformatSmartQuotes,
+        ...autoformatPunctuation,
+        ...autoformatLegal,
+        ...autoformatArrow,
+        ...autoformatMath,
+      ].map(
+        (rule): AutoformatRule => ({
+          ...rule,
+          query: (editor) =>
+            !editor.api.some({
+              match: { type: editor.getType(CodeBlockPlugin) },
+            }),
+        })
+      ),
     },
   }),
+  
   // ExitBreakPlugin lets users “break out” of a block (like a heading)
   ExitBreakPlugin.configure({
     options: {
@@ -144,13 +168,13 @@ export const editorPlugins = [
       rules: [
         {
           ...resetBlockTypesCommonRule,
-          hotkey: "Enter",
+          hotkey: 'Enter',
           predicate: (editor) =>
             editor.api.isEmpty(editor.selection, { block: true }),
         },
         {
           ...resetBlockTypesCommonRule,
-          hotkey: "Backspace",
+          hotkey: 'Backspace',
           predicate: (editor) => editor.api.isAt({ start: true }),
         },
         {
