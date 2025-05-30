@@ -1,38 +1,39 @@
 "use client";
 
+import { createSlatePlugin } from "@udecode/plate";
+import { AutoformatPlugin } from "@udecode/plate-autoformat/react";
 import {
   BasicMarksPlugin,
   UnderlinePlugin,
 } from "@udecode/plate-basic-marks/react";
-import { HeadingPlugin } from "@udecode/plate-heading/react";
-import { ParagraphPlugin } from "@udecode/plate/react";
-import { CodeBlockPlugin } from "@udecode/plate-code-block/react";
 import { BlockquotePlugin } from "@udecode/plate-block-quote/react";
-import { ListPlugin } from "@udecode/plate-list/react";
-import { IndentListPlugin } from "@udecode/plate-indent-list/react";
-import { HorizontalRulePlugin } from "@udecode/plate-horizontal-rule/react";
-import { NodeIdPlugin } from "@udecode/plate-node-id";
-import { TablePlugin } from "@udecode/plate-table/react";
-import { SlashPlugin } from "@udecode/plate-slash-command/react";
-import { TrailingBlockPlugin } from "@udecode/plate-trailing-block";
-import { AutoformatPlugin } from "@udecode/plate-autoformat/react";
 import { ExitBreakPlugin, SoftBreakPlugin } from "@udecode/plate-break/react";
-import { autoformatRules } from "./core/autoformat/autoformat-rules";
+import { CodeBlockPlugin } from "@udecode/plate-code-block/react";
 import { HEADING_KEYS, HEADING_LEVELS } from "@udecode/plate-heading";
+import { HeadingPlugin } from "@udecode/plate-heading/react";
+import { HorizontalRulePlugin } from "@udecode/plate-horizontal-rule/react";
+import { IndentListPlugin } from "@udecode/plate-indent-list/react";
 import { LinkPlugin } from "@udecode/plate-link/react";
-import { isUrl } from "../transforms/is-url";
-import { LinkFloatingToolbar } from "../components/plate-ui/link-floating-toolbar";
-import React from "react";
+import { ListPlugin } from "@udecode/plate-list/react";
+import { NodeIdPlugin } from "@udecode/plate-node-id";
 import { ResetNodePlugin } from "@udecode/plate-reset-node/react";
-import { createInvalidMarkdownPlugin } from "./create-invalid-markdown-plugin";
+import { SlashPlugin } from "@udecode/plate-slash-command/react";
+import { TablePlugin } from "@udecode/plate-table/react";
+import { TrailingBlockPlugin } from "@udecode/plate-trailing-block";
+import { ParagraphPlugin } from "@udecode/plate/react";
+import React from "react";
+import { LinkFloatingToolbar } from "../components/plate-ui/link-floating-toolbar";
+import { isUrl } from "../transforms/is-url";
+import { autoformatRules } from "./core/autoformat/autoformat-rules";
 import createImgPlugin from "./create-img-plugin";
+import { createInvalidMarkdownPlugin } from "./create-invalid-markdown-plugin";
 import {
   createMdxBlockPlugin,
   createMdxInlinePlugin,
 } from "./create-mdx-plugins";
 import { FloatingToolbarPlugin } from "./ui/floating-toolbar-plugin";
-import { createSlatePlugin } from "@udecode/plate";
 // NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
+import { isCodeBlockEmpty, isSelectionAtCodeBlockStart, unwrapCodeBlock } from "@udecode/plate-code-block";
 import { all, createLowlight } from "lowlight";
 
 // Define block types that support MDX embedding
@@ -58,6 +59,12 @@ const resetBlockTypesCommonRule = {
     HEADING_KEYS.h6,
   ],
   defaultType: ParagraphPlugin.key,
+};
+
+const resetBlockTypesCodeBlockRule = {
+  types: [CodeBlockPlugin.key],
+  defaultType: ParagraphPlugin.key,
+  onReset: unwrapCodeBlock,
 };
 
 // View Plugins: Basic nodes and marks
@@ -145,6 +152,16 @@ export const editorPlugins = [
           ...resetBlockTypesCommonRule,
           hotkey: "Backspace",
           predicate: (editor) => editor.api.isAt({ start: true }),
+        },
+        {
+          ...resetBlockTypesCodeBlockRule,
+          hotkey: 'Enter',
+          predicate: isCodeBlockEmpty,
+        },
+        {
+          ...resetBlockTypesCodeBlockRule,
+          hotkey: 'Backspace',
+          predicate: isSelectionAtCodeBlockStart,
         },
       ],
     },
