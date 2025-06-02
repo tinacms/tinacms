@@ -14,7 +14,7 @@ import { HeadingPlugin } from "@udecode/plate-heading/react";
 import { HorizontalRulePlugin } from "@udecode/plate-horizontal-rule/react";
 import { IndentListPlugin } from "@udecode/plate-indent-list/react";
 import { LinkPlugin } from "@udecode/plate-link/react";
-import { ListPlugin } from "@udecode/plate-list/react";
+import { BulletedListPlugin, ListPlugin, NumberedListPlugin } from "@udecode/plate-list/react";
 import { NodeIdPlugin } from "@udecode/plate-node-id";
 import { ResetNodePlugin } from "@udecode/plate-reset-node/react";
 import { SlashPlugin } from "@udecode/plate-slash-command/react";
@@ -32,16 +32,14 @@ import {
 } from "./create-mdx-plugins";
 import { FloatingToolbarPlugin } from "./ui/floating-toolbar-plugin";
 // NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
+import { autoformatArrow, autoformatLegal, autoformatMath, autoformatPunctuation, AutoformatRule, autoformatSmartQuotes } from "@udecode/plate-autoformat";
 import { isCodeBlockEmpty, isSelectionAtCodeBlockStart, unwrapCodeBlock } from "@udecode/plate-code-block";
+import { ListStyleType } from '@udecode/plate-indent-list';
+import { unwrapList } from "@udecode/plate-list";
 import { all, createLowlight } from "lowlight";
-import { AutoformatRule } from "@udecode/plate-autoformat";
-import { autoformatArrow, autoformatMath } from "@udecode/plate-autoformat";
-import { autoformatLegal, autoformatPunctuation } from "@udecode/plate-autoformat";
-import { autoformatMarks } from "./core/autoformat/autoformat-marks";
 import { autoformatBlocks } from "./core/autoformat/autoformat-block";
-import { autoformatSmartQuotes } from "@udecode/plate-autoformat";
 import { autoformatLists } from "./core/autoformat/autoformat-lists";
-import { INDENT_LIST_KEYS, ListStyleType } from '@udecode/plate-indent-list';
+import { autoformatMarks } from "./core/autoformat/autoformat-marks";
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -175,7 +173,10 @@ export const editorPlugins = [
         {
           ...resetBlockTypesCommonRule,
           hotkey: 'Backspace',
-          predicate: (editor) => editor.api.isAt({ start: true }),
+          predicate: (editor) => {
+            console.log('predicate', editor.api.isAt({ start: true }));
+            return editor.api.isAt({ start: true });
+          },
         },
         {
           ...resetBlockTypesCodeBlockRule,
@@ -187,6 +188,17 @@ export const editorPlugins = [
           hotkey: 'Backspace',
           predicate: isSelectionAtCodeBlockStart,
         },
+// NOTE: Plate's ListPlugin usually handles resetting lists to paragraphs when pressing Backspace at the start of a list item.
+// However, if the list is the first node in the editor, the default reset behavior may not fully unwrap the list item,
+// which can leave an invalid structure (like a <li> inside a <p>).
+// This rule uses `onReset: unwrapList` to ensure lists are always properly reset to paragraphs, even when they are the first node.
+        {
+          types: [BulletedListPlugin.key, NumberedListPlugin.key],
+          defaultType: ParagraphPlugin.key,
+          hotkey: 'Backspace',
+          predicate: (editor) => editor.api.isAt({ start: true }),
+          onReset: unwrapList,
+        }
       ],
     },
   }),
