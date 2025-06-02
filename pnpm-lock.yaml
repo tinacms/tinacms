@@ -88,19 +88,6 @@ importers:
         specifier: '7'
         version: 7.32.0
 
-  examples/brookjeynes.dev:
-    dependencies:
-      tinacms:
-        specifier: workspace:*
-        version: link:../../packages/tinacms
-    devDependencies:
-      '@tinacms/cli':
-        specifier: workspace:*
-        version: link:../../packages/@tinacms/cli
-      '@types/node':
-        specifier: ^22.14.1
-        version: 22.15.17
-
   examples/empty:
     dependencies:
       '@tinacms/cli':
@@ -777,12 +764,6 @@ importers:
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@22.15.17)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.17)(typescript@5.7.3))
-
-  packages/@tinacms/common:
-    devDependencies:
-      typescript:
-        specifier: ^4.7.4
-        version: 4.9.5
 
   packages/@tinacms/datalayer:
     dependencies:
@@ -12215,11 +12196,6 @@ packages:
     hasBin: true
     peerDependencies:
       typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x
-
-  typescript@4.9.5:
-    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
 
   typescript@5.7.3:
     resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
@@ -25908,8 +25884,6 @@ snapshots:
       shiki: 1.29.2
       typescript: 5.7.3
       yaml: 2.7.0
-
-  typescript@4.9.5: {}
 
   typescript@5.7.3: {}
 
