@@ -37,6 +37,12 @@ export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   extraSubscribeValues?: FormSubscription;
   queries?: string[];
   crudType?: 'create' | 'update';
+
+  /**
+   * @deprecated
+   * Misleading name as per https://github.com/tinacms/tinacms/issues/5686#issuecomment-2899840518
+   * Use id property instead.
+   */
   relativePath?: string;
 }
 
@@ -56,7 +62,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   queries: string[];
   global: GlobalOptions | null = null;
   loading: boolean = false;
+
+  /**
+   * @deprecated
+   * Misleading name as per https://github.com/tinacms/tinacms/issues/5686#issuecomment-2899840518
+   * Use id property instead.
+   */
   relativePath: string;
+
   crudType?: 'create' | 'update';
   beforeSubmit?: (values: S) => Promise<void | S>;
 
