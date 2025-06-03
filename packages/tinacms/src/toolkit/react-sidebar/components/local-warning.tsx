@@ -1,19 +1,18 @@
-import * as React from 'react';
-import { AiFillWarning } from 'react-icons/ai';
-import { BiError, BiRightArrowAlt } from 'react-icons/bi';
 import { useCMS } from '@toolkit/react-core';
+import * as React from 'react';
+import { BiError, BiRightArrowAlt } from 'react-icons/bi';
+import { Alert } from './alert';
 
 export const LocalWarning = () => {
   return (
-    <a
-      className='flex-grow-0 flex w-full text-xs items-center py-1 px-4 text-yellow-600 bg-gradient-to-r from-yellow-50 to-yellow-100 border-b border-gray-150 shadow-sm'
-      href='https://tina.io/docs/tina-cloud/'
-      target='_blank'
-    >
-      <AiFillWarning className='w-5 h-auto inline-block mr-1 opacity-70 text-yellow-600' />{' '}
-      You are currently in
-      <strong className='ml-1 font-bold text-yellow-700'>Local Mode</strong>
-    </a>
+    <Alert style="warning">
+      <a
+        href='https://tina.io/docs/tina-cloud/'
+        target='_blank'
+      >
+        You are on local mode
+      </a>
+    </Alert>
   );
 };
 

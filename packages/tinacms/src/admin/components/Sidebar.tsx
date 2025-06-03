@@ -3,19 +3,19 @@
 */
 
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import { ImFilesEmpty, ImUsers } from 'react-icons/im';
 import type { IconType } from 'react-icons/lib';
+import { NavLink } from 'react-router-dom';
 
-import { Button, Nav } from '@tinacms/toolkit';
-import type { TinaCMS, ScreenPlugin } from '@tinacms/toolkit';
 import { Transition, TransitionChild } from '@headlessui/react';
 import { useWindowWidth } from '@react-hook/window-size';
+import { Button, Nav } from '@tinacms/toolkit';
+import type { ScreenPlugin, TinaCMS } from '@tinacms/toolkit';
 
-import { useGetCollections } from './GetCollections';
-import { IoMdClose } from 'react-icons/io';
-import { BiMenu } from 'react-icons/bi';
 import type { CloudConfigPlugin } from '@tinacms/toolkit';
+import { BiMenu } from 'react-icons/bi';
+import { IoMdClose } from 'react-icons/io';
+import { useGetCollections } from './GetCollections';
 
 export const slugify = (text) => {
   return text
@@ -178,9 +178,8 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
           onClick={() => {
             setMenuIsOpen(true);
           }}
-          className={`pointer-events-auto -ml-px absolute left-0 z-50 ${
-            isLocalMode ? 'top-10' : 'top-4'
-          }`}
+          className={`pointer-events-auto -ml-px absolute left-0 z-50 ${isLocalMode ? 'top-10' : 'top-4'
+            }`}
         >
           <BiMenu className='h-7 w-auto' />
         </Button>
@@ -199,11 +198,10 @@ const SidebarLink = (props: {
   return (
     <NavLink
       className={({ isActive }) => {
-        return `text-base tracking-wide ${
-          isActive ? 'text-blue-600' : 'text-gray-500'
-        } hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`;
+        return `text-base tracking-wide ${isActive ? 'text-blue-600' : 'text-gray-500'
+          } hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`;
       }}
-      onClick={props.onClick ? props.onClick : () => {}}
+      onClick={props.onClick ? props.onClick : () => { }}
       to={to}
     >
       <Icon className='mr-2 h-6 opacity-80 w-auto' /> {label}

@@ -1,14 +1,15 @@
 import * as React from 'react';
+import { cn } from '../../lib/utils';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'white' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'white' | 'ghost' | 'danger' | 'custom';
   as?: React.ElementType;
   href?: string;
   target?: string;
   size?: 'small' | 'medium' | 'custom';
   busy?: boolean;
-  rounded?: 'full' | 'left' | 'right' | 'custom';
+  rounded?: 'full' | 'left' | 'right' | 'custom' | 'none';
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -33,10 +34,11 @@ export const Button = ({
     white: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100`,
     ghost: `text-gray-500 hover:text-blue-500 hover:shadow border border-transparent border-0 hover:border hover:border-gray-200 bg-transparent`,
     danger: `shadow text-white bg-red-500 hover:bg-red-600 focus:ring-red-500`,
+    custom: '',
   };
   const state = busy ? `busy` : disabled ? `disabled` : `default`;
   const stateClasses = {
-    disabled: `pointer-events-none	opacity-30 cursor-not-allowed`,
+    disabled: `pointer-events-none opacity-30 cursor-not-allowed`,
     busy: `pointer-events-none opacity-70 cursor-wait`,
     default: ``,
   };
@@ -45,6 +47,7 @@ export const Button = ({
     left: `rounded-l-full`,
     right: `rounded-r-full`,
     custom: '',
+    none: '',
   };
   const sizeClasses = {
     small: `text-xs h-8 px-3`,
@@ -54,7 +57,7 @@ export const Button = ({
 
   return (
     <Tag
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${stateClasses[state]} ${roundedClasses[rounded]} ${className}`}
+      className={cn(baseClasses, variantClasses[variant], sizeClasses[size], stateClasses[state], roundedClasses[rounded], className)}
       {...props}
     >
       {children}

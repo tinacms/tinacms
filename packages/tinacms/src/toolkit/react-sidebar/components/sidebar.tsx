@@ -1,17 +1,17 @@
 import { Transition, TransitionChild } from '@headlessui/react';
 import { useWindowWidth } from '@react-hook/window-size';
-import { BranchButton } from '@toolkit/plugin-branch-switcher';
+import { BranchButton, BranchPreviewButton } from '@toolkit/plugin-branch-switcher';
 import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
 import { useCMS, useSubscribable } from '@toolkit/react-core';
 import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
 import { Button } from '@toolkit/styles';
 import * as React from 'react';
 import { useState } from 'react';
-import { BiExpandAlt, BiLinkExternal, BiMenu, BiPencil } from 'react-icons/bi';
+import { BiMenu, BiPencil } from 'react-icons/bi';
 import { ImFilesEmpty, ImUsers } from 'react-icons/im';
 import { IoMdClose } from 'react-icons/io';
 import type { IconType } from 'react-icons/lib';
-import { MdOutlineArrowBackIos } from 'react-icons/md';
+import { PiSidebarSimpleLight } from "react-icons/pi";
 import type { SidebarState, SidebarStateOptions } from '../sidebar';
 import { BillingWarning, LocalWarning } from './local-warning';
 import { Nav } from './nav';
@@ -62,7 +62,7 @@ export function SidebarProvider({
         // @ts-ignore
         typeof cms?.sidebar?.renderNav !== 'undefined'
           ? // @ts-ignore
-            cms.sidebar.renderNav
+          cms.sidebar.renderNav
           : true
       }
       sidebar={sidebar}
@@ -435,88 +435,47 @@ const SidebarHeader = ({
   displayNav,
   isLocalMode,
 }) => {
-  const { toggleFullscreen, displayState, setMenuIsOpen, toggleSidebarOpen } =
+  const { toggleFullscreen, toggleSidebarOpen } =
     React.useContext(SidebarContext);
 
   const displayMenuButton = renderNav && !displayNav;
 
-  const cms = useCMS();
-  const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl;
-  const branch = cms.api?.tina?.branch;
-  const previewUrl =
-    typeof previewFunction === 'function'
-      ? previewFunction({ branch })?.url
-      : null;
-
-  return (
-    <div className='flex-grow-0 w-full overflow-visible z-20'>
-      {isLocalMode && <LocalWarning />}
+  return (<>
+    <div className='flex-grow-0 w-full'>
       {!isLocalMode && <BillingWarning />}
 
-      <div className='mt-4 -mb-14 w-full flex gap-3 items-center justify-between pointer-events-none'>
-        {displayMenuButton && (
-          <Button
-            rounded='right'
-            variant='white'
-            onClick={() => {
-              setMenuIsOpen(true);
-            }}
-            className='pointer-events-auto -ml-px'
-          >
-            <BiMenu className='h-6 w-auto text-blue-500' />
-          </Button>
-        )}
-        <div className='flex-1 flex gap-3 items-center shrink min-w-0'>
-          {branchingEnabled && !isLocalMode && <BranchButton />}
-          {branchingEnabled && !isLocalMode && previewUrl && (
+      <div className='px-2 w-full flex gap-3 items-center justify-between pointer-events-none'>
+        <div>
+          {displayMenuButton && (
             <button
-              className='pointer-events-auto flex min-w-0	shrink gap-1 items-center justify-between form-select text-sm h-10 px-4 shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100 transition-color duration-150 ease-out rounded-full focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight min-w-[5rem]'
-              onClick={() => {
-                window.open(previewUrl, '_blank');
-              }}
+              className="pointer-events-auto m-2 p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded"
+              onClick={toggleFullscreen}
             >
-              <BiLinkExternal className='flex-shrink-0 w-4 h-auto text-blue-500/70 mr-1' />
-              <span className='truncate max-w-full min-w-0 shrink'>
-                Preview
-              </span>
+              <BiMenu className="h-6 w-auto text-gray-600" />
             </button>
           )}
         </div>
-        <div
-          className={
-            'flex items-center pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px'
-          }
-        >
-          <Button
-            rounded='left'
-            variant='white'
+        <div>
+          <button
+            className="pointer-events-auto m-2 p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded"
             onClick={toggleSidebarOpen}
-            aria-label='closes cms sidebar'
-            className='-mr-px'
           >
-            <MdOutlineArrowBackIos className='h-[18px] w-auto -mr-1 text-blue-500' />
-          </Button>
-          <Button rounded='custom' variant='white' onClick={toggleFullscreen}>
-            {displayState === 'fullscreen' ? (
-              // BiCollapseAlt
-              <svg
-                className='h-5 w-auto -mx-1 text-blue-500'
-                stroke='currentColor'
-                fill='currentColor'
-                strokeWidth='0'
-                viewBox='0 0 24 24'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path d='M2 15h7v7h2v-9H2v2zM15 2h-2v9h9V9h-7V2z'></path>
-              </svg>
-            ) : (
-              <BiExpandAlt className='h-5 -mx-1 w-auto text-blue-500' />
-            )}
-          </Button>
+            <PiSidebarSimpleLight className="h-6 w-auto text-gray-600" />
+          </button>
         </div>
       </div>
     </div>
-  );
+
+    <div className='px-4'>
+      {isLocalMode && <LocalWarning />}
+      {branchingEnabled && !isLocalMode && (
+        <div className="flex justify-between items-center">
+          <BranchButton />
+          <BranchPreviewButton />
+        </div>
+      )}
+    </div>
+  </>);
 };
 
 const SidebarSiteLink = ({
@@ -579,9 +538,8 @@ const SidebarCollectionLink = ({
   return (
     <a
       onClick={onClick}
-      href={`${
-        tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
-      }/collections/${collection.name}/~`}
+      href={`${tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+        }/collections/${collection.name}/~`}
       className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
     >
       <Icon className='mr-2 h-6 opacity-80 w-auto' />{' '}
@@ -590,7 +548,7 @@ const SidebarCollectionLink = ({
   );
 };
 
-const EditButton = ({}) => {
+const EditButton = ({ }) => {
   const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext);
 
   return (
@@ -599,11 +557,10 @@ const EditButton = ({}) => {
       variant='primary'
       size='custom'
       onClick={toggleSidebarOpen}
-      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${
-        displayState !== 'closed'
-          ? 'opacity-0 ease-in pointer-events-none'
-          : 'ease-out pointer-events-auto'
-      }`}
+      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${displayState !== 'closed'
+        ? 'opacity-0 ease-in pointer-events-none'
+        : 'ease-out pointer-events-auto'
+        }`}
       aria-label='opens cms sidebar'
     >
       <BiPencil className='h-6 w-auto' />
@@ -617,22 +574,19 @@ const SidebarWrapper = ({ children }) => {
 
   return (
     <div
-      className={`fixed top-0 left-0 h-dvh z-base ${
-        displayState === 'closed' ? 'pointer-events-none' : ''
-      }`}
+      className={`fixed top-0 left-0 h-dvh z-base ${displayState === 'closed' ? 'pointer-events-none' : ''
+        }`}
     >
       <div
-        className={`relative h-dvh transform flex ${
-          displayState !== 'closed' ? '' : '-translate-x-full'
-        } ${
-          resizingSidebar
+        className={`relative h-dvh transform flex ${displayState !== 'closed' ? '' : '-translate-x-full'
+          } ${resizingSidebar
             ? 'transition-none'
             : displayState === 'closed'
               ? 'transition-all duration-300 ease-in'
               : displayState === 'fullscreen'
                 ? 'transition-all duration-150 ease-out'
                 : 'transition-all duration-300 ease-out'
-        }`}
+          }`}
         style={{
           width: displayState === 'fullscreen' ? '100vw' : `${sidebarWidth}px`,
           maxWidth:
@@ -650,7 +604,7 @@ const SidebarBody = ({ children }) => {
   return (
     <div
       className={
-        'relative left-0 w-full h-full flex flex-col items-stretch bg-white border-r border-gray-200 overflow-hidden'
+        'relative left-0 w-full h-full flex flex-col items-stretch bg-gray-50 border-r border-gray-200 overflow-hidden'
       }
     >
       {children}
