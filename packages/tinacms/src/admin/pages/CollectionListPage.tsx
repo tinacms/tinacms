@@ -327,7 +327,7 @@ const CollectionListPage = () => {
                   (field) => field.name === sortName
                 );
 
-                const searchEnabled = true;//!!cms.api.tina.schema?.config?.config?.search;
+                const searchEnabled = !!cms.api.tina.schema?.config?.config?.search;
 
                 const collectionDefinition = cms.api.tina.schema.getCollection(
                   collection.name
