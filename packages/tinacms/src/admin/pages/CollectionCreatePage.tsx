@@ -262,7 +262,7 @@ export const RenderForm = ({
             folderName && !filename?.startsWith('/') ? `/${folderName}/` : '/';
 
           // keeps the forms relative path in sync with the filename
-          form.relativePath =
+          form.id =
             schemaCollection.path +
             appendFolder +
             `${filename}.${schemaCollection.format || 'md'}`;
