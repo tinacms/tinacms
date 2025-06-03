@@ -1,5 +1,11 @@
 # tinacms
 
+## 2.7.9
+
+### Patch Changes
+
+- [#5734](https://github.com/tinacms/tinacms/pull/5734) [`2a3ed6c`](https://github.com/tinacms/tinacms/commit/2a3ed6c3ec3233fd90fd94f3dd3d0243aaad079a) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collection list - simplified search input design
+
 ## 2.7.8
 
 ### Patch Changes
