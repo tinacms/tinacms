@@ -560,6 +560,7 @@ export interface Config<
   SearchClient = undefined,
 > {
   contentApiUrlOverride?: string;
+  oauth2?: boolean;
   authProvider?: AuthProvider;
   admin?: {
     /**
