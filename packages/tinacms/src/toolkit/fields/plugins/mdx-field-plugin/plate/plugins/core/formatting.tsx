@@ -1,14 +1,12 @@
-import { createSoftBreakPlugin } from "../soft-break";
-import { createPlatePlugin, ParagraphPlugin } from "@udecode/plate/react";
-import { BlockquotePlugin } from "@udecode/plate-block-quote/react";
-import { TrailingBlockPlugin } from "@udecode/plate-trailing-block";
 import { AutoformatPlugin } from "@udecode/plate-autoformat/react";
+import { BlockquotePlugin } from "@udecode/plate-block-quote/react";
 import { ExitBreakPlugin, SoftBreakPlugin } from "@udecode/plate-break/react";
-import { HEADING_KEYS, HEADING_LEVELS } from "@udecode/plate-heading";
 import { CodeBlockPlugin } from "@udecode/plate-code-block/react";
-import { autoformatRules } from "./autoformat/autoformat-rules";
+import { HEADING_KEYS, HEADING_LEVELS } from "@udecode/plate-heading";
 import { ResetNodePlugin } from "@udecode/plate-reset-node/react";
-import { createSlatePlugin } from "@udecode/plate";
+import { TrailingBlockPlugin } from "@udecode/plate-trailing-block";
+import { ParagraphPlugin } from "@udecode/plate/react";
+import { autoformatRules } from "./autoformat/autoformat-rules";
 
 export const HANDLES_MDX = [
   HEADING_KEYS.h1,
