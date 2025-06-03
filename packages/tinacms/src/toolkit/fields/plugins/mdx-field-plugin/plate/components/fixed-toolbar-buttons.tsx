@@ -1,7 +1,7 @@
-import { useEditorState } from '@udecode/plate/react';
-import React from 'react';
-import { useResize } from '../hooks/use-resize';
-import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
+import { useEditorState } from "@udecode/plate/react";
+import React from "react";
+import { useResize } from "../hooks/use-resize";
+import { helpers, unsupportedItemsInTable } from "../plugins/core/common";
 import {
   CONTAINER_MD_BREAKPOINT,
   EMBED_ICON_WIDTH,
@@ -11,31 +11,32 @@ import {
   HEADING_LABEL,
   STANDARD_ICON_WIDTH,
   type ToolbarOverrideType,
-} from '../toolbar/toolbar-overrides';
-import { useToolbarContext } from '../toolbar/toolbar-provider';
-import { HeadingsMenu } from './headings-dropdown';
-import { CodeBlockToolbarButton } from './plate-ui/code-block-toolbar-button';
-import { ImageToolbarButton } from './plate-ui/image-toolbar-button';
-import { LinkToolbarButton } from './plate-ui/link-toolbar-button';
-import { MermaidToolbarButton } from './plate-ui/mermaid-toolbar-button';
-import OverflowMenu from './plate-ui/overflow-menu';
-import { QuoteToolbarButton } from './plate-ui/quote-toolbar-button';
-import { RawMarkdownToolbarButton } from './plate-ui/raw-markdown-toolbar-button';
-import TemplatesToolbarButton from './plate-ui/templates-toolbar-button';
-import { ToolbarGroup } from './plate-ui/toolbar';
+} from "../toolbar/toolbar-overrides";
+import { useToolbarContext } from "../toolbar/toolbar-provider";
+import { HeadingsMenu } from "./headings-dropdown";
+import { CodeBlockToolbarButton } from "./plate-ui/code-block-toolbar-button";
+import { ImageToolbarButton } from "./plate-ui/image-toolbar-button";
+import { LinkToolbarButton } from "./plate-ui/link-toolbar-button";
+import { MermaidToolbarButton } from "./plate-ui/mermaid-toolbar-button";
+import OverflowMenu from "./plate-ui/overflow-menu";
+import { QuoteToolbarButton } from "./plate-ui/quote-toolbar-button";
+import { RawMarkdownToolbarButton } from "./plate-ui/raw-markdown-toolbar-button";
+import { HorizontalRuleToolbarButton } from "./plate-ui/hr-toolbar-button";
+import TemplatesToolbarButton from "./plate-ui/templates-toolbar-button";
+import { ToolbarGroup } from "./plate-ui/toolbar";
 import {
   BoldToolbarButton,
   CodeToolbarButton,
   ItalicToolbarButton,
   StrikethroughToolbarButton,
-} from './plate-ui/mark-toolbar-button';
-import { TablePlugin } from '@udecode/plate-table/react';
+} from "./plate-ui/mark-toolbar-button";
+import { TablePlugin } from "@udecode/plate-table/react";
 import {
   BulletedListPlugin,
   NumberedListPlugin,
-} from '@udecode/plate-list/react';
-import { ListToolbarButton } from './plate-ui/indent-list-toolbar-button';
-import { TableDropdownMenu } from './plate-ui/table/table-dropdown-menu';
+} from "@udecode/plate-list/react";
+import { ListToolbarButton } from "./plate-ui/indent-list-toolbar-button";
+import { TableDropdownMenu } from "./plate-ui/table/table-dropdown-menu";
 
 type ToolbarItem = {
   label: string;
@@ -55,72 +56,77 @@ const toolbarItems: { [key in ToolbarOverrideType]: ToolbarItem } = {
     ),
   },
   link: {
-    label: 'Link',
+    label: "Link",
     width: () => STANDARD_ICON_WIDTH,
     Component: <LinkToolbarButton />,
   },
   image: {
-    label: 'Image',
+    label: "Image",
     width: () => STANDARD_ICON_WIDTH,
     Component: <ImageToolbarButton />,
   },
+  hr: {
+    label: "Horizontal Rule",
+    width: () => STANDARD_ICON_WIDTH,
+    Component: <HorizontalRuleToolbarButton />,
+  },
   quote: {
-    label: 'Quote',
+    label: "Quote",
     width: () => STANDARD_ICON_WIDTH,
     Component: <QuoteToolbarButton />,
   },
   ul: {
-    label: 'Unordered List',
+    label: "Unordered List",
     width: () => STANDARD_ICON_WIDTH,
     Component: <ListToolbarButton nodeType={BulletedListPlugin.key} />,
   },
   ol: {
-    label: 'Ordered List',
+    label: "Ordered List",
     width: () => STANDARD_ICON_WIDTH,
     Component: <ListToolbarButton nodeType={NumberedListPlugin.key} />,
   },
   bold: {
-    label: 'Bold',
+    label: "Bold",
     width: () => STANDARD_ICON_WIDTH,
     Component: <BoldToolbarButton />,
   },
   strikethrough: {
-    label: 'Strikethrough',
+    label: "Strikethrough",
     width: () => STANDARD_ICON_WIDTH,
     Component: <StrikethroughToolbarButton />,
   },
   italic: {
-    label: 'Italic',
+    label: "Italic",
     width: () => STANDARD_ICON_WIDTH,
     Component: <ItalicToolbarButton />,
   },
   code: {
-    label: 'Code',
+    label: "Code",
     width: () => STANDARD_ICON_WIDTH,
     Component: <CodeToolbarButton />,
   },
   codeBlock: {
-    label: 'Code Block',
+    label: "Code Block",
     width: () => STANDARD_ICON_WIDTH,
     Component: <CodeBlockToolbarButton />,
   },
   mermaid: {
-    label: 'Mermaid',
+    label: "Mermaid",
     width: () => STANDARD_ICON_WIDTH,
     Component: <MermaidToolbarButton />,
   },
   table: {
-    label: 'Table',
+    label: "Table",
     width: () => STANDARD_ICON_WIDTH,
     Component: <TableDropdownMenu />,
   },
   raw: {
-    label: 'Raw Markdown',
+    label: "Raw Markdown",
     width: () => STANDARD_ICON_WIDTH,
     Component: <RawMarkdownToolbarButton />,
   },
   embed: {
-    label: 'Templates',
+    label: "Templates",
     width: () => EMBED_ICON_WIDTH,
     Component: <TemplatesToolbarButton />,
   },
@@ -191,11 +197,11 @@ export default function FixedToolbarButtons() {
   });
 
   return (
-    <div className='w-full overflow-hidden @container/toolbar' ref={toolbarRef}>
+    <div className="w-full overflow-hidden @container/toolbar" ref={toolbarRef}>
       <div
-        className='flex'
+        className="flex"
         style={{
-          transform: 'translateX(calc(-1px))',
+          transform: "translateX(calc(-1px))",
         }}
       >
         <>

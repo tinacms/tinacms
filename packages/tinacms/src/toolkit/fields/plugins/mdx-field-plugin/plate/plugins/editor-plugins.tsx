@@ -14,7 +14,11 @@ import { HeadingPlugin } from "@udecode/plate-heading/react";
 import { HorizontalRulePlugin } from "@udecode/plate-horizontal-rule/react";
 import { IndentListPlugin } from "@udecode/plate-indent-list/react";
 import { LinkPlugin } from "@udecode/plate-link/react";
-import { BulletedListPlugin, ListPlugin, NumberedListPlugin } from "@udecode/plate-list/react";
+import {
+  BulletedListPlugin,
+  ListPlugin,
+  NumberedListPlugin,
+} from "@udecode/plate-list/react";
 import { NodeIdPlugin } from "@udecode/plate-node-id";
 import { ResetNodePlugin } from "@udecode/plate-reset-node/react";
 import { SlashPlugin } from "@udecode/plate-slash-command/react";
@@ -32,9 +36,20 @@ import {
 } from "./create-mdx-plugins";
 import { FloatingToolbarPlugin } from "./ui/floating-toolbar-plugin";
 // NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
-import { autoformatArrow, autoformatLegal, autoformatMath, autoformatPunctuation, AutoformatRule, autoformatSmartQuotes } from "@udecode/plate-autoformat";
-import { isCodeBlockEmpty, isSelectionAtCodeBlockStart, unwrapCodeBlock } from "@udecode/plate-code-block";
-import { ListStyleType } from '@udecode/plate-indent-list';
+import {
+  autoformatArrow,
+  autoformatLegal,
+  autoformatMath,
+  autoformatPunctuation,
+  AutoformatRule,
+  autoformatSmartQuotes,
+} from "@udecode/plate-autoformat";
+import {
+  isCodeBlockEmpty,
+  isSelectionAtCodeBlockStart,
+  unwrapCodeBlock,
+} from "@udecode/plate-code-block";
+import { ListStyleType } from "@udecode/plate-indent-list";
 import { unwrapList } from "@udecode/plate-list";
 import { all, createLowlight } from "lowlight";
 import { autoformatBlocks } from "./core/autoformat/autoformat-block";
@@ -141,7 +156,7 @@ export const editorPlugins = [
       ),
     },
   }),
-  
+
   // ExitBreakPlugin lets users “break out” of a block (like a heading)
   ExitBreakPlugin.configure({
     options: {
@@ -164,45 +179,45 @@ export const editorPlugins = [
       ],
     },
   }),
-// ResetNodePlugin lets users turn a heading back into a paragraph by pressing Enter (when empty) or Backspace (at the start).
+  // ResetNodePlugin lets users turn a heading back into a paragraph by pressing Enter (when empty) or Backspace (at the start).
   ResetNodePlugin.configure({
     options: {
       rules: [
         {
           ...resetBlockTypesCommonRule,
-          hotkey: 'Enter',
+          hotkey: "Enter",
           predicate: (editor) =>
             editor.api.isEmpty(editor.selection, { block: true }),
         },
         {
           ...resetBlockTypesCommonRule,
-          hotkey: 'Backspace',
+          hotkey: "Backspace",
           predicate: (editor) => {
-            console.log('predicate', editor.api.isAt({ start: true }));
+            console.log("predicate", editor.api.isAt({ start: true }));
             return editor.api.isAt({ start: true });
           },
         },
         {
           ...resetBlockTypesCodeBlockRule,
-          hotkey: 'Enter',
+          hotkey: "Enter",
           predicate: isCodeBlockEmpty,
         },
         {
           ...resetBlockTypesCodeBlockRule,
-          hotkey: 'Backspace',
+          hotkey: "Backspace",
           predicate: isSelectionAtCodeBlockStart,
         },
-// NOTE: Plate's ListPlugin usually handles resetting lists to paragraphs when pressing Backspace at the start of a list item.
-// However, if the list is the first node in the editor, the default reset behavior may not fully unwrap the list item,
-// which can leave an invalid structure (like a <li> inside a <p>).
-// This rule uses `onReset: unwrapList` to ensure lists are always properly reset to paragraphs, even when they are the first node.
+        // NOTE: Plate's ListPlugin usually handles resetting lists to paragraphs when pressing Backspace at the start of a list item.
+        // However, if the list is the first node in the editor, the default reset behavior may not fully unwrap the list item,
+        // which can leave an invalid structure (like a <li> inside a <p>).
+        // This rule uses `onReset: unwrapList` to ensure lists are always properly reset to paragraphs, even when they are the first node.
         {
           types: [BulletedListPlugin.key, NumberedListPlugin.key],
           defaultType: ParagraphPlugin.key,
-          hotkey: 'Backspace',
+          hotkey: "Backspace",
           predicate: (editor) => editor.api.isAt({ start: true }),
           onReset: unwrapList,
-        }
+        },
       ],
     },
   }),
