@@ -22,7 +22,7 @@ export function HrElement(props: PlateElementProps) {
       <div contentEditable={false}>
         <hr
           className={cn(
-            'm-0 h-0.5 rounded-sm border-none bg-muted bg-clip-content',
+            'm-0 h-0.5 rounded-sm border-none bg-gray-400 bg-clip-content',
             selected && focused && 'ring-2 ring-ring ring-offset-2',
             !readOnly && 'cursor-pointer'
           )}
