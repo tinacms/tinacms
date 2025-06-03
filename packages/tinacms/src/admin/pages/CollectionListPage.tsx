@@ -327,7 +327,7 @@ const CollectionListPage = () => {
                   (field) => field.name === sortName
                 );
 
-                const searchEnabled = !!cms.api.tina.schema?.config?.config?.search;
+                const searchEnabled = true;//!!cms.api.tina.schema?.config?.config?.search;
 
                 const collectionDefinition = cms.api.tina.schema.getCollection(
                   collection.name
@@ -591,19 +591,17 @@ const CollectionListPage = () => {
                                   setSearchInput={setSearchInput}
                                 />
                               ) : (
-                                <>
-                                  <label className='block font-sans text-xs font-semibold text-gray-500 whitespace-normal'>
-                                    Search
-                                  </label>
+                                <div className='flex flex-col gap-2 items-start w-full md:w-auto'>
+                                  <div className='h-4'></div>
                                   <Message
-                                    link='https://tina.io/docs/reference/search/overview'
-                                    linkLabel='Read The Docs'
-                                    type='info'
-                                    size='small'
+                                    link="https://tina.io/docs/reference/search/overview"
+                                    linkLabel="Read The Docs"
+                                    type="info"
+                                    size="small"
                                   >
                                     Search not configured.
                                   </Message>
-                                </>
+                                </div>
                               )}
                             </div>
                           </div>
@@ -1058,12 +1056,7 @@ const SearchInput = ({
 
   return (
     <form className='flex flex-1 flex-col gap-2 items-start w-full'>
-      <label
-        htmlFor='search'
-        className='block font-sans text-xs font-semibold text-gray-500 whitespace-normal'
-      >
-        Search
-      </label>
+      <div className="h-4"></div>
       <div className='flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3'>
         <div className='flex-1 min-w-[200px] w-full md:w-auto'>
           <Input
