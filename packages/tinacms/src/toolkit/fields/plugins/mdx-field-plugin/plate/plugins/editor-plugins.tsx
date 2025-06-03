@@ -40,6 +40,8 @@ import { all, createLowlight } from "lowlight";
 import { autoformatBlocks } from "./core/autoformat/autoformat-block";
 import { autoformatLists } from "./core/autoformat/autoformat-lists";
 import { autoformatMarks } from "./core/autoformat/autoformat-marks";
+import { createHTMLInlinePlugin } from "./create-html-block";
+import { createHTMLBlockPlugin } from "./create-html-block";
 
 // Define block types that support MDX embedding
 export const HANDLES_MDX = [
@@ -90,6 +92,8 @@ export const editorPlugins = [
   createMdxBlockPlugin,
   createMdxInlinePlugin,
   createImgPlugin,
+  createHTMLBlockPlugin,
+  createHTMLInlinePlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
   LinkPlugin.configure({
