@@ -178,8 +178,9 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
           onClick={() => {
             setMenuIsOpen(true);
           }}
-          className={`pointer-events-auto -ml-px absolute left-0 z-50 ${isLocalMode ? 'top-10' : 'top-4'
-            }`}
+          className={`pointer-events-auto -ml-px absolute left-0 z-50 ${
+            isLocalMode ? 'top-10' : 'top-4'
+          }`}
         >
           <BiMenu className='h-7 w-auto' />
         </Button>
@@ -198,10 +199,11 @@ const SidebarLink = (props: {
   return (
     <NavLink
       className={({ isActive }) => {
-        return `text-base tracking-wide ${isActive ? 'text-blue-600' : 'text-gray-500'
-          } hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`;
+        return `text-base tracking-wide ${
+          isActive ? 'text-blue-600' : 'text-gray-500'
+        } hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`;
       }}
-      onClick={props.onClick ? props.onClick : () => { }}
+      onClick={props.onClick ? props.onClick : () => {}}
       to={to}
     >
       <Icon className='mr-2 h-6 opacity-80 w-auto' /> {label}

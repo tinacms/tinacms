@@ -57,7 +57,14 @@ export const Button = ({
 
   return (
     <Tag
-      className={cn(baseClasses, variantClasses[variant], sizeClasses[size], stateClasses[state], roundedClasses[rounded], className)}
+      className={cn(
+        baseClasses,
+        variantClasses[variant],
+        sizeClasses[size],
+        stateClasses[state],
+        roundedClasses[rounded],
+        className
+      )}
       {...props}
     >
       {children}

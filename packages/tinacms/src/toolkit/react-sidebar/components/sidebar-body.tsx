@@ -99,16 +99,16 @@ const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
       style={
         isEditing
           ? {
-            transform: 'none',
-            animationName: 'fly-in-left',
-            animationDuration: '150ms',
-            animationDelay: '0',
-            animationIterationCount: 1,
-            animationTimingFunction: 'ease-out',
-          }
+              transform: 'none',
+              animationName: 'fly-in-left',
+              animationDuration: '150ms',
+              animationDelay: '0',
+              animationIterationCount: 1,
+              animationTimingFunction: 'ease-out',
+            }
           : {
-            transform: 'translate3d(100%, 0, 0)',
-          }
+              transform: 'translate3d(100%, 0, 0)',
+            }
       }
     >
       {children}
@@ -155,8 +155,9 @@ export const MultiformFormHeader = ({
               cms.state.activeFormId
             ).name;
 
-            window.location.href = `${new URL(window.location.href).pathname
-              }#/collections/${collectionName}/~`;
+            window.location.href = `${
+              new URL(window.location.href).pathname
+            }#/collections/${collectionName}/~`;
           }}
         >
           <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
@@ -200,8 +201,9 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
             const collectionName = cms.api.tina.schema.getCollectionByFullPath(
               cms.state.activeFormId
             ).name;
-            window.location.href = `${new URL(window.location.href).pathname
-              }#/collections/${collectionName}/~`;
+            window.location.href = `${
+              new URL(window.location.href).pathname
+            }#/collections/${collectionName}/~`;
           }}
         >
           <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
