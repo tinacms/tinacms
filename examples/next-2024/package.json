@@ -7,9 +7,7 @@
 		"build": "tinacms build && next build",
 		"start": "next start",
 		"lint": "biome check .",
-		"format": "biome check . --write",
-		"diff-tina-lock": "tinacms-scripts diff-tina-lock",
-		"update-tina-lock": "tinacms dev --no-server"
+		"format": "biome check . --write"
 	},
 	"dependencies": {
 		"@radix-ui/react-icons": "catalog:",

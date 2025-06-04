@@ -8,7 +8,6 @@
 		"start": "next start",
 		"lint": "next lint",
 		"searchindex": "tinacms search-index",
-		"diff-tina-lock": "tinacms-scripts diff-tina-lock",
 		"update-tina-lock": "tinacms dev --no-server"
 	},
 	"dependencies": {
