@@ -38,7 +38,8 @@ export const TableCellElement = withRef<
     <PlateElement
       ref={ref}
       as={isHeader ? 'th' : 'td'}
-      elementToAttributes={() => ({
+      attributes={() => ({
+        ...props.attributes,
         colSpan: api.table.getColSpan(element),
         rowSpan: api.table.getRowSpan(element),
       })}
@@ -64,9 +65,6 @@ export const TableCellElement = withRef<
         } as React.CSSProperties
       }
       {...props}
-      attributes={{
-        ...props.attributes,
-      }}
     >
       <div
         className='relative z-20 box-border h-full px-3 py-2'
