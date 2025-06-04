@@ -1,23 +1,23 @@
-import React, { ReactNode, useState } from "react";
-import { TinaCloudProvider } from "./auth";
-import { FontLoader } from "./toolkit/styles/font-loader";
+import React, { ReactNode, useState } from 'react';
+import { TinaCloudProvider } from './auth';
+import { FontLoader } from './toolkit/styles/font-loader';
 
-import { LocalClient } from "./internalClient/index";
-import { useDocumentCreatorPlugin } from "./hooks/use-content-creator";
-import { parseURL } from "@tinacms/schema-tools";
-import type { TinaCMSProviderDefaultProps } from "./types/cms";
+import { LocalClient } from './internalClient/index';
+import { useDocumentCreatorPlugin } from './hooks/use-content-creator';
+import { parseURL } from '@tinacms/schema-tools';
+import type { TinaCMSProviderDefaultProps } from './types/cms';
 
 const errorButtonStyles = {
-  background: "#eb6337",
-  padding: "12px 18px",
-  cursor: "pointer",
-  borderRadius: "50px",
-  textTransform: "uppercase",
-  letterSpacing: "2px",
-  fontWeight: "bold",
-  border: "none",
-  color: "white",
-  margin: "1rem 0",
+  background: '#eb6337',
+  padding: '12px 18px',
+  cursor: 'pointer',
+  borderRadius: '50px',
+  textTransform: 'uppercase',
+  letterSpacing: '2px',
+  fontWeight: 'bold',
+  border: 'none',
+  color: 'white',
+  margin: '1rem 0',
 };
 
 interface ErrorBoundaryProps {
@@ -30,7 +30,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
 
     this.state = {
       hasError: props.hasError,
-      message: "",
+      message: '',
       pageRefresh: false,
     };
   }
@@ -52,36 +52,36 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
       return (
         <div
           style={{
-            background: "#efefef",
-            height: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            background: '#efefef',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <style>
             {
-              "\
+              '\
             body {\
               margin: 0;\
             }\
-          "
+          '
             }
           </style>
           <div
             style={{
-              background: "#fff",
-              maxWidth: "400px",
-              padding: "20px",
+              background: '#fff',
+              maxWidth: '400px',
+              padding: '20px',
               fontFamily: "'Inter', sans-serif",
-              borderRadius: "5px",
+              borderRadius: '5px',
               boxShadow:
-                "0 6px 24px rgb(0 37 91 / 5%), 0 2px 4px rgb(0 37 91 / 3%)",
+                '0 6px 24px rgb(0 37 91 / 5%), 0 2px 4px rgb(0 37 91 / 3%)',
             }}
           >
-            <h3 style={{ color: "#eb6337" }}>TinaCMS Render Error</h3>
+            <h3 style={{ color: '#eb6337' }}>TinaCMS Render Error</h3>
             <p>Tina caught an error while updating the page:</p>
-            <pre style={{ marginTop: "1rem", overflowX: "auto" }}>
+            <pre style={{ marginTop: '1rem', overflowX: 'auto' }}>
               {/* @ts-ignore */}
               {this.state.message}
             </pre>
@@ -93,20 +93,20 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
               Please reach out to your site admin.
             </p>
             <p>
-              See our{" "}
+              See our{' '}
               <a
-                className="text-gray-600"
-                style={{ textDecoration: "underline" }}
-                href="https://tina.io/docs/errors/faq/"
-                target="_blank"
+                className='text-gray-600'
+                style={{ textDecoration: 'underline' }}
+                href='https://tina.io/docs/errors/faq/'
+                target='_blank'
               >
-                {" "}
-                Error FAQ{" "}
-              </a>{" "}
+                {' '}
+                Error FAQ{' '}
+              </a>{' '}
               for more information.
             </p>
             <button
-              type="button"
+              type='button'
               style={errorButtonStyles as any}
               onClick={() => {
                 /* @ts-ignore */
@@ -146,7 +146,7 @@ export const TinaCMSProvider2 = ({
 }: TinaCMSProviderDefaultProps) => {
   if (props?.apiURL) {
     console.warn(
-      "The apiURL prop is deprecated. Please see https://tina.io/blog/tina-v-0.68.14 for information on how to upgrade to the new API"
+      'The apiURL prop is deprecated. Please see https://tina.io/blog/tina-v-0.68.14 for information on how to upgrade to the new API'
     );
   }
   const apiURL = props?.client?.apiUrl || props?.apiURL;
@@ -160,7 +160,7 @@ export const TinaCMSProvider2 = ({
       };
   if (
     // Check if local client is defined
-    typeof isLocalClient === "undefined" ||
+    typeof isLocalClient === 'undefined' ||
     // If in not in localMode check if clientId and branch are defined
     (!isLocalClient &&
       (!branch || !clientId) &&
@@ -168,14 +168,14 @@ export const TinaCMSProvider2 = ({
       !schema.config.contentApiUrlOverride)
   ) {
     throw new Error(
-      "Invalid setup. See https://tina.io/docs/tina-cloud/overview for more information."
+      'Invalid setup. See https://tina.io/docs/tina-cloud/overview for more information.'
     );
   }
 
   // schema is now required as the Global Nav and CMS utilize it
   if (!schema) {
     throw new Error(
-      "`schema` is required to be passed as a property to `TinaProvider`.  You can learn more about this change here: https://github.com/tinacms/tinacms/pull/2823"
+      '`schema` is required to be passed as a property to `TinaProvider`.  You can learn more about this change here: https://github.com/tinacms/tinacms/pull/2823'
     );
   }
 
@@ -223,94 +223,94 @@ const Loader = (props: { children: React.ReactNode }) => {
     <>
       <div
         style={{
-          position: "fixed",
-          background: "rgba(0, 0, 0, 0.5)",
+          position: 'fixed',
+          background: 'rgba(0, 0, 0, 0.5)',
           inset: 0,
           zIndex: 200,
-          opacity: "0.8",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "40px",
+          opacity: '0.8',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '40px',
         }}
       >
         <div
           style={{
-            background: "#f6f6f9",
+            background: '#f6f6f9',
             boxShadow:
-              "0px 2px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1)",
-            borderRadius: "5px",
-            padding: "40px 32px",
-            width: "460px",
-            maxWidth: "90%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
+              '0px 2px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1)',
+            borderRadius: '5px',
+            padding: '40px 32px',
+            width: '460px',
+            maxWidth: '90%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
           }}
         >
           <svg
             style={{
-              width: "64px",
-              color: "#2296fe",
-              marginTop: "-8px",
-              marginBottom: "16px",
+              width: '64px',
+              color: '#2296fe',
+              marginTop: '-8px',
+              marginBottom: '16px',
             }}
-            version="1.1"
-            id="L5"
-            xmlns="http://www.w3.org/2000/svg"
-            xmlnsXlink="http://www.w3.org/1999/xlink"
-            x="0px"
-            y="0px"
-            viewBox="0 0 100 64"
-            enableBackground="new 0 0 0 0"
-            xmlSpace="preserve"
+            version='1.1'
+            id='L5'
+            xmlns='http://www.w3.org/2000/svg'
+            xmlnsXlink='http://www.w3.org/1999/xlink'
+            x='0px'
+            y='0px'
+            viewBox='0 0 100 64'
+            enableBackground='new 0 0 0 0'
+            xmlSpace='preserve'
           >
-            <circle fill="currentColor" stroke="none" cx={6} cy={32} r={6}>
+            <circle fill='currentColor' stroke='none' cx={6} cy={32} r={6}>
               <animateTransform
-                attributeName="transform"
-                dur="1s"
-                type="translate"
-                values="0 15 ; 0 -15; 0 15"
-                calcMode="spline"
-                keySplines="0.8 0 0.4 1; 0.4 0 0.2 1"
-                repeatCount="indefinite"
-                begin="0.1"
+                attributeName='transform'
+                dur='1s'
+                type='translate'
+                values='0 15 ; 0 -15; 0 15'
+                calcMode='spline'
+                keySplines='0.8 0 0.4 1; 0.4 0 0.2 1'
+                repeatCount='indefinite'
+                begin='0.1'
               />
             </circle>
-            <circle fill="currentColor" stroke="none" cx={30} cy={32} r={6}>
+            <circle fill='currentColor' stroke='none' cx={30} cy={32} r={6}>
               <animateTransform
-                attributeName="transform"
-                dur="1s"
-                type="translate"
-                values="0 15 ; 0 -10; 0 15"
-                calcMode="spline"
-                keySplines="0.8 0 0.4 1; 0.4 0 0.2 1"
-                repeatCount="indefinite"
-                begin="0.2"
+                attributeName='transform'
+                dur='1s'
+                type='translate'
+                values='0 15 ; 0 -10; 0 15'
+                calcMode='spline'
+                keySplines='0.8 0 0.4 1; 0.4 0 0.2 1'
+                repeatCount='indefinite'
+                begin='0.2'
               />
             </circle>
-            <circle fill="currentColor" stroke="none" cx={54} cy={32} r={6}>
+            <circle fill='currentColor' stroke='none' cx={54} cy={32} r={6}>
               <animateTransform
-                attributeName="transform"
-                dur="1s"
-                type="translate"
-                values="0 15 ; 0 -5; 0 15"
-                calcMode="spline"
-                keySplines="0.8 0 0.4 1; 0.4 0 0.2 1"
-                repeatCount="indefinite"
-                begin="0.3"
+                attributeName='transform'
+                dur='1s'
+                type='translate'
+                values='0 15 ; 0 -5; 0 15'
+                calcMode='spline'
+                keySplines='0.8 0 0.4 1; 0.4 0 0.2 1'
+                repeatCount='indefinite'
+                begin='0.3'
               />
             </circle>
           </svg>
           <p
             style={{
-              fontSize: "18px",
-              color: "#252336",
-              textAlign: "center",
-              lineHeight: "1.3",
+              fontSize: '18px',
+              color: '#252336',
+              textAlign: 'center',
+              lineHeight: '1.3',
               fontFamily: "'Inter', sans-serif",
-              fontWeight: "normal",
+              fontWeight: 'normal',
             }}
           >
             Please wait, Tina is loading data...
@@ -360,7 +360,7 @@ export const getStaticPropsForTina = async ({
 };
 
 function is_server() {
-  return !(typeof window != "undefined" && window.document);
+  return !(typeof window != 'undefined' && window.document);
 }
 
 /**

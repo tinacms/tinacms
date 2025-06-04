@@ -1,12 +1,12 @@
-import { AutoformatPlugin } from "@udecode/plate-autoformat/react";
-import { BlockquotePlugin } from "@udecode/plate-block-quote/react";
-import { ExitBreakPlugin, SoftBreakPlugin } from "@udecode/plate-break/react";
-import { CodeBlockPlugin } from "@udecode/plate-code-block/react";
-import { HEADING_KEYS, HEADING_LEVELS } from "@udecode/plate-heading";
-import { ResetNodePlugin } from "@udecode/plate-reset-node/react";
-import { TrailingBlockPlugin } from "@udecode/plate-trailing-block";
-import { ParagraphPlugin } from "@udecode/plate/react";
-import { autoformatRules } from "./autoformat/autoformat-rules";
+import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
+import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
+import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
+import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
+import { ParagraphPlugin } from '@udecode/plate/react';
+import { autoformatRules } from './autoformat/autoformat-rules';
 
 export const HANDLES_MDX = [
   HEADING_KEYS.h1,
@@ -46,15 +46,15 @@ export const plugins = [
         // TOOD: maybe this should be shift+enter, but that's a soft break
         // for other things like list items (see below)
         {
-          hotkey: "mod+enter",
+          hotkey: 'mod+enter',
         },
         // Same as above but drops you at the top of a block
         {
-          hotkey: "mod+shift+enter",
+          hotkey: 'mod+shift+enter',
           before: true,
         },
         {
-          hotkey: "enter",
+          hotkey: 'enter',
           query: {
             start: true,
             end: true,
@@ -84,9 +84,9 @@ export const plugins = [
   SoftBreakPlugin.configure({
     options: {
       rules: [
-        { hotkey: "shift+enter" },
+        { hotkey: 'shift+enter' },
         {
-          hotkey: "enter",
+          hotkey: 'enter',
           query: {
             allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
           },

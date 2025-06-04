@@ -92,26 +92,26 @@ export function LinkFloatingToolbar({
   if (hidden) return null;
 
   const input = (
-    <div className="z-[999999] flex w-[330px] flex-col" {...inputProps}>
-      <div className="flex items-center">
-        <div className="flex items-center pr-1 pl-2 text-muted-foreground">
-          <Link className="size-4" />
+    <div className='z-[999999] flex w-[330px] flex-col' {...inputProps}>
+      <div className='flex items-center'>
+        <div className='flex items-center pr-1 pl-2 text-muted-foreground'>
+          <Link className='size-4' />
         </div>
 
         <FloatingLinkUrlInput
           className={inputVariants()}
-          placeholder="Paste link"
+          placeholder='Paste link'
           data-plate-focus
         />
       </div>
-      <Separator className="my-1" />
-      <div className="flex items-center">
-        <div className="flex items-center pr-1 pl-2 text-muted-foreground">
-          <Text className="size-4" />
+      <Separator className='my-1' />
+      <div className='flex items-center'>
+        <div className='flex items-center pr-1 pl-2 text-muted-foreground'>
+          <Text className='size-4' />
         </div>
         <input
           className={inputVariants()}
-          placeholder="Text to display"
+          placeholder='Text to display'
           data-plate-focus
           {...textInputProps}
         />
@@ -122,27 +122,27 @@ export function LinkFloatingToolbar({
   const editContent = editState.isEditing ? (
     input
   ) : (
-    <div className="box-content flex items-center">
+    <div className='box-content flex items-center'>
       <button
         className={buttonVariants({ size: 'sm', variant: 'ghost' })}
-        type="button"
+        type='button'
         {...editButtonProps}
       >
         Edit link
       </button>
 
-      <Separator orientation="vertical" />
+      <Separator orientation='vertical' />
 
       <LinkOpenButton />
 
-      <Separator orientation="vertical" />
+      <Separator orientation='vertical' />
 
       <button
         className={buttonVariants({
           size: 'icon',
           variant: 'ghost',
         })}
-        type="button"
+        type='button'
         {...unlinkButtonProps}
       >
         <Unlink width={18} />
@@ -192,8 +192,8 @@ function LinkOpenButton() {
       onMouseOver={(e) => {
         e.stopPropagation();
       }}
-      aria-label="Open link in a new tab"
-      target="_blank"
+      aria-label='Open link in a new tab'
+      target='_blank'
     >
       <ExternalLink width={18} />
     </a>

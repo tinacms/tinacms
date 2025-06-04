@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react';
 
-import { withRef } from "@udecode/cn";
-import { useEditorState } from "@udecode/plate/react";
+import { withRef } from '@udecode/cn';
+import { useEditorState } from '@udecode/plate/react';
 
-import { Icons } from "./icons";
-import { ToolbarButton } from "./toolbar";
-import { helpers } from "../../plugins/core/common";
-import { HorizontalRulePlugin } from "@udecode/plate-horizontal-rule/react";
-import { ParagraphPlugin } from "@udecode/plate/react";
+import { Icons } from './icons';
+import { ToolbarButton } from './toolbar';
+import { helpers } from '../../plugins/core/common';
+import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
+import { ParagraphPlugin } from '@udecode/plate/react';
 
 const useHorizontalRuleToolbarButtonState = () => {
   const editor = useEditorState();
@@ -27,7 +27,7 @@ const useHorizontalRuleToolbarButton = (state) => {
     editor.tf.setNodes({ type: HorizontalRulePlugin.key });
     editor.tf.insertNodes({
       type: ParagraphPlugin.key,
-      children: [{ text: "" }],
+      children: [{ text: '' }],
     });
   };
 
@@ -56,7 +56,7 @@ export const HorizontalRuleToolbarButton = withRef<
   const { props } = useHorizontalRuleToolbarButton(state);
 
   return (
-    <ToolbarButton ref={ref} tooltip="Horizontal Rule" {...rest} {...props}>
+    <ToolbarButton ref={ref} tooltip='Horizontal Rule' {...rest} {...props}>
       <Icons.horizontalRule />
     </ToolbarButton>
   );

@@ -1,25 +1,25 @@
-import React, { useMemo } from "react";
-import { Components } from "./plugins/ui/components";
-import { helpers } from "./plugins/core/common";
-import { uuid } from "./plugins/ui/helpers";
-import type { RichTextType } from "..";
-import { Editor, EditorContainer } from "./components/editor";
-import { FixedToolbar } from "./components/plate-ui/fixed-toolbar";
-import { TooltipProvider } from "./components/plate-ui/tooltip";
-import FixedToolbarButtons from "./components/fixed-toolbar-buttons";
-import { ToolbarProvider } from "./toolbar/toolbar-provider";
-import { Plate, usePlateEditor } from "@udecode/plate/react";
-import { useCreateEditor } from "./hooks/use-create-editor";
-import { editorPlugins } from "./plugins/editor-plugins";
-import { FloatingToolbar } from "./components/plate-ui/floating-toolbar";
-import FloatingToolbarButtons from "./components/floating-toolbar-buttons";
+import React, { useMemo } from 'react';
+import { Components } from './plugins/ui/components';
+import { helpers } from './plugins/core/common';
+import { uuid } from './plugins/ui/helpers';
+import type { RichTextType } from '..';
+import { Editor, EditorContainer } from './components/editor';
+import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
+import { TooltipProvider } from './components/plate-ui/tooltip';
+import FixedToolbarButtons from './components/fixed-toolbar-buttons';
+import { ToolbarProvider } from './toolbar/toolbar-provider';
+import { Plate, usePlateEditor } from '@udecode/plate/react';
+import { useCreateEditor } from './hooks/use-create-editor';
+import { editorPlugins } from './plugins/editor-plugins';
+import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
+import FloatingToolbarButtons from './components/floating-toolbar-buttons';
 
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(
     () =>
       input.value?.children?.length
         ? input.value.children.map(helpers.normalize)
-        : [{ type: "p", children: [{ type: "text", text: "" }] }],
+        : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
     []
   );
 
@@ -30,7 +30,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
     components: Components(),
   });
 
-  console.log("♻️ Initial Value", initialValue);
+  console.log('♻️ Initial Value', initialValue);
 
   // This should be a plugin customization
   const ref = React.useRef<HTMLDivElement>(null);
@@ -56,10 +56,10 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       <Plate
         editor={editor}
         onChange={(value) => {
-          console.log("changes 🎯", value.value);
+          console.log('changes 🎯', value.value);
           input.onChange({
-            type: "root",
-//value.value is used because the new Plate seperate the editor instance and causing the editor to passed as well int he value change, so value.value is a quick work around to extract the value of the editor (if not we will have error down the track to the final form, circular dependency error)
+            type: 'root',
+            //value.value is used because the new Plate seperate the editor instance and causing the editor to passed as well int he value change, so value.value is a quick work around to extract the value of the editor (if not we will have error down the track to the final form, circular dependency error)
             children: value.value,
           });
         }}

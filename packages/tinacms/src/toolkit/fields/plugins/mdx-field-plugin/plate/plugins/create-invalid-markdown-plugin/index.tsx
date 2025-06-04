@@ -1,10 +1,7 @@
 import React from 'react';
 import { useEditorContext } from '../../editor-context';
 import { buildErrorMessage } from '../../../monaco/error-message';
-import {
-  createPlatePlugin,
-  PlateElementProps,
-} from '@udecode/plate/react';
+import { createPlatePlugin, PlateElementProps } from '@udecode/plate/react';
 
 export const ELEMENT_INVALID_MARKDOWN = 'invalid_markdown';
 

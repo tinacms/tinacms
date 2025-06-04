@@ -1,17 +1,17 @@
-import React from "react";
+import React from 'react';
 import {
   type InputFieldType,
   wrapFieldsWithMeta,
-} from "../wrap-field-with-meta";
-import { EditorContext } from "./plate/editor-context";
+} from '../wrap-field-with-meta';
+import { EditorContext } from './plate/editor-context';
 
-import type { MdxTemplate } from "./plate/types";
-import { RichEditor } from "./plate";
-import type { InputProps } from "@toolkit/fields/components";
+import type { MdxTemplate } from './plate/types';
+import { RichEditor } from './plate';
+import type { InputProps } from '@toolkit/fields/components';
 import type {
   ToolbarOverrides,
   ToolbarOverrideType,
-} from "./plate/toolbar/toolbar-overrides";
+} from './plate/toolbar/toolbar-overrides';
 
 export type RichTextType = React.PropsWithChildren<
   InputFieldType<
@@ -26,7 +26,7 @@ export type RichTextType = React.PropsWithChildren<
 
 //(Plate Upgrade) Ask Jeff: Is this in used?
 export const MdxFieldPlugin = {
-  name: "rich-text",
+  name: 'rich-text',
   Component: wrapFieldsWithMeta<
     InputProps,
     {
@@ -64,7 +64,7 @@ export const MdxFieldPlugin = {
       >
         <div
           className={
-            "min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md pt-0 py-2"
+            'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md pt-0 py-2'
           }
         >
           <RichEditor {...props} />
@@ -75,16 +75,16 @@ export const MdxFieldPlugin = {
 };
 
 export const MdxFieldPluginExtendible = {
-  name: "rich-text",
+  name: 'rich-text',
   validate(value: any) {
     if (
-      typeof value !== "undefined" &&
+      typeof value !== 'undefined' &&
       value !== null &&
       Array.isArray(value.children) &&
       value.children[0] &&
-      value.children[0].type === "invalid_markdown"
+      value.children[0].type === 'invalid_markdown'
     ) {
-      return "Unable to parse rich-text";
+      return 'Unable to parse rich-text';
     }
     return undefined;
   },
@@ -124,7 +124,7 @@ export const MdxFieldPluginExtendible = {
       >
         <div
           className={
-            "min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md pt-0 py-2"
+            'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md pt-0 py-2'
           }
         >
           {props.rawMode ? props.rawEditor : <RichEditor {...props} />}

@@ -3,7 +3,7 @@ import {
   BoldPlugin,
   CodePlugin,
   ItalicPlugin,
-  StrikethroughPlugin
+  StrikethroughPlugin,
 } from '@udecode/plate-basic-marks/react';
 
 export const autoformatMarks: AutoformatRule[] = [

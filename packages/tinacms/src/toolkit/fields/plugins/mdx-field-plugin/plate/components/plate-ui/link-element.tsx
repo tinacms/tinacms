@@ -14,8 +14,8 @@ export function LinkElement(props: PlateElementProps<TLinkElement>) {
   return (
     <PlateElement
       {...props}
-      as="a"
-      className="font-small underline underline-offset-2 text-blue-500 hover:text-blue-600 transition-color ease-out duration-150"
+      as='a'
+      className='font-small underline underline-offset-2 text-blue-500 hover:text-blue-600 transition-color ease-out duration-150'
       attributes={{
         ...props.attributes,
         ...(linkProps as any),

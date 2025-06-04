@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   useOpenState,
-} from "../plate-ui/dropdown-menu";
-import { ToolbarButton } from "./toolbar";
-import { Icons } from "./icons";
+} from '../plate-ui/dropdown-menu';
+import { ToolbarButton } from './toolbar';
+import { Icons } from './icons';
 
 type OverflowMenuProps = {
   [key: string]: any;
@@ -23,16 +23,16 @@ export default function OverflowMenu({
       <DropdownMenuTrigger asChild>
         <ToolbarButton
           showArrow={false}
-          data-testid="rich-text-editor-overflow-menu-button"
+          data-testid='rich-text-editor-overflow-menu-button'
           isDropdown
           pressed={openState.open}
-          tooltip="More tools..."
+          tooltip='More tools...'
         >
-          <Icons.overflow className="size-5" />
+          <Icons.overflow className='size-5' />
         </ToolbarButton>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="min-w-0 flex flex-grow">
+      <DropdownMenuContent align='start' className='min-w-0 flex flex-grow'>
         {children}
       </DropdownMenuContent>
     </DropdownMenu>
