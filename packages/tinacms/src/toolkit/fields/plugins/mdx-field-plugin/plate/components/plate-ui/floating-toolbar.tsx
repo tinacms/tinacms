@@ -52,8 +52,6 @@ export const FloatingToolbar = withRef<
     ref: floatingRef,
   } = useCustomFloatingToolbar(test);
 
-  const ref = useComposedRef<HTMLDivElement>(floatingRef);
-
   if (hidden) return null;
 
   return (
@@ -64,7 +62,6 @@ export const FloatingToolbar = withRef<
         )}
         {...props}
         {...rootProps}
-        ref={ref}
       >
         {children}
       </Toolbar>
