@@ -1,21 +1,20 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { cn, withRef } from "@udecode/cn";
 import { formatCodeBlock, isLangSupported } from "@udecode/plate-code-block";
 import { PlateElement } from "@udecode/plate/react";
-import { AlertTriangle, BracesIcon, ChevronDown } from "lucide-react";
+import { AlertTriangle, BracesIcon } from "lucide-react";
 import mermaid from "mermaid";
 
+import {
+  CodeLineElement,
+  CodeBlockElement as PlateCodeBlockElement,
+} from "@tinacms/mdx";
 import { Button } from "./button";
 import { CodeBlockCombobox } from "./code-block-combobox";
 import { MermaidElementWithRef } from "./mermaid-element";
-import {
-  CodeBlockElement as PlateCodeBlockElement,
-  CodeLineElement,
-} from "@tinacms/mdx";
-import { TElement } from "@udecode/plate";
 
 type CodeBlockProps = {
   callback: () => void;

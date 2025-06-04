@@ -75,7 +75,6 @@ export const insertBlockElement = (editor: PlateEditor, blockElement) => {
   });
 };
 
-//TODO : Test this function in UI, not sure if it works after replace with latest api
 const isCurrentBlockEmpty = (editor) => {
   if (!editor.selection) {
     return false;
@@ -84,7 +83,7 @@ const isCurrentBlockEmpty = (editor) => {
   const cursor = editor.selection.focus;
   const blockAbove = editor.api.block();
   const isEmpty =
-    !NodeApi.string(node) && //TODO : Test this function in UI, not sure if it works after replace with latest api
+    !NodeApi.string(node) &&
     // @ts-ignore bad type from slate
     !node.children?.some((n) => Editor.isInline(editor, n)) &&
     // Only do this if we're at the start of a block

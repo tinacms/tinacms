@@ -25,7 +25,6 @@ const useCodeBlockToolbarButton = (state) => {
 
   const onClick = () => {
     insertEmptyCodeBlock(editor);
-    // insertEmptyCodeBlock(editor);
   };
 
   const onMouseDown = (e) => {
