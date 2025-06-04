@@ -20,7 +20,7 @@ export const FloatingToolbar = withRef<
   {
     state?: FloatingToolbarState;
   }
->(({ children, state, ...props }) => {
+>(({ children, state, ...props }, propRef) => {
   const editorId = useEditorRef();
   const focusedEditorId = useEventEditorValue('focus');
 
@@ -52,6 +52,8 @@ export const FloatingToolbar = withRef<
     ref: floatingRef,
   } = useCustomFloatingToolbar(test);
 
+  const ref = useComposedRef<HTMLDivElement>(propRef, floatingRef);
+
   if (hidden) return null;
 
   return (
@@ -62,6 +64,7 @@ export const FloatingToolbar = withRef<
         )}
         {...props}
         {...rootProps}
+        ref={ref}
       >
         {children}
       </Toolbar>
