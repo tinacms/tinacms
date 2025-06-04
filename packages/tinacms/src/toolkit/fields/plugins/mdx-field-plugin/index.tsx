@@ -24,7 +24,7 @@ export type RichTextType = React.PropsWithChildren<
   >
 >;
 
-//TODO(Plate Upgrade) : Is this in used?
+//TODO (Plate Upgrade) Ask Jeff: Is this in used?
 export const MdxFieldPlugin = {
   name: "rich-text",
   Component: wrapFieldsWithMeta<
@@ -74,7 +74,6 @@ export const MdxFieldPlugin = {
   }),
 };
 
-//TODO(Plate Upgrade) : Is this in used?
 export const MdxFieldPluginExtendible = {
   name: "rich-text",
   validate(value: any) {
