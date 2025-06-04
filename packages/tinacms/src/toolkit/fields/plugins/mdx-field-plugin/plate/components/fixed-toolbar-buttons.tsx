@@ -167,14 +167,15 @@ export default function FixedToolbarButtons() {
   }
 
   useResize(toolbarRef, (entry) => {
-    const width = entry.target.getBoundingClientRect().width;
+    const width = entry.target.getBoundingClientRect().width - 8;
     const headingButton = items.find((item) => item.label === HEADING_LABEL);
     const headingWidth = headingButton
-      ? headingButton.width(width > CONTAINER_MD_BREAKPOINT)
+      ? //some discrepancy here between the md breakpoint here and in practice, but it works
+        headingButton.width(width > CONTAINER_MD_BREAKPOINT - 9)
       : 0;
 
-    // Calculate the available width excluding the heading button and float button icon width
-    const availableWidth = width - headingWidth - FLOAT_BUTTON_WIDTH;
+    // Calculate the available width excluding the heading button
+    const availableWidth = width - headingWidth;
 
     // Count numbers of buttons can fit into the available width
     const { itemFitCount } = items.reduce(
@@ -184,7 +185,8 @@ export default function FixedToolbarButtons() {
           acc.totalItemsWidth + item.width() <= availableWidth
         ) {
           return {
-            totalItemsWidth: acc.totalItemsWidth + item.width(),
+            //add 4px to account for additional padding on toolbar buttons
+            totalItemsWidth: acc.totalItemsWidth + item.width() + 4,
             itemFitCount: acc.itemFitCount + 1,
           };
         }
@@ -205,15 +207,19 @@ export default function FixedToolbarButtons() {
         }}
       >
         <>
-          {items.slice(0, itemsShown).map((item) => (
-            <React.Fragment key={item.label}>{item.Component}</React.Fragment>
-          ))}
+          {items
+            .slice(0, items.length > itemsShown ? itemsShown - 1 : itemsShown)
+            .map((item) => (
+              <React.Fragment key={item.label}>{item.Component}</React.Fragment>
+            ))}
           {items.length > itemsShown && (
-            <OverflowMenu>
-              {items.slice(itemsShown).flatMap((c) => (
-                <React.Fragment key={c.label}>{c.Component}</React.Fragment>
-              ))}
-            </OverflowMenu>
+            <div className="w-fit ml-auto">
+              <OverflowMenu>
+                {items.slice(itemsShown).flatMap((c) => (
+                  <React.Fragment key={c.label}>{c.Component}</React.Fragment>
+                ))}
+              </OverflowMenu>
+            </div>
           )}
         </>
       </div>
