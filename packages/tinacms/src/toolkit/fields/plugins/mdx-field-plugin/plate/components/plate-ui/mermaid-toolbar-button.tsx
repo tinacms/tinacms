@@ -1,13 +1,12 @@
+import { CodeLineElement } from '@tinacms/mdx';
 import { withRef } from '@udecode/cn';
-import { type PlateEditor, useEditorState } from '@udecode/plate/react';
-import React from 'react';
-import { helpers } from '../../plugins/core/common';
-import { ELEMENT_MERMAID } from '../../plugins/custom/mermaid-plugin';
-import { Icons } from './icons';
-import { ToolbarButton } from './toolbar';
 import { TElement } from '@udecode/plate';
 import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
-import { CodeLineElement } from '@tinacms/mdx';
+import { useEditorState } from '@udecode/plate/react';
+import React from 'react';
+import { helpers } from '../../plugins/core/common';
+import { Icons } from './icons';
+import { ToolbarButton } from './toolbar';
 
 const DEFAULT_MERMAID_CONFIG = `%% This won't render without implementing a rendering engine (e.g. mermaid on npm)
 flowchart TD
