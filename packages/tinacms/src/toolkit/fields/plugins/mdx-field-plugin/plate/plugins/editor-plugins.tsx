@@ -74,9 +74,7 @@ const resetBlockTypesCommonRule = {
   defaultType: ParagraphPlugin.key,
   types: [
     ...HEADING_LEVELS,
-    BlockquotePlugin.key,
-    ListStyleType.Disc,
-    ListStyleType.Decimal,
+    BlockquotePlugin.key
   ],
 };
 

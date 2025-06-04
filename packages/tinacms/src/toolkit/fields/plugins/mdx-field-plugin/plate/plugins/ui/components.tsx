@@ -177,8 +177,6 @@ export const Components = () => {
     ),
     [ParagraphPlugin.key]: ParagraphElement,
     [BlockquotePlugin.key]: BlockquoteElement,
-    // [CodeBlockPlugin.key]: (editor) =>
-    //   insertCodeBlock(editor, { select: true }),
     [CodeBlockPlugin.key]: CodeBlockElement,
     [CodeLinePlugin.key]: CodeLineElement,
     [CodeSyntaxPlugin.key]: CodeSyntaxLeaf,
