@@ -215,7 +215,7 @@ export default function FixedToolbarButtons() {
           {items.length > itemsShown && (
             <div className="w-fit ml-auto">
               <OverflowMenu>
-                {items.slice(itemsShown).flatMap((c) => (
+                {items.slice(itemsShown - 1).flatMap((c) => (
                   <React.Fragment key={c.label}>{c.Component}</React.Fragment>
                 ))}
               </OverflowMenu>
