@@ -3,6 +3,8 @@ import { KEY_SOFT_BREAK } from './create-soft-break-plugin';
 import { queryNode } from '@udecode/plate';
 import { PlateEditor } from '@udecode/plate/react';
 
+// TODO [2025-05-28]: Potentially unused. Searched usage but found none.
+// Consider removing after verifying with the team
 export const onKeyDownSoftBreak =
   (editor: PlateEditor, { options: { rules = [] } }) =>
   (event) => {

@@ -11,6 +11,8 @@ type LinkElement = {
   text: string | undefined;
 };
 
+// TODO [2025-05-28]: Potentially unused. Searched usage but found none.
+// Consider removing after verifying with the team
 export const wrapOrRewrapLink = (editor) => {
   const baseLink = {
     type: 'a',
@@ -27,7 +29,7 @@ export const wrapOrRewrapLink = (editor) => {
         ElementApi.isElement(n) &&
         editor.getType(LinkPlugin.key),
     });
-    editor.tf.select(path); //TODO : Test this function in UI, not sure if it works after replace with latest api
+    editor.tf.select(path);
   }
   if (isLinkActive(editor)) {
     const [link] = getLinks(editor);
@@ -43,6 +45,8 @@ export const wrapOrRewrapLink = (editor) => {
 const matchLink = (n: Node) =>
   !NodeApi.isEditor(n) && ElementApi.isElement(n) && n.type === LinkPlugin.key;
 
+// TODO [2025-05-28]: Potentially unused. Searched usage but found none.
+// Consider removing after verifying with the team
 export const LinkForm = (props) => {
   const [initialValues, setInitialValues] = React.useState<{
     url: string;
@@ -107,7 +111,6 @@ export const LinkForm = (props) => {
   );
 };
 
-//TODO - Fix the selection type was BaseRange from slate before (need to find what the actual type is)
 export const unwrapLink = (editor: PlateEditor, selection?: any) => {
   editor.tf.unwrapNodes({
     match: matchLink,

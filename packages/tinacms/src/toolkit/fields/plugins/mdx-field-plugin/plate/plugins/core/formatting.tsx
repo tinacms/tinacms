@@ -64,7 +64,6 @@ export const plugins = [
       ],
     },
   }),
-  //TODO : I think the docs is outdate and below is the copy and paste from the docs
   //See the usage code example from https://platejs.org/docs/reset-node
   ResetNodePlugin.configure({
     // options: {

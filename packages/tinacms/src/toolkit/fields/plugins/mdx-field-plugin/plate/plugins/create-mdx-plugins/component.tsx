@@ -31,7 +31,6 @@ const Wrapper = ({ inline, children }) => {
   );
 };
 
-//TODO : remove the any type
 interface InlineEmbedProps {
   attributes: any;
   children: any;
@@ -181,7 +180,7 @@ const getLabel = (activeTemplate, formProps) => {
 
   return label;
 };
-//TODO : Test this function in UI, not sure if it works after replace with latest api
+
 const EmbedNestedForm = ({
   editor,
   element,

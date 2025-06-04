@@ -33,7 +33,7 @@ export const formatList = (editor: SlateEditor, elementType: string) => {
   );
 };
 
-// TODO [2025-05-28] (dev:alex): Potentially unused. Searched usage but found none.
+// TODO [2025-05-28]: Potentially unused. Searched usage but found none.
 // Consider removing after verifying with the team
 export const formatText = (editor: SlateEditor, text: string) => {
   format(editor, () => editor.tf.insertText(text));
