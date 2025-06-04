@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.7.4
+
+### Patch Changes
+
+- [#5679](https://github.com/tinacms/tinacms/pull/5679) [`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: dedupe format types by moving them into schema-tools
+
 ## 1.7.3
 
 ### Patch Changes

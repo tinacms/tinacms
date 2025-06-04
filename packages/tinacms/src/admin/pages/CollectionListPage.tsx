@@ -594,10 +594,8 @@ const CollectionListPage = () => {
                                   setSearchInput={setSearchInput}
                                 />
                               ) : (
-                                <>
-                                  <label className='block font-sans text-xs font-semibold text-gray-500 whitespace-normal'>
-                                    Search
-                                  </label>
+                                <div className='flex flex-col gap-2 items-start w-full md:w-auto'>
+                                  <div className='h-4'></div>
                                   <Message
                                     link='https://tina.io/docs/reference/search/overview'
                                     linkLabel='Read The Docs'
@@ -606,7 +604,7 @@ const CollectionListPage = () => {
                                   >
                                     Search not configured.
                                   </Message>
-                                </>
+                                </div>
                               )}
                             </div>
                           </div>
@@ -1062,47 +1060,40 @@ const SearchInput = ({
 
   return (
     <form className='flex flex-1 flex-col gap-2 items-start w-full'>
-      <label
-        htmlFor='search'
-        className='block font-sans text-xs font-semibold text-gray-500 whitespace-normal'
-      >
-        Search
-      </label>
+      <div className='h-4'></div>
       <div className='flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3'>
-        <div className='flex-1 min-w-[200px] w-full md:w-auto'>
-          <Input
+        <div className='flex-1 min-w-[200px] w-full md:w-auto relative'>
+          <BiSearch className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none' />
+          <input
             type='text'
             name='search'
-            placeholder='Search'
+            placeholder='Search...'
             value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value);
             }}
-          />
-        </div>
-        <div className='flex w-full md:w-auto gap-3'>
-          <Button
-            onClick={(e) => {
-              e.preventDefault();
-              setSearch(searchInput);
-              setSearchLoaded(false);
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                if (searchInput.trim()) {
+                  setSearch(searchInput);
+                  setSearchLoaded(false);
+                }
+              }
             }}
-            variant='primary'
-            className='w-full md:w-auto'
-          >
-            Search <BiSearch className='w-5 h-full ml-1.5 opacity-70' />
-          </Button>
+            className='shadow appearance-none bg-white block pl-10 pr-10 py-2 truncate w-full text-base border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md placeholder:text-gray-300 text-gray-600 focus:text-gray-900'
+          />
           {search && searchLoaded && (
-            <Button
+            <button
               onClick={(e) => {
                 e.preventDefault();
                 setSearch('');
                 setSearchInput('');
               }}
-              variant='white'
+              className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'
             >
-              Clear <BiX className='w-5 h-full ml-1 opacity-70' />
-            </Button>
+              <BiX className='w-5 h-5' />
+            </button>
           )}
         </div>
       </div>

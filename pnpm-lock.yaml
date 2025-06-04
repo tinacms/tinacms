@@ -1435,8 +1435,8 @@ importers:
         specifier: ^0.32.0
         version: 0.32.0
       jest:
-        specifier: 'catalog:'
-        version: 29.7.0(@types/node@22.13.10)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.10)(typescript@5.8.2))
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@22.15.17)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.17)(typescript@5.7.3))
 
   packages/@tinacms/datalayer:
     dependencies:
@@ -12664,8 +12664,8 @@ packages:
     peerDependencies:
       typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x
 
-  typescript@5.8.2:
-    resolution: {integrity: sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==}
+  typescript@5.7.3:
+    resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -25846,7 +25846,7 @@ snapshots:
       typescript: 5.8.2
       yaml: 2.7.0
 
-  typescript@5.8.2: {}
+  typescript@5.7.3: {}
 
   ua-parser-js@1.0.40: {}
 
