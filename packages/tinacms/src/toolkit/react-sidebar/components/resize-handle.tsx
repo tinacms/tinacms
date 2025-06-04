@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 import * as React from 'react';
 import { SidebarContext, minSidebarWidth } from './sidebar';
 

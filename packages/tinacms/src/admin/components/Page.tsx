@@ -2,13 +2,13 @@
 
 */
 
-import React from 'react';
 import {
-  LocalWarning,
   BillingWarning,
   BranchBanner,
+  LocalWarning,
   useCMS,
 } from '@tinacms/toolkit';
+import React from 'react';
 
 export const PageWrapper = ({ children }: { children: React.ReactNode }) => {
   const cms = useCMS();
@@ -42,10 +42,12 @@ export const PageHeader = ({
 }) => {
   return (
     <>
-      {isLocalMode && <LocalWarning />}
-      {!isLocalMode && <BillingWarning />}
+      <div className='p-4'>
+        {isLocalMode && <LocalWarning />}
+        {!isLocalMode && <BillingWarning />}
+      </div>
 
-      <div className='pt-16 xl:pt-12 px-6 xl:px-12'>
+      <div className='pt-4 px-6 xl:px-12'>
         <div className='w-full mx-auto max-w-screen-xl'>
           <div className='w-full flex justify-between items-end'>
             {children}

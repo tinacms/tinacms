@@ -1,5 +1,4 @@
 import { Transition, TransitionChild } from '@headlessui/react';
-import { useWindowWidth } from '@react-hook/window-size';
 import {
   BranchButton,
   BranchPreviewButton,
@@ -10,9 +9,8 @@ import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
 import { Button } from '@toolkit/styles';
 import * as React from 'react';
 import { useState } from 'react';
-import { BiMenu, BiPencil } from 'react-icons/bi';
+import { BiMenu } from 'react-icons/bi';
 import { ImFilesEmpty, ImUsers } from 'react-icons/im';
-import { IoMdClose } from 'react-icons/io';
 import type { IconType } from 'react-icons/lib';
 import { PiSidebarSimpleLight } from 'react-icons/pi';
 import type { SidebarState, SidebarStateOptions } from '../sidebar';
@@ -24,7 +22,6 @@ import { FormsView } from './sidebar-body';
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
 export const minSidebarWidth = 360;
-export const navBreakpoint = 1279;
 
 const LOCALSTATEKEY = 'tina.sidebarState';
 const LOCALWIDTHKEY = 'tina.sidebarWidth';
@@ -221,15 +218,6 @@ const Sidebar = ({
     };
   }, [displayState, position, sidebarWidth, resizingSidebar]);
 
-  const windowWidth = useWindowWidth();
-  const displayNav =
-    renderNav &&
-    ((sidebarWidth > navBreakpoint && windowWidth > navBreakpoint) ||
-      (displayState === 'fullscreen' && windowWidth > navBreakpoint));
-  const renderMobileNav =
-    renderNav &&
-    (sidebarWidth < navBreakpoint + 1 || windowWidth < navBreakpoint + 1);
-
   return (
     <SidebarContext.Provider
       value={{
@@ -253,50 +241,8 @@ const Sidebar = ({
       <>
         <SidebarWrapper>
           <EditButton />
-          {displayNav && (
-            <Nav
-              isLocalMode={cms.api?.tina?.isLocalMode}
-              showCollections={isTinaAdminEnabled}
-              collectionsInfo={collectionsInfo}
-              screens={activeScreens}
-              cloudConfigs={allConfigs}
-              contentCreators={contentCreators}
-              sidebarWidth={sidebarWidth}
-              RenderNavSite={({ view }) => (
-                <SidebarSiteLink
-                  view={view}
-                  onClick={() => {
-                    setActiveView(view);
-                    setMenuIsOpen(false);
-                  }}
-                />
-              )}
-              RenderNavCloud={({ config }) => (
-                <SidebarCloudLink config={config} />
-              )}
-              RenderNavCollection={({ collection }) => (
-                <SidebarCollectionLink
-                  onClick={() => {
-                    setMenuIsOpen(false);
-                  }}
-                  collection={collection}
-                />
-              )}
-              AuthRenderNavCollection={({ collection }) => (
-                <SidebarCollectionLink
-                  onClick={() => {
-                    setMenuIsOpen(false);
-                  }}
-                  collection={collection}
-                  Icon={ImUsers}
-                />
-              )}
-            />
-          )}
           <SidebarBody>
             <SidebarHeader
-              displayNav={displayNav}
-              renderNav={renderNav}
               isLocalMode={cms.api?.tina?.isLocalMode}
               branchingEnabled={branchingEnabled}
             />
@@ -310,89 +256,74 @@ const Sidebar = ({
           </SidebarBody>
           <ResizeHandle />
         </SidebarWrapper>
-        {renderMobileNav && (
-          <Transition show={menuIsOpen} as='div'>
-            <TransitionChild
-              enter='transform transition-all ease-out duration-300'
-              enterFrom='opacity-0 -translate-x-full'
-              enterTo='opacity-100 translate-x-0'
-              leave='transform transition-all ease-in duration-200'
-              leaveFrom='opacity-100 translate-x-0'
-              leaveTo='opacity-0 -translate-x-full'
-            >
-              <div className='fixed left-0 top-0 z-overlay h-full transform'>
-                <Nav
-                  isLocalMode={cms.api?.tina?.isLocalMode}
-                  className='rounded-r-md'
-                  showCollections={isTinaAdminEnabled}
-                  collectionsInfo={collectionsInfo}
-                  screens={activeScreens}
-                  cloudConfigs={allConfigs}
-                  contentCreators={contentCreators}
-                  sidebarWidth={sidebarWidth}
-                  RenderNavSite={({ view }) => (
-                    <SidebarSiteLink
-                      view={view}
-                      onClick={() => {
-                        setActiveView(view);
-                        setMenuIsOpen(false);
-                      }}
-                    />
-                  )}
-                  RenderNavCloud={({ config }) => (
-                    <SidebarCloudLink config={config} />
-                  )}
-                  RenderNavCollection={({ collection }) => (
-                    <SidebarCollectionLink
-                      onClick={() => {
-                        setMenuIsOpen(false);
-                      }}
-                      collection={collection}
-                    />
-                  )}
-                  AuthRenderNavCollection={({ collection }) => (
-                    <SidebarCollectionLink
-                      onClick={() => {
-                        setMenuIsOpen(false);
-                      }}
-                      collection={collection}
-                      Icon={ImUsers}
-                    />
-                  )}
-                >
-                  <div className='absolute top-8 right-0 transform translate-x-full overflow-hidden'>
-                    <Button
-                      rounded='right'
-                      variant='secondary'
-                      onClick={() => {
-                        setMenuIsOpen(false);
-                      }}
-                      className={'transition-opacity duration-150 ease-out'}
-                    >
-                      <IoMdClose className='h-5 w-auto text-blue-500' />
-                    </Button>
-                  </div>
-                </Nav>
-              </div>
-            </TransitionChild>
-            <TransitionChild
-              enter='ease-out duration-300'
-              enterFrom='opacity-0'
-              enterTo='opacity-80'
-              entered='opacity-80'
-              leave='ease-in duration-200'
-              leaveFrom='opacity-80'
-              leaveTo='opacity-0'
-            >
-              <div
-                onClick={() => {
-                  setMenuIsOpen(false);
-                }}
-                className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
-              />
-            </TransitionChild>
-          </Transition>
-        )}
+        <Transition show={menuIsOpen} as='div'>
+          <TransitionChild
+            enter='transform transition-all ease-out duration-300'
+            enterFrom='opacity-0 -translate-x-full'
+            enterTo='opacity-100 translate-x-0'
+            leave='transform transition-all ease-in duration-200'
+            leaveFrom='opacity-100 translate-x-0'
+            leaveTo='opacity-0 -translate-x-full'
+          >
+            <div className='fixed left-0 top-0 z-overlay h-full transform'>
+              <Nav
+                isLocalMode={cms.api?.tina?.isLocalMode}
+                toggleMenu={toggleMenu}
+                showCollections={isTinaAdminEnabled}
+                collectionsInfo={collectionsInfo}
+                screens={activeScreens}
+                cloudConfigs={allConfigs}
+                contentCreators={contentCreators}
+                sidebarWidth={sidebarWidth}
+                RenderNavSite={({ view }) => (
+                  <SidebarSiteLink
+                    view={view}
+                    onClick={() => {
+                      setActiveView(view);
+                      setMenuIsOpen(false);
+                    }}
+                  />
+                )}
+                RenderNavCloud={({ config }) => (
+                  <SidebarCloudLink config={config} />
+                )}
+                RenderNavCollection={({ collection }) => (
+                  <SidebarCollectionLink
+                    onClick={() => {
+                      setMenuIsOpen(false);
+                    }}
+                    collection={collection}
+                  />
+                )}
+                AuthRenderNavCollection={({ collection }) => (
+                  <SidebarCollectionLink
+                    onClick={() => {
+                      setMenuIsOpen(false);
+                    }}
+                    collection={collection}
+                    Icon={ImUsers}
+                  />
+                )}
+              ></Nav>
+            </div>
+          </TransitionChild>
+          <TransitionChild
+            enter='ease-out duration-300'
+            enterFrom='opacity-0'
+            enterTo='opacity-80'
+            entered='opacity-80'
+            leave='ease-in duration-200'
+            leaveFrom='opacity-80'
+            leaveTo='opacity-0'
+          >
+            <div
+              onClick={() => {
+                setMenuIsOpen(false);
+              }}
+              className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
+            />
+          </TransitionChild>
+        </Transition>
       </>
     </SidebarContext.Provider>
   );
@@ -432,16 +363,8 @@ export const updateBodyDisplacement = ({
   }
 };
 
-const SidebarHeader = ({
-  branchingEnabled,
-  renderNav,
-  displayNav,
-  isLocalMode,
-}) => {
-  const { toggleFullscreen, toggleSidebarOpen } =
-    React.useContext(SidebarContext);
-
-  const displayMenuButton = renderNav && !displayNav;
+const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
+  const { toggleSidebarOpen, toggleMenu } = React.useContext(SidebarContext);
 
   return (
     <>
@@ -450,14 +373,12 @@ const SidebarHeader = ({
 
         <div className='px-2 w-full flex gap-3 items-center justify-between pointer-events-none'>
           <div>
-            {displayMenuButton && (
-              <button
-                className='pointer-events-auto m-2 p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
-                onClick={toggleFullscreen}
-              >
-                <BiMenu className='h-6 w-auto text-gray-600' />
-              </button>
-            )}
+            <button
+              className='pointer-events-auto m-2 p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+              onClick={toggleMenu}
+            >
+              <BiMenu className='h-6 w-auto text-gray-600' />
+            </button>
           </div>
           <div>
             <button
@@ -560,7 +481,7 @@ const EditButton = ({}) => {
   return (
     <Button
       rounded='right'
-      variant='primary'
+      variant='secondary'
       size='custom'
       onClick={toggleSidebarOpen}
       className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${
@@ -570,7 +491,7 @@ const EditButton = ({}) => {
       }`}
       aria-label='opens cms sidebar'
     >
-      <BiPencil className='h-6 w-auto' />
+      <PiSidebarSimpleLight className='h-6 w-auto' />
     </Button>
   );
 };
