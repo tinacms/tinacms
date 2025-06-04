@@ -35,7 +35,6 @@ import {
   createMdxInlinePlugin,
 } from "./create-mdx-plugins";
 import { FloatingToolbarPlugin } from "./ui/floating-toolbar-plugin";
-// NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
 import {
   autoformatArrow,
   autoformatLegal,
@@ -51,6 +50,8 @@ import {
 } from "@udecode/plate-code-block";
 import { ListStyleType } from "@udecode/plate-indent-list";
 import { unwrapList } from "@udecode/plate-list";
+// @ts-ignore
+// NOTE: Linter complains about ESM import here, as per conversation with Jeff it will be fine at build time—ignore this linting error for now.
 import { all, createLowlight } from "lowlight";
 import { autoformatBlocks } from "./core/autoformat/autoformat-block";
 import { autoformatLists } from "./core/autoformat/autoformat-lists";

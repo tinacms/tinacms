@@ -52,7 +52,7 @@ export const FloatingToolbar = withRef<
     ref: floatingRef,
   } = useCustomFloatingToolbar(test);
 
-  const ref = useComposedRef<HTMLDivElement>(props.ref, floatingRef);
+  const ref = useComposedRef<HTMLDivElement>(floatingRef);
 
   if (hidden) return null;
 

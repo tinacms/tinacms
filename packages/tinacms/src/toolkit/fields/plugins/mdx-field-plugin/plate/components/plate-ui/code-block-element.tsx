@@ -16,10 +16,6 @@ import { Button } from "./button";
 import { CodeBlockCombobox } from "./code-block-combobox";
 import { MermaidElementWithRef } from "./mermaid-element";
 
-type CodeBlockProps = {
-  callback: () => void;
-};
-
 export function codeLineToString(content: PlateCodeBlockElement): string {
   return (content.children || [])
     .map((line: CodeLineElement) =>
@@ -56,15 +52,12 @@ const ErrorMsg = ({ error }) => {
 
 //the default code block element from @udecode/plate-code-block
 //custom styling to match TinaCMS branding + remove copy button
-export const CodeBlockElement = withRef<typeof PlateElement & CodeBlockProps>(
-  ({ children, className, callback, ...props }, ref) => {
+export const CodeBlockElement = withRef<typeof PlateElement>(
+  ({ children, className, ...props }, ref) => {
     const { editor, element } = props;
 
     const [isEditing, setIsEditing] = useState(true);
     const [mermaidError, setMermaidError] = useState<string | null>(null);
-
-    console.log("[CodeBlockElement] Children: ", children);
-    console.log("[CodeBlockElement] element: ", element);
 
     useEffect(() => {
       // Look to find mermaid errors as well as format ( formatCodeBlock(editor, { element })})
