@@ -8,6 +8,7 @@ import { TinaAdminApi } from '../api';
 import type { DocumentForm } from '../types';
 import LoadingPage from './LoadingPage';
 import { FullscreenError } from './FullscreenError';
+
 export const useGetDocument = (
   cms: TinaCMS,
   collectionName: string,
@@ -19,29 +20,45 @@ export const useGetDocument = (
   const [error, setError] = useState<Error | undefined>(undefined);
 
   useEffect(() => {
+    let isCancelled = false; // Add cancellation flag
+
     const fetchDocument = async () => {
-      if (api.isAuthenticated()) {
+      if (api.isAuthenticated() && !isCancelled) {
         try {
           const response = await api.fetchDocument(
             collectionName,
             relativePath
           );
-          setDocument(response.document);
+
+          // Only update state if the request hasn't been cancelled
+          if (!isCancelled) {
+            setDocument(response.document);
+          }
         } catch (error) {
-          cms.alerts.error(
-            `[${error.name}] GetDocument failed: ${error.message}`
-          );
-          console.error(error);
-          setDocument(undefined);
-          setError(error);
+          // Only handle error if the request hasn't been cancelled
+          if (!isCancelled) {
+            cms.alerts.error(
+              `[${error.name}] GetDocument failed: ${error.message}`
+            );
+            console.error(error);
+            setDocument(undefined);
+            setError(error);
+          }
         }
 
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     setLoading(true);
     fetchDocument();
+
+    // Cleanup function to cancel the request
+    return () => {
+      isCancelled = true;
+    };
   }, [cms, collectionName, relativePath]);
 
   return { document, loading, error };

@@ -11,6 +11,8 @@ export type Document = {
       name: string;
     };
     breadcrumbs: string[];
+    filename: string;
+    relativePath: string;
   };
 };
 

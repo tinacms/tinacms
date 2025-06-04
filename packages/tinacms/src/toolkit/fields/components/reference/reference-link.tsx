@@ -1,9 +1,9 @@
-import * as React from 'react';
 import type { TinaCMS } from '@toolkit/tina-cms';
+import * as React from 'react';
 import { BiEdit } from 'react-icons/bi';
 import {
-  ReferenceLinkProps,
   Document,
+  ReferenceLinkProps,
   Response,
 } from './model/reference-link-props';
 
@@ -14,31 +14,39 @@ const useGetNode = (cms: TinaCMS, id: string) => {
 
   React.useEffect(() => {
     const fetchNode = async () => {
-      const response: Response = await cms.api.tina.request(
-        `#graphql
-        query($id: String!) {
-          node(id:$id) {
-            ... on Document {
-              _sys {
-                collection {
-                  name
+      try {
+        const response: Response = await cms.api.tina.request(
+          `#graphql
+          query($id: String!) {
+            node(id:$id) {
+              ... on Document {
+                _sys {
+                  collection {
+                    name
+                  }
+                  breadcrumbs
+                  filename
+                  relativePath
                 }
-                breadcrumbs
               }
             }
-          }
-        }`,
-        { variables: { id } }
-      );
+          }`,
+          { variables: { id } }
+        );
 
-      setDocument(response.node);
+        setDocument(response.node);
+      } catch (error) {
+        setDocument(undefined);
+      }
     };
+
     if (cms && id) {
       fetchNode();
     } else {
       setDocument(undefined);
     }
   }, [cms, id]);
+
   return document;
 };
 
@@ -61,8 +69,14 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
 
   return (
     <GetReference cms={cms} id={input.value}>
-      {(document: Document) =>
-        cms.state.editingMode === 'visual' ? (
+      {(document: Document) => {
+        // Remove file extension from filename for the URL
+        const filenameWithoutExt = document._sys.filename.replace(
+          /\.[^/.]+$/,
+          ''
+        );
+
+        return cms.state.editingMode === 'visual' ? (
           <button
             type='button'
             onClick={() => {
@@ -80,18 +94,17 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
           <a
             href={`${
               tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
-            }/collections/${
+            }/collections/edit/${
               document._sys.collection.name
-            }/${document._sys.breadcrumbs.join('/')}`}
+            }/~/${filenameWithoutExt}`}
             className='text-gray-700 hover:text-blue-500 inline-flex items-center uppercase text-sm mt-2 mb-2 leading-none'
           >
             <BiEdit className='h-5 w-auto opacity-80 mr-2' />
             Edit in CMS
           </a>
-        )
-      }
+        );
+      }}
     </GetReference>
   );
 };
-
 export default ReferenceLink;
