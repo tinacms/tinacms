@@ -1,5 +1,13 @@
 # @tinacms/app
 
+## 2.2.8
+
+### Patch Changes
+
+- Updated dependencies [[`5e36123`](https://github.com/tinacms/tinacms/commit/5e361239a372e21dda624d17b4ff274bab23ce90), [`856e07a`](https://github.com/tinacms/tinacms/commit/856e07a0b8d742ee78d5eba565623cf081a61534), [`4d9c8ab`](https://github.com/tinacms/tinacms/commit/4d9c8abf6badd1bcc833bda432ab22dace4925ae), [`7346dc9`](https://github.com/tinacms/tinacms/commit/7346dc996fd81ecb395b62f373976512e8224c21)]:
+  - tinacms@2.7.8
+  - @tinacms/mdx@1.6.3
+
 ## 2.2.7
 
 ### Patch Changes
