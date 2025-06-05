@@ -317,6 +317,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
      * Specify `"markdown"` if you're having problems with Tina parsing your content.
      */
     parser?:
+      | { type: 'mdx' }
       | {
           type: 'markdown';
           /**
@@ -325,7 +326,12 @@ export type RichTextField<WithNamespace extends boolean = false> = (
            */
           skipEscaping?: 'all' | 'html' | 'none';
         }
-      | { type: 'mdx' };
+      | {
+          /**
+           * Returns the native Slate.js document as JSON. Ideal to retain the pure editor content structure.
+           */
+          type: 'slatejson';
+        };
   };
 export type RichTextTemplate<WithNamespace extends boolean = false> =
   Template<WithNamespace> & {
