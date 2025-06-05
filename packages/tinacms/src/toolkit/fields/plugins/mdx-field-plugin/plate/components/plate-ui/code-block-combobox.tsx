@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import type { TCodeBlockElement } from '@udecode/plate-code-block';
 
 import { cn } from '@udecode/cn';
-import { useEditorRef, useElement, useReadOnly } from '@udecode/plate/react';
+import { useElement, useReadOnly } from '@udecode/plate/react';
 import { Check, ChevronDown } from 'lucide-react';
 
 import { Button } from './button';
@@ -89,10 +89,15 @@ const languages: { label: string; value: string }[] = [
   { label: 'VHDL', value: 'vhdl' },
 ];
 
-export function CodeBlockCombobox() {
+interface CodeBlockComboboxProps {
+  onLanguageChange: (lang: string) => void;
+}
+
+export function CodeBlockCombobox({
+  onLanguageChange,
+}: CodeBlockComboboxProps) {
   const [open, setOpen] = useState(false);
   const readOnly = useReadOnly();
-  const editor = useEditorRef();
   const element = useElement<TCodeBlockElement>();
   const value = element.lang || 'plaintext';
   const [searchValue, setSearchValue] = React.useState('');
@@ -150,10 +155,7 @@ export function CodeBlockCombobox() {
                   className='cursor-pointer rounded-md'
                   value={language.value}
                   onSelect={(value) => {
-                    editor.tf.setNodes<TCodeBlockElement>(
-                      { lang: value },
-                      { at: element }
-                    );
+                    onLanguageChange(value);
                     setSearchValue(value);
                     setOpen(false);
                   }}

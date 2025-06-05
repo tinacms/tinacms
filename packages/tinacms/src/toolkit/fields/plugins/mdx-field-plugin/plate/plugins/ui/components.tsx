@@ -30,7 +30,7 @@ import {
 import { ParagraphPlugin, PlateElement, PlateLeaf } from '@udecode/plate/react';
 import React from 'react';
 import { BlockquoteElement } from '../../components/plate-ui/blockquote-element';
-import { CodeBlockElement } from '../../components/plate-ui/code-block-element';
+import { CodeBlockElement } from '../../components/plate-ui/code-block/code-block-element';
 import { CodeLeaf } from '../../components/plate-ui/code-leaf';
 import { CodeLineElement } from '../../components/plate-ui/code-line-element';
 import { CodeSyntaxLeaf } from '../../components/plate-ui/code-syntax-leaf';

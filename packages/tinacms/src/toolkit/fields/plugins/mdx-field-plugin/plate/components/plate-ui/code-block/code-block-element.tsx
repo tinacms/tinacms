@@ -3,18 +3,23 @@
 import React, { useEffect, useState } from 'react';
 
 import { cn, withRef } from '@udecode/cn';
-import { formatCodeBlock, isLangSupported } from '@udecode/plate-code-block';
+import {
+  formatCodeBlock,
+  isLangSupported,
+  TCodeBlockElement,
+} from '@udecode/plate-code-block';
 import { PlateElement } from '@udecode/plate/react';
-import { AlertTriangle, BracesIcon } from 'lucide-react';
+import { BracesIcon } from 'lucide-react';
 import mermaid from 'mermaid';
 
 import {
   CodeLineElement,
   CodeBlockElement as PlateCodeBlockElement,
 } from '@tinacms/mdx';
-import { Button } from './button';
-import { CodeBlockCombobox } from './code-block-combobox';
-import { MermaidElementWithRef } from './mermaid-element';
+import { Button } from '../button';
+import { CodeBlockCombobox } from '../code-block-combobox';
+import { MermaidElementWithRef } from '../mermaid-element';
+import { ErrorMessage } from './error-message';
 
 export function codeLineToString(content: PlateCodeBlockElement): string {
   return (content.children || [])
@@ -26,30 +31,6 @@ export function codeLineToString(content: PlateCodeBlockElement): string {
     .join('\n');
 }
 
-const ErrorMsg = ({ error }) => {
-  if (!error) {
-    return null;
-  }
-
-  return (
-    <div
-      contentEditable={false}
-      className='mt-2 flex items-start rounded-md border border-red-300 bg-red-50 p-3 shadow-sm'
-      role='alert' // For accessibility
-    >
-      <div className='flex-shrink-0'>
-        <AlertTriangle className='h-5 w-5 text-red-400' aria-hidden='true' />
-      </div>
-      <div className='ml-3 flex-1'>
-        {/* Using <pre> to respect formatting (like newlines) in the error message */}
-        <pre className='m-0 font-mono text-sm text-red-700 whitespace-pre-wrap break-words'>
-          {error}
-        </pre>
-      </div>
-    </div>
-  );
-};
-
 //the default code block element from @udecode/plate-code-block
 //custom styling to match TinaCMS branding + remove copy button
 export const CodeBlockElement = withRef<typeof PlateElement>(
@@ -57,26 +38,27 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
     const { editor, element } = props;
 
     const [isEditing, setIsEditing] = useState(true);
-    const [mermaidError, setMermaidError] = useState<string | null>(null);
+    const [codeBlockError, setCodeBlockError] = useState<string | null>(null);
 
     useEffect(() => {
+      console.log('[On Children Change Event]: ', element.children[0].text);
       // Look to find mermaid errors as well as format ( formatCodeBlock(editor, { element })})
       if ((element.lang as string) !== 'mermaid') {
         return;
       }
 
       if (mermaid.parse(codeLineToString(element as PlateCodeBlockElement))) {
-        setMermaidError(null); // Clear errors on success
+        setCodeBlockError(null); // Clear errors on success
       }
-
-      console.log('[On Children Change Event]: ', element.children);
     }, [element.children]);
 
     mermaid.parseError = (err: any) => {
-      setMermaidError(
+      setCodeBlockError(
         String(err.message) || 'An error occurred while parsing the diagram.'
       );
     };
+
+    console.log('[Code Block Element]: ', element);
 
     return (
       <PlateElement
@@ -128,7 +110,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
           {isEditing ? (
             <pre className='overflow-x-auto p-4 pt-12 font-mono text-sm leading-[normal] [tab-size:2] print:break-inside-avoid my-2 tina-code-block'>
               <code>{children}</code>
-              <ErrorMsg error={mermaidError} />
+              <ErrorMessage error={codeBlockError} />
             </pre>
           ) : (
             <MermaidElementWithRef
@@ -162,12 +144,18 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
                 {isEditing ? 'Preview' : 'Edit'}
               </Button>
             )}
-            <CodeBlockCombobox />
+            <CodeBlockCombobox
+              onLanguageChange={(lang) => {
+                setCodeBlockError(null); // Clear errors on language change
+                editor.tf.setNodes<TCodeBlockElement>(
+                  { lang },
+                  { at: element }
+                );
+              }}
+            />
           </div>
         </div>
       </PlateElement>
     );
   }
 );
-
-//
