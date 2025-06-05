@@ -120,7 +120,7 @@ const InlineCombobox = ({
   }, [editor, element]);
 
   const { props: inputProps, removeInput } = useComboboxInput({
-    cancelInputOnBlur: false,
+    cancelInputOnBlur: true,
     cursorState,
     onCancelInput: (cause) => {
       if (cause !== 'backspace') {
