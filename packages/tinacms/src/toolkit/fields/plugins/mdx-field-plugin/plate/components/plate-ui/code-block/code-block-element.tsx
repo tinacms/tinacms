@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 
 import { cn, withRef } from '@udecode/cn';
-import { formatCodeBlock, isLangSupported } from '@udecode/plate-code-block';
+import { formatCodeBlock, isLangSupported, TCodeBlockElement } from '@udecode/plate-code-block';
 import { PlateElement } from '@udecode/plate/react';
-import { AlertTriangle, BracesIcon } from 'lucide-react';
+import { BracesIcon } from 'lucide-react';
 import mermaid from 'mermaid';
 
 import {
@@ -34,7 +34,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
     const { editor, element } = props;
 
     const [isEditing, setIsEditing] = useState(true);
-    const [mermaidError, setMermaidError] = useState<string | null>(null);
+    const [codeBlockError, setCodeBlockError] = useState<string | null>(null);
 
     useEffect(() => {
       // Look to find mermaid errors as well as format ( formatCodeBlock(editor, { element })})
@@ -43,14 +43,14 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
       }
 
       if (mermaid.parse(codeLineToString(element as PlateCodeBlockElement))) {
-        setMermaidError(null); // Clear errors on success
+        setCodeBlockError(null); // Clear errors on success
       }
 
       console.log('[On Children Change Event]: ', element.children);
     }, [element.children]);
 
     mermaid.parseError = (err: any) => {
-      setMermaidError(
+      setCodeBlockError(
         String(err.message) || 'An error occurred while parsing the diagram.'
       );
     };
@@ -105,7 +105,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
           {isEditing ? (
             <pre className='overflow-x-auto p-4 pt-12 font-mono text-sm leading-[normal] [tab-size:2] print:break-inside-avoid my-2 tina-code-block'>
               <code>{children}</code>
-              <ErrorMessage error={mermaidError} />
+              <ErrorMessage error={codeBlockError} />
             </pre>
           ) : (
             <MermaidElementWithRef
@@ -139,12 +139,18 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
                 {isEditing ? 'Preview' : 'Edit'}
               </Button>
             )}
-            <CodeBlockCombobox />
+            <CodeBlockCombobox
+              onLanguageChange={(lang) => {
+                setCodeBlockError(null); // Clear errors on language change
+                editor.tf.setNodes<TCodeBlockElement>(
+                  { lang },
+                  { at: element }
+                );
+              }}
+            />
           </div>
         </div>
       </PlateElement>
     );
   }
 );
-
-//
