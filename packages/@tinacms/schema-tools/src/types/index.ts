@@ -328,7 +328,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
         }
       | {
           /**
-           * Returns the native Slate.js document as JSON. Ideal to retain the pure editor content structure.
+           * Experimental: Returns the native Slate.js document as JSON. Ideal to retain the pure editor content structure.
            */
           type: 'slatejson';
         };
