@@ -3,7 +3,8 @@ import { useCMS } from '@toolkit/react-core';
 import { GitFile } from './git-file';
 
 /**
- * @deprecated
+ * @deprecated as the API is clunky and hard to use. Mutations should now be
+ * done via Graphql. This will be removed within the next month.
  */
 export function useGitFile(
   relativePath: string,

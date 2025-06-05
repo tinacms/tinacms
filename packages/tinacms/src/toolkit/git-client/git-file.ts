@@ -2,7 +2,8 @@ import { CMS } from '@toolkit/core';
 import { GitClient } from './git-client';
 
 /**
- * @deprecated
+ * @deprecated as the API is clunky and hard to use. Mutations should now be
+ * done via Graphql. This will be removed within the next month.
  */
 export class GitFile {
   constructor(
@@ -14,6 +15,8 @@ export class GitFile {
 
   /**
    * Load the contents of this file at HEAD
+   *
+   * @deprecated
    */
   show = () => {
     return this.git.show(this.relativePath).then((git: { content: string }) => {
@@ -21,6 +24,9 @@ export class GitFile {
     });
   };
 
+  /**
+   * @deprecated
+   */
   commit = () => {
     return this.git.commit!({
       files: [this.relativePath],
@@ -29,10 +35,16 @@ export class GitFile {
     );
   };
 
+  /**
+   * @deprecated
+   */
   reset = () => {
     this.cms.api.git.reset({ files: [this.relativePath] });
   };
 
+  /**
+   * @deprecated
+   */
   write = (values: any) => {
     this.git.writeToDisk!({
       fileRelativePath: this.relativePath,
@@ -40,6 +52,9 @@ export class GitFile {
     });
   };
 
+  /**
+   * @deprecated
+   */
   private get git(): GitClient {
     return this.cms.api.git;
   }

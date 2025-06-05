@@ -1,5 +1,6 @@
 /**
- * @deprecated
+ * @deprecated as the API is clunky and hard to use. Mutations should now be
+ * done via Graphql. This will be removed within the next month.
  */
 export class GitClient {
   constructor(private baseUrl: string) {}
@@ -43,6 +44,9 @@ export class GitClient {
     return true;
   }
 
+  /**
+   * @deprecated
+   */
   commit(data: {
     files: string[];
     message?: string;
@@ -59,9 +63,10 @@ export class GitClient {
   }
 
   /**
-   *
    * TODO: Add return type.
    * TODO: Remove `catch`
+   *
+   * @deprecated
    */
   push(): Promise<any> {
     return fetch(`${this.baseUrl}/push`, {
@@ -75,9 +80,10 @@ export class GitClient {
   }
 
   /**
-   *
    * TODO: Add return type.
    * TODO: Remove `catch`
+   *
+   * @deprecated
    */
   writeToDisk(data: {
     fileRelativePath: string;
@@ -100,6 +106,8 @@ export class GitClient {
   /**
    * Uploads a File to disk
    * TODO: Remove `catch`
+   *
+   * @deprecated
    */
   writeMediaToDisk(data: { directory: string; content: File }): Promise<any> {
     const formData = new FormData();
@@ -117,6 +125,8 @@ export class GitClient {
    * TODO: rename `data.relPath` to `data.fileRelativePath`
    * TODO: Add return type.
    * TODO: Remove `catch`
+   *
+   * @deprecated
    */
   deleteFromDisk(data: { relPath: string }): Promise<any> {
     return fetch(`${this.baseUrl}/${encodeURIComponent(data.relPath)}`, {
@@ -132,6 +142,8 @@ export class GitClient {
 
   /**
    * Resets the given files.
+   *
+   * @deprecated
    */
   reset(data: { files: string[] }) {
     return fetch(`${this.baseUrl}/reset`, {
@@ -145,6 +157,8 @@ export class GitClient {
 
   /**
    * Get the contents of a file or directory on disk.
+   *
+   * @deprecated
    */
   getFile(fileRelativePath: string) {
     return fetch(`${this.baseUrl}/${encodeURIComponent(fileRelativePath)}`, {
@@ -158,6 +172,8 @@ export class GitClient {
 
   /**
    * Get the contents of a file for the most recent commit.
+   *
+   * @deprecated
    */
   show(fileRelativePath: string) {
     return fetch(
@@ -175,6 +191,8 @@ export class GitClient {
   /**
    * Get information about a local branch by name, or the current branch if no
    * name is specified.
+   *
+   * @deprecated
    */
   branch(name?: string) {
     return fetch(`${this.baseUrl}/${name ? `branches/${name}` : 'branch'}`, {
@@ -188,6 +206,8 @@ export class GitClient {
 
   /**
    * Get a list of the names of all local branches.
+   *
+   * @deprecated
    */
   branches() {
     return fetch(`${this.baseUrl}/branches`, {
