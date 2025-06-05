@@ -10,7 +10,7 @@ import { cva } from 'class-variance-authority';
 import { cn } from '@udecode/cn';
 
 const editorContainerVariants = cva(
-  'relative w-full cursor-text overflow-y-auto caret-primary select-text selection:bg-brand/25 focus-visible:outline-none [&_.slate-selection-area]:z-50 [&_.slate-selection-area]:border [&_.slate-selection-area]:border-brand/25 [&_.slate-selection-area]:bg-brand/15',
+  'relative w-full cursor-text caret-primary select-text selection:bg-brand/25 focus-visible:outline-none [&_.slate-selection-area]:z-50 [&_.slate-selection-area]:border [&_.slate-selection-area]:border-brand/25 [&_.slate-selection-area]:bg-brand/15',
   {
     defaultVariants: {
       variant: 'default',
@@ -57,7 +57,7 @@ EditorContainer.displayName = 'EditorContainer';
 const editorVariants = cva(
   cn(
     'group/editor',
-    'relative w-full cursor-text overflow-x-hidden break-words whitespace-pre-wrap select-text',
+    'relative w-full cursor-text overflow-x-hidden overflow-y-auto break-words whitespace-pre-wrap select-text',
     'rounded-md ring-offset-background focus-visible:outline-none',
     'placeholder:text-muted-foreground/80 **:data-slate-placeholder:top-[auto_!important] **:data-slate-placeholder:text-muted-foreground/80 **:data-slate-placeholder:opacity-100!',
     '[&_strong]:font-bold'
