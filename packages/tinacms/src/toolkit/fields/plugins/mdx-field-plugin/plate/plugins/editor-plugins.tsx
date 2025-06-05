@@ -72,10 +72,7 @@ export const HANDLES_MDX = [
 // Common rule for resetting block types
 const resetBlockTypesCommonRule = {
   defaultType: ParagraphPlugin.key,
-  types: [
-    ...HEADING_LEVELS,
-    BlockquotePlugin.key
-  ],
+  types: [...HEADING_LEVELS, BlockquotePlugin.key],
 };
 
 const resetBlockTypesCodeBlockRule = {
@@ -155,7 +152,7 @@ export const editorPlugins = [
     },
   }),
 
-  // ExitBreakPlugin lets users “break out” of a block (like a heading)
+  // ExitBreakPlugin lets users "break out" of a block (like a heading)
   ExitBreakPlugin.configure({
     options: {
       rules: [

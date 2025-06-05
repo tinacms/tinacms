@@ -9,6 +9,7 @@ export const unsupportedItemsInTable = new Set([
   "Code Block",
   "Unordered List",
   "Ordered List",
+  "Horizontal Rule",
   "Quote",
   "Mermaid",
   "Heading 1",

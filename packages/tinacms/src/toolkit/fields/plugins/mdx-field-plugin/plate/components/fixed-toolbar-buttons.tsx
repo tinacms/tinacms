@@ -37,6 +37,8 @@ import {
 } from "@udecode/plate-list/react";
 import { ListToolbarButton } from "./plate-ui/indent-list-toolbar-button";
 import { TableDropdownMenu } from "./plate-ui/table/table-dropdown-menu";
+import { CodeBlockPlugin } from "@udecode/plate-code-block/react";
+import { cn } from "@udecode/cn";
 
 type ToolbarItem = {
   label: string;
@@ -161,10 +163,9 @@ export default function FixedToolbarButtons() {
   }
 
   const editorState = useEditorState();
-  const userInTable = helpers.isNodeActive(editorState, TablePlugin.key);
-  if (userInTable) {
-    items = items.filter((item) => !unsupportedItemsInTable.has(item.label));
-  }
+  const userInTable = helpers.isNodeActive(editorState, TablePlugin);
+
+  const userInCodeBlock = helpers.isNodeActive(editorState, CodeBlockPlugin);
 
   useResize(toolbarRef, (entry) => {
     const width = entry.target.getBoundingClientRect().width - 8;
@@ -198,6 +199,16 @@ export default function FixedToolbarButtons() {
     setItemsShown(itemFitCount);
   });
 
+  const getOpacity = (item: ToolbarItem) => {
+    if (userInTable && unsupportedItemsInTable.has(item.label)) {
+      return "opacity-25 pointer-events-none";
+    }
+    if (userInCodeBlock) {
+      return "opacity-25 pointer-events-none";
+    }
+    return "opacity-100";
+  };
+
   return (
     <div className="w-full overflow-hidden @container/toolbar" ref={toolbarRef}>
       <div
@@ -210,13 +221,29 @@ export default function FixedToolbarButtons() {
           {items
             .slice(0, items.length > itemsShown ? itemsShown - 1 : itemsShown)
             .map((item) => (
-              <React.Fragment key={item.label}>{item.Component}</React.Fragment>
+              <div
+                className={cn(
+                  "transition duration-500 ease-in-out",
+                  getOpacity(item)
+                )}
+                key={item.label}
+              >
+                {item.Component}
+              </div>
             ))}
           {items.length > itemsShown && (
             <div className="w-fit ml-auto">
               <OverflowMenu>
                 {items.slice(itemsShown - 1).flatMap((c) => (
-                  <React.Fragment key={c.label}>{c.Component}</React.Fragment>
+                  <div
+                    className={cn(
+                      "transition duration-500 ease-in-out",
+                      getOpacity(c)
+                    )}
+                    key={c.label}
+                  >
+                    {c.Component}
+                  </div>
                 ))}
               </OverflowMenu>
             </div>
