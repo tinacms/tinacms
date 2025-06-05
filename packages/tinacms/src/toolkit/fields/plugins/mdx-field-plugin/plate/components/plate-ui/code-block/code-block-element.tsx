@@ -3,7 +3,11 @@
 import React, { useEffect, useState } from 'react';
 
 import { cn, withRef } from '@udecode/cn';
-import { formatCodeBlock, isLangSupported, TCodeBlockElement } from '@udecode/plate-code-block';
+import {
+  formatCodeBlock,
+  isLangSupported,
+  TCodeBlockElement,
+} from '@udecode/plate-code-block';
 import { PlateElement } from '@udecode/plate/react';
 import { BracesIcon } from 'lucide-react';
 import mermaid from 'mermaid';
@@ -37,6 +41,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
     const [codeBlockError, setCodeBlockError] = useState<string | null>(null);
 
     useEffect(() => {
+      console.log('[On Children Change Event]: ', element.children[0].text);
       // Look to find mermaid errors as well as format ( formatCodeBlock(editor, { element })})
       if ((element.lang as string) !== 'mermaid') {
         return;
@@ -45,8 +50,6 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
       if (mermaid.parse(codeLineToString(element as PlateCodeBlockElement))) {
         setCodeBlockError(null); // Clear errors on success
       }
-
-      console.log('[On Children Change Event]: ', element.children);
     }, [element.children]);
 
     mermaid.parseError = (err: any) => {
@@ -54,6 +57,8 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
         String(err.message) || 'An error occurred while parsing the diagram.'
       );
     };
+
+    console.log('[Code Block Element]: ', element);
 
     return (
       <PlateElement
