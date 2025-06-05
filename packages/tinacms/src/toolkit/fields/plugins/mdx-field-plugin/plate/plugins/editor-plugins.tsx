@@ -153,7 +153,7 @@ export const editorPlugins = [
     },
   }),
 
-  // ExitBreakPlugin lets users “break out” of a block (like a heading)
+  // ExitBreakPlugin lets users "break out" of a block (like a heading)
   ExitBreakPlugin.configure({
     options: {
       rules: [
