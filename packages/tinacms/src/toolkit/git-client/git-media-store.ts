@@ -9,7 +9,7 @@ import { GitClient } from './git-client';
 
 /**
  * @deprecated as the API is clunky and hard to use. Mutations should now be
- * done via Graphql. This will be removed within the next month.
+ * done via Graphql. This will be removed by July 2025.
  */
 export class GitMediaStore implements MediaStore {
   accept = '*';
