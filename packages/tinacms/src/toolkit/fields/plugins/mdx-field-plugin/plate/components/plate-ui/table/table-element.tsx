@@ -74,8 +74,8 @@ export const TableElement = withHOC(
         ref={ref}
         className={cn(
           className,
-          'overflow-x-auto py-5',
-          hasControls && '-ml-2 *:data-[slot=block-selection]:left-2'
+          'overflow-x-auto py-2',
+          hasControls && '*:data-[slot=block-selection]:left-2'
         )}
         style={{ paddingLeft: marginLeft }}
         {...props}
@@ -83,7 +83,7 @@ export const TableElement = withHOC(
         <div className='group/table relative w-fit'>
           <table
             className={cn(
-              'mr-0 ml-px table h-px table-fixed border-collapse',
+              'mr-0 table h-px border-collapse border border-gray-200 not-tina-prose my-2',
               isSelectingCell && 'selection:bg-transparent'
             )}
             {...tableProps}
