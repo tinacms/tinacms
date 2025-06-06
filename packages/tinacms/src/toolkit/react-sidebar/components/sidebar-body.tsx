@@ -129,10 +129,10 @@ export const MultiformFormHeader = ({
   return (
     <div
       className={
-        'pt-18 pb-4 px-6 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50'
+        'pt-4 pb-4 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50'
       }
     >
-      <div className='max-w-form mx-auto flex gap-2 justify-between items-center'>
+      <div className='px-6 flex gap-2 justify-between items-center'>
         <button
           type='button'
           className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
@@ -190,10 +190,10 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
   return (
     <div
       className={
-        'pt-18 pb-4 px-6 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50'
+        'pt-4 pb-4 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50'
       }
     >
-      <div className='max-w-form mx-auto flex gap-2 justify-between items-center'>
+      <div className='px-6 flex gap-2 justify-between items-center'>
         <button
           type='button'
           className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'

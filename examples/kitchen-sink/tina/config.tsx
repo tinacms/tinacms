@@ -1,37 +1,37 @@
-import React from 'react'
-import { defineConfig } from 'tinacms'
-import { BiBall, BiBasketball, BiBaseball, BiFootball } from 'react-icons/bi'
+import React from 'react';
+import { BiBall, BiBaseball, BiBasketball, BiFootball } from 'react-icons/bi';
+import { defineConfig } from 'tinacms';
 
-const TINA_TOKEN_KEY = 'tina_token_key'
+const TINA_TOKEN_KEY = 'tina_token_key';
 
 const slugify = (values) => {
   return `${(values?.name || values?.title || `document-${Date.now()}`)
     .toLowerCase()
     .split(' ')
-    .join('-')}`
-}
+    .join('-')}`;
+};
 const router = ({ document, collection }) => {
-  return `/${collection.name}/${document._sys.filename}`
-}
+  return `/${collection.name}/${document._sys.filename}`;
+};
 const extendedRouter = ({ document, collection }) => {
-  return `/${collection.name}/${document._sys.breadcrumbs.join('/')}`
-}
+  return `/${collection.name}/${document._sys.breadcrumbs.join('/')}`;
+};
 
 const customAuthProvider = {
   getToken: async () => {
-    return { id_token: 'some-token' }
+    return { id_token: 'some-token' };
   },
   logout: async () => {
-    localStorage.removeItem(TINA_TOKEN_KEY)
+    localStorage.removeItem(TINA_TOKEN_KEY);
   },
   authenticate: async () => {
-    localStorage.setItem(TINA_TOKEN_KEY, 'some-token')
-    return true
+    localStorage.setItem(TINA_TOKEN_KEY, 'some-token');
+    return true;
   },
   getUser: async () => {
-    return localStorage.getItem(TINA_TOKEN_KEY)
+    return localStorage.getItem(TINA_TOKEN_KEY);
   },
-}
+};
 export default defineConfig({
   // contentApiUrlOverride: '/api/gql',
   build: {
@@ -85,23 +85,23 @@ export default defineConfig({
                 ui: {
                   component: ({ input }) => {
                     return (
-                      <div className="my-4">
+                      <div className='my-4'>
                         <label
                           htmlFor={input.name}
-                          className="block text-sm font-medium text-blue-700 underline"
+                          className='block text-sm font-medium text-blue-700 underline'
                         >
                           {input.name} (this is a custom component)
                         </label>
-                        <div className="mt-1">
+                        <div className='mt-1'>
                           <input
-                            type="text"
+                            type='text'
                             id={input.name}
-                            className="py-2 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className='py-2 px-4 block w-full rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                             {...input}
                           />
                         </div>
                       </div>
-                    )
+                    );
                   },
                 },
               },
@@ -159,7 +159,7 @@ export default defineConfig({
                     name: 'hero',
                     ui: {
                       itemProps: (item) => {
-                        return { label: item?.headline }
+                        return { label: item?.headline };
                       },
                       defaultItem: {
                         _template: 'hero',
@@ -918,4 +918,4 @@ export default defineConfig({
       },
     ],
   },
-})
+});

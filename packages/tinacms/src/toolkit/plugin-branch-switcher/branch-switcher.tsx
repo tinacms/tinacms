@@ -575,7 +575,7 @@ const IndexStatus = ({ indexingStatus }: { indexingStatus: Status }) => {
   };
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium border space-x-1 ${styles[indexingStatus].classes}`}
+      className={`inline-flex items-center rounded px-2 py-1 text-xs font-medium border space-x-1 ${styles[indexingStatus].classes}`}
     >
       {styles[indexingStatus].content()}
     </span>

@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { useState } from 'react';
-import { TinaCMS } from '@toolkit/tina-cms';
-import { MdSyncProblem } from 'react-icons/md';
-import { HiOutlineClipboardList } from 'react-icons/hi';
 import {
   FullscreenModal,
   Modal,
   ModalBody,
   ModalHeader,
 } from '@toolkit/react-modals';
-import { BsCheckCircleFill, BsExclamationOctagonFill } from 'react-icons/bs';
 import { Button } from '@toolkit/styles';
+import { TinaCMS } from '@toolkit/tina-cms';
+import * as React from 'react';
+import { useState } from 'react';
+import { BsCheckCircleFill, BsExclamationOctagonFill } from 'react-icons/bs';
+import { HiOutlineClipboardList } from 'react-icons/hi';
+import { MdSyncProblem } from 'react-icons/md';
 
 type EventListState = 'loading' | 'success' | 'error' | 'unauthorized';
 
@@ -147,7 +147,7 @@ const EventsList = ({ cms }) => {
   return (
     <div className='flex flex-col gap-4 w-full h-full grow-0'>
       {events.length > 0 && (
-        <div className='shrink grow-0 overflow-scroll w-full rounded-md shadow ring-1 ring-black ring-opacity-5'>
+        <div className='shrink grow-0 overflow-scroll w-full rounded shadow ring-1 ring-black ring-opacity-5'>
           <table className='w-full divide-y divide-gray-100'>
             {events
               .map((event, index) => {

@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { InputProps, BaseTextField } from '../components';
-import { wrapFieldsWithMeta } from './wrap-field-with-meta';
-import { parse } from './text-format';
-import { BiX } from 'react-icons/bi';
 import { AddIcon } from '@toolkit/icons';
 import { IconButton } from '@toolkit/styles';
+import * as React from 'react';
+import { BiX } from 'react-icons/bi';
+import { BaseTextField, InputProps } from '../components';
+import { parse } from './text-format';
+import { wrapFieldsWithMeta } from './wrap-field-with-meta';
 
 export const TagsField = wrapFieldsWithMeta<
   { placeholder: string },
@@ -79,7 +79,7 @@ const Tag = ({ tinaForm, field, index, children, ...styleProps }) => {
   }, [tinaForm, field, index]);
   return (
     <span
-      className='rounded-full shadow bg-white border border-gray-150 flex items-center tracking-[0.01em] leading-none text-gray-700'
+      className='rounded shadow bg-white border border-gray-150 flex items-center tracking-[0.01em] leading-none text-gray-700'
       {...styleProps}
     >
       <span

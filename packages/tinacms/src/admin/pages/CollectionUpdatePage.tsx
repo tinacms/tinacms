@@ -1,26 +1,26 @@
 import {
+  Collection,
+  TinaSchema,
+  canonicalPath,
+  resolveForm,
+} from '@tinacms/schema-tools';
+import {
   BillingWarning,
   Form,
   FormBuilder,
   FormStatus,
 } from '@tinacms/toolkit';
+import { LocalWarning } from '@tinacms/toolkit';
+import type { TinaCMS } from '@tinacms/toolkit';
+import React, { useMemo, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { TinaAdminApi } from '../api';
+import { ErrorDialog } from '../components/ErrorDialog';
 import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
 import GetDocument from '../components/GetDocument';
-import React, { useMemo, useState } from 'react';
-import {
-  TinaSchema,
-  resolveForm,
-  Collection,
-  canonicalPath,
-} from '@tinacms/schema-tools';
-import { Link, useParams } from 'react-router-dom';
-import { LocalWarning } from '@tinacms/toolkit';
 import { PageWrapper } from '../components/Page';
-import { TinaAdminApi } from '../api';
-import type { TinaCMS } from '@tinacms/toolkit';
 import { useCollectionFolder } from './utils';
-import { ErrorDialog } from '../components/ErrorDialog';
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -174,9 +174,11 @@ const RenderForm = ({
 
   return (
     <>
-      {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
+      <div className='pt-2 px-6 bg-white'>
+        {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
+      </div>
       <div
-        className={`pt-10 xl:pt-3 pb-10 xl:pb-4 px-20 xl:px-12 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
+        className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
       >
         <div className='w-full flex gap-1.5 justify-between items-center'>
           <Link

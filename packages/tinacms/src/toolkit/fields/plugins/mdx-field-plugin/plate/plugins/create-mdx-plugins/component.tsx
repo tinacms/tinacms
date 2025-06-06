@@ -1,20 +1,20 @@
-import React from 'react';
-import { Element } from 'slate';
-import { useSelected, ReactEditor } from 'slate-react';
 import {
-  Transition,
   Popover,
   PopoverButton,
   PopoverPanel,
+  Transition,
 } from '@headlessui/react';
+import { ELEMENT_PARAGRAPH } from '@udecode/plate';
+import { insertNodes } from '@udecode/plate-common';
+import React from 'react';
+import { Element } from 'slate';
+import { ReactEditor, useSelected } from 'slate-react';
+import { ELEMENT_MDX_INLINE } from '.';
+import { useTemplates } from '../../editor-context';
+import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { NestedForm } from '../../nested-form';
 import { classNames } from '../ui/helpers';
-import { ELEMENT_MDX_INLINE } from '.';
 import { EllipsisIcon } from '../ui/icons';
-import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
-import { useTemplates } from '../../editor-context';
-import { insertNodes } from '@udecode/plate-common';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate';
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div';
@@ -80,15 +80,15 @@ export const InlineEmbed = ({
         <span
           // give just enough margin so that the cursor is visible when adjacent to this node.
           style={{ margin: '0 0.5px' }}
-          className='relative inline-flex shadow-sm rounded-md leading-none'
+          className='relative inline-flex shadow-sm rounded leading-none'
         >
           {selected && (
-            <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none' />
+            <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded z-10 pointer-events-none' />
           )}
           <span
             style={{ fontWeight: 'inherit', maxWidth: '275px' }}
             // Tailwind reset puts styles on buttons
-            className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l-md border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            className='truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
             onMouseDown={handleSelect}
           >
             {label}
@@ -140,13 +140,13 @@ export const BlockEmbed = ({
     <div {...attributes} className='w-full my-2'>
       {children}
       <Wrapper inline={false}>
-        <span className='relative w-full inline-flex shadow-sm rounded-md'>
+        <span className='relative w-full inline-flex shadow-sm rounded'>
           {selected && (
-            <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none' />
+            <span className='absolute inset-0 ring-2 ring-blue-100 ring-inset rounded z-10 pointer-events-none' />
           )}
           <span
             onMouseDown={handleSelect}
-            className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l-md border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            className='truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
           >
             {label}
           </span>
@@ -197,7 +197,7 @@ const DotMenu = ({ onOpen, onRemove }) => {
     <Popover as='span' className='-ml-px relative block'>
       <PopoverButton
         as='span'
-        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r-md border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+        className='cursor-pointer h-full relative inline-flex items-center px-1 py-0.5 rounded-r border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
       >
         <EllipsisIcon title='Open options' />
       </PopoverButton>
@@ -210,7 +210,7 @@ const DotMenu = ({ onOpen, onRemove }) => {
         leaveTo='transform opacity-0 scale-95'
       >
         <PopoverPanel className='z-30 absolute origin-top-right right-0'>
-          <div className='mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
+          <div className='mt-2 -mr-1 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
             <div className='py-1'>
               <span
                 onClick={onOpen}

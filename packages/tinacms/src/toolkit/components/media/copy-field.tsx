@@ -32,7 +32,7 @@ export const CopyField = ({ label, description, value }: CopyFieldProps) => {
 
           navigator.clipboard.writeText(value);
         }}
-        className={`shadow-inner text-base leading-5 whitespace-normal break-all px-3 py-2 text-gray-600 w-full bg-gray-50 border border-gray-200 transition-all ease-out duration-150 rounded-md relative overflow-hidden appearance-none flex items-center w-full cursor-pointer hover:bg-white hover:text-blue-500  ${
+        className={`shadow-inner text-base leading-5 whitespace-normal break-all px-3 py-2 text-gray-600 w-full bg-gray-50 border border-gray-200 transition-all ease-out duration-150 rounded relative overflow-hidden appearance-none flex items-center w-full cursor-pointer hover:bg-white hover:text-blue-500  ${
           copied ? `pointer-events-none` : ``
         }`}
       >
