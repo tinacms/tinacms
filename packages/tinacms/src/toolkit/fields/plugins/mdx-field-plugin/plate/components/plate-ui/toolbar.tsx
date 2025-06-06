@@ -96,7 +96,7 @@ const ToolbarButton = withTooltip(
                 size,
                 variant,
               }),
-              isDropdown && 'my-1 justify-between pr-1',
+              isDropdown && 'my-1 justify-between',
               className
             )}
             ref={ref}

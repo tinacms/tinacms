@@ -52,6 +52,8 @@ export const Button = withRef<
     <Comp
       className={cn(buttonVariants({ className, isMenu, size, variant }))}
       ref={ref}
+      contentEditable={false}
+      type='button'
       {...props}
     />
   );

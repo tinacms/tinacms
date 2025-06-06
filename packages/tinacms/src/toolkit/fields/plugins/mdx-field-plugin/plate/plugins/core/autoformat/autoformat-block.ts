@@ -1,80 +1,76 @@
+// import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
 import { preFormat } from './autoformat-utils';
-import { insertEmptyCodeBlock } from '../../../transforms/insert-empty-block';
-import type { AutoformatRule } from '@udecode/plate-autoformat';
-import {
-  ELEMENT_BLOCKQUOTE,
-  ELEMENT_CODE_BLOCK,
-  ELEMENT_H1,
-  ELEMENT_H2,
-  ELEMENT_H3,
-  ELEMENT_H4,
-  ELEMENT_H5,
-  ELEMENT_H6,
-  ELEMENT_HR,
-} from '@udecode/plate';
-import { ELEMENT_DEFAULT, insertNodes, setNodes } from '@udecode/plate-common';
+import { HEADING_KEYS } from '@udecode/plate-heading';
+import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
+import { AutoformatRule } from '@udecode/plate-autoformat';
+import { ParagraphPlugin } from '@udecode/plate/react';
+import { insertEmptyCodeBlock } from '@udecode/plate-code-block';
 
 export const autoformatBlocks: AutoformatRule[] = [
   {
     mode: 'block',
-    type: ELEMENT_H1,
+    type: HEADING_KEYS.h1,
     match: '# ',
     preFormat,
   },
   {
     mode: 'block',
-    type: ELEMENT_H2,
+    type: HEADING_KEYS.h2,
     match: '## ',
     preFormat,
   },
   {
     mode: 'block',
-    type: ELEMENT_H3,
+    type: HEADING_KEYS.h3,
     match: '### ',
     preFormat,
   },
   {
     mode: 'block',
-    type: ELEMENT_H4,
+    type: HEADING_KEYS.h4,
     match: '#### ',
     preFormat,
   },
   {
     mode: 'block',
-    type: ELEMENT_H5,
+    type: HEADING_KEYS.h5,
     match: '##### ',
     preFormat,
   },
   {
     mode: 'block',
-    type: ELEMENT_H6,
+    type: HEADING_KEYS.h6,
     match: '###### ',
     preFormat,
   },
   {
     mode: 'block',
-    type: ELEMENT_BLOCKQUOTE,
+    type: BlockquotePlugin.key,
     match: '> ',
     preFormat,
   },
   {
     mode: 'block',
-    type: ELEMENT_CODE_BLOCK,
+    type: CodeBlockPlugin.key,
     match: '```',
-    triggerAtBlockStart: false,
     preFormat,
     format: (editor) => {
-      insertEmptyCodeBlock(editor);
+      insertEmptyCodeBlock(editor, {
+        defaultType: ParagraphPlugin.key,
+        insertNodesOptions: { select: true },
+      });
     },
   },
   {
     mode: 'block',
-    type: ELEMENT_HR,
+    type: HorizontalRulePlugin.key,
     match: ['---', '—-', '___ '],
     format: (editor) => {
-      setNodes(editor, { type: ELEMENT_HR });
-      insertNodes(editor, {
-        type: ELEMENT_DEFAULT,
+      editor.tf.setNodes({ type: HorizontalRulePlugin.key });
+      editor.tf.insertNodes({
+        type: ParagraphPlugin.key,
         children: [{ text: '' }],
       });
     },
