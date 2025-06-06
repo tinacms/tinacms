@@ -1,28 +1,28 @@
+import type { Form } from '@toolkit/forms';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
-import type { Form } from '@toolkit/forms';
 import { Form as FinalForm } from 'react-final-form';
 
-import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
+import type { TinaSchema } from '@tinacms/schema-tools';
+import { formatBranchName } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
-import { LoadingDots } from './loading-dots';
-import { FormPortalProvider } from './form-portal';
-import { FieldsBuilder } from './fields-builder';
-import { ResetForm } from './reset-form';
-import { FormActionMenu } from './form-actions';
-import { useCMS } from '../react-core';
+import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
+import { BiGitBranch } from 'react-icons/bi';
 import { IoMdClose } from 'react-icons/io';
+import { MdOutlineSaveAlt } from 'react-icons/md';
+import { useCMS } from '../react-core';
 import {
   Modal,
-  PopupModal,
-  ModalHeader,
-  ModalBody,
   ModalActions,
+  ModalBody,
+  ModalHeader,
+  PopupModal,
 } from '../react-modals';
-import { BiGitBranch } from 'react-icons/bi';
-import { MdOutlineSaveAlt } from 'react-icons/md';
-import { formatBranchName } from '@toolkit/plugin-branch-switcher';
-import type { TinaSchema } from '@tinacms/schema-tools';
+import { FieldsBuilder } from './fields-builder';
+import { FormActionMenu } from './form-actions';
+import { FormPortalProvider } from './form-portal';
+import { LoadingDots } from './loading-dots';
+import { ResetForm } from './reset-form';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -280,12 +280,12 @@ export const FormStatus = ({ pristine }) => {
           <p className='text-gray-500 text-xs leading-tight whitespace-nowrap mr-2'>
             Unsaved Changes
           </p>
-          <span className='w-3 h-3 flex-0 rounded-full bg-red-300 border border-red-400' />{' '}
+          <span className='w-3 h-3 flex-0 rounded bg-red-300 border border-red-400' />{' '}
         </>
       )}
       {pristine && (
         <>
-          <span className='w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400' />{' '}
+          <span className='w-3 h-3 flex-0 rounded bg-green-300 border border-green-400' />{' '}
         </>
       )}
     </div>
@@ -539,7 +539,7 @@ export const CreateBranchModal = ({
 
 export const PrefixedTextField = ({ prefix = 'tina/', ...props }) => {
   return (
-    <div className='border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded-md shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150'>
+    <div className='border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150'>
       <span className='pl-3 pr-2 py-2 font-medium text-base text-gray-700 opacity-50'>
         {prefix}
       </span>

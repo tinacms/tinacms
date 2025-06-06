@@ -1,29 +1,29 @@
 import {
+  Collection,
+  TinaSchema,
+  normalizePath,
+  resolveForm,
+} from '@tinacms/schema-tools';
+import type { Template } from '@tinacms/schema-tools';
+import {
   BillingWarning,
   Form,
   FormBuilder,
   FormStatus,
   wrapFieldsWithMeta,
 } from '@tinacms/toolkit';
-import { Link, useNavigate, useParams } from 'react-router-dom';
 import React, { useMemo, useState } from 'react';
-import {
-  TinaSchema,
-  resolveForm,
-  normalizePath,
-  Collection,
-} from '@tinacms/schema-tools';
-import type { Template } from '@tinacms/schema-tools';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
-import GetCMS from '../components/GetCMS';
-import GetCollection from '../components/GetCollection';
 import { LocalWarning } from '@tinacms/toolkit';
-import { PageWrapper } from '../components/Page';
-import { TinaAdminApi } from '../api';
 import type { TinaCMS } from '@tinacms/toolkit';
 import { FaLock, FaUnlock } from 'react-icons/fa';
-import { useCollectionFolder } from './utils';
+import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
+import GetCMS from '../components/GetCMS';
+import GetCollection from '../components/GetCollection';
+import { PageWrapper } from '../components/Page';
+import { useCollectionFolder } from './utils';
 
 const createDocument = async (
   cms: TinaCMS,
@@ -108,7 +108,7 @@ const FilenameInput = (props) => {
     >
       <input
         type='text'
-        className={`shadow-inner focus:shadow-outline focus:border-blue-500 focus:outline-none block text-base pr-3 truncate py-2 w-full border transition-all ease-out duration-150 focus:text-gray-900 rounded-md ${
+        className={`shadow-inner focus:shadow-outline focus:border-blue-500 focus:outline-none block text-base pr-3 truncate py-2 w-full border transition-all ease-out duration-150 focus:text-gray-900 rounded ${
           props.readonly || !filenameTouched
             ? 'bg-gray-50 text-gray-300  border-gray-150 pointer-events-none pl-8 group-hover:bg-white group-hover:text-gray-600  group-hover:border-gray-200'
             : 'bg-white text-gray-600  border-gray-200 pl-3'
@@ -351,10 +351,12 @@ export const RenderForm = ({
   return (
     <PageWrapper>
       <>
-        {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
+        <div className='pt-2 px-6 bg-white'>
+          {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
+        </div>
 
         <div
-          className={`pt-10 xl:pt-3 pb-10 xl:pb-4 px-20 xl:px-12 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
+          className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
         >
           <div className='w-full flex gap-1.5 justify-between items-center'>
             <Link

@@ -484,7 +484,7 @@ const EditButton = ({}) => {
       variant='secondary'
       size='custom'
       onClick={toggleSidebarOpen}
-      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 pl-3 pr-4 transition-all duration-300 ${
+      className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 px-3 transition-all duration-300 ${
         displayState !== 'closed'
           ? 'opacity-0 ease-in pointer-events-none'
           : 'ease-out pointer-events-auto'
