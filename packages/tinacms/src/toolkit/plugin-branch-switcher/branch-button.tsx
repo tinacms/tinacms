@@ -62,10 +62,10 @@ export const BranchPreviewButton = () => {
   const cms = useCMS();
   const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl;
   const branch = cms.api?.tina?.branch;
-  const previewUrl = 'https://preview.tinajs.io/';
-  typeof previewFunction === 'function'
-    ? previewFunction({ branch })?.url
-    : null;
+  const previewUrl =
+    typeof previewFunction === 'function'
+      ? previewFunction({ branch })?.url
+      : null;
 
   if (!previewUrl) {
     return null;
