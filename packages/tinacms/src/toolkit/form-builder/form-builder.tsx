@@ -307,7 +307,7 @@ export const FormWrapper = ({
       className='h-full overflow-y-auto max-h-full bg-gray-50'
     >
       {header}
-      <div className='py-5 px-6 xl:px-12'>
+      <div className='py-5 px-6'>
         <div className='w-full flex justify-center'>
           <div className='w-full'>{children}</div>
         </div>
