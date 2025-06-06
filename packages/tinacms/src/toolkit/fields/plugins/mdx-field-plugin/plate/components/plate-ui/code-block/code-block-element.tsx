@@ -105,6 +105,7 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
           .tina-code-block .hljs-bullet { color: #735c0f; }
           .tina-code-block .hljs-addition { background: #f0fff4; color: #22863a; }
           .tina-code-block .hljs-deletion { background: #ffeef0; color: #b31d28; }
+          .slate-code_line > span:last-child {margin-right: 1rem;}
         `}</style>
         <div className='relative rounded-md bg-[#F1F5F9] shadow-sm'>
           {isEditing ? (
