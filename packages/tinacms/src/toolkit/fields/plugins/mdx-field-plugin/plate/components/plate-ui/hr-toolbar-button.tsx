@@ -24,6 +24,10 @@ const useHorizontalRuleToolbarButton = (state) => {
   const editor = useEditorState();
 
   const onClick = () => {
+    editor.tf.insertNodes({
+      type: ParagraphPlugin.key,
+      children: [{ text: '' }],
+    });
     editor.tf.setNodes({ type: HorizontalRulePlugin.key });
     editor.tf.insertNodes({
       type: ParagraphPlugin.key,
