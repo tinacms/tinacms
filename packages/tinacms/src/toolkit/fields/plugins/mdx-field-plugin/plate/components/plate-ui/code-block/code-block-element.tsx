@@ -108,7 +108,10 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
         `}</style>
         <div className='relative rounded-md bg-[#F1F5F9] shadow-sm'>
           {isEditing ? (
-            <pre className='overflow-x-auto p-4 pt-12 font-mono text-sm leading-[normal] [tab-size:2] print:break-inside-avoid my-2 tina-code-block'>
+            <pre
+              spellCheck={false}
+              className='overflow-x-auto p-4 pt-12 font-mono text-sm leading-[normal] [tab-size:2] print:break-inside-avoid my-2 tina-code-block'
+            >
               <code>{children}</code>
               <ErrorMessage error={codeBlockError} />
             </pre>
