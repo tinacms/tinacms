@@ -535,6 +535,9 @@ export const makeFilterSuffixes = (
   filterChain: (BinaryFilter | TernaryFilter)[],
   index: IndexDefinition
 ): { left?: string; right?: string } | undefined => {
+  if (index.fields.some((field) => field.list)) {
+    return;
+  }
   if (filterChain && filterChain.length) {
     const indexFields = index.fields.map((field) => field.name);
     const orderedFilterChain = [];

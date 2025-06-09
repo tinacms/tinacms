@@ -290,10 +290,12 @@ export class Database {
       }
       this.contentLevel = this.contentNamespace
         ? this.rootLevel
-            .sublevel('_content')
+            .sublevel('_content', SUBLEVEL_OPTIONS)
             .sublevel(this.contentNamespace, SUBLEVEL_OPTIONS)
             .sublevel(version, SUBLEVEL_OPTIONS)
-        : this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS);
+        : this.rootLevel
+            .sublevel('_content', SUBLEVEL_OPTIONS)
+            .sublevel(version, SUBLEVEL_OPTIONS);
     }
 
     // Make sure this error bubbles up to the user
@@ -576,7 +578,6 @@ export class Database {
           filepath,
           collection.path || ''
         );
-        // console.log("folderKey", folderKey);
         const level = collection?.isDetached
           ? this.appLevel.sublevel(collection?.name, SUBLEVEL_OPTIONS)
           : this.contentLevel;
@@ -945,7 +946,7 @@ export class Database {
                   }
                 }
               }
-              for (const conflictedField in conflictedFields) {
+              for (const conflictedField of conflictedFields) {
                 delete templateFieldMap[conflictedField];
               }
               for (const field of Object.values(templateFieldMap)) {
@@ -1035,13 +1036,10 @@ export class Database {
       filterChain: rawFilterChain,
       folder,
     } = queryOptions;
-    // console.log({ folder });
     const keys = [];
     for await (const [key, value] of this.contentLevel.iterator({})) {
-      // console.log("key", key);
       keys.push(key);
     }
-    // console.log({ keys });
     let limit = 50;
     if (first) {
       limit = first;
@@ -1181,7 +1179,6 @@ export class Database {
       endKey = key || '';
       edges = [...edges, { cursor: key, path: filepath, value: itemRecord }];
     }
-    // console.log({ edges });
 
     return {
       edges: await sequential(
@@ -1206,8 +1203,8 @@ export class Database {
             console.log(error);
             if (
               error instanceof Error &&
-              (!path.includes('.tina/__generated__/_graphql.json') ||
-                !path.includes('tina/__generated__/_graphql.json'))
+              !path.includes('.tina/__generated__/_graphql.json') &&
+              !path.includes('tina/__generated__/_graphql.json')
             ) {
               throw new TinaQueryError({
                 originalError: error,

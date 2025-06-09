@@ -1,5 +1,6 @@
 import { MemoryLevel } from 'memory-level';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { TinaSchema } from '..';
 import { OP } from './datalayer';
 import { Database } from './index';
 import { CONTENT_ROOT_PREFIX, Level, SUBLEVEL_OPTIONS } from './level';
@@ -11,6 +12,30 @@ const schema = {
       name: 'posts',
       path: 'content/posts',
       format: 'mdx',
+      indexes: [
+        {
+          name: 'titletimestamp',
+          fields: [
+            {
+              name: 'title',
+            },
+            {
+              name: 'timestamp',
+            },
+          ],
+        },
+        {
+          name: 'timestamptitle',
+          fields: [
+            {
+              name: 'timestamp',
+            },
+            {
+              name: 'title',
+            },
+          ],
+        },
+      ],
       fields: [
         {
           type: 'string',
@@ -22,14 +47,147 @@ const schema = {
           searchable: true,
           uid: false,
         },
+        {
+          type: 'number',
+          label: 'timestamp',
+          name: 'timestamp',
+          isTitle: false,
+          required: false,
+          namespace: ['post', 'timestamp'],
+          searchable: true,
+          uid: false,
+        },
+        {
+          type: 'string',
+          label: 'Author',
+          name: 'author',
+          isTitle: false,
+          required: false,
+          namespace: ['post', 'author'],
+          searchable: true,
+          uid: false,
+        },
+        {
+          type: 'string',
+          label: 'Category',
+          name: 'category',
+          isTitle: false,
+          required: false,
+          namespace: ['post', 'category'],
+          searchable: true,
+          list: true,
+        },
+      ],
+    },
+    {
+      label: 'Pages',
+      name: 'pages',
+      path: 'content/pages',
+      templates: [
+        {
+          label: 'Marketing Page',
+          name: 'marketing-page',
+          fields: [
+            {
+              type: 'string',
+              label: 'Title',
+              name: 'title',
+              isTitle: true,
+              required: true,
+              namespace: ['page', 'title'],
+              searchable: true,
+              uid: false,
+            },
+            {
+              type: 'string',
+              label: 'Order',
+              name: 'order',
+              namespace: ['page', 'order'],
+              searchable: true,
+              uid: false,
+            },
+          ],
+        },
+        {
+          label: 'Contact Page',
+          name: 'contact-page',
+          fields: [
+            {
+              type: 'string',
+              label: 'Title',
+              name: 'title',
+              isTitle: true,
+              required: true,
+              namespace: ['page', 'title'],
+              searchable: true,
+              uid: false,
+            },
+            {
+              type: 'number', // intentionally conflicting type with marketing-page
+              label: 'Order',
+              name: 'order',
+              namespace: ['page', 'order'],
+              searchable: true,
+              uid: false,
+            },
+            {
+              type: 'object',
+              label: 'Contact Info',
+              name: 'contactInfo',
+              fields: [
+                {
+                  type: 'string',
+                  label: 'Email',
+                  name: 'email',
+                  isTitle: false,
+                  required: true,
+                  namespace: ['page', 'contactInfo', 'email'],
+                  searchable: true,
+                  uid: false,
+                },
+                {
+                  type: 'string',
+                  label: 'Phone',
+                  name: 'phone',
+                  isTitle: false,
+                  required: false,
+                  searchable: true,
+                  uid: false,
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],
-};
+} as TinaSchema;
 
-const initSchema = async (level: Level, schema: Record<string, unknown>) => {
-  return level
-    .sublevel('_content', SUBLEVEL_OPTIONS)
+const initSchema = async (
+  level: Level,
+  schema: TinaSchema,
+  version = false,
+  namespace?: string
+) => {
+  let sl = level.sublevel('_content', SUBLEVEL_OPTIONS);
+  if (namespace) {
+    sl = sl.sublevel<string, Record<string, any>>(namespace, SUBLEVEL_OPTIONS);
+  }
+  if (version) {
+    let metadataLevel = level.sublevel('_metadata', SUBLEVEL_OPTIONS);
+    if (namespace) {
+      metadataLevel = metadataLevel.sublevel(namespace, SUBLEVEL_OPTIONS);
+    }
+    let dbVersion: string | undefined;
+    try {
+      dbVersion = (await metadataLevel.get('metadata'))?.version;
+    } catch (e: any) {
+      if (e.code !== 'LEVEL_NOT_FOUND' && e.notFound !== true) throw e;
+      dbVersion = ''; // fallback for first run
+    }
+    sl = sl.sublevel(dbVersion || '', SUBLEVEL_OPTIONS);
+  }
+  return sl
     .sublevel<string, Record<string, any>>(
       CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
@@ -51,32 +209,90 @@ describe('Database', () => {
     expect(db).toBeInstanceOf(Database);
   });
 
-  it('should be able to set, get and delete a value', async () => {
+  it.each([
+    [undefined, false],
+    [undefined, true],
+    ['testNamespace', false],
+    ['abcxyz', true],
+  ])(
+    'should be able to set, get, delete, update a value',
+    async (namespace, version) => {
+      const db = new Database({
+        level,
+        namespace,
+        version,
+      });
+
+      await initSchema(level, schema, version, namespace);
+
+      await db.put('content/posts/foo.mdx', { title: 'mytitle' }, 'posts');
+      const value = await db.get('content/posts/foo.mdx');
+      expect(value).toStrictEqual({
+        title: 'mytitle',
+        _collection: 'posts',
+        _template: 'posts',
+        _relativePath: 'foo.mdx',
+        _id: 'content/posts/foo.mdx',
+        _keepTemplateKey: false,
+      });
+
+      await db.put('content/posts/foo.mdx', { title: 'newtitle' }, 'posts');
+      const updatedValue = await db.get('content/posts/foo.mdx');
+      expect(updatedValue).toStrictEqual({
+        title: 'newtitle',
+        _collection: 'posts',
+        _template: 'posts',
+        _relativePath: 'foo.mdx',
+        _id: 'content/posts/foo.mdx',
+        _keepTemplateKey: false,
+      });
+
+      await db.delete('content/posts/foo.mdx');
+      let deletedValue;
+      try {
+        deletedValue = await db.get('content/posts/foo.mdx');
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+      }
+      expect(deletedValue).toBeUndefined();
+    }
+  );
+
+  it('handles .gitkeep files', async () => {
     const db = new Database({
       level,
     });
 
     await initSchema(level, schema);
 
-    await db.put('content/posts/foo.mdx', { title: 'mytitle' }, 'posts');
-    const value = await db.get('content/posts/foo.mdx');
+    await db.put('content/posts/.gitkeep.mdx', {}, 'posts');
+    const value = await db.get('content/posts/.gitkeep.mdx');
     expect(value).toStrictEqual({
-      title: 'mytitle',
       _collection: 'posts',
       _template: 'posts',
-      _relativePath: 'foo.mdx',
-      _id: 'content/posts/foo.mdx',
+      _relativePath: '.gitkeep.mdx',
+      _id: 'content/posts/.gitkeep.mdx',
       _keepTemplateKey: false,
     });
-    await db.delete('content/posts/foo.mdx');
-    let deletedValue;
-    try {
-      deletedValue = await db.get('content/posts/foo.mdx');
-    } catch (e) {
-      expect(e).toBeInstanceOf(Error);
-    }
-    expect(deletedValue).toBeUndefined();
   });
+
+  it.each([[undefined], ['abcxyz']])(
+    'sets and gets metadata',
+    async (namespace) => {
+      const db = new Database({
+        level,
+        namespace,
+      });
+
+      await initSchema(level, schema);
+
+      const metadata = await db.getMetadata('foo');
+      expect(metadata).toBeUndefined();
+      await db.setMetadata('foo', 'bar');
+      const updatedMetadata = await db.getMetadata('foo');
+      expect(updatedMetadata).toBe('bar');
+    }
+  );
 
   describe('query', () => {
     it('orders results using default sort key', async () => {
@@ -188,7 +404,6 @@ describe('Database', () => {
           },
           (item) => item
         );
-        console.log(results?.edges);
         expect(results?.edges).toHaveLength(2);
         expect(results?.edges[0].node).toStrictEqual(
           'content/posts/e3ff5a1eaf5c7b3c2aa59c602ae98ae5988f33c8.mdx'
@@ -449,6 +664,48 @@ describe('Database', () => {
         expect(results?.edges[0].node).toStrictEqual('content/posts/foo.mdx');
       });
 
+      it('author equals on custom index', async () => {
+        const db = new Database({
+          level,
+        });
+
+        await initSchema(level, schema);
+
+        await db.put(
+          'content/posts/foo.mdx',
+          { title: 'apple', timestamp: 1, author: 'sam' },
+          'posts'
+        );
+        await db.put(
+          'content/posts/bar.mdx',
+          { title: 'berry', timestamp: 2, author: 'bill' },
+          'posts'
+        );
+        await db.put(
+          'content/posts/baz.mdx',
+          { title: 'clam', timestamp: 3, author: 'ann' },
+          'posts'
+        );
+
+        const results = await db.query(
+          {
+            collection: 'posts',
+            sort: 'timestamptitle',
+            filterChain: [
+              {
+                pathExpression: 'author',
+                operator: OP.EQ,
+                rightOperand: 'sam',
+                type: 'string',
+                list: false,
+              },
+            ],
+          },
+          (item) => item
+        );
+        expect(results?.edges).toHaveLength(1);
+      });
+
       it('title equals default sort', async () => {
         const db = new Database({
           level,
@@ -478,6 +735,38 @@ describe('Database', () => {
         expect(results?.edges).toHaveLength(1);
         expect(results?.edges[0].node).toStrictEqual('content/posts/foo.mdx');
       });
+
+      it('title equals non-existent sort', async () => {
+        const db = new Database({
+          level,
+        });
+
+        await initSchema(level, schema);
+
+        await db.put('content/posts/foo.mdx', { title: 'apple' }, 'posts');
+        await db.put('content/posts/bar.mdx', { title: 'berry' }, 'posts');
+        await db.put('content/posts/baz.mdx', { title: 'clam' }, 'posts');
+
+        const results = await db.query(
+          {
+            collection: 'posts',
+            sort: 'nonExistentSort',
+            filterChain: [
+              {
+                pathExpression: 'title',
+                operator: OP.EQ,
+                rightOperand: 'apple',
+                type: 'string',
+                list: false,
+              },
+            ],
+          },
+          (item) => item
+        );
+        expect(results?.edges).toHaveLength(1);
+        expect(results?.edges[0].node).toStrictEqual('content/posts/foo.mdx');
+      });
+
       it('title equals', async () => {
         const db = new Database({
           level,
@@ -734,6 +1023,50 @@ describe('Database', () => {
         expect(results?.edges).toHaveLength(1);
         expect(results?.edges[0].node).toStrictEqual('content/posts/bar.mdx');
       });
+
+      it('category equals list field', async () => {
+        const db = new Database({
+          level,
+        });
+
+        await initSchema(level, schema);
+
+        await db.put(
+          'content/posts/foo.mdx',
+          { title: 'apple', category: ['small', 'large'] },
+          'posts'
+        );
+        await db.put(
+          'content/posts/bar.mdx',
+          { title: 'berry', category: ['small', 'medium'] },
+          'posts'
+        );
+        await db.put(
+          'content/posts/baz.mdx',
+          { title: 'clam', category: ['medium', 'large'] },
+          'posts'
+        );
+
+        const results = await db.query(
+          {
+            collection: 'posts',
+            sort: 'category',
+            filterChain: [
+              {
+                pathExpression: 'category',
+                operator: OP.EQ,
+                rightOperand: 'small',
+                type: 'string',
+                list: true,
+              },
+            ],
+          },
+          (item) => item
+        );
+        expect(results?.edges).toHaveLength(2);
+        expect(results?.edges[0].node).toStrictEqual('content/posts/foo.mdx');
+        expect(results?.edges[1].node).toStrictEqual('content/posts/bar.mdx');
+      });
     });
 
     describe('ternary filter', () => {
@@ -872,6 +1205,84 @@ describe('Database', () => {
         expect(results?.edges[1].node).toStrictEqual('content/posts/bar.mdx');
         expect(results?.edges[2].node).toStrictEqual('content/posts/baz.mdx');
       });
+    });
+
+    it('skips keys that do not match the expected index key format', async () => {
+      const db = new Database({ level });
+      await initSchema(level, schema);
+
+      // Insert a valid document
+      await db.put(
+        'content/posts/foo.mdx',
+        { title: 'apple', timestamp: 1 },
+        'posts'
+      );
+
+      // manually insert a malformed key that does not match the expected index key format
+      const sublevel = db.contentLevel
+        ?.sublevel('posts', SUBLEVEL_OPTIONS)
+        .sublevel('title', SUBLEVEL_OPTIONS);
+      await sublevel?.put('appleWRONGSEPARATORcontent/posts/bar.mdx', {});
+
+      // Query should skip the malformed key and only return the valid one
+      const results = await db.query(
+        {
+          collection: 'posts',
+          sort: 'title',
+        },
+        (item) => item
+      );
+
+      expect(results?.edges.map((e) => e.node)).toContain(
+        'content/posts/foo.mdx'
+      );
+      expect(results?.edges.map((e) => e.node)).not.toContain(
+        'content/posts/bar.mdx'
+      );
+    });
+
+    it('throws TinaQueryError if the hydrator throws', async () => {
+      const db = new Database({ level });
+      await initSchema(level, schema);
+
+      await db.put('content/posts/foo.mdx', { title: 'apple' }, 'posts');
+
+      // Hydrator that always throws
+      const badHydrator = () => {
+        throw new Error('Hydrator failed!');
+      };
+
+      await expect(
+        db.query(
+          {
+            collection: 'posts',
+            sort: 'title',
+          },
+          badHydrator
+        )
+      ).rejects.toThrow(/Error querying file/);
+    });
+
+    it('throws a non-Error object directly from the hydrator', async () => {
+      const db = new Database({ level });
+      await initSchema(level, schema);
+
+      await db.put('content/posts/foo.mdx', { title: 'apple' }, 'posts');
+
+      // Hydrator that throws a string
+      const badHydrator = () => {
+        throw 'not an error object';
+      };
+
+      await expect(
+        db.query(
+          {
+            collection: 'posts',
+            sort: 'title',
+          },
+          badHydrator
+        )
+      ).rejects.toBe('not an error object');
     });
   });
 });
