@@ -1,5 +1,13 @@
 # tinacms
 
+## 2.7.9
+
+### Patch Changes
+
+- [#5734](https://github.com/tinacms/tinacms/pull/5734) [`2a3ed6c`](https://github.com/tinacms/tinacms/commit/2a3ed6c3ec3233fd90fd94f3dd3d0243aaad079a) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collection list - simplified search input design
+
+- [#5715](https://github.com/tinacms/tinacms/pull/5715) [`bc47f93`](https://github.com/tinacms/tinacms/commit/bc47f938431c400714808613f633b05659a87be1) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - refactor: deprecate git media store
+
 ## 2.7.8
 
 ### Patch Changes
