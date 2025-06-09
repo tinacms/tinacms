@@ -700,7 +700,6 @@ export const makeFolderOpsForCollection = <T extends object>(
   level: Level,
   escapeStr: StringEscaper = stringEscaper
 ): BatchOp[] => {
-  // console.log("makeFolderOpsForCollection");
   const result: BatchOp[] = [];
 
   const data: any = {};
