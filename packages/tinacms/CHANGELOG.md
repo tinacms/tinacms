@@ -1,5 +1,25 @@
 # tinacms
 
+## 2.7.8
+
+### Patch Changes
+
+- [#5680](https://github.com/tinacms/tinacms/pull/5680) [`5e36123`](https://github.com/tinacms/tinacms/commit/5e361239a372e21dda624d17b4ff274bab23ce90) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collections - Add folder button is now always visible
+  When the collection is using templates, the button will be disabled and a tooltip as to why
+
+- [#5697](https://github.com/tinacms/tinacms/pull/5697) [`856e07a`](https://github.com/tinacms/tinacms/commit/856e07a0b8d742ee78d5eba565623cf081a61534) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - - ✏️ Rename `CreateBranchModel` to `CreateBranchModal`
+
+  - Add Deprecation no `CreateBranchModel`
+
+- [#5691](https://github.com/tinacms/tinacms/pull/5691) [`4d9c8ab`](https://github.com/tinacms/tinacms/commit/4d9c8abf6badd1bcc833bda432ab22dace4925ae) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - 🐛 Bug - Fix issue where editorial workflow fails to save from preview when path ends in slash
+
+- [#5668](https://github.com/tinacms/tinacms/pull/5668) [`7346dc9`](https://github.com/tinacms/tinacms/commit/7346dc996fd81ecb395b62f373976512e8224c21) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Allow tel links
+
+- Updated dependencies [[`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734)]:
+  - @tinacms/schema-tools@1.7.4
+  - @tinacms/mdx@1.6.3
+  - @tinacms/search@1.0.45
+
 ## 2.7.7
 
 ### Patch Changes

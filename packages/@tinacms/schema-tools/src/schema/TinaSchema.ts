@@ -9,7 +9,7 @@ import type {
   TinaField,
 } from '../types/index';
 import { lastItem, assertShape } from '../util';
-import { normalizePath } from '../util/normalizePath';
+import { canonicalPath } from '../util/normalizePath';
 
 type Version = {
   fullVersion: string;
@@ -116,6 +116,7 @@ export class TinaSchema {
       format: collection.format || 'md',
     };
   };
+
   public getCollections = () => {
     return (
       this.schema.collections.map((collection) =>
@@ -123,14 +124,15 @@ export class TinaSchema {
       ) || []
     );
   };
+
   public getCollectionByFullPath = (filepath: string) => {
     const fileExtension = filepath.split('.').pop();
-    const normalizedPath = filepath.replace(/\\/g, '/');
+    const canonicalFilepath = canonicalPath(filepath);
 
     const possibleCollections = this.getCollections().filter((collection) => {
       // filter out file extensions that don't match the collection format
       if (
-        !normalizedPath.endsWith(`.gitkeep.${collection.format || 'md'}`) &&
+        !canonicalFilepath.endsWith(`.gitkeep.${collection.format || 'md'}`) &&
         fileExtension !== (collection.format || 'md')
       ) {
         return false;
@@ -138,15 +140,17 @@ export class TinaSchema {
       if (collection?.match?.include || collection?.match?.exclude) {
         // if the collection has a match or exclude, we need to check if the file matches
         const matches = this.getMatches({ collection });
-        const match = picomatch.isMatch(normalizedPath, matches);
+        const match = picomatch.isMatch(canonicalFilepath, matches);
 
         if (!match) {
           return false;
         }
       }
-      // add / to the end of the path if it is not "''"
-      const path = collection.path ? collection.path.replace(/\/?$/, '/') : '';
-      return normalizedPath.startsWith(path);
+      const collectionPath = canonicalPath(collection.path);
+      return (
+        collectionPath === '' ||
+        canonicalFilepath.startsWith(`${collectionPath}/`)
+      );
     });
 
     // No matches
@@ -300,6 +304,7 @@ export class TinaSchema {
       [collectionName]: this.transformCollectablePayload(payload, collection),
     };
   };
+
   private transformCollectablePayload = (
     payload: object,
     collection: Collectable
@@ -561,18 +566,18 @@ export class TinaSchema {
       typeof collectionOrString === 'string'
         ? this.getCollection(collectionOrString)
         : collectionOrString;
-    const normalPath = normalizePath(collection.path);
+    const collectionPath = canonicalPath(collection.path);
 
     // if normalPath is empty, we don't want to add a trailing slash
-    const pathSuffix = normalPath ? '/' : '';
+    const pathSuffix = collectionPath ? '/' : '';
     const format = collection.format || 'md';
     const matches: string[] = [];
     if (collection?.match?.include) {
-      const match = `${normalPath}${pathSuffix}${collection.match.include}.${format}`;
+      const match = `${collectionPath}${pathSuffix}${collection.match.include}.${format}`;
       matches.push(match);
     }
     if (collection?.match?.exclude) {
-      const exclude = `!(${normalPath}${pathSuffix}${collection.match.exclude}.${format})`;
+      const exclude = `!(${collectionPath}${pathSuffix}${collection.match.exclude}.${format})`;
       matches.push(exclude);
     }
     return matches;

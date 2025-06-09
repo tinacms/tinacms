@@ -1,3 +1,4 @@
+import { ContentFrontmatterFormat } from '@tinacms/schema-tools';
 import { Framework, GeneratedFileType } from '../';
 
 export type Config = {
@@ -6,7 +7,7 @@ export type Config = {
   framework: Framework;
   packageManager: 'pnpm' | 'yarn' | 'npm';
   forestryMigrate: boolean;
-  frontMatterFormat?: 'yaml' | 'toml' | 'json';
+  frontMatterFormat?: ContentFrontmatterFormat;
   hosting?: 'tina-cloud' | 'self-host';
   gitProvider?: PromptGitProvider;
   databaseAdapter?: PromptDatabaseAdapter;

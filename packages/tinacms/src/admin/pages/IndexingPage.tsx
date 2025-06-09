@@ -1,3 +1,4 @@
+import { canonicalPath } from '@tinacms/schema-tools';
 import { formatBranchName, useBranchData, useCMS } from '@tinacms/toolkit';
 import React, { FC, useEffect } from 'react';
 import { BiError, BiLoaderAlt } from 'react-icons/bi';
@@ -5,7 +6,6 @@ import { useSearchParams } from 'react-router-dom';
 import { Client } from '../../internalClient';
 import { TinaAdminApi } from '../api';
 
-// TODO: Scott B styles
 type IndexingState =
   | 'starting'
   | 'indexing'
@@ -104,7 +104,10 @@ export const IndexingPage: FC = () => {
 
           const api = new TinaAdminApi(cms);
           const params = api.schema.transformPayload(collection.name, values);
-          const relativePath = fullPath.replace(`${collection.path}/`, '');
+          const relativePath = pathRelativeToCollection(
+            collection.path,
+            fullPath
+          );
 
           if (await api.isAuthenticated()) {
             if (kind === 'delete') {
@@ -197,3 +200,17 @@ const Wrapper = ({ children }: any) => (
     {children}
   </div>
 );
+
+const pathRelativeToCollection = (
+  collectionPath: string,
+  fullPath: string
+): string => {
+  const cleanCollectionPath = canonicalPath(collectionPath) + '/';
+  const cleanFullPath = canonicalPath(fullPath);
+  if (cleanFullPath.startsWith(cleanCollectionPath)) {
+    return cleanFullPath.substring(cleanCollectionPath.length);
+  }
+  throw new Error(
+    `Path ${fullPath} not within collection path ${collectionPath}`
+  );
+};
