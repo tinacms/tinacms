@@ -713,7 +713,6 @@ export const makeFolderOpsForCollection = <T extends object>(
   const baseCharacter = 'a'.charCodeAt(0);
 
   for (const [folderName, folder] of Object.entries(folderTree)) {
-    // console.log({ folderName, folder });
     const parentFolderKey =
       folderName === FOLDER_ROOT ? FOLDER_ROOT : sha.hex(folderName);
     const folderCollectionSublevel = level.sublevel(
@@ -752,7 +751,6 @@ export const makeFolderOpsForCollection = <T extends object>(
     }
 
     if (folderName !== FOLDER_ROOT) {
-      // console.log("should add parent folder");
       result.push({
         type: 'put',
         key: `${collection.path}/${parentFolderKey}.${collection.format}`,
@@ -807,7 +805,6 @@ export const makeIndexOpsForDocument = <T extends object>(
       }
     }
   }
-  // console.log({ result });
   return result;
 };
 
