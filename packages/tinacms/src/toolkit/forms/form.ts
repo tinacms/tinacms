@@ -48,7 +48,7 @@ export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   /**
    * Where to save the form within the content directory on next submission.
    */
-  path?: string
+  path?: string;
 }
 
 export class Form<S = any, F extends Field = AnyField> implements Plugin {
