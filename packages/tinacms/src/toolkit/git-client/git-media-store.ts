@@ -7,6 +7,10 @@ import {
 } from '@toolkit/core';
 import { GitClient } from './git-client';
 
+/**
+ * @deprecated as the API is clunky and hard to use. Mutations should now be
+ * done via Graphql. This will be removed by July 2025.
+ */
 export class GitMediaStore implements MediaStore {
   accept = '*';
 
@@ -14,6 +18,9 @@ export class GitMediaStore implements MediaStore {
     //
   }
 
+  /**
+   * @deprecated
+   */
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
     const uploaded: Media[] = [];
 
@@ -36,6 +43,9 @@ export class GitMediaStore implements MediaStore {
 
     return uploaded;
   }
+  /**
+   * @deprecated
+   */
   async list(options?: MediaListOptions): Promise<MediaList> {
     const directory = options?.directory ?? '';
     const offset = (options?.offset as number) ?? 0;
@@ -47,6 +57,9 @@ export class GitMediaStore implements MediaStore {
       nextOffset: nextOffset(offset, limit, file.content.length),
     };
   }
+  /**
+   * @deprecated
+   */
   async delete(media: Media): Promise<void> {
     return this.client.deleteFromDisk({
       relPath: media.id,
