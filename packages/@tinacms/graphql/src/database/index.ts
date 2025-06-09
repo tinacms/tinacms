@@ -651,7 +651,6 @@ export class Database {
             : [];
         }
 
-        // TODO do we need to handle deletes
         let folderOps: BatchOp[];
         if (collection) {
           folderOps = makeFolderOpsForCollection(
