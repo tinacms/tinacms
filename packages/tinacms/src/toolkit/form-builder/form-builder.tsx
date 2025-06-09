@@ -114,14 +114,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const schema: TinaSchema = cms.api.tina.schema;
 
   React.useEffect(() => {
-    const collection = schema.getCollectionByFullPath(tinaForm.id);
+    const collection = schema.getCollectionByFullPath(tinaForm.path);
     if (collection?.ui?.beforeSubmit) {
       tinaForm.beforeSubmit = (values: any) =>
         collection.ui.beforeSubmit({ cms, form: tinaForm, values });
     } else {
       tinaForm.beforeSubmit = undefined;
     }
-  }, [tinaForm.id]);
+  }, [tinaForm.path]);
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
@@ -209,7 +209,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
               <CreateBranchModal
                 safeSubmit={safeSubmit}
                 crudType={tinaForm.crudType}
-                path={tinaForm.id}
+                path={tinaForm.path}
                 values={tinaForm.values}
                 close={() => setCreateBranchModalOpen(false)}
               />

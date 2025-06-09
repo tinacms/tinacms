@@ -3,6 +3,7 @@ import {
   Form,
   FormBuilder,
   FormStatus,
+  TinaForm,
   wrapFieldsWithMeta,
 } from '@tinacms/toolkit';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -262,7 +263,7 @@ export const RenderForm = ({
             folderName && !filename?.startsWith('/') ? `/${folderName}/` : '/';
 
           // keeps the forms relative path in sync with the filename
-          form.id =
+          form.path =
             schemaCollection.path +
             appendFolder +
             `${filename}.${schemaCollection.format || 'md'}`;
