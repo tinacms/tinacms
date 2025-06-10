@@ -16,7 +16,6 @@ const trimPrefix = (branchName: string) => {
 
 export const BranchButton = () => {
   const [open, setOpen] = React.useState(false);
-  const openModal = () => setOpen(true);
   const { currentBranch } = useBranchData();
 
   const cms = useCMS();
@@ -30,7 +29,7 @@ export const BranchButton = () => {
             ? 'text-white hover:text-blue-50 bg-blue-500 hover:bg-blue-400 border-0'
             : 'text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100'
         }`}
-        onClick={openModal}
+        onClick={() => setOpen(true)}
       >
         {isProtected ? (
           <BiLockAlt className='flex-shrink-0 w-4.5 h-auto opacity-70 text-white' />
@@ -58,7 +57,9 @@ export const BranchButton = () => {
   );
 };
 
-export const BranchPreviewButton = () => {
+export const BranchPreviewButton = (
+  props: React.HTMLProps<HTMLButtonElement>
+) => {
   const cms = useCMS();
   const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl;
   const branch = cms.api?.tina?.branch;
@@ -73,13 +74,15 @@ export const BranchPreviewButton = () => {
 
   return (
     <button
-      className='pointer-events-auto flex min-w-0	shrink gap-1 items-center justify-between form-select text-sm h-10 px-4 shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100 transition-color duration-150 ease-out rounded focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight min-w-[5rem]'
+      className='my-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+      {...props}
       onClick={() => {
         window.open(previewUrl, '_blank');
       }}
+      title='Preview site in new tab'
     >
-      <span className='truncate max-w-full min-w-0 shrink'>Preview</span>
-      <BiLinkExternal className='flex-shrink-0 w-4 h-auto text-blue-500/70 ml-1' />
+      <span className='sr-only'>Preview</span>
+      <BiLinkExternal className='h-5 w-auto' />
     </button>
   );
 };

@@ -9,8 +9,8 @@ import { TinaCMS } from '@toolkit/tina-cms';
 import * as React from 'react';
 import { useState } from 'react';
 import { BsCheckCircleFill, BsExclamationOctagonFill } from 'react-icons/bs';
-import { HiOutlineClipboardList } from 'react-icons/hi';
 import { MdSyncProblem } from 'react-icons/md';
+import { TbLogs } from 'react-icons/tb';
 
 type EventListState = 'loading' | 'success' | 'error' | 'unauthorized';
 
@@ -228,7 +228,7 @@ export const SyncStatusButton = ({
     <>
       <button onClick={() => setEventsOpen(true)} {...buttonProps}>
         {syncStatus.state !== 'error' ? (
-          <HiOutlineClipboardList className='w-6 h-auto mr-2' />
+          <TbLogs className='w-6 h-auto mr-2' />
         ) : (
           <MdSyncProblem className='w-6 h-auto mr-2 text-red-400' />
         )}{' '}

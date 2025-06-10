@@ -7,6 +7,7 @@ import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
 import { useCMS, useSubscribable } from '@toolkit/react-core';
 import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
 import { Button } from '@toolkit/styles';
+import { Play } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
 import { BiMenu } from 'react-icons/bi';
@@ -315,18 +316,23 @@ const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
       <div className='flex-grow-0 w-full'>
         {!isLocalMode && <BillingWarning />}
 
-        <div className='px-2 w-full flex gap-3 items-center justify-between pointer-events-none'>
-          <div>
+        <div className='w-full flex justify-between items-center'>
+          <div className='flex'>
             <button
-              className='pointer-events-auto m-2 p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+              className='m-2 p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleMenu}
             >
               <BiMenu className='h-6 w-auto text-gray-600' />
             </button>
+
+            {branchingEnabled && !isLocalMode && <BranchButton />}
           </div>
-          <div>
+
+          <div className='flex'>
+            {branchingEnabled && !isLocalMode && <BranchPreviewButton />}
+
             <button
-              className='pointer-events-auto m-2 p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+              className='m-2 p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleSidebarOpen}
             >
               <PiSidebarSimpleLight className='h-6 w-auto text-gray-600' />
@@ -335,15 +341,11 @@ const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
         </div>
       </div>
 
-      <div className='px-4'>
-        {isLocalMode && <LocalWarning />}
-        {branchingEnabled && !isLocalMode && (
-          <div className='flex justify-between items-center'>
-            <BranchButton />
-            <BranchPreviewButton />
-          </div>
-        )}
-      </div>
+      {isLocalMode && (
+        <div className='px-4'>
+          <LocalWarning />
+        </div>
+      )}
     </>
   );
 };
