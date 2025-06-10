@@ -2,8 +2,10 @@
 
 */
 
-import { JSONPath } from 'jsonpath-plus';
+import path from 'path';
+import type { Collection } from '@tinacms/schema-tools';
 import sha from 'js-sha1';
+import { JSONPath } from 'jsonpath-plus';
 import {
   ARRAY_ITEM_VALUE_SEPARATOR,
   BatchOp,
@@ -12,8 +14,6 @@ import {
   Level,
   SUBLEVEL_OPTIONS,
 } from './level';
-import type { Collection } from '@tinacms/schema-tools';
-import path from 'path';
 import { normalizePath } from './util';
 
 export enum OP {
@@ -173,7 +173,7 @@ export const coerceFilterChainOperands = (
   escapeString: StringEscaper = stringEscaper
 ) => {
   const result: (BinaryFilter | TernaryFilter)[] = [];
-  if (filterChain.length) {
+  if (filterChain?.length) {
     // convert operands by type
     for (const filter of filterChain) {
       const dataType: string = filter.type;
@@ -535,6 +535,9 @@ export const makeFilterSuffixes = (
   filterChain: (BinaryFilter | TernaryFilter)[],
   index: IndexDefinition
 ): { left?: string; right?: string } | undefined => {
+  if (index.fields.some((field) => field.list)) {
+    return;
+  }
   if (filterChain && filterChain.length) {
     const indexFields = index.fields.map((field) => field.name);
     const orderedFilterChain = [];

@@ -290,10 +290,12 @@ export class Database {
       }
       this.contentLevel = this.contentNamespace
         ? this.rootLevel
-            .sublevel('_content')
+            .sublevel('_content', SUBLEVEL_OPTIONS)
             .sublevel(this.contentNamespace, SUBLEVEL_OPTIONS)
             .sublevel(version, SUBLEVEL_OPTIONS)
-        : this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS);
+        : this.rootLevel
+            .sublevel('_content', SUBLEVEL_OPTIONS)
+            .sublevel(version, SUBLEVEL_OPTIONS);
     }
 
     // Make sure this error bubbles up to the user
@@ -649,9 +651,21 @@ export class Database {
             : [];
         }
 
+        let folderOps: BatchOp[];
+        if (collection) {
+          folderOps = makeFolderOpsForCollection(
+            folderTreeBuilder.tree,
+            collection,
+            collectionIndexDefinitions,
+            'put',
+            level
+          );
+        }
+
         const ops: BatchOp[] = [
           ...delOps,
           ...putOps,
+          ...folderOps,
           {
             type: 'put',
             key: normalizedPath,
@@ -931,7 +945,7 @@ export class Database {
                   }
                 }
               }
-              for (const conflictedField in conflictedFields) {
+              for (const conflictedField of conflictedFields) {
                 delete templateFieldMap[conflictedField];
               }
               for (const field of Object.values(templateFieldMap)) {
@@ -1129,6 +1143,9 @@ export class Database {
         // for index match fields, convert the array value from comma-separated string to array
         for (const field of indexDefinition.fields) {
           if (itemRecord[field.name]) {
+            // TODO this looks like it is now unreachable code since
+            // filterSuffixes is always undefined when there is a list field
+            // so this is never reached
             if (field.list) {
               itemRecord[field.name] = itemRecord[field.name].split(
                 ARRAY_ITEM_VALUE_SEPARATOR
@@ -1184,8 +1201,8 @@ export class Database {
             console.log(error);
             if (
               error instanceof Error &&
-              (!path.includes('.tina/__generated__/_graphql.json') ||
-                !path.includes('tina/__generated__/_graphql.json'))
+              !path.includes('.tina/__generated__/_graphql.json') &&
+              !path.includes('tina/__generated__/_graphql.json')
             ) {
               throw new TinaQueryError({
                 originalError: error,
