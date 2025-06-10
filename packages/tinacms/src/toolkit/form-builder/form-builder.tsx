@@ -4,7 +4,10 @@ import { type FC, useEffect } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 
 import type { TinaSchema } from '@tinacms/schema-tools';
-import { formatBranchName, useBranchData } from '@toolkit/plugin-branch-switcher';
+import {
+  formatBranchName,
+  useBranchData,
+} from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import { BiError, BiGitBranch, BiLoaderAlt } from 'react-icons/bi';
@@ -57,7 +60,7 @@ const NoFieldsPlaceholder = () => (
         className='text-center rounded-3xl border border-solid border-gray-100 shadow-[0_2px_3px_rgba(0,0,0,0.12)] font-normal cursor-pointer text-[12px] transition-all duration-100 ease-out bg-white text-gray-700 py-3 pr-5 pl-14 relative no-underline inline-block hover:text-blue-500'
         href='https://tinacms.org/docs/fields'
         target='_blank'
-        rel="noopener noreferrer"
+        rel='noopener noreferrer'
       >
         <Emoji
           className='absolute left-5 top-1/2 origin-center -translate-y-1/2 transition-all duration-100 ease-out'
@@ -472,7 +475,9 @@ export const CreateBranchModal = ({
   const [branchName, setBranchName] = React.useState('');
   const [state, setState] = React.useState<IndexingState>('starting');
   const [errorMessage, setErrorMessage] = React.useState('');
-  const [baseBranch, setBaseBranch] = React.useState<string | undefined>(tinaApi.branch);
+  const [baseBranch, setBaseBranch] = React.useState<string | undefined>(
+    tinaApi.branch
+  );
 
   useEffect(() => {
     const run = async () => {
@@ -500,12 +505,10 @@ export const CreateBranchModal = ({
         }
       } else if (state === 'indexing') {
         try {
-          const [
-            waitForIndexStatusPromise,
-            _cancelWaitForIndexFunc,
-          ] = tinaApi.waitForIndexStatus({
-            ref: branchName,
-          });
+          const [waitForIndexStatusPromise, _cancelWaitForIndexFunc] =
+            tinaApi.waitForIndexStatus({
+              ref: branchName,
+            });
           await waitForIndexStatusPromise;
           cms.alerts.success('Branch indexed.');
           setState('submitting');
@@ -523,17 +526,17 @@ export const CreateBranchModal = ({
           const collection = tinaApi.schema.getCollectionByFullPath(path);
 
           const adminApi = new TinaAdminApi(cms);
-          const params = adminApi.schema.transformPayload(collection.name, values);
-          const relativePath = pathRelativeToCollection(
-            collection.path,
-            path
+          const params = adminApi.schema.transformPayload(
+            collection.name,
+            values
           );
+          const relativePath = pathRelativeToCollection(collection.path, path);
 
           if (await adminApi.isAuthenticated()) {
             if (crudType === 'delete') {
               await adminApi.deleteDocument({
                 collection: collection.name,
-                relativePath: relativePath
+                relativePath: relativePath,
               });
             } else if (crudType === 'create') {
               await adminApi.createDocument(collection, relativePath, params);
@@ -558,8 +561,7 @@ export const CreateBranchModal = ({
           );
           setState('error');
         }
-      }
-      else if (state === 'creatingPR') {
+      } else if (state === 'creatingPR') {
         try {
           const result = await tinaApi.createPullRequest({
             baseBranch,
@@ -572,7 +574,6 @@ export const CreateBranchModal = ({
           cms.alerts.success('Pull request created.');
           setState('done');
           close();
-
         } catch (e) {
           console.error(e);
           cms.alerts.error('Failed to create PR');
@@ -621,7 +622,9 @@ export const CreateBranchModal = ({
       return (
         <div className='flex items-center gap-1 text-red-700 py-4'>
           <BiError className='w-7 h-auto text-red-400 flex-shrink-0' />
-          <span><b>Error:</b> {errorMessage}</span>
+          <span>
+            <b>Error:</b> {errorMessage}
+          </span>
         </div>
       );
     } else {
@@ -644,9 +647,7 @@ export const CreateBranchModal = ({
           <BiGitBranch className='w-6 h-auto mr-1 text-blue-500 opacity-70' />{' '}
           Create Branch
         </ModalHeader>
-        <ModalBody padded={true}>
-          {renderStateContent()}
-        </ModalBody>
+        <ModalBody padded={true}>{renderStateContent()}</ModalBody>
         {state === 'starting' && (
           <ModalActions>
             <Button style={{ flexGrow: 1 }} onClick={close}>
