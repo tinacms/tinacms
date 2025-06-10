@@ -19,7 +19,7 @@ export const TagsField = wrapFieldsWithMeta<
       if (!tag.length) {
         return;
       }
-      form.mutators.push(field.name, 0, tag);
+      form.mutators.push(field.name, tag);
       setValue('');
     },
     [form, field.name]

@@ -59,7 +59,7 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
     } else if (typeof field.defaultItem !== 'undefined') {
       newItem = field.defaultItem;
     }
-    form.mutators.push(field.name, 0, newItem);
+    form.mutators.push(field.name, newItem);
   }, [form, field]);
 
   const items = input.value || [];
