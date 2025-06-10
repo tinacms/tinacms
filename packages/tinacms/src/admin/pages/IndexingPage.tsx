@@ -2,7 +2,6 @@ import { canonicalPath } from '@tinacms/schema-tools';
 import { formatBranchName, useBranchData, useCMS } from '@tinacms/toolkit';
 import React, { FC, useEffect } from 'react';
 import { BiError, BiLoaderAlt } from 'react-icons/bi';
-import { useSearchParams } from 'react-router-dom';
 import { Client } from '../../internalClient';
 import { TinaAdminApi } from '../api';
 
@@ -15,35 +14,38 @@ type IndexingState =
   | 'done'
   | 'error';
 
-export const IndexingPage: FC = () => {
+interface IndexingPageProps {
+  initialState?: IndexingState;
+  kind?: 'create' | 'update' | 'delete';
+  baseBranch?: string;
+  back?: string;
+  fullPath?: string;
+  values?: any;
+  branchName: string;
+}
+
+export const IndexingPage: FC<IndexingPageProps> = ({
+  initialState = 'starting',
+  kind = 'update',
+  baseBranch: initialBaseBranch,
+  back,
+  fullPath,
+  values,
+  branchName,
+}) => {
   const cms = useCMS();
   const tinaApi: Client = cms.api.tina;
   // @ts-ignore
   const currentBranch = tinaApi.branch;
-  const kind = localStorage?.getItem('tina.createBranchState.kind') as
-    | 'create'
-    | 'update'
-    | 'delete';
   const { setCurrentBranch } = useBranchData();
-  const [state, setState] = React.useState(
-    localStorage?.getItem('tina.createBranchState') as IndexingState
-  );
+  const [state, setState] = React.useState<IndexingState>(initialState);
   const [errorMessage, setErrorMessage] = React.useState('');
 
-  const [baseBranch, setBaseBranch] = React.useState(
-    localStorage?.getItem('tina.createBranchState.baseBranch') as string
-  );
-  const [searchParams] = useSearchParams();
-
-  const back = localStorage?.getItem('tina.createBranchState.back');
-  const fullPath = localStorage?.getItem('tina.createBranchState.fullPath');
-  const values = JSON.parse(
-    localStorage?.getItem('tina.createBranchState.values')
+  const [baseBranch, setBaseBranch] = React.useState<string | undefined>(
+    initialBaseBranch
   );
 
-  const [branch, setBranch] = React.useState(
-    ('tina/' + searchParams.get('branch')) as string
-  );
+  const [branch, setBranch] = React.useState<string>(branchName);
 
   useEffect(() => {
     const run = async () => {
@@ -58,9 +60,8 @@ export const IndexingPage: FC = () => {
             throw new Error('Branch creation failed.');
           }
           setBranch(name);
-          localStorage.setItem('tina.createBranchState', 'indexing');
-          cms.alerts.success('Branch created.');
           setState('indexing');
+          cms.alerts.success('Branch created.');
         } catch (e) {
           console.error(e);
           cms.alerts.error('Branch creation failed: ' + e.message);
@@ -82,7 +83,6 @@ export const IndexingPage: FC = () => {
           });
           await waitForIndexStatusPromise;
           cms.alerts.success('Branch indexed.');
-          localStorage.setItem('tina.createBranchState', 'submitting');
           setState('submitting');
         } catch {
           cms.alerts.error('Branch indexing failed.');
@@ -95,10 +95,6 @@ export const IndexingPage: FC = () => {
       if (state === 'submitting') {
         try {
           setBaseBranch(tinaApi.branch);
-          localStorage.setItem(
-            'tina.createBranchState.baseBranch',
-            tinaApi.branch
-          );
           setCurrentBranch(branch);
           const collection = tinaApi.schema.getCollectionByFullPath(fullPath);
 
@@ -123,7 +119,6 @@ export const IndexingPage: FC = () => {
             console.error(authMessage);
             return false;
           }
-          localStorage.setItem('tina.createBranchState', 'creatingPR');
           cms.alerts.success('Content saved.');
           setState('creatingPR');
         } catch (e) {
@@ -146,7 +141,6 @@ export const IndexingPage: FC = () => {
           });
           console.log('PR created', foo);
           cms.alerts.success('Pull request created.');
-          localStorage.setItem('tina.createBranchState', 'done');
           setState('done');
         } catch (e) {
           console.error(e);
@@ -165,6 +159,7 @@ export const IndexingPage: FC = () => {
       run();
     }
   }, [state]);
+
   if (!back || !fullPath || !values || !branch) {
     return (
       <Wrapper>

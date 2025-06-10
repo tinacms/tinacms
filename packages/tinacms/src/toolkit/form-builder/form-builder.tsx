@@ -1,28 +1,29 @@
+import type { Form } from '@toolkit/forms';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
-import type { Form } from '@toolkit/forms';
 import { Form as FinalForm } from 'react-final-form';
 
-import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
+import type { TinaSchema } from '@tinacms/schema-tools';
+import { formatBranchName } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
-import { LoadingDots } from './loading-dots';
-import { FormPortalProvider } from './form-portal';
-import { FieldsBuilder } from './fields-builder';
-import { ResetForm } from './reset-form';
-import { FormActionMenu } from './form-actions';
-import { useCMS } from '../react-core';
+import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
+import { BiGitBranch } from 'react-icons/bi';
 import { IoMdClose } from 'react-icons/io';
+import { MdOutlineSaveAlt } from 'react-icons/md';
+import { IndexingPage } from '../../admin/pages/IndexingPage';
+import { useCMS } from '../react-core';
 import {
   Modal,
-  PopupModal,
-  ModalHeader,
-  ModalBody,
   ModalActions,
+  ModalBody,
+  ModalHeader,
+  PopupModal,
 } from '../react-modals';
-import { BiGitBranch } from 'react-icons/bi';
-import { MdOutlineSaveAlt } from 'react-icons/md';
-import { formatBranchName } from '@toolkit/plugin-branch-switcher';
-import type { TinaSchema } from '@tinacms/schema-tools';
+import { FieldsBuilder } from './fields-builder';
+import { FormActionMenu } from './form-actions';
+import { FormPortalProvider } from './form-portal';
+import { LoadingDots } from './loading-dots';
+import { ResetForm } from './reset-form';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -435,30 +436,33 @@ export const CreateBranchModal = ({
   const [disabled, setDisabled] = React.useState(false);
   const [newBranchName, setNewBranchName] = React.useState('');
   const [error, setError] = React.useState('');
+  const [showIndexingPage, setShowIndexingPage] = React.useState(false);
+  const [branchName, setBranchName] = React.useState('');
 
-  const onCreateBranch = (newBranchName) => {
-    localStorage.setItem('tina.createBranchState', 'starting');
-    localStorage.setItem('tina.createBranchState.fullPath', path);
-    localStorage.setItem(
-      'tina.createBranchState.values',
-      JSON.stringify(values)
-    );
-    localStorage.setItem('tina.createBranchState.kind', crudType);
+  const onCreateBranch = async (newBranchName) => {
+    // Set the branch name to be used in IndexingPage
+    setBranchName(`tina/${newBranchName}`);
 
-    if (crudType === 'create') {
-      localStorage.setItem(
-        'tina.createBranchState.back',
-        // go back to the list view
-        window.location.href.replace('/new', '')
-      );
-    } else {
-      localStorage.setItem('tina.createBranchState.back', window.location.href);
-    }
-    const hash = window.location.hash;
-    const newHash = `#/branch/new?branch=${newBranchName}`;
-    const newUrl = window.location.href.replace(hash, newHash);
-    window.location.href = newUrl;
+    // Show the IndexingPage component instead of navigating
+    setShowIndexingPage(true);
   };
+
+  // If IndexingPage is being shown, render it with the props
+  if (showIndexingPage) {
+    return (
+      <IndexingPage
+        initialState="starting"
+        kind={crudType as 'create' | 'update' | 'delete'}
+        back={crudType === 'create' ?
+          window.location.href.replace('/new', '') :
+          window.location.href
+        }
+        fullPath={path}
+        values={values}
+        branchName={branchName}
+      />
+    );
+  }
 
   return (
     <Modal>
