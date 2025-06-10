@@ -1144,6 +1144,9 @@ export class Database {
         // for index match fields, convert the array value from comma-separated string to array
         for (const field of indexDefinition.fields) {
           if (itemRecord[field.name]) {
+            // TODO this looks like it is unreachable code
+            // filterSuffixes is always undefined when there is a list field
+            // so this is never reached
             if (field.list) {
               itemRecord[field.name] = itemRecord[field.name].split(
                 ARRAY_ITEM_VALUE_SEPARATOR
