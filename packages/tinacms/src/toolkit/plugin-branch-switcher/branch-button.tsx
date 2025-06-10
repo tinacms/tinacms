@@ -6,6 +6,7 @@ import {
   BiLinkExternal,
   BiLockAlt,
 } from 'react-icons/bi';
+import { cn } from '../../utils/cn';
 import { useBranchData } from './branch-data';
 import { BranchModal } from './branch-modal';
 
@@ -22,20 +23,22 @@ export const BranchButton = () => {
   const isProtected = cms.api.tina.usingProtectedBranch();
 
   return (
-    <div className='py-2'>
+    <>
       <button
-        className={`pointer-events-auto flex min-w-0	shrink gap-1 items-center justify-between form-select text-sm h-10 px-4 shadow transition-color duration-150 ease-out rounded focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight min-w-[5rem] ${
+        className={cn(
+          `pointer-events-auto px-3 my-3 flex shrink gap-1 items-center justify-between form-select text-sm shadow transition-color duration-150 ease-out rounded-lg`,
+          `focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out `,
           isProtected
             ? 'text-white hover:text-blue-50 bg-blue-500 hover:bg-blue-400 border-0'
             : 'text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100'
-        }`}
+        )}
         onClick={() => setOpen(true)}
       >
         {isProtected ? (
-          <BiLockAlt className='flex-shrink-0 w-4.5 h-auto opacity-70 text-white' />
+          <BiLockAlt className='flex-shrink-0 h-4 w-auto opacity-70 text-white' />
         ) : (
           <BiGitBranch
-            className={`flex-shrink-0 w-4.5 h-auto opacity-70 text-zinc-400`}
+            className={`flex-shrink-0 h-4 w-auto opacity-70 text-zinc-400`}
           />
         )}
         <span className='truncate max-w-full -mr-1'>
@@ -46,19 +49,13 @@ export const BranchButton = () => {
           aria-hidden='true'
         />
       </button>
-      {open && (
-        <BranchModal
-          close={() => {
-            setOpen(false);
-          }}
-        />
-      )}
-    </div>
+      {open && <BranchModal close={() => setOpen(false)} />}
+    </>
   );
 };
 
 export const BranchPreviewButton = (
-  props: React.HTMLProps<HTMLButtonElement>
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>
 ) => {
   const cms = useCMS();
   const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl;
@@ -74,6 +71,7 @@ export const BranchPreviewButton = (
 
   return (
     <button
+      type='button'
       className='my-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
       {...props}
       onClick={() => {

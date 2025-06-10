@@ -9,6 +9,7 @@ import { BiExit, BiMenu } from 'react-icons/bi';
 import { FiInfo } from 'react-icons/fi';
 import { VscNewFile } from 'react-icons/vsc';
 import { version } from '../../../../package.json';
+import { cn } from '../../../utils/cn';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
 
 interface NavCollection {
@@ -102,14 +103,16 @@ export const Nav = ({
         {...props}
       >
         <div className='flex w-full px-4 py-3 justify-between items-center gap-2 border-b border-gray-200'>
-          {showHamburger && (
-            <button
-              className='pointer-events-auto p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
-              onClick={toggleMenu}
-            >
-              <BiMenu className='h-6 w-auto text-gray-600' />
-            </button>
-          )}
+          <button
+            className={cn(
+              'pointer-events-auto p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded',
+              showHamburger ? '' : 'md:hidden'
+            )}
+            onClick={toggleMenu}
+          >
+            <BiMenu className='h-6 w-auto text-gray-600' />
+          </button>
+
           <span className='text-left inline-flex items-center text-xl tracking-wide text-gray-800/80 flex-1 gap-1'>
             <TinaIcon className='w-10 h-auto -ml-1 fill-orange-500' />
             <span>TinaCMS</span>
