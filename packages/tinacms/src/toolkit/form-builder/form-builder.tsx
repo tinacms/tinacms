@@ -4,13 +4,13 @@ import { type FC, useEffect } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 
 import type { TinaSchema } from '@tinacms/schema-tools';
-import { formatBranchName } from '@toolkit/plugin-branch-switcher';
+import { formatBranchName, useBranchData } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
-import { BiGitBranch } from 'react-icons/bi';
+import { BiError, BiGitBranch, BiLoaderAlt } from 'react-icons/bi';
 import { IoMdClose } from 'react-icons/io';
 import { MdOutlineSaveAlt } from 'react-icons/md';
-import { IndexingPage } from '../../admin/pages/IndexingPage';
+import { TinaAdminApi } from '../../admin/api';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -57,6 +57,7 @@ const NoFieldsPlaceholder = () => (
         className='text-center rounded-3xl border border-solid border-gray-100 shadow-[0_2px_3px_rgba(0,0,0,0.12)] font-normal cursor-pointer text-[12px] transition-all duration-100 ease-out bg-white text-gray-700 py-3 pr-5 pl-14 relative no-underline inline-block hover:text-blue-500'
         href='https://tinacms.org/docs/fields'
         target='_blank'
+        rel="noopener noreferrer"
       >
         <Emoji
           className='absolute left-5 top-1/2 origin-center -translate-y-1/2 transition-all duration-100 ease-out'
@@ -418,6 +419,37 @@ export const CreateBranchModel = ({
   />
 );
 
+const pathRelativeToCollection = (
+  collectionPath: string,
+  fullPath: string
+): string => {
+  // Normalize paths with forward slashes
+  const normalizedCollectionPath = collectionPath.replace(/\\/g, '/');
+  const normalizedFullPath = fullPath.replace(/\\/g, '/');
+
+  // Ensure collection path ends with a slash
+  const collectionPathWithSlash = normalizedCollectionPath.endsWith('/')
+    ? normalizedCollectionPath
+    : normalizedCollectionPath + '/';
+
+  if (normalizedFullPath.startsWith(collectionPathWithSlash)) {
+    return normalizedFullPath.substring(collectionPathWithSlash.length);
+  }
+
+  throw new Error(
+    `Path ${fullPath} not within collection path ${collectionPath}`
+  );
+};
+
+type IndexingState =
+  | 'starting'
+  | 'indexing'
+  | 'submitting'
+  | 'creatingPR'
+  | 'creatingBranch'
+  | 'done'
+  | 'error';
+
 export const CreateBranchModal = ({
   close,
   safeSubmit,
@@ -433,45 +465,139 @@ export const CreateBranchModal = ({
 }) => {
   const cms = useCMS();
   const tinaApi = cms.api.tina;
+  const { setCurrentBranch } = useBranchData();
   const [disabled, setDisabled] = React.useState(false);
   const [newBranchName, setNewBranchName] = React.useState('');
   const [error, setError] = React.useState('');
-  const [showIndexingPage, setShowIndexingPage] = React.useState(false);
   const [branchName, setBranchName] = React.useState('');
+  const [state, setState] = React.useState<IndexingState>('starting');
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const [baseBranch, setBaseBranch] = React.useState<string | undefined>(tinaApi.branch);
 
-  const onCreateBranch = async (newBranchName) => {
-    // Set the branch name to be used in IndexingPage
-    setBranchName(`tina/${newBranchName}`);
+  useEffect(() => {
+    const run = async () => {
+      if (state === 'creatingBranch') {
+        try {
+          console.log('starting', branchName, formatBranchName(branchName));
+          const currentBranch = tinaApi.branch;
+          const name = await tinaApi.createBranch({
+            branchName: formatBranchName(branchName),
+            baseBranch: currentBranch,
+          });
+          if (!name) {
+            throw new Error('Branch creation failed.');
+          }
+          setBranchName(name);
+          setState('indexing');
+          cms.alerts.success('Branch created.');
+        } catch (e) {
+          console.error(e);
+          cms.alerts.error('Branch creation failed: ' + e.message);
+          setErrorMessage(
+            'Branch creation failed, please try again. By refreshing the page.'
+          );
+          setState('error');
+        }
+      } else if (state === 'indexing') {
+        try {
+          const [
+            waitForIndexStatusPromise,
+            _cancelWaitForIndexFunc,
+          ] = tinaApi.waitForIndexStatus({
+            ref: branchName,
+          });
+          await waitForIndexStatusPromise;
+          cms.alerts.success('Branch indexed.');
+          setState('submitting');
+        } catch {
+          cms.alerts.error('Branch indexing failed.');
+          setErrorMessage(
+            'Branch indexing failed, please check the TinaCloud dashboard for more information. To try again chick "re-index" on the branch in the dashboard.'
+          );
+          setState('error');
+        }
+      } else if (state === 'submitting') {
+        try {
+          setBaseBranch(tinaApi.branch);
+          setCurrentBranch(branchName);
+          const collection = tinaApi.schema.getCollectionByFullPath(path);
 
-    // Show the IndexingPage component instead of navigating
-    setShowIndexingPage(true);
+          const adminApi = new TinaAdminApi(cms);
+          const params = adminApi.schema.transformPayload(collection.name, values);
+          const relativePath = pathRelativeToCollection(
+            collection.path,
+            path
+          );
+
+          if (await adminApi.isAuthenticated()) {
+            if (crudType === 'delete') {
+              await adminApi.deleteDocument({
+                collection: collection.name,
+                relativePath: relativePath
+              });
+            } else if (crudType === 'create') {
+              await adminApi.createDocument(collection, relativePath, params);
+            } else {
+              await adminApi.updateDocument(collection, relativePath, params);
+            }
+          } else {
+            const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`;
+            cms.alerts.error(authMessage);
+            console.error(authMessage);
+            setErrorMessage(authMessage);
+            setState('error');
+            return;
+          }
+          cms.alerts.success('Content saved.');
+          setState('creatingPR');
+        } catch (e) {
+          console.error(e);
+          cms.alerts.error('Content save failed.');
+          setErrorMessage(
+            'Content save failed, please try again. If the problem persists please contact support.'
+          );
+          setState('error');
+        }
+      }
+      else if (state === 'creatingPR') {
+        try {
+          const result = await tinaApi.createPullRequest({
+            baseBranch,
+            branch: branchName,
+            title: `${branchName
+              .replace('tina/', '')
+              .replace('-', ' ')} (PR from TinaCMS)`,
+          });
+          console.log('PR created', result);
+          cms.alerts.success('Pull request created.');
+          setState('done');
+          close();
+
+        } catch (e) {
+          console.error(e);
+          cms.alerts.error('Failed to create PR');
+          setErrorMessage(
+            'Failed to create PR, please try again. If the problem persists please contact support.'
+          );
+          setState('error');
+        }
+      }
+    };
+
+    if (state !== 'starting' && state !== 'done' && state !== 'error') {
+      run();
+    }
+  }, [state, branchName, path, values, crudType, baseBranch]);
+
+  const onCreateBranch = async (inputBranchName: string) => {
+    setBranchName(`tina/${inputBranchName}`);
+    setState('creatingBranch');
   };
 
-  // If IndexingPage is being shown, render it with the props
-  if (showIndexingPage) {
-    return (
-      <IndexingPage
-        initialState="starting"
-        kind={crudType as 'create' | 'update' | 'delete'}
-        back={crudType === 'create' ?
-          window.location.href.replace('/new', '') :
-          window.location.href
-        }
-        fullPath={path}
-        values={values}
-        branchName={branchName}
-      />
-    );
-  }
-
-  return (
-    <Modal>
-      <PopupModal>
-        <ModalHeader close={close}>
-          <BiGitBranch className='w-6 h-auto mr-1 text-blue-500 opacity-70' />{' '}
-          Create Branch
-        </ModalHeader>
-        <ModalBody padded={true}>
+  const renderStateContent = () => {
+    if (state === 'starting') {
+      return (
+        <>
           <p className='text-lg text-gray-700 font-bold mb-2'>
             This content is protected 🚧
           </p>
@@ -489,53 +615,83 @@ export const CreateBranchModal = ({
             }}
           />
           {error && <div className='mt-2 text-sm text-red-700'>{error}</div>}
+        </>
+      );
+    } else if (state === 'error') {
+      return (
+        <div className='flex items-center gap-1 text-red-700 py-4'>
+          <BiError className='w-7 h-auto text-red-400 flex-shrink-0' />
+          <span><b>Error:</b> {errorMessage}</span>
+        </div>
+      );
+    } else {
+      return (
+        <div className='flex flex-col items-center gap-4 py-6'>
+          <BiLoaderAlt className='opacity-70 text-blue-400 animate-spin w-10 h-auto' />
+          {state === 'creatingBranch' && <p>Creating branch&hellip;</p>}
+          {state === 'indexing' && <p>Indexing Content&hellip;</p>}
+          {state === 'submitting' && <p>Saving content&hellip;</p>}
+          {state === 'creatingPR' && <p>Creating Pull Request&hellip;</p>}
+        </div>
+      );
+    }
+  };
+
+  return (
+    <Modal>
+      <PopupModal>
+        <ModalHeader close={close}>
+          <BiGitBranch className='w-6 h-auto mr-1 text-blue-500 opacity-70' />{' '}
+          Create Branch
+        </ModalHeader>
+        <ModalBody padded={true}>
+          {renderStateContent()}
         </ModalBody>
-        <ModalActions>
-          <Button style={{ flexGrow: 1 }} onClick={close}>
-            Cancel
-          </Button>
-          <Button
-            variant='primary'
-            style={{ flexGrow: 2 }}
-            disabled={newBranchName === '' || Boolean(error) || disabled}
-            onClick={async () => {
-              setDisabled(true);
-              // get the list of branches form tina
-              const branchList = await tinaApi.listBranches({
-                includeIndexStatus: false,
-              });
-              // filter out the branches that are not content branches
-              const contentBranches = branchList
-                .filter((x) => x?.name?.startsWith('tina/'))
-                .map((x) => x.name.replace('tina/', ''));
+        {state === 'starting' && (
+          <ModalActions>
+            <Button style={{ flexGrow: 1 }} onClick={close}>
+              Cancel
+            </Button>
+            <Button
+              variant='primary'
+              style={{ flexGrow: 2 }}
+              disabled={newBranchName === '' || Boolean(error) || disabled}
+              onClick={async () => {
+                setDisabled(true);
+                const branchList = await tinaApi.listBranches({
+                  includeIndexStatus: false,
+                });
+                const contentBranches = branchList
+                  .filter((x) => x?.name?.startsWith('tina/'))
+                  .map((x) => x.name.replace('tina/', ''));
 
-              // check if the branch already exists
-              if (contentBranches.includes(newBranchName)) {
-                setError('Branch already exists');
-                setDisabled(false);
-                return;
-              }
+                if (contentBranches.includes(newBranchName)) {
+                  setError('Branch already exists');
+                  setDisabled(false);
+                  return;
+                }
 
-              if (!error) onCreateBranch(newBranchName);
-            }}
-          >
-            Create Branch and Save
-          </Button>
-          <OverflowMenu
-            className='-ml-2'
-            toolbarItems={[
-              {
-                name: 'override',
-                label: 'Save to Protected Branch',
-                Icon: <MdOutlineSaveAlt size='1rem' />,
-                onMouseDown: () => {
-                  close();
-                  safeSubmit();
+                if (!error) onCreateBranch(newBranchName);
+              }}
+            >
+              Create Branch and Save
+            </Button>
+            <OverflowMenu
+              className='-ml-2'
+              toolbarItems={[
+                {
+                  name: 'override',
+                  label: 'Save to Protected Branch',
+                  Icon: <MdOutlineSaveAlt size='1rem' />,
+                  onMouseDown: () => {
+                    close();
+                    safeSubmit();
+                  },
                 },
-              },
-            ]}
-          />
-        </ModalActions>
+              ]}
+            />
+          </ModalActions>
+        )}
       </PopupModal>
     </Modal>
   );
