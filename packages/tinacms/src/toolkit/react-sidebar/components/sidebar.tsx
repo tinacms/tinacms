@@ -313,13 +313,13 @@ const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
 
   return (
     <>
-      <div className='flex-grow-0 w-full'>
+      <div className='p-2 flex-grow-0 w-full'>
         {!isLocalMode && <BillingWarning />}
 
         <div className='w-full flex justify-between items-center'>
           <div className='flex'>
             <button
-              className='m-2 p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+              className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleMenu}
             >
               <BiMenu className='h-6 w-auto text-gray-600' />
@@ -332,7 +332,7 @@ const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
             {branchingEnabled && !isLocalMode && <BranchPreviewButton />}
 
             <button
-              className='m-2 p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+              className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleSidebarOpen}
             >
               <PiSidebarSimpleLight className='h-6 w-auto text-gray-600' />

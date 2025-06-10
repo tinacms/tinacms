@@ -26,7 +26,7 @@ export const BranchButton = () => {
     <>
       <button
         className={cn(
-          `pointer-events-auto px-3 my-3 flex shrink gap-1 items-center justify-between form-select text-sm shadow transition-color duration-150 ease-out rounded-lg`,
+          `pointer-events-auto px-3 py-3 flex shrink gap-1 items-center justify-between form-select text-sm shadow transition-color duration-150 ease-out rounded-lg`,
           `focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out `,
           isProtected
             ? 'text-white hover:text-blue-50 bg-blue-500 hover:bg-blue-400 border-0'
@@ -63,7 +63,7 @@ export const BranchPreviewButton = (
   const previewUrl =
     typeof previewFunction === 'function'
       ? previewFunction({ branch })?.url
-      : null;
+      : 'null';
 
   if (!previewUrl) {
     return null;
@@ -72,7 +72,7 @@ export const BranchPreviewButton = (
   return (
     <button
       type='button'
-      className='my-2 p-2 text-gray-500 hover:text-blue-500 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
+      className='p-2 text-gray-500 hover:text-blue-500 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
       {...props}
       onClick={() => {
         window.open(previewUrl, '_blank');
