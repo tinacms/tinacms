@@ -48,7 +48,7 @@ export function FieldsBuilder({
 
 const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
   /**
-     * We double-render form builders for some reason which reults in useMemo not working here
+   * We double-render form builders for some reason which reults in useMemo not working here
    */
   React.useEffect(() => {
     form.mutators.setFieldData(field.name, {
