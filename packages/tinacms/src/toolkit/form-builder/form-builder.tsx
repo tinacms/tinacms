@@ -3,10 +3,7 @@ import * as React from 'react';
 import { type FC, useEffect } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 
-// Replace the problematic import with a type alias
-// import type { TinaSchema } from '@tinacms/schema-tools';
-type TinaSchema = any; // TODO: Replace with proper type when available
-
+import type { TinaSchema } from '@tinacms/schema-tools';
 import { formatBranchName, useBranchData } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
