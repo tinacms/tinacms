@@ -43,7 +43,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "@tinacms/metrics": "workspace:*",
+    "@tinacms/metrics": "^1.0.9",
     "chalk": "4.1.2",
     "commander": "^12.1.0",
     "cross-spawn": "^7.0.6",
