@@ -196,28 +196,6 @@ const Sidebar = ({
     setMenuIsOpen((menuIsOpen) => !menuIsOpen);
   };
 
-  React.useEffect(() => {
-    const updateLayout = () => {
-      if (displayState === 'fullscreen') {
-        return;
-      }
-      updateBodyDisplacement({
-        position,
-        displayState,
-        sidebarWidth,
-        resizingSidebar,
-      });
-    };
-
-    updateLayout();
-
-    window.addEventListener('resize', updateLayout);
-
-    return () => {
-      window.removeEventListener('resize', updateLayout);
-    };
-  }, [displayState, position, sidebarWidth, resizingSidebar]);
-
   return (
     <SidebarContext.Provider
       value={{
@@ -327,40 +305,6 @@ const Sidebar = ({
       </>
     </SidebarContext.Provider>
   );
-};
-
-export const updateBodyDisplacement = ({
-  position = 'overlay',
-  displayState,
-  sidebarWidth,
-  resizingSidebar,
-}) => {
-  const body = document.getElementsByTagName('body')[0];
-  const windowWidth = window.innerWidth;
-
-  if (position === 'displace') {
-    // Padding can't be animated smoothly, so we're using a delay to time the size change
-    body.style.transition = resizingSidebar
-      ? ''
-      : displayState === 'fullscreen'
-        ? 'padding 0ms 150ms'
-        : displayState === 'closed'
-          ? 'padding 0ms 0ms'
-          : 'padding 0ms 300ms';
-
-    if (displayState === 'open') {
-      const bodyDisplacement = Math.min(
-        sidebarWidth,
-        windowWidth - minPreviewWidth
-      );
-      body.style.paddingLeft = `${bodyDisplacement}px`;
-    } else {
-      body.style.paddingLeft = '0';
-    }
-  } else {
-    body.style.transition = '';
-    body.style.paddingLeft = '0';
-  }
 };
 
 const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {

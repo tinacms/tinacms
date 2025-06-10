@@ -71,7 +71,7 @@ export const useGetEvents = (
   return { events, cursor: nextCursor, loading, error };
 };
 
-function useSyncStatus(cms) {
+function useSyncStatus(cms: TinaCMS) {
   const [syncStatus, setSyncStatus] = useState<{
     state: EventListState;
     message: string;
@@ -107,23 +107,6 @@ function useSyncStatus(cms) {
 
   return syncStatus;
 }
-
-export const SyncErrorWidget = ({ cms }: { cms: any }) => {
-  const syncStatus = useSyncStatus(cms);
-
-  if (syncStatus.state !== 'error') {
-    return null;
-  }
-
-  return (
-    <div
-      title={syncStatus.message}
-      className='flex-grow-0 flex text-xs items-center'
-    >
-      <MdSyncProblem className='w-6 h-full ml-2 text-red-500 fill-current' />
-    </div>
-  );
-};
 
 const EventsList = ({ cms }) => {
   const [cursor, setCursor] = React.useState<string | undefined>(undefined);
@@ -226,12 +209,16 @@ export const SyncStatusModal = ({ closeEventsModal, cms }) => (
     </FullscreenModal>
   </Modal>
 );
-export const SyncStatus = ({ cms, setEventsOpen }) => {
-  const syncStatus = useSyncStatus(cms);
 
-  function openEventsModal() {
-    setEventsOpen(true);
-  }
+export const SyncStatusButton = ({
+  cms,
+  setEventsOpen,
+  ...buttonProps
+}: {
+  cms: TinaCMS;
+  setEventsOpen: (open: boolean) => void;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+  const syncStatus = useSyncStatus(cms);
 
   if (cms.api?.tina?.isCustomContentApi) {
     return null;
@@ -239,12 +226,9 @@ export const SyncStatus = ({ cms, setEventsOpen }) => {
 
   return (
     <>
-      <button
-        className={`text-lg px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400 hover:bg-gray-50 hover:opacity-100`}
-        onClick={openEventsModal}
-      >
+      <button onClick={() => setEventsOpen(true)} {...buttonProps}>
         {syncStatus.state !== 'error' ? (
-          <HiOutlineClipboardList className='w-6 h-auto mr-2 text-blue-400' />
+          <HiOutlineClipboardList className='w-6 h-auto mr-2' />
         ) : (
           <MdSyncProblem className='w-6 h-auto mr-2 text-red-400' />
         )}{' '}
