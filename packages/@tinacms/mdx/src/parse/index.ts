@@ -4,20 +4,20 @@
 
 */
 
-import { remark } from 'remark';
-import remarkMdx, { type Root } from 'remark-mdx';
-import { gfm } from 'micromark-extension-gfm';
-import { gfmFromMarkdown } from 'mdast-util-gfm';
-import remarkGfm from 'remark-gfm';
-import { parseMDX as parseMDXNext } from '../next';
-import { fromMarkdown } from 'mdast-util-from-markdown';
-import { remarkToSlate, RichTextParseError } from './remarkToPlate';
 import type { RichTextType } from '@tinacms/schema-tools';
-import type * as Plate from './plate';
-import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { gfmFromMarkdown } from 'mdast-util-gfm';
+import { gfm } from 'micromark-extension-gfm';
+import { remark } from 'remark';
+import remarkGfm from 'remark-gfm';
+import remarkMdx, { type Root } from 'remark-mdx';
 import { tinaDirective } from '../extensions/tina-shortcodes/extension';
+import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown';
+import { parseMDX as parseMDXNext } from '../next';
 import type { Pattern } from '../stringify';
 import { parseShortcode } from './parseShortcode';
+import type * as Plate from './plate';
+import { RichTextParseError, remarkToSlate } from './remarkToPlate';
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -107,8 +107,13 @@ export const parseMDX = (
   }
   let tree: Root | null;
   try {
-    if (field.parser?.type === 'markdown') {
-      return parseMDXNext(value, field, imageCallback);
+    switch (field.parser?.type) {
+      case 'markdown':
+        return parseMDXNext(value, field, imageCallback);
+      case 'slatejson':
+        // Assuming `value` is a JSON string, parse it into an object
+        const parsedValue = JSON.parse(value);
+        return parsedValue as Plate.RootElement;
     }
     let preprocessedString = value;
     const templatesWithMatchers = field.templates?.filter(

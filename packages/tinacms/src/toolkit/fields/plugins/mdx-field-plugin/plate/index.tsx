@@ -1,34 +1,36 @@
+import { Plate, createPlugins } from '@udecode/plate-common';
 import React from 'react';
-import { Components } from './plugins/ui/components';
-import { formattingPlugins, commonPlugins } from './plugins/core';
+import type { RichTextType } from '..';
+import { Editor } from './components/editor';
+import FixedToolbarButtons from './components/fixed-toolbar-buttons';
+import FloatingToolbarButtons from './components/floating-toolbar-buttons';
+import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
+import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
+import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar';
+import { TooltipProvider } from './components/plate-ui/tooltip';
+import { commonPlugins, formattingPlugins } from './plugins/core';
 import { helpers } from './plugins/core/common';
+import createImgPlugin from './plugins/create-img-plugin';
+import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin';
+import { createLinkPlugin } from './plugins/create-link-plugin';
 import {
   createMdxBlockPlugin,
   createMdxInlinePlugin,
 } from './plugins/create-mdx-plugins';
-import createImgPlugin from './plugins/create-img-plugin';
-import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-plugin';
-import { createLinkPlugin } from './plugins/create-link-plugin';
-import { uuid } from './plugins/ui/helpers';
-import type { RichTextType } from '..';
-import { createPlugins, Plate } from '@udecode/plate-common';
-import { Editor } from './components/editor';
-import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
-import { TooltipProvider } from './components/plate-ui/tooltip';
-import FixedToolbarButtons from './components/fixed-toolbar-buttons';
-import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
-import FloatingToolbarButtons from './components/floating-toolbar-buttons';
-import { LinkFloatingToolbar } from './components/plate-ui/link-floating-toolbar';
-import { isUrl } from './transforms/is-url';
-import { ToolbarProvider } from './toolbar/toolbar-provider';
 import { createMermaidPlugin } from './plugins/custom/mermaid-plugin';
+import { Components } from './plugins/ui/components';
+import { uuid } from './plugins/ui/helpers';
+import { ToolbarProvider } from './toolbar/toolbar-provider';
+import { isUrl } from './transforms/is-url';
 
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(
     () =>
-      input.value?.children?.length
-        ? input.value.children.map(helpers.normalize)
-        : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
+      field?.parser?.type === 'slatejson'
+        ? input.value.children
+        : input.value?.children?.length
+          ? input.value.children.map(helpers.normalize)
+          : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
     []
   );
 

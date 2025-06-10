@@ -1,24 +1,18 @@
-/**
-
-
-
-*/
-
-import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
-import { text } from 'mdast-util-to-markdown/lib/handle/text';
-import { gfmToMarkdown } from 'mdast-util-gfm';
-import {
-  mdxJsxToMarkdown,
-  MdxJsxTextElement,
-  MdxJsxFlowElement,
-} from 'mdast-util-mdx-jsx';
-import { stringifyMDX as stringifyMDXNext } from '../next';
 import type { RichTextType } from '@tinacms/schema-tools';
 import type * as Md from 'mdast';
-import type * as Plate from '../parse/plate';
-import { eat } from './marks';
-import { stringifyProps } from './acorn';
+import { gfmToMarkdown } from 'mdast-util-gfm';
+import {
+  MdxJsxFlowElement,
+  MdxJsxTextElement,
+  mdxJsxToMarkdown,
+} from 'mdast-util-mdx-jsx';
+import { Handlers, toMarkdown } from 'mdast-util-to-markdown';
+import { text } from 'mdast-util-to-markdown/lib/handle/text';
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown';
+import { stringifyMDX as stringifyMDXNext } from '../next';
+import type * as Plate from '../parse/plate';
+import { stringifyProps } from './acorn';
+import { eat } from './marks';
 import { stringifyShortcode } from './stringifyShortcode';
 
 declare module 'mdast' {
@@ -37,14 +31,29 @@ declare module 'mdast' {
   }
 }
 
+export const formatMdxForPersistence = (
+  value: Plate.RootElement,
+  field: RichTextType,
+  imageCallback: (url: string) => string
+): Plate.RootElement | string | undefined => {
+  if (field.parser?.type === 'slatejson') {
+    return value;
+  }
+  return stringifyMDX(value, field, imageCallback);
+};
+
 export const stringifyMDX = (
   value: Plate.RootElement,
   field: RichTextType,
   imageCallback: (url: string) => string
-) => {
+): string | undefined => {
   if (field.parser?.type === 'markdown') {
     return stringifyMDXNext(value, field, imageCallback);
   }
+  if (field.parser?.type === 'slatejson') {
+    return JSON.stringify(value);
+  }
+
   if (!value) {
     return;
   }
