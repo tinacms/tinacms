@@ -44,16 +44,7 @@ export const createMdxBlockPlugin = createPlatePlugin({
 });
 
 export const insertMDX = (editor: PlateEditor, value: MdxTemplate) => {
-  console.log('@[INFO] insertMDX');
   const isInline = value.inline;
-  console.log('@[INFO] flow: ', isInline);
-
-  // TODO: Might need to re-implement this?
-  //   if (!helpers.currentNodeSupportsMDX(editor)) {
-  //     console.log('@[INFO] IS THIS HIT?');
-  //     return;
-  //   }
-
   if (isInline) {
     insertInlineElement(editor, {
       type: ELEMENT_MDX_INLINE,

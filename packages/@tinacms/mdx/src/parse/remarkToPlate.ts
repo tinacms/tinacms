@@ -86,7 +86,6 @@ export const remarkToSlate = (
       case 'heading':
         return heading(content);
       case 'code':
-        console.log('[INFO code] ', field, root);
         return parseCode(content);
       case 'paragraph':
         return paragraph(content);

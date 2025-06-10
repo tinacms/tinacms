@@ -41,7 +41,6 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
     const [codeBlockError, setCodeBlockError] = useState<string | null>(null);
 
     useEffect(() => {
-      console.log('[On Children Change Event]: ', element.children[0].text);
       // Look to find mermaid errors as well as format ( formatCodeBlock(editor, { element })})
       if ((element.lang as string) !== 'mermaid') {
         return;
@@ -57,8 +56,6 @@ export const CodeBlockElement = withRef<typeof PlateElement>(
         String(err.message) || 'An error occurred while parsing the diagram.'
       );
     };
-
-    console.log('[Code Block Element]: ', element);
 
     return (
       <PlateElement

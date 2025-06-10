@@ -61,9 +61,7 @@ export const useEmbedHandles = (editor, element, baseFieldName: string) => {
     setIsExpanded(false);
     handleCloseBase(editor, element);
   };
-  // console.log(editor, element);
   const path = editor.findPath(element);
-  // console.log(path);
   const fieldName = `${baseFieldName}.children.${path.join('.children.')}.props`;
   const handleSelect = () => {
     cms.dispatch({
