@@ -14,6 +14,23 @@ export type ContentFormat = (typeof CONTENT_FORMATS)[number];
 
 export type ContentFrontmatterFormat = 'yaml' | 'toml' | 'json';
 
+export type Parser =
+  | { type: 'mdx' }
+  | {
+      type: 'markdown';
+      /**
+       * Tina will escape entities like `<` and `[` by default. You can choose to turn
+       * off all escaping, or specify HTML, so `<div>` will not be turned into `\<div>`
+       */
+      skipEscaping?: 'all' | 'html' | 'none';
+    }
+  | {
+      /**
+       * Experimental: Returns the native Slate.js document as JSON. Ideal to retain the pure editor content structure.
+       */
+      type: 'slatejson';
+    };
+
 type Meta = {
   active?: boolean;
   dirty?: boolean;
@@ -316,22 +333,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
      *
      * Specify `"markdown"` if you're having problems with Tina parsing your content.
      */
-    parser?:
-      | { type: 'mdx' }
-      | {
-          type: 'markdown';
-          /**
-           * Tina will escape entities like `<` and `[` by default. You can choose to turn
-           * off all escaping, or specify HTML, so `<div>` will not be turned into `\<div>`
-           */
-          skipEscaping?: 'all' | 'html' | 'none';
-        }
-      | {
-          /**
-           * Experimental: Returns the native Slate.js document as JSON. Ideal to retain the pure editor content structure.
-           */
-          type: 'slatejson';
-        };
+    parser?: Parser;
   };
 export type RichTextTemplate<WithNamespace extends boolean = false> =
   Template<WithNamespace> & {

@@ -1,16 +1,16 @@
-import arrayMutators from 'final-form-arrays';
-import setFieldData from 'final-form-set-field-data';
+import type { Plugin } from '@toolkit/core';
 import {
-  FormApi,
-  createForm,
   Config,
-  FormState,
   FORM_ERROR,
+  FormApi,
+  FormState,
+  createForm,
   getIn,
 } from 'final-form';
 import type { FormSubscription } from 'final-form';
-import type { Plugin } from '@toolkit/core';
-import { Field, AnyField } from './field';
+import arrayMutators from 'final-form-arrays';
+import setFieldData from 'final-form-set-field-data';
+import { AnyField, Field } from './field';
 
 export type { FormApi };
 

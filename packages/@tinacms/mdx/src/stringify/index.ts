@@ -50,6 +50,10 @@ export const stringifyMDX = (
   if (field.parser?.type === 'markdown') {
     return stringifyMDXNext(value, field, imageCallback);
   }
+  if (field.parser?.type === 'slatejson') {
+    return JSON.stringify(value);
+  }
+
   if (!value) {
     return;
   }

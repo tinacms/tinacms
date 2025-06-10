@@ -1,3 +1,5 @@
+import { Parser } from '@tinacms/schema-tools';
+
 export type AnyField = Field & { [key: string]: any };
 
 export interface Field<F extends Field = AnyField> {
@@ -6,6 +8,7 @@ export interface Field<F extends Field = AnyField> {
   description?: string;
   component: React.FC<any> | string | null;
   inlineComponent?: React.FC<any>;
+  parser?: Parser;
   parse?: (value: any, name: string, field: F) => any;
   format?: (value: any, name: string, field: F) => any;
   validate?(
