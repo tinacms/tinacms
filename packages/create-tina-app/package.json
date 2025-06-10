@@ -34,7 +34,7 @@
     "directory": "packages/create-tina-app"
   },
   "devDependencies": {
-    "@tinacms/scripts": "workspace:*",
+    "@tinacms/scripts": "^1.3.5",
     "@types/cross-spawn": "^6.0.6",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.1",
