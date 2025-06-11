@@ -162,8 +162,8 @@ export const RawEditor = (props: RichTextType) => {
       <div style={{ height: `${height}px` }}>
         <MonacoEditor
           beforeMount={() => {}}
-          height="100%"
-          width="100%"
+          height='100%'
+          width='100%'
           path={id}
           onMount={handleEditorDidMount}
           // Setting a custom theme is kind of buggy because it doesn't get defined until monaco has mounted.
