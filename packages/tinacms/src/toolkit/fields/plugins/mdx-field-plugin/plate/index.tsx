@@ -55,7 +55,9 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
         editor={editor}
         onChange={(value) => {
           // Normalize links in code blocks before saving
-          const normalized = (value.value as any[]).map(normalizeLinksInCodeBlocks);
+          const normalized = (value.value as any[]).map(
+            normalizeLinksInCodeBlocks
+          );
           input.onChange({
             type: 'root',
             children: normalized,

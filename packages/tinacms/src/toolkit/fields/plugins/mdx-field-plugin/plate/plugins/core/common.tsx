@@ -109,11 +109,12 @@ const currentNodeSupportsMDX = (editor: PlateEditor) =>
  * replacing them with their text children.
  */
 export function normalizeLinksInCodeBlocks(node) {
+  console.log('node', node);
   // If this is a code_line node, flatten any 'a' children
   if (node.type === 'code_line' && node.children) {
     return {
       ...node,
-      children: node.children.flatMap(child => {
+      children: node.children.flatMap((child) => {
         if (child.type === 'a') {
           return child.children || []; // Replace link node with its text children
         }
