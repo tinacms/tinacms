@@ -485,25 +485,50 @@ export const CreateBranchModal = ({
         try {
           console.log('starting', branchName, formatBranchName(branchName));
           const currentBranch = tinaApi.branch;
-          const name = await tinaApi.createBranch({
+          
+          // Use enhanced branch creation that handles everything in one request
+          const result = await tinaApi.createBranchEnhanced({
             branchName: formatBranchName(branchName),
             baseBranch: currentBranch,
+            waitForIndex: true,
+            createPR: true,
+            prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
+            contentOp: crudType !== 'view' ? {
+              collection: tinaApi.schema.getCollectionByFullPath(path).name,
+              relativePath: pathRelativeToCollection(
+                tinaApi.schema.getCollectionByFullPath(path).path, 
+                path
+              ),
+              values: values,
+              crudType: crudType
+            } : undefined
           });
-          if (!name) {
+          
+          if (!result.branchName) {
             throw new Error('Branch creation failed.');
           }
-          setBranchName(name);
-          setState('indexing');
-          cms.alerts.success('Branch created.');
+          
+          setBranchName(result.branchName);
+          setCurrentBranch(result.branchName);
+          
+          // Skip intermediate states and go directly to done
+          cms.alerts.success('Branch created and content saved.');
+          if (result.pullRequestURL) {
+            cms.alerts.success('Pull request created.');
+          }
+          
+          setState('done');
+          close();
         } catch (e) {
           console.error(e);
-          cms.alerts.error('Branch creation failed: ' + e.message);
+          cms.alerts.error('Branch operation failed: ' + e.message);
           setErrorMessage(
-            'Branch creation failed, please try again. By refreshing the page.'
+            'Branch operation failed, please try again. If the problem persists please contact support.'
           );
           setState('error');
         }
       } else if (state === 'indexing') {
+        // Legacy code - now handled by the enhanced endpoint
         try {
           const [waitForIndexStatusPromise, _cancelWaitForIndexFunc] =
             tinaApi.waitForIndexStatus({

@@ -568,6 +568,48 @@ mutation addPendingDocumentMutation(
       throw error;
     }
   }
+
+  /**
+   * Enhanced createBranch that can also wait for indexing and create a PR
+   * 
+   * @param options Branch creation options
+   * @returns Object with branch info, optionally PR info
+   */
+  async createBranchEnhanced(options: {
+    baseBranch: string;
+    branchName: string;
+    waitForIndex?: boolean;
+    createPR?: boolean;
+    prTitle?: string;
+    contentOp?: {
+      collection: string;
+      relativePath: string;
+      values: Record<string, unknown>;
+      crudType: string;
+    };
+  }) {
+    const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/branches`;
+
+    try {
+      const res = await this.authProvider.fetchWithToken(url, {
+        method: 'POST',
+        body: JSON.stringify(options),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) {
+        console.error('There was an error with branch operation.');
+        const error = await res.json();
+        throw new Error(error?.message);
+      }
+      const result = await res.json();
+      return result;
+    } catch (error) {
+      console.error('There was an error with branch operation.', error);
+      throw error;
+    }
+  }
 }
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL =
