@@ -6,10 +6,27 @@ import type { TLinkElement } from '@udecode/plate-link';
 import type { PlateElementProps } from '@udecode/plate/react';
 
 import { useLink } from '@udecode/plate-link/react';
-import { PlateElement } from '@udecode/plate/react';
+import { PlateElement, useEditorRef } from '@udecode/plate/react';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 
 export function LinkElement(props: PlateElementProps<TLinkElement>) {
   const { props: linkProps } = useLink({ element: props.element });
+  const editor = useEditorRef();
+
+  const isInCodeBlock = editor?.api.above({
+    match: { type: editor.getType(CodeBlockPlugin) },
+  });
+
+  if (isInCodeBlock) {
+    return (
+      <code
+      {...props.attributes}
+      className="rounded-md bg-muted px-[0.3em] py-[0.2em] font-mono text-sm whitespace-pre-wrap"
+    >
+      {props.children}
+    </code>
+    );
+  }
 
   return (
     <PlateElement

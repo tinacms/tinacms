@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Components } from './plugins/ui/components';
-import { helpers } from './plugins/core/common';
+import { helpers, normalizeLinksInCodeBlocks } from './plugins/core/common';
 import { uuid } from './plugins/ui/helpers';
 import type { RichTextType } from '..';
 import { Editor, EditorContainer } from './components/editor';
@@ -54,10 +54,11 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       <Plate
         editor={editor}
         onChange={(value) => {
+          // Normalize links in code blocks before saving
+          const normalized = (value.value as any[]).map(normalizeLinksInCodeBlocks);
           input.onChange({
             type: 'root',
-            //value.value is used because the new Plate seperate the editor instance and causing the editor to passed as well int he value change, so value.value is a quick work around to extract the value of the editor (if not we will have error down the track to the final form, circular dependency error)
-            children: value.value,
+            children: normalized,
           });
         }}
       >

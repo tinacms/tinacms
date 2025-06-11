@@ -104,9 +104,37 @@ const currentNodeSupportsMDX = (editor: PlateEditor) =>
     match: { type: HANDLES_MDX },
   });
 
+/**
+ * Recursively removes link nodes (type: 'a') from inside code blocks,
+ * replacing them with their text children.
+ */
+export function normalizeLinksInCodeBlocks(node) {
+  // If this is a code_line node, flatten any 'a' children
+  if (node.type === 'code_line' && node.children) {
+    return {
+      ...node,
+      children: node.children.flatMap(child => {
+        if (child.type === 'a') {
+          return child.children || []; // Replace link node with its text children
+        }
+        return [normalizeLinksInCodeBlocks(child)];
+      }),
+    };
+  }
+  // Recurse for other nodes with children
+  if (node.children) {
+    return {
+      ...node,
+      children: node.children.map(normalizeLinksInCodeBlocks),
+    };
+  }
+  return node;
+}
+
 export const helpers = {
   isNodeActive,
   isListActive,
   currentNodeSupportsMDX,
   normalize,
+  normalizeLinksInCodeBlocks,
 };
