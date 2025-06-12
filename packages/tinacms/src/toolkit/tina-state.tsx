@@ -289,14 +289,6 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
   }
 }
 
-type FieldNode = {
-  name: string;
-  label: string;
-  type: string;
-  namespace: string[];
-  children?: FieldNode[];
-};
-
 export function calculateBreadcrumbs(
   forms: { activeFieldName?: string | null; tinaForm: Form }[],
   activeFormId: string,
@@ -305,6 +297,14 @@ export function calculateBreadcrumbs(
   const form = forms.find(
     (form) => form.tinaForm.id === activeFormId
   )?.tinaForm;
+
+  if (!form) {
+    console.warn(
+      '[calculateBreadcrumbs] No form found for activeFormId:',
+      activeFormId
+    );
+    return [];
+  }
 
   const makeCrumb = (field: {
     label?: string;
