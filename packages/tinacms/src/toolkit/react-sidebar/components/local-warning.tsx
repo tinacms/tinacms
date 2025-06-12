@@ -7,7 +7,7 @@ export const LocalWarning = () => {
   return (
     <Alert alertStyle='warning'>
       <a href='https://tina.io/docs/tina-cloud/' target='_blank'>
-        You are on local mode
+        You are in local mode
       </a>
     </Alert>
   );

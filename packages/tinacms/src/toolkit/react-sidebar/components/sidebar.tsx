@@ -382,13 +382,13 @@ const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
             </button>
 
             {branchingEnabled && !isLocalMode && <BranchButton />}
-          </div>
 
-          {isLocalMode && (
-            <div className='px-4'>
-              <LocalWarning />
-            </div>
-          )}
+            {isLocalMode && (
+              <div className='px-4'>
+                <LocalWarning />
+              </div>
+            )}
+          </div>
 
           <div className='flex'>
             {branchingEnabled && !isLocalMode && <BranchPreviewButton />}
