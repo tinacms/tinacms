@@ -1,3 +1,6 @@
+import { fi } from 'date-fns/locale';
+import { act } from 'react';
+import { AnyField } from './forms';
 import { Form } from './react-tinacms';
 import { TinaCMS } from './tina-cms';
 
@@ -17,6 +20,12 @@ type FormList = {
   // This value is somewhat duplicated from whats inside the items array, but it makes cleaning
   // Up orphaned forms easier.
   formIds: string[];
+};
+
+type Breadcrumb = {
+  label: string;
+  formId: string;
+  formName: string;
 };
 
 export type TinaAction =
@@ -81,6 +90,7 @@ export type TinaAction =
     };
 
 export interface TinaState {
+  breadcrumbs: Breadcrumb[];
   activeFormId: string | null;
   /**
    * Forms are wrapped here because we need `activeFieldName` to be reactive, so adding it as a propery
@@ -101,6 +111,7 @@ export interface TinaState {
 
 export const initialState = (cms: TinaCMS): TinaState => {
   return {
+    breadcrumbs: [],
     activeFormId: null,
     forms: [],
     formLists: [],
@@ -135,6 +146,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       return {
         ...state,
         quickEditSupported: false,
+        breadcrumbs: [],
         activeFormId: null,
         formLists: [],
         forms: [],
@@ -170,9 +182,12 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         });
       }
 
+      const breadcrumbs = calculateBreadcrumbs(state.forms, activeFormId, '');
+
       return {
         ...state,
         activeFormId,
+        breadcrumbs,
         formLists: nextFormLists,
         isLoadingContent: false,
       };
@@ -206,8 +221,10 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
     }
     case 'forms:set-active-form-id':
       if (action.value !== state.activeFormId) {
+        const breadcrumbs = calculateBreadcrumbs(state.forms, action.value, '');
         return {
           ...state,
+          breadcrumbs,
           activeFormId: action.value,
         };
       }
@@ -222,7 +239,19 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         }
         return form;
       });
-      return { ...state, forms, activeFormId: action.value.formId };
+
+      const breadcrumbs = calculateBreadcrumbs(
+        state.forms,
+        action.value.formId,
+        action.value.fieldName
+      );
+
+      return {
+        ...state,
+        breadcrumbs,
+        forms,
+        activeFormId: action.value.formId,
+      };
     case 'toggle-edit-state': {
       return state.sidebarDisplayState === 'closed'
         ? { ...state, sidebarDisplayState: 'open' }
@@ -258,4 +287,76 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       throw new Error(`Unhandled action ${action.type}`);
       return state;
   }
+}
+
+type FieldNode = {
+  name: string;
+  label: string;
+  type: string;
+  namespace: string[];
+  children?: FieldNode[];
+};
+
+export function calculateBreadcrumbs(
+  forms: { activeFieldName?: string | null; tinaForm: Form }[],
+  activeFormId: string,
+  activeFieldName: string = ''
+): Breadcrumb[] {
+  const form = forms.find(
+    (form) => form.tinaForm.id === activeFormId
+  )?.tinaForm;
+
+  const makeCrumb = (field: {
+    label?: string;
+    name?: string;
+  }): Breadcrumb => {
+    return {
+      label: typeof field.label === 'string' ? field.label : field.name,
+      formId: form.id,
+      formName: field.name,
+    };
+  };
+
+  console.log(
+    '[calculateBreadcrumbs] Calculating breadcrumbs for active field:',
+    activeFieldName,
+    'Form ID:',
+    activeFormId,
+    'Form:',
+    form
+  );
+
+  if (!activeFieldName) {
+    const fieldGroup = form.getActiveField('');
+    return [makeCrumb(fieldGroup)];
+  }
+
+  const breadcrumbs: Breadcrumb[] = [];
+  let activePath = activeFieldName.split('.');
+  while (activePath.length > 0) {
+    const fieldGroup = form.getActiveField(activePath.join('.'));
+    console.log(
+      '[calculateBreadcrumbs] Current fieldGroup:',
+      fieldGroup,
+      'Active path:',
+      activePath
+    );
+    if (!fieldGroup) {
+      break;
+    }
+
+    breadcrumbs.unshift(makeCrumb(fieldGroup));
+
+    // continue up the tree
+    activePath = fieldGroup.name.split('.').slice(0, -1);
+    if (['rich-text'].includes(fieldGroup.type)) {
+      // we should've hit a `props` and fields inside are nested under `.children.[\d+]`
+      // so we need to go up 2 more levels)
+      activePath = activePath.slice(0, -2);
+    }
+  }
+
+  console.log('[calculateBreadcrumbs] Calculated breadcrumbs:', breadcrumbs);
+
+  return breadcrumbs;
 }
