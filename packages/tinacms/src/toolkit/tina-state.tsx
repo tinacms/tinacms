@@ -347,6 +347,14 @@ export function calculateBreadcrumbs(
 
     breadcrumbs.unshift(makeCrumb(fieldGroup));
 
+    if (!fieldGroup.name) {
+      console.warn(
+        '[calculateBreadcrumbs] Field group has no name, breaking out of loop:',
+        fieldGroup
+      );
+      break;
+    }
+
     // continue up the tree
     activePath = fieldGroup.name.split('.').slice(0, -1);
     switch ((fieldGroup as any).type) {
@@ -366,7 +374,7 @@ export function calculateBreadcrumbs(
   }
 
   // ensure that the last breadcrumb is the form itself
-  if (!breadcrumbs.some((crumb) => crumb.formId === '')) {
+  if (!breadcrumbs.some((crumb) => !crumb.formName)) {
     const fieldGroup = form.getActiveField('');
     breadcrumbs.unshift(makeCrumb(fieldGroup));
   }
