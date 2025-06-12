@@ -7,7 +7,6 @@ import type { CloudConfigPlugin } from '@toolkit/react-cloud-config';
 import { useCMS, useSubscribable } from '@toolkit/react-core';
 import { type ScreenPlugin, ScreenPluginModal } from '@toolkit/react-screens';
 import { Button } from '@toolkit/styles';
-import { Play } from 'lucide-react';
 import * as React from 'react';
 import { useState } from 'react';
 import { BiMenu } from 'react-icons/bi';
