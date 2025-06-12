@@ -8,7 +8,6 @@ import { formatBranchName } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import { BiGitBranch } from 'react-icons/bi';
-import { IoMdClose } from 'react-icons/io';
 import { MdOutlineSaveAlt } from 'react-icons/md';
 import { useCMS } from '../react-core';
 import {
@@ -86,18 +85,6 @@ const FormKeyBindings: FC<FormKeyBindingsProps> = ({ onSubmit }) => {
 
   return null;
 };
-
-function usePrevious(value) {
-  // The ref object is a generic container whose current property is mutable ...
-  // ... and can hold any value, similar to an instance property on a class
-  const ref = React.useRef(null);
-  // Store current value in ref
-  useEffect(() => {
-    ref.current = value;
-  }, [value]); // Only re-run if value changes
-  // Return previous value (happens before update in useEffect above)
-  return ref.current;
-}
 
 export const FormBuilder: FC<FormBuilderProps> = ({
   form,
@@ -217,10 +204,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormKeyBindings onSubmit={safeHandleSubmit} />
               <FormPortalProvider>
-                <FormWrapper
-                  header={<PanelHeader {...fieldGroup} id={tinaForm.id} />}
-                  id={tinaForm.id}
-                >
+                <FormWrapper id={tinaForm.id}>
                   {tinaForm?.fields.length ? (
                     <FieldsBuilder
                       form={tinaForm}
@@ -293,25 +277,18 @@ export const FormStatus = ({ pristine }) => {
 };
 
 export const FormWrapper = ({
-  header,
-  children,
   id,
+  children,
 }: {
-  header?: React.ReactNode;
-  children: React.ReactNode;
   id: string;
+  children: React.ReactNode;
 }) => {
   return (
     <div
       data-test={`form:${id?.replace(/\\/g, '/')}`}
       className='h-full overflow-y-auto max-h-full bg-gray-50'
     >
-      {header}
-      <div className='py-5 px-6'>
-        <div className='w-full flex justify-center'>
-          <div className='w-full'>{children}</div>
-        </div>
-      </div>
+      <div className='py-5 px-6'>{children}</div>
     </div>
   );
 };
@@ -322,74 +299,6 @@ const Emoji = ({ className = '', ...props }) => (
     {...props}
   />
 );
-
-const isNumber = (item: string) => {
-  return !isNaN(Number(item));
-};
-
-const PanelHeader = (props: { label?: string; name?: string; id: string }) => {
-  const cms = useCMS();
-  const activePath = props.name?.split('.') || [];
-  if (!activePath || activePath.length === 0) {
-    return null;
-  }
-
-  let lastItemIndex;
-  activePath.forEach((item, index) => {
-    if (!isNumber(item)) {
-      lastItemIndex = index;
-    }
-  });
-  const returnPath = activePath.slice(0, lastItemIndex);
-
-  return (
-    <button
-      type='button'
-      className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
-   border-gray-100 px-6 -mt-px`}
-      onClick={() => {
-        cms.dispatch({
-          type: 'forms:set-active-field-name',
-          value: {
-            formId: props.id,
-            fieldName: returnPath.length > 0 ? returnPath.join('.') : null,
-          },
-        });
-      }}
-      tabIndex={-1}
-    >
-      <div className='flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto'>
-        {props.label || props.name || 'Back'}
-        <IoMdClose className='h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5' />
-      </div>
-    </button>
-  );
-};
-
-const getAnimationProps = (animateStatus) => {
-  const forwardsAnimation = {
-    enter: 'transform transition ease-in-out duration-500 sm:duration-700',
-    enterFrom: 'translate-x-8',
-    enterTo: 'translate-x-0',
-    leave: 'transform transition ease-in-out duration-500 sm:duration-700',
-    leaveFrom: 'translate-x-0',
-    leaveTo: 'translate-x-8',
-  };
-  const backwardsAnimation = {
-    enter: 'transform transition ease-in-out duration-500 sm:duration-700',
-    enterFrom: '-translate-x-8',
-    enterTo: 'translate-x-0',
-    leave: 'transform transition ease-in-out duration-500 sm:duration-700',
-    leaveFrom: 'translate-x-0',
-    leaveTo: '-translate-x-8',
-  };
-
-  return animateStatus === 'backwards'
-    ? backwardsAnimation
-    : animateStatus === 'forwards'
-      ? forwardsAnimation
-      : {};
-};
 
 /**
  * @deprecated
