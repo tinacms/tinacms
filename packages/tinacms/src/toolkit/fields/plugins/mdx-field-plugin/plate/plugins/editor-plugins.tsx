@@ -24,7 +24,7 @@ import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 import { SlashPlugin } from '@udecode/plate-slash-command/react';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
-import { ParagraphPlugin } from '@udecode/plate/react';
+import { createPlatePlugin, ParagraphPlugin, PlateEditor } from '@udecode/plate/react';
 import React from 'react';
 import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
 import { isUrl } from '../transforms/is-url';
@@ -98,6 +98,30 @@ const CorrectNodeBehaviorPlugin = createSlatePlugin({
   key: 'WITH_CORRECT_NODE_BEHAVIOR',
 });
 
+export const LogBlockquotePlugin = createSlatePlugin({
+  key: 'LOG_BLOCKQUOTE',
+  handlers: {
+    onKeyDown: ({ editor, event }) => {
+      if (event.key === 'Enter') {
+        const [blockquoteEntry] = editor.api.nodes({
+          match: { type: BlockquotePlugin.key },
+        });
+        if (blockquoteEntry) {
+          event.preventDefault();
+          console.log('Blockquote used! Inserting new break node inside blockquote.');
+          console.log('Editor value BEFORE:', JSON.stringify(editor.children, null, 2));
+          // Insert a break node at the current selection inside the blockquote
+          editor.insertNodes(
+            { type: 'break', children: [{ text: '' }] }
+          );
+          console.log('Editor value AFTER:', JSON.stringify(editor.children, null, 2));
+          return true;
+        }
+      }
+    }
+  },
+}); 
+
 // Editor Plugins: Functional and formatting plugins
 export const editorPlugins = [
   createMdxBlockPlugin,
@@ -122,7 +146,7 @@ export const editorPlugins = [
   NodeIdPlugin,
   TablePlugin,
   SlashPlugin,
-
+  LogBlockquotePlugin,
   // TrailingBlockPlugin makes sure there's always a blank paragraph at the end of the editor.
   // This lets users keep typing after end of marks like headings or quotes
 
@@ -224,10 +248,11 @@ export const editorPlugins = [
         {
           hotkey: 'enter',
           query: {
-            allow: [CodeBlockPlugin.key],
+            allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
           },
         },
       ],
     },
   }),
 ] as const;
+
