@@ -224,7 +224,7 @@ export const editorPlugins = [
         {
           hotkey: 'enter',
           query: {
-            allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
+            allow: [CodeBlockPlugin.key],
           },
         },
       ],
