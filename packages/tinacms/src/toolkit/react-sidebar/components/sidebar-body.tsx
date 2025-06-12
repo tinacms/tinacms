@@ -1,3 +1,11 @@
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@toolkit/components/ui/breadcrumb';
 import { FormBuilder, FormStatus } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
@@ -72,8 +80,7 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
     <>
       {activeForm && (
         <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-          {isMultiform && <MultiformFormHeader activeForm={activeForm} />}
-          {!isMultiform && <FormHeader activeForm={activeForm} />}
+          <FormHeader activeForm={activeForm} />
           {formMetas?.map((meta) => (
             <React.Fragment key={meta.name}>
               <meta.Component />
@@ -116,37 +123,34 @@ const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
   );
 };
 
-export interface MultiformFormHeaderProps {
+export interface FormHeaderProps {
   activeForm: { activeFieldName?: string; tinaForm: Form };
 }
 
-export const MultiformFormHeader = ({
-  activeForm,
-}: MultiformFormHeaderProps) => {
+export const FormHeader = ({ activeForm }: FormHeaderProps) => {
   const cms = useCMS();
   const { formIsPristine } = React.useContext(SidebarContext);
+  const isMultiform = cms.state.forms.length > 1;
 
   return (
-    <div
-      className={
-        'pt-4 pb-4 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50'
-      }
-    >
+    <div className={'py-4 bg-gradient-to-t from-white to-gray-50'}>
       <div className='px-6 flex gap-2 justify-between items-center'>
-        <button
-          type='button'
-          className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
-          onClick={() => {
-            const state = activeForm.tinaForm.finalForm.getState();
-            if (state.invalid === true) {
-              cms.alerts.error('Cannot navigate away from an invalid form.');
-            } else {
-              cms.dispatch({ type: 'forms:set-active-form-id', value: null });
-            }
-          }}
-        >
-          <BiDotsVertical className='h-auto w-5 inline-block opacity-70' />
-        </button>
+        {isMultiform && (
+          <button
+            type='button'
+            className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
+            onClick={() => {
+              const state = activeForm.tinaForm.finalForm.getState();
+              if (state.invalid === true) {
+                cms.alerts.error('Cannot navigate away from an invalid form.');
+              } else {
+                cms.dispatch({ type: 'forms:set-active-form-id', value: null });
+              }
+            }}
+          >
+            <BiDotsVertical className='h-auto w-5 inline-block opacity-70' />
+          </button>
+        )}
         <button
           type='button'
           className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
@@ -163,59 +167,69 @@ export const MultiformFormHeader = ({
           <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
         </button>
 
-        <span className='opacity-30 text-sm leading-tight whitespace-nowrap flex-0'>
-          /
-        </span>
-        <span className='block w-full text-sm leading-tight whitespace-nowrap truncate'>
-          {activeForm.tinaForm.label || activeForm.tinaForm.id}
-        </span>
+        <FormBreadcrumbs className='w-full' />
+
         <FormStatus pristine={formIsPristine} />
       </div>
     </div>
   );
 };
 
-export interface FormHeaderProps {
-  activeForm: { activeFieldName?: string; tinaForm: Form };
-}
-
-export const FormHeader = ({ activeForm }: FormHeaderProps) => {
-  const { formIsPristine } = React.useContext(SidebarContext);
+const FormBreadcrumbs = (props: React.HTMLAttributes<HTMLDivElement>) => {
   const cms = useCMS();
 
-  const shortFormLabel = activeForm.tinaForm.label
-    ? activeForm.tinaForm.label.replace(/^.*[\\\/]/, '')
-    : false;
+  if (cms.state.breadcrumbs.length === 0) {
+    return null;
+  }
+
+  const goBack = (formId: string, fieldName: string) => {
+    cms.dispatch({
+      type: 'forms:set-active-field-name',
+      value: {
+        formId,
+        fieldName,
+      },
+    });
+  };
 
   return (
-    <div
-      className={
-        'pt-4 pb-4 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50'
-      }
-    >
-      <div className='px-6 flex gap-2 justify-between items-center'>
-        <button
-          type='button'
-          className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
-          onClick={() => {
-            const collectionName = cms.api.tina.schema.getCollectionByFullPath(
-              cms.state.activeFormId
-            ).name;
-            window.location.href = `${
-              new URL(window.location.href).pathname
-            }#/collections/${collectionName}/~`;
-          }}
-        >
-          <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
-        </button>
-        {shortFormLabel && (
-          <span className='block w-full text-sm leading-tight whitespace-nowrap truncate'>
-            {shortFormLabel}
-          </span>
-        )}
-
-        <FormStatus pristine={formIsPristine} />
-      </div>
-    </div>
+    <Breadcrumb {...props}>
+      <BreadcrumbList>
+        {cms.state.breadcrumbs.map((breadcrumb, index) => {
+          return (
+            <React.Fragment key={index}>
+              <BreadcrumbItem>
+                {
+                  // If the breadcrumb is the last one, render it as a page
+                  index === cms.state.breadcrumbs.length - 1 ? (
+                    <BreadcrumbPage className='text-gray-700 font-medium'>
+                      {breadcrumb.label}
+                    </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink
+                      asChild
+                      className='text-gray-700 hover:text-blue-500'
+                    >
+                      <button
+                        type='button'
+                        onClick={(e) => {
+                          e.preventDefault();
+                          goBack(breadcrumb.formId, breadcrumb.formName);
+                        }}
+                      >
+                        {breadcrumb.label}
+                      </button>
+                    </BreadcrumbLink>
+                  )
+                }
+              </BreadcrumbItem>
+              {index < cms.state.breadcrumbs.length - 1 && (
+                <BreadcrumbSeparator />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </BreadcrumbList>
+    </Breadcrumb>
   );
 };
