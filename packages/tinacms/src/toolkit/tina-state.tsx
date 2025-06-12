@@ -365,6 +365,12 @@ export function calculateBreadcrumbs(
     }
   }
 
+  // ensure that the last breadcrumb is the form itself
+  if (!breadcrumbs.some((crumb) => crumb.formId === '')) {
+    const fieldGroup = form.getActiveField('');
+    breadcrumbs.unshift(makeCrumb(fieldGroup));
+  }
+
   console.log('[calculateBreadcrumbs] Calculated breadcrumbs:', breadcrumbs);
 
   return breadcrumbs;
