@@ -124,7 +124,7 @@ export const DeleteImageButton = ({
 }) => {
   return (
     <IconButton variant='white' className='flex-none' onClick={onClick}>
-      <TrashIcon className='w-7 h-auto' />
+      <TrashIcon className='w-7 h-auto caret-transparent' />
     </IconButton>
   );
 };

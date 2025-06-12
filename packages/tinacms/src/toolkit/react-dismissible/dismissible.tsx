@@ -82,7 +82,6 @@ export function useDismissible({
       if (disabled) return;
 
       if (!area.current.contains(event.target)) {
-        console.log('did not click main content', event.target, area.current);
         if (!allowClickPropagation) {
           stopAndPrevent(event);
         }

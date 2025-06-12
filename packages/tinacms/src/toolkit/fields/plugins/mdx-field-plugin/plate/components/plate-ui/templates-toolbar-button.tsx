@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useToolbarContext } from '../../toolbar/toolbar-provider';
-import { type PlateEditor, useEditorState } from '@udecode/plate-common';
+import { type PlateEditor, useEditorState } from '@udecode/plate/react';
 import type { MdxTemplate } from '../../types';
 import {
   DropdownMenu,

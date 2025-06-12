@@ -1,44 +1,34 @@
+import { ElementApi, SlateEditor } from '@udecode/plate';
+import { isType } from '@udecode/plate';
+import { AutoformatBlockRule } from '@udecode/plate-autoformat';
 import {
-  type AutoformatBlockRule,
-  ELEMENT_CODE_BLOCK,
-  ELEMENT_CODE_LINE,
-  toggleList,
-  unwrapList,
-} from '@udecode/plate';
-import {
-  getParentNode,
-  isElement,
-  isType,
-  type PlateEditor,
-  type TEditor,
-} from '@udecode/plate-common';
+  CodeBlockPlugin,
+  CodeLinePlugin,
+} from '@udecode/plate-code-block/react';
+import { toggleList, unwrapList } from '@udecode/plate-list';
 
 export const preFormat: AutoformatBlockRule['preFormat'] = (editor) =>
-  unwrapList(editor as PlateEditor);
+  unwrapList(editor);
 
-export const format = (editor: TEditor, customFormatting: any) => {
+const format = (editor: SlateEditor, customFormatting: any) => {
   if (editor.selection) {
-    const parentEntry = getParentNode(editor, editor.selection);
+    const parentEntry = editor.api.parent(editor.selection);
     if (!parentEntry) return;
     const [node] = parentEntry;
     if (
-      isElement(node) &&
-      !isType(editor as PlateEditor, node, ELEMENT_CODE_BLOCK) &&
-      !isType(editor as PlateEditor, node, ELEMENT_CODE_LINE)
+      ElementApi.isElement(node) &&
+      !isType(editor, node, CodeBlockPlugin.key) &&
+      !isType(editor, node, CodeLinePlugin.key)
     ) {
       customFormatting();
     }
   }
 };
 
-export const formatList = (editor: TEditor, elementType: string) => {
+export const formatList = (editor: SlateEditor, elementType: string) => {
   format(editor, () =>
-    toggleList(editor as PlateEditor, {
+    toggleList(editor, {
       type: elementType,
     })
   );
-};
-
-export const formatText = (editor: TEditor, text: string) => {
-  format(editor, () => editor.insertText(text));
 };
