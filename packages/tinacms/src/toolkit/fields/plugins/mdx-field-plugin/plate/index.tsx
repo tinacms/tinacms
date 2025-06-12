@@ -1,14 +1,13 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Components } from './plugins/ui/components';
 import { helpers, normalizeLinksInCodeBlocks } from './plugins/core/common';
-import { uuid } from './plugins/ui/helpers';
 import type { RichTextType } from '..';
 import { Editor, EditorContainer } from './components/editor';
 import { FixedToolbar } from './components/plate-ui/fixed-toolbar';
 import { TooltipProvider } from './components/plate-ui/tooltip';
 import FixedToolbarButtons from './components/fixed-toolbar-buttons';
 import { ToolbarProvider } from './toolbar/toolbar-provider';
-import { Plate, usePlateEditor } from '@udecode/plate/react';
+import { Plate } from '@udecode/plate/react';
 import { useCreateEditor } from './hooks/use-create-editor';
 import { editorPlugins } from './plugins/editor-plugins';
 import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
@@ -56,7 +55,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
         onChange={(value) => {
           console.log('value 🤖', value);
           // Normalize links in code blocks before saving (we dont want type: 'a' inside code blocks, this will break the mdx parser)
-          // Ideal Solution: let code block provider to have a option for exclude certain plugins 
+          // Ideal Solution: let code block provider to have a option for exclude certain plugins
           const normalized = (value.value as any[]).map(
             normalizeLinksInCodeBlocks
           );
