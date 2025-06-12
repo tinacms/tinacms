@@ -162,6 +162,10 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         return formList;
       });
 
+      if (formListItemExists) {
+        return state;
+      }
+
       if (!formListItemExists) {
         nextFormLists.push(action.value);
       }
@@ -348,10 +352,10 @@ export function calculateBreadcrumbs(
     breadcrumbs.unshift(makeCrumb(fieldGroup));
 
     if (!fieldGroup.name) {
-      console.warn(
-        '[calculateBreadcrumbs] Field group has no name, breaking out of loop:',
-        fieldGroup
-      );
+      // console.warn(
+      //   '[calculateBreadcrumbs] Field group has no name, breaking out of loop:',
+      //   fieldGroup
+      // );
       break;
     }
 
@@ -379,7 +383,7 @@ export function calculateBreadcrumbs(
     breadcrumbs.unshift(makeCrumb(fieldGroup));
   }
 
-  console.log('[calculateBreadcrumbs] Calculated breadcrumbs:', breadcrumbs);
+  // console.log('[calculateBreadcrumbs] Calculated breadcrumbs:', breadcrumbs);
 
   return breadcrumbs;
 }
