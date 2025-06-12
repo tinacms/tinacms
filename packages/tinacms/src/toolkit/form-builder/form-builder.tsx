@@ -9,6 +9,7 @@ import { Button, OverflowMenu } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import { BiGitBranch } from 'react-icons/bi';
 import { MdOutlineSaveAlt } from 'react-icons/md';
+import { cn } from '../../utils/cn';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -256,22 +257,13 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   );
 };
 
-export const FormStatus = ({ pristine }) => {
+export const FormStatus = ({ pristine }: { pristine: boolean }) => {
+  const pristineClass = pristine
+    ? 'bg-green-300 border-green-400'
+    : 'bg-red-300 border-red-400 border-red-400';
   return (
     <div className='flex flex-0 items-center'>
-      {!pristine && (
-        <>
-          <p className='text-gray-500 text-xs leading-tight whitespace-nowrap mr-2'>
-            Unsaved Changes
-          </p>
-          <span className='w-3 h-3 flex-0 rounded bg-red-300 border border-red-400' />{' '}
-        </>
-      )}
-      {pristine && (
-        <>
-          <span className='w-3 h-3 flex-0 rounded bg-green-300 border border-green-400' />{' '}
-        </>
-      )}
+      <span className={cn('w-3 h-3 flex-0 rounded border', pristineClass)} />
     </div>
   );
 };
