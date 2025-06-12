@@ -4,13 +4,13 @@ import { cn } from '../../../lib/utils';
 
 export const Alert = ({
   children,
-  style = 'warning',
+  alertStyle = 'warning',
   className = '',
+  ...props
 }: {
   children?: React.ReactNode;
-  style?: 'warning';
-  className?: string;
-}) => {
+  alertStyle?: 'warning';
+} & React.HTMLProps<HTMLDivElement>) => {
   const styles = {
     warning:
       'text-sm px-4 py-2 text-amber-700 bg-amber-100 rounded border border-amber-700/20',
@@ -23,8 +23,8 @@ export const Alert = ({
   };
 
   return (
-    <div className={cn(styles[style], className)}>
-      {icon[style]} {children}
+    <div className={cn(styles[alertStyle], className)} {...props}>
+      {icon[alertStyle]} {children}
     </div>
   );
 };
