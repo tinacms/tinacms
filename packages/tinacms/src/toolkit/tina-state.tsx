@@ -234,6 +234,21 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       }
       return state;
     case 'forms:set-active-field-name':
+      if (state.activeFormId === action.value.formId) {
+        const existingForm = state.forms.find(
+          (form) => form.tinaForm.id === action.value.formId
+        );
+
+        if (existingForm?.activeFieldName === action.value.fieldName) {
+          // If the active field name is already set, do nothing
+          return state;
+        }
+      }
+
+      console.log(
+        '[tinaReducer] Setting active field name for form to %s',
+        action.value.fieldName
+      );
       const forms = state.forms.map((form) => {
         if (form.tinaForm.id === action.value.formId) {
           return {
@@ -310,14 +325,17 @@ export function calculateBreadcrumbs(
     return [];
   }
 
-  const makeCrumb = (field: {
-    label?: string;
-    name?: string;
-  }): Breadcrumb => {
+  const makeCrumb = (
+    field: {
+      label?: string;
+      name?: string;
+    },
+    path: string
+  ): Breadcrumb => {
     return {
       label: typeof field.label === 'string' ? field.label : field.name,
       formId: form.id,
-      formName: field.name,
+      formName: path,
     };
   };
 
@@ -332,58 +350,58 @@ export function calculateBreadcrumbs(
 
   if (!activeFieldName) {
     const fieldGroup = form.getActiveField('');
-    return [makeCrumb(fieldGroup)];
+    return [makeCrumb(fieldGroup, '')];
   }
 
   const breadcrumbs: Breadcrumb[] = [];
   let activePath = activeFieldName.split('.');
   while (activePath.length > 0) {
     const fieldGroup = form.getActiveField(activePath.join('.'));
+
     console.log(
-      '[calculateBreadcrumbs] Current fieldGroup:',
-      fieldGroup,
-      'Active path:',
-      activePath
+      '[calculateBreadcrumbs] Current fieldGroup: %s',
+      activePath.join('.'),
+      fieldGroup
     );
-    if (!fieldGroup) {
+
+    if (!fieldGroup || (fieldGroup as any).__type === 'form') {
+      // If we reach the form itself or a non-field group, we stop
       break;
     }
 
-    breadcrumbs.unshift(makeCrumb(fieldGroup));
+    const fieldType = (fieldGroup as AnyField).type;
+    const isListField = !!(fieldGroup as AnyField).list;
+    const pathEndsWithDigit = /^\d+$/.test(activePath[activePath.length - 1]);
 
-    if (!fieldGroup.name) {
-      // console.warn(
-      //   '[calculateBreadcrumbs] Field group has no name, breaking out of loop:',
-      //   fieldGroup
-      // );
-      break;
+    if (isListField && !pathEndsWithDigit) {
+      // continue up the tree since we should be on a list item, not the list itself
+      activePath = activePath.slice(0, -1);
+      continue;
     }
 
-    // continue up the tree
-    activePath = fieldGroup.name.split('.').slice(0, -1);
-    switch ((fieldGroup as any).type) {
-      case 'object':
-        if ((fieldGroup as any).list) {
-          // If the field is a list, we need to go up one more level
-          activePath = activePath.slice(0, -1);
-        }
-        break;
-      case 'rich-text':
-        // rich-text fields are special, they have a `props` object that contains the actual fields
-        // we should've hit a `props` and fields inside are nested under `.children.[\d+]`
-        // so we need to go up 2 more levels)
-        activePath = activePath.slice(0, -2);
-        break;
+    breadcrumbs.unshift(makeCrumb(fieldGroup, activePath.join('.')));
+
+    if (activePath.length > 0) {
+      if (
+        fieldType === 'rich-text' ||
+        (activePath[activePath.length - 2] === 'children' && pathEndsWithDigit)
+      ) {
+        // if activePath ends with ['children', '\d+']
+        activePath = activePath.slice(0, -3);
+      } else {
+        // continue up the tree
+        activePath = activePath.slice(0, -1);
+      }
     }
   }
 
   // ensure that the last breadcrumb is the form itself
   if (!breadcrumbs.some((crumb) => !crumb.formName)) {
     const fieldGroup = form.getActiveField('');
-    breadcrumbs.unshift(makeCrumb(fieldGroup));
+    breadcrumbs.unshift(makeCrumb(fieldGroup, ''));
   }
 
-  // console.log('[calculateBreadcrumbs] Calculated breadcrumbs:', breadcrumbs);
+  console.log('[calculateBreadcrumbs] Calculated breadcrumbs:', breadcrumbs);
 
   return breadcrumbs;
 }

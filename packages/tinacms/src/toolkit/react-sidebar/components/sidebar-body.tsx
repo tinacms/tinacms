@@ -202,13 +202,13 @@ const FormBreadcrumbs = (props: React.HTMLAttributes<HTMLDivElement>) => {
                 {
                   // If the breadcrumb is the last one, render it as a page
                   index === cms.state.breadcrumbs.length - 1 ? (
-                    <BreadcrumbPage className='text-gray-700 font-medium'>
+                    <BreadcrumbPage className='text-gray-700 font-medium truncate max-w-[10ch]'>
                       {breadcrumb.label}
                     </BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink
                       asChild
-                      className='text-gray-700 hover:text-blue-500'
+                      className='text-gray-700 hover:text-blue-500 truncate max-w-[10ch]'
                     >
                       <button
                         type='button'
