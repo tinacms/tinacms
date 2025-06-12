@@ -26,6 +26,7 @@ type Breadcrumb = {
   label: string;
   formId: string;
   formName: string;
+  namespace: string[];
 };
 
 export type TinaAction =
@@ -329,6 +330,7 @@ export function calculateBreadcrumbs(
     field: {
       label?: string;
       name?: string;
+      namespace?: string[];
     },
     path: string
   ): Breadcrumb => {
@@ -336,6 +338,7 @@ export function calculateBreadcrumbs(
       label: typeof field.label === 'string' ? field.label : field.name,
       formId: form.id,
       formName: path,
+      namespace: field.namespace || [],
     };
   };
 
@@ -379,7 +382,20 @@ export function calculateBreadcrumbs(
       continue;
     }
 
-    breadcrumbs.unshift(makeCrumb(fieldGroup, activePath.join('.')));
+    const lastInsertedCrumb = breadcrumbs.length > 0 ? breadcrumbs[0] : null;
+    const newCrumb = makeCrumb(fieldGroup, activePath.join('.'));
+    if (
+      lastInsertedCrumb &&
+      lastInsertedCrumb.label === newCrumb.label &&
+      lastInsertedCrumb.namespace.join('.') === newCrumb.namespace.join('.')
+    ) {
+      console.log(
+        '[calculateBreadcrumbs] Skipping duplicate breadcrumb:',
+        newCrumb
+      );
+    } else {
+      breadcrumbs.unshift(newCrumb);
+    }
 
     if (activePath.length > 0) {
       if (

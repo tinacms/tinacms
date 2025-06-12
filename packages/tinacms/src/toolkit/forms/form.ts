@@ -310,6 +310,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     label?: string;
     name?: string;
     fields: Field[];
+    namespace?: string[];
   } {
     if (!fieldName) {
       return this;
