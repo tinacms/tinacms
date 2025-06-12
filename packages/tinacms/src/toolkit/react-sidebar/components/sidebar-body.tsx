@@ -167,7 +167,7 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
           <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
         </button>
 
-        <FormBreadcrumbs className='w-full' />
+        <FormBreadcrumbs className='grow' />
 
         <FormStatus pristine={formIsPristine} />
       </div>
@@ -202,13 +202,13 @@ const FormBreadcrumbs = (props: React.HTMLAttributes<HTMLDivElement>) => {
                 {
                   // If the breadcrumb is the last one, render it as a page
                   index === cms.state.breadcrumbs.length - 1 ? (
-                    <BreadcrumbPage className='text-gray-700 font-medium truncate max-w-[10ch]'>
+                    <BreadcrumbPage className='text-gray-700 font-medium'>
                       {breadcrumb.label}
                     </BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink
                       asChild
-                      className='text-gray-700 hover:text-blue-500 truncate max-w-[10ch]'
+                      className='text-gray-700 hover:text-blue-500'
                     >
                       <button
                         type='button'
