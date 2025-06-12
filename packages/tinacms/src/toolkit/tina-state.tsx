@@ -349,10 +349,19 @@ export function calculateBreadcrumbs(
 
     // continue up the tree
     activePath = fieldGroup.name.split('.').slice(0, -1);
-    if (['rich-text'].includes(fieldGroup.type)) {
-      // we should've hit a `props` and fields inside are nested under `.children.[\d+]`
-      // so we need to go up 2 more levels)
-      activePath = activePath.slice(0, -2);
+    switch ((fieldGroup as any).type) {
+      case 'object':
+        if ((fieldGroup as any).list) {
+          // If the field is a list, we need to go up one more level
+          activePath = activePath.slice(0, -1);
+        }
+        break;
+      case 'rich-text':
+        // rich-text fields are special, they have a `props` object that contains the actual fields
+        // we should've hit a `props` and fields inside are nested under `.children.[\d+]`
+        // so we need to go up 2 more levels)
+        activePath = activePath.slice(0, -2);
+        break;
     }
   }
 
