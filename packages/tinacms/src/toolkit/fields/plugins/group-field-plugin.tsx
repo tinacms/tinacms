@@ -151,14 +151,7 @@ export const PanelHeader = ({ onClick, children }) => {
 
 export const PanelBody = ({ id, children }) => {
   return (
-    <div
-      style={{
-        flex: '1 1 0%',
-        width: '100%',
-        overflowY: 'auto',
-        background: 'var(--tina-color-grey-1)',
-      }}
-    >
+    <div className='flex-1 w-full overflow-y-auto bg-[var(--tina-color-grey-1)]'>
       <FormWrapper id={id}>{children}</FormWrapper>
     </div>
   );
