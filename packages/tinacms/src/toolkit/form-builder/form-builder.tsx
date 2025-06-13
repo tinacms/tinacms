@@ -8,6 +8,7 @@ import { formatBranchName } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import { BiGitBranch } from 'react-icons/bi';
+import { FaCircle } from 'react-icons/fa';
 import { MdOutlineSaveAlt } from 'react-icons/md';
 import { cn } from '../../utils/cn';
 import { useCMS } from '../react-core';
@@ -258,14 +259,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 };
 
 export const FormStatus = ({ pristine }: { pristine: boolean }) => {
-  const pristineClass = pristine
-    ? 'bg-green-300 border-green-400'
-    : 'bg-red-300 border-red-400 border-red-400';
-  return (
-    <div className='flex flex-0 items-center'>
-      <span className={cn('w-3 h-3 flex-0 rounded border', pristineClass)} />
-    </div>
-  );
+  const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
+  return <FaCircle className={cn('h-3', pristineClass)} />;
 };
 
 export const FormWrapper = ({

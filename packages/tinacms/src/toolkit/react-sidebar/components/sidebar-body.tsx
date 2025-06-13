@@ -1,17 +1,24 @@
 import {
   Breadcrumb,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@toolkit/components/ui/breadcrumb';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@toolkit/components/ui/dropdown-menu';
 import { FormBuilder, FormStatus } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
+import { EllipsisVertical } from 'lucide-react';
 import * as React from 'react';
-import { BiDotsVertical } from 'react-icons/bi';
 import { FormLists } from './form-list';
 import { SidebarContext } from './sidebar';
 import { SidebarLoadingPlaceholder } from './sidebar-loading-placeholder';
@@ -131,22 +138,19 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
   const { formIsPristine } = React.useContext(SidebarContext);
 
   return (
-    <div className={'p-4 bg-gradient-to-t from-white to-gray-50'}>
-      <div className='flex gap-2 justify-between items-center'>
-        <MultiformSelector activeForm={activeForm} />
-
-        <FormBreadcrumbs className='grow' />
-
-        <FormStatus pristine={formIsPristine} />
-      </div>
+    <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50'>
+      <MultiformSelector activeForm={activeForm} />
+      <FormBreadcrumbs className='w-[calc(100%-3rem)]' />
+      <FormStatus pristine={formIsPristine} />
     </div>
   );
 };
 
 const FormBreadcrumbs = (props: React.HTMLAttributes<HTMLDivElement>) => {
   const cms = useCMS();
+  const breadcrumbs = cms.state.breadcrumbs;
 
-  if (cms.state.breadcrumbs.length === 0) {
+  if (breadcrumbs.length === 0) {
     return null;
   }
 
@@ -160,43 +164,102 @@ const FormBreadcrumbs = (props: React.HTMLAttributes<HTMLDivElement>) => {
     });
   };
 
+  const firstBreadcrumb = breadcrumbs[0];
+  const secondLastBreadcrumb =
+    breadcrumbs.length > 2 ? breadcrumbs[breadcrumbs.length - 2] : null;
+  const lastBreadcrumb = breadcrumbs[breadcrumbs.length - 1];
+  const dropdownBreadcrumbs =
+    breadcrumbs.length > 3 ? breadcrumbs.slice(1, -2) : [];
+
   return (
     <Breadcrumb {...props}>
-      <BreadcrumbList>
-        {cms.state.breadcrumbs.map((breadcrumb, index) => {
-          return (
-            <React.Fragment key={index}>
-              <BreadcrumbItem>
-                {
-                  // If the breadcrumb is the last one, render it as a page
-                  index === cms.state.breadcrumbs.length - 1 ? (
-                    <BreadcrumbPage className='text-gray-700 font-medium'>
-                      {breadcrumb.label}
-                    </BreadcrumbPage>
-                  ) : (
-                    <BreadcrumbLink
-                      asChild
-                      className='text-gray-700 hover:text-blue-500'
+      <BreadcrumbList className='flex-nowrap text-nowrap'>
+        {/* First breadcrumb - only use when there is more than 1 breadcrumb */}
+        {breadcrumbs.length > 1 && (
+          <BreadcrumbItem className='shrink truncate'>
+            <BreadcrumbLink
+              asChild
+              className='text-gray-700 hover:text-blue-500 truncate'
+            >
+              <button
+                type='button'
+                onClick={(e) => {
+                  e.preventDefault();
+                  goBack(firstBreadcrumb.formId, firstBreadcrumb.formName);
+                }}
+              >
+                {firstBreadcrumb.label}
+              </button>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        )}
+
+        {/* Dropdown for middle breadcrumbs */}
+        {dropdownBreadcrumbs.length > 0 && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger className='flex items-center gap-1'>
+                  <BreadcrumbEllipsis className='size-4' />
+                  <span className='sr-only'>Toggle menu</span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='start'>
+                  {dropdownBreadcrumbs.map((breadcrumb) => (
+                    <DropdownMenuItem
+                      key={breadcrumb.formId}
+                      className='cursor-pointer text-gray-700 hover:text-blue-500'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        goBack(breadcrumb.formId, breadcrumb.formName);
+                      }}
                     >
-                      <button
-                        type='button'
-                        onClick={(e) => {
-                          e.preventDefault();
-                          goBack(breadcrumb.formId, breadcrumb.formName);
-                        }}
-                      >
-                        {breadcrumb.label}
-                      </button>
-                    </BreadcrumbLink>
-                  )
-                }
-              </BreadcrumbItem>
-              {index < cms.state.breadcrumbs.length - 1 && (
-                <BreadcrumbSeparator />
-              )}
-            </React.Fragment>
-          );
-        })}
+                      {breadcrumb.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </BreadcrumbItem>
+          </>
+        )}
+
+        {/* Second last breadcrumb */}
+        {secondLastBreadcrumb && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem className='shrink truncate'>
+              <BreadcrumbLink
+                asChild
+                className='text-gray-700 hover:text-blue-500 truncate'
+              >
+                <button
+                  type='button'
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goBack(
+                      secondLastBreadcrumb.formId,
+                      secondLastBreadcrumb.formName
+                    );
+                  }}
+                >
+                  {secondLastBreadcrumb.label}
+                </button>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </>
+        )}
+
+        {/* Last breadcrumb - only use when there is more than 2 breadcrumbs */}
+        {lastBreadcrumb && (
+          <>
+            {breadcrumbs.length > 1 && <BreadcrumbSeparator />}
+            <BreadcrumbItem>
+              <BreadcrumbPage className='text-gray-700 font-medium'>
+                {lastBreadcrumb.label}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </>
+        )}
       </BreadcrumbList>
     </Breadcrumb>
   );
@@ -204,7 +267,9 @@ const FormBreadcrumbs = (props: React.HTMLAttributes<HTMLDivElement>) => {
 
 const MultiformSelector = ({
   activeForm,
-}: { activeForm: { activeFieldName?: string; tinaForm: Form } }) => {
+}: {
+  activeForm: { activeFieldName?: string; tinaForm: Form };
+}) => {
   const cms = useCMS();
   const isMultiform = cms.state.forms.length > 1;
 
@@ -224,7 +289,7 @@ const MultiformSelector = ({
         }
       }}
     >
-      <BiDotsVertical className='h-auto w-5 inline-block opacity-70' />
+      <EllipsisVertical className='h-5 w-auto opacity-70' />
     </button>
   );
 };
