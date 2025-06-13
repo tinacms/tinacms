@@ -11,7 +11,7 @@ import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
 import * as React from 'react';
-import { BiDotsVertical, BiHomeAlt } from 'react-icons/bi';
+import { BiDotsVertical } from 'react-icons/bi';
 import { FormLists } from './form-list';
 import { SidebarContext } from './sidebar';
 import { SidebarLoadingPlaceholder } from './sidebar-loading-placeholder';
@@ -128,29 +128,12 @@ export interface FormHeaderProps {
 }
 
 export const FormHeader = ({ activeForm }: FormHeaderProps) => {
-  const cms = useCMS();
   const { formIsPristine } = React.useContext(SidebarContext);
-  const isMultiform = cms.state.forms.length > 1;
 
   return (
     <div className={'py-4 bg-gradient-to-t from-white to-gray-50'}>
       <div className='px-6 flex gap-2 justify-between items-center'>
-        {isMultiform && (
-          <button
-            type='button'
-            className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
-            onClick={() => {
-              const state = activeForm.tinaForm.finalForm.getState();
-              if (state.invalid === true) {
-                cms.alerts.error('Cannot navigate away from an invalid form.');
-              } else {
-                cms.dispatch({ type: 'forms:set-active-form-id', value: null });
-              }
-            }}
-          >
-            <BiDotsVertical className='h-auto w-5 inline-block opacity-70' />
-          </button>
-        )}
+        <MultiformSelector activeForm={activeForm} />
 
         <FormBreadcrumbs className='grow' />
 
@@ -216,5 +199,32 @@ const FormBreadcrumbs = (props: React.HTMLAttributes<HTMLDivElement>) => {
         })}
       </BreadcrumbList>
     </Breadcrumb>
+  );
+};
+
+const MultiformSelector = ({
+  activeForm,
+}: { activeForm: { activeFieldName?: string; tinaForm: Form } }) => {
+  const cms = useCMS();
+  const isMultiform = cms.state.forms.length > 1;
+
+  if (!isMultiform) {
+    return null;
+  }
+  return (
+    <button
+      type='button'
+      className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
+      onClick={() => {
+        const state = activeForm.tinaForm.finalForm.getState();
+        if (state.invalid === true) {
+          cms.alerts.error('Cannot navigate away from an invalid form.');
+        } else {
+          cms.dispatch({ type: 'forms:set-active-form-id', value: null });
+        }
+      }}
+    >
+      <BiDotsVertical className='h-auto w-5 inline-block opacity-70' />
+    </button>
   );
 };
