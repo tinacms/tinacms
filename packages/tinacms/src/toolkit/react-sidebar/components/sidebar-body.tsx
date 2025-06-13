@@ -146,7 +146,12 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
   );
 };
 
-const FormBreadcrumbs = (props: React.HTMLAttributes<HTMLDivElement>) => {
+export const FormBreadcrumbs = ({
+  rootBreadcrumbName,
+  ...props
+}: {
+  rootBreadcrumbName?: string;
+} & React.HTMLAttributes<HTMLDivElement>) => {
   const cms = useCMS();
   const breadcrumbs = cms.state.breadcrumbs;
 
@@ -188,7 +193,7 @@ const FormBreadcrumbs = (props: React.HTMLAttributes<HTMLDivElement>) => {
                   goBack(firstBreadcrumb.formId, firstBreadcrumb.formName);
                 }}
               >
-                {firstBreadcrumb.label}
+                {rootBreadcrumbName || firstBreadcrumb.label}
               </button>
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -255,7 +260,9 @@ const FormBreadcrumbs = (props: React.HTMLAttributes<HTMLDivElement>) => {
             {breadcrumbs.length > 1 && <BreadcrumbSeparator />}
             <BreadcrumbItem>
               <BreadcrumbPage className='text-gray-700 font-medium'>
-                {lastBreadcrumb.label}
+                {breadcrumbs.length === 1 && rootBreadcrumbName
+                  ? rootBreadcrumbName
+                  : lastBreadcrumb.label}
               </BreadcrumbPage>
             </BreadcrumbItem>
           </>

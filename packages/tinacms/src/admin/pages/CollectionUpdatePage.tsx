@@ -12,8 +12,9 @@ import {
 } from '@tinacms/toolkit';
 import { LocalWarning } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
+import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
 import React, { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
 import GetCMS from '../components/GetCMS';
@@ -181,18 +182,10 @@ const RenderForm = ({
         className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
       >
         <div className='w-full flex gap-1.5 justify-between items-center'>
-          <Link
-            to={`/collections/${collection.name}/~${parentFolder}`}
-            className='flex-0 text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 text-sm leading-tight whitespace-nowrap truncate transition-all duration-150 ease-out'
-          >
-            {collection.label ? collection.label : collection.name}
-          </Link>
-          <span className='opacity-30 text-sm leading-tight whitespace-nowrap flex-0'>
-            /
-          </span>
-          <span className='flex-1 w-full text-sm leading-tight whitespace-nowrap truncate'>
-            {`${filename}.${collection.format}`}
-          </span>
+          <FormBreadcrumbs
+            className='w-[calc(100%-3rem)]'
+            rootBreadcrumbName={`${filename}.${collection.format}`}
+          />
           <FormStatus pristine={formIsPristine} />
         </div>
       </div>

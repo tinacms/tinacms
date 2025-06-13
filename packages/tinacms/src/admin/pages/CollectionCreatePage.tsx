@@ -13,10 +13,11 @@ import {
   wrapFieldsWithMeta,
 } from '@tinacms/toolkit';
 import React, { useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { LocalWarning } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
+import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
 import { FaLock, FaUnlock } from 'react-icons/fa';
 import { TinaAdminApi } from '../api';
 import { ErrorDialog } from '../components/ErrorDialog';
@@ -359,20 +360,10 @@ export const RenderForm = ({
           className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
         >
           <div className='w-full flex gap-1.5 justify-between items-center'>
-            <Link
-              to={`/collections/${collection.name}${
-                folder.fullyQualifiedName ? `/${folder.fullyQualifiedName}` : ''
-              }`}
-              className='flex-0 text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 text-sm leading-tight whitespace-nowrap truncate transition-all duration-150 ease-out'
-            >
-              {collection.label ? collection.label : collection.name}
-            </Link>
-            <span className='opacity-30 text-sm leading-tight whitespace-nowrap flex-0'>
-              /
-            </span>
-            <span className='flex-1 w-full text-sm leading-tight whitespace-nowrap truncate'>
-              Create New
-            </span>
+            <FormBreadcrumbs
+              className='w-[calc(100%-3rem)]'
+              rootBreadcrumbName='Create New'
+            />
             <FormStatus pristine={formIsPristine} />
           </div>
         </div>
