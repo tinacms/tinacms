@@ -131,8 +131,8 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
   const { formIsPristine } = React.useContext(SidebarContext);
 
   return (
-    <div className={'py-4 bg-gradient-to-t from-white to-gray-50'}>
-      <div className='px-6 flex gap-2 justify-between items-center'>
+    <div className={'p-4 bg-gradient-to-t from-white to-gray-50'}>
+      <div className='flex gap-2 justify-between items-center'>
         <MultiformSelector activeForm={activeForm} />
 
         <FormBreadcrumbs className='grow' />
