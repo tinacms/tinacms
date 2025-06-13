@@ -1,14 +1,15 @@
 import * as React from 'react';
+import { cn } from '../../lib/utils';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'white' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'white' | 'ghost' | 'danger' | 'custom';
   as?: React.ElementType;
   href?: string;
   target?: string;
   size?: 'small' | 'medium' | 'custom';
   busy?: boolean;
-  rounded?: 'full' | 'left' | 'right' | 'custom';
+  rounded?: 'full' | 'left' | 'right' | 'custom' | 'none';
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -33,18 +34,20 @@ export const Button = ({
     white: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100`,
     ghost: `text-gray-500 hover:text-blue-500 hover:shadow border border-transparent border-0 hover:border hover:border-gray-200 bg-transparent`,
     danger: `shadow text-white bg-red-500 hover:bg-red-600 focus:ring-red-500`,
+    custom: '',
   };
   const state = busy ? `busy` : disabled ? `disabled` : `default`;
   const stateClasses = {
-    disabled: `pointer-events-none	opacity-30 cursor-not-allowed`,
+    disabled: `pointer-events-none opacity-30 cursor-not-allowed`,
     busy: `pointer-events-none opacity-70 cursor-wait`,
     default: ``,
   };
   const roundedClasses = {
-    full: `rounded-full`,
-    left: `rounded-l-full`,
-    right: `rounded-r-full`,
+    full: `rounded`,
+    left: `rounded-l`,
+    right: `rounded-r`,
     custom: '',
+    none: '',
   };
   const sizeClasses = {
     small: `text-xs h-8 px-3`,
@@ -54,7 +57,14 @@ export const Button = ({
 
   return (
     <Tag
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${stateClasses[state]} ${roundedClasses[rounded]} ${className}`}
+      className={cn(
+        baseClasses,
+        variantClasses[variant],
+        sizeClasses[size],
+        stateClasses[state],
+        roundedClasses[rounded],
+        className
+      )}
       {...props}
     >
       {children}
@@ -72,7 +82,7 @@ export const IconButton = ({
   ...props
 }: ButtonProps) => {
   const baseClasses =
-    'icon-parent inline-flex items-center border border-transparent text-sm font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out rounded-full ';
+    'icon-parent inline-flex items-center border border-transparent text-sm font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out rounded-full';
   const variantClasses = {
     primary: `shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500`,
     secondary: `shadow text-gray-500 hover:text-blue-500 bg-gray-50 hover:bg-white border border-gray-200`,
@@ -93,7 +103,13 @@ export const IconButton = ({
 
   return (
     <button
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${stateClasses[state]} ${className}`}
+      className={cn(
+        baseClasses,
+        variantClasses[variant],
+        sizeClasses[size],
+        stateClasses[state],
+        className
+      )}
       {...props}
     >
       {children}

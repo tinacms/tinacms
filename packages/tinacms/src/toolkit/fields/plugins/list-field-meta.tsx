@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { useEvent } from '@toolkit/react-core/use-cms-event';
-import { FieldHoverEvent, FieldFocusEvent } from '../field-events';
 import { Form } from '@toolkit/forms';
+import { useEvent } from '@toolkit/react-core/use-cms-event';
+import * as React from 'react';
+import { FieldFocusEvent, FieldHoverEvent } from '../field-events';
 import {
   FieldDescription,
   FieldError,
@@ -99,7 +99,7 @@ export const ListLabel = ({ children }: { children?: any }) => {
 
 export const ListPanel = ({ className = '', ...props }) => (
   <div
-    className={`max-h-[initial] relative h-auto rounded-md shadow bg-gray-100 ${className}`}
+    className={`max-h-[initial] relative h-auto rounded shadow bg-gray-100 ${className}`}
     {...props}
   />
 );

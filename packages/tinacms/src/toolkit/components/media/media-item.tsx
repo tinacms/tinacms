@@ -1,6 +1,6 @@
-import React from 'react';
 import { Media } from '@toolkit/core';
-import { BiFolder, BiFile, BiMovie } from 'react-icons/bi';
+import React from 'react';
+import { BiFile, BiFolder, BiMovie } from 'react-icons/bi';
 import { isImage, isVideo } from './utils';
 
 interface MediaItemProps {
@@ -33,7 +33,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
       }}
     >
       {item.new && (
-        <span className='absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
+        <span className='absolute top-1.5 left-1.5 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
           NEW
         </span>
       )}
@@ -67,14 +67,14 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
   const thumbnail = (item.thumbnails || {})['400x400'];
   return (
     <li
-      className={`relative pb-[100%] h-0 block border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out ${
+      className={`relative pb-[100%] h-0 block border border-gray-100 rounded overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out ${
         active
           ? 'shadow-outline'
           : 'shadow hover:shadow-md hover:scale-103 hover:border-gray-150'
       } ${item.type === 'dir' ? 'cursor-pointer' : ''}`}
     >
       {item.new && (
-        <span className='absolute top-1.5 left-1.5 rounded-full shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
+        <span className='absolute top-1.5 left-1.5 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
           NEW
         </span>
       )}

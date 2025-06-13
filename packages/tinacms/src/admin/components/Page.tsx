@@ -2,13 +2,15 @@
 
 */
 
-import React from 'react';
 import {
-  LocalWarning,
   BillingWarning,
   BranchBanner,
+  BranchButton,
+  BranchPreviewButton,
+  LocalWarning,
   useCMS,
 } from '@tinacms/toolkit';
+import React from 'react';
 
 export const PageWrapper = ({ children }: { children: React.ReactNode }) => {
   const cms = useCMS();
@@ -40,28 +42,28 @@ export const PageHeader = ({
   isLocalMode?: boolean;
   children: React.ReactNode;
 }) => {
+  const cms = useCMS();
+  const branchingEnabled = cms.flags.get('branch-switcher');
   return (
     <>
-      {isLocalMode && <LocalWarning />}
-      {!isLocalMode && <BillingWarning />}
-
-      <div className='pt-16 xl:pt-12 px-6 xl:px-12'>
-        <div className='w-full mx-auto max-w-screen-xl'>
-          <div className='w-full flex justify-between items-end'>
-            {children}
+      <div className='py-2 px-4'>
+        {isLocalMode && <LocalWarning />}
+        {!isLocalMode && <BillingWarning />}
+        {branchingEnabled && !isLocalMode && (
+          <div className='flex justify-between items-center'>
+            <BranchButton />
+            <BranchPreviewButton />
           </div>
-        </div>
+        )}
+      </div>
+
+      <div className='pt-4 pb-2 px-6'>
+        <div className='w-full flex justify-between items-end'>{children}</div>
       </div>
     </>
   );
 };
 
 export const PageBody = ({ children }: { children: React.ReactNode }) => (
-  <div className='py-8 px-6 xl:px-12'>{children}</div>
-);
-
-export const PageBodyNarrow = ({ children }: { children: React.ReactNode }) => (
-  <div className='py-10 px-6 xl:px-12'>
-    <div className='w-full mx-auto max-w-screen-xl'>{children}</div>
-  </div>
+  <div className='py-4 px-6'>{children}</div>
 );

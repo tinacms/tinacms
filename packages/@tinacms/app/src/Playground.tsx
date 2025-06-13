@@ -100,7 +100,7 @@ const Playground = () => {
                         false
                           ? 'bg-gray-100 text-gray-900'
                           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                        'flex items-center rounded-md px-3 py-2 text-sm font-medium w-full text-left'
+                        'flex items-center rounded px-3 py-2 text-sm font-medium w-full text-left'
                       )}
                       onClick={async () => {
                         if (typeof value === 'function') {

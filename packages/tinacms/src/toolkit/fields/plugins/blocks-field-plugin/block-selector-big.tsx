@@ -1,6 +1,3 @@
-import * as React from 'react';
-import { AddIcon } from '@toolkit/icons';
-import { IconButton } from '@toolkit/styles';
 import {
   Disclosure,
   DisclosureButton,
@@ -9,10 +6,13 @@ import {
   TransitionChild,
 } from '@headlessui/react';
 import { useFormPortal } from '@toolkit/form-builder';
-import { PanelHeader } from '../group-field-plugin';
-import type { BlockTemplate } from '.';
-import { MdKeyboardArrowDown, MdOutlineClear } from 'react-icons/md';
+import { AddIcon } from '@toolkit/icons';
+import { IconButton } from '@toolkit/styles';
+import * as React from 'react';
 import { BiSearch } from 'react-icons/bi';
+import { MdKeyboardArrowDown, MdOutlineClear } from 'react-icons/md';
+import type { BlockTemplate } from '.';
+import { PanelHeader } from '../group-field-plugin';
 
 export const BlockSelectorBig = ({
   templates,
@@ -120,7 +120,7 @@ export const BlockSelectorBig = ({
                           <input
                             type='text'
                             className={
-                              'shadow-inner focus:shadow-outline focus:border-blue-400 focus:outline-none block text-sm pl-2.5 pr-8 py-1.5 text-gray-600 w-full bg-white border border-gray-200 focus:text-gray-900 rounded-md placeholder-gray-400 hover:placeholder-gray-600 transition-all ease-out duration-150'
+                              'shadow-inner focus:shadow-outline focus:border-blue-400 focus:outline-none block text-sm pl-2.5 pr-8 py-1.5 text-gray-600 w-full bg-white border border-gray-200 focus:text-gray-900 rounded placeholder-gray-400 hover:placeholder-gray-600 transition-all ease-out duration-150'
                             }
                             onClick={(event: any) => {
                               event.stopPropagation();
@@ -287,7 +287,7 @@ const CardColumns = ({ children, className = '' }) => {
 const BlockCard = ({ close, name, template }) => {
   return (
     <button
-      className='mb-2 mt-2 group relative text-xs font-bold border border-gray-100 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 rounded-md bg-white shadow overflow-hidden'
+      className='mb-2 mt-2 group relative text-xs font-bold border border-gray-100 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 rounded bg-white shadow overflow-hidden'
       style={{ breakInside: 'avoid', transform: 'translateZ(0)' }}
       key={name}
       onClick={() => {

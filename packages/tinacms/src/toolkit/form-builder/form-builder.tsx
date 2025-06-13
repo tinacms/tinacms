@@ -1,28 +1,29 @@
+import type { Form } from '@toolkit/forms';
 import * as React from 'react';
 import { type FC, useEffect } from 'react';
-import type { Form } from '@toolkit/forms';
 import { Form as FinalForm } from 'react-final-form';
 
-import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
+import type { TinaSchema } from '@tinacms/schema-tools';
+import { formatBranchName } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
-import { LoadingDots } from './loading-dots';
-import { FormPortalProvider } from './form-portal';
-import { FieldsBuilder } from './fields-builder';
-import { ResetForm } from './reset-form';
-import { FormActionMenu } from './form-actions';
+import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
+import { BiGitBranch } from 'react-icons/bi';
+import { FaCircle } from 'react-icons/fa';
+import { MdOutlineSaveAlt } from 'react-icons/md';
+import { cn } from '../../utils/cn';
 import { useCMS } from '../react-core';
-import { IoMdClose } from 'react-icons/io';
 import {
   Modal,
-  PopupModal,
-  ModalHeader,
-  ModalBody,
   ModalActions,
+  ModalBody,
+  ModalHeader,
+  PopupModal,
 } from '../react-modals';
-import { BiGitBranch } from 'react-icons/bi';
-import { MdOutlineSaveAlt } from 'react-icons/md';
-import { formatBranchName } from '@toolkit/plugin-branch-switcher';
-import type { TinaSchema } from '@tinacms/schema-tools';
+import { FieldsBuilder } from './fields-builder';
+import { FormActionMenu } from './form-actions';
+import { FormPortalProvider } from './form-portal';
+import { LoadingDots } from './loading-dots';
+import { ResetForm } from './reset-form';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -86,18 +87,6 @@ const FormKeyBindings: FC<FormKeyBindingsProps> = ({ onSubmit }) => {
 
   return null;
 };
-
-function usePrevious(value) {
-  // The ref object is a generic container whose current property is mutable ...
-  // ... and can hold any value, similar to an instance property on a class
-  const ref = React.useRef(null);
-  // Store current value in ref
-  useEffect(() => {
-    ref.current = value;
-  }, [value]); // Only re-run if value changes
-  // Return previous value (happens before update in useEffect above)
-  return ref.current;
-}
 
 export const FormBuilder: FC<FormBuilderProps> = ({
   form,
@@ -217,10 +206,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormKeyBindings onSubmit={safeHandleSubmit} />
               <FormPortalProvider>
-                <FormWrapper
-                  header={<PanelHeader {...fieldGroup} id={tinaForm.id} />}
-                  id={tinaForm.id}
-                >
+                <FormWrapper id={tinaForm.id}>
                   {tinaForm?.fields.length ? (
                     <FieldsBuilder
                       form={tinaForm}
@@ -233,7 +219,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 </FormWrapper>
               </FormPortalProvider>
               {!hideFooter && (
-                <div className='relative flex-none w-full h-16 px-12 bg-white border-t border-gray-100 flex items-center justify-end'>
+                <div className='relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100 flex items-center justify-end'>
                   <div className='flex-1 w-full justify-end gap-2	flex items-center max-w-form'>
                     {tinaForm.reset && (
                       <ResetForm
@@ -272,46 +258,24 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   );
 };
 
-export const FormStatus = ({ pristine }) => {
-  return (
-    <div className='flex flex-0 items-center'>
-      {!pristine && (
-        <>
-          <p className='text-gray-500 text-xs leading-tight whitespace-nowrap mr-2'>
-            Unsaved Changes
-          </p>
-          <span className='w-3 h-3 flex-0 rounded-full bg-red-300 border border-red-400' />{' '}
-        </>
-      )}
-      {pristine && (
-        <>
-          <span className='w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400' />{' '}
-        </>
-      )}
-    </div>
-  );
+export const FormStatus = ({ pristine }: { pristine: boolean }) => {
+  const pristineClass = pristine ? 'text-green-500' : 'text-red-500';
+  return <FaCircle className={cn('h-3', pristineClass)} />;
 };
 
 export const FormWrapper = ({
-  header,
-  children,
   id,
+  children,
 }: {
-  header?: React.ReactNode;
-  children: React.ReactNode;
   id: string;
+  children: React.ReactNode;
 }) => {
   return (
     <div
       data-test={`form:${id?.replace(/\\/g, '/')}`}
       className='h-full overflow-y-auto max-h-full bg-gray-50'
     >
-      {header}
-      <div className='py-5 px-6 xl:px-12'>
-        <div className='w-full flex justify-center'>
-          <div className='w-full'>{children}</div>
-        </div>
-      </div>
+      <div className='py-5 px-6'>{children}</div>
     </div>
   );
 };
@@ -322,74 +286,6 @@ const Emoji = ({ className = '', ...props }) => (
     {...props}
   />
 );
-
-const isNumber = (item: string) => {
-  return !isNaN(Number(item));
-};
-
-const PanelHeader = (props: { label?: string; name?: string; id: string }) => {
-  const cms = useCMS();
-  const activePath = props.name?.split('.') || [];
-  if (!activePath || activePath.length === 0) {
-    return null;
-  }
-
-  let lastItemIndex;
-  activePath.forEach((item, index) => {
-    if (!isNumber(item)) {
-      lastItemIndex = index;
-    }
-  });
-  const returnPath = activePath.slice(0, lastItemIndex);
-
-  return (
-    <button
-      type='button'
-      className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
-   border-gray-100 px-6 -mt-px`}
-      onClick={() => {
-        cms.dispatch({
-          type: 'forms:set-active-field-name',
-          value: {
-            formId: props.id,
-            fieldName: returnPath.length > 0 ? returnPath.join('.') : null,
-          },
-        });
-      }}
-      tabIndex={-1}
-    >
-      <div className='flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto'>
-        {props.label || props.name || 'Back'}
-        <IoMdClose className='h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5' />
-      </div>
-    </button>
-  );
-};
-
-const getAnimationProps = (animateStatus) => {
-  const forwardsAnimation = {
-    enter: 'transform transition ease-in-out duration-500 sm:duration-700',
-    enterFrom: 'translate-x-8',
-    enterTo: 'translate-x-0',
-    leave: 'transform transition ease-in-out duration-500 sm:duration-700',
-    leaveFrom: 'translate-x-0',
-    leaveTo: 'translate-x-8',
-  };
-  const backwardsAnimation = {
-    enter: 'transform transition ease-in-out duration-500 sm:duration-700',
-    enterFrom: '-translate-x-8',
-    enterTo: 'translate-x-0',
-    leave: 'transform transition ease-in-out duration-500 sm:duration-700',
-    leaveFrom: 'translate-x-0',
-    leaveTo: '-translate-x-8',
-  };
-
-  return animateStatus === 'backwards'
-    ? backwardsAnimation
-    : animateStatus === 'forwards'
-      ? forwardsAnimation
-      : {};
-};
 
 /**
  * @deprecated
@@ -539,7 +435,7 @@ export const CreateBranchModal = ({
 
 export const PrefixedTextField = ({ prefix = 'tina/', ...props }) => {
   return (
-    <div className='border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded-md shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150'>
+    <div className='border border-gray-200 focus-within:border-blue-200 bg-gray-100 focus-within:bg-blue-100 rounded shadow-sm focus-within:shadow-outline overflow-hidden flex items-stretch divide-x divide-gray-200 focus-within:divide-blue-100 w-full transition-all ease-out duration-150'>
       <span className='pl-3 pr-2 py-2 font-medium text-base text-gray-700 opacity-50'>
         {prefix}
       </span>

@@ -4,7 +4,6 @@
 
 */
 
-import React from 'react';
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
 /**
  * MDX is built directly to the app because of how we load dependencies.
@@ -13,14 +12,15 @@ import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
  * (when we're working in the monorepo, or working with a tagged npm version)
  */
 import { parseMDX, stringifyMDX } from '@tinacms/mdx';
-import { useDebounce } from './use-debounce';
 import type * as monaco from 'monaco-editor';
+import React from 'react';
+import { RichTextType } from 'tinacms';
 import {
-  buildError,
   ErrorMessage,
   InvalidMarkdownElement,
+  buildError,
 } from './error-message';
-import { RichTextType } from 'tinacms';
+import { useDebounce } from './use-debounce';
 
 export const uuid = () => {
   // @ts-ignore
@@ -219,10 +219,8 @@ const Button = (props) => {
   return (
     <button
       className={`${
-        props.align === 'left'
-          ? 'rounded-l-md border-r-0'
-          : 'rounded-r-md border-l-0'
-      } flex justify-center w-full shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+        props.align === 'left' ? 'rounded-l border-r-0' : 'rounded-r border-l-0'
+      } flex justify-center w-full shadow rounded bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
       type='button'
       onClick={props.onClick}
     >

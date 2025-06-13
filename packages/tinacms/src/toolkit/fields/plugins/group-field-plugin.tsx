@@ -1,11 +1,11 @@
-import * as React from 'react';
-import { Field, Form } from '@toolkit/forms';
 import {
   FieldsBuilder,
-  useFormPortal,
   FormWrapper,
+  useFormPortal,
 } from '@toolkit/form-builder';
+import { Field, Form } from '@toolkit/forms';
 import { useCMS } from '@toolkit/react-core/use-cms';
+import * as React from 'react';
 import { BiPencil } from 'react-icons/bi';
 import { IoMdClose } from 'react-icons/io';
 import { wrapFieldWithNoHeader } from './wrap-field-with-meta';
@@ -122,7 +122,7 @@ const Header = ({ onClick, children }) => {
     <div className='pt-1 mb-5'>
       <button
         onClick={onClick}
-        className='group px-4 py-3 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-blue-500 w-full border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-blue-400 focus:text-blue-500 rounded-md flex justify-between items-center gap-2'
+        className='group px-4 py-3 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-blue-500 w-full border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-blue-400 focus:text-blue-500 rounded flex justify-between items-center gap-2'
       >
         <span className='text-left text-base font-medium overflow-hidden text-ellipsis whitespace-nowrap flex-1'>
           {children}
@@ -151,14 +151,7 @@ export const PanelHeader = ({ onClick, children }) => {
 
 export const PanelBody = ({ id, children }) => {
   return (
-    <div
-      style={{
-        flex: '1 1 0%',
-        width: '100%',
-        overflowY: 'auto',
-        background: 'var(--tina-color-grey-1)',
-      }}
-    >
+    <div className='flex-1 w-full overflow-y-auto bg-[var(--tina-color-grey-1)]'>
       <FormWrapper id={id}>{children}</FormWrapper>
     </div>
   );

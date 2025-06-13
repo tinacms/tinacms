@@ -559,13 +559,13 @@ const ActiveItemPreview = ({
           {isImage(thumbnail) ? (
             <div className='w-full max-h-[75%]'>
               <img
-                className='block border border-gray-100 rounded-md overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
+                className='block border border-gray-100 rounded overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
                 src={thumbnail}
                 alt={activeItem.filename}
               />
             </div>
           ) : (
-            <span className='p-3 border border-gray-100 rounded-md overflow-hidden bg-gray-50 shadow'>
+            <span className='p-3 border border-gray-100 rounded overflow-hidden bg-gray-50 shadow'>
               <BiFile className='w-14 h-auto fill-gray-300' />
             </span>
           )}
@@ -757,10 +757,10 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
 
   return (
     <div
-      className={`grow-0 flex justify-between rounded-md border border-gray-100`}
+      className={`grow-0 flex justify-between rounded border border-gray-100`}
     >
       <button
-        className={`${toggleClasses.base} px-2.5 rounded-l-md ${
+        className={`${toggleClasses.base} px-2.5 rounded-l ${
           viewMode === 'grid' ? toggleClasses.active : toggleClasses.inactive
         }`}
         onClick={() => {
@@ -770,7 +770,7 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => {
         <BiGridAlt className='w-6 h-full opacity-70' />
       </button>
       <button
-        className={`${toggleClasses.base} px-2 rounded-r-md ${
+        className={`${toggleClasses.base} px-2 rounded-r ${
           viewMode === 'list' ? toggleClasses.active : toggleClasses.inactive
         }`}
         onClick={() => {

@@ -1,11 +1,5 @@
-/**
-
-
-
-*/
-
 import * as React from 'react';
-import { minSidebarWidth, SidebarContext } from './sidebar';
+import { SidebarContext, minSidebarWidth } from './sidebar';
 
 export const ResizeHandle = () => {
   const {
@@ -63,10 +57,10 @@ export const ResizeHandle = () => {
   return (
     <div
       onMouseDown={handleresizingSidebar}
-      className={`z-100 absolute top-1/2 right-px w-2 h-32 bg-white rounded-r-md border border-gray-150 shadow-sm hover:shadow-md origin-left transition-all duration-150 ease-out transform translate-x-full -translate-y-1/2 group hover:bg-gray-50 ${
+      className={`z-100 absolute top-1/2 right-px w-2 h-32 bg-white rounded-r border border-gray-150 shadow-sm hover:shadow-md origin-left transition-all duration-150 ease-out transform translate-x-full -translate-y-1/2 group hover:bg-gray-50 ${
         displayState !== 'closed' ? `opacity-100` : `opacity-0`
       } ${resizingSidebar ? `scale-110` : `scale-90 hover:scale-100`}`}
-      style={{ cursor: 'grab' }}
+      style={{ cursor: 'ew-resize' }}
     >
       <span className='absolute top-1/2 left-1/2 h-4/6 w-px bg-gray-200 transform -translate-y-1/2 -translate-x-1/2 opacity-30 transition-opacity duration-150 ease-out group-hover:opacity-100'></span>
     </div>

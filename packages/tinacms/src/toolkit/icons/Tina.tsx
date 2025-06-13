@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 import * as React from 'react';
 
 export const TinaIcon = ({ ...props }) => (
