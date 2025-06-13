@@ -172,32 +172,31 @@ export const FormBreadcrumbs = ({
   const firstBreadcrumb = breadcrumbs[0];
   const secondLastBreadcrumb =
     breadcrumbs.length > 2 ? breadcrumbs[breadcrumbs.length - 2] : null;
-  const lastBreadcrumb = breadcrumbs[breadcrumbs.length - 1];
+  const lastBreadcrumb =
+    breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 1] : null;
   const dropdownBreadcrumbs =
     breadcrumbs.length > 3 ? breadcrumbs.slice(1, -2) : [];
 
   return (
     <Breadcrumb {...props}>
       <BreadcrumbList className='flex-nowrap text-nowrap'>
-        {/* First breadcrumb - only use when there is more than 1 breadcrumb */}
-        {breadcrumbs.length > 1 && (
-          <BreadcrumbItem className='shrink truncate'>
-            <BreadcrumbLink
-              asChild
-              className='text-gray-700 hover:text-blue-500 truncate'
+        {/* First breadcrumb */}
+        <BreadcrumbItem className='shrink truncate'>
+          <BreadcrumbLink
+            asChild
+            className='text-gray-700 hover:text-blue-500 truncate'
+          >
+            <button
+              type='button'
+              onClick={(e) => {
+                e.preventDefault();
+                goBack(firstBreadcrumb.formId, firstBreadcrumb.formName);
+              }}
             >
-              <button
-                type='button'
-                onClick={(e) => {
-                  e.preventDefault();
-                  goBack(firstBreadcrumb.formId, firstBreadcrumb.formName);
-                }}
-              >
-                {rootBreadcrumbName || firstBreadcrumb.label}
-              </button>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-        )}
+              {rootBreadcrumbName || firstBreadcrumb.label}
+            </button>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
 
         {/* Dropdown for middle breadcrumbs */}
         {dropdownBreadcrumbs.length > 0 && (
@@ -260,9 +259,7 @@ export const FormBreadcrumbs = ({
             {breadcrumbs.length > 1 && <BreadcrumbSeparator />}
             <BreadcrumbItem>
               <BreadcrumbPage className='text-gray-700 font-medium'>
-                {breadcrumbs.length === 1 && rootBreadcrumbName
-                  ? rootBreadcrumbName
-                  : lastBreadcrumb.label}
+                {lastBreadcrumb.label}
               </BreadcrumbPage>
             </BreadcrumbItem>
           </>
