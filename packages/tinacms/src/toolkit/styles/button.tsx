@@ -82,7 +82,7 @@ export const IconButton = ({
   ...props
 }: ButtonProps) => {
   const baseClasses =
-    'icon-parent inline-flex items-center border border-transparent text-sm font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out rounded ';
+    'icon-parent inline-flex items-center border border-transparent text-sm font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out rounded-full';
   const variantClasses = {
     primary: `shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500`,
     secondary: `shadow text-gray-500 hover:text-blue-500 bg-gray-50 hover:bg-white border border-gray-200`,
@@ -103,7 +103,13 @@ export const IconButton = ({
 
   return (
     <button
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${stateClasses[state]} ${className}`}
+      className={cn(
+        baseClasses,
+        variantClasses[variant],
+        sizeClasses[size],
+        stateClasses[state],
+        className
+      )}
       {...props}
     >
       {children}
