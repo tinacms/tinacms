@@ -151,21 +151,6 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
             <BiDotsVertical className='h-auto w-5 inline-block opacity-70' />
           </button>
         )}
-        <button
-          type='button'
-          className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
-          onClick={() => {
-            const collectionName = cms.api.tina.schema.getCollectionByFullPath(
-              cms.state.activeFormId
-            ).name;
-
-            window.location.href = `${
-              new URL(window.location.href).pathname
-            }#/collections/${collectionName}/~`;
-          }}
-        >
-          <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
-        </button>
 
         <FormBreadcrumbs className='grow' />
 
