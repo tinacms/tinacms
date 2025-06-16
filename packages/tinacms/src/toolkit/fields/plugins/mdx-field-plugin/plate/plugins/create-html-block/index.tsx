@@ -40,21 +40,16 @@ export const createBlockquoteEnterBreakPlugin = createPlatePlugin({
 
       event.preventDefault();
 
-      const [blockquoteNode, blockquotePath] = blockquoteEntry;
+      const cursorPosition = editor.selection?.focus;
+      if (!cursorPosition) return;
 
       editor.tf.insertNodes(
         [
-          {
-            type: ELEMENT_BREAK,
-            children: [{ text: '' }],
-          },
-          {
-            type: 'p',
-            children: [{ text: '' }],
-          },
+          { type: ELEMENT_BREAK, children: [{ text: '' }] },
+          { type: 'text', text: '' },
         ],
         {
-          at: [...blockquotePath, blockquoteNode.children.length],
+          at: { path: cursorPosition.path, offset: cursorPosition.offset },
           select: true,
         }
       );
@@ -78,3 +73,13 @@ export const createBreakPlugin = createPlatePlugin({
     ),
   },
 });
+
+function getNodeText(node) {
+  if (typeof node.text === 'string') {
+    return node.text;
+  }
+  if (Array.isArray(node.children)) {
+    return node.children.map(getNodeText).join('');
+  }
+  return '';
+}
