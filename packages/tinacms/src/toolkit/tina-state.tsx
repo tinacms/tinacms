@@ -1,5 +1,3 @@
-import { fi } from 'date-fns/locale';
-import { act } from 'react';
 import { AnyField } from './forms';
 import { Form } from './react-tinacms';
 import { TinaCMS } from './tina-cms';
