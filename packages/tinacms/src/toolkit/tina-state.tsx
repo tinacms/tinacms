@@ -244,10 +244,6 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         }
       }
 
-      console.log(
-        '[tinaReducer] Setting active field name for form to %s',
-        action.value.fieldName
-      );
       const forms = state.forms.map((form) => {
         if (form.tinaForm.id === action.value.formId) {
           return {
