@@ -21,11 +21,12 @@ export const BranchButton = () => {
 
   const cms = useCMS();
   const branchingEnabled = cms.flags.get('branch-switcher');
-  const isProtected = cms.api.tina.usingProtectedBranch();
 
   if (!branchingEnabled) {
     return null;
   }
+
+  const isProtected = cms.api.tina.usingProtectedBranch();
 
   return (
     <>
