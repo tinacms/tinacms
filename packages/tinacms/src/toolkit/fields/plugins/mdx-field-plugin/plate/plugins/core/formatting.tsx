@@ -88,7 +88,7 @@ export const plugins = [
         {
           hotkey: 'enter',
           query: {
-            allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
+            allow: [CodeBlockPlugin.key],
           },
         },
       ],

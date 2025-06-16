@@ -53,7 +53,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       <Plate
         editor={editor}
         onChange={(value) => {
-          console.log('value 🤖', value);
+          console.log('[RichEditor onChange] value:', JSON.stringify(value.value, null, 2));
           // Normalize links in code blocks before saving (we dont want type: 'a' inside code blocks, this will break the mdx parser)
           // Ideal Solution: let code block provider to have a option for exclude certain plugins
           const normalized = (value.value as any[]).map(
