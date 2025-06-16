@@ -25,61 +25,56 @@ export const KEY_BLOCKQUOTE_ENTER_BREAK = 'blockquote-enter-break';
 // Custom Plate plugin to handle Enter key inside blockquotes.
 // Our parsing logic expects a soft break with type 'break' to be inserted for proper handling within blockquotes.
 // This plugin inserts a 'break' element and a new paragraph when Enter is pressed inside a blockquote.
-export const createBlockquoteEnterBreakPlugin =
-  createPlatePlugin({
-    key: KEY_BLOCKQUOTE_ENTER_BREAK,
+export const createBlockquoteEnterBreakPlugin = createPlatePlugin({
+  key: KEY_BLOCKQUOTE_ENTER_BREAK,
 
-    handlers: {
-      onKeyDown: ({editor, event}) => {
-        if (event.key !== 'Enter') return;
+  handlers: {
+    onKeyDown: ({ editor, event }) => {
+      if (event.key !== 'Enter') return;
 
-        const blockquoteEntry = editor.api.above({
-          match: { type: BlockquotePlugin.key },
-        });
-  
-        if (!blockquoteEntry) return;
+      const blockquoteEntry = editor.api.above({
+        match: { type: BlockquotePlugin.key },
+      });
 
-        event.preventDefault();
+      if (!blockquoteEntry) return;
 
-        const [blockquoteNode, blockquotePath] = blockquoteEntry;
-        
-        editor.tf.insertNodes(
-          [{
+      event.preventDefault();
+
+      const [blockquoteNode, blockquotePath] = blockquoteEntry;
+
+      editor.tf.insertNodes(
+        [
+          {
             type: ELEMENT_BREAK,
-            children: [{ text: '' }]
+            children: [{ text: '' }],
           },
           {
             type: 'p',
-            children: [{ text: '' }]
+            children: [{ text: '' }],
           },
-          ],
-          {
-            at: [...blockquotePath, blockquoteNode.children.length],
-            select: true
-          }
-        );
-      },
+        ],
+        {
+          at: [...blockquotePath, blockquoteNode.children.length],
+          select: true,
+        }
+      );
     },
-  }
-);
+  },
+});
 
 export const ELEMENT_BREAK = 'break';
 
-export const createBreakPlugin =
-  createPlatePlugin({
-    key: ELEMENT_BREAK,
-    node: {
-      isElement: true,
-      isVoid: true,
-      isInline: true,
-      component: (props) => (
-        <>
-          <br className={props.className} {...props.attributes} />
-          {props.children}
-        </>
-      ),
-    },
-  });
-
-
-  
+export const createBreakPlugin = createPlatePlugin({
+  key: ELEMENT_BREAK,
+  node: {
+    isElement: true,
+    isVoid: true,
+    isInline: true,
+    component: (props) => (
+      <>
+        <br className={props.className} {...props.attributes} />
+        {props.children}
+      </>
+    ),
+  },
+});

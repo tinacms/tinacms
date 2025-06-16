@@ -24,7 +24,7 @@ import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
 import { SlashPlugin } from '@udecode/plate-slash-command/react';
 import { TablePlugin } from '@udecode/plate-table/react';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
-import { createPlatePlugin, ParagraphPlugin, PlateEditor } from '@udecode/plate/react';
+import { ParagraphPlugin } from '@udecode/plate/react';
 import React from 'react';
 import { LinkFloatingToolbar } from '../components/plate-ui/link-floating-toolbar';
 import { isUrl } from '../transforms/is-url';
@@ -56,7 +56,11 @@ import { all, createLowlight } from 'lowlight';
 import { autoformatBlocks } from './core/autoformat/autoformat-block';
 import { autoformatLists } from './core/autoformat/autoformat-lists';
 import { autoformatMarks } from './core/autoformat/autoformat-marks';
-import { createBlockquoteEnterBreakPlugin, createBreakPlugin, createHTMLInlinePlugin } from './create-html-block';
+import {
+  createBlockquoteEnterBreakPlugin,
+  createBreakPlugin,
+  createHTMLInlinePlugin,
+} from './create-html-block';
 import { createHTMLBlockPlugin } from './create-html-block';
 
 // Define block types that support MDX embedding
@@ -97,8 +101,6 @@ export const viewPlugins = [
 const CorrectNodeBehaviorPlugin = createSlatePlugin({
   key: 'WITH_CORRECT_NODE_BEHAVIOR',
 });
-
-
 
 // Editor Plugins: Functional and formatting plugins
 export const editorPlugins = [
@@ -231,4 +233,3 @@ export const editorPlugins = [
     },
   }),
 ] as const;
-
