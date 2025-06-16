@@ -4,13 +4,7 @@ import {
   canonicalPath,
   resolveForm,
 } from '@tinacms/schema-tools';
-import {
-  BillingWarning,
-  Form,
-  FormBuilder,
-  FormStatus,
-} from '@tinacms/toolkit';
-import { LocalWarning } from '@tinacms/toolkit';
+import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
 import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
 import React, { useMemo, useState } from 'react';
@@ -65,7 +59,7 @@ const CollectionUpdatePage = () => {
             };
 
             return (
-              <PageWrapper>
+              <PageWrapper headerClassName='bg-white'>
                 <GetDocument
                   cms={cms}
                   collectionName={collection.name}
@@ -108,7 +102,6 @@ const RenderForm = ({
 }) => {
   const [formIsPristine, setFormIsPristine] = useState(true);
   const schema: TinaSchema | undefined = cms.api.tina.schema;
-  const parentFolder = relativePath.split('/').slice(0, -1).join('/');
 
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name);
@@ -175,9 +168,6 @@ const RenderForm = ({
 
   return (
     <>
-      <div className='pt-2 px-6 bg-white'>
-        {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
-      </div>
       <div
         className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
       >

@@ -507,7 +507,7 @@ const CollectionListPage = () => {
                       />
                     )}
 
-                    <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
+                    <PageHeader>
                       <div className='w-full'>
                         <h3 className='font-sans text-2xl text-gray-700'>
                           {collection.label

@@ -20,7 +20,12 @@ export const BranchButton = () => {
   const { currentBranch } = useBranchData();
 
   const cms = useCMS();
+  const branchingEnabled = cms.flags.get('branch-switcher');
   const isProtected = cms.api.tina.usingProtectedBranch();
+
+  if (!branchingEnabled) {
+    return null;
+  }
 
   return (
     <>
@@ -58,12 +63,18 @@ export const BranchPreviewButton = (
   props: React.ButtonHTMLAttributes<HTMLButtonElement>
 ) => {
   const cms = useCMS();
+  const branchingEnabled = cms.flags.get('branch-switcher');
+
+  if (!branchingEnabled) {
+    return null;
+  }
+
   const previewFunction = cms.api?.tina?.schema?.config?.config?.ui?.previewUrl;
   const branch = cms.api?.tina?.branch;
   const previewUrl =
     typeof previewFunction === 'function'
       ? previewFunction({ branch })?.url
-      : 'null';
+      : null;
 
   if (!previewUrl) {
     return null;

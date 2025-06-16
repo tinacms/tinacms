@@ -381,17 +381,15 @@ const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
               <BiMenu className='h-6 w-auto text-gray-600' />
             </button>
 
-            {branchingEnabled && !isLocalMode && <BranchButton />}
+            <BranchButton />
 
-            {isLocalMode && (
-              <div className='px-4'>
-                <LocalWarning />
-              </div>
-            )}
+            <div className='px-4'>
+              <LocalWarning />
+            </div>
           </div>
 
           <div className='flex'>
-            {branchingEnabled && !isLocalMode && <BranchPreviewButton />}
+            <BranchPreviewButton />
 
             <button
               className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'

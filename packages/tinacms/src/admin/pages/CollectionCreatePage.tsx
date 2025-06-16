@@ -350,12 +350,8 @@ export const RenderForm = ({
   );
 
   return (
-    <PageWrapper>
+    <PageWrapper headerClassName='bg-white'>
       <>
-        <div className='pt-2 px-6 bg-white'>
-          {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
-        </div>
-
         <div
           className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
         >
