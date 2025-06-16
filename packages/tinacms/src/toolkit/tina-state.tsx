@@ -319,10 +319,7 @@ export function calculateBreadcrumbs(
   )?.tinaForm;
 
   if (!form) {
-    console.warn(
-      '[calculateBreadcrumbs] No form found for activeFormId:',
-      activeFormId
-    );
+    // couldn't find the active form
     return [];
   }
 
@@ -342,15 +339,6 @@ export function calculateBreadcrumbs(
     };
   };
 
-  console.log(
-    '[calculateBreadcrumbs] Calculating breadcrumbs for active field:',
-    activeFieldName,
-    'Form ID:',
-    activeFormId,
-    'Form:',
-    form
-  );
-
   if (!activeFieldName) {
     const fieldGroup = form.getActiveField('');
     return [makeCrumb(fieldGroup, '')];
@@ -358,46 +346,44 @@ export function calculateBreadcrumbs(
 
   const breadcrumbs: Breadcrumb[] = [];
   let activePath = activeFieldName.split('.');
+
   while (activePath.length > 0) {
-    const fieldGroup = form.getActiveField(activePath.join('.'));
+    let fieldGroup = null;
+    try {
+      fieldGroup = form.getActiveField(activePath.join('.'));
+    } catch (error) {
+      // swallow the error to continue up the tree
+      // This can happen when you have a structure like form -> object -> rich-text -> component
+    }
 
-    console.log(
-      '[calculateBreadcrumbs] Current fieldGroup: %s',
-      activePath.join('.'),
-      fieldGroup
-    );
-
-    if (!fieldGroup || (fieldGroup as any).__type === 'form') {
-      // If we reach the form itself or a non-field group, we stop
+    if ((fieldGroup as any)?.__type === 'form') {
+      // If we reach the form itself - we stop
       break;
     }
 
-    const fieldType = (fieldGroup as AnyField).type;
-    const isListField = !!(fieldGroup as AnyField).list;
+    const isListField = !!(fieldGroup as AnyField)?.list;
     const pathEndsWithDigit = /^\d+$/.test(activePath[activePath.length - 1]);
-
     if (isListField && !pathEndsWithDigit) {
       // continue up the tree since we should be on a list item, not the list itself
       activePath = activePath.slice(0, -1);
       continue;
     }
 
-    const lastInsertedCrumb = breadcrumbs.length > 0 ? breadcrumbs[0] : null;
-    const newCrumb = makeCrumb(fieldGroup, activePath.join('.'));
-    if (
-      lastInsertedCrumb &&
-      lastInsertedCrumb.label === newCrumb.label &&
-      lastInsertedCrumb.namespace.join('.') === newCrumb.namespace.join('.')
-    ) {
-      console.log(
-        '[calculateBreadcrumbs] Skipping duplicate breadcrumb:',
-        newCrumb
-      );
-    } else {
-      breadcrumbs.unshift(newCrumb);
+    if (fieldGroup) {
+      // If we found a fieldGroup, we create a breadcrumb for it
+      const lastInsertedCrumb = breadcrumbs.length > 0 ? breadcrumbs[0] : null;
+      const newCrumb = makeCrumb(fieldGroup, activePath.join('.'));
+      if (
+        !lastInsertedCrumb ||
+        lastInsertedCrumb.label !== newCrumb.label ||
+        lastInsertedCrumb.namespace.join('.') !== newCrumb.namespace.join('.')
+      ) {
+        breadcrumbs.unshift(newCrumb);
+      }
     }
 
     if (activePath.length > 0) {
+      const fieldType = (fieldGroup as AnyField)?.type;
       if (
         fieldType === 'rich-text' ||
         (activePath[activePath.length - 2] === 'children' && pathEndsWithDigit)
@@ -416,8 +402,6 @@ export function calculateBreadcrumbs(
     const fieldGroup = form.getActiveField('');
     breadcrumbs.unshift(makeCrumb(fieldGroup, ''));
   }
-
-  console.log('[calculateBreadcrumbs] Calculated breadcrumbs:', breadcrumbs);
 
   return breadcrumbs;
 }
