@@ -1,1 +1,0 @@
-"{\n  \"type\": \"root\",\n  \"children\": [\n    {\n      \"type\": \"p\",\n      \"children\": [\n        { \n            \"type\": \"text\",\"text\": \"This is a test paragraph.\" }\n      ]\n    }\n  ]\n}\n"

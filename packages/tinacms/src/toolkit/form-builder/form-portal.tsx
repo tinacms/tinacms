@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useContext } from 'react';
 import { createPortal } from 'react-dom';
 
 export type FormPortal = React.FC<{
@@ -11,7 +10,7 @@ const FormPortalContext = React.createContext<FormPortal>(() => {
 });
 
 export function useFormPortal() {
-  return useContext(FormPortalContext);
+  return React.useContext(FormPortalContext);
 }
 
 type FormPortalProviderProps = {
@@ -38,15 +37,7 @@ export const FormPortalProvider: React.FC<FormPortalProviderProps> = ({
 
   return (
     <FormPortalContext.Provider value={FormPortal}>
-      <div
-        ref={wrapperRef}
-        style={{
-          position: 'relative',
-          width: '100%',
-          flex: '1 1 0%',
-          overflow: 'hidden',
-        }}
-      >
+      <div ref={wrapperRef} className='relative w-full flex-1 overflow-hidden'>
         {children}
       </div>
     </FormPortalContext.Provider>

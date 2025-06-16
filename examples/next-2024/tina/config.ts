@@ -1,11 +1,11 @@
-import { defineConfig } from "tinacms";
+import { defineConfig } from 'tinacms';
 
 // Your hosting provider likely exposes this as an environment variable
 const branch =
   process.env.GITHUB_BRANCH ||
   process.env.VERCEL_GIT_COMMIT_REF ||
   process.env.HEAD ||
-  "main";
+  'main';
 
 export default defineConfig({
   branch,
@@ -35,54 +35,6 @@ export default defineConfig({
         path: "content/tests",
         ui: {
           router({ document }) {
-            return `/tests/${document._sys.filename}`;
-          },
-        },
-
-        fields: [
-          {
-            name: "testingMdx",
-            label: "Testing MDX Plate JSON",
-            type: "rich-text",
-            parser: {
-              type: "slatejson",
-            },
-            templates: [
-              {
-                name: "callToAction",
-                fields: [
-                  {
-                    name: "callToActionTitle",
-                    type: "string",
-                  },
-                  {
-                    name: "nestedRichText",
-                    type: "rich-text",
-                    templates: [
-                      {
-                        name: "evenMoreNesting",
-                        fields: [
-                          {
-                            name: "richTextTwo",
-                            type: "rich-text",
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        name: "post",
-        label: "Posts",
-        path: "content/posts",
-        format: "mdx",
-        ui: {
-          router({ document }) {
             return `/posts/${document._sys.filename}`;
           },
         },
@@ -101,9 +53,35 @@ export default defineConfig({
             isBody: true,
           },
           {
-            type: "rich-text",
-            label: "Test Templates",
-            name: "template",
+            name: 'items',
+            type: 'object',
+            ui: {
+              itemProps: (values) => ({
+                label: values?.title || 'Showcase Item',
+              }),
+            },
+            list: true,
+            fields: [
+              {
+                name: 'title',
+                type: 'string',
+                required: true,
+                isTitle: true,
+              },
+              {
+                name: 'description',
+                type: 'rich-text',
+              },
+              {
+                name: 'image',
+                type: 'image',
+              },
+            ],
+          },
+          {
+            type: 'rich-text',
+            label: 'Test Templates',
+            name: 'template',
             isBody: true,
             toolbarOverride: [
               "heading",
