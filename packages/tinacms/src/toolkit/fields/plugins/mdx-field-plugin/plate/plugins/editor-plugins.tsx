@@ -56,7 +56,7 @@ import { all, createLowlight } from 'lowlight';
 import { autoformatBlocks } from './core/autoformat/autoformat-block';
 import { autoformatLists } from './core/autoformat/autoformat-lists';
 import { autoformatMarks } from './core/autoformat/autoformat-marks';
-import { createBlockquoteEnterLoggerPlugin, createBreakPlugin, createHTMLInlinePlugin } from './create-html-block';
+import { createBlockquoteEnterBreakPlugin, createBreakPlugin, createHTMLInlinePlugin } from './create-html-block';
 import { createHTMLBlockPlugin } from './create-html-block';
 
 // Define block types that support MDX embedding
@@ -107,7 +107,7 @@ export const editorPlugins = [
   createImgPlugin,
   createHTMLBlockPlugin,
   createHTMLInlinePlugin,
-  createBlockquoteEnterLoggerPlugin,
+  createBlockquoteEnterBreakPlugin,
   createInvalidMarkdownPlugin,
   CorrectNodeBehaviorPlugin,
   LinkPlugin.configure({

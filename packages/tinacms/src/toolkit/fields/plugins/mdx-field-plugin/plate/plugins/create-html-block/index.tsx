@@ -20,11 +20,14 @@ export const createHTMLInlinePlugin = createPlatePlugin({
   },
 });
 
-export const KEY_BLOCKQUOTE_ENTER_LOGGER = 'blockquote-enter-logger';
+export const KEY_BLOCKQUOTE_ENTER_BREAK = 'blockquote-enter-break';
 
-export const createBlockquoteEnterLoggerPlugin =
+// Custom Plate plugin to handle Enter key inside blockquotes.
+// Our parsing logic expects a soft break with type 'break' to be inserted for proper handling within blockquotes.
+// This plugin inserts a 'break' element and a new paragraph when Enter is pressed inside a blockquote.
+export const createBlockquoteEnterBreakPlugin =
   createPlatePlugin({
-    key: KEY_BLOCKQUOTE_ENTER_LOGGER,
+    key: KEY_BLOCKQUOTE_ENTER_BREAK,
 
     handlers: {
       onKeyDown: ({editor, event}) => {
@@ -36,67 +39,25 @@ export const createBlockquoteEnterLoggerPlugin =
   
         if (!blockquoteEntry) return;
 
-        // const [blockquoteNode, blockquotePath] = blockquoteEntry;
-      
-        // // Prevent default behavior
-        // event.preventDefault();
-        
-        // // CORRECTED: Create the insertion path properly
-        // const insertionPath = [
-        //   ...blockquotePath, 
-        //   blockquoteNode.children.length
-        // ];
-        
-        // // Insert new paragraph INSIDE the blockquote
-        // editor.tf.insertNode(
-        //   {
-        //     type: 'p',
-        //     children: [{ text: '' }],
-        //   },
-        //   { 
-        //     at: insertionPath,
-        //     select: true,  // Focus the new paragraph
-        //     mode: 'lowest' // Ensures proper insertion
-        //   }
-        // );
-  
-        // const [blockquoteNode, blockquotePath] = blockquoteEntry;
-        // const currentLength = blockquoteNode.children.length;
-  
-        // editor.tf.insertNodes(
-        //   [
-        //     {
-        //       type: 'p',
-        //       children: [{ text: 'N' }],
-        //     },
-        //     {
-        //       type: ELEMENT_BREAK,
-        //       children: [{ text: '' }],
-        //     }
-        //   ],
-        //   {
-        //     at: [...blockquotePath, currentLength], // Insert at end
-        //     select: true // Focus the last inserted node
-        //   }
-        // );
         event.preventDefault();
 
-      const [blockquoteNode, blockquotePath] = blockquoteEntry;
-      
-      // Exactly what works for 'N', but with just the break
-      editor.tf.insertNodes(
-        [{
-          type: ELEMENT_BREAK,
-          children: [{ text: '' }]
-        }],
-        {
-          at: [...blockquotePath, blockquoteNode.children.length],
-          select: true
-        }
-      );
+        const [blockquoteNode, blockquotePath] = blockquoteEntry;
         
-        console.log('[DEBUG] Editor value AFTER:', JSON.stringify(editor.children, null, 2));
-
+        editor.tf.insertNodes(
+          [{
+            type: ELEMENT_BREAK,
+            children: [{ text: '' }]
+          },
+          {
+            type: 'p',
+            children: [{ text: '' }]
+          },
+          ],
+          {
+            at: [...blockquotePath, blockquoteNode.children.length],
+            select: true
+          }
+        );
       },
     },
   }
@@ -112,9 +73,10 @@ export const createBreakPlugin =
       isVoid: true,
       isInline: true,
       component: (props) => (
-        <div {...props.attributes}>
-          <br />
-        </div>
+        <>
+          <br className={props.className} {...props.attributes} />
+          {props.children}
+        </>
       ),
     },
   });
