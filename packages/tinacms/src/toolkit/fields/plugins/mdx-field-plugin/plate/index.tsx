@@ -16,9 +16,11 @@ import FloatingToolbarButtons from './components/floating-toolbar-buttons';
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(
     () =>
-      input.value?.children?.length
-        ? input.value.children.map(helpers.normalize)
-        : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
+      field?.parser?.type === 'slatejson'
+        ? input.value.children
+        : input.value?.children?.length
+          ? input.value.children.map(helpers.normalize)
+          : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
     []
   );
 

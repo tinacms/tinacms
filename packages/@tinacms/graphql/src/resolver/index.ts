@@ -3,39 +3,39 @@
 */
 
 import path from 'path';
-import { Database } from '../database';
-import { assertShape, lastItem, sequential } from '../util';
-import { NAMER } from '../ast-builder';
 import isValid from 'date-fns/isValid/index.js';
-import { parseMDX, stringifyMDX } from '../mdx';
 import { JSONPath } from 'jsonpath-plus';
+import { NAMER } from '../ast-builder';
+import { Database } from '../database';
+import { parseMDX, stringifyMDX } from '../mdx';
+import { assertShape, lastItem, sequential } from '../util';
 
 import type {
   Collectable,
-  ReferenceType,
   Collection,
-  TinaField,
+  ReferenceType,
   Template,
+  TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools';
 
 import type { GraphQLConfig } from '../types';
 
-import { TinaGraphQLError, TinaParseDocumentError } from './error';
-import { collectConditionsForField, resolveReferences } from './filter-utils';
-import {
-  resolveMediaRelativeToCloud,
-  resolveMediaCloudToRelative,
-} from './media-utils';
 import { GraphQLError } from 'graphql';
+import { generatePasswordHash } from '../auth/utils';
 import {
   FilterCondition,
-  makeFilterChain,
   REFS_COLLECTIONS_SORT_KEY,
   REFS_PATH_FIELD,
   REFS_REFERENCE_FIELD,
+  makeFilterChain,
 } from '../database/datalayer';
-import { generatePasswordHash } from '../auth/utils';
+import { TinaGraphQLError, TinaParseDocumentError } from './error';
+import { collectConditionsForField, resolveReferences } from './filter-utils';
+import {
+  resolveMediaCloudToRelative,
+  resolveMediaRelativeToCloud,
+} from './media-utils';
 
 interface ResolverConfig {
   config?: GraphQLConfig;
