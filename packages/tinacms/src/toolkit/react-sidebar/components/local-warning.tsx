@@ -4,6 +4,13 @@ import { BiError, BiRightArrowAlt } from 'react-icons/bi';
 import { Alert } from './alert';
 
 export const LocalWarning = () => {
+  const cms = useCMS();
+  const isLocalMode = cms.api?.tina?.isLocalMode;
+
+  if (!isLocalMode) {
+    return null;
+  }
+
   return (
     <Alert alertStyle='warning'>
       <a href='https://tina.io/docs/tina-cloud/' target='_blank'>
@@ -25,13 +32,14 @@ export const BillingWarning = () => {
       billingState: 'current' | 'late' | 'delinquent';
     } | null
   );
+
   React.useEffect(() => {
     const fetchBillingState = async () => {
       if (typeof api?.getBillingState !== 'function') return;
       const billingRes = await api?.getBillingState();
       setBillingState(billingRes);
     };
-    if (!isCustomContentApi) fetchBillingState();
+    if (!cms.api?.tina?.isLocalMode && !isCustomContentApi) fetchBillingState();
   }, []);
 
   if (
