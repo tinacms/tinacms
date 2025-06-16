@@ -30,7 +30,6 @@ import ScreenPage from './pages/ScreenPage';
 
 import { Client } from '../internalClient';
 import { TinaAdminApi } from './api';
-import { IndexingPage } from './pages/IndexingPage';
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -233,14 +232,6 @@ export const TinaAdmin = ({
                         <PlainLayout>
                           <Playground />
                         </PlainLayout>
-                      }
-                    />
-                    <Route
-                      path='branch/new'
-                      element={
-                        <DefaultWrapper cms={cms}>
-                          <IndexingPage />
-                        </DefaultWrapper>
                       }
                     />
                     <Route
