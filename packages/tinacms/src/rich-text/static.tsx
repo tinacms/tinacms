@@ -95,12 +95,12 @@ export const StaticTinaMarkdown = <
 }: {
   content: TinaMarkdownContent | TinaMarkdownContent[];
   components?:
-  | Components<{}>
-  | Components<{
-    [BK in keyof CustomComponents]: (
-      props: CustomComponents[BK]
-    ) => JSX.Element;
-  }>;
+    | Components<{}>
+    | Components<{
+        [BK in keyof CustomComponents]: (
+          props: CustomComponents[BK]
+        ) => JSX.Element;
+      }>;
 }) => {
   if (!content) {
     return null;
