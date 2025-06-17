@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from './dropdown-menu';
 import { PlusIcon } from './icons';
+import { insertMDX } from '../../plugins/create-mdx-plugins';
 
 export default function TemplatesToolbarButton() {
   const { templates } = useToolbarContext();

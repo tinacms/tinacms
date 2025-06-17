@@ -5,14 +5,7 @@ import {
   PopoverPanel,
   Transition,
 } from '@headlessui/react';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate';
-import { insertNodes } from '@udecode/plate-common';
-import React from 'react';
-import { Element } from 'slate';
-import { ReactEditor, useSelected } from 'slate-react';
 import { ELEMENT_MDX_INLINE } from '.';
-import { useTemplates } from '../../editor-context';
-import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { NestedForm } from '../../nested-form';
 import { classNames } from '../ui/helpers';
 import { EllipsisIcon } from '../ui/icons';
