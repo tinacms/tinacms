@@ -1,3 +1,4 @@
+import { AnyField } from './forms';
 import { Form } from './react-tinacms';
 import { TinaCMS } from './tina-cms';
 
@@ -17,6 +18,13 @@ type FormList = {
   // This value is somewhat duplicated from whats inside the items array, but it makes cleaning
   // Up orphaned forms easier.
   formIds: string[];
+};
+
+type Breadcrumb = {
+  label: string;
+  formId: string;
+  formName: string;
+  namespace: string[];
 };
 
 export type TinaAction =
@@ -81,6 +89,7 @@ export type TinaAction =
     };
 
 export interface TinaState {
+  breadcrumbs: Breadcrumb[];
   activeFormId: string | null;
   /**
    * Forms are wrapped here because we need `activeFieldName` to be reactive, so adding it as a propery
@@ -101,6 +110,7 @@ export interface TinaState {
 
 export const initialState = (cms: TinaCMS): TinaState => {
   return {
+    breadcrumbs: [],
     activeFormId: null,
     forms: [],
     formLists: [],
@@ -135,6 +145,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       return {
         ...state,
         quickEditSupported: false,
+        breadcrumbs: [],
         activeFormId: null,
         formLists: [],
         forms: [],
@@ -149,6 +160,10 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         }
         return formList;
       });
+
+      if (formListItemExists) {
+        return state;
+      }
 
       if (!formListItemExists) {
         nextFormLists.push(action.value);
@@ -170,9 +185,12 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         });
       }
 
+      const breadcrumbs = calculateBreadcrumbs(state.forms, activeFormId, '');
+
       return {
         ...state,
         activeFormId,
+        breadcrumbs,
         formLists: nextFormLists,
         isLoadingContent: false,
       };
@@ -206,13 +224,26 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
     }
     case 'forms:set-active-form-id':
       if (action.value !== state.activeFormId) {
+        const breadcrumbs = calculateBreadcrumbs(state.forms, action.value, '');
         return {
           ...state,
+          breadcrumbs,
           activeFormId: action.value,
         };
       }
       return state;
     case 'forms:set-active-field-name':
+      if (state.activeFormId === action.value.formId) {
+        const existingForm = state.forms.find(
+          (form) => form.tinaForm.id === action.value.formId
+        );
+
+        if (existingForm?.activeFieldName === action.value.fieldName) {
+          // If the active field name is already set, do nothing
+          return state;
+        }
+      }
+
       const forms = state.forms.map((form) => {
         if (form.tinaForm.id === action.value.formId) {
           return {
@@ -222,7 +253,19 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         }
         return form;
       });
-      return { ...state, forms, activeFormId: action.value.formId };
+
+      const breadcrumbs = calculateBreadcrumbs(
+        state.forms,
+        action.value.formId,
+        action.value.fieldName
+      );
+
+      return {
+        ...state,
+        breadcrumbs,
+        forms,
+        activeFormId: action.value.formId,
+      };
     case 'toggle-edit-state': {
       return state.sidebarDisplayState === 'closed'
         ? { ...state, sidebarDisplayState: 'open' }
@@ -258,4 +301,101 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
       throw new Error(`Unhandled action ${action.type}`);
       return state;
   }
+}
+
+export function calculateBreadcrumbs(
+  forms: { activeFieldName?: string | null; tinaForm: Form }[],
+  activeFormId: string,
+  activeFieldName: string = ''
+): Breadcrumb[] {
+  const form = forms.find(
+    (form) => form.tinaForm.id === activeFormId
+  )?.tinaForm;
+
+  if (!form) {
+    // couldn't find the active form
+    return [];
+  }
+
+  const makeCrumb = (
+    field: {
+      label?: string;
+      name?: string;
+      namespace?: string[];
+    },
+    path: string
+  ): Breadcrumb => {
+    return {
+      label: typeof field.label === 'string' ? field.label : field.name,
+      formId: form.id,
+      formName: path,
+      namespace: field.namespace || [],
+    };
+  };
+
+  if (!activeFieldName) {
+    const fieldGroup = form.getActiveField('');
+    return [makeCrumb(fieldGroup, '')];
+  }
+
+  const breadcrumbs: Breadcrumb[] = [];
+  let activePath = activeFieldName.split('.');
+
+  while (activePath.length > 0) {
+    let fieldGroup = null;
+    try {
+      fieldGroup = form.getActiveField(activePath.join('.'));
+    } catch (error) {
+      // swallow the error to continue up the tree
+      // This can happen when you have a structure like form -> object -> rich-text -> component
+    }
+
+    if ((fieldGroup as any)?.__type === 'form') {
+      // If we reach the form itself - we stop
+      break;
+    }
+
+    const isListField = !!(fieldGroup as AnyField)?.list;
+    const pathEndsWithDigit = /^\d+$/.test(activePath[activePath.length - 1]);
+    if (isListField && !pathEndsWithDigit) {
+      // continue up the tree since we should be on a list item, not the list itself
+      activePath = activePath.slice(0, -1);
+      continue;
+    }
+
+    if (fieldGroup) {
+      // If we found a fieldGroup, we create a breadcrumb for it
+      const lastInsertedCrumb = breadcrumbs.length > 0 ? breadcrumbs[0] : null;
+      const newCrumb = makeCrumb(fieldGroup, activePath.join('.'));
+      if (
+        !lastInsertedCrumb ||
+        lastInsertedCrumb.label !== newCrumb.label ||
+        lastInsertedCrumb.namespace.join('.') !== newCrumb.namespace.join('.')
+      ) {
+        breadcrumbs.unshift(newCrumb);
+      }
+    }
+
+    if (activePath.length > 0) {
+      const fieldType = (fieldGroup as AnyField)?.type;
+      if (
+        fieldType === 'rich-text' ||
+        (activePath[activePath.length - 2] === 'children' && pathEndsWithDigit)
+      ) {
+        // if activePath ends with ['children', '\d+']
+        activePath = activePath.slice(0, -3);
+      } else {
+        // continue up the tree
+        activePath = activePath.slice(0, -1);
+      }
+    }
+  }
+
+  // ensure that the last breadcrumb is the form itself
+  if (!breadcrumbs.some((crumb) => !crumb.formName)) {
+    const fieldGroup = form.getActiveField('');
+    breadcrumbs.unshift(makeCrumb(fieldGroup, ''));
+  }
+
+  return breadcrumbs;
 }

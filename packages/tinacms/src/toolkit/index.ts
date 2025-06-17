@@ -36,7 +36,7 @@ export {
   Nav,
   LocalWarning,
   BillingWarning,
-  SyncStatus,
+  SyncStatusButton,
 } from '@toolkit/react-sidebar';
 
 export { useCMS } from '@toolkit/react-core';

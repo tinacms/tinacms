@@ -1231,7 +1231,7 @@ importers:
         version: 2.6.8(graphql@15.8.0)
       '@graphql-codegen/plugin-helpers':
         specifier: latest
-        version: 5.1.0(graphql@15.8.0)
+        version: 5.1.1(graphql@15.8.0)
       '@graphql-codegen/typescript':
         specifier: 'catalog:'
         version: 4.1.5(graphql@15.8.0)
@@ -4414,8 +4414,8 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
 
-  '@graphql-codegen/plugin-helpers@5.1.0':
-    resolution: {integrity: sha512-Y7cwEAkprbTKzVIe436TIw4w03jorsMruvCvu0HJkavaKMQbWY+lQ1RIuROgszDbxAyM35twB5/sUvYG5oW+yg==}
+  '@graphql-codegen/plugin-helpers@5.1.1':
+    resolution: {integrity: sha512-28GHODK2HY1NhdyRcPP3sCz0Kqxyfiz7boIZ8qIxFYmpLYnlDgiYok5fhFLVSZihyOpCs4Fa37gVHf/Q4I2FEg==}
     engines: {node: '>=16'}
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
@@ -10619,6 +10619,7 @@ packages:
   multer@1.4.5-lts.1:
     resolution: {integrity: sha512-ywPWvcDMeH+z9gQq5qYHCCy+ethsk4goepZ45GLD63fOu0YcNecQxi64nDs3qluZB+murG3/D4dJ7+dGctcCQQ==}
     engines: {node: '>= 6.0.0'}
+    deprecated: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
 
   mutative@1.1.0:
     resolution: {integrity: sha512-2PJADREjOusk3iJkD3rXV2YjAxTuaLxdfqtqTEt6vcY07LtEBR1seHuBHXWEIuscqRDGvbauYPs+A4Rj/KTczQ==}
@@ -15590,7 +15591,7 @@ snapshots:
       lodash: 4.17.21
       tslib: 2.4.1
 
-  '@graphql-codegen/plugin-helpers@5.1.0(graphql@15.8.0)':
+  '@graphql-codegen/plugin-helpers@5.1.1(graphql@15.8.0)':
     dependencies:
       '@graphql-tools/utils': 10.8.3(graphql@15.8.0)
       change-case-all: 1.0.15
@@ -15602,14 +15603,14 @@ snapshots:
 
   '@graphql-codegen/schema-ast@4.1.0(graphql@15.8.0)':
     dependencies:
-      '@graphql-codegen/plugin-helpers': 5.1.0(graphql@15.8.0)
+      '@graphql-codegen/plugin-helpers': 5.1.1(graphql@15.8.0)
       '@graphql-tools/utils': 10.8.3(graphql@15.8.0)
       graphql: 15.8.0
       tslib: 2.6.3
 
   '@graphql-codegen/typescript-operations@4.5.1(graphql@15.8.0)':
     dependencies:
-      '@graphql-codegen/plugin-helpers': 5.1.0(graphql@15.8.0)
+      '@graphql-codegen/plugin-helpers': 5.1.1(graphql@15.8.0)
       '@graphql-codegen/typescript': 4.1.5(graphql@15.8.0)
       '@graphql-codegen/visitor-plugin-common': 5.7.1(graphql@15.8.0)
       auto-bind: 4.0.0
@@ -15620,7 +15621,7 @@ snapshots:
 
   '@graphql-codegen/typescript@4.1.5(graphql@15.8.0)':
     dependencies:
-      '@graphql-codegen/plugin-helpers': 5.1.0(graphql@15.8.0)
+      '@graphql-codegen/plugin-helpers': 5.1.1(graphql@15.8.0)
       '@graphql-codegen/schema-ast': 4.1.0(graphql@15.8.0)
       '@graphql-codegen/visitor-plugin-common': 5.7.1(graphql@15.8.0)
       auto-bind: 4.0.0
@@ -15631,7 +15632,7 @@ snapshots:
 
   '@graphql-codegen/visitor-plugin-common@4.1.2(graphql@15.8.0)':
     dependencies:
-      '@graphql-codegen/plugin-helpers': 5.1.0(graphql@15.8.0)
+      '@graphql-codegen/plugin-helpers': 5.1.1(graphql@15.8.0)
       '@graphql-tools/optimize': 2.0.0(graphql@15.8.0)
       '@graphql-tools/relay-operation-optimizer': 7.0.16(graphql@15.8.0)
       '@graphql-tools/utils': 10.8.3(graphql@15.8.0)
@@ -15647,7 +15648,7 @@ snapshots:
 
   '@graphql-codegen/visitor-plugin-common@5.7.1(graphql@15.8.0)':
     dependencies:
-      '@graphql-codegen/plugin-helpers': 5.1.0(graphql@15.8.0)
+      '@graphql-codegen/plugin-helpers': 5.1.1(graphql@15.8.0)
       '@graphql-tools/optimize': 2.0.0(graphql@15.8.0)
       '@graphql-tools/relay-operation-optimizer': 7.0.16(graphql@15.8.0)
       '@graphql-tools/utils': 10.8.3(graphql@15.8.0)

@@ -18,6 +18,7 @@ export interface Field<F extends Field = AnyField> {
     field: Field
   ): string | object | undefined;
   defaultValue?: any;
+  namespace?: string[];
   fields?: F[];
   /**
    * Focus events can come from outside of the component, this is not
