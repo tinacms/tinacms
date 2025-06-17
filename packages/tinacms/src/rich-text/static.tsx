@@ -216,6 +216,7 @@ const Node = ({
     case 'img':
       if (components[child.type]) {
         const Component = components[child.type];
+        //@ts-ignore Same issue with TinaMarkdown
         return <Component {...props} />;
       }
       return <img src={child.url} alt={child.alt} />;
@@ -223,6 +224,7 @@ const Node = ({
       if (components[child.type]) {
         const Component = components[child.type];
         return (
+          //@ts-ignore Same issue with TinaMarkdown
           <Component {...props}>
             <StaticTinaMarkdown components={components} content={children} />
           </Component>
@@ -261,16 +263,19 @@ const Node = ({
     case 'hr':
       if (components[child.type]) {
         const Component = components[child.type];
+        //@ts-ignore Same issue with TinaMarkdown
         return <Component {...props} />;
       }
       return <hr />;
     case 'break':
       if (components[child.type]) {
         const Component = components[child.type];
+        //@ts-ignore Same issue with TinaMarkdown
         return <Component {...props} />;
       }
       return <br />;
     case 'text':
+      //@ts-ignore Same issue with TinaMarkdown
       return <Leaf components={components} {...child} />;
     case 'mdxJsxTextElement':
     case 'mdxJsxFlowElement':
@@ -286,7 +291,7 @@ const Node = ({
               ? child.props?.tableRows.filter((_, i) => i !== 0)
               : child.props?.tableRows) || [];
           const header = child.props?.tableRows?.at(0);
-          const TableComponent =
+          const TableComponent = //@ts-ignore Same issue with TinaMarkdown
             components['table'] || ((props) => <table {...props} />);
           const TrComponent =
             components['tr'] || ((props) => <tr {...props} />);
@@ -302,6 +307,7 @@ const Node = ({
             ));
           const align = child.props?.align || [];
           return (
+            //@ts-ignore Same issue with TinaMarkdown
             <TableComponent>
               {firstRowHeader && (
                 <thead>
@@ -357,9 +363,9 @@ const Node = ({
       const rows = child.children || [];
       const TableComponent =
         components['table'] ||
-        ((props) => (
-          <table style={{ border: '1px solid #EDECF3' }} {...props} />
-        ));
+        ((
+          props //@ts-ignore Same issue with TinaMarkdown
+        ) => <table style={{ border: '1px solid #EDECF3' }} {...props} />);
       const TrComponent = components['tr'] || ((props) => <tr {...props} />);
       const TdComponent =
         components['td'] ||
@@ -375,6 +381,7 @@ const Node = ({
         ));
       const align = child.props?.align || [];
       return (
+        //@ts-ignore Same issue with TinaMarkdown
         <TableComponent>
           <tbody>
             {rows.map((row, i) => {
@@ -409,6 +416,7 @@ const Node = ({
     case 'html_inline':
       if (components[child.type]) {
         const Component = components[child.type];
+        //@ts-ignore Same issue with TinaMarkdown
         return <Component {...props} />;
       }
       return child.value;
@@ -416,6 +424,7 @@ const Node = ({
       return <pre>{child.value}</pre>;
     default:
       if (typeof child.text === 'string') {
+        //@ts-ignore Same issue with TinaMarkdown
         return <Leaf components={components} {...child} />;
       }
       return null;
