@@ -1,11 +1,11 @@
-import React from 'react';
-import { XCircleIcon } from '@heroicons/react/solid';
 import {
   Popover,
   PopoverButton,
   PopoverPanel,
   Transition,
 } from '@headlessui/react';
+import { XCircleIcon } from '@heroicons/react/solid';
+import React from 'react';
 import { Fragment } from 'react';
 export type EmptyTextElement = { type: 'text'; text: '' };
 export type PositionItem = {
@@ -87,7 +87,7 @@ export function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
           >
             <PopoverPanel className='absolute top-8 w-[300px] -right-3 z-10 mt-3 px-4 sm:px-0'>
               <div className='overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5'>
-                <div className='rounded-md bg-red-50 p-4 overflow-scroll'>
+                <div className='rounded bg-red-50 p-4 overflow-scroll'>
                   <div className='flex'>
                     <div className='flex-shrink-0'>
                       <XCircleIcon

@@ -27,7 +27,7 @@ const MermaidElementWithRef = ({ config }) => {
 
 const Bubble = ({ children }) => {
   return (
-    <div className='bg-blue-600 rounded-full p-2 transition-transform duration-200 ease-in-out hover:scale-110'>
+    <div className='bg-blue-600 rounded p-2 transition-transform duration-200 ease-in-out hover:scale-110'>
       {children}
     </div>
   );
@@ -38,7 +38,7 @@ const ErrorMsg = ({ error }) => {
     return (
       <div
         contentEditable={false}
-        className='font-mono bg-red-600 text-white p-2 rounded-md cursor-default'
+        className='font-mono bg-red-600 text-white p-2 rounded cursor-default'
       >
         {error}
       </div>

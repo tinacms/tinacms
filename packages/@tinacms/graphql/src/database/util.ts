@@ -1,20 +1,20 @@
-import * as yup from 'yup';
 import toml from '@iarna/toml';
-import yaml from 'js-yaml';
-import matter from 'gray-matter';
 import {
   Collection,
   CollectionTemplateable,
-  normalizePath,
   TinaSchema,
+  normalizePath,
 } from '@tinacms/schema-tools';
+import matter from 'gray-matter';
+import yaml from 'js-yaml';
+import * as yup from 'yup';
 
-import { assertShape, lastItem, sequential } from '../util';
-import micromatch from 'micromatch';
-import { Bridge } from './bridge';
 import path from 'path';
-import { replaceNameOverrides } from './alias-utils';
 import { ContentFormat, ContentFrontmatterFormat } from '@tinacms/schema-tools';
+import micromatch from 'micromatch';
+import { assertShape, lastItem, sequential } from '../util';
+import { replaceNameOverrides } from './alias-utils';
+import { Bridge } from './bridge';
 
 export { normalizePath };
 

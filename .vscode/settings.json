@@ -4,6 +4,12 @@
         "source.organizeImports.biome": "explicit"
     },
     "editor.defaultFormatter": "biomejs.biome",
+    "[typescript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
