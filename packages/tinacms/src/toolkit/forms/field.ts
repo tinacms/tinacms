@@ -1,3 +1,5 @@
+import { Parser } from '@tinacms/schema-tools';
+
 export type AnyField = Field & { [key: string]: any };
 
 export interface Field<F extends Field = AnyField> {
@@ -6,6 +8,7 @@ export interface Field<F extends Field = AnyField> {
   description?: string;
   component: React.FC<any> | string | null;
   inlineComponent?: React.FC<any>;
+  parser?: Parser;
   parse?: (value: any, name: string, field: F) => any;
   format?: (value: any, name: string, field: F) => any;
   validate?(
@@ -15,6 +18,7 @@ export interface Field<F extends Field = AnyField> {
     field: Field
   ): string | object | undefined;
   defaultValue?: any;
+  namespace?: string[];
   fields?: F[];
   /**
    * Focus events can come from outside of the component, this is not

@@ -1,9 +1,9 @@
-import { render, act } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import React, { useEffect } from 'react';
+import { describe, it, vi } from 'vitest';
+import { TinaCMS } from '../tina-cms';
 import { TinaCMSProvider } from './tina-cms-provider';
 import { TinaUI } from './tina-ui';
-import { TinaCMS } from '../tina-cms';
-import { describe, it, vi } from 'vitest';
 
 describe('TinaUI', () => {
   describe('when the CMS is enabled', () => {

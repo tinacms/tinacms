@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { Form, Field } from '@toolkit/forms';
+import { Field, Form } from '@toolkit/forms';
 import { useCMS, useEventSubscription } from '@toolkit/react-core';
+import * as React from 'react';
 import { Field as FinalField } from 'react-final-form';
 import { FieldPlugin } from './field-plugin';
 

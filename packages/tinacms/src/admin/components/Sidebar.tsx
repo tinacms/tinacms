@@ -1,21 +1,13 @@
-/**
-
-*/
-
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import { ImFilesEmpty, ImUsers } from 'react-icons/im';
 import type { IconType } from 'react-icons/lib';
+import { NavLink } from 'react-router-dom';
 
-import { Button, Nav } from '@tinacms/toolkit';
-import type { TinaCMS, ScreenPlugin } from '@tinacms/toolkit';
-import { Transition, TransitionChild } from '@headlessui/react';
-import { useWindowWidth } from '@react-hook/window-size';
+import { Nav } from '@tinacms/toolkit';
+import type { ScreenPlugin, TinaCMS } from '@tinacms/toolkit';
 
-import { useGetCollections } from './GetCollections';
-import { IoMdClose } from 'react-icons/io';
-import { BiMenu } from 'react-icons/bi';
 import type { CloudConfigPlugin } from '@tinacms/toolkit';
+import { useGetCollections } from './GetCollections';
 
 export const slugify = (text) => {
   return text
@@ -33,12 +25,8 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
   const cloudConfigs = cms.plugins
     .getType<CloudConfigPlugin>('cloud-config')
     .all();
-  const [menuIsOpen, setMenuIsOpen] = React.useState(false);
 
   const isLocalMode = cms.api?.tina?.isLocalMode;
-  const navBreakpoint = 1279;
-  const windowWidth = useWindowWidth();
-  const renderDesktopNav = windowWidth > navBreakpoint;
   const activeScreens = screens.filter(
     (screen) =>
       screen.navCategory !== 'Account' ||
@@ -46,146 +34,39 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
   );
 
   return (
-    <>
-      {renderDesktopNav && (
-        <Nav
-          isLocalMode={isLocalMode}
-          sidebarWidth={360}
-          showCollections={true}
-          collectionsInfo={collectionsInfo}
-          screens={activeScreens}
-          cloudConfigs={cloudConfigs}
-          contentCreators={[]}
-          RenderNavSite={({ view }) => (
-            <SidebarLink
-              label={view.name}
-              to={`/screens/${slugify(view.name)}`}
-              Icon={view.Icon ? view.Icon : ImFilesEmpty}
-            />
-          )}
-          RenderNavCloud={({ config }) => <SidebarCloudLink config={config} />}
-          RenderNavCollection={({ collection }) => (
-            <SidebarLink
-              label={collection.label ? collection.label : collection.name}
-              to={`/collections/${collection.name}/~`}
-              Icon={ImFilesEmpty}
-            />
-          )}
-          AuthRenderNavCollection={({ collection }) => (
-            <SidebarLink
-              label={collection.label ? collection.label : collection.name}
-              to={`/collections/${collection.name}/~`}
-              Icon={ImUsers}
-            />
-          )}
+    <Nav
+      isLocalMode={isLocalMode}
+      showHamburger={false}
+      toggleMenu={() => {}}
+      sidebarWidth={360}
+      showCollections={true}
+      collectionsInfo={collectionsInfo}
+      screens={activeScreens}
+      cloudConfigs={cloudConfigs}
+      contentCreators={[]}
+      RenderNavSite={({ view }) => (
+        <SidebarLink
+          label={view.name}
+          to={`/screens/${slugify(view.name)}`}
+          Icon={view.Icon ? view.Icon : ImFilesEmpty}
         />
       )}
-      {!renderDesktopNav && (
-        <Transition show={menuIsOpen}>
-          <TransitionChild
-            enter='transform transition-all ease-out duration-300'
-            enterFrom='opacity-0 -translate-x-full'
-            enterTo='opacity-100 translate-x-0'
-            leave='transform transition-all ease-in duration-200'
-            leaveFrom='opacity-100 translate-x-0'
-            leaveTo='opacity-0 -translate-x-full'
-          >
-            <div className='fixed left-0 top-0 z-overlay h-full transform'>
-              <Nav
-                isLocalMode={isLocalMode}
-                className='rounded-r-md'
-                sidebarWidth={360}
-                showCollections={true}
-                collectionsInfo={collectionsInfo}
-                screens={activeScreens}
-                cloudConfigs={cloudConfigs}
-                contentCreators={[]}
-                RenderNavSite={({ view }) => (
-                  <SidebarLink
-                    label={view.name}
-                    to={`/screens/${slugify(view.name)}`}
-                    Icon={view.Icon ? view.Icon : ImFilesEmpty}
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                  />
-                )}
-                RenderNavCloud={({ config }) => (
-                  <SidebarCloudLink config={config} />
-                )}
-                RenderNavCollection={({ collection }) => (
-                  <SidebarLink
-                    label={
-                      collection.label ? collection.label : collection.name
-                    }
-                    to={`/collections/${collection.name}/~`}
-                    Icon={ImFilesEmpty}
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                  />
-                )}
-                AuthRenderNavCollection={({ collection }) => (
-                  <SidebarLink
-                    label={
-                      collection.label ? collection.label : collection.name
-                    }
-                    to={`/collections/${collection.name}/~`}
-                    Icon={ImUsers}
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                  />
-                )}
-              >
-                <div className='absolute top-8 right-0 transform translate-x-full overflow-hidden'>
-                  <Button
-                    rounded='right'
-                    variant='secondary'
-                    onClick={() => {
-                      setMenuIsOpen(false);
-                    }}
-                    className={`transition-opacity duration-150 ease-out`}
-                  >
-                    <IoMdClose className='h-6 w-auto' />
-                  </Button>
-                </div>
-              </Nav>
-            </div>
-          </TransitionChild>
-          <TransitionChild
-            enter='ease-out duration-300'
-            enterFrom='opacity-0'
-            enterTo='opacity-80'
-            entered='opacity-80'
-            leave='ease-in duration-200'
-            leaveFrom='opacity-80'
-            leaveTo='opacity-0'
-          >
-            <div
-              onClick={() => {
-                setMenuIsOpen(false);
-              }}
-              className='fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black'
-            />
-          </TransitionChild>
-        </Transition>
+      RenderNavCloud={({ config }) => <SidebarCloudLink config={config} />}
+      RenderNavCollection={({ collection }) => (
+        <SidebarLink
+          label={collection.label ? collection.label : collection.name}
+          to={`/collections/${collection.name}/~`}
+          Icon={ImFilesEmpty}
+        />
       )}
-      {!renderDesktopNav && (
-        <Button
-          rounded='right'
-          variant='secondary'
-          onClick={() => {
-            setMenuIsOpen(true);
-          }}
-          className={`pointer-events-auto -ml-px absolute left-0 z-50 ${
-            isLocalMode ? 'top-10' : 'top-4'
-          }`}
-        >
-          <BiMenu className='h-7 w-auto' />
-        </Button>
+      AuthRenderNavCollection={({ collection }) => (
+        <SidebarLink
+          label={collection.label ? collection.label : collection.name}
+          to={`/collections/${collection.name}/~`}
+          Icon={ImUsers}
+        />
       )}
-    </>
+    />
   );
 };
 

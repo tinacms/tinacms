@@ -1,22 +1,16 @@
-/**
-
-
-
-*/
-// @ts-ignore Fix this by updating prettier
-import prettier from 'prettier/esm/standalone.mjs';
-// @ts-ignore Fix this by updating prettier
-import parser from 'prettier/esm/parser-espree.mjs';
 import type {
   RichTextField,
   RichTextTemplate,
-  ObjectField,
   TinaField,
 } from '@tinacms/schema-tools';
-import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
-import * as Plate from '../parse/plate';
 import type * as Md from 'mdast';
-import { rootElement, stringifyMDX } from '.';
+import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
+// @ts-ignore Fix this by updating prettier
+import parser from 'prettier/esm/parser-espree.mjs';
+// @ts-ignore Fix this by updating prettier
+import prettier from 'prettier/esm/standalone.mjs';
+import { formatMdxForPersistence, rootElement, stringifyMDX } from '.';
+import * as Plate from '../parse/plate';
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
@@ -352,7 +346,11 @@ const findAndTransformNestedRichText = (
         (value) => value.type === 'root' && Array.isArray(value.children),
         `Nested rich-text element is not a valid shape for field ${field.name}`
       );
-      parentValue[field.name] = stringifyMDX(value, field, imageCallback);
+      parentValue[field.name] = formatMdxForPersistence(
+        value,
+        field,
+        imageCallback
+      );
       break;
     }
     case 'object': {
