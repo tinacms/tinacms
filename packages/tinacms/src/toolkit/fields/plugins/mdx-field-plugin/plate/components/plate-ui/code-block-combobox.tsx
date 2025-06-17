@@ -55,7 +55,7 @@ const languages: { label: string; value: string }[] = [
   { label: 'Shell', value: 'shell' },
   { label: 'SQL', value: 'sql' },
   { label: 'Swift', value: 'swift' },
-  { label: 'TypeScript', value: 'typescript' },
+  { label: 'TypeScript', value: 'ts' },
   { label: 'VB.Net', value: 'vbnet' },
   { label: 'WebAssembly', value: 'wasm' },
   { label: 'XML', value: 'xml' },
