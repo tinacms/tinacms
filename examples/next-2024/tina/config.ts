@@ -16,23 +16,33 @@ export default defineConfig({
   token: process.env.TINA_TOKEN,
 
   build: {
-    outputFolder: "admin",
-    publicFolder: "public",
+    outputFolder: 'admin',
+    publicFolder: 'public',
   },
   media: {
     tina: {
-      mediaRoot: "",
-      publicFolder: "public",
+      mediaRoot: '',
+      publicFolder: 'public',
     },
   },
   // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/schema/
   schema: {
     collections: [
       {
-        name: "test",
-        label: "Testing",
-        format: "json",
-        path: "content/tests",
+        name: 'simpleRef',
+        path: 'content/refs',
+        fields: [
+          {
+            name: 'title',
+            type: 'string',
+          },
+        ],
+      },
+      {
+        name: 'post',
+        label: 'Posts',
+        format: 'mdx',
+        path: 'content/posts',
         ui: {
           router({ document }) {
             return `/posts/${document._sys.filename}`;
@@ -40,16 +50,16 @@ export default defineConfig({
         },
         fields: [
           {
-            type: "string",
-            name: "title",
-            label: "Title",
+            type: 'string',
+            name: 'title',
+            label: 'Title',
             isTitle: true,
             required: true,
           },
           {
-            type: "rich-text",
-            name: "body",
-            label: "Body",
+            type: 'rich-text',
+            name: 'body',
+            label: 'Body',
             isBody: true,
           },
           {
@@ -76,6 +86,12 @@ export default defineConfig({
                 name: 'image',
                 type: 'image',
               },
+
+              {
+                name: 'ref',
+                type: 'reference',
+                collections: ['simpleRef'],
+              },
             ],
           },
           {
@@ -84,28 +100,38 @@ export default defineConfig({
             name: 'template',
             isBody: true,
             toolbarOverride: [
-              "heading",
-              "bold",
-              "italic",
-              "image",
-              "link",
-              "embed",
+              'heading',
+              'bold',
+              'italic',
+              'image',
+              'link',
+              'embed',
             ],
             overrides: {
-              toolbar: ["heading", "bold", "italic", "image", "link", "embed"],
+              toolbar: ['heading', 'bold', 'italic', 'image', 'link', 'embed'],
               showFloatingToolbar: false,
             },
             templates: [
               {
-                name: "DateTime",
-                label: "Date & Time",
+                name: 'DateTime',
+                label: 'Date & Time',
                 inline: true,
                 fields: [
                   {
-                    name: "format",
-                    label: "Format",
-                    type: "string",
-                    options: ["utc", "iso", "local"],
+                    name: 'format',
+                    label: 'Format',
+                    type: 'string',
+                    options: ['utc', 'iso', 'local'],
+                  },
+                ],
+              },
+              {
+                name: 'ref',
+                fields: [
+                  {
+                    name: 'ref',
+                    type: 'reference',
+                    collections: ['simpleRef'],
                   },
                 ],
               },
