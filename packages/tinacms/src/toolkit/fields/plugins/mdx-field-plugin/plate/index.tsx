@@ -23,7 +23,9 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       console.log('🧹 [useMemo] Normalized children:', normalized);
       return normalized;
     } else {
-      console.log('🆕 [useMemo] No children found, using default empty paragraph');
+      console.log(
+        '🆕 [useMemo] No children found, using default empty paragraph'
+      );
       return [{ type: 'p', children: [{ type: 'text', text: '' }] }];
     }
   }, []);
