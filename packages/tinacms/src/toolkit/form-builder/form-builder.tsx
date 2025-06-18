@@ -401,19 +401,17 @@ export const CreateBranchModal = ({
 
           const api = new TinaAdminApi(cms);
           const params = api.schema.transformPayload(collection.name, values);
-
+          const relativePath = pathRelativeToCollection(collection.path, path);
           // Use enhanced branch creation that handles everything in one request
           const result = await tinaApi.executeEditorialWorkflow({
             branchName: formatBranchName(branchName),
             baseBranch: currentBranch,
-            waitForIndex: true,
-            createPR: true,
             prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
             graphQLContentOp: {
               query: graphql,
               variables: {
                 collection: collection.name,
-                relativePath: path,
+                relativePath: relativePath,
                 params,
               },
             },
