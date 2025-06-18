@@ -571,24 +571,19 @@ mutation addPendingDocumentMutation(
 
   /**
    * Enhanced createBranch that can also wait for indexing and create a PR
-   * 
    * @param options Branch creation options
    * @returns Object with branch info, optionally PR info
    */
-  async createBranchEnhanced(options: {
-    baseBranch: string;
+  async executeEditorialWorkflow(options: {
     branchName: string;
-    waitForIndex?: boolean;
-    createPR?: boolean;
+    baseBranch: string;
     prTitle?: string;
-    contentOp?: {
-      collection: string;
-      relativePath: string;
-      values: Record<string, unknown>;
-      crudType: string;
+    graphQLContentOp?: {
+      query: string;
+      variables: Record<string, unknown>;
     };
   }) {
-    const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/branches`;
+    const url = `${this.contentApiBase}/github/${this.clientId}/editorial-workflow`;
 
     try {
       const res = await this.authProvider.fetchWithToken(url, {

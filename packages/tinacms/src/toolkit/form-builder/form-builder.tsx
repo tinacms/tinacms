@@ -3,7 +3,6 @@ import * as React from 'react';
 import { type FC, useEffect } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 
-import type { TinaSchema } from '@tinacms/schema-tools';
 import {
   formatBranchName,
   useBranchData,
@@ -13,7 +12,12 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import { BiError, BiGitBranch, BiLoaderAlt } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';
 import { MdOutlineSaveAlt } from 'react-icons/md';
-import { TinaAdminApi } from '../../admin/api';
+import {
+  CREATE_DOCUMENT_GQL,
+  DELETE_DOCUMENT_GQL,
+  TinaAdminApi,
+  UPDATE_DOCUMENT_GQL,
+} from '../../admin/api';
 import { cn } from '../../utils/cn';
 import { useCMS } from '../react-core';
 import {
@@ -105,10 +109,11 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
   const tinaForm = form.tinaForm;
   const finalForm = form.tinaForm.finalForm;
-  const schema: TinaSchema = cms.api.tina.schema;
 
   React.useEffect(() => {
-    const collection = schema.getCollectionByFullPath(tinaForm.relativePath);
+    const collection = cms.api.tina.schema.getCollectionByFullPath(
+      tinaForm.relativePath
+    );
     if (collection?.ui?.beforeSubmit) {
       tinaForm.beforeSubmit = (values: any) =>
         collection.ui.beforeSubmit({ cms, form: tinaForm, values });
@@ -382,26 +387,36 @@ export const CreateBranchModal = ({
           console.log('starting', branchName, formatBranchName(branchName));
           const currentBranch = tinaApi.branch;
 
+          // Determine which GraphQL mutation to use based on crudType
+          let graphql = '';
+          if (crudType === 'create') {
+            graphql = CREATE_DOCUMENT_GQL;
+          } else if (crudType === 'delete') {
+            graphql = DELETE_DOCUMENT_GQL;
+          } else if (crudType !== 'view') {
+            graphql = UPDATE_DOCUMENT_GQL;
+          }
+
+          const collection = tinaApi.schema.getCollectionByFullPath(path);
+
+          const api = new TinaAdminApi(cms);
+          const params = api.schema.transformPayload(collection.name, values);
+
           // Use enhanced branch creation that handles everything in one request
-          const result = await tinaApi.createBranchEnhanced({
+          const result = await tinaApi.executeEditorialWorkflow({
             branchName: formatBranchName(branchName),
             baseBranch: currentBranch,
             waitForIndex: true,
             createPR: true,
             prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
-            contentOp:
-              crudType !== 'view'
-                ? {
-                    collection:
-                      tinaApi.schema.getCollectionByFullPath(path).name,
-                    relativePath: pathRelativeToCollection(
-                      tinaApi.schema.getCollectionByFullPath(path).path,
-                      path
-                    ),
-                    values: values,
-                    crudType: crudType,
-                  }
-                : undefined,
+            graphQLContentOp: {
+              query: graphql,
+              variables: {
+                collection: collection.name,
+                relativePath: path,
+                params,
+              },
+            },
           });
 
           if (!result.branchName) {
