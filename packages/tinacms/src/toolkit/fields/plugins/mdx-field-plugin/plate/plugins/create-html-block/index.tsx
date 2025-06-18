@@ -30,7 +30,6 @@ export const createBlockquoteEnterBreakPlugin = createPlatePlugin({
 
   handlers: {
     onKeyDown: ({ editor, event }) => {
-
       if (event.key !== 'Enter') return;
       const blockquoteEntry = editor.api.above({
         match: { type: BlockquotePlugin.key },
@@ -43,7 +42,6 @@ export const createBlockquoteEnterBreakPlugin = createPlatePlugin({
       const cursorPosition = editor.selection?.focus;
       if (!cursorPosition) return;
 
-      console.log('Inserting nodes at', cursorPosition.path, cursorPosition.offset);
       editor.tf.insertNodes(
         [
           { type: ELEMENT_BREAK, children: [{ text: '' }] },

@@ -95,7 +95,7 @@ export const viewPlugins = [
   CodeBlockPlugin.configure({
     options: { lowlight: createLowlight(all) },
   }),
-  BlockquotePlugin
+  BlockquotePlugin,
 ] as const;
 
 const CorrectNodeBehaviorPlugin = createSlatePlugin({
