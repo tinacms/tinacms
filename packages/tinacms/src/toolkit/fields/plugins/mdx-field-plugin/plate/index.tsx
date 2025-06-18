@@ -19,6 +19,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       console.log('🧩 [useMemo] Using slatejson parser:', input.value.children);
       return input.value.children;
     } else if (input.value?.children?.length) {
+      console.log('🧹 [useMemo] input.value.children:', input.value.children);
       const normalized = input.value.children.map(helpers.normalize);
       console.log('🧹 [useMemo] Normalized children:', normalized);
       return normalized;

@@ -111,7 +111,7 @@ export const MdxFieldPluginExtendible = {
         return reset(initialValues);
       };
     }, []);
-
+    console.log('🧩 [MdxFieldPluginExtendible] props:', props);
     return (
       <EditorContext.Provider
         key={key}
