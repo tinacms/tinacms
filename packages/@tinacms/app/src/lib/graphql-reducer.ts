@@ -45,7 +45,7 @@ const sysSchema = z.object({
   collection: z.object({
     name: z.string(),
     slug: z.string(),
-    label: z.string(),
+    label: z.string().optional().nullable(),
     path: z.string(),
     format: z.string().optional().nullable(),
     matches: z.string().optional().nullable(),
@@ -305,6 +305,7 @@ export const useGraphQLReducer = (
               prefix: '',
             };
           }
+
           if (isConnectionType(info.returnType)) {
             const name = G.getNamedType(info.returnType).name;
             const connectionCollection = tinaSchema
@@ -339,6 +340,7 @@ export const useGraphQLReducer = (
               const maybeResolvedDocument = resolvedDocuments.find(
                 (doc) => doc._internalSys.path === value
               );
+
               // If we already have this document, use it.
               if (maybeResolvedDocument) {
                 resolvedDocument = maybeResolvedDocument;
@@ -349,6 +351,7 @@ export const useGraphQLReducer = (
                 // here and just grab it from the response
                 const maybeResolvedDocument =
                   documentSchema.parse(valueFromSetup);
+
                 if (maybeResolvedDocument._internalSys.path === value) {
                   resolvedDocument = maybeResolvedDocument;
                 } else {

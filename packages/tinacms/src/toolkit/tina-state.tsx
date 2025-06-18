@@ -224,7 +224,15 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
     }
     case 'forms:set-active-form-id':
       if (action.value !== state.activeFormId) {
-        const breadcrumbs = calculateBreadcrumbs(state.forms, action.value, '');
+        const newActiveForm = state.forms.find(
+          (form) => form.tinaForm.id === action.value
+        );
+
+        const breadcrumbs = calculateBreadcrumbs(
+          state.forms,
+          action.value,
+          newActiveForm?.activeFieldName || ''
+        );
         return {
           ...state,
           breadcrumbs,
