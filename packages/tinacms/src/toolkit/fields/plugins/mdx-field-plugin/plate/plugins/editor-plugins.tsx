@@ -95,7 +95,7 @@ export const viewPlugins = [
   CodeBlockPlugin.configure({
     options: { lowlight: createLowlight(all) },
   }),
-  BlockquotePlugin,
+  BlockquotePlugin
 ] as const;
 
 const CorrectNodeBehaviorPlugin = createSlatePlugin({
@@ -226,7 +226,7 @@ export const editorPlugins = [
         {
           hotkey: 'enter',
           query: {
-            allow: [CodeBlockPlugin.key],
+            allow: [CodeBlockPlugin.key, BlockquotePlugin.key],
           },
         },
       ],
