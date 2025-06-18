@@ -14,15 +14,19 @@ import { FloatingToolbar } from './components/plate-ui/floating-toolbar';
 import FloatingToolbarButtons from './components/floating-toolbar-buttons';
 
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
-  const initialValue = React.useMemo(
-    () =>
-      field?.parser?.type === 'slatejson'
-        ? input.value.children
-        : input.value?.children?.length
-          ? input.value.children.map(helpers.normalize)
-          : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
-    []
-  );
+  const initialValue = React.useMemo(() => {
+    if (field?.parser?.type === 'slatejson') {
+      console.log('🧩 [useMemo] Using slatejson parser:', input.value.children);
+      return input.value.children;
+    } else if (input.value?.children?.length) {
+      const normalized = input.value.children.map(helpers.normalize);
+      console.log('🧹 [useMemo] Normalized children:', normalized);
+      return normalized;
+    } else {
+      console.log('🆕 [useMemo] No children found, using default empty paragraph');
+      return [{ type: 'p', children: [{ type: 'text', text: '' }] }];
+    }
+  }, []);
 
   console.log('initialValue', initialValue);
   //TODO try with a wrapper?
