@@ -24,6 +24,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
     []
   );
 
+  console.log('initialValue', initialValue);
   //TODO try with a wrapper?
   const editor = useCreateEditor({
     plugins: [...editorPlugins],
