@@ -125,6 +125,16 @@ export default defineConfig({
                   },
                 ],
               },
+              {
+                name: 'ref',
+                fields: [
+                  {
+                    name: 'ref',
+                    type: 'reference',
+                    collections: ['simpleRef'],
+                  },
+                ],
+              },
             ],
           },
         ],
