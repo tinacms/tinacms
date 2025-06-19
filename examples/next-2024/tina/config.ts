@@ -1,4 +1,5 @@
 import { defineConfig } from 'tinacms';
+import PathwaySchema, { contentBlock } from './collection/bugReproduction';
 
 // Your hosting provider likely exposes this as an environment variable
 const branch =
