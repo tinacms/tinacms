@@ -32,7 +32,7 @@ export const tinaTableTemplate: RichTextTemplate = {
             if (Array.isArray(value.tableCells)) {
               return {
                 label: value.tableCells
-                  .map((cellItem) => stringifyCell(cellItem.value).trim())
+                  .map((cellItem) => stringifyCell(cellItem.value))
                   .join(' | '),
               };
             }
@@ -51,7 +51,7 @@ export const tinaTableTemplate: RichTextTemplate = {
               if (cell) {
                 if (cell.value) {
                   return {
-                    label: stringifyCell(cell.value).trim(),
+                    label: stringifyCell(cell.value),
                   };
                 }
               }
@@ -130,5 +130,5 @@ const stringifyCell = (cell: any): string => {
   if (typeof serialized !== 'string') {
     throw new Error('stringifyCell: Expected serializeMDX to return a string');
   }
-  return serialized;
+  return serialized?.trim();
 };
