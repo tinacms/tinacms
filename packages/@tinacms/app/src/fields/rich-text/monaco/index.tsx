@@ -11,7 +11,7 @@ import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
  * easily install the current version of the mdx package in all scenarios
  * (when we're working in the monorepo, or working with a tagged npm version)
  */
-import { parseMDX, stringifyMDX } from '@tinacms/mdx';
+import { parseMDX, serializeMDX } from '@tinacms/mdx';
 import type * as monaco from 'monaco-editor';
 import React from 'react';
 import { RichTextType } from 'tinacms';
@@ -68,7 +68,7 @@ export const RawEditor = (props: RichTextType) => {
   const field = props.field;
   const inputValue = React.useMemo(() => {
     // @ts-ignore no access to the rich-text type from this package
-    const res = stringifyMDX(props.input.value, field, (value) => value);
+    const res = serializeMDX(props.input.value, field, (value) => value);
     return typeof props.input.value === 'string' ? props.input.value : res;
   }, []);
   const [value, setValue] = React.useState(inputValue);
