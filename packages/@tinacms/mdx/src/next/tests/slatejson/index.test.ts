@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import { parseMDX } from '../../../parse';
 import type * as Plate from '../../../parse/plate';
-import { stringifyMDX } from '../../../stringify';
+import { serializeMDX } from '../../../stringify';
 import { field } from './field';
 import inputString from './node.json?raw';
 
@@ -14,7 +14,7 @@ it('matches input', () => {
   // Ensure the parsed tree is the same as the input
   expect(tree).toEqual(input);
 
-  const rootElement = stringifyMDX(tree, field, (v) => v);
+  const rootElement = serializeMDX(tree, field, (v) => v);
 
   // Ensure the 'stringified' output is the same as the input
   expect(rootElement).toEqual(input);

@@ -31,7 +31,7 @@ declare module 'mdast' {
   }
 }
 
-export const stringifyMDX = (
+export const serializeMDX = (
   value: Plate.RootElement,
   field: RichTextType,
   imageCallback: (url: string) => string

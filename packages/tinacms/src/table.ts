@@ -1,4 +1,4 @@
-import { stringifyMDX } from '@tinacms/mdx';
+import { serializeMDX } from '@tinacms/mdx';
 import { RichTextTemplate } from '@tinacms/schema-tools';
 import { z } from 'zod';
 
@@ -136,5 +136,5 @@ const tableCellSchema = z.object({
 });
 
 const stringifyCell = (cell: any) => {
-  return stringifyMDX(cell, { name: 'body', type: 'rich-text' }, () => '');
+  return serializeMDX(cell, { name: 'body', type: 'rich-text' }, () => '');
 };
