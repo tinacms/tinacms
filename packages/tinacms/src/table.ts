@@ -32,15 +32,7 @@ export const tinaTableTemplate: RichTextTemplate = {
             if (Array.isArray(value.tableCells)) {
               return {
                 label: value.tableCells
-                  .map((cellItem) => {
-                    const s = stringifyCell(cellItem.value);
-                    if (typeof s !== 'string') {
-                      throw new Error(
-                        'tableRows: Expected stringifyCell to return a string'
-                      );
-                    }
-                    return s.trim();
-                  })
+                  .map((cellItem) => stringifyCell(cellItem.value).trim())
                   .join(' | '),
               };
             }
@@ -58,14 +50,8 @@ export const tinaTableTemplate: RichTextTemplate = {
             itemProps: (cell) => {
               if (cell) {
                 if (cell.value) {
-                  const s = stringifyCell(cell.value);
-                  if (typeof s !== 'string') {
-                    throw new Error(
-                      'tableCells: Expected stringifyCell to return a string'
-                    );
-                  }
                   return {
-                    label: s.trim(),
+                    label: stringifyCell(cell.value).trim(),
                   };
                 }
               }
@@ -135,6 +121,14 @@ const tableCellSchema = z.object({
     ),
 });
 
-const stringifyCell = (cell: any) => {
-  return serializeMDX(cell, { name: 'body', type: 'rich-text' }, () => '');
+const stringifyCell = (cell: any): string => {
+  const serialized = serializeMDX(
+    cell,
+    { name: 'body', type: 'rich-text' },
+    () => ''
+  );
+  if (typeof serialized !== 'string') {
+    throw new Error('stringifyCell: Expected serializeMDX to return a string');
+  }
+  return serialized;
 };
