@@ -111,9 +111,8 @@ export const parseMDX = (
       case 'markdown':
         return parseMDXNext(value, field, imageCallback);
       case 'slatejson':
-        // Assuming `value` is a JSON string, parse it into an object
-        const parsedValue = JSON.parse(value);
-        return parsedValue as Plate.RootElement;
+        // Assuming `value` is a JSON object
+        return value as unknown as Plate.RootElement;
     }
     let preprocessedString = value;
     const templatesWithMatchers = field.templates?.filter(

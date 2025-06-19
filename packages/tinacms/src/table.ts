@@ -1,5 +1,5 @@
-import { RichTextTemplate } from '@tinacms/schema-tools';
 import { stringifyMDX } from '@tinacms/mdx';
+import { RichTextTemplate } from '@tinacms/schema-tools';
 import { z } from 'zod';
 
 /**
@@ -32,7 +32,15 @@ export const tinaTableTemplate: RichTextTemplate = {
             if (Array.isArray(value.tableCells)) {
               return {
                 label: value.tableCells
-                  .map((cellItem) => stringifyCell(cellItem.value)?.trim())
+                  .map((cellItem) => {
+                    const s = stringifyCell(cellItem.value);
+                    if (typeof s !== 'string') {
+                      throw new Error(
+                        'tableRows: Expected stringifyCell to return a string'
+                      );
+                    }
+                    return s.trim();
+                  })
                   .join(' | '),
               };
             }
@@ -50,8 +58,14 @@ export const tinaTableTemplate: RichTextTemplate = {
             itemProps: (cell) => {
               if (cell) {
                 if (cell.value) {
+                  const s = stringifyCell(cell.value);
+                  if (typeof s !== 'string') {
+                    throw new Error(
+                      'tableCells: Expected stringifyCell to return a string'
+                    );
+                  }
                   return {
-                    label: stringifyCell(cell.value)?.trim(),
+                    label: s.trim(),
                   };
                 }
               }

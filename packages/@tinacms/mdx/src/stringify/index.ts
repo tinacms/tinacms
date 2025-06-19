@@ -31,27 +31,16 @@ declare module 'mdast' {
   }
 }
 
-export const formatMdxForPersistence = (
-  value: Plate.RootElement,
-  field: RichTextType,
-  imageCallback: (url: string) => string
-): Plate.RootElement | string | undefined => {
-  if (field.parser?.type === 'slatejson') {
-    return value;
-  }
-  return stringifyMDX(value, field, imageCallback);
-};
-
 export const stringifyMDX = (
   value: Plate.RootElement,
   field: RichTextType,
   imageCallback: (url: string) => string
-): string | undefined => {
+): string | Plate.RootElement | undefined => {
   if (field.parser?.type === 'markdown') {
     return stringifyMDXNext(value, field, imageCallback);
   }
   if (field.parser?.type === 'slatejson') {
-    return JSON.stringify(value);
+    return value;
   }
 
   if (!value) {

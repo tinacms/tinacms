@@ -9,7 +9,7 @@ import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
 import parser from 'prettier/esm/parser-espree.mjs';
 // @ts-ignore Fix this by updating prettier
 import prettier from 'prettier/esm/standalone.mjs';
-import { formatMdxForPersistence, rootElement, stringifyMDX } from '.';
+import { rootElement, stringifyMDX } from '.';
 import * as Plate from '../parse/plate';
 
 export const stringifyPropsInline = (
@@ -231,7 +231,7 @@ export function stringifyProps(
             return;
           } else {
             const stringValue = stringifyMDX(value, field, imageCallback);
-            if (stringValue) {
+            if (stringValue && typeof stringValue === 'string') {
               val = stringValue
                 .trim()
                 .split('\n')
@@ -346,11 +346,7 @@ const findAndTransformNestedRichText = (
         (value) => value.type === 'root' && Array.isArray(value.children),
         `Nested rich-text element is not a valid shape for field ${field.name}`
       );
-      parentValue[field.name] = formatMdxForPersistence(
-        value,
-        field,
-        imageCallback
-      );
+      parentValue[field.name] = stringifyMDX(value, field, imageCallback);
       break;
     }
     case 'object': {
