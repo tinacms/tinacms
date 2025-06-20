@@ -7,7 +7,7 @@ import isValid from 'date-fns/isValid/index.js';
 import { JSONPath } from 'jsonpath-plus';
 import { NAMER } from '../ast-builder';
 import { Database } from '../database';
-import { parseMDX, stringifyMDX } from '../mdx';
+import { parseMDX, serializeMDX } from '../mdx';
 import { assertShape, lastItem, sequential } from '../util';
 
 import type {
@@ -1292,7 +1292,7 @@ export class Resolver {
           break;
         case 'rich-text':
           // @ts-ignore
-          accum[fieldName] = stringifyMDX(fieldValue, field, (fieldValue) =>
+          accum[fieldName] = serializeMDX(fieldValue, field, (fieldValue) =>
             resolveMediaCloudToRelative(
               fieldValue as string,
               this.config,

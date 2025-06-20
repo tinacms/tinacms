@@ -536,6 +536,15 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
               ],
             };
           }
+          if (!isLastItem) {
+            return this.getFieldGroup({
+              formOrObjectField: template,
+              values: props,
+              namePath,
+              namePathIndex:
+                namePathIndex + Math.max(4, childrenIndex + propsIndex),
+            });
+          }
           if (!template) {
             throw new Error(`Expected template value for field ${item.name}`);
           }

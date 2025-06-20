@@ -1,4 +1,5 @@
 import { defineConfig } from 'tinacms';
+import PathwaySchema, { contentBlock } from './collection/bugReproduction';
 
 // Your hosting provider likely exposes this as an environment variable
 const branch =
@@ -28,6 +29,39 @@ export default defineConfig({
   // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/schema/
   schema: {
     collections: [
+      {
+        name: 'slateJson',
+        path: 'content/slate-json',
+        format: 'json',
+        fields: [
+          {
+            name: 'title',
+            type: 'string',
+            label: 'Title',
+          },
+          {
+            type: 'rich-text',
+            name: 'body',
+            label: 'Body',
+            parser: { type: 'slatejson' },
+            templates: [
+              {
+                name: 'DateTime',
+                label: 'Date & Time',
+                inline: true,
+                fields: [
+                  {
+                    name: 'format',
+                    label: 'Format',
+                    type: 'string',
+                    options: ['utc', 'iso', 'local'],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
       {
         name: 'simpleRef',
         path: 'content/refs',
