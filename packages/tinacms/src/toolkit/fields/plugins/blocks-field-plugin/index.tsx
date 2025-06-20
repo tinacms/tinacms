@@ -78,7 +78,7 @@ const Blocks = ({
         obj = template.defaultItem || {};
       }
       obj._template = name;
-      form.mutators.insert(field.name, 0, obj);
+      form.mutators.push(field.name, obj);
     },
     [field.name, form.mutators]
   );
