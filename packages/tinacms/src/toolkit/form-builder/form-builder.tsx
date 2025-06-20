@@ -515,7 +515,7 @@ export const CreateBranchModal = ({
         } catch {
           cms.alerts.error('Branch indexing failed.');
           setErrorMessage(
-            'Branch indexing failed, please check the TinaCloud dashboard for more information. To try again chick "re-index" on the branch in the dashboard.'
+            'Branch indexing failed, please check the TinaCloud dashboard for more information. To try again click "re-index" on the branch in the dashboard.'
           );
           setState('error');
         }
