@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.8.0
+
+### Minor Changes
+
+- [#5750](https://github.com/tinacms/tinacms/pull/5750) [`dbef36f`](https://github.com/tinacms/tinacms/commit/dbef36f594b949024d5525184b6a9e1b9085b759) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Rich text parsers - adds support for slate serialization in json
+
 ## 1.7.4
 
 ### Patch Changes
