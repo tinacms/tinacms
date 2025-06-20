@@ -16,22 +16,15 @@ import FloatingToolbarButtons from './components/floating-toolbar-buttons';
 export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
   const initialValue = React.useMemo(() => {
     if (field?.parser?.type === 'slatejson') {
-      console.log('🧩 [useMemo] Using slatejson parser:', input.value.children);
       return input.value.children;
     } else if (input.value?.children?.length) {
-      console.log('🧹 [useMemo] input.value.children:', input.value.children);
       const normalized = input.value.children.map(helpers.normalize);
-      console.log('🧹 [useMemo] Normalized children:', normalized);
       return normalized;
     } else {
-      console.log(
-        '🆕 [useMemo] No children found, using default empty paragraph'
-      );
       return [{ type: 'p', children: [{ type: 'text', text: '' }] }];
     }
   }, []);
-
-  console.log('initialValue', initialValue);
+  
   //TODO try with a wrapper?
   const editor = useCreateEditor({
     plugins: [...editorPlugins],
