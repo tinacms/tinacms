@@ -46,7 +46,21 @@ export function FieldsBuilder({
   );
 }
 
-const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
+interface InnerFieldProps {
+  field: Field;
+  form: Form;
+  fieldPlugins: FieldPlugin[];
+  index: number;
+  activeFieldName?: string;
+}
+
+const InnerField = ({
+  field,
+  form,
+  fieldPlugins,
+  index,
+  activeFieldName,
+}: InnerFieldProps) => {
   /**
    * We double-render form builders for some reason which reults in useMemo not working here
    */

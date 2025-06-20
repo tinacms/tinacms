@@ -95,6 +95,21 @@ export default defineConfig({
             name: 'body',
             label: 'Body',
             isBody: true,
+            templates: [
+              {
+                name: 'DateTime',
+                label: 'Date & Time',
+                inline: true,
+                fields: [
+                  {
+                    name: 'format',
+                    label: 'Format',
+                    type: 'string',
+                    options: ['utc', 'iso', 'local'],
+                  },
+                ],
+              },
+            ],
           },
           {
             name: 'items',
