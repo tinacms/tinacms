@@ -1,13 +1,12 @@
 import React from 'react';
-import { Transforms } from 'slate';
-import { useSelected, ReactEditor } from 'slate-react';
 import { isHotkey } from 'is-hotkey';
 import { useCMS, useEvent } from '@toolkit/react-core';
 import { FieldFocusEvent } from '@toolkit/fields/field-events';
+import { useSelected } from '@udecode/plate/react';
 
 const handleCloseBase = (editor, element) => {
-  const path = ReactEditor.findPath(editor, element);
-  const editorEl = ReactEditor.toDOMNode(editor, editor);
+  const path = editor.findPath(element);
+  const editorEl = editor.toDOMNode(editor, editor);
   if (editorEl) {
     /**
      * FIXME: there must be a better way to do this. When jumping
@@ -22,14 +21,14 @@ const handleCloseBase = (editor, element) => {
      */
     editorEl.focus();
     setTimeout(() => {
-      Transforms.select(editor, path);
+      editor.tf.select(path);
     }, 1);
   }
 };
 
 const handleRemoveBase = (editor, element) => {
-  const path = ReactEditor.findPath(editor, element);
-  Transforms.removeNodes(editor, {
+  const path = editor.findPath(element);
+  editor.tf.removeNodes({
     at: path,
   });
 };
@@ -62,8 +61,7 @@ export const useEmbedHandles = (editor, element, baseFieldName: string) => {
     setIsExpanded(false);
     handleCloseBase(editor, element);
   };
-
-  const path = ReactEditor.findPath(editor, element);
+  const path = editor.findPath(element);
   const fieldName = `${baseFieldName}.children.${path.join('.children.')}.props`;
   const handleSelect = () => {
     cms.dispatch({

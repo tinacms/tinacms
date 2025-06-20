@@ -1,7 +1,6 @@
-import { type PlateEditor, useEditorState } from '@udecode/plate-common';
 import React, { useState } from 'react';
-import { insertMDX } from '../../plugins/create-mdx-plugins';
 import { useToolbarContext } from '../../toolbar/toolbar-provider';
+import { type PlateEditor, useEditorState } from '@udecode/plate/react';
 import type { MdxTemplate } from '../../types';
 import {
   DropdownMenu,
@@ -11,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from './dropdown-menu';
 import { PlusIcon } from './icons';
+import { insertMDX } from '../../plugins/create-mdx-plugins';
 
 export default function TemplatesToolbarButton() {
   const { templates } = useToolbarContext();

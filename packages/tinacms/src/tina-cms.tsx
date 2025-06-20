@@ -1,5 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 import { TinaCloudProvider } from './auth';
+import { FontLoader } from './toolkit/styles/font-loader';
 
 import { LocalClient } from './internalClient/index';
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator';
@@ -196,6 +197,7 @@ export const TinaCMSProvider2 = ({
         tinaGraphQLVersion={props.tinaGraphQLVersion}
       >
         {/* <style>{styles}</style> */}
+        <FontLoader />
         <ErrorBoundary>{props.children}</ErrorBoundary>
       </TinaCloudProvider>
     </>

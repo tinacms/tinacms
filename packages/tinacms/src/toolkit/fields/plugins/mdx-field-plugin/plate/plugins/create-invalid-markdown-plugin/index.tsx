@@ -1,26 +1,36 @@
-import { createPluginFactory } from '@udecode/plate-common';
 import React from 'react';
-import { buildErrorMessage } from '../../../monaco/error-message';
 import { useEditorContext } from '../../editor-context';
+import { buildErrorMessage } from '../../../monaco/error-message';
+import { createPlatePlugin, PlateElementProps } from '@udecode/plate/react';
 
 export const ELEMENT_INVALID_MARKDOWN = 'invalid_markdown';
 
-export const createInvalidMarkdownPlugin = createPluginFactory({
+export const createInvalidMarkdownPlugin = createPlatePlugin({
   key: ELEMENT_INVALID_MARKDOWN,
-  isVoid: true,
-  isInline: false,
-  isElement: true,
-  component: ({ attributes, element, children }) => {
-    return (
-      <div {...attributes}>
-        <ErrorMessage error={element} />
-        {children}
-      </div>
-    );
+  options: {
+    isElement: true,
+    isVoid: true,
+    isInline: false,
+  },
+  node: {
+    component: InvalidMarkdownElement,
   },
 });
 
-export function ErrorMessage({ error }) {
+function InvalidMarkdownElement({
+  attributes,
+  element,
+  children,
+}: PlateElementProps) {
+  return (
+    <div {...attributes}>
+      <ErrorMessage error={element} />
+      {children}
+    </div>
+  );
+}
+
+function ErrorMessage({ error }) {
   const message = buildErrorMessage(error);
   const { setRawMode } = useEditorContext();
   return (

@@ -41,6 +41,7 @@ import {
   RotateCcw,
   Search,
   Settings,
+  SeparatorHorizontal,
   Smile,
   Strikethrough,
   Subscript,
@@ -384,7 +385,7 @@ export const Icons = {
   threeColumn: ThreeColumnOutlined,
   leftSideDoubleColumn: LeftSideDoubleColumnOutlined,
   rightSideDoubleColumn: RightSideDoubleColumnOutlined,
-
+  horizontalRule: SeparatorHorizontal,
   heading: HeadingIcon,
   link: LinkIcon,
   quote: QuoteIcon,
