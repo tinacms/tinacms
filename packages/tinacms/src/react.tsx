@@ -209,6 +209,7 @@ export const tinaField = <
           path: (number | string)[];
         };
       }
+    | Record<string, unknown>
     | null
     | undefined,
 >(
@@ -216,7 +217,9 @@ export const tinaField = <
   property?: keyof Omit<NonNullable<T>, '__typename' | '_sys'>,
   index?: number
 ): string => {
-  const contentSource = object?._content_source;
+  const contentSource = object?._content_source as
+    | { queryId: string; path: (number | string)[] }
+    | undefined;
 
   if (!contentSource) {
     return '';
