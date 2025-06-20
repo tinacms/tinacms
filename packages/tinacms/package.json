@@ -29,6 +29,11 @@
 			"import": "./dist/rich-text/index.mjs",
 			"require": "./dist/rich-text/index.js"
 		},
+        "./dist/rich-text/static": {
+			"types": "./dist/rich-text/static.d.ts",
+			"import": "./dist/rich-text/static.mjs",
+			"require": "./dist/rich-text/static.js"
+		},
 		"./dist/rich-text/prism": {
 			"types": "./dist/rich-text/prism.d.ts",
 			"import": "./dist/rich-text/prism.mjs",
@@ -42,6 +47,7 @@
 		"entryPoints": [
 			"src/index.ts",
 			"src/rich-text/index.tsx",
+            "src/rich-text/static.tsx",
 			"src/rich-text/prism.tsx",
 			"src/react.tsx",
 			"src/client.ts"
@@ -162,6 +168,7 @@
 		"identity-obj-proxy": "^3.0.0",
 		"isomorphic-fetch": "^3.0.0",
 		"jest-file-snapshot": "^0.7.0",
+		"lowlight": "^3.3.0",
 		"next": "14.2.10",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
