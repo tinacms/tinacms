@@ -3,7 +3,7 @@ import { copy } from 'fs-extra';
 import path from 'path';
 import { log, TextStyles } from './util/logger';
 
-type BaseExample = {
+export type BaseExample = {
   title: string;
   description?: string;
   value: string;
@@ -26,6 +26,14 @@ export const TEMPLATES: Template[] = [
     value: 'tina-cloud-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-cloud-starter',
+  },
+  {
+    title: '⭐️ TinaDocs',
+    description:
+      'Get your documentation site up and running with TinaCMS and Next.JS in minutes.',
+    value: 'tina-docs',
+    isInternal: false,
+    gitURL: 'https://github.com/tinacms/tina-docs',
   },
   {
     title: 'Astro Starter',
