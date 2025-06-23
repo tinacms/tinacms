@@ -133,6 +133,8 @@
 		"react-beautiful-dnd": "catalog:",
 		"react-color": "catalog:",
 		"react-datetime": "catalog:",
+		"react-dnd": "catalog:",
+		"react-dnd-html5-backend": "catalog:",
 		"react-dropzone": "catalog:",
 		"react-final-form": "catalog:",
 		"react-icons": "^5.4.0",

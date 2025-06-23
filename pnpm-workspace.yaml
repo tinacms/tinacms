@@ -205,6 +205,8 @@ catalog:
   react-beautiful-dnd: ^13.1.1
   react-color: ^2.19.3
   react-datetime: ^3.3.1
+  react-dnd: ^16.0.1
+  react-dnd-html5-backend: ^16.0.1
   react-dropzone: 14.2.3
   react-final-form: ^6.5.9
   react-router-dom: 6.3.0
