@@ -579,9 +579,11 @@ mutation addPendingDocumentMutation(
     branchName: string;
     baseBranch: string;
     prTitle?: string;
-    graphQLContentOp?: {
-      query: string;
-      variables: Record<string, unknown>;
+    contentOperation?: {
+      crudType: string;
+      collection: string;
+      relativePath: string;
+      values: Record<string, unknown>;
     };
   }) {
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}`;
