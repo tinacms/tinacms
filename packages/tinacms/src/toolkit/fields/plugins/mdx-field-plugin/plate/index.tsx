@@ -24,7 +24,7 @@ export const RichEditor = ({ input, tinaForm, field }: RichTextType) => {
       return [{ type: 'p', children: [{ type: 'text', text: '' }] }];
     }
   }, []);
-  
+
   //TODO try with a wrapper?
   const editor = useCreateEditor({
     plugins: [...editorPlugins],
