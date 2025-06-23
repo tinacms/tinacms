@@ -584,7 +584,7 @@ mutation addPendingDocumentMutation(
       variables: Record<string, unknown>;
     };
   }) {
-    const url = `${this.contentApiBase}/github/${this.clientId}/editorial-workflow`;
+    const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}`;
 
     try {
       // Initial request to start the editorial workflow process
@@ -622,7 +622,7 @@ mutation addPendingDocumentMutation(
         await new Promise((resolve) => setTimeout(resolve, pollInterval));
         attempts++;
 
-        const statusUrl = `${this.contentApiBase}/github/${this.clientId}/editorial-workflow-status/${requestId}`;
+        const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
         const statusRes = await this.authProvider.fetchWithToken(statusUrl);
 
         if (!statusRes.ok) {
