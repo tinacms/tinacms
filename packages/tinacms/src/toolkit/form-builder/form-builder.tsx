@@ -345,15 +345,6 @@ const pathRelativeToCollection = (
   );
 };
 
-type IndexingState =
-  | 'starting'
-  | 'indexing'
-  | 'submitting'
-  | 'creatingPR'
-  | 'creatingBranch'
-  | 'done'
-  | 'error';
-
 export const CreateBranchModal = ({
   close,
   safeSubmit,
@@ -374,167 +365,94 @@ export const CreateBranchModal = ({
   const [newBranchName, setNewBranchName] = React.useState('');
   const [error, setError] = React.useState('');
   const [branchName, setBranchName] = React.useState('');
-  const [state, setState] = React.useState<IndexingState>('starting');
+  const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
-  const [baseBranch, setBaseBranch] = React.useState<string | undefined>(
-    tinaApi.branch
-  );
 
   useEffect(() => {
     const run = async () => {
-      if (state === 'creatingBranch') {
-        try {
-          console.log('starting', branchName, formatBranchName(branchName));
-          const currentBranch = tinaApi.branch;
+      try {
+        const currentBranch = tinaApi.branch;
 
-          // Determine which GraphQL mutation to use based on crudType
-          let graphql = '';
-          if (crudType === 'create') {
-            graphql = CREATE_DOCUMENT_GQL;
-          } else if (crudType === 'delete') {
-            graphql = DELETE_DOCUMENT_GQL;
-          } else if (crudType !== 'view') {
-            graphql = UPDATE_DOCUMENT_GQL;
-          }
+        let graphql = '';
+        if (crudType === 'create') {
+          graphql = CREATE_DOCUMENT_GQL;
+        } else if (crudType === 'delete') {
+          graphql = DELETE_DOCUMENT_GQL;
+        } else if (crudType !== 'view') {
+          graphql = UPDATE_DOCUMENT_GQL;
+        }
 
-          const collection = tinaApi.schema.getCollectionByFullPath(path);
+        const collection = tinaApi.schema.getCollectionByFullPath(path);
 
-          const api = new TinaAdminApi(cms);
-          const params = api.schema.transformPayload(collection.name, values);
-          const relativePath = pathRelativeToCollection(collection.path, path);
-          // Use enhanced branch creation that handles everything in one request
-          const result = await tinaApi.executeEditorialWorkflow({
-            branchName: formatBranchName(branchName),
-            baseBranch: currentBranch,
-            prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
-            graphQLContentOp: {
-              query: graphql,
-              variables: {
-                collection: collection.name,
-                relativePath: relativePath,
-                params,
-              },
+        const api = new TinaAdminApi(cms);
+        const params = api.schema.transformPayload(collection.name, values);
+        const relativePath = pathRelativeToCollection(collection.path, path);
+
+        const result = await tinaApi.executeEditorialWorkflow({
+          branchName: formatBranchName(branchName),
+          baseBranch: currentBranch,
+          prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
+          graphQLContentOp: {
+            query: graphql,
+            variables: {
+              collection: collection.name,
+              relativePath: relativePath,
+              params,
             },
-          });
+          },
+        });
 
-          if (!result.branchName) {
-            throw new Error('Branch creation failed.');
-          }
-
-          setBranchName(result.branchName);
-          setCurrentBranch(result.branchName);
-
-          // Skip intermediate states and go directly to done
-          cms.alerts.success('Branch created and content saved.');
-          if (result.pullRequestURL) {
-            cms.alerts.success('Pull request created.');
-          }
-
-          setState('done');
-          close();
-        } catch (e) {
-          console.error(e);
-          cms.alerts.error('Branch operation failed: ' + e.message);
-          setErrorMessage(
-            'Branch operation failed, please try again. If the problem persists please contact support.'
-          );
-          setState('error');
+        if (!result.branchName) {
+          throw new Error('Branch creation failed.');
         }
-      } else if (state === 'indexing') {
-        // Legacy code - now handled by the enhanced endpoint
-        try {
-          const [waitForIndexStatusPromise, _cancelWaitForIndexFunc] =
-            tinaApi.waitForIndexStatus({
-              ref: branchName,
-            });
-          await waitForIndexStatusPromise;
-          cms.alerts.success('Branch indexed.');
-          setState('submitting');
-        } catch {
-          cms.alerts.error('Branch indexing failed.');
-          setErrorMessage(
-            'Branch indexing failed, please check the TinaCloud dashboard for more information. To try again chick "re-index" on the branch in the dashboard.'
-          );
-          setState('error');
-        }
-      } else if (state === 'submitting') {
-        try {
-          setBaseBranch(tinaApi.branch);
-          setCurrentBranch(branchName);
-          const collection = tinaApi.schema.getCollectionByFullPath(path);
 
-          const adminApi = new TinaAdminApi(cms);
-          const params = adminApi.schema.transformPayload(
-            collection.name,
-            values
-          );
-          const relativePath = pathRelativeToCollection(collection.path, path);
+        setBranchName(result.branchName);
+        setCurrentBranch(result.branchName);
 
-          if (await adminApi.isAuthenticated()) {
-            if (crudType === 'delete') {
-              await adminApi.deleteDocument({
-                collection: collection.name,
-                relativePath: relativePath,
-              });
-            } else if (crudType === 'create') {
-              await adminApi.createDocument(collection, relativePath, params);
-            } else {
-              await adminApi.updateDocument(collection, relativePath, params);
-            }
-          } else {
-            const authMessage = `UpdateDocument failed: User is no longer authenticated; please login and try again.`;
-            cms.alerts.error(authMessage);
-            console.error(authMessage);
-            setErrorMessage(authMessage);
-            setState('error');
-            return;
-          }
-          cms.alerts.success('Content saved.');
-          setState('creatingPR');
-        } catch (e) {
-          console.error(e);
-          cms.alerts.error('Content save failed.');
-          setErrorMessage(
-            'Content save failed, please try again. If the problem persists please contact support.'
-          );
-          setState('error');
-        }
-      } else if (state === 'creatingPR') {
-        try {
-          const result = await tinaApi.createPullRequest({
-            baseBranch,
-            branch: branchName,
-            title: `${branchName
-              .replace('tina/', '')
-              .replace('-', ' ')} (PR from TinaCMS)`,
-          });
-          console.log('PR created', result);
+        cms.alerts.success('Branch created and content saved.');
+        if (result.pullRequestURL) {
           cms.alerts.success('Pull request created.');
-          setState('done');
-          close();
-        } catch (e) {
-          console.error(e);
-          cms.alerts.error('Failed to create PR');
-          setErrorMessage(
-            'Failed to create PR, please try again. If the problem persists please contact support.'
-          );
-          setState('error');
         }
+
+        close();
+      } catch (e) {
+        console.error(e);
+        cms.alerts.error('Branch operation failed: ' + e.message);
+        setErrorMessage(
+          'Branch operation failed, please try again. If the problem persists please contact support.'
+        );
+        setIsExecuting(false);
       }
     };
 
-    if (state !== 'starting' && state !== 'done' && state !== 'error') {
+    if (isExecuting) {
       run();
     }
-  }, [state, branchName, path, values, crudType, baseBranch]);
+  }, [isExecuting, branchName, path, values, crudType]);
 
   const onCreateBranch = async (inputBranchName: string) => {
     setBranchName(`tina/${inputBranchName}`);
-    setState('creatingBranch');
+    setIsExecuting(true);
   };
 
   const renderStateContent = () => {
-    if (state === 'starting') {
+    if (errorMessage) {
+      return (
+        <div className='flex items-center gap-1 text-red-700 py-4'>
+          <BiError className='w-7 h-auto text-red-400 flex-shrink-0' />
+          <span>
+            <b>Error:</b> {errorMessage}
+          </span>
+        </div>
+      );
+    } else if (isExecuting) {
+      return (
+        <div className='flex flex-col items-center gap-4 py-6'>
+          <BiLoaderAlt className='opacity-70 text-blue-400 animate-spin w-10 h-auto' />
+          <p>Executing editorial workflow&hellip;</p>
+        </div>
+      );
+    } else {
       return (
         <>
           <p className='text-lg text-gray-700 font-bold mb-2'>
@@ -550,30 +468,12 @@ export const CreateBranchModal = ({
             onChange={(e) => {
               // reset error state on change
               setError('');
+              setErrorMessage('');
               setNewBranchName(formatBranchName(e.target.value));
             }}
           />
           {error && <div className='mt-2 text-sm text-red-700'>{error}</div>}
         </>
-      );
-    } else if (state === 'error') {
-      return (
-        <div className='flex items-center gap-1 text-red-700 py-4'>
-          <BiError className='w-7 h-auto text-red-400 flex-shrink-0' />
-          <span>
-            <b>Error:</b> {errorMessage}
-          </span>
-        </div>
-      );
-    } else {
-      return (
-        <div className='flex flex-col items-center gap-4 py-6'>
-          <BiLoaderAlt className='opacity-70 text-blue-400 animate-spin w-10 h-auto' />
-          {state === 'creatingBranch' && <p>Creating branch&hellip;</p>}
-          {state === 'indexing' && <p>Indexing Content&hellip;</p>}
-          {state === 'submitting' && <p>Saving content&hellip;</p>}
-          {state === 'creatingPR' && <p>Creating Pull Request&hellip;</p>}
-        </div>
       );
     }
   };
@@ -586,7 +486,7 @@ export const CreateBranchModal = ({
           Create Branch
         </ModalHeader>
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
-        {state === 'starting' && (
+        {!isExecuting && !errorMessage && (
           <ModalActions>
             <Button style={{ flexGrow: 1 }} onClick={close}>
               Cancel
