@@ -1,9 +1,11 @@
 import { useCMS } from '@toolkit/react-tinacms';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import { Check, LoaderCircle, X } from 'lucide-react';
+import { Check, LoaderCircle, TriangleAlert } from 'lucide-react';
 import React from 'react';
-import { version as currentVersion } from '../../../../package.json';
+// import { version as currentVersion } from '../../../../package.json';
 import { LatestVersionResponse } from '../../../internalClient';
+
+const currentVersion = '1.0';
 
 export const VersionInfo = () => {
   const cms = useCMS();
@@ -16,8 +18,8 @@ export const VersionInfo = () => {
       try {
         const latestVersion = await cms.api.tina.getLatestVersion();
         setLatestVersionInfo(latestVersion);
-      } catch (error) {
-        console.error('Error fetching version info:', error);
+      } catch {
+        // swallow errors silently since the api call logs them
       }
       setIsLoading(false);
     };
@@ -58,8 +60,8 @@ const LatestVersionWarning = ({
   }
 
   return (
-    <span className='text-red-500'>
-      <X className='w-4 h-4 inline-block mb-px' />
+    <span className='text-yellow-700'>
+      <TriangleAlert className='w-4 h-4 inline-block mb-px' />
       <br />v{latestVersion} published {relativePublishedAt}
     </span>
   );
