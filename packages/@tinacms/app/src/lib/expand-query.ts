@@ -103,12 +103,11 @@ const addMetadataField = (
         kind: 'SelectionSet',
         selections: [],
       }),
-      selections:
-        [
-          ...(node.selectionSet?.selections || []),
-          METADATA_FIELD,
-          CONTENT_SOURCE_FIELD,
-        ] || [],
+      selections: [
+        ...(node.selectionSet?.selections || []),
+        METADATA_FIELD,
+        CONTENT_SOURCE_FIELD,
+      ],
     },
   };
 };
@@ -127,8 +126,7 @@ const addMetaFieldsToQuery = (
           kind: 'SelectionSet',
           selections: [],
         }),
-        selections:
-          [...(node.selectionSet?.selections || []), ...metaFields] || [],
+        selections: [...(node.selectionSet?.selections || []), ...metaFields],
       },
     };
   };
@@ -242,6 +240,7 @@ export const isNodeType = (type: G.GraphQLOutputType) => {
       return true;
     }
   }
+  return false;
 };
 
 export const isConnectionType = (type: G.GraphQLOutputType) => {
@@ -270,4 +269,5 @@ export const isConnectionType = (type: G.GraphQLOutputType) => {
       return true;
     }
   }
+  return false;
 };
