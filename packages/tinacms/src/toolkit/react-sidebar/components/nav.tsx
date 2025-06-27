@@ -8,8 +8,8 @@ import * as React from 'react';
 import { BiExit, BiMenu } from 'react-icons/bi';
 import { FiInfo } from 'react-icons/fi';
 import { VscNewFile } from 'react-icons/vsc';
-import { version } from '../../../../package.json';
 import { cn } from '../../../utils/cn';
+import { VersionInfo } from './VersionInfo';
 import { SyncStatusButton, SyncStatusModal } from './sync-status';
 
 interface NavCollection {
@@ -220,9 +220,7 @@ export const Nav = ({
             className='text-lg py-2 first:pt-3 last:pb-3 whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400'
             cms={cms}
           />
-          <span className='font-sans font-light text-xs mb-3 mt-4 text-gray-500'>
-            TinaCMS v{version}
-          </span>
+          <VersionInfo />
         </div>
       </div>
 
