@@ -16,6 +16,7 @@
 		"@tinacms/graphql": "workspace:*",
 		"dotenv": "catalog:",
 		"js-base64": "catalog:",
+		"mermaid": "^11.7.0",
 		"next": "^14.2.24",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
