@@ -583,6 +583,7 @@ mutation addPendingDocumentMutation(
       query: string;
       variables: Record<string, unknown>;
     };
+    onStatusUpdate?: (status: { status: string; message?: string }) => void;
   }) {
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}`;
 
@@ -590,7 +591,12 @@ mutation addPendingDocumentMutation(
       // Initial request to start the editorial workflow process
       const res = await this.authProvider.fetchWithToken(url, {
         method: 'POST',
-        body: JSON.stringify(options),
+        body: JSON.stringify({
+          branchName: options.branchName,
+          baseBranch: options.baseBranch,
+          prTitle: options.prTitle,
+          graphQLContentOp: options.graphQLContentOp,
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -610,6 +616,14 @@ mutation addPendingDocumentMutation(
       }
 
       const requestId = initialResponse.requestId;
+
+      // Notify that workflow is queued
+      if (options.onStatusUpdate) {
+        options.onStatusUpdate({
+          status: 'queued',
+          message: 'Workflow queued, starting...',
+        });
+      }
 
       // Setup polling configuration
       const maxAttempts = 60; // 5 minutes with 5 second intervals
@@ -632,6 +646,15 @@ mutation addPendingDocumentMutation(
         }
 
         const statusResponse = await statusRes.json();
+
+        // Notify about status update
+        if (options.onStatusUpdate) {
+          options.onStatusUpdate({
+            status: statusResponse.status,
+            message:
+              statusResponse.message || `Status: ${statusResponse.status}`,
+          });
+        }
 
         // If complete, return the full response
         if (statusResponse.status === 'complete') {

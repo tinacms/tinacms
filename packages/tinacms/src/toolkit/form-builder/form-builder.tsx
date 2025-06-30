@@ -367,6 +367,7 @@ export const CreateBranchModal = ({
   const [branchName, setBranchName] = React.useState('');
   const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [statusMessage, setStatusMessage] = React.useState('');
 
   useEffect(() => {
     const run = async () => {
@@ -400,6 +401,9 @@ export const CreateBranchModal = ({
               params,
             },
           },
+          onStatusUpdate: (status) => {
+            setStatusMessage(status.message || `Status: ${status.status}`);
+          },
         });
 
         if (!result.branchName) {
@@ -432,6 +436,7 @@ export const CreateBranchModal = ({
 
   const onCreateBranch = async (inputBranchName: string) => {
     setBranchName(`tina/${inputBranchName}`);
+    setStatusMessage('Initializing workflow...');
     setIsExecuting(true);
   };
 
@@ -449,7 +454,7 @@ export const CreateBranchModal = ({
       return (
         <div className='flex flex-col items-center gap-4 py-6'>
           <BiLoaderAlt className='opacity-70 text-blue-400 animate-spin w-10 h-auto' />
-          <p>Executing editorial workflow&hellip;</p>
+          <p>{statusMessage || 'Executing editorial workflow...'}</p>
         </div>
       );
     } else {
@@ -469,6 +474,7 @@ export const CreateBranchModal = ({
               // reset error state on change
               setError('');
               setErrorMessage('');
+              setStatusMessage('');
               setNewBranchName(formatBranchName(e.target.value));
             }}
           />
