@@ -34,7 +34,8 @@ const Item = ({
       <BiEdit className='opacity-70 w-5 h-auto text-blue-500 flex-none' />
       <div className='flex-1 flex flex-col gap-0.5 items-start'>
         <div className='group-hover:text-blue-500 font-sans text-xs font-semibold text-gray-700 whitespace-normal'>
-          {form.tinaForm.label}
+          {form.tinaForm.label} -{' '}
+          <span className='text-gray-500'>{item.path}</span>
         </div>
         <div className='group-hover:text-blue-500 text-base truncate leading-tight text-gray-600'>
           {form.tinaForm.id}
@@ -120,7 +121,6 @@ export const FormList = (props: {
   formList: TinaState['formLists'][number];
 }) => {
   const cms = useCMS();
-
   const listItems: TinaState['formLists'][number]['items'] =
     React.useMemo(() => {
       const orderedListItems: TinaState['formLists'][number]['items'] = [];

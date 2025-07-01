@@ -9,7 +9,6 @@ import {
   Collection,
   ErrorDialog,
   Form,
-  FormOptions,
   GlobalFormPlugin,
   NAMER,
   Template,
@@ -52,6 +51,7 @@ const sysSchema = z.object({
   }),
 });
 
+//@ts-ignore TODO: sysSchema label optional type issue
 const documentSchema: z.ZodType<ResolvedDocument> = z.object({
   _internalValues: z.record(z.unknown()),
   _internalSys: sysSchema,
@@ -210,6 +210,103 @@ export const useGraphQLReducer = (
     }
   }, [documentsToResolve.join('.')]);
 
+  const extractRichTextReferences = (data: any, tinaSchema: TinaSchema) => {
+    const referencedDocuments: { path: string; refPath: string }[] = [];
+
+    // Helper function to check if a string is a valid document reference
+    const isValidDocumentReference = (str: string): boolean => {
+      if (typeof str !== 'string') return false;
+
+      // Must contain forward slashes (basic path check)
+      if (!str.includes('/')) return false;
+
+      try {
+        // Try to get the collection for this path
+        const collection = tinaSchema.getCollectionByFullPath(str);
+        return !!collection;
+      } catch (e) {
+        // If getCollectionByFullPath throws, it's not a valid document path
+        return false;
+      }
+    };
+
+    const traverseData = (obj: any, path: string[] = []) => {
+      if (!obj || typeof obj !== 'object') {
+        return;
+      }
+
+      if (Array.isArray(obj)) {
+        obj.forEach((item, index) =>
+          traverseData(item, [...path, index.toString()])
+        );
+        return;
+      }
+
+      // Check if this is a rich text JSX node with references
+      if (
+        obj.type === 'mdxJsxFlowElement' ||
+        obj.type === 'mdxJsxTextElement'
+      ) {
+        // Look for reference properties in JSX props
+        if (obj.props) {
+          Object.keys(obj.props).forEach((propName) => {
+            const propValue = obj.props[propName];
+
+            // Check if this prop value is a valid document reference
+            if (isValidDocumentReference(propValue)) {
+              const fullPath = [...path, propName].join('.');
+              referencedDocuments.push({
+                path: fullPath,
+                refPath: propValue,
+              });
+            }
+          });
+        }
+
+        // Also check for legacy attributes format (just in case)
+        if (obj.attributes) {
+          obj.attributes.forEach((attr: any) => {
+            if (isValidDocumentReference(attr.value)) {
+              const fullPath = [...path, attr.name].join('.');
+              referencedDocuments.push({
+                path: fullPath,
+                refPath: attr.value,
+              });
+            }
+          });
+        }
+      }
+
+      // Check for template references in rich text content
+      if (obj._template && obj.reference) {
+        if (isValidDocumentReference(obj.reference)) {
+          const fullPath = [...path, 'reference'].join('.');
+          referencedDocuments.push({
+            path: fullPath,
+            refPath: obj.reference,
+          });
+        }
+      }
+
+      // Check any string value that might be a document reference
+      if (typeof obj === 'string' && isValidDocumentReference(obj)) {
+        const fullPath = path.join('.');
+        referencedDocuments.push({
+          path: fullPath,
+          refPath: obj,
+        });
+      }
+
+      // Recursively traverse all object properties
+      Object.keys(obj).forEach((key) => {
+        traverseData(obj[key], [...path, key]);
+      });
+    };
+
+    traverseData(data);
+    return referencedDocuments;
+  };
+
   /**
    * Note: since React runs effects twice in development this will run twice for a given query
    * which results in duplicate network requests in quick succession
@@ -225,6 +322,22 @@ export const useGraphQLReducer = (
             return payload;
           } else {
             const expandedPayload = await expandPayload(payload, cms);
+
+            // Extract rich text references and add them to documents to resolve
+            const richTextRefs = extractRichTextReferences(
+              expandedPayload.expandedData,
+              tinaSchema
+            );
+
+            // Add rich text references to documentsToResolve - extract just the refPath strings
+            if (richTextRefs.length > 0) {
+              const refPaths = richTextRefs.map((ref) => ref.refPath);
+              setDocumentsToResolve((docs) => [
+                ...docs,
+                ...refPaths.filter((refPath) => !docs.includes(refPath)),
+              ]);
+            }
+
             processPayload(expandedPayload);
             return expandedPayload;
           }
@@ -249,8 +362,156 @@ export const useGraphQLReducer = (
           `Unable to process payload which has not been expanded`
         );
       }
-      const formListItems: TinaState['formLists'][number]['items'] = [];
-      const formIds: string[] = [];
+
+      // Extract rich text references first to determine if we need to process
+      const richTextRefs = extractRichTextReferences(
+        payload.expandedData,
+        tinaSchema
+      );
+
+      // Check if this payload has already been fully processed
+      const existingFormList = cms.state.formLists.find(
+        (fl) => fl.id === payload.id
+      );
+
+      // More specific check: if we have an existing form list and all rich text refs are already processed
+      if (existingFormList) {
+        const allRichTextRefsProcessed = richTextRefs.every(({ refPath }) =>
+          existingFormList.formIds.includes(refPath)
+        );
+
+        if (allRichTextRefsProcessed && existingFormList.formIds.length > 1) {
+          return;
+        }
+      }
+
+      // Extract common form creation logic
+      const createOrGetForm = (
+        resolvedDocument: ResolvedDocument,
+        tinaSchema: TinaSchema,
+        payloadId: string,
+        cms: TinaCMS,
+        pathString: string
+      ) => {
+        const id = resolvedDocument._internalSys.path;
+        const existingForm = cms.state.forms.find((f) => f.tinaForm.id === id);
+
+        if (!existingForm) {
+          const { form, template } = buildForm({
+            resolvedDocument,
+            tinaSchema,
+            payloadId,
+            cms,
+          });
+          form.subscribe(
+            () => {
+              setOperationIndex((i) => i + 1);
+            },
+            { values: true }
+          );
+          return {
+            form,
+            template,
+            isNew: true,
+          };
+        } else {
+          existingForm.tinaForm.addQuery(payloadId);
+          const { template } = getTemplateForDocument(
+            resolvedDocument,
+            tinaSchema
+          );
+          return {
+            form: existingForm.tinaForm,
+            template,
+            isNew: false,
+          };
+        }
+      };
+
+      // Extract form list item creation logic
+      const addDocumentToFormList = (
+        formListItems: TinaState['formLists'][number]['items'],
+        pathString: string,
+        formId: string
+      ) => {
+        // Check if this exact path already exists (not just the formId)
+        const alreadyExists = formListItems.some((item) => {
+          if (item.type === 'document' && item.path === pathString) {
+            return true;
+          }
+          if (item.type === 'document' && item.subItems) {
+            return item.subItems.some(
+              (subItem) =>
+                subItem.type === 'document' && subItem.path === pathString
+            );
+          }
+          return false;
+        });
+
+        if (alreadyExists) {
+          return;
+        }
+
+        const ancestors = formListItems.filter((item) => {
+          if (item.type === 'document') {
+            return pathString.startsWith(item.path);
+          }
+        });
+        const parent = ancestors[ancestors.length - 1];
+
+        if (parent && parent.type === 'document') {
+          parent.subItems.push({
+            type: 'document',
+            path: pathString,
+            formId,
+            subItems: [],
+          });
+        } else {
+          formListItems.push({
+            type: 'document',
+            path: pathString,
+            formId,
+            subItems: [],
+          });
+        }
+      };
+
+      // In the processDocument function, make sure we're not returning early:
+      const processDocument = (
+        resolvedDocument: ResolvedDocument,
+        tinaSchema: TinaSchema,
+        payloadId: string,
+        cms: TinaCMS,
+        pathString: string,
+        formListItems: TinaState['formLists'][number]['items'],
+        formIds: string[]
+      ) => {
+        const id = resolvedDocument._internalSys.path;
+
+        // DON'T return early - we still need to add to formListItems even if form exists
+        if (!formIds.includes(id)) {
+          formIds.push(id);
+        }
+
+        const { form, template } = createOrGetForm(
+          resolvedDocument,
+          tinaSchema,
+          payloadId,
+          cms,
+          pathString
+        );
+
+        // Always add to form list (this was the missing piece!)
+        addDocumentToFormList(formListItems, pathString, id);
+        return resolveDocument(resolvedDocument, template, form, pathString);
+      };
+
+      // Initialize with existing form list items if they exist, otherwise start fresh
+      const formListItems: TinaState['formLists'][number]['items'] =
+        existingFormList ? [...existingFormList.items] : [];
+      const formIds: string[] = existingFormList
+        ? [...existingFormList.formIds]
+        : [];
 
       const result = G.graphqlSync({
         schema: schemaForResolver,
@@ -280,6 +541,8 @@ export const useGraphQLReducer = (
               value = aliasValue;
             }
           });
+
+          // Handle special fields
           if (fieldName === '_sys') {
             return source._internalSys;
           }
@@ -297,8 +560,6 @@ export const useGraphQLReducer = (
             if (value) {
               return value;
             }
-            // TODO: ensure all fields that have _tina_metadata
-            // actually need it
             return {
               id: null,
               fields: [],
@@ -306,6 +567,7 @@ export const useGraphQLReducer = (
             };
           }
 
+          // Handle connection types
           if (isConnectionType(info.returnType)) {
             const name = G.getNamedType(info.returnType).name;
             const connectionCollection = tinaSchema
@@ -314,10 +576,7 @@ export const useGraphQLReducer = (
                 const collectionName = NAMER.referenceConnectionType(
                   collection.namespace
                 );
-                if (collectionName === name) {
-                  return true;
-                }
-                return false;
+                return collectionName === name;
               });
             if (connectionCollection) {
               formListItems.push({
@@ -326,12 +585,16 @@ export const useGraphQLReducer = (
               });
             }
           }
+
+          // Handle node types (regular references)
           if (isNodeType(info.returnType)) {
             if (!value) {
               return;
             }
+
             let resolvedDocument: ResolvedDocument;
-            // This is a reference from another form
+
+            // Handle string references (from other forms)
             if (typeof value === 'string') {
               const valueFromSetup = getIn(
                 expandedData,
@@ -351,7 +614,6 @@ export const useGraphQLReducer = (
                 // here and just grab it from the response
                 const maybeResolvedDocument =
                   documentSchema.parse(valueFromSetup);
-
                 if (maybeResolvedDocument._internalSys.path === value) {
                   resolvedDocument = maybeResolvedDocument;
                 } else {
@@ -363,75 +625,25 @@ export const useGraphQLReducer = (
             } else {
               resolvedDocument = documentSchema.parse(value);
             }
-            const id = resolvedDocument._internalSys.path;
-            formIds.push(id);
-            const existingForm = cms.state.forms.find(
-              (f) => f.tinaForm.id === id
-            );
 
             const pathArray = G.responsePathAsArray(info.path);
             const pathString = pathArray.join('.');
-            const ancestors = formListItems.filter((item) => {
-              if (item.type === 'document') {
-                return pathString.startsWith(item.path);
-              }
-            });
-            const parent = ancestors[ancestors.length - 1];
-            if (parent) {
-              if (parent.type === 'document') {
-                parent.subItems.push({
-                  type: 'document',
-                  path: pathString,
-                  formId: id,
-                  subItems: [],
-                });
-              }
-            } else {
-              formListItems.push({
-                type: 'document',
-                path: pathString,
-                formId: id,
-                subItems: [],
-              });
-            }
 
-            if (!existingForm) {
-              const { form, template } = buildForm({
-                resolvedDocument,
-                tinaSchema,
-                payloadId: payload.id,
-                cms,
-              });
-              form.subscribe(
-                () => {
-                  setOperationIndex((i) => i + 1);
-                },
-                { values: true }
-              );
-              return resolveDocument(
-                resolvedDocument,
-                template,
-                form,
-                pathString
-              );
-            } else {
-              existingForm.tinaForm.addQuery(payload.id);
-              const { template } = getTemplateForDocument(
-                resolvedDocument,
-                tinaSchema
-              );
-              existingForm.tinaForm.addQuery(payload.id);
-              return resolveDocument(
-                resolvedDocument,
-                template,
-                existingForm.tinaForm,
-                pathString
-              );
-            }
+            return processDocument(
+              resolvedDocument,
+              tinaSchema,
+              payload.id,
+              cms,
+              pathString,
+              formListItems,
+              formIds
+            );
           }
+
           return value;
         },
       });
+
       if (result.errors) {
         result.errors.forEach((error) => {
           if (
@@ -445,9 +657,6 @@ export const useGraphQLReducer = (
             ]);
           } else {
             console.log(error);
-            // throw new Error(
-            //   `Error processing value change, please contact support`
-            // )
           }
         });
       } else {
@@ -457,6 +666,46 @@ export const useGraphQLReducer = (
             { id: payload.id, data: result.data },
           ]);
         }
+        // Process rich text references - but filter out duplicates first
+        const uniqueRichTextRefs = richTextRefs.filter(
+          (ref, index, self) =>
+            index === self.findIndex((r) => r.refPath === ref.refPath)
+        );
+
+        uniqueRichTextRefs.forEach(({ path: refGraphQLPath, refPath }) => {
+          const resolvedDoc = resolvedDocuments.find(
+            (doc) => doc._internalSys.path === refPath
+          );
+
+          if (resolvedDoc && !formIds.includes(refPath)) {
+            try {
+              processDocument(
+                resolvedDoc,
+                tinaSchema,
+                payload.id,
+                cms,
+                refGraphQLPath,
+                formListItems,
+                formIds
+              );
+            } catch (error) {
+              console.error(
+                '[DEBUG] Error processing rich text document:',
+                refPath,
+                error
+              );
+            }
+          } else if (!resolvedDoc) {
+            setDocumentsToResolve((docs) => {
+              if (!docs.includes(refPath)) {
+                return [...docs, refPath];
+              }
+              return docs;
+            });
+          } else {
+            // Already processed this document, skip it
+          }
+        });
         if (activeField) {
           setSearchParams({});
           const [queryId, eventFieldName] = activeField.split('---');
@@ -475,22 +724,23 @@ export const useGraphQLReducer = (
               value: 'openOrFull',
             });
           }
+          iframe.current?.contentWindow?.postMessage({
+            type: 'updateData',
+            id: payload.id,
+            data: result.data,
+          });
         }
-        iframe.current?.contentWindow?.postMessage({
-          type: 'updateData',
-          id: payload.id,
-          data: result.data,
+
+        cms.dispatch({
+          type: 'form-lists:add',
+          value: {
+            id: payload.id,
+            label: 'Anonymous Query', // TODO: grab the name of the query if it exists
+            items: formListItems,
+            formIds,
+          },
         });
       }
-      cms.dispatch({
-        type: 'form-lists:add',
-        value: {
-          id: payload.id,
-          label: 'Anonymous Query', // TODO: grab the name of the query if it exists
-          items: formListItems,
-          formIds,
-        },
-      });
     },
     [
       resolvedDocuments.map((doc) => doc._internalSys.path).join('.'),
@@ -543,7 +793,7 @@ export const useGraphQLReducer = (
           previous.filter((payload) => payload.id !== id)
         );
         setResults((previous) => previous.filter((result) => result.id !== id));
-        cms.forms.all().map((form) => {
+        cms.forms.all().map((form: { removeQuery: (arg0: string) => void }) => {
           form.removeQuery(id);
         });
         cms.removeOrphanedForms();
@@ -575,7 +825,27 @@ export const useGraphQLReducer = (
   React.useEffect(() => {
     payloads.forEach((payload) => {
       if (payload.expandedData) {
-        processPayload(payload);
+        // Only process if we haven't already processed this payload completely
+        const existingFormList = cms.state.formLists.find(
+          (fl: { id: string }) => fl.id === payload.id
+        );
+        const richTextRefs = extractRichTextReferences(
+          payload.expandedData,
+          tinaSchema
+        );
+
+        const shouldProcess =
+          !existingFormList ||
+          (richTextRefs.length > 0 &&
+            !richTextRefs.every(({ refPath }) =>
+              existingFormList.formIds.includes(refPath)
+            ));
+
+        if (shouldProcess) {
+          processPayload(payload);
+        } else {
+          // Skipping already processed payload
+        }
       }
     });
   }, [operationIndex]);
