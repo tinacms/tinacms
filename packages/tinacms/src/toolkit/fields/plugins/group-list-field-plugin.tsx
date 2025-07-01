@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Field, Form } from '@toolkit/forms';
 import { IconButton } from '@toolkit/styles';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Droppable, Draggable, SortableProvider } from './dnd-kit-wrapper';
 import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '@toolkit/icons';
 import { useEvent } from '@toolkit/react-core/use-cms-event';
 import type { FieldHoverEvent, FieldFocusEvent } from '../field-events';
@@ -99,19 +99,21 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
             {(provider) => (
               <div ref={provider.innerRef}>
                 {items.length === 0 && <EmptyList />}
-                {items.map((item: any, index: any) => (
-                  <Item
-                    // NOTE: Supressing warnings, but not helping with render perf
-                    key={index}
-                    tinaForm={tinaForm}
-                    field={field}
-                    item={item}
-                    index={index}
-                    isMin={isMin}
-                    fixedLength={fixedLength}
-                    {...itemProps(item)}
-                  />
-                ))}
+                <SortableProvider items={items.map((_, index) => `${field.name}.${index}`)}>
+                  {items.map((item: any, index: any) => (
+                    <Item
+                      // NOTE: Supressing warnings, but not helping with render perf
+                      key={index}
+                      tinaForm={tinaForm}
+                      field={field}
+                      item={item}
+                      index={index}
+                      isMin={isMin}
+                      fixedLength={fixedLength}
+                      {...itemProps(item)}
+                    />
+                  ))}
+                </SortableProvider>
                 {provider.placeholder}
               </div>
             )}
@@ -247,7 +249,7 @@ export const ItemHeader = ({
 } & any) => {
   return (
     <div
-      ref={provider.innerRef}
+      ref={provider.draggableProps?.ref}
       {...provider.draggableProps}
       {...provider.dragHandleProps}
       {...props}
@@ -257,8 +259,8 @@ export const ItemHeader = ({
           : 'text-gray-600 first:rounded-t last:rounded-b'
       } ${props.className ?? ''}`}
       style={{
-        ...(provider.draggableProps.style ?? {}),
-        ...(provider.dragHandleProps.style ?? {}),
+        ...(provider.draggableProps?.style ?? {}),
+        ...(provider.dragHandleProps?.style ?? {}),
         ...(props.style ?? {}),
       }}
     >
