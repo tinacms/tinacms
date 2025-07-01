@@ -24,7 +24,6 @@ export type RichTextType = React.PropsWithChildren<
   >
 >;
 
-//(Plate Upgrade) Ask Jeff: Is this in used?
 export const MdxFieldPlugin = {
   name: 'rich-text',
   Component: wrapFieldsWithMeta<
