@@ -68,7 +68,7 @@ const FormListItem = ({
           {item.subItems?.map((subItem) => {
             if (subItem.type === 'document') {
               return (
-                <li key={subItem.formId}>
+                <li key={`${subItem.formId}-${subItem.path}`}>
                   <Item
                     setActiveFormId={setActiveFormId}
                     depth={depth + 1}

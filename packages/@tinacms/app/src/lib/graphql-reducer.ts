@@ -322,22 +322,6 @@ export const useGraphQLReducer = (
             return payload;
           } else {
             const expandedPayload = await expandPayload(payload, cms);
-
-            // Extract rich text references and add them to documents to resolve
-            const richTextRefs = extractRichTextReferences(
-              expandedPayload.expandedData,
-              tinaSchema
-            );
-
-            // Add rich text references to documentsToResolve - extract just the refPath strings
-            if (richTextRefs.length > 0) {
-              const refPaths = richTextRefs.map((ref) => ref.refPath);
-              setDocumentsToResolve((docs) => [
-                ...docs,
-                ...refPaths.filter((refPath) => !docs.includes(refPath)),
-              ]);
-            }
-
             processPayload(expandedPayload);
             return expandedPayload;
           }
