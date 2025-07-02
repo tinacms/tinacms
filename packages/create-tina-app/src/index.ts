@@ -8,7 +8,7 @@ import {
   setupProjectDirectory,
   updateProjectPackageName,
   updateProjectPackageVersion,
-  updateThemeSettings
+  updateThemeSettings,
 } from './util/fileUtil';
 import { install } from './util/install';
 import { initializeGit, makeFirstCommit } from './util/git';
