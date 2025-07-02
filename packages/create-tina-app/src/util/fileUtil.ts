@@ -90,8 +90,8 @@ export function updateProjectPackageVersion(dir: string, version: string) {
 }
 
 export async function updateThemeSettings(dir: string, selectedTheme: string) {
-  const settingsDir = path.join(dir, "content", "settings");
-  const configPath = path.join(settingsDir, "config.json");
+  const settingsDir = path.join(dir, 'content', 'settings');
+  const configPath = path.join(settingsDir, 'config.json');
 
   // Create settings directory if it doesn't exist
   await fs.mkdirp(settingsDir);
@@ -99,7 +99,7 @@ export async function updateThemeSettings(dir: string, selectedTheme: string) {
   // Read existing config or create new one
   let config: any = {};
   try {
-    const existingConfig = await fs.readFile(configPath, "utf8");
+    const existingConfig = await fs.readFile(configPath, 'utf8');
     config = JSON.parse(existingConfig);
   } catch (error) {
     // File doesn't exist or is invalid JSON, start with empty object
