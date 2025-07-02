@@ -88,3 +88,26 @@ export function updateProjectPackageVersion(dir: string, version: string) {
   packageJson.version = version;
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 }
+
+export async function updateThemeSettings(dir: string, selectedTheme: string) {
+  const settingsDir = path.join(dir, "content", "settings");
+  const configPath = path.join(settingsDir, "config.json");
+
+  // Create settings directory if it doesn't exist
+  await fs.mkdirp(settingsDir);
+
+  // Read existing config or create new one
+  let config: any = {};
+  try {
+    const existingConfig = await fs.readFile(configPath, "utf8");
+    config = JSON.parse(existingConfig);
+  } catch (error) {
+    // File doesn't exist or is invalid JSON, start with empty object
+  }
+
+  // Always overwrite selectedTheme with the new choice, preserve all other existing fields
+  config.selectedTheme = selectedTheme;
+
+  // Write the updated config
+  await fs.writeFile(configPath, JSON.stringify(config, null, 2));
+}

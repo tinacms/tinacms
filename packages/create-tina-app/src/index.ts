@@ -8,6 +8,7 @@ import {
   setupProjectDirectory,
   updateProjectPackageName,
   updateProjectPackageVersion,
+  updateThemeSettings
 } from './util/fileUtil';
 import { install } from './util/install';
 import { initializeGit, makeFirstCommit } from './util/git';
@@ -178,12 +179,8 @@ export async function run() {
     await downloadTemplate(template, rootDir);
 
     if (themeChoice) {
-      // usually dangerous to write to .env, but we're in a fresh project so there is never a .env existing
-      await writeFile(
-        path.join(rootDir, '.env'),
-        `NEXT_PUBLIC_TINA_THEME=${themeChoice}`,
-        'utf-8'
-      );
+      // Add selected theme to content/settings/config.json
+      await updateThemeSettings(rootDir, themeChoice);
     }
 
     updateProjectPackageName(rootDir, projectName);
