@@ -108,27 +108,22 @@ export const getFormAndFieldNameFromMetadata = (
   object: object,
   eventFieldName: string
 ) => {
-  let formId;
-  let n;
-  const value = getDeepestMetadata(object, eventFieldName);
-  if (value) {
-    if (value.prefix) {
-      const fieldName = eventFieldName.slice(value?.prefix?.length + 1);
-      const localFieldName = value.name
-        ? fieldName.slice(value?.name?.length + 1)
-        : fieldName;
-      if (localFieldName) {
-        // If localFieldName is tags.2, just use `tags`
-        if (!isNaN(Number(localFieldName.split('.')[1]))) {
-          n = value.fields[localFieldName.split('.')[0]];
-        } else {
-          n = value.fields[localFieldName];
-        }
-      } else {
-        n = value.name;
-      }
-      formId = value.id;
-    }
+  const metadata = getDeepestMetadata(object, eventFieldName);
+
+  if (!metadata) {
+    console.warn(
+      '[getFormAndFieldNameFromMetadata] No metadata found for:',
+      eventFieldName
+    );
+    return { formId: undefined, fieldName: undefined };
   }
-  return { formId, fieldName: n };
+
+  const { id: formId, prefix } = metadata;
+  const prefixLength = prefix?.length ?? 0;
+  const localFieldName = eventFieldName.slice(prefixLength + 1);
+
+  return {
+    formId,
+    fieldName: localFieldName,
+  };
 };

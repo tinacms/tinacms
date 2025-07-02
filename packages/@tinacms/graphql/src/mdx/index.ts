@@ -1,10 +1,4 @@
-/**
-
-
-
-*/
-
-import { parseMDX, stringifyMDX } from '@tinacms/mdx';
+import { parseMDX, serializeMDX } from '@tinacms/mdx';
 
 export { parseMDX };
-export { stringifyMDX };
+export { serializeMDX };

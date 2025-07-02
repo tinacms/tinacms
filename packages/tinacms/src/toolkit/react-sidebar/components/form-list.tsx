@@ -1,8 +1,8 @@
+import { Transition } from '@headlessui/react';
+import { useCMS } from '@toolkit/react-tinacms';
+import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
 import { BiEdit } from 'react-icons/bi';
-import { Transition } from '@headlessui/react';
-import type { TinaState } from '@toolkit/tina-state';
-import { useCMS } from '@toolkit/react-tinacms';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
 
@@ -28,7 +28,7 @@ const Item = ({
       key={item.path}
       onClick={() => setActiveFormId(item.formId)}
       className={`${
-        depths[depth] || 'pl-12'
+        depths[depth]
       } pr-6 py-3 w-full h-full bg-transparent border-none text-lg text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center justify-between gap-2`}
     >
       <BiEdit className='opacity-70 w-5 h-auto text-blue-500 flex-none' />
@@ -99,7 +99,7 @@ export const FormLists = (props: { isEditing: boolean }) => {
       leaveTo='opacity-0 -translate-x-1/2'
     >
       {cms.state.formLists.map((formList, index) => (
-        <div key={`${formList.id}-${index}`} className='pt-16'>
+        <div key={`${formList.id}-${index}`}>
           {/* TODO: add labels for each list */}
           <FormList
             isEditing={props.isEditing}
