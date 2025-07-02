@@ -1,5 +1,17 @@
 # @tinacms/schema-tools
 
+## 1.8.0
+
+### Minor Changes
+
+- [#5750](https://github.com/tinacms/tinacms/pull/5750) [`dbef36f`](https://github.com/tinacms/tinacms/commit/dbef36f594b949024d5525184b6a9e1b9085b759) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Rich text parsers - adds support for slate serialization in json
+
+## 1.7.4
+
+### Patch Changes
+
+- [#5679](https://github.com/tinacms/tinacms/pull/5679) [`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: dedupe format types by moving them into schema-tools
+
 ## 1.7.3
 
 ### Patch Changes

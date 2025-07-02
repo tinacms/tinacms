@@ -1,5 +1,27 @@
 # tina-graphql
 
+## 1.5.19
+
+### Patch Changes
+
+- [#5786](https://github.com/tinacms/tinacms/pull/5786) [`e27c017`](https://github.com/tinacms/tinacms/commit/e27c0172005797af93b908152d51b2966c0cf059) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Modifies SlateJson rich text parser to store non-stringified json objects of the rich text content
+
+- Updated dependencies [[`e27c017`](https://github.com/tinacms/tinacms/commit/e27c0172005797af93b908152d51b2966c0cf059), [`dbef36f`](https://github.com/tinacms/tinacms/commit/dbef36f594b949024d5525184b6a9e1b9085b759)]:
+  - @tinacms/mdx@1.7.0
+  - @tinacms/schema-tools@1.8.0
+
+## 1.5.18
+
+### Patch Changes
+
+- [#5679](https://github.com/tinacms/tinacms/pull/5679) [`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - feat: dedupe format types by moving them into schema-tools
+
+- [#5653](https://github.com/tinacms/tinacms/pull/5653) [`4c2c724`](https://github.com/tinacms/tinacms/commit/4c2c7240fdc1d0f177cc71eddd006e73389fe7c8) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - fix: spurious error messages by FilesystemBridge on some relative paths
+
+- Updated dependencies [[`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734)]:
+  - @tinacms/schema-tools@1.7.4
+  - @tinacms/mdx@1.6.3
+
 ## 1.5.17
 
 ### Patch Changes

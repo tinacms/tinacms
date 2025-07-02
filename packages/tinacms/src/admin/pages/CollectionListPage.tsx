@@ -80,7 +80,7 @@ const TemplateMenu = ({
       {() => (
         <div>
           <div>
-            <MenuButton className='icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6'>
+            <MenuButton className='icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6'>
               Create New <BiPlus className='w-5 h-full ml-1 opacity-70' />
             </MenuButton>
           </div>
@@ -93,7 +93,7 @@ const TemplateMenu = ({
             leaveFrom='transform opacity-100 scale-100'
             leaveTo='transform opacity-0 scale-95'
           >
-            <MenuItems className='origin-top-right absolute right-0 mt-2 z-menu w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
+            <MenuItems className='origin-top-right absolute right-0 mt-2 z-menu w-56 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
               <div className='py-1'>
                 {templates.map((template) => (
                   <MenuItem key={`${template.label}-${template.name}`}>
@@ -507,7 +507,7 @@ const CollectionListPage = () => {
                       />
                     )}
 
-                    <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
+                    <PageHeader>
                       <div className='w-full'>
                         <h3 className='font-sans text-2xl text-gray-700'>
                           {collection.label
@@ -594,10 +594,8 @@ const CollectionListPage = () => {
                                   setSearchInput={setSearchInput}
                                 />
                               ) : (
-                                <>
-                                  <label className='block font-sans text-xs font-semibold text-gray-500 whitespace-normal'>
-                                    Search
-                                  </label>
+                                <div className='flex flex-col gap-2 items-start w-full md:w-auto'>
+                                  <div className='h-4'></div>
                                   <Message
                                     link='https://tina.io/docs/reference/search/overview'
                                     linkLabel='Read The Docs'
@@ -606,7 +604,7 @@ const CollectionListPage = () => {
                                   >
                                     Search not configured.
                                   </Message>
-                                </>
+                                </div>
                               )}
                             </div>
                           </div>
@@ -635,7 +633,7 @@ const CollectionListPage = () => {
                                             }}
                                             to='/collections/new-folder'
                                             className={cn(
-                                              'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4',
+                                              'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4',
                                               collection.templates &&
                                                 'opacity-50 pointer-events-none cursor-not-allowed'
                                             )}
@@ -694,10 +692,10 @@ const CollectionListPage = () => {
                                             collectionName,
                                           ].join('/')
                                     }`}
-                                    className='inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6'
+                                    className='inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6'
                                   >
                                     <FaFile className='mr-2' />
-                                    Add Files{' '}
+                                    Add File
                                   </Link>
                                 </>
                               )}
@@ -1062,47 +1060,40 @@ const SearchInput = ({
 
   return (
     <form className='flex flex-1 flex-col gap-2 items-start w-full'>
-      <label
-        htmlFor='search'
-        className='block font-sans text-xs font-semibold text-gray-500 whitespace-normal'
-      >
-        Search
-      </label>
+      <div className='h-4'></div>
       <div className='flex flex-col md:flex-row items-start md:items-center w-full md:w-auto gap-3'>
-        <div className='flex-1 min-w-[200px] w-full md:w-auto'>
-          <Input
+        <div className='flex-1 min-w-[200px] w-full md:w-auto relative'>
+          <BiSearch className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none' />
+          <input
             type='text'
             name='search'
-            placeholder='Search'
+            placeholder='Search...'
             value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value);
             }}
-          />
-        </div>
-        <div className='flex w-full md:w-auto gap-3'>
-          <Button
-            onClick={(e) => {
-              e.preventDefault();
-              setSearch(searchInput);
-              setSearchLoaded(false);
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                if (searchInput.trim()) {
+                  setSearch(searchInput);
+                  setSearchLoaded(false);
+                }
+              }
             }}
-            variant='primary'
-            className='w-full md:w-auto'
-          >
-            Search <BiSearch className='w-5 h-full ml-1.5 opacity-70' />
-          </Button>
+            className='shadow appearance-none bg-white block pl-10 pr-10 py-2 truncate w-full text-base border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded placeholder:text-gray-300 text-gray-600 focus:text-gray-900'
+          />
           {search && searchLoaded && (
-            <Button
+            <button
               onClick={(e) => {
                 e.preventDefault();
                 setSearch('');
                 setSearchInput('');
               }}
-              variant='white'
+              className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'
             >
-              Clear <BiX className='w-5 h-full ml-1 opacity-70' />
-            </Button>
+              <BiX className='w-5 h-5' />
+            </button>
           )}
         </div>
       </div>

@@ -1,11 +1,12 @@
-import { defineConfig } from 'tinacms'
+import { defineConfig } from 'tinacms';
+import PathwaySchema, { contentBlock } from './collection/bugReproduction';
 
 // Your hosting provider likely exposes this as an environment variable
 const branch =
   process.env.GITHUB_BRANCH ||
   process.env.VERCEL_GIT_COMMIT_REF ||
   process.env.HEAD ||
-  'main'
+  'main';
 
 export default defineConfig({
   branch,
@@ -29,13 +30,56 @@ export default defineConfig({
   schema: {
     collections: [
       {
+        name: 'slateJson',
+        path: 'content/slate-json',
+        format: 'json',
+        fields: [
+          {
+            name: 'title',
+            type: 'string',
+            label: 'Title',
+          },
+          {
+            type: 'rich-text',
+            name: 'body',
+            label: 'Body',
+            parser: { type: 'slatejson' },
+            templates: [
+              {
+                name: 'DateTime',
+                label: 'Date & Time',
+                inline: true,
+                fields: [
+                  {
+                    name: 'format',
+                    label: 'Format',
+                    type: 'string',
+                    options: ['utc', 'iso', 'local'],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'simpleRef',
+        path: 'content/refs',
+        fields: [
+          {
+            name: 'title',
+            type: 'string',
+          },
+        ],
+      },
+      {
         name: 'post',
         label: 'Posts',
-        path: 'content/posts',
         format: 'mdx',
+        path: 'content/posts',
         ui: {
           router({ document }) {
-            return `/posts/${document._sys.filename}`
+            return `/posts/${document._sys.filename}`;
           },
         },
         fields: [
@@ -51,6 +95,53 @@ export default defineConfig({
             name: 'body',
             label: 'Body',
             isBody: true,
+            templates: [
+              {
+                name: 'DateTime',
+                label: 'Date & Time',
+                inline: true,
+                fields: [
+                  {
+                    name: 'format',
+                    label: 'Format',
+                    type: 'string',
+                    options: ['utc', 'iso', 'local'],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: 'items',
+            type: 'object',
+            ui: {
+              itemProps: (values) => ({
+                label: values?.title || 'Showcase Item',
+              }),
+            },
+            list: true,
+            fields: [
+              {
+                name: 'title',
+                type: 'string',
+                required: true,
+                isTitle: true,
+              },
+              {
+                name: 'description',
+                type: 'rich-text',
+              },
+              {
+                name: 'image',
+                type: 'image',
+              },
+
+              {
+                name: 'ref',
+                type: 'reference',
+                collections: ['simpleRef'],
+              },
+            ],
           },
           {
             type: 'rich-text',
@@ -83,10 +174,20 @@ export default defineConfig({
                   },
                 ],
               },
+              {
+                name: 'ref',
+                fields: [
+                  {
+                    name: 'ref',
+                    type: 'reference',
+                    collections: ['simpleRef'],
+                  },
+                ],
+              },
             ],
           },
         ],
       },
     ],
   },
-})
+});

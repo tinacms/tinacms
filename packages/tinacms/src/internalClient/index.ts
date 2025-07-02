@@ -568,6 +568,27 @@ mutation addPendingDocumentMutation(
       throw error;
     }
   }
+
+  async getLatestVersion(): Promise<LatestVersionResponse> {
+    // needs to point at production content api as self hosted doesn't have this endpoint
+    const url = 'https://content.tinajs.io/latest-version';
+
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch latest version: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      return data as LatestVersionResponse;
+    } catch (error) {
+      console.error('Error fetching latest version:', error);
+      throw error;
+    }
+  }
 }
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL =
@@ -705,3 +726,10 @@ export class LocalSearchClient implements SearchClient {
     return false;
   }
 }
+
+export type PackageVersionInfo = {
+  version: string;
+  publishedAt: string;
+};
+
+export type LatestVersionResponse = Record<string, PackageVersionInfo>;

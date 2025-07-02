@@ -1,0 +1,48 @@
+{
+  "title": "demo",
+  "body": {
+    "type": "root",
+    "children": [
+      {
+        "children": [
+          {
+            "text": "this is slate json"
+          }
+        ],
+        "type": "p"
+      },
+      {
+        "type": "p",
+        "id": "ui7n7",
+        "children": [
+          {
+            "text": ""
+          },
+          {
+            "type": "mdxJsxTextElement",
+            "name": "DateTime",
+            "children": [
+              {
+                "text": ""
+              }
+            ],
+            "props": {},
+            "id": "tmf6n"
+          },
+          {
+            "text": ""
+          }
+        ]
+      },
+      {
+        "type": "p",
+        "id": "ikvcb",
+        "children": [
+          {
+            "text": "another paragraph"
+          }
+        ]
+      }
+    ]
+  }
+}

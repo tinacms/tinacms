@@ -31,7 +31,7 @@ export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content style={{ zIndex: 20000 }} align='end'>
-          <div className='mt-0 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1'>
+          <div className='mt-0 -mr-1 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1'>
             {toolbarItems.map((toolbarItem) => {
               return (
                 <span

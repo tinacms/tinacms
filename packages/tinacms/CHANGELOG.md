@@ -1,5 +1,53 @@
 # tinacms
 
+## 2.7.9
+
+### Patch Changes
+
+- [#5734](https://github.com/tinacms/tinacms/pull/5734) [`2a3ed6c`](https://github.com/tinacms/tinacms/commit/2a3ed6c3ec3233fd90fd94f3dd3d0243aaad079a) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collection list - simplified search input design
+
+- [#5715](https://github.com/tinacms/tinacms/pull/5715) [`bc47f93`](https://github.com/tinacms/tinacms/commit/bc47f938431c400714808613f633b05659a87be1) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - refactor: deprecate git media store
+
+- [#5741](https://github.com/tinacms/tinacms/pull/5741) [`0e9de37`](https://github.com/tinacms/tinacms/commit/0e9de379dab2970206b9b60eb014808662f67287) Thanks [@wicksipedia](https://github.com/wicksipedia)! - CMS admin UI - Refactor Sidebar and Branch Button Components
+  Forms header - Adds breadcrumb navigation
+
+- [#5755](https://github.com/tinacms/tinacms/pull/5755) [`468f0ee`](https://github.com/tinacms/tinacms/commit/468f0eefc0a15a9a9a23737d29ea9a5cb5c6aef6) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - ♻️ Refactor - Use Form.path instead of Form.relativePath, mark FormOptions.relativePath and Form.relativePath as deprecated
+
+- [#5786](https://github.com/tinacms/tinacms/pull/5786) [`e27c017`](https://github.com/tinacms/tinacms/commit/e27c0172005797af93b908152d51b2966c0cf059) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Modifies SlateJson rich text parser to store non-stringified json objects of the rich text content
+
+- [#5784](https://github.com/tinacms/tinacms/pull/5784) [`b25c5f0`](https://github.com/tinacms/tinacms/commit/b25c5f0b0e1d3f37870b780230b41dbc56bef1ab) Thanks [@JackDevAU](https://github.com/JackDevAU)! - - Fixed padding issues in FormLists
+
+  - Fixed Visual Editing's "Edit" button (Reference Fields)
+
+- [#5789](https://github.com/tinacms/tinacms/pull/5789) [`5040a6a`](https://github.com/tinacms/tinacms/commit/5040a6aa24e62166d942c47b61a3f18585caded6) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Adds click to focus for nested objects
+
+- [#5748](https://github.com/tinacms/tinacms/pull/5748) [`3ba6d78`](https://github.com/tinacms/tinacms/commit/3ba6d78f35f817d55bfc3d12b750e54b7e0d11f2) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ♻️ Improve "Edit in CMS" Button in Admin
+  - Now takes you directly to the Document instead of the collection the Document is in
+- Updated dependencies [[`e27c017`](https://github.com/tinacms/tinacms/commit/e27c0172005797af93b908152d51b2966c0cf059), [`dbef36f`](https://github.com/tinacms/tinacms/commit/dbef36f594b949024d5525184b6a9e1b9085b759)]:
+  - @tinacms/mdx@1.7.0
+  - @tinacms/schema-tools@1.8.0
+  - @tinacms/search@1.0.46
+
+## 2.7.8
+
+### Patch Changes
+
+- [#5680](https://github.com/tinacms/tinacms/pull/5680) [`5e36123`](https://github.com/tinacms/tinacms/commit/5e361239a372e21dda624d17b4ff274bab23ce90) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Collections - Add folder button is now always visible
+  When the collection is using templates, the button will be disabled and a tooltip as to why
+
+- [#5697](https://github.com/tinacms/tinacms/pull/5697) [`856e07a`](https://github.com/tinacms/tinacms/commit/856e07a0b8d742ee78d5eba565623cf081a61534) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - - ✏️ Rename `CreateBranchModel` to `CreateBranchModal`
+
+  - Add Deprecation no `CreateBranchModel`
+
+- [#5691](https://github.com/tinacms/tinacms/pull/5691) [`4d9c8ab`](https://github.com/tinacms/tinacms/commit/4d9c8abf6badd1bcc833bda432ab22dace4925ae) Thanks [@ncn-ssw](https://github.com/ncn-ssw)! - 🐛 Bug - Fix issue where editorial workflow fails to save from preview when path ends in slash
+
+- [#5668](https://github.com/tinacms/tinacms/pull/5668) [`7346dc9`](https://github.com/tinacms/tinacms/commit/7346dc996fd81ecb395b62f373976512e8224c21) Thanks [@JackDevAU](https://github.com/JackDevAU)! - Allow tel links
+
+- Updated dependencies [[`d689189`](https://github.com/tinacms/tinacms/commit/d68918973d39aabbb9e5e4672a913771f8841734)]:
+  - @tinacms/schema-tools@1.7.4
+  - @tinacms/mdx@1.6.3
+  - @tinacms/search@1.0.45
+
 ## 2.7.7
 
 ### Patch Changes

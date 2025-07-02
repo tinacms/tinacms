@@ -1,16 +1,16 @@
-import arrayMutators from 'final-form-arrays';
-import setFieldData from 'final-form-set-field-data';
+import type { Plugin } from '@toolkit/core';
 import {
-  FormApi,
-  createForm,
   Config,
-  FormState,
   FORM_ERROR,
+  FormApi,
+  FormState,
+  createForm,
   getIn,
 } from 'final-form';
 import type { FormSubscription } from 'final-form';
-import type { Plugin } from '@toolkit/core';
-import { Field, AnyField } from './field';
+import arrayMutators from 'final-form-arrays';
+import setFieldData from 'final-form-set-field-data';
+import { AnyField, Field } from './field';
 
 export type { FormApi };
 
@@ -37,7 +37,18 @@ export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   extraSubscribeValues?: FormSubscription;
   queries?: string[];
   crudType?: 'create' | 'update';
+
+  /**
+   * @deprecated
+   * Misleading name as per https://github.com/tinacms/tinacms/issues/5686#issuecomment-2899840518
+   * Use path property instead.
+   */
   relativePath?: string;
+
+  /**
+   * Where to save the form within the content directory on next submission.
+   */
+  path?: string;
 }
 
 export class Form<S = any, F extends Field = AnyField> implements Plugin {
@@ -56,7 +67,19 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   queries: string[];
   global: GlobalOptions | null = null;
   loading: boolean = false;
+
+  /**
+   * @deprecated
+   * Misleading name as per https://github.com/tinacms/tinacms/issues/5686#issuecomment-2899840518
+   * Use path property instead.
+   */
   relativePath: string;
+
+  /**
+   * Where to save the form within the content directory on next submission.
+   */
+  path: string;
+
   crudType?: 'create' | 'update';
   beforeSubmit?: (values: S) => Promise<void | S>;
 
@@ -83,6 +106,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.queries = queries || [];
     this.crudType = options.crudType || 'update';
     this.relativePath = options.relativePath || id;
+    this.path = options.path || id;
     this.finalForm = createForm<S>({
       ...options,
       initialValues,
@@ -310,6 +334,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     label?: string;
     name?: string;
     fields: Field[];
+    namespace?: string[];
   } {
     if (!fieldName) {
       return this;
@@ -512,24 +537,6 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             };
           }
           if (!isLastItem) {
-            // The `propsIndex` is set to 0 when the namePath does NOT include 'props'
-            // e.g. when navigating from a rich-text template back to the parent field
-            if (currentPathIndex === namePath.length || propsIndex === 0) {
-              return {
-                ...formOrObjectField,
-                name: namePath.slice(0, namePathIndex).join('.'),
-                fields: formOrObjectField.fields.map((field) => {
-                  return {
-                    ...field,
-                    name: [
-                      ...namePath.slice(0, namePathIndex),
-                      field.name,
-                    ].join('.'),
-                  };
-                }),
-              };
-            }
-
             return this.getFieldGroup({
               formOrObjectField: template,
               values: props,

@@ -47,6 +47,10 @@ export const mdPath = (dir: string) => {
   return join(dir, './out.md');
 };
 
+export const jsonPath = (dir: string) => {
+  return join(dir, './out.json');
+};
+
 const walkThrough = function* (obj: object) {
   // @ts-ignore
   const walk = function* (x: object & { position?: object }, previous = []) {

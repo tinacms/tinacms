@@ -1,5 +1,35 @@
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import type React from 'react';
+
+export const CONTENT_FORMATS = [
+  'mdx',
+  'md',
+  'markdown',
+  'json',
+  'yaml',
+  'yml',
+  'toml',
+] as const;
+export type ContentFormat = (typeof CONTENT_FORMATS)[number];
+
+export type ContentFrontmatterFormat = 'yaml' | 'toml' | 'json';
+
+export type Parser =
+  | { type: 'mdx' }
+  | {
+      type: 'markdown';
+      /**
+       * Tina will escape entities like `<` and `[` by default. You can choose to turn
+       * off all escaping, or specify HTML, so `<div>` will not be turned into `\<div>`
+       */
+      skipEscaping?: 'all' | 'html' | 'none';
+    }
+  | {
+      /**
+       * Experimental: Returns the native Slate.js document as JSON. Ideal to retain the pure editor content structure.
+       */
+      type: 'slatejson';
+    };
 
 type Meta = {
   active?: boolean;
@@ -303,16 +333,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
      *
      * Specify `"markdown"` if you're having problems with Tina parsing your content.
      */
-    parser?:
-      | {
-          type: 'markdown';
-          /**
-           * Tina will escape entities like `<` and `[` by default. You can choose to turn
-           * off all escaping, or specify HTML, so `<div>` will not be turned into `\<div>`
-           */
-          skipEscaping?: 'all' | 'html' | 'none';
-        }
-      | { type: 'mdx' };
+    parser?: Parser;
   };
 export type RichTextTemplate<WithNamespace extends boolean = false> =
   Template<WithNamespace> & {
@@ -782,7 +803,7 @@ interface BaseCollection {
   name: string;
   path: string;
   indexes?: IndexType[];
-  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml';
+  format?: ContentFormat;
   ui?: UICollection;
   /**
    * @deprecated - use `ui.defaultItem` on the each `template` instead
@@ -791,7 +812,7 @@ interface BaseCollection {
   /**
    * This format will be used to parse the markdown frontmatter
    */
-  frontmatterFormat?: 'yaml' | 'toml' | 'json';
+  frontmatterFormat?: ContentFrontmatterFormat;
   /**
    * The delimiters used to parse the frontmatter.
    */

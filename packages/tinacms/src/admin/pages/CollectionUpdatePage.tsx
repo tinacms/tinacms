@@ -1,21 +1,21 @@
 import {
-  BillingWarning,
-  Form,
-  FormBuilder,
-  FormStatus,
-} from '@tinacms/toolkit';
+  Collection,
+  TinaSchema,
+  canonicalPath,
+  resolveForm,
+} from '@tinacms/schema-tools';
+import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit';
+import type { TinaCMS } from '@tinacms/toolkit';
+import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
+import React, { useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { TinaAdminApi } from '../api';
+import { ErrorDialog } from '../components/ErrorDialog';
 import GetCMS from '../components/GetCMS';
 import GetCollection from '../components/GetCollection';
 import GetDocument from '../components/GetDocument';
-import React, { useMemo, useState } from 'react';
-import { TinaSchema, resolveForm, Collection } from '@tinacms/schema-tools';
-import { Link, useParams } from 'react-router-dom';
-import { LocalWarning } from '@tinacms/toolkit';
 import { PageWrapper } from '../components/Page';
-import { TinaAdminApi } from '../api';
-import type { TinaCMS } from '@tinacms/toolkit';
 import { useCollectionFolder } from './utils';
-import { ErrorDialog } from '../components/ErrorDialog';
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -59,7 +59,7 @@ const CollectionUpdatePage = () => {
             };
 
             return (
-              <PageWrapper>
+              <PageWrapper headerClassName='bg-white'>
                 <GetDocument
                   cms={cms}
                   collectionName={collection.name}
@@ -102,7 +102,6 @@ const RenderForm = ({
 }) => {
   const [formIsPristine, setFormIsPristine] = useState(true);
   const schema: TinaSchema | undefined = cms.api.tina.schema;
-  const parentFolder = relativePath.split('/').slice(0, -1).join('/');
 
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name);
@@ -121,7 +120,7 @@ const RenderForm = ({
   const form = useMemo(() => {
     return new Form({
       // id is the full document path
-      id: `${schemaCollection.path}/${relativePath}`,
+      id: canonicalPath(`${schemaCollection.path}/${relativePath}`),
       label: 'form',
       fields: formInfo.fields as any,
       initialValues: document._values,
@@ -169,23 +168,14 @@ const RenderForm = ({
 
   return (
     <>
-      {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
       <div
-        className={`pt-10 xl:pt-3 pb-10 xl:pb-4 px-20 xl:px-12 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
+        className={`py-4 px-6 border-b border-gray-200 bg-white w-full grow-0 shrink basis-0 flex justify-center`}
       >
         <div className='w-full flex gap-1.5 justify-between items-center'>
-          <Link
-            to={`/collections/${collection.name}/~${parentFolder}`}
-            className='flex-0 text-blue-500 hover:text-blue-400 hover:underline underline decoration-blue-200 hover:decoration-blue-400 text-sm leading-tight whitespace-nowrap truncate transition-all duration-150 ease-out'
-          >
-            {collection.label ? collection.label : collection.name}
-          </Link>
-          <span className='opacity-30 text-sm leading-tight whitespace-nowrap flex-0'>
-            /
-          </span>
-          <span className='flex-1 w-full text-sm leading-tight whitespace-nowrap truncate'>
-            {`${filename}.${collection.format}`}
-          </span>
+          <FormBreadcrumbs
+            className='w-[calc(100%-3rem)]'
+            rootBreadcrumbName={`${filename}.${collection.format}`}
+          />
           <FormStatus pristine={formIsPristine} />
         </div>
       </div>

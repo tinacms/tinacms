@@ -1,9 +1,24 @@
+import {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@toolkit/components/ui/breadcrumb';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@toolkit/components/ui/dropdown-menu';
 import { FormBuilder, FormStatus } from '@toolkit/form-builder';
 import type { Form } from '@toolkit/forms';
 import type { FormMetaPlugin } from '@toolkit/plugin-form-meta';
 import { useCMS } from '@toolkit/react-core';
+import { EllipsisVertical } from 'lucide-react';
 import * as React from 'react';
-import { BiDotsVertical, BiHomeAlt } from 'react-icons/bi';
 import { FormLists } from './form-list';
 import { SidebarContext } from './sidebar';
 import { SidebarLoadingPlaceholder } from './sidebar-loading-placeholder';
@@ -72,8 +87,7 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
     <>
       {activeForm && (
         <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-          {isMultiform && <MultiformFormHeader activeForm={activeForm} />}
-          {!isMultiform && <FormHeader activeForm={activeForm} />}
+          <FormHeader activeForm={activeForm} />
           {formMetas?.map((meta) => (
             <React.Fragment key={meta.name}>
               <meta.Component />
@@ -116,106 +130,170 @@ const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
   );
 };
 
-export interface MultiformFormHeaderProps {
-  activeForm: { activeFieldName?: string; tinaForm: Form };
-}
-
-export const MultiformFormHeader = ({
-  activeForm,
-}: MultiformFormHeaderProps) => {
-  const cms = useCMS();
-  const { formIsPristine } = React.useContext(SidebarContext);
-
-  return (
-    <div
-      className={
-        'pt-18 pb-4 px-6 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50'
-      }
-    >
-      <div className='max-w-form mx-auto flex gap-2 justify-between items-center'>
-        <button
-          type='button'
-          className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
-          onClick={() => {
-            const state = activeForm.tinaForm.finalForm.getState();
-            if (state.invalid === true) {
-              cms.alerts.error('Cannot navigate away from an invalid form.');
-            } else {
-              cms.dispatch({ type: 'forms:set-active-form-id', value: null });
-            }
-          }}
-        >
-          <BiDotsVertical className='h-auto w-5 inline-block opacity-70' />
-        </button>
-        <button
-          type='button'
-          className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
-          onClick={() => {
-            const collectionName = cms.api.tina.schema.getCollectionByFullPath(
-              cms.state.activeFormId
-            ).name;
-
-            window.location.href = `${
-              new URL(window.location.href).pathname
-            }#/collections/${collectionName}/~`;
-          }}
-        >
-          <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
-        </button>
-
-        <span className='opacity-30 text-sm leading-tight whitespace-nowrap flex-0'>
-          /
-        </span>
-        <span className='block w-full text-sm leading-tight whitespace-nowrap truncate'>
-          {activeForm.tinaForm.label || activeForm.tinaForm.id}
-        </span>
-        <FormStatus pristine={formIsPristine} />
-      </div>
-    </div>
-  );
-};
-
 export interface FormHeaderProps {
   activeForm: { activeFieldName?: string; tinaForm: Form };
 }
 
 export const FormHeader = ({ activeForm }: FormHeaderProps) => {
   const { formIsPristine } = React.useContext(SidebarContext);
-  const cms = useCMS();
-
-  const shortFormLabel = activeForm.tinaForm.label
-    ? activeForm.tinaForm.label.replace(/^.*[\\\/]/, '')
-    : false;
 
   return (
-    <div
-      className={
-        'pt-18 pb-4 px-6 border-b border-gray-200 bg-gradient-to-t from-white to-gray-50'
-      }
-    >
-      <div className='max-w-form mx-auto flex gap-2 justify-between items-center'>
-        <button
-          type='button'
-          className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
-          onClick={() => {
-            const collectionName = cms.api.tina.schema.getCollectionByFullPath(
-              cms.state.activeFormId
-            ).name;
-            window.location.href = `${
-              new URL(window.location.href).pathname
-            }#/collections/${collectionName}/~`;
-          }}
-        >
-          <BiHomeAlt className='h-auto w-5 inline-block opacity-70' />
-        </button>
-        {shortFormLabel && (
-          <span className='block w-full text-sm leading-tight whitespace-nowrap truncate'>
-            {shortFormLabel}
-          </span>
+    <div className='px-4 pt-2 pb-4 flex flex-row flex-nowrap justify-between items-center gap-2 bg-gradient-to-t from-white to-gray-50'>
+      <MultiformSelector activeForm={activeForm} />
+      <FormBreadcrumbs className='w-[calc(100%-3rem)]' />
+      <FormStatus pristine={formIsPristine} />
+    </div>
+  );
+};
+
+export const FormBreadcrumbs = ({
+  rootBreadcrumbName,
+  ...props
+}: {
+  rootBreadcrumbName?: string;
+} & React.HTMLAttributes<HTMLDivElement>) => {
+  const cms = useCMS();
+  const breadcrumbs = cms.state.breadcrumbs;
+
+  if (breadcrumbs.length === 0) {
+    return null;
+  }
+
+  const goBack = (formId: string, fieldName: string) => {
+    cms.dispatch({
+      type: 'forms:set-active-field-name',
+      value: {
+        formId,
+        fieldName,
+      },
+    });
+  };
+
+  const firstBreadcrumb = breadcrumbs[0];
+  const secondLastBreadcrumb =
+    breadcrumbs.length > 2 ? breadcrumbs[breadcrumbs.length - 2] : null;
+  const lastBreadcrumb =
+    breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 1] : null;
+  const dropdownBreadcrumbs =
+    breadcrumbs.length > 3 ? breadcrumbs.slice(1, -2) : [];
+
+  return (
+    <Breadcrumb {...props}>
+      <BreadcrumbList className='flex-nowrap text-nowrap'>
+        {/* First breadcrumb */}
+        <BreadcrumbItem className='shrink truncate'>
+          <BreadcrumbLink
+            asChild
+            className='text-gray-700 hover:text-blue-500 truncate'
+          >
+            <button
+              type='button'
+              onClick={(e) => {
+                e.preventDefault();
+                goBack(firstBreadcrumb.formId, firstBreadcrumb.formName);
+              }}
+            >
+              {rootBreadcrumbName || firstBreadcrumb.label}
+            </button>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+
+        {/* Dropdown for middle breadcrumbs */}
+        {dropdownBreadcrumbs.length > 0 && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger className='flex items-center gap-1'>
+                  <BreadcrumbEllipsis className='size-4' />
+                  <span className='sr-only'>Toggle menu</span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='start'>
+                  {dropdownBreadcrumbs.map((breadcrumb) => (
+                    <DropdownMenuItem
+                      key={breadcrumb.formId}
+                      className='cursor-pointer text-gray-700 hover:text-blue-500'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        goBack(breadcrumb.formId, breadcrumb.formName);
+                      }}
+                    >
+                      {breadcrumb.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </BreadcrumbItem>
+          </>
         )}
 
-        <FormStatus pristine={formIsPristine} />
-      </div>
-    </div>
+        {/* Second last breadcrumb */}
+        {secondLastBreadcrumb && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem className='shrink truncate'>
+              <BreadcrumbLink
+                asChild
+                className='text-gray-700 hover:text-blue-500 truncate'
+              >
+                <button
+                  type='button'
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goBack(
+                      secondLastBreadcrumb.formId,
+                      secondLastBreadcrumb.formName
+                    );
+                  }}
+                >
+                  {secondLastBreadcrumb.label}
+                </button>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </>
+        )}
+
+        {/* Last breadcrumb - only use when there is more than 2 breadcrumbs */}
+        {lastBreadcrumb && (
+          <>
+            {breadcrumbs.length > 1 && <BreadcrumbSeparator />}
+            <BreadcrumbItem>
+              <BreadcrumbPage className='text-gray-700 font-medium'>
+                {lastBreadcrumb.label}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </>
+        )}
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+};
+
+const MultiformSelector = ({
+  activeForm,
+}: {
+  activeForm: { activeFieldName?: string; tinaForm: Form };
+}) => {
+  const cms = useCMS();
+  const isMultiform = cms.state.forms.length > 1;
+
+  if (!isMultiform) {
+    return null;
+  }
+  return (
+    <button
+      type='button'
+      className='pointer-events-auto text-xs text-blue-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150'
+      onClick={() => {
+        const state = activeForm.tinaForm.finalForm.getState();
+        if (state.invalid === true) {
+          cms.alerts.error('Cannot navigate away from an invalid form.');
+        } else {
+          cms.dispatch({ type: 'forms:set-active-form-id', value: null });
+        }
+      }}
+    >
+      <EllipsisVertical className='h-5 w-auto opacity-70' />
+    </button>
   );
 };

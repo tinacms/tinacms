@@ -1,5 +1,5 @@
+import { serializeMDX } from '@tinacms/mdx';
 import { RichTextTemplate } from '@tinacms/schema-tools';
-import { stringifyMDX } from '@tinacms/mdx';
 import { z } from 'zod';
 
 /**
@@ -32,7 +32,7 @@ export const tinaTableTemplate: RichTextTemplate = {
             if (Array.isArray(value.tableCells)) {
               return {
                 label: value.tableCells
-                  .map((cellItem) => stringifyCell(cellItem.value)?.trim())
+                  .map((cellItem) => stringifyCell(cellItem.value))
                   .join(' | '),
               };
             }
@@ -51,7 +51,7 @@ export const tinaTableTemplate: RichTextTemplate = {
               if (cell) {
                 if (cell.value) {
                   return {
-                    label: stringifyCell(cell.value)?.trim(),
+                    label: stringifyCell(cell.value),
                   };
                 }
               }
@@ -121,6 +121,14 @@ const tableCellSchema = z.object({
     ),
 });
 
-const stringifyCell = (cell: any) => {
-  return stringifyMDX(cell, { name: 'body', type: 'rich-text' }, () => '');
+const stringifyCell = (cell: any): string => {
+  const serialized = serializeMDX(
+    cell,
+    { name: 'body', type: 'rich-text' },
+    () => ''
+  );
+  if (typeof serialized !== 'string') {
+    throw new Error('stringifyCell: Expected serializeMDX to return a string');
+  }
+  return serialized?.trim();
 };

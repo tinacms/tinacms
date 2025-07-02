@@ -1,4 +1,3 @@
-import React, { Fragment } from 'react';
 import {
   Combobox,
   ComboboxButton,
@@ -7,8 +6,9 @@ import {
   ComboboxOptions,
   Transition,
 } from '@headlessui/react';
-import { classNames } from './helpers';
 import { ChevronDownIcon } from '@heroicons/react/solid';
+import React, { Fragment } from 'react';
+import { classNames } from './helpers';
 
 interface AutocompleteItem {
   key: string;
@@ -74,7 +74,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
         leaveFrom='transform opacity-100 scale-100'
         leaveTo='transform opacity-0 scale-95'
       >
-        <ComboboxOptions className='origin-top-right absolute right-0 mt-1 w-full max-h-[300px] overflow-y-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
+        <ComboboxOptions className='origin-top-right absolute right-0 mt-1 w-full max-h-[300px] overflow-y-auto rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
           {filteredItems.map((item) => (
             <ComboboxOption key={item.key} value={item}>
               {({ focus }) => (

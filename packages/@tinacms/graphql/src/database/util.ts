@@ -1,23 +1,20 @@
-/**
-
-*/
-
-import * as yup from 'yup';
 import toml from '@iarna/toml';
-import yaml from 'js-yaml';
-import matter from 'gray-matter';
 import {
   Collection,
   CollectionTemplateable,
-  normalizePath,
   TinaSchema,
+  normalizePath,
 } from '@tinacms/schema-tools';
+import matter from 'gray-matter';
+import yaml from 'js-yaml';
+import * as yup from 'yup';
 
-import { assertShape, lastItem, sequential } from '../util';
-import micromatch from 'micromatch';
-import { Bridge } from './bridge';
 import path from 'path';
+import { ContentFormat, ContentFrontmatterFormat } from '@tinacms/schema-tools';
+import micromatch from 'micromatch';
+import { assertShape, lastItem, sequential } from '../util';
 import { replaceNameOverrides } from './alias-utils';
+import { Bridge } from './bridge';
 
 export { normalizePath };
 
@@ -30,11 +27,11 @@ const matterEngines = {
 
 export const stringifyFile = (
   content: object,
-  format: FormatType | string, // FIXME
+  format: ContentFormat | string, // FIXME
   /** For non-polymorphic documents we don't need the template key */
   keepTemplateKey: boolean,
   markdownParseConfig?: {
-    frontmatterFormat?: 'toml' | 'yaml' | 'json';
+    frontmatterFormat?: ContentFrontmatterFormat;
     frontmatterDelimiters?: [string, string] | string;
   }
 ): string => {
@@ -87,10 +84,10 @@ export const stringifyFile = (
 
 export const parseFile = <T extends object>(
   content: string,
-  format: FormatType | string, // FIXME
+  format: ContentFormat | string, // FIXME
   yupSchema: (args: typeof yup) => yup.ObjectSchema<any>,
   markdownParseConfig?: {
-    frontmatterFormat?: 'toml' | 'yaml' | 'json';
+    frontmatterFormat?: ContentFrontmatterFormat;
     frontmatterDelimiters?: [string, string] | string;
   }
 ): T => {
@@ -134,8 +131,6 @@ export const parseFile = <T extends object>(
   }
   throw new Error(`Must specify a valid format, got ${format}`);
 };
-
-export type FormatType = 'json' | 'md' | 'mdx' | 'markdown';
 
 export const atob = (b64Encoded: string) => {
   return Buffer.from(b64Encoded, 'base64').toString();
