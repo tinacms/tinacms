@@ -385,8 +385,7 @@ export const CreateBranchModal = ({
 
         const collection = tinaApi.schema.getCollectionByFullPath(path);
 
-        const api = new TinaAdminApi(cms);
-        const params = api.schema.transformPayload(collection.name, values);
+        const params = tinaApi.schema.transformPayload(collection.name, values);
         const relativePath = pathRelativeToCollection(collection.path, path);
 
         const result = await tinaApi.executeEditorialWorkflow({
