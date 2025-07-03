@@ -366,10 +366,11 @@ export const CreateBranchModal = ({
   const [errorMessage, setErrorMessage] = React.useState('');
   const [statusMessage, setStatusMessage] = React.useState('');
 
-  const executeEditorialWorkflow = async (inputBranchName: string) => {
+  const executeEditorialWorkflow = async () => {
     try {
-      const branchName = `tina/${inputBranchName}`;\
+      const branchName = `tina/${newBranchName}`;
       setStatusMessage('Initializing workflow...');
+      setDisabled(true);
       setIsExecuting(true);
 
       let graphql = '';
@@ -387,7 +388,7 @@ export const CreateBranchModal = ({
       const relativePath = pathRelativeToCollection(collection.path, path);
 
       const result = await tinaApi.executeEditorialWorkflow({
-        branchName: formatBranchName(branchName), //TODO: Handle server-side
+        branchName: formatBranchName(branchName), //TODO: Handle server-side 
         baseBranch: tinaApi.branch,
         prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
         graphQLContentOp: {
@@ -418,9 +419,12 @@ export const CreateBranchModal = ({
     } catch (e) {
       console.error(e);
       cms.alerts.error('Branch operation failed: ' + e.message);
-      setErrorMessage(
-        'Branch operation failed, please try again. If the problem persists please contact support.'
-      );
+      const errorMessage =
+        e.message && e.message.includes('Branch already exists')
+          ? 'Branch already exists'
+          : 'Branch operation failed, please try again. If the problem persists please contact support.';
+      setErrorMessage(errorMessage);
+      setDisabled(false);
       setIsExecuting(false);
     }
   };
@@ -489,24 +493,7 @@ export const CreateBranchModal = ({
               disabled={
                 newBranchName === '' || Boolean(errorMessage) || disabled
               }
-              onClick={async () => {
-                setDisabled(true);
-                //TODO: Handle server-side
-                const branchList = await tinaApi.listBranches({
-                  includeIndexStatus: false,
-                });
-                const contentBranches = branchList
-                  .filter((x) => x?.name?.startsWith('tina/'))
-                  .map((x) => x.name.replace('tina/', ''));
-
-                if (contentBranches.includes(newBranchName)) {
-                  setErrorMessage('Branch already exists');
-                  setDisabled(false);
-                  return;
-                }
-
-                if (!errorMessage) executeEditorialWorkflow(newBranchName);
-              }}
+              onClick={executeEditorialWorkflow}
             >
               Create Branch and Save
             </Button>
