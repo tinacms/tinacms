@@ -3,10 +3,7 @@ import * as React from 'react';
 import { type FC, useEffect } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 
-import {
-  formatBranchName,
-  useBranchData,
-} from '@toolkit/plugin-branch-switcher';
+import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import { BiError, BiGitBranch, BiLoaderAlt } from 'react-icons/bi';
@@ -388,7 +385,7 @@ export const CreateBranchModal = ({
       const relativePath = pathRelativeToCollection(collection.path, path);
 
       const result = await tinaApi.executeEditorialWorkflow({
-        branchName: formatBranchName(branchName), //TODO: Handle server-side
+        branchName: branchName,
         baseBranch: tinaApi.branch,
         prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
         graphQLContentOp: {
@@ -461,7 +458,7 @@ export const CreateBranchModal = ({
               // reset error state on change
               setErrorMessage('');
               setStatusMessage('');
-              setNewBranchName(formatBranchName(e.target.value));
+              setNewBranchName(e.target.value);
             }}
           />
         </>
