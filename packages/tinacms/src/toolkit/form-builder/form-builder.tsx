@@ -388,7 +388,7 @@ export const CreateBranchModal = ({
       const relativePath = pathRelativeToCollection(collection.path, path);
 
       const result = await tinaApi.executeEditorialWorkflow({
-        branchName: formatBranchName(branchName), //TODO: Handle server-side 
+        branchName: formatBranchName(branchName), //TODO: Handle server-side
         baseBranch: tinaApi.branch,
         prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
         graphQLContentOp: {
@@ -418,7 +418,6 @@ export const CreateBranchModal = ({
       close();
     } catch (e) {
       console.error(e);
-      cms.alerts.error('Branch operation failed: ' + e.message);
       const errorMessage =
         e.message && e.message.includes('Branch already exists')
           ? 'Branch already exists'
@@ -430,16 +429,7 @@ export const CreateBranchModal = ({
   };
 
   const renderStateContent = () => {
-    if (errorMessage) {
-      return (
-        <div className='flex items-center gap-1 text-red-700 py-4'>
-          <BiError className='w-7 h-auto text-red-400 flex-shrink-0' />
-          <span>
-            <b>Error:</b> {errorMessage}
-          </span>
-        </div>
-      );
-    } else if (isExecuting) {
+    if (isExecuting) {
       return (
         <div className='flex flex-col items-center gap-4 py-6'>
           <BiLoaderAlt className='opacity-70 text-blue-400 animate-spin w-10 h-auto' />
@@ -449,6 +439,14 @@ export const CreateBranchModal = ({
     } else {
       return (
         <>
+          {errorMessage && (
+            <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
+              <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
+              <span className='text-sm'>
+                <b>Error:</b> {errorMessage}
+              </span>
+            </div>
+          )}
           <p className='text-lg text-gray-700 font-bold mb-2'>
             This content is protected 🚧
           </p>
@@ -466,9 +464,6 @@ export const CreateBranchModal = ({
               setNewBranchName(formatBranchName(e.target.value));
             }}
           />
-          {errorMessage && (
-            <div className='mt-2 text-sm text-red-700'>{errorMessage}</div>
-          )}
         </>
       );
     }
@@ -482,7 +477,7 @@ export const CreateBranchModal = ({
           Create Branch
         </ModalHeader>
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
-        {!isExecuting && !errorMessage && (
+        {!isExecuting && (
           <ModalActions>
             <Button style={{ flexGrow: 1 }} onClick={close}>
               Cancel
@@ -490,9 +485,7 @@ export const CreateBranchModal = ({
             <Button
               variant='primary'
               style={{ flexGrow: 2 }}
-              disabled={
-                newBranchName === '' || Boolean(errorMessage) || disabled
-              }
+              disabled={newBranchName === '' || disabled}
               onClick={executeEditorialWorkflow}
             >
               Create Branch and Save
