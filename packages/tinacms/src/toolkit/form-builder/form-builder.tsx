@@ -15,7 +15,6 @@ import { MdOutlineSaveAlt } from 'react-icons/md';
 import {
   CREATE_DOCUMENT_GQL,
   DELETE_DOCUMENT_GQL,
-  TinaAdminApi,
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
 import { cn } from '../../utils/cn';
@@ -363,80 +362,67 @@ export const CreateBranchModal = ({
   const { setCurrentBranch } = useBranchData();
   const [disabled, setDisabled] = React.useState(false);
   const [newBranchName, setNewBranchName] = React.useState('');
-  const [error, setError] = React.useState('');
-  const [branchName, setBranchName] = React.useState('');
   const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
   const [statusMessage, setStatusMessage] = React.useState('');
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        const currentBranch = tinaApi.branch;
+  const executeEditorialWorkflow = async (inputBranchName: string) => {
+    try {
+      const branchName = `tina/${inputBranchName}`;\
+      setStatusMessage('Initializing workflow...');
+      setIsExecuting(true);
 
-        let graphql = '';
-        if (crudType === 'create') {
-          graphql = CREATE_DOCUMENT_GQL;
-        } else if (crudType === 'delete') {
-          graphql = DELETE_DOCUMENT_GQL;
-        } else if (crudType !== 'view') {
-          graphql = UPDATE_DOCUMENT_GQL;
-        }
-
-        const collection = tinaApi.schema.getCollectionByFullPath(path);
-
-        const params = tinaApi.schema.transformPayload(collection.name, values);
-        const relativePath = pathRelativeToCollection(collection.path, path);
-
-        const result = await tinaApi.executeEditorialWorkflow({
-          branchName: formatBranchName(branchName),
-          baseBranch: currentBranch,
-          prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
-          graphQLContentOp: {
-            query: graphql,
-            variables: {
-              collection: collection.name,
-              relativePath: relativePath,
-              params,
-            },
-          },
-          onStatusUpdate: (status) => {
-            setStatusMessage(status.message || `Status: ${status.status}`);
-          },
-        });
-
-        if (!result.branchName) {
-          throw new Error('Branch creation failed.');
-        }
-
-        setBranchName(result.branchName);
-        setCurrentBranch(result.branchName);
-
-        cms.alerts.success('Branch created and content saved.');
-        if (result.pullRequestURL) {
-          cms.alerts.success('Pull request created.');
-        }
-
-        close();
-      } catch (e) {
-        console.error(e);
-        cms.alerts.error('Branch operation failed: ' + e.message);
-        setErrorMessage(
-          'Branch operation failed, please try again. If the problem persists please contact support.'
-        );
-        setIsExecuting(false);
+      let graphql = '';
+      if (crudType === 'create') {
+        graphql = CREATE_DOCUMENT_GQL;
+      } else if (crudType === 'delete') {
+        graphql = DELETE_DOCUMENT_GQL;
+      } else if (crudType !== 'view') {
+        graphql = UPDATE_DOCUMENT_GQL;
       }
-    };
 
-    if (isExecuting) {
-      run();
+      const collection = tinaApi.schema.getCollectionByFullPath(path);
+
+      const params = tinaApi.schema.transformPayload(collection.name, values);
+      const relativePath = pathRelativeToCollection(collection.path, path);
+
+      const result = await tinaApi.executeEditorialWorkflow({
+        branchName: formatBranchName(branchName), //TODO: Handle server-side
+        baseBranch: tinaApi.branch,
+        prTitle: `${branchName.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
+        graphQLContentOp: {
+          query: graphql,
+          variables: {
+            collection: collection.name,
+            relativePath: relativePath,
+            params,
+          },
+        },
+        onStatusUpdate: (status) => {
+          setStatusMessage(status.message || `Status: ${status.status}`);
+        },
+      });
+
+      if (!result.branchName) {
+        throw new Error('Branch creation failed.');
+      }
+
+      setCurrentBranch(result.branchName);
+
+      cms.alerts.success('Branch created and content saved.');
+      if (result.pullRequestURL) {
+        cms.alerts.success('Pull request created.');
+      }
+
+      close();
+    } catch (e) {
+      console.error(e);
+      cms.alerts.error('Branch operation failed: ' + e.message);
+      setErrorMessage(
+        'Branch operation failed, please try again. If the problem persists please contact support.'
+      );
+      setIsExecuting(false);
     }
-  }, [isExecuting, branchName, path, values, crudType]);
-
-  const onCreateBranch = async (inputBranchName: string) => {
-    setBranchName(`tina/${inputBranchName}`);
-    setStatusMessage('Initializing workflow...');
-    setIsExecuting(true);
   };
 
   const renderStateContent = () => {
@@ -471,13 +457,14 @@ export const CreateBranchModal = ({
             value={newBranchName}
             onChange={(e) => {
               // reset error state on change
-              setError('');
               setErrorMessage('');
               setStatusMessage('');
               setNewBranchName(formatBranchName(e.target.value));
             }}
           />
-          {error && <div className='mt-2 text-sm text-red-700'>{error}</div>}
+          {errorMessage && (
+            <div className='mt-2 text-sm text-red-700'>{errorMessage}</div>
+          )}
         </>
       );
     }
@@ -499,9 +486,12 @@ export const CreateBranchModal = ({
             <Button
               variant='primary'
               style={{ flexGrow: 2 }}
-              disabled={newBranchName === '' || Boolean(error) || disabled}
+              disabled={
+                newBranchName === '' || Boolean(errorMessage) || disabled
+              }
               onClick={async () => {
                 setDisabled(true);
+                //TODO: Handle server-side
                 const branchList = await tinaApi.listBranches({
                   includeIndexStatus: false,
                 });
@@ -510,12 +500,12 @@ export const CreateBranchModal = ({
                   .map((x) => x.name.replace('tina/', ''));
 
                 if (contentBranches.includes(newBranchName)) {
-                  setError('Branch already exists');
+                  setErrorMessage('Branch already exists');
                   setDisabled(false);
                   return;
                 }
 
-                if (!error) onCreateBranch(newBranchName);
+                if (!errorMessage) executeEditorialWorkflow(newBranchName);
               }}
             >
               Create Branch and Save

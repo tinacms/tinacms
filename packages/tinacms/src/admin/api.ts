@@ -16,7 +16,7 @@ import {
 } from '@tinacms/search/dist/index-client';
 
 // GraphQL operation constants for document operations
-export const CREATE_DOCUMENT_GQL = `
+export const CREATE_DOCUMENT_GQL = `#graphql
 mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
   createDocument(
     collection: $collection,
@@ -25,7 +25,7 @@ mutation($collection: String!, $relativePath: String!, $params: DocumentMutation
   ){__typename}
 }`;
 
-export const UPDATE_DOCUMENT_GQL = `
+export const UPDATE_DOCUMENT_GQL = `#graphql
 mutation($collection: String!, $relativePath: String!, $params: DocumentUpdateMutation!) {
   updateDocument(
     collection: $collection,
@@ -34,7 +34,7 @@ mutation($collection: String!, $relativePath: String!, $params: DocumentUpdateMu
   ){__typename}
 }`;
 
-export const DELETE_DOCUMENT_GQL = `
+export const DELETE_DOCUMENT_GQL = `#graphql
 mutation DeleteDocument($collection: String!, $relativePath: String!){
   deleteDocument(collection: $collection, relativePath: $relativePath){
     __typename

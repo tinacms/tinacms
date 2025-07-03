@@ -609,7 +609,6 @@ mutation addPendingDocumentMutation(
     const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}`;
 
     try {
-      // Initial request to start the editorial workflow process
       const res = await this.authProvider.fetchWithToken(url, {
         method: 'POST',
         body: JSON.stringify({
@@ -623,22 +622,21 @@ mutation addPendingDocumentMutation(
         },
       });
 
+      const responseBody = await res.json();
+
       if (!res.ok) {
         console.error('There was an error starting editorial workflow.');
-        const error = await res.json();
-        throw new Error(error?.message || 'Failed to start editorial workflow');
+        throw new Error(
+          responseBody?.message || 'Failed to start editorial workflow'
+        );
       }
 
-      const initialResponse = await res.json();
+      const requestId = responseBody.requestId;
 
-      // If no requestId is returned, the API is using the old behavior (not long polling)
-      if (!initialResponse.requestId) {
-        return initialResponse;
+      if (!requestId) {
+        return responseBody;
       }
 
-      const requestId = initialResponse.requestId;
-
-      // Notify that workflow is queued
       if (options.onStatusUpdate) {
         options.onStatusUpdate({
           status: 'queued',
@@ -646,59 +644,53 @@ mutation addPendingDocumentMutation(
         });
       }
 
-      // Setup polling configuration
-      const maxAttempts = 60; // 5 minutes with 5 second intervals
-      const pollInterval = 5000; // 5 seconds
+      const maxAttempts = 60;
+      const pollInterval = 5000;
       let attempts = 0;
 
-      // Poll for status until complete or error
       while (attempts < maxAttempts) {
-        // Wait between polling attempts
         await new Promise((resolve) => setTimeout(resolve, pollInterval));
         attempts++;
 
         const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
-        const statusRes = await this.authProvider.fetchWithToken(statusUrl);
+        const statusResponse =
+          await this.authProvider.fetchWithToken(statusUrl);
 
-        if (!statusRes.ok) {
+        if (!statusResponse.ok) {
           throw new Error(
-            `Failed to check workflow status: ${statusRes.statusText}`
+            `Failed to check workflow status: ${statusResponse.statusText}`
           );
         }
 
-        const statusResponse = await statusRes.json();
+        const statusResponseBody = await statusResponse.json();
 
-        // Notify about status update
         if (options.onStatusUpdate) {
           options.onStatusUpdate({
-            status: statusResponse.status,
+            status: statusResponseBody.status,
             message:
-              statusResponse.message || `Status: ${statusResponse.status}`,
+              statusResponseBody.message ||
+              `Status: ${statusResponseBody.status}`,
           });
         }
 
-        // If complete, return the full response
-        if (statusResponse.status === 'complete') {
+        // Only on 200 OK status, return the response
+        if (statusResponse.status === 200) {
           return {
-            branchName: statusResponse.branchName,
-            branchRef: statusResponse.branchRef,
-            indexStatus: statusResponse.indexStatus,
-            pullRequestURL: statusResponse.pullRequestUrl,
-            pullRequestNumber: statusResponse.pullRequestNumber,
+            branchName: statusResponseBody.branchName,
+            branchRef: statusResponseBody.branchRef,
+            indexStatus: statusResponseBody.indexStatus,
+            pullRequestURL: statusResponseBody.pullRequestUrl,
+            pullRequestNumber: statusResponseBody.pullRequestNumber,
           };
         }
 
-        // If error, throw it
-        if (statusResponse.status === 'error') {
+        if (!statusResponse.ok) {
           throw new Error(
-            statusResponse.message || 'Editorial workflow failed'
+            statusResponseBody.message || 'Editorial workflow failed'
           );
         }
-
-        // Otherwise continue polling
       }
 
-      // If we exceed max attempts, return a timeout error
       throw new Error('Editorial workflow timed out after 5 minutes');
     } catch (error) {
       console.error(
