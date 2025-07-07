@@ -205,15 +205,15 @@ export function useEditState(): { edit: boolean } {
  */
 export const tinaField = <
   T extends
-  | {
-    _content_source?: {
-      queryId: string;
-      path: (number | string)[];
-    };
-  }
-  | Record<string, unknown>
-  | null
-  | undefined,
+    | {
+        _content_source?: {
+          queryId: string;
+          path: (number | string)[];
+        };
+      }
+    | Record<string, unknown>
+    | null
+    | undefined,
 >(
   object: T,
   property?: keyof Omit<NonNullable<T>, '__typename' | '_sys'>,
