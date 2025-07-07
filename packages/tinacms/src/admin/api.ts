@@ -3,10 +3,7 @@ import { buildSchema, print } from 'graphql';
 
 import { diff } from '@graphql-inspector/core';
 
-// Using any types temporarily to avoid linter errors
-type Collection = any;
-type Schema = any;
-
+import type { Collection, TinaSchema } from '@tinacms/schema-tools';
 import type { Client } from '../internalClient';
 import type { CollectionResponse, DocumentForm } from './types';
 
@@ -15,7 +12,6 @@ import {
   processDocumentForIndexing,
 } from '@tinacms/search/dist/index-client';
 
-// GraphQL operation constants for document operations
 export const CREATE_DOCUMENT_GQL = `#graphql
 mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
   createDocument(
@@ -57,7 +53,7 @@ export interface FilterArgs {
 export class TinaAdminApi {
   api: Client;
   useDataLayer: boolean;
-  schema: Schema;
+  schema: TinaSchema;
   searchClient?: SearchClient;
   maxSearchIndexFieldLength: number = 100;
   constructor(cms: TinaCMS) {
