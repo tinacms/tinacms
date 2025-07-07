@@ -31,6 +31,7 @@ export class TinaGraphQLError extends Error implements GraphQLError {
 }
 
 export type TypeFetchErrorArgs = {
+  /** @deprecated */
   stack?: string;
   file?: string;
   includeAuditMessage?: boolean;
