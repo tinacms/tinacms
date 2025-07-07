@@ -1,5 +1,15 @@
 # tinacms
 
+## 2.7.10
+
+### Patch Changes
+
+- [#5833](https://github.com/tinacms/tinacms/pull/5833) [`5269d65`](https://github.com/tinacms/tinacms/commit/5269d6578d361c55326f39375eaa175707342d51) Thanks [@JackDevAU](https://github.com/JackDevAU)! - 🐛 FIX - Visual Editor Webpack HMR loading issue
+
+- [#5796](https://github.com/tinacms/tinacms/pull/5796) [`3026a2b`](https://github.com/tinacms/tinacms/commit/3026a2b492113a53c036e43d5d85837cea4a6de3) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Sidebar - display a warning if the user isn't on the latest version
+
+- [#5783](https://github.com/tinacms/tinacms/pull/5783) [`28a94a6`](https://github.com/tinacms/tinacms/commit/28a94a602186f48b528b91236007839e5d02a9de) Thanks [@JackDevAU](https://github.com/JackDevAU)! - ✨ Add a `StaticTinaMarkdown` component
+
 ## 2.7.9
 
 ### Patch Changes
