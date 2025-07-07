@@ -16,9 +16,11 @@ export function useTina<T extends object>(props: {
   );
 
   const processedData = React.useMemo(() => {
-    // We make a deep copy to avoid mutating the original props.data
-    const dataCopy = JSON.parse(JSON.stringify(props.data));
-    return addMetadata(id, dataCopy, []);
+    if (props.data) {
+      // We make a deep copy to avoid mutating the original props.data
+      const dataCopy = JSON.parse(JSON.stringify(props.data));
+      return addMetadata(id, dataCopy, []);
+    }
   }, [props.data, id]);
 
   const [data, setData] = React.useState(processedData);
@@ -203,15 +205,15 @@ export function useEditState(): { edit: boolean } {
  */
 export const tinaField = <
   T extends
-    | {
-        _content_source?: {
-          queryId: string;
-          path: (number | string)[];
-        };
-      }
-    | Record<string, unknown>
-    | null
-    | undefined,
+  | {
+    _content_source?: {
+      queryId: string;
+      path: (number | string)[];
+    };
+  }
+  | Record<string, unknown>
+  | null
+  | undefined,
 >(
   object: T,
   property?: keyof Omit<NonNullable<T>, '__typename' | '_sys'>,
