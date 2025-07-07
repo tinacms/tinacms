@@ -1750,7 +1750,6 @@ const _indexContent = async ({
         originalError: error,
         file: filepath,
         collection: collection?.name,
-        stack: error.stack,
       });
     }
   });
