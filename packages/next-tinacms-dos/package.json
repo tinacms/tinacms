@@ -43,7 +43,7 @@
 		"directory": "packages/next-tinacms-dos"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "^3.744.0",
-		"multer": "1.4.5-lts.1"
+		"@aws-sdk/client-s3": "catalog:",
+		"multer": "catalog:"
 	}
 }

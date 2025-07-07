@@ -44,7 +44,7 @@
 		"directory": "packages/next-tinacms-s3"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "^3.744.0",
-		"@aws-sdk/s3-request-presigner": "^3.744.0"
+		"@aws-sdk/client-s3": "catalog:",
+		"@aws-sdk/s3-request-presigner": "catalog:"
 	}
 }

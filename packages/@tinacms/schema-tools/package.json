@@ -25,12 +25,12 @@
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",
 		"@types/jest": "^29.5.14",
-		"@types/micromatch": "^4.0.9",
+		"@types/micromatch": "catalog:",
 		"@types/react": "^18.3.18",
 		"@types/yup": "^0.29.14",
-		"jest": "^29.7.0",
+		"jest": "catalog:",
 		"react": "^18.3.1",
-		"ts-jest": "^29.2.5",
+		"ts-jest": "catalog:",
 		"typescript": "^5.7.3",
 		"yup": "^0.32.11"
 	},
@@ -53,8 +53,8 @@
 		"directory": "packages/@tinacms/cli"
 	},
 	"dependencies": {
-		"picomatch-browser": "2.2.6",
-		"url-pattern": "^1.0.3",
+		"picomatch-browser": "catalog:",
+		"url-pattern": "catalog:",
 		"zod": "^3.24.2"
 	}
 }

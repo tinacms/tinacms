@@ -8,13 +8,11 @@
 		"build": "tinacms build && next build",
 		"start": "tinacms build && next start",
 		"export": "npm run build && next export",
-		"lint": "eslint . --ext .ts,.tsx",
-		"diff-tina-lock": "TINA_PUBLIC_IS_LOCAL=true tinacms-scripts diff-tina-lock",
-		"update-tina-lock": "TINA_PUBLIC_IS_LOCAL=true tinacms dev --no-server"
+		"lint": "eslint . --ext .ts,.tsx"
 	},
 	"dependencies": {
 		"@headlessui/react": "2.1.8",
-		"@octokit/rest": "^19.0.13",
+		"@octokit/rest": "catalog:",
 		"@tailwindcss/typography": "^0.5.16",
 		"@tinacms/datalayer": "workspace:*",
 		"date-fns": "^2.30.0",
@@ -29,18 +27,18 @@
 		"tinacms-gitprovider-github": "workspace:*"
 	},
 	"devDependencies": {
-		"@svgr/webpack": "^8.1.0",
+		"@svgr/webpack": "catalog:",
 		"@tinacms/cli": "workspace:*",
 		"@tinacms/scripts": "workspace:*",
 		"@types/node": "^22.13.1",
 		"@types/react": "^18.3.18",
-		"@typescript-eslint/eslint-plugin": "^5.62.0",
-		"@typescript-eslint/parser": "^5.62.0",
-		"autoprefixer": "^10.4.20",
+		"@typescript-eslint/eslint-plugin": "catalog:",
+		"@typescript-eslint/parser": "catalog:",
+		"autoprefixer": "catalog:",
 		"eslint": "^8.57.1",
 		"postcss": "^8.5.2",
-		"postcss-import": "^14.1.0",
-		"postcss-nesting": "^10.2.0",
+		"postcss-import": "catalog:",
+		"postcss-nesting": "catalog:",
 		"tailwindcss": "^3.4.17",
 		"typescript": "^5.7.3"
 	}

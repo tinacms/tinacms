@@ -1,20 +1,22 @@
+import React from 'react';
 import {
   Popover,
   PopoverButton,
   PopoverPanel,
   Transition,
 } from '@headlessui/react';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate';
-import { insertNodes } from '@udecode/plate-common';
-import React from 'react';
-import { Element } from 'slate';
-import { ReactEditor, useSelected } from 'slate-react';
 import { ELEMENT_MDX_INLINE } from '.';
-import { useTemplates } from '../../editor-context';
-import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { NestedForm } from '../../nested-form';
 import { classNames } from '../ui/helpers';
 import { EllipsisIcon } from '../ui/icons';
+import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
+import { useTemplates } from '../../editor-context';
+import {
+  ParagraphPlugin,
+  PlateEditor,
+  useSelected,
+} from '@udecode/plate/react';
+import { ElementApi } from '@udecode/plate';
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div';
@@ -29,26 +31,34 @@ const Wrapper = ({ inline, children }) => {
   );
 };
 
+interface InlineEmbedProps {
+  attributes: any;
+  children: any;
+  element: any;
+  onChange?: (value: any) => void;
+  editor: PlateEditor;
+}
+
 export const InlineEmbed = ({
   attributes,
   children,
   element,
   onChange,
   editor,
-}) => {
+}: InlineEmbedProps) => {
   const selected = useSelected();
   const { templates, fieldName } = useTemplates();
   const { handleClose, handleRemove, handleSelect, isExpanded } =
     useEmbedHandles(editor, element, fieldName);
   useHotkey('enter', () => {
-    insertNodes(editor, [
-      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
+    editor.tf.insertNodes([
+      { type: ParagraphPlugin.key, children: [{ text: '' }] },
     ]);
   });
   useHotkey('space', () => {
-    insertNodes(editor, [{ text: ' ' }], {
+    editor.tf.insertNodes([{ text: ' ' }], {
       match: (n) => {
-        if (Element.isElement(n) && n.type === ELEMENT_MDX_INLINE) {
+        if (ElementApi.isElement(n) && n.type === ELEMENT_MDX_INLINE) {
           return true;
         }
       },
@@ -114,8 +124,8 @@ export const BlockEmbed = ({
     useEmbedHandles(editor, element, fieldName);
 
   useHotkey('enter', () => {
-    insertNodes(editor, [
-      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
+    editor.tf.insertNodes([
+      { type: ParagraphPlugin.key, children: [{ text: '' }] },
     ]);
   });
 
@@ -178,7 +188,7 @@ const EmbedNestedForm = ({
   onClose,
   onChange,
 }) => {
-  const path = ReactEditor.findPath(editor, element);
+  const path = editor.findPath(element);
   const id = [...path, activeTemplate.name].join('.');
   return (
     <NestedForm

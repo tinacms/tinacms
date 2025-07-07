@@ -8,15 +8,15 @@
 		"start": "next start",
 		"lint": "next lint",
 		"searchindex": "tinacms search-index",
-		"diff-tina-lock": "tinacms-scripts diff-tina-lock",
 		"update-tina-lock": "tinacms dev --no-server"
 	},
 	"dependencies": {
-		"@octokit/rest": "^19.0.13",
+		"@octokit/rest": "catalog:",
 		"@tinacms/datalayer": "workspace:*",
 		"@tinacms/graphql": "workspace:*",
-		"dotenv": "^16.4.7",
-		"js-base64": "^3.7.7",
+		"dotenv": "catalog:",
+		"js-base64": "catalog:",
+		"mermaid": "^11.7.0",
 		"next": "^14.2.24",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
@@ -25,8 +25,8 @@
 		"typescript": "^5.7.3"
 	},
 	"devDependencies": {
-		"@tinacms/scripts": "workspace:*",
 		"@tinacms/cli": "workspace:*",
+		"@tinacms/scripts": "workspace:*",
 		"@types/node": "^22.13.1",
 		"eslint": "7"
 	},

@@ -1,25 +1,6 @@
 import React from 'react';
 
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
-import {
-  collapseSelection,
-  focusEditor,
-  getNodeEntries,
-  isBlock,
-  toggleNodeType,
-  useEditorRef,
-  useEditorState,
-  useEditorSelector,
-} from '@udecode/plate-common';
-import {
-  ELEMENT_H1,
-  ELEMENT_H2,
-  ELEMENT_H3,
-  ELEMENT_H4,
-  ELEMENT_H5,
-  ELEMENT_H6,
-} from '@udecode/plate-heading';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
 import { ToolbarButton } from './plate-ui/toolbar';
 import { helpers, unsupportedItemsInTable } from '../plugins/core/common';
 
@@ -32,62 +13,69 @@ import {
   useOpenState,
 } from './plate-ui/dropdown-menu';
 import { Icons } from './plate-ui/icons';
-import { ELEMENT_TABLE } from '@udecode/plate-table';
+import { HEADING_KEYS } from '@udecode/plate-heading';
+import { TablePlugin } from '@udecode/plate-table/react';
+import {
+  ParagraphPlugin,
+  useEditorRef,
+  useEditorSelector,
+  useEditorState,
+} from '@udecode/plate/react';
 
 const items = [
   {
     description: 'Paragraph',
     icon: Icons.heading,
     label: 'Paragraph',
-    value: ELEMENT_PARAGRAPH,
+    value: ParagraphPlugin.key,
   },
   {
     description: 'Heading 1',
     icon: Icons.h1,
     label: 'Heading 1',
-    value: ELEMENT_H1,
+    value: HEADING_KEYS.h1,
   },
   {
     description: 'Heading 2',
     icon: Icons.h2,
     label: 'Heading 2',
-    value: ELEMENT_H2,
+    value: HEADING_KEYS.h2,
   },
   {
     description: 'Heading 3',
     icon: Icons.h3,
     label: 'Heading 3',
-    value: ELEMENT_H3,
+    value: HEADING_KEYS.h3,
   },
   {
     description: 'Heading 4',
     icon: Icons.h4,
     label: 'Heading 4',
-    value: ELEMENT_H4,
+    value: HEADING_KEYS.h4,
   },
   {
     description: 'Heading 5',
     icon: Icons.h5,
     label: 'Heading 5',
-    value: ELEMENT_H5,
+    value: HEADING_KEYS.h5,
   },
   {
     description: 'Heading 6',
     icon: Icons.h6,
     label: 'Heading 6',
-    value: ELEMENT_H6,
+    value: HEADING_KEYS.h6,
   },
 ];
 
 const defaultItem =
-  items.find((item) => item.value === ELEMENT_PARAGRAPH) || items[0];
+  items.find((item) => item.value === ParagraphPlugin.key) || items[0];
 
 export function HeadingsMenu(props: DropdownMenuProps) {
   const value: string = useEditorSelector((editor) => {
-    let initialNodeType: string = ELEMENT_PARAGRAPH;
+    let initialNodeType: string = ParagraphPlugin.key;
     let allNodesMatchInitialNodeType = false;
-    const codeBlockEntries = getNodeEntries(editor, {
-      match: (n) => isBlock(editor, n),
+    const codeBlockEntries = editor.api.nodes({
+      match: (n) => editor.api.isBlock(n),
       mode: 'highest',
     });
     const nodes = Array.from(codeBlockEntries);
@@ -95,68 +83,70 @@ export function HeadingsMenu(props: DropdownMenuProps) {
     if (nodes.length > 0) {
       initialNodeType = nodes[0][0].type as string;
       allNodesMatchInitialNodeType = nodes.every(([node]) => {
-        const type: string = (node?.type as string) || ELEMENT_PARAGRAPH;
+        const type: string = (node?.type as string) || ParagraphPlugin.key;
 
         return type === initialNodeType;
       });
     }
 
-    return allNodesMatchInitialNodeType ? initialNodeType : ELEMENT_PARAGRAPH;
+    return allNodesMatchInitialNodeType ? initialNodeType : ParagraphPlugin.key;
   }, []);
 
   const editor = useEditorRef();
   const editorState = useEditorState();
   const openState = useOpenState();
 
-  const userInTable = helpers.isNodeActive(editorState, ELEMENT_TABLE);
+  const userInTable = helpers.isNodeActive(editorState, TablePlugin.key);
 
   const selectedItem =
     items.find((item) => item.value === value) ?? defaultItem;
   const { icon: SelectedItemIcon, label: selectedItemLabel } = selectedItem;
 
   return (
-    <DropdownMenu modal={false} {...openState} {...props}>
-      <DropdownMenuTrigger asChild>
-        <ToolbarButton
-          showArrow
-          isDropdown
-          pressed={openState.open}
-          tooltip='Headings'
-        >
-          <SelectedItemIcon className='size-5' />
-          <span className='@md/toolbar:flex hidden'>{selectedItemLabel}</span>
-        </ToolbarButton>
-      </DropdownMenuTrigger>
+    <div className='rounded-md'>
+      <DropdownMenu modal={false} {...openState} {...props}>
+        <DropdownMenuTrigger asChild>
+          <ToolbarButton
+            showArrow
+            isDropdown
+            pressed={openState.open}
+            tooltip='Headings'
+          >
+            <SelectedItemIcon className='size-5' />
+            <span className='@md/toolbar:flex hidden'>{selectedItemLabel}</span>
+          </ToolbarButton>
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent align='start' className='min-w-0'>
-        <DropdownMenuRadioGroup
-          className='flex flex-col gap-0.5'
-          onValueChange={(type) => {
-            toggleNodeType(editor, { activeType: type });
-            collapseSelection(editor);
-            focusEditor(editor);
-          }}
-          value={value}
-        >
-          {items
-            .filter((item) => {
-              if (userInTable) {
-                return !unsupportedItemsInTable.has(item.label);
-              }
-              return true;
-            })
-            .map(({ icon: Icon, label, value: itemValue }) => (
-              <DropdownMenuRadioItem
-                className='min-w-[180px]'
-                key={itemValue}
-                value={itemValue}
-              >
-                <Icon className='mr-2 size-5' />
-                {label}
-              </DropdownMenuRadioItem>
-            ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <DropdownMenuContent align='start' className='min-w-0 rounded-md'>
+          <DropdownMenuRadioGroup
+            className='flex flex-col gap-0.5'
+            onValueChange={(type) => {
+              editor.tf.toggleBlock(type);
+              editor.tf.collapse();
+              editor.tf.focus();
+            }}
+            value={value}
+          >
+            {items
+              .filter((item) => {
+                if (userInTable) {
+                  return !unsupportedItemsInTable.has(item.label);
+                }
+                return true;
+              })
+              .map(({ icon: Icon, label, value: itemValue }) => (
+                <DropdownMenuRadioItem
+                  className='min-w-[180px]'
+                  key={itemValue}
+                  value={itemValue}
+                >
+                  <Icon className='mr-2 size-5' />
+                  {label}
+                </DropdownMenuRadioItem>
+              ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

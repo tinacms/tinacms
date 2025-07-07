@@ -21,8 +21,8 @@
 		"build": "tinacms-scripts build"
 	},
 	"dependencies": {
-		"@octokit/rest": "^19.0.13",
-		"js-base64": "^3.7.7",
+		"@octokit/rest": "catalog:",
+		"js-base64": "catalog:",
 		"typescript": "^5.7.3"
 	},
 	"devDependencies": {
