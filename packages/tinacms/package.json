@@ -1,6 +1,6 @@
 {
 	"name": "tinacms",
-	"version": "2.7.9",
+	"version": "2.7.10",
 	"main": "dist/index.js",
 	"module": "./dist/index.mjs",
 	"exports": {
@@ -29,7 +29,7 @@
 			"import": "./dist/rich-text/index.mjs",
 			"require": "./dist/rich-text/index.js"
 		},
-        "./dist/rich-text/static": {
+		"./dist/rich-text/static": {
 			"types": "./dist/rich-text/static.d.ts",
 			"import": "./dist/rich-text/static.mjs",
 			"require": "./dist/rich-text/static.js"
@@ -47,7 +47,7 @@
 		"entryPoints": [
 			"src/index.ts",
 			"src/rich-text/index.tsx",
-            "src/rich-text/static.tsx",
+			"src/rich-text/static.tsx",
 			"src/rich-text/prism.tsx",
 			"src/react.tsx",
 			"src/client.ts"

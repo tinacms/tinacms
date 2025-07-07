@@ -1,5 +1,12 @@
 # tinacms-clerk
 
+## 10.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`5269d65`](https://github.com/tinacms/tinacms/commit/5269d6578d361c55326f39375eaa175707342d51), [`3026a2b`](https://github.com/tinacms/tinacms/commit/3026a2b492113a53c036e43d5d85837cea4a6de3), [`28a94a6`](https://github.com/tinacms/tinacms/commit/28a94a602186f48b528b91236007839e5d02a9de)]:
+  - tinacms@2.7.10
+
 ## 10.0.9
 
 ### Patch Changes
