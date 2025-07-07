@@ -1,5 +1,21 @@
 # tinacms-cli
 
+## 1.10.0
+
+### Minor Changes
+
+- [#5744](https://github.com/tinacms/tinacms/pull/5744) [`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be) Thanks [@Ben0189](https://github.com/Ben0189)! - Upgrade Plate editor to v48 beta, integrating latest features and improvements.
+
+### Patch Changes
+
+- Updated dependencies [[`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be)]:
+  - @tinacms/schema-tools@1.9.0
+  - @tinacms/graphql@1.6.0
+  - @tinacms/metrics@1.1.0
+  - @tinacms/search@1.1.0
+  - @tinacms/app@2.3.0
+  - tinacms@2.8.0
+
 ## 1.9.10
 
 ### Patch Changes
