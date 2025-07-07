@@ -6,7 +6,7 @@ import { Form as FinalForm } from 'react-final-form';
 import type { TinaSchema } from '@tinacms/schema-tools';
 import { formatBranchName } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
-import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, type DropResult } from '../fields/plugins/dnd-kit-wrapper';
 import { BiGitBranch } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';
 import { MdOutlineSaveAlt } from 'react-icons/md';

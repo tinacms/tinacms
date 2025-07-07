@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Field, Form } from '@toolkit/forms';
 import { FieldsBuilder } from '@toolkit/form-builder';
 import { IconButton } from '@toolkit/styles';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Droppable, Draggable, SortableProvider } from './dnd-kit-wrapper';
 import { AddIcon } from '@toolkit/icons';
 import {
   DragHandle,
@@ -100,19 +100,21 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
             {(provider) => (
               <div ref={provider.innerRef}>
                 {items.length === 0 && <EmptyList />}
-                {items.map((item: any, index: any) => (
-                  <Item
-                    // NOTE: Supressing warnings, but not helping with render perf
-                    key={index}
-                    tinaForm={tinaForm}
-                    field={field}
-                    item={item}
-                    index={index}
-                    isMin={isMin}
-                    fixedLength={fixedLength}
-                    {...itemProps(item)}
-                  />
-                ))}
+                <SortableProvider items={items.map((_, index) => `${field.name}.${index}`)}>
+                  {items.map((item: any, index: any) => (
+                    <Item
+                      // NOTE: Supressing warnings, but not helping with render perf
+                      key={index}
+                      tinaForm={tinaForm}
+                      field={field}
+                      item={item}
+                      index={index}
+                      isMin={isMin}
+                      fixedLength={fixedLength}
+                      {...itemProps(item)}
+                    />
+                  ))}
+                </SortableProvider>
                 {provider.placeholder}
               </div>
             )}
