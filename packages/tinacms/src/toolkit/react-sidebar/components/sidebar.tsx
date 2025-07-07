@@ -1,5 +1,4 @@
 import { Transition, TransitionChild } from '@headlessui/react';
-import { ProgressIndicatorTest } from '@toolkit/form-builder/ProgressIndicatorTest';
 import {
   BranchButton,
   BranchPreviewButton,
@@ -506,11 +505,6 @@ const SidebarWrapper = ({ children }) => {
         displayState === 'closed' ? 'pointer-events-none' : ''
       }`}
     >
-      <div
-        style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 10000 }}
-      >
-        <ProgressIndicatorTest />
-      </div>
       <div
         className={`relative h-dvh transform flex ${
           displayState !== 'closed' ? '' : '-translate-x-full'

@@ -27,6 +27,7 @@ import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
+import { ProgressBar } from './ProgressBar';
 import { ResetForm } from './reset-form';
 
 export interface FormBuilderProps {
@@ -366,10 +367,9 @@ export const CreateBranchModal = ({
 
   const steps = [
     { id: 1, name: 'Creating branch', description: 'Setting up your workspace' },
-    { id: 2, name: 'Indexing branch', description: 'Processing and organizing' },
-    { id: 3, name: 'Saving content', description: 'Storing your changes' },
-    { id: 4, name: 'Creating pull request', description: 'Preparing for review' },
-    { id: 5, name: 'Complete', description: 'Ready for review' }
+    { id: 2, name: 'Saving content', description: 'Storing your changes' },
+    { id: 3, name: 'Creating pull request', description: 'Preparing for review' },
+    { id: 4, name: 'Complete', description: 'Ready for review' }
   ];
 
   const executeEditorialWorkflow = async () => {
@@ -410,14 +410,12 @@ export const CreateBranchModal = ({
           setStatusMessage(message);
           
           // Update step based on status message
-          if (message.toLowerCase().includes('branch') && !message.toLowerCase().includes('index')) {
+          if (message.toLowerCase().includes('branch') && !message.toLowerCase().includes('pull')) {
             setCurrentStep(1);
-          } else if (message.toLowerCase().includes('index') || message.toLowerCase().includes('processing')) {
-            setCurrentStep(2);
           } else if (message.toLowerCase().includes('content') || message.toLowerCase().includes('saving')) {
-            setCurrentStep(3);
+            setCurrentStep(2);
           } else if (message.toLowerCase().includes('pull request') || message.toLowerCase().includes('pr')) {
-            setCurrentStep(4);
+            setCurrentStep(3);
           }
         },
       });
@@ -426,7 +424,7 @@ export const CreateBranchModal = ({
         throw new Error('Branch creation failed.');
       }
 
-      setCurrentStep(5);
+      setCurrentStep(4);
       setStatusMessage('Workflow completed successfully!');
       setCurrentBranch(result.branchName);
 
@@ -458,9 +456,9 @@ export const CreateBranchModal = ({
     return (
       <div className='py-6'>
         {/* Step indicators - Responsive layout */}
-        <div className='mb-6'>
+        <div className='mb-8'>
           {/* Mobile: Vertical layout */}
-          <div className='block sm:hidden space-y-3'>
+          <div className='block sm:hidden space-y-8'>
             {steps.map((step, index) => {
               const stepNumber = index + 1;
               const isActive = stepNumber === currentStep;
@@ -493,14 +491,14 @@ export const CreateBranchModal = ({
           </div>
           
           {/* Desktop: Horizontal layout */}
-          <div className='hidden sm:flex justify-between items-center'>
+          <div className='hidden sm:flex justify-between items-center gap-4'>
             {steps.map((step, index) => {
               const stepNumber = index + 1;
               const isActive = stepNumber === currentStep;
               const isCompleted = stepNumber < currentStep;
               
               return (
-                <div key={step.id} className='flex flex-col items-center flex-1 max-w-32'>
+                <div key={step.id} className='flex flex-col items-center flex-1 px-2 max-w-32'>
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-3 ${
                     isCompleted 
                       ? 'bg-green-500 text-white' 
@@ -511,12 +509,12 @@ export const CreateBranchModal = ({
                     {isCompleted ? '✓' : stepNumber}
                   </div>
                   <div className='text-center'>
-                    <div className={`text-xs font-medium leading-tight ${
+                    <div className={`text-xs font-medium leading-tight whitespace-nowrap ${
                       isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
                     }`}>
                       {step.name}
                     </div>
-                    <div className='text-xs text-gray-500 mt-1 leading-tight'>
+                    <div className='text-xs text-gray-500 mt-1 leading-tight whitespace-nowrap'>
                       {step.description}
                     </div>
                   </div>
@@ -527,12 +525,7 @@ export const CreateBranchModal = ({
         </div>
         
         {/* Progress bar */}
-        <div className='w-full bg-gray-200 rounded-full h-2 mb-6'>
-          <div 
-            className='bg-blue-500 h-2 rounded-full transition-all duration-300 ease-out'
-            style={{ width: `${progressPercentage}%` }}
-          />
-        </div>
+        <ProgressBar progress={progressPercentage} className='mb-6' />
         
         {/* Current status message */}
         <div className='text-center'>
