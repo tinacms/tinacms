@@ -1,6 +1,6 @@
 {
 	"name": "tinacms-gitprovider-github",
-	"version": "2.0.19",
+	"version": "3.0.0",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"files": [
