@@ -674,7 +674,6 @@ export class Database {
         originalError: error,
         file: filepath,
         collection: collectionName,
-        stack: error.stack,
       });
     }
   };
@@ -1191,7 +1190,6 @@ export class Database {
                 originalError: error,
                 file: path,
                 collection: collection.name,
-                stack: error.stack,
               });
             }
             // I dont think this should ever happen
