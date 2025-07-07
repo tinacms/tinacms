@@ -1,11 +1,10 @@
 import React, { ReactNode, useState } from 'react';
 import { TinaCloudProvider } from './auth';
 
-import { LocalClient } from './internalClient/index';
-import { useDocumentCreatorPlugin } from './hooks/use-content-creator';
 import { parseURL } from '@tinacms/schema-tools';
+import { useDocumentCreatorPlugin } from './hooks/use-content-creator';
+import { LocalClient } from './internalClient/index';
 import type { TinaCMSProviderDefaultProps } from './types/cms';
-import { ProgressIndicatorTest } from '@toolkit/form-builder/ProgressIndicatorTest';
 
 const errorButtonStyles = {
   background: '#eb6337',
@@ -181,10 +180,6 @@ export const TinaCMSProvider2 = ({
 
   return (
     <>
-    {/* Progress Indicator Test Component - Always visible for development */}
-    <div style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 10000 }}>
-        <ProgressIndicatorTest />
-      </div>  
       <TinaCloudProvider
         branch={branch}
         clientId={clientId || schema?.config?.clientId}

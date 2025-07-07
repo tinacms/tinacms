@@ -1,4 +1,5 @@
 import { Transition, TransitionChild } from '@headlessui/react';
+import { ProgressIndicatorTest } from '@toolkit/form-builder/ProgressIndicatorTest';
 import {
   BranchButton,
   BranchPreviewButton,
@@ -18,7 +19,6 @@ import { BillingWarning, LocalWarning } from './local-warning';
 import { Nav } from './nav';
 import { ResizeHandle } from './resize-handle';
 import { FormsView } from './sidebar-body';
-
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
 export const minSidebarWidth = 360;
@@ -506,6 +506,11 @@ const SidebarWrapper = ({ children }) => {
         displayState === 'closed' ? 'pointer-events-none' : ''
       }`}
     >
+      <div
+        style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 10000 }}
+      >
+        <ProgressIndicatorTest />
+      </div>
       <div
         className={`relative h-dvh transform flex ${
           displayState !== 'closed' ? '' : '-translate-x-full'
