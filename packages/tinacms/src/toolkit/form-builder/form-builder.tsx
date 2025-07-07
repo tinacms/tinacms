@@ -361,14 +361,24 @@ export const CreateBranchModal = ({
   const [newBranchName, setNewBranchName] = React.useState('');
   const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [currentStep, setCurrentStep] = React.useState(0);
   const [statusMessage, setStatusMessage] = React.useState('');
+
+  const steps = [
+    { id: 1, name: 'Creating branch', description: 'Setting up your workspace' },
+    { id: 2, name: 'Indexing branch', description: 'Processing and organizing' },
+    { id: 3, name: 'Saving content', description: 'Storing your changes' },
+    { id: 4, name: 'Creating pull request', description: 'Preparing for review' },
+    { id: 5, name: 'Complete', description: 'Ready for review' }
+  ];
 
   const executeEditorialWorkflow = async () => {
     try {
       const branchName = `tina/${newBranchName}`;
-      setStatusMessage('Initializing workflow...');
       setDisabled(true);
       setIsExecuting(true);
+      setCurrentStep(1);
+      setStatusMessage('Initializing workflow...');
 
       let graphql = '';
       if (crudType === 'create') {
@@ -380,7 +390,6 @@ export const CreateBranchModal = ({
       }
 
       const collection = tinaApi.schema.getCollectionByFullPath(path);
-
       const params = tinaApi.schema.transformPayload(collection.name, values);
       const relativePath = pathRelativeToCollection(collection.path, path);
 
@@ -397,7 +406,19 @@ export const CreateBranchModal = ({
           },
         },
         onStatusUpdate: (status) => {
-          setStatusMessage(status.message || `Status: ${status.status}`);
+          const message = status.message || `Status: ${status.status}`;
+          setStatusMessage(message);
+          
+          // Update step based on status message
+          if (message.toLowerCase().includes('branch') && !message.toLowerCase().includes('index')) {
+            setCurrentStep(1);
+          } else if (message.toLowerCase().includes('index') || message.toLowerCase().includes('processing')) {
+            setCurrentStep(2);
+          } else if (message.toLowerCase().includes('content') || message.toLowerCase().includes('saving')) {
+            setCurrentStep(3);
+          } else if (message.toLowerCase().includes('pull request') || message.toLowerCase().includes('pr')) {
+            setCurrentStep(4);
+          }
         },
       });
 
@@ -405,6 +426,8 @@ export const CreateBranchModal = ({
         throw new Error('Branch creation failed.');
       }
 
+      setCurrentStep(5);
+      setStatusMessage('Workflow completed successfully!');
       setCurrentBranch(result.branchName);
 
       cms.alerts.success('Branch created and content saved.');
@@ -412,7 +435,10 @@ export const CreateBranchModal = ({
         cms.alerts.success('Pull request created.');
       }
 
-      close();
+      // Brief delay to show completion state
+      setTimeout(() => {
+        close();
+      }, 1000);
     } catch (e) {
       console.error(e);
       const errorMessage =
@@ -422,17 +448,114 @@ export const CreateBranchModal = ({
       setErrorMessage(errorMessage);
       setDisabled(false);
       setIsExecuting(false);
+      setCurrentStep(0);
     }
+  };
+
+  const renderProgressIndicator = () => {
+    const progressPercentage = (currentStep / steps.length) * 100;
+    
+    return (
+      <div className='py-6'>
+        {/* Step indicators - Responsive layout */}
+        <div className='mb-6'>
+          {/* Mobile: Vertical layout */}
+          <div className='block sm:hidden space-y-3'>
+            {steps.map((step, index) => {
+              const stepNumber = index + 1;
+              const isActive = stepNumber === currentStep;
+              const isCompleted = stepNumber < currentStep;
+              
+              return (
+                <div key={step.id} className='flex items-center gap-3'>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 ${
+                    isCompleted 
+                      ? 'bg-green-500 text-white' 
+                      : isActive 
+                        ? 'bg-blue-500 text-white' 
+                        : 'bg-gray-200 text-gray-600'
+                  }`}>
+                    {isCompleted ? '✓' : stepNumber}
+                  </div>
+                  <div className='flex-1 min-w-0'>
+                    <div className={`text-sm font-medium leading-tight ${
+                      isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
+                    }`}>
+                      {step.name}
+                    </div>
+                    <div className='text-sm text-gray-500 mt-1 leading-tight'>
+                      {step.description}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Desktop: Horizontal layout */}
+          <div className='hidden sm:flex justify-between items-center'>
+            {steps.map((step, index) => {
+              const stepNumber = index + 1;
+              const isActive = stepNumber === currentStep;
+              const isCompleted = stepNumber < currentStep;
+              
+              return (
+                <div key={step.id} className='flex flex-col items-center flex-1 max-w-32'>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-3 ${
+                    isCompleted 
+                      ? 'bg-green-500 text-white' 
+                      : isActive 
+                        ? 'bg-blue-500 text-white' 
+                        : 'bg-gray-200 text-gray-600'
+                  }`}>
+                    {isCompleted ? '✓' : stepNumber}
+                  </div>
+                  <div className='text-center'>
+                    <div className={`text-xs font-medium leading-tight ${
+                      isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
+                    }`}>
+                      {step.name}
+                    </div>
+                    <div className='text-xs text-gray-500 mt-1 leading-tight'>
+                      {step.description}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        
+        {/* Progress bar */}
+        <div className='w-full bg-gray-200 rounded-full h-2 mb-6'>
+          <div 
+            className='bg-blue-500 h-2 rounded-full transition-all duration-300 ease-out'
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
+        
+        {/* Current status message */}
+        <div className='text-center'>
+          <div className='flex items-center justify-center gap-2 mb-2'>
+            {currentStep < steps.length && (
+              <BiLoaderAlt className='opacity-70 text-blue-400 animate-spin w-4 h-4' />
+            )}
+            <span className='text-sm font-medium text-gray-700'>
+              {currentStep === steps.length ? 'Complete!' : `Step ${currentStep} of ${steps.length}`}
+            </span>
+          </div>
+          <p className='text-sm text-gray-600 leading-relaxed'>{statusMessage}</p>
+          {currentStep > 0 && currentStep < steps.length && (
+            <p className='text-xs text-gray-500 mt-2'>This usually takes 1-2 minutes</p>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const renderStateContent = () => {
     if (isExecuting) {
-      return (
-        <div className='flex flex-col items-center gap-4 py-6'>
-          <BiLoaderAlt className='opacity-70 text-blue-400 animate-spin w-10 h-auto' />
-          <p>{statusMessage || 'Executing editorial workflow...'}</p>
-        </div>
-      );
+      return renderProgressIndicator();
     } else {
       return (
         <>
