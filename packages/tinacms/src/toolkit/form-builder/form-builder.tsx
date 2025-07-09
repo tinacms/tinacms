@@ -23,12 +23,13 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
-import { ProgressBar } from './ProgressBar';
+import { ProgressBar } from '../components/ProgressBar';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
+import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -450,19 +451,23 @@ export const CreateBranchModal = ({
           const message = status.message || `Status: ${status.status}`;
           setStatusMessage(message);
 
-          // Update step based on status message
-          if (
-            message.toLowerCase().includes('branch') &&
-            !message.toLowerCase().includes('indexing')
-          ) {
-            setCurrentStep(1);
-          } else if (
-            message.toLowerCase().includes('indexing') &&
-            !message.toLowerCase().includes('content')
-          ) {
-            setCurrentStep(2);
-          } else if (message.toLowerCase().includes('content')) {
-            setCurrentStep(3);
+          switch (status.status) {
+            case EDITORIAL_WORKFLOW_STATUS.SETTING_UP:
+            case EDITORIAL_WORKFLOW_STATUS.CREATING_BRANCH:
+              setCurrentStep(1);
+              break;
+            case EDITORIAL_WORKFLOW_STATUS.INDEXING:
+              setCurrentStep(2);
+              break;
+            case EDITORIAL_WORKFLOW_STATUS.CONTENT_GENERATION:
+              setCurrentStep(3);
+              break;
+            case EDITORIAL_WORKFLOW_STATUS.CREATING_PR:
+              setCurrentStep(4);
+              break;
+            case EDITORIAL_WORKFLOW_STATUS.COMPLETE:
+              setCurrentStep(5);
+              break;
           }
         },
       });
