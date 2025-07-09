@@ -2,10 +2,8 @@ import { useCMS } from '@toolkit/react-tinacms';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { Check, LoaderCircle, TriangleAlert } from 'lucide-react';
 import React from 'react';
-// import { version as currentVersion } from '../../../../package.json';
+import { version as currentVersion } from '../../../../package.json';
 import { LatestVersionResponse } from '../../../internalClient';
-
-const currentVersion = '1.0';
 
 export const VersionInfo = () => {
   const cms = useCMS();
