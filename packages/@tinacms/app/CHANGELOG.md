@@ -1,5 +1,12 @@
 # @tinacms/app
 
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`41359ed`](https://github.com/tinacms/tinacms/commit/41359edaf08def7a5e26969ec114155038c09752), [`41359ed`](https://github.com/tinacms/tinacms/commit/41359edaf08def7a5e26969ec114155038c09752)]:
+  - tinacms@2.8.1
+
 ## 2.3.0
 
 ### Minor Changes

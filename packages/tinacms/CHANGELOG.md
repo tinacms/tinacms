@@ -1,5 +1,13 @@
 # tinacms
 
+## 2.8.1
+
+### Patch Changes
+
+- [#5842](https://github.com/tinacms/tinacms/pull/5842) [`41359ed`](https://github.com/tinacms/tinacms/commit/41359edaf08def7a5e26969ec114155038c09752) Thanks [@wicksipedia](https://github.com/wicksipedia)! - VersionInfo - fix version info
+
+- [#5842](https://github.com/tinacms/tinacms/pull/5842) [`41359ed`](https://github.com/tinacms/tinacms/commit/41359edaf08def7a5e26969ec114155038c09752) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Sidebar - fixed version number being reported in UI
+
 ## 2.8.0
 
 ### Minor Changes
