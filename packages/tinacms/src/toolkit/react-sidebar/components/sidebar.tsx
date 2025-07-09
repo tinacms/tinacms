@@ -18,6 +18,10 @@ import { BillingWarning, LocalWarning } from './local-warning';
 import { Nav } from './nav';
 import { ResizeHandle } from './resize-handle';
 import { FormsView } from './sidebar-body';
+
+// TODO: REMOVE - Temporary import for testing CreateBranchModal
+import { CreateBranchModal } from '../../form-builder/form-builder';
+
 export const SidebarContext = React.createContext<any>(null);
 export const minPreviewWidth = 440;
 export const minSidebarWidth = 360;
@@ -127,6 +131,11 @@ const Sidebar = ({
   const setDisplayState = (value: 'closed' | 'fullscreen' | 'open') =>
     cms.dispatch({ type: 'sidebar:set-display-state', value: value });
   const displayState = cms.state.sidebarDisplayState;
+
+  // TODO: REMOVE - Temporary state for testing CreateBranchModal
+  const [showTestModal, setShowTestModal] = React.useState(true);
+  const [testModalInProgress, setTestModalInProgress] = React.useState(true);
+  const [useTestMode, setUseTestMode] = React.useState(true); // Toggle between test and normal mode
 
   /* Set sidebar open state and width to local values if available */
   React.useEffect(() => {
@@ -239,6 +248,162 @@ const Sidebar = ({
       }}
     >
       <>
+        {/* TODO: REMOVE - Temporary development section for testing CreateBranchModal */}
+        {showTestModal && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              zIndex: 9999,
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: 'white',
+                padding: '20px',
+                borderRadius: '8px',
+                minWidth: '400px',
+                maxWidth: '500px',
+              }}
+            >
+              <h3 style={{ margin: '0 0 15px 0' }}>
+                CreateBranchModal Testing
+              </h3>
+              <div style={{ marginBottom: '15px' }}>
+                <p
+                  style={{
+                    margin: '0 0 10px 0',
+                    fontSize: '14px',
+                    color: '#666',
+                  }}
+                >
+                  Toggle between normal implementation and test mode to see
+                  progress immediately
+                </p>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '10px',
+                  marginBottom: '15px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <button
+                  onClick={() => setTestModalInProgress(!testModalInProgress)}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: testModalInProgress
+                      ? '#dc3545'
+                      : '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
+                  {testModalInProgress ? 'Hide Modal' : 'Show Modal'}
+                </button>
+                <button
+                  onClick={() => setUseTestMode(!useTestMode)}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: useTestMode ? '#ffc107' : '#007bff',
+                    color: useTestMode ? '#000' : 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
+                  {useTestMode ? 'Test Mode ON' : 'Test Mode OFF'}
+                </button>
+              </div>
+              <div style={{ marginBottom: '15px' }}>
+                <p
+                  style={{
+                    margin: '0 0 5px 0',
+                    fontSize: '12px',
+                    color: '#666',
+                  }}
+                >
+                  <strong>Current Mode:</strong>{' '}
+                  {useTestMode
+                    ? 'Test Mode (isExecuting: true)'
+                    : 'Normal Mode (isExecuting: false)'}
+                </p>
+                <ul
+                  style={{
+                    margin: '0',
+                    padding: '0 0 0 20px',
+                    fontSize: '12px',
+                    color: '#666',
+                  }}
+                >
+                  <li>
+                    <strong>Test Mode:</strong> Shows progress state immediately
+                  </li>
+                  <li>
+                    <strong>Normal Mode:</strong> Shows form first, then
+                    progress after submit
+                  </li>
+                  <li>
+                    Steps: Creating branch → Indexing branch → Creating PR
+                  </li>
+                </ul>
+              </div>
+              <button
+                onClick={() => setShowTestModal(false)}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                Close Test Panel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* TODO: REMOVE - Temporary CreateBranchModal for testing */}
+        {testModalInProgress && (
+          <CreateBranchModal
+            safeSubmit={async () => {
+              console.log(
+                '🔄 Mock safeSubmit called - simulating async operation'
+              );
+              await new Promise((resolve) => setTimeout(resolve, 1500));
+              console.log('✅ Mock safeSubmit completed');
+            }}
+            close={() => {
+              console.log('❌ Mock close called - modal should close');
+              setTestModalInProgress(false);
+            }}
+            path='content/pages/test-page.md'
+            values={{
+              title: 'Test Page for CreateBranchModal',
+              body: 'This is test content to simulate a real document being saved.',
+              slug: 'test-page-modal',
+              date: new Date().toISOString(),
+            }}
+            crudType='update'
+            testMode={useTestMode}
+          />
+        )}
+
         <SidebarWrapper>
           <EditButton />
           <SidebarBody>
@@ -376,6 +541,8 @@ const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
             <button
               className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleMenu}
+              title='Open navigation menu'
+              aria-label='Open navigation menu'
             >
               <BiMenu className='h-6 w-auto text-gray-600' />
             </button>
@@ -393,6 +560,8 @@ const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
             <button
               className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleSidebarOpen}
+              title='Close sidebar'
+              aria-label='Close sidebar'
             >
               <PiSidebarSimpleLight className='h-6 w-auto text-gray-600' />
             </button>

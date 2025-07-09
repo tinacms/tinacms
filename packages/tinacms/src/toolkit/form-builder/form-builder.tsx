@@ -23,11 +23,11 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
+import { ProgressBar } from './ProgressBar';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
-import { ProgressBar } from './ProgressBar';
 import { ResetForm } from './reset-form';
 
 export interface FormBuilderProps {
@@ -348,28 +348,69 @@ export const CreateBranchModal = ({
   path,
   values,
   crudType,
+  testMode = false,
 }: {
   safeSubmit: () => Promise<void>;
   close: () => void;
   path: string;
   values: Record<string, unknown>;
   crudType: string;
+  testMode?: boolean;
 }) => {
   const cms = useCMS();
   const tinaApi = cms.api.tina;
   const { setCurrentBranch } = useBranchData();
   const [disabled, setDisabled] = React.useState(false);
   const [newBranchName, setNewBranchName] = React.useState('');
-  const [isExecuting, setIsExecuting] = React.useState(false);
+  const [isExecuting, setIsExecuting] = React.useState(testMode);
   const [errorMessage, setErrorMessage] = React.useState('');
-  const [currentStep, setCurrentStep] = React.useState(0);
-  const [statusMessage, setStatusMessage] = React.useState('');
+  // TODO: REMOVE - Start with step 1 in test mode to show progress immediately
+  const [currentStep, setCurrentStep] = React.useState(testMode ? 4 : 0);
+  // TODO: REMOVE - Set initial status message for test mode
+  const [statusMessage, setStatusMessage] = React.useState(
+    testMode ? 'Testing progress state...' : ''
+  );
+  // TODO: REMOVE - Add timer for progress tracking
+  const [elapsedTime, setElapsedTime] = React.useState(0);
+
+  // TODO: REMOVE - Timer effect for tracking elapsed time during progress
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isExecuting && currentStep > 0) {
+      interval = setInterval(() => {
+        setElapsedTime((prev) => prev + 1);
+      }, 1000);
+    } else {
+      setElapsedTime(0);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isExecuting, currentStep]);
+
+  // Helper function to format time as MM:SS
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const steps = [
-    { id: 1, name: 'Creating branch', description: 'Setting up your workspace' },
-    { id: 2, name: 'Saving content', description: 'Storing your changes' },
-    { id: 3, name: 'Creating pull request', description: 'Preparing for review' },
-    { id: 4, name: 'Complete', description: 'Ready for review' }
+    {
+      id: 1,
+      name: 'Creating branch',
+      description: 'Setting up workspace',
+    },
+    {
+      id: 2,
+      name: 'Indexing branch',
+      description: 'Indexing your branch',
+    },
+    {
+      id: 3,
+      name: 'Creating pull request',
+      description: 'Preparing for review',
+    },
   ];
 
   const executeEditorialWorkflow = async () => {
@@ -408,13 +449,19 @@ export const CreateBranchModal = ({
         onStatusUpdate: (status) => {
           const message = status.message || `Status: ${status.status}`;
           setStatusMessage(message);
-          
+
           // Update step based on status message
-          if (message.toLowerCase().includes('branch') && !message.toLowerCase().includes('pull')) {
+          if (
+            message.toLowerCase().includes('branch') &&
+            !message.toLowerCase().includes('indexing')
+          ) {
             setCurrentStep(1);
-          } else if (message.toLowerCase().includes('content') || message.toLowerCase().includes('saving')) {
+          } else if (
+            message.toLowerCase().includes('indexing') &&
+            !message.toLowerCase().includes('content')
+          ) {
             setCurrentStep(2);
-          } else if (message.toLowerCase().includes('pull request') || message.toLowerCase().includes('pr')) {
+          } else if (message.toLowerCase().includes('content')) {
             setCurrentStep(3);
           }
         },
@@ -424,14 +471,13 @@ export const CreateBranchModal = ({
         throw new Error('Branch creation failed.');
       }
 
-      setCurrentStep(4);
       setStatusMessage('Workflow completed successfully!');
       setCurrentBranch(result.branchName);
 
-      cms.alerts.success('Branch created and content saved.');
-      if (result.pullRequestURL) {
-        cms.alerts.success('Pull request created.');
-      }
+      // Set to step 4 to show all steps as completed
+      setCurrentStep(4);
+
+      cms.alerts.success('Branch created.');
 
       // Brief delay to show completion state
       setTimeout(() => {
@@ -451,96 +497,146 @@ export const CreateBranchModal = ({
   };
 
   const renderProgressIndicator = () => {
-    const progressPercentage = (currentStep / steps.length) * 100;
-    
+    const progressPercentage = (currentStep / (steps.length + 1)) * 100;
+
     return (
       <div className='py-6'>
-        {/* Step indicators - Responsive layout */}
-        <div className='mb-8'>
-          {/* Mobile: Vertical layout */}
-          <div className='block sm:hidden space-y-8'>
-            {steps.map((step, index) => {
-              const stepNumber = index + 1;
-              const isActive = stepNumber === currentStep;
-              const isCompleted = stepNumber < currentStep;
-              
-              return (
-                <div key={step.id} className='flex items-center gap-3'>
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 ${
-                    isCompleted 
-                      ? 'bg-green-500 text-white' 
-                      : isActive 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-gray-200 text-gray-600'
-                  }`}>
-                    {isCompleted ? '✓' : stepNumber}
-                  </div>
-                  <div className='flex-1 min-w-0'>
-                    <div className={`text-sm font-medium leading-tight ${
-                      isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
-                    }`}>
-                      {step.name}
-                    </div>
-                    <div className='text-sm text-gray-500 mt-1 leading-tight'>
-                      {step.description}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          
-          {/* Desktop: Horizontal layout */}
-          <div className='hidden sm:flex justify-between items-center gap-4'>
-            {steps.map((step, index) => {
-              const stepNumber = index + 1;
-              const isActive = stepNumber === currentStep;
-              const isCompleted = stepNumber < currentStep;
-              
-              return (
-                <div key={step.id} className='flex flex-col items-center flex-1 px-2 max-w-32'>
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-3 ${
-                    isCompleted 
-                      ? 'bg-green-500 text-white' 
-                      : isActive 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-gray-200 text-gray-600'
-                  }`}>
-                    {isCompleted ? '✓' : stepNumber}
-                  </div>
-                  <div className='text-center'>
-                    <div className={`text-xs font-medium leading-tight whitespace-nowrap ${
-                      isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
-                    }`}>
-                      {step.name}
-                    </div>
-                    <div className='text-xs text-gray-500 mt-1 leading-tight whitespace-nowrap'>
-                      {step.description}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        
-        {/* Progress bar */}
-        <ProgressBar progress={progressPercentage} className='mb-6' />
-        
-        {/* Current status message */}
-        <div className='text-center'>
-          <div className='flex items-center justify-center gap-2 mb-2'>
-            {currentStep < steps.length && (
-              <BiLoaderAlt className='opacity-70 text-blue-400 animate-spin w-4 h-4' />
-            )}
-            <span className='text-sm font-medium text-gray-700'>
-              {currentStep === steps.length ? 'Complete!' : `Step ${currentStep} of ${steps.length}`}
-            </span>
-          </div>
-          <p className='text-sm text-gray-600 leading-relaxed'>{statusMessage}</p>
-          {currentStep > 0 && currentStep < steps.length && (
-            <p className='text-xs text-gray-500 mt-2'>This usually takes 1-2 minutes</p>
+        {/* Horizontal step indicators */}
+        <div className='flex justify-between items-center mb-4 relative px-5 sm:gap-x-8'>
+          {/* Connecting line - only between steps */}
+          <div
+            className='absolute top-5 h-0.5 bg-gray-200 -z-10'
+            style={{ left: '50px', right: '50px' }}
+          ></div>
+          {currentStep > 1 && currentStep < 4 && (
+            <div
+              className='absolute top-5 h-0.5 bg-blue-500 -z-10 transition-all duration-500'
+              style={{
+                left: '50px',
+                width: `calc((100% - 100px) * ${(currentStep - 1) / (steps.length - 1)})`,
+              }}
+            ></div>
           )}
+          {/* Green progress bar for completed sections */}
+          {currentStep > 2 && (
+            <div
+              className='absolute top-5 h-0.5 bg-green-500 -z-10 transition-all duration-500'
+              style={{
+                left: '50px',
+                width: `calc((100% - 100px) * ${Math.min(1, (currentStep - 2) / (steps.length - 1))})`,
+              }}
+            ></div>
+          )}
+
+          {steps.map((step, index) => {
+            const stepNumber = index + 1;
+            const isActive = stepNumber === currentStep;
+            const isCompleted = stepNumber < currentStep;
+
+            return (
+              <div
+                key={step.id}
+                className='flex flex-col items-center relative'
+              >
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-medium mb-3 border-2 transition-all duration-300 ${
+                    isCompleted
+                      ? 'bg-green-500 border-green-500 text-white'
+                      : isActive
+                        ? 'bg-blue-500 border-blue-500 text-white'
+                        : 'bg-white border-gray-200 text-gray-400'
+                  }`}
+                >
+                  {isCompleted ? (
+                    <svg
+                      className='w-5 h-5'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                    >
+                      <path
+                        fillRule='evenodd'
+                        d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                        clipRule='evenodd'
+                      />
+                    </svg>
+                  ) : isActive ? (
+                    <BiLoaderAlt className='animate-spin text-lg' />
+                  ) : (
+                    stepNumber
+                  )}
+                </div>
+                <div className='text-center max-w-24'>
+                  <div
+                    className={`text-sm font-semibold leading-tight ${
+                      isActive
+                        ? 'text-blue-600'
+                        : isCompleted
+                          ? 'text-green-600'
+                          : 'text-gray-400'
+                    }`}
+                  >
+                    {step.name}
+                  </div>
+                  <div className='text-xs text-gray-400 mt-1 leading-tight'>
+                    {step.description}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Step count and timer - between stepper and progress bar */}
+        <div className='flex items-center justify-between mb-4'>
+          <div className='text-sm font-medium text-gray-700'>
+            Step {currentStep} of {steps.length}
+          </div>
+          {isExecuting && currentStep > 0 && (
+            <div className='flex items-center gap-1 text-sm text-gray-500'>
+              <svg className='w-4 h-4' fill='currentColor' viewBox='0 0 20 20'>
+                <path
+                  fillRule='evenodd'
+                  d='M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z'
+                  clipRule='evenodd'
+                />
+              </svg>
+              {formatTime(elapsedTime)}
+            </div>
+          )}
+        </div>
+
+        {/* Progress bar */}
+        <ProgressBar
+          progress={progressPercentage}
+          className='mb-4'
+          color={currentStep >= 4 ? 'green' : 'blue'}
+        />
+
+        {/* Current status - reduced padding */}
+        <div className='flex items-center gap-2 mb-2'>
+          {currentStep >= 4 ? (
+            <svg
+              className='w-4 h-4 text-green-500'
+              fill='currentColor'
+              viewBox='0 0 20 20'
+            >
+              <path
+                fillRule='evenodd'
+                d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                clipRule='evenodd'
+              />
+            </svg>
+          ) : (
+            <BiLoaderAlt className='text-blue-500 animate-spin' />
+          )}
+          <span className='text-sm font-medium text-gray-700'>
+            {statusMessage || `${steps[currentStep - 1]?.name}...`}
+          </span>
+        </div>
+
+        {/* Estimated time - aligned left */}
+        <div className='text-left'>
+          <p className='text-xs text-gray-500'>Estimated time: 1-2 minutes</p>
         </div>
       </div>
     );
@@ -583,14 +679,18 @@ export const CreateBranchModal = ({
   };
 
   return (
-    <Modal>
-      <PopupModal>
+    <Modal className='flex'>
+      <PopupModal className='w-auto'>
         <ModalHeader close={close}>
-          <BiGitBranch className='w-6 h-auto mr-1 text-blue-500 opacity-70' />{' '}
-          Create Branch
+          <div className='flex items-center justify-between w-full'>
+            <div className='flex items-center'>
+              <BiGitBranch className='w-6 h-auto mr-1 text-blue-500 opacity-70' />
+              Create Branch
+            </div>
+          </div>
         </ModalHeader>
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
-        {!isExecuting && (
+        {!isExecuting ? (
           <ModalActions>
             <Button style={{ flexGrow: 1 }} onClick={close}>
               Cancel
@@ -617,6 +717,12 @@ export const CreateBranchModal = ({
                 },
               ]}
             />
+          </ModalActions>
+        ) : (
+          <ModalActions>
+            <Button onClick={close} variant='secondary'>
+              Cancel
+            </Button>
           </ModalActions>
         )}
       </PopupModal>
