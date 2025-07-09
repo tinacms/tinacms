@@ -138,6 +138,7 @@ export class Client {
         getTokenFn: options.getTokenFn,
         tokenStorage: tokenStorage,
         frontendUrl: this.frontendUrl,
+        oauth2: options.schema?.config?.oauth2,
       });
   }
 
