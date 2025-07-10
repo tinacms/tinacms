@@ -477,7 +477,9 @@ export const CreateBranchModal = ({
       }
 
       setCurrentBranch(result.branchName);
-      cms.alerts.success('Branch created.');
+      cms.alerts.success(
+        `Branch created successfully - Pull Request at ${result.pullRequestUrl}`
+      );
 
       // Brief delay to show completion state
       setTimeout(() => {
@@ -589,7 +591,8 @@ export const CreateBranchModal = ({
         {/* Step count and timer - between stepper and progress bar */}
         <div className='flex items-center justify-between mb-4'>
           <div className='text-sm font-medium text-gray-700'>
-            Step {currentStep} of {steps.length}
+            Step {currentStep > steps.length ? steps.length : currentStep} of{' '}
+            {steps.length}
           </div>
           {isExecuting && currentStep > 0 && (
             <div className='flex items-center gap-1 text-sm text-gray-500'>

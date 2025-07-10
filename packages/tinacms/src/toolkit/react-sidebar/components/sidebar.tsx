@@ -326,6 +326,24 @@ const Sidebar = ({
                 >
                   {useTestMode ? 'Test Mode ON' : 'Test Mode OFF'}
                 </button>
+                <button
+                  onClick={() => {
+                    cms.alerts.success(
+                      `Branch created successfully - Pull Request at https://github.com/tinacms/tinacms/pull/12345`
+                    );
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
+                  Test Alert
+                </button>
               </div>
               <div style={{ marginBottom: '15px' }}>
                 <p
