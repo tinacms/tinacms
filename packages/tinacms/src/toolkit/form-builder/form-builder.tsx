@@ -15,6 +15,7 @@ import {
   UPDATE_DOCUMENT_GQL,
 } from '../../admin/api';
 import { cn } from '../../utils/cn';
+import { ProgressBar } from '../components/ProgressBar';
 import { useCMS } from '../react-core';
 import {
   Modal,
@@ -23,13 +24,12 @@ import {
   ModalHeader,
   PopupModal,
 } from '../react-modals';
-import { ProgressBar } from '../components/ProgressBar';
+import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
 import { FieldsBuilder } from './fields-builder';
 import { FormActionMenu } from './form-actions';
 import { FormPortalProvider } from './form-portal';
 import { LoadingDots } from './loading-dots';
 import { ResetForm } from './reset-form';
-import { EDITORIAL_WORKFLOW_STATUS } from './editorial-workflow-constants';
 
 export interface FormBuilderProps {
   form: { tinaForm: Form; activeFieldName?: string };
@@ -404,8 +404,8 @@ export const CreateBranchModal = ({
     },
     {
       id: 2,
-      name: 'Indexing branch',
-      description: 'Indexing your branch',
+      name: 'Updating branch',
+      description: 'Syncing content to branch',
     },
     {
       id: 3,
@@ -476,12 +476,7 @@ export const CreateBranchModal = ({
         throw new Error('Branch creation failed.');
       }
 
-      setStatusMessage('Workflow completed successfully!');
       setCurrentBranch(result.branchName);
-
-      // Set to step 4 to show all steps as completed
-      setCurrentStep(4);
-
       cms.alerts.success('Branch created.');
 
       // Brief delay to show completion state
@@ -502,7 +497,7 @@ export const CreateBranchModal = ({
   };
 
   const renderProgressIndicator = () => {
-    const progressPercentage = (currentStep / (steps.length + 1)) * 100;
+    const progressPercentage = (currentStep / steps.length) * 100;
 
     return (
       <div className='py-6'>
