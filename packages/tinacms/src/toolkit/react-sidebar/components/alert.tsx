@@ -13,7 +13,7 @@ export const Alert = ({
 } & React.HTMLProps<HTMLDivElement>) => {
   const styles = {
     warning:
-      'text-sm px-4 py-2 text-amber-700 bg-amber-100 rounded border border-amber-700/20',
+      'ml-8 text-sm px-4 py-2 text-amber-700 bg-amber-100 rounded border border-amber-700/20',
   };
 
   const icon = {

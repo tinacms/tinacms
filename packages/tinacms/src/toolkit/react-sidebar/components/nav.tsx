@@ -21,6 +21,7 @@ interface NavCollection {
 interface NavProps {
   isLocalMode: boolean;
   showHamburger?: boolean;
+  menuIsOpen: boolean;
   toggleMenu: () => void;
   children?: any;
   className?: string;
@@ -46,6 +47,7 @@ interface NavProps {
 export const Nav = ({
   isLocalMode,
   showHamburger = true,
+  menuIsOpen,
   toggleMenu,
   className = '',
   children,
@@ -97,18 +99,34 @@ export const Nav = ({
 
   return (
     <>
+      <button
+        className={cn(
+          'fixed pointer-events-auto p-4 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded z-10',
+          menuIsOpen ? 'hidden' : ''
+        )}
+        onClick={() => {
+          toggleMenu();
+        }}
+      >
+        <BiMenu className='h-6 w-auto text-gray-600' />
+      </button>
+
       <div
-        className={`relative z-30 flex flex-col bg-white border-r border-gray-200 w-96 h-full ${className}`}
+        className={cn(
+          `relative z-30 flex flex-col bg-white border-r border-gray-200 w-96 h-full ${className}`,
+          menuIsOpen ? '' : 'hidden'
+        )}
         style={{ maxWidth: `${sidebarWidth}px` }}
         {...props}
       >
         <div className='flex w-full px-4 py-3 justify-between items-center gap-2 border-b border-gray-200'>
           <button
             className={cn(
-              'pointer-events-auto p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded',
-              showHamburger ? '' : 'md:hidden'
+              'pointer-events-auto p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
             )}
-            onClick={toggleMenu}
+            onClick={() => {
+              toggleMenu();
+            }}
           >
             <BiMenu className='h-6 w-auto text-gray-600' />
           </button>

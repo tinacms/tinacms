@@ -26,6 +26,8 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
     .getType<CloudConfigPlugin>('cloud-config')
     .all();
 
+  const [menuIsOpen, setMenuIsOpen] = React.useState(false);
+
   const isLocalMode = cms.api?.tina?.isLocalMode;
   const activeScreens = screens.filter(
     (screen) =>
@@ -37,7 +39,8 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
     <Nav
       isLocalMode={isLocalMode}
       showHamburger={false}
-      toggleMenu={() => {}}
+      menuIsOpen={menuIsOpen}
+      toggleMenu={() => setMenuIsOpen((menu) => !menu)}
       sidebarWidth={360}
       showCollections={true}
       collectionsInfo={collectionsInfo}
