@@ -26,6 +26,8 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
     .getType<CloudConfigPlugin>('cloud-config')
     .all();
 
+  const [menuIsOpen, setMenuIsOpen] = React.useState(false);
+
   const isLocalMode = cms.api?.tina?.isLocalMode;
   const activeScreens = screens.filter(
     (screen) =>
@@ -37,7 +39,8 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
     <Nav
       isLocalMode={isLocalMode}
       showHamburger={false}
-      toggleMenu={() => {}}
+      menuIsOpen={menuIsOpen}
+      toggleMenu={() => setMenuIsOpen((menu) => !menu)}
       sidebarWidth={360}
       showCollections={true}
       collectionsInfo={collectionsInfo}
@@ -80,11 +83,10 @@ const SidebarLink = (props: {
   return (
     <NavLink
       className={({ isActive }) => {
-        return `text-base tracking-wide ${
-          isActive ? 'text-blue-600' : 'text-gray-500'
-        } hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`;
+        return `text-base tracking-wide ${isActive ? 'text-blue-600' : 'text-gray-500'
+          } hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`;
       }}
-      onClick={props.onClick ? props.onClick : () => {}}
+      onClick={props.onClick ? props.onClick : () => { }}
       to={to}
     >
       <Icon className='mr-2 h-6 opacity-80 w-auto' /> {label}

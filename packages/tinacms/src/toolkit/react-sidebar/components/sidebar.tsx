@@ -269,6 +269,7 @@ const Sidebar = ({
             <div className='fixed left-0 top-0 z-overlay h-full transform'>
               <Nav
                 isLocalMode={cms.api?.tina?.isLocalMode}
+                menuIsOpen
                 toggleMenu={toggleMenu}
                 showCollections={isTinaAdminEnabled}
                 collectionsInfo={collectionsInfo}
