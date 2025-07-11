@@ -661,7 +661,7 @@ export const CreateBranchModal = ({
           <p className='text-lg text-gray-700 font-bold mb-2'>
             This content is protected 🚧
           </p>
-          <p className='text-sm text-gray-700 mb-4'>
+          <p className='text-sm text-gray-700 mb-4 max-w-sm'>
             To make changes, you need to create a copy then get it approved and
             merged for it to go live.
           </p>
@@ -683,7 +683,7 @@ export const CreateBranchModal = ({
   return (
     <Modal className='flex'>
       <PopupModal className='w-auto'>
-        <ModalHeader close={close}>
+        <ModalHeader close={isExecuting ? undefined : close}>
           <div className='flex items-center justify-between w-full'>
             <div className='flex items-center'>
               <BiGitBranch className='w-6 h-auto mr-1 text-blue-500 opacity-70' />
@@ -692,7 +692,7 @@ export const CreateBranchModal = ({
           </div>
         </ModalHeader>
         <ModalBody padded={true}>{renderStateContent()}</ModalBody>
-        {!isExecuting ? (
+        {!isExecuting && (
           <ModalActions>
             <Button style={{ flexGrow: 1 }} onClick={close}>
               Cancel
@@ -703,7 +703,7 @@ export const CreateBranchModal = ({
               disabled={newBranchName === '' || disabled}
               onClick={executeEditorialWorkflow}
             >
-              Create Branch and Save
+              Confirm
             </Button>
             <OverflowMenu
               className='-ml-2'
@@ -719,12 +719,6 @@ export const CreateBranchModal = ({
                 },
               ]}
             />
-          </ModalActions>
-        ) : (
-          <ModalActions>
-            <Button onClick={close} variant='secondary'>
-              Cancel
-            </Button>
           </ModalActions>
         )}
       </PopupModal>
