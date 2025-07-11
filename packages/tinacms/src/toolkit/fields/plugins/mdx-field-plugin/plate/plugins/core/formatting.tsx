@@ -1,67 +1,45 @@
-import {
-  createAutoformatPlugin,
-  createResetNodePlugin,
-  createTrailingBlockPlugin,
-  createExitBreakPlugin,
-  ELEMENT_PARAGRAPH,
-  ELEMENT_CODE_BLOCK,
-  ELEMENT_BLOCKQUOTE,
-  ELEMENT_H1,
-  ELEMENT_H2,
-  ELEMENT_H3,
-  ELEMENT_H4,
-  ELEMENT_H5,
-  ELEMENT_H6,
-  KEYS_HEADING,
-} from '@udecode/plate';
-import { createSoftBreakPlugin } from '../soft-break';
+import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
+import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
+import { ExitBreakPlugin, SoftBreakPlugin } from '@udecode/plate-break/react';
+import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
+import { HEADING_KEYS, HEADING_LEVELS } from '@udecode/plate-heading';
+import { ResetNodePlugin } from '@udecode/plate-reset-node/react';
+import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
+import { ParagraphPlugin } from '@udecode/plate/react';
 import { autoformatRules } from './autoformat/autoformat-rules';
-import { withCorrectVoidBehavior } from './with-correct-void-behavior';
-import {
-  createPluginFactory,
-  isBlockAboveEmpty,
-  isSelectionAtBlockStart,
-} from '@udecode/plate-common';
 
 export const HANDLES_MDX = [
-  ELEMENT_H1,
-  ELEMENT_H2,
-  ELEMENT_H3,
-  ELEMENT_H3,
-  ELEMENT_H4,
-  ELEMENT_H5,
-  ELEMENT_H6,
-  ELEMENT_PARAGRAPH,
+  HEADING_KEYS.h1,
+  HEADING_KEYS.h2,
+  HEADING_KEYS.h3,
+  HEADING_KEYS.h4,
+  HEADING_KEYS.h5,
+  HEADING_KEYS.h6,
+  ParagraphPlugin.key,
 ];
 
 const resetBlockTypesCommonRule = {
   types: [
-    ELEMENT_BLOCKQUOTE,
-    ELEMENT_H1,
-    ELEMENT_H2,
-    ELEMENT_H3,
-    ELEMENT_H3,
-    ELEMENT_H4,
-    ELEMENT_H5,
-    ELEMENT_H6,
+    BlockquotePlugin.key,
+    HEADING_KEYS.h1,
+    HEADING_KEYS.h2,
+    HEADING_KEYS.h3,
+    HEADING_KEYS.h4,
+    HEADING_KEYS.h5,
+    HEADING_KEYS.h6,
     // NOTE: code blocks behave strangely when used here
   ],
-  defaultType: ELEMENT_PARAGRAPH,
+  defaultType: ParagraphPlugin.key,
 };
 
-const createCorrectNodeBehaviorPlugin = createPluginFactory({
-  key: 'WITH_CORRECT_NODE_BEHAVIOR',
-  withOverrides: withCorrectVoidBehavior,
-});
 export const plugins = [
-  createTrailingBlockPlugin(),
-  createCorrectNodeBehaviorPlugin(),
-  createAutoformatPlugin({
+  TrailingBlockPlugin,
+  AutoformatPlugin.configure({
     options: {
       rules: autoformatRules,
     },
   }),
-  createExitBreakPlugin({
+  ExitBreakPlugin.configure({
     options: {
       rules: [
         // Break out of a block entirely, eg. get out of a blockquote
@@ -80,36 +58,37 @@ export const plugins = [
           query: {
             start: true,
             end: true,
-            allow: KEYS_HEADING,
+            allow: HEADING_LEVELS,
           },
         },
       ],
     },
   }),
-  createResetNodePlugin({
-    options: {
-      rules: [
-        {
-          ...resetBlockTypesCommonRule,
-          hotkey: 'Enter',
-          predicate: isBlockAboveEmpty,
-        },
-        {
-          ...resetBlockTypesCommonRule,
-          hotkey: 'Backspace',
-          predicate: isSelectionAtBlockStart,
-        },
-      ],
-    },
+  //See the usage code example from https://platejs.org/docs/reset-node
+  ResetNodePlugin.configure({
+    // options: {
+    //   rules: [
+    //     {
+    //       ...resetBlockTypesCommonRule,
+    //       hotkey: 'Enter',
+    //       predicate: editor.api.isEmpty(editor.selection, { block: true }),
+    //     },
+    //     {
+    //       ...resetBlockTypesCommonRule,
+    //       hotkey: 'Backspace',
+    //       predicate: isSelectionAtBlockStart,
+    //     },
+    //   ],
+    // },
   }),
-  createSoftBreakPlugin({
+  SoftBreakPlugin.configure({
     options: {
       rules: [
         { hotkey: 'shift+enter' },
         {
           hotkey: 'enter',
           query: {
-            allow: [ELEMENT_CODE_BLOCK, ELEMENT_BLOCKQUOTE],
+            allow: [CodeBlockPlugin.key],
           },
         },
       ],

@@ -7,25 +7,23 @@
 		"build": "tinacms build && next build",
 		"start": "next start",
 		"lint": "biome check .",
-		"format": "biome check . --write",
-		"diff-tina-lock": "tinacms-scripts diff-tina-lock",
-		"update-tina-lock": "tinacms dev --no-server"
+		"format": "biome check . --write"
 	},
 	"dependencies": {
-		"@radix-ui/react-icons": "^1.3.2",
-		"class-variance-authority": "^0.7.1",
-		"clsx": "^2.1.1",
+		"@radix-ui/react-icons": "catalog:",
+		"class-variance-authority": "catalog:",
+		"clsx": "catalog:",
 		"mermaid": "^10.9.3",
 		"next": "14.2.10",
-		"next-themes": "^0.3.0",
+		"next-themes": "catalog:",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"tailwind-merge": "^2.6.0",
-		"tailwindcss-animate": "^1.0.7",
+		"tailwindcss-animate": "catalog:",
 		"tinacms": "workspace:*"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.4",
+		"@biomejs/biome": "catalog:",
 		"@tinacms/cli": "workspace:*",
 		"@tinacms/scripts": "workspace:*",
 		"@types/node": "^22.13.1",
