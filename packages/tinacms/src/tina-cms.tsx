@@ -2,9 +2,9 @@ import React, { ReactNode, useState } from 'react';
 import { TinaCloudProvider } from './auth';
 import { FontLoader } from './toolkit/styles/font-loader';
 
-import { parseURL } from '@tinacms/schema-tools';
-import { useDocumentCreatorPlugin } from './hooks/use-content-creator';
 import { LocalClient } from './internalClient/index';
+import { useDocumentCreatorPlugin } from './hooks/use-content-creator';
+import { parseURL } from '@tinacms/schema-tools';
 import type { TinaCMSProviderDefaultProps } from './types/cms';
 
 const errorButtonStyles = {

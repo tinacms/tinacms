@@ -7,7 +7,7 @@ import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 import { AiOutlineLoading } from 'react-icons/ai';
-import { BiError, BiGitBranch, BiLoaderAlt } from 'react-icons/bi';
+import { BiError, BiGitBranch } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';
 import { MdOutlineSaveAlt } from 'react-icons/md';
 import {
@@ -382,7 +382,6 @@ export const CreateBranchModal = ({
     };
   }, [isExecuting, currentStep]);
 
-  // Helper function to format time as MM:SS
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -599,7 +598,6 @@ export const CreateBranchModal = ({
           )}
         </div>
 
-        {/* Progress bar */}
         <ProgressBar
           progress={progressPercentage}
           className='mb-4'
