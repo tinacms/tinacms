@@ -25,10 +25,10 @@ import {
   queryToSearchIndexQuery,
 } from '@tinacms/search/dist/index-client';
 import gql from 'graphql-tag';
+import { EDITORIAL_WORKFLOW_STATUS } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
 import { TinaCloudProject } from './types';
-import { EDITORIAL_WORKFLOW_STATUS } from '../toolkit/form-builder/editorial-workflow-constants';
 
 export * from './authProvider';
 
@@ -678,10 +678,7 @@ mutation addPendingDocumentMutation(
         if (statusResponse.status === 200) {
           return {
             branchName: statusResponseBody.branchName,
-            branchRef: statusResponseBody.branchRef,
-            indexStatus: statusResponseBody.indexStatus,
-            pullRequestURL: statusResponseBody.pullRequestUrl,
-            pullRequestNumber: statusResponseBody.pullRequestNumber,
+            pullRequestUrl: statusResponseBody.pullRequestUrl,
           };
         }
 

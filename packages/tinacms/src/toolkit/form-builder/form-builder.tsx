@@ -6,6 +6,7 @@ import { Form as FinalForm } from 'react-final-form';
 import { useBranchData } from '@toolkit/plugin-branch-switcher';
 import { Button, OverflowMenu } from '@toolkit/styles';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
+import { AiOutlineLoading } from 'react-icons/ai';
 import { BiError, BiGitBranch, BiLoaderAlt } from 'react-icons/bi';
 import { FaCircle } from 'react-icons/fa';
 import { MdOutlineSaveAlt } from 'react-icons/md';
@@ -366,7 +367,7 @@ export const CreateBranchModal = ({
   const [isExecuting, setIsExecuting] = React.useState(testMode);
   const [errorMessage, setErrorMessage] = React.useState('');
   // TODO: REMOVE - Start with step 1 in test mode to show progress immediately
-  const [currentStep, setCurrentStep] = React.useState(testMode ? 4 : 0);
+  const [currentStep, setCurrentStep] = React.useState(testMode ? 2 : 0);
   // TODO: REMOVE - Set initial status message for test mode
   const [statusMessage, setStatusMessage] = React.useState(
     testMode ? 'Testing progress state...' : ''
@@ -460,13 +461,11 @@ export const CreateBranchModal = ({
               setCurrentStep(2);
               break;
             case EDITORIAL_WORKFLOW_STATUS.CONTENT_GENERATION:
+            case EDITORIAL_WORKFLOW_STATUS.CREATING_PR:
               setCurrentStep(3);
               break;
-            case EDITORIAL_WORKFLOW_STATUS.CREATING_PR:
-              setCurrentStep(4);
-              break;
             case EDITORIAL_WORKFLOW_STATUS.COMPLETE:
-              setCurrentStep(5);
+              setCurrentStep(4);
               break;
           }
         },
@@ -499,7 +498,7 @@ export const CreateBranchModal = ({
   };
 
   const renderProgressIndicator = () => {
-    const progressPercentage = (currentStep / steps.length) * 100;
+    const progressPercentage = ((currentStep - 1) / steps.length) * 100;
 
     return (
       <div className='py-6'>
@@ -562,7 +561,7 @@ export const CreateBranchModal = ({
                       />
                     </svg>
                   ) : isActive ? (
-                    <BiLoaderAlt className='animate-spin text-lg' />
+                    <AiOutlineLoading className='animate-spin text-lg' />
                   ) : (
                     stepNumber
                   )}
@@ -630,7 +629,7 @@ export const CreateBranchModal = ({
               />
             </svg>
           ) : (
-            <BiLoaderAlt className='text-blue-500 animate-spin' />
+            <AiOutlineLoading className='text-blue-500 animate-spin' />
           )}
           <span className='text-sm font-medium text-gray-700'>
             {statusMessage || `${steps[currentStep - 1]?.name}...`}
