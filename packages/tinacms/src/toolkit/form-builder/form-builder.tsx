@@ -350,32 +350,24 @@ export const CreateBranchModal = ({
   path,
   values,
   crudType,
-  testMode = false,
 }: {
   safeSubmit: () => Promise<void>;
   close: () => void;
   path: string;
   values: Record<string, unknown>;
   crudType: string;
-  testMode?: boolean;
 }) => {
   const cms = useCMS();
   const tinaApi = cms.api.tina;
   const { setCurrentBranch } = useBranchData();
   const [disabled, setDisabled] = React.useState(false);
   const [newBranchName, setNewBranchName] = React.useState('');
-  const [isExecuting, setIsExecuting] = React.useState(testMode);
+  const [isExecuting, setIsExecuting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
-  // TODO: REMOVE - Start with step 1 in test mode to show progress immediately
-  const [currentStep, setCurrentStep] = React.useState(testMode ? 2 : 0);
-  // TODO: REMOVE - Set initial status message for test mode
-  const [statusMessage, setStatusMessage] = React.useState(
-    testMode ? 'Testing progress state...' : ''
-  );
-  // TODO: REMOVE - Add timer for progress tracking
+  const [currentStep, setCurrentStep] = React.useState(0);
+  const [statusMessage, setStatusMessage] = React.useState('');
   const [elapsedTime, setElapsedTime] = React.useState(0);
 
-  // TODO: REMOVE - Timer effect for tracking elapsed time during progress
   React.useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isExecuting && currentStep > 0) {
