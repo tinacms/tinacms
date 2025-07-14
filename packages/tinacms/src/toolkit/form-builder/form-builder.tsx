@@ -468,13 +468,10 @@ export const CreateBranchModal = ({
 
       setCurrentBranch(result.branchName);
       cms.alerts.success(
-        `Branch created successfully - Pull Request at ${result.pullRequestUrl}`
+        `Branch created successfully - blah Pull Request at ${result.pullRequestUrl}`
       );
 
-      // Brief delay to show completion state
-      setTimeout(() => {
-        close();
-      }, 1000);
+      close();
     } catch (e) {
       console.error(e);
       const errorMessage =
