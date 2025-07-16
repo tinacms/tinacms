@@ -37,10 +37,9 @@ export const setup = async (dir: string, config: any) => {
     tinaDirectory: 'tina',
   });
   await database.indexContent(await buildSchema(config));
-  const get = async <T extends z.ZodSchema = typeof dataSchema>(options?: {
+  const get = async (options?: {
     query: string;
     variables: Record<string, unknown>;
-    schema: T;
   }) => {
     const result = await resolve({
       database,
