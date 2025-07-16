@@ -1,6 +1,6 @@
 {
 	"name": "next-tinacms-cloudinary",
-	"version": "13.0.9",
+	"version": "14.0.1",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"files": [
@@ -22,8 +22,8 @@
 		"build": "tinacms-scripts build"
 	},
 	"dependencies": {
-		"cloudinary": "^1.41.3",
-		"multer": "1.4.5-lts.1"
+		"cloudinary": "catalog:",
+		"multer": "catalog:"
 	},
 	"devDependencies": {
 		"@tinacms/scripts": "workspace:*",

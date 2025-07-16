@@ -32,6 +32,16 @@ export const rootElement = (
   };
 };
 
+export const codeLinesToString = (children: any[]) => {
+  return (children ?? []).map((line: any) =>
+    Array.isArray(line.children) && line.children.length > 0
+      ? line.children
+          .map((t: any) => t.text)
+          .join('') // join in case of multiple text nodes
+      : ''
+  );
+};
+
 export const blockElement = (
   content: Plate.BlockElement,
   field: RichTextField,
@@ -67,17 +77,11 @@ export const blockElement = (
         type: 'paragraph',
         children: eat(content.children, field, imageCallback),
       };
-    case 'mermaid':
-      return {
-        type: 'code',
-        lang: 'mermaid',
-        value: content.value,
-      };
     case 'code_block':
       return {
         type: 'code',
         lang: content.lang,
-        value: content.value,
+        value: codeLinesToString(content.children).join('\n'),
       };
     case 'mdxJsxFlowElement':
       if (content.name === 'table') {

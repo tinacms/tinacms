@@ -13,6 +13,10 @@
   fill: currentColor;
 }
 
+.font-libre-baskerville {
+  font-family: "Libre Baskerville", serif;
+}
+
 body {
   margin: 0;
   padding: 0;

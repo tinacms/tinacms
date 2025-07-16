@@ -1,40 +1,40 @@
+import { AutoformatRule } from '@udecode/plate-autoformat';
 import {
-  type AutoformatRule,
-  MARK_BOLD,
-  MARK_CODE,
-  MARK_ITALIC,
-  MARK_STRIKETHROUGH,
-} from '@udecode/plate';
+  BoldPlugin,
+  CodePlugin,
+  ItalicPlugin,
+  StrikethroughPlugin,
+} from '@udecode/plate-basic-marks/react';
 
 export const autoformatMarks: AutoformatRule[] = [
   {
     mode: 'mark',
-    type: [MARK_BOLD, MARK_ITALIC],
+    type: [BoldPlugin.key, ItalicPlugin.key],
     match: '***',
   },
   {
     mode: 'mark',
-    type: MARK_BOLD,
+    type: BoldPlugin.key,
     match: '**',
   },
   {
     mode: 'mark',
-    type: MARK_ITALIC,
+    type: ItalicPlugin.key,
     match: '*',
   },
   {
     mode: 'mark',
-    type: MARK_ITALIC,
+    type: ItalicPlugin.key,
     match: '_',
   },
   {
     mode: 'mark',
-    type: MARK_CODE,
+    type: CodePlugin.key,
     match: '`',
   },
   {
     mode: 'mark',
-    type: MARK_STRIKETHROUGH,
+    type: StrikethroughPlugin.key,
     match: ['~~', '~'],
   },
 ];

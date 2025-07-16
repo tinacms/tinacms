@@ -5,14 +5,15 @@ import { withRef } from '@udecode/cn';
 import { Icons } from './icons';
 
 import { ToolbarButton } from './toolbar';
-import { toggleNodeType, useEditorState } from '@udecode/plate-common';
-import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote';
+import { useEditorState } from '@udecode/plate/react';
+import { BaseBlockquotePlugin } from '@udecode/plate-block-quote';
 import { helpers } from '../../plugins/core/common';
 
 const useBlockQuoteToolbarButtonState = () => {
   const editor = useEditorState();
 
-  const isBlockActive = () => helpers.isNodeActive(editor, ELEMENT_BLOCKQUOTE);
+  const isBlockActive = () =>
+    helpers.isNodeActive(editor, BaseBlockquotePlugin.key);
 
   return {
     pressed: isBlockActive(),
@@ -23,9 +24,7 @@ const useBlockQuoteToolbarButton = (state) => {
   const editor = useEditorState();
 
   const onClick = () => {
-    toggleNodeType(editor, {
-      activeType: ELEMENT_BLOCKQUOTE,
-    });
+    editor.tf.toggleBlock(BaseBlockquotePlugin.key);
   };
 
   const onMouseDown = (e) => {
