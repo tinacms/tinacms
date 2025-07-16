@@ -11,13 +11,11 @@ it('retrieves template-based document with union types', async () => {
         title
         seo {
           seoTitle
-          ogImage
           ogDescription
         }
         blocks {
           __typename
           ... on PageBlocksHero {
-            backgroundImage
             description
           }
           ... on PageBlocksCta {

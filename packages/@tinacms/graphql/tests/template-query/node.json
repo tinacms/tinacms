@@ -5,13 +5,11 @@
       "title": "Welcome",
       "seo": {
         "seoTitle": "Welcome to our website",
-        "ogImage": "http://placehold.it/300x200",
         "ogDescription": "You're gonna love this site!"
       },
       "blocks": [
         {
           "__typename": "PageBlocksHero",
-          "backgroundImage": "http://placehold.it/300x200",
           "description": "Welcome!"
         },
         {

@@ -23,11 +23,6 @@ export const schema: Schema = {
               label: 'SEO Title',
             },
             {
-              type: 'image',
-              name: 'ogImage',
-              label: 'Open Graph Image',
-            },
-            {
               type: 'string',
               name: 'ogDescription',
               label: 'Open Graph Description',
@@ -48,11 +43,6 @@ export const schema: Schema = {
                   type: 'string',
                   label: 'Description',
                   name: 'description',
-                },
-                {
-                  type: 'image',
-                  label: 'Background Image',
-                  name: 'backgroundImage',
                 },
               ],
             },
