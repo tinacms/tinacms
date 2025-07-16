@@ -7,7 +7,7 @@ export const queryToSearchIndexQuery = (
   stopwordLanguages?: string[]
 ) => {
   let q;
-  const parts = query.split(' ');
+  const parts = query.trim().split(' ');
   const stopwords = lookupStopwords(stopwordLanguages);
   if (parts.length === 1) {
     q = { AND: [parts[0]] };
