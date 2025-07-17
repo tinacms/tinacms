@@ -1,0 +1,30 @@
+{
+  "data": {
+    "moviesByBobNorthwind": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha",
+            "director": {
+              "name": "Bob Northwind"
+            }
+          }
+        }
+      ]
+    },
+    "moviesByCharlieSouthwind": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Movie Beta",
+            "director": {
+              "name": "Charlie Southwind"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
