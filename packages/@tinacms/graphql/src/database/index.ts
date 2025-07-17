@@ -1010,7 +1010,18 @@ export class Database {
     return true;
   };
 
-  public query = async (queryOptions: QueryOptions, hydrator) => {
+  public query = async <T>(
+    queryOptions: QueryOptions,
+    hydrator: (path: string, value?: Record<string, unknown>) => T
+  ): Promise<{
+    edges: { node: T; cursor: string }[];
+    pageInfo: {
+      hasPreviousPage: boolean;
+      hasNextPage: boolean;
+      startCursor: string;
+      endCursor: string;
+    };
+  }> => {
     await this.initLevel();
     const {
       first,
