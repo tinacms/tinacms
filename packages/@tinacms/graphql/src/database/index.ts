@@ -1014,10 +1014,8 @@ export class Database {
     queryOptions: QueryOptions,
     hydrator: (
       path: string,
-      value?: Record<string, unknown>,
-      abortSignal?: AbortSignal
-    ) => T,
-    abortSignal?: AbortSignal
+      value?: Record<string, unknown>
+    ) => T
   ): Promise<{
     edges: { node: T; cursor: string }[];
     pageInfo: {
@@ -1028,7 +1026,6 @@ export class Database {
     };
   }> => {
     await this.initLevel();
-    abortSignal?.throwIfAborted();
 
     const {
       first,
@@ -1130,9 +1127,7 @@ export class Database {
     // @ts-ignore
     // It looks like tslint is confused by the multiple iterator() overloads
     const iterator = sublevel.iterator<string, Record<string, any>>(query);
-    abortSignal?.throwIfAborted();
     for await (const [key, value] of iterator) {
-      abortSignal?.throwIfAborted();
       const matcher = valuesRegex.exec(key);
       if (
         !matcher ||
@@ -1184,8 +1179,7 @@ export class Database {
         collection.name,
         key,
         filepath,
-        value,
-        abortSignal
+        value
       );
       hydratorsInProgress.push(startedHydrator);
     }
@@ -1218,16 +1212,14 @@ export class Database {
     hydrator: (
       path: string,
       value?: Record<string, unknown>,
-      abortSignal?: AbortSignal
     ) => T,
     collectionName: string,
     key: string,
     filepath: string,
     value: Record<string, any>,
-    abortSignal: AbortSignal
   ): Promise<{ cursor: string; node: T }> {
     try {
-      const node = await hydrator(filepath, value, abortSignal);
+      const node = await hydrator(filepath, value);
       return {
         cursor: key,
         node: node,
