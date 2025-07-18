@@ -5,10 +5,16 @@ import { setup, format, SlowMemoryLevel } from '../util';
 const TEST_TIMEOUT = 5000;
 const EACH_GET_DELAY = 1000;
 
-it('retrieves a 4 item list within 5 seconds', async () => {
-  const { get } = await setup(__dirname, config, new SlowMemoryLevel<string, Record<string, any>>(EACH_GET_DELAY));
-  const result = await get({
-    query: `query {
+it(
+  'retrieves a 4 item list within 5 seconds',
+  async () => {
+    const { get } = await setup(
+      __dirname,
+      config,
+      new SlowMemoryLevel<string, Record<string, any>>(EACH_GET_DELAY)
+    );
+    const result = await get({
+      query: `query {
       movieConnection {
         totalCount
         edges {
@@ -21,7 +27,9 @@ it('retrieves a 4 item list within 5 seconds', async () => {
         }
       }
     }`,
-    variables: {},
-  });
-  expect(format(result)).toMatchFileSnapshot('node.json');
-}, { timeout: TEST_TIMEOUT });
+      variables: {},
+    });
+    expect(format(result)).toMatchFileSnapshot('node.json');
+  },
+  { timeout: TEST_TIMEOUT }
+);

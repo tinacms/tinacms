@@ -24,7 +24,7 @@ const dataSchema = z.object({
 
 const defaultQuery = `query { document(collection: "post", relativePath: "in.md") { ...on Document { _values, _sys { title } }} }`;
 
-export class SlowMemoryLevel<K, V> extends MemoryLevel<K,V> {
+export class SlowMemoryLevel<K, V> extends MemoryLevel<K, V> {
   private delayMS: number;
 
   constructor(delayMS: number) {
@@ -33,7 +33,7 @@ export class SlowMemoryLevel<K, V> extends MemoryLevel<K,V> {
   }
 
   public async get(key: any, options?: any, callback?: any): Promise<any> {
-    await new Promise(r => setTimeout(r, this.delayMS));
+    await new Promise((r) => setTimeout(r, this.delayMS));
     if (typeof callback === 'function') {
       return super.get(key, options, callback);
     }
