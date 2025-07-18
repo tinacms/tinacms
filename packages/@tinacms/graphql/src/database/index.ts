@@ -1010,8 +1010,20 @@ export class Database {
     return true;
   };
 
-  public query = async (queryOptions: QueryOptions, hydrator) => {
+  public query = async <T>(
+    queryOptions: QueryOptions,
+    hydrator: (path: string, value?: Record<string, unknown>) => T
+  ): Promise<{
+    edges: { node: T; cursor: string }[];
+    pageInfo: {
+      hasPreviousPage: boolean;
+      hasNextPage: boolean;
+      startCursor: string;
+      endCursor: string;
+    };
+  }> => {
     await this.initLevel();
+
     const {
       first,
       after,
@@ -1091,8 +1103,6 @@ export class Database {
         : '\uFFFF';
     }
 
-    let edges: { cursor: string; path: string; value?: Record<string, any> }[] =
-      [];
     let startKey: string = '';
     let endKey: string = '';
     let hasPreviousPage = false;
@@ -1107,6 +1117,8 @@ export class Database {
       ? new RegExp(`^${fieldsPattern}(?<_filepath_>.+)`)
       : new RegExp(`^(?<_filepath_>.+)`);
     const itemFilter = makeFilter({ filterChain });
+
+    const hydratorsInProgress: Promise<{ cursor: string; node: T }>[] = [];
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -1147,7 +1159,7 @@ export class Database {
         continue;
       }
 
-      if (limit !== -1 && edges.length >= limit) {
+      if (limit !== -1 && hydratorsInProgress.length >= limit) {
         if (query.reverse) {
           hasPreviousPage = true;
         } else {
@@ -1158,47 +1170,32 @@ export class Database {
 
       startKey = startKey || key || '';
       endKey = key || '';
-      edges = [...edges, { cursor: key, path: filepath, value: itemRecord }];
+
+      const startedHydrator = this.startHydrator(
+        hydrator,
+        collection.name,
+        key,
+        filepath,
+        value
+      );
+      hydratorsInProgress.push(startedHydrator);
     }
 
+    const allHydrationResults = await Promise.allSettled(hydratorsInProgress);
+    const edges: { cursor: string; node: T }[] = [];
+    for (const result of allHydrationResults) {
+      if (result.status === 'rejected') {
+        const err = result.reason;
+        throw new TinaQueryError({
+          originalError: err,
+          collection: collection.name,
+          stack: err.stack,
+        });
+      }
+      edges.push(result.value);
+    }
     return {
-      edges: await sequential(
-        edges,
-        async ({
-          cursor,
-          path,
-          value,
-        }: {
-          cursor: string;
-          path: string;
-          value?: Record<string, any>;
-        }) => {
-          try {
-            // pass the path to the matched item and the raw index value
-            const node = await hydrator(path, value);
-            return {
-              node,
-              cursor: btoa(cursor),
-            };
-          } catch (error) {
-            console.log(error);
-            if (
-              error instanceof Error &&
-              (!path.includes('.tina/__generated__/_graphql.json') ||
-                !path.includes('tina/__generated__/_graphql.json'))
-            ) {
-              throw new TinaQueryError({
-                originalError: error,
-                file: path,
-                collection: collection.name,
-                stack: error.stack,
-              });
-            }
-            // I dont think this should ever happen
-            throw error;
-          }
-        }
-      ),
+      edges,
       pageInfo: {
         hasPreviousPage,
         hasNextPage,
@@ -1207,6 +1204,30 @@ export class Database {
       },
     };
   };
+
+  private async startHydrator<T>(
+    hydrator: (path: string, value?: Record<string, unknown>) => T,
+    collectionName: string,
+    key: string,
+    filepath: string,
+    value: Record<string, any>
+  ): Promise<{ cursor: string; node: T }> {
+    try {
+      const node = await hydrator(filepath, value);
+      return {
+        cursor: key,
+        node: node,
+      };
+    } catch (err) {
+      throw new TinaQueryError({
+        originalError: err,
+        file: filepath,
+        collection: collectionName,
+        stack: err.stack,
+      });
+    }
+  }
+
   private async indexStatusCallbackWrapper<T>(
     fn: () => Promise<T>,
     post?: () => Promise<void>
