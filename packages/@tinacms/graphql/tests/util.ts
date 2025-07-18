@@ -24,13 +24,39 @@ const dataSchema = z.object({
 
 const defaultQuery = `query { document(collection: "post", relativePath: "in.md") { ...on Document { _values, _sys { title } }} }`;
 
-export const setup = async (dir: string, config: any) => {
-  const hasGraphQL = await fs.existsSync(path.join(dir, 'query.gql'));
+export class SlowMemoryLevel<K, V> extends MemoryLevel<K,V> {
+  private delayMS: number;
+
+  constructor(delayMS: number) {
+    super();
+    this.delayMS = delayMS;
+  }
+
+  public async get(key: any, options?: any, callback?: any): Promise<any> {
+    await new Promise(r => setTimeout(r, this.delayMS));
+    if (typeof callback === 'function') {
+      return super.get(key, options, callback);
+    }
+    if (options !== undefined) {
+      return super.get(key, options);
+    }
+    return super.get(key);
+  }
+}
+
+export const setup = async (
+  dir: string,
+  config: any,
+  level?: MemoryLevel<string, Record<string, any>>
+) => {
+  const hasGraphQL = fs.existsSync(path.join(dir, 'query.gql'));
   const query = hasGraphQL
     ? await fs.readFile(path.join(dir, 'query.gql'), 'utf-8')
     : defaultQuery;
+  if (!level) {
+    level = new MemoryLevel<string, Record<string, any>>();
+  }
   const bridge = new OutputBridge(dir, dir);
-  const level = new MemoryLevel<string, Record<string, any>>();
   const database = createDatabaseInternal({
     bridge,
     level,
