@@ -8,6 +8,7 @@ import {
   setupProjectDirectory,
   updateProjectPackageName,
   updateProjectPackageVersion,
+  updateThemeSettings,
 } from './util/fileUtil';
 import { install } from './util/install';
 import { initializeGit, makeFirstCommit } from './util/git';
@@ -17,6 +18,8 @@ import { checkPackageExists } from './util/checkPkgManagers';
 import { log, TextStyles } from './util/logger';
 import { exit } from 'node:process';
 import validate from 'validate-npm-package-name';
+import { THEMES } from './themes';
+import { writeFile } from 'fs/promises';
 
 /**
  * The available package managers a user can use.
@@ -144,6 +147,17 @@ export async function run() {
     template = TEMPLATES.find((_template) => _template.value === res.template);
   }
 
+  let themeChoice: string | undefined;
+  if (template.value === 'tina-docs') {
+    const res = await prompts({
+      name: 'theme',
+      type: 'select',
+      message: 'What theme would you like to use?',
+      choices: THEMES,
+    });
+    if (!Object.hasOwn(res, 'theme')) exit(1); // User most likely sent SIGINT.
+    themeChoice = res.theme;
+  }
   await telemetry.submitRecord({
     event: {
       name: 'create-tina-app:invoke',
@@ -163,6 +177,12 @@ export async function run() {
 
   try {
     await downloadTemplate(template, rootDir);
+
+    if (themeChoice) {
+      // Add selected theme to content/settings/config.json
+      await updateThemeSettings(rootDir, themeChoice);
+    }
+
     updateProjectPackageName(rootDir, projectName);
     updateProjectPackageVersion(rootDir, '0.0.1');
   } catch (err) {
