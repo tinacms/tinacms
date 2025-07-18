@@ -1012,10 +1012,7 @@ export class Database {
 
   public query = async <T>(
     queryOptions: QueryOptions,
-    hydrator: (
-      path: string,
-      value?: Record<string, unknown>
-    ) => T
+    hydrator: (path: string, value?: Record<string, unknown>) => T
   ): Promise<{
     edges: { node: T; cursor: string }[];
     pageInfo: {
@@ -1209,14 +1206,11 @@ export class Database {
   };
 
   private async startHydrator<T>(
-    hydrator: (
-      path: string,
-      value?: Record<string, unknown>,
-    ) => T,
+    hydrator: (path: string, value?: Record<string, unknown>) => T,
     collectionName: string,
     key: string,
     filepath: string,
-    value: Record<string, any>,
+    value: Record<string, any>
   ): Promise<{ cursor: string; node: T }> {
     try {
       const node = await hydrator(filepath, value);
