@@ -1012,7 +1012,8 @@ export class Database {
 
   public query = async <T>(
     queryOptions: QueryOptions,
-    hydrator: (path: string, value?: Record<string, unknown>) => T
+    hydrator: (path: string, value?: Record<string, unknown>, abortSignal?: AbortSignal) => T,
+    abortSignal?: AbortSignal
   ): Promise<{
     edges: { node: T; cursor: string }[];
     pageInfo: {
@@ -1023,6 +1024,8 @@ export class Database {
     };
   }> => {
     await this.initLevel();
+    abortSignal?.throwIfAborted();
+
     const {
       first,
       after,
@@ -1123,7 +1126,9 @@ export class Database {
     // @ts-ignore
     // It looks like tslint is confused by the multiple iterator() overloads
     const iterator = sublevel.iterator<string, Record<string, any>>(query);
+    abortSignal?.throwIfAborted();
     for await (const [key, value] of iterator) {
+      abortSignal?.throwIfAborted();
       const matcher = valuesRegex.exec(key);
       if (
         !matcher ||
@@ -1184,9 +1189,10 @@ export class Database {
           path: string;
           value?: Record<string, any>;
         }) => {
+          abortSignal?.throwIfAborted();
           try {
             // pass the path to the matched item and the raw index value
-            const node = await hydrator(path, value);
+            const node = await hydrator(path, value, abortSignal);
             return {
               node,
               cursor: btoa(cursor),
@@ -1218,6 +1224,7 @@ export class Database {
       },
     };
   };
+
   private async indexStatusCallbackWrapper<T>(
     fn: () => Promise<T>,
     post?: () => Promise<void>
