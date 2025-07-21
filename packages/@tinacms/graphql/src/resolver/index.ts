@@ -333,28 +333,28 @@ export const updateObjectWithJsonPath = (
 };
 
 interface TransformedDocument {
-  __typename: string,
-  id: string,
+  __typename: string;
+  id: string;
   _sys: {
-    title: string,
-    basename: string,
-    filename: string,
-    extension: string,
-    hasReferences: boolean,
-    path: string,
-    relativePath: string,
-    breadcrumbs: string[],
-    collection: Collection<true>,
-    template: string | number,
-  },
+    title: string;
+    basename: string;
+    filename: string;
+    extension: string;
+    hasReferences: boolean;
+    path: string;
+    relativePath: string;
+    breadcrumbs: string[];
+    collection: Collection<true>;
+    template: string | number;
+  };
   _values: {
-    _collection: any,
-    _template: any,
-  },
+    _collection: any;
+    _template: any;
+  };
   _rawData: {
-    _collection: any,
-    _template: any,
-  }
+    _collection: any;
+    _template: any;
+  };
 }
 
 /**
