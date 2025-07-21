@@ -1,5 +1,5 @@
 import type { TinaCMS } from '@tinacms/toolkit';
-import { print, buildSchema } from 'graphql';
+import { buildSchema, print } from 'graphql';
 
 import { diff } from '@graphql-inspector/core';
 
@@ -11,6 +11,31 @@ import {
   SearchClient,
   processDocumentForIndexing,
 } from '@tinacms/search/dist/index-client';
+
+export const CREATE_DOCUMENT_GQL = `#graphql
+mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+  createDocument(
+    collection: $collection,
+    relativePath: $relativePath,
+    params: $params
+  ){__typename}
+}`;
+
+export const UPDATE_DOCUMENT_GQL = `#graphql
+mutation($collection: String!, $relativePath: String!, $params: DocumentUpdateMutation!) {
+  updateDocument(
+    collection: $collection,
+    relativePath: $relativePath,
+    params: $params
+  ){__typename}
+}`;
+
+export const DELETE_DOCUMENT_GQL = `#graphql
+mutation DeleteDocument($collection: String!, $relativePath: String!){
+  deleteDocument(collection: $collection, relativePath: $relativePath){
+    __typename
+  }
+}`;
 
 export interface FilterArgs {
   filterField: string;
@@ -95,15 +120,9 @@ export class TinaAdminApi {
     collection: string;
     relativePath: string;
   }) {
-    await this.api.request(
-      `#graphql
-      mutation DeleteDocument($collection: String!, $relativePath: String!  ){
-  deleteDocument(collection: $collection, relativePath: $relativePath){
-    __typename
-  }
-}`,
-      { variables: { collection, relativePath } }
-    );
+    await this.api.request(DELETE_DOCUMENT_GQL, {
+      variables: { collection, relativePath },
+    });
     await this.searchClient?.del([`${collection}:${relativePath}`]);
   }
   async fetchCollection(
@@ -332,23 +351,13 @@ export class TinaAdminApi {
     relativePath: string,
     params: Object
   ) {
-    const response = await this.api.request(
-      `#graphql
-      mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
-        createDocument(
-          collection: $collection,
-          relativePath: $relativePath,
-          params: $params
-        ){__typename}
-      }`,
-      {
-        variables: {
-          collection: collection.name,
-          relativePath,
-          params,
-        },
-      }
-    );
+    const response = await this.api.request(CREATE_DOCUMENT_GQL, {
+      variables: {
+        collection: collection.name,
+        relativePath,
+        params,
+      },
+    });
 
     if (this.searchClient) {
       const { document: doc } = await this.fetchDocument(
@@ -372,23 +381,13 @@ export class TinaAdminApi {
     relativePath: string,
     params: Object
   ) {
-    const response = await this.api.request(
-      `#graphql
-      mutation($collection: String!, $relativePath: String!, $params: DocumentUpdateMutation!) {
-        updateDocument(
-          collection: $collection,
-          relativePath: $relativePath,
-          params: $params
-        ){__typename}
-      }`,
-      {
-        variables: {
-          collection: collection.name,
-          relativePath,
-          params,
-        },
-      }
-    );
+    const response = await this.api.request(UPDATE_DOCUMENT_GQL, {
+      variables: {
+        collection: collection.name,
+        relativePath,
+        params,
+      },
+    });
 
     if (this.searchClient) {
       const { document: doc } = await this.fetchDocument(
