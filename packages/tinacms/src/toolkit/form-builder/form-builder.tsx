@@ -369,7 +369,7 @@ export const CreateBranchModal = ({
   const [elapsedTime, setElapsedTime] = React.useState(0);
 
   React.useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isExecuting && currentStep > 0) {
       interval = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
@@ -468,7 +468,7 @@ export const CreateBranchModal = ({
 
       setCurrentBranch(result.branchName);
       cms.alerts.success(
-        `Branch created successfully - blah Pull Request at ${result.pullRequestUrl}`
+        `Branch created successfully - Pull Request at ${result.pullRequestUrl}`
       );
 
       close();
@@ -491,13 +491,13 @@ export const CreateBranchModal = ({
     return (
       <div className='py-6'>
         {/* Horizontal step indicators */}
-        <div className='flex justify-between items-center mb-4 relative px-5 sm:gap-x-8'>
+        <div className='flex justify-between mb-4 relative px-5 sm:gap-x-8'>
           {/* Connecting line - only between steps */}
           <div
             className='absolute top-5 h-0.5 bg-gray-200 -z-10'
             style={{ left: '50px', right: '50px' }}
           ></div>
-          {currentStep > 1 && currentStep < 4 && (
+          {currentStep > 1 && currentStep <= steps.length && (
             <div
               className='absolute top-5 h-0.5 bg-blue-500 -z-10 transition-all duration-500'
               style={{
@@ -598,7 +598,7 @@ export const CreateBranchModal = ({
         <ProgressBar
           progress={progressPercentage}
           className='mb-4'
-          color={currentStep >= 4 ? 'green' : 'blue'}
+          color={currentStep > steps.length ? 'green' : 'blue'}
         />
 
         {/* Current status - reduced padding */}

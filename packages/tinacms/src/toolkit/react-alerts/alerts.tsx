@@ -47,7 +47,7 @@ export function Alerts({ alerts }: AlertsProps) {
 
   return (
     <>
-      <div className='fixed bottom-0 left-0 right-0 p-6 flex flex-col items-center z-[999999] pointer-events-none'>
+      <div className='fixed bottom-0 left-0 right-0 p-6 flex flex-col items-center z-[999999]'>
         {alerts.all
           .filter((alert) => {
             return alert.level !== 'error';
