@@ -332,6 +332,31 @@ export const updateObjectWithJsonPath = (
   return { object: obj, updated };
 };
 
+interface TransformedDocument {
+  __typename: string,
+  id: string,
+  _sys: {
+    title: string,
+    basename: string,
+    filename: string,
+    extension: string,
+    hasReferences: boolean,
+    path: string,
+    relativePath: string,
+    breadcrumbs: string[],
+    collection: Collection<true>,
+    template: string | number,
+  },
+  _values: {
+    _collection: any,
+    _template: any,
+  },
+  _rawData: {
+    _collection: any,
+    _template: any,
+  }
+}
+
 /**
  * The resolver provides functions for all possible types of lookup
  * values and retrieves them from the database
@@ -341,12 +366,16 @@ export class Resolver {
   public database: Database;
   public tinaSchema: TinaSchema;
   public isAudit: boolean;
+  private documentCache: Map<string, TransformedDocument>;
+
   constructor(public init: ResolverConfig) {
     this.config = init.config;
     this.database = init.database;
     this.tinaSchema = init.tinaSchema;
     this.isAudit = init.isAudit;
+    this.documentCache = new Map<string, TransformedDocument>();
   }
+
   public resolveCollection = async (
     args,
     collectionName: string,
@@ -369,6 +398,7 @@ export class Resolver {
       ...extraFields,
     };
   };
+
   public getRaw = async (fullPath: unknown) => {
     if (typeof fullPath !== 'string') {
       throw new Error(
@@ -381,12 +411,19 @@ export class Resolver {
       _template: string;
     }>(fullPath);
   };
+
   public getDocumentOrDirectory = async (fullPath: unknown) => {
     if (typeof fullPath !== 'string') {
       throw new Error(
         `fullPath must be of type string for getDocumentOrDirectory request`
       );
     }
+
+    const cachedDoc = this.documentCache.get(fullPath);
+    if (cachedDoc !== undefined) {
+      return cachedDoc;
+    }
+
     const rawData = await this.getRaw(fullPath);
     if (rawData['__folderBasename']) {
       return {
@@ -395,13 +432,15 @@ export class Resolver {
         path: rawData['__folderPath'],
       };
     } else {
-      return transformDocumentIntoPayload(
+      const transformedDoc = await transformDocumentIntoPayload(
         fullPath,
         rawData,
         this.tinaSchema,
         this.config,
         this.isAudit
       );
+      this.documentCache.set(fullPath, transformedDoc);
+      return transformedDoc;
     }
   };
 
@@ -418,11 +457,16 @@ export class Resolver {
       );
     }
 
+    const cachedDoc = this.documentCache.get(fullPath);
+    if (cachedDoc !== undefined) {
+      return cachedDoc;
+    }
+
     const rawData = await this.getRaw(fullPath);
     const hasReferences = opts?.checkReferences
       ? await this.hasReferences(fullPath, opts.collection)
       : undefined;
-    return transformDocumentIntoPayload(
+    const transformedDoc = await transformDocumentIntoPayload(
       fullPath,
       rawData,
       this.tinaSchema,
@@ -430,6 +474,8 @@ export class Resolver {
       this.isAudit,
       hasReferences
     );
+    this.documentCache.set(fullPath, transformedDoc);
+    return transformedDoc;
   };
 
   public deleteDocument = async (fullPath: unknown) => {
