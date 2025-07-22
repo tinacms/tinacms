@@ -9,6 +9,7 @@ import { NAMER } from '../ast-builder';
 import { Database } from '../database';
 import { parseMDX, serializeMDX } from '../mdx';
 import { assertShape, lastItem, sequential } from '../util';
+import deepClone from 'lodash.clonedeep';
 
 import type {
   Collectable,
@@ -421,7 +422,7 @@ export class Resolver {
 
     const cachedDoc = this.documentCache.get(fullPath);
     if (cachedDoc !== undefined) {
-      return cachedDoc;
+      return deepClone(cachedDoc);
     }
 
     const rawData = await this.getRaw(fullPath);
@@ -440,7 +441,7 @@ export class Resolver {
         this.isAudit
       );
       this.documentCache.set(fullPath, transformedDoc);
-      return transformedDoc;
+      return deepClone(transformedDoc);
     }
   };
 
@@ -459,7 +460,7 @@ export class Resolver {
 
     const cachedDoc = this.documentCache.get(fullPath);
     if (cachedDoc !== undefined) {
-      return cachedDoc;
+      return deepClone(cachedDoc);
     }
 
     const rawData = await this.getRaw(fullPath);
@@ -475,7 +476,7 @@ export class Resolver {
       hasReferences
     );
     this.documentCache.set(fullPath, transformedDoc);
-    return transformedDoc;
+    return deepClone(transformedDoc);
   };
 
   public deleteDocument = async (fullPath: unknown) => {
