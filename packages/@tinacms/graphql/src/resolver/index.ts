@@ -367,14 +367,12 @@ export class Resolver {
   public database: Database;
   public tinaSchema: TinaSchema;
   public isAudit: boolean;
-  private documentCache: Map<string, TransformedDocument>;
 
   constructor(public init: ResolverConfig) {
     this.config = init.config;
     this.database = init.database;
     this.tinaSchema = init.tinaSchema;
     this.isAudit = init.isAudit;
-    this.documentCache = new Map<string, TransformedDocument>();
   }
 
   public resolveCollection = async (
@@ -420,11 +418,6 @@ export class Resolver {
       );
     }
 
-    const cachedDoc = this.documentCache.get(fullPath);
-    if (cachedDoc !== undefined) {
-      return deepClone(cachedDoc);
-    }
-
     const rawData = await this.getRaw(fullPath);
     if (rawData['__folderBasename']) {
       return {
@@ -448,11 +441,6 @@ export class Resolver {
       throw new Error(
         `fullPath must be of type string for getDocument request`
       );
-    }
-
-    const cachedDoc = this.documentCache.get(fullPath);
-    if (cachedDoc !== undefined) {
-      return deepClone(cachedDoc);
     }
 
     const rawData = await this.getRaw(fullPath);
