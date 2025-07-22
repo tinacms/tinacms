@@ -433,15 +433,7 @@ export class Resolver {
         path: rawData['__folderPath'],
       };
     } else {
-      const transformedDoc = await transformDocumentIntoPayload(
-        fullPath,
-        rawData,
-        this.tinaSchema,
-        this.config,
-        this.isAudit
-      );
-      this.documentCache.set(fullPath, transformedDoc);
-      return deepClone(transformedDoc);
+      return rawData;
     }
   };
 
@@ -464,19 +456,7 @@ export class Resolver {
     }
 
     const rawData = await this.getRaw(fullPath);
-    const hasReferences = opts?.checkReferences
-      ? await this.hasReferences(fullPath, opts.collection)
-      : undefined;
-    const transformedDoc = await transformDocumentIntoPayload(
-      fullPath,
-      rawData,
-      this.tinaSchema,
-      this.config,
-      this.isAudit,
-      hasReferences
-    );
-    this.documentCache.set(fullPath, transformedDoc);
-    return deepClone(transformedDoc);
+    return rawData;
   };
 
   public deleteDocument = async (fullPath: unknown) => {

@@ -14,7 +14,11 @@ import type {
 } from '@tinacms/schema-tools';
 import sha from 'js-sha1';
 import set from 'lodash.set';
-import { FilesystemBridge, TinaLevelClient } from '..';
+import {
+  FilesystemBridge,
+  TinaLevelClient,
+  transformDocumentIntoPayload,
+} from '..';
 import { generatePasswordHash, mapUserFields } from '../auth/utils';
 import { NotFoundError } from '../error';
 import { TinaFetchError, TinaQueryError } from '../resolver/error';
@@ -350,11 +354,7 @@ export class Database {
       if (!contentObject) {
         throw new NotFoundError(`Unable to find record ${filepath}`);
       }
-      return transformDocument(
-        filepath,
-        contentObject,
-        await this.getSchema(this.contentLevel)
-      );
+      return contentObject as T;
     }
   };
 
@@ -477,13 +477,27 @@ export class Database {
         : [];
     }
 
+    const tinaSchema = await this.getSchema();
+    const partiallyPreparedPayload = transformDocument(
+      normalizedPath,
+      dataFields,
+      tinaSchema
+    );
+    const preparedPayload = await transformDocumentIntoPayload(
+      normalizedPath,
+      partiallyPreparedPayload as any,
+      tinaSchema,
+      { useRelativeMedia: true },
+      false
+    );
+
     const ops: BatchOp[] = [
       ...delOps,
       ...putOps,
       {
         type: 'put',
         key: normalizedPath,
-        value: dataFields,
+        value: preparedPayload,
         sublevel: level.sublevel<string, Record<string, any>>(
           CONTENT_ROOT_PREFIX,
           SUBLEVEL_OPTIONS
@@ -649,13 +663,27 @@ export class Database {
             : [];
         }
 
+        const tinaSchema = await this.getSchema();
+        const partiallyPreparedPayload = transformDocument(
+          normalizedPath,
+          dataFields,
+          tinaSchema
+        );
+        const preparedPayload = await transformDocumentIntoPayload(
+          normalizedPath,
+          partiallyPreparedPayload as any,
+          tinaSchema,
+          { useRelativeMedia: true },
+          false
+        );
+
         const ops: BatchOp[] = [
           ...delOps,
           ...putOps,
           {
             type: 'put',
             key: normalizedPath,
-            value: dataFields,
+            value: preparedPayload,
             sublevel: level.sublevel<string, Record<string, any>>(
               CONTENT_ROOT_PREFIX,
               SUBLEVEL_OPTIONS
@@ -780,7 +808,8 @@ export class Database {
   }
 
   public flush = async (filepath: string) => {
-    const data = await this.get<{ [key: string]: unknown }>(filepath);
+    const storedData = await this.get<{ [key: string]: unknown }>(filepath);
+    const data = storedData._rawData as { [key: string]: string };
 
     const dataFields = await this.formatBodyOnPayload(filepath, data);
     const collection = await this.collectionForPath(filepath);
@@ -809,6 +838,7 @@ export class Database {
     }
     return returnType ? this._lookup[returnType] : this._lookup;
   };
+
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
     await this.initLevel();
     const graphqlPath = normalizePath(
@@ -821,7 +851,7 @@ export class Database {
       )
       .get(graphqlPath)) as unknown as DocumentNode;
   };
-  //TODO - is there a reason why the database fetches some config with "bridge.get", and some with "store.get"?
+
   public getGraphQLSchemaFromBridge = async (): Promise<DocumentNode> => {
     if (!this.bridge) {
       throw new Error(`No bridge configured`);
@@ -833,6 +863,7 @@ export class Database {
     const _graphql = await this.bridge.get(graphqlPath);
     return JSON.parse(_graphql);
   };
+
   public getTinaSchema = async (level?: Level): Promise<Schema> => {
     await this.initLevel();
     const schemaPath = normalizePath(
@@ -1730,6 +1761,19 @@ const _indexContent = async ({
         }
       }
 
+      const partiallyPreparedPayload = transformDocument(
+        normalizedPath,
+        aliasedData,
+        tinaSchema
+      );
+      const preparedPayload = await transformDocumentIntoPayload(
+        normalizedPath,
+        partiallyPreparedPayload as any,
+        tinaSchema,
+        { useRelativeMedia: true },
+        false
+      );
+
       if (!isGitKeep(filepath, collection)) {
         await enqueueOps([
           ...makeRefOpsForDocument(
@@ -1760,7 +1804,7 @@ const _indexContent = async ({
           {
             type: 'put',
             key: normalizedPath,
-            value: aliasedData as any,
+            value: preparedPayload as any,
             sublevel: level.sublevel<string, Record<string, any>>(
               CONTENT_ROOT_PREFIX,
               SUBLEVEL_OPTIONS
