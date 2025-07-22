@@ -195,6 +195,7 @@ export const EditoralBranchSwitcher = ({
               <BranchSelector
                 currentBranch={currentBranch}
                 branchList={branchList}
+                refreshBranchList={refreshBranchList}
                 createBranch={() => {
                   setViewState('create');
                 }}
@@ -330,11 +331,13 @@ const BranchSelector = ({
   currentBranch,
   onChange,
   createBranch,
+  refreshBranchList,
 }: {
   branchList: Branch[];
   currentBranch: string;
   onChange: (branchName: string) => void;
   createBranch: () => void;
+  refreshBranchList: () => void;
 }) => {
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState<'content' | 'all'>('content');
@@ -343,6 +346,25 @@ const BranchSelector = ({
   >('default');
 
   const cms = useCMS();
+
+  const handleCreatePullRequest = async (branchName: string) => {
+    try {
+      await cms.api.tina.createPullRequest({
+        baseBranch: cms.api.tina.branch,
+        branch: branchName,
+        title: `Content updates from ${branchName}`,
+      });
+
+      refreshBranchList();
+
+      // @ts-ignore
+      cms.alerts.success('Pull request created successfully!');
+    } catch (error) {
+      console.error('Failed to create pull request:', error);
+      // @ts-ignore
+      cms.alerts.error('Failed to create pull request');
+    }
+  };
 
   const filteredBranchList = getFilteredBranchList(
     branchList,
@@ -481,7 +503,8 @@ const BranchSelector = ({
                     </Button>
                   )}
                   {(branch.githubPullRequestUrl ||
-                    typeof previewFunction === 'function') && (
+                    typeof previewFunction === 'function' ||
+                    !branch.githubPullRequestUrl) && (
                     <div className='ml-auto'>
                       <OverflowMenu
                         toolbarItems={[
@@ -498,6 +521,18 @@ const BranchSelector = ({
                               );
                             },
                           },
+                          !branch.githubPullRequestUrl &&
+                            branch.name !==
+                              cms.api.tina
+                                .branch && /* And not protected branch */ {
+                              name: 'create-pr',
+                              label: 'Create Pull Request',
+                              Icon: (
+                                <BiGitBranch className='w-5 h-auto text-blue-500 opacity-70' />
+                              ),
+                              onMouseDown: () =>
+                                handleCreatePullRequest(branch.name),
+                            },
                           typeof previewFunction === 'function' &&
                             previewFunction({ branch: branch.name })?.url && {
                               name: 'preview',
