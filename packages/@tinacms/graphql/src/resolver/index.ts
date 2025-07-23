@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import path from 'path';
 import isValid from 'date-fns/isValid/index.js';
 import { JSONPath } from 'jsonpath-plus';
@@ -9,7 +5,6 @@ import { NAMER } from '../ast-builder';
 import { Database } from '../database';
 import { parseMDX, serializeMDX } from '../mdx';
 import { assertShape, lastItem, sequential } from '../util';
-import deepClone from 'lodash.clonedeep';
 
 import type {
   Collectable,
@@ -398,17 +393,14 @@ export class Resolver {
     };
   };
 
-  public getRaw = async (fullPath: unknown) => {
+  public getRaw = async (fullPath: unknown): Promise<TransformedDocument> => {
     if (typeof fullPath !== 'string') {
       throw new Error(
         `fullPath must be of type string for getDocument request`
       );
     }
 
-    return this.database.get<{
-      _collection: string;
-      _template: string;
-    }>(fullPath);
+    return this.database.get<TransformedDocument>(fullPath);
   };
 
   public getDocumentOrDirectory = async (fullPath: unknown) => {
@@ -436,15 +428,14 @@ export class Resolver {
       collection?: Collection<true>;
       checkReferences?: boolean;
     } = {}
-  ) => {
+  ): Promise<TransformedDocument> => {
     if (typeof fullPath !== 'string') {
       throw new Error(
         `fullPath must be of type string for getDocument request`
       );
     }
 
-    const rawData = await this.getRaw(fullPath);
-    return rawData;
+    return await this.getRaw(fullPath);
   };
 
   public deleteDocument = async (fullPath: unknown) => {
@@ -860,12 +851,12 @@ export class Resolver {
         await this.deleteDocument(realPath);
         if (await this.hasReferences(realPath, collection)) {
           const collRefs = await this.findReferences(realPath, collection);
-          for (const [collection, docsWithRefs] of Object.entries(collRefs)) {
+          for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
             for (const [pathToDocWithRef, referencePaths] of Object.entries(
               docsWithRefs
             )) {
               // load the doc with the references
-              let refDoc = await this.getRaw(pathToDocWithRef);
+              let refDoc = (await this.getDocument(pathToDocWithRef))._rawData;
 
               let hasUpdate = false;
               // Update each reference to the deleted document
@@ -932,7 +923,7 @@ export class Resolver {
             docsWithRefs
           )) {
             // load the document with the references
-            let docWithRef = await this.getRaw(pathToDocWithRef);
+            let docWithRef = (await this.getRaw(pathToDocWithRef))._rawData;
 
             let hasUpdate = false;
             // update each reference to the updated document
