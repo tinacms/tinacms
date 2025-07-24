@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import type { stripNativeTrailingSlash as StripFn } from './path';
 
 describe('stripNativeTrailingSlash under Windows', () => {
