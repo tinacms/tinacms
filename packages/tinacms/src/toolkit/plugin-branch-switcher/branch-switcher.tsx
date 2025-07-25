@@ -344,12 +344,18 @@ const BranchSelector = ({
   const [sortValue, setSortValue] = React.useState<
     'default' | 'updated' | 'name'
   >('default');
+  const [creatingPRForBranch, setCreatingPRForBranch] = React.useState<
+    string | null
+  >(null);
 
   const cms = useCMS();
 
   const handleCreatePullRequest = async (branchName: string) => {
+    if (creatingPRForBranch) return;
+
+    setCreatingPRForBranch(branchName);
     try {
-      await cms.api.tina.createPullRequest({
+      const res = await cms.api.tina.createPullRequest({
         baseBranch: cms.api.tina.branch,
         branch: branchName,
         title: `Content updates from ${branchName}`,
@@ -358,11 +364,15 @@ const BranchSelector = ({
       refreshBranchList();
 
       // @ts-ignore
-      cms.alerts.success('Pull request created successfully!');
+      cms.alerts.success(
+        `Pull request created successfully! ${res.url ? `View in GitHub: ${res.url}` : ''}`
+      );
     } catch (error) {
       console.error('Failed to create pull request:', error);
       // @ts-ignore
       cms.alerts.error('Failed to create pull request');
+    } finally {
+      setCreatingPRForBranch(null);
     }
   };
 
@@ -478,15 +488,31 @@ const BranchSelector = ({
                   )}
                 </div>
                 <div className='flex-1'>
-                  <div className='text-xs font-bold'>Last Updated</div>
-                  <span className='text-sm leading-tight'>
-                    {formatDistanceToNow(
-                      new Date(branch.indexStatus.timestamp),
-                      {
-                        addSuffix: true,
-                      }
-                    )}
-                  </span>
+                  {creatingPRForBranch === branch.name ? (
+                    <div className='flex items-center gap-2'>
+                      <div>
+                        <div className='text-xs font-bold text-blue-600'>
+                          Creating PR
+                        </div>
+                        <span className='text-sm leading-tight text-blue-500'>
+                          Please wait...
+                        </span>
+                      </div>
+                      <FaSpinner className='w-3 h-auto animate-spin text-blue-500' />
+                    </div>
+                  ) : (
+                    <>
+                      <div className='text-xs font-bold'>Last Updated</div>
+                      <span className='text-sm leading-tight'>
+                        {formatDistanceToNow(
+                          new Date(branch.indexStatus.timestamp),
+                          {
+                            addSuffix: true,
+                          }
+                        )}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className='flex items-center'>
                   {indexingStatus === 'complete' && !isCurrentBranch && (

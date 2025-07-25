@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -7,8 +7,10 @@ export function classNames(...classes: string[]) {
 import * as Popover from '@radix-ui/react-popover';
 
 export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Popover.Root>
+    <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger
         className={`cursor-pointer relative justify-center inline-flex items-center p-3 text-sm font-medium focus:outline-1 focus:outline-blue-200 pointer-events-auto ${
           open ? `text-blue-400` : `text-gray-300 hover:text-blue-500`
@@ -40,6 +42,7 @@ export const OverflowMenu = ({ toolbarItems, className = 'w-full' }) => {
                   onMouseDown={(event) => {
                     event.preventDefault();
                     toolbarItem.onMouseDown(event);
+                    setOpen(false);
                   }}
                   className={classNames(
                     toolbarItem.active
