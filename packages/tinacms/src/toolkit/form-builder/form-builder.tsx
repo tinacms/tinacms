@@ -636,7 +636,7 @@ export const CreateBranchModal = ({
       return renderProgressIndicator();
     } else {
       return (
-        <>
+        <div className='max-w-sm'>
           {errorMessage && (
             <div className='flex items-center gap-1 text-red-700 py-2 px-3 mb-4 bg-red-50 border border-red-200 rounded'>
               <BiError className='w-5 h-auto text-red-400 flex-shrink-0' />
@@ -662,7 +662,7 @@ export const CreateBranchModal = ({
               setNewBranchName(e.target.value);
             }}
           />
-        </>
+        </div>
       );
     }
   };
