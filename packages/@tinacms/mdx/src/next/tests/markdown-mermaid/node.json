@@ -2,12 +2,81 @@
   "type": "root",
   "children": [
     {
-      "type": "mermaid",
+      "type": "code_block",
+      "lang": "mermaid",
       "value": "---\nconfig:\n  theme: light\n---\nflowchart TD\n    A[Christmas] -->|Get money| B(Go shopping)\n    B --> C{Let me think}\n    C -->|One| D[Laptop]\n    C -->|Two| E[iPhone]",
       "children": [
         {
-          "type": "text",
-          "text": ""
+          "type": "code_line",
+          "children": [
+            {
+              "text": "---"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "config:"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "  theme: light"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "---"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "flowchart TD"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "    A[Christmas] -->|Get money| B(Go shopping)"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "    B --> C{Let me think}"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "    C -->|One| D[Laptop]"
+            }
+          ]
+        },
+        {
+          "type": "code_line",
+          "children": [
+            {
+              "text": "    C -->|Two| E[iPhone]"
+            }
+          ]
         }
       ]
     }

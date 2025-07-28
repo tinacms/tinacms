@@ -285,33 +285,34 @@ export const remarkToSlate = (
     }
   };
 
-  const parseCode = (
-    content: Md.Code
-  ): Plate.CodeBlockElement | Plate.MermaidElement => {
-    if (content.lang === 'mermaid') {
-      return mermaid(content);
-    }
+  const parseCode = (content: Md.Code): Plate.CodeBlockElement => {
     return code(content);
   };
 
-  const mermaid = (content: Md.Code): Plate.MermaidElement => {
+  function makeCodeLine(text: string): Plate.CodeLineElement {
     return {
-      type: 'mermaid',
-      value: content.value,
-      children: [{ type: 'text', text: '' }],
+      type: 'code_line',
+      children: [{ text }],
     };
-  };
-
+  }
   const code = (content: Md.Code): Plate.CodeBlockElement => {
     const extra: Record<string, string> = {};
     if (content.lang) extra['lang'] = content.lang;
+
+    const value = content.value ?? '';
+    const children =
+      value.length > 0
+        ? value.split('\n').map(makeCodeLine)
+        : [makeCodeLine('')];
+
     return {
       type: 'code_block',
       ...extra,
-      value: content.value,
-      children: [{ type: 'text', text: '' }],
+      value,
+      children,
     };
   };
+
   const link = (content: Md.Link): Plate.LinkElement => {
     return {
       type: 'a',

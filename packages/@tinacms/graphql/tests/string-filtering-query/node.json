@@ -1,0 +1,52 @@
+{
+  "data": {
+    "titleEQ": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha"
+          }
+        }
+      ]
+    },
+    "titleIN": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha"
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Movie Beta"
+          }
+        }
+      ]
+    },
+    "titleStartsWith": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha"
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Movie Beta"
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-gamma.md",
+            "title": "Movie Gamma"
+          }
+        }
+      ]
+    }
+  }
+}

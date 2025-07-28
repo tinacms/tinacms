@@ -2,6 +2,9 @@ import client from '../tina/__generated__/client'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Layout } from '../components/Layout'
 import { useTina } from 'tinacms/dist/react'
+import dynamic from 'next/dynamic'
+
+const MermaidElement = dynamic(() => import('../components/mermaid-element'), { ssr: false })
 
 const query = `query PageQuery {
   page(relativePath: "home.mdx"){
@@ -17,8 +20,21 @@ export default function Home(props) {
 
   const content = data.page.body
   return (
-    <Layout>
-      <TinaMarkdown content={content} />
+    <Layout suppressHydrationWarning={true}>
+      <TinaMarkdown content={content} components={{ 
+        code_block: ({ lang,value }) => {
+
+          if (lang === 'mermaid') {
+            return <MermaidElement value={value} />
+          }
+
+          return (
+            <pre  style={{ background: '#f5f5f5', padding: '1rem', overflowX: 'auto' }}>
+              <code>{value}</code>
+            </pre>
+          )
+        },
+        }}/>
     </Layout>
   )
 }

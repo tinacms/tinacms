@@ -1,5 +1,33 @@
 # @tinacms/app
 
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`41359ed`](https://github.com/tinacms/tinacms/commit/41359edaf08def7a5e26969ec114155038c09752), [`b20a2c4`](https://github.com/tinacms/tinacms/commit/b20a2c4fd64fa2d06711850db63fb317302ee361), [`41359ed`](https://github.com/tinacms/tinacms/commit/41359edaf08def7a5e26969ec114155038c09752)]:
+  - tinacms@2.8.1
+
+## 2.3.0
+
+### Minor Changes
+
+- [#5744](https://github.com/tinacms/tinacms/pull/5744) [`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be) Thanks [@Ben0189](https://github.com/Ben0189)! - Upgrade Plate editor to v48 beta, integrating latest features and improvements.
+
+### Patch Changes
+
+- Updated dependencies [[`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be)]:
+  - @tinacms/mdx@1.8.0
+  - tinacms@2.8.0
+
+## 2.2.10
+
+### Patch Changes
+
+- [#5833](https://github.com/tinacms/tinacms/pull/5833) [`5269d65`](https://github.com/tinacms/tinacms/commit/5269d6578d361c55326f39375eaa175707342d51) Thanks [@JackDevAU](https://github.com/JackDevAU)! - 🐛 FIX - Visual Editor Webpack HMR loading issue
+
+- Updated dependencies [[`5269d65`](https://github.com/tinacms/tinacms/commit/5269d6578d361c55326f39375eaa175707342d51), [`3026a2b`](https://github.com/tinacms/tinacms/commit/3026a2b492113a53c036e43d5d85837cea4a6de3), [`28a94a6`](https://github.com/tinacms/tinacms/commit/28a94a602186f48b528b91236007839e5d02a9de)]:
+  - tinacms@2.7.10
+
 ## 2.2.9
 
 ### Patch Changes

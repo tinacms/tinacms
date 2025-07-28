@@ -562,12 +562,14 @@ export const useGraphQLReducer = (
           payload,
         ]);
       }
-      if (event.data.type === 'url-changed') {
-        cms.dispatch({
-          type: 'sidebar:set-loading-state',
-          value: true,
-        });
-      }
+      // TODO: This is causing a webpack HMR issue - look into refactoring this logic
+      // if (event.data.type === 'url-changed') {
+      //   console.log('[EVENT_TRIGGERED] url-changed: ', event);
+      //   cms.dispatch({
+      //     type: 'sidebar:set-loading-state',
+      //     value: true,
+      //   });
+      // }
     },
     [cms, JSON.stringify(results)]
   );

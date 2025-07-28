@@ -291,22 +291,35 @@ const Node = ({ components, child }) => {
           <TinaMarkdown components={components} content={children} />
         </a>
       );
-    case 'mermaid':
     case 'code_block': {
-      const value = child.value;
+      // Extract code string from children if present, else fallback to value
+      let codeString = '';
+      if (Array.isArray(child.children)) {
+        codeString = child.children
+          .map((line) =>
+            Array.isArray(line.children)
+              ? line.children.map((t) => t.text).join('')
+              : ''
+          )
+          .join('\n');
+      } else if (typeof child.value === 'string') {
+        codeString = child.value;
+      }
+
       if (components[child.type]) {
         const Component = components[child.type];
         return (
           // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-          <Component {...props} />
+          <Component {...props} value={codeString} />
         );
       }
       return (
         <pre>
-          <code>{value}</code>
+          <code>{codeString}</code>
         </pre>
       );
     }
+
     case 'hr':
       if (components[child.type]) {
         const Component = components[child.type];
