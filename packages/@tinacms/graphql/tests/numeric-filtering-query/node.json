@@ -1,0 +1,126 @@
+{
+  "data": {
+    "ratingIN": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Movie Beta",
+            "rating": 7.2
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha",
+            "rating": 8.5
+          }
+        }
+      ]
+    },
+    "ratingBetween": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Movie Beta",
+            "rating": 7.2
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha",
+            "rating": 8.5
+          }
+        }
+      ]
+    },
+    "ratingGTE": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Movie Beta",
+            "rating": 7.2
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha",
+            "rating": 8.5
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-gamma.md",
+            "title": "Movie Gamma",
+            "rating": 9.1
+          }
+        }
+      ]
+    },
+    "ratingGT": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha",
+            "rating": 8.5
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-gamma.md",
+            "title": "Movie Gamma",
+            "rating": 9.1
+          }
+        }
+      ]
+    },
+    "ratingLTE": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-delta.md",
+            "title": "Movie Delta",
+            "rating": 6.8
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Movie Beta",
+            "rating": 7.2
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha",
+            "rating": 8.5
+          }
+        }
+      ]
+    },
+    "ratingLT": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-delta.md",
+            "title": "Movie Delta",
+            "rating": 6.8
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Movie Beta",
+            "rating": 7.2
+          }
+        }
+      ]
+    }
+  }
+}

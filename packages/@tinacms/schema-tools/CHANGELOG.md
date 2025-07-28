@@ -1,5 +1,17 @@
 # @tinacms/schema-tools
 
+## 1.9.0
+
+### Minor Changes
+
+- [#5744](https://github.com/tinacms/tinacms/pull/5744) [`98a61e2`](https://github.com/tinacms/tinacms/commit/98a61e2d263978a7096cc23ac7e94aa0039981be) Thanks [@Ben0189](https://github.com/Ben0189)! - Upgrade Plate editor to v48 beta, integrating latest features and improvements.
+
+## 1.8.0
+
+### Minor Changes
+
+- [#5750](https://github.com/tinacms/tinacms/pull/5750) [`dbef36f`](https://github.com/tinacms/tinacms/commit/dbef36f594b949024d5525184b6a9e1b9085b759) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Rich text parsers - adds support for slate serialization in json
+
 ## 1.7.4
 
 ### Patch Changes

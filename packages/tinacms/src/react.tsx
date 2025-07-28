@@ -14,18 +14,27 @@ export function useTina<T extends object>(props: {
     () => hashFromQuery(stringifiedQuery),
     [stringifiedQuery]
   );
-  const [data, setData] = React.useState(props.data);
+
+  const processedData = React.useMemo(() => {
+    if (props.data) {
+      // We make a deep copy to avoid mutating the original props.data
+      const dataCopy = JSON.parse(JSON.stringify(props.data));
+      return addMetadata(id, dataCopy, []);
+    }
+  }, [props.data, id]);
+
+  const [data, setData] = React.useState(processedData);
   const [isClient, setIsClient] = React.useState(false);
   const [quickEditEnabled, setQuickEditEnabled] = React.useState(false);
   const [isInTinaIframe, setIsInTinaIframe] = React.useState(false);
 
   React.useEffect(() => {
     setIsClient(true);
-    setData(props.data);
+    setData(processedData);
     parent.postMessage({
       type: 'url-changed',
     });
-  }, [id]);
+  }, [id, processedData]);
 
   React.useEffect(() => {
     if (quickEditEnabled) {
@@ -71,6 +80,7 @@ export function useTina<T extends object>(props: {
         const tinaAttribute = attributeNames.find((name) =>
           name.startsWith('data-tina-field')
         );
+
         let fieldName;
         if (tinaAttribute) {
           e.preventDefault();
@@ -131,14 +141,19 @@ export function useTina<T extends object>(props: {
   React.useEffect(() => {
     const { experimental___selectFormByFormId, ...rest } = props;
     parent.postMessage({ type: 'open', ...rest, id }, window.location.origin);
-    window.addEventListener('message', (event) => {
+    const handleMessage = (event) => {
       if (event.data.type === 'quickEditEnabled') {
         setQuickEditEnabled(event.data.value);
       }
       if (event.data.id === id && event.data.type === 'updateData') {
-        setData(event.data.data);
+        const rawData = event.data.data;
+        const newlyProcessedData = addMetadata(
+          id,
+          JSON.parse(JSON.stringify(rawData)),
+          []
+        );
+        setData(newlyProcessedData);
         setIsInTinaIframe(true);
-        // Ensure we still have a tina-field on the page
         const anyTinaField = document.querySelector('[data-tina-field]');
         if (anyTinaField) {
           parent.postMessage(
@@ -152,16 +167,14 @@ export function useTina<T extends object>(props: {
           );
         }
       }
-    });
+    };
 
+    window.addEventListener('message', handleMessage);
     return () => {
+      window.removeEventListener('message', handleMessage);
       parent.postMessage({ type: 'close', id }, window.location.origin);
     };
   }, [id, setQuickEditEnabled]);
-
-  // Probably don't want to always do this on every data update,
-  // Just needs to be done once when in non-edit mode
-  // addMetadata(id, data, [])
 
   return { data, isClient };
 }
@@ -186,81 +199,116 @@ export function useEditState(): { edit: boolean } {
  * to signal to Tina which DOM element the field
  * is working with.
  */
+/**
+ * Generate a field identifier for Tina to associate DOM elements with form fields.
+ * Format: "queryId---path.to.field" or "queryId---path.to.array.index"
+ */
 export const tinaField = <
   T extends
-    | (object & {
+    | {
         _content_source?: {
           queryId: string;
           path: (number | string)[];
         };
-      })
-    | undefined
-    | null,
+      }
+    | Record<string, unknown>
+    | null
+    | undefined,
 >(
   object: T,
   property?: keyof Omit<NonNullable<T>, '__typename' | '_sys'>,
   index?: number
-) => {
-  if (!object) {
+): string => {
+  const contentSource = object?._content_source as
+    | { queryId: string; path: (number | string)[] }
+    | undefined;
+
+  if (!contentSource) {
     return '';
   }
-  if (object._content_source) {
-    if (!property) {
-      return [
-        object._content_source?.queryId,
-        object._content_source.path.join('.'),
-      ].join('---');
-    }
-    if (typeof index === 'number') {
-      return [
-        object._content_source?.queryId,
-        [...object._content_source.path, property, index].join('.'),
-      ].join('---');
-    }
-    return [
-      object._content_source?.queryId,
-      [...object._content_source.path, property].join('.'),
-    ].join('---');
+
+  const { queryId, path } = contentSource;
+
+  // Base path without property
+  if (!property) {
+    return `${queryId}---${path.join('.')}`;
   }
-  return '';
+
+  // Build full path with property and optional index
+  const fullPath =
+    typeof index === 'number'
+      ? [...path, property, index]
+      : [...path, property];
+
+  return `${queryId}---${fullPath.join('.')}`;
 };
 
+/**
+ * FIX: This function is updated to be more robust. It explicitly checks for
+ * `null` and `String` objects to prevent them from being processed as
+ * iterable objects, which is the root cause of the "Objects are not valid
+ * as a React child" error.
+ */
 export const addMetadata = <T extends object>(
   id: string,
-  object: T & { type?: string; _content_source?: unknown },
-  path: (string | number)[]
+  obj: T,
+  path: (string | number)[] = []
 ): T => {
-  Object.entries(object).forEach(([key, value]) => {
-    if (Array.isArray(value)) {
-      value.forEach((item, index) => {
-        if (isScalarOrUndefined(item)) {
-          return;
-        }
-        if (Array.isArray(item)) {
-          return; // we don't expect arrays of arrays
-        }
-        const itemObject = item as object;
-        addMetadata(id, itemObject, [...path, key, index]);
-      });
-    } else {
-      if (isScalarOrUndefined(value)) {
-        return;
-      }
-      const itemObject = value as object;
-      addMetadata(id, itemObject, [...path, key]);
-    }
-  });
-  // This is a rich-text field object
-  if (object?.type === 'root') {
-    return;
+  // Guard against null values, which have a typeof 'object'
+  if (obj === null) {
+    return obj;
   }
 
-  object._content_source = {
-    queryId: id,
-    path,
-  };
-  return object;
+  // Guard against primitive values
+  if (isScalarOrUndefined(obj)) {
+    return obj;
+  }
+
+  // Guard against String objects, returning their primitive value.
+  if (obj instanceof String) {
+    return obj.valueOf() as unknown as T;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map((item, index) =>
+      addMetadata(id, item, [...path, index])
+    ) as unknown as T;
+  }
+
+  const transformedObj = {} as T;
+  for (const [key, value] of Object.entries(obj)) {
+    const currentPath = [...path, key];
+
+    // Safely skip system keys and copy them over without recursion
+    if (
+      [
+        '__typename',
+        '_sys',
+        '_internalSys',
+        '_values',
+        '_internalValues',
+        '_content_source',
+        '_tina_metadata',
+      ].includes(key)
+    ) {
+      transformedObj[key] = value;
+    } else {
+      transformedObj[key] = addMetadata(id, value, currentPath);
+    }
+  }
+
+  if (
+    transformedObj &&
+    typeof transformedObj === 'object' &&
+    'type' in transformedObj &&
+    (transformedObj as { type?: unknown }).type === 'root'
+  ) {
+    return transformedObj;
+  }
+
+  return { ...transformedObj, _content_source: { queryId: id, path } };
 };
+
 function isScalarOrUndefined(value: unknown) {
   const type = typeof value;
   if (type === 'string') return true;

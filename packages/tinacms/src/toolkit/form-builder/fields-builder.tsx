@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { Form, Field } from '@toolkit/forms';
+import { Field, Form } from '@toolkit/forms';
 import { useCMS, useEventSubscription } from '@toolkit/react-core';
+import * as React from 'react';
 import { Field as FinalField } from 'react-final-form';
 import { FieldPlugin } from './field-plugin';
 
@@ -46,7 +46,21 @@ export function FieldsBuilder({
   );
 }
 
-const InnerField = ({ field, form, fieldPlugins, index, activeFieldName }) => {
+interface InnerFieldProps {
+  field: Field;
+  form: Form;
+  fieldPlugins: FieldPlugin[];
+  index: number;
+  activeFieldName?: string;
+}
+
+const InnerField = ({
+  field,
+  form,
+  fieldPlugins,
+  index,
+  activeFieldName,
+}: InnerFieldProps) => {
   /**
    * We double-render form builders for some reason which reults in useMemo not working here
    */

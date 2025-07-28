@@ -1,5 +1,4 @@
 import React from 'react';
-import { useSelected } from 'slate-react';
 import { NestedForm } from '../../nested-form';
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks';
 import { useTemplates } from '../../editor-context';
@@ -9,8 +8,7 @@ import {
   StyledImage,
 } from '../../../../../components';
 import { isImage } from '@toolkit/components/media/utils';
-import { insertNodes } from '@udecode/plate-common';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate';
+import { ParagraphPlugin, useSelected } from '@udecode/plate/react';
 
 export const ImgEmbed = ({
   attributes,
@@ -25,8 +23,8 @@ export const ImgEmbed = ({
     useEmbedHandles(editor, element, fieldName);
 
   useHotkey('enter', () => {
-    insertNodes(editor, [
-      { type: ELEMENT_PARAGRAPH, children: [{ text: '' }] },
+    editor.tf.insertNodes([
+      { type: ParagraphPlugin.key, children: [{ text: '' }] },
     ]);
   });
 

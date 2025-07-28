@@ -80,7 +80,7 @@ const TemplateMenu = ({
       {() => (
         <div>
           <div>
-            <MenuButton className='icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6'>
+            <MenuButton className='icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6'>
               Create New <BiPlus className='w-5 h-full ml-1 opacity-70' />
             </MenuButton>
           </div>
@@ -93,7 +93,7 @@ const TemplateMenu = ({
             leaveFrom='transform opacity-100 scale-100'
             leaveTo='transform opacity-0 scale-95'
           >
-            <MenuItems className='origin-top-right absolute right-0 mt-2 z-menu w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
+            <MenuItems className='origin-top-right absolute right-0 mt-2 z-menu w-56 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none'>
               <div className='py-1'>
                 {templates.map((template) => (
                   <MenuItem key={`${template.label}-${template.name}`}>
@@ -507,7 +507,7 @@ const CollectionListPage = () => {
                       />
                     )}
 
-                    <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
+                    <PageHeader>
                       <div className='w-full'>
                         <h3 className='font-sans text-2xl text-gray-700'>
                           {collection.label
@@ -633,7 +633,7 @@ const CollectionListPage = () => {
                                             }}
                                             to='/collections/new-folder'
                                             className={cn(
-                                              'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4',
+                                              'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-blue-500 bg-white hover:bg-[#f1f5f9] focus:ring-white focus:ring-blue-500 w-full md:w-auto text-sm h-10 px-6 mr-4',
                                               collection.templates &&
                                                 'opacity-50 pointer-events-none cursor-not-allowed'
                                             )}
@@ -692,10 +692,10 @@ const CollectionListPage = () => {
                                             collectionName,
                                           ].join('/')
                                     }`}
-                                    className='inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6'
+                                    className='inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6'
                                   >
                                     <FaFile className='mr-2' />
-                                    Add Files{' '}
+                                    Add File
                                   </Link>
                                 </>
                               )}
@@ -1081,7 +1081,7 @@ const SearchInput = ({
                 }
               }
             }}
-            className='shadow appearance-none bg-white block pl-10 pr-10 py-2 truncate w-full text-base border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md placeholder:text-gray-300 text-gray-600 focus:text-gray-900'
+            className='shadow appearance-none bg-white block pl-10 pr-10 py-2 truncate w-full text-base border border-gray-200 focus:outline-none focus:shadow-outline focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded placeholder:text-gray-300 text-gray-600 focus:text-gray-900'
           />
           {search && searchLoaded && (
             <button

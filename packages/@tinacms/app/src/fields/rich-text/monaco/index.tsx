@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 import React from 'react';
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
 /**
@@ -12,15 +6,15 @@ import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react';
  * easily install the current version of the mdx package in all scenarios
  * (when we're working in the monorepo, or working with a tagged npm version)
  */
-import { parseMDX, stringifyMDX } from '@tinacms/mdx';
-import { useDebounce } from './use-debounce';
+import { parseMDX, serializeMDX } from '@tinacms/mdx';
 import type * as monaco from 'monaco-editor';
+import { RichTextType } from 'tinacms';
 import {
-  buildError,
   ErrorMessage,
   InvalidMarkdownElement,
+  buildError,
 } from './error-message';
-import { RichTextType } from 'tinacms';
+import { useDebounce } from './use-debounce';
 
 export const uuid = () => {
   // @ts-ignore
@@ -33,11 +27,6 @@ export const uuid = () => {
 };
 
 type Monaco = typeof monaco;
-
-// 0.33.0 has a bug https://github.com/microsoft/monaco-editor/issues/2947
-loader.config({
-  paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs' },
-});
 
 /**
  * Since monaco lazy-loads we may have a delay from when the block is inserted
@@ -68,7 +57,7 @@ export const RawEditor = (props: RichTextType) => {
   const field = props.field;
   const inputValue = React.useMemo(() => {
     // @ts-ignore no access to the rich-text type from this package
-    const res = stringifyMDX(props.input.value, field, (value) => value);
+    const res = serializeMDX(props.input.value, field, (value) => value);
     return typeof props.input.value === 'string' ? props.input.value : res;
   }, []);
   const [value, setValue] = React.useState(inputValue);
@@ -149,13 +138,17 @@ export const RawEditor = (props: RichTextType) => {
     monacoEditor: monaco.editor.IStandaloneCodeEditor,
     monaco: Monaco
   ) {
-    monacoEditorRef.current = monacoEditor;
-    monacoEditor.onDidContentSizeChange(() => {
-      // FIXME: if the window is too tall the performance degrades, come up with a nice
-      // balance between the two
-      setHeight(Math.min(Math.max(100, monacoEditor.getContentHeight()), 1000));
-      monacoEditor.layout();
-    });
+    if (monacoEditor) {
+      monacoEditorRef.current = monacoEditor;
+      monacoEditor.onDidContentSizeChange(() => {
+        // FIXME: if the window is too tall the performance degrades, come up with a nice
+        // balance between the two
+        setHeight(
+          Math.min(Math.max(100, monacoEditor.getContentHeight()), 1000)
+        );
+        monacoEditor.layout();
+      });
+    }
   }
 
   return (
@@ -168,6 +161,9 @@ export const RawEditor = (props: RichTextType) => {
       </div>
       <div style={{ height: `${height}px` }}>
         <MonacoEditor
+          beforeMount={() => {}}
+          height='100%'
+          width='100%'
           path={id}
           onMount={handleEditorDidMount}
           // Setting a custom theme is kind of buggy because it doesn't get defined until monaco has mounted.
@@ -219,10 +215,8 @@ const Button = (props) => {
   return (
     <button
       className={`${
-        props.align === 'left'
-          ? 'rounded-l-md border-r-0'
-          : 'rounded-r-md border-l-0'
-      } flex justify-center w-full shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+        props.align === 'left' ? 'rounded-l border-r-0' : 'rounded-r border-l-0'
+      } flex justify-center w-full shadow rounded bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
       type='button'
       onClick={props.onClick}
     >

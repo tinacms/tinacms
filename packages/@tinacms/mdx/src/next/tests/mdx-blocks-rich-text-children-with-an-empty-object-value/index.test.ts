@@ -1,8 +1,8 @@
-import { it, expect } from 'vitest';
-import { stringifyMDX } from '../../../stringify';
-import { field } from './field';
-import * as util from '../util';
+import { expect, it } from 'vitest';
 import { RootElement } from '../../../parse/plate';
+import { serializeMDX } from '../../../stringify';
+import * as util from '../util';
+import { field } from './field';
 
 it('matches input', () => {
   const tree: RootElement = {
@@ -24,6 +24,6 @@ it('matches input', () => {
     ],
   };
 
-  const string = stringifyMDX(tree, field, (v) => v);
+  const string = serializeMDX(tree, field, (v) => v);
   expect(string).toMatchFile(util.mdPath(__dirname));
 });

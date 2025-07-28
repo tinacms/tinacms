@@ -37,7 +37,7 @@ export const ButtonToggle: React.FC<ButtonToggleProps> = ({
       <div
         className={`flex ${
           direction === 'horizontal' ? 'divide-x' : 'flex-col divide-y'
-        } divide-gray-150 shadow-inner bg-gray-50 border border-gray-200 w-full justify-between rounded-md`}
+        } divide-gray-150 shadow-inner bg-gray-50 border border-gray-200 w-full justify-between rounded`}
       >
         {toggleOptions
           ? toggleOptions.map((toggleOption) => {
@@ -98,7 +98,7 @@ const ButtonOption = ({
         <span className='flex-1 truncate max-w-full w-0'>{label}</span>
       )}
       <span
-        className={`absolute whitespace-nowrap px-3 py-2 z-20 font-medium text-base flex items-center justify-center -top-0.5 -right-0.5 -bottom-0.5 -left-0.5 truncate bg-white border border-gray-200 origin-center rounded-md shadow text-blue-500 transition-all ease-out duration-150 ${
+        className={`absolute whitespace-nowrap px-3 py-2 z-20 font-medium text-base flex items-center justify-center -top-0.5 -right-0.5 -bottom-0.5 -left-0.5 truncate bg-white border border-gray-200 origin-center rounded shadow text-blue-500 transition-all ease-out duration-150 ${
           input.value === value ? 'opacity-100' : 'opacity-0'
         }`}
       >

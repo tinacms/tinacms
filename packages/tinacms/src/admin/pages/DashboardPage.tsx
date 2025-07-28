@@ -1,12 +1,8 @@
-/**
-
-*/
-
-import React from 'react';
 import type { TinaCMS } from '@tinacms/toolkit';
+import React from 'react';
 
 import GetCMS from '../components/GetCMS';
-import { PageWrapper, PageHeader, PageBodyNarrow } from '../components/Page';
+import { PageBody, PageHeader, PageWrapper } from '../components/Page';
 
 const DashboardPage = () => {
   return (
@@ -14,15 +10,15 @@ const DashboardPage = () => {
       {(cms: TinaCMS) => (
         <PageWrapper>
           <>
-            <PageHeader isLocalMode={cms.api?.tina?.isLocalMode}>
+            <PageHeader>
               <h3 className='text-2xl font-sans text-gray-700'>
                 Welcome to Tina!
               </h3>
             </PageHeader>
-            <PageBodyNarrow>
+            <PageBody>
               This is your dashboard for editing or creating content. Select a
               collection on the left to begin.
-            </PageBodyNarrow>
+            </PageBody>
           </>
         </PageWrapper>
       )}

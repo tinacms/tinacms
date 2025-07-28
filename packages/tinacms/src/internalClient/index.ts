@@ -25,6 +25,7 @@ import {
   queryToSearchIndexQuery,
 } from '@tinacms/search/dist/index-client';
 import gql from 'graphql-tag';
+import { EDITORIAL_WORKFLOW_STATUS } from '../toolkit/form-builder/editorial-workflow-constants';
 import { AsyncData, asyncPoll } from './asyncPoll';
 import { LocalAuthProvider, TinaCloudAuthProvider } from './authProvider';
 import { TinaCloudProject } from './types';
@@ -568,6 +569,135 @@ mutation addPendingDocumentMutation(
       throw error;
     }
   }
+
+  async getLatestVersion(): Promise<LatestVersionResponse> {
+    // needs to point at production content api as self hosted doesn't have this endpoint
+    const url = 'https://content.tinajs.io/latest-version';
+
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch latest version: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      return data as LatestVersionResponse;
+    } catch (error) {
+      console.error('Error fetching latest version:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Initiate and poll for the results of an editorial workflow operation
+   *
+   * @param options Editorial workflow options
+   * @returns Object with branch and PR info when complete
+   */
+  async executeEditorialWorkflow(options: {
+    branchName: string;
+    baseBranch: string;
+    prTitle?: string;
+    graphQLContentOp?: {
+      query: string;
+      variables: Record<string, unknown>;
+    };
+    onStatusUpdate?: (status: { status: string; message?: string }) => void;
+  }) {
+    const url = `${this.contentApiBase}/editorial-workflow/${this.clientId}`;
+
+    try {
+      const res = await this.authProvider.fetchWithToken(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          branchName: options.branchName,
+          baseBranch: options.baseBranch,
+          prTitle: options.prTitle,
+          graphQLContentOp: options.graphQLContentOp,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const responseBody = await res.json();
+
+      if (!res.ok) {
+        console.error('There was an error starting editorial workflow.');
+        throw new Error(
+          responseBody?.message || 'Failed to start editorial workflow'
+        );
+      }
+
+      const requestId = responseBody.requestId;
+
+      if (!requestId) {
+        return responseBody;
+      }
+
+      if (options.onStatusUpdate) {
+        options.onStatusUpdate({
+          status: EDITORIAL_WORKFLOW_STATUS.QUEUED,
+          message: 'Workflow queued, starting...',
+        });
+      }
+
+      const maxAttempts = 60;
+      const pollInterval = 5000;
+      let attempts = 0;
+
+      while (attempts < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, pollInterval));
+        attempts++;
+
+        const statusUrl = `${this.contentApiBase}/editorial-workflow/${this.clientId}/status/${requestId}`;
+        const statusResponse =
+          await this.authProvider.fetchWithToken(statusUrl);
+
+        if (!statusResponse.ok) {
+          throw new Error(
+            `Failed to check workflow status: ${statusResponse.statusText}`
+          );
+        }
+
+        const statusResponseBody = await statusResponse.json();
+
+        if (options.onStatusUpdate) {
+          options.onStatusUpdate({
+            status: statusResponseBody.status,
+            message:
+              statusResponseBody.message ||
+              `Status: ${statusResponseBody.status}`,
+          });
+        }
+
+        // Only on 200 OK status, return the response
+        if (statusResponse.status === 200) {
+          return {
+            branchName: statusResponseBody.branchName,
+            pullRequestUrl: statusResponseBody.pullRequestUrl,
+          };
+        }
+
+        if (!statusResponse.ok) {
+          throw new Error(
+            statusResponseBody.message || 'Editorial workflow failed'
+          );
+        }
+      }
+
+      throw new Error('Editorial workflow timed out after 5 minutes');
+    } catch (error) {
+      console.error(
+        'There was an error with editorial workflow operation.',
+        error
+      );
+      throw error;
+    }
+  }
 }
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL =
@@ -705,3 +835,10 @@ export class LocalSearchClient implements SearchClient {
     return false;
   }
 }
+
+export type PackageVersionInfo = {
+  version: string;
+  publishedAt: string;
+};
+
+export type LatestVersionResponse = Record<string, PackageVersionInfo>;

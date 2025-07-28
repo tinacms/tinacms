@@ -1,0 +1,23 @@
+{
+  "data": {
+    "page": {
+      "id": "pages/home.md",
+      "title": "Welcome",
+      "seo": {
+        "seoTitle": "Welcome to our website",
+        "ogDescription": "You're gonna love this site!"
+      },
+      "blocks": [
+        {
+          "__typename": "PageBlocksHero",
+          "description": "Welcome!"
+        },
+        {
+          "__typename": "PageBlocksCta",
+          "ctaText": "Join Us",
+          "ctaStyle": "minimal"
+        }
+      ]
+    }
+  }
+}

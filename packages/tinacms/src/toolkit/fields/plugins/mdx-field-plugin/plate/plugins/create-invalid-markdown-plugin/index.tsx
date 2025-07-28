@@ -1,26 +1,36 @@
 import React from 'react';
-import { createPluginFactory } from '@udecode/plate-common';
 import { useEditorContext } from '../../editor-context';
 import { buildErrorMessage } from '../../../monaco/error-message';
+import { createPlatePlugin, PlateElementProps } from '@udecode/plate/react';
 
 export const ELEMENT_INVALID_MARKDOWN = 'invalid_markdown';
 
-export const createInvalidMarkdownPlugin = createPluginFactory({
+export const createInvalidMarkdownPlugin = createPlatePlugin({
   key: ELEMENT_INVALID_MARKDOWN,
-  isVoid: true,
-  isInline: false,
-  isElement: true,
-  component: ({ attributes, element, children }) => {
-    return (
-      <div {...attributes}>
-        <ErrorMessage error={element} />
-        {children}
-      </div>
-    );
+  options: {
+    isElement: true,
+    isVoid: true,
+    isInline: false,
+  },
+  node: {
+    component: InvalidMarkdownElement,
   },
 });
 
-export function ErrorMessage({ error }) {
+function InvalidMarkdownElement({
+  attributes,
+  element,
+  children,
+}: PlateElementProps) {
+  return (
+    <div {...attributes}>
+      <ErrorMessage error={element} />
+      {children}
+    </div>
+  );
+}
+
+function ErrorMessage({ error }) {
   const message = buildErrorMessage(error);
   const { setRawMode } = useEditorContext();
   return (
@@ -35,7 +45,7 @@ export function ErrorMessage({ error }) {
           <button
             type='button'
             onClick={() => setRawMode(true)}
-            className='rounded-l-md border-r-0 shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-gray-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500'
+            className='rounded-l border-r-0 shadow rounded bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-gray-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500'
           >
             Switch to raw-mode
           </button>
