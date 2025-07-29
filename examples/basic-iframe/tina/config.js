@@ -1,4 +1,4 @@
-import { TinaCMS, defineConfig } from 'tinacms';
+import { TinaCMS, defineConfig } from "tinacms";
 
 export default defineConfig({
   // Example of how you can override the frontend url
@@ -8,26 +8,26 @@ export default defineConfig({
       // Get token function examples (can be removed)
       getToken: async () => {
         return {
-          id_token: 'Foo',
+          id_token: "Foo",
         };
       },
       // This is called when they want to authenticate a user. For a lot of implementations it just may be redirecting to the login page
       async authenticate() {
-        console.log('Authenticating...');
+        console.log("Authenticating...");
         localStorage.setItem(
-          'logan',
-          JSON.stringify({ name: 'Logan', role: 'admin' })
+          "logan",
+          JSON.stringify({ name: "Logan", role: "admin" })
         );
         return {};
       },
       async logOut() {
-        console.log('logOut...');
-        localStorage.removeItem('logan');
-        window.location.href = '/';
+        console.log("logOut...");
+        localStorage.removeItem("logan");
+        window.location.href = "/";
       },
       async getUser() {
-        console.log('getUser...');
-        const userStr = localStorage.getItem('logan');
+        console.log("getUser...");
+        const userStr = localStorage.getItem("logan");
         if (!userStr) {
           return undefined;
         } else {
@@ -41,30 +41,33 @@ export default defineConfig({
 
       // Other methods
       onLogin: () => {
-        console.log('Logged in!');
+        console.log("Logged in!");
         // hook function to be called when the user logs in
       },
       onLogout: () => {
-        console.log('Logged out!');
+        console.log("Logged out!");
         // hook function to be called when the user logs out
       },
     },
   },
-  branch: '',
+  branch: "",
   clientId: null,
   token: null,
   build: {
     // can set the host of the vite config here
     // host: true,
-    outputFolder: 'admin',
-    publicFolder: 'public',
+    outputFolder: "admin",
+    publicFolder: "public",
   },
   media: {
     tina: {
-      mediaRoot: 'uploads',
-      publicFolder: 'public',
+      mediaRoot: "uploads",
+      publicFolder: "public",
     },
-    accept: ['image/jpeg', 'video/mp4'],
+    accept: ["image/jpeg", "video/mp4"],
+  },
+  ui: {
+    // optOutOfUpdateCheck: true,
   },
   schema: {
     collections: [
@@ -72,38 +75,38 @@ export default defineConfig({
         ui: {
           filename: {
             slugify: (values, meta) => {
-              if (meta.template.name === 'tem1') {
-                return 'tem1/' + (values?.foo || '');
+              if (meta.template.name === "tem1") {
+                return "tem1/" + (values?.foo || "");
               }
-              if (meta.template.name === 'tem2') {
-                return 'tem2/' + (values?.bar || '');
+              if (meta.template.name === "tem2") {
+                return "tem2/" + (values?.bar || "");
               }
             },
           },
         },
-        name: 'test',
-        path: 'content/test',
-        label: 'Test',
+        name: "test",
+        path: "content/test",
+        label: "Test",
         templates: [
           {
-            name: 'tem1',
-            label: 'Template 1',
-            fields: [{ type: 'string', name: 'foo' }],
+            name: "tem1",
+            label: "Template 1",
+            fields: [{ type: "string", name: "foo" }],
           },
           {
-            name: 'tem2',
-            label: 'Template 2',
-            fields: [{ type: 'string', name: 'bar' }],
+            name: "tem2",
+            label: "Template 2",
+            fields: [{ type: "string", name: "bar" }],
           },
         ],
       },
       {
-        name: 'page',
-        path: 'content/page',
-        label: 'Page',
-        format: 'mdx',
-        frontmatterFormat: 'toml',
-        frontmatterDelimiters: ['+++', '+++'],
+        name: "page",
+        path: "content/page",
+        label: "Page",
+        format: "mdx",
+        frontmatterFormat: "toml",
+        frontmatterDelimiters: ["+++", "+++"],
         ui: {
           filename: {
             description:
@@ -111,8 +114,8 @@ export default defineConfig({
             showFirst: true,
           },
           router: ({ document }) => {
-            if (document._sys.breadcrumbs[0] === 'home') {
-              return '/';
+            if (document._sys.breadcrumbs[0] === "home") {
+              return "/";
             }
             return `/${document._sys.filename}`;
           },
@@ -126,9 +129,9 @@ export default defineConfig({
         },
         fields: [
           {
-            label: 'Title',
-            name: 'Title',
-            type: 'string',
+            label: "Title",
+            name: "Title",
+            type: "string",
             ui: {
               description:
                 'The title of the <span style="text-decoration:underline;font-weight:bold">page</span>',
@@ -152,33 +155,33 @@ export default defineConfig({
             },
           },
           {
-            name: 'lastUpdated',
-            type: 'datetime',
+            name: "lastUpdated",
+            type: "datetime",
             ui: {
-              component: 'hidden',
+              component: "hidden",
             },
           },
           {
-            name: 'body',
-            label: 'Body',
-            type: 'rich-text',
+            name: "body",
+            label: "Body",
+            type: "rich-text",
             isBody: true,
             templates: [
               {
-                name: 'WarningCallout',
-                label: 'WarningCallout',
+                name: "WarningCallout",
+                label: "WarningCallout",
                 match: {
-                  start: '{%',
-                  end: '%}',
+                  start: "{%",
+                  end: "%}",
                 },
                 fields: [
                   {
-                    name: 'text',
-                    label: 'Text',
-                    type: 'string',
+                    name: "text",
+                    label: "Text",
+                    type: "string",
                     required: true,
                     ui: {
-                      component: 'textarea',
+                      component: "textarea",
                     },
                   },
                 ],
@@ -188,23 +191,23 @@ export default defineConfig({
         ],
       },
       {
-        label: 'Blog 2',
-        name: 'post2',
-        path: 'content/new-folder-2',
-        format: 'md',
+        label: "Blog 2",
+        name: "post2",
+        path: "content/new-folder-2",
+        format: "md",
         fields: [
           {
-            type: 'string',
-            label: 'Title',
-            name: 'title',
+            type: "string",
+            label: "Title",
+            name: "title",
           },
         ],
       },
       {
-        label: 'Blog Posts',
-        name: 'post',
-        path: 'content/post',
-        format: 'md',
+        label: "Blog Posts",
+        name: "post",
+        path: "content/post",
+        format: "md",
         ui: {
           router: ({ document }) => {
             return `/posts/${document._sys.filename}`;
@@ -212,21 +215,21 @@ export default defineConfig({
         },
         fields: [
           {
-            type: 'string',
-            label: 'Title',
-            name: 'title',
+            type: "string",
+            label: "Title",
+            name: "title",
           },
           {
-            type: 'image',
+            type: "image",
             list: true,
-            name: 'images',
+            name: "images",
             description:
               'This is a list of <span style="text-decoration:underline;font-weight:bold">images</span>',
           },
           {
-            type: 'object',
-            label: 'Related Posts',
-            name: 'posts',
+            type: "object",
+            label: "Related Posts",
+            name: "posts",
             list: true,
             description:
               'This is a list of <span style="text-decoration:underline;font-weight:bold">related posts</span>',
@@ -237,84 +240,84 @@ export default defineConfig({
             },
             fields: [
               {
-                name: 'post',
-                type: 'reference',
-                collections: ['post', 'page'],
+                name: "post",
+                type: "reference",
+                collections: ["post", "page"],
               },
               {
-                name: 'label',
-                type: 'string',
+                name: "label",
+                type: "string",
               },
             ],
           },
           {
-            type: 'object',
-            label: 'Something',
-            name: 'foo',
+            type: "object",
+            label: "Something",
+            name: "foo",
             description:
               'This is a description of an <span style="text-decoration:underline;font-weight:bold">object</span>',
             fields: [
               {
-                name: 'bar',
-                label: 'Bar',
-                type: 'string',
+                name: "bar",
+                label: "Bar",
+                type: "string",
               },
             ],
           },
           {
-            type: 'string',
-            label: 'Topic',
-            name: 'topic',
+            type: "string",
+            label: "Topic",
+            name: "topic",
             description:
               'This is the <span style="text-decoration:underline;font-weight:bold">topic</span> of the blog post',
-            options: ['programming', 'blacksmithing'],
+            options: ["programming", "blacksmithing"],
             list: true,
           },
           {
-            type: 'rich-text',
-            label: 'Blog Post Body',
-            name: 'body',
+            type: "rich-text",
+            label: "Blog Post Body",
+            name: "body",
             description:
               'This is the <span style="text-decoration:underline;font-weight:bold">body</span> of the blog post',
             isBody: true,
             templates: [
               {
-                name: 'Gallery',
-                label: 'Gallery',
+                name: "Gallery",
+                label: "Gallery",
                 fields: [
                   {
-                    label: 'Images',
-                    name: 'images',
-                    type: 'object',
+                    label: "Images",
+                    name: "images",
+                    type: "object",
                     list: true,
                     fields: [
                       {
-                        type: 'image',
-                        name: 'src',
-                        label: 'Source',
+                        type: "image",
+                        name: "src",
+                        label: "Source",
                       },
                       {
-                        type: 'string',
-                        name: 'width',
-                        label: 'Width',
+                        type: "string",
+                        name: "width",
+                        label: "Width",
                       },
                       {
-                        type: 'string',
-                        name: 'height',
-                        label: 'Height',
+                        type: "string",
+                        name: "height",
+                        label: "Height",
                       },
                     ],
                   },
                   {
-                    type: 'string',
-                    name: 'alignment',
-                    label: 'Alignment',
-                    options: ['left', 'center', 'right'],
+                    type: "string",
+                    name: "alignment",
+                    label: "Alignment",
+                    options: ["left", "center", "right"],
                   },
                   {
-                    type: 'string',
-                    name: 'gap',
-                    label: 'Gap',
+                    type: "string",
+                    name: "gap",
+                    label: "Gap",
                   },
                 ],
               },
