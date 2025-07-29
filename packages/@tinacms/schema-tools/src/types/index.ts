@@ -162,6 +162,11 @@ type FieldGeneric<
   ? {
       list: true;
       ui?: UIField<Type, true> & ExtraFieldUIProps;
+      /**
+       * Defines where new items will be added in the list.
+       * If not specified, defaults to `append`.
+       */
+      addItemBehavior?: 'append' | 'prepend';
     }
   : List extends false
     ? {
