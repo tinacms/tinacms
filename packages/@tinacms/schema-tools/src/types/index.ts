@@ -624,7 +624,7 @@ export interface Config<
      * ```
      * [more info](https://vercel.com/docs/concepts/deployments/generated-urls#url-with-git-branch)
      */
-    previewUrl: (context: { branch: string }) => { url: string };
+    previewUrl?: (context: { branch: string }) => { url: string };
 
     /**
      * Opt out of update checks - this will prevent the CMS for checking for new versions
