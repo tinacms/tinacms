@@ -564,7 +564,8 @@ const BranchItem = ({
               },
               !branch.githubPullRequestUrl &&
                 !branch.protected &&
-                !creatingPR && {
+                !creatingPR &&
+                cms.api.tina.usingProtectedBranch() && {
                   name: 'create-pr',
                   label: 'Create Pull Request',
                   Icon: (
