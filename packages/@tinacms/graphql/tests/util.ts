@@ -15,6 +15,29 @@ class OutputBridge extends FilesystemBridge {
   }
 }
 
+class MemoryCaptureBridge extends FilesystemBridge {
+  private writes: Map<string, string> = new Map();
+
+  // Read operations continue to use filesystem
+  async get(filepath: string): Promise<string> {
+    return super.get(filepath);
+  }
+
+  // Write operations are captured in memory
+  async put(filepath: string, data: string): Promise<void> {
+    this.writes.set(filepath, data);
+  }
+
+  // Test utilities to access captured writes
+  getWrites(): Map<string, string> {
+    return new Map(this.writes);
+  }
+
+  getWrite(filepath: string): string | undefined {
+    return this.writes.get(filepath);
+  }
+}
+
 const dataSchema = z.object({
   document: z.object({
     _sys: z.object({ title: z.string() }),
@@ -63,6 +86,42 @@ export const setup = async (dir: string, config: any) => {
 
 export const assertDoc = (doc: any) => {
   return z.object({ data: dataSchema, errors: z.any() }).parse(doc);
+};
+
+export const setupMutation = async (dir: string, config: any) => {
+  const bridge = new MemoryCaptureBridge(dir);
+  const level = new MemoryLevel<string, Record<string, any>>();
+  const database = createDatabaseInternal({
+    bridge,
+    level,
+    tinaDirectory: 'tina',
+  });
+  await database.indexContent(await buildSchema(config));
+
+  const query = async (options?: {
+    query: string;
+    variables: Record<string, unknown>;
+  }) => {
+    const result = await resolve({
+      database,
+      query: options?.query || defaultQuery,
+      variables: options?.variables || {},
+    });
+    return result;
+  };
+
+  return { query, bridge };
+};
+
+export const loadVariables = async (
+  dir: string,
+  filename = 'variables.json'
+) => {
+  const variablesPath = path.join(dir, filename);
+  if (await fs.pathExists(variablesPath)) {
+    return JSON.parse(await fs.readFile(variablesPath, 'utf-8'));
+  }
+  return {};
 };
 
 export const format = (data: any) => {
