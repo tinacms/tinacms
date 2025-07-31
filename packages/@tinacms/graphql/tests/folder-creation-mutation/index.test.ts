@@ -9,10 +9,6 @@ const createFolderMutation = `
       relativePath: "northwind/company-updates"
     ) {
       __typename
-      ... on Folder {
-        name
-        path
-      }
     }
   }
 `;
