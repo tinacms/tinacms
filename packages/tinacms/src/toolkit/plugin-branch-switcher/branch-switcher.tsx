@@ -468,7 +468,7 @@ const BranchItem = ({
       const res = await cms.api.tina.createPullRequest({
         baseBranch: cms.api.tina.branch,
         branch: branch.name,
-        title: `Content updates from ${branch.name}`,
+        title: `${branch.name.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
       });
 
       refreshBranchList();
