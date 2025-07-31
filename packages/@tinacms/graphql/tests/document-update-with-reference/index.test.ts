@@ -14,7 +14,7 @@ const updateMutation = `
   }
 `;
 
-it('executes mutation with variables and validates bridge writes', async () => {
+it('executes mutation with reference and validates bridge writes', async () => {
   const { query, bridge } = await setupMutation(__dirname, config);
   const variables = await loadVariables(__dirname);
 
