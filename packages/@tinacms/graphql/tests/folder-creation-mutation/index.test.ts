@@ -20,10 +20,12 @@ it('creates folder and validates bridge writes', async () => {
     query: createFolderMutation,
     variables: {},
   });
-  
+
   expect(format(result)).toMatchFileSnapshot('folder-creation-response.json');
 
-  const folderWrite = bridge.getWrite('posts/northwind/company-updates/.gitkeep.md');
+  const folderWrite = bridge.getWrite(
+    'posts/northwind/company-updates/.gitkeep.md'
+  );
   expect(folderWrite).toBeDefined();
 });
 
@@ -56,10 +58,6 @@ it('creates nested folder structure', async () => {
         relativePath: "northwind/departments/marketing/campaigns"
       ) {
         __typename
-        ... on Folder {
-          name
-          path
-        }
       }
     }
   `;
@@ -68,7 +66,9 @@ it('creates nested folder structure', async () => {
     query: nestedFolderMutation,
     variables: {},
   });
-  
-  const folderWrite = bridge.getWrite('posts/northwind/departments/marketing/campaigns/.gitkeep.md');
+
+  const folderWrite = bridge.getWrite(
+    'posts/northwind/departments/marketing/campaigns/.gitkeep.md'
+  );
   expect(folderWrite).toBeDefined();
 });
