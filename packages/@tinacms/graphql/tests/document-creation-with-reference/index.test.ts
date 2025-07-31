@@ -64,7 +64,11 @@ it('validates document with reference field is queryable after creation', async 
   });
 
   expect(queryResult.errors).toBeUndefined();
-  expect(queryResult.data?.post?.title).toBe('Test Post with Reference by Mr Bob Northwind');
+  expect(queryResult.data?.post?.title).toBe(
+    'Test Post with Reference by Mr Bob Northwind'
+  );
   expect(queryResult.data?.post?.author?.name).toBe('Mr Bob Northwind');
-  expect(queryResult.data?.post?.author?.bio).toBe('CEO of Northwind company and expert business writer');
+  expect(queryResult.data?.post?.author?.bio).toBe(
+    'CEO of Northwind company and expert business writer'
+  );
 });
