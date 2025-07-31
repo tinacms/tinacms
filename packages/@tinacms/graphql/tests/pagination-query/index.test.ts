@@ -105,7 +105,7 @@ it('handles forward pagination through to last page', async () => {
   expect(finalPage.data!.movieConnection.pageInfo.hasNextPage).toBe(false);
 });
 
-// NOTE: The following test is incorrect.
+// NOTE: The following test is incorrect - see https://github.com/tinacms/tinacms/issues/5921
 // There is no consistency between how sequences of 1 or 2 pages are being returned.
 /*
 it('handles backward pagination through to first page', async () => {
