@@ -19,11 +19,6 @@ export const schema: Schema = {
           type: 'rich-text',
         },
         {
-          name: 'author',
-          label: 'Author',
-          type: 'string',
-        },
-        {
           name: 'published',
           label: 'Published',
           type: 'boolean',

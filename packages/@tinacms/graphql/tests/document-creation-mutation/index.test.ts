@@ -24,7 +24,6 @@ const createMutation = `
               }
             ]
           }
-          author: "Mr Bob Northwind"
           published: true
           rating: 10
           publishDate: "2023-12-01T00:00:00.000Z"
@@ -50,9 +49,9 @@ const createMutation = `
 `;
 
 it('creates document with all field types and validates bridge writes', async () => {
-  const { get, bridge } = await setupMutation(__dirname, config);
+  const { query, bridge } = await setupMutation(__dirname, config);
 
-  const result = await get({
+  const result = await query({
     query: createMutation,
     variables: {},
   });
@@ -64,9 +63,9 @@ it('creates document with all field types and validates bridge writes', async ()
 });
 
 it('validates immediate document availability after creation', async () => {
-  const { get } = await setupMutation(__dirname, config);
+  const { query } = await setupMutation(__dirname, config);
 
-  await get({
+  await query({
     query: createMutation,
     variables: {},
   });
@@ -76,7 +75,6 @@ it('validates immediate document availability after creation', async () => {
       post(relativePath: "comprehensive-post.md") {
         title
         content
-        author
         published
         rating
         publishDate
@@ -95,7 +93,7 @@ it('validates immediate document availability after creation', async () => {
     }
   `;
 
-  const queryResult = await get({
+  const queryResult = await query({
     query: getQuery,
     variables: {},
   });

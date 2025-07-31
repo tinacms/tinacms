@@ -98,7 +98,7 @@ export const setupMutation = async (dir: string, config: any) => {
   });
   await database.indexContent(await buildSchema(config));
 
-  const get = async (options?: {
+  const query = async (options?: {
     query: string;
     variables: Record<string, unknown>;
   }) => {
@@ -110,7 +110,7 @@ export const setupMutation = async (dir: string, config: any) => {
     return result;
   };
 
-  return { get, bridge };
+  return { query, bridge };
 };
 
 export const loadVariables = async (

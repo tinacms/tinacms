@@ -3,7 +3,6 @@ title: Comprehensive Test Post by Mr Bob Northwind
 content: >
   This is a comprehensive test post created by Mr Bob Northwind for his
   Northwind company.
-author: Mr Bob Northwind
 published: true
 rating: 10
 publishDate: 2023-12-01T00:00:00.000Z
