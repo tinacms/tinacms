@@ -40,7 +40,10 @@ it('creates pending document with valid parameters', async () => {
 it('handles validation error for invalid collection', async () => {
   const { query } = await setupMutation(__dirname, config);
 
-  const result = await query({ query: invalidCollectionMutation, variables: {} });
+  const result = await query({
+    query: invalidCollectionMutation,
+    variables: {},
+  });
 
   expect(result.errors).toBeDefined();
   expect(result.errors?.length).toBeGreaterThan(0);
