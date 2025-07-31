@@ -1,0 +1,27 @@
+{
+  "data": {
+    "directorsConnection": {
+      "totalCount": 2,
+      "edges": [
+        {
+          "node": {
+            "id": "directors/bob-northwind.md",
+            "name": "Bob Northwind",
+            "bio": "Australian filmmaker known for fantasy and adventure films.",
+            "yearsActive": 35,
+            "nationality": "Australian"
+          }
+        },
+        {
+          "node": {
+            "id": "directors/john-smith.md",
+            "name": "John Smith",
+            "bio": "American filmmaker known for horror, superhero, and thriller films.",
+            "yearsActive": 45,
+            "nationality": "American"
+          }
+        }
+      ]
+    }
+  }
+}

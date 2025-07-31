@@ -1,0 +1,51 @@
+{
+  "data": {
+    "releaseDateAfter": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-gamma.md",
+            "title": "Movie Gamma",
+            "releaseDate": "2020-09-10T07:00:00.000Z"
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Movie Beta",
+            "releaseDate": "2021-03-20T07:00:00.000Z"
+          }
+        }
+      ]
+    },
+    "releaseDateBefore": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha",
+            "releaseDate": "2019-06-15T07:00:00.000Z"
+          }
+        }
+      ]
+    },
+    "releaseDateBetween": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Movie Alpha",
+            "releaseDate": "2019-06-15T07:00:00.000Z"
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-gamma.md",
+            "title": "Movie Gamma",
+            "releaseDate": "2020-09-10T07:00:00.000Z"
+          }
+        }
+      ]
+    }
+  }
+}
