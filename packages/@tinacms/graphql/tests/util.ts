@@ -101,11 +101,13 @@ export const setupMutation = async (dir: string, config: any) => {
   const query = async (options?: {
     query: string;
     variables: Record<string, unknown>;
+    ctxUser?: { sub: string };
   }) => {
     const result = await resolve({
       database,
       query: options?.query || defaultQuery,
       variables: options?.variables || {},
+      ctxUser: options?.ctxUser,
     });
     return result;
   };
