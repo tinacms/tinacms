@@ -84,7 +84,7 @@ export async function downloadTemplate(
 
     spinner.text = `Downloading files from repo ${TextStyles.tinaOrange(
       `${repoInfo?.username}/${repoInfo?.name}`
-    )}.`;
+    )}`;
     await downloadAndExtractRepo(root, repoInfo);
   } else {
     // Copy the template from the local file system.
