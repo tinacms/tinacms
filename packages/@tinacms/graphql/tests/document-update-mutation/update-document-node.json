@@ -1,0 +1,30 @@
+{
+  "data": {
+    "updateDocument": {
+      "_values": {
+        "_collection": "post",
+        "_template": "post",
+        "title": "Updated Title by Mr Bob Northwind",
+        "genre": "action",
+        "rating": 9,
+        "body": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "This is the updated content for Mr Bob Northwind's post about Northwind. The company has achieved remarkable success through innovation and customer focus."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "_sys": {
+        "title": ""
+      }
+    }
+  }
+}
