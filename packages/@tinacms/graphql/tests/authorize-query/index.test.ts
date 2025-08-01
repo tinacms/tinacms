@@ -18,14 +18,14 @@ it('authorizes user with valid context user', async () => {
   const result = await query({
     query: authorizeQuery,
     variables: {},
-    ctxUser: { sub: 'northwind' }
+    ctxUser: { sub: 'northwind' },
   });
 
   expect(result.errors).toBeUndefined();
   expect(result.data?.authorize).toEqual({
     username: 'northwind',
     name: 'Mr Bob Northwind',
-    email: 'bob@northwind.com'
+    email: 'bob@northwind.com',
   });
 });
 
@@ -35,7 +35,7 @@ it('returns null for non-existent user', async () => {
   const result = await query({
     query: authorizeQuery,
     variables: {},
-    ctxUser: { sub: 'nonexistent' }
+    ctxUser: { sub: 'nonexistent' },
   });
 
   expect(result.errors).toBeUndefined();
@@ -48,14 +48,14 @@ it('authorizes second test user with valid context user', async () => {
   const result = await query({
     query: authorizeQuery,
     variables: {},
-    ctxUser: { sub: 'testuser' }
+    ctxUser: { sub: 'testuser' },
   });
 
   expect(result.errors).toBeUndefined();
   expect(result.data?.authorize).toEqual({
     username: 'testuser',
     name: 'Test User',
-    email: 'test@example.com'
+    email: 'test@example.com',
   });
 });
 
@@ -64,7 +64,7 @@ it('returns null when no context user provided', async () => {
 
   const result = await query({
     query: authorizeQuery,
-    variables: {}
+    variables: {},
   });
 
   expect(result.errors).toBeUndefined();
@@ -77,7 +77,7 @@ it('returns null when context user has empty sub', async () => {
   const result = await query({
     query: authorizeQuery,
     variables: {},
-    ctxUser: { sub: '' }
+    ctxUser: { sub: '' },
   });
 
   expect(result.errors).toBeUndefined();
@@ -90,7 +90,7 @@ it('returns null when context user has null sub', async () => {
   const result = await query({
     query: authorizeQuery,
     variables: {},
-    ctxUser: { sub: null as any }
+    ctxUser: { sub: null as any },
   });
 
   expect(result.errors).toBeUndefined();

@@ -19,7 +19,7 @@ it('authenticates user with valid credentials', async () => {
     query: authenticateQuery,
     variables: {
       sub: 'northwind',
-      password: 'northwind123'
+      password: 'northwind123',
     },
   });
 
@@ -27,7 +27,7 @@ it('authenticates user with valid credentials', async () => {
   expect(result.data?.authenticate).toEqual({
     username: 'northwind',
     name: 'Mr Bob Northwind',
-    email: 'bob@northwind.com'
+    email: 'bob@northwind.com',
   });
 });
 
@@ -38,7 +38,7 @@ it('returns null for invalid password', async () => {
     query: authenticateQuery,
     variables: {
       sub: 'northwind',
-      password: 'wrongpassword'
+      password: 'wrongpassword',
     },
   });
 
@@ -53,7 +53,7 @@ it('returns null for non-existent user', async () => {
     query: authenticateQuery,
     variables: {
       sub: 'nonexistent',
-      password: 'anypassword'
+      password: 'anypassword',
     },
   });
 
@@ -68,7 +68,7 @@ it('authenticates second test user with valid credentials', async () => {
     query: authenticateQuery,
     variables: {
       sub: 'testuser',
-      password: 'testpassword'
+      password: 'testpassword',
     },
   });
 
@@ -76,7 +76,7 @@ it('authenticates second test user with valid credentials', async () => {
   expect(result.data?.authenticate).toEqual({
     username: 'testuser',
     name: 'Test User',
-    email: 'test@example.com'
+    email: 'test@example.com',
   });
 });
 
@@ -87,7 +87,7 @@ it('handles empty password gracefully', async () => {
     query: authenticateQuery,
     variables: {
       sub: 'northwind',
-      password: ''
+      password: '',
     },
   });
 

@@ -54,14 +54,14 @@ const generateTestUsers = async () => {
       username: 'northwind',
       name: 'Mr Bob Northwind',
       email: 'bob@northwind.com',
-      password: 'northwind123'
+      password: 'northwind123',
     },
     {
       username: 'testuser',
       name: 'Test User',
       email: 'test@example.com',
-      password: 'testpassword'
-    }
+      password: 'testpassword',
+    },
   ];
 
   const hashedUsers = [];
@@ -72,19 +72,21 @@ const generateTestUsers = async () => {
       name: user.name,
       email: user.email,
       password: {
-        value: hashedPassword
-      }
+        value: hashedPassword,
+      },
     });
-    console.log(`Generated hash for ${user.username} (password: ${user.password})`);
+    console.log(
+      `Generated hash for ${user.username} (password: ${user.password})`
+    );
   }
 
   const userData = {
-    users: hashedUsers
+    users: hashedUsers,
   };
 
   console.log('\nGenerated user data:');
   console.log(JSON.stringify(userData, null, 2));
-  
+
   return userData;
 };
 
