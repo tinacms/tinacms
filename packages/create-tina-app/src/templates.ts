@@ -1,7 +1,8 @@
 import { downloadAndExtractRepo, getRepoInfo } from './util/examples';
 import { copy } from 'fs-extra';
 import path from 'path';
-import { log, TextStyles } from './util/logger';
+import { TextStyles } from './util/textstyles';
+import { Ora } from 'ora';
 
 type BaseExample = {
   title: string;
@@ -69,7 +70,11 @@ export const TEMPLATES: Template[] = [
   },
 ];
 
-export async function downloadTemplate(template: Template, root: string) {
+export async function downloadTemplate(
+  template: Template,
+  root: string,
+  spinner: Ora
+) {
   if (template.isInternal === false) {
     const repoURL = new URL(template.gitURL);
     const repoInfo = await getRepoInfo(repoURL);
@@ -77,11 +82,9 @@ export async function downloadTemplate(template: Template, root: string) {
       throw new Error('Repository information not found.');
     }
 
-    log.info(
-      `Downloading files from repo ${TextStyles.link(
-        `${repoInfo?.username}/${repoInfo?.name}`
-      )}.`
-    );
+    spinner.text = `Downloading files from repo ${TextStyles.tinaOrange(
+      `${repoInfo?.username}/${repoInfo?.name}`
+    )}.`;
     await downloadAndExtractRepo(root, repoInfo);
   } else {
     // Copy the template from the local file system.

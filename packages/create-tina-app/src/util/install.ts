@@ -1,5 +1,5 @@
 import spawn from 'cross-spawn';
-import { PackageManager } from '..';
+import { PackageManager } from './packageManagers';
 
 /**
  * Spawn a package manager installation.
@@ -9,9 +9,10 @@ import { PackageManager } from '..';
 export function install(packageManager: PackageManager): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn(packageManager, ['install'], {
-      stdio: 'inherit',
+      stdio: 'ignore',
       env: { ...process.env, ADBLOCK: '1', DISABLE_OPENCOLLECTIVE: '1' },
     });
+
     child.on('close', (code) => {
       if (code !== 0) {
         reject({ command: `${packageManager} install` });
