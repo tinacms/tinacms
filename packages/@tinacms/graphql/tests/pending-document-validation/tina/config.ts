@@ -4,11 +4,13 @@ export const schema: Schema = {
   collections: [
     {
       name: 'post',
-      path: 'post',
+      label: 'Posts',
+      path: 'posts',
       fields: [
         {
           type: 'string',
           name: 'title',
+          label: 'Title',
         },
       ],
     },

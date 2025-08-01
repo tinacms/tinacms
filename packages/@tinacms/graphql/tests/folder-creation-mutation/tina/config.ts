@@ -3,12 +3,20 @@ import { Schema } from '@tinacms/schema-tools';
 export const schema: Schema = {
   collections: [
     {
+      label: 'Post',
       name: 'post',
-      path: 'post',
+      path: 'posts',
       fields: [
         {
-          type: 'string',
           name: 'title',
+          label: 'Title',
+          type: 'string',
+          required: true,
+        },
+        {
+          name: 'content',
+          label: 'Content',
+          type: 'string',
         },
       ],
     },
