@@ -48,6 +48,74 @@ The `@tinacms/graphql` package does not have a mechanism to detect direct conten
 - For `tinacms dev`, a [filesystem watcher](https://www.npmjs.com/package/chokidar) is used.
 - For TinaCloud, the system listens to GitHub webhook events.
 
+## Content transformations
+
+### Indexing content
+
+The following diagram illustrates how data is loaded into a TinaCMS instance. Note the following:
+
+- A `Resolver` object is only required when responding to a GraphQL mutation request.
+- The re-indexing process is handled by a `Database` instance, and no `Resolver` object is available.
+- The TinaCMS schema, GraphQL schema, and Lookup collection must be build and loaded separately prior to indexing. This can be done through the `Database` instance.
+
+```mermaid
+flowchart TB
+  subgraph Bridge
+    rawData[Raw data from filesystem or GitHub]
+  end
+  rawData--When triggered by watcher or Webhook-->loadAndParseAliases{{Replaces name overrides and _template alias}}
+  loadAndParseAliases-->contentDataEntry[Raw Content Entry]
+  subgraph Resolver
+  graphQLRequest@{ shape: stadium, label: "GraphQL mutation request passed to field resolver" }-->graphQLPayload[GraphQL request payload]
+  graphQLPayload-->buildObjectMutations{{Serialize to follow raw format}}
+  end
+  buildObjectMutations-->contentDataEntry
+  subgraph Database
+  contentDataEntry-->indexEntries@{ shape: cylinder, label: "Index Entries" }
+  contentDataEntry-->referenceEntries@{ shape: cylinder, label: "Reference Entries" }
+  contentDataEntry-->contentEntries@{shape: cylinder, label: "Content Entries"}
+  contentDataEntry-->rawData
+  end
+```
+**Figure: The lifecycle of content in the Database - note that it starts with a load from the Bridge**
+
+### Document Retrieval Process
+
+THe following diagram shows the flow of information for retrieving a single document.
+
+```mermaid
+flowchart TB
+  subgraph Database
+    contentEntries@{shape: cylinder, label: "Content Entries"}-->transformDocument{{Alias body to fieldName}}
+    referenceEntries@{ shape: cylinder, label: "Reference Entries" }
+  end
+  subgraph Resolver
+  transformDocument-->transformDocumentIntoPayload{{Transform document into payload tree - update image URLs}}
+  transformDocumentIntoPayload-->addReferences{{Add references}}
+  referenceEntries-->addReferences
+  end
+  addReferences-->payload[GraphQL Payload]
+```
+**Figure: Single document retrieval**
+
+### Query Process
+
+The following diagram shows the flow of information for retrieving data during a query, is as per `resolveCollectionConnection`:
+
+```mermaid
+flowchart TB
+  subgraph Database
+    indexEntries@{ shape: cylinder, label: "Index Entries" }-->query{{ Query engine }}
+    contentEntries@{shape: cylinder, label: "Content Entries"}-->transformDocument{{Alias body to fieldName}}
+  end
+  subgraph Resolver
+    transformDocument-->transformDocumentIntoPayload{{Transform document into payload tree - update image URLs}}
+    transformDocumentIntoPayload-->query
+  end
+  query-->payload[GraphQL Payload]
+```
+**Figure: Query information flow - note that the query engine 'pulls' the content entries as they are filtered**
+
 ## Index Schema
 
 The Content Index is fundamentally a key-value store, but it uses functionality from the [AbstractLevel](https://github.com/Level/abstract-level) package to impose a hierarchy upon the store through "sublevels". The levels are separated by a Group Separator (ASCII hexadecimal code 1D), which will be represented as [\\GS] throughout the remainder of this document.
@@ -104,66 +172,3 @@ For every reference value within a field, there will be reference entries as fol
 - Value: { }
 
 The reference entries are important as they allow us to enforce referential integrity by querying to see if a document is referenced.
-
-## Content transformations
-
-### Indexing content
-
-The following diagram illustrates how data is loaded into a TinaCMS instance. Note the following:
-
-- A `Resolver` object is only required when responding to a GraphQL mutation request.
-- The re-indexing process is handled by a `Database` instance, and no `Resolver` object is available.
-- The TinaCMS schema, GraphQL schema, and Lookup collection must be build and loaded separately prior to indexing. This can be done through the `Database` instance.
-
-```mermaid
-flowchart TB
-  subgraph Bridge
-    rawData[Raw data from filesystem or GitHub]
-  end
-  rawData--When triggered by watcher or Webhook-->loadAndParseAliases{{Replaces name overrides and _template alias}}
-  loadAndParseAliases-->contentDataEntry[Raw Content Entry]
-  subgraph Resolver
-  graphQLRequest@{ shape: stadium, label: "GraphQL mutation request passed to field resolver" }-->graphQLPayload[GraphQL request payload]
-  graphQLPayload-->buildObjectMutations{{Serialize to follow raw format}}
-  end
-  buildObjectMutations-->contentDataEntry
-  subgraph Database
-  contentDataEntry-->indexEntries@{ shape: cylinder, label: "Index Entries" }
-  contentDataEntry-->referenceEntries@{ shape: cylinder, label: "Reference Entries" }
-  contentDataEntry-->contentEntries@{shape: cylinder, label: "Content Entries"}
-  contentDataEntry-->rawData
-  end
-```
-
-### Document Retrieval Process
-
-```mermaid
-flowchart TB
-  subgraph Database
-    contentEntries@{shape: cylinder, label: "Content Entries"}-->transformDocument{{Alias body to fieldName}}
-    referenceEntries@{ shape: cylinder, label: "Reference Entries" }
-  end
-  subgraph Resolver
-  transformDocument-->transformDocumentIntoPayload{{Transform document into payload tree - update image URLs}}
-  transformDocumentIntoPayload-->addReferences{{Add references}}
-  referenceEntries-->addReferences
-  end
-  addReferences-->payload[GraphQL Payload]
-```
-
-### Query Process
-
-The following is as per `resolveCollectionConnection`:
-
-```mermaid
-flowchart TB
-  subgraph Database
-    indexEntries@{ shape: cylinder, label: "Index Entries" }-->query{{ Query engine }}
-    contentEntries@{shape: cylinder, label: "Content Entries"}-->transformDocument{{Alias body to fieldName}}
-  end
-  subgraph Resolver
-    transformDocument-->transformDocumentIntoPayload{{Transform document into payload tree - update image URLs}}
-    transformDocumentIntoPayload-->query
-  end
-  query-->payload[GraphQL Payload]
-```
