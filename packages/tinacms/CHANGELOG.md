@@ -1,5 +1,18 @@
 # tinacms
 
+## 2.8.2
+
+### Patch Changes
+
+- [#5909](https://github.com/tinacms/tinacms/pull/5909) [`eaa6ed5`](https://github.com/tinacms/tinacms/commit/eaa6ed551c76349c5849cd1e19a8066ecbbe205c) Thanks [@wicksipedia](https://github.com/wicksipedia)! - feat: added ability to opt out of latest version update check
+
+- [#5766](https://github.com/tinacms/tinacms/pull/5766) [`60a15d5`](https://github.com/tinacms/tinacms/commit/60a15d533b85a0c3f9f483f6f0f0b6824616284b) Thanks [@brookjeynes-ssw](https://github.com/brookjeynes-ssw)! - fix: improve blocks plugin behavior by appending new items instead of inserting them at the start
+  feat: Added a new `addItemBehavior` prop for lists/groups, allowing users to choose between `prepend` or `append`
+- Updated dependencies [[`eaa6ed5`](https://github.com/tinacms/tinacms/commit/eaa6ed551c76349c5849cd1e19a8066ecbbe205c)]:
+  - @tinacms/schema-tools@1.9.1
+  - @tinacms/mdx@1.8.1
+  - @tinacms/search@1.1.1
+
 ## 2.8.1
 
 ### Patch Changes
