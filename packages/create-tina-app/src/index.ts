@@ -20,6 +20,17 @@ import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from 'validate-npm-package-name';
 
 export async function run() {
+  console.log(
+    TextStyles.tinaOrange(`
+    ████████╗██╗███╗   ██╗ █████╗  ██████╗███╗   ███╗███████╗
+    ╚══██╔══╝██║████╗  ██║██╔══██╗██╔════╝████╗ ████║██╔════╝
+       ██║   ██║██╔██╗ ██║███████║██║     ██╔████╔██║███████╗
+       ██║   ██║██║╚██╗██║██╔══██║██║     ██║╚██╔╝██║╚════██║
+       ██║   ██║██║ ╚████║██║  ██║╚██████╗██║ ╚═╝ ██║███████║
+       ╚═╝   ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝╚═╝     ╚═╝╚══════╝
+  `)
+  );
+
   const spinner = ora();
   preRunChecks(spinner);
 
