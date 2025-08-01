@@ -8,6 +8,7 @@ type BaseExample = {
   title: string;
   description?: string;
   value: string;
+  devUrl: string;
 };
 
 export type InternalTemplate = BaseExample & {
@@ -27,6 +28,7 @@ export const TEMPLATES: Template[] = [
     value: 'tina-cloud-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-cloud-starter',
+    devUrl: 'http://localhost:3000',
   },
   {
     title: 'Astro Starter',
@@ -35,6 +37,7 @@ export const TEMPLATES: Template[] = [
     value: 'tina-astro-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-astro-starter',
+    devUrl: 'http://localhost:4321',
   },
   {
     title: 'Hugo Starter',
@@ -43,6 +46,7 @@ export const TEMPLATES: Template[] = [
     value: 'tina-hugo-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-hugo-starter',
+    devUrl: 'http://localhost:1313',
   },
   {
     title: 'Remix Starter',
@@ -51,6 +55,7 @@ export const TEMPLATES: Template[] = [
     value: 'tina-remix-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-remix-starter',
+    devUrl: 'http://localhost:3000',
   },
   {
     title: 'Docusaurus Starter',
@@ -59,6 +64,7 @@ export const TEMPLATES: Template[] = [
     value: 'tinasaurus',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tinasaurus',
+    devUrl: 'http://localhost:3000',
   },
   {
     title: 'Bare bones starter',
@@ -67,6 +73,7 @@ export const TEMPLATES: Template[] = [
     value: 'basic',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-barebones-starter',
+    devUrl: 'http://localhost:3000',
   },
 ];
 
