@@ -176,22 +176,27 @@ export async function run() {
     spinner.fail('Failed to initialize Git repository, skipping.');
   }
 
-  spinner.succeed(`Created ${TextStyles.tinaOrange(appName)}`);
+  spinner.succeed(`Created ${TextStyles.tinaOrange(appName)}\n`);
 
   if (template.value === 'tina-hugo-starter') {
     spinner.warn(
-      `Hugo is required for this starter. Install it via ${TextStyles.link('https://gohugo.io/installation/')}.`
+      `Hugo is required for this starter. Install it via ${TextStyles.link('https://gohugo.io/installation/')}\n`
     );
   }
 
-  console.log();
-  console.info(TextStyles.bold('To launch your app, run:'));
-  console.log('  ' + TextStyles.cmd(`cd ${appName}`));
-  console.log('  ' + TextStyles.cmd(`${pkgManager} run dev`));
-  console.log();
+  const padCommand = (cmd: string, width = 20) =>
+    TextStyles.cmd(cmd) + ' '.repeat(Math.max(0, width - cmd.length));
+
+  spinner.info(`${TextStyles.bold('To get started:')}
+
+  ${padCommand(`cd ${appName}`)}# move into your project directory
+  ${padCommand(`${pkgManager} run dev`)}# start the dev server ${TextStyles.link(template.devUrl)}
+  ${padCommand(`${pkgManager} run build`)}# build the app for production
+`);
+
   console.log('Next steps:');
   console.log(
-    `  • 📝 Edit some content on ${TextStyles.link('http://localhost:3000')} (See ${TextStyles.link('https://tina.io/docs/using-tina-editor')})`
+    `  • 📝 Edit some content: ${TextStyles.link('https://tina.io/docs/using-tina-editor')}`
   );
   console.log(
     `  • 📖 Learn the basics: ${TextStyles.link('https://tina.io/docs/schema/')}`
