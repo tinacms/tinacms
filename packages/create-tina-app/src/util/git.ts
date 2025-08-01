@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import path from 'path';
-import { log } from './logger';
 import fs from 'fs-extra';
+import { Ora } from 'ora';
 
 function isInGitRepository(): boolean {
   try {
@@ -33,16 +33,18 @@ export function makeFirstCommit(root: string) {
   }
 }
 
-export function initializeGit(): boolean {
+export function initializeGit(spinner: Ora): boolean {
   execSync('git --version', { stdio: 'ignore' });
 
   if (isInGitRepository() || isInMercurialRepository()) {
-    log.warn('Already in a Git repository, skipping.');
+    spinner.warn('Already in a Git repository, skipping.');
     return false;
   }
 
   if (!fs.existsSync('.gitignore')) {
-    log.warn('There is no .gitignore file in this repository, creating one...');
+    spinner.warn(
+      'There is no .gitignore file in this repository, creating one...'
+    );
     fs.writeFileSync(
       '.gitignore',
       `node_modules

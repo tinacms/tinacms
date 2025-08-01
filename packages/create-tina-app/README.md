@@ -6,6 +6,6 @@ Create Tina App is a powerful command-line interface (CLI) tool designed to kick
 
 To get started, you need to first build the code - see [contributing](https://github.com/tinacms/tinacms/blob/main/CONTRIBUTING.md).
 
-1. run `pnpm link create-tina-app`
+1. run `pnpm link --global`
 1. Test your changes by running `npx create-tina-app`
 1. Run `pnpm unlink` when done to unlink the local build

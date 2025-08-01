@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { PackageManager } from '..';
+import { PackageManager } from './packageManagers';
 
 export async function checkPackageExists(name: PackageManager) {
   try {
