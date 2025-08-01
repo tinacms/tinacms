@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
 import config from './tina/config';
-import { setupMutation } from '../util';
+import { setup } from '../util';
 
 const authorizeQuery = `
   query authorize {
@@ -13,9 +13,9 @@ const authorizeQuery = `
 `;
 
 it('authorizes user with valid context user', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authorizeQuery,
     variables: {},
     ctxUser: { sub: 'northwind' },
@@ -30,9 +30,9 @@ it('authorizes user with valid context user', async () => {
 });
 
 it('returns null for non-existent user', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authorizeQuery,
     variables: {},
     ctxUser: { sub: 'nonexistent' },
@@ -43,9 +43,9 @@ it('returns null for non-existent user', async () => {
 });
 
 it('authorizes second test user with valid context user', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authorizeQuery,
     variables: {},
     ctxUser: { sub: 'testuser' },
@@ -60,9 +60,9 @@ it('authorizes second test user with valid context user', async () => {
 });
 
 it('returns null when no context user provided', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authorizeQuery,
     variables: {},
   });
@@ -72,9 +72,9 @@ it('returns null when no context user provided', async () => {
 });
 
 it('returns null when context user has empty sub', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authorizeQuery,
     variables: {},
     ctxUser: { sub: '' },
@@ -85,9 +85,9 @@ it('returns null when context user has empty sub', async () => {
 });
 
 it('returns null when context user has null sub', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authorizeQuery,
     variables: {},
     ctxUser: { sub: null as any },

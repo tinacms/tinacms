@@ -63,11 +63,13 @@ export const setup = async (dir: string, config: any) => {
   const get = async (options?: {
     query: string;
     variables: Record<string, unknown>;
+    ctxUser?: { sub: string };
   }) => {
     const result = await resolve({
       database,
       query: options?.query || query,
       variables: options?.variables || {},
+      ctxUser: options?.ctxUser,
     });
     return result;
   };

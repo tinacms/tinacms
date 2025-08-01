@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
 import config from './tina/config';
-import { setupMutation } from '../util';
+import { setup } from '../util';
 
 const authenticateQuery = `
   query authenticate($sub: String!, $password: String!) {
@@ -13,9 +13,9 @@ const authenticateQuery = `
 `;
 
 it('authenticates user with valid credentials', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authenticateQuery,
     variables: {
       sub: 'northwind',
@@ -32,9 +32,9 @@ it('authenticates user with valid credentials', async () => {
 });
 
 it('returns null for invalid password', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authenticateQuery,
     variables: {
       sub: 'northwind',
@@ -47,9 +47,9 @@ it('returns null for invalid password', async () => {
 });
 
 it('returns null for non-existent user', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authenticateQuery,
     variables: {
       sub: 'nonexistent',
@@ -62,9 +62,9 @@ it('returns null for non-existent user', async () => {
 });
 
 it('authenticates second test user with valid credentials', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authenticateQuery,
     variables: {
       sub: 'testuser',
@@ -81,9 +81,9 @@ it('authenticates second test user with valid credentials', async () => {
 });
 
 it('handles empty password gracefully', async () => {
-  const { query } = await setupMutation(__dirname, config);
+  const { get } = await setup(__dirname, config);
 
-  const result = await query({
+  const result = await get({
     query: authenticateQuery,
     variables: {
       sub: 'northwind',
