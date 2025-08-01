@@ -18,18 +18,17 @@ import ora from 'ora';
 import { extractOptions } from './util/options';
 import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from 'validate-npm-package-name';
+import * as ascii from './util/asciiArt';
 
 export async function run() {
-  console.log(
-    TextStyles.tinaOrange(`
-    ████████╗██╗███╗   ██╗ █████╗  ██████╗███╗   ███╗███████╗
-    ╚══██╔══╝██║████╗  ██║██╔══██╗██╔════╝████╗ ████║██╔════╝
-       ██║   ██║██╔██╗ ██║███████║██║     ██╔████╔██║███████╗
-       ██║   ██║██║╚██╗██║██╔══██║██║     ██║╚██╔╝██║╚════██║
-       ██║   ██║██║ ╚████║██║  ██║╚██████╗██║ ╚═╝ ██║███████║
-       ╚═╝   ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝╚═╝     ╚═╝╚══════╝
-  `)
-  );
+  if (process.stdout.columns >= 60) {
+    console.log(TextStyles.tinaOrange(`${ascii.llama}`));
+    console.log(TextStyles.tinaOrange(`${ascii.tinaCms}`));
+  } else {
+    console.log(TextStyles.tinaOrange(`🦙 TinaCMS`));
+  }
+  const version = require('../package.json').version;
+  console.log(`Create Tina App v${version}`);
 
   const spinner = ora();
   preRunChecks(spinner);
