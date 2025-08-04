@@ -26,7 +26,7 @@ The typical lifecycle for a database within a program is as follows.
 1. A `Database` instance is created with:
     - A `bridge` providing access to the content (e.g. a `FileSystemBridge` when running `tinacms dev` locally).
     - A `databaseAdapter` providing access to the Content Index, which is a [LevelDB instance](https://github.com/google/leveldb) (e.g. a [`MemoryLevel`](https://github.com/Level/memory-level) instance when running `tinacms dev` locally).
-2. The `indexContent` method on the `Database` instance is called with the TinaCMS schema, GraphQL schema and the type lookup. This populates the database with the entries required for querying the system.
+2. The `indexContent` method on the `Database` instance is called with the TinaCMS schema, GraphQL schema, and the type lookup. This populates the database with the entries required for querying the system.
 
 Once indexing has been successfully completed:
 - The `Database` can be used with a `Resolver` instance to support GraphQL queries.
@@ -41,7 +41,7 @@ Content is modified by either:
 - A GraphQL mutation query, or
 - By direct content changes.
 
-When the changes are made by mutation query, the translation of the GraphQL data structures is handled by a `Resolver` instance.
+When the changes are made by a mutation query, the translation of the GraphQL data structures is handled by a `Resolver` instance.
 
 The `@tinacms/graphql` package does not have a mechanism to detect direct content changes. There needs to be separate logic for monitoring for changes. For instance:
 
@@ -81,7 +81,7 @@ flowchart TB
 
 ### Document Retrieval Process
 
-THe following diagram shows the flow of information for retrieving a single document.
+The following diagram shows the flow of information for retrieving a single document.
 
 ```mermaid
 flowchart TB
@@ -120,7 +120,7 @@ flowchart TB
 
 The Content Index is fundamentally a key-value store, but it uses functionality from the [AbstractLevel](https://github.com/Level/abstract-level) package to impose a hierarchy upon the store through "sublevels". The levels are separated by a Group Separator (ASCII hexadecimal code 1D), which will be represented as [\\GS] throughout the remainder of this document.
 
-That heirarchy will be ignored in the rest of this document.
+That hierarchy will be ignored in the rest of this document.
 
 ### Content data entries
 
