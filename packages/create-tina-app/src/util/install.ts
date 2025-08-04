@@ -6,10 +6,13 @@ import { PackageManager } from './packageManagers';
  *
  * @returns A Promise that resolves once the installation is finished.
  */
-export function install(packageManager: PackageManager): Promise<void> {
+export function install(
+  packageManager: PackageManager,
+  verboseOutput: boolean
+): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn(packageManager, ['install'], {
-      stdio: 'ignore',
+      stdio: verboseOutput ? 'inherit' : 'ignore',
       env: { ...process.env, ADBLOCK: '1', DISABLE_OPENCOLLECTIVE: '1' },
     });
 

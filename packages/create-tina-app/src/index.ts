@@ -159,7 +159,7 @@ export async function run() {
 
   spinner.start('Installing packages.');
   try {
-    await install(pkgManager as PackageManager);
+    await install(pkgManager as PackageManager, opts.verbose);
     spinner.succeed();
   } catch (err) {
     spinner.fail(`Failed to install packages: ${(err as Error).message}`);

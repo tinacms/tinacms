@@ -4,13 +4,16 @@ import { TEMPLATES } from '../templates';
 import { PKG_MANAGERS } from './packageManagers';
 import { TextStyles } from './textstyles';
 
-export function extractOptions(args: string[]): {
+export interface CreateOptions {
   template: string;
   pkgManager: string;
   dir: string;
   noTelemetry: boolean;
   projectName: string;
-} {
+  verbose: boolean;
+}
+
+export function extractOptions(args: string[]): CreateOptions {
   let projectName = '';
   const program = new Command(name);
   program
@@ -29,6 +32,7 @@ export function extractOptions(args: string[]): {
       '-d, --dir <dir>',
       'Choose which directory to run this script from.'
     )
+    .option('-v, --verbose', 'Enable verbose output.')
     .option('--noTelemetry', 'Disable anonymous telemetry that is collected.')
     .arguments('[project-directory]')
     .usage(`${TextStyles.success('<project-directory>')} [options]`)
@@ -37,7 +41,7 @@ export function extractOptions(args: string[]): {
     });
 
   program.parse(args);
-  const opts = program.opts();
+  const opts = program.opts() as CreateOptions;
   if (opts.dir) {
     process.chdir(opts.dir);
   }
