@@ -8,7 +8,7 @@ export type BaseExample = {
   title: string;
   description?: string;
   value: string;
-  devUrl: string;
+  devUrl?: string;
 };
 
 export type InternalTemplate = BaseExample & {
