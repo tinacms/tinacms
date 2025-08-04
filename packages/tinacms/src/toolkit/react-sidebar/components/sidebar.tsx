@@ -378,6 +378,8 @@ const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
             <button
               className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleMenu}
+              title='Open navigation menu'
+              aria-label='Open navigation menu'
             >
               <BiMenu className='h-6 w-auto text-gray-600' />
             </button>
@@ -395,6 +397,8 @@ const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
             <button
               className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleSidebarOpen}
+              title='Close sidebar'
+              aria-label='Close sidebar'
             >
               <PiSidebarSimpleLight className='h-6 w-auto text-gray-600' />
             </button>

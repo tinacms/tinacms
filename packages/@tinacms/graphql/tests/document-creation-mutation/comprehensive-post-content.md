@@ -1,0 +1,22 @@
+---
+title: Comprehensive Test Post by Mr Bob Northwind
+content: >
+  This is a comprehensive test post created by Mr Bob Northwind for his
+  Northwind company.
+published: true
+rating: 10
+publishDate: 2023-12-01T00:00:00.000Z
+category: business
+featuredImage: /images/northwind-featured.jpg
+tags:
+  - test
+  - comprehensive
+  - northwind
+metadata:
+  seoTitle: Comprehensive Test Post - Northwind
+  seoDescription: A comprehensive test post demonstrating all field types
+authors:
+  - name: Mr Bob Northwind
+    bio: CEO of Northwind company
+---
+

@@ -1,0 +1,14 @@
+{
+  "data": {
+    "post": {
+      "_values": {
+        "_collection": "post",
+        "_template": "post",
+        "title": "Hello"
+      },
+      "_sys": {
+        "title": ""
+      }
+    }
+  }
+}

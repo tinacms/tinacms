@@ -19,7 +19,7 @@ export const TagsField = wrapFieldsWithMeta<
       if (!tag.length) {
         return;
       }
-      form.mutators.insert(field.name, 0, tag);
+      form.mutators.push(field.name, tag);
       setValue('');
     },
     [form, field.name]
@@ -40,7 +40,7 @@ export const TagsField = wrapFieldsWithMeta<
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder={field.placeholder ? field.placeholder : 'Add a tag'}
-          onKeyPress={(event) => {
+          onKeyUp={(event) => {
             if (event.key === ',' || event.key === 'Enter') {
               event.preventDefault();
               addTag(value);

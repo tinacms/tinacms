@@ -1,0 +1,112 @@
+{
+  "data": {
+    "sortByTitle": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Alpha Movie",
+            "releaseDate": "2020-03-15T00:00:00.000Z",
+            "rating": 8.5
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Beta Movie",
+            "releaseDate": "2019-07-22T00:00:00.000Z",
+            "rating": 7.2
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-delta.md",
+            "title": "Delta Movie",
+            "releaseDate": "2018-05-10T00:00:00.000Z",
+            "rating": 6.8
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-gamma.md",
+            "title": "Gamma Movie",
+            "releaseDate": "2021-11-08T00:00:00.000Z",
+            "rating": 9.1
+          }
+        }
+      ]
+    },
+    "sortByReleaseDate": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-delta.md",
+            "title": "Delta Movie",
+            "releaseDate": "2018-05-10T00:00:00.000Z",
+            "rating": 6.8
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Beta Movie",
+            "releaseDate": "2019-07-22T00:00:00.000Z",
+            "rating": 7.2
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Alpha Movie",
+            "releaseDate": "2020-03-15T00:00:00.000Z",
+            "rating": 8.5
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-gamma.md",
+            "title": "Gamma Movie",
+            "releaseDate": "2021-11-08T00:00:00.000Z",
+            "rating": 9.1
+          }
+        }
+      ]
+    },
+    "sortByRating": {
+      "edges": [
+        {
+          "node": {
+            "id": "movies/movie-delta.md",
+            "title": "Delta Movie",
+            "releaseDate": "2018-05-10T00:00:00.000Z",
+            "rating": 6.8
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-beta.md",
+            "title": "Beta Movie",
+            "releaseDate": "2019-07-22T00:00:00.000Z",
+            "rating": 7.2
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-alpha.md",
+            "title": "Alpha Movie",
+            "releaseDate": "2020-03-15T00:00:00.000Z",
+            "rating": 8.5
+          }
+        },
+        {
+          "node": {
+            "id": "movies/movie-gamma.md",
+            "title": "Gamma Movie",
+            "releaseDate": "2021-11-08T00:00:00.000Z",
+            "rating": 9.1
+          }
+        }
+      ]
+    }
+  }
+}

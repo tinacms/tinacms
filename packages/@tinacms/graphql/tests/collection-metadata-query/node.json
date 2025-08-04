@@ -1,0 +1,60 @@
+{
+  "data": {
+    "collection": {
+      "name": "article",
+      "label": "Article",
+      "path": "content",
+      "format": "md",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Title",
+          "name": "title",
+          "namespace": [
+            "article",
+            "title"
+          ],
+          "searchable": true,
+          "uid": false
+        },
+        {
+          "type": "string",
+          "label": "Author",
+          "name": "author",
+          "namespace": [
+            "article",
+            "author"
+          ],
+          "searchable": true,
+          "uid": false
+        },
+        {
+          "type": "datetime",
+          "label": "Date",
+          "name": "date",
+          "namespace": [
+            "article",
+            "date"
+          ],
+          "searchable": true,
+          "uid": false
+        },
+        {
+          "type": "rich-text",
+          "label": "Content",
+          "name": "content",
+          "namespace": [
+            "article",
+            "content"
+          ],
+          "searchable": true,
+          "parser": {
+            "type": "markdown"
+          },
+          "uid": false
+        }
+      ],
+      "templates": null
+    }
+  }
+}
