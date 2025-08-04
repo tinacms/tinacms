@@ -1,5 +1,13 @@
 # create-tina-app
 
+## 1.5.0
+
+### Minor Changes
+
+- [#5929](https://github.com/tinacms/tinacms/pull/5929) [`ec43c87`](https://github.com/tinacms/tinacms/commit/ec43c87a1da55b4cb86e9b428eb39fc0740a9e1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Enhanced CLI output with some branded ASCII art
+  Refined user experience with clearer messaging and structure
+  Added optional --verbose flag (disabled by default) for detailed output
+
 ## 1.4.0
 
 ### Minor Changes
