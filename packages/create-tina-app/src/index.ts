@@ -19,9 +19,8 @@ import ora from 'ora';
 import { extractOptions } from './util/options';
 import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from 'validate-npm-package-name';
-import { THEMES } from './themes';
-import { writeFile } from 'fs/promises';
 import * as ascii from './util/asciiArt';
+import { THEMES } from './themes';
 
 export async function run() {
   if (process.stdout.columns >= 60) {
@@ -158,7 +157,7 @@ export async function run() {
   }
 
   try {
-    await downloadTemplate(template, rootDir);
+    await downloadTemplate(template, rootDir, spinner);
 
     if (themeChoice) {
       // Add selected theme to content/settings/config.json
