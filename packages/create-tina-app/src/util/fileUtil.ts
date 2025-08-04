@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { log, TextStyles } from './logger';
+import { TextStyles } from './textstyles';
 
 export async function isWriteable(directory: string): Promise<boolean> {
   try {
@@ -51,25 +51,23 @@ export async function setupProjectDirectory(dir: string): Promise<string> {
 
   const conflicts = folderContainsInstallConflicts(dir);
   if (conflicts.length > 0) {
-    log.err(
-      `The directory '${TextStyles.bold(
-        appName
-      )}' contains files that could conflict. Below is a list of conflicts, please remove them and try again.`
-    );
+    const errorMessageLines = [
+      `The directory '${TextStyles.bold(appName)}' contains files that could conflict. Below is a list of conflicts, please remove them and try again.`,
+    ];
     for (const file of conflicts) {
       try {
         const stats = fs.lstatSync(path.join(dir, file));
         if (stats.isDirectory()) {
-          log.log(`-  ${TextStyles.info(file)}/`);
+          errorMessageLines.push(`  -  ${TextStyles.info(file)}/`);
         } else {
-          log.log(`-  ${file}`);
+          errorMessageLines.push(`  -  ${file}`);
         }
       } catch {
-        log.log(`-  ${file}`);
+        errorMessageLines.push(`  -  ${file}`);
       }
     }
 
-    process.exit(1);
+    throw new Error(errorMessageLines.join('\n'));
   }
 
   return appName;
