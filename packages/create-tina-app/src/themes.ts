@@ -3,13 +3,13 @@ import { BaseExample } from './templates';
 export const THEMES: BaseExample[] = [
   {
     title: 'Default',
-    description: 'A default theme for your project',
+    description: 'The default monochromatic theme for your documentation site',
     value: 'default',
   },
   {
-    title: 'Monochrome',
-    description: 'A monochrome theme for your project',
-    value: 'monochrome',
+    title: 'Tina',
+    description: 'The warm color scheme of TinaCMS for your documentation',
+    value: 'tina',
   },
   {
     title: 'Blossom',
