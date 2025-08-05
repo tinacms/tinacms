@@ -6,6 +6,7 @@ import {
   setupProjectDirectory,
   updateProjectPackageName,
   updateProjectPackageVersion,
+  updateThemeSettings,
 } from './util/fileUtil';
 import { install } from './util/install';
 import { initializeGit, makeFirstCommit } from './util/git';
@@ -19,6 +20,7 @@ import { extractOptions } from './util/options';
 import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from 'validate-npm-package-name';
 import * as ascii from './util/asciiArt';
+import { THEMES } from './themes';
 
 export async function run() {
   if (process.stdout.columns >= 60) {
@@ -119,6 +121,17 @@ export async function run() {
     template = TEMPLATES.find((_template) => _template.value === res.template);
   }
 
+  let themeChoice: string | undefined;
+  if (template.value === 'tina-docs') {
+    const res = await prompts({
+      name: 'theme',
+      type: 'select',
+      message: 'What theme would you like to use?',
+      choices: THEMES,
+    });
+    if (!Object.hasOwn(res, 'theme')) exit(1); // User most likely sent SIGINT.
+    themeChoice = res.theme;
+  }
   await telemetry.submitRecord({
     event: {
       name: 'create-tina-app:invoke',
@@ -144,6 +157,13 @@ export async function run() {
   }
 
   try {
+    await downloadTemplate(template, rootDir, spinner);
+
+    if (themeChoice) {
+      // Add selected theme to content/settings/config.json
+      await updateThemeSettings(rootDir, themeChoice);
+    }
+
     spinner.start('Downloading template...');
     await downloadTemplate(template, rootDir, spinner);
     spinner.succeed();

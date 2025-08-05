@@ -4,11 +4,11 @@ import path from 'path';
 import { TextStyles } from './util/textstyles';
 import { Ora } from 'ora';
 
-type BaseExample = {
+export type BaseExample = {
   title: string;
   description?: string;
   value: string;
-  devUrl: string;
+  devUrl?: string;
 };
 
 export type InternalTemplate = BaseExample & {
@@ -29,6 +29,14 @@ export const TEMPLATES: Template[] = [
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-cloud-starter',
     devUrl: 'http://localhost:3000',
+  },
+  {
+    title: '⭐️ TinaDocs',
+    description:
+      'Get your documentation site up and running with TinaCMS and Next.JS in minutes.',
+    value: 'tina-docs',
+    isInternal: false,
+    gitURL: 'https://github.com/tinacms/tina-docs',
   },
   {
     title: 'Astro Starter',
