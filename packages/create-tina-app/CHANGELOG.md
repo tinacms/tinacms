@@ -1,5 +1,13 @@
 # create-tina-app
 
+## 1.5.1
+
+### Patch Changes
+
+- [#5937](https://github.com/tinacms/tinacms/pull/5937) [`3f1e88d`](https://github.com/tinacms/tinacms/commit/3f1e88dfed8d597cee7936f9b0c09e6e4a2e4e71) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - fix: added missing devUrl
+
+- [#5624](https://github.com/tinacms/tinacms/pull/5624) [`0e749d5`](https://github.com/tinacms/tinacms/commit/0e749d5bf7bce552da1beadef3772103c55afd67) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add TinaDocs to NPX CLI templates
+
 ## 1.5.0
 
 ### Minor Changes
