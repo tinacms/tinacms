@@ -44,10 +44,10 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
           NEW
         </span>
       )}
-      <div className='w-16 h-16 bg-gray-50 border-r border-gray-150 overflow-hidden flex justify-center flex-shrink-0'>
+      <div className='w-16 h-16 bg-gray-50 overflow-hidden flex justify-center flex-shrink-0'>
         {isImage(thumbnail) ? (
           <img
-            className='object-contain object-center w-full h-full'
+            className='block overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
             style={checkerboardStyle}
             src={thumbnail}
             alt={item.filename}
@@ -98,7 +98,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
       >
         {isImage(thumbnail) ? (
           <img
-            className='object-contain object-center w-full h-full'
+            className='block overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
             style={checkerboardStyle}
             src={thumbnail}
             alt={item.filename}
