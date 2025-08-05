@@ -1,12 +1,12 @@
 import { BaseExample } from './templates';
 
-type TINADOCS_THEME = {
+type TinaDocsTheme = {
   title: string;
   value: string;
   description: string;
 };
 
-export const THEMES: TINADOCS_THEME[] = [
+export const THEMES: TinaDocsTheme[] = [
   {
     title: 'Default',
     description: 'The default monochromatic theme for your documentation site',
