@@ -8,7 +8,7 @@ export type BaseExample = {
   title: string;
   description?: string;
   value: string;
-  devUrl?: string;
+  devUrl: string;
 };
 
 export type InternalTemplate = BaseExample & {
@@ -37,6 +37,7 @@ export const TEMPLATES: Template[] = [
     value: 'tina-docs',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-docs',
+    devUrl: 'http://localhost:3000',
   },
   {
     title: 'Astro Starter',
