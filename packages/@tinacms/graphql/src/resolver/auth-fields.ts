@@ -8,16 +8,18 @@ import type { Resolver } from './index';
 export async function handleAuthenticate({
   tinaSchema,
   resolver,
-  args,
+  sub,
+  password,
   ctxUser,
 }: {
   tinaSchema: TinaSchema;
   resolver: Resolver;
-  args: { sub?: string; password: string };
+  sub?: string;
+  password: string;
   info: GraphQLResolveInfo;
   ctxUser?: { sub?: string };
 }): Promise<any> {
-  const sub = args.sub || ctxUser?.sub;
+  const userSub = sub || ctxUser?.sub;
   const collection = tinaSchema
     .getCollections()
     .find((c) => c.isAuthCollection);
@@ -48,7 +50,7 @@ export async function handleAuthenticate({
   if (!idFieldName) {
     throw new Error('No uid field found on user field');
   }
-  const user = users.find((u) => u[idFieldName] === sub);
+  const user = users.find((u) => u[idFieldName] === userSub);
   if (!user) {
     return null;
   }
@@ -60,7 +62,7 @@ export async function handleAuthenticate({
 
   const matches = await checkPasswordHash({
     saltedHash,
-    password: args.password,
+    password,
   });
 
   if (matches) {
