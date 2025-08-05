@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.9.1
+
+### Patch Changes
+
+- [#5909](https://github.com/tinacms/tinacms/pull/5909) [`eaa6ed5`](https://github.com/tinacms/tinacms/commit/eaa6ed551c76349c5849cd1e19a8066ecbbe205c) Thanks [@wicksipedia](https://github.com/wicksipedia)! - feat: added ability to opt out of latest version update check
+
 ## 1.9.0
 
 ### Minor Changes

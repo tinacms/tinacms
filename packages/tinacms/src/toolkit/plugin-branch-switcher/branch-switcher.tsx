@@ -74,9 +74,7 @@ export const EditoralBranchSwitcher = ({
       branchName: formatBranchName(value),
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
-      // @ts-ignore
       cms.alerts.success('Branch created.');
-      // add the newly created branch to the list
       setBranchList((oldBranchList) => {
         return [
           ...oldBranchList,
@@ -195,6 +193,7 @@ export const EditoralBranchSwitcher = ({
               <BranchSelector
                 currentBranch={currentBranch}
                 branchList={branchList}
+                refreshBranchList={refreshBranchList}
                 createBranch={() => {
                   setViewState('create');
                 }}
@@ -330,11 +329,13 @@ const BranchSelector = ({
   currentBranch,
   onChange,
   createBranch,
+  refreshBranchList,
 }: {
   branchList: Branch[];
   currentBranch: string;
   onChange: (branchName: string) => void;
   createBranch: () => void;
+  refreshBranchList: () => void;
 }) => {
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState<'content' | 'all'>('content');
@@ -425,100 +426,168 @@ const BranchSelector = ({
       )}
       {filteredBranchList.length > 0 && (
         <div className='min-w-[192px] max-h-[24rem] overflow-y-auto flex flex-col w-full h-full rounded-lg shadow-inner bg-white border border-gray-200'>
-          {filteredBranchList.map((branch) => {
-            const isCurrentBranch = branch.name === currentBranch;
-            // @ts-ignore
-            const indexingStatus = branch?.indexStatus?.status;
-            return (
-              <div
-                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
-                  indexingStatus !== 'complete'
-                    ? 'bg-gray-50 text-gray-400'
-                    : isCurrentBranch
-                      ? 'border-blue-500 border-l-5 bg-blue-50 text-blue-800 border-b-0'
-                      : 'border-b-2'
-                }`}
-                key={branch.name}
-              >
-                <div className='w-1/2'>
-                  <div className='flex items-center gap-1'>
-                    <div className='flex-0'>
-                      {branch.protected && (
-                        <BiLock className='w-5 h-auto opacity-70 text-blue-500' />
-                      )}
-                    </div>
-                    <div className='truncate flex-1'>{branch.name}</div>
-                  </div>
-                  {indexingStatus !== 'complete' && (
-                    <div className='w-fit'>
-                      <IndexStatus indexingStatus={branch.indexStatus.status} />
-                    </div>
-                  )}
-                </div>
-                <div className='flex-1'>
-                  <div className='text-xs font-bold'>Last Updated</div>
-                  <span className='text-sm leading-tight'>
-                    {formatDistanceToNow(
-                      new Date(branch.indexStatus.timestamp),
-                      {
-                        addSuffix: true,
-                      }
-                    )}
-                  </span>
-                </div>
-                <div className='flex items-center'>
-                  {indexingStatus === 'complete' && !isCurrentBranch && (
-                    <Button
-                      variant='white'
-                      size='custom'
-                      onClick={() => {
-                        onChange(branch.name);
-                      }}
-                      className='mr-auto cursor-pointer text-sm h-9 px-4 flex items-center gap-1'
-                    >
-                      <BiPencil className='h-4 w-auto text-blue-500 opacity-70 -mt-px' />{' '}
-                      Select
-                    </Button>
-                  )}
-                  {(branch.githubPullRequestUrl ||
-                    typeof previewFunction === 'function') && (
-                    <div className='ml-auto'>
-                      <OverflowMenu
-                        toolbarItems={[
-                          branch.githubPullRequestUrl && {
-                            name: 'github-pr',
-                            label: 'View in GitHub',
-                            Icon: (
-                              <BiLinkExternal className='w-5 h-auto text-blue-500 opacity-70' />
-                            ),
-                            onMouseDown: () => {
-                              window.open(
-                                branch.githubPullRequestUrl,
-                                '_blank'
-                              );
-                            },
-                          },
-                          typeof previewFunction === 'function' &&
-                            previewFunction({ branch: branch.name })?.url && {
-                              name: 'preview',
-                              label: 'Preview',
-                              onMouseDown: () => {
-                                const previewUrl = previewFunction({
-                                  branch: branch.name,
-                                })?.url;
-                                window.open(previewUrl, '_blank');
-                              },
-                            },
-                        ].filter(Boolean)}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+          {filteredBranchList.map((branch) => (
+            <BranchItem
+              key={branch.name}
+              branch={branch}
+              currentBranch={currentBranch}
+              onChange={onChange}
+              refreshBranchList={refreshBranchList}
+              previewFunction={previewFunction}
+              cms={cms}
+            />
+          ))}
         </div>
       )}
+    </div>
+  );
+};
+
+const BranchItem = ({
+  branch,
+  currentBranch,
+  onChange,
+  refreshBranchList,
+  previewFunction,
+  cms,
+}: {
+  branch: Branch;
+  currentBranch: string;
+  onChange: (branchName: string) => void;
+  refreshBranchList: () => void;
+  previewFunction?: any;
+  cms: any;
+}) => {
+  const [creatingPR, setCreatingPR] = React.useState(false);
+
+  const handleCreatePullRequest = async () => {
+    if (creatingPR) return;
+
+    setCreatingPR(true);
+    try {
+      const res = await cms.api.tina.createPullRequest({
+        baseBranch: cms.api.tina.branch,
+        branch: branch.name,
+        title: `${branch.name.replace('tina/', '').replace('-', ' ')} (PR from TinaCMS)`,
+      });
+
+      refreshBranchList();
+
+      cms.alerts.success(
+        `Pull request created successfully! ${res.url ? `View in GitHub: ${res.url}` : ''}`
+      );
+    } catch (error) {
+      console.error('Failed to create pull request:', error);
+      cms.alerts.error(error.message);
+    } finally {
+      setCreatingPR(false);
+    }
+  };
+
+  const isCurrentBranch = branch.name === currentBranch;
+  // @ts-ignore
+  const indexingStatus = branch?.indexStatus?.status;
+
+  return (
+    <div
+      className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
+        indexingStatus !== 'complete'
+          ? 'bg-gray-50 text-gray-400'
+          : isCurrentBranch
+            ? 'border-blue-500 border-l-5 bg-blue-50 text-blue-800 border-b-0'
+            : 'border-b-2'
+      }`}
+    >
+      <div className='w-1/2'>
+        <div className='flex items-center gap-1'>
+          <div className='flex-0'>
+            {branch.protected && (
+              <BiLock className='w-5 h-auto opacity-70 text-blue-500' />
+            )}
+          </div>
+          <div className='truncate flex-1'>{branch.name}</div>
+        </div>
+        {indexingStatus !== 'complete' && (
+          <div className='w-fit'>
+            <IndexStatus indexingStatus={branch.indexStatus.status} />
+          </div>
+        )}
+      </div>
+      <div className='flex-1'>
+        {creatingPR ? (
+          <div className='flex items-center gap-2'>
+            <div>
+              <div className='text-xs font-bold text-blue-600'>Creating PR</div>
+              <span className='text-sm leading-tight text-blue-500'>
+                Please wait...
+              </span>
+            </div>
+            <FaSpinner className='w-3 h-auto animate-spin text-blue-500' />
+          </div>
+        ) : (
+          <>
+            <div className='text-xs font-bold'>Last Updated</div>
+            <span className='text-sm leading-tight'>
+              {formatDistanceToNow(new Date(branch.indexStatus.timestamp), {
+                addSuffix: true,
+              })}
+            </span>
+          </>
+        )}
+      </div>
+      <div className='flex items-center'>
+        {indexingStatus === 'complete' && !isCurrentBranch && (
+          <Button
+            variant='white'
+            size='custom'
+            onClick={() => {
+              onChange(branch.name);
+            }}
+            className='mr-auto cursor-pointer text-sm h-9 px-4 flex items-center gap-1'
+          >
+            <BiPencil className='h-4 w-auto text-blue-500 opacity-70 -mt-px' />{' '}
+            Select
+          </Button>
+        )}
+        <div className='ml-auto'>
+          <OverflowMenu
+            toolbarItems={[
+              branch.githubPullRequestUrl && {
+                name: 'github-pr',
+                label: 'View in GitHub',
+                Icon: (
+                  <BiLinkExternal className='w-5 h-auto text-blue-500 opacity-70' />
+                ),
+                onMouseDown: () => {
+                  window.open(branch.githubPullRequestUrl, '_blank');
+                },
+              },
+              !branch.githubPullRequestUrl &&
+                !branch.protected &&
+                !creatingPR &&
+                cms.api.tina.usingProtectedBranch() && {
+                  name: 'create-pr',
+                  label: 'Create Pull Request',
+                  Icon: (
+                    <BiGitBranch className='w-5 h-auto text-blue-500 opacity-70' />
+                  ),
+                  onMouseDown: () => handleCreatePullRequest(),
+                },
+              typeof previewFunction === 'function' &&
+                previewFunction({ branch: branch.name })?.url && {
+                  name: 'preview',
+                  label: 'Preview',
+                  onMouseDown: () => {
+                    const previewUrl = previewFunction({
+                      branch: branch.name,
+                    })?.url;
+                    window.open(previewUrl, '_blank');
+                  },
+                },
+            ].filter(Boolean)}
+          />
+        </div>
+      </div>
     </div>
   );
 };
