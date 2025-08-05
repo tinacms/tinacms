@@ -9,6 +9,13 @@ interface MediaItemProps {
   active: boolean;
 }
 
+export const checkerboardStyle = {
+  backgroundImage:
+    'linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%)',
+  backgroundSize: '24px 24px',
+  backgroundPosition: '0 0, 0 12px, 12px -12px, -12px 0px',
+};
+
 export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
   let FileIcon = BiFile;
   if (item.type === 'dir') {
@@ -40,7 +47,8 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
       <div className='w-16 h-16 bg-gray-50 border-r border-gray-150 overflow-hidden flex justify-center flex-shrink-0'>
         {isImage(thumbnail) ? (
           <img
-            className='object-contain object-center w-full h-full origin-center transition-all duration-150 ease-out group-hover:scale-110'
+            className='object-contain object-center w-full h-full'
+            style={checkerboardStyle}
             src={thumbnail}
             alt={item.filename}
           />
@@ -91,6 +99,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
         {isImage(thumbnail) ? (
           <img
             className='object-contain object-center w-full h-full'
+            style={checkerboardStyle}
             src={thumbnail}
             alt={item.filename}
           />

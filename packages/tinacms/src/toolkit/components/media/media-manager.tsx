@@ -27,7 +27,7 @@ import { BiFile } from 'react-icons/bi';
 import { IoMdRefresh } from 'react-icons/io';
 import { Breadcrumb } from './breadcrumb';
 import { CopyField } from './copy-field';
-import { GridMediaItem, ListMediaItem } from './media-item';
+import { checkerboardStyle, GridMediaItem, ListMediaItem } from './media-item';
 import { DeleteModal, NewFolderModal } from './modal';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
@@ -560,6 +560,7 @@ const ActiveItemPreview = ({
             <div className='w-full max-h-[75%]'>
               <img
                 className='block border border-gray-100 rounded overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
+                style={checkerboardStyle}
                 src={thumbnail}
                 alt={activeItem.filename}
               />
