@@ -5,21 +5,7 @@ import set from 'lodash.set';
 import { checkPasswordHash, mapUserFields } from '../auth/utils';
 import type { Resolver } from './index';
 
-export async function handleAuthenticate({
-  tinaSchema,
-  resolver,
-  sub,
-  password,
-  ctxUser,
-}: {
-  tinaSchema: TinaSchema;
-  resolver: Resolver;
-  sub?: string;
-  password: string;
-  info: GraphQLResolveInfo;
-  ctxUser?: { sub?: string };
-}): Promise<any> {
-  const userSub = sub || ctxUser?.sub;
+async function getUserDocumentContext(tinaSchema: TinaSchema, resolver: Resolver) {
   const collection = tinaSchema
     .getCollections()
     .find((c) => c.isAuthCollection);
@@ -46,15 +32,41 @@ export async function handleAuthenticate({
   if (!users) {
     throw new Error('No users found');
   }
-  const { idFieldName, passwordFieldName } = userField;
+
+  return { collection, userField, users, userDoc, realPath };
+}
+
+function findUserInCollection(users: any[], userField: any, userSub: string) {
+  const { idFieldName } = userField;
   if (!idFieldName) {
     throw new Error('No uid field found on user field');
   }
-  const user = users.find((u) => u[idFieldName] === userSub);
+  return users.find((u) => u[idFieldName] === userSub) || null;
+}
+
+export async function handleAuthenticate({
+  tinaSchema,
+  resolver,
+  sub,
+  password,
+  ctxUser,
+}: {
+  tinaSchema: TinaSchema;
+  resolver: Resolver;
+  sub?: string;
+  password: string;
+  info: GraphQLResolveInfo;
+  ctxUser?: { sub?: string };
+}): Promise<any> {
+  const userSub = sub || ctxUser?.sub;
+  const { userField, users } = await getUserDocumentContext(tinaSchema, resolver);
+  
+  const user = findUserInCollection(users, userField, userSub);
   if (!user) {
     return null;
   }
 
+  const { passwordFieldName } = userField;
   const saltedHash = get(user, [passwordFieldName || '', 'value']);
   if (!saltedHash) {
     throw new Error('No password field found on user field');
@@ -84,37 +96,9 @@ export async function handleAuthorize({
   ctxUser?: { sub?: string };
 }): Promise<any> {
   const userSub = sub || ctxUser?.sub;
-  const collection = tinaSchema
-    .getCollections()
-    .find((c) => c.isAuthCollection);
-  if (!collection) {
-    throw new Error('Auth collection not found');
-  }
-
-  const userFields = mapUserFields(collection, ['_rawData']);
-  if (!userFields.length) {
-    throw new Error(
-      `No user field found in collection ${collection.name}`
-    );
-  }
-  if (userFields.length > 1) {
-    throw new Error(
-      `Multiple user fields found in collection ${collection.name}`
-    );
-  }
-  const userField = userFields[0];
-
-  const realPath = `${collection.path}/index.json`;
-  const userDoc = await resolver.getDocument(realPath);
-  const users = get(userDoc, userField.path);
-  if (!users) {
-    throw new Error('No users found');
-  }
-  const { idFieldName } = userField;
-  if (!idFieldName) {
-    throw new Error('No uid field found on user field');
-  }
-  const user = users.find((u) => u[idFieldName] === userSub);
+  const { userField, users } = await getUserDocumentContext(tinaSchema, resolver);
+  
+  const user = findUserInCollection(users, userField, userSub);
   if (!user) {
     return null;
   }
@@ -142,33 +126,10 @@ export async function handleUpdatePassword({
     throw new Error('No password provided');
   }
 
-  const collection = tinaSchema
-    .getCollections()
-    .find((c) => c.isAuthCollection);
-  if (!collection) {
-    throw new Error('Auth collection not found');
-  }
-
-  const userFields = mapUserFields(collection, ['_rawData']);
-  if (!userFields.length) {
-    throw new Error(
-      `No user field found in collection ${collection.name}`
-    );
-  }
-  if (userFields.length > 1) {
-    throw new Error(
-      `Multiple user fields found in collection ${collection.name}`
-    );
-  }
-  const userField = userFields[0];
-  const realPath = `${collection.path}/index.json`;
-  const userDoc = await resolver.getDocument(realPath);
-  const users = get(userDoc, userField.path);
-  if (!users) {
-    throw new Error('No users found');
-  }
+  const { collection, userField, users, realPath } = await getUserDocumentContext(tinaSchema, resolver);
+  
   const { idFieldName, passwordFieldName } = userField;
-  const user = users.find((u) => u[idFieldName] === ctxUser.sub);
+  const user = users.find((u: any) => u[idFieldName] === ctxUser.sub);
   if (!user) {
     throw new Error('Not authorized');
   }
@@ -182,7 +143,7 @@ export async function handleUpdatePassword({
   set(
     params,
     userField.path.slice(1), // remove _rawData from users path
-    users.map((u) => {
+    users.map((u: any) => {
       if (user[idFieldName] === u[idFieldName]) {
         return user;
       }
