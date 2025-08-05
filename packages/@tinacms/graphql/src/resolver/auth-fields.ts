@@ -80,11 +80,7 @@ export async function handleAuthenticate({
     saltedHash,
     password,
   });
-
-  if (matches) {
-    return user;
-  }
-  return null;
+  return matches ? user : null;
 }
 
 export async function handleAuthorize({
@@ -106,11 +102,7 @@ export async function handleAuthorize({
   );
 
   const user = findUserInCollection(users, userField, userSub);
-  if (!user) {
-    return null;
-  }
-
-  return user;
+  return user ? user : null;
 }
 
 export async function handleUpdatePassword({
