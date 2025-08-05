@@ -184,7 +184,7 @@ export const resolve = async ({
             return handleAuthorize({
               tinaSchema,
               resolver,
-              args,
+              sub: args.sub,
               info,
               ctxUser,
             });
@@ -194,7 +194,7 @@ export const resolve = async ({
             return handleUpdatePassword({
               tinaSchema,
               resolver,
-              args,
+              password: args.password,
               info,
               ctxUser,
             });

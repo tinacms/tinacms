@@ -74,16 +74,16 @@ export async function handleAuthenticate({
 export async function handleAuthorize({
   tinaSchema,
   resolver,
-  args,
+  sub,
   ctxUser,
 }: {
   tinaSchema: TinaSchema;
   resolver: Resolver;
-  args: { sub?: string };
+  sub?: string;
   info: GraphQLResolveInfo;
   ctxUser?: { sub?: string };
 }): Promise<any> {
-  const sub = args.sub || ctxUser?.sub;
+  const userSub = sub || ctxUser?.sub;
   const collection = tinaSchema
     .getCollections()
     .find((c) => c.isAuthCollection);
@@ -114,7 +114,7 @@ export async function handleAuthorize({
   if (!idFieldName) {
     throw new Error('No uid field found on user field');
   }
-  const user = users.find((u) => u[idFieldName] === sub);
+  const user = users.find((u) => u[idFieldName] === userSub);
   if (!user) {
     return null;
   }
@@ -125,12 +125,12 @@ export async function handleAuthorize({
 export async function handleUpdatePassword({
   tinaSchema,
   resolver,
-  args,
+  password,
   ctxUser,
 }: {
   tinaSchema: TinaSchema;
   resolver: Resolver;
-  args: { password: string };
+  password: string;
   info: GraphQLResolveInfo;
   ctxUser?: { sub?: string };
 }): Promise<boolean> {
@@ -138,7 +138,7 @@ export async function handleUpdatePassword({
     throw new Error('Not authorized');
   }
 
-  if (!args.password) {
+  if (!password) {
     throw new Error('No password provided');
   }
 
@@ -174,7 +174,7 @@ export async function handleUpdatePassword({
   }
 
   user[passwordFieldName] = {
-    value: args.password,
+    value: password,
     passwordChangeRequired: false,
   };
 
