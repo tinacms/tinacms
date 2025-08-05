@@ -578,22 +578,20 @@ const ActiveItemPreview = ({
                 <Button
                   size='medium'
                   variant='primary'
-                  className='grow'
                   onClick={() => selectMediaItem(activeItem)}
                 >
                   Insert
-                  <BiArrowToBottom className='ml-1 -mr-0.5 w-6 h-auto text-white opacity-70' />
+                  <BiArrowToBottom className='ml-1 -mr-0.5 w-6 h-auto opacity-70' />
                 </Button>
               )}
               {allowDelete && (
                 <Button
-                  variant='white'
+                  variant='danger'
                   size='medium'
-                  className='grow max-w-[40%]'
                   onClick={deleteMediaItem}
                 >
                   Delete
-                  <TrashIcon className='ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70' />
+                  <TrashIcon className='ml-1 -mr-0.5 w-6 h-auto opacity-70' />
                 </Button>
               )}
             </div>
