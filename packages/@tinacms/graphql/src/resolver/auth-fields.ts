@@ -3,35 +3,20 @@ import type { GraphQLResolveInfo } from 'graphql';
 import { get } from '../util';
 import set from 'lodash.set';
 import { checkPasswordHash, mapUserFields } from '../auth/utils';
-
-export interface AuthContext {
-  sub?: string;
-}
-
-export interface AuthenticateArgs {
-  sub?: string;
-  password: string;
-}
-
-export interface UpdatePasswordArgs {
-  password: string;
-}
-
-export interface AuthFieldsParams {
-  tinaSchema: TinaSchema;
-  resolver: any;
-  args: any;
-  context: any;
-  info: GraphQLResolveInfo;
-  ctxUser?: AuthContext;
-}
+import type { Resolver } from './index';
 
 export async function handleAuthenticate({
   tinaSchema,
   resolver,
   args,
   ctxUser,
-}: AuthFieldsParams): Promise<any> {
+}: {
+  tinaSchema: TinaSchema;
+  resolver: Resolver;
+  args: { sub?: string; password: string };
+  info: GraphQLResolveInfo;
+  ctxUser?: { sub?: string };
+}): Promise<any> {
   const sub = args.sub || ctxUser?.sub;
   const collection = tinaSchema
     .getCollections()
@@ -89,7 +74,13 @@ export async function handleAuthorize({
   resolver,
   args,
   ctxUser,
-}: AuthFieldsParams): Promise<any> {
+}: {
+  tinaSchema: TinaSchema;
+  resolver: Resolver;
+  args: { sub?: string };
+  info: GraphQLResolveInfo;
+  ctxUser?: { sub?: string };
+}): Promise<any> {
   const sub = args.sub || ctxUser?.sub;
   const collection = tinaSchema
     .getCollections()
@@ -134,7 +125,13 @@ export async function handleUpdatePassword({
   resolver,
   args,
   ctxUser,
-}: AuthFieldsParams): Promise<boolean> {
+}: {
+  tinaSchema: TinaSchema;
+  resolver: Resolver;
+  args: { password: string };
+  info: GraphQLResolveInfo;
+  ctxUser?: { sub?: string };
+}): Promise<boolean> {
   if (!ctxUser?.sub) {
     throw new Error('Not authorized');
   }
