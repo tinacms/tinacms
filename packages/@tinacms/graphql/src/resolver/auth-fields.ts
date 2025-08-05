@@ -5,7 +5,10 @@ import set from 'lodash.set';
 import { checkPasswordHash, mapUserFields } from '../auth/utils';
 import type { Resolver } from './index';
 
-async function getUserDocumentContext(tinaSchema: TinaSchema, resolver: Resolver) {
+async function getUserDocumentContext(
+  tinaSchema: TinaSchema,
+  resolver: Resolver
+) {
   const collection = tinaSchema
     .getCollections()
     .find((c) => c.isAuthCollection);
@@ -15,9 +18,7 @@ async function getUserDocumentContext(tinaSchema: TinaSchema, resolver: Resolver
 
   const userFields = mapUserFields(collection, ['_rawData']);
   if (!userFields.length) {
-    throw new Error(
-      `No user field found in collection ${collection.name}`
-    );
+    throw new Error(`No user field found in collection ${collection.name}`);
   }
   if (userFields.length > 1) {
     throw new Error(
@@ -59,8 +60,11 @@ export async function handleAuthenticate({
   ctxUser?: { sub?: string };
 }): Promise<any> {
   const userSub = sub || ctxUser?.sub;
-  const { userField, users } = await getUserDocumentContext(tinaSchema, resolver);
-  
+  const { userField, users } = await getUserDocumentContext(
+    tinaSchema,
+    resolver
+  );
+
   const user = findUserInCollection(users, userField, userSub);
   if (!user) {
     return null;
@@ -96,8 +100,11 @@ export async function handleAuthorize({
   ctxUser?: { sub?: string };
 }): Promise<any> {
   const userSub = sub || ctxUser?.sub;
-  const { userField, users } = await getUserDocumentContext(tinaSchema, resolver);
-  
+  const { userField, users } = await getUserDocumentContext(
+    tinaSchema,
+    resolver
+  );
+
   const user = findUserInCollection(users, userField, userSub);
   if (!user) {
     return null;
@@ -126,8 +133,9 @@ export async function handleUpdatePassword({
     throw new Error('No password provided');
   }
 
-  const { collection, userField, users, realPath } = await getUserDocumentContext(tinaSchema, resolver);
-  
+  const { collection, userField, users, realPath } =
+    await getUserDocumentContext(tinaSchema, resolver);
+
   const { idFieldName, passwordFieldName } = userField;
   const user = users.find((u: any) => u[idFieldName] === ctxUser.sub);
   if (!user) {

@@ -13,7 +13,11 @@ import type { GraphQLResolveInfo } from 'graphql';
 import type { Database } from './database';
 import { NAMER } from './ast-builder';
 import { handleFetchErrorError } from './resolver/error';
-import { handleAuthenticate, handleAuthorize, handleUpdatePassword } from './resolver/auth-fields';
+import {
+  handleAuthenticate,
+  handleAuthorize,
+  handleUpdatePassword,
+} from './resolver/auth-fields';
 import { NotFoundError } from './error';
 
 export const resolve = async ({
