@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 1.5.2
+
+### Patch Changes
+
+- [#5939](https://github.com/tinacms/tinacms/pull/5939) [`8a5ca67`](https://github.com/tinacms/tinacms/commit/8a5ca6745b918c6fe7cb15b4b4f3420fd4b3104d) Thanks [@wicksipedia](https://github.com/wicksipedia)! - fix: cli compatibility with CommonJS
+
 ## 1.5.1
 
 ### Patch Changes
