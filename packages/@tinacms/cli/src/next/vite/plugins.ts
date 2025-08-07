@@ -1,4 +1,3 @@
-import AsyncLock from 'async-lock';
 import type { Plugin } from 'vite';
 import { createFilter, FilterPattern } from '@rollup/pluginutils';
 import type { Config } from '@svgr/core';
