@@ -559,7 +559,7 @@ const ActiveItemPreview = ({
           {isImage(thumbnail) ? (
             <div className='w-full max-h-[75%]'>
               <img
-                className='block border border-gray-100 rounded overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
+                className='block border border-gray-100 bg-gray-50/50 rounded overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
                 style={checkerboardStyle}
                 src={thumbnail}
                 alt={activeItem.filename}
