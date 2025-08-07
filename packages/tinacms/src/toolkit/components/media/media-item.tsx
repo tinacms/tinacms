@@ -41,11 +41,11 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
       }}
     >
       {item.new && (
-        <span className='absolute top-1.5 left-1.5 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
+        <span className='absolute top-1 right-1 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide	 font-bold text-green-600 px-1.5 py-0.5 z-10'>
           NEW
         </span>
       )}
-      <div className='w-16 h-16 bg-gray-50 overflow-hidden flex justify-center flex-shrink-0'>
+      <div className='w-16 h-16 overflow-hidden flex justify-center flex-shrink-0'>
         {isImage(thumbnail) ? (
           <img
             className='block overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
@@ -77,13 +77,8 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
   const itemIsImage = isImage(thumbnail);
   return (
     <li className='block overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out'>
-      {item.new && (
-        <span className='absolute top-1.5 left-1.5 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide font-bold text-green-600 px-1.5 py-0.5 z-10'>
-          NEW
-        </span>
-      )}
       <button
-        className={cn('flex items-center justify-center', {
+        className={cn('relative flex items-center justify-center', {
           // 'primary-outline': active,
           'shadow hover:shadow-md hover:scale-103 hover:border-gray-150':
             !active,
@@ -98,6 +93,11 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
           }
         }}
       >
+        {item.new && (
+          <span className='absolute top-1 right-1 rounded shadow bg-green-100 border border-green-200 text-[10px] tracking-wide font-bold text-green-600 px-1.5 py-0.5 z-10'>
+            NEW
+          </span>
+        )}
         {itemIsImage ? (
           <img
             className={cn(
