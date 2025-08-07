@@ -392,10 +392,11 @@ const SidebarHeader = ({ isLocalMode }) => {
             <BranchPreviewButton />
 
             <button
+              type='button'
               className='p-2 hover:bg-gray-100 transition-colors duration-150 ease-in-out rounded'
               onClick={toggleSidebarOpen}
-              title='Close sidebar'
-              aria-label='Close sidebar'
+              title='Hide editing panel'
+              aria-label='Hide editing panel'
             >
               <PiSidebarSimpleLight className='h-6 w-auto text-gray-600' />
             </button>
@@ -483,7 +484,7 @@ const EditButton = ({}) => {
   return (
     <Button
       rounded='right'
-      variant='secondary'
+      variant='accent'
       size='custom'
       onClick={toggleSidebarOpen}
       className={`z-chrome absolute top-6 right-0 translate-x-full text-sm h-10 px-3 transition-all duration-300 ${
@@ -491,7 +492,8 @@ const EditButton = ({}) => {
           ? 'opacity-0 ease-in pointer-events-none'
           : 'ease-out pointer-events-auto'
       }`}
-      aria-label='opens cms sidebar'
+      title='Show editing panel'
+      aria-label='Show editing panel'
     >
       <PiSidebarSimpleLight className='h-6 w-auto' />
     </Button>
