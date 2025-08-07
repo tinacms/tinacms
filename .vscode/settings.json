@@ -16,8 +16,9 @@
         "**/.hg": true,
         "**/CVS": true,
         "**/.DS_Store": true,
+        "**/.turbo": true,
         "**/Thumbs.db": true,
-        "node_modules": true
+        "**/node_modules": true
     },
     "files.watcherExclude": {
         "**/.git/objects/**": true,
@@ -25,5 +26,6 @@
         "**/node_modules/*/**": true,
         "**/.turbo/**": true,
         "**/.next/**": true,
-    }
+    },
+    "search.followSymlinks": false
 }
