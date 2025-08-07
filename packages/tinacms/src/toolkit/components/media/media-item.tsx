@@ -13,8 +13,15 @@ interface MediaItemProps {
 export const checkerboardStyle = {
   backgroundImage:
     'linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%)',
-  backgroundSize: '24px 24px',
-  backgroundPosition: '0 0, 0 12px, 12px -12px, -12px 0px',
+  backgroundSize: '12px 12px',
+  backgroundPosition: '0 0, 0 6px, 6px -6px, -6px 0px',
+};
+
+export const smallCheckerboardStyle = {
+  backgroundImage:
+    'linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%)',
+  backgroundSize: '6px 6px',
+  backgroundPosition: '0 0, 0 3px, 3px -3px, -3px 0px',
 };
 
 export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
@@ -49,7 +56,7 @@ export function ListMediaItem({ item, onClick, active }: MediaItemProps) {
         {isImage(thumbnail) ? (
           <img
             className='block overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
-            style={checkerboardStyle}
+            style={smallCheckerboardStyle}
             src={thumbnail}
             alt={item.filename}
           />
@@ -78,8 +85,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
   return (
     <li className='block overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out'>
       <button
-        className={cn('relative flex items-center justify-center', {
-          // 'primary-outline': active,
+        className={cn('relative flex flex-col items-center justify-center', {
           'shadow hover:shadow-md hover:scale-103 hover:border-gray-150':
             !active,
           'cursor-pointer': item.type === 'dir',
@@ -98,24 +104,37 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
             NEW
           </span>
         )}
-        {itemIsImage ? (
-          <img
-            className={cn(
-              'block overflow-hidden object-center object-contain max-w-full max-h-[16rem] m-auto shadow',
-              { 'border border-blue-500': active }
-            )}
-            style={checkerboardStyle}
-            src={thumbnail}
-            alt={item.filename}
-          />
-        ) : (
-          <div className='p-4 w-full h-full flex flex-col gap-4 items-center justify-center'>
-            <FileIcon className='w-[30%] h-auto fill-gray-300' />
-            <span className='block text-base text-gray-600 w-full break-words truncate'>
-              {item.filename}
-            </span>
-          </div>
-        )}
+        <div className='relative w-full flex items-center justify-center'>
+          {itemIsImage ? (
+            <>
+              <img
+                className={cn(
+                  'block overflow-hidden object-center object-contain max-w-full max-h-[16rem] m-auto shadow',
+                  { 'border border-blue-500': active }
+                )}
+                style={checkerboardStyle}
+                src={thumbnail}
+                alt={item.filename}
+              />
+              <span
+                className={cn(
+                  'absolute bottom-0 left-0 w-full text-xs text-white px-2 py-1 truncate z-10',
+                  active ? 'bg-blue-500/60' : 'bg-black/60'
+                )}
+                style={{ pointerEvents: 'none' }}
+              >
+                {item.filename}
+              </span>
+            </>
+          ) : (
+            <div className='p-4 w-full h-full flex flex-col gap-4 items-center justify-center'>
+              <FileIcon className='w-[30%] h-auto fill-gray-300' />
+              <span className='block text-base text-gray-600 w-full break-words truncate'>
+                {item.filename}
+              </span>
+            </div>
+          )}
+        </div>
       </button>
     </li>
   );
