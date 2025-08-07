@@ -85,12 +85,14 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
   return (
     <li className='block overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out'>
       <button
-        className={cn('relative flex flex-col items-center justify-center', {
-          'shadow hover:shadow-md hover:scale-103 hover:border-gray-150':
-            !active,
-          'cursor-pointer': item.type === 'dir',
-          'w-full': !itemIsImage,
-        })}
+        className={cn(
+          'relative flex flex-col items-center justify-center w-full',
+          {
+            'shadow hover:shadow-md hover:scale-103 hover:border-gray-150':
+              !active,
+            'cursor-pointer': item.type === 'dir',
+          }
+        )}
         onClick={() => {
           if (!active) {
             onClick(item);
@@ -127,7 +129,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
               </span>
             </>
           ) : (
-            <div className='p-4 w-full h-full flex flex-col gap-4 items-center justify-center'>
+            <div className='p-4 w-full flex flex-col gap-4 items-center justify-center'>
               <FileIcon className='w-[30%] h-auto fill-gray-300' />
               <span className='block text-base text-gray-600 w-full break-words truncate'>
                 {item.filename}
