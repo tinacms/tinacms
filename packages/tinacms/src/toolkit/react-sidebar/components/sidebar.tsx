@@ -243,10 +243,7 @@ const Sidebar = ({
         <SidebarWrapper>
           <EditButton />
           <SidebarBody>
-            <SidebarHeader
-              isLocalMode={cms.api?.tina?.isLocalMode}
-              branchingEnabled={branchingEnabled}
-            />
+            <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
             <FormsView loadingPlaceholder={sidebar.loadingPlaceholder} />
             {activeScreen && (
               <ScreenPluginModal
@@ -365,7 +362,7 @@ const updateBodyDisplacement = ({
   }
 };
 
-const SidebarHeader = ({ branchingEnabled, isLocalMode }) => {
+const SidebarHeader = ({ isLocalMode }) => {
   const { toggleSidebarOpen, toggleMenu } = React.useContext(SidebarContext);
 
   return (
