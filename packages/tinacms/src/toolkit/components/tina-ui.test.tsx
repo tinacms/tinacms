@@ -36,7 +36,7 @@ describe('TinaUI', () => {
           </TinaCMSProvider>
         );
 
-        app.getByLabelText('opens cms sidebar');
+        app.getByLabelText('Show editing panel');
       });
     });
     describe('when sidebar is false', () => {
@@ -63,7 +63,7 @@ describe('TinaUI', () => {
           </TinaCMSProvider>
         );
 
-        const sidebarButton = app.queryByLabelText('opens cms sidebar');
+        const sidebarButton = app.queryByLabelText('Show editing panel');
         expect(sidebarButton).toBeNull();
       });
     });
@@ -93,7 +93,7 @@ describe('TinaUI', () => {
           </TinaCMSProvider>
         );
 
-        const sidebarButton = app.queryByLabelText('opens cms sidebar');
+        const sidebarButton = app.queryByLabelText('Show editing panel');
         expect(sidebarButton).toBeNull();
       });
       it('does not remount children when cms is toggled', () => {
@@ -151,7 +151,7 @@ describe('TinaUI', () => {
           </TinaCMSProvider>
         );
 
-        const sidebarButton = app.queryByLabelText('opens cms sidebar');
+        const sidebarButton = app.queryByLabelText('Show editing panel');
         expect(sidebarButton).toBeNull();
       });
     });
