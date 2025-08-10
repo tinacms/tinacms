@@ -24,7 +24,7 @@ export const TEMPLATES: Template[] = [
   {
     title: '⭐ NextJS starter',
     description:
-      'Kickstart your project with NextJS – our top recommendation for a seamless, performant, and versatile web experience.',
+      'Kickstart your project with Next.js – our top recommendation for a seamless, performant, and versatile web experience.',
     value: 'tina-cloud-starter',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-cloud-starter',
@@ -33,7 +33,7 @@ export const TEMPLATES: Template[] = [
   {
     title: '⭐️ TinaDocs',
     description:
-      'Get your documentation site up and running with TinaCMS and Next.JS in minutes.',
+      'Get your documentation site up and running with TinaCMS and Next.js in minutes.',
     value: 'tina-docs',
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-docs',
