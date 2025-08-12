@@ -1,73 +1,51 @@
 import { Telemetry } from '@tinacms/metrics';
-import { Command } from 'commander';
 import prompts from 'prompts';
 import path from 'node:path';
-import { version, name } from '../package.json';
 import {
   isWriteable,
   setupProjectDirectory,
   updateProjectPackageName,
   updateProjectPackageVersion,
+  updateThemeSettings,
 } from './util/fileUtil';
 import { install } from './util/install';
 import { initializeGit, makeFirstCommit } from './util/git';
-import { TEMPLATES, downloadTemplate } from './templates';
+import { TEMPLATES, Template, downloadTemplate } from './templates';
 import { preRunChecks } from './util/preRunChecks';
 import { checkPackageExists } from './util/checkPkgManagers';
-import { log, TextStyles } from './util/logger';
+import { TextStyles } from './util/textstyles';
 import { exit } from 'node:process';
+import { extractOptions } from './util/options';
+import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from 'validate-npm-package-name';
-
-/**
- * The available package managers a user can use.
- * To add a new supported package manager, add the usage command to this list.
- * The `PackageManager` type will be automatically updated as a result.
- */
-const PKG_MANAGERS = ['npm', 'yarn', 'pnpm', 'bun'] as const;
-export type PackageManager = (typeof PKG_MANAGERS)[number];
+import * as ascii from './util/asciiArt';
+import { THEMES } from './themes';
 
 export async function run() {
-  preRunChecks();
+  // Dynamic import for ora to handle ES module compatibility
+  const ora = (await import('ora')).default;
 
-  let projectName = '';
-
-  const program = new Command(name);
-  program
-    .version(version)
-    .option(
-      '-t, --template <template>',
-      `Choose which template to start from. Valid templates are: ${TEMPLATES.map(
-        (x) => x.value
-      )}`
-    )
-    .option(
-      '-p, --pkg-manager <pkg-manager>',
-      `Choose which package manager to use. Valid package managers are: ${PKG_MANAGERS}`
-    )
-    .option(
-      '-d, --dir <dir>',
-      'Choose which directory to run this script from.'
-    )
-    .option('--noTelemetry', 'Disable anonymous telemetry that is collected.')
-    .arguments('[project-directory]')
-    .usage(`${TextStyles.success('<project-directory>')} [options]`)
-    .action((name) => {
-      projectName = name;
-    });
-
-  program.parse(process.argv);
-  const opts = program.opts();
-  if (opts.dir) {
-    process.chdir(opts.dir);
+  if (process.stdout.columns >= 60) {
+    console.log(TextStyles.tinaOrange(`${ascii.llama}`));
+    console.log(TextStyles.tinaOrange(`${ascii.tinaCms}`));
+  } else {
+    console.log(TextStyles.tinaOrange(`🦙 TinaCMS`));
   }
+  const version = require('../package.json').version;
+  console.log(`Create Tina App v${version}`);
+
+  const spinner = ora();
+  preRunChecks(spinner);
+
+  const opts = extractOptions(process.argv);
 
   const telemetry = new Telemetry({ disabled: opts?.noTelemetry });
 
-  let template = opts.template;
-  if (template) {
-    template = TEMPLATES.find((_template) => _template.value === template);
+  let template: Template = null;
+  if (opts.template) {
+    template = TEMPLATES.find((_template) => _template.value === opts.template);
     if (!template) {
-      log.err(
+      spinner.fail(
         `The provided template '${
           opts.template
         }' is invalid. Please provide one of the following: ${TEMPLATES.map(
@@ -81,7 +59,7 @@ export async function run() {
   let pkgManager = opts.pkgManager;
   if (pkgManager) {
     if (!PKG_MANAGERS.find((_pkgManager) => _pkgManager === pkgManager)) {
-      log.err(
+      spinner.fail(
         `The provided package manager '${opts.pkgManager}' is not supported. Please provide one of the following: ${PKG_MANAGERS}`
       );
       exit(1);
@@ -97,7 +75,7 @@ export async function run() {
     }
 
     if (installedPkgManagers.length === 0) {
-      log.err(
+      spinner.fail(
         `You have no supported package managers installed. Please install one of the following: ${PKG_MANAGERS}`
       );
       exit(1);
@@ -115,6 +93,7 @@ export async function run() {
     pkgManager = res.packageManager;
   }
 
+  let projectName = opts.projectName;
   if (!projectName) {
     const res = await prompts({
       name: 'name',
@@ -144,66 +123,115 @@ export async function run() {
     template = TEMPLATES.find((_template) => _template.value === res.template);
   }
 
+  let themeChoice: string | undefined;
+  if (template.value === 'tina-docs') {
+    const res = await prompts({
+      name: 'theme',
+      type: 'select',
+      message: 'What theme would you like to use?',
+      choices: THEMES,
+    });
+    if (!Object.hasOwn(res, 'theme')) exit(1); // User most likely sent SIGINT.
+    themeChoice = res.theme;
+  }
   await telemetry.submitRecord({
     event: {
       name: 'create-tina-app:invoke',
-      template: template,
+      template: template.value,
       pkgManager: pkgManager,
     },
   });
 
   const rootDir = path.join(process.cwd(), projectName);
   if (!(await isWriteable(path.dirname(rootDir)))) {
-    log.err(
+    spinner.fail(
       'The application path is not writable, please check folder permissions and try again. It is likely you do not have write permissions for this folder.'
     );
     process.exit(1);
   }
-  const appName = await setupProjectDirectory(rootDir);
 
+  let appName: string;
   try {
-    await downloadTemplate(template, rootDir);
-    updateProjectPackageName(rootDir, projectName);
-    updateProjectPackageVersion(rootDir, '0.0.1');
+    appName = await setupProjectDirectory(rootDir);
   } catch (err) {
-    log.err(`Failed to download template: ${(err as Error).message}`);
+    spinner.fail((err as Error).message);
     exit(1);
   }
 
-  log.info('Installing packages.');
-  await install(pkgManager as PackageManager);
-
-  log.info('Initializing git repository.');
   try {
-    if (initializeGit()) {
-      makeFirstCommit(rootDir);
-      log.info('Initialized git repository.');
+    await downloadTemplate(template, rootDir, spinner);
+
+    if (themeChoice) {
+      // Add selected theme to content/settings/config.json
+      await updateThemeSettings(rootDir, themeChoice);
     }
+
+    spinner.start('Downloading template...');
+    await downloadTemplate(template, rootDir, spinner);
+    spinner.succeed();
+
+    spinner.start('Updating project metadata...');
+    updateProjectPackageName(rootDir, projectName);
+    updateProjectPackageVersion(rootDir, '0.0.1');
+    spinner.succeed();
   } catch (err) {
-    log.err('Failed to initialize Git repository, skipping.');
+    spinner.fail(`Failed to download template: ${(err as Error).message}`);
+    exit(1);
   }
 
-  log.success('Starter successfully created!');
+  spinner.start('Installing packages.');
+  try {
+    await install(pkgManager as PackageManager, opts.verbose);
+    spinner.succeed();
+  } catch (err) {
+    spinner.fail(`Failed to install packages: ${(err as Error).message}`);
+    exit(1);
+  }
 
-  if (template.value === 'tina-hugo-starter')
-    log.warn(
-      `Hugo is required for this starter. Install it via ${TextStyles.link('https://gohugo.io/installation/')}.`
+  spinner.start('Initializing git repository.');
+  try {
+    if (initializeGit(spinner)) {
+      makeFirstCommit(rootDir);
+      spinner.succeed();
+    }
+  } catch (err) {
+    spinner.fail('Failed to initialize Git repository, skipping.');
+  }
+
+  spinner.succeed(`Created ${TextStyles.tinaOrange(appName)}\n`);
+
+  if (template.value === 'tina-hugo-starter') {
+    spinner.warn(
+      `Hugo is required for this starter. Install it via ${TextStyles.link('https://gohugo.io/installation/')}\n`
     );
+  }
 
-  log.log(TextStyles.bold('\nTo launch your app, run:\n'));
-  log.cmd(`cd ${appName}\n${pkgManager} run dev`);
-  log.log(`\nNext steps:
-    • 📝 Edit some content on ${TextStyles.link(
-      'http://localhost:3000'
-    )} (See ${TextStyles.link('https://tina.io/docs/using-tina-editor')})
-    • 📖 Learn the basics: ${TextStyles.link('https://tina.io/docs/schema/')}
-    • 🖌️ Extend Tina with custom field components: ${TextStyles.link(
-      'https://tina.io/docs/advanced/extending-tina/'
-    )}
-    • 🚀 Deploy to Production: ${TextStyles.link(
-      'https://tina.io/docs/tina-cloud/'
-    )}
-  `);
+  const padCommand = (cmd: string, width = 20) =>
+    TextStyles.cmd(cmd) + ' '.repeat(Math.max(0, width - cmd.length));
+
+  spinner.info(`${TextStyles.bold('To get started:')}
+
+  ${padCommand(`cd ${appName}`)}# move into your project directory
+  ${padCommand(`${pkgManager} run dev`)}# start the dev server ${TextStyles.link(template.devUrl)}
+  ${padCommand(`${pkgManager} run build`)}# build the app for production
+`);
+
+  console.log('Next steps:');
+  console.log(
+    `  • 📝 Edit some content: ${TextStyles.link('https://tina.io/docs/using-tina-editor')}`
+  );
+  console.log(
+    `  • 📖 Learn the basics: ${TextStyles.link('https://tina.io/docs/schema/')}`
+  );
+  console.log(
+    `  • 🖌️ Extend Tina with custom field components: ${TextStyles.link('https://tina.io/docs/advanced/extending-tina/')}`
+  );
+  console.log(
+    `  • 🚀 Deploy to Production: ${TextStyles.link('https://tina.io/docs/tina-cloud/')}`
+  );
 }
 
-run();
+run().catch((error) => {
+  console.error('Error running create-tina-app:', error);
+  process.exit(1);
+});

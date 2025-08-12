@@ -1,5 +1,27 @@
 # create-tina-app
 
+## 1.5.2
+
+### Patch Changes
+
+- [#5939](https://github.com/tinacms/tinacms/pull/5939) [`8a5ca67`](https://github.com/tinacms/tinacms/commit/8a5ca6745b918c6fe7cb15b4b4f3420fd4b3104d) Thanks [@wicksipedia](https://github.com/wicksipedia)! - fix: cli compatibility with CommonJS
+
+## 1.5.1
+
+### Patch Changes
+
+- [#5937](https://github.com/tinacms/tinacms/pull/5937) [`3f1e88d`](https://github.com/tinacms/tinacms/commit/3f1e88dfed8d597cee7936f9b0c09e6e4a2e4e71) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - fix: added missing devUrl
+
+- [#5624](https://github.com/tinacms/tinacms/pull/5624) [`0e749d5`](https://github.com/tinacms/tinacms/commit/0e749d5bf7bce552da1beadef3772103c55afd67) Thanks [@joshbermanssw](https://github.com/joshbermanssw)! - Add TinaDocs to NPX CLI templates
+
+## 1.5.0
+
+### Minor Changes
+
+- [#5929](https://github.com/tinacms/tinacms/pull/5929) [`ec43c87`](https://github.com/tinacms/tinacms/commit/ec43c87a1da55b4cb86e9b428eb39fc0740a9e1f) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Enhanced CLI output with some branded ASCII art
+  Refined user experience with clearer messaging and structure
+  Added optional --verbose flag (disabled by default) for detailed output
+
 ## 1.4.0
 
 ### Minor Changes

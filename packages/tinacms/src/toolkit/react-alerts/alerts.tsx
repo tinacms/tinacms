@@ -1,4 +1,4 @@
-import type { Alerts as AlertsCollection, AlertLevel } from '@toolkit/alerts';
+import type { AlertLevel, Alerts as AlertsCollection } from '@toolkit/alerts';
 import { useSubscribable } from '@toolkit/react-core';
 import {
   Modal,
@@ -10,6 +10,29 @@ import {
 import { Button } from '@toolkit/styles';
 import React from 'react';
 import { BiCheckCircle, BiError, BiInfoCircle, BiX } from 'react-icons/bi';
+
+const parseUrlsInText = (text: string): React.ReactNode => {
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      const href = part.startsWith('http') ? part : `https://${part}`;
+      return (
+        <a
+          key={index}
+          href={href}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='text-blue-600 underline hover:text-blue-800'
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
 
 export interface AlertsProps {
   alerts: AlertsCollection;
@@ -24,7 +47,7 @@ export function Alerts({ alerts }: AlertsProps) {
 
   return (
     <>
-      <div className='fixed bottom-0 left-0 right-0 p-6 flex flex-col items-center z-[999999] pointer-events-none'>
+      <div className='fixed bottom-0 left-0 right-0 p-6 flex flex-col items-center z-[999999]'>
         {alerts.all
           .filter((alert) => {
             return alert.level !== 'error';
@@ -42,7 +65,7 @@ export function Alerts({ alerts }: AlertsProps) {
                   <BiError className='w-5 h-auto opacity-70' />
                 )}
                 <p className='m-0 flex-1 max-w-[680px] text-left'>
-                  {alert.message.toString()}
+                  {parseUrlsInText(alert.message.toString())}
                 </p>
                 <CloseAlert
                   onClick={() => {
@@ -63,7 +86,7 @@ export function Alerts({ alerts }: AlertsProps) {
               ? () => {
                   return (
                     <p className='text-base mb-3 overflow-y-auto'>
-                      {alert.message.toString()}
+                      {parseUrlsInText(alert.message.toString())}
                     </p>
                   );
                 }

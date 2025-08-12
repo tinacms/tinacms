@@ -1,6 +1,6 @@
 {
   "name": "create-tina-app",
-  "version": "1.4.0",
+  "version": "1.5.2",
   "main": "dist/index.js",
   "files": [
     "dist",
@@ -48,6 +48,7 @@
     "commander": "^12.1.0",
     "cross-spawn": "catalog:",
     "fs-extra": "catalog:",
+    "ora": "^8.2.0",
     "prompts": "catalog:",
     "tar": "catalog:",
     "validate-npm-package-name": "catalog:"
