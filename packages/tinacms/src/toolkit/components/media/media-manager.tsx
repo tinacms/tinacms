@@ -27,7 +27,7 @@ import { BiFile } from 'react-icons/bi';
 import { IoMdRefresh } from 'react-icons/io';
 import { Breadcrumb } from './breadcrumb';
 import { CopyField } from './copy-field';
-import { GridMediaItem, ListMediaItem } from './media-item';
+import { checkerboardStyle, GridMediaItem, ListMediaItem } from './media-item';
 import { DeleteModal, NewFolderModal } from './modal';
 import {
   DEFAULT_MEDIA_UPLOAD_TYPES,
@@ -559,7 +559,8 @@ const ActiveItemPreview = ({
           {isImage(thumbnail) ? (
             <div className='w-full max-h-[75%]'>
               <img
-                className='block border border-gray-100 rounded overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
+                className='block border border-gray-100 bg-gray-50/50 rounded overflow-hidden object-center object-contain max-w-full max-h-full m-auto shadow'
+                style={checkerboardStyle}
                 src={thumbnail}
                 alt={activeItem.filename}
               />
@@ -578,22 +579,20 @@ const ActiveItemPreview = ({
                 <Button
                   size='medium'
                   variant='primary'
-                  className='grow'
                   onClick={() => selectMediaItem(activeItem)}
                 >
                   Insert
-                  <BiArrowToBottom className='ml-1 -mr-0.5 w-6 h-auto text-white opacity-70' />
+                  <BiArrowToBottom className='ml-1 -mr-0.5 w-6 h-auto opacity-70' />
                 </Button>
               )}
               {allowDelete && (
                 <Button
-                  variant='white'
+                  variant='danger'
                   size='medium'
-                  className='grow max-w-[40%]'
                   onClick={deleteMediaItem}
                 >
                   Delete
-                  <TrashIcon className='ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70' />
+                  <TrashIcon className='ml-1 -mr-0.5 w-6 h-auto opacity-70' />
                 </Button>
               )}
             </div>
