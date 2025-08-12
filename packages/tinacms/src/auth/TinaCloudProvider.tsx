@@ -187,8 +187,8 @@ export const AuthWallInner = ({
           title={modalTitle}
           message={
             isTinaCloud
-              ? 'Your site uses TinaCloud to track changes. To make edits, you must log in.'
-              : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
+              ? 'This site uses TinaCloud to track changes. Let’s get you logged in to start making edits...'
+              : 'To save edits, enter edit mode. When you save, changes will be saved to the local filesystem.'
           }
           close={close}
           actions={[
