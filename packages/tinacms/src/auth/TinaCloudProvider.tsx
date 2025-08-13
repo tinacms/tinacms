@@ -45,7 +45,7 @@ export interface TinaCloudAuthWallProps {
     | (() => Promise<TinaCloudMediaStoreClass>);
 }
 
-export const AuthWallInner = ({
+const AuthWallInner = ({
   children,
   cms,
   getModalActions,
