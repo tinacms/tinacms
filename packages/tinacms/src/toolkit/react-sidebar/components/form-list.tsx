@@ -60,24 +60,30 @@ const FormListItem = ({
   setActiveFormId: (id: string) => void;
 }) => {
   return (
-    <div className={'divide-y divide-gray-200'}>
+    <div>
       <Item setActiveFormId={setActiveFormId} item={item} depth={depth} />
       {item.subItems && (
-        <ul className='divide-y divide-gray-200'>
-          {item.subItems?.map((subItem) => {
-            if (subItem.type === 'document') {
-              return (
-                <li key={subItem.formId}>
-                  <Item
-                    setActiveFormId={setActiveFormId}
-                    depth={depth + 1}
-                    item={subItem}
-                  />
-                </li>
-              );
-            }
-          })}
-        </ul>
+        <>
+          <hr className='m-0 w-full border-0 border-t border-gray-200' />
+          <ul>
+            {item.subItems?.map((subItem, subIndex) => {
+              if (subItem.type === 'document') {
+                return (
+                  <li key={subItem.formId}>
+                    {subIndex > 0 && (
+                      <hr className='m-0 w-full border-0 border-t border-gray-200' />
+                    )}
+                    <Item
+                      setActiveFormId={setActiveFormId}
+                      depth={depth + 1}
+                      item={subItem}
+                    />
+                  </li>
+                );
+              }
+            })}
+          </ul>
+        </>
       )}
     </div>
   );
@@ -97,6 +103,7 @@ export const FormLists = (props: { isEditing: boolean }) => {
       leave='transition-all ease-out duration-150'
       leaveFrom='opacity-100'
       leaveTo='opacity-0 -translate-x-1/2'
+      className='w-full min-w-fit'
     >
       {cms.state.formLists.map((formList, index) => (
         <div key={`${formList.id}-${index}`}>
@@ -153,36 +160,40 @@ export const FormList = (props: {
 
   return (
     <ul>
-      <li className={'divide-y divide-gray-200'}>
+      <li>
         {listItems.map((item, index) => {
-          if (item.type === 'list') {
-            return (
-              <div
-                key={item.label}
-                className={`relative group text-left w-full bg-white shadow-sm
+          const key =
+            item.type === 'list' ? `list-${item.label}` : `doc-${item.formId}`;
+          return (
+            <React.Fragment key={key}>
+              {index > 0 && (
+                <hr className='m-0 w-full border-0 border-t border-gray-200' />
+              )}
+              {item.type === 'list' ? (
+                <div
+                  className={`relative group text-left w-full bg-white shadow-sm
    border-gray-100 px-6 -mt-px pb-3 ${
      index > 0
        ? 'pt-6 bg-gradient-to-b from-gray-50 via-white to-white'
        : 'pt-3'
    }`}
-              >
-                <span
-                  className={
-                    'text-sm tracking-wide font-bold text-gray-700 uppercase'
-                  }
                 >
-                  {item.label}
-                </span>
-              </div>
-            );
-          }
-          return (
-            <FormListItem
-              setActiveFormId={(id) => props.setActiveFormId(id)}
-              key={item.formId}
-              item={item}
-              depth={0}
-            />
+                  <span
+                    className={
+                      'text-sm tracking-wide font-bold text-gray-700 uppercase'
+                    }
+                  >
+                    {item.label}
+                  </span>
+                </div>
+              ) : (
+                <FormListItem
+                  setActiveFormId={(id) => props.setActiveFormId(id)}
+                  item={item}
+                  depth={0}
+                />
+              )}
+            </React.Fragment>
           );
         })}
       </li>
