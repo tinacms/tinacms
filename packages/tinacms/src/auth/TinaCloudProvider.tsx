@@ -186,9 +186,15 @@ export const AuthWallInner = ({
         <ModalBuilder
           title={modalTitle}
           message={
-            isTinaCloud
-              ? 'This site uses TinaCloud to track changes.\nLet’s get you logged in to start making edits...'
-              : 'To save edits, enter edit mode. When you save, changes will be saved to the local filesystem.'
+            isTinaCloud ? (
+              <p>
+                This site uses TinaCloud to track changes.
+                <br />
+                Let’s get you logged in to start making edits...
+              </p>
+            ) : (
+              'To save edits, enter edit mode. When you save, changes will be saved to the local filesystem.'
+            )
           }
           close={close}
           actions={[
