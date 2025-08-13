@@ -2,9 +2,13 @@ import { Transition } from '@headlessui/react';
 import { useCMS } from '@toolkit/react-tinacms';
 import type { TinaState } from '@toolkit/tina-state';
 import * as React from 'react';
-import { BiEdit } from 'react-icons/bi';
+import { BiEdit, BiChevronDown, BiChevronRight } from 'react-icons/bi';
 
 type FormListItem = TinaState['formLists'][number]['items'][number];
+type DocumentFormListItem = Extract<
+  TinaState['formLists'][number]['items'][number],
+  { type: 'document' }
+>;
 
 const Item = ({
   item,
@@ -59,24 +63,120 @@ const FormListItem = ({
   depth: number;
   setActiveFormId: (id: string) => void;
 }) => {
+  const cms = useCMS();
+  const [openNestedGroups, setOpenNestedGroups] = React.useState<
+    Record<string, boolean>
+  >({});
+  const idToLabel = React.useMemo(() => {
+    const map = new Map<string, string>();
+    cms.state.forms.forEach(({ tinaForm }) => {
+      map.set(tinaForm.id, tinaForm.label || '');
+    });
+    return map;
+  }, [cms.state.forms]);
+  const getFormLabel = React.useCallback(
+    (doc: DocumentFormListItem) => idToLabel.get(doc.formId) || '',
+    [idToLabel]
+  );
+  const normalizeLabel = (value: string) => (value || '').trim().toLowerCase();
   return (
     <div className={'divide-y divide-gray-200'}>
       <Item setActiveFormId={setActiveFormId} item={item} depth={depth} />
       {item.subItems && (
         <ul className='divide-y divide-gray-200'>
-          {item.subItems?.map((subItem) => {
-            if (subItem.type === 'document') {
-              return (
-                <li key={subItem.formId}>
-                  <Item
-                    setActiveFormId={setActiveFormId}
-                    depth={depth + 1}
-                    item={subItem}
-                  />
+          {(() => {
+            const rendered: React.ReactNode[] = [];
+            const subItems = item.subItems || [];
+            for (let i = 0; i < subItems.length; i++) {
+              const current = subItems[i];
+              if (current.type !== 'document') continue;
+              const firstDoc = current as DocumentFormListItem;
+              const label = getFormLabel(firstDoc);
+              const normalized = normalizeLabel(label);
+              const group: DocumentFormListItem[] = [firstDoc];
+              let j = i + 1;
+              while (
+                j < subItems.length &&
+                subItems[j].type === 'document' &&
+                normalizeLabel(
+                  getFormLabel(subItems[j] as DocumentFormListItem)
+                ) === normalized
+              ) {
+                group.push(subItems[j] as DocumentFormListItem);
+                j++;
+              }
+
+              if (group.length === 1) {
+                rendered.push(
+                  <li key={`sub-${firstDoc.formId}`}>
+                    <Item
+                      setActiveFormId={setActiveFormId}
+                      depth={depth + 1}
+                      item={firstDoc}
+                    />
+                  </li>
+                );
+                continue;
+              }
+
+              const groupKey = `sub-${i}-${normalized}`;
+              const isOpen = openNestedGroups[groupKey] ?? false;
+              rendered.push(
+                <li
+                  key={`sub-group-${groupKey}`}
+                  className='divide-y divide-gray-200'
+                >
+                  <button
+                    type='button'
+                    onClick={() =>
+                      setOpenNestedGroups((s) => ({
+                        ...s,
+                        [groupKey]: !(s[groupKey] ?? false),
+                      }))
+                    }
+                    className={`pl-10 pr-4 py-3 w-full bg-transparent border-none text-lg text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center justify-between gap-2`}
+                  >
+                    <div className='flex items-center gap-2 min-w-0'>
+                      {isOpen ? (
+                        <BiChevronDown className='w-5 h-auto text-gray-500 flex-none' />
+                      ) : (
+                        <BiChevronRight className='w-5 h-auto text-gray-500 flex-none' />
+                      )}
+                      <div className='flex-1 flex flex-col gap-0.5 items-start min-w-0'>
+                        <div className='flex items-center gap-2 min-w-0'>
+                          <span className='group-hover:text-blue-500 font-sans text-xs font-semibold text-gray-700 truncate'>
+                            {label}
+                          </span>
+                          <span className='flex-none px-2 py-0.5 rounded-full bg-gray-100 text-orange-600 text-[10px] font-semibold uppercase'>
+                            referenced
+                          </span>
+                        </div>
+                        <div className='text-xs text-gray-500'>
+                          {group.length} items
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                  {isOpen && (
+                    <ul className='divide-y divide-gray-200'>
+                      {group.map((doc) => (
+                        <li key={`sub-doc-${doc.formId}`}>
+                          <Item
+                            setActiveFormId={setActiveFormId}
+                            depth={Math.min(depth + 2, 2)}
+                            item={doc}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               );
+
+              i = j - 1; // skip grouped items
             }
-          })}
+            return rendered;
+          })()}
         </ul>
       )}
     </div>
@@ -151,41 +251,130 @@ export const FormList = (props: {
       return [...topItems, ...orderedListItems, ...extra];
     }, [JSON.stringify(props.formList.items)]);
 
-  return (
-    <ul>
-      <li className={'divide-y divide-gray-200'}>
-        {listItems.map((item, index) => {
-          if (item.type === 'list') {
-            return (
-              <div
-                key={item.label}
-                className={`relative group text-left w-full bg-white shadow-sm
+  // Track open/closed state for grouped labels (keyed by start index + label)
+  const [openGroups, setOpenGroups] = React.useState<Record<string, boolean>>(
+    {}
+  );
+  const idToLabel = React.useMemo(() => {
+    const map = new Map<string, string>();
+    cms.state.forms.forEach(({ tinaForm }) => {
+      map.set(tinaForm.id, tinaForm.label || '');
+    });
+    return map;
+  }, [cms.state.forms]);
+
+  const getFormLabel = React.useCallback(
+    (doc: DocumentFormListItem) => idToLabel.get(doc.formId) || '',
+    [idToLabel]
+  );
+
+  const elements: React.ReactNode[] = [];
+  const normalizeLabel = (value: string) => (value || '').trim().toLowerCase();
+  for (let i = 0; i < listItems.length; i++) {
+    const item = listItems[i];
+    if (item.type === 'list') {
+      const index = i;
+      elements.push(
+        <div
+          key={`section-${item.label}-${index}`}
+          className={`relative group text-left w-full bg-white shadow-sm
    border-gray-100 px-6 -mt-px pb-3 ${
      index > 0
        ? 'pt-6 bg-gradient-to-b from-gray-50 via-white to-white'
        : 'pt-3'
    }`}
-              >
-                <span
-                  className={
-                    'text-sm tracking-wide font-bold text-gray-700 uppercase'
-                  }
-                >
-                  {item.label}
-                </span>
-              </div>
-            );
+        >
+          <span
+            className={
+              'text-sm tracking-wide font-bold text-gray-700 uppercase'
+            }
+          >
+            {item.label}
+          </span>
+        </div>
+      );
+      continue;
+    }
+
+    // Group adjacent documents with the same label
+    const firstDoc = item as DocumentFormListItem;
+    const label = getFormLabel(firstDoc);
+    const normalized = normalizeLabel(label);
+    const group: DocumentFormListItem[] = [firstDoc];
+    let j = i + 1;
+    while (
+      j < listItems.length &&
+      listItems[j].type === 'document' &&
+      normalizeLabel(getFormLabel(listItems[j] as DocumentFormListItem)) ===
+        normalized
+    ) {
+      group.push(listItems[j] as DocumentFormListItem);
+      j++;
+    }
+
+    if (group.length === 1) {
+      elements.push(
+        <FormListItem
+          setActiveFormId={(id) => props.setActiveFormId(id)}
+          key={firstDoc.formId}
+          item={firstDoc}
+          depth={0}
+        />
+      );
+      continue; // i will be incremented by the for-loop
+    }
+
+    const groupKey = `${i}-${normalized}`;
+    const isOpen = openGroups[groupKey] ?? false;
+    elements.push(
+      <div key={`group-${groupKey}`} className='divide-y divide-gray-200'>
+        <button
+          type='button'
+          onClick={() =>
+            setOpenGroups((s) => ({
+              ...s,
+              [groupKey]: !(s[groupKey] ?? false),
+            }))
           }
-          return (
-            <FormListItem
-              setActiveFormId={(id) => props.setActiveFormId(id)}
-              key={item.formId}
-              item={item}
-              depth={0}
-            />
-          );
-        })}
-      </li>
+          className={`pl-6 pr-4 py-3 w-full h-full bg-transparent border-none text-lg text-gray-700 group hover:bg-gray-50 transition-all ease-out duration-150 flex items-center justify-between gap-2`}
+        >
+          <div className='flex items-center gap-2 min-w-0'>
+            {isOpen ? (
+              <BiChevronDown className='w-5 h-auto text-gray-500 flex-none' />
+            ) : (
+              <BiChevronRight className='w-5 h-auto text-gray-500 flex-none' />
+            )}
+            <div className='flex-1 flex flex-col gap-0.5 items-start min-w-0'>
+              <div className='group-hover:text-blue-500 font-sans text-xs font-semibold text-gray-700 truncate'>
+                {label}
+              </div>
+              <div className='text-xs text-gray-500'>{group.length} items</div>
+            </div>
+          </div>
+        </button>
+        {isOpen && (
+          <ul className='divide-y divide-gray-200'>
+            {group.map((doc) => (
+              <li key={`doc-${doc.formId}`}>
+                <FormListItem
+                  setActiveFormId={(id) => props.setActiveFormId(id)}
+                  item={doc}
+                  depth={1}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+
+    // Skip over the grouped items
+    i = j - 1;
+  }
+
+  return (
+    <ul>
+      <li className={'divide-y divide-gray-200'}>{elements}</li>
     </ul>
   );
 };
