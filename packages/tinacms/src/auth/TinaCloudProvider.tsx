@@ -45,7 +45,7 @@ export interface TinaCloudAuthWallProps {
     | (() => Promise<TinaCloudMediaStoreClass>);
 }
 
-export const AuthWallInner = ({
+const AuthWallInner = ({
   children,
   cms,
   getModalActions,
@@ -186,9 +186,15 @@ export const AuthWallInner = ({
         <ModalBuilder
           title={modalTitle}
           message={
-            isTinaCloud
-              ? 'Your site uses TinaCloud to track changes. To make edits, you must log in.'
-              : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
+            isTinaCloud ? (
+              <p>
+                This site uses TinaCloud to track changes.
+                <br />
+                Let’s get you logged in to start making edits...
+              </p>
+            ) : (
+              'To save edits, enter edit mode. When you save, changes will be saved to the local filesystem.'
+            )
           }
           close={close}
           actions={[
