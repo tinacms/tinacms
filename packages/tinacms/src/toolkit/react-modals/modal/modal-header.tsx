@@ -2,7 +2,7 @@ import * as React from 'react';
 import { CloseIcon } from '@toolkit/icons';
 
 export interface ModalHeaderProps {
-  children: React.ReactChild | React.ReactChild[];
+  children: React.ReactNode;
   close?(): void;
 }
 
