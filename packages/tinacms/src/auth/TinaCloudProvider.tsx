@@ -160,7 +160,7 @@ const AuthWallInner = ({
     }
   };
 
-  let modalTitle = 'TinaCloud';
+  let modalTitle = 'Let’s get you editing with TinaCMS...';
   if (
     activeModal === 'authenticate' &&
     loginStrategy === 'Redirect' &&
@@ -171,12 +171,12 @@ const AuthWallInner = ({
     activeModal === 'authenticate' &&
     loginStrategy === 'UsernamePassword'
   ) {
-    modalTitle = 'Sign in to Tina';
+    modalTitle = 'Let’s get you editing with TinaCMS...';
   } else if (activeModal === 'error') {
     if (loginStrategy === 'Redirect' && !isTinaCloud) {
       modalTitle = 'Enter into edit mode';
     } else if (loginStrategy === 'UsernamePassword') {
-      modalTitle = 'Sign in to Tina';
+      modalTitle = 'Let’s get you editing with TinaCMS...';
     }
   }
 
@@ -186,15 +186,9 @@ const AuthWallInner = ({
         <ModalBuilder
           title={modalTitle}
           message={
-            isTinaCloud ? (
-              <p>
-                This site uses TinaCloud to track changes.
-                <br />
-                Let’s get you logged in to start making edits...
-              </p>
-            ) : (
-              'To save edits, enter edit mode. When you save, changes will be saved to the local filesystem.'
-            )
+            isTinaCloud
+              ? ''
+              : 'When you save, changes will be saved to the local filesystem.'
           }
           close={close}
           actions={[
