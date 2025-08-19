@@ -8,12 +8,12 @@ export interface ModalHeaderProps {
 
 export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
   return (
-    <div className='h-14 flex items-center justify-between px-5 border-b border-gray-200 m-0 bg-orange-500'>
+    <div className='h-14 flex items-center justify-between px-5 border-b border-gray-200 m-0'>
       <ModalTitle>{children}</ModalTitle>
       {close && (
         <div
           onClick={close}
-          className='flex items-center fill-white opacity-70 cursor-pointer transition-colors duration-100 ease-out hover:opacity-100'
+          className='flex items-center fill-gray-400 cursor-pointer transition-colors duration-100 ease-out hover:fill-gray-700'
         >
           <CloseIcon className='w-6 h-auto' />
         </div>
@@ -24,7 +24,7 @@ export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
 
 const ModalTitle = ({ children }) => {
   return (
-    <h2 className='text-white font-sans font-bold text-base leading-none m-0 block truncate flex items-center'>
+    <h2 className='text-gray-600 font-sans font-medium text-base leading-none m-0 block truncate flex items-center'>
       {children}
     </h2>
   );
