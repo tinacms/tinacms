@@ -4,6 +4,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalActions,
+  TinaIcon,
 } from '@tinacms/toolkit';
 import { LoadingDots, Button } from '@tinacms/toolkit';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -21,7 +22,10 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
   return (
     <Modal>
       <ModalPopup>
-        <ModalHeader>{modalProps.title}</ModalHeader>
+        <ModalHeader>
+          <TinaIcon className='w-10 h-auto -ml-1 mr-1 my-1 fill-orange-500' />
+          {modalProps.title}
+        </ModalHeader>
         <ModalBody padded>
           {modalProps.message &&
             (typeof modalProps.message === 'string' ? (
