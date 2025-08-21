@@ -13,6 +13,7 @@ import {
 } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
+import loginLlama from './tina-login.png';
 
 import { TinaAdminApi } from '../admin/api';
 import {
@@ -45,7 +46,7 @@ export interface TinaCloudAuthWallProps {
     | (() => Promise<TinaCloudMediaStoreClass>);
 }
 
-export const AuthWallInner = ({
+const AuthWallInner = ({
   children,
   cms,
   getModalActions,
@@ -160,7 +161,7 @@ export const AuthWallInner = ({
     }
   };
 
-  let modalTitle = 'TinaCloud';
+  let modalTitle = 'Let’s get you editing with TinaCMS...';
   if (
     activeModal === 'authenticate' &&
     loginStrategy === 'Redirect' &&
@@ -171,12 +172,12 @@ export const AuthWallInner = ({
     activeModal === 'authenticate' &&
     loginStrategy === 'UsernamePassword'
   ) {
-    modalTitle = 'Sign in to Tina';
+    modalTitle = 'Let’s get you editing with TinaCMS...';
   } else if (activeModal === 'error') {
     if (loginStrategy === 'Redirect' && !isTinaCloud) {
       modalTitle = 'Enter into edit mode';
     } else if (loginStrategy === 'UsernamePassword') {
-      modalTitle = 'Sign in to Tina';
+      modalTitle = 'Let’s get you editing with TinaCMS...';
     }
   }
 
@@ -186,9 +187,15 @@ export const AuthWallInner = ({
         <ModalBuilder
           title={modalTitle}
           message={
-            isTinaCloud
-              ? 'Your site uses TinaCloud to track changes. To make edits, you must log in.'
-              : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
+            isTinaCloud ? (
+              <img
+                src={loginLlama}
+                alt='TinaCMS Security Illustration'
+                style={{ maxWidth: '100%', margin: '0 auto', display: 'block' }}
+              />
+            ) : (
+              'When you save, changes will be saved to the local filesystem.'
+            )
           }
           close={close}
           actions={[
