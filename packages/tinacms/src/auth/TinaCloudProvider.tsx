@@ -13,7 +13,7 @@ import {
 } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
 import { ModalBuilder } from './AuthModal';
-import securityLlama from './tina-llama-security.png';
+import loginLlama from './tina-login.png';
 
 import { TinaAdminApi } from '../admin/api';
 import {
@@ -189,7 +189,7 @@ const AuthWallInner = ({
           message={
             isTinaCloud ? (
               <img
-                src={securityLlama}
+                src={loginLlama}
                 alt='TinaCMS Security Illustration'
                 style={{ maxWidth: '100%', margin: '0 auto', display: 'block' }}
               />
