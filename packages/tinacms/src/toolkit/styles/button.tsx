@@ -3,7 +3,14 @@ import { cn } from '../../lib/utils';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'white' | 'ghost' | 'danger' | 'custom';
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'white'
+    | 'ghost'
+    | 'danger'
+    | 'accent'
+    | 'custom';
   as?: React.ElementType;
   href?: string;
   target?: string;
@@ -34,6 +41,7 @@ export const Button = ({
     white: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100`,
     ghost: `text-gray-500 hover:text-blue-500 hover:shadow border border-transparent border-0 hover:border hover:border-gray-200 bg-transparent`,
     danger: `shadow text-white bg-red-500 hover:bg-red-600 focus:ring-red-500`,
+    accent: `shadow text-white bg-orange-500 hover:bg-orange-600 focus:ring-orange-500`,
     custom: '',
   };
   const state = busy ? `busy` : disabled ? `disabled` : `default`;
@@ -88,6 +96,7 @@ export const IconButton = ({
     secondary: `shadow text-gray-500 hover:text-blue-500 bg-gray-50 hover:bg-white border border-gray-200`,
     white: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-200`,
     ghost: `text-gray-500 hover:text-blue-500 hover:shadow border border-transparent hover:border-gray-200 bg-transparent`,
+    accent: `shadow text-white bg-orange-500 hover:bg-orange-600 focus:ring-orange-500`,
   };
   const state = busy ? `busy` : disabled ? `disabled` : `default`;
   const stateClasses = {

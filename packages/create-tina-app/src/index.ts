@@ -6,6 +6,7 @@ import {
   setupProjectDirectory,
   updateProjectPackageName,
   updateProjectPackageVersion,
+  updateThemeSettings,
 } from './util/fileUtil';
 import { install } from './util/install';
 import { initializeGit, makeFirstCommit } from './util/git';
@@ -14,13 +15,16 @@ import { preRunChecks } from './util/preRunChecks';
 import { checkPackageExists } from './util/checkPkgManagers';
 import { TextStyles } from './util/textstyles';
 import { exit } from 'node:process';
-import ora from 'ora';
 import { extractOptions } from './util/options';
 import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from 'validate-npm-package-name';
 import * as ascii from './util/asciiArt';
+import { THEMES } from './themes';
 
 export async function run() {
+  // Dynamic import for ora to handle ES module compatibility
+  const ora = (await import('ora')).default;
+
   if (process.stdout.columns >= 60) {
     console.log(TextStyles.tinaOrange(`${ascii.llama}`));
     console.log(TextStyles.tinaOrange(`${ascii.tinaCms}`));
@@ -119,6 +123,17 @@ export async function run() {
     template = TEMPLATES.find((_template) => _template.value === res.template);
   }
 
+  let themeChoice: string | undefined;
+  if (template.value === 'tina-docs') {
+    const res = await prompts({
+      name: 'theme',
+      type: 'select',
+      message: 'What theme would you like to use?',
+      choices: THEMES,
+    });
+    if (!Object.hasOwn(res, 'theme')) exit(1); // User most likely sent SIGINT.
+    themeChoice = res.theme;
+  }
   await telemetry.submitRecord({
     event: {
       name: 'create-tina-app:invoke',
@@ -144,6 +159,13 @@ export async function run() {
   }
 
   try {
+    await downloadTemplate(template, rootDir, spinner);
+
+    if (themeChoice) {
+      // Add selected theme to content/settings/config.json
+      await updateThemeSettings(rootDir, themeChoice);
+    }
+
     spinner.start('Downloading template...');
     await downloadTemplate(template, rootDir, spinner);
     spinner.succeed();
@@ -209,4 +231,7 @@ export async function run() {
   );
 }
 
-run();
+run().catch((error) => {
+  console.error('Error running create-tina-app:', error);
+  process.exit(1);
+});
