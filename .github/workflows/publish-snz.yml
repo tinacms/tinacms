@@ -2,7 +2,7 @@ name: Publish SNZ
 on:
   push:
     branches:
-      - 'main'
+      - 'streamliners-main'
   workflow_dispatch: # Manual trigger
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
