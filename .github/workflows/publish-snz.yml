@@ -59,6 +59,15 @@ jobs:
           echo "registry=https://streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/" > ~/.npmrc
           echo "//streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/:_authToken=${CODEARTIFACT_TOKEN}" >> ~/.npmrc
 
+      # Run our package.json updater script.
+      # Note: We require glob which we can globally install before hand in a temp dir to not trigger any of the pnpm workspace code
+      - name: Update all package.json files
+        run: |
+          cd $RUNNER_TEMP
+          pnpm install -g glob
+          cd $GITHUB_WORKSPACE
+          node scripts/update-package-jsons.js
+
       - name: Clean workspace and prepare
         run: |
           # Clean node_modules to ensure clean install
