@@ -80,7 +80,11 @@ export const FormsView = ({ loadingPlaceholder }: FormsViewProps = {}) => {
   );
   const isEditing = !!activeForm;
   if (isMultiform && !activeForm) {
-    return <FormLists isEditing={isEditing} />;
+    return (
+      <div className='max-h-full overflow-y-auto'>
+        <FormLists isEditing={isEditing} />
+      </div>
+    );
   }
   const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta');
   return (
