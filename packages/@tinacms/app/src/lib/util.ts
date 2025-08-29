@@ -120,7 +120,10 @@ export const getFormAndFieldNameFromMetadata = (
 
   const { id: formId, prefix } = metadata;
   const prefixLength = prefix?.length ?? 0;
-  const localFieldName = eventFieldName.slice(prefixLength + 1);
+  const localFieldName =
+    eventFieldName.startsWith(prefix) && eventFieldName[prefixLength] === '.'
+      ? eventFieldName.slice(prefixLength + 1)
+      : eventFieldName;
 
   return {
     formId,
