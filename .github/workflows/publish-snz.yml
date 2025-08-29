@@ -1,8 +1,6 @@
 name: Publish SNZ
 on:
   push:
-    branches:
-      - '**'
     branches-ignore:
       - 'main'
   workflow_dispatch: # Manual trigger
