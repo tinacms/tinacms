@@ -1,20 +1,17 @@
-/**
-
-*/
-
 import {
   Modal,
   ModalPopup,
   ModalHeader,
   ModalBody,
   ModalActions,
+  TinaIcon,
 } from '@tinacms/toolkit';
 import { LoadingDots, Button } from '@tinacms/toolkit';
 import React, { useCallback, useEffect, useState } from 'react';
 
 interface ModalBuilderProps {
   title: string;
-  message?: string;
+  message?: React.ReactNode;
   error?: string;
   actions: ButtonProps[];
   close(): void;
@@ -25,9 +22,17 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
   return (
     <Modal>
       <ModalPopup>
-        <ModalHeader>{modalProps.title}</ModalHeader>
+        <ModalHeader>
+          <TinaIcon className='w-10 h-auto -ml-1 mr-1 my-1 fill-orange-500' />
+          {modalProps.title}
+        </ModalHeader>
         <ModalBody padded>
-          {modalProps.message && <p>{modalProps.message}</p>}
+          {modalProps.message &&
+            (typeof modalProps.message === 'string' ? (
+              <p>{modalProps.message}</p>
+            ) : (
+              modalProps.message
+            ))}
           {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
           {modalProps.children}
         </ModalBody>
