@@ -20,7 +20,6 @@ import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from 'validate-npm-package-name';
 import * as ascii from './util/asciiArt';
 import { THEMES } from './themes';
-import { useState } from 'react';
 
 export async function run() {
   // Dynamic import for ora to handle ES module compatibility
