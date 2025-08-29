@@ -314,11 +314,11 @@ export const useGraphQLReducer = (
                 const collectionName = NAMER.referenceConnectionType(
                   collection.namespace
                 );
-                if (collectionName === name) {
-                  return true;
-                }
-                return false;
-              });
+              if (collectionName === name) {
+                return true;
+              }
+              return false;
+            });
             if (connectionCollection) {
               formListItems.push({
                 type: 'list',
@@ -570,6 +570,104 @@ export const useGraphQLReducer = (
       //     value: true,
       //   });
       // }
+      /**
+       * SNZ Custom Handler: `select-rich-text-embed`
+       */
+      if (event.data.type === 'select-rich-text-embed') {
+        // Step 1: Parse and validate the incoming message payload from the client.
+        const payloadSchema = z.object({
+          id: z.string(),
+          // Allow any key-value pairs for matching, assuming values are strings
+          match: z.record(z.string()),
+        });
+        const { id: queryId, match } = payloadSchema.parse(event.data);
+
+        // Step 2: Find the form data that corresponds to the queryId from the message.
+        const result = results.find((r) => r.id === queryId);
+        if (!result?.data) {
+          console.warn(
+            `[TinaCMS] No result found for queryId '${queryId}' in select-rich-text-embed`
+          );
+          return;
+        }
+
+        // Step 3: Define a recursive function to search the rich-text tree.
+        const doc = result.data as any;
+        const tryRoots = [doc?.content?.content, doc?.content, doc];
+
+        const findPath = (
+          node: any,
+          path: (string | number)[] = []
+        ): (string | number)[] | null => {
+          if (!node || typeof node !== 'object') return null;
+
+          if (
+            (node.type === 'mdxJsxTextElement' || node.type === 'mdxJsxFlowElement') &&
+            node.props
+          ) {
+            const p = node.props || {};
+            const normalize = (s?: string) => (s || '').trim().replace(/\/+$/, '');
+
+            // Check if the node's props match the criteria sent from the client.
+            const isMatch = Object.entries(match).every(([key, value]) => {
+              const propValue = p[key];
+              // Special normalization for URLs/refs for backwards compatibility.
+              if (key === 'contentRef' || key === 'url') {
+                return normalize(propValue) === normalize(value);
+              }
+              // For other keys, do a direct comparison.
+              return propValue === value;
+            });
+
+            if (isMatch) {
+              return path;
+            }
+          }
+
+          if (Array.isArray(node.children)) {
+            for (let i = 0; i < node.children.length; i++) {
+              const found = findPath(node.children[i], [...path, 'children', i]);
+              if (found) return found;
+            }
+          }
+          return null;
+        };
+
+        // Step 4: Execute the search, trying different potential root objects within the document.
+        let embedPath: (string | number)[] | null = null;
+        for (const root of tryRoots) {
+          if (!root) continue;
+          embedPath = findPath(root);
+          if (embedPath) break;
+        }
+        if (!embedPath) {
+          console.warn('[admin] embed not found', { queryId, match });
+          return;
+        }
+
+        // Step 5: Resolve the formId from the document's metadata.
+        const formDoc = doc?.content || doc;
+        const formId = formDoc?._tina_metadata?.id || formDoc?.id;
+        console.log('[admin] resolved formId', { formId });
+        if (!formId) {
+          console.warn('[admin] could not resolve formId from doc', {
+            doc,
+            formDoc,
+          });
+          return;
+        }
+
+        // Step 6: Construct the final field name and dispatch events to update the UI.
+        const fieldName = ['content', ...embedPath, 'props'].join('.');
+        console.log('[admin] selecting field', { formId, fieldName });
+
+        cms.dispatch({
+          type: 'forms:set-active-field-name',
+          value: { formId, fieldName },
+        });
+
+        cms.dispatch({ type: 'sidebar:set-display-state', value: 'openOrFull' });
+      }
     },
     [cms, JSON.stringify(results)]
   );

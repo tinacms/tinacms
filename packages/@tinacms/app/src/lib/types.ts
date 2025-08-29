@@ -7,7 +7,12 @@ export type PostMessage =
   | { type: 'field:selected'; fieldName: string }
   | { type: 'quick-edit'; value: boolean }
   | { type: 'user-select-form'; formId: string }
-  | { type: 'url-changed' };
+  | { type: 'url-changed' }
+  | {
+      type: 'select-rich-text-embed';
+      id: string;
+      match: Record<string, string>;
+    };
 
 export type Payload = {
   id: string;
