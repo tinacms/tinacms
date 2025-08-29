@@ -20,10 +20,13 @@ import { PackageManager, PKG_MANAGERS } from './util/packageManagers';
 import validate from 'validate-npm-package-name';
 import * as ascii from './util/asciiArt';
 import { THEMES } from './themes';
+import { useState } from 'react';
+
 
 export async function run() {
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
+  const [packageManagerErrorMsg, setPackageManagerErrorMsg] = useState('');
 
   if (process.stdout.columns >= 60) {
     console.log(TextStyles.tinaOrange(`${ascii.llama}`));
@@ -185,6 +188,7 @@ export async function run() {
     spinner.succeed();
   } catch (err) {
     spinner.fail(`Failed to install packages: ${(err as Error).message}`);
+    setPackageManagerErrorMsg(`Failed to install packages: ${(err as Error).message}`);
     exit(1);
   }
 
@@ -212,7 +216,7 @@ export async function run() {
   spinner.info(`${TextStyles.bold('To get started:')}
 
   ${padCommand(`cd ${appName}`)}# move into your project directory
-  ${padCommand(`${pkgManager} install`)}# install dependencies
+  ${packageManagerErrorMsg ? `${padCommand(`${pkgManager} install`)}# install dependencies` : ''}
   ${padCommand(`${pkgManager} run dev`)}# start the dev server ${TextStyles.link(template.devUrl)}
   ${padCommand(`${pkgManager} run build`)}# build the app for production
 `);
