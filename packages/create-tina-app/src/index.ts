@@ -212,6 +212,7 @@ export async function run() {
   spinner.info(`${TextStyles.bold('To get started:')}
 
   ${padCommand(`cd ${appName}`)}# move into your project directory
+  ${padCommand(`${pkgManager} install`)}# install dependencies
   ${padCommand(`${pkgManager} run dev`)}# start the dev server ${TextStyles.link(template.devUrl)}
   ${padCommand(`${pkgManager} run build`)}# build the app for production
 `);
