@@ -22,7 +22,6 @@ import * as ascii from './util/asciiArt';
 import { THEMES } from './themes';
 import { useState } from 'react';
 
-
 export async function run() {
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
@@ -188,7 +187,9 @@ export async function run() {
     spinner.succeed();
   } catch (err) {
     spinner.fail(`Failed to install packages: ${(err as Error).message}`);
-    setPackageManagerErrorMsg(`Failed to install packages: ${(err as Error).message}`);
+    setPackageManagerErrorMsg(
+      `Failed to install packages: ${(err as Error).message}`
+    );
     exit(1);
   }
 
