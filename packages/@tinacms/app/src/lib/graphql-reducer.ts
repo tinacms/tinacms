@@ -314,11 +314,11 @@ export const useGraphQLReducer = (
                 const collectionName = NAMER.referenceConnectionType(
                   collection.namespace
                 );
-              if (collectionName === name) {
-                return true;
-              }
-              return false;
-            });
+                if (collectionName === name) {
+                  return true;
+                }
+                return false;
+              });
             if (connectionCollection) {
               formListItems.push({
                 type: 'list',
