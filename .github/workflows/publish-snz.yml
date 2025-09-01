@@ -86,7 +86,7 @@ jobs:
           cat changed_list.json >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      # Your repo/registry rewrite (safe to run after we captured diffs)
+      # registry rewrite (safe to run after captured diffs)
       - name: Update all package.json files
         run: node scripts/update-package-jsons.js
 
