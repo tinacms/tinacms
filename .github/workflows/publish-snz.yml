@@ -121,13 +121,14 @@ jobs:
             exit 0
           fi
 
-          SNAP="$(echo $GITHUB_SHA | cut -c1-7)-$(date -u +%Y%m%d%H%M%S)"
-          echo "Using snapshot suffix: $SNAP"
+          SNAPSHOT_SUFFIX="$(git rev-parse --short "$GITHUB_SHA")-$(date -u +%Y%m%d%H%M%S)"
+          echo "Using snapshot suffix: $SNAPSHOT_SUFFIX"
+          export SNAPSHOT_SUFFIX
 
           node -e '
             const fs = require("fs");
             const paths = fs.readFileSync("changed_paths.txt","utf8").trim().split("\n").filter(Boolean);
-            const suffix = process.env.SNAP;
+            const suffix = process.env.SNAPSHOT_SUFFIX;
             let bumped = [];
             for (const p of paths) {
               const pj = p.replace(/\/$/, "") + "/package.json";
