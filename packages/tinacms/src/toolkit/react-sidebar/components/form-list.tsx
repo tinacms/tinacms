@@ -37,7 +37,7 @@ const Item = ({
           {form.tinaForm.label}
         </div>
         <div className='group-hover:text-blue-500 text-base truncate leading-tight text-gray-600'>
-          {form.tinaForm.id}
+          {form.tinaForm.values.title || form.tinaForm.id}
         </div>
       </div>
     </button>

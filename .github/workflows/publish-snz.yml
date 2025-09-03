@@ -1,8 +1,8 @@
 name: Publish SNZ
 on:
   push:
-    branches:
-      - 'streamliners-main'
+    branches-ignore:
+      - 'main' # upstream mirror
   workflow_dispatch: # Manual trigger
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -22,14 +22,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js environment
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
 
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        id: pnpm-install
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
           package_json_file: package.json
           run_install: false
@@ -39,7 +38,6 @@ jobs:
           git config --global user.email "ci@streamliners.co.nz"
           git config --global user.name "Streamliners CI"
 
-      # Configure AWS credentials step
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -47,11 +45,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-southeast-2
 
-      # Get CodeArtifact authorization token
       - name: Get CodeArtifact token
         id: codeartifact-token
         run: |
-          TOKEN=$(aws codeartifact get-authorization-token --domain streamliners-npm --domain-owner 368438108069 --query authorizationToken --output text)
+          TOKEN=$(aws codeartifact get-authorization-token \
+            --domain streamliners-npm \
+            --domain-owner 368438108069 \
+            --query authorizationToken --output text)
           echo "CODEARTIFACT_TOKEN=$TOKEN" >> $GITHUB_ENV
 
       - name: Configure .npmrc for AWS CodeArtifact
@@ -59,50 +59,123 @@ jobs:
           echo "registry=https://streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/" > ~/.npmrc
           echo "//streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/:_authToken=${CODEARTIFACT_TOKEN}" >> ~/.npmrc
 
-      # Run our package.json updater script.
-      # Note: We require glob which we can globally install before hand in a temp dir to not trigger any of the pnpm workspace code
-      - name: Update all package.json files
+      # ----------------------------- #
+      # Detect changed workspaces first
+      # ----------------------------- #
+      - name: Detect changed packages since origin/streamliners-main
+        id: changed
         run: |
-          node scripts/update-package-jsons.js
+          set -euo pipefail
+          BASE_REF=origin/streamliners-main
+          # Ensure we have the base branch locally for the filter:
+          git fetch origin streamliners-main --depth=1 || true
+
+          # List package dirs changed since BASE_REF using pnpm workspace filter:
+          pnpm -r --filter "...[${BASE_REF}]" exec node -e "console.log(process.cwd())" > changed_paths.txt
+
+          echo "Changed package paths:"
+          cat changed_paths.txt || true
+
+          CHANGED_COUNT=$(wc -l < changed_paths.txt | tr -d ' ')
+          echo "CHANGED_COUNT=$CHANGED_COUNT" >> $GITHUB_ENV
+
+          # Handy JSON with names/versions for debugging:
+          pnpm -r --filter "...[${BASE_REF}]" list --depth=-1 --json > changed_list.json
+
+          echo "CHANGED_JSON<<EOF" >> $GITHUB_ENV
+          cat changed_list.json >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      # registry rewrite (safe to run after captured diffs)
+      - name: Update all package.json files
+        run: node scripts/update-package-jsons.js
 
       - name: Clean workspace and prepare
         run: |
-          # Clean node_modules to ensure clean install
           find . -name "node_modules" -type d -exec rm -rf {} +
           find . -name ".turbo" -type d -exec rm -rf {} +
 
-          # Create a docker-like isolated environment
-
-          # Configure .npmrc for AWS CodeArtifact in the tinacms directory too
+          # Also create a local .npmrc for publishes from repo root
           echo "registry=https://streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/" > .npmrc
           echo "//streamliners-npm-368438108069.d.codeartifact.ap-southeast-2.amazonaws.com/npm/tina-cms-snz/:_authToken=${CODEARTIFACT_TOKEN}" >> .npmrc
 
-          # Install with scripts enabled (removed --ignore-scripts)
           pnpm install --no-frozen-lockfile
 
-          # Build @tinacms/scripts first
+          # Build scripts first
           cd packages/@tinacms/scripts
           pnpm build
           cd ../..
 
-          # Then build the rest
           pnpm build
           pnpm types
 
-      - name: Publish to CodeArtifact
+      # ------------------------------------- #
+      # PREVIEW: non-streamliners-main branches
+      # ------------------------------------- #
+      - name: Bump snapshot versions (CHANGED ONLY)
+        if: ${{ github.ref != 'refs/heads/streamliners-main' }}
         run: |
-          # Stable publish for main
-          if [[ "$GITHUB_REF" == "refs/heads/streamliners-main" ]]; then
-            echo "Publishing stable version"
-            pnpm run version
-            pnpm publish -r --no-git-checks --access public
-          # Beta/preview publish for all other branches
-          else
-            echo "Publishing beta version"
-            git checkout ${{ github.sha }}
-            pnpm version:snapshot $(echo ${{ github.sha }} | cut -c1-7)
-            pnpm publish -r --tag beta --no-git-checks --access public
+          set -euo pipefail
+          if [[ "${CHANGED_COUNT:-0}" -eq 0 ]]; then
+            echo "No changed packages to snapshot."
+            exit 0
           fi
+
+          SNAPSHOT_SUFFIX="$(git rev-parse --short "$GITHUB_SHA")-$(date -u +%Y%m%d%H%M%S)"
+          echo "Using snapshot suffix: $SNAPSHOT_SUFFIX"
+          export SNAPSHOT_SUFFIX
+
+          node -e '
+            const fs = require("fs");
+            const paths = fs.readFileSync("changed_paths.txt","utf8").trim().split("\n").filter(Boolean);
+            const suffix = process.env.SNAPSHOT_SUFFIX;
+            let bumped = [];
+            for (const p of paths) {
+              const pj = p.replace(/\/$/, "") + "/package.json";
+              if (!fs.existsSync(pj)) continue;
+              const data = JSON.parse(fs.readFileSync(pj,"utf8"));
+              if (data.private) continue; // skip private
+              const newVer = `0.0.0-${suffix}`;
+              data.version = newVer;
+
+              // Leave workspace:* deps as-is; pnpm resolves them on publish.
+              fs.writeFileSync(pj, JSON.stringify(data, null, 2) + "\n");
+              bumped.push(`${data.name}@${newVer}`);
+            }
+            console.log("BUMPED_SNAPSHOTS=" + JSON.stringify(bumped));
+          ' | tee snapshot_bump.log
+
+      - name: Publish preview (changed only) to CodeArtifact with tag=beta
+        if: ${{ github.ref != 'refs/heads/streamliners-main' }}
+        run: |
+          set -euo pipefail
+          if [[ "${CHANGED_COUNT:-0}" -eq 0 ]]; then
+            echo "Nothing to publish (no workspace changes vs streamliners-main)."
+            exit 0
+          fi
+
+          # Filter publish to only the changed set
+          pnpm publish -r \
+            --filter "...[origin/streamliners-main]" \
+            --tag beta \
+            --no-git-checks \
+            --access public
+
+      # ------------------------------------- #
+      # STABLE-INTERNAL: streamliners-main only
+      # ------------------------------------- #
+      - name: Version for snz prerelease using Changesets
+        if: ${{ github.ref == 'refs/heads/streamliners-main' }}
+        run: |
+          # Enter prerelease mode with channel "snz" and bump versions
+          pnpm exec changeset pre enter snz
+          pnpm exec changeset version
+
+      - name: Publish snz prerelease to CodeArtifact (dist-tag=snz)
+        if: ${{ github.ref == 'refs/heads/streamliners-main' }}
+        run: |
+          pnpm publish -r --tag snz --no-git-checks --access public
+          pnpm exec changeset pre exit
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           CODEARTIFACT_TOKEN: ${{ env.CODEARTIFACT_TOKEN }}
@@ -110,4 +183,7 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "📝 Build completed. Check above for publish status." >> $GITHUB_STEP_SUMMARY
+          echo "📝 Build completed. Branch: ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Changed packages since origin/streamliners-main:" >> $GITHUB_STEP_SUMMARY
+          echo '${{ env.CHANGED_JSON }}' >> $GITHUB_STEP_SUMMARY
