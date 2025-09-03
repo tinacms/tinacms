@@ -211,13 +211,25 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         allFormIdsListed.includes(tinaForm.id)
       );
 
+      // Streamliners: Start Change
+      // The original logic always set activeFormId to null here. This caused a race
+      // condition where a nested component's quick re-render (which triggers a 'close'
+      // message) could incorrectly clear the active form set by a user's click on a
+      // parent component. This change makes the logic more defensive by only clearing
+      // the active form if the form being removed is the one that is currently active.
+      let nextActiveFormId = state.activeFormId;
+      const activeFormIsBeingRemoved = !nextForms.some(
+        (form) => form.tinaForm.id === state.activeFormId
+      );
+
+      if (activeFormIsBeingRemoved) {
+        nextActiveFormId = null;
+      }
+      // Streamliners: End Change
       return {
         ...state,
         quickEditSupported: false,
-        // Always set it to null for now, this will become more annoying for users
-        // when `useTina` hooks are mounting client-side as a result of the app itself
-        // rather than route navigation
-        activeFormId: null,
+        activeFormId: nextActiveFormId,
         forms: nextForms,
         formLists: nextFormLists,
       };
