@@ -537,7 +537,7 @@ const SidebarBody = ({ children }) => {
   return (
     <div
       className={
-        'relative left-0 w-full h-full flex flex-col items-stretch bg-gray-50 border-r border-gray-200 overflow-hidden'
+        'relative overflow-auto left-0 w-full h-full flex flex-col items-stretch bg-gray-50 border-r border-gray-200'
       }
     >
       {children}
