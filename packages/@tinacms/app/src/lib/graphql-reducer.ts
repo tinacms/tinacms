@@ -577,7 +577,7 @@ export const useGraphQLReducer = (
         // Step 1: Parse and validate the incoming message payload from the client.
         const payloadSchema = z.object({
           id: z.string(),
-          // Allow any key-value pairs for matching, assuming values are strings
+          // Allow any key-value pairs for matching, assuming values are strings.
           match: z.record(z.string()),
         });
         const { id: queryId, match } = payloadSchema.parse(event.data);
