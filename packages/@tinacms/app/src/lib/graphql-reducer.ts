@@ -220,7 +220,7 @@ export const useGraphQLReducer = (
       // gather the errors and display an error message containing each error unique message
       return Promise.allSettled(
         payloads.map(async (payload) => {
-          // This payload has already been expanded, skip it.
+          // This payload has already been expanded, skip it
           if (payload.expandedQuery) {
             return payload;
           } else {

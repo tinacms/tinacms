@@ -198,7 +198,6 @@ jobs:
 
           node -e '
             const fs = require("fs");
-            const semver = require("semver"); // available via repo deps; if not, do simple string ops
             const suffix = process.env.SNAPSHOT_SUFFIX;
             const paths = fs.readFileSync("changed_paths.txt","utf8").trim().split("\n").filter(Boolean);
             let bumped = [];
@@ -207,7 +206,8 @@ jobs:
               if (!fs.existsSync(pj)) continue;
               const data = JSON.parse(fs.readFileSync(pj,"utf8"));
               if (data.private) continue; // skip private
-              const base = String(data.version || "").replace(/-snz\..*$/,""); // strip prior snz prerelease if present
+              // strip prior -snz.* if present, then append fresh prerelease
+              const base = String(data.version || "").replace(/-snz\..*$/,"");
               if (!base) continue;
               const newVer = `${base}-snz.${suffix}`;
               data.version = newVer;
@@ -216,7 +216,7 @@ jobs:
             }
             console.log("BUMPED_SNZ=" + JSON.stringify(bumped));
           ' | tee snz_bump.log
-
+                
       - name: Publish SNZ prerelease (changed only) to CodeArtifact with tag=snz
         if: ${{ github.ref == 'refs/heads/streamliners-main' || (github.event_name == 'workflow_dispatch' && inputs.force_snz == 'true') }}
         run: |
