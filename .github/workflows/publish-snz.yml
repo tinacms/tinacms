@@ -73,29 +73,86 @@ jobs:
       # ----------------------------- #
       # Detect changed workspaces first
       # ----------------------------- #
-      - name: Detect changed packages since origin/streamliners-main
+      - name: Detect changed packages since appropriate base
         id: changed
+        shell: bash
         run: |
           set -euo pipefail
-          BASE_REF=origin/streamliners-main
-          # Ensure we have the base branch locally for the filter:
-          git fetch origin streamliners-main --depth=1 || true
 
-          # List package dirs changed since BASE_REF using pnpm workspace filter:
-          pnpm -r --filter "...[${BASE_REF}]" exec node -e "console.log(process.cwd())" > changed_paths.txt
+          # Decide the base:
+          # - If we're pushing on streamliners-main, use the previous commit (github.event.before)
+          # - Otherwise (feature branches), compare to the current tip of origin/streamliners-main
+          BASE_SHA=""
+          if [[ "${GITHUB_EVENT_NAME}" == "push" && "${GITHUB_REF}" == "refs/heads/streamliners-main" ]]; then
+            BASE_SHA="${{ github.event.before }}"
+            echo "Push on streamliners-main. Using github.event.before as base: ${BASE_SHA}"
+          else
+            echo "Feature branch. Using tip of origin/streamliners-main as base."
+            git fetch origin streamliners-main --depth=1 || true
+            BASE_SHA="$(git rev-parse origin/streamliners-main)"
+          fi
+
+          echo "BASE_SHA=${BASE_SHA}"
+          echo "HEAD_SHA=${GITHUB_SHA}"
+
+          # Files changed vs base
+          git diff --name-only "${BASE_SHA}..${GITHUB_SHA}" > changed_files.txt || true
+          echo "Changed files:"
+          cat changed_files.txt || true
+
+          # List all workspaces quickly (no install required)
+          pnpm -r list --depth=-1 --json > workspace_list.json
+
+          # Map changed files -> nearest workspace root using pnpm workspace list
+          node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const repo = process.cwd();
+            const toAbs = p => path.resolve(repo, p);
+
+            const files = fs.existsSync("changed_files.txt")
+              ? fs.readFileSync("changed_files.txt","utf8").split("\n").filter(Boolean).map(toAbs)
+              : [];
+
+            let workspaces = [];
+            try { workspaces = JSON.parse(fs.readFileSync("workspace_list.json","utf8")) || []; } catch {}
+            if (!Array.isArray(workspaces)) workspaces = [];
+            workspaces = workspaces
+              .filter(Boolean)
+              .map(w => ({ name: w.name, version: w.version, path: toAbs(w.path || w.dir || ""), private: !!w.private }))
+              .filter(w => w.path && fs.existsSync(w.path));
+
+            const roots = new Set();
+            for (const f of files) {
+              const candidates = workspaces.filter(w => f.startsWith(w.path + path.sep));
+              if (candidates.length) {
+                candidates.sort((a,b) => b.path.length - a.path.length);
+                roots.add(candidates[0].path);
+              }
+            }
+
+            const rootList = Array.from(roots);
+            const rels = rootList.map(p => path.relative(repo, p));
+            fs.writeFileSync("changed_paths.txt", rels.join("\n") + (rels.length ? "\n" : ""));
+
+            // Compact info for summary/env
+            const info = [];
+            for (const r of rootList) {
+              const ws = workspaces.find(w => w.path === r);
+              if (ws) info.push(ws);
+            }
+            fs.writeFileSync("changed_list.json", JSON.stringify(info));
+          '
 
           echo "Changed package paths:"
           cat changed_paths.txt || true
 
-          CHANGED_COUNT=$(wc -l < changed_paths.txt | tr -d ' ')
-          echo "CHANGED_COUNT=$CHANGED_COUNT" >> $GITHUB_ENV
+          CHANGED_COUNT=$(grep -c . changed_paths.txt || true)
+          echo "CHANGED_COUNT=${CHANGED_COUNT}" | tee -a "$GITHUB_ENV"
 
-          # Handy JSON with names/versions for debugging:
-          pnpm -r --filter "...[${BASE_REF}]" list --depth=-1 --json > changed_list.json
-
-          echo "CHANGED_JSON<<EOF" >> $GITHUB_ENV
-          cat changed_list.json >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          # Compact JSON into one line to safely export as env
+          node -e 'const fs=require("fs"); const j=fs.readFileSync("changed_list.json","utf8"); const o=j ? JSON.parse(j) : []; process.stdout.write(JSON.stringify(o));' > changed_list.compact.json
+          echo "CHANGED_JSON=$(cat changed_list.compact.json)" >> "$GITHUB_ENV"
 
       # registry rewrite (safe to run after captured diffs)
       - name: Update all package.json files
@@ -120,9 +177,24 @@ jobs:
           pnpm build
           pnpm types
 
+      # Build pnpm --filter args from changed_paths.txt
+      - name: Build pnpm filters
+        id: filters
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILTERS=""
+          if [[ -f changed_paths.txt ]]; then
+            while IFS= read -r p; do
+              [[ -z "$p" ]] && continue
+              FILTERS="$FILTERS --filter ./$p"
+            done < changed_paths.txt
+          fi
+          echo "FILTERS=${FILTERS}" >> $GITHUB_ENV
+          echo "Filters: $FILTERS"
+
       # ------------------------------------- #
-      # PREVIEW: non-streamliners-main branches
-      # -> 0.0.0-{SNAPSHOT_SUFFIX} under tag=beta
+      # PREVIEW: feature branches -> tag beta
       # ------------------------------------- #
       - name: Bump snapshot versions (CHANGED ONLY)
         if: ${{ github.ref != 'refs/heads/streamliners-main' && (github.event_name != 'workflow_dispatch' || inputs.force_snz != 'true') }}
@@ -146,11 +218,9 @@ jobs:
               const pj = p.replace(/\/$/, "") + "/package.json";
               if (!fs.existsSync(pj)) continue;
               const data = JSON.parse(fs.readFileSync(pj,"utf8"));
-              if (data.private) continue; // skip private
+              if (data.private) continue;
               const newVer = `0.0.0-${suffix}`;
               data.version = newVer;
-
-              // Leave workspace:* deps as-is; pnpm resolves them on publish.
               fs.writeFileSync(pj, JSON.stringify(data, null, 2) + "\n");
               bumped.push(`${data.name}@${newVer}`);
             }
@@ -162,7 +232,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "${CHANGED_COUNT:-0}" -eq 0 ]]; then
-            echo "Nothing to publish (no workspace changes vs streamliners-main)."
+            echo "Nothing to publish (no workspace changes)."
             exit 0
           fi
 
@@ -172,16 +242,14 @@ jobs:
           fi
 
           pnpm publish -r \
-            --filter "...[origin/streamliners-main]" \
+            $FILTERS \
             --tag beta \
             --no-git-checks \
             --access public \
             ${DRY_FLAG}
 
       # ------------------------------------- #
-      # STABLE-INTERNAL (SNZ): streamliners-main
-      # or workflow_dispatch with force_snz=true
-      # -> {currentVersion}-snz.{SNAPSHOT_SUFFIX} under tag=snz
+      # STABLE-INTERNAL (SNZ): streamliners-main or forced
       # ------------------------------------- #
       - name: Bump SNZ prerelease versions (CHANGED ONLY)
         if: ${{ github.ref == 'refs/heads/streamliners-main' || (github.event_name == 'workflow_dispatch' && inputs.force_snz == 'true') }}
@@ -205,8 +273,7 @@ jobs:
               const pj = p.replace(/\/$/, "") + "/package.json";
               if (!fs.existsSync(pj)) continue;
               const data = JSON.parse(fs.readFileSync(pj,"utf8"));
-              if (data.private) continue; // skip private
-              // strip prior -snz.* if present, then append fresh prerelease
+              if (data.private) continue;
               const base = String(data.version || "").replace(/-snz\..*$/,"");
               if (!base) continue;
               const newVer = `${base}-snz.${suffix}`;
@@ -222,7 +289,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "${CHANGED_COUNT:-0}" -eq 0 ]]; then
-            echo "Nothing to publish (no workspace changes vs streamliners-main)."
+            echo "Nothing to publish (no workspace changes)."
             exit 0
           fi
 
@@ -232,7 +299,7 @@ jobs:
           fi
 
           pnpm publish -r \
-            --filter "...[origin/streamliners-main]" \
+            $FILTERS \
             --tag snz \
             --no-git-checks \
             --access public \
@@ -243,5 +310,5 @@ jobs:
         run: |
           echo "📝 Build completed. Branch: ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Changed packages since origin/streamliners-main:" >> $GITHUB_STEP_SUMMARY
+          echo "Changed packages since base:" >> $GITHUB_STEP_SUMMARY
           echo '${{ env.CHANGED_JSON }}' >> $GITHUB_STEP_SUMMARY

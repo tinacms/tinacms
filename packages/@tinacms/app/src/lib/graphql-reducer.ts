@@ -571,7 +571,7 @@ export const useGraphQLReducer = (
       //   });
       // }
       /**
-       * SNZ Custom Handler: `select-rich-text-embed`
+       * SNZ Custom Handler: `select-rich-text-embed`.
        */
       if (event.data.type === 'select-rich-text-embed') {
         // Step 1: Parse and validate the incoming message payload from the client.
