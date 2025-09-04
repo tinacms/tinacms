@@ -124,59 +124,59 @@ jobs:
       # PREVIEW: non-streamliners-main branches
       # -> 0.0.0-{SNAPSHOT_SUFFIX} under tag=beta
       # ------------------------------------- #
-      - name: Bump snapshot versions (CHANGED ONLY)
-        if: ${{ github.ref != 'refs/heads/streamliners-main' && (github.event_name != 'workflow_dispatch' || inputs.force_snz != 'true') }}
-        run: |
-          set -euo pipefail
-          if [[ "${CHANGED_COUNT:-0}" -eq 0 ]]; then
-            echo "No changed packages to snapshot."
-            exit 0
-          fi
+      # - name: Bump snapshot versions (CHANGED ONLY)
+      #   if: ${{ github.ref != 'refs/heads/streamliners-main' && (github.event_name != 'workflow_dispatch' || inputs.force_snz != 'true') }}
+      #   run: |
+      #     set -euo pipefail
+      #     if [[ "${CHANGED_COUNT:-0}" -eq 0 ]]; then
+      #       echo "No changed packages to snapshot."
+      #       exit 0
+      #     fi
 
-          SNAPSHOT_SUFFIX="$(git rev-parse --short "$GITHUB_SHA")-$(date -u +%Y%m%d%H%M%S)"
-          echo "Using snapshot suffix: $SNAPSHOT_SUFFIX"
-          export SNAPSHOT_SUFFIX
+      #     SNAPSHOT_SUFFIX="$(git rev-parse --short "$GITHUB_SHA")-$(date -u +%Y%m%d%H%M%S)"
+      #     echo "Using snapshot suffix: $SNAPSHOT_SUFFIX"
+      #     export SNAPSHOT_SUFFIX
 
-          node -e '
-            const fs = require("fs");
-            const paths = fs.readFileSync("changed_paths.txt","utf8").trim().split("\n").filter(Boolean);
-            const suffix = process.env.SNAPSHOT_SUFFIX;
-            let bumped = [];
-            for (const p of paths) {
-              const pj = p.replace(/\/$/, "") + "/package.json";
-              if (!fs.existsSync(pj)) continue;
-              const data = JSON.parse(fs.readFileSync(pj,"utf8"));
-              if (data.private) continue; // skip private
-              const newVer = `0.0.0-${suffix}`;
-              data.version = newVer;
+      #     node -e '
+      #       const fs = require("fs");
+      #       const paths = fs.readFileSync("changed_paths.txt","utf8").trim().split("\n").filter(Boolean);
+      #       const suffix = process.env.SNAPSHOT_SUFFIX;
+      #       let bumped = [];
+      #       for (const p of paths) {
+      #         const pj = p.replace(/\/$/, "") + "/package.json";
+      #         if (!fs.existsSync(pj)) continue;
+      #         const data = JSON.parse(fs.readFileSync(pj,"utf8"));
+      #         if (data.private) continue; // skip private
+      #         const newVer = `0.0.0-${suffix}`;
+      #         data.version = newVer;
 
-              // Leave workspace:* deps as-is; pnpm resolves them on publish.
-              fs.writeFileSync(pj, JSON.stringify(data, null, 2) + "\n");
-              bumped.push(`${data.name}@${newVer}`);
-            }
-            console.log("BUMPED_SNAPSHOTS=" + JSON.stringify(bumped));
-          ' | tee snapshot_bump.log
+      #         // Leave workspace:* deps as-is; pnpm resolves them on publish.
+      #         fs.writeFileSync(pj, JSON.stringify(data, null, 2) + "\n");
+      #         bumped.push(`${data.name}@${newVer}`);
+      #       }
+      #       console.log("BUMPED_SNAPSHOTS=" + JSON.stringify(bumped));
+      #     ' | tee snapshot_bump.log
 
-      - name: Publish preview (changed only) to CodeArtifact with tag=beta
-        if: ${{ github.ref != 'refs/heads/streamliners-main' && (github.event_name != 'workflow_dispatch' || inputs.force_snz != 'true') }}
-        run: |
-          set -euo pipefail
-          if [[ "${CHANGED_COUNT:-0}" -eq 0 ]]; then
-            echo "Nothing to publish (no workspace changes vs streamliners-main)."
-            exit 0
-          fi
+      # - name: Publish preview (changed only) to CodeArtifact with tag=beta
+      #   if: ${{ github.ref != 'refs/heads/streamliners-main' && (github.event_name != 'workflow_dispatch' || inputs.force_snz != 'true') }}
+      #   run: |
+      #     set -euo pipefail
+      #     if [[ "${CHANGED_COUNT:-0}" -eq 0 ]]; then
+      #       echo "Nothing to publish (no workspace changes vs streamliners-main)."
+      #       exit 0
+      #     fi
 
-          DRY_FLAG=""
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.dry_run }}" == "true" ]]; then
-            DRY_FLAG="--dry-run"
-          fi
+      #     DRY_FLAG=""
+      #     if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.dry_run }}" == "true" ]]; then
+      #       DRY_FLAG="--dry-run"
+      #     fi
 
-          pnpm publish -r \
-            --filter "...[origin/streamliners-main]" \
-            --tag beta \
-            --no-git-checks \
-            --access public \
-            ${DRY_FLAG}
+      #     pnpm publish -r \
+      #       --filter "...[origin/streamliners-main]" \
+      #       --tag beta \
+      #       --no-git-checks \
+      #       --access public \
+      #       ${DRY_FLAG}
 
       # ------------------------------------- #
       # STABLE-INTERNAL (SNZ): streamliners-main
@@ -184,7 +184,7 @@ jobs:
       # -> {currentVersion}-snz.{SNAPSHOT_SUFFIX} under tag=snz
       # ------------------------------------- #
       - name: Bump SNZ prerelease versions (CHANGED ONLY)
-        if: ${{ github.ref == 'refs/heads/streamliners-main' || (github.event_name == 'workflow_dispatch' && inputs.force_snz == 'true') }}
+        # if: ${{ github.ref == 'refs/heads/streamliners-main' || (github.event_name == 'workflow_dispatch' && inputs.force_snz == 'true') }}
         run: |
           set -euo pipefail
           if [[ "${CHANGED_COUNT:-0}" -eq 0 ]]; then
@@ -218,7 +218,7 @@ jobs:
           ' | tee snz_bump.log
 
       - name: Publish SNZ prerelease (changed only) to CodeArtifact with tag=snz
-        if: ${{ github.ref == 'refs/heads/streamliners-main' || (github.event_name == 'workflow_dispatch' && inputs.force_snz == 'true') }}
+        # if: ${{ github.ref == 'refs/heads/streamliners-main' || (github.event_name == 'workflow_dispatch' && inputs.force_snz == 'true') }}
         run: |
           set -euo pipefail
           if [[ "${CHANGED_COUNT:-0}" -eq 0 ]]; then

@@ -211,7 +211,7 @@ export function tinaReducer(state: TinaState, action: TinaAction): TinaState {
         allFormIdsListed.includes(tinaForm.id)
       );
 
-      // Streamliners: Start Change.
+      // Streamliners: Start Change
       // The original logic always set activeFormId to null here. This caused a race
       // condition where a nested component's quick re-render (which triggers a 'close'
       // message) could incorrectly clear the active form set by a user's click on a
