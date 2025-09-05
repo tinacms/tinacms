@@ -12,48 +12,25 @@ export const DEFAULT_TIME_DISPLAY_FORMAT = 'h:mm A';
 export const getLocaleDateFormat = (): string => {
   try {
     const locale = navigator?.language || 'en-US';
-
-    const formatter = new Intl.DateTimeFormat(locale, {
+    const sampleDate = new Date(2024, 11, 25); // Dec 25, 2024
+    const formatted = new Intl.DateTimeFormat(locale, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
-    });
+    }).format(sampleDate);
 
-    const sampleDate = new Date(2024, 11, 25); // Dec 25, 2024
-    const formatted = formatter.format(sampleDate);
+    // Split by common separators and find positions of known values
+    const parts = formatted.split(/[\/\.\-\s]+/);
+    const dayIndex = parts.findIndex((part) => part === '25');
+    const monthIndex = parts.findIndex((part) => part === '12');
+    const yearIndex = parts.findIndex((part) => part === '2024');
 
-    // Analyze the pattern to determine date ordering
-    let format: string;
+    // Determine format based on component positions
+    if (dayIndex === 0) return 'DD MMM YYYY'; // Day first
+    if (yearIndex === 0) return 'YYYY MMM DD'; // Year first
+    if (monthIndex === 0) return 'MMM DD YYYY'; // Month first (US style)
 
-    // Common patterns and their analysis
-    if (formatted.startsWith('25')) {
-      // Starts with day: DD/MM/YYYY or DD.MM.YYYY format
-      format = 'DD MMM YYYY';
-    } else if (
-      formatted.includes('/25/') ||
-      formatted.includes('.25.') ||
-      formatted.includes('-25-')
-    ) {
-      // Day in middle: MM/DD/YYYY, MM.DD.YYYY, YYYY-MM-DD format
-      if (formatted.startsWith('12') || formatted.startsWith('2024')) {
-        // Either MM/DD/YYYY or YYYY/MM/DD
-        const parts = formatted.split(/[\/\.\-\s]/);
-        if (parts[0] === '2024') {
-          // YYYY-MM-DD format (less common for display)
-          format = 'YYYY MMM DD';
-        } else {
-          // MM/DD/YYYY format (US style)
-          format = 'MMM DD YYYY';
-        }
-      } else {
-        format = 'MMM DD YYYY';
-      }
-    } else {
-      // Default fallback
-      format = 'MMM DD YYYY';
-    }
-
-    return format;
+    return DEFAULT_DATE_DISPLAY_FORMAT; // Fallback
   } catch (error) {
     console.log('Error detecting locale format:', error);
     return DEFAULT_DATE_DISPLAY_FORMAT;
