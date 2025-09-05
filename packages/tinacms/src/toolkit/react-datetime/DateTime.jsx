@@ -460,12 +460,10 @@ export default class Datetime extends React.Component {
     props = props || this.props;
     let m = null;
 
-    if (props.utc) {
-      m = moment.utc(date, format, props.strictParsing);
-    } else if (props.displayTimeZone) {
+    if (props.displayTimeZone) {
       m = moment.tz(date, format, props.displayTimeZone);
     } else {
-      m = moment(date, format, props.strictParsing);
+      m = moment.utc(date, format, props.strictParsing);
     }
 
     if (props.locale) m.locale(props.locale);
@@ -517,15 +515,12 @@ export default class Datetime extends React.Component {
       viewDate.locale(props.locale);
       selectedDate && selectedDate.locale(props.locale);
     }
-    if (props.utc) {
-      viewDate.utc();
-      selectedDate && selectedDate.utc();
-    } else if (props.displayTimeZone) {
+    if (props.displayTimeZone) {
       viewDate.tz(props.displayTimeZone);
       selectedDate && selectedDate.tz(props.displayTimeZone);
     } else {
-      viewDate.locale();
-      selectedDate && selectedDate.locale();
+      viewDate.utc();
+      selectedDate && selectedDate.utc();
     }
 
     const update = { viewDate: viewDate, selectedDate: selectedDate };
