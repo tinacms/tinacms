@@ -1,5 +1,16 @@
 # tinacms
 
+## 2.8.3
+
+### Patch Changes
+
+- [#5951](https://github.com/tinacms/tinacms/pull/5951) [`ea917dd`](https://github.com/tinacms/tinacms/commit/ea917dd2840c955d462b66b58009d2a16da39377) Thanks [@tiagov8](https://github.com/tiagov8)! - Auth prompt - added branding
+
+- [#5947](https://github.com/tinacms/tinacms/pull/5947) [`b012b6c`](https://github.com/tinacms/tinacms/commit/b012b6c7fae2674c613fd4c54e1819a86c6d2c3e) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Sidebar - updated tooltips, show editing panel is now orange for visibility/branding
+
+- [#5946](https://github.com/tinacms/tinacms/pull/5946) [`55e018b`](https://github.com/tinacms/tinacms/commit/55e018b9826a540005bbadf8fd51e9bac456d531) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Media manager - improved display of transparent images
+  Media manager - grid view now displays filenames
+
 ## 2.8.2
 
 ### Patch Changes
