@@ -13,15 +13,12 @@ export const getLocaleDateFormat = (): string => {
   try {
     const locale = navigator?.language || 'en-US';
 
-    // Use Intl.DateTimeFormat to get the actual locale-specific ordering
-    // This is more reliable than moment.js for detecting locale patterns
     const formatter = new Intl.DateTimeFormat(locale, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
     });
 
-    // Format a sample date to analyze the pattern
     const sampleDate = new Date(2024, 11, 25); // Dec 25, 2024
     const formatted = formatter.format(sampleDate);
 
@@ -59,7 +56,6 @@ export const getLocaleDateFormat = (): string => {
     return format;
   } catch (error) {
     console.log('Error detecting locale format:', error);
-    // Fallback to default if there's any issue with locale detection
     return DEFAULT_DATE_DISPLAY_FORMAT;
   }
 };
