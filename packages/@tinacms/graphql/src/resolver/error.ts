@@ -31,6 +31,7 @@ export class TinaGraphQLError extends Error implements GraphQLError {
 }
 
 export type TypeFetchErrorArgs = {
+  /** @deprecated */
   stack?: string;
   file?: string;
   includeAuditMessage?: boolean;
@@ -39,19 +40,19 @@ export type TypeFetchErrorArgs = {
 };
 
 export class TinaFetchError extends Error {
-  public stack?: string;
   public collection?: string;
   public file?: string;
   originalError: Error;
+
   constructor(message: string, args: TypeFetchErrorArgs) {
     super(message);
     this.name = 'TinaFetchError';
     this.collection = args.collection;
-    this.stack = args.stack;
     this.file = args.file;
     this.originalError = args.originalError;
   }
 }
+
 export class TinaQueryError extends TinaFetchError {
   public stack?: string;
   public collection?: string;
@@ -68,10 +69,10 @@ export class TinaQueryError extends TinaFetchError {
 }
 
 export class TinaParseDocumentError extends TinaFetchError {
-  public stack?: string;
   public collection?: string;
   public file?: string;
   originalError: Error;
+
   constructor(args: TypeFetchErrorArgs) {
     super(
       `Error parsing file ${args.file} from collection ${
@@ -80,6 +81,7 @@ export class TinaParseDocumentError extends TinaFetchError {
       args
     );
   }
+
   toString() {
     return (
       super.toString() + '\n OriginalError: \n' + this.originalError.toString()
