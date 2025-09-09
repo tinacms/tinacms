@@ -2,4 +2,4 @@
 "tinacms": patch
 ---
 
-🗓️ feat: Make UTC the default for the DateField
+✨ Feature: Make UTC the default for the DateField
