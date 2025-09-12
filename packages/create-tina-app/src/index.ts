@@ -24,6 +24,7 @@ import { THEMES } from './themes';
 export async function run() {
   // Dynamic import for ora to handle ES module compatibility
   const ora = (await import('ora')).default;
+  let packageManagerInstallationHadError = false;
 
   if (process.stdout.columns >= 60) {
     console.log(TextStyles.tinaOrange(`${ascii.llama}`));
@@ -185,7 +186,7 @@ export async function run() {
     spinner.succeed();
   } catch (err) {
     spinner.fail(`Failed to install packages: ${(err as Error).message}`);
-    exit(1);
+    packageManagerInstallationHadError = true;
   }
 
   spinner.start('Initializing git repository.');
@@ -211,7 +212,12 @@ export async function run() {
 
   spinner.info(`${TextStyles.bold('To get started:')}
 
-  ${padCommand(`cd ${appName}`)}# move into your project directory
+  ${padCommand(`cd ${appName}`)}# move into your project directory${
+    packageManagerInstallationHadError
+      ? `
+  ${padCommand(`${pkgManager} install`)}# install dependencies`
+      : ''
+  }
   ${padCommand(`${pkgManager} run dev`)}# start the dev server ${TextStyles.link(template.devUrl)}
   ${padCommand(`${pkgManager} run build`)}# build the app for production
 `);
