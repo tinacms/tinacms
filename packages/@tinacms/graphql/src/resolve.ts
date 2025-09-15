@@ -81,12 +81,11 @@ export const resolve = async ({
       },
       fieldResolver: async (
         source: { [key: string]: undefined | Record<string, unknown> } = {},
-        _args: object = {},
+        args: object = {},
         _context: object,
         info: GraphQLResolveInfo
       ) => {
         try {
-          const args = JSON.parse(JSON.stringify(_args));
           const returnType = getNamedType(info.returnType).toString();
           const lookup = await database.getLookup(returnType);
           const isMutation = info.parentType.toString() === 'Mutation';
