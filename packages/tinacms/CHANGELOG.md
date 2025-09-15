@@ -8,7 +8,7 @@
 
 - [#5947](https://github.com/tinacms/tinacms/pull/5947) [`b012b6c`](https://github.com/tinacms/tinacms/commit/b012b6c7fae2674c613fd4c54e1819a86c6d2c3e) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Sidebar - updated tooltips, show editing panel is now orange for visibility/branding
 
-- [#5969](https://github.com/tinacms/tinacms/pull/5969) [`39e5b05`](https://github.com/tinacms/tinacms/commit/39e5b0562af7bca1e2923fc94b7c8119e12a0133) Thanks [@kulesy](https://github.com/kulesy)! - ✨ Feature: Make UTC the default for the DateField
+- [#5969](https://github.com/tinacms/tinacms/pull/5969) [`39e5b05`](https://github.com/tinacms/tinacms/commit/39e5b0562af7bca1e2923fc94b7c8119e12a0133) Thanks [@kulesy](https://github.com/kulesy)! - Content manager - Make UTC the default for the DateField
 
 - [#5946](https://github.com/tinacms/tinacms/pull/5946) [`55e018b`](https://github.com/tinacms/tinacms/commit/55e018b9826a540005bbadf8fd51e9bac456d531) Thanks [@wicksipedia](https://github.com/wicksipedia)! - Media manager - improved display of transparent images
   Media manager - grid view now displays filenames
