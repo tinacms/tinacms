@@ -3,7 +3,7 @@
 */
 
 import { graphql, buildASTSchema, getNamedType, GraphQLError } from 'graphql';
-import type { TinaSchema } from '@tinacms/schema-tools';
+import type { Collection, TinaSchema } from '@tinacms/schema-tools';
 import type { GraphQLConfig } from './types';
 import { createSchema } from './schema/createSchema';
 import { createResolver } from './resolver';
@@ -330,35 +330,16 @@ export const resolve = async ({
                   after?: string;
                 };
 
-                let filter = documentsArgs.filter;
-
                 // When querying for documents, filter has shape filter { [collectionName]: { ... }} but we need to pass the filter directly to the resolver
-                if (
-                  // 1. Make sure that the filter exists
-                  typeof documentsArgs?.filter !== 'undefined' &&
-                  documentsArgs?.filter !== null &&
-                  // 2. Make sure that the collection name exists
-                  // @ts-ignore
-                  typeof value?.collection?.name === 'string' &&
-                  // 3. Make sure that the collection name is in the filter and is not undefined
-                  // @ts-ignore
-                  Object.keys(documentsArgs.filter).includes(value?.collection?.name) &&
-                  // @ts-ignore
-                  typeof documentsArgs.filter[value?.collection?.name] !== 'undefined'
-                ) {
-                  // Since 1. 2. and 3. are true, we can safely assume that the filter exists and is not undefined
-
-                  // @ts-ignore
-                  filter = documentsArgs.filter[value.collection.name];
-                }
+                const collectionName = (value.collection as { name?: string })?.name;
+                const filter = (collectionName && documentsArgs.filter?.[collectionName]) ?? documentsArgs.filter;
                 // use the collection and hasDocuments to resolve the documents
                 return resolver.resolveCollectionConnection({
                   args: {
                     ...documentsArgs,
                     filter,
                   },
-                  // @ts-ignore
-                  collection: value.collection,
+                  collection: value.collection as Collection<true>,
                 });
               }
               throw new Error(
