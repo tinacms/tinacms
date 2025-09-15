@@ -81,7 +81,7 @@ export const resolve = async ({
       },
       fieldResolver: async (
         source: { [key: string]: undefined | Record<string, unknown> } = {},
-        args: object = {},
+        args: unknown = {},
         _context: object,
         info: GraphQLResolveInfo
       ) => {
@@ -127,6 +127,12 @@ export const resolve = async ({
                 return x?.name?.value === 'documents';
               }
             );
+            assertShape<{ collection: string }>(
+              args,
+              (yup) => yup.object({
+                collection: yup.string().required()
+              })
+            );
             return resolver.resolveCollection(
               args,
               args.collection,
@@ -163,6 +169,12 @@ export const resolve = async ({
            */
           if (info.fieldName === 'getOptimizedQuery') {
             try {
+              assertShape<{ queryString: string }>(
+                args,
+                (yup) => yup.object({
+                  queryString: yup.string().required()
+                })
+              );
               // Deprecated
               return args.queryString;
             } catch (e) {
@@ -173,31 +185,34 @@ export const resolve = async ({
           }
 
           if (info.fieldName === 'authenticate') {
+            const authArgs = args as { sub?: string; password?: string };
             return handleAuthenticate({
               tinaSchema,
               resolver,
-              sub: args.sub,
-              password: args.password,
+              sub: authArgs.sub,
+              password: authArgs.password,
               info,
               ctxUser,
             });
           }
 
           if (info.fieldName === 'authorize') {
+            const authArgs = args as { sub?: string };
             return handleAuthorize({
               tinaSchema,
               resolver,
-              sub: args.sub,
+              sub: authArgs.sub,
               info,
               ctxUser,
             });
           }
 
           if (info.fieldName === 'updatePassword') {
+            const authArgs = args as { password?: string };
             return handleUpdatePassword({
               tinaSchema,
               resolver,
-              password: args.password,
+              password: authArgs.password,
               info,
               ctxUser,
             });
@@ -231,7 +246,13 @@ export const resolve = async ({
                  */
                 return resolver.getDocument(value);
               }
-              if (args?.collection && info.fieldName === 'addPendingDocument') {
+              if (info.fieldName === 'addPendingDocument') {
+                assertShape<{ collection: string }>(
+                  args,
+                  (yup) => yup.object({
+                    collection: yup.string().required()
+                  })
+                );
                 /**
                  * `addPendingDocument`
                  * FIXME: this should probably be it's own lookup
@@ -253,6 +274,20 @@ export const resolve = async ({
                   'createFolder',
                 ].includes(info.fieldName)
               ) {
+                assertShape<{
+                  collection: string;
+                  relativePath?: string;
+                  params?: { relativePath?: string }
+                }>(
+                  args,
+                  (yup) => yup.object({
+                    collection: yup.string().required(),
+                    relativePath: yup.string().optional(),
+                    params: yup.object({
+                      relativePath: yup.string().optional()
+                    }).optional()
+                  })
+                );
                 /**
                  * `getDocument`/`createDocument`/`updateDocument`/`deleteDocument`/`createFolder`
                  */
@@ -289,31 +324,37 @@ export const resolve = async ({
                 value?.collection &&
                 value?.hasDocuments
               ) {
-                let filter = args.filter;
+                const documentsArgs = args as {
+                  filter?: Record<string, any>;
+                  first?: number;
+                  after?: string;
+                };
+
+                let filter = documentsArgs.filter;
 
                 // When querying for documents, filter has shape filter { [collectionName]: { ... }} but we need to pass the filter directly to the resolver
                 if (
                   // 1. Make sure that the filter exists
-                  typeof args?.filter !== 'undefined' &&
-                  args?.filter !== null &&
+                  typeof documentsArgs?.filter !== 'undefined' &&
+                  documentsArgs?.filter !== null &&
                   // 2. Make sure that the collection name exists
                   // @ts-ignore
                   typeof value?.collection?.name === 'string' &&
                   // 3. Make sure that the collection name is in the filter and is not undefined
                   // @ts-ignore
-                  Object.keys(args.filter).includes(value?.collection?.name) &&
+                  Object.keys(documentsArgs.filter).includes(value?.collection?.name) &&
                   // @ts-ignore
-                  typeof args.filter[value?.collection?.name] !== 'undefined'
+                  typeof documentsArgs.filter[value?.collection?.name] !== 'undefined'
                 ) {
                   // Since 1. 2. and 3. are true, we can safely assume that the filter exists and is not undefined
 
                   // @ts-ignore
-                  filter = args.filter[value.collection.name];
+                  filter = documentsArgs.filter[value.collection.name];
                 }
                 // use the collection and hasDocuments to resolve the documents
                 return resolver.resolveCollectionConnection({
                   args: {
-                    ...args,
+                    ...documentsArgs,
                     filter,
                   },
                   // @ts-ignore
@@ -351,8 +392,10 @@ export const resolve = async ({
              * eg. `getPageList`
              */
             case 'collectionDocumentList':
+              // Cast args to an acceptable type for the resolver
+              const collectionArgs = args as Record<string, string | number | Record<string, object>>;
               return resolver.resolveCollectionConnection({
-                args,
+                args: collectionArgs,
                 collection: tinaSchema.getCollection(lookup.collection),
               });
             /**
@@ -377,7 +420,8 @@ export const resolve = async ({
               // This is an array in many cases so it's easier to just pass it through
               // to be handled by the `typeResolver`
               if (!value) {
-                if (args.relativePath) {
+                const unionArgs = args as { relativePath?: string };
+                if (unionArgs.relativePath) {
                   // FIXME: unionData doesn't have enough info
                   const result = await resolver.resolveDocument({
                     args,
