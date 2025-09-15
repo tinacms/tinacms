@@ -140,48 +140,9 @@ export const resolve = async ({
             );
           }
 
-          /**
-           * `getOptimizedQuery`
-           *
-           * Returns a version of the query with fragments inlined. Eg.
-           * ```graphql
-           * {
-           *   getPostDocument(relativePath: "") {
-           *     data {
-           *       ...PostFragment
-           *     }
-           *   }
-           * }
-           *
-           * fragment PostFragment on Post {
-           *   title
-           * }
-           * ```
-           * Turns into
-           * ```graphql
-           * {
-           *   getPostDocument(relativePath: "") {
-           *     data {
-           *       title
-           *     }
-           *   }
-           * }
-           */
           if (info.fieldName === 'getOptimizedQuery') {
-            try {
-              assertShape<{ queryString: string }>(
-                args,
-                (yup) => yup.object({
-                  queryString: yup.string().required()
-                })
-              );
-              // Deprecated
-              return args.queryString;
-            } catch (e) {
-              throw new Error(
-                `Invalid query provided, Error message: ${e.message}`
-              );
-            }
+            // Deprecated - returns query string as-is
+            return (args as { queryString?: string }).queryString || '';
           }
 
           if (info.fieldName === 'authenticate') {
