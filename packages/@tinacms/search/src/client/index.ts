@@ -1,5 +1,5 @@
 import type { SearchClient } from '../types';
-import SqliteLevel from 'sqlite-level';
+import { SqliteLevel } from 'sqlite-level';
 import si from 'search-index';
 import { MemoryLevel } from 'memory-level';
 import { lookupStopwords } from '../indexer/utils';
