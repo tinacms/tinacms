@@ -22,7 +22,7 @@ export default function Home(props) {
     variables: {},
     data: props.data,
   })
-  const postsList = data.postConnection.edges
+  const postsList = data?.postConnection?.edges ?? [];
   return (
     <Layout>
       <h1>Posts</h1>
