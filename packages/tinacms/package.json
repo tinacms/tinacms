@@ -1,48 +1,18 @@
 {
 	"name": "tinacms",
+	"type": "module",
 	"version": "2.8.2",
-	"main": "dist/index.js",
-	"module": "./dist/index.mjs",
+	"typings": "dist/index.d.ts",
 	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.mjs",
-			"require": "./dist/index.js"
-		},
-		"./dist/client": {
-			"types": "./dist/client.d.ts",
-			"import": "./dist/client.mjs",
-			"require": "./dist/client.js"
-		},
-		"./dist/edit-state": {
-			"types": "./dist/edit-state.d.ts",
-			"import": "./dist/edit-state.mjs",
-			"require": "./dist/edit-state.js"
-		},
-		"./dist/react": {
-			"types": "./dist/react.d.ts",
-			"import": "./dist/react.mjs",
-			"require": "./dist/react.js"
-		},
-		"./dist/rich-text": {
-			"types": "./dist/rich-text/index.d.ts",
-			"import": "./dist/rich-text/index.mjs",
-			"require": "./dist/rich-text/index.js"
-		},
-		"./dist/rich-text/static": {
-			"types": "./dist/rich-text/static.d.ts",
-			"import": "./dist/rich-text/static.mjs",
-			"require": "./dist/rich-text/static.js"
-		},
-		"./dist/rich-text/prism": {
-			"types": "./dist/rich-text/prism.d.ts",
-			"import": "./dist/rich-text/prism.mjs",
-			"require": "./dist/rich-text/prism.js"
-		}
+		".": "./dist/index.js",
+		"./dist/client": "./dist/client.js",
+		"./dist/edit-state": "./dist/edit-state.js",
+		"./dist/react": "./dist/react.js",
+		"./dist/rich-text": "./dist/rich-text/index.js",
+		"./dist/rich-text/static": "./dist/rich-text/static.js",
+		"./dist/rich-text/prism": "./dist/rich-text/prism.js"
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"buildConfig": {
 		"entryPoints": [
 			"src/index.ts",
@@ -63,7 +33,6 @@
 			}
 		}
 	},
-	"typings": "dist/index.d.ts",
 	"license": "Apache-2.0",
 	"scripts": {
 		"types": "pnpm tsc && pnpm tsc-alias",
