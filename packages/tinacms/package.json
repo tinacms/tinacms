@@ -1,7 +1,7 @@
 {
 	"name": "tinacms",
 	"type": "module",
-	"version": "2.8.2",
+	"version": "2.8.3",
 	"typings": "dist/index.d.ts",
 	"exports": {
 		".": "./dist/index.js",

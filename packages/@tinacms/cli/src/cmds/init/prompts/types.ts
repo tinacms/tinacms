@@ -5,7 +5,7 @@ export type Config = {
   typescript: boolean;
   publicFolder?: string;
   framework: Framework;
-  packageManager: 'pnpm' | 'yarn' | 'npm';
+  packageManager: 'pnpm' | 'yarn' | 'npm' | 'bun';
   forestryMigrate: boolean;
   frontMatterFormat?: ContentFrontmatterFormat;
   hosting?: 'tina-cloud' | 'self-host';
