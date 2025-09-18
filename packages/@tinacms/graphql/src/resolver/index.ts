@@ -236,7 +236,6 @@ export const transformDocumentIntoPayload = async (
         collection: collection.name,
         includeAuditMessage: !isAudit,
         file: relativePath,
-        stack: e.stack,
       });
     }
 
