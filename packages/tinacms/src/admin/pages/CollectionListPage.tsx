@@ -597,7 +597,7 @@ const CollectionListPage = () => {
                                 <div className='flex flex-col gap-2 items-start w-full md:w-auto'>
                                   <div className='h-4'></div>
                                   <Message
-                                    link='https://tina.io/docs/reference/search/overview'
+                                    link='https://tina.io/docs/r/content-search'
                                     linkLabel='Read The Docs'
                                     type='info'
                                     size='small'
@@ -660,12 +660,12 @@ const CollectionListPage = () => {
                                             <br />
                                             See the docs -{' '}
                                             <a
-                                              href='https://tina.io/docs/reference/templates'
+                                              href='https://tina.io/docs/r/content-modelling-templates'
                                               target='_blank'
                                               rel='noopener noreferrer'
                                               className='underline text-blue-500'
                                             >
-                                              https://tina.io/docs/reference/templates
+                                              https://tina.io/docs/r/content-modelling-templates
                                             </a>
                                           </p>
                                         </TooltipContent>

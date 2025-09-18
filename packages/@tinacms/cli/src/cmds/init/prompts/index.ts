@@ -118,7 +118,7 @@ export const askTinaSetupPrompts = async (params: {
         `Where are public assets stored? (default: "public")\n` +
         logText(
           `Not sure what value to use? Refer to our "Frameworks" doc: ${linkText(
-            'https://tina.io/docs/integration/frameworks/#configuring-tina-with-each-framework'
+            'https://tina.io/docs/r/framework-guides-overview'
           )}`
         ),
     });

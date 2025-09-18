@@ -74,7 +74,7 @@ const Playground = () => {
             {noAutoQueries
               ? 'No auto-generated queries found, the Tina config is likely set to client.skip = true'
               : "Tina's auto-generated queries can be found here as well as any queries you may have defined yourself."}{' '}
-            <a href='https://tina.io/docs/data-fetching/custom-queries/'>
+            <a href='https://tina.io/docs/r/custom-queries/'>
               Learn more here
             </a>
           </div>

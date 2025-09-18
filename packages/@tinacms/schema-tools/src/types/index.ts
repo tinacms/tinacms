@@ -587,7 +587,7 @@ export interface Config<
   /**
    * The Schema is used to define the shape of the content.
    *
-   * https://tina.io/docs/reference/schema/
+   * https://tina.io/docs/r/the-config-file/
    */
   schema: Schema;
   /**
@@ -713,7 +713,7 @@ export interface Config<
     | {
         /**
          * Use Git-backed assets for media, these values will
-         * [Learn more](https://tina.io/docs/reference/media/repo-based/)
+         * [Learn more](https://tina.io/docs/r/repo-based-media/)
          */
         tina: {
           /**
@@ -797,7 +797,7 @@ export interface Schema<WithNamespace extends boolean = false> {
   /**
    * Collections represent a type of content (EX, blog post, page, author, etc). We recommend using singular naming in a collection (Ex: use post and not posts).
    *
-   * https://tina.io/docs/reference/collections/
+   * https://tina.io/docs/r/content-modelling-collections/
    */
   collections: Collection<WithNamespace>[];
   /**
@@ -841,7 +841,7 @@ type TemplateCollection<WithNamespace extends boolean = false> = {
   /**
    * In most cases, just using fields is enough, however templates can be used when there are multiple variants of the same collection or object. For example in a "page" collection there might be a need for a marketing page template and a content page template, both under the collection "page".
    *
-   * https://tina.io/docs/reference/templates/
+   * https://tina.io/docs/r/content-modelling-templates/
    */
   templates: Template<WithNamespace>[];
   fields?: undefined;
@@ -852,7 +852,7 @@ type FieldCollection<WithNamespace extends boolean = false> = {
   /**
    * Fields define the shape of the content and the user input.
    *
-   * https://tina.io/docs/reference/fields/
+   * https://tina.io/docs/r/string-fields/
    */
   fields: TinaField<WithNamespace>[];
   templates?: undefined;

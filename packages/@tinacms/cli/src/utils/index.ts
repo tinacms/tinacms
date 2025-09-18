@@ -20,7 +20,7 @@ export const parseMediaFolder = (str: string) => {
 export const getFaqLink = (type: ChangeType): string | null => {
   switch (type) {
     case ChangeType.FieldRemoved: {
-      return 'https://tina.io/docs/introduction/faq#how-do-i-resolve-the-local-graphql-schema-doesnt-match-the-remote-graphql-schema-errors';
+      return 'https://tina.io/docs/r/FAQ/#2-how-do-i-resolve-the-local-graphql-schema-doesnt-match-the-remote-graphql-schema-error';
     }
     default:
       return null;

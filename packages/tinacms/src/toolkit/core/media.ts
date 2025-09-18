@@ -266,17 +266,17 @@ export class MediaListError extends Error {
 export const E_UNAUTHORIZED = new MediaListError({
   title: 'Unauthorized',
   message: "You don't have access to this resource.",
-  docsLink: 'https://tina.io/docs/reference/media/overview',
+  docsLink: 'https://tina.io/docs/r/repo-based-media',
 });
 
 export const E_BAD_ROUTE = new MediaListError({
   title: 'Bad Route',
   message: 'The Cloudinary API route is missing or misconfigured.',
-  docsLink: 'https://tina.io/docs/reference/media/external/authentication/',
+  docsLink: 'https://tina.io/docs/r/backend-media-handler/',
 });
 
 export const E_DEFAULT = new MediaListError({
   title: 'An Error Occurred',
   message: 'Something went wrong accessing your media from TinaCloud.',
-  docsLink: '', // TODO
+  docsLink: 'https://tina.io/docs/r/repo-based-media', 
 });
