@@ -4,8 +4,6 @@
     "outDir": "dist",
     "rootDir": "src",
     "baseUrl": "./",
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
     "paths": {
       "@tinacms/toolkit": ["./src/toolkit/index.ts"],
       "@toolkit/*": ["./src/toolkit/*"]

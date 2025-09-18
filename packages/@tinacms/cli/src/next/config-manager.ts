@@ -8,6 +8,7 @@ import * as dotenv from 'dotenv';
 import normalizePath from 'normalize-path';
 import chalk from 'chalk';
 import { logger } from '../logger';
+import { createRequire } from 'module';
 
 export const TINA_FOLDER = 'tina';
 export const LEGACY_TINA_FOLDER = '.tina';
@@ -93,6 +94,7 @@ export class ConfigManager {
   }
 
   async processConfig() {
+    const require = createRequire(import.meta.url);
     this.tinaFolderPath = await this.getTinaFolderPath(this.rootPath);
 
     // TODO - .env should potentially be configurable
@@ -381,10 +383,11 @@ export class ConfigManager {
       entryPoints: [this.selfHostedDatabaseFilePath],
       bundle: true,
       platform: 'node',
+      format: 'esm',
       outfile: outfile,
       loader: loaders,
     });
-    const result = require(outfile);
+    const result = await import(outfile);
     fs.removeSync(outfile);
     return result.default;
   }
@@ -399,6 +402,18 @@ export class ConfigManager {
       'config.prebuild.jsx'
     );
 
+    const nativeNodeModulesPlugin = {
+      name: 'native-node-modules',
+      setup(build) {
+        build.onResolve({ filter: /^node:.*/ }, (args) => {
+          return {
+            path: args.path,
+            external: true,
+          };
+        });
+      },
+    };
+
     const outfile = path.join(tmpdir, 'config.build.jsx');
     const outfile2 = path.join(tmpdir, 'config.build.js');
     const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json');
@@ -407,7 +422,7 @@ export class ConfigManager {
     const result2 = await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
-      target: ['es2020'],
+      target: ['esnext'],
       platform: 'browser',
       format: 'esm',
       logLevel: 'silent',
@@ -429,9 +444,10 @@ export class ConfigManager {
     await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
-      target: ['es2020'],
+      target: ['esnext'],
       logLevel: 'silent',
       platform: 'node',
+      format: 'esm',
       outfile,
       loader: loaders,
     });
@@ -441,12 +457,14 @@ export class ConfigManager {
       // Suppress warning about comparison with -0 from client module
       logLevel: 'silent',
       platform: 'node',
+      target: ['esnext'],
+      format: 'esm',
       outfile: outfile2,
       loader: loaders,
     });
     let result: { default: any };
     try {
-      result = require(outfile2);
+      result = await import(outfile2);
     } catch (e) {
       console.error('Unexpected error loading config');
       console.error(e);

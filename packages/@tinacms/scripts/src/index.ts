@@ -366,7 +366,8 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
-          target: 'node20',
+          target: 'esnext',
+          format: 'esm',
           outfile: path.join(
             process.cwd(),
             'dist',
@@ -383,12 +384,12 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
-          target: 'es2020',
+          target: 'esnext',
           format: 'esm',
           outfile: path.join(
             process.cwd(),
             'dist',
-            `${outInfo.outfile ? outInfo.outfile : 'index'}.mjs`
+            `${outInfo.outfile ? outInfo.outfile : 'index'}.js`
           ),
           external,
         });
@@ -398,22 +399,9 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
-          target: 'node20',
-          format: 'cjs',
-          outfile: path.join(process.cwd(), 'dist', 'index.js'),
-          external: Object.keys({ ...peerDeps }),
-        });
-
-        await esbuild({
-          entryPoints: [path.join(process.cwd(), entry)],
-          bundle: true,
-          platform: 'node',
-          target: 'es2020',
+          target: 'esnext',
           format: 'esm',
-          outfile: path.join(process.cwd(), 'dist', 'index.mjs'),
-          // Bundle dependencies, the remark ecosystem only publishes ES modules
-          // and includes "development" export maps which actually throw errors during
-          // development, which we don't want to expose our users to.
+          outfile: path.join(process.cwd(), 'dist', 'index.js'),
           external: Object.keys({ ...peerDeps }),
         });
 
@@ -422,9 +410,9 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'browser',
-          target: 'es2020',
+          target: 'esnext',
           format: 'esm',
-          outfile: path.join(process.cwd(), 'dist', 'index.browser.mjs'),
+          outfile: path.join(process.cwd(), 'dist', 'index.browser.js'),
           // Bundle dependencies, the remark ecosystem only publishes ES modules
           // and includes "development" export maps which actually throw errors during
           // development, which we don't want to expose our users to.
@@ -435,7 +423,8 @@ export class BuildTina {
           entryPoints: [path.join(process.cwd(), entry)],
           bundle: true,
           platform: 'node',
-          target: 'node20',
+          target: 'esnext',
+          format: 'esm',
           outfile: path.join(process.cwd(), 'dist', `${outInfo.outfile}.js`),
           external,
         });
@@ -471,11 +460,8 @@ export class BuildTina {
         lib: {
           entry: path.resolve(process.cwd(), entry),
           name: packageJSON.name,
-          fileName: (format) => {
-            return format === 'umd'
-              ? `${outInfo.outfile}.js`
-              : `${outInfo.outfile}.mjs`;
-          },
+          formats: ['es'],
+          fileName: () => `${outInfo.outfile}.js`,
         },
         outDir: outInfo.outdir,
         emptyOutDir: false, // We build multiple files in to the dir.
