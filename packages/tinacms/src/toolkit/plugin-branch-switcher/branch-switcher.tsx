@@ -161,14 +161,14 @@ export const EditoralBranchSwitcher = ({
               <a
                 target='_blank'
                 className='transition-all duration-150 ease-out text-blue-600 hover:text-blue-400 hover:underline no-underline'
-                href='https://tina.io/docs/tina-cloud/'
+                href='https://tina.io/docs/tinacloud/'
               >
                 Learn more about moving to production with TinaCloud.
               </a>
             </p>
             <p>
               <Button
-                href='https://tina.io/docs/tina-cloud/'
+                href='https://tina.io/docs/tinacloud/'
                 target='_blank'
                 as='a'
               >

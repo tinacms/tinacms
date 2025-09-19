@@ -168,7 +168,7 @@ export const TinaCMSProvider2 = ({
       !schema.config.contentApiUrlOverride)
   ) {
     throw new Error(
-      'Invalid setup. See https://tina.io/docs/tina-cloud/overview for more information.'
+      'Invalid setup. See https://tina.io/docs/tinacloud/overview for more information.'
     );
   }
 
