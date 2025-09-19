@@ -29,8 +29,7 @@ export const E_DEFAULT = new MediaListError({
 export const E_UNAUTHORIZED = new MediaListError({
   title: 'Unauthorized',
   message: "You don't have access to this resource.",
-  docsLink:
-    'https://tina.io/docs/r/cloudinary',
+  docsLink: 'https://tina.io/docs/r/cloudinary',
 });
 
 export const E_CONFIG = new MediaListError({
@@ -50,8 +49,7 @@ export const E_KEY_FAIL = new MediaListError({
 export const E_BAD_ROUTE = new MediaListError({
   title: 'Bad Route',
   message: 'The Cloudinary API route is missing or misconfigured.',
-  docsLink:
-    'https://tina.io/docs/r/cloudinary',
+  docsLink: 'https://tina.io/docs/r/cloudinary',
 });
 
 export const interpretErrorMessage = (message: string) => {
