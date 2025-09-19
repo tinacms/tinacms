@@ -1,7 +1,7 @@
 import * as React from "react";
 import { AiFillWarning } from "react-icons/ai";
 import { cn } from "../../../lib/utils";
-import { MdInfo } from "react-icons/md";
+import { MdCheckCircle, MdError, MdInfo } from "react-icons/md";
 
 export const Callout = ({
   children,
@@ -17,6 +17,8 @@ export const Callout = ({
   const styles = {
     warning: `text-amber-700 bg-amber-100 border-amber-700/20`,
     info: `text-blue-600 bg-blue-100/50 border-blue-600/20`,
+    success: `text-green-600 bg-green-100/50 border-green-600/20`,
+    error: `text-red-600 bg-red-100/50 border-red-600/20`,
   };
 
   const icon = {
@@ -25,6 +27,12 @@ export const Callout = ({
     ),
     info: (
       <MdInfo className="w-5 h-auto inline-block mr-1 opacity-70 text-[#1D4ED8]" />
+    ),
+    success: (
+      <MdCheckCircle className="w-5 h-auto inline-block mr-1 opacity-70 text-green-600" />
+    ),
+    error: (
+      <MdError className="w-5 h-auto inline-block mr-1 opacity-70 text-red-600" />
     ),
   };
 
