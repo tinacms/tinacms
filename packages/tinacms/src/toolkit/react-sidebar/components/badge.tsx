@@ -1,9 +1,10 @@
 import * as React from "react";
 import { AiFillWarning } from "react-icons/ai";
 import { cn } from "../../../lib/utils";
-import { MdCheckCircle, MdError, MdInfo } from "react-icons/md";
+import { MdAccessTime, MdCheckCircle, MdError, MdInfo, MdOutlineDataSaverOff, MdWifiOff } from "react-icons/md";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
-export const Callout = ({
+export const Badge = ({
   children,
   calloutStyle = "warning",
   className = "",
@@ -12,27 +13,27 @@ export const Callout = ({
   children?: React.ReactNode;
   calloutStyle?: "warning" | "info" | "success" | "error";
 } & React.HTMLProps<HTMLDivElement>) => {
-  const commonAlertStyles = "ml-8 text-sm px-4 py-3 rounded-md border";
+  const commonAlertStyles = "ml-8 text-xs px-2 py-0.5 flex items-center rounded-md border";
 
   const styles = {
     warning: `text-amber-700 bg-amber-100 border-amber-700/20`,
     info: `text-blue-600 bg-blue-100/50 border-blue-600/20`,
     success: `text-green-600 bg-green-100/50 border-green-600/20`,
-    error: `text-red-600 bg-red-100/50 border-red-600/20`,
+    error: `text-red-700 bg-red-100/50 border-red-700/20`,
   };
 
   const icon = {
     warning: (
-      <AiFillWarning className="w-5 h-auto inline-block mr-1 opacity-70 text-amber-600" />
+      <MdAccessTime className="w-5 h-auto inline-block mr-1 opacity-70 text-amber-600" />
     ),
     info: (
-      <MdInfo className="w-5 h-auto inline-block mr-1 opacity-70 text-[#1D4ED8]" />
+      <MdOutlineDataSaverOff className="w-5 h-auto inline-block mr-1 opacity-70 text-blue-600" />
     ),
     success: (
       <MdCheckCircle className="w-5 h-auto inline-block mr-1 opacity-70 text-green-600" />
     ),
     error: (
-      <MdError className="w-5 h-auto inline-block mr-1 opacity-70 text-red-600" />
+      <MdWifiOff className="w-5 h-auto inline-block mr-1 opacity-70 text-red-700" />
     ),
   };
 
