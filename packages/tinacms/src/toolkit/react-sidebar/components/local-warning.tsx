@@ -12,7 +12,7 @@ export const LocalWarning = () => {
   }
 
   return (
-    <Callout calloutStyle="warning">
+    <Callout calloutStyle="warning" className="w-fit">
       <a href="https://tina.io/docs/tina-cloud/" target="_blank">
         You are in local mode
       </a>
