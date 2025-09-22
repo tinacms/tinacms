@@ -551,6 +551,53 @@ export class Resolver {
     }
   };
 
+  public resolveAddPendingDocument = async ({
+    collection,
+    realPath,
+    args,
+  }: {
+    collection: Collection<true>;
+    realPath: string;
+    args: unknown;
+  }) => {
+    const templateInfo =
+      this.tinaSchema.getTemplatesForCollectable(collection);
+
+    switch (templateInfo.type) {
+      case 'object':
+        await this.database.addPendingDocument(realPath, {});
+        break;
+      case 'union':
+        // @ts-ignore
+        const templateString = args.template;
+        const template = templateInfo.templates.find(
+          (template) => lastItem(template.namespace) === templateString
+        );
+        // @ts-ignore
+        if (!args.template) {
+          throw new Error(
+            `Must specify a template when creating content for a collection with multiple templates. Possible templates are: ${templateInfo.templates
+              .map((t) => lastItem(t.namespace))
+              .join(' ')}`
+          );
+        }
+        // @ts-ignore
+        if (!template) {
+          throw new Error(
+            `Expected to find template named ${templateString} in collection "${
+              collection.name
+            }" but none was found. Possible templates are: ${templateInfo.templates
+              .map((t) => lastItem(t.namespace))
+              .join(' ')}`
+          );
+        }
+        await this.database.addPendingDocument(realPath, {
+          _template: lastItem(template.namespace),
+        });
+    }
+    return this.getDocument(realPath);
+  };
+
   public createResolveDocument = async ({
     collection,
     realPath,
@@ -566,42 +613,7 @@ export class Resolver {
      * TODO: Remove when `addPendingDocument` is no longer needed.
      */
     if (isAddPendingDocument === true) {
-      const templateInfo =
-        this.tinaSchema.getTemplatesForCollectable(collection);
-
-      switch (templateInfo.type) {
-        case 'object':
-          await this.database.addPendingDocument(realPath, {});
-          break;
-        case 'union':
-          // @ts-ignore
-          const templateString = args.template;
-          const template = templateInfo.templates.find(
-            (template) => lastItem(template.namespace) === templateString
-          );
-          // @ts-ignore
-          if (!args.template) {
-            throw new Error(
-              `Must specify a template when creating content for a collection with multiple templates. Possible templates are: ${templateInfo.templates
-                .map((t) => lastItem(t.namespace))
-                .join(' ')}`
-            );
-          }
-          // @ts-ignore
-          if (!template) {
-            throw new Error(
-              `Expected to find template named ${templateString} in collection "${
-                collection.name
-              }" but none was found. Possible templates are: ${templateInfo.templates
-                .map((t) => lastItem(t.namespace))
-                .join(' ')}`
-            );
-          }
-          await this.database.addPendingDocument(realPath, {
-            _template: lastItem(template.namespace),
-          });
-      }
-      return this.getDocument(realPath);
+      return this.resolveAddPendingDocument({ collection, realPath, args });
     }
 
     const params = await this.buildObjectMutations(
@@ -736,6 +748,20 @@ export class Resolver {
     return legacyValues;
   };
 
+  private checkCollectionName = (collectionLookup: string) => {
+    const collectionNames = this.tinaSchema
+      .getCollections()
+      .map((item) => item.name);
+
+    if (!collectionNames.includes(collectionLookup)) {
+      throw new Error(
+        `"collection" must be one of: [${collectionNames.join(
+          ', '
+        )}] but got ${collectionLookup}`
+      );
+    }
+  };
+
   private resolveAndValidateCollection = ({
     collectionName,
     args,
@@ -766,19 +792,7 @@ export class Resolver {
       collectionLookup = Object.keys(args.params)[0];
     }
 
-    const collectionNames = this.tinaSchema
-      .getCollections()
-      .map((item) => item.name);
-
-    assertShape<string>(
-      collectionLookup,
-      (yup) => {
-        return yup.mixed().oneOf(collectionNames);
-      },
-      `"collection" must be one of: [${collectionNames.join(
-        ', '
-      )}] but got ${collectionLookup}`
-    );
+    this.checkCollectionName(collectionLookup);
 
     const collection = this.tinaSchema.getCollection(collectionLookup);
     return { collection };
