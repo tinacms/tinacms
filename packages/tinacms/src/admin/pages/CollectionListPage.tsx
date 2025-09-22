@@ -661,7 +661,7 @@ const CollectionListPage = () => {
                                           align='center'
                                         >
                                           <p>
-                                            Folders can’t be manually added when
+                                            Folders can&apos;t be manually added when
                                             using templates.
                                             <br />
                                             See the docs -{' '}
@@ -1305,7 +1305,7 @@ const RenameModal = ({
               Are you sure you want to rename <strong>{filename}</strong>?
             </p>
             <BaseTextField
-              placeholder='Enter a new name for the document's file'
+              placeholder='Enter a new name for the document&apos;s file'
               value={newRelativePath}
               onChange={(event) => setNewRelativePath(event.target.value)}
             />
