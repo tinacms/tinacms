@@ -736,6 +736,54 @@ export class Resolver {
     return legacyValues;
   };
 
+  private resolveAndValidateCollection = ({
+    collectionName,
+    args,
+    isCollectionSpecific,
+  }: {
+    collectionName?: string;
+    args: unknown;
+    isCollectionSpecific?: boolean;
+  }) => {
+    /**
+     * `collectionName` is passed in:
+     *    * `addPendingDocument()` has `collection` on `args`
+     *    * `getDocument()` provides a `collection` on `args`
+     *    * `get<Collection>Document()` has `collection` on `lookup`
+     */
+    let collectionLookup = collectionName || undefined;
+
+    /**
+     * For generic functions (like `createDocument()` and `updateDocument()`), `collection` is the top key of the `params`
+     */
+    if (!collectionLookup && isCollectionSpecific === false) {
+      assertShape<{ params: Record<string, unknown> }>(
+        args,
+        (yup) => yup.object({
+          params: yup.object().required()
+        })
+      );
+      collectionLookup = Object.keys(args.params)[0];
+    }
+
+    const collectionNames = this.tinaSchema
+      .getCollections()
+      .map((item) => item.name);
+
+    assertShape<string>(
+      collectionLookup,
+      (yup) => {
+        return yup.mixed().oneOf(collectionNames);
+      },
+      `"collection" must be one of: [${collectionNames.join(
+        ', '
+      )}] but got ${collectionLookup}`
+    );
+
+    const collection = this.tinaSchema.getCollection(collectionLookup);
+    return { collection };
+  };
+
   public resolveDocument = async ({
     args,
     collection: collectionName,
@@ -757,41 +805,15 @@ export class Resolver {
     isCollectionSpecific?: boolean;
     isUpdateName?: boolean;
   }) => {
-    /**
-     * `collectionName` is passed in:
-     *    * `addPendingDocument()` has `collection` on `args`
-     *    * `getDocument()` provides a `collection` on `args`
-     *    * `get<Collection>Document()` has `collection` on `lookup`
-     */
-    let collectionLookup = collectionName || undefined;
-
-    /**
-     * For generic functions (like `createDocument()` and `updateDocument()`), `collection` is the top key of the `params`
-     */
-    if (!collectionLookup && isCollectionSpecific === false) {
-      //@ts-ignore
-      collectionLookup = Object.keys(args.params)[0];
-    }
-
-    const collectionNames = this.tinaSchema
-      .getCollections()
-      .map((item) => item.name);
-
-    assertShape<string>(
-      collectionLookup,
-      (yup) => {
-        return yup.mixed().oneOf(collectionNames);
-      },
-      `"collection" must be one of: [${collectionNames.join(
-        ', '
-      )}] but got ${collectionLookup}`
-    );
+    const { collection } = this.resolveAndValidateCollection({
+      collectionName,
+      args,
+      isCollectionSpecific,
+    });
 
     assertShape<{ relativePath: string }>(args, (yup) =>
       yup.object({ relativePath: yup.string().required() })
     );
-
-    const collection = await this.tinaSchema.getCollection(collectionLookup);
     let realPath = path.join(collection?.path, args.relativePath);
     if (isFolderCreation) {
       realPath = `${realPath}/.gitkeep.${collection.format || 'md'}`;
