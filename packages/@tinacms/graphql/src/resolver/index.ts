@@ -552,16 +552,18 @@ export class Resolver {
   };
 
   public resolveAddPendingDocument = async ({
-    collection,
-    realPath,
+    collectionName,
+    relativePath,
     args,
   }: {
-    collection: Collection<true>;
-    realPath: string;
+    collectionName: string;
+    relativePath: string;
     args: unknown;
   }) => {
-    const templateInfo =
-      this.tinaSchema.getTemplatesForCollectable(collection);
+    const collection = this.getCollectionWithName(collectionName);
+    const realPath = path.join(collection?.path, relativePath);
+
+    const templateInfo = this.tinaSchema.getTemplatesForCollectable(collection);
 
     switch (templateInfo.type) {
       case 'object':
@@ -613,7 +615,11 @@ export class Resolver {
      * TODO: Remove when `addPendingDocument` is no longer needed.
      */
     if (isAddPendingDocument === true) {
-      return this.resolveAddPendingDocument({ collection, realPath, args });
+      return this.resolveAddPendingDocument({
+        collectionName: collection.name,
+        relativePath: path.relative(collection.path, realPath),
+        args,
+      });
     }
 
     const params = await this.buildObjectMutations(
@@ -748,18 +754,20 @@ export class Resolver {
     return legacyValues;
   };
 
-  private checkCollectionName = (collectionLookup: string) => {
+  private getCollectionWithName = (collectionName: string) => {
     const collectionNames = this.tinaSchema
       .getCollections()
       .map((item) => item.name);
 
-    if (!collectionNames.includes(collectionLookup)) {
+    if (!collectionNames.includes(collectionName)) {
       throw new Error(
         `"collection" must be one of: [${collectionNames.join(
           ', '
-        )}] but got ${collectionLookup}`
+        )}] but got ${collectionName}`
       );
     }
+
+    return this.tinaSchema.getCollection(collectionName);
   };
 
   private resolveAndValidateCollection = ({
@@ -783,18 +791,15 @@ export class Resolver {
      * For generic functions (like `createDocument()` and `updateDocument()`), `collection` is the top key of the `params`
      */
     if (!collectionLookup && isCollectionSpecific === false) {
-      assertShape<{ params: Record<string, unknown> }>(
-        args,
-        (yup) => yup.object({
-          params: yup.object().required()
+      assertShape<{ params: Record<string, unknown> }>(args, (yup) =>
+        yup.object({
+          params: yup.object().required(),
         })
       );
       collectionLookup = Object.keys(args.params)[0];
     }
 
-    this.checkCollectionName(collectionLookup);
-
-    const collection = this.tinaSchema.getCollection(collectionLookup);
+    const collection = this.getCollectionWithName(collectionLookup);
     return { collection };
   };
 
@@ -830,7 +835,7 @@ export class Resolver {
     );
     let realPath = path.join(collection?.path, args.relativePath);
     if (isFolderCreation) {
-      realPath = `${realPath}/.gitkeep.${collection.format || 'md'}`;
+      realPath = path.join(realPath, `.gitkeep.${collection.format || 'md'}`);
     }
     const alreadyExists = await this.database.documentExists(realPath);
 
