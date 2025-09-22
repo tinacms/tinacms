@@ -3,7 +3,7 @@
 */
 
 import { graphql, buildASTSchema, getNamedType, GraphQLError } from 'graphql';
-import type { Collection, TinaSchema } from '@tinacms/schema-tools';
+import type { Collection } from '@tinacms/schema-tools';
 import type { GraphQLConfig } from './types';
 import { createSchema } from './schema/createSchema';
 import { createResolver } from './resolver';
@@ -48,13 +48,13 @@ export const resolve = async ({
     const graphQLSchema = buildASTSchema(graphQLSchemaAst);
 
     const tinaConfig = await database.getTinaSchema();
-    const tinaSchema = (await createSchema({
+    const tinaSchema = await createSchema({
       // TODO: please update all the types to import from @tinacms/schema-tools
       // @ts-ignore
       schema: tinaConfig,
       // @ts-ignore
       flags: tinaConfig?.meta?.flags,
-    })) as unknown as TinaSchema;
+    });
     const resolver = createResolver({
       config,
       database,
