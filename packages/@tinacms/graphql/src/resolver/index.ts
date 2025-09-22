@@ -340,12 +340,14 @@ export class Resolver {
   public database: Database;
   public tinaSchema: TinaSchema;
   public isAudit: boolean;
+
   constructor(public init: ResolverConfig) {
     this.config = init.config;
     this.database = init.database;
     this.tinaSchema = init.tinaSchema;
     this.isAudit = init.isAudit;
   }
+
   public resolveCollection = async (
     args,
     collectionName: string,
@@ -368,6 +370,7 @@ export class Resolver {
       ...extraFields,
     };
   };
+
   public getRaw = async (fullPath: unknown) => {
     if (typeof fullPath !== 'string') {
       throw new Error(
@@ -380,6 +383,7 @@ export class Resolver {
       _template: string;
     }>(fullPath);
   };
+
   public getDocumentOrDirectory = async (fullPath: unknown) => {
     if (typeof fullPath !== 'string') {
       throw new Error(
@@ -561,10 +565,14 @@ export class Resolver {
     args: unknown;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
-    const realPath = path.join(collection?.path, relativePath);
+    const realPath = path.join(collection.path, relativePath);
+
+    const alreadyExists = await this.database.documentExists(realPath);
+    if (alreadyExists) {
+      throw new Error(`Unable to add document, ${realPath} already exists`);
+    }
 
     const templateInfo = this.tinaSchema.getTemplatesForCollectable(collection);
-
     switch (templateInfo.type) {
       case 'object':
         await this.database.addPendingDocument(realPath, {});
@@ -572,18 +580,17 @@ export class Resolver {
       case 'union':
         // @ts-ignore
         const templateString = args.template;
-        const template = templateInfo.templates.find(
-          (template) => lastItem(template.namespace) === templateString
-        );
-        // @ts-ignore
-        if (!args.template) {
+        if (!templateString) {
           throw new Error(
             `Must specify a template when creating content for a collection with multiple templates. Possible templates are: ${templateInfo.templates
               .map((t) => lastItem(t.namespace))
               .join(' ')}`
           );
         }
-        // @ts-ignore
+
+        const template = templateInfo.templates.find(
+          (template) => lastItem(template.namespace) === templateString
+        );
         if (!template) {
           throw new Error(
             `Expected to find template named ${templateString} in collection "${

@@ -21,7 +21,12 @@ import {
 } from './resolver/auth-fields';
 import { NotFoundError } from './error';
 
-const handleCollectionsField = (info: GraphQLResolveInfo, tinaSchema: TinaSchema, resolver: Resolver, args: unknown) => {
+const handleCollectionsField = (
+  info: GraphQLResolveInfo,
+  tinaSchema: TinaSchema,
+  resolver: Resolver,
+  args: unknown
+) => {
   const collectionNode = info.fieldNodes.find(
     (x) => x.name.value === 'collections'
   );
@@ -37,17 +42,20 @@ const handleCollectionsField = (info: GraphQLResolveInfo, tinaSchema: TinaSchema
   });
 };
 
-const handleCollectionField = (info: GraphQLResolveInfo, args: unknown, resolver: Resolver) => {
+const handleCollectionField = (
+  info: GraphQLResolveInfo,
+  args: unknown,
+  resolver: Resolver
+) => {
   const collectionNode = info.fieldNodes.find(
     (x) => x.name.value === 'collection'
   );
   const hasDocuments = collectionNode.selectionSet.selections.find(
     (x) => x.kind == 'Field' && x?.name?.value === 'documents'
   );
-  assertShape<{ collection: string }>(
-    args,
-    (yup) => yup.object({
-      collection: yup.string().required()
+  assertShape<{ collection: string }>(args, (yup) =>
+    yup.object({
+      collection: yup.string().required(),
     })
   );
   return resolver.resolveCollection(
@@ -207,29 +215,36 @@ export const resolve = async ({
               return resolver.getDocument(args.id);
             case 'multiCollectionDocument':
               const possibleReferenceValue = source[info.fieldName];
-              if (typeof possibleReferenceValue === 'string' && possibleReferenceValue !== '') {
+              if (
+                typeof possibleReferenceValue === 'string' &&
+                possibleReferenceValue !== ''
+              ) {
                 /**
                  * This is a reference value (`director: /path/to/george.md`)
                  */
                 return resolver.getDocument(possibleReferenceValue);
               }
+              /**
+               * `addPendingDocument`
+               */
               if (info.fieldName === 'addPendingDocument') {
-                assertShape<{ collection: string }>(
+                assertShape<{ collection: string; relativePath: string }>(
                   args,
-                  (yup) => yup.object({
-                    collection: yup.string().required()
-                  })
+                  (yup) =>
+                    yup.object({
+                      collection: yup.string().required(),
+                      relativePath: yup.string().required(),
+                    })
                 );
-                /**
-                 * `addPendingDocument`
-                 * FIXME: this should probably be it's own lookup
-                 */
-                return resolver.resolveDocument({
-                  args: { ...args, params: {} },
-                  collection: args.collection,
-                  isMutation,
-                  isCreation: true,
-                  isAddPendingDocument: true,
+                if (!isMutation) {
+                  throw new Error(
+                    'Tried to call addPendingDocument outside of a mutation.'
+                  );
+                }
+                return resolver.resolveAddPendingDocument({
+                  collectionName: args.collection,
+                  relativePath: args.relativePath,
+                  args,
                 });
               }
               if (
@@ -244,15 +259,16 @@ export const resolve = async ({
                 assertShape<{
                   collection: string;
                   relativePath?: string;
-                  params?: { relativePath?: string }
-                }>(
-                  args,
-                  (yup) => yup.object({
+                  params?: { relativePath?: string };
+                }>(args, (yup) =>
+                  yup.object({
                     collection: yup.string().required(),
                     relativePath: yup.string().optional(),
-                    params: yup.object({
-                      relativePath: yup.string().optional()
-                    }).optional()
+                    params: yup
+                      .object({
+                        relativePath: yup.string().optional(),
+                      })
+                      .optional(),
                   })
                 );
                 /**
@@ -299,8 +315,12 @@ export const resolve = async ({
                 };
 
                 // When querying for documents, filter has shape filter { [collectionName]: { ... }} but we need to pass the filter directly to the resolver
-                const collectionName = (listValue.collection as { name?: string })?.name;
-                const filter = (collectionName && documentsArgs.filter?.[collectionName]) ?? documentsArgs.filter;
+                const collectionName = (
+                  listValue.collection as { name?: string }
+                )?.name;
+                const filter =
+                  (collectionName && documentsArgs.filter?.[collectionName]) ??
+                  documentsArgs.filter;
                 // use the collection and hasDocuments to resolve the documents
                 return resolver.resolveCollectionConnection({
                   args: {
@@ -321,7 +341,8 @@ export const resolve = async ({
              * the field will be `node`
              */
             case 'collectionDocument': {
-              return source[info.fieldName] ||
+              return (
+                source[info.fieldName] ||
                 (await resolver.resolveDocument({
                   args,
                   collection: lookup.collection,
@@ -329,7 +350,8 @@ export const resolve = async ({
                   isCreation,
                   isAddPendingDocument: false,
                   isCollectionSpecific: true,
-                }));
+                }))
+              );
             }
             /**
              * Collections-specific list getter
@@ -337,7 +359,10 @@ export const resolve = async ({
              */
             case 'collectionDocumentList':
               // Cast args to an acceptable type for the resolver
-              const collectionArgs = args as Record<string, string | number | Record<string, object>>;
+              const collectionArgs = args as Record<
+                string,
+                string | number | Record<string, object>
+              >;
               return resolver.resolveCollectionConnection({
                 args: collectionArgs,
                 collection: tinaSchema.getCollection(lookup.collection),
