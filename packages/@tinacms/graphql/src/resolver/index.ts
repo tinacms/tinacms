@@ -660,6 +660,7 @@ export class Resolver {
      * TODO: Remove when `addPendingDocument` is no longer needed.
      */
     if (isAddPendingDocument === true) {
+      console.warn("*** DEPRECATION: isAddPendingDocument functionality will be removed Resolver.updateResolveDocument in a future version. ***");
       const templateInfo =
         this.tinaSchema.getTemplatesForCollectable(collection);
 
@@ -809,6 +810,24 @@ export class Resolver {
     const collection = this.getCollectionWithName(collectionLookup);
     return { collection };
   };
+
+  /*
+   * Used for getDocument, get<Collection>Document.
+   */
+  public resolveRetrievedDocument = async({
+    collectionName,
+    relativePath
+  }: {
+    collectionName: string,
+    relativePath: string
+  }) => {
+    const collection = this.getCollectionWithName(collectionName);
+    const realPath = path.join(collection.path, relativePath);
+    return this.getDocument(realPath, {
+      collection,
+      checkReferences: true,
+    });
+  }
 
   public resolveDocument = async ({
     args,
