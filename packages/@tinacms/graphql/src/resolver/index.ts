@@ -660,7 +660,9 @@ export class Resolver {
      * TODO: Remove when `addPendingDocument` is no longer needed.
      */
     if (isAddPendingDocument === true) {
-      console.warn("*** DEPRECATION: isAddPendingDocument functionality will be removed Resolver.updateResolveDocument in a future version. ***");
+      console.warn(
+        '*** DEPRECATION: isAddPendingDocument functionality will be removed Resolver.updateResolveDocument in a future version. ***'
+      );
       const templateInfo =
         this.tinaSchema.getTemplatesForCollectable(collection);
 
@@ -814,12 +816,12 @@ export class Resolver {
   /*
    * Used for getDocument, get<Collection>Document.
    */
-  public resolveRetrievedDocument = async({
+  public resolveRetrievedDocument = async ({
     collectionName,
-    relativePath
+    relativePath,
   }: {
-    collectionName: string,
-    relativePath: string
+    collectionName: string;
+    relativePath: string;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
@@ -827,20 +829,24 @@ export class Resolver {
       collection,
       checkReferences: true,
     });
-  }
+  };
 
   /*
    * Used for createFolder, create<Collection>Folder
    */
-  public resolveCreateFolder = async({
+  public resolveCreateFolder = async ({
     collectionName,
-    relativePath
+    relativePath,
   }: {
-    collectionName: string,
-    relativePath: string
+    collectionName: string;
+    relativePath: string;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
-    const realPath = path.join(collection.path, relativePath, `.gitkeep.${collection.format || 'md'}`);
+    const realPath = path.join(
+      collection.path,
+      relativePath,
+      `.gitkeep.${collection.format || 'md'}`
+    );
     const alreadyExists = await this.database.documentExists(realPath);
     if (alreadyExists) {
       throw new Error(`Unable to add folder, ${realPath} already exists`);
@@ -851,16 +857,16 @@ export class Resolver {
       collection.name
     );
     return this.getDocument(realPath);
-  }
+  };
 
-  public resolveCreateDocument = async({
+  public resolveCreateDocument = async ({
     collectionName,
     relativePath,
-    args
+    args,
   }: {
-    collectionName: string,
-    relativePath: string,
-    args: Record<string, unknown>
+    collectionName: string;
+    relativePath: string;
+    args: Record<string, unknown>;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
@@ -873,10 +879,103 @@ export class Resolver {
       args.params[collection.name],
       collection
     );
-    // @ts-ignore
+    // @ts-expect-error
     await this.database.put(realPath, params, collection.name);
     return this.getDocument(realPath);
-  }
+  };
+
+  public resolveUpdateDocument = async ({
+    collectionName,
+    relativePath,
+    newRelativePath,
+    args,
+  }: {
+    collectionName: string;
+    relativePath: string;
+    newRelativePath?: string;
+    args: Record<string, unknown>;
+  }) => {
+    const collection = this.getCollectionWithName(collectionName);
+    const realPath = path.join(collection.path, relativePath);
+    const alreadyExists = await this.database.documentExists(realPath);
+    if (!alreadyExists) {
+      throw new Error(`Unable to update document, ${realPath} does not exist`);
+    }
+
+    const doc = await this.getDocument(realPath);
+
+    if (newRelativePath) {
+      const newRealPath = path.join(collection?.path, newRelativePath);
+
+      // don't update if the paths are the same
+      if (newRealPath === realPath) {
+        return doc;
+      }
+
+      // Update the document
+      await this.database.put(newRealPath, doc._rawData, collection.name);
+      // Delete the old document
+      await this.deleteDocument(realPath);
+      // Update references to the document
+      const collRefs = await this.findReferences(realPath, collection);
+      for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
+        for (const [pathToDocWithRef, referencePaths] of Object.entries(
+          docsWithRefs
+        )) {
+          // load the document with the references
+          let docWithRef = await this.getRaw(pathToDocWithRef);
+
+          let hasUpdate = false;
+          // update each reference to the updated document
+          for (const path of referencePaths) {
+            const { object, updated } = updateObjectWithJsonPath(
+              docWithRef,
+              path,
+              realPath,
+              newRealPath
+            );
+            docWithRef = object;
+            hasUpdate = updated || hasUpdate;
+          }
+
+          // save the updated document
+          if (hasUpdate) {
+            // lookup collection for the document with the references
+            const collectionWithRef =
+              this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
+            if (!collectionWithRef) {
+              throw new Error(
+                `Unable to find collection for ${pathToDocWithRef}`
+              );
+            }
+
+            await this.database.put(
+              pathToDocWithRef,
+              docWithRef,
+              collectionWithRef.name
+            );
+          }
+        }
+      }
+      return this.getDocument(newRealPath);
+    }
+
+    const params = await this.buildObjectMutations(
+      args.params[collection.name],
+      collection,
+      doc?._rawData
+    );
+    const legacyValues = this.resolveLegacyValues(
+      doc?._rawData || {},
+      collection
+    );
+    await this.database.put(
+      realPath,
+      { ...legacyValues, ...params },
+      collection.name
+    );
+    return this.getDocument(realPath);
+  };
 
   public resolveDocument = async ({
     args,

@@ -199,13 +199,13 @@ export const resolve = async ({
           const isCreation = lookup[info.fieldName] === 'create';
           const isMutation = info.parentType.toString() === 'Mutation';
 
-          /**
+          /*
            * From here, we need more information on how to resolve this, aided
            * by the lookup value for the given return type, we can enrich the request
            * with more contextual information that we gathered at build-time.
            */
           switch (lookup.resolveType) {
-            /**
+            /*
              * `node(id: $id)`
              */
             case 'nodeDocument':
@@ -219,9 +219,7 @@ export const resolve = async ({
                 typeof possibleReferenceValue === 'string' &&
                 possibleReferenceValue !== ''
               ) {
-                /**
-                 * This is a reference value (`director: /path/to/george.md`)
-                 */
+                // This is a reference value (`director: /path/to/george.md`)
                 return resolver.getDocument(possibleReferenceValue);
               }
 
@@ -231,7 +229,7 @@ export const resolve = async ({
               }>(args, (yup) =>
                 yup.object({
                   collection: yup.string().required(),
-                  relativePath: yup.string().required()
+                  relativePath: yup.string().required(),
                 })
               );
 
@@ -252,11 +250,11 @@ export const resolve = async ({
                 if (isMutation) {
                   throw new Error(
                     'Tried to retrieve document within a mutation.'
-                  )
+                  );
                 }
                 return resolver.resolveRetrievedDocument({
                   collectionName: args.collection,
-                  relativePath: args.relativePath
+                  relativePath: args.relativePath,
                 });
               }
 
@@ -264,11 +262,11 @@ export const resolve = async ({
                 if (!isMutation) {
                   throw new Error(
                     'Tried to create a folder outside of a mutation.'
-                  )
+                  );
                 }
                 return resolver.resolveCreateFolder({
                   collectionName: args.collection,
-                  relativePath: args.relativePath
+                  relativePath: args.relativePath,
                 });
               }
 
@@ -276,20 +274,36 @@ export const resolve = async ({
                 if (!isMutation) {
                   throw new Error(
                     'Tried to create a document outside of a mutation.'
-                  )
+                  );
                 }
                 return resolver.resolveCreateDocument({
                   collectionName: args.collection,
                   relativePath: args.relativePath,
-                  args
+                  args,
+                });
+              }
+
+              if (info.fieldName === 'updateDocument') {
+                if (!isMutation) {
+                  throw new Error(
+                    'Tried to update a document outside of a mutation.'
+                  );
+                }
+                const newRelativePath = (
+                  (args as Record<string, unknown>).params as
+                    | undefined
+                    | Record<string, string>
+                )?.relativePath;
+                return resolver.resolveUpdateDocument({
+                  collectionName: args.collection,
+                  relativePath: args.relativePath,
+                  newRelativePath,
+                  args,
                 });
               }
 
               if (
-                [
-                  'updateDocument',
-                  'deleteDocument'
-                ].includes(info.fieldName)
+                ['deleteDocument'].includes(info.fieldName)
               ) {
                 assertShape<{
                   params?: { relativePath?: string };
