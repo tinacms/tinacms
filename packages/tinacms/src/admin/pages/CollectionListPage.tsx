@@ -163,8 +163,8 @@ export const handleNavigate = async (
         collection: collectionDefinition,
       })
     : routeMapping
-    ? routeMapping.mapper(collection, document)
-    : undefined;
+      ? routeMapping.mapper(collection, document)
+      : undefined;
 
   /**
    * Redirect the browser if 'yes', else navigate react-router.
@@ -661,8 +661,8 @@ const CollectionListPage = () => {
                                           align='center'
                                         >
                                           <p>
-                                            Folders can&apos;t be manually added when
-                                            using templates.
+                                            Folders can&apos;t be manually added
+                                            when using templates.
                                             <br />
                                             See the docs -{' '}
                                             <a
