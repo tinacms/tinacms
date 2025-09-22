@@ -5,12 +5,12 @@ import {
   GraphQLError,
   type GraphQLResolveInfo,
 } from 'graphql';
-import type { Collection } from '@tinacms/schema-tools';
+import type { Collection, TinaSchema } from '@tinacms/schema-tools';
 
 import type { GraphQLConfig } from './types';
 import type { Database } from './database';
 import { createSchema } from './schema/createSchema';
-import { createResolver } from './resolver';
+import { createResolver, Resolver } from './resolver';
 import { assertShape } from './util';
 import { NAMER } from './ast-builder';
 import { handleFetchErrorError } from './resolver/error';
@@ -20,6 +20,42 @@ import {
   handleUpdatePassword,
 } from './resolver/auth-fields';
 import { NotFoundError } from './error';
+
+const handleCollectionsField = (info: GraphQLResolveInfo, tinaSchema: TinaSchema, resolver: Resolver, args: unknown) => {
+  const collectionNode = info.fieldNodes.find(
+    (x) => x.name.value === 'collections'
+  );
+  const hasDocuments = collectionNode.selectionSet.selections.find(
+    (x) => x.kind == 'Field' && x?.name?.value === 'documents'
+  );
+  return tinaSchema.getCollections().map((collection) => {
+    return resolver.resolveCollection(
+      args,
+      collection.name,
+      Boolean(hasDocuments)
+    );
+  });
+};
+
+const handleCollectionField = (info: GraphQLResolveInfo, args: unknown, resolver: Resolver) => {
+  const collectionNode = info.fieldNodes.find(
+    (x) => x.name.value === 'collection'
+  );
+  const hasDocuments = collectionNode.selectionSet.selections.find(
+    (x) => x.kind == 'Field' && x?.name?.value === 'documents'
+  );
+  assertShape<{ collection: string }>(
+    args,
+    (yup) => yup.object({
+      collection: yup.string().required()
+    })
+  );
+  return resolver.resolveCollection(
+    args,
+    args.collection,
+    Boolean(hasDocuments)
+  );
+};
 
 export const resolve = async ({
   config,
@@ -102,39 +138,10 @@ export const resolve = async ({
               return possibleCollectionValue;
             }
             if (info.fieldName === 'collections') {
-              const collectionNode = info.fieldNodes.find(
-                (x) => x.name.value === 'collections'
-              );
-              const hasDocuments = collectionNode.selectionSet.selections.find(
-                (x) => x.kind == 'Field' && x?.name?.value === 'documents'
-              );
-              return tinaSchema.getCollections().map((collection) => {
-                return resolver.resolveCollection(
-                  args,
-                  collection.name,
-                  Boolean(hasDocuments)
-                );
-              });
+              return handleCollectionsField(info, tinaSchema, resolver, args);
             }
-
             // The field is `collection`
-            const collectionNode = info.fieldNodes.find(
-              (x) => x.name.value === 'collection'
-            );
-            const hasDocuments = collectionNode.selectionSet.selections.find(
-              (x) => x.kind == 'Field' && x?.name?.value === 'documents'
-            );
-            assertShape<{ collection: string }>(
-              args,
-              (yup) => yup.object({
-                collection: yup.string().required()
-              })
-            );
-            return resolver.resolveCollection(
-              args,
-              args.collection,
-              Boolean(hasDocuments)
-            );
+            return handleCollectionField(info, args, resolver);
           }
 
           if (info.fieldName === 'getOptimizedQuery') {
