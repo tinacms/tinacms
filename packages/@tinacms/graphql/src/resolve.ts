@@ -1,16 +1,17 @@
-/**
-
-*/
-
-import { graphql, buildASTSchema, getNamedType, GraphQLError } from 'graphql';
+import {
+  graphql,
+  buildASTSchema,
+  getNamedType,
+  GraphQLError,
+  type GraphQLResolveInfo,
+} from 'graphql';
 import type { Collection } from '@tinacms/schema-tools';
+
 import type { GraphQLConfig } from './types';
+import type { Database } from './database';
 import { createSchema } from './schema/createSchema';
 import { createResolver } from './resolver';
 import { assertShape } from './util';
-
-import type { GraphQLResolveInfo } from 'graphql';
-import type { Database } from './database';
 import { NAMER } from './ast-builder';
 import { handleFetchErrorError } from './resolver/error';
 import {
