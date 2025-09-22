@@ -106,10 +106,7 @@ export const resolve = async ({
                 (x) => x.name.value === 'collections'
               );
               const hasDocuments = collectionNode.selectionSet.selections.find(
-                (x) => {
-                  // @ts-ignore
-                  return x?.name?.value === 'documents';
-                }
+                (x) => x.kind == 'Field' && x?.name?.value === 'documents'
               );
               return tinaSchema.getCollections().map((collection) => {
                 return resolver.resolveCollection(
@@ -125,10 +122,7 @@ export const resolve = async ({
               (x) => x.name.value === 'collection'
             );
             const hasDocuments = collectionNode.selectionSet.selections.find(
-              (x) => {
-                // @ts-ignore
-                return x?.name?.value === 'documents';
-              }
+              (x) => x.kind == 'Field' && x?.name?.value === 'documents'
             );
             assertShape<{ collection: string }>(
               args,
