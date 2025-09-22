@@ -603,7 +603,7 @@ const CollectionListPage = () => {
                                     {" "}
                                     You have not configured search.{" "}
                                     <a
-                                      href="https://tina.io/docs/reference/search"
+                                      href="https://tina.io/docs/r/content-search"
                                       target="_blank"
                                       className="underline hover:text-blue-700 transition-all duration-150"
                                     >
@@ -666,12 +666,12 @@ const CollectionListPage = () => {
                                             <br />
                                             See the docs -{" "}
                                             <a
-                                              href="https://tina.io/docs/reference/templates"
+                                              href="https://tina.io/docs/r/content-modelling-templates"
                                               target="_blank"
                                               rel="noopener noreferrer"
                                               className="underline text-blue-500"
                                             >
-                                              https://tina.io/docs/reference/templates
+                                              https://tina.io/docs/r/content-modelling-templates
                                             </a>
                                           </p>
                                         </TooltipContent>

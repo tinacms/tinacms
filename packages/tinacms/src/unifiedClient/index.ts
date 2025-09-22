@@ -179,13 +179,13 @@ async function requestFromServer<DataType extends Record<string, any> = any>(
     throw new Error(
       `Server responded with status code ${res.status}, ${res.statusText}. ${
         additionalInfo ? additionalInfo : ''
-      } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
+      } Please see our FAQ for more information: https://tina.io/docs/r/FAQ/`
     );
   }
   const json = await res.json();
   if (json.errors && errorPolicyDefined === 'throw') {
     throw new Error(
-      `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
+      `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/r/FAQ/
       Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
     );
   }

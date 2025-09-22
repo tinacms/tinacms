@@ -768,12 +768,12 @@ async function request(args: {
     throw new Error(
       `Server responded with status code ${res.status}, ${res.statusText}. ${
         additionalInfo ? additionalInfo : ''
-      } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
+      } Please see our FAQ for more information: https://tina.io/docs/r/FAQ/`
     );
   }
   if (json.errors) {
     throw new Error(
-      `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
+      `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/r/FAQ/
 
       Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
     );

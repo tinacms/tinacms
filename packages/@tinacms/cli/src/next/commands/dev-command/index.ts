@@ -304,11 +304,11 @@ export class DevCommand extends BaseCommand {
         //   subItems: [
         //     {
         //       key: 'Custom queries',
-        //       value: 'https://tina.io/querying',
+        //       value: 'https://tina.io/docs/r/content-api-overview',
         //     },
         //     {
         //       key: 'Visual editing',
-        //       value: 'https://tina.io/visual-editing',
+        //       value: 'https://tina.io/docs/r/visual-editing-setup',
         //     },
         //   ],
         // },
