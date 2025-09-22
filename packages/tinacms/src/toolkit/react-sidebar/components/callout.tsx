@@ -1,17 +1,17 @@
-import * as React from "react";
-import { cn } from "../../../lib/utils";
-import { MdCheckCircle, MdError, MdInfo, MdWarning } from "react-icons/md";
+import * as React from 'react';
+import { cn } from '../../../lib/utils';
+import { MdCheckCircle, MdError, MdInfo, MdWarning } from 'react-icons/md';
 
 export const Callout = ({
   children,
-  calloutStyle = "warning",
-  className = "",
+  calloutStyle = 'warning',
+  className = '',
   ...props
 }: {
   children?: React.ReactNode;
-  calloutStyle?: "warning" | "info" | "success" | "error";
+  calloutStyle?: 'warning' | 'info' | 'success' | 'error';
 } & React.HTMLProps<HTMLDivElement>) => {
-  const commonAlertStyles = "ml-8 text-sm px-4 py-3 rounded-md border";
+  const commonAlertStyles = 'ml-8 text-sm px-4 py-3 rounded-md border';
 
   const styles = {
     warning: `text-amber-700 bg-amber-100 border-amber-700/20`,
@@ -22,16 +22,16 @@ export const Callout = ({
 
   const icon = {
     warning: (
-      <MdWarning className="w-5 h-auto inline-block mr-1 opacity-70 text-amber-600" />
+      <MdWarning className='w-5 h-auto inline-block mr-1 opacity-70 text-amber-600' />
     ),
     info: (
-      <MdInfo className="w-5 h-auto inline-block mr-1 opacity-70 text-[#1D4ED8]" />
+      <MdInfo className='w-5 h-auto inline-block mr-1 opacity-70 text-[#1D4ED8]' />
     ),
     success: (
-      <MdCheckCircle className="w-5 h-auto inline-block mr-1 opacity-70 text-green-600" />
+      <MdCheckCircle className='w-5 h-auto inline-block mr-1 opacity-70 text-green-600' />
     ),
     error: (
-      <MdError className="w-5 h-auto inline-block mr-1 opacity-70 text-red-600" />
+      <MdError className='w-5 h-auto inline-block mr-1 opacity-70 text-red-600' />
     ),
   };
 

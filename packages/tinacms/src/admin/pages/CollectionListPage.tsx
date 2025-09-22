@@ -4,8 +4,8 @@ import {
   MenuItem,
   MenuItems,
   Transition,
-} from "@headlessui/react";
-import type { Collection, TinaField } from "@tinacms/schema-tools";
+} from '@headlessui/react';
+import type { Collection, TinaField } from '@tinacms/schema-tools';
 import {
   BaseTextField,
   Button,
@@ -21,8 +21,8 @@ import {
   PopupModal,
   Select,
   type TinaCMS,
-} from "@tinacms/toolkit";
-import React, { useEffect, useState } from "react";
+} from '@tinacms/toolkit';
+import React, { useEffect, useState } from 'react';
 import {
   BiArrowBack,
   BiCopy,
@@ -34,38 +34,38 @@ import {
   BiSearch,
   BiTrash,
   BiX,
-} from "react-icons/bi";
-import { FaFile, FaFolder } from "react-icons/fa";
-import { RiHome2Line } from "react-icons/ri";
+} from 'react-icons/bi';
+import { FaFile, FaFolder } from 'react-icons/fa';
+import { RiHome2Line } from 'react-icons/ri';
 import {
   Link,
   type NavigateFunction,
   useLocation,
   useNavigate,
   useParams,
-} from "react-router-dom";
-import { cn } from "../../lib/utils";
-import type { TinaAdminApi } from "../api";
-import GetCMS from "../components/GetCMS";
-import GetCollection from "../components/GetCollection";
-import { PageBody, PageHeader, PageWrapper } from "../components/Page";
+} from 'react-router-dom';
+import { cn } from '../../lib/utils';
+import type { TinaAdminApi } from '../api';
+import GetCMS from '../components/GetCMS';
+import GetCollection from '../components/GetCollection';
+import { PageBody, PageHeader, PageWrapper } from '../components/Page';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../components/ui/tooltip";
-import type { RouteMappingPlugin } from "../plugins/route-mapping";
+} from '../components/ui/tooltip';
+import type { RouteMappingPlugin } from '../plugins/route-mapping';
 import type {
   CollectionResponse,
   DocumentSys,
   TemplateResponse,
-} from "../types";
-import { type CollectionFolder, useCollectionFolder } from "./utils";
-import { Callout } from "@toolkit/react-sidebar/components/callout";
+} from '../types';
+import { type CollectionFolder, useCollectionFolder } from './utils';
+import { Callout } from '@toolkit/react-sidebar/components/callout';
 
-const LOCAL_STORAGE_KEY = "tinacms.admin.collection.list.page";
-const isSSR = typeof window === "undefined";
+const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page';
+const isSSR = typeof window === 'undefined';
 
 const TemplateMenu = ({
   templates,
