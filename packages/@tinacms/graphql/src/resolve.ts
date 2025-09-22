@@ -233,84 +233,47 @@ export const resolve = async ({
                 })
               );
 
-              if (info.fieldName === 'addPendingDocument') {
-                if (!isMutation) {
-                  throw new Error(
-                    'Tried to call addPendingDocument outside of a mutation.'
-                  );
+              if (isMutation) {
+                switch (info.fieldName) {
+                  case 'addPendingDocument':
+                    return resolver.resolveAddPendingDocument({
+                      collectionName: args.collection,
+                      relativePath: args.relativePath,
+                      args,
+                    });
+                  case 'createFolder':
+                    return resolver.resolveCreateFolder({
+                      collectionName: args.collection,
+                      relativePath: args.relativePath,
+                    });
+                  case 'createDocument':
+                    return resolver.resolveCreateDocument({
+                      collectionName: args.collection,
+                      relativePath: args.relativePath,
+                      args,
+                    });
+                  case 'updateDocument':
+                    const newRelativePath = (
+                      (args as Record<string, unknown>).params as
+                        | undefined
+                        | Record<string, string>
+                    )?.relativePath;
+                    return resolver.resolveUpdateDocument({
+                      collectionName: args.collection,
+                      relativePath: args.relativePath,
+                      newRelativePath,
+                      args,
+                    });
+                  case 'deleteDocument':
+                    return resolver.resolveDeleteDocument({
+                      collectionName: args.collection,
+                      relativePath: args.relativePath
+                    });
                 }
-                return resolver.resolveAddPendingDocument({
-                  collectionName: args.collection,
-                  relativePath: args.relativePath,
-                  args,
-                });
-              }
-
-              if (info.fieldName === NAMER.documentQueryName()) {
-                if (isMutation) {
-                  throw new Error(
-                    'Tried to retrieve document within a mutation.'
-                  );
-                }
+              } else if (info.fieldName === NAMER.documentQueryName()) {
                 return resolver.resolveRetrievedDocument({
                   collectionName: args.collection,
                   relativePath: args.relativePath,
-                });
-              }
-
-              if (info.fieldName === 'createFolder') {
-                if (!isMutation) {
-                  throw new Error(
-                    'Tried to create a folder outside of a mutation.'
-                  );
-                }
-                return resolver.resolveCreateFolder({
-                  collectionName: args.collection,
-                  relativePath: args.relativePath,
-                });
-              }
-
-              if (info.fieldName === 'createDocument') {
-                if (!isMutation) {
-                  throw new Error(
-                    'Tried to create a document outside of a mutation.'
-                  );
-                }
-                return resolver.resolveCreateDocument({
-                  collectionName: args.collection,
-                  relativePath: args.relativePath,
-                  args,
-                });
-              }
-
-              if (info.fieldName === 'updateDocument') {
-                if (!isMutation) {
-                  throw new Error(
-                    'Tried to update a document outside of a mutation.'
-                  );
-                }
-                const newRelativePath = (
-                  (args as Record<string, unknown>).params as
-                    | undefined
-                    | Record<string, string>
-                )?.relativePath;
-                return resolver.resolveUpdateDocument({
-                  collectionName: args.collection,
-                  relativePath: args.relativePath,
-                  newRelativePath,
-                  args,
-                });
-              }
-
-              if (info.fieldName === 'deleteDocument') {
-                if (!isMutation) {
-                  throw new Error(
-                    'Tried to delete a document outside of a deletion.'
-                  );
-                }
-                return resolver.resolveDeleteDocument({
-                  collectionName: args.collection,
-                  relativePath: args.relativePath
                 });
               }
 
