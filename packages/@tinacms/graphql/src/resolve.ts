@@ -302,38 +302,18 @@ export const resolve = async ({
                 });
               }
 
-              if (
-                ['deleteDocument'].includes(info.fieldName)
-              ) {
-                assertShape<{
-                  params?: { relativePath?: string };
-                }>(args, (yup) =>
-                  yup.object({
-                    params: yup
-                      .object({
-                        relativePath: yup.string().optional(),
-                      })
-                      .optional(),
-                  })
-                );
-                /**
-                 * `getDocument`/`createDocument`/`updateDocument`/`deleteDocument`/`createFolder`
-                 */
-                const result = await resolver.resolveDocument({
-                  args,
-                  collection: args.collection,
-                  isMutation,
-                  isCreation,
-                  // Right now this is the only case for deletion
-                  isDeletion: info.fieldName === 'deleteDocument',
-                  isFolderCreation: false,
-                  isUpdateName: Boolean(args?.params?.relativePath),
-                  isAddPendingDocument: false,
-                  isCollectionSpecific: false,
+              if (info.fieldName === 'deleteDocument') {
+                if (!isMutation) {
+                  throw new Error(
+                    'Tried to delete a document outside of a deletion.'
+                  );
+                }
+                return resolver.resolveDeleteDocument({
+                  collectionName: args.collection,
+                  relativePath: args.relativePath
                 });
-
-                return result;
               }
+
               return possibleReferenceValue;
             /**
              * eg `getMovieDocument.data.actors`

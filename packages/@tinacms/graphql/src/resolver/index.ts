@@ -977,6 +977,65 @@ export class Resolver {
     return this.getDocument(realPath);
   };
 
+  public resolveDeleteDocument = async({
+    collectionName,
+    relativePath
+  }: {
+    collectionName: string,
+    relativePath: string
+  }) => {
+    const collection = this.getCollectionWithName(collectionName);
+    const realPath = path.join(collection.path, relativePath);
+    const alreadyExists = await this.database.documentExists(realPath);
+    if (!alreadyExists) {
+      throw new Error(`Unable to delete document, ${realPath} does not exist`);
+    }
+
+    const doc = await this.getDocument(realPath);
+    await this.deleteDocument(realPath);
+    if (await this.hasReferences(realPath, collection)) {
+      const collRefs = await this.findReferences(realPath, collection);
+      for (const [_collection, docsWithRefs] of Object.entries(collRefs)) {
+        for (const [pathToDocWithRef, referencePaths] of Object.entries(
+          docsWithRefs
+        )) {
+          // load the doc with the references
+          let refDoc = await this.getRaw(pathToDocWithRef);
+
+          let hasUpdate = false;
+          // Update each reference to the deleted document
+          for (const path of referencePaths) {
+            const { object, updated } = updateObjectWithJsonPath(
+              refDoc,
+              path,
+              realPath,
+              null
+            );
+            refDoc = object;
+            hasUpdate = updated || hasUpdate;
+          }
+
+          if (hasUpdate) {
+            const collectionWithRef =
+              this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
+            if (!collectionWithRef) {
+              throw new Error(
+                `Unable to find collection for ${pathToDocWithRef}`
+              );
+            }
+            // save the updated doc
+            await this.database.put(
+              pathToDocWithRef,
+              refDoc,
+              collectionWithRef.name
+            );
+          }
+        }
+      }
+    }
+    return doc;
+  }
+
   public resolveDocument = async ({
     args,
     collection: collectionName,
