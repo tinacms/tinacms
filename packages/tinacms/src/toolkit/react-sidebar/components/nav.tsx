@@ -145,7 +145,7 @@ export const Nav = ({
                 {isLocalMode && (
                   <span className='flex items-center'>
                     <a
-                      href='https://tina.io/docs/schema/#defining-collections'
+                      href='https://tina.io/docs/r/content-modelling-collections'
                       target='_blank'
                     >
                       <FiInfo />

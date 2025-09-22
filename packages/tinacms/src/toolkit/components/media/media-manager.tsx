@@ -111,7 +111,7 @@ type MediaListState = 'loading' | 'loaded' | 'error' | 'not-configured';
 const defaultListError = new MediaListError({
   title: 'Error fetching media',
   message: 'Something went wrong while requesting the resource.',
-  docsLink: 'https://tina.io/docs/media/#media-store',
+  docsLink: 'https://tina.io/docs/r/repo-based-media',
 });
 
 export function MediaPicker({
@@ -372,7 +372,7 @@ export function MediaPicker({
       <DocsLink
         title='No Media Store Configured'
         message='To use the media manager, you need to configure a Media Store.'
-        docsLink='https://tina.io/docs/reference/media/overview/'
+        docsLink='https://tina.io/docs/r/repo-based-media'
       />
     );
   }
