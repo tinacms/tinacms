@@ -263,7 +263,7 @@ export const resolve = async ({
               if (info.fieldName === 'createFolder') {
                 if (!isMutation) {
                   throw new Error(
-                    'Tried to create a folder within a mutation.'
+                    'Tried to create a folder outside of a mutation.'
                   )
                 }
                 return resolver.resolveCreateFolder({
@@ -272,9 +272,21 @@ export const resolve = async ({
                 });
               }
 
+              if (info.fieldName === 'createDocument') {
+                if (!isMutation) {
+                  throw new Error(
+                    'Tried to create a document outside of a mutation.'
+                  )
+                }
+                return resolver.resolveCreateDocument({
+                  collectionName: args.collection,
+                  relativePath: args.relativePath,
+                  args
+                });
+              }
+
               if (
                 [
-                  'createDocument',
                   'updateDocument',
                   'deleteDocument'
                 ].includes(info.fieldName)

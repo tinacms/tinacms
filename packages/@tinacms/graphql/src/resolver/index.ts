@@ -853,6 +853,31 @@ export class Resolver {
     return this.getDocument(realPath);
   }
 
+  public resolveCreateDocument = async({
+    collectionName,
+    relativePath,
+    args
+  }: {
+    collectionName: string,
+    relativePath: string,
+    args: Record<string, unknown>
+  }) => {
+    const collection = this.getCollectionWithName(collectionName);
+    const realPath = path.join(collection.path, relativePath);
+    const alreadyExists = await this.database.documentExists(realPath);
+    if (alreadyExists) {
+      throw new Error(`Unable to add document, ${realPath} already exists`);
+    }
+
+    const params = await this.buildObjectMutations(
+      args.params[collection.name],
+      collection
+    );
+    // @ts-ignore
+    await this.database.put(realPath, params, collection.name);
+    return this.getDocument(realPath);
+  }
+
   public resolveDocument = async ({
     args,
     collection: collectionName,
@@ -883,7 +908,7 @@ export class Resolver {
     assertShape<{ relativePath: string }>(args, (yup) =>
       yup.object({ relativePath: yup.string().required() })
     );
-    let realPath = path.join(collection?.path, args.relativePath);
+    let realPath = path.join(collection.path, args.relativePath);
     if (isFolderCreation) {
       realPath = path.join(realPath, `.gitkeep.${collection.format || 'md'}`);
     }
