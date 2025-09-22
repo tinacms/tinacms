@@ -86,18 +86,20 @@ export const resolve = async ({
         _context: object,
         info: GraphQLResolveInfo
       ) => {
-        try {
-          const returnType = getNamedType(info.returnType).toString();
-          const lookup = await database.getLookup(returnType);
-          const isMutation = info.parentType.toString() === 'Mutation';
-          const value = source[info.fieldName];
+        // console.log("Path is: ");
+        // console.log(info.path);
+        // console.log("Field name");
+        // console.log(info.fieldName);
 
+        try {
           /**
            * `collection`
            */
+          const returnType = getNamedType(info.returnType).toString();
           if (returnType === 'Collection') {
-            if (value) {
-              return value;
+            const possibleCollectionValue = source[info.fieldName];
+            if (possibleCollectionValue) {
+              return possibleCollectionValue;
             }
             if (info.fieldName === 'collections') {
               const collectionNode = info.fieldNodes.find(
@@ -180,12 +182,14 @@ export const resolve = async ({
             });
           }
 
+          const lookup = await database.getLookup(returnType);
           // We assume the value is already fully resolved
           if (!lookup) {
-            return value;
+            return source[info.fieldName];
           }
 
           const isCreation = lookup[info.fieldName] === 'create';
+          const isMutation = info.parentType.toString() === 'Mutation';
 
           /**
            * From here, we need more information on how to resolve this, aided
@@ -202,11 +206,12 @@ export const resolve = async ({
               );
               return resolver.getDocument(args.id);
             case 'multiCollectionDocument':
-              if (typeof value === 'string' && value !== '') {
+              const possibleReferenceValue = source[info.fieldName];
+              if (typeof possibleReferenceValue === 'string' && possibleReferenceValue !== '') {
                 /**
                  * This is a reference value (`director: /path/to/george.md`)
                  */
-                return resolver.getDocument(value);
+                return resolver.getDocument(possibleReferenceValue);
               }
               if (info.fieldName === 'addPendingDocument') {
                 assertShape<{ collection: string }>(
@@ -268,23 +273,24 @@ export const resolve = async ({
 
                 return result;
               }
-              return value;
+              return possibleReferenceValue;
             /**
              * eg `getMovieDocument.data.actors`
              */
             case 'multiCollectionDocumentList':
-              if (Array.isArray(value)) {
+              const listValue = source[info.fieldName];
+              if (Array.isArray(listValue)) {
                 return {
-                  totalCount: value.length,
-                  edges: value.map((document) => {
+                  totalCount: listValue.length,
+                  edges: listValue.map((document) => {
                     return { node: document };
                   }),
                 };
               }
               if (
                 info.fieldName === 'documents' &&
-                value?.collection &&
-                value?.hasDocuments
+                listValue?.collection &&
+                listValue?.hasDocuments
               ) {
                 const documentsArgs = args as {
                   filter?: Record<string, any>;
@@ -293,7 +299,7 @@ export const resolve = async ({
                 };
 
                 // When querying for documents, filter has shape filter { [collectionName]: { ... }} but we need to pass the filter directly to the resolver
-                const collectionName = (value.collection as { name?: string })?.name;
+                const collectionName = (listValue.collection as { name?: string })?.name;
                 const filter = (collectionName && documentsArgs.filter?.[collectionName]) ?? documentsArgs.filter;
                 // use the collection and hasDocuments to resolve the documents
                 return resolver.resolveCollectionConnection({
@@ -301,7 +307,7 @@ export const resolve = async ({
                     ...documentsArgs,
                     filter,
                   },
-                  collection: value.collection as Collection<true>,
+                  collection: listValue.collection as Collection<true>,
                 });
               }
               throw new Error(
@@ -315,11 +321,7 @@ export const resolve = async ({
              * the field will be `node`
              */
             case 'collectionDocument': {
-              if (value) {
-                return value;
-              }
-              const result =
-                value ||
+              return source[info.fieldName] ||
                 (await resolver.resolveDocument({
                   args,
                   collection: lookup.collection,
@@ -328,7 +330,6 @@ export const resolve = async ({
                   isAddPendingDocument: false,
                   isCollectionSpecific: true,
                 }));
-              return result;
             }
             /**
              * Collections-specific list getter
@@ -362,7 +363,8 @@ export const resolve = async ({
               // `unionData` is used by the typeResolver, need to keep this check in-place
               // This is an array in many cases so it's easier to just pass it through
               // to be handled by the `typeResolver`
-              if (!value) {
+              const unionValue = source[info.fieldName];
+              if (!unionValue) {
                 const unionArgs = args as { relativePath?: string };
                 if (unionArgs.relativePath) {
                   // FIXME: unionData doesn't have enough info
@@ -377,7 +379,7 @@ export const resolve = async ({
                   return result;
                 }
               }
-              return value;
+              return unionValue;
             default:
               console.error(lookup);
               throw new Error('Unexpected resolve type');
