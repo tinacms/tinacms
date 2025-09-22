@@ -829,6 +829,30 @@ export class Resolver {
     });
   }
 
+  /*
+   * Used for createFolder, create<Collection>Folder
+   */
+  public resolveCreateFolder = async({
+    collectionName,
+    relativePath
+  }: {
+    collectionName: string,
+    relativePath: string
+  }) => {
+    const collection = this.getCollectionWithName(collectionName);
+    const realPath = path.join(collection.path, relativePath, `.gitkeep.${collection.format || 'md'}`);
+    const alreadyExists = await this.database.documentExists(realPath);
+    if (alreadyExists) {
+      throw new Error(`Unable to add folder, ${realPath} already exists`);
+    }
+    await this.database.put(
+      realPath,
+      { _is_tina_folder_placeholder: true },
+      collection.name
+    );
+    return this.getDocument(realPath);
+  }
+
   public resolveDocument = async ({
     args,
     collection: collectionName,

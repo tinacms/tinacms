@@ -224,18 +224,18 @@ export const resolve = async ({
                  */
                 return resolver.getDocument(possibleReferenceValue);
               }
-              /**
-               * `addPendingDocument`
-               */
+
+              assertShape<{
+                collection: string;
+                relativePath: string;
+              }>(args, (yup) =>
+                yup.object({
+                  collection: yup.string().required(),
+                  relativePath: yup.string().required()
+                })
+              );
+
               if (info.fieldName === 'addPendingDocument') {
-                assertShape<{ collection: string; relativePath: string }>(
-                  args,
-                  (yup) =>
-                    yup.object({
-                      collection: yup.string().required(),
-                      relativePath: yup.string().required(),
-                    })
-                );
                 if (!isMutation) {
                   throw new Error(
                     'Tried to call addPendingDocument outside of a mutation.'
@@ -247,23 +247,42 @@ export const resolve = async ({
                   args,
                 });
               }
+
+              if (info.fieldName === NAMER.documentQueryName()) {
+                if (isMutation) {
+                  throw new Error(
+                    'Tried to retrieve document within a mutation.'
+                  )
+                }
+                return resolver.resolveRetrievedDocument({
+                  collectionName: args.collection,
+                  relativePath: args.relativePath
+                });
+              }
+
+              if (info.fieldName === 'createFolder') {
+                if (!isMutation) {
+                  throw new Error(
+                    'Tried to create a folder within a mutation.'
+                  )
+                }
+                return resolver.resolveCreateFolder({
+                  collectionName: args.collection,
+                  relativePath: args.relativePath
+                });
+              }
+
               if (
                 [
-                  NAMER.documentQueryName(),
                   'createDocument',
                   'updateDocument',
-                  'deleteDocument',
-                  'createFolder',
+                  'deleteDocument'
                 ].includes(info.fieldName)
               ) {
                 assertShape<{
-                  collection: string;
-                  relativePath?: string;
                   params?: { relativePath?: string };
                 }>(args, (yup) =>
                   yup.object({
-                    collection: yup.string().required(),
-                    relativePath: yup.string().optional(),
                     params: yup
                       .object({
                         relativePath: yup.string().optional(),
@@ -281,7 +300,7 @@ export const resolve = async ({
                   isCreation,
                   // Right now this is the only case for deletion
                   isDeletion: info.fieldName === 'deleteDocument',
-                  isFolderCreation: info.fieldName === 'createFolder',
+                  isFolderCreation: false,
                   isUpdateName: Boolean(args?.params?.relativePath),
                   isAddPendingDocument: false,
                   isCollectionSpecific: false,
