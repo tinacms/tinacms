@@ -239,7 +239,7 @@ export const resolve = async ({
                     return resolver.resolveAddPendingDocument({
                       collectionName: args.collection,
                       relativePath: args.relativePath,
-                      args,
+                      templateName: (args as { template?: string }).template,
                     });
                   case 'createFolder':
                     return resolver.resolveCreateFolder({
@@ -252,18 +252,29 @@ export const resolve = async ({
                       relativePath: args.relativePath,
                       args,
                     });
-                  case 'updateDocument':
-                    const newRelativePath = (
-                      (args as Record<string, unknown>).params as
-                        | undefined
-                        | Record<string, string>
-                    )?.relativePath;
+                  case 'updateDocument': {
+                    assertShape<{
+                      params: {
+                        relativePath: string;
+                        // [args.collection]: Record<string, unknown>; .. effectively.
+                      }
+                    }>(args, (yup) =>
+                      yup.object({
+                        params: yup.object().shape({
+                          relativePath: yup.string().optional(),
+                          [args.collection]: yup.object().required()
+                        }).required()
+                      })
+                    );
+                    const newRelativePath = args.params.relativePath;
+                    const newBody = args.params[args.collection] as Record<string, unknown>;
                     return resolver.resolveUpdateDocument({
                       collectionName: args.collection,
                       relativePath: args.relativePath,
                       newRelativePath,
-                      args,
+                      newBody
                     });
+                  }
                   case 'deleteDocument':
                     return resolver.resolveDeleteDocument({
                       collectionName: args.collection,
@@ -329,17 +340,47 @@ export const resolve = async ({
              * the field will be `node`
              */
             case 'collectionDocument': {
-              return (
-                source[info.fieldName] ||
-                (await resolver.resolveDocument({
-                  args,
-                  collection: lookup.collection,
-                  isMutation,
-                  isCreation,
-                  isAddPendingDocument: false,
-                  isCollectionSpecific: true,
-                }))
+              const possibleDocValue = source[info.fieldName];
+              if (possibleDocValue) {
+                return possibleDocValue;
+              }
+
+              assertShape<{
+                relativePath: string;
+              }>(args, (yup) =>
+                yup.object({
+                  relativePath: yup.string().required(),
+                })
               );
+
+              if (isMutation) {
+                if (isCreation) {
+                  return resolver.resolveCreateDocument({
+                    collectionName: lookup.collection,
+                    relativePath: args.relativePath,
+                    args
+                  });
+                } else {
+                  assertShape<{
+                      params: Record<string, unknown>
+                    }>(args, (yup) =>
+                      yup.object({
+                        params: yup.object().required()
+                      })
+                    );
+                  // Note that document renaming is not supported.
+                  return resolver.resolveUpdateDocument({
+                    collectionName: lookup.collection,
+                    relativePath: args.relativePath,
+                    newBody: args.params
+                  });
+                }
+              } else {
+                return resolver.resolveRetrievedDocument({
+                  collectionName: lookup.collection,
+                  relativePath: args.relativePath
+                });
+              }
             }
             /**
              * Collections-specific list getter

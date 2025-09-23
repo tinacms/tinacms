@@ -558,11 +558,11 @@ export class Resolver {
   public resolveAddPendingDocument = async ({
     collectionName,
     relativePath,
-    args,
+    templateName
   }: {
     collectionName: string;
     relativePath: string;
-    args: unknown;
+    templateName: string;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
@@ -579,8 +579,8 @@ export class Resolver {
         break;
       case 'union':
         // @ts-ignore
-        const templateString = args.template;
-        if (!templateString) {
+        // const templateString = args.template;
+        if (!templateName) {
           throw new Error(
             `Must specify a template when creating content for a collection with multiple templates. Possible templates are: ${templateInfo.templates
               .map((t) => lastItem(t.namespace))
@@ -589,11 +589,11 @@ export class Resolver {
         }
 
         const template = templateInfo.templates.find(
-          (template) => lastItem(template.namespace) === templateString
+          (template) => lastItem(template.namespace) === templateName
         );
         if (!template) {
           throw new Error(
-            `Expected to find template named ${templateString} in collection "${
+            `Expected to find template named ${templateName} in collection "${
               collection.name
             }" but none was found. Possible templates are: ${templateInfo.templates
               .map((t) => lastItem(t.namespace))
@@ -625,7 +625,7 @@ export class Resolver {
       return this.resolveAddPendingDocument({
         collectionName: collection.name,
         relativePath: path.relative(collection.path, realPath),
-        args,
+        templateName: (args as { template?: string }).template,
       });
     }
 
@@ -888,12 +888,12 @@ export class Resolver {
     collectionName,
     relativePath,
     newRelativePath,
-    args,
+    newBody
   }: {
     collectionName: string;
     relativePath: string;
     newRelativePath?: string;
-    args: Record<string, unknown>;
+    newBody?: Record<string, unknown>;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
@@ -961,7 +961,7 @@ export class Resolver {
     }
 
     const params = await this.buildObjectMutations(
-      args.params[collection.name],
+      newBody,
       collection,
       doc?._rawData
     );
