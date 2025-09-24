@@ -509,7 +509,7 @@ const CollectionListPage = () => {
 
                     <PageHeader>
                       <div className='w-full'>
-                        <h3 className='font-sans text-2xl text-gray-700'>
+                        <h3 className='font-sans text-2xl text-tina-orange'>
                           {collection.label
                             ? collection.label
                             : collection.name}
@@ -722,11 +722,11 @@ const CollectionListPage = () => {
                             </em>
                           </p>
                         )}
-                        <div className='w-full overflow-x-auto'>
+                        <div className='w-full overflow-x-auto shadow-md rounded-md'>
                           {((folder.name && !search) ||
                             documents.length > 0) && (
                             <table className='table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg'>
-                              <tbody className='divide-y divide-gray-150'>
+                              <tbody>
                                 {folder.name && !search ? (
                                   <tr>
                                     <td colSpan={5}>
@@ -808,6 +808,7 @@ const CollectionListPage = () => {
 
                                     return (
                                       <tr
+                                        className='hover:bg-gray-100 transition-colors duration-300'
                                         key={`document-${document.node._sys.relativePath}`}
                                       >
                                         <td
