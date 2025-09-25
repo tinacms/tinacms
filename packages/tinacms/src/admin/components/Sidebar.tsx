@@ -20,6 +20,7 @@ export const slugify = (text) => {
 };
 
 const Sidebar = ({ cms }: { cms: TinaCMS }) => {
+  const branchName  = cms.api.tina.branch;
   const collectionsInfo = useGetCollections(cms);
   const screens = cms.plugins.getType<ScreenPlugin>('screen').all();
   const cloudConfigs = cms.plugins
@@ -47,10 +48,13 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
       screens={activeScreens}
       cloudConfigs={cloudConfigs}
       contentCreators={[]}
+      branchName={branchName}
       RenderNavSite={({ view }) => (
         <SidebarLink
           label={view.name}
-          to={`/screens/${slugify(view.name)}`}
+          to={`/${encodeURIComponent(branchName)}/screens/${slugify(
+            view.name
+          )}`}
           Icon={view.Icon ? view.Icon : ImFilesEmpty}
         />
       )}
@@ -58,14 +62,18 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
       RenderNavCollection={({ collection }) => (
         <SidebarLink
           label={collection.label ? collection.label : collection.name}
-          to={`/collections/${collection.name}/~`}
+          to={`/${encodeURIComponent(branchName)}/collections/${
+            collection.name
+          }/~`}
           Icon={ImFilesEmpty}
         />
       )}
       AuthRenderNavCollection={({ collection }) => (
         <SidebarLink
           label={collection.label ? collection.label : collection.name}
-          to={`/collections/${collection.name}/~`}
+          to={`/${encodeURIComponent(branchName)}/collections/${
+            collection.name
+          }/~`}
           Icon={ImUsers}
         />
       )}

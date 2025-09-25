@@ -78,6 +78,7 @@ interface SidebarProps {
   defaultState?: SidebarStateOptions['defaultState'];
   position?: SidebarStateOptions['position'];
   renderNav?: boolean;
+  branchName?: string;
 }
 
 const useFetchCollections = (cms) => {
@@ -92,6 +93,7 @@ const Sidebar = ({
   renderNav,
   resizingSidebar,
   setResizingSidebar,
+  branchName,
 }: SidebarProps) => {
   const cms = useCMS();
   const collectionsInfo = useFetchCollections(cms);
@@ -274,6 +276,7 @@ const Sidebar = ({
                 cloudConfigs={allConfigs}
                 contentCreators={contentCreators}
                 sidebarWidth={sidebarWidth}
+                branchName={branchName}
                 RenderNavSite={({ view }) => (
                   <SidebarSiteLink
                     view={view}
@@ -292,6 +295,7 @@ const Sidebar = ({
                       setMenuIsOpen(false);
                     }}
                     collection={collection}
+                    branchName={branchName}
                   />
                 )}
                 AuthRenderNavCollection={({ collection }) => (
@@ -301,6 +305,7 @@ const Sidebar = ({
                     }}
                     collection={collection}
                     Icon={ImUsers}
+                    branchName={branchName}
                   />
                 )}
               ></Nav>
@@ -454,6 +459,7 @@ const SidebarCollectionLink = ({
   Icon = ImFilesEmpty,
   collection,
   onClick,
+  branchName,
 }: {
   Icon?: IconType;
   collection: {
@@ -461,6 +467,7 @@ const SidebarCollectionLink = ({
     name: string;
   };
   onClick: () => void;
+  branchName?: string;
 }) => {
   const cms = useCMS();
   const tinaPreview = cms.flags.get('tina-preview') || false;
@@ -469,7 +476,7 @@ const SidebarCollectionLink = ({
       onClick={onClick}
       href={`${
         tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
-      }/collections/${collection.name}/~`}
+      }/${branchName}/collections/${collection.name}/~`}
       className='text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100'
     >
       <Icon className='mr-2 h-6 opacity-80 w-auto' />{' '}

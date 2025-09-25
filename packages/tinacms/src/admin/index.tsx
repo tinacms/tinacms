@@ -41,6 +41,14 @@ const Redirect = () => {
   return null;
 };
 
+const BranchRedirect = ({ branch }) => {
+  const navigate = useNavigate();
+  React.useEffect(() => {
+    navigate(`/${encodeURIComponent(branch)}`);
+  }, [branch]);
+  return null;
+};
+
 const MaybeRedirectToPreview = ({
   redirect,
   children,
@@ -50,12 +58,13 @@ const MaybeRedirectToPreview = ({
 }) => {
   const cms = useCMS();
   const navigate = useNavigate();
+  const branchName = cms.api.tina.branch;
   React.useEffect(() => {
     const basePath = cms.flags.get('tina-basepath');
     if (redirect) {
-      navigate(`/~${basePath ? `/${basePath}` : ''}`);
+      navigate(`/${encodeURIComponent(branchName)}/~${basePath ? `/${basePath}` : ''}`);
     }
-  }, [redirect]);
+  }, [redirect, branchName]);
 
   return children;
 };
@@ -220,14 +229,14 @@ export const TinaAdmin = ({
                   <Routes>
                     {preview && (
                       <Route
-                        path='/~/*'
+                        path=':branchName/~/*'
                         element={
                           <PreviewInner config={config} preview={preview} />
                         }
                       />
                     )}
                     <Route
-                      path='graphql'
+                      path=':branchName/graphql'
                       element={
                         <PlainLayout>
                           <Playground />
@@ -235,7 +244,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path='collections/new/:collectionName'
+                      path=':branchName/collections/new/:collectionName'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionCreatePage />
@@ -243,7 +252,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path='collections/duplicate/:collectionName/~/*'
+                      path=':branchName/collections/duplicate/:collectionName/~/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionDuplicatePage />
@@ -251,7 +260,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path='collections/duplicate/:collectionName/*'
+                      path=':branchName/collections/duplicate/:collectionName/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionDuplicatePage />
@@ -259,7 +268,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path='collections/new/:collectionName/:templateName'
+                      path=':branchName/collections/new/:collectionName/:templateName'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionCreatePage />
@@ -267,7 +276,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path='collections/new/:collectionName/:templateName/~/*'
+                      path=':branchName/collections/new/:collectionName/:templateName/~/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionCreatePage />
@@ -275,7 +284,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path='collections/new/:collectionName/~/*'
+                      path=':branchName/collections/new/:collectionName/~/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionCreatePage />
@@ -283,7 +292,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path='collections/edit/:collectionName/*'
+                      path=':branchName/collections/edit/:collectionName/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionUpdatePage />
@@ -291,7 +300,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path='collections/:collectionName/*'
+                      path=':branchName/collections/:collectionName/*'
                       element={
                         <DefaultWrapper cms={cms}>
                           <CollectionListPage />
@@ -299,7 +308,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path='screens/:screenName'
+                      path=':branchName/screens/:screenName'
                       element={
                         <DefaultWrapper cms={cms}>
                           <ScreenPage />
@@ -307,7 +316,7 @@ export const TinaAdmin = ({
                       }
                     />
                     <Route
-                      path='/'
+                      path=':branchName'
                       element={
                         <MaybeRedirectToPreview
                           redirect={!!preview && hasRouter}
@@ -317,6 +326,10 @@ export const TinaAdmin = ({
                           </DefaultWrapper>
                         </MaybeRedirectToPreview>
                       }
+                    />
+                    <Route
+                      path='/'
+                      element={<BranchRedirect branch={tinaClient.branch} />}
                     />
                   </Routes>
                 </Router>
@@ -346,6 +359,7 @@ const DefaultWrapper = ({
   cms: TinaCMS;
   children: React.ReactNode;
 }) => {
+  const branchName = cms.api.tina.branch;
   return (
     <Layout>
       <div className='flex items-stretch h-dvh overflow-hidden'>

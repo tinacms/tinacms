@@ -20,6 +20,7 @@ import {
   OverflowMenu,
   PopupModal,
   Select,
+  useCMS,
   type TinaCMS,
 } from '@tinacms/toolkit';
 import React, { useEffect, useState } from 'react';
@@ -70,10 +71,12 @@ const TemplateMenu = ({
   templates,
   folder,
   collectionName,
+  branchName,
 }: {
   collectionName: string;
   templates: TemplateResponse[];
   folder: CollectionFolder;
+  branchName: string;
 }) => {
   return (
     <Menu as='div' className='relative inline-block text-left'>
@@ -99,8 +102,9 @@ const TemplateMenu = ({
                   <MenuItem key={`${template.label}-${template.name}`}>
                     {({ focus }) => (
                       <Link
-                        to={`/${
-                          folder.fullyQualifiedName
+                        to={`/${[
+                          encodeURIComponent(branchName),
+                          ...(folder.fullyQualifiedName
                             ? [
                                 'collections',
                                 'new',
@@ -108,14 +112,14 @@ const TemplateMenu = ({
                                 template.name,
                                 '~',
                                 folder.name,
-                              ].join('/')
+                              ]
                             : [
                                 'collections',
                                 'new',
                                 collectionName,
                                 template.name,
-                              ].join('/')
-                        }`}
+                              ]),
+                        ].join('/')}`}
                         // to={`${template.name}/new`}
                         className={`w-full text-md px-4 py-2 tracking-wide flex items-center transition ease-out duration-100 ${
                           focus
@@ -144,7 +148,8 @@ export const handleNavigate = async (
   collection: CollectionResponse,
   // The actual Collection definition
   collectionDefinition: Collection<true>,
-  document: DocumentSys
+  document: DocumentSys,
+  branchName: string
 ) => {
   /**
    * Retrieve the RouteMapping Plugin
@@ -162,8 +167,8 @@ export const handleNavigate = async (
         collection: collectionDefinition,
       })
     : routeMapping
-      ? routeMapping.mapper(collection, document)
-      : undefined;
+    ? routeMapping.mapper(collection, document)
+    : undefined;
 
   /**
    * Redirect the browser if 'yes', else navigate react-router.
@@ -174,13 +179,19 @@ export const handleNavigate = async (
       routeOverride = routeOverride.slice(1);
     }
     tinaPreview
-      ? navigate(`/~/${routeOverride}`)
+      ? navigate(`/${encodeURIComponent(branchName)}/~/${routeOverride}`)
       : (window.location.href = routeOverride);
     return null;
   } else {
     const pathToDoc = document._sys.breadcrumbs;
     navigate(
-      `/${['collections', 'edit', collection.name, ...pathToDoc].join('/')}`,
+      `/${[
+        encodeURIComponent(branchName),
+        'collections',
+        'edit',
+        collection.name,
+        ...pathToDoc,
+      ].join('/')}`,
       { replace: true }
     );
   }
@@ -204,7 +215,9 @@ function getUniqueTemplateFields(collection: Collection<true>): TinaField[] {
 
 const CollectionListPage = () => {
   const navigate = useNavigate();
+  const cms = useCMS();
   const { collectionName } = useParams();
+  const branchName = cms.api.tina.branch;
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [renameModalOpen, setRenameModalOpen] = React.useState(false);
   const [folderModalOpen, setFolderModalOpen] = React.useState(false);
@@ -479,6 +492,7 @@ const CollectionListPage = () => {
                                 reFetchCollection();
                                 navigate(
                                   `/${[
+                                    encodeURIComponent(branchName),
                                     'collections',
                                     collectionName,
                                     '~',
@@ -677,21 +691,18 @@ const CollectionListPage = () => {
                               {!collection.templates && (
                                 <>
                                   <Link
-                                    to={`/${
-                                      folder.fullyQualifiedName
+                                    to={`/${[
+                                      encodeURIComponent(branchName),
+                                      ...(folder.fullyQualifiedName
                                         ? [
                                             'collections',
                                             'new',
                                             collectionName,
                                             '~',
                                             folder.name,
-                                          ].join('/')
-                                        : [
-                                            'collections',
-                                            'new',
-                                            collectionName,
-                                          ].join('/')
-                                    }`}
+                                          ]
+                                        : ['collections', 'new', collectionName]),
+                                    ].join('/')}`}
                                     className='inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 w-full md:w-auto text-sm h-10 px-6'
                                   >
                                     <FaFile className='mr-2' />
@@ -704,6 +715,7 @@ const CollectionListPage = () => {
                                   collectionName={collectionName}
                                   templates={collection.templates}
                                   folder={folder}
+                                  branchName={branchName}
                                 />
                               )}
                             </div>
@@ -734,6 +746,7 @@ const CollectionListPage = () => {
                                         folder={folder}
                                         navigate={navigate}
                                         collectionName={collectionName}
+                                        branchName={branchName}
                                       />
                                     </td>
                                   </tr>
@@ -751,6 +764,9 @@ const CollectionListPage = () => {
                                               onClick={() => {
                                                 navigate(
                                                   `/${[
+                                                    encodeURIComponent(
+                                                      branchName
+                                                    ),
                                                     'collections',
                                                     collectionName,
                                                     document.node.path,
@@ -823,7 +839,8 @@ const CollectionListPage = () => {
                                                 cms,
                                                 collection,
                                                 collectionDefinition,
-                                                document.node
+                                                document.node,
+                                                branchName
                                               );
                                             }}
                                           >
@@ -906,6 +923,9 @@ const CollectionListPage = () => {
                                                   }
                                                   navigate(
                                                     `/${[
+                                                      encodeURIComponent(
+                                                        branchName
+                                                      ),
                                                       'collections',
                                                       'edit',
                                                       collectionName,
@@ -930,6 +950,9 @@ const CollectionListPage = () => {
                                                   }
                                                   navigate(
                                                     `/${[
+                                                      encodeURIComponent(
+                                                        branchName
+                                                      ),
                                                       'collections',
                                                       'duplicate',
                                                       collectionName,
@@ -1102,7 +1125,7 @@ const SearchInput = ({
   );
 };
 
-const Breadcrumb = ({ folder, navigate, collectionName }) => {
+const Breadcrumb = ({ folder, navigate, collectionName, branchName }) => {
   const folderArray = folder.name.split('/');
 
   return (
@@ -1112,6 +1135,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
           const folders = folder.fullyQualifiedName.split('/');
           navigate(
             `/${[
+              branchName,
               'collections',
               collectionName,
               ...folders.slice(0, folders.length - 1),
@@ -1126,7 +1150,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
       <span className='px-3 py-2 text-gray-600 flex flex-wrap items-center justify-start gap-1'>
         <button
           onClick={() => {
-            navigate(`/collections/${collectionName}/~`, {
+            navigate(`/${branchName}/collections/${collectionName}/~`, {
               replace: true,
             });
           }}
@@ -1145,6 +1169,7 @@ const Breadcrumb = ({ folder, navigate, collectionName }) => {
                     const folders = folder.fullyQualifiedName.split('/');
                     navigate(
                       `/${[
+                        branchName,
                         'collections',
                         collectionName,
                         ...folders.slice(

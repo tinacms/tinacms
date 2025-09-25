@@ -34,6 +34,7 @@ interface NavProps {
   screens?: ScreenPlugin[];
   cloudConfigs?: CloudConfigPlugin[];
   sidebarWidth?: number;
+  branchName?: string;
   RenderNavSite: React.ComponentType<{ view: ScreenPlugin }>;
   RenderNavCloud: React.ComponentType<{ config: CloudConfigPlugin }>;
   RenderNavCollection: React.ComponentType<{
@@ -41,6 +42,7 @@ interface NavProps {
   }>;
   AuthRenderNavCollection: React.ComponentType<{
     collection: { label: string; name: string };
+    branchName?: string;
   }>;
 }
 
@@ -57,6 +59,7 @@ export const Nav = ({
   cloudConfigs,
   contentCreators,
   sidebarWidth,
+  branchName,
   RenderNavSite,
   RenderNavCloud,
   RenderNavCollection,
@@ -156,6 +159,7 @@ export const Nav = ({
               <CollectionsList
                 RenderNavCollection={RenderNavCollection}
                 collections={contentCollections}
+                branchName={branchName}
               />
             </>
           )}
@@ -185,6 +189,7 @@ export const Nav = ({
                   <CollectionsList
                     RenderNavCollection={AuthRenderNavCollection}
                     collections={[authCollection]}
+                    branchName={branchName}
                   />
                 )}
               </ul>
@@ -255,11 +260,14 @@ export const Nav = ({
 const CollectionsList = ({
   collections,
   RenderNavCollection,
+  branchName,
 }: {
   collections: { label?: string; name: string }[];
   RenderNavCollection: React.ComponentType<{
     collection: { label?: string; name: string };
+    branchName?: string;
   }>;
+  branchName?: string;
 }) => {
   if (collections.length === 0) {
     return <div>No collections found</div>;
@@ -270,7 +278,10 @@ const CollectionsList = ({
       {collections.map((collection) => {
         return (
           <li key={`nav-collection-${collection.name}`}>
-            <RenderNavCollection collection={collection} />
+            <RenderNavCollection
+              collection={collection}
+              branchName={branchName}
+            />
           </li>
         );
       })}
