@@ -150,7 +150,7 @@ export class TinaCMS extends CMS {
             name: 'Support',
             link: {
               text: 'Support',
-              href: 'https://tina.io/docs/support',
+              href: 'https://tina.io/docs/r/support',
             },
             Icon: MdOutlineHelpOutline,
           })

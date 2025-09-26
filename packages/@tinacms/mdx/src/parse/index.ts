@@ -93,9 +93,9 @@ export const mdxToAst = (value: string) => {
   return remark().use(remarkMdx).use(remarkGfm).parse(value);
 };
 export const MDX_PARSE_ERROR_MSG =
-  'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations';
+  'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/r/what-is-markdown';
 export const MDX_PARSE_ERROR_MSG_HTML =
-  'TinaCMS supports a stricter version of markdown and a subset of MDX. <a href="https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations" target="_blank" rel="noopener noreferrer">Learn More</a>';
+  'TinaCMS supports a stricter version of markdown and a subset of MDX. <a href="https://tina.io/docs/r/what-is-markdown" target="_blank" rel="noopener noreferrer">Learn More</a>';
 
 export const parseMDX = (
   value: string,

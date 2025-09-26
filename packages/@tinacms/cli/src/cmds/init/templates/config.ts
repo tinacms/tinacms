@@ -144,7 +144,7 @@ export const generateConfig = (args: ConfigTemplateArgs) => {
         publicFolder: "${args.publicFolder}",
       },
     },
-    // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/schema/
+    // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/r/content-modelling-collections/
     schema: {
       collections: ${generateCollectionString(args)},
     },

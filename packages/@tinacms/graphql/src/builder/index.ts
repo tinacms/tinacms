@@ -1527,7 +1527,7 @@ export class Builder {
   private _buildDataField = async (field: TinaField<true>) => {
     const listWarningMsg = `
 WARNING: The user interface for ${field.type} does not support \`list: true\`
-Visit https://tina.io/docs/errors/ui-not-supported/ for more information
+Visit https://tina.io/docs/r/content-fields/#list-fields/ for more information
 
 `;
 

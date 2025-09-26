@@ -51,7 +51,7 @@ To be the world-leading CMS with Git support that developers love.
 ## Tech Stack
 
 See
-https://tina.io/docs/introduction/faq/#what-is-tinas-tech-stack
+https://tina.io/docs/r/FAQ/#5-what-is-tinas-tech-stack
 
 ## Roadmap
 

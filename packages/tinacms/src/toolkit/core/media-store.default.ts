@@ -337,22 +337,18 @@ export class TinaMediaStore implements MediaStore {
 
     let res;
     if (!this.isLocal) {
-      if (await this.isAuthenticated()) {
-        res = await this.api.authProvider.fetchWithToken(
-          `${this.url}/list/${options.directory || ''}?limit=${
-            options.limit || 20
-          }${options.offset ? `&cursor=${options.offset}` : ''}`
-        );
+      res = await this.api.authProvider.fetchWithToken(
+        `${this.url}/list/${options.directory || ''}?limit=${
+          options.limit || 20
+        }${options.offset ? `&cursor=${options.offset}` : ''}`
+      );
 
-        if (res.status == 401) {
-          throw E_UNAUTHORIZED;
-        }
+      if (res.status == 401) {
+        throw E_UNAUTHORIZED;
+      }
 
-        if (res.status == 404) {
-          throw E_BAD_ROUTE;
-        }
-      } else {
-        throw new Error('Not authenticated');
+      if (res.status == 404) {
+        throw E_BAD_ROUTE;
       }
     } else {
       res = await this.fetchFunction(
