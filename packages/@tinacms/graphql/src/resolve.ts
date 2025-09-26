@@ -366,27 +366,20 @@ export const resolve = async ({
               );
 
               if (isMutation) {
+                assertShape<{
+                  params: Record<string, unknown>
+                }>(args, (yup) =>
+                  yup.object({
+                    params: yup.object().required()
+                  })
+                );
                 if (isCreation) {
-                  assertShape<{
-                    params: Record<string, unknown>
-                  }>(args, (yup) =>
-                    yup.object({
-                      params: yup.object().required()
-                    })
-                  );
                   return resolver.resolveCreateDocument({
                     collectionName: lookup.collection,
                     relativePath: args.relativePath,
                     body: args.params,
                   });
                 } else {
-                  assertShape<{
-                      params: Record<string, unknown>
-                    }>(args, (yup) =>
-                      yup.object({
-                        params: yup.object().required()
-                      })
-                    );
                   // Note that document renaming is not supported.
                   return resolver.resolveUpdateDocument({
                     collectionName: lookup.collection,
@@ -440,28 +433,42 @@ export const resolve = async ({
               if (!unionValue) {
                 const unionArgs = args as { relativePath?: string };
                 if (unionArgs.relativePath) {
-                  console.log(' *** Requesting additional unionData for ', unionArgs.relativePath, ' ***');
-                  console.log(`isMutation = '${isMutation}', isCreation = '${isCreation}'`);
-                  console.log(args);
                   // FIXME: there is a bug in the lookup generation where the create fieldname is not generated.
-                  /* if (isMutation) {
+                  // Therefore, you cannot create a new item using create{{ COLLECTION-NAME }}.
+                  assertShape<{
+                    relativePath: string;
+                  }>(args, (yup) =>
+                    yup.object({
+                      relativePath: yup.string().required(),
+                    })
+                  );
+                  if (isMutation) {
+                    assertShape<{
+                      params: Record<string, unknown>
+                    }>(args, (yup) =>
+                      yup.object({
+                        params: yup.object().required()
+                      })
+                    );
                     if (isCreation) {
                       return resolver.resolveCreateDocument({
                         collectionName: lookup.collection,
                         relativePath: args.relativePath,
-                        args.params
+                        body: args.params
                       })
+                    } else {
+                      return resolver.resolveUpdateDocument({
+                        collectionName: lookup.collection,
+                        relativePath: args.relativePath,
+                        newBody: args.params
+                      });
                     }
-                  } */
-                  const result = await resolver.resolveDocument({
-                    args,
-                    collection: lookup.collection,
-                    isMutation,
-                    isCreation,
-                    isAddPendingDocument: false,
-                    isCollectionSpecific: true,
-                  });
-                  return result;
+                  } else {
+                    return resolver.resolveRetrievedDocument({
+                      collectionName: lookup.collection,
+                      relativePath: args.relativePath
+                    });
+                  }
                 }
               }
               return unionValue;
