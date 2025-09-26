@@ -20,7 +20,7 @@ class MemoryCaptureBridge extends FilesystemBridge {
 
   // Read operations continue to use filesystem
   async get(filepath: string): Promise<string> {
-    return super.get(filepath);
+    return this.writes.get(filepath) || super.get(filepath);
   }
 
   // Write operations are captured in memory
