@@ -83,7 +83,7 @@ export function GridMediaItem({ item, active, onClick }: MediaItemProps) {
   const thumbnail = (item.thumbnails || {})['400x400'];
   const itemIsImage = isImage(thumbnail);
   return (
-    <li className='block overflow-hidden flex justify-center shrink-0 w-full transition duration-150 ease-out'>
+    <li className='block flex justify-center shrink-0 w-full transition duration-150 ease-out'>
       <button
         className={cn(
           'relative flex flex-col items-center justify-center w-full',
