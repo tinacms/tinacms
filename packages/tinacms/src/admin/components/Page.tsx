@@ -18,7 +18,7 @@ export const PageWrapper = ({
       <div className={`py-2 px-4 ${headerClassName}`}>
         <LocalWarning />
         <BillingWarning />
-        <div className='flex justify-between items-center'>
+        <div className='flex justify-between items-center relative left-12'>
           <BranchButton />
           <BranchPreviewButton />
         </div>
