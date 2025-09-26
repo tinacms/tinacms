@@ -1,5 +1,11 @@
 # tinacms
 
+## 2.8.4
+
+### Patch Changes
+
+- [#5995](https://github.com/tinacms/tinacms/pull/5995) [`ced9076`](https://github.com/tinacms/tinacms/commit/ced9076d25d7177bd8d9ae3c6133d0560366511c) Thanks [@kulesy](https://github.com/kulesy)! - ⚡ Performance - Improve media load performance
+
 ## 2.8.3
 
 ### Patch Changes

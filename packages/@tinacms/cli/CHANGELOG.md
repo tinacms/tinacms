@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 1.11.0
+
+### Minor Changes
+
+- [#5901](https://github.com/tinacms/tinacms/pull/5901) [`c4f0716`](https://github.com/tinacms/tinacms/commit/c4f0716f84cf06dd94e444b3d6d042057a21d5d7) Thanks [@ArkadiuszIrlik](https://github.com/ArkadiuszIrlik)! - 🐛 Fix - Fixes a bug where trailing slash in localContentPath would break database
+  and search indexers, causing "Unable to find collection for file at (...)"
+  error.
+
+### Patch Changes
+
+- Updated dependencies [[`ced9076`](https://github.com/tinacms/tinacms/commit/ced9076d25d7177bd8d9ae3c6133d0560366511c)]:
+  - tinacms@2.8.4
+  - @tinacms/app@2.3.4
+
 ## 1.10.3
 
 ### Patch Changes
