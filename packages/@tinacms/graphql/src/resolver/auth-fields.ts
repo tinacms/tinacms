@@ -1,3 +1,4 @@
+import path from 'path';
 import type { TinaSchema } from '@tinacms/schema-tools';
 import type { GraphQLResolveInfo } from 'graphql';
 import { get } from '../util';
@@ -27,14 +28,15 @@ async function getUserDocumentContext(
   }
   const userField = userFields[0];
 
-  const realPath = `${collection.path}/index.json`;
+  const relativePath = 'index.json';
+  const realPath = path.join(collection.path, relativePath);
   const userDoc = await resolver.getDocument(realPath);
   const users = get(userDoc, userField.path);
   if (!users) {
     throw new Error('No users found');
   }
 
-  return { collection, userField, users, userDoc, realPath };
+  return { collection, userField, users, userDoc, relativePath };
 }
 
 function findUserInCollection(users: any[], userField: any, userSub: string) {
@@ -125,7 +127,7 @@ export async function handleUpdatePassword({
     throw new Error('No password provided');
   }
 
-  const { collection, userField, users, realPath } =
+  const { collection, userField, users, relativePath } =
     await getUserDocumentContext(tinaSchema, resolver);
 
   const { idFieldName, passwordFieldName } = userField;
@@ -139,9 +141,9 @@ export async function handleUpdatePassword({
     passwordChangeRequired: false,
   };
 
-  const params = {};
+  const newBody = {};
   set(
-    params,
+    newBody,
     userField.path.slice(1), // remove _rawData from users path
     users.map((u: any) => {
       if (user[idFieldName] === u[idFieldName]) {
@@ -158,12 +160,10 @@ export async function handleUpdatePassword({
     })
   );
 
-  await resolver.updateResolveDocument({
-    collection,
-    args: { params },
-    realPath,
-    isCollectionSpecific: true,
-    isAddPendingDocument: false,
+  await resolver.resolveUpdateDocument({
+    collectionName: collection.name,
+    relativePath,
+    newBody,
   });
 
   return true;
