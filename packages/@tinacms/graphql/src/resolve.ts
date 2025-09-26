@@ -250,12 +250,15 @@ export const resolve = async ({
                     assertShape<{
                       params: {
                         // [args.collection]: Record<string, unknown>; .. effectively.
-                      }
+                      };
                     }>(args, (yup) =>
                       yup.object({
-                        params: yup.object().shape({
-                          [args.collection]: yup.object().required()
-                        }).required()
+                        params: yup
+                          .object()
+                          .shape({
+                            [args.collection]: yup.object().required(),
+                          })
+                          .required(),
                       })
                     );
                     return resolver.resolveCreateDocument({
@@ -269,28 +272,34 @@ export const resolve = async ({
                       params: {
                         relativePath: string;
                         // [args.collection]: Record<string, unknown>; .. effectively.
-                      }
+                      };
                     }>(args, (yup) =>
                       yup.object({
-                        params: yup.object().shape({
-                          relativePath: yup.string().optional(),
-                          [args.collection]: yup.object().required()
-                        }).required()
+                        params: yup
+                          .object()
+                          .shape({
+                            relativePath: yup.string().optional(),
+                            [args.collection]: yup.object().required(),
+                          })
+                          .required(),
                       })
                     );
                     const newRelativePath = args.params.relativePath;
-                    const newBody = args.params[args.collection] as Record<string, unknown>;
+                    const newBody = args.params[args.collection] as Record<
+                      string,
+                      unknown
+                    >;
                     return resolver.resolveUpdateDocument({
                       collectionName: args.collection,
                       relativePath: args.relativePath,
                       newRelativePath,
-                      newBody
+                      newBody,
                     });
                   }
                   case 'deleteDocument':
                     return resolver.resolveDeleteDocument({
                       collectionName: args.collection,
-                      relativePath: args.relativePath
+                      relativePath: args.relativePath,
                     });
                 }
               } else if (info.fieldName === NAMER.documentQueryName()) {
@@ -367,10 +376,10 @@ export const resolve = async ({
 
               if (isMutation) {
                 assertShape<{
-                  params: Record<string, unknown>
+                  params: Record<string, unknown>;
                 }>(args, (yup) =>
                   yup.object({
-                    params: yup.object().required()
+                    params: yup.object().required(),
                   })
                 );
                 if (isCreation) {
@@ -384,13 +393,13 @@ export const resolve = async ({
                   return resolver.resolveUpdateDocument({
                     collectionName: lookup.collection,
                     relativePath: args.relativePath,
-                    newBody: args.params
+                    newBody: args.params,
                   });
                 }
               } else {
                 return resolver.resolveRetrievedDocument({
                   collectionName: lookup.collection,
-                  relativePath: args.relativePath
+                  relativePath: args.relativePath,
                 });
               }
             }
@@ -444,29 +453,29 @@ export const resolve = async ({
                   );
                   if (isMutation) {
                     assertShape<{
-                      params: Record<string, unknown>
+                      params: Record<string, unknown>;
                     }>(args, (yup) =>
                       yup.object({
-                        params: yup.object().required()
+                        params: yup.object().required(),
                       })
                     );
                     if (isCreation) {
                       return resolver.resolveCreateDocument({
                         collectionName: lookup.collection,
                         relativePath: args.relativePath,
-                        body: args.params
-                      })
+                        body: args.params,
+                      });
                     } else {
                       return resolver.resolveUpdateDocument({
                         collectionName: lookup.collection,
                         relativePath: args.relativePath,
-                        newBody: args.params
+                        newBody: args.params,
                       });
                     }
                   } else {
                     return resolver.resolveRetrievedDocument({
                       collectionName: lookup.collection,
-                      relativePath: args.relativePath
+                      relativePath: args.relativePath,
                     });
                   }
                 }

@@ -558,7 +558,7 @@ export class Resolver {
   public resolveAddPendingDocument = async ({
     collectionName,
     relativePath,
-    templateName
+    templateName,
   }: {
     collectionName: string;
     relativePath: string;
@@ -725,10 +725,7 @@ export class Resolver {
       throw new Error(`Unable to add document, ${realPath} already exists`);
     }
 
-    const params = await this.buildObjectMutations(
-      body,
-      collection
-    );
+    const params = await this.buildObjectMutations(body, collection);
     // @ts-expect-error
     await this.database.put(realPath, params, collection.name);
     return this.getDocument(realPath);
@@ -738,7 +735,7 @@ export class Resolver {
     collectionName,
     relativePath,
     newRelativePath,
-    newBody
+    newBody,
   }: {
     collectionName: string;
     relativePath: string;
@@ -827,12 +824,12 @@ export class Resolver {
     return this.getDocument(realPath);
   };
 
-  public resolveDeleteDocument = async({
+  public resolveDeleteDocument = async ({
     collectionName,
-    relativePath
+    relativePath,
   }: {
-    collectionName: string,
-    relativePath: string
+    collectionName: string;
+    relativePath: string;
   }) => {
     const collection = this.getCollectionWithName(collectionName);
     const realPath = path.join(collection.path, relativePath);
@@ -884,7 +881,7 @@ export class Resolver {
       }
     }
     return doc;
-  }
+  };
 
   private resolveAndValidateCollection = ({
     collectionName,
@@ -917,7 +914,7 @@ export class Resolver {
 
     const collection = this.getCollectionWithName(collectionLookup);
     return { collection };
-  }
+  };
 
   /**
    * @deprecated - To be removed in next major version.
@@ -1085,7 +1082,7 @@ export class Resolver {
           return this.resolveAddPendingDocument({
             collectionName: collection.name,
             relativePath: args.relativePath,
-            templateName: (args as { template?: string }).template || ''
+            templateName: (args as { template?: string }).template || '',
           });
         } else {
           assertShape<{ params: Record<string, unknown> }>(args, (yup) =>
@@ -1094,22 +1091,26 @@ export class Resolver {
           return this.resolveCreateDocument({
             collectionName: collection.name,
             relativePath: args.relativePath,
-            body: args.params[collection.name] as Record<string, unknown>
+            body: args.params[collection.name] as Record<string, unknown>,
           });
         }
       } else if (isFolderCreation) {
         return this.resolveCreateFolder({
           collectionName: collection.name,
-          relativePath: args.relativePath
+          relativePath: args.relativePath,
         });
       } else if (isDeletion) {
         return this.resolveDeleteDocument({
           collectionName: collection.name,
-          relativePath: args.relativePath
+          relativePath: args.relativePath,
         });
       } else if (isUpdateName) {
         assertShape<{ params: { relativePath: string } }>(args, (yup) =>
-          yup.object({ params: yup.object({ relativePath: yup.string().required() }).required() })
+          yup.object({
+            params: yup
+              .object({ relativePath: yup.string().required() })
+              .required(),
+          })
         );
         const realPath = path.join(collection.path, args.relativePath);
         return this.updateResolveDocument({
@@ -1126,7 +1127,9 @@ export class Resolver {
         return this.resolveUpdateDocument({
           collectionName: collection.name,
           relativePath: args.relativePath,
-          newBody: isCollectionSpecific ? args.params as Record<string, unknown> : args.params[collection.name] as Record<string, unknown>
+          newBody: isCollectionSpecific
+            ? (args.params as Record<string, unknown>)
+            : (args.params[collection.name] as Record<string, unknown>),
         });
       }
     } else {

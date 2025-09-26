@@ -24,7 +24,9 @@ it('queries single template-defined document', async () => {
     }`,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('expected-snapshots/single-template-document.json');
+  expect(format(result)).toMatchFileSnapshot(
+    'expected-snapshots/single-template-document.json'
+  );
 });
 
 it('queries multi-template collection with union types', async () => {
@@ -59,7 +61,9 @@ it('queries multi-template collection with union types', async () => {
     }`,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('expected-snapshots/multi-template-collection.json');
+  expect(format(result)).toMatchFileSnapshot(
+    'expected-snapshots/multi-template-collection.json'
+  );
 });
 
 it('queries specific template type from multi-template collection', async () => {
@@ -85,7 +89,9 @@ it('queries specific template type from multi-template collection', async () => 
     }`,
     variables: {},
   });
-  expect(format(result)).toMatchFileSnapshot('expected-snapshots/specific-template-type.json');
+  expect(format(result)).toMatchFileSnapshot(
+    'expected-snapshots/specific-template-type.json'
+  );
 });
 
 describe('Template-Defined Files Mutations', () => {
@@ -129,11 +135,15 @@ describe('Template-Defined Files Mutations', () => {
         variables: {},
       });
 
-      expect(format(result)).toMatchFileSnapshot('expected-snapshots/create-author-response.json');
+      expect(format(result)).toMatchFileSnapshot(
+        'expected-snapshots/create-author-response.json'
+      );
 
       const newDocWrite = bridge.getWrite('authors/new-author.md');
       expect(newDocWrite).toBeDefined();
-      expect(newDocWrite).toMatchFileSnapshot('expected-snapshots/new-author-content.md');
+      expect(newDocWrite).toMatchFileSnapshot(
+        'expected-snapshots/new-author-content.md'
+      );
     });
 
     /*
@@ -221,11 +231,15 @@ describe('Template-Defined Files Mutations', () => {
         variables: {},
       });
 
-      expect(format(result)).toMatchFileSnapshot('expected-snapshots/create-product-book-response.json');
+      expect(format(result)).toMatchFileSnapshot(
+        'expected-snapshots/create-product-book-response.json'
+      );
 
       const newDocWrite = bridge.getWrite('products/northwind-book.md');
       expect(newDocWrite).toBeDefined();
-      expect(newDocWrite).toMatchFileSnapshot('expected-snapshots/northwind-book-content.md');
+      expect(newDocWrite).toMatchFileSnapshot(
+        'expected-snapshots/northwind-book-content.md'
+      );
     });
 
     /*
@@ -315,11 +329,15 @@ describe('Template-Defined Files Mutations', () => {
         variables: {},
       });
 
-      expect(format(result)).toMatchFileSnapshot('expected-snapshots/update-author-response.json');
+      expect(format(result)).toMatchFileSnapshot(
+        'expected-snapshots/update-author-response.json'
+      );
 
       const updatedWrite = bridge.getWrite('authors/bob-northwind.md');
       expect(updatedWrite).toBeDefined();
-      expect(updatedWrite).toMatchFileSnapshot('expected-snapshots/updated-bob-northwind-content.md');
+      expect(updatedWrite).toMatchFileSnapshot(
+        'expected-snapshots/updated-bob-northwind-content.md'
+      );
     });
 
     it('updates single template document using collection-specific mutation', async () => {
@@ -353,11 +371,15 @@ describe('Template-Defined Files Mutations', () => {
         variables: {},
       });
 
-      expect(format(result)).toMatchFileSnapshot('expected-snapshots/update-author-specific-response.json');
+      expect(format(result)).toMatchFileSnapshot(
+        'expected-snapshots/update-author-specific-response.json'
+      );
 
       const updatedWrite = bridge.getWrite('authors/bob-northwind.md');
       expect(updatedWrite).toBeDefined();
-      expect(updatedWrite).toMatchFileSnapshot('expected-snapshots/updated-bob-northwind-specific-content.md');
+      expect(updatedWrite).toMatchFileSnapshot(
+        'expected-snapshots/updated-bob-northwind-specific-content.md'
+      );
     });
 
     it('updates multi-template document with book template', async () => {
@@ -399,11 +421,15 @@ describe('Template-Defined Files Mutations', () => {
         variables: {},
       });
 
-      expect(format(result)).toMatchFileSnapshot('expected-snapshots/update-product-book-response.json');
+      expect(format(result)).toMatchFileSnapshot(
+        'expected-snapshots/update-product-book-response.json'
+      );
 
       const updatedWrite = bridge.getWrite('products/accounting-book.md');
       expect(updatedWrite).toBeDefined();
-      expect(updatedWrite).toMatchFileSnapshot('expected-snapshots/updated-accounting-book-content.md');
+      expect(updatedWrite).toMatchFileSnapshot(
+        'expected-snapshots/updated-accounting-book-content.md'
+      );
     });
 
     it('updates multi-template document with software template', async () => {
@@ -442,12 +468,16 @@ describe('Template-Defined Files Mutations', () => {
         variables: {},
       });
 
-      expect(format(result)).toMatchFileSnapshot('expected-snapshots/update-product-software-response.json');
+      expect(format(result)).toMatchFileSnapshot(
+        'expected-snapshots/update-product-software-response.json'
+      );
 
       const updatedWrite = bridge.getWrite('products/crm-software.md');
       expect(updatedWrite).toBeDefined();
-      expect(updatedWrite).toMatchFileSnapshot('expected-snapshots/updated-crm-software-content.md');
-    }); 
+      expect(updatedWrite).toMatchFileSnapshot(
+        'expected-snapshots/updated-crm-software-content.md'
+      );
+    });
   });
 
   describe('Error Handling Tests', () => {
@@ -477,7 +507,9 @@ describe('Template-Defined Files Mutations', () => {
         variables: {},
       });
 
-      expect(format(result)).toMatchFileSnapshot('expected-snapshots/invalid-template-error.json');
+      expect(format(result)).toMatchFileSnapshot(
+        'expected-snapshots/invalid-template-error.json'
+      );
 
       // Verify no file was written when mutation fails
       const writes = bridge.getWrites();
@@ -510,7 +542,9 @@ describe('Template-Defined Files Mutations', () => {
         variables: {},
       });
 
-      expect(format(result)).toMatchFileSnapshot('expected-snapshots/update-nonexistent-document-error.json');
+      expect(format(result)).toMatchFileSnapshot(
+        'expected-snapshots/update-nonexistent-document-error.json'
+      );
 
       // Verify no files were written when update fails
       const writes = bridge.getWrites();

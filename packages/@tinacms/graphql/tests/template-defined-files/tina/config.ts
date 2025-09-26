@@ -6,15 +6,17 @@ export const schema: Schema = {
       name: 'author',
       label: 'Author',
       path: 'authors',
-      templates: [{
-        name: 'author',
-        label: 'Author',
-        fields: [
-          { name: 'name', label: 'Name', type: 'string' },
-          { name: 'email', label: 'Email', type: 'string' },
-          { name: 'bio', label: 'Bio', type: 'string' }
-        ]
-      }]
+      templates: [
+        {
+          name: 'author',
+          label: 'Author',
+          fields: [
+            { name: 'name', label: 'Name', type: 'string' },
+            { name: 'email', label: 'Email', type: 'string' },
+            { name: 'bio', label: 'Bio', type: 'string' },
+          ],
+        },
+      ],
     },
     {
       name: 'product',
@@ -27,8 +29,8 @@ export const schema: Schema = {
           fields: [
             { name: 'title', label: 'Title', type: 'string' },
             { name: 'isbn', label: 'ISBN', type: 'string' },
-            { name: 'pages', label: 'Pages', type: 'number' }
-          ]
+            { name: 'pages', label: 'Pages', type: 'number' },
+          ],
         },
         {
           name: 'software',
@@ -36,12 +38,12 @@ export const schema: Schema = {
           fields: [
             { name: 'title', label: 'Title', type: 'string' },
             { name: 'version', label: 'Version', type: 'string' },
-            { name: 'platform', label: 'Platform', type: 'string' }
-          ]
-        }
-      ]
-    }
-  ]
+            { name: 'platform', label: 'Platform', type: 'string' },
+          ],
+        },
+      ],
+    },
+  ],
 };
 
 export default { schema };
