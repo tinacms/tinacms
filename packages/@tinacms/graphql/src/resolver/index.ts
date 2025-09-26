@@ -607,123 +607,6 @@ export class Resolver {
     return this.getDocument(realPath);
   };
 
-  public createResolveDocument = async ({
-    collection,
-    realPath,
-    args,
-    isAddPendingDocument,
-  }: {
-    collection: Collection<true>;
-    realPath: string;
-    args: unknown;
-    isAddPendingDocument: boolean;
-  }) => {
-    /**
-     * TODO: Remove when `addPendingDocument` is no longer needed.
-     */
-    if (isAddPendingDocument === true) {
-      return this.resolveAddPendingDocument({
-        collectionName: collection.name,
-        relativePath: path.relative(collection.path, realPath),
-        templateName: (args as { template?: string }).template,
-      });
-    }
-
-    const params = await this.buildObjectMutations(
-      // @ts-ignore
-      args.params[collection.name],
-      collection
-    );
-
-    // @ts-ignore
-    await this.database.put(realPath, params, collection.name);
-    return this.getDocument(realPath);
-  };
-
-  public updateResolveDocument = async ({
-    collection,
-    realPath,
-    args,
-    isAddPendingDocument,
-    isCollectionSpecific,
-  }: {
-    collection: Collection<true>;
-    realPath: string;
-    args: unknown;
-    isAddPendingDocument: boolean;
-    isCollectionSpecific: boolean;
-  }) => {
-    const doc = await this.getDocument(realPath);
-
-    const oldDoc = this.resolveLegacyValues(doc?._rawData || {}, collection);
-    /**
-     * TODO: Remove when `addPendingDocument` is no longer needed.
-     */
-    if (isAddPendingDocument === true) {
-      console.warn(
-        '*** DEPRECATION: isAddPendingDocument functionality will be removed Resolver.updateResolveDocument in a future version. ***'
-      );
-      const templateInfo =
-        this.tinaSchema.getTemplatesForCollectable(collection);
-
-      const params = this.buildParams(args);
-      switch (templateInfo.type) {
-        case 'object':
-          if (params) {
-            const values = await this.buildFieldMutations(
-              params,
-              templateInfo.template,
-              doc?._rawData
-            );
-            await this.database.put(
-              realPath,
-              { ...oldDoc, ...values },
-              collection.name
-            );
-          }
-          break;
-        case 'union':
-          // FIXME: ensure only one field is passed here
-          await sequential(templateInfo.templates, async (template) => {
-            const templateParams = params[lastItem(template.namespace)];
-            if (templateParams) {
-              if (typeof templateParams === 'string') {
-                throw new Error(
-                  `Expected to find an object for template params, but got string`
-                );
-              }
-              const values = {
-                ...oldDoc,
-                ...(await this.buildFieldMutations(
-                  // @ts-ignore FIXME: failing on unknown, which we don't need to know because it's recursive
-                  templateParams,
-                  template,
-                  doc?._rawData
-                )),
-                _template: lastItem(template.namespace),
-              };
-              await this.database.put(realPath, values, collection.name);
-            }
-          });
-      }
-      return this.getDocument(realPath);
-    }
-
-    const params = await this.buildObjectMutations(
-      //@ts-ignore
-      isCollectionSpecific ? args.params : args.params[collection.name],
-      collection,
-      doc?._rawData
-    );
-    //@ts-ignore
-    await this.database.put(
-      realPath,
-      { ...oldDoc, ...params },
-      collection.name
-    );
-    return this.getDocument(realPath);
-  };
-
   /**
    * Returns top-level fields which are not defined in the collection, so their
    * values are not eliminated from Tina when new values are saved
@@ -778,39 +661,6 @@ export class Resolver {
     }
 
     return this.tinaSchema.getCollection(collectionName);
-  };
-
-  private resolveAndValidateCollection = ({
-    collectionName,
-    args,
-    isCollectionSpecific,
-  }: {
-    collectionName?: string;
-    args: unknown;
-    isCollectionSpecific?: boolean;
-  }) => {
-    /**
-     * `collectionName` is passed in:
-     *    * `addPendingDocument()` has `collection` on `args`
-     *    * `getDocument()` provides a `collection` on `args`
-     *    * `get<Collection>Document()` has `collection` on `lookup`
-     */
-    let collectionLookup = collectionName || undefined;
-
-    /**
-     * For generic functions (like `createDocument()` and `updateDocument()`), `collection` is the top key of the `params`
-     */
-    if (!collectionLookup && isCollectionSpecific === false) {
-      assertShape<{ params: Record<string, unknown> }>(args, (yup) =>
-        yup.object({
-          params: yup.object().required(),
-        })
-      );
-      collectionLookup = Object.keys(args.params)[0];
-    }
-
-    const collection = this.getCollectionWithName(collectionLookup);
-    return { collection };
   };
 
   /*
@@ -1036,6 +886,165 @@ export class Resolver {
     return doc;
   }
 
+  private resolveAndValidateCollection = ({
+    collectionName,
+    args,
+    isCollectionSpecific,
+  }: {
+    collectionName?: string;
+    args: unknown;
+    isCollectionSpecific?: boolean;
+  }) => {
+    /**
+     * `collectionName` is passed in:
+     *    * `addPendingDocument()` has `collection` on `args`
+     *    * `getDocument()` provides a `collection` on `args`
+     *    * `get<Collection>Document()` has `collection` on `lookup`
+     */
+    let collectionLookup = collectionName || undefined;
+
+    /**
+     * For generic functions (like `createDocument()` and `updateDocument()`), `collection` is the top key of the `params`
+     */
+    if (!collectionLookup && isCollectionSpecific === false) {
+      assertShape<{ params: Record<string, unknown> }>(args, (yup) =>
+        yup.object({
+          params: yup.object().required(),
+        })
+      );
+      collectionLookup = Object.keys(args.params)[0];
+    }
+
+    const collection = this.getCollectionWithName(collectionLookup);
+    return { collection };
+  }
+
+  /**
+   * @deprecated - To be removed in next major version.
+   */
+  public createResolveDocument = async ({
+    collection,
+    realPath,
+    args,
+    isAddPendingDocument,
+  }: {
+    collection: Collection<true>;
+    realPath: string;
+    args: unknown;
+    isAddPendingDocument: boolean;
+  }) => {
+    /**
+     * TODO: Remove when `addPendingDocument` is no longer needed.
+     */
+    if (isAddPendingDocument === true) {
+      return this.resolveAddPendingDocument({
+        collectionName: collection.name,
+        relativePath: path.relative(collection.path, realPath),
+        templateName: (args as { template?: string }).template,
+      });
+    }
+
+    const params = await this.buildObjectMutations(
+      // @ts-ignore
+      args.params[collection.name],
+      collection
+    );
+
+    // @ts-ignore
+    await this.database.put(realPath, params, collection.name);
+    return this.getDocument(realPath);
+  };
+
+  /**
+   * @deprecated - To be removed in next major version.
+   */
+  public updateResolveDocument = async ({
+    collection,
+    realPath,
+    args,
+    isAddPendingDocument,
+    isCollectionSpecific,
+  }: {
+    collection: Collection<true>;
+    realPath: string;
+    args: unknown;
+    isAddPendingDocument: boolean;
+    isCollectionSpecific: boolean;
+  }) => {
+    const doc = await this.getDocument(realPath);
+
+    const oldDoc = this.resolveLegacyValues(doc?._rawData || {}, collection);
+    /**
+     * TODO: Remove when `addPendingDocument` is no longer needed.
+     */
+    if (isAddPendingDocument === true) {
+      console.warn(
+        '*** DEPRECATION: isAddPendingDocument functionality will be removed Resolver.updateResolveDocument in a future version. ***'
+      );
+      const templateInfo =
+        this.tinaSchema.getTemplatesForCollectable(collection);
+
+      const params = this.buildParams(args);
+      switch (templateInfo.type) {
+        case 'object':
+          if (params) {
+            const values = await this.buildFieldMutations(
+              params,
+              templateInfo.template,
+              doc?._rawData
+            );
+            await this.database.put(
+              realPath,
+              { ...oldDoc, ...values },
+              collection.name
+            );
+          }
+          break;
+        case 'union':
+          // FIXME: ensure only one field is passed here
+          await sequential(templateInfo.templates, async (template) => {
+            const templateParams = params[lastItem(template.namespace)];
+            if (templateParams) {
+              if (typeof templateParams === 'string') {
+                throw new Error(
+                  `Expected to find an object for template params, but got string`
+                );
+              }
+              const values = {
+                ...oldDoc,
+                ...(await this.buildFieldMutations(
+                  // @ts-ignore FIXME: failing on unknown, which we don't need to know because it's recursive
+                  templateParams,
+                  template,
+                  doc?._rawData
+                )),
+                _template: lastItem(template.namespace),
+              };
+              await this.database.put(realPath, values, collection.name);
+            }
+          });
+      }
+      return this.getDocument(realPath);
+    }
+
+    const params = await this.buildObjectMutations(
+      //@ts-ignore
+      isCollectionSpecific ? args.params : args.params[collection.name],
+      collection,
+      doc?._rawData
+    );
+    //@ts-ignore
+    await this.database.put(
+      realPath,
+      { ...oldDoc, ...params },
+      collection.name
+    );
+    return this.getDocument(realPath);
+  };
+
+  /**
+   * @deprecated
+   */
   public resolveDocument = async ({
     args,
     collection: collectionName,
@@ -1066,185 +1075,62 @@ export class Resolver {
     assertShape<{ relativePath: string }>(args, (yup) =>
       yup.object({ relativePath: yup.string().required() })
     );
-    let realPath = path.join(collection.path, args.relativePath);
-    if (isFolderCreation) {
-      realPath = path.join(realPath, `.gitkeep.${collection.format || 'md'}`);
-    }
-    const alreadyExists = await this.database.documentExists(realPath);
 
     if (isMutation) {
       if (isCreation) {
-        /**
-         * createDocument, create<Collection>Document
-         */
-        if (alreadyExists === true) {
-          throw new Error(`Unable to add document, ${realPath} already exists`);
+        if (isAddPendingDocument) {
+          assertShape<{ template?: string }>(args, (yup) =>
+            yup.object({ template: yup.string() })
+          );
+          return this.resolveAddPendingDocument({
+            collectionName: collection.name,
+            relativePath: args.relativePath,
+            templateName: (args as { template?: string }).template || ''
+          });
+        } else {
+          assertShape<{ params: Record<string, unknown> }>(args, (yup) =>
+            yup.object({ params: yup.object().required() })
+          );
+          return this.resolveCreateDocument({
+            collectionName: collection.name,
+            relativePath: args.relativePath,
+            body: args.params[collection.name] as Record<string, unknown>
+          });
         }
-        return this.createResolveDocument({
+      } else if (isFolderCreation) {
+        return this.resolveCreateFolder({
+          collectionName: collection.name,
+          relativePath: args.relativePath
+        });
+      } else if (isDeletion) {
+        return this.resolveDeleteDocument({
+          collectionName: collection.name,
+          relativePath: args.relativePath
+        });
+      } else if (isUpdateName) {
+        assertShape<{ params: { relativePath: string } }>(args, (yup) =>
+          yup.object({ params: yup.object({ relativePath: yup.string().required() }).required() })
+        );
+        const realPath = path.join(collection.path, args.relativePath);
+        return this.updateResolveDocument({
           collection,
           realPath,
           args,
           isAddPendingDocument,
+          isCollectionSpecific,
         });
-      } else if (isFolderCreation) {
-        /**
-         * createFolder, create<Collection>Folder
-         */
-        if (alreadyExists === true) {
-          throw new Error(`Unable to add folder, ${realPath} already exists`);
-        }
-        await this.database.put(
-          realPath,
-          { _is_tina_folder_placeholder: true },
-          collection.name
-        );
-        return this.getDocument(realPath);
-      }
-      // if we are deleting a document or updating its name we should check if it exists
-      if (!alreadyExists) {
-        if (isDeletion) {
-          throw new Error(
-            `Unable to delete document, ${realPath} does not exist`
-          );
-        }
-        if (isUpdateName) {
-          throw new Error(
-            `Unable to update document, ${realPath} does not exist`
-          );
-        }
-      }
-      if (isDeletion) {
-        const doc = await this.getDocument(realPath);
-        await this.deleteDocument(realPath);
-        if (await this.hasReferences(realPath, collection)) {
-          const collRefs = await this.findReferences(realPath, collection);
-          for (const [collection, docsWithRefs] of Object.entries(collRefs)) {
-            for (const [pathToDocWithRef, referencePaths] of Object.entries(
-              docsWithRefs
-            )) {
-              // load the doc with the references
-              let refDoc = await this.getRaw(pathToDocWithRef);
-
-              let hasUpdate = false;
-              // Update each reference to the deleted document
-              for (const path of referencePaths) {
-                const { object, updated } = updateObjectWithJsonPath(
-                  refDoc,
-                  path,
-                  realPath,
-                  null
-                );
-                refDoc = object;
-                hasUpdate = updated || hasUpdate;
-              }
-
-              if (hasUpdate) {
-                const collectionWithRef =
-                  this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
-                if (!collectionWithRef) {
-                  throw new Error(
-                    `Unable to find collection for ${pathToDocWithRef}`
-                  );
-                }
-                // save the updated doc
-                await this.database.put(
-                  pathToDocWithRef,
-                  refDoc,
-                  collectionWithRef.name
-                );
-              }
-            }
-          }
-        }
-        return doc;
-      }
-      if (isUpdateName) {
-        // Must provide a new relative path in the params
-        assertShape<{ params: string }>(args, (yup) =>
+      } else {
+        assertShape<{ params: Record<string, unknown> }>(args, (yup) =>
           yup.object({ params: yup.object().required() })
         );
-        assertShape<{ relativePath: string }>(args?.params, (yup) =>
-          yup.object({ relativePath: yup.string().required() })
-        );
-
-        // Get the real document
-        const doc = await this.getDocument(realPath);
-        const newRealPath = path.join(
-          collection?.path,
-          args.params.relativePath
-        );
-
-        // don't update if the paths are the same
-        if (newRealPath === realPath) {
-          return doc;
-        }
-
-        // Update the document
-        await this.database.put(newRealPath, doc._rawData, collection.name);
-        // Delete the old document
-        await this.deleteDocument(realPath);
-        // Update references to the document
-        const collRefs = await this.findReferences(realPath, collection);
-        for (const [collection, docsWithRefs] of Object.entries(collRefs)) {
-          for (const [pathToDocWithRef, referencePaths] of Object.entries(
-            docsWithRefs
-          )) {
-            // load the document with the references
-            let docWithRef = await this.getRaw(pathToDocWithRef);
-
-            let hasUpdate = false;
-            // update each reference to the updated document
-            for (const path of referencePaths) {
-              const { object, updated } = updateObjectWithJsonPath(
-                docWithRef,
-                path,
-                realPath,
-                newRealPath
-              );
-              docWithRef = object;
-              hasUpdate = updated || hasUpdate;
-            }
-
-            // save the updated document
-            if (hasUpdate) {
-              // lookup collection for the document with the references
-              const collectionWithRef =
-                this.tinaSchema.getCollectionByFullPath(pathToDocWithRef);
-              if (!collectionWithRef) {
-                throw new Error(
-                  `Unable to find collection for ${pathToDocWithRef}`
-                );
-              }
-
-              await this.database.put(
-                pathToDocWithRef,
-                docWithRef,
-                collectionWithRef.name
-              );
-            }
-          }
-        }
-        return this.getDocument(newRealPath);
+        return this.resolveUpdateDocument({
+          collectionName: collection.name,
+          relativePath: args.relativePath,
+          newBody: isCollectionSpecific ? args.params as Record<string, unknown> : args.params[collection.name] as Record<string, unknown>
+        });
       }
-      /**
-       * updateDocument, update<Collection>Document
-       */
-      if (alreadyExists === false) {
-        throw new Error(
-          `Unable to update document, ${realPath} does not exist`
-        );
-      }
-      return this.updateResolveDocument({
-        collection,
-        realPath,
-        args,
-        isAddPendingDocument,
-        isCollectionSpecific,
-      });
     } else {
-      /**
-       * getDocument, get<Collection>Document
-       */
+      const realPath = path.join(collection.path, args.relativePath);
       return this.getDocument(realPath, {
         collection,
         checkReferences: true,
