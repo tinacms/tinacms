@@ -1,5 +1,12 @@
 # tinacms-clerk
 
+## 11.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`ced9076`](https://github.com/tinacms/tinacms/commit/ced9076d25d7177bd8d9ae3c6133d0560366511c)]:
+  - tinacms@2.8.4
+
 ## 11.0.3
 
 ### Patch Changes
