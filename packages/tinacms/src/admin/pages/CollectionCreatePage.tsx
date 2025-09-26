@@ -15,8 +15,6 @@ import {
 } from '@tinacms/toolkit';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
-import { LocalWarning } from '@tinacms/toolkit';
 import type { TinaCMS } from '@tinacms/toolkit';
 import { FormBreadcrumbs } from '@toolkit/react-sidebar/components/sidebar-body';
 import { FaLock, FaUnlock } from 'react-icons/fa';

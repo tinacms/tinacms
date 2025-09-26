@@ -62,6 +62,7 @@ import type {
   TemplateResponse,
 } from '../types';
 import { type CollectionFolder, useCollectionFolder } from './utils';
+import { Callout } from '@toolkit/react-sidebar/components/callout';
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page';
 const isSSR = typeof window === 'undefined';
@@ -515,7 +516,7 @@ const CollectionListPage = () => {
                             : collection.name}
                         </h3>
                         <div className='flex flex-col lg:flex-row justify-between lg:items-end pt-2'>
-                          <div className='flex flex-col md:flex-row gap-2 md:gap-4 items-start'>
+                          <div className='flex flex-col md:flex-row gap-2 md:gap-4 items-baseline'>
                             {fields?.length > 0 && (
                               <>
                                 {!search && (
@@ -584,7 +585,7 @@ const CollectionListPage = () => {
                                 )}
                               </>
                             )}
-                            <div className='flex flex-1 flex-col gap-2 items-start w-full'>
+                            <div className='flex flex-1 flex-row gap-2 items-end w-full'>
                               {searchEnabled ? (
                                 <SearchInput
                                   loading={_loading}
@@ -595,15 +596,20 @@ const CollectionListPage = () => {
                                 />
                               ) : (
                                 <div className='flex flex-col gap-2 items-start w-full md:w-auto'>
-                                  <div className='h-4'></div>
-                                  <Message
-                                    link='https://tina.io/docs/r/content-search'
-                                    linkLabel='Read The Docs'
-                                    type='info'
-                                    size='small'
-                                  >
-                                    Search not configured.
-                                  </Message>
+                                  <div className='block font-sans text-xs font-semibold opacity-0'>
+                                    {' '}
+                                  </div>
+                                  <Callout calloutStyle='info'>
+                                    {' '}
+                                    You have not configured search.{' '}
+                                    <a
+                                      href='https://tina.io/docs/r/content-search'
+                                      target='_blank'
+                                      className='underline hover:text-blue-700 transition-all duration-150'
+                                    >
+                                      Read the docs
+                                    </a>
+                                  </Callout>
                                 </div>
                               )}
                             </div>
@@ -655,8 +661,8 @@ const CollectionListPage = () => {
                                           align='center'
                                         >
                                           <p>
-                                            Folders can’t be manually added when
-                                            using templates.
+                                            Folders can&apos;t be manually added
+                                            when using templates.
                                             <br />
                                             See the docs -{' '}
                                             <a
@@ -1246,7 +1252,7 @@ const FolderModal = ({
         <ModalHeader close={close}>Create Folder</ModalHeader>
         <ModalBody padded={true}>
           <>
-            {/* <p className="mb-4">
+            {/* <p className='mb-4'>
             </p> */}
             <BaseTextField
               placeholder='Enter the name of the new folder'
@@ -1300,7 +1306,7 @@ const RenameModal = ({
               Are you sure you want to rename <strong>{filename}</strong>?
             </p>
             <BaseTextField
-              placeholder="Enter a new name for the document's file"
+              placeholder='Enter a new name for the document&apos;s file'
               value={newRelativePath}
               onChange={(event) => setNewRelativePath(event.target.value)}
             />

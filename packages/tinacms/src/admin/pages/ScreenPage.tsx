@@ -18,7 +18,7 @@ const ScreenPage = () => {
         );
         return (
           <div className='relative w-full h-full flex flex-col items-stretch justify-between'>
-            <div className='pt-2 px-6 bg-white'>
+            <div className='py-2 px-6 w-fit '>
               <LocalWarning />
               <BillingWarning />
             </div>
